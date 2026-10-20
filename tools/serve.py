@@ -5,6 +5,8 @@
 /game-files.json lists game/ (relative paths and sizes); /game/ answers Range requests (host/files.c reads them).
 /save/... = save/ of this repo (gitignored): what the game writes. GET reads, PUT writes a whole file, DELETE
 removes one; /save-files.json lists save/. Writes never reach game/.
+POST /log appends the page's log to build/web.log (POST /log?new starts it again; the last one is kept as
+build/web.prev.log), so a Chrome session can be read after it stops.
 Usage: .venv/bin/python tools/serve.py [port]
 """
 import http.server, json, os, sys, urllib.parse
@@ -44,6 +46,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         with open(p + ".tmp", "wb") as f:
             f.write(body)
         os.replace(p + ".tmp", p)
+        self.send_response(204)
+        self.end_headers()
+
+    def do_POST(self):
+        if self.path.split("?", 1)[0] != "/log":
+            self.send_error(403)
+            return
+        body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        log = os.path.join(ROOT, "build", "web.log")
+        if self.path.endswith("?new") and os.path.exists(log):
+            os.replace(log, os.path.join(ROOT, "build", "web.prev.log"))
+        with open(log, "ab") as f:
+            f.write(body)
         self.send_response(204)
         self.end_headers()
 

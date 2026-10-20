@@ -29,7 +29,25 @@
 <script>
 const log = document.getElementById('log'), status = document.getElementById('status');
 const t0 = performance.now();
+// Everything shown here also goes to tools/serve.py (build/web.log), so a session can be read afterwards.
+let pending = [];
+function flush() {
+  if (!pending.length) return;
+  const body = pending.join('\n') + '\n';
+  pending = [];
+  fetch('/log', { method: 'POST', body, keepalive: true }).catch(() => {});
+}
+fetch('/log?new', { method: 'POST', body: `page ${location.href} ${new Date().toISOString()}\n` }).catch(() => {});
+setInterval(flush, 1000);
+const secs = () => ((performance.now() - t0) / 1000).toFixed(2);
+addEventListener('keydown', e => { if (!e.repeat) pending.push(`${secs()} key down ${e.code}`); }, true);
+addEventListener('keyup', e => pending.push(`${secs()} key up ${e.code}`), true);
+addEventListener('error', e => { line('JS error: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'stop'); flush(); });
+addEventListener('unhandledrejection', e => { line('JS rejection: ' + (e.reason && e.reason.stack || e.reason), 'stop'); flush(); });
+addEventListener('pagehide', flush);
 function line(s, cls) {
+  pending.push(`${secs()} ${s}`);
+  if (/^STOP|^JS |abort|Aborted|RuntimeError/.test(s)) setTimeout(flush, 0);
   const d = document.createElement('div');
   if (cls) d.className = cls;
   else if (/^STOP/.test(s)) d.className = 'stop';
@@ -46,6 +64,7 @@ function line(s, cls) {
   const M = await Speed({
     arguments: ['/pc/Speed.exe', '/game'],
     print: s => line(s), printErr: s => line(s, 'dim'),
+    onAbort: what => line('STOP wasm abort: ' + what),
     preRun: [m => {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
