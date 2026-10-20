@@ -1,0 +1,46 @@
+// Plays what the dsound mixer (host/dsound.c) writes into its ring in the shared heap, with an
+// AudioWorklet at 44.1 kHz. The mixer runs on the wall clock; the worklet follows it and resyncs when
+// the two clocks drift apart. The browser starts audio only after a key or a click on the page.
+'use strict';
+const AUDIO_WORKLET = `
+class Ring extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.port.onmessage = e => {
+      const { buffer, hdr } = e.data;
+      this.h = new Uint32Array(buffer, hdr, 4);           // written, taken, ring address, ring frames
+      this.f = new Float32Array(buffer, this.h[2], 2 * this.h[3]);
+      this.n = this.h[3];
+    };
+  }
+  process(inputs, outputs) {
+    const l = outputs[0][0], r = outputs[0][1] || l;
+    if (!this.h) return true;
+    const written = Atomics.load(this.h, 0);
+    let taken = this.h[1];
+    const behind = (written - taken) >>> 0;
+    if (behind > 8192) taken = (written - 1024) >>> 0;     // start, or the page was paused: catch up
+    for (let i = 0; i < l.length; i++) {
+      if (taken === written) { l[i] = r[i] = 0; continue; } // underrun: silence
+      const k = 2 * (taken % this.n);
+      l[i] = this.f[k]; r[i] = this.f[k + 1];
+      taken = (taken + 1) >>> 0;
+    }
+    Atomics.store(this.h, 1, taken);
+    return true;
+  }
+}
+registerProcessor('rn-ring', Ring);`;
+
+async function startAudio(M) {
+  const ctx = new AudioContext({ sampleRate: 44100 });
+  const url = URL.createObjectURL(new Blob([AUDIO_WORKLET], { type: 'text/javascript' }));
+  await ctx.audioWorklet.addModule(url);
+  const node = new AudioWorkletNode(ctx, 'rn-ring', { numberOfInputs: 0, outputChannelCount: [2] });
+  node.port.postMessage({ buffer: M.HEAPU8.buffer, hdr: M._rn_audio_ring() });
+  node.connect(ctx.destination);
+  const resume = () => { if (ctx.state !== 'running') ctx.resume(); };
+  addEventListener('keydown', resume, true);
+  addEventListener('mousedown', resume, true);
+  return ctx;
+}

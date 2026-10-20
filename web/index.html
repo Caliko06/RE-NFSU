@@ -24,6 +24,7 @@
 <pre id="log"></pre>
 <script src="gpu.js"></script>
 <script src="input.js"></script>
+<script src="audio.js"></script>
 <script src="out/speed.js"></script>
 <script>
 const log = document.getElementById('log'), status = document.getElementById('status');
@@ -56,6 +57,7 @@ function line(s, cls) {
   });
   startGpu(M, document.getElementById('screen'), s => line(s, 'api')).catch(e => line('gpu.js: ' + e.message, 'stop'));
   startInput(M, document.getElementById('screen'));
+  startAudio(M).catch(e => line('audio.js: ' + e.message, 'stop'));
   window.RN_M = M;                          // for checks from the console or tools/webcheck.mjs
 })();
 </script>
