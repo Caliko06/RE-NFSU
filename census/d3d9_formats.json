@@ -1,0 +1,2625 @@
+{
+  "_header": "Made by tools/census/d3d9_formats.py; SDK header enum and D3DFORMAT tables; channel masks are arithmetic derivations, not runtime measurements.",
+  "limits": [
+    "All header entries are included, including D3D9Ex and FORCE_DWORD.",
+    "Depth/stencil masks are unknown unless the documentation guarantees a layout.",
+    "FOURCC does not imply block compression. Packed RGB/YUV and MULTI2 are distinguished.",
+    "Buffer formats report element widths instead of pixels. No device support was measured."
+  ],
+  "counts": {
+    "enum_entries": 66,
+    "fourcc": 10,
+    "dxt_block_formats": 5,
+    "unknown_pixel_sizes": 2
+  },
+  "formats": [
+    {
+      "name": "D3DFMT_UNKNOWN",
+      "value": 0,
+      "value_hex": "0x00000000",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": "unknown",
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1375",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#other",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    },
+    {
+      "name": "D3DFMT_R8G8B8",
+      "value": 20,
+      "value_hex": "0x00000014",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 24,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "R",
+          "bits": 8,
+          "lsb": 16,
+          "mask_hex": "0xff0000"
+        },
+        {
+          "channel": "G",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0x00ff00"
+        },
+        {
+          "channel": "B",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x0000ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1377",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A8R8G8B8",
+      "value": 21,
+      "value_hex": "0x00000015",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 8,
+          "lsb": 24,
+          "mask_hex": "0xff000000"
+        },
+        {
+          "channel": "R",
+          "bits": 8,
+          "lsb": 16,
+          "mask_hex": "0x00ff0000"
+        },
+        {
+          "channel": "G",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0x0000ff00"
+        },
+        {
+          "channel": "B",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x000000ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L35",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_X8R8G8B8",
+      "value": 22,
+      "value_hex": "0x00000016",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "X",
+          "bits": 8,
+          "lsb": 24,
+          "mask_hex": "0xff000000"
+        },
+        {
+          "channel": "R",
+          "bits": 8,
+          "lsb": 16,
+          "mask_hex": "0x00ff0000"
+        },
+        {
+          "channel": "G",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0x0000ff00"
+        },
+        {
+          "channel": "B",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x000000ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1379",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_R5G6B5",
+      "value": 23,
+      "value_hex": "0x00000017",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "R",
+          "bits": 5,
+          "lsb": 11,
+          "mask_hex": "0xf800"
+        },
+        {
+          "channel": "G",
+          "bits": 6,
+          "lsb": 5,
+          "mask_hex": "0x07e0"
+        },
+        {
+          "channel": "B",
+          "bits": 5,
+          "lsb": 0,
+          "mask_hex": "0x001f"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1380",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_X1R5G5B5",
+      "value": 24,
+      "value_hex": "0x00000018",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "X",
+          "bits": 1,
+          "lsb": 15,
+          "mask_hex": "0x8000"
+        },
+        {
+          "channel": "R",
+          "bits": 5,
+          "lsb": 10,
+          "mask_hex": "0x7c00"
+        },
+        {
+          "channel": "G",
+          "bits": 5,
+          "lsb": 5,
+          "mask_hex": "0x03e0"
+        },
+        {
+          "channel": "B",
+          "bits": 5,
+          "lsb": 0,
+          "mask_hex": "0x001f"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1381",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A1R5G5B5",
+      "value": 25,
+      "value_hex": "0x00000019",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 1,
+          "lsb": 15,
+          "mask_hex": "0x8000"
+        },
+        {
+          "channel": "R",
+          "bits": 5,
+          "lsb": 10,
+          "mask_hex": "0x7c00"
+        },
+        {
+          "channel": "G",
+          "bits": 5,
+          "lsb": 5,
+          "mask_hex": "0x03e0"
+        },
+        {
+          "channel": "B",
+          "bits": 5,
+          "lsb": 0,
+          "mask_hex": "0x001f"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1382",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A4R4G4B4",
+      "value": 26,
+      "value_hex": "0x0000001a",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 4,
+          "lsb": 12,
+          "mask_hex": "0xf000"
+        },
+        {
+          "channel": "R",
+          "bits": 4,
+          "lsb": 8,
+          "mask_hex": "0x0f00"
+        },
+        {
+          "channel": "G",
+          "bits": 4,
+          "lsb": 4,
+          "mask_hex": "0x00f0"
+        },
+        {
+          "channel": "B",
+          "bits": 4,
+          "lsb": 0,
+          "mask_hex": "0x000f"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1383",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_R3G3B2",
+      "value": 27,
+      "value_hex": "0x0000001b",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "R",
+          "bits": 3,
+          "lsb": 5,
+          "mask_hex": "0xe0"
+        },
+        {
+          "channel": "G",
+          "bits": 3,
+          "lsb": 2,
+          "mask_hex": "0x1c"
+        },
+        {
+          "channel": "B",
+          "bits": 2,
+          "lsb": 0,
+          "mask_hex": "0x03"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1384",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A8",
+      "value": 28,
+      "value_hex": "0x0000001c",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0xff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L35",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A8R3G3B2",
+      "value": 29,
+      "value_hex": "0x0000001d",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0xff00"
+        },
+        {
+          "channel": "R",
+          "bits": 3,
+          "lsb": 5,
+          "mask_hex": "0x00e0"
+        },
+        {
+          "channel": "G",
+          "bits": 3,
+          "lsb": 2,
+          "mask_hex": "0x001c"
+        },
+        {
+          "channel": "B",
+          "bits": 2,
+          "lsb": 0,
+          "mask_hex": "0x0003"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1386",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_X4R4G4B4",
+      "value": 30,
+      "value_hex": "0x0000001e",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "X",
+          "bits": 4,
+          "lsb": 12,
+          "mask_hex": "0xf000"
+        },
+        {
+          "channel": "R",
+          "bits": 4,
+          "lsb": 8,
+          "mask_hex": "0x0f00"
+        },
+        {
+          "channel": "G",
+          "bits": 4,
+          "lsb": 4,
+          "mask_hex": "0x00f0"
+        },
+        {
+          "channel": "B",
+          "bits": 4,
+          "lsb": 0,
+          "mask_hex": "0x000f"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1387",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A2B10G10R10",
+      "value": 31,
+      "value_hex": "0x0000001f",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 2,
+          "lsb": 30,
+          "mask_hex": "0xc0000000"
+        },
+        {
+          "channel": "B",
+          "bits": 10,
+          "lsb": 20,
+          "mask_hex": "0x3ff00000"
+        },
+        {
+          "channel": "G",
+          "bits": 10,
+          "lsb": 10,
+          "mask_hex": "0x000ffc00"
+        },
+        {
+          "channel": "R",
+          "bits": 10,
+          "lsb": 0,
+          "mask_hex": "0x000003ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1388",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A8B8G8R8",
+      "value": 32,
+      "value_hex": "0x00000020",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 8,
+          "lsb": 24,
+          "mask_hex": "0xff000000"
+        },
+        {
+          "channel": "B",
+          "bits": 8,
+          "lsb": 16,
+          "mask_hex": "0x00ff0000"
+        },
+        {
+          "channel": "G",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0x0000ff00"
+        },
+        {
+          "channel": "R",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x000000ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1389",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_X8B8G8R8",
+      "value": 33,
+      "value_hex": "0x00000021",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "X",
+          "bits": 8,
+          "lsb": 24,
+          "mask_hex": "0xff000000"
+        },
+        {
+          "channel": "B",
+          "bits": 8,
+          "lsb": 16,
+          "mask_hex": "0x00ff0000"
+        },
+        {
+          "channel": "G",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0x0000ff00"
+        },
+        {
+          "channel": "R",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x000000ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1390",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_G16R16",
+      "value": 34,
+      "value_hex": "0x00000022",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "G",
+          "bits": 16,
+          "lsb": 16,
+          "mask_hex": "0xffff0000"
+        },
+        {
+          "channel": "R",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0x0000ffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1391",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A2R10G10B10",
+      "value": 35,
+      "value_hex": "0x00000023",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 2,
+          "lsb": 30,
+          "mask_hex": "0xc0000000"
+        },
+        {
+          "channel": "R",
+          "bits": 10,
+          "lsb": 20,
+          "mask_hex": "0x3ff00000"
+        },
+        {
+          "channel": "G",
+          "bits": 10,
+          "lsb": 10,
+          "mask_hex": "0x000ffc00"
+        },
+        {
+          "channel": "B",
+          "bits": 10,
+          "lsb": 0,
+          "mask_hex": "0x000003ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1392",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A16B16G16R16",
+      "value": 36,
+      "value_hex": "0x00000024",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 64,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 16,
+          "lsb": 48,
+          "mask_hex": "0xffff000000000000"
+        },
+        {
+          "channel": "B",
+          "bits": 16,
+          "lsb": 32,
+          "mask_hex": "0x0000ffff00000000"
+        },
+        {
+          "channel": "G",
+          "bits": 16,
+          "lsb": 16,
+          "mask_hex": "0x00000000ffff0000"
+        },
+        {
+          "channel": "R",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0x000000000000ffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1393",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A8P8",
+      "value": 40,
+      "value_hex": "0x00000028",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0xff00"
+        },
+        {
+          "channel": "P",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x00ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1395",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_P8",
+      "value": 41,
+      "value_hex": "0x00000029",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "P",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0xff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1396",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_L8",
+      "value": 50,
+      "value_hex": "0x00000032",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "L",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0xff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1398",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A8L8",
+      "value": 51,
+      "value_hex": "0x00000033",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0xff00"
+        },
+        {
+          "channel": "L",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x00ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1349",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A4L4",
+      "value": 52,
+      "value_hex": "0x00000034",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 4,
+          "lsb": 4,
+          "mask_hex": "0xf0"
+        },
+        {
+          "channel": "L",
+          "bits": 4,
+          "lsb": 0,
+          "mask_hex": "0x0f"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1400",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_V8U8",
+      "value": 60,
+      "value_hex": "0x0000003c",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "V",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0xff00"
+        },
+        {
+          "channel": "U",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x00ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1402",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#signed-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "signed"
+    },
+    {
+      "name": "D3DFMT_L6V5U5",
+      "value": 61,
+      "value_hex": "0x0000003d",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "L",
+          "bits": 6,
+          "lsb": 10,
+          "mask_hex": "0xfc00"
+        },
+        {
+          "channel": "V",
+          "bits": 5,
+          "lsb": 5,
+          "mask_hex": "0x03e0"
+        },
+        {
+          "channel": "U",
+          "bits": 5,
+          "lsb": 0,
+          "mask_hex": "0x001f"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1403",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#mixed-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "mixed"
+    },
+    {
+      "name": "D3DFMT_X8L8V8U8",
+      "value": 62,
+      "value_hex": "0x0000003e",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "X",
+          "bits": 8,
+          "lsb": 24,
+          "mask_hex": "0xff000000"
+        },
+        {
+          "channel": "L",
+          "bits": 8,
+          "lsb": 16,
+          "mask_hex": "0x00ff0000"
+        },
+        {
+          "channel": "V",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0x0000ff00"
+        },
+        {
+          "channel": "U",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x000000ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1404",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#mixed-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "mixed"
+    },
+    {
+      "name": "D3DFMT_Q8W8V8U8",
+      "value": 63,
+      "value_hex": "0x0000003f",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "Q",
+          "bits": 8,
+          "lsb": 24,
+          "mask_hex": "0xff000000"
+        },
+        {
+          "channel": "W",
+          "bits": 8,
+          "lsb": 16,
+          "mask_hex": "0x00ff0000"
+        },
+        {
+          "channel": "V",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0x0000ff00"
+        },
+        {
+          "channel": "U",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x000000ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1405",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#signed-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "signed"
+    },
+    {
+      "name": "D3DFMT_V16U16",
+      "value": 64,
+      "value_hex": "0x00000040",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "V",
+          "bits": 16,
+          "lsb": 16,
+          "mask_hex": "0xffff0000"
+        },
+        {
+          "channel": "U",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0x0000ffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1406",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#signed-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "signed"
+    },
+    {
+      "name": "D3DFMT_A2W10V10U10",
+      "value": 67,
+      "value_hex": "0x00000043",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 2,
+          "lsb": 30,
+          "mask_hex": "0xc0000000"
+        },
+        {
+          "channel": "W",
+          "bits": 10,
+          "lsb": 20,
+          "mask_hex": "0x3ff00000"
+        },
+        {
+          "channel": "V",
+          "bits": 10,
+          "lsb": 10,
+          "mask_hex": "0x000ffc00"
+        },
+        {
+          "channel": "U",
+          "bits": 10,
+          "lsb": 0,
+          "mask_hex": "0x000003ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1407",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#mixed-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "mixed"
+    },
+    {
+      "name": "D3DFMT_UYVY",
+      "value": 1498831189,
+      "value_hex": "0x59565955",
+      "fourcc": [
+        "U",
+        "Y",
+        "V",
+        "Y"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": {
+        "unit_pixels": 2,
+        "bytes_in_memory": [
+          "U0",
+          "Y0",
+          "V0",
+          "Y1"
+        ],
+        "bits_per_component": 8
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1409",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#makefourcc",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks",
+        "packed_yuv": "https://learn.microsoft.com/en-us/windows/win32/medfound/recommended-8-bit-yuv-formats-for-video-rendering#422-formats-16-bits-per-pixel"
+      }
+    },
+    {
+      "name": "D3DFMT_R8G8_B8G8",
+      "value": 1195525970,
+      "value_hex": "0x47424752",
+      "fourcc": [
+        "R",
+        "G",
+        "B",
+        "G"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": {
+        "unit_pixels": 2,
+        "unit_bits": 32,
+        "words_msb_to_lsb": [
+          "R0:8 G0:8",
+          "B0:8 G1:8"
+        ],
+        "shared_channels": [
+          "R",
+          "B"
+        ]
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1410",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#makefourcc",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    },
+    {
+      "name": "D3DFMT_YUY2",
+      "value": 844715353,
+      "value_hex": "0x32595559",
+      "fourcc": [
+        "Y",
+        "U",
+        "Y",
+        "2"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": {
+        "unit_pixels": 2,
+        "bytes_in_memory": [
+          "Y0",
+          "U0",
+          "Y1",
+          "V0"
+        ],
+        "bits_per_component": 8
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1411",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#makefourcc",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks",
+        "packed_yuv": "https://learn.microsoft.com/en-us/windows/win32/medfound/recommended-8-bit-yuv-formats-for-video-rendering#422-formats-16-bits-per-pixel"
+      }
+    },
+    {
+      "name": "D3DFMT_G8R8_G8B8",
+      "value": 1111970375,
+      "value_hex": "0x42475247",
+      "fourcc": [
+        "G",
+        "R",
+        "G",
+        "B"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": {
+        "unit_pixels": 2,
+        "unit_bits": 32,
+        "words_msb_to_lsb": [
+          "G0:8 R0:8",
+          "G1:8 B0:8"
+        ],
+        "shared_channels": [
+          "R",
+          "B"
+        ]
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1412",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#makefourcc",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    },
+    {
+      "name": "D3DFMT_DXT1",
+      "value": 827611204,
+      "value_hex": "0x31545844",
+      "fourcc": [
+        "D",
+        "X",
+        "T",
+        "1"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": true
+      },
+      "bits_per_pixel": 4,
+      "bytes_per_4x4_block": 8,
+      "channel_fields": "unknown",
+      "layout": {
+        "block_texels": [
+          4,
+          4
+        ],
+        "color": "RGB565 endpoints plus 2-bit selectors",
+        "alpha": "opaque or 1-bit",
+        "premultiplied_alpha": false
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1413",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#dxtn-compressed-texture-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks",
+        "block_size": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/compressed-texture-formats",
+        "color_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/opaque-and-1-bit-alpha-textures",
+        "alpha_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/textures-with-alpha-channels"
+      },
+      "bits_per_pixel_scope": "average within a 4x4 block"
+    },
+    {
+      "name": "D3DFMT_DXT2",
+      "value": 844388420,
+      "value_hex": "0x32545844",
+      "fourcc": [
+        "D",
+        "X",
+        "T",
+        "2"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": true
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": 16,
+      "channel_fields": "unknown",
+      "layout": {
+        "block_texels": [
+          4,
+          4
+        ],
+        "color": "RGB565 endpoints plus 2-bit selectors",
+        "alpha": "4-bit explicit",
+        "premultiplied_alpha": true
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1414",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#dxtn-compressed-texture-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks",
+        "block_size": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/compressed-texture-formats",
+        "color_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/opaque-and-1-bit-alpha-textures",
+        "alpha_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/textures-with-alpha-channels"
+      },
+      "bits_per_pixel_scope": "average within a 4x4 block"
+    },
+    {
+      "name": "D3DFMT_DXT3",
+      "value": 861165636,
+      "value_hex": "0x33545844",
+      "fourcc": [
+        "D",
+        "X",
+        "T",
+        "3"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": true
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": 16,
+      "channel_fields": "unknown",
+      "layout": {
+        "block_texels": [
+          4,
+          4
+        ],
+        "color": "RGB565 endpoints plus 2-bit selectors",
+        "alpha": "4-bit explicit",
+        "premultiplied_alpha": false
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1415",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#dxtn-compressed-texture-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks",
+        "block_size": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/compressed-texture-formats",
+        "color_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/opaque-and-1-bit-alpha-textures",
+        "alpha_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/textures-with-alpha-channels"
+      },
+      "bits_per_pixel_scope": "average within a 4x4 block"
+    },
+    {
+      "name": "D3DFMT_DXT4",
+      "value": 877942852,
+      "value_hex": "0x34545844",
+      "fourcc": [
+        "D",
+        "X",
+        "T",
+        "4"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": true
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": 16,
+      "channel_fields": "unknown",
+      "layout": {
+        "block_texels": [
+          4,
+          4
+        ],
+        "color": "RGB565 endpoints plus 2-bit selectors",
+        "alpha": "endpoints plus 3-bit selectors",
+        "premultiplied_alpha": true
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1416",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#dxtn-compressed-texture-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks",
+        "block_size": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/compressed-texture-formats",
+        "color_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/opaque-and-1-bit-alpha-textures",
+        "alpha_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/textures-with-alpha-channels"
+      },
+      "bits_per_pixel_scope": "average within a 4x4 block"
+    },
+    {
+      "name": "D3DFMT_DXT5",
+      "value": 894720068,
+      "value_hex": "0x35545844",
+      "fourcc": [
+        "D",
+        "X",
+        "T",
+        "5"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": true
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": 16,
+      "channel_fields": "unknown",
+      "layout": {
+        "block_texels": [
+          4,
+          4
+        ],
+        "color": "RGB565 endpoints plus 2-bit selectors",
+        "alpha": "endpoints plus 3-bit selectors",
+        "premultiplied_alpha": false
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1417",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#dxtn-compressed-texture-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks",
+        "block_size": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/compressed-texture-formats",
+        "color_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/opaque-and-1-bit-alpha-textures",
+        "alpha_layout": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/textures-with-alpha-channels"
+      },
+      "bits_per_pixel_scope": "average within a 4x4 block"
+    },
+    {
+      "name": "D3DFMT_D16_LOCKABLE",
+      "value": 70,
+      "value_hex": "0x00000046",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "D",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0x0000ffff"
+        }
+      ],
+      "layout": "16-bit unsigned depth integer",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1352",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 16
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_D32",
+      "value": 71,
+      "value_hex": "0x00000047",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1356",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 32
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_D15S1",
+      "value": 73,
+      "value_hex": "0x00000049",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": true,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1421",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 15
+        },
+        {
+          "channel": "S",
+          "bits": 1
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_D24S8",
+      "value": 75,
+      "value_hex": "0x0000004b",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": true,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1422",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 24
+        },
+        {
+          "channel": "S",
+          "bits": 8
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_D24X8",
+      "value": 77,
+      "value_hex": "0x0000004d",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1423",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 24
+        },
+        {
+          "channel": "X",
+          "bits": 8
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_D24X4S4",
+      "value": 79,
+      "value_hex": "0x0000004f",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": true,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1424",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 24
+        },
+        {
+          "channel": "X",
+          "bits": 4
+        },
+        {
+          "channel": "S",
+          "bits": 4
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_D16",
+      "value": 80,
+      "value_hex": "0x00000050",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1352",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 16
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_D32F_LOCKABLE",
+      "value": 82,
+      "value_hex": "0x00000052",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1356",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 32
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed.",
+      "depth_encoding": "32-bit IEEE float"
+    },
+    {
+      "name": "D3DFMT_D24FS8",
+      "value": 83,
+      "value_hex": "0x00000053",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": true,
+        "stencil": true,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1428",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 24
+        },
+        {
+          "channel": "S",
+          "bits": 8
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed.",
+      "depth_encoding": "24-bit float, 20e4"
+    },
+    {
+      "name": "D3DFMT_D32_LOCKABLE",
+      "value": 84,
+      "value_hex": "0x00000054",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": true,
+      "classification": {
+        "depth": true,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1434",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "D",
+          "bits": 32
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_S8_LOCKABLE",
+      "value": 85,
+      "value_hex": "0x00000055",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": true,
+      "classification": {
+        "depth": false,
+        "stencil": true,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 8,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "unknown; no per-pixel bit order guaranteed by this enum",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1435",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "logical_channels": [
+        {
+          "channel": "S",
+          "bits": 8
+        }
+      ],
+      "storage_note": "Nominal bit count; driver may use extra depth bits. Stencil bit count is fixed."
+    },
+    {
+      "name": "D3DFMT_L16",
+      "value": 81,
+      "value_hex": "0x00000051",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "L",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0xffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1441",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_VERTEXDATA",
+      "value": 100,
+      "value_hex": "0x00000064",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": true,
+        "compressed": false
+      },
+      "bits_per_pixel": "not_applicable",
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "vertex buffer; per-vertex layout is not specified by D3DFORMAT",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1443",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    },
+    {
+      "name": "D3DFMT_INDEX16",
+      "value": 101,
+      "value_hex": "0x00000065",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": true,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": "not_applicable",
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": {
+        "element_bits": 16,
+        "encoding": "unsigned index"
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1444",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    },
+    {
+      "name": "D3DFMT_INDEX32",
+      "value": 102,
+      "value_hex": "0x00000066",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": true,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": "not_applicable",
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": {
+        "element_bits": 32,
+        "encoding": "unsigned index"
+      },
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1445",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#buffer-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    },
+    {
+      "name": "D3DFMT_Q16W16V16U16",
+      "value": 110,
+      "value_hex": "0x0000006e",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 64,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "Q",
+          "bits": 16,
+          "lsb": 48,
+          "mask_hex": "0xffff000000000000"
+        },
+        {
+          "channel": "W",
+          "bits": 16,
+          "lsb": 32,
+          "mask_hex": "0x0000ffff00000000"
+        },
+        {
+          "channel": "V",
+          "bits": 16,
+          "lsb": 16,
+          "mask_hex": "0x00000000ffff0000"
+        },
+        {
+          "channel": "U",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0x000000000000ffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1447",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#signed-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "signed"
+    },
+    {
+      "name": "D3DFMT_MULTI2_ARGB8",
+      "value": 827606349,
+      "value_hex": "0x3154454d",
+      "fourcc": [
+        "M",
+        "E",
+        "T",
+        "1"
+      ],
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": "unknown",
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "multiple ARGB8 elements; element count and full layout unknown from this page",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1449",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#makefourcc",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    },
+    {
+      "name": "D3DFMT_R16F",
+      "value": 111,
+      "value_hex": "0x0000006f",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "R",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0xffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1454",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#floating-point-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "s10e5 float per channel"
+    },
+    {
+      "name": "D3DFMT_G16R16F",
+      "value": 112,
+      "value_hex": "0x00000070",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "G",
+          "bits": 16,
+          "lsb": 16,
+          "mask_hex": "0xffff0000"
+        },
+        {
+          "channel": "R",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0x0000ffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1455",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#floating-point-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "s10e5 float per channel"
+    },
+    {
+      "name": "D3DFMT_A16B16G16R16F",
+      "value": 113,
+      "value_hex": "0x00000071",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 64,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 16,
+          "lsb": 48,
+          "mask_hex": "0xffff000000000000"
+        },
+        {
+          "channel": "B",
+          "bits": 16,
+          "lsb": 32,
+          "mask_hex": "0x0000ffff00000000"
+        },
+        {
+          "channel": "G",
+          "bits": 16,
+          "lsb": 16,
+          "mask_hex": "0x00000000ffff0000"
+        },
+        {
+          "channel": "R",
+          "bits": 16,
+          "lsb": 0,
+          "mask_hex": "0x000000000000ffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1456",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#floating-point-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "s10e5 float per channel"
+    },
+    {
+      "name": "D3DFMT_R32F",
+      "value": 114,
+      "value_hex": "0x00000072",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "R",
+          "bits": 32,
+          "lsb": 0,
+          "mask_hex": "0xffffffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1459",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#ieee-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "s23e8 float per channel"
+    },
+    {
+      "name": "D3DFMT_G32R32F",
+      "value": 115,
+      "value_hex": "0x00000073",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 64,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "G",
+          "bits": 32,
+          "lsb": 32,
+          "mask_hex": "0xffffffff00000000"
+        },
+        {
+          "channel": "R",
+          "bits": 32,
+          "lsb": 0,
+          "mask_hex": "0x00000000ffffffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1460",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#ieee-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "s23e8 float per channel"
+    },
+    {
+      "name": "D3DFMT_A32B32G32R32F",
+      "value": 116,
+      "value_hex": "0x00000074",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 128,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 32,
+          "lsb": 96,
+          "mask_hex": "0xffffffff000000000000000000000000"
+        },
+        {
+          "channel": "B",
+          "bits": 32,
+          "lsb": 64,
+          "mask_hex": "0x00000000ffffffff0000000000000000"
+        },
+        {
+          "channel": "G",
+          "bits": 32,
+          "lsb": 32,
+          "mask_hex": "0x0000000000000000ffffffff00000000"
+        },
+        {
+          "channel": "R",
+          "bits": 32,
+          "lsb": 0,
+          "mask_hex": "0x000000000000000000000000ffffffff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1461",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#ieee-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "s23e8 float per channel"
+    },
+    {
+      "name": "D3DFMT_CxV8U8",
+      "value": 117,
+      "value_hex": "0x00000075",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": true
+      },
+      "bits_per_pixel": 16,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "V",
+          "bits": 8,
+          "lsb": 8,
+          "mask_hex": "0xff00"
+        },
+        {
+          "channel": "U",
+          "bits": 8,
+          "lsb": 0,
+          "mask_hex": "0x00ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1463",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#signed-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "computed_channel": "C = sqrt(1 - U*U - V*V); C is not stored",
+      "encoding": "signed"
+    },
+    {
+      "name": "D3DFMT_A1",
+      "value": 118,
+      "value_hex": "0x00000076",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": true,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 1,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 1,
+          "lsb": 0,
+          "mask_hex": "0x1"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1382",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "unsigned"
+    },
+    {
+      "name": "D3DFMT_A2B10G10R10_XR_BIAS",
+      "value": 119,
+      "value_hex": "0x00000077",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": true,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": 32,
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": [
+        {
+          "channel": "A",
+          "bits": 2,
+          "lsb": 30,
+          "mask_hex": "0xc0000000"
+        },
+        {
+          "channel": "B",
+          "bits": 10,
+          "lsb": 20,
+          "mask_hex": "0x3ff00000"
+        },
+        {
+          "channel": "G",
+          "bits": 10,
+          "lsb": 10,
+          "mask_hex": "0x000ffc00"
+        },
+        {
+          "channel": "R",
+          "bits": 10,
+          "lsb": 0,
+          "mask_hex": "0x000003ff"
+        }
+      ],
+      "layout": "MSB-to-LSB channel fields; little-endian memory bytes",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1472",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      },
+      "field_derivation": "INFERENCE: widths from documented format notation; offsets and masks are arithmetic using the SDK channel-order rule.",
+      "encoding": "2.8-biased fixed point color"
+    },
+    {
+      "name": "D3DFMT_BINARYBUFFER",
+      "value": 199,
+      "value_hex": "0x000000c7",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": true,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": "not_applicable",
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "untyped binary buffer",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1476",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#unsigned-formats",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    },
+    {
+      "name": "D3DFMT_FORCE_DWORD",
+      "value": 2147483647,
+      "value_hex": "0x7fffffff",
+      "fourcc": "not_applicable",
+      "d3d9ex_only": false,
+      "classification": {
+        "depth": false,
+        "stencil": false,
+        "index": false,
+        "vertex_data": false,
+        "compressed": false
+      },
+      "bits_per_pixel": "not_applicable",
+      "bytes_per_4x4_block": "not_applicable",
+      "channel_fields": "unknown",
+      "layout": "enum sentinel, not a surface format",
+      "sources": {
+        "id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1482",
+        "format": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#syntax",
+        "channel_order": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat#remarks"
+      }
+    }
+  ],
+  "source_documents": [
+    {
+      "url": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h",
+      "sha256_text_utf8": "5ba31e75a3ea03c1a71b48f39d966b6f67967b22bb9e4abcc419a3118269cd6a"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat",
+      "sha256_text_utf8": "f1a29e9a9fed1a01aa5ef0072f2d1a82a78446ff462b56bff5937a3de306a05e"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/compressed-texture-formats",
+      "sha256_text_utf8": "0e7a4e56757f30bd810c879a2ccf4b1499e0af96c19f6c477da5f603acc8ef50"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/opaque-and-1-bit-alpha-textures",
+      "sha256_text_utf8": "ccf7abcdb33d08ef1451c8e9aae8b3420f25ade8fbc30c11c2a7c476fd8809c0"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/textures-with-alpha-channels",
+      "sha256_text_utf8": "2fc69486b966efd1159c8588f039eab7d08d284a800ca4a0692a178be1ed13cd"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/medfound/recommended-8-bit-yuv-formats-for-video-rendering",
+      "sha256_text_utf8": "665933e508ffa1952dfb1143b32b378f72f75c52ffd6ad621af3ade6840f0ca1"
+    }
+  ]
+}
