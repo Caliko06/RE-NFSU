@@ -76,7 +76,7 @@ def lift_all():
 
 
 HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c",
-        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c"]
+        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c"]
 
 
 def compile_native():
@@ -111,8 +111,8 @@ def compile_web():
     subprocess.run(["emcc", "-O1", "-pthread", "-Ihost", f"-I{GEN}", *HOST, *objs, "-o", "web/out/speed.js",
                     "-sINITIAL_MEMORY=1280MB", "-sSTACK_SIZE=16MB", "-sDEFAULT_PTHREAD_STACK_SIZE=16MB",
                     "-sPROXY_TO_PTHREAD=1", "-sPTHREAD_POOL_SIZE=8", "-sEXIT_RUNTIME=1",
-                    "-sMODULARIZE=1", "-sEXPORT_NAME=Speed", "-sEXPORTED_RUNTIME_METHODS=FS,HEAPU8,HEAP32,HEAPU32",
-                    "-sEXPORTED_FUNCTIONS=_main,_rn_gpu_mailbox",
+                    "-sMODULARIZE=1", "-sEXPORT_NAME=Speed", "-sEXPORTED_RUNTIME_METHODS=FS,ENV,HEAPU8,HEAP32,HEAPU32",
+                    "-sEXPORTED_FUNCTIONS=_main,_rn_gpu_mailbox,_rn_input_ring,_rn_audio_ring",
                     "-sFORCE_FILESYSTEM=1", "-sENVIRONMENT=web,worker"], check=True)
     print("built web/out/speed.js + speed.wasm")
 

@@ -1,6 +1,7 @@
 // One headless Chrome run of the page on 5180: prints the page log when it stops (or after the timeout)
 // and saves a screenshot of the page.
-// Usage: node tools/webcheck.mjs [url] [seconds] [screenshot.png]
+// Usage: node tools/webcheck.mjs [url] [seconds] [screenshot.png] [keys]
+// keys: "20:Enter,23:ArrowDown" = at that second, a tap of that KeyboardEvent.code on the canvas.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -9,6 +10,7 @@ import { join } from 'node:path';
 const url = process.argv[2] || 'http://127.0.0.1:5180/';
 const secs = Number(process.argv[3] || 120);
 const shot = process.argv[4] || 'build/webcheck.png';
+const keys = (process.argv[5] || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, code]) => ({ t: +t, code }));
 const port = 9333;
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
   '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'rn-'))}`,
@@ -32,6 +34,13 @@ const t0 = Date.now();
 let text = '';
 while (Date.now() - t0 < secs * 1000) {
   await sleep(1000);
+  for (const k of keys.filter(k => !k.done && Date.now() - t0 >= k.t * 1000)) {
+    k.done = true;
+    await send('Runtime.evaluate', { expression: "document.getElementById('screen').focus()" });
+    await send('Input.dispatchKeyEvent', { type: 'keyDown', code: k.code, key: k.code });
+    await sleep(100);
+    await send('Input.dispatchKeyEvent', { type: 'keyUp', code: k.code, key: k.code });
+  }
   const r = await send('Runtime.evaluate', { expression: "document.getElementById('status')?.textContent + '\\n' + document.getElementById('log')?.innerText" });
   text = r?.result?.value || '';
   if (/STOP|Falta COOP/.test(text)) break;

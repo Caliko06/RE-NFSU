@@ -27,7 +27,8 @@ static struct timespec t0;
 uint64_t now_us(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (uint64_t)(ts.tv_sec - t0.tv_sec) * 1000000ull + (uint64_t)(ts.tv_nsec - t0.tv_nsec) / 1000;
+    int64_t ns = (int64_t)(ts.tv_sec - t0.tv_sec) * 1000000000 + (ts.tv_nsec - t0.tv_nsec);   // signed: nsec may be below t0's
+    return (uint64_t)ns / 1000;
 }
 
 // ---- guest heap: boundary tags, size-class free lists, coalescing ----------------------------
@@ -605,6 +606,19 @@ static uint32_t GetFullPathNameA_(Ctx *c) {
     if (part) { char *s = strrchr(G(buf), '\\'); st(c, part, s ? buf + (uint32_t)(s - G(buf)) + 1 : buf, 4); }
     return len;
 }
+// Every name on this PC is already long; the path must exist. Same buffer in and out is allowed.
+static uint32_t GetLongPathNameA_(Ctx *c) {
+    uint32_t src = ARG(0), dst = ARG(1), n = ARG(2);
+    char p[600];
+    snprintf(p, sizeof p, "%s", G(src));
+    int r = gf_stat(p);
+    if (r == -2) { rn_halt(c, "GetLongPathNameA outside the game folder: %s", p); return 0; }
+    if (r < 0) { set_error(c, ERROR_FILE_NOT_FOUND); return 0; }
+    uint32_t len = (uint32_t)strlen(p);
+    if (n <= len) return len + 1;
+    memcpy(G(dst), p, len + 1);
+    return len;
+}
 
 // Toolhelp: the process list holds this process only.
 static uint32_t CreateToolhelp32Snapshot_(Ctx *c) {
@@ -642,10 +656,92 @@ static uint32_t timeEndPeriod_(Ctx *c) { (void)c; return 0; }
 static uint32_t timeGetDevCaps_(Ctx *c) { st(c, ARG(0), 1, 4); st(c, ARG(0) + 4, 1000000, 4); return 0; }
 
 // =================================== advapi32 ==================================================
-// There is no registry: every key is absent, as on a machine where the game was never installed.
-static uint32_t RegOpenKeyExA_(Ctx *c) { rn_log("RegOpenKeyExA(%08x, %s) -> not found", ARG(0), ARG(1) ? G(ARG(1)) : ""); return ERROR_FILE_NOT_FOUND; }
-static uint32_t RegOpenKeyA_(Ctx *c) { rn_log("RegOpenKeyA(%08x, %s) -> not found", ARG(0), ARG(1) ? G(ARG(1)) : ""); return ERROR_FILE_NOT_FOUND; }
-static uint32_t RegCloseKey_(Ctx *c) { (void)c; return 0; }
+// The registry of this PC: Windows XP with DirectX 9, the game installed at C:\NFSU from the disc in D:.
+// Game values are the ones the installer on the disc (AutoRun.exe 0x40e9bb-0x40ec99, 0x40fbe5, 0x40fd85)
+// writes for a full install, from AutoRun\autorun.cfg: Install Dir = GetShortPathName(dir) + "\",
+// CD Drive = the source drive + "\", Language = the language name (NumLanguages=1: "English UK"),
+// CacheSize/SwapSize = "%I64d" of bytes / 1024 (CacheFull=1296003, SwapSize=0). It never writes
+// StreamingInstall. Speed.exe (SKU 0, 0x401190) opens "Need For Speed Underground", not the
+// "NFS Underground" of autorun.cfg, so the values sit under the key Speed.exe opens.
+// ~MHz is the CPU we present: rn_rdtsc counts at 1 GHz.
+#define ERROR_MORE_DATA 234
+#define HKLM 0x80000002u
+typedef struct { const char *key, *name; uint32_t type; const char *sz; uint32_t dw; } RegValue;
+static const RegValue registry[] = {
+    {"Software\\EA Games\\Need For Speed Underground", "Install Dir", 1, "C:\\NFSU\\", 0},
+    {"Software\\EA Games\\Need For Speed Underground", "CD Drive", 1, "D:\\", 0},
+    {"Software\\EA Games\\Need For Speed Underground", "Language", 1, "English UK", 0},
+    {"Software\\EA Games\\Need For Speed Underground", "CacheSize", 1, "1296003", 0},
+    {"Software\\EA Games\\Need For Speed Underground", "SwapSize", 1, "0", 0},
+    {"Software\\Microsoft\\Direct3D", NULL, 0, NULL, 0},
+    {"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "~MHz", 4, NULL, 1000},
+};
+#define NREG (int)(sizeof registry / sizeof registry[0])
+
+// HKLM\<path> exists when it is a listed key or a parent of one. Names match without case.
+static int key_exists(const char *path) {
+    size_t n = strlen(path);
+    if (!n) return 1;
+    for (int k = 0; k < NREG; k++) {
+        const char *key = registry[k].key;
+        if (!strncasecmp(key, path, n) && (!key[n] || key[n] == '\\')) return 1;
+    }
+    return 0;
+}
+static uint32_t open_key(Ctx *c, uint32_t parent, uint32_t sub, uint32_t out) {
+    char path[512] = "";
+    const char *name = sub ? G(sub) : "";
+    if (parent != HKLM) {
+        Handle *h = get_handle(parent);
+        if (!h || h->kind != H_KEY) {
+            if (parent < 0x80000000u || parent > 0x80000006u) return ERROR_INVALID_HANDLE;
+            if (rn_trace()) rn_log("registry: open %08x\\%s -> not found", parent, name);
+            return ERROR_FILE_NOT_FOUND;        // other hives hold nothing the game asks for
+        }
+        snprintf(path, sizeof path, "%s", h->path);
+    }
+    if (*name == '\\') name++;
+    if (*name) snprintf(path + strlen(path), sizeof path - strlen(path), "%s%s", *path ? "\\" : "", name);
+    if (!key_exists(path)) {
+        if (rn_trace()) rn_log("registry: open HKLM\\%s -> not found", path);
+        return ERROR_FILE_NOT_FOUND;
+    }
+    uint32_t h = new_handle(H_KEY);
+    if (!h) { rn_halt(c, "out of handles"); return ERROR_NOT_ENOUGH_MEMORY; }
+    snprintf(get_handle(h)->path, sizeof get_handle(h)->path, "%s", path);
+    st(c, out, h, 4);
+    return 0;
+}
+static uint32_t RegOpenKeyExA_(Ctx *c) { return open_key(c, ARG(0), ARG(1), ARG(4)); }
+static uint32_t RegOpenKeyA_(Ctx *c) { return open_key(c, ARG(0), ARG(1), ARG(2)); }
+static uint32_t RegQueryValueExA_(Ctx *c) {
+    Handle *h = get_handle(ARG(0));
+    uint32_t vname = ARG(1), ptype = ARG(3), data = ARG(4), psize = ARG(5);
+    if (!h || h->kind != H_KEY) return ERROR_INVALID_HANDLE;
+    const char *name = vname ? G(vname) : "";
+    const RegValue *v = NULL;
+    for (int k = 0; k < NREG && !v; k++)
+        if (registry[k].name && !strcasecmp(registry[k].key, h->path) && !strcasecmp(registry[k].name, name)) v = &registry[k];
+    if (rn_trace()) rn_log("registry: HKLM\\%s \"%s\" -> %s", h->path, name, v ? (v->sz ? v->sz : "dword") : "not found");
+    if (!v) return ERROR_FILE_NOT_FOUND;
+    uint32_t len = v->type == 4 ? 4 : (uint32_t)strlen(v->sz) + 1;
+    if (ptype) st(c, ptype, v->type, 4);
+    if (!psize) return data ? 87 : 0;           // ERROR_INVALID_PARAMETER: data without a size
+    uint32_t room = ld(c, psize, 4);
+    st(c, psize, len, 4);
+    if (!data) return 0;
+    if (room < len) return ERROR_MORE_DATA;
+    if (v->type == 4) st(c, data, v->dw, 4);
+    else memcpy(G(data), v->sz, len);
+    return 0;
+}
+static uint32_t RegCloseKey_(Ctx *c) {
+    Handle *h = get_handle(ARG(0));
+    if (ARG(0) >= 0x80000000u) return 0;
+    if (!h || h->kind != H_KEY) return ERROR_INVALID_HANDLE;
+    h->kind = H_FREE;
+    return 0;
+}
 
 static uint32_t entry_returned(Ctx *c) { rn_halt(c, "entry point returned eax=%08x", c->r[EAX]); return 0; }
 
@@ -671,14 +767,14 @@ const Api win32_apis[] = {
     K(GetSystemInfo, 1), K(IsProcessorFeaturePresent, 1), K(GetTickCount, 0), K(QueryPerformanceCounter, 1), K(QueryPerformanceFrequency, 1),
     K(GetSystemTimeAsFileTime, 1), K(GetTimeZoneInformation, 1), K(ExitProcess, 1), K(OutputDebugStringA, 1),
     K(GetModuleHandleA, 1), K(LoadLibraryA, 1), K(GetProcAddress, 2),
-    K(CreateFileA, 7), K(ReadFile, 5), K(SetFilePointer, 4), K(GetFileSize, 2), K(CloseHandle, 1), K(GetFullPathNameA, 4),
+    K(CreateFileA, 7), K(ReadFile, 5), K(SetFilePointer, 4), K(GetFileSize, 2), K(CloseHandle, 1), K(GetFullPathNameA, 4), K(GetLongPathNameA, 3),
     K(GetProcessAffinityMask, 3), K(SetProcessAffinityMask, 2), K(GetPriorityClass, 1), K(SetPriorityClass, 2),
     K(GetThreadPriority, 1), K(SetThreadPriority, 2),
     K(CreateToolhelp32Snapshot, 2), K(Process32First, 2), K(Process32Next, 2),
     {"winmm.dll", "timeGetTime", 0, timeGetTime_}, {"winmm.dll", "timeBeginPeriod", 1, timeBeginPeriod_},
     {"winmm.dll", "timeEndPeriod", 1, timeEndPeriod_}, {"winmm.dll", "timeGetDevCaps", 2, timeGetDevCaps_},
     {"advapi32.dll", "RegOpenKeyExA", 5, RegOpenKeyExA_}, {"advapi32.dll", "RegOpenKeyA", 3, RegOpenKeyA_},
-    {"advapi32.dll", "RegCloseKey", 1, RegCloseKey_},
+    {"advapi32.dll", "RegQueryValueExA", 6, RegQueryValueExA_}, {"advapi32.dll", "RegCloseKey", 1, RegCloseKey_},
 };
 const int win32_api_count = sizeof win32_apis / sizeof win32_apis[0];
 

@@ -24,7 +24,7 @@ extern Ctx *g_ctx;
 extern const Api win32_apis[], user32_apis[], thread_apis[], net_apis[], d3d9_apis[], dinput8_apis[], dsound_apis[];
 extern const int win32_api_count, user32_api_count, thread_api_count, net_api_count, d3d9_api_count, dinput8_api_count, dsound_api_count;
 
-enum { H_FREE, H_FILE, H_EVENT, H_MUTEX, H_FIND, H_HEAP, H_THREAD, H_SNAPSHOT };
+enum { H_FREE, H_FILE, H_EVENT, H_MUTEX, H_FIND, H_HEAP, H_THREAD, H_SNAPSHOT, H_KEY };
 struct Thread;
 typedef struct {
     int kind;
@@ -60,8 +60,20 @@ void gil_slice(void);                                          // preempt at an 
 void threads_init(Ctx *main_ctx);
 void rn_stop(Ctx *c);                                          // report the halt and end the process
 void files_set_root(const char *dir);
+int gf_stat(const char *gpath);                                // 0 file, 1 directory, -1 missing, -2 outside
 int gf_open(const char *gpath);                                // id, or -1 missing, -2 outside, -3 directory
 uint64_t gf_size(int id);
 int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n);
 void gf_close(int id);
 void set_error(Ctx *c, uint32_t e);
+// Keyboard and mouse (host/input.c): input_poll hands new events to dinput8_* and user32_key.
+void input_poll(void);
+uint32_t input_vk_state(uint32_t vk);                          // GetAsyncKeyState/GetKeyState bits
+int input_key_down(uint8_t dik);
+int input_shift(void);
+int input_alt(void);
+char input_char_of(uint8_t vk, int shift);
+void dinput8_key(uint8_t dik, int down);
+void dinput8_button(int b, int down);
+void dinput8_motion(int32_t dx, int32_t dy, int32_t dz);
+void user32_key(uint8_t dik, uint8_t vk, int down);

@@ -56,6 +56,18 @@ static int ring[RING];
 static uint32_t ring_ret[RING];
 static unsigned ring_n;
 
+// RN_API=Draw,Present: the trace shows only API names that contain one of these words.
+static int traced(const char *name) {
+    static const char *f;
+    if (!f) f = getenv("RN_API") ? getenv("RN_API") : "";
+    if (!*f) return 1;
+    for (const char *p = f; *p;) {
+        size_t n = strcspn(p, ",");
+        for (const char *q = name; *q; q++) if (!strncmp(q, p, n)) return 1;
+        p += n + (p[n] == ',');
+    }
+    return 0;
+}
 static void call_host(Ctx *c, uint32_t target) {
     uint32_t k = (target - HOST_BASE) / 16;
     if (k >= (uint32_t)nhosts || (target & 15)) { rn_halt(c, "jump into host space %08x", target); return; }
@@ -64,7 +76,7 @@ static void call_host(Ctx *c, uint32_t target) {
     ring[ring_n % RING] = (int)k; ring_ret[ring_n % RING] = ra; ring_n++;
     h->calls++;
     if (!h->fn) { c->halt_at = ra; rn_halt(c, "missing API %s!%s", h->dll, h->name); return; }
-    if (rn_trace()) rn_log("api %s (ret %08x)", h->name, ra);
+    if (rn_trace() && traced(h->name)) rn_log("api %s (ret %08x)", h->name, ra);
     gil_slice();
     uint32_t v = h->fn(c);
     if (c->halt) { if (!c->halt_at) c->halt_at = ra; return; }

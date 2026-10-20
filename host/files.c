@@ -14,12 +14,14 @@ static char root[1024];
 void files_set_root(const char *dir) { snprintf(root, sizeof root, "%s", dir); }
 
 // C:\NFSU\a\b or a\b or .\a\b -> "a/b". -1: outside the game folder.
+// D:\ is the CD-ROM drive with the game disc in it; the OWNER's folder holds the disc files too.
 static int game_rel(const char *gpath, char *rel, size_t n) {
     char p[512];
     snprintf(p, sizeof p, "%s", gpath);
     for (char *q = p; *q; q++) if (*q == '\\') *q = '/';
     const char *r = p;
     if (!strncasecmp(p, "C:/NFSU", 7) && (p[7] == '/' || !p[7])) r = p + 7 + (p[7] == '/');
+    else if ((p[0] == 'D' || p[0] == 'd') && p[1] == ':' && (p[2] == '/' || !p[2])) r = p + 2 + (p[2] == '/');
     else if (p[0] && p[1] == ':') return -1;
     while (r[0] == '.' && r[1] == '/') r += 2;
     char *o = rel;
@@ -103,6 +105,13 @@ static int lookup(const char *gpath, char *real, size_t n, uint64_t *size) {
     *size = (uint64_t)sb.st_size;
     return 0;
 #endif
+}
+
+// 0 = a file, 1 = a directory, -1 = missing, -2 = outside the game folder.
+int gf_stat(const char *gpath) {
+    char real[512];
+    uint64_t size;
+    return lookup(gpath, real, sizeof real, &size);
 }
 
 // Opens a game file: id >= 0, or -1 missing, -2 outside the folder, -3 a directory.
