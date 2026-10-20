@@ -2,9 +2,10 @@
 Read AGENTS.md, HANDOFF.md, docs/PLAN.md. You own main, the recompiler (tools/recomp), the gate and the plan.
 
 ## Every session
+0. Before any lane starts a new scope: data check (strict rule 2). Ask the OWNER once, yourself.
 1. Reconcile: for each lane branch with new commits (w-d3d9, w-win32, w-census): read its diff and its HANDOFF
    lines, merge with `--no-commit`, resolve overlaps (two lanes may add the same API: keep one, documented version),
-   build native + web, run the gate if tools/recomp or host/rt.h changed, one native --shot and one Chrome run.
+   delete every STANDIN(<lane>) the owner lane replaced, build native + web, run the gate if tools/recomp or host/rt.h changed, one native --shot and one Chrome run.
    Commit only if the run matches what the lane reported. Then the lane merges main back (say so in its brief).
 2. Work your own blocks back to back (PLAN.md): lifter bugs found by lanes, performance for M6, the PATCH table,
    widescreen M8. Update PLAN.md (done / next) and HANDOFF.md (replace, max 30 lines).

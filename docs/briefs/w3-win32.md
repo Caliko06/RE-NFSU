@@ -21,5 +21,6 @@ Read AGENTS.md, HANDOFF.md, docs/PLAN.md (M4 helper, M5 lead, M7). W1 merges you
 - Outside your scope only what blocks you, minimal, listed for W1. Only tests that fail when it matters.
 
 ## Done
-One commit per block on w-win32. HANDOFF lines for W1: what works, numbers, next stop, outside-scope changes.
+One commit per block on w-win32. Report = commit body (AGENTS.md strict rule 7): what works, numbers, next stop,
+outside-scope changes.
 Gate M5: in Chrome the menus react to the keyboard and menu music plays.

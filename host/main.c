@@ -1,7 +1,10 @@
 // Loads pc/Speed.exe into guest memory the way the Windows loader does, then runs its entry point.
 // Usage: speed <Speed.exe> <game dir> [--shot frame.png]
+// Native runs end after RN_SECS seconds (default 60, 0 = no limit), so no run is ever unbounded.
 #include "host.h"
 #include "gpu.h"
+#include <pthread.h>
+#include <unistd.h>
 
 Ctx *g_ctx;
 void dispatch_report(void);
@@ -37,6 +40,16 @@ static void backtrace(Ctx *c) {
     rn_log("stack:%s", line);
 }
 
+#ifndef __EMSCRIPTEN__
+static void *watchdog(void *arg) {
+    unsigned secs = (unsigned)(uintptr_t)arg;
+    sleep(secs);
+    dispatch_report();
+    rn_log("RN_SECS: stopped after %u s (no stop reached)", secs);
+    _exit(0);
+}
+#endif
+
 static uint32_t rd32(const uint8_t *p) { uint32_t v; memcpy(&v, p, 4); return v; }
 static uint16_t rd16(const uint8_t *p) { uint16_t v; memcpy(&v, p, 2); return v; }
 
@@ -47,6 +60,12 @@ int main(int argc, char **argv) {
     if (!pe) { fprintf(stderr, "cannot read %s\n", argv[1]); return 2; }
     win32_set_root(argv[2]);
     if (argc > 4 && !strcmp(argv[3], "--shot")) gpu_set_shot(argv[4]);
+#ifndef __EMSCRIPTEN__
+    const char *lim = getenv("RN_SECS");
+    unsigned secs = lim ? (unsigned)atoi(lim) : 60;
+    pthread_t wd;
+    if (secs) { pthread_create(&wd, NULL, watchdog, (void *)(uintptr_t)secs); pthread_detach(wd); }
+#endif
 
     static Ctx ctx;
     Ctx *c = g_ctx = &ctx;
