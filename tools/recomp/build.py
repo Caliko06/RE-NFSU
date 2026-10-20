@@ -118,12 +118,12 @@ def compile_web():
 
 
 def run_jobs(jobs):
-    running = []
+    running, bad = [], 0
     for j in jobs:
         while len(running) >= os.cpu_count():
-            running.pop(0).wait()
+            bad += running.pop(0).wait() != 0
         running.append(subprocess.Popen(j))
-    bad = [p for p in running if p.wait() != 0]
+    bad += sum(p.wait() != 0 for p in running)
     if bad:
         sys.exit("compile failed")
     if jobs:

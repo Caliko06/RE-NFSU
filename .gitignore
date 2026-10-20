@@ -1,8 +1,8 @@
-game/
+/game
 pc/*.exe
-ref/
+/ref
 build/
-.venv/
+/.venv
 __pycache__/
 *.pyc
 .DS_Store
