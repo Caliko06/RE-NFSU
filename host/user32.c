@@ -204,6 +204,21 @@ static uint32_t GetWindowLongA_(Ctx *c) {
     rn_halt(c, "GetWindowLongA index %d", idx);
     return 0;
 }
+// Painting with nothing drawn by GDI: the paint DC is a handle only, the whole client area is
+// the update region. (W3 stand-in so the game gets past WM_PAINT; W2 owns painting.)
+static uint32_t BeginPaint_(Ctx *c) {
+    uint32_t h = ARG(0), ps = ARG(1);
+    Window *w = win(h);
+    if (!w) return 0;
+    int b, cap;
+    frame(w->style, w->exstyle, &b, &cap);
+    memset(G(ps), 0, 64);
+    st(c, ps, 0x40010000u + (h & 0xffff), 4);              // hdc
+    st(c, ps + 16, w->w - 2 * b, 4);                       // rcPaint = client rect
+    st(c, ps + 20, w->h - 2 * b - cap, 4);
+    return 0x40010000u + (h & 0xffff);
+}
+static uint32_t EndPaint_(Ctx *c) { (void)c; return 1; }
 static uint32_t IsIconic_(Ctx *c) { (void)c; return 0; }
 static uint32_t ClientToScreen_(Ctx *c) { (void)c; return 1; }
 static uint32_t DestroyWindow_(Ctx *c) { Window *w = win(ARG(0)); if (w) w->visible = 0; return w != NULL; }
@@ -314,7 +329,7 @@ const Api user32_apis[] = {
     U(CreateWindowExA, 12), U(ShowWindow, 2), U(UpdateWindow, 1), U(SetFocus, 1), U(SetForegroundWindow, 1),
     U(SetActiveWindow, 1), U(GetForegroundWindow, 0), U(GetDesktopWindow, 0), U(GetClientRect, 2),
     U(GetWindowRect, 2), U(SetWindowPos, 7), U(SetRect, 5), U(SetWindowLongA, 3), U(GetWindowLongA, 2),
-    U(IsIconic, 1), U(ClientToScreen, 2), U(DestroyWindow, 1), U(DefWindowProcA, 4), U(PeekMessageA, 5),
+    U(BeginPaint, 2), U(EndPaint, 2), U(IsIconic, 1), U(ClientToScreen, 2), U(DestroyWindow, 1), U(DefWindowProcA, 4), U(PeekMessageA, 5),
     U(GetMessageA, 4), U(PostMessageA, 4), U(PostQuitMessage, 1), U(TranslateMessage, 1), U(DispatchMessageA, 1),
     U(GetSystemMetrics, 1), U(CharUpperA, 1), U(GetAsyncKeyState, 1), U(GetKeyState, 1),
     U(wvsprintfA, 3), {"user32.dll", "wsprintfA", -1, wsprintfA_},
