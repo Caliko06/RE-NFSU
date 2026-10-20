@@ -11,9 +11,10 @@ that proves it. Lanes: W1 orchestrator, W2 D3D9, W3 Win32/input/audio, C1 Codex 
 - ABK code modules (W1, 2026-10-20): the x86 patch code in game/Sound/*.abk is lifted ahead of time
   (tools/recomp/abk.py: 106 files, 79 modules, 23 distinct codes, 28 functions); rn_call finds the live copy
   (host/abk.c); the difftest runs them relocated at another base. Enter at the title no longer stops.
-  Stop now: native and Chrome stay on the title after Enter (no stop, 92 draws). Next W1 block: find what
-  the title waits for after Enter (measure: messages/state the front end reads; layer vs Wine).
-  Lanes W2/W3 wait for it (strict rule 2).
+- Title -> USER PROFILE (W1, 2026-10-20): Enter reaches the FE (dinput action "Menu Select" -> FEPad_Accept ->
+  LS_Splash_PC -> MU_UG_NEwOrLoad_PC2 + GarageMain). Layer: SHGetFolderPathA (CSIDL_COMMON_APPDATA) and the
+  save folder (...\NFS Underground = save/, read only). Chrome shows USER PROFILE over the 3D garage.
+  Next: create a profile (typing a name, file writes to save/ -> M7 write path).
 
 ## M4 Front end on screen (W2 leads, W3 helps)
 - W2: BeginPaint/EndPaint/ValidateRect; vs_1_1 + ps_1_x bytecode -> WGSL; vertex declarations and FVF; DXT1/3/5 and

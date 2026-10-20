@@ -743,6 +743,15 @@ static uint32_t RegCloseKey_(Ctx *c) {
     return 0;
 }
 
+// SHGetFolderPathA(hwnd, csidl, hToken, dwFlags, pszPath): the folders Windows XP gives a default install.
+// Only the CSIDL the game asks for is answered; any other one stops loudly.
+static uint32_t SHGetFolderPathA_(Ctx *c) {
+    uint32_t csidl = ARG(1) & 0xff, out = ARG(4);     // high bits: CSIDL_FLAG_CREATE and friends
+    if (csidl != 0x23) { rn_halt(c, "SHGetFolderPathA(CSIDL %#x)", csidl); return 0x80004005u; }
+    put_str(c, out, "C:\\Documents and Settings\\All Users\\Application Data");   // CSIDL_COMMON_APPDATA
+    return 0;                                           // S_OK
+}
+
 static uint32_t entry_returned(Ctx *c) { rn_halt(c, "entry point returned eax=%08x", c->r[EAX]); return 0; }
 
 #define K(name, n) {"kernel32.dll", #name, n, name##_}
@@ -775,6 +784,7 @@ const Api win32_apis[] = {
     {"winmm.dll", "timeEndPeriod", 1, timeEndPeriod_}, {"winmm.dll", "timeGetDevCaps", 2, timeGetDevCaps_},
     {"advapi32.dll", "RegOpenKeyExA", 5, RegOpenKeyExA_}, {"advapi32.dll", "RegOpenKeyA", 3, RegOpenKeyA_},
     {"advapi32.dll", "RegQueryValueExA", 6, RegQueryValueExA_}, {"advapi32.dll", "RegCloseKey", 1, RegCloseKey_},
+    {"shfolder.dll", "SHGetFolderPathA", 5, SHGetFolderPathA_},
 };
 const int win32_api_count = sizeof win32_apis / sizeof win32_apis[0];
 

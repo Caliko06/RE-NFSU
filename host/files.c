@@ -1,4 +1,5 @@
-// Read-only access to the game folder (C:\NFSU = game/). Names match without case, like NTFS.
+// Read-only access to the game folder (C:\NFSU = game/) and the save folder (what the game keeps under
+// CSIDL_COMMON_APPDATA\NFS Underground = save/ of this repo). Names match without case, like NTFS.
 // Native: the folder on disk. Web: tools/serve.py; the game thread reads byte ranges with synchronous
 // XHR (allowed in its worker), through a read-ahead buffer, so only what the game opens is fetched.
 #include <strings.h>
@@ -9,18 +10,24 @@
 #define AHEAD (256u << 10)
 typedef struct { int used; uint64_t size; char real[512]; FILE *f; uint8_t *buf; uint64_t buf_off; uint32_t buf_len; } GFile;
 static GFile files[MAXF];
-static char root[1024];
+static char root[1024], save_root[1024];
 
-void files_set_root(const char *dir) { snprintf(root, sizeof root, "%s", dir); }
+void files_set_root(const char *dir) {
+    snprintf(root, sizeof root, "%s", dir);
+    snprintf(save_root, sizeof save_root, "%s/../save", dir);     // tools/serve.py serves the same save/
+}
+#define SAVE_DIR "C:/Documents and Settings/All Users/Application Data/NFS Underground"
 
-// C:\NFSU\a\b or a\b or .\a\b -> "a/b". -1: outside the game folder.
+// C:\NFSU\a\b or a\b or .\a\b -> "a/b": 0 in the game folder, 1 in the save folder, -1 outside both.
 // D:\ is the CD-ROM drive with the game disc in it; the OWNER's folder holds the disc files too.
 static int game_rel(const char *gpath, char *rel, size_t n) {
     char p[512];
     snprintf(p, sizeof p, "%s", gpath);
     for (char *q = p; *q; q++) if (*q == '\\') *q = '/';
     const char *r = p;
-    if (!strncasecmp(p, "C:/NFSU", 7) && (p[7] == '/' || !p[7])) r = p + 7 + (p[7] == '/');
+    int save = 0, k = (int)strlen(SAVE_DIR);
+    if (!strncasecmp(p, SAVE_DIR, k) && (p[k] == '/' || !p[k])) r = p + k + (p[k] == '/'), save = 1;
+    else if (!strncasecmp(p, "C:/NFSU", 7) && (p[7] == '/' || !p[7])) r = p + 7 + (p[7] == '/');
     else if ((p[0] == 'D' || p[0] == 'd') && p[1] == ':' && (p[2] == '/' || !p[2])) r = p + 2 + (p[2] == '/');
     else if (p[0] && p[1] == ':') return -1;
     while (r[0] == '.' && r[1] == '/') r += 2;
@@ -28,7 +35,7 @@ static int game_rel(const char *gpath, char *rel, size_t n) {
     for (; *r && (size_t)(o - rel) < n - 1; r++)
         if (!(*r == '/' && (o == rel || o[-1] == '/'))) *o++ = *r;     // drop empty components
     *o = 0;
-    return 0;
+    return save;
 }
 
 #ifdef __EMSCRIPTEN__
@@ -54,9 +61,17 @@ EM_JS(double, web_lookup, (const char *rel, char *real, int realsz), {
     stringToUTF8(e[0], real, realsz);
     return e[1];
 });
+// A save file: its size, -1 missing (tools/serve.py /save/).
+EM_JS(double, web_save_lookup, (const char *rel), {
+    var x = new XMLHttpRequest();
+    x.open('HEAD', '/save/' + UTF8ToString(rel).split('/').map(encodeURIComponent).join('/'), false);
+    x.send();
+    return x.status === 200 ? Number(x.getResponseHeader('Content-Length')) : -1;
+});
+// real is "game/<path>" or "save/<path>".
 EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
     var x = new XMLHttpRequest();
-    x.open('GET', '/game/' + UTF8ToString(real).split('/').map(encodeURIComponent).join('/'), false);
+    x.open('GET', '/' + UTF8ToString(real).split('/').map(encodeURIComponent).join('/'), false);
     x.responseType = 'arraybuffer';
     x.setRequestHeader('Range', 'bytes=' + off + '-' + (off + n - 1));
     x.send();
@@ -67,19 +82,30 @@ EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
 });
 #endif
 
-// 0 = found (size set), 1 = a directory, -1 = missing, -2 = outside the game folder.
+// 0 = found (size set), 1 = a directory, -1 = missing, -2 = outside the game and save folders.
 static int lookup(const char *gpath, char *real, size_t n, uint64_t *size) {
     char rel[512];
-    if (game_rel(gpath, rel, sizeof rel)) return -2;
+    int save = game_rel(gpath, rel, sizeof rel);
+    if (save < 0) return -2;
 #ifdef __EMSCRIPTEN__
-    double r = web_lookup(rel, real, (int)n);
+    if (save) {
+        double r = !*rel ? -2 : web_save_lookup(rel);
+        if (r == -2) return 1;
+        if (r < 0) return -1;
+        snprintf(real, n, "save/%s", rel);
+        *size = (uint64_t)r;
+        return 0;
+    }
+    char g[512];
+    double r = web_lookup(rel, g, sizeof g);
     if (r == -2) return 1;
     if (r < 0) return -1;
+    snprintf(real, n, "game/%s", g);
     *size = (uint64_t)r;
     return 0;
 #else
     // Each component, matched without case against the directory on disk.
-    snprintf(real, n, "%s", root);
+    snprintf(real, n, "%s", save ? save_root : root);
     for (char *c = rel; *c;) {
         char *e = strchr(c, '/');
         if (e) *e = 0;
