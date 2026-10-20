@@ -27,7 +27,8 @@ static struct timespec t0;
 uint64_t now_us(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (uint64_t)(ts.tv_sec - t0.tv_sec) * 1000000ull + (uint64_t)(ts.tv_nsec - t0.tv_nsec) / 1000;
+    int64_t ns = (int64_t)(ts.tv_sec - t0.tv_sec) * 1000000000 + (ts.tv_nsec - t0.tv_nsec);   // signed: nsec may be below t0's
+    return (uint64_t)ns / 1000;
 }
 
 // ---- guest heap: boundary tags, size-class free lists, coalescing ----------------------------

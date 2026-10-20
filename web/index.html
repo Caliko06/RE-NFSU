@@ -23,6 +23,7 @@
 <canvas id="screen" width="800" height="600"></canvas>
 <pre id="log"></pre>
 <script src="gpu.js"></script>
+<script src="input.js"></script>
 <script src="out/speed.js"></script>
 <script>
 const log = document.getElementById('log'), status = document.getElementById('status');
@@ -46,9 +47,16 @@ function line(s, cls) {
     print: s => line(s), printErr: s => line(s, 'dim'),
     preRun: [m => {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
+      // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
+      for (const kv of (new URLSearchParams(location.search).get('env') || '').split(',').filter(Boolean)) {
+        const k = kv.indexOf('=');
+        m.ENV[k < 0 ? kv : kv.slice(0, k)] = k < 0 ? '1' : kv.slice(k + 1);
+      }
     }],
   });
   startGpu(M, document.getElementById('screen'), s => line(s, 'api')).catch(e => line('gpu.js: ' + e.message, 'stop'));
+  startInput(M, document.getElementById('screen'));
+  window.RN_M = M;                          // for checks from the console or tools/webcheck.mjs
 })();
 </script>
 </body>

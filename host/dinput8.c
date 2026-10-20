@@ -1,6 +1,5 @@
 // dinput8: DirectInput8Create and the keyboard and mouse devices, as documented by Microsoft (DirectX 9).
-// The PC has one keyboard and one mouse, no game controllers. No input reaches the devices yet:
-// every key is up and the mouse does not move (the browser input source is a later block).
+// The PC has one keyboard and one mouse, no game controllers. host/input.c delivers their events.
 #include "host.h"
 
 #define DI_OK 0u
@@ -39,11 +38,23 @@ static uint32_t vtable(int i) {
 
 // The two devices: GUID_SysKeyboard {6F1D2B61-...} and GUID_SysMouse {6F1D2B60-...}.
 enum { KEYBOARD, MOUSE };
+// What GetDeviceState reports: each object of the data format (or each action of the action map)
+// at its offset. what: 0-2 = X/Y/Z axis, 0x100 + n = button n, 0x200 + DIK = key.
+typedef struct { uint32_t ofs, what, size, app; } Field;
+typedef struct { uint32_t ofs, data, time, seq, app; } Event;
+#define MAXF 256
+#define MAXEV 256
 typedef struct {
     int iface, kind;
     uint32_t refs, guest;
     uint32_t data_size, coop, hwnd, buffer;
-    int acquired, format_set;
+    int acquired, format_set, actions, overflow;
+    int nf;
+    Field f[MAXF];
+    int32_t axis[3];               // relative motion since the last GetDeviceState
+    uint8_t buttons[8];
+    unsigned ev_head, ev_tail;
+    Event ev[MAXEV];
 } Obj;
 static Obj objs[16];
 static int nobjs;
@@ -108,14 +119,44 @@ static uint32_t IDirectInput8A_CreateDevice(Ctx *c) {
     return DI_OK;
 }
 
-// DIDATAFORMAT {dwSize, dwObjSize, dwFlags, dwDataSize, dwNumObjs, rgodf}. Only the state size matters here:
-// with no input every object of the format reads as zero (keys up, no motion, buttons up).
+// DIDATAFORMAT {dwSize, dwObjSize, dwFlags, dwDataSize, dwNumObjs, rgodf}; DIOBJECTDATAFORMAT {pguid, dwOfs,
+// dwType, dwFlags}. An object names a guid (GUID_XAxis.. {A36D02E0..E2-...}, GUID_Button {A36D02F0-...},
+// GUID_Key {55728220-...}) or none, and a DIDFT_ type with an instance or DIDFT_ANYINSTANCE (the next free one).
 static uint32_t IDirectInputDevice8A_SetDataFormat(Ctx *c) {
     SELF(I_DEV);
     uint32_t f = ARG(1);
     if (!f || ld(c, f, 4) != 24 || ld(c, f + 4, 4) != 16) return DIERR_INVALIDPARAM;
     if (o->acquired) return 0x80070005u;                  // DIERR_ACQUIRED
+    uint32_t n = ld(c, f + 16, 4), objs_p = ld(c, f + 20, 4);
+    if (n > MAXF) { rn_halt(c, "dinput8: data format with %u objects", n); return DIERR_INVALIDPARAM; }
     o->data_size = ld(c, f + 12, 4);
+    o->nf = 0;
+    o->actions = 0;
+    uint8_t used[3 + 8 + 256] = {0};
+    for (uint32_t k = 0; k < n; k++) {
+        uint32_t od = objs_p + 16 * k, g = ld(c, od, 4), ofs = ld(c, od + 4, 4), type = ld(c, od + 8, 4);
+        uint32_t inst = (type >> 8) & 0xffff, any = inst == 0xffff, gd = g ? ld(c, g, 4) : 0;
+        int axis = (type & 3) != 0, button = (type & 0xc) != 0;
+        uint32_t what = ~0u;
+        if (o->kind == MOUSE && axis && (!g || (gd >= 0xa36d02e0u && gd <= 0xa36d02e2u))) {
+            uint32_t a = g ? gd - 0xa36d02e0u : inst;
+            if (any && !g) for (a = 0; a < 3 && used[a]; a++) {}
+            if (a < 3 && !used[a]) { used[a] = 1; what = a; }
+        } else if (o->kind == MOUSE && button && (!g || gd == 0xa36d02f0u)) {
+            uint32_t b = inst;
+            if (any) for (b = 0; b < 8 && used[3 + b]; b++) {}
+            if (b < 8 && !used[3 + b]) { used[3 + b] = 1; what = 0x100 + b; }
+        } else if (o->kind == KEYBOARD && button && (!g || gd == 0x55728220u)) {
+            uint32_t d = inst;
+            if (any) for (d = 0; d < 256 && used[11 + d]; d++) {}
+            if (d < 256 && !used[11 + d]) { used[11 + d] = 1; what = 0x200 + d; }
+        }
+        if (what == ~0u) {
+            if (ld(c, od + 12, 4) & 0x80000000u || (type & 0x80000000u)) continue;   // DIDOI_ / DIDFT_OPTIONAL
+            return DIERR_INVALIDPARAM;                    // the device has no such object
+        }
+        o->f[o->nf++] = (Field){ofs, what, axis ? 4u : 1u, 0};
+    }
     o->format_set = 1;
     TR("SetDataFormat(%s): %u bytes, %u objects", o->kind == KEYBOARD ? "keyboard" : "mouse", o->data_size, ld(c, f + 16, 4));
     return DI_OK;
@@ -135,6 +176,9 @@ static uint32_t IDirectInputDevice8A_Acquire(Ctx *c) {
     if (!o->format_set) return DIERR_INVALIDPARAM;
     if (o->acquired) return 1;                            // S_FALSE: already acquired
     o->acquired = 1;
+    o->ev_head = o->ev_tail = 0;
+    o->overflow = 0;
+    memset(o->axis, 0, sizeof o->axis);
     return DI_OK;
 }
 static uint32_t IDirectInputDevice8A_Unacquire(Ctx *c) {
@@ -146,19 +190,43 @@ static uint32_t IDirectInputDevice8A_Unacquire(Ctx *c) {
 static uint32_t IDirectInputDevice8A_GetDeviceState(Ctx *c) {
     SELF(I_DEV);
     uint32_t n = ARG(1), p = ARG(2);
+    input_poll();
     if (!o->acquired) return DIERR_NOTACQUIRED;
     if (!p || n != o->data_size) return DIERR_INVALIDPARAM;
     memset(G(p), 0, n);
+    for (int k = 0; k < o->nf; k++) {
+        Field *f = &o->f[k];
+        uint32_t v = f->what < 3 ? (uint32_t)o->axis[f->what] : f->what < 0x200 ? o->buttons[f->what - 0x100] :
+                     input_key_down(f->what - 0x200) ? 0x80 : 0;
+        if (f->ofs + f->size <= n) st(c, p + f->ofs, v, (int)f->size);
+    }
+    memset(o->axis, 0, sizeof o->axis);
     return DI_OK;
 }
-// GetDeviceData(cbObjectData, rgdod, pdwInOut, dwFlags): the buffer holds no events.
+// GetDeviceData(cbObjectData, rgdod, pdwInOut, dwFlags): DIDEVICEOBJECTDATA is 20 bytes (16 for DirectX 3
+// applications: no uAppData). rgdod NULL with *pdwInOut = INFINITE flushes. DIGDD_PEEK (1) keeps the events.
 static uint32_t IDirectInputDevice8A_GetDeviceData(Ctx *c) {
     SELF(I_DEV);
+    uint32_t sz = ARG(1), out = ARG(2), io = ARG(3), flags = ARG(4);
+    input_poll();
     if (!o->acquired) return DIERR_NOTACQUIRED;
-    if (!ARG(3) || ARG(1) != 16) return DIERR_INVALIDPARAM;
+    if (!io || (sz != 20 && sz != 16)) return DIERR_INVALIDPARAM;
     if (!o->buffer) return 0x80040201u;                   // DIERR_NOTBUFFERED
-    st(c, ARG(3), 0, 4);
-    return DI_OK;
+    uint32_t want = ld(c, io, 4), have = o->ev_tail - o->ev_head, n = want < have ? want : have;
+    if (out)
+        for (uint32_t k = 0; k < n; k++) {
+            Event *e = &o->ev[(o->ev_head + k) % MAXEV];
+            uint32_t d = out + sz * k;
+            st(c, d, e->ofs, 4); st(c, d + 4, e->data, 4); st(c, d + 8, e->time, 4); st(c, d + 12, e->seq, 4);
+            if (sz == 20) st(c, d + 16, e->app, 4);
+        }
+    if (!(flags & 1)) o->ev_head += n;
+    st(c, io, n, 4);
+    if (n) TR("GetDeviceData(%s): %u events, first ofs %u data %x app %x", o->kind == KEYBOARD ? "keyboard" : "mouse", n,
+              o->ev[(o->ev_head - n) % MAXEV].ofs, o->ev[(o->ev_head - n) % MAXEV].data, o->ev[(o->ev_head - n) % MAXEV].app);
+    uint32_t r = o->overflow ? 1u : DI_OK;                // DI_BUFFEROVERFLOW
+    if (!(flags & 1)) o->overflow = 0;
+    return r;
 }
 // SetProperty(rguidProp, pdiph): rguidProp is MAKEDIPROP(n). DIPROPDWORD {DIPROPHEADER(16), dwData}.
 static uint32_t IDirectInputDevice8A_SetProperty(Ctx *c) {
@@ -270,7 +338,20 @@ static uint32_t IDirectInputDevice8A_SetActionMap(Ctx *c) {
     o->data_size = ld(c, af + 8, 4);
     o->buffer = ld(c, af + 40, 4);
     o->format_set = 1;
+    o->actions = 1;
+    o->nf = 0;
+    // Each action mapped to this device reports at 4 * its index in the action array, so the data
+    // (dwDataSize, at least 4 * dwNumActions) holds one DWORD per action. GUESS: check dwOfs against Wine.
+    for (uint32_t k = 0, n = ld(c, af + 12, 4), a = ld(c, af + 16, 4); k < n; k++, a += 40) {
+        uint32_t obj = ld(c, a + 32, 4);
+        if (!ld(c, a + 36, 4) || !is_this_device(c, a + 16, o->kind) || o->nf == MAXF) continue;
+        if (o->kind != KEYBOARD) { rn_halt(c, "dinput8: action map on the mouse"); return DIERR_INVALIDPARAM; }
+        o->f[o->nf++] = (Field){4 * k, 0x200 + ((obj >> 8) & 0xff), 4, ld(c, a, 4)};
+    }
     TR("SetActionMap: %u bytes of data, buffer %u", o->data_size, o->buffer);
+    for (uint32_t k = 0, n = ld(c, af + 12, 4), a = ld(c, af + 16, 4); k < n && rn_trace(); k++, a += 40)
+        TR("  action %u: app %08x sem %08x flags %x obj %08x how %x name %s", k, ld(c, a, 4), ld(c, a + 4, 4), ld(c, a + 8, 4),
+           ld(c, a + 32, 4), ld(c, a + 36, 4), ld(c, a + 12, 4) > 0x10000 ? G(ld(c, a + 12, 4)) : "");
     return DI_OK;
 }
 
@@ -298,6 +379,42 @@ static uint32_t IDirectInput8A_EnumDevices(Ctx *c) {
 static uint32_t IDirectInputDevice8A_Poll(Ctx *c) {
     SELF(I_DEV);
     return o->acquired ? 1 : DIERR_NOTACQUIRED;
+}
+
+// Input from host/input.c goes to every acquired device of its kind (the window is always in the foreground).
+static void push(Obj *o, uint32_t ofs, uint32_t data, uint32_t app) {
+    static uint32_t seq;
+    if (!o->buffer) return;
+    if (o->ev_tail - o->ev_head >= o->buffer || o->ev_tail - o->ev_head >= MAXEV) { o->overflow = 1; return; }
+    o->ev[o->ev_tail++ % MAXEV] = (Event){ofs, data, (uint32_t)(now_us() / 1000), ++seq, app};
+}
+void dinput8_key(uint8_t dik, int down) {
+    for (int k = 0; k < nobjs; k++) {
+        Obj *o = &objs[k];
+        if (o->iface != I_DEV || o->kind != KEYBOARD || !o->acquired) continue;
+        for (int j = 0; j < o->nf; j++)
+            if (o->f[j].what == 0x200u + dik) push(o, o->f[j].ofs, down ? 0x80 : 0, o->f[j].app);
+    }
+}
+void dinput8_button(int b, int down) {
+    for (int k = 0; k < nobjs; k++) {
+        Obj *o = &objs[k];
+        if (o->iface != I_DEV || o->kind != MOUSE || !o->acquired) continue;
+        o->buttons[b] = down ? 0x80 : 0;
+        for (int j = 0; j < o->nf; j++) if (o->f[j].what == 0x100u + b) push(o, o->f[j].ofs, o->buttons[b], 0);
+    }
+}
+void dinput8_motion(int32_t dx, int32_t dy, int32_t dz) {
+    int32_t d[3] = {dx, dy, dz};
+    for (int k = 0; k < nobjs; k++) {
+        Obj *o = &objs[k];
+        if (o->iface != I_DEV || o->kind != MOUSE || !o->acquired) continue;
+        for (int a = 0; a < 3; a++) {
+            if (!d[a]) continue;
+            o->axis[a] += d[a];
+            for (int j = 0; j < o->nf; j++) if (o->f[j].what == (uint32_t)a) push(o, o->f[j].ofs, (uint32_t)d[a], 0);
+        }
+    }
 }
 
 #define DI(name, n) {"dinput8.dll", "IDirectInput8A::" #name, n, IDirectInput8A_##name}

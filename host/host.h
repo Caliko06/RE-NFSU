@@ -66,3 +66,14 @@ uint64_t gf_size(int id);
 int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n);
 void gf_close(int id);
 void set_error(Ctx *c, uint32_t e);
+// Keyboard and mouse (host/input.c): input_poll hands new events to dinput8_* and user32_key.
+void input_poll(void);
+uint32_t input_vk_state(uint32_t vk);                          // GetAsyncKeyState/GetKeyState bits
+int input_key_down(uint8_t dik);
+int input_shift(void);
+int input_alt(void);
+char input_char_of(uint8_t vk, int shift);
+void dinput8_key(uint8_t dik, int down);
+void dinput8_button(int b, int down);
+void dinput8_motion(int32_t dx, int32_t dy, int32_t dz);
+void user32_key(uint8_t dik, uint8_t vk, int down);

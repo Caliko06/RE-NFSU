@@ -238,8 +238,19 @@ static void fill_msg(Ctx *c, uint32_t p, Msg m) {
     st(c, p, m.hwnd, 4); st(c, p + 4, m.msg, 4); st(c, p + 8, m.wp, 4); st(c, p + 12, m.lp, 4);
     st(c, p + 16, (uint32_t)(now_us() / 1000), 4); st(c, p + 20, 0, 4); st(c, p + 24, 0, 4);
 }
+// A key goes to the focus window as WM_KEYDOWN/UP, or WM_SYSKEYDOWN/UP for F10 and while ALT is down.
+// lParam: repeat count 1, scan code, extended key (bit 24), context = ALT (29), previous state (30), transition (31).
+void user32_key(uint8_t dik, uint8_t vk, int down) {
+    if (!focus || !vk) return;
+    int sys = input_alt() || vk == 0x79 || vk == 0x12;
+    uint32_t msg = (sys ? 0x104u : 0x100u) + (down ? 0 : 1);
+    uint32_t lp = 1u | (uint32_t)(dik & 0x7f) << 16 | (dik & 0x80 ? 1u << 24 : 0) | (input_alt() ? 1u << 29 : 0) |
+                  (down ? 0 : 3u << 30);
+    post(focus, msg, vk, lp);
+}
 static uint32_t PeekMessageA_(Ctx *c) {
     uint32_t p = ARG(0), remove = ARG(4) & 1;
+    input_poll();
     if (qhead != qtail) {
         fill_msg(c, p, queue[qhead % 256]);
         if (remove) qhead++;
@@ -254,6 +265,7 @@ static uint32_t PeekMessageA_(Ctx *c) {
 }
 static uint32_t GetMessageA_(Ctx *c) {
     uint32_t p = ARG(0);
+    input_poll();
     if (qhead != qtail) { fill_msg(c, p, queue[qhead++ % 256]); return 1; }
     if (quit_posted) { fill_msg(c, p, (Msg){0, WM_QUIT, quit_code, 0}); return 0; }
     rn_halt(c, "GetMessageA would wait for input");
@@ -261,7 +273,15 @@ static uint32_t GetMessageA_(Ctx *c) {
 }
 static uint32_t PostMessageA_(Ctx *c) { post(ARG(0), ARG(1), ARG(2), ARG(3)); return 1; }
 static uint32_t PostQuitMessage_(Ctx *c) { quit_posted = 1; quit_code = ARG(0); return 0; }
-static uint32_t TranslateMessage_(Ctx *c) { (void)c; return 0; }
+// WM_KEYDOWN / WM_SYSKEYDOWN of a key that types a character posts WM_CHAR / WM_SYSCHAR (US layout).
+static uint32_t TranslateMessage_(Ctx *c) {
+    uint32_t p = ARG(0), msg = ld(c, p + 4, 4);
+    if (msg != 0x100 && msg != 0x104) return 0;
+    char ch = input_char_of((uint8_t)ld(c, p + 8, 4), input_shift());
+    if (!ch) return 0;
+    post(ld(c, p, 4), msg == 0x100 ? 0x102u : 0x106u, (uint8_t)ch, ld(c, p + 12, 4));
+    return 1;
+}
 static uint32_t DispatchMessageA_(Ctx *c) {
     uint32_t p = ARG(0);
     return send(c, ld(c, p, 4), ld(c, p + 4, 4), ld(c, p + 8, 4), ld(c, p + 12, 4));
@@ -287,8 +307,11 @@ static uint32_t CharUpperA_(Ctx *c) {
     for (char *s = G(p); *s; s++) if (*s >= 'a' && *s <= 'z') *s -= 32;
     return p;
 }
-static uint32_t GetAsyncKeyState_(Ctx *c) { (void)c; return 0; }
-static uint32_t GetKeyState_(Ctx *c) { (void)c; return 0; }
+// GetAsyncKeyState: bit 15 = down now. GetKeyState: bit 15 = down, bit 0 = toggled (CAPS LOCK etc.).
+// Both return a SHORT (sign-extended here). The thread's key state is the live state: the game reads
+// it from the thread that pumps messages.
+static uint32_t GetAsyncKeyState_(Ctx *c) { return input_vk_state(ARG(0)) & 0x8000u ? 0xffff8000u : 0; }
+static uint32_t GetKeyState_(Ctx *c) { uint32_t s = input_vk_state(ARG(0)); return (s & 0x8000u ? 0xffffff80u : 0) | (s & 1); }
 
 // wsprintf: %[-][#][0][width][.prec][l|h]{c,d,i,s,u,x,X,%}; arguments are guest dwords.
 static uint32_t format(Ctx *c, uint32_t out, uint32_t fmt, uint32_t ap) {
