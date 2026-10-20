@@ -14,7 +14,7 @@ typedef struct Ctx {
     uint32_t halt, halt_at;     // halt != 0: stop everything, halt_at = guest address
     const char *why;
     uint32_t fs;                // TEB guest address
-    int32_t cf, zf, sf, of, pf, df;
+    int32_t cf, zf, sf, of, pf, df, af;
     uint32_t eflx;              // eflags bits we only store (AC, ID)
     uint32_t fcw, fsw, ftop, ftag;  // fsw keeps C0..C3 only; ftag bit i = physical st i in use
     double st[8];
@@ -47,20 +47,93 @@ void rn_cpuid(Ctx *c, uint32_t *a, uint32_t *b, uint32_t *cc, uint32_t *d);
 #define FC3 0x4000u
 static inline double *fr(Ctx *c, int i) { return &c->st[(c->ftop + i) & 7]; }
 static inline double fround(Ctx *c, double v) { return ((c->fcw >> 8) & 3) == 0 ? (double)(float)v : v; }
-static inline void fpush(Ctx *c, double v) { c->ftop = (c->ftop - 1) & 7; c->st[c->ftop] = v; c->ftag |= 1u << c->ftop; }
-static inline void fpop(Ctx *c) { c->ftag &= ~(1u << c->ftop); c->ftop = (c->ftop + 1) & 7; }
-// An invalid operation (inf-inf, 0*inf...) makes the x87 "real indefinite", a negative quiet NaN.
-// The host makes +NaN (ARM, wasm on ARM): turn its default NaN into the x87 one.
-static inline double fixnan(double v) {
-    uint64_t b;
-    memcpy(&b, &v, 8);
-    if (b == 0x7ff8000000000000ull) { b = 0xfff8000000000000ull; memcpy(&v, &b, 8); }
-    return v;
+// NaN results follow the x87 rules (Intel SDM table 4-7), not the host's: an invalid operation on
+// non-NaN operands gives the "real indefinite" (-NaN); NaN operands propagate quieted, the larger
+// significand wins and a tie takes the positive one.
+static inline uint64_t dbits(double v) { uint64_t b; memcpy(&b, &v, 8); return b; }
+static inline double bitsd(uint64_t b) { double v; memcpy(&v, &b, 8); return v; }
+static inline double fnan2(double a, double b) {
+    if (a == a) return bitsd(dbits(b) | 0x8000000000000ull);
+    if (b == b) return bitsd(dbits(a) | 0x8000000000000ull);
+    uint64_t x = dbits(a) | 0x8000000000000ull, y = dbits(b) | 0x8000000000000ull;
+    uint64_t mx = x & 0xfffffffffffffull, my = y & 0xfffffffffffffull;
+    if (mx != my) return bitsd(mx > my ? x : y);
+    return bitsd(x < y ? x : y);     // same significand: the one without the sign bit
 }
-static inline void fset(Ctx *c, int i, double v) { *fr(c, i) = fround(c, v != v ? fixnan(v) : v); }
-static inline void fcom(Ctx *c, double a, double b) {
+#ifdef RN_REF_QEMU5
+#define FIE 0x00u     // difftest only: QEMU 5 (Unicorn) never raises IE; the SDM does
+#else
+#define FIE 0x01u     // invalid operation
+#endif
+#define FZE 0x04u     // zero divide
+#define FSF 0x40u     // stack fault
+// Results of x87 arithmetic: NaN rules above; an invalid operation on non-NaN operands also sets IE.
+static inline double fx2(Ctx *c, double a, double b, double r) {
+    if (r == r) return r;
+    if (a != a || b != b) return fnan2(a, b);
+    c->fsw |= FIE;
+    return bitsd(0xfff8000000000000ull);
+}
+static inline double fx1(Ctx *c, double a, double r) {
+    if (r == r) return r;
+    if (a != a) return bitsd(dbits(a) | 0x8000000000000ull);
+    c->fsw |= FIE;
+    return bitsd(0xfff8000000000000ull);
+}
+static inline double fdiv_(Ctx *c, double a, double b) {
+#ifdef RN_REF_QEMU5
+    if (b == 0) c->fsw |= FZE;      // difftest only: the reference CPU flags every x/0, and never IE
+#else
+    if (b == 0 && a == a && a != 0 && !isinf(a)) c->fsw |= FZE;     // finite non-zero / 0
+#endif
+    return fx2(c, a, b, a / b);
+}
+#define FADD(a, b) fx2(c, (a), (b), (a) + (b))
+#define FSUB(a, b) fx2(c, (a), (b), (a) - (b))
+#define FMUL(a, b) fx2(c, (a), (b), (a) * (b))
+#define FDIV(a, b) fdiv_(c, (a), (b))
+
+// Stack faults are masked on Windows: an empty register reads as the "real indefinite" (-NaN), and a push
+// onto a full register loads it too. Keeping every empty slot at that value gives both for free.
+static inline double findef(void) { uint64_t b = 0xfff8000000000000ull; double v; memcpy(&v, &b, 8); return v; }
+static inline void fpush(Ctx *c, double v) {
+    c->ftop = (c->ftop - 1) & 7;
+    if (c->ftag & (1u << c->ftop)) { v = findef(); c->fsw |= FIE | FSF | 0x200u; }
+    c->st[c->ftop] = v;
+    c->ftag |= 1u << c->ftop;
+}
+static inline void fpop(Ctx *c) { c->st[c->ftop] = findef(); c->ftag &= ~(1u << c->ftop); c->ftop = (c->ftop + 1) & 7; }
+static inline void ffree(Ctx *c, int i) { *fr(c, i) = findef(); c->ftag &= ~(1u << ((c->ftop + i) & 7)); }
+static inline void finit(Ctx *c) {
+    c->fcw = 0x37f; c->fsw = 0; c->ftop = 0; c->ftag = 0;
+    for (int k = 0; k < 8; k++) c->st[k] = findef();
+}
+// x87 loads of float/double memory turn a signaling NaN into a quiet one (Intel SDM, FLD).
+static inline double ldfx(Ctx *c, uint32_t a) {
+    uint32_t b = ld(c, a, 4);
+    float f;
+    if ((b & 0x7f800000u) == 0x7f800000u && (b & 0x7fffffu) && !(b & 0x400000u)) { b |= 0x400000u; c->fsw |= FIE; }
+    memcpy(&f, &b, 4);
+    return f;
+}
+static inline double lddx(Ctx *c, uint32_t a) {
+    uint64_t b = ld64(c, a);
+    if ((b & 0x7ff0000000000000ull) == 0x7ff0000000000000ull && (b & 0xfffffffffffffull) && !(b & 0x8000000000000ull)) {
+        b |= 0x8000000000000ull;
+        c->fsw |= FIE;
+    }
+    return bitsd(b);
+}
+static inline void fset(Ctx *c, int i, double v) { *fr(c, i) = fround(c, v); }
+static inline void fucom(Ctx *c, double a, double b) {
     c->fsw &= ~(FC0 | FC2 | FC3);
     if (a != a || b != b) c->fsw |= FC0 | FC2 | FC3;
+    else if (a < b) c->fsw |= FC0;
+    else if (a == b) c->fsw |= FC3;
+}
+static inline void fcom(Ctx *c, double a, double b) {
+    c->fsw &= ~(FC0 | FC2 | FC3);
+    if (a != a || b != b) c->fsw |= FC0 | FC2 | FC3 | FIE;
     else if (a < b) c->fsw |= FC0;
     else if (a == b) c->fsw |= FC3;
 }
@@ -77,15 +150,40 @@ static inline double frnd(Ctx *c, double v) {
 static inline int64_t fist(Ctx *c, double v, int bits, int truncate) {
     double r = truncate ? trunc(v) : frnd(c, v);
     double lim = ldexp(1.0, bits - 1);
-    if (!(r >= -lim && r < lim)) return (int64_t)((uint64_t)1 << (bits - 1));
+    if (!(r >= -lim && r < lim)) { c->fsw |= FIE; return (int64_t)((uint64_t)1 << (bits - 1)); }
     return (int64_t)r;
+}
+// FPREM/FPREM1 (Intel SDM): remainder of st0/st1 with the quotient truncated (FPREM) or rounded to
+// nearest (FPREM1); C0, C3, C1 get quotient bits 2, 0, 1; C2 = 0 (the reduction is complete in one step:
+// doubles never have the 64-bit exponent difference that makes the x87 stop early).
+static inline void fprem(Ctx *c, int nearest) {
+    double a = *fr(c, 0), b = *fr(c, 1), r;
+    c->fsw &= ~(FC0 | 0x200u | FC2 | FC3);
+    if (a != a || b != b || isinf(a) || b == 0) { *fr(c, 0) = fx2(c, a, b, NAN); return; }
+    unsigned q;
+    if (nearest) { int qi; r = remquo(a, b, &qi); q = (unsigned)(qi < 0 ? -qi : qi); }
+    else {
+        r = fmod(a, b);
+        double r8 = fmod(a, 8 * fabs(b));
+        q = (unsigned)nearbyint(fabs((r8 - r) / b));   // quotient mod 8
+    }
+    *fr(c, 0) = r;
+    if (q & 4) c->fsw |= FC0;
+    if (q & 1) c->fsw |= FC3;
+    if (q & 2) c->fsw |= 0x200u;
 }
 static inline double ld80(Ctx *c, uint32_t a) {
     uint64_t m; uint16_t se;
     memcpy(&m, c->mem + a, 8); memcpy(&se, c->mem + a + 8, 2);
     int e = se & 0x7fff; double s = (se & 0x8000) ? -1.0 : 1.0;
+    // Unsupported encodings (integer bit clear with a non-zero exponent: unnormal, pseudo-NaN/infinity)
+    // make any x87 operation invalid (SDM 8.2.2): hold them as the real indefinite.
+    if (e != 0 && !(m >> 63)) return findef();
     if (e == 0 && m == 0) return s * 0.0;
-    if (e == 0x7fff) return (m << 1) ? NAN : s * INFINITY;
+    if (e == 0x7fff) {
+        if (!(m << 1)) return s * INFINITY;
+        return bitsd((uint64_t)(se >> 15) << 63 | 0x7ff0000000000000ull | ((m >> 11) & 0xfffffffffffffull) | 0x8000000000000ull);
+    }
     return s * ldexp((double)m, e - 16383 - 63);
 }
 static inline void st80(Ctx *c, uint32_t a, double v) {

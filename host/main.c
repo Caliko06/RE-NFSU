@@ -83,6 +83,7 @@ int main(int argc, char **argv) {
 
     win32_init(c, image_size);
     threads_init(c);
+    finit(c);
     c->fcw = 0x27f;              // Windows starts threads with 53-bit precision, all exceptions masked
     c->r[ESP] = STACK_HI - 16;
     c->r[ESP] -= 4;

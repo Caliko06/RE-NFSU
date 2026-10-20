@@ -143,8 +143,9 @@ static Thread *new_thread(Ctx *c, uint32_t size) {
     if (!stack || !teb) { set_error(c, 8); free(t); return NULL; }
     t->ctx = *c;                      // same memory; fresh registers below
     memset(t->ctx.r, 0, sizeof t->ctx.r);
-    t->ctx.halt = 0; t->ctx.cf = t->ctx.zf = t->ctx.sf = t->ctx.of = t->ctx.pf = t->ctx.df = 0;
-    t->ctx.fcw = 0x27f; t->ctx.fsw = 0; t->ctx.ftop = 0; t->ctx.ftag = 0;
+    t->ctx.halt = 0; t->ctx.cf = t->ctx.zf = t->ctx.sf = t->ctx.of = t->ctx.pf = t->ctx.df = t->ctx.af = 0;
+    finit(&t->ctx);
+    t->ctx.fcw = 0x27f;
     t->id = 0x10 + 4u * nthreads;
     teb_init(&t->ctx, teb, stack, stack + reserve, t->id);
     t->ctx.r[ESP] = stack + reserve - 16;

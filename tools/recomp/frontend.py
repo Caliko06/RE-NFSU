@@ -150,6 +150,23 @@ for v in sorted(data_ptrs):
         add_func(v, "data")
 drain()
 
+# Packed tables (e.g. the CRT math dispatch) hold code pointers at unaligned offsets. One counts if it hits
+# an instruction start already decoded, or if the same value appears at least twice (random bytes rarely do).
+unaligned = 0
+seen_unaligned = collections.Counter()
+for sec in data_secs:
+    raw = sec.get_data()
+    for o in range(len(raw) - 3):
+        if o % 4:
+            v = struct.unpack_from("<I", raw, o)[0]
+            if in_text(v):
+                seen_unaligned[v] += 1
+for v, n in sorted(seen_unaligned.items()):
+    if v not in funcs and (v in insn_at or n >= 2):
+        add_func(v, "data")
+        unaligned += 1
+drain()
+
 # Code pointers as instruction immediates (push offset f, mov reg/mem, offset f): callbacks, atexit, vtables.
 imm_ptrs, scanned = set(), set()
 while True:
@@ -201,7 +218,7 @@ res = {
     "groups": dict(groups.most_common()),
     "decode_failures": len(bad),
     "data_pointers_into_text": len(data_ptrs), "data_pointers_mid_instruction": mid,
-    "immediate_pointers_into_text": len(imm_ptrs),
+    "immediate_pointers_into_text": len(imm_ptrs), "unaligned_pointers_to_code": unaligned,
     "top_mnemonics": dict(mn.most_common(40)),
     "all_mnemonics": sorted(mn),
     "unresolved_jmp_sites": [hex(a) for a in indirect_jmp],
@@ -213,7 +230,8 @@ with open(OUT.rsplit(".", 1)[0] + "_functions.tsv", "w") as f:
         f.write(f"{a:08x}\t{funcs[a]}\n")
 for k in ("text_bytes", "functions", "instructions", "distinct_mnemonics", "text_coverage", "jump_tables",
           "indirect_jmp_unresolved", "indirect_call", "import_call_sites", "imports_called", "x87_instructions",
-          "decode_failures", "data_pointers_into_text", "data_pointers_mid_instruction", "immediate_pointers_into_text"):
+          "decode_failures", "data_pointers_into_text", "data_pointers_mid_instruction", "immediate_pointers_into_text",
+          "unaligned_pointers_to_code"):
     print(f"{k}: {res[k]}")
 print("imports by dll:", res["imports"]["by_dll"])
 print("groups:", {g: c for g, c in groups.most_common() if g not in ("jump", "call", "ret", "branch_relative", "int")})

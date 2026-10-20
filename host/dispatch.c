@@ -94,15 +94,6 @@ void dispatch_report(void) {
     rn_log("distinct APIs called: %d of %d imported", used, nhosts);
 }
 
-// The CPU we present: a plain P6-class x86 with an FPU and a TSC, no MMX/SSE/3DNow.
-// The game's CPU checks then take its x87 code paths.
-void rn_cpuid(Ctx *c, uint32_t *a, uint32_t *b, uint32_t *cc, uint32_t *d) {
-    (void)c;
-    if (*a == 0) { *a = 1; *b = 0x756e6547; *d = 0x49656e69; *cc = 0x6c65746e; return; }   // "GenuineIntel"
-    if (*a == 1) { *a = 0x0611; *b = 0; *cc = 0; *d = 0x00000111; return; }               // FPU, TSC, CX8
-    *a = *b = *cc = *d = 0;
-}
-
 uint64_t rn_rdtsc(Ctx *c) {
     (void)c;
     struct timespec ts;

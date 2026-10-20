@@ -75,7 +75,7 @@ def lift_all():
     print("top trap reasons:", dict(traps.most_common(15)))
 
 
-HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c"]
+HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c"]
 
 
 def compile_native():

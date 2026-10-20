@@ -15,7 +15,7 @@ REG32 = ["eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"]
 LO8 = {"al": "eax", "cl": "ecx", "dl": "edx", "bl": "ebx"}
 HI8 = {"ah": "eax", "ch": "ecx", "dh": "edx", "bh": "ebx"}
 R16 = {"ax": "eax", "cx": "ecx", "dx": "edx", "bx": "ebx", "sp": "esp", "bp": "ebp", "si": "esi", "di": "edi"}
-FLAGS = ["cf", "zf", "sf", "of", "pf", "df"]
+FLAGS = ["cf", "zf", "sf", "of", "pf", "df", "af"]
 
 COND = {"o": "of", "no": "!of", "b": "cf", "ae": "!cf", "e": "zf", "ne": "!zf", "be": "(cf||zf)",
         "a": "(!cf&&!zf)", "s": "sf", "ns": "!sf", "l": "(sf!=of)", "ge": "(sf==of)",
@@ -50,6 +50,19 @@ class Lifter:
             for i in e.imports:
                 self.iat.add(i.address)
         self._cache = {}
+        self.trace = False
+        # Address-taken code: dwords in the data sections that point into .text (jump tables, vtables).
+        self.addr_taken, self.addr_taken_aligned = set(), set()
+        for sec in self.pe.sections:
+            if sec.Name.rstrip(b"\0") == b".text":
+                continue
+            raw = sec.get_data()
+            for o in range(len(raw) - 3):       # every offset: packed tables exist; labels filter the noise
+                v = struct.unpack_from("<I", raw, o)[0]
+                if self.t0 <= v < self.t1:
+                    self.addr_taken.add(v)
+                    if o % 4 == 0:
+                        self.addr_taken_aligned.add(v)
 
     def u32(self, a):
         return struct.unpack_from("<I", self.img, a - self.base)[0]
@@ -72,6 +85,15 @@ class Lifter:
         self._cache[a] = i
         return i
 
+    def entries_after(self, a):
+        """Real function entries above a, nearest first."""
+        if not hasattr(self, "_real"):
+            import bisect
+            self._real = sorted(e for e, k in self.funcs.items() if k in ("call", "entry"))
+            self._bisect = bisect.bisect_right
+        k = self._bisect(self._real, a)
+        return iter(self._real[k:k + 1])
+
     def is_func(self, a):
         """A real function entry: a jump there is a tail call, not a local branch."""
         return self.funcs.get(a) in ("call", "entry")
@@ -93,17 +115,28 @@ class Lifter:
                 seen[a] = i
                 m = self.mnem(i)[1]
                 op = i.operands[0] if i.operands else None
-                if m == "cmp" and op.type == x86.X86_OP_REG and i.operands[1].type == x86.X86_OP_IMM:
+                # Jump table bounds: the largest index a register can hold when the jmp uses it.
+                imm1 = len(i.operands) > 1 and i.operands[1].type == x86.X86_OP_IMM
+                if m == "cmp" and op.type == x86.X86_OP_REG and imm1:
                     last_cmp[i.reg_name(op.reg)] = i.operands[1].imm
                 elif m == "movzx" and op.type == x86.X86_OP_REG and i.operands[1].type == x86.X86_OP_MEM:
                     mm = i.operands[1].mem
-                    if i.operands[1].size == 1 and mm.base and not mm.index and i.reg_name(mm.base) in last_cmp:
-                        n = last_cmp[i.reg_name(mm.base)] + 1
+                    src = i.reg_name(mm.base) if mm.base else None
+                    last_cmp.pop(i.reg_name(op.reg), None)
+                    if i.operands[1].size == 1 and src in last_cmp and not mm.index:
+                        n = last_cmp[src] + 1
                         if self.in_image(mm.disp) and self.in_image(mm.disp + n):
                             last_cmp[i.reg_name(op.reg)] = max(self.u8(mm.disp + k) for k in range(n))
+                elif m == "and" and op.type == x86.X86_OP_REG and imm1 and (i.operands[1].imm & (i.operands[1].imm + 1)) == 0:
+                    last_cmp[i.reg_name(op.reg)] = i.operands[1].imm
+                elif op is not None and op.type == x86.X86_OP_REG and m not in ("cmp", "test", "push") and not m.startswith("j"):
+                    r = i.reg_name(op.reg)
+                    last_cmp.pop({**LO8, **HI8, **R16}.get(r, r), None)
+                if m in ("call", "mul", "div", "imul", "idiv", "cdq", "lodsb", "lodsd"):
+                    last_cmp.clear()
                 if i.group(CS_GRP_RET) or m in ("hlt", "int3", "ud2", "iretd", "retf", "int", "int1", "into"):
                     break
-                if i.group(CS_GRP_JUMP):
+                if i.group(CS_GRP_JUMP) or m in ("loop", "loope", "loopne", "jecxz"):
                     if op.type == x86.X86_OP_IMM:
                         t = op.imm
                         tail = t != entry and self.is_func(t)
@@ -113,6 +146,9 @@ class Lifter:
                             break
                     else:
                         mm = op.mem if op.type == x86.X86_OP_MEM else None
+                        # Code pointers in data between this entry and the next real function are its labels.
+                        nxt = next((f for f in self.entries_after(entry)), self.t1)
+                        todo.extend(t for t in self.addr_taken_aligned if entry < t < nxt and not self.is_func(t))
                         if mm and not mm.base and mm.index and mm.scale == 4:
                             n = last_cmp.get(i.reg_name(mm.index))
                             tg = self.table(mm.disp, None if n is None else n + 1)
@@ -123,12 +159,17 @@ class Lifter:
         return seen, switches, bad
 
     def table(self, at, n):
+        """Targets of a jump table. With a known bound, entries that are not code are skipped (a table base
+        may overlap code when index 0 is never used); without one, read until the first non-code dword."""
         out = []
-        while self.in_image(at + 4 * len(out) + 3) and len(out) < (n if n is not None else 1024):
-            v = self.u32(at + 4 * len(out))
-            if not (self.t0 <= v < self.t1):
+        for k in range(n if n is not None else 1024):
+            if not self.in_image(at + 4 * k + 3):
                 break
-            out.append(v)
+            v = self.u32(at + 4 * k)
+            if self.t0 <= v < self.t1:
+                out.append(v)
+            elif n is None:
+                break
         return out
 
     # --- operand helpers --------------------------------------------------
@@ -163,6 +204,8 @@ class Lifter:
         return f"0x{self.i.address:x}"
 
     def addr(self, op):
+        if op.size not in (1, 2, 4):
+            raise Unsupported(f"{op.size}-byte operand")     # far pointers (m16:32), m64...
         self.out.append(f"ea={self.ea(op.mem)}; CHK(ea,{op.size},{self.at()});")
 
     def read(self, op, size=None):
@@ -210,15 +253,15 @@ class Lifter:
 
     def arith(self, m, M, S):
         if m in ("add", "xadd"):
-            return f"res=(t1+t2)&0x{M:x}u; cf=((uint64_t)t1+t2)>0x{M:x}u; of=((~(t1^t2))&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
+            return f"res=(t1+t2)&0x{M:x}u; af=((t1^t2^res)>>4)&1; cf=((uint64_t)t1+t2)>0x{M:x}u; of=((~(t1^t2))&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
         if m == "adc":
-            return f"res=(t1+t2+cf)&0x{M:x}u; cf=((uint64_t)t1+t2+cf)>0x{M:x}u; of=((~(t1^t2))&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
+            return f"res=(t1+t2+cf)&0x{M:x}u; af=((t1^t2^res)>>4)&1; cf=((uint64_t)t1+t2+cf)>0x{M:x}u; of=((~(t1^t2))&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
         if m in ("sub", "cmp"):
-            return f"res=(t1-t2)&0x{M:x}u; cf=t1<t2; of=((t1^t2)&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
+            return f"res=(t1-t2)&0x{M:x}u; af=((t1^t2^res)>>4)&1; cf=t1<t2; of=((t1^t2)&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
         if m == "sbb":
-            return f"res=(t1-t2-cf)&0x{M:x}u; cf=(uint64_t)t1<(uint64_t)t2+cf; of=((t1^t2)&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
+            return f"res=(t1-t2-cf)&0x{M:x}u; af=((t1^t2^res)>>4)&1; cf=(uint64_t)t1<(uint64_t)t2+cf; of=((t1^t2)&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
         opc = {"and": "&", "test": "&", "or": "|", "xor": "^"}[m]
-        return f"res=(t1{opc}t2)&0x{M:x}u; cf=0; of=0; " + self.zsp(M, S)
+        return f"res=(t1{opc}t2)&0x{M:x}u; cf=0; of=0; af=0; " + self.zsp(M, S)
 
     # --- control transfer -------------------------------------------------
     def save(self):
@@ -294,11 +337,11 @@ class Lifter:
             a = self.read(ops[0])
             o.append(f"t1={a};")
             if m == "inc":
-                o.append(f"res=(t1+1)&0x{M:x}u; of=res==0x{S:x}u; {ZSP}")
+                o.append(f"res=(t1+1)&0x{M:x}u; of=res==0x{S:x}u; af=((t1^res)>>4)&1; {ZSP}")
             elif m == "dec":
-                o.append(f"res=(t1-1)&0x{M:x}u; of=t1==0x{S:x}u; {ZSP}")
+                o.append(f"res=(t1-1)&0x{M:x}u; of=t1==0x{S:x}u; af=((t1^res)>>4)&1; {ZSP}")
             elif m == "neg":
-                o.append(f"res=(0u-t1)&0x{M:x}u; cf=t1!=0; of=t1==0x{S:x}u; {ZSP}")
+                o.append(f"res=(0u-t1)&0x{M:x}u; cf=t1!=0; of=t1==0x{S:x}u; af=((t1^res)>>4)&1; {ZSP}")
             else:
                 o.append(f"res=(~t1)&0x{M:x}u;")
             o.append(self.write(ops[0], "res"))
@@ -311,11 +354,11 @@ class Lifter:
             bits = 8 * sz
             o.append("if (n) {")
             if m in ("shl", "sal"):
-                o.append(f"res=(uint32_t)(((uint64_t)t1<<n)&0x{M:x}u); cf=n<={bits}?(int)((((uint64_t)t1)>>({bits}-n))&1):0; of=((res&0x{S:x}u)!=0)^cf; {ZSP}")
+                o.append(f"res=(uint32_t)(((uint64_t)t1<<n)&0x{M:x}u); cf=n<={bits}?(int)((((uint64_t)t1)>>({bits}-n))&1):0; of=((res&0x{S:x}u)!=0)^cf; af=0; {ZSP}")
             elif m == "shr":
-                o.append(f"res=(uint32_t)((uint64_t)t1>>n); cf=(int)(((uint64_t)t1>>(n-1))&1); of=(t1&0x{S:x}u)!=0; {ZSP}")
+                o.append(f"res=(uint32_t)((uint64_t)t1>>n); cf=(int)(((uint64_t)t1>>(n-1))&1); of=(t1&0x{S:x}u)!=0; af=0; {ZSP}")
             elif m == "sar":
-                o.append(f"res=(uint32_t)(((int64_t)(int{bits}_t)t1)>>n)&0x{M:x}u; cf=(int)((((int64_t)(int{bits}_t)t1)>>(n-1))&1); of=0; {ZSP}")
+                o.append(f"res=(uint32_t)(((int64_t)(int{bits}_t)t1)>>n)&0x{M:x}u; cf=(int)((((int64_t)(int{bits}_t)t1)>>(n-1))&1); of=0; af=0; {ZSP}")
             elif m == "rol":
                 o.append(f"k=n%{bits}; res=k?((t1<<k)|(t1>>({bits}-k)))&0x{M:x}u:t1; cf=res&1; of=((res&0x{S:x}u)!=0)^cf;")
             elif m == "ror":
@@ -413,18 +456,18 @@ class Lifter:
                      " ".join(f"{r}=ld(c,esp+{28 - 4 * k},4);" for k, r in enumerate(REG32) if r != "esp") + " esp+=32;")
             return
         if m == "pushfd":
-            o.append(f"t1=(uint32_t)cf|2u|((uint32_t)pf<<2)|((uint32_t)zf<<6)|((uint32_t)sf<<7)|0x200u|((uint32_t)df<<10)|((uint32_t)of<<11)|c->eflx; "
+            o.append(f"t1=(uint32_t)cf|2u|((uint32_t)pf<<2)|((uint32_t)af<<4)|((uint32_t)zf<<6)|((uint32_t)sf<<7)|0x200u|((uint32_t)df<<10)|((uint32_t)of<<11)|c->eflx; "
                      f"esp-=4; CHK(esp,4,{self.at()}); st(c,esp,t1,4);")
             return
         if m == "popfd":
-            o.append(f"CHK(esp,4,{self.at()}); t1=ld(c,esp,4); esp+=4; cf=t1&1; pf=(t1>>2)&1; zf=(t1>>6)&1; sf=(t1>>7)&1; "
+            o.append(f"CHK(esp,4,{self.at()}); t1=ld(c,esp,4); esp+=4; cf=t1&1; pf=(t1>>2)&1; af=(t1>>4)&1; zf=(t1>>6)&1; sf=(t1>>7)&1; "
                      "df=(t1>>10)&1; of=(t1>>11)&1; c->eflx=t1&0x240000u;")
             return
         if m == "lahf":
-            o.append("eax=(eax&0xffff00ffu)|(((uint32_t)sf<<7|(uint32_t)zf<<6|(uint32_t)pf<<2|2u|(uint32_t)cf)<<8);")
+            o.append("eax=(eax&0xffff00ffu)|(((uint32_t)sf<<7|(uint32_t)zf<<6|(uint32_t)af<<4|(uint32_t)pf<<2|2u|(uint32_t)cf)<<8);")
             return
         if m == "sahf":
-            o.append("t1=(eax>>8)&0xffu; cf=t1&1; pf=(t1>>2)&1; zf=(t1>>6)&1; sf=(t1>>7)&1;")
+            o.append("t1=(eax>>8)&0xffu; cf=t1&1; pf=(t1>>2)&1; af=(t1>>4)&1; zf=(t1>>6)&1; sf=(t1>>7)&1;")
             return
         if m in ("clc", "stc", "cmc", "cld", "std"):
             o.append({"clc": "cf=0;", "stc": "cf=1;", "cmc": "cf=!cf;", "cld": "df=0;", "std": "df=1;"}[m])
@@ -501,7 +544,9 @@ class Lifter:
                 o.append(self.jump(op.imm))
                 return
             o.append(f"t1={self.read(op)};")
-            cases = self.switches.get(i.address, [])
+            # Any address-taken label of this function can be the target, not only the table we bounded:
+            # the targets of all its tables (they may sit in .text) and code pointers in data.
+            cases = self.all_cases
             if cases:
                 o.append("switch (t1) { " + " ".join(f"case 0x{t:x}u: {self.jump(t)}" for t in sorted(set(cases))) + " }")
             o.append(self.tail("t1"))
@@ -557,21 +602,21 @@ class Lifter:
         if op < 0xd8 or op > 0xdf:
             raise Unsupported(i.mnemonic)
         mem = next((x for x in i.operands if x.type == x86.X86_OP_MEM), None)
-        ar = ["fset(c,0,*fr(c,0)+v);", "fset(c,0,*fr(c,0)*v);", "fcom(c,*fr(c,0),v);", "fcom(c,*fr(c,0),v); fpop(c);",
-              "fset(c,0,*fr(c,0)-v);", "fset(c,0,v-*fr(c,0));", "fset(c,0,*fr(c,0)/v);", "fset(c,0,v/ *fr(c,0));"]
+        ar = ["fset(c,0,FADD(*fr(c,0),v));", "fset(c,0,FMUL(*fr(c,0),v));", "fcom(c,*fr(c,0),v);", "fcom(c,*fr(c,0),v); fpop(c);",
+              "fset(c,0,FSUB(*fr(c,0),v));", "fset(c,0,FSUB(v,*fr(c,0)));", "fset(c,0,FDIV(*fr(c,0),v));", "fset(c,0,FDIV(v,*fr(c,0)));"]
         if mod != 3:
             o.append(f"ea={self.ea(mem.mem)};")
             ck = lambda n: f"CHK(ea,{n},{at});"
             if op in (0xd8, 0xdc):
                 n = 4 if op == 0xd8 else 8
-                o.append(f"{ck(n)} {{ double v={'ldf' if n == 4 else 'ldd'}(c,ea); {ar[reg]} }}")
+                o.append(f"{ck(n)} {{ double v={'ldfx' if n == 4 else 'lddx'}(c,ea); {ar[reg]} }}")
                 return
             if op in (0xda, 0xde):
                 n = 4 if op == 0xda else 2
                 o.append(f"{ck(n)} {{ double v=(int{8*n}_t)ld(c,ea,{n}); {ar[reg]} }}")
                 return
             if op == 0xd9:
-                s = {0: f"{ck(4)} fpush(c,ldf(c,ea));", 2: f"{ck(4)} stf(c,ea,(float)*fr(c,0));",
+                s = {0: f"{ck(4)} fpush(c,ldfx(c,ea));", 2: f"{ck(4)} stf(c,ea,(float)*fr(c,0));",
                      3: f"{ck(4)} stf(c,ea,(float)*fr(c,0)); fpop(c);", 5: f"{ck(2)} c->fcw=ld(c,ea,2);",
                      7: f"{ck(2)} st(c,ea,c->fcw,2);"}.get(reg)
             elif op == 0xdb:
@@ -579,7 +624,7 @@ class Lifter:
                      2: f"{ck(4)} st(c,ea,(uint32_t)fist(c,*fr(c,0),32,0),4);", 3: f"{ck(4)} st(c,ea,(uint32_t)fist(c,*fr(c,0),32,0),4); fpop(c);",
                      5: f"{ck(10)} fpush(c,ld80(c,ea));", 7: f"{ck(10)} st80(c,ea,*fr(c,0)); fpop(c);"}.get(reg)
             elif op == 0xdd:
-                s = {0: f"{ck(8)} fpush(c,ldd(c,ea));", 1: f"{ck(8)} st64(c,ea,(uint64_t)fist(c,*fr(c,0),64,1)); fpop(c);",
+                s = {0: f"{ck(8)} fpush(c,lddx(c,ea));", 1: f"{ck(8)} st64(c,ea,(uint64_t)fist(c,*fr(c,0),64,1)); fpop(c);",
                      2: f"{ck(8)} std_(c,ea,*fr(c,0));", 3: f"{ck(8)} std_(c,ea,*fr(c,0)); fpop(c);",
                      7: f"{ck(2)} st(c,ea,fstsw(c),2);"}.get(reg)
             else:  # 0xdf
@@ -601,8 +646,8 @@ class Lifter:
                     raise Unsupported(i.mnemonic)
                 o.append("fcom(c,*fr(c,0),*fr(c,1)); fpop(c); fpop(c);")
                 return
-            ex = {0: f"*fr(c,{k})+*fr(c,0)", 1: f"*fr(c,{k})*(*fr(c,0))", 4: f"*fr(c,0)-*fr(c,{k})",
-                  5: f"*fr(c,{k})-*fr(c,0)", 6: f"*fr(c,0)/ *fr(c,{k})", 7: f"*fr(c,{k})/ *fr(c,0)"}.get(reg)
+            ex = {0: f"FADD(*fr(c,{k}),*fr(c,0))", 1: f"FMUL(*fr(c,{k}),*fr(c,0))", 4: f"FSUB(*fr(c,0),*fr(c,{k}))",
+                  5: f"FSUB(*fr(c,{k}),*fr(c,0))", 6: f"FDIV(*fr(c,0),*fr(c,{k}))", 7: f"FDIV(*fr(c,{k}),*fr(c,0))"}.get(reg)
             if ex is None:
                 if reg in (2, 3) and op == 0xdc:
                     o.append(f"fcom(c,*fr(c,0),*fr(c,{k}));" + (" fpop(c);" if reg == 3 else ""))
@@ -622,33 +667,33 @@ class Lifter:
                 o.append(f"fpush(c,{FPU_CONST[x]});")
                 return
             s = {0xd0: "", 0xe0: "*fr(c,0)=-*fr(c,0);", 0xe1: "*fr(c,0)=fabs(*fr(c,0));", 0xe4: "fcom(c,*fr(c,0),0.0);",
-                 0xe5: "fxam(c);", 0xf0: "fset(c,0,exp2(*fr(c,0))-1.0);", 0xf1: "fset(c,1,*fr(c,1)*log2(*fr(c,0))); fpop(c);",
-                 0xf2: "fset(c,0,tan(*fr(c,0))); fpush(c,1.0); c->fsw&=~FC2;",
-                 0xf3: "fset(c,1,atan2(*fr(c,1),*fr(c,0))); fpop(c);",
-                 0xf8: "fset(c,0,fmod(*fr(c,0),*fr(c,1))); c->fsw&=~(FC2|FC0|FC3|0x200u);",
-                 0xf5: "fset(c,0,remainder(*fr(c,0),*fr(c,1))); c->fsw&=~(FC2|FC0|FC3|0x200u);",
+                 0xe5: "fxam(c);", 0xf0: "fset(c,0,fx1(c,*fr(c,0),exp2(*fr(c,0))-1.0));", 0xf1: "if (*fr(c,0)==0 && *fr(c,1)==*fr(c,1) && *fr(c,1)!=0) c->fsw|=FZE; fset(c,1,fx2(c,*fr(c,0),*fr(c,1),*fr(c,1)*log2(*fr(c,0)))); fpop(c);",
+                 0xf2: "if (fabs(*fr(c,0))>=9223372036854775808.0) c->fsw|=FC2; else { fset(c,0,fx1(c,*fr(c,0),tan(*fr(c,0)))); fpush(c,1.0); c->fsw&=~FC2; }",
+                 0xf3: "fset(c,1,fx2(c,*fr(c,1),*fr(c,0),atan2(*fr(c,1),*fr(c,0)))); fpop(c);",
+                 0xf8: "fprem(c,0);",
+                 0xf5: "fprem(c,1);",
                  0xf7: "c->ftop=(c->ftop+1)&7;", 0xf6: "c->ftop=(c->ftop-1)&7;",
-                 0xf9: "fset(c,1,*fr(c,1)*log2(*fr(c,0)+1.0)); fpop(c);",
-                 0xfa: "fset(c,0,sqrt(*fr(c,0)));",
-                 0xfb: "{ double v=*fr(c,0); fset(c,0,sin(v)); fpush(c,cos(v)); c->fsw&=~FC2; }",
-                 0xfc: "fset(c,0,frnd(c,*fr(c,0)));", 0xfd: "fset(c,0,ldexp(*fr(c,0),(int)trunc(*fr(c,1))));",
-                 0xfe: "fset(c,0,sin(*fr(c,0))); c->fsw&=~FC2;", 0xff: "fset(c,0,cos(*fr(c,0))); c->fsw&=~FC2;"}.get(x)
+                 0xf9: "fset(c,1,fx2(c,*fr(c,0),*fr(c,1),*fr(c,1)*log2(*fr(c,0)+1.0))); fpop(c);",
+                 0xfa: "fset(c,0,fx1(c,*fr(c,0),sqrt(*fr(c,0))));",
+                 0xfb: "if (fabs(*fr(c,0))>=9223372036854775808.0) c->fsw|=FC2; else { double v=*fr(c,0); fset(c,0,fx1(c,v,sin(v))); fpush(c,fx1(c,v,cos(v))); c->fsw&=~FC2; }",
+                 0xfc: "fset(c,0,fx1(c,*fr(c,0),frnd(c,*fr(c,0))));", 0xfd: "fset(c,0,fx2(c,*fr(c,0),*fr(c,1),ldexp(*fr(c,0),(int)trunc(*fr(c,1)))));",
+                 0xfe: "if (fabs(*fr(c,0))>=9223372036854775808.0) c->fsw|=FC2; else { fset(c,0,fx1(c,*fr(c,0),sin(*fr(c,0)))); c->fsw&=~FC2; }", 0xff: "if (fabs(*fr(c,0))>=9223372036854775808.0) c->fsw|=FC2; else { fset(c,0,fx1(c,*fr(c,0),cos(*fr(c,0)))); c->fsw&=~FC2; }"}.get(x)
             if s is None:
                 raise Unsupported(i.mnemonic)
             o.append(s)
             return
         if op == 0xdd:
-            s = {0: f"c->ftag&=~(1u<<((c->ftop+{k})&7));", 2: f"*fr(c,{k})=*fr(c,0);", 3: f"*fr(c,{k})=*fr(c,0); fpop(c);",
-                 4: f"fcom(c,*fr(c,0),*fr(c,{k}));", 5: f"fcom(c,*fr(c,0),*fr(c,{k})); fpop(c);"}.get(reg)
+            s = {0: f"ffree(c,{k});", 2: f"*fr(c,{k})=*fr(c,0);", 3: f"*fr(c,{k})=*fr(c,0); fpop(c);",
+                 4: f"fucom(c,*fr(c,0),*fr(c,{k}));", 5: f"fucom(c,*fr(c,0),*fr(c,{k})); fpop(c);"}.get(reg)
             if s is None:
                 raise Unsupported(i.mnemonic)
             o.append(s)
             return
         if op == 0xda and modrm == 0xe9:
-            o.append("fcom(c,*fr(c,0),*fr(c,1)); fpop(c); fpop(c);")
+            o.append("fucom(c,*fr(c,0),*fr(c,1)); fpop(c); fpop(c);")
             return
         if op == 0xdb and modrm in (0xe2, 0xe3):
-            o.append("c->fsw=0;" if modrm == 0xe2 else "c->fcw=0x37f; c->fsw=0; c->ftop=0; c->ftag=0;")
+            o.append("c->fsw&=~0x80ffu;" if modrm == 0xe2 else "finit(c);")
             return
         if op == 0xdb and reg in (5, 6) or op == 0xdf and reg in (5, 6):    # fucomi/fcomi(p): ZF PF CF
             o.append(f"{{ double a=*fr(c,0), v=*fr(c,{k}); if (a!=a||v!=v) zf=pf=cf=1; else {{ zf=a==v; cf=a<v; pf=0; }} of=sf=0; }}" +
@@ -670,11 +715,16 @@ class Lifter:
                 targets.add(i.operands[0].imm)
             targets.update(self.switches.get(a, []))
         self.labels = set(body) | bad
+        self.all_cases = {t for tg in self.switches.values() for t in tg if t in self.labels} | (self.addr_taken & self.labels)
         self.info = {"calls": 0, "traps": [], "x87": 0}
         self.out = []
-        for a in sorted(self.labels):
+        order = sorted(self.labels)
+        next_label = dict(zip(order, order[1:]))
+        for a in order:
             i = body.get(a)
             self.out.append(f"L{a:x}:;")
+            if self.trace:      # difftest RN_ONLY: report the state before every instruction
+                self.out.append(f"{{ {self.save()} rn_trace_step(c,0x{a:x}u); }}")
             if i is None:
                 self.out.append(f"TRAP(0x{a:x},\"cannot decode\");")
                 self.info["traps"].append("decode")
@@ -694,6 +744,8 @@ class Lifter:
             ends = i.group(CS_GRP_RET) or m in ("jmp", "hlt", "int3", "ud2", "iretd", "retf", "int", "int1", "into")
             if not ends and nxt not in self.labels:
                 self.out.append(f"TRAP(0x{nxt:x},\"ran off the decoded body\");")
+            elif not ends and next_label.get(a) != nxt:
+                self.out.append(f"goto L{nxt:x};")     # an overlapping decode stream starts in between
         regs = " ".join(f"uint32_t {r}=c->r[{k}];" for k, r in enumerate(REG32))
         flags = " ".join(f"int {f}=c->{f};" for f in FLAGS)
         return (f"void f_{entry:x}(Ctx *c) {{\n{regs} {flags}\n"
