@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Lift x86-32 functions of pc/Speed.exe to C (integer subset, first slice).
+"""Lift x86-32 functions of pc/Speed.exe to C.
 
-A function is lifted only if every instruction is in the supported set and it makes
-no calls (leaf). Anything else is reported with the reason, never guessed.
-Each lifted function is `int f_<addr>(Ctx *c)`: 0 = returned, 1 = fault.
+Each guest function becomes `void f_<addr>(Ctx *c)` (host/rt.h). Registers and flags are C locals,
+written back to the Ctx at calls and exits. Direct calls are C calls; indirect calls and jumps go
+through rn_call (address -> function). An instruction the lifter does not know becomes a TRAP that
+stops the game with its address and name when it runs. Nothing is guessed.
 """
 import struct
 import pefile
@@ -14,23 +15,20 @@ REG32 = ["eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"]
 LO8 = {"al": "eax", "cl": "ecx", "dl": "edx", "bl": "ebx"}
 HI8 = {"ah": "eax", "ch": "ecx", "dh": "edx", "bh": "ebx"}
 R16 = {"ax": "eax", "cx": "ecx", "dx": "edx", "bx": "ebx", "sp": "esp", "bp": "ebp", "si": "esi", "di": "edi"}
+FLAGS = ["cf", "zf", "sf", "of", "pf", "df"]
 
 COND = {"o": "of", "no": "!of", "b": "cf", "ae": "!cf", "e": "zf", "ne": "!zf", "be": "(cf||zf)",
         "a": "(!cf&&!zf)", "s": "sf", "ns": "!sf", "l": "(sf!=of)", "ge": "(sf==of)",
-        "le": "(zf||sf!=of)", "g": "(!zf&&sf==of)"}
-ALU = {"mov", "movzx", "movsx", "lea", "add", "sub", "adc", "sbb", "and", "or", "xor", "not", "neg",
-       "inc", "dec", "cmp", "test", "shl", "sal", "shr", "sar", "rol", "ror", "imul", "mul", "div", "idiv",
-       "push", "pop", "xchg", "cdq", "cwde", "nop", "leave", "ret", "jmp",
-       "movsd", "movsb", "movsw", "stosd", "stosb", "stosw"}
-ALU |= {"j" + k for k in COND} | {"set" + k for k in COND}
+        "le": "(zf||sf!=of)", "g": "(!zf&&sf==of)", "p": "pf", "np": "!pf"}
+PREFIXES = ("lock ", "rep ", "repe ", "repne ", "bnd ", "notrack ")
+STRING_OPS = {0xa4: "movs", 0xa5: "movs", 0xa6: "cmps", 0xa7: "cmps", 0xaa: "stos", 0xab: "stos",
+              0xac: "lods", 0xad: "lods", 0xae: "scas", 0xaf: "scas"}
+FPU_CONST = {0xe8: "1.0", 0xe9: "3.321928094887362347870319429489390175864831393",
+             0xea: "1.442695040888963407359924681001892137426645954", 0xeb: "3.141592653589793238462643383279502884197",
+             0xec: "0.301029995663981195213738894724493026768189881", 0xed: "0.693147180559945309417232121458176568075500134",
+             0xee: "0.0"}
 
-PROLOGUE = """#include <stdint.h>
-#include <string.h>
-typedef struct { uint32_t r[8]; uint8_t *mem; uint32_t memsz; uint32_t ret; } Ctx;
-#define CHK(a,n) do { if ((uint32_t)(a) > c->memsz - (n)) goto fault; } while (0)
-static inline uint32_t ld(Ctx *c, uint32_t a, int n) { uint32_t v = 0; memcpy(&v, c->mem + a, n); return v; }
-static inline void st(Ctx *c, uint32_t a, uint32_t v, int n) { memcpy(c->mem + a, &v, n); }
-"""
+PROLOGUE = '#include "rt.h"\n'
 
 
 class Unsupported(Exception):
@@ -38,7 +36,7 @@ class Unsupported(Exception):
 
 
 class Lifter:
-    def __init__(self, exe):
+    def __init__(self, exe, funcs=None):
         self.pe = pefile.PE(exe)
         self.base = self.pe.OPTIONAL_HEADER.ImageBase
         self.img = self.pe.get_memory_mapped_image()
@@ -46,44 +44,108 @@ class Lifter:
         self.t0, self.t1 = self.base + t.VirtualAddress, self.base + t.VirtualAddress + t.Misc_VirtualSize
         self.md = Cs(CS_ARCH_X86, CS_MODE_32)
         self.md.detail = True
+        self.funcs = funcs or {}          # entry -> "call" | "data" | "entry"
+        self.iat = set()
+        for e in self.pe.DIRECTORY_ENTRY_IMPORT:
+            for i in e.imports:
+                self.iat.add(i.address)
+        self._cache = {}
+
+    def u32(self, a):
+        return struct.unpack_from("<I", self.img, a - self.base)[0]
+
+    def u8(self, a):
+        return self.img[a - self.base]
+
+    def in_image(self, a):
+        return self.base <= a < self.base + len(self.img)
 
     def insn(self, a):
+        if a in self._cache:
+            return self._cache[a]
+        if not (self.t0 <= a < self.t1):
+            return None
         o = a - self.base
         i = next(self.md.disasm(bytes(self.img[o:o + 16]), a), None)
-        if i is None:
-            raise Unsupported(f"decode {a:#x}")
+        if len(self._cache) > 400000:
+            self._cache.clear()
+        self._cache[a] = i
         return i
 
-    def body(self, entry, limit=4000):
-        """Instructions of one function, by local recursive descent."""
-        seen, todo = {}, [entry]
+    def is_func(self, a):
+        """A real function entry: a jump there is a tail call, not a local branch."""
+        return self.funcs.get(a) in ("call", "entry")
+
+    # --- body discovery ---------------------------------------------------
+    def body(self, entry, limit=60000):
+        """Instructions of one function by local recursive descent. Returns (insns, switch_targets)."""
+        seen, todo, switches, bad = {}, [entry], {}, set()
         while todo:
             a = todo.pop()
-            while a not in seen:
-                if not (self.t0 <= a < self.t1) or len(seen) > limit:
-                    raise Unsupported("outside .text or too big")
+            last_cmp = {}
+            while a not in seen and a not in bad:
+                if len(seen) > limit:
+                    raise Unsupported("function too big")
                 i = self.insn(a)
-                seen[a] = i
-                m = i.mnemonic
-                if i.group(CS_GRP_RET):
+                if i is None:
+                    bad.add(a)
                     break
-                if i.group(CS_GRP_CALL):
-                    raise Unsupported("call")
+                seen[a] = i
+                m = self.mnem(i)[1]
+                op = i.operands[0] if i.operands else None
+                if m == "cmp" and op.type == x86.X86_OP_REG and i.operands[1].type == x86.X86_OP_IMM:
+                    last_cmp[i.reg_name(op.reg)] = i.operands[1].imm
+                elif m == "movzx" and op.type == x86.X86_OP_REG and i.operands[1].type == x86.X86_OP_MEM:
+                    mm = i.operands[1].mem
+                    if i.operands[1].size == 1 and mm.base and not mm.index and i.reg_name(mm.base) in last_cmp:
+                        n = last_cmp[i.reg_name(mm.base)] + 1
+                        if self.in_image(mm.disp) and self.in_image(mm.disp + n):
+                            last_cmp[i.reg_name(op.reg)] = max(self.u8(mm.disp + k) for k in range(n))
+                if i.group(CS_GRP_RET) or m in ("hlt", "int3", "ud2", "iretd", "retf", "int", "int1", "into"):
+                    break
                 if i.group(CS_GRP_JUMP):
-                    op = i.operands[0]
-                    if op.type != x86.X86_OP_IMM:
-                        raise Unsupported("indirect jmp")
-                    todo.append(op.imm)
-                    if m == "jmp":
+                    if op.type == x86.X86_OP_IMM:
+                        t = op.imm
+                        tail = t != entry and self.is_func(t)
+                        if not tail:
+                            todo.append(t)
+                        if m == "jmp":
+                            break
+                    else:
+                        mm = op.mem if op.type == x86.X86_OP_MEM else None
+                        if mm and not mm.base and mm.index and mm.scale == 4:
+                            n = last_cmp.get(i.reg_name(mm.index))
+                            tg = self.table(mm.disp, None if n is None else n + 1)
+                            switches[a] = tg
+                            todo.extend(t for t in tg if not (t != entry and self.is_func(t)))
                         break
                 a = i.address + i.size
-        return seen
+        return seen, switches, bad
+
+    def table(self, at, n):
+        out = []
+        while self.in_image(at + 4 * len(out) + 3) and len(out) < (n if n is not None else 1024):
+            v = self.u32(at + 4 * len(out))
+            if not (self.t0 <= v < self.t1):
+                break
+            out.append(v)
+        return out
 
     # --- operand helpers --------------------------------------------------
+    @staticmethod
+    def mnem(i):
+        m, pre = i.mnemonic, ""
+        for p in PREFIXES:
+            if m.startswith(p):
+                pre, m = p.strip(), m[len(p):]
+        return pre, m
+
     def ea(self, mem):
-        if mem.segment != 0:
-            raise Unsupported("segment")
         parts = []
+        if mem.segment == x86.X86_REG_FS:
+            parts.append("c->fs")
+        elif mem.segment not in (0, x86.X86_REG_DS, x86.X86_REG_SS, x86.X86_REG_ES, x86.X86_REG_CS):
+            raise Unsupported(f"segment {self.i.reg_name(mem.segment)}")
         if mem.base:
             parts.append(self.r32(mem.base))
         if mem.index:
@@ -97,9 +159,16 @@ class Lifter:
             raise Unsupported(f"reg {n}")
         return n
 
-    def read(self, op):
+    def at(self):
+        return f"0x{self.i.address:x}"
+
+    def addr(self, op):
+        self.out.append(f"ea={self.ea(op.mem)}; CHK(ea,{op.size},{self.at()});")
+
+    def read(self, op, size=None):
         if op.type == x86.X86_OP_IMM:
-            return f"0x{op.imm & ((1 << (8 * op.size)) - 1):x}u"
+            s = size or op.size
+            return f"0x{op.imm & ((1 << (8 * s)) - 1):x}u"
         if op.type == x86.X86_OP_REG:
             n = self.i.reg_name(op.reg)
             if n in REG32:
@@ -111,7 +180,7 @@ class Lifter:
             if n in HI8:
                 return f"(({HI8[n]}>>8)&0xffu)"
             raise Unsupported(f"reg {n}")
-        self.out.append(f"ea={self.ea(op.mem)}; CHK(ea,{op.size});")
+        self.addr(op)
         return f"ld(c,ea,{op.size})"
 
     def write(self, op, v):
@@ -129,61 +198,95 @@ class Lifter:
                 r = HI8[n]
                 return f"{r}=({r}&0xffff00ffu)|((({v})&0xffu)<<8);"
             raise Unsupported(f"reg {n}")
-        # ea was computed by the matching read() or by addr()
-        return f"st(c,ea,(uint32_t)({v}),{op.size});"
+        return f"st(c,ea,(uint32_t)({v}),{op.size});"      # ea from the matching read() or addr()
 
-    def addr(self, op):
+    def mem_dst(self, op):
         if op.type == x86.X86_OP_MEM:
-            self.out.append(f"ea={self.ea(op.mem)}; CHK(ea,{op.size});")
+            self.addr(op)
+
+    @staticmethod
+    def zsp(M, S):
+        return f"zf=(res&0x{M:x}u)==0; sf=(res&0x{S:x}u)!=0; pf=par(res);"
+
+    def arith(self, m, M, S):
+        if m in ("add", "xadd"):
+            return f"res=(t1+t2)&0x{M:x}u; cf=((uint64_t)t1+t2)>0x{M:x}u; of=((~(t1^t2))&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
+        if m == "adc":
+            return f"res=(t1+t2+cf)&0x{M:x}u; cf=((uint64_t)t1+t2+cf)>0x{M:x}u; of=((~(t1^t2))&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
+        if m in ("sub", "cmp"):
+            return f"res=(t1-t2)&0x{M:x}u; cf=t1<t2; of=((t1^t2)&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
+        if m == "sbb":
+            return f"res=(t1-t2-cf)&0x{M:x}u; cf=(uint64_t)t1<(uint64_t)t2+cf; of=((t1^t2)&(t1^res)&0x{S:x}u)!=0; " + self.zsp(M, S)
+        opc = {"and": "&", "test": "&", "or": "|", "xor": "^"}[m]
+        return f"res=(t1{opc}t2)&0x{M:x}u; cf=0; of=0; " + self.zsp(M, S)
+
+    # --- control transfer -------------------------------------------------
+    def save(self):
+        return " ".join(f"c->r[{k}]={r};" for k, r in enumerate(REG32)) + " " + " ".join(f"c->{f}={f};" for f in FLAGS)
+
+    def load(self):
+        return " ".join(f"{r}=c->r[{k}];" for k, r in enumerate(REG32)) + " " + " ".join(f"{f}=c->{f};" for f in FLAGS)
+
+    def call_to(self, target_c, direct=None):
+        """Call a guest/host address. target_c is a C expression already computed into t1 if indirect."""
+        nxt = self.i.address + self.i.size
+        o = self.out
+        o.append(f"esp-=4; CHK(esp,4,{self.at()}); st(c,esp,0x{nxt:x}u,4); {self.save()}")
+        o.append(f"f_{direct:x}(c);" if direct is not None else f"rn_call(c,{target_c});")
+        o.append(f"{self.load()} if (c->halt) return; if (c->ret!=0x{nxt:x}u) TRAP({self.at()},\"return address changed\");")
+
+    def tail(self, target_c, direct=None):
+        call = f"f_{direct:x}(c);" if direct is not None else f"rn_call(c,{target_c});"
+        return f"{{ {self.save()} {call} return; }}"
+
+    def jump(self, t, cond=None):
+        if t in self.labels:
+            s = f"goto L{t:x};"
+        elif t in self.lifted:
+            s = self.tail(None, t)
+        else:
+            s = self.tail(f"0x{t:x}u")
+        return f"if ({cond}) {s}" if cond else s
 
     # --- one instruction --------------------------------------------------
-    def emit(self, i, fn_entry):
+    def emit(self, i):
         self.i = i
-        m = i.mnemonic
+        pre, m = self.mnem(i)
         ops = i.operands
         o = self.out
-        if m not in ALU:
-            raise Unsupported(f"mnemonic {m}")
-        if i.prefix[0] in (0xf2, 0xf3) and m not in ("movsd", "movsb", "movsw", "stosd", "stosb", "stosw"):
-            raise Unsupported(f"rep {m}")
+        op0 = i.opcode[0]
+        if 0xd8 <= op0 <= 0xdf:
+            return self.x87(i)
+        if m in ("wait", "nop", "fwait") or (m == "pause"):
+            return
         sz = ops[0].size if ops else 4
         M = (1 << (8 * sz)) - 1
         S = 1 << (8 * sz - 1)
-        ZS = f"zf=(res&0x{M:x}u)==0; sf=(res&0x{S:x}u)!=0;"
+        ZSP = self.zsp(M, S)
 
-        if m == "nop":
-            return
+        if op0 in STRING_OPS and len(i.opcode) and i.opcode[1] == 0:
+            return self.string(i, pre, STRING_OPS[op0], 1 if op0 & 1 == 0 else (2 if i.prefix[2] == 0x66 else 4))
         if m in ("mov", "movzx"):
-            v = self.read(ops[1])
-            if ops[0].type == x86.X86_OP_MEM:
-                self.addr(ops[0])
+            for x in ops:
+                if x.type == x86.X86_OP_REG and i.reg_name(x.reg) not in (*REG32, *R16, *LO8, *HI8):
+                    raise Unsupported(f"mov {i.reg_name(x.reg)}")
+            v = self.read(ops[1], sz)
+            self.mem_dst(ops[0])
             o.append(self.write(ops[0], v))
             return
         if m == "movsx":
             s2 = ops[1].size
             v = self.read(ops[1])
-            o.append(self.write(ops[0], f"(uint32_t)(int{8*s2}_t)({v})"))
+            o.append(self.write(ops[0], f"(uint32_t)(int32_t)(int{8*s2}_t)({v})"))
             return
         if m == "lea":
             o.append(self.write(ops[0], self.ea(ops[1].mem)))
             return
         if m in ("add", "sub", "adc", "sbb", "and", "or", "xor", "cmp", "test"):
-            b = self.read(ops[1])
+            b = self.read(ops[1], sz)
             o.append(f"t2={b};")
             a = self.read(ops[0])
-            o.append(f"t1={a};")
-            if m == "add":
-                o.append(f"res=(t1+t2)&0x{M:x}u; cf=((uint64_t)t1+t2)>0x{M:x}u; of=((~(t1^t2))&(t1^res)&0x{S:x}u)!=0;")
-            elif m == "adc":
-                o.append(f"res=(t1+t2+cf)&0x{M:x}u; cf=((uint64_t)t1+t2+cf)>0x{M:x}u; of=((~(t1^t2))&(t1^res)&0x{S:x}u)!=0;")
-            elif m in ("sub", "cmp"):
-                o.append(f"res=(t1-t2)&0x{M:x}u; cf=t1<t2; of=((t1^t2)&(t1^res)&0x{S:x}u)!=0;")
-            elif m == "sbb":
-                o.append(f"res=(t1-t2-cf)&0x{M:x}u; cf=(uint64_t)t1<(uint64_t)t2+cf; of=((t1^t2)&(t1^res)&0x{S:x}u)!=0;")
-            else:
-                opc = {"and": "&", "test": "&", "or": "|", "xor": "^"}[m]
-                o.append(f"res=(t1{opc}t2)&0x{M:x}u; cf=0; of=0;")
-            o.append(ZS)
+            o.append(f"t1={a}; " + self.arith(m, M, S))
             if m not in ("cmp", "test"):
                 o.append(self.write(ops[0], "res"))
             return
@@ -191,16 +294,16 @@ class Lifter:
             a = self.read(ops[0])
             o.append(f"t1={a};")
             if m == "inc":
-                o.append(f"res=(t1+1)&0x{M:x}u; of=res==0x{S:x}u; {ZS}")
+                o.append(f"res=(t1+1)&0x{M:x}u; of=res==0x{S:x}u; {ZSP}")
             elif m == "dec":
-                o.append(f"res=(t1-1)&0x{M:x}u; of=t1==0x{S:x}u; {ZS}")
+                o.append(f"res=(t1-1)&0x{M:x}u; of=t1==0x{S:x}u; {ZSP}")
             elif m == "neg":
-                o.append(f"res=(0u-t1)&0x{M:x}u; cf=t1!=0; of=t1==0x{S:x}u; {ZS}")
+                o.append(f"res=(0u-t1)&0x{M:x}u; cf=t1!=0; of=t1==0x{S:x}u; {ZSP}")
             else:
                 o.append(f"res=(~t1)&0x{M:x}u;")
             o.append(self.write(ops[0], "res"))
             return
-        if m in ("shl", "sal", "shr", "sar", "rol", "ror"):
+        if m in ("shl", "sal", "shr", "sar", "rol", "ror", "rcl", "rcr"):
             n = self.read(ops[1]) if len(ops) > 1 else "1u"
             o.append(f"n=({n})&31u;")
             a = self.read(ops[0])
@@ -208,53 +311,131 @@ class Lifter:
             bits = 8 * sz
             o.append("if (n) {")
             if m in ("shl", "sal"):
-                o.append(f"res=(uint32_t)(((uint64_t)t1<<n)&0x{M:x}u); cf=n<={bits}?((uint64_t)t1>>({bits}-n))&1:0; of=((res&0x{S:x}u)!=0)^cf; {ZS}")
+                o.append(f"res=(uint32_t)(((uint64_t)t1<<n)&0x{M:x}u); cf=n<={bits}?(int)((((uint64_t)t1)>>({bits}-n))&1):0; of=((res&0x{S:x}u)!=0)^cf; {ZSP}")
             elif m == "shr":
-                o.append(f"res=(uint32_t)((uint64_t)t1>>n); cf=(t1>>(n-1))&1; of=(t1&0x{S:x}u)!=0; {ZS}")
+                o.append(f"res=(uint32_t)((uint64_t)t1>>n); cf=(int)(((uint64_t)t1>>(n-1))&1); of=(t1&0x{S:x}u)!=0; {ZSP}")
             elif m == "sar":
-                o.append(f"res=(uint32_t)(((int64_t)(int{bits}_t)t1)>>n)&0x{M:x}u; cf=(uint32_t)((((int64_t)(int{bits}_t)t1)>>(n-1))&1); of=0; {ZS}")
+                o.append(f"res=(uint32_t)(((int64_t)(int{bits}_t)t1)>>n)&0x{M:x}u; cf=(int)((((int64_t)(int{bits}_t)t1)>>(n-1))&1); of=0; {ZSP}")
             elif m == "rol":
                 o.append(f"k=n%{bits}; res=k?((t1<<k)|(t1>>({bits}-k)))&0x{M:x}u:t1; cf=res&1; of=((res&0x{S:x}u)!=0)^cf;")
-            else:
+            elif m == "ror":
                 o.append(f"k=n%{bits}; res=k?((t1>>k)|(t1<<({bits}-k)))&0x{M:x}u:t1; cf=(res&0x{S:x}u)!=0; of=((res^(res<<1))&0x{S:x}u)!=0;")
+            elif m == "rcl":
+                o.append(f"res=t1; for (k=n%{bits + 1}; k; k--) {{ uint32_t hi=(res&0x{S:x}u)!=0; res=((res<<1)|cf)&0x{M:x}u; cf=hi; }} of=((res&0x{S:x}u)!=0)^cf;")
+            else:
+                o.append(f"of=((t1&0x{S:x}u)!=0)^cf; res=t1; for (k=n%{bits + 1}; k; k--) {{ uint32_t lo=res&1; res=(res>>1)|(cf?0x{S:x}u:0); cf=lo; }}")
             o.append(self.write(ops[0], "res"))
             o.append("}")
             return
-        if m == "imul" and len(ops) >= 2:
+        if m in ("shld", "shrd"):
             if sz != 4:
-                raise Unsupported("imul16")
-            b = self.read(ops[2]) if len(ops) == 3 else self.read(ops[0])
+                raise Unsupported(f"{m}16")
+            n = self.read(ops[2])
+            o.append(f"n=({n})&31u; t2={self.read(ops[1])};")
+            a = self.read(ops[0])
+            o.append(f"t1={a}; if (n) {{")
+            if m == "shld":
+                o.append(f"res=(t1<<n)|(t2>>(32-n)); cf=(t1>>(32-n))&1; of=((res^t1)&0x80000000u)!=0; {ZSP}")
+            else:
+                o.append(f"res=(t1>>n)|(t2<<(32-n)); cf=(t1>>(n-1))&1; of=((res^t1)&0x80000000u)!=0; {ZSP}")
+            o.append(self.write(ops[0], "res"))
+            o.append("}")
+            return
+        if m in ("bt", "bts", "btr", "btc"):
+            bits = 8 * sz
+            if ops[0].type == x86.X86_OP_MEM and ops[1].type == x86.X86_OP_REG:
+                o.append(f"t2={self.read(ops[1])}; ea={self.ea(ops[0].mem)}+(uint32_t)(((int32_t)t2>>5)*4); CHK(ea,4,{self.at()}); t1=ld(c,ea,4); n=t2&31u;")
+                dst = f"st(c,ea,res,4);"
+            else:
+                o.append(f"n=({self.read(ops[1])})&{bits - 1}u;")
+                o.append(f"t1={self.read(ops[0])};")
+                dst = self.write(ops[0], "res")
+            o.append("cf=(t1>>n)&1;")
+            if m != "bt":
+                expr = {"bts": "t1|(1u<<n)", "btr": "t1&~(1u<<n)", "btc": "t1^(1u<<n)"}[m]
+                o.append(f"res={expr}; {dst}")
+            return
+        if m == "imul" and len(ops) >= 2:
+            b = self.read(ops[2], sz) if len(ops) == 3 else self.read(ops[1])
             o.append(f"t2={b};")
-            a = self.read(ops[1])
-            o.append(f"w=(int64_t)(int32_t)({a})*(int64_t)(int32_t)t2; cf=of=(w!=(int64_t)(int32_t)w);")
+            a = self.read(ops[1]) if len(ops) == 3 else self.read(ops[0])
+            bits = 8 * sz
+            o.append(f"w=(int64_t)(int{bits}_t)({a})*(int64_t)(int{bits}_t)t2; cf=of=(w!=(int64_t)(int{bits}_t)w);")
             o.append(self.write(ops[0], "(uint32_t)w"))
             return
         if m in ("mul", "imul", "div", "idiv"):
-            if sz != 4:
-                raise Unsupported(f"{m}{8*sz}")
             v = self.read(ops[0])
             o.append(f"t1={v};")
-            if m == "mul":
-                o.append("u=(uint64_t)eax*t1; eax=(uint32_t)u; edx=(uint32_t)(u>>32); cf=of=edx!=0;")
-            elif m == "imul":
-                o.append("w=(int64_t)(int32_t)eax*(int32_t)t1; eax=(uint32_t)w; edx=(uint32_t)((uint64_t)w>>32); cf=of=(w!=(int64_t)(int32_t)w);")
-            elif m == "div":
-                o.append("u=((uint64_t)edx<<32)|eax; if (!t1 || u/t1>0xffffffffu) goto fault; eax=(uint32_t)(u/t1); edx=(uint32_t)(u%t1);")
+            at = self.at()
+            if sz == 4:
+                o.append({
+                    "mul": "u=(uint64_t)eax*t1; eax=(uint32_t)u; edx=(uint32_t)(u>>32); cf=of=edx!=0;",
+                    "imul": "w=(int64_t)(int32_t)eax*(int32_t)t1; eax=(uint32_t)w; edx=(uint32_t)((uint64_t)w>>32); cf=of=(w!=(int64_t)(int32_t)w);",
+                    "div": f"u=((uint64_t)edx<<32)|eax; if (!t1 || u/t1>0xffffffffu) TRAP({at},\"divide error\"); eax=(uint32_t)(u/t1); edx=(uint32_t)(u%t1);",
+                    "idiv": f"w=(int64_t)(((uint64_t)edx<<32)|eax); if (!t1) TRAP({at},\"divide error\"); {{ int64_t q=w/(int32_t)t1; if (q!=(int32_t)q) TRAP({at},\"divide error\"); eax=(uint32_t)q; edx=(uint32_t)(w%(int32_t)t1); }}",
+                }[m])
+            elif sz == 2:
+                o.append({
+                    "mul": "u=(eax&0xffffu)*(uint64_t)t1; eax=(eax&0xffff0000u)|(uint32_t)(u&0xffff); edx=(edx&0xffff0000u)|(uint32_t)((u>>16)&0xffff); cf=of=(u>>16)!=0;",
+                    "imul": "w=(int64_t)(int16_t)eax*(int16_t)t1; eax=(eax&0xffff0000u)|(uint32_t)(w&0xffff); edx=(edx&0xffff0000u)|(uint32_t)((w>>16)&0xffff); cf=of=(w!=(int16_t)w);",
+                    "div": f"u=((edx&0xffffu)<<16)|(eax&0xffffu); if (!t1 || u/t1>0xffffu) TRAP({at},\"divide error\"); eax=(eax&0xffff0000u)|(uint32_t)(u/t1); edx=(edx&0xffff0000u)|(uint32_t)(u%t1);",
+                    "idiv": f"w=(int32_t)(((edx&0xffffu)<<16)|(eax&0xffffu)); if (!t1) TRAP({at},\"divide error\"); {{ int64_t q=w/(int16_t)t1; if (q!=(int16_t)q) TRAP({at},\"divide error\"); eax=(eax&0xffff0000u)|(uint32_t)(q&0xffff); edx=(edx&0xffff0000u)|(uint32_t)((w%(int16_t)t1)&0xffff); }}",
+                }[m])
             else:
-                o.append("w=(int64_t)(((uint64_t)edx<<32)|eax); if (!t1) goto fault; { int64_t q=w/(int32_t)t1; if (q!=(int32_t)q) goto fault; eax=(uint32_t)q; edx=(uint32_t)(w%(int32_t)t1); }")
+                o.append({
+                    "mul": "u=(eax&0xffu)*t1; eax=(eax&0xffff0000u)|(uint32_t)(u&0xffff); cf=of=(u>>8)!=0;",
+                    "imul": "w=(int8_t)eax*(int8_t)t1; eax=(eax&0xffff0000u)|(uint32_t)(w&0xffff); cf=of=(w!=(int8_t)w);",
+                    "div": f"u=eax&0xffffu; if (!t1 || u/t1>0xffu) TRAP({at},\"divide error\"); eax=(eax&0xffff0000u)|(uint32_t)((u%t1)<<8)|(uint32_t)(u/t1);",
+                    "idiv": f"w=(int16_t)eax; if (!t1) TRAP({at},\"divide error\"); {{ int64_t q=w/(int8_t)t1; if (q!=(int8_t)q) TRAP({at},\"divide error\"); eax=(eax&0xffff0000u)|(uint32_t)(((w%(int8_t)t1)&0xff)<<8)|(uint32_t)(q&0xff); }}",
+                }[m])
             return
         if m == "push":
-            v = self.read(ops[0])
-            o.append(f"t1={v}; esp-=4; CHK(esp,4); st(c,esp,t1,4);")
+            if ops[0].type == x86.X86_OP_IMM:
+                n = 2 if i.prefix[2] == 0x66 else 4
+                v = f"0x{ops[0].imm & ((1 << (8 * n)) - 1):x}u"
+            else:
+                n = ops[0].size
+                v = self.read(ops[0])
+            o.append(f"t1={v}; esp-={n}; CHK(esp,{n},{self.at()}); st(c,esp,t1,{n});")
             return
         if m == "pop":
-            o.append("CHK(esp,4); t1=ld(c,esp,4); esp+=4;")
-            if ops[0].type == x86.X86_OP_MEM:
-                self.addr(ops[0])
+            n = ops[0].size
+            o.append(f"CHK(esp,{n},{self.at()}); t1=ld(c,esp,{n}); esp+={n};")
+            self.mem_dst(ops[0])
             o.append(self.write(ops[0], "t1"))
             return
+        if m == "pushal":
+            o.append(f"t1=esp; esp-=32; CHK(esp,32,{self.at()}); " +
+                     " ".join(f"st(c,esp+{28 - 4 * k},{r if r != 'esp' else 't1'},4);" for k, r in enumerate(REG32)))
+            return
+        if m == "popal":
+            o.append(f"CHK(esp,32,{self.at()}); " +
+                     " ".join(f"{r}=ld(c,esp+{28 - 4 * k},4);" for k, r in enumerate(REG32) if r != "esp") + " esp+=32;")
+            return
+        if m == "pushfd":
+            o.append(f"t1=(uint32_t)cf|2u|((uint32_t)pf<<2)|((uint32_t)zf<<6)|((uint32_t)sf<<7)|0x200u|((uint32_t)df<<10)|((uint32_t)of<<11)|c->eflx; "
+                     f"esp-=4; CHK(esp,4,{self.at()}); st(c,esp,t1,4);")
+            return
+        if m == "popfd":
+            o.append(f"CHK(esp,4,{self.at()}); t1=ld(c,esp,4); esp+=4; cf=t1&1; pf=(t1>>2)&1; zf=(t1>>6)&1; sf=(t1>>7)&1; "
+                     "df=(t1>>10)&1; of=(t1>>11)&1; c->eflx=t1&0x240000u;")
+            return
+        if m == "lahf":
+            o.append("eax=(eax&0xffff00ffu)|(((uint32_t)sf<<7|(uint32_t)zf<<6|(uint32_t)pf<<2|2u|(uint32_t)cf)<<8);")
+            return
+        if m == "sahf":
+            o.append("t1=(eax>>8)&0xffu; cf=t1&1; pf=(t1>>2)&1; zf=(t1>>6)&1; sf=(t1>>7)&1;")
+            return
+        if m in ("clc", "stc", "cmc", "cld", "std"):
+            o.append({"clc": "cf=0;", "stc": "cf=1;", "cmc": "cf=!cf;", "cld": "df=0;", "std": "df=1;"}[m])
+            return
         if m == "leave":
-            o.append("esp=ebp; CHK(esp,4); ebp=ld(c,esp,4); esp+=4;")
+            o.append(f"esp=ebp; CHK(esp,4,{self.at()}); ebp=ld(c,esp,4); esp+=4;")
+            return
+        if m == "enter":
+            if ops[1].imm != 0:
+                raise Unsupported("enter nested")
+            o.append(f"esp-=4; CHK(esp,4,{self.at()}); st(c,esp,ebp,4); ebp=esp; esp-=0x{ops[0].imm:x}u;")
             return
         if m == "xchg":
             a = self.read(ops[0])
@@ -262,54 +443,261 @@ class Lifter:
             b = self.read(ops[1])
             o.append(f"t2={b};")
             o.append(self.write(ops[1], "t1"))
-            if ops[0].type == x86.X86_OP_MEM:
-                self.addr(ops[0])
+            self.mem_dst(ops[0])
             o.append(self.write(ops[0], "t2"))
             return
-        if m == "cdq":
-            o.append("edx=(uint32_t)((int32_t)eax>>31);")
+        if m == "xadd":
+            b = self.read(ops[1])
+            o.append(f"t2={b};")
+            a = self.read(ops[0])
+            o.append(f"t1={a}; " + self.arith("add", M, S))
+            o.append(self.write(ops[1], "t1"))
+            o.append(self.write(ops[0], "res"))
             return
-        if m == "cwde":
-            o.append("eax=(uint32_t)(int16_t)(eax&0xffffu);")
+        if m == "bswap":
+            r = self.r32(ops[0].reg)
+            o.append(f"{r}=__builtin_bswap32({r});")
             return
-        if m.startswith("set"):
-            if ops[0].type == x86.X86_OP_MEM:
-                self.addr(ops[0])
+        if m in ("cdq", "cwde", "cbw", "cwd"):
+            o.append({"cdq": "edx=(uint32_t)((int32_t)eax>>31);",
+                      "cwde": "eax=(uint32_t)(int32_t)(int16_t)(eax&0xffffu);",
+                      "cbw": "eax=(eax&0xffff0000u)|((uint32_t)(int16_t)(int8_t)(eax&0xffu)&0xffffu);",
+                      "cwd": "edx=(edx&0xffff0000u)|(((int16_t)eax<0)?0xffffu:0u);"}[m])
+            return
+        if m == "xlatb":
+            o.append(f"ea=ebx+(eax&0xffu); CHK(ea,1,{self.at()}); eax=(eax&0xffffff00u)|ld(c,ea,1);")
+            return
+        if m.startswith("set") and m[3:] in COND:
+            self.mem_dst(ops[0])
             o.append(self.write(ops[0], f"({COND[m[3:]]})?1u:0u"))
             return
-        if m in ("movsd", "movsb", "movsw", "stosd", "stosb", "stosw"):
-            n = {"d": 4, "w": 2, "b": 1}[m[-1]]
-            rep = i.prefix[0] in (0xf2, 0xf3)
-            step = (f"CHK(esi,{n}); CHK(edi,{n}); st(c,edi,ld(c,esi,{n}),{n}); esi+={n}; edi+={n};" if m.startswith("movs")
-                    else f"CHK(edi,{n}); st(c,edi,eax,{n}); edi+={n};")
-            o.append(f"while (ecx) {{ {step} ecx--; }}" if rep else step)
+        if m == "rdtsc":
+            o.append("u=rn_rdtsc(c); eax=(uint32_t)u; edx=(uint32_t)(u>>32);")
+            return
+        if m == "cpuid":
+            o.append("rn_cpuid(c,&eax,&ebx,&ecx,&edx);")
             return
         if m == "ret":
             imm = ops[0].imm if ops else 0
-            o.append(f"CHK(esp,4); c->ret=ld(c,esp,4); esp+=4+{imm}; goto done;")
+            o.append(f"CHK(esp,4,{self.at()}); c->ret=ld(c,esp,4); esp+=4+{imm}; goto done;")
+            return
+        if m == "call":
+            op = ops[0]
+            nxt = i.address + i.size
+            if op.type == x86.X86_OP_IMM:
+                if op.imm == nxt:          # call $+5: pushes its own address
+                    o.append(f"esp-=4; CHK(esp,4,{self.at()}); st(c,esp,0x{nxt:x}u,4);")
+                elif op.imm in self.lifted:
+                    self.call_to(None, op.imm)
+                else:
+                    self.call_to(f"0x{op.imm:x}u")
+                return
+            o.append(f"t1={self.read(op)};")
+            self.call_to("t1")
             return
         if m == "jmp":
-            o.append(f"goto L{ops[0].imm:x};")
+            op = ops[0]
+            if op.type == x86.X86_OP_IMM:
+                o.append(self.jump(op.imm))
+                return
+            o.append(f"t1={self.read(op)};")
+            cases = self.switches.get(i.address, [])
+            if cases:
+                o.append("switch (t1) { " + " ".join(f"case 0x{t:x}u: {self.jump(t)}" for t in sorted(set(cases))) + " }")
+            o.append(self.tail("t1"))
             return
-        if m.startswith("j"):
-            o.append(f"if ({COND[m[1:]]}) goto L{ops[0].imm:x};")
+        if m in ("loop", "loope", "loopne", "jecxz"):
+            t = ops[0].imm
+            cond = {"loop": "ecx", "loope": "ecx&&zf", "loopne": "ecx&&!zf", "jecxz": "!ecx"}[m]
+            if m != "jecxz":
+                o.append("ecx--;")
+            o.append(self.jump(t, cond))
             return
-        raise Unsupported(f"mnemonic {m}")
+        if m.startswith("j") and m[1:] in COND:
+            o.append(self.jump(ops[0].imm, COND[m[1:]]))
+            return
+        raise Unsupported(f"{m}")
 
-    def lift(self, entry):
-        body = self.body(entry)
+    def string(self, i, pre, kind, n):
+        o = self.out
+        at = self.at()
+        d = f"(df?-{n}:{n})"
+        M = (1 << (8 * n)) - 1
+        S = 1 << (8 * n - 1)
+        acc = {1: "(eax&0xffu)", 2: "(eax&0xffffu)", 4: "eax"}[n]
+        wacc = {1: "eax=(eax&0xffffff00u)|t1;", 2: "eax=(eax&0xffff0000u)|t1;", 4: "eax=t1;"}[n]
+        if kind == "movs":
+            step = f"CHK(esi,{n},{at}); CHK(edi,{n},{at}); st(c,edi,ld(c,esi,{n}),{n}); esi+={d}; edi+={d};"
+        elif kind == "stos":
+            step = f"CHK(edi,{n},{at}); st(c,edi,eax,{n}); edi+={d};"
+        elif kind == "lods":
+            step = f"CHK(esi,{n},{at}); t1=ld(c,esi,{n}); {wacc} esi+={d};"
+        elif kind == "cmps":
+            step = f"CHK(esi,{n},{at}); CHK(edi,{n},{at}); t1=ld(c,esi,{n}); t2=ld(c,edi,{n}); esi+={d}; edi+={d}; " + self.arith("cmp", M, S)
+        else:
+            step = f"CHK(edi,{n},{at}); t1={acc}; t2=ld(c,edi,{n}); edi+={d}; " + self.arith("cmp", M, S)
+        if not pre:
+            o.append(step)
+        elif kind in ("movs", "stos", "lods"):
+            if kind == "movs" and n == 4:   # bulk path for the common forward copy that does not overlap
+                o.append(f"if (!df && ecx && ecx<0x40000000u && (uint32_t)(esi-LOW)<=c->memsz-LOW-ecx*4 && (uint32_t)(edi-LOW)<=c->memsz-LOW-ecx*4 "
+                         f"&& (edi+ecx*4<=esi || esi+ecx*4<=edi)) {{ memcpy(c->mem+edi,c->mem+esi,ecx*4); esi+=ecx*4; edi+=ecx*4; ecx=0; }}")
+            o.append(f"while (ecx) {{ {step} ecx--; }}")
+        else:
+            stop = "if (!zf) break;" if pre == "repe" else "if (zf) break;"
+            o.append(f"while (ecx) {{ {step} ecx--; {stop} }}")
+
+    # --- x87, decoded from the opcode bytes (capstone's operand order is ambiguous) ---------------
+    def x87(self, i):
+        o = self.out
+        at = self.at()
+        b = list(i.opcode)
+        op, modrm = b[0], i.modrm
+        mod, reg, rm = modrm >> 6, (modrm >> 3) & 7, modrm & 7
+        if op < 0xd8 or op > 0xdf:
+            raise Unsupported(i.mnemonic)
+        mem = next((x for x in i.operands if x.type == x86.X86_OP_MEM), None)
+        ar = ["fset(c,0,*fr(c,0)+v);", "fset(c,0,*fr(c,0)*v);", "fcom(c,*fr(c,0),v);", "fcom(c,*fr(c,0),v); fpop(c);",
+              "fset(c,0,*fr(c,0)-v);", "fset(c,0,v-*fr(c,0));", "fset(c,0,*fr(c,0)/v);", "fset(c,0,v/ *fr(c,0));"]
+        if mod != 3:
+            o.append(f"ea={self.ea(mem.mem)};")
+            ck = lambda n: f"CHK(ea,{n},{at});"
+            if op in (0xd8, 0xdc):
+                n = 4 if op == 0xd8 else 8
+                o.append(f"{ck(n)} {{ double v={'ldf' if n == 4 else 'ldd'}(c,ea); {ar[reg]} }}")
+                return
+            if op in (0xda, 0xde):
+                n = 4 if op == 0xda else 2
+                o.append(f"{ck(n)} {{ double v=(int{8*n}_t)ld(c,ea,{n}); {ar[reg]} }}")
+                return
+            if op == 0xd9:
+                s = {0: f"{ck(4)} fpush(c,ldf(c,ea));", 2: f"{ck(4)} stf(c,ea,(float)*fr(c,0));",
+                     3: f"{ck(4)} stf(c,ea,(float)*fr(c,0)); fpop(c);", 5: f"{ck(2)} c->fcw=ld(c,ea,2);",
+                     7: f"{ck(2)} st(c,ea,c->fcw,2);"}.get(reg)
+            elif op == 0xdb:
+                s = {0: f"{ck(4)} fpush(c,(int32_t)ld(c,ea,4));", 1: f"{ck(4)} st(c,ea,(uint32_t)fist(c,*fr(c,0),32,1),4); fpop(c);",
+                     2: f"{ck(4)} st(c,ea,(uint32_t)fist(c,*fr(c,0),32,0),4);", 3: f"{ck(4)} st(c,ea,(uint32_t)fist(c,*fr(c,0),32,0),4); fpop(c);",
+                     5: f"{ck(10)} fpush(c,ld80(c,ea));", 7: f"{ck(10)} st80(c,ea,*fr(c,0)); fpop(c);"}.get(reg)
+            elif op == 0xdd:
+                s = {0: f"{ck(8)} fpush(c,ldd(c,ea));", 1: f"{ck(8)} st64(c,ea,(uint64_t)fist(c,*fr(c,0),64,1)); fpop(c);",
+                     2: f"{ck(8)} std_(c,ea,*fr(c,0));", 3: f"{ck(8)} std_(c,ea,*fr(c,0)); fpop(c);",
+                     7: f"{ck(2)} st(c,ea,fstsw(c),2);"}.get(reg)
+            else:  # 0xdf
+                s = {0: f"{ck(2)} fpush(c,(int16_t)ld(c,ea,2));", 1: f"{ck(2)} st(c,ea,(uint32_t)fist(c,*fr(c,0),16,1),2); fpop(c);",
+                     2: f"{ck(2)} st(c,ea,(uint32_t)fist(c,*fr(c,0),16,0),2);", 3: f"{ck(2)} st(c,ea,(uint32_t)fist(c,*fr(c,0),16,0),2); fpop(c);",
+                     5: f"{ck(8)} fpush(c,(double)(int64_t)ld64(c,ea));", 7: f"{ck(8)} st64(c,ea,(uint64_t)fist(c,*fr(c,0),64,0)); fpop(c);"}.get(reg)
+            if s is None:
+                raise Unsupported(i.mnemonic)
+            o.append(s)
+            return
+        k = rm
+        if op == 0xd8:
+            o.append(f"{{ double v=*fr(c,{k}); {ar[reg]} }}")
+            return
+        if op in (0xdc, 0xde):
+            # dest st(i), src st(0); for 4..7 the direction is swapped relative to d8 (Intel SDM).
+            if op == 0xde and reg == 3:
+                if k != 1:
+                    raise Unsupported(i.mnemonic)
+                o.append("fcom(c,*fr(c,0),*fr(c,1)); fpop(c); fpop(c);")
+                return
+            ex = {0: f"*fr(c,{k})+*fr(c,0)", 1: f"*fr(c,{k})*(*fr(c,0))", 4: f"*fr(c,0)-*fr(c,{k})",
+                  5: f"*fr(c,{k})-*fr(c,0)", 6: f"*fr(c,0)/ *fr(c,{k})", 7: f"*fr(c,{k})/ *fr(c,0)"}.get(reg)
+            if ex is None:
+                if reg in (2, 3) and op == 0xdc:
+                    o.append(f"fcom(c,*fr(c,0),*fr(c,{k}));" + (" fpop(c);" if reg == 3 else ""))
+                    return
+                raise Unsupported(i.mnemonic)
+            o.append(f"fset(c,{k},{ex});" + (" fpop(c);" if op == 0xde else ""))
+            return
+        if op == 0xd9:
+            if reg == 0:
+                o.append(f"{{ double v=*fr(c,{k}); fpush(c,v); }}")
+                return
+            if reg == 1:
+                o.append(f"{{ double v=*fr(c,0); *fr(c,0)=*fr(c,{k}); *fr(c,{k})=v; }}")
+                return
+            x = modrm
+            if x in FPU_CONST:
+                o.append(f"fpush(c,{FPU_CONST[x]});")
+                return
+            s = {0xd0: "", 0xe0: "*fr(c,0)=-*fr(c,0);", 0xe1: "*fr(c,0)=fabs(*fr(c,0));", 0xe4: "fcom(c,*fr(c,0),0.0);",
+                 0xe5: "fxam(c);", 0xf0: "fset(c,0,exp2(*fr(c,0))-1.0);", 0xf1: "fset(c,1,*fr(c,1)*log2(*fr(c,0))); fpop(c);",
+                 0xf2: "fset(c,0,tan(*fr(c,0))); fpush(c,1.0); c->fsw&=~FC2;",
+                 0xf3: "fset(c,1,atan2(*fr(c,1),*fr(c,0))); fpop(c);",
+                 0xf8: "fset(c,0,fmod(*fr(c,0),*fr(c,1))); c->fsw&=~(FC2|FC0|FC3|0x200u);",
+                 0xf5: "fset(c,0,remainder(*fr(c,0),*fr(c,1))); c->fsw&=~(FC2|FC0|FC3|0x200u);",
+                 0xf7: "c->ftop=(c->ftop+1)&7;", 0xf6: "c->ftop=(c->ftop-1)&7;",
+                 0xf9: "fset(c,1,*fr(c,1)*log2(*fr(c,0)+1.0)); fpop(c);",
+                 0xfa: "fset(c,0,sqrt(*fr(c,0)));",
+                 0xfb: "{ double v=*fr(c,0); fset(c,0,sin(v)); fpush(c,cos(v)); c->fsw&=~FC2; }",
+                 0xfc: "fset(c,0,frnd(c,*fr(c,0)));", 0xfd: "fset(c,0,ldexp(*fr(c,0),(int)trunc(*fr(c,1))));",
+                 0xfe: "fset(c,0,sin(*fr(c,0))); c->fsw&=~FC2;", 0xff: "fset(c,0,cos(*fr(c,0))); c->fsw&=~FC2;"}.get(x)
+            if s is None:
+                raise Unsupported(i.mnemonic)
+            o.append(s)
+            return
+        if op == 0xdd:
+            s = {0: f"c->ftag&=~(1u<<((c->ftop+{k})&7));", 2: f"*fr(c,{k})=*fr(c,0);", 3: f"*fr(c,{k})=*fr(c,0); fpop(c);",
+                 4: f"fcom(c,*fr(c,0),*fr(c,{k}));", 5: f"fcom(c,*fr(c,0),*fr(c,{k})); fpop(c);"}.get(reg)
+            if s is None:
+                raise Unsupported(i.mnemonic)
+            o.append(s)
+            return
+        if op == 0xda and modrm == 0xe9:
+            o.append("fcom(c,*fr(c,0),*fr(c,1)); fpop(c); fpop(c);")
+            return
+        if op == 0xdb and modrm in (0xe2, 0xe3):
+            o.append("c->fsw=0;" if modrm == 0xe2 else "c->fcw=0x37f; c->fsw=0; c->ftop=0; c->ftag=0;")
+            return
+        if op == 0xdb and reg in (5, 6) or op == 0xdf and reg in (5, 6):    # fucomi/fcomi(p): ZF PF CF
+            o.append(f"{{ double a=*fr(c,0), v=*fr(c,{k}); if (a!=a||v!=v) zf=pf=cf=1; else {{ zf=a==v; cf=a<v; pf=0; }} of=sf=0; }}" +
+                     (" fpop(c);" if op == 0xdf else ""))
+            return
+        if op == 0xdf and modrm == 0xe0:
+            o.append("eax=(eax&0xffff0000u)|fstsw(c);")
+            return
+        raise Unsupported(i.mnemonic)
+
+    # --- whole function ---------------------------------------------------
+    def lift(self, entry, lifted=None):
+        """C source for one function. `lifted` = set of entries that exist as C functions."""
+        self.lifted = lifted if lifted is not None else {entry}
+        body, self.switches, bad = self.body(entry)
+        targets = {entry}
+        for a, i in body.items():
+            if i.group(CS_GRP_JUMP) and i.operands and i.operands[0].type == x86.X86_OP_IMM:
+                targets.add(i.operands[0].imm)
+            targets.update(self.switches.get(a, []))
+        self.labels = set(body) | bad
+        self.info = {"calls": 0, "traps": [], "x87": 0}
         self.out = []
-        addrs = sorted(body)
-        for a in addrs:
+        for a in sorted(self.labels):
+            i = body.get(a)
             self.out.append(f"L{a:x}:;")
-            self.emit(body[a], entry)
-            nxt = a + body[a].size
-            if nxt not in body and not (body[a].group(CS_GRP_RET) or body[a].mnemonic == "jmp"):
-                self.out.append(f"goto L{nxt:x};")   # fall into code not decoded: cannot happen
+            if i is None:
+                self.out.append(f"TRAP(0x{a:x},\"cannot decode\");")
+                self.info["traps"].append("decode")
+                continue
+            mark = len(self.out)
+            try:
+                self.emit(i)
+            except (Unsupported, KeyError, IndexError) as x:
+                del self.out[mark:]
+                name = (i.mnemonic + " " + i.op_str).strip().replace('"', "'")
+                self.out.append(f"TRAP(0x{a:x},\"not lifted: {name}\");")
+                self.info["traps"].append(str(x) if isinstance(x, Unsupported) else i.mnemonic)
+            if i.group(CS_GRP_CALL):
+                self.info["calls"] += 1
+            nxt = a + i.size
+            pre, m = self.mnem(i)
+            ends = i.group(CS_GRP_RET) or m in ("jmp", "hlt", "int3", "ud2", "iretd", "retf", "int", "int1", "into")
+            if not ends and nxt not in self.labels:
+                self.out.append(f"TRAP(0x{nxt:x},\"ran off the decoded body\");")
         regs = " ".join(f"uint32_t {r}=c->r[{k}];" for k, r in enumerate(REG32))
-        back = " ".join(f"c->r[{k}]={r};" for k, r in enumerate(REG32))
-        return (f"int f_{entry:x}(Ctx *c) {{\n{regs}\n"
-                "uint32_t ea=0,t1=0,t2=0,res=0,n=0,k=0; uint64_t u=0; int64_t w=0; int cf=0,zf=0,sf=0,of=0;\n"
-                "(void)ea;(void)t1;(void)t2;(void)res;(void)n;(void)k;(void)u;(void)w;(void)cf;(void)zf;(void)sf;(void)of;\n"
+        flags = " ".join(f"int {f}=c->{f};" for f in FLAGS)
+        return (f"void f_{entry:x}(Ctx *c) {{\n{regs} {flags}\n"
+                "uint32_t ea=0,t1=0,t2=0,res=0,n=0,k=0; uint64_t u=0; int64_t w=0;\n"
+                "(void)ea;(void)t1;(void)t2;(void)res;(void)n;(void)k;(void)u;(void)w;\n"
                 f"goto L{entry:x};\n" + "\n".join(self.out) +
-                f"\ndone: {back} return 0;\nfault: {back} return 1;\n}}\n")
+                f"\ndone: {self.save()} return;\ntrap: c->halt=1; {self.save()} return;\n}}\n")

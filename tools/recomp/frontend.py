@@ -150,6 +150,27 @@ for v in sorted(data_ptrs):
         add_func(v, "data")
 drain()
 
+# Code pointers as instruction immediates (push offset f, mov reg/mem, offset f): callbacks, atexit, vtables.
+imm_ptrs, scanned = set(), set()
+while True:
+    new = []
+    for a in sorted(set(insn_at) - scanned):
+        scanned.add(a)
+        ins = next(md.disasm(bytes(img[a - base:a - base + 16]), a), None)
+        if ins is None or ins.mnemonic not in ("push", "mov"):
+            continue
+        for op in ins.operands:
+            if op.type == x86.X86_OP_IMM and in_text(op.imm & 0xffffffff) and op.size == 4:
+                v = op.imm & 0xffffffff
+                imm_ptrs.add(v)
+                if v not in insn_at and v not in funcs:
+                    new.append(v)
+    if not new:
+        break
+    for v in new:
+        add_func(v, "data")
+    drain()
+
 # Pointers that land inside an already-decoded instruction are not code starts.
 mid = 0
 starts = set(insn_at)
@@ -180,6 +201,7 @@ res = {
     "groups": dict(groups.most_common()),
     "decode_failures": len(bad),
     "data_pointers_into_text": len(data_ptrs), "data_pointers_mid_instruction": mid,
+    "immediate_pointers_into_text": len(imm_ptrs),
     "top_mnemonics": dict(mn.most_common(40)),
     "all_mnemonics": sorted(mn),
     "unresolved_jmp_sites": [hex(a) for a in indirect_jmp],
@@ -191,7 +213,7 @@ with open(OUT.rsplit(".", 1)[0] + "_functions.tsv", "w") as f:
         f.write(f"{a:08x}\t{funcs[a]}\n")
 for k in ("text_bytes", "functions", "instructions", "distinct_mnemonics", "text_coverage", "jump_tables",
           "indirect_jmp_unresolved", "indirect_call", "import_call_sites", "imports_called", "x87_instructions",
-          "decode_failures", "data_pointers_into_text", "data_pointers_mid_instruction"):
+          "decode_failures", "data_pointers_into_text", "data_pointers_mid_instruction", "immediate_pointers_into_text"):
     print(f"{k}: {res[k]}")
 print("imports by dll:", res["imports"]["by_dll"])
 print("groups:", {g: c for g, c in groups.most_common() if g not in ("jump", "call", "ret", "branch_relative", "int")})
