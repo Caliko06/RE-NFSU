@@ -533,8 +533,8 @@ static uint32_t GetProcAddress_(Ctx *c) {
 }
 
 // ---- files -------------------------------------------------------------------------------------
-static uint32_t CreateFileA_(Ctx *c) {
-    const char *name = G(ARG(0));
+// CreateFile{A,W}(name, access, share, security, disposition, flags, template).
+static uint32_t create_file(Ctx *c, const char *name) {
     uint32_t access = ARG(1), disp = ARG(4);
     int id, existed = 0;
     if ((access & 0x40000000u) || (disp != 3 && gf_stat(name) != -2 && gf_stat(name) != 0)) {   // GENERIC_WRITE or create
@@ -563,6 +563,7 @@ static uint32_t CreateFileA_(Ctx *c) {
     set_error(c, 0);
     return h;
 }
+static uint32_t CreateFileA_(Ctx *c) { return create_file(c, G(ARG(0))); }
 static uint32_t ReadFile_(Ctx *c) {
     Handle *h = get_handle(ARG(0));
     uint32_t buf = ARG(1), n = ARG(2), got = ARG(3);
@@ -848,6 +849,110 @@ static uint32_t SHGetFolderPathA_(Ctx *c) {
     return 0;                                           // S_OK
 }
 
+// ---- date and time text: English (United Kingdom), the language the install writes; the time zone is GMT ----
+// SYSTEMTIME: wYear, wMonth, wDayOfWeek, wDay, wHour, wMinute, wSecond, wMilliseconds (u16 each).
+static void now_systemtime(uint16_t t[8]) {
+    time_t now = time(NULL);
+    struct tm g;
+    gmtime_r(&now, &g);
+    uint16_t v[8] = {(uint16_t)(g.tm_year + 1900), (uint16_t)(g.tm_mon + 1), (uint16_t)g.tm_wday, (uint16_t)g.tm_mday,
+                     (uint16_t)g.tm_hour, (uint16_t)g.tm_min, (uint16_t)g.tm_sec, 0};
+    memcpy(t, v, sizeof v);
+}
+// A date/time picture (d dd ddd dddd M MM MMM MMMM y yy yyyy h hh H HH m mm s ss t tt, 'quoted text').
+static int picture(const char *f, const uint16_t t[8], char *out, int n) {
+    static const char *mon[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September",
+                                "October", "November", "December"};
+    static const char *day[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    int o = 0;
+    char tmp[32];
+    while (*f && o < n - 1) {
+        char ch = *f;
+        int k = 1;
+        if (ch == '\'') {
+            for (f++; *f && *f != '\'' && o < n - 1; f++) out[o++] = *f;
+            if (*f) f++;
+            continue;
+        }
+        while (f[k] == ch) k++;
+        tmp[0] = 0;
+        int h12 = t[4] % 12 ? t[4] % 12 : 12;
+        switch (ch) {
+        case 'd': if (k <= 2) snprintf(tmp, sizeof tmp, k == 1 ? "%u" : "%02u", t[3]);
+                  else snprintf(tmp, sizeof tmp, "%.*s", k == 3 ? 3 : 20, day[t[2] % 7]); break;
+        case 'M': if (k <= 2) snprintf(tmp, sizeof tmp, k == 1 ? "%u" : "%02u", t[1]);
+                  else snprintf(tmp, sizeof tmp, "%.*s", k == 3 ? 3 : 20, mon[(t[1] + 11) % 12]); break;
+        case 'y': if (k <= 2) snprintf(tmp, sizeof tmp, k == 1 ? "%u" : "%02u", t[0] % 100);
+                  else snprintf(tmp, sizeof tmp, "%u", t[0]); break;
+        case 'h': snprintf(tmp, sizeof tmp, k == 1 ? "%u" : "%02u", h12); break;
+        case 'H': snprintf(tmp, sizeof tmp, k == 1 ? "%u" : "%02u", t[4]); break;
+        case 'm': snprintf(tmp, sizeof tmp, k == 1 ? "%u" : "%02u", t[5]); break;
+        case 's': snprintf(tmp, sizeof tmp, k == 1 ? "%u" : "%02u", t[6]); break;
+        case 't': snprintf(tmp, sizeof tmp, "%.*s", k == 1 ? 1 : 2, t[4] < 12 ? "AM" : "PM"); break;
+        default: k = 1; tmp[0] = ch; tmp[1] = 0;
+        }
+        f += k;
+        for (char *q = tmp; *q && o < n - 1; q++) out[o++] = *q;
+    }
+    out[o] = 0;
+    return o;
+}
+// Get{Date,Time}FormatA(locale, flags, SYSTEMTIME*, format, out, size): chars written with the NUL, or the
+// size needed when size is 0. DATE_LONGDATE = 2; TIME_NOSECONDS = 2, TIME_NOMINUTESORSECONDS = 1.
+static uint32_t date_time_format(Ctx *c, int date) {
+    uint32_t flags = ARG(1), tp = ARG(2), fmt = ARG(3), out = ARG(4), n = ARG(5);
+    uint16_t t[8];
+    if (tp) for (int k = 0; k < 8; k++) t[k] = (uint16_t)ld(c, tp + 2 * k, 2); else now_systemtime(t);
+    const char *f = fmt ? G(fmt) : date ? (flags & 2 ? "dd MMMM yyyy" : "dd/MM/yyyy")
+                                        : (flags & 1 ? "HH" : flags & 2 ? "HH:mm" : "HH:mm:ss");
+    char buf[256];
+    int len = picture(f, t, buf, sizeof buf) + 1;
+    if (!n) return (uint32_t)len;
+    if ((uint32_t)len > n) { set_error(c, 122); return 0; }      // ERROR_INSUFFICIENT_BUFFER
+    memcpy(G(out), buf, (size_t)len);
+    return (uint32_t)len;
+}
+static uint32_t GetDateFormatA_(Ctx *c) { return date_time_format(c, 1); }
+static uint32_t GetTimeFormatA_(Ctx *c) { return date_time_format(c, 0); }
+
+// ---- C runtime support ----------------------------------------------------------------------------
+static uint32_t GetProcessHeap_(Ctx *c) {
+    static uint32_t heap;
+    if (!heap) { heap = new_handle(H_HEAP); st(c, PEB_ADDR + 0x18, heap, 4); }
+    return heap;
+}
+static uint32_t SetEnvironmentVariableA_(Ctx *c) { (void)c; return 1; }      // nothing reads it back
+// EnumSystemLocalesA(callback, flags): the one installed locale, English (United Kingdom).
+static uint32_t EnumSystemLocalesA_(Ctx *c) {
+    static uint32_t str;
+    if (!str) { str = virtual_reserve(c, 16); put_str(c, str, "00000809"); }
+    uint32_t fn = ARG(0);
+    call_guest(c, fn, 1, &str);
+    return 1;
+}
+// No console is attached to a GUI program.
+static uint32_t no_console(Ctx *c) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
+static uint32_t RaiseException_(Ctx *c) {
+    rn_halt(c, "RaiseException code %08x flags %x (%u args)", ARG(0), ARG(1), ARG(2));
+    return 0;
+}
+static uint32_t RtlUnwind_(Ctx *c) { rn_halt(c, "RtlUnwind (exception unwinding)"); return 0; }
+static uint32_t UnhandledExceptionFilter_(Ctx *c) { rn_halt(c, "UnhandledExceptionFilter"); return 0; }
+static uint32_t TerminateProcess_(Ctx *c) { rn_halt(c, "TerminateProcess(%u): the game quit", ARG(1)); return 0; }
+// CreateFileW: the UTF-16 name narrowed (game paths are ASCII).
+static uint32_t CreateFileW_(Ctx *c) {
+    uint32_t w = ARG(0), k = 0;
+    char name[512];
+    for (uint16_t ch; (ch = (uint16_t)ld(c, w + 2 * k, 2)) && k < sizeof name - 1; k++) {
+        if (ch > 0x7f) { rn_halt(c, "CreateFileW with a non-ASCII name"); return INVALID_HANDLE; }
+        name[k] = (char)ch;
+    }
+    name[k] = 0;
+    return create_file(c, name);
+}
+// Serial ports and modems: this PC has none. Handles to them can never be opened.
+static uint32_t no_comm(Ctx *c) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
+
 static uint32_t entry_returned(Ctx *c) { rn_halt(c, "entry point returned eax=%08x", c->r[EAX]); return 0; }
 
 #define K(name, n) {"kernel32.dll", #name, n, name##_}
@@ -883,6 +988,16 @@ const Api win32_apis[] = {
     {"advapi32.dll", "RegOpenKeyExA", 5, RegOpenKeyExA_}, {"advapi32.dll", "RegOpenKeyA", 3, RegOpenKeyA_},
     {"advapi32.dll", "RegQueryValueExA", 6, RegQueryValueExA_}, {"advapi32.dll", "RegCloseKey", 1, RegCloseKey_},
     {"shfolder.dll", "SHGetFolderPathA", 5, SHGetFolderPathA_},
+    K(GetDateFormatA, 6), K(GetTimeFormatA, 6), K(GetProcessHeap, 0), K(SetEnvironmentVariableA, 2),
+    K(EnumSystemLocalesA, 2), K(RaiseException, 4), K(RtlUnwind, 4), K(UnhandledExceptionFilter, 1),
+    K(TerminateProcess, 2), K(CreateFileW, 7),
+    {"kernel32.dll", "GetConsoleMode", 2, no_console}, {"kernel32.dll", "GetNumberOfConsoleInputEvents", 2, no_console},
+    {"kernel32.dll", "PeekConsoleInputA", 4, no_console},
+    {"kernel32.dll", "GetCommConfig", 3, no_comm}, {"kernel32.dll", "GetCommState", 2, no_comm},
+    {"kernel32.dll", "SetCommConfig", 3, no_comm}, {"kernel32.dll", "SetCommState", 2, no_comm},
+    {"kernel32.dll", "SetCommMask", 2, no_comm}, {"kernel32.dll", "SetCommTimeouts", 2, no_comm},
+    {"kernel32.dll", "SetupComm", 3, no_comm}, {"kernel32.dll", "PurgeComm", 2, no_comm},
+    {"kernel32.dll", "WaitCommEvent", 3, no_comm}, {"kernel32.dll", "GetOverlappedResult", 4, no_comm},
 };
 const int win32_api_count = sizeof win32_apis / sizeof win32_apis[0];
 

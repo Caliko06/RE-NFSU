@@ -24,6 +24,8 @@ static uint32_t htonl_(Ctx *c) { return __builtin_bswap32(ARG(0)); }
 // TAPI: lineInitialize reports no devices; netapi32 Netbios: NRC_NOWILD-style "no adapter".
 static uint32_t lineInitialize_(Ctx *c) { if (ARG(4)) st(c, ARG(4), 0, 4); return 0; }   // 0 line devices
 static uint32_t lineShutdown_(Ctx *c) { (void)c; return 0; }
+static uint32_t line_bad_device(Ctx *c) { (void)c; return 0x80000010u; }
+static uint32_t line_bad_handle(Ctx *c) { (void)c; return 0x8000002bu; }
 static uint32_t Netbios_(Ctx *c) {
     uint32_t ncb = ARG(0);
     st(c, ncb + 1, 0x23, 1);    // ncb_retcode = NRC_BRIDGE: invalid LAN adapter number
@@ -38,6 +40,11 @@ const Api net_apis[] = {
     W(13, fail, 2), W(1, fail, 3), W(20, fail, 6), W(19, fail, 4), W(17, fail, 6), W(16, fail, 4), W(7, fail, 5),
     W(18, fail, 5), W(5, fail, 3), W(6, fail, 3), {"ws2_32.dll", "WSAIoctl", 9, fail},
     {"tapi32.dll", "lineInitialize", 5, lineInitialize_}, {"tapi32.dll", "lineShutdown", 1, lineShutdown_},
+    // lineInitialize reports 0 devices, so any device id is bad (LINEERR_BADDEVICEID / LINEERR_INVALLINEHANDLE).
+    {"tapi32.dll", "lineNegotiateAPIVersion", 6, line_bad_device}, {"tapi32.dll", "lineGetDevCaps", 5, line_bad_device},
+    {"tapi32.dll", "lineOpen", 9, line_bad_device}, {"tapi32.dll", "lineGetID", 6, line_bad_handle},
+    {"tapi32.dll", "lineMakeCall", 5, line_bad_handle}, {"tapi32.dll", "lineAnswer", 3, line_bad_handle},
+    {"tapi32.dll", "lineClose", 1, line_bad_handle},
     {"netapi32.dll", "Netbios", 1, Netbios_},
 };
 const int net_api_count = sizeof net_apis / sizeof net_apis[0];

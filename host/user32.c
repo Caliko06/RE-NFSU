@@ -308,6 +308,16 @@ static uint32_t GetMessageA_(Ctx *c) {
     return 0;
 }
 static uint32_t PostMessageA_(Ctx *c) { post(ARG(0), ARG(1), ARG(2), ARG(3)); return 1; }
+static uint32_t capture;
+static uint32_t SetCapture_(Ctx *c) { uint32_t old = capture; capture = ARG(0); return old; }
+static uint32_t ReleaseCapture_(Ctx *c) { (void)c; capture = 0; return 1; }
+// One GUI thread reads messages here: a thread message joins the same queue with no window.
+static uint32_t PostThreadMessageA_(Ctx *c) { post(0, ARG(1), ARG(2), ARG(3)); return 1; }
+static uint32_t DeleteObject_(Ctx *c) { (void)c; return 1; }                    // GDI objects are not tracked
+// ShellExecuteA (the EA web site and such): nothing is launched outside the game; > 32 means success.
+static uint32_t ShellExecuteA_(Ctx *c) { rn_log("ShellExecuteA(%s) not launched", G(ARG(2))); return 31; }  // SE_ERR_NOASSOC
+// DirectDrawCreate: the game draws with D3D9; DirectDraw reports no hardware.
+static uint32_t DirectDrawCreate_(Ctx *c) { (void)c; return 0x887601ffu; }      // DDERR_NODIRECTDRAWHW
 static uint32_t PostQuitMessage_(Ctx *c) { quit_posted = 1; quit_code = ARG(0); return 0; }
 // WM_KEYDOWN / WM_SYSKEYDOWN of a key that types a character posts WM_CHAR / WM_SYSCHAR (US layout).
 static uint32_t TranslateMessage_(Ctx *c) {
@@ -425,6 +435,9 @@ static uint32_t wsprintfA_(Ctx *c) { return format(c, ARG(0), ARG(1), c->r[ESP] 
 
 #define U(name, n) {"user32.dll", #name, n, name##_}
 const Api user32_apis[] = {
+    U(SetCapture, 1), U(ReleaseCapture, 0), U(PostThreadMessageA, 4),
+    {"gdi32.dll", "DeleteObject", 1, DeleteObject_}, {"shell32.dll", "ShellExecuteA", 6, ShellExecuteA_},
+    {"ddraw.dll", "DirectDrawCreate", 3, DirectDrawCreate_},
     U(RegisterClassA, 1), U(RegisterClassExA, 1), U(UnregisterClassA, 2), U(LoadIconA, 2), U(LoadCursorA, 2),
     U(SetCursor, 1), U(ShowCursor, 1), U(SetCursorPos, 2), U(AdjustWindowRect, 3), U(AdjustWindowRectEx, 4),
     U(CreateWindowExA, 12), U(ShowWindow, 2), U(UpdateWindow, 1), U(SetFocus, 1), U(SetForegroundWindow, 1),
