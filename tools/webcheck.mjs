@@ -1,16 +1,18 @@
-// One headless Chrome run of the page on 5180: prints the page log when it stops (or after the timeout).
-// Usage: node tools/webcheck.mjs [url] [seconds]
+// One headless Chrome run of the page on 5180: prints the page log when it stops (or after the timeout)
+// and saves a screenshot of the page.
+// Usage: node tools/webcheck.mjs [url] [seconds] [screenshot.png]
 import { spawn } from 'node:child_process';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const url = process.argv[2] || 'http://127.0.0.1:5180/';
 const secs = Number(process.argv[3] || 120);
+const shot = process.argv[4] || 'build/webcheck.png';
 const port = 9333;
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
   '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'rn-'))}`,
-  '--no-first-run', '--enable-unsafe-webgpu', 'about:blank'], { stdio: 'ignore' });
+  '--no-first-run', '--enable-unsafe-webgpu', '--window-size=1280,1100', 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let tabs;
 for (let i = 0; i < 50 && !tabs; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); } catch { await sleep(200); } }
@@ -34,6 +36,9 @@ while (Date.now() - t0 < secs * 1000) {
   text = r?.result?.value || '';
   if (/STOP|Falta COOP/.test(text)) break;
 }
+await sleep(500);   // let the last frame reach the canvas
+const png = await send('Page.captureScreenshot', { format: 'png' });
+if (png?.data) { writeFileSync(shot, Buffer.from(png.data, 'base64')); console.log(`screenshot: ${shot}`); }
 console.log(`[${((Date.now() - t0) / 1000).toFixed(1)} s]`);
 console.log(text);
 if (errors.length) console.log('page errors:\n' + errors.join('\n'));

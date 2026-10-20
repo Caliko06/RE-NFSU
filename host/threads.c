@@ -17,6 +17,7 @@ typedef struct Thread {
     int started, finished, suspended;
     pthread_t pt;
     uint32_t timer_ms, timer_flags, timer_user, timer_id, killed;   // winmm timers
+    uint32_t stack_top;
 } Thread;
 static Thread *threads[64];
 static int nthreads;
@@ -26,11 +27,25 @@ static pthread_cond_t gcv = PTHREAD_COND_INITIALIZER;   // GIL turn changed
 static pthread_cond_t scv = PTHREAD_COND_INITIALIZER;   // some object changed state
 static unsigned long next_ticket, serving, gen;
 
+static uint64_t slice_start;
 void gil_acquire(void) {
     pthread_mutex_lock(&gm);
     unsigned long t = next_ticket++;
     while (t != serving) pthread_cond_wait(&gcv, &gm);
     pthread_mutex_unlock(&gm);
+    slice_start = now_us();
+}
+// Windows preempts a thread when its quantum (about 20 ms on XP) ends. A guest that polls for work
+// done by another thread relies on it. The GIL holder gives its turn away at the next API call
+// once it has run a quantum while another thread waits for the GIL.
+#define QUANTUM_US 20000
+void gil_slice(void) {
+    if (now_us() - slice_start < QUANTUM_US) return;
+    pthread_mutex_lock(&gm);
+    int waiting = next_ticket != serving + 1;
+    pthread_mutex_unlock(&gm);
+    if (waiting) { gil_release(); gil_acquire(); }
+    else slice_start = now_us();
 }
 void gil_release(void) {
     pthread_mutex_lock(&gm);
@@ -148,9 +163,27 @@ static Thread *new_thread(Ctx *c, uint32_t size) {
     t->ctx.fcw = 0x27f;
     t->id = 0x10 + 4u * nthreads;
     teb_init(&t->ctx, teb, stack, stack + reserve, t->id);
-    t->ctx.r[ESP] = stack + reserve - 16;
+    t->stack_top = stack + reserve - 16;
+    t->ctx.r[ESP] = t->stack_top;
     threads[nthreads++] = t;
     return t;
+}
+// A one-shot timer's thread ends after its callback. A new timer reuses such a thread (its stack and
+// TEB too): games re-arm one-shot timers from inside the callback, every few milliseconds.
+static Thread *reuse_timer(void) {
+    for (int k = 0; k < nthreads; k++) {
+        Thread *t = threads[k];
+        if (!t->timer_id || !t->finished) continue;
+        pthread_join(t->pt, NULL);
+        memset(t->ctx.r, 0, sizeof t->ctx.r);
+        t->ctx.halt = 0; t->ctx.cf = t->ctx.zf = t->ctx.sf = t->ctx.of = t->ctx.pf = t->ctx.df = t->ctx.af = 0;
+        finit(&t->ctx);
+        t->ctx.fcw = 0x27f;
+        t->ctx.r[ESP] = t->stack_top;
+        t->finished = 0; t->killed = 0;
+        return t;
+    }
+    return NULL;
 }
 static uint32_t CreateThread_(Ctx *c) {
     uint32_t size = ARG(1), entry = ARG(2), param = ARG(3), flags = ARG(4), out = ARG(5);
@@ -190,11 +223,12 @@ static uint32_t GetCurrentThreadId_(Ctx *c) { return tid(c); }
 static uint32_t timeSetEvent_(Ctx *c) {
     uint32_t ms = ARG(0), cb = ARG(2), user = ARG(3), flags = ARG(4);
     if (flags & ~0x111u) { rn_halt(c, "timeSetEvent flags %08x", flags); return 0; }
-    Thread *t = new_thread(c, 0);
+    Thread *t = reuse_timer();
+    if (!t) t = new_thread(c, 0);
     if (!t) return 0;
     t->timer_ms = ms ? ms : 1; t->timer_flags = flags; t->timer_user = user; t->start = cb;
     t->timer_id = t->id;
-    rn_log("timeSetEvent %u ms -> %s %08x", ms, (flags & 0x10) ? "event" : "callback", cb);
+    if (rn_trace()) rn_log("timeSetEvent %u ms -> %s %08x", ms, (flags & 0x10) ? "event" : "callback", cb);
     start_fn(t, run_timer);
     return t->timer_id;
 }

@@ -26,9 +26,9 @@ uint32_t host_addr_of(const char *dll, const char *name) {
 }
 
 const Api *find_api(const char *dll, const char *name) {
-    static const Api *tables[] = {win32_apis, user32_apis, thread_apis, net_apis};
-    const int *counts[] = {&win32_api_count, &user32_api_count, &thread_api_count, &net_api_count};
-    for (int t = 0; t < 4; t++)
+    static const Api *tables[] = {win32_apis, user32_apis, thread_apis, net_apis, d3d9_apis, dinput8_apis, dsound_apis};
+    const int *counts[] = {&win32_api_count, &user32_api_count, &thread_api_count, &net_api_count, &d3d9_api_count, &dinput8_api_count, &dsound_api_count};
+    for (int t = 0; t < 7; t++)
         for (int k = 0; k < *counts[t]; k++)
             if (!strcasecmp(tables[t][k].dll, dll) && !strcmp(tables[t][k].name, name)) return &tables[t][k];
     return NULL;
@@ -65,6 +65,7 @@ static void call_host(Ctx *c, uint32_t target) {
     h->calls++;
     if (!h->fn) { c->halt_at = ra; rn_halt(c, "missing API %s!%s", h->dll, h->name); return; }
     if (rn_trace()) rn_log("api %s (ret %08x)", h->name, ra);
+    gil_slice();
     uint32_t v = h->fn(c);
     if (c->halt) { if (!c->halt_at) c->halt_at = ra; return; }
     c->ret = ra;

@@ -2,15 +2,54 @@
 """Local web server for the browser build on 127.0.0.1:5180 (COOP/COEP for SharedArrayBuffer).
 
 / -> web/, /pc/Speed.exe -> pc/Speed.exe, /game/... -> game/ (the OWNER's files, never leave this machine).
+/game-files.json lists game/ (relative paths and sizes); /game/ answers Range requests (host/files.c reads them).
 Usage: .venv/bin/python tools/serve.py [port]
 """
-import http.server, os, sys
+import http.server, json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5180
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path.split("?", 1)[0] == "/game-files.json":
+            game = os.path.join(ROOT, "game")
+            files = []
+            for d, _, names in os.walk(game, followlinks=True):
+                for n in names:
+                    p = os.path.join(d, n)
+                    files.append([os.path.relpath(p, game), os.path.getsize(p)])
+            body = json.dumps(sorted(files)).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        rng = self.headers.get("Range")
+        path = self.translate_path(self.path)
+        if rng and rng.startswith("bytes=") and os.path.isfile(path):    # the game thread reads byte ranges
+            size = os.path.getsize(path)
+            a, b = rng[6:].split("-")
+            a, b = int(a), min(int(b) if b else size - 1, size - 1)
+            if a >= size or b < a:
+                self.send_response(416)
+                self.send_header("Content-Range", f"bytes */{size}")
+                self.end_headers()
+                return
+            with open(path, "rb") as f:
+                f.seek(a)
+                body = f.read(b - a + 1)
+            self.send_response(206)
+            self.send_header("Content-Type", "application/octet-stream")
+            self.send_header("Content-Range", f"bytes {a}-{b}/{size}")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        super().do_GET()
+
     def translate_path(self, path):
         path = path.split("?", 1)[0].split("#", 1)[0]
         if path == "/pc/Speed.exe":

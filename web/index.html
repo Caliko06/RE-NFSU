@@ -12,6 +12,7 @@
   #status.run { color: var(--ok); }
   #status.stop { color: var(--stop); }
   #log { padding: 12px 16px; white-space: pre-wrap; word-break: break-all; margin: 0; }
+  #screen { display: block; max-width: 100%; background: #000; margin: 12px 16px 0; }
   .stop { color: var(--stop); font-weight: bold; }
   .api { color: var(--api); }
   .dim { color: var(--dim); }
@@ -19,7 +20,9 @@
 </head>
 <body>
 <header><b>Need for Speed Underground</b><span class="dim">Speed.exe traducido a WebAssembly</span><span id="status">cargando…</span></header>
+<canvas id="screen" width="800" height="600"></canvas>
 <pre id="log"></pre>
+<script src="gpu.js"></script>
 <script src="out/speed.js"></script>
 <script>
 const log = document.getElementById('log'), status = document.getElementById('status');
@@ -36,12 +39,16 @@ function line(s, cls) {
 (async () => {
   if (!crossOriginIsolated) { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
   const exe = new Uint8Array(await (await fetch('pc/Speed.exe')).arrayBuffer());
+  // Game files are read on demand by the game thread (host/files.c), not loaded here.
   status.textContent = 'corriendo'; status.className = 'run';
-  await Speed({
+  const M = await Speed({
     arguments: ['/pc/Speed.exe', '/game'],
     print: s => line(s), printErr: s => line(s, 'dim'),
-    preRun: [m => { m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe); m.FS.mkdir('/game'); }],
+    preRun: [m => {
+      m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
+    }],
   });
+  startGpu(M, document.getElementById('screen'), s => line(s, 'api')).catch(e => line('gpu.js: ' + e.message, 'stop'));
 })();
 </script>
 </body>

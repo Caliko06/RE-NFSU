@@ -17,9 +17,7 @@
 
 static const char *MODULE_PATH = "C:\\NFSU\\Speed.exe";
 static const char *GAME_DIR = "C:\\NFSU";
-static char game_root[1024];
-
-void win32_set_root(const char *dir) { snprintf(game_root, sizeof game_root, "%s", dir); }
+void win32_set_root(const char *dir) { files_set_root(dir); }
 
 void set_error(Ctx *c, uint32_t e) { st(c, c->fs + 0x34, e, 4); }
 static uint32_t gstrlen(Ctx *c, uint32_t p) { return (uint32_t)strnlen(G(p), c->memsz - p); }
@@ -125,42 +123,6 @@ Handle *get_handle(uint32_t h) {
     uint32_t k = (h - 0x100) / 4;
     if (h < 0x100 || (h & 3) || k >= 512 || handles[k].kind == H_FREE) return NULL;
     return &handles[k];
-}
-
-// ---- paths: C:\NFSU\x and relative x -> <game root>/x, matched without case ------------------
-static int host_path(const char *gpath, char *out, size_t outsz) {
-    char p[512];
-    snprintf(p, sizeof p, "%s", gpath);
-    for (char *q = p; *q; q++) if (*q == '\\') *q = '/';
-    const char *rel = p;
-    size_t gl = strlen(GAME_DIR);
-    if (!strncasecmp(p, "C:/NFSU", gl) && (p[gl] == '/' || !p[gl])) rel = p + gl + (p[gl] == '/');
-    else if (p[0] && p[1] == ':') return -1;
-    while (rel[0] == '.' && rel[1] == '/') rel += 2;
-    snprintf(out, outsz, "%s", game_root);
-    char comp[256];
-    while (*rel) {
-        const char *e = strchr(rel, '/');
-        size_t n = e ? (size_t)(e - rel) : strlen(rel);
-        if (n == 0 || n >= sizeof comp) { rel += n + (e != NULL); continue; }
-        memcpy(comp, rel, n); comp[n] = 0;
-        rel += n + (e != NULL);
-        char *dst = out + strlen(out);
-        snprintf(dst, outsz - (dst - out), "/%s", comp);
-        struct stat sb;
-        if (stat(out, &sb) == 0) continue;
-        *dst = 0;
-        DIR *d = opendir(out);
-        int found = 0;
-        if (d) {
-            struct dirent *de;
-            while ((de = readdir(d)))
-                if (!strcasecmp(de->d_name, comp)) { snprintf(dst, outsz - (dst - out), "/%s", de->d_name); found = 1; break; }
-            closedir(d);
-        }
-        if (!found) snprintf(dst, outsz - (dst - out), "/%s", comp);
-    }
-    return 0;
 }
 
 // =================================== kernel32 ==================================================
@@ -342,6 +304,17 @@ static uint32_t CompareStringW_(Ctx *c) {
     }
     return n1 < n2 ? 1 : n1 > n2 ? 3 : 2;
 }
+// lstrcmp(i)A = CompareStringA(LOCALE_USER_DEFAULT, 0 or NORM_IGNORECASE, s1, -1, s2, -1) - 2.
+static uint32_t lstrcmp_any(Ctx *c, uint32_t s1, uint32_t s2, uint32_t flags) {
+    uint32_t n1 = gstrlen(c, s1), n2 = gstrlen(c, s2);
+    for (uint32_t k = 0; k < n1 && k < n2; k++) {
+        int r = cmp_units(to_wide((uint8_t)G(s1)[k]), to_wide((uint8_t)G(s2)[k]), flags);
+        if (r) return (uint32_t)r;
+    }
+    return n1 < n2 ? 0xffffffffu : n1 > n2;
+}
+static uint32_t lstrcmpiA_(Ctx *c) { return lstrcmp_any(c, ARG(0), ARG(1), 1); }
+static uint32_t lstrcmpA_(Ctx *c) { return lstrcmp_any(c, ARG(0), ARG(1), 0); }
 // Locale 0x0409 (English, United States).
 static const char *locale_info(uint32_t type) {
     switch (type & 0xffff) {
@@ -503,6 +476,15 @@ static uint32_t IsProcessorFeaturePresent_(Ctx *c) { uint32_t f = ARG(0); return
 static uint32_t GetTickCount_(Ctx *c) { (void)c; return (uint32_t)(now_us() / 1000); }
 static uint32_t QueryPerformanceCounter_(Ctx *c) { st64(c, ARG(0), now_us()); return 1; }
 static uint32_t QueryPerformanceFrequency_(Ctx *c) { st64(c, ARG(0), 1000000); return 1; }
+// The PC's clock runs on UTC: time zone "Greenwich Standard Time" (bias 0, no daylight saving),
+// so local time = system time. GetTimeZoneInformation then answers TIME_ZONE_ID_UNKNOWN.
+static uint32_t GetTimeZoneInformation_(Ctx *c) {
+    uint32_t p = ARG(0);
+    memset(G(p), 0, 172);
+    const char *name = "Greenwich Standard Time";
+    for (int k = 0; name[k]; k++) { st(c, p + 4 + 2 * k, (uint8_t)name[k], 2); st(c, p + 88 + 2 * k, (uint8_t)name[k], 2); }
+    return 0;
+}
 static uint32_t GetSystemTimeAsFileTime_(Ctx *c) {
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
@@ -553,24 +535,19 @@ static uint32_t GetProcAddress_(Ctx *c) {
 static uint32_t CreateFileA_(Ctx *c) {
     const char *name = G(ARG(0));
     uint32_t access = ARG(1), disp = ARG(4);
-    char hp[1024];
-    if (host_path(name, hp, sizeof hp)) { rn_halt(c, "CreateFileA outside the game folder: %s", name); return 0; }
-    const char *mode = "rb";
-    struct stat sb;
-    int exists = stat(hp, &sb) == 0;
     if (access & 0x40000000u) {    // GENERIC_WRITE
         rn_halt(c, "CreateFileA for writing: %s (disp %u)", name, disp);
         return INVALID_HANDLE;
     }
-    if (!exists || S_ISDIR(sb.st_mode)) {
+    int id = gf_open(name);
+    if (id == -2) { rn_halt(c, "CreateFileA outside the game folder: %s", name); return INVALID_HANDLE; }
+    if (id < 0) {
         if (rn_trace()) rn_log("file missing: %s", name);
-        set_error(c, ERROR_FILE_NOT_FOUND);
+        set_error(c, id == -3 ? 5 : ERROR_FILE_NOT_FOUND);   // a directory: ERROR_ACCESS_DENIED
         return INVALID_HANDLE;
     }
-    FILE *f = fopen(hp, mode);
-    if (!f) { set_error(c, ERROR_FILE_NOT_FOUND); return INVALID_HANDLE; }
     uint32_t h = new_handle(H_FILE);
-    get_handle(h)->f = f;
+    get_handle(h)->gf = id;
     snprintf(get_handle(h)->path, sizeof get_handle(h)->path, "%s", name);
     if (rn_trace()) rn_log("open %s -> %x", name, h);
     set_error(c, 0);
@@ -582,7 +559,9 @@ static uint32_t ReadFile_(Ctx *c) {
     if (!h || h->kind != H_FILE) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
     if (ARG(4)) { rn_halt(c, "ReadFile with OVERLAPPED"); return 0; }
     if (bad_range(c, buf, n)) { rn_halt(c, "ReadFile buffer %08x+%u", buf, n); return 0; }
-    size_t r = fread(G(buf), 1, n, h->f);
+    int64_t r = gf_read(h->gf, h->pos, (uint8_t *)G(buf), n);
+    if (r < 0) { rn_halt(c, "ReadFile I/O error on %s", h->path); return 0; }
+    h->pos += (uint32_t)r;
     if (got) st(c, got, (uint32_t)r, 4);
     return 1;
 }
@@ -592,24 +571,23 @@ static uint32_t SetFilePointer_(Ctx *c) {
     uint32_t hi = ARG(2), how = ARG(3);
     if (!h || h->kind != H_FILE) { set_error(c, ERROR_INVALID_HANDLE); return INVALID_HANDLE; }
     if (hi && ld(c, hi, 4) != 0 && ld(c, hi, 4) != 0xffffffffu) { rn_halt(c, "SetFilePointer beyond 4 GB"); return 0; }
-    fseek(h->f, dist, how == 0 ? SEEK_SET : how == 1 ? SEEK_CUR : SEEK_END);
+    int64_t base = how == 0 ? 0 : how == 1 ? (int64_t)h->pos : (int64_t)gf_size(h->gf);
+    int64_t to = base + dist;
+    if (to < 0) { set_error(c, 131); return INVALID_HANDLE; }    // ERROR_NEGATIVE_SEEK
+    h->pos = (uint32_t)to;
     if (hi) st(c, hi, 0, 4);
-    return (uint32_t)ftell(h->f);
+    return h->pos;
 }
 static uint32_t GetFileSize_(Ctx *c) {
     Handle *h = get_handle(ARG(0));
     if (!h || h->kind != H_FILE) { set_error(c, ERROR_INVALID_HANDLE); return INVALID_HANDLE; }
-    long pos = ftell(h->f);
-    fseek(h->f, 0, SEEK_END);
-    long n = ftell(h->f);
-    fseek(h->f, pos, SEEK_SET);
     if (ARG(1)) st(c, ARG(1), 0, 4);
-    return (uint32_t)n;
+    return (uint32_t)gf_size(h->gf);
 }
 static uint32_t CloseHandle_(Ctx *c) {
     Handle *h = get_handle(ARG(0));
     if (!h) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
-    if (h->f) fclose(h->f);
+    if (h->kind == H_FILE) gf_close(h->gf);
     if (h->dir) closedir(h->dir);
     h->kind = H_FREE;
     return 1;
@@ -682,7 +660,7 @@ const Api win32_apis[] = {
     K(GetModuleFileNameA, 3), K(GetStartupInfoA, 1), K(GetStdHandle, 1), K(SetStdHandle, 2), K(GetFileType, 1),
     K(SetHandleCount, 1), K(GetACP, 0), K(GetOEMCP, 0), K(IsValidCodePage, 1), K(GetCPInfo, 2),
     K(MultiByteToWideChar, 6), K(WideCharToMultiByte, 8), K(GetStringTypeW, 4), K(GetStringTypeA, 5),
-    K(LCMapStringW, 6), K(LCMapStringA, 6), K(CompareStringA, 6), K(CompareStringW, 6),
+    K(LCMapStringW, 6), K(LCMapStringA, 6), K(CompareStringA, 6), K(CompareStringW, 6), K(lstrcmpiA, 2), K(lstrcmpA, 2),
     K(GetLocaleInfoA, 4), K(GetLocaleInfoW, 4), K(GetUserDefaultLCID, 0), K(IsValidLocale, 2),
     K(HeapCreate, 3), K(HeapDestroy, 1), K(HeapAlloc, 3), K(HeapFree, 3), K(HeapSize, 3), K(HeapReAlloc, 4),
     K(VirtualAlloc, 4), K(VirtualFree, 3), K(VirtualQuery, 3), K(VirtualProtect, 4),
@@ -691,7 +669,7 @@ const Api win32_apis[] = {
     K(GetLastError, 0), K(SetLastError, 1), K(SetUnhandledExceptionFilter, 1),
     K(SetErrorMode, 1), K(IsBadReadPtr, 2), {"kernel32.dll", "IsBadWritePtr", 2, IsBadReadPtr_}, K(IsBadCodePtr, 1),
     K(GetSystemInfo, 1), K(IsProcessorFeaturePresent, 1), K(GetTickCount, 0), K(QueryPerformanceCounter, 1), K(QueryPerformanceFrequency, 1),
-    K(GetSystemTimeAsFileTime, 1), K(ExitProcess, 1), K(OutputDebugStringA, 1),
+    K(GetSystemTimeAsFileTime, 1), K(GetTimeZoneInformation, 1), K(ExitProcess, 1), K(OutputDebugStringA, 1),
     K(GetModuleHandleA, 1), K(LoadLibraryA, 1), K(GetProcAddress, 2),
     K(CreateFileA, 7), K(ReadFile, 5), K(SetFilePointer, 4), K(GetFileSize, 2), K(CloseHandle, 1), K(GetFullPathNameA, 4),
     K(GetProcessAffinityMask, 3), K(SetProcessAffinityMask, 2), K(GetPriorityClass, 1), K(SetPriorityClass, 2),

@@ -75,7 +75,8 @@ def lift_all():
     print("top trap reasons:", dict(traps.most_common(15)))
 
 
-HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c"]
+HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c",
+        "host/d3d9.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c"]
 
 
 def compile_native():
@@ -110,7 +111,8 @@ def compile_web():
     subprocess.run(["emcc", "-O1", "-pthread", "-Ihost", f"-I{GEN}", *HOST, *objs, "-o", "web/out/speed.js",
                     "-sINITIAL_MEMORY=1280MB", "-sSTACK_SIZE=16MB", "-sDEFAULT_PTHREAD_STACK_SIZE=16MB",
                     "-sPROXY_TO_PTHREAD=1", "-sPTHREAD_POOL_SIZE=8", "-sEXIT_RUNTIME=1",
-                    "-sMODULARIZE=1", "-sEXPORT_NAME=Speed", "-sEXPORTED_RUNTIME_METHODS=FS",
+                    "-sMODULARIZE=1", "-sEXPORT_NAME=Speed", "-sEXPORTED_RUNTIME_METHODS=FS,HEAPU8,HEAP32,HEAPU32",
+                    "-sEXPORTED_FUNCTIONS=_main,_rn_gpu_mailbox",
                     "-sFORCE_FILESYSTEM=1", "-sENVIRONMENT=web,worker"], check=True)
     print("built web/out/speed.js + speed.wasm")
 
