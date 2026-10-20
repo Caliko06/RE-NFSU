@@ -6,6 +6,7 @@
 #include <strings.h>
 #include "host.h"
 #include "gpu.h"
+#include "sm1.h"
 
 #define D3D_OK 0u
 #define D3DERR_NOTFOUND 0x88760866u
@@ -97,6 +98,7 @@ typedef struct {
     int locked, lockable;
     uint32_t levels, level0, fvf;           // textures: mip count, object index of level 0 (levels follow)
     uint32_t *blob, nblob;                  // shader tokens, vertex elements (host copy)
+    Sm1 *sm;                                // shaders: decoded
     struct Rec *rec;                        // state blocks: the recorded Set calls
     uint32_t nrec;
 } Obj;
@@ -623,6 +625,12 @@ static uint32_t IDirect3DDevice9_Clear(Ctx *c) {
     return D3D_OK;
 }
 
+// The list goes to the renderer in parts of at most 16 MB: a load can upload hundreds of MB of
+// texels in one frame, more than the web build's heap holds at once. Commands keep their order.
+// The list is handed off under the GIL; the wait for the page is without it.
+static void hand_off(void) { gpu_submit(); gil_release(); gpu_wait(); gil_acquire(); }
+static void flush_big(void) { if (gpu_pending() > (4u << 20)) hand_off(); }
+
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
@@ -635,9 +643,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     gpu_cmd(GPU_PRESENT, 3, w);
     dev.frames++;
     if (dev.frames == 1) rn_log("d3d9 first Present: %ux%u", b->w, b->h);
-    gil_release();          // the frame hand-off may wait for the display
-    gpu_submit();
-    gil_acquire();
+    hand_off();             // may wait for the display
     return D3D_OK;
 }
 
@@ -760,6 +766,7 @@ static uint32_t IDirect3DDevice9_CreateTexture(Ctx *c) {
         objs[nobjs - 1].container = tk;
         if (pool == POOL_DEFAULT || pool == POOL_MANAGED) vram_used += objs[nobjs - 1].size;
     }
+    if (!(usage & U_RENDERTARGET)) { uint32_t w4[4] = {tk, w, h, levels}; gpu_cmd(GPU_TEXTURE, 4, w4); }
     st(c, out, g, 4);
     return D3D_OK;
 }
@@ -806,9 +813,103 @@ static uint32_t lock_rect(Ctx *c, Obj *s, uint32_t out, uint32_t rect, uint32_t 
     (void)flags;
     return D3D_OK;
 }
-static uint32_t unlock_rect(Obj *s) {
+// ---- texel decoding: every format the game creates becomes RGBA8 (bytes R G B A) for both backends.
+static uint32_t rgba(uint32_t r, uint32_t g, uint32_t b, uint32_t a) { return r | g << 8 | b << 16 | a << 24; }
+static uint32_t x5(uint32_t v) { return (v << 3) | (v >> 2); }
+static uint32_t x6(uint32_t v) { return (v << 2) | (v >> 4); }
+static uint32_t x4(uint32_t v) { return v << 4 | v; }
+// DXT color block: two R5G6B5 ends and 2-bit indices. Four colors, or three and transparent black
+// when c0 <= c1 (DXT1 only; DXT2-5 always use four).
+static void dxt_color(const uint8_t *b, int dxt1, uint32_t out[16]) {
+    uint32_t c0 = b[0] | b[1] << 8, c1 = b[2] | b[3] << 8, bits = b[4] | b[5] << 8 | b[6] << 16 | (uint32_t)b[7] << 24;
+    uint32_t r[4], g[4], bl[4], a[4] = {255, 255, 255, 255};
+    r[0] = x5(c0 >> 11); g[0] = x6((c0 >> 5) & 63); bl[0] = x5(c0 & 31);
+    r[1] = x5(c1 >> 11); g[1] = x6((c1 >> 5) & 63); bl[1] = x5(c1 & 31);
+    if (c0 > c1 || !dxt1) {
+        r[2] = (2 * r[0] + r[1] + 1) / 3; g[2] = (2 * g[0] + g[1] + 1) / 3; bl[2] = (2 * bl[0] + bl[1] + 1) / 3;
+        r[3] = (r[0] + 2 * r[1] + 1) / 3; g[3] = (g[0] + 2 * g[1] + 1) / 3; bl[3] = (bl[0] + 2 * bl[1] + 1) / 3;
+    } else {
+        r[2] = (r[0] + r[1]) / 2; g[2] = (g[0] + g[1]) / 2; bl[2] = (bl[0] + bl[1]) / 2;
+        r[3] = g[3] = bl[3] = a[3] = 0;
+    }
+    for (int k = 0; k < 16; k++) { uint32_t i = bits >> (2 * k) & 3; out[k] = rgba(r[i], g[i], bl[i], a[i]); }
+}
+static void dxt_alpha5(const uint8_t *b, uint32_t out[16]) {
+    uint32_t a[8] = {b[0], b[1]};
+    if (a[0] > a[1]) for (int k = 1; k < 7; k++) a[k + 1] = ((7 - k) * a[0] + k * a[1] + 3) / 7;
+    else { for (int k = 1; k < 5; k++) a[k + 1] = ((5 - k) * a[0] + k * a[1] + 2) / 5; a[6] = 0; a[7] = 255; }
+    uint64_t bits = 0;
+    for (int k = 0; k < 6; k++) bits |= (uint64_t)b[2 + k] << (8 * k);
+    for (int k = 0; k < 16; k++) out[k] = (out[k] & 0x00ffffffu) | a[bits >> (3 * k) & 7] << 24;
+}
+static int decode_texels(uint32_t f, const uint8_t *src, uint32_t pitch, uint32_t w, uint32_t h, uint32_t *dst) {
+    if (is_dxt(f)) {
+        int bs = f == F_DXT1 ? 8 : 16;
+        for (uint32_t by = 0; by < (h + 3) / 4; by++)
+            for (uint32_t bx = 0; bx < (w + 3) / 4; bx++) {
+                const uint8_t *b = src + by * pitch + bx * (uint32_t)bs;
+                uint32_t px[16];
+                dxt_color(b + bs - 8, f == F_DXT1, px);
+                if (f == F_DXT2 || f == F_DXT3)
+                    for (int k = 0; k < 16; k++) px[k] = (px[k] & 0x00ffffffu) | x4(b[k / 2] >> (4 * (k & 1)) & 15) << 24;
+                if (f == F_DXT4 || f == F_DXT5) dxt_alpha5(b, px);
+                for (int k = 0; k < 16; k++) {
+                    uint32_t x = bx * 4 + (k & 3), y = by * 4 + (k >> 2);
+                    if (x < w && y < h) dst[y * w + x] = px[k];
+                }
+            }
+        return 1;
+    }
+    for (uint32_t y = 0; y < h; y++) {
+        const uint8_t *r = src + y * pitch;
+        for (uint32_t x = 0; x < w; x++) {
+            uint32_t v, o;
+            switch (f) {
+            case F_A8R8G8B8: case F_X8R8G8B8:
+                v = r[4 * x] | r[4 * x + 1] << 8 | r[4 * x + 2] << 16 | (uint32_t)r[4 * x + 3] << 24;
+                o = rgba(v >> 16 & 255, v >> 8 & 255, v & 255, f == F_X8R8G8B8 ? 255 : v >> 24);
+                break;
+            case F_R5G6B5: v = r[2 * x] | r[2 * x + 1] << 8; o = rgba(x5(v >> 11), x6(v >> 5 & 63), x5(v & 31), 255); break;
+            case F_X1R5G5B5: case F_A1R5G5B5:
+                v = r[2 * x] | r[2 * x + 1] << 8;
+                o = rgba(x5(v >> 10 & 31), x5(v >> 5 & 31), x5(v & 31), f == F_X1R5G5B5 || (v >> 15) ? 255 : 0);
+                break;
+            case F_A4R4G4B4: v = r[2 * x] | r[2 * x + 1] << 8; o = rgba(x4(v >> 8 & 15), x4(v >> 4 & 15), x4(v & 15), x4(v >> 12)); break;
+            case F_A8: o = rgba(0, 0, 0, r[x]); break;
+            case F_L8: o = rgba(r[x], r[x], r[x], 255); break;
+            case F_A8L8: o = rgba(r[2 * x], r[2 * x], r[2 * x], r[2 * x + 1]); break;
+            default: return 0;
+            }
+            dst[y * w + x] = o;
+        }
+    }
+    return 1;
+}
+// A texture level's contents count from its unlock: send the whole level to the renderer.
+static void upload_level(Ctx *c, Obj *s) {
+    Obj *t = obj_k(s->container);
+    if (!t || t->iface != I_TEXTURE || (t->usage & U_RENDERTARGET)) return;
+    uint32_t level = idx(s) - t->level0, n = s->w * s->h;
+    uint32_t *w = malloc(4u * (4 + n));
+    w[0] = s->container; w[1] = level; w[2] = s->w; w[3] = s->h;
+    if (!decode_texels(s->fmt, (const uint8_t *)G(lock_mem(s)), s->pitch, s->w, s->h, w + 4)) {
+        rn_halt(c, "d3d9: texture format %u has no decoder", s->fmt);
+        free(w);
+        return;
+    }
+    static uint32_t seen[8];
+    for (int k = 0; k < 8; k++) {
+        if (seen[k] == s->fmt) break;
+        if (!seen[k]) { seen[k] = s->fmt; rn_log("d3d9 first texture of format %u (%ux%u)", s->fmt, s->w, s->h); break; }
+    }
+    gpu_cmd(GPU_TEXDATA, (int)(4 + n), w);
+    free(w);
+    flush_big();
+}
+static uint32_t unlock_rect(Ctx *c, Obj *s) {
     if (!s->locked) return D3DERR_INVALIDCALL;
     s->locked = 0;
+    upload_level(c, s);
     return D3D_OK;
 }
 static uint32_t IDirect3DTexture9_LockRect(Ctx *c) {
@@ -820,12 +921,12 @@ static uint32_t IDirect3DTexture9_LockRect(Ctx *c) {
 static uint32_t IDirect3DTexture9_UnlockRect(Ctx *c) {
     SELF(I_TEXTURE);
     Obj *l = level_of(c, o, ARG(1));
-    return l ? unlock_rect(l) : D3DERR_INVALIDCALL;
+    return l ? unlock_rect(c, l) : D3DERR_INVALIDCALL;
 }
 static uint32_t IDirect3DTexture9_GetType(Ctx *c) { SELF(I_TEXTURE); return 3; }
 static uint32_t IDirect3DTexture9_PreLoad(Ctx *c) { SELF(I_TEXTURE); return 0; }
 static uint32_t IDirect3DSurface9_LockRect(Ctx *c) { SELF(I_SURFACE); return lock_rect(c, o, ARG(1), ARG(2), ARG(3)); }
-static uint32_t IDirect3DSurface9_UnlockRect(Ctx *c) { SELF(I_SURFACE); return unlock_rect(o); }
+static uint32_t IDirect3DSurface9_UnlockRect(Ctx *c) { SELF(I_SURFACE); return unlock_rect(c, o); }
 
 static uint32_t new_buffer(Ctx *c, int iface, uint32_t len, uint32_t usage, uint32_t f, uint32_t pool, uint32_t out) {
     if (!len || !out || bad_pool(usage, pool) || (usage & (U_RENDERTARGET | U_DEPTHSTENCIL))) return D3DERR_INVALIDCALL;
@@ -940,6 +1041,11 @@ static uint32_t IDirect3DDevice9_CreateVertexDeclaration(Ctx *c) {
     o->nblob = 2 * (n + 1);
     o->blob = malloc(4u * o->nblob);
     memcpy(o->blob, G(p), 8u * (n + 1));
+    uint32_t *w = calloc(2 + 2 * n, 4);
+    w[0] = idx(o) + 1; w[1] = n;
+    memcpy(w + 2, o->blob, 8u * n);
+    gpu_cmd(GPU_DECL, (int)(2 + 2 * n), w);
+    free(w);
     if (rn_trace())
         for (uint32_t k = 0; k < n; k++)
             rn_log("d3d9   element stream %u off %u type %u method %u usage %u/%u", ld(c, p + 8 * k, 2),
@@ -954,6 +1060,7 @@ static uint32_t IDirect3DVertexDeclaration9_GetDeclaration(Ctx *c) {
     if (ARG(1)) memcpy(G(ARG(1)), o->blob, 4u * o->nblob);
     return D3D_OK;
 }
+static void disasm_line(const char *l) { rn_log("d3d9   %s", l); }
 // Shader tokens: version, instructions, D3DSIO_END (0x0000ffff).
 static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     if (!p || !out) return D3DERR_INVALIDCALL;
@@ -961,13 +1068,29 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     if (iface == I_VS ? (ver >> 16 != 0xfffe || (ver & 0xffff) > 0x200) : (ver >> 16 != 0xffff || (ver & 0xffff) > 0x200))
         return D3DERR_INVALIDCALL;
     while (ld(c, p + 4 * (n - 1), 4) != 0x0000ffffu) if (++n > 65536) return D3DERR_INVALIDCALL;
+    Sm1 *sm = calloc(1, sizeof *sm);
+    char err[128];
+    if (sm1_decode(sm, (const uint32_t *)G(p), n, err, sizeof err)) { rn_halt(c, "d3d9: shader: %s", err); return D3DERR_INVALIDCALL; }
     uint32_t g = new_obj(c, iface);
     Obj *o = &objs[nobjs - 1];
     o->nblob = n;
     o->blob = malloc(4u * n);
     memcpy(o->blob, G(p), 4u * n);
+    o->sm = sm;
     TR("Create%sShader %s_%u_%u, %u tokens -> %08x", iface == I_VS ? "Vertex" : "Pixel", iface == I_VS ? "vs" : "ps",
        (ver >> 8) & 0xff, ver & 0xff, n, g);
+    if (rn_trace()) sm1_disasm(sm, disasm_line);
+    char *wgsl = sm1_wgsl(sm);
+    uint32_t m = (uint32_t)strlen(wgsl), nw = 21 + n + (m + 4) / 4;
+    uint32_t *w = calloc(nw, 4);
+    w[0] = idx(o) + 1; w[1] = iface == I_PS; w[2] = n; w[3] = m;
+    for (int k = 0; k < 16; k++) if (sm->inputs >> k & 1) w[4 + k] = 1u << 31 | (uint32_t)sm->in_usage[k] << 8 | sm->in_index[k];
+    w[20] = sm->tex_used;
+    memcpy(w + 21, o->blob, 4u * n);
+    memcpy(w + 21 + n, wgsl, m);
+    gpu_cmd(GPU_SHADER, (int)nw, w);
+    free(w);
+    free(wgsl);
     st(c, out, g, 4);
     return D3D_OK;
 }
@@ -1147,39 +1270,148 @@ static uint32_t IDirect3DDevice9_GetGammaRamp(Ctx *c) {
 }
 
 // ---- draws --------------------------------------------------------------------------------------
-// The renderer does not draw yet: the call is checked as d3d9 checks it and goes to the list as GPU_DRAW.
+// A draw goes to the list with everything the renderer needs: the states, the constants and a copy of
+// the vertices and indices it uses (so later locks cannot change it). Fans become lists here.
 static uint32_t prim_ok(uint32_t type, uint32_t count) {
     return type >= 1 && type <= 6 && count && count <= 0xfffff && dev.in_scene;
 }
-static void draw_cmd(uint32_t type, uint32_t count) {
-    uint32_t w[4] = {type, count, dev.vs, dev.ps};
-    gpu_cmd(GPU_DRAW, 4, w);
+static uint32_t verts_of(uint32_t type, uint32_t n) {
+    switch (type) {
+    case 1: return n;
+    case 2: return 2 * n;
+    case 3: return n + 1;
+    case 4: return 3 * n;
+    }
+    return n + 2;
+}
+// States this renderer does not draw yet stop loudly (each one is a feature to add, not to guess).
+static int draw_supported(Ctx *c, const Sm1 *ps) {
+    const char *why = NULL;
+    if (!dev.vs || !dev.ps) why = "fixed-function draw (no vertex or pixel shader)";
+    else if (!dev.decl) why = "draw without a vertex declaration";
+    else if (dev.rs[8] != 3) why = "FILLMODE not solid";
+    else if (dev.rs[9] != 2) why = "SHADEMODE not Gouraud";
+    else if (dev.rs[52]) why = "stencil test";
+    else if (dev.rs[152]) why = "user clip planes";
+    else if (dev.rs[195] || dev.rs[176]) why = "depth bias";
+    else if (dev.rs[194]) why = "SRGBWRITEENABLE";
+    else if (dev.rs[28] && dev.rs[35]) why = "table (pixel) fog";
+    else if (dev.rs[206] && (dev.rs[207] != dev.rs[19] || dev.rs[208] != dev.rs[20] || dev.rs[209] != dev.rs[171]))
+        why = "separate alpha blend";
+    for (int k = 0; k < 8 && !why; k++) {
+        if (!(ps->tex_used >> k & 1)) continue;
+        const uint32_t *ss = dev.ss[k];
+        if (ss[1] == 4 || ss[2] == 4) why = "BORDER texture address";
+        else if (ss[8]) why = "MIPMAPLODBIAS";
+        else if (ss[9]) why = "MAXMIPLEVEL";
+        else if (ss[11]) why = "SRGBTEXTURE";
+        else if (dev.tex[k] && obj_k(dev.tex[k])->iface != I_TEXTURE) why = "cube texture";
+    }
+    if (why) rn_halt(c, "d3d9: draw needs %s", why);
+    return !why;
+}
+// vbase: guest address of vertex 0 of the draw; idx: guest indices (0 = none) of nidx, 16 or 32 bits,
+// rebased by -vmin. Vertices [vmin, vmin + nvert) are copied.
+static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint32_t stride, uint32_t vmin, uint32_t nvert,
+                     uint32_t ib, int i32, int32_t ibias) {
+    TR("draw %u x%u vs %u ps %u decl %u tex %u %u %u %u blend %u %u/%u atest %u z %u/%u cull %u fog %u", type, count,
+       dev.vs, dev.ps, dev.decl, dev.tex[0], dev.tex[1], dev.tex[2], dev.tex[3], dev.rs[27], dev.rs[19], dev.rs[20],
+       dev.rs[15], dev.rs[7], dev.rs[14], dev.rs[22], dev.rs[28]);
+    Obj *vs = obj_k(dev.vs), *ps = obj_k(dev.ps);
+    if (!draw_supported(c, ps ? ps->sm : NULL)) return;
+    if (type <= 3) { rn_halt(c, "d3d9: point and line draws are not drawn yet"); return; }
+    // Index list: given, or made for fans.
+    uint32_t nidx = 0, *ix = NULL, n = verts_of(type, count);
+    if (ib || type == 6) {
+        nidx = type == 6 ? 3 * count : n;
+        ix = malloc(4u * nidx);
+        for (uint32_t k = 0; k < nidx; k++) {
+            uint32_t src = type == 6 ? (k % 3 == 0 ? 0 : k / 3 + k % 3) : k;
+            uint32_t v = ib ? ld(c, ib + (i32 ? 4 : 2) * src, i32 ? 4 : 2) : src;
+            ix[k] = (uint32_t)((int32_t)v + ibias) - vmin;
+        }
+        if (type == 6) type = 4;
+    }
+    if (!ib) nvert = n;
+    Obj *rt = obj_k(dev.rt[0]), *ds = obj_k(dev.ds);
+    uint32_t nvc = (uint32_t)(vs->sm->max_const + 1), npc = 8, vbytes = nvert * stride;
+    uint32_t total = D_HDR + 4 * nvc + 4 * npc + (vbytes + 3) / 4 + nidx;
+    uint32_t *w = calloc(total, 4);
+    w[D_TOPO] = type; w[D_NVERT] = nvert; w[D_NIDX] = nidx; w[D_STRIDE] = stride;
+    w[D_VS] = dev.vs; w[D_PS] = dev.ps; w[D_DECL] = dev.decl;
+    w[D_RT] = rt->gpu; w[D_DS] = ds && dev.rs[7] ? ds->gpu : 0;
+    w[D_VP] = dev.vp.x; w[D_VP + 1] = dev.vp.y; w[D_VP + 2] = dev.vp.w; w[D_VP + 3] = dev.vp.h;
+    memcpy(&w[D_VP + 4], &dev.vp.zmin, 4); memcpy(&w[D_VP + 5], &dev.vp.zmax, 4);
+    uint32_t sc[4] = {0, 0, rt->w, rt->h};
+    if (dev.rs[174]) {
+        for (int k = 0; k < 2; k++) if (dev.scissor[k] > sc[k]) sc[k] = dev.scissor[k];
+        for (int k = 2; k < 4; k++) if (dev.scissor[k] < sc[k]) sc[k] = dev.scissor[k];
+    }
+    memcpy(&w[D_SC], sc, 16);
+    w[D_ZEN] = dev.rs[7]; w[D_ZWRITE] = dev.rs[14]; w[D_ZFUNC] = dev.rs[23]; w[D_CULL] = dev.rs[22];
+    w[D_BLEND] = dev.rs[27]; w[D_SRCB] = dev.rs[19]; w[D_DSTB] = dev.rs[20]; w[D_BOP] = dev.rs[171];
+    w[D_SEPA] = dev.rs[206]; w[D_SRCBA] = dev.rs[207]; w[D_DSTBA] = dev.rs[208]; w[D_BOPA] = dev.rs[209];
+    w[D_BFACTOR] = dev.rs[193]; w[D_CWRITE] = dev.rs[168];
+    w[D_AFUNC] = dev.rs[15] ? dev.rs[25] : 0; w[D_AREF] = dev.rs[24] & 0xff;
+    w[D_FOG] = dev.rs[28]; w[D_FOGC] = dev.rs[34];
+    for (int k = 0; k < 8; k++) {
+        if (!(ps->sm->tex_used >> k & 1)) continue;
+        uint32_t *t = &w[D_TEX + D_TEXN * k];
+        Obj *tx = obj_k(dev.tex[k]);
+        t[T_ID] = !tx ? 0 : (tx->usage & U_RENDERTARGET) ? objs[tx->level0].gpu : dev.tex[k];
+        t[T_AU] = dev.ss[k][1]; t[T_AV] = dev.ss[k][2]; t[T_MAG] = dev.ss[k][5]; t[T_MIN] = dev.ss[k][6];
+        t[T_MIP] = tx && tx->levels > 1 ? dev.ss[k][7] : 0; t[T_TT] = dev.tss[k][24]; t[T_ANISO] = dev.ss[k][10];
+    }
+    w[D_NVC] = nvc; w[D_NPC] = npc;
+    uint32_t *p = w + D_HDR;
+    memcpy(p, dev.vsf, 16u * nvc); p += 4 * nvc;
+    memcpy(p, dev.psf, 16u * npc); p += 4 * npc;
+    memcpy(p, G(vbase + vmin * stride), vbytes); p += (vbytes + 3) / 4;
+    if (nidx) memcpy(p, ix, 4u * nidx);
+    gpu_cmd(GPU_DRAW, (int)total, w);
+    free(w);
+    free(ix);
+    flush_big();
+}
+static uint32_t stream0(Ctx *c) {
+    Obj *vb = obj_k(dev.stream[0].vb);
+    for (uint32_t k = 1; k < 16; k++) if (dev.stream[k].vb) { rn_halt(c, "d3d9: draw with stream %u", k); return 0; }
+    return lock_mem(vb) + dev.stream[0].off;
 }
 static uint32_t IDirect3DDevice9_DrawPrimitive(Ctx *c) {
     DEV();
     if (!prim_ok(ARG(1), ARG(3)) || !dev.stream[0].vb) return D3DERR_INVALIDCALL;
-    draw_cmd(ARG(1), ARG(3));
+    uint32_t base = stream0(c), stride = dev.stream[0].stride;
+    if (base) draw_cmd(c, ARG(1), ARG(3), base + ARG(2) * stride, stride, 0, 0, 0, 0, 0);
     return D3D_OK;
 }
+// DrawIndexedPrimitive(Type, BaseVertexIndex, MinVertexIndex, NumVertices, StartIndex, PrimitiveCount)
 static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     DEV();
     if (!prim_ok(ARG(1), ARG(6)) || !dev.stream[0].vb || !dev.ib) return D3DERR_INVALIDCALL;
-    draw_cmd(ARG(1), ARG(6));
+    Obj *ib = obj_k(dev.ib);
+    int i32 = ib->fmt == F_INDEX32;
+    uint32_t base = stream0(c), stride = dev.stream[0].stride;
+    int32_t bv = (int32_t)ARG(2);
+    if (base) draw_cmd(c, ARG(1), ARG(6), base + (uint32_t)bv * stride, stride, ARG(3), ARG(4),
+                       lock_mem(ib) + ARG(5) * (i32 ? 4 : 2), i32, 0);
     return D3D_OK;
 }
 // The UP draws leave stream 0 (and the index buffer for the indexed one) unset, as documented.
 static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     DEV();
     if (!prim_ok(ARG(1), ARG(2)) || !ARG(3) || !ARG(4)) return D3DERR_INVALIDCALL;
-    draw_cmd(ARG(1), ARG(2));
+    draw_cmd(c, ARG(1), ARG(2), ARG(3), ARG(4), 0, 0, 0, 0, 0);
     dev.stream[0].vb = 0; dev.stream[0].off = 0; dev.stream[0].stride = 0;
     return D3D_OK;
 }
+// DrawIndexedPrimitiveUP(Type, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat,
+// pVertexStreamZeroData, VertexStreamZeroStride)
 static uint32_t IDirect3DDevice9_DrawIndexedPrimitiveUP(Ctx *c) {
     DEV();
     if (!prim_ok(ARG(1), ARG(4)) || !ARG(5) || !ARG(7) || !ARG(8) || (ARG(6) != F_INDEX16 && ARG(6) != F_INDEX32))
         return D3DERR_INVALIDCALL;
-    draw_cmd(ARG(1), ARG(4));
+    draw_cmd(c, ARG(1), ARG(4), ARG(7), ARG(8), ARG(2), ARG(3), ARG(5), ARG(6) == F_INDEX32, 0);
     dev.stream[0].vb = 0; dev.stream[0].off = 0; dev.stream[0].stride = 0;
     dev.ib = 0;
     return D3D_OK;

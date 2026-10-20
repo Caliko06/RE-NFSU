@@ -14,12 +14,15 @@
 #define WM_SHOWWINDOW 0x0018
 #define WM_ACTIVATEAPP 0x001c
 #define WM_NCCREATE 0x0081
+#define WM_PAINT 0x000f
 #define WM_QUIT 0x0012
+#define WM_ERASEBKGND 0x0014
 
-typedef struct { char name[64]; uint32_t proc, style, extra, instance, atom; } WClass;
+typedef struct { char name[64]; uint32_t proc, style, extra, instance, atom, brush; } WClass;
 static WClass classes[32];
 static int nclasses;
-typedef struct { uint32_t proc, style, exstyle, x, y, w, h, visible, userdata, id, parent; WClass *cls; } Window;
+typedef struct { uint32_t proc, style, exstyle, x, y, w, h, visible, userdata, id, parent; WClass *cls;
+                 int32_t upd[4]; int dirty, erase; } Window;    // update region (its bounding rectangle)
 static Window windows[16];
 static int nwindows;
 static uint32_t focus, active;
@@ -48,22 +51,25 @@ static WClass *find_class(Ctx *c, uint32_t name) {
         if (name < 0x10000 ? classes[k].atom == name : !strcasecmp(classes[k].name, G(name))) return &classes[k];
     return NULL;
 }
-static uint32_t register_class(Ctx *c, uint32_t style, uint32_t proc, uint32_t extra, uint32_t inst, uint32_t name) {
+static uint32_t register_class(Ctx *c, uint32_t style, uint32_t proc, uint32_t extra, uint32_t inst, uint32_t brush,
+                               uint32_t name) {
     if (nclasses == 32) { rn_halt(c, "too many window classes"); return 0; }
     WClass *k = &classes[nclasses];
     snprintf(k->name, sizeof k->name, "%s", name < 0x10000 ? "#atom" : G(name));
-    k->proc = proc; k->style = style; k->extra = extra; k->instance = inst;
+    k->proc = proc; k->style = style; k->extra = extra; k->instance = inst; k->brush = brush;
     k->atom = 0xc000 + nclasses++;
     return k->atom;
 }
 static uint32_t RegisterClassA_(Ctx *c) {
     uint32_t p = ARG(0);
-    return register_class(c, ld(c, p, 4), ld(c, p + 4, 4), ld(c, p + 12, 4), ld(c, p + 16, 4), ld(c, p + 36, 4));
+    return register_class(c, ld(c, p, 4), ld(c, p + 4, 4), ld(c, p + 12, 4), ld(c, p + 16, 4), ld(c, p + 28, 4),
+                          ld(c, p + 36, 4));
 }
 static uint32_t RegisterClassExA_(Ctx *c) {
     uint32_t p = ARG(0);
     if (ld(c, p, 4) != 48) { set_error(c, 87); return 0; }
-    return register_class(c, ld(c, p + 4, 4), ld(c, p + 8, 4), ld(c, p + 16, 4), ld(c, p + 20, 4), ld(c, p + 40, 4));
+    return register_class(c, ld(c, p + 4, 4), ld(c, p + 8, 4), ld(c, p + 16, 4), ld(c, p + 20, 4), ld(c, p + 32, 4),
+                          ld(c, p + 40, 4));
 }
 static uint32_t UnregisterClassA_(Ctx *c) { (void)c; return 1; }
 // Icons and cursors are only handed back to RegisterClass/SetCursor: a nonzero handle per resource id.
@@ -90,6 +96,31 @@ static void adjust(Ctx *c, uint32_t r, uint32_t style, uint32_t ex) {
 static uint32_t AdjustWindowRect_(Ctx *c) { adjust(c, ARG(0), ARG(1), 0); return 1; }
 static uint32_t AdjustWindowRectEx_(Ctx *c) { adjust(c, ARG(0), ARG(1), ARG(3)); return 1; }
 
+// Client = window minus the frame AdjustWindowRect adds.
+static void client_size(const Window *w, uint32_t *cw, uint32_t *ch) {
+    int b, cap;
+    frame(w->style, w->exstyle, &b, &cap);
+    *cw = w->w - 2 * b;
+    *ch = w->h - 2 * b - cap;
+}
+// The update region is kept as its bounding rectangle in client coordinates.
+static void invalidate(Window *w, const int32_t *r, int erase) {
+    uint32_t cw, ch;
+    client_size(w, &cw, &ch);
+    int32_t a[4] = {0, 0, (int32_t)cw, (int32_t)ch};
+    if (r) {
+        for (int k = 0; k < 2; k++) if (r[k] > a[k]) a[k] = r[k];
+        for (int k = 2; k < 4; k++) if (r[k] < a[k]) a[k] = r[k];
+    }
+    if (a[0] >= a[2] || a[1] >= a[3]) return;
+    if (!w->dirty) memcpy(w->upd, a, sizeof a);
+    else {
+        for (int k = 0; k < 2; k++) if (a[k] < w->upd[k]) w->upd[k] = a[k];
+        for (int k = 2; k < 4; k++) if (a[k] > w->upd[k]) w->upd[k] = a[k];
+    }
+    w->dirty = 1;
+    w->erase |= erase;
+}
 static uint32_t CreateWindowExA_(Ctx *c) {
     uint32_t ex = ARG(0), cname = ARG(1), title = ARG(2), style = ARG(3);
     int32_t x = ARG(4), y = ARG(5), w = ARG(6), h = ARG(7);
@@ -113,6 +144,7 @@ static uint32_t CreateWindowExA_(Ctx *c) {
     if (c->halt) return 0;
     if (style & 0x10000000) {   // WS_VISIBLE
         wd->visible = 1;
+        invalidate(wd, NULL, 1);
         send(c, hw, WM_SHOWWINDOW, 1, 0);
     }
     send(c, hw, WM_SIZE, 0, ((uint32_t)h << 16) | ((uint32_t)w & 0xffff));
@@ -133,11 +165,17 @@ static uint32_t ShowWindow_(Ctx *c) {
     uint32_t was = w->visible;
     if (cmd == 0) { w->visible = 0; if (was) send(c, h, WM_SHOWWINDOW, 0, 0); return was; }
     w->visible = 1;
-    if (!was) send(c, h, WM_SHOWWINDOW, 1, 0);
+    if (!was) { invalidate(w, NULL, 1); send(c, h, WM_SHOWWINDOW, 1, 0); }
     if (cmd != 4 && cmd != 8 && cmd != 7) activate(c, h);    // SW_SHOWNOACTIVATE, SW_SHOWNA, SW_SHOWMINNOACTIVE
     return was;
 }
-static uint32_t UpdateWindow_(Ctx *c) { return win(ARG(0)) != NULL; }
+// UpdateWindow sends WM_PAINT at once when the window has an update region.
+static uint32_t UpdateWindow_(Ctx *c) {
+    Window *w = win(ARG(0));
+    if (!w) return 0;
+    if (w->visible && w->dirty) send(c, ARG(0), WM_PAINT, 0, 0);
+    return 1;
+}
 static uint32_t SetFocus_(Ctx *c) {
     uint32_t h = ARG(0), old = focus;
     if (h && h != focus) { focus = h; send(c, h, WM_SETFOCUS, old, 0); }
@@ -151,12 +189,8 @@ static uint32_t GetClientRect_(Ctx *c) {
     uint32_t h = ARG(0), r = ARG(1);
     Window *w = win(h);
     uint32_t cw = DESK_W, ch = DESK_H;
-    if (w) {     // client = window minus the frame AdjustWindowRect adds
-        int b, cap;
-        frame(w->style, w->exstyle, &b, &cap);
-        cw = w->w - 2 * b;
-        ch = w->h - 2 * b - cap;
-    } else if (h != 0x10004) { set_error(c, 1400); return 0; }
+    if (w) client_size(w, &cw, &ch);
+    else if (h != 0x10004) { set_error(c, 1400); return 0; }
     st(c, r, 0, 4); st(c, r + 4, 0, 4); st(c, r + 8, cw, 4); st(c, r + 12, ch, 4);
     return 1;
 }
@@ -213,6 +247,12 @@ static uint32_t DefWindowProcA_(Ctx *c) {
     uint32_t msg = ARG(1);
     if (msg == WM_NCCREATE) return 1;
     if (msg == 0x0010) { DestroyWindow_(c); return 0; }
+    if (msg == WM_ERASEBKGND) { Window *w = win(ARG(0)); return w && w->cls->brush; }
+    if (msg == WM_PAINT) {    // validates the update region
+        Window *w = win(ARG(0));
+        if (w) w->dirty = w->erase = 0;
+        return 0;
+    }
     return 0;
 }
 
@@ -223,13 +263,22 @@ static void fill_msg(Ctx *c, uint32_t p, Msg m) {
     st(c, p, m.hwnd, 4); st(c, p + 4, m.msg, 4); st(c, p + 8, m.wp, 4); st(c, p + 12, m.lp, 4);
     st(c, p + 16, (uint32_t)(now_us() / 1000), 4); st(c, p + 20, 0, 4); st(c, p + 24, 0, 4);
 }
+// Windows makes WM_PAINT when no other message is waiting and a window has an update region;
+// it stays until the region is validated (BeginPaint, ValidateRect), so PM_REMOVE does not drop it.
+static int paint_msg(Msg *m) {
+    for (int k = 0; k < nwindows; k++)
+        if (windows[k].visible && windows[k].dirty) { *m = (Msg){hwnd_of(k), WM_PAINT, 0, 0}; return 1; }
+    return 0;
+}
 static uint32_t PeekMessageA_(Ctx *c) {
     uint32_t p = ARG(0), remove = ARG(4) & 1;
+    Msg m;
     if (qhead != qtail) {
         fill_msg(c, p, queue[qhead % 256]);
         if (remove) qhead++;
         return 1;
     }
+    if (paint_msg(&m)) { fill_msg(c, p, m); return 1; }
     if (quit_posted) {
         fill_msg(c, p, (Msg){0, WM_QUIT, quit_code, 0});
         if (remove) quit_posted = 0;
@@ -239,7 +288,9 @@ static uint32_t PeekMessageA_(Ctx *c) {
 }
 static uint32_t GetMessageA_(Ctx *c) {
     uint32_t p = ARG(0);
+    Msg m;
     if (qhead != qtail) { fill_msg(c, p, queue[qhead++ % 256]); return 1; }
+    if (paint_msg(&m)) { fill_msg(c, p, m); return 1; }
     if (quit_posted) { fill_msg(c, p, (Msg){0, WM_QUIT, quit_code, 0}); return 0; }
     rn_halt(c, "GetMessageA would wait for input");
     return 0;
@@ -250,6 +301,48 @@ static uint32_t TranslateMessage_(Ctx *c) { (void)c; return 0; }
 static uint32_t DispatchMessageA_(Ctx *c) {
     uint32_t p = ARG(0);
     return send(c, ld(c, p, 4), ld(c, p + 4, 4), ld(c, p + 8, 4), ld(c, p + 12, 4));
+}
+
+// Painting. The window's device context is a fixed handle per window: nothing draws with GDI yet.
+static uint32_t hdc_of(uint32_t h) { return 0x50000 + (h & 0xffff); }
+static uint32_t BeginPaint_(Ctx *c) {
+    uint32_t h = ARG(0), ps = ARG(1);
+    Window *w = win(h);
+    if (!w || !ps) { set_error(c, 1400); return 0; }
+    int erase = w->erase;
+    w->erase = 0;
+    if (erase) erase = !send(c, h, WM_ERASEBKGND, hdc_of(h), 0);    // fErase: the background still needs erasing
+    // PAINTSTRUCT: hdc, fErase, rcPaint, fRestore, fIncUpdate, rgbReserved[32]
+    memset(G(ps), 0, 64);
+    st(c, ps, hdc_of(h), 4);
+    st(c, ps + 4, (uint32_t)erase, 4);
+    if (w->dirty) for (int k = 0; k < 4; k++) st(c, ps + 8 + 4 * k, (uint32_t)w->upd[k], 4);
+    w->dirty = 0;
+    return hdc_of(h);
+}
+static uint32_t EndPaint_(Ctx *c) { return win(ARG(0)) != NULL; }
+static uint32_t InvalidateRect_(Ctx *c) {
+    uint32_t h = ARG(0), r = ARG(1);
+    if (!h) { for (int k = 0; k < nwindows; k++) if (windows[k].visible) invalidate(&windows[k], NULL, ARG(2) != 0); return 1; }
+    Window *w = win(h);
+    if (!w) { set_error(c, 1400); return 0; }
+    int32_t rr[4];
+    if (r) for (int k = 0; k < 4; k++) rr[k] = (int32_t)ld(c, r + 4 * k, 4);
+    invalidate(w, r ? rr : NULL, ARG(2) != 0);
+    return 1;
+}
+// ValidateRect with a rectangle removes it from the region; the region is one rectangle here, so
+// only a rectangle that covers it validates it all.
+static uint32_t ValidateRect_(Ctx *c) {
+    uint32_t h = ARG(0), r = ARG(1);
+    Window *w = win(h);
+    if (!w) { set_error(c, 1400); return 0; }
+    if (!r) { w->dirty = w->erase = 0; return 1; }
+    int32_t a[4];
+    for (int k = 0; k < 4; k++) a[k] = (int32_t)ld(c, r + 4 * k, 4);
+    if (w->dirty && a[0] <= w->upd[0] && a[1] <= w->upd[1] && a[2] >= w->upd[2] && a[3] >= w->upd[3]) w->dirty = w->erase = 0;
+    else if (w->dirty) rn_halt(c, "ValidateRect of part of the update region");
+    return 1;
 }
 
 static uint32_t GetSystemMetrics_(Ctx *c) {
@@ -317,6 +410,7 @@ const Api user32_apis[] = {
     U(IsIconic, 1), U(ClientToScreen, 2), U(DestroyWindow, 1), U(DefWindowProcA, 4), U(PeekMessageA, 5),
     U(GetMessageA, 4), U(PostMessageA, 4), U(PostQuitMessage, 1), U(TranslateMessage, 1), U(DispatchMessageA, 1),
     U(GetSystemMetrics, 1), U(CharUpperA, 1), U(GetAsyncKeyState, 1), U(GetKeyState, 1),
+    U(BeginPaint, 2), U(EndPaint, 2), U(InvalidateRect, 3), U(ValidateRect, 2),
     U(wvsprintfA, 3), {"user32.dll", "wsprintfA", -1, wsprintfA_},
 };
 const int user32_api_count = sizeof user32_apis / sizeof user32_apis[0];
