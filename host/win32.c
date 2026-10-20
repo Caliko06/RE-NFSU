@@ -342,6 +342,17 @@ static uint32_t CompareStringW_(Ctx *c) {
     }
     return n1 < n2 ? 1 : n1 > n2 ? 3 : 2;
 }
+// lstrcmp(i)A = CompareStringA(LOCALE_USER_DEFAULT, 0 or NORM_IGNORECASE, s1, -1, s2, -1) - 2.
+static uint32_t lstrcmp_any(Ctx *c, uint32_t s1, uint32_t s2, uint32_t flags) {
+    uint32_t n1 = gstrlen(c, s1), n2 = gstrlen(c, s2);
+    for (uint32_t k = 0; k < n1 && k < n2; k++) {
+        int r = cmp_units(to_wide((uint8_t)G(s1)[k]), to_wide((uint8_t)G(s2)[k]), flags);
+        if (r) return (uint32_t)r;
+    }
+    return n1 < n2 ? 0xffffffffu : n1 > n2;
+}
+static uint32_t lstrcmpiA_(Ctx *c) { return lstrcmp_any(c, ARG(0), ARG(1), 1); }
+static uint32_t lstrcmpA_(Ctx *c) { return lstrcmp_any(c, ARG(0), ARG(1), 0); }
 // Locale 0x0409 (English, United States).
 static const char *locale_info(uint32_t type) {
     switch (type & 0xffff) {
@@ -503,6 +514,15 @@ static uint32_t IsProcessorFeaturePresent_(Ctx *c) { uint32_t f = ARG(0); return
 static uint32_t GetTickCount_(Ctx *c) { (void)c; return (uint32_t)(now_us() / 1000); }
 static uint32_t QueryPerformanceCounter_(Ctx *c) { st64(c, ARG(0), now_us()); return 1; }
 static uint32_t QueryPerformanceFrequency_(Ctx *c) { st64(c, ARG(0), 1000000); return 1; }
+// The PC's clock runs on UTC: time zone "Greenwich Standard Time" (bias 0, no daylight saving),
+// so local time = system time. GetTimeZoneInformation then answers TIME_ZONE_ID_UNKNOWN.
+static uint32_t GetTimeZoneInformation_(Ctx *c) {
+    uint32_t p = ARG(0);
+    memset(G(p), 0, 172);
+    const char *name = "Greenwich Standard Time";
+    for (int k = 0; name[k]; k++) { st(c, p + 4 + 2 * k, (uint8_t)name[k], 2); st(c, p + 88 + 2 * k, (uint8_t)name[k], 2); }
+    return 0;
+}
 static uint32_t GetSystemTimeAsFileTime_(Ctx *c) {
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
@@ -682,7 +702,7 @@ const Api win32_apis[] = {
     K(GetModuleFileNameA, 3), K(GetStartupInfoA, 1), K(GetStdHandle, 1), K(SetStdHandle, 2), K(GetFileType, 1),
     K(SetHandleCount, 1), K(GetACP, 0), K(GetOEMCP, 0), K(IsValidCodePage, 1), K(GetCPInfo, 2),
     K(MultiByteToWideChar, 6), K(WideCharToMultiByte, 8), K(GetStringTypeW, 4), K(GetStringTypeA, 5),
-    K(LCMapStringW, 6), K(LCMapStringA, 6), K(CompareStringA, 6), K(CompareStringW, 6),
+    K(LCMapStringW, 6), K(LCMapStringA, 6), K(CompareStringA, 6), K(CompareStringW, 6), K(lstrcmpiA, 2), K(lstrcmpA, 2),
     K(GetLocaleInfoA, 4), K(GetLocaleInfoW, 4), K(GetUserDefaultLCID, 0), K(IsValidLocale, 2),
     K(HeapCreate, 3), K(HeapDestroy, 1), K(HeapAlloc, 3), K(HeapFree, 3), K(HeapSize, 3), K(HeapReAlloc, 4),
     K(VirtualAlloc, 4), K(VirtualFree, 3), K(VirtualQuery, 3), K(VirtualProtect, 4),
@@ -691,7 +711,7 @@ const Api win32_apis[] = {
     K(GetLastError, 0), K(SetLastError, 1), K(SetUnhandledExceptionFilter, 1),
     K(SetErrorMode, 1), K(IsBadReadPtr, 2), {"kernel32.dll", "IsBadWritePtr", 2, IsBadReadPtr_}, K(IsBadCodePtr, 1),
     K(GetSystemInfo, 1), K(IsProcessorFeaturePresent, 1), K(GetTickCount, 0), K(QueryPerformanceCounter, 1), K(QueryPerformanceFrequency, 1),
-    K(GetSystemTimeAsFileTime, 1), K(ExitProcess, 1), K(OutputDebugStringA, 1),
+    K(GetSystemTimeAsFileTime, 1), K(GetTimeZoneInformation, 1), K(ExitProcess, 1), K(OutputDebugStringA, 1),
     K(GetModuleHandleA, 1), K(LoadLibraryA, 1), K(GetProcAddress, 2),
     K(CreateFileA, 7), K(ReadFile, 5), K(SetFilePointer, 4), K(GetFileSize, 2), K(CloseHandle, 1), K(GetFullPathNameA, 4),
     K(GetProcessAffinityMask, 3), K(SetProcessAffinityMask, 2), K(GetPriorityClass, 1), K(SetPriorityClass, 2),

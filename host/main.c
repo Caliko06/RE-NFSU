@@ -1,6 +1,7 @@
 // Loads pc/Speed.exe into guest memory the way the Windows loader does, then runs its entry point.
-// Usage: speed <Speed.exe> <game dir>
+// Usage: speed <Speed.exe> <game dir> [--shot frame.png]
 #include "host.h"
+#include "gpu.h"
 
 Ctx *g_ctx;
 void dispatch_report(void);
@@ -45,6 +46,7 @@ int main(int argc, char **argv) {
     uint8_t *pe = read_file(argv[1], &fsize);
     if (!pe) { fprintf(stderr, "cannot read %s\n", argv[1]); return 2; }
     win32_set_root(argv[2]);
+    if (argc > 4 && !strcmp(argv[3], "--shot")) gpu_set_shot(argv[4]);
 
     static Ctx ctx;
     Ctx *c = g_ctx = &ctx;
