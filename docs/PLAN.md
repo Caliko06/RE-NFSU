@@ -9,6 +9,11 @@ that proves it. Lanes: W1 orchestrator, W2 D3D9, W3 Win32/input/audio, C1 Codex 
 - M4 part: loading screen renders (SM1 -> WGSL, textures, native = Chrome). Input and dsound -> Web Audio exist.
   Title screen renders (PATCH 0x4f5891 while MOVIES\ is missing; OWNER adds it).
   Stop: Enter -> the sound engine runs x86 code from game/Sound/*.abk (not in Speed.exe). W1: recompiler.
+- W1 next block (OWNER 2026-10-20: AOT): lift the x86 code modules inside game/Sound/*.abk ahead of time, like
+  Speed.exe. Steps: measure (how many modules, their header, relocation table; FE_MB.abk +0x2c7 is one), lift each
+  module once (keyed by content), apply its relocations at the load base, rn_call finds the module of a heap
+  address. Gate: Chrome, Enter at the title -> next screen, no stop; difftest covers the module code.
+  Lanes W2/W3 wait for this block (strict rule 2: no lane starts into a known blocker).
 
 ## M4 Front end on screen (W2 leads, W3 helps)
 - W2: BeginPaint/EndPaint/ValidateRect; vs_1_1 + ps_1_x bytecode -> WGSL; vertex declarations and FVF; DXT1/3/5 and
