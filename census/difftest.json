@@ -1,26 +1,27 @@
 {
- "functions": 13703,
+ "functions": 13787,
  "cases": {
-  "match": 15994,
-  "skip_unmapped": 38139,
+  "match": 16007,
+  "skip_unmapped": 38409,
   "skip_pinned_cpu_path": 399,
-  "skip_timeout": 186,
+  "skip_timeout": 238,
   "skip_not_a_function": 72,
   "skip_ret_imm16_sign": 8,
-  "skip_call_into_data": 6,
+  "skip_call_into_data": 7,
   "mismatch": 8
  },
  "compared_stop_kinds": {
-  "import": 3292,
-  "ret": 12624,
+  "import": 3300,
+  "ret": 12629,
   "invalid": 65,
   "fault": 21
  },
- "functions_compared": 5389,
- "functions_all_match": 5386,
+ "functions_compared": 5398,
+ "functions_all_match": 5395,
  "all_match_by_seed": {
   "data": 2192,
-  "call": 3194
+  "call": 3195,
+  "?": 8
  },
  "functions_with_mismatch": 3,
  "mismatch_funcs": [

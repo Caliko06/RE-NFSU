@@ -20,7 +20,8 @@ CASES = int(sys.argv[1]) if len(sys.argv) > 1 else 4
 UREG = [UC_X86_REG_EAX, UC_X86_REG_ECX, UC_X86_REG_EDX, UC_X86_REG_EBX,
         UC_X86_REG_ESP, UC_X86_REG_EBP, UC_X86_REG_ESI, UC_X86_REG_EDI]
 MEMSZ = 0x2000000
-REGIONS = [(0x400000, 0x400000), (0x1000000, 0x100000), (0x1f00000, 0x100000)]   # image, scratch, stack
+REGIONS = [(0x400000, 0x400000), (0x1000000, 0x100000), (0x1f00000, 0x100000), (0x1100000, 0x100000)]   # image, scratch, stack, ABK
+MODS, MOD_STEP = 0x1100000, 0x3000      # ABK code modules relocated here, one every 0x3000 (header <= 0x2780)
 SCRATCH, STACK_TOP, RET = 0x1000000, 0x1ff0000, 0x1fffff0
 HOST = 0xe0000000
 
@@ -28,7 +29,7 @@ HOST = 0xe0000000
 os.makedirs("build/dobj", exist_ok=True)
 jobs, objs = [], []
 for f in sorted(os.listdir("build/gen")):
-    if not (f.startswith("f") or f == "table.c") or not f.endswith(".c"):
+    if not (f.startswith("f") or f in ("table.c", "abk.c")) or not f.endswith(".c"):
         continue
     src, o = "build/gen/" + f, "build/dobj/" + f[:-2] + ".o"
     objs.append(o)
@@ -42,7 +43,7 @@ for j in jobs:
 if any(p.wait() for p in running):
     sys.exit("compile failed")
 subprocess.run(["clang", "-O1", "-shared", "-w", "-Ihost", "-DRN_REF_QEMU5", "-o", "build/difftest.dylib", *objs,
-                "tools/recomp/difftest_rt.c", "host/cpu.c"], check=True)
+                "tools/recomp/difftest_rt.c", "host/cpu.c", "host/abk.c"], check=True)
 lib = ctypes.CDLL(os.path.abspath("build/difftest.dylib"))
 
 
@@ -50,7 +51,8 @@ class Ctx(ctypes.Structure):     # host/rt.h
     _fields_ = [("r", ctypes.c_uint32 * 8), ("mem", ctypes.c_void_p), ("memsz", ctypes.c_uint32), ("ret", ctypes.c_uint32),
                 ("halt", ctypes.c_uint32), ("halt_at", ctypes.c_uint32), ("why", ctypes.c_char_p), ("fs", ctypes.c_uint32),
                 ("flags", ctypes.c_int32 * 7), ("eflx", ctypes.c_uint32), ("fcw", ctypes.c_uint32), ("fsw", ctypes.c_uint32),
-                ("ftop", ctypes.c_uint32), ("ftag", ctypes.c_uint32), ("st", ctypes.c_double * 8)]
+                ("ftop", ctypes.c_uint32), ("ftag", ctypes.c_uint32), ("st", ctypes.c_double * 8),
+                ("mb", ctypes.c_uint32)]
 
 
 lib.rn_call.argtypes = [ctypes.POINTER(Ctx), ctypes.c_uint32]
@@ -71,6 +73,25 @@ for d in pe.DIRECTORY_ENTRY_IMPORT:
         img[i.address - 0x400000:i.address - 0x400000 + 4] = (HOST + 16 * k).to_bytes(4, "little")
         k += 1
 image = bytes(img)
+
+
+class RnMod(ctypes.Structure):   # host/rt.h
+    _fields_ = [("id", ctypes.c_uint32), ("size", ctypes.c_uint32), ("nfn", ctypes.c_uint32),
+                ("off", ctypes.POINTER(ctypes.c_uint32)), ("fn", ctypes.c_void_p)]
+
+
+# ABK code modules as the engine relocates them (0x64df30), each at its own base; their functions are entries too.
+sys.path.insert(0, os.path.dirname(__file__))
+import abk
+by_key = {(m["id"], m["size"]): m for m in abk.modules()}
+mods = bytearray(0x100000)
+nmod = ctypes.c_uint32.in_dll(lib, "rn_mod_count").value
+for k, r in enumerate((RnMod * nmod).in_dll(lib, "rn_mods")):
+    b = MODS + k * MOD_STEP
+    m = by_key[(r.id, r.size)]
+    mods[b - MODS:b - MODS + len(m["hdr"])] = abk.relocate(m, b, lambda a: struct.unpack_from("<I", image, a - 0x400000)[0])
+    entries += [b + r.off[j] for j in range(r.nfn)]
+mods = bytes(mods)
 
 hostmem = ctypes.create_string_buffer(MEMSZ)
 INDEF = struct.unpack("<d", struct.pack("<Q", 0xfff8000000000000))[0]
@@ -127,6 +148,8 @@ def wide_ret_sites():
     """`ret imm16` with imm >= 0x8000: Unicorn sign-extends the immediate, the SDM zero-extends it."""
     out = set()
     for f in sorted(os.listdir("build/gen")):
+        if f == "abk.c":       # module code has no rdtsc and no ret imm16 (tools/recomp/abk.py census)
+            continue
         last = None
         for line in open("build/gen/" + f):
             if line.startswith("L") and line.rstrip().endswith(":;"):
@@ -144,6 +167,8 @@ def rdtsc_sites():
     """Guest addresses of rdtsc: the label line before each rn_rdtsc call in build/gen."""
     out = set()
     for f in sorted(os.listdir("build/gen")):
+        if f == "abk.c":       # module code has no rdtsc and no ret imm16 (tools/recomp/abk.py census)
+            continue
         last = None
         for line in open("build/gen/" + f):
             if line.startswith("L") and line.rstrip().endswith(":;"):
@@ -220,7 +245,7 @@ for e in entries:
         uc = make_uc()          # fresh CPU per case: junk entries run privileged code in Unicorn's ring 0
         if ONLY:
             hook_only(uc)
-        for (b, sz), d in zip(REGIONS, (image, scratch, bytes(stack))):
+        for (b, sz), d in zip(REGIONS, (image, scratch, bytes(stack), mods)):
             uc.mem_write(b, d)
             ctypes.memmove(ctypes.addressof(hostmem) + b, d, sz)
         for r, v in zip(UREG, regs):

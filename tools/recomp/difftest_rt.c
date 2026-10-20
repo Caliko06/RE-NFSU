@@ -14,6 +14,9 @@ void rn_call(Ctx *c, uint32_t t) {
         if (rn_fn_addr[mid] < t) lo = mid + 1; else hi = mid;
     }
     if (lo < rn_fn_count && rn_fn_addr[lo] == t) { rn_fn_ptr[lo](c); return; }
+    uint32_t mb;
+    void (*mod)(Ctx *) = rn_mod_find(c, t, &mb);
+    if (mod) { c->mb = mb; mod(c); return; }
     c->halt = 1; c->halt_at = t; c->why = "no lifted function";
 }
 uint64_t rn_rdtsc(Ctx *c) { (void)c; return 0x123456789abcull; }

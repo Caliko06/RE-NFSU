@@ -7,10 +7,11 @@ build/gen/table.c  sorted guest address -> function table for rn_call
 census/lift_report.json  counts: functions, traps by reason
 Usage: .venv/bin/python tools/recomp/build.py [native|web|lift]   (default: native)
 """
-import collections, json, multiprocessing as mp, os, subprocess, sys
+import collections, json, multiprocessing as mp, os, struct, subprocess, sys
+import pefile
 sys.path.insert(0, os.path.dirname(__file__))
 from lift import Lifter, Unsupported
-import patches
+import abk, patches
 
 CHUNKS = 160
 GEN = "build/gen"
@@ -69,21 +70,26 @@ def lift_all():
                      "const uint32_t rn_fn_addr[] = {" + ",".join(f"0x{e:x}" for e, _ in out) + "};\n"
                      "void (*const rn_fn_ptr[])(Ctx *) = {" + ",".join(f"f_{e:x}" for e, _ in out) + "};\n"
                      + patches.c_table())
-    rep = {"functions": len(out), "patches": [f"{p['addr']:#x}" for p in patches.active()], "data_seeds_inside_instructions": dropped, "failed": failed,
+    pe = pefile.PE("pc/Speed.exe")
+    img, base = pe.get_memory_mapped_image(), pe.OPTIONAL_HEADER.ImageBase
+    src, _, mods = abk.c_source(FUNCS, {e for e, _ in out}, lambda a: struct.unpack_from("<I", img, a - base)[0])
+    write_if_changed(f"{GEN}/abk.c", src)
+    rep = {"functions": len(out), **mods, "patches": [f"{p['addr']:#x}" for p in patches.active()], "data_seeds_inside_instructions": dropped, "failed": failed,
            "trap_sites_by_reason": dict(traps.most_common())}
     json.dump(rep, open("census/lift_report.json", "w"), indent=1)
     print(f"patches active: {len(patches.active())}")
     print(f"lifted {len(out)} functions, dropped {dropped} false data seeds, failed {len(failed)}, "
           f"trap sites {sum(traps.values())}")
+    print(f"ABK code modules: {mods}")
     print("top trap reasons:", dict(traps.most_common(15)))
 
 
 HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c",
-        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c"]
+        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c", "host/abk.c"]
 
 
 def compile_native():
-    srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c"]
+    srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c", f"{GEN}/abk.c"]
     os.makedirs("build/obj", exist_ok=True)
     flags = ["-O1", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing"]
     jobs = []
@@ -99,7 +105,7 @@ def compile_native():
 
 
 def compile_web():
-    srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c"]
+    srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c", f"{GEN}/abk.c"]
     os.makedirs("build/wobj", exist_ok=True)
     flags = ["-O1", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing", "-pthread"]
     jobs = []

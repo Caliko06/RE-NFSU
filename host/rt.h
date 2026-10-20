@@ -18,6 +18,7 @@ typedef struct Ctx {
     uint32_t eflx;              // eflags bits we only store (AC, ID)
     uint32_t fcw, fsw, ftop, ftag;  // fsw keeps C0..C3 only; ftag bit i = physical st i in use
     double st[8];
+    uint32_t mb;                // base of the live ABK code module the called lifted function belongs to
 } Ctx;
 
 // Guest pages below 64 KB are never mapped: a null pointer read is a loud fault.
@@ -37,6 +38,9 @@ static inline int par(uint32_t v) { return !__builtin_parity(v & 0xffu); }
 
 // Calls any guest or host address. Defined in host/dispatch.c.
 void rn_call(Ctx *c, uint32_t target);
+// ABK code modules lifted ahead of time (tools/recomp/abk.py -> build/gen/abk.c). Defined in host/abk.c.
+typedef struct { uint32_t id, size, nfn; const uint32_t *off; void (*const *fn)(Ctx *); } RnMod;
+void (*rn_mod_find(Ctx *c, uint32_t target, uint32_t *mb))(Ctx *);
 uint64_t rn_rdtsc(Ctx *c);
 void rn_cpuid(Ctx *c, uint32_t *a, uint32_t *b, uint32_t *cc, uint32_t *d);
 

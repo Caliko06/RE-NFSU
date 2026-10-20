@@ -66,6 +66,18 @@ class Lifter:
                     if o % 4 == 0:
                         self.addr_taken_aligned.add(v)
 
+    @classmethod
+    def image(cls, img, base, funcs):
+        """A lifter over raw code mapped at base (an ABK code module, tools/recomp/abk.py): no imports, and no
+        code pointers in data (abk.py checks that)."""
+        self = cls.__new__(cls)
+        self.base, self.img, self.t0, self.t1 = base, bytearray(img), base, base + len(img)
+        self.md = Cs(CS_ARCH_X86, CS_MODE_32)
+        self.md.detail = True
+        self.funcs, self.iat, self._cache, self.trace = funcs, set(), {}, False
+        self.addr_taken, self.addr_taken_aligned = set(), set()
+        return self
+
     def u32(self, a):
         return struct.unpack_from("<I", self.img, a - self.base)[0]
 

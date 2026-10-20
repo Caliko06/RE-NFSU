@@ -1,5 +1,9 @@
 {
  "functions": 13703,
+ "abk_files": 106,
+ "abk_modules": 79,
+ "abk_distinct_code": 23,
+ "abk_functions": 28,
  "patches": [
   "0x4f5891"
  ],

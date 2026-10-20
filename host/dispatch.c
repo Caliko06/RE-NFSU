@@ -93,6 +93,9 @@ void rn_call(Ctx *c, uint32_t target) {
         if (rn_fn_addr[mid] < target) lo = mid + 1; else hi = mid;
     }
     if (lo < rn_fn_count && rn_fn_addr[lo] == target) { rn_fn_ptr[lo](c); return; }
+    uint32_t mb;
+    void (*mod)(Ctx *) = rn_mod_find(c, target, &mb);
+    if (mod) { c->mb = mb; mod(c); return; }
     c->halt_at = target;
     // Evidence for the stop: what is at the target and who called it (the return address on the stack).
     char hex[2 * 32 + 1] = "";
