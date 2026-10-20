@@ -1,0 +1,2182 @@
+{
+  "_header": "Made by tools/census/d3d9_states.py; SDK enum syntax and per-enumerator default clauses, cross-checked against Microsoft d3d9types.h.",
+  "limits": [
+    "All IDs and literal defaults are FACT from cited sections. Conditional and driver-dependent defaults remain conditional.",
+    "No runtime state was measured. Unknown defaults are not initialized to zero by assumption.",
+    "FORCE_DWORD entries are included for enum completeness and are not settable states."
+  ],
+  "counts": {
+    "enum_entries": 137,
+    "states": 134,
+    "by_enum": {
+      "D3DRENDERSTATETYPE": 104,
+      "D3DSAMPLERSTATETYPE": 14,
+      "D3DTEXTURESTAGESTATETYPE": 19
+    },
+    "unknown_defaults": 1
+  },
+  "states": [
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ZENABLE",
+      "id": 7,
+      "id_hex": "0x00000007",
+      "documented_default": {
+        "kind": "conditional",
+        "value": {
+          "EnableAutoDepthStencil=TRUE": "D3DZB_TRUE",
+          "otherwise": "D3DZB_FALSE"
+        }
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_zenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L351"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FILLMODE",
+      "id": 8,
+      "id_hex": "0x00000008",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DFILL_SOLID"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_fillmode",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L352"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SHADEMODE",
+      "id": 9,
+      "id_hex": "0x00000009",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DSHADE_GOURAUD"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_shademode",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L353"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ZWRITEENABLE",
+      "id": 14,
+      "id_hex": "0x0000000e",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "TRUE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_zwriteenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L354"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ALPHATESTENABLE",
+      "id": 15,
+      "id_hex": "0x0000000f",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_alphatestenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L355"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_LASTPIXEL",
+      "id": 16,
+      "id_hex": "0x00000010",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "TRUE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_lastpixel",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L356"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SRCBLEND",
+      "id": 19,
+      "id_hex": "0x00000013",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DBLEND_ONE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_srcblend",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L357"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_DESTBLEND",
+      "id": 20,
+      "id_hex": "0x00000014",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DBLEND_ZERO"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_destblend",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L358"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_CULLMODE",
+      "id": 22,
+      "id_hex": "0x00000016",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DCULL_CCW"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_cullmode",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L359"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ZFUNC",
+      "id": 23,
+      "id_hex": "0x00000017",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DCMP_LESSEQUAL"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_zfunc",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L360"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ALPHAREF",
+      "id": 24,
+      "id_hex": "0x00000018",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_alpharef",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L361"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ALPHAFUNC",
+      "id": 25,
+      "id_hex": "0x00000019",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DCMP_ALWAYS"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_alphafunc",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L362"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_DITHERENABLE",
+      "id": 26,
+      "id_hex": "0x0000001a",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_ditherenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L363"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ALPHABLENDENABLE",
+      "id": 27,
+      "id_hex": "0x0000001b",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_alphablendenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L364"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FOGENABLE",
+      "id": 28,
+      "id_hex": "0x0000001c",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_fogenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L365"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SPECULARENABLE",
+      "id": 29,
+      "id_hex": "0x0000001d",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_specularenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L366"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FOGCOLOR",
+      "id": 34,
+      "id_hex": "0x00000022",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_fogcolor",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L367"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FOGTABLEMODE",
+      "id": 35,
+      "id_hex": "0x00000023",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DFOG_NONE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_fogtablemode",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L368"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FOGSTART",
+      "id": 36,
+      "id_hex": "0x00000024",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_fogstart",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L369"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FOGEND",
+      "id": 37,
+      "id_hex": "0x00000025",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 1.0,
+        "documented_literal": "1.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_fogend",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L370"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FOGDENSITY",
+      "id": 38,
+      "id_hex": "0x00000026",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 1.0,
+        "documented_literal": "1.0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_fogdensity",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L371"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_RANGEFOGENABLE",
+      "id": 48,
+      "id_hex": "0x00000030",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_rangefogenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L372"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_STENCILENABLE",
+      "id": 52,
+      "id_hex": "0x00000034",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_stencilenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L373"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_STENCILFAIL",
+      "id": 53,
+      "id_hex": "0x00000035",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DSTENCILOP_KEEP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_stencilfail",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L374"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_STENCILZFAIL",
+      "id": 54,
+      "id_hex": "0x00000036",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DSTENCILOP_KEEP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_stencilzfail",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L375"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_STENCILPASS",
+      "id": 55,
+      "id_hex": "0x00000037",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DSTENCILOP_KEEP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_stencilpass",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L376"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_STENCILFUNC",
+      "id": 56,
+      "id_hex": "0x00000038",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DCMP_ALWAYS"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_stencilfunc",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L377"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_STENCILREF",
+      "id": 57,
+      "id_hex": "0x00000039",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_stencilref",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L378"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_STENCILMASK",
+      "id": 58,
+      "id_hex": "0x0000003a",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 4294967295,
+        "documented_literal": "0xFFFFFFFF"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_stencilmask",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L379"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_STENCILWRITEMASK",
+      "id": 59,
+      "id_hex": "0x0000003b",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 4294967295,
+        "documented_literal": "0xFFFFFFFF"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_stencilwritemask",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L380"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_TEXTUREFACTOR",
+      "id": 60,
+      "id_hex": "0x0000003c",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 4294967295,
+        "documented_literal": "0xFFFFFFFF"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_texturefactor",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L381"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP0",
+      "id": 128,
+      "id_hex": "0x00000080",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L382"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP1",
+      "id": 129,
+      "id_hex": "0x00000081",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap1",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L383",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP2",
+      "id": 130,
+      "id_hex": "0x00000082",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap2",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L384",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP3",
+      "id": 131,
+      "id_hex": "0x00000083",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap3",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L385",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP4",
+      "id": 132,
+      "id_hex": "0x00000084",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap4",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L386",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP5",
+      "id": 133,
+      "id_hex": "0x00000085",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap5",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L387",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP6",
+      "id": 134,
+      "id_hex": "0x00000086",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap6",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L388",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP7",
+      "id": 135,
+      "id_hex": "0x00000087",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap7",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L389",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_CLIPPING",
+      "id": 136,
+      "id_hex": "0x00000088",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "TRUE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_clipping",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L390"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_LIGHTING",
+      "id": 137,
+      "id_hex": "0x00000089",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "TRUE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_lighting",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L391"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_AMBIENT",
+      "id": 139,
+      "id_hex": "0x0000008b",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_ambient",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L392"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FOGVERTEXMODE",
+      "id": 140,
+      "id_hex": "0x0000008c",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DFOG_NONE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_fogvertexmode",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L393"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_COLORVERTEX",
+      "id": 141,
+      "id_hex": "0x0000008d",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "TRUE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_colorvertex",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L394"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_LOCALVIEWER",
+      "id": 142,
+      "id_hex": "0x0000008e",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "TRUE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_localviewer",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L395"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_NORMALIZENORMALS",
+      "id": 143,
+      "id_hex": "0x0000008f",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_normalizenormals",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L396"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_DIFFUSEMATERIALSOURCE",
+      "id": 145,
+      "id_hex": "0x00000091",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DMCS_COLOR1"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_diffusematerialsource",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L397"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SPECULARMATERIALSOURCE",
+      "id": 146,
+      "id_hex": "0x00000092",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DMCS_COLOR2"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_specularmaterialsource",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L398"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_AMBIENTMATERIALSOURCE",
+      "id": 147,
+      "id_hex": "0x00000093",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DMCS_MATERIAL"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_ambientmaterialsource",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L399"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_EMISSIVEMATERIALSOURCE",
+      "id": 148,
+      "id_hex": "0x00000094",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DMCS_MATERIAL"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_emissivematerialsource",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L400"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_VERTEXBLEND",
+      "id": 151,
+      "id_hex": "0x00000097",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DVBF_DISABLE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_vertexblend",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L401"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_CLIPPLANEENABLE",
+      "id": 152,
+      "id_hex": "0x00000098",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_clipplaneenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L128"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POINTSIZE",
+      "id": 154,
+      "id_hex": "0x0000009a",
+      "documented_default": {
+        "kind": "device_dependent",
+        "value": "driver return value; 64 if driver returns 0 or 1",
+        "numeric_value": "unknown"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_pointsize",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L403"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POINTSIZE_MIN",
+      "id": 155,
+      "id_hex": "0x0000009b",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 1.0,
+        "documented_literal": "1.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_pointsize_min",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L404"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POINTSPRITEENABLE",
+      "id": 156,
+      "id_hex": "0x0000009c",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_pointspriteenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L405"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POINTSCALEENABLE",
+      "id": 157,
+      "id_hex": "0x0000009d",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_pointscaleenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L406"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POINTSCALE_A",
+      "id": 158,
+      "id_hex": "0x0000009e",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 1.0,
+        "documented_literal": "1.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_pointscale_a",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L407"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POINTSCALE_B",
+      "id": 159,
+      "id_hex": "0x0000009f",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_pointscale_b",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L408"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POINTSCALE_C",
+      "id": 160,
+      "id_hex": "0x000000a0",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_pointscale_c",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L409"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_MULTISAMPLEANTIALIAS",
+      "id": 161,
+      "id_hex": "0x000000a1",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "TRUE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_multisampleantialias",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L410"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_MULTISAMPLEMASK",
+      "id": 162,
+      "id_hex": "0x000000a2",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 4294967295,
+        "documented_literal": "0xFFFFFFFF"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_multisamplemask",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L411"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_PATCHEDGESTYLE",
+      "id": 163,
+      "id_hex": "0x000000a3",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DPATCHEDGE_DISCRETE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_patchedgestyle",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L412"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_DEBUGMONITORTOKEN",
+      "id": 165,
+      "id_hex": "0x000000a5",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DDMT_ENABLE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_debugmonitortoken",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L413"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POINTSIZE_MAX",
+      "id": 166,
+      "id_hex": "0x000000a6",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 64.0,
+        "documented_literal": "64.0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_pointsize_max",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L414"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_INDEXEDVERTEXBLENDENABLE",
+      "id": 167,
+      "id_hex": "0x000000a7",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_indexedvertexblendenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L415"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_COLORWRITEENABLE",
+      "id": 168,
+      "id_hex": "0x000000a8",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 15,
+        "documented_literal": "0x0000000F"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_colorwriteenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L416"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_TWEENFACTOR",
+      "id": 170,
+      "id_hex": "0x000000aa",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_tweenfactor",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L417"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_BLENDOP",
+      "id": 171,
+      "id_hex": "0x000000ab",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DBLENDOP_ADD"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_blendop",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L418"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_POSITIONDEGREE",
+      "id": 172,
+      "id_hex": "0x000000ac",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DDEGREE_CUBIC"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_positiondegree",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L419"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_NORMALDEGREE",
+      "id": 173,
+      "id_hex": "0x000000ad",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DDEGREE_LINEAR"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_normaldegree",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L420"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SCISSORTESTENABLE",
+      "id": 174,
+      "id_hex": "0x000000ae",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_scissortestenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L421"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SLOPESCALEDEPTHBIAS",
+      "id": 175,
+      "id_hex": "0x000000af",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_slopescaledepthbias",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L422"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ANTIALIASEDLINEENABLE",
+      "id": 176,
+      "id_hex": "0x000000b0",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_antialiasedlineenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L423"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_MINTESSELLATIONLEVEL",
+      "id": 178,
+      "id_hex": "0x000000b2",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 1.0,
+        "documented_literal": "1.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_mintessellationlevel",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L424"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_MAXTESSELLATIONLEVEL",
+      "id": 179,
+      "id_hex": "0x000000b3",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 1.0,
+        "documented_literal": "1.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_maxtessellationlevel",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L425"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ADAPTIVETESS_X",
+      "id": 180,
+      "id_hex": "0x000000b4",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_adaptivetess_x",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L426"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ADAPTIVETESS_Y",
+      "id": 181,
+      "id_hex": "0x000000b5",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_adaptivetess_y",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L427"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ADAPTIVETESS_Z",
+      "id": 182,
+      "id_hex": "0x000000b6",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 1.0,
+        "documented_literal": "1.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_adaptivetess_z",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L428"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ADAPTIVETESS_W",
+      "id": 183,
+      "id_hex": "0x000000b7",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_adaptivetess_w",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L429"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_ENABLEADAPTIVETESSELLATION",
+      "id": 184,
+      "id_hex": "0x000000b8",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_enableadaptivetessellation",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L430"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_TWOSIDEDSTENCILMODE",
+      "id": 185,
+      "id_hex": "0x000000b9",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_twosidedstencilmode",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L431"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_CCW_STENCILFAIL",
+      "id": 186,
+      "id_hex": "0x000000ba",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DSTENCILOP_KEEP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_ccw_stencilfail",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L432"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_CCW_STENCILZFAIL",
+      "id": 187,
+      "id_hex": "0x000000bb",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DSTENCILOP_KEEP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_ccw_stencilzfail",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L433"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_CCW_STENCILPASS",
+      "id": 188,
+      "id_hex": "0x000000bc",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DSTENCILOP_KEEP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_ccw_stencilpass",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L434"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_CCW_STENCILFUNC",
+      "id": 189,
+      "id_hex": "0x000000bd",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DCMP_ALWAYS"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_ccw_stencilfunc",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L435"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_COLORWRITEENABLE1",
+      "id": 190,
+      "id_hex": "0x000000be",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 15,
+        "documented_literal": "0x0000000f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_colorwriteenable1",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L436"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_COLORWRITEENABLE2",
+      "id": 191,
+      "id_hex": "0x000000bf",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 15,
+        "documented_literal": "0x0000000f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_colorwriteenable2",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L437"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_COLORWRITEENABLE3",
+      "id": 192,
+      "id_hex": "0x000000c0",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 15,
+        "documented_literal": "0x0000000f"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_colorwriteenable3",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L438"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_BLENDFACTOR",
+      "id": 193,
+      "id_hex": "0x000000c1",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 4294967295,
+        "documented_literal": "0xffffffff"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_blendfactor",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L439"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SRGBWRITEENABLE",
+      "id": 194,
+      "id_hex": "0x000000c2",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_srgbwriteenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L440"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_DEPTHBIAS",
+      "id": 195,
+      "id_hex": "0x000000c3",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_depthbias",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L441"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP8",
+      "id": 198,
+      "id_hex": "0x000000c6",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap8",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L442",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP9",
+      "id": 199,
+      "id_hex": "0x000000c7",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap9",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L443",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP10",
+      "id": 200,
+      "id_hex": "0x000000c8",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap10",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L444",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP11",
+      "id": 201,
+      "id_hex": "0x000000c9",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap11",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L445",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP12",
+      "id": 202,
+      "id_hex": "0x000000ca",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap12",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L446",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP13",
+      "id": 203,
+      "id_hex": "0x000000cb",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap13",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L447",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP14",
+      "id": 204,
+      "id_hex": "0x000000cc",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap14",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L448",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_WRAP15",
+      "id": 205,
+      "id_hex": "0x000000cd",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap15",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L449",
+        "inherited_default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_wrap0"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SEPARATEALPHABLENDENABLE",
+      "id": 206,
+      "id_hex": "0x000000ce",
+      "documented_default": {
+        "kind": "boolean",
+        "value": "FALSE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_separatealphablendenable",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L450"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_SRCBLENDALPHA",
+      "id": 207,
+      "id_hex": "0x000000cf",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DBLEND_ONE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_srcblendalpha",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L451"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_DESTBLENDALPHA",
+      "id": 208,
+      "id_hex": "0x000000d0",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DBLEND_ZERO"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_destblendalpha",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L452"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_BLENDOPALPHA",
+      "id": 209,
+      "id_hex": "0x000000d1",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DBLENDOP_ADD"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_blendopalpha",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L453"
+      }
+    },
+    {
+      "enum": "D3DRENDERSTATETYPE",
+      "name": "D3DRS_FORCE_DWORD",
+      "id": 2147483647,
+      "id_hex": "0x7fffffff",
+      "documented_default": {
+        "kind": "sentinel",
+        "value": "not_applicable; not a state"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype#d3drs_force_dword",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L456"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_ADDRESSU",
+      "id": 1,
+      "id_hex": "0x00000001",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTADDRESS_WRAP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_addressu",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L525"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_ADDRESSV",
+      "id": 2,
+      "id_hex": "0x00000002",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTADDRESS_WRAP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_addressv",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L526"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_ADDRESSW",
+      "id": 3,
+      "id_hex": "0x00000003",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTADDRESS_WRAP"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_addressw",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L527"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_BORDERCOLOR",
+      "id": 4,
+      "id_hex": "0x00000004",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0x00000000"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_bordercolor",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L528"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_MAGFILTER",
+      "id": 5,
+      "id_hex": "0x00000005",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTEXF_POINT"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_magfilter",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L529"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_MINFILTER",
+      "id": 6,
+      "id_hex": "0x00000006",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTEXF_POINT"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_minfilter",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L530"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_MIPFILTER",
+      "id": 7,
+      "id_hex": "0x00000007",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTEXF_NONE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_mipfilter",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L531"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_MIPMAPLODBIAS",
+      "id": 8,
+      "id_hex": "0x00000008",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "zero"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_mipmaplodbias",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L532"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_MAXMIPLEVEL",
+      "id": 9,
+      "id_hex": "0x00000009",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "zero"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_maxmiplevel",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L533"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_MAXANISOTROPY",
+      "id": 10,
+      "id_hex": "0x0000000a",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 1,
+        "documented_literal": "1"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_maxanisotropy",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L534"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_SRGBTEXTURE",
+      "id": 11,
+      "id_hex": "0x0000000b",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_srgbtexture",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L535"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_ELEMENTINDEX",
+      "id": 12,
+      "id_hex": "0x0000000c",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_elementindex",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L538"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_DMAPOFFSET",
+      "id": 13,
+      "id_hex": "0x0000000d",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0,
+        "documented_literal": "0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_dmapoffset",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L540"
+      }
+    },
+    {
+      "enum": "D3DSAMPLERSTATETYPE",
+      "name": "D3DSAMP_FORCE_DWORD",
+      "id": 2147483647,
+      "id_hex": "0x7fffffff",
+      "documented_default": {
+        "kind": "sentinel",
+        "value": "not_applicable; not a state"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype#d3dsamp_force_dword",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L542"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_COLOROP",
+      "id": 1,
+      "id_hex": "0x00000001",
+      "documented_default": {
+        "kind": "stage_dependent",
+        "value": {
+          "stage_0": "D3DTOP_MODULATE",
+          "other_stages": "D3DTOP_DISABLE"
+        }
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_colorop",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L497"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_COLORARG1",
+      "id": 2,
+      "id_hex": "0x00000002",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTA_TEXTURE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_colorarg1",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L498"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_COLORARG2",
+      "id": 3,
+      "id_hex": "0x00000003",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTA_CURRENT"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_colorarg2",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L499"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_ALPHAOP",
+      "id": 4,
+      "id_hex": "0x00000004",
+      "documented_default": {
+        "kind": "stage_dependent",
+        "value": {
+          "stage_0": "D3DTOP_SELECTARG1",
+          "other_stages": "D3DTOP_DISABLE"
+        }
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_alphaop",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L500"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_ALPHAARG1",
+      "id": 5,
+      "id_hex": "0x00000005",
+      "documented_default": {
+        "kind": "conditional",
+        "value": {
+          "texture_bound": "D3DTA_TEXTURE",
+          "no_texture": "D3DTA_DIFFUSE"
+        }
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_alphaarg1",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L501"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_ALPHAARG2",
+      "id": 6,
+      "id_hex": "0x00000006",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTA_CURRENT"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_alphaarg2",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L502"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_BUMPENVMAT00",
+      "id": 7,
+      "id_hex": "0x00000007",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_bumpenvmat00",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L503"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_BUMPENVMAT01",
+      "id": 8,
+      "id_hex": "0x00000008",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_bumpenvmat01",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L504"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_BUMPENVMAT10",
+      "id": 9,
+      "id_hex": "0x00000009",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_bumpenvmat10",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L505"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_BUMPENVMAT11",
+      "id": 10,
+      "id_hex": "0x0000000a",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_bumpenvmat11",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L506"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_TEXCOORDINDEX",
+      "id": 11,
+      "id_hex": "0x0000000b",
+      "documented_default": {
+        "kind": "stage_dependent",
+        "value": "stage index"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_texcoordindex",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L507"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_BUMPENVLSCALE",
+      "id": 22,
+      "id_hex": "0x00000016",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_bumpenvlscale",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L508"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_BUMPENVLOFFSET",
+      "id": 23,
+      "id_hex": "0x00000017",
+      "documented_default": {
+        "kind": "numeric",
+        "value": 0.0,
+        "documented_literal": "0.0"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_bumpenvloffset",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L509"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_TEXTURETRANSFORMFLAGS",
+      "id": 24,
+      "id_hex": "0x00000018",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTTFF_DISABLE"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_texturetransformflags",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L510"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_COLORARG0",
+      "id": 26,
+      "id_hex": "0x0000001a",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTA_CURRENT"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_colorarg0",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L511"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_ALPHAARG0",
+      "id": 27,
+      "id_hex": "0x0000001b",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTA_CURRENT"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_alphaarg0",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L512"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_RESULTARG",
+      "id": 28,
+      "id_hex": "0x0000001c",
+      "documented_default": {
+        "kind": "enum_or_flag",
+        "value": "D3DTA_CURRENT"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_resultarg",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L513"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_CONSTANT",
+      "id": 32,
+      "id_hex": "0x00000020",
+      "documented_default": {
+        "kind": "unknown",
+        "value": "unknown; not stated in this enumerator section"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_constant",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L514"
+      }
+    },
+    {
+      "enum": "D3DTEXTURESTAGESTATETYPE",
+      "name": "D3DTSS_FORCE_DWORD",
+      "id": 2147483647,
+      "id_hex": "0x7fffffff",
+      "documented_default": {
+        "kind": "sentinel",
+        "value": "not_applicable; not a state"
+      },
+      "sources": {
+        "id": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#syntax",
+        "default": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype#d3dtss_force_dword",
+        "sdk_id": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L517"
+      }
+    }
+  ],
+  "source_documents": [
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3drenderstatetype",
+      "sha256_text_utf8": "7f194a76b4fd2e0bed02267f11ddf0bd2ddf80aee94b061c54a6e8a695b8a733"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dsamplerstatetype",
+      "sha256_text_utf8": "da5506c2f5b5ba4b264ccd4347d35641659d70c20d00524d98d3cb98399f5251"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dtexturestagestatetype",
+      "sha256_text_utf8": "859f6ab28854c6f4bb103a971c3973fc2426bb0f527582f7ff95fa095563f153"
+    },
+    {
+      "url": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h",
+      "sha256_text_utf8": "5ba31e75a3ea03c1a71b48f39d966b6f67967b22bb9e4abcc419a3118269cd6a"
+    }
+  ]
+}

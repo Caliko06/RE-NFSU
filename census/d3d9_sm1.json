@@ -1,0 +1,3143 @@
+{
+  "_header": "Made by tools/census/d3d9_sm1.py; mechanical SDK Markdown tables and syntax, plus Microsoft SDK d3d9types.h.",
+  "limits": [
+    "FACT: enum numbers, literal syntax and support-table cells. Rules are scoped to the cited sections.",
+    "No compiler or game was executed. Assembler expansion and undocumented behavior remain unknown.",
+    "ps_1_0 is requested but absent from the DX9 SDK profile index; its instruction support is unknown."
+  ],
+  "profile_version_tokens": {
+    "vs_1_1": 4294836481,
+    "ps_1_1": 4294902017,
+    "ps_1_2": 4294902018,
+    "ps_1_3": 4294902019,
+    "ps_1_4": 4294902020,
+    "ps_1_0": 4294902016
+  },
+  "version_token_source": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1203",
+  "rules": {
+    "vs_source": {
+      "modifiers": [
+        "NONE",
+        "NEG"
+      ],
+      "matrix_src1": "no negate/swizzle",
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source-swizzling#source-register-swizzling"
+      ]
+    },
+    "ps_arithmetic_source": {
+      "base": [
+        "NONE",
+        "NEG",
+        "BIAS",
+        "BIASNEG",
+        "SIGN",
+        "SIGNNEG",
+        "COMP"
+      ],
+      "ps_1_4_adds": [
+        "X2",
+        "X2NEG"
+      ],
+      "constants": "modifiers undefined in 1_1..1_3; validation failure in 1_4",
+      "combinations": "NEG after BIAS/SIGN/X2; COMP excludes other arithmetic modifiers",
+      "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4"
+    },
+    "ps_texture_source": {
+      "general": "no arithmetic modifiers",
+      "ps_1_1_exception": "SIGN on texm* source",
+      "ps_1_2_1_3_exception": "SIGN on texture-address source",
+      "ps_1_4": "texcrd t#_dw.xyw; texld t#_dw.xyw or r#_dz.xyz; see instruction-specific limits",
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texcrd---ps#examples",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texld---ps-1-4#examples"
+      ]
+    },
+    "ps_swizzle": {
+      "ps_1_1_1_2_1_3": [
+        "identity",
+        "replicate .w",
+        "replicate .z subject to the SDK table footnote (unknown exact restriction)"
+      ],
+      "ps_1_4": [
+        "identity",
+        "single-channel .x/.y/.z/.w replicate"
+      ],
+      "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source-register-swizzling#remarks"
+    },
+    "vs_output_masks": {
+      "a0": ".x; mov only",
+      "oT#": "aggregate prefix .x/.xy/.xyz/.xyzw; preceding oT registers also written",
+      "oFog_oPts": "generic VS and PS mask pages differ on explicit scalar masks; unknown resolution",
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#texture-register-masks",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks"
+      ]
+    }
+  },
+  "write_mask_bits": [
+    {
+      "name": "D3DSP_WRITEMASK_0",
+      "value": 65536,
+      "source": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L986"
+    },
+    {
+      "name": "D3DSP_WRITEMASK_1",
+      "value": 131072,
+      "source": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L987"
+    },
+    {
+      "name": "D3DSP_WRITEMASK_2",
+      "value": 262144,
+      "source": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L988"
+    },
+    {
+      "name": "D3DSP_WRITEMASK_3",
+      "value": 524288,
+      "source": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L989"
+    },
+    {
+      "name": "D3DSP_WRITEMASK_ALL",
+      "value": 983040,
+      "source": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L990"
+    }
+  ],
+  "source_modifier_tokens": [
+    {
+      "name": "D3DSPSM_NONE",
+      "encoded_bits": 0,
+      "encoded_hex": "0x00000000",
+      "field_value": 0,
+      "supported_profiles": [
+        "vs_1_1",
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1167",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_NEG",
+      "encoded_bits": 16777216,
+      "encoded_hex": "0x01000000",
+      "field_value": 1,
+      "supported_profiles": [
+        "vs_1_1",
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1168",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_BIAS",
+      "encoded_bits": 33554432,
+      "encoded_hex": "0x02000000",
+      "field_value": 2,
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1169",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_BIASNEG",
+      "encoded_bits": 50331648,
+      "encoded_hex": "0x03000000",
+      "field_value": 3,
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1170",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_SIGN",
+      "encoded_bits": 67108864,
+      "encoded_hex": "0x04000000",
+      "field_value": 4,
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1171",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_SIGNNEG",
+      "encoded_bits": 83886080,
+      "encoded_hex": "0x05000000",
+      "field_value": 5,
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1172",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_COMP",
+      "encoded_bits": 100663296,
+      "encoded_hex": "0x06000000",
+      "field_value": 6,
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1173",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_X2",
+      "encoded_bits": 117440512,
+      "encoded_hex": "0x07000000",
+      "field_value": 7,
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1174",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_X2NEG",
+      "encoded_bits": 134217728,
+      "encoded_hex": "0x08000000",
+      "field_value": 8,
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1175",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_DZ",
+      "encoded_bits": 150994944,
+      "encoded_hex": "0x09000000",
+      "field_value": 9,
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1176",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    },
+    {
+      "name": "D3DSPSM_DW",
+      "encoded_bits": 167772160,
+      "encoded_hex": "0x0a000000",
+      "field_value": 10,
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "sources": [
+        "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L1177",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source#ps_1_1---ps_1_4",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source#negate"
+      ]
+    }
+  ],
+  "instructions": [
+    {
+      "stage": "vs",
+      "mnemonic": "add",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_ADD",
+      "opcode_token": 2,
+      "opcode_hex": "0x0002",
+      "syntax": "add dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/add---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/add---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L823"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "dcl_usage",
+      "category": "setup",
+      "sdk_opcode_name": "D3DSIO_DCL",
+      "opcode_token": 31,
+      "opcode_hex": "0x001f",
+      "syntax": "dcl_usage[usage_index] v#",
+      "operand_count": 1,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "0"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "not_applicable"
+      },
+      "source_modifiers": {
+        "vs_1_1": "not_applicable"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dcl-usage-input-register---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dcl-usage-input-register---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L852"
+      },
+      "bytecode_encoding": "unknown for vs_1_1; assembly input declaration is not evidence of a shader-stream DCL token"
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "def",
+      "category": "setup",
+      "sdk_opcode_name": "D3DSIO_DEF",
+      "opcode_token": 81,
+      "opcode_hex": "0x0051",
+      "syntax": "def dst, float1, float2, float3, float4",
+      "operand_count": 5,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "0"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "unknown; constant definition, not an ALU write"
+      },
+      "source_modifiers": {
+        "vs_1_1": "not_applicable"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/def---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/def---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L868"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "dp3",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_DP3",
+      "opcode_token": 8,
+      "opcode_hex": "0x0008",
+      "syntax": "dp3 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp3---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp3---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L829"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "dp4",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_DP4",
+      "opcode_token": 9,
+      "opcode_hex": "0x0009",
+      "syntax": "dp4 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp4---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp4---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L830"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "dst",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_DST",
+      "opcode_token": 17,
+      "opcode_hex": "0x0011",
+      "syntax": "dst dest, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dst---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dst---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L838"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "exp",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_EXP",
+      "opcode_token": 14,
+      "opcode_hex": "0x000e",
+      "syntax": "exp dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "10"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "single component per generic mask reference; see documented conflicts"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/exp---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/exp---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L835"
+      },
+      "source_swizzle_requirement": {
+        "rule": "explicit single-component replicate",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/exp---vs#syntax"
+      },
+      "assembly_note": "SDK index charges multiple instruction slots; enum opcode does not prove the assembler emits one token. Expansion was not executed."
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "expp",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_EXPP",
+      "opcode_token": 78,
+      "opcode_hex": "0x004e",
+      "syntax": "expp dst, src.{x|y|z|w}",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "single component per generic mask reference; see documented conflicts"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/expp---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/expp---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L885"
+      },
+      "source_swizzle_requirement": {
+        "rule": "explicit single-component replicate",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/expp---vs#syntax"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "frc",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_FRC",
+      "opcode_token": 19,
+      "opcode_hex": "0x0013",
+      "syntax": "frc dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "3"
+      },
+      "destination_write_masks": {
+        "vs_1_1": [
+          ".y",
+          ".xy"
+        ]
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/frc---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/frc---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L840"
+      },
+      "assembly_note": "SDK index charges multiple instruction slots; enum opcode does not prove the assembler emits one token. Expansion was not executed."
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "lit",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_LIT",
+      "opcode_token": 16,
+      "opcode_hex": "0x0010",
+      "syntax": "lit dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/lit---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/lit---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L837"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "log",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_LOG",
+      "opcode_token": 15,
+      "opcode_hex": "0x000f",
+      "syntax": "log dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "10"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "single component per generic mask reference; see documented conflicts"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/log---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/log---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L836"
+      },
+      "source_swizzle_requirement": {
+        "rule": "explicit single-component replicate",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/log---vs#syntax"
+      },
+      "assembly_note": "SDK index charges multiple instruction slots; enum opcode does not prove the assembler emits one token. Expansion was not executed."
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "logp",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_LOGP",
+      "opcode_token": 79,
+      "opcode_hex": "0x004f",
+      "syntax": "logp dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "single component per generic mask reference; see documented conflicts"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/logp---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/logp---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L886"
+      },
+      "source_swizzle_requirement": {
+        "rule": "explicit single-component replicate",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/logp---vs#syntax"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "m3x2",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_M3x2",
+      "opcode_token": 24,
+      "opcode_hex": "0x0018",
+      "syntax": "m3x2 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "2"
+      },
+      "destination_write_masks": {
+        "vs_1_1": [
+          ".xy"
+        ]
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x2---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x2---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L845"
+      },
+      "source_operand_restrictions": {
+        "src1": "no negate or swizzle",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x2---vs#remarks"
+      },
+      "assembly_note": "SDK index charges multiple instruction slots; enum opcode does not prove the assembler emits one token. Expansion was not executed."
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "m3x3",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_M3x3",
+      "opcode_token": 23,
+      "opcode_hex": "0x0017",
+      "syntax": "m3x3 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "3"
+      },
+      "destination_write_masks": {
+        "vs_1_1": [
+          ".xyz"
+        ]
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x3---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x3---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L844"
+      },
+      "source_operand_restrictions": {
+        "src1": "no negate or swizzle",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x3---vs#remarks"
+      },
+      "assembly_note": "SDK index charges multiple instruction slots; enum opcode does not prove the assembler emits one token. Expansion was not executed."
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "m3x4",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_M3x4",
+      "opcode_token": 22,
+      "opcode_hex": "0x0016",
+      "syntax": "m3x4 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "4"
+      },
+      "destination_write_masks": {
+        "vs_1_1": [
+          ".xyzw"
+        ]
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x4---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x4---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L843"
+      },
+      "source_operand_restrictions": {
+        "src1": "no negate or swizzle",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x4---vs#remarks"
+      },
+      "assembly_note": "SDK index charges multiple instruction slots; enum opcode does not prove the assembler emits one token. Expansion was not executed."
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "m4x3",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_M4x3",
+      "opcode_token": 21,
+      "opcode_hex": "0x0015",
+      "syntax": "m4x3 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "3"
+      },
+      "destination_write_masks": {
+        "vs_1_1": [
+          ".xyz"
+        ]
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x3---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x3---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L842"
+      },
+      "source_operand_restrictions": {
+        "src1": "no negate or swizzle",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x3---vs#remarks"
+      },
+      "assembly_note": "SDK index charges multiple instruction slots; enum opcode does not prove the assembler emits one token. Expansion was not executed."
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "m4x4",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_M4x4",
+      "opcode_token": 20,
+      "opcode_hex": "0x0014",
+      "syntax": "m4x4 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "4"
+      },
+      "destination_write_masks": {
+        "vs_1_1": [
+          ".xyzw"
+        ]
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x4---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x4---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L841"
+      },
+      "source_operand_restrictions": {
+        "src1": "no negate or swizzle",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x4---vs#remarks"
+      },
+      "assembly_note": "SDK index charges multiple instruction slots; enum opcode does not prove the assembler emits one token. Expansion was not executed."
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "mad",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_MAD",
+      "opcode_token": 4,
+      "opcode_hex": "0x0004",
+      "syntax": "mad dst, src0, src1, src2",
+      "operand_count": 4,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mad---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mad---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L825"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "max",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_MAX",
+      "opcode_token": 11,
+      "opcode_hex": "0x000b",
+      "syntax": "max dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/max---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/max---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L832"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "min",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_MIN",
+      "opcode_token": 10,
+      "opcode_hex": "0x000a",
+      "syntax": "min dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/min---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/min---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L831"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "mov",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_MOV",
+      "opcode_token": 1,
+      "opcode_hex": "0x0001",
+      "syntax": "mov dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mov---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mov---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L822"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "mul",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_MUL",
+      "opcode_token": 5,
+      "opcode_hex": "0x0005",
+      "syntax": "mul dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mul---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mul---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L826"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "nop",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_NOP",
+      "opcode_token": 0,
+      "opcode_hex": "0x0000",
+      "syntax": "nop",
+      "operand_count": 0,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "not_applicable"
+      },
+      "source_modifiers": {
+        "vs_1_1": "not_applicable"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/nop---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/nop---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L821"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "rcp",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_RCP",
+      "opcode_token": 6,
+      "opcode_hex": "0x0006",
+      "syntax": "rcp dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "single component per generic mask reference; see documented conflicts"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/rcp---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/rcp---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L827"
+      },
+      "source_swizzle_requirement": {
+        "rule": "explicit single-component replicate",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/rcp---vs#syntax"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "rsq",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_RSQ",
+      "opcode_token": 7,
+      "opcode_hex": "0x0007",
+      "syntax": "rsq dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "single component per generic mask reference; see documented conflicts"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/rsq---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/rsq---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L828"
+      },
+      "source_swizzle_requirement": {
+        "rule": "explicit single-component replicate",
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/rsq---vs#syntax"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "sge",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_SGE",
+      "opcode_token": 13,
+      "opcode_hex": "0x000d",
+      "syntax": "sge dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sge---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sge---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L834"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "slt",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_SLT",
+      "opcode_token": 12,
+      "opcode_hex": "0x000c",
+      "syntax": "slt dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/slt---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/slt---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L833"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "sub",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_SUB",
+      "opcode_token": 3,
+      "opcode_hex": "0x0003",
+      "syntax": "sub dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "1"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "ordered xyzw subset; output-register constraints apply"
+      },
+      "source_modifiers": {
+        "vs_1_1": "vs_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sub---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sub---vs#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L824"
+      }
+    },
+    {
+      "stage": "vs",
+      "mnemonic": "vs",
+      "category": "setup",
+      "sdk_opcode_name": "not_applicable",
+      "opcode_token": "not_applicable; version token",
+      "opcode_hex": "unknown",
+      "syntax": "vs_mainVer_subVer",
+      "operand_count": 0,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "vs_1_1"
+      ],
+      "ps_1_0_support": "not_applicable",
+      "instruction_slots": {
+        "vs_1_1": "0"
+      },
+      "destination_write_masks": {
+        "vs_1_1": "not_applicable"
+      },
+      "source_modifiers": {
+        "vs_1_1": "not_applicable"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/vs---vs#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/vs---vs#remarks"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "ps",
+      "category": "setup",
+      "sdk_opcode_name": "not_applicable",
+      "opcode_token": "not_applicable; version token",
+      "opcode_hex": "unknown",
+      "syntax": "ps_mainVer_subVer",
+      "operand_count": 0,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "0",
+        "ps_1_2": "0",
+        "ps_1_3": "0",
+        "ps_1_4": "0"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "not_applicable",
+        "ps_1_2": "not_applicable",
+        "ps_1_3": "not_applicable",
+        "ps_1_4": "not_applicable"
+      },
+      "source_modifiers": {
+        "ps_1_1": "not_applicable",
+        "ps_1_2": "not_applicable",
+        "ps_1_3": "not_applicable",
+        "ps_1_4": "not_applicable"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/ps---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/ps---ps#remarks"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "def",
+      "category": "setup",
+      "sdk_opcode_name": "D3DSIO_DEF",
+      "opcode_token": 81,
+      "opcode_hex": "0x0051",
+      "syntax": "def dst, fVvalue1, fValue2, fValue3, fValue4",
+      "operand_count": 5,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "0",
+        "ps_1_2": "0",
+        "ps_1_3": "0",
+        "ps_1_4": "0"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "unknown; constant definition, not an ALU write",
+        "ps_1_2": "unknown; constant definition, not an ALU write",
+        "ps_1_3": "unknown; constant definition, not an ALU write",
+        "ps_1_4": "unknown; constant definition, not an ALU write"
+      },
+      "source_modifiers": {
+        "ps_1_1": "not_applicable",
+        "ps_1_2": "not_applicable",
+        "ps_1_3": "not_applicable",
+        "ps_1_4": "not_applicable"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/def---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/def---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L868"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "phase",
+      "category": "setup",
+      "sdk_opcode_name": "D3DSIO_PHASE",
+      "opcode_token": 65533,
+      "opcode_hex": "0xfffd",
+      "syntax": "phase",
+      "operand_count": 0,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_4": "0"
+      },
+      "destination_write_masks": {
+        "ps_1_4": "not_applicable"
+      },
+      "source_modifiers": {
+        "ps_1_4": "not_applicable"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/phase---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/phase---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L905"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "add",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_ADD",
+      "opcode_token": 2,
+      "opcode_hex": "0x0002",
+      "syntax": "add dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_arithmetic_source",
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/add---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/add---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L823"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "bem",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_BEM",
+      "opcode_token": 89,
+      "opcode_hex": "0x0059",
+      "syntax": "bem dst.rg, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_4": "2"
+      },
+      "destination_write_masks": {
+        "ps_1_4": [
+          ".rg"
+        ]
+      },
+      "source_modifiers": {
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/bem---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/bem---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L896"
+      },
+      "version_restrictions": {
+        "ps_1_4": {
+          "phase": 1,
+          "maximum_uses": 1,
+          "coissue": false
+        },
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/bem---ps#remarks"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "cmp",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_CMP",
+      "opcode_token": 88,
+      "opcode_hex": "0x0058",
+      "syntax": "cmp dst, src0, src1, src2",
+      "operand_count": 4,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_2": 2,
+        "ps_1_3": 2,
+        "ps_1_4": 1
+      },
+      "destination_write_masks": {
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/cmp---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/cmp---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L895"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "cnd",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_CND",
+      "opcode_token": 80,
+      "opcode_hex": "0x0050",
+      "syntax": "cnd dst, src0, src1, src2",
+      "operand_count": 4,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_arithmetic_source",
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/cnd---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/cnd---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L887"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "dp3",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_DP3",
+      "opcode_token": 8,
+      "opcode_hex": "0x0008",
+      "syntax": "dp3 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": [
+          ".rgb",
+          ".rgba"
+        ],
+        "ps_1_2": [
+          ".rgb",
+          ".rgba"
+        ],
+        "ps_1_3": [
+          ".rgb",
+          ".rgba"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_arithmetic_source",
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp3---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp3---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L829"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "dp4",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_DP4",
+      "opcode_token": 9,
+      "opcode_hex": "0x0009",
+      "syntax": "dp4 dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_2": 2,
+        "ps_1_3": 2,
+        "ps_1_4": 1
+      },
+      "destination_write_masks": {
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp4---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp4---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L830"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "lrp",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_LRP",
+      "opcode_token": 18,
+      "opcode_hex": "0x0012",
+      "syntax": "lrp dst, src0, src1, src2",
+      "operand_count": 4,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_arithmetic_source",
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/lrp---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/lrp---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L839"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "mad",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_MAD",
+      "opcode_token": 4,
+      "opcode_hex": "0x0004",
+      "syntax": "mad dst, src0, src1, src2",
+      "operand_count": 4,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_arithmetic_source",
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mad---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mad---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L825"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "mov",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_MOV",
+      "opcode_token": 1,
+      "opcode_hex": "0x0001",
+      "syntax": "mov dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_arithmetic_source",
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mov---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mov---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L822"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "mul",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_MUL",
+      "opcode_token": 5,
+      "opcode_hex": "0x0005",
+      "syntax": "mul dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_arithmetic_source",
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mul---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mul---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L826"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "nop",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_NOP",
+      "opcode_token": 0,
+      "opcode_hex": "0x0000",
+      "syntax": "nop",
+      "operand_count": 0,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "0",
+        "ps_1_2": "0",
+        "ps_1_3": "0",
+        "ps_1_4": "0"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "not_applicable",
+        "ps_1_2": "not_applicable",
+        "ps_1_3": "not_applicable",
+        "ps_1_4": "not_applicable"
+      },
+      "source_modifiers": {
+        "ps_1_1": "not_applicable",
+        "ps_1_2": "not_applicable",
+        "ps_1_3": "not_applicable",
+        "ps_1_4": "not_applicable"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/nop---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/nop---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L821"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "sub",
+      "category": "arithmetic",
+      "sdk_opcode_name": "D3DSIO_SUB",
+      "opcode_token": 3,
+      "opcode_hex": "0x0003",
+      "syntax": "sub dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_2": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_3": [
+          ".rgba",
+          ".rgb",
+          ".a"
+        ],
+        "ps_1_4": "any nonempty ordered rgba subset"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_arithmetic_source",
+        "ps_1_2": "ps_arithmetic_source",
+        "ps_1_3": "ps_arithmetic_source",
+        "ps_1_4": "ps_arithmetic_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sub---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sub---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L824"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "tex",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEX",
+      "opcode_token": 66,
+      "opcode_hex": "0x0042",
+      "syntax": "tex dst",
+      "operand_count": 1,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/tex---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/tex---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L871"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texbem",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXBEM",
+      "opcode_token": 67,
+      "opcode_hex": "0x0043",
+      "syntax": "texbem dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texbem---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texbem---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L874"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texbeml",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXBEML",
+      "opcode_token": 68,
+      "opcode_hex": "0x0044",
+      "syntax": "texbeml dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": {
+          "arithmetic": 1,
+          "texture": 1
+        },
+        "ps_1_2": {
+          "arithmetic": 1,
+          "texture": 1
+        },
+        "ps_1_3": {
+          "arithmetic": 1,
+          "texture": 1
+        }
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texbeml---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texbeml---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L875"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texcoord",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXCOORD",
+      "opcode_token": 64,
+      "opcode_hex": "0x0040",
+      "syntax": "texcoord dst",
+      "operand_count": 1,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texcoord---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texcoord---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L871"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texcrd",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXCOORD",
+      "opcode_token": 64,
+      "opcode_hex": "0x0040",
+      "syntax": "texcrd dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_4": ".rgb for xyz/xyw; .rg for xyw_dw; other channels undefined"
+      },
+      "source_modifiers": {
+        "ps_1_4": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texcrd---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texcrd---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L871"
+      },
+      "opcode_alias_source": "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3d9types/ne-d3d9types-_d3dshader_instruction_opcode_type#constants"
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texdepth",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXDEPTH",
+      "opcode_token": 87,
+      "opcode_hex": "0x0057",
+      "syntax": "texdepth dst",
+      "operand_count": 1,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_4": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_4": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdepth---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdepth---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L894"
+      },
+      "version_restrictions": {
+        "ps_1_4": {
+          "register": "r5",
+          "after_phase": true,
+          "r5_afterward": "unavailable"
+        },
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdepth---ps#remarks"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texdp3",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXDP3",
+      "opcode_token": 85,
+      "opcode_hex": "0x0055",
+      "syntax": "texdp3 dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdp3---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdp3---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L890"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texdp3tex",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXDP3TEX",
+      "opcode_token": 83,
+      "opcode_hex": "0x0053",
+      "syntax": "texdp3tex dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdp3tex---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdp3tex---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L890"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texkill",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXKILL",
+      "opcode_token": 65,
+      "opcode_hex": "0x0041",
+      "syntax": "texkill dst",
+      "operand_count": 1,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3",
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1",
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask",
+        "ps_1_4": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source",
+        "ps_1_4": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texkill---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texkill---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L872"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texld",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEX",
+      "opcode_token": 66,
+      "opcode_hex": "0x0042",
+      "syntax": "texld dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_4"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_4": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_4": "none explicitly shown in the complete syntax list; generic mask page differs"
+      },
+      "source_modifiers": {
+        "ps_1_4": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texld---ps-1-4#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texld---ps-1-4#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L871"
+      },
+      "opcode_alias_source": "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3d9types/ne-d3d9types-_d3dshader_instruction_opcode_type#constants",
+      "version_restrictions": {
+        "ps_1_4": {
+          "dz_source": "r# in phase 2",
+          "maximum_dz_uses": 2,
+          "t_reads": "same xyz or xyw selection per register"
+        },
+        "source": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texld---ps-1-4#remarks"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texm3x2depth",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXM3x2DEPTH",
+      "opcode_token": 84,
+      "opcode_hex": "0x0054",
+      "syntax": "texm3x2depth dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2depth---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2depth---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L891"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texm3x2pad",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXM3x2PAD",
+      "opcode_token": 71,
+      "opcode_hex": "0x0047",
+      "syntax": "tex3x2pad dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2pad---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2pad---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L878"
+      },
+      "documentation_note": "Syntax cell spells tex3x2pad; index and title spell texm3x2pad. Operand count comes from that cell."
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texm3x2tex",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXM3x2TEX",
+      "opcode_token": 72,
+      "opcode_hex": "0x0048",
+      "syntax": "texm3x2tex dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2tex---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2tex---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L879"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texm3x3",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXM3x3",
+      "opcode_token": 86,
+      "opcode_hex": "0x0056",
+      "syntax": "texm3x3 dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L880"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texm3x3pad",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXM3x3PAD",
+      "opcode_token": 73,
+      "opcode_hex": "0x0049",
+      "syntax": "texm3x3pad dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3pad---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3pad---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L880"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texm3x3spec",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXM3x3SPEC",
+      "opcode_token": 76,
+      "opcode_hex": "0x004c",
+      "syntax": "texm3x3spec dst, src0, src1",
+      "operand_count": 3,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3spec---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3spec---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L883"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texm3x3tex",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXM3x3TEX",
+      "opcode_token": 74,
+      "opcode_hex": "0x004a",
+      "syntax": "texm3x3tex dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3tex---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3tex---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L881"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texm3x3vspec",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXM3x3VSPEC",
+      "opcode_token": 77,
+      "opcode_hex": "0x004d",
+      "syntax": "texm3x3vspec dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3vspec---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3vspec---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L884"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texreg2ar",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXREG2AR",
+      "opcode_token": 69,
+      "opcode_hex": "0x0045",
+      "syntax": "texreg2ar dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2ar---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2ar---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L876"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texreg2gb",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXREG2GB",
+      "opcode_token": 70,
+      "opcode_hex": "0x0046",
+      "syntax": "texreg2gb dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_1",
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_1": "1",
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_1": "no explicit destination mask",
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_1": "ps_texture_source",
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2gb---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2gb---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L877"
+      }
+    },
+    {
+      "stage": "ps",
+      "mnemonic": "texreg2rgb",
+      "category": "texture",
+      "sdk_opcode_name": "D3DSIO_TEXREG2RGB",
+      "opcode_token": 82,
+      "opcode_hex": "0x0052",
+      "syntax": "texreg2rgb dst, src",
+      "operand_count": 2,
+      "operand_count_scope": "assembly operands including destination/immediates; excludes opcode and implicit operands",
+      "supported_profiles": [
+        "ps_1_2",
+        "ps_1_3"
+      ],
+      "ps_1_0_support": "unknown; not in SDK index",
+      "instruction_slots": {
+        "ps_1_2": "1",
+        "ps_1_3": "1"
+      },
+      "destination_write_masks": {
+        "ps_1_2": "no explicit destination mask",
+        "ps_1_3": "no explicit destination mask"
+      },
+      "source_modifiers": {
+        "ps_1_2": "ps_texture_source",
+        "ps_1_3": "ps_texture_source"
+      },
+      "sources": {
+        "syntax": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2rgb---ps#syntax",
+        "version_limits": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x#instruction-set",
+        "masks": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "instruction_specific_rules": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2rgb---ps#remarks",
+        "opcode_token": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L889"
+      }
+    }
+  ],
+  "stream_tokens": [
+    {
+      "name": "end",
+      "opcode_token": 65535,
+      "operand_count": 0,
+      "source": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L850"
+    },
+    {
+      "name": "comment",
+      "opcode_token": 65534,
+      "operand_count": "variable; size encoded in comment token",
+      "source": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h#L906"
+    }
+  ],
+  "documentation_conflicts": [
+    {
+      "topic": "m4x4 src0 modifiers",
+      "status": "unknown",
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x4---vs#remarks"
+      ],
+      "detail": "Consecutive sentences both allow and forbid src0 negate/swizzle."
+    },
+    {
+      "topic": "m3x4/m4x4 masks",
+      "status": "unknown",
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x4---vs#remarks",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x4---vs#remarks"
+      ],
+      "detail": "Generic page allows xyz or xyzw; individual instruction pages require xyzw. Records retain the specific rule."
+    },
+    {
+      "topic": "expp/logp scalar masks",
+      "status": "unknown",
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking#destination-register-masking",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/expp---vs#remarks",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/logp---vs#remarks"
+      ],
+      "detail": "Generic page says single component; vs_1_1 instruction pages describe four distinct results."
+    },
+    {
+      "topic": "ps_1_4 texld destination mask",
+      "status": "unknown",
+      "sources": [
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask#remarks",
+        "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texld---ps-1-4#examples"
+      ],
+      "detail": "Generic exception permits masking; the instruction complete-syntax list shows no explicit destination masks."
+    }
+  ],
+  "source_documents": [
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/add---ps",
+      "sha256_text_utf8": "a60944016abc1d69c7651a0189d2b91538f06a4d97989aaaf3532f47949444fb"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/add---vs",
+      "sha256_text_utf8": "39136c17f3b75baf4461cba3022cd7aec689157e2bdc3b422d89501fc7c4da78"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/bem---ps",
+      "sha256_text_utf8": "de12280b35027f233743bae563184f01adc892489a4bfc05f98516b87ad654ed"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/cmp---ps",
+      "sha256_text_utf8": "ff59e578da0542fe991611e0f928a72926688e535f0733211e8a463134a2d1fc"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/cnd---ps",
+      "sha256_text_utf8": "9be403deaf7bd76b4b76f077102ad7299ce91dbfedefe87ab3f6b0dc5ab95770"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dcl-usage-input-register---vs",
+      "sha256_text_utf8": "e687abcd9b2618928e7255a6d14fa49e84cb37565588894ad7b7d50e6b32c498"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/def---ps",
+      "sha256_text_utf8": "780b2098e091832c6a19ab37345ab2d490cb1a9419c47ad97cc6cc80ba39708c"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/def---vs",
+      "sha256_text_utf8": "86fd4605298da9b8c79c79b49c2660fc99c84d06b585bc8db7a6e9169efe15de"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp3---ps",
+      "sha256_text_utf8": "16ab841291afc96f590392991e54b29a5d098126e658fd2197c77801c7e4c893"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp3---vs",
+      "sha256_text_utf8": "a866739a6607f0d76d6fb095b07d1455fc67b60d2ad2a2c418acfac71f28d191"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp4---ps",
+      "sha256_text_utf8": "84208a61fb35dc3d53540d0b9d91b3fda7d3d34629b54350290df705a0edfd0f"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp4---vs",
+      "sha256_text_utf8": "9a7bd5e0a680ba95f6ff5d34de79114192455bf13017b0f0894f4a70da8fb6d8"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dst---vs",
+      "sha256_text_utf8": "f5280f2d5a9375e80de0f602ab9bbe42b4c73e1dfd4b83038c7b09b070ba7b30"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-instructions-ps-1-x",
+      "sha256_text_utf8": "0733ac0ee5ff913133663543f6f968fa95b17e34be39484032aa4167252b3dfe"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source-register-swizzling",
+      "sha256_text_utf8": "b562df15299a01e886ef4bfd660634c400ec6df6a8fb15390f4217ee86980dc9"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-source",
+      "sha256_text_utf8": "e9508301dd0505e2faa496e65c68fa2e0e695ba651173bc1f5e5142f9c2b27f6"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-write-mask",
+      "sha256_text_utf8": "f3d65f35c9c91e13b8651594e7cba51fb6811f52cd4ff7b9588ef82531202cc2"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-instructions-vs-1-1",
+      "sha256_text_utf8": "dfada6c00471ab30b36f37f29e1ae19cdcb40dd7de0a6d4688d7f4b56186d3c6"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-masking",
+      "sha256_text_utf8": "10de141fcedc3a649c1cd4cd10be12b92ca3e523e57cf59f083e15cb35f24410"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source-swizzling",
+      "sha256_text_utf8": "b1c24f87702638de46294506ec6e4ea2432a3fcfdd4a5263abc50db912310818"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-vs-registers-modifiers-source",
+      "sha256_text_utf8": "5714905cfced1c76c12c63e7bde2b7c03f06d7d492b48051550bf1b090bea6a9"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/exp---vs",
+      "sha256_text_utf8": "9c64da68171d85aec871155fdea6f7df92543600f04299bd467c37df45a4bcf5"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/expp---vs",
+      "sha256_text_utf8": "07f7ffb11052f7badb27153a0104dba5a096322e4db1da593001913988034b40"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/frc---vs",
+      "sha256_text_utf8": "f7382a6d24ddb6cb53b1588debeb9c7a5ab4c26279e7b634eda75291a606b58d"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/lit---vs",
+      "sha256_text_utf8": "dd799033d59d3ee8413017e3379eae9c465d95b469ef4e71bf2bd3ed1bc25a60"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/log---vs",
+      "sha256_text_utf8": "b1653344d7baf4ed9504477d3644319df9cf2bdce3a71e9f378e601e3c508952"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/logp---vs",
+      "sha256_text_utf8": "726de4b0dafc35bd77b162d697d1d910736116dc509f780dbac3d0999b6ce059"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/lrp---ps",
+      "sha256_text_utf8": "dfea7475b2f77ea819481583d782cd66be7afa804136ac7b262cf40586db5ea6"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x2---vs",
+      "sha256_text_utf8": "ddb9ba361cff99ca674abf6f8b86a24817b278c1f306e884ac2f87b38696243c"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x3---vs",
+      "sha256_text_utf8": "4fb805afeb1f6ca9799a9df73f88e9be102976e0ac80ca1c3e66f6217a2ba25b"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m3x4---vs",
+      "sha256_text_utf8": "49914f68a8560ac818b74d8d5438a4b9f5af1ba3a6cd2db4431644bb01c72907"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x3---vs",
+      "sha256_text_utf8": "a54b7e11ef05e7a8b6c38ae62958f8754aca2cb6247294b220726018d774b884"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/m4x4---vs",
+      "sha256_text_utf8": "e4705dcf19972d81e57567524098402853da48562dcbe20a06afcd7ea96957f2"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mad---ps",
+      "sha256_text_utf8": "dabc9e4b45b6505e2fa6384dcefa27fd3e8843f9954104e2fb2fd58c728af14b"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mad---vs",
+      "sha256_text_utf8": "36bb231bc1a906d7de131c53044ffadf97a741faeb09b6606e5f37d095ef42ac"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/max---vs",
+      "sha256_text_utf8": "a69909b1f6147d3fabec0ad3f5c7a861904521d30966dcbe185e20fc0781975f"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/min---vs",
+      "sha256_text_utf8": "c8e66c21b1d2ebba4e1e30990f22a064f2d87c7163308233f80c687e677ef59c"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mov---ps",
+      "sha256_text_utf8": "b2270c92b1f0f0143c5b4e1992caaaff33aa27ac9fa7979c650f83df6d671ad8"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mov---vs",
+      "sha256_text_utf8": "246b3054cfa0a91c6ad5d767375ef024d37336a86e9eae5da863c099c175664f"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mul---ps",
+      "sha256_text_utf8": "9e8e12145ed8f1aa5e40d02556213ae4ca0b9ef302a3ad3499a4cf44abcbdffc"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/mul---vs",
+      "sha256_text_utf8": "f2a027ce2d7f433d19c7df6394802c6c9d72273efe2bfe9536ddd2a85e7a643a"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/nop---ps",
+      "sha256_text_utf8": "ca1415f581314843928f25f40ff0a9cf41fb99a0caaad011c04c6079fa13a5a1"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/nop---vs",
+      "sha256_text_utf8": "4e879497ff78c7dad002254c2aa796ff9ddb15601b59e51e7c6ed2fa76ef82b4"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/phase---ps",
+      "sha256_text_utf8": "0af510830d81955f6b7344830b64e7356c532ff4206bc28e7b5c9da91662d7e9"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/ps---ps",
+      "sha256_text_utf8": "3acca860fd6dd33b0bd0b2e5aab0b196be8bdc3fd50cfb4d9790359c839516ce"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/rcp---vs",
+      "sha256_text_utf8": "c0ce25c826e1b1da5ca7fcde58fefa3a0a27166554c80eae2e010eae1d99be54"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/rsq---vs",
+      "sha256_text_utf8": "771bc5103457847fa33fafca10c982ac0a8195e68c484b894f8d726d31866592"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sge---vs",
+      "sha256_text_utf8": "3184760c86f12f725db8e92e33754246fac098c284c761d8b8fd171d73e3bdb2"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/slt---vs",
+      "sha256_text_utf8": "b0dbf845f5cb81c7f74e461b61c3c06d4dc1787c8a3c460beb7b9258001ee030"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sub---ps",
+      "sha256_text_utf8": "c3bd89e0d370ed70ded3e5f977d065077522bedfe14b7d828d77247619d01653"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sub---vs",
+      "sha256_text_utf8": "319abff6d960221abc1eb92e19db082dd6664a30b9d7a5227431d02f34a754e3"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/tex---ps",
+      "sha256_text_utf8": "3360f5ee1acd9797b91a911509356ec6adc8aa99423f589d49fd44555ac93f51"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texbem---ps",
+      "sha256_text_utf8": "f015c8fe82ea16888d179e5a5079a52f06feff26342e502342fd6d07c44a3579"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texbeml---ps",
+      "sha256_text_utf8": "c07f278f48d1ff5315d17d3c2b3a80c4fece802d5402280ffa53eb486f73cc5a"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texcoord---ps",
+      "sha256_text_utf8": "4874a6f8fa171ea020ff9369d0fa301348af3be9a9f18582e525d285bb057dbb"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texcrd---ps",
+      "sha256_text_utf8": "fd5d6bf5957cd244b1169ad25b93874340f2bbcc0b2a721d99f5985fb7100954"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdepth---ps",
+      "sha256_text_utf8": "afd5d60f76fe11ec9e14e429ef09c94e76b3e6b9e127f3e49e719f52b00f3b7a"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdp3---ps",
+      "sha256_text_utf8": "d35c3f7dc5b072e567f95afb7323023079572f6f3e64e8ac267ea847df0bcfb7"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texdp3tex---ps",
+      "sha256_text_utf8": "47f4a33668cc6240a2b2651e841e4cb5cb56ca316262bf622357d6411f4fa4a1"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texkill---ps",
+      "sha256_text_utf8": "9c09c0c8a505924e1bcbdc9d78dad6019dc01c3ac0f7228ac91f4f5f5f8abf10"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texld---ps-1-4",
+      "sha256_text_utf8": "906995ed76945c3cc9602c1d0ab320d883148b6486ddd21e076b07b1bb3fc690"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2depth---ps",
+      "sha256_text_utf8": "3abfcebd1ceae09b1e5a0b00b4b819bc594a6c231ebf0d2c6f9c737df4898bd5"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2pad---ps",
+      "sha256_text_utf8": "6430c7187aa935bc831f0ce9e0a0b0a52379896ea19af415e9a4773cf8313f87"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x2tex---ps",
+      "sha256_text_utf8": "9d479564b2a31836acfcf51717c90a5b5f48184db9b736482ec7d27aabb32ef7"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3---ps",
+      "sha256_text_utf8": "66faa0296905381dd8582c85b4891bb62ffa7e39a3b6c88de1469d96ce7cdfa3"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3pad---ps",
+      "sha256_text_utf8": "f92890cb7cb9da685c53b587e6adad408dc244097b892ed19079757d32df4487"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3spec---ps",
+      "sha256_text_utf8": "0bdbb8cdd5dfbbc4ed9c7587727ef65ecafa3673eb427506af2900f6598c8b63"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3tex---ps",
+      "sha256_text_utf8": "ec08eb4be6f92c7f06f4f35cab12d4dd0d6f8241cdeadf85ece187cf2e238596"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texm3x3vspec---ps",
+      "sha256_text_utf8": "1b0ccba661a35893c76edfc708614b69348733ce5e9d9421dc6d9e6794415ff9"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2ar---ps",
+      "sha256_text_utf8": "76583a1a54c6c7969a5e7f3fc9da565bfdd8845aea0724f19cc76d94fb7ad24c"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2gb---ps",
+      "sha256_text_utf8": "37467cf890092c3ed12b63e8545235308008082783d0c881096bfe8383aee2e8"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/texreg2rgb---ps",
+      "sha256_text_utf8": "78d5f5ebdcf6cd09afa850d2b0bc3c57ada8013f2b7b3df8ffbddd719d31d530"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/vs---vs",
+      "sha256_text_utf8": "8b23e1594ac2227046833e7bcfff53d02b153fb9352b03b0349ef3fe3c7d35d0"
+    },
+    {
+      "url": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/d3d9types.h",
+      "sha256_text_utf8": "5ba31e75a3ea03c1a71b48f39d966b6f67967b22bb9e4abcc419a3118269cd6a"
+    }
+  ],
+  "counts": {
+    "instructions": 65,
+    "vs_index_rows": 29,
+    "ps_index_rows": 36,
+    "source_modifiers": 11
+  }
+}
