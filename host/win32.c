@@ -536,11 +536,20 @@ static uint32_t GetProcAddress_(Ctx *c) {
 static uint32_t CreateFileA_(Ctx *c) {
     const char *name = G(ARG(0));
     uint32_t access = ARG(1), disp = ARG(4);
-    if (access & 0x40000000u) {    // GENERIC_WRITE
-        rn_halt(c, "CreateFileA for writing: %s (disp %u)", name, disp);
-        return INVALID_HANDLE;
+    int id, existed = 0;
+    if ((access & 0x40000000u) || (disp != 3 && gf_stat(name) != -2 && gf_stat(name) != 0)) {   // GENERIC_WRITE or create
+        id = gf_create(name, (int)disp, &existed);
+        static const uint32_t err[] = {0, ERROR_FILE_NOT_FOUND, 0, 5, 80, 5, ERROR_PATH_NOT_FOUND};
+        if (id == -2) { rn_halt(c, "CreateFileA outside the game and save folders: %s", name); return INVALID_HANDLE; }
+        if (id < 0) { set_error(c, err[-id]); return INVALID_HANDLE; }
+        uint32_t h = new_handle(H_FILE);
+        get_handle(h)->gf = id;
+        snprintf(get_handle(h)->path, sizeof get_handle(h)->path, "%s", name);
+        if (rn_trace()) rn_log("open for writing %s (disp %u) -> %x", name, disp, h);
+        set_error(c, existed && (disp == 2 || disp == 4) ? ERROR_ALREADY_EXISTS : 0);
+        return h;
     }
-    int id = gf_open(name);
+    id = gf_open(name);
     if (id == -2) { rn_halt(c, "CreateFileA outside the game folder: %s", name); return INVALID_HANDLE; }
     if (id < 0) {
         if (rn_trace()) rn_log("file missing: %s", name);
@@ -566,6 +575,93 @@ static uint32_t ReadFile_(Ctx *c) {
     if (got) st(c, got, (uint32_t)r, 4);
     return 1;
 }
+static uint32_t WriteFile_(Ctx *c) {
+    Handle *h = get_handle(ARG(0));
+    uint32_t buf = ARG(1), n = ARG(2), put = ARG(3);
+    if (!h || h->kind != H_FILE) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
+    if (ARG(4)) { rn_halt(c, "WriteFile with OVERLAPPED"); return 0; }
+    if (!gf_is_save(h->gf)) { set_error(c, 5); return 0; }        // opened for reading only
+    if (bad_range(c, buf, n)) { rn_halt(c, "WriteFile buffer %08x+%u", buf, n); return 0; }
+    if (gf_write(h->gf, h->pos, (const uint8_t *)G(buf), n) < 0) { set_error(c, 5); return 0; }
+    h->pos += n;
+    if (put) st(c, put, n, 4);
+    return 1;
+}
+static uint32_t SetEndOfFile_(Ctx *c) {
+    Handle *h = get_handle(ARG(0));
+    if (!h || h->kind != H_FILE) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
+    if (gf_truncate(h->gf, h->pos)) { set_error(c, 5); return 0; }
+    return 1;
+}
+static uint32_t FlushFileBuffers_(Ctx *c) {
+    Handle *h = get_handle(ARG(0));
+    if (!h || h->kind != H_FILE) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
+    if (gf_flush(h->gf)) { rn_halt(c, "FlushFileBuffers: cannot write %s", h->path); return 0; }
+    return 1;
+}
+static uint32_t CreateDirectoryA_(Ctx *c) {
+    const char *name = G(ARG(0));
+    int r = gf_mkdir(name);
+    if (r == -2) { rn_halt(c, "CreateDirectoryA outside the save folder: %s", name); return 0; }
+    if (r) { set_error(c, r == 1 ? ERROR_ALREADY_EXISTS : ERROR_PATH_NOT_FOUND); return 0; }
+    if (rn_trace()) rn_log("mkdir %s", name);
+    return 1;
+}
+static uint32_t DeleteFileA_(Ctx *c) {
+    const char *name = G(ARG(0));
+    int r = gf_delete(name);
+    if (r == -2) { set_error(c, 5); return 0; }                     // the game folder is read-only
+    if (r) { set_error(c, ERROR_FILE_NOT_FOUND); return 0; }
+    return 1;
+}
+// FindFirstFileA(pattern, WIN32_FIND_DATAA*): 320 bytes; attributes, 3 FILETIMEs, size hi/lo, 2 reserved,
+// cFileName[260] at 44, cAlternateFileName[14] at 304. The game imports no FindNextFileA.
+static uint32_t FindFirstFileA_(Ctx *c) {
+    const char *pat = G(ARG(0));
+    uint32_t fd = ARG(1);
+    char name[260];
+    int dir = 0;
+    uint64_t size = 0;
+    int r = gf_find(pat, name, sizeof name, &dir, &size);
+    if (r == -2) { rn_halt(c, "FindFirstFileA outside the game and save folders: %s", pat); return INVALID_HANDLE; }
+    if (rn_trace()) rn_log("find %s -> %s", pat, r ? "none" : name);
+    if (r) { set_error(c, ERROR_FILE_NOT_FOUND); return INVALID_HANDLE; }
+    memset(G(fd), 0, 320);
+    st(c, fd, dir ? 0x10 : 0x20, 4);                                 // FILE_ATTRIBUTE_DIRECTORY / ARCHIVE
+    st(c, fd + 32, (uint32_t)size, 4);
+    memcpy(G(fd + 44), name, strlen(name) + 1);
+    return new_handle(H_FIND);
+}
+static uint32_t FindClose_(Ctx *c) {
+    Handle *h = get_handle(ARG(0));
+    if (!h || h->kind != H_FIND) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
+    h->kind = H_FREE;
+    return 1;
+}
+// File mappings, read-only: the view is a private copy of the file in fresh guest memory.
+static uint32_t CreateFileMappingA_(Ctx *c) {
+    Handle *f = get_handle(ARG(0));
+    uint32_t prot = ARG(2);
+    if (!f || f->kind != H_FILE) { rn_halt(c, "CreateFileMappingA without a file (%08x)", ARG(0)); return 0; }
+    if (prot != 2) { rn_halt(c, "CreateFileMappingA protect %#x (only PAGE_READONLY)", prot); return 0; }
+    uint32_t h = new_handle(H_MAPPING);
+    get_handle(h)->gf = f->gf;
+    return h;
+}
+static uint32_t MapViewOfFile_(Ctx *c) {
+    Handle *m = get_handle(ARG(0));
+    uint32_t off = ARG(3), n = ARG(4);
+    if (!m || m->kind != H_MAPPING) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
+    if (ARG(2)) { rn_halt(c, "MapViewOfFile beyond 4 GB"); return 0; }
+    uint64_t size = gf_size(m->gf);
+    if (!n) n = (uint32_t)(size - off);
+    uint32_t p = virtual_reserve(c, n);
+    if (!p) { set_error(c, ERROR_NOT_ENOUGH_MEMORY); return 0; }
+    if (gf_read(m->gf, off, (uint8_t *)G(p), n) < 0) { rn_halt(c, "MapViewOfFile: I/O error"); return 0; }
+    return p;
+}
+static uint32_t UnmapViewOfFile_(Ctx *c) { (void)c; return 1; }   // address space is not reused (VirtualFree)
+
 static uint32_t SetFilePointer_(Ctx *c) {
     Handle *h = get_handle(ARG(0));
     int32_t dist = (int32_t)ARG(1);
@@ -588,7 +684,7 @@ static uint32_t GetFileSize_(Ctx *c) {
 static uint32_t CloseHandle_(Ctx *c) {
     Handle *h = get_handle(ARG(0));
     if (!h) { set_error(c, ERROR_INVALID_HANDLE); return 0; }
-    if (h->kind == H_FILE) gf_close(h->gf);
+    if (h->kind == H_FILE) gf_close(h->gf);    // a mapping shares the file id; the file handle owns it
     if (h->dir) closedir(h->dir);
     h->kind = H_FREE;
     return 1;
@@ -776,7 +872,9 @@ const Api win32_apis[] = {
     K(GetSystemInfo, 1), K(IsProcessorFeaturePresent, 1), K(GetTickCount, 0), K(QueryPerformanceCounter, 1), K(QueryPerformanceFrequency, 1),
     K(GetSystemTimeAsFileTime, 1), K(GetTimeZoneInformation, 1), K(ExitProcess, 1), K(OutputDebugStringA, 1),
     K(GetModuleHandleA, 1), K(LoadLibraryA, 1), K(GetProcAddress, 2),
-    K(CreateFileA, 7), K(ReadFile, 5), K(SetFilePointer, 4), K(GetFileSize, 2), K(CloseHandle, 1), K(GetFullPathNameA, 4), K(GetLongPathNameA, 3),
+    K(CreateFileA, 7), K(ReadFile, 5), K(WriteFile, 5), K(SetEndOfFile, 1), K(FlushFileBuffers, 1),
+    K(CreateDirectoryA, 2), K(DeleteFileA, 1), K(FindFirstFileA, 2), K(FindClose, 1),
+    K(CreateFileMappingA, 6), K(MapViewOfFile, 5), K(UnmapViewOfFile, 1), K(SetFilePointer, 4), K(GetFileSize, 2), K(CloseHandle, 1), K(GetFullPathNameA, 4), K(GetLongPathNameA, 3),
     K(GetProcessAffinityMask, 3), K(SetProcessAffinityMask, 2), K(GetPriorityClass, 1), K(SetPriorityClass, 2),
     K(GetThreadPriority, 1), K(SetThreadPriority, 2),
     K(CreateToolhelp32Snapshot, 2), K(Process32First, 2), K(Process32Next, 2),

@@ -42,6 +42,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_error(403)
             return
         body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        if self.path.endswith("/"):         # PUT /save/dir/ makes a directory (CreateDirectoryA)
+            os.makedirs(p, exist_ok=True)
+            self.send_response(204)
+            self.end_headers()
+            return
         os.makedirs(os.path.dirname(p), exist_ok=True)
         with open(p + ".tmp", "wb") as f:
             f.write(body)

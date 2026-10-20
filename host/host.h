@@ -24,7 +24,7 @@ extern Ctx *g_ctx;
 extern const Api win32_apis[], user32_apis[], thread_apis[], net_apis[], d3d9_apis[], dinput8_apis[], dsound_apis[];
 extern const int win32_api_count, user32_api_count, thread_api_count, net_api_count, d3d9_api_count, dinput8_api_count, dsound_api_count;
 
-enum { H_FREE, H_FILE, H_EVENT, H_MUTEX, H_FIND, H_HEAP, H_THREAD, H_SNAPSHOT, H_KEY };
+enum { H_FREE, H_FILE, H_EVENT, H_MUTEX, H_FIND, H_HEAP, H_THREAD, H_SNAPSHOT, H_KEY, H_MAPPING };
 struct Thread;
 typedef struct {
     int kind;
@@ -65,6 +65,16 @@ int gf_open(const char *gpath);                                // id, or -1 miss
 uint64_t gf_size(int id);
 int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n);
 void gf_close(int id);
+// Save folder only: create/open for writing (disp = CreateFileA dwCreationDisposition). id, or -1 missing,
+// -2 outside, -3 a directory, -4 exists (CREATE_NEW), -5 read-only (game folder), -6 the folder is missing.
+int gf_create(const char *gpath, int disp, int *existed);
+int gf_is_save(int id);
+int64_t gf_write(int id, uint64_t off, const uint8_t *src, uint32_t n);
+int gf_truncate(int id, uint64_t size);
+int gf_flush(int id);
+int gf_mkdir(const char *gpath);                                // 0 made, 1 exists, -1 no parent, -2 outside
+int gf_delete(const char *gpath);                               // 0, -1 missing, -2 outside the save folder
+int gf_find(const char *gpath, char *name, size_t n, int *is_dir, uint64_t *size);
 void set_error(Ctx *c, uint32_t e);
 // Keyboard and mouse (host/input.c): input_poll hands new events to dinput8_* and user32_key.
 void input_poll(void);
