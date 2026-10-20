@@ -1,49 +1,36 @@
-# Plan: NFSU PC 1:1 in Chrome (W1 keeps this current)
-Done = the OWNER plays the career in Chrome and it behaves like the PC game. Each milestone has one gate: the run
-that proves it. Lanes: W1 orchestrator, W2 D3D9, W3 Win32/input/audio, C1 Codex census (docs/briefs/).
+# Plan: NFSU PC 1:1 in Chrome
+For the OWNER alone: Chrome on this Mac, tools/serve.py on 127.0.0.1:5180, saves in save/. No deploy.
+One session on main. Each milestone has one gate: the run that proves it.
 
 ## Done
 - M0 census. M1 lifter: whole exe lifted, gate pass (census/difftest.json).
 - M2 boot: CRT, threads (one GIL + 20 ms quantum), timers, no-network Winsock, files on demand (host/files.c).
-- M3 first frames: window, D3D9 device, 2 Presents (frame 2 = Clear). Stop: USER32!BeginPaint (0x41116f).
-- M4 part: loading screen renders (SM1 -> WGSL, textures, native = Chrome). Input and dsound -> Web Audio exist.
-  Title screen renders (PATCH 0x4f5891 while MOVIES\ is missing; OWNER adds it).
-- ABK code modules (W1, 2026-10-20): the x86 patch code in game/Sound/*.abk is lifted ahead of time
-  (tools/recomp/abk.py: 106 files, 79 modules, 23 distinct codes, 28 functions); rn_call finds the live copy
-  (host/abk.c); the difftest runs them relocated at another base. Enter at the title no longer stops.
-- Title -> USER PROFILE (W1, 2026-10-20): Enter reaches the FE (dinput action "Menu Select" -> FEPad_Accept ->
-  LS_Splash_PC -> MU_UG_NEwOrLoad_PC2 + GarageMain). Layer: SHGetFolderPathA (CSIDL_COMMON_APPDATA) and the
-  save folder (...\NFS Underground = save/, read only). Chrome shows USER PROFILE over the 3D garage.
-  Next: create a profile (typing a name, file writes to save/ -> M7 write path).
+- M3 first frames: window, D3D9 device, Presents.
+- M4 front end on screen: SM1 -> WGSL, textures, loading screen, title (PATCH 0x4f5891 while MOVIES\ is missing).
+  Input (dinput8) and dsound -> Web Audio exist. ABK code modules lifted ahead of time (tools/recomp/abk.py).
+- Title -> USER PROFILE over the 3D garage. Save folder (CSIDL_COMMON_APPDATA\NFS Underground = save/) with writes.
 
-## M4 Front end on screen (W2 leads, W3 helps)
-- W2: BeginPaint/EndPaint/ValidateRect; vs_1_1 + ps_1_x bytecode -> WGSL; vertex declarations and FVF; DXT1/3/5 and
-  the other formats the game creates; render/texture/sampler states -> WebGPU pipelines; locks of VB/IB/textures.
-- W3: registry values of a real install; any Win32 stop on the way; file writes for the config file.
-- Gate: native --shot and one Chrome capture show the EA logo / title / main menu as on a real PC
-  (compare with a real-hardware capture or video: same layout, text, colors).
+## M5 Menus
+- Create a profile (type a name, the file lands in save/), reach the main menu, move through the menus, hear music.
+- Gate: one Chrome capture of the main menu after the profile; the profile file is in save/.
 
-## M5 Interactive menus (W3 leads)
-- dinput8: keyboard + mouse from browser events (shared memory, read in GetDeviceState/GetDeviceData).
-- user32: key/mouse/focus messages the game reads; cursor.
-- dsound -> Web Audio: secondary buffers, Lock/Unlock, play cursors, volume/pan/frequency; one AudioWorklet
-  draining a ring buffer in the shared heap. Music and menu sounds play.
-- Movies run as the game's own code (no host work expected); fix what stops.
-- Gate: in Chrome the OWNER moves through the menus with the keyboard and hears menu music.
+## M6 A race
+- Quick Race: the circuit loads, the car drives, the race ends and returns to the menu.
+- Gate: one full race in Chrome without a stop.
 
-## M6 A race (W1 leads performance; W2/W3 fix their stops)
-- Quick Race -> circuit loads, the car drives, the race ends and returns to the menu.
-- Speed: build/gen at -O2, drop CHK where the address is provably in range, x87 state in locals,
-  hot host paths. Measure hitches over 33 ms (lag rule), not percents.
-- Gate: one full race in Chrome without a stop; hitches over 33 ms counted and reported.
+## M7 Career and saves
+- Underground career, garage, customization, options persist in save/.
+- Gate: save, reload the page, continue the career.
 
-## M7 Career and saves (W3)
-- Save/load through the server (write endpoint, saves outside game/), profile, Underground career, garage,
-  customization, options persist. Gate: save, reload the page, continue the career.
+## M8 Widescreen
+- 16:9, wider horizontal view, HUD placed for it. Every change is a `PATCH:` line. Gate: a race in 16:9.
 
-## M8 Widescreen (W1, PATCH table)
-- 16:9 resolution, wider horizontal view, HUD placed for it. Every change is a `PATCH:` line. Gate: race in 16:9.
+## M9 Play
+- The OWNER plays the career at http://127.0.0.1:5180/.
 
-## Always
-- New lifter bug -> W1 fixes it in tools/recomp with the difftest (RN_ONLY trace) and merges.
-- Layer facts that are guesses today (D3D caps/modes, window message order) -> check against Wine when available.
+## Only when a run hits it
+- Known layer gaps: GetMessageA that would wait (0x411030, window inactive), SuspendThread of a running thread
+  (0x448d00, 0x5a4a50), D3D9 device lost / Reset (0x4016e0 -> 0x40a4e0). Fix one when a run stops on it.
+- Speed: only when the OWNER feels lag. Then measure hitches over 33 ms first; candidates are -O2 for build/gen,
+  fewer CHK, x87 state in locals, GIL hand-offs (audio thread 0x654a90 wakes every 10 ms).
+- New lifter bug -> fix it in tools/recomp with the difftest (RN_ONLY trace).
