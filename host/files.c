@@ -104,7 +104,7 @@ EM_JS(int, web_list, (const char *rel, int save, char *out, int outsz), {
         var x = new XMLHttpRequest();
         x.open('GET', '/save-files.json', false);
         x.send();
-        for (const [p, n] of JSON.parse(x.responseText)) add(p.split('\\').join('/'), n);
+        for (const [p, n] of JSON.parse(x.responseText)) add(p, n);
     } else for (const [low, e] of Module.rnIndex.files) add(e[0], e[1]);
     var s = '';
     for (const [name, n] of seen) s += name + '\t' + n + '\n';
