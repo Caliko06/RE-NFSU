@@ -11,10 +11,10 @@ Read AGENTS.md, HANDOFF.md, docs/PLAN.md. You own main, the recompiler (tools/re
 3. When a lane finishes its brief, rewrite its brief with the next scope from PLAN.md and give the OWNER the
    one-line prompt to paste (below). Mechanical batches -> rewrite docs/briefs/c1-codex.md.
 
-## Prompts the OWNER pastes (one per session)
-- W2: `Lee AGENTS.md, HANDOFF.md, docs/PLAN.md y docs/briefs/w2-d3d9.md en ~/RE-NFSU-wt/d3d9. Haz el brief completo.`
-- W3: `Lee AGENTS.md, HANDOFF.md, docs/PLAN.md y docs/briefs/w3-win32.md en ~/RE-NFSU-wt/win32. Haz el brief completo.`
-- C1 (Codex): `Work in ~/RE-NFSU-wt/census. Read AGENTS.md and docs/briefs/c1-codex.md. Do the brief, commit on w-census.`
+## Prompts the OWNER pastes (one per session; briefs live on main, so each lane merges main first)
+- W2: `En ~/RE-NFSU-wt/d3d9 haz git merge main. Luego lee AGENTS.md, HANDOFF.md, docs/PLAN.md y docs/briefs/w2-d3d9.md. Haz el brief completo.`
+- W3: `En ~/RE-NFSU-wt/win32 haz git merge main. Luego lee AGENTS.md, HANDOFF.md, docs/PLAN.md y docs/briefs/w3-win32.md. Haz el brief completo.`
+- C1 (Codex): `Work in ~/RE-NFSU-wt/census. First run git merge main. Then read AGENTS.md and docs/briefs/c1-codex.md. Do the brief, commit on w-census.`
 
 ## Rules that matter here
 - No subagents. You do the work; parallel work is the lanes.
