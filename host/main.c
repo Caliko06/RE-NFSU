@@ -9,6 +9,8 @@
 Ctx *g_ctx;
 void dispatch_report(void);
 void win32_set_root(const char *game_dir);
+extern const uint32_t rn_patch_count, rn_patch_addr[];
+extern const char *const rn_patch_hex[];
 
 static uint8_t *read_file(const char *path, long *size) {
     FILE *f = fopen(path, "rb");
@@ -84,6 +86,16 @@ int main(int argc, char **argv) {
     for (uint32_t k = 0; k < nsec; k++, sec += 40) {
         uint32_t va = rd32(sec + 12), raw = rd32(sec + 16), off = rd32(sec + 20);
         memcpy(c->mem + base + va, pe + off, raw);
+    }
+    // PATCH table (tools/recomp/patches.py): the lifted code already has these bytes; the image must match.
+    for (uint32_t k = 0; k < rn_patch_count; k++) {
+        const char *h = rn_patch_hex[k];
+        for (uint32_t n = 0; h[2 * n]; n++) {
+            unsigned v;
+            sscanf(h + 2 * n, "%2x", &v);
+            c->mem[rn_patch_addr[k] + n] = (uint8_t)v;
+        }
+        rn_log("PATCH %08x active (tools/recomp/patches.py)", rn_patch_addr[k]);
     }
 
     // Imports: every IAT slot gets the fake address of its host function.

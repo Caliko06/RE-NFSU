@@ -94,7 +94,10 @@ void rn_call(Ctx *c, uint32_t target) {
     }
     if (lo < rn_fn_count && rn_fn_addr[lo] == target) { rn_fn_ptr[lo](c); return; }
     c->halt_at = target;
-    rn_halt(c, "no lifted function at %08x", target);
+    // Evidence for the stop: what is at the target and who called it (the return address on the stack).
+    char hex[2 * 32 + 1] = "";
+    for (uint32_t k = 0; k < 32 && target + k < c->memsz; k++) snprintf(hex + 2 * k, 3, "%02x", c->mem[target + k]);
+    rn_halt(c, "no lifted function at %08x (bytes %s, return address %08x)", target, hex, ld(c, c->r[ESP], 4));
 }
 
 void dispatch_report(void) {

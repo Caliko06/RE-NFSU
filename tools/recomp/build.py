@@ -10,6 +10,7 @@ Usage: .venv/bin/python tools/recomp/build.py [native|web|lift]   (default: nati
 import collections, json, multiprocessing as mp, os, subprocess, sys
 sys.path.insert(0, os.path.dirname(__file__))
 from lift import Lifter, Unsupported
+import patches
 
 CHUNKS = 160
 GEN = "build/gen"
@@ -66,10 +67,12 @@ def lift_all():
     write_if_changed(f"{GEN}/table.c", '#include "funcs.h"\n'
                      f"const uint32_t rn_fn_count = {len(out)};\n"
                      "const uint32_t rn_fn_addr[] = {" + ",".join(f"0x{e:x}" for e, _ in out) + "};\n"
-                     "void (*const rn_fn_ptr[])(Ctx *) = {" + ",".join(f"f_{e:x}" for e, _ in out) + "};\n")
-    rep = {"functions": len(out), "data_seeds_inside_instructions": dropped, "failed": failed,
+                     "void (*const rn_fn_ptr[])(Ctx *) = {" + ",".join(f"f_{e:x}" for e, _ in out) + "};\n"
+                     + patches.c_table())
+    rep = {"functions": len(out), "patches": [f"{p['addr']:#x}" for p in patches.active()], "data_seeds_inside_instructions": dropped, "failed": failed,
            "trap_sites_by_reason": dict(traps.most_common())}
     json.dump(rep, open("census/lift_report.json", "w"), indent=1)
+    print(f"patches active: {len(patches.active())}")
     print(f"lifted {len(out)} functions, dropped {dropped} false data seeds, failed {len(failed)}, "
           f"trap sites {sum(traps.values())}")
     print("top trap reasons:", dict(traps.most_common(15)))
@@ -109,7 +112,7 @@ def compile_web():
     os.makedirs("web/out", exist_ok=True)
     # main() runs in a worker (PROXY_TO_PTHREAD) so guest threads and waits may block.
     subprocess.run(["emcc", "-O1", "-pthread", "-Ihost", f"-I{GEN}", *HOST, *objs, "-o", "web/out/speed.js",
-                    "-sINITIAL_MEMORY=1280MB", "-sSTACK_SIZE=16MB", "-sDEFAULT_PTHREAD_STACK_SIZE=16MB",
+                    "-sINITIAL_MEMORY=2048MB", "-sSTACK_SIZE=16MB", "-sDEFAULT_PTHREAD_STACK_SIZE=16MB",
                     "-sPROXY_TO_PTHREAD=1", "-sPTHREAD_POOL_SIZE=8", "-sEXIT_RUNTIME=1",
                     "-sMODULARIZE=1", "-sEXPORT_NAME=Speed", "-sEXPORTED_RUNTIME_METHODS=FS,ENV,HEAPU8,HEAP32,HEAPU32",
                     "-sEXPORTED_FUNCTIONS=_main,_rn_gpu_mailbox,_rn_input_ring,_rn_audio_ring",

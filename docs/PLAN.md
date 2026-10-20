@@ -7,7 +7,8 @@ that proves it. Lanes: W1 orchestrator, W2 D3D9, W3 Win32/input/audio, C1 Codex 
 - M2 boot: CRT, threads (one GIL + 20 ms quantum), timers, no-network Winsock, files on demand (host/files.c).
 - M3 first frames: window, D3D9 device, 2 Presents (frame 2 = Clear). Stop: USER32!BeginPaint (0x41116f).
 - M4 part: loading screen renders (SM1 -> WGSL, textures, native = Chrome). Input and dsound -> Web Audio exist.
-  Stop (data): no MOVIES\ in game/. OWNER adds it; temporary PATCH until then (W1).
+  Title screen renders (PATCH 0x4f5891 while MOVIES\ is missing; OWNER adds it).
+  Stop: Enter -> the sound engine runs x86 code from game/Sound/*.abk (not in Speed.exe). W1: recompiler.
 
 ## M4 Front end on screen (W2 leads, W3 helps)
 - W2: BeginPaint/EndPaint/ValidateRect; vs_1_1 + ps_1_x bytecode -> WGSL; vertex declarations and FVF; DXT1/3/5 and

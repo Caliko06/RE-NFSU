@@ -1,5 +1,8 @@
 {
  "functions": 13703,
+ "patches": [
+  "0x4f5891"
+ ],
  "data_seeds_inside_instructions": 615,
  "failed": {},
  "trap_sites_by_reason": {

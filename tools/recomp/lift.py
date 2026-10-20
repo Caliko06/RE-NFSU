@@ -8,6 +8,7 @@ stops the game with its address and name when it runs. Nothing is guessed.
 """
 import struct
 import pefile
+import patches
 from capstone import Cs, CS_ARCH_X86, CS_MODE_32, CS_GRP_JUMP, CS_GRP_CALL, CS_GRP_RET
 from capstone import x86
 
@@ -39,7 +40,8 @@ class Lifter:
     def __init__(self, exe, funcs=None):
         self.pe = pefile.PE(exe)
         self.base = self.pe.OPTIONAL_HEADER.ImageBase
-        self.img = self.pe.get_memory_mapped_image()
+        self.img = bytearray(self.pe.get_memory_mapped_image())
+        patches.apply(self.img, self.base)
         t = next(s for s in self.pe.sections if s.Name.rstrip(b"\0") == b".text")
         self.t0, self.t1 = self.base + t.VirtualAddress, self.base + t.VirtualAddress + t.Misc_VirtualSize
         self.md = Cs(CS_ARCH_X86, CS_MODE_32)

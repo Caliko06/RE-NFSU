@@ -14,6 +14,7 @@ from unicorn.x86_const import (UC_X86_REG_FPCW, UC_X86_REG_FPSW, UC_X86_REG_FPTA
                                UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EIP, UC_X86_REG_EFLAGS,
                                UC_X86_INS_CPUID)
 import pefile
+import patches
 
 CASES = int(sys.argv[1]) if len(sys.argv) > 1 else 4
 UREG = [UC_X86_REG_EAX, UC_X86_REG_ECX, UC_X86_REG_EDX, UC_X86_REG_EBX,
@@ -63,6 +64,7 @@ seed = {int(l.split()[0], 16): l.split()[1] for l in open("census/speed_exe_func
 # Image with every IAT slot pointing at a fake host address, the same in both.
 pe = pefile.PE("pc/Speed.exe")
 img = bytearray(pe.get_memory_mapped_image()[:0x400000].ljust(0x400000, b"\0"))
+patches.apply(img, 0x400000)
 k = 0
 for d in pe.DIRECTORY_ENTRY_IMPORT:
     for i in d.imports:
