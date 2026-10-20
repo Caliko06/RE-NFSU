@@ -283,9 +283,9 @@
   ]
  },
  "functions": {
-  "total": 14318,
+  "total": 14330,
   "from_entry_and_calls": 7455,
-  "from_data_pointers": 6863
+  "from_data_pointers": 6875
  },
  "instructions": 816559,
  "distinct_mnemonics": 310,

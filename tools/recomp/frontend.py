@@ -180,7 +180,9 @@ while True:
             if op.type == x86.X86_OP_IMM and in_text(op.imm & 0xffffffff) and op.size == 4:
                 v = op.imm & 0xffffffff
                 imm_ptrs.add(v)
-                if v not in insn_at and v not in funcs:
+                # An entry already decoded inside another flow still needs its own function (0x504010: a
+                # destructor pushed for the CRT array iterator 0x672188).
+                if v not in funcs:
                     new.append(v)
     if not new:
         break

@@ -1,8 +1,8 @@
 {
- "functions": 13787,
+ "functions": 13799,
  "cases": {
-  "match": 16007,
-  "skip_unmapped": 38409,
+  "match": 16018,
+  "skip_unmapped": 38446,
   "skip_pinned_cpu_path": 399,
   "skip_timeout": 238,
   "skip_not_a_function": 72,
@@ -12,14 +12,14 @@
  },
  "compared_stop_kinds": {
   "import": 3300,
-  "ret": 12629,
+  "ret": 12640,
   "invalid": 65,
   "fault": 21
  },
- "functions_compared": 5398,
- "functions_all_match": 5395,
+ "functions_compared": 5401,
+ "functions_all_match": 5398,
  "all_match_by_seed": {
-  "data": 2192,
+  "data": 2195,
   "call": 3195,
   "?": 8
  },

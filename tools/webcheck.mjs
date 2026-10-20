@@ -14,7 +14,7 @@ const keys = (process.argv[5] || '').split(',').filter(Boolean).map(k => k.split
 const port = 9333;
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
   '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'rn-'))}`,
-  '--no-first-run', '--enable-unsafe-webgpu', '--window-size=1280,1100', 'about:blank'], { stdio: 'ignore' });
+  '--no-first-run', '--enable-unsafe-webgpu', '--mute-audio', '--window-size=1280,1100', 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let tabs;
 for (let i = 0; i < 50 && !tabs; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); } catch { await sleep(200); } }
@@ -51,5 +51,5 @@ if (png?.data) { writeFileSync(shot, Buffer.from(png.data, 'base64')); console.l
 console.log(`[${((Date.now() - t0) / 1000).toFixed(1)} s]`);
 console.log(text);
 if (errors.length) console.log('page errors:\n' + errors.join('\n'));
-chrome.kill();
+chrome.kill('SIGKILL');   // headless Chrome can ignore SIGTERM and keep the game (and its sound) running
 process.exit(0);
