@@ -1,0 +1,8 @@
+game/
+pc/*.exe
+ref/
+build/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store

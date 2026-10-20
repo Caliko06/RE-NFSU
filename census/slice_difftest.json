@@ -1,0 +1,500 @@
+{
+ "functions_tried": 11538,
+ "functions_lifted": 1973,
+ "not_lifted_by_reason": {
+  "call": 8126,
+  "mnemonic fld": 830,
+  "indirect jmp": 276,
+  "mnemonic fild": 91,
+  "decode": 59,
+  "mnemonic rep stosd": 41,
+  "mnemonic rep movsd": 28,
+  "mnemonic movq": 10,
+  "mnemonic movd": 6,
+  "mnemonic fmul": 5,
+  "mnemonic fnstsw": 5,
+  "mnemonic les": 4,
+  "segment": 4,
+  "mnemonic fstp": 4,
+  "outside .text or too big": 3,
+  "mnemonic pushfd": 3,
+  "mnemonic jp": 3,
+  "mnemonic popal": 3,
+  "mnemonic loopne": 3,
+  "mnemonic fcomp": 3,
+  "imul8": 3,
+  "reg es": 3,
+  "mnemonic retf": 3,
+  "mnemonic cpuid": 3,
+  "mnemonic wait": 3,
+  "mnemonic rcr": 3,
+  "mnemonic repe cmpsd": 2,
+  "mnemonic insb": 2,
+  "reg ss": 2,
+  "mnemonic int3": 2,
+  "mnemonic fldz": 2,
+  "mnemonic hlt": 2,
+  "mnemonic pushal": 2,
+  "mnemonic cld": 2,
+  "mnemonic movaps": 2,
+  "mnemonic bts": 2,
+  "mnemonic into": 1,
+  "reg ds": 1,
+  "mnemonic lodsd": 1,
+  "mnemonic lahf": 1,
+  "mnemonic fdivr": 1,
+  "mnemonic fld1": 1,
+  "mnemonic punpckldq": 1,
+  "mnemonic loop": 1,
+  "mnemonic movss": 1,
+  "mnemonic sahf": 1,
+  "mnemonic emms": 1,
+  "mnemonic stc": 1,
+  "idiv8": 1,
+  "mnemonic repne scasb": 1,
+  "mnemonic jecxz": 1,
+  "mnemonic fxch": 1,
+  "mnemonic fldcw": 1,
+  "mnemonic fadd": 1,
+  "mnemonic shrd": 1,
+  "mnemonic shld": 1
+ },
+ "cases": {
+  "match": 4049,
+  "skip_unmapped": 3776,
+  "skip_timeout": 45,
+  "mismatch": 16,
+  "skip_not_a_function": 6
+ },
+ "mismatches": [
+  {
+   "func": "0x415353",
+   "uc": [
+    "0x1b",
+    "0x10c9a74",
+    "0x107d7c4",
+    "0x20",
+    "0x1fefec4",
+    "0x4",
+    "0x1082d7c",
+    "0x10ca46c"
+   ],
+   "lift": [
+    "0x1b",
+    "0x10c9a74",
+    "0x107d7c4",
+    "0x20",
+    "0x1fffec4",
+    "0x4",
+    "0x1082d7c",
+    "0x10ca46c"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x415353",
+   "uc": [
+    "0x1040c5c",
+    "0x3f",
+    "0x3",
+    "0x107436c",
+    "0x1fefec4",
+    "0x1026244",
+    "0x1005d94",
+    "0x10553bc"
+   ],
+   "lift": [
+    "0x1040c5c",
+    "0x3f",
+    "0x3",
+    "0x107436c",
+    "0x1fffec4",
+    "0x1026244",
+    "0x1005d94",
+    "0x10553bc"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x415353",
+   "uc": [
+    "0x10b9e50",
+    "0xb920ddaf",
+    "0x100cc10",
+    "0x2a",
+    "0x1fefec4",
+    "0x22521c85",
+    "0x106b164",
+    "0x10051bc"
+   ],
+   "lift": [
+    "0x10b9e50",
+    "0xb920ddaf",
+    "0x100cc10",
+    "0x2a",
+    "0x1fffec4",
+    "0x22521c85",
+    "0x106b164",
+    "0x10051bc"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x415353",
+   "uc": [
+    "0xe16cf9ce",
+    "0x10a3b78",
+    "0x1",
+    "0x17",
+    "0x1fefec4",
+    "0x10",
+    "0x109e380",
+    "0x105915c"
+   ],
+   "lift": [
+    "0xe16cf9ce",
+    "0x10a3b78",
+    "0x1",
+    "0x17",
+    "0x1fffec4",
+    "0x10",
+    "0x109e380",
+    "0x105915c"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x435020",
+   "uc": [
+    "0x10530ac",
+    "0x10c9f60",
+    "0x10bdd94",
+    "0xa97243cb",
+    "0x1fecbdc",
+    "0x1041624",
+    "0x6e2d2026",
+    "0x104dba8"
+   ],
+   "lift": [
+    "0x10530ac",
+    "0x10c9f60",
+    "0x10bdd94",
+    "0xa97243cb",
+    "0x1ffcbdc",
+    "0x1041624",
+    "0x6e2d2026",
+    "0x104dba8"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x435020",
+   "uc": [
+    "0x103bc98",
+    "0x10de724",
+    "0x7",
+    "0x10d45c8",
+    "0x1fecbdc",
+    "0x102afec",
+    "0x103a3f4",
+    "0x107c0d8"
+   ],
+   "lift": [
+    "0x103bc98",
+    "0x10de724",
+    "0x7",
+    "0x10d45c8",
+    "0x1ffcbdc",
+    "0x102afec",
+    "0x103a3f4",
+    "0x107c0d8"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x435020",
+   "uc": [
+    "0x1061f38",
+    "0xe",
+    "0x108a984",
+    "0x10b278c",
+    "0x1fecbdc",
+    "0x4d2b1dfa",
+    "0x99bbf73f",
+    "0x10be5e4"
+   ],
+   "lift": [
+    "0x1061f38",
+    "0xe",
+    "0x108a984",
+    "0x10b278c",
+    "0x1ffcbdc",
+    "0x4d2b1dfa",
+    "0x99bbf73f",
+    "0x10be5e4"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x435020",
+   "uc": [
+    "0x100e8bc",
+    "0x1096fd8",
+    "0x1c",
+    "0x1066edc",
+    "0x1fecbdc",
+    "0x1049848",
+    "0x101ac38",
+    "0x9ba31bad"
+   ],
+   "lift": [
+    "0x100e8bc",
+    "0x1096fd8",
+    "0x1c",
+    "0x1066edc",
+    "0x1ffcbdc",
+    "0x1049848",
+    "0x101ac38",
+    "0x9ba31bad"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x50414d",
+   "uc": [
+    "0x10e407c",
+    "0x1064788",
+    "0x1085d84",
+    "0x100d028",
+    "0x1fec362",
+    "0xc",
+    "0x10a3300",
+    "0x38"
+   ],
+   "lift": [
+    "0x10e407c",
+    "0x1064788",
+    "0x1085d84",
+    "0x100d028",
+    "0x1ffc362",
+    "0xc",
+    "0x10a3300",
+    "0x38"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x50414d",
+   "uc": [
+    "0x10515bc",
+    "0x101ae94",
+    "0xc48f8b83",
+    "0x38",
+    "0x1fec362",
+    "0x1045c80",
+    "0x1031dec",
+    "0x1f"
+   ],
+   "lift": [
+    "0x10515bc",
+    "0x101ae94",
+    "0xc48f8b83",
+    "0x38",
+    "0x1ffc362",
+    "0x1045c80",
+    "0x1031dec",
+    "0x1f"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x50414d",
+   "uc": [
+    "0x10c8638",
+    "0xc90a47ff",
+    "0x106e298",
+    "0x26",
+    "0x1fec362",
+    "0x4",
+    "0x10147dc",
+    "0xaa8438a5"
+   ],
+   "lift": [
+    "0x10c8638",
+    "0xc90a47ff",
+    "0x106e298",
+    "0x26",
+    "0x1ffc362",
+    "0x4",
+    "0x10147dc",
+    "0xaa8438a5"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x50414d",
+   "uc": [
+    "0x850f974d",
+    "0x10a7998",
+    "0x27",
+    "0x10a39dc",
+    "0x1fec362",
+    "0x1061228",
+    "0x103401c",
+    "0x1058878"
+   ],
+   "lift": [
+    "0x850f974d",
+    "0x10a7998",
+    "0x27",
+    "0x10a39dc",
+    "0x1ffc362",
+    "0x1061228",
+    "0x103401c",
+    "0x1058878"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x5b003b",
+   "uc": [
+    "0xc0502af5",
+    "0x1030ea8",
+    "0x1008ad8",
+    "0xd6fc35f1",
+    "0x1fe8310",
+    "0x1046aec",
+    "0x10a0b74",
+    "0x1000fd8"
+   ],
+   "lift": [
+    "0xc0502af5",
+    "0x1030ea8",
+    "0x1008ad8",
+    "0xd6fc35f1",
+    "0x1ff8310",
+    "0x1046aec",
+    "0x10a0b74",
+    "0x1000fd8"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x5b003b",
+   "uc": [
+    "0x4806389c",
+    "0x1098c5c",
+    "0x10036a4",
+    "0x1084654",
+    "0x1fe8310",
+    "0x1b",
+    "0x10d20b0",
+    "0x3d"
+   ],
+   "lift": [
+    "0x4806389c",
+    "0x1098c5c",
+    "0x10036a4",
+    "0x1084654",
+    "0x1ff8310",
+    "0x1b",
+    "0x10d20b0",
+    "0x3d"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x5b003b",
+   "uc": [
+    "0x103ef3c",
+    "0x10d6294",
+    "0x100cf90",
+    "0x10a50e0",
+    "0x1fe8310",
+    "0x10344b4",
+    "0x108c9a0",
+    "0x107305c"
+   ],
+   "lift": [
+    "0x103ef3c",
+    "0x10d6294",
+    "0x100cf90",
+    "0x10a50e0",
+    "0x1ff8310",
+    "0x10344b4",
+    "0x108c9a0",
+    "0x107305c"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  },
+  {
+   "func": "0x5b003b",
+   "uc": [
+    "0x511118b8",
+    "0x24",
+    "0x10c9c74",
+    "0x10dddf0",
+    "0x1fe8310",
+    "0x10eaf8c",
+    "0x1090c7c",
+    "0x2a"
+   ],
+   "lift": [
+    "0x511118b8",
+    "0x24",
+    "0x10c9c74",
+    "0x10dddf0",
+    "0x1ff8310",
+    "0x10eaf8c",
+    "0x1090c7c",
+    "0x2a"
+   ],
+   "ufault": false,
+   "lfault": false,
+   "mem_diff": []
+  }
+ ],
+ "functions_with_mismatch": 4,
+ "functions_compared": 1407,
+ "functions_all_match": 1403,
+ "all_match_by_seed": {
+  "data": 574,
+  "call": 829
+ },
+ "mismatch_funcs": [
+  "0x415353",
+  "0x435020",
+  "0x50414d",
+  "0x5b003b"
+ ]
+}
