@@ -1,0 +1,1655 @@
+{
+  "_header": "Made by tools/census/dsound_consts.py; complete requested dsound.h macro groups; Clang evaluates HRESULT expressions and x86 Windows sizeof/offsetof on extracted SDK structures.",
+  "limits": [
+    "FACT: SDK names, expressions, conditions and field declarations. INFERENCE: compile-time ABI sizes, offsets and HRESULT bit arithmetic.",
+    "Windows aliases use the _WIN32 branch of winerror.h, not its historical Macintosh HRESULT values.",
+    "Both conditional DSBFREQUENCY_MAX values are retained. Runtime device sample-rate support is unknown.",
+    "Layouts target 32-bit Windows for Speed.exe, not the 64-bit macOS host. DSBUFFERDESC uses the DX9 definition.",
+    "No sound was played and no game or device was executed."
+  ],
+  "layout_method": {
+    "target": "i686-pc-windows-msvc",
+    "evaluation": "Clang sizeof, __alignof and __builtin_offsetof on extracted declarations",
+    "waveformatex_pack": 1,
+    "other_structure_pack": 8,
+    "pointer_bytes": 4,
+    "primitive_types": {
+      "WORD": "unsigned short (16-bit Windows)",
+      "DWORD": "unsigned long (32-bit Windows)",
+      "GUID": "extracted from shared/guiddef.h"
+    }
+  },
+  "constant_method": {
+    "target": "i686-pc-windows-msvc",
+    "command": "clang -target i686-pc-windows-msvc -x c -S -emit-llvm -o - -",
+    "evaluation": "SDK macro expressions compiled as unsigned long constants; low 32 bits are the HRESULT representation"
+  },
+  "counts": {
+    "constant_records": 67,
+    "distinct_constant_names": 66,
+    "by_group": {
+      "HRESULT": 24,
+      "DSSCL": 4,
+      "DSBCAPS": 16,
+      "DSBPLAY": 6,
+      "DSBSTATUS": 6,
+      "DSBLOCK": 2,
+      "DSBVOLUME": 2,
+      "DSBPAN": 3,
+      "DSBFREQUENCY": 4
+    },
+    "structures": 4,
+    "fields": 42,
+    "names_absent_from_doc_section": 3
+  },
+  "constants": [
+    {
+      "group": "HRESULT",
+      "name": "DS_OK",
+      "value": 0,
+      "value_hex": "0x00000000",
+      "header_expression": "S_OK",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1965",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "winerror_alias": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L31271"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x00000000",
+      "signed_hresult": 0,
+      "severity": 0,
+      "facility": 0,
+      "code": 0,
+      "win32_alias_expression": "((HRESULT)0L)"
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_ALLOCATED",
+      "value": 2289565706,
+      "value_hex": "0x8878000a",
+      "header_expression": "MAKE_DSHRESULT(10)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1972",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x8878000a",
+      "signed_hresult": -2005401590,
+      "severity": 1,
+      "facility": 2168,
+      "code": 10
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_CONTROLUNAVAIL",
+      "value": 2289565726,
+      "value_hex": "0x8878001e",
+      "header_expression": "MAKE_DSHRESULT(30)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1975",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x8878001e",
+      "signed_hresult": -2005401570,
+      "severity": 1,
+      "facility": 2168,
+      "code": 30
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_INVALIDPARAM",
+      "value": 2147942487,
+      "value_hex": "0x80070057",
+      "header_expression": "E_INVALIDARG",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1978",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "winerror_alias": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30516"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x80070057",
+      "signed_hresult": -2147024809,
+      "severity": 1,
+      "facility": 7,
+      "code": 87,
+      "win32_alias_expression": "_HRESULT_TYPEDEF_(0x80070057L)"
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_INVALIDCALL",
+      "value": 2289565746,
+      "value_hex": "0x88780032",
+      "header_expression": "MAKE_DSHRESULT(50)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1981",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x88780032",
+      "signed_hresult": -2005401550,
+      "severity": 1,
+      "facility": 2168,
+      "code": 50
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_GENERIC",
+      "value": 2147500037,
+      "value_hex": "0x80004005",
+      "header_expression": "E_FAIL",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1984",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "winerror_alias": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30561"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x80004005",
+      "signed_hresult": -2147467259,
+      "severity": 1,
+      "facility": 0,
+      "code": 16389,
+      "win32_alias_expression": "_HRESULT_TYPEDEF_(0x80004005L)"
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_PRIOLEVELNEEDED",
+      "value": 2289565766,
+      "value_hex": "0x88780046",
+      "header_expression": "MAKE_DSHRESULT(70)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1988",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x88780046",
+      "signed_hresult": -2005401530,
+      "severity": 1,
+      "facility": 2168,
+      "code": 70
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_OUTOFMEMORY",
+      "value": 2147942414,
+      "value_hex": "0x8007000e",
+      "header_expression": "E_OUTOFMEMORY",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1991",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "winerror_alias": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30507"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x8007000e",
+      "signed_hresult": -2147024882,
+      "severity": 1,
+      "facility": 7,
+      "code": 14,
+      "win32_alias_expression": "_HRESULT_TYPEDEF_(0x8007000EL)"
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_BADFORMAT",
+      "value": 2289565796,
+      "value_hex": "0x88780064",
+      "header_expression": "MAKE_DSHRESULT(100)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1994",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x88780064",
+      "signed_hresult": -2005401500,
+      "severity": 1,
+      "facility": 2168,
+      "code": 100
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_UNSUPPORTED",
+      "value": 2147500033,
+      "value_hex": "0x80004001",
+      "header_expression": "E_NOTIMPL",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L1997",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "winerror_alias": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30498"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x80004001",
+      "signed_hresult": -2147467263,
+      "severity": 1,
+      "facility": 0,
+      "code": 16385,
+      "win32_alias_expression": "_HRESULT_TYPEDEF_(0x80004001L)"
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_NODRIVER",
+      "value": 2289565816,
+      "value_hex": "0x88780078",
+      "header_expression": "MAKE_DSHRESULT(120)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2000",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x88780078",
+      "signed_hresult": -2005401480,
+      "severity": 1,
+      "facility": 2168,
+      "code": 120
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_ALREADYINITIALIZED",
+      "value": 2289565826,
+      "value_hex": "0x88780082",
+      "header_expression": "MAKE_DSHRESULT(130)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2003",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x88780082",
+      "signed_hresult": -2005401470,
+      "severity": 1,
+      "facility": 2168,
+      "code": 130
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_NOAGGREGATION",
+      "value": 2147746064,
+      "value_hex": "0x80040110",
+      "header_expression": "CLASS_E_NOAGGREGATION",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2006",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "winerror_alias": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L31608"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x80040110",
+      "signed_hresult": -2147221232,
+      "severity": 1,
+      "facility": 4,
+      "code": 272,
+      "win32_alias_expression": "_HRESULT_TYPEDEF_(0x80040110L)"
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_BUFFERLOST",
+      "value": 2289565846,
+      "value_hex": "0x88780096",
+      "header_expression": "MAKE_DSHRESULT(150)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2009",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x88780096",
+      "signed_hresult": -2005401450,
+      "severity": 1,
+      "facility": 2168,
+      "code": 150
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_OTHERAPPHASPRIO",
+      "value": 2289565856,
+      "value_hex": "0x887800a0",
+      "header_expression": "MAKE_DSHRESULT(160)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2013",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x887800a0",
+      "signed_hresult": -2005401440,
+      "severity": 1,
+      "facility": 2168,
+      "code": 160
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_UNINITIALIZED",
+      "value": 2289565866,
+      "value_hex": "0x887800aa",
+      "header_expression": "MAKE_DSHRESULT(170)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2016",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x887800aa",
+      "signed_hresult": -2005401430,
+      "severity": 1,
+      "facility": 2168,
+      "code": 170
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_NOINTERFACE",
+      "value": 2147500034,
+      "value_hex": "0x80004002",
+      "header_expression": "E_NOINTERFACE",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2019",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "winerror_alias": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30525"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x80004002",
+      "signed_hresult": -2147467262,
+      "severity": 1,
+      "facility": 0,
+      "code": 16386,
+      "win32_alias_expression": "_HRESULT_TYPEDEF_(0x80004002L)"
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_ACCESSDENIED",
+      "value": 2147942405,
+      "value_hex": "0x80070005",
+      "header_expression": "E_ACCESSDENIED",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2022",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "winerror_alias": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30570"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x80070005",
+      "signed_hresult": -2147024891,
+      "severity": 1,
+      "facility": 7,
+      "code": 5,
+      "win32_alias_expression": "_HRESULT_TYPEDEF_(0x80070005L)"
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_BUFFERTOOSMALL",
+      "value": 2289565876,
+      "value_hex": "0x887800b4",
+      "header_expression": "MAKE_DSHRESULT(180)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2025",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x887800b4",
+      "signed_hresult": -2005401420,
+      "severity": 1,
+      "facility": 2168,
+      "code": 180
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_DS8_REQUIRED",
+      "value": 2289565886,
+      "value_hex": "0x887800be",
+      "header_expression": "MAKE_DSHRESULT(190)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2028",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x887800be",
+      "signed_hresult": -2005401410,
+      "severity": 1,
+      "facility": 2168,
+      "code": 190
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_SENDLOOP",
+      "value": 2289565896,
+      "value_hex": "0x887800c8",
+      "header_expression": "MAKE_DSHRESULT(200)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2031",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x887800c8",
+      "signed_hresult": -2005401400,
+      "severity": 1,
+      "facility": 2168,
+      "code": 200
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_BADSENDBUFFERGUID",
+      "value": 2289565906,
+      "value_hex": "0x887800d2",
+      "header_expression": "MAKE_DSHRESULT(210)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2034",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x887800d2",
+      "signed_hresult": -2005401390,
+      "severity": 1,
+      "facility": 2168,
+      "code": 210
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_OBJECTNOTFOUND",
+      "value": 2289570145,
+      "value_hex": "0x88781161",
+      "header_expression": "MAKE_DSHRESULT(4449)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2037",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x88781161",
+      "signed_hresult": -2005397151,
+      "severity": 1,
+      "facility": 2168,
+      "code": 4449
+    },
+    {
+      "group": "HRESULT",
+      "name": "DSERR_FXUNAVAILABLE",
+      "value": 2289565916,
+      "value_hex": "0x887800dc",
+      "header_expression": "MAKE_DSHRESULT(220)",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2041",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+        "facility": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L72",
+        "make_dshresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L73",
+        "make_hresult": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h#L30390"
+      },
+      "documented_name_present": true,
+      "hresult_hex": "0x887800dc",
+      "signed_hresult": -2005401380,
+      "severity": 1,
+      "facility": 2168,
+      "code": 220
+    },
+    {
+      "group": "DSSCL",
+      "name": "DSSCL_NORMAL",
+      "value": 1,
+      "value_hex": "0x00000001",
+      "header_expression": "0x00000001",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2059",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418049(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSSCL",
+      "name": "DSSCL_PRIORITY",
+      "value": 2,
+      "value_hex": "0x00000002",
+      "header_expression": "0x00000002",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2060",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418049(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSSCL",
+      "name": "DSSCL_EXCLUSIVE",
+      "value": 3,
+      "value_hex": "0x00000003",
+      "header_expression": "0x00000003",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2061",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418049(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSSCL",
+      "name": "DSSCL_WRITEPRIMARY",
+      "value": 4,
+      "value_hex": "0x00000004",
+      "header_expression": "0x00000004",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2062",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418049(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_PRIMARYBUFFER",
+      "value": 1,
+      "value_hex": "0x00000001",
+      "header_expression": "0x00000001",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2086",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_STATIC",
+      "value": 2,
+      "value_hex": "0x00000002",
+      "header_expression": "0x00000002",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2087",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_LOCHARDWARE",
+      "value": 4,
+      "value_hex": "0x00000004",
+      "header_expression": "0x00000004",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2088",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_LOCSOFTWARE",
+      "value": 8,
+      "value_hex": "0x00000008",
+      "header_expression": "0x00000008",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2089",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_CTRL3D",
+      "value": 16,
+      "value_hex": "0x00000010",
+      "header_expression": "0x00000010",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2090",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_CTRLFREQUENCY",
+      "value": 32,
+      "value_hex": "0x00000020",
+      "header_expression": "0x00000020",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2091",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_CTRLPAN",
+      "value": 64,
+      "value_hex": "0x00000040",
+      "header_expression": "0x00000040",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2092",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_CTRLVOLUME",
+      "value": 128,
+      "value_hex": "0x00000080",
+      "header_expression": "0x00000080",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2093",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_CTRLPOSITIONNOTIFY",
+      "value": 256,
+      "value_hex": "0x00000100",
+      "header_expression": "0x00000100",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2094",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_CTRLFX",
+      "value": 512,
+      "value_hex": "0x00000200",
+      "header_expression": "0x00000200",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2095",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_STICKYFOCUS",
+      "value": 16384,
+      "value_hex": "0x00004000",
+      "header_expression": "0x00004000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2096",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_GLOBALFOCUS",
+      "value": 32768,
+      "value_hex": "0x00008000",
+      "header_expression": "0x00008000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2097",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_GETCURRENTPOSITION2",
+      "value": 65536,
+      "value_hex": "0x00010000",
+      "header_expression": "0x00010000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2098",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_MUTE3DATMAXDISTANCE",
+      "value": 131072,
+      "value_hex": "0x00020000",
+      "header_expression": "0x00020000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2099",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_LOCDEFER",
+      "value": 262144,
+      "value_hex": "0x00040000",
+      "header_expression": "0x00040000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2100",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBCAPS",
+      "name": "DSBCAPS_TRUEPLAYPOSITION",
+      "value": 524288,
+      "value_hex": "0x00080000",
+      "header_expression": "0x00080000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2101",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#members"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBPLAY",
+      "name": "DSBPLAY_LOOPING",
+      "value": 1,
+      "value_hex": "0x00000001",
+      "header_expression": "0x00000001",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2103",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418074(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBPLAY",
+      "name": "DSBPLAY_LOCHARDWARE",
+      "value": 2,
+      "value_hex": "0x00000002",
+      "header_expression": "0x00000002",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2104",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418074(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBPLAY",
+      "name": "DSBPLAY_LOCSOFTWARE",
+      "value": 4,
+      "value_hex": "0x00000004",
+      "header_expression": "0x00000004",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2105",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418074(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBPLAY",
+      "name": "DSBPLAY_TERMINATEBY_TIME",
+      "value": 8,
+      "value_hex": "0x00000008",
+      "header_expression": "0x00000008",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2106",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418074(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBPLAY",
+      "name": "DSBPLAY_TERMINATEBY_DISTANCE",
+      "value": 16,
+      "value_hex": "0x00000010",
+      "header_expression": "0x000000010",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2107",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418074(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBPLAY",
+      "name": "DSBPLAY_TERMINATEBY_PRIORITY",
+      "value": 32,
+      "value_hex": "0x00000020",
+      "header_expression": "0x000000020",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2108",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418074(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBSTATUS",
+      "name": "DSBSTATUS_PLAYING",
+      "value": 1,
+      "value_hex": "0x00000001",
+      "header_expression": "0x00000001",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2110",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418070(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBSTATUS",
+      "name": "DSBSTATUS_BUFFERLOST",
+      "value": 2,
+      "value_hex": "0x00000002",
+      "header_expression": "0x00000002",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2111",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418070(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBSTATUS",
+      "name": "DSBSTATUS_LOOPING",
+      "value": 4,
+      "value_hex": "0x00000004",
+      "header_expression": "0x00000004",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2112",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418070(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBSTATUS",
+      "name": "DSBSTATUS_LOCHARDWARE",
+      "value": 8,
+      "value_hex": "0x00000008",
+      "header_expression": "0x00000008",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2113",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418070(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBSTATUS",
+      "name": "DSBSTATUS_LOCSOFTWARE",
+      "value": 16,
+      "value_hex": "0x00000010",
+      "header_expression": "0x00000010",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2114",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418070(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBSTATUS",
+      "name": "DSBSTATUS_TERMINATED",
+      "value": 32,
+      "value_hex": "0x00000020",
+      "header_expression": "0x00000020",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2115",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418070(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBLOCK",
+      "name": "DSBLOCK_FROMWRITECURSOR",
+      "value": 1,
+      "value_hex": "0x00000001",
+      "header_expression": "0x00000001",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2117",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418073(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBLOCK",
+      "name": "DSBLOCK_ENTIREBUFFER",
+      "value": 2,
+      "value_hex": "0x00000002",
+      "header_expression": "0x00000002",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2118",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418073(v=vs.85)#parameters"
+      },
+      "documented_name_present": true
+    },
+    {
+      "group": "DSBVOLUME",
+      "name": "DSBVOLUME_MIN",
+      "value": -10000,
+      "value_hex": "0xffffd8f0",
+      "header_expression": "-10000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2132",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418150(v=vs.85)#remarks"
+      },
+      "documented_name_present": true,
+      "units": "hundredths of a decibel"
+    },
+    {
+      "group": "DSBVOLUME",
+      "name": "DSBVOLUME_MAX",
+      "value": 0,
+      "value_hex": "0x00000000",
+      "header_expression": "0",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2133",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418150(v=vs.85)#remarks"
+      },
+      "documented_name_present": true,
+      "units": "hundredths of a decibel"
+    },
+    {
+      "group": "DSBPAN",
+      "name": "DSBPAN_LEFT",
+      "value": -10000,
+      "value_hex": "0xffffd8f0",
+      "header_expression": "-10000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2128",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418148(v=vs.85)#remarks"
+      },
+      "documented_name_present": true,
+      "units": "hundredths of a decibel"
+    },
+    {
+      "group": "DSBPAN",
+      "name": "DSBPAN_CENTER",
+      "value": 0,
+      "value_hex": "0x00000000",
+      "header_expression": "0",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2129",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418148(v=vs.85)#remarks"
+      },
+      "documented_name_present": true,
+      "units": "hundredths of a decibel"
+    },
+    {
+      "group": "DSBPAN",
+      "name": "DSBPAN_RIGHT",
+      "value": 10000,
+      "value_hex": "0x00002710",
+      "header_expression": "10000",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2130",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418148(v=vs.85)#remarks"
+      },
+      "documented_name_present": true,
+      "units": "hundredths of a decibel"
+    },
+    {
+      "group": "DSBFREQUENCY",
+      "name": "DSBFREQUENCY_ORIGINAL",
+      "value": 0,
+      "value_hex": "0x00000000",
+      "header_expression": "0",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2120",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418143(v=vs.85)#remarks"
+      },
+      "documented_name_present": true,
+      "units": "special value: reset to buffer format sample rate",
+      "device_limit_note": "Actual supported range comes from DSCAPS dwMinSecondarySampleRate/dwMaxSecondarySampleRate. Some systems do not support over 100000 Hz."
+    },
+    {
+      "group": "DSBFREQUENCY",
+      "name": "DSBFREQUENCY_MIN",
+      "value": 100,
+      "value_hex": "0x00000064",
+      "header_expression": "100",
+      "condition": "all versions in this header",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2121",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418143(v=vs.85)#remarks"
+      },
+      "documented_name_present": false,
+      "units": "Hz",
+      "device_limit_note": "Actual supported range comes from DSCAPS dwMinSecondarySampleRate/dwMaxSecondarySampleRate. Some systems do not support over 100000 Hz."
+    },
+    {
+      "group": "DSBFREQUENCY",
+      "name": "DSBFREQUENCY_MAX",
+      "value": 200000,
+      "value_hex": "0x00030d40",
+      "header_expression": "200000",
+      "condition": "DIRECTSOUND_VERSION >= 0x0900",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2123",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418143(v=vs.85)#remarks"
+      },
+      "documented_name_present": false,
+      "units": "Hz",
+      "device_limit_note": "Actual supported range comes from DSCAPS dwMinSecondarySampleRate/dwMaxSecondarySampleRate. Some systems do not support over 100000 Hz."
+    },
+    {
+      "group": "DSBFREQUENCY",
+      "name": "DSBFREQUENCY_MAX",
+      "value": 100000,
+      "value_hex": "0x000186a0",
+      "header_expression": "100000",
+      "condition": "DIRECTSOUND_VERSION < 0x0900",
+      "sources": {
+        "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L2125",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418143(v=vs.85)#remarks"
+      },
+      "documented_name_present": false,
+      "units": "Hz",
+      "device_limit_note": "Actual supported range comes from DSCAPS dwMinSecondarySampleRate/dwMaxSecondarySampleRate. Some systems do not support over 100000 Hz."
+    }
+  ],
+  "structures": {
+    "WAVEFORMATEX": {
+      "size": 18,
+      "alignment": 1,
+      "fields": [
+        {
+          "name": "wFormatTag",
+          "type": "WORD",
+          "offset": 0,
+          "size": 2,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L2427",
+            "documentation": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex#syntax"
+          }
+        },
+        {
+          "name": "nChannels",
+          "type": "WORD",
+          "offset": 2,
+          "size": 2,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L2427",
+            "documentation": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex#syntax"
+          }
+        },
+        {
+          "name": "nSamplesPerSec",
+          "type": "DWORD",
+          "offset": 4,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L2427",
+            "documentation": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex#syntax"
+          }
+        },
+        {
+          "name": "nAvgBytesPerSec",
+          "type": "DWORD",
+          "offset": 8,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L2427",
+            "documentation": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex#syntax"
+          }
+        },
+        {
+          "name": "nBlockAlign",
+          "type": "WORD",
+          "offset": 12,
+          "size": 2,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L2427",
+            "documentation": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex#syntax"
+          }
+        },
+        {
+          "name": "wBitsPerSample",
+          "type": "WORD",
+          "offset": 14,
+          "size": 2,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L2427",
+            "documentation": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex#syntax"
+          }
+        },
+        {
+          "name": "cbSize",
+          "type": "WORD",
+          "offset": 16,
+          "size": 2,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L2427",
+            "documentation": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex#syntax"
+          }
+        }
+      ],
+      "packing": 1,
+      "sources": {
+        "declaration": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L2427",
+        "windows_types": "https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types",
+        "documentation": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex#syntax",
+        "packing": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h#L35"
+      },
+      "size_note": "18-byte fixed header. cbSize counts extra bytes after this header; those bytes are not included here."
+    },
+    "DSBUFFERDESC": {
+      "size": 36,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "dwSize",
+          "type": "DWORD",
+          "offset": 0,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L355",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416820(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFlags",
+          "type": "DWORD",
+          "offset": 4,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L355",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416820(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwBufferBytes",
+          "type": "DWORD",
+          "offset": 8,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L355",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416820(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwReserved",
+          "type": "DWORD",
+          "offset": 12,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L355",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416820(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "lpwfxFormat",
+          "type": "LPWAVEFORMATEX",
+          "offset": 16,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L355",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416820(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "guid3DAlgorithm",
+          "type": "GUID",
+          "offset": 20,
+          "size": 16,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L355",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416820(v=vs.85)#syntax"
+          }
+        }
+      ],
+      "packing": 8,
+      "sources": {
+        "declaration": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L355",
+        "windows_types": "https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416820(v=vs.85)#syntax",
+        "guid": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/shared/guiddef.h#L22"
+      },
+      "version_scope": "DIRECTSOUND_VERSION >= 0x0700, including DX9. guid3DAlgorithm is conditional in dsound.h."
+    },
+    "DSCAPS": {
+      "size": 96,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "dwSize",
+          "type": "DWORD",
+          "offset": 0,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFlags",
+          "type": "DWORD",
+          "offset": 4,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMinSecondarySampleRate",
+          "type": "DWORD",
+          "offset": 8,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMaxSecondarySampleRate",
+          "type": "DWORD",
+          "offset": 12,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwPrimaryBuffers",
+          "type": "DWORD",
+          "offset": 16,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMaxHwMixingAllBuffers",
+          "type": "DWORD",
+          "offset": 20,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMaxHwMixingStaticBuffers",
+          "type": "DWORD",
+          "offset": 24,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMaxHwMixingStreamingBuffers",
+          "type": "DWORD",
+          "offset": 28,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFreeHwMixingAllBuffers",
+          "type": "DWORD",
+          "offset": 32,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFreeHwMixingStaticBuffers",
+          "type": "DWORD",
+          "offset": 36,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFreeHwMixingStreamingBuffers",
+          "type": "DWORD",
+          "offset": 40,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMaxHw3DAllBuffers",
+          "type": "DWORD",
+          "offset": 44,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMaxHw3DStaticBuffers",
+          "type": "DWORD",
+          "offset": 48,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMaxHw3DStreamingBuffers",
+          "type": "DWORD",
+          "offset": 52,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFreeHw3DAllBuffers",
+          "type": "DWORD",
+          "offset": 56,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFreeHw3DStaticBuffers",
+          "type": "DWORD",
+          "offset": 60,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFreeHw3DStreamingBuffers",
+          "type": "DWORD",
+          "offset": 64,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwTotalHwMemBytes",
+          "type": "DWORD",
+          "offset": 68,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFreeHwMemBytes",
+          "type": "DWORD",
+          "offset": 72,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwMaxContigFreeHwMemBytes",
+          "type": "DWORD",
+          "offset": 76,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwUnlockTransferRateHwBuffers",
+          "type": "DWORD",
+          "offset": 80,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwPlayCpuOverheadSwBuffers",
+          "type": "DWORD",
+          "offset": 84,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwReserved1",
+          "type": "DWORD",
+          "offset": 88,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwReserved2",
+          "type": "DWORD",
+          "offset": 92,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+          }
+        }
+      ],
+      "packing": 8,
+      "sources": {
+        "declaration": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L269",
+        "windows_types": "https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)#syntax"
+      }
+    },
+    "DSBCAPS": {
+      "size": 20,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "dwSize",
+          "type": "DWORD",
+          "offset": 0,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L299",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwFlags",
+          "type": "DWORD",
+          "offset": 4,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L299",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwBufferBytes",
+          "type": "DWORD",
+          "offset": 8,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L299",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwUnlockTransferRate",
+          "type": "DWORD",
+          "offset": 12,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L299",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#syntax"
+          }
+        },
+        {
+          "name": "dwPlayCpuOverhead",
+          "type": "DWORD",
+          "offset": 16,
+          "size": 4,
+          "sources": {
+            "header": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L299",
+            "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#syntax"
+          }
+        }
+      ],
+      "packing": 8,
+      "sources": {
+        "declaration": "https://github.com/microsoft/win32metadata/blob/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h#L299",
+        "windows_types": "https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types",
+        "documentation": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)#syntax"
+      }
+    }
+  },
+  "source_documents": [
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/um/dsound.h",
+      "sha256_text_utf8": "66e97a46d9aaba5108731126fefc1d5bfe30fa52187a270b2ea11274ff0c0211"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416775(v=vs.85)",
+      "sha256_text_utf8": "ea5fd4ac67808a6d5d9d972e9b3d9285a55668cd513a35aede662e4ffa8aeb20"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416818(v=vs.85)",
+      "sha256_text_utf8": "81ab0413e233932d30ccece678c176ae9cecd980ab793503a1e00e0432a8645d"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416820(v=vs.85)",
+      "sha256_text_utf8": "eaee6cae3277d1db1c0d5ee1bf9a4d4affd24b7be148250df60054c58da0ba44"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee416821(v=vs.85)",
+      "sha256_text_utf8": "64ef24232cd003ceb18d1db157814a8c3b5089281d6a6e8650b0f708008b1dfc"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418049(v=vs.85)",
+      "sha256_text_utf8": "841399c07ad7568cca896169956ae10c8cf30282deb8ca1ebfab77f9ff123c2b"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418070(v=vs.85)",
+      "sha256_text_utf8": "18b428137398467d6b56519ee6a80efdd2d2f8d8cb655190f876fe16947130a1"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418073(v=vs.85)",
+      "sha256_text_utf8": "5bd4462fd3ecfd18da6ef6f958f46ecbc01d171b51c73e0d76032e57228b8e41"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418074(v=vs.85)",
+      "sha256_text_utf8": "ee44e5131c7e5640ef2a36bf7a82645bc621df934e63f594f58653721feafae8"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418143(v=vs.85)",
+      "sha256_text_utf8": "5d4dd3dad8e24267746c15b644d0173b5ce0deb8b784b820d3fc045c48aa5527"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418148(v=vs.85)",
+      "sha256_text_utf8": "f7b0fce6517026dfd37294884acb1a72f6c60aa55bd91ecd8e0991df076b9e21"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418150(v=vs.85)",
+      "sha256_text_utf8": "fa4c89d7b9a05bc83a0e24bd664db9b3dcc9f484b73c075f6ddc7376311c1177"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/shared/guiddef.h",
+      "sha256_text_utf8": "7b0ff3b03ace4b2b26f2765ff7b68a925242ee13f678672491c4b347b0dcbff6"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/shared/mmreg.h",
+      "sha256_text_utf8": "cd0f0686d4882a45f85d70197f1f71c3dcf6872351fa19aff48ee6ad0f14186d"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex",
+      "sha256_text_utf8": "6f7ea73935f2d5651028f113f7f1ece03ff48f24aa73087650d695d2f7d42b39"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/shared/winerror.h",
+      "sha256_text_utf8": "0423ebea8bca5bd635681f274e762a8aefdd7b723c9da1e14cd4e3dcf71ff8e1"
+    }
+  ]
+}
