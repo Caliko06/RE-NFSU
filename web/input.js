@@ -44,7 +44,19 @@ function startInput(M, canvas) {
   canvas.addEventListener('blur', () => { for (const d of held) push(d); held.clear(); });
   // Mouse: relative motion while the pointer is over the canvas; buttons 0 left, 1 right, 2 middle.
   const btn = [0, 2, 1, 3, 4];
-  canvas.addEventListener('mousemove', e => { Atomics.add(H(), base + 2, e.movementX); Atomics.add(H(), base + 3, e.movementY); });
+  // movementX/Y are CSS pixels; the game's cursor moves in canvas pixels, so scale by canvas.width / on-screen width
+  // and carry the fraction (Atomics takes integers).
+  let remX = 0, remY = 0;
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    remX += e.movementX * canvas.width / r.width;
+    remY += e.movementY * canvas.height / r.height;
+    const ix = Math.trunc(remX), iy = Math.trunc(remY);
+    remX -= ix; remY -= iy;
+    if (ix) Atomics.add(H(), base + 2, ix);
+    if (iy) Atomics.add(H(), base + 3, iy);
+  });
   canvas.addEventListener('mousedown', e => { canvas.focus(); push(0x80000100 | btn[e.button]); e.preventDefault(); });
   canvas.addEventListener('mouseup', e => push(0x80000000 | btn[e.button]));
   canvas.addEventListener('wheel', e => { Atomics.add(H(), base + 4, e.deltaY < 0 ? 120 : -120); e.preventDefault(); }, { passive: false });
