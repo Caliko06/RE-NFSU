@@ -1,7 +1,8 @@
 // One headless Chrome run of the page on 5180: prints the page log when it stops (or after the timeout)
 // and saves a screenshot of the page.
 // Usage: node tools/webcheck.mjs [url] [seconds] [screenshot.png] [keys]
-// keys: "20:Enter,23:ArrowDown" = at that second, a tap of that KeyboardEvent.code on the canvas.
+// keys: "20:Enter,23:ArrowDown" = at that second, a tap of that KeyboardEvent.code on the canvas;
+// "60:KeyW+6" holds it 6 seconds (released on the first check after that).
 // node tools/webcheck.mjs --route: the regression route; exit 0 = PASS. It grows with each milestone met.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
@@ -17,7 +18,7 @@ const arg = route ? [] : process.argv.slice(2);
 const url = arg[0] || 'http://127.0.0.1:5180/';
 const secs = route ? ROUTE.secs : Number(arg[1] || 120);
 const shot = route ? ROUTE.shot : arg[2] || 'build/webcheck.png';
-const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, code]) => ({ t: +t, code }));
+const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, c]) => ({ t: +t, code: c.split('+')[0], hold: +(c.split('+')[1] || 0) }));
 const port = 9333;
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
   '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'rn-'))}`,
@@ -45,7 +46,12 @@ while (Date.now() - t0 < secs * 1000) {
     k.done = true;
     await send('Runtime.evaluate', { expression: "document.getElementById('screen').focus()" });
     await send('Input.dispatchKeyEvent', { type: 'keyDown', code: k.code, key: k.code });
+    if (k.hold) continue;
     await sleep(100);
+    await send('Input.dispatchKeyEvent', { type: 'keyUp', code: k.code, key: k.code });
+  }
+  for (const k of keys.filter(k => k.done && k.hold && !k.up && Date.now() - t0 >= (k.t + k.hold) * 1000)) {
+    k.up = true;
     await send('Input.dispatchKeyEvent', { type: 'keyUp', code: k.code, key: k.code });
   }
   const r = await send('Runtime.evaluate', { expression: "document.getElementById('status')?.textContent + '\\n' + document.getElementById('log')?.innerText" });

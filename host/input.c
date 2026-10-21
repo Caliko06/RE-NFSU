@@ -44,6 +44,24 @@ static const Key *key_of(uint8_t dik) {
     return NULL;
 }
 
+// The key's name as GetKeyNameText gives it for the US layout: the aKeyNames / aKeyNamesExt tables of
+// kbdus.c (Windows-driver-samples, input/layout/kbdus), else the key's unshifted character, letters in capitals.
+typedef struct { uint8_t sc; const char *name; } Name;
+static const Name names[] = {
+    {0x01, "Esc"}, {0x0e, "Backspace"}, {0x0f, "Tab"}, {0x1c, "Enter"}, {0x1d, "Ctrl"}, {0x2a, "Shift"},
+    {0x36, "Right Shift"}, {0x37, "Num *"}, {0x38, "Alt"}, {0x39, "Space"}, {0x3a, "Caps Lock"}, {0x3b, "F1"},
+    {0x3c, "F2"}, {0x3d, "F3"}, {0x3e, "F4"}, {0x3f, "F5"}, {0x40, "F6"}, {0x41, "F7"}, {0x42, "F8"}, {0x43, "F9"},
+    {0x44, "F10"}, {0x45, "Pause"}, {0x46, "Scroll Lock"}, {0x47, "Num 7"}, {0x48, "Num 8"}, {0x49, "Num 9"},
+    {0x4a, "Num -"}, {0x4b, "Num 4"}, {0x4c, "Num 5"}, {0x4d, "Num 6"}, {0x4e, "Num +"}, {0x4f, "Num 1"},
+    {0x50, "Num 2"}, {0x51, "Num 3"}, {0x52, "Num 0"}, {0x53, "Num Del"}, {0x54, "Sys Req"}, {0x57, "F11"},
+    {0x58, "F12"},
+}, names_ext[] = {
+    {0x1c, "Num Enter"}, {0x1d, "Right Ctrl"}, {0x35, "Num /"}, {0x37, "Prnt Scrn"}, {0x38, "Right Alt"},
+    {0x45, "Num Lock"}, {0x46, "Break"}, {0x47, "Home"}, {0x48, "Up"}, {0x49, "Page Up"}, {0x4b, "Left"},
+    {0x4d, "Right"}, {0x4f, "End"}, {0x50, "Down"}, {0x51, "Page Down"}, {0x52, "Insert"}, {0x53, "Delete"},
+    {0x56, "Help"}, {0x5b, "Left Windows"}, {0x5c, "Right Windows"}, {0x5d, "Application"},
+};
+
 static uint8_t down[256];      // by DIK
 static uint8_t vk_down[256], vk_toggle[256];
 
@@ -70,6 +88,20 @@ char input_char_of(uint8_t vk, int shift) {
             return ch;
         }
     return 0;
+}
+
+// The kbd tables put Pause at 0x45 and Num Lock at E0 45; the DIK codes are the other way round
+// (DIK_NUMLOCK 0x45, DIK_PAUSE 0xC5), so those two swap tables.
+void input_key_name(uint8_t dik, char *out, int n) {
+    int ext = (dik & 0x80) != 0;
+    if ((dik & 0x7f) == 0x45) ext = !ext;
+    const Name *t = ext ? names_ext : names;
+    int nt = ext ? (int)(sizeof names_ext / sizeof *names_ext) : (int)(sizeof names / sizeof *names);
+    for (int k = 0; k < nt; k++)
+        if (t[k].sc == (dik & 0x7f)) { snprintf(out, n, "%s", t[k].name); return; }
+    const Key *k = key_of(dik);
+    char ch = k && k->ch > ' ' ? (k->vk >= 'A' && k->vk <= 'Z' ? k->shift_ch : k->ch) : 0;
+    snprintf(out, n, "%.*s", ch ? 1 : 0, &ch);
 }
 
 static void key_event(uint8_t dik, int d) {

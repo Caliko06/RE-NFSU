@@ -265,6 +265,59 @@ static uint32_t IDirectInputDevice8A_GetDeviceInfo(Ctx *c) {
     put_instance(c, p, o->kind);
     return DI_OK;
 }
+// DIDEVICEOBJECTINSTANCEA is 316 bytes (292 for DirectX 3): dwSize, guidType, dwOfs, dwType, dwFlags,
+// tszName[260], then the force-feedback and HID fields. A key is GUID_Key {55728220-D33C-11CF-...},
+// DIDFT_PSHBUTTON | DIDFT_MAKEINSTANCE(DIK), named by GetKeyNameText; dwOfs is its offset in the current format.
+static int put_key(Ctx *c, Obj *o, uint32_t p, uint32_t sz, int dik) {
+    char name[64];
+    input_key_name((uint8_t)dik, name, sizeof name);
+    if (!name[0]) return 0;
+    // GUESS: a key the format does not hold reports its c_dfDIKeyboard offset (the DIK); check against Wine.
+    uint32_t ofs = (uint32_t)dik;
+    for (int k = 0; k < o->nf; k++) if (o->f[k].what == 0x200u + dik) { ofs = o->f[k].ofs; break; }
+    memset(G(p + 4), 0, sz - 4);
+    st(c, p + 4, 0x55728220u, 4); st(c, p + 8, 0xd33c, 2); st(c, p + 10, 0x11cf, 2);
+    memcpy(G(p + 12), guid_tail + 4, 8);
+    st(c, p + 0x14, ofs, 4);
+    st(c, p + 0x18, 0x04u | (uint32_t)dik << 8, 4);
+    memcpy(G(p + 0x20), name, strlen(name) + 1);
+    return 1;
+}
+// GetObjectInfo(pdidoi, dwObj, dwHow): DIPH_BYOFFSET (1) names an offset of the current format (an action's
+// DWORD under an action map), DIPH_BYID (2) a dwType.
+static uint32_t IDirectInputDevice8A_GetObjectInfo(Ctx *c) {
+    SELF(I_DEV);
+    uint32_t p = ARG(1), obj = ARG(2), how = ARG(3), sz = p ? ld(c, p, 4) : 0;
+    if (!p || (sz != 316 && sz != 292)) return DIERR_INVALIDPARAM;
+    if (o->kind != KEYBOARD) { rn_halt(c, "dinput8: GetObjectInfo on the mouse"); return DIERR_INVALIDPARAM; }
+    if (how != 1 && how != 2) { rn_halt(c, "dinput8: GetObjectInfo dwHow %u", how); return DIERR_INVALIDPARAM; }
+    int dik = -1;
+    for (int k = 0; k < o->nf && how == 1; k++)
+        if (o->f[k].what >= 0x200 && o->f[k].ofs == obj) { dik = (int)o->f[k].what - 0x200; break; }
+    if (how == 2 && (obj & 0xc) && ((obj >> 8) & 0xffff) < 256) dik = (obj >> 8) & 0xff;
+    if (dik < 0 || !put_key(c, o, p, sz, dik)) return 0x80070002u;    // DIERR_OBJECTNOTFOUND
+    TR("GetObjectInfo(%s %x) -> key %02x \"%s\"", how == 1 ? "offset" : "id", obj, dik, G(p + 0x20));
+    return DI_OK;
+}
+// EnumObjects(lpCallback, pvRef, dwFlags): each object whose type matches dwFlags (DIDFT_ALL = 0), as
+// callback(lpddoi, pvRef) until it returns DIENUM_STOP. The keyboard's objects are its keys, all buttons.
+static uint32_t IDirectInputDevice8A_EnumObjects(Ctx *c) {
+    SELF(I_DEV);
+    uint32_t cb = ARG(1), ref = ARG(2), flags = ARG(3);
+    if (!cb) return DIERR_INVALIDPARAM;
+    if (o->kind != KEYBOARD) { rn_halt(c, "dinput8: EnumObjects on the mouse"); return DIERR_INVALIDPARAM; }
+    TR("EnumObjects(flags %x)", flags);
+    if ((flags & 0xff) && !(flags & 0x0c)) return DI_OK;          // asks for no buttons
+    uint32_t inst = guest_alloc(316);
+    st(c, inst, 316, 4);
+    for (int dik = 0; dik < 256; dik++) {
+        if (!put_key(c, o, inst, 316, dik)) continue;
+        uint32_t args[2] = {inst, ref};
+        if (!call_guest(c, cb, 2, args) || c->halt) break;
+    }
+    return DI_OK;
+}
+
 // EnumDevicesBySemantics(ptszUserName, lpdiActionFormat, lpCallback, pvRef, dwFlags): the attached
 // devices are the keyboard and the mouse. Each comes as a new device object that is released after
 // the callback (the application AddRefs it to keep it). Flags: DIEDBS_NEWDEVICE (no saved user map),
@@ -296,8 +349,9 @@ static uint32_t IDirectInput8A_EnumDevicesBySemantics(Ctx *c) {
 
 // DIACTIONFORMATA: dwSize, dwActionSize, dwDataSize, dwNumActions, rgoAction, guidActionMap, dwGenre,
 // dwBufferSize, ... DIACTIONA (40 bytes): uAppData, dwSemantic, dwFlags, name, guidInstance, dwObjID, dwHow.
-// The keyboard maps the actions named with DIKEYBOARD_ semantics (0x810004xx, xx = DIK code) to that key:
-// object DIDFT_PSHBUTTON | DIDFT_MAKEINSTANCE(DIK). Genre semantics are not mapped to the keyboard.
+// BuildActionMap and SetActionMap do what Wine's dinput does (dlls/dinput/device.c). The keyboard maps
+// DIKEYBOARD_ semantics (0x810004xx, xx = DIK) to that key, object DIDFT_PSHBUTTON | DIDFT_MAKEINSTANCE(DIK);
+// genre semantics are not mapped to the keyboard.
 #define DIA_APPMAPPED 0x2u
 #define DIA_APPNOMAP 0x4u
 #define DIAH_APPREQUESTED 0x2u
@@ -305,54 +359,153 @@ static uint32_t IDirectInput8A_EnumDevicesBySemantics(Ctx *c) {
 static int is_this_device(Ctx *c, uint32_t g, int kind) {
     return ld(c, g, 4) == (kind == KEYBOARD ? 0x6f1d2b61u : 0x6f1d2b60u) && !memcmp(G(g + 4), guid_tail, 12);
 }
+static void set_guid(Ctx *c, uint32_t g, int kind) {
+    if (kind < 0) { memset(G(g), 0, 16); return; }                 // GUID_NULL
+    st(c, g, kind == KEYBOARD ? 0x6f1d2b61u : 0x6f1d2b60u, 4);
+    memcpy(G(g + 4), guid_tail, 12);
+}
+// The key a keyboard object id names, or -1.
+static int key_of_obj(uint32_t obj) {
+    uint32_t dik = (obj >> 8) & 0xffff;
+    char name[64];
+    if ((obj & 0xffu) != 0x04u || dik > 255) return -1;
+    input_key_name((uint8_t)dik, name, sizeof name);
+    return name[0] ? (int)dik : -1;
+}
+
+// The user's saved maps: SetActionMap saves "dwSemantic = dwObjID" for each action on the device, per action
+// map guid (Wine: HKCU\Software\Wine\DirectInput\Mappings\<user>\<device>\<guid>); BuildActionMap loads them.
+// One user and one keyboard here, kept in save/ as lines "<guid hex> <semantic> <object id>".
+#define USER_MAPS "DirectInput user maps.txt"
+typedef struct { uint8_t guid[16]; uint32_t sem, obj; } Saved;
+static Saved saved[1024];
+static int nsaved = -1;
+static void load_saved(void) {
+    if (nsaved >= 0) return;
+    nsaved = 0;
+    static char text[64 << 10];
+    int n = layer_load(USER_MAPS, (uint8_t *)text, sizeof text - 1);
+    if (n <= 0) return;
+    text[n] = 0;
+    for (char *l = text; *l && nsaved < 1024;) {
+        Saved s;
+        char hex[33];
+        if (sscanf(l, "%32s %x %x", hex, &s.sem, &s.obj) == 3 && strlen(hex) == 32) {
+            for (int k = 0; k < 16; k++) { unsigned b; sscanf(hex + 2 * k, "%2x", &b); s.guid[k] = (uint8_t)b; }
+            saved[nsaved++] = s;
+        }
+        char *e = strchr(l, '\n');
+        if (!e) break;
+        l = e + 1;
+    }
+}
+static void save_map(Ctx *c, uint32_t af, int kind) {
+    load_saved();
+    const uint8_t *g = (const uint8_t *)G(af + 20);
+    int k = 0;
+    for (int j = 0; j < nsaved; j++) if (memcmp(saved[j].guid, g, 16)) saved[k++] = saved[j];
+    nsaved = k;
+    for (uint32_t i = 0, n = ld(c, af + 12, 4), a = ld(c, af + 16, 4); i < n && nsaved < 1024; i++, a += 40)
+        if (is_this_device(c, a + 16, kind) && ld(c, a + 36, 4)) {
+            memcpy(saved[nsaved].guid, g, 16);
+            saved[nsaved].sem = ld(c, a + 4, 4);
+            saved[nsaved++].obj = ld(c, a + 32, 4);
+        }
+    static char text[64 << 10];
+    int len = 0;
+    for (int j = 0; j < nsaved && len < (int)sizeof text - 80; j++) {
+        for (int b = 0; b < 16; b++) len += snprintf(text + len, 3, "%02x", saved[j].guid[b]);
+        len += snprintf(text + len, 40, " %x %x\n", saved[j].sem, saved[j].obj);
+    }
+    if (layer_store(USER_MAPS, (const uint8_t *)text, len)) rn_log("dinput8: cannot write save/" USER_MAPS);
+}
+
 static uint32_t IDirectInputDevice8A_BuildActionMap(Ctx *c) {
     SELF(I_DEV);
     uint32_t af = ARG(1), flags = ARG(3);
     if (!af || ld(c, af, 4) != 328 || ld(c, af + 4, 4) != 40) return DIERR_INVALIDPARAM;
+    if (flags != 0 && flags != 1 && flags != 2 && flags != 4) return DIERR_INVALIDPARAM;
+    uint32_t n = ld(c, af + 12, 4), acts = ld(c, af + 16, 4);
+    if (ld(c, af + 8, 4) != 4 * n) return DIERR_INVALIDPARAM;
     if (o->kind != KEYBOARD) { rn_halt(c, "dinput8: BuildActionMap on the mouse"); return DIERR_INVALIDPARAM; }
-    uint32_t n = ld(c, af + 12, 4), acts = ld(c, af + 16, 4), mapped = 0;
+    // Reset: app-mapped actions keep their object; DIA_APPNOMAP holds only for genre semantics.
     for (uint32_t k = 0; k < n; k++) {
-        uint32_t a = acts + 40 * k, sem = ld(c, a + 4, 4), fl = ld(c, a + 8, 4), how = ld(c, a + 36, 4);
-        if (fl & DIA_APPNOMAP) continue;
-        if (fl & DIA_APPMAPPED) {
-            if (is_this_device(c, a + 16, o->kind)) { st(c, a + 36, DIAH_APPREQUESTED, 4); mapped++; }
-            continue;
-        }
-        if (how && (flags & 1)) continue;                   // DIDBAM_PRESERVE keeps existing mappings
-        if ((sem & 0xffffff00u) != 0x81000400u) continue;
-        st(c, a + 16, 0x6f1d2b61u, 4);
-        memcpy(G(a + 20), guid_tail, 12);
-        st(c, a + 32, 0x04u | (sem & 0xff) << 8, 4);
-        st(c, a + 36, DIAH_DEFAULT, 4);
-        mapped++;
+        uint32_t a = acts + 40 * k, sem = ld(c, a + 4, 4), fl = ld(c, a + 8, 4);
+        if (!sem) return DIERR_INVALIDPARAM;
+        if (flags == 1 && ld(c, a + 16, 4) | ld(c, a + 20, 4) | ld(c, a + 24, 4) | ld(c, a + 28, 4) &&
+            !is_this_device(c, a + 16, o->kind)) continue;          // DIDBAM_PRESERVE: another device's
+        if (fl & DIA_APPMAPPED) { st(c, a + 36, DIAH_APPREQUESTED, 4); continue; }
+        if ((sem & 0xf0000000u) == 0x80000000u) st(c, a + 8, fl &= ~DIA_APPNOMAP, 4);
+        if (!(fl & DIA_APPNOMAP)) set_guid(c, a + 16, -1);
+        st(c, a + 36, 0, 4);
     }
-    TR("BuildActionMap(flags %x): %u of %u actions on the keyboard", flags, mapped, n);
-    return mapped ? DI_OK : 1;                               // DI_NOEFFECT
+    int from_user = 0;
+    if (!(flags & 4)) {                                         // not DIDBAM_HWDEFAULTS: the user's map first
+        load_saved();
+        for (uint32_t k = 0; k < n; k++) {
+            uint32_t a = acts + 40 * k, sem = ld(c, a + 4, 4);
+            if (ld(c, a + 36, 4)) continue;
+            for (int j = 0; j < nsaved; j++)
+                if (saved[j].sem == sem && !memcmp(saved[j].guid, G(af + 20), 16)) {
+                    st(c, a + 32, saved[j].obj, 4);
+                    set_guid(c, a + 16, o->kind);
+                    st(c, a + 36, DIAH_DEFAULT, 4);
+                    from_user++;
+                    break;
+                }
+        }
+    }
+    // Each key serves one action: the ones already mapped, then priority 1 semantics, then priority 2.
+    uint8_t used[256] = {0};
+    for (uint32_t k = 0; k < n; k++) {
+        uint32_t a = acts + 40 * k;
+        int dik = key_of_obj(ld(c, a + 32, 4));
+        if (ld(c, a + 36, 4) && dik >= 0 && is_this_device(c, a + 16, o->kind)) used[dik] = 1;
+    }
+    uint32_t mapped = 0;
+    for (int pri = 0; pri < 2; pri++)
+        for (uint32_t k = 0; k < n; k++) {
+            uint32_t a = acts + 40 * k, sem = ld(c, a + 4, 4);
+            if (ld(c, a + 36, 4) || (ld(c, a + 8, 4) & DIA_APPNOMAP) || !(sem & 0x4000) != !pri) continue;
+            int dik = (sem & 0xff000700u) == 0x81000400u ? key_of_obj(0x04u | (sem & 0xff) << 8) : -1;
+            if (dik < 0 || used[dik]) continue;
+            st(c, a + 32, 0x04u | (uint32_t)dik << 8, 4);
+            set_guid(c, a + 16, o->kind);
+            st(c, a + 36, DIAH_DEFAULT, 4);
+            used[dik] = 1;
+            mapped++;
+        }
+    int any = 0;
+    for (int k = 0; k < 256; k++) any |= used[k];
+    TR("BuildActionMap(flags %x): %u of %u actions from the user map, %u by semantic", flags, from_user, n, mapped);
+    return any ? DI_OK : 1;                                     // DI_NOEFFECT
 }
-// SetActionMap: the device now reports the action format's data (dwDataSize) and buffers dwBufferSize events.
+// SetActionMap(lpdiaf, lptszUserName, dwFlags): the device now reports one DWORD per action, at 4 * its index,
+// for each action on this device (not DIA_APPNOMAP), and buffers dwBufferSize events. The map is saved.
 static uint32_t IDirectInputDevice8A_SetActionMap(Ctx *c) {
     SELF(I_DEV);
-    uint32_t af = ARG(1);
+    uint32_t af = ARG(1), flags = ARG(3);
     if (!af || ld(c, af, 4) != 328) return DIERR_INVALIDPARAM;
+    if (flags != 0 && flags != 1 && flags != 2) return DIERR_INVALIDPARAM;
     if (o->acquired) return 0x80070005u;                    // DIERR_ACQUIRED
+    if (o->kind != KEYBOARD) { rn_halt(c, "dinput8: action map on the mouse"); return DIERR_INVALIDPARAM; }
     o->data_size = ld(c, af + 8, 4);
     o->buffer = ld(c, af + 40, 4);
     o->format_set = 1;
     o->actions = 1;
     o->nf = 0;
-    // Each action mapped to this device reports at 4 * its index in the action array, so the data
-    // (dwDataSize, at least 4 * dwNumActions) holds one DWORD per action. GUESS: check dwOfs against Wine.
     for (uint32_t k = 0, n = ld(c, af + 12, 4), a = ld(c, af + 16, 4); k < n; k++, a += 40) {
-        uint32_t obj = ld(c, a + 32, 4);
-        if (!ld(c, a + 36, 4) || !is_this_device(c, a + 16, o->kind) || o->nf == MAXF) continue;
-        if (o->kind != KEYBOARD) { rn_halt(c, "dinput8: action map on the mouse"); return DIERR_INVALIDPARAM; }
-        o->f[o->nf++] = (Field){4 * k, 0x200 + ((obj >> 8) & 0xff), 4, ld(c, a, 4)};
+        int dik = key_of_obj(ld(c, a + 32, 4));
+        if ((ld(c, a + 8, 4) & DIA_APPNOMAP) || !is_this_device(c, a + 16, o->kind) || dik < 0 || o->nf == MAXF) continue;
+        o->f[o->nf++] = (Field){4 * k, 0x200u + (uint32_t)dik, 4, ld(c, a, 4)};
     }
-    TR("SetActionMap: %u bytes of data, buffer %u", o->data_size, o->buffer);
+    save_map(c, af, o->kind);
+    TR("SetActionMap(flags %x): %u bytes of data, %d keys, buffer %u", flags, o->data_size, o->nf, o->buffer);
     for (uint32_t k = 0, n = ld(c, af + 12, 4), a = ld(c, af + 16, 4); k < n && rn_trace(); k++, a += 40)
         TR("  action %u: app %08x sem %08x flags %x obj %08x how %x name %s", k, ld(c, a, 4), ld(c, a + 4, 4), ld(c, a + 8, 4),
            ld(c, a + 32, 4), ld(c, a + 36, 4), ld(c, a + 12, 4) > 0x10000 ? G(ld(c, a + 12, 4)) : "");
-    return DI_OK;
+    if (flags == 2) return 0x0000000bu;                     // DI_SETTINGSNOTSAVED, as Wine answers DIDSAM_FORCESAVE
+    return o->nf ? DI_OK : 1;                               // DI_NOEFFECT
 }
 
 // EnumDevices(dwDevType, lpCallback, pvRef, dwFlags): mouse then keyboard, the order Windows lists them.
@@ -428,6 +581,6 @@ const Api dinput8_apis[] = {
     {"dinput8.dll", "IDirectInputDevice8A::Release", 1, Release_},
     DI(CreateDevice, 4), DI(EnumDevicesBySemantics, 6), DI(EnumDevices, 5), DEVM(GetDeviceInfo, 2), DEVM(BuildActionMap, 4), DEVM(SetActionMap, 4), DEVM(Poll, 1),
     DEVM(SetDataFormat, 2), DEVM(SetCooperativeLevel, 3), DEVM(Acquire, 1), DEVM(Unacquire, 1),
-    DEVM(GetDeviceState, 3), DEVM(GetDeviceData, 5), DEVM(SetProperty, 3),
+    DEVM(GetDeviceState, 3), DEVM(GetDeviceData, 5), DEVM(SetProperty, 3), DEVM(GetObjectInfo, 4), DEVM(EnumObjects, 4),
 };
 const int dinput8_api_count = sizeof dinput8_apis / sizeof dinput8_apis[0];

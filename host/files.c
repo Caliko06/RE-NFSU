@@ -447,3 +447,25 @@ int gf_find(const char *gpath, char *name, size_t n, int *is_dir, uint64_t *size
     return -1;
 #endif
 }
+
+// State the layer keeps for the PC, not the game: save/<name> (DirectInput user maps). The whole file in
+// dst (at most n bytes): its length, -1 missing. layer_store replaces it.
+int layer_load(const char *name, uint8_t *dst, int n) {
+    char p[600];
+    snprintf(p, sizeof p, SAVE_DIR "/%s", name);
+    int id = gf_open(p);
+    if (id < 0) return -1;
+    int64_t r = gf_read(id, 0, dst, gf_size(id) < (uint64_t)n ? (uint32_t)gf_size(id) : (uint32_t)n);
+    gf_close(id);
+    return (int)r;
+}
+int layer_store(const char *name, const uint8_t *src, int n) {
+    char p[600];
+    int existed;
+    snprintf(p, sizeof p, SAVE_DIR "/%s", name);
+    int id = gf_create(p, 2, &existed);                          // CREATE_ALWAYS
+    if (id < 0) return -1;
+    int r = gf_write(id, 0, src, (uint32_t)n) == n ? 0 : -1;
+    gf_close(id);
+    return r;
+}

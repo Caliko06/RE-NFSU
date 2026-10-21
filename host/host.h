@@ -75,6 +75,8 @@ int gf_flush(int id);
 int gf_mkdir(const char *gpath);                                // 0 made, 1 exists, -1 no parent, -2 outside
 int gf_delete(const char *gpath);                               // 0, -1 missing, -2 outside the save folder
 int gf_find(const char *gpath, char *name, size_t n, int *is_dir, uint64_t *size);
+int layer_load(const char *name, uint8_t *dst, int n);         // save/<name>: length, -1 missing
+int layer_store(const char *name, const uint8_t *src, int n);
 void set_error(Ctx *c, uint32_t e);
 // Keyboard and mouse (host/input.c): input_poll hands new events to dinput8_* and user32_key.
 void input_poll(void);
@@ -83,6 +85,7 @@ int input_key_down(uint8_t dik);
 int input_shift(void);
 int input_alt(void);
 char input_char_of(uint8_t vk, int shift);
+void input_key_name(uint8_t dik, char *out, int n);                 // GetKeyNameText, US layout
 void dinput8_key(uint8_t dik, int down);
 void dinput8_button(int b, int down);
 void dinput8_motion(int32_t dx, int32_t dy, int32_t dz);
