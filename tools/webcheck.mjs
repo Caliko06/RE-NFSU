@@ -2,15 +2,22 @@
 // and saves a screenshot of the page.
 // Usage: node tools/webcheck.mjs [url] [seconds] [screenshot.png] [keys]
 // keys: "20:Enter,23:ArrowDown" = at that second, a tap of that KeyboardEvent.code on the canvas.
+// node tools/webcheck.mjs --route: the regression route; exit 0 = PASS. It grows with each milestone met.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const url = process.argv[2] || 'http://127.0.0.1:5180/';
-const secs = Number(process.argv[3] || 120);
-const shot = process.argv[4] || 'build/webcheck.png';
-const keys = (process.argv[5] || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, code]) => ({ t: +t, code }));
+// Title -> profile "asas" -> Quick Race, Olympic Square. PASS: no STOP, the race starts (the device Reset to
+// 640x480) and runs `hold` more seconds.
+const ROUTE = { keys: '20:Enter,23:Enter,26:ArrowRight,29:Enter,32:Enter,35:Enter,38:Enter,44:Enter,50:Enter',
+  marker: /d3d9 Reset: 640x480/, hold: 20, secs: 150, shot: 'build/route.png' };
+const route = process.argv[2] === '--route';
+const arg = route ? [] : process.argv.slice(2);
+const url = arg[0] || 'http://127.0.0.1:5180/';
+const secs = route ? ROUTE.secs : Number(arg[1] || 120);
+const shot = route ? ROUTE.shot : arg[2] || 'build/webcheck.png';
+const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, code]) => ({ t: +t, code }));
 const port = 9333;
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
   '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'rn-'))}`,
@@ -31,7 +38,7 @@ const send = (method, params = {}) => new Promise(r => { pending.set(++id, r); w
 await send('Runtime.enable');
 await send('Page.navigate', { url });
 const t0 = Date.now();
-let text = '';
+let text = '', seen = 0;
 while (Date.now() - t0 < secs * 1000) {
   await sleep(1000);
   for (const k of keys.filter(k => !k.done && Date.now() - t0 >= k.t * 1000)) {
@@ -44,6 +51,8 @@ while (Date.now() - t0 < secs * 1000) {
   const r = await send('Runtime.evaluate', { expression: "document.getElementById('status')?.textContent + '\\n' + document.getElementById('log')?.innerText" });
   text = r?.result?.value || '';
   if (/STOP|Falta COOP/.test(text)) break;
+  if (route && !seen && ROUTE.marker.test(text)) seen = Date.now();
+  if (seen && Date.now() - seen >= ROUTE.hold * 1000) break;
 }
 await sleep(500);   // let the last frame reach the canvas
 const png = await send('Page.captureScreenshot', { format: 'png' });
@@ -52,4 +61,9 @@ console.log(`[${((Date.now() - t0) / 1000).toFixed(1)} s]`);
 console.log(text);
 if (errors.length) console.log('page errors:\n' + errors.join('\n'));
 chrome.kill('SIGKILL');   // headless Chrome can ignore SIGTERM and keep the game (and its sound) running
+if (route) {
+  const why = /STOP/.test(text) ? 'a STOP' : !seen ? `no ${ROUTE.marker} in ${secs} s` : Date.now() - seen < ROUTE.hold * 1000 ? 'ended early' : '';
+  console.log(why ? `ROUTE FAIL: ${why}` : `ROUTE PASS: race started at ${((seen - t0) / 1000).toFixed(0)} s and ran ${ROUTE.hold} s`);
+  process.exit(why ? 1 : 0);
+}
 process.exit(0);
