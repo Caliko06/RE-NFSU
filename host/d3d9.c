@@ -984,6 +984,17 @@ static void upload_level(Ctx *c, Obj *s) {
     gpu_cmd(GPU_TEXDATA, (int)(4 + n), w);
     free(w);
     flush_big();
+    if (level == 0 && is_dxt(s->fmt)) {
+        // FNV-1a 64 of the level-0 blocks: the key of tools/remaster/index.py.
+        const uint8_t *p = (const uint8_t *)G(lock_mem(s));
+        uint64_t h = 0xcbf29ce484222325ull;
+        for (uint32_t k = 0, m = s->pitch * ((s->h + 3) / 4); k < m; k++) h = (h ^ p[k]) * 0x100000001b3ull;
+        static int log = -1;
+        if (log < 0) log = getenv("RN_TEXHASH") != NULL;
+        if (log) rn_log("d3d9 texhash %016llx %ux%u fmt %08x", (unsigned long long)h, s->w, s->h, s->fmt);
+        uint32_t k3[3] = {s->container, (uint32_t)h, (uint32_t)(h >> 32)};
+        gpu_cmd(GPU_TEXKEY, 3, k3);
+    }
 }
 static uint32_t unlock_rect(Ctx *c, Obj *s) {
     if (!s->locked) return D3DERR_INVALIDCALL;

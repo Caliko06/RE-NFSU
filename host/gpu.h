@@ -17,6 +17,7 @@ enum {
     GPU_DECL = 6,       // id, element count n, n D3DVERTEXELEMENT9 (2 words each)
     GPU_TEXTURE = 7,    // id, width, height, levels
     GPU_TEXDATA = 8,    // id, level, width, height, RGBA8 texels (one word each, bytes R G B A)
+    GPU_TEXKEY = 9,     // id, key low word, key high word: FNV-1a 64 of a DXT level 0 (web/gpu.js remaster pack)
 };
 
 // GPU_DRAW header (word offsets). Render states keep their D3D9 values.

@@ -3,7 +3,7 @@
 // before the one it submits. Shaders arrive as WGSL (host/sm1.c); textures as RGBA8.
 'use strict';
 const GPU_TARGET = 1, GPU_CLEAR = 2, GPU_PRESENT = 3, GPU_DRAW = 4, GPU_SHADER = 5, GPU_DECL = 6, GPU_TEXTURE = 7,
-  GPU_TEXDATA = 8;
+  GPU_TEXDATA = 8, GPU_TEXKEY = 9;
 const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_DECL = 6, D_RT = 7, D_DS = 8, D_VP = 9,
   D_SC = 15, D_ZEN = 19, D_ZWRITE = 20, D_ZFUNC = 21, D_CULL = 22, D_BLEND = 23, D_SRCB = 24, D_DSTB = 25, D_BOP = 26,
   D_SEPA = 27, D_SRCBA = 28, D_DSTBA = 29, D_BOPA = 30, D_BFACTOR = 31, D_CWRITE = 32, D_AFUNC = 33, D_AREF = 34,
@@ -33,6 +33,46 @@ async function startGpu(M, canvas, report) {
   const shaders = new Map(), decls = new Map();
   let canvasSize = '';
   const fail = msg => { throw new Error('gpu.js: ' + msg); };
+
+  // Remaster pack (web/remaster, tools/remaster/index.py): FNV-1a 64 of a DXT level 0 -> an upscaled PNG.
+  // A texture keeps its original; while its contents match the index it is drawn with the PNG (own mip chain).
+  // ?remaster=0 turns it off. No index file = off.
+  const pack = new Map(), hd = new Map();   // key -> png name; png name -> {view} once loaded, null while loading
+  let packed = 0;
+  if (new URLSearchParams(location.search).get('remaster') !== '0') {
+    try {
+      const r = await fetch('remaster/index.tsv');
+      if (r.ok) for (const l of (await r.text()).split('\n')) { const f = l.split('\t'); if (f[1]) pack.set(f[0], f[1]); }
+    } catch {}
+    if (pack.size) report(`gpu.js: remaster pack ${pack.size} textures`);
+  }
+  async function loadHd(name) {
+    const blob = await (await fetch(`remaster/png/${name}.png`)).blob();
+    const opt = { premultiplyAlpha: 'none', colorSpaceConversion: 'none' };
+    const base = await createImageBitmap(blob, opt), W = base.width, H = base.height;
+    const levels = Math.floor(Math.log2(Math.max(W, H))) + 1;
+    const tex = device.createTexture({ size: [W, H], mipLevelCount: levels, format: 'rgba8unorm',
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
+    for (let l = 0; l < levels; l++) {
+      const w = Math.max(1, W >> l), h = Math.max(1, H >> l);
+      const bmp = l ? await createImageBitmap(blob, { ...opt, resizeWidth: w, resizeHeight: h, resizeQuality: 'high' }) : base;
+      device.queue.copyExternalImageToTexture({ source: bmp }, { texture: tex, mipLevel: l }, [w, h]);
+    }
+    return { view: tex.createView() };
+  }
+  function useHd(t, key) {
+    const name = pack.get(key);
+    if (!name) { t.view = t.own; return; }
+    const h = hd.get(name);
+    if (h) { t.view = h.view; return; }
+    t.view = t.own;
+    if (h === null) return;
+    hd.set(name, null);
+    loadHd(name).then(v => {
+      hd.set(name, v); packed++;
+      for (const x of res.values()) if (x.key && pack.get(x.key) === name) x.view = v.view;
+    }, e => report(`gpu.js: remaster ${name}: ${e.message}`));
+  }
 
   // Clear of a rectangle: a full-screen triangle under a scissor, writing the color, depth and
   // stencil the D3DCLEAR flags ask for. Uniforms come from a ring with 256-byte steps.
@@ -238,7 +278,11 @@ async function startGpu(M, canvas, report) {
         res.get(w[a])?.tex.destroy();
         const tex = device.createTexture({ size: [w[a + 1], w[a + 2]], mipLevelCount: w[a + 3], format: 'rgba8unorm',
           usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
-        res.set(w[a], { tex, view: tex.createView(), w: w[a + 1], h: w[a + 2], depth: false });
+        const own = tex.createView();
+        res.set(w[a], { tex, own, view: own, w: w[a + 1], h: w[a + 2], depth: false });
+      } else if (op === GPU_TEXKEY) {
+        const t = res.get(w[a]);
+        if (t && pack.size) { t.key = (w[a + 2] >>> 0).toString(16).padStart(8, '0') + (w[a + 1] >>> 0).toString(16).padStart(8, '0'); useHd(t, t.key); }
       } else if (op === GPU_TEXDATA) {
         // queue.writeTexture runs before this frame's commands: a texture changed after a draw of the
         // same frame that used it would show its new texels in that draw (not seen yet).
@@ -328,7 +372,8 @@ async function startGpu(M, canvas, report) {
         const s = run(h[box + 2 + (k & 1)], h[box + 4 + (k & 1)]);
         frames++;
         if (s.present) presents++;
-        if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}`);
+        if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +
+          (pack.size ? `, remaster ${packed}` : ''));
         Atomics.store(h, box + 1, k);
         Atomics.notify(M.HEAP32, box + 1);
       }

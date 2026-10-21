@@ -437,6 +437,8 @@ void gpu_run(const uint32_t *w, uint32_t n) {
                 t->lv[a[1]] = malloc(4u * a[2] * a[3]);
                 memcpy(t->lv[a[1]], a + 4, 4u * a[2] * a[3]);
             }
+        } else if (op == GPU_TEXKEY) {
+            // the remaster pack is web only (web/gpu.js)
         } else if (op == GPU_DRAW) {
             run_draw(a);
             draws++;
