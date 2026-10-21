@@ -29,9 +29,12 @@ One session on main. Each milestone has one gate: the run that proves it.
   which fills D3DPRESENT_PARAMETERS at 0x71a96c/0x71a970. Table: 640x480, 800x600, 1024x768, 1280x960, 1280x1024.
   Default 800x600 (0x408782). Enabled only if [0x71b7b0+i*4] != 0 (the layer's mode list). No patch needed for 1280x960.
   Gate: CreateDevice log shows the new size, the title and a race fill the window sharp.
-- M8.3 True 16:9 (build/w169.png, 1600x900: the 3D view and the HUD are stretched 4:3; no 4/3 float in the exe,
-  so the aspect comes from the width/height globals 0x701034/0x701038; readers: 0x40a92d, 0x40a938, 0x40aa9a, 0x40cb81, 0x42f0a8): aspect ratio of the 3D view and the 2D screens (not stretched 4:3). Each change is a `PATCH:` line.
-  Gate: Quick Race capture in 16:9, no stretch.
+- M8.3 3D aspect: probably already right. 0x42f020 builds the projection with H/W from 0x701038/0x701034 (REA);
+  the 16:9 captures show normal car proportions. Horizontal FOV is fixed (less sky and road at 16:9). Confirm once.
+- M8.3b 2D stretched (OWNER captures 2026-10-20, ~2.2:1 window): HUD, speedometer, menus and loading art stretch
+  horizontally. RN_VP=1 shows one viewport per size only: everything is drawn in the full back buffer, so the 2D
+  layout is computed in code or in vertex shaders from a 4:3 space, not through a viewport.
+  Next measurement: FVF of the 2D draws (XYZRHW pixels or shader constants), then find the writer of that scale.
 - M8.4 HUD and menus placed for 16:9. Gate: capture of menu, HUD and garage.
 - M8.5 Route grows to 16:9: `node tools/webcheck.mjs --route` PASS at 1920x1080.
 

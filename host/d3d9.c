@@ -780,6 +780,16 @@ static uint32_t IDirect3DDevice9_SetViewport(Ctx *c) {
     Obj *rt = obj_k(dev.rt[0]);
     Viewport v = {ld(c, p, 4), ld(c, p + 4, 4), ld(c, p + 8, 4), ld(c, p + 12, 4), ldf(c, p + 16), ldf(c, p + 20)};
     TR("SetViewport(%u, %u, %ux%u, %g..%g)", v.x, v.y, v.w, v.h, (double)v.zmin, (double)v.zmax);
+    {   // RN_VP=1: each new viewport once (bounded), to see how the game lays out 3D and 2D
+        static int on = -1, seen, n;
+        static uint32_t keys[64][4];
+        if (on < 0) on = getenv("RN_VP") != NULL;
+        uint32_t k[4] = {v.x, v.y, v.w, v.h};
+        if (on && n < 64) {
+            for (seen = 0; seen < n && memcmp(keys[seen], k, sizeof k); seen++) {}
+            if (seen == n) { memcpy(keys[n++], k, sizeof k); rn_log("d3d9 viewport %u,%u %ux%u (rt %ux%u)", v.x, v.y, v.w, v.h, rt->w, rt->h); }
+        }
+    }
     if (!v.w || !v.h || v.x + v.w > rt->w || v.y + v.h > rt->h) return D3DERR_INVALIDCALL;
     dev.vp = v;
     return D3D_OK;
