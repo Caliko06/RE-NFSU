@@ -36,8 +36,9 @@ One session on main. Each milestone has one gate: the run that proves it.
   PATCH 0x40bf09.. (8 operands) scales x by S = (4/3)/(W/H): HUD and menus keep their shape, centred in 4:3.
   PATCH 0x408a24: the first CreateDevice uses the screen size too (it was 800x600), so the front end is 16:9.
   Captures: build/hud169.png, build/menu169.png. Route PASS.
-- M8.4 HUD and menus placed for 16:9: corners anchored to the screen edges, full-screen art (title, loading) covering
-  16:9 instead of 4:3 bars. Needs where the game places each element (quad positions). Gate: capture of menu, HUD, garage.
+- M8.4 HUD and menus placed for 16:9 (closed UNKNOWN 2026-10-20, REA Ghidra+Hopper; build/evidence/1_hud.md).
+  FEng places every element by a matrix in 640x480 relative to the centre (0x4f1810, translate 320,240); no anchor field.
+  Corner anchors and full-screen art cover (stretch or crop) are new rules: OWNER decision before any PATCH.
 - M8.5 Route grows to 16:9: `node tools/webcheck.mjs --route` PASS at 1920x1080.
 
 ## M9 Play, ends at 5180
