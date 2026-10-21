@@ -40,15 +40,16 @@ void gil_acquire(void) {
 }
 // Windows preempts a thread when its quantum (about 20 ms on XP) ends. A guest that polls for work
 // done by another thread relies on it. The GIL holder gives its turn away at the next API call
-// once it has run a quantum while another thread waits for the GIL.
+// once it has run a quantum (since it got the GIL) while another thread waits for the GIL.
+// This runs at every API call (thousands per frame): with no waiter it reads no clock (a clock read
+// is a call out to JS on the web), and with one it reads the clock every 16th call.
 #define QUANTUM_US 20000
 void gil_slice(void) {
-    if (now_us() - slice_start < QUANTUM_US) return;
-    pthread_mutex_lock(&gm);
-    int waiting = next_ticket != serving + 1;
-    pthread_mutex_unlock(&gm);
-    if (waiting) { gil_release(); gil_acquire(); }
-    else slice_start = now_us();
+    static unsigned calls;
+    if (__atomic_load_n(&next_ticket, __ATOMIC_RELAXED) == __atomic_load_n(&serving, __ATOMIC_RELAXED) + 1) return;
+    if (++calls & 15 || now_us() - slice_start < QUANTUM_US) return;
+    gil_release();
+    gil_acquire();
 }
 static void count_hold(void) {
     double held = (double)(now_us() - hold_start) / 1000, *m = is_main ? &rn_telem.hold_main_max_ms : &rn_telem.hold_other_max_ms;
@@ -127,26 +128,32 @@ static void *run(void *arg) {
     return NULL;
 }
 // winmm timer: TIME_PERIODIC (1) or one shot; TIME_CALLBACK_EVENT_SET (0x10) or a TIMECALLBACK.
+// A one-shot or killed timer's thread does not end: it parks until a new timeSetEvent re-arms it
+// (reuse_timer). Games re-arm one-shot timers from inside the callback, every few milliseconds, and a
+// thread start on the web waits for the page's thread, with the GIL held (measured: 16% of the main
+// thread's race time waiting for that GIL).
 static void *run_timer(void *arg) {
     Thread *t = arg;
-    uint64_t next = now_us();
     gil_acquire();
     Ctx *c = &t->ctx;
-    do {
-        next += (uint64_t)t->timer_ms * 1000;
-        while (!t->killed && now_us() < next) wait_change(next);
-        if (t->killed) break;
-        if (t->timer_flags & 0x10) {
-            Handle *h = get_handle(t->start);
-            if (h && h->kind == H_EVENT) { h->signaled = 1; notify(); }
-        } else {
-            uint32_t args[5] = {t->timer_id, 0, t->timer_user, 0, 0};
-            call_guest(c, t->start, 5, args);
-            if (c->halt) rn_stop(c);
-        }
-    } while (t->timer_flags & 1);
-    t->finished = 1;
-    gil_release();
+    for (;;) {
+        uint64_t next = now_us();
+        do {
+            next += (uint64_t)t->timer_ms * 1000;
+            while (!t->killed && now_us() < next) wait_change(next);
+            if (t->killed) break;
+            if (t->timer_flags & 0x10) {
+                Handle *h = get_handle(t->start);
+                if (h && h->kind == H_EVENT) { h->signaled = 1; notify(); }
+            } else {
+                uint32_t args[5] = {t->timer_id, 0, t->timer_user, 0, 0};
+                call_guest(c, t->start, 5, args);
+                if (c->halt) rn_stop(c);
+            }
+        } while (t->timer_flags & 1);
+        t->finished = 1;
+        while (t->finished) wait_change(0);
+    }
     return NULL;
 }
 static void start_fn(Thread *t, void *(*fn)(void *)) {
@@ -180,13 +187,11 @@ static Thread *new_thread(Ctx *c, uint32_t size) {
     threads[nthreads++] = t;
     return t;
 }
-// A one-shot timer's thread ends after its callback. A new timer reuses such a thread (its stack and
-// TEB too): games re-arm one-shot timers from inside the callback, every few milliseconds.
+// A new timer takes a parked timer thread (its stack and TEB too); timeSetEvent_ wakes it.
 static Thread *reuse_timer(void) {
     for (int k = 0; k < nthreads; k++) {
         Thread *t = threads[k];
         if (!t->timer_id || !t->finished) continue;
-        pthread_join(t->pt, NULL);
         memset(t->ctx.r, 0, sizeof t->ctx.r);
         t->ctx.halt = 0; t->ctx.cf = t->ctx.zf = t->ctx.sf = t->ctx.of = t->ctx.pf = t->ctx.df = t->ctx.af = 0;
         finit(&t->ctx);
@@ -235,13 +240,14 @@ static uint32_t GetCurrentThreadId_(Ctx *c) { return tid(c); }
 static uint32_t timeSetEvent_(Ctx *c) {
     uint32_t ms = ARG(0), cb = ARG(2), user = ARG(3), flags = ARG(4);
     if (flags & ~0x111u) { rn_halt(c, "timeSetEvent flags %08x", flags); return 0; }
-    Thread *t = reuse_timer();
+    Thread *t = reuse_timer(), *parked = t;
     if (!t) t = new_thread(c, 0);
     if (!t) return 0;
     t->timer_ms = ms ? ms : 1; t->timer_flags = flags; t->timer_user = user; t->start = cb;
     t->timer_id = t->id;
     if (rn_trace()) rn_log("timeSetEvent %u ms -> %s %08x", ms, (flags & 0x10) ? "event" : "callback", cb);
-    start_fn(t, run_timer);
+    if (parked) notify();
+    else start_fn(t, run_timer);
     return t->timer_id;
 }
 static uint32_t timeKillEvent_(Ctx *c) {
