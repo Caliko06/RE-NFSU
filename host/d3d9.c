@@ -1020,6 +1020,63 @@ static uint32_t IDirect3DTexture9_UnlockRect(Ctx *c) {
     Obj *l = level_of(c, o, ARG(1));
     return l ? unlock_rect(c, l) : D3DERR_INVALIDCALL;
 }
+// Cube textures: one-level render targets only, what the game makes for the car reflection (0x40b340: 128,
+// A8R8G8B8, its six faces drawn each frame with their own depth buffers). Faces are surfaces level0..level0+5
+// in D3DCUBEMAP_FACES order; the renderer keeps them as the layers of one texture (GPU_CUBE).
+static uint32_t IDirect3DDevice9_CreateCubeTexture(Ctx *c) {
+    DEV();
+    uint32_t e = ARG(1), levels = ARG(2), usage = ARG(3), f = ARG(4), pool = ARG(5), out = ARG(6);
+    TR("CreateCubeTexture(%u, %u levels, usage %x, fmt %u, pool %u)", e, levels, usage, f, pool);
+    if (!e || !out || ARG(7) || bad_pool(usage, pool) || e > 2048) return D3DERR_INVALIDCALL;
+    if (pool != POOL_SCRATCH && check_format(F_X8R8G8B8, usage & ~U_QUERY_MASK, 5, f) >= 0x80000000u) return D3DERR_INVALIDCALL;
+    if (!(usage & U_RENDERTARGET) || levels != 1) {
+        rn_halt(c, "d3d9: cube texture that is not a one-level render target (usage %x, %u levels)", usage, levels);
+        return D3DERR_INVALIDCALL;
+    }
+    uint32_t g = new_obj(c, I_CUBE);
+    if (!g) return D3DERR_OUTOFVIDEOMEMORY;
+    Obj *t = &objs[nobjs - 1];
+    t->w = e; t->h = e; t->fmt = f; t->usage = usage; t->pool = pool; t->type = 5; t->levels = 1;
+    uint32_t tk = idx(t) + 1;
+    t->level0 = (uint32_t)nobjs;
+    for (int k = 0; k < 6; k++) {
+        new_surface(c, e, e, f, usage, pool, 0);
+        objs[nobjs - 1].container = tk;
+    }
+    uint32_t w3[3] = {tk, e, objs[t->level0].gpu};
+    gpu_cmd(GPU_CUBE, 3, w3);
+    st(c, out, g, 4);
+    return D3D_OK;
+}
+static Obj *face_of(Obj *t, uint32_t face, uint32_t l) { return face < 6 && l < t->levels ? &objs[t->level0 + face] : NULL; }
+static uint32_t IDirect3DCubeTexture9_GetLevelCount(Ctx *c) { SELF(I_CUBE); return o->levels; }
+static uint32_t IDirect3DCubeTexture9_GetLevelDesc(Ctx *c) {
+    SELF(I_CUBE);
+    Obj *l = face_of(o, 0, ARG(1));
+    if (!l || !ARG(2)) return D3DERR_INVALIDCALL;
+    surface_desc(c, l, ARG(2));
+    return D3D_OK;
+}
+static uint32_t IDirect3DCubeTexture9_GetCubeMapSurface(Ctx *c) {
+    SELF(I_CUBE);
+    Obj *l = face_of(o, ARG(1), ARG(2));
+    if (!l || !ARG(3)) return D3DERR_INVALIDCALL;
+    o->refs++;
+    st(c, ARG(3), l->guest, 4);
+    return D3D_OK;
+}
+static uint32_t IDirect3DCubeTexture9_LockRect(Ctx *c) {
+    SELF(I_CUBE);
+    Obj *l = face_of(o, ARG(1), ARG(2));
+    return l ? lock_rect(c, l, ARG(3), ARG(4), ARG(5)) : D3DERR_INVALIDCALL;
+}
+static uint32_t IDirect3DCubeTexture9_UnlockRect(Ctx *c) {
+    SELF(I_CUBE);
+    Obj *l = face_of(o, ARG(1), ARG(2));
+    return l ? unlock_rect(c, l) : D3DERR_INVALIDCALL;
+}
+static uint32_t IDirect3DCubeTexture9_GetType(Ctx *c) { SELF(I_CUBE); return 5; }
+static uint32_t IDirect3DCubeTexture9_PreLoad(Ctx *c) { SELF(I_CUBE); return 0; }
 static uint32_t IDirect3DTexture9_GetType(Ctx *c) { SELF(I_TEXTURE); return 3; }
 static uint32_t IDirect3DTexture9_PreLoad(Ctx *c) { SELF(I_TEXTURE); return 0; }
 static uint32_t IDirect3DSurface9_LockRect(Ctx *c) { SELF(I_SURFACE); return lock_rect(c, o, ARG(1), ARG(2), ARG(3)); }
@@ -1440,7 +1497,6 @@ static int draw_supported(Ctx *c, const Sm1 *ps) {
         else if (ss[8]) why = "MIPMAPLODBIAS";
         else if (ss[9]) why = "MAXMIPLEVEL";
         else if (ss[11]) why = "SRGBTEXTURE";
-        else if (dev.tex[k] && obj_k(dev.tex[k])->iface != I_TEXTURE) why = "cube texture";
     }
     if (why) rn_halt(c, "d3d9: draw needs %s", why);
     return !why;
@@ -1493,9 +1549,11 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
         if (!(ps->sm->tex_used >> k & 1)) continue;
         uint32_t *t = &w[D_TEX + D_TEXN * k];
         Obj *tx = obj_k(dev.tex[k]);
-        t[T_ID] = !tx ? 0 : (tx->usage & U_RENDERTARGET) ? objs[tx->level0].gpu : dev.tex[k];
+        int cube = tx && tx->iface == I_CUBE;
+        t[T_ID] = !tx ? 0 : cube ? dev.tex[k] : (tx->usage & U_RENDERTARGET) ? objs[tx->level0].gpu : dev.tex[k];
         t[T_AU] = dev.ss[k][1]; t[T_AV] = dev.ss[k][2]; t[T_MAG] = dev.ss[k][5]; t[T_MIN] = dev.ss[k][6];
-        t[T_MIP] = tx && tx->levels > 1 ? dev.ss[k][7] : 0; t[T_TT] = dev.tss[k][24]; t[T_ANISO] = dev.ss[k][10];
+        t[T_MIP] = tx && tx->levels > 1 ? dev.ss[k][7] : 0; t[T_TT] = dev.tss[k][24] | (cube ? T_CUBE : 0);
+        t[T_ANISO] = dev.ss[k][10];
     }
     w[D_NVC] = nvc; w[D_NPC] = npc;
     uint32_t *p = w + D_HDR;
@@ -1664,7 +1722,7 @@ const Api d3d9_apis[] = {
     DEV_ENTRY(GetRenderState, 3), DEV_ENTRY(SetTextureStageState, 4), DEV_ENTRY(GetTextureStageState, 4),
     DEV_ENTRY(SetSamplerState, 4), DEV_ENTRY(GetSamplerState, 4), DEV_ENTRY(SetTransform, 3),
     DEV_ENTRY(GetTransform, 3), DEV_ENTRY(SetViewport, 2), DEV_ENTRY(GetViewport, 2),
-    DEV_ENTRY(CreateTexture, 9), DEV_ENTRY(CreateVertexBuffer, 7), DEV_ENTRY(CreateIndexBuffer, 7),
+    DEV_ENTRY(CreateTexture, 9), DEV_ENTRY(CreateCubeTexture, 8), DEV_ENTRY(CreateVertexBuffer, 7), DEV_ENTRY(CreateIndexBuffer, 7),
     DEV_ENTRY(CreateRenderTarget, 9), DEV_ENTRY(CreateDepthStencilSurface, 9), DEV_ENTRY(CreateOffscreenPlainSurface, 7),
     DEV_ENTRY(SetRenderTarget, 3), DEV_ENTRY(SetDepthStencilSurface, 2), DEV_ENTRY(CreateVertexDeclaration, 3),
     DEV_ENTRY(CreateVertexShader, 3), DEV_ENTRY(CreatePixelShader, 3), DEV_ENTRY(SetVertexDeclaration, 2),
@@ -1693,6 +1751,13 @@ const Api d3d9_apis[] = {
     {"d3d9.dll", "IDirect3DTexture9::UnlockRect", 2, IDirect3DTexture9_UnlockRect},
     {"d3d9.dll", "IDirect3DTexture9::GetType", 1, IDirect3DTexture9_GetType},
     {"d3d9.dll", "IDirect3DTexture9::PreLoad", 1, IDirect3DTexture9_PreLoad},
+    {"d3d9.dll", "IDirect3DCubeTexture9::GetLevelCount", 1, IDirect3DCubeTexture9_GetLevelCount},
+    {"d3d9.dll", "IDirect3DCubeTexture9::GetLevelDesc", 3, IDirect3DCubeTexture9_GetLevelDesc},
+    {"d3d9.dll", "IDirect3DCubeTexture9::GetCubeMapSurface", 4, IDirect3DCubeTexture9_GetCubeMapSurface},
+    {"d3d9.dll", "IDirect3DCubeTexture9::LockRect", 6, IDirect3DCubeTexture9_LockRect},
+    {"d3d9.dll", "IDirect3DCubeTexture9::UnlockRect", 3, IDirect3DCubeTexture9_UnlockRect},
+    {"d3d9.dll", "IDirect3DCubeTexture9::GetType", 1, IDirect3DCubeTexture9_GetType},
+    {"d3d9.dll", "IDirect3DCubeTexture9::PreLoad", 1, IDirect3DCubeTexture9_PreLoad},
     {"d3d9.dll", "IDirect3DVertexBuffer9::Lock", 5, IDirect3DVertexBuffer9_Lock},
     {"d3d9.dll", "IDirect3DVertexBuffer9::Unlock", 1, IDirect3DVertexBuffer9_Unlock},
     {"d3d9.dll", "IDirect3DVertexBuffer9::GetDesc", 2, IDirect3DVertexBuffer9_GetDesc},

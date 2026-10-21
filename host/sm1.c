@@ -339,7 +339,8 @@ char *sm1_wgsl(const Sm1 *s) {
         for (int k = 0; k < 12; k++) emit(&b, "  var r%d = vec4f(0.0);\n", k);
     } else {
         for (int k = 0; k < 8; k++)
-            if (s->tex_used >> k & 1) emit(&b, "@group(1) @binding(%d) var s%d: sampler;\n@group(1) @binding(%d) var x%d: texture_2d<f32>;\n", 2 * k, k, 2 * k + 1, k);
+            if (s->tex_used >> k & 1) emit(&b, "@group(1) @binding(%d) var s%d: sampler;\n@group(1) @binding(%d) var x%d: texture_2d<f32>;\n"
+                                            "@group(1) @binding(%d) var y%d: texture_cube<f32>;\n", 2 * k, k, 2 * k + 1, k, 16 + k, k);
         emit(&b, "fn tc(t: vec4f, f: u32) -> vec2f { if ((f & 256u) != 0u) { let n = f & 7u;"
                  " let q = select(t.w, t[n - 1u], n >= 2u && n <= 4u); return t.xy / q; } return t.xy; }\n");
         emit(&b, "@fragment fn main(i: VO) -> @location(0) vec4f {\n  let v0 = i.d0;\n  let v1 = i.d1;\n");
@@ -354,7 +355,9 @@ char *sm1_wgsl(const Sm1 *s) {
         if (in->op == OP_DCL || in->op == OP_DEF || in->op == OP_NOP) continue;
         if (in->op == OP_TEX) {
             int k = in->d.num;
-            emit(&b, "  t%d = textureSample(x%d, s%d, tc(i.t%d, u.tt[%d][%d]));\n", k, k, k, k, k / 4, k % 4);
+            // Both samples run (WGSL samples in uniform control flow only); the stage's flag picks one.
+            emit(&b, "  t%d = select(textureSample(x%d, s%d, tc(i.t%d, u.tt[%d][%d])), textureSample(y%d, s%d, i.t%d.xyz),"
+                     " (u.tt[%d][%d] & 65536u) != 0u);\n", k, k, k, k, k / 4, k % 4, k, k, k, k / 4, k % 4);
             continue;
         }
         if (in->op == OP_TEXCOORD) { emit(&b, "  t%d = vec4f(clamp(i.t%d.xyz, vec3f(0.0), vec3f(1.0)), 1.0);\n", in->d.num, in->d.num); continue; }

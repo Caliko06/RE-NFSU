@@ -3,12 +3,12 @@
 // before the one it submits. Shaders arrive as WGSL (host/sm1.c); textures as RGBA8.
 'use strict';
 const GPU_TARGET = 1, GPU_CLEAR = 2, GPU_PRESENT = 3, GPU_DRAW = 4, GPU_SHADER = 5, GPU_DECL = 6, GPU_TEXTURE = 7,
-  GPU_TEXDATA = 8, GPU_TEXKEY = 9;
+  GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10;
 const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_DECL = 6, D_RT = 7, D_DS = 8, D_VP = 9,
   D_SC = 15, D_ZEN = 19, D_ZWRITE = 20, D_ZFUNC = 21, D_CULL = 22, D_BLEND = 23, D_SRCB = 24, D_DSTB = 25, D_BOP = 26,
   D_SEPA = 27, D_SRCBA = 28, D_DSTBA = 29, D_BOPA = 30, D_BFACTOR = 31, D_CWRITE = 32, D_AFUNC = 33, D_AREF = 34,
   D_FOG = 35, D_FOGC = 36, D_TEX = 37, D_TEXN = 8, D_NVC = 37 + 64, D_NPC = 38 + 64, D_HDR = 39 + 64;
-const T_ID = 0, T_AU = 1, T_AV = 2, T_MAG = 3, T_MIN = 4, T_MIP = 5, T_TT = 6, T_ANISO = 7;
+const T_ID = 0, T_AU = 1, T_AV = 2, T_MAG = 3, T_MIN = 4, T_MIP = 5, T_TT = 6, T_ANISO = 7, T_CUBE = 0x10000;
 const U_SIZE = 4320, U_STEP = 4352;     // sm1.h SM1_U_SIZE, rounded to the 256-byte offset alignment
 
 const CMP = [null, 'never', 'less', 'equal', 'less-equal', 'greater', 'not-equal', 'greater-equal', 'always'];
@@ -117,6 +117,7 @@ async function startGpu(M, canvas, report, onFrame) {
       for (let k = 0; k < 8; k++) if (mask >> k & 1) {
         entries.push({ binding: 2 * k, visibility: GPUShaderStage.FRAGMENT, sampler: { type: 'filtering' } });
         entries.push({ binding: 2 * k + 1, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: 'float' } });
+        entries.push({ binding: 16 + k, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: 'float', viewDimension: 'cube' } });
       }
       texBgls.set(mask, device.createBindGroupLayout({ entries }));
     }
@@ -131,6 +132,10 @@ async function startGpu(M, canvas, report, onFrame) {
   const dummy = device.createTexture({ size: [1, 1], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
   device.queue.writeTexture({ texture: dummy }, new Uint8Array([0, 0, 0, 255]), { bytesPerRow: 4 }, [1, 1]);
   const dummyView = dummy.createView();
+  const dummyCube = device.createTexture({ size: [1, 1, 6], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
+  device.queue.writeTexture({ texture: dummyCube }, new Uint8Array(24).map((_, i) => i % 4 === 3 ? 255 : 0),
+    { bytesPerRow: 4, rowsPerImage: 1 }, [1, 1, 6]);
+  const dummyCubeView = dummyCube.createView({ dimension: 'cube' });
   const samplers = new Map();
   function sampler(t) {
     const key = `${t[T_AU]},${t[T_AV]},${t[T_MAG]},${t[T_MIN]},${t[T_MIP]},${t[T_ANISO]}`;
@@ -284,6 +289,17 @@ async function startGpu(M, canvas, report, onFrame) {
           usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
         const own = tex.createView();
         res.set(w[a], { tex, own, view: own, w: w[a + 1], h: w[a + 2], depth: false });
+      } else if (op === GPU_CUBE) {
+        // One texture, six layers: each face target draws into its layer, the stage samples the cube view.
+        const e = w[a + 1], f0 = w[a + 2];
+        const tex = device.createTexture({ size: [e, e, 6], format: 'rgba8unorm',
+          usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC });
+        for (let k = 0; k < 6; k++) {
+          res.get(f0 + k)?.tex.destroy();
+          res.set(f0 + k, { tex, view: tex.createView({ dimension: '2d', baseArrayLayer: k, arrayLayerCount: 1 }), w: e, h: e, depth: false });
+        }
+        res.set(w[a], { tex, cube: tex.createView({ dimension: 'cube' }), w: e, h: e, depth: false });
+        stats.targets++;
       } else if (op === GPU_TEXKEY) {
         const t = res.get(w[a]);
         if (t && pack.size) { t.key = (w[a + 2] >>> 0).toString(16).padStart(8, '0') + (w[a + 1] >>> 0).toString(16).padStart(8, '0'); useHd(t, t.key); }
@@ -329,8 +345,10 @@ async function startGpu(M, canvas, report, onFrame) {
           const entries = [];
           for (let k = 0; k < 8; k++) if (ps.texMask >> k & 1) {
             const t = w.subarray(a + D_TEX + D_TEXN * k, a + D_TEX + D_TEXN * (k + 1));
-            const img = t[T_ID] ? res.get(t[T_ID]) : null;
-            entries.push({ binding: 2 * k, resource: sampler(t) }, { binding: 2 * k + 1, resource: img ? img.view : dummyView });
+            const img = t[T_ID] ? res.get(t[T_ID]) : null, cube = (t[T_TT] & T_CUBE) !== 0;
+            entries.push({ binding: 2 * k, resource: sampler(t) },
+              { binding: 2 * k + 1, resource: !cube && img?.view || dummyView },
+              { binding: 16 + k, resource: cube && img?.cube || dummyCubeView });
           }
           pass.setBindGroup(1, device.createBindGroup({ layout: texBgl(ps.texMask), entries }));
           pass.setViewport(g(D_VP), g(D_VP + 1), g(D_VP + 2), g(D_VP + 3), f32[a + D_VP + 4], f32[a + D_VP + 5]);

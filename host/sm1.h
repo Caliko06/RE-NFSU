@@ -39,7 +39,8 @@ void sm1_disasm(const Sm1 *s, void (*out)(const char *line));
 // WGSL source for a shader. Bindings and varyings are fixed: the web backend builds its pipelines
 // against them. Returns a malloc'd string.
 //   group 0 binding 0: uniform U (layout below, SM1_U_* byte offsets), both stages.
-//   group 1 binding 2k / 2k+1: sampler / texture_2d of stage k (ps).
+//   group 1 binding 2k / 2k+1: sampler / texture_2d of stage k (ps); binding 16+k: texture_cube of stage k. A ps_1_x
+//   tex samples the one its stage's word in u.tt says (gpu.h T_CUBE): the type comes from the bound texture.
 //   vs input v<n> at @location(n); varyings: 0 oD0, 1 oD1, 2+k oTk, 10 oFog.
 enum { SM1_U_VC = 0, SM1_U_PC = 4096, SM1_U_HP = 4224, SM1_U_FOGC = 4240, SM1_U_AF = 4256, SM1_U_AR = 4272,
        SM1_U_TT = 4288, SM1_U_SIZE = 4320 };

@@ -18,6 +18,8 @@ enum {
     GPU_TEXTURE = 7,    // id, width, height, levels
     GPU_TEXDATA = 8,    // id, level, width, height, RGBA8 texels (one word each, bytes R G B A)
     GPU_TEXKEY = 9,     // id, key low word, key high word: FNV-1a 64 of a DXT level 0 (web/gpu.js remaster pack)
+    GPU_CUBE = 10,      // id, edge, id of face 0: the six face targets (ids face0..face0+5, D3DCUBEMAP_FACES order
+                        // +X -X +Y -Y +Z -Z, sent before as GPU_TARGET) become the layers of one cube texture
 };
 
 // GPU_DRAW header (word offsets). Render states keep their D3D9 values.
@@ -34,7 +36,9 @@ enum {
     D_NVC = 37 + 8 * 8, D_NPC, D_HDR,
 };
 // Per stage: texture id (0 none), ADDRESSU, ADDRESSV, MAGFILTER, MINFILTER, MIPFILTER, TEXTURETRANSFORMFLAGS, MAXANISOTROPY.
+// T_TT also carries T_CUBE: the stage's texture is a cube (ps_1_x samples by the bound texture's type).
 enum { T_ID = 0, T_AU, T_AV, T_MAG, T_MIN, T_MIP, T_TT, T_ANISO, D_TEXN };
+#define T_CUBE 0x10000u
 
 void gpu_cmd(int op, int n, const uint32_t *w);
 void gpu_submit(void);                  // run or hand off the list, then start a new one (a frame or a part of one)

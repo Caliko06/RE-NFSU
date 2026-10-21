@@ -62,12 +62,13 @@ void gpu_wait(void) {
 #include <math.h>
 #include "sm1.h"
 
-enum { IMG_COLOR, IMG_DEPTH, IMG_TEX };
+enum { IMG_COLOR, IMG_DEPTH, IMG_TEX, IMG_CUBE };
 typedef struct {
     uint32_t w, h, kind, levels;
     uint32_t *color;            // color target: ARGB
     float *z; uint8_t *stencil;
     uint32_t *lv[14];           // texture levels: RGBA8 (bytes R G B A)
+    uint32_t face0;             // cube: the id of its +X face; the six faces are color targets face0..face0+5
 } Img;
 static Img imgs[GPU_MAXID + 1];
 static Sm1 *shaders[GPU_MAXID + 1];
@@ -143,9 +144,24 @@ typedef struct {
     Img *rt, *ds;
 } Draw;
 
+// A cube lookup (D3D9 "Cubic Environment Mapping"): the major axis picks the face, the other two give s, t.
+static void cube_sample(const Img *t, const uint32_t *st, const float r[3], float out[4]) {
+    float ax = fabsf(r[0]), ay = fabsf(r[1]), az = fabsf(r[2]), ma, sc, tc;
+    int face;
+    if (ax >= ay && ax >= az) { face = r[0] >= 0 ? 0 : 1; ma = ax; sc = r[0] >= 0 ? -r[2] : r[2]; tc = -r[1]; }
+    else if (ay >= az) { face = r[1] >= 0 ? 2 : 3; ma = ay; sc = r[0]; tc = r[1] >= 0 ? r[2] : -r[2]; }
+    else { face = r[2] >= 0 ? 4 : 5; ma = az; sc = r[2] >= 0 ? r[0] : -r[0]; tc = -r[1]; }
+    if (!t || t->kind != IMG_CUBE || ma == 0) { out[0] = out[1] = out[2] = 0; out[3] = 1; return; }
+    uint32_t cst[D_TEXN];
+    memcpy(cst, st, sizeof cst);
+    cst[T_AU] = cst[T_AV] = 3;                      // a face's edge texels: clamp
+    float uv[2] = {(sc / ma + 1) * 0.5f, (tc / ma + 1) * 0.5f};
+    sample(&imgs[t->face0 + (uint32_t)face], cst, 0, uv, out);
+}
 static void ps_sample(void *ctx, int k, const float uv[2], float out[4]) {
     Draw *d = ctx;
     const Img *t = d->st[k].img;
+    if (d->st[k].st[T_TT] & T_CUBE) { cube_sample(t, d->st[k].st, d->at.t[k], out); return; }
     float lod = 0;
     if (t) {
         const float *a = d->at.t[k], *ddx = d->dx.t[k], *ddy = d->dy.t[k];
@@ -437,6 +453,10 @@ void gpu_run(const uint32_t *w, uint32_t n) {
                 t->lv[a[1]] = malloc(4u * a[2] * a[3]);
                 memcpy(t->lv[a[1]], a + 4, 4u * a[2] * a[3]);
             }
+        } else if (op == GPU_CUBE) {
+            Img *t = &imgs[a[0]];
+            img_free(t);
+            *t = (Img){a[1], a[1], IMG_CUBE, 1, NULL, NULL, NULL, {0}, a[2]};
         } else if (op == GPU_TEXKEY) {
             // the remaster pack is web only (web/gpu.js)
         } else if (op == GPU_DRAW) {
