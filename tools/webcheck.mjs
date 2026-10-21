@@ -82,6 +82,9 @@ async function profile() {
   }
 }
 if (route) await send('Emulation.setDeviceMetricsOverride', { ...ROUTE.view, deviceScaleFactor: 1, mobile: false });
+// RN_VIEW=WxH@dpr: the page at the OWNER's window size and pixel ratio (a stop can depend on the back buffer size).
+const view = process.env.RN_VIEW?.match(/^(\d+)x(\d+)@([\d.]+)$/);
+if (view) await send('Emulation.setDeviceMetricsOverride', { width: +view[1], height: +view[2], deviceScaleFactor: +view[3], mobile: false });
 await send('Page.navigate', { url });
 const t0 = Date.now();
 let text = '', seen = 0;
