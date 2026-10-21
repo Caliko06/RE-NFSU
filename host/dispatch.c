@@ -133,7 +133,7 @@ uint64_t rn_rdtsc(Ctx *c) {
     (void)c;
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;   // 1 GHz clock
+    return ((uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec) * 16 / 5;   // 3.2 GHz (host/cpu.c)
 }
 
 static char halt_msg[256];
