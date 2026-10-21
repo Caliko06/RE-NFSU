@@ -174,6 +174,19 @@ static float sample(const Obj *o, uint32_t frame, int ch) {
     memcpy(&s, p, 2);
     return s / 32768.0f;
 }
+// Frame a+d of a buffer: wraps when it loops, else holds the first or last frame.
+static uint32_t at(const Obj *o, uint32_t frames, uint32_t a, int d) {
+    int64_t i = (int64_t)a + d;
+    if (o->looping) return (uint32_t)((i % frames + frames) % frames);
+    return i < 0 ? 0 : i >= frames ? frames - 1 : (uint32_t)i;
+}
+// 4-point, 3rd-order Hermite between frames a and a+1 (t in [0,1)); t = 0 gives frame a exactly.
+static float hermite(const Obj *o, uint32_t frames, uint32_t a, float t, int ch) {
+    float ym = sample(o, at(o, frames, a, -1), ch), y0 = sample(o, a, ch);
+    float y1 = sample(o, at(o, frames, a, 1), ch), y2 = sample(o, at(o, frames, a, 2), ch);
+    float c1 = 0.5f * (y1 - ym), c2 = ym - 2.5f * y0 + 2 * y1 - 0.5f * y2, c3 = 0.5f * (y2 - ym) + 1.5f * (y0 - y1);
+    return ((c3 * t + c2) * t + c1) * t + y0;
+}
 // Mixes n frames of every playing buffer into out[] and moves the buffers on. Called with mx held.
 static void mix(uint32_t n) {
     memset(out, 0, 8u * n);
@@ -186,10 +199,10 @@ static void mix(uint32_t n) {
         float g = gain(o->volume) * m;
         float gl = g * (o->pan > 0 ? gain(-o->pan) : 1), gr = g * (o->pan < 0 ? gain(o->pan) : 1);
         for (uint32_t j = 0; j < n; j++) {
-            uint32_t a = (uint32_t)o->pos, b = a + 1 < frames ? a + 1 : (o->looping ? 0 : a);
+            uint32_t a = (uint32_t)o->pos;
             float t = (float)(o->pos - a);
-            out[2 * j] += gl * ((1 - t) * sample(o, a, 0) + t * sample(o, b, 0));
-            out[2 * j + 1] += gr * ((1 - t) * sample(o, a, 1) + t * sample(o, b, 1));
+            out[2 * j] += gl * hermite(o, frames, a, t, 0);
+            out[2 * j + 1] += gr * hermite(o, frames, a, t, 1);
             o->pos += step;
             if (o->pos >= frames) {
                 if (o->looping) o->pos -= frames * floor(o->pos / frames);

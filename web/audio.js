@@ -6,6 +6,7 @@ const AUDIO_WORKLET = `
 class Ring extends AudioWorkletProcessor {
   constructor() {
     super();
+    this.fade = 0; this.resyncs = 0; this.l = this.r = 0;
     this.port.onmessage = e => {
       const { buffer, hdr } = e.data;
       this.h = new Uint32Array(buffer, hdr, 4);           // written, taken, ring address, ring frames
@@ -19,12 +20,24 @@ class Ring extends AudioWorkletProcessor {
     const written = Atomics.load(this.h, 0);
     let taken = this.h[1];
     const behind = (written - taken) >>> 0;
-    if (behind > 8192) taken = (written - 1024) >>> 0;     // start, or the page was paused: catch up
+    if (behind > 8192) {                                   // start, or the page was paused: catch up
+      taken = (written - 1024) >>> 0;
+      if (this.started) { this.fade = 64; this.port.postMessage({ resync: ++this.resyncs, behind }); }
+      else this.port.postMessage({ started: true });
+      this.started = true;
+    }
     for (let i = 0; i < l.length; i++) {
-      if (taken === written) { l[i] = r[i] = 0; continue; } // underrun: silence
-      const k = 2 * (taken % this.n);
-      l[i] = this.f[k]; r[i] = this.f[k + 1];
-      taken = (taken + 1) >>> 0;
+      let a = 0, b = 0;
+      if (taken !== written) {                             // else underrun: silence
+        const k = 2 * (taken % this.n);
+        a = this.f[k]; b = this.f[k + 1];
+        taken = (taken + 1) >>> 0;
+      }
+      if (this.fade > 0) {                                 // the jump: last sample fades out as the new one fades in
+        const w = this.fade-- / 64;
+        a = w * this.l + (1 - w) * a; b = w * this.r + (1 - w) * b;
+      } else { this.l = a; this.r = b; }
+      l[i] = a; r[i] = b;
     }
     Atomics.store(this.h, 1, taken);
     return true;
@@ -32,11 +45,13 @@ class Ring extends AudioWorkletProcessor {
 }
 registerProcessor('rn-ring', Ring);`;
 
-async function startAudio(M) {
+// log gets one line per catch-up after the start (the resync counter).
+async function startAudio(M, log) {
   const ctx = new AudioContext({ sampleRate: 44100 });
   const url = URL.createObjectURL(new Blob([AUDIO_WORKLET], { type: 'text/javascript' }));
   await ctx.audioWorklet.addModule(url);
   const node = new AudioWorkletNode(ctx, 'rn-ring', { numberOfInputs: 0, outputChannelCount: [2] });
+  node.port.onmessage = e => log(e.data.started ? 'audio started' : `audio resync ${e.data.resync}: ${e.data.behind} frames behind, 64-frame fade`);
   node.port.postMessage({ buffer: M.HEAPU8.buffer, hdr: M._rn_audio_ring() });
   node.connect(ctx.destination);
   const resume = () => { if (ctx.state !== 'running') ctx.resume(); };

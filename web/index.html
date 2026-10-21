@@ -87,7 +87,7 @@ function line(s, cls) {
   });
   startGpu(M, document.getElementById('screen'), s => line(s, 'api')).catch(e => line('gpu.js: ' + e.message, 'stop'));
   startInput(M, document.getElementById('screen'));
-  startAudio(M).catch(e => line('audio.js: ' + e.message, 'stop'));
+  startAudio(M, s => line(s)).catch(e => line('audio.js: ' + e.message, 'stop'));
   window.RN_M = M;                          // for checks from the console or tools/webcheck.mjs
 })();
 </script>
