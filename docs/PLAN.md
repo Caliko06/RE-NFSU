@@ -22,11 +22,18 @@ One session on main. Each milestone has one gate: the run that proves it.
 - Underground career, garage, customization, options persist in save/.
 - Gate: save, reload the page, continue the career.
 
-## M8 Widescreen
-- 16:9, wider horizontal view, HUD placed for it. Every change is a `PATCH:` line. Gate: a race in 16:9.
+## M8 Screen and widescreen (each step has one gate, a capture in Chrome at http://127.0.0.1:5180/)
+- M8.1 Big screen: the canvas fills the window, aspect kept, log on F2 (done 2026-10-20; build/fill.png).
+- M8.2 Bigger picture: the game runs at 1280x720 or more (the layer already offers modes up to 1920x1080).
+  Lead: 0x408830 calls 0x4086b0(0x320) = 800 right before CreateDevice; find where width and height are chosen.
+  Gate: CreateDevice log shows the new size, the title and a race fill the window sharp.
+- M8.3 True 16:9: aspect ratio of the 3D view and the 2D screens (not stretched 4:3). Each change is a `PATCH:` line.
+  Gate: Quick Race capture in 16:9, no stretch.
+- M8.4 HUD and menus placed for 16:9. Gate: capture of menu, HUD and garage.
+- M8.5 Route grows to 16:9: `node tools/webcheck.mjs --route` PASS at 1920x1080.
 
-## M9 Play
-- The OWNER plays the career at http://127.0.0.1:5180/.
+## M9 Play, ends at 5180
+- The OWNER plays the career in Chrome at http://127.0.0.1:5180/, full window, 16:9.
 
 ## Only when a run hits it
 - Known layer gaps: GetMessageA that would wait (0x411030, window inactive), SuspendThread of a running thread

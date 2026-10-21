@@ -6,22 +6,29 @@
 <style>
   :root { --bg: #0b0d10; --fg: #c9d1d9; --dim: #6e7681; --ok: #3fb950; --stop: #f85149; --api: #79c0ff; }
   html, body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.45 ui-monospace, Menlo, monospace; }
+  html, body { height: 100%; overflow: hidden; }
+  body.dbg { overflow: auto; }
   header { padding: 12px 16px; border-bottom: 1px solid #21262d; display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
   header b { font-size: 15px; }
   #status { color: var(--dim); }
   #status.run { color: var(--ok); }
   #status.stop { color: var(--stop); }
   #log { padding: 12px 16px; white-space: pre-wrap; word-break: break-all; margin: 0; }
-  #screen { display: block; max-width: 100%; background: #000; margin: 12px 16px 0; }
+  /* The game fills the window and keeps its aspect; the log is a panel (F2, or at a STOP). */
+  #screen { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: contain; background: #000; }
+  #panel { display: none; position: fixed; inset: 0; background: rgba(11,13,16,.92); overflow: auto; }
+  body.dbg #panel { display: block; }
   .stop { color: var(--stop); font-weight: bold; }
   .api { color: var(--api); }
   .dim { color: var(--dim); }
 </style>
 </head>
 <body>
-<header><b>Need for Speed Underground</b><span class="dim">Speed.exe traducido a WebAssembly</span><span id="status">cargando…</span></header>
 <canvas id="screen" width="800" height="600"></canvas>
+<div id="panel">
+<header><b>Need for Speed Underground</b><span class="dim">Speed.exe traducido a WebAssembly · F2 cierra</span><span id="status">cargando…</span></header>
 <pre id="log"></pre>
+</div>
 <script src="gpu.js"></script>
 <script src="input.js"></script>
 <script src="audio.js"></script>
@@ -45,6 +52,7 @@ addEventListener('keyup', e => pending.push(`${secs()} key up ${e.code}`), true)
 addEventListener('error', e => { line('JS error: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'stop'); flush(); });
 addEventListener('unhandledrejection', e => { line('JS rejection: ' + (e.reason && e.reason.stack || e.reason), 'stop'); flush(); });
 addEventListener('pagehide', flush);
+addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classList.toggle('dbg'); e.preventDefault(); } }, true);
 function line(s, cls) {
   pending.push(`${secs()} ${s}`);
   if (/^STOP|^JS |abort|Aborted|RuntimeError/.test(s)) setTimeout(flush, 0);
@@ -54,7 +62,7 @@ function line(s, cls) {
   else if (/^  \S+!/.test(s)) d.className = 'api';
   d.textContent = s;
   log.appendChild(d);
-  if (/^STOP/.test(s)) { status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; }
+  if (/^STOP/.test(s)) { document.body.classList.add('dbg'); status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; }
 }
 (async () => {
   if (!crossOriginIsolated) { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
