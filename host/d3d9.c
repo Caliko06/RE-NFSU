@@ -194,6 +194,9 @@ static uint32_t size_of(uint32_t f, uint32_t w, uint32_t h) { return pitch_of(f,
 #define DESK_W rn_screen_w
 #define DESK_H rn_screen_h
 #define VRAM (128u << 20)
+// Largest texture side. The R350 had 2048, but this adapter offers desktop sizes past it, and the game makes
+// render targets of the screen's size (0x40cc4b, LIGHTSTREAKS: [0x701034] x [0x701038]). WebGPU allows 8192.
+#define MAXTEX 4096u
 static const uint16_t modes[][2] = {{640, 480}, {720, 480}, {720, 576}, {800, 600}, {1024, 768}, {1152, 864},
     {1280, 720}, {1280, 768}, {1280, 800}, {1280, 960}, {1280, 1024}, {1360, 768}, {1366, 768}, {1400, 1050},
     {1440, 900}, {1600, 900}, {1680, 1050}, {1920, 1080}};
@@ -365,7 +368,7 @@ static void put_caps(Ctx *c, uint32_t p) {
         {32, 0x00144ff2}, {36, 0x0f732191}, {40, 0xff}, {44, 0x3fff}, {48, 0x3fff}, {52, 0xff},
         {56, 0x00084208}, {60, 0x0007ed07}, {64, 0x07030700}, {68, 0x07030700}, {72, 0x03030300},
         {76, 0x3f}, {80, 0x3f}, {84, 0x1f},
-        {88, 2048}, {92, 2048}, {96, 2048}, {100, 2048}, {104, 2048}, {108, 16},
+        {88, MAXTEX}, {92, MAXTEX}, {96, 2048}, {100, 2048}, {104, 2048}, {108, 16},
         {136, 0x1ff}, {140, 0x00100008}, {144, 0x03feffff}, {148, 8}, {152, 8}, {156, 0x17b},
         {160, 8}, {164, 6}, {168, 4}, {172, 37}, {180, 0xfffff}, {184, 0xffffff}, {188, 16}, {192, 508},
         {196, 0xfffe0200}, {200, 256}, {204, 0xffff0200}, {212, 0x51},
@@ -833,7 +836,7 @@ static uint32_t IDirect3DDevice9_CreateTexture(Ctx *c) {
     uint32_t w = ARG(1), h = ARG(2), levels = ARG(3), usage = ARG(4), f = ARG(5), pool = ARG(6), out = ARG(7);
     TR("CreateTexture(%ux%u, %u levels, usage %x, fmt %u, pool %u)", w, h, levels, usage, f, pool);
     if (!w || !h || !out || ARG(8) || bad_pool(usage, pool)) return D3DERR_INVALIDCALL;
-    if (w > 2048 || h > 2048 || (pool != POOL_SCRATCH && check_format(F_X8R8G8B8, usage & ~U_QUERY_MASK, 3, f) >= 0x80000000u))
+    if (w > MAXTEX || h > MAXTEX || (pool != POOL_SCRATCH && check_format(F_X8R8G8B8, usage & ~U_QUERY_MASK, 3, f) >= 0x80000000u))
         return D3DERR_INVALIDCALL;
     uint32_t full = mip_count(w, h);
     if (usage & U_AUTOGENMIPMAP) { rn_halt(c, "d3d9: CreateTexture with AUTOGENMIPMAP"); return D3DERR_INVALIDCALL; }
@@ -1027,7 +1030,7 @@ static uint32_t IDirect3DDevice9_CreateCubeTexture(Ctx *c) {
     DEV();
     uint32_t e = ARG(1), levels = ARG(2), usage = ARG(3), f = ARG(4), pool = ARG(5), out = ARG(6);
     TR("CreateCubeTexture(%u, %u levels, usage %x, fmt %u, pool %u)", e, levels, usage, f, pool);
-    if (!e || !out || ARG(7) || bad_pool(usage, pool) || e > 2048) return D3DERR_INVALIDCALL;
+    if (!e || !out || ARG(7) || bad_pool(usage, pool) || e > MAXTEX) return D3DERR_INVALIDCALL;
     if (pool != POOL_SCRATCH && check_format(F_X8R8G8B8, usage & ~U_QUERY_MASK, 5, f) >= 0x80000000u) return D3DERR_INVALIDCALL;
     if (!(usage & U_RENDERTARGET) || levels != 1) {
         rn_halt(c, "d3d9: cube texture that is not a one-level render target (usage %x, %u levels)", usage, levels);
