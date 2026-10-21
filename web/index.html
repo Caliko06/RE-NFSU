@@ -77,7 +77,12 @@ function line(s, cls) {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
       // The game draws at the pixels of this window (PATCH 0x408760), at most 2560x1440 to keep the GPU load sane.
       const dpr = window.devicePixelRatio || 1, k = Math.min(1, 2560 / (innerWidth * dpr), 1440 / (innerHeight * dpr));
-      m.ENV.RN_SCREEN = `${Math.round(innerWidth * dpr * k)}x${Math.round(innerHeight * dpr * k)}`;
+      // Even sizes: the layer keeps width and height even (host/win32.c). At k = 1 the canvas gets exactly
+      // back buffer / dpr CSS pixels, centred, so one back-buffer pixel is one device pixel; k < 1: Chrome scales it up.
+      const bw = 2 * Math.floor(innerWidth * dpr * k / 2), bh = 2 * Math.floor(innerHeight * dpr * k / 2);
+      m.ENV.RN_SCREEN = `${bw}x${bh}`;
+      if (k === 1) Object.assign(document.getElementById('screen').style, { width: `${bw / dpr}px`, height: `${bh / dpr}px`, margin: 'auto' });
+      line(`screen: window ${innerWidth}x${innerHeight} css, dpr ${dpr}, k ${k.toFixed(3)}, back buffer ${m.ENV.RN_SCREEN}`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
       for (const kv of (new URLSearchParams(location.search).get('env') || '').split(',').filter(Boolean)) {
         const k = kv.indexOf('=');
