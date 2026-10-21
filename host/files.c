@@ -213,6 +213,17 @@ void gf_close(int id) {
     files[id].used = 0;
 }
 // Reads up to n bytes at off; returns the count (short at the end of the file), -1 on an I/O error.
+#ifdef __EMSCRIPTEN__
+// One request to the server, counted for the telemetry (the callers hold the GIL).
+static int timed_read(const char *real, uint64_t at, uint8_t *dst, uint32_t n) {
+    uint64_t t0 = now_us();
+    int r = web_read(real, (double)at, dst, (int)n);
+    rn_telem.read_ms += (double)(now_us() - t0) / 1000;
+    rn_telem.reads++;
+    rn_telem.read_kb += (r > 0 ? (uint32_t)r : 0) >> 10;
+    return r;
+}
+#endif
 int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
     GFile *g = &files[id];
     if (off >= g->size) return 0;
@@ -231,14 +242,14 @@ int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
         }
         uint32_t want = n - done;
         if (want >= AHEAD) {        // large reads go straight to the destination
-            int r = web_read(g->real, (double)at, dst + done, (int)want);
+            int r = timed_read(g->real, at, dst + done, want);
             if (r <= 0) return -1;
             done += (uint32_t)r;
             continue;
         }
         if (!g->buf) g->buf = malloc(AHEAD);
         uint32_t len = g->size - at < AHEAD ? (uint32_t)(g->size - at) : AHEAD;
-        int r = web_read(g->real, (double)at, g->buf, (int)len);
+        int r = timed_read(g->real, at, g->buf, len);
         if (r <= 0) return -1;
         g->buf_off = at;
         g->buf_len = (uint32_t)r;

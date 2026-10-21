@@ -9,7 +9,7 @@ class Ring extends AudioWorkletProcessor {
     this.fade = 0; this.resyncs = 0; this.l = this.r = 0;
     this.port.onmessage = e => {
       const { buffer, hdr } = e.data;
-      this.h = new Uint32Array(buffer, hdr, 4);           // written, taken, ring address, ring frames
+      this.h = new Uint32Array(buffer, hdr, 8);           // written, taken, ring address, ring frames, underruns, resyncs
       this.f = new Float32Array(buffer, this.h[2], 2 * this.h[3]);
       this.n = this.h[3];
     };
@@ -22,17 +22,18 @@ class Ring extends AudioWorkletProcessor {
     const behind = (written - taken) >>> 0;
     if (behind > 8192) {                                   // start, or the page was paused: catch up
       taken = (written - 1024) >>> 0;
-      if (this.started) { this.fade = 64; this.port.postMessage({ resync: ++this.resyncs, behind }); }
+      if (this.started) { this.fade = 64; Atomics.add(this.h, 5, 1); this.port.postMessage({ resync: ++this.resyncs, behind }); }
       else this.port.postMessage({ started: true });
       this.started = true;
     }
+    let silent = 0;
     for (let i = 0; i < l.length; i++) {
       let a = 0, b = 0;
       if (taken !== written) {                             // else underrun: silence
         const k = 2 * (taken % this.n);
         a = this.f[k]; b = this.f[k + 1];
         taken = (taken + 1) >>> 0;
-      }
+      } else if (this.started) silent++;
       if (this.fade > 0) {                                 // the jump: last sample fades out as the new one fades in
         const w = this.fade-- / 64;
         a = w * this.l + (1 - w) * a; b = w * this.r + (1 - w) * b;
@@ -40,6 +41,7 @@ class Ring extends AudioWorkletProcessor {
       l[i] = a; r[i] = b;
     }
     Atomics.store(this.h, 1, taken);
+    if (silent) Atomics.add(this.h, 4, silent);           // telemetry (web/telemetry.js)
     return true;
   }
 }

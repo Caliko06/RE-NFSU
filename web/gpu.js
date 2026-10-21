@@ -20,7 +20,7 @@ const ADDRESS = [null, 'repeat', 'mirror-repeat', 'clamp-to-edge'];
 const VFMT = ['float32', 'float32x2', 'float32x3', 'float32x4', 'unorm8x4-bgra', null, null, null, 'unorm8x4',
   'snorm16x2', 'snorm16x4', 'unorm16x2', 'unorm16x4', null, null, 'float16x2', 'float16x4'];
 
-async function startGpu(M, canvas, report) {
+async function startGpu(M, canvas, report, onFrame) {
   if (!navigator.gpu) throw new Error('WebGPU no disponible');
   const adapter = await navigator.gpu.requestAdapter();
   if (!adapter) throw new Error('WebGPU: sin adaptador');
@@ -191,8 +191,10 @@ async function startGpu(M, canvas, report) {
       depthStencil: ds ? { format: 'depth24plus-stencil8', depthWriteEnabled: !!(g(D_ZEN) && g(D_ZWRITE)),
         depthCompare: g(D_ZEN) ? CMP[g(D_ZFUNC)] : 'always', stencilFront: st, stencilBack: st } : undefined });
     pipes.set(key, p);
+    newPipes++;
     return p;
   }
+  let newPipes = 0;     // telemetry: pipelines made in this frame (each is a shader compile in the browser)
   // Per-frame data: vertices, indices and uniforms gathered on the CPU, written once before submit.
   let vbuf = null, ibuf = null, ubuf = null, vcap = 0, icap = 0, ucap = 0;
   const grow = (buf, cap, need, usage) => {
@@ -208,7 +210,7 @@ async function startGpu(M, canvas, report) {
     const u8 = new Uint8Array(w.buffer, w.byteOffset, w.length * 4);
     const enc = device.createCommandEncoder();
     const uni = new ArrayBuffer(256 * 1024), uf = new Float32Array(uni);
-    let nuni = 0, stats = { clears: 0, draws: 0, present: '' };
+    let nuni = 0, stats = { clears: 0, draws: 0, present: '', words: w.length, texKb: 0, pipes: 0, shaders: 0, targets: 0 };
     // First pass over the frame: sizes of the per-frame buffers.
     let vneed = 0, ineed = 0, uneed = 0;
     for (let i = 0; i < w.length;) {
@@ -240,6 +242,7 @@ async function startGpu(M, canvas, report) {
           usage: GPUTextureUsage.RENDER_ATTACHMENT | (depth ? 0 : GPUTextureUsage.COPY_SRC | GPUTextureUsage.TEXTURE_BINDING) });
         res.get(w[a])?.tex.destroy();
         res.set(w[a], { tex, view: tex.createView(), w: w[a + 1], h: w[a + 2], depth });
+        stats.targets++;
       } else if (op === GPU_CLEAR) {
         endPass();
         const rt = w[a] ? res.get(w[a]) : null, ds = w[a + 1] ? res.get(w[a + 1]) : null, flags = w[a + 2];
@@ -267,6 +270,7 @@ async function startGpu(M, canvas, report) {
           for (const m of info.messages) if (m.type === 'error') report(`gpu.js: shader ${id}: ${m.message} (line ${m.lineNum})`);
         });
         shaders.set(id, { kind, module, inputs: Array.from(w.subarray(a + 4, a + 20)), texMask: w[a + 20] });
+        stats.shaders++;
       } else if (op === GPU_DECL) {
         const els = [];
         for (let k = 0; k < w[a + 1]; k++) {
@@ -289,6 +293,7 @@ async function startGpu(M, canvas, report) {
         const t = res.get(w[a]), tw = w[a + 2], th = w[a + 3];
         device.queue.writeTexture({ texture: t.tex, mipLevel: w[a + 1] }, u8.subarray(4 * (a + 4), 4 * (a + 4 + tw * th)),
           { bytesPerRow: 4 * tw }, [tw, th]);
+        stats.texKb += tw * th >> 8;
       } else if (op === GPU_DRAW) {
         const g = k => w[a + k];
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
@@ -358,6 +363,8 @@ async function startGpu(M, canvas, report) {
     if (ioff) device.queue.writeBuffer(ibuf, 0, idata, 0, ioff / 4);
     if (uoff) device.queue.writeBuffer(ubuf, 0, udata, 0, uoff);
     device.queue.submit([enc.finish()]);
+    stats.pipes = newPipes; newPipes = 0;
+    stats.hd = packed;
     return stats;
   }
 
@@ -369,7 +376,9 @@ async function startGpu(M, canvas, report) {
     try {
       while (Atomics.load(h, box + 1) < Atomics.load(h, box) && !(hold && presents >= hold)) {
         const k = Atomics.load(h, box + 1) + 1;
+        const t = performance.now();
         const s = run(h[box + 2 + (k & 1)], h[box + 4 + (k & 1)]);
+        onFrame?.(s, t, performance.now() - t);
         frames++;
         if (s.present) presents++;
         if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +

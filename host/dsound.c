@@ -52,6 +52,8 @@ typedef struct {
     uint32_t rate, freq;                // format rate; SetFrequency (0 = the format rate)
     int32_t volume, pan;                // hundredths of a dB
     double pos;
+    double since_unlock;                // telemetry: frames played since the last Unlock (a stream refills by Unlock)
+    uint32_t unlocks;
 } Obj;
 #define MAXO 512
 static Obj objs[MAXO];
@@ -127,7 +129,7 @@ static float out[2 * 4096];
 // Header: frames written (mixer), frames taken (web/audio.js), ring address, ring size in stereo float frames.
 #define RING 16384
 static float ring[2 * RING];
-static uint32_t ring_hdr[4];
+static uint32_t ring_hdr[8];            // [4] frames of silence the page played (underruns), [5] resyncs: web/audio.js
 EMSCRIPTEN_KEEPALIVE uint32_t rn_audio_ring(void) {
     ring_hdr[2] = (uint32_t)(uintptr_t)ring;
     ring_hdr[3] = RING;
@@ -204,9 +206,21 @@ static void mix(uint32_t n) {
             out[2 * j] += gl * hermite(o, frames, a, t, 0);
             out[2 * j + 1] += gr * hermite(o, frames, a, t, 1);
             o->pos += step;
+            o->since_unlock += step;
             if (o->pos >= frames) {
                 if (o->looping) o->pos -= frames * floor(o->pos / frames);
                 else { o->playing = 0; o->pos = 0; break; }   // Wine resets the cursor at the end: check
+            }
+        }
+        if (o->looping && o->unlocks >= 2) {                // a stream: the game refills it as it plays
+            uint32_t pm = (uint32_t)(1000 * o->since_unlock / frames);
+            if (pm > rn_telem.stream_pm) rn_telem.stream_pm = pm;
+            if (o->since_unlock >= frames && o->since_unlock - n * step < frames) {
+                rn_telem.starves++; rn_telem.starve_buf = (uint32_t)k;
+                if (rn_telem.starves <= 20)
+                    rn_log("dsound stream %d: a whole lap with no Unlock (%u frames, %u Hz, %u ch, %u Unlocks)", k, frames,
+                           o->freq ? o->freq : o->rate, o->channels, o->unlocks);
+                if (rn_telem.starves <= 5) dispatch_threads_report();
             }
         }
     }
@@ -436,7 +450,11 @@ static uint32_t IDirectSoundBuffer_Lock(Ctx *c) {
     if (n > a && !p2) return DSERR_INVALIDPARAM;
     return DS_OK;
 }
-static uint32_t IDirectSoundBuffer_Unlock(Ctx *c) { SELF(I_BUF); return DS_OK; }
+static uint32_t IDirectSoundBuffer_Unlock(Ctx *c) {
+    SELF(I_BUF);
+    pthread_mutex_lock(&mx); o->since_unlock = 0; o->unlocks++; pthread_mutex_unlock(&mx);
+    return DS_OK;
+}
 // Play(dwReserved1, dwPriority, dwFlags): DSBPLAY_LOOPING 1. The primary buffer must loop.
 static uint32_t IDirectSoundBuffer_Play(Ctx *c) {
     SELF(I_BUF);

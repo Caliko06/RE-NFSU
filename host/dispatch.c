@@ -68,6 +68,19 @@ static int traced(const char *name) {
     }
     return 0;
 }
+// What each guest thread is doing (telemetry): inside an API since `since`, or running guest code since it left one.
+static struct { uint32_t tid, api, ra, in; uint64_t since; } busy[64];
+static int nbusy;
+static __thread int slot = -1;
+void dispatch_threads_report(void) {
+    uint64_t now = now_us();
+    for (int k = 0; k < nbusy && k < 64; k++) {
+        int newer = 0;      // a thread id that came back (short-lived threads): only its newest slot
+        for (int j = k + 1; j < nbusy && j < 64; j++) newer |= busy[j].tid == busy[k].tid;
+        if (!newer) rn_log("  thread %x: %s %s!%s (ret %08x) for %u ms", busy[k].tid, busy[k].in ? "in" : "guest code after",
+               hosts[busy[k].api].dll, hosts[busy[k].api].name, busy[k].ra, (unsigned)((now - busy[k].since) / 1000));
+    }
+}
 static void call_host(Ctx *c, uint32_t target) {
     uint32_t k = (target - HOST_BASE) / 16;
     if (k >= (uint32_t)nhosts || (target & 15)) { rn_halt(c, "jump into host space %08x", target); return; }
@@ -78,7 +91,10 @@ static void call_host(Ctx *c, uint32_t target) {
     if (!h->fn) { c->halt_at = ra; rn_halt(c, "missing API %s!%s", h->dll, h->name); return; }
     if (rn_trace() && traced(h->name)) rn_log("api %s (ret %08x)", h->name, ra);
     gil_slice();
+    if (slot < 0) slot = __atomic_fetch_add(&nbusy, 1, __ATOMIC_RELAXED);
+    if (slot < 64) { busy[slot].tid = ld(c, c->fs + 0x24, 4); busy[slot].api = k; busy[slot].ra = ra; busy[slot].since = now_us(); busy[slot].in = 1; }
     uint32_t v = h->fn(c);
+    if (slot < 64) { busy[slot].in = 0; busy[slot].since = now_us(); }
     if (c->halt) { if (!c->halt_at) c->halt_at = ra; return; }
     c->ret = ra;
     c->r[ESP] += 4 + (h->nargs > 0 ? 4u * h->nargs : 0);

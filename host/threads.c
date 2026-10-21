@@ -27,13 +27,16 @@ static pthread_cond_t gcv = PTHREAD_COND_INITIALIZER;   // GIL turn changed
 static pthread_cond_t scv = PTHREAD_COND_INITIALIZER;   // some object changed state
 static unsigned long next_ticket, serving, gen;
 
-static uint64_t slice_start;
+static uint64_t slice_start, hold_start;
+static __thread int is_main;
 void gil_acquire(void) {
+    uint64_t t0 = now_us();
     pthread_mutex_lock(&gm);
     unsigned long t = next_ticket++;
     while (t != serving) pthread_cond_wait(&gcv, &gm);
     pthread_mutex_unlock(&gm);
-    slice_start = now_us();
+    slice_start = hold_start = now_us();
+    *(is_main ? &rn_telem.gil_main_ms : &rn_telem.gil_other_ms) += (double)(slice_start - t0) / 1000;
 }
 // Windows preempts a thread when its quantum (about 20 ms on XP) ends. A guest that polls for work
 // done by another thread relies on it. The GIL holder gives its turn away at the next API call
@@ -47,7 +50,12 @@ void gil_slice(void) {
     if (waiting) { gil_release(); gil_acquire(); }
     else slice_start = now_us();
 }
+static void count_hold(void) {
+    double held = (double)(now_us() - hold_start) / 1000, *m = is_main ? &rn_telem.hold_main_max_ms : &rn_telem.hold_other_max_ms;
+    if (held > *m) *m = held;
+}
 void gil_release(void) {
+    count_hold();
     pthread_mutex_lock(&gm);
     serving++;
     pthread_cond_broadcast(&gcv);
@@ -61,6 +69,8 @@ static void notify(void) {
 }
 // Give up the GIL until some object changes state or the deadline (µs, 0 = none) passes.
 static void wait_change(uint64_t deadline) {
+    uint64_t t0 = now_us();
+    count_hold();
     pthread_mutex_lock(&gm);
     unsigned long g = gen;
     serving++;
@@ -77,6 +87,7 @@ static void wait_change(uint64_t deadline) {
         pthread_cond_timedwait(&scv, &gm, &ts);
     }
     pthread_mutex_unlock(&gm);
+    if (is_main) rn_telem.idle_main_ms += (double)(now_us() - t0) / 1000;   // before the GIL is back: this thread's field
     gil_acquire();
 }
 
@@ -96,6 +107,7 @@ static void teb_init(Ctx *c, uint32_t teb, uint32_t lo, uint32_t hi, uint32_t id
 
 void threads_init(Ctx *c) {
     teb_init(c, TEB_ADDR, STACK_LO, STACK_HI, 0xc);
+    is_main = 1;
     gil_acquire();
 }
 

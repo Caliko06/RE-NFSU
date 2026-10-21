@@ -8,6 +8,7 @@ removes one; /save-files.json lists save/. Writes never reach game/.
 POST /log appends the page's log to build/web.log (POST /log?new starts it again; the last one is kept as
 build/web.prev.log), so a Chrome session can be read after it stops. Headless Chrome (tools/webcheck.mjs) writes
 build/webcheck.log instead, so a test never replaces the OWNER's session.
+POST /telemetry does the same for web/telemetry.js: build/telemetry.ndjson (build/webcheck.telemetry.ndjson).
 Usage: .venv/bin/python tools/serve.py [port]
 """
 import http.server, json, os, sys, urllib.parse
@@ -56,14 +57,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
-        if self.path.split("?", 1)[0] != "/log":
+        route = self.path.split("?", 1)[0]
+        if route not in ("/log", "/telemetry"):
             self.send_error(403)
             return
         body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
         name = "webcheck" if "HeadlessChrome" in self.headers.get("User-Agent", "") else "web"
-        log = os.path.join(ROOT, "build", name + ".log")
+        # (session file, previous one) for each route and browser
+        files = {("/log", "web"): ("web.log", "web.prev.log"), ("/log", "webcheck"): ("webcheck.log", "webcheck.prev.log"),
+                 ("/telemetry", "web"): ("telemetry.ndjson", "telemetry.prev.ndjson"),
+                 ("/telemetry", "webcheck"): ("webcheck.telemetry.ndjson", "webcheck.telemetry.prev.ndjson")}
+        log, prev = (os.path.join(ROOT, "build", f) for f in files[(route, name)])
         if self.path.endswith("?new") and os.path.exists(log):
-            os.replace(log, os.path.join(ROOT, "build", name + ".prev.log"))
+            os.replace(log, prev)
         with open(log, "ab") as f:
             f.write(body)
         self.send_response(204)

@@ -697,7 +697,13 @@ static uint32_t IDirect3DDevice9_Clear(Ctx *c) {
 // The list goes to the renderer in parts of at most 16 MB: a load can upload hundreds of MB of
 // texels in one frame, more than the web build's heap holds at once. Commands keep their order.
 // The list is handed off under the GIL; the wait for the page is without it.
-static void hand_off(void) { gpu_submit(); gil_release(); gpu_wait(); gil_acquire(); }
+static void hand_off(void) {
+    gpu_submit(); gil_release();
+    uint64_t t0 = now_us();
+    gpu_wait();
+    rn_telem.gpu_wait_ms += (double)(now_us() - t0) / 1000;   // written before the GIL is back: only this thread presents
+    gil_acquire();
+}
 static void flush_big(void) { if (gpu_pending() > (4u << 20)) hand_off(); }
 
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
@@ -711,6 +717,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     uint32_t w[3] = {b->gpu, b->w, b->h};
     gpu_cmd(GPU_PRESENT, 3, w);
     dev.frames++;
+    rn_telem.presents++;
     if (dev.frames == 1) rn_log("d3d9 first Present: %ux%u", b->w, b->h);
     hand_off();             // may wait for the display
     return D3D_OK;

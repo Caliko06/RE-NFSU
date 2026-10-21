@@ -60,6 +60,24 @@ uint32_t virtual_reserve(Ctx *c, uint32_t size);
 void gil_acquire(void);
 void gil_release(void);
 void gil_slice(void);                                          // preempt at an API call after a quantum
+// Telemetry: running totals that web/telemetry.js reads at every frame (layout mirrored there). Each field has
+// one writer: the game threads under the GIL, or the mixer under its lock. The maxima are cleared by the page.
+typedef struct {
+    double gpu_wait_ms;         // Present waiting for the page (d3d9 hand_off)
+    double gil_main_ms;         // the main thread waiting for its GIL turn (another guest thread runs)
+    double gil_other_ms;        // every other guest thread waiting for its turn
+    double read_ms;             // game file reads from the server (sync XHR, GIL held)
+    double idle_main_ms;        // the main thread in Sleep or a wait (GIL given up on purpose)
+    double hold_main_max_ms;    // longest time the main thread kept the GIL in one go (a maximum the page clears)
+    double hold_other_max_ms;   // the same for every other guest thread
+    uint32_t presents, reads, read_kb;
+    uint32_t stream_pm;         // worst looping buffer: frames mixed since its last Unlock, per mille of its length
+    uint32_t starves;           // times a looping buffer played a whole lap with no Unlock (stale audio repeats)
+    uint32_t starve_buf;        // dsound object index of the last one
+    uint32_t clock_calls;       // GetTickCount, timeGetTime, QueryPerformanceCounter: many per frame = a busy wait
+} Telem;
+extern Telem rn_telem;
+void dispatch_threads_report(void);                             // log what every guest thread is doing now
 void threads_init(Ctx *main_ctx);
 void rn_stop(Ctx *c);                                          // report the halt and end the process
 void files_set_root(const char *dir);
