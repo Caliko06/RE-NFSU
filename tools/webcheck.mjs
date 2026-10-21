@@ -37,8 +37,50 @@ ws.onmessage = e => {
   if (m.method === 'Runtime.exceptionThrown') errors.push(m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text);
   if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') errors.push(m.params.args.map(a => a.value ?? a.description).join(' '));
 };
-const send = (method, params = {}) => new Promise(r => { pending.set(++id, r); ws.send(JSON.stringify({ id, method, params })); });
+const send = (method, params = {}, sessionId) => new Promise(r => { pending.set(++id, r); ws.send(JSON.stringify({ id, method, params, sessionId })); });
 await send('Runtime.enable');
+// RN_PROFILE=start:secs: a CPU sampling profile of every worker (the game runs in them) from second `start` for `secs`
+// seconds -> build/profile.txt, functions by self and total time. Names need a web build with RN_PROF=1.
+const prof = process.env.RN_PROFILE?.split(':').map(Number), workers = new Map();
+if (prof) {
+  const onmsg = ws.onmessage;
+  ws.onmessage = e => { const m = JSON.parse(e.data); if (m.method === 'Target.attachedToTarget') workers.set(m.params.sessionId, m.params.targetInfo); onmsg(e); };
+  await send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true });
+}
+let profState = 0;
+async function profile() {
+  if (profState === 0 && Date.now() - t0 >= prof[0] * 1000) {
+    profState = 1;
+    workers.set(undefined, { url: 'page' });       // the page's own thread (gpu.js runs the frames there)
+    for (const s of workers.keys()) { await send('Profiler.enable', {}, s); await send('Profiler.setSamplingInterval', { interval: 250 }, s); await send('Profiler.start', {}, s); }
+  } else if (profState === 1 && Date.now() - t0 >= (prof[0] + prof[1]) * 1000) {
+    profState = 2;
+    let out = `CPU profile ${prof[1]} s from ${prof[0]} s, ${url}; per worker: samples, then functions by self and total %\n`;
+    for (const s of workers.keys()) {
+      const p = (await send('Profiler.stop', {}, s))?.profile;
+      if (!p) continue;
+      const byId = new Map(p.nodes.map(n => [n.id, n])), parent = new Map();
+      for (const n of p.nodes) for (const c of n.children || []) parent.set(c, n.id);
+      const self = new Map(), total = new Map(), n = p.samples.length;
+      for (const id of p.samples) {
+        const name = k => byId.get(k).callFrame.functionName || '(anon)';
+        self.set(name(id), (self.get(name(id)) || 0) + 1);
+        const seen = new Set();
+        for (let k = id; k; k = parent.get(k)) seen.add(name(k));
+        for (const x of seen) total.set(x, (total.get(x) || 0) + 1);
+      }
+      const idle = (self.get('(idle)') || 0) + (self.get('(program)') || 0);
+      if (n - idle < 200) continue;
+      const pct = v => (100 * v / n).toFixed(1).padStart(5);
+      out += `\n== ${s ? 'worker' : 'page'} ${workers.get(s).url.split('/').pop()} ${(s || '').slice(0, 8)}: ${n} samples, idle/program ${pct(idle)}%\n self:\n`;
+      for (const [k, v] of [...self].sort((a, b) => b[1] - a[1]).slice(0, 40)) out += `${pct(v)}  ${k}\n`;
+      out += ' total (self + callees):\n';
+      for (const [k, v] of [...total].sort((a, b) => b[1] - a[1]).slice(0, 40)) out += `${pct(v)}  ${k}\n`;
+    }
+    writeFileSync('build/profile.txt', out);
+    console.log('profile: build/profile.txt');
+  }
+}
 if (route) await send('Emulation.setDeviceMetricsOverride', { ...ROUTE.view, deviceScaleFactor: 1, mobile: false });
 await send('Page.navigate', { url });
 const t0 = Date.now();
@@ -57,6 +99,7 @@ while (Date.now() - t0 < secs * 1000) {
     k.up = true;
     await send('Input.dispatchKeyEvent', { type: 'keyUp', code: k.code, key: k.code });
   }
+  if (prof) await profile();
   const r = await send('Runtime.evaluate', { expression: "document.getElementById('status')?.textContent + '\\n' + document.getElementById('log')?.innerText" });
   text = r?.result?.value || '';
   if (/STOP|Falta COOP/.test(text)) break;
