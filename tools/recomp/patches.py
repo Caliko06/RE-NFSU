@@ -43,6 +43,13 @@ for _a in (0x40bf17, 0x40bfa0, 0x40c00b, 0x40c064):
 PATCHES.append(dict(addr=0x408a24, old="6820030000be58020000c705802a700015000000",
                     new="ff35003001008b35043001006a158f05802a7000", when=lambda: True))
 
+# PATCH: 0x4494c4, widescreen: back to the front end after a race, 0x449497 puts the device back to 800x600 (push 0x320 /
+# mov esi,0x258; call 0x4086b0) unless the resolution option [0x700e70] is 1 (800x600 already). It now asks for the screen
+# size, as 0x408a24 does at the start. Same 18 bytes: mov esi,[0x13004]; push [0x13000]; call 0x4086b0; pop ecx
+# (for add esp,4: ecx is free here, the jmp 0x40a4e0 that follows takes no register).
+PATCHES.append(dict(addr=0x4494c4, old="6820030000be58020000e8ddf1fbff83c404",
+                    new="8b3504300100ff3500300100e8dbf1fbff59", when=lambda: True))
+
 # PATCH: 0x735ec1, OWNER 2026-10-20 (everything available): a debug byte in .bss that no retail code writes (REA/Ghidra
 # xrefs: 61 reads, 0 writes). When it is set, the game itself reports every part, paint, vinyl, rim and performance
 # upgrade unlocked and owned (0x507e10, 0x509d70, 0x50aa90, 0x5a1550, 0x5a3570), every Quick Race track won

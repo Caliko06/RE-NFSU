@@ -78,7 +78,7 @@ void dispatch_threads_report(void) {
         int newer = 0;      // a thread id that came back (short-lived threads): only its newest slot
         for (int j = k + 1; j < nbusy && j < 64; j++) newer |= busy[j].tid == busy[k].tid;
         if (!newer) rn_log("  thread %x: %s %s!%s (ret %08x) for %u ms", busy[k].tid, busy[k].in ? "in" : "guest code after",
-               hosts[busy[k].api].dll, hosts[busy[k].api].name, busy[k].ra, (unsigned)((now - busy[k].since) / 1000));
+               hosts[busy[k].api].dll, hosts[busy[k].api].name, busy[k].ra, (unsigned)(now > busy[k].since ? (now - busy[k].since) / 1000 : 0));
     }
 }
 static void call_host(Ctx *c, uint32_t target) {
