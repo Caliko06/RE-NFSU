@@ -191,13 +191,17 @@ static uint32_t pitch_of(uint32_t f, uint32_t w) {
 static uint32_t size_of(uint32_t f, uint32_t w, uint32_t h) { return pitch_of(f, w) * (is_dxt(f) ? (h + 3) / 4 : h); }
 
 // ---- the adapter ----------------------------------------------------------------------------
-#define DESK_W 1920
-#define DESK_H 1080
+#define DESK_W rn_screen_w
+#define DESK_H rn_screen_h
 #define VRAM (128u << 20)
 static const uint16_t modes[][2] = {{640, 480}, {720, 480}, {720, 576}, {800, 600}, {1024, 768}, {1152, 864},
     {1280, 720}, {1280, 768}, {1280, 800}, {1280, 960}, {1280, 1024}, {1360, 768}, {1366, 768}, {1400, 1050},
     {1440, 900}, {1600, 900}, {1680, 1050}, {1920, 1080}};
-#define NMODES (int)(sizeof modes / sizeof modes[0])
+#define NSTATIC (int)(sizeof modes / sizeof modes[0])
+// The list ends with the desktop size, so the game can pick the size of the window (PATCH 0x408760).
+static int has_desk(void) { for (int k = 0; k < NSTATIC; k++) if (modes[k][0] == DESK_W && modes[k][1] == DESK_H) return 1; return 0; }
+#define NMODES (NSTATIC + !has_desk())
+static void mode_at(int k, uint32_t *w, uint32_t *h) { if (k < NSTATIC) { *w = modes[k][0]; *h = modes[k][1]; } else { *w = DESK_W; *h = DESK_H; } }
 static int display_fmt(uint32_t f) { return f == F_X8R8G8B8 || f == F_R5G6B5; }
 static uint32_t vram_used;
 
@@ -255,7 +259,9 @@ static uint32_t IDirect3D9_EnumAdapterModes(Ctx *c) {
     uint32_t ad = ARG(1), f = ARG(2), k = ARG(3), p = ARG(4);
     TR("EnumAdapterModes(%u, fmt %u, %u)", ad, f, k);
     if (ad != 0 || !display_fmt(f) || k >= (uint32_t)NMODES || !p) return D3DERR_INVALIDCALL;
-    put_mode(c, p, modes[k][0], modes[k][1], f);
+    uint32_t mw, mh;
+    mode_at((int)k, &mw, &mh);
+    put_mode(c, p, mw, mh, f);
     return D3D_OK;
 }
 static uint32_t IDirect3D9_GetAdapterDisplayMode(Ctx *c) {
@@ -500,7 +506,7 @@ static uint32_t take_pp(Ctx *c, uint32_t pp, uint32_t window) {
     }
     if (!windowed) {
         int found = 0;
-        for (int k = 0; k < NMODES; k++) found |= modes[k][0] == p[0] && modes[k][1] == p[1];
+        for (int k = 0; k < NMODES; k++) { uint32_t mw, mh; mode_at(k, &mw, &mh); found |= mw == p[0] && mh == p[1]; }
         if (!found || (!display_fmt(p[2]) && p[2] != F_A8R8G8B8)) return D3DERR_INVALIDCALL;
         if (p[12] && p[12] != 60) return D3DERR_INVALIDCALL;
     }

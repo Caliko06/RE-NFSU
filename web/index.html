@@ -75,6 +75,9 @@ function line(s, cls) {
     onAbort: what => line('STOP wasm abort: ' + what),
     preRun: [m => {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
+      // The game draws at the pixels of this window (PATCH 0x408760), at most 2560x1440 to keep the GPU load sane.
+      const dpr = window.devicePixelRatio || 1, k = Math.min(1, 2560 / (innerWidth * dpr), 1440 / (innerHeight * dpr));
+      m.ENV.RN_SCREEN = `${Math.round(innerWidth * dpr * k)}x${Math.round(innerHeight * dpr * k)}`;
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
       for (const kv of (new URLSearchParams(location.search).get('env') || '').split(',').filter(Boolean)) {
         const k = kv.indexOf('=');

@@ -4,8 +4,8 @@
 #include <strings.h>
 #include "host.h"
 
-#define DESK_W 1920
-#define DESK_H 1080
+#define DESK_W rn_screen_w
+#define DESK_H rn_screen_h
 #define WM_CREATE 0x0001
 #define WM_MOVE 0x0003
 #define WM_SIZE 0x0005

@@ -9,10 +9,10 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-// Title -> profile "asas" -> Quick Race, Olympic Square. PASS: no STOP, the race starts (the device Reset to
-// 640x480) and runs `hold` more seconds.
+// Title -> profile "asas" -> Quick Race, Olympic Square. PASS: no STOP, the race starts (the device Reset to the
+// window size, PATCH 0x40877e) and runs `hold` more seconds.
 const ROUTE = { keys: '20:Enter,23:Enter,26:ArrowRight,29:Enter,32:Enter,35:Enter,38:Enter,44:Enter,50:Enter',
-  marker: /d3d9 Reset: 640x480/, hold: 20, secs: 150, shot: 'build/route.png' };
+  marker: /d3d9 Reset: \d+x\d+/, hold: 20, secs: 150, shot: 'build/route.png' };
 const route = process.argv[2] === '--route';
 const arg = route ? [] : process.argv.slice(2);
 const url = arg[0] || 'http://127.0.0.1:5180/';

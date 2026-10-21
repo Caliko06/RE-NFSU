@@ -1001,7 +1001,15 @@ const Api win32_apis[] = {
 };
 const int win32_api_count = sizeof win32_apis / sizeof win32_apis[0];
 
+int rn_screen_w = 1920, rn_screen_h = 1080;
+
 void win32_init(Ctx *c, uint32_t image_size) {
+    int sw, sh;
+    const char *scr = getenv("RN_SCREEN");
+    if (scr && sscanf(scr, "%dx%d", &sw, &sh) == 2 && sw >= 640 && sh >= 480 && sw <= 7680 && sh <= 4320) {
+        rn_screen_w = sw & ~1; rn_screen_h = sh & ~1;
+    }
+    st(c, SCREEN_ADDR, rn_screen_w, 4); st(c, SCREEN_ADDR + 4, rn_screen_h, 4);
     clock_gettime(CLOCK_MONOTONIC, &t0);
     brk_ptr = HEAP_LO;
     vtop = c->memsz;

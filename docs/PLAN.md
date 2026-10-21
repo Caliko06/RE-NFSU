@@ -24,12 +24,13 @@ One session on main. Each milestone has one gate: the run that proves it.
 
 ## M8 Screen and widescreen (each step has one gate, a capture in Chrome at http://127.0.0.1:5180/)
 - M8.1 Big screen: the canvas fills the window, aspect kept, log on F2 (done 2026-10-20; build/fill.png).
-- M8.2 Bigger picture: the game runs at 1280x720 or more (the layer already offers modes up to 1920x1080).
+- M8.2 (done 2026-10-20: PATCH 0x40877e, the race Reset is 1280x956 = the window; build/route.png) Bigger picture: the game runs at 1280x720 or more (the layer already offers modes up to 1920x1080).
   Found (REA): 0x408760 maps the game's resolution option [0x700e70] to width (eax) and height (esi) and calls 0x4086b0,
   which fills D3DPRESENT_PARAMETERS at 0x71a96c/0x71a970. Table: 640x480, 800x600, 1024x768, 1280x960, 1280x1024.
   Default 800x600 (0x408782). Enabled only if [0x71b7b0+i*4] != 0 (the layer's mode list). No patch needed for 1280x960.
   Gate: CreateDevice log shows the new size, the title and a race fill the window sharp.
-- M8.3 True 16:9 (PATCH the width/height immediates at 0x408760, then the aspect of the 3D view): aspect ratio of the 3D view and the 2D screens (not stretched 4:3). Each change is a `PATCH:` line.
+- M8.3 True 16:9 (build/w169.png, 1600x900: the 3D view and the HUD are stretched 4:3; no 4/3 float in the exe,
+  so the aspect comes from the width/height globals 0x701034/0x701038; readers: 0x40a92d, 0x40a938, 0x40aa9a, 0x40cb81, 0x42f0a8): aspect ratio of the 3D view and the 2D screens (not stretched 4:3). Each change is a `PATCH:` line.
   Gate: Quick Race capture in 16:9, no stretch.
 - M8.4 HUD and menus placed for 16:9. Gate: capture of menu, HUD and garage.
 - M8.5 Route grows to 16:9: `node tools/webcheck.mjs --route` PASS at 1920x1080.

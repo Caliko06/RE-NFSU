@@ -12,6 +12,7 @@
 #define STACK_LO    0x00300000u     // 1 MB main stack (SizeOfStackReserve)
 #define STACK_HI    0x00400000u
 #define IMAGE_BASE  0x00400000u
+#define SCREEN_ADDR 0x00013000u     // PATCH 0x408760 reads the screen width and height here (win32_init writes them)
 #define HEAP_LO     0x00800000u
 #define HOST_BASE   0xe0000000u     // fake code addresses of host functions: HOST_BASE + 16*index
 
@@ -48,6 +49,7 @@ const Api *find_api(const char *dll, const char *name);
 uint32_t call_guest(Ctx *c, uint32_t fn, int n, const uint32_t *args);
 uint32_t host_addr_of(const char *dll, const char *name);     // HOST_BASE address, registering if needed
 void rn_halt(Ctx *c, const char *fmt, ...);
+extern int rn_screen_w, rn_screen_h;   // the desktop the game sees: RN_SCREEN=WxH (the page passes its window size)
 void rn_log(const char *fmt, ...);
 int rn_trace(void);
 void win32_init(Ctx *c, uint32_t image_size);
