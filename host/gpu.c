@@ -69,9 +69,9 @@ typedef struct {
     float *z; uint8_t *stencil;
     uint32_t *lv[14];           // texture levels: RGBA8 (bytes R G B A)
 } Img;
-static Img imgs[8193];
-static Sm1 *shaders[8193];
-static uint32_t *decls[8193], ndecl[8193];
+static Img imgs[GPU_MAXID + 1];
+static Sm1 *shaders[GPU_MAXID + 1];
+static uint32_t *decls[GPU_MAXID + 1], ndecl[GPU_MAXID + 1];
 static const char *shot;
 static uint32_t draws, frames;
 

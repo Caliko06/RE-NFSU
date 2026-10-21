@@ -102,11 +102,18 @@ typedef struct {
     struct Rec *rec;                        // state blocks: the recorded Set calls
     uint32_t nrec;
 } Obj;
-static Obj objs[8192];
+#define MAXOBJ GPU_MAXID
+static Obj objs[MAXOBJ];
 static int nobjs;
 
 static uint32_t new_obj(Ctx *c, int iface) {
-    if (nobjs == 8192) { rn_halt(c, "d3d9: too many objects"); return 0; }
+    if (nobjs == MAXOBJ) {
+        int live[I_N] = {0}, n = 0;
+        for (int k = 0; k < nobjs; k++) if (objs[k].refs || objs[k].container) { live[objs[k].iface]++; n++; }
+        rn_halt(c, "d3d9: too many objects (%d live: %d surfaces, %d textures, %d VBs, %d IBs)", n,
+                live[I_SURFACE], live[I_TEXTURE], live[I_VB], live[I_IB]);
+        return 0;
+    }
     Obj *o = &objs[nobjs];
     memset(o, 0, sizeof *o);
     o->iface = iface;
@@ -482,18 +489,10 @@ static void default_state(void) {
     }
 }
 
-static uint32_t IDirect3D9_CreateDevice(Ctx *c) {
-    uint32_t ad = ARG(1), type = ARG(2), focus = ARG(3), flags = ARG(4), pp = ARG(5), out = ARG(6);
-    for (int k = 0; k < 14; k++) dev.pp[k] = ld(c, pp + 4 * k, 4);
+// D3DPRESENT_PARAMETERS of CreateDevice and Reset: checked, completed and written back like the runtime does.
+static uint32_t take_pp(Ctx *c, uint32_t pp, uint32_t window) {
     uint32_t *p = dev.pp;
-    rn_log("d3d9 CreateDevice(%u, type %u, focus %08x, flags %x): %ux%u fmt %u x%u ms %u/%u swap %u hwnd %08x "
-           "windowed %u autodepth %u fmt %u flags %x %u Hz interval %x",
-           ad, type, focus, flags, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[13]);
-    if (ad != 0 || !out || !pp) return D3DERR_INVALIDCALL;
-    if (type != 1) return D3DERR_NOTAVAILABLE;
-    if (dev.guest) { rn_halt(c, "d3d9: a second device"); return D3DERR_INVALIDCALL; }
     int windowed = p[8] != 0;
-    uint32_t window = p[7] ? p[7] : focus;
     if (!p[0] || !p[1]) {
         if (!windowed) return D3DERR_INVALIDCALL;
         rn_halt(c, "d3d9: windowed device sized from window %08x", window);
@@ -514,22 +513,45 @@ static uint32_t IDirect3D9_CreateDevice(Ctx *c) {
         return D3DERR_INVALIDCALL;
     }
     for (int k = 0; k < 14; k++) st(c, pp + 4 * k, p[k], 4);     // the runtime writes back what it chose
-    // Without D3DCREATE_FPU_PRESERVE the runtime sets the calling thread's FPU to single precision, round to nearest.
-    if (!(flags & 2)) c->fcw &= ~0xf00u;
-    dev.flags = flags;
-    dev.window = window;
-    dev.guest = new_obj(c, I_DEVICE);
-    objs[ld(c, d3d9_obj + 4, 4) - 1].refs++;
+    return D3D_OK;
+}
+// The implicit swap chain: back buffer and automatic depth buffer from dev.pp, then the default state.
+static void swap_chain(Ctx *c) {
+    uint32_t *p = dev.pp;
     uint32_t bb = new_surface(c, p[0], p[1], p[2], U_RENDERTARGET, POOL_DEFAULT, (p[11] & 1) != 0);  // LOCKABLE_BACKBUFFER
     Obj *b = obj_of(c, bb, I_SURFACE);
     b->container = 0;
+    memset(dev.rt, 0, sizeof dev.rt);
     dev.backbuf = dev.rt[0] = idx(b) + 1;
+    dev.depth = dev.ds = 0;
     if (p[9]) {
         Obj *d = obj_of(c, new_surface(c, p[0], p[1], p[10], U_DEPTHSTENCIL, POOL_DEFAULT, p[10] == F_D16_LOCKABLE), I_SURFACE);
         dev.depth = dev.ds = idx(d) + 1;
     }
     default_state();
     reset_viewport(b);
+}
+
+static uint32_t IDirect3D9_CreateDevice(Ctx *c) {
+    uint32_t ad = ARG(1), type = ARG(2), focus = ARG(3), flags = ARG(4), pp = ARG(5), out = ARG(6);
+    if (ad != 0 || !out || !pp) return D3DERR_INVALIDCALL;
+    for (int k = 0; k < 14; k++) dev.pp[k] = ld(c, pp + 4 * k, 4);
+    uint32_t *p = dev.pp;
+    rn_log("d3d9 CreateDevice(%u, type %u, focus %08x, flags %x): %ux%u fmt %u x%u ms %u/%u swap %u hwnd %08x "
+           "windowed %u autodepth %u fmt %u flags %x %u Hz interval %x",
+           ad, type, focus, flags, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[13]);
+    if (type != 1) return D3DERR_NOTAVAILABLE;
+    if (dev.guest) { rn_halt(c, "d3d9: a second device"); return D3DERR_INVALIDCALL; }
+    uint32_t window = p[7] ? p[7] : focus;
+    uint32_t r = take_pp(c, pp, window);
+    if (r != D3D_OK) return r;
+    // Without D3DCREATE_FPU_PRESERVE the runtime sets the calling thread's FPU to single precision, round to nearest.
+    if (!(flags & 2)) c->fcw &= ~0xf00u;
+    dev.flags = flags;
+    dev.window = window;
+    dev.guest = new_obj(c, I_DEVICE);
+    objs[ld(c, d3d9_obj + 4, 4) - 1].refs++;
+    swap_chain(c);
     st(c, out, dev.guest, 4);
     return D3D_OK;
 }
@@ -537,6 +559,47 @@ static uint32_t IDirect3D9_CreateDevice(Ctx *c) {
 #define DEV() do { if (ARG(0) != dev.guest) { rn_halt(c, "d3d9: %08x is not the device", ARG(0)); return D3DERR_INVALIDCALL; } } while (0)
 
 static uint32_t IDirect3DDevice9_TestCooperativeLevel(Ctx *c) { DEV(); return D3D_OK; }
+// Reset (d3d9 docs): fails unless every D3DPOOL_DEFAULT resource but the implicit back buffer and depth buffer
+// is released; makes a new swap chain from the new parameters and puts all device state back to its defaults.
+static uint32_t IDirect3DDevice9_Reset(Ctx *c) {
+    DEV();
+    uint32_t pp = ARG(1);
+    if (!pp) return D3DERR_INVALIDCALL;
+    if (dev.recording) { rn_halt(c, "d3d9: Reset while recording a state block"); return D3DERR_INVALIDCALL; }
+    for (int k = 0; k < nobjs; k++) {
+        Obj *o = &objs[k];
+        int implicit = (uint32_t)k + 1 == dev.backbuf || (uint32_t)k + 1 == dev.depth;
+        int resource = o->iface == I_SURFACE || o->iface == I_TEXTURE || o->iface == I_CUBE || o->iface == I_VB || o->iface == I_IB;
+        if (resource && !o->container && o->pool == POOL_DEFAULT && o->refs > (implicit ? 1u : 0u)) {
+            rn_halt(c, "d3d9: Reset with a live D3DPOOL_DEFAULT %s %08x (%u refs)", iface_name[o->iface], o->guest, o->refs);
+            return D3DERR_INVALIDCALL;
+        }
+    }
+    uint32_t old[14];
+    memcpy(old, dev.pp, sizeof old);
+    for (int k = 0; k < 14; k++) dev.pp[k] = ld(c, pp + 4 * k, 4);
+    uint32_t *p = dev.pp;
+    rn_log("d3d9 Reset: %ux%u fmt %u x%u ms %u/%u swap %u hwnd %08x windowed %u autodepth %u fmt %u flags %x %u Hz interval %x",
+           p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[13]);
+    uint32_t r = take_pp(c, pp, p[7] ? p[7] : dev.window);
+    if (r != D3D_OK) { memcpy(dev.pp, old, sizeof old); return r; }
+    for (uint32_t k1 = dev.backbuf, j = 0; j < 2; k1 = dev.depth, j++) {
+        Obj *o = obj_k(k1);
+        if (o) { o->refs = 0; vram_used -= o->size; }
+    }
+    dev.decl = dev.fvf = dev.vs = dev.ps = dev.ib = 0;
+    memset(dev.tex, 0, sizeof dev.tex);
+    memset(dev.stream, 0, sizeof dev.stream);
+    memset(dev.vsf, 0, sizeof dev.vsf); memset(dev.psf, 0, sizeof dev.psf);
+    memset(dev.vsi, 0, sizeof dev.vsi); memset(dev.psi, 0, sizeof dev.psi);
+    memset(dev.vsb, 0, sizeof dev.vsb); memset(dev.psb, 0, sizeof dev.psb);
+    memset(dev.material, 0, sizeof dev.material);
+    memset(dev.light, 0, sizeof dev.light); memset(dev.light_on, 0, sizeof dev.light_on);
+    memset(dev.light_set, 0, sizeof dev.light_set);
+    memset(dev.clip, 0, sizeof dev.clip);
+    swap_chain(c);
+    return D3D_OK;
+}
 static uint32_t IDirect3DDevice9_GetAvailableTextureMem(Ctx *c) {
     DEV();
     uint32_t m = (VRAM - vram_used + (1u << 19)) & ~((1u << 20) - 1);     // rounded to the nearest MB
@@ -1031,28 +1094,66 @@ static uint32_t IDirect3DDevice9_SetDepthStencilSurface(Ctx *c) {
 
 // ---- declarations and shaders -----------------------------------------------------------------
 // D3DVERTEXELEMENT9 {WORD Stream, Offset; BYTE Type, Method, Usage, UsageIndex}, ended by stream 0xff.
-static uint32_t IDirect3DDevice9_CreateVertexDeclaration(Ctx *c) {
-    DEV();
-    uint32_t p = ARG(1), out = ARG(2), n = 0;
-    if (!p || !out) return D3DERR_INVALIDCALL;
-    while (ld(c, p + 8 * n, 2) != 0xff) if (++n > 64) return D3DERR_INVALIDCALL;
-    uint32_t g = new_obj(c, I_DECL);
+// A declaration object from n elements (8 bytes each, then the D3DDECL_END element); returns its index + 1.
+static uint32_t make_decl(Ctx *c, const void *el, uint32_t n) {
+    if (!new_obj(c, I_DECL)) return 0;
     Obj *o = &objs[nobjs - 1];
     o->nblob = 2 * (n + 1);
     o->blob = malloc(4u * o->nblob);
-    memcpy(o->blob, G(p), 8u * (n + 1));
+    memcpy(o->blob, el, 8u * (n + 1));
     uint32_t *w = calloc(2 + 2 * n, 4);
     w[0] = idx(o) + 1; w[1] = n;
     memcpy(w + 2, o->blob, 8u * n);
     gpu_cmd(GPU_DECL, (int)(2 + 2 * n), w);
     free(w);
     if (rn_trace())
-        for (uint32_t k = 0; k < n; k++)
-            rn_log("d3d9   element stream %u off %u type %u method %u usage %u/%u", ld(c, p + 8 * k, 2),
-                   ld(c, p + 8 * k + 2, 2), ld(c, p + 8 * k + 4, 1), ld(c, p + 8 * k + 5, 1), ld(c, p + 8 * k + 6, 1),
-                   ld(c, p + 8 * k + 7, 1));
-    st(c, out, g, 4);
+        for (uint32_t k = 0; k < n; k++) {
+            const uint8_t *e = (const uint8_t *)el + 8 * k;
+            rn_log("d3d9   element stream %u off %u type %u method %u usage %u/%u", e[0] | e[1] << 8, e[2] | e[3] << 8,
+                   e[4], e[5], e[6], e[7]);
+        }
+    return idx(o) + 1;
+}
+static uint32_t IDirect3DDevice9_CreateVertexDeclaration(Ctx *c) {
+    DEV();
+    uint32_t p = ARG(1), out = ARG(2), n = 0;
+    if (!p || !out) return D3DERR_INVALIDCALL;
+    while (ld(c, p + 8 * n, 2) != 0xff) if (++n > 64) return D3DERR_INVALIDCALL;
+    uint32_t k1 = make_decl(c, G(p), n);
+    if (!k1) return D3DERR_INVALIDCALL;
+    st(c, out, objs[k1 - 1].guest, 4);
     return D3D_OK;
+}
+// SetFVF with a vertex shader: the runtime draws through the declaration the FVF describes (d3d9 docs,
+// "Mapping FVF Codes to a Directx 9 Declaration"). One declaration per FVF, made on first use.
+static uint32_t fvf_decl(Ctx *c, uint32_t fvf) {
+    static uint32_t key[64], val[64], n;
+    for (uint32_t k = 0; k < n; k++) if (key[k] == fvf) return val[k];
+    uint8_t el[8 * 16];
+    uint32_t ne = 0, off = 0;
+    #define EL(type, usage, ui, size) do { uint8_t *e = el + 8 * ne++; e[0] = 0; e[1] = 0; e[2] = (uint8_t)off; \
+        e[3] = (uint8_t)(off >> 8); e[4] = (type); e[5] = 0; e[6] = (usage); e[7] = (ui); off += (size); } while (0)
+    uint32_t pos = fvf & 0x400e;
+    if (pos == 0x2) EL(2, 0, 0, 12);                    // XYZ: FLOAT3 POSITION
+    else if (pos == 0x4) EL(3, 9, 0, 16);               // XYZRHW: FLOAT4 POSITIONT
+    else if (pos == 0x4002) EL(3, 0, 0, 16);            // XYZW: FLOAT4 POSITION
+    else if (pos) { rn_halt(c, "d3d9: FVF %x with blend weights", fvf); return 0; }
+    if (fvf & 0x10) EL(2, 3, 0, 12);                    // NORMAL
+    if (fvf & 0x20) EL(0, 4, 0, 4);                     // PSIZE
+    if (fvf & 0x40) EL(4, 10, 0, 4);                    // DIFFUSE: D3DCOLOR COLOR0
+    if (fvf & 0x80) EL(4, 10, 1, 4);                    // SPECULAR: D3DCOLOR COLOR1
+    static const uint8_t tc_type[4] = {1, 2, 3, 0}, tc_size[4] = {8, 12, 16, 4};
+    for (uint32_t t = 0; t < ((fvf >> 8) & 0xf); t++) {
+        uint32_t f = (fvf >> (16 + 2 * t)) & 3;
+        EL(tc_type[f], 5, t, tc_size[f]);
+    }
+    #undef EL
+    uint8_t *e = el + 8 * ne;                           // D3DDECL_END
+    e[0] = 0xff; e[1] = 0; e[2] = e[3] = 0; e[4] = 17; e[5] = e[6] = e[7] = 0;
+    uint32_t k1 = make_decl(c, el, ne);
+    if (k1 && n < 64) { key[n] = fvf; val[n++] = k1; }
+    TR("FVF %x -> declaration %u (%u elements, %u bytes)", fvf, k1, ne, off);
+    return k1;
 }
 static uint32_t IDirect3DVertexDeclaration9_GetDeclaration(Ctx *c) {
     SELF(I_DECL);
@@ -1119,7 +1220,7 @@ static uint32_t get_bound(Ctx *c, uint32_t out, uint32_t k1) {
 }
 static uint32_t IDirect3DDevice9_SetVertexDeclaration(Ctx *c) { DEV(); REC(IDirect3DDevice9_SetVertexDeclaration, 2, -1, 0); dev.fvf = 0; return bind(c, &dev.decl, ARG(1), I_DECL); }
 static uint32_t IDirect3DDevice9_GetVertexDeclaration(Ctx *c) { DEV(); return get_bound(c, ARG(1), dev.decl); }
-static uint32_t IDirect3DDevice9_SetFVF(Ctx *c) { DEV(); REC(IDirect3DDevice9_SetFVF, 2, -1, 0); TR("SetFVF(%x)", ARG(1)); dev.fvf = ARG(1); dev.decl = 0; return D3D_OK; }
+static uint32_t IDirect3DDevice9_SetFVF(Ctx *c) { DEV(); REC(IDirect3DDevice9_SetFVF, 2, -1, 0); TR("SetFVF(%x)", ARG(1)); dev.fvf = ARG(1); dev.decl = dev.fvf ? fvf_decl(c, dev.fvf) : 0; return D3D_OK; }
 static uint32_t IDirect3DDevice9_GetFVF(Ctx *c) { DEV(); st(c, ARG(1), dev.fvf, 4); return D3D_OK; }
 static uint32_t IDirect3DDevice9_SetVertexShader(Ctx *c) { DEV(); REC(IDirect3DDevice9_SetVertexShader, 2, -1, 0); return bind(c, &dev.vs, ARG(1), I_VS); }
 static uint32_t IDirect3DDevice9_GetVertexShader(Ctx *c) { DEV(); return get_bound(c, ARG(1), dev.vs); }
@@ -1522,7 +1623,7 @@ const Api d3d9_apis[] = {
     D3D_ENTRY(EnumAdapterModes, 5), D3D_ENTRY(GetAdapterDisplayMode, 3), D3D_ENTRY(CheckDeviceType, 6),
     D3D_ENTRY(CheckDeviceFormat, 7), D3D_ENTRY(CheckDeviceMultiSampleType, 7), D3D_ENTRY(CheckDepthStencilMatch, 6),
     D3D_ENTRY(GetDeviceCaps, 4), D3D_ENTRY(GetAdapterMonitor, 2), D3D_ENTRY(CreateDevice, 7),
-    DEV_ENTRY(TestCooperativeLevel, 1), DEV_ENTRY(GetAvailableTextureMem, 1), DEV_ENTRY(GetDirect3D, 2),
+    DEV_ENTRY(TestCooperativeLevel, 1), DEV_ENTRY(Reset, 2), DEV_ENTRY(GetAvailableTextureMem, 1), DEV_ENTRY(GetDirect3D, 2),
     DEV_ENTRY(GetDeviceCaps, 2), DEV_ENTRY(GetDisplayMode, 3), DEV_ENTRY(GetBackBuffer, 5),
     DEV_ENTRY(GetRenderTarget, 3), DEV_ENTRY(GetDepthStencilSurface, 2), DEV_ENTRY(BeginScene, 1),
     DEV_ENTRY(EndScene, 1), DEV_ENTRY(Clear, 7), DEV_ENTRY(Present, 5), DEV_ENTRY(SetRenderState, 3),

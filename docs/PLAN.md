@@ -15,7 +15,7 @@ One session on main. Each milestone has one gate: the run that proves it.
 - Gate: one Chrome capture of the main menu after the profile; the profile file is in save/.
 
 ## M6 A race
-- Quick Race: the circuit loads, the car drives, the race ends and returns to the menu.
+- Quick Race: the circuit loads and runs (done 2026-10-20); next: the car drives, the race ends, back to the menu.
 - Gate: one full race in Chrome without a stop.
 
 ## M7 Career and saves
@@ -30,7 +30,7 @@ One session on main. Each milestone has one gate: the run that proves it.
 
 ## Only when a run hits it
 - Known layer gaps: GetMessageA that would wait (0x411030, window inactive), SuspendThread of a running thread
-  (0x448d00, 0x5a4a50), D3D9 device lost / Reset (0x4016e0 -> 0x40a4e0). Fix one when a run stops on it.
+  (0x448d00, 0x5a4a50). Fix one when a run stops on it.
 - Speed: only when the OWNER feels lag. Then measure hitches over 33 ms first; candidates are -O2 for build/gen,
   fewer CHK, x87 state in locals, GIL hand-offs (audio thread 0x654a90 wakes every 10 ms).
 - New lifter bug -> fix it in tools/recomp with the difftest (RN_ONLY trace).

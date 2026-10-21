@@ -6,6 +6,7 @@
 
 // Command: [op | nwords << 8] then nwords payload words. Ids are d3d9 object indexes + 1; render
 // targets and textures share the id space.
+#define GPU_MAXID 65536     // d3d9 objects; a race keeps about 7,300 alive
 enum {
     GPU_TARGET = 1,     // id, width, height, kind (0 color, 1 depth/stencil)
     GPU_CLEAR = 2,      // color id (0 none), depth id (0 none), D3DCLEAR flags, ARGB, z (float bits), stencil, x0, y0, x1, y1
