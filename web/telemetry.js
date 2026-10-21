@@ -48,17 +48,29 @@ function startTelemetry(M, t0, log) {
   addEventListener('visibilitychange', () => event('visibility', { state: document.visibilityState }));
   addEventListener('blur', () => event('focus', { state: 'blur' }));
   addEventListener('focus', () => event('focus', { state: 'focus' }));
+  // A short note over the game (a mark, or the server refusing the data).
+  const note = document.createElement('div');
+  Object.assign(note.style, { position: 'fixed', top: '12px', left: '50%', transform: 'translateX(-50%)', padding: '6px 14px',
+    background: 'rgba(0,0,0,.75)', color: '#fff', font: '15px ui-monospace, Menlo, monospace', borderRadius: '6px',
+    pointerEvents: 'none', display: 'none', zIndex: 10 });
+  document.body.appendChild(note);
+  let noteTimer = 0;
+  const show = (text, ms) => { note.textContent = text; note.style.display = 'block'; clearTimeout(noteTimer); noteTimer = setTimeout(() => note.style.display = 'none', ms); };
   let marks = 0;
   addEventListener('keydown', e => {
     if (e.code !== 'F8') return;
     e.preventDefault(); e.stopPropagation();
-    if (!e.repeat) { event('mark', { n: ++marks }); log(`telemetry: mark ${marks}`); }
+    if (!e.repeat) { event('mark', { n: ++marks }); log(`telemetry: mark ${marks}`); show(`marca ${marks} guardada`, 1500); }
   }, true);
   setInterval(() => event('heap', { mb: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : -1 }), 5000);
 
   const head = { kind: 'session', url: location.href, date: new Date().toISOString(), ua: navigator.userAgent,
     screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, cols: TELEM_COLS };
-  fetch('/telemetry?new', { method: 'POST', body: JSON.stringify(head) + '\n' }).catch(() => {});
+  fetch('/telemetry?new', { method: 'POST', body: JSON.stringify(head) + '\n' }).then(r => {
+    if (r.ok) return;
+    log(`telemetry: the server answered ${r.status}: restart tools/serve.py`);
+    show('telemetría sin guardar: reinicia tools/serve.py', 8000);
+  }).catch(() => {});
   function flush() {
     if (!rows.length && !events.length) return;
     let body = rows.length ? JSON.stringify({ rows }) + '\n' : '';
