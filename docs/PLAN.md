@@ -39,7 +39,8 @@ One session on main. Each milestone has one gate: the run that proves it.
 - M8.4 HUD and menus placed for 16:9 (closed UNKNOWN 2026-10-20, REA Ghidra+Hopper; build/evidence/1_hud.md).
   FEng places every element by a matrix in 640x480 relative to the centre (0x4f1810, translate 320,240); no anchor field.
   Corner anchors and full-screen art cover (stretch or crop) are new rules: OWNER decision before any PATCH.
-- M8.5 Route grows to 16:9: `node tools/webcheck.mjs --route` PASS at 1920x1080.
+- M8.5 (done 2026-10-20) Route grows to 16:9: `node tools/webcheck.mjs --route` PASS at 1920x1080 (CDP viewport, marker
+  `d3d9 Reset: 1920x1080`, present 1920x1080, no page error; build/route.png).
 
 ## M9 Play, ends at 5180
 - The OWNER plays the career in Chrome at http://127.0.0.1:5180/, full window, 16:9.

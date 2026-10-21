@@ -10,9 +10,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 // Title -> profile "asas" -> Quick Race, Olympic Square. PASS: no STOP, the race starts (the device Reset to the
-// window size, PATCH 0x40877e) and runs `hold` more seconds.
+// window size, PATCH 0x40877e) and runs `hold` more seconds. M8.5: the page is 1920x1080 device pixels (dpr 1), so the
+// race Reset and every present are 1920x1080.
 const ROUTE = { keys: '20:Enter,23:Enter,26:ArrowRight,29:Enter,32:Enter,35:Enter,38:Enter,44:Enter,50:Enter',
-  marker: /d3d9 Reset: \d+x\d+/, hold: 20, secs: 150, shot: 'build/route.png' };
+  marker: /d3d9 Reset: 1920x1080 /, present: /present 1920x1080/, view: { width: 1920, height: 1080 }, hold: 20, secs: 150,
+  shot: 'build/route.png' };
 const route = process.argv[2] === '--route';
 const arg = route ? [] : process.argv.slice(2);
 const url = arg[0] || 'http://127.0.0.1:5180/';
@@ -37,6 +39,7 @@ ws.onmessage = e => {
 };
 const send = (method, params = {}) => new Promise(r => { pending.set(++id, r); ws.send(JSON.stringify({ id, method, params })); });
 await send('Runtime.enable');
+if (route) await send('Emulation.setDeviceMetricsOverride', { ...ROUTE.view, deviceScaleFactor: 1, mobile: false });
 await send('Page.navigate', { url });
 const t0 = Date.now();
 let text = '', seen = 0;
@@ -68,8 +71,9 @@ console.log(text);
 if (errors.length) console.log('page errors:\n' + errors.join('\n'));
 chrome.kill('SIGKILL');   // headless Chrome can ignore SIGTERM and keep the game (and its sound) running
 if (route) {
-  const why = /STOP/.test(text) ? 'a STOP' : !seen ? `no ${ROUTE.marker} in ${secs} s` : Date.now() - seen < ROUTE.hold * 1000 ? 'ended early' : '';
-  console.log(why ? `ROUTE FAIL: ${why}` : `ROUTE PASS: race started at ${((seen - t0) / 1000).toFixed(0)} s and ran ${ROUTE.hold} s`);
+  const why = /STOP/.test(text) ? 'a STOP' : errors.length ? 'a page error' : !seen ? `no ${ROUTE.marker} in ${secs} s`
+    : Date.now() - seen < ROUTE.hold * 1000 ? 'ended early' : !ROUTE.present.test(text) ? `no ${ROUTE.present}` : '';
+  console.log(why ? `ROUTE FAIL: ${why}` : `ROUTE PASS: race started at ${((seen - t0) / 1000).toFixed(0)} s and ran ${ROUTE.hold} s, present 1920x1080`);
   process.exit(why ? 1 : 0);
 }
 process.exit(0);
