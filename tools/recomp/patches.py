@@ -43,6 +43,12 @@ for _a in (0x40bf17, 0x40bfa0, 0x40c00b, 0x40c064):
 PATCHES.append(dict(addr=0x408a24, old="6820030000be58020000c705802a700015000000",
                     new="ff35003001008b35043001006a158f05802a7000", when=lambda: True))
 
+# PATCH: 0x735ec1, OWNER 2026-10-20 (everything available): a debug byte in .bss that no retail code writes (REA/Ghidra
+# xrefs: 61 reads, 0 writes). When it is set, the game itself reports every part, paint, vinyl, rim and performance
+# upgrade unlocked and owned (0x507e10, 0x509d70, 0x50aa90, 0x5a1550, 0x5a3570), every Quick Race track won
+# (0x5a16f0 -> 0x4b9f40) and money as 1000000000 (0x5a1520). Mode flags of a track (0x4ab470) still apply.
+PATCHES.append(dict(addr=0x735ec1, old="00", new="01", when=lambda: True))
+
 
 def active():
     return [p for p in PATCHES if p["when"]()]
@@ -52,6 +58,9 @@ def apply(img, base):
     """Patch a bytearray image mapped at base."""
     for p in active():
         o, old, new = p["addr"] - base, bytes.fromhex(p["old"]), bytes.fromhex(p["new"])
+        if o >= len(img):   # .bss past the raw data: zero by the PE format; the loader writes it in guest memory
+            if old.strip(b"\0"): raise SystemExit(f"PATCH {p['addr']:#x}: .bss starts as zero")
+            continue
         if len(old) != len(new) or bytes(img[o:o + len(old)]) != old:
             raise SystemExit(f"PATCH {p['addr']:#x}: original bytes do not match")
         img[o:o + len(new)] = new
