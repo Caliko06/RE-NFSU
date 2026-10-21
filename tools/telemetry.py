@@ -2,7 +2,8 @@
 """Reads a play session's telemetry (web/telemetry.js -> build/telemetry.ndjson) next to its log (build/web.log)
 and prints where the time went: frame times, the worst frames with what happened in each, audio stream starvation,
 the F8 marks, and a 10 s timeline.
-Usage: .venv/bin/python tools/telemetry.py [telemetry.ndjson] [web.log]   (defaults: the OWNER's last session)
+Usage: .venv/bin/python tools/telemetry.py [telemetry.ndjson | nfsu-session-*.json] [web.log]   (defaults: the OWNER's last
+session; a .json from F10 in the page carries its own log)
 A frame's time is the page's time between two presents. In it: gpuWait = the game waiting for the page (the page or
 the GPU is slow), gilMain = the main thread waiting for another guest thread, read = file reads from the server,
 idle = the main thread in Sleep or a wait (its own frame pacing), game = the rest (the game's translated code).
@@ -14,8 +15,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 tel = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "build", "telemetry.ndjson")
 logp = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "build", "web.log")
 
-head, rows, events = None, [], []
-for line in open(tel):
+head, rows, events, inlog = None, [], [], None
+if tel.endswith(".json"):                   # F10 download: one object with rows, events and the page log
+    o = json.load(open(tel))
+    head, rows, events, inlog = o, o["rows"], o["events"], o.get("log")
+for line in ([] if inlog is not None else open(tel)):
     if not line.strip():
         continue
     try:
@@ -35,8 +39,8 @@ col = lambda r, c: r[C[c]]
 
 # The log: "secs text" lines (index.html), for what happened around a frame.
 log = []
-if os.path.exists(logp):
-    for l in open(logp, errors="replace"):
+if inlog is not None or os.path.exists(logp):
+    for l in (inlog if inlog is not None else open(logp, errors="replace")):
         p = l.split(" ", 1)
         try:
             log.append((float(p[0]) * 1000, p[1].rstrip()))

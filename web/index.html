@@ -38,7 +38,8 @@
 const log = document.getElementById('log'), status = document.getElementById('status');
 const t0 = performance.now();
 // Everything shown here also goes to tools/serve.py (build/web.log), so a session can be read afterwards.
-let pending = [];
+let pending = [], allLog = [];       // allLog: the whole session, for the F10 download (telemetry.js)
+const keep = s => { pending.push(s); allLog.push(s); };
 function flush() {
   if (!pending.length) return;
   const body = pending.join('\n') + '\n';
@@ -48,14 +49,14 @@ function flush() {
 fetch('/log?new', { method: 'POST', body: `page ${location.href} ${new Date().toISOString()}\n` }).catch(() => {});
 setInterval(flush, 1000);
 const secs = () => ((performance.now() - t0) / 1000).toFixed(2);
-addEventListener('keydown', e => { if (!e.repeat) pending.push(`${secs()} key down ${e.code}`); }, true);
-addEventListener('keyup', e => pending.push(`${secs()} key up ${e.code}`), true);
+addEventListener('keydown', e => { if (!e.repeat) keep(`${secs()} key down ${e.code}`); }, true);
+addEventListener('keyup', e => keep(`${secs()} key up ${e.code}`), true);
 addEventListener('error', e => { line('JS error: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'stop'); flush(); });
 addEventListener('unhandledrejection', e => { line('JS rejection: ' + (e.reason && e.reason.stack || e.reason), 'stop'); flush(); });
 addEventListener('pagehide', flush);
 addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classList.toggle('dbg'); e.preventDefault(); } }, true);
 function line(s, cls) {
-  pending.push(`${secs()} ${s}`);
+  keep(`${secs()} ${s}`);
   if (/^STOP|^JS |abort|Aborted|RuntimeError/.test(s)) setTimeout(flush, 0);
   const d = document.createElement('div');
   if (cls) d.className = cls;
@@ -91,7 +92,7 @@ function line(s, cls) {
       }
     }],
   });
-  const telem = startTelemetry(M, t0, s => line(s));
+  const telem = startTelemetry(M, t0, s => line(s), allLog);
   startGpu(M, document.getElementById('screen'), s => line(s, 'api'), telem?.frame).catch(e => line('gpu.js: ' + e.message, 'stop'));
   startInput(M, document.getElementById('screen'));
   startAudio(M, s => line(s)).catch(e => line('audio.js: ' + e.message, 'stop'));

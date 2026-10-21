@@ -2,7 +2,8 @@
 // tools/serve.py (POST /telemetry -> build/telemetry.ndjson; build/webcheck.telemetry.ndjson for headless Chrome).
 // tools/telemetry.py reads it with build/web.log (same clock: ms since the page started).
 // F8 drops a mark ("this moment"), so a lag or a sound bug can be found in the file. F9 shows the same numbers live over
-// the game (per frame: where its time went). ?telemetry=0 turns it off.
+// the game (per frame: where its time went). F10 downloads the whole session as one .json (rows, events, the page log),
+// like NFSU1-RE's F9 black box. ?telemetry=0 turns it off.
 'use strict';
 // Row columns. Host totals (host.h Telem) go in as deltas since the previous row.
 const TELEM_COLS = ['t', 'run', 'present', 'draws', 'clears', 'kwords', 'texKb', 'pipes', 'shaders', 'targets', 'hd',
@@ -10,7 +11,7 @@ const TELEM_COLS = ['t', 'run', 'present', 'draws', 'clears', 'kwords', 'texKb',
   'starves', 'starveBuf',
   'audioBehind', 'underrun', 'resyncs', 'clockCalls'];
 
-function startTelemetry(M, t0, log) {
+function startTelemetry(M, t0, log, logLines) {
   if (new URLSearchParams(location.search).get('telemetry') === '0') return null;
   const base = M._rn_telem_addr(), audio = M._rn_audio_ring() >> 2;
   const F = () => M.HEAPF64, U = () => M.HEAPU32;
@@ -22,12 +23,14 @@ function startTelemetry(M, t0, log) {
     return [f[d], f[d + 1], f[d + 2], f[d + 3], f[d + 4], f[d + 5], f[d + 6], u[W], u[W + 1], u[W + 2], u[W + 3], u[W + 4], u[W + 6]];
   };
   let prev = host(), prevUnder = 0, prevResync = 0, rows = [], events = [];
+  const allRows = [], allEvents = [];                  // the whole session, for F10
   // Live view: the last N presented frames, each the sum of its rows (a load hands a frame over in parts).
   const N = 300, live = [];
   let acc = null, lastPresent = 0, starves = 0, underruns = 0;
   const ms = () => Math.round(performance.now() - t0);
   const r1 = x => Math.round(x * 10) / 10;
-  const event = (kind, data) => events.push({ t: ms(), kind, ...data });
+  const push = e => { events.push(e); allEvents.push(e); };
+  const event = (kind, data) => push({ t: ms(), kind, ...data });
 
   function frame(s, t, runMs) {
     const h = host(), u = U();
@@ -40,6 +43,7 @@ function startTelemetry(M, t0, log) {
     F()[(base >> 3) + 5] = F()[(base >> 3) + 6] = 0; u[W + 3] = 0;     // the maxima are since the last row
     starves += h[11] - prev[11]; underruns += under - prevUnder;
     const r = rows[rows.length - 1];
+    allRows.push(r);
     acc = acc || { gpuWait: 0, gil: 0, read: 0, run: 0, draws: 0, texKb: 0, pipes: 0, readKb: 0, clock: 0, hold: 0 };
     acc.gpuWait += r[11]; acc.gil += r[12]; acc.read += r[14]; acc.run += r[1]; acc.draws += r[3]; acc.texKb += r[6];
     acc.pipes += r[7]; acc.readKb += r[19]; acc.clock += r[27]; acc.hold = Math.max(acc.hold, r[16], r[17]);
@@ -59,7 +63,7 @@ function startTelemetry(M, t0, log) {
   try {
     new PerformanceObserver(list => {
       for (const e of list.getEntries()) if (e.duration >= 50)
-        events.push({ t: Math.round(e.startTime - t0), kind: 'loaf', dur: Math.round(e.duration), block: Math.round(e.blockingDuration || 0),
+        push({ t: Math.round(e.startTime - t0), kind: 'loaf', dur: Math.round(e.duration), block: Math.round(e.blockingDuration || 0),
           scripts: (e.scripts || []).slice(0, 3).map(x => `${x.invoker || x.name} ${Math.round(x.duration)}ms`) });
     }).observe({ type: 'long-animation-frame', buffered: true });
   } catch {}
@@ -150,6 +154,21 @@ function startTelemetry(M, t0, log) {
   }
   setInterval(flush, 2000);
   addEventListener('pagehide', flush);
-  log('telemetry: on (build/telemetry.ndjson), F8 = mark, F9 = live panel');
+  // F10: the session as one file the browser saves (Downloads): head, cols, rows, events, log.
+  addEventListener('keydown', e => {
+    if (e.code !== 'F10') return;
+    e.preventDefault(); e.stopPropagation();
+    if (e.repeat) return;
+    event('download', {});
+    const name = `nfsu-session-${head.date.replace(/[:.]/g, '-')}.json`;
+    const blob = new Blob([JSON.stringify({ format: 'rn-session-1', ...head, saved: ms(), rows: allRows, events: allEvents,
+      log: logLines || [] })], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    log(`telemetry: session saved as ${name} (${allRows.length} rows)`);
+    show(`sesión descargada: ${name}`, 3000);
+  }, true);
+  log('telemetry: on (build/telemetry.ndjson), F8 = mark, F9 = live panel, F10 = download the session');
   return { frame, event };
 }
