@@ -12,7 +12,8 @@
 #define STACK_LO    0x00300000u     // 1 MB main stack (SizeOfStackReserve)
 #define STACK_HI    0x00400000u
 #define IMAGE_BASE  0x00400000u
-#define SCREEN_ADDR 0x00013000u     // PATCH 0x408760 reads the screen width and height here (win32_init writes them)
+#define SCREEN_ADDR 0x00013000u     // PATCH 0x40877e reads the screen width and height here (win32_init writes them)
+// PATCH 0x40bf09..: the 2D quad code reads S/320 (+8) and S (+12) as floats; S = 4:3 over the screen aspect, at most 1
 #define HEAP_LO     0x00800000u
 #define HOST_BASE   0xe0000000u     // fake code addresses of host functions: HOST_BASE + 16*index
 

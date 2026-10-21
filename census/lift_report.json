@@ -5,7 +5,17 @@
  "abk_distinct_code": 23,
  "abk_functions": 28,
  "patches": [
-  "0x4f5891"
+  "0x4f5891",
+  "0x40877e",
+  "0x40bf09",
+  "0x40bf9a",
+  "0x40bfff",
+  "0x40c053",
+  "0x40bf17",
+  "0x40bfa0",
+  "0x40c00b",
+  "0x40c064",
+  "0x408a24"
  ],
  "data_seeds_inside_instructions": 615,
  "failed": {},

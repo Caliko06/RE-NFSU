@@ -1196,7 +1196,7 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     o->sm = sm;
     TR("Create%sShader %s_%u_%u, %u tokens -> %08x", iface == I_VS ? "Vertex" : "Pixel", iface == I_VS ? "vs" : "ps",
        (ver >> 8) & 0xff, ver & 0xff, n, g);
-    if (rn_trace()) sm1_disasm(sm, disasm_line);
+    if (rn_trace() || getenv("RN_VS")) { TR(""); rn_log("d3d9 shader %08x %s_%u_%u", g, iface == I_VS ? "vs" : "ps", (ver >> 8) & 0xff, ver & 0xff); sm1_disasm(sm, disasm_line); }
     char *wgsl = sm1_wgsl(sm);
     uint32_t m = (uint32_t)strlen(wgsl), nw = 21 + n + (m + 4) / 4;
     uint32_t *w = calloc(nw, 4);

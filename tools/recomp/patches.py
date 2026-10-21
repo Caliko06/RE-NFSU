@@ -26,6 +26,24 @@ PATCHES = [
 ]
 
 
+# PATCH: 0x40bf09.., widescreen 2D: the sprite quad code (0x40beef) turns a position of the 640x480 screen into clip
+# space as x/320 - 1 and 1 - y/240 for each of its four corners. The 4:3 layout was stretched over the whole
+# back buffer. The x of each corner now uses x*(S/320) - S, with S = (4/3)/(W/H) (at most 1), so the 2D layer keeps
+# its 4:3 shape, centred. S/320 and S live at SCREEN_ADDR+8 and +12 (host/win32.c). Operands of fmul [0x6cc914]
+# and fsub [0x6cc7bc].
+_OLD_MUL, _OLD_SUB = "14c96c00", "bcc76c00"
+for _a in (0x40bf09, 0x40bf9a, 0x40bfff, 0x40c053):
+    PATCHES.append(dict(addr=_a, old=_OLD_MUL, new="08300100", when=lambda: True))
+for _a in (0x40bf17, 0x40bfa0, 0x40c00b, 0x40c064):
+    PATCHES.append(dict(addr=_a, old=_OLD_SUB, new="0c300100", when=lambda: True))
+
+# PATCH: 0x408a24, widescreen: the first CreateDevice (0x408830) asked for 800x600 with push 0x320 / mov esi,0x258 and
+# [0x702a80] = 0x15 (D3DFMT_A8R8G8B8). It now asks for the screen size at SCREEN_ADDR, so the front end is drawn at the
+# size the race is. Same bytes count: push [0x13000]; mov esi,[0x13004]; push 0x15; pop [0x702a80]; the call stays.
+PATCHES.append(dict(addr=0x408a24, old="6820030000be58020000c705802a700015000000",
+                    new="ff35003001008b35043001006a158f05802a7000", when=lambda: True))
+
+
 def active():
     return [p for p in PATCHES if p["when"]()]
 

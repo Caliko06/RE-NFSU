@@ -1010,6 +1010,10 @@ void win32_init(Ctx *c, uint32_t image_size) {
         rn_screen_w = sw & ~1; rn_screen_h = sh & ~1;
     }
     st(c, SCREEN_ADDR, rn_screen_w, 4); st(c, SCREEN_ADDR + 4, rn_screen_h, 4);
+    float s43 = 4.f * (float)rn_screen_h / (3.f * (float)rn_screen_w);
+    if (s43 > 1.f) s43 = 1.f;
+    float k[2] = {s43 / 320.f, s43};
+    memcpy(G(SCREEN_ADDR + 8), k, sizeof k);
     clock_gettime(CLOCK_MONOTONIC, &t0);
     brk_ptr = HEAP_LO;
     vtop = c->memsz;
