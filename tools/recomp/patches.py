@@ -62,6 +62,15 @@ PATCHES.append(dict(addr=0x735ec1, old="00", new="01", when=lambda: True))
 # 0x4ff960; ~/NFSU1-RE docs/re/postfx-elf.md). The PC algorithm and its 0.65 cap stay. Only 0x40ce70/0x40ce7a read them.
 PATCHES.append(dict(addr=0x702a38, old="0000c8410000fa42", new="cdcccc3d0000c841", when=lambda: True))
 
+# PATCH: 0x40d615, 0x40d2a2, game bug (EA's 2011 patch notes call it the "NOS black screen effect"): the 4-tap blur passes
+# 0x40d370 and 0x40d090 turn blending off with effect->SetInt(BaseAlphaBlendEnable, 0) when an effect is current, but
+# filter.efx pass p3 never reads that parameter. The pass then inherits the light-streak decay state (blend on, ZERO /
+# BLENDFACTOR 0x8296b4, restored by the D3DX End state block), so the blur copy never receives the scene and fades to
+# black; the frame is then mostly that copy. The jne goes: both always take the SetRenderState(ALPHABLENDENABLE, 0)
+# branch that is already there for "no effect".
+PATCHES.append(dict(addr=0x40d615, old="7512", new="9090", when=lambda: True))
+PATCHES.append(dict(addr=0x40d2a2, old="7512", new="9090", when=lambda: True))
+
 # PATCH: 0x702a84, OWNER 2026-10-21 (sharper cars): the car reflection cube (0x40b340, ENVMAP) is 128 px a side; every
 # reader (0x40aa20 view table, 0x40b340 cube and its depth surface) takes the size from here. Now 512.
 PATCHES.append(dict(addr=0x702a84, old="80000000", new="00020000", when=lambda: True))
