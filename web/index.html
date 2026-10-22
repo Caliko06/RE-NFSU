@@ -33,6 +33,11 @@
 <script src="input.js"></script>
 <script src="audio.js"></script>
 <script src="telemetry.js"></script>
+<script>
+// ?bridge[=url]: a race chosen in this menu opens in the NFSU1-RE engine instead (host/bridge.c). Off by default.
+const bridgeTo = new URLSearchParams(location.search).get('bridge');
+if (bridgeTo !== null) window.rnBridge = q => { location.href = (bridgeTo && bridgeTo !== '1' ? bridgeTo : `http://${location.hostname}:5190/`) + '?' + q; return 1; };
+</script>
 <script src="out/speed.js"></script>
 <script>
 const log = document.getElementById('log'), status = document.getElementById('status');

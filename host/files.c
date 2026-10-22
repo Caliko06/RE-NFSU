@@ -183,10 +183,13 @@ int gf_stat(const char *gpath) {
     return lookup(gpath, real, sizeof real, &size);
 }
 
+void rn_race_bridge(const char *gpath);   // host/bridge.c
+
 // Opens a game file: id >= 0, or -1 missing, -2 outside the folder, -3 a directory.
 int gf_open(const char *gpath) {
     char real[512];
     uint64_t size = 0;
+    rn_race_bridge(gpath);
     int r = lookup(gpath, real, sizeof real, &size);
     if (r) return r == 1 ? -3 : r;
     for (int k = 0; k < MAXF; k++) {
