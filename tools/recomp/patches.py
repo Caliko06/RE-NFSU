@@ -56,6 +56,16 @@ PATCHES.append(dict(addr=0x4494c4, old="6820030000be58020000e8ddf1fbff83c404",
 # (0x5a16f0 -> 0x4b9f40) and money as 1000000000 (0x5a1520). Mode flags of a track (0x4ab470) still apply.
 PATCHES.append(dict(addr=0x735ec1, old="00", new="01", when=lambda: True))
 
+# PATCH: 0x702a38, OWNER 2026-10-21 (blur visible, as in ~/NFSU1-RE): the PC motion blur 0x40cd40 weights its half-size
+# copy by t = (|camera +0x1e0| - [0x702a38]) / ([0x702a3c] - [0x702a38]) + 1.1 * nitrous, at most 0.65 ([0x702a40]).
+# PC ramp 25 -> 125 m/s: no blur under 90 km/h, full at 450 km/h. Now the PS2 ramp 0.1 -> 25 m/s (SLUS_208.11 0x4ff95c,
+# 0x4ff960; ~/NFSU1-RE docs/re/postfx-elf.md). The PC algorithm and its 0.65 cap stay. Only 0x40ce70/0x40ce7a read them.
+PATCHES.append(dict(addr=0x702a38, old="0000c8410000fa42", new="cdcccc3d0000c841", when=lambda: True))
+
+# PATCH: 0x702a84, OWNER 2026-10-21 (sharper cars): the car reflection cube (0x40b340, ENVMAP) is 128 px a side; every
+# reader (0x40aa20 view table, 0x40b340 cube and its depth surface) takes the size from here. Now 512.
+PATCHES.append(dict(addr=0x702a84, old="80000000", new="00020000", when=lambda: True))
+
 
 def active():
     return [p for p in PATCHES if p["when"]()]
