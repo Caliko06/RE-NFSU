@@ -91,16 +91,23 @@ async function startGpu(M, canvas, report, onFrame) {
     buffer: { type: 'uniform', hasDynamicOffset: true, minBindingSize: 32 } }] });
   const clearBind = device.createBindGroup({ layout: clearBgl, entries: [{ binding: 0, resource: { buffer: clearRing, size: 32 } }] });
   const clearLayout = device.createPipelineLayout({ bindGroupLayouts: [clearBgl] });
+  // BRIDGE: remaster, OWNER 2026-10-22: 4x MSAA on the screen-sized targets (?msaa=0 turns it off). Each colour target keeps
+  // its single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
+  // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
+  const MSAA = new URLSearchParams(location.search).get('msaa') === '0' ? 1 : 4;
+  const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
+  const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
+    : { view: rt.view, loadOp: 'load', storeOp: 'store' };
   const clearPipes = new Map();
-  function clearPipe(hasColor, hasDepth, flags) {
-    const key = `${hasColor}${hasDepth}${flags}`;
+  function clearPipe(hasColor, hasDepth, flags, sc) {
+    const key = `${hasColor}${hasDepth}${flags}${sc}`;
     if (clearPipes.has(key)) return clearPipes.get(key);
     const st = { compare: 'always', passOp: (flags & 4) ? 'replace' : 'keep' };
     const p = device.createRenderPipeline({ layout: clearLayout,
       vertex: { module: clearShader, entryPoint: 'vs' },
       fragment: { module: clearShader, entryPoint: hasColor ? 'fs' : 'fs_none',
         targets: hasColor ? [{ format: 'rgba8unorm', writeMask: (flags & 1) ? GPUColorWrite.ALL : 0 }] : [] },
-      primitive: { topology: 'triangle-list' },
+      primitive: { topology: 'triangle-list' }, multisample: { count: sc },
       depthStencil: hasDepth ? { format: 'depth24plus-stencil8', depthWriteEnabled: !!(flags & 2), depthCompare: 'always',
         stencilFront: st, stencilBack: st, stencilWriteMask: (flags & 4) ? 0xff : 0 } : undefined });
     clearPipes.set(key, p);
@@ -168,13 +175,13 @@ async function startGpu(M, canvas, report, onFrame) {
     const color = comp(w[D_SRCB], w[D_DSTB], w[D_BOP]);
     return { color, alpha: w[D_SEPA] ? comp(w[D_SRCBA], w[D_DSTBA], w[D_BOPA]) : color };
   }
-  function pipeline(w, hdr, stride) {
+  function pipeline(w, hdr, stride, sc) {
     const vs = shaders.get(w[hdr + D_VS]), ps = shaders.get(w[hdr + D_PS]), decl = decls.get(w[hdr + D_DECL]);
     if (!vs || !ps || !decl) fail('draw with an unknown shader or declaration');
     const g = i => w[hdr + i];
     const ds = g(D_DS) !== 0;
     const key = [g(D_VS), g(D_PS), g(D_DECL), stride, g(D_TOPO), ds, g(D_ZEN), g(D_ZWRITE), g(D_ZFUNC), g(D_CULL), g(D_BLEND),
-      g(D_SRCB), g(D_DSTB), g(D_BOP), g(D_SEPA), g(D_SRCBA), g(D_DSTBA), g(D_BOPA), g(D_CWRITE)].join(',');
+      g(D_SRCB), g(D_DSTB), g(D_BOP), g(D_SEPA), g(D_SRCBA), g(D_DSTBA), g(D_BOPA), g(D_CWRITE), sc].join(',');
     if (pipes.has(key)) return pipes.get(key);
     const attributes = [];
     for (let k = 0; k < 16; k++) {
@@ -194,6 +201,7 @@ async function startGpu(M, canvas, report, onFrame) {
       fragment: { module: ps.module, entryPoint: 'main',
         targets: [{ format: 'rgba8unorm', blend: blendState(w.subarray(hdr)), writeMask: g(D_CWRITE) & 15 }] },
       // D3D9 front faces are clockwise on screen; CULL_CCW (the default) culls the back ones.
+      multisample: { count: sc },
       primitive: { topology: topo, frontFace: 'cw', cullMode: cull,
         stripIndexFormat: topo === 'triangle-strip' && g(D_NIDX) ? 'uint32' : undefined },
       depthStencil: ds ? { format: 'depth24plus-stencil8', depthWriteEnabled: !!(g(D_ZEN) && g(D_ZWRITE)),
@@ -246,10 +254,15 @@ async function startGpu(M, canvas, report, onFrame) {
       if (op === GPU_TARGET) {
         endPass();
         const depth = w[a + 3] === 1;
+        const sc = msFor(w[a + 1], w[a + 2]);
         const tex = device.createTexture({ size: [w[a + 1], w[a + 2]], format: depth ? 'depth24plus-stencil8' : 'rgba8unorm',
+          sampleCount: depth ? sc : 1,
           usage: GPUTextureUsage.RENDER_ATTACHMENT | (depth ? 0 : GPUTextureUsage.COPY_SRC | GPUTextureUsage.TEXTURE_BINDING) });
-        res.get(w[a])?.tex.destroy();
-        res.set(w[a], { tex, view: tex.createView(), w: w[a + 1], h: w[a + 2], depth });
+        const ms = !depth && sc > 1 ? device.createTexture({ size: [w[a + 1], w[a + 2]], format: 'rgba8unorm', sampleCount: sc,
+          usage: GPUTextureUsage.RENDER_ATTACHMENT }) : null;
+        const old = res.get(w[a]);
+        old?.tex.destroy(); old?.ms?.destroy();
+        res.set(w[a], { tex, view: tex.createView(), w: w[a + 1], h: w[a + 2], depth, sc, ms, msView: ms?.createView() });
         stats.targets++;
       } else if (op === GPU_CLEAR) {
         endPass();
@@ -259,10 +272,10 @@ async function startGpu(M, canvas, report, onFrame) {
         uf.set([((c >>> 16) & 255) / 255, ((c >>> 8) & 255) / 255, (c & 255) / 255, (c >>> 24) / 255, f32[a + 4]], off / 4);
         nuni++;
         const p = enc.beginRenderPass({
-          colorAttachments: rt ? [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] : [],
+          colorAttachments: rt ? [colorAtt(rt)] : [],
           depthStencilAttachment: ds ? { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store',
             stencilLoadOp: 'load', stencilStoreOp: 'store' } : undefined });
-        p.setPipeline(clearPipe(!!rt, !!ds, flags));
+        p.setPipeline(clearPipe(!!rt, !!ds, flags, (rt || ds)?.sc || 1));
         p.setBindGroup(0, clearBind, [off]);
         p.setStencilReference(w[a + 5] & 0xff);
         p.setScissorRect(w[a + 6], w[a + 7], w[a + 8] - w[a + 6], w[a + 9] - w[a + 7]);
@@ -320,7 +333,7 @@ async function startGpu(M, canvas, report, onFrame) {
         if (key !== passKey) {
           endPass();
           pass = enc.beginRenderPass({
-            colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }],
+            colorAttachments: [colorAtt(rt)],
             depthStencilAttachment: ds ? { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store',
               stencilLoadOp: 'load', stencilStoreOp: 'store' } : undefined });
           passKey = key;
@@ -343,7 +356,7 @@ async function startGpu(M, canvas, report, onFrame) {
         if (ni) idata.set(w.subarray(src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2), src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2) + ni), ioff / 4);
         const sc = [g(D_SC), g(D_SC + 1), Math.min(g(D_SC + 2), rt.w), Math.min(g(D_SC + 3), rt.h)];
         if (sc[2] > sc[0] && sc[3] > sc[1]) {
-          pass.setPipeline(pipeline(w, a, stride));
+          pass.setPipeline(pipeline(w, a, stride, rt.sc || 1));
           pass.setBindGroup(0, uBind, [uoff]);
           const entries = [];
           for (let k = 0; k < 8; k++) if (ps.texMask >> k & 1) {
