@@ -79,6 +79,15 @@ PATCHES.append(dict(addr=0x40d2a2, old="7512", new="9090", when=lambda: True))
 # reader (0x40aa20 view table, 0x40b340 cube and its depth surface) takes the size from here. Now 512.
 PATCHES.append(dict(addr=0x702a84, old="80000000", new="00020000", when=lambda: True))
 
+# PATCH: 0x42f098, OWNER 2026-10-22 (camera look of ~/NFSU1-RE): the projection 0x42f020 keeps the horizontal FOV fixed
+# (0x32dc = 71.5 deg, set at 0x484b53 / 0x486b5d) and scales y by W/H, so 16:9 loses sky and road. The PS2 camera
+# (SLUS_208.11 0x10a7f8, zoom = 256 / tan(fov / 2) over 512 x 448) keeps the VERTICAL view (64.4 deg) and widens x with the
+# window (96.5 deg at 16:9). Stack on entry: X (x scale), Y0, R. New: y = X * 512/448 ([0x707fc0], free .data), x = y * H/W
+# ([0x701038] / [0x701034]); fcompp drops Y0 and R. Same 27 bytes as the old tail (fstp, fmul, fild, fmul, fidiv, fdivp, fstp, fstp).
+PATCHES.append(dict(addr=0x707fc0, old="00000000", new="2549923f", when=lambda: True))
+PATCHES.append(dict(addr=0x42f098, old="d91ed84c2410db0538107000d8cada3534107000def9d95e04ddd8",
+                    new="d80dc07f7000d95604db0538107000dec9da3534107000d91eded9", when=lambda: True))
+
 
 def active():
     return [p for p in PATCHES if p["when"]()]
