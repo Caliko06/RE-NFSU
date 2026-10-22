@@ -79,33 +79,27 @@ PATCHES.append(dict(addr=0x40d2a2, old="7512", new="9090", when=lambda: True))
 # reader (0x40aa20 view table, 0x40b340 cube and its depth surface) takes the size from here. Now 512.
 PATCHES.append(dict(addr=0x702a84, old="80000000", new="00020000", when=lambda: True))
 
-# PATCH: 0x40debb, 0x40deec, 0x40dcdb, 0x40dce6 (+ caves 0x408799, 0x40e174, constant 0x707fc0), OWNER 2026-10-22: the camera look
-# of ~/NFSU1-RE. RE (REA, Speed.exe): 0x40dd00 builds a view's projection from the camera FOV u16 F (0x484b53: 0x32dc = 71.5 deg).
-# P[0] (view+0x40) = 1/tan(F/2): the horizontal view is fixed. P[5] (view+0x54) = -1/tan(A*F/2), A = viewport H/W (+0x18 / +0x14)
-# times 1.21 for view types 1, 2, 4, 5 (0x6b7c74 / 0x6b7c6c) and the constant 0x6cccf0 for types 8, 9: the angle (not the tangent)
-# follows the aspect, so 16:9 gives a 48 deg vertical view, pixels 12% too tall, and sky and road are lost. 0x40dcb0 returns the
-# focal length (W/2)/tan(F/2) into view+0xc. The PS2 (SLUS_208.11 0x10a7f8) keeps the VERTICAL view (zoom 256/tan(F/2) over
-# 512 x 448 = 64.4 deg) and widens x with the window. Now (types other than 8, 9): P[5] = -(512/448)/tan(F/2),
-# P[0] = P[5] * H/W (cave 0x408799 A and B; jumps from 0x40debb, 0x40deec); focal = (H/2)(512/448)/tan(F/2) (0x40dcdb reads
-# H, cave 0x40e174 multiplies). 512/448 float is [0x707fc0] (free .data). The frustum planes follow from the matrix.
+# PATCH: 0x40debb, 0x40deec, 0x40dcdb (+ caves 0x408799, 0x5f4a04, constant 0x707fc0), OWNER 2026-10-22: the camera look of
+# ~/NFSU1-RE. RE (Speed.exe): 0x40dd00 builds a view's projection from the camera FOV u16 F (0x484b53: 0x32dc = 71.5 deg).
+# P[0] (view+0x40) = 1/tan(F/2): the horizontal view is fixed. P[5] (view+0x54) = -1/tan(A*F/2), A = viewport H/W (+0x18 / +0x14,
+# view+0x58 struct) times 1.21 for view types 1, 2, 4, 5: the angle (not the tangent) follows the aspect, so 16:9 gives a 48 deg
+# vertical view and pixels 12% too tall. 0x40dcb0 returns the focal length into view+0xc. The PS2 (SLUS_208.11 0x10a7f8) keeps the
+# VERTICAL view (zoom 256/tan(F/2) over 512 x 448 = 64.4 deg) and widens x with the window. Now (types other than 8, 9), with
+# k = 512/448 ([0x707fc0], free .data) and H' = max(H, 9W/16): P[0] = k/tan(F/2) * H'/W, P[5] = -P[0] * W/H. Up to 16:9 this is the
+# PS2 look; wider windows stop at the 16:9 horizontal view (96 deg) and crop top and bottom, since the edge stretch of a flat
+# projection past that made traffic look squashed wide. Focal (view+0xc) = (H'/2) k / tan(F/2), the same scale. Cave 0x408799 =
+# A (P[0]) + fallback + focal; cave 0x5f4a04 (CC padding) = B (P[5]) + fallback. W is [0x701034], H is [0x701038].
 PATCHES.append(dict(addr=0x707fc0, old="00000000", new="2549923f", when=lambda: True))
-PATCHES.append(dict(addr=0x408799, old="9090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090",
-                    new="8b4c241c83790408742483790409741e8b4958d83dbcc76c00d80dc07f7000db4118da7114dec9d91fe9fc560000d83dbcc76c00d91fe9ef5600008b44241c83780408741f8378040974198b4058ddd8d907db4014dec9da7018d9e0d95e54e9fa560000d83dbcc76c00d9e0d95e54e9ea560000", when=lambda: True))
+PATCHES.append(dict(addr=0x408799, old="909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090",
+                    new="8b4c241c83790408743483790409742e8b4958d83dbcc76c00d80dc07f70008b41148d04c0c1e8043b41187f038b411850db042458da7114dec9d91feb08d83dbcc76c00d91fe9df560000a1341070008d04c0c1e8058b0d38107000d1f939c87f0289c8890424da3c24d80dc07f700059c3", when=lambda: True))
+PATCHES.append(dict(addr=0x5f4a04, old="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+                    new="8b44241c83780408741c8378040974168b4058ddd8d907db4014dec9da7018d9e0d95e54eb0bd83dbcc76c00d9e0d95e54e9bd94e1ff", when=lambda: True))
 PATCHES.append(dict(addr=0x40debb, old="d83dbcc76c00d91f",
                     new="e9d9a8ffff909090", when=lambda: True))
 PATCHES.append(dict(addr=0x40deec, old="d83dbcc76c00d9e0d95e54",
-                    new="e9e3a8ffff909090909090", when=lambda: True))
-PATCHES.append(dict(addr=0x40dcdb, old="a134107000",
-                    new="a138107000", when=lambda: True))
-PATCHES.append(dict(addr=0x40dce6, old="da7c240059c3",
-                    new="e98904000090", when=lambda: True))
-PATCHES.append(dict(addr=0x40e174, old="909090909090909090909090",
-                    new="da3c24d80dc07f700059c390", when=lambda: True))
-# PATCH: 0x42f098, the same look for the LOD scales: 0x42f020 returns the projection scales of three fixed distances
-# ([esi] x, [esi+4] y; 0x42f0c0 calls it from view+0x230). Old x = X = 1/tan(F/2), y = X * W/H. Now y = X * 512/448 and
-# x = y * H/W, equal to the matrix above. Stack on entry X, Y0, R. 27 bytes as before; fcompp drops Y0 and R.
-PATCHES.append(dict(addr=0x42f098, old="d91ed84c2410db0538107000d8cada3534107000def9d95e04ddd8",
-                    new="d80dc07f7000d95604db0538107000dec9da3534107000d91eded9", when=lambda: True))
+                    new="e9136b1e00909090909090", when=lambda: True))
+PATCHES.append(dict(addr=0x40dcdb, old="a134107000d1f889442400da7c240059c3",
+                    new="e904abffff909090909090909090909090", when=lambda: True))
 
 
 def active():
