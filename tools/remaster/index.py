@@ -2,6 +2,8 @@
 
 The layer (host/d3d9.c) hashes level 0 at UnlockRect the same way (FNV-1a 64 of the locked bytes) and asks
 web/gpu.js to show the PNG instead. TPK layout and JDLZ from ~/NFSU1-RE/tools (cartex.py, jdlz.py).
+CARS/TEXTURES.BIN is the shared pack (traffic skins, sponsor decals); DUMMY_* are the game's own composited skins and
+wheels, so they keep their original. Format 0x20 is 32-bit (w*h*4 bytes), hashed like DXT by the layer.
 Usage: index.py game web/remaster/png web/remaster/index.tsv  (png = cp -c -R ~/NFSU1-RE/remaster/out)
 """
 import os, struct, sys
@@ -44,21 +46,21 @@ def textures(fn):
                 if m3 == 0x33310004: recs += [d[b3 + k:b3 + k + 0x7c] for k in range(0, s3, 0x7c)]
     for r in recs:
         key, = struct.unpack_from('<I', r, 0x24); w, h = struct.unpack_from('<HH', r, 0x44); comp = r[0x4A]
-        if key not in slots or comp not in (0x22, 0x24, 0x26): continue
+        if key not in slots or comp not in (0x20, 0x22, 0x24, 0x26) or r[0xc:0x12] == b'DUMMY_': continue
         ao, es = slots[key]; raw = d[ao:ao + es]
         if raw[:4] == b'JDLZ': raw = jdlz(raw)
-        n = max(1, w // 4) * max(1, h // 4) * (8 if comp == 0x22 else 16)
+        n = w * h * 4 if comp == 0x20 else max(1, w // 4) * max(1, h // 4) * (8 if comp == 0x22 else 16)
         yield key, w, h, comp, raw[:n]
 
 game, pngs, out = sys.argv[1:4]
 have = {f[:8] for f in os.listdir(pngs) if f.endswith('.png')}
 rows = n = 0
 with open(out, 'w') as o:
-    for car in sorted(os.listdir(os.path.join(game, 'CARS'))):
+    for car in [''] + sorted(os.listdir(os.path.join(game, 'CARS'))):
         fn = os.path.join(game, 'CARS', car, 'TEXTURES.BIN')
         if not os.path.isfile(fn): continue
         for key, w, h, comp, lvl0 in textures(fn):
             n += 1
             if f'{key:08x}' in have:
-                o.write(f'{fnv64(lvl0):016x}\t{key:08x}\t{w}\t{h}\t{comp:#x}\t{car}\n'); rows += 1
+                o.write(f'{fnv64(lvl0):016x}\t{key:08x}\t{w}\t{h}\t{comp:#x}\t{car or 'SHARED'}\n'); rows += 1
 print(f'{n} textures, {rows} with a PNG -> {out}')

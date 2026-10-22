@@ -994,11 +994,12 @@ static void upload_level(Ctx *c, Obj *s) {
     gpu_cmd(GPU_TEXDATA, (int)(4 + n), w);
     free(w);
     flush_big();
-    if (level == 0 && is_dxt(s->fmt)) {
+    // 32-bit textures too (rims, decals); a dynamic one is relocked each frame, so it is never a pack texture.
+    if (level == 0 && (is_dxt(s->fmt) || ((s->fmt == F_A8R8G8B8 || s->fmt == F_X8R8G8B8) && !(t->usage & U_DYNAMIC)))) {
         // FNV-1a 64 of the level-0 blocks: the key of tools/remaster/index.py.
         const uint8_t *p = (const uint8_t *)G(lock_mem(s));
         uint64_t h = 0xcbf29ce484222325ull;
-        for (uint32_t k = 0, m = s->pitch * ((s->h + 3) / 4); k < m; k++) h = (h ^ p[k]) * 0x100000001b3ull;
+        for (uint32_t k = 0, m = s->pitch * (is_dxt(s->fmt) ? (s->h + 3) / 4 : s->h); k < m; k++) h = (h ^ p[k]) * 0x100000001b3ull;
         static int log = -1;
         if (log < 0) log = getenv("RN_TEXHASH") != NULL;
         if (log) rn_log("d3d9 texhash %016llx %ux%u fmt %08x", (unsigned long long)h, s->w, s->h, s->fmt);

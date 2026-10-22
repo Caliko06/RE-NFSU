@@ -101,6 +101,13 @@ PATCHES.append(dict(addr=0x40deec, old="d83dbcc76c00d9e0d95e54",
 PATCHES.append(dict(addr=0x40dcdb, old="a134107000d1f889442400da7c240059c3",
                     new="e904abffff909090909090909090909090", when=lambda: True))
 
+# PATCH: 0x56e0d2, OWNER 2026-10-22 (remastered cars: rivals and traffic looked odd): the car draw 0x56dc30 picks the model
+# LOD from its screen size, ftol(focal view+0xc * 3 / (dist - 3)) (0x545180), stepping up while size < [0x6b5dec + 4*lod] =
+# 120, 45, 20, 0 px. With the focal of 0x40dcdb (~857 at 1080 lines) a rival is the full model only within ~24 m and model B
+# out to ~60 m. The jp that enters the step loop is now a jmp: every car keeps the minimum LOD its caller asks for (0 = full;
+# the reflection views pass 1, 0x6f1b38). The table stays: 0x56e77e fades by (size - 20) / (45 - 20).
+PATCHES.append(dict(addr=0x56e0d2, old="7a1f", new="eb1f", when=lambda: True))
+
 
 def active():
     return [p for p in PATCHES if p["when"]()]
