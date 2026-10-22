@@ -1600,17 +1600,36 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     // BRIDGE: widescreen 2D, PC Speed.exe 0x40c2d0 / 0x40c4a2: the front-end sprite quad is one fan of 2 triangles, stride 32.
     // The PATCH at 0x40bf09 lays the 640x480 screen in a centred 4:3 island; the original cut what lies outside 0..640 at the
     // window edge (items parked off screen, slide-ins), so the island is the scissor of these draws.
+    // In a race ([0x77a90c] = "EndGameFlowLoadingTrackSpecific" 0x6c9c3c, set once when the track is loaded) the HUD groups sit at the
+    // window edges: a quad whose centre is in the left (x < 190) or right (x > 430) part of the 640 screen moves by the free margin.
+    // Whole quads move, never single glyphs of a string, because the centre zone (190..430) is empty in the HUD; no scissor then.
     Obj *rt = obj_k(dev.rt[0]);
     int isl = ARG(1) == 6 && ARG(2) == 2 && ARG(4) == 32 && rt && (int)rt->w == rn_screen_w && (int)rt->h == rn_screen_h
               && 3 * rn_screen_w > 4 * rn_screen_h;
+    int moved = 0;
+    static int racing;   // 0x77a90c is a transient label: latch the track-loaded one until a front-end label follows
+    if (isl) {
+        uint32_t lb = ld(c, 0x77a90c, 4);
+        if (lb == 0x6c9c3c) racing = 1;
+        else if (lb == 0x6c9cf0 || lb == 0x6c9de8 || lb == 0x6c9e8c || lb == 0x6c9ea0) racing = 0;
+    }
+    if (isl && racing) {
+        float S = 4.f * rn_screen_h / (3.f * rn_screen_w), x[4], cx = 0;
+        for (int k = 0; k < 4; k++) { uint32_t b = ld(c, ARG(3) + 32 * k, 4); memcpy(&x[k], &b, 4); cx += x[k] / 4; }
+        float u = (cx + S) / (2 * S) * 640.f, d = u < 0 || u > 640 ? 0 : u < 190 ? -(1 - S) : u > 430 ? 1 - S : 0;
+        if (d != 0) {
+            for (int k = 0; k < 4; k++) { float y = x[k] + d; uint32_t b; memcpy(&b, &y, 4); st(c, ARG(3) + 32 * k, b, 4); }
+            moved = 1;
+        }
+    }
     uint32_t s_rs = dev.rs[174], s_sc[4];
     memcpy(s_sc, dev.scissor, 16);
-    if (isl) {
+    if (isl && !moved) {
         uint32_t iw = (uint32_t)rn_screen_h * 4 / 3, x0 = ((uint32_t)rn_screen_w - iw) / 2;
         dev.rs[174] = 1; dev.scissor[0] = x0; dev.scissor[1] = 0; dev.scissor[2] = x0 + iw; dev.scissor[3] = (uint32_t)rn_screen_h;
     }
     draw_cmd(c, ARG(1), ARG(2), ARG(3), ARG(4), 0, 0, 0, 0, 0);
-    if (isl) { dev.rs[174] = s_rs; memcpy(dev.scissor, s_sc, 16); }
+    if (isl && !moved) { dev.rs[174] = s_rs; memcpy(dev.scissor, s_sc, 16); }
     dev.stream[0].vb = 0; dev.stream[0].off = 0; dev.stream[0].stride = 0;
     return D3D_OK;
 }
