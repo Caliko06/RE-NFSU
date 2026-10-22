@@ -1597,7 +1597,20 @@ static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
 static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     DEV();
     if (!prim_ok(ARG(1), ARG(2)) || !ARG(3) || !ARG(4)) return D3DERR_INVALIDCALL;
+    // BRIDGE: widescreen 2D, PC Speed.exe 0x40c2d0 / 0x40c4a2: the front-end sprite quad is one fan of 2 triangles, stride 32.
+    // The PATCH at 0x40bf09 lays the 640x480 screen in a centred 4:3 island; the original cut what lies outside 0..640 at the
+    // window edge (items parked off screen, slide-ins), so the island is the scissor of these draws.
+    Obj *rt = obj_k(dev.rt[0]);
+    int isl = ARG(1) == 6 && ARG(2) == 2 && ARG(4) == 32 && rt && (int)rt->w == rn_screen_w && (int)rt->h == rn_screen_h
+              && 3 * rn_screen_w > 4 * rn_screen_h;
+    uint32_t s_rs = dev.rs[174], s_sc[4];
+    memcpy(s_sc, dev.scissor, 16);
+    if (isl) {
+        uint32_t iw = (uint32_t)rn_screen_h * 4 / 3, x0 = ((uint32_t)rn_screen_w - iw) / 2;
+        dev.rs[174] = 1; dev.scissor[0] = x0; dev.scissor[1] = 0; dev.scissor[2] = x0 + iw; dev.scissor[3] = (uint32_t)rn_screen_h;
+    }
     draw_cmd(c, ARG(1), ARG(2), ARG(3), ARG(4), 0, 0, 0, 0, 0);
+    if (isl) { dev.rs[174] = s_rs; memcpy(dev.scissor, s_sc, 16); }
     dev.stream[0].vb = 0; dev.stream[0].off = 0; dev.stream[0].stride = 0;
     return D3D_OK;
 }

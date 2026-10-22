@@ -147,6 +147,9 @@ async function startGpu(M, canvas, report, onFrame) {
       mipmapFilter: t[T_MIP] === 2 ? 'linear' : 'nearest' };
     if (!t[T_MIP]) d.lodMaxClamp = 0;      // D3DTEXF_NONE: level 0 only
     if ((t[T_MIN] === 3 || t[T_MAG] === 3) && t[T_MIP] === 2) d.maxAnisotropy = Math.min(16, Math.max(1, t[T_ANISO]));
+    // BRIDGE: remaster, OWNER 2026-10-22: every linear sampler of a mipmapped texture is trilinear with 16x anisotropy
+    // (the game asks for point mips or no anisotropy). WebGPU needs all three filters linear for maxAnisotropy > 1.
+    if (t[T_MIP] && filt(t[T_MIN]) === 'linear' && filt(t[T_MAG]) === 'linear') { d.mipmapFilter = 'linear'; d.maxAnisotropy = 16; }
     const s = device.createSampler(d);
     samplers.set(key, s);
     return s;
