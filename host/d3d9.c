@@ -102,6 +102,7 @@ typedef struct {
     Sm1 *sm;                                // shaders: decoded
     struct Rec *rec;                        // state blocks: the recorded Set calls
     uint32_t nrec;
+    uint32_t dlo, dhi;                      // resident buffers: bytes written since the last upload
 } Obj;
 #define MAXOBJ GPU_MAXID
 static Obj objs[MAXOBJ];
@@ -1171,6 +1172,32 @@ static uint32_t IDirect3DTexture9_PreLoad(Ctx *c) { SELF(I_TEXTURE); return 0; }
 static uint32_t IDirect3DSurface9_LockRect(Ctx *c) { SELF(I_SURFACE); return lock_rect(c, o, ARG(1), ARG(2), ARG(3)); }
 static uint32_t IDirect3DSurface9_UnlockRect(Ctx *c) { SELF(I_SURFACE); return unlock_rect(c, o); }
 
+// Static vertex and index buffers live on the GPU (web): their bytes go once per Unlock (GPU_BUFDATA), and a draw names
+// the buffer instead of copying its vertices and indices into every frame (OWNER 2026-10-23, 60 fps: the per-draw copies
+// were ~40% of the game thread). Dynamic buffers are refilled inside a frame, so they keep the per-draw copy: a GPU-side
+// write would land before earlier draws of the same frame ran. RN_INLINE=1 copies everything as before (A/B).
+static int resident(const Obj *o) {
+#ifdef __EMSCRIPTEN__
+    static int off = -1;
+    if (off < 0) off = getenv("RN_INLINE") != NULL;
+    return o && !off && !(o->usage & U_DYNAMIC);
+#else
+    (void)o;
+    return 0;
+#endif
+}
+static void buffer_upload(Ctx *c, Obj *o) {
+    uint32_t lo = o->dlo & ~3u, hi = (o->dhi + 3) & ~3u, n = hi - lo;
+    o->dlo = o->dhi = 0;
+    if (!n) return;
+    uint32_t *w = calloc(3 + n / 4, 4);
+    w[0] = idx(o) + 1; w[1] = lo; w[2] = n;
+    memcpy(w + 3, G(lock_mem(o) + lo), hi <= o->size ? n : o->size - lo);
+    gpu_cmd(GPU_BUFDATA, (int)(3 + n / 4), w);
+    free(w);
+    flush_big();
+    (void)c;
+}
 static uint32_t new_buffer(Ctx *c, int iface, uint32_t len, uint32_t usage, uint32_t f, uint32_t pool, uint32_t out) {
     if (!len || !out || bad_pool(usage, pool) || (usage & (U_RENDERTARGET | U_DEPTHSTENCIL))) return D3DERR_INVALIDCALL;
     uint32_t g = new_obj(c, iface);
@@ -1179,6 +1206,7 @@ static uint32_t new_buffer(Ctx *c, int iface, uint32_t len, uint32_t usage, uint
     o->size = len; o->usage = usage; o->pool = pool;
     if (iface == I_VB) { o->fvf = f; o->fmt = 100; o->type = 6; } else { o->fmt = f; o->type = 7; }
     if (pool == POOL_DEFAULT) vram_used += len;
+    if (resident(o)) { uint32_t w2[2] = {idx(o) + 1, (len + 3) & ~3u}; gpu_cmd(GPU_BUFFER, 2, w2); }
     st(c, out, g, 4);
     return D3D_OK;
 }
@@ -1200,17 +1228,23 @@ static uint32_t buffer_lock(Ctx *c, Obj *o) {
     if (!out || off > o->size || (size && off + size > o->size)) return D3DERR_INVALIDCALL;
     o->locked++;
     st(c, out, lock_mem(o) + off, 4);
+    if (resident(o) && !(ARG(4) & 0x10)) {     // D3DLOCK_READONLY writes nothing
+        uint32_t hi = size ? off + size : o->size;
+        if (o->dhi <= o->dlo) { o->dlo = off; o->dhi = hi; }
+        else { if (off < o->dlo) o->dlo = off; if (hi > o->dhi) o->dhi = hi; }
+    }
     return D3D_OK;
 }
-static uint32_t buffer_unlock(Obj *o) {
+static uint32_t buffer_unlock(Ctx *c, Obj *o) {
     if (!o->locked) return D3DERR_INVALIDCALL;
     o->locked--;
+    if (!o->locked && resident(o)) buffer_upload(c, o);
     return D3D_OK;
 }
 static uint32_t IDirect3DVertexBuffer9_Lock(Ctx *c) { SELF(I_VB); return buffer_lock(c, o); }
-static uint32_t IDirect3DVertexBuffer9_Unlock(Ctx *c) { SELF(I_VB); return buffer_unlock(o); }
+static uint32_t IDirect3DVertexBuffer9_Unlock(Ctx *c) { SELF(I_VB); return buffer_unlock(c, o); }
 static uint32_t IDirect3DIndexBuffer9_Lock(Ctx *c) { SELF(I_IB); return buffer_lock(c, o); }
-static uint32_t IDirect3DIndexBuffer9_Unlock(Ctx *c) { SELF(I_IB); return buffer_unlock(o); }
+static uint32_t IDirect3DIndexBuffer9_Unlock(Ctx *c) { SELF(I_IB); return buffer_unlock(c, o); }
 static uint32_t IDirect3DVertexBuffer9_GetDesc(Ctx *c) {
     SELF(I_VB);
     uint32_t d[6] = {100, 6, o->usage, o->pool, o->size, o->fvf}, p = ARG(1);
@@ -1600,6 +1634,8 @@ static int draw_supported(Ctx *c, const Sm1 *ps) {
 // rebased by -vmin. Vertices [vmin, vmin + nvert) are copied.
 // A draw whose vertices and indices are host-made (the smoothed car): draw_cmd takes them instead of the guest's.
 static struct { const void *vb; uint32_t nvert; const uint16_t *idx; uint32_t nidx; } xdraw;
+// A resident draw (see resident()): set by the draw call, read by draw_cmd. vb = 0: not resident.
+static struct { uint32_t vb, voff, ib, isize, first; int32_t basev; } rdraw;
 static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint32_t stride, uint32_t vmin, uint32_t nvert,
                      uint32_t ib, int i32, int32_t ibias) {
     TR("draw %u x%u vs %u ps %u decl %u tex %u %u %u %u blend %u %u/%u atest %u z %u/%u cull %u fog %u", type, count,
@@ -1610,7 +1646,9 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     if (type <= 3) { rn_halt(c, "d3d9: point and line draws are not drawn yet"); return; }
     // Index list: given, or made for fans.
     uint32_t nidx = 0, *ix = NULL, n = verts_of(type, count);
-    if (xdraw.vb) {
+    if (rdraw.vb) {
+        nidx = rdraw.ib ? n : 0; nvert = rdraw.ib ? 0 : n;
+    } else if (xdraw.vb) {
         nidx = xdraw.nidx; nvert = xdraw.nvert; ix = malloc(4u * nidx);
         for (uint32_t k = 0; k < nidx; k++) ix[k] = xdraw.idx[k];
         type = 4;
@@ -1624,10 +1662,10 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
         }
         if (type == 6) type = 4;
     }
-    if (!ib && !xdraw.vb) nvert = n;
+    if (!ib && !xdraw.vb && !rdraw.vb) nvert = n;
     Obj *rt = obj_k(dev.rt[0]), *ds = obj_k(dev.ds);
-    uint32_t nvc = (uint32_t)(vs->sm->max_const + 1), npc = 8, vbytes = nvert * stride;
-    uint32_t total = D_HDR + 4 * nvc + 4 * npc + (vbytes + 3) / 4 + nidx;
+    uint32_t nvc = (uint32_t)(vs->sm->max_const + 1), npc = 8, vbytes = rdraw.vb ? 0 : nvert * stride, ni = rdraw.vb ? 0 : nidx;
+    uint32_t total = D_HDR + 4 * nvc + 4 * npc + (vbytes + 3) / 4 + ni;
     uint32_t *w = calloc(total, 4);
     w[D_TOPO] = type; w[D_NVERT] = nvert; w[D_NIDX] = nidx; w[D_STRIDE] = stride;
     w[D_VS] = dev.vs; w[D_PS] = dev.ps; w[D_DECL] = dev.decl;
@@ -1657,11 +1695,14 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
         t[T_ANISO] = dev.ss[k][10];
     }
     w[D_NVC] = nvc; w[D_NPC] = npc;
+    w[D_RVB] = rdraw.vb; w[D_RVOFF] = rdraw.voff; w[D_RIB] = rdraw.ib; w[D_RIFMT] = rdraw.isize;
+    w[D_RFIRST] = rdraw.first; w[D_RBASEV] = (uint32_t)rdraw.basev;
     uint32_t *p = w + D_HDR;
     memcpy(p, dev.vsf, 16u * nvc); p += 4 * nvc;
     memcpy(p, dev.psf, 16u * npc); p += 4 * npc;
-    memcpy(p, xdraw.vb ? xdraw.vb : G(vbase + vmin * stride), vbytes); p += (vbytes + 3) / 4;
-    if (nidx) memcpy(p, ix, 4u * nidx);
+    if (vbytes) memcpy(p, xdraw.vb ? xdraw.vb : G(vbase + vmin * stride), vbytes);
+    p += (vbytes + 3) / 4;
+    if (ni) memcpy(p, ix, 4u * ni);
     gpu_cmd(GPU_DRAW, (int)total, w);
     free(w);
     free(ix);
@@ -1676,6 +1717,13 @@ static uint32_t IDirect3DDevice9_DrawPrimitive(Ctx *c) {
     DEV();
     if (!prim_ok(ARG(1), ARG(3)) || !dev.stream[0].vb) return D3DERR_INVALIDCALL;
     uint32_t base = stream0(c), stride = dev.stream[0].stride;
+    Obj *vb = obj_k(dev.stream[0].vb);
+    if (base && resident(vb) && (ARG(1) == 4 || ARG(1) == 5)) {
+        rdraw.vb = dev.stream[0].vb; rdraw.voff = dev.stream[0].off; rdraw.ib = 0; rdraw.isize = 0; rdraw.first = ARG(2); rdraw.basev = 0;
+        draw_cmd(c, ARG(1), ARG(3), base, stride, 0, 0, 0, 0, 0);
+        rdraw.vb = 0;
+        return D3D_OK;
+    }
     if (base) draw_cmd(c, ARG(1), ARG(3), base + ARG(2) * stride, stride, 0, 0, 0, 0, 0);
     return D3D_OK;
 }
@@ -1784,6 +1832,13 @@ static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     if (base && getenv("RN_SMOOTH_LOG") && is_car_vs(dev.vs)) { static int nl; if (nl++ < 6) rn_log("SMOOTH call type %u i32 %d prims %u", ARG(1), i32, ARG(6)); }
     if (base && ARG(1) == 4 && !i32 && smooth_draw(c, base + (uint32_t)bv * stride, stride, ARG(3), ARG(4), lock_mem(ib) + ARG(5) * 2, ARG(6)))
         return D3D_OK;
+    if (base && (ARG(1) == 4 || ARG(1) == 5) && resident(obj_k(dev.stream[0].vb)) && resident(ib)) {
+        rdraw.vb = dev.stream[0].vb; rdraw.voff = dev.stream[0].off; rdraw.ib = dev.ib; rdraw.isize = i32 ? 4 : 2;
+        rdraw.first = ARG(5); rdraw.basev = bv;
+        draw_cmd(c, ARG(1), ARG(6), base, stride, 0, 0, 0, 0, 0);
+        rdraw.vb = 0;
+        return D3D_OK;
+    }
     if (base) draw_cmd(c, ARG(1), ARG(6), base + (uint32_t)bv * stride, stride, ARG(3), ARG(4),
                        lock_mem(ib) + ARG(5) * (i32 ? 4 : 2), i32, 0);
     return D3D_OK;

@@ -21,6 +21,8 @@ enum {
     GPU_FXAA = 11,      // color id: FXAA over that target's current contents (web/gpu.js; sent at the start of the HUD, so the HUD stays crisp)
     GPU_CUBE = 10,      // id, edge, id of face 0: the six face targets (ids face0..face0+5, D3DCUBEMAP_FACES order
                         // +X -X +Y -Y +Z -Z, sent before as GPU_TARGET) become the layers of one cube texture
+    GPU_BUFFER = 13,    // id, bytes: a vertex or index buffer that lives on the GPU (web only; static buffers)
+    GPU_BUFDATA = 14,   // id, byte offset, byte count n, n bytes (zero padded): its contents from that Unlock on
     GPU_SKIN = 12,      // skin id, fill ARGB, layer count n, n x (layer id, mask id, recolour, 4 ARGB colours), 4 marker ARGB,
                         // marker count m, m x (texel index, colour 0-3): the HD replay of the skin composite (d3d9.c skin_bridge)
 };
@@ -36,7 +38,11 @@ enum {
     D_BLEND = 23, D_SRCB, D_DSTB, D_BOP, D_SEPA, D_SRCBA, D_DSTBA, D_BOPA, D_BFACTOR,
     D_CWRITE = 32, D_AFUNC, D_AREF, D_FOG, D_FOGC,   // D_AFUNC 0 = alpha test off
     D_TEX = 37,         // 8 stages x D_TEXN words
-    D_NVC = 37 + 8 * 8, D_NPC, D_HDR,
+    D_NVC = 37 + 8 * 8, D_NPC,
+    D_RVB, D_RVOFF,     // resident draw (web): vertex buffer id (0 = vertices in the payload) and its byte offset
+    D_RIB, D_RIFMT,     // index buffer id (0 = indices in the payload, u32) and its index size (2 or 4)
+    D_RFIRST, D_RBASEV, // first index (or first vertex) and base vertex (signed) of a resident draw
+    D_HDR,
 };
 // Per stage: texture id (0 none), ADDRESSU, ADDRESSV, MAGFILTER, MINFILTER, MIPFILTER, TEXTURETRANSFORMFLAGS, MAXANISOTROPY.
 // T_TT also carries T_CUBE: the stage's texture is a cube (ps_1_x samples by the bound texture's type).

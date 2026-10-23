@@ -3,11 +3,13 @@
 // before the one it submits. Shaders arrive as WGSL (host/sm1.c); textures as RGBA8.
 'use strict';
 const GPU_TARGET = 1, GPU_CLEAR = 2, GPU_PRESENT = 3, GPU_DRAW = 4, GPU_SHADER = 5, GPU_DECL = 6, GPU_TEXTURE = 7,
-  GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10, GPU_FXAA = 11, GPU_SKIN = 12;
+  GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10, GPU_FXAA = 11, GPU_SKIN = 12,
+  GPU_BUFFER = 13, GPU_BUFDATA = 14;
 const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_DECL = 6, D_RT = 7, D_DS = 8, D_VP = 9,
   D_SC = 15, D_ZEN = 19, D_ZWRITE = 20, D_ZFUNC = 21, D_CULL = 22, D_BLEND = 23, D_SRCB = 24, D_DSTB = 25, D_BOP = 26,
   D_SEPA = 27, D_SRCBA = 28, D_DSTBA = 29, D_BOPA = 30, D_BFACTOR = 31, D_CWRITE = 32, D_AFUNC = 33, D_AREF = 34,
-  D_FOG = 35, D_FOGC = 36, D_TEX = 37, D_TEXN = 8, D_NVC = 37 + 64, D_NPC = 38 + 64, D_HDR = 39 + 64;
+  D_FOG = 35, D_FOGC = 36, D_TEX = 37, D_TEXN = 8, D_NVC = 37 + 64, D_NPC = 38 + 64,
+  D_RVB = 39 + 64, D_RVOFF = 40 + 64, D_RIB = 41 + 64, D_RIFMT = 42 + 64, D_RFIRST = 43 + 64, D_RBASEV = 44 + 64, D_HDR = 45 + 64;
 const T_ID = 0, T_AU = 1, T_AV = 2, T_MAG = 3, T_MIN = 4, T_MIP = 5, T_TT = 6, T_ANISO = 7, T_CUBE = 0x10000;
 const U_SIZE = 4320, U_STEP = 4352;     // sm1.h SM1_U_SIZE, rounded to the 256-byte offset alignment
 
@@ -270,13 +272,16 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
     const color = comp(w[D_SRCB], w[D_DSTB], w[D_BOP]);
     return { color, alpha: w[D_SEPA] ? comp(w[D_SRCBA], w[D_DSTBA], w[D_BOPA]) : color };
   }
+  // Index size of a draw: resident index buffers keep the game's 16 or 32 bits; payload indices are 32 bits.
+  const ifmt = (w, hdr) => w[hdr + D_RIB] && w[hdr + D_RIFMT] === 2 ? 'uint16' : 'uint32';
+  const gbufs = new Map();   // resident vertex / index buffers (GPU_BUFFER): id -> GPUBuffer
   function pipeline(w, hdr, stride, sc) {
     const vs = shaders.get(w[hdr + D_VS]), ps = shaders.get(w[hdr + D_PS]), decl = decls.get(w[hdr + D_DECL]);
     if (!vs || !ps || !decl) fail('draw with an unknown shader or declaration');
     const g = i => w[hdr + i];
     const ds = g(D_DS) !== 0;
     const key = [g(D_VS), g(D_PS), g(D_DECL), stride, g(D_TOPO), ds, g(D_ZEN), g(D_ZWRITE), g(D_ZFUNC), g(D_CULL), g(D_BLEND),
-      g(D_SRCB), g(D_DSTB), g(D_BOP), g(D_SEPA), g(D_SRCBA), g(D_DSTBA), g(D_BOPA), g(D_CWRITE), sc].join(',');
+      g(D_SRCB), g(D_DSTB), g(D_BOP), g(D_SEPA), g(D_SRCBA), g(D_DSTBA), g(D_BOPA), g(D_CWRITE), sc, ifmt(w, hdr)].join(',');
     if (pipes.has(key)) return pipes.get(key);
     const attributes = [];
     for (let k = 0; k < 16; k++) {
@@ -298,7 +303,7 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
       // D3D9 front faces are clockwise on screen; CULL_CCW (the default) culls the back ones.
       multisample: { count: sc },
       primitive: { topology: topo, frontFace: 'cw', cullMode: cull,
-        stripIndexFormat: topo === 'triangle-strip' && g(D_NIDX) ? 'uint32' : undefined },
+        stripIndexFormat: topo === 'triangle-strip' && g(D_NIDX) ? ifmt(w, hdr) : undefined },
       depthStencil: ds ? { format: 'depth24plus-stencil8', depthWriteEnabled: !!(g(D_ZEN) && g(D_ZWRITE)),
         depthCompare: g(D_ZEN) ? CMP[g(D_ZFUNC)] : 'always', stencilFront: st, stencilBack: st } : undefined });
     pipes.set(key, p);
@@ -391,7 +396,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   const skinTmp = new Map();     // size -> [ping, pong]
   const argb = c => [(c >>> 16) & 255, (c >>> 8) & 255, c & 255, c >>> 24];
   function skin(w, a) {
-    const t = res.get(w[a]);
+    const id = w[a], t = res.get(id);     // id read now: w is the frame list, reused by the time a check reports
     if (!t || SKIN_MODE === '0') return;
     const check = SKIN_MODE === 'check', S = check ? t.w : Math.min(2048, 4 * t.w);
     if (!skinTmp.has(S)) skinTmp.set(S, [0, 1].map(() => device.createTexture({ size: [S, S], format: 'rgba8unorm',
@@ -437,7 +442,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           if (dk && !first) first = ` first at texel ${k / 4}: gpu ${x.subarray(k, k + 4).join(',')} game ${y.subarray(k, k + 4).join(',')}`;
           if (dk) diff++; max = Math.max(max, dk);
         }
-        report(`gpu.js: skinhd check id ${w[a]} ${S}x${S} layers ${n} markers ${nm}: ${diff} texels differ, max ${max}${first}`);
+        report(`gpu.js: skinhd check id ${id} ${S}x${S} layers ${n} markers ${nm}: ${diff} texels differ, max ${max}${first}`);
       });
       return;
     }
@@ -470,11 +475,11 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     for (let i = 0; i < w.length;) {
       const op = w[i] & 0xff, n = w[i] >>> 8, a = i + 1;
       i += 1 + n;
-      if (op === GPU_DRAW) {
+      if (op === GPU_DRAW && !w[a + D_RVB]) {
         vneed += (w[a + D_NVERT] * w[a + D_STRIDE] + 3) & ~3;
         ineed += 4 * w[a + D_NIDX];
-        uneed += U_STEP;
       }
+      if (op === GPU_DRAW) uneed += U_STEP;
     }
     [vbuf, vcap] = grow(vbuf, vcap, vneed, GPUBufferUsage.VERTEX);
     [ibuf, icap] = grow(ibuf, icap, ineed + 4, GPUBufferUsage.INDEX);
@@ -588,10 +593,12 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         udw[ub + 1064] = g(D_AFUNC); udw[ub + 1065] = g(D_FOG);
         udf[ub + 1068] = g(D_AREF) / 255;
         for (let k = 0; k < 8; k++) udw[ub + 1072 + k] = g(D_TEX + D_TEXN * k + T_TT);
-        // vertices and indices
-        const vsrc = 4 * (src + 4 * nvc + 4 * npc), vbytes = nv * stride;
-        vdata.set(u8.subarray(vsrc, vsrc + vbytes), voff);
-        if (ni) idata.set(w.subarray(src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2), src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2) + ni), ioff / 4);
+        // vertices and indices: in the payload, or in resident buffers (GPU_BUFFER)
+        const rvb = g(D_RVB), vsrc = 4 * (src + 4 * nvc + 4 * npc), vbytes = rvb ? 0 : nv * stride;
+        if (!rvb) {
+          vdata.set(u8.subarray(vsrc, vsrc + vbytes), voff);
+          if (ni) idata.set(w.subarray(src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2), src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2) + ni), ioff / 4);
+        }
         const sc = [g(D_SC), g(D_SC + 1), Math.min(g(D_SC + 2), rt.w), Math.min(g(D_SC + 3), rt.h)];
         if (sc[2] > sc[0] && sc[3] > sc[1]) {
           pass.setPipeline(pipeline(w, a, stride, rt.sc || 1));
@@ -609,11 +616,18 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           pass.setScissorRect(sc[0], sc[1], sc[2] - sc[0], sc[3] - sc[1]);
           const bf = g(D_BFACTOR);
           if (g(D_BLEND)) pass.setBlendConstant([((bf >>> 16) & 255) / 255, ((bf >>> 8) & 255) / 255, (bf & 255) / 255, (bf >>> 24) / 255]);
-          pass.setVertexBuffer(0, vbuf, voff, vbytes);
-          if (ni) { pass.setIndexBuffer(ibuf, 'uint32', ioff, 4 * ni); pass.drawIndexed(ni); }
-          else pass.draw(nv);
+          if (rvb) {
+            pass.setVertexBuffer(0, gbufs.get(rvb), g(D_RVOFF));
+            if (g(D_RIB)) { pass.setIndexBuffer(gbufs.get(g(D_RIB)), ifmt(w, a)); pass.drawIndexed(ni, 1, g(D_RFIRST), w[a + D_RBASEV] | 0); }
+            else pass.draw(nv, 1, g(D_RFIRST));
+          } else {
+            pass.setVertexBuffer(0, vbuf, voff, vbytes);
+            if (ni) { pass.setIndexBuffer(ibuf, 'uint32', ioff, 4 * ni); pass.drawIndexed(ni); }
+            else pass.draw(nv);
+          }
         }
-        voff += (vbytes + 3) & ~3; ioff += 4 * ni; uoff += U_STEP;
+        if (!rvb) { voff += (vbytes + 3) & ~3; ioff += 4 * ni; }
+        uoff += U_STEP;
         stats.draws++;
       } else if (op === GPU_FXAA) {
         endPass();
@@ -631,6 +645,11 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           p.draw(3);
           p.end();
         }
+      } else if (op === GPU_BUFFER) {
+        gbufs.get(w[a])?.destroy();
+        gbufs.set(w[a], device.createBuffer({ size: Math.max(4, w[a + 1]), usage: GPUBufferUsage.VERTEX | GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST }));
+      } else if (op === GPU_BUFDATA) {
+        device.queue.writeBuffer(gbufs.get(w[a]), w[a + 1], u8, 4 * (a + 3), w[a + 2]);
       } else if (op === GPU_SKIN) {
         skin(w, a);
       } else if (op === GPU_PRESENT) {
@@ -661,6 +680,22 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   // ?hold=N (debug): stop after the N-th Present, so a capture shows that frame (the game then waits).
   const hold = Number(new URLSearchParams(location.search).get('hold')) || 0;
   let frames = 0, presents = 0;
+  // The page runs a frame as soon as the game submits it (host/gpu.c wakes seq), not at the next animation frame: with one
+  // frame in flight, waiting for requestAnimationFrame made Present wait up to a refresh more (OWNER session 2026-10-23:
+  // game thread 40% in gpu_wait, page 62% idle, frames alternating 17 / 34 ms).
+  // A task boundary after each pass, so input, timers and the canvas update still get their turns.
+  const ch = new MessageChannel(), yields = [];
+  ch.port1.onmessage = () => yields.shift()?.();
+  const yieldTask = () => new Promise(f => { yields.push(f); ch.port2.postMessage(0); });
+  async function pump() {
+    for (;;) {
+      if (!tick()) return;
+      if (hold && presents >= hold) { await new Promise(f => setTimeout(f, 100)); continue; }
+      const h = M.HEAP32, seq = Atomics.load(h, box);
+      const r = Atomics.load(h, box + 1) < seq ? { async: false } : Atomics.waitAsync(h, box, seq);
+      if (r.async) await r.value; else await yieldTask();
+    }
+  }
   function tick() {
     const h = H();
     try {
@@ -678,9 +713,9 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       }
     } catch (e) {
       report(e.message);
-      return;
+      return false;
     }
-    requestAnimationFrame(tick);
+    return true;
   }
-  requestAnimationFrame(tick);
+  pump();
 }

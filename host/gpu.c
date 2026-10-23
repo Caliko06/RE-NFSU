@@ -45,6 +45,7 @@ void gpu_submit(void) {
     box.len[k] = nlist;
     nlist = 0;
     __atomic_add_fetch(&box.seq, 1, __ATOMIC_SEQ_CST);
+    emscripten_futex_wake(&box.seq, 1);     // web/gpu.js waits on seq (Atomics.waitAsync) to run the frame at once
 }
 void gpu_wait(void) {
     uint32_t n = __atomic_load_n(&box.seq, __ATOMIC_SEQ_CST);
@@ -457,7 +458,7 @@ void gpu_run(const uint32_t *w, uint32_t n) {
             Img *t = &imgs[a[0]];
             img_free(t);
             *t = (Img){a[1], a[1], IMG_CUBE, 1, NULL, NULL, NULL, {0}, a[2]};
-        } else if (op == GPU_FXAA || op == GPU_SKIN) {
+        } else if (op == GPU_FXAA || op == GPU_SKIN || op == GPU_BUFFER || op == GPU_BUFDATA) {
             // web only (web/gpu.js)
         } else if (op == GPU_TEXKEY) {
             // the remaster pack is web only (web/gpu.js)
