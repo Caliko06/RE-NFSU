@@ -3,7 +3,7 @@
 // before the one it submits. Shaders arrive as WGSL (host/sm1.c); textures as RGBA8.
 'use strict';
 const GPU_TARGET = 1, GPU_CLEAR = 2, GPU_PRESENT = 3, GPU_DRAW = 4, GPU_SHADER = 5, GPU_DECL = 6, GPU_TEXTURE = 7,
-  GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10;
+  GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10, GPU_FXAA = 11;
 const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_DECL = 6, D_RT = 7, D_DS = 8, D_VP = 9,
   D_SC = 15, D_ZEN = 19, D_ZWRITE = 20, D_ZFUNC = 21, D_CULL = 22, D_BLEND = 23, D_SRCB = 24, D_DSTB = 25, D_BOP = 26,
   D_SEPA = 27, D_SRCBA = 28, D_DSTBA = 29, D_BOPA = 30, D_BFACTOR = 31, D_CWRITE = 32, D_AFUNC = 33, D_AREF = 34,
@@ -101,6 +101,91 @@ async function startGpu(M, canvas, report, onFrame) {
   // its single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
   // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
   const MSAA = new URLSearchParams(location.search).get('msaa') === '4' ? 4 : 1;
+  // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first HUD quad of a race
+  // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
+  const FXAA_MODE = new URLSearchParams(location.search).get('fxaa');   // '0' off, '2' debug: edges in red
+  const FXAA_ON = FXAA_MODE !== '0';
+  const fxaaMod = device.createShaderModule({ code: `
+const DBG = ${FXAA_MODE === '2' ? 1 : 0};
+@group(0) @binding(0) var src: texture_2d<f32>;
+@group(0) @binding(1) var smp: sampler;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
+}
+fn lum(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
+fn L(uv: vec2f) -> f32 { return lum(textureSampleLevel(src, smp, uv, 0.0).rgb); }
+const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  let rcp = 1.0 / vec2f(textureDimensions(src));
+  let uv0 = pos.xy * rcp;
+  let m4 = textureSampleLevel(src, smp, uv0, 0.0);
+  let lumaM = lum(m4.rgb);
+  var lumaN = L(uv0 + vec2f(0.0, -rcp.y)); var lumaS = L(uv0 + vec2f(0.0, rcp.y));
+  let lumaW0 = L(uv0 + vec2f(-rcp.x, 0.0)); let lumaE0 = L(uv0 + vec2f(rcp.x, 0.0));
+  let rangeMax = max(max(lumaN, lumaW0), max(lumaE0, max(lumaS, lumaM)));
+  let rangeMin = min(min(lumaN, lumaW0), min(lumaE0, min(lumaS, lumaM)));
+  let range = rangeMax - rangeMin;
+  if (range < max(0.0625, rangeMax * 0.125)) { return m4; }
+  if (DBG == 1) { return vec4f(1.0, 0.0, 0.0, m4.a); }
+  let lumaNW = L(uv0 + vec2f(-rcp.x, -rcp.y)); let lumaNE = L(uv0 + vec2f(rcp.x, -rcp.y));
+  let lumaSW = L(uv0 + vec2f(-rcp.x, rcp.y)); let lumaSE = L(uv0 + vec2f(rcp.x, rcp.y));
+  let lumaNS = lumaN + lumaS; let lumaWE = lumaW0 + lumaE0;
+  let subpixNSWE = lumaNS + lumaWE;
+  let edgeHorz1 = -2.0 * lumaM + lumaNS; let edgeVert1 = -2.0 * lumaM + lumaWE;
+  let lumaNESE = lumaNE + lumaSE; let lumaNWNE = lumaNW + lumaNE;
+  let edgeHorz2 = -2.0 * lumaE0 + lumaNESE; let edgeVert2 = -2.0 * lumaN + lumaNWNE;
+  let lumaNWSW = lumaNW + lumaSW; let lumaSWSE = lumaSW + lumaSE;
+  let edgeHorz4 = abs(edgeHorz1) * 2.0 + abs(edgeHorz2); let edgeVert4 = abs(edgeVert1) * 2.0 + abs(edgeVert2);
+  let edgeHorz3 = -2.0 * lumaW0 + lumaNWSW; let edgeVert3 = -2.0 * lumaS + lumaSWSE;
+  let edgeHorz = abs(edgeHorz3) + edgeHorz4; let edgeVert = abs(edgeVert3) + edgeVert4;
+  let subpixNWSWNESE = lumaNWSW + lumaNESE;
+  let horzSpan = edgeHorz >= edgeVert;
+  var lengthSign = rcp.x;
+  let subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;
+  if (!horzSpan) { lumaN = lumaW0; lumaS = lumaE0; } else { lengthSign = rcp.y; }
+  let subpixB = subpixA * (1.0 / 12.0) - lumaM;
+  let gradientN = lumaN - lumaM; let gradientS = lumaS - lumaM;
+  var lumaNN = lumaN + lumaM; let lumaSS = lumaS + lumaM;
+  let pairN = abs(gradientN) >= abs(gradientS);
+  let gradient = max(abs(gradientN), abs(gradientS));
+  if (pairN) { lengthSign = -lengthSign; }
+  let subpixC = clamp(abs(subpixB) / range, 0.0, 1.0);
+  var posB = uv0;
+  let offNP = select(vec2f(0.0, rcp.y), vec2f(rcp.x, 0.0), horzSpan);
+  if (!horzSpan) { posB.x = posB.x + lengthSign * 0.5; } else { posB.y = posB.y + lengthSign * 0.5; }
+  var posN = posB - offNP * Q[0]; var posP = posB + offNP * Q[0];
+  let subpixD = -2.0 * subpixC + 3.0;
+  var lumaEndN = L(posN); let subpixE = subpixC * subpixC; var lumaEndP = L(posP);
+  if (!pairN) { lumaNN = lumaSS; }
+  let gradientScaled = gradient * 0.25;
+  let lumaMM = lumaM - lumaNN * 0.5;
+  let subpixF = subpixD * subpixE;
+  let lumaMLTZero = lumaMM < 0.0;
+  lumaEndN = lumaEndN - lumaNN * 0.5; lumaEndP = lumaEndP - lumaNN * 0.5;
+  var doneN = abs(lumaEndN) >= gradientScaled; var doneP = abs(lumaEndP) >= gradientScaled;
+  for (var i = 1; i < 12 && !(doneN && doneP); i++) {
+    if (!doneN) { posN = posN - offNP * Q[i]; lumaEndN = L(posN) - lumaNN * 0.5; doneN = abs(lumaEndN) >= gradientScaled; }
+    if (!doneP) { posP = posP + offNP * Q[i]; lumaEndP = L(posP) - lumaNN * 0.5; doneP = abs(lumaEndP) >= gradientScaled; }
+  }
+  let dstN = select(uv0.y - posN.y, uv0.x - posN.x, horzSpan);
+  let dstP = select(posP.y - uv0.y, posP.x - uv0.x, horzSpan);
+  let directionN = dstN < dstP;
+  let lumaEndG = select(lumaEndP, lumaEndN, directionN);
+  let goodSpan = (lumaEndG < 0.0) != lumaMLTZero;
+  let spanLength = dstP + dstN;
+  let dstM = select(dstP, dstN, directionN);
+  let pixelOffset = dstM * (-1.0 / spanLength) + 0.5;
+  let pixelOffsetGood = select(0.0, pixelOffset, goodSpan);
+  let pixelOffsetSubpix = max(pixelOffsetGood, subpixF * subpixF * 0.75);
+  var uv = uv0;
+  if (!horzSpan) { uv.x = uv.x + pixelOffsetSubpix * lengthSign; } else { uv.y = uv.y + pixelOffsetSubpix * lengthSign; }
+  return vec4f(textureSampleLevel(src, smp, uv, 0.0).rgb, m4.a);
+}` });
+  const fxaaPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: fxaaMod, entryPoint: 'vs' },
+    fragment: { module: fxaaMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
+  let fxaaTmp = null;
   const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
@@ -384,6 +469,22 @@ async function startGpu(M, canvas, report, onFrame) {
         }
         voff += (vbytes + 3) & ~3; ioff += 4 * ni; uoff += U_STEP;
         stats.draws++;
+      } else if (op === GPU_FXAA) {
+        endPass();
+        const rt = res.get(w[a]);
+        if (FXAA_ON && rt && !rt.depth && !rt.msView) {
+          if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
+            fxaaTmp?.destroy();
+            fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
+          }
+          enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
+          const p = enc.beginRenderPass({ colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
+          p.setPipeline(fxaaPipe);
+          p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
+            entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
+          p.draw(3);
+          p.end();
+        }
       } else if (op === GPU_PRESENT) {
         endPass();
         const t = res.get(w[a]), size = `${w[a + 1]}x${w[a + 2]}`;

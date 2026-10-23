@@ -1765,6 +1765,9 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
         if (lb == 0x6c9c3c) racing = 1;
         else if (lb == 0x6c9cf0 || lb == 0x6c9de8 || lb == 0x6c9e8c || lb == 0x6c9ea0) racing = 0;
     }
+    // BRIDGE: FXAA (web/gpu.js) over the 3D scene, once per race frame, before the first HUD quad (the HUD is drawn last into the same target).
+    static uint32_t fxaa_frame = ~0u;
+    if (isl && racing && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
     if (isl && racing) {
         float S = 4.f * rn_screen_h / (3.f * rn_screen_w), x[4], cx = 0;
         for (int k = 0; k < 4; k++) { uint32_t b = ld(c, ARG(3) + 32 * k, 4); memcpy(&x[k], &b, 4); cx += x[k] / 4; }

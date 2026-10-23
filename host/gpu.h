@@ -18,6 +18,7 @@ enum {
     GPU_TEXTURE = 7,    // id, width, height, levels
     GPU_TEXDATA = 8,    // id, level, width, height, RGBA8 texels (one word each, bytes R G B A)
     GPU_TEXKEY = 9,     // id, key low word, key high word: FNV-1a 64 of a DXT level 0 (web/gpu.js remaster pack)
+    GPU_FXAA = 11,      // color id: FXAA over that target's current contents (web/gpu.js; sent at the start of the HUD, so the HUD stays crisp)
     GPU_CUBE = 10,      // id, edge, id of face 0: the six face targets (ids face0..face0+5, D3DCUBEMAP_FACES order
                         // +X -X +Y -Y +Z -Z, sent before as GPU_TARGET) become the layers of one cube texture
 };
