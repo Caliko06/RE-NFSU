@@ -19,7 +19,9 @@ def parse(d, b, e):
     slots = {}; recs = []; data = None
     for m2, b2, s2 in chunks(d, b, e):
         for m3, b3, s3 in chunks(d, b2, b2 + s2):
-            if m3 == 0x33320002: data = b3   # world / sky variant: one data chunk, offsets in the records
+            # world / sky variant: one data chunk, offsets in the records. The chunk body is padded with 0x11 up to a 0x80 file
+            # alignment and the offsets count from there (V: all 222 chunks in STREAML1R*.BUN; runtime texhash matches).
+            if m3 == 0x33320002: data = (b3 + 0x7f) & ~0x7f
             if m3 == 0x33310003:
                 for k in range(0, s3, 20):
                     key, ao, es = struct.unpack_from('<3I', d, b3 + k); slots[key] = (ao, es)

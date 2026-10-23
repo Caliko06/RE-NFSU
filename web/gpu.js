@@ -40,15 +40,18 @@ async function startGpu(M, canvas, report, onFrame) {
   const pack = new Map(), hd = new Map();   // key -> png name; png name -> {view} once loaded, null while loading
   let packed = 0;
   if (new URLSearchParams(location.search).get('remaster') !== '0') {
-    try {
-      const r = await fetch('remaster/index.tsv');
+    // ?worldhd=1 adds the world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh): opt-in, the world look stays 2003 by default.
+    const lists = ['remaster/index.tsv'].concat(new URLSearchParams(location.search).get('worldhd') === '1' ? ['remaster/index_world.tsv'] : []);
+    for (const u of lists) try {
+      const r = await fetch(u);
       if (r.ok) for (const l of (await r.text()).split('\n')) { const f = l.split('\t'); if (f[1]) pack.set(f[0], f[1]); }
     } catch {}
     if (pack.size) report(`gpu.js: remaster pack ${pack.size} textures`);
   }
   const HD_MAX = Number(new URLSearchParams(location.search).get('hdmax') || 1024);
   async function loadHd(name) {
-    const blob = await (await fetch(`remaster/png/${name}.png`)).blob();
+    // A name with a path is a file under remaster/ (world pack: world/<hash>.webp); a bare key is png/<key>.png.
+    const blob = await (await fetch(name.includes('/') ? `remaster/${name}` : `remaster/png/${name}.png`)).blob();
     const opt = { premultiplyAlpha: 'none', colorSpaceConversion: 'none' };
     // Level 0 is at most HD_MAX on a side (?hdmax=, default 1024): the 2048 car PNGs cost 22 MB each and, with ~80 in a
     // race, made the GPU wait 60-110 ms a frame at 2560x1116 (OWNER 2026-10-22 session).
