@@ -323,7 +323,47 @@ static void write_result(const Sm1 *s, const Ins *in, const char *val, Buf *b) {
     for (int k = 0; k < 4; k++) if (in->d.mask >> k & 1) emit(b, "  %s.%c = %s.%c;\n", d, SW[k], val, SW[k]);
 }
 
-char *sm1_wgsl(const Sm1 *s) {
+
+// BRIDGE: per-pixel evaluation of the car body shader pair, PC Speed.exe vs 0x4728b668 / ps 0xc27f3669 (census/car_draw_census.txt).
+// The original vertex shader lights per vertex: N.V, (N.V)^k (c23.x Fresnel, c22.x specular), 9 spherical-harmonic coefficients
+// c0..c9 on the normal (diffuse, oD0) and on R = 2(N.V)N - V (reflection tint, oD1), cube coordinates R x c14..c16 (oT0).
+// Here the same terms, constants and operation order run per pixel on the interpolated normal (t2) and eye vector (t3).
+static const char *const car_ps_body =
+    "  let N = normalize(i.t2.xyz);\n"
+    "  let Vr = i.t3.xyz;\n"
+    "  let Vn = Vr * d3d_rsq(dot(Vr, Vr));\n"
+    "  let d = max(dot(Vn, N), 0.01);\n"             /* def c24 = (0.01, 0, 1, 0.5) in the original vertex shader */
+    "  let lg = d3d_log(d);\n"
+    "  let F = exp2(lg * u.c[23].x);\n"
+    "  let n4 = vec4f(N.x * N.x, N.y * N.y, N.z * N.z, N.y * N.x);\n"
+    "  let n2 = vec2f(N.x * N.z, N.z * N.y);\n"
+    "  var shn = n4.x * u.c[1].xyz + u.c[0].xyz;\n"
+    "  shn = n4.y * u.c[2].xyz + shn; shn = n4.z * u.c[3].xyz + shn; shn = n4.w * u.c[4].xyz + shn;\n"
+    "  shn = n2.x * u.c[5].xyz + shn; shn = n2.y * u.c[6].xyz + shn;\n"
+    "  shn = N.x * u.c[7].xyz + shn; shn = N.y * u.c[8].xyz + shn; shn = N.z * u.c[9].xyz + shn;\n"
+    "  let k1 = d * u.c[19] + u.c[18];\n"
+    "  let d0c = clamp(vec4f(shn * k1.xyz, k1.w) * 0.5, vec4f(0.0), vec4f(1.0));\n"
+    "  let R = (2.0 * d) * N - Vn;\n"
+    "  let cc = vec3f(dot(R, u.c[14].xyz), dot(R, u.c[15].xyz), dot(R, u.c[16].xyz));\n"
+    "  let sp = exp2(lg * u.c[22].x);\n"
+    "  let tint = sp * u.c[21].xyz + u.c[20].xyz;\n"
+    "  let r4 = vec4f(R.x * R.x, R.y * R.y, R.z * R.z, R.y * R.x);\n"
+    "  let r2 = vec2f(R.x * R.z, R.z * R.y);\n"
+    "  var shr = r4.x * u.c[1] + u.c[0];\n"
+    "  shr = r4.y * u.c[2] + shr; shr = r4.z * u.c[3] + shr; shr = r4.w * u.c[4] + shr;\n"
+    "  shr = r2.x * u.c[5] + shr; shr = r2.y * u.c[6] + shr;\n"
+    "  shr = R.z * u.c[9] + (R.y * u.c[8] + (R.x * u.c[7] + shr));\n"
+    "  let g = exp2(d3d_log(clamp(shr.w, 0.0, 1.0)) * u.c[22].x);\n"
+    "  let d1c = clamp(vec4f(tint * (shr.xyz * g) * 0.5, F), vec4f(0.0), vec4f(1.0));\n"
+    "  t0 = select(textureSample(x0, s0, tc(vec4f(cc, 1.0), u.tt[0][0])), textureSample(y0, s0, cc), (u.tt[0][0] & 65536u) != 0u);\n"
+    "  t1 = textureSample(x1, s1, tc(i.t1, u.tt[0][1]));\n"
+    "  let a = clamp(d1c.w * u.pc[1].xyz + u.pc[0].xyz, vec3f(-8.0), vec3f(8.0));\n"
+    "  let b = clamp(4.0 * (t0.xyz * a), vec3f(-8.0), vec3f(8.0));\n"
+    "  let e = clamp(b + d1c.xyz, vec3f(-8.0), vec3f(8.0));\n"
+    "  let f = clamp(2.0 * (t1 * d0c), vec4f(-8.0), vec4f(8.0));\n"
+    "  r0 = vec4f(clamp(e * f.w + f.xyz, vec3f(-8.0), vec3f(8.0)), f.w);\n";
+
+char *sm1_wgsl(const Sm1 *s, int mode) {
     Buf b = {malloc(4096), 0, 4096};
     b.p[0] = 0;
     emit(&b, "struct U { c: array<vec4f, 256>, pc: array<vec4f, 8>, hp: vec4f, fogc: vec4f, af: vec4u, ar: vec4f,"
@@ -348,9 +388,10 @@ char *sm1_wgsl(const Sm1 *s) {
         for (int k = 0; k < 4; k++) emit(&b, "  var t%d = vec4f(0.0);\n", k);
     }
     // Co-issue: the pair reads all its sources before either one writes.
+    if (s->ps && mode == SM1_CAR_PS) emit(&b, "%s", car_ps_body);
     const Ins *pend = NULL;
     char pend_val[64] = "";
-    for (int i = 0; i < s->n; i++) {
+    for (int i = 0; i < s->n && !(s->ps && mode == SM1_CAR_PS); i++) {
         const Ins *in = &s->ins[i];
         if (in->op == OP_DCL || in->op == OP_DEF || in->op == OP_NOP) continue;
         if (in->op == OP_TEX) {
@@ -379,6 +420,7 @@ char *sm1_wgsl(const Sm1 *s) {
         write_result(s, in, val, &b);
     }
     if (!s->ps) {
+        if (mode == SM1_CAR_VS) emit(&b, "  o.t2 = vec4f(i.v1.xyz, 0.0);\n  o.t3 = vec4f(u.c[17].xyz - i.v0.xyz, 0.0);\n");
         emit(&b, "  o.d0 = clamp(o.d0, vec4f(0.0), vec4f(1.0));\n  o.d1 = clamp(o.d1, vec4f(0.0), vec4f(1.0));\n"
                  "  o.fog = clamp(fogv, 0.0, 1.0);\n"
                  // D3D9 samples pixels at integer positions, WebGPU at half: move by half a pixel.

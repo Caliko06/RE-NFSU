@@ -722,6 +722,12 @@ static void census_draw(Ctx *c, uint32_t prims) {
     cen[i].n++; cen[i].prims += prims; cen_total++;
 }
 static void disasm_line(const char *l);
+// Content hash of a shader's tokens: stable across runs, unlike the object id.
+static uint32_t shader_hash(const Obj *o) {
+    uint32_t h = 2166136261u;
+    for (uint32_t k = 0; k < o->nblob; k++) h = (h ^ ((const uint32_t *)o->blob)[k]) * 16777619u;
+    return h;
+}
 static void census_dump(void) {
     for (int a = 0; a < ncen; a++) for (int b = a + 1; b < ncen; b++) if (cen[b].prims > cen[a].prims) { __typeof__(cen[0]) t = cen[a]; cen[a] = cen[b]; cen[b] = t; }
     rn_log("DRAWS frame %u: %u draws, %d groups", dev.frames, cen_total, ncen);
@@ -734,8 +740,8 @@ static void census_dump(void) {
         for (int j = 0; j < i; j++) if (cen[j].vs == cen[i].vs && cen[j].ps == cen[i].ps) seen = 1;
         if (seen) continue;
         Obj *v = obj_k(cen[i].vs), *p = obj_k(cen[i].ps);
-        rn_log("DRAWS SHADER vs=%x", cen[i].vs); if (v && v->sm) sm1_disasm(v->sm, disasm_line);
-        rn_log("DRAWS SHADER ps=%x", cen[i].ps); if (p && p->sm) sm1_disasm(p->sm, disasm_line);
+        rn_log("DRAWS SHADER vs=%x hash=%08x", cen[i].vs, v ? shader_hash(v) : 0); if (v && v->sm) sm1_disasm(v->sm, disasm_line);
+        rn_log("DRAWS SHADER ps=%x hash=%08x", cen[i].ps, p ? shader_hash(p) : 0); if (p && p->sm) sm1_disasm(p->sm, disasm_line);
     }
 }
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
@@ -1308,7 +1314,11 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     TR("Create%sShader %s_%u_%u, %u tokens -> %08x", iface == I_VS ? "Vertex" : "Pixel", iface == I_VS ? "vs" : "ps",
        (ver >> 8) & 0xff, ver & 0xff, n, g);
     if (rn_trace() || getenv("RN_VS")) { TR(""); rn_log("d3d9 shader %08x %s_%u_%u", g, iface == I_VS ? "vs" : "ps", (ver >> 8) & 0xff, ver & 0xff); sm1_disasm(sm, disasm_line); }
-    char *wgsl = sm1_wgsl(sm);
+    static int perpixel = -1;   // RN_NOPERPIXEL=1: the plain per-vertex car shader (the before of an A/B)
+    if (perpixel < 0) perpixel = getenv("RN_NOPERPIXEL") == NULL;
+    uint32_t h = shader_hash(o);
+    int mode = !perpixel ? SM1_PLAIN : iface == I_VS && h == 0x4728b668u ? SM1_CAR_VS : iface == I_PS && h == 0xc27f3669u ? SM1_CAR_PS : SM1_PLAIN;
+    char *wgsl = sm1_wgsl(sm, mode);
     uint32_t m = (uint32_t)strlen(wgsl), nw = 21 + n + (m + 4) / 4;
     uint32_t *w = calloc(nw, 4);
     w[0] = idx(o) + 1; w[1] = iface == I_PS; w[2] = n; w[3] = m;

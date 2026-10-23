@@ -44,7 +44,9 @@ void sm1_disasm(const Sm1 *s, void (*out)(const char *line));
 //   vs input v<n> at @location(n); varyings: 0 oD0, 1 oD1, 2+k oTk, 10 oFog.
 enum { SM1_U_VC = 0, SM1_U_PC = 4096, SM1_U_HP = 4224, SM1_U_FOGC = 4240, SM1_U_AF = 4256, SM1_U_AR = 4272,
        SM1_U_TT = 4288, SM1_U_SIZE = 4320 };
-char *sm1_wgsl(const Sm1 *s);
+// mode: 0 plain; SM1_CAR_VS / SM1_CAR_PS = the car body pair of PC Speed.exe (vs 0x4728b668 / ps 0xc27f3669, token FNV hash), per-pixel lighting.
+enum { SM1_PLAIN, SM1_CAR_VS, SM1_CAR_PS };
+char *sm1_wgsl(const Sm1 *s, int mode);
 
 // Interpreter. A vertex: 16 inputs in, outputs out (oPos, oD0, oD1, oT0..7, oFog). A pixel: the
 // interpolated colors and texture coordinates in, r0 out; sample() reads texture stage k.
