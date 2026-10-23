@@ -7,6 +7,7 @@
 #include "host.h"
 #include "gpu.h"
 #include "sm1.h"
+#include "carsmooth.h"
 
 #define D3D_OK 0u
 #define D3DERR_NOTFOUND 0x88760866u
@@ -711,17 +712,20 @@ static void flush_big(void) { if (gpu_pending() > (4u << 20)) hand_off(); }
 
 // RN_DRAWS=<min frame>: census of the indexed draws of the first frame at or after it that has >= 300 of them (a race frame):
 // who calls, which shaders/declaration/textures. Logged at its Present.
-static struct { uint32_t caller, vs, ps, decl, stride, tex0, tex1, n, prims; } cen[256];
+static struct { uint32_t caller, vs, ps, decl, stride, tex0, tex1, rtw, n, prims; } cen[256];
 static int ncen, cen_on = -1;
 static uint32_t cen_frame, cen_total;
 static void census_draw(Ctx *c, uint32_t prims) {
-    uint32_t k[7] = {ld(c, c->r[ESP], 4), dev.vs, dev.ps, dev.decl, dev.stream[0].stride, dev.tex[0], dev.tex[1]};
+    Obj *rt = obj_k(dev.rt[0]);
+    uint32_t k[8] = {ld(c, c->r[ESP], 4), dev.vs, dev.ps, dev.decl, dev.stream[0].stride, dev.tex[0], dev.tex[1], rt ? rt->w : 0};
     int i = 0;
     while (i < ncen && memcmp(&cen[i], k, sizeof k)) i++;
     if (i == ncen) { if (ncen == 256) return; memset(&cen[ncen], 0, sizeof cen[0]); memcpy(&cen[ncen++], k, sizeof k); }
     cen[i].n++; cen[i].prims += prims; cen_total++;
 }
 static void disasm_line(const char *l);
+static const Obj *car_vs_obj[8];   // the car body vertex shader objects (token hash 0x4728b668); dev.vs is an internal index, not the game's handle
+static int ncar_vs;
 // Content hash of a shader's tokens: stable across runs, unlike the object id.
 static uint32_t shader_hash(const Obj *o) {
     uint32_t h = 2166136261u;
@@ -732,8 +736,8 @@ static void census_dump(void) {
     for (int a = 0; a < ncen; a++) for (int b = a + 1; b < ncen; b++) if (cen[b].prims > cen[a].prims) { __typeof__(cen[0]) t = cen[a]; cen[a] = cen[b]; cen[b] = t; }
     rn_log("DRAWS frame %u: %u draws, %d groups", dev.frames, cen_total, ncen);
     for (int i = 0; i < ncen; i++)
-        rn_log("DRAWS caller=%08x vs=%x ps=%x decl=%x stride=%u tex0=%x tex1=%x draws=%u prims=%u", cen[i].caller, cen[i].vs, cen[i].ps,
-               cen[i].decl, cen[i].stride, cen[i].tex0, cen[i].tex1, cen[i].n, cen[i].prims);
+        rn_log("DRAWS caller=%08x vs=%x ps=%x decl=%x stride=%u tex0=%x tex1=%x rt=%u draws=%u prims=%u", cen[i].caller, cen[i].vs, cen[i].ps,
+               cen[i].decl, cen[i].stride, cen[i].tex0, cen[i].tex1, cen[i].rtw, cen[i].n, cen[i].prims);
     // The code of every distinct vs/ps pair of the frame, once.
     for (int i = 0; i < ncen; i++) {
         int seen = 0;
@@ -1318,6 +1322,8 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     if (perpixel < 0) perpixel = getenv("RN_NOPERPIXEL") == NULL;
     uint32_t h = shader_hash(o);
     int mode = !perpixel ? SM1_PLAIN : iface == I_VS && h == 0x4728b668u ? SM1_CAR_VS : iface == I_PS && h == 0xc27f3669u ? SM1_CAR_PS : SM1_PLAIN;
+    if (getenv("RN_SMOOTH_LOG")) rn_log("SMOOTH shader %s id %x hash %08x mode %d", iface == I_VS ? "vs" : "ps", g, h, mode);
+    if (mode == SM1_CAR_VS && ncar_vs < 8) car_vs_obj[ncar_vs++] = o;
     char *wgsl = sm1_wgsl(sm, mode);
     uint32_t m = (uint32_t)strlen(wgsl), nw = 21 + n + (m + 4) / 4;
     uint32_t *w = calloc(nw, 4);
@@ -1549,6 +1555,8 @@ static int draw_supported(Ctx *c, const Sm1 *ps) {
 }
 // vbase: guest address of vertex 0 of the draw; idx: guest indices (0 = none) of nidx, 16 or 32 bits,
 // rebased by -vmin. Vertices [vmin, vmin + nvert) are copied.
+// A draw whose vertices and indices are host-made (the smoothed car): draw_cmd takes them instead of the guest's.
+static struct { const void *vb; uint32_t nvert; const uint16_t *idx; uint32_t nidx; } xdraw;
 static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint32_t stride, uint32_t vmin, uint32_t nvert,
                      uint32_t ib, int i32, int32_t ibias) {
     TR("draw %u x%u vs %u ps %u decl %u tex %u %u %u %u blend %u %u/%u atest %u z %u/%u cull %u fog %u", type, count,
@@ -1559,7 +1567,11 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     if (type <= 3) { rn_halt(c, "d3d9: point and line draws are not drawn yet"); return; }
     // Index list: given, or made for fans.
     uint32_t nidx = 0, *ix = NULL, n = verts_of(type, count);
-    if (ib || type == 6) {
+    if (xdraw.vb) {
+        nidx = xdraw.nidx; nvert = xdraw.nvert; ix = malloc(4u * nidx);
+        for (uint32_t k = 0; k < nidx; k++) ix[k] = xdraw.idx[k];
+        type = 4;
+    } else if (ib || type == 6) {
         nidx = type == 6 ? 3 * count : n;
         ix = malloc(4u * nidx);
         for (uint32_t k = 0; k < nidx; k++) {
@@ -1569,7 +1581,7 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
         }
         if (type == 6) type = 4;
     }
-    if (!ib) nvert = n;
+    if (!ib && !xdraw.vb) nvert = n;
     Obj *rt = obj_k(dev.rt[0]), *ds = obj_k(dev.ds);
     uint32_t nvc = (uint32_t)(vs->sm->max_const + 1), npc = 8, vbytes = nvert * stride;
     uint32_t total = D_HDR + 4 * nvc + 4 * npc + (vbytes + 3) / 4 + nidx;
@@ -1605,7 +1617,7 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     uint32_t *p = w + D_HDR;
     memcpy(p, dev.vsf, 16u * nvc); p += 4 * nvc;
     memcpy(p, dev.psf, 16u * npc); p += 4 * npc;
-    memcpy(p, G(vbase + vmin * stride), vbytes); p += (vbytes + 3) / 4;
+    memcpy(p, xdraw.vb ? xdraw.vb : G(vbase + vmin * stride), vbytes); p += (vbytes + 3) / 4;
     if (nidx) memcpy(p, ix, 4u * nidx);
     gpu_cmd(GPU_DRAW, (int)total, w);
     free(w);
@@ -1624,6 +1636,96 @@ static uint32_t IDirect3DDevice9_DrawPrimitive(Ctx *c) {
     if (base) draw_cmd(c, ARG(1), ARG(3), base + ARG(2) * stride, stride, 0, 0, 0, 0, 0);
     return D3D_OK;
 }
+
+// BRIDGE: PN smoothing of the car body draws (OWNER 2026-10-20 car remaster; host/carsmooth.c). The original draws the 2003 low-poly
+// meshes as authored; here a draw of the car shader (vs token hash 0x4728b668) with >= 40 triangles is curved and subdivided before
+// it goes to the GPU. Vertex offsets come from the bound declaration; results are cached by content. RN_SMOOTH=<level> (default 3, 0 = off).
+static int is_car_vs(uint32_t id) { const Obj *o = obj_k(id); for (int k = 0; k < ncar_vs; k++) if (o && car_vs_obj[k] == o) return 1; return 0; }
+typedef struct { uint64_t key; uint8_t *vb; uint32_t nvert; uint16_t *idx; uint32_t nidx; } SmoothEnt;
+static SmoothEnt smooth_cache[192];
+static uint32_t smooth_next;
+static uint64_t fnv64b(uint64_t h, const void *p, size_t n) {
+    const uint8_t *b = p;
+    for (size_t k = 0; k < n; k++) h = (h ^ b[k]) * 0x100000001b3ull;
+    return h;
+}
+// Offsets of POSITION (float3), NORMAL (float3) and TEXCOORD0 (float2) in stream 0 of the bound declaration; 0 when it is not that shape.
+static int decl_offsets(int *po, int *no, int *to) {
+    Obj *d = obj_k(dev.decl);
+    *po = *no = *to = -1;
+    if (!d || !d->blob) return 0;
+    const uint8_t *e = (const uint8_t *)d->blob;
+    for (uint32_t k = 0; k + 1 < d->nblob / 2; k++, e += 8) {
+        uint16_t stream = (uint16_t)(e[0] | e[1] << 8), off = (uint16_t)(e[2] | e[3] << 8);
+        if (stream == 0xff) break;
+        if (stream != 0) return 0;
+        if (e[6] == 0 && e[7] == 0 && e[4] == 2) *po = off;        // POSITION0, D3DDECLTYPE_FLOAT3
+        else if (e[6] == 3 && e[7] == 0 && e[4] == 2) *no = off;   // NORMAL0
+        else if (e[6] == 5 && e[7] == 0 && e[4] == 1) *to = off;   // TEXCOORD0, FLOAT2
+    }
+    return *po >= 0 && *no >= 0 && *to >= 0;
+}
+// Tries to draw the indexed triangle list smoothed; 1 = drawn.
+static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, uint32_t nvert, uint32_t ibp, uint32_t count) {
+    static int level = -1;
+    if (level < 0) { const char *e = getenv("RN_SMOOTH"); level = e ? atoi(e) : 3; }
+    static int slog = -1, nlog;   // RN_SMOOTH_LOG=1: why a car draw is not smoothed (first 40 draws)
+    if (slog < 0) slog = getenv("RN_SMOOTH_LOG") != NULL;
+    if (!level || !is_car_vs(dev.vs)) return 0;
+    int po, no, to;
+    int dok = decl_offsets(&po, &no, &to);
+    if (slog && nlog < 40) {
+        nlog++;
+        rn_log("SMOOTH draw tris %u nverts %u stride %u decl_ok %d offsets %d %d %d", count, nvert, stride, dok, po, no, to);
+        Obj *d = obj_k(dev.decl);
+        if (d && nlog <= 2) for (uint32_t k = 0; k + 1 < d->nblob / 2; k++) {
+            const uint8_t *e = (const uint8_t *)d->blob + 8 * k;
+            rn_log("SMOOTH   elem stream %u off %u type %u usage %u idx %u", e[0] | e[1] << 8, e[2] | e[3] << 8, e[4], e[6], e[7]);
+            if ((e[0] | e[1] << 8) == 0xff) break;
+        }
+    }
+    if (count < 40 || nvert < 3 || nvert > 60000 || stride < 32 || stride > 64 || !dok) return 0;
+    const uint8_t *vsrc = G(base + vmin * stride), *isrc = G(ibp);
+    uint64_t key = fnv64b(fnv64b(1469598103934665603ull, vsrc, (size_t)nvert * stride), isrc, (size_t)count * 6);
+    key = fnv64b(key, &level, sizeof level) ^ ((uint64_t)vmin << 32 | stride);
+    SmoothEnt *ent = NULL;
+    for (int k = 0; k < 192; k++) if (smooth_cache[k].key == key && smooth_cache[k].vb) { ent = &smooth_cache[k]; break; }
+    if (!ent) {
+        float *v5 = malloc((size_t)nvert * 5 * sizeof *v5);
+        uint16_t *ix = malloc((size_t)count * 6);
+        for (uint32_t k = 0; k < nvert; k++) {
+            const uint8_t *s = vsrc + (size_t)k * stride;
+            memcpy(&v5[5 * k], s + po, 12); memcpy(&v5[5 * k + 3], s + to, 8);
+        }
+        int bad = 0;
+        for (uint32_t k = 0; k < count * 3; k++) {
+            uint32_t v = (uint32_t)(isrc[2 * k] | isrc[2 * k + 1] << 8);
+            if (v < vmin || v - vmin >= nvert) { bad = 1; break; }
+            ix[k] = (uint16_t)(v - vmin);
+        }
+        CsIn in = {v5, (int)nvert, ix, (int)count * 3};
+        CsOut out;
+        int ok = !bad && cs_smooth(&in, &out, level);
+        free(v5); free(ix);
+        if (!ok) return 0;
+        ent = &smooth_cache[smooth_next++ % 192];
+        free(ent->vb); free(ent->idx);
+        ent->vb = malloc((size_t)out.nverts * stride);
+        for (int k = 0; k < out.nverts; k++) {
+            uint8_t *d = ent->vb + (size_t)k * stride;
+            memcpy(d, vsrc, stride);                                   // the bytes the car shader does not read (tail) come from vertex 0
+            memcpy(d + po, &out.verts[5 * k], 12);
+            memcpy(d + no, &out.verts[(size_t)out.nverts * 5 + 3 * k], 12);
+            memcpy(d + to, &out.verts[5 * k + 3], 8);
+        }
+        ent->key = key; ent->nvert = (uint32_t)out.nverts; ent->idx = out.idx; ent->nidx = (uint32_t)out.nidx;
+        free(out.verts);
+    }
+    xdraw.vb = ent->vb; xdraw.nvert = ent->nvert; xdraw.idx = ent->idx; xdraw.nidx = ent->nidx;
+    draw_cmd(c, 4, ent->nidx / 3, base, stride, vmin, nvert, 0, 0, 0);
+    xdraw.vb = NULL;
+    return 1;
+}
 // DrawIndexedPrimitive(Type, BaseVertexIndex, MinVertexIndex, NumVertices, StartIndex, PrimitiveCount)
 static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     DEV();
@@ -1636,6 +1738,9 @@ static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     int i32 = ib->fmt == F_INDEX32;
     uint32_t base = stream0(c), stride = dev.stream[0].stride;
     int32_t bv = (int32_t)ARG(2);
+    if (base && getenv("RN_SMOOTH_LOG") && is_car_vs(dev.vs)) { static int nl; if (nl++ < 6) rn_log("SMOOTH call type %u i32 %d prims %u", ARG(1), i32, ARG(6)); }
+    if (base && ARG(1) == 4 && !i32 && smooth_draw(c, base + (uint32_t)bv * stride, stride, ARG(3), ARG(4), lock_mem(ib) + ARG(5) * 2, ARG(6)))
+        return D3D_OK;
     if (base) draw_cmd(c, ARG(1), ARG(6), base + (uint32_t)bv * stride, stride, ARG(3), ARG(4),
                        lock_mem(ib) + ARG(5) * (i32 ? 4 : 2), i32, 0);
     return D3D_OK;
