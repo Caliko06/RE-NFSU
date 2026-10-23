@@ -91,10 +91,11 @@ async function startGpu(M, canvas, report, onFrame) {
     buffer: { type: 'uniform', hasDynamicOffset: true, minBindingSize: 32 } }] });
   const clearBind = device.createBindGroup({ layout: clearBgl, entries: [{ binding: 0, resource: { buffer: clearRing, size: 32 } }] });
   const clearLayout = device.createPipelineLayout({ bindGroupLayouts: [clearBgl] });
-  // BRIDGE: remaster, OWNER 2026-10-22: 4x MSAA on the screen-sized targets (?msaa=0 turns it off). Each colour target keeps
+  // BRIDGE: remaster, OWNER 2026-10-22: 4x MSAA on the screen-sized targets, opt-in with ?msaa=4 (OWNER 2026-10-22: it lagged;
+  // headless race 1280x956: hitches >33 ms 369 with it, 153 without, GPU wait p90 46 -> 18 ms). Each colour target keeps
   // its single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
   // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
-  const MSAA = new URLSearchParams(location.search).get('msaa') === '0' ? 1 : 4;
+  const MSAA = new URLSearchParams(location.search).get('msaa') === '4' ? 4 : 1;
   const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
@@ -143,6 +144,7 @@ async function startGpu(M, canvas, report, onFrame) {
   device.queue.writeTexture({ texture: dummyCube }, new Uint8Array(24).map((_, i) => i % 4 === 3 ? 255 : 0),
     { bytesPerRow: 4, rowsPerImage: 1 }, [1, 1, 6]);
   const dummyCubeView = dummyCube.createView({ dimension: 'cube' });
+  const ANISO = Number(new URLSearchParams(location.search).get('aniso') ?? 16);   // ?aniso=1 turns the bridge off
   const samplers = new Map();
   function sampler(t) {
     const key = `${t[T_AU]},${t[T_AV]},${t[T_MAG]},${t[T_MIN]},${t[T_MIP]},${t[T_ANISO]}`;
@@ -156,7 +158,7 @@ async function startGpu(M, canvas, report, onFrame) {
     if ((t[T_MIN] === 3 || t[T_MAG] === 3) && t[T_MIP] === 2) d.maxAnisotropy = Math.min(16, Math.max(1, t[T_ANISO]));
     // BRIDGE: remaster, OWNER 2026-10-22: every linear sampler of a mipmapped texture is trilinear with 16x anisotropy
     // (the game asks for point mips or no anisotropy). WebGPU needs all three filters linear for maxAnisotropy > 1.
-    if (t[T_MIP] && filt(t[T_MIN]) === 'linear' && filt(t[T_MAG]) === 'linear') { d.mipmapFilter = 'linear'; d.maxAnisotropy = 16; }
+    if (ANISO > 1 && t[T_MIP] && filt(t[T_MIN]) === 'linear' && filt(t[T_MAG]) === 'linear') { d.mipmapFilter = 'linear'; d.maxAnisotropy = ANISO; }
     const s = device.createSampler(d);
     samplers.set(key, s);
     return s;
