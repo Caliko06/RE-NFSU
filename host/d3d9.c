@@ -103,6 +103,7 @@ typedef struct {
     struct Rec *rec;                        // state blocks: the recorded Set calls
     uint32_t nrec;
     uint32_t dlo, dhi;                      // resident buffers: bytes written since the last upload
+    uint32_t ver;                           // buffers: write locks so far (a cheap content key for static ones)
 } Obj;
 #define MAXOBJ GPU_MAXID
 static Obj objs[MAXOBJ];
@@ -1176,16 +1177,16 @@ static uint32_t IDirect3DSurface9_UnlockRect(Ctx *c) { SELF(I_SURFACE); return u
 // the buffer instead of copying its vertices and indices into every frame (OWNER 2026-10-23, 60 fps: the per-draw copies
 // were ~40% of the game thread). Dynamic buffers are refilled inside a frame, so they keep the per-draw copy: a GPU-side
 // write would land before earlier draws of the same frame ran. RN_INLINE=1 copies everything as before (A/B).
-static int resident(const Obj *o) {
+static int resident_on(void) {
 #ifdef __EMSCRIPTEN__
     static int off = -1;
     if (off < 0) off = getenv("RN_INLINE") != NULL;
-    return o && !off && !(o->usage & U_DYNAMIC);
+    return !off;
 #else
-    (void)o;
     return 0;
 #endif
 }
+static int resident(const Obj *o) { return o && resident_on() && !(o->usage & U_DYNAMIC); }
 static void buffer_upload(Ctx *c, Obj *o) {
     uint32_t lo = o->dlo & ~3u, hi = (o->dhi + 3) & ~3u, n = hi - lo;
     o->dlo = o->dhi = 0;
@@ -1228,6 +1229,7 @@ static uint32_t buffer_lock(Ctx *c, Obj *o) {
     if (!out || off > o->size || (size && off + size > o->size)) return D3DERR_INVALIDCALL;
     o->locked++;
     st(c, out, lock_mem(o) + off, 4);
+    if (!(ARG(4) & 0x10)) o->ver++;
     if (resident(o) && !(ARG(4) & 0x10)) {     // D3DLOCK_READONLY writes nothing
         uint32_t hi = size ? off + size : o->size;
         if (o->dhi <= o->dlo) { o->dlo = off; o->dhi = hi; }
@@ -1706,6 +1708,20 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     gpu_cmd(GPU_DRAW, (int)total, w);
     free(w);
     free(ix);
+    // RN_DRAWSTAT=1: words per frame by kind of draw (resident, smoothed car, indexed copy, plain copy), every 300 frames.
+    static int dstat = -1;
+    if (dstat < 0) dstat = getenv("RN_DRAWSTAT") != NULL;
+    if (dstat) {
+        static uint64_t sw[4], sn[4], hw, cw; static uint32_t f0;
+        int k = rdraw.vb ? 0 : xdraw.vb ? 1 : ib ? 2 : 3;
+        sw[k] += total; sn[k]++; hw += D_HDR; cw += 4 * nvc + 4 * npc;
+        if (dev.frames - f0 >= 300) {
+            uint32_t nf = dev.frames - f0 ? dev.frames - f0 : 1;
+            rn_log("DRAWSTAT per frame: resident %llu draws %llukw, smooth %llu %llukw, indexed copy %llu %llukw, plain copy %llu %llukw; header %llukw, constants %llukw",
+                   sn[0] / nf, sw[0] / nf / 1024, sn[1] / nf, sw[1] / nf / 1024, sn[2] / nf, sw[2] / nf / 1024, sn[3] / nf, sw[3] / nf / 1024, hw / nf / 1024, cw / nf / 1024);
+            memset(sw, 0, sizeof sw); memset(sn, 0, sizeof sn); hw = cw = 0; f0 = dev.frames;
+        }
+    }
     flush_big();
 }
 static uint32_t stream0(Ctx *c) {
@@ -1732,7 +1748,10 @@ static uint32_t IDirect3DDevice9_DrawPrimitive(Ctx *c) {
 // meshes as authored; here a draw of the car shader (vs token hash 0x4728b668) with >= 40 triangles is curved and subdivided before
 // it goes to the GPU. Vertex offsets come from the bound declaration; results are cached by content. RN_SMOOTH=<level> (default 3, 0 = off).
 static int is_car_vs(uint32_t id) { const Obj *o = obj_k(id); for (int k = 0; k < ncar_vs; k++) if (o && car_vs_obj[k] == o) return 1; return 0; }
-typedef struct { uint64_t key; uint8_t *vb; uint32_t nvert; uint16_t *idx; uint32_t nidx; } SmoothEnt;
+// fail: cs_smooth said no for this key (drawn as authored, not retried every frame). On the web an entry's vertices and
+// indices are resident GPU buffers SMOOTH_GPU + 2 * slot (+1), uploaded once when the entry is made.
+typedef struct { uint64_t key; uint8_t *vb; uint32_t nvert; uint16_t *idx; uint32_t nidx; int fail; } SmoothEnt;
+#define SMOOTH_GPU 0x40000000u
 static SmoothEnt smooth_cache[192];
 static uint32_t smooth_next;
 static uint64_t fnv64b(uint64_t h, const void *p, size_t n) {
@@ -1777,10 +1796,20 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
     }
     if (count < 40 || nvert < 3 || nvert > 60000 || stride < 32 || stride > 64 || !dok) return 0;
     const uint8_t *vsrc = G(base + vmin * stride), *isrc = G(ibp);
-    uint64_t key = fnv64b(fnv64b(1469598103934665603ull, vsrc, (size_t)nvert * stride), isrc, (size_t)count * 6);
+    // Key: static buffers are named by (id, write count) and the draw's ranges, so a frame does not hash ~7 MB of car
+    // vertices; dynamic ones by content.
+    Obj *svb = obj_k(dev.stream[0].vb), *sib = obj_k(dev.ib);
+    uint64_t key;
+    if (svb && sib && !(svb->usage & U_DYNAMIC) && !(sib->usage & U_DYNAMIC)) {
+        uint32_t t[9] = {dev.stream[0].vb, svb->ver, dev.ib, sib->ver, base, vmin, nvert, ibp, count};
+        key = fnv64b(1469598103934665603ull, t, sizeof t);
+    } else {
+        key = fnv64b(fnv64b(1469598103934665603ull, vsrc, (size_t)nvert * stride), isrc, (size_t)count * 6);
+    }
     key = fnv64b(key, &level, sizeof level) ^ ((uint64_t)vmin << 32 | stride);
     SmoothEnt *ent = NULL;
-    for (int k = 0; k < 192; k++) if (smooth_cache[k].key == key && smooth_cache[k].vb) { ent = &smooth_cache[k]; break; }
+    for (int k = 0; k < 192; k++) if (smooth_cache[k].key == key && (smooth_cache[k].vb || smooth_cache[k].fail)) { ent = &smooth_cache[k]; break; }
+    if (ent && ent->fail) return 0;
     if (!ent) {
         float *v5 = malloc((size_t)nvert * 5 * sizeof *v5);
         uint16_t *ix = malloc((size_t)count * 6);
@@ -1798,9 +1827,10 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
         CsOut out;
         int ok = !bad && cs_smooth(&in, &out, level);
         free(v5); free(ix);
-        if (!ok) return 0;
         ent = &smooth_cache[smooth_next++ % 192];
         free(ent->vb); free(ent->idx);
+        ent->vb = NULL; ent->idx = NULL; ent->key = key; ent->fail = !ok;
+        if (!ok) return 0;
         ent->vb = malloc((size_t)out.nverts * stride);
         for (int k = 0; k < out.nverts; k++) {
             uint8_t *d = ent->vb + (size_t)k * stride;
@@ -1811,6 +1841,27 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
         }
         ent->key = key; ent->nvert = (uint32_t)out.nverts; ent->idx = out.idx; ent->nidx = (uint32_t)out.nidx;
         free(out.verts);
+        if (resident_on()) {
+            uint32_t slot = (uint32_t)(ent - smooth_cache), gv = SMOOTH_GPU + 2 * slot, nb[2] = {ent->nvert * stride, ent->nidx * 2};
+            const void *src[2] = {ent->vb, ent->idx};
+            for (int b = 0; b < 2; b++) {
+                uint32_t n4 = (nb[b] + 3) & ~3u, w2[2] = {gv + (uint32_t)b, n4 ? n4 : 4};
+                gpu_cmd(GPU_BUFFER, 2, w2);
+                uint32_t *w = calloc(3 + n4 / 4, 4);
+                w[0] = gv + (uint32_t)b; w[1] = 0; w[2] = n4;
+                memcpy(w + 3, src[b], nb[b]);
+                gpu_cmd(GPU_BUFDATA, (int)(3 + n4 / 4), w);
+                free(w);
+            }
+            flush_big();
+        }
+    }
+    if (resident_on()) {
+        uint32_t gv = SMOOTH_GPU + 2 * (uint32_t)(ent - smooth_cache);
+        rdraw.vb = gv; rdraw.voff = 0; rdraw.ib = gv + 1; rdraw.isize = 2; rdraw.first = 0; rdraw.basev = 0;
+        draw_cmd(c, 4, ent->nidx / 3, base, stride, vmin, nvert, 0, 0, 0);
+        rdraw.vb = 0;
+        return 1;
     }
     xdraw.vb = ent->vb; xdraw.nvert = ent->nvert; xdraw.idx = ent->idx; xdraw.nidx = ent->nidx;
     draw_cmd(c, 4, ent->nidx / 3, base, stride, vmin, nvert, 0, 0, 0);
@@ -1829,7 +1880,9 @@ static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     int i32 = ib->fmt == F_INDEX32;
     uint32_t base = stream0(c), stride = dev.stream[0].stride;
     int32_t bv = (int32_t)ARG(2);
-    if (base && getenv("RN_SMOOTH_LOG") && is_car_vs(dev.vs)) { static int nl; if (nl++ < 6) rn_log("SMOOTH call type %u i32 %d prims %u", ARG(1), i32, ARG(6)); }
+    static int smlog = -1;
+    if (smlog < 0) smlog = getenv("RN_SMOOTH_LOG") != NULL;
+    if (base && smlog && is_car_vs(dev.vs)) { static int nl; if (nl++ < 6) rn_log("SMOOTH call type %u i32 %d prims %u", ARG(1), i32, ARG(6)); }
     if (base && ARG(1) == 4 && !i32 && smooth_draw(c, base + (uint32_t)bv * stride, stride, ARG(3), ARG(4), lock_mem(ib) + ARG(5) * 2, ARG(6)))
         return D3D_OK;
     if (base && (ARG(1) == 4 || ARG(1) == 5) && resident(obj_k(dev.stream[0].vb)) && resident(ib)) {
