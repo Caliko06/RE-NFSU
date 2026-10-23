@@ -108,6 +108,24 @@ PATCHES.append(dict(addr=0x40dcdb, old="a134107000d1f889442400da7c240059c3",
 # the reflection views pass 1, 0x6f1b38). The table stays: 0x56e77e fades by (size - 20) / (45 - 20).
 PATCHES.append(dict(addr=0x56e0d2, old="7a1f", new="eb1f", when=lambda: True))
 
+# PATCH: 0x409bca, 0x409bf6, OWNER 2026-10-22 (light flares blind the view and smear at speed): with LIGHTSTREAKS
+# (0x700e9c) the flares 0x544f30 go only into a half-size buffer 0x71abb0 (0x409b70). Each frame that buffer is multiplied
+# by BLENDFACTOR 0x008296b4 (ZERO / BLENDFACTOR quad, filter.efx p0) and then added to the screen (ONE / ONE) with weight
+# 0x1fffffff = rgb 1.0. A still light builds up to 1/(1 - k): R 2.0x, G 2.4x, B 3.4x, and a trail needs 4.5 / 5.7 / 8.7
+# frames to fall under 5%. Now k is a quarter (0x0020252d) and the screen weight 0.55 (0x1f8c8c8c): a still light is
+# 0.63x / 0.64x / 0.67x (a third of before), a trail 1.4 / 1.6 / 1.7 frames. The decay quad reads that weight too, but its
+# source factor is ZERO. Measured pair: build/lights_before.png, build/lights_after.png (start grid, same lamp).
+PATCHES.append(dict(addr=0x409bca, old="68b4968200", new="682d252000", when=lambda: True))
+PATCHES.append(dict(addr=0x409bf6, old="c7442420ffffff1f", new="c74424208c8c8c1f", when=lambda: True))
+
+# PATCH: 0x40fbb7..0x40fc38, OWNER 2026-10-22 (less car reflection): 0x40fae0 sets the car material constants of car.efx.
+# EnvmapMin = mat+0x84 * mat+0x80 * 0.5 and EnvmapMin + EnvmapRange = mat+0x94 * mat+0x90 * 0.5, both with the shared 0.5
+# at [0x6cc7dc]; the shader adds 4 * diffuse.w * cube * (EnvmapMin + f * EnvmapRange). These six fmul now read 0.35 at
+# [0x707fc4] (free .data, next to 0x707fc0): the cube reflection is 70% of the original. Specular and diffuse keep 0.5.
+PATCHES.append(dict(addr=0x707fc4, old="00000000", new="3333b33e", when=lambda: True))
+for a in (0x40fbb7, 0x40fbcd, 0x40fbe3, 0x40fbf9, 0x40fc1e, 0x40fc38):
+    PATCHES.append(dict(addr=a, old="d80ddcc76c00", new="d80dc47f7000", when=lambda: True))
+
 
 def active():
     return [p for p in PATCHES if p["when"]()]
