@@ -1,0 +1,95 @@
+# Race frame draw census, Quick Race 1001, Tiburon, Speed.exe via RE-NFSU (host/d3d9.c, RN_DRAWS=4500)
+# Ids are the layer's shader/declaration object ids. V = measured. The car family was proven by RN_SKIPVS=3b (the player car vanishes, the world stays).
+frame 4500: 602 indexed draws, 60788 primitives. Every draw goes through the call site 0x40ef88 (2% through 0x40495f).
+
+caller vs ps decl stride | draws prims share | distinct tex0 tex1 | reading
+0040ef88 9 8 7 24 | 334 32193 53% | 60 1 | world, lightmap tex1 fixed
+0040ef88 13 12 11 24 | 129 18589 31% | 60 1 | world, 3 textures (detail/lightmap) 
+0040ef88 3b 3a 39 36 | 83 5465 9% | 1 18 | CAR BODY (proven)
+0040ef88 1d 1c 1b 24 | 14 2632 4% | 2 1 | planar/projective (shadow or reflection quad, I)
+0040495f 9 8 7 24 | 38 1162 2% | 4 1 | world, lightmap tex1 fixed
+0040ef88 27 26 25 24 | 4 747 1% | 2 1 | projective + fog, 2 draws (I)
+
+## Car shader (vs=3b, ps=3a), SM1 disassembly from the layer
+#### SHADER vs=3b
+  vs_1_1
+  def c24, 0.01, 0, 1, 0.5
+  dcl_usage0_0 v0
+  dcl_usage3_0 v1
+  dcl_usage5_0 v2
+  m4x4 oPos, v0, c10
+  add r7.xyz, -v0, c17
+  dp3 r7.w, r7, r7
+  rsq r7.w, r7.wwww
+  mul r2.xyz, r7, r7.wwww
+  dp3 r2.w, r2, v1
+  max r2.w, r2.wwww, c24.xxxx
+  log r9.w, r2.wwww
+  mul r4.w, r9.wwww, c23.xxxx
+  mul r11.w, r9.wwww, c22.xxxx
+  exp oD1.w, r4.wwww
+  mul r6, v1.xyzy, v1.xyzx
+  mul r11.xyz, r6.xxxx, c1
+  add r11.xyz, r11, c0
+  mad r11.xyz, r6.yyyy, c2, r11
+  mad r11.xyz, r6.zzzz, c3, r11
+  mad r11.xyz, r6.wwww, c4, r11
+  mul r3.xy, v1.xzzw, v1.zyzw
+  mad r11.xyz, r3.xxxx, c5, r11
+  mad r11.xyz, r3.yyyy, c6, r11
+  mad r11.xyz, v1.xxxx, c7, r11
+  mad r11.xyz, v1.yyyy, c8, r11
+  mad r11.xyz, v1.zzzz, c9, r11
+  mul r4, r2.wwww, c19
+  add r2.w, r2.wwww, r2.wwww
+  add r1, r4, c18
+  mul r6.xyz, r11, r1
+  mov r6.w, r1.wwww
+  mul oD0, r6, c24.wwww
+  mad r11.xyz, r2.wwww, v1, -r2
+  m3x3 oT0.xyz, r11, c14
+  exp r11.w, r11.wwww
+  mul r8.xyz, r11.wwww, c21
+  add r3.xyz, r8, c20
+  mul r10, r11.zzzz, c9
+  mul r5, r11.yyyy, c8
+  mul r0, r11.xyzy, r11.xyzx
+  mul r7, r0.xxxx, c1
+  add r9, r7, c0
+  mad r2, r0.yyyy, c2, r9
+  mad r8, r0.zzzz, c3, r2
+  mad r0, r0.wwww, c4, r8
+  mul r7.xy, r11.xzzw, r11.zyzw
+  mul r11, r11.xxxx, c7
+  mad r2, r7.xxxx, c5, r0
+  mad r1, r7.yyyy, c6, r2
+  add r6, r11, r1
+  add r5, r5, r6
+  add r10, r10, r5
+  max r10.w, r10.wwww, c24.yyyy
+  min r10.w, r10.wwww, c24.zzzz
+  log r10.w, r10.wwww
+  mul r10.w, r10.wwww, c22.xxxx
+  exp r10.w, r10.wwww
+  mul r8.xyz, r10, r10.wwww
+  mul r3.xyz, r3, r8
+  mul oD1.xyz, r3, c24.wwww
+  mov oT0.w, c24.zzzz
+  mov oT1, v2
+#### SHADER ps=3a
+  ps_1_1
+  tex t0
+  tex t1
+  mad r0.xyz, v1.wwww, c1, c0
+  mul_x4 r0.xyz, t0, r0
+  add r0.xyz, r0, v1
+  mul_x2 r1, t1, v0
+  mad r0.xyz, r0, r1.wwww, r1
+  +mov r0.w, r1.wwww
+
+## Reading (V from the code above, I where marked)
+- VS: v0 pos, v1 NORMAL, v2 UV. V = normalize(c17 - pos); d = max(N.V, 0.01); (d^k) via log/exp with c22.x / c23.x -> Fresnel-like term in oD1.w and oD0.
+- Reflection vector R = 2(N.V)N - V, then oT0 = R x c14 (3x3): texture 0 is an ENVIRONMENT CUBE MAP read with R. oT1 = UV (texture 1 = diffuse).
+- Lighting = 9 spherical-harmonic coefficients c0..c9 evaluated on the normal (diffuse, oD0) and on R (reflection tint, oD1), all PER VERTEX.
+- PS: env(t0) x4 x (v1.w*c1 + c0) + v1; diffuse(t1) x2 x v0 = r1; out = r0*r1.a + r1: the diffuse ALPHA is the reflectivity mask.
+- So the original already has cube reflections + Fresnel + SH lighting on cars. Per-vertex evaluation on faceted meshes is why it reads faceted (I).

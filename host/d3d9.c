@@ -709,6 +709,35 @@ static void hand_off(void) {
 }
 static void flush_big(void) { if (gpu_pending() > (4u << 20)) hand_off(); }
 
+// RN_DRAWS=<min frame>: census of the indexed draws of the first frame at or after it that has >= 300 of them (a race frame):
+// who calls, which shaders/declaration/textures. Logged at its Present.
+static struct { uint32_t caller, vs, ps, decl, stride, tex0, tex1, n, prims; } cen[256];
+static int ncen, cen_on = -1;
+static uint32_t cen_frame, cen_total;
+static void census_draw(Ctx *c, uint32_t prims) {
+    uint32_t k[7] = {ld(c, c->r[ESP], 4), dev.vs, dev.ps, dev.decl, dev.stream[0].stride, dev.tex[0], dev.tex[1]};
+    int i = 0;
+    while (i < ncen && memcmp(&cen[i], k, sizeof k)) i++;
+    if (i == ncen) { if (ncen == 256) return; memset(&cen[ncen], 0, sizeof cen[0]); memcpy(&cen[ncen++], k, sizeof k); }
+    cen[i].n++; cen[i].prims += prims; cen_total++;
+}
+static void disasm_line(const char *l);
+static void census_dump(void) {
+    for (int a = 0; a < ncen; a++) for (int b = a + 1; b < ncen; b++) if (cen[b].prims > cen[a].prims) { __typeof__(cen[0]) t = cen[a]; cen[a] = cen[b]; cen[b] = t; }
+    rn_log("DRAWS frame %u: %u draws, %d groups", dev.frames, cen_total, ncen);
+    for (int i = 0; i < ncen; i++)
+        rn_log("DRAWS caller=%08x vs=%x ps=%x decl=%x stride=%u tex0=%x tex1=%x draws=%u prims=%u", cen[i].caller, cen[i].vs, cen[i].ps,
+               cen[i].decl, cen[i].stride, cen[i].tex0, cen[i].tex1, cen[i].n, cen[i].prims);
+    // The code of every distinct vs/ps pair of the frame, once.
+    for (int i = 0; i < ncen; i++) {
+        int seen = 0;
+        for (int j = 0; j < i; j++) if (cen[j].vs == cen[i].vs && cen[j].ps == cen[i].ps) seen = 1;
+        if (seen) continue;
+        Obj *v = obj_k(cen[i].vs), *p = obj_k(cen[i].ps);
+        rn_log("DRAWS SHADER vs=%x", cen[i].vs); if (v && v->sm) sm1_disasm(v->sm, disasm_line);
+        rn_log("DRAWS SHADER ps=%x", cen[i].ps); if (p && p->sm) sm1_disasm(p->sm, disasm_line);
+    }
+}
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
@@ -719,6 +748,9 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     Obj *b = obj_k(dev.backbuf);
     uint32_t w[3] = {b->gpu, b->w, b->h};
     gpu_cmd(GPU_PRESENT, 3, w);
+    if (cen_on < 0) { const char *e = getenv("RN_DRAWS"); cen_on = e != NULL; cen_frame = e ? (uint32_t)atoi(e) : 0; }
+    if (cen_on > 0 && dev.frames >= cen_frame && cen_total >= 300) { census_dump(); cen_on = 0; }
+    ncen = 0; cen_total = 0;
     dev.frames++;
     rn_telem.presents++;
     if (dev.frames == 1) rn_log("d3d9 first Present: %ux%u", b->w, b->h);
@@ -1586,6 +1618,10 @@ static uint32_t IDirect3DDevice9_DrawPrimitive(Ctx *c) {
 static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     DEV();
     if (!prim_ok(ARG(1), ARG(6)) || !dev.stream[0].vb || !dev.ib) return D3DERR_INVALIDCALL;
+    if (cen_on > 0) census_draw(c, ARG(6));
+    static long skip_vs = -2;   // RN_SKIPVS=<hex id>: drop every indexed draw of that vertex shader (find which family is the car)
+    if (skip_vs == -2) { const char *e = getenv("RN_SKIPVS"); skip_vs = e ? strtol(e, NULL, 16) : -1; }
+    if (skip_vs >= 0 && dev.vs == (uint32_t)skip_vs) return D3D_OK;
     Obj *ib = obj_k(dev.ib);
     int i32 = ib->fmt == F_INDEX32;
     uint32_t base = stream0(c), stride = dev.stream[0].stride;
