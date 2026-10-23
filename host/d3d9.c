@@ -1051,10 +1051,51 @@ static void upload_level(Ctx *c, Obj *s) {
         gpu_cmd(GPU_TEXKEY, 3, k3);
     }
 }
+// BRIDGE: HD car skins, 0x5a8a50, OWNER 2026-10-23 (remaster scope). The game composites DUMMY_SKINn on the CPU at 512 from
+// 512 layers (base _HOOD/_SPOILER, up to 4 vinyls, decal; each + "<name>_MASK", 0x5a9ce0), so its masks step on the car.
+// At that composite's own UnlockRect (return address 0x5a8e7d) the spec is var_1C - 8 = [esp+0x44] - 8 (0x5a8a74 keeps spec+8 there;
+// the arg_0 slot is reused as a pointer by then, 0x5a8e2e). The
+// renderer replays the same per-texel rules on the same layer textures at 4x (web/gpu.js GPU_SKIN); the game's 512 result
+// stays the texture's own contents (?skinhd=0, and the oracle of ?skinhd=check). Spec (V, Hopper 0x5a8a50/0x5a8640):
+// +0 skin, +4 fill ARGB with R/B swapped, +8 four marker colours (swapped in place), +0x18 layers of 0x34: +0 name hash
+// (0 = off), +0xc layer bits, +0x14 mask bits, +0x20 recolour flag, +0x24 four colours (swapped in place); +0x1b8 count.
+// Markers: counts at 0x733f50 (4), texel indexes at 0x733e28 (4 x 16).
+static uint32_t tex_of_bits(uint32_t bits) {
+    for (int k = 0; k < nobjs; k++)
+        if (objs[k].iface == I_SURFACE && objs[k].mem == bits && objs[k].container) return objs[k].container;
+    return 0;
+}
+static void skin_bridge(Ctx *c, Obj *s) {
+    if (ld(c, c->r[ESP], 4) != 0x5a8e7d) return;
+    uint32_t p = ld(c, c->r[ESP] + 0x44, 4) - 8, n = ld(c, p + 0x1b8, 4), fill = ld(c, p + 4, 4);
+    if (getenv("RN_SKINLOG")) {
+        rn_log("skin_bridge esp %08x spec %08x n %u fill %08x skin %08x", c->r[ESP], p, n, fill, ld(c, p, 4));
+        for (uint32_t i = 0; i < 8; i++) rn_log("  layer %u: %08x bits %08x mask %08x rc %u", i, ld(c, p + 0x18 + 0x34 * i, 4),
+            ld(c, p + 0x24 + 0x34 * i, 4), ld(c, p + 0x2c + 0x34 * i, 4), ld(c, p + 0x38 + 0x34 * i, 4));
+    }
+    uint32_t w[3 + 8 * 7 + 4 + 1 + 2 * 64], k = 0;
+    w[k++] = s->container; w[k++] = (fill & 0xff00ff00u) | (fill >> 16 & 0xff) | (fill & 0xff) << 16; w[k++] = 0;
+    for (uint32_t i = 0; i < n && i < 8; i++) {
+        uint32_t b = p + 0x18 + 0x34 * i;
+        if (!ld(c, b, 4)) continue;
+        uint32_t lt = tex_of_bits(ld(c, b + 0xc, 4)), mt = tex_of_bits(ld(c, b + 0x14, 4));
+        if (!lt || !mt) return;
+        w[k++] = lt; w[k++] = mt; w[k++] = ld(c, b + 0x20, 4) != 0;
+        for (int j = 0; j < 4; j++) w[k++] = ld(c, b + 0x24 + 4 * j, 4);
+        w[2]++;
+    }
+    for (int j = 0; j < 4; j++) w[k++] = ld(c, p + 8 + 4 * j, 4);
+    uint32_t nm = k++;
+    w[nm] = 0;
+    for (uint32_t j = 0; j < 4; j++)
+        for (uint32_t i = 0, cnt = ld(c, 0x733f50 + 4 * j, 4); i < cnt && i < 16; i++) { w[k++] = ld(c, 0x733e28 + 4 * (16 * j + i), 4); w[k++] = j; w[nm]++; }
+    gpu_cmd(GPU_SKIN, (int)k, w);
+}
 static uint32_t unlock_rect(Ctx *c, Obj *s) {
     if (!s->locked) return D3DERR_INVALIDCALL;
     s->locked = 0;
     upload_level(c, s);
+    skin_bridge(c, s);
     return D3D_OK;
 }
 static uint32_t IDirect3DTexture9_LockRect(Ctx *c) {

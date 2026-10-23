@@ -3,7 +3,7 @@
 // before the one it submits. Shaders arrive as WGSL (host/sm1.c); textures as RGBA8.
 'use strict';
 const GPU_TARGET = 1, GPU_CLEAR = 2, GPU_PRESENT = 3, GPU_DRAW = 4, GPU_SHADER = 5, GPU_DECL = 6, GPU_TEXTURE = 7,
-  GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10, GPU_FXAA = 11;
+  GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10, GPU_FXAA = 11, GPU_SKIN = 12;
 const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_DECL = 6, D_RT = 7, D_DS = 8, D_VP = 9,
   D_SC = 15, D_ZEN = 19, D_ZWRITE = 20, D_ZFUNC = 21, D_CULL = 22, D_BLEND = 23, D_SRCB = 24, D_DSTB = 25, D_BOP = 26,
   D_SEPA = 27, D_SRCBA = 28, D_DSTBA = 29, D_BOPA = 30, D_BFACTOR = 31, D_CWRITE = 32, D_AFUNC = 33, D_AREF = 34,
@@ -315,6 +315,149 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
     return [device.createBuffer({ size: cap, usage: usage | GPUBufferUsage.COPY_DST }), cap];
   };
 
+  // BRIDGE: HD car skins (host/d3d9.c skin_bridge; OWNER 2026-10-23, remaster scope). GPU_SKIN replays the game's CPU composite
+  // 0x5a8a50 of DUMMY_SKINn on the GPU at 4x (at most 2048), with the 512 layers and masks sampled bilinear, so mask edges
+  // follow a smooth curve instead of the 512 grid. Per texel, as 0x5a8a50/0x5a8640 do (V, Hopper): m = mask blue byte;
+  // m = 0 keeps; a recolour layer first becomes sum_k ftol(colour_k * w_k), w = layer (R, G, B) * 1/255 rounded to f32, only
+  // w > 1/255 counted (alpha: the largest term); m >= 128 replaces, 1..127 blends ftol(L * m/128) + ftol(D * (1 - m/128)), alpha
+  // summed; every channel stops at 255. Then the marker texels (the 4 colours of the spec) are written.
+  // ?skinhd=0 off; ?skinhd=check runs it at 512 with nearest texels and reports the texels that differ from the game's result.
+  const SKIN_MODE = new URLSearchParams(location.search).get('skinhd');
+  const skinMod = device.createShaderModule({ code: `
+struct U { mode: u32, recolour: u32, nmark: u32, exact: u32, src: vec2f, k: f32, pad: f32, cols: array<vec4f, 4>, marks: array<vec4u, 64> };
+@group(0) @binding(0) var prev: texture_2d<f32>;
+@group(0) @binding(1) var layer: texture_2d<f32>;
+@group(0) @binding(2) var mask: texture_2d<f32>;
+@group(0) @binding(3) var smp: sampler;
+@group(0) @binding(4) var<uniform> u: U;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
+}
+// ftol(c * w) for a colour byte c and an f32 weight w < 2, from the exact product as the x87 makes it: c * mantissa fits 32 bits.
+fn mulfloor(c: f32, w: f32) -> f32 {
+  let b = bitcast<u32>(w); let e = (b >> 23u) & 255u;
+  if (e == 0u || e > 150u || 150u - e >= 32u) { return 0.0; }
+  return f32((u32(c) * ((b & 0x7fffffu) | 0x800000u)) >> (150u - e));
+}
+@fragment fn fs(@builtin(position) p: vec4f) -> @location(0) vec4f {
+  let size = vec2f(textureDimensions(prev));
+  let uv = p.xy / size;
+  var d = round(textureLoad(prev, vec2i(p.xy), 0) * 255.0);
+  if (u.mode == 1u) {
+    let t = vec2u(uv * u.src); let i = t.y * u32(u.src.x) + t.x;
+    for (var m = 0u; m < u.nmark; m++) { if (u.marks[m].x == i) { return u.cols[u.marks[m].y] / 255.0; } }
+    return d / 255.0;
+  }
+  var l = textureSampleLevel(layer, smp, uv, 0.0) * 255.0;
+  var m = textureSampleLevel(mask, smp, uv, 0.0).b * 255.0;
+  if (u.exact == 1u) { l = round(l); m = round(m); }
+  if (m <= 0.0) { return d / 255.0; }
+  if (u.recolour == 1u) {
+    let w = vec3f(l.r * u.k, l.g * u.k, l.b * u.k);
+    var acc = vec3f(0.0); var a = 0.0;
+    for (var k = 0u; k < 3u; k++) {
+      if (w[k] > u.k) {
+        let c = u.cols[k];
+        acc += vec3f(mulfloor(c.r, w[k]), mulfloor(c.g, w[k]), mulfloor(c.b, w[k]));
+        a = max(a, mulfloor(c.a, w[k]));
+      }
+    }
+    l = min(vec4f(acc, a), vec4f(255.0));
+  }
+  if (m >= 128.0) { return l / 255.0; }
+  let t = m * (1.0 / 128.0); let r = 1.0 - t;
+  var s = vec4f(0.0);
+  if (t > u.k) { s += floor(l * t); }
+  if (r > u.k) { s += floor(d * r); }
+  return min(s, vec4f(255.0)) / 255.0;
+}` });
+  const mipMod = device.createShaderModule({ code: `
+@group(0) @binding(0) var down: texture_2d<f32>;
+@group(0) @binding(1) var smp: sampler;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
+}
+@fragment fn fs(@builtin(position) p: vec4f) -> @location(0) vec4f {
+  return textureSampleLevel(down, smp, 2.0 * p.xy / vec2f(textureDimensions(down)), 0.0);
+}` });
+  const skinPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: skinMod, entryPoint: 'vs' },
+    fragment: { module: skinMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const mipPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: mipMod, entryPoint: 'vs' },
+    fragment: { module: mipMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const skinLin = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
+  const skinNear = device.createSampler({ magFilter: 'nearest', minFilter: 'nearest' });
+  const skinTmp = new Map();     // size -> [ping, pong]
+  const argb = c => [(c >>> 16) & 255, (c >>> 8) & 255, c & 255, c >>> 24];
+  function skin(w, a) {
+    const t = res.get(w[a]);
+    if (!t || SKIN_MODE === '0') return;
+    const check = SKIN_MODE === 'check', S = check ? t.w : Math.min(2048, 4 * t.w);
+    if (!skinTmp.has(S)) skinTmp.set(S, [0, 1].map(() => device.createTexture({ size: [S, S], format: 'rgba8unorm',
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC })));
+    const [A, B] = skinTmp.get(S), e = device.createCommandEncoder();
+    const n = w[a + 2], fill = argb(w[a + 1]);
+    const step = (dst, bind) => {
+      const p = e.beginRenderPass({ colorAttachments: [{ view: dst.createView(), loadOp: 'load', storeOp: 'store' }] });
+      p.setPipeline(skinPipe); p.setBindGroup(0, bind); p.draw(3); p.end();
+    };
+    const uni = (mode, recolour, cols, marks) => {
+      const b = new ArrayBuffer(96 + 64 * 16), u = new Uint32Array(b), f = new Float32Array(b);
+      u[0] = mode; u[1] = recolour; u[2] = marks.length / 2; u[3] = check ? 1 : 0; f[4] = t.w; f[5] = t.h;
+      f[6] = 0.003921569;    // the 1/255 of 0x5a8d1a and 0x5a8681 (f32)
+      cols.forEach((c, k) => f.set(argb(c), 8 + 4 * k));
+      for (let m = 0; m < marks.length / 2; m++) { u[24 + 4 * m] = marks[2 * m]; u[25 + 4 * m] = marks[2 * m + 1]; }
+      const g = device.createBuffer({ size: b.byteLength, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+      device.queue.writeBuffer(g, 0, b); return g;
+    };
+    const bind = (src, l, m, buf) => device.createBindGroup({ layout: skinPipe.getBindGroupLayout(0), entries: [
+      { binding: 0, resource: src.createView() }, { binding: 1, resource: l.own }, { binding: 2, resource: m.own },
+      { binding: 3, resource: check ? skinNear : skinLin }, { binding: 4, resource: { buffer: buf } }] });
+    e.beginRenderPass({ colorAttachments: [{ view: A.createView(), loadOp: 'clear', storeOp: 'store',
+      clearValue: { r: fill[0] / 255, g: fill[1] / 255, b: fill[2] / 255, a: fill[3] / 255 } }] }).end();
+    let src = A, dst = B, o = a + 3;
+    for (let i = 0; i < n; i++, o += 7) {
+      const l = res.get(w[o]), m = res.get(w[o + 1]);
+      if (!l || !m) return;
+      step(dst, bind(src, l, m, uni(0, w[o + 2], [w[o + 3], w[o + 4], w[o + 5], w[o + 6]], [])));
+      [src, dst] = [dst, src];
+    }
+    const nm = w[o + 4];
+    step(dst, bind(src, t, t, uni(1, 0, [w[o], w[o + 1], w[o + 2], w[o + 3]], Array.from(w.subarray(o + 5, o + 5 + 2 * nm)))));
+    if (check) {
+      const bufs = [dst, t.tex].map(x => { const b = device.createBuffer({ size: S * S * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+        e.copyTextureToBuffer({ texture: x }, { buffer: b, bytesPerRow: S * 4 }, [S, S]); return b; });
+      device.queue.submit([e.finish()]);
+      Promise.all(bufs.map(b => b.mapAsync(GPUMapMode.READ))).then(() => {
+        const [x, y] = bufs.map(b => new Uint8Array(b.getMappedRange()));
+        let diff = 0, max = 0, first = '';
+        for (let k = 0; k < x.length; k += 4) {
+          let dk = 0; for (let c = 0; c < 4; c++) dk = Math.max(dk, Math.abs(x[k + c] - y[k + c]));
+          if (dk && !first) first = ` first at texel ${k / 4}: gpu ${x.subarray(k, k + 4).join(',')} game ${y.subarray(k, k + 4).join(',')}`;
+          if (dk) diff++; max = Math.max(max, dk);
+        }
+        report(`gpu.js: skinhd check id ${w[a]} ${S}x${S} layers ${n} markers ${nm}: ${diff} texels differ, max ${max}${first}`);
+      });
+      return;
+    }
+    if (!t.skin || t.skin.width !== S) {
+      t.skin?.destroy();
+      t.skin = device.createTexture({ size: [S, S], mipLevelCount: Math.log2(S) + 1, format: 'rgba8unorm',
+        usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST });
+    }
+    e.copyTextureToTexture({ texture: dst }, { texture: t.skin }, [S, S]);
+    for (let l = 1; l <= Math.log2(S); l++) {
+      const p = e.beginRenderPass({ colorAttachments: [{ view: t.skin.createView({ baseMipLevel: l, mipLevelCount: 1 }), loadOp: 'clear', storeOp: 'store' }] });
+      p.setPipeline(mipPipe);
+      p.setBindGroup(0, device.createBindGroup({ layout: mipPipe.getBindGroupLayout(0), entries: [
+        { binding: 0, resource: t.skin.createView({ baseMipLevel: l - 1, mipLevelCount: 1 }) }, { binding: 1, resource: skinLin }] }));
+      p.draw(3); p.end();
+    }
+    device.queue.submit([e.finish()]);
+    t.view = t.skin.createView();
+  }
+
   function run(ptr, len) {
     const w = H().subarray(ptr >> 2, (ptr >> 2) + len);
     const f32 = new Float32Array(w.buffer, w.byteOffset, w.length);
@@ -397,7 +540,7 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
       } else if (op === GPU_TEXTURE) {
         res.get(w[a])?.tex.destroy();
         const tex = device.createTexture({ size: [w[a + 1], w[a + 2]], mipLevelCount: w[a + 3], format: 'rgba8unorm',
-          usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
+          usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC });
         const own = tex.createView();
         res.set(w[a], { tex, own, view: own, w: w[a + 1], h: w[a + 2], depth: false });
       } else if (op === GPU_CUBE) {
@@ -488,6 +631,8 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
           p.draw(3);
           p.end();
         }
+      } else if (op === GPU_SKIN) {
+        skin(w, a);
       } else if (op === GPU_PRESENT) {
         endPass();
         const t = res.get(w[a]), size = `${w[a + 1]}x${w[a + 2]}`;

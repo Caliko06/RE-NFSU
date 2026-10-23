@@ -21,6 +21,8 @@ enum {
     GPU_FXAA = 11,      // color id: FXAA over that target's current contents (web/gpu.js; sent at the start of the HUD, so the HUD stays crisp)
     GPU_CUBE = 10,      // id, edge, id of face 0: the six face targets (ids face0..face0+5, D3DCUBEMAP_FACES order
                         // +X -X +Y -Y +Z -Z, sent before as GPU_TARGET) become the layers of one cube texture
+    GPU_SKIN = 12,      // skin id, fill ARGB, layer count n, n x (layer id, mask id, recolour, 4 ARGB colours), 4 marker ARGB,
+                        // marker count m, m x (texel index, colour 0-3): the HD replay of the skin composite (d3d9.c skin_bridge)
 };
 
 // GPU_DRAW header (word offsets). Render states keep their D3D9 values.

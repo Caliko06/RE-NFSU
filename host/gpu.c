@@ -457,7 +457,7 @@ void gpu_run(const uint32_t *w, uint32_t n) {
             Img *t = &imgs[a[0]];
             img_free(t);
             *t = (Img){a[1], a[1], IMG_CUBE, 1, NULL, NULL, NULL, {0}, a[2]};
-        } else if (op == GPU_FXAA) {
+        } else if (op == GPU_FXAA || op == GPU_SKIN) {
             // web only (web/gpu.js)
         } else if (op == GPU_TEXKEY) {
             // the remaster pack is web only (web/gpu.js)
