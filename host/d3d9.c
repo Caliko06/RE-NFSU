@@ -736,8 +736,9 @@ static void census_dump(void) {
     for (int a = 0; a < ncen; a++) for (int b = a + 1; b < ncen; b++) if (cen[b].prims > cen[a].prims) { __typeof__(cen[0]) t = cen[a]; cen[a] = cen[b]; cen[b] = t; }
     rn_log("DRAWS frame %u: %u draws, %d groups", dev.frames, cen_total, ncen);
     for (int i = 0; i < ncen; i++)
-        rn_log("DRAWS caller=%08x vs=%x ps=%x decl=%x stride=%u tex0=%x tex1=%x rt=%u draws=%u prims=%u", cen[i].caller, cen[i].vs, cen[i].ps,
-               cen[i].decl, cen[i].stride, cen[i].tex0, cen[i].tex1, cen[i].rtw, cen[i].n, cen[i].prims);
+        { const Obj *t1 = obj_k(cen[i].tex1);
+        rn_log("DRAWS caller=%08x vs=%x ps=%x decl=%x stride=%u tex0=%x tex1=%x rt=%u draws=%u prims=%u tex1dim=%ux%u fmt=%u", cen[i].caller, cen[i].vs, cen[i].ps,
+               cen[i].decl, cen[i].stride, cen[i].tex0, cen[i].tex1, cen[i].rtw, cen[i].n, cen[i].prims, t1 ? t1->w : 0, t1 ? t1->h : 0, t1 ? t1->fmt : 0); }
     // The code of every distinct vs/ps pair of the frame, once.
     for (int i = 0; i < ncen; i++) {
         int seen = 0;
@@ -877,6 +878,7 @@ static uint32_t IDirect3DDevice9_CreateTexture(Ctx *c) {
     DEV();
     uint32_t w = ARG(1), h = ARG(2), levels = ARG(3), usage = ARG(4), f = ARG(5), pool = ARG(6), out = ARG(7);
     TR("CreateTexture(%ux%u, %u levels, usage %x, fmt %u, pool %u)", w, h, levels, usage, f, pool);
+    if (getenv("RN_RTLOG")) rn_log("RTLOG CreateTexture %ux%u levels %u usage %x fmt %u pool %u caller %08x frame %u", w, h, levels, usage, f, pool, ld(c, c->r[ESP], 4), dev.frames);
     if (!w || !h || !out || ARG(8) || bad_pool(usage, pool)) return D3DERR_INVALIDCALL;
     if (w > MAXTEX || h > MAXTEX || (pool != POOL_SCRATCH && check_format(F_X8R8G8B8, usage & ~U_QUERY_MASK, 3, f) >= 0x80000000u))
         return D3DERR_INVALIDCALL;
