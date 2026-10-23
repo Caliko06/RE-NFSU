@@ -46,10 +46,15 @@ async function startGpu(M, canvas, report, onFrame) {
     } catch {}
     if (pack.size) report(`gpu.js: remaster pack ${pack.size} textures`);
   }
+  const HD_MAX = Number(new URLSearchParams(location.search).get('hdmax') || 1024);
   async function loadHd(name) {
     const blob = await (await fetch(`remaster/png/${name}.png`)).blob();
     const opt = { premultiplyAlpha: 'none', colorSpaceConversion: 'none' };
-    const base = await createImageBitmap(blob, opt), W = base.width, H = base.height;
+    // Level 0 is at most HD_MAX on a side (?hdmax=, default 1024): the 2048 car PNGs cost 22 MB each and, with ~80 in a
+    // race, made the GPU wait 60-110 ms a frame at 2560x1116 (OWNER 2026-10-22 session).
+    const full = await createImageBitmap(blob, opt), f = Math.min(1, HD_MAX / Math.max(full.width, full.height));
+    const W = Math.round(full.width * f), H = Math.round(full.height * f);
+    const base = f < 1 ? await createImageBitmap(blob, { ...opt, resizeWidth: W, resizeHeight: H, resizeQuality: 'high' }) : full;
     const levels = Math.floor(Math.log2(Math.max(W, H))) + 1;
     const tex = device.createTexture({ size: [W, H], mipLevelCount: levels, format: 'rgba8unorm',
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
