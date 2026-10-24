@@ -42,6 +42,15 @@ One session on main. Each milestone has one gate: the run that proves it.
 - M8.5 (done 2026-10-20) Route grows to 16:9: `node tools/webcheck.mjs --route` PASS at 1920x1080 (CDP viewport, marker
   `d3d9 Reset: 1920x1080`, present 1920x1080, no page error; build/route.png).
 
+## M8.6 Completion matrix (OWNER 2026-10-24: the full game, 60 fps, remaster; the Pod does the volume)
+- The status of M5-M7 above is not measured: the route proves only that a Quick Race starts and runs.
+- census/completion.json: one row per mode (Circuit, Sprint, Drag, Drift, Lap Knockout, Tournament, career events,
+  save -> reload -> continue). Row = reached (menu / start / finish / results / back to menu / saved), the stop if any,
+  flow states (RN_FLOWLOG), a shot per stage. Native build/speed on the Pod with RN_KEYS + RN_AUTOPILOT + RN_SEED,
+  several runs at once (AGENTS.md: one run dir per process). A row that stops is the next fix (recompiler or layer).
+- Parity: the same rows on the Wine reference (tools/wine) for the modes where ours differs or the autopilot cannot drive.
+- Gate: every row reaches "back to menu" natively, then the route grows to one full race to results in Chrome.
+
 ## M9 Play, ends at 5180
 - The OWNER plays the career in Chrome at http://127.0.0.1:5180/, full window, 16:9.
 
