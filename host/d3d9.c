@@ -1913,7 +1913,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     static int racing;   // 0x77a90c is a transient label: latch the track-loaded one until a front-end label follows
     if (isl) {
         uint32_t lb = ld(c, 0x77a90c, 4);
-        if (lb == 0x6c9c3c) racing = 1;
+        if (lb == 0x6c9c3c && !racing) { racing = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c)", rt->w, rt->h); }
         else if (lb == 0x6c9cf0 || lb == 0x6c9de8 || lb == 0x6c9e8c || lb == 0x6c9ea0) racing = 0;
     }
     // BRIDGE: FXAA (web/gpu.js) over the 3D scene, once per race frame, before the first HUD quad (the HUD is drawn last into the same target).
