@@ -197,6 +197,9 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
   const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
+  const IN_CL = [];      // commands that open, close or clear passes
+  for (const op of [GPU_TARGET, GPU_CLEAR, GPU_DRAW, GPU_FXAA, GPU_PRESENT]) IN_CL[op] = true;
+  const cl = [];
   const clearPipes = new Map();
   function clearPipe(hasColor, hasDepth, flags, sc) {
     const key = `${hasColor}${hasDepth}${flags}${sc}`;
@@ -322,6 +325,15 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
     cap = Math.max(need, cap * 2, 1 << 20);
     return [device.createBuffer({ size: cap, usage: usage | GPUBufferUsage.COPY_DST }), cap];
   };
+  // Their CPU copies live across frames (a new 8 MB of uniforms per frame made GC pauses). A uniform slot keeps the
+  // previous frame's constants above this draw's count, so those are zeroed back (unv/unp: counts last written there).
+  const uni = new ArrayBuffer(256 * 1024), uf = new Float32Array(uni);
+  let vdata = new Uint8Array(0), idata = new Uint32Array(0), udata = new ArrayBuffer(0), udw = null, udf = null,
+    unv = new Uint16Array(0), unp = new Uint16Array(0), uBind = null, uBindBuf = null;
+  // Texture bind groups by layout and resources (each GPU object gets a number the first time it is seen).
+  const objIds = new WeakMap(), texBinds = new Map();
+  let nextObj = 1;
+  const oid = o => { let k = objIds.get(o); if (!k) objIds.set(o, k = nextObj++); return k; };
 
   // BRIDGE: HD car skins (host/d3d9.c skin_bridge; OWNER 2026-10-23, remaster scope). GPU_SKIN replays the game's CPU composite
   // 0x5a8a50 of DUMMY_SKINn on the GPU at 4x (at most 2048), with the 512 layers and masks sampled bilinear, so mask edges
@@ -496,12 +508,15 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     const u8 = new Uint8Array(w.buffer, w.byteOffset, w.length * 4);
     const enc = device.createCommandEncoder();
     tsN = 0;
-    const uni = new ArrayBuffer(256 * 1024), uf = new Float32Array(uni);
     let nuni = 0, stats = { clears: 0, draws: 0, present: '', words: w.length, texKb: 0, pipes: 0, shaders: 0, targets: 0 };
     // First pass over the frame: sizes of the per-frame buffers.
+    // It also lists the commands that open, close or clear targets (cl): a pass looks ahead in it to know if
+    // its attachments are read again in this frame.
     let vneed = 0, ineed = 0, uneed = 0;
+    cl.length = 0;
     for (let i = 0; i < w.length;) {
       const op = w[i] & 0xff, n = w[i] >>> 8, a = i + 1;
+      if (IN_CL[op]) cl.push(i);
       i += 1 + n;
       if (op === GPU_DRAW && !w[a + D_RVB]) {
         vneed += (w[a + D_NVERT] * w[a + D_STRIDE] + 3) & ~3;
@@ -512,15 +527,70 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     [vbuf, vcap] = grow(vbuf, vcap, vneed, GPUBufferUsage.VERTEX);
     [ibuf, icap] = grow(ibuf, icap, ineed + 4, GPUBufferUsage.INDEX);
     [ubuf, ucap] = grow(ubuf, ucap, uneed + U_STEP, GPUBufferUsage.UNIFORM);
-    const vdata = new Uint8Array(vneed), idata = new Uint32Array(ineed / 4 + 1), udata = new ArrayBuffer(uneed + U_STEP);
-    const udw = new Uint32Array(udata), udf = new Float32Array(udata);
-    const uBind = device.createBindGroup({ layout: drawBgl, entries: [{ binding: 0, resource: { buffer: ubuf, size: U_SIZE } }] });
+    if (vdata.length < vneed) vdata = new Uint8Array(vcap);
+    if (idata.length < ineed / 4 + 1) idata = new Uint32Array(icap / 4);
+    if (udata.byteLength < uneed + U_STEP) {
+      udata = new ArrayBuffer(ucap); udw = new Uint32Array(udata); udf = new Float32Array(udata);
+      unv = new Uint16Array(ucap / U_STEP); unp = new Uint16Array(ucap / U_STEP);
+    }
+    if (uBindBuf !== ubuf) {
+      uBind = device.createBindGroup({ layout: drawBgl, entries: [{ binding: 0, resource: { buffer: ubuf, size: U_SIZE } }] });
+      uBindBuf = ubuf;
+    }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '';
-    const endPass = () => { if (pass) { pass.end(); pass = null; passKey = ''; } };
+    let pass = null, passKey = '', pend = null, ci = 0;
+    // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
+    // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
+    const endPass = keepClear => {
+      if (pass) { pass.end(); pass = null; passKey = ''; }
+      if (pend && !keepClear) { enc.beginRenderPass(passDesc(null, pend.mask & 1 ? pend.rt : 0, pend.mask & 6 ? pend.ds : 0, pend.k, pend)).end(); pend = null; }
+    };
+    // What a later command does to target id's colour (asp 0, the MSAA twin), depth (1) or stencil (2):
+    // true = it reads it (draw or partial clear: loadOp 'load'), false = it overwrites it first (full clear, new target).
+    const needed = (k, id, asp) => {
+      for (; k < cl.length; k++) {
+        const a = cl[k] + 1, op = w[a - 1] & 0xff;
+        if (op === GPU_TARGET) { if (w[a] === id) return false; }
+        else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
+        else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
+      }
+      return true;     // the next frame may read it
+    };
+    // The aspects (1 colour, 2 depth, 4 stencil) a clear writes over whole attachments; 0 if it is partial.
+    const fullClear = a => {
+      const rt = w[a] ? res.get(w[a]) : null, ds = w[a + 1] ? res.get(w[a + 1]) : null;
+      const mask = (rt ? w[a + 2] & 1 : 0) | (ds ? w[a + 2] & 6 : 0);
+      const all = t => w[a + 6] <= 0 && w[a + 7] <= 0 && w[a + 8] >= t.w && w[a + 9] >= t.h;
+      return mask && (!(mask & 1) || all(rt)) && (!(mask & 6) || all(ds)) ? mask : 0;
+    };
+    // Pass on rid/did whose last command is cl[k - 1]: storeOp 'discard' where nothing reads the attachment again
+    // (the single-sample colour texture is what the game samples and presents, so it is always stored or resolved).
+    function passDesc(lab, rid, did, k, pc) {
+      const rt = rid ? res.get(rid) : null, ds = did ? res.get(did) : null;
+      const d = { timestampWrites: lab ? tsw(passLab(lab, rt || ds)) : undefined, colorAttachments: [] };
+      if (rt) {
+        const c = rt.msView ? { view: rt.msView, resolveTarget: rt.view, storeOp: needed(k, rid, 0) ? 'store' : 'discard' }
+          : { view: rt.view, storeOp: 'store' };
+        c.loadOp = pc && pc.mask & 1 ? 'clear' : 'load';
+        if (pc && pc.mask & 1) c.clearValue = pc.color;
+        d.colorAttachments.push(c);
+      }
+      if (ds) {
+        const z = pc && pc.mask & 2, s = pc && pc.mask & 4;
+        // Depth and stencil are discarded together or not at all: discarding one aspect alone cost more than storing
+        // it (race frames >20 ms 0.1 -> 4 %, 2026-10-24; Dawn re-initializes the texture).
+        const st = needed(k, did, 1) || needed(k, did, 2) ? 'store' : 'discard';
+        d.depthStencilAttachment = { view: ds.view, depthLoadOp: z ? 'clear' : 'load', depthStoreOp: st,
+          stencilLoadOp: s ? 'clear' : 'load', stencilStoreOp: st };
+        if (z) d.depthStencilAttachment.depthClearValue = pc.z;
+        if (s) d.depthStencilAttachment.stencilClearValue = pc.stencil;
+      }
+      return d;
+    }
 
     for (let i = 0; i < w.length;) {
       const op = w[i] & 0xff, n = w[i] >>> 8, a = i + 1;
+      if (IN_CL[op]) ci++;
       i += 1 + n;
       if (op === GPU_TARGET) {
         endPass();
@@ -538,7 +608,13 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       } else if (op === GPU_CLEAR) {
         endPass();
         const rt = w[a] ? res.get(w[a]) : null, ds = w[a + 1] ? res.get(w[a + 1]) : null, flags = w[a + 2];
-        const c = w[a + 3], off = nuni * 256;
+        const c = w[a + 3], off = nuni * 256, mask = fullClear(a);
+        if (mask) {
+          pend = { rt: w[a], ds: w[a + 1], mask, k: ci, z: f32[a + 4], stencil: w[a + 5] & 0xff,
+            color: { r: ((c >>> 16) & 255) / 255, g: ((c >>> 8) & 255) / 255, b: (c & 255) / 255, a: (c >>> 24) / 255 } };
+          stats.clears++;
+          continue;
+        }
         if (nuni === 1024) fail('more than 1024 clears in a frame');
         uf.set([((c >>> 16) & 255) / 255, ((c >>> 8) & 255) / 255, (c & 255) / 255, (c >>> 24) / 255, f32[a + 4]], off / 4);
         nuni++;
@@ -602,19 +678,23 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
         const key = `${g(D_RT)}/${g(D_DS)}`;
         if (key !== passKey) {
-          endPass();
-          pass = enc.beginRenderPass({ timestampWrites: tsw(passLab('draw', rt)),
-            colorAttachments: [colorAtt(rt)],
-            depthStencilAttachment: ds ? { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store',
-              stencilLoadOp: 'load', stencilStoreOp: 'store' } : undefined });
+          const fold = pend && (!(pend.mask & 1) || pend.rt === g(D_RT)) && (!(pend.mask & 6) || pend.ds === g(D_DS));
+          endPass(fold);
+          let k = ci;      // the pass runs while the draws keep this target pair
+          while (k < cl.length && (w[cl[k]] & 0xff) === GPU_DRAW && w[cl[k] + 1 + D_RT] === g(D_RT) && w[cl[k] + 1 + D_DS] === g(D_DS)) k++;
+          pass = enc.beginRenderPass(passDesc('draw', g(D_RT), g(D_DS), k, fold ? pend : null));
+          if (fold) pend = null;
           passKey = key;
         }
         const nv = g(D_NVERT), ni = g(D_NIDX), stride = g(D_STRIDE), nvc = g(D_NVC), npc = g(D_NPC);
         const ps = shaders.get(g(D_PS));
         // uniforms (sm1.h SM1_U_*)
-        const ub = uoff / 4, src = a + D_HDR;
+        const ub = uoff / 4, src = a + D_HDR, slot = uoff / U_STEP;
         udf.set(f32.subarray(src, src + 4 * nvc), ub);
         udf.set(f32.subarray(src + 4 * nvc, src + 4 * nvc + 4 * npc), ub + 1024);
+        if (unv[slot] > nvc) udf.fill(0, ub + 4 * nvc, ub + 4 * unv[slot]);
+        if (unp[slot] > npc) udf.fill(0, ub + 1024 + 4 * npc, ub + 1024 + 4 * unp[slot]);
+        unv[slot] = nvc; unp[slot] = npc;
         udf[ub + 1056] = 1 / g(D_VP + 2); udf[ub + 1057] = 1 / g(D_VP + 3);
         const fc = g(D_FOGC);
         udf[ub + 1060] = ((fc >>> 16) & 255) / 255; udf[ub + 1061] = ((fc >>> 8) & 255) / 255; udf[ub + 1062] = (fc & 255) / 255;
@@ -632,14 +712,20 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           pass.setPipeline(pipeline(w, a, stride, rt.sc || 1));
           pass.setBindGroup(0, uBind, [uoff]);
           const entries = [];
+          let bkey = ps.texMask;
           for (let k = 0; k < 8; k++) if (ps.texMask >> k & 1) {
             const t = w.subarray(a + D_TEX + D_TEXN * k, a + D_TEX + D_TEXN * (k + 1));
             const img = t[T_ID] ? res.get(t[T_ID]) : null, cube = (t[T_TT] & T_CUBE) !== 0;
-            entries.push({ binding: 2 * k, resource: sampler(t) },
-              { binding: 2 * k + 1, resource: !cube && img?.view || dummyView },
-              { binding: 16 + k, resource: cube && img?.cube || dummyCubeView });
+            const smp = sampler(t), v2 = !cube && img?.view || dummyView, vc = cube && img?.cube || dummyCubeView;
+            bkey += `,${oid(smp)},${oid(v2)},${oid(vc)}`;
+            entries.push({ binding: 2 * k, resource: smp }, { binding: 2 * k + 1, resource: v2 }, { binding: 16 + k, resource: vc });
           }
-          pass.setBindGroup(1, device.createBindGroup({ layout: texBgl(ps.texMask), entries }));
+          let bg = texBinds.get(bkey);
+          if (!bg) {
+            if (texBinds.size >= 8192) texBinds.clear();     // keys of destroyed textures are never asked again
+            texBinds.set(bkey, bg = device.createBindGroup({ layout: texBgl(ps.texMask), entries }));
+          }
+          pass.setBindGroup(1, bg);
           pass.setViewport(g(D_VP), g(D_VP + 1), g(D_VP + 2), g(D_VP + 3), f32[a + D_VP + 4], f32[a + D_VP + 5]);
           pass.setScissorRect(sc[0], sc[1], sc[2] - sc[0], sc[3] - sc[1]);
           const bf = g(D_BFACTOR);

@@ -44,12 +44,26 @@ void gil_acquire(void) {
 // This runs at every API call (thousands per frame): with no waiter it reads no clock (a clock read
 // is a call out to JS on the web), and with one it reads the clock every 16th call.
 #define QUANTUM_US 20000
+#define SPIN_QUANTUM_US 2000
+static int spinners;     // threads that gave the GIL away at a clock read (gil_clock) and wait to get it back
 void gil_slice(void) {
     static unsigned calls;
     if (__atomic_load_n(&next_ticket, __ATOMIC_RELAXED) == __atomic_load_n(&serving, __ATOMIC_RELAXED) + 1) return;
-    if (++calls & 15 || now_us() - slice_start < QUANTUM_US) return;
+    if (++calls & 15 || now_us() - slice_start < (__atomic_load_n(&spinners, __ATOMIC_RELAXED) ? SPIN_QUANTUM_US : QUANTUM_US)) return;
     gil_release();
     gil_acquire();
+}
+// A thread that polls the clock is spinning: Speed.exe's frame limiter 0x585b40 loops on QueryPerformanceCounter
+// until the frame time is used up. On Windows it spins on its own core while the other threads run (the file
+// thread 0x63e4d0 during a load). Under the GIL the spin took their turn: the file thread waited for the GIL 55%
+// of the menu->race load (CPU profile 2026-10-24). So a clock read hands the GIL to a waiting thread, and that
+// thread gets a short quantum, so the spinner is back about as soon as its time would pass on Windows.
+void gil_clock(void) {
+    if (__atomic_load_n(&next_ticket, __ATOMIC_RELAXED) == __atomic_load_n(&serving, __ATOMIC_RELAXED) + 1) return;
+    __atomic_add_fetch(&spinners, 1, __ATOMIC_RELAXED);
+    gil_release();
+    gil_acquire();
+    __atomic_sub_fetch(&spinners, 1, __ATOMIC_RELAXED);
 }
 static void count_hold(void) {
     double held = (double)(now_us() - hold_start) / 1000, *m = is_main ? &rn_telem.hold_main_max_ms : &rn_telem.hold_other_max_ms;

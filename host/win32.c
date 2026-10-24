@@ -480,8 +480,8 @@ static uint32_t GetSystemInfo_(Ctx *c) {
 }
 // Same CPU as rn_cpuid: CX8 and RDTSC, no MMX/SSE/3DNow.
 static uint32_t IsProcessorFeaturePresent_(Ctx *c) { uint32_t f = ARG(0); return f == 2 || f == 8; }
-static uint32_t GetTickCount_(Ctx *c) { (void)c; rn_telem.clock_calls++; return (uint32_t)(now_us() / 1000); }
-static uint32_t QueryPerformanceCounter_(Ctx *c) { rn_telem.clock_calls++; st64(c, ARG(0), now_us()); return 1; }
+static uint32_t GetTickCount_(Ctx *c) { (void)c; rn_telem.clock_calls++; gil_clock(); return (uint32_t)(now_us() / 1000); }
+static uint32_t QueryPerformanceCounter_(Ctx *c) { rn_telem.clock_calls++; gil_clock(); st64(c, ARG(0), now_us()); return 1; }
 static uint32_t QueryPerformanceFrequency_(Ctx *c) { st64(c, ARG(0), 1000000); return 1; }
 // The PC's clock runs on UTC: time zone "Greenwich Standard Time" (bias 0, no daylight saving),
 // so local time = system time. GetTimeZoneInformation then answers TIME_ZONE_ID_UNKNOWN.
@@ -753,7 +753,7 @@ static uint32_t GetThreadPriority_(Ctx *c) { (void)c; return 0; }
 static uint32_t SetThreadPriority_(Ctx *c) { (void)c; return 1; }
 
 // =================================== winmm =====================================================
-static uint32_t timeGetTime_(Ctx *c) { (void)c; rn_telem.clock_calls++; return (uint32_t)(now_us() / 1000); }
+static uint32_t timeGetTime_(Ctx *c) { (void)c; rn_telem.clock_calls++; gil_clock(); return (uint32_t)(now_us() / 1000); }
 static uint32_t timeBeginPeriod_(Ctx *c) { (void)c; return 0; }
 static uint32_t timeEndPeriod_(Ctx *c) { (void)c; return 0; }
 static uint32_t timeGetDevCaps_(Ctx *c) { st(c, ARG(0), 1, 4); st(c, ARG(0) + 4, 1000000, 4); return 0; }

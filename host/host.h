@@ -61,6 +61,7 @@ uint32_t virtual_reserve(Ctx *c, uint32_t size);
 void gil_acquire(void);
 void gil_release(void);
 void gil_slice(void);                                          // preempt at an API call after a quantum
+void gil_clock(void);                                          // a clock read: let a waiting thread run
 // Telemetry: running totals that web/telemetry.js reads at every frame (layout mirrored there). Each field has
 // one writer: the game threads under the GIL, or the mixer under its lock. The maxima are cleared by the page.
 typedef struct {
