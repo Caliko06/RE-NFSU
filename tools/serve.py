@@ -4,28 +4,38 @@
 / -> web/, /pc/Speed.exe -> pc/Speed.exe, /game/... -> game/ (the OWNER's files, never leave this machine).
 /game-files.json lists game/ (relative paths and sizes); /game/ answers Range requests (host/files.c reads them).
 /save/... = save/ of this repo (gitignored): what the game writes. GET reads, PUT writes a whole file, DELETE
-removes one; /save-files.json lists save/. Writes never reach game/.
+removes one; /save-files.json lists save/. Writes never reach game/. Headless Chrome (tests) gets build/save-headless
+instead, a copy of save/ made when it is missing (webcheck deletes it at start), so a test never changes the OWNER's save.
 POST /log appends the page's log to build/web.log (POST /log?new starts it again; the last one is kept as
 build/web.prev.log), so a Chrome session can be read after it stops. Headless Chrome (tools/webcheck.mjs) writes
 build/webcheck.log instead, so a test never replaces the OWNER's session.
 POST /telemetry does the same for web/telemetry.js: build/telemetry.ndjson (build/webcheck.telemetry.ndjson).
 Usage: .venv/bin/python tools/serve.py [port]
 """
-import http.server, json, os, sys, urllib.parse
+import http.server, json, os, shutil, sys, urllib.parse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5180
 
 
 SAVE = os.path.join(ROOT, "save")
+SAVE_HEADLESS = os.path.join(ROOT, "build", "save-headless")
 
 
-def save_path(url):
-    """save/<rel> for /save/<rel>, or None when it would leave save/."""
+def save_root(headers):
+    if "HeadlessChrome" not in headers.get("User-Agent", ""):
+        return SAVE
+    if not os.path.isdir(SAVE_HEADLESS):
+        shutil.copytree(SAVE, SAVE_HEADLESS) if os.path.isdir(SAVE) else os.makedirs(SAVE_HEADLESS)
+    return SAVE_HEADLESS
+
+
+def save_path(url, root):
+    """<root>/<rel> for /save/<rel>, or None when it would leave the save root."""
     rel = os.path.normpath(urllib.parse.unquote(url.split("?", 1)[0][len("/save/"):]))
     if rel.startswith("..") or os.path.isabs(rel) or rel == ".":
         return None
-    return os.path.join(SAVE, rel)
+    return os.path.join(root, rel)
 
 
 def listing(top):
@@ -39,7 +49,7 @@ def listing(top):
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_PUT(self):
-        p = save_path(self.path) if self.path.startswith("/save/") else None
+        p = save_path(self.path, save_root(self.headers)) if self.path.startswith("/save/") else None
         if not p:
             self.send_error(403)
             return
@@ -76,7 +86,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_DELETE(self):
-        p = save_path(self.path) if self.path.startswith("/save/") else None
+        p = save_path(self.path, save_root(self.headers)) if self.path.startswith("/save/") else None
         if not p or not os.path.isfile(p):
             self.send_error(404)
             return
@@ -87,7 +97,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         route = self.path.split("?", 1)[0]
         if route in ("/game-files.json", "/save-files.json"):
-            top = os.path.join(ROOT, "game") if route == "/game-files.json" else SAVE
+            top = os.path.join(ROOT, "game") if route == "/game-files.json" else save_root(self.headers)
             body = listing(top) if os.path.isdir(top) else b"[]"
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -125,7 +135,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path.startswith("/game/"):
             return os.path.join(ROOT, "game", os.path.normpath(path[6:]).lstrip("/."))
         if path.startswith("/save/"):
-            return save_path(path) or os.path.join(SAVE, "..refused")
+            root = save_root(self.headers)
+            return save_path(path, root) or os.path.join(root, "..refused")
         return os.path.join(ROOT, "web", os.path.normpath(path).lstrip("/."))
 
     def end_headers(self):

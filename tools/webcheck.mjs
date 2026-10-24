@@ -5,7 +5,7 @@
 // "60:KeyW+6" holds it 6 seconds (released on the first check after that).
 // node tools/webcheck.mjs --route: the regression route; exit 0 = PASS. It grows with each milestone met.
 import { spawn } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -21,6 +21,8 @@ const url = arg[0] || 'http://127.0.0.1:5180/';
 const secs = route ? ROUTE.secs : Number(arg[1] || 120);
 const shot = route ? ROUTE.shot : arg[2] || 'build/webcheck.png';
 const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, c]) => ({ t: +t, code: c.split('+')[0], hold: +(c.split('+')[1] || 0) }));
+// Each run starts from a fresh copy of the OWNER's save (tools/serve.py gives headless Chrome build/save-headless).
+rmSync('build/save-headless', { recursive: true, force: true });
 const port = Number(process.env.RN_CDP_PORT || 9333);   // another session may hold 9333: then use your own
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
   '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'rn-'))}`,
