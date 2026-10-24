@@ -48,6 +48,7 @@ static uint32_t vtable(int i) {
 typedef struct {
     int iface, primary, playing, looping;
     uint32_t refs, guest, flags, data, size;
+    int owner;                          // the IDirectSound object that created it (objs index)
     uint16_t channels, bits, align;
     uint32_t rate, freq;                // format rate; SetFrequency (0 = the format rate)
     int32_t volume, pan;                // hundredths of a dB
@@ -114,11 +115,21 @@ static Obj *any_obj(Ctx *c) {
     return NULL;
 }
 static uint32_t AddRef_(Ctx *c) { Obj *o = any_obj(c); return o ? ++o->refs : 0; }
-// The last Release stops the buffer; its memory stays (guest memory, not reused).
+// The last Release stops the buffer; its memory stays (guest memory, not reused). The last Release of
+// an IDirectSound releases every buffer it created (DirectSound docs; Wine frees them too). Speed.exe
+// 0x653d50 lets go of its stream buffer only this way: without it the old stream loops forever.
 static uint32_t Release_(Ctx *c) {
     Obj *o = any_obj(c);
     if (!o || !o->refs) return 0;
-    if (!--o->refs) { pthread_mutex_lock(&mx); o->playing = 0; pthread_mutex_unlock(&mx); }
+    if (!--o->refs) {
+        int self = (int)(o - objs);
+        pthread_mutex_lock(&mx);
+        o->playing = 0;
+        if (o->iface == I_DS)
+            for (int k = 0; k < nobjs; k++)
+                if (objs[k].iface == I_BUF && objs[k].owner == self && objs[k].refs) { objs[k].refs = 0; objs[k].playing = 0; }
+        pthread_mutex_unlock(&mx);
+    }
     return o->refs;
 }
 
@@ -300,6 +311,7 @@ static uint32_t IDirectSound_CreateSoundBuffer(Ctx *c) {
     if (!g) return DSERR_INVALIDPARAM;
     Obj *b = &objs[nobjs - 1];
     b->flags = flags;
+    b->owner = (int)(o - objs);
     if (flags & 1) {                    // DSBCAPS_PRIMARYBUFFER: the output, 22 kHz 8-bit stereo until SetFormat
         if (bytes || fmt) { nobjs--; return DSERR_INVALIDPARAM; }
         b->primary = 1; b->channels = 2; b->bits = 8; b->align = 2; b->rate = 22050;
