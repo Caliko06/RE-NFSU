@@ -50,6 +50,19 @@ static void *watchdog(void *arg) {
     rn_log("RN_SECS: stopped after %u s (no stop reached)", secs);
     _exit(0);
 }
+// RN_WATCH=70fe28,77a920: every 250 ms, log each listed dword of guest memory (read without the GIL; a counter
+// needs no lock). The same addresses can be read in the Wine reference through /proc/PID/mem (tools/wine/memwatch.py).
+static void *memwatch(void *arg) {
+    uint32_t a[8]; int n = 0;
+    for (char *s = arg; *s && n < 8; s += *s == ',') a[n++] = (uint32_t)strtoul(s, &s, 16);
+    uint64_t t0 = now_us();
+    for (;;) {
+        char line[256]; int k = snprintf(line, sizeof line, "watch %6.2f", (now_us() - t0) / 1e6);
+        for (int i = 0; i < n; i++) { uint32_t v; memcpy(&v, g_ctx->mem + a[i], 4); k += snprintf(line + k, sizeof line - k, " %x=%u", a[i], v); }
+        rn_log("%s", line);
+        usleep(250000);
+    }
+}
 #endif
 
 static uint32_t rd32(const uint8_t *p) { uint32_t v; memcpy(&v, p, 4); return v; }
@@ -121,6 +134,9 @@ int main(int argc, char **argv) {
     c->r[ESP] = STACK_HI - 16;
     c->r[ESP] -= 4;
     st(c, c->r[ESP], host_addr_of("rn", "entry_returned"), 4);
+#ifndef __EMSCRIPTEN__
+    if (getenv("RN_WATCH")) { pthread_t mw; pthread_create(&mw, NULL, memwatch, getenv("RN_WATCH")); pthread_detach(mw); }
+#endif
     rn_log("Speed.exe loaded: entry %08x, %u sections, guest memory %u MB", entry, nsec, GUEST_MEM >> 20);
     rn_call(c, entry);
     rn_stop(c);

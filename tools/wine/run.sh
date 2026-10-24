@@ -9,13 +9,13 @@
 #   DirectInput polls once per frame and llvmpipe is slow: keys are held 0.3 s. Atlantica is locked here (our PATCH 0x735ec1
 #   unlocks it); Olympic Square = one ArrowLeft on SELECT LOCATION. Never `pgrep -f "Xvfb :77"` inside an ssh command line.
 # Pod side of the Wine reference run of Speed.exe (only PATCH 0x4f5891). usage: run.sh start | key <xdotool key> | shot <file> | stop
-export WINEPREFIX=/root/wine/pfx DISPLAY=:77 WINEDEBUG=${WINEDEBUG:-err+all,fixme-all} LP_NUM_THREADS=4
+export WINEPREFIX=${WINEPREFIX:-/root/wine/pfx} DISPLAY=${DISPLAY:-:77} WINEDEBUG=${WINEDEBUG:-err+all,fixme-all} LP_NUM_THREADS=4
 case $1 in
 start)
   wineserver -k 2>/dev/null; sleep 1
   # A null ALSA device: with no sound device the game skips one RNG draw at boot (audio init) and every race differs.
   [ -f /root/.asoundrc ] || printf 'pcm.!default { type null }\nctl.!default { type hw card 0 }\n' > /root/.asoundrc
-  pgrep -f "Xvfb :77" >/dev/null || { setsid nohup Xvfb :77 -screen 0 1280x960x24 +extension GLX > /root/wine/xvfb.log 2>&1 < /dev/null & sleep 2; }
+  pgrep -f "Xvfb $DISPLAY " >/dev/null || { setsid nohup Xvfb $DISPLAY -screen 0 1280x960x24 +extension GLX > /root/wine/xvfb.log 2>&1 < /dev/null & sleep 2; }
   cd /root/wine/pfx/drive_c/NFSU
   # GPU: vglrun -d egl (gpu.sh once per pod); without it wined3d falls back to llvmpipe (slow, keys must be held).
   VGL=; [ -x /opt/VirtualGL/bin/vglrun ] && VGL="/opt/VirtualGL/bin/vglrun -d egl"
