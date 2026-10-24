@@ -785,10 +785,22 @@ static void rng_log(Ctx *c, uint32_t frame) {
     } else if (!frame) rn_log("RNG seed %08x", x);
     prev = x;
 }
+// RN_FLOWLOG: each new game-flow label [0x77a90c] (a string in .rdata, e.g. 0x6c9c3c "EndGameFlowLoadingTrackSpecific")
+// at the Present that first sees it: the bounds of the loads (tools/bench.py).
+static void flow_log(Ctx *c) {
+    static int on = -1;
+    static uint32_t prev;
+    if (on < 0) on = getenv("RN_FLOWLOG") != NULL;
+    if (!on) return;
+    uint32_t lb = ld(c, 0x77a90c, 4);
+    if (lb != prev && lb >= 0x697000 && lb < 0x6d4000) rn_log("flow %.64s (frame %u)", G(lb), dev.frames);
+    prev = lb;
+}
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     tune_apply(c);
     rng_log(c, dev.frames);
+    flow_log(c);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
         return D3DERR_INVALIDCALL;

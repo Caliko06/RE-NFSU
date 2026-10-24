@@ -470,11 +470,25 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   const tsq = TS ? { set: device.createQuerySet({ type: 'timestamp', count: TS_MAX }),
     res: device.createBuffer({ size: 8 * TS_MAX, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC }), free: [] } : null;
   let tsN = 0;
-  const tsw = () => tsq && tsN + 2 <= TS_MAX ? { querySet: tsq.set, beginningOfPassWriteIndex: tsN++, endOfPassWriteIndex: tsN++ } : undefined;
+  // ?gpuprof=1: GPU time per pass kind (label = what the pass does and its target), summed over 300 frames, in the frame log.
+  const PROF = new URLSearchParams(location.search).get('gpuprof') === '1', profLab = [], profSum = new Map();
+  let profFrames = 0;
+  const tsw = lab => {
+    if (!tsq || tsN + 2 > TS_MAX) return undefined;
+    if (PROF) profLab[tsN >> 1] = lab;
+    return { querySet: tsq.set, beginningOfPassWriteIndex: tsN++, endOfPassWriteIndex: tsN++ };
+  };
+  const passLab = (kind, rt) => rt ? `${kind} ${rt.w}x${rt.h}${rt.sc > 1 || rt.msView ? ' ms' : ''}` : kind;
   const gpuReport = () => {
     if (!gpuDone.length) return '';
     const v = gpuDone.splice(0).sort((x, y) => x - y), q = f => v[Math.min(v.length - 1, Math.floor(f * v.length))].toFixed(1);
-    return `, gpu ts p50 ${q(0.5)} p90 ${q(0.9)} max ${q(1)} ms`;
+    let prof = '';
+    if (PROF && profFrames) {
+      prof = '; per frame: ' + [...profSum].sort((x, y) => y[1][0] - x[1][0]).slice(0, 10)
+        .map(([l, e]) => `${l} ${(e[0] / profFrames).toFixed(2)} ms/${(e[1] / profFrames).toFixed(1)}`).join(', ');
+      profSum.clear(); profFrames = 0;
+    }
+    return `, gpu ts p50 ${q(0.5)} p90 ${q(0.9)} max ${q(1)} ms` + prof;
   };
   function run(ptr, len) {
     const w = H().subarray(ptr >> 2, (ptr >> 2) + len);
@@ -528,7 +542,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         if (nuni === 1024) fail('more than 1024 clears in a frame');
         uf.set([((c >>> 16) & 255) / 255, ((c >>> 8) & 255) / 255, (c & 255) / 255, (c >>> 24) / 255, f32[a + 4]], off / 4);
         nuni++;
-        const p = enc.beginRenderPass({ timestampWrites: tsw(),
+        const p = enc.beginRenderPass({ timestampWrites: tsw(passLab('clear', rt || ds)),
           colorAttachments: rt ? [colorAtt(rt)] : [],
           depthStencilAttachment: ds ? { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store',
             stencilLoadOp: 'load', stencilStoreOp: 'store' } : undefined });
@@ -589,7 +603,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const key = `${g(D_RT)}/${g(D_DS)}`;
         if (key !== passKey) {
           endPass();
-          pass = enc.beginRenderPass({ timestampWrites: tsw(),
+          pass = enc.beginRenderPass({ timestampWrites: tsw(passLab('draw', rt)),
             colorAttachments: [colorAtt(rt)],
             depthStencilAttachment: ds ? { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store',
               stencilLoadOp: 'load', stencilStoreOp: 'store' } : undefined });
@@ -652,7 +666,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
             fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
           }
           enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
-          const p = enc.beginRenderPass({ timestampWrites: tsw(), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
+          const p = enc.beginRenderPass({ timestampWrites: tsw('fxaa'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
           p.setPipeline(fxaaPipe);
           p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
             entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
@@ -694,12 +708,19 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     }
     device.queue.submit([enc.finish()]);
     if (tsBuf) {
-      const n = tsN;
+      const n = tsN, labs = PROF ? profLab.slice(0, n >> 1) : null;
       tsBuf.mapAsync(GPUMapMode.READ).then(() => {
         const q = new BigInt64Array(tsBuf.getMappedRange(0, 8 * n));
         // first pass begin to last pass end (Apple GPUs overlap passes, so a sum of passes overcounts)
         let lo = q[0], hi = q[0]; for (let k = 0; k < n; k++) if (q[k] > 0n) { if (q[k] < lo || lo === 0n) lo = q[k]; if (q[k] > hi) hi = q[k]; }
         const ns = hi - lo;
+        if (labs) {
+          for (let k = 0; k < labs.length; k++) {
+            const d = q[2 * k + 1] > q[2 * k] ? Number(q[2 * k + 1] - q[2 * k]) / 1e6 : 0, e = profSum.get(labs[k]) || [0, 0];
+            e[0] += d; e[1]++; profSum.set(labs[k], e);
+          }
+          profFrames++;
+        }
         tsBuf.unmap(); tsq.free.push(tsBuf);
         gpuDone.push(Number(ns) / 1e6);
       });
