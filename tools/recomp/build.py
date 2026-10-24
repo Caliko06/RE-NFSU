@@ -17,6 +17,8 @@ CHUNKS = 160
 GEN = "build/gen"
 FUNCS = {int(l.split()[0], 16): l.split()[1] for l in open("census/speed_exe_functions.tsv")}
 L = None
+# RN_JOBS caps both pools: a pod quota is smaller than os.cpu_count() and freezes the container when exceeded.
+JOBS = int(os.environ.get("RN_JOBS") or os.cpu_count())
 
 
 def init():
@@ -41,7 +43,7 @@ def write_if_changed(path, text):
 
 def lift_all():
     os.makedirs(GEN, exist_ok=True)
-    with mp.Pool(os.cpu_count(), initializer=init) as pool:
+    with mp.Pool(JOBS, initializer=init) as pool:
         res = pool.map(work, sorted(FUNCS), chunksize=64)
     # A data pointer that lands inside an instruction of real code is not a code start.
     inside = set()
@@ -131,7 +133,7 @@ def compile_web():
 def run_jobs(jobs):
     running, bad = [], 0
     for j in jobs:
-        while len(running) >= os.cpu_count():
+        while len(running) >= JOBS:
             bad += running.pop(0).wait() != 0
         running.append(subprocess.Popen(j))
     bad += sum(p.wait() != 0 for p in running)
