@@ -11,7 +11,7 @@ import numpy as np, torch, lpips, piq
 from PIL import Image, ImageDraw
 
 a_mp4, b_mp4, out = sys.argv[1:4]
-dev = 'cuda'
+dev = 'cuda' if torch.cuda.is_available() else 'mps'   # the Mac: .mvenv (system torch + lpips + piq)
 WIN, LOCAL = 60, 90
 # A window is aligned when its best thumbnail L1 is at most this (1004 with autopilot: 0.8-5.8 while both races match,
 # 12-49 once the autopilots take different lines). Worst frames come from aligned windows only: past that the A/B

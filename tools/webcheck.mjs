@@ -5,7 +5,7 @@
 // "60:KeyW+6" holds it 6 seconds (released on the first check after that).
 // node tools/webcheck.mjs --route: the regression route; exit 0 = PASS. It grows with each milestone met.
 import { spawn } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -24,9 +24,12 @@ const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).ma
 // Each run starts from a fresh copy of the OWNER's save (tools/serve.py gives headless Chrome build/save-headless).
 rmSync('build/save-headless', { recursive: true, force: true });
 const port = Number(process.env.RN_CDP_PORT || 9333);   // another session may hold 9333: then use your own
+const profileDir = mkdtempSync(join(tmpdir(), 'rn-'));
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
-  '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'rn-'))}`,
+  '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profileDir}`,
   '--no-first-run', '--enable-unsafe-webgpu', '--mute-audio', '--window-size=1280,1100', 'about:blank'], { stdio: 'ignore' });
+// Each profile is ~330 MB: 107 left behind filled 29 GB of the Mac. Removed on every exit.
+process.on('exit', () => { chrome.kill('SIGKILL'); try { rmSync(profileDir, { recursive: true, force: true }); } catch {} });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let tabs;
 for (let i = 0; i < 50 && !tabs; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); } catch { await sleep(200); } }
@@ -47,6 +50,24 @@ const prof = process.env.RN_PROFILE?.split(':').map(Number), workers = new Map()
 if (prof) {
   const onmsg = ws.onmessage;
   ws.onmessage = e => { const m = JSON.parse(e.data); if (m.method === 'Target.attachedToTarget') workers.set(m.params.sessionId, m.params.targetInfo); onmsg(e); };
+  await send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true });
+}
+// RN_NETLOG=file: each game file the page reads (first request per path, any worker), with the page second -> file.
+// Which files a menu path loads, without RN_TRACE (its log slows the game down so much that timed keys miss).
+const netlog = process.env.RN_NETLOG;
+if (netlog) {
+  writeFileSync(netlog, '');
+  const seen = new Set(), onmsg = ws.onmessage, n0 = Date.now();
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.method === 'Target.attachedToTarget') send('Network.enable', {}, m.params.sessionId);
+    if (m.method === 'Network.requestWillBeSent') {
+      const u = decodeURIComponent(new URL(m.params.request.url).pathname);
+      if (u.startsWith('/game/') && !seen.has(u)) { seen.add(u); appendFileSync(netlog, `${((Date.now() - n0) / 1000).toFixed(1)} ${u.slice(6)}\n`); }
+    }
+    onmsg(e);
+  };
+  await send('Network.enable');
   await send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true });
 }
 let profState = 0;

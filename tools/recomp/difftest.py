@@ -37,7 +37,7 @@ for f in sorted(os.listdir("build/gen")):
         jobs.append(["clang", "-O1", "-w", "-Ihost", "-Ibuild/gen", "-fno-strict-aliasing", "-DRN_REF_QEMU5", "-c", src, "-o", o])
 running = []
 for j in jobs:
-    while len(running) >= os.cpu_count():
+    while len(running) >= int(os.environ.get("RN_JOBS") or os.cpu_count()):   # RN_JOBS: the Mac allows at most 4
         running.pop(0).wait()
     running.append(subprocess.Popen(j))
 if any(p.wait() for p in running):
