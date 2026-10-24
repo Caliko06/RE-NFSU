@@ -18,7 +18,7 @@ const DIK = {
   PageDown: 0xd1, Insert: 0xd2, Delete: 0xd3, MetaLeft: 0xdb, MetaRight: 0xdc, ContextMenu: 0xdd,
 };
 
-// Ring (u32 words): [0] head (here), [1] tail (game), [2..4] mouse dx, dy, wheel, [8..8+1024) events:
+// Ring (u32 words): [0] head (here), [1] tail (game), [2..4] mouse dx, dy, wheel, [5] exclusive mouse (game), [8..8+1024) events:
 // bit 31 = mouse button, bit 8 = down, low byte = DIK or button. The game thread reads it at its input calls.
 function startInput(M, canvas) {
   const base = M._rn_input_ring() >> 2, RING = 1024;
@@ -47,6 +47,15 @@ function startInput(M, canvas) {
   // movementX/Y are CSS pixels; the game's cursor moves in canvas pixels, so scale by canvas.width / on-screen width
   // and carry the fraction (Atomics takes integers).
   let remX = 0, remY = 0;
+  // While the game holds an exclusive mouse (host/dinput8.c), Windows shows no cursor of its own and keeps the
+  // mouse in the window: hide ours and lock it at the first click, so the game's cursor is the only one.
+  const exclusive = () => Atomics.load(H(), base + 5) !== 0;
+  function mouseMode() {
+    const ex = exclusive();
+    canvas.style.cursor = ex ? 'none' : '';
+    if (!ex && document.pointerLockElement === canvas) document.exitPointerLock();
+  }
+  setInterval(mouseMode, 250);
   canvas.addEventListener('mousemove', e => {
     const r = canvas.getBoundingClientRect();
     if (!r.width || !r.height) return;
@@ -57,7 +66,12 @@ function startInput(M, canvas) {
     if (ix) Atomics.add(H(), base + 2, ix);
     if (iy) Atomics.add(H(), base + 3, iy);
   });
-  canvas.addEventListener('mousedown', e => { canvas.focus(); push(0x80000100 | btn[e.button]); e.preventDefault(); });
+  canvas.addEventListener('mousedown', e => {
+    canvas.focus();
+    if (exclusive() && document.pointerLockElement !== canvas) canvas.requestPointerLock()?.catch?.(() => {});
+    push(0x80000100 | btn[e.button]);
+    e.preventDefault();
+  });
   canvas.addEventListener('mouseup', e => push(0x80000000 | btn[e.button]));
   canvas.addEventListener('wheel', e => { Atomics.add(H(), base + 4, e.deltaY < 0 ? 120 : -120); e.preventDefault(); }, { passive: false });
   canvas.addEventListener('contextmenu', e => e.preventDefault());

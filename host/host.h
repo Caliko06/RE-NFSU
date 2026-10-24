@@ -111,4 +111,5 @@ void input_key_name(uint8_t dik, char *out, int n);                 // GetKeyNam
 void dinput8_key(uint8_t dik, int down);
 void dinput8_button(int b, int down);
 void dinput8_motion(int32_t dx, int32_t dy, int32_t dz);
+void input_mouse_exclusive(int on);                            // web: the page hides and locks the pointer
 void user32_key(uint8_t dik, uint8_t vk, int down);

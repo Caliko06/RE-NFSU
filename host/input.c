@@ -129,11 +129,12 @@ static void button_event(int b, int d) {
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-// u32 words: [0] head (page), [1] tail (game), [2..4] mouse dx, dy, wheel (page adds, game takes),
+// u32 words: [0] head (page), [1] tail (game), [2..4] mouse dx, dy, wheel (page adds, game takes), [5] exclusive mouse,
 // [8..8+RING) events: bit 31 = mouse button (else key), bit 8 = down, low byte = DIK or button.
 #define RING 1024
 static uint32_t ring[8 + RING];
 EMSCRIPTEN_KEEPALIVE uint32_t rn_input_ring(void) { return (uint32_t)(uintptr_t)ring; }
+void input_mouse_exclusive(int on) { __atomic_store_n(&ring[5], (uint32_t)on, __ATOMIC_RELEASE); }
 void input_poll(void) {
     uint32_t head = __atomic_load_n(&ring[0], __ATOMIC_ACQUIRE), tail = ring[1];
     for (; tail != head; tail++) {
@@ -148,6 +149,7 @@ void input_poll(void) {
     if (dx || dy || dz) dinput8_motion(dx, dy, dz);
 }
 #else
+void input_mouse_exclusive(int on) { (void)on; }
 typedef struct { uint64_t at_us; uint8_t dik; } Tap;
 static Tap taps[256];
 static int ntaps, script_read;
