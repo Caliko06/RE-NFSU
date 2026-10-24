@@ -27,13 +27,27 @@ static pthread_cond_t gcv = PTHREAD_COND_INITIALIZER;   // GIL turn changed
 static pthread_cond_t scv = PTHREAD_COND_INITIALIZER;   // some object changed state
 static unsigned long next_ticket, serving, gen;
 
+#define QUANTUM_US 20000
+// A guest loop holds the GIL while threads that Windows runs on other cores wait: the movie clock is a one-shot
+// winmm timer (0x63eaa0) that re-arms itself and wakes the scheduler thread 0x63ea00, which counts the tick
+// [0x70fe28] the decoder 0x645a77 spins on. Two GIL hand-offs per tick: at a 20 ms quantum the title movie ran
+// ~20x slow and "Press enter" never came. A waiter asks the looping holder to yield after 2 ms.
+#define PREEMPT_US 2000
+volatile int rn_preempt;
 static uint64_t slice_start, hold_start;
 static __thread int is_main;
 void gil_acquire(void) {
     uint64_t t0 = now_us();
     pthread_mutex_lock(&gm);
     unsigned long t = next_ticket++;
-    while (t != serving) pthread_cond_wait(&gcv, &gm);
+    while (t != serving) {
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        uint64_t ns = (uint64_t)ts.tv_nsec + PREEMPT_US * 1000ull;
+        ts.tv_sec += ns / 1000000000ull;
+        ts.tv_nsec = ns % 1000000000ull;
+        if (pthread_cond_timedwait(&gcv, &gm, &ts) && t != serving) rn_preempt = 1;   // the holder ran a quantum
+    }
     pthread_mutex_unlock(&gm);
     slice_start = hold_start = now_us();
     *(is_main ? &rn_telem.gil_main_ms : &rn_telem.gil_other_ms) += (double)(slice_start - t0) / 1000;
@@ -43,7 +57,6 @@ void gil_acquire(void) {
 // once it has run a quantum (since it got the GIL) while another thread waits for the GIL.
 // This runs at every API call (thousands per frame): with no waiter it reads no clock (a clock read
 // is a call out to JS on the web), and with one it reads the clock every 16th call.
-#define QUANTUM_US 20000
 #define SPIN_QUANTUM_US 2000
 static int spinners;     // threads that gave the GIL away at a clock read (gil_clock) and wait to get it back
 void gil_slice(void) {
@@ -64,6 +77,12 @@ void gil_clock(void) {
     gil_release();
     gil_acquire();
     __atomic_sub_fetch(&spinners, 1, __ATOMIC_RELAXED);
+}
+// The GIL holder at a backward jump after a waiter's quantum ran out (rt.h PREEMPT).
+void gil_preempt(void) {
+    rn_preempt = 0;
+    gil_release();
+    gil_acquire();
 }
 static void count_hold(void) {
     double held = (double)(now_us() - hold_start) / 1000, *m = is_main ? &rn_telem.hold_main_max_ms : &rn_telem.hold_other_max_ms;

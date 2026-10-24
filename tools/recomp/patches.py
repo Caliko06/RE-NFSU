@@ -3,17 +3,17 @@
 The lifter, the difftest and the loader (build/gen/table.c -> host/main.c) all see the patched image.
 Each entry checks the original bytes first; a mismatch stops the build.
 """
-import os
-
 PATCHES = [
-    # PATCH: 0x4f5891, temporary: game/ has no MOVIES\ (disc 2), so the boot screen LS_EAlogo waits forever for
-    # "movie done". The movie message handler (0x4f5860, msg type 7) posts that message (0xc3960eb9, the way the
-    # player does at 0x5a4c31: push msg, edx = 0x746104, call 0x4f3dc0) instead of checking the file and starting
-    # it. Active only while game/MOVIES is missing: adding the folder removes the patch at the next build.
-    dict(addr=0x4f5891,
-         old="e80a6c140083c40484c07410568d4c24106a0151e8a6f10a0083c40c",
-         new="83c404" "68b90e96c3" "ba04617400" "e81de5ffff" + "90" * 10,
-         when=lambda: not os.path.isdir("game/MOVIES")),
+    # PATCH: 0x4f5891 (+ caves 0x43a001, 0x438eb1, 0x438b41: CC padding, no reference), a missing movie file: the movie
+    # message handler (0x4f5860, msg type 7) builds MOVIES\<name>.mad (0x4f57a0), checks it (0x63c4a0) and starts the
+    # player only if it exists. On a miss it posts nothing, so the screen waits forever for "movie done". The boot screen
+    # 0x4deaa0 always asks for "na_boot" (SKU [0x734998] is .bss with no writer, so 0), and game/Movies (23 files) has no
+    # na_boot.mad. The check now goes through the caves: on a miss they post "movie done" (0xc3960eb9, the way the player
+    # does at 0x5a4c31: push msg, edx = 0x746104, call 0x4f3dc0, ret 4) and return 0. Movies that exist play as before.
+    dict(addr=0x4f5891, old="e80a6c1400", new="e86b47f4ff", when=lambda: True),
+    dict(addr=0x43a001, old="cc" * 15, new="ff742404e89624200059e9a1eeffff", when=lambda: True, entry=True),
+    dict(addr=0x438eb1, old="cc" * 15, new="84c07401c368b90e96c3e981fcffff", when=lambda: True),
+    dict(addr=0x438b41, old="cc" * 13, new="ba04617400e875b20b0030c0c3", when=lambda: True),
     # PATCH: 0x40877e, widescreen: 0x408760 applies the resolution option [0x700e70] through a table of five fixed
     # 4:3 sizes (640x480 ... 1280x1024). Every size now comes from the screen size the layer keeps at
     # SCREEN_ADDR 0x13000 (width, height; host.h): the page passes its window size as RN_SCREEN. The guards at

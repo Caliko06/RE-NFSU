@@ -3,6 +3,8 @@ import sys, os, torch, numpy as np, spandrel
 from PIL import Image
 lst, src, out, sr, pre = sys.argv[1:6]
 dev = 'cuda'
+# A shared GPU (Pod B: MaxPayne too): GPU_GB caps this process's CUDA memory.
+if os.environ.get('GPU_GB'): torch.cuda.set_per_process_memory_fraction(float(os.environ['GPU_GB']) * 2**30 / torch.cuda.get_device_properties(0).total_memory)
 # fp32: MW measured bf16/fp16 below fp32 on 4x-UltraSharpV2 (DAT2).
 def load(f): return spandrel.ModelLoader().load_from_file(f).to(dev).eval()
 M = load(sr); P = load(pre) if pre != '-' else None

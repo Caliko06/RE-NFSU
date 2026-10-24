@@ -16,6 +16,8 @@ import abk, patches
 CHUNKS = 160
 GEN = "build/gen"
 FUNCS = {int(l.split()[0], 16): l.split()[1] for l in open("census/speed_exe_functions.tsv")}
+# The census reads the unpatched exe: a PATCH cave reached by a call is a function entry of its own.
+FUNCS.update({p["addr"]: "call" for p in patches.active() if p.get("entry")})
 L = None
 # RN_JOBS caps both pools: a pod quota is smaller than os.cpu_count() and freezes the container when exceeded.
 JOBS = int(os.environ.get("RN_JOBS") or os.cpu_count())

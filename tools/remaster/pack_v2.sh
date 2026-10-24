@@ -4,14 +4,19 @@
 # 28 dB to the soft fallback (deblock + Lanczos x4). Ships WebP (ship_webp.py) and deletes the PNGs of each stage.
 # Models: /root/rm2/m (4x-UltraSharpV2.safetensors from RE-NFSMW, 1x-BCGone-Smooth.pth). venv: RE-NFSMW upvenv.
 # Output /root/rm2/out/{world2,cars2}/<hash>.webp + index_world_v2.tsv, index_v2.tsv. usage: pack_v2.sh [SHARDS]
+# SETS=fe pack_v2.sh: the front end, HUD and global packs (FrontEnd/, Global/), into fe2/ + index_fe_v2.tsv.
 # SETS=extra pack_v2.sh: the world textures the first pass left out (TEX*TRACK.BIN, and sides of 1024), added to world2.
 set -euo pipefail
-R=/root/RE-NFSU; W=/root/rm2; PY=/root/RE-NFSMW/build/upvenv/bin/python; T=$R/tools/remaster; N=${1:-3}
+R=/root/RE-NFSU; W=/root/rm2; PY=${PY:-/root/RE-NFSMW/build/upvenv/bin/python}; T=$R/tools/remaster; N=${1:-3}
 export OMP_NUM_THREADS=${OMP_NUM_THREADS:-1}   # the GPU does the work: ~1 core per shard
 cd $W
-[ -f world.tsv ] || $PY $T/decode_world.py $W/world $R/game/Tracks/STREAML1R*.BUN
-[ -d cars ] || { mkdir -p cars; $PY $T/decode_all.py $W/cars; }
 SETS=${SETS:-world cars}
+if [ "$SETS" = fe ]; then
+  [ -d fe ] || $PY $T/decode_world.py $W/fe $R/game/FrontEnd/{FrontB.lzc,MAGAZINE_TEXTURES.BIN,TSELECT.BIN} $R/game/Global/{INGAMEB.BUN,DYNTEX.BIN,GLOBALA.BUN,GLOBALB.BUN,HUDTEX.BIN}
+else
+  [ -f world.tsv ] || $PY $T/decode_world.py $W/world $R/game/Tracks/STREAML1R*.BUN
+  [ -d cars ] || { mkdir -p cars; $PY $T/decode_all.py $W/cars; }
+fi
 if [ "$SETS" = extra ] && [ ! -d extra ]; then
   $PY $T/decode_world.py $W/extra.tex $R/game/Tracks/TEX*TRACK.BIN
   mkdir extra; cut -f1 world.tsv | sed 's/$/.png/' > world.have
@@ -25,7 +30,7 @@ from PIL import Image
 s = sys.argv[1]; keep = []
 for f in sorted(os.listdir(s)):
     w, h = Image.open(f'{s}/{f}').size
-    if min(w, h) >= 32 and max(w, h) < (2048 if s == 'extra' else 1024): keep.append(f)
+    if min(w, h) >= 32 and max(w, h) < (2048 if s in ('extra', 'fe') else 1024): keep.append(f)
 open(f'{s}.lst', 'w').write('\n'.join(keep) + '\n'); print(s, len(keep), 'of', len(os.listdir(s)))
 PY
   for pass in us db; do
@@ -52,6 +57,10 @@ PY
   rm -rf $set.us $set.db
   $PY $T/ship_webp.py $set.fin out/$set.webp && rm -rf $set.fin
 done
+if [ "$SETS" = fe ]; then
+  mv out/fe.webp out/fe2; for f in $(ls out/fe2); do echo -e "${f%.webp}\tfe2/$f"; done > out/index_fe_v2.tsv
+  echo PACK-V2-FE-DONE $(wc -l < out/index_fe_v2.tsv); exit
+fi
 if [ "$SETS" = extra ]; then
   for f in $(ls out/extra.webp); do mv out/extra.webp/$f out/world2/; echo -e "${f%.webp}\tworld2/$f" >> out/index_world_v2.tsv; done
   rmdir out/extra.webp; echo PACK-V2-EXTRA-DONE $(wc -l < out/index_world_v2.tsv); exit

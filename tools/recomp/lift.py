@@ -297,8 +297,8 @@ class Lifter:
         return f"{{ {self.save()} {call} return; }}"
 
     def jump(self, t, cond=None):
-        if t in self.labels:
-            s = f"goto L{t:x};"
+        if t in self.labels:   # a backward jump closes a loop: a preemption point (rt.h PREEMPT)
+            s = f"{{ PREEMPT(); goto L{t:x}; }}" if t <= self.i.address else f"goto L{t:x};"
         elif t in self.lifted:
             s = self.tail(None, t)
         else:

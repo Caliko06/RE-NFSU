@@ -19,6 +19,8 @@ void rn_call(Ctx *c, uint32_t t) {
     if (mod) { c->mb = mb; mod(c); return; }
     c->halt = 1; c->halt_at = t; c->why = "no lifted function";
 }
+volatile int rn_preempt;
+void gil_preempt(void) {}
 uint64_t rn_rdtsc(Ctx *c) { (void)c; return 0x123456789abcull; }
 
 // Random test data without signaling-NaN floats/doubles (QEMU 5 keeps an sNaN on fld; the SDM quiets it).

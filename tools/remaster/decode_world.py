@@ -1,6 +1,6 @@
 """Decode every unique world texture (STREAML1R*.BUN) to OUT/<fnv64 of level 0>.png (RGBA) and write OUT.tsv:
 hash, name(=hash), w, h, comp, source. The hash is the one web/gpu.js looks up at UnlockRect (index.py: FNV-1a 64 of the level-0 bytes).
-usage: decode_world.py OUT game/TRACKS/STREAML1R?.BUN game/TRACKS/STREAML1R?_*.BUN"""
+usage: decode_world.py OUT game/TRACKS/STREAML1R?.BUN game/TRACKS/STREAML1R?_*.BUN (also FE/HUD packs: SETS=fe pack_v2.sh)"""
 import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import census_world as cw
@@ -11,6 +11,7 @@ out = sys.argv[1]; os.makedirs(out, exist_ok=True)
 seen = {}; rows = []
 for f in sys.argv[2:]:
     d = open(f, 'rb').read()
+    if d[:4] == b'JDLZ': d = cw.jdlz(d)   # FrontB.lzc: the whole file is one JDLZ block
     for b, e in cw.tpks(d, 0, len(d)):
         for key, name, w, h, comp, raw in cw.parse(d, b, e):
             if w < 4 or h < 4: continue

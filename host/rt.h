@@ -36,6 +36,13 @@ static inline uint64_t ld64(Ctx *c, uint32_t a) { uint64_t v; memcpy(&v, c->mem 
 static inline void st64(Ctx *c, uint32_t a, uint64_t v) { memcpy(c->mem + a, &v, 8); }
 static inline int par(uint32_t v) { return !__builtin_parity(v & 0xffu); }
 
+// A guest loop that polls for another thread's work without an API call (the movie decoder 0x645a77 waits for
+// the tick the winmm timer callback 0x63eaa0 counts) never reaches gil_slice. A thread that waited a quantum for
+// the GIL sets rn_preempt; the lifted code checks it at every backward jump (host/threads.c).
+extern volatile int rn_preempt;
+void gil_preempt(void);
+#define PREEMPT() do { if (__builtin_expect(rn_preempt, 0)) gil_preempt(); } while (0)
+
 // Calls any guest or host address. Defined in host/dispatch.c.
 void rn_call(Ctx *c, uint32_t target);
 // ABK code modules lifted ahead of time (tools/recomp/abk.py -> build/gen/abk.c). Defined in host/abk.c.

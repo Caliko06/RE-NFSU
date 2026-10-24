@@ -1,5 +1,5 @@
 # Speed.exe for the Wine reference, from tools/recomp/patches.py.
-# Default: only PATCH 0x4f5891 (no MOVIES\ in game/). --set parity: every active PATCH, as ours has them, for one screen
+# Default: only PATCH 0x4f5891 and its caves (a missing movie file posts "movie done"). --set parity: every active PATCH, as ours has them, for one screen
 # size WxH (4:3 or narrower). Wine has no layer to write SCREEN_ADDR 0x13000, so the reads of the size there become
 # immediates (same bytes count), the 2D scale PATCHes 0x40bf.. are left out (they are the identity at 4:3), and the seed
 # PATCH 0x4470f0 is `mov edi,K; jmp 0x447110` with K from --seed (ours reads K from 0x13010 through the cave 0x408814).
@@ -45,7 +45,7 @@ if a.set == 'parity':
     print('.bss PATCHes written by the seed block:', ' '.join(f"{p['addr']:#x}" for p in bss))
     print('left out (read 0x13000):', ' '.join(f"{p['addr']:#x}" for p in patches.active() if screen(imm(p))))
 else:
-    ps = [p for p in patches.PATCHES if p['addr'] == 0x4f5891]
+    ps = [p for p in patches.PATCHES if p['addr'] in (0x4f5891, 0x43a001, 0x438eb1, 0x438b41)]
 for p in ps:
     off = pe.get_offset_from_rva(p['addr'] - 0x400000)
     old, new = bytes.fromhex(p['old']), bytes.fromhex(p['new'])
