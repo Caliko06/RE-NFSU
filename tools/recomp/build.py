@@ -102,7 +102,7 @@ def compile_native():
     run_jobs(jobs)
     objs = ["build/obj/" + os.path.basename(s)[:-2] + ".o" for s in srcs]
     subprocess.run(["clang", "-O1", "-g", "-Wall", "-Wno-unused-function", "-Ihost", f"-I{GEN}", *HOST, *objs,
-                    "-o", "build/speed"], check=True)
+                    "-lm", "-o", "build/speed"], check=True)
     print("built build/speed")
 
 

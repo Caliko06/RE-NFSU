@@ -27,7 +27,7 @@ def report(name):
     log = [l.rstrip('\n') for l in open(f'{OUT}/{name}.log', errors='replace')]
     ev = []
     for l in log:
-        m = re.match(r'([\d.]+) (flow (\S+)|key down (\S+)|d3d9 first Present|d3d9 race HUD)', l)
+        m = re.match(r'([\d.]+) (flow (state \S+|\S+)|key down (\S+)|d3d9 first Present|d3d9 race HUD)', l)
         if m: ev.append((float(m.group(1)), m.group(3) or (m.group(4) and 'key ' + m.group(4)) or m.group(2)))
     rows, cols = [], None
     for l in open(f'{OUT}/{name}.ndjson'):

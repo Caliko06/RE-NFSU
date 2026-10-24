@@ -3,6 +3,7 @@
 // Native: the folder on disk. Web: tools/serve.py; the game thread reads byte ranges with synchronous
 // XHR (allowed in its worker), through a read-ahead buffer, so only what the game opens is fetched.
 #include <ctype.h>
+#include <sched.h>
 #include <strings.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -10,15 +11,16 @@
 
 #define MAXF 256
 #define AHEAD (256u << 10)
+#define AHEAD_MAX (4u << 20)
 // Save files live whole in memory (data): changed there, written back whole by gf_flush and gf_close.
 typedef struct {
-    int used, save, dirty;
+    int used, save, dirty, busy;
     uint64_t size, cap;
     char real[512];
     FILE *f;
     uint8_t *buf, *data;
-    uint64_t buf_off;
-    uint32_t buf_len;
+    uint64_t buf_off, next;               // next: where the last request ended
+    uint32_t buf_len, buf_cap, ahead;
 } GFile;
 static GFile files[MAXF];
 static char root[1024], save_root[1024];
@@ -217,11 +219,19 @@ void gf_close(int id) {
 }
 // Reads up to n bytes at off; returns the count (short at the end of the file), -1 on an I/O error.
 #ifdef __EMSCRIPTEN__
-// One request to the server, counted for the telemetry (the callers hold the GIL).
-static int timed_read(const char *real, uint64_t at, uint8_t *dst, uint32_t n) {
+// One request to the server, counted for the telemetry. The callers hold the GIL; ReadFile blocks only the calling
+// thread on Windows, so the request runs without it and the other guest threads go on (the main loop drew nothing
+// while the file thread 0x63e4d0 waited for the server: 1.1 s of the menu->race load, telemetry 2026-10-24).
+// g->busy keeps a second thread off the same file (its read-ahead buffer) until the request is back (gf_read).
+static int timed_read(GFile *g, uint64_t at, uint8_t *dst, uint32_t n) {
+    g->busy = 1;
+    gil_release();
     uint64_t t0 = now_us();
-    int r = web_read(real, (double)at, dst, (int)n);
-    rn_telem.read_ms += (double)(now_us() - t0) / 1000;
+    int r = web_read(g->real, (double)at, dst, (int)n);
+    uint64_t t1 = now_us();
+    gil_acquire();
+    g->busy = 0;
+    rn_telem.read_ms += (double)(t1 - t0) / 1000;
     rn_telem.reads++;
     rn_telem.read_kb += (r > 0 ? (uint32_t)r : 0) >> 10;
     return r;
@@ -233,6 +243,7 @@ int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
     if (n > g->size - off) n = (uint32_t)(g->size - off);
     if (g->save) { memcpy(dst, g->data + off, n); return n; }
 #ifdef __EMSCRIPTEN__
+    while (g->busy) { gil_release(); sched_yield(); gil_acquire(); }
     uint32_t done = 0;
     while (done < n) {
         uint64_t at = off + done;
@@ -243,19 +254,25 @@ int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
             done += k;
             continue;
         }
+        // A request costs ~2 ms on top of its bytes (telemetry 2026-10-24: 256 KB in 2.2-3.5 ms), and a track loads
+        // in 256 KB steps. While the reads of a file run on in sequence the read-ahead doubles, up to AHEAD_MAX.
         uint32_t want = n - done;
-        if (want >= AHEAD) {        // large reads go straight to the destination
-            int r = timed_read(g->real, at, dst + done, want);
+        uint32_t ahead = g->ahead && at == g->next ? (g->ahead < AHEAD_MAX ? 2 * g->ahead : AHEAD_MAX) : AHEAD;
+        g->ahead = ahead;
+        if (want >= ahead) {        // large reads go straight to the destination
+            int r = timed_read(g, at, dst + done, want);
             if (r <= 0) return -1;
             done += (uint32_t)r;
+            g->next = at + (uint32_t)r;
             continue;
         }
-        if (!g->buf) g->buf = malloc(AHEAD);
-        uint32_t len = g->size - at < AHEAD ? (uint32_t)(g->size - at) : AHEAD;
-        int r = timed_read(g->real, at, g->buf, len);
+        if (g->buf_cap < ahead) { free(g->buf); g->buf = malloc(ahead); g->buf_cap = ahead; g->buf_len = 0; }
+        uint32_t len = g->size - at < ahead ? (uint32_t)(g->size - at) : ahead;
+        int r = timed_read(g, at, g->buf, len);
         if (r <= 0) return -1;
         g->buf_off = at;
         g->buf_len = (uint32_t)r;
+        g->next = at + (uint32_t)r;
     }
     return done;
 #else

@@ -786,15 +786,18 @@ static void rng_log(Ctx *c, uint32_t frame) {
     prev = x;
 }
 // RN_FLOWLOG: each new game-flow label [0x77a90c] (a string in .rdata, e.g. 0x6c9c3c "EndGameFlowLoadingTrackSpecific")
-// at the Present that first sees it: the bounds of the loads (tools/bench.py).
+// at the Present that first sees it: the bounds of the loads (tools/bench.py). Also each new game-flow state [0x77a920]
+// (written at 0x448b11 .. 0x449a15: 1 loading FE, 2 unloading FE, 3 FE, 4/5 loading track, 6 race, 7 unloading track).
 static void flow_log(Ctx *c) {
     static int on = -1;
-    static uint32_t prev;
+    static uint32_t prev, prev_st;
     if (on < 0) on = getenv("RN_FLOWLOG") != NULL;
     if (!on) return;
-    uint32_t lb = ld(c, 0x77a90c, 4);
+    uint32_t lb = ld(c, 0x77a90c, 4), rs = ld(c, 0x7361f0, 4), st = ld(c, 0x77a920, 4) << 8 | (rs ? ld(c, rs, 4) & 0xff : 0xff);
     if (lb != prev && lb >= 0x697000 && lb < 0x6d4000) rn_log("flow %.64s (frame %u)", G(lb), dev.frames);
-    prev = lb;
+    // [[0x7361f0]]: the race's own state; 0x447600 and the draws read state 6 with it == 1 as "not racing yet"
+    if (st != prev_st) rn_log("flow state %u/%d (frame %u)", st >> 8, st & 0xff, dev.frames);
+    prev = lb, prev_st = st;
 }
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
