@@ -1051,6 +1051,25 @@ static void upload_level(Ctx *c, Obj *s) {
         if (log) rn_log("d3d9 texhash %016llx %ux%u fmt %08x id %x", (unsigned long long)h, s->w, s->h, s->fmt, s->container);
         uint32_t k3[3] = {s->container, (uint32_t)h, (uint32_t)(h >> 32)};
         gpu_cmd(GPU_TEXKEY, 3, k3);
+        // RN_TEXDUMP=1: each level-0 content once to save/texdump/<key>.bin (w, h, fmt, pitch, then the locked bytes), for the
+        // remaster pack: the exact texels the game uploads, whatever container they came from (tools/remaster/texdump.py).
+        static int dump = -1;
+        if (dump < 0) { dump = getenv("RN_TEXDUMP") != NULL; if (dump) gf_mkdir("C:/Documents and Settings/All Users/Application Data/NFS Underground/texdump"); }
+        static uint64_t dumped[16384]; static uint32_t ndumped;
+        if (dump && ndumped < 16384) {
+            uint32_t k = 0;
+            while (k < ndumped && dumped[k] != h) k++;
+            if (k == ndumped) {
+                dumped[ndumped++] = h;
+                uint32_t m = s->pitch * (is_dxt(s->fmt) ? (s->h + 3) / 4 : s->h), hd[4] = {s->w, s->h, s->fmt, s->pitch};
+                uint8_t *b = malloc(16 + m);
+                memcpy(b, hd, 16); memcpy(b + 16, p, m);
+                char name[64];
+                snprintf(name, sizeof name, "texdump/%016llx.bin", (unsigned long long)h);
+                layer_store(name, b, (int)(16 + m));
+                free(b);
+            }
+        }
     }
 }
 // BRIDGE: HD car skins, 0x5a8a50, OWNER 2026-10-23 (remaster scope). The game composites DUMMY_SKINn on the CPU at 512 from
@@ -1938,6 +1957,18 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     }
     uint32_t s_rs = dev.rs[174], s_sc[4];
     memcpy(s_sc, dev.scissor, 16);
+    // A 2D-only frame (no indexed draw yet: loading and title screens) has nothing under the margins of the 4:3 island, so they
+    // kept the last 3D frame (the garage behind the loading screen). The original at 4:3 has no margins: they are black.
+    static uint32_t margin_frame = ~0u;
+    if (isl && !hud && !(dip_frame == dev.frames && dip_n > 0) && margin_frame != dev.frames) {
+        margin_frame = dev.frames;
+        uint32_t iw = (uint32_t)rn_screen_h * 4 / 3, x0 = ((uint32_t)rn_screen_w - iw) / 2;
+        uint32_t m[2][4] = {{0, 0, x0, (uint32_t)rn_screen_h}, {x0 + iw, 0, (uint32_t)rn_screen_w, (uint32_t)rn_screen_h}};
+        for (int k = 0; k < 2; k++) {
+            uint32_t w[10] = {rt->gpu, 0, 1, 0xff000000u, 0, 0, m[k][0], m[k][1], m[k][2], m[k][3]};
+            gpu_cmd(GPU_CLEAR, 10, w);
+        }
+    }
     if (isl && !moved) {
         uint32_t iw = (uint32_t)rn_screen_h * 4 / 3, x0 = ((uint32_t)rn_screen_w - iw) / 2;
         dev.rs[174] = 1; dev.scissor[0] = x0; dev.scissor[1] = 0; dev.scissor[2] = x0 + iw; dev.scissor[3] = (uint32_t)rn_screen_h;
