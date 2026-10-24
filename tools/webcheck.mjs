@@ -5,7 +5,7 @@
 // "60:KeyW+6" holds it 6 seconds (released on the first check after that).
 // node tools/webcheck.mjs --route: the regression route; exit 0 = PASS. It grows with each milestone met.
 import { spawn } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -87,6 +87,22 @@ if (route) await send('Emulation.setDeviceMetricsOverride', { ...ROUTE.view, dev
 // RN_VIEW=WxH@dpr: the page at the OWNER's window size and pixel ratio (a stop can depend on the back buffer size).
 const view = process.env.RN_VIEW?.match(/^(\d+)x(\d+)@([\d.]+)$/);
 if (view) await send('Emulation.setDeviceMetricsOverride', { width: +view[1], height: +view[2], deviceScaleFactor: +view[3], mobile: false });
+// RN_REC=dir: every frame the compositor makes (CDP screencast, jpeg) -> dir/<page ms>.jpg; tools/recvideo.sh turns them
+// into a video with the real frame times (A/B against the Wine reference recording, tools/wine/rec.sh).
+const rec = process.env.RN_REC;
+if (rec) {
+  mkdirSync(rec, { recursive: true });
+  const onmsg = ws.onmessage;
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.method === 'Page.screencastFrame') {
+      writeFileSync(join(rec, `${Math.round(m.params.metadata.timestamp * 1000)}.jpg`), Buffer.from(m.params.data, 'base64'));
+      ws.send(JSON.stringify({ id: ++id, method: 'Page.screencastFrameAck', params: { sessionId: m.params.sessionId } }));
+    }
+    onmsg(e);
+  };
+  await send('Page.startScreencast', { format: 'jpeg', quality: 90, everyNthFrame: 1 });
+}
 await send('Page.navigate', { url });
 const t0 = Date.now();
 let text = '', seen = 0;

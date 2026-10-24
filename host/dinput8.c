@@ -171,6 +171,7 @@ static uint32_t IDirectInputDevice8A_SetCooperativeLevel(Ctx *c) {
     o->coop = flags;
     return DI_OK;
 }
+static void push(Obj *o, uint32_t ofs, uint32_t data, uint32_t app);
 static uint32_t IDirectInputDevice8A_Acquire(Ctx *c) {
     SELF(I_DEV);
     if (!o->format_set) return DIERR_INVALIDPARAM;
@@ -179,6 +180,13 @@ static uint32_t IDirectInputDevice8A_Acquire(Ctx *c) {
     o->ev_head = o->ev_tail = 0;
     o->overflow = 0;
     memset(o->axis, 0, sizeof o->axis);
+    // A key already held reports a down event once acquired. V (Wine reference 2026-10-24, tools/wine rec.sh): Up held
+    // from the intro cinematic launches the car at the start; here the race keyboard is acquired after that key went
+    // down, so without this its only down event went to no device and the car stayed on the grid.
+    if (o->kind == KEYBOARD)
+        for (int j = 0; j < o->nf; j++)
+            if (o->f[j].what >= 0x200 && input_key_down((uint8_t)(o->f[j].what - 0x200)))
+                push(o, o->f[j].ofs, 0x80, o->f[j].app);
     return DI_OK;
 }
 static uint32_t IDirectInputDevice8A_Unacquire(Ctx *c) {
