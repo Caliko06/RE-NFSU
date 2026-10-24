@@ -45,8 +45,8 @@ want={}
 for l in open('/Users/angeldamian/RE-NFSU/web/remaster/index.tsv'):
     f=l.rstrip('\n').split('\t'); want[(f[1],f[5])]=f
 out=sys.argv[1]; n=0; game='/Users/angeldamian/RE-NFSU/game'
-for car in ['']+sorted(os.listdir(game+'/CARS')):
-    fn=os.path.join(game,'CARS',car,'TEXTURES.BIN')
+for car in ['']+sorted(os.listdir(game+'/Cars')):
+    fn=os.path.join(game,'Cars',car,'TEXTURES.BIN')
     if not os.path.isfile(fn): continue
     for key,w,h,comp,raw in ns['textures'](fn):
         k=f'{key:08x}'

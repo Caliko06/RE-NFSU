@@ -36,6 +36,7 @@ static uint32_t *buf[2], bufcap[2];
 EMSCRIPTEN_KEEPALIVE uint32_t rn_gpu_mailbox(void) { return (uint32_t)(uintptr_t)&box; }
 
 void gpu_set_shot(const char *path) { (void)path; }
+void gpu_keep_frame(void) {}
 
 void gpu_submit(void) {
     uint32_t k = (box.seq + 1) & 1;
@@ -411,8 +412,19 @@ static void run_draw(const uint32_t *h) {
     free(out);
 }
 
+uint64_t now_us(void);
+static uint64_t run_us, wall0;
+// RN_RASTER=N: rasterize only every Nth frame and the frames gpu_keep_frame() asks for (resources still load every
+// frame). The game never reads a frame back (on the web it cannot), so this changes only the PNGs and the speed.
+static int every = -1, keep;
+void gpu_keep_frame(void) { keep = 1; }
 void gpu_run(const uint32_t *w, uint32_t n) {
+    static int keep_every = -1;   // RN_KEEP=N: also keep every Nth frame as <shot>.<frame>.png (a menu path, step by step)
+    if (every < 0) { const char *e = getenv("RN_RASTER"); every = e && atoi(e) > 1 ? atoi(e) : 1; }
+    if (keep_every < 0) { const char *e = getenv("RN_KEEP"); keep_every = e ? atoi(e) : 0; }
+    if (keep_every > 0 && frames % (uint32_t)keep_every == 0) keep = 1;
     for (uint32_t i = 0; i < n;) {
+        int raster = every == 1 || frames % (uint32_t)every == 0 || keep;
         uint32_t op = w[i] & 0xff, len = w[i] >> 8;
         const uint32_t *a = w + i + 1;
         i += 1 + len;
@@ -423,6 +435,7 @@ void gpu_run(const uint32_t *w, uint32_t n) {
             if (a[3] == 0) t->color = calloc((size_t)a[1] * a[2], 4);
             else { t->z = calloc((size_t)a[1] * a[2], 4); t->stencil = calloc((size_t)a[1] * a[2], 1); }
         } else if (op == GPU_CLEAR) {
+            if (!raster) continue;
             Img *rt = a[0] ? &imgs[a[0]] : NULL, *ds = a[1] ? &imgs[a[1]] : NULL;
             float z;
             memcpy(&z, &a[4], 4);
@@ -463,10 +476,17 @@ void gpu_run(const uint32_t *w, uint32_t n) {
         } else if (op == GPU_TEXKEY) {
             // the remaster pack is web only (web/gpu.js)
         } else if (op == GPU_DRAW) {
+            if (!raster) continue;
             run_draw(a);
             draws++;
         } else if (op == GPU_PRESENT) {
-            if (shot) png(shot, imgs[a[0]].color, a[1], a[2]);
+            if (shot && raster) png(shot, imgs[a[0]].color, a[1], a[2]);
+            if (shot && keep) {
+                char path[600];
+                snprintf(path, sizeof path, "%s.%u.png", shot, frames);
+                png(path, imgs[a[0]].color, a[1], a[2]);
+            }
+            keep = 0;
             // RN_SHOT_FRAMES=a-b: also keep frames a..b as <shot>.<frame>.png (debug).
             static int lo = -1, hi = -1;
             if (lo == -1) { const char *e = getenv("RN_SHOT_FRAMES"); lo = -2; if (e && sscanf(e, "%d-%d", &lo, &hi) != 2) lo = -2; }
@@ -475,7 +495,12 @@ void gpu_run(const uint32_t *w, uint32_t n) {
                 snprintf(path, sizeof path, "%s.%u.png", shot, frames);
                 png(path, imgs[a[0]].color, a[1], a[2]);
             }
-            if (frames < 3 || frames % 100 == 0) fprintf(stderr, "gpu: frame %u: %u draws\n", frames, draws);
+            // how much of the wall time the CPU backend takes (it is not the game: a slow native run is often this)
+            if (frames < 3 || frames % 100 == 0) {
+                uint64_t now = now_us();
+                fprintf(stderr, "gpu: frame %u: %u draws, raster %llu of %llu ms\n", frames, draws, (unsigned long long)run_us / 1000, (unsigned long long)(now - wall0) / 1000);
+                run_us = 0, wall0 = now;
+            }
             frames++;
             draws = 0;
         } else {
@@ -486,7 +511,9 @@ void gpu_run(const uint32_t *w, uint32_t n) {
 }
 
 void gpu_submit(void) {
+    uint64_t t = now_us();
     gpu_run(list, nlist);
+    run_us += now_us() - t;
     nlist = 0;
 }
 void gpu_wait(void) {}

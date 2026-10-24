@@ -3,7 +3,8 @@ import sys, os, torch, numpy as np, spandrel
 from PIL import Image
 lst, src, out, sr, pre = sys.argv[1:6]
 dev = 'cuda'
-def load(f): return spandrel.ModelLoader().load_from_file(f).to(dev).eval().half() if 'SwinIR' not in f else spandrel.ModelLoader().load_from_file(f).to(dev).eval()
+# fp32: MW measured bf16/fp16 below fp32 on 4x-UltraSharpV2 (DAT2).
+def load(f): return spandrel.ModelLoader().load_from_file(f).to(dev).eval()
 M = load(sr); P = load(pre) if pre != '-' else None
 @torch.no_grad()
 def run(m, x, tile=256, pad=16):

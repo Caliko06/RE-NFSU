@@ -50,6 +50,9 @@ One session on main. Each milestone has one gate: the run that proves it.
   several runs at once (AGENTS.md: one run dir per process). A row that stops is the next fix (recompiler or layer).
 - Parity: the same rows on the Wine reference (tools/wine) for the modes where ours differs or the autopilot cannot drive.
 - Gate: every row reaches "back to menu" natively, then the route grows to one full race to results in Chrome.
+- 2026-10-24 (Pod A, tools/completion.py, census/completion.json): Circuit, Sprint, Drift, Lap Knockout reach results (6/8);
+  Drag races but never finishes (autopilot, 6/4); Free Run starts. No row is back to menu yet: the post-race Leave Race taps
+  (ms@6/8) did not leave. Career (GO UNDERGROUND = UP on the main menu) and save -> reload rows not written yet.
 
 ## M9 Play, ends at 5180
 - The OWNER plays the career in Chrome at http://127.0.0.1:5180/, full window, 16:9.

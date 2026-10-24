@@ -1,6 +1,7 @@
 // The keyboard and mouse of this PC. One source feeds them: the browser (web/input.js writes key and
 // mouse events into a ring in the shared heap) or, native, a script in RN_KEYS for off-screen runs:
-// RN_KEYS="3000:RETURN,4500:DOWN" taps each key (100 ms down) at that many ms after start.
+// RN_KEYS="3000:RETURN,4500:DOWN" taps each key (100 ms down) at that many ms after start. "3000@6/8:DOWN" taps it
+// 3000 ms after the game-flow state 6 / race state 8 (RN_FLOWLOG, host/d3d9.c) is first seen once the taps before it are done.
 // input_poll() hands new events to the key state, the DirectInput devices and the window messages.
 #include <strings.h>
 #include "host.h"
@@ -150,7 +151,7 @@ void input_poll(void) {
 }
 #else
 void input_mouse_exclusive(int on) { (void)on; }
-typedef struct { uint64_t at_us; uint8_t dik; } Tap;
+typedef struct { uint64_t at_us; uint8_t dik; uint32_t cond; } Tap;   // cond: flow state to wait for, ~0 = none
 static Tap taps[256];
 static int ntaps, script_read;
 static unsigned next_tap;
@@ -159,25 +160,34 @@ static void read_script(void) {
     const char *s = getenv("RN_KEYS");
     while (s && *s && ntaps < 256) {
         char name[32];
-        unsigned ms;
+        unsigned ms, fs, rs;
+        uint32_t cond = ~0u;
         int used;
-        if (sscanf(s, "%u:%31[A-Z0-9_]%n", &ms, name, &used) != 2) { rn_log("RN_KEYS: cannot read \"%s\"", s); break; }
+        if (sscanf(s, "%u@%u/%u:%31[A-Z0-9_]%n", &ms, &fs, &rs, name, &used) == 4) cond = fs << 8 | (rs & 0xff);
+        else if (sscanf(s, "%u:%31[A-Z0-9_]%n", &ms, name, &used) != 2) { rn_log("RN_KEYS: cannot read \"%s\"", s); break; }
         const Key *k = NULL;
         for (int j = 0; j < NKEYS && !k; j++) if (!strcasecmp(keys[j].name, name)) k = &keys[j];
         if (!k) { rn_log("RN_KEYS: no key %s", name); break; }
-        taps[ntaps++] = (Tap){(uint64_t)ms * 1000, k->dik};
+        taps[ntaps++] = (Tap){(uint64_t)ms * 1000, k->dik, cond};
         s += used;
         while (*s == ',' || *s == ' ') s++;
     }
 }
-// Each tap is a down event at its time and an up event 100 ms later, in time order.
+// Each tap is a down event at its time and an up event 100 ms later, in time order. The up waits two more frames
+// (Presents): a slow frame (a rasterized RN_RASTER frame takes ~1 s) would else see both edges and no key down.
 void input_poll(void) {
+    static uint32_t down_at;
     if (!script_read) read_script();
     uint64_t now = now_us();
     while (next_tap < 2u * (unsigned)ntaps) {
         unsigned k = next_tap / 2;
+        if (!(next_tap & 1) && taps[k].cond != ~0u) {   // anchor a flow-state tap when its state shows up
+            if (rn_flow != taps[k].cond) break;
+            taps[k].at_us += now, taps[k].cond = ~0u;
+        }
         uint64_t at = taps[k].at_us + (next_tap & 1 ? 100000 : 0);
-        if (at > now) break;
+        if (at > now || ((next_tap & 1) && rn_telem.presents - down_at < 2)) break;
+        if (!(next_tap & 1)) down_at = rn_telem.presents;
         key_event(taps[k].dik, !(next_tap & 1));
         next_tap++;
     }

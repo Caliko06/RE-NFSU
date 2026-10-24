@@ -54,6 +54,7 @@ void gpu_submit(void);                  // run or hand off the list, then start 
 void gpu_wait(void);                    // web: wait until the page is at most one part behind (call without the GIL)
 uint32_t gpu_pending(void);             // words in the list not handed off yet
 void gpu_set_shot(const char *path);    // native: write every presented frame to this PNG
+void gpu_keep_frame(void);              // native: rasterize this frame and also keep it as <shot>.<frame>.png
 
 // Backend side: the frame's words.
 void gpu_run(const uint32_t *w, uint32_t n);

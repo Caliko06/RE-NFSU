@@ -51,6 +51,7 @@ const Api *find_api(const char *dll, const char *name);
 uint32_t call_guest(Ctx *c, uint32_t fn, int n, const uint32_t *args);
 uint32_t host_addr_of(const char *dll, const char *name);     // HOST_BASE address, registering if needed
 void rn_halt(Ctx *c, const char *fmt, ...);
+extern uint32_t rn_flow;   // RN_FLOWLOG: game-flow state << 8 | race state (RN_KEYS "ms@S/R:KEY")
 extern int rn_screen_w, rn_screen_h;   // the desktop the game sees: RN_SCREEN=WxH (the page passes its window size)
 void rn_log(const char *fmt, ...);
 int rn_trace(void);

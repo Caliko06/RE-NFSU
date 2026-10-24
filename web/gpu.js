@@ -45,7 +45,10 @@ async function startGpu(M, canvas, report, onFrame) {
   let packed = 0;
   if (new URLSearchParams(location.search).get('remaster') !== '0') {
     // ?worldhd=1 adds the world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh): opt-in, the world look stays 2003 by default.
-    const lists = ['remaster/index.tsv'].concat(new URLSearchParams(location.search).get('worldhd') === '1' ? ['remaster/index_world.tsv'] : []);
+    // Pack v2 (tools/remaster/pack_v2.sh: deblock + 4x-UltraSharpV2) overrides the v1 entries it has; ?pack=1 = v1 only.
+    const q = new URLSearchParams(location.search), v2 = q.get('pack') !== '1', world = q.get('worldhd') === '1';
+    const lists = ['remaster/index.tsv', ...(v2 ? ['remaster/index_v2.tsv'] : []),
+      ...(world ? ['remaster/index_world.tsv', ...(v2 ? ['remaster/index_world_v2.tsv'] : [])] : [])];
     for (const u of lists) try {
       const r = await fetch(u);
       if (r.ok) for (const l of (await r.text()).split('\n')) { const f = l.split('\t'); if (f[1]) pack.set(f[0], f[1]); }
