@@ -119,10 +119,12 @@ void rn_call(Ctx *c, uint32_t target) {
     rn_halt(c, "no lifted function at %08x (bytes %s, return address %08x)", target, hex, ld(c, c->r[ESP], 4));
 }
 
+// RN_APIRING=1: also the last API calls. The end is read once: the other threads keep calling (at RN_SECS the game still
+// runs), and a loop bound on the live ring_n never ended (GBs of log per matrix run, Pod disk full, 2026-10-24).
 void dispatch_report(void) {
-    unsigned n = ring_n < RING ? ring_n : RING;
-    rn_log("last %u API calls (oldest first):", n);
-    for (unsigned k = ring_n - n; k < ring_n; k++)
+    unsigned end = ring_n, n = end < RING ? end : RING;
+    if (getenv("RN_APIRING")) rn_log("last %u API calls (oldest first):", n);
+    for (unsigned k = end - n; k < end && getenv("RN_APIRING"); k++)
         rn_log("  %s!%s  <- %08x", hosts[ring[k % RING]].dll, hosts[ring[k % RING]].name, ring_ret[k % RING]);
     int used = 0;
     for (int k = 0; k < nhosts; k++) used += hosts[k].calls != 0;

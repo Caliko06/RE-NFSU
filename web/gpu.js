@@ -26,6 +26,8 @@ async function startGpu(M, canvas, report, onFrame) {
   if (!navigator.gpu) throw new Error('WebGPU no disponible');
   const adapter = await navigator.gpu.requestAdapter();
   if (!adapter) throw new Error('WebGPU: sin adaptador');
+  // Which GPU drew (the Pod's Chrome must get the NVIDIA, not SwiftShader).
+  report(`gpu.js: adapter ${adapter.info?.vendor || '?'} ${adapter.info?.architecture || ''} ${adapter.info?.description || ''}`);
   // timestamp-query (when the adapter has it): GPU time of each frame's passes, reported with the frame log (gpu.js ts).
   const TS = adapter.features.has('timestamp-query');
   const device = await adapter.requestDevice(TS ? { requiredFeatures: ['timestamp-query'] } : undefined);

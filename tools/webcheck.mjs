@@ -25,8 +25,12 @@ const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).ma
 rmSync('build/save-headless', { recursive: true, force: true });
 const port = Number(process.env.RN_CDP_PORT || 9333);   // another session may hold 9333: then use your own
 const profileDir = mkdtempSync(join(tmpdir(), 'rn-'));
-const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
-  '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profileDir}`,
+// RN_X11=1 (Pod, AGENTS.md): headless Chrome on Linux gets SwiftShader, so Chrome runs on an Xvfb DISPLAY with Vulkan,
+// which gives WebGPU the NVIDIA. The user agent still says HeadlessChrome: tools/serve.py tells test runs apart by it.
+const x11 = process.env.RN_X11 ? ['--ozone-platform=x11', '--enable-features=Vulkan', '--ignore-gpu-blocklist', '--no-sandbox',
+  '--user-agent=Mozilla/5.0 (X11; Linux x86_64) HeadlessChrome webcheck'] : ['--headless=new'];
+const chrome = spawn(process.env.RN_CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
+  ...x11, `--remote-debugging-port=${port}`, `--user-data-dir=${profileDir}`,
   '--no-first-run', '--enable-unsafe-webgpu', '--mute-audio', '--window-size=1280,1100', 'about:blank'], { stdio: 'ignore' });
 // Each profile is ~330 MB: 107 left behind filled 29 GB of the Mac. Removed on every exit.
 process.on('exit', () => { chrome.kill('SIGKILL'); try { rmSync(profileDir, { recursive: true, force: true }); } catch {} });
