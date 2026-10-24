@@ -48,6 +48,8 @@ if (prof) {
   await send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true });
 }
 let profState = 0;
+const afterHud = process.env.RN_AFTER_HUD ? Number(process.env.RN_AFTER_HUD) : -1;
+let hudAt = 0;
 async function profile() {
   if (profState === 0 && Date.now() - t0 >= prof[0] * 1000) {
     profState = 1;
@@ -108,6 +110,10 @@ while (Date.now() - t0 < secs * 1000) {
   if (/STOP|Falta COOP/.test(text)) break;
   if (route && !seen && ROUTE.marker.test(text)) seen = Date.now();
   if (seen && Date.now() - seen >= ROUTE.hold * 1000) break;
+  // RN_AFTER_HUD=s: the shot s seconds after the race HUD appears (the race starts at a different second each run, so a
+  // shot at a fixed page time shows a different moment: camera-dependent effects then look like regressions).
+  if (afterHud >= 0 && !hudAt && /d3d9 race HUD /.test(text)) hudAt = Date.now();
+  if (hudAt && Date.now() - hudAt >= afterHud * 1000) break;
 }
 await sleep(500);   // let the last frame reach the canvas
 const png = await send('Page.captureScreenshot', { format: 'png' });

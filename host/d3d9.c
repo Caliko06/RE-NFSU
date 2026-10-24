@@ -1869,8 +1869,11 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
     return 1;
 }
 // DrawIndexedPrimitive(Type, BaseVertexIndex, MinVertexIndex, NumVertices, StartIndex, PrimitiveCount)
+static uint32_t dip_frame, dip_n;   // indexed draws so far in this frame (the race HUD bridge: is there a 3D scene under the quads?)
 static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     DEV();
+    if (dip_frame != dev.frames) { dip_frame = dev.frames; dip_n = 0; }
+    dip_n++;
     if (!prim_ok(ARG(1), ARG(6)) || !dev.stream[0].vb || !dev.ib) return D3DERR_INVALIDCALL;
     if (cen_on > 0) census_draw(c, ARG(6));
     static long skip_vs = -2;   // RN_SKIPVS=<hex id>: drop every indexed draw of that vertex shader (find which family is the car)
@@ -1913,13 +1916,18 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     static int racing;   // 0x77a90c is a transient label: latch the track-loaded one until a front-end label follows
     if (isl) {
         uint32_t lb = ld(c, 0x77a90c, 4);
-        if (lb == 0x6c9c3c && !racing) { racing = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c)", rt->w, rt->h); }
+        if (lb == 0x6c9c3c) racing = 1;
         else if (lb == 0x6c9cf0 || lb == 0x6c9de8 || lb == 0x6c9e8c || lb == 0x6c9ea0) racing = 0;
     }
     // BRIDGE: FXAA (web/gpu.js) over the 3D scene, once per race frame, before the first HUD quad (the HUD is drawn last into the same target).
     static uint32_t fxaa_frame = ~0u;
-    if (isl && racing && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
-    if (isl && racing) {
+    // The label is set when the track starts loading, so the loading screen is not a race frame: a race frame drew its 3D
+    // scene (indexed draws) before the HUD; a loading screen has none (its text was split to the window edges, 2026-10-23).
+    int hud = isl && racing && dip_frame == dev.frames && dip_n > 0;
+    static int hud_seen;
+    if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); }
+    if (hud && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
+    if (hud) {
         float S = 4.f * rn_screen_h / (3.f * rn_screen_w), x[4], cx = 0;
         for (int k = 0; k < 4; k++) { uint32_t b = ld(c, ARG(3) + 32 * k, 4); memcpy(&x[k], &b, 4); cx += x[k] / 4; }
         float u = (cx + S) / (2 * S) * 640.f, d = u < 0 || u > 640 ? 0 : u < 190 ? -(1 - S) : u > 430 ? 1 - S : 0;
