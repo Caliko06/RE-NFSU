@@ -1020,6 +1020,9 @@ void win32_init(Ctx *c, uint32_t image_size) {
     if (s43 > 1.f) s43 = 1.f;
     float k[2] = {s43 / 320.f, s43};
     memcpy(G(SCREEN_ADDR + 8), k, sizeof k);
+    const char *seed = getenv("RN_SEED");     // PATCH 0x4470f0: test-only fixed RNG seed (A/B vs Wine); 0 = the clock
+    st(c, SCREEN_ADDR + 16, seed ? (uint32_t)strtoul(seed, NULL, 0) : 0, 4);
+    st(c, SCREEN_ADDR + 20, getenv("RN_AUTOPILOT") != NULL, 4);   // PATCH 0x42d4b0: test-only, the AI drives the player
     clock_gettime(CLOCK_MONOTONIC, &t0);
     brk_ptr = HEAP_LO;
     vtop = c->memsz;

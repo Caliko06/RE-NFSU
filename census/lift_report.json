@@ -38,7 +38,9 @@
   "0x40fbe3",
   "0x40fbf9",
   "0x40fc1e",
-  "0x40fc38"
+  "0x40fc38",
+  "0x408814",
+  "0x4470f0"
  ],
  "data_seeds_inside_instructions": 615,
  "failed": {},

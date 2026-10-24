@@ -103,8 +103,12 @@ if (rec) {
     }
     onmsg(e);
   };
-  await send('Page.startScreencast', { format: 'jpeg', quality: 90, everyNthFrame: 1 });
 }
+// RN_REC_AT=s: start that recording at second s of the page (the race start), not at load: the disk is tight.
+const recAt = rec ? Number(process.env.RN_REC_AT || 0) : -1;
+let recOn = false;
+async function recStart() { recOn = true; await send('Page.startScreencast', { format: 'jpeg', quality: 90, everyNthFrame: 1 }); }
+if (recAt === 0) await recStart();
 await send('Page.navigate', { url });
 const t0 = Date.now();
 let text = '', seen = 0;
@@ -122,6 +126,7 @@ while (Date.now() - t0 < secs * 1000) {
     k.up = true;
     await send('Input.dispatchKeyEvent', { type: 'keyUp', code: k.code, key: k.code });
   }
+  if (recAt > 0 && !recOn && Date.now() - t0 >= recAt * 1000) await recStart();
   if (prof) await profile();
   const r = await send('Runtime.evaluate', { expression: "document.getElementById('status')?.textContent + '\\n' + document.getElementById('log')?.innerText" });
   text = r?.result?.value || '';

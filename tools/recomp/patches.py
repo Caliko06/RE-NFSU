@@ -126,6 +126,23 @@ PATCHES.append(dict(addr=0x707fc4, old="00000000", new="3333b33e", when=lambda: 
 for a in (0x40fbb7, 0x40fbcd, 0x40fbe3, 0x40fbf9, 0x40fc1e, 0x40fc38):
     PATCHES.append(dict(addr=a, old="d80ddcc76c00", new="d80dc47f7000", when=lambda: True))
 
+# PATCH: 0x4470f0 (+ cave 0x408814), TEST-ONLY seed for the A/B against the original (off unless RN_SEED is set): 0x4470d0,
+# called once from the boot 0x4471b0, seeds the game RNG [0x6f227c] from (QPC >> [0x7349c8]) + 0x12345678. The step is
+# inlined at ~60 sites (e.g. 0x41f81d). Cave (the jump table 0x408814 that PATCH 0x40877e left unused, no other reference):
+# mov edi,[0x13010]; test edi,edi; jnz 0x447110 (edi = K, then + 0x12345678 as before); else the original lea/push and
+# back to the QPC call. The layer writes RN_SEED to SCREEN_ADDR+0x10 (0 = the original clock seed). The Wine exe gets
+# `mov edi,K; jmp 0x447110` at 0x4470f0 instead (tools/wine/mkexe.py --set parity).
+PATCHES.append(dict(addr=0x408814, old="95874000ae874000c7874000e0874000f987400090909090",
+                    new="8b3d1030010085ff0f85eee803008d44240450e9c9e80300", when=lambda: True))
+PATCHES.append(dict(addr=0x4470f0, old="8d44240450", new="e91f17fcff", when=lambda: True))
+
+# PATCH: 0x42d4b0, TEST-ONLY autopilot for the A/B and the lap runs (off unless RN_AUTOPILOT is set): Player::UpdateInputMode
+# 0x42d470 picks the racing input mode as (Player+0x4ae != 0) ? 4 (PLAYER_MODE_AUTO_PILOT, name table 0x700b00) : 2
+# (CAR_RACING); SetInputMode 0x42d520 then runs AutoPilotOn 0x42e230 (the car drives itself with the game's AI) and camera
+# 0x12. Only joy event 0xa3 (0x431960) toggles +0x4ae and no code registers 0xa3 (FUN_00574020), so the byte is always 0
+# in play. It now reads SCREEN_ADDR+0x14 (the layer writes RN_AUTOPILOT there). Wine: mkexe.py --autopilot (mov dl,1).
+PATCHES.append(dict(addr=0x42d4b0, old="8a90ae040000", new="8a1514300100", when=lambda: True))
+
 
 def active():
     return [p for p in PATCHES if p["when"]()]

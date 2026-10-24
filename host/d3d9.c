@@ -770,9 +770,25 @@ static void tune_apply(Ctx *c) {
     memcpy(f, &tune[1], sizeof f);
     rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f", f[0], f[1], f[2], f[3]);
 }
+// RN_RNGLOG: how many steps the game RNG [0x6f227c] took since the last Present (step inlined ~60 times, e.g. 0x41f81d:
+// u = x ^ 0x1d872b41, v = u ^ u >> 5, x' = v ^ v << 27 ^ u). A frame with steps makes key timing matter in frames.
+static void rng_log(Ctx *c, uint32_t frame) {
+    static int on = -1;
+    static uint32_t prev, total;
+    if (on < 0) on = getenv("RN_RNGLOG") != NULL;
+    if (!on) return;
+    uint32_t x = ld(c, 0x6f227c, 4), n = 0;
+    if (frame && x != prev) {
+        for (uint32_t y = prev; n < 100000 && y != x; n++) { uint32_t u = y ^ 0x1d872b41, v = u ^ u >> 5; y = v ^ v << 27 ^ u; }
+        total += n;
+        rn_log("RNG frame %u: %d steps (total %u)", frame, n < 100000 ? (int)n : -1, total);
+    } else if (!frame) rn_log("RNG seed %08x", x);
+    prev = x;
+}
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     tune_apply(c);
+    rng_log(c, dev.frames);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
         return D3DERR_INVALIDCALL;
