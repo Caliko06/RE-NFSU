@@ -18,7 +18,9 @@ for f in sorted(os.listdir(src)):
     im = Image.open(os.path.join(src, f)).convert('RGBA')
     s = min(1, 1024 / max(im.size))
     if s < 1:
-        im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+        # RGB and alpha apart: Pillow resizes RGBA premultiplied, which zeroes the RGB under alpha 0 (see ship_webp.py)
+        size = (round(im.width * s), round(im.height * s))
+        im = Image.merge('RGBA', (*im.convert('RGB').resize(size, Image.LANCZOS).split(), im.getchannel('A').resize(size, Image.LANCZOS)))
     im.save(os.path.join(web, 'dump', key + '.webp'), 'WEBP', quality=90, exact=True)   # exact: see ship_webp.py
     idx = 'index.tsv' if key in default else 'index_world.tsv'
     if key not in have[idx]:

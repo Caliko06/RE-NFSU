@@ -1,7 +1,7 @@
 """PNG -> shipped WebP for the remaster packs: level 0 capped at 1024, quality 90, exact=True.
-exact matters: without it libwebp zeroes the RGB of alpha-0 texels, and the game uses alpha as a separate channel on some
-textures (front-end floor ROAD*: 40% alpha 0, RGB drawn), which came out black (V 2026-10-23: RGB mean under alpha 0
-44 in the PNG, 4 in the WebP).
+The RGB under alpha 0 must survive: the game uses alpha as a separate channel on some textures (front-end floor ROAD*:
+40% alpha 0, RGB drawn), which came out black (V 2026-10-23: RGB mean under alpha 0 44 in the PNG, 0.2 shipped). Two
+steps zeroed it: Pillow's RGBA resize (premultiplied) and libwebp without exact=True. RGB and alpha are resized apart.
 usage: ship_webp.py SRC_PNG_DIR OUT_DIR [KEYS.lst]   (KEYS.lst: <key>.png lines; default: every PNG in SRC)"""
 import os, sys
 from PIL import Image
@@ -15,7 +15,9 @@ for f in names:
     im = Image.open(os.path.join(src, f)).convert('RGBA')
     s = min(1, 1024 / max(im.size))
     if s < 1:
-        im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+        # RGB and alpha apart: Pillow resizes RGBA premultiplied, which zeroes the RGB under alpha 0 (see ship_webp.py)
+        size = (round(im.width * s), round(im.height * s))
+        im = Image.merge('RGBA', (*im.convert('RGB').resize(size, Image.LANCZOS).split(), im.getchannel('A').resize(size, Image.LANCZOS)))
     im.save(os.path.join(out, f[:-4] + '.webp'), 'WEBP', quality=90, exact=True)
     n += 1
 print(n, 'webp ->', out)
