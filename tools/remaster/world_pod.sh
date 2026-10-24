@@ -9,8 +9,9 @@
 #   m/4x-UltraSharp.pth   https://huggingface.co/lokCX/4x-Ultrasharp/resolve/main/4x-UltraSharp.pth
 #   m/1x-BCGone-Smooth.pth https://drive.google.com/uc?export=download&confirm=1&id=1EYAoxC1tE2EhEgI4tiKujHUKjhq68gY- (openmodeldb)
 # Mac side: decode_world.py -> world/ + world.tsv; world.lst = sides >= 32 and < 1024. Ship: cap 1024, WebP q90 into
-# web/remaster/world/, index_world.tsv (<key>\tworld/<key>.webp) WITHOUT road textures (names RD*): with the 7
-# RD_ARROYOCONC_* the car's road reflection disappears (V, Olympic Square A/B 2026-10-23; why: U). ?worldhd=1 turns it on.
+# web/remaster/world/, index_world.tsv (<key>\tworld/<key>.webp). ?worldhd=1 turns it on. Road textures (RD*) are in since
+# 2026-10-23: the earlier "RD_ARROYOCONC_* lose the car reflection" A/B was capture timing (the reflection depends on the
+# camera); those 7 are never uploaded in the Olympic Square race (RN_TEXHASH), 24 of the 41 RD* are.
 set -euo pipefail
 cd /root/remaster; PY=/root/remaster/venv/bin/python; M=/root/remaster/m
 # sr.py is CPU-bound per file (PNG io, small tiles): 6 shards per pass keep the GPU busy. Files already in us/ or db/ are skipped.

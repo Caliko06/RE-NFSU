@@ -1048,7 +1048,7 @@ static void upload_level(Ctx *c, Obj *s) {
         for (uint32_t k = 0, m = s->pitch * (is_dxt(s->fmt) ? (s->h + 3) / 4 : s->h); k < m; k++) h = (h ^ p[k]) * 0x100000001b3ull;
         static int log = -1;
         if (log < 0) log = getenv("RN_TEXHASH") != NULL;
-        if (log) rn_log("d3d9 texhash %016llx %ux%u fmt %08x", (unsigned long long)h, s->w, s->h, s->fmt);
+        if (log) rn_log("d3d9 texhash %016llx %ux%u fmt %08x id %x", (unsigned long long)h, s->w, s->h, s->fmt, s->container);
         uint32_t k3[3] = {s->container, (uint32_t)h, (uint32_t)(h >> 32)};
         gpu_cmd(GPU_TEXKEY, 3, k3);
     }
