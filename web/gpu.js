@@ -26,7 +26,9 @@ async function startGpu(M, canvas, report, onFrame) {
   if (!navigator.gpu) throw new Error('WebGPU no disponible');
   const adapter = await navigator.gpu.requestAdapter();
   if (!adapter) throw new Error('WebGPU: sin adaptador');
-  const device = await adapter.requestDevice();
+  // timestamp-query (when the adapter has it): GPU time of each frame's passes, reported with the frame log (gpu.js ts).
+  const TS = adapter.features.has('timestamp-query');
+  const device = await adapter.requestDevice(TS ? { requiredFeatures: ['timestamp-query'] } : undefined);
   device.addEventListener('uncapturederror', e => report('webgpu: ' + e.error.message));
   const ctx = canvas.getContext('webgpu');
   const box = M._rn_gpu_mailbox() >> 2;     // u32 index: seq, done, ptr[2], len[2]
@@ -101,11 +103,12 @@ async function startGpu(M, canvas, report, onFrame) {
     buffer: { type: 'uniform', hasDynamicOffset: true, minBindingSize: 32 } }] });
   const clearBind = device.createBindGroup({ layout: clearBgl, entries: [{ binding: 0, resource: { buffer: clearRing, size: 32 } }] });
   const clearLayout = device.createPipelineLayout({ bindGroupLayouts: [clearBgl] });
-  // BRIDGE: remaster, OWNER 2026-10-22: 4x MSAA on the screen-sized targets, opt-in with ?msaa=4 (OWNER 2026-10-22: it lagged;
-  // headless race 1280x956: hitches >33 ms 369 with it, 153 without, GPU wait p90 46 -> 18 ms). Each colour target keeps
+  // BRIDGE: remaster, OWNER 2026-10-22: 4x MSAA on the screen-sized targets. Opt-in on 2026-10-22 (it lagged then: the lag was the
+  // frame pacing and per-draw copies, fixed 2026-10-23). Default since 2026-10-23 (OWNER goal: 60 fps, excellent quality): race at
+  // 2560x1160, GPU time per frame (timestamp-query) p50 11 / p90 13.5 ms with it, 7.7 / 11.3 without; ?msaa=1 turns it off. Each colour target keeps
   // its single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
   // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
-  const MSAA = new URLSearchParams(location.search).get('msaa') === '4' ? 4 : 1;
+  const MSAA = new URLSearchParams(location.search).get('msaa') === '1' ? 1 : 4;
   // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first HUD quad of a race
   // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
   const FXAA_MODE = new URLSearchParams(location.search).get('fxaa');   // '0' off, '2' debug: edges in red
@@ -463,11 +466,22 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     t.view = t.skin.createView();
   }
 
+  const gpuDone = [], TS_MAX = 256;
+  const tsq = TS ? { set: device.createQuerySet({ type: 'timestamp', count: TS_MAX }),
+    res: device.createBuffer({ size: 8 * TS_MAX, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC }), free: [] } : null;
+  let tsN = 0;
+  const tsw = () => tsq && tsN + 2 <= TS_MAX ? { querySet: tsq.set, beginningOfPassWriteIndex: tsN++, endOfPassWriteIndex: tsN++ } : undefined;
+  const gpuReport = () => {
+    if (!gpuDone.length) return '';
+    const v = gpuDone.splice(0).sort((x, y) => x - y), q = f => v[Math.min(v.length - 1, Math.floor(f * v.length))].toFixed(1);
+    return `, gpu ts p50 ${q(0.5)} p90 ${q(0.9)} max ${q(1)} ms`;
+  };
   function run(ptr, len) {
     const w = H().subarray(ptr >> 2, (ptr >> 2) + len);
     const f32 = new Float32Array(w.buffer, w.byteOffset, w.length);
     const u8 = new Uint8Array(w.buffer, w.byteOffset, w.length * 4);
     const enc = device.createCommandEncoder();
+    tsN = 0;
     const uni = new ArrayBuffer(256 * 1024), uf = new Float32Array(uni);
     let nuni = 0, stats = { clears: 0, draws: 0, present: '', words: w.length, texKb: 0, pipes: 0, shaders: 0, targets: 0 };
     // First pass over the frame: sizes of the per-frame buffers.
@@ -514,7 +528,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         if (nuni === 1024) fail('more than 1024 clears in a frame');
         uf.set([((c >>> 16) & 255) / 255, ((c >>> 8) & 255) / 255, (c & 255) / 255, (c >>> 24) / 255, f32[a + 4]], off / 4);
         nuni++;
-        const p = enc.beginRenderPass({
+        const p = enc.beginRenderPass({ timestampWrites: tsw(),
           colorAttachments: rt ? [colorAtt(rt)] : [],
           depthStencilAttachment: ds ? { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store',
             stencilLoadOp: 'load', stencilStoreOp: 'store' } : undefined });
@@ -575,7 +589,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const key = `${g(D_RT)}/${g(D_DS)}`;
         if (key !== passKey) {
           endPass();
-          pass = enc.beginRenderPass({
+          pass = enc.beginRenderPass({ timestampWrites: tsw(),
             colorAttachments: [colorAtt(rt)],
             depthStencilAttachment: ds ? { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store',
               stencilLoadOp: 'load', stencilStoreOp: 'store' } : undefined });
@@ -638,7 +652,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
             fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
           }
           enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
-          const p = enc.beginRenderPass({ colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
+          const p = enc.beginRenderPass({ timestampWrites: tsw(), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
           p.setPipeline(fxaaPipe);
           p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
             entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
@@ -671,7 +685,25 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     if (voff) device.queue.writeBuffer(vbuf, 0, vdata, 0, voff);
     if (ioff) device.queue.writeBuffer(ibuf, 0, idata, 0, ioff / 4);
     if (uoff) device.queue.writeBuffer(ubuf, 0, udata, 0, uoff);
+    // GPU time of the frame list: first pass begin to last pass end (timestamp-query), read back without waiting.
+    let tsBuf = null;
+    if (tsq && tsN) {
+      enc.resolveQuerySet(tsq.set, 0, tsN, tsq.res, 0);
+      tsBuf = tsq.free.pop() || device.createBuffer({ size: 8 * TS_MAX, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+      enc.copyBufferToBuffer(tsq.res, 0, tsBuf, 0, 8 * tsN);
+    }
     device.queue.submit([enc.finish()]);
+    if (tsBuf) {
+      const n = tsN;
+      tsBuf.mapAsync(GPUMapMode.READ).then(() => {
+        const q = new BigInt64Array(tsBuf.getMappedRange(0, 8 * n));
+        // first pass begin to last pass end (Apple GPUs overlap passes, so a sum of passes overcounts)
+        let lo = q[0], hi = q[0]; for (let k = 0; k < n; k++) if (q[k] > 0n) { if (q[k] < lo || lo === 0n) lo = q[k]; if (q[k] > hi) hi = q[k]; }
+        const ns = hi - lo;
+        tsBuf.unmap(); tsq.free.push(tsBuf);
+        gpuDone.push(Number(ns) / 1e6);
+      });
+    }
     stats.pipes = newPipes; newPipes = 0;
     stats.hd = packed;
     return stats;
@@ -707,7 +739,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         frames++;
         if (s.present) presents++;
         if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +
-          (pack.size ? `, remaster ${packed}` : ''));
+          (pack.size ? `, remaster ${packed}` : '') + gpuReport());
         Atomics.store(h, box + 1, k);
         Atomics.notify(M.HEAP32, box + 1);
       }
