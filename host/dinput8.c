@@ -252,9 +252,9 @@ static uint32_t IDirectInputDevice8A_GetDeviceData(Ctx *c) {
         }
     if (!(flags & 1)) o->ev_head += n;
     st(c, io, n, 4);
-    if (n && dilog()) rn_log("di GetDeviceData dev %d: %u of %u, first ofs %u data %x app %x%s", (int)(o - objs), n, want,
+    if (n && dilog()) rn_log("di GetDeviceData dev %d: %u of %u, first ofs %u data %x app %x%s frame %u", (int)(o - objs), n, want,
               o->ev[(o->ev_head - (flags & 1 ? 0 : n)) % MAXEV].ofs, o->ev[(o->ev_head - (flags & 1 ? 0 : n)) % MAXEV].data,
-              o->ev[(o->ev_head - (flags & 1 ? 0 : n)) % MAXEV].app, flags & 1 ? " peek" : "");
+              o->ev[(o->ev_head - (flags & 1 ? 0 : n)) % MAXEV].app, flags & 1 ? " peek" : "", rn_telem.presents);
     if (n) TR("GetDeviceData(%s): %u events, first ofs %u data %x app %x", o->kind == KEYBOARD ? "keyboard" : "mouse", n,
               o->ev[(o->ev_head - n) % MAXEV].ofs, o->ev[(o->ev_head - n) % MAXEV].data, o->ev[(o->ev_head - n) % MAXEV].app);
     uint32_t r = o->overflow ? 1u : DI_OK;                // DI_BUFFEROVERFLOW
@@ -578,7 +578,8 @@ void dinput8_key(uint8_t dik, int down) {
     for (int k = 0; k < nobjs; k++) {
         Obj *o = &objs[k];
         if (dilog() && o->iface == I_DEV && o->kind == KEYBOARD)
-            rn_log("di key %02x %s dev %d acq %d buf %u queued %u", dik, down ? "down" : "up", k, o->acquired, o->buffer, o->ev_tail - o->ev_head);
+            rn_log("di key %02x %s dev %d acq %d buf %u queued %u frame %u", dik, down ? "down" : "up", k, o->acquired, o->buffer,
+                   o->ev_tail - o->ev_head, rn_telem.presents);
         if (o->iface != I_DEV || o->kind != KEYBOARD || !o->acquired) continue;
         for (int j = 0; j < o->nf; j++)
             if (o->f[j].what == 0x200u + dik) push(o, o->f[j].ofs, down ? 0x80 : 0, o->f[j].app);

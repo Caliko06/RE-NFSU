@@ -59,9 +59,16 @@ def row_of(d):
     after = seen[seen.index(6):] if raced else []
     back = 7 in after and 3 in after[after.index(7):]
     again = back and 6 in after[after.index(7):]
+    # The row (census/rows.json id): the track is the TRACKB<id>.LZC the game opened (host/win32.c RN_FLOWLOG; GLOBALB track
+    # +0x20 "Location1\Track_<id>"), the mode is the run name. A track of another mode's family (rows.py FAMILY) means the
+    # menu path picked another mode: no row (2026-10-25: sprint/drag/drift rows loaded 1002, a circuit track).
+    mode = os.path.basename(d).split('.')[0]
+    trk = [int(m[1]) for m in (re.search(r'flow open .*TRACKB(\d{4})\.LZC', l, re.I) for l in log) if m]
+    fam = {'circuit': 10, 'lapko': 10, 'sprint': 11, 'drag': 12, 'drift': 13}
+    row = 'qr.freerun' if mode == 'freerun' and trk else f'qr.{mode}.{trk[0]}' if trk and trk[0] // 100 == fam.get(mode) else None
     stop = next((l for l in reversed(log) if re.search(r'STOP|stop:|unimplemented|missing|fault|abort', l, re.I)), '')
     end = next((l for l in reversed(log) if l.startswith('RN_SECS')), 'running or killed')
-    return {'reached': {'menu': 3 in seen, 'start': raced, 'racing': any(s == 6 and r not in (1, 255) for s, r, _ in st),
+    return {'row': row, 'track': trk[0] if trk else None, 'reached': {'menu': 3 in seen, 'start': raced, 'racing': any(s == 6 and r not in (1, 255) for s, r, _ in st),
                         'results': any(s == 6 and r == 8 for s, r, _ in st),
                         'unload': 7 in after, 'back_to_menu': back, 'second_race': again},
             'states': [f'{s}/{r}@{f}' for s, r, f in st], 'stop': stop, 'end': end,

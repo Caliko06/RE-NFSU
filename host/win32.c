@@ -566,6 +566,11 @@ static uint32_t create_file(Ctx *c, const char *name) {
     get_handle(h)->gf = id;
     snprintf(get_handle(h)->path, sizeof get_handle(h)->path, "%s", name);
     if (rn_trace()) rn_log("open %s -> %x", name, h);
+    else {   // RN_FLOWLOG: the files a run read (completion.py names a run's row by them)
+        static int fl = -1;
+        if (fl < 0) fl = getenv("RN_FLOWLOG") != NULL;
+        if (fl) rn_log("flow open %s", name);
+    }
     set_error(c, 0);
     return h;
 }
