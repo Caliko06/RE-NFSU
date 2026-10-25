@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "123/167",
+ "progress": "167/167",
  "rows": [
   {
    "id": "career.0",
@@ -124,7 +124,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7c8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.7",
@@ -184,7 +184,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0xbac",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.10",
@@ -276,7 +276,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x1228",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.15",
@@ -390,7 +390,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x19f0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.21",
@@ -562,7 +562,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x26e8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.31",
@@ -702,7 +702,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3148",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.39",
@@ -874,7 +874,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3e40",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.49",
@@ -1174,7 +1174,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5598",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.67",
@@ -1234,7 +1234,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x597c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.70",
@@ -1250,7 +1250,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5ac8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.71",
@@ -1266,7 +1266,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5c14",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.72",
@@ -1282,7 +1282,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5d60",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.73",
@@ -1428,7 +1428,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x67c0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.81",
@@ -1508,7 +1508,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6e3c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.87",
@@ -1524,7 +1524,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6f88",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.88",
@@ -1540,7 +1540,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x70d4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.89",
@@ -1556,7 +1556,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7220",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.90",
@@ -1572,7 +1572,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x736c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.91",
@@ -1588,7 +1588,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x74b8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.92",
@@ -1616,7 +1616,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7604",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.93",
@@ -1632,7 +1632,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7750",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.94",
@@ -1648,7 +1648,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x789c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.95",
@@ -1664,7 +1664,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x79e8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.96",
@@ -1680,7 +1680,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7b34",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.97",
@@ -1696,7 +1696,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7c80",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.98",
@@ -1712,7 +1712,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7dcc",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.99",
@@ -1728,7 +1728,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7f18",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.100",
@@ -1744,7 +1744,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8064",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.101",
@@ -1760,7 +1760,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x81b0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.102",
@@ -1788,7 +1788,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x82fc",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.103",
@@ -1804,7 +1804,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8448",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.104",
@@ -1820,7 +1820,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8594",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.105",
@@ -1836,7 +1836,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x86e0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.106",
@@ -1852,7 +1852,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x882c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.107",
@@ -1868,7 +1868,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8978",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.108",
@@ -1884,7 +1884,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8ac4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.109",
@@ -1900,7 +1900,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8c10",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.110",
@@ -1916,7 +1916,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8d5c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.111",
@@ -1932,7 +1932,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8ea8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.112",
@@ -1948,7 +1948,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x8ff4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.113",
@@ -1964,7 +1964,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x9140",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.120",
@@ -1980,7 +1980,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x928c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.121",
@@ -1996,7 +1996,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x93d8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.122",
@@ -2012,7 +2012,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x9524",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.circuit.1001",

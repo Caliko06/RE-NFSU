@@ -226,14 +226,16 @@ void input_jump(Ctx *c) {
     const char *home = car ? "MU_UG_MapScreen" : "MU_QuickRaceModeSelect";
     if (!*s && !fired) return;
     // The list done: any front end ends the run (a career race comes back on the hub or another screen, 0x4ab670)
-    if ((rn_flow >> 8) != 3 || (*s && !screen_on(home))) { seen = 0; return; }
+    // After a career race the hub is home too: the map path below needs no map screen (it started races from the hub,
+    // runs/cjump_6), and a dialog over the hub ate the key to the map (runs/cjump_111+..: after 113's NewCareerExtroFMV).
+    if ((rn_flow >> 8) != 3 || (*s && !screen_on(home) && !(car && fired && screen_on("MU_UG_UndergroundMenu")))) { seen = 0; return; }
     if (!seen) seen = rn_telem.presents;
     if (rn_telem.presents - seen < 30) return;   // let the screen settle as a player would
     extern uint32_t rn_next_left;
 #ifndef __EMSCRIPTEN__
     if (!*s && !rn_next_left) { rn_log("RN_JUMP: done, back in the front end at frame %u", rn_telem.presents); fflush(NULL); _exit(0); }
 #endif
-    if (rn_next_left) return;   // the tournament's next stage starts from here
+    if (rn_next_left) return;   // a tournament between stages (race message 9 loads the next one)
     if (car) {
         // The map's own path (0x4c5df0): esi = career 0x75eef8, edi = event id, ebx = its record ([0x733ff8 + 4*id],
         // filled by 0x5a0060); 0x5a0ce0 makes the race record [0x7677a8] (= career +0x88b0), 0x4dfa10(eax = record),
@@ -243,10 +245,10 @@ void input_jump(Ctx *c) {
         if (sscanf(s, "e%u%n", &n, &used) != 1) { rn_log("RN_JUMP: cannot read \"%s\"", s); s = ""; return; }
         s += used;
         while (*s == ',' || *s == ' ' || *s == '+') s++;
-        uint32_t lo = ~0u, rec, id;
-        for (uint32_t k = 0; k < 0x100; k++) { uint32_t r = ld(c, 0x733ff8 + 4 * k, 4); if (r && r < lo) lo = r; }
-        rec = lo + n * 0x14c, id = ld(c, rec, 4);
-        if (lo == ~0u || id >= 0x100 || ld(c, 0x733ff8 + 4 * id, 4) != rec) { rn_log("RN_JUMP: no career event %u", n); s = ""; return; }
+        // N is the event id (census/rows.json career.N): its record is [0x733ff8 + 4 * id], as the map reads it. The
+        // table order is not the id order (runs/cjump_91: the 91st record was id 92, the tournament 1002/1004/1007).
+        uint32_t rec = n < 0x100 ? ld(c, 0x733ff8 + 4 * n, 4) : 0, id = rec ? ld(c, rec, 4) : ~0u;
+        if (id != n) { rn_log("RN_JUMP: no career event %u", n); s = ""; return; }
         rn_log("RN_JUMP: career event %u (id %u, record %08x) at frame %u", n, id, rec, rn_telem.presents);
         uint32_t r[8];
         memcpy(r, c->r, sizeof r);
@@ -258,7 +260,6 @@ void input_jump(Ctx *c) {
         call_guest(c, 0x4b5df0, 0, NULL);
         memcpy(c->r, r, sizeof r);
         seen = 0, fired = 2;
-        { extern uint32_t rn_jump_ev; rn_jump_ev = n; }
         return;
     }
     if (sscanf(s, "%u:%u%n", &m, &t, &used) != 2 || m > 6) { rn_log("RN_JUMP: cannot read \"%s\"", s); s = ""; return; }
@@ -348,8 +349,7 @@ static void screen_msg(Ctx *c, uint32_t name, uint32_t msg) {
     memcpy(c->r, r, sizeof r);
     rn_log("RN_NEXT: message %08x to package %08x screen %08x (handler %08x) at frame %u", msg, pkg, obj, obj ? ld(c, ld(c, obj, 4) + 8, 4) : 0, rn_telem.presents);
 }
-uint32_t rn_jump_ev;     // the career event RN_JUMP started (its later stages start from it)
-uint32_t rn_next_left;   // RN_JUMP waits while a tournament has stages left (Next Race goes through the front end)
+uint32_t rn_next_left;   // stages left in the tournament RN_JUMP started
 void input_next(Ctx *c) {
     static const char *s;
     static uint32_t seen, done, raced, want, on;
@@ -373,48 +373,21 @@ void input_next(Ctx *c) {
     // magazine's 0x4c9240 (Hopper magaccept.txt) takes 0x911ab364 to mark the covers won ([0x76777c + i] = 1) and autosave
     // (0x4c96f0), then 0x14141414 to leave (0x51bb50, 0x4c72d0: the hub, or the next magazine). 0x406415e3 is not one of
     // its messages (runs/cjump_8+..: it stayed up). The hook sends that pair, 60 frames apart.
-    static const char *const fwd[4] = {"RewardPopup", "StyleAnimator", "MU_UG_MagazineGiveth", "MU_UG_JunkmanGiveth"};
-    static uint32_t pop[4], sent[4];
-    for (int k = 0; k < 4; k++)
+    // PostRaceResults is the first screen of that list (0x49e040 / 0x49dfd0 walk it); its RETURN taps ran out on a
+    // tournament's second stage (runs/cjump_6).
+    static const char *const fwd[6] = {"RewardPopup", "StyleAnimator", "PostRaceResults", "MU_UG_MagazineGiveth", "MU_UG_JunkmanGiveth", "MU_UG_SamanthaGiveth"};
+    static uint32_t pop[6], sent[6];
+    for (int k = 0; k < 6; k++)
         if (screen_on(fwd[k])) {
             if (!pop[k]) pop[k] = rn_telem.presents;
             if (rn_telem.presents - pop[k] < 60) continue;
-            uint32_t m = k < 2 ? 0x406415e3 : sent[k]++ ? 0x14141414 : 0x911ab364;
+            uint32_t m = k < 3 ? 0x406415e3 : sent[k]++ ? 0x14141414 : 0x911ab364;
             screen_msg(c, rdata_str(c, fwd[k]), m), pop[k] = rn_telem.presents;
         } else pop[k] = sent[k] = 0;
-    // The next stage: Next Race's 0x496f00 closes the stage on the race record ([0x777ccc] vtable+0x14, 0x5a2f10) and the
-    // race unloads to the front end (0x4970f0, message 0xa; Hopper nextstage.txt). There [0x7677a8] is no longer a race
-    // record (0x4b5df0 alone faulted at 0x4b5e61 reading [ebx+0x59d4], runs/cjump_6), so the stage starts the way the map
-    // starts the event (0x4c5df0: 0x5a0ce0, 0x4dfa10, 0x4b5df0), from the map, with the event's own id: the map cursor is
-    // not on it (runs/cjump_6: its briefing RETURN loaded 1301, a drift).
-    static uint32_t pend, fe;
-    if (pend && (rn_flow >> 8) == 3 && screen_on("MU_UG_MapScreen")) {
-        if (!fe) fe = rn_telem.presents;
-        if (rn_telem.presents - fe >= 30) {
-            // The front end reloads its event table after a race (runs/cjump_6: the old record faulted in 0x5a0ce0 at
-            // 0x5a0d43, [0x733ff8 + 4 * id] no longer pointing at it), so the record is found again as RN_JUMP does.
-            uint32_t r[8], lo = ~0u, rec;
-            for (uint32_t k = 0; k < 0x100; k++) { uint32_t x = ld(c, 0x733ff8 + 4 * k, 4); if (x && x < lo) lo = x; }
-            rec = lo + rn_jump_ev * 0x14c;
-            memcpy(r, c->r, sizeof r);
-            c->r[ESI] = 0x75eef8, c->r[EDI] = ld(c, rec, 4), c->r[EBX] = rec;
-            call_guest(c, 0x5a0ce0, 0, NULL);
-            c->r[EAX] = rec;
-            call_guest(c, 0x4dfa10, 0, NULL);
-            c->r[EBX] = ld(c, 0x7677a8, 4);
-            call_guest(c, 0x4b5df0, 0, NULL);
-            memcpy(c->r, r, sizeof r);
-            rn_log("RN_NEXT: next stage of record %08x at frame %u", rec, rn_telem.presents);
-            pend = fe = 0;
-        }
-    } else fe = 0;
-    if (!screen_on("PostRaceMenu")) { seen = done = 0; return; }
-    if (done || !left) return;
-    if (!seen) seen = rn_telem.presents;
-    if (rn_telem.presents - seen < 30) return;
-    uint32_t name = rdata_str(c, "PostRaceMenu");
-    {   // its five item callbacks (0x4975c0: 0x0c407210 with item hash + 0x47583934 = 0..4 calls this+0x54 + 0x10 * k)
-        uint32_t l = 0x746104, r[8], pkg, obj;
+    static uint32_t logged;
+    if (!screen_on("PostRaceMenu")) { seen = done = logged = 0; return; }
+    if (!logged++) {   // once per showing: its five item callbacks (0x4975c0: 0x0c407210 with item hash + 0x47583934 = 0..4 calls this+0x54 + 0x10 * k)
+        uint32_t l = 0x746104, r[8], pkg, obj, name = rdata_str(c, "PostRaceMenu");
         memcpy(r, c->r, sizeof r);
         c->r[EAX] = name, pkg = call_guest(c, 0x4f3f90, 1, &l), obj = pkg ? ld(c, pkg + 0x14, 4) : 0;
         memcpy(c->r, r, sizeof r);
@@ -422,10 +395,18 @@ void input_next(Ctx *c) {
             rn_log("RN_NEXT: PostRaceMenu item %d at +%x: %08x %08x %08x %08x", k, 0x50 + 0x10 * k, ld(c, obj + 0x50 + 0x10 * k, 4),
                    ld(c, obj + 0x54 + 0x10 * k, 4), ld(c, obj + 0x58 + 0x10 * k, 4), ld(c, obj + 0x5c + 0x10 * k, 4));
     }
-    screen_msg(c, name, 0x7e9ccc8f);
+    if (done || !left) return;
+    if (!seen) seen = rn_telem.presents;
+    if (rn_telem.presents - seen < 30) return;
+    uint32_t name = rdata_str(c, "PostRaceMenu");
+    // Between stages 0x64bf64d2 sets +0x44 (0x49774e), which the reactivation runs as 0x497410 (Hopper praitems.txt): the
+    // race record's [0x777ccc] vtable+0x18 moves to the next stage and race message 9 loads it, never leaving the race.
+    // 0x7e9ccc8f (+0x42) is the other way out: 0x496f00 unloads to the front end and, the event not finished
+    // (0x5a2f10), 0x5a0f60 marks it 5 and deletes the record (Hopper prunload.txt); restarting it from the map
+    // (0x5a0ce0) ran stage 1 again (runs/cjump_6: 1003 three times).
+    screen_msg(c, name, left > 1 ? 0x64bf64d2 : 0x7e9ccc8f);
     screen_msg(c, name, 0xc98356ba);
     done = 1, left--;
-    pend = left > 0;
 }
 #undef left
 // RN_CALL="MU_Main_PC#2:41c7a0": test-only, call a game function with no arguments once, 30 frames into the n-th time

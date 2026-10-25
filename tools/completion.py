@@ -131,11 +131,12 @@ def cjump(name):
     # Three taps reach PostRaceMenu from the results (runs/cjump_6 taps 12-14); a fourth is dropped there or lands on the
     # loading screen.
     res = ['3000@6/8:RETURN'] + ['4000@!PostRaceMenu:RETURN'] * 4
-    # The next stage starts from RN_NEXT on the map (host/input.c: the map's 0x5a0ce0, 0x4dfa10, 0x4b5df0 for the event).
-    nxt = [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6/4:RETURN']
+    # The next stage loads from the race (RN_NEXT 0x64bf64d2 -> 0x497410, race message 9); its keys anchor on its race.
+    nxt = ['3000@6/4:RETURN']
     stages = lambda e: (res + nxt) * (STAGES[f'career.{e}'] - 1) + (res if STAGES[f'career.{e}'] > 1 else leave)
     out = keys(pre, stages(evs[0])).split(',')
-    for e in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + stages(e)
+    # The next event starts from the hub (RN_JUMP, host/input.c): no key to the map.
+    for e in evs[1:]: out += ['3000@6:RETURN', '3000@6:RETURN'] + stages(e)
     # A tournament runs its stages back to back (runs/cjump_5+..: event 6 stage 3 began as RN_SECS ran out): time per stage.
     return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * sum(STAGES[f'career.{e}'] for e in evs) + 120, '+'.join(str(STAGES[f'career.{e}'] if STAGES[f'career.{e}'] > 1 else 0) for e in evs)
 

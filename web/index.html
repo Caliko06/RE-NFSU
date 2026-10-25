@@ -103,8 +103,6 @@ function line(s, cls) {
       // 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift), the next one when a race comes back to the menu
       const jump = new URLSearchParams(location.search).get('jump');
       if (jump) m.ENV.RN_JUMP = jump;
-      // ?unlock=1: RN_UNLOCK (host/d3d9.c), every track, car and part open, as after the last career event
-      if (new URLSearchParams(location.search).get('unlock') === '1') m.ENV.RN_UNLOCK = '1';
     }],
   });
   const telem = startTelemetry(M, t0, s => line(s), allLog);
