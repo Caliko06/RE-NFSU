@@ -1,0 +1,2421 @@
+{
+ "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
+ "progress": "0/162",
+ "rows": [
+  {
+   "id": "career.0",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x0",
+   "ok": false
+  },
+  {
+   "id": "career.1",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x14c",
+   "ok": false
+  },
+  {
+   "id": "career.2",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1102,
+     "name": "SP2 - Liberty Gardens",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x298",
+   "ok": false
+  },
+  {
+   "id": "career.3",
+   "group": "career",
+   "kind": 0,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1301,
+     "name": "Drift 1",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3e4",
+   "ok": false
+  },
+  {
+   "id": "career.4",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1210,
+     "name": "Downtown Drag 2",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x530",
+   "ok": false
+  },
+  {
+   "id": "career.5",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x67c",
+   "ok": false
+  },
+  {
+   "id": "career.6",
+   "group": "career",
+   "kind": 1,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x7c8",
+   "ok": false
+  },
+  {
+   "id": "career.7",
+   "group": "career",
+   "kind": 2,
+   "type": "type4 (U)",
+   "stages": [
+    {
+     "track": 1102,
+     "name": "SP2 - Liberty Gardens",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x914",
+   "ok": false
+  },
+  {
+   "id": "career.8",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1005,
+     "name": "DT3 - Atlantic",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0xa60",
+   "ok": false
+  },
+  {
+   "id": "career.9",
+   "group": "career",
+   "kind": 1,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1210,
+     "name": "Downtown Drag 2",
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1210,
+     "name": "Downtown Drag 2",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1201,
+     "name": "DTDrag - 14th & Vine",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0xbac",
+   "ok": false
+  },
+  {
+   "id": "career.10",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0xcf8",
+   "ok": false
+  },
+  {
+   "id": "career.11",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1202,
+     "name": "CTDrag - Highway 1",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0xe44",
+   "ok": false
+  },
+  {
+   "id": "career.12",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1103,
+     "name": "SP3 - Broadway",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0xf90",
+   "ok": false
+  },
+  {
+   "id": "career.13",
+   "group": "career",
+   "kind": 0,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1302,
+     "name": "Drift 2",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x10dc",
+   "ok": false
+  },
+  {
+   "id": "career.14",
+   "group": "career",
+   "kind": 1,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 4,
+     "direction": 0
+    },
+    {
+     "track": 1005,
+     "name": "DT3 - Atlantic",
+     "laps": 4,
+     "direction": 1
+    },
+    {
+     "track": 1002,
+     "name": "CT2 - Stadium",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x1228",
+   "ok": false
+  },
+  {
+   "id": "career.15",
+   "group": "career",
+   "kind": 3,
+   "type": "type4 (U)",
+   "stages": [
+    {
+     "track": 1104,
+     "name": "SP4 - Lock Up",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x1374",
+   "ok": false
+  },
+  {
+   "id": "career.16",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x14c0",
+   "ok": false
+  },
+  {
+   "id": "career.17",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1201,
+     "name": "DTDrag - 14th & Vine",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x160c",
+   "ok": false
+  },
+  {
+   "id": "career.18",
+   "group": "career",
+   "kind": 0,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1302,
+     "name": "Drift 2",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x1758",
+   "ok": false
+  },
+  {
+   "id": "career.19",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1001,
+     "name": "CT1 - Market St.",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x18a4",
+   "ok": false
+  },
+  {
+   "id": "career.20",
+   "group": "career",
+   "kind": 1,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1210,
+     "name": "Downtown Drag 2",
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1202,
+     "name": "CTDrag - Highway 1",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1201,
+     "name": "DTDrag - 14th & Vine",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1206,
+     "name": "MSNDrag - Main St.",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x19f0",
+   "ok": false
+  },
+  {
+   "id": "career.21",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1201,
+     "name": "DTDrag - 14th & Vine",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x1b3c",
+   "ok": false
+  },
+  {
+   "id": "career.22",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1103,
+     "name": "SP3 - Broadway",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x1c88",
+   "ok": false
+  },
+  {
+   "id": "career.23",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1104,
+     "name": "SP4 - Lock Up",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x1dd4",
+   "ok": false
+  },
+  {
+   "id": "career.24",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x1f20",
+   "ok": false
+  },
+  {
+   "id": "career.25",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1303,
+     "name": "Drift 3",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x206c",
+   "ok": false
+  },
+  {
+   "id": "career.26",
+   "group": "career",
+   "kind": 2,
+   "type": "type4 (U)",
+   "stages": [
+    {
+     "track": 1105,
+     "name": "SP5 - 9th & Frey",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x21b8",
+   "ok": false
+  },
+  {
+   "id": "career.27",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1106,
+     "name": "SP6 - Bedard Bridge",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2304",
+   "ok": false
+  },
+  {
+   "id": "career.28",
+   "group": "career",
+   "kind": 0,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1304,
+     "name": "Drift 4",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2450",
+   "ok": false
+  },
+  {
+   "id": "career.29",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1201,
+     "name": "DTDrag - 14th & Vine",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x259c",
+   "ok": false
+  },
+  {
+   "id": "career.30",
+   "group": "career",
+   "kind": 1,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1008,
+     "name": "RS2 - National Rail",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1002,
+     "name": "CT2 - Stadium",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x26e8",
+   "ok": false
+  },
+  {
+   "id": "career.31",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1005,
+     "name": "DT3 - Atlantic",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2834",
+   "ok": false
+  },
+  {
+   "id": "career.32",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1008,
+     "name": "RS2 - National Rail",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2980",
+   "ok": false
+  },
+  {
+   "id": "career.33",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1303,
+     "name": "Drift 3",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2acc",
+   "ok": false
+  },
+  {
+   "id": "career.34",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1105,
+     "name": "SP5 - 9th & Frey",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2c18",
+   "ok": false
+  },
+  {
+   "id": "career.35",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 6,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2d64",
+   "ok": false
+  },
+  {
+   "id": "career.36",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1206,
+     "name": "MSNDrag - Main St.",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2eb0",
+   "ok": false
+  },
+  {
+   "id": "career.37",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1005,
+     "name": "DT3 - Atlantic",
+     "laps": 6,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x2ffc",
+   "ok": false
+  },
+  {
+   "id": "career.38",
+   "group": "career",
+   "kind": 1,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1303,
+     "name": "Drift 3",
+     "laps": 4,
+     "direction": 0
+    },
+    {
+     "track": 1304,
+     "name": "Drift 4",
+     "laps": 4,
+     "direction": 0
+    },
+    {
+     "track": 1305,
+     "name": "Drift 5",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3148",
+   "ok": false
+  },
+  {
+   "id": "career.39",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3294",
+   "ok": false
+  },
+  {
+   "id": "career.40",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1304,
+     "name": "Drift 4",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x33e0",
+   "ok": false
+  },
+  {
+   "id": "career.41",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1103,
+     "name": "SP3 - Broadway",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x352c",
+   "ok": false
+  },
+  {
+   "id": "career.42",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1202,
+     "name": "CTDrag - Highway 1",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3678",
+   "ok": false
+  },
+  {
+   "id": "career.43",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1104,
+     "name": "SP4 - Lock Up",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x37c4",
+   "ok": false
+  },
+  {
+   "id": "career.44",
+   "group": "career",
+   "kind": 0,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1305,
+     "name": "Drift 5",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3910",
+   "ok": false
+  },
+  {
+   "id": "career.45",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1008,
+     "name": "RS2 - National Rail",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3a5c",
+   "ok": false
+  },
+  {
+   "id": "career.46",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1201,
+     "name": "DTDrag - 14th & Vine",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3ba8",
+   "ok": false
+  },
+  {
+   "id": "career.47",
+   "group": "career",
+   "kind": 3,
+   "type": "type4 (U)",
+   "stages": [
+    {
+     "track": 1103,
+     "name": "SP3 - Broadway",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3cf4",
+   "ok": false
+  },
+  {
+   "id": "career.48",
+   "group": "career",
+   "kind": 1,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1005,
+     "name": "DT3 - Atlantic",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3e40",
+   "ok": false
+  },
+  {
+   "id": "career.49",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1008,
+     "name": "RS2 - National Rail",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x3f8c",
+   "ok": false
+  },
+  {
+   "id": "career.50",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1303,
+     "name": "Drift 3",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x40d8",
+   "ok": false
+  },
+  {
+   "id": "career.51",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1210,
+     "name": "Downtown Drag 2",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x4224",
+   "ok": false
+  },
+  {
+   "id": "career.52",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1005,
+     "name": "DT3 - Atlantic",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x4370",
+   "ok": false
+  },
+  {
+   "id": "career.53",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x44bc",
+   "ok": false
+  },
+  {
+   "id": "career.54",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1105,
+     "name": "SP5 - 9th & Frey",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x4608",
+   "ok": false
+  },
+  {
+   "id": "career.55",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1206,
+     "name": "MSNDrag - Main St.",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x4754",
+   "ok": false
+  },
+  {
+   "id": "career.56",
+   "group": "career",
+   "kind": 0,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1305,
+     "name": "Drift 5",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x48a0",
+   "ok": false
+  },
+  {
+   "id": "career.57",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1106,
+     "name": "SP6 - Bedard Bridge",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x49ec",
+   "ok": false
+  },
+  {
+   "id": "career.58",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1008,
+     "name": "RS2 - National Rail",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x4b38",
+   "ok": false
+  },
+  {
+   "id": "career.59",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1002,
+     "name": "CT2 - Stadium",
+     "laps": 4,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x4c84",
+   "ok": false
+  },
+  {
+   "id": "career.60",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x4dd0",
+   "ok": false
+  },
+  {
+   "id": "career.61",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1105,
+     "name": "SP5 - 9th & Frey",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x4f1c",
+   "ok": false
+  },
+  {
+   "id": "career.62",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1206,
+     "name": "MSNDrag - Main St.",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5068",
+   "ok": false
+  },
+  {
+   "id": "career.63",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1201,
+     "name": "DTDrag - 14th & Vine",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x51b4",
+   "ok": false
+  },
+  {
+   "id": "career.64",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1304,
+     "name": "Drift 4",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5300",
+   "ok": false
+  },
+  {
+   "id": "career.65",
+   "group": "career",
+   "kind": 0,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1306,
+     "name": "Drift 6",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x544c",
+   "ok": false
+  },
+  {
+   "id": "career.66",
+   "group": "career",
+   "kind": 1,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1103,
+     "name": "SP3 - Broadway",
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1105,
+     "name": "SP5 - 9th & Frey",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1104,
+     "name": "SP4 - Lock Up",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5598",
+   "ok": false
+  },
+  {
+   "id": "career.67",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1104,
+     "name": "SP4 - Lock Up",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x56e4",
+   "ok": false
+  },
+  {
+   "id": "career.68",
+   "group": "career",
+   "kind": 3,
+   "type": "type4 (U)",
+   "stages": [
+    {
+     "track": 1106,
+     "name": "SP6 - Bedard Bridge",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5830",
+   "ok": false
+  },
+  {
+   "id": "career.69",
+   "group": "career",
+   "kind": 1,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1008,
+     "name": "RS2 - National Rail",
+     "laps": 3,
+     "direction": 0
+    },
+    {
+     "track": 1005,
+     "name": "DT3 - Atlantic",
+     "laps": 3,
+     "direction": 1
+    },
+    {
+     "track": 1002,
+     "name": "CT2 - Stadium",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x597c",
+   "ok": false
+  },
+  {
+   "id": "career.70",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1214,
+     "name": "Mission Drag 2",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5ac8",
+   "ok": false
+  },
+  {
+   "id": "career.71",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1004,
+     "name": "DT2 - Terminal",
+     "laps": 6,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5c14",
+   "ok": false
+  },
+  {
+   "id": "career.72",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1001,
+     "name": "CT1 - Market St.",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5d60",
+   "ok": false
+  },
+  {
+   "id": "career.73",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1304,
+     "name": "Drift 4",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5eac",
+   "ok": false
+  },
+  {
+   "id": "career.74",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1107,
+     "name": "SP7 - Spillway",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x5ff8",
+   "ok": false
+  },
+  {
+   "id": "career.75",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1008,
+     "name": "RS2 - National Rail",
+     "laps": 5,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6144",
+   "ok": false
+  },
+  {
+   "id": "career.76",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1206,
+     "name": "MSNDrag - Main St.",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6290",
+   "ok": false
+  },
+  {
+   "id": "career.77",
+   "group": "career",
+   "kind": 3,
+   "type": "type4 (U)",
+   "stages": [
+    {
+     "track": 1107,
+     "name": "SP7 - Spillway",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x63dc",
+   "ok": false
+  },
+  {
+   "id": "career.78",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1108,
+     "name": "SP8 - 1st Ave. Truck Stop",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6528",
+   "ok": false
+  },
+  {
+   "id": "career.79",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1206,
+     "name": "MSNDrag - Main St.",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6674",
+   "ok": false
+  },
+  {
+   "id": "career.80",
+   "group": "career",
+   "kind": 1,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1214,
+     "name": "Mission Drag 2",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1214,
+     "name": "Mission Drag 2",
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1214,
+     "name": "Mission Drag 2",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1214,
+     "name": "Mission Drag 2",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x67c0",
+   "ok": false
+  },
+  {
+   "id": "career.81",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1004,
+     "name": "DT2 - Terminal",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x690c",
+   "ok": false
+  },
+  {
+   "id": "career.82",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1108,
+     "name": "SP8 - 1st Ave. Truck Stop",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6a58",
+   "ok": false
+  },
+  {
+   "id": "career.83",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1207,
+     "name": "Commercial",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6ba4",
+   "ok": false
+  },
+  {
+   "id": "career.84",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1001,
+     "name": "CT1 - Market St.",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6cf0",
+   "ok": false
+  },
+  {
+   "id": "career.86",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1306,
+     "name": "Drift 6",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6e3c",
+   "ok": false
+  },
+  {
+   "id": "career.87",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1004,
+     "name": "DT2 - Terminal",
+     "laps": 4,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x6f88",
+   "ok": false
+  },
+  {
+   "id": "career.88",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1210,
+     "name": "Downtown Drag 2",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x70d4",
+   "ok": false
+  },
+  {
+   "id": "career.89",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1004,
+     "name": "DT2 - Terminal",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x7220",
+   "ok": false
+  },
+  {
+   "id": "career.90",
+   "group": "career",
+   "kind": 0,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1307,
+     "name": "Drift 7",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x736c",
+   "ok": false
+  },
+  {
+   "id": "career.91",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1007,
+     "name": "RS1 - Port Royal",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x74b8",
+   "ok": false
+  },
+  {
+   "id": "career.92",
+   "group": "career",
+   "kind": 1,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1002,
+     "name": "CT2 - Stadium",
+     "laps": 3,
+     "direction": 1
+    },
+    {
+     "track": 1004,
+     "name": "DT2 - Terminal",
+     "laps": 3,
+     "direction": 1
+    },
+    {
+     "track": 1007,
+     "name": "RS1 - Port Royal",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x7604",
+   "ok": false
+  },
+  {
+   "id": "career.93",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1307,
+     "name": "Drift 7",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x7750",
+   "ok": false
+  },
+  {
+   "id": "career.94",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1109,
+     "name": "SP9 - 7th & Sparling",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x789c",
+   "ok": false
+  },
+  {
+   "id": "career.95",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1108,
+     "name": "SP8 - 1st Ave. Truck Stop",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x79e8",
+   "ok": false
+  },
+  {
+   "id": "career.96",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1001,
+     "name": "CT1 - Market St.",
+     "laps": 6,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x7b34",
+   "ok": false
+  },
+  {
+   "id": "career.97",
+   "group": "career",
+   "kind": 2,
+   "type": "type4 (U)",
+   "stages": [
+    {
+     "track": 1109,
+     "name": "SP9 - 7th & Sparling",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x7c80",
+   "ok": false
+  },
+  {
+   "id": "career.98",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1207,
+     "name": "Commercial",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x7dcc",
+   "ok": false
+  },
+  {
+   "id": "career.99",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1007,
+     "name": "RS1 - Port Royal",
+     "laps": 6,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x7f18",
+   "ok": false
+  },
+  {
+   "id": "career.100",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1106,
+     "name": "SP6 - Bedard Bridge",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8064",
+   "ok": false
+  },
+  {
+   "id": "career.101",
+   "group": "career",
+   "kind": 0,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1105,
+     "name": "SP5 - 9th & Frey",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x81b0",
+   "ok": false
+  },
+  {
+   "id": "career.102",
+   "group": "career",
+   "kind": 1,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1106,
+     "name": "SP6 - Bedard Bridge",
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1107,
+     "name": "SP7 - Spillway",
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1103,
+     "name": "SP3 - Broadway",
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x82fc",
+   "ok": false
+  },
+  {
+   "id": "career.103",
+   "group": "career",
+   "kind": 0,
+   "type": "type5 (U)",
+   "stages": [
+    {
+     "track": 1001,
+     "name": "CT1 - Market St.",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8448",
+   "ok": false
+  },
+  {
+   "id": "career.104",
+   "group": "career",
+   "kind": 0,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1004,
+     "name": "DT2 - Terminal",
+     "laps": 7,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8594",
+   "ok": false
+  },
+  {
+   "id": "career.105",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1308,
+     "name": "Drift 8",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x86e0",
+   "ok": false
+  },
+  {
+   "id": "career.106",
+   "group": "career",
+   "kind": 0,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1206,
+     "name": "MSNDrag - Main St.",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x882c",
+   "ok": false
+  },
+  {
+   "id": "career.107",
+   "group": "career",
+   "kind": 6,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1007,
+     "name": "RS1 - Port Royal",
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8978",
+   "ok": false
+  },
+  {
+   "id": "career.108",
+   "group": "career",
+   "kind": 6,
+   "type": "drag",
+   "stages": [
+    {
+     "track": 1202,
+     "name": "CTDrag - Highway 1",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8ac4",
+   "ok": false
+  },
+  {
+   "id": "career.109",
+   "group": "career",
+   "kind": 6,
+   "type": "drift",
+   "stages": [
+    {
+     "track": 1308,
+     "name": "Drift 8",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8c10",
+   "ok": false
+  },
+  {
+   "id": "career.110",
+   "group": "career",
+   "kind": 6,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1109,
+     "name": "SP9 - 7th & Sparling",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8d5c",
+   "ok": false
+  },
+  {
+   "id": "career.111",
+   "group": "career",
+   "kind": 3,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1007,
+     "name": "RS1 - Port Royal",
+     "laps": 5,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8ea8",
+   "ok": false
+  },
+  {
+   "id": "career.112",
+   "group": "career",
+   "kind": 5,
+   "type": "sprint",
+   "stages": [
+    {
+     "track": 1108,
+     "name": "SP8 - 1st Ave. Truck Stop",
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x8ff4",
+   "ok": false
+  },
+  {
+   "id": "career.113",
+   "group": "career",
+   "kind": 4,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1001,
+     "name": "CT1 - Market St.",
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x9140",
+   "ok": false
+  },
+  {
+   "id": "career.120",
+   "group": "career",
+   "kind": 8,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1001,
+     "name": "CT1 - Market St.",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x928c",
+   "ok": false
+  },
+  {
+   "id": "career.121",
+   "group": "career",
+   "kind": 8,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1003,
+     "name": "DT1 - Olympic Square",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x93d8",
+   "ok": false
+  },
+  {
+   "id": "career.122",
+   "group": "career",
+   "kind": 8,
+   "type": "circuit",
+   "stages": [
+    {
+     "track": 1006,
+     "name": "DT4 - Inner City",
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "src": "FrontB.lzc 0x34A02 +0x9524",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1001",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1001,
+   "name": "CT1 - Market St.",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1002",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1002,
+   "name": "CT2 - Stadium",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1003",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1003,
+   "name": "DT1 - Olympic Square",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1004",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1004,
+   "name": "DT2 - Terminal",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1005",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1005,
+   "name": "DT3 - Atlantic",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1006",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1006,
+   "name": "DT4 - Inner City",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1007",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1007,
+   "name": "RS1 - Port Royal",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1008",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1008,
+   "name": "RS2 - National Rail",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.circuit.1099",
+   "group": "quick_race",
+   "mode": "circuit",
+   "track": 1099,
+   "name": "Test Track",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.sprint.1102",
+   "group": "quick_race",
+   "mode": "sprint",
+   "track": 1102,
+   "name": "SP2 - Liberty Gardens",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.sprint.1103",
+   "group": "quick_race",
+   "mode": "sprint",
+   "track": 1103,
+   "name": "SP3 - Broadway",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.sprint.1104",
+   "group": "quick_race",
+   "mode": "sprint",
+   "track": 1104,
+   "name": "SP4 - Lock Up",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.sprint.1105",
+   "group": "quick_race",
+   "mode": "sprint",
+   "track": 1105,
+   "name": "SP5 - 9th & Frey",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.sprint.1106",
+   "group": "quick_race",
+   "mode": "sprint",
+   "track": 1106,
+   "name": "SP6 - Bedard Bridge",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.sprint.1107",
+   "group": "quick_race",
+   "mode": "sprint",
+   "track": 1107,
+   "name": "SP7 - Spillway",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.sprint.1108",
+   "group": "quick_race",
+   "mode": "sprint",
+   "track": 1108,
+   "name": "SP8 - 1st Ave. Truck Stop",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.sprint.1109",
+   "group": "quick_race",
+   "mode": "sprint",
+   "track": 1109,
+   "name": "SP9 - 7th & Sparling",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drag.1201",
+   "group": "quick_race",
+   "mode": "drag",
+   "track": 1201,
+   "name": "DTDrag - 14th & Vine",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drag.1202",
+   "group": "quick_race",
+   "mode": "drag",
+   "track": 1202,
+   "name": "CTDrag - Highway 1",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drag.1206",
+   "group": "quick_race",
+   "mode": "drag",
+   "track": 1206,
+   "name": "MSNDrag - Main St.",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drag.1207",
+   "group": "quick_race",
+   "mode": "drag",
+   "track": 1207,
+   "name": "Commercial",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drag.1210",
+   "group": "quick_race",
+   "mode": "drag",
+   "track": 1210,
+   "name": "Downtown Drag 2",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drag.1214",
+   "group": "quick_race",
+   "mode": "drag",
+   "track": 1214,
+   "name": "Mission Drag 2",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drift.1301",
+   "group": "quick_race",
+   "mode": "drift",
+   "track": 1301,
+   "name": "Drift 1",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drift.1302",
+   "group": "quick_race",
+   "mode": "drift",
+   "track": 1302,
+   "name": "Drift 2",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drift.1303",
+   "group": "quick_race",
+   "mode": "drift",
+   "track": 1303,
+   "name": "Drift 3",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drift.1304",
+   "group": "quick_race",
+   "mode": "drift",
+   "track": 1304,
+   "name": "Drift 4",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drift.1305",
+   "group": "quick_race",
+   "mode": "drift",
+   "track": 1305,
+   "name": "Drift 5",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drift.1306",
+   "group": "quick_race",
+   "mode": "drift",
+   "track": 1306,
+   "name": "Drift 6",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drift.1307",
+   "group": "quick_race",
+   "mode": "drift",
+   "track": 1307,
+   "name": "Drift 7",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.drift.1308",
+   "group": "quick_race",
+   "mode": "drift",
+   "track": 1308,
+   "name": "Drift 8",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1001",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1001,
+   "name": "CT1 - Market St.",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1002",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1002,
+   "name": "CT2 - Stadium",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1003",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1003,
+   "name": "DT1 - Olympic Square",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1004",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1004,
+   "name": "DT2 - Terminal",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1005",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1005,
+   "name": "DT3 - Atlantic",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1006",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1006,
+   "name": "DT4 - Inner City",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1007",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1007,
+   "name": "RS1 - Port Royal",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1008",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1008,
+   "name": "RS2 - National Rail",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.lapko.1099",
+   "group": "quick_race",
+   "mode": "lapko",
+   "track": 1099,
+   "name": "Test Track",
+   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "ok": false
+  },
+  {
+   "id": "qr.freerun",
+   "group": "quick_race",
+   "mode": "freerun",
+   "track": null,
+   "src": "which tracks Free Run lists: U",
+   "ok": false
+  },
+  {
+   "id": "game.profile",
+   "group": "game",
+   "check": "create a profile; the file lands in save/",
+   "src": "AGENTS.md Scope",
+   "ok": false
+  },
+  {
+   "id": "game.garage",
+   "group": "game",
+   "check": "Garage: every part type can be fitted and is seen on the car (everything unlocked)",
+   "src": "AGENTS.md Scope",
+   "ok": false
+  },
+  {
+   "id": "game.options",
+   "group": "game",
+   "check": "options change and persist in save/",
+   "src": "AGENTS.md Scope",
+   "ok": false
+  },
+  {
+   "id": "game.save_reload",
+   "group": "game",
+   "check": "career: save, reload the page, continue at the same event",
+   "src": "AGENTS.md Scope",
+   "ok": false
+  },
+  {
+   "id": "game.movies",
+   "group": "game",
+   "check": "the game movies play (MOVIES\\)",
+   "src": "AGENTS.md Scope",
+   "ok": false
+  }
+ ]
+}
