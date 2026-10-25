@@ -104,14 +104,14 @@ def jump(name):
 
 # cjump_<n>+<n>..: RN_JUMP "e<n>" (host/input.c) starts career row n (record n of the event table) from MU_UG_MapScreen with
 # the map's own path (0x5a0ce0, 0x4dfa10, 0x4b5df0). The OWNER's save (profile asas, first on the list) opens on the map
-# right after GO UNDERGROUND (runs cj1 2026-10-25: e1 at frame 1231, results 6/8 at 4795). Each race leaves as Quick Race does.
+# after GO UNDERGROUND and RETURN on the hub MU_UG_UndergroundMenu (runs cj1 2026-10-25: e1 at frame 1231, results 6/8 at 4795). Each race leaves as Quick Race does.
 def cjump(name):
     evs = name.split('_')[1].split('+')
     q = lambda scr, k: f'1500@={scr}:{k}'
-    pre = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + [q('MU_UG_NewOrLoad_PC2', 'RETURN'), q('MU_Main_PC', 'UP'), q('MU_Main_PC', 'RETURN')]
+    pre = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + [q('MU_UG_NewOrLoad_PC2', 'RETURN'), q('MU_Main_PC', 'UP'), q('MU_Main_PC', 'RETURN'), q('MU_UG_UndergroundMenu', 'RETURN')]
     leave = _LEAVE + ['3000@6:LEFT', '1500@6:RETURN']
     out = keys(pre, leave).split(',')
-    for _ in evs[1:]: out += ['3000@6:RETURN', '3000@6:RETURN'] + leave
+    for _ in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + leave
     return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * len(evs) + 120
 
 def launch(run):

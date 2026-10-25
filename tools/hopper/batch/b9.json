@@ -1,0 +1,4 @@
+{
+ "careerpost": {"q": "After a career race: return-screen pick 0x4ab670 ([[0x777ccc]+0x58a0]), hub 0x4e89b0, post-race menu entries in career (Restart/Quit/Continue), what a win vs a loss does and how the front end goes back to MU_UG_MapScreen", "addrs": ["0x4ab670", "0x4e89b0", "0x4e86d0", "0x49e100"], "strings": ["MU_UG_MapScreen.fng", "PostRaceMenu"]},
+ "trklist": {"q": "Quick Race track list: 0x4ab470 builds the tracks a mode lists; which unlock query (0x4d8040 family, [0x7677ac], table [0x737668]) hides a locked track, and how a locked track shows (lock icon)", "addrs": ["0x4ab470", "0x4b70c0", "0x4b6fe0"]}
+}
