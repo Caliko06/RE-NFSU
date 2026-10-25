@@ -1,32 +1,33 @@
 {
  "functions": 13800,
  "cases": {
-  "match": 16072,
-  "skip_unmapped": 38402,
-  "skip_pinned_cpu_path": 393,
-  "skip_timeout": 238,
-  "skip_not_a_function": 72,
-  "skip_ret_imm16_sign": 8,
-  "skip_call_into_data": 7,
-  "mismatch": 8
+  "match": 32215,
+  "skip_unmapped": 76752,
+  "skip_call_into_data": 16,
+  "skip_pinned_cpu_path": 775,
+  "skip_timeout": 474,
+  "skip_not_a_function": 133,
+  "skip_ret_imm16_sign": 16,
+  "mismatch": 19
  },
  "compared_stop_kinds": {
-  "import": 3299,
-  "ret": 12695,
-  "invalid": 65,
-  "fault": 21
+  "import": 6598,
+  "ret": 25467,
+  "invalid": 132,
+  "fault": 37
  },
- "functions_compared": 5411,
- "functions_all_match": 5408,
+ "functions_compared": 5813,
+ "functions_all_match": 5809,
  "all_match_by_seed": {
-  "data": 2196,
-  "call": 3203,
-  "?": 9
+  "data": 2361,
+  "call": 3434,
+  "?": 14
  },
- "functions_with_mismatch": 3,
+ "functions_with_mismatch": 4,
  "mismatch_funcs": [
   "0x642774",
   "0x673824",
+  "0x67a337",
   "0x67ca06"
  ],
  "mismatches": [
@@ -59,6 +60,62 @@
    "mem_diff": []
   },
   {
+   "func": "0x642774",
+   "unicorn": "invalid",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x31",
+    "0x10ee7d8",
+    "0x102730c",
+    "0xf6a45b99",
+    "0x1ff0000",
+    "0x10c6d54",
+    "0x10c17b0",
+    "0x1043a70"
+   ],
+   "lift": [
+    "0x31",
+    "0x10ee7d8",
+    "0x102730c",
+    "0xf6a45b99",
+    "0x1ffd137",
+    "0x10c6d54",
+    "0x10c17b0",
+    "0x1043a70"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x642774",
+   "unicorn": "invalid",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x1065b50",
+    "0x1b",
+    "0x24",
+    "0x1055a14",
+    "0x1ff0000",
+    "0xb0624659",
+    "0x107b484",
+    "0x1020900"
+   ],
+   "lift": [
+    "0x1065b50",
+    "0x1b",
+    "0x24",
+    "0x1055a14",
+    "0x1ffd137",
+    "0xb0624659",
+    "0x107b484",
+    "0x1020900"
+   ],
+   "mem_diff": []
+  },
+  {
    "func": "0x673824",
    "unicorn": "ret",
    "lifted": "ret",
@@ -171,6 +228,149 @@
    "mem_diff": []
   },
   {
+   "func": "0x673824",
+   "unicorn": "ret",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x0",
+    "0x10d4390",
+    "0x108c0fc",
+    "0x10b7ee4",
+    "0x1ff0004",
+    "0x10cc1a4",
+    "0x10691a4",
+    "0x3d"
+   ],
+   "lift": [
+    "0x0",
+    "0x10d4390",
+    "0x108c0fc",
+    "0x10b7ee4",
+    "0x1ff0004",
+    "0x10cc1a4",
+    "0x10691a4",
+    "0x3d"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x673824",
+   "unicorn": "ret",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x0",
+    "0x10c9944",
+    "0xde7779a5",
+    "0x1062164",
+    "0x1ff0004",
+    "0x101f2b8",
+    "0xc",
+    "0x15ed24cf"
+   ],
+   "lift": [
+    "0x0",
+    "0x10c9944",
+    "0xde7779a5",
+    "0x1062164",
+    "0x1ff0004",
+    "0x101f2b8",
+    "0xc",
+    "0x15ed24cf"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x673824",
+   "unicorn": "ret",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x10e0000",
+    "0x10cc5bc",
+    "0x104d260",
+    "0x39",
+    "0x1ff0004",
+    "0x104aa60",
+    "0x29",
+    "0x10a5398"
+   ],
+   "lift": [
+    "0x10e0000",
+    "0x10cc5bc",
+    "0x104d260",
+    "0x39",
+    "0x1ff0004",
+    "0x104aa60",
+    "0x29",
+    "0x10a5398"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x673824",
+   "unicorn": "ret",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x57980000",
+    "0x101541c",
+    "0x1078480",
+    "0x100e958",
+    "0x1ff0004",
+    "0x21",
+    "0x9",
+    "0x1060594"
+   ],
+   "lift": [
+    "0x57980000",
+    "0x101541c",
+    "0x1078480",
+    "0x100e958",
+    "0x1ff0004",
+    "0x21",
+    "0x9",
+    "0x1060594"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x67a337",
+   "unicorn": "ret",
+   "lifted": "no lifted function",
+   "why": "no lifted function",
+   "at": "0x6728cc",
+   "uc": [
+    "0x105337c",
+    "0xbb40e64e",
+    "0x7",
+    "0x1b",
+    "0x1ff0004",
+    "0x10b3cac",
+    "0x36",
+    "0x34"
+   ],
+   "lift": [
+    "0x105339b",
+    "0xfffffff9",
+    "0x3",
+    "0x105337c",
+    "0x1feff68",
+    "0x1feff70",
+    "0x1053397",
+    "0x1053398"
+   ],
+   "mem_diff": [
+    "0x105337d",
+    "0x1feff88"
+   ]
+  },
+  {
    "func": "0x67ca06",
    "unicorn": "ret",
    "lifted": "ret",
@@ -251,6 +451,118 @@
     "0x1080698",
     "0x10199d0",
     "0x1014b14"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x67ca06",
+   "unicorn": "ret",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x5b61d59c",
+    "0x1062984",
+    "0x10022b4",
+    "0x3",
+    "0x1ff0004",
+    "0x105fdb4",
+    "0x1a",
+    "0x10b8ae0"
+   ],
+   "lift": [
+    "0x5b61d59c",
+    "0x1062984",
+    "0x10022b4",
+    "0x3",
+    "0x1ff0004",
+    "0x105fdb4",
+    "0x1a",
+    "0x10b8ae0"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x67ca06",
+   "unicorn": "ret",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x20",
+    "0x109b8f0",
+    "0x10a8a70",
+    "0x10b98d0",
+    "0x1ff0004",
+    "0x10d60cc",
+    "0x34",
+    "0x6a83c5eb"
+   ],
+   "lift": [
+    "0x20",
+    "0x109b8f0",
+    "0x10a8a70",
+    "0x10b98d0",
+    "0x1ff0004",
+    "0x10d60cc",
+    "0x34",
+    "0x6a83c5eb"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x67ca06",
+   "unicorn": "ret",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x1067580",
+    "0x109d0b8",
+    "0x38",
+    "0x10bffd4",
+    "0x1ff0004",
+    "0x3c",
+    "0x35",
+    "0x1071b38"
+   ],
+   "lift": [
+    "0x1067580",
+    "0x109d0b8",
+    "0x38",
+    "0x10bffd4",
+    "0x1ff0004",
+    "0x3c",
+    "0x35",
+    "0x1071b38"
+   ],
+   "mem_diff": []
+  },
+  {
+   "func": "0x67ca06",
+   "unicorn": "ret",
+   "lifted": "ret",
+   "why": "",
+   "at": "0x0",
+   "uc": [
+    "0x1034054",
+    "0x10056bc",
+    "0x10d1be4",
+    "0x1066768",
+    "0x1ff0004",
+    "0x1034344",
+    "0xf0cd8992",
+    "0x1008aa8"
+   ],
+   "lift": [
+    "0x1034054",
+    "0x10056bc",
+    "0x10d1be4",
+    "0x1066768",
+    "0x1ff0004",
+    "0x1034344",
+    "0xf0cd8992",
+    "0x1008aa8"
    ],
    "mem_diff": []
   }
@@ -260,5 +572,5 @@
   "0x673824": "FPREM with invalid operands: the SDM gives the real indefinite (-NaN), QEMU 5 gives +NaN.",
   "0x67ca06": "FPREM on unsupported 80-bit encodings (unnormals): the SDM gives -NaN, QEMU 5 gives +NaN."
  },
- "gate": "pass"
+ "gate": "FAIL"
 }

@@ -109,12 +109,14 @@ async function startGpu(M, canvas, report, onFrame) {
     buffer: { type: 'uniform', hasDynamicOffset: true, minBindingSize: 32 } }] });
   const clearBind = device.createBindGroup({ layout: clearBgl, entries: [{ binding: 0, resource: { buffer: clearRing, size: 32 } }] });
   const clearLayout = device.createPipelineLayout({ bindGroupLayouts: [clearBgl] });
-  // BRIDGE: remaster, OWNER 2026-10-22: 4x MSAA on the screen-sized targets. Opt-in on 2026-10-22 (it lagged then: the lag was the
-  // frame pacing and per-draw copies, fixed 2026-10-23). Default since 2026-10-23 (OWNER goal: 60 fps, excellent quality): race at
-  // 2560x1160, GPU time per frame (timestamp-query) p50 11 / p90 13.5 ms with it, 7.7 / 11.3 without; ?msaa=1 turns it off. Each colour target keeps
-  // its single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
+  // BRIDGE: remaster, OWNER 2026-10-22: 4x MSAA on the screen-sized targets, opt-in with ?msaa=4. Off by default since
+  // 2026-10-25: in a race at 2560x1116 GPU time per frame (timestamp-query) was p50 17.5 ms with it and 7.6 without (bloom
+  // on), and the queue behind it gave the OWNER 200-400 ms stalls. The game draws the screen in ~8 passes a frame (scene,
+  // the draws after the motion blur, copies, HUD); on Apple's tiled GPUs each one loads and stores every sample of colour and
+  // depth (~190 MB a pass). FXAA (below) is the antialiasing when it is off. With it on, each colour target keeps its
+  // single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
   // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
-  const MSAA = new URLSearchParams(location.search).get('msaa') === '1' ? 1 : 4;
+  const MSAA = new URLSearchParams(location.search).get('msaa') === '4' ? 4 : 1;
   // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first HUD quad of a race
   // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
   const FXAA_MODE = new URLSearchParams(location.search).get('fxaa');   // '0' off, '2' debug: edges in red
@@ -767,7 +769,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           let k = ci;      // the pass runs while the draws keep this target pair
           while (k < cl.length && (w[cl[k]] & 0xff) === GPU_DRAW && w[cl[k] + 1 + D_RT] === g(D_RT) && w[cl[k] + 1 + D_DS] === g(D_DS)) k++;
           pass = enc.beginRenderPass(passDesc('draw', g(D_RT), g(D_DS), k, fold ? pend : null));
-          if (PROF) profSeq.push(`D${rt ? rt.w : 0}x${k - ci + 1}`);
+          if (PROF) profSeq.push(`D${rt ? rt.w : 0}:${g(D_RT)}/${g(D_DS)}${g(D_ZEN) ? 'z' : ''}x${k - ci + 1}`);
           if (fold) pend = null;
           passKey = key;
         }
@@ -829,7 +831,14 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         uoff += U_STEP;
         stats.draws++;
       } else if (op === GPU_FXAA) {
-        if (PROF) profSeq.push('fxaa');
+        if (PROF) {   // the draws on this target after the scene, and how many of them test or write depth
+          let n = 0, z = 0;
+          for (let k = ci; k < cl.length; k++) {
+            const b = cl[k] + 1;
+            if ((w[b - 1] & 0xff) === GPU_DRAW && w[b + D_RT] === w[a]) { n++; z += w[b + D_ZEN] ? 1 : 0; }
+          }
+          profSeq.push(`fxaa(post ${n}, zen ${z})`);
+        }
         endPass();
         const rt = res.get(w[a]);
         if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);

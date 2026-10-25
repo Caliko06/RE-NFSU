@@ -832,7 +832,9 @@ class Lifter:
                 self.out.append(f"goto L{nxt:x};")     # an overlapping decode stream starts in between
         regs = " ".join(f"uint32_t {r}=c->r[{k}];" for k, r in enumerate(REG32))
         flags = " ".join(f"int {f}=c->{f};" for f in FLAGS)
-        return (f"void f_{entry:x}(Ctx *c) {{\n{regs} {flags}\n"
+        # restrict: guest memory (c->mem) never overlaps the Ctx, so a guest store does not make the compiler reload
+        # c->mem, c->memsz, c->ftop and c->st[] (with -fno-strict-aliasing any byte store could alias them).
+        return (f"void f_{entry:x}(Ctx *restrict c) {{\n{regs} {flags}\n"
                 "uint32_t ea=0,t1=0,t2=0,res=0,n=0,k=0; uint64_t u=0; int64_t w=0;\n"
                 "(void)ea;(void)t1;(void)t2;(void)res;(void)n;(void)k;(void)u;(void)w;\n"
                 f"goto L{entry:x};\n" + "\n".join(self.out) +

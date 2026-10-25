@@ -93,7 +93,7 @@ def lift_module(m, cb, funcs, lifted, exe_u32):
     text = re.sub(r"0x([0-9a-f]+)u?\b", lambda x: f"(mb+0x{int(x[1], 16) - cb:x}u)" if cb <= int(x[1], 16) < end else x[0], text)
     text = re.sub(r"\bL([0-9a-f]+)\b", lambda x: f"Lo{int(x[1], 16) - cb:x}" if cb <= int(x[1], 16) < end else x[0], text)
     text = re.sub(r"\bf_([0-9a-f]+)\(c\)", lambda x: f"(c->mb=mb, M_{int(x[1], 16) - cb:x}(c))" if cb <= int(x[1], 16) < end else x[0], text)
-    text = re.sub(r"void f_([0-9a-f]+)\(Ctx \*c\) \{\n", lambda x: f"void M_{int(x[1], 16) - cb:x}(Ctx *c) {{\nuint32_t mb=c->mb;\n", text)
+    text = re.sub(r"void f_([0-9a-f]+)\(Ctx \*restrict c\) \{\n", lambda x: f"void M_{int(x[1], 16) - cb:x}(Ctx *restrict c) {{\nuint32_t mb=c->mb;\n", text)
     key = hashlib.sha1(text.encode()).hexdigest()[:10]       # same code, same C: lifted once
     return key, sorted(e - cb for e in entries), text.replace("M_", f"m{key}_")
 
