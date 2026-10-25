@@ -35,17 +35,22 @@ for f in files:
             p = pos @ A[:, :3].T + A[:, 3]
             ak = (tuple(np.round(A[:, :3], 2).ravel()), tuple(np.round(A[:, 3], 0)))
             if (vh, ak) in inst: drift.append(np.abs(blocks[inst[vh, ak][0]][0] - p).max()); continue
-            b = blocks.setdefault((vbh, ak), (p, A, []))[2]; b.append(tris(d)); inst[vh, ak] = ((vbh, ak), d['tex0'])
+            col = np.array(geodump.attr(d, 10), np.uint8)[:, [2, 1, 0, 3]]   # D3DCOLOR bytes are B, G, R, A
+            b = blocks.setdefault((vbh, ak), (p, A, [], col))[2]; b.append((tris(d), d['tex0'])); inst[vh, ak] = ((vbh, ak), d['tex0'])
         elif d['vs'] == CAR:
             M = tuple(np.round(d['vsc'][40:56], 4))
             cars.setdefault((f, M), {})[vh] = (pos, tris(d), d['tex0'], vh)
 # Flat npz (Blender's numpy 1 cannot read numpy 2 pickles). World: one vertex block per vb placed by one matrix (draws of
 # one vb with other index ranges share its vertices, so their tris are one mesh, not coplanar copies); w.vh/w.blk/w.tex
-# list the draws. Cars: c<k>.vh, c<k>.<j>.p, c<k>.<j>.t per distinct car (one set of part hashes, in its own space).
+# list the draws; w.col = the vertex colour (the game's baked light, RGBA), w.ttk = the tex0 key of each w.tri (for bake.py gi).
+# Cars: c<k>.vh, c<k>.<j>.p, c<k>.<j>.t per distinct car (one set of part hashes, in its own space).
 bk = list(blocks); bi = {k: i for i, k in enumerate(bk)}
 boff = np.cumsum([0] + [len(blocks[k][0]) for k in bk])
-d = {'w.pos': np.concatenate([blocks[k][0] for k in bk]).astype(np.float32), 'w.boff': boff,
-     'w.tri': np.unique(np.concatenate([np.concatenate(blocks[k][2]) + boff[i] for i, k in enumerate(bk)]), axis=0).astype(np.uint32),
+T = np.concatenate([t + boff[i] for i, k in enumerate(bk) for t, _ in blocks[k][2]])
+K = np.concatenate([np.full(len(t), x, np.uint64) for k in bk for t, x in blocks[k][2]])
+T, u = np.unique(T, axis=0, return_index=True)
+d = {'w.tri': T.astype(np.uint32), 'w.ttk': K[u], 'w.pos': np.concatenate([blocks[k][0] for k in bk]).astype(np.float32), 'w.boff': boff,
+     'w.col': np.concatenate([blocks[k][3] for k in bk]),
      'w.A': np.array([blocks[k][1].ravel() for k in bk], np.float32), 'w.vbh': np.array([k[0] for k in bk]),
      'w.vh': np.array([k[0] for k in inst]), 'w.blk': np.array([bi[v[0]] for v in inst.values()], np.int32),
      'w.tex': np.array([v[1] for v in inst.values()], np.uint64)}

@@ -20,13 +20,13 @@ ROWS = {'explore_career': ','.join(f'{20000 + 4000 * i}:RETURN' for i in range(1
         'explore_ug': ','.join(f'{20000 + 4000 * i}:{k}' for i, k in enumerate(['RETURN', 'RETURN', 'UP'] + ['RETURN'] * 10)),
         'circuit': menu(0), 'sprint': menu(1), 'drag': menu(2), 'drift': menu(3), 'lapko': menu(4), 'freerun': menu(5)}
 
-# After the race (flow state 6/8): the results screen has Quit and Next (RETURN), Next shows Race Stats with only Quit
-# (runs/circuit shots, 2026-10-24). Which key is Quit is not known yet: one variant per seed. Taps "ms@6/8:" wait for that
-# state and count from the tap before (host/input.c). Then, back in the front end (state 3, any race state), RETURNs
-# start the next race from wherever the menu lands.
-LEAVE = [['3000@6/8:RETURN', '3000@6/8:Q', '2000@6/8:RETURN', '2000@6/8:RETURN'],
-         ['3000@6/8:RETURN', '3000@6/8:ESCAPE', '2000@6/8:RETURN', '2000@6/8:RETURN'],
-         ['3000@6/8:RETURN', '3000@6/8:BACK', '2000@6/8:RETURN', '2000@6/8:RETURN']]   # Q: 4 rows of seed 0x1234 stayed on 6/8
+# After the race (flow state 6/8), RETURN walks Results -> Race Style Points -> the post-race menu (Restart, Statistics,
+# Leave Race; RETURN there opens "Restart Race? OK / Cancel", runs/leave_ret 2026-10-25). So: two RETURNs, DOWN DOWN to
+# Leave Race, RETURN, then the confirm. Which button the confirm starts on is not known yet: one variant per seed.
+# Taps "ms@6/8:" wait for that state and count from the tap before (host/input.c). Then, back in the front end (state 3,
+# any race state), RETURNs start the next race from wherever the menu lands.
+_LEAVE = ['3000@6/8:RETURN', '4000@6/8:RETURN', '4000@6/8:DOWN', '1500@6/8:DOWN', '1500@6/8:RETURN']
+LEAVE = [_LEAVE + ['3000@6:RETURN'], _LEAVE + ['3000@6:LEFT', '1500@6:RETURN'], _LEAVE + ['3000@6:RIGHT', '1500@6:RETURN']]
 NEXT = ['8000@3:RETURN'] + ['3000@3:RETURN'] * 9
 
 def keys(seq, post=()):
