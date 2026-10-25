@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "52/167",
+ "progress": "67/167",
  "rows": [
   {
    "id": "career.0",
@@ -292,7 +292,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x1374",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.16",
@@ -308,7 +308,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x14c0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.17",
@@ -324,7 +324,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x160c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.18",
@@ -356,7 +356,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x18a4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.20",
@@ -454,7 +454,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x1f20",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.25",
@@ -486,7 +486,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x21b8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.27",
@@ -502,7 +502,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2304",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.28",
@@ -534,7 +534,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x259c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.30",
@@ -642,7 +642,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2d64",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.36",
@@ -658,7 +658,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2eb0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.37",
@@ -674,7 +674,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2ffc",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.38",
@@ -718,7 +718,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3294",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.40",
@@ -750,7 +750,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x352c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.42",
@@ -830,7 +830,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3ba8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.47",
@@ -846,7 +846,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3cf4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.48",
