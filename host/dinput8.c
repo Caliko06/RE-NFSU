@@ -584,6 +584,15 @@ void dinput8_key(uint8_t dik, int down) {
             if (o->f[j].what == 0x200u + dik) push(o, o->f[j].ofs, down ? 0x80 : 0, o->f[j].app);
     }
 }
+// Events the game has not read yet on the acquired buffered keyboards; -1 when no keyboard is acquired (RN_KEYS pacing).
+int dinput8_key_pending(void) {
+    int n = -1;
+    for (int k = 0; k < nobjs; k++) {
+        Obj *o = &objs[k];
+        if (o->iface == I_DEV && o->kind == KEYBOARD && o->acquired && o->buffer) n = (n < 0 ? 0 : n) + (int)(o->ev_tail - o->ev_head);
+    }
+    return n;
+}
 void dinput8_button(int b, int down) {
     for (int k = 0; k < nobjs; k++) {
         Obj *o = &objs[k];

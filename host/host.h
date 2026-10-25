@@ -111,6 +111,7 @@ int input_alt(void);
 char input_char_of(uint8_t vk, int shift);
 void input_key_name(uint8_t dik, char *out, int n);                 // GetKeyNameText, US layout
 void dinput8_key(uint8_t dik, int down);
+int dinput8_key_pending(void);
 void dinput8_button(int b, int down);
 void dinput8_motion(int32_t dx, int32_t dy, int32_t dz);
 void input_mouse_exclusive(int on);                            // web: the page hides and locks the pointer

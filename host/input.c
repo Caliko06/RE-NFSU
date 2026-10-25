@@ -177,8 +177,14 @@ static void read_script(void) {
 }
 // Each tap is a down event at its time and an up event 100 ms later, in time order. The up waits two more frames
 // (Presents): a slow frame (a rasterized RN_RASTER frame takes ~1 s) would else see both edges and no key down.
+// The game finds a press as an edge between two input frames (0x405980 keeps the last mask at 0x7187b8; 0x4070a0 applies
+// the GetDeviceData events), so a tap must not outrun the game's reads (runs/e1_down6 2026-10-25: during a 3 s load the
+// next down came before the up was read, both in one read, no edge, the tap lost). So, up to 10 s each: the up also
+// waits for an acquired keyboard (an up while the game swaps action maps reaches no device and the key stays down in
+// its mask, runs/dilog2: ESC), and the next down waits until the game has read every event, plus two frames.
 void input_poll(void) {
-    static uint32_t down_at;
+    static uint32_t down_at, read_at;
+    static uint64_t wait_from;
     if (!script_read) read_script();
     uint64_t now = now_us();
     while (next_tap < 2u * (unsigned)ntaps) {
@@ -189,6 +195,11 @@ void input_poll(void) {
         }
         uint64_t at = taps[k].at_us + (next_tap & 1 ? 100000 : 0);
         if (at > now || ((next_tap & 1) && rn_telem.presents - down_at < 2)) break;
+        int pend = dinput8_key_pending();
+        if (pend > 0) read_at = rn_telem.presents;
+        int hold = (next_tap & 1) ? pend < 0 : pend > 0 || rn_telem.presents - read_at < 2;
+        if (hold) { if (!wait_from) wait_from = now; if (now - wait_from < 10000000) break; }
+        wait_from = 0;
         if (!(next_tap & 1)) down_at = rn_telem.presents;
         key_event(taps[k].dik, !(next_tap & 1));
         next_tap++;
