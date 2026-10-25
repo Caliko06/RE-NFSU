@@ -15,10 +15,10 @@ Blocks in order. Each one closes with progress before -> after, `webcheck --rout
 1. Quick Race (46 rows): DONE 2026-10-25 (46/46, f414af4). RN_JUMP per track + one RN_KEYS route per mode.
 2. Underground career (116 rows): career.1+ = ChooseCareerCar -> MapScreen -> EventBriefing -> race -> results.
    `career1` like `career0`; RN_JUMP to the game's own event start (RE); the OWNER's save (asas) as a mid-career start.
-   RUNNING 2026-10-25: `cjump_<n>+..` chains of 8 (RN_JUMP e<N>, map path 0x4c5df0). Stops: drift events (autopilot
-   crawls at 1-9 mph), some tournament stages wait on PostRaceResults, long races outrun RN_SECS.
+   DONE 2026-10-25 (116/116): RN_JUMP e<N> + RN_FINISH + RN_NEXT (tournament stages by PostRaceMenu 0x64bf64d2).
 3. Whole game (5 game rows + scope): garage and customization with everything unlocked (PATCH with RE citation),
    options persist, save -> reload page -> continue, sound, music, movies. Gate: one Chrome run that saves, reloads, continues.
+   Rows DONE 2026-10-25 (5/5, native); the Chrome save/reload run is still open.
 4. 60 fps, 0 hitches > 33 ms: gate60/bench in Chrome; measure first, fix in the recompiler or the layer.
 5. RTX as layer bridges, each with a switch: textures 4x + normal/AO, shadows + SSAO, HDR bloom/tonemap, body reflections,
    AA, speed motion blur + light trails (RE PC/PS2 first, never overdone, road never wet). A/B shot per effect; gate60 with all on.
