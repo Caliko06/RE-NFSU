@@ -103,14 +103,26 @@ static void call_host(Ctx *c, uint32_t target) {
     c->r[EAX] = v;
 }
 
+// Every indirect call and vtable call looks its target up: a binary search over the 14k functions was 6% of the game
+// thread in a race (CPU profile 2026-10-25). Buckets of 64 code bytes index the sorted list: one or two compares.
+#define BUCKET_SHIFT 6
+static uint32_t *bucket, nbucket;      // bucket[b] = first function at or after rn_fn_addr[0] + (b << BUCKET_SHIFT)
+static void bucket_init(void) {         // under the GIL, like every rn_call
+    nbucket = ((rn_fn_addr[rn_fn_count - 1] - rn_fn_addr[0]) >> BUCKET_SHIFT) + 2;
+    bucket = malloc(4u * nbucket);
+    for (uint32_t b = 0, k = 0; b < nbucket; b++) {
+        while (k < rn_fn_count && ((rn_fn_addr[k] - rn_fn_addr[0]) >> BUCKET_SHIFT) < b) k++;
+        bucket[b] = k;
+    }
+}
+
 void rn_call(Ctx *c, uint32_t target) {
     if (target >= HOST_BASE) { call_host(c, target); return; }
-    uint32_t lo = 0, hi = rn_fn_count;
-    while (lo < hi) {
-        uint32_t mid = (lo + hi) / 2;
-        if (rn_fn_addr[mid] < target) lo = mid + 1; else hi = mid;
-    }
-    if (lo < rn_fn_count && rn_fn_addr[lo] == target) { rn_fn_ptr[lo](c); return; }
+    if (!bucket) bucket_init();
+    uint32_t b = (target - rn_fn_addr[0]) >> BUCKET_SHIFT;
+    if (target >= rn_fn_addr[0] && b + 1 < nbucket)
+        for (uint32_t k = bucket[b]; k < bucket[b + 1]; k++)
+            if (rn_fn_addr[k] == target) { rn_fn_ptr[k](c); return; }
     uint32_t mb;
     void (*mod)(Ctx *) = rn_mod_find(c, target, &mb);
     if (mod) { c->mb = mb; mod(c); return; }

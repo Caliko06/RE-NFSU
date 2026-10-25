@@ -23,7 +23,7 @@ static Thread *threads[64];
 static int nthreads;
 
 static pthread_mutex_t gm = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t gcv = PTHREAD_COND_INITIALIZER;   // GIL turn changed
+static pthread_cond_t turn_cv[128] = {[0 ... 127] = PTHREAD_COND_INITIALIZER};   // ticket t waits on turn_cv[t & 127]
 static pthread_cond_t scv = PTHREAD_COND_INITIALIZER;   // some object changed state
 static unsigned long next_ticket, serving, gen;
 
@@ -33,20 +33,43 @@ static unsigned long next_ticket, serving, gen;
 // [0x70fe28] the decoder 0x645a77 spins on. Two GIL hand-offs per tick: at a 20 ms quantum the title movie ran
 // ~20x slow and "Press enter" never came. A waiter asks the looping holder to yield after 2 ms.
 #define PREEMPT_US 2000
+// In a race the main thread passes the GIL ~60 times per frame (at clock reads, to the sound and timer threads) and each
+// turn is short; a wake from the condition variable lay ~22 us per hand-off (telemetry gilGap, 2026-10-25). The main
+// thread spins this long for its turn before it sleeps. Only the main thread: it is the frame's critical path.
+#define MAIN_SPIN_US 300
 volatile int rn_preempt;
 static uint64_t slice_start, hold_start;
+static uint64_t free_since;     // the GIL was passed on (under gm) to a thread that waits for it; 0 = it was taken
 static __thread int is_main;
+// Under gm: the next ticket's turn. Only its thread wakes (a broadcast woke every waiter to re-check its ticket).
+// Telemetry times the gap until that thread holds the GIL.
+static void pass_turn(void) {
+    unsigned long s = __atomic_add_fetch(&serving, 1, __ATOMIC_RELEASE);
+    if (next_ticket != s) { free_since = now_us(); pthread_cond_signal(&turn_cv[s & 127]); }
+}
 void gil_acquire(void) {
     uint64_t t0 = now_us();
     pthread_mutex_lock(&gm);
     unsigned long t = next_ticket++;
+    if (is_main && t != serving) {
+        pthread_mutex_unlock(&gm);
+        for (unsigned k = 1; __atomic_load_n(&serving, __ATOMIC_ACQUIRE) != t; k++)
+            if (!(k & 63) && now_us() - t0 >= MAIN_SPIN_US) break;
+        pthread_mutex_lock(&gm);
+    }
     while (t != serving) {
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
         uint64_t ns = (uint64_t)ts.tv_nsec + PREEMPT_US * 1000ull;
         ts.tv_sec += ns / 1000000000ull;
         ts.tv_nsec = ns % 1000000000ull;
-        if (pthread_cond_timedwait(&gcv, &gm, &ts) && t != serving) rn_preempt = 1;   // the holder ran a quantum
+        if (pthread_cond_timedwait(&turn_cv[t & 127], &gm, &ts) && t != serving) rn_preempt = 1;   // the holder ran a quantum
+    }
+    if (free_since) {       // the web's clock is per worker: a gap measured across two threads can come out < 0
+        uint64_t now = now_us();
+        rn_telem.gil_handoffs++;
+        if (now > free_since) rn_telem.gil_gap_us += (uint32_t)(now - free_since);
+        free_since = 0;
     }
     pthread_mutex_unlock(&gm);
     slice_start = hold_start = now_us();
@@ -91,8 +114,7 @@ static void count_hold(void) {
 void gil_release(void) {
     count_hold();
     pthread_mutex_lock(&gm);
-    serving++;
-    pthread_cond_broadcast(&gcv);
+    pass_turn();
     pthread_mutex_unlock(&gm);
 }
 static void notify(void) {
@@ -107,8 +129,7 @@ static void wait_change(uint64_t deadline) {
     count_hold();
     pthread_mutex_lock(&gm);
     unsigned long g = gen;
-    serving++;
-    pthread_cond_broadcast(&gcv);
+    pass_turn();
     while (gen == g) {
         uint64_t now = now_us();
         if (deadline && now >= deadline) break;

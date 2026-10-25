@@ -59,7 +59,7 @@ def near(t, before=1500, after=300, n=4):
 # Frames: sum the rows between two presents (a big load hands the list over in parts).
 frames, acc = [], None
 SUM = ["run", "draws", "kwords", "texKb", "pipes", "shaders", "targets", "gpuWait", "gilMain", "gilOther", "read", "idleMain",
-       "reads", "readKb", "starves", "underrun", "resyncs", "clockCalls"]
+       "reads", "readKb", "starves", "underrun", "resyncs", "clockCalls", "handoffs", "gilGap"]
 MAX = ["streamPm", "holdMain", "holdOther"]
 last_t = None
 for r in rows:

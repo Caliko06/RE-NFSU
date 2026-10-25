@@ -88,6 +88,8 @@ typedef struct {
     uint32_t starves;           // times a looping buffer played a whole lap with no Unlock (stale audio repeats)
     uint32_t starve_buf;        // dsound object index of the last one
     uint32_t clock_calls;       // GetTickCount, timeGetTime, QueryPerformanceCounter: many per frame = a busy wait
+    uint32_t gil_handoffs;      // GIL turns passed to a thread that was waiting for it
+    uint32_t gil_gap_us;        // time the GIL lay free in those hand-offs (the waiter waking up): no guest code runs
 } Telem;
 extern Telem rn_telem;
 void dispatch_threads_report(void);                             // log what every guest thread is doing now
