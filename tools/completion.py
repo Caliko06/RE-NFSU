@@ -128,11 +128,11 @@ def cjump(name):
     # Tournament (runs/cjump_6 shot 12173): the race leave's DOWN DOWN RETURN restarts the tournament, so RETURN = Next Race.
     # Next Race itself is RN_NEXT (host/input.c): its confirm opens with No focused (runs/cjump_6 taps 18-19).
     # After the last stage the menu is the same and Next Race ends the tournament (runs/cjump_6 shot 4301, 3 stages done).
-    # Next Race goes back to the hub, then the map and the next stage's briefing (runs/cjump_6 2026-10-25: hub 3023, map
-    # 3183, MU_UG_EventBriefing 3429): each gets its RETURN when it shows. Three taps reach PostRaceMenu from the results
-    # (taps 12-14); a fourth is dropped there or lands on the loading screen.
+    # Three taps reach PostRaceMenu from the results (runs/cjump_6 taps 12-14); a fourth is dropped there or lands on the
+    # loading screen.
     res = ['3000@6/8:RETURN'] + ['4000@!PostRaceMenu:RETURN'] * 4
-    nxt = [q('MU_UG_UndergroundMenu', 'RETURN'), q('MU_UG_MapScreen', 'RETURN'), q('MU_UG_EventBriefing', 'RETURN'), '3000@6/4:RETURN']
+    # The next stage starts from RN_NEXT on the map (host/input.c: the map's 0x5a0ce0, 0x4dfa10, 0x4b5df0 for the event).
+    nxt = [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6/4:RETURN']
     stages = lambda e: (res + nxt) * (STAGES[f'career.{e}'] - 1) + (res if STAGES[f'career.{e}'] > 1 else leave)
     out = keys(pre, stages(evs[0])).split(',')
     for e in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + stages(e)
@@ -262,6 +262,10 @@ def row_of(d, log):
     # A career jump names its row (host/input.c "RN_JUMP: career event N"); the opened track must still be its first stage.
     cj = [int(m[1]) for m in (re.match(r'RN_JUMP: career event (\d+)', l) for l in log) if m]
     if career and cj and trk and STAGE1.get(f'career.{cj[-1]}') == trk[0]: row = f'career.{cj[-1]}'
+    # A tournament is done when every stage has its results (runs/cjump_6 2026-10-25: stage 1 back to the hub alone counted).
+    if row and STAGES.get(row, 1) > 1:
+        n = sum(1 for a, b in zip(st, st[1:]) if (b[0], b[1]) == (6, 8) and (a[0], a[1]) != (6, 8))
+        back = back and n >= STAGES[row]
 
     stop = next((l for l in reversed(log) if re.search(r'STOP|stop:|unimplemented|missing|fault|abort', l, re.I)), '')
     end = next((l for l in reversed(log) if l.startswith('RN_SECS')), 'running or killed')

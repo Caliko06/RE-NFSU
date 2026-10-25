@@ -258,6 +258,7 @@ void input_jump(Ctx *c) {
         call_guest(c, 0x4b5df0, 0, NULL);
         memcpy(c->r, r, sizeof r);
         seen = 0, fired = 2;
+        { extern uint32_t rn_jump_ev; rn_jump_ev = n; }
         return;
     }
     if (sscanf(s, "%u:%u%n", &m, &t, &used) != 2 || m > 6) { rn_log("RN_JUMP: cannot read \"%s\"", s); s = ""; return; }
@@ -347,6 +348,7 @@ static void screen_msg(Ctx *c, uint32_t name, uint32_t msg) {
     memcpy(c->r, r, sizeof r);
     rn_log("RN_NEXT: message %08x to package %08x screen %08x (handler %08x) at frame %u", msg, pkg, obj, obj ? ld(c, ld(c, obj, 4) + 8, 4) : 0, rn_telem.presents);
 }
+uint32_t rn_jump_ev;     // the career event RN_JUMP started (its later stages start from it)
 uint32_t rn_next_left;   // RN_JUMP waits while a tournament has stages left (Next Race goes through the front end)
 void input_next(Ctx *c) {
     static const char *s;
@@ -361,22 +363,69 @@ void input_next(Ctx *c) {
         while (*s == '+' || *s == ',') s++;
         want = (uint32_t)strtoul(s, (char **)&s, 10);
     }
-    // RewardPopup (one per reward, list [0x735ed0]): its handler 0x49f0c0 takes 0x911ab364 as "next": the next reward
-    // (0x49f000) or, after the last, 0x49e040 goes on to the next screen (Hopper rewardpop.txt). The RETURN taps did not
-    // close it (runs/cjump_6 stage 2, taps 23-24), so the hook sends that message, once per 60 frames it stays up.
-    static uint32_t pop;
-    if (screen_on("RewardPopup")) {
-        if (!pop) pop = rn_telem.presents;
-        if (rn_telem.presents - pop >= 60) screen_msg(c, rdata_str(c, "RewardPopup"), 0x911ab364), pop = rn_telem.presents;
-    } else pop = 0;
+    // RewardPopup: its handler 0x49f0c0 (Hopper rewardpop.txt) walks the post-race screen list [0x735ed0]: 0x406415e3
+    // goes forward (the next item, or after the last 0x49dfd0 opens the next screen: PostRaceMenu), 0x911ab364 goes back
+    // (0x49e040: StyleAnimator again; runs/cjump_8+.. looped StyleAnimator <-> RewardPopup on it). The RETURN taps ran out
+    // on a stage with several rewards (runs/cjump_6 stage 2), so the hook sends "forward" once per 60 frames it stays up.
+    // StyleAnimator's 0x49fbc0 (Hopper styleanim.txt) takes the same pair: 0x406415e3 plays the animation on (0x49f7a0)
+    // until [this+0x48] == 3, then 0x49dfd0 opens the next screen; 0x911ab364 is 0x49e040, back.
+    // The front end's reward screens after a career race (0x4ab670 picks MU_UG_MagazineGiveth or JunkmanGiveth): the
+    // magazine's 0x4c9240 (Hopper magaccept.txt) takes 0x911ab364 to mark the covers won ([0x76777c + i] = 1) and autosave
+    // (0x4c96f0), then 0x14141414 to leave (0x51bb50, 0x4c72d0: the hub, or the next magazine). 0x406415e3 is not one of
+    // its messages (runs/cjump_8+..: it stayed up). The hook sends that pair, 60 frames apart.
+    static const char *const fwd[4] = {"RewardPopup", "StyleAnimator", "MU_UG_MagazineGiveth", "MU_UG_JunkmanGiveth"};
+    static uint32_t pop[4], sent[4];
+    for (int k = 0; k < 4; k++)
+        if (screen_on(fwd[k])) {
+            if (!pop[k]) pop[k] = rn_telem.presents;
+            if (rn_telem.presents - pop[k] < 60) continue;
+            uint32_t m = k < 2 ? 0x406415e3 : sent[k]++ ? 0x14141414 : 0x911ab364;
+            screen_msg(c, rdata_str(c, fwd[k]), m), pop[k] = rn_telem.presents;
+        } else pop[k] = sent[k] = 0;
+    // The next stage: Next Race's 0x496f00 closes the stage on the race record ([0x777ccc] vtable+0x14, 0x5a2f10) and the
+    // race unloads to the front end (0x4970f0, message 0xa; Hopper nextstage.txt). There [0x7677a8] is no longer a race
+    // record (0x4b5df0 alone faulted at 0x4b5e61 reading [ebx+0x59d4], runs/cjump_6), so the stage starts the way the map
+    // starts the event (0x4c5df0: 0x5a0ce0, 0x4dfa10, 0x4b5df0), from the map, with the event's own id: the map cursor is
+    // not on it (runs/cjump_6: its briefing RETURN loaded 1301, a drift).
+    static uint32_t pend, fe;
+    if (pend && (rn_flow >> 8) == 3 && screen_on("MU_UG_MapScreen")) {
+        if (!fe) fe = rn_telem.presents;
+        if (rn_telem.presents - fe >= 30) {
+            // The front end reloads its event table after a race (runs/cjump_6: the old record faulted in 0x5a0ce0 at
+            // 0x5a0d43, [0x733ff8 + 4 * id] no longer pointing at it), so the record is found again as RN_JUMP does.
+            uint32_t r[8], lo = ~0u, rec;
+            for (uint32_t k = 0; k < 0x100; k++) { uint32_t x = ld(c, 0x733ff8 + 4 * k, 4); if (x && x < lo) lo = x; }
+            rec = lo + rn_jump_ev * 0x14c;
+            memcpy(r, c->r, sizeof r);
+            c->r[ESI] = 0x75eef8, c->r[EDI] = ld(c, rec, 4), c->r[EBX] = rec;
+            call_guest(c, 0x5a0ce0, 0, NULL);
+            c->r[EAX] = rec;
+            call_guest(c, 0x4dfa10, 0, NULL);
+            c->r[EBX] = ld(c, 0x7677a8, 4);
+            call_guest(c, 0x4b5df0, 0, NULL);
+            memcpy(c->r, r, sizeof r);
+            rn_log("RN_NEXT: next stage of record %08x at frame %u", rec, rn_telem.presents);
+            pend = fe = 0;
+        }
+    } else fe = 0;
     if (!screen_on("PostRaceMenu")) { seen = done = 0; return; }
     if (done || !left) return;
     if (!seen) seen = rn_telem.presents;
     if (rn_telem.presents - seen < 30) return;
     uint32_t name = rdata_str(c, "PostRaceMenu");
+    {   // its five item callbacks (0x4975c0: 0x0c407210 with item hash + 0x47583934 = 0..4 calls this+0x54 + 0x10 * k)
+        uint32_t l = 0x746104, r[8], pkg, obj;
+        memcpy(r, c->r, sizeof r);
+        c->r[EAX] = name, pkg = call_guest(c, 0x4f3f90, 1, &l), obj = pkg ? ld(c, pkg + 0x14, 4) : 0;
+        memcpy(c->r, r, sizeof r);
+        if (obj) for (int k = 0; k < 5; k++)
+            rn_log("RN_NEXT: PostRaceMenu item %d at +%x: %08x %08x %08x %08x", k, 0x50 + 0x10 * k, ld(c, obj + 0x50 + 0x10 * k, 4),
+                   ld(c, obj + 0x54 + 0x10 * k, 4), ld(c, obj + 0x58 + 0x10 * k, 4), ld(c, obj + 0x5c + 0x10 * k, 4));
+    }
     screen_msg(c, name, 0x7e9ccc8f);
     screen_msg(c, name, 0xc98356ba);
     done = 1, left--;
+    pend = left > 0;
 }
 #undef left
 // RN_CALL="MU_Main_PC#2:41c7a0": test-only, call a game function with no arguments once, 30 frames into the n-th time

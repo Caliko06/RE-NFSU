@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "86/167",
+ "progress": "123/167",
  "rows": [
   {
    "id": "career.0",
@@ -124,7 +124,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7c8",
-   "ok": true
+   "ok": false
   },
   {
    "id": "career.7",
@@ -156,7 +156,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0xa60",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.9",
@@ -200,7 +200,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0xcf8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.11",
@@ -340,7 +340,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x1758",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.19",
@@ -406,7 +406,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x1b3c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.22",
@@ -422,7 +422,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x1c88",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.23",
@@ -470,7 +470,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x206c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.26",
@@ -518,7 +518,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2450",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.29",
@@ -578,7 +578,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2834",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.32",
@@ -594,7 +594,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2980",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.33",
@@ -610,7 +610,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2acc",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.34",
@@ -626,7 +626,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x2c18",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.35",
@@ -734,7 +734,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x33e0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.41",
@@ -766,7 +766,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3678",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.43",
@@ -782,7 +782,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x37c4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.44",
@@ -798,7 +798,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3910",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.45",
@@ -814,7 +814,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3a5c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.46",
@@ -890,7 +890,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3f8c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.50",
@@ -906,7 +906,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x40d8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.51",
@@ -922,7 +922,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x4224",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.52",
@@ -938,7 +938,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x4370",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.53",
@@ -954,7 +954,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x44bc",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.54",
@@ -970,7 +970,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x4608",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.55",
@@ -1002,7 +1002,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x48a0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.57",
@@ -1130,7 +1130,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5300",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.65",
@@ -1146,7 +1146,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x544c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.66",
@@ -1190,7 +1190,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x56e4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.68",
@@ -1206,7 +1206,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5830",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.69",
@@ -1298,7 +1298,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5eac",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.74",
@@ -1314,7 +1314,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5ff8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.75",
@@ -1330,7 +1330,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6144",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.76",
@@ -1346,7 +1346,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6290",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.77",
@@ -1362,7 +1362,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x63dc",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.78",
@@ -1378,7 +1378,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6528",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.79",
@@ -1394,7 +1394,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6674",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.80",
@@ -1444,7 +1444,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x690c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.82",
@@ -1460,7 +1460,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6a58",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.83",
@@ -1476,7 +1476,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6ba4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.84",
@@ -1492,7 +1492,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x6cf0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.86",

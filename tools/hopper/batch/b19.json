@@ -1,0 +1,3 @@
+{
+ "magaccept": {"q": "MU_UG_MagazineGiveth screen handler 0x4c9240 (log: vtable+8 of [pkg+0x14]): which message (0x9120409e, 0x14141414, 0x911ab364, 0xb5971bf1, 0xc519bfc8, 0xc98356ba) reaches the autosave 0x4c96f0 at 0x4c92cd and 0x4c72d0 at 0x4c92e8 (leave to the hub); and what 0x4c90c0, 0x4c9150, 0x4c9030 do", "addrs": ["0x4c9240", "0x4c90c0", "0x4c9150", "0x4c9030", "0x51bb50"]}
+}
