@@ -109,6 +109,31 @@ elif mode == 'gi':   # bake.py -- gi OUT.npz 0/1 SAMPLES PASS MESH.npz ALBEDO.ts
     bpy.ops.object.bake(type='DIFFUSE', pass_filter={'DIRECT', 'INDIRECT'})
     g = np.empty(len(z['w.pos']) * 4, np.float32); o.data.color_attributes['GI'].data.foreach_get('color', g)
     res[ps] = g.reshape(-1, 4)[:, :3].astype(np.float16)
+elif mode == 'lightmap':   # bake.py -- lightmap OUT.npz 0/1 SAMPLES SIZE MESH.npz ALBEDO.tsv SCENE.json RUN
+    # Per-texel GI: the passes b/s/u of gi, baked to one SIZE x SIZE float image each through one lightmap UV (Blender
+    # smart_project, one set for all passes). OUT: uv[ntri*3,2] f32 per corner of w.tri (row order), b/s/u[SIZE,SIZE,3] f16
+    # (rows bottom to top, Blender order: uv (0,0) = row 0).
+    import json
+    z = np.load(ins[0]); sc = json.load(open(ins[2]))[ins[3]]; W = int(dist)
+    o, emi = world_mesh(z, albedo(ins[1])); bg, sun = lights(sc)
+    s.cycles.max_bounces, s.cycles.diffuse_bounces = 4, 3
+    s.render.bake.target = 'IMAGE_TEXTURES'; s.render.bake.margin = 4; s.render.bake.use_clear = True
+    for x in s.objects: x.select_set(x is o)
+    bpy.context.view_layer.objects.active = o
+    o.data.uv_layers.new(name='lm'); t = time.time()
+    bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.smart_project(angle_limit=1.15, island_margin=0.001, area_weight=0.0, scale_to_bounds=True)
+    bpy.ops.object.mode_set(mode='OBJECT'); print(f'uv {time.time() - t:.0f} s', flush=True)
+    uv = np.empty(len(o.data.loops) * 2, np.float32); o.data.uv_layers['lm'].data.foreach_get('uv', uv); res['uv'] = uv.reshape(-1, 2)
+    im = bpy.data.images.new('lm', W, W, float_buffer=True)
+    nt = o.data.materials[0].node_tree; tx = nt.nodes.new('ShaderNodeTexImage'); tx.image = im; nt.nodes.active = tx
+    for ps in 'bsu':
+        emi.inputs['Strength'].default_value = 1.0 if ps == 'b' else 0.0
+        bg.inputs['Strength'].default_value = 1.0 if ps == 's' else 0.0
+        sun.energy = 1.0 if ps == 'u' else 0.0; t = time.time()
+        bpy.ops.object.bake(type='DIFFUSE', pass_filter={'DIRECT', 'INDIRECT'})
+        px = np.empty(W * W * 4, np.float32); im.pixels.foreach_get(px); res[ps] = px.reshape(W, W, 4)[:, :, :3].astype(np.float16)
+        print(f'pass {ps} {W}x{W} {time.time() - t:.0f} s', flush=True)
 elif mode == 'probes':   # bake.py -- probes OUT.npz 0/1 SAMPLES WIDTH MESH.npz ALBEDO.tsv SCENE.json RUN
     # HDR reflection probes of the lit track (the game's light as emission + fog sky + sun) every 10 m along the route
     # (scene.py), 1.0 above the road (a downward ray from 5 above the last probe). One equirectangular render per probe

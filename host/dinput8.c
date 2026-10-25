@@ -188,11 +188,14 @@ static void mouse_mode(void) {
     input_mouse_exclusive(on);
 }
 static void push(Obj *o, uint32_t ofs, uint32_t data, uint32_t app);
+// RN_DILOG: one line per key event per keyboard device and per GetDeviceData that returns events (the in-race menus).
+static int dilog(void) { static int on = -1; if (on < 0) on = getenv("RN_DILOG") != NULL; return on; }
 static uint32_t IDirectInputDevice8A_Acquire(Ctx *c) {
     SELF(I_DEV);
     if (!o->format_set) return DIERR_INVALIDPARAM;
     if (o->acquired) return 1;                            // S_FALSE: already acquired
     o->acquired = 1;
+    if (dilog()) rn_log("di Acquire dev %d kind %d buf %u nf %d", (int)(o - objs), o->kind, o->buffer, o->nf);
     o->ev_head = o->ev_tail = 0;
     o->overflow = 0;
     memset(o->axis, 0, sizeof o->axis);
@@ -210,6 +213,7 @@ static uint32_t IDirectInputDevice8A_Unacquire(Ctx *c) {
     SELF(I_DEV);
     if (!o->acquired) return 1;
     o->acquired = 0;
+    if (dilog()) rn_log("di Unacquire dev %d", (int)(o - objs));
     mouse_mode();
     return DI_OK;
 }
@@ -248,6 +252,9 @@ static uint32_t IDirectInputDevice8A_GetDeviceData(Ctx *c) {
         }
     if (!(flags & 1)) o->ev_head += n;
     st(c, io, n, 4);
+    if (n && dilog()) rn_log("di GetDeviceData dev %d: %u of %u, first ofs %u data %x app %x%s", (int)(o - objs), n, want,
+              o->ev[(o->ev_head - (flags & 1 ? 0 : n)) % MAXEV].ofs, o->ev[(o->ev_head - (flags & 1 ? 0 : n)) % MAXEV].data,
+              o->ev[(o->ev_head - (flags & 1 ? 0 : n)) % MAXEV].app, flags & 1 ? " peek" : "");
     if (n) TR("GetDeviceData(%s): %u events, first ofs %u data %x app %x", o->kind == KEYBOARD ? "keyboard" : "mouse", n,
               o->ev[(o->ev_head - n) % MAXEV].ofs, o->ev[(o->ev_head - n) % MAXEV].data, o->ev[(o->ev_head - n) % MAXEV].app);
     uint32_t r = o->overflow ? 1u : DI_OK;                // DI_BUFFEROVERFLOW
@@ -570,6 +577,8 @@ static void push(Obj *o, uint32_t ofs, uint32_t data, uint32_t app) {
 void dinput8_key(uint8_t dik, int down) {
     for (int k = 0; k < nobjs; k++) {
         Obj *o = &objs[k];
+        if (dilog() && o->iface == I_DEV && o->kind == KEYBOARD)
+            rn_log("di key %02x %s dev %d acq %d buf %u queued %u", dik, down ? "down" : "up", k, o->acquired, o->buffer, o->ev_tail - o->ev_head);
         if (o->iface != I_DEV || o->kind != KEYBOARD || !o->acquired) continue;
         for (int j = 0; j < o->nf; j++)
             if (o->f[j].what == 0x200u + dik) push(o, o->f[j].ofs, down ? 0x80 : 0, o->f[j].app);
