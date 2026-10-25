@@ -52,7 +52,7 @@ class Ctx(ctypes.Structure):     # host/rt.h
                 ("halt", ctypes.c_uint32), ("halt_at", ctypes.c_uint32), ("why", ctypes.c_char_p), ("fs", ctypes.c_uint32),
                 ("flags", ctypes.c_int32 * 7), ("eflx", ctypes.c_uint32), ("fcw", ctypes.c_uint32), ("fsw", ctypes.c_uint32),
                 ("ftop", ctypes.c_uint32), ("ftag", ctypes.c_uint32), ("st", ctypes.c_double * 8),
-                ("mb", ctypes.c_uint32)]
+                ("mb", ctypes.c_uint32), ("mm", ctypes.c_uint64 * 8)]
 
 
 lib.rn_call.argtypes = [ctypes.POINTER(Ctx), ctypes.c_uint32]
@@ -285,6 +285,7 @@ for e in entries:
         c.fcw = 0x27f
         for j in range(8):
             c.st[j] = INDEF                         # empty x87 registers hold the real indefinite
+            c.mm[j] = 0xc000000000000000            # MMX aliases their mantissa (Unicorn's FP0.. above)
         if ONLY:
             tfn(ctypes.byref(c))    # same code with the step callback
         else:

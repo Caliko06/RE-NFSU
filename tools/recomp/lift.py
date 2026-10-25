@@ -314,6 +314,8 @@ class Lifter:
         op0 = i.opcode[0]
         if 0xd8 <= op0 <= 0xdf:
             return self.x87(i)
+        if m == "emms" or any(x.type == x86.X86_OP_REG and i.reg_name(x.reg).startswith("mm") for x in ops):
+            return self.mmx(i, m)
         if m in ("wait", "nop", "fwait") or (m == "pause"):
             return
         sz = ops[0].size if ops else 4
@@ -605,6 +607,74 @@ class Lifter:
         else:
             stop = "if (!zf) break;" if pre == "repe" else "if (zf) break;"
             o.append(f"while (ecx) {{ {step} ecx--; {stop} }}")
+
+    # --- MMX (host/cpu.c reports it; the SSE forms of these mnemonics stay traps) ----------------------
+    MX_ARITH = {"paddb": ("MX_ADD", 8), "paddw": ("MX_ADD", 16), "paddd": ("MX_ADD", 32), "paddsb": ("MX_ADDS", 8),
+                "paddsw": ("MX_ADDS", 16), "paddusb": ("MX_ADDUS", 8), "paddusw": ("MX_ADDUS", 16), "psubb": ("MX_SUB", 8),
+                "psubw": ("MX_SUB", 16), "psubd": ("MX_SUB", 32), "psubsb": ("MX_SUBS", 8), "psubsw": ("MX_SUBS", 16),
+                "psubusb": ("MX_SUBUS", 8), "psubusw": ("MX_SUBUS", 16), "pcmpeqb": ("MX_CMPEQ", 8), "pcmpeqw": ("MX_CMPEQ", 16),
+                "pcmpeqd": ("MX_CMPEQ", 32), "pcmpgtb": ("MX_CMPGT", 8), "pcmpgtw": ("MX_CMPGT", 16), "pcmpgtd": ("MX_CMPGT", 32),
+                "pmullw": ("MX_MULL", 16), "pmulhw": ("MX_MULH", 16)}
+    MX_SHIFT = {"psllw": (16, 0), "pslld": (32, 0), "psllq": (64, 0), "psrlw": (16, 1), "psrld": (32, 1), "psrlq": (64, 1),
+                "psraw": (16, 2), "psrad": (32, 2)}
+    MX_LOGIC = {"pand": "{d}&{s}", "pandn": "~{d}&{s}", "por": "{d}|{s}", "pxor": "{d}^{s}"}
+
+    def mx(self, op):
+        """An MMX source as a uint64_t expression: mm register, or memory of the operand's size (4 or 8 bytes)."""
+        if op.type == x86.X86_OP_REG:
+            n = self.i.reg_name(op.reg)
+            if not n.startswith("mm"):
+                raise Unsupported(f"reg {n}")
+            return f"c->mm[{n[2]}]"
+        if op.type == x86.X86_OP_IMM:
+            return f"0x{op.imm & 0xff:x}ull"
+        if op.size not in (4, 8):
+            raise Unsupported(f"{op.size}-byte operand")
+        self.out.append(f"ea={self.ea(op.mem)}; CHK(ea,{op.size},{self.at()});")
+        return "ld64(c,ea)" if op.size == 8 else "(uint64_t)ld(c,ea,4)"
+
+    def mmx(self, i, m):
+        o, ops = self.out, i.operands
+        if m == "emms":
+            o.append("c->ftag=0;")
+            return
+        d = ops[0]
+        dn = i.reg_name(d.reg) if d.type == x86.X86_OP_REG else None
+        if m in ("movd", "movq") and (d.type == x86.X86_OP_MEM or dn in REG32):
+            s = self.mx(ops[1])
+            if d.type == x86.X86_OP_MEM:
+                self.out.append(f"ea={self.ea(d.mem)}; CHK(ea,{d.size},{self.at()});")
+                o.append(f"MMX_ENTER(); " + (f"st64(c,ea,{s});" if m == "movq" else f"st(c,ea,(uint32_t){s},4);"))
+            else:
+                o.append(f"MMX_ENTER(); {dn}=(uint32_t){s};")
+            return
+        if dn is None or not dn.startswith("mm"):
+            raise Unsupported(m)
+        D = f"c->mm[{dn[2]}]"
+        src = ops[1]
+        if m == "movd":
+            s = self.read(src) if src.type == x86.X86_OP_REG else self.mx(src)
+            v = f"(uint64_t)(uint32_t)({s})"
+        elif m == "movq":
+            v = self.mx(src)
+        elif m in self.MX_ARITH:
+            f, b = self.MX_ARITH[m]
+            v = f"mx_op({D},{self.mx(src)},{b},{f})"
+        elif m in self.MX_SHIFT:
+            b, k = self.MX_SHIFT[m]
+            v = f"mx_shift({D},{self.mx(src)},{b},{k})"
+        elif m in self.MX_LOGIC:
+            v = "(" + self.MX_LOGIC[m].format(d=D, s=f"({self.mx(src)})") + ")"
+        elif m.startswith("punpck"):
+            b = {"bw": 8, "wd": 16, "dq": 32}[m[-2:]]
+            v = f"mx_unpack({D},{self.mx(src)},{b},{int(m[6] == 'h')})"
+        elif m in ("packsswb", "packuswb", "packssdw"):
+            v = f"mx_pack({D},{self.mx(src)},{32 if m == 'packssdw' else 16},{int(m == 'packuswb')})"
+        elif m == "pmaddwd":
+            v = f"mx_maddwd({D},{self.mx(src)})"
+        else:
+            raise Unsupported(m)
+        o.append(f"MMX_ENTER(); u={v}; {D}=u;")
 
     # --- x87, decoded from the opcode bytes (capstone's operand order is ambiguous) ---------------
     def x87(self, i):

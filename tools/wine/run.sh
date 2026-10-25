@@ -18,7 +18,7 @@ start)
   pgrep -f "Xvfb $DISPLAY " >/dev/null || { setsid nohup Xvfb $DISPLAY -screen 0 1280x960x24 +extension GLX > /root/wine/xvfb.log 2>&1 < /dev/null & sleep 2; }
   cd /root/wine/pfx/drive_c/NFSU
   # GPU: vglrun -d egl (gpu.sh once per pod); without it wined3d falls back to llvmpipe (slow, keys must be held).
-  VGL=; [ -x /opt/VirtualGL/bin/vglrun ] && VGL="/opt/VirtualGL/bin/vglrun -d egl"
+  VGL=; [ -z "$NOVGL" ] && [ -x /opt/VirtualGL/bin/vglrun ] && VGL="/opt/VirtualGL/bin/vglrun -d egl"   # NOVGL=1: llvmpipe
   setsid nohup nice -n 10 $VGL wine explorer /desktop=NFSU,${2:-1280x960} Speed.exe > /root/wine/game.log 2>&1 < /dev/null &
   echo started ;;
 key) for k in "${@:2}"; do xdotool keydown $k; sleep 0.3; xdotool keyup $k; sleep 0.4; done ;;

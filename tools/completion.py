@@ -40,7 +40,9 @@ def launch(run):
     row, seed = (run.split('.') + [SEEDS[0]])[:2]
     d = f'{R}/runs/{row}.{seed}'
     subprocess.run(['rm', '-rf', d]); os.makedirs(d)
-    subprocess.run(['cp', '-al', f'{R}/game', f'{d}/game'], check=True)
+    # RN_GAMEDIR: another game/ copy. BRIDGE (test only, never shipped): game_nomad = game/ without Movies/E3_TITLE.mad, so
+    # the title shows "Press enter" while the movie's YUV path (MMX only, 0x647cb0) is not lifted yet.
+    subprocess.run(['cp', '-al', os.environ.get('RN_GAMEDIR', f'{R}/game'), f'{d}/game'], check=True)
     subprocess.run(['cp', '-r', f'{R}/save', f'{d}/save'], check=True)
     seq = ROWS[row]
     env = dict(os.environ, RN_SECS=str(SECS), RN_SCREEN='640x480', RN_RASTER='300', RN_FLOWLOG='1', RN_SEED=seed,

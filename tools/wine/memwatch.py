@@ -24,6 +24,6 @@ while time.time() < end:
     t = time.time() - t0
     print(f'watch {t:6.2f} ' + ' '.join(f'{a:x}={v}' for a, v in zip(addrs, vals)), flush=True)
     if t >= 5 * (nshot + 1):
-        nshot += 1; subprocess.run(['import', '-window', 'root', f'{shots}/{nshot * 5}.png'], env=os.environ)
+        nshot += 1; subprocess.run(['import', '-window', 'root', f'{shots}/{nshot * 5}.png'], env={**os.environ, 'DISPLAY': os.environ.get('DISPLAY', ':77')})
     os.waitpid(-1, os.WNOHANG) if cmd.poll() is not None else None
     time.sleep(0.25)

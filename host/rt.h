@@ -19,6 +19,7 @@ typedef struct Ctx {
     uint32_t fcw, fsw, ftop, ftag;  // fsw keeps C0..C3 only; ftag bit i = physical st i in use
     double st[8];
     uint32_t mb;                // base of the live ABK code module the called lifted function belongs to
+    uint64_t mm[8];             // MMX registers (kept apart from st[]: the game leaves MMX code with emms)
 } Ctx;
 
 // Guest pages below 64 KB are never mapped: a null pointer read is a loud fault.
@@ -216,4 +217,77 @@ static inline void fxam(Ctx *c) {
     else if (isinf(v)) c->fsw |= FC2 | FC0 | s;
     else if (v == 0) c->fsw |= FC3 | s;
     else c->fsw |= FC2 | s;
+}
+
+// ---- MMX (host/cpu.c reports it): lane-wise integer ops on 64-bit values -------------------------
+// An MMX instruction sets TOP = 0 and tags every x87 register valid; emms empties them (SDM vol. 1, 9.5).
+#define MMX_ENTER() (c->ftop = 0, c->ftag = 0xffu)
+enum { MX_ADD, MX_ADDS, MX_ADDUS, MX_SUB, MX_SUBS, MX_SUBUS, MX_CMPEQ, MX_CMPGT, MX_MULL, MX_MULH };
+static inline int64_t mx_lane(uint64_t v, int bits, int k, int sgn) {
+    uint64_t x = (v >> (k * bits)) & (bits == 64 ? ~0ull : (1ull << bits) - 1);
+    return sgn && bits < 64 && (x >> (bits - 1)) ? (int64_t)(x | ~((1ull << bits) - 1)) : (int64_t)x;
+}
+static inline int64_t mx_sat(int64_t v, int64_t lo, int64_t hi) { return v < lo ? lo : v > hi ? hi : v; }
+static inline uint64_t mx_op(uint64_t a, uint64_t b, int bits, int op) {
+    uint64_t r = 0, m = bits == 64 ? ~0ull : (1ull << bits) - 1;
+    int64_t smin = -(1ll << (bits - 1)), smax = (1ll << (bits - 1)) - 1, umax = (int64_t)m;
+    for (int k = 0; k < 64 / bits; k++) {
+        int sg = op == MX_ADDS || op == MX_SUBS || op == MX_CMPGT || op == MX_MULL || op == MX_MULH;
+        int64_t x = mx_lane(a, bits, k, sg), y = mx_lane(b, bits, k, sg), v;
+        switch (op) {
+        case MX_ADD: v = x + y; break;
+        case MX_ADDS: v = mx_sat(x + y, smin, smax); break;
+        case MX_ADDUS: v = mx_sat(x + y, 0, umax); break;
+        case MX_SUB: v = x - y; break;
+        case MX_SUBS: v = mx_sat(x - y, smin, smax); break;
+        case MX_SUBUS: v = mx_sat(x - y, 0, umax); break;
+        case MX_CMPEQ: v = x == y ? -1 : 0; break;
+        case MX_CMPGT: v = x > y ? -1 : 0; break;
+        case MX_MULL: v = x * y; break;
+        default: v = (x * y) >> bits; break;
+        }
+        r |= ((uint64_t)v & m) << (k * bits);
+    }
+    return r;
+}
+// Shifts: a count above the lane width gives 0, or the sign for psra.
+static inline uint64_t mx_shift(uint64_t a, uint64_t n, int bits, int kind) {   // kind 0 sll, 1 srl, 2 sra
+    uint64_t r = 0, m = bits == 64 ? ~0ull : (1ull << bits) - 1;
+    for (int k = 0; k < 64 / bits; k++) {
+        int64_t x = mx_lane(a, bits, k, kind == 2), v;
+        if (kind == 2) v = x >> (n >= (uint64_t)bits ? bits - 1 : (int)n);
+        else if (n >= (uint64_t)bits) v = 0;
+        else v = kind == 0 ? (int64_t)((uint64_t)x << n) : (int64_t)((uint64_t)x >> n);
+        r |= ((uint64_t)v & m) << (k * bits);
+    }
+    return r;
+}
+// punpckl/h: interleave the low (or high) halves, lanes of the destination first.
+static inline uint64_t mx_unpack(uint64_t a, uint64_t b, int bits, int high) {
+    uint64_t r = 0, m = bits == 64 ? ~0ull : (1ull << bits) - 1;
+    int n = 32 / bits;
+    for (int k = 0; k < n; k++) {
+        r |= ((a >> ((k + high * n) * bits)) & m) << (2 * k * bits);
+        r |= ((b >> ((k + high * n) * bits)) & m) << ((2 * k + 1) * bits);
+    }
+    return r;
+}
+// packsswb / packuswb (words -> bytes), packssdw (dwords -> words): the destination's lanes fill the low half.
+static inline uint64_t mx_pack(uint64_t a, uint64_t b, int bits, int uns) {
+    int h = bits / 2, n = 64 / bits;
+    int64_t lo = uns ? 0 : -(1ll << (h - 1)), hi = uns ? (1ll << h) - 1 : (1ll << (h - 1)) - 1;
+    uint64_t r = 0, m = (1ull << h) - 1;
+    for (int k = 0; k < n; k++) {
+        r |= ((uint64_t)mx_sat(mx_lane(a, bits, k, 1), lo, hi) & m) << (k * h);
+        r |= ((uint64_t)mx_sat(mx_lane(b, bits, k, 1), lo, hi) & m) << ((k + n) * h);
+    }
+    return r;
+}
+static inline uint64_t mx_maddwd(uint64_t a, uint64_t b) {
+    uint64_t r = 0;
+    for (int k = 0; k < 2; k++) {
+        int64_t v = mx_lane(a, 16, 2 * k, 1) * mx_lane(b, 16, 2 * k, 1) + mx_lane(a, 16, 2 * k + 1, 1) * mx_lane(b, 16, 2 * k + 1, 1);
+        r |= ((uint64_t)v & 0xffffffffu) << (32 * k);
+    }
+    return r;
 }
