@@ -807,6 +807,16 @@ static void flow_log(Ctx *c) {
     uint32_t pr = ld(c, 0x735ed0, 4), node = pr ? ld(c, pr + 0xc, 4) : 0, nm = node ? ld(c, node + 8, 4) : 0;
     const char *scr = nm >= 0x697000 && nm < 0x6d4000 ? G(nm) : "";
     if (strcmp(scr, rn_screen)) { rn_log("flow screen %.32s (frame %u)", *scr ? scr : "-", dev.frames); gpu_keep_frame(); }
+    // Read only. [0x777cc8] = the Quick Race mode the Accept switch takes (0x4b5c00: 0..6 -> 0x4b49e0..0x4b59b0); the
+    // mode list 0x4b70c0 adds Circuit 0, Sprint 1, Drag 5, Drift 6, then 2, 3 (asm: ebx before each call 0x4b6fe0),
+    // each only if its flag is set. The setup copies the track to [0x78a2f0] and a race kind to [0x78a31c].
+    // [0x735dc8] = the career event under the cursor (0x4c4f00 writes it; 0x4e8180 reads the table 0x733ff8 with it).
+    static uint32_t pm = ~0u, pt = ~0u, pe = ~0u;
+    uint32_t m = ld(c, 0x777cc8, 4) | ld(c, 0x777b4c, 4) << 8, t = ld(c, 0x78a2f0, 4) | ld(c, 0x78a31c, 4) << 16;
+    uint32_t e = ld(c, 0x735dc8, 4);
+    if (m != pm || t != pt) rn_log("flow mode %u gametype %u track %u kind %u (frame %u)", m & 0xff, m >> 8, t & 0xffff, t >> 16, dev.frames);
+    if (e != pe) rn_log("flow event %u (frame %u)", e, dev.frames);
+    pm = m, pt = t, pe = e;
     prev = lb, prev_st = st, rn_flow = st, rn_screen = scr;
 }
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {

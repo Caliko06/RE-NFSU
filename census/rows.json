@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "3/162",
+ "progress": "3/167",
  "rows": [
   {
    "id": "career.0",
@@ -2020,7 +2020,7 @@
    "mode": "circuit",
    "track": 1001,
    "name": "CT1 - Market St.",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x1 (0x4ab470)",
    "ok": false
   },
   {
@@ -2029,7 +2029,7 @@
    "mode": "circuit",
    "track": 1002,
    "name": "CT2 - Stadium",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x1 (0x4ab470)",
    "ok": false
   },
   {
@@ -2038,7 +2038,7 @@
    "mode": "circuit",
    "track": 1003,
    "name": "DT1 - Olympic Square",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x1 (0x4ab470)",
    "ok": false
   },
   {
@@ -2047,7 +2047,7 @@
    "mode": "circuit",
    "track": 1004,
    "name": "DT2 - Terminal",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x1 (0x4ab470)",
    "ok": true
   },
   {
@@ -2056,7 +2056,7 @@
    "mode": "circuit",
    "track": 1005,
    "name": "DT3 - Atlantic",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x1 (0x4ab470)",
    "ok": false
   },
   {
@@ -2065,7 +2065,7 @@
    "mode": "circuit",
    "track": 1006,
    "name": "DT4 - Inner City",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x1 (0x4ab470)",
    "ok": false
   },
   {
@@ -2074,7 +2074,7 @@
    "mode": "circuit",
    "track": 1007,
    "name": "RS1 - Port Royal",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x1 (0x4ab470)",
    "ok": false
   },
   {
@@ -2083,16 +2083,7 @@
    "mode": "circuit",
    "track": 1008,
    "name": "RS2 - National Rail",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
-   "ok": false
-  },
-  {
-   "id": "qr.circuit.1099",
-   "group": "quick_race",
-   "mode": "circuit",
-   "track": 1099,
-   "name": "Test Track",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x1 (0x4ab470)",
    "ok": false
   },
   {
@@ -2101,7 +2092,7 @@
    "mode": "sprint",
    "track": 1102,
    "name": "SP2 - Liberty Gardens",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x4 (0x4ab470)",
    "ok": false
   },
   {
@@ -2110,7 +2101,7 @@
    "mode": "sprint",
    "track": 1103,
    "name": "SP3 - Broadway",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x4 (0x4ab470)",
    "ok": false
   },
   {
@@ -2119,7 +2110,7 @@
    "mode": "sprint",
    "track": 1104,
    "name": "SP4 - Lock Up",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x4 (0x4ab470)",
    "ok": false
   },
   {
@@ -2128,7 +2119,7 @@
    "mode": "sprint",
    "track": 1105,
    "name": "SP5 - 9th & Frey",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x4 (0x4ab470)",
    "ok": false
   },
   {
@@ -2137,7 +2128,7 @@
    "mode": "sprint",
    "track": 1106,
    "name": "SP6 - Bedard Bridge",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x4 (0x4ab470)",
    "ok": false
   },
   {
@@ -2146,7 +2137,7 @@
    "mode": "sprint",
    "track": 1107,
    "name": "SP7 - Spillway",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x4 (0x4ab470)",
    "ok": false
   },
   {
@@ -2155,7 +2146,7 @@
    "mode": "sprint",
    "track": 1108,
    "name": "SP8 - 1st Ave. Truck Stop",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x4 (0x4ab470)",
    "ok": false
   },
   {
@@ -2164,7 +2155,7 @@
    "mode": "sprint",
    "track": 1109,
    "name": "SP9 - 7th & Sparling",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x4 (0x4ab470)",
    "ok": false
   },
   {
@@ -2173,7 +2164,7 @@
    "mode": "drag",
    "track": 1201,
    "name": "DTDrag - 14th & Vine",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
    "ok": false
   },
   {
@@ -2182,7 +2173,7 @@
    "mode": "drag",
    "track": 1202,
    "name": "CTDrag - Highway 1",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
    "ok": false
   },
   {
@@ -2191,7 +2182,7 @@
    "mode": "drag",
    "track": 1206,
    "name": "MSNDrag - Main St.",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
    "ok": false
   },
   {
@@ -2200,7 +2191,7 @@
    "mode": "drag",
    "track": 1207,
    "name": "Commercial",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
    "ok": false
   },
   {
@@ -2209,7 +2200,7 @@
    "mode": "drag",
    "track": 1210,
    "name": "Downtown Drag 2",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
    "ok": false
   },
   {
@@ -2218,7 +2209,7 @@
    "mode": "drag",
    "track": 1214,
    "name": "Mission Drag 2",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
    "ok": false
   },
   {
@@ -2227,7 +2218,7 @@
    "mode": "drift",
    "track": 1301,
    "name": "Drift 1",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
    "ok": false
   },
   {
@@ -2236,7 +2227,7 @@
    "mode": "drift",
    "track": 1302,
    "name": "Drift 2",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
    "ok": false
   },
   {
@@ -2245,7 +2236,7 @@
    "mode": "drift",
    "track": 1303,
    "name": "Drift 3",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
    "ok": false
   },
   {
@@ -2254,7 +2245,7 @@
    "mode": "drift",
    "track": 1304,
    "name": "Drift 4",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
    "ok": false
   },
   {
@@ -2263,7 +2254,7 @@
    "mode": "drift",
    "track": 1305,
    "name": "Drift 5",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
    "ok": false
   },
   {
@@ -2272,7 +2263,7 @@
    "mode": "drift",
    "track": 1306,
    "name": "Drift 6",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
    "ok": false
   },
   {
@@ -2281,7 +2272,7 @@
    "mode": "drift",
    "track": 1307,
    "name": "Drift 7",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
    "ok": false
   },
   {
@@ -2290,7 +2281,7 @@
    "mode": "drift",
    "track": 1308,
    "name": "Drift 8",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
    "ok": false
   },
   {
@@ -2299,7 +2290,7 @@
    "mode": "lapko",
    "track": 1001,
    "name": "CT1 - Market St.",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x40 (0x4ab470)",
    "ok": false
   },
   {
@@ -2308,7 +2299,7 @@
    "mode": "lapko",
    "track": 1002,
    "name": "CT2 - Stadium",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x40 (0x4ab470)",
    "ok": true
   },
   {
@@ -2317,7 +2308,7 @@
    "mode": "lapko",
    "track": 1003,
    "name": "DT1 - Olympic Square",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x40 (0x4ab470)",
    "ok": false
   },
   {
@@ -2326,7 +2317,7 @@
    "mode": "lapko",
    "track": 1004,
    "name": "DT2 - Terminal",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x40 (0x4ab470)",
    "ok": false
   },
   {
@@ -2335,7 +2326,7 @@
    "mode": "lapko",
    "track": 1005,
    "name": "DT3 - Atlantic",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x40 (0x4ab470)",
    "ok": false
   },
   {
@@ -2344,7 +2335,7 @@
    "mode": "lapko",
    "track": 1006,
    "name": "DT4 - Inner City",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x40 (0x4ab470)",
    "ok": false
   },
   {
@@ -2353,7 +2344,7 @@
    "mode": "lapko",
    "track": 1007,
    "name": "RS1 - Port Royal",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x40 (0x4ab470)",
    "ok": false
   },
   {
@@ -2362,25 +2353,80 @@
    "mode": "lapko",
    "track": 1008,
    "name": "RS2 - National Rail",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
+   "src": "GLOBALB 0x34201 +0x74 & 0x40 (0x4ab470)",
    "ok": false
   },
   {
-   "id": "qr.lapko.1099",
-   "group": "quick_race",
-   "mode": "lapko",
-   "track": 1099,
-   "name": "Test Track",
-   "src": "GLOBALB 0x34201 (track list per mode: I)",
-   "ok": false
-  },
-  {
-   "id": "qr.freerun",
+   "id": "qr.freerun.1001",
    "group": "quick_race",
    "mode": "freerun",
-   "track": null,
-   "src": "which tracks Free Run lists: U",
+   "track": 1001,
+   "name": "CT1 - Market St.",
+   "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
+   "ok": false
+  },
+  {
+   "id": "qr.freerun.1002",
+   "group": "quick_race",
+   "mode": "freerun",
+   "track": 1002,
+   "name": "CT2 - Stadium",
+   "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
    "ok": true
+  },
+  {
+   "id": "qr.freerun.1003",
+   "group": "quick_race",
+   "mode": "freerun",
+   "track": 1003,
+   "name": "DT1 - Olympic Square",
+   "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
+   "ok": false
+  },
+  {
+   "id": "qr.freerun.1004",
+   "group": "quick_race",
+   "mode": "freerun",
+   "track": 1004,
+   "name": "DT2 - Terminal",
+   "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
+   "ok": false
+  },
+  {
+   "id": "qr.freerun.1005",
+   "group": "quick_race",
+   "mode": "freerun",
+   "track": 1005,
+   "name": "DT3 - Atlantic",
+   "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
+   "ok": false
+  },
+  {
+   "id": "qr.freerun.1006",
+   "group": "quick_race",
+   "mode": "freerun",
+   "track": 1006,
+   "name": "DT4 - Inner City",
+   "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
+   "ok": false
+  },
+  {
+   "id": "qr.freerun.1007",
+   "group": "quick_race",
+   "mode": "freerun",
+   "track": 1007,
+   "name": "RS1 - Port Royal",
+   "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
+   "ok": false
+  },
+  {
+   "id": "qr.freerun.1008",
+   "group": "quick_race",
+   "mode": "freerun",
+   "track": 1008,
+   "name": "RS2 - National Rail",
+   "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
+   "ok": false
   },
   {
    "id": "game.profile",

@@ -57,6 +57,9 @@ def launch(run):
         return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
 
+ALL_ROWS = {r['id']: r['group'] for r in json.load(open(f'{R}/census/rows.json'))['rows']}
+QR_ROWS = {k for k, g in ALL_ROWS.items() if g == 'quick_race'}
+
 def row_of(d):
     # flow.txt: only the flow lines of a log that was too big to keep (2026-10-24: 5-8 GB each, Pod disk full)
     log = open(f'{d}/log.txt' if os.path.exists(f'{d}/log.txt') else f'{d}/flow.txt', errors='replace').read().splitlines()
@@ -66,16 +69,22 @@ def row_of(d):
     after = seen[seen.index(6):] if raced else []
     back = 7 in after and 3 in after[after.index(7):]
     again = back and 6 in after[after.index(7):]
-    # The row (census/rows.json id): the track is the TRACKB<id>.LZC the game opened (host/win32.c RN_FLOWLOG; GLOBALB track
-    # +0x20 "Location1\Track_<id>"), the mode is the run name. A track of another mode's family (rows.py FAMILY) means the
-    # menu path picked another mode: no row (2026-10-25: sprint/drag/drift rows loaded 1002, a circuit track).
-    mode = os.path.basename(d).split('.')[0]
+    # The row (census/rows.json id): the track is the TRACKB<id>.LZC the game opened (host/win32.c RN_FLOWLOG), the mode is
+    # [0x777cc8] at the Accept (host/d3d9.c "flow mode"). Runs before that line: the run name, only for circuit, lapko and
+    # freerun (sprint/drag/drift runs of that time wrote the mode with RN_POKE: not the game's own path). A track the mode
+    # does not list (rows.json, 0x4ab470) is no row (2026-10-25: sprint/drag/drift taps loaded 1002).
+    ids = {0: 'circuit', 1: 'sprint', 2: 'lapko', 3: 'freerun', 5: 'drag', 6: 'drift'}
+    modes = [int(m[1]) for m in (re.match(r'flow mode (\d+)', l) for l in log[:next((i for i, l in enumerate(log) if l.startswith('flow state 6/')), len(log))]) if m]
+    mode = ids.get(modes[-1], f'mode{modes[-1]}') if modes else os.path.basename(d).split('.')[0].split('-')[0]
+    if not modes and mode not in ('circuit', 'lapko', 'freerun'): mode = None
     trk = [int(m[1]) for m in (re.search(r'flow open .*TRACKB(\d{4})\.LZC', l, re.I) for l in log) if m]
-    fam = {'circuit': 10, 'lapko': 10, 'sprint': 11, 'drag': 12, 'drift': 13}
-    row = 'qr.freerun' if mode == 'freerun' and trk else f'qr.{mode}.{trk[0]}' if trk and trk[0] // 100 == fam.get(mode) else None
+    row = f'qr.{mode}.{trk[0]}' if trk and f'qr.{mode}.{trk[0]}' in QR_ROWS else None
+    # A career run: the event under the cursor at the race start ([0x735dc8], host/d3d9.c "flow event").
+    ev = [int(m[1]) for m in (re.match(r'flow event (\d+)', l) for l in log[:next((i for i, l in enumerate(log) if l.startswith('flow state 6/')), len(log))]) if m]
+    if os.path.basename(d).startswith(('career', 'explore_ug')) and ev and f'career.{ev[-1]}' in ALL_ROWS: row = f'career.{ev[-1]}'
     stop = next((l for l in reversed(log) if re.search(r'STOP|stop:|unimplemented|missing|fault|abort', l, re.I)), '')
     end = next((l for l in reversed(log) if l.startswith('RN_SECS')), 'running or killed')
-    return {'row': row, 'track': trk[0] if trk else None, 'reached': {'menu': 3 in seen, 'start': raced, 'racing': any(s == 6 and r not in (1, 255) for s, r, _ in st),
+    return {'row': row, 'mode': mode, 'track': trk[0] if trk else None, 'reached': {'menu': 3 in seen, 'start': raced, 'racing': any(s == 6 and r not in (1, 255) for s, r, _ in st),
                         'results': any(s == 6 and r == 8 for s, r, _ in st),
                         'unload': 7 in after, 'back_to_menu': back, 'second_race': again},
             'states': [f'{s}/{r}@{f}' for s, r, f in st], 'stop': stop, 'end': end,
@@ -90,12 +99,9 @@ def webp(d):   # the PNG shots -> WebP (only these and completion.json come down
 if sys.argv[1] == 'launch':
     for r in sys.argv[2:]: launch(r)
 elif sys.argv[1] == 'queue':
-    def live():   # every native row of this repo, also those another queue started (the cgroup budget is shared)
-        n = 0
-        for p in os.listdir('/proc'):
-            try: n += p.isdigit() and open(f'/proc/{p}/cmdline', 'rb').read().startswith(f'{R}/build/speed'.encode())
-            except OSError: pass
-        return n
+    def live():   # every native row of this repo, also those another queue started (one game process at a time)
+        ps = subprocess.run(['ps', '-axo', 'command='], capture_output=True, text=True).stdout.splitlines()
+        return sum(l.startswith(f'{R}/build/speed') for l in ps)
     n, todo, kids = int(sys.argv[2]), sys.argv[3:], []
     while todo:
         kids = [k for k in kids if k.poll() is None]   # reap
