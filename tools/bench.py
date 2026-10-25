@@ -13,9 +13,12 @@ def keys(mode, loc):   # same menu path as tools/abrun.py
     return ['Enter', 'Enter', 'Right', 'Enter'] + ['Down'] * mode + ['Enter', 'Enter', 'Enter'] + ['Right'] * loc + ['Enter', 'Enter']
 
 def run(mode, loc, secs, name):
-    ks = keys(mode, loc)
+    # BENCH_JUMP='0:1003': the menu keys stop on MU_QuickRaceModeSelect and RN_JUMP starts that race (host/input.c);
+    # the car select's GenericDialog took a key of the full menu path (build/bench/b4_base, 2026-10-25).
+    jump = os.environ.get('BENCH_JUMP')
+    ks = keys(mode, loc)[:6] if jump else keys(mode, loc)
     ours = ','.join(f'{20 + GAP * i}:{"Arrow" + x if x in ("Right", "Down") else x}' for i, x in enumerate(ks))
-    url = 'http://127.0.0.1:5180/?env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1' + os.environ.get('BENCH_Q', '')   # BENCH_Q='&gpuprof=1'
+    url = 'http://127.0.0.1:5180/?env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1' + (f'&jump={jump}' if jump else '') + os.environ.get('BENCH_Q', '')   # BENCH_Q='&gpuprof=1'
     env = dict(os.environ, RN_CDP_PORT='9341', RN_VIEW=VIEW)
     with open(f'{OUT}/{name}.out', 'w') as f:
         subprocess.run(['node', 'tools/webcheck.mjs', url, str(20 + GAP * len(ks) + secs), f'{OUT}/{name}.png', ours],

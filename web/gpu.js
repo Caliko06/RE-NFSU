@@ -200,6 +200,70 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
     fragment: { module: fxaaMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
   const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   let fxaaTmp = null;
+  // BRIDGE: bloom over the 3D scene, not in the original (docs/PLAN.md block 5). PC NFSU1 has its own light glow and
+  // streaks (0x409b70, PATCH 0x409bca), and it is the sharpest of the four versions, so this one only lifts what is
+  // already near white: a quarter-size bright pass (luma over 0.72), a separable 9-tap Gaussian, added back with weight
+  // 0.2. It runs at GPU_FXAA (the first HUD quad: the scene is done, the HUD comes after) and adds into the multisampled
+  // twin too, so the HUD pass's resolve keeps it. ?bloom=0 turns it off; ?bloom=split = only the right half (A/B in one frame).
+  const BLOOM_MODE = new URLSearchParams(location.search).get('bloom'), BLOOM_ON = BLOOM_MODE !== '0';
+  const bloomMod = device.createShaderModule({ code: `
+@group(0) @binding(0) var src: texture_2d<f32>;
+@group(0) @binding(1) var smp: sampler;
+struct V { @builtin(position) p: vec4f, @location(0) uv: vec2f };
+@vertex fn vs(@builtin(vertex_index) i: u32) -> V {
+  let xy = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return V(vec4f(xy * 2.0 - 1.0, 0.0, 1.0), vec2f(xy.x, 1.0 - xy.y));
+}
+@fragment fn bright(v: V) -> @location(0) vec4f {
+  let t = 1.0 / vec2f(textureDimensions(src));
+  let c = 0.25 * (textureSampleLevel(src, smp, v.uv + vec2f(-t.x, -t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, -t.y), 0.0).rgb
+    + textureSampleLevel(src, smp, v.uv + vec2f(-t.x, t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, t.y), 0.0).rgb);
+  let l = dot(c, vec3f(0.299, 0.587, 0.114));
+  return vec4f(c * smoothstep(0.72, 1.0, l), 1.0);
+}
+fn blur(uv: vec2f, d: vec2f) -> vec4f {
+  let w = array<f32, 5>(0.2270270, 0.1945946, 0.1216216, 0.0540540, 0.0162162);
+  var c = textureSampleLevel(src, smp, uv, 0.0).rgb * w[0];
+  for (var k = 1; k < 5; k++) {
+    c += (textureSampleLevel(src, smp, uv + d * f32(k), 0.0).rgb + textureSampleLevel(src, smp, uv - d * f32(k), 0.0).rgb) * w[k];
+  }
+  return vec4f(c, 1.0);
+}
+@fragment fn blurH(v: V) -> @location(0) vec4f { return blur(v.uv, vec2f(1.0 / f32(textureDimensions(src).x), 0.0)); }
+@fragment fn blurV(v: V) -> @location(0) vec4f { return blur(v.uv, vec2f(0.0, 1.0 / f32(textureDimensions(src).y))); }
+@fragment fn add(v: V) -> @location(0) vec4f {
+  let k = select(0.2, 0.2 * step(0.5, v.uv.x), ${BLOOM_MODE === 'split' ? 'true' : 'false'});
+  return vec4f(textureSampleLevel(src, smp, v.uv, 0.0).rgb * k, 0.0);
+}` });
+  const bloomPipe = (fs, sc) => device.createRenderPipeline({ layout: 'auto', vertex: { module: bloomMod, entryPoint: 'vs' },
+    fragment: { module: bloomMod, entryPoint: fs, targets: [{ format: 'rgba8unorm', ...(fs === 'add' ? { blend: {
+      color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } } : {}) }] },
+    primitive: { topology: 'triangle-list' }, multisample: { count: sc } });
+  const bloomPipes = BLOOM_ON ? { bright: bloomPipe('bright', 1), blurH: bloomPipe('blurH', 1), blurV: bloomPipe('blurV', 1), add: new Map() } : null;
+  let bloomA = null, bloomB = null;
+  function bloom(enc, rt) {
+    const bw = Math.max(1, rt.w >> 2), bh = Math.max(1, rt.h >> 2);
+    if (!bloomA || bloomA.width !== bw || bloomA.height !== bh) {
+      bloomA?.destroy(); bloomB?.destroy();
+      const mk = () => device.createTexture({ size: [bw, bh], format: 'rgba8unorm', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING });
+      bloomA = mk(); bloomB = mk();
+    }
+    const step = (pipe, from, att, lab) => {
+      const p = enc.beginRenderPass({ timestampWrites: tsw(lab), colorAttachments: [att] });
+      p.setPipeline(pipe);
+      p.setBindGroup(0, device.createBindGroup({ layout: pipe.getBindGroupLayout(0),
+        entries: [{ binding: 0, resource: from.createView() }, { binding: 1, resource: fxaaSamp }] }));
+      p.draw(3);
+      p.end();
+    };
+    const to = t => ({ view: t.createView(), loadOp: 'clear', clearValue: [0, 0, 0, 1], storeOp: 'store' });
+    step(bloomPipes.bright, rt.tex, to(bloomA), 'bloom bright');
+    step(bloomPipes.blurH, bloomA, to(bloomB), 'bloom blur');
+    step(bloomPipes.blurV, bloomB, to(bloomA), 'bloom blur');
+    const sc = rt.msView ? rt.sc : 1;
+    if (!bloomPipes.add.has(sc)) bloomPipes.add.set(sc, bloomPipe('add', sc));
+    step(bloomPipes.add.get(sc), bloomA, colorAtt(rt), 'bloom add');
+  }
   const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
@@ -490,7 +554,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   let tsN = 0;
   // ?gpuprof=1: GPU time per pass kind (label = what the pass does and its target), summed over 300 frames, in the frame log.
   const PROF = new URLSearchParams(location.search).get('gpuprof') === '1', profLab = [], profSum = new Map();
-  let profFrames = 0;
+  let profFrames = 0, profSeq = [], profLast = '';   // the frame's pass breaks in order (?gpuprof=1)
   const tsw = lab => {
     if (!tsq || tsN + 2 > TS_MAX) return undefined;
     if (PROF) profLab[tsN >> 1] = lab;
@@ -505,10 +569,21 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       prof = '; per frame: ' + [...profSum].sort((x, y) => y[1][0] - x[1][0]).slice(0, 10)
         .map(([l, e]) => `${l} ${(e[0] / profFrames).toFixed(2)} ms/${(e[1] / profFrames).toFixed(1)}`).join(', ');
       profSum.clear(); profFrames = 0;
+      const e = encMs.splice(0).sort((x, y) => x - y);
+      if (e.length) prof += `; encode p50 ${e[e.length >> 1].toFixed(1)} p90 ${e[Math.floor(e.length * .9)].toFixed(1)} max ${e[e.length - 1].toFixed(1)} ms`;
+      prof += '; passes: ' + profLast;
     }
     return `, gpu ts p50 ${q(0.5)} p90 ${q(0.9)} max ${q(1)} ms` + prof;
   };
+  // ?gpuprof=1: the JS time to encode and submit one command list (the page's CPU side of a frame)
+  const encMs = [];
   function run(ptr, len) {
+    if (!PROF) return runList(ptr, len);
+    const t = performance.now(), r = runList(ptr, len);
+    encMs.push(performance.now() - t);
+    return r;
+  }
+  function runList(ptr, len) {
     const w = H().subarray(ptr >> 2, (ptr >> 2) + len);
     const f32 = new Float32Array(w.buffer, w.byteOffset, w.length);
     const u8 = new Uint8Array(w.buffer, w.byteOffset, w.length * 4);
@@ -545,6 +620,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     }
     let voff = 0, ioff = 0, uoff = 0;
     let pass = null, passKey = '', pend = null, ci = 0;
+    if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
     // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
     const endPass = keepClear => {
@@ -599,6 +675,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       if (IN_CL[op]) ci++;
       i += 1 + n;
       if (op === GPU_TARGET) {
+        if (PROF) profSeq.push('T');
         endPass();
         const depth = w[a + 3] === 1;
         const sc = msFor(w[a + 1], w[a + 2]);
@@ -612,6 +689,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         res.set(w[a], { tex, view: tex.createView(), w: w[a + 1], h: w[a + 2], depth, sc, ms, msView: ms?.createView() });
         stats.targets++;
       } else if (op === GPU_CLEAR) {
+        if (PROF) { const t = res.get(w[a]) || res.get(w[a + 1]); profSeq.push(`c${fullClear(a) ? 'F' : 'p'}${w[a + 2] & 7}${t ? t.w : 0}`); }
         endPass();
         const rt = w[a] ? res.get(w[a]) : null, ds = w[a + 1] ? res.get(w[a + 1]) : null, flags = w[a + 2];
         const c = w[a + 3], off = nuni * 256, mask = fullClear(a);
@@ -689,6 +767,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           let k = ci;      // the pass runs while the draws keep this target pair
           while (k < cl.length && (w[cl[k]] & 0xff) === GPU_DRAW && w[cl[k] + 1 + D_RT] === g(D_RT) && w[cl[k] + 1 + D_DS] === g(D_DS)) k++;
           pass = enc.beginRenderPass(passDesc('draw', g(D_RT), g(D_DS), k, fold ? pend : null));
+          if (PROF) profSeq.push(`D${rt ? rt.w : 0}x${k - ci + 1}`);
           if (fold) pend = null;
           passKey = key;
         }
@@ -750,8 +829,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         uoff += U_STEP;
         stats.draws++;
       } else if (op === GPU_FXAA) {
+        if (PROF) profSeq.push('fxaa');
         endPass();
         const rt = res.get(w[a]);
+        if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
         if (FXAA_ON && rt && !rt.depth && !rt.msView) {
           if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
             fxaaTmp?.destroy();
@@ -799,6 +880,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       enc.copyBufferToBuffer(tsq.res, 0, tsBuf, 0, 8 * tsN);
     }
     device.queue.submit([enc.finish()]);
+    if (PROF && stats.present) profLast = profSeq.join(' ');
     if (tsBuf) {
       const n = tsN, labs = PROF ? profLab.slice(0, n >> 1) : null;
       tsBuf.mapAsync(GPUMapMode.READ).then(() => {
