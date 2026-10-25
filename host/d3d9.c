@@ -871,7 +871,13 @@ static void flow_log(Ctx *c) {
     uint32_t e = ld(c, 0x735dc8, 4);
     if (m != pm || t != pt) rn_log("flow mode %u gametype %u track %u kind %u (frame %u)", m & 0xff, m >> 8, t & 0xffff, t >> 16, dev.frames);
     if (e != pe) rn_log("flow event %u (frame %u)", e, dev.frames);
-    pm = m, pt = t, pe = e;
+    // Career progress: one status byte per event id at career 0x75eef8 + 0x34c (0x5a0ce0 writes 3 when the event's race
+    // starts; Hopper evbrief.txt). The count after a profile load shows what the save brought back (game.save_reload).
+    static int pcar = -1;
+    int car = 0;
+    for (uint32_t k = 0; k < 0x100; k++) car += ld(c, 0x75eef8 + 0x34c + k, 1) != 0;
+    if (car != pcar) rn_log("flow career %d (frame %u)", car, dev.frames);
+    pm = m, pt = t, pe = e, pcar = car;
     input_jump(c);
     prev = lb, prev_st = st, rn_flow = st, rn_screen = scr;
 }

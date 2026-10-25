@@ -1,0 +1,5 @@
+{
+ "optsave": {"q": "Options persistence: who writes <profile>.opt / .cfg (strings at 0x6cb0f0 .opt, 0x6cb15c .cfg), when (leaving the options screen?), the layout of the options block, and who reads it at profile load", "strings": [".opt", ".cfg"], "addrs": ["0x4d4610", "0x4d4900"]},
+ "profnew": {"q": "Creating a profile: the new-profile flow (0x41cf40 new career init, Profiles.usr 0x6cb138 .usr), which function writes Profiles.usr and the first <name>.ugd, and what name-entry screen feeds it", "addrs": ["0x41cf40", "0x4b3240", "0x4de0e0"], "strings": [".usr", "Profiles.usr"]},
+ "partfit": {"q": "Garage part fitting: how a part chosen in the customize screens is installed on the player car (car record, part slots per type: body kits, spoilers, rims, hoods, vinyls, decals, paint, neon, window tint, headlights, taillights, performance), and which unlock query hides a part", "strings": ["MU_Garage.fng", "GarageMain.fng", "CUSTOMIZE"]}
+}

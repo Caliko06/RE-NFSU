@@ -114,7 +114,10 @@ def cjump(name):
     for _ in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + leave
     return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * len(evs) + 120
 
+# reload_<run dir>: a new process on that run's save/ (a page reload in Chrome), the same route to the career map.
+# game.save_reload is OK when its "flow career" count on the map equals the count the source run ended with.
 def launch(run):
+    if run.startswith('reload_'): return reload(run)
     row, seed = (run.split('.') + [SEEDS[0]])[:2]
     d = f'{R}/runs/{row}.{seed}'
     subprocess.run(['rm', '-rf', d]); os.makedirs(d)
@@ -132,6 +135,33 @@ def launch(run):
     with open(f'{d}/log.txt', 'w') as log:
         return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
+
+def reload(run):
+    d, src = f'{R}/runs/{run}', f'{R}/runs/{run[7:]}'
+    subprocess.run(['rm', '-rf', d]); os.makedirs(d)
+    subprocess.run(['cp', '-al', f'{R}/game', f'{d}/game'], check=True)
+    subprocess.run(['cp', '-r', f'{src}/save', f'{d}/save'], check=True)
+    seq = cjump('cjump_0')[0].split(',')[:-len(_LEAVE) - 4] + ['4000@=MU_UG_MapScreen:RIGHT']
+    env = dict(os.environ, RN_TURBO='4', RN_SECS='150', RN_SCREEN='640x480', RN_RASTER='300', RN_FLOWLOG='1', RN_KEYS=','.join(seq))
+    with open(f'{d}/log.txt', 'w') as log:
+        return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
+                         stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
+
+def careers(d):   # the "flow career N" values of a run, in order (host/d3d9.c flow_log)
+    p = f'{d}/log.txt' if os.path.exists(f'{d}/log.txt') else f'{d}/flow.txt'
+    return [int(m[1]) for m in re.finditer(r'^flow career (\d+)', open(p, errors='replace').read(), re.M)]
+
+def game_rows():   # the whole-game rows (census/rows.json group game) a run proves
+    out, names = {}, lambda f: set(open(f, 'rb').read().split(b'\0')) - {b''} if os.path.exists(f) else set()
+    ok = lambda row, why: {'row': row, 'reached': {'back_to_menu': True}, 'why': why}
+    for r in sorted(os.listdir(f'{R}/runs')):
+        d = f'{R}/runs/{r}'
+        if r.startswith('reload_') and os.path.isdir(f'{R}/runs/{r[7:]}'):
+            a, b = careers(f'{R}/runs/{r[7:]}'), careers(d)
+            if a and b and a[-1] > 0 and b[-1] == a[-1]: out[f'{r}#game'] = ok('game.save_reload', f'career {a[-1]} -> reload {b[-1]}')
+        new = {n for n in names(f'{d}/save/Profiles.usr') - names(f'{R}/save/Profiles.usr') if n.isalnum()}
+        if new and any(os.path.exists(f'{d}/save/{n.decode()}.cfg') for n in new): out[f'{r}#profile'] = ok('game.profile', f'new profile {sorted(new)}')
+    return out
 
 ALL_ROWS = {r['id']: r['group'] for r in json.load(open(f'{R}/census/rows.json'))['rows']}
 QR_ROWS = {k for k, g in ALL_ROWS.items() if g == 'quick_race'}
@@ -206,5 +236,6 @@ elif sys.argv[1] == 'collect':
     runs = [r for r in sorted(os.listdir(f'{R}/runs')) if any(os.path.exists(f'{R}/runs/{r}/{f}') for f in ('log.txt', 'flow.txt'))]
     for r in runs: webp(f'{R}/runs/{r}')
     rows = {f'{r}#{i}' if i else r: v for r in runs for i, v in enumerate(rows_of(f'{R}/runs/{r}')) if not i or v['reached']['start']}
+    rows.update(game_rows())
     json.dump(rows, open(f'{R}/census/completion.json', 'w'), indent=1)
-    for r, v in rows.items(): print(f'{r:10s}', ' '.join(k for k, x in v['reached'].items() if x) or '-', '|', v['end'], '|', v['stop'][:80])
+    for r, v in rows.items(): print(f'{r:10s}', ' '.join(k for k, x in v['reached'].items() if x) or '-', '|', v.get('end', v.get('why')), '|', v.get('stop', '')[:80])

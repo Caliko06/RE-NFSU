@@ -225,11 +225,12 @@ void input_jump(Ctx *c) {
     int car = *s ? *s == 'e' : fired == 2;
     const char *home = car ? "MU_UG_MapScreen" : "MU_QuickRaceModeSelect";
     if (!*s && !fired) return;
-    if ((rn_flow >> 8) != 3 || !screen_on(home)) { seen = 0; return; }
+    // The list done: any front end ends the run (a career race comes back on the hub or another screen, 0x4ab670)
+    if ((rn_flow >> 8) != 3 || (*s && !screen_on(home))) { seen = 0; return; }
     if (!seen) seen = rn_telem.presents;
     if (rn_telem.presents - seen < 30) return;   // let the screen settle as a player would
 #ifndef __EMSCRIPTEN__
-    if (!*s) { rn_log("RN_JUMP: done, back on %s at frame %u", home, rn_telem.presents); fflush(NULL); _exit(0); }
+    if (!*s) { rn_log("RN_JUMP: done, back in the front end at frame %u", rn_telem.presents); fflush(NULL); _exit(0); }
 #endif
     if (car) {
         // The map's own path (0x4c5df0): esi = career 0x75eef8, edi = event id, ebx = its record ([0x733ff8 + 4*id],
