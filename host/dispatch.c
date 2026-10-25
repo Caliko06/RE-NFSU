@@ -35,7 +35,7 @@ const Api *find_api(const char *dll, const char *name) {
 }
 
 // Host -> guest call (window procedures, callbacks): stdcall, the callee pops the arguments.
-uint32_t call_guest(Ctx *c, uint32_t fn, int n, const uint32_t *args) {
+static uint32_t call_guest_pop(Ctx *c, uint32_t fn, int n, const uint32_t *args, int cdecl) {
     uint32_t saved[8];
     memcpy(saved, c->r, sizeof saved);
     for (int k = n - 1; k >= 0; k--) { c->r[ESP] -= 4; st(c, c->r[ESP], args[k], 4); }
@@ -45,10 +45,12 @@ uint32_t call_guest(Ctx *c, uint32_t fn, int n, const uint32_t *args) {
     rn_call(c, fn);
     uint32_t v = c->r[EAX];
     if (!c->halt && c->ret != back) { c->halt_at = fn; rn_halt(c, "callback %08x returned to %08x", fn, c->ret); }
-    if (!c->halt && c->r[ESP] != saved[ESP]) { c->halt_at = fn; rn_halt(c, "callback %08x is not stdcall/%d", fn, n); }
+    if (!c->halt && c->r[ESP] != saved[ESP] - (cdecl ? 4u * n : 0)) { c->halt_at = fn; rn_halt(c, "callback %08x is not %s/%d", fn, cdecl ? "cdecl" : "stdcall", n); }
     if (!c->halt) memcpy(c->r, saved, sizeof saved);
     return v;
 }
+uint32_t call_guest(Ctx *c, uint32_t fn, int n, const uint32_t *args) { return call_guest_pop(c, fn, n, args, 0); }
+uint32_t call_guest_cdecl(Ctx *c, uint32_t fn, int n, const uint32_t *args) { return call_guest_pop(c, fn, n, args, 1); }
 
 // Last host calls, for the stop report.
 #define RING 48

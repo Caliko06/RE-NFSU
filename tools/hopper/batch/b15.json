@@ -1,0 +1,4 @@
+{
+ "dbgfin": {"q": "Debug race menu screen (vtable 0x6c56b8, built by 0x4c24c0; option index 3 = 'Force Race Finish' when [[0x73619c]]==4): its handlers 0x4c2830 / 0x4bd880 / 0x4bdd10 / 0x4bdf20; which one runs on accept and what it calls for option 3 to force the race finish (the exact function and its register/stack arguments)", "addrs": ["0x4c2830", "0x4bd880", "0x4bdd10", "0x4bdf20", "0x4dedf0", "0x4c09b0"]},
+ "fepush": {"q": "How the front end opens a screen by package name (e.g. MU_Garage, MU_Options_PC from MU_UG_UndergroundMenu or MU_Main_PC): the push/switch function (0x4f7c00 called by 0x4c96f0?), its arguments (name string, flags), and the exact call a hub menu item makes to open the garage and the options screen", "addrs": ["0x4f7c00", "0x4c96f0"], "strings": ["MU_Garage", "MU_Options_PC"]}
+}

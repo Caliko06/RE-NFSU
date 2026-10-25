@@ -90,6 +90,18 @@ ROWS.update({f'sweep_{k}': sweep(k) for k in SWEEP})
 FREE_LEAVE = ['60000@6/4:ESCAPE'] + ['1500@=MU_Pause_PC:DOWN'] * 3 + ['1500@=MU_Pause_PC:RETURN', '1500@=MU_PauseConfirm:LEFT', '1500@=MU_PauseConfirm:RETURN']
 ROWS['freerun'] = ','.join(keys(menu(5, 3)).split(',') + FREE_LEAVE)
 
+# garage: RN_OPEN (host/input.c) switches MU_Main_PC to MU_MainMenuCarCustomize as the menu does (0x4b3494), then
+# Next, Visual, Body, Spoiler into the parts browser and four parts (runs/open_garage shot 5100: kit STRIKE on the car).
+_PROFILE = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + ['1500@=MU_UG_NewOrLoad_PC2:RETURN']
+ROWS['garage'] = ','.join(['0:RETURN'] + _PROFILE[1:] + [f'1500@={s}:RETURN' for s in ('MU_MainMenuCarCustomize', 'MU_Garage', 'MU_GaragePartsChooseVisual', 'MU_GaragePartsCategoryVisual')] + ['3000@!NONE:RIGHT'] * 4)
+# options: RN_OPEN opens MU_OptionsSelector_PC (0x4b3413), Audio, Volume LEFT x3, Back x2; leaving saves nothing
+# (0x4d4892), so RN_CALL runs the save 0x41c7a0 (.cfg/.opt, as autosave 0x4c9705) back on MU_Main_PC. reload_options.<seed>
+# opens Audio again on that save/ (runs/reload_opt 2026-10-25: Volume one notch, the .opt bytes 62, 65 and checksum moved).
+_OPTS = ['0:RETURN'] + _PROFILE[1:] + ['1500@=MU_OptionsSelector_PC:RETURN']
+ROWS['options'] = ','.join(_OPTS + ['2000@!NONE:LEFT'] * 3 + ['2000@!NONE:BACK'] * 2)
+OPEN = {'garage': 'MU_Main_PC>MU_MainMenuCarCustomize:20', 'options': 'MU_Main_PC>MU_OptionsSelector_PC:10'}
+CALL = {'options': 'MU_Main_PC#2:41c7a0'}
+
 # jump_<mode>_<track>+<track>..: RN_JUMP (host/input.c) starts each race from MU_QuickRaceModeSelect with the game's own
 # Accept 0x4b5c00 (mode = [0x777cc8] id: 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift); the keys only reach
 # that screen, leave each race, and wait for the front end (state 3) before the next race's PreRaceStats RETURNs.
@@ -114,12 +126,18 @@ def cjump(name):
     # their "@6/8" anchors on the stage before's 6/8 and fires on the loading screen (runs/cjump_6+.. taps 22-23).
     # After a stage that is not the last, PostRaceMenu is Next Race, Restart Race, Restart Tournament, Statistics, Quit
     # Tournament (runs/cjump_6 shot 12173): the race leave's DOWN DOWN RETURN restarts the tournament, so RETURN = Next Race.
-    nxt = ['3000@6/8:RETURN'] + ['4000@!PostRaceMenu:RETURN'] * 6 + ['1500@=PostRaceMenu:RETURN', '3000@6/4:RETURN']
-    stages = lambda e: nxt * (STAGES[f'career.{e}'] - 1) + leave
+    # Next Race itself is RN_NEXT (host/input.c): its confirm opens with No focused (runs/cjump_6 taps 18-19).
+    # After the last stage the menu is the same and Next Race ends the tournament (runs/cjump_6 shot 4301, 3 stages done).
+    # Next Race goes back to the hub, then the map and the next stage's briefing (runs/cjump_6 2026-10-25: hub 3023, map
+    # 3183, MU_UG_EventBriefing 3429): each gets its RETURN when it shows. Three taps reach PostRaceMenu from the results
+    # (taps 12-14); a fourth is dropped there or lands on the loading screen.
+    res = ['3000@6/8:RETURN'] + ['4000@!PostRaceMenu:RETURN'] * 4
+    nxt = [q('MU_UG_UndergroundMenu', 'RETURN'), q('MU_UG_MapScreen', 'RETURN'), q('MU_UG_EventBriefing', 'RETURN'), '3000@6/4:RETURN']
+    stages = lambda e: (res + nxt) * (STAGES[f'career.{e}'] - 1) + (res if STAGES[f'career.{e}'] > 1 else leave)
     out = keys(pre, stages(evs[0])).split(',')
     for e in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + stages(e)
     # A tournament runs its stages back to back (runs/cjump_5+..: event 6 stage 3 began as RN_SECS ran out): time per stage.
-    return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * sum(STAGES[f'career.{e}'] for e in evs) + 120
+    return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * sum(STAGES[f'career.{e}'] for e in evs) + 120, '+'.join(str(STAGES[f'career.{e}'] if STAGES[f'career.{e}'] > 1 else 0) for e in evs)
 
 # reload_<run dir>: a new process on that run's save/ (a page reload in Chrome), the same route to the career map.
 # game.save_reload is OK when its "flow career" count on the map equals the count the source run ended with.
@@ -137,7 +155,9 @@ def launch(run):
     env = dict(os.environ, RN_TURBO='4', RN_SECS=str(secs), RN_SCREEN='640x480', RN_RASTER='1000000', RN_FLOWLOG='1', RN_SEED=seed,
                RN_AUTOPILOT='1', RN_KEYS=seq if isinstance(seq, str) else keys(seq, LEAVE[SEEDS.index(seed) % 3] + NEXT))
     if row.startswith('explore'): env.update(RN_KEEP='120', RN_SECS='600')
-    if jmp: env.update(RN_JUMP=jmp[1], RN_SECS=str(jmp[2]))
+    if row in OPEN: env.update(RN_OPEN=OPEN[row], RN_SECS='45', RN_KEEP='500')
+    if row in CALL: env.update(RN_CALL=CALL[row])
+    if jmp: env.update(RN_JUMP=jmp[1], RN_SECS=str(jmp[2]), **({'RN_NEXT': jmp[3]} if len(jmp) > 3 else {}))
     if os.environ.get('RN_KEEP'): env['RN_KEEP'] = os.environ['RN_KEEP']   # a kept frame every N (look inside a long race)
     with open(f'{d}/log.txt', 'w') as log:
         return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
@@ -150,13 +170,31 @@ def reload(run):
     subprocess.run(['cp', '-r', f'{src}/save', f'{d}/save'], check=True)
     seq = cjump('cjump_0')[0].split(',')[:-len(_LEAVE) - 4] + ['4000@=MU_UG_MapScreen:RIGHT']
     env = dict(os.environ, RN_TURBO='4', RN_SECS='150', RN_SCREEN='640x480', RN_RASTER='1000000', RN_FLOWLOG='1', RN_KEYS=','.join(seq))
+    if run.startswith('reload_options'): env.update(RN_KEYS=','.join(_OPTS), RN_OPEN=OPEN['options'], RN_SECS='30', RN_KEEP='500')
     with open(f'{d}/log.txt', 'w') as log:
         return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
 
-def careers(d):   # the "flow career N" values of a run, in order (host/d3d9.c flow_log)
+def careers(d):   # the "flow career N status H" of a run, in order (host/d3d9.c flow_log: H hashes the event status bytes)
     p = f'{d}/log.txt' if os.path.exists(f'{d}/log.txt') else f'{d}/flow.txt'
-    return [int(m[1]) for m in re.finditer(r'^flow career (\d+)', open(p, errors='replace').read(), re.M)]
+    return [(int(m[1]), m[2]) for m in re.finditer(r'^flow career (\d+) status (\w+)', open(p, errors='replace').read(), re.M)]
+
+# A movie plays when two kept frames while an *FMV.fng screen is up (LS_IntroFMV, MU_UG_NewCareerFMV) show a picture
+# (not flat) and differ (runs/explore_new: 01_DAY frame 2160 is a wheel, MU_UG_NewCareerFMV 2101-2282).
+def movie(d):
+    txt = open(f'{d}/log.txt', errors='replace').read()
+    if 'flow open MOVIES' not in txt: return None
+    from PIL import Image, ImageStat
+    fe = [(int(m[2]), 'FMV.fng' in m[1]) for m in re.finditer(r'^flow fe (.*) \(frame (\d+)\)', txt, re.M)] + [(1 << 30, False)]
+    for (a, on), (b, _) in zip(fe, fe[1:]):
+        if not on: continue
+        pics = []
+        for n in sorted(int(f.split('.')[2]) for f in os.listdir(d) if re.fullmatch(r'shot\.png\.\d+\.png', f)):
+            if a < n < b:
+                im = Image.open(f'{d}/shot.png.{n}.png').convert('L').resize((64, 48))
+                if ImageStat.Stat(im).stddev[0] > 20: pics.append((n, im.tobytes()))
+        if len({p for _, p in pics}) > 1: return f'movie frames {pics[0][0]}..{pics[-1][0]} between frames {a} and {b}'
+    return None
 
 def game_rows():   # the whole-game rows (census/rows.json group game) a run proves
     out, names = {}, lambda f: set(open(f, 'rb').read().split(b'\0')) - {b''} if os.path.exists(f) else set()
@@ -164,8 +202,20 @@ def game_rows():   # the whole-game rows (census/rows.json group game) a run pro
     for r in sorted(os.listdir(f'{R}/runs')):
         d = f'{R}/runs/{r}'
         if r.startswith('reload_') and os.path.isdir(f'{R}/runs/{r[7:]}'):
-            a, b = careers(f'{R}/runs/{r[7:]}'), careers(d)
-            if a and b and a[-1] > 0 and b[-1] == a[-1]: out[f'{r}#game'] = ok('game.save_reload', f'career {a[-1]} -> reload {b[-1]}')
+            # The source run's race changed the autosave (0x4c96f0 writes <profile>_autosave.ugd, which the profile
+            # load reads back: runs/reload_cjump_7) and the reload's status bytes equal the source's last ones.
+            a, b, sv = careers(f'{R}/runs/{r[7:]}'), careers(d), lambda x: open(f'{x}/save/asas_autosave.ugd', 'rb').read()
+            if a and b and a[-1][0] > 0 and b[-1] == a[-1] and sv(f'{R}/runs/{r[7:]}') != sv(R):
+                out[f'{r}#game'] = ok('game.save_reload', f'career {a[-1]} -> reload {b[-1]}')
+        src = f'{R}/runs/{r[7:]}'
+        if r.startswith('reload_options') and os.path.isdir(src) and os.path.exists(f'{d}/log.txt'):
+            opt = lambda x: open(f'{x}/save/asas.opt', 'rb').read() if os.path.exists(f'{x}/save/asas.opt') else b''
+            if opt(src) and opt(src) != opt(R) and b'MU_Options_PC.fng' in open(f'{d}/log.txt', 'rb').read():
+                out[f'{r}#game'] = ok('game.options', 'asas.opt changed by the save 0x41c7a0, reloaded into Options')
+        log = f'{d}/log.txt'
+        if os.path.exists(log) and b'MU_GaragePartsBrowser.fng' in open(log, 'rb').read(): out[f'{r}#garage'] = ok('game.garage', 'parts browser reached')
+        mv = movie(d) if os.path.exists(log) else None
+        if mv: out[f'{r}#movies'] = ok('game.movies', mv)
         new = {n for n in names(f'{d}/save/Profiles.usr') - names(f'{R}/save/Profiles.usr') if n.isalnum()}
         if new and any(os.path.exists(f'{d}/save/{n.decode()}.cfg') for n in new): out[f'{r}#profile'] = ok('game.profile', f'new profile {sorted(new)}')
     return out

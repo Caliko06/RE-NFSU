@@ -874,11 +874,18 @@ static void flow_log(Ctx *c) {
     // Career progress: one status byte per event id at career 0x75eef8 + 0x34c (0x5a0ce0 writes 3 when the event's race
     // starts; Hopper evbrief.txt). The count after a profile load shows what the save brought back (game.save_reload).
     static int pcar = -1;
+    static uint32_t phash;
     int car = 0;
-    for (uint32_t k = 0; k < 0x100; k++) car += ld(c, 0x75eef8 + 0x34c + k, 1) != 0;
-    if (car != pcar) rn_log("flow career %d (frame %u)", car, dev.frames);
+    uint32_t hash = 2166136261u;   // FNV-1a of the 256 status bytes: a reload must bring back the same ones
+    for (uint32_t k = 0; k < 0x100; k++) { uint32_t b = ld(c, 0x75eef8 + 0x34c + k, 1); car += b != 0; hash = (hash ^ b) * 16777619u; }
+    if (car != pcar || hash != phash) rn_log("flow career %d status %08x (frame %u)", car, hash, dev.frames);
+    phash = hash;
     pm = m, pt = t, pe = e, pcar = car;
     input_jump(c);
+    input_finish(c);
+    input_open(c);
+    input_next(c);
+    input_call(c);
     prev = lb, prev_st = st, rn_flow = st, rn_screen = scr;
 }
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
@@ -886,11 +893,6 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     tune_apply(c);
     rng_log(c, dev.frames);
     flow_log(c);
-    // RN_UNLOCK: [0x7677ac] is the game's "career beaten" flag (0x5a0dc0 sets it when event 0x71 is won, new profile
-    // 0x41cf40 clears it); the unlock queries 0x4d8040..0x512d10 (Hopper beatgame.txt) take it as "everything open".
-    static int unlock = -1;
-    if (unlock < 0) unlock = getenv("RN_UNLOCK") && *getenv("RN_UNLOCK") != '0';
-    if (unlock) st(c, 0x7677ac, 1, 4);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
         return D3DERR_INVALIDCALL;

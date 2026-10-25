@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "76/167",
+ "progress": "86/167",
  "rows": [
   {
    "id": "career.0",
@@ -64,7 +64,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x3e4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.4",
@@ -124,7 +124,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x7c8",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.7",
@@ -140,7 +140,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x914",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.8",
@@ -216,7 +216,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0xe44",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.12",
@@ -248,7 +248,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x10dc",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.14",
@@ -438,7 +438,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x1dd4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.24",
@@ -2440,28 +2440,28 @@
    "group": "game",
    "check": "Garage: every part type can be fitted and is seen on the car (everything unlocked)",
    "src": "AGENTS.md Scope",
-   "ok": false
+   "ok": true
   },
   {
    "id": "game.options",
    "group": "game",
    "check": "options change and persist in save/",
    "src": "AGENTS.md Scope",
-   "ok": false
+   "ok": true
   },
   {
    "id": "game.save_reload",
    "group": "game",
    "check": "career: save, reload the page, continue at the same event",
    "src": "AGENTS.md Scope",
-   "ok": false
+   "ok": true
   },
   {
    "id": "game.movies",
    "group": "game",
    "check": "the game movies play (MOVIES\\)",
    "src": "AGENTS.md Scope",
-   "ok": false
+   "ok": true
   }
  ]
 }

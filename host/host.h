@@ -50,6 +50,7 @@ Handle *get_handle(uint32_t h);
 
 const Api *find_api(const char *dll, const char *name);
 uint32_t call_guest(Ctx *c, uint32_t fn, int n, const uint32_t *args);
+uint32_t call_guest_cdecl(Ctx *c, uint32_t fn, int n, const uint32_t *args);   // the caller pops the args
 uint32_t host_addr_of(const char *dll, const char *name);     // HOST_BASE address, registering if needed
 void rn_halt(Ctx *c, const char *fmt, ...);
 extern uint32_t rn_flow;   // RN_FLOWLOG: game-flow state << 8 | race state (RN_KEYS "ms@S/R:KEY")
@@ -59,6 +60,10 @@ extern const char *rn_fe;       // RN_FLOWLOG: the front end's active packages, 
 extern int rn_screen_w, rn_screen_h;   // the desktop the game sees: RN_SCREEN=WxH (the page passes its window size)
 void rn_log(const char *fmt, ...);
 void input_jump(Ctx *c);        // RN_JUMP (host/input.c), from the RN_FLOWLOG pass at each Present
+void input_finish(Ctx *c);      // RN_FINISH (host/input.c), same place
+void input_open(Ctx *c);        // RN_OPEN (host/input.c), same place
+void input_next(Ctx *c);        // RN_NEXT (host/input.c), same place
+void input_call(Ctx *c);        // RN_CALL (host/input.c), same place
 int rn_trace(void);
 void win32_init(Ctx *c, uint32_t image_size);
 uint32_t guest_alloc(uint32_t size);                           // zeroed, for host-owned guest data

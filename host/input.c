@@ -131,7 +131,7 @@ static void button_event(int b, int d) {
     dinput8_button(b, d);
 }
 
-typedef struct { uint64_t at_us; uint8_t dik; uint32_t cond, mask; char op, scr[24]; } Tap;   // cond: flow state to wait for, ~0 = none
+typedef struct { uint64_t at_us; uint8_t dik; uint32_t cond, mask; char op, scr[48]; } Tap;   // cond: flow state to wait for, ~0 = none
 static Tap taps[256];
 static int ntaps, script_read;
 static unsigned next_tap;
@@ -142,9 +142,9 @@ static void read_script(void) {
         char name[32];
         unsigned ms, fs, rs;
         uint32_t cond = ~0u, mask = ~0u;
-        char op[2] = "", scr[24] = "";
+        char op[2] = "", scr[48] = "";
         int used;
-        if (sscanf(s, "%u@%1[=!]%23[A-Za-z0-9_]:%31[A-Z0-9_]%n", &ms, op, scr, name, &used) == 4) ;
+        if (sscanf(s, "%u@%1[=!]%47[A-Za-z0-9_]:%31[A-Z0-9_]%n", &ms, op, scr, name, &used) == 4) ;
         else if (op[0] = 0, sscanf(s, "%u@%u/%u:%31[A-Z0-9_]%n", &ms, &fs, &rs, name, &used) == 4) cond = fs << 8 | (rs & 0xff);
         else if (sscanf(s, "%u@%u:%31[A-Z0-9_]%n", &ms, &fs, name, &used) == 3) cond = fs << 8, mask = ~0xffu;
         else if (sscanf(s, "%u:%31[A-Z0-9_]%n", &ms, name, &used) != 2) { rn_log("RN_KEYS: cannot read \"%s\"", s); break; }
@@ -229,9 +229,11 @@ void input_jump(Ctx *c) {
     if ((rn_flow >> 8) != 3 || (*s && !screen_on(home))) { seen = 0; return; }
     if (!seen) seen = rn_telem.presents;
     if (rn_telem.presents - seen < 30) return;   // let the screen settle as a player would
+    extern uint32_t rn_next_left;
 #ifndef __EMSCRIPTEN__
-    if (!*s) { rn_log("RN_JUMP: done, back in the front end at frame %u", rn_telem.presents); fflush(NULL); _exit(0); }
+    if (!*s && !rn_next_left) { rn_log("RN_JUMP: done, back in the front end at frame %u", rn_telem.presents); fflush(NULL); _exit(0); }
 #endif
+    if (rn_next_left) return;   // the tournament's next stage starts from here
     if (car) {
         // The map's own path (0x4c5df0): esi = career 0x75eef8, edi = event id, ebx = its record ([0x733ff8 + 4*id],
         // filled by 0x5a0060); 0x5a0ce0 makes the race record [0x7677a8] (= career +0x88b0), 0x4dfa10(eax = record),
@@ -266,6 +268,141 @@ void input_jump(Ctx *c) {
     rn_log("RN_JUMP: mode %u track %u at frame %u", m, t, rn_telem.presents);
     call_guest(c, 0x4b5c00, 0, NULL);
     seen = 0, fired = 1;
+}
+// RN_FINISH=<place>: test-only, finish each race at that place a second after [[0x73619c]] reaches 4, the way
+// the debug race menu's Force Race Finish does (Hopper dbgfin.txt; 0x4c09b0 accept at 0x4c0a52): eax = 0, edx = place,
+// stdcall 0x572a90([0x7345d0], player) -> 0x494b90 message 0 sets [[0x73619c]+0x534] = place, +0x538 = player.
+void input_finish(Ctx *c) {
+    static const char *s;
+    static uint32_t seen, done;
+    if (!s) { s = getenv("RN_FINISH"); if (!s) s = ""; }
+    if (!*s) return;
+    if (rn_flow >> 8 != 6) { seen = done = 0; return; }
+    // The menu offers it only while [[0x73619c]] == 4 (0x4c09c0); runs/cjump_3 fired at 3 and the race went on.
+    uint32_t rs = ld(c, 0x73619c, 4), v = rs ? ld(c, rs, 4) : ~0u;
+    static uint32_t last = ~1u;
+    if (v != last) rn_log("RN_FINISH: [[0x73619c]] = %d at frame %u", (int)v, rn_telem.presents), last = v;
+    if (v != 4) { seen = done = 0; return; }   // each tournament stage comes back through 0, 2, 3
+    if (done) return;
+    if (!seen) seen = rn_telem.presents;
+    if (rn_telem.presents - seen < 60) return;
+    uint32_t r[8];
+    memcpy(r, c->r, sizeof r);
+    // Player 0 = the first local player [0x7361b4] (0x4cd610's 0). 0x4cd610 itself reads who paused ([[0x7361f0]+0x1c]):
+    // unpaused it gave 1 and no racer matched. The race update 0x435570 (esi = [0x73619c]) finds the racer whose
+    // [[r]+0x18]+0x10 == +0x538 and calls 0x4350d0(place, 0, 1).
+    uint32_t player = 0, a[2] = {ld(c, 0x7345d0, 4), player};
+    c->r[EAX] = 0, c->r[EDX] = (uint32_t)atoi(s);
+    call_guest(c, 0x572a90, 2, a);
+    memcpy(c->r, r, sizeof r);
+    rn_log("RN_FINISH: place %s player %u at frame %u", s, player, rn_telem.presents);
+    done = 1;
+}
+// RN_OPEN="MU_Main_PC>MU_MainMenuCarCustomize:20": test-only, once <from> is on, switch it to <to> the way the menus do
+// (0x4b3494: [0x777b4c] = 0x20, edi = "MU_MainMenuCarCustomize.fng", cdecl 0x4f6360("<from>.fng")). 0x4f6360 finds the
+// open package by its name (0x4f3f90) and 0x4f0800 replaces it with edi's. ":<hex>" = the [0x777b4c] the menu sets
+// (options 0x10, customize 0x20; scratchpad opens.txt lists every call site). Both names are .rdata strings.
+static uint32_t rdata_str(Ctx *c, const char *name) {
+    char z[80];
+    snprintf(z, sizeof z, "%s.fng", name);
+    size_t n = strlen(z) + 1;
+    for (uint32_t a = 0x697000; a + n < 0x6d4000; a++)
+        if (!memcmp(c->mem + a, z, n) && !c->mem[a - 1]) return a;
+    return 0;
+}
+void input_open(Ctx *c) {
+    static const char *s;
+    static uint32_t seen, done;
+    if (!s) { s = getenv("RN_OPEN"); if (!s) s = ""; }
+    if (!*s || done) return;
+    char from[64] = "", to[64] = "";
+    unsigned mode = 0;
+    if (sscanf(s, "%63[^>]>%63[^:]:%x", from, to, &mode) < 2) { rn_log("RN_OPEN: cannot read \"%s\"", s); done = 1; return; }
+    if ((rn_flow >> 8) != 3 || !screen_on(from)) { seen = 0; return; }
+    if (!seen) seen = rn_telem.presents;
+    if (rn_telem.presents - seen < 30) return;
+    uint32_t f = rdata_str(c, from), t = rdata_str(c, to), r[8];
+    done = 1;
+    if (!f || !t) { rn_log("RN_OPEN: no string %s or %s", from, to); return; }
+    if (mode) st(c, 0x777b4c, mode, 4);
+    memcpy(r, c->r, sizeof r);
+    c->r[EDI] = t;
+    call_guest_cdecl(c, 0x4f6360, 1, &f);
+    memcpy(c->r, r, sizeof r);
+    rn_log("RN_OPEN: %s -> %s at frame %u", from, to, rn_telem.presents);
+}
+// RN_NEXT="3+0": test-only, per event of the chain, how many times to pick Next Race on a tournament's PostRaceMenu
+// (every stage: after the last one Next Race ends the tournament).
+// The menu's flags +0x42..+0x46 follow its items: Next Race's confirm (0x496ea9) answers 0x7e9ccc8f -> +0x42 (0x497759);
+// the menu's reactivation 0xc98356ba then runs 0x497809 -> 0x497850 -> 0x4970f0 (race message 0xa, unload). 0xe1a57d51
+// (+0x43 -> 0x497260, race message 8) is Restart Race: runs/cjump_6+7 ran stage 1 (1003) four times, never TRACKB1006.
+// The screen object = [pkg+0x14] of 0x4f3f90("PostRaceMenu.fng"), sent through its vtable+8 (msg, 0, 0, [pkg+0x18]),
+// as 0x435570 sends 0xd8692111. RETURN there opened the confirm with No focused (runs/cjump_6 taps 18-19).
+static void screen_msg(Ctx *c, uint32_t name, uint32_t msg) {
+    uint32_t r[8], a[4] = {msg, 0, 0, 0}, l = 0x746104;
+    memcpy(r, c->r, sizeof r);
+    c->r[EAX] = name;
+    uint32_t pkg = call_guest(c, 0x4f3f90, 1, &l), obj = pkg ? ld(c, pkg + 0x14, 4) : 0;
+    if (obj) a[3] = ld(c, pkg + 0x18, 4), c->r[ECX] = obj, call_guest(c, ld(c, ld(c, obj, 4) + 8, 4), 4, a);
+    memcpy(c->r, r, sizeof r);
+    rn_log("RN_NEXT: message %08x to package %08x screen %08x (handler %08x) at frame %u", msg, pkg, obj, obj ? ld(c, ld(c, obj, 4) + 8, 4) : 0, rn_telem.presents);
+}
+uint32_t rn_next_left;   // RN_JUMP waits while a tournament has stages left (Next Race goes through the front end)
+void input_next(Ctx *c) {
+    static const char *s;
+    static uint32_t seen, done, raced, want, on;
+#define left rn_next_left
+    if (!s) { s = getenv("RN_NEXT"); if (!s) s = ""; else on = 1, want = (uint32_t)strtoul(s, (char **)&s, 10); }
+    if (!on) return;
+    // The count arms when the event's first stage races, so RN_JUMP still starts it from the map
+    if ((rn_flow >> 8) == 6 && !raced) raced = 1, left = want;
+    if ((rn_flow >> 8) == 3 && raced && !left) {   // the event is over: the next one's count
+        raced = 0;
+        while (*s == '+' || *s == ',') s++;
+        want = (uint32_t)strtoul(s, (char **)&s, 10);
+    }
+    // RewardPopup (one per reward, list [0x735ed0]): its handler 0x49f0c0 takes 0x911ab364 as "next": the next reward
+    // (0x49f000) or, after the last, 0x49e040 goes on to the next screen (Hopper rewardpop.txt). The RETURN taps did not
+    // close it (runs/cjump_6 stage 2, taps 23-24), so the hook sends that message, once per 60 frames it stays up.
+    static uint32_t pop;
+    if (screen_on("RewardPopup")) {
+        if (!pop) pop = rn_telem.presents;
+        if (rn_telem.presents - pop >= 60) screen_msg(c, rdata_str(c, "RewardPopup"), 0x911ab364), pop = rn_telem.presents;
+    } else pop = 0;
+    if (!screen_on("PostRaceMenu")) { seen = done = 0; return; }
+    if (done || !left) return;
+    if (!seen) seen = rn_telem.presents;
+    if (rn_telem.presents - seen < 30) return;
+    uint32_t name = rdata_str(c, "PostRaceMenu");
+    screen_msg(c, name, 0x7e9ccc8f);
+    screen_msg(c, name, 0xc98356ba);
+    done = 1, left--;
+}
+#undef left
+// RN_CALL="MU_Main_PC#2:41c7a0": test-only, call a game function with no arguments once, 30 frames into the n-th time
+// that screen shows. 0x41c7a0 writes <profile>.cfg and .opt (0x41e200(0x78a478), when [0x736230] names a profile), as the
+// autosave 0x4c96f0 does at 0x4c9705. Leaving Options alone saves nothing (0x4d4892: only when 0x4c9570 finds the save
+// image changed, and the options are not in it; runs/open_opt).
+void input_call(Ctx *c) {
+    static const char *s;
+    static char scr[48];
+    static unsigned want, fn, seen_n, on, done;
+    static uint32_t seen;
+    if (!s) {
+        s = getenv("RN_CALL"); if (!s) s = "";
+        if (*s && sscanf(s, "%47[^#]#%u:%x", scr, &want, &fn) != 3) { rn_log("RN_CALL: cannot read \"%s\"", s); s = ""; }
+    }
+    if (!*s || done) return;
+    int now = (rn_flow >> 8) == 3 && screen_on(scr);
+    if (now && !on) seen_n++, seen = rn_telem.presents;
+    on = now;
+    if (!on || seen_n != want || rn_telem.presents - seen < 30) return;
+    uint32_t r[8];
+    memcpy(r, c->r, sizeof r);
+    call_guest(c, fn, 0, NULL);
+    memcpy(c->r, r, sizeof r);
+    rn_log("RN_CALL: %08x on %s #%u at frame %u", fn, scr, want, rn_telem.presents);
+    done = 1;
 }
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

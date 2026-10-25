@@ -1,0 +1,4 @@
+{
+ "forcefin": {"q": "The game's own debug 'Force Race Finish': which procedure runs it, what it calls to finish the race for every racer or the player (finish position, race state [[0x7361f0]] -> 8 results), and its arguments; a test hook will call it at race start", "strings": ["Force Race Finish", "PLAYER_MODE_FINISH_RACE", "RACING_CAR_NOT_FINISHED"]},
+ "crossfin": {"q": "How a racer finishes: CrossFinishLine and the driver-finish message MSG_R_BI_DRIVERFINISH, who sends it on the last lap, what the handler records (position, time, style points for drift) and how the race state reaches 8 (results) when the player finishes", "strings": ["CrossFinishLine", "MSG_R_BI_DRIVERFINISH", "RaceFinishedPosition", "HUD_FEATURE_RACE_OVER"]}
+}

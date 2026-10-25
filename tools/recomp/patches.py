@@ -168,6 +168,19 @@ PATCHES.append(dict(addr=0x585b94,
 def active():
     return [p for p in PATCHES if p["when"]()]
 
+# PATCH: unlock everything (AGENTS Scope). [0x7677ac] is the game's "career beaten" flag: 0x5a0dc0 sets it to 1 when the
+# last event (0x71) is won, new profile 0x41cf40 clears it (Hopper beatgame.txt). Its 22 readers are lock queries that
+# answer "open" when it is not 0 (0x4d7eb0: "if [0x7677ac]==0 && [0x735ec1]==0 && ... return locked"), for tracks, cars
+# and parts (0x506210..0x512dd8 next to the garage screen 0x505fb0). Each read becomes the constant 1:
+# mov eax,[m] (a1 m) -> mov eax,1 (b8 01000000); mov r32,[m] (8b 05+r*8 m) -> mov r32,1 (b8+r 01000000) + nop.
+for a, old in [(0x4d7eb9, "8b3d"), (0x4d8077, "a1"), (0x4d8117, "a1"), (0x4d81c7, "8b0d"), (0x4d82b4, "8b0d"),
+               (0x4d8334, "8b0d"), (0x4d83b3, "a1"), (0x5062d7, "8b15"), (0x5077f9, "8b15"), (0x507cff, "a1"),
+               (0x507e54, "a1"), (0x50823f, "a1"), (0x509d88, "a1"), (0x50a708, "8b0d"), (0x50aac3, "a1"),
+               (0x50ab04, "8b0d"), (0x50c1d7, "a1"), (0x50d1f3, "a1"), (0x50d6a4, "8b0d"), (0x50df69, "8b0d"),
+               (0x512223, "a1"), (0x512dd8, "8b0d")]:
+    new = "b801000000" if old == "a1" else f"{0xb8 + (int(old[2:], 16) - 5) // 8:02x}0100000090"
+    PATCHES.append(dict(addr=a, old=old + "ac777600", new=new, when=lambda: True))
+
 
 def apply(img, base):
     """Patch a bytearray image mapped at base."""
