@@ -4,7 +4,7 @@
 # FACT 2026-10-25 (Hopper 6.6.0-demo, PID 20369): an instance opened in the background (open -g -n, persistence off)
 # keeps its license panel (697x335, "Try the Demo") off screen and still runs the open event + script (DONE in ~45 s,
 # focus untouched). So nobody clicks; never bring a window to the front (the panel then blocks until a click).
-# - HOP_WIN windows (default: one per topic, at most 6) from the exact bundle /Applications/Hopper Disassembler.app
+# - HOP_WIN windows (default: one per topic, at most one per core) from the exact bundle /Applications/Hopper Disassembler.app
 #   (~/Applications and ~/Desktop hold copies with the same id); the new PID is the one not running before.
 # - Topics go round-robin to the windows; in each window they run one after another on the same PID. With less than
 #   8 min left of its 30 min demo, the window is killed and a new one takes the rest (only our PIDs are killed).
@@ -13,9 +13,8 @@
 #   else it writes build/hopper/<topic>.wrong and does nothing.
 # - HOP_STALL=s: a window whose output file has not grown for s seconds is killed and the topic left without DONE
 #   (Hopper can hang inside one decompile); HOP_KEEP=1 keeps the old output so the script can resume after it.
-# - Waits while the free memory level (kern.memorystatus_level, %) is under 20 before opening a window
-#   (vm_stat "Pages free" stays near 5000 on this Mac with 37 % free, so the old guard blocked forever).
-dir=${HOP_DIR:?set HOP_DIR to the scratchpad}; win=${HOP_WIN:-$(( $# < 6 ? $# : 6 ))}; B=$(cd "$(dirname "$0")/../.." && pwd); cd "$B" || exit 1
+# - Each window opens through ~/.claude/hooks/macgate.sh (the machine-wide gate; a Hopper window is ~100 MB, so 3 s apart).
+dir=${HOP_DIR:?set HOP_DIR to the scratchpad}; ncpu=$(sysctl -n hw.ncpu); win=${HOP_WIN:-$(( $# < ncpu ? $# : ncpu ))}; B=$(cd "$(dirname "$0")/../.." && pwd); cd "$B" || exit 1
 APP="/Applications/Hopper Disassembler.app"; LIFE=1800; MINLEFT=480
 
 prep() {    # topic -> exe copy + wrapper script that checks the document
@@ -32,7 +31,7 @@ EOF
 }
 
 launch() {  # -> new PID in $pid, its start in $t0 (launches are serialized by the caller's lock)
-  while [ "$(sysctl -n kern.memorystatus_level)" -lt 20 ]; do sleep 5; done
+  MACGATE_SETTLE=3 "$HOME/.claude/hooks/macgate.sh"
   while ! mkdir "$dir/hpar.lock" 2>/dev/null; do sleep 1; done
   before=$(pgrep -x "Hopper Disassembler")
   open -g -n -a "$APP" --args -ApplePersistenceIgnoreState YES; t0=$(date +%s)

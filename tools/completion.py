@@ -2,7 +2,7 @@
 # game/ as a hard-link copy, its own save/), the game's autopilot drives (RN_AUTOPILOT, RN_SEED), RN_RASTER keeps the CPU
 # backend off the frames nobody looks at, RN_FLOWLOG logs the game-flow states and keeps a shot at each change.
 # usage: completion.py launch ROW[.SEED] ...     start rows in the background (nohup), runs/<row>.<seed>/
-#        completion.py queue N ROW[.SEED] ...    the same, N at a time, blocking (run it under nohup)
+#        completion.py queue N ROW[.SEED] ...    the same, at most N at a time through macgate.sh, blocking (run it under nohup)
 #        completion.py collect                   runs/*/log.txt -> census/completion.json (one row per run dir), shots -> WebP
 import json, os, re, shutil, subprocess, sys, time
 R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -291,6 +291,7 @@ elif sys.argv[1] == 'queue':
     # A run whose game flow state has not moved for STALL s is stuck (runs/cjump_46+..: PostRaceResults for 1 h): kill it, go on.
     # The longest race leg seen is ~200 s of one flow state at RN_TURBO 4.
     STALL = 420
+    GATE = os.path.expanduser('~/.claude/hooks/macgate.sh')
     n, todo, kids = int(sys.argv[2]), sys.argv[3:], {}
     while todo or kids:
         for k, w in list(kids.items()):
@@ -301,7 +302,8 @@ elif sys.argv[1] == 'queue':
                 print(f'{time.strftime("%T")} {w[0]}: no flow change for {STALL} s, killed', flush=True)
                 k.kill()
         free = shutil.disk_usage(R).free >> 30   # never launch under 5 GB free
-        if todo and live() < n and free >= 5:
+        # N is a ceiling; the machine-wide gate (memory level, launches 30 s apart, every session) decides each launch.
+        if todo and live() < n and free >= 5 and subprocess.run([GATE, '--try']).returncode == 0:
             row = todo.pop(0)
             kids[launch(row)] = [f'{R}/runs/{row if "." in row else row + "." + SEEDS[0]}/log.txt', 0, time.time()]
         elif todo and free < 5: print(f'{time.strftime("%T")} {free} GB free: {todo[0]} waits', flush=True)
