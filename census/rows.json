@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "67/167",
+ "progress": "76/167",
  "rows": [
   {
    "id": "career.0",
@@ -232,7 +232,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0xf90",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.13",
@@ -986,7 +986,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x4754",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.56",
@@ -1018,7 +1018,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x49ec",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.58",
@@ -1034,7 +1034,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x4b38",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.59",
@@ -1050,7 +1050,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x4c84",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.60",
@@ -1066,7 +1066,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x4dd0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.61",
@@ -1082,7 +1082,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x4f1c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.62",
@@ -1098,7 +1098,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x5068",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.63",
@@ -1114,7 +1114,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x51b4",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.64",

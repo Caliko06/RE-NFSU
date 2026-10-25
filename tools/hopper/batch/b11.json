@@ -1,0 +1,4 @@
+{
+ "apdrive": {"q": "Player autopilot (input mode 4 AUTO_PILOT, set by 0x42d520 into player+0x278): which code drives the player car in mode 4 (AI driver object, throttle/steer), what target speed it uses, and any drift-specific branch (drift race kind, 'TooSlowToGain' 0x4a7b80, style points) that makes it crawl at ~9 mph", "addrs": ["0x42d520", "0x4a7b80"], "strings": ["JOY_EVENT_AUTO_PILOT", "AIActionJustDrive", "AIActionEndOfRace"]},
+ "aispeed": {"q": "AI racer target speed: where an AI driver computes desired speed along the route (skill tables, catch-up, speed limit per race type), especially for drift races where AI racers do not drive", "strings": ["AIActionJustDrive", "AIActionPass", "AIActionDraft"]}
+}

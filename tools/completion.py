@@ -110,9 +110,14 @@ def cjump(name):
     q = lambda scr, k: f'1500@={scr}:{k}'
     pre = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + [q('MU_UG_NewOrLoad_PC2', 'RETURN'), q('MU_Main_PC', 'UP'), q('MU_Main_PC', 'RETURN'), q('MU_UG_UndergroundMenu', 'RETURN')]
     leave = _LEAVE + ['3000@6:LEFT', '1500@6:RETURN']
-    # Each stage of a tournament ends in its own results (runs/cjump_6+..: stage 2 waited on PostRaceResults for good).
-    out = keys(pre, leave * STAGES[f'career.{evs[0]}']).split(',')
-    for e in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + leave * STAGES[f'career.{e}']
+    # Each stage of a tournament ends in its own results. The next stage's keys first anchor on its race (6/4): else
+    # their "@6/8" anchors on the stage before's 6/8 and fires on the loading screen (runs/cjump_6+.. taps 22-23).
+    # After a stage that is not the last, PostRaceMenu is Next Race, Restart Race, Restart Tournament, Statistics, Quit
+    # Tournament (runs/cjump_6 shot 12173): the race leave's DOWN DOWN RETURN restarts the tournament, so RETURN = Next Race.
+    nxt = ['3000@6/8:RETURN'] + ['4000@!PostRaceMenu:RETURN'] * 6 + ['1500@=PostRaceMenu:RETURN', '3000@6/4:RETURN']
+    stages = lambda e: nxt * (STAGES[f'career.{e}'] - 1) + leave
+    out = keys(pre, stages(evs[0])).split(',')
+    for e in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + stages(e)
     # A tournament runs its stages back to back (runs/cjump_5+..: event 6 stage 3 began as RN_SECS ran out): time per stage.
     return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * sum(STAGES[f'career.{e}'] for e in evs) + 120
 
@@ -129,7 +134,7 @@ def launch(run):
     seq = jmp[0] if jmp else ROWS[row] if '-' not in row else sweep(row[6:].split('-')[0], int(row.split('-')[1]))
     # RN_TURBO 4: the guest clocks run 4x (host/win32.c now_us); a sprint race + leave took ~10 min at 1x, ~3.3 min at 4x.
     secs = 330 * (SWEEP[row[6:].split('-')[0]][1] - int((row + '-0').split('-')[1])) + 120 if row.startswith('sweep_') else SECS
-    env = dict(os.environ, RN_TURBO='4', RN_SECS=str(secs), RN_SCREEN='640x480', RN_RASTER='300', RN_FLOWLOG='1', RN_SEED=seed,
+    env = dict(os.environ, RN_TURBO='4', RN_SECS=str(secs), RN_SCREEN='640x480', RN_RASTER='1000000', RN_FLOWLOG='1', RN_SEED=seed,
                RN_AUTOPILOT='1', RN_KEYS=seq if isinstance(seq, str) else keys(seq, LEAVE[SEEDS.index(seed) % 3] + NEXT))
     if row.startswith('explore'): env.update(RN_KEEP='120', RN_SECS='600')
     if jmp: env.update(RN_JUMP=jmp[1], RN_SECS=str(jmp[2]))
@@ -144,7 +149,7 @@ def reload(run):
     subprocess.run(['cp', '-al', f'{R}/game', f'{d}/game'], check=True)
     subprocess.run(['cp', '-r', f'{src}/save', f'{d}/save'], check=True)
     seq = cjump('cjump_0')[0].split(',')[:-len(_LEAVE) - 4] + ['4000@=MU_UG_MapScreen:RIGHT']
-    env = dict(os.environ, RN_TURBO='4', RN_SECS='150', RN_SCREEN='640x480', RN_RASTER='300', RN_FLOWLOG='1', RN_KEYS=','.join(seq))
+    env = dict(os.environ, RN_TURBO='4', RN_SECS='150', RN_SCREEN='640x480', RN_RASTER='1000000', RN_FLOWLOG='1', RN_KEYS=','.join(seq))
     with open(f'{d}/log.txt', 'w') as log:
         return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
@@ -228,12 +233,23 @@ elif sys.argv[1] == 'queue':
     def live():   # every native row of this repo, also those another queue started (one game process at a time)
         ps = subprocess.run(['ps', '-axo', 'command='], capture_output=True, text=True).stdout.splitlines()
         return sum(l.startswith(f'{R}/build/speed') for l in ps)
-    n, todo, kids = int(sys.argv[2]), sys.argv[3:], []
-    while todo:
-        kids = [k for k in kids if k.poll() is None]   # reap
-        free = shutil.disk_usage(R).free >> 30   # the Pod disk is shared (Most Wanted): never launch under 5 GB free
-        if live() < n and free >= 5: kids.append(launch(todo.pop(0)))
-        elif free < 5: print(f'{time.strftime("%T")} {free} GB free: {todo[0]} waits', flush=True)
+    # A run whose game flow state has not moved for STALL s is stuck (runs/cjump_46+..: PostRaceResults for 1 h): kill it, go on.
+    # The longest race leg seen is ~200 s of one flow state at RN_TURBO 4.
+    STALL = 420
+    n, todo, kids = int(sys.argv[2]), sys.argv[3:], {}
+    while todo or kids:
+        for k, w in list(kids.items()):
+            if k.poll() is not None: del kids[k]; continue
+            flows = open(w[0], 'rb').read().count(b'flow state')
+            if flows != w[1]: kids[k] = [w[0], flows, time.time()]
+            elif time.time() - w[2] > STALL:
+                print(f'{time.strftime("%T")} {w[0]}: no flow change for {STALL} s, killed', flush=True)
+                k.kill()
+        free = shutil.disk_usage(R).free >> 30   # never launch under 5 GB free
+        if todo and live() < n and free >= 5:
+            row = todo.pop(0)
+            kids[launch(row)] = [f'{R}/runs/{row if "." in row else row + "." + SEEDS[0]}/log.txt', 0, time.time()]
+        elif todo and free < 5: print(f'{time.strftime("%T")} {free} GB free: {todo[0]} waits', flush=True)
         time.sleep(10)
 elif sys.argv[1] == 'collect':
     runs = [r for r in sorted(os.listdir(f'{R}/runs')) if any(os.path.exists(f'{R}/runs/{r}/{f}') for f in ('log.txt', 'flow.txt'))]

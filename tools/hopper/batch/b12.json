@@ -1,0 +1,5 @@
+{
+ "apon": {"q": "AutoPilotOn 0x42e230 (player input mode 4): which AI driver object it attaches to the player car, how that driver picks its target speed and throttle each tick, and whether a drift race (gametype drift, no AI racers) leaves it without a route or speed so the car crawls at 1-9 mph", "addrs": ["0x42e230", "0x42e1e0", "0x42e400", "0x4506b0"]},
+ "postres": {"q": "Post-race results screen PostRaceResults (and StyleAnimator, RewardPopup): which handler takes the accept key, what it calls next for a tournament stage that is not the last (next stage load) versus the last stage (PostRaceMenu), and what the screen waits for before it accepts input", "strings": ["PostRaceResults.fng", "PostRaceMenu.fng", "StyleAnimator.fng", "RewardPopup.fng"]},
+ "render": {"q": "Hot per-frame render path for performance: what 0x40a580, 0x409580 and 0x40ed50 do per frame (scene traversal, culling, draw submission), loops per object/mesh, and which calls dominate", "addrs": ["0x40a580", "0x409580", "0x40ed50"]}
+}

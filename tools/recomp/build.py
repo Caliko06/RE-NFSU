@@ -95,7 +95,7 @@ HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host
 def compile_native():
     srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c", f"{GEN}/abk.c"]
     os.makedirs("build/obj", exist_ok=True)
-    flags = ["-O1", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing"]
+    flags = ["-O2", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing"]
     jobs = []
     for s in srcs:
         o = "build/obj/" + os.path.basename(s)[:-2] + ".o"
@@ -103,7 +103,7 @@ def compile_native():
             jobs.append(["clang", *flags, "-c", s, "-o", o])
     run_jobs(jobs)
     objs = ["build/obj/" + os.path.basename(s)[:-2] + ".o" for s in srcs]
-    subprocess.run(["clang", "-O1", "-g", "-Wall", "-Wno-unused-function", "-Ihost", f"-I{GEN}", *HOST, *objs,
+    subprocess.run(["clang", "-O2", "-g", "-Wall", "-Wno-unused-function", "-Ihost", f"-I{GEN}", *HOST, *objs,
                     "-lm", "-o", "build/speed"], check=True)
     print("built build/speed")
 
@@ -111,7 +111,7 @@ def compile_native():
 def compile_web():
     srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c", f"{GEN}/abk.c"]
     os.makedirs("build/wobj", exist_ok=True)
-    flags = ["-O1", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing", "-pthread"]
+    flags = ["-O2", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing", "-pthread"]
     jobs = []
     for s in srcs:
         o = "build/wobj/" + os.path.basename(s)[:-2] + ".o"
@@ -121,7 +121,7 @@ def compile_web():
     objs = ["build/wobj/" + os.path.basename(s)[:-2] + ".o" for s in srcs]
     os.makedirs("web/out", exist_ok=True)
     # main() runs in a worker (PROXY_TO_PTHREAD) so guest threads and waits may block.
-    subprocess.run(["emcc", "-O1", "-pthread", "-Ihost", f"-I{GEN}", *HOST, *objs, "-o", "web/out/speed.js",
+    subprocess.run(["emcc", "-O2", "-pthread", "-Ihost", f"-I{GEN}", *HOST, *objs, "-o", "web/out/speed.js",
                     "-sINITIAL_MEMORY=2048MB", "-sSTACK_SIZE=16MB", "-sDEFAULT_PTHREAD_STACK_SIZE=16MB",
                     "-sPROXY_TO_PTHREAD=1", "-sPTHREAD_POOL_SIZE=8", "-sEXIT_RUNTIME=1",
                     "-sMODULARIZE=1", "-sEXPORT_NAME=Speed", "-sEXPORTED_RUNTIME_METHODS=FS,ENV,HEAPU8,HEAP32,HEAPU32,HEAPF64",
