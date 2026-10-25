@@ -838,7 +838,7 @@ const char *rn_screen = "", *rn_fe = "";
 static void flow_log(Ctx *c) {
     static int on = -1;
     static uint32_t prev, prev_st;
-    if (on < 0) on = getenv("RN_FLOWLOG") != NULL;
+    if (on < 0) on = getenv("RN_FLOWLOG") != NULL || getenv("RN_JUMP") != NULL;   // RN_JUMP reads rn_fe
     if (!on) return;
     uint32_t lb = ld(c, 0x77a90c, 4), rs = ld(c, 0x7361f0, 4), st = ld(c, 0x77a920, 4) << 8 | (rs ? ld(c, rs, 4) & 0xff : 0xff);
     if (lb != prev && lb >= 0x697000 && lb < 0x6d4000) rn_log("flow %.64s (frame %u)", G(lb), dev.frames);
@@ -872,6 +872,7 @@ static void flow_log(Ctx *c) {
     if (m != pm || t != pt) rn_log("flow mode %u gametype %u track %u kind %u (frame %u)", m & 0xff, m >> 8, t & 0xffff, t >> 16, dev.frames);
     if (e != pe) rn_log("flow event %u (frame %u)", e, dev.frames);
     pm = m, pt = t, pe = e;
+    input_jump(c);
     prev = lb, prev_st = st, rn_flow = st, rn_screen = scr;
 }
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {

@@ -1,0 +1,8 @@
+{
+ "cevent": {"q": "Career event flow: how EventBriefing starts a career race (event record, stages, car) and what FERaceEvent holds", "strings": ["MU_UG_EventBriefing.fng", "FERaceEvent", "EVENT_%d_TITLE", "Event %d"]},
+ "ccarpick": {"q": "Career car pick: what ChooseCareerCarScreen / TradeCareerCar write (player car, CAREER_CAR) and which screen comes next", "strings": ["ChooseCareerCarScreen", "CAREER_CAR", "MU_UG_TradeCareerCar.fng", "MU_UG_ChooseCareerCar.fng"]},
+ "creward": {"q": "Career rewards and progress: where event done flags, cash and unlocks are written after a win", "strings": ["RewardPopupScreen", "EVENT_REWARD_%s_LEVEL_%d", "EVENT_REWARD_CAR_%s%s", "EVENT_REWARD_TRACK_%d%s", "UnlockStatusScreen", "Cash: %d"]},
+ "cheats": {"q": "Unlock-all: what the cheat codes (gimmesomedrag, gimmesomecircuits, gimmesomesprints, gimmeppablo) set, and what other unlock flags exist", "strings": ["gimmesomedrag", "gimmesomecircuits", "gimmesomesprints", "gimmeppablo", "User is cheating"]},
+ "garage": {"q": "Garage: which screens open from GarageMain, how a part is locked/unlocked (HAS_VIS_* flags) and how a part gets fitted to the player car", "strings": ["GarageMainScreen", "GaragePartsBrowser", "GarageCategoryVisual", "HAS_VIS_RIMS", "HAS_VIS_VINYL", "HAS_UG_CUSTOMIZE"]},
+ "saveload": {"q": "Save and load: which functions write and read the profile (.usr/.ugd/.cfg/.opt), autosave trigger, and what PC_LoadSave does", "strings": ["PC_LoadSave.fng", "SavingOptions", "MU_UG_NewOrLoad_PC2.fng", "LOADING_CONTROLLER_PC"]}
+}

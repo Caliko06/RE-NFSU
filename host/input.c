@@ -6,6 +6,7 @@
 // (rn_screen, or a front-end package in rn_fe); "4000@!PostRaceMenu:RETURN" counts from the tap before and is dropped if that screen shows when it is due.
 // input_poll() hands new events to the key state, the DirectInput devices and the window messages.
 #include <strings.h>
+#include <unistd.h>
 #include "host.h"
 
 // DirectInput key codes (scan codes; 0x80 = the 0xE0-prefixed extended keys), US layout.
@@ -203,6 +204,37 @@ static void script_poll(void) {
         if (!(next_tap & 1)) rn_log("RN_KEYS: tap %u dik 0x%02x at frame %u flow %u/%u on %s", k, taps[k].dik, rn_telem.presents, rn_flow >> 8, rn_flow & 0xff, rn_screen);
         next_tap++;
     }
+}
+// RN_JUMP="6:1304,6:1305" (or "+" between, for the web ?env=): test-only, start each Quick Race (mode:track) the way the game's Accept does, without the car,
+// track and options screens. Mode = [0x777cc8] (0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift; rows.py QR).
+// Hopper build/hopper/jump.txt: the setup 0x4b49e0..0x4b59b0 reads the mode's record from 0x4ab510(ecx = 0x748f70,
+// edx = [0x777cc8]) = 0x748f70 + {0xfa10, 0xfa30, 0xfa50, 0xfa70, 0xfa94, 0xfb18, 0xfb44}[mode], track at +8 (0x4b4a37
+// esi = eax[2] -> [0x78a2f0]). Accept 0x4b5c00 (called by the options screens 0x4b8050, 0x4bb2b0, 0x4bd710) runs that
+// setup and only queues UnloadingFrontEnd 0x448d10 in [0x77a904]; the main loop 0x447600 runs it (0x4476c5,
+// build/hopper/fsm.txt). So a jump fires on MU_QuickRaceModeSelect (gametype and players already set by the menu), the
+// next one each time a race comes back to it. Needs RN_FLOWLOG (rn_fe).
+void input_jump(Ctx *c) {
+    static const uint32_t rec[7] = {0xfa10, 0xfa30, 0xfa50, 0xfa70, 0xfa94, 0xfb18, 0xfb44};
+    static const char *s;
+    static uint32_t seen;
+    if (!s) { s = getenv("RN_JUMP"); if (!s) { s = ""; return; } }
+    unsigned m, t;
+    int used;
+    static int fired;
+    if ((!*s && !fired) || (rn_flow >> 8) != 3 || !screen_on("MU_QuickRaceModeSelect")) { seen = 0; return; }
+    if (!seen) seen = rn_telem.presents;
+    if (rn_telem.presents - seen < 30) return;   // let the screen settle as a player would
+#ifndef __EMSCRIPTEN__
+    if (!*s) { rn_log("RN_JUMP: done, back on MU_QuickRaceModeSelect at frame %u", rn_telem.presents); fflush(NULL); _exit(0); }
+#endif
+    if (sscanf(s, "%u:%u%n", &m, &t, &used) != 2 || m > 6) { rn_log("RN_JUMP: cannot read \"%s\"", s); s = ""; return; }
+    s += used;
+    while (*s == ',' || *s == ' ' || *s == '+') s++;
+    st(c, 0x777cc8, m, 4);
+    st(c, 0x748f70 + rec[m] + 8, t, 4);
+    rn_log("RN_JUMP: mode %u track %u at frame %u", m, t, rn_telem.presents);
+    call_guest(c, 0x4b5c00, 0, NULL);
+    seen = 0, fired = 1;
 }
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

@@ -142,6 +142,13 @@ PATCHES.append(dict(addr=0x4470f0, old="8d44240450", new="e91f17fcff", when=lamb
 # 0x12. Only joy event 0xa3 (0x431960) toggles +0x4ae and no code registers 0xa3 (FUN_00574020), so the byte is always 0
 # in play. It now reads SCREEN_ADDR+0x14 (the layer writes RN_AUTOPILOT there). Wine: mkexe.py --autopilot (mov dl,1).
 PATCHES.append(dict(addr=0x42d4b0, old="8a90ae040000", new="8a1514300100", when=lambda: True))
+# PATCH: 0x42d4a9 (+ cave 0x6436e3, CC padding before 0x6436f0), TEST-ONLY autopilot in Drag: in 0x42d470 race state 3
+# (case 0x42d49f) takes Player+0x4af != 0 (a drag race) as mode 3 PLAYER_MODE_DRAG_RACING (names 0x700af0: 0 NONE,
+# 1 PAUSEMENU, 2 CAR_RACING, 3 DRAG_RACING, 4 AUTO_PILOT) before the autopilot read at 0x42d4b0, so the drag car never
+# drove itself (runs 2026-10-24: drag 6/4, no finish). `mov ecx,3; jmp 0x42d4c1` now goes through the cave:
+# mov ecx,[0x13018]; jmp 0x42d4c1. The layer writes SCREEN_ADDR+0x18 = 4 with RN_AUTOPILOT, else 3 (the original).
+PATCHES.append(dict(addr=0x42d4a9, old="b903000000eb11", new="e9356221009090", when=lambda: True))
+PATCHES.append(dict(addr=0x6436e3, old="cc" * 11, new="8b0d18300100e9d39ddeff", when=lambda: True))
 
 
 # PATCH: 0x585b94 (+ mask 0x707fc8), OWNER 2026-10-24 (faster loads): the frame limiter 0x585b40 (main loop 0x447600) spins on

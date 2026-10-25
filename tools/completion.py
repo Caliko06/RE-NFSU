@@ -90,18 +90,32 @@ ROWS.update({f'sweep_{k}': sweep(k) for k in SWEEP})
 FREE_LEAVE = ['60000@6/4:ESCAPE'] + ['1500@=MU_Pause_PC:DOWN'] * 3 + ['1500@=MU_Pause_PC:RETURN', '1500@=MU_PauseConfirm:LEFT', '1500@=MU_PauseConfirm:RETURN']
 ROWS['freerun'] = ','.join(keys(menu(5, 3)).split(',') + FREE_LEAVE)
 
+# jump_<mode>_<track>+<track>..: RN_JUMP (host/input.c) starts each race from MU_QuickRaceModeSelect with the game's own
+# Accept 0x4b5c00 (mode = [0x777cc8] id: 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift); the keys only reach
+# that screen, leave each race, and wait for the front end (state 3) before the next race's PreRaceStats RETURNs.
+def jump(name):
+    m, tracks = int(name.split('_')[1]), name.split('_')[2].split('+')
+    q = lambda scr, k: f'1500@={scr}:{k}'
+    pre = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + [q('MU_UG_NewOrLoad_PC2', 'RETURN'), q('MU_Main_PC', 'RETURN')]
+    leave = FREE_LEAVE if m == 3 else _LEAVE + ['3000@6:LEFT', '1500@6:RETURN']
+    out = keys(pre, leave).split(',')
+    for _ in tracks[1:]: out += ['1000@3:LSHIFT', '3000@6:RETURN', '3000@6:RETURN'] + leave
+    return ','.join(out), ','.join(f'{m}:{t}' for t in tracks), 330 * len(tracks) + 120
+
 def launch(run):
     row, seed = (run.split('.') + [SEEDS[0]])[:2]
     d = f'{R}/runs/{row}.{seed}'
     subprocess.run(['rm', '-rf', d]); os.makedirs(d)
     subprocess.run(['cp', '-al', f'{R}/game', f'{d}/game'], check=True)
     subprocess.run(['cp', '-r', f'{R}/save', f'{d}/save'], check=True)
-    seq = ROWS[row] if '-' not in row else sweep(row[6:].split('-')[0], int(row.split('-')[1]))
+    jmp = jump(row) if row.startswith('jump_') else None
+    seq = jmp[0] if jmp else ROWS[row] if '-' not in row else sweep(row[6:].split('-')[0], int(row.split('-')[1]))
     # RN_TURBO 4: the guest clocks run 4x (host/win32.c now_us); a sprint race + leave took ~10 min at 1x, ~3.3 min at 4x.
     secs = 330 * (SWEEP[row[6:].split('-')[0]][1] - int((row + '-0').split('-')[1])) + 120 if row.startswith('sweep_') else SECS
     env = dict(os.environ, RN_TURBO='4', RN_SECS=str(secs), RN_SCREEN='640x480', RN_RASTER='300', RN_FLOWLOG='1', RN_SEED=seed,
                RN_AUTOPILOT='1', RN_KEYS=seq if isinstance(seq, str) else keys(seq, LEAVE[SEEDS.index(seed) % 3] + NEXT))
     if row.startswith('explore'): env.update(RN_KEEP='120', RN_SECS='600')
+    if jmp: env.update(RN_JUMP=jmp[1], RN_SECS=str(jmp[2]))
     with open(f'{d}/log.txt', 'w') as log:
         return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)

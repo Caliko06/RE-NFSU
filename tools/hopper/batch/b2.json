@@ -1,0 +1,8 @@
+{
+ "options": {"q": "Options: which globals each option screen writes and how they persist (OptionsScreen, PC_Customize_Graphics)", "strings": ["OptionsScreen", "OptionsMenu", "MU_Options_PC.fng", "PC_Customize_Graphics.fng"]},
+ "movies": {"q": "Movies: how a movie screen picks and plays a .mad (THX, PSA, trailer, career FMV) and how it ends", "strings": ["%sMOVIES\\%s%s", "THXMovieScreen", "PSAMovie", "TrailerMovie.fng", "UndergroundNewCareerFMV"]},
+ "pause": {"q": "Pause menu: what Leave Race / Restart do in the game flow (functions, state writes)", "strings": ["PauseMenu", "MU_Pause_PC.fng", "MU_PauseConfirm.fng", "PauseOptionsMenu"]},
+ "frame": {"q": "Frame cost: main loop and limiter, what runs each frame (world update, render, sound), any busy waits", "addrs": ["0x447600", "0x585b40", "0x4472e0"], "data": ["0x77a920"]},
+ "blur": {"q": "Speed/motion blur and light trails on PC: how BLURTEST, wheel blur and shadows are drawn (render passes, textures, conditions on speed)", "strings": ["BLURTEST", "B%s_WHEEL_BLUR", "%s_SHADOW%s", "CAMERASPACEREFLECTIONVECTOR"]},
+ "tooslow": {"q": "Lap knockout / tournament and TOO SLOW: what Player Too Slow and TooSlowToGain decide (drift rule, race end)", "strings": ["Player Too Slow", "TooSlowToGain", "LAP_KNOCKOUT", "_TOURNAMENT", "QR_lapknockout"]}
+}

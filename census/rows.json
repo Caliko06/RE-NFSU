@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "25/167",
+ "progress": "30/167",
  "rows": [
   {
    "id": "career.0",
@@ -2165,7 +2165,7 @@
    "track": 1201,
    "name": "DTDrag - 14th & Vine",
    "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.drag.1202",
@@ -2174,7 +2174,7 @@
    "track": 1202,
    "name": "CTDrag - Highway 1",
    "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.drag.1206",
@@ -2183,7 +2183,7 @@
    "track": 1206,
    "name": "MSNDrag - Main St.",
    "src": "GLOBALB 0x34201 +0x74 & 0x2 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.drag.1207",
@@ -2246,7 +2246,7 @@
    "track": 1304,
    "name": "Drift 4",
    "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.drift.1305",
@@ -2255,7 +2255,7 @@
    "track": 1305,
    "name": "Drift 5",
    "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.drift.1306",

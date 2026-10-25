@@ -15,6 +15,7 @@
 #define SCREEN_ADDR 0x00013000u     // PATCH 0x40877e reads the screen width and height here (win32_init writes them)
 // PATCH 0x40bf09..: the 2D quad code reads S/320 (+8) and S (+12) as floats; S = 4:3 over the screen aspect, at most 1
 // PATCH 0x4470f0: the RNG seed reads RN_SEED at +16 (0 = the original clock seed); PATCH 0x42d4b0: RN_AUTOPILOT at +20
+// PATCH 0x42d4a9: the drag player mode at +24 (4 with RN_AUTOPILOT, else 3)
 #define HEAP_LO     0x00800000u
 #define HOST_BASE   0xe0000000u     // fake code addresses of host functions: HOST_BASE + 16*index
 
@@ -57,6 +58,7 @@ extern unsigned rn_turbo;       // RN_TURBO: the guest clocks run this many time
 extern const char *rn_fe;       // RN_FLOWLOG: the front end's active packages, "A.fng,B.fng,..."
 extern int rn_screen_w, rn_screen_h;   // the desktop the game sees: RN_SCREEN=WxH (the page passes its window size)
 void rn_log(const char *fmt, ...);
+void input_jump(Ctx *c);        // RN_JUMP (host/input.c), from the RN_FLOWLOG pass at each Present
 int rn_trace(void);
 void win32_init(Ctx *c, uint32_t image_size);
 uint32_t guest_alloc(uint32_t size);                           // zeroed, for host-owned guest data

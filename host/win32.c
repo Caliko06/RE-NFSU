@@ -1032,6 +1032,7 @@ void win32_init(Ctx *c, uint32_t image_size) {
     const char *seed = getenv("RN_SEED");     // PATCH 0x4470f0: test-only fixed RNG seed (A/B vs Wine); 0 = the clock
     st(c, SCREEN_ADDR + 16, seed ? (uint32_t)strtoul(seed, NULL, 0) : 0, 4);
     st(c, SCREEN_ADDR + 20, getenv("RN_AUTOPILOT") != NULL, 4);   // PATCH 0x42d4b0: test-only, the AI drives the player
+    st(c, SCREEN_ADDR + 24, getenv("RN_AUTOPILOT") ? 4 : 3, 4);  // PATCH 0x42d4a9: drag player mode, 4 = autopilot, 3 = drag (original)
     clock_gettime(CLOCK_MONOTONIC, &t0);
     brk_ptr = HEAP_LO;
     vtop = c->memsz;
