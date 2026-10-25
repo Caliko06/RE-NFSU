@@ -112,7 +112,8 @@ def cjump(name):
     leave = _LEAVE + ['3000@6:LEFT', '1500@6:RETURN']
     out = keys(pre, leave).split(',')
     for _ in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + leave
-    return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * len(evs) + 120
+    # A tournament runs its stages back to back (runs/cjump_5+..: event 6 stage 3 began as RN_SECS ran out): time per stage.
+    return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * sum(STAGES[f'career.{e}'] for e in evs) + 120
 
 # reload_<run dir>: a new process on that run's save/ (a page reload in Chrome), the same route to the career map.
 # game.save_reload is OK when its "flow career" count on the map equals the count the source run ended with.
@@ -165,6 +166,7 @@ def game_rows():   # the whole-game rows (census/rows.json group game) a run pro
 
 ALL_ROWS = {r['id']: r['group'] for r in json.load(open(f'{R}/census/rows.json'))['rows']}
 QR_ROWS = {k for k, g in ALL_ROWS.items() if g == 'quick_race'}
+STAGES = {r['id']: len(r['stages']) for r in json.load(open(f'{R}/census/rows.json'))['rows'] if r.get('stages')}
 STAGE1 = {r['id']: r['stages'][0]['track'] for r in json.load(open(f'{R}/census/rows.json'))['rows'] if r.get('stages')}
 
 def rows_of(d):

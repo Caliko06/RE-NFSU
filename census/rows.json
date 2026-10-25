@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "50/167",
+ "progress": "52/167",
  "rows": [
   {
    "id": "career.0",
@@ -96,7 +96,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x67c",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.6",
@@ -2433,7 +2433,7 @@
    "group": "game",
    "check": "create a profile; the file lands in save/",
    "src": "AGENTS.md Scope",
-   "ok": false
+   "ok": true
   },
   {
    "id": "game.garage",
