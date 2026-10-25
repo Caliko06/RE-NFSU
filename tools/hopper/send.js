@@ -11,7 +11,8 @@ function run(argv) {
   ev.setParamDescriptorForKeyword(file(argv[2]), cc('EXPY'));
   ev.setParamDescriptorForKeyword($.NSAppleEventDescriptor.descriptorWithBoolean(true), cc('STAN'));
   const rec = $.NSAppleEventDescriptor.recordDescriptor;
-  rec.setDescriptorForKeyword($.NSAppleEventDescriptor.descriptorWithString('PE'), cc('LoLo'));
+  // Loader command identifier, as REA passes it (-l WinPE): "PE" or "Windows PE" matches none and the Loader dialog opens.
+  rec.setDescriptorForKeyword($.NSAppleEventDescriptor.descriptorWithString('WinPE'), cc('LoLo'));
   const opts = $.NSAppleEventDescriptor.listDescriptor; opts.insertDescriptorAtIndex(rec, 1);
   ev.setParamDescriptorForKeyword(opts, cc('OPTS'));
   const err = Ref();
