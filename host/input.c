@@ -1,5 +1,5 @@
 // The keyboard and mouse of this PC. One source feeds them: the browser (web/input.js writes key and
-// mouse events into a ring in the shared heap) or, native, a script in RN_KEYS for off-screen runs:
+// mouse events into a ring in the shared heap) and, for test runs (native, or web with ?keys=), a script in RN_KEYS:
 // RN_KEYS="3000:RETURN,4500:DOWN" taps each key (100 ms down) at that many ms after start. "3000@6/8:DOWN" taps it
 // 3000 ms after the game-flow state 6 / race state 8 (RN_FLOWLOG, host/d3d9.c) is first seen once the taps before it are done;
 // "3000@3:RETURN" waits for flow state 3 with any race state. "1500@=PostRaceMenu:DOWN" waits for that post-race screen
@@ -130,29 +130,6 @@ static void button_event(int b, int d) {
     dinput8_button(b, d);
 }
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-// u32 words: [0] head (page), [1] tail (game), [2..4] mouse dx, dy, wheel (page adds, game takes), [5] exclusive mouse,
-// [8..8+RING) events: bit 31 = mouse button (else key), bit 8 = down, low byte = DIK or button.
-#define RING 1024
-static uint32_t ring[8 + RING];
-EMSCRIPTEN_KEEPALIVE uint32_t rn_input_ring(void) { return (uint32_t)(uintptr_t)ring; }
-void input_mouse_exclusive(int on) { __atomic_store_n(&ring[5], (uint32_t)on, __ATOMIC_RELEASE); }
-void input_poll(void) {
-    uint32_t head = __atomic_load_n(&ring[0], __ATOMIC_ACQUIRE), tail = ring[1];
-    for (; tail != head; tail++) {
-        uint32_t e = ring[8 + tail % RING];
-        if (e & 0x80000000u) button_event(e & 0xff, (e >> 8) & 1);
-        else key_event(e & 0xff, (e >> 8) & 1);
-    }
-    __atomic_store_n(&ring[1], tail, __ATOMIC_RELEASE);
-    int32_t dx = (int32_t)__atomic_exchange_n(&ring[2], 0, __ATOMIC_ACQ_REL);
-    int32_t dy = (int32_t)__atomic_exchange_n(&ring[3], 0, __ATOMIC_ACQ_REL);
-    int32_t dz = (int32_t)__atomic_exchange_n(&ring[4], 0, __ATOMIC_ACQ_REL);
-    if (dx || dy || dz) dinput8_motion(dx, dy, dz);
-}
-#else
-void input_mouse_exclusive(int on) { (void)on; }
 typedef struct { uint64_t at_us; uint8_t dik; uint32_t cond, mask; char op, scr[24]; } Tap;   // cond: flow state to wait for, ~0 = none
 static Tap taps[256];
 static int ntaps, script_read;
@@ -193,7 +170,7 @@ static int screen_on(const char *scr) {   // the post-race screen, or one of the
 // next down came before the up was read, both in one read, no edge, the tap lost). So, up to 10 s each: the up also
 // waits for an acquired keyboard (an up while the game swaps action maps reaches no device and the key stays down in
 // its mask, runs/dilog2: ESC), and the next down waits until the game has read every event, plus two frames.
-void input_poll(void) {
+static void script_poll(void) {
     static uint32_t down_at, read_at;
     static uint64_t wait_from;
     if (!script_read) read_script();
@@ -227,4 +204,29 @@ void input_poll(void) {
         next_tap++;
     }
 }
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+// u32 words: [0] head (page), [1] tail (game), [2..4] mouse dx, dy, wheel (page adds, game takes), [5] exclusive mouse,
+// [8..8+RING) events: bit 31 = mouse button (else key), bit 8 = down, low byte = DIK or button.
+#define RING 1024
+static uint32_t ring[8 + RING];
+EMSCRIPTEN_KEEPALIVE uint32_t rn_input_ring(void) { return (uint32_t)(uintptr_t)ring; }
+void input_mouse_exclusive(int on) { __atomic_store_n(&ring[5], (uint32_t)on, __ATOMIC_RELEASE); }
+void input_poll(void) {
+    uint32_t head = __atomic_load_n(&ring[0], __ATOMIC_ACQUIRE), tail = ring[1];
+    for (; tail != head; tail++) {
+        uint32_t e = ring[8 + tail % RING];
+        if (e & 0x80000000u) button_event(e & 0xff, (e >> 8) & 1);
+        else key_event(e & 0xff, (e >> 8) & 1);
+    }
+    __atomic_store_n(&ring[1], tail, __ATOMIC_RELEASE);
+    int32_t dx = (int32_t)__atomic_exchange_n(&ring[2], 0, __ATOMIC_ACQ_REL);
+    int32_t dy = (int32_t)__atomic_exchange_n(&ring[3], 0, __ATOMIC_ACQ_REL);
+    int32_t dz = (int32_t)__atomic_exchange_n(&ring[4], 0, __ATOMIC_ACQ_REL);
+    if (dx || dy || dz) dinput8_motion(dx, dy, dz);
+    script_poll();
+}
+#else
+void input_mouse_exclusive(int on) { (void)on; }
+void input_poll(void) { script_poll(); }
 #endif

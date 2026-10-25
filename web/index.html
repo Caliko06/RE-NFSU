@@ -96,6 +96,9 @@ function line(s, cls) {
         const k = kv.indexOf('=');
         m.ENV[k < 0 ? kv : kv.slice(0, k)] = k < 0 ? '1' : kv.slice(k + 1);
       }
+      // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
+      const keys = new URLSearchParams(location.search).get('keys');
+      if (keys) m.ENV.RN_KEYS = keys;
     }],
   });
   const telem = startTelemetry(M, t0, s => line(s), allLog);

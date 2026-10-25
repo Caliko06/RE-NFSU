@@ -1,4 +1,4 @@
-// send.js PID EXE SCRIPT: Hopper's own "open executable" Apple event (Hopper.sdef HoppOpEx) sent to ONE Hopper process,
+// send.js PID EXE SCRIPT [TIMEOUT_S]: Hopper's own "open executable" Apple event (Hopper.sdef HoppOpEx) sent to ONE Hopper process,
 // with the PE loader, analysis on and "execute Python script" (EXPY). `open --args -Y` does not run the script, and the
 // hopper launcher talks to whichever Hopper runs first (another session's too).
 ObjC.import('Foundation');
@@ -16,6 +16,6 @@ function run(argv) {
   const opts = $.NSAppleEventDescriptor.listDescriptor; opts.insertDescriptorAtIndex(rec, 1);
   ev.setParamDescriptorForKeyword(opts, cc('OPTS'));
   const err = Ref();
-  const r = ev.sendEventWithOptionsTimeoutError($.NSAppleEventSendWaitForReply, 30, err);
+  const r = ev.sendEventWithOptionsTimeoutError($.NSAppleEventSendWaitForReply, parseInt(argv[3] || "30"), err);
   return r.isNil() ? 'error ' + (err[0] ? err[0].localizedDescription.js : '?') : 'sent ' + r.description.js.slice(0, 200);
 }

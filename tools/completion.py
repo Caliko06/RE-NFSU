@@ -29,7 +29,24 @@ def menu(mode, loc=0):
 # explore_*: a menu path tapped step by step with a kept frame every 120 (RN_KEEP), to learn a path before it is a row.
 ROWS = {'explore_career': ','.join(f'{20000 + 4000 * i}:RETURN' for i in range(12)),
         'explore_qr': ','.join(f'{20000 + 3000 * i}:{k}' for i, k in enumerate(['RETURN', 'RETURN', 'RIGHT', 'RETURN'] + ['DOWN'] * 8)),
-        'explore_ug': ','.join(f'{20000 + 4000 * i}:{k}' for i, k in enumerate(['RETURN', 'RETURN', 'UP'] + ['RETURN'] * 10)),
+        # GO UNDERGROUND (one UP on MU_Main_PC), then RETURNs every 4 s through the new-career screens until the race HUD,
+        # the race (autopilot), then plain RETURNs (NONE never shows) to see where the career comes back.
+        'explore_ug': ','.join(['20000:RETURN', '3000@!MU_UG_NewOrLoad_PC2:RETURN', '3000@!MU_UG_NewOrLoad_PC2:RETURN', '3000@!MU_UG_NewOrLoad_PC2:RETURN',
+                                '3000@!MU_UG_NewOrLoad_PC2:RETURN', '1500@=MU_UG_NewOrLoad_PC2:RETURN', '1500@=MU_Main_PC:UP', '1500@=MU_Main_PC:RETURN']
+                               + ['4000@!HUD_SingleRace:RETURN'] * 15 + ['3000@6:RETURN'] * 2 + ['3000@6/8:RETURN'] + ['4000@!NONE:RETURN'] * 12),
+        # career.0, the first event of a new career: NEW DRIVER PROFILE is two UPs above the first profile; type a name.
+        # GO UNDERGROUND opens MU_UG_Explained (starts on Exit: LEFT, RETURN), then MU_UG_NewCareerFMV and the race on 1003.
+        # That race has no results screen (6/4 -> 7/0); RETURNs skip MU_UG_NewCareerExtroFMV until MU_UG_ChooseCareerCar
+        # (0x4ab670: [[0x777ccc]+0x58a0] picks the return screen; 0x4e89b0 the hub, Hopper build/hopper/newcareer.txt).
+        # A loss ends on 6/8 with RewardPopup "Sorry, you lost this event" (Chrome 2026-10-25): RETURNs to PostRaceMenu, which
+        # starts on Restart; its confirm starts on Cancel (LEFT = OK). Up to 3 restarts; a win never shows 6/8 and goes on.
+        'career0': ','.join(['20000:RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + ['1500@=MU_UG_NewOrLoad_PC2:UP'] * 2
+                            + ['1500@=MU_UG_NewOrLoad_PC2:RETURN', '3000@!NONE:Z', '1000@!NONE:Z', '1500@!NONE:RETURN']
+                            + ['4000@!MU_Main_PC:RETURN'] * 4 + ['1500@=MU_Main_PC:UP', '1500@=MU_Main_PC:RETURN']
+                            + ['1500@=MU_UG_Explained:LEFT', '1500@=MU_UG_Explained:RETURN']
+                            + ['4000@!HUD_SingleRace:RETURN'] * 15 + ['3000@6:RETURN'] * 2
+                            + (['3000@6/8:RETURN'] + ['4000@!PostRaceMenu:RETURN'] * 6 + ['1500@=PostRaceMenu:RETURN', '3000@6:LEFT', '1500@6:RETURN']) * 3
+                            + ['3000@3:RETURN'] + ['4000@!MU_UG_ChooseCareerCar:RETURN'] * 3),
         'circuit': menu(0), 'sprint': menu(1), 'drag': menu(2), 'drift': menu(3), 'lapko': menu(4), 'freerun': menu(5)}
 
 # After the race (flow state 6/8), RETURN walks Results -> Race Style Points -> the post-race menu (Restart, Statistics,
@@ -66,6 +83,12 @@ def sweep(mode, start=0):   # sweep_<mode>-<k>: from the k-th track of the list 
                 q('MU_QuickRaceTrackSelect', 'RIGHT'), q('MU_QuickRaceTrackSelect', 'RETURN'), q('MU_QuickRaceOptions_PC', 'RETURN')] + race
     return ','.join(out)
 ROWS.update({f'sweep_{k}': sweep(k) for k in SWEEP})
+# Free Run has no finish (Chrome 2026-10-25: 11 min on 1002, no end): learn the pause menu (ESC -> MU_Pause_PC) step by step.
+# Free Run has no finish (Chrome 2026-10-25: 11 min on 1002, no end). Pause (ESC -> MU_Pause_PC: Resume, Restart, Options,
+# Leave Race; runs/explore_pause shot 2702), Leave Race, then its confirm MU_PauseConfirm (assumed like the post-race one:
+# starts on Cancel, LEFT = OK).
+FREE_LEAVE = ['60000@6/4:ESCAPE'] + ['1500@=MU_Pause_PC:DOWN'] * 3 + ['1500@=MU_Pause_PC:RETURN', '1500@=MU_PauseConfirm:LEFT', '1500@=MU_PauseConfirm:RETURN']
+ROWS['freerun'] = ','.join(keys(menu(5, 3)).split(',') + FREE_LEAVE)
 
 def launch(run):
     row, seed = (run.split('.') + [SEEDS[0]])[:2]
@@ -78,13 +101,14 @@ def launch(run):
     secs = 330 * (SWEEP[row[6:].split('-')[0]][1] - int((row + '-0').split('-')[1])) + 120 if row.startswith('sweep_') else SECS
     env = dict(os.environ, RN_TURBO='4', RN_SECS=str(secs), RN_SCREEN='640x480', RN_RASTER='300', RN_FLOWLOG='1', RN_SEED=seed,
                RN_AUTOPILOT='1', RN_KEYS=seq if isinstance(seq, str) else keys(seq, LEAVE[SEEDS.index(seed) % 3] + NEXT))
-    if row.startswith('explore'): env.update(RN_KEEP='120', RN_SECS='240')
+    if row.startswith('explore'): env.update(RN_KEEP='120', RN_SECS='600')
     with open(f'{d}/log.txt', 'w') as log:
         return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
 
 ALL_ROWS = {r['id']: r['group'] for r in json.load(open(f'{R}/census/rows.json'))['rows']}
 QR_ROWS = {k for k, g in ALL_ROWS.items() if g == 'quick_race'}
+STAGE1 = {r['id']: r['stages'][0]['track'] for r in json.load(open(f'{R}/census/rows.json'))['rows'] if r.get('stages')}
 
 def rows_of(d):
     # flow.txt: only the flow lines of a log that was too big to keep (2026-10-24: 5-8 GB each, Pod disk full)
@@ -111,10 +135,15 @@ def row_of(d, log):
     # No "flow mode" line, no mode: the timed taps of those runs put the mode DOWNs on the profile screen (2026-10-25).
     mode = ids.get(modes[-1], f'mode{modes[-1]}') if modes else None
     trk = [int(m[1]) for m in (re.search(r'flow open .*TRACKB(\d{4})\.LZC', l, re.I) for l in log) if m]
-    row = f'qr.{mode}.{trk[0]}' if trk and f'qr.{mode}.{trk[0]}' in QR_ROWS else None
+    # The game type [0x777b4c] at the Accept: 1 = career, 2 and 4 = Quick Race (0x4ab670 picks the return screen on it).
+    gt = [int(m[1]) for m in (re.match(r'flow mode \d+ gametype (\d+)', l) for l in log[:next((i for i, l in enumerate(log) if l.startswith('flow state 6/')), len(log))]) if m]
+    career = bool(gt) and gt[-1] == 1
+    row = f'qr.{mode}.{trk[0]}' if trk and not career and f'qr.{mode}.{trk[0]}' in QR_ROWS else None
     # A career run: the event under the cursor at the race start ([0x735dc8], host/d3d9.c "flow event").
     ev = [int(m[1]) for m in (re.match(r'flow event (\d+)', l) for l in log[:next((i for i, l in enumerate(log) if l.startswith('flow state 6/')), len(log))]) if m]
-    if os.path.basename(d).startswith(('career', 'explore_ug')) and ev and f'career.{ev[-1]}' in ALL_ROWS: row = f'career.{ev[-1]}'
+    # [0x735dc8] stayed 0 when the map picked a later event (runs/explore_ug: drift on 1301), so the opened track must be the
+    # event's first stage too.
+    if career and ev and trk and STAGE1.get(f'career.{ev[-1]}') == trk[0]: row = f'career.{ev[-1]}'
     stop = next((l for l in reversed(log) if re.search(r'STOP|stop:|unimplemented|missing|fault|abort', l, re.I)), '')
     end = next((l for l in reversed(log) if l.startswith('RN_SECS')), 'running or killed')
     return {'row': row, 'mode': mode, 'track': trk[0] if trk else None, 'reached': {'menu': 3 in seen, 'start': raced, 'racing': any(s == 6 and r not in (1, 255) for s, r, _ in st),

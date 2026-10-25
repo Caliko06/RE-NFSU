@@ -24,7 +24,9 @@ const shot = route ? ROUTE.shot : arg[2] || 'build/webcheck.png';
 const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, c]) => ({ t: +t, code: c.split('+')[0], hold: +(c.split('+')[1] || 0) }));
 // Each run starts from a fresh copy of the OWNER's save (tools/serve.py gives headless Chrome build/save-headless).
 rmSync('build/save-headless', { recursive: true, force: true });
-const port = Number(process.env.RN_CDP_PORT || 9333);   // another session may hold 9333: then use your own
+// RE-NFSU's own CDP port: ~/RE-NFSMW's webcheck holds 9333 (127.0.0.1) and once took this repo's run into its Chrome,
+// which died with its run (2026-10-25, the page stopped at 61 s).
+const port = Number(process.env.RN_CDP_PORT || 9381);
 const profileDir = mkdtempSync(join(tmpdir(), 'rn-'));
 // RN_X11=1 (Pod, AGENTS.md): headless Chrome on Linux gets SwiftShader, so Chrome runs on an Xvfb DISPLAY with Vulkan,
 // which gives WebGPU the NVIDIA. The user agent still says HeadlessChrome: tools/serve.py tells test runs apart by it.

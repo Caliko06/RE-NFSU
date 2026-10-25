@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "23/167",
+ "progress": "25/167",
  "rows": [
   {
    "id": "career.0",
@@ -16,7 +16,7 @@
     }
    ],
    "src": "FrontB.lzc 0x34A02 +0x0",
-   "ok": false
+   "ok": true
   },
   {
    "id": "career.1",
@@ -2372,7 +2372,7 @@
    "track": 1002,
    "name": "CT2 - Stadium",
    "src": "GLOBALB 0x34201 +0x74 & 0x10 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.freerun.1003",
