@@ -1,0 +1,6 @@
+{
+ "unlocktab": {"q": "Unlock table 0x706944 (29 records of 0x34: +0 flag, +4 0x100, +8 name, +0x28 kind 0 car/1 see parts/2 parts level/4 race type/5/6, +0x2c value): who reads it, how a record gets applied (what globals each kind sets)", "data": ["0x706944", "0x706948", "0x70694c", "0x70696c", "0x706970", "0x706974", "0x706eec", "0x706ef0", "0x706ef4"]},
+ "hasflags": {"q": "Garage gating: the HAS_* name tables (0x6fa8c4, 0x6fa8dc, 0x6fa934) - who reads them and which player/career fields decide if a garage category or part is available", "data": ["0x6fa8c4", "0x6fa8dc", "0x6fa934"]},
+ "cobj": {"q": "Career object [0x7677a8]: who creates/sets it, layout fields (+0x5864 stage ptr, +0x58a0 return screen, +0x59d4 race kind), how the map/briefing choose the event, and 0x735dc4/0x735dc8 roles", "addrs": ["0x4e8640", "0x4c4f50", "0x4c5320", "0x4c5fa0", "0x4c4a60", "0x568250"], "data": ["0x7677a8", "0x735dc4"]},
+ "savefiles": {"q": "Profile save/load: functions that build <name>.usr/.ugd/.cfg/.opt/_autosave paths and write/read them; when autosave fires", "data": ["0x6cb0f0", "0x6cb110", "0x6cb138", "0x6cb140", "0x6cb15c"]}
+}

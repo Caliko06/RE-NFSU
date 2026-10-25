@@ -99,6 +99,10 @@ function line(s, cls) {
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = new URLSearchParams(location.search).get('keys');
       if (keys) m.ENV.RN_KEYS = keys;
+      // ?jump=5:1201,6:1304: RN_JUMP (host/input.c). On Quick Race, each race of the list starts at once (mode:track;
+      // 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift), the next one when a race comes back to the menu
+      const jump = new URLSearchParams(location.search).get('jump');
+      if (jump) m.ENV.RN_JUMP = jump;
     }],
   });
   const telem = startTelemetry(M, t0, s => line(s), allLog);
