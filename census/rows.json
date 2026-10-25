@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "0/162",
+ "progress": "1/162",
  "rows": [
   {
    "id": "career.0",
@@ -2048,7 +2048,7 @@
    "track": 1004,
    "name": "DT2 - Terminal",
    "src": "GLOBALB 0x34201 (track list per mode: I)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.circuit.1005",

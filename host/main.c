@@ -52,13 +52,23 @@ static void *watchdog(void *arg) {
 }
 // RN_WATCH=70fe28,77a920: every 250 ms, log each listed dword of guest memory (read without the GIL; a counter
 // needs no lock). The same addresses can be read in the Wine reference through /proc/PID/mem (tools/wine/memwatch.py).
+// 7345d0>20 reads [[0x7345d0]+0x20] (a field of a heap object; 0 while the pointer is 0).
 static void *memwatch(void *arg) {
-    uint32_t a[8]; int n = 0;
-    for (char *s = arg; *s && n < 8; s += *s == ',') a[n++] = (uint32_t)strtoul(s, &s, 16);
+    uint32_t a[12], off[12]; int n = 0;
+    for (char *s = arg; *s && n < 12; s += *s == ',') {
+        a[n] = (uint32_t)strtoul(s, &s, 16); off[n] = ~0u;
+        if (*s == '>') off[n] = (uint32_t)strtoul(s + 1, &s, 16);
+        n++;
+    }
     uint64_t t0 = now_us();
     for (;;) {
-        char line[256]; int k = snprintf(line, sizeof line, "watch %6.2f", (now_us() - t0) / 1e6);
-        for (int i = 0; i < n; i++) { uint32_t v; memcpy(&v, g_ctx->mem + a[i], 4); k += snprintf(line + k, sizeof line - k, " %x=%u", a[i], v); }
+        char line[384]; int k = snprintf(line, sizeof line, "watch %6.2f", (now_us() - t0) / 1e6);
+        for (int i = 0; i < n; i++) {
+            uint32_t v; memcpy(&v, g_ctx->mem + a[i], 4);
+            if (off[i] != ~0u) { uint32_t p = v; v = 0; if (p && p + off[i] < GUEST_MEM - 4) memcpy(&v, g_ctx->mem + p + off[i], 4); }
+            k += off[i] != ~0u ? snprintf(line + k, sizeof line - k, " %x>%x=%u", a[i], off[i], v)
+                               : snprintf(line + k, sizeof line - k, " %x=%u", a[i], v);
+        }
         rn_log("%s", line);
         usleep(250000);
     }

@@ -6,7 +6,7 @@
 #        completion.py collect                   runs/*/log.txt -> census/completion.json (one row per run dir), shots -> WebP
 import json, os, re, shutil, subprocess, sys, time
 R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECS, GAP = 900, 3000
+SECS, GAP = 1300, 3000   # 6/8 comes near 840 s with 4 rows on 10 cores; leaving takes ~30 s more
 SEEDS = ['0x1234', '0x5678', '0x9abc']
 
 def menu(mode, loc=0):   # title, profile, (main menu) Quick Race, mode, car, transmission, location, Accept (tools/abrun.py)
@@ -21,12 +21,16 @@ ROWS = {'explore_career': ','.join(f'{20000 + 4000 * i}:RETURN' for i in range(1
         'circuit': menu(0), 'sprint': menu(1), 'drag': menu(2), 'drift': menu(3), 'lapko': menu(4), 'freerun': menu(5)}
 
 # After the race (flow state 6/8), RETURN walks Results -> Race Style Points -> the post-race menu (Restart, Statistics,
-# Leave Race; RETURN there opens "Restart Race? OK / Cancel", runs/leave_ret 2026-10-25). So: two RETURNs, DOWN DOWN to
-# Leave Race, RETURN, then the confirm. Which button the confirm starts on is not known yet: one variant per seed.
+# Leave Race; RETURN there opens "Restart Race? OK / Cancel", runs/leave_ret 2026-10-25). So: three RETURNs, DOWN DOWN to
+# Leave Race, RETURN, then the confirm: it starts on Cancel, LEFT moves to OK (runs/circuit.0x5678 2026-10-25: 6/8 ->
+# 7/0 at 9543 -> front end 3 at 9575 -> second race; the RETURN and RIGHT variants stayed on the dialog).
 # Taps "ms@6/8:" wait for that state and count from the tap before (host/input.c). Then, back in the front end (state 3,
 # any race state), RETURNs start the next race from wherever the menu lands.
-_LEAVE = ['3000@6/8:RETURN', '4000@6/8:RETURN', '4000@6/8:DOWN', '1500@6/8:DOWN', '1500@6/8:RETURN']
-LEAVE = [_LEAVE + ['3000@6:RETURN'], _LEAVE + ['3000@6:LEFT', '1500@6:RETURN'], _LEAVE + ['3000@6:RIGHT', '1500@6:RETURN']]
+# Race Style Points takes two RETURNs (the first skips the tally): runs/circuit.0x1234 DILOG, RETURN 8641 -> Points,
+# RETURN 8701 -> tally 77..457 done, DOWN DOWN 8761/8810 lost on Points, RETURN 8821 -> menu (8880, cursor on Restart),
+# RETURN 8881 -> "Restart Race?" (8940). The menu reads keys on edges only (0x5744b0), so a tap on Points is gone.
+_LEAVE = ['3000@6/8:RETURN', '4000@6/8:RETURN', '4000@6/8:RETURN', '4000@6/8:DOWN', '1500@6/8:DOWN', '1500@6/8:RETURN']
+LEAVE = [_LEAVE + ['3000@6:LEFT', '1500@6:RETURN']] * 3
 NEXT = ['8000@3:RETURN'] + ['3000@3:RETURN'] * 9
 
 def keys(seq, post=()):
