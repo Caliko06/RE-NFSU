@@ -11,13 +11,16 @@
 # - Each topic: ONE Apple event (send.js: HoppOpEx + EXPY, loader WinPE; "PE" opens the Loader dialog) to that PID,
 #   never retried, so a binary is never opened twice. The script first checks its document is Speed_<topic>.exe,
 #   else it writes build/hopper/<topic>.wrong and does nothing.
-# - Waits while vm_stat Pages free < 20000 before opening a window.
+# - HOP_STALL=s: a window whose output file has not grown for s seconds is killed and the topic left without DONE
+#   (Hopper can hang inside one decompile); HOP_KEEP=1 keeps the old output so the script can resume after it.
+# - Waits while the free memory level (kern.memorystatus_level, %) is under 20 before opening a window
+#   (vm_stat "Pages free" stays near 5000 on this Mac with 37 % free, so the old guard blocked forever).
 dir=${HOP_DIR:?set HOP_DIR to the scratchpad}; win=${HOP_WIN:-$(( $# < 6 ? $# : 6 ))}; B=$(cd "$(dirname "$0")/../.." && pwd); cd "$B" || exit 1
 APP="/Applications/Hopper Disassembler.app"; LIFE=1800; MINLEFT=480
 
 prep() {    # topic -> exe copy + wrapper script that checks the document
   t=$1; q=$B/tools/hopper/q_$t.py; [ -f "$q" ] || { echo "hpar: no $q"; return 1; }
-  cp -c pc/Speed.exe "$dir/Speed_$t.exe"; rm -f "build/hopper/$t.txt" "build/hopper/$t.wrong"
+  cp -c pc/Speed.exe "$dir/Speed_$t.exe"; [ -n "$HOP_KEEP" ] || rm -f "build/hopper/$t.txt"; rm -f "build/hopper/$t.wrong"
   cat > "$dir/w_$t.py" <<EOF
 import os
 _p = Document.getCurrentDocument().getExecutableFilePath() or ''
@@ -29,7 +32,7 @@ EOF
 }
 
 launch() {  # -> new PID in $pid, its start in $t0 (launches are serialized by the caller's lock)
-  while [ "$(vm_stat | awk '/Pages free/ {gsub(/\./,""); print $3}')" -lt 20000 ]; do sleep 5; done
+  while [ "$(sysctl -n kern.memorystatus_level)" -lt 20 ]; do sleep 5; done
   while ! mkdir "$dir/hpar.lock" 2>/dev/null; do sleep 1; done
   before=$(pgrep -x "Hopper Disassembler")
   open -g -n -a "$APP" --args -ApplePersistenceIgnoreState YES; t0=$(date +%s)
@@ -51,8 +54,13 @@ window() {  # topics of one window, run in sequence; a fresh window when the dem
     fi
     prep "$t" || continue
     echo "hpar: PID $pid: $t: $(osascript -l JavaScript tools/hopper/send.js "$pid" "$dir/Speed_$t.exe" "$dir/w_$t.py" 900)"
+    ts=$(date +%s)
     while ! grep -q '^DONE' "build/hopper/$t.txt" 2>/dev/null && [ ! -f "build/hopper/$t.wrong" ] \
-          && [ $(( $(date +%s) - t0 )) -lt $LIFE ] && kill -0 "$pid" 2>/dev/null; do sleep 5; done
+          && [ $(( $(date +%s) - t0 )) -lt $LIFE ] && kill -0 "$pid" 2>/dev/null; do
+      sleep 5
+      m=$(stat -f %m "build/hopper/$t.txt" 2>/dev/null || echo 0); [ "$m" -gt "$ts" ] || m=$ts
+      [ -n "$HOP_STALL" ] && [ $(( $(date +%s) - m )) -gt "$HOP_STALL" ] && { echo "hpar: PID $pid: $t stalled"; kill -9 "$pid"; break; }
+    done
     echo "hpar: PID $pid: $t done: $(tail -1 "build/hopper/$t.txt" 2>/dev/null)$(cat "build/hopper/$t.wrong" 2>/dev/null)"
     sleep 3    # the script closes its document; give Hopper a moment before the next open
   done

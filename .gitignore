@@ -11,3 +11,4 @@ save/
 web/remaster/
 /.mvenv
 /runs
+census/hopper/decomp.c

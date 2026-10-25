@@ -1,6 +1,6 @@
 # Question (date): <one question this run answers>
-# Use Hopper for what Ghidra does not give: bodies Ghidra lacks or splits differently, or a second reading when
-# Ghidra's pseudocode looks wrong. Offsets/writers/callers: Ghidra first (tools/rea/gpar.sh: scalar, xref, callers).
+# Hopper first: grep census/hopper/decomp.c (every procedure, callers, callees) before writing a query; a query is for
+# what the export lacks: data refs (DATA), a body after a new Speed.exe. Ghidra only when Hopper lacks the answer.
 # Out: build/hopper/<topic>.txt: per address its pseudocode and callers/callees (addresses + names, no recursion);
 # per DATA address each referencing instruction (so reads and writes show). Ends "DONE"; never cut silently.
 # Copy as q_<topic>.py, set OUT/Q/ADDRS/DATA, run with tools/hopper/hpar.sh <topic> ...
