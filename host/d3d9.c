@@ -791,6 +791,7 @@ static void rng_log(Ctx *c, uint32_t frame) {
 // at the Present that first sees it: the bounds of the loads (tools/bench.py). Also each new game-flow state [0x77a920]
 // (written at 0x448b11 .. 0x449a15: 1 loading FE, 2 unloading FE, 3 FE, 4/5 loading track, 6 race, 7 unloading track).
 uint32_t rn_flow = ~0u;
+const char *rn_screen = "";
 static void flow_log(Ctx *c) {
     static int on = -1;
     static uint32_t prev, prev_st;
@@ -800,7 +801,13 @@ static void flow_log(Ctx *c) {
     if (lb != prev && lb >= 0x697000 && lb < 0x6d4000) rn_log("flow %.64s (frame %u)", G(lb), dev.frames);
     // [[0x7361f0]]: the race's own state; 0x447600 and the draws read state 6 with it == 1 as "not racing yet"
     if (st != prev_st) { rn_log("flow state %u/%d (frame %u)", st >> 8, st & 0xff, dev.frames); gpu_keep_frame(); }
-    prev = lb, prev_st = st, rn_flow = st;
+    // The post-race screens: [0x735ed0] queues PostRaceResults, StyleAnimator, RewardPopup, PostRaceMenu (0x49e100, a
+    // variable count); +0xc is the node shown, +8 of a node its .fng name (0x49dfd0 steps it: esi = [cur+8] leaves,
+    // edi = [next+8] comes in).
+    uint32_t pr = ld(c, 0x735ed0, 4), node = pr ? ld(c, pr + 0xc, 4) : 0, nm = node ? ld(c, node + 8, 4) : 0;
+    const char *scr = nm >= 0x697000 && nm < 0x6d4000 ? G(nm) : "";
+    if (strcmp(scr, rn_screen)) { rn_log("flow screen %.32s (frame %u)", *scr ? scr : "-", dev.frames); gpu_keep_frame(); }
+    prev = lb, prev_st = st, rn_flow = st, rn_screen = scr;
 }
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();

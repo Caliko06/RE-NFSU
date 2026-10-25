@@ -2,7 +2,8 @@
 // mouse events into a ring in the shared heap) or, native, a script in RN_KEYS for off-screen runs:
 // RN_KEYS="3000:RETURN,4500:DOWN" taps each key (100 ms down) at that many ms after start. "3000@6/8:DOWN" taps it
 // 3000 ms after the game-flow state 6 / race state 8 (RN_FLOWLOG, host/d3d9.c) is first seen once the taps before it are done;
-// "3000@3:RETURN" waits for flow state 3 with any race state.
+// "3000@3:RETURN" waits for flow state 3 with any race state. "1500@=PostRaceMenu:DOWN" waits for that post-race screen
+// (rn_screen); "4000@!PostRaceMenu:RETURN" counts from the tap before and is dropped if that screen shows when it is due.
 // input_poll() hands new events to the key state, the DirectInput devices and the window messages.
 #include <strings.h>
 #include "host.h"
@@ -152,7 +153,7 @@ void input_poll(void) {
 }
 #else
 void input_mouse_exclusive(int on) { (void)on; }
-typedef struct { uint64_t at_us; uint8_t dik; uint32_t cond, mask; } Tap;   // cond: flow state to wait for, ~0 = none
+typedef struct { uint64_t at_us; uint8_t dik; uint32_t cond, mask; char op, scr[24]; } Tap;   // cond: flow state to wait for, ~0 = none
 static Tap taps[256];
 static int ntaps, script_read;
 static unsigned next_tap;
@@ -163,14 +164,17 @@ static void read_script(void) {
         char name[32];
         unsigned ms, fs, rs;
         uint32_t cond = ~0u, mask = ~0u;
+        char op[2] = "", scr[24] = "";
         int used;
-        if (sscanf(s, "%u@%u/%u:%31[A-Z0-9_]%n", &ms, &fs, &rs, name, &used) == 4) cond = fs << 8 | (rs & 0xff);
+        if (sscanf(s, "%u@%1[=!]%23[A-Za-z_]:%31[A-Z0-9_]%n", &ms, op, scr, name, &used) == 4) ;
+        else if (op[0] = 0, sscanf(s, "%u@%u/%u:%31[A-Z0-9_]%n", &ms, &fs, &rs, name, &used) == 4) cond = fs << 8 | (rs & 0xff);
         else if (sscanf(s, "%u@%u:%31[A-Z0-9_]%n", &ms, &fs, name, &used) == 3) cond = fs << 8, mask = ~0xffu;
         else if (sscanf(s, "%u:%31[A-Z0-9_]%n", &ms, name, &used) != 2) { rn_log("RN_KEYS: cannot read \"%s\"", s); break; }
         const Key *k = NULL;
         for (int j = 0; j < NKEYS && !k; j++) if (!strcasecmp(keys[j].name, name)) k = &keys[j];
         if (!k) { rn_log("RN_KEYS: no key %s", name); break; }
-        taps[ntaps++] = (Tap){(uint64_t)ms * 1000, k->dik, cond, mask};
+        taps[ntaps] = (Tap){(uint64_t)ms * 1000, k->dik, cond, mask, op[0], ""};
+        memcpy(taps[ntaps++].scr, scr, sizeof scr);
         s += used;
         while (*s == ',' || *s == ' ') s++;
     }
@@ -192,6 +196,18 @@ void input_poll(void) {
         if (!(next_tap & 1) && taps[k].cond != ~0u) {   // anchor a flow-state tap when its state shows up
             if ((rn_flow & taps[k].mask) != taps[k].cond) break;
             taps[k].at_us += now, taps[k].cond = ~0u;
+        }
+        if (!(next_tap & 1) && (taps[k].op == '=' || taps[k].op == '!')) {   // a screen tap: "=" anchors when it shows, "!" from the tap before
+            size_t n = strlen(taps[k].scr);
+            int on = !strncasecmp(rn_screen, taps[k].scr, n) && rn_screen[n] == '.';
+            if (taps[k].op == '=' && !on) break;
+            taps[k].at_us += now, taps[k].op = taps[k].op == '!' ? '?' : 0;
+        }
+        if (!(next_tap & 1) && taps[k].op == '?') {   // due: dropped if the screen came up meanwhile
+            size_t n = strlen(taps[k].scr);
+            if (taps[k].at_us > now) break;
+            taps[k].op = 0;
+            if (!strncasecmp(rn_screen, taps[k].scr, n) && rn_screen[n] == '.') { rn_log("RN_KEYS: tap %u dropped on %s", k, rn_screen); next_tap += 2; continue; }
         }
         uint64_t at = taps[k].at_us + (next_tap & 1 ? 100000 : 0);
         if (at > now || ((next_tap & 1) && rn_telem.presents - down_at < 2)) break;

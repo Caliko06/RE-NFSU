@@ -29,7 +29,10 @@ ROWS = {'explore_career': ','.join(f'{20000 + 4000 * i}:RETURN' for i in range(1
 # Race Style Points takes two RETURNs (the first skips the tally): runs/circuit.0x1234 DILOG, RETURN 8641 -> Points,
 # RETURN 8701 -> tally 77..457 done, DOWN DOWN 8761/8810 lost on Points, RETURN 8821 -> menu (8880, cursor on Restart),
 # RETURN 8881 -> "Restart Race?" (8940). The menu reads keys on edges only (0x5744b0), so a tap on Points is gone.
-_LEAVE = ['3000@6/8:RETURN', '4000@6/8:RETURN', '4000@6/8:RETURN', '4000@6/8:DOWN', '1500@6/8:DOWN', '1500@6/8:RETURN']
+# The screens before the menu vary (0x49e100: Results, StyleAnimator, RewardPopup only with a reward, runs/lapko.0x5678
+# "Style Reward" ate a RETURN), so RETURNs walk them until the flow log sees PostRaceMenu (host/d3d9.c rn_screen) and the
+# rest are dropped; the menu taps wait for it.
+_LEAVE = ['3000@6/8:RETURN'] + ['4000@!PostRaceMenu:RETURN'] * 6 + ['1500@=PostRaceMenu:DOWN'] * 2 + ['1500@=PostRaceMenu:RETURN']
 LEAVE = [_LEAVE + ['3000@6:LEFT', '1500@6:RETURN']] * 3
 NEXT = ['8000@3:RETURN'] + ['3000@3:RETURN'] * 9
 

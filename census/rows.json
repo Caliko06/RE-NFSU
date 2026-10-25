@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "1/162",
+ "progress": "3/162",
  "rows": [
   {
    "id": "career.0",
@@ -2309,7 +2309,7 @@
    "track": 1002,
    "name": "CT2 - Stadium",
    "src": "GLOBALB 0x34201 (track list per mode: I)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.lapko.1003",
@@ -2380,7 +2380,7 @@
    "mode": "freerun",
    "track": null,
    "src": "which tracks Free Run lists: U",
-   "ok": false
+   "ok": true
   },
   {
    "id": "game.profile",
