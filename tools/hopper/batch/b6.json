@@ -1,0 +1,4 @@
+{
+ "resetcar": {"q": "Player reset-car input JOY_EVENT_RESET_CAR: event id, handler that resets the player car to the road, and whether the AI/autopilot calls the same reset", "strings": ["JOY_EVENT_RESET_CAR", "RESET_TO_POINT", "ResetEvent"]},
+ "unstuck": {"q": "AIActionGetUnstuck ('Get Unstuck'): when the AI decides it is stuck (speed/time thresholds), what it does (reverse, reset), and whether the player autopilot (mode 4 AUTO_PILOT) runs AI actions", "strings": ["AIActionGetUnstuck", "Get Unstuck"]}
+}

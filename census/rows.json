@@ -1,6 +1,6 @@
 {
  "note": "Whole-game denominator. Made by tools/census/rows.py from game/; never edit by hand.",
- "progress": "44/167",
+ "progress": "47/167",
  "rows": [
   {
    "id": "career.0",
@@ -2264,7 +2264,7 @@
    "track": 1306,
    "name": "Drift 6",
    "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.drift.1307",
@@ -2273,7 +2273,7 @@
    "track": 1307,
    "name": "Drift 7",
    "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.drift.1308",
@@ -2282,7 +2282,7 @@
    "track": 1308,
    "name": "Drift 8",
    "src": "GLOBALB 0x34201 +0x74 & 0x8 (0x4ab470)",
-   "ok": false
+   "ok": true
   },
   {
    "id": "qr.lapko.1001",

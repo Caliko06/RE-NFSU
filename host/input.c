@@ -221,12 +221,42 @@ void input_jump(Ctx *c) {
     unsigned m, t;
     int used;
     static int fired;
-    if ((!*s && !fired) || (rn_flow >> 8) != 3 || !screen_on("MU_QuickRaceModeSelect")) { seen = 0; return; }
+    // "e<N>": career row N (record N of the event table, FrontB.lzc 0x34A02, 0x14c each), from the career map
+    int car = *s ? *s == 'e' : fired == 2;
+    const char *home = car ? "MU_UG_MapScreen" : "MU_QuickRaceModeSelect";
+    if (!*s && !fired) return;
+    if ((rn_flow >> 8) != 3 || !screen_on(home)) { seen = 0; return; }
     if (!seen) seen = rn_telem.presents;
     if (rn_telem.presents - seen < 30) return;   // let the screen settle as a player would
 #ifndef __EMSCRIPTEN__
-    if (!*s) { rn_log("RN_JUMP: done, back on MU_QuickRaceModeSelect at frame %u", rn_telem.presents); fflush(NULL); _exit(0); }
+    if (!*s) { rn_log("RN_JUMP: done, back on %s at frame %u", home, rn_telem.presents); fflush(NULL); _exit(0); }
 #endif
+    if (car) {
+        // The map's own path (0x4c5df0): esi = career 0x75eef8, edi = event id, ebx = its record ([0x733ff8 + 4*id],
+        // filled by 0x5a0060); 0x5a0ce0 makes the race record [0x7677a8] (= career +0x88b0), 0x4dfa10(eax = record),
+        // then 0x4b5df0 (ebx = [0x7677a8]) sets the race up and queues UnloadingFrontEnd 0x448d10 (Hopper evbrief.txt).
+        // The briefing (record +0xac) is skipped, as the map does for events 7, 15 and 92.
+        unsigned n;
+        if (sscanf(s, "e%u%n", &n, &used) != 1) { rn_log("RN_JUMP: cannot read \"%s\"", s); s = ""; return; }
+        s += used;
+        while (*s == ',' || *s == ' ' || *s == '+') s++;
+        uint32_t lo = ~0u, rec, id;
+        for (uint32_t k = 0; k < 0x100; k++) { uint32_t r = ld(c, 0x733ff8 + 4 * k, 4); if (r && r < lo) lo = r; }
+        rec = lo + n * 0x14c, id = ld(c, rec, 4);
+        if (lo == ~0u || id >= 0x100 || ld(c, 0x733ff8 + 4 * id, 4) != rec) { rn_log("RN_JUMP: no career event %u", n); s = ""; return; }
+        rn_log("RN_JUMP: career event %u (id %u, record %08x) at frame %u", n, id, rec, rn_telem.presents);
+        uint32_t r[8];
+        memcpy(r, c->r, sizeof r);
+        c->r[ESI] = 0x75eef8, c->r[EDI] = id, c->r[EBX] = rec;
+        call_guest(c, 0x5a0ce0, 0, NULL);
+        c->r[EAX] = rec;
+        call_guest(c, 0x4dfa10, 0, NULL);
+        c->r[EBX] = ld(c, 0x7677a8, 4);
+        call_guest(c, 0x4b5df0, 0, NULL);
+        memcpy(c->r, r, sizeof r);
+        seen = 0, fired = 2;
+        return;
+    }
     if (sscanf(s, "%u:%u%n", &m, &t, &used) != 2 || m > 6) { rn_log("RN_JUMP: cannot read \"%s\"", s); s = ""; return; }
     s += used;
     while (*s == ',' || *s == ' ' || *s == '+') s++;

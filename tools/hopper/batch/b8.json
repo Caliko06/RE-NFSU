@@ -1,0 +1,4 @@
+{
+ "resetreq": {"q": "Reset-car request: player input dispatcher 0x431960 case 0x9a (JOY_EVENT_RESET_CAR) sets [[this+4]+0x855]=1. Who reads +0x855 and performs the reset (to road/spline point); conditions (+0xc54, [0x78a368]); which global holds the player car/driver object so a host can reach this+4", "addrs": ["0x431960", "0x431920", "0x431940", "0x42d520", "0x5740b0"], "data": ["0x78a368"]},
+ "keybind": {"q": "Default keyboard bindings: the table mapping DIK scancodes to JOY_EVENT ids (name/id pairs at 0x6f1934..; RESET_CAR=0x9a, EBRAKE=0x92). Which key triggers 0x9a by default on PC, and who loads the bindings", "data": ["0x6f1974", "0x6f1934"]}
+}

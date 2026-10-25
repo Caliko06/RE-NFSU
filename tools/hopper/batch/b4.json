@@ -1,0 +1,5 @@
+{
+ "careerptr": {"q": "Career pointers: who writes [0x777ccc] (current event record? +0x58a0 return screen) and [0x7677a8] (career obj, +0x5864 stage); what 0x4c96c0 does when EventBriefing has [0x735dc8] != 0", "addrs": ["0x4c96c0"], "data": ["0x777ccc", "0x7677a8"]},
+ "cheatuse": {"q": "Cheat manager object 0x73765c (+0xc table 0x706918, +0x10 count 0x21; ctor 0x59e060 from static init 0x6934c0): who reads it, how a typed code is matched and what each kind applies", "data": ["0x73765c", "0x737668", "0x73766c"]},
+ "eventtab": {"q": "Career event table 0x733ff8 (records of 0x14c from FrontB.lzc 0x34A02) and [0x735dc8]: who reads them, how an event becomes available/done, and how a race result marks it", "data": ["0x733ff8", "0x735dc8", "0x733ffc"]}
+}

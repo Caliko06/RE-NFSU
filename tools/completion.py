@@ -102,13 +102,25 @@ def jump(name):
     for _ in tracks[1:]: out += ['1000@3:LSHIFT', '3000@6:RETURN', '3000@6:RETURN'] + leave
     return ','.join(out), ','.join(f'{m}:{t}' for t in tracks), 330 * len(tracks) + 120
 
+# cjump_<n>+<n>..: RN_JUMP "e<n>" (host/input.c) starts career row n (record n of the event table) from MU_UG_MapScreen with
+# the map's own path (0x5a0ce0, 0x4dfa10, 0x4b5df0). The OWNER's save (profile asas, first on the list) opens on the map
+# right after GO UNDERGROUND (runs cj1 2026-10-25: e1 at frame 1231, results 6/8 at 4795). Each race leaves as Quick Race does.
+def cjump(name):
+    evs = name.split('_')[1].split('+')
+    q = lambda scr, k: f'1500@={scr}:{k}'
+    pre = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + [q('MU_UG_NewOrLoad_PC2', 'RETURN'), q('MU_Main_PC', 'UP'), q('MU_Main_PC', 'RETURN')]
+    leave = _LEAVE + ['3000@6:LEFT', '1500@6:RETURN']
+    out = keys(pre, leave).split(',')
+    for _ in evs[1:]: out += ['3000@6:RETURN', '3000@6:RETURN'] + leave
+    return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * len(evs) + 120
+
 def launch(run):
     row, seed = (run.split('.') + [SEEDS[0]])[:2]
     d = f'{R}/runs/{row}.{seed}'
     subprocess.run(['rm', '-rf', d]); os.makedirs(d)
     subprocess.run(['cp', '-al', f'{R}/game', f'{d}/game'], check=True)
     subprocess.run(['cp', '-r', f'{R}/save', f'{d}/save'], check=True)
-    jmp = jump(row) if row.startswith('jump_') else None
+    jmp = jump(row) if row.startswith('jump_') else cjump(row) if row.startswith('cjump_') else None
     seq = jmp[0] if jmp else ROWS[row] if '-' not in row else sweep(row[6:].split('-')[0], int(row.split('-')[1]))
     # RN_TURBO 4: the guest clocks run 4x (host/win32.c now_us); a sprint race + leave took ~10 min at 1x, ~3.3 min at 4x.
     secs = 330 * (SWEEP[row[6:].split('-')[0]][1] - int((row + '-0').split('-')[1])) + 120 if row.startswith('sweep_') else SECS
@@ -159,6 +171,10 @@ def row_of(d, log):
     # [0x735dc8] stayed 0 when the map picked a later event (runs/explore_ug: drift on 1301), so the opened track must be the
     # event's first stage too.
     if career and ev and trk and STAGE1.get(f'career.{ev[-1]}') == trk[0]: row = f'career.{ev[-1]}'
+    # A career jump names its row (host/input.c "RN_JUMP: career event N"); the opened track must still be its first stage.
+    cj = [int(m[1]) for m in (re.match(r'RN_JUMP: career event (\d+)', l) for l in log) if m]
+    if career and cj and trk and STAGE1.get(f'career.{cj[-1]}') == trk[0]: row = f'career.{cj[-1]}'
+
     stop = next((l for l in reversed(log) if re.search(r'STOP|stop:|unimplemented|missing|fault|abort', l, re.I)), '')
     end = next((l for l in reversed(log) if l.startswith('RN_SECS')), 'running or killed')
     return {'row': row, 'mode': mode, 'track': trk[0] if trk else None, 'reached': {'menu': 3 in seen, 'start': raced, 'racing': any(s == 6 and r not in (1, 255) for s, r, _ in st),

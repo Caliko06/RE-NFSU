@@ -880,6 +880,11 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     tune_apply(c);
     rng_log(c, dev.frames);
     flow_log(c);
+    // RN_UNLOCK: [0x7677ac] is the game's "career beaten" flag (0x5a0dc0 sets it when event 0x71 is won, new profile
+    // 0x41cf40 clears it); the unlock queries 0x4d8040..0x512d10 (Hopper beatgame.txt) take it as "everything open".
+    static int unlock = -1;
+    if (unlock < 0) unlock = getenv("RN_UNLOCK") && *getenv("RN_UNLOCK") != '0';
+    if (unlock) st(c, 0x7677ac, 1, 4);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
         return D3DERR_INVALIDCALL;

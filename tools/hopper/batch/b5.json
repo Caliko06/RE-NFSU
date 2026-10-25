@@ -1,0 +1,8 @@
+{
+ "beatgame": {"q": "Flag [0x7677ac] (set 1 by 0x5a0dc0 when event 0x71 completes, cleared by new-profile 0x41cf40): every reader and what it unlocks (cars, parts, tracks, modes); is it saved in the profile?", "addrs": ["0x5a0dc0", "0x4d8040", "0x4d80e0", "0x4d8180"], "data": ["0x7677ac"]},
+ "careerinit": {"q": "Career state block 0x7677b8 (0x294 dwords, zeroed by 0x41cf40): layout, per-event done flags, current stage; who writes it on race end", "addrs": ["0x41cf40", "0x5a0a00", "0x4aa4d0"], "data": ["0x7677b8", "0x7677b0", "0x76777c"]},
+ "evbrief": {"q": "How a career event race starts: EventBriefing handler 0x4e8580 -> 0x4b5df0, map 0x4c5df0 -> 0x4b5df0, and 0x568250; which globals select the event ([0x735dc8], [0x75f240])", "addrs": ["0x4e8580", "0x4c5df0", "0x568250", "0x4b5df0", "0x4c4f00"], "data": ["0x75f240"]},
+ "evdone": {"q": "Event completion 0x5a0dc0(param event id): callers, how the race result reaches it, what param 0x71 is", "addrs": ["0x5a0dc0"], "data": ["0x76323d"]},
+ "unlockq": {"q": "Unlock queries over table [0x737668] count [0x73766c]: 0x4d8270, 0x4d82f0, 0x4d8370, 0x4bc170, 0x4c6700, 0x4e0d90, 0x507670, 0x50fb00; what each returns and which flags short-circuit to unlocked", "addrs": ["0x4d8270", "0x4d82f0", "0x4d8370", "0x4bc170", "0x4c6700", "0x4e0d90", "0x507670", "0x50fb00"]},
+ "flags735": {"q": "Bytes 0x735e10, 0x735e11, 0x735e12, 0x735ec1 (no code writer): what struct they belong to (options/profile loaded from file?) and who reads them", "data": ["0x735e10", "0x735e11", "0x735e12", "0x735ec1"]}
+}
