@@ -110,8 +110,9 @@ def cjump(name):
     q = lambda scr, k: f'1500@={scr}:{k}'
     pre = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + [q('MU_UG_NewOrLoad_PC2', 'RETURN'), q('MU_Main_PC', 'UP'), q('MU_Main_PC', 'RETURN'), q('MU_UG_UndergroundMenu', 'RETURN')]
     leave = _LEAVE + ['3000@6:LEFT', '1500@6:RETURN']
-    out = keys(pre, leave).split(',')
-    for _ in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + leave
+    # Each stage of a tournament ends in its own results (runs/cjump_6+..: stage 2 waited on PostRaceResults for good).
+    out = keys(pre, leave * STAGES[f'career.{evs[0]}']).split(',')
+    for e in evs[1:]: out += [q('MU_UG_UndergroundMenu', 'RETURN'), '3000@6:RETURN', '3000@6:RETURN'] + leave * STAGES[f'career.{e}']
     # A tournament runs its stages back to back (runs/cjump_5+..: event 6 stage 3 began as RN_SECS ran out): time per stage.
     return ','.join(out), ','.join(f'e{e}' for e in evs), 330 * sum(STAGES[f'career.{e}'] for e in evs) + 120
 

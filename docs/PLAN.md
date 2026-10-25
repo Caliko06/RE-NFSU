@@ -12,10 +12,11 @@ One session on main. Each milestone has one gate: the run that proves it.
 
 ## Roadmap contract (OWNER 2026-10-25): 25/167 -> 167/167, 60 fps, RTX effects
 Blocks in order. Each one closes with progress before -> after, `webcheck --route` PASS, one commit, HANDOFF.md.
-1. Quick Race (46 rows): drag, drift, sprint, circuit 1001, drift 1304 (TOO SLOW lap 2: read build/hopper/autopilot.txt,
-   fix the autopilot cause). RN_JUMP sweep per track + one RN_KEYS route per mode.
+1. Quick Race (46 rows): DONE 2026-10-25 (46/46, f414af4). RN_JUMP per track + one RN_KEYS route per mode.
 2. Underground career (116 rows): career.1+ = ChooseCareerCar -> MapScreen -> EventBriefing -> race -> results.
    `career1` like `career0`; RN_JUMP to the game's own event start (RE); the OWNER's save (asas) as a mid-career start.
+   RUNNING 2026-10-25: `cjump_<n>+..` chains of 8 (RN_JUMP e<N>, map path 0x4c5df0). Stops: drift events (autopilot
+   crawls at 1-9 mph), some tournament stages wait on PostRaceResults, long races outrun RN_SECS.
 3. Whole game (5 game rows + scope): garage and customization with everything unlocked (PATCH with RE citation),
    options persist, save -> reload page -> continue, sound, music, movies. Gate: one Chrome run that saves, reloads, continues.
 4. 60 fps, 0 hitches > 33 ms: gate60/bench in Chrome; measure first, fix in the recompiler or the layer.
