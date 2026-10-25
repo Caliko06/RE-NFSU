@@ -118,6 +118,7 @@ elif mode == 'lightmap':   # bake.py -- lightmap OUT.npz 0/1 SAMPLES SIZE MESH.n
     o, emi = world_mesh(z, albedo(ins[1])); bg, sun = lights(sc)
     s.cycles.max_bounces, s.cycles.diffuse_bounces = 4, 3
     s.render.bake.target = 'IMAGE_TEXTURES'; s.render.bake.margin = 4; s.render.bake.use_clear = True
+    s.cycles.adaptive_threshold = float(os.environ.get('LM_THRESH', '0.01'))   # Cycles' default; samples alone stop at it
     for x in s.objects: x.select_set(x is o)
     bpy.context.view_layer.objects.active = o
     o.data.uv_layers.new(name='lm'); t = time.time()
