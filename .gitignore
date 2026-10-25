@@ -10,3 +10,4 @@ web/out/
 save/
 web/remaster/
 /.mvenv
+/runs
