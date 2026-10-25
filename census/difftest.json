@@ -1,9 +1,9 @@
 {
- "functions": 13799,
+ "functions": 13800,
  "cases": {
-  "match": 16063,
-  "skip_unmapped": 38401,
-  "skip_pinned_cpu_path": 399,
+  "match": 16072,
+  "skip_unmapped": 38402,
+  "skip_pinned_cpu_path": 393,
   "skip_timeout": 238,
   "skip_not_a_function": 72,
   "skip_ret_imm16_sign": 8,
@@ -11,17 +11,17 @@
   "mismatch": 8
  },
  "compared_stop_kinds": {
-  "import": 3296,
-  "ret": 12689,
+  "import": 3299,
+  "ret": 12695,
   "invalid": 65,
   "fault": 21
  },
- "functions_compared": 5407,
- "functions_all_match": 5404,
+ "functions_compared": 5411,
+ "functions_all_match": 5408,
  "all_match_by_seed": {
-  "data": 2195,
-  "call": 3201,
-  "?": 8
+  "data": 2196,
+  "call": 3203,
+  "?": 9
  },
  "functions_with_mismatch": 3,
  "mismatch_funcs": [

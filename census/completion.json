@@ -1,204 +1,738 @@
 {
- "circuit": {
+ "circuit.0x1234": {
   "reached": {
    "menu": true,
    "start": true,
    "racing": true,
+   "results": true,
    "unload": false,
-   "back_to_menu": false
+   "back_to_menu": false,
+   "second_race": false
   },
   "states": [
    "0/255@0",
    "1/255@1",
    "3/255@29",
-   "4/255@2352",
-   "5/255@2513",
-   "6/1@2591",
-   "6/3@2758",
-   "6/4@2760",
-   "6/1@13816",
-   "6/8@13934"
+   "4/255@2102",
+   "5/255@2263",
+   "6/1@2341",
+   "6/3@2508",
+   "6/4@2557",
+   "6/1@9128",
+   "6/8@9245"
   ],
-  "stop": "",
-  "end": "running or killed",
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
   "shots": [
-   "shot.png.0.png",
-   "shot.png.1.png",
-   "shot.png.13816.png",
-   "shot.png.13934.png",
-   "shot.png.2352.png",
-   "shot.png.2513.png",
-   "shot.png.2591.png",
-   "shot.png.2758.png",
-   "shot.png.2760.png",
-   "shot.png.29.png"
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2102.webp",
+   "shot.png.2263.webp",
+   "shot.png.2341.webp",
+   "shot.png.2508.webp",
+   "shot.png.2557.webp",
+   "shot.png.29.webp",
+   "shot.png.9128.webp",
+   "shot.png.9245.webp",
+   "shot.webp"
   ]
  },
- "drag": {
+ "circuit.0x5678": {
   "reached": {
    "menu": true,
    "start": true,
    "racing": true,
+   "results": true,
    "unload": false,
-   "back_to_menu": false
+   "back_to_menu": false,
+   "second_race": false
   },
   "states": [
    "0/255@0",
    "1/255@1",
    "3/255@29",
-   "4/255@2451",
-   "5/255@2612",
-   "6/1@2690",
-   "6/3@2803",
-   "6/4@2896"
+   "4/255@2102",
+   "5/255@2265",
+   "6/1@2343",
+   "6/3@2510",
+   "6/4@2560",
+   "6/1@10973",
+   "6/8@11090"
   ],
-  "stop": "",
-  "end": "running or killed",
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
   "shots": [
-   "shot.png.0.png",
-   "shot.png.1.png",
-   "shot.png.2451.png",
-   "shot.png.2612.png",
-   "shot.png.2690.png",
-   "shot.png.2803.png",
-   "shot.png.2896.png",
-   "shot.png.29.png"
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.10973.webp",
+   "shot.png.11090.webp",
+   "shot.png.2102.webp",
+   "shot.png.2265.webp",
+   "shot.png.2343.webp",
+   "shot.png.2510.webp",
+   "shot.png.2560.webp",
+   "shot.png.29.webp",
+   "shot.webp"
   ]
  },
- "drift": {
+ "circuit.0x9abc": {
   "reached": {
    "menu": true,
    "start": true,
    "racing": true,
+   "results": true,
    "unload": false,
-   "back_to_menu": false
+   "back_to_menu": false,
+   "second_race": false
   },
   "states": [
    "0/255@0",
    "1/255@1",
    "3/255@29",
-   "4/255@2754",
-   "5/255@2763",
+   "4/255@2102",
+   "5/255@2248",
+   "6/1@2326",
+   "6/3@2493",
+   "6/4@2523",
+   "6/1@10426",
+   "6/8@10529"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.10426.webp",
+   "shot.png.10529.webp",
+   "shot.png.2102.webp",
+   "shot.png.2248.webp",
+   "shot.png.2326.webp",
+   "shot.png.2493.webp",
+   "shot.png.2523.webp",
+   "shot.png.29.webp",
+   "shot.webp"
+  ]
+ },
+ "drag.0x1234": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": false,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2269",
+   "5/255@2430",
+   "6/1@2508",
+   "6/3@2620",
+   "6/4@2622"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2269.webp",
+   "shot.png.2430.webp",
+   "shot.png.2508.webp",
+   "shot.png.2620.webp",
+   "shot.png.2622.webp",
+   "shot.png.29.webp",
+   "shot.webp"
+  ]
+ },
+ "drag.0x5678": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": false,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2239",
+   "5/255@2402",
+   "6/1@2480",
+   "6/3@2592",
+   "6/4@2594"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2239.webp",
+   "shot.png.2402.webp",
+   "shot.png.2480.webp",
+   "shot.png.2592.webp",
+   "shot.png.2594.webp",
+   "shot.png.29.webp",
+   "shot.webp"
+  ]
+ },
+ "drag.0x9abc": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": false,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2253",
+   "5/255@2399",
+   "6/1@2477",
+   "6/3@2589",
+   "6/4@2591"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2253.webp",
+   "shot.png.2399.webp",
+   "shot.png.2477.webp",
+   "shot.png.2589.webp",
+   "shot.png.2591.webp",
+   "shot.png.29.webp",
+   "shot.webp"
+  ]
+ },
+ "drift.0x1234": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": true,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2511",
+   "5/255@2520",
+   "6/1@2586",
+   "6/3@2701",
+   "6/4@2703",
+   "6/1@9322",
+   "6/8@9440"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2511.webp",
+   "shot.png.2520.webp",
+   "shot.png.2586.webp",
+   "shot.png.2701.webp",
+   "shot.png.2703.webp",
+   "shot.png.29.webp",
+   "shot.png.9322.webp",
+   "shot.png.9440.webp",
+   "shot.webp"
+  ]
+ },
+ "drift.0x5678": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": false,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2498",
+   "5/255@2507",
+   "6/1@2573",
+   "6/3@2686",
+   "6/4@2688"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2498.webp",
+   "shot.png.2507.webp",
+   "shot.png.2573.webp",
+   "shot.png.2686.webp",
+   "shot.png.2688.webp",
+   "shot.png.29.webp",
+   "shot.webp"
+  ]
+ },
+ "drift.0x9abc": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": true,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2474",
+   "5/255@2483",
+   "6/1@2549",
+   "6/3@2664",
+   "6/4@2666",
+   "6/1@5819",
+   "6/8@5937"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2474.webp",
+   "shot.png.2483.webp",
+   "shot.png.2549.webp",
+   "shot.png.2664.webp",
+   "shot.png.2666.webp",
+   "shot.png.29.webp",
+   "shot.png.5819.webp",
+   "shot.png.5937.webp",
+   "shot.webp"
+  ]
+ },
+ "explore_qr.0x1234": {
+  "reached": {
+   "menu": true,
+   "start": false,
+   "racing": false,
+   "results": false,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29"
+  ],
+  "stop": "RN_SECS: stopped after 240 s (no stop reached)",
+  "end": "RN_SECS: stopped after 240 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.1080.webp",
+   "shot.png.120.webp",
+   "shot.png.1200.webp",
+   "shot.png.1320.webp",
+   "shot.png.1440.webp",
+   "shot.png.1560.webp",
+   "shot.png.1680.webp",
+   "shot.png.1800.webp",
+   "shot.png.1920.webp",
+   "shot.png.2040.webp",
+   "shot.png.2160.webp",
+   "shot.png.2280.webp",
+   "shot.png.240.webp",
+   "shot.png.2400.webp",
+   "shot.png.2520.webp",
+   "shot.png.2640.webp",
+   "shot.png.2760.webp",
+   "shot.png.2880.webp",
+   "shot.png.29.webp",
+   "shot.png.3000.webp",
+   "shot.png.3120.webp",
+   "shot.png.3240.webp",
+   "shot.png.3360.webp",
+   "shot.png.3480.webp",
+   "shot.png.360.webp",
+   "shot.png.3600.webp",
+   "shot.png.3720.webp",
+   "shot.png.3840.webp",
+   "shot.png.3960.webp",
+   "shot.png.4080.webp",
+   "shot.png.4200.webp",
+   "shot.png.4320.webp",
+   "shot.png.4440.webp",
+   "shot.png.4560.webp",
+   "shot.png.4680.webp",
+   "shot.png.480.webp",
+   "shot.png.4800.webp",
+   "shot.png.4920.webp",
+   "shot.png.5040.webp",
+   "shot.png.5160.webp",
+   "shot.png.5280.webp",
+   "shot.png.5400.webp",
+   "shot.png.5520.webp",
+   "shot.png.5640.webp",
+   "shot.png.5760.webp",
+   "shot.png.5880.webp",
+   "shot.png.600.webp",
+   "shot.png.6000.webp",
+   "shot.png.6120.webp",
+   "shot.png.6240.webp",
+   "shot.png.6360.webp",
+   "shot.png.6480.webp",
+   "shot.png.6600.webp",
+   "shot.png.6720.webp",
+   "shot.png.720.webp",
+   "shot.png.840.webp",
+   "shot.png.960.webp",
+   "shot.webp"
+  ]
+ },
+ "freerun.0x1234": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": false,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2721",
+   "5/255@2760",
+   "6/1@2832",
+   "6/3@2993",
+   "6/4@2995"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2721.webp",
+   "shot.png.2760.webp",
+   "shot.png.2832.webp",
+   "shot.png.29.webp",
+   "shot.png.2993.webp",
+   "shot.png.2995.webp",
+   "shot.webp"
+  ]
+ },
+ "freerun.0x5678": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": false,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2702",
+   "5/255@2741",
+   "6/1@2813",
+   "6/3@2974",
+   "6/4@2976"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2702.webp",
+   "shot.png.2741.webp",
+   "shot.png.2813.webp",
+   "shot.png.29.webp",
+   "shot.png.2974.webp",
+   "shot.png.2976.webp",
+   "shot.webp"
+  ]
+ },
+ "freerun.0x9abc": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": false,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2718",
+   "5/255@2757",
    "6/1@2829",
-   "6/3@2946",
-   "6/4@2994",
-   "6/1@5887",
-   "6/8@6003"
+   "6/3@2990",
+   "6/4@2992"
   ],
-  "stop": "",
-  "end": "running or killed",
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
   "shots": [
-   "shot.png.0.png",
-   "shot.png.1.png",
-   "shot.png.2754.png",
-   "shot.png.2763.png",
-   "shot.png.2829.png",
-   "shot.png.29.png",
-   "shot.png.2946.png",
-   "shot.png.2994.png",
-   "shot.png.5887.png",
-   "shot.png.6003.png"
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2718.webp",
+   "shot.png.2757.webp",
+   "shot.png.2829.webp",
+   "shot.png.29.webp",
+   "shot.png.2990.webp",
+   "shot.png.2992.webp",
+   "shot.webp"
   ]
  },
- "freerun": {
+ "lapko.0x1234": {
   "reached": {
    "menu": true,
    "start": true,
    "racing": true,
+   "results": true,
    "unload": false,
-   "back_to_menu": false
+   "back_to_menu": false,
+   "second_race": false
   },
   "states": [
    "0/255@0",
    "1/255@1",
    "3/255@29",
-   "4/255@3028",
-   "5/255@3067",
-   "6/1@3139",
-   "6/3@3300",
-   "6/4@3316"
+   "4/255@2687",
+   "5/255@2848",
+   "6/1@2926",
+   "6/3@3087",
+   "6/4@3144",
+   "6/1@5718",
+   "6/8@5835"
   ],
-  "stop": "",
-  "end": "running or killed",
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
   "shots": [
-   "shot.png.0.png",
-   "shot.png.1.png",
-   "shot.png.29.png",
-   "shot.png.3028.png",
-   "shot.png.3067.png",
-   "shot.png.3139.png",
-   "shot.png.3300.png",
-   "shot.png.3316.png"
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2687.webp",
+   "shot.png.2848.webp",
+   "shot.png.29.webp",
+   "shot.png.2926.webp",
+   "shot.png.3087.webp",
+   "shot.png.3144.webp",
+   "shot.png.5718.webp",
+   "shot.png.5835.webp",
+   "shot.webp"
   ]
  },
- "lapko": {
+ "lapko.0x5678": {
   "reached": {
    "menu": true,
    "start": true,
    "racing": true,
+   "results": true,
    "unload": false,
-   "back_to_menu": false
+   "back_to_menu": false,
+   "second_race": false
   },
   "states": [
    "0/255@0",
    "1/255@1",
    "3/255@29",
-   "4/255@2963",
-   "5/255@3124",
-   "6/1@3202",
-   "6/3@3363",
-   "6/4@3365",
-   "6/1@13017",
-   "6/8@13135"
+   "4/255@2672",
+   "5/255@2835",
+   "6/1@2913",
+   "6/3@3074",
+   "6/4@3134",
+   "6/1@7651",
+   "6/8@7768"
   ],
-  "stop": "",
-  "end": "running or killed",
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
   "shots": [
-   "shot.png.0.png",
-   "shot.png.1.png",
-   "shot.png.13017.png",
-   "shot.png.13135.png",
-   "shot.png.29.png",
-   "shot.png.2963.png",
-   "shot.png.3124.png",
-   "shot.png.3202.png",
-   "shot.png.3363.png",
-   "shot.png.3365.png"
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2672.webp",
+   "shot.png.2835.webp",
+   "shot.png.29.webp",
+   "shot.png.2913.webp",
+   "shot.png.3074.webp",
+   "shot.png.3134.webp",
+   "shot.png.7651.webp",
+   "shot.png.7768.webp",
+   "shot.webp"
   ]
  },
- "sprint": {
+ "lapko.0x9abc": {
   "reached": {
    "menu": true,
    "start": true,
    "racing": true,
+   "results": true,
    "unload": false,
-   "back_to_menu": false
+   "back_to_menu": false,
+   "second_race": false
   },
   "states": [
    "0/255@0",
    "1/255@1",
    "3/255@29",
-   "4/255@2456",
-   "5/255@2617",
-   "6/1@2695",
-   "6/3@3094",
-   "6/4@3264",
-   "6/1@13105",
-   "6/8@13221"
+   "4/255@2684",
+   "5/255@2830",
+   "6/1@2908",
+   "6/3@3069",
+   "6/4@3126",
+   "6/1@7865",
+   "6/8@7982"
   ],
-  "stop": "",
-  "end": "running or killed",
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
   "shots": [
-   "shot.png.0.png",
-   "shot.png.1.png",
-   "shot.png.13105.png",
-   "shot.png.13221.png",
-   "shot.png.2456.png",
-   "shot.png.2617.png",
-   "shot.png.2695.png",
-   "shot.png.29.png",
-   "shot.png.3094.png",
-   "shot.png.3264.png"
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2684.webp",
+   "shot.png.2830.webp",
+   "shot.png.29.webp",
+   "shot.png.2908.webp",
+   "shot.png.3069.webp",
+   "shot.png.3126.webp",
+   "shot.png.7865.webp",
+   "shot.png.7982.webp",
+   "shot.webp"
+  ]
+ },
+ "sprint.0x1234": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": true,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2293",
+   "5/255@2454",
+   "6/1@2532",
+   "6/3@2931",
+   "6/4@2938",
+   "6/1@9506",
+   "6/8@9621"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2293.webp",
+   "shot.png.2454.webp",
+   "shot.png.2532.webp",
+   "shot.png.29.webp",
+   "shot.png.2931.webp",
+   "shot.png.2938.webp",
+   "shot.png.9506.webp",
+   "shot.png.9621.webp",
+   "shot.webp"
+  ]
+ },
+ "sprint.0x5678": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": true,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2291",
+   "5/255@2454",
+   "6/1@2532",
+   "6/3@2931",
+   "6/4@2935",
+   "6/1@9945",
+   "6/8@10062"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.10062.webp",
+   "shot.png.2291.webp",
+   "shot.png.2454.webp",
+   "shot.png.2532.webp",
+   "shot.png.29.webp",
+   "shot.png.2931.webp",
+   "shot.png.2935.webp",
+   "shot.png.9945.webp",
+   "shot.webp"
+  ]
+ },
+ "sprint.0x9abc": {
+  "reached": {
+   "menu": true,
+   "start": true,
+   "racing": true,
+   "results": true,
+   "unload": false,
+   "back_to_menu": false,
+   "second_race": false
+  },
+  "states": [
+   "0/255@0",
+   "1/255@1",
+   "3/255@29",
+   "4/255@2281",
+   "5/255@2427",
+   "6/1@2505",
+   "6/3@2904",
+   "6/4@2915",
+   "6/1@8832",
+   "6/8@8949"
+  ],
+  "stop": "RN_SECS: stopped after 900 s (no stop reached)",
+  "end": "RN_SECS: stopped after 900 s (no stop reached)",
+  "shots": [
+   "shot.png.0.webp",
+   "shot.png.1.webp",
+   "shot.png.2281.webp",
+   "shot.png.2427.webp",
+   "shot.png.2505.webp",
+   "shot.png.29.webp",
+   "shot.png.2904.webp",
+   "shot.png.2915.webp",
+   "shot.png.8832.webp",
+   "shot.png.8949.webp",
+   "shot.webp"
   ]
  }
 }

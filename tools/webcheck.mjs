@@ -9,10 +9,11 @@ import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-// Title -> profile "asas" -> Quick Race, Olympic Square. PASS: no STOP, the race starts (its HUD at the window size: the
+// Title -> profile "asas" -> Quick Race, Olympic Square. Since the title movie really plays (MMX, 2026-10-25) the menus
+// land later: the last Enters (58-74 s) keep the path going; during the load they do nothing. PASS: no STOP, the race starts (its HUD at the window size: the
 // device is made at the screen size since PATCH 0x408a24, so no Reset comes) and runs `hold` more seconds. M8.5: the page is 1920x1080 device pixels (dpr 1), so the
 // race HUD and every present are 1920x1080.
-const ROUTE = { keys: '20:Enter,23:Enter,26:ArrowRight,29:Enter,32:Enter,35:Enter,38:Enter,44:Enter,50:Enter',
+const ROUTE = { keys: '20:Enter,23:Enter,26:ArrowRight,29:Enter,32:Enter,35:Enter,38:Enter,44:Enter,50:Enter,58:Enter,66:Enter,74:Enter',
   marker: /d3d9 race HUD 1920x1080 /, present: /present 1920x1080/, view: { width: 1920, height: 1080 }, hold: 20, secs: 150,
   shot: 'build/route.png' };
 const route = process.argv[2] === '--route';

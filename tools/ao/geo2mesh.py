@@ -1,40 +1,59 @@
 # geodump frames of one run -> unique world instances in world space (and cars in their own space), for bake.py.
-# The world shaders (vs a96c3fef, 67da8f41, 102e066d, a9fb4c90) take oPos = v0 * c0..c3 (WVP, rows); the most common
-# c0..c3 of a frame is the frame's view-projection (geometry already in world space), every other draw's world matrix is
-# inv(VP) * WVP (affine on every dump checked, 2026-10-25). The car body (vs 4728b668) has WVP in c10..c13; car parts with
+# The world shaders (vs a96c3fef, 67da8f41, 102e066d, a9fb4c90) take clip = c0..c3 * v0 (WVP). In race frames the most
+# common c0..c3 (M0) is the world VP: its draws are track chunks already in world space (median |x| or |y| > 150); FE
+# frames (garage, ~100-unit tiles, |pos| ~ 20) are dropped. Each draw's world matrix inv(VP) * WVP is solved from the
+# clip x, y, w rows only: the z row is almost the w row (z/w ~ 1), so the full 4x4 inverse was ill-conditioned (the old
+# merge drifted up to 22 units). One instance = vb+idx hash + its world matrix (props reuse one vb at many places). The car body (vs 4728b668) has WVP in c10..c13; car parts with
 # the same matrix in a frame are one car, kept in that car's space. usage: geo2mesh.py OUT.npz FRAME.bin...
 import sys, hashlib, collections, numpy as np; sys.path.insert(0, __file__.rsplit('/', 1)[0]); import geodump
 WORLD, CAR = {0xa96c3fef, 0x67da8f41, 0x102e066d, 0xa9fb4c90}, 0x4728b668
 out, files = sys.argv[1], sys.argv[2:]
-inst, cars, drift = {}, {}, []
+inst, cars, drift = {}, {}, []   # inst: (vb+idx hash, world matrix) -> (block key, tex0)
 def tris(d):
     i = np.array(d['idx'], np.uint32)
     if d['type'] == 5:   # strip -> list, dropping degenerates
         t = np.stack([i[:-2], i[1:-1], i[2:]], 1); t[1::2] = t[1::2][:, [1, 0, 2]]
         i = t[(t[:, 0] != t[:, 1]) & (t[:, 1] != t[:, 2]) & (t[:, 0] != t[:, 2])].ravel()
     return i.reshape(-1, 3)
+fe, blocks = 0, {}   # blocks: (vb hash, world matrix) -> (world pos, A, [tris of every draw of that vb])
 for f in files:
     ds = [d for d in geodump.draws(f) if d['rt'][0] == 640 and d['type'] in (4, 5)]
     w = [d for d in ds if d['vs'] in WORLD]
     if w:
-        iVP = np.linalg.inv(np.array(collections.Counter(tuple(d['vsc'][:16]) for d in w).most_common(1)[0][0]).reshape(4, 4))
+        k0 = collections.Counter(tuple(d['vsc'][:16]) for d in w).most_common(1)[0][0]
+        P0 = np.concatenate([np.array(geodump.attr(d, 0)) for d in w if tuple(d['vsc'][:16]) == k0 and d['nvert']])
+        if np.median(np.abs(P0[:, :2]), 0).max() < 150: fe += 1; continue
+        N0 = np.array(k0).reshape(4, 4)[[0, 1, 3]]; iN0 = np.linalg.inv(N0[:, :3])
     for d in ds:
         pos = np.array(geodump.attr(d, 0), np.float64)
         if pos.size == 0: continue
         vh = hashlib.sha1(d['vb'] + np.array(d['idx'], np.uint32).tobytes()).hexdigest()[:16]
+        vbh = hashlib.sha1(d['vb']).hexdigest()[:16]
         if d['vs'] in WORLD:
-            W = iVP @ np.array(d['vsc'][:16]).reshape(4, 4)
-            p = (np.c_[pos, np.ones(len(pos))] @ W.T)[:, :3]
-            key = (vh, tuple(np.round(W[:3, 3], 0)))
-            if key in inst: drift.append(np.abs(inst[key][0] - p).max()); continue
-            inst[key] = (p, tris(d), d['tex0'], vh)
+            N = np.array(d['vsc'][:16]).reshape(4, 4)[[0, 1, 3]]; N[:, 3] -= N0[:, 3]
+            A = iN0 @ N                                   # rows 0..2 of the affine world matrix
+            p = pos @ A[:, :3].T + A[:, 3]
+            ak = (tuple(np.round(A[:, :3], 2).ravel()), tuple(np.round(A[:, 3], 0)))
+            if (vh, ak) in inst: drift.append(np.abs(blocks[inst[vh, ak][0]][0] - p).max()); continue
+            b = blocks.setdefault((vbh, ak), (p, A, []))[2]; b.append(tris(d)); inst[vh, ak] = ((vbh, ak), d['tex0'])
         elif d['vs'] == CAR:
             M = tuple(np.round(d['vsc'][40:56], 4))
             cars.setdefault((f, M), {})[vh] = (pos, tris(d), d['tex0'], vh)
-keys = list(inst)
-np.savez_compressed(out, n=len(keys), vh=[inst[k][3] for k in keys], tex=np.array([inst[k][2] for k in keys], np.uint64),
-                    pos=np.array([inst[k][0].astype(np.float32) for k in keys], dtype=object),
-                    tri=np.array([inst[k][1] for k in keys], dtype=object),
-                    cars=np.array([[(v[3], v[0].astype(np.float32), v[1], v[2]) for v in c.values()] for c in cars.values()], dtype=object))
-print(f'{out}: {len(keys)} world instances, {sum(len(v[1]) for v in inst.values())} tris, {len(cars)} car groups; '
-      f'same instance in two frames: {len(drift)}, max drift {max(drift) if drift else 0:.4f}')
+# Flat npz (Blender's numpy 1 cannot read numpy 2 pickles). World: one vertex block per vb placed by one matrix (draws of
+# one vb with other index ranges share its vertices, so their tris are one mesh, not coplanar copies); w.vh/w.blk/w.tex
+# list the draws. Cars: c<k>.vh, c<k>.<j>.p, c<k>.<j>.t per distinct car (one set of part hashes, in its own space).
+bk = list(blocks); bi = {k: i for i, k in enumerate(bk)}
+boff = np.cumsum([0] + [len(blocks[k][0]) for k in bk])
+d = {'w.pos': np.concatenate([blocks[k][0] for k in bk]).astype(np.float32), 'w.boff': boff,
+     'w.tri': np.unique(np.concatenate([np.concatenate(blocks[k][2]) + boff[i] for i, k in enumerate(bk)]), axis=0).astype(np.uint32),
+     'w.A': np.array([blocks[k][1].ravel() for k in bk], np.float32), 'w.vbh': np.array([k[0] for k in bk]),
+     'w.vh': np.array([k[0] for k in inst]), 'w.blk': np.array([bi[v[0]] for v in inst.values()], np.int32),
+     'w.tex': np.array([v[1] for v in inst.values()], np.uint64)}
+sets = {}
+for c in cars.values(): sets.setdefault(tuple(sorted(c)), c)
+for k, key in enumerate(sorted(sets)):
+    parts = list(sets[key].values()); d[f'c{k}.vh'] = np.array([q[3] for q in parts])
+    for j, q in enumerate(parts): d[f'c{k}.{j}.p'], d[f'c{k}.{j}.t'] = q[0].astype(np.float32), q[1].astype(np.uint32)
+np.savez_compressed(out, **d)
+print(f'{out}: {len(inst)} world draws in {len(bk)} vb blocks, {len(d["w.tri"])} tris, {len(sets)} distinct cars; '
+      f'same draw in two frames: {len(drift)}, max drift {max(drift) if drift else 0:.4f}; FE frames dropped {fe}')
