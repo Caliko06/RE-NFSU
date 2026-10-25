@@ -86,6 +86,7 @@ int main(int argc, char **argv) {
     win32_set_root(argv[2]);
     if (argc > 4 && !strcmp(argv[3], "--shot")) gpu_set_shot(argv[4]);
 #ifndef __EMSCRIPTEN__
+    if (getenv("RN_TURBO") && atoi(getenv("RN_TURBO")) > 1) rn_turbo = (unsigned)atoi(getenv("RN_TURBO"));
     const char *lim = getenv("RN_SECS");
     unsigned secs = lim ? (unsigned)atoi(lim) : 60;
     pthread_t wd;

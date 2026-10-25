@@ -108,24 +108,50 @@ typedef struct {
 #define MAXOBJ GPU_MAXID
 static Obj objs[MAXOBJ];
 static uint64_t tex_key[MAXOBJ];   // textures: the pack key (FNV-1a 64 of level 0) of the last upload, 0 = none
-static int nobjs;
-
+static int nobjs;   // slots ever used; objs[top] is the newest object
+static int top;
+// Slots are reused once the table is full: every track load makes thousands of textures and the old ones die
+// textures; RN_MAXOBJ=20000: each track load also leaves ~3000 dead VBs and IBs). Surfaces, textures and buffers come
+// back (GPU_TARGET, GPU_TEXTURE, GPU_BUFFER replace an id; the smooth cache keys by the buffer's own memory); shaders and
+// declarations keep their ids, which the GPU side caches by. A texture takes a run of 1 + levels slots (level0 follows it, GPU_CUBE ids face0..face0+5).
+static int slot_free(int k);
+static int run_at, run_n, cursor;
+static int find_run(int n) {
+    static int lim;   // RN_MAXOBJ=N: a smaller table, so a short run already reuses slots (a test of this code)
+    if (!lim) lim = getenv("RN_MAXOBJ") && atoi(getenv("RN_MAXOBJ")) > 0 && atoi(getenv("RN_MAXOBJ")) < MAXOBJ ? atoi(getenv("RN_MAXOBJ")) : MAXOBJ;
+    if (nobjs + n <= lim) return nobjs;
+    for (int tried = 0, at = cursor; tried < MAXOBJ; ) {
+        int len = 0;
+        while (len < n && at + len < nobjs && slot_free(at + len)) len++;
+        if (len == n) { cursor = at + n; return at; }
+        tried += len + 1, at += len + 1;
+        if (at + n > nobjs) at = 0;
+    }
+    return -1;
+}
+static void reserve(int n) { run_at = find_run(n); run_n = run_at < 0 ? 0 : n; }
 static uint32_t new_obj(Ctx *c, int iface) {
-    if (nobjs == MAXOBJ) {
+    int k = run_n ? (run_n--, run_at++) : find_run(1);
+    if (k < 0) {
         int live[I_N] = {0}, n = 0;
-        for (int k = 0; k < nobjs; k++) if (objs[k].refs || objs[k].container) { live[objs[k].iface]++; n++; }
+        for (int j = 0; j < nobjs; j++) if (!slot_free(j)) { live[objs[j].iface]++; n++; }
         rn_halt(c, "d3d9: too many objects (%d live: %d surfaces, %d textures, %d VBs, %d IBs)", n,
                 live[I_SURFACE], live[I_TEXTURE], live[I_VB], live[I_IB]);
         return 0;
     }
-    Obj *o = &objs[nobjs];
+    if (k < nobjs && (objs[k].iface == I_TEXTURE || objs[k].iface == I_CUBE))   // its levels outlive it as dead surfaces
+        for (uint32_t l = 0; l < (objs[k].iface == I_CUBE ? 6u : objs[k].levels); l++)
+            if (objs[objs[k].level0 + l].container == (uint32_t)k + 1) objs[objs[k].level0 + l].container = 0, objs[objs[k].level0 + l].refs = 0;
+    if (k >= nobjs) nobjs = k + 1;
+    Obj *o = &objs[k];
     memset(o, 0, sizeof *o);
+    tex_key[k] = 0;
     o->iface = iface;
     o->refs = 1;
-    o->guest = guest_alloc(16);
+    o->guest = guest_alloc(16);   // a new pointer: a stale one stops in obj_of
     st(c, o->guest, vtable(iface), 4);
-    st(c, o->guest + 4, (uint32_t)nobjs + 1, 4);
-    nobjs++;
+    st(c, o->guest + 4, (uint32_t)k + 1, 4);
+    top = k;
     return o->guest;
 }
 static Obj *obj_of(Ctx *c, uint32_t p, int iface) {
@@ -461,11 +487,28 @@ static uint32_t record(Ctx *c, HostFn fn, uint32_t n, int pidx, uint32_t bytes) 
 #define REC(fn, n, pidx, bytes) do { if (dev.recording) return record(c, fn, n, pidx, bytes); } while (0)
 
 static Obj *obj_k(uint32_t k1) { return k1 ? &objs[k1 - 1] : NULL; }
+// Dead and bound nowhere: a released surface, a released texture, or a level of a released texture.
+static int bound(int k) {
+    uint32_t k1 = (uint32_t)k + 1;
+    if (k1 == dev.backbuf || k1 == dev.depth || k1 == dev.ds) return 1;
+    for (int i = 0; i < 4; i++) if (dev.rt[i] == k1) return 1;
+    for (int i = 0; i < 16; i++) if (dev.tex[i] == k1 || dev.stream[i].vb == k1) return 1;
+    return k1 == dev.ib;
+}
+static int slot_free(int k) {
+    const Obj *o = &objs[k];
+    if (bound(k)) return 0;
+    if (o->iface == I_TEXTURE || o->iface == I_CUBE || o->iface == I_VB || o->iface == I_IB) return !o->refs;
+    if (o->iface != I_SURFACE) return 0;
+    if (!o->container) return !o->refs;
+    const Obj *t = &objs[o->container - 1];
+    return (t->iface == I_TEXTURE || t->iface == I_CUBE) && !t->refs && !bound((int)o->container - 1);
+}
 
 static uint32_t new_surface(Ctx *c, uint32_t w, uint32_t h, uint32_t f, uint32_t usage, uint32_t pool, int lockable) {
     uint32_t g = new_obj(c, I_SURFACE);
     if (!g) return 0;
-    Obj *o = &objs[nobjs - 1];
+    Obj *o = &objs[top];
     o->w = w; o->h = h; o->fmt = f; o->usage = usage; o->pool = pool; o->type = 1; o->lockable = lockable;
     o->pitch = pitch_of(f, w);
     o->size = size_of(f, w, h);
@@ -791,7 +834,7 @@ static void rng_log(Ctx *c, uint32_t frame) {
 // at the Present that first sees it: the bounds of the loads (tools/bench.py). Also each new game-flow state [0x77a920]
 // (written at 0x448b11 .. 0x449a15: 1 loading FE, 2 unloading FE, 3 FE, 4/5 loading track, 6 race, 7 unloading track).
 uint32_t rn_flow = ~0u;
-const char *rn_screen = "";
+const char *rn_screen = "", *rn_fe = "";
 static void flow_log(Ctx *c) {
     static int on = -1;
     static uint32_t prev, prev_st;
@@ -807,6 +850,18 @@ static void flow_log(Ctx *c) {
     uint32_t pr = ld(c, 0x735ed0, 4), node = pr ? ld(c, pr + 0xc, 4) : 0, nm = node ? ld(c, node + 8, 4) : 0;
     const char *scr = nm >= 0x697000 && nm < 0x6d4000 ? G(nm) : "";
     if (strcmp(scr, rn_screen)) { rn_log("flow screen %.32s (frame %u)", *scr ? scr : "-", dev.frames); gpu_keep_frame(); }
+    // The front end's active packages: FEngine = [[0x73578c]+8], list head [+0xe4], node next +4, .fng name +0xc
+    // (cFEng::FindPackage 0x4f6600..0x4f661d walks it with 0x4fd1e0).
+    static char fe[256], pfe[256];
+    uint32_t fg = ld(c, 0x73578c, 4), en = fg ? ld(c, fg + 8, 4) : 0, nd = en ? ld(c, en + 0xe4, 4) : 0;
+    size_t fl = 0;
+    fe[0] = 0;
+    for (int i = 0; nd && nd < c->memsz && i < 16; i++, nd = ld(c, nd + 4, 4)) {
+        uint32_t np = ld(c, nd + 0xc, 4);
+        if (np && np < c->memsz && fl < sizeof fe - 40) fl += (size_t)snprintf(fe + fl, sizeof fe - fl, "%s%.32s", fl ? "," : "", G(np));
+    }
+    if (strcmp(fe, pfe)) { rn_log("flow fe %s (frame %u)", fe, dev.frames); memcpy(pfe, fe, sizeof fe); }
+    rn_fe = pfe;
     // Read only. [0x777cc8] = the Quick Race mode the Accept switch takes (0x4b5c00: 0..6 -> 0x4b49e0..0x4b59b0); the
     // mode list 0x4b70c0 adds Circuit 0, Sprint 1, Drag 5, Drift 6, then 2, 3 (asm: ebx before each call 0x4b6fe0),
     // each only if its flag is set. The setup copies the track to [0x78a2f0] and a race kind to [0x78a31c].
@@ -961,17 +1016,18 @@ static uint32_t IDirect3DDevice9_CreateTexture(Ctx *c) {
     if (!levels) levels = full;
     if (levels > full) return D3DERR_INVALIDCALL;
     if ((!pow2(w) || !pow2(h)) && levels != 1 && pool != POOL_SCRATCH) return D3DERR_INVALIDCALL;   // NONPOW2CONDITIONAL
+    reserve(1 + (int)levels);
     uint32_t g = new_obj(c, I_TEXTURE);
     if (!g) return D3DERR_OUTOFVIDEOMEMORY;
-    Obj *t = &objs[nobjs - 1];
+    Obj *t = &objs[top];
     t->w = w; t->h = h; t->fmt = f; t->usage = usage; t->pool = pool; t->type = 3; t->levels = levels;
     uint32_t tk = idx(t) + 1;
-    t->level0 = (uint32_t)nobjs;
+    t->level0 = (uint32_t)top + 1;
     for (uint32_t l = 0; l < levels; l++) {
         uint32_t lw = w >> l ? w >> l : 1, lh = h >> l ? h >> l : 1;
         new_surface(c, lw, lh, f, usage, pool, !(usage & (U_RENDERTARGET | U_DEPTHSTENCIL)));
-        objs[nobjs - 1].container = tk;
-        if (pool == POOL_DEFAULT || pool == POOL_MANAGED) vram_used += objs[nobjs - 1].size;
+        objs[top].container = tk;
+        if (pool == POOL_DEFAULT || pool == POOL_MANAGED) vram_used += objs[top].size;
     }
     if (!(usage & U_RENDERTARGET)) { uint32_t w4[4] = {tk, w, h, levels}; gpu_cmd(GPU_TEXTURE, 4, w4); }
     st(c, out, g, 4);
@@ -1216,15 +1272,16 @@ static uint32_t IDirect3DDevice9_CreateCubeTexture(Ctx *c) {
         rn_halt(c, "d3d9: cube texture that is not a one-level render target (usage %x, %u levels)", usage, levels);
         return D3DERR_INVALIDCALL;
     }
+    reserve(7);
     uint32_t g = new_obj(c, I_CUBE);
     if (!g) return D3DERR_OUTOFVIDEOMEMORY;
-    Obj *t = &objs[nobjs - 1];
+    Obj *t = &objs[top];
     t->w = e; t->h = e; t->fmt = f; t->usage = usage; t->pool = pool; t->type = 5; t->levels = 1;
     uint32_t tk = idx(t) + 1;
-    t->level0 = (uint32_t)nobjs;
+    t->level0 = (uint32_t)top + 1;
     for (int k = 0; k < 6; k++) {
         new_surface(c, e, e, f, usage, pool, 0);
-        objs[nobjs - 1].container = tk;
+        objs[top].container = tk;
     }
     uint32_t w3[3] = {tk, e, objs[t->level0].gpu};
     gpu_cmd(GPU_CUBE, 3, w3);
@@ -1295,7 +1352,7 @@ static uint32_t new_buffer(Ctx *c, int iface, uint32_t len, uint32_t usage, uint
     if (!len || !out || bad_pool(usage, pool) || (usage & (U_RENDERTARGET | U_DEPTHSTENCIL))) return D3DERR_INVALIDCALL;
     uint32_t g = new_obj(c, iface);
     if (!g) return D3DERR_OUTOFVIDEOMEMORY;
-    Obj *o = &objs[nobjs - 1];
+    Obj *o = &objs[top];
     o->size = len; o->usage = usage; o->pool = pool;
     if (iface == I_VB) { o->fvf = f; o->fmt = 100; o->type = 6; } else { o->fmt = f; o->type = 7; }
     if (pool == POOL_DEFAULT) vram_used += len;
@@ -1405,7 +1462,7 @@ static uint32_t IDirect3DDevice9_SetDepthStencilSurface(Ctx *c) {
 // A declaration object from n elements (8 bytes each, then the D3DDECL_END element); returns its index + 1.
 static uint32_t make_decl(Ctx *c, const void *el, uint32_t n) {
     if (!new_obj(c, I_DECL)) return 0;
-    Obj *o = &objs[nobjs - 1];
+    Obj *o = &objs[top];
     o->nblob = 2 * (n + 1);
     o->blob = malloc(4u * o->nblob);
     memcpy(o->blob, el, 8u * (n + 1));
@@ -1481,7 +1538,7 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     char err[128];
     if (sm1_decode(sm, (const uint32_t *)G(p), n, err, sizeof err)) { rn_halt(c, "d3d9: shader: %s", err); return D3DERR_INVALIDCALL; }
     uint32_t g = new_obj(c, iface);
-    Obj *o = &objs[nobjs - 1];
+    Obj *o = &objs[top];
     o->nblob = n;
     o->blob = malloc(4u * n);
     memcpy(o->blob, G(p), 4u * n);
@@ -2125,7 +2182,7 @@ static uint32_t IDirect3DDevice9_EndStateBlock(Ctx *c) {
     if (!dev.recording || !ARG(1)) return D3DERR_INVALIDCALL;
     dev.recording = 0;
     uint32_t g = new_obj(c, I_SB);
-    Obj *o = &objs[nobjs - 1];
+    Obj *o = &objs[top];
     o->rec = malloc(sizeof(Rec) * (dev.nrec ? dev.nrec : 1));
     memcpy(o->rec, dev.rec, sizeof(Rec) * dev.nrec);
     o->nrec = dev.nrec;
@@ -2193,7 +2250,7 @@ static uint32_t IDirect3DDevice9_CreateQuery(Ctx *c) {
     TR("CreateQuery(%u) -> %08x", type, r);
     if (r || !out) return r;
     uint32_t g = new_obj(c, I_QUERY);
-    objs[nobjs - 1].type = type;
+    objs[top].type = type;
     st(c, out, g, 4);
     return D3D_OK;
 }

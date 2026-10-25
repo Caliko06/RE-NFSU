@@ -62,7 +62,7 @@ static int spinners;     // threads that gave the GIL away at a clock read (gil_
 void gil_slice(void) {
     static unsigned calls;
     if (__atomic_load_n(&next_ticket, __ATOMIC_RELAXED) == __atomic_load_n(&serving, __ATOMIC_RELAXED) + 1) return;
-    if (++calls & 15 || now_us() - slice_start < (__atomic_load_n(&spinners, __ATOMIC_RELAXED) ? SPIN_QUANTUM_US : QUANTUM_US)) return;
+    if (++calls & 15 || now_us() - slice_start < (__atomic_load_n(&spinners, __ATOMIC_RELAXED) ? SPIN_QUANTUM_US : QUANTUM_US) * rn_turbo) return;   // a real-time quantum
     gil_release();
     gil_acquire();
 }
@@ -112,7 +112,7 @@ static void wait_change(uint64_t deadline) {
     while (gen == g) {
         uint64_t now = now_us();
         if (deadline && now >= deadline) break;
-        uint64_t step = deadline ? deadline - now : 100000;
+        uint64_t step = (deadline ? deadline - now : 100000) / rn_turbo;   // real time: now_us runs rn_turbo times faster
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
         uint64_t ns = (uint64_t)ts.tv_nsec + step * 1000;
@@ -355,7 +355,7 @@ static uint32_t WaitForMultipleObjects_(Ctx *c) {
 static uint32_t Sleep_(Ctx *c) {
     uint32_t ms = ARG(0);
     gil_release();
-    if (ms) { struct timespec ts = {ms / 1000, (long)(ms % 1000) * 1000000L}; nanosleep(&ts, NULL); }
+    if (ms) { uint64_t ns = (uint64_t)ms * 1000000 / rn_turbo; struct timespec ts = {(time_t)(ns / 1000000000), (long)(ns % 1000000000)}; nanosleep(&ts, NULL); }
     else sched_yield();
     gil_acquire();
     (void)c;

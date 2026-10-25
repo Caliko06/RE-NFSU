@@ -3,7 +3,7 @@
 // RN_KEYS="3000:RETURN,4500:DOWN" taps each key (100 ms down) at that many ms after start. "3000@6/8:DOWN" taps it
 // 3000 ms after the game-flow state 6 / race state 8 (RN_FLOWLOG, host/d3d9.c) is first seen once the taps before it are done;
 // "3000@3:RETURN" waits for flow state 3 with any race state. "1500@=PostRaceMenu:DOWN" waits for that post-race screen
-// (rn_screen); "4000@!PostRaceMenu:RETURN" counts from the tap before and is dropped if that screen shows when it is due.
+// (rn_screen, or a front-end package in rn_fe); "4000@!PostRaceMenu:RETURN" counts from the tap before and is dropped if that screen shows when it is due.
 // input_poll() hands new events to the key state, the DirectInput devices and the window messages.
 #include <strings.h>
 #include "host.h"
@@ -166,7 +166,7 @@ static void read_script(void) {
         uint32_t cond = ~0u, mask = ~0u;
         char op[2] = "", scr[24] = "";
         int used;
-        if (sscanf(s, "%u@%1[=!]%23[A-Za-z_]:%31[A-Z0-9_]%n", &ms, op, scr, name, &used) == 4) ;
+        if (sscanf(s, "%u@%1[=!]%23[A-Za-z0-9_]:%31[A-Z0-9_]%n", &ms, op, scr, name, &used) == 4) ;
         else if (op[0] = 0, sscanf(s, "%u@%u/%u:%31[A-Z0-9_]%n", &ms, &fs, &rs, name, &used) == 4) cond = fs << 8 | (rs & 0xff);
         else if (sscanf(s, "%u@%u:%31[A-Z0-9_]%n", &ms, &fs, name, &used) == 3) cond = fs << 8, mask = ~0xffu;
         else if (sscanf(s, "%u:%31[A-Z0-9_]%n", &ms, name, &used) != 2) { rn_log("RN_KEYS: cannot read \"%s\"", s); break; }
@@ -178,6 +178,13 @@ static void read_script(void) {
         s += used;
         while (*s == ',' || *s == ' ') s++;
     }
+}
+static int screen_on(const char *scr) {   // the post-race screen, or one of the front end's active packages
+    size_t n = strlen(scr);
+    if (!strncasecmp(rn_screen, scr, n) && rn_screen[n] == '.') return 1;
+    for (const char *f = rn_fe; *f; f++)
+        if ((f == rn_fe || f[-1] == ',') && !strncasecmp(f, scr, n) && f[n] == '.') return 1;
+    return 0;
 }
 // Each tap is a down event at its time and an up event 100 ms later, in time order. The up waits two more frames
 // (Presents): a slow frame (a rasterized RN_RASTER frame takes ~1 s) would else see both edges and no key down.
@@ -198,16 +205,14 @@ void input_poll(void) {
             taps[k].at_us += now, taps[k].cond = ~0u;
         }
         if (!(next_tap & 1) && (taps[k].op == '=' || taps[k].op == '!')) {   // a screen tap: "=" anchors when it shows, "!" from the tap before
-            size_t n = strlen(taps[k].scr);
-            int on = !strncasecmp(rn_screen, taps[k].scr, n) && rn_screen[n] == '.';
+            int on = screen_on(taps[k].scr);
             if (taps[k].op == '=' && !on) break;
             taps[k].at_us += now, taps[k].op = taps[k].op == '!' ? '?' : 0;
         }
         if (!(next_tap & 1) && taps[k].op == '?') {   // due: dropped if the screen came up meanwhile
-            size_t n = strlen(taps[k].scr);
             if (taps[k].at_us > now) break;
             taps[k].op = 0;
-            if (!strncasecmp(rn_screen, taps[k].scr, n) && rn_screen[n] == '.') { rn_log("RN_KEYS: tap %u dropped on %s", k, rn_screen); next_tap += 2; continue; }
+            if (screen_on(taps[k].scr)) { rn_log("RN_KEYS: tap %u dropped on %s", k, rn_screen); next_tap += 2; continue; }
         }
         uint64_t at = taps[k].at_us + (next_tap & 1 ? 100000 : 0);
         if (at > now || ((next_tap & 1) && rn_telem.presents - down_at < 2)) break;
@@ -218,6 +223,7 @@ void input_poll(void) {
         wait_from = 0;
         if (!(next_tap & 1)) down_at = rn_telem.presents;
         key_event(taps[k].dik, !(next_tap & 1));
+        if (!(next_tap & 1)) rn_log("RN_KEYS: tap %u dik 0x%02x at frame %u flow %u/%u on %s", k, taps[k].dik, rn_telem.presents, rn_flow >> 8, rn_flow & 0xff, rn_screen);
         next_tap++;
     }
 }

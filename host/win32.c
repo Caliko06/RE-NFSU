@@ -30,11 +30,15 @@ EMSCRIPTEN_KEEPALIVE uint32_t rn_telem_addr(void) { return (uint32_t)(uintptr_t)
 #endif
 
 static struct timespec t0;
+// RN_TURBO=k (native test runs only): every clock the game sees runs k times faster (QPC, ticks, Sleep, timers, the
+// audio clock, RN_KEYS times), so a race that paces itself on QPC (0x585b40 spins to the frame period) ends sooner.
+// RN_SECS stays real seconds. Default 1: play is untouched.
+unsigned rn_turbo = 1;
 uint64_t now_us(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     int64_t ns = (int64_t)(ts.tv_sec - t0.tv_sec) * 1000000000 + (ts.tv_nsec - t0.tv_nsec);   // signed: nsec may be below t0's
-    return (uint64_t)ns / 1000;
+    return (uint64_t)ns / 1000 * rn_turbo;
 }
 
 // ---- guest heap: boundary tags, size-class free lists, coalescing ----------------------------
