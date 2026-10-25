@@ -4,14 +4,15 @@ OUT = '/Users/angeldamian/RE-NFSU/build/hopper/options.txt'
 Q = 'Options and saves: who reads and writes <profile>.cfg (0x41c680, ROADREFLECTION), .opt and .ugd (profile block 0x7588c4 size 0xf660 via 0x4ab120)? Which garage screens and calls fit a part on the car?'
 MAXP = 160
 ADDRS = [0x41c680, 0x4ab120, 0x507e10, 0x509d70, 0x50aa90, 0x5a3570, 0x5a1520]
-DATA = [0x7588c4, 0x700e70]
+DATA = [0x7588c4, 0x700e70, 0x777cc8, 0x75899e, 0x7589be, 0x758aa6, 0x758ad2, 0x735dc8, 0x733ff8, 0x78a2f0, 0x78a31c, 0x6faefc]
 
 import time
 t0 = time.time(); doc = Document.getCurrentDocument(); doc.waitForBackgroundProcessToEnd()
 f = open(OUT, 'w'); f.write('# %s\nanalysis %.0f s\n' % (Q, time.time() - t0))
 seg = doc.getSegmentAtAddress(0x401000); done = set()
 def refs(a):
-    for get in (lambda: doc.getReferencesOfAddress(a), lambda: seg.getReferencesOfAddress(a)):
+    # xrefs live in the segment that holds the address (.data for globals), not in .text
+    for get in (lambda: doc.getSegmentAtAddress(a).getReferencesOfAddress(a), lambda: doc.getReferencesOfAddress(a)):
         try:
             r = get()
             if r is not None: return list(r)

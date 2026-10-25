@@ -11,7 +11,8 @@ t0 = time.time(); doc = Document.getCurrentDocument(); doc.waitForBackgroundProc
 f = open(OUT, 'w'); f.write('# %s\nanalysis %.0f s\n' % (Q, time.time() - t0))
 seg = doc.getSegmentAtAddress(0x401000); done = set()
 def refs(a):
-    for get in (lambda: doc.getReferencesOfAddress(a), lambda: seg.getReferencesOfAddress(a)):
+    # xrefs live in the segment that holds the address (.data for globals), not in .text
+    for get in (lambda: doc.getSegmentAtAddress(a).getReferencesOfAddress(a), lambda: doc.getReferencesOfAddress(a)):
         try:
             r = get()
             if r is not None: return list(r)
