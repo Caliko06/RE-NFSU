@@ -10,6 +10,19 @@ One session on main. Each milestone has one gate: the run that proves it.
   Input (dinput8) and dsound -> Web Audio exist. ABK code modules lifted ahead of time (tools/recomp/abk.py).
 - Title -> USER PROFILE over the 3D garage. Save folder (CSIDL_COMMON_APPDATA\NFS Underground = save/) with writes.
 
+## Roadmap contract (OWNER 2026-10-25): 25/167 -> 167/167, 60 fps, RTX effects
+Blocks in order. Each one closes with progress before -> after, `webcheck --route` PASS, one commit, HANDOFF.md.
+1. Quick Race (46 rows): drag, drift, sprint, circuit 1001, drift 1304 (TOO SLOW lap 2: read build/hopper/autopilot.txt,
+   fix the autopilot cause). RN_JUMP sweep per track + one RN_KEYS route per mode.
+2. Underground career (116 rows): career.1+ = ChooseCareerCar -> MapScreen -> EventBriefing -> race -> results.
+   `career1` like `career0`; RN_JUMP to the game's own event start (RE); the OWNER's save (asas) as a mid-career start.
+3. Whole game (5 game rows + scope): garage and customization with everything unlocked (PATCH with RE citation),
+   options persist, save -> reload page -> continue, sound, music, movies. Gate: one Chrome run that saves, reloads, continues.
+4. 60 fps, 0 hitches > 33 ms: gate60/bench in Chrome; measure first, fix in the recompiler or the layer.
+5. RTX as layer bridges, each with a switch: textures 4x + normal/AO, shadows + SSAO, HDR bloom/tonemap, body reflections,
+   AA, speed motion blur + light trails (RE PC/PS2 first, never overdone, road never wet). A/B shot per effect; gate60 with all on.
+Rules: RE before every fix (address + Hopper/Ghidra line). Short targeted runs. Two attempts without progress -> stop in HANDOFF, move on.
+
 ## M5 Menus
 - Create a profile (type a name, the file lands in save/), reach the main menu, move through the menus, hear music.
 - Gate: one Chrome capture of the main menu after the profile; the profile file is in save/.
