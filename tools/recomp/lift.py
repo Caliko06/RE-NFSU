@@ -6,6 +6,8 @@ written back to the Ctx at calls and exits. Direct calls are C calls; indirect c
 through rn_call (address -> function). An instruction the lifter does not know becomes a TRAP that
 stops the game with its address and name when it runs. Nothing is guessed.
 """
+import os
+import re
 import struct
 import pefile
 import patches
@@ -788,6 +790,171 @@ class Lifter:
             return
         raise Unsupported(i.mnemonic)
 
+    # --- x87 runs: the register stack in C locals ---------------------------
+    # Inside a run of x87 instructions with no jump, call or jump target between them, the stack depth relative to
+    # the run's start is known at every instruction, so st(i) is a C local (fq<rel+8>, rel = slot relative to the
+    # start TOP ft0) that clang keeps in a register. c->st/ftop/ftag are written back (flush) before anything that
+    # can see them: a jump target, a branch, a call, a non-run x87 or MMX instruction, a memory fault or trap.
+    # Same results as the per-instruction helpers: a push onto a tagged slot still loads the indefinite and sets
+    # IE/SF/C1, empty slots still hold the indefinite (rt.h fpush/fpop).
+    X87_REWRITE = re.compile(r"\*fr\(c,(\d)\)\s*=(?!=)|\*fr\(c,(\d)\)|fset\(c,(\d),|fpush\(c,|fpop\(c\);|ffree\(c,(\d)\);|fstsw\(c\)")
+
+    def fs_start(self):
+        self.fs = {"d": 0, "slot": {}, "lo": 0, "hi": 0}
+        self.uses_fs = True
+        return "ft0=c->ftop;"
+
+    def fs_flush(self):
+        """C that writes the run back to the Ctx (the run stays usable: the state it describes is now in memory)."""
+        fs = self.fs
+        if not fs:
+            return ""
+        out, setm, clrm = [], 0, 0
+        for r, sl in sorted(fs["slot"].items()):
+            if sl["dirty"]:
+                out.append(f"c->st[(ft0+({r}))&7]=fq{r + 8};")
+            if sl["tag"] == "set":
+                setm |= 1 << (r & 7)
+            elif sl["tag"] == "clear":
+                clrm |= 1 << (r & 7)
+        if setm or clrm:
+            out.append(f"c->ftag=(c->ftag|frot(0x{setm:x}u,ft0))&~frot(0x{clrm:x}u,ft0);")
+        if fs["d"]:
+            out.append(f"c->ftop=(ft0-({fs['d']}))&7;")
+        return " ".join(out)
+
+    def fs_end(self):
+        t = self.fs_flush()
+        self.fs = None
+        return t
+
+    def fs_slot(self, rel, loads, write=False):
+        """The local of slot rel; a slot the run has not touched is loaded from c->st first."""
+        fs = self.fs
+        fs["lo"], fs["hi"] = min(fs["lo"], rel), max(fs["hi"], rel)
+        if fs["hi"] - fs["lo"] > 7:     # rel and rel+8 are one register: leave this to a new run
+            raise Unsupported("x87 run window")
+        sl = fs["slot"].get(rel)
+        if sl is None:
+            sl = fs["slot"][rel] = {"dirty": False, "tag": "orig"}
+            loads.append(f"fq{rel + 8}=c->st[(ft0+({rel}))&7];")
+        if write:
+            sl["dirty"] = True
+        return f"fq{rel + 8}"
+
+    def fs_xform(self, text, loads):
+        """Rewrite one x87 template (x87()) from c->st helpers to the run's locals, left to right."""
+        out, pos = [], 0
+        while True:
+            m = self.X87_REWRITE.search(text, pos)
+            if not m:
+                out.append(text[pos:])
+                return "".join(out)
+            out.append(text[pos:m.start()])
+            pos = m.end()
+            g, d = m.group(0), self.fs["d"]
+            if m.group(1) is not None:          # *fr(c,k)= : a plain store to st(k)
+                out.append(self.fs_slot(int(m.group(1)) - d, loads, True) + "=")
+            elif m.group(2) is not None:        # *fr(c,k) : a read of st(k)
+                out.append(self.fs_slot(int(m.group(2)) - d, loads))
+            elif m.group(3) is not None:        # fset(c,k,E) : st(k) = fround(E); the ")" of fset closes fround
+                out.append(self.fs_slot(int(m.group(3)) - d, loads, True) + "=fround(c,")
+            elif g.startswith("fpush"):
+                depth, k = 1, pos
+                while depth:
+                    depth += {"(": 1, ")": -1}.get(text[k], 0)
+                    k += 1
+                expr = self.fs_xform(text[pos:k - 1], loads)
+                pos = k + (text[k:k + 1] == ";")
+                rel = -(d + 1)
+                if rel < self.fs["lo"] and rel + 8 <= self.fs["hi"]:
+                    raise Unsupported("x87 run window")
+                had = self.fs["slot"].get(rel)
+                tag = had["tag"] if had else "orig"
+                if had is None:
+                    self.fs["slot"][rel] = {"dirty": True, "tag": "set"}
+                    self.fs["lo"] = min(self.fs["lo"], rel)
+                v = f"fq{rel + 8}"
+                if tag == "clear":
+                    out.append(f"{v}=({expr});")
+                elif tag == "set":
+                    out.append(f"{{ (void)({expr}); c->fsw|=FIE|FSF|0x200u; {v}=findef(); }}")
+                else:
+                    out.append(f"if (c->ftag&frot(1u<<({rel}&7),ft0)) {{ c->fsw|=FIE|FSF|0x200u; {v}=findef(); }} else {v}=({expr});")
+                self.fs["slot"][rel].update(dirty=True, tag="set")
+                self.fs["d"] = d + 1
+            elif g.startswith("fpop"):
+                v = self.fs_slot(-d, loads, True)
+                self.fs["slot"][-d]["tag"] = "clear"
+                out.append(f"{v}=findef();")
+                self.fs["d"] = d - 1
+            elif g.startswith("ffree"):
+                rel = int(m.group(4)) - d
+                v = self.fs_slot(rel, loads, True)
+                self.fs["slot"][rel]["tag"] = "clear"
+                out.append(f"{v}=findef();")
+            else:                               # fstsw(c): TOP is known here
+                out.append(f"fstsw_t(c,(ft0-({d}))&7)")
+
+    def fs_static(self, i):
+        """The template of an x87 instruction a run can take, or None (it needs the Ctx: a barrier)."""
+        save, self.out = self.out, []
+        try:
+            self.x87(i)
+            t = " ".join(self.out)
+        except (Unsupported, KeyError, IndexError):
+            return None
+        finally:
+            self.out = save
+        if any(x in t for x in ("fxam(", "fprem(", "c->ftop", "finit(", "c->ftag", "fr(c,(")):
+            return None
+        if ("if (" in t or "else" in t) and ("fpush" in t or "fpop" in t):
+            return None     # a push or pop on one branch only: the depth after it is not static
+        return t
+
+    def x87_run(self, tpl):
+        """Emit one x87 instruction inside a run (a new run when none is open or its 8-slot window is full)."""
+        import copy
+        for attempt in (0, 1):
+            pre = []
+            if self.fs is None:
+                pre.append(self.fs_start())
+            keep, loads = copy.deepcopy(self.fs), []
+            self.fs_pre = self.fs_flush()     # the state a fault in this instruction leaves (before its effect)
+            try:
+                body = self.fs_xform(tpl, loads)
+            except Unsupported:
+                self.fs = keep
+                if attempt:
+                    raise
+                self.out.append(self.fs_end())
+                continue
+            self.out.append(" ".join(pre + loads + [body]))
+            return
+
+    def fs_barrier(self, i):
+        pre, m = self.mnem(i)
+        if i.group(CS_GRP_JUMP) or i.group(CS_GRP_CALL) or i.group(CS_GRP_RET):
+            return True
+        if m in ("hlt", "int3", "ud2", "iretd", "retf", "int", "int1", "into", "loop", "loope", "loopne", "jecxz", "jcxz"):
+            return True
+        if m == "emms" or m == "femms" or any(x.type == x86.X86_OP_REG and i.reg_name(x.reg).startswith("mm") for x in i.operands):
+            return True
+        return False
+
+    TRAP_RE = re.compile(r'CHK\(([^,()]+),(\d+),(0x[0-9a-f]+)\);?|TRAP\((0x[0-9a-f]+),("(?:[^"\\]|\\.)*")\);?')
+
+    def fs_traps(self, lines, flush):
+        """In a run, a memory fault or trap leaves through the flush, so the Ctx shows the x87 state at the fault."""
+        if not flush:
+            return lines
+        def sub(m):
+            if m.group(1) is not None:
+                return (f"if ((uint32_t)(({m.group(1)})-LOW)>c->memsz-LOW-({m.group(2)})) {{ {flush} c->halt_at=({m.group(3)}); "
+                        f"c->why=\"memory fault\"; goto trap; }}")
+            return f"{{ {flush} c->halt_at=({m.group(4)}); c->why=({m.group(5)}); goto trap; }}"
+        return [self.TRAP_RE.sub(sub, l) for l in lines]
+
     # --- whole function ---------------------------------------------------
     def lift(self, entry, lifted=None):
         """C source for one function. `lifted` = set of entries that exist as C functions."""
@@ -804,36 +971,58 @@ class Lifter:
         self.out = []
         order = sorted(self.labels)
         next_label = dict(zip(order, order[1:]))
+        # RN_X87RUN=1: x87 runs (stack slots in locals). Opt-in: difftest-clean, but at load 11 they cut f_5d6f5d 4.7 -> 3.1 %
+        # of the game thread, fx2 and the culling functions not at all, for +3.3 MB of wasm (build/bench/b4_x87.prof.txt).
+        runs = not self.trace and os.environ.get("RN_X87RUN") == "1"
+        self.fs, self.uses_fs = None, False
+        entered = targets | self.all_cases       # labels a jump can reach: the run state must be in the Ctx there
         for a in order:
             i = body.get(a)
+            if self.fs and a in entered:
+                self.out.append(self.fs_end())
             self.out.append(f"L{a:x}:;")
             if self.trace:      # difftest RN_ONLY: report the state before every instruction
                 self.out.append(f"{{ {self.save()} rn_trace_step(c,0x{a:x}u); }}")
             if i is None:
-                self.out.append(f"TRAP(0x{a:x},\"cannot decode\");")
+                self.out.append(self.fs_end() + f"TRAP(0x{a:x},\"cannot decode\");")
                 self.info["traps"].append("decode")
                 continue
+            self.i = i
+            tpl = self.fs_static(i) if runs and 0xd8 <= i.opcode[0] <= 0xdf else None
+            if self.fs and (self.fs_barrier(i) or (0xd8 <= i.opcode[0] <= 0xdf and tpl is None)):
+                self.out.append(self.fs_end())
+            flush = self.fs_flush()
             mark = len(self.out)
             try:
-                self.emit(i)
+                if tpl is not None:
+                    self.x87_run(tpl)
+                    flush = self.fs_pre
+                else:
+                    self.emit(i)
             except (Unsupported, KeyError, IndexError) as x:
                 del self.out[mark:]
                 name = (i.mnemonic + " " + i.op_str).strip().replace('"', "'")
                 self.out.append(f"TRAP(0x{a:x},\"not lifted: {name}\");")
                 self.info["traps"].append(str(x) if isinstance(x, Unsupported) else i.mnemonic)
+            if self.fs:
+                self.out[mark:] = self.fs_traps(self.out[mark:], flush)
             if i.group(CS_GRP_CALL):
                 self.info["calls"] += 1
             nxt = a + i.size
             pre, m = self.mnem(i)
             ends = i.group(CS_GRP_RET) or m in ("jmp", "hlt", "int3", "ud2", "iretd", "retf", "int", "int1", "into")
             if not ends and nxt not in self.labels:
-                self.out.append(f"TRAP(0x{nxt:x},\"ran off the decoded body\");")
+                self.out.append(self.fs_end() + f"TRAP(0x{nxt:x},\"ran off the decoded body\");")
             elif not ends and next_label.get(a) != nxt:
-                self.out.append(f"goto L{nxt:x};")     # an overlapping decode stream starts in between
+                self.out.append(self.fs_end() + f"goto L{nxt:x};")     # an overlapping decode stream starts in between
+        if self.fs:
+            self.out.append(self.fs_end())
         regs = " ".join(f"uint32_t {r}=c->r[{k}];" for k, r in enumerate(REG32))
         flags = " ".join(f"int {f}=c->{f};" for f in FLAGS)
         # restrict: guest memory (c->mem) never overlaps the Ctx, so a guest store does not make the compiler reload
         # c->mem, c->memsz, c->ftop and c->st[] (with -fno-strict-aliasing any byte store could alias them).
+        if self.uses_fs:
+            flags += " uint32_t ft0=0; double " + ",".join(f"fq{k}=0" for k in range(16)) + ";"
         return (f"void f_{entry:x}(Ctx *restrict c) {{\n{regs} {flags}\n"
                 "uint32_t ea=0,t1=0,t2=0,res=0,n=0,k=0; uint64_t u=0; int64_t w=0;\n"
                 "(void)ea;(void)t1;(void)t2;(void)res;(void)n;(void)k;(void)u;(void)w;\n"

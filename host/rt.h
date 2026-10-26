@@ -150,6 +150,10 @@ static inline void fcom(Ctx *c, double a, double b) {
     else if (a == b) c->fsw |= FC3;
 }
 static inline uint16_t fstsw(Ctx *c) { return (uint16_t)((c->fsw & ~0x3800u) | (c->ftop << 11)); }
+// x87 runs (tools/recomp/lift.py): fstsw with TOP known by the lifter, and a slot mask (bit = slot relative to the
+// run's start TOP) turned into physical tag bits.
+static inline uint16_t fstsw_t(Ctx *c, uint32_t top) { return (uint16_t)((c->fsw & ~0x3800u) | (top << 11)); }
+static inline uint32_t frot(uint32_t m, uint32_t k) { k &= 7; return ((m << k) | (m >> ((8 - k) & 7))) & 0xffu; }
 static inline double frnd(Ctx *c, double v) {
     switch ((c->fcw >> 10) & 3) {
     case 0: return nearbyint(v);

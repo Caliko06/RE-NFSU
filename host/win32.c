@@ -34,12 +34,19 @@ static struct timespec t0;
 // audio clock, RN_KEYS times), so a race that paces itself on QPC (0x585b40 spins to the frame period) ends sooner.
 // RN_SECS stays real seconds. Default 1: play is untouched.
 unsigned rn_turbo = 1;
+#ifdef __EMSCRIPTEN__
+// The same clock clock_gettime(CLOCK_MONOTONIC) reads on the web (emscripten_get_now, timeOrigin-based in every worker),
+// without musl and the wasi i64 round trip: clock reads were ~10% of the game thread in a race (build/bench/b4_s10.prof.txt).
+static double t0_ms;
+uint64_t now_us(void) { return (uint64_t)((emscripten_get_now() - t0_ms) * 1000.0) * rn_turbo; }
+#else
 uint64_t now_us(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     int64_t ns = (int64_t)(ts.tv_sec - t0.tv_sec) * 1000000000 + (ts.tv_nsec - t0.tv_nsec);   // signed: nsec may be below t0's
     return (uint64_t)ns / 1000 * rn_turbo;
 }
+#endif
 
 // ---- guest heap: boundary tags, size-class free lists, coalescing ----------------------------
 // Block: [size|used] header (8 bytes: size, prev size), payload 16-aligned. Sizes in bytes.
@@ -1034,6 +1041,9 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 20, getenv("RN_AUTOPILOT") != NULL, 4);   // PATCH 0x42d4b0: test-only, the AI drives the player
     st(c, SCREEN_ADDR + 24, getenv("RN_AUTOPILOT") ? 4 : 3, 4);  // PATCH 0x42d4a9: drag player mode, 4 = autopilot, 3 = drag (original)
     clock_gettime(CLOCK_MONOTONIC, &t0);
+#ifdef __EMSCRIPTEN__
+    t0_ms = emscripten_get_now();
+#endif
     brk_ptr = HEAP_LO;
     vtop = c->memsz;
     (void)image_size;

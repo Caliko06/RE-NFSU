@@ -36,7 +36,8 @@ function startTelemetry(M, t0, log, logLines) {
     const h = host(), u = U();
     const d = k => h[k] - prev[k];
     const under = u[audio + 4], resync = u[audio + 5];
-    rows.push([Math.round(t - t0), r1(runMs), s.present ? 1 : 0, s.draws, s.clears, s.words >> 10, s.texKb, s.pipes,
+    // t at 0.01 ms: whole ms made a 60 fps limiter (0x585b40, 1/60 s) read as intervals 16, 17, 17 and a p50 of 17.
+    rows.push([Math.round((t - t0) * 100) / 100, r1(runMs), s.present ? 1 : 0, s.draws, s.clears, s.words >> 10, s.texKb, s.pipes,
       s.shaders, s.targets, s.hd, r1(d(0)), r1(d(1)), r1(d(2)), r1(d(3)), r1(d(4)), r1(h[5]), r1(h[6]), d(8), d(9), d(7),
       h[10], h[11] - prev[11], h[11] !== prev[11] ? u[W + 5] : -1, (u[audio] - u[audio + 1]) | 0, under - prevUnder,
       resync - prevResync, d(12), d(13), r1(((h[14] - prev[14]) >>> 0) / 1000)]);

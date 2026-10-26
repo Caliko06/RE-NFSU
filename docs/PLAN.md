@@ -21,6 +21,8 @@ Blocks in order. Each one closes with progress before -> after, `webcheck --rout
    Rows DONE 2026-10-25 (5/5, native). Chrome gate DONE 2026-10-25: tools/savegate.py PASS (event 3 saves, a new page
    loads that career status, event 4 runs and saves, a third page loads it).
 4. 60 fps, 0 hitches > 33 ms: gate60/bench in Chrome; measure first, fix in the recompiler or the layer.
+   2026-10-25: the game caps itself at 60 (0x585b40); the misses are CPU-bound frames of ~4450 draws. Telemetry at
+   0.01 ms, direct web clock. x87 runs are opt-in (RN_X87RUN=1, small gain). Next: inline fx2, then D3DX per-draw Pass.
 5. RTX as layer bridges, each with a switch: textures 4x + normal/AO, shadows + SSAO, HDR bloom/tonemap, body reflections,
    AA, speed motion blur + light trails (RE PC/PS2 first, never overdone, road never wet). A/B shot per effect; gate60 with all on.
 Rules: RE before every fix (address + Hopper/Ghidra line). Short targeted runs. Two attempts without progress -> stop in HANDOFF, move on.

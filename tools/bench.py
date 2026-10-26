@@ -24,6 +24,7 @@ def run(mode, loc, secs, name):
         subprocess.run(['node', 'tools/webcheck.mjs', url, str(20 + GAP * len(ks) + secs), f'{OUT}/{name}.png', ours],
                        env=env, stdout=f, stderr=subprocess.STDOUT)
     shutil.copy('build/webcheck.log', f'{OUT}/{name}.log')
+    open(f'{OUT}/{name}.load', 'w').write(f'{os.getloadavg()[1]:.1f}\n')   # 5-minute load at the end of the run
     shutil.copy('build/webcheck.telemetry.ndjson', f'{OUT}/{name}.ndjson')
 
 def report(name):
@@ -58,7 +59,9 @@ def report(name):
             ms = sorted(d * 1000 for d in dts)
             n = len(ms)
             print(f'RACE frames {n}: p50 {ms[n // 2]:.1f}  p99 {ms[int(n * .99)]:.1f}  max {ms[-1]:.0f} ms   '
-                  f'>33 ms: {sum(m > 33.4 for m in ms)}   >20 ms: {100 * sum(m > 20 for m in ms) / n:.2f} %')
+                  f'>33 ms: {sum(m > 33.4 for m in ms)}   >20 ms: {100 * sum(m > 20 for m in ms) / n:.2f} %   {1000 * n / sum(ms):.1f} fps')
+            # gate60 (AGENTS.md): p50 <= 16.7 ms and no frame over 33 ms. Only on a quiet Mac (load < 6).
+            print(f'GATE60 {"PASS" if ms[n // 2] <= 16.7 and ms[-1] <= 33.4 else "FAIL"}   load {open(f"{OUT}/{name}.load").read().strip() if os.path.exists(f"{OUT}/{name}.load") else "?"} (valid < 6)')
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
