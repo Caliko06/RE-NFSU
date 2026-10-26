@@ -89,9 +89,13 @@ PATCHES.append(dict(addr=0x702a84, old="80000000", new="00020000", when=lambda: 
 # PS2 look; wider windows stop at the 16:9 horizontal view (96 deg) and crop top and bottom, since the edge stretch of a flat
 # projection past that made traffic look squashed wide. Focal (view+0xc) = (H'/2) k / tan(F/2), the same scale. Cave 0x408799 =
 # A (P[0]) + fallback + focal; cave 0x5f4a04 (CC padding) = B (P[5]) + fallback. W is [0x701034], H is [0x701038].
+# The 16:9 cap is for races only ([0x77a920] == 6): the front end keeps H' = H, so its 3D (the car on a magazine cover,
+# full-screen viewport) keeps the scale of the 2D layout, which stays 4:3 and centred (PATCH 0x40bf09); with the cap the
+# cover car was 1440/1116 = 1.29x too big at 2560x1116 and ran past the cover (runs/magn_wide, 2026-10-26). The focal
+# keeps the cap (no room). The fallback (types 8, 9) puts back eax = ebp, the angle 0x40dec3 passes to sin 0x564b10.
 PATCHES.append(dict(addr=0x707fc0, old="00000000", new="2549923f", when=lambda: True))
 PATCHES.append(dict(addr=0x408799, old="909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090909090",
-                    new="8b4c241c83790408743483790409742e8b4958d83dbcc76c00d80dc07f70008b41148d04c0c1e8043b41187f038b411850db042458da7114dec9d91feb08d83dbcc76c00d91fe9df560000a1341070008d04c0c1e8058b0d38107000d1f939c87f0289c8890424da3c24d80dc07f700059c3", when=lambda: True))
+                    new="d83dbcc76c008b4c241c8a410424fe3c08742e8b4958d80dc07f7000803d20a97700068b4118750f6b411409c1e8043b41187f038b411850db042458da7114dec9d91f89e8e9e056000090a1341070008d04c0c1e8058b0d38107000d1f939c87f0289c8890424da3c24d80dc07f700059c3", when=lambda: True))
 PATCHES.append(dict(addr=0x5f4a04, old="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
                     new="8b44241c83780408741c8378040974168b4058ddd8d907db4014dec9da7018d9e0d95e54eb0bd83dbcc76c00d9e0d95e54e9bd94e1ff", when=lambda: True))
 PATCHES.append(dict(addr=0x40debb, old="d83dbcc76c00d91f",
