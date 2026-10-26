@@ -62,6 +62,20 @@ def report(name):
                   f'>33 ms: {sum(m > 33.4 for m in ms)}   >20 ms: {100 * sum(m > 20 for m in ms) / n:.2f} %   {1000 * n / sum(ms):.1f} fps')
             # gate60 (AGENTS.md): p50 <= 16.7 ms and no frame over 33 ms. Only on a quiet Mac (load < 6).
             print(f'GATE60 {"PASS" if ms[n // 2] <= 16.7 and ms[-1] <= 33.4 else "FAIL"}   load {open(f"{OUT}/{name}.load").read().strip() if os.path.exists(f"{OUT}/{name}.load") else "?"} (valid < 6)')
+        # Each slow frame: who had the GIL (host/threads.c). heldMain ~ the frame = the main thread's own work;
+        # gilMain ~ the frame = it waited for another thread (who = the start address of the longest other hold).
+        if hud and 'heldMain' in cols:
+            C = lambda r, k: r[cols[k]]
+            ip = [i for i, r in enumerate(rows) if C(r, 'present')]
+            print('SLOW frames (> 33 ms): t s, dt, heldMain, gilMain, idleMain, read, heldOther, longest other hold @ who, clock calls')
+            for a, b in zip(ip, ip[1:]):
+                dt = C(rows[b], 't') - C(rows[a], 't')
+                if dt <= 33.4 or C(rows[a], 't') / 1000 < hud + 3: continue
+                seg = rows[a + 1:b + 1]
+                s = lambda k: sum(C(r, k) for r in seg)
+                top = max(seg, key=lambda r: C(r, 'holdOther'))
+                print(f'  {C(rows[b], "t") / 1000:7.2f} {dt:5.0f} {s("heldMain"):6.1f} {s("gilMain"):6.1f} {s("idleMain"):5.1f} '
+                      f'{s("read"):5.1f} {s("heldOther"):6.1f} {C(top, "holdOther"):5.1f} @ {C(top, "holdWho"):08x} {s("clockCalls"):6}')
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)

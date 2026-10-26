@@ -41,6 +41,7 @@ volatile int rn_preempt;
 static uint64_t slice_start, hold_start;
 static uint64_t free_since;     // the GIL was passed on (under gm) to a thread that waits for it; 0 = it was taken
 static __thread int is_main;
+static __thread uint32_t self_start;    // the guest thread's start address (telemetry hold_other_who)
 // Under gm: the next ticket's turn. Only its thread wakes (a broadcast woke every waiter to re-check its ticket).
 // Telemetry times the gap until that thread holds the GIL.
 static void pass_turn(void) {
@@ -108,8 +109,15 @@ void gil_preempt(void) {
     gil_acquire();
 }
 static void count_hold(void) {
-    double held = (double)(now_us() - hold_start) / 1000, *m = is_main ? &rn_telem.hold_main_max_ms : &rn_telem.hold_other_max_ms;
-    if (held > *m) *m = held;
+    uint64_t us = now_us() - hold_start;
+    double held = (double)us / 1000;
+    if (is_main) {
+        rn_telem.hold_main_us += (uint32_t)us;
+        if (held > rn_telem.hold_main_max_ms) rn_telem.hold_main_max_ms = held;
+    } else {
+        rn_telem.hold_other_us += (uint32_t)us;
+        if (held > rn_telem.hold_other_max_ms) { rn_telem.hold_other_max_ms = held; rn_telem.hold_other_who = self_start; }
+    }
 }
 void gil_release(void) {
     count_hold();
@@ -169,6 +177,7 @@ void threads_init(Ctx *c) {
 // ---- threads -------------------------------------------------------------------------------
 static void *run(void *arg) {
     Thread *t = arg;
+    self_start = t->start;
     gil_acquire();
     Ctx *c = &t->ctx;
     uint32_t args[1] = {t->param};
@@ -188,6 +197,7 @@ static void *run(void *arg) {
 // thread's race time waiting for that GIL).
 static void *run_timer(void *arg) {
     Thread *t = arg;
+    self_start = t->start;
     gil_acquire();
     Ctx *c = &t->ctx;
     for (;;) {

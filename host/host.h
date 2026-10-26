@@ -90,6 +90,9 @@ typedef struct {
     uint32_t clock_calls;       // GetTickCount, timeGetTime, QueryPerformanceCounter: many per frame = a busy wait
     uint32_t gil_handoffs;      // GIL turns passed to a thread that was waiting for it
     uint32_t gil_gap_us;        // time the GIL lay free in those hand-offs (the waiter waking up): no guest code runs
+    uint32_t hold_main_us;      // time the main thread kept the GIL (its guest code and the APIs it ran)
+    uint32_t hold_other_us;     // the same for every other guest thread
+    uint32_t hold_other_who;    // start address of the thread behind hold_other_max_ms (the page clears it with the max)
 } Telem;
 extern Telem rn_telem;
 void dispatch_threads_report(void);                             // log what every guest thread is doing now

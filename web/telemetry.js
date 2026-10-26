@@ -9,18 +9,19 @@
 const TELEM_COLS = ['t', 'run', 'present', 'draws', 'clears', 'kwords', 'texKb', 'pipes', 'shaders', 'targets', 'hd',
   'gpuWait', 'gilMain', 'gilOther', 'read', 'idleMain', 'holdMain', 'holdOther', 'reads', 'readKb', 'presents', 'streamPm',
   'starves', 'starveBuf',
-  'audioBehind', 'underrun', 'resyncs', 'clockCalls', 'handoffs', 'gilGap'];
+  'audioBehind', 'underrun', 'resyncs', 'clockCalls', 'handoffs', 'gilGap', 'heldMain', 'heldOther', 'holdWho'];
 
 function startTelemetry(M, t0, log, logLines) {
   if (new URLSearchParams(location.search).get('telemetry') === '0') return null;
   const base = M._rn_telem_addr(), audio = M._rn_audio_ring() >> 2;
   const F = () => M.HEAPF64, U = () => M.HEAPU32;
   // host.h Telem: 7 doubles (gpu_wait, gil_main, gil_other, read, idle_main, hold_main_max, hold_other_max),
-  // then u32 presents, reads, read_kb, stream_pm, starves, starve_buf, clock_calls, gil_handoffs, gil_gap_us.
+  // then u32 presents, reads, read_kb, stream_pm, starves, starve_buf, clock_calls, gil_handoffs, gil_gap_us,
+  // hold_main_us, hold_other_us, hold_other_who.
   const W = (base + 56) >> 2;
   const host = () => {
     const f = F(), u = U(), d = base >> 3;
-    return [f[d], f[d + 1], f[d + 2], f[d + 3], f[d + 4], f[d + 5], f[d + 6], u[W], u[W + 1], u[W + 2], u[W + 3], u[W + 4], u[W + 6], u[W + 7], u[W + 8]];
+    return [f[d], f[d + 1], f[d + 2], f[d + 3], f[d + 4], f[d + 5], f[d + 6], u[W], u[W + 1], u[W + 2], u[W + 3], u[W + 4], u[W + 6], u[W + 7], u[W + 8], u[W + 9], u[W + 10], u[W + 11]];
   };
   let prev = host(), prevUnder = 0, prevResync = 0, rows = [], events = [];
   const allRows = [], allEvents = [];                  // the whole session, for F10
@@ -40,8 +41,9 @@ function startTelemetry(M, t0, log, logLines) {
     rows.push([Math.round((t - t0) * 100) / 100, r1(runMs), s.present ? 1 : 0, s.draws, s.clears, s.words >> 10, s.texKb, s.pipes,
       s.shaders, s.targets, s.hd, r1(d(0)), r1(d(1)), r1(d(2)), r1(d(3)), r1(d(4)), r1(h[5]), r1(h[6]), d(8), d(9), d(7),
       h[10], h[11] - prev[11], h[11] !== prev[11] ? u[W + 5] : -1, (u[audio] - u[audio + 1]) | 0, under - prevUnder,
-      resync - prevResync, d(12), d(13), r1(((h[14] - prev[14]) >>> 0) / 1000)]);
-    F()[(base >> 3) + 5] = F()[(base >> 3) + 6] = 0; u[W + 3] = 0;     // the maxima are since the last row
+      resync - prevResync, d(12), d(13), r1(((h[14] - prev[14]) >>> 0) / 1000), r1(((h[15] - prev[15]) >>> 0) / 1000),
+      r1(((h[16] - prev[16]) >>> 0) / 1000), h[17]]);
+    F()[(base >> 3) + 5] = F()[(base >> 3) + 6] = 0; u[W + 3] = u[W + 11] = 0;     // the maxima are since the last row
     starves += h[11] - prev[11]; underruns += under - prevUnder;
     const r = rows[rows.length - 1];
     allRows.push(r);
