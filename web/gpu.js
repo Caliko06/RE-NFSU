@@ -61,9 +61,19 @@ async function startGpu(M, canvas, report, onFrame) {
     if (pack.size) report(`gpu.js: remaster pack ${pack.size} textures`);
   }
   const HD_MAX = Number(new URLSearchParams(location.search).get('hdmax') || 1024);
+  // At most HD_NET pack downloads at once (?hdnet=): Chrome opens 6 connections to one host, and the ~1600 world textures
+  // a race uploads took all 6, so the game's own reads of the track (host/files.c sync XHR) waited behind them: 6/1 -> race
+  // HUD 1.0 s without the world pack, 6.0 s with it, STREAML1RA.BUN reads > 100 ms (build/bench/e_world2, 2026-10-26).
+  const HD_NET = Number(new URLSearchParams(location.search).get('hdnet') || 3), netQ = [];
+  let netN = 0;
+  async function hdBlob(url) {
+    if (netN < HD_NET) netN++; else await new Promise(r => netQ.push(r));   // a finished download hands its slot over
+    try { return await (await fetch(url)).blob(); }
+    finally { const next = netQ.shift(); if (next) next(); else netN--; }
+  }
   async function loadHd(name) {
     // A name with a path is a file under remaster/ (world pack: world/<hash>.webp); a bare key is png/<key>.png.
-    const blob = await (await fetch(name.includes('/') ? `remaster/${name}` : `remaster/png/${name}.png`)).blob();
+    const blob = await hdBlob(name.includes('/') ? `remaster/${name}` : `remaster/png/${name}.png`);
     const opt = { premultiplyAlpha: 'none', colorSpaceConversion: 'none' };
     // Level 0 is at most HD_MAX on a side (?hdmax=, default 1024): the 2048 car PNGs cost 22 MB each and, with ~80 in a
     // race, made the GPU wait 60-110 ms a frame at 2560x1116 (OWNER 2026-10-22 session).
