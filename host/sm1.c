@@ -355,9 +355,34 @@ static const char *const car_ps_body =
     "  shr = R.z * u.c[9] + (R.y * u.c[8] + (R.x * u.c[7] + shr));\n"
     "  let g = exp2(d3d_log(clamp(shr.w, 0.0, 1.0)) * u.c[22].x);\n"
     "  let d1c = clamp(vec4f(tint * (shr.xyz * g) * 0.5, F), vec4f(0.0), vec4f(1.0));\n"
+    "  t1 = textureSample(x1, s1, tc(i.t1, u.tt[0][1]));\n";
+static const char *const car_ps_env =
     "  t0 = select(textureSample(x0, s0, tc(vec4f(cc, 1.0), u.tt[0][0])), textureSample(y0, s0, cc), (u.tt[0][0] & 65536u) != 0u);\n"
-    "  t1 = textureSample(x1, s1, tc(i.t1, u.tt[0][1]));\n"
-    "  let a = clamp(d1c.w * u.pc[1].xyz + u.pc[0].xyz, vec3f(-8.0), vec3f(8.0));\n"
+    "  let a = clamp(d1c.w * u.pc[1].xyz + u.pc[0].xyz, vec3f(-8.0), vec3f(8.0));\n";
+// BRIDGE: clearcoat, OWNER 2026-10-25 ("the cars look wrapped in cellophane": RN_CARLOOK=0 / ?carlook=0 is the line above).
+// car.efx reflects 4 * diffuse.a * cube * (EnvmapMin + (N.V)^c23 * (EnvmapMax - EnvmapMin)) (pc0 = Min, pc1 = Max - Min; 0x40fae0
+// from the light material, GLOBALB chunk 0x135200). The paints have Min (grazing) 0.6..1.5 and Max (facing) 0.0..0.2, but with
+// c23 = 0.3..0.5 the curve is flat: a roof seen at N.V 0.5..0.7 still adds 25..55 % of the 128 px cube (trees, sky) over the
+// paint. Here the same Min/Max on Schlick's (1 - N.V)^5, the facing value at 45 % (a clearcoat reflects ~4 % head on), the cube
+// read as 5 taps in a small cone (128 px of world, mirror-sharp, reads as wrinkled foil), and its bright texels expanded up to 5x
+// (an 8-bit cube holds a street lamp as bright as a leaf; a real one stays visible in a 4 % reflection, the foliage does not). Metals (diffuse ~0: CHROME,
+// mirrors, reflectors) keep their facing value and a sharper cone.
+static const char *const car_ps_clearcoat =
+    "  let Rc = normalize(cc);\n"
+    "  let ax = select(vec3f(0.0, 1.0, 0.0), vec3f(1.0, 0.0, 0.0), abs(Rc.y) > 0.9);\n"
+    "  let ta = normalize(cross(ax, Rc));\n  let tb = cross(Rc, ta);\n"
+    "  let dmax = max(u.c[18].x + u.c[19].x, max(u.c[18].y + u.c[19].y, u.c[18].z + u.c[19].z));\n"
+    "  let metal = 1.0 - smoothstep(0.05, 0.3, dmax);\n"
+    "  let rad = mix(0.035, 0.012, metal);\n"
+    "  let cs = 0.4 * textureSample(y0, s0, Rc) + 0.15 * (textureSample(y0, s0, Rc + rad * ta) + textureSample(y0, s0, Rc - rad * ta)"
+    " + textureSample(y0, s0, Rc + rad * tb) + textureSample(y0, s0, Rc - rad * tb));\n"
+    "  let lum = dot(cs.xyz, vec3f(0.3, 0.59, 0.11));\n"
+    "  let hdr = vec4f(cs.xyz * (1.0 + 4.0 * lum * lum * lum * lum), cs.w);\n"
+    "  t0 = select(textureSample(x0, s0, tc(vec4f(cc, 1.0), u.tt[0][0])), hdr, (u.tt[0][0] & 65536u) != 0u);\n"
+    "  let emn = u.pc[0].xyz;\n  let emx = u.pc[0].xyz + u.pc[1].xyz;\n"
+    "  let fs = pow(1.0 - min(d, 1.0), 5.0);\n"
+    "  let a = clamp(mix(min(emn, emx) * mix(0.45, 1.0, metal), max(emn, emx), fs), vec3f(-8.0), vec3f(8.0));\n";
+static const char *const car_ps_tail =
     "  let b = clamp(4.0 * (t0.xyz * a), vec3f(-8.0), vec3f(8.0));\n"
     "  let e = clamp(b + d1c.xyz, vec3f(-8.0), vec3f(8.0));\n"
     "  let f = clamp(2.0 * (t1 * d0c), vec4f(-8.0), vec4f(8.0));\n"
@@ -388,7 +413,11 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
         for (int k = 0; k < 4; k++) emit(&b, "  var t%d = vec4f(0.0);\n", k);
     }
     // Co-issue: the pair reads all its sources before either one writes.
-    if (s->ps && mode == SM1_CAR_PS) emit(&b, "%s", car_ps_body);
+    if (s->ps && mode == SM1_CAR_PS) {
+        static int look = -1;
+        if (look < 0) { const char *e = getenv("RN_CARLOOK"); look = !e || atoi(e) != 0; }
+        emit(&b, "%s%s%s", car_ps_body, look ? car_ps_clearcoat : car_ps_env, car_ps_tail);
+    }
     const Ins *pend = NULL;
     char pend_val[64] = "";
     for (int i = 0; i < s->n && !(s->ps && mode == SM1_CAR_PS); i++) {
