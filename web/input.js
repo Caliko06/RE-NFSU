@@ -44,7 +44,8 @@ function startInput(M, canvas) {
   canvas.addEventListener('blur', () => { for (const d of held) push(d); held.clear(); });
   // Mouse: relative motion while the pointer is over the canvas; buttons 0 left, 1 right, 2 middle.
   const btn = [0, 2, 1, 3, 4];
-  // movementX/Y are CSS pixels; the game's cursor moves in canvas pixels, so scale by canvas.width / on-screen width
+  // movementX/Y are CSS pixels; the game's cursor moves in back-buffer pixels (canvas.gameW, set by web/gpu.js at each
+  // present; the canvas itself is at the screen's pixels), so scale by that / on-screen width
   // and carry the fraction (Atomics takes integers).
   let remX = 0, remY = 0;
   // While the game holds an exclusive mouse (host/dinput8.c), Windows shows no cursor of its own and keeps the
@@ -59,8 +60,8 @@ function startInput(M, canvas) {
   canvas.addEventListener('mousemove', e => {
     const r = canvas.getBoundingClientRect();
     if (!r.width || !r.height) return;
-    remX += e.movementX * canvas.width / r.width;
-    remY += e.movementY * canvas.height / r.height;
+    remX += e.movementX * (canvas.gameW || canvas.width) / r.width;
+    remY += e.movementY * (canvas.gameH || canvas.height) / r.height;
     const ix = Math.trunc(remX), iy = Math.trunc(remY);
     remX -= ix; remY -= iy;
     if (ix) Atomics.add(H(), base + 2, ix);

@@ -50,7 +50,9 @@ function flush() {
   if (!pending.length) return;
   const body = pending.join('\n') + '\n';
   pending = [];
-  fetch('/log', { method: 'POST', body, keepalive: true }).catch(() => {});
+  // keepalive (the batch still goes out if the page is closing) caps the body at 64 KB: a bigger batch was dropped whole,
+  // silently (518 pack errors in one second took the race HUD line with them and the run looked hung, build/bench/g_cas).
+  fetch('/log', { method: 'POST', body, keepalive: body.length < 60000 }).catch(() => {});
 }
 fetch('/log?new', { method: 'POST', body: `page ${location.href} ${new Date().toISOString()}\n` }).catch(() => {});
 setInterval(flush, 1000);

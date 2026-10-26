@@ -80,6 +80,7 @@ async function startGpu(M, canvas, report, onFrame) {
     finally { const next = netQ.shift(); if (next) next(); else netN--; }
   }
   async function loadHd(name) {
+    if (name.endsWith('.dds')) return loadDds(`remaster/${name}`);
     // A name with a path is a file under remaster/ (world pack: world/<hash>.webp); a bare key is png/<key>.png.
     const blob = await hdBlob(name.includes('/') ? `remaster/${name}` : `remaster/png/${name}.png`);
     const opt = { premultiplyAlpha: 'none', colorSpaceConversion: 'none' };
@@ -108,6 +109,8 @@ async function startGpu(M, canvas, report, onFrame) {
     }
     device.queue.submit([e.finish()]);
     hdMs += performance.now() - t;
+    return { view: tex.createView() };
+  }
   // A BC7 .dds with its mip chain (tools/remaster/world_bc7.sh, MW's bcdds.cpp), gzipped on disk next to it (<name>.gz):
   // no decode on the page thread, a quarter of the VRAM of rgba8. Same reader as ~/RE-NFSMW web/gpu.js loadDds.
   async function loadDds(url) {
@@ -131,9 +134,6 @@ async function startGpu(M, canvas, report, onFrame) {
     }
     hdMs += performance.now() - t;
     return { view: tex.createView() };
-  }
-    return { view: tex.createView() };
-    if (name.endsWith('.dds')) return loadDds(`remaster/${name}`);
   }
   function useHd(t, key) {
     const name = pack.get(key);
@@ -262,6 +262,63 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
     fragment: { module: fxaaMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
   const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   let fxaaTmp = null;
+  // BRIDGE: remaster, the last step of a frame. The back buffer is at most 2560 wide (web/index.html), so on the OWNER's
+  // window (1920x871 css, dpr 2) Chrome stretched 2560x1160 to 3840x1742 with a bilinear filter: a soft image. The present
+  // now draws it into a canvas at the window's device pixels through AMD FidelityFX CAS (MIT; its upscaling path: the four
+  // nearest texels each sharpened by their contrast, then blended), so the 1.5x upscale keeps edges and text crisp.
+  // ?sharp=0..1 is CAS's sharpness (default 0.5); ?sharp=off = the old copy at the back buffer size.
+  const SHARP_Q = new URLSearchParams(location.search).get('sharp'), SHARP = SHARP_Q === 'off' ? -1 : Number(SHARP_Q ?? 0.5);
+  const casMod = device.createShaderModule({ code: `
+struct U { scale: vec2f, peak: f32, pad: f32, inMax: vec2i };
+@group(0) @binding(0) var src: texture_2d<f32>;
+@group(0) @binding(1) var<uniform> u: U;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
+}
+fn T(p: vec2i) -> vec3f { return textureLoad(src, clamp(p, vec2i(0), u.inMax), 0).rgb; }
+// Weight of one quadrant's sharpening: CAS's soft min/max over a cross of 5 texels.
+fn amp(a: vec3f, b: vec3f, c: vec3f, d: vec3f, e: vec3f, mn: ptr<function, f32>, mx: ptr<function, f32>) -> vec3f {
+  let lo = min(min(min(a, b), min(c, d)), e);
+  let hi = max(max(max(a, b), max(c, d)), e);
+  *mn = lo.g; *mx = hi.g;
+  return sqrt(clamp(min(lo, 2.0 - hi) / max(hi, vec3f(1e-5)), vec3f(0.0), vec3f(1.0))) * u.peak;
+}
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  //    b c
+  //  e f g h
+  //  i j k l
+  //    n o
+  var pp = pos.xy * u.scale - 0.5;
+  let fp = floor(pp); pp -= fp;
+  let q = vec2i(fp);
+  let b = T(q + vec2i(0, -1)); let c = T(q + vec2i(1, -1));
+  let e = T(q + vec2i(-1, 0)); let f = T(q); let g = T(q + vec2i(1, 0)); let h = T(q + vec2i(2, 0));
+  let i = T(q + vec2i(-1, 1)); let j = T(q + vec2i(0, 1)); let k = T(q + vec2i(1, 1)); let l = T(q + vec2i(2, 1));
+  let n = T(q + vec2i(0, 2)); let o = T(q + vec2i(1, 2));
+  var mnf: f32; var mxf: f32; var mng: f32; var mxg: f32; var mnj: f32; var mxj: f32; var mnk: f32; var mxk: f32;
+  let wf = amp(b, e, f, g, j, &mnf, &mxf); let wg = amp(c, f, g, h, k, &mng, &mxg);
+  let wj = amp(f, i, j, k, n, &mnj, &mxj); let wk = amp(g, j, k, l, o, &mnk, &mxk);
+  // bilinear weights of the four results, thinned where the quadrant has contrast (hides the bilinear on diagonals)
+  let s = (1.0 - pp.x) * (1.0 - pp.y) / (1.0 / 32.0 + mxf - mnf);
+  let t = pp.x * (1.0 - pp.y) / (1.0 / 32.0 + mxg - mng);
+  let uu = (1.0 - pp.x) * pp.y / (1.0 / 32.0 + mxj - mnj);
+  let v = pp.x * pp.y / (1.0 / 32.0 + mxk - mnk);
+  let qbe = wf * s; let qch = wg * t; let qir = wj * uu; let qlo = wk * v;
+  let qf = wg * t + wj * uu + s; let qg = wf * s + wk * v + t;
+  let qj = wf * s + wk * v + uu; let qk = wg * t + wj * uu + v;
+  let sum = (b + e) * qbe + (c + h) * qch + (i + n) * qir + (l + o) * qlo + f * qf + g * qg + j * qj + k * qk;
+  return vec4f(clamp(sum / (2.0 * (qbe + qch + qir + qlo) + qf + qg + qj + qk), vec3f(0.0), vec3f(1.0)), 1.0);
+}` });
+  const casPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: casMod, entryPoint: 'vs' },
+    fragment: { module: casMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const casU = device.createBuffer({ size: 32, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+  // The canvas's size in device pixels (what the screen shows), kept by a ResizeObserver.
+  let disp = null;
+  if (SHARP >= 0) new ResizeObserver(([e]) => {
+    const b = e.devicePixelContentBoxSize?.[0];
+    disp = b ? [b.inlineSize, b.blockSize] : [Math.round(e.contentRect.width * devicePixelRatio), Math.round(e.contentRect.height * devicePixelRatio)];
+  }).observe(canvas);
   // BRIDGE: bloom over the 3D scene, not in the original (docs/PLAN.md block 5). PC NFSU1 has its own light glow and
   // streaks (0x409b70, PATCH 0x409bca), and it is the sharpest of the four versions, so this one only lifts what is
   // already near white: a quarter-size bright pass (luma over 0.72), a separable 9-tap Gaussian, added back with weight
@@ -302,11 +359,15 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
       color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } } : {}) }] },
     primitive: { topology: 'triangle-list' }, multisample: { count: sc } });
   const bloomPipes = BLOOM_ON ? { bright: bloomPipe('bright', 1), blurH: bloomPipe('blurH', 1), blurV: bloomPipe('blurV', 1), add: new Map() } : null;
+  // A resource replaced while the frame is being encoded is destroyed after the frame's submit: the game reuses a
+  // buffer or texture id mid-frame (GPU_BUFFER on a live id), and destroying it at once made WebGPU reject the whole
+  // frame's command buffer ("used in submit while destroyed": 2 frames lost per race, build/bench/f_default_bc7).
+  const doomed = [], doom = x => { if (x) doomed.push(x); };
   let bloomA = null, bloomB = null;
   function bloom(enc, rt) {
     const bw = Math.max(1, rt.w >> 2), bh = Math.max(1, rt.h >> 2);
     if (!bloomA || bloomA.width !== bw || bloomA.height !== bh) {
-      bloomA?.destroy(); bloomB?.destroy();
+      doom(bloomA); doom(bloomB);
       const mk = () => device.createTexture({ size: [bw, bh], format: 'rgba8unorm', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING });
       bloomA = mk(); bloomB = mk();
     }
@@ -453,7 +514,7 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
   let vbuf = null, ibuf = null, ubuf = null, vcap = 0, icap = 0, ucap = 0;
   const grow = (buf, cap, need, usage) => {
     if (need <= cap) return [buf, cap];
-    buf?.destroy();
+    doom(buf);
     cap = Math.max(need, cap * 2, 1 << 20);
     return [device.createBuffer({ size: cap, usage: usage | GPUBufferUsage.COPY_DST }), cap];
   };
@@ -594,7 +655,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       return;
     }
     if (!t.skin || t.skin.width !== S) {
-      t.skin?.destroy();
+      doom(t.skin);
       t.skin = device.createTexture({ size: [S, S], mipLevelCount: Math.log2(S) + 1, format: 'rgba8unorm',
         usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST });
     }
@@ -747,7 +808,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const ms = !depth && sc > 1 ? device.createTexture({ size: [w[a + 1], w[a + 2]], format: 'rgba8unorm', sampleCount: sc,
           usage: GPUTextureUsage.RENDER_ATTACHMENT }) : null;
         const old = res.get(w[a]);
-        old?.tex.destroy(); old?.ms?.destroy();
+        doom(old?.tex); doom(old?.ms);
         res.set(w[a], { tex, view: tex.createView(), w: w[a + 1], h: w[a + 2], depth, sc, ms, msView: ms?.createView() });
         stats.targets++;
       } else if (op === GPU_CLEAR) {
@@ -793,7 +854,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         }
         decls.set(w[a], els);
       } else if (op === GPU_TEXTURE) {
-        res.get(w[a])?.tex.destroy();
+        doom(res.get(w[a])?.tex);
         const tex = device.createTexture({ size: [w[a + 1], w[a + 2]], mipLevelCount: w[a + 3], format: 'rgba8unorm',
           usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC });
         const own = tex.createView();
@@ -804,7 +865,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const tex = device.createTexture({ size: [e, e, 6], format: 'rgba8unorm',
           usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC });
         for (let k = 0; k < 6; k++) {
-          res.get(f0 + k)?.tex.destroy();
+          doom(res.get(f0 + k)?.tex);
           res.set(f0 + k, { tex, view: tex.createView({ dimension: '2d', baseArrayLayer: k, arrayLayerCount: 1 }), w: e, h: e, depth: false });
         }
         res.set(w[a], { tex, cube: tex.createView({ dimension: 'cube' }), w: e, h: e, depth: false });
@@ -904,7 +965,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
         if (FXAA_ON && rt && !rt.depth && !rt.msView) {
           if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
-            fxaaTmp?.destroy();
+            doom(fxaaTmp);
             fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
           }
           enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
@@ -916,7 +977,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           p.end();
         }
       } else if (op === GPU_BUFFER) {
-        gbufs.get(w[a])?.destroy();
+        doom(gbufs.get(w[a]));
         gbufs.set(w[a], device.createBuffer({ size: Math.max(4, w[a + 1]), usage: GPUBufferUsage.VERTEX | GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST }));
       } else if (op === GPU_BUFDATA) {
         device.queue.writeBuffer(gbufs.get(w[a]), w[a + 1], u8, 4 * (a + 3), w[a + 2]);
@@ -925,12 +986,25 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       } else if (op === GPU_PRESENT) {
         endPass();
         const t = res.get(w[a]), size = `${w[a + 1]}x${w[a + 2]}`;
-        if (size !== canvasSize) {
-          canvas.width = w[a + 1]; canvas.height = w[a + 2];
+        // The game's cursor moves in back-buffer pixels (web/input.js), whatever the canvas size.
+        canvas.gameW = w[a + 1]; canvas.gameH = w[a + 2];
+        const [cw, ch] = SHARP >= 0 && disp ? disp : [w[a + 1], w[a + 2]], csize = `${size} ${cw}x${ch}`;
+        if (csize !== canvasSize) {
+          canvas.width = cw; canvas.height = ch;
           ctx.configure({ device, format: 'rgba8unorm', alphaMode: 'opaque', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST });
-          canvasSize = size;
+          canvasSize = csize;
+          device.queue.writeBuffer(casU, 0, new Float32Array([w[a + 1] / cw, w[a + 2] / ch, -1 / (8 - 3 * Math.min(1, SHARP)), 0]));
+          device.queue.writeBuffer(casU, 16, new Int32Array([w[a + 1] - 1, w[a + 2] - 1]));
         }
-        enc.copyTextureToTexture({ texture: t.tex }, { texture: ctx.getCurrentTexture() }, [w[a + 1], w[a + 2]]);
+        if (SHARP < 0) enc.copyTextureToTexture({ texture: t.tex }, { texture: ctx.getCurrentTexture() }, [w[a + 1], w[a + 2]]);
+        else {
+          const p = enc.beginRenderPass({ timestampWrites: tsw('cas'), colorAttachments: [{ view: ctx.getCurrentTexture().createView(), loadOp: 'clear', storeOp: 'store' }] });
+          p.setPipeline(casPipe);
+          p.setBindGroup(0, device.createBindGroup({ layout: casPipe.getBindGroupLayout(0),
+            entries: [{ binding: 0, resource: t.view }, { binding: 1, resource: { buffer: casU } }] }));
+          p.draw(3);
+          p.end();
+        }
         stats.present = size;
       } else {
         fail('unknown command ' + op);
@@ -949,6 +1023,8 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       enc.copyBufferToBuffer(tsq.res, 0, tsBuf, 0, 8 * tsN);
     }
     device.queue.submit([enc.finish()]);
+    for (const x of doomed) x.destroy();
+    doomed.length = 0;
     if (PROF && stats.present) profLast = profSeq.join(' ');
     if (tsBuf) {
       const n = tsN, labs = PROF ? profLab.slice(0, n >> 1) : null;

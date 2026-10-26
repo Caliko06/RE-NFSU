@@ -4,6 +4,7 @@
 # usage: bench.py MODE LOC SECS [NAME]   (QUICK RACE MODE row / SELECT LOCATION index; row 2 = Drift, measured 2026-10-24)
 #        bench.py --report NAME           (only re-read build/bench/NAME.*)
 import json, os, re, shutil, subprocess, sys
+from completion import _PROFILE
 
 OUT = 'build/bench'
 GAP = 3
@@ -15,13 +16,17 @@ def keys(mode, loc):   # same menu path as tools/abrun.py
 def run(mode, loc, secs, name):
     # BENCH_JUMP='0:1003': the menu keys stop on MU_QuickRaceModeSelect and RN_JUMP starts that race (host/input.c);
     # the car select's GenericDialog took a key of the full menu path (build/bench/b4_base, 2026-10-25).
+    # The keys to that screen wait for each screen (RN_KEYS anchors, tools/completion.py's profile path): timed taps hung a
+    # jump run when the title movie ended later than the 20 s tap (build/bench/g_short: 20 ms of margin), so every later
+    # tap landed one screen early and MU_QuickRaceModeSelect never showed.
     jump = os.environ.get('BENCH_JUMP')
-    ks = keys(mode, loc)[:6] if jump else keys(mode, loc)
+    ks = [] if jump else keys(mode, loc)
     ours = ','.join(f'{20 + GAP * i}:{"Arrow" + x if x in ("Right", "Down") else x}' for i, x in enumerate(ks))
-    url = 'http://127.0.0.1:5180/?env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1' + (f'&jump={jump}' if jump else '') + os.environ.get('BENCH_Q', '')   # BENCH_Q='&gpuprof=1'
+    nav = ','.join(['20000:RETURN'] + _PROFILE[1:] + ['1500@=MU_Main_PC:RETURN']) if jump else ''
+    url = 'http://127.0.0.1:5180/?env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1' + (f'&jump={jump}&keys={nav}' if jump else '') + os.environ.get('BENCH_Q', '')   # BENCH_Q='&gpuprof=1'
     env = dict(os.environ, RN_CDP_PORT='9341', RN_VIEW=VIEW)
     with open(f'{OUT}/{name}.out', 'w') as f:
-        subprocess.run(['node', 'tools/webcheck.mjs', url, str(20 + GAP * len(ks) + secs), f'{OUT}/{name}.png', ours],
+        subprocess.run(['node', 'tools/webcheck.mjs', url, str(20 + GAP * (len(ks) or 6) + secs), f'{OUT}/{name}.png', ours],
                        env=env, stdout=f, stderr=subprocess.STDOUT)
     shutil.copy('build/webcheck.log', f'{OUT}/{name}.log')
     open(f'{OUT}/{name}.load', 'w').write(f'{os.getloadavg()[1]:.1f}\n')   # 5-minute load at the end of the run
