@@ -45,6 +45,8 @@ async function startGpu(M, canvas, report, onFrame) {
   // ?remaster=0 turns it off. No index file = off.
   const pack = new Map(), hd = new Map();   // key -> png name; png name -> {view} once loaded, null while loading
   let packed = 0;
+  // ?hdlog=1: each pack hit once (texture id, size, key, png), to find a texture the pack should not take.
+  const hdLog = new URLSearchParams(location.search).get('hdlog') === '1' ? new Set() : null;
   if (new URLSearchParams(location.search).get('remaster') !== '0') {
     // ?worldhd=1 adds the world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh): opt-in, the world look stays 2003 by default.
     // Pack v2 (tools/remaster/pack_v2.sh: deblock + 4x-UltraSharpV2) overrides the v1 entries it has; ?pack=1 = v1 only.
@@ -81,6 +83,7 @@ async function startGpu(M, canvas, report, onFrame) {
   function useHd(t, key) {
     const name = pack.get(key);
     if (!name) { t.view = t.own; return; }
+    if (hdLog && !hdLog.has(t.id + name)) { hdLog.add(t.id + name); report(`gpu.js: hd ${name} on ${t.id} ${t.w}x${t.h}`); }
     const h = hd.get(name);
     if (h) { t.view = h.view; return; }
     t.view = t.own;
@@ -751,7 +754,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         stats.targets++;
       } else if (op === GPU_TEXKEY) {
         const t = res.get(w[a]);
-        if (t && pack.size) { t.key = (w[a + 2] >>> 0).toString(16).padStart(8, '0') + (w[a + 1] >>> 0).toString(16).padStart(8, '0'); useHd(t, t.key); }
+        if (t && pack.size) { t.id = w[a]; t.key = (w[a + 2] >>> 0).toString(16).padStart(8, '0') + (w[a + 1] >>> 0).toString(16).padStart(8, '0'); useHd(t, t.key); }
       } else if (op === GPU_TEXDATA) {
         // queue.writeTexture runs before this frame's commands: a texture changed after a draw of the
         // same frame that used it would show its new texels in that draw (not seen yet).

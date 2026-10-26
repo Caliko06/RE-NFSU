@@ -8,7 +8,8 @@ class Ring extends AudioWorkletProcessor {
     super();
     this.fade = 0; this.resyncs = 0; this.l = this.r = 0;
     this.port.onmessage = e => {
-      const { buffer, hdr } = e.data;
+      const { buffer, hdr, level } = e.data;
+      this.level = level; this.acc = 0; this.cnt = 0;
       this.h = new Uint32Array(buffer, hdr, 8);           // written, taken, ring address, ring frames, underruns, resyncs
       this.f = new Float32Array(buffer, this.h[2], 2 * this.h[3]);
       this.n = this.h[3];
@@ -39,6 +40,11 @@ class Ring extends AudioWorkletProcessor {
         a = w * this.l + (1 - w) * a; b = w * this.r + (1 - w) * b;
       } else { this.l = a; this.r = b; }
       l[i] = a; r[i] = b;
+      if (this.level) this.acc += a * a + b * b;
+    }
+    if (this.level && (this.cnt += l.length) >= 5 * 44100) {   // ?audiolog=1: the mean level of the last 5 s
+      this.port.postMessage({ level: (10 * Math.log10(this.acc / (2 * this.cnt) + 1e-12)).toFixed(1) });
+      this.acc = this.cnt = 0;
     }
     Atomics.store(this.h, 1, taken);
     if (silent) Atomics.add(this.h, 4, silent);           // telemetry (web/telemetry.js)
@@ -53,8 +59,8 @@ async function startAudio(M, log) {
   const url = URL.createObjectURL(new Blob([AUDIO_WORKLET], { type: 'text/javascript' }));
   await ctx.audioWorklet.addModule(url);
   const node = new AudioWorkletNode(ctx, 'rn-ring', { numberOfInputs: 0, outputChannelCount: [2] });
-  node.port.onmessage = e => log(e.data.started ? 'audio started' : `audio resync ${e.data.resync}: ${e.data.behind} frames behind, 64-frame fade`);
-  node.port.postMessage({ buffer: M.HEAPU8.buffer, hdr: M._rn_audio_ring() });
+  node.port.onmessage = e => log(e.data.level ? `audio level ${e.data.level} dBFS` : e.data.started ? 'audio started' : `audio resync ${e.data.resync}: ${e.data.behind} frames behind, 64-frame fade`);
+  node.port.postMessage({ buffer: M.HEAPU8.buffer, hdr: M._rn_audio_ring(), level: new URLSearchParams(location.search).get('audiolog') === '1' });
   node.connect(ctx.destination);
   const resume = () => { if (ctx.state !== 'running') ctx.resume(); };
   addEventListener('keydown', resume, true);

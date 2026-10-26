@@ -54,8 +54,14 @@ static void *watchdog(void *arg) {
 // needs no lock). The same addresses can be read in the Wine reference through /proc/PID/mem (tools/wine/memwatch.py).
 // 7345d0>20 reads [[0x7345d0]+0x20] (a field of a heap object; 0 while the pointer is 0); 78a418>10+750*26 reads that
 // field in 26 records 0x750 apart (the type of each race ride: list [0x78a418], count [0x78a41c]).
+// RN_POKE=76778b=1,...: with RN_WATCH, also write each byte at every tick (a state a save cannot reach yet, such as a
+// won magazine; the load overwrites it once, the next tick sets it again).
 static void *memwatch(void *arg) {
-    uint32_t a[12], off[12], step[12], cnt[12]; int n = 0;
+    uint32_t a[12], off[12], step[12], cnt[12], pa[12], pv[12]; int n = 0, np = 0;
+    for (char *s = getenv("RN_POKE"); s && *s && np < 12; s += *s == ',') {
+        pa[np] = (uint32_t)strtoul(s, &s, 16);
+        if (*s == '=') pv[np++] = (uint32_t)strtoul(s + 1, &s, 16);
+    }
     for (char *s = arg; *s && n < 12; s += *s == ',') {
         a[n] = (uint32_t)strtoul(s, &s, 16); off[n] = ~0u; step[n] = 0; cnt[n] = 1;
         if (*s == '>') off[n] = (uint32_t)strtoul(s + 1, &s, 16);
@@ -75,6 +81,7 @@ static void *memwatch(void *arg) {
             }
         }
         rn_log("%s", line);
+        for (int i = 0; i < np; i++) g_ctx->mem[pa[i]] = (uint8_t)pv[i];
         usleep(250000);
     }
 }

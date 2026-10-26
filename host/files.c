@@ -234,6 +234,8 @@ static int timed_read(GFile *g, uint64_t at, uint8_t *dst, uint32_t n) {
     rn_telem.read_ms += (double)(t1 - t0) / 1000;
     rn_telem.reads++;
     rn_telem.read_kb += (r > 0 ? (uint32_t)r : 0) >> 10;
+    // A request this slow waited for a connection or the server (a movie or a track stream read as it plays).
+    if (t1 - t0 > 100000) rn_log("files: slow read %s at %llu, %u bytes, %.0f ms", g->real, (unsigned long long)at, n, (t1 - t0) / 1000.0);
     return r;
 }
 #endif

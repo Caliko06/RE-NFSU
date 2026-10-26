@@ -145,6 +145,9 @@ if (recAt === 0) await recStart();
 await send('Page.navigate', { url });
 const t0 = Date.now();
 let text = '', seen = 0;
+const shotFe = process.env.RN_SHOT_FE, feSeen = new Set(), feDue = [], feAt = (process.env.RN_SHOT_FE_AT || '2').split(',').map(Number);
+let feN = 0;
+if (shotFe) mkdirSync(shotFe, { recursive: true });
 while (Date.now() - t0 < secs * 1000) {
   await sleep(1000);
   for (const k of keys.filter(k => !k.done && Date.now() - t0 >= k.t * 1000)) {
@@ -164,6 +167,19 @@ while (Date.now() - t0 < secs * 1000) {
   const r = await send('Runtime.evaluate', { expression: "document.getElementById('status')?.textContent + '\\n' + document.getElementById('log')?.innerText" });
   text = r?.result?.value || '';
   if (/STOP|Falta COOP/.test(text)) break;
+  // RN_SHOT_FE=dir: a shot 2 s after each new front-end screen (RN_FLOWLOG "flow fe" line) -> dir/<n>_<screen>.png:
+  // one frame per screen of a menu tour (garage, magazines, jukebox), at the page's size. RN_SHOT_FE_AT=2,8,20: a shot at
+  // each of those seconds instead (a movie screen).
+  if (shotFe) {
+    for (const m of text.matchAll(/flow fe (\S+) \(frame/g)) if (!feSeen.has(m[1])) { feSeen.add(m[1]); for (const a of feAt) feDue.push({ at: Date.now() + a * 1000, fe: m[1] }); }
+    for (const d of feDue.filter(d => !d.done && Date.now() >= d.at)) {
+      d.done = true;
+      const fe = [...text.matchAll(/flow fe (\S+) \(frame/g)].pop()?.[1] || d.fe;   // the screen on now, not the one that asked
+      const main = fe.split(',').find(x => !/^(GarageMain|PC_|Chyron|MU_HorizontalBrowserBack|MU_QRBackground|MU_MPBackground|background)/.test(x)) || fe.split(',')[0];
+      const p = await send('Page.captureScreenshot', { format: 'png' });
+      if (p?.data) writeFileSync(join(shotFe, `${String(++feN).padStart(2, '0')}_${main.replace('.fng', '')}.png`), Buffer.from(p.data, 'base64'));
+    }
+  }
   if (route && !seen && ROUTE.marker.test(text)) seen = Date.now();
   if (seen && Date.now() - seen >= ROUTE.hold * 1000) break;
   // RN_AFTER_HUD=s: the shot s seconds after the race HUD appears (the race starts at a different second each run, so a
