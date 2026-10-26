@@ -33,7 +33,7 @@ const profileDir = mkdtempSync(join(tmpdir(), 'rn-'));
 // which gives WebGPU the NVIDIA. The user agent still says HeadlessChrome: tools/serve.py tells test runs apart by it.
 const x11 = process.env.RN_X11 ? ['--ozone-platform=x11', '--enable-features=Vulkan', '--ignore-gpu-blocklist', '--no-sandbox',
   '--user-agent=Mozilla/5.0 (X11; Linux x86_64) HeadlessChrome webcheck'] : ['--headless=new'];
-const chrome = spawn(process.env.RN_CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
+const chrome = spawn(process.env.RN_CHROME || '/Users/angeldamian/.local/bin/chrome-bot', [
   ...x11, `--remote-debugging-port=${port}`, `--user-data-dir=${profileDir}`,
   '--no-first-run', '--enable-unsafe-webgpu', '--mute-audio', '--window-size=1280,1100', 'about:blank'], { stdio: 'ignore' });
 // Each profile is ~330 MB: 107 left behind filled 29 GB of the Mac. Removed on every exit.
