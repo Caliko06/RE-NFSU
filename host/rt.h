@@ -80,18 +80,20 @@ static inline double fnan2(double a, double b) {
 #define FZE 0x04u     // zero divide
 #define FSF 0x40u     // stack fault
 // Results of x87 arithmetic: NaN rules above; an invalid operation on non-NaN operands also sets IE.
-static inline double fx2(Ctx *c, double a, double b, double r) {
-    if (r == r) return r;
+// The NaN path is a cold call of its own and the test stays inline: as one inline function wasm kept fx2 a call on every
+// FADD/FMUL (3.3 % of the game thread, build/bench/b4_x87.prof.txt).
+__attribute__((noinline, cold)) static double fx2_nan(Ctx *c, double a, double b) {
     if (a != a || b != b) return fnan2(a, b);
     c->fsw |= FIE;
     return bitsd(0xfff8000000000000ull);
 }
-static inline double fx1(Ctx *c, double a, double r) {
-    if (r == r) return r;
+__attribute__((noinline, cold)) static double fx1_nan(Ctx *c, double a) {
     if (a != a) return bitsd(dbits(a) | 0x8000000000000ull);
     c->fsw |= FIE;
     return bitsd(0xfff8000000000000ull);
 }
+__attribute__((always_inline)) static inline double fx2(Ctx *c, double a, double b, double r) { return r == r ? r : fx2_nan(c, a, b); }
+__attribute__((always_inline)) static inline double fx1(Ctx *c, double a, double r) { return r == r ? r : fx1_nan(c, a); }
 static inline double fdiv_(Ctx *c, double a, double b) {
 #ifdef RN_REF_QEMU5
     if (b == 0) c->fsw |= FZE;      // difftest only: the reference CPU flags every x/0, and never IE

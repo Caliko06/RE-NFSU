@@ -27,9 +27,10 @@ Blocks in order. Each one closes with progress before -> after, `webcheck --rout
    AA, speed motion blur + light trails (RE PC/PS2 first, never overdone, road never wet). A/B shot per effect; gate60 with all on.
 Rules: RE before every fix (address + Hopper/Ghidra line). Short targeted runs. Two attempts without progress -> stop in HANDOFF, move on.
 
-## Open OWNER decision
-- HUD/menus in 16:9 (M8.4, build/evidence/1_hud.md): FEng places every element from the 640x480 centre, no anchor
-  field. Corner anchors or full-screen art cover are new rules: OWNER decision before any PATCH.
+## OWNER decisions
+- HUD/menus in 16:9 (M8.4, build/evidence/1_hud.md), OWNER 2026-10-25: race HUD side groups at the window edges (the
+  default; B = a 16:9 box only differs on wider windows, and on the OWNER's 2.2:1 window they want the edges); menus stay a
+  4:3 panel, no stretch. A/B shots in build/hud169; ?env=RN_HUD=169|43 and RN_FE=stretch stay as opt-in switches.
 
 ## Only when a run hits it
 - Known layer gaps: GetMessageA that would wait (0x411030, window inactive), SuspendThread of a running thread

@@ -2138,10 +2138,20 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); }
     if (hud && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
-    if (hud) {
-        float S = 4.f * rn_screen_h / (3.f * rn_screen_w), x[4], cx = 0;
+    // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
+    // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
+    static int hud_mode = -1, fe_stretch = -1;
+    if (hud_mode < 0) { const char *e = getenv("RN_HUD"); hud_mode = !e ? 0 : !strcmp(e, "169") ? 1 : !strcmp(e, "43") ? 2 : 0; }
+    if (fe_stretch < 0) { const char *e = getenv("RN_FE"); fe_stretch = e && !strcmp(e, "stretch"); }
+    if (isl && !hud && fe_stretch) {
+        float S = 4.f * rn_screen_h / (3.f * rn_screen_w);
+        for (int k = 0; k < 4; k++) { uint32_t b = ld(c, ARG(3) + 32 * k, 4); float y; memcpy(&y, &b, 4); y /= S; memcpy(&b, &y, 4); st(c, ARG(3) + 32 * k, b, 4); }
+        moved = 1;
+    }
+    if (hud && hud_mode != 2) {
+        float S = 4.f * rn_screen_h / (3.f * rn_screen_w), x[4], cx = 0, B = hud_mode == 1 && S * 4 / 3 < 1 ? S * 4 / 3 : 1;
         for (int k = 0; k < 4; k++) { uint32_t b = ld(c, ARG(3) + 32 * k, 4); memcpy(&x[k], &b, 4); cx += x[k] / 4; }
-        float u = (cx + S) / (2 * S) * 640.f, d = u < 0 || u > 640 ? 0 : u < 190 ? -(1 - S) : u > 430 ? 1 - S : 0;
+        float u = (cx + S) / (2 * S) * 640.f, d = u < 0 || u > 640 ? 0 : u < 190 ? -(B - S) : u > 430 ? B - S : 0;
         if (d != 0) {
             for (int k = 0; k < 4; k++) { float y = x[k] + d; uint32_t b; memcpy(&b, &y, 4); st(c, ARG(3) + 32 * k, b, 4); }
             moved = 1;

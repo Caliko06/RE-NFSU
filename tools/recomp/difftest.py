@@ -204,7 +204,7 @@ if ONLY:
     LT = Lifter("pc/Speed.exe", seed)
     LT.trace = True
     code = LT.lift(entries[0], set(entries))
-    code = code.replace(f"void f_{entries[0]:x}(Ctx *c)", f"void t_{entries[0]:x}(Ctx *c)", 1)
+    code = code.replace(f"void f_{entries[0]:x}(Ctx *", f"void t_{entries[0]:x}(Ctx *", 1)   # Ctx *c or Ctx *restrict c
     open("build/gen/trace.c", "w").write('#include "rt.h"\nvoid (*rn_trace_cb)(Ctx *, uint32_t);\n'
                                          "static void rn_trace_step(Ctx *c, uint32_t a) { rn_trace_cb(c, a); }\n" + code)
     subprocess.run(["clang", "-O1", "-shared", "-w", "-Ihost", "-o", "build/trace.dylib", "build/gen/trace.c",
