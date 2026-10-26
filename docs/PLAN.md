@@ -18,7 +18,8 @@ Blocks in order. Each one closes with progress before -> after, `webcheck --rout
    DONE 2026-10-25 (116/116): RN_JUMP e<N> + RN_FINISH + RN_NEXT (tournament stages by PostRaceMenu 0x64bf64d2).
 3. Whole game (5 game rows + scope): garage and customization with everything unlocked (PATCH with RE citation),
    options persist, save -> reload page -> continue, sound, music, movies. Gate: one Chrome run that saves, reloads, continues.
-   Rows DONE 2026-10-25 (5/5, native); the Chrome save/reload run is still open.
+   Rows DONE 2026-10-25 (5/5, native). Chrome gate DONE 2026-10-25: tools/savegate.py PASS (event 3 saves, a new page
+   loads that career status, event 4 runs and saves, a third page loads it).
 4. 60 fps, 0 hitches > 33 ms: gate60/bench in Chrome; measure first, fix in the recompiler or the layer.
 5. RTX as layer bridges, each with a switch: textures 4x + normal/AO, shadows + SSAO, HDR bloom/tonemap, body reflections,
    AA, speed motion blur + light trails (RE PC/PS2 first, never overdone, road never wet). A/B shot per effect; gate60 with all on.

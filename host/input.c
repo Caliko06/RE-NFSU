@@ -232,9 +232,15 @@ void input_jump(Ctx *c) {
     if (!seen) seen = rn_telem.presents;
     if (rn_telem.presents - seen < 30) return;   // let the screen settle as a player would
     extern uint32_t rn_next_left;
+    // The page has no exit: it logs done once and stays (the list read "" as a jump every frame: build/gate3_a.log).
+    if (!*s && !rn_next_left) {
+        static int done;
+        if (!done++) rn_log("RN_JUMP: done, back in the front end at frame %u", rn_telem.presents);
 #ifndef __EMSCRIPTEN__
-    if (!*s && !rn_next_left) { rn_log("RN_JUMP: done, back in the front end at frame %u", rn_telem.presents); fflush(NULL); _exit(0); }
+        fflush(NULL); _exit(0);
 #endif
+        return;
+    }
     if (rn_next_left) return;   // a tournament between stages (race message 9 loads the next one)
     if (car) {
         // The map's own path (0x4c5df0): esi = career 0x75eef8, edi = event id, ebx = its record ([0x733ff8 + 4*id],

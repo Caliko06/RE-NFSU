@@ -282,9 +282,10 @@ def webp(d):   # the PNG shots -> WebP (only these and completion.json come down
         if f.startswith('shot.png') and f.endswith('.png') and not os.path.exists(f'{d}/{f[:-4]}.webp'):
             Image.open(f'{d}/{f}').save(f'{d}/{f[:-4]}.webp', quality=80)
 
-if sys.argv[1] == 'launch':
+CMD = sys.argv[1] if __name__ == '__main__' else None   # imported (tools/savegate.py): routes only
+if CMD == 'launch':
     for r in sys.argv[2:]: launch(r)
-elif sys.argv[1] == 'queue':
+elif CMD == 'queue':
     def live():   # every native row of this repo, also those another queue started (one game process at a time)
         ps = subprocess.run(['ps', '-axo', 'command='], capture_output=True, text=True).stdout.splitlines()
         return sum(l.startswith(f'{R}/build/speed') for l in ps)
@@ -308,7 +309,7 @@ elif sys.argv[1] == 'queue':
             kids[launch(row)] = [f'{R}/runs/{row if "." in row else row + "." + SEEDS[0]}/log.txt', 0, time.time()]
         elif todo and free < 5: print(f'{time.strftime("%T")} {free} GB free: {todo[0]} waits', flush=True)
         time.sleep(10)
-elif sys.argv[1] == 'collect':
+elif CMD == 'collect':
     runs = [r for r in sorted(os.listdir(f'{R}/runs')) if any(os.path.exists(f'{R}/runs/{r}/{f}') for f in ('log.txt', 'flow.txt'))]
     for r in runs: webp(f'{R}/runs/{r}')
     rows = {f'{r}#{i}' if i else r: v for r in runs for i, v in enumerate(rows_of(f'{R}/runs/{r}')) if not i or v['reached']['start']}

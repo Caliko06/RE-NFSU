@@ -23,7 +23,8 @@ const secs = route ? ROUTE.secs : Number(arg[1] || 120);
 const shot = route ? ROUTE.shot : arg[2] || 'build/webcheck.png';
 const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, c]) => ({ t: +t, code: c.split('+')[0], hold: +(c.split('+')[1] || 0) }));
 // Each run starts from a fresh copy of the OWNER's save (tools/serve.py gives headless Chrome build/save-headless).
-rmSync('build/save-headless', { recursive: true, force: true });
+// RN_KEEP_SAVE=1 keeps the last run's: a second run is a page reload on what the first one saved (block 3 gate).
+if (!process.env.RN_KEEP_SAVE) rmSync('build/save-headless', { recursive: true, force: true });
 // RE-NFSU's own CDP port: ~/RE-NFSMW's webcheck holds 9333 (127.0.0.1) and once took this repo's run into its Chrome,
 // which died with its run (2026-10-25, the page stopped at 61 s).
 const port = Number(process.env.RN_CDP_PORT || 9381);
@@ -54,6 +55,7 @@ await send('Runtime.enable');
 // RN_PROFILE=start:secs: a CPU sampling profile of every worker (the game runs in them) from second `start` for `secs`
 // seconds -> build/profile.txt, functions by self and total time. Names need a web build with RN_PROF=1.
 const prof = process.env.RN_PROFILE?.split(':').map(Number), workers = new Map();
+const profTop = Number(process.env.RN_PROFILE_TOP || 40);   // functions listed per worker and list
 if (prof) {
   const onmsg = ws.onmessage;
   ws.onmessage = e => { const m = JSON.parse(e.data); if (m.method === 'Target.attachedToTarget') workers.set(m.params.sessionId, m.params.targetInfo); onmsg(e); };
@@ -79,7 +81,8 @@ if (netlog) {
 }
 let profState = 0;
 const afterHud = process.env.RN_AFTER_HUD ? Number(process.env.RN_AFTER_HUD) : -1;
-let hudAt = 0;
+let hudAt = 0, untilAt = 0;
+const until = process.env.RN_UNTIL && { re: new RegExp(process.env.RN_UNTIL.replace(/@\d+$/, '')), s: Number(process.env.RN_UNTIL.match(/@(\d+)$/)?.[1] ?? 5) };
 async function profile() {
   if (profState === 0 && Date.now() - t0 >= prof[0] * 1000) {
     profState = 1;
@@ -105,9 +108,9 @@ async function profile() {
       if (n - idle < 200) continue;
       const pct = v => (100 * v / n).toFixed(1).padStart(5);
       out += `\n== ${s ? 'worker' : 'page'} ${workers.get(s).url.split('/').pop()} ${(s || '').slice(0, 8)}: ${n} samples, idle/program ${pct(idle)}%\n self:\n`;
-      for (const [k, v] of [...self].sort((a, b) => b[1] - a[1]).slice(0, 40)) out += `${pct(v)}  ${k}\n`;
+      for (const [k, v] of [...self].sort((a, b) => b[1] - a[1]).slice(0, profTop)) out += `${pct(v)}  ${k}\n`;
       out += ' total (self + callees):\n';
-      for (const [k, v] of [...total].sort((a, b) => b[1] - a[1]).slice(0, 40)) out += `${pct(v)}  ${k}\n`;
+      for (const [k, v] of [...total].sort((a, b) => b[1] - a[1]).slice(0, profTop)) out += `${pct(v)}  ${k}\n`;
     }
     writeFileSync('build/profile.txt', out);
     console.log('profile: build/profile.txt');
@@ -165,6 +168,9 @@ while (Date.now() - t0 < secs * 1000) {
   // shot at a fixed page time shows a different moment: camera-dependent effects then look like regressions).
   if (afterHud >= 0 && !hudAt && /d3d9 race HUD /.test(text)) hudAt = Date.now();
   if (hudAt && Date.now() - hudAt >= afterHud * 1000) break;
+  // RN_UNTIL=regex[@s]: stop s seconds (default 5) after the page log first matches (e.g. "RN_JUMP: done").
+  if (until && !untilAt && until.re.test(text)) untilAt = Date.now();
+  if (untilAt && Date.now() - untilAt >= until.s * 1000) break;
 }
 await sleep(500);   // let the last frame reach the canvas
 const png = await send('Page.captureScreenshot', { format: 'png' });
