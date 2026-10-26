@@ -30,7 +30,9 @@ async function startGpu(M, canvas, report, onFrame) {
   report(`gpu.js: adapter ${adapter.info?.vendor || '?'} ${adapter.info?.architecture || ''} ${adapter.info?.description || ''}`);
   // timestamp-query (when the adapter has it): GPU time of each frame's passes, reported with the frame log (gpu.js ts).
   const TS = adapter.features.has('timestamp-query');
-  const device = await adapter.requestDevice(TS ? { requiredFeatures: ['timestamp-query'] } : undefined);
+  // texture-compression-bc (Apple and desktop GPUs have it): the world pack in BC7 (loadDds).
+  const BC = adapter.features.has('texture-compression-bc');
+  const device = await adapter.requestDevice({ requiredFeatures: [...(TS ? ['timestamp-query'] : []), ...(BC ? ['texture-compression-bc'] : [])] });
   device.addEventListener('uncapturederror', e => report('webgpu: ' + e.error.message));
   const ctx = canvas.getContext('webgpu');
   const box = M._rn_gpu_mailbox() >> 2;     // u32 index: seq, done, ptr[2], len[2]
@@ -48,13 +50,18 @@ async function startGpu(M, canvas, report, onFrame) {
   // ?hdlog=1: each pack hit once (texture id, size, key, png), to find a texture the pack should not take.
   const hdLog = new URLSearchParams(location.search).get('hdlog') === '1' ? new Set() : null;
   if (new URLSearchParams(location.search).get('remaster') !== '0') {
-    // ?worldhd=1 adds the world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh): opt-in, since with them gate60
-    // passed 1 run in 4 (heavy scenes, > 3300 draws, drop 18-53 frames over 20 ms; base 0-2), build/bench/e_default*, 2026-10-26.
+    // The world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh) are on by default in BC7; ?worldhd=0 turns them off.
+    // As rgba8 (webp: ?worldhd=1&worldbc=0) gate60 passed 1 run in 4 (scenes > 3300 draws dropped 18-53 frames over 20 ms; base 0-2,
+    // build/bench/e_default*); as BC7 4 in 4, max 24-25 ms, 0 > 33 ms like the base (build/bench/f_bc7_q*, 2026-10-26).
+    // Without the BC feature (or with ?pack=1) the webp world pack stays opt-in with ?worldhd=1.
     // Pack v2 (tools/remaster/pack_v2.sh: deblock + 4x-UltraSharpV2) overrides the v1 entries it has; ?pack=1 = v1 only.
     // index_fe_v2.tsv (SETS=fe): the front end, HUD and global textures, only in v2.
-    const q = new URLSearchParams(location.search), v2 = q.get('pack') !== '1', world = q.get('worldhd') === '1';
+    // index_world_bc.tsv (tools/remaster/world_bc7.sh): the same world pack (v2 over v1) in BC7; ?worldbc=0 = the webp.
+    const q = new URLSearchParams(location.search), v2 = q.get('pack') !== '1', wq = q.get('worldhd');
+    const world = wq === '1' || (wq !== '0' && v2 && BC && q.get('worldbc') !== '0');
+    const worldBc = world && v2 && BC && q.get('worldbc') !== '0';
     const lists = ['remaster/index.tsv', ...(v2 ? ['remaster/index_v2.tsv', 'remaster/index_fe_v2.tsv'] : []),
-      ...(world ? ['remaster/index_world.tsv', ...(v2 ? ['remaster/index_world_v2.tsv'] : [])] : [])];
+      ...(worldBc ? ['remaster/index_world_bc.tsv'] : world ? ['remaster/index_world.tsv', ...(v2 ? ['remaster/index_world_v2.tsv'] : [])] : [])];
     for (const u of lists) try {
       const r = await fetch(u);
       if (r.ok) for (const l of (await r.text()).split('\n')) { const f = l.split('\t'); if (f[1]) pack.set(f[0], f[1]); }
@@ -101,7 +108,32 @@ async function startGpu(M, canvas, report, onFrame) {
     }
     device.queue.submit([e.finish()]);
     hdMs += performance.now() - t;
+  // A BC7 .dds with its mip chain (tools/remaster/world_bc7.sh, MW's bcdds.cpp), gzipped on disk next to it (<name>.gz):
+  // no decode on the page thread, a quarter of the VRAM of rgba8. Same reader as ~/RE-NFSMW web/gpu.js loadDds.
+  async function loadDds(url) {
+    if (netN < HD_NET) netN++; else await new Promise(r => netQ.push(r));
+    let b;
+    try {
+      const r = await fetch(url + '.gz');
+      b = r.ok ? await new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer() : await (await fetch(url)).arrayBuffer();
+    } finally { const next = netQ.shift(); if (next) next(); else netN--; }
+    const u = new Uint32Array(b, 0, 32);
+    if (u[0] !== 0x20534444 || u[21] !== 0x30315844 || new Uint32Array(b, 128, 1)[0] !== 98) throw new Error('not a BC7 dds');
+    const H = u[3], W = u[4], levels = u[7], t = performance.now();
+    const tex = device.createTexture({ size: [W, H], mipLevelCount: levels, format: 'bc7-rgba-unorm',
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
+    let off = 148;
+    for (let l = 0; l < levels; l++) {
+      const bw = Math.ceil(Math.max(1, W >> l) / 4), bh = Math.ceil(Math.max(1, H >> l) / 4);
+      device.queue.writeTexture({ texture: tex, mipLevel: l }, new Uint8Array(b, off, bw * bh * 16),
+        { bytesPerRow: bw * 16, rowsPerImage: bh }, [bw * 4, bh * 4]);
+      off += bw * bh * 16;
+    }
+    hdMs += performance.now() - t;
     return { view: tex.createView() };
+  }
+    return { view: tex.createView() };
+    if (name.endsWith('.dds')) return loadDds(`remaster/${name}`);
   }
   function useHd(t, key) {
     const name = pack.get(key);
