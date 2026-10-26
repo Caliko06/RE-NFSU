@@ -1040,6 +1040,8 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 16, seed ? (uint32_t)strtoul(seed, NULL, 0) : 0, 4);
     st(c, SCREEN_ADDR + 20, getenv("RN_AUTOPILOT") != NULL, 4);   // PATCH 0x42d4b0: test-only, the AI drives the player
     st(c, SCREEN_ADDR + 24, getenv("RN_AUTOPILOT") ? 4 : 3, 4);  // PATCH 0x42d4a9: drag player mode, 4 = autopilot, 3 = drag (original)
+    const char *tr = getenv("RN_TRAFFIC");     // PATCH 0x57d060 (cave 0x63b270): 1 = full traffic pool, 0 = original
+    st(c, SCREEN_ADDR + 28, !(tr && tr[0] == '0'), 4);
     clock_gettime(CLOCK_MONOTONIC, &t0);
 #ifdef __EMSCRIPTEN__
     t0_ms = emscripten_get_now();

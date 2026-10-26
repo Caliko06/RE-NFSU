@@ -1,5 +1,5 @@
 {
- "functions": 13716,
+ "functions": 13720,
  "abk_files": 106,
  "abk_modules": 79,
  "abk_distinct_code": 23,
@@ -70,7 +70,14 @@
   "0x50d6a4",
   "0x50df69",
   "0x512223",
-  "0x512dd8"
+  "0x512dd8",
+  "0x63b270",
+  "0x57d060",
+  "0x57d0c1",
+  "0x57cfc7",
+  "0x4b3b01",
+  "0x583a37",
+  "0x583a5b"
  ],
  "data_seeds_inside_instructions": 615,
  "failed": {},

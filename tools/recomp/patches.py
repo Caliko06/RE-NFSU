@@ -182,6 +182,28 @@ for a, old in [(0x4d7eb9, "8b3d"), (0x4d8077, "a1"), (0x4d8117, "a1"), (0x4d81c7
     PATCHES.append(dict(addr=a, old=old + "ac777600", new=new, when=lambda: True))
 
 
+# PATCH: 0x57d060, 0x57d0c1, 0x57cfc7, 0x4b3b01, 0x583a37, 0x583a5b (+ cave 0x63b270, a dead CRT routine: no call, jump or pointer
+# reaches 0x63b270..0x63b3bf; source tools/recomp/caves/traffic.s), OWNER 2026-10-25 (traffic alive). AddTrafficCars
+# 0x4b3ac0 spawns i8 [trackinfo + side + sel*2 + 0xc0] cars (GLOBALB 0x34201: 12 on most tracks), each of a type from
+# 0x57d000: weights f32 [row + 0xc60 + district*4] of the rows the iterator 0x57cfa0 keeps (usage +0xc54 == 2, enable
+# +0x40, skins +0xd9 > 0) in the table [0x734588] (GLOBALB 0x34600, 35 rows x 0xc90). District 0 (every Quick Race)
+# weights only 6 of the 12 normal traffic types. Now: the 12 types weigh 1.0 in every district (BUS, AMBULANCE and
+# FIRETRUCK stay 0), the iterator also lets the traffic pick take racer rows (usage 0) and 8 compact racers weigh 0.375
+# (stock skin: d9 = 1, skin 1); +0xc60 has no other reader. The count is x1.5 (12 -> 18), at most 26 (rides cap 30 at
+# 0x4322a0); the 100 re-picks at 0x4b3b30 keep every ride a distinct type (run: 6 -> 18 types on track 1001). The
+# traffic driver 0x583910 (ctor 0x582f90, vtable 0x6b96b0; racers use 0x5a6ef0 from 0x462b30) asks 0x5a6b00 the lane speed
+# (node +0x6a via 0x5a7690) twice a frame; each car now drives at x0.85..1.15 of it, from a hash of its AI object (esi), so
+# a car keeps its pace (a spawn speed alone would not last). [0x1301c] (SCREEN_ADDR+28) = 0 (RN_TRAFFIC=0) = original.
+PATCHES.append(dict(addr=0x63b270, entries=(0x63b280, 0x63b28a, 0x63b310, 0x63b331), old="8b44240881ec0801000085c00f8424010000538b9c24100100005556578944241053e8b91e000083c40484c00f85eb000000a1f4756e008d5424142bd08d49008a08880c024084c975f68bc38bf38bff8a084084c975f98d7c24142bc64f8bff8a4f014784c975f88bc8c1e9026a00f3a568800000006a036a006a008bc868000000808d44242c83e10350f3a4ff15c07169008bf883ffff745268fc8c6a006a07e84a7b000053e834fdffff8be883c40c85ed750f8b0d18766e0051e81f71000083c4048b3590f470006a005783c610ff15b871690001068356040057c6850401000001ff1528716900eb316a00681001000068f08c",
+                    new="7b4002000000c03e9a99593fce339a3a5089c8e80200000058c3833d1c300100007508d984b0600c0000c3528b90540c000085d274248b90600c00000b90640c00000b90680c00000b906c0c00000b90700c00007420d9e85ac38b90500c000083fa1f77110fa31570b263007308d90574b263005ac3d9ee5ac38b88540c000039f17412833d1c30010000740e85c9750a83fe027505e9c61cf4ffe9dd1cf4ff0fbe9479c0000000833d1c30010000740f8d1452d1fa83fa1a7e05ba1a000000c3ff742404e8c6b7f6ff833d1c3001000074205089f069c0b179379ec1e81850db042458d80d7cb26300d80578b26300dec958c20400", when=lambda: True))
+PATCHES.append(dict(addr=0x57d060, old="d984b0600c0000", new="e825e20b009090", when=lambda: True))
+PATCHES.append(dict(addr=0x57d0c1, old="d984b1600c0000", new="e8bae10b009090", when=lambda: True))
+PATCHES.append(dict(addr=0x57cfc7, old="8b88540c00003bce751c", new="e91ee30b009090909090", when=lambda: True))
+PATCHES.append(dict(addr=0x4b3b01, old="0fbe9479c0000000", new="e80a781800909090", when=lambda: True))
+PATCHES.append(dict(addr=0x583a37, old="e8c4300200", new="e8f5780b00", when=lambda: True))
+PATCHES.append(dict(addr=0x583a5b, old="e8a0300200", new="e8d1780b00", when=lambda: True))
+
+
 def apply(img, base):
     """Patch a bytearray image mapped at base."""
     for p in active():
