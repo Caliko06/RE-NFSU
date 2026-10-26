@@ -44,11 +44,12 @@ async function startGpu(M, canvas, report, onFrame) {
   // A texture keeps its original; while its contents match the index it is drawn with the PNG (own mip chain).
   // ?remaster=0 turns it off. No index file = off.
   const pack = new Map(), hd = new Map();   // key -> png name; png name -> {view} once loaded, null while loading
-  let packed = 0;
+  let packed = 0, hdMs = 0;   // hdMs: page-thread ms in pack uploads and view swaps since the last frame report
   // ?hdlog=1: each pack hit once (texture id, size, key, png), to find a texture the pack should not take.
   const hdLog = new URLSearchParams(location.search).get('hdlog') === '1' ? new Set() : null;
   if (new URLSearchParams(location.search).get('remaster') !== '0') {
-    // ?worldhd=1 adds the world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh): opt-in, the world look stays 2003 by default.
+    // ?worldhd=1 adds the world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh): opt-in, since with them gate60
+    // passed 1 run in 4 (heavy scenes, > 3300 draws, drop 18-53 frames over 20 ms; base 0-2), build/bench/e_default*, 2026-10-26.
     // Pack v2 (tools/remaster/pack_v2.sh: deblock + 4x-UltraSharpV2) overrides the v1 entries it has; ?pack=1 = v1 only.
     // index_fe_v2.tsv (SETS=fe): the front end, HUD and global textures, only in v2.
     const q = new URLSearchParams(location.search), v2 = q.get('pack') !== '1', world = q.get('worldhd') === '1';
@@ -83,11 +84,23 @@ async function startGpu(M, canvas, report, onFrame) {
     const levels = Math.floor(Math.log2(Math.max(W, H))) + 1;
     const tex = device.createTexture({ size: [W, H], mipLevelCount: levels, format: 'rgba8unorm',
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
-    for (let l = 0; l < levels; l++) {
-      const w = Math.max(1, W >> l), h = Math.max(1, H >> l);
-      const bmp = l ? await createImageBitmap(blob, { ...opt, resizeWidth: w, resizeHeight: h, resizeQuality: 'high' }) : base;
-      device.queue.copyExternalImageToTexture({ source: bmp }, { texture: tex, mipLevel: l }, [w, h]);
+    // The mips are drawn on the GPU from the level above (mipPipe, as the car skins). Decoding the blob again per level
+    // (~720 world textures x ~11 levels in the first 4 s of a race) dropped it to 22-30 ms frames, and resizing the
+    // bitmap instead still cost 11 % of the page thread in createImageBitmap (build/bench/e_world_q, e_default_p, 2026-10-26).
+    if (full !== base) full.close();
+    const t = performance.now();
+    device.queue.copyExternalImageToTexture({ source: base }, { texture: tex, mipLevel: 0 }, [W, H]);
+    base.close();
+    const e = device.createCommandEncoder();
+    for (let l = 1; l < levels; l++) {
+      const p = e.beginRenderPass({ colorAttachments: [{ view: tex.createView({ baseMipLevel: l, mipLevelCount: 1 }), loadOp: 'clear', storeOp: 'store' }] });
+      p.setPipeline(mipPipe);
+      p.setBindGroup(0, device.createBindGroup({ layout: mipPipe.getBindGroupLayout(0), entries: [
+        { binding: 0, resource: tex.createView({ baseMipLevel: l - 1, mipLevelCount: 1 }) }, { binding: 1, resource: skinLin }] }));
+      p.draw(3); p.end();
     }
+    device.queue.submit([e.finish()]);
+    hdMs += performance.now() - t;
     return { view: tex.createView() };
   }
   function useHd(t, key) {
@@ -100,8 +113,10 @@ async function startGpu(M, canvas, report, onFrame) {
     if (h === null) return;
     hd.set(name, null);
     loadHd(name).then(v => {
+      const t = performance.now();
       hd.set(name, v); packed++;
       for (const x of res.values()) if (x.key && pack.get(x.key) === name) x.view = v.view;
+      hdMs += performance.now() - t;
     }, e => report(`gpu.js: remaster ${name}: ${e.message}`));
   }
 
@@ -956,7 +971,8 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         frames++;
         if (s.present) presents++;
         if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +
-          (pack.size ? `, remaster ${packed}` : '') + gpuReport());
+          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + gpuReport());
+        if (frames % 300 === 0) hdMs = 0;
         Atomics.store(h, box + 1, k);
         Atomics.notify(M.HEAP32, box + 1);
       }
