@@ -53,7 +53,8 @@ static void *watchdog(void *arg) {
 // RN_WATCH=70fe28,77a920: every 250 ms, log each listed dword of guest memory (read without the GIL; a counter
 // needs no lock). The same addresses can be read in the Wine reference through /proc/PID/mem (tools/wine/memwatch.py).
 // 7345d0>20 reads [[0x7345d0]+0x20] (a field of a heap object; 0 while the pointer is 0); 78a418>10+750*26 reads that
-// field in 26 records 0x750 apart (the type of each race ride: list [0x78a418], count [0x78a41c]).
+// field in 26 records 0x750 apart (the type of each race ride: list [0x78a418], count [0x78a41c]); 7602a0+454*27 reads
+// 27 static records.
 // RN_POKE=76778b=1,...: with RN_WATCH, also write each byte at every tick (a state a save cannot reach yet, such as a
 // won magazine; the load overwrites it once, the next tick sets it again).
 static void *memwatch(void *arg) {
@@ -75,8 +76,9 @@ static void *memwatch(void *arg) {
             uint32_t v, p; memcpy(&v, g_ctx->mem + a[i], 4); p = v;
             for (uint32_t j = 0; j < cnt[i]; j++) {
                 if (off[i] != ~0u) { uint32_t q = p + off[i] + j * step[i]; v = 0; if (p && q < GUEST_MEM - 4) memcpy(&v, g_ctx->mem + q, 4); }
-                k += off[i] == ~0u ? snprintf(line + k, sizeof line - k, " %x=%u", a[i], v)
-                   : j ? snprintf(line + k, sizeof line - k, ",%u", v)
+                else if (j) memcpy(&v, g_ctx->mem + a[i] + j * step[i], 4);   // 7602a0+454*27: 27 static records
+                k += j ? snprintf(line + k, sizeof line - k, ",%u", v)
+                   : off[i] == ~0u ? snprintf(line + k, sizeof line - k, " %x=%u", a[i], v)
                        : snprintf(line + k, sizeof line - k, " %x>%x=%u", a[i], off[i], v);
             }
         }
