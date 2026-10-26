@@ -95,8 +95,14 @@ void gil_slice(void) {
 // thread 0x63e4d0 during a load). Under the GIL the spin took their turn: the file thread waited for the GIL 55%
 // of the menu->race load (CPU profile 2026-10-24). So a clock read hands the GIL to a waiting thread, and that
 // thread gets a short quantum, so the spinner is back about as soon as its time would pass on Windows.
+// The main thread also reads the clock ~250 times in a frame's own work. Passing the GIL at each read cost 49 ms of
+// waiting in one 83 ms race frame (247 hand-offs, ~190 us each to come back; bench b4_gil1, 2026-10-26), so it passes
+// at a clock read only after holding it this long: the limiter's spin still hands its time to the other threads.
+// RN_MAINCLOCK=0: pass at every read again (the A/B).
+static uint64_t main_clock_us = 1000;
 void gil_clock(void) {
     if (__atomic_load_n(&next_ticket, __ATOMIC_RELAXED) == __atomic_load_n(&serving, __ATOMIC_RELAXED) + 1) return;
+    if (is_main && now_us() - slice_start < main_clock_us) return;
     __atomic_add_fetch(&spinners, 1, __ATOMIC_RELAXED);
     gil_release();
     gil_acquire();
@@ -171,6 +177,8 @@ static void teb_init(Ctx *c, uint32_t teb, uint32_t lo, uint32_t hi, uint32_t id
 void threads_init(Ctx *c) {
     teb_init(c, TEB_ADDR, STACK_LO, STACK_HI, 0xc);
     is_main = 1;
+    const char *mc = getenv("RN_MAINCLOCK");
+    if (mc) main_clock_us = strtoull(mc, NULL, 10);
     gil_acquire();
 }
 

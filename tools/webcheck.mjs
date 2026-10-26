@@ -94,6 +94,8 @@ async function profile() {
     for (const s of workers.keys()) {
       const p = (await send('Profiler.stop', {}, s))?.profile;
       if (!p) continue;
+      // RN_PROFILE_RAW=prefix: also each thread's raw .cpuprofile (samples + timeDeltas: slice one slow frame).
+      if (process.env.RN_PROFILE_RAW) writeFileSync(`${process.env.RN_PROFILE_RAW}.${(s || 'page').slice(0, 8)}.cpuprofile`, JSON.stringify(p));
       const byId = new Map(p.nodes.map(n => [n.id, n])), parent = new Map();
       for (const n of p.nodes) for (const c of n.children || []) parent.set(c, n.id);
       const self = new Map(), total = new Map(), n = p.samples.length;
