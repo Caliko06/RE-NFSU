@@ -365,8 +365,10 @@ static const char *const car_ps_env =
 // c23 = 0.3..0.5 the curve is flat: a roof seen at N.V 0.5..0.7 still adds 25..55 % of the 128 px cube (trees, sky) over the
 // paint. Here the same Min/Max on Schlick's (1 - N.V)^5, the facing value at 45 % (a clearcoat reflects ~4 % head on), the cube
 // read as 5 taps in a small cone (128 px of world, mirror-sharp, reads as wrinkled foil), and its bright texels expanded up to 5x
-// (an 8-bit cube holds a street lamp as bright as a leaf; a real one stays visible in a 4 % reflection, the foliage does not). Metals (diffuse ~0: CHROME,
-// mirrors, reflectors) keep their facing value and a sharper cone.
+// (an 8-bit cube holds a street lamp as bright as a leaf; a real one stays visible in a 4 % reflection, the foliage does not),
+// but never past what car.efx itself reflects there (ag, the line above's a): uncapped, 5x clipped every light texel to flat
+// white blobs on pillars and spoilers where the original stays light blue (OWNER 2026-10-26, build/carlook/layers_ab.png A vs B).
+// Metals (diffuse ~0: CHROME, mirrors, reflectors) keep their facing value and a sharper cone.
 static const char *const car_ps_clearcoat =
     "  let Rc = normalize(cc);\n"
     "  let ax = select(vec3f(0.0, 1.0, 0.0), vec3f(1.0, 0.0, 0.0), abs(Rc.y) > 0.9);\n"
@@ -377,11 +379,15 @@ static const char *const car_ps_clearcoat =
     "  let cs = 0.4 * textureSample(y0, s0, Rc) + 0.15 * (textureSample(y0, s0, Rc + rad * ta) + textureSample(y0, s0, Rc - rad * ta)"
     " + textureSample(y0, s0, Rc + rad * tb) + textureSample(y0, s0, Rc - rad * tb));\n"
     "  let lum = dot(cs.xyz, vec3f(0.3, 0.59, 0.11));\n"
-    "  let hdr = vec4f(cs.xyz * (1.0 + 4.0 * lum * lum * lum * lum), cs.w);\n"
-    "  t0 = select(textureSample(x0, s0, tc(vec4f(cc, 1.0), u.tt[0][0])), hdr, (u.tt[0][0] & 65536u) != 0u);\n"
-    "  let emn = u.pc[0].xyz;\n  let emx = u.pc[0].xyz + u.pc[1].xyz;\n"
     "  let fs = pow(1.0 - min(d, 1.0), 5.0);\n"
-    "  let a = clamp(mix(min(emn, emx) * mix(0.45, 1.0, metal), max(emn, emx), fs), vec3f(-8.0), vec3f(8.0));\n";
+    "  let emn = u.pc[0].xyz;\n  let emx = u.pc[0].xyz + u.pc[1].xyz;\n"
+    "  let ac = clamp(mix(min(emn, emx) * mix(0.45, 1.0, metal), max(emn, emx), fs), vec3f(-8.0), vec3f(8.0));\n"
+    "  let ag = clamp(d1c.w * u.pc[1].xyz + u.pc[0].xyz, vec3f(-8.0), vec3f(8.0));\n"
+    "  let hdr = cs.xyz * (1.0 + 4.0 * lum * lum * lum * lum);\n"
+    "  let rc = min(hdr * ac, max(cs.xyz * ag, cs.xyz * ac));\n"
+    "  let cube = (u.tt[0][0] & 65536u) != 0u;\n"
+    "  t0 = select(textureSample(x0, s0, tc(vec4f(cc, 1.0), u.tt[0][0])), vec4f(rc, cs.w), cube);\n"
+    "  let a = select(ac, vec3f(1.0), cube);\n";
 // RN_CARLOOK=2 / ?carlook=2, a candidate for the OWNER (2026-10-26, "the cars look flat"): the clearcoat at full strength.
 // car.efx adds the cube in gamma space, so its mid-tones (foliage, the grey sky) are what made the 2003 veil, and the 45 %
 // facing value above makes the paint flat. Here the cube is read linear (c * c: mid-tones fall to a quarter, the sky and the

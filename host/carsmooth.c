@@ -32,9 +32,13 @@ static void norm3(float *a, const float *fallback) {
     if (l > 1e-12f) { a[0] /= l; a[1] /= l; a[2] /= l; } else memcpy(a, fallback, 3 * sizeof(float));
 }
 
-/* PN edge control point next to P (toward Q): (2P + Q - ((Q - P).N) N) / 3. */
+/* PN edge control point next to P (toward Q): (2P + Q - ((Q - P).N) N) / 3, only toward the face's own side (w <= 0).
+ * PN bulges toward the convex side whatever way the normal points, so a dark inner shell under the roof (normals inward,
+ * same piece) rose through the paint as black blotches (OWNER 2026-10-26, Supra roof, the 268-triangle draw of 774 vertices).
+ * Held to its own side each layer moves away from the other; both faces of an edge still get the same point. */
 static void edge_ctrl(const float *p, const float *q, const float *n, int curved, float *out) {
     float w = curved ? (q[0]-p[0])*n[0] + (q[1]-p[1])*n[1] + (q[2]-p[2])*n[2] : 0.0f;
+    if (w > 0.0f) w = 0.0f;
     for (int k = 0; k < 3; k++) out[k] = (2.0f * p[k] + q[k] - w * n[k]) / 3.0f;
 }
 
