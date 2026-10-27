@@ -50,6 +50,9 @@ static void *watchdog(void *arg) {
     rn_log("RN_SECS: stopped after %u s (no stop reached)", secs);
     _exit(0);
 }
+
+#endif
+
 // RN_WATCH=70fe28,77a920: every 250 ms, log each listed dword of guest memory (read without the GIL; a counter
 // needs no lock). The same addresses can be read in the Wine reference through /proc/PID/mem (tools/wine/memwatch.py).
 // 7345d0>20 reads [[0x7345d0]+0x20] (a field of a heap object; 0 while the pointer is 0); 78a418>10+750*26 reads that
@@ -87,7 +90,6 @@ static void *memwatch(void *arg) {
         usleep(250000);
     }
 }
-#endif
 
 static uint32_t rd32(const uint8_t *p) { uint32_t v; memcpy(&v, p, 4); return v; }
 static uint16_t rd16(const uint8_t *p) { uint16_t v; memcpy(&v, p, 2); return v; }
@@ -159,9 +161,7 @@ int main(int argc, char **argv) {
     c->r[ESP] = STACK_HI - 16;
     c->r[ESP] -= 4;
     st(c, c->r[ESP], host_addr_of("rn", "entry_returned"), 4);
-#ifndef __EMSCRIPTEN__
     if (getenv("RN_WATCH")) { pthread_t mw; pthread_create(&mw, NULL, memwatch, getenv("RN_WATCH")); pthread_detach(mw); }
-#endif
     rn_steerlog = getenv("RN_STEERLOG") != NULL;
     // RN_CARLOOK=2003 (car.efx as shipped) and 2 (host/sm1.c car_ps_sharp): the car's cube reflection at the game's 0.5,
     // not PATCH 0x40fbb7's 0.35 (the float it reads at 0x707fc4).
