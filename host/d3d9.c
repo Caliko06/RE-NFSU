@@ -893,6 +893,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     tune_apply(c);
     rng_log(c, dev.frames);
     flow_log(c);
+    if (rn_steerlog) steer_frame(c);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
         return D3DERR_INVALIDCALL;

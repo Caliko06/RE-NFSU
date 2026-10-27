@@ -105,13 +105,18 @@ function line(s, cls) {
       // 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift), the next one when a race comes back to the menu
       const jump = new URLSearchParams(location.search).get('jump');
       if (jump) m.ENV.RN_JUMP = jump;
-      // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off)
-      if (new URLSearchParams(location.search).get('carlook') === '0') m.ENV.RN_CARLOOK = '0';
+      // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
+      // 2: the sharp clearcoat candidate (host/sm1.c car_ps_sharp)
+      // ?steer=pad: the keyboard steers through the game's gamepad model (PATCH 0x460a80, host/win32.c RN_STEER)
+      if (new URLSearchParams(location.search).get('steer') === 'pad') m.ENV.RN_STEER = 'pad';
+      const look = new URLSearchParams(location.search).get('carlook');
+      if (look !== null) m.ENV.RN_CARLOOK = look;
     }],
   });
   const telem = startTelemetry(M, t0, s => line(s), allLog);
   startGpu(M, document.getElementById('screen'), s => line(s, 'api'), telem?.frame).catch(e => line('gpu.js: ' + e.message, 'stop'));
-  startInput(M, document.getElementById('screen'));
+  // RN_STEERLOG (host/input.c): also each key at the page and each present's GPU completion, on the page's clock
+  startInput(M, document.getElementById('screen'), /RN_STEERLOG/.test(location.search) ? s => line(s) : null);
   startTune(M);
   startAudio(M, s => line(s)).catch(e => line('audio.js: ' + e.message, 'stop'));
   window.RN_M = M;                          // for checks from the console or tools/webcheck.mjs

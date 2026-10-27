@@ -15,7 +15,7 @@
 #define SCREEN_ADDR 0x00013000u     // PATCH 0x40877e reads the screen width and height here (win32_init writes them)
 // PATCH 0x40bf09..: the 2D quad code reads S/320 (+8) and S (+12) as floats; S = 4:3 over the screen aspect, at most 1
 // PATCH 0x4470f0: the RNG seed reads RN_SEED at +16 (0 = the original clock seed); PATCH 0x42d4b0: RN_AUTOPILOT at +20
-// PATCH 0x42d4a9: the drag player mode at +24 (4 with RN_AUTOPILOT, else 3)
+// PATCH 0x42d4a9: the drag player mode at +24 (4 with RN_AUTOPILOT, else 3); PATCH 0x460a80: the steering model at +32
 #define HEAP_LO     0x00800000u
 #define HOST_BASE   0xe0000000u     // fake code addresses of host functions: HOST_BASE + 16*index
 
@@ -64,6 +64,9 @@ void input_finish(Ctx *c);      // RN_FINISH (host/input.c), same place
 void input_open(Ctx *c);        // RN_OPEN (host/input.c), same place
 void input_next(Ctx *c);        // RN_NEXT (host/input.c), same place
 void input_call(Ctx *c);        // RN_CALL (host/input.c), same place
+extern int rn_steerlog;         // RN_STEERLOG (host/input.c): the player's steering, per event and per Present
+void steer_event(Ctx *c);       // from rn_call at the steer handler 0x461840
+void steer_frame(Ctx *c);       // from Present
 int rn_trace(void);
 void win32_init(Ctx *c, uint32_t image_size);
 uint32_t guest_alloc(uint32_t size);                           // zeroed, for host-owned guest data

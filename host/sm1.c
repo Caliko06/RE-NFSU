@@ -382,6 +382,26 @@ static const char *const car_ps_clearcoat =
     "  let emn = u.pc[0].xyz;\n  let emx = u.pc[0].xyz + u.pc[1].xyz;\n"
     "  let fs = pow(1.0 - min(d, 1.0), 5.0);\n"
     "  let a = clamp(mix(min(emn, emx) * mix(0.45, 1.0, metal), max(emn, emx), fs), vec3f(-8.0), vec3f(8.0));\n";
+// RN_CARLOOK=2 / ?carlook=2, a candidate for the OWNER (2026-10-26, "the cars look flat"): the clearcoat at full strength.
+// car.efx adds the cube in gamma space, so its mid-tones (foliage, the grey sky) are what made the 2003 veil, and the 45 %
+// facing value above makes the paint flat. Here the cube is read linear (c * c: mid-tones fall to a quarter, the sky and the
+// lamps stay), the facing value is the paint's own EnvmapMax, the scale is the game's 0.5 (main.c), and the cone is smaller.
+static const char *const car_ps_sharp =
+    "  let Rc = normalize(cc);\n"
+    "  let ax = select(vec3f(0.0, 1.0, 0.0), vec3f(1.0, 0.0, 0.0), abs(Rc.y) > 0.9);\n"
+    "  let ta = normalize(cross(ax, Rc));\n  let tb = cross(Rc, ta);\n"
+    "  let dmax = max(u.c[18].x + u.c[19].x, max(u.c[18].y + u.c[19].y, u.c[18].z + u.c[19].z));\n"
+    "  let metal = 1.0 - smoothstep(0.05, 0.3, dmax);\n"
+    "  let rad = mix(0.018, 0.008, metal);\n"
+    "  let cs = 0.4 * textureSample(y0, s0, Rc) + 0.15 * (textureSample(y0, s0, Rc + rad * ta) + textureSample(y0, s0, Rc - rad * ta)"
+    " + textureSample(y0, s0, Rc + rad * tb) + textureSample(y0, s0, Rc - rad * tb));\n"
+    "  let cl = cs.xyz * cs.xyz;\n"
+    "  let lum = dot(cs.xyz, vec3f(0.3, 0.59, 0.11));\n"
+    "  let hdr = vec4f(cl * (1.0 + 4.0 * lum * lum * lum * lum), cs.w);\n"
+    "  t0 = select(textureSample(x0, s0, tc(vec4f(cc, 1.0), u.tt[0][0])), hdr, (u.tt[0][0] & 65536u) != 0u);\n"
+    "  let emn = u.pc[0].xyz;\n  let emx = u.pc[0].xyz + u.pc[1].xyz;\n"
+    "  let fs = pow(1.0 - min(d, 1.0), 5.0);\n"
+    "  let a = clamp(mix(min(emn, emx), max(emn, emx), fs), vec3f(-8.0), vec3f(8.0));\n";
 static const char *const car_ps_tail =
     "  let b = clamp(4.0 * (t0.xyz * a), vec3f(-8.0), vec3f(8.0));\n"
     "  let e = clamp(b + d1c.xyz, vec3f(-8.0), vec3f(8.0));\n"
@@ -415,8 +435,8 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
     // Co-issue: the pair reads all its sources before either one writes.
     if (s->ps && mode == SM1_CAR_PS) {
         static int look = -1;
-        if (look < 0) { const char *e = getenv("RN_CARLOOK"); look = !e || atoi(e) != 0; }
-        emit(&b, "%s%s%s", car_ps_body, look ? car_ps_clearcoat : car_ps_env, car_ps_tail);
+        if (look < 0) { const char *e = getenv("RN_CARLOOK"); look = e ? atoi(e) : 1; }   // 0 and 2003: car.efx, 2: sharp
+        emit(&b, "%s%s%s", car_ps_body, look == 1 ? car_ps_clearcoat : look == 2 ? car_ps_sharp : car_ps_env, car_ps_tail);
     }
     const Ins *pend = NULL;
     char pend_val[64] = "";

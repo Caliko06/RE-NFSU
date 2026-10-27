@@ -162,6 +162,11 @@ int main(int argc, char **argv) {
 #ifndef __EMSCRIPTEN__
     if (getenv("RN_WATCH")) { pthread_t mw; pthread_create(&mw, NULL, memwatch, getenv("RN_WATCH")); pthread_detach(mw); }
 #endif
+    rn_steerlog = getenv("RN_STEERLOG") != NULL;
+    // RN_CARLOOK=2003 (car.efx as shipped) and 2 (host/sm1.c car_ps_sharp): the car's cube reflection at the game's 0.5,
+    // not PATCH 0x40fbb7's 0.35 (the float it reads at 0x707fc4).
+    const char *look = getenv("RN_CARLOOK");
+    if (look && (atoi(look) == 2003 || atoi(look) == 2)) { float h = 0.5f; uint32_t w; memcpy(&w, &h, 4); st(c, 0x707fc4, w, 4); }
     rn_log("Speed.exe loaded: entry %08x, %u sections, guest memory %u MB", entry, nsec, GUEST_MEM >> 20);
     rn_call(c, entry);
     rn_stop(c);

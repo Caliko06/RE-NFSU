@@ -118,6 +118,7 @@ static void bucket_init(void) {         // under the GIL, like every rn_call
 
 void rn_call(Ctx *c, uint32_t target) {
     if (target >= HOST_BASE) { call_host(c, target); return; }
+    if (rn_steerlog && target == 0x461840) steer_event(c);
     if (!bucket) bucket_init();
     uint32_t b = (target - rn_fn_addr[0]) >> BUCKET_SHIFT;
     if (target >= rn_fn_addr[0] && b + 1 < nbucket)

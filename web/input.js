@@ -20,7 +20,7 @@ const DIK = {
 
 // Ring (u32 words): [0] head (here), [1] tail (game), [2..4] mouse dx, dy, wheel, [5] exclusive mouse (game), [8..8+1024) events:
 // bit 31 = mouse button, bit 8 = down, low byte = DIK or button. The game thread reads it at its input calls.
-function startInput(M, canvas) {
+function startInput(M, canvas, steerLog) {
   const base = M._rn_input_ring() >> 2, RING = 1024;
   const H = () => M.HEAP32;
   function push(e) {
@@ -36,6 +36,7 @@ function startInput(M, canvas) {
     ev.preventDefault();
     if (down === held.has(d)) return;                  // auto-repeat: DirectInput reports changes only
     down ? held.add(d) : held.delete(d);
+    steerLog?.(`page key ${d.toString(16)} ${down ? 'down' : 'up'} t ${ev.timeStamp.toFixed(1)}`);
     push((down ? 0x100 : 0) | d);
   }
   canvas.tabIndex = 0;

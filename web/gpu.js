@@ -1052,6 +1052,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   // ?hold=N (debug): stop after the N-th Present, so a capture shows that frame (the game then waits).
   const hold = Number(new URLSearchParams(location.search).get('hold')) || 0;
   let frames = 0, presents = 0;
+  const steerLog = /RN_STEERLOG/.test(location.search);   // host/input.c RN_STEERLOG: GPU completion per present
   // The page runs a frame as soon as the game submits it (host/gpu.c wakes seq), not at the next animation frame: with one
   // frame in flight, waiting for requestAnimationFrame made Present wait up to a refresh more (OWNER session 2026-10-23:
   // game thread 40% in gpu_wait, page 62% idle, frames alternating 17 / 34 ms).
@@ -1078,6 +1079,8 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         onFrame?.(s, t, performance.now() - t);
         frames++;
         if (s.present) presents++;
+        if (s.present && steerLog) { const p = presents; device.queue.onSubmittedWorkDone().then(() =>
+          report(`page present ${p} start ${t.toFixed(1)} done ${performance.now().toFixed(1)}`)); }
         if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +
           (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + gpuReport());
         if (frames % 300 === 0) hdMs = 0;

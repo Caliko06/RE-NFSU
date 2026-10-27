@@ -1,6 +1,6 @@
 // The keyboard and mouse of this PC. One source feeds them: the browser (web/input.js writes key and
 // mouse events into a ring in the shared heap) and, for test runs (native, or web with ?keys=), a script in RN_KEYS:
-// RN_KEYS="3000:RETURN,4500:DOWN" taps each key (100 ms down) at that many ms after start. "3000@6/8:DOWN" taps it
+// RN_KEYS="3000:RETURN,4500:DOWN" taps each key (100 ms down, "4500:D~1500" holds it 1500 ms while the taps after it go on) at that many ms after start. "3000@6/8:DOWN" taps it
 // 3000 ms after the game-flow state 6 / race state 8 (RN_FLOWLOG, host/d3d9.c) is first seen once the taps before it are done;
 // "3000@3:RETURN" waits for flow state 3 with any race state. "1500@=PostRaceMenu:DOWN" waits for that post-race screen
 // (rn_screen, or a front-end package in rn_fe); "4000@!PostRaceMenu:RETURN" counts from the tap before and is dropped if that screen shows when it is due.
@@ -131,7 +131,7 @@ static void button_event(int b, int d) {
     dinput8_button(b, d);
 }
 
-typedef struct { uint64_t at_us; uint8_t dik; uint32_t cond, mask; char op, scr[48]; } Tap;   // cond: flow state to wait for, ~0 = none
+typedef struct { uint64_t at_us, hold_us; uint8_t dik; uint32_t cond, mask; char op, scr[48]; } Tap;   // cond: flow state to wait for, ~0 = none
 static Tap taps[256];
 static int ntaps, script_read;
 static unsigned next_tap;
@@ -151,9 +151,12 @@ static void read_script(void) {
         const Key *k = NULL;
         for (int j = 0; j < NKEYS && !k; j++) if (!strcasecmp(keys[j].name, name)) k = &keys[j];
         if (!k) { rn_log("RN_KEYS: no key %s", name); break; }
-        taps[ntaps] = (Tap){(uint64_t)ms * 1000, k->dik, cond, mask, op[0], ""};
-        memcpy(taps[ntaps++].scr, scr, sizeof scr);
+        taps[ntaps] = (Tap){(uint64_t)ms * 1000, 100000, k->dik, cond, mask, op[0], ""};
+        memcpy(taps[ntaps].scr, scr, sizeof scr);
         s += used;
+        unsigned hold;                 // "3000:D~1500": held 1500 ms instead of a 100 ms tap
+        if (*s == '~' && sscanf(s, "~%u%n", &hold, &used) == 1) taps[ntaps].hold_us = (uint64_t)hold * 1000, s += used;
+        ntaps++;
         while (*s == ',' || *s == ' ') s++;
     }
 }
@@ -171,11 +174,13 @@ static int screen_on(const char *scr) {   // the post-race screen, or one of the
 // next down came before the up was read, both in one read, no edge, the tap lost). So, up to 10 s each: the up also
 // waits for an acquired keyboard (an up while the game swaps action maps reaches no device and the key stays down in
 // its mask, runs/dilog2: ESC), and the next down waits until the game has read every event, plus two frames.
+static struct { uint8_t dik; uint64_t up_us; } held[8];
 static void script_poll(void) {
     static uint32_t down_at, read_at;
     static uint64_t wait_from;
     if (!script_read) read_script();
     uint64_t now = now_us();
+    for (int j = 0; j < 8; j++) if (held[j].dik && now >= held[j].up_us) { key_event(held[j].dik, 0); held[j].dik = 0; }
     while (next_tap < 2u * (unsigned)ntaps) {
         unsigned k = next_tap / 2;
         if (!(next_tap & 1) && taps[k].cond != ~0u) {   // anchor a flow-state tap when its state shows up
@@ -192,7 +197,7 @@ static void script_poll(void) {
             taps[k].op = 0;
             if (screen_on(taps[k].scr)) { rn_log("RN_KEYS: tap %u dropped on %s", k, rn_screen); next_tap += 2; continue; }
         }
-        uint64_t at = taps[k].at_us + (next_tap & 1 ? 100000 : 0);
+        uint64_t at = taps[k].at_us + (next_tap & 1 ? taps[k].hold_us : 0);
         if (at > now || ((next_tap & 1) && rn_telem.presents - down_at < 2)) break;
         int pend = dinput8_key_pending();
         if (pend > 0) read_at = rn_telem.presents;
@@ -201,6 +206,12 @@ static void script_poll(void) {
         wait_from = 0;
         if (!(next_tap & 1)) down_at = rn_telem.presents;
         key_event(taps[k].dik, !(next_tap & 1));
+        if (!(next_tap & 1) && taps[k].hold_us != 100000) {   // a held key lets go on its own; the next tap need not wait
+            for (int j = 0; j < 8; j++) if (!held[j].dik) { held[j].dik = taps[k].dik, held[j].up_us = now + taps[k].hold_us; break; }
+            rn_log("RN_KEYS: hold %u dik 0x%02x at frame %u for %llu ms", k, taps[k].dik, rn_telem.presents, (unsigned long long)taps[k].hold_us / 1000);
+            next_tap += 2;
+            continue;
+        }
         if (!(next_tap & 1)) rn_log("RN_KEYS: tap %u dik 0x%02x at frame %u flow %u/%u on %s", k, taps[k].dik, rn_telem.presents, rn_flow >> 8, rn_flow & 0xff, rn_screen);
         next_tap++;
     }
@@ -439,6 +450,36 @@ void input_call(Ctx *c) {
     memcpy(c->r, r, sizeof r);
     rn_log("RN_CALL: %08x on %s #%u at frame %u", fn, scr, want, rn_telem.presents);
     done = 1;
+}
+
+// RN_STEERLOG=1: test-only trace of the player's steering, read only. Speed.exe: the joy event handler 0x461840 (registered
+// for 0x87 STEER / 0x88 STEER_ANALOG by 0x4611f3, ecx = the player input object P) stores the event byte at P+0x288/+0x289
+// and the input (b - 128) * -1/128 at P+0x28c (0xff = -1). Each player update (0x461650) filters it through PlayerSteering
+// S = P+0x1f0 (0x460930 -> 0x460a80 limit by speed, counter-steer, return ramp; 0x460de0 rate) into the word P+0x1d0.
+// Keyboard actions 3/4 (0x702d38, 0x702d88) clear the digital flag [0x736514] (0x4070a0), which selects that model.
+// Frame time: 0x585b40 measures it with QPC into dt [0x73ad38]; 0x585d70 steps the world in 1/60 s.
+int rn_steerlog;
+static uint32_t steer_obj;
+void steer_event(Ctx *c) {
+    uint32_t esp = c->r[ESP], ev = ld(c, esp + 8, 4), b = ld(c, esp + 12, 1), p = ld(c, esp + 16, 4);
+    steer_obj = p;
+    rn_log("steer ev %x byte %u at frame %u t %.1f ms", ev, b, rn_telem.presents, (double)now_us() / 1000);
+}
+void steer_frame(Ctx *c) {
+    uint32_t p = steer_obj;
+    if (!p || (rn_flow >> 8) != 6) return;
+    float in, dt, sp, v[3], s14, s74, s78, eb;
+    uint32_t w, car = ld(c, p + 0x26c, 4), s = p + 0x1f0;
+#define F(dst, a) (w = ld(c, (a), 4), memcpy(&(dst), &w, 4))
+    F(in, p + 0x28c); F(dt, 0x73ad38); F(s14, s + 0x14); F(s74, s + 0x74); F(s78, s + 0x78); F(eb, p + 0x2ac);
+    sp = 0, v[0] = v[1] = v[2] = 0;
+    if (car) { F(sp, car + 0x3d0); F(v[0], car + 0x70); F(v[1], car + 0x74); F(v[2], car + 0x78); }
+#undef F
+    rn_log("steer f %u t %.1f keys %d%d%d%d dt %.4f flag %u in %.3f out %d s14 %.3f s74 %.2f s78 %.3f s0car %d spd %.2f v %.2f %.2f %.2f eb %.2f shift %d slide %u hd %u",
+           rn_telem.presents, (double)now_us() / 1000, down[0x1e], down[0x20], down[0xcb], down[0xcd], dt, ld(c, 0x736514, 1), in,
+           (int16_t)ld(c, p + 0x1d0, 2), s14, s74, s78, ld(c, s, 4) == car, sp, v[0], v[1], v[2],
+           eb, down[0x2a] | down[0x36], ld(c, s + 4, 1), car ? ld(c, car + 0x3b4, 2) : 0);
+    // the slip angle 0x464ed0 (ESI = car+0x40): heading word car+0x3b4 minus the angle 0x564db0 of the velocity car+0x70/74   // ebrake 0x461e10 -> P+0x2ac; S+4 the slide flag of 0x460a80
 }
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
