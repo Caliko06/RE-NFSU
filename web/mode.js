@@ -9,8 +9,8 @@ const RN_ORIGINAL = {
   carlook: '2003',    // host/sm1.c: car.efx at the shipped strength
   cardetail: '0',     // host/sm1.c: no AO/grime terms
 };   // blur: web/tune.js starts the original mode at 'PC original' (shipped blur and flare colour)
-// Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places).
-const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43' };
+// Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places, night lights).
+const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43', RN_LIGHTS: '0' };
 
 // ?mode=original|remaster: one run in that mode without touching the stored choice (tools/webcheck.mjs).
 const RN_MODE = (() => {

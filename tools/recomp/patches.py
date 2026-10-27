@@ -207,6 +207,13 @@ PATCHES.append(dict(addr=0x585b94,
 PATCHES.append(dict(addr=0x4b4321, old="e89ac60c00", new="e8" + _rel(0x4b4321, 0x6736b1), when=lambda: True))
 PATCHES.append(dict(addr=0x6736b1, old="cc" * 6, new="ff2560300100", entry=True, when=lambda: True))
 
+# PATCH: 0x40e6b5 (+ cave 0x43a7e4, CC padding after the jump table at 0x43a7d8, no reference), OWNER 2026-10-27 (headlight
+# reach, docs/night_re.md): 0x40e560 fills HeadlightClipTex (64x1, u = view depth * 0.005 + 0.5) while it is locked, pBits
+# at [esp+4], then reads [0x71abb4] for UnlockRect. That mov now calls the cave: push pBits, call [SCREEN_ADDR+0x64] =
+# host/lights.c headlight_clip (stdcall 1), which rewrites the ramp when RN_LIGHTS is on and returns [0x71abb4] in eax.
+PATCHES.append(dict(addr=0x40e6b5, old="a1b4ab7100", new="e8" + _rel(0x40e6b5, 0x43a7e4), when=lambda: True))
+PATCHES.append(dict(addr=0x43a7e4, old="cc" * 11, new="ff742408ff1564300100c3", entry=True, when=lambda: True))
+
 def active():
     return [p for p in PATCHES if p["when"]()]
 

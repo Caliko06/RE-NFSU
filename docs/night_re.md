@@ -48,3 +48,25 @@ Speed = |v| of [0x740500]+0x1e0. t = clamp((speed - [0x702a38]) / ([0x702a3c] - 
 capped by [0x702a40]; [0x73641c] ramps toward [0x73654c] (nitrous) by 0x702a48 / 0x702a4c per frame. The previous
 frame (0x71ab9c, 0x71aba0) is drawn back zoomed toward the centre (offset x [0x702a44] streak) with that alpha:
 a zoom feedback blur. web/tune.js presets write 0x702a38..0x702a44.
+
+## Bridge host/lights.c (Block 7 parts 1-2, RN_LIGHTS=0 = shipped; F4 Original sets it)
+REA (Ghidra 12.1.4, Speed.exe sha256 c0fad450...) checked each target before the patch: 0x6b5da0 has one reader
+(0x56d9d7, ev_7cff0ca1), 0x7010ac one (0x4102ad in 0x4100a0, ev_0ee4a966), the cave 0x43a7e4 no reference and is CC
+padding after the jump table at 0x43a7d8 (ev_6a127f7b, ev_a6bf0c32).
+- Tail base 0.7 -> 0.35: a brake (16 * [car+0x1e4]) still clamps to 1.0, so braking now doubles the flare.
+- HeadlightColor (0.8, 0.8, 0.9) -> (1.0, 0.94, 0.82), warm halogen.
+- PATCH 0x40e6b5 -> cave -> headlight_clip: texels 48..55 stay 255, 56..63 fall 32 per texel: full light to ~73 m.
+Chrome: RN_WATCH=6b5da0 reads 0.7 with RN_LIGHTS=0 and 0.35 by default.
+
+## Part 3 map: projected headlights for rivals and traffic (RE done, bridge not built)
+- 0x56d8d0(carobj, view, rot3x3*, flags, mode), ESI = position: copies rot (0x401cd0) + position into a 0x40-byte frame
+  matrix (pool 0x7355b4/b8), then for each marker node of carobj+0x500 (next at +0, hash +8, local pos +0x10/14/18
+  floats, on +0xc, flare type +0xd) calls 0x5447c0 with EAX = that matrix (0x56dc05). 0x5447c0 transforms the marker
+  position by it (0x5abda2). So: headlight world position = marker local pos x car matrix; forward = a matrix row.
+  Callers 0x570c70 (racers) and 0x570d00 (traffic) pass each car's rotation and position (ev_51694fe2).
+- 0x4100a0 (per worldheadlight draw, from 0x40ed70): HeadlightWVP = World ((*drawobj)+0x80) x view-7 viewproj
+  (0x40bc10), set through the effect (vtable +0x98, handle [0x73640c+0x38]); ClipMat row = depth * 0.005 (+0xb8);
+  Color (+0x88, handle +0x70) (ev_c904c16a). World geometry is object space: a pool per car needs World per draw.
+- Plan: build view-7-like viewproj per nearby car from its matrix (RE 0x408410/0x40bc10 first), pass N of them as
+  extra constants on worldheadlight draws, and a WORLD mode in host/sm1.c that adds N projective HeadlightTex x clip
+  terms, like the player's. Open: the forward axis of the car matrix, how 0x40bc10 builds view 7.
