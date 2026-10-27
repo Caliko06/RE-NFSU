@@ -30,6 +30,8 @@ extern Ctx *g_ctx;
 extern const Api win32_apis[], user32_apis[], thread_apis[], net_apis[], d3d9_apis[], dinput8_apis[], dsound_apis[], rivals_apis[], lights_apis[];
 extern const int win32_api_count, user32_api_count, thread_api_count, net_api_count, d3d9_api_count, dinput8_api_count, dsound_api_count, rivals_api_count, lights_api_count;
 void lights_init(Ctx *c);   // host/lights.c
+#define LIGHTS_N 4          // other cars' headlights on the world (sm1.h SM1_HL_N, the free texcoords t4..t7)
+const float *lights_hl(Ctx *c);   // their projectors this frame: VS c16..c31 of the headlight world shaders
 
 enum { H_FREE, H_FILE, H_EVENT, H_MUTEX, H_FIND, H_HEAP, H_THREAD, H_SNAPSHOT, H_KEY, H_MAPPING };
 struct Thread;

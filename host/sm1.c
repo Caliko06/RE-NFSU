@@ -495,11 +495,29 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
     }
     if (!s->ps) {
         if (mode == SM1_CAR_VS) emit(&b, "  o.t2 = vec4f(i.v1.xyz, 0.0);\n  o.t3 = vec4f(u.c[17].xyz - i.v0.xyz, 0.0);\n");
+        // Other cars' projectors (host/lights.c): oT1 is the player's projected coordinate, c16.. the per-car M_k columns.
+        if (mode == SM1_HL_VS)
+            for (int k = 0; k < SM1_HL_N; k++)
+                emit(&b, "  o.t%d = vec4f(dot(o.t1, u.c[%d]), dot(o.t1, u.c[%d]), dot(o.t1, u.c[%d]), dot(o.t1, u.c[%d]));\n",
+                     4 + k, 16 + 4 * k, 17 + 4 * k, 18 + 4 * k, 19 + 4 * k);
         emit(&b, "  o.d0 = clamp(o.d0, vec4f(0.0), vec4f(1.0));\n  o.d1 = clamp(o.d1, vec4f(0.0), vec4f(1.0));\n"
                  "  o.fog = clamp(fogv, 0.0, 1.0);\n"
                  // D3D9 samples pixels at integer positions, WebGPU at half: move by half a pixel.
                  "  o.pos.x = o.pos.x + u.hp.x * o.pos.w;\n  o.pos.y = o.pos.y - u.hp.y * o.pos.w;\n  return o;\n}\n");
     } else {
+        // Each car's cone (stage 1, projective) times its reach ramp (stage 2 at u = w * 0.005 + 0.5, as oT2.x); w <= 0.5 m
+        // is behind or inside the car. Lights combine as a screen, 1 - (1 - Lp) prod(1 - g h_k) with Lp = t1 t2 the
+        // player's, so where cars light the same road it never passes one headlight's centre (a sum burnt it white:
+        // four cars on the grid). The difference over Lp goes in HeadlightColor (c0) on the diffuse (t0) x2, as Lp does.
+        if (mode == SM1_HL_PS) {
+            emit(&b, "  var dark = vec3f(1.0);\n");
+            for (int k = 0; k < SM1_HL_N; k++)
+                emit(&b, "  { let q = i.t%d; let ok = q.w > 0.5; let w = select(1.0, q.w, ok);\n"
+                         "    let h = textureSample(x1, s1, q.xy / w).xyz * textureSample(x2, s2, vec2f(q.w * 0.005 + 0.5, 0.5)).xyz;\n"
+                         "    dark = dark * (1.0 - select(vec3f(0.0), %.2f * h, ok)); }\n", 4 + k, SM1_HL_GAIN);
+            emit(&b, "  let lp = clamp(t1.xyz * t2.xyz, vec3f(0.0), vec3f(1.0));\n"
+                     "  r0 = vec4f(r0.xyz + 2.0 * t0.xyz * (1.0 - dark) * (1.0 - lp) * u.pc[0].xyz, r0.w);\n");
+        }
         emit(&b, "  var c = r0;\n  if (u.af.y != 0u) { c = vec4f(mix(u.fogc.xyz, c.xyz, i.fog), c.w); }\n"
                  "  if (u.af.x != 0u && !d3d_cmp(u.af.x, clamp(c.w, 0.0, 1.0), u.ar.x)) { discard; }\n  return c;\n}\n");
     }

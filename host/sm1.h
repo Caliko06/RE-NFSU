@@ -45,7 +45,11 @@ void sm1_disasm(const Sm1 *s, void (*out)(const char *line));
 enum { SM1_U_VC = 0, SM1_U_PC = 4096, SM1_U_HP = 4224, SM1_U_FOGC = 4240, SM1_U_AF = 4256, SM1_U_AR = 4272,
        SM1_U_TT = 4288, SM1_U_SIZE = 4320 };
 // mode: 0 plain; SM1_CAR_VS / SM1_CAR_PS = the car body pair of PC Speed.exe (vs 0x4728b668 / ps 0xc27f3669, token FNV hash), per-pixel lighting.
-enum { SM1_PLAIN, SM1_CAR_VS, SM1_CAR_PS };
+// SM1_HL_VS / SM1_HL_PS = the headlight world pairs (worldheadlight vs 0x67da8f41 / ps 0x91d5deec, worldheadlightreflect
+// vs 0x102e066d / ps 0x9bb3f7c7): SM1_HL_N more projectors (host/lights.c) in oT4..oT7, from VS c16..c31.
+enum { SM1_PLAIN, SM1_CAR_VS, SM1_CAR_PS, SM1_HL_VS, SM1_HL_PS };
+#define SM1_HL_N 4
+#define SM1_HL_GAIN 0.8   // another car's headlight against the player's own (1 = as bright)
 char *sm1_wgsl(const Sm1 *s, int mode);
 
 // Interpreter. A vertex: 16 inputs in, outputs out (oPos, oD0, oD1, oT0..7, oFog). A pixel: the

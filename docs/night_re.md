@@ -58,15 +58,20 @@ padding after the jump table at 0x43a7d8 (ev_6a127f7b, ev_a6bf0c32).
 - PATCH 0x40e6b5 -> cave -> headlight_clip: texels 48..55 stay 255, 56..63 fall 32 per texel: full light to ~73 m.
 Chrome: RN_WATCH=6b5da0 reads 0.7 with RN_LIGHTS=0 and 0.35 by default.
 
-## Part 3 map: projected headlights for rivals and traffic (RE done, bridge not built)
-- 0x56d8d0(carobj, view, rot3x3*, flags, mode), ESI = position: copies rot (0x401cd0) + position into a 0x40-byte frame
-  matrix (pool 0x7355b4/b8), then for each marker node of carobj+0x500 (next at +0, hash +8, local pos +0x10/14/18
-  floats, on +0xc, flare type +0xd) calls 0x5447c0 with EAX = that matrix (0x56dc05). 0x5447c0 transforms the marker
-  position by it (0x5abda2). So: headlight world position = marker local pos x car matrix; forward = a matrix row.
-  Callers 0x570c70 (racers) and 0x570d00 (traffic) pass each car's rotation and position (ev_51694fe2).
-- 0x4100a0 (per worldheadlight draw, from 0x40ed70): HeadlightWVP = World ((*drawobj)+0x80) x view-7 viewproj
-  (0x40bc10), set through the effect (vtable +0x98, handle [0x73640c+0x38]); ClipMat row = depth * 0.005 (+0xb8);
-  Color (+0x88, handle +0x70) (ev_c904c16a). World geometry is object space: a pool per car needs World per draw.
-- Plan: build view-7-like viewproj per nearby car from its matrix (RE 0x408410/0x40bc10 first), pass N of them as
-  extra constants on worldheadlight draws, and a WORLD mode in host/sm1.c that adds N projective HeadlightTex x clip
-  terms, like the player's. Open: the forward axis of the car matrix, how 0x40bc10 builds view 7.
+## Part 3: projected headlights for rivals and traffic (bridge host/lights.c + host/sm1.c SM1_HL_*, web only)
+REA (Ghidra 12.1.4) + runtime (RN_LIGHTSLOG, native and Chrome):
+- 0x4100a0 (from 0x40ed50, EAX = 0x740760, ECX = the object World): HeadlightWVP = World x VP x S (ev_dfdc8ea9),
+  VP = [[0x740760]]+0x80, S = T(0.5, 0.5, 0) (0x6cc7dc = 0.5, ev_f9491a5a). The block [0x740760] (0x78b340 at run time):
+  +0 View, +0x40 Proj (near 1, far 100, y flipped), +0x80 View x Proj. 0x40bc10 = rigid inverse T(-p) R^T (ev_575f101e).
+- View table 0x740460 + i * 0x60: +0 camera block, +8 enable, +0x40 camera object (0x40a7f0). Headlight view = entry 8
+  (0x740760, enable 0x740768, set by 0x408410 from HEADLIGHTS 0x7364a4; ev_cf65f4e9).
+- Measured: the projector sits 0.75 m above the player car's position, z axis = car x axis tilted 5.7 deg down,
+  constant over a whole race. So VP_k = W_k^-1 W_p VP; the GPU takes tp_k = tp x M_k, M_k = (VP S)^-1 W_k^-1 W_p VP S.
+- Cars in a race: list [0x7361f8] (0x570d00, ev_1ea79100), head node, next at +0, [+0x4d4] model ([model] = the node),
+  matrix +0x90 rows 0..2 + position +0x50 (+0x4e0 / +0x520 when bit (1 << view) of +0x530; always 0 seen). The racer
+  list 0x73d6d8 (0x570c70) is empty in a race; it holds the front-end cars. ~17 cars: 4 racers + traffic.
+- Shaders (vs_1_1 / ps_1_1): worldheadlight vs 67da8f41 (oT1 = tp xyzw, oT2.x = w * c9.x + c9.w) / ps 91d5deec
+  (t1 x t2 x c0 + v0, x t0 x2); worldheadlightreflect vs 102e066d / ps 9bb3f7c7 (+ t3 reflection). Clip ramp 64x1
+  (0x40e560 CreateTexture 64, 1). t4..t7 are free: 4 more projectors from VS c16..c31.
+- First try summed the cones and burnt the grid white (4 cars aim at one road); lights now combine as a screen,
+  1 - (1 - Lp) prod(1 - 0.8 h_k). A/B in Chrome at the start of race 1001: rival cones on the road, no burn.

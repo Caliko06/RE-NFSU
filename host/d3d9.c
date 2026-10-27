@@ -100,6 +100,7 @@ typedef struct {
     uint32_t levels, level0, fvf;           // textures: mip count, object index of level 0 (levels follow)
     uint32_t *blob, nblob;                  // shader tokens, vertex elements (host copy)
     Sm1 *sm;                                // shaders: decoded
+    int hl;                                 // vertex shaders: SM1_HL_VS, it takes host/lights.c's projectors
     struct Rec *rec;                        // state blocks: the recorded Set calls
     uint32_t nrec;
     uint32_t dlo, dhi;                      // resident buffers: bytes written since the last upload
@@ -1600,6 +1601,10 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     if (perpixel < 0) perpixel = getenv("RN_NOPERPIXEL") == NULL;
     uint32_t h = shader_hash(o);
     int mode = !perpixel ? SM1_PLAIN : iface == I_VS && h == 0x4728b668u ? SM1_CAR_VS : iface == I_PS && h == 0xc27f3669u ? SM1_CAR_PS : SM1_PLAIN;
+    // The headlight world pairs (worldheadlight, worldheadlightreflect): other cars' headlights, host/lights.c.
+    if (iface == I_VS && (h == 0x67da8f41u || h == 0x102e066du)) mode = SM1_HL_VS;
+    if (iface == I_PS && (h == 0x91d5deecu || h == 0x9bb3f7c7u)) mode = SM1_HL_PS;
+    o->hl = mode == SM1_HL_VS;
     if (getenv("RN_SMOOTH_LOG")) rn_log("SMOOTH shader %s id %x hash %08x mode %d", iface == I_VS ? "vs" : "ps", g, h, mode);
     if (mode == SM1_CAR_VS && ncar_vs < 8) car_vs_obj[ncar_vs++] = o;
     char *wgsl = sm1_wgsl(sm, mode);
@@ -1865,7 +1870,7 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     }
     if (!ib && !xdraw.vb && !rdraw.vb) nvert = n;
     Obj *rt = obj_k(dev.rt[0]), *ds = obj_k(dev.ds);
-    uint32_t nvc = (uint32_t)(vs->sm->max_const + 1), npc = 8, vbytes = rdraw.vb ? 0 : nvert * stride, ni = rdraw.vb ? 0 : nidx;
+    uint32_t nvc = vs->hl ? 16 + 4 * SM1_HL_N : (uint32_t)(vs->sm->max_const + 1), npc = 8, vbytes = rdraw.vb ? 0 : nvert * stride, ni = rdraw.vb ? 0 : nidx;
     uint32_t total = D_HDR + 4 * nvc + 4 * npc + (vbytes + 3) / 4 + ni;
     uint32_t *w = calloc(total, 4);
     w[D_TOPO] = type; w[D_NVERT] = nvert; w[D_NIDX] = nidx; w[D_STRIDE] = stride;
@@ -1899,7 +1904,9 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     w[D_RVB] = rdraw.vb; w[D_RVOFF] = rdraw.voff; w[D_RIB] = rdraw.ib; w[D_RIFMT] = rdraw.isize;
     w[D_RFIRST] = rdraw.first; w[D_RBASEV] = (uint32_t)rdraw.basev;
     uint32_t *p = w + D_HDR;
-    memcpy(p, dev.vsf, 16u * nvc); p += 4 * nvc;
+    memcpy(p, dev.vsf, 16u * nvc);
+    if (vs->hl) memcpy(p + 4 * 16, lights_hl(c), 16u * 4 * SM1_HL_N);
+    p += 4 * nvc;
     memcpy(p, dev.psf, 16u * npc); p += 4 * npc;
     if (vbytes) memcpy(p, xdraw.vb ? xdraw.vb : G(vbase + vmin * stride), vbytes);
     p += (vbytes + 3) / 4;
