@@ -13,6 +13,8 @@ const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_D
 const T_ID = 0, T_AU = 1, T_AV = 2, T_MAG = 3, T_MIN = 4, T_MIP = 5, T_TT = 6, T_ANISO = 7, T_CUBE = 0x10000;
 const U_SIZE = 4320, U_STEP = 4352;     // sm1.h SM1_U_SIZE, rounded to the 256-byte offset alignment
 
+// PS2 depth speed blur (psblur below): web/tune.js sets .on from the blur preset ('PS2 depth') and ?psblur.
+const RN_PS = { on: false };
 const CMP = [null, 'never', 'less', 'equal', 'less-equal', 'greater', 'not-equal', 'greater-equal', 'always'];
 const BLEND = [null, 'zero', 'one', 'src', 'one-minus-src', 'src-alpha', 'one-minus-src-alpha', 'dst-alpha',
   'one-minus-dst-alpha', 'dst', 'one-minus-dst', 'src-alpha-saturated', null, null, 'constant', 'one-minus-constant'];
@@ -390,6 +392,94 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
     if (!bloomPipes.add.has(sc)) bloomPipes.add.set(sc, bloomPipe('add', sc));
     step(bloomPipes.add.get(sc), bloomA, colorAtt(rt), 'bloom add');
   }
+
+  // BRIDGE: PS2 speed blur with the scene's real depth, not in the PC game. Source: SLUS_208.11 0x113fc8 (read in the corpus C and the
+  // ELF data 2026-10-27; ref/docs/re/postfx-elf.md section 4). The PS2 copies the frame into a texture whose alpha is
+  // min(depth_byte * k, 255) (k = 2), then draws it back over the frame, one pass per offset (2.3 6.4 8.8 11.4 px at 512 x 448), each
+  // copy stretched along the car's velocity in camera space (x, y, z, normalised; y down, as here): rect X0 = -(x+z) o, X1 = W + (z-x) o,
+  // Y0 = -(y+z) o, Y1 = H + (z-y) o, o = offset_i * c, c = 2. Vertex alpha 50 35 28 17 (/128), times t = clamp((speed - 0.1) / 24.9)
+  // (speed in m/s, |[0x740500]+0x1e0|). The GS modulates the texture alpha by the vertex alpha (As = At * Af / 128) and blends
+  // Cs * As + Cd * (1 - As), 128 = 1. So the car (near, low depth) stays sharp and the far city stretches.
+  // Nitrous (the game's [0x73654c], the PS2's view +0x50): a counter climbs 2 a frame to 15 and falls 1 a frame; k = 2 + 13 r and
+  // c = 2 + 2 r (r = counter / 15); passes 5-6 (22 and 40 px, alpha 8 r and 4 r) join, and while it is active every copy is tinted
+  // (130 + 10 i, 130 + 10 i, 130 + 28 i) / 128 for pass i (the PS2's table 0x44a680; plain 130 / 128 otherwise).
+  // The PS2 had a 16-bit Z; here the depth buffer is turned into metres (z_ndc = _33 + _43 / z) and the byte is 255 * metres / PS_FAR.
+  // Offsets scale with the resolution per axis (W / 512, H / 448). It runs on the scene colour (not the FXAA target: that one holds
+  // the light trails and the HUD), after the game's own blur, which must be off (web/tune.js 'PS2 depth' sets its cap to 0), before the
+  // HUD. ?psblur=0 off, ?psblur=depth shows the weight (debug), ?psblur=split = the right half only (A/B in one frame),
+  // ?psspeed=57 a still scene as if driving straight at 57 m/s, ?psfar=metres the distance where the depth byte reaches 255.
+  const PS_DBG = RN_Q.get('psblur') === 'depth', PS_SPLIT = RN_Q.get('psblur') === 'split';   // split: the pass on the right half only (A/B in one frame)
+  const PS_FORCE = Number(RN_Q.get('psspeed') || 0);   // debug: a still scene as if driving straight at this many m/s (?psspeed=57)
+  const PS_OFF = [2.3, 6.4, 8.8, 11.4, 22, 40], PS_ALPHA = [50, 35, 28, 17];
+  const PS_FAR = Number(RN_Q.get('psfar') || 200);   // metres where the depth byte reaches 255 (k = 2 saturates the blur at half)
+  const psMod = device.createShaderModule({ code: `
+struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
+@group(0) @binding(0) var src: texture_2d<f32>;
+@group(0) @binding(1) var dep: texture_depth_2d;
+@group(0) @binding(2) var smp: sampler;
+@group(0) @binding(3) var<uniform> u: U;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
+}
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  let uv = (pos.xy - u.rect.xy) / (u.rect.zw - u.rect.xy);
+  if (any(uv < vec2f(0.0)) || any(uv > vec2f(1.0)) || pos.x < u.par.z) { discard; }
+  let col = textureSampleLevel(src, smp, uv, 0.0).rgb;
+  let dsz = vec2f(textureDimensions(dep));
+  let zn = textureLoad(dep, vec2i(clamp(uv * dsz, vec2f(0.0), dsz - 1.0)), 0);
+  // metres from the camera: z_ndc = _33 + _43 / z. The far clear (1.0) is the sky.
+  let zv = select(u.zz.z, u.zz.y / (zn - u.zz.x), zn < 0.99999);
+  let byte = 255.0 * clamp(zv / u.zz.z, 0.0, 1.0);
+  let at = min(byte * u.par.y, 255.0);                  // CLUT alpha
+  let a = min(at * u.par.x / 128.0, 255.0) / 128.0;     // x vertex alpha (par.x = Af * t), GS modulate then blend weight
+  if (${PS_DBG ? 'true' : 'false'}) { return vec4f(vec3f(at / 255.0), 1.0); }
+  return vec4f(min(col * u.tint.rgb, vec3f(1.0)), a);
+}` });
+  const psPipes = new Map();
+  const psPipe = () => {
+    if (!psPipes.has(0)) psPipes.set(0, device.createRenderPipeline({ layout: 'auto', vertex: { module: psMod, entryPoint: 'vs' },
+      fragment: { module: psMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm', blend: {
+        color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha', operation: 'add' },
+        alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } }] }, primitive: { topology: 'triangle-list' } }));
+    return psPipes.get(0);
+  };
+  const psU = Array.from({ length: 6 }, () => device.createBuffer({ size: 64, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST }));
+  const PS_LOG = RN_Q.get('pslog') === '1';
+  let psN = 0, psTmp = null, psCount = 0;
+  const psBase = (v) => { const z = Math.hypot(v[0], v[1], v[2]); return z > 0.5; };
+  function psblur(enc, rt, ds, v, nitro) {
+    // v: x y z (unit velocity in camera space), speed (m/s), (nitro bits), _33, _43
+    if (PS_LOG && ++psN % 120 === 1) report(`gpu.js: psblur ds ${ds ? `${ds.w}x${ds.h} sc ${ds.sc} depth ${ds.depth}` : 'none'} rt ${rt.w}x${rt.h} v ${Array.from(v).map(x => x.toFixed(3)).join(' ')} nitro ${nitro}`);
+    if (PS_FORCE) v = Float32Array.of(0, 0, 1, PS_FORCE, 0, v[5], v[6]);
+    if (!ds || !ds.depth || ds.sc !== 1 || ds.w !== rt.w || ds.h !== rt.h || !psBase(v)) return;
+    const t = Math.max(0, Math.min(1, (v[3] - 0.1) / (25 - 0.1)));
+    psCount = nitro ? Math.min(15, psCount + 2) : Math.max(0, psCount - 1);   // one step per race frame
+    const r = psCount / 15, active = nitro || psCount > 0, k = 2 + 13 * r, c = 2 + 2 * r;
+    if (t <= 0) return;
+    if (!psTmp || psTmp.width !== rt.w || psTmp.height !== rt.h) {
+      doom(psTmp);
+      psTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
+    }
+    enc.copyTextureToTexture({ texture: rt.tex }, { texture: psTmp }, [rt.w, rt.h]);
+    const pipe = psPipe(), W = rt.w, Hh = rt.h, sx = W / 512, sy = Hh / 448;
+    const srcV = psTmp.createView(), depV = ds.tex.createView({ aspect: 'depth-only' });
+    const n = active ? 6 : 4;
+    for (let i = 0; i < n; i++) {
+      const ox = PS_OFF[i] * c * sx, oy = PS_OFF[i] * c * sy, x = v[0], y = v[1], z = v[2];
+      device.queue.writeBuffer(psU[i], 0, new Float32Array([
+        -(x + z) * ox, -(y + z) * oy, W + (z - x) * ox, Hh + (z - y) * oy,
+        Math.floor((i === 4 ? 8 * r : i === 5 ? 4 * r : PS_ALPHA[i]) * t), k, PS_SPLIT ? W / 2 : 0, 0,
+        v[5], v[6], PS_FAR, 0,
+        ...(active ? [(130 + 10 * i) / 128, (130 + 10 * i) / 128, (130 + 28 * i) / 128, 0] : [130 / 128, 130 / 128, 130 / 128, 0])]));
+      const p = enc.beginRenderPass({ timestampWrites: tsw('psblur'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
+      p.setPipeline(pipe);
+      p.setBindGroup(0, device.createBindGroup({ layout: pipe.getBindGroupLayout(0), entries: [
+        { binding: 0, resource: srcV }, { binding: 1, resource: depV }, { binding: 2, resource: fxaaSamp }, { binding: 3, resource: { buffer: psU[i] } }] }));
+      p.draw(3);
+      p.end();
+    }
+  }
   const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
@@ -745,7 +835,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       uBindBuf = ubuf;
     }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '', pend = null, ci = 0;
+    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
     if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
     // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
@@ -760,6 +850,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
+        else if (op === GPU_FXAA) { if (asp && RN_PS.on && res.get(id)?.w >= 1000) return true; }   // psblur reads the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
       return true;     // the next frame may read it
@@ -807,7 +898,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const sc = msFor(w[a + 1], w[a + 2]);
         const tex = device.createTexture({ size: [w[a + 1], w[a + 2]], format: depth ? 'depth24plus-stencil8' : 'rgba8unorm',
           sampleCount: depth ? sc : 1,
-          usage: GPUTextureUsage.RENDER_ATTACHMENT | (depth ? 0 : GPUTextureUsage.COPY_SRC | GPUTextureUsage.TEXTURE_BINDING) });
+          usage: GPUTextureUsage.RENDER_ATTACHMENT | (depth ? (sc === 1 ? GPUTextureUsage.TEXTURE_BINDING : 0) : GPUTextureUsage.COPY_SRC | GPUTextureUsage.TEXTURE_BINDING) });
         const ms = !depth && sc > 1 ? device.createTexture({ size: [w[a + 1], w[a + 2]], format: 'rgba8unorm', sampleCount: sc,
           usage: GPUTextureUsage.RENDER_ATTACHMENT }) : null;
         const old = res.get(w[a]);
@@ -887,6 +978,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const g = k => w[a + k];
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
         const key = `${g(D_RT)}/${g(D_DS)}`;
+        if (ds && g(D_ZEN) && ds.w >= 1000 && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
         if (key !== passKey) {
           const fold = pend && (!(pend.mask & 1) || pend.rt === g(D_RT)) && (!(pend.mask & 6) || pend.ds === g(D_DS));
           endPass(fold);
@@ -965,6 +1057,9 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         }
         endPass();
         const rt = res.get(w[a]);
+        // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
+        // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
+        if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
         if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
         if (FXAA_ON && rt && !rt.depth && !rt.msView) {
           if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {

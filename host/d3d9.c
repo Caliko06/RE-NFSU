@@ -841,6 +841,39 @@ static void tune_apply(Ctx *c) {
     memcpy(f, &tune[1], sizeof f);
     rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f, trails %08x", f[0], f[1], f[2], f[3], tune[5]);
 }
+// PS2-style depth speed blur (web/gpu.js psblur): out[0..2] = the player car's velocity [0x740500]+0x1e0 (what the game's own blur 0x40cd40
+// reads) in camera space, normalised, out[3] = its length (m/s); float bits, 0 when there is no car. out[4] = nitrous on ([0x73654c],
+// written by 0x4010e0 for the player's view), out[5..6] = the projection's _33 and _43 (block +0x40; z_ndc = _33 + _43 / z_view, so the
+// page can turn the depth buffer into metres). Sent with GPU_FXAA.
+// The camera block of the player's view (table 0x740460 + 0x60, +0 pointer; block +0 = View, rows 0..2 = the axes)
+// maps world to camera: v_cam = v * R (D3D row vectors). RN_PSLOG=1 logs it each 60 frames.
+static void psblur_vel(Ctx *c, uint32_t *out) {
+    static int lg = -1;
+    if (lg < 0) lg = getenv("RN_PSLOG") != NULL;
+    out[0] = out[1] = out[2] = out[3] = out[4] = out[5] = out[6] = 0;
+    uint32_t car = ld(c, 0x740500, 4), blk = ld(c, 0x7404c0, 4), blk0 = ld(c, 0x740460, 4);
+    if (!car || !blk || car >= GUEST_MEM - 0x200 || blk >= GUEST_MEM - 0x80) return;
+    float v[3] = {ldf(c, car + 0x1e0), ldf(c, car + 0x1e4), ldf(c, car + 0x1e8)}, m[32];
+    for (int k = 0; k < 32; k++) m[k] = ldf(c, blk + 4 * k);
+    out[4] = ld(c, 0x73654c, 4) != 0;
+    memcpy(&out[5], &m[26], 4); memcpy(&out[6], &m[30], 4);
+    float s = sqrtf(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]), r[3];
+    for (int j = 0; j < 3; j++) r[j] = v[0] * m[j] + v[1] * m[4 + j] + v[2] * m[8 + j];
+    if (lg && dev.frames % 60 == 0) {
+        float n[16] = {0};
+        if (blk0 && blk0 < GUEST_MEM - 0x40) for (int k = 0; k < 16; k++) n[k] = ldf(c, blk0 + 4 * k);
+        float q[3];
+        for (int j = 0; j < 3; j++) q[j] = v[0] * n[j] + v[1] * n[4 + j] + v[2] * n[8 + j];
+        float t[3];   // the transposed reading (R * v)
+        for (int j = 0; j < 3; j++) t[j] = m[4 * j] * v[0] + m[4 * j + 1] * v[1] + m[4 * j + 2] * v[2];
+        rn_log("PSBLUR frame %u speed %.2f v %.2f %.2f %.2f | view1 v*R %.2f %.2f %.2f R*v %.2f %.2f %.2f | view0 v*R %.2f %.2f %.2f | nitro %u P %.4f %.4f %.4f %.4f P33 %.5f P43 %.5f",
+               dev.frames, s, v[0], v[1], v[2], r[0], r[1], r[2], t[0], t[1], t[2], q[0], q[1], q[2],
+               out[4], m[16], m[21], m[26], m[27], m[26], m[30]);
+    }
+    if (s < 1e-3f) return;
+    for (int j = 0; j < 3; j++) { r[j] /= s; memcpy(&out[j], &r[j], 4); }
+    memcpy(&out[3], &s, 4);
+}
 // RN_RNGLOG: how many steps the game RNG [0x6f227c] took since the last Present (step inlined ~60 times, e.g. 0x41f81d:
 // u = x ^ 0x1d872b41, v = u ^ u >> 5, x' = v ^ v << 27 ^ u). A frame with steps makes key timing matter in frames.
 static void rng_log(Ctx *c, uint32_t frame) {
@@ -2307,7 +2340,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     int hud = race && (fen ? fen->hud : !menu), screen = race && fen && !fen->hud;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); }
-    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
+    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 8, w1); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
     static int hud_mode = -1, fe_stretch = -1;

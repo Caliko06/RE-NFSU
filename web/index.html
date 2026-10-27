@@ -110,7 +110,7 @@ function line(s, cls) {
       const jump = RN_Q.get('jump');
       if (jump) m.ENV.RN_JUMP = jump;
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
-      // 2: the sharp clearcoat candidate (host/sm1.c car_ps_sharp)
+      // 1: the clearcoat (OWNER: flat), 2: the sharp clearcoat candidate, 3 (default): live, the 2003 strength with contrast
       // ?steer=pad: the keyboard steers through the game's gamepad model (PATCH 0x460a80, host/win32.c RN_STEER)
       if (RN_Q.get('steer') === 'pad') m.ENV.RN_STEER = 'pad';
       // ?career=normal: the Underground as shipped, events open one by one (unlock patches off: PATCH 0x63b370 caves read
