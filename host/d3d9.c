@@ -835,6 +835,17 @@ static void rng_log(Ctx *c, uint32_t frame) {
 // (written at 0x448b11 .. 0x449a15: 1 loading FE, 2 unloading FE, 3 FE, 4/5 loading track, 6 race, 7 unloading track).
 uint32_t rn_flow = ~0u;
 const char *rn_screen = "", *rn_fe = "";
+// The front end's active packages: FEngine = [[0x73578c]+8], list head [+0xe4], node next +4, .fng name +0xc
+// (cFEng::FindPackage 0x4f6600..0x4f661d walks it with 0x4fd1e0). The guest addresses of the names, at most 16.
+static int fe_packages(Ctx *c, uint32_t np[16]) {
+    uint32_t fg = ld(c, 0x73578c, 4), en = fg ? ld(c, fg + 8, 4) : 0, nd = en ? ld(c, en + 0xe4, 4) : 0;
+    int n = 0;
+    for (int i = 0; nd && nd < c->memsz && i < 16; i++, nd = ld(c, nd + 4, 4)) {
+        uint32_t p = ld(c, nd + 0xc, 4);
+        if (p && p < c->memsz) np[n++] = p;
+    }
+    return n;
+}
 static void flow_log(Ctx *c) {
     static int on = -1;
     static uint32_t prev, prev_st;
@@ -850,16 +861,13 @@ static void flow_log(Ctx *c) {
     uint32_t pr = ld(c, 0x735ed0, 4), node = pr ? ld(c, pr + 0xc, 4) : 0, nm = node ? ld(c, node + 8, 4) : 0;
     const char *scr = nm >= 0x697000 && nm < 0x6d4000 ? G(nm) : "";
     if (strcmp(scr, rn_screen)) { rn_log("flow screen %.32s (frame %u)", *scr ? scr : "-", dev.frames); gpu_keep_frame(); }
-    // The front end's active packages: FEngine = [[0x73578c]+8], list head [+0xe4], node next +4, .fng name +0xc
-    // (cFEng::FindPackage 0x4f6600..0x4f661d walks it with 0x4fd1e0).
     static char fe[256], pfe[256];
-    uint32_t fg = ld(c, 0x73578c, 4), en = fg ? ld(c, fg + 8, 4) : 0, nd = en ? ld(c, en + 0xe4, 4) : 0;
+    uint32_t np[16];
+    int n = fe_packages(c, np);
     size_t fl = 0;
     fe[0] = 0;
-    for (int i = 0; nd && nd < c->memsz && i < 16; i++, nd = ld(c, nd + 4, 4)) {
-        uint32_t np = ld(c, nd + 0xc, 4);
-        if (np && np < c->memsz && fl < sizeof fe - 40) fl += (size_t)snprintf(fe + fl, sizeof fe - fl, "%s%.32s", fl ? "," : "", G(np));
-    }
+    for (int i = 0; i < n; i++)
+        if (fl < sizeof fe - 40) fl += (size_t)snprintf(fe + fl, sizeof fe - fl, "%s%.32s", fl ? "," : "", G(np[i]));
     if (strcmp(fe, pfe)) { rn_log("flow fe %s (frame %u)", fe, dev.frames); memcpy(pfe, fe, sizeof fe); }
     rn_fe = pfe;
     // Read only. [0x777cc8] = the Quick Race mode the Accept switch takes (0x4b5c00: 0..6 -> 0x4b49e0..0x4b59b0); the
@@ -2135,10 +2143,25 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     static uint32_t fxaa_frame = ~0u;
     // The label is set when the track starts loading, so the loading screen is not a race frame: a race frame drew its 3D
     // scene (indexed draws) before the HUD; a loading screen has none (its text was split to the window edges, 2026-10-23).
-    int hud = isl && racing && dip_frame == dev.frames && dip_n > 0;
+    int race = isl && racing && dip_frame == dev.frames && dip_n > 0;
+    // The race's own screens (PreRaceStats, PostRaceResults, StyleAnimator, RewardPopup, PostRaceMenu, MU_Pause_PC, ...) are
+    // FEng packages drawn over the same 3D scene. Their strings cross the 190/430 lines, so a per-quad move split words
+    // ("Race St | yle Points", OWNER shot 2026-10-26 7.12 p.m.). Only the HUD packages (HUD_SingleRace, HUD_Drift,
+    // drag_HUD_test) and the song banner Chyron go to the edges; with any other package up the whole frame keeps the 4:3 island.
+    static uint32_t menu_frame = ~0u;
+    static int menu;
+    if (race && menu_frame != dev.frames) {
+        menu_frame = dev.frames; menu = 0;
+        uint32_t np[16];
+        for (int i = 0, n = fe_packages(c, np); i < n; i++) {
+            const char *s = (const char *)G(np[i]);
+            if (strncmp(s, "HUD_", 4) && strncmp(s, "drag_HUD", 8) && strncmp(s, "Chyron.", 7)) menu = 1;
+        }
+    }
+    int hud = race && !menu;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); }
-    if (hud && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
+    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
     static int hud_mode = -1, fe_stretch = -1;
