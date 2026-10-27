@@ -12,7 +12,7 @@ const TELEM_COLS = ['t', 'run', 'present', 'draws', 'clears', 'kwords', 'texKb',
   'audioBehind', 'underrun', 'resyncs', 'clockCalls', 'handoffs', 'gilGap', 'heldMain', 'heldOther', 'holdWho'];
 
 function startTelemetry(M, t0, log, logLines) {
-  if (new URLSearchParams(location.search).get('telemetry') === '0') return null;
+  if (RN_Q.get('telemetry') === '0') return null;
   const base = M._rn_telem_addr(), audio = M._rn_audio_ring() >> 2;
   const F = () => M.HEAPF64, U = () => M.HEAPU32;
   // host.h Telem: 7 doubles (gpu_wait, gil_main, gil_other, read, idle_main, hold_main_max, hold_other_max),

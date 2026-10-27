@@ -29,6 +29,7 @@
 <header><b>Need for Speed Underground</b><span class="dim">Speed.exe traducido a WebAssembly · F2 cierra</span><span id="status">cargando…</span></header>
 <pre id="log"></pre>
 </div>
+<script src="mode.js"></script>
 <script src="gpu.js"></script>
 <script src="input.js"></script>
 <script src="audio.js"></script>
@@ -36,7 +37,7 @@
 <script src="tune.js"></script>
 <script>
 // ?bridge[=url]: a race chosen in this menu opens in the NFSU1-RE engine instead (host/bridge.c). Off by default.
-const bridgeTo = new URLSearchParams(location.search).get('bridge');
+const bridgeTo = RN_Q.get('bridge');
 if (bridgeTo !== null) window.rnBridge = q => { location.href = (bridgeTo && bridgeTo !== '1' ? bridgeTo : `http://${location.hostname}:5190/`) + '?' + q; return 1; };
 </script>
 <script src="out/speed.js"></script>
@@ -93,29 +94,32 @@ function line(s, cls) {
       m.ENV.RN_SCREEN = `${bw}x${bh}`;
       if (k === 1) Object.assign(document.getElementById('screen').style, { width: `${bw / dpr}px`, height: `${bh / dpr}px`, margin: 'auto' });
       line(`screen: window ${innerWidth}x${innerHeight} css, dpr ${dpr}, k ${k.toFixed(3)}, back buffer ${m.ENV.RN_SCREEN}`);
+      // web/mode.js: the original mode turns the native bridges off too (?env= still wins)
+      if (RN_MODE === 'original') Object.assign(m.ENV, RN_ORIGINAL_ENV);
+      line(`mode: ${RN_MODE} (F4 switches)`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
-      for (const kv of (new URLSearchParams(location.search).get('env') || '').split(',').filter(Boolean)) {
+      for (const kv of (RN_Q.get('env') || '').split(',').filter(Boolean)) {
         const k = kv.indexOf('=');
         m.ENV[k < 0 ? kv : kv.slice(0, k)] = k < 0 ? '1' : kv.slice(k + 1);
       }
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
-      const keys = new URLSearchParams(location.search).get('keys');
+      const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;
       // ?jump=5:1201,6:1304: RN_JUMP (host/input.c). On Quick Race, each race of the list starts at once (mode:track;
       // 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift), the next one when a race comes back to the menu
-      const jump = new URLSearchParams(location.search).get('jump');
+      const jump = RN_Q.get('jump');
       if (jump) m.ENV.RN_JUMP = jump;
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
       // 2: the sharp clearcoat candidate (host/sm1.c car_ps_sharp)
       // ?steer=pad: the keyboard steers through the game's gamepad model (PATCH 0x460a80, host/win32.c RN_STEER)
-      if (new URLSearchParams(location.search).get('steer') === 'pad') m.ENV.RN_STEER = 'pad';
+      if (RN_Q.get('steer') === 'pad') m.ENV.RN_STEER = 'pad';
       // ?career=normal: the Underground as shipped, events open one by one (unlock patches off: PATCH 0x63b370 caves read
       // [0x7677ac] alone, debug byte 0x735ec1 = 0; host/win32.c RN_UNLOCK). Default: everything unlocked
-      if (new URLSearchParams(location.search).get('career') === 'normal') m.ENV.RN_UNLOCK = '0';
+      if (RN_Q.get('career') === 'normal') m.ENV.RN_UNLOCK = '0';
       // ?cardetail=0: the car paint without the occlusion and grime terms (host/sm1.c car_ps_detail); =split: right half only
-      const cd = new URLSearchParams(location.search).get('cardetail');
+      const cd = RN_Q.get('cardetail');
       if (cd !== null) m.ENV.RN_CARDETAIL = cd;
-      const look = new URLSearchParams(location.search).get('carlook');
+      const look = RN_Q.get('carlook');
       if (look !== null) m.ENV.RN_CARLOOK = look;
     }],
   });

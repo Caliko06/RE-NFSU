@@ -24,9 +24,10 @@ function startTune(M) {
   const base = M._rn_tune_addr() >> 2;
   const f = new Float32Array(1), u = new Uint32Array(f.buffer);
   const bits = x => (f[0] = x, u[0]);
-  let level = BLUR_DEFAULT;
-  try { const s = localStorage.getItem('rn_blur2'); if (s !== null && BLUR[+s]) level = +s; } catch {}
-  const q = new URLSearchParams(location.search).get('blur');
+  let level = RN_MODE === 'original' ? BLUR.length - 1 : BLUR_DEFAULT;
+  const KEY = RN_MODE === 'original' ? 'rn_blur2_orig' : 'rn_blur2';   // web/mode.js: each mode keeps its own F6/F7 choice
+  try { const s = localStorage.getItem(KEY); if (s !== null && BLUR[+s]) level = +s; } catch {}
+  const q = RN_Q.get('blur');
   if (q !== null && BLUR[+q]) level = +q;
 
   const toast = document.createElement('div');
@@ -40,7 +41,7 @@ function startTune(M) {
     const p = BLUR[level], h = M.HEAPU32;
     h[base + 1] = bits(p.ramp[0]); h[base + 2] = bits(p.ramp[1]); h[base + 3] = bits(p.cap); h[base + 4] = bits(STREAK); h[base + 5] = trailColor(p.trails);
     Atomics.add(h, base, 1);
-    try { localStorage.setItem('rn_blur2', String(level)); } catch {}
+    try { localStorage.setItem(KEY, String(level)); } catch {}
     if (!show) return;
     toast.textContent = `Blur ${level}/${BLUR.length - 1}: ${p.name}   (F6 / F7)`;
     toast.style.display = 'block';

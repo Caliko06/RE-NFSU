@@ -48,8 +48,8 @@ async function startGpu(M, canvas, report, onFrame) {
   const pack = new Map(), hd = new Map();   // key -> png name; png name -> {view} once loaded, null while loading
   let packed = 0, hdMs = 0;   // hdMs: page-thread ms in pack uploads and view swaps since the last frame report
   // ?hdlog=1: each pack hit once (texture id, size, key, png), to find a texture the pack should not take.
-  const hdLog = new URLSearchParams(location.search).get('hdlog') === '1' ? new Set() : null;
-  if (new URLSearchParams(location.search).get('remaster') !== '0') {
+  const hdLog = RN_Q.get('hdlog') === '1' ? new Set() : null;
+  if (RN_Q.get('remaster') !== '0') {
     // The world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh) are on by default in BC7; ?worldhd=0 turns them off.
     // As rgba8 (webp: ?worldhd=1&worldbc=0) gate60 passed 1 run in 4 (scenes > 3300 draws dropped 18-53 frames over 20 ms; base 0-2,
     // build/bench/e_default*); as BC7 4 in 4, max 24-25 ms, 0 > 33 ms like the base (build/bench/f_bc7_q*, 2026-10-26).
@@ -57,7 +57,7 @@ async function startGpu(M, canvas, report, onFrame) {
     // Pack v2 (tools/remaster/pack_v2.sh: deblock + 4x-UltraSharpV2) overrides the v1 entries it has; ?pack=1 = v1 only.
     // index_fe_v2.tsv (SETS=fe): the front end, HUD and global textures, only in v2.
     // index_world_bc.tsv (tools/remaster/world_bc7.sh): the same world pack (v2 over v1) in BC7; ?worldbc=0 = the webp.
-    const q = new URLSearchParams(location.search), v2 = q.get('pack') !== '1', wq = q.get('worldhd');
+    const q = RN_Q, v2 = q.get('pack') !== '1', wq = q.get('worldhd');
     const world = wq === '1' || (wq !== '0' && v2 && BC && q.get('worldbc') !== '0');
     const worldBc = world && v2 && BC && q.get('worldbc') !== '0';
     const lists = ['remaster/index.tsv', ...(v2 ? ['remaster/index_v2.tsv', 'remaster/index_fe_v2.tsv'] : []),
@@ -68,11 +68,11 @@ async function startGpu(M, canvas, report, onFrame) {
     } catch {}
     if (pack.size) report(`gpu.js: remaster pack ${pack.size} textures`);
   }
-  const HD_MAX = Number(new URLSearchParams(location.search).get('hdmax') || 1024);
+  const HD_MAX = Number(RN_Q.get('hdmax') || 1024);
   // At most HD_NET pack downloads at once (?hdnet=): Chrome opens 6 connections to one host, and the ~1600 world textures
   // a race uploads took all 6, so the game's own reads of the track (host/files.c sync XHR) waited behind them: 6/1 -> race
   // HUD 1.0 s without the world pack, 6.0 s with it, STREAML1RA.BUN reads > 100 ms (build/bench/e_world2, 2026-10-26).
-  const HD_NET = Number(new URLSearchParams(location.search).get('hdnet') || 3), netQ = [];
+  const HD_NET = Number(RN_Q.get('hdnet') || 3), netQ = [];
   let netN = 0;
   async function hdBlob(url) {
     if (netN < HD_NET) netN++; else await new Promise(r => netQ.push(r));   // a finished download hands its slot over
@@ -176,10 +176,10 @@ async function startGpu(M, canvas, report, onFrame) {
   // depth (~190 MB a pass). FXAA (below) is the antialiasing when it is off. With it on, each colour target keeps its
   // single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
   // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
-  const MSAA = new URLSearchParams(location.search).get('msaa') === '4' ? 4 : 1;
+  const MSAA = RN_Q.get('msaa') === '4' ? 4 : 1;
   // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first HUD quad of a race
   // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
-  const FXAA_MODE = new URLSearchParams(location.search).get('fxaa');   // '0' off, '2' debug: edges in red
+  const FXAA_MODE = RN_Q.get('fxaa');   // '0' off, '2' debug: edges in red
   const FXAA_ON = FXAA_MODE !== '0';
   const fxaaMod = device.createShaderModule({ code: `
 const DBG = ${FXAA_MODE === '2' ? 1 : 0};
@@ -267,7 +267,7 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
   // now draws it into a canvas at the window's device pixels through AMD FidelityFX CAS (MIT; its upscaling path: the four
   // nearest texels each sharpened by their contrast, then blended), so the 1.5x upscale keeps edges and text crisp.
   // ?sharp=0..1 is CAS's sharpness (default 0.5); ?sharp=off = the old copy at the back buffer size.
-  const SHARP_Q = new URLSearchParams(location.search).get('sharp'), SHARP = SHARP_Q === 'off' ? -1 : Number(SHARP_Q ?? 0.5);
+  const SHARP_Q = RN_Q.get('sharp'), SHARP = SHARP_Q === 'off' ? -1 : Number(SHARP_Q ?? 0.5);
   const casMod = device.createShaderModule({ code: `
 struct U { scale: vec2f, peak: f32, pad: f32, inMax: vec2i };
 @group(0) @binding(0) var src: texture_2d<f32>;
@@ -326,7 +326,7 @@ fn amp(a: vec3f, b: vec3f, c: vec3f, d: vec3f, e: vec3f, mn: ptr<function, f32>,
   // twin too, so the HUD pass's resolve keeps it. ?bloom=0 turns it off; ?bloom=split = only the right half (A/B in one frame).
   // ?bloom=lights (OWNER 2026-10-27, "the lights and how they look"): street lamps, neon and headlights glow wider: the
   // bright pass starts at luma 0.55 and adds back at 0.35 (the default lifts only near-white, 0.72 at 0.2).
-  const BLOOM_MODE = new URLSearchParams(location.search).get('bloom'), BLOOM_ON = BLOOM_MODE !== '0';
+  const BLOOM_MODE = RN_Q.get('bloom'), BLOOM_ON = BLOOM_MODE !== '0';
   const [BLOOM_T, BLOOM_W] = BLOOM_MODE?.startsWith('lights') ? ['0.55', '0.35'] : ['0.72', '0.2'];   // lights-split: A/B
   const bloomMod = device.createShaderModule({ code: `
 @group(0) @binding(0) var src: texture_2d<f32>;
@@ -441,7 +441,7 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
   device.queue.writeTexture({ texture: dummyCube }, new Uint8Array(24).map((_, i) => i % 4 === 3 ? 255 : 0),
     { bytesPerRow: 4, rowsPerImage: 1 }, [1, 1, 6]);
   const dummyCubeView = dummyCube.createView({ dimension: 'cube' });
-  const ANISO = Number(new URLSearchParams(location.search).get('aniso') ?? 16);   // ?aniso=1 turns the bridge off
+  const ANISO = Number(RN_Q.get('aniso') ?? 16);   // ?aniso=1 turns the bridge off
   const samplers = new Map();
   function sampler(t) {
     const key = `${t[T_AU]},${t[T_AV]},${t[T_MAG]},${t[T_MIN]},${t[T_MIP]},${t[T_ANISO]}`;
@@ -538,7 +538,7 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
   // w > 1/255 counted (alpha: the largest term); m >= 128 replaces, 1..127 blends ftol(L * m/128) + ftol(D * (1 - m/128)), alpha
   // summed; every channel stops at 255. Then the marker texels (the 4 colours of the spec) are written.
   // ?skinhd=0 off; ?skinhd=check runs it at 512 with nearest texels and reports the texels that differ from the game's result.
-  const SKIN_MODE = new URLSearchParams(location.search).get('skinhd');
+  const SKIN_MODE = RN_Q.get('skinhd');
   const skinMod = device.createShaderModule({ code: `
 struct U { mode: u32, recolour: u32, nmark: u32, exact: u32, src: vec2f, k: f32, pad: f32, cols: array<vec4f, 4>, marks: array<vec4u, 64> };
 @group(0) @binding(0) var prev: texture_2d<f32>;
@@ -679,7 +679,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     res: device.createBuffer({ size: 8 * TS_MAX, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC }), free: [] } : null;
   let tsN = 0;
   // ?gpuprof=1: GPU time per pass kind (label = what the pass does and its target), summed over 300 frames, in the frame log.
-  const PROF = new URLSearchParams(location.search).get('gpuprof') === '1', profLab = [], profSum = new Map();
+  const PROF = RN_Q.get('gpuprof') === '1', profLab = [], profSum = new Map();
   let profFrames = 0, profSeq = [], profLast = '';   // the frame's pass breaks in order (?gpuprof=1)
   const tsw = lab => {
     if (!tsq || tsN + 2 > TS_MAX) return undefined;
@@ -1053,7 +1053,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   }
 
   // ?hold=N (debug): stop after the N-th Present, so a capture shows that frame (the game then waits).
-  const hold = Number(new URLSearchParams(location.search).get('hold')) || 0;
+  const hold = Number(RN_Q.get('hold')) || 0;
   let frames = 0, presents = 0;
   const steerLog = /RN_STEERLOG/.test(location.search);   // host/input.c RN_STEERLOG: GPU completion per present
   // The page runs a frame as soon as the game submits it (host/gpu.c wakes seq), not at the next animation frame: with one
