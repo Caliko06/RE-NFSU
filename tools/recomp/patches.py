@@ -112,15 +112,21 @@ PATCHES.append(dict(addr=0x40dcdb, old="a134107000d1f889442400da7c240059c3",
 # the reflection views pass 1, 0x6f1b38). The table stays: 0x56e77e fades by (size - 20) / (45 - 20).
 PATCHES.append(dict(addr=0x56e0d2, old="7a1f", new="eb1f", when=lambda: True))
 
-# PATCH: 0x409bca, 0x409bf6, OWNER 2026-10-22 (light flares blind the view and smear at speed): with LIGHTSTREAKS
-# (0x700e9c) the flares 0x544f30 go only into a half-size buffer 0x71abb0 (0x409b70). Each frame that buffer is multiplied
-# by BLENDFACTOR 0x008296b4 (ZERO / BLENDFACTOR quad, filter.efx p0) and then added to the screen (ONE / ONE) with weight
-# 0x1fffffff = rgb 1.0. A still light builds up to 1/(1 - k): R 2.0x, G 2.4x, B 3.4x, and a trail needs 4.5 / 5.7 / 8.7
-# frames to fall under 5%. Now k is a quarter (0x0020252d) and the screen weight 0.55 (0x1f8c8c8c): a still light is
-# 0.63x / 0.64x / 0.67x (a third of before), a trail 1.4 / 1.6 / 1.7 frames. The decay quad reads that weight too, but its
-# source factor is ZERO. Measured pair: build/lights_before.png, build/lights_after.png (start grid, same lamp).
-PATCHES.append(dict(addr=0x409bca, old="68b4968200", new="682d252000", when=lambda: True))
-PATCHES.append(dict(addr=0x409bf6, old="c7442420ffffff1f", new="c74424208c8c8c1f", when=lambda: True))
+# PATCH: 0x409bdb (+ weight 0x707fcc), OWNER 2026-10-22 (light flares blind the view) and 2026-10-26 (now the trails are
+# gone; wants the aura around moving lights back): with LIGHTSTREAKS (0x700e9c) the flares 0x544f30 go only into a half-size
+# buffer 0x71abb0 (0x409b70). Each frame that buffer is multiplied by BLENDFACTOR k = 0x008296b4 (ZERO / BLENDFACTOR quad,
+# filter.efx p0, mode 0xe) and then added to the screen (ONE / ONE, mode 2) modulated by the colour at [esp+8], 0x1fffffff
+# (both 0x40d6e0 calls point at that slot; the decay quad ignores it, source factor ZERO). A still light builds to
+# w/(1 - k): R 2.0x, G 2.4x, B 3.4x (the blinding, blue-white lamps); a moving one leaves a trail of 4.4 / 5.6 / 8.6 frames
+# at 60 fps (73 / 93 / 143 ms). That decay stays as shipped: it is the PS2 trail in time (SLUS_208.11 glow buffer loses
+# (90,79,53) per 30 fps frame: 94 / 107 / 160 ms; ~/NFSU1-RE docs/re/postfx-elf.md). The 2026-10-22 patch (k / 4, w 0.55)
+# cut the trail to 1.7 frames and a still lamp to 0.65x, so the aura vanished. Now the colour comes from [0x707fcc] (free
+# .data, no reference in the exe), set per channel to s (1 - k): a still light is s times its own flare in R, G and B alike,
+# and the trail keeps the game's length. Default s = 1.5 (0x1fbc9e71); web/tune.js sets s per blur preset (F6/F7).
+# The block 0x409bdb..0x409bfe is rewritten in place: same args to 0x40d6e0, same ecx / edx / eax as before the call.
+PATCHES.append(dict(addr=0x707fcc, old="00000000", new="719ebc1f", when=lambda: True))
+PATCHES.append(dict(addr=0x409bdb, old="8b46186a0e6a016a018d4c2414518d54241c52894424206a0133c0c7442420ffffff1f",
+                    new="8b46188d4c2408894104a1cc7f700089018d51046a0e6a016a0151526a0131c0909090", when=lambda: True))
 
 # PATCH: 0x40fbb7..0x40fc38, OWNER 2026-10-22 (less car reflection): 0x40fae0 sets the car material constants of car.efx.
 # EnvmapMin = mat+0x84 * mat+0x80 * 0.5 and EnvmapMin + EnvmapRange = mat+0x94 * mat+0x90 * 0.5, both with the shared 0.5

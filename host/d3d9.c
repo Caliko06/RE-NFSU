@@ -798,9 +798,10 @@ static void census_dump(void) {
 }
 // Blur bank (web/tune.js: ?blur=, F6/F7). The motion blur 0x40cd40 reads only these .data floats (V, Hopper xrefs
 // 2026-10-24): ramp start/end in m/s at 0x702a38/0x702a3c (40ce6e), the cap of t at 0x702a40 (40ced4, 40cee1; composite
-// TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). The page writes the 4 floats, then bumps
-// seq; Present copies them into the game's .data when seq changed. Game code is untouched.
-static uint32_t tune[6];      // seq, then the 4 floats as bits
+// TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
+// at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
+// seq; Present copies them into the game's .data when seq changed.
+static uint32_t tune[6];      // seq, then the 4 floats as bits, then the trail colour
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -811,9 +812,10 @@ static void tune_apply(Ctx *c) {
     if (s == seen) return;
     seen = s;
     for (int k = 0; k < 4; k++) st(c, 0x702a38 + 4 * k, tune[1 + k], 4);
+    if (tune[5]) st(c, 0x707fcc, tune[5], 4);
     float f[4];
     memcpy(f, &tune[1], sizeof f);
-    rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f", f[0], f[1], f[2], f[3]);
+    rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f, trails %08x", f[0], f[1], f[2], f[3], tune[5]);
 }
 // RN_RNGLOG: how many steps the game RNG [0x6f227c] took since the last Present (step inlined ~60 times, e.g. 0x41f81d:
 // u = x ^ 0x1d872b41, v = u ^ u >> 5, x' = v ^ v << 27 ^ u). A frame with steps makes key timing matter in frames.

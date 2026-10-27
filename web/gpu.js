@@ -320,7 +320,7 @@ fn amp(a: vec3f, b: vec3f, c: vec3f, d: vec3f, e: vec3f, mn: ptr<function, f32>,
     disp = b ? [b.inlineSize, b.blockSize] : [Math.round(e.contentRect.width * devicePixelRatio), Math.round(e.contentRect.height * devicePixelRatio)];
   }).observe(canvas);
   // BRIDGE: bloom over the 3D scene, not in the original (docs/PLAN.md block 5). PC NFSU1 has its own light glow and
-  // streaks (0x409b70, PATCH 0x409bca), and it is the sharpest of the four versions, so this one only lifts what is
+  // streaks (0x409b70, PATCH 0x409bdb), and it is the sharpest of the four versions, so this one only lifts what is
   // already near white: a quarter-size bright pass (luma over 0.72), a separable 9-tap Gaussian, added back with weight
   // 0.2. It runs at GPU_FXAA (the first HUD quad: the scene is done, the HUD comes after) and adds into the multisampled
   // twin too, so the HUD pass's resolve keeps it. ?bloom=0 turns it off; ?bloom=split = only the right half (A/B in one frame).
