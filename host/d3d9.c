@@ -2121,6 +2121,111 @@ static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
                        lock_mem(ib) + ARG(5) * (i32 ? 4 : 2), i32, 0);
     return D3D_OK;
 }
+// BRIDGE: the FEng tree of the race's screens, for the widescreen layout below. PATCH 0x4f2f13 leaves the FEObject that is
+// drawing in SCREEN_ADDR+0x40 (0 outside 0x4f2cb0). An active package (fe_packages' list node) holds its children at +0x40, a
+// group (type +0x18 == 5) at +0x60, siblings at +4 (FEPackage::ForAllObjects 0x4ffb00, 0x4ffab0). Once per frame each object
+// gets its package and kind (1 = HUD: HUD_*, drag_HUD*); each draw grows its package's box (x in the 640 screen),
+// and a frame lays out with the boxes of the frame before (a package's first frame stays in place).
+typedef struct { uint32_t obj, pkg; uint8_t hud; } FeNode;
+typedef struct { uint32_t obj, f, pf; float x0, x1, px0, px1; } FeBox;
+static FeNode fe_node[4096];
+static FeBox fe_box[4096];
+static uint32_t fe_node_frame = ~0u;
+static uint32_t fe_hash(uint32_t a) { return (a >> 2) * 0x9e3779b1u >> 20; }   // 12 bits
+static FeNode *fe_node_at(uint32_t obj) {
+    for (uint32_t h = fe_hash(obj), k = 0; k < 4096; k++, h = (h + 1) & 4095) {
+        if (fe_node[h].obj == obj) return &fe_node[h];
+        if (!fe_node[h].obj) return NULL;
+    }
+    return NULL;
+}
+static void fe_tree(Ctx *c, uint32_t first, uint32_t pkg, uint8_t hud, int depth, int *budget) {
+    for (uint32_t o = first; o && o < c->memsz && depth < 16 && (*budget)-- > 0; o = ld(c, o + 4, 4)) {
+        uint32_t h = fe_hash(o);
+        while (fe_node[h].obj && fe_node[h].obj != o) h = (h + 1) & 4095;
+        fe_node[h] = (FeNode){o, pkg, hud};
+        if (ld(c, o + 0x18, 4) == 5) fe_tree(c, ld(c, o + 0x60, 4), pkg, hud, depth + 1, budget);
+    }
+}
+static void fe_tree_frame(Ctx *c) {
+    if (fe_node_frame == dev.frames) return;
+    fe_node_frame = dev.frames;
+    memset(fe_node, 0, sizeof fe_node);
+    uint32_t fg = ld(c, 0x73578c, 4), en = fg ? ld(c, fg + 8, 4) : 0, nd = en ? ld(c, en + 0xe4, 4) : 0;
+    int budget = 3000;   // 3/4 of the table at most: lookups always meet an empty slot
+    for (int i = 0; nd && nd < c->memsz && i < 16; i++, nd = ld(c, nd + 4, 4)) {
+        uint32_t p = ld(c, nd + 0xc, 4);
+        if (!p || p >= c->memsz) continue;
+        const char *s = (const char *)G(p);
+        uint8_t hud = !strncmp(s, "HUD_", 4) || !strncmp(s, "drag_HUD", 8);
+        fe_tree(c, ld(c, nd + 0x40, 4), nd, hud, 0, &budget);
+    }
+}
+static int fe_side(uint32_t pkg);
+static int fe_last(uint32_t obj, float *x0, float *x1);
+// RN_FELOG=1: 30 frames after the package set changes (rn_fe), each package of a race screen: its box in the 640 screen
+// and side (fe_side), to check the layout against what the screen shows.
+static uint32_t fe_log_at = ~0u;
+static void fe_log(Ctx *c) {
+    static int on = -1;
+    static char last[256];
+    static uint32_t again = ~0u;
+    if (on < 0) on = getenv("RN_FELOG") != NULL;
+    if (!on) return;
+    if (strcmp(last, rn_fe)) { snprintf(last, sizeof last, "%s", rn_fe); fe_log_at = dev.frames + 30; again = dev.frames + 150; }
+    if (dev.frames == again) fe_log_at = dev.frames;   // once more 150 frames in, when the slide-ins are done
+    static uint32_t done = ~0u;
+    if (dev.frames != fe_log_at || done == dev.frames) return;
+    done = dev.frames;
+    rn_log("FELOG frame %u packages %s", dev.frames, last);
+    uint32_t seen[16];
+    int ns = 0;
+    for (int h = 0; h < 4096 && ns < 16; h++) {
+        FeNode *n = &fe_node[h];
+        int dup = 0;
+        for (int k = 0; k < ns; k++) dup |= seen[k] == n->pkg;
+        if (!n->obj || dup) continue;
+        seen[ns++] = n->pkg;
+        float x0 = 0, x1 = 0;
+        int ok = fe_last(n->pkg, &x0, &x1);
+        rn_log("FELOG  %.32s hud %u box %s%.0f..%.0f side %d", G(ld(c, n->pkg + 0xc, 4)), n->hud, ok ? "" : "(none) ", x0, x1, fe_side(n->pkg));
+    }
+}
+static FeBox *fe_box_at(uint32_t obj, int make) {
+    uint32_t h = fe_hash(obj);
+    for (uint32_t k = 0; k < 4096; k++, h = (h + 1) & 4095) {
+        FeBox *b = &fe_box[h];
+        if (b->obj == obj) return b;
+        if (!b->obj || (make && dev.frames - b->f > 2)) break;   // empty, or an object not drawn for 3 frames: reuse
+    }
+    if (!make) return NULL;
+    fe_box[h] = (FeBox){obj, ~0u, ~0u, 0, 0, 0, 0};
+    return &fe_box[h];
+}
+static void fe_grow(uint32_t key, float u0, float u1) {
+    FeBox *b = fe_box_at(key, 1);
+    if (b->f != dev.frames) { b->pf = b->f; b->px0 = b->x0; b->px1 = b->x1; b->f = dev.frames; b->x0 = u0; b->x1 = u1; }
+    else { if (u0 < b->x0) b->x0 = u0; if (u1 > b->x1) b->x1 = u1; }
+}
+// The box of obj as the frame before drew it: 0 = none.
+static int fe_last(uint32_t obj, float *x0, float *x1) {
+    FeBox *b = fe_box_at(obj, 0);
+    if (!b) return 0;
+    if (b->f == dev.frames && b->pf == dev.frames - 1) { *x0 = b->px0; *x1 = b->px1; return 1; }
+    if (b->f == dev.frames - 1) { *x0 = b->x0; *x1 = b->x1; return 1; }
+    return 0;
+}
+// Where a race screen goes: -1 the left window edge, +1 the right one, 0 stays. The package moves as one piece: one whose
+// drawn box (layers across the whole 640 screen left out) reaches only the left outer band (x < 190) goes left, only the
+// right band (x > 450) right (the standings, the post-race menu, the song banner); one that reaches neither or both (Race
+// Style Points, the Leave Race dialog) stays whole in the centre. A package has no anchors (FEng places by 640 x 480
+// position only), and moving its groups apart split centred tables into labels and values (run 2026-10-26, shots 14-19).
+static int fe_side(uint32_t pkg) {
+    float x0, x1;
+    if (!fe_last(pkg, &x0, &x1)) return 0;
+    int l = x0 < 190.f, r = x1 > 450.f;
+    return l != r ? r - l : 0;
+}
 // The UP draws leave stream 0 (and the index buffer for the indexed one) unset, as documented.
 static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     DEV();
@@ -2147,9 +2252,13 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     // scene (indexed draws) before the HUD; a loading screen has none (its text was split to the window edges, 2026-10-23).
     int race = isl && racing && dip_frame == dev.frames && dip_n > 0;
     // The race's own screens (PreRaceStats, PostRaceResults, StyleAnimator, RewardPopup, PostRaceMenu, MU_Pause_PC, ...) are
-    // FEng packages drawn over the same 3D scene. Their strings cross the 190/430 lines, so a per-quad move split words
-    // ("Race St | yle Points", OWNER shot 2026-10-26 7.12 p.m.). Only the HUD packages (HUD_SingleRace, HUD_Drift,
-    // drag_HUD_test) and the song banner Chyron go to the edges; with any other package up the whole frame keeps the 4:3 island.
+    // FEng packages drawn over the same 3D scene. A per-quad move split their words ("Race St | yle Points", OWNER shot
+    // 2026-10-26 7.12 p.m.), and keeping the whole frame in the 4:3 island while one is up made the HUD jump (OWNER 2026-10-26
+    // 11.16 p.m.: "the HUD turns 4:3 after the race and on pause"). Now each quad knows its FEng object (PATCH 0x4f2f13):
+    // the HUD packages (HUD_SingleRace, HUD_Drift, drag_HUD_test) always go to the edges as before, quad by quad (their centre
+    // zone is empty); in the others (the song banner Chyron too: its bar crosses 190) the whole package goes to its side (fe_side)
+    // and a layer across the whole 640 screen (the dim behind the results) covers the window. Quads drawn outside the FEng
+    // render keep the old rule.
     static uint32_t menu_frame = ~0u;
     static int menu;
     if (race && menu_frame != dev.frames) {
@@ -2160,7 +2269,10 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
             if (strncmp(s, "HUD_", 4) && strncmp(s, "drag_HUD", 8) && strncmp(s, "Chyron.", 7)) menu = 1;
         }
     }
-    int hud = race && !menu;
+    uint32_t feo = race ? ld(c, SCREEN_ADDR + 0x40, 4) : 0;
+    FeNode *fen = NULL;
+    if (feo) { fe_tree_frame(c); fen = fe_node_at(feo); fe_log(c); }
+    int hud = race && (fen ? fen->hud : !menu), screen = race && fen && !fen->hud;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); }
     if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
@@ -2169,17 +2281,30 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     static int hud_mode = -1, fe_stretch = -1;
     if (hud_mode < 0) { const char *e = getenv("RN_HUD"); hud_mode = !e ? 0 : !strcmp(e, "169") ? 1 : !strcmp(e, "43") ? 2 : 0; }
     if (fe_stretch < 0) { const char *e = getenv("RN_FE"); fe_stretch = e && !strcmp(e, "stretch"); }
-    if (isl && !hud && fe_stretch) {
+    if (isl && !race && fe_stretch) {
         float S = 4.f * rn_screen_h / (3.f * rn_screen_w);
         for (int k = 0; k < 4; k++) { uint32_t b = ld(c, ARG(3) + 32 * k, 4); float y; memcpy(&y, &b, 4); y /= S; memcpy(&b, &y, 4); st(c, ARG(3) + 32 * k, b, 4); }
         moved = 1;
     }
-    if (hud && hud_mode != 2) {
+    if ((hud || screen) && hud_mode != 2) {
         float S = 4.f * rn_screen_h / (3.f * rn_screen_w), x[4], cx = 0, B = hud_mode == 1 && S * 4 / 3 < 1 ? S * 4 / 3 : 1;
-        for (int k = 0; k < 4; k++) { uint32_t b = ld(c, ARG(3) + 32 * k, 4); memcpy(&x[k], &b, 4); cx += x[k] / 4; }
-        float u = (cx + S) / (2 * S) * 640.f, d = u < 0 || u > 640 ? 0 : u < 190 ? -(B - S) : u > 430 ? B - S : 0;
-        if (d != 0) {
-            for (int k = 0; k < 4; k++) { float y = x[k] + d; uint32_t b; memcpy(&b, &y, 4); st(c, ARG(3) + 32 * k, b, 4); }
+        float u0 = 1e9f, u1 = -1e9f;
+        for (int k = 0; k < 4; k++) {
+            uint32_t b = ld(c, ARG(3) + 32 * k, 4); memcpy(&x[k], &b, 4); cx += x[k] / 4;
+            float u = (x[k] + S) / (2 * S) * 640.f; if (u < u0) u0 = u; if (u > u1) u1 = u;
+        }
+        int full = u0 <= 1.f && u1 >= 639.f;
+        // Items parked off screen (the menu's unused strings at x < 0) were cut by the original's scissor: not part of the box.
+        if (fen && !full && u1 > 0 && u0 < 640) fe_grow(fen->pkg, u0 < 0 ? 0 : u0, u1 > 640 ? 640 : u1);
+        if (fen && dev.frames == fe_log_at && !fen->hud)
+            rn_log("FELOG   quad obj %08x pkg %.24s %.0f..%.0f%s", feo, G(ld(c, fen->pkg + 0xc, 4)), u0, u1, full ? " full" : "");
+        float u = (cx + S) / (2 * S) * 640.f, d = 0, m = 1;
+        if (hud) d = u < 0 || u > 640 ? 0 : u < 190 ? -(B - S) : u > 430 ? B - S : 0;
+        else if (full) m = B / S;
+        else if (u1 <= 0 || u0 >= 640) d = -4;   // parked off the 640 screen: moving the package would bring it into view, so cut it
+        else d = (float)fe_side(fen->pkg) * (B - S);
+        if (d != 0 || m != 1) {
+            for (int k = 0; k < 4; k++) { float y = x[k] * m + d; uint32_t b; memcpy(&b, &y, 4); st(c, ARG(3) + 32 * k, b, 4); }
             moved = 1;
         }
     }

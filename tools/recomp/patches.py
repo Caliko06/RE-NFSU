@@ -3,6 +3,8 @@
 The lifter, the difftest and the loader (build/gen/table.c -> host/main.c) all see the patched image.
 Each entry checks the original bytes first; a mismatch stops the build.
 """
+import struct
+
 PATCHES = [
     # PATCH: 0x4f5891 (+ caves 0x43a001, 0x438eb1, 0x438b41: CC padding, no reference), a missing movie file: the movie
     # message handler (0x4f5860, msg type 7) builds MOVIES\<name>.mad (0x4f57a0), checks it (0x63c4a0) and starts the
@@ -36,6 +38,18 @@ for _a in (0x40bf09, 0x40bf9a, 0x40bfff, 0x40c053):
     PATCHES.append(dict(addr=_a, old=_OLD_MUL, new="08300100", when=lambda: True))
 for _a in (0x40bf17, 0x40bfa0, 0x40c00b, 0x40c064):
     PATCHES.append(dict(addr=_a, old=_OLD_SUB, new="0c300100", when=lambda: True))
+
+# PATCH: 0x4f2f13 (+ caves 0x689391, 0x688b61: CC padding after a jmp, no call, jump or pointer reaches them), widescreen race
+# screens: the FEng render 0x4f2eb0 walks its draw lists (0x746910..) and draws each object with 0x4f2cb0 (eax = FEObject,
+# edi = the render; type 1 image 0x4f2000, 2 string 0x4f25f0, 9 multi-image 0x4f2280, cached nodes 0x514b90), whose quads
+# reach DrawPrimitiveUP (0x40bef0) before it returns. That call now goes through cave A, which leaves the object in
+# SCREEN_ADDR+0x40 while it draws and clears it after (cave B), so host/d3d9.c moves each race screen package as a whole, not single quads.
+#   A: mov [0x13040],eax; call 0x4f2cb0; jmp B        B: and dword [0x13040],0; ret
+def _rel(src, dst): return struct.pack('<i', dst - (src + 5)).hex()
+PATCHES.append(dict(addr=0x4f2f13, old="e898fdffff", new="e8" + _rel(0x4f2f13, 0x689391), when=lambda: True))
+PATCHES.append(dict(addr=0x689391, old="cc" * 15, entry=True, when=lambda: True,
+                    new="a340300100" + "e8" + _rel(0x689396, 0x4f2cb0) + "e9" + _rel(0x68939b, 0x688b61)))
+PATCHES.append(dict(addr=0x688b61, old="cc" * 8, new="832540300100" + "00" + "c3", when=lambda: True))
 
 # PATCH: 0x408a24, widescreen: the first CreateDevice (0x408830) asked for 800x600 with push 0x320 / mov esi,0x258 and
 # [0x702a80] = 0x15 (D3DFMT_A8R8G8B8). It now asks for the screen size at SCREEN_ADDR, so the front end is drawn at the
