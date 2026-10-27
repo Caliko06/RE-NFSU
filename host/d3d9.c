@@ -114,7 +114,8 @@ static int top;
 // textures; RN_MAXOBJ=20000: each track load also leaves ~3000 dead VBs and IBs). Surfaces, textures and buffers come
 // back (GPU_TARGET, GPU_TEXTURE, GPU_BUFFER replace an id; the smooth cache keys by the buffer's own memory); shaders and
 // declarations keep their ids, which the GPU side caches by. A texture takes a run of 1 + levels slots (level0 follows it, GPU_CUBE ids face0..face0+5).
-static int slot_free(int k);
+static int slot_free(int k), bound(int k);
+static void drop_mem(Obj *o) { if (o->mem) guest_free(o->mem), o->mem = 0; }   // see free_dead
 static int run_at, run_n, cursor;
 static int find_run(int n) {
     static int lim;   // RN_MAXOBJ=N: a smaller table, so a short run already reuses slots (a test of this code)
@@ -141,9 +142,11 @@ static uint32_t new_obj(Ctx *c, int iface) {
     }
     if (k < nobjs && (objs[k].iface == I_TEXTURE || objs[k].iface == I_CUBE))   // its levels outlive it as dead surfaces
         for (uint32_t l = 0; l < (objs[k].iface == I_CUBE ? 6u : objs[k].levels); l++)
-            if (objs[objs[k].level0 + l].container == (uint32_t)k + 1) objs[objs[k].level0 + l].container = 0, objs[objs[k].level0 + l].refs = 0;
+            if (objs[objs[k].level0 + l].container == (uint32_t)k + 1)
+                objs[objs[k].level0 + l].container = 0, objs[objs[k].level0 + l].refs = 0, drop_mem(&objs[objs[k].level0 + l]);
     if (k >= nobjs) nobjs = k + 1;
     Obj *o = &objs[k];
+    drop_mem(o);
     memset(o, 0, sizeof *o);
     tex_key[k] = 0;
     o->iface = iface;
@@ -169,12 +172,27 @@ static uint32_t unk_QueryInterface(Ctx *c) {
     return 0x80004002u;     // E_NOINTERFACE
 }
 static uint32_t unk_AddRef(Ctx *c) { SELF(-1); return ++o->refs; }
+// A dead object's Lock memory goes back to the guest heap once nothing binds it (else when its slot is reused): it
+// stayed forever, ~60 MB a track load, and runs/career_trace ran the 1 GB guest space out at event 11 (the game's pool
+// malloc 0x67121a -> NULL, int3 0x565cd2; guest_mem_log: dead 91 -> 157 -> 215 MB as the heap 146 -> 212 -> 266 MB).
+static void free_dead(int k) {
+    Obj *o = &objs[k];
+    if (o->refs || bound(k)) return;
+    if (o->iface == I_TEXTURE || o->iface == I_CUBE)
+        for (uint32_t l = 0; l < (o->iface == I_CUBE ? 6u : o->levels); l++)
+            if (objs[o->level0 + l].container == (uint32_t)k + 1) drop_mem(&objs[o->level0 + l]);
+    drop_mem(o);
+}
 // A surface that belongs to a texture or a swap chain shares its container's count (d3d9 docs).
 static uint32_t unk_Release(Ctx *c) {
     SELF(-1);
-    if (o->container) return --objs[o->container - 1].refs;
+    if (o->container) {
+        uint32_t n = --objs[o->container - 1].refs;
+        if (!n) free_dead((int)o->container - 1);
+        return n;
+    }
     if (!o->refs) { rn_halt(c, "d3d9: Release of a dead %s", iface_name[o->iface]); return 0; }
-    if (!--o->refs) TR("%s %08x freed", iface_name[o->iface], o->guest);   // guest memory is not reused yet
+    if (!--o->refs) { TR("%s %08x freed", iface_name[o->iface], o->guest); free_dead((int)(o - objs)); }
     return o->refs;
 }
 
@@ -503,6 +521,11 @@ static int slot_free(int k) {
     if (!o->container) return !o->refs;
     const Obj *t = &objs[o->container - 1];
     return (t->iface == I_TEXTURE || t->iface == I_CUBE) && !t->refs && !bound((int)o->container - 1);
+}
+// guest memory (lock_mem) held by dead objects and by live ones, bytes (host/win32.c guest_mem_log)
+void d3d9_mem(uint32_t *dead, uint32_t *live) {
+    *dead = *live = 0;
+    for (int k = 0; k < nobjs; k++) if (objs[k].mem) *(slot_free(k) ? dead : live) += objs[k].size ? objs[k].size : 16;
 }
 
 static uint32_t new_surface(Ctx *c, uint32_t w, uint32_t h, uint32_t f, uint32_t usage, uint32_t pool, int lockable) {
@@ -851,7 +874,7 @@ static int fe_packages(Ctx *c, uint32_t np[16]) {
 static void flow_log(Ctx *c) {
     static int on = -1;
     static uint32_t prev, prev_st;
-    if (on < 0) on = getenv("RN_FLOWLOG") != NULL || getenv("RN_JUMP") != NULL;   // RN_JUMP reads rn_fe
+    if (on < 0) on = getenv("RN_FLOWLOG") != NULL || getenv("RN_JUMP") != NULL || getenv("RN_CAREER") != NULL;   // RN_JUMP, RN_CAREER read rn_fe
     if (!on) return;
     uint32_t lb = ld(c, 0x77a90c, 4), rs = ld(c, 0x7361f0, 4), st = ld(c, 0x77a920, 4) << 8 | (rs ? ld(c, rs, 4) & 0xff : 0xff);
     if (lb != prev && lb >= 0x697000 && lb < 0x6d4000) rn_log("flow %.64s (frame %u)", G(lb), dev.frames);
@@ -896,6 +919,7 @@ static void flow_log(Ctx *c) {
     input_open(c);
     input_next(c);
     input_call(c);
+    input_career(c);
     prev = lb, prev_st = st, rn_flow = st, rn_screen = scr;
 }
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
@@ -1403,7 +1427,8 @@ static uint32_t buffer_lock(Ctx *c, Obj *o) {
     if (!out || off > o->size || (size && off + size > o->size)) return D3DERR_INVALIDCALL;
     o->locked++;
     st(c, out, lock_mem(o) + off, 4);
-    if (!(ARG(4) & 0x10)) o->ver++;
+    static uint32_t ver_clock;   // one clock for every buffer: a reused slot at a reused address never repeats a smooth key
+    if (!(ARG(4) & 0x10)) o->ver = ++ver_clock;
     if (resident(o) && !(ARG(4) & 0x10)) {     // D3DLOCK_READONLY writes nothing
         uint32_t hi = size ? off + size : o->size;
         if (o->dhi <= o->dlo) { o->dlo = off; o->dhi = hi; }

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+extern int rn_screen_w;   // host/win32.c (RN_CARDETAIL=split)
 #include "sm1.h"
 
 // ---- decoder --------------------------------------------------------------------------------------
@@ -408,11 +409,24 @@ static const char *const car_ps_sharp =
     "  let emn = u.pc[0].xyz;\n  let emx = u.pc[0].xyz + u.pc[1].xyz;\n"
     "  let fs = pow(1.0 - min(d, 1.0), 5.0);\n"
     "  let a = clamp(mix(min(emn, emx), max(emn, emx), fs), vec3f(-8.0), vec3f(8.0));\n";
+// BRIDGE: car detail, OWNER 2026-10-27 ("detail: AO, grime, wear, not gloss"; ?cardetail=0 / RN_CARDETAIL=0 = car.efx as is).
+// The car vertex shader works in the car's own space (t2 = normal v1, t3 = eye c17 - position v0); there Z is up (the body
+// spans z 0.23..1.14 m, x -2.24..2.21: build/pod/mesh/cars.circuit.npz). Occlusion from the normal: faces turned down (sills,
+// under the bumpers, wheel arches) get less sky and less reflection. Grime from the height: below ~0.6 m the paint darkens
+// toward road dirt and loses most of its reflection. dk/rk scale the diffuse and the reflection; at 1 (switch off) the
+// result is car.efx's to the bit.
+static const char *const car_ps_flat = "  let dk = vec3f(1.0);\n  let rk = 1.0;\n";
+static const char *const car_ps_detail =
+    "  let pz = u.c[17].z - i.t3.z;\n"
+    "  let up = smoothstep(-0.7, 0.5, N.z);\n"
+    "  let low = 1.0 - smoothstep(0.25, 0.6, pz);\n"
+    "  let dk0 = mix(0.55, 1.0, up) * mix(vec3f(1.0), vec3f(0.62, 0.56, 0.48), low);\n"
+    "  let rk0 = mix(0.35, 1.0, up) * (1.0 - 0.7 * low);\n";
 static const char *const car_ps_tail =
-    "  let b = clamp(4.0 * (t0.xyz * a), vec3f(-8.0), vec3f(8.0));\n"
-    "  let e = clamp(b + d1c.xyz, vec3f(-8.0), vec3f(8.0));\n"
+    "  let b = clamp(4.0 * (t0.xyz * a) * rk, vec3f(-8.0), vec3f(8.0));\n"
+    "  let e = clamp(b + d1c.xyz * rk, vec3f(-8.0), vec3f(8.0));\n"
     "  let f = clamp(2.0 * (t1 * d0c), vec4f(-8.0), vec4f(8.0));\n"
-    "  r0 = vec4f(clamp(e * f.w + f.xyz, vec3f(-8.0), vec3f(8.0)), f.w);\n";
+    "  r0 = vec4f(clamp(e * f.w + f.xyz * dk, vec3f(-8.0), vec3f(8.0)), f.w);\n";
 
 char *sm1_wgsl(const Sm1 *s, int mode) {
     Buf b = {malloc(4096), 0, 4096};
@@ -442,7 +456,12 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
     if (s->ps && mode == SM1_CAR_PS) {
         static int look = -1;
         if (look < 0) { const char *e = getenv("RN_CARLOOK"); look = e ? atoi(e) : 1; }   // 0 and 2003: car.efx, 2: sharp
-        emit(&b, "%s%s%s", car_ps_body, look == 1 ? car_ps_clearcoat : look == 2 ? car_ps_sharp : car_ps_env, car_ps_tail);
+        static int detail = -1;   // RN_CARDETAIL=split: only on the right half of the screen (A/B in one frame)
+        if (detail < 0) { const char *e = getenv("RN_CARDETAIL"); detail = !e ? 1 : e[0] == '0' ? 0 : !strcmp(e, "split") ? 2 : 1; }
+        emit(&b, "%s%s%s", car_ps_body, look == 1 ? car_ps_clearcoat : look == 2 ? car_ps_sharp : car_ps_env, detail ? car_ps_detail : car_ps_flat);
+        if (detail == 2) emit(&b, "  let sh = step(%d.0, i.pos.x);\n  let dk = mix(vec3f(1.0), dk0, sh);\n  let rk = mix(1.0, rk0, sh);\n", rn_screen_w / 2);
+        else if (detail) emit(&b, "  let dk = dk0;\n  let rk = rk0;\n");
+        emit(&b, "%s", car_ps_tail);
     }
     const Ins *pend = NULL;
     char pend_val[64] = "";

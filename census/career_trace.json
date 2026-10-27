@@ -1,0 +1,3222 @@
+{
+ "run": "runs/career_trace.0x1234/log.txt",
+ "events": [
+  {
+   "id": 0,
+   "tracks": [
+    1003
+   ],
+   "movies": [
+    "E3_TITLE",
+    "01_DAY",
+    "02_FAN_S",
+    "02_FAN_E"
+   ],
+   "track": 1003,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "BRIAN",
+    "BRETT",
+    "LOLA"
+   ],
+   "status": 2,
+   "cash": 2000,
+   "gain": 2000,
+   "spent": 8000,
+   "opened": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 1,
+   "open_before": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "tracks": [
+    1003
+   ],
+   "movies": [],
+   "track": 1003,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "WART",
+    "NESTO",
+    "JOSE"
+   ],
+   "status": 2,
+   "cash": 2500,
+   "gain": 500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 2,
+   "open_before": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "tracks": [
+    1102
+   ],
+   "movies": [],
+   "track": 1102,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "ROSIE",
+    "JACKIE",
+    "BRYCE"
+   ],
+   "status": 2,
+   "cash": 3000,
+   "gain": 500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 3,
+   "open_before": [
+    3,
+    4,
+    5
+   ],
+   "tracks": [
+    1301
+   ],
+   "movies": [],
+   "track": 1301,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "CARL",
+    "CARLA",
+    "DIRT"
+   ],
+   "status": 2,
+   "cash": 3500,
+   "gain": 500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 4,
+   "open_before": [
+    4,
+    5
+   ],
+   "tracks": [
+    1210
+   ],
+   "movies": [],
+   "track": 1210,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "DARYL",
+    "CARL",
+    "KLUTCH"
+   ],
+   "status": 2,
+   "cash": 4000,
+   "gain": 500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 5,
+   "open_before": [
+    5
+   ],
+   "tracks": [
+    1003
+   ],
+   "movies": [],
+   "track": 1003,
+   "word1": 1,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "ROSIE",
+    "WART",
+    "PRISS"
+   ],
+   "status": 2,
+   "cash": 4500,
+   "gain": 500,
+   "spent": 0,
+   "opened": [
+    6
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 6,
+   "open_before": [
+    6
+   ],
+   "tracks": [
+    1003,
+    1006
+   ],
+   "movies": [],
+   "track": 1003,
+   "word1": 0,
+   "word2": 2,
+   "stages": 3,
+   "opponents": [
+    "CARL",
+    "STEFAN",
+    "PROBES"
+   ],
+   "status": 2,
+   "cash": 9500,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    7
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 7,
+   "open_before": [
+    7
+   ],
+   "tracks": [
+    1102
+   ],
+   "movies": [
+    "05_ENG"
+   ],
+   "track": 1102,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [],
+   "status": 2,
+   "cash": 9625,
+   "gain": 125,
+   "spent": 0,
+   "opened": [
+    8
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 8,
+   "open_before": [
+    8
+   ],
+   "tracks": [
+    1005
+   ],
+   "movies": [],
+   "track": 1005,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "DARYL",
+    "STEWART",
+    "ROSIE"
+   ],
+   "status": 2,
+   "cash": 10375,
+   "gain": 750,
+   "spent": 0,
+   "opened": [
+    9
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 9,
+   "open_before": [
+    9
+   ],
+   "tracks": [
+    1210,
+    1201
+   ],
+   "movies": [],
+   "track": 1210,
+   "word1": 1,
+   "word2": 2,
+   "stages": 3,
+   "opponents": [
+    "AL",
+    "NESTO",
+    "STEFAN"
+   ],
+   "status": 2,
+   "cash": 15375,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    10,
+    11,
+    12,
+    13
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 10,
+   "open_before": [
+    10,
+    11,
+    12,
+    13
+   ],
+   "tracks": [
+    1003
+   ],
+   "movies": [],
+   "track": 1003,
+   "word1": 1,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "AL",
+    "SCOTT",
+    "HUNTER"
+   ],
+   "status": 2,
+   "cash": 16125,
+   "gain": 750,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 11,
+   "open_before": [
+    11,
+    12,
+    13
+   ],
+   "tracks": [
+    1202
+   ],
+   "movies": [],
+   "track": 1202,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "KLUTCH",
+    "BRYCE",
+    "STEWART"
+   ],
+   "status": 2,
+   "cash": 16875,
+   "gain": 750,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 12,
+   "open_before": [
+    12,
+    13
+   ],
+   "tracks": [
+    1103
+   ],
+   "movies": [],
+   "track": 1103,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "STEFAN",
+    "CARLA",
+    "ROSIE"
+   ],
+   "status": 2,
+   "cash": 17625,
+   "gain": 750,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 13,
+   "open_before": [
+    13
+   ],
+   "tracks": [
+    1302
+   ],
+   "movies": [],
+   "track": 1302,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "WART",
+    "DIRT",
+    "CARL"
+   ],
+   "status": 2,
+   "cash": 18375,
+   "gain": 750,
+   "spent": 0,
+   "opened": [
+    14
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 14,
+   "open_before": [
+    14
+   ],
+   "tracks": [
+    1006,
+    1005,
+    1002
+   ],
+   "movies": [],
+   "track": 1006,
+   "word1": 0,
+   "word2": 4,
+   "stages": 3,
+   "opponents": [
+    "SCOTT",
+    "PRISS",
+    "TERRY"
+   ],
+   "status": 2,
+   "cash": 23375,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    15
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 15,
+   "open_before": [
+    15
+   ],
+   "tracks": [
+    1104
+   ],
+   "movies": [
+    "06_SAM"
+   ],
+   "track": 1104,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [],
+   "status": 2,
+   "cash": 23500,
+   "gain": 125,
+   "spent": 0,
+   "opened": [
+    16,
+    17
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 16,
+   "open_before": [
+    16,
+    17
+   ],
+   "tracks": [
+    1006
+   ],
+   "movies": [
+    "07_GOD"
+   ],
+   "track": 1006,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "JOSE",
+    "JACKIE",
+    "STEWART"
+   ],
+   "status": 2,
+   "cash": 23750,
+   "gain": 250,
+   "spent": 0,
+   "opened": [
+    18,
+    19
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 17,
+   "open_before": [
+    17,
+    18,
+    19
+   ],
+   "tracks": [
+    1201
+   ],
+   "movies": [],
+   "track": 1201,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "FISH",
+    "LEBRON",
+    "MACCA"
+   ],
+   "status": 2,
+   "cash": 24000,
+   "gain": 250,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 18,
+   "open_before": [
+    18,
+    19
+   ],
+   "tracks": [
+    1302
+   ],
+   "movies": [],
+   "track": 1302,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "STEFAN",
+    "PRISS",
+    "HECTOR"
+   ],
+   "status": 2,
+   "cash": 24250,
+   "gain": 250,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 19,
+   "open_before": [
+    19
+   ],
+   "tracks": [
+    1001
+   ],
+   "movies": [],
+   "track": 1001,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "JOSE",
+    "BRYCE",
+    "BRIAN"
+   ],
+   "status": 2,
+   "cash": 24500,
+   "gain": 250,
+   "spent": 0,
+   "opened": [
+    20
+   ],
+   "covers": [
+    0
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 20,
+   "open_before": [
+    20
+   ],
+   "tracks": [
+    1210,
+    1202,
+    1201,
+    1206
+   ],
+   "movies": [],
+   "track": 1210,
+   "word1": 1,
+   "word2": 2,
+   "stages": 4,
+   "opponents": [
+    "JET",
+    "NESTO",
+    "SPIN"
+   ],
+   "status": 2,
+   "cash": 29500,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    21,
+    22
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 21,
+   "open_before": [
+    21,
+    22
+   ],
+   "tracks": [
+    1201
+   ],
+   "movies": [],
+   "track": 1201,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "KLUTCH",
+    "SCOTT",
+    "CARLA"
+   ],
+   "status": 2,
+   "cash": 29750,
+   "gain": 250,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 22,
+   "open_before": [
+    22
+   ],
+   "tracks": [
+    1103
+   ],
+   "movies": [],
+   "track": 1103,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "DESHAWN",
+    "WILL",
+    "FISH"
+   ],
+   "status": 2,
+   "cash": 30000,
+   "gain": 250,
+   "spent": 0,
+   "opened": [
+    23,
+    24
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 23,
+   "open_before": [
+    23,
+    24
+   ],
+   "tracks": [
+    1104
+   ],
+   "movies": [],
+   "track": 1104,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "PRISS",
+    "CARLA",
+    "MUTT"
+   ],
+   "status": 2,
+   "cash": 30300,
+   "gain": 300,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 24,
+   "open_before": [
+    24
+   ],
+   "tracks": [
+    1006
+   ],
+   "movies": [],
+   "track": 1006,
+   "word1": 1,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "RICCO",
+    "HECTOR",
+    "HOFFMAN"
+   ],
+   "status": 2,
+   "cash": 30600,
+   "gain": 300,
+   "spent": 0,
+   "opened": [
+    25
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 25,
+   "open_before": [
+    25
+   ],
+   "tracks": [
+    1303
+   ],
+   "movies": [],
+   "track": 1303,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "DIRT",
+    "LEBRON",
+    "CARL"
+   ],
+   "status": 2,
+   "cash": 30850,
+   "gain": 250,
+   "spent": 0,
+   "opened": [
+    26
+   ],
+   "covers": [
+    2
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 26,
+   "open_before": [
+    26
+   ],
+   "tracks": [
+    1105
+   ],
+   "movies": [],
+   "track": 1105,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [],
+   "status": 2,
+   "cash": 30975,
+   "gain": 125,
+   "spent": 0,
+   "opened": [
+    27,
+    28,
+    29
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 27,
+   "open_before": [
+    27,
+    28,
+    29
+   ],
+   "tracks": [
+    1106
+   ],
+   "movies": [],
+   "track": 1106,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "CHAD",
+    "WART",
+    "TERRY"
+   ],
+   "status": 2,
+   "cash": 31275,
+   "gain": 300,
+   "spent": 0,
+   "opened": [],
+   "covers": [
+    1
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 28,
+   "open_before": [
+    28,
+    29
+   ],
+   "tracks": [
+    1304
+   ],
+   "movies": [],
+   "track": 1304,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "AL",
+    "LEBRON",
+    "JARED"
+   ],
+   "status": 2,
+   "cash": 31575,
+   "gain": 300,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 29,
+   "open_before": [
+    29
+   ],
+   "tracks": [
+    1201
+   ],
+   "movies": [],
+   "track": 1201,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "STEWART",
+    "TODD",
+    "FISH"
+   ],
+   "status": 2,
+   "cash": 31875,
+   "gain": 300,
+   "spent": 0,
+   "opened": [
+    30
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 30,
+   "open_before": [
+    30
+   ],
+   "tracks": [
+    1003,
+    1008,
+    1002
+   ],
+   "movies": [],
+   "track": 1003,
+   "word1": 1,
+   "word2": 2,
+   "stages": 3,
+   "opponents": [
+    "BRAD",
+    "WILL",
+    "JACKIE"
+   ],
+   "status": 2,
+   "cash": 36875,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    31,
+    32
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 31,
+   "open_before": [
+    31,
+    32
+   ],
+   "tracks": [
+    1005
+   ],
+   "movies": [],
+   "track": 1005,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "PAUL",
+    "DESHAWN",
+    "BOPPER"
+   ],
+   "status": 2,
+   "cash": 37175,
+   "gain": 300,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 32,
+   "open_before": [
+    32
+   ],
+   "tracks": [
+    1008
+   ],
+   "movies": [],
+   "track": 1008,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "LAZIO",
+    "MACK-D",
+    "KURT"
+   ],
+   "status": 2,
+   "cash": 37475,
+   "gain": 300,
+   "spent": 0,
+   "opened": [
+    33
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 33,
+   "open_before": [
+    33
+   ],
+   "tracks": [
+    1303
+   ],
+   "movies": [],
+   "track": 1303,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "LOLA",
+    "B-DOG",
+    "BRITTON"
+   ],
+   "status": 2,
+   "cash": 37675,
+   "gain": 200,
+   "spent": 0,
+   "opened": [
+    34,
+    35
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 34,
+   "open_before": [
+    34,
+    35
+   ],
+   "tracks": [
+    1105
+   ],
+   "movies": [],
+   "track": 1105,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "JET",
+    "LEBRON",
+    "WILL"
+   ],
+   "status": 2,
+   "cash": 37975,
+   "gain": 300,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 35,
+   "open_before": [
+    35
+   ],
+   "tracks": [
+    1006
+   ],
+   "movies": [],
+   "track": 1006,
+   "word1": 1,
+   "word2": 6,
+   "stages": 1,
+   "opponents": [
+    "TANAKA",
+    "VINCE",
+    "TAKASHI"
+   ],
+   "status": 2,
+   "cash": 38175,
+   "gain": 200,
+   "spent": 0,
+   "opened": [
+    36
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 36,
+   "open_before": [
+    36
+   ],
+   "tracks": [
+    1206
+   ],
+   "movies": [],
+   "track": 1206,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "TODD",
+    "NUTZ",
+    "DARYL"
+   ],
+   "status": 2,
+   "cash": 38375,
+   "gain": 200,
+   "spent": 0,
+   "opened": [
+    37
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 37,
+   "open_before": [
+    37
+   ],
+   "tracks": [
+    1005
+   ],
+   "movies": [],
+   "track": 1005,
+   "word1": 1,
+   "word2": 6,
+   "stages": 1,
+   "opponents": [
+    "KURT",
+    "STAN",
+    "PAUL"
+   ],
+   "status": 2,
+   "cash": 38675,
+   "gain": 300,
+   "spent": 0,
+   "opened": [
+    38
+   ],
+   "covers": [
+    5
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 38,
+   "open_before": [
+    38
+   ],
+   "tracks": [
+    1303,
+    1304,
+    1305
+   ],
+   "movies": [],
+   "track": 1303,
+   "word1": 0,
+   "word2": 4,
+   "stages": 3,
+   "opponents": [
+    "FISH",
+    "JET",
+    "AL"
+   ],
+   "status": 2,
+   "cash": 43675,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    39,
+    40,
+    41
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 39,
+   "open_before": [
+    39,
+    40,
+    41
+   ],
+   "tracks": [
+    1006
+   ],
+   "movies": [],
+   "track": 1006,
+   "word1": 1,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "LAZIO",
+    "MUTT",
+    "NUTZ"
+   ],
+   "status": 2,
+   "cash": 43975,
+   "gain": 300,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 40,
+   "open_before": [
+    40,
+    41
+   ],
+   "tracks": [
+    1304
+   ],
+   "movies": [],
+   "track": 1304,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "DIRT",
+    "SPIN",
+    "DESHAWN"
+   ],
+   "status": 2,
+   "cash": 44275,
+   "gain": 300,
+   "spent": 0,
+   "opened": [],
+   "covers": [
+    4
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 41,
+   "open_before": [
+    41
+   ],
+   "tracks": [
+    1103
+   ],
+   "movies": [],
+   "track": 1103,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "BRAD",
+    "B-DOG",
+    "JARED"
+   ],
+   "status": 2,
+   "cash": 44575,
+   "gain": 300,
+   "spent": 0,
+   "opened": [
+    42
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 42,
+   "open_before": [
+    42
+   ],
+   "tracks": [
+    1202
+   ],
+   "movies": [],
+   "track": 1202,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "STEFAN",
+    "RICCO",
+    "BOPPER"
+   ],
+   "status": 2,
+   "cash": 44875,
+   "gain": 300,
+   "spent": 0,
+   "opened": [
+    43,
+    44,
+    45
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 43,
+   "open_before": [
+    43,
+    44,
+    45
+   ],
+   "tracks": [
+    1104
+   ],
+   "movies": [],
+   "track": 1104,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "CHAD",
+    "ROSIE",
+    "LOLA"
+   ],
+   "status": 2,
+   "cash": 45275,
+   "gain": 400,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 44,
+   "open_before": [
+    44,
+    45
+   ],
+   "tracks": [
+    1305
+   ],
+   "movies": [],
+   "track": 1305,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "WART",
+    "BRYCE",
+    "TICKETS"
+   ],
+   "status": 2,
+   "cash": 45675,
+   "gain": 400,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 45,
+   "open_before": [
+    45
+   ],
+   "tracks": [
+    1008
+   ],
+   "movies": [],
+   "track": 1008,
+   "word1": 1,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "JOSE"
+   ],
+   "status": 2,
+   "cash": 46075,
+   "gain": 400,
+   "spent": 0,
+   "opened": [
+    46
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 46,
+   "open_before": [
+    46
+   ],
+   "tracks": [
+    1201
+   ],
+   "movies": [],
+   "track": 1201,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "KLUTCH",
+    "TERRY",
+    "BRIAN"
+   ],
+   "status": 2,
+   "cash": 46475,
+   "gain": 400,
+   "spent": 0,
+   "opened": [
+    47
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 47,
+   "open_before": [
+    47
+   ],
+   "tracks": [
+    1103
+   ],
+   "movies": [],
+   "track": 1103,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [],
+   "status": 2,
+   "cash": 46600,
+   "gain": 125,
+   "spent": 0,
+   "opened": [
+    48
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 48,
+   "open_before": [
+    48
+   ],
+   "tracks": [
+    1003,
+    1006,
+    1005
+   ],
+   "movies": [],
+   "track": 1003,
+   "word1": 0,
+   "word2": 2,
+   "stages": 3,
+   "opponents": [
+    "TAKASHI",
+    "NESTO",
+    "SCOTT"
+   ],
+   "status": 2,
+   "cash": 51600,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    49,
+    50
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 49,
+   "open_before": [
+    49,
+    50
+   ],
+   "tracks": [
+    1008
+   ],
+   "movies": [],
+   "track": 1008,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "WILL",
+    "LEBRON",
+    "MACK-D"
+   ],
+   "status": 2,
+   "cash": 52000,
+   "gain": 400,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 50,
+   "open_before": [
+    50
+   ],
+   "tracks": [
+    1303
+   ],
+   "movies": [],
+   "track": 1303,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "GEARS",
+    "BRITTON",
+    "VIONCE"
+   ],
+   "status": 2,
+   "cash": 52400,
+   "gain": 400,
+   "spent": 0,
+   "opened": [
+    51,
+    52
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 51,
+   "open_before": [
+    51,
+    52
+   ],
+   "tracks": [
+    1210
+   ],
+   "movies": [],
+   "track": 1210,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "WILL",
+    "MUTT",
+    "B-DOG"
+   ],
+   "status": 2,
+   "cash": 52900,
+   "gain": 500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 52,
+   "open_before": [
+    52
+   ],
+   "tracks": [
+    1005
+   ],
+   "movies": [],
+   "track": 1005,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "NESTO",
+    "PRISS",
+    "LEBRON"
+   ],
+   "status": 2,
+   "cash": 53300,
+   "gain": 400,
+   "spent": 0,
+   "opened": [
+    53,
+    54
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 53,
+   "open_before": [
+    53,
+    54
+   ],
+   "tracks": [
+    1006
+   ],
+   "movies": [],
+   "track": 1006,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "JOSE",
+    "AL",
+    "FISH"
+   ],
+   "status": 2,
+   "cash": 53800,
+   "gain": 500,
+   "spent": 0,
+   "opened": [
+    55
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 54,
+   "open_before": [
+    54,
+    55
+   ],
+   "tracks": [
+    1105
+   ],
+   "movies": [],
+   "track": 1105,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "NUTZ",
+    "VINCE",
+    "DESHAWN"
+   ],
+   "status": 2,
+   "cash": 54300,
+   "gain": 500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 55,
+   "open_before": [
+    55
+   ],
+   "tracks": [
+    1206
+   ],
+   "movies": [],
+   "track": 1206,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "MUTT",
+    "RICCO",
+    "BOPPER"
+   ],
+   "status": 2,
+   "cash": 54700,
+   "gain": 400,
+   "spent": 0,
+   "opened": [
+    56,
+    57,
+    58
+   ],
+   "covers": [
+    3
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 56,
+   "open_before": [
+    56,
+    57,
+    58
+   ],
+   "tracks": [
+    1305
+   ],
+   "movies": [],
+   "track": 1305,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "DARYL",
+    "HECTOR",
+    "STAN"
+   ],
+   "status": 2,
+   "cash": 55200,
+   "gain": 500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 57,
+   "open_before": [
+    57,
+    58
+   ],
+   "tracks": [
+    1106
+   ],
+   "movies": [],
+   "track": 1106,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "SKID",
+    "CHAD",
+    "BRITTON"
+   ],
+   "status": 2,
+   "cash": 55600,
+   "gain": 400,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 58,
+   "open_before": [
+    58
+   ],
+   "tracks": [
+    1008
+   ],
+   "movies": [],
+   "track": 1008,
+   "word1": 1,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "JET",
+    "PAUL",
+    "TAKASHI"
+   ],
+   "status": 2,
+   "cash": 56200,
+   "gain": 600,
+   "spent": 0,
+   "opened": [
+    59
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 59,
+   "open_before": [
+    59
+   ],
+   "tracks": [
+    1002
+   ],
+   "movies": [],
+   "track": 1002,
+   "word1": 1,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "JOSE",
+    "LOLA",
+    "MACK-D"
+   ],
+   "status": 2,
+   "cash": 56700,
+   "gain": 500,
+   "spent": 0,
+   "opened": [
+    60,
+    61,
+    62
+   ],
+   "covers": [
+    6
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 60,
+   "open_before": [
+    60,
+    61,
+    62
+   ],
+   "tracks": [
+    1006
+   ],
+   "movies": [],
+   "track": 1006,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "BRIAN",
+    "SPIN",
+    "LAZIO"
+   ],
+   "status": 2,
+   "cash": 57700,
+   "gain": 1000,
+   "spent": 0,
+   "opened": [
+    63,
+    64
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 61,
+   "open_before": [
+    61,
+    62,
+    63,
+    64
+   ],
+   "tracks": [
+    1105
+   ],
+   "movies": [],
+   "track": 1105,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "STEWART",
+    "BRYCE",
+    "ROSIE"
+   ],
+   "status": 2,
+   "cash": 58700,
+   "gain": 1000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 62,
+   "open_before": [
+    62,
+    63,
+    64
+   ],
+   "tracks": [
+    1206
+   ],
+   "movies": [],
+   "track": 1206,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "KLUTCH",
+    "JACKIE",
+    "NESTO"
+   ],
+   "status": 2,
+   "cash": 59700,
+   "gain": 1000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 63,
+   "open_before": [
+    63,
+    64
+   ],
+   "tracks": [
+    1201
+   ],
+   "movies": [],
+   "track": 1201,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "ISHII",
+    "JARED",
+    "CARLA"
+   ],
+   "status": 2,
+   "cash": 61200,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 64,
+   "open_before": [
+    64
+   ],
+   "tracks": [
+    1304
+   ],
+   "movies": [],
+   "track": 1304,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "WU",
+    "STAN",
+    "BRIAN"
+   ],
+   "status": 2,
+   "cash": 62700,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [
+    65
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 65,
+   "open_before": [
+    65
+   ],
+   "tracks": [
+    1306
+   ],
+   "movies": [],
+   "track": 1306,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "BOPPER",
+    "SPIN",
+    "LOLA"
+   ],
+   "status": 2,
+   "cash": 64700,
+   "gain": 2000,
+   "spent": 0,
+   "opened": [
+    66
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 66,
+   "open_before": [
+    66
+   ],
+   "tracks": [
+    1103,
+    1105,
+    1104
+   ],
+   "movies": [],
+   "track": 1103,
+   "word1": 1,
+   "word2": 2,
+   "stages": 3,
+   "opponents": [
+    "LAZIO",
+    "BRIAN",
+    "FORGE"
+   ],
+   "status": 2,
+   "cash": 69700,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    67
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 67,
+   "open_before": [
+    67
+   ],
+   "tracks": [
+    1104
+   ],
+   "movies": [],
+   "track": 1104,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "CHAD",
+    "RICCO",
+    "DARYL"
+   ],
+   "status": 2,
+   "cash": 72200,
+   "gain": 2500,
+   "spent": 0,
+   "opened": [
+    68
+   ],
+   "covers": [
+    7
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 68,
+   "open_before": [
+    68
+   ],
+   "tracks": [
+    1106
+   ],
+   "movies": [],
+   "track": 1106,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [],
+   "status": 2,
+   "cash": 74700,
+   "gain": 2500,
+   "spent": 0,
+   "opened": [
+    69
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 69,
+   "open_before": [
+    69
+   ],
+   "tracks": [
+    1008,
+    1005,
+    1002
+   ],
+   "movies": [],
+   "track": 1008,
+   "word1": 0,
+   "word2": 3,
+   "stages": 3,
+   "opponents": [
+    "MATT",
+    "SLIK",
+    "JARRUS"
+   ],
+   "status": 2,
+   "cash": 79700,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    70,
+    71,
+    72
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 70,
+   "open_before": [
+    70,
+    71,
+    72
+   ],
+   "tracks": [
+    1214
+   ],
+   "movies": [],
+   "track": 1214,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "STAN"
+   ],
+   "status": 2,
+   "cash": 80300,
+   "gain": 600,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 71,
+   "open_before": [
+    71,
+    72
+   ],
+   "tracks": [
+    1004
+   ],
+   "movies": [],
+   "track": 1004,
+   "word1": 0,
+   "word2": 6,
+   "stages": 1,
+   "opponents": [
+    "JARRUS",
+    "JET",
+    "PRISS"
+   ],
+   "status": 2,
+   "cash": 80900,
+   "gain": 600,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 72,
+   "open_before": [
+    72
+   ],
+   "tracks": [
+    1001
+   ],
+   "movies": [],
+   "track": 1001,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "B-DOG",
+    "WILL",
+    "MUTT"
+   ],
+   "status": 2,
+   "cash": 81500,
+   "gain": 600,
+   "spent": 0,
+   "opened": [
+    73,
+    74,
+    75
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 73,
+   "open_before": [
+    73,
+    74,
+    75
+   ],
+   "tracks": [
+    1304
+   ],
+   "movies": [],
+   "track": 1304,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "KIRBY",
+    "LEBRON",
+    "HECTOR"
+   ],
+   "status": 2,
+   "cash": 82100,
+   "gain": 600,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 74,
+   "open_before": [
+    74,
+    75
+   ],
+   "tracks": [
+    1107
+   ],
+   "movies": [],
+   "track": 1107,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "MATT",
+    "AL",
+    "STEWART"
+   ],
+   "status": 2,
+   "cash": 82700,
+   "gain": 600,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 75,
+   "open_before": [
+    75
+   ],
+   "tracks": [
+    1008
+   ],
+   "movies": [],
+   "track": 1008,
+   "word1": 1,
+   "word2": 5,
+   "stages": 1,
+   "opponents": [
+    "KURT",
+    "STEFAN",
+    "BRAD"
+   ],
+   "status": 2,
+   "cash": 83300,
+   "gain": 600,
+   "spent": 0,
+   "opened": [
+    76
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 76,
+   "open_before": [
+    76
+   ],
+   "tracks": [
+    1206
+   ],
+   "movies": [],
+   "track": 1206,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "KLUTCH",
+    "PAUL",
+    "SCOTT"
+   ],
+   "status": 2,
+   "cash": 83900,
+   "gain": 600,
+   "spent": 0,
+   "opened": [
+    77
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 77,
+   "open_before": [
+    77
+   ],
+   "tracks": [
+    1107
+   ],
+   "movies": [],
+   "track": 1107,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [],
+   "status": 2,
+   "cash": 84025,
+   "gain": 125,
+   "spent": 0,
+   "opened": [
+    78
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 78,
+   "open_before": [
+    78
+   ],
+   "tracks": [
+    1108
+   ],
+   "movies": [
+    "11_PNK",
+    "13_KIT"
+   ],
+   "track": 1108,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "SAMANTHA"
+   ],
+   "status": 2,
+   "cash": 88025,
+   "gain": 4000,
+   "spent": 0,
+   "opened": [
+    79
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 79,
+   "open_before": [
+    79
+   ],
+   "tracks": [
+    1206
+   ],
+   "movies": [],
+   "track": 1206,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "TODD",
+    "KAZ",
+    "SPARKS"
+   ],
+   "status": 2,
+   "cash": 90025,
+   "gain": 2000,
+   "spent": 0,
+   "opened": [
+    80
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 80,
+   "open_before": [
+    80
+   ],
+   "tracks": [
+    1214
+   ],
+   "movies": [],
+   "track": 1214,
+   "word1": 0,
+   "word2": 2,
+   "stages": 4,
+   "opponents": [
+    "WART",
+    "BRITTON",
+    "FISH"
+   ],
+   "status": 2,
+   "cash": 98025,
+   "gain": 8000,
+   "spent": 0,
+   "opened": [
+    81,
+    82,
+    83,
+    84
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 81,
+   "open_before": [
+    81,
+    82,
+    83,
+    84
+   ],
+   "tracks": [
+    1004
+   ],
+   "movies": [],
+   "track": 1004,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "TAKASHI",
+    "JARED",
+    "SPIN"
+   ],
+   "status": 2,
+   "cash": 99225,
+   "gain": 1200,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 82,
+   "open_before": [
+    82,
+    83,
+    84
+   ],
+   "tracks": [
+    1108
+   ],
+   "movies": [],
+   "track": 1108,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "MATT",
+    "STAN",
+    "HECTOR"
+   ],
+   "status": 2,
+   "cash": 100725,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 83,
+   "open_before": [
+    83,
+    84
+   ],
+   "tracks": [
+    1207
+   ],
+   "movies": [],
+   "track": 1207,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "ISHII",
+    "MACK-D",
+    "LAZIO"
+   ],
+   "status": 2,
+   "cash": 102225,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 84,
+   "open_before": [
+    84
+   ],
+   "tracks": [
+    1001
+   ],
+   "movies": [],
+   "track": 1001,
+   "word1": 1,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "DESHAWN",
+    "RICCO",
+    "BRYCE"
+   ],
+   "status": 2,
+   "cash": 103425,
+   "gain": 1200,
+   "spent": 0,
+   "opened": [
+    86,
+    87
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 86,
+   "open_before": [
+    86,
+    87
+   ],
+   "tracks": [
+    1306
+   ],
+   "movies": [],
+   "track": 1306,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "TAKASHI",
+    "CARLA",
+    "NESTO"
+   ],
+   "status": 2,
+   "cash": 104925,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [],
+   "covers": [
+    8
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 87,
+   "open_before": [
+    87
+   ],
+   "tracks": [
+    1004
+   ],
+   "movies": [],
+   "track": 1004,
+   "word1": 1,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "TANAKA",
+    "BRETT",
+    "NUTZ"
+   ],
+   "status": 2,
+   "cash": 106425,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [
+    88,
+    89,
+    90
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 88,
+   "open_before": [
+    88,
+    89,
+    90
+   ],
+   "tracks": [
+    1210
+   ],
+   "movies": [],
+   "track": 1210,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "WART",
+    "B-DOG",
+    "AMY"
+   ],
+   "status": 2,
+   "cash": 108425,
+   "gain": 2000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 89,
+   "open_before": [
+    89,
+    90
+   ],
+   "tracks": [
+    1004
+   ],
+   "movies": [],
+   "track": 1004,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "LAZIO",
+    "WILL",
+    "PRISS"
+   ],
+   "status": 2,
+   "cash": 110425,
+   "gain": 2000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 90,
+   "open_before": [
+    90
+   ],
+   "tracks": [
+    1307
+   ],
+   "movies": [],
+   "track": 1307,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "LOLA",
+    "TERRY",
+    "DARYL"
+   ],
+   "status": 2,
+   "cash": 111625,
+   "gain": 1200,
+   "spent": 0,
+   "opened": [
+    91
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 91,
+   "open_before": [
+    91
+   ],
+   "tracks": [
+    1007
+   ],
+   "movies": [],
+   "track": 1007,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "BRETT",
+    "SPARKS",
+    "SLIK"
+   ],
+   "status": 2,
+   "cash": 113125,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [
+    92
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 92,
+   "open_before": [
+    92
+   ],
+   "tracks": [
+    1002,
+    1004,
+    1007
+   ],
+   "movies": [
+    "09_GBE"
+   ],
+   "track": 1002,
+   "word1": 1,
+   "word2": 3,
+   "stages": 3,
+   "opponents": [
+    "KURT",
+    "CHAD",
+    "TODD"
+   ],
+   "status": 2,
+   "cash": 118125,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    93,
+    94
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 93,
+   "open_before": [
+    93,
+    94
+   ],
+   "tracks": [
+    1307
+   ],
+   "movies": [],
+   "track": 1307,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "TANAKA",
+    "TAKASHI",
+    "KIRBY"
+   ],
+   "status": 2,
+   "cash": 120125,
+   "gain": 2000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 94,
+   "open_before": [
+    94
+   ],
+   "tracks": [
+    1109
+   ],
+   "movies": [],
+   "track": 1109,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "CHAD",
+    "WU",
+    "KAZ"
+   ],
+   "status": 2,
+   "cash": 121625,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [
+    95
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 95,
+   "open_before": [
+    95
+   ],
+   "tracks": [
+    1108
+   ],
+   "movies": [],
+   "track": 1108,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "SCOTT",
+    "VINCE",
+    "SPIN"
+   ],
+   "status": 2,
+   "cash": 123625,
+   "gain": 2000,
+   "spent": 0,
+   "opened": [
+    96
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 96,
+   "open_before": [
+    96
+   ],
+   "tracks": [
+    1001
+   ],
+   "movies": [],
+   "track": 1001,
+   "word1": 1,
+   "word2": 6,
+   "stages": 1,
+   "opponents": [
+    "KURT",
+    "AMY",
+    "JARRUS"
+   ],
+   "status": 2,
+   "cash": 124625,
+   "gain": 1000,
+   "spent": 0,
+   "opened": [
+    97
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 97,
+   "open_before": [
+    97
+   ],
+   "tracks": [
+    1109
+   ],
+   "movies": [],
+   "track": 1109,
+   "word1": 0,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [],
+   "status": 2,
+   "cash": 124750,
+   "gain": 125,
+   "spent": 0,
+   "opened": [
+    98,
+    99,
+    100
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 98,
+   "open_before": [
+    98,
+    99,
+    100
+   ],
+   "tracks": [
+    1207
+   ],
+   "movies": [],
+   "track": 1207,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "HECTOR",
+    "WU",
+    "BRETT"
+   ],
+   "status": 2,
+   "cash": 127750,
+   "gain": 3000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 99,
+   "open_before": [
+    99,
+    100
+   ],
+   "tracks": [
+    1007
+   ],
+   "movies": [],
+   "track": 1007,
+   "word1": 0,
+   "word2": 6,
+   "stages": 1,
+   "opponents": [
+    "SPARKS",
+    "SLIK",
+    "AMY"
+   ],
+   "status": 2,
+   "cash": 130750,
+   "gain": 3000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 100,
+   "open_before": [
+    100
+   ],
+   "tracks": [
+    1106
+   ],
+   "movies": [],
+   "track": 1106,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "VINCE",
+    "MACK-D",
+    "MUTT"
+   ],
+   "status": 2,
+   "cash": 133750,
+   "gain": 3000,
+   "spent": 0,
+   "opened": [
+    101
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 101,
+   "open_before": [
+    101
+   ],
+   "tracks": [
+    1105
+   ],
+   "movies": [],
+   "track": 1105,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "BRIAN",
+    "LOLA",
+    "BRAD"
+   ],
+   "status": 2,
+   "cash": 135250,
+   "gain": 1500,
+   "spent": 0,
+   "opened": [
+    102
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 102,
+   "open_before": [
+    102
+   ],
+   "tracks": [
+    1106,
+    1107,
+    1103
+   ],
+   "movies": [],
+   "track": 1106,
+   "word1": 1,
+   "word2": 2,
+   "stages": 3,
+   "opponents": [
+    "CHAD",
+    "TODD",
+    "KURT"
+   ],
+   "status": 2,
+   "cash": 143250,
+   "gain": 8000,
+   "spent": 0,
+   "opened": [
+    103,
+    104
+   ],
+   "covers": [
+    9
+   ],
+   "beaten": 0
+  },
+  {
+   "id": 103,
+   "open_before": [
+    103,
+    104
+   ],
+   "tracks": [
+    1001
+   ],
+   "movies": [],
+   "track": 1001,
+   "word1": 0,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "KAZ",
+    "ISHII",
+    "KIRBY"
+   ],
+   "status": 2,
+   "cash": 144250,
+   "gain": 1000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 104,
+   "open_before": [
+    104
+   ],
+   "tracks": [
+    1004
+   ],
+   "movies": [],
+   "track": 1004,
+   "word1": 1,
+   "word2": 7,
+   "stages": 1,
+   "opponents": [
+    "BRETT",
+    "MATT",
+    "WU"
+   ],
+   "status": 2,
+   "cash": 145250,
+   "gain": 1000,
+   "spent": 0,
+   "opened": [
+    105
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 105,
+   "open_before": [
+    105
+   ],
+   "tracks": [
+    1308
+   ],
+   "movies": [],
+   "track": 1308,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "FISH",
+    "KAZ",
+    "JARRUS"
+   ],
+   "status": 2,
+   "cash": 148250,
+   "gain": 3000,
+   "spent": 0,
+   "opened": [
+    106
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 106,
+   "open_before": [
+    106
+   ],
+   "tracks": [
+    1206
+   ],
+   "movies": [],
+   "track": 1206,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "KIRBY",
+    "AMY",
+    "BRETT"
+   ],
+   "status": 2,
+   "cash": 149250,
+   "gain": 1000,
+   "spent": 0,
+   "opened": [
+    107,
+    108,
+    109,
+    110
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 107,
+   "open_before": [
+    107,
+    108,
+    109,
+    110
+   ],
+   "tracks": [
+    1007
+   ],
+   "movies": [],
+   "track": 1007,
+   "word1": 1,
+   "word2": 3,
+   "stages": 1,
+   "opponents": [
+    "KURT"
+   ],
+   "status": 2,
+   "cash": 154250,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 108,
+   "open_before": [
+    108,
+    109,
+    110
+   ],
+   "tracks": [
+    1202
+   ],
+   "movies": [],
+   "track": 1202,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "TODD",
+    "SLIK",
+    "NUTZ"
+   ],
+   "status": 2,
+   "cash": 159250,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 109,
+   "open_before": [
+    109,
+    110
+   ],
+   "tracks": [
+    1308
+   ],
+   "movies": [],
+   "track": 1308,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "DIRT",
+    "RICCO",
+    "BRIAN"
+   ],
+   "status": 2,
+   "cash": 164250,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 110,
+   "open_before": [
+    110
+   ],
+   "tracks": [
+    1109
+   ],
+   "movies": [],
+   "track": 1109,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "CHAD",
+    "JET",
+    "BOPPER"
+   ],
+   "status": 2,
+   "cash": 169250,
+   "gain": 5000,
+   "spent": 0,
+   "opened": [
+    111
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 111,
+   "open_before": [
+    111
+   ],
+   "tracks": [
+    1007
+   ],
+   "movies": [
+    "14_MUT",
+    "16_RES"
+   ],
+   "track": 1007,
+   "word1": 1,
+   "word2": 5,
+   "stages": 1,
+   "opponents": [
+    "TJ"
+   ],
+   "status": 2,
+   "cash": 179250,
+   "gain": 10000,
+   "spent": 0,
+   "opened": [
+    112
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 112,
+   "open_before": [
+    112
+   ],
+   "tracks": [
+    1108
+   ],
+   "movies": [
+    "08_EDD",
+    "17_MET"
+   ],
+   "track": 1108,
+   "word1": 1,
+   "word2": 2,
+   "stages": 1,
+   "opponents": [
+    "EDDIE"
+   ],
+   "status": 2,
+   "cash": 189250,
+   "gain": 10000,
+   "spent": 0,
+   "opened": [
+    113
+   ],
+   "covers": [],
+   "beaten": 0
+  },
+  {
+   "id": 113,
+   "open_before": [
+    113
+   ],
+   "tracks": [
+    1001
+   ],
+   "movies": [
+    "19_FIN"
+   ],
+   "track": 1001,
+   "word1": 0,
+   "word2": 4,
+   "stages": 1,
+   "opponents": [
+    "MELISSA"
+   ],
+   "status": 2,
+   "cash": 199250,
+   "gain": 10000,
+   "spent": 0,
+   "opened": [],
+   "covers": [],
+   "beaten": 1
+  },
+  {
+   "end": "done: no open event, beaten 1, cash 199250 (frame 253908)"
+  }
+ ],
+ "diff": []
+}

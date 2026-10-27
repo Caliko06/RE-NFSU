@@ -64,12 +64,16 @@ void input_finish(Ctx *c);      // RN_FINISH (host/input.c), same place
 void input_open(Ctx *c);        // RN_OPEN (host/input.c), same place
 void input_next(Ctx *c);        // RN_NEXT (host/input.c), same place
 void input_call(Ctx *c);        // RN_CALL (host/input.c), same place
+void guest_mem_log(const char *why);
+void d3d9_mem(uint32_t *dead, uint32_t *live);   // host/d3d9.c: guest memory of its objects   // host/win32.c: heap and VirtualAlloc space, one line
+void input_career(Ctx *c);      // RN_CAREER (host/input.c), same place
 extern int rn_steerlog;         // RN_STEERLOG (host/input.c): the player's steering, per event and per Present
 void steer_event(Ctx *c);       // from rn_call at the steer handler 0x461840
 void steer_frame(Ctx *c);       // from Present
 int rn_trace(void);
 void win32_init(Ctx *c, uint32_t image_size);
 uint32_t guest_alloc(uint32_t size);                           // zeroed, for host-owned guest data
+void guest_free(uint32_t p);       // host/win32.c: back to the guest heap
 uint64_t now_us(void);
 uint32_t virtual_reserve(Ctx *c, uint32_t size);
 void gil_acquire(void);

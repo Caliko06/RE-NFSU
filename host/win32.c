@@ -95,7 +95,7 @@ static uint32_t heap_alloc(Ctx *c, uint32_t n) {
             return b + HDR;
         }
     }
-    if (brk_ptr + need >= vtop) return 0;
+    if (brk_ptr + need >= vtop) { guest_mem_log("full"); return 0; }
     uint32_t b = brk_ptr;
     st(c, b, need | 1, 4);
     st(c, b + 4, heap_top, 4);           // size of the previous block
@@ -113,6 +113,7 @@ static void heap_free(Ctx *c, uint32_t p) {
     if (b + sz == brk_ptr) { brk_ptr = b; heap_top = B_PREV(b); return; }
     push_free(c, b, sz);
 }
+void guest_free(uint32_t p) { if (p) heap_free(g_ctx, p); }
 uint32_t guest_alloc(uint32_t size) {
     Ctx *c = g_ctx;
     uint32_t p = heap_alloc(c, size);
@@ -403,6 +404,46 @@ static uint32_t HeapReAlloc_(Ctx *c) {
     return q;
 }
 
+// Released ranges (VirtualFree MEM_RELEASE), merged with their neighbours; VirtualAlloc takes them before new space, as
+// Windows reuses released address space. Without it the space only went down (runs/career_trace stopped at event 11:
+// the pool's malloc 0x67121a returned NULL, 0x565b60 -> int3 0x565cd2).
+static Region vfree[4096];
+static int nvfree;
+static uint32_t vstat_alloc, vstat_release;   // bytes, for guest_mem_log
+static void vfree_add(uint32_t base, uint32_t size) {
+    for (int k = 0; k < nvfree; k++)
+        if (vfree[k].base + vfree[k].size == base || base + size == vfree[k].base) {
+            if (vfree[k].base < base) base = vfree[k].base;
+            size += vfree[k].size;
+            vfree[k--] = vfree[--nvfree];
+        }
+    if (base == vtop) vtop += size;
+    else if (nvfree < 4096) vfree[nvfree++] = (Region){base, size, 0, 0};
+}
+static uint32_t vspace(Ctx *c, uint32_t sz) {   // first fit in the released ranges, else below vtop
+    vstat_alloc += sz;
+    for (int k = 0; k < nvfree; k++)
+        if (vfree[k].size >= sz) {
+            uint32_t b = vfree[k].base;
+            vfree[k].base += sz, vfree[k].size -= sz;
+            if (!vfree[k].size) vfree[k] = vfree[--nvfree];
+            return b;
+        }
+    if (vtop - sz <= brk_ptr) return 0;
+    return vtop -= sz;
+}
+void guest_mem_log(const char *why) {
+    Ctx *c = g_ctx;
+    uint32_t fb = 0, vf = 0;
+    for (int k = 0; k < NBIN; k++) for (uint32_t b = bins[k]; b; b = B_NEXTF(b)) fb += B_SIZE(b);
+    for (int k = 0; k < nvfree; k++) vf += vfree[k].size;
+    uint32_t dd, dl;
+    d3d9_mem(&dd, &dl);
+    rn_log("guest memory %s: d3d9 locked memory %u MB live, %u MB dead", why, dl >> 20, dd >> 20);
+    rn_log("guest memory %s: heap %u MB (%u MB free in bins), virtual %u MB in %d regions (%u MB released, reusable), "
+           "VirtualAlloc %u MB / released %u MB in all, gap %u MB", why, (brk_ptr - HEAP_LO) >> 20, fb >> 20,
+           (c->memsz - vtop) >> 20, nregions, vf >> 20, vstat_alloc >> 20, vstat_release >> 20, (vtop - brk_ptr) >> 20);
+}
 static uint32_t VirtualAlloc_(Ctx *c) {
     uint32_t addr = ARG(0), size = ARG(1), type = ARG(2), prot = ARG(3);
     if (addr) {
@@ -414,27 +455,28 @@ static uint32_t VirtualAlloc_(Ctx *c) {
         set_error(c, 487);
         return 0;
     }
-    uint32_t sz = (size + 0xffff) & ~0xffffu;
-    if (nregions == 4096 || vtop - sz <= brk_ptr) { set_error(c, ERROR_NOT_ENOUGH_MEMORY); return 0; }
-    vtop -= sz;
-    regions[nregions++] = (Region){vtop, sz, (type & 0x1000) != 0, prot};
-    memset(G(vtop), 0, sz);
-    return vtop;
+    uint32_t sz = (size + 0xffff) & ~0xffffu, b = nregions < 4096 ? vspace(c, sz) : 0;
+    if (!b) { guest_mem_log("full"); set_error(c, ERROR_NOT_ENOUGH_MEMORY); return 0; }
+    regions[nregions++] = (Region){b, sz, (type & 0x1000) != 0, prot};
+    memset(G(b), 0, sz);
+    return b;
 }
 uint32_t virtual_reserve(Ctx *c, uint32_t size) {
-    uint32_t sz = (size + 0xffff) & ~0xffffu;
-    if (nregions == 4096 || vtop - sz <= brk_ptr) return 0;
-    vtop -= sz;
-    regions[nregions++] = (Region){vtop, sz, 1, 4};
-    memset(G(vtop), 0, sz);
-    return vtop;
+    uint32_t sz = (size + 0xffff) & ~0xffffu, b = nregions < 4096 ? vspace(c, sz) : 0;
+    if (!b) { guest_mem_log("full"); return 0; }
+    regions[nregions++] = (Region){b, sz, 1, 4};
+    memset(G(b), 0, sz);
+    return b;
 }
 static uint32_t VirtualFree_(Ctx *c) {
     uint32_t addr = ARG(0), type = ARG(2);
     Region *r = region_at(addr);
     if (!r) { set_error(c, 487); return 0; }
-    if (type & 0x8000) {        // MEM_RELEASE: the address space stays used (no reuse yet)
-        r->commit = 0;
+    if (type & 0x8000) {        // MEM_RELEASE (of the whole reservation, from its base): the space goes back
+        if (addr != r->base) { set_error(c, 87); return 0; }
+        vstat_release += r->size;
+        vfree_add(r->base, r->size);
+        *r = regions[--nregions];
     }
     return 1;
 }
@@ -1044,6 +1086,12 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 28, !(tr && tr[0] == '0'), 4);
     const char *steer = getenv("RN_STEER");    // PATCH 0x460a80: 1 = the keys steer through the game's gamepad model
     st(c, SCREEN_ADDR + 32, steer && !strcmp(steer, "pad"), 4);
+    // PATCH 0x63b370 (the 22 reads of the career-beaten flag) and PATCH 0x735ec1 (debug byte): 1 = everything open (the
+    // default, OWNER 2026-10-20), RN_UNLOCK=0 = the normal Underground, locks and money as shipped (OWNER 2026-10-27).
+    const char *un = getenv("RN_UNLOCK");
+    int unlock = !(un && un[0] == '0');
+    st(c, SCREEN_ADDR + 36, unlock, 4);
+    st(c, 0x735ec1, unlock, 1);
     clock_gettime(CLOCK_MONOTONIC, &t0);
 #ifdef __EMSCRIPTEN__
     t0_ms = emscripten_get_now();

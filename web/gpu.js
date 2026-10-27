@@ -324,7 +324,10 @@ fn amp(a: vec3f, b: vec3f, c: vec3f, d: vec3f, e: vec3f, mn: ptr<function, f32>,
   // already near white: a quarter-size bright pass (luma over 0.72), a separable 9-tap Gaussian, added back with weight
   // 0.2. It runs at GPU_FXAA (the first HUD quad: the scene is done, the HUD comes after) and adds into the multisampled
   // twin too, so the HUD pass's resolve keeps it. ?bloom=0 turns it off; ?bloom=split = only the right half (A/B in one frame).
+  // ?bloom=lights (OWNER 2026-10-27, "the lights and how they look"): street lamps, neon and headlights glow wider: the
+  // bright pass starts at luma 0.55 and adds back at 0.35 (the default lifts only near-white, 0.72 at 0.2).
   const BLOOM_MODE = new URLSearchParams(location.search).get('bloom'), BLOOM_ON = BLOOM_MODE !== '0';
+  const [BLOOM_T, BLOOM_W] = BLOOM_MODE?.startsWith('lights') ? ['0.55', '0.35'] : ['0.72', '0.2'];   // lights-split: A/B
   const bloomMod = device.createShaderModule({ code: `
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
@@ -338,7 +341,7 @@ struct V { @builtin(position) p: vec4f, @location(0) uv: vec2f };
   let c = 0.25 * (textureSampleLevel(src, smp, v.uv + vec2f(-t.x, -t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, -t.y), 0.0).rgb
     + textureSampleLevel(src, smp, v.uv + vec2f(-t.x, t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, t.y), 0.0).rgb);
   let l = dot(c, vec3f(0.299, 0.587, 0.114));
-  return vec4f(c * smoothstep(0.72, 1.0, l), 1.0);
+  return vec4f(c * smoothstep(${BLOOM_T}, 1.0, l), 1.0);
 }
 fn blur(uv: vec2f, d: vec2f) -> vec4f {
   let w = array<f32, 5>(0.2270270, 0.1945946, 0.1216216, 0.0540540, 0.0162162);
@@ -351,7 +354,7 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
 @fragment fn blurH(v: V) -> @location(0) vec4f { return blur(v.uv, vec2f(1.0 / f32(textureDimensions(src).x), 0.0)); }
 @fragment fn blurV(v: V) -> @location(0) vec4f { return blur(v.uv, vec2f(0.0, 1.0 / f32(textureDimensions(src).y))); }
 @fragment fn add(v: V) -> @location(0) vec4f {
-  let k = select(0.2, 0.2 * step(0.5, v.uv.x), ${BLOOM_MODE === 'split' ? 'true' : 'false'});
+  let k = select(${BLOOM_W}, ${BLOOM_W} * step(0.5, v.uv.x), ${BLOOM_MODE?.endsWith('split') ? 'true' : 'false'});
   return vec4f(textureSampleLevel(src, smp, v.uv, 0.0).rgb * k, 0.0);
 }` });
   const bloomPipe = (fs, sc) => device.createRenderPipeline({ layout: 'auto', vertex: { module: bloomMod, entryPoint: 'vs' },

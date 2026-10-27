@@ -14,7 +14,7 @@
 typedef struct Thread {
     Ctx ctx;
     uint32_t id, handle, start, param, exit_code;
-    int started, finished, suspended;
+    int started, finished, suspended, parked;
     pthread_t pt;
     uint32_t timer_ms, timer_flags, timer_user, timer_id, killed;   // winmm timers
     uint32_t stack_top;
@@ -188,14 +188,17 @@ static void *run(void *arg) {
     self_start = t->start;
     gil_acquire();
     Ctx *c = &t->ctx;
-    uint32_t args[1] = {t->param};
-    if (rn_trace()) rn_log("thread %x starts at %08x", t->id, t->start);
-    uint32_t r = call_guest(c, t->start, 1, args);
-    if (c->halt) rn_stop(c);
-    t->exit_code = r;
-    t->finished = 1;
-    notify();
-    gil_release();
+    for (;;) {   // a finished thread parks until a new CreateThread takes it (reuse_finished)
+        uint32_t args[1] = {t->param};
+        if (rn_trace()) rn_log("thread %x starts at %08x", t->id, t->start);
+        uint32_t r = call_guest(c, t->start, 1, args);
+        if (c->halt) rn_stop(c);
+        t->exit_code = r;
+        t->finished = t->parked = 1;
+        notify();
+        while (t->parked) wait_change(0);
+        self_start = t->start;
+    }
     return NULL;
 }
 // winmm timer: TIME_PERIODIC (1) or one shot; TIME_CALLBACK_EVENT_SET (0x10) or a TIMECALLBACK.
@@ -274,9 +277,34 @@ static Thread *reuse_timer(void) {
     }
     return NULL;
 }
+// A new thread takes a finished one (its stack, TEB and host thread, parked in run): the game starts one per load
+// (0x654a90, from 0x654cad: two per career event) and never closes its handle ([0x7160c4] is not read again), so
+// threads[64] ran out near event 27; on the web each is a Worker. The old handle keeps the exit code (Handle.count).
+static Thread *reuse_finished(uint32_t size) {
+    if (size > 0x100000) return NULL;
+    for (int k = 0; k < nthreads; k++) {
+        Thread *t = threads[k];
+        if (t->timer_id || !t->finished || !t->parked) continue;
+        Handle *h = get_handle(t->handle);
+        if (h && h->kind == H_THREAD && h->thread == t) h->thread = NULL, h->count = t->exit_code;
+        memset(t->ctx.r, 0, sizeof t->ctx.r);
+        t->ctx.halt = 0; t->ctx.cf = t->ctx.zf = t->ctx.sf = t->ctx.of = t->ctx.pf = t->ctx.df = t->ctx.af = 0;
+        finit(&t->ctx);
+        t->ctx.fcw = 0x27f;
+        t->ctx.r[ESP] = t->stack_top;
+        t->finished = 0;
+        return t;
+    }
+    return NULL;
+}
+static void wake(Thread *t) {
+    if (t->parked) { t->parked = 0; notify(); }
+    else start(t);
+}
 static uint32_t CreateThread_(Ctx *c) {
     uint32_t size = ARG(1), entry = ARG(2), param = ARG(3), flags = ARG(4), out = ARG(5);
-    Thread *t = new_thread(c, size);
+    Thread *t = reuse_finished(size);
+    if (!t) t = new_thread(c, size);
     if (!t) return 0;
     t->start = entry; t->param = param;
     t->handle = new_handle(H_THREAD);
@@ -284,14 +312,14 @@ static uint32_t CreateThread_(Ctx *c) {
     if (out) st(c, out, t->id, 4);
     rn_log("CreateThread %08x(%08x) -> thread %x%s", entry, param, t->id, (flags & 4) ? " suspended" : "");
     if (flags & 4) t->suspended = 1;
-    else start(t);
+    else wake(t);
     return t->handle;
 }
 static uint32_t ResumeThread_(Ctx *c) {
     Thread *t = thread_of(ARG(0));
     if (!t) { rn_halt(c, "ResumeThread on handle %08x", ARG(0)); return 0xffffffffu; }
     uint32_t prev = (uint32_t)t->suspended;
-    if (t->suspended && !--t->suspended && !t->started) start(t);
+    if (t->suspended && !--t->suspended && (!t->started || t->parked)) wake(t);
     return prev;
 }
 static uint32_t SuspendThread_(Ctx *c) {
@@ -301,6 +329,8 @@ static uint32_t SuspendThread_(Ctx *c) {
 }
 static uint32_t GetExitCodeThread_(Ctx *c) {
     Thread *t = thread_of(ARG(0));
+    Handle *h = get_handle(ARG(0));
+    if (!t && h && h->kind == H_THREAD) { st(c, ARG(1), h->count, 4); return 1; }   // finished, its thread reused
     if (!t) { set_error(c, 6); return 0; }
     st(c, ARG(1), t->finished ? t->exit_code : 259, 4);    // STILL_ACTIVE
     return 1;
@@ -359,7 +389,7 @@ static int try_take(Ctx *c, uint32_t hv) {
         h->count++;
         return 1;
     case H_THREAD:
-        return h->thread ? h->thread->finished : -1;
+        return h->thread ? h->thread->finished : 1;   // NULL: its thread finished and was reused
     }
     return -1;
 }

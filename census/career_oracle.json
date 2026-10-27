@@ -1,0 +1,7879 @@
+{
+ "source": "game/FrontEnd/FrontB.lzc chunk 0x34A02 (0x14c records), rules from Speed.exe (see tools/census/career.py)",
+ "difficulty": 1,
+ "final_event": 113,
+ "events": [
+  {
+   "id": 0,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    10000.0,
+    10000.0,
+    10000.0
+   ],
+   "stages": [
+    {
+     "track": 1003,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "BRIAN",
+     "car": "155e2b37"
+    },
+    {
+     "name": "BRETT",
+     "car": "7ad155fb"
+    },
+    {
+     "name": "LOLA",
+     "car": "dfb87891"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "3455d6b",
+     "arg": 0
+    },
+    {
+     "type": 2,
+     "value": "19dd0f",
+     "arg": 0
+    },
+    {
+     "type": 2,
+     "value": "290c04d",
+     "arg": 0
+    },
+    {
+     "type": 2,
+     "value": "163087",
+     "arg": 0
+    },
+    {
+     "type": 2,
+     "value": "72b2e513",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "01_DAY",
+    "02_FAN",
+    "02_FAN"
+   ],
+   "movies": {
+    "before": "01_DAY",
+    "before_at": "race start",
+    "after_win": [
+     "02_FAN_S",
+     "02_FAN_E"
+    ],
+    "after_loss": "02_FAN"
+   }
+  },
+  {
+   "id": 1,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1003,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "WART",
+     "car": "3e438ee4"
+    },
+    {
+     "name": "NESTO",
+     "car": "493349a7"
+    },
+    {
+     "name": "JOSE",
+     "car": "496e17a7"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 4,
+     "value": "0",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 2,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1102,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "ROSIE",
+     "car": "f713b958"
+    },
+    {
+     "name": "JACKIE",
+     "car": "6b75fb85"
+    },
+    {
+     "name": "BRYCE",
+     "car": "71845b7b"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 3,
+   "kind": 0,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1301,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CARL",
+     "car": "bff2ba3c"
+    },
+    {
+     "name": "CARLA",
+     "car": "f5ea3c46"
+    },
+    {
+     "name": "DIRT",
+     "car": "6f1ac102"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "515",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 4,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1210,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "DARYL",
+     "car": "b83c0592"
+    },
+    {
+     "name": "CARL",
+     "car": "bff2ba3c"
+    },
+    {
+     "name": "KLUTCH",
+     "car": "6408b989"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "6911f794",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "4ba",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 5,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1003,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "ROSIE",
+     "car": "f713b958"
+    },
+    {
+     "name": "WART",
+     "car": "3e438ee4"
+    },
+    {
+     "name": "PRISS",
+     "car": "7335abb4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "3eb",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 6,
+   "kind": 1,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1003,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1003,
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1006,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CARL",
+     "car": "bff2ba3c"
+    },
+    {
+     "name": "STEFAN",
+     "car": "4e07a75b"
+    },
+    {
+     "name": "PROBES",
+     "car": "283031c5"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "12",
+     "arg": 1
+    },
+    {
+     "type": 0,
+     "value": "13",
+     "arg": 1
+    },
+    {
+     "type": 0,
+     "value": "14",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 7,
+   "kind": 2,
+   "mode": 4,
+   "fee": 0.0,
+   "cash": [
+    100.0,
+    125.0,
+    150.0
+   ],
+   "stages": [
+    {
+     "track": 1102,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     6
+    ]
+   },
+   "opponents": [],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "12",
+     "arg": 4
+    },
+    {
+     "type": 0,
+     "value": "13",
+     "arg": 4
+    },
+    {
+     "type": 0,
+     "value": "14",
+     "arg": 4
+    },
+    {
+     "type": 3,
+     "value": "44e",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "05_ENG",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": "05_ENG",
+    "before_at": "event list",
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 8,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    525.0,
+    750.0,
+    900.0
+   ],
+   "stages": [
+    {
+     "track": 1005,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     7
+    ]
+   },
+   "opponents": [
+    {
+     "name": "DARYL",
+     "car": "b83c0592"
+    },
+    {
+     "name": "STEWART",
+     "car": "3328d418"
+    },
+    {
+     "name": "ROSIE",
+     "car": "f713b958"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "2ca04df",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "3ed",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 9,
+   "kind": 1,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1210,
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1210,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1201,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     8
+    ]
+   },
+   "opponents": [
+    {
+     "name": "AL",
+     "car": "98b598c9"
+    },
+    {
+     "name": "NESTO",
+     "car": "493349a7"
+    },
+    {
+     "name": "STEFAN",
+     "car": "4e07a75b"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "17",
+     "arg": 1
+    },
+    {
+     "type": 0,
+     "value": "16",
+     "arg": 1
+    },
+    {
+     "type": 0,
+     "value": "11",
+     "arg": 1
+    },
+    {
+     "type": 3,
+     "value": "4b1",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 10,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    525.0,
+    750.0,
+    900.0
+   ],
+   "stages": [
+    {
+     "track": 1003,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     9
+    ]
+   },
+   "opponents": [
+    {
+     "name": "AL",
+     "car": "98b598c9"
+    },
+    {
+     "name": "SCOTT",
+     "car": "869bd629"
+    },
+    {
+     "name": "HUNTER",
+     "car": "f71014d2"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 4,
+     "value": "0",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 11,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    525.0,
+    750.0,
+    900.0
+   ],
+   "stages": [
+    {
+     "track": 1202,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     9
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KLUTCH",
+     "car": "6408b989"
+    },
+    {
+     "name": "BRYCE",
+     "car": "71845b7b"
+    },
+    {
+     "name": "STEWART",
+     "car": "3328d418"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "4b2",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 12,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    525.0,
+    750.0,
+    900.0
+   ],
+   "stages": [
+    {
+     "track": 1103,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     9
+    ]
+   },
+   "opponents": [
+    {
+     "name": "STEFAN",
+     "car": "4e07a75b"
+    },
+    {
+     "name": "CARLA",
+     "car": "f5ea3c46"
+    },
+    {
+     "name": "ROSIE",
+     "car": "f713b958"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "44f",
+     "arg": 0
+    },
+    {
+     "type": 0,
+     "value": "1",
+     "arg": 2
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 13,
+   "kind": 0,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    525.0,
+    750.0,
+    900.0
+   ],
+   "stages": [
+    {
+     "track": 1302,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     9
+    ]
+   },
+   "opponents": [
+    {
+     "name": "WART",
+     "car": "3e438ee4"
+    },
+    {
+     "name": "DIRT",
+     "car": "6f1ac102"
+    },
+    {
+     "name": "CARL",
+     "car": "bff2ba3c"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 14,
+   "kind": 1,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6205.0
+   ],
+   "stages": [
+    {
+     "track": 1006,
+     "laps": 4,
+     "direction": 0
+    },
+    {
+     "track": 1005,
+     "laps": 4,
+     "direction": 1
+    },
+    {
+     "track": 1002,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     10,
+     11,
+     12,
+     13
+    ]
+   },
+   "opponents": [
+    {
+     "name": "SCOTT",
+     "car": "869bd629"
+    },
+    {
+     "name": "PRISS",
+     "car": "7335abb4"
+    },
+    {
+     "name": "TERRY",
+     "car": "f9ed7e04"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "10",
+     "arg": 1
+    },
+    {
+     "type": 0,
+     "value": "15",
+     "arg": 1
+    },
+    {
+     "type": 0,
+     "value": "18",
+     "arg": 1
+    },
+    {
+     "type": 3,
+     "value": "3ea",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "3ed",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 15,
+   "kind": 3,
+   "mode": 4,
+   "fee": 0.0,
+   "cash": [
+    100.0,
+    125.0,
+    150.0
+   ],
+   "stages": [
+    {
+     "track": 1104,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     14
+    ]
+   },
+   "opponents": [],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "c",
+     "arg": 4
+    }
+   ],
+   "movie_slots": [
+    "06_SAM",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": "06_SAM",
+    "before_at": "event list",
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 16,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    200.0,
+    250.0,
+    300.0
+   ],
+   "stages": [
+    {
+     "track": 1006,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     15
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JOSE",
+     "car": "496e17a7"
+    },
+    {
+     "name": "JACKIE",
+     "car": "6b75fb85"
+    },
+    {
+     "name": "STEWART",
+     "car": "3328d418"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "3ee",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    "07_GOD"
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [
+     "07_GOD"
+    ],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 17,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    200.0,
+    250.0,
+    300.0
+   ],
+   "stages": [
+    {
+     "track": 1201,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     15
+    ]
+   },
+   "opponents": [
+    {
+     "name": "FISH",
+     "car": "4fa5993b"
+    },
+    {
+     "name": "LEBRON",
+     "car": "3bd031d3"
+    },
+    {
+     "name": "MACCA",
+     "car": "49f9c026"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "4fd0522",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 18,
+   "kind": 0,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    200.0,
+    250.0,
+    300.0
+   ],
+   "stages": [
+    {
+     "track": 1302,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "any",
+    "ids": [
+     16,
+     17
+    ]
+   },
+   "opponents": [
+    {
+     "name": "STEFAN",
+     "car": "4e07a75c"
+    },
+    {
+     "name": "PRISS",
+     "car": "7335abb4"
+    },
+    {
+     "name": "HECTOR",
+     "car": "6ff2a4c1"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "e",
+     "arg": 2
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 19,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    200.0,
+    250.0,
+    300.0
+   ],
+   "stages": [
+    {
+     "track": 1001,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "any",
+    "ids": [
+     16,
+     17
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JOSE",
+     "car": "496e17a7"
+    },
+    {
+     "name": "BRYCE",
+     "car": "71845b7b"
+    },
+    {
+     "name": "BRIAN",
+     "car": "a76ad63c"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "3e9",
+     "arg": 0
+    },
+    {
+     "type": 1,
+     "value": "16e178f5",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 20,
+   "kind": 1,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1210,
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1202,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1201,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1206,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     16,
+     17,
+     18,
+     19
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JET",
+     "car": "43fe5c09"
+    },
+    {
+     "name": "NESTO",
+     "car": "493349a7"
+    },
+    {
+     "name": "SPIN",
+     "car": "939ccbd3"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "4b1",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "4b6",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 21,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    200.0,
+    250.0,
+    300.0
+   ],
+   "stages": [
+    {
+     "track": 1201,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     20
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KLUTCH",
+     "car": "6408b989"
+    },
+    {
+     "name": "SCOTT",
+     "car": "869bd629"
+    },
+    {
+     "name": "CARLA",
+     "car": "f5ea3c46"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 22,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    200.0,
+    250.0,
+    300.0
+   ],
+   "stages": [
+    {
+     "track": 1103,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     20
+    ]
+   },
+   "opponents": [
+    {
+     "name": "DESHAWN",
+     "car": "b708963a"
+    },
+    {
+     "name": "WILL",
+     "car": "db2d97be"
+    },
+    {
+     "name": "FISH",
+     "car": "4fa5993b"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "c08c8757",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "44f",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 23,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1104,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     21,
+     22
+    ]
+   },
+   "opponents": [
+    {
+     "name": "PRISS",
+     "car": "7335abb4"
+    },
+    {
+     "name": "CARLA",
+     "car": "f5ea3c46"
+    },
+    {
+     "name": "MUTT",
+     "car": "a0f830fe"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "0",
+     "arg": 2
+    },
+    {
+     "type": 3,
+     "value": "450",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 24,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1006,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     21,
+     22
+    ]
+   },
+   "opponents": [
+    {
+     "name": "RICCO",
+     "car": "3ea53eec"
+    },
+    {
+     "name": "HECTOR",
+     "car": "6ff2a4c1"
+    },
+    {
+     "name": "HOFFMAN",
+     "car": "46ae2a9a"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "79aebfec",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 25,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    200.0,
+    250.0,
+    300.0
+   ],
+   "stages": [
+    {
+     "track": 1303,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     23,
+     24
+    ]
+   },
+   "opponents": [
+    {
+     "name": "DIRT",
+     "car": "6f1ac102"
+    },
+    {
+     "name": "LEBRON",
+     "car": "3bd031d3"
+    },
+    {
+     "name": "CARL",
+     "car": "bff2ba3d"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "16e178f7",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "517",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 26,
+   "kind": 2,
+   "mode": 4,
+   "fee": 0.0,
+   "cash": [
+    100.0,
+    125.0,
+    150.0
+   ],
+   "stages": [
+    {
+     "track": 1105,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     25
+    ]
+   },
+   "opponents": [],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "17",
+     "arg": 4
+    },
+    {
+     "type": 0,
+     "value": "16",
+     "arg": 4
+    },
+    {
+     "type": 0,
+     "value": "11",
+     "arg": 4
+    },
+    {
+     "type": 3,
+     "value": "451",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 27,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1106,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     26
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CHAD",
+     "car": "608fd5af"
+    },
+    {
+     "name": "WART",
+     "car": "3e438ee4"
+    },
+    {
+     "name": "TERRY",
+     "car": "f9ed7e04"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "16e178f6",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "452",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 28,
+   "kind": 0,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1304,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     26
+    ]
+   },
+   "opponents": [
+    {
+     "name": "AL",
+     "car": "98b598c9"
+    },
+    {
+     "name": "LEBRON",
+     "car": "3bd031d3"
+    },
+    {
+     "name": "JARED",
+     "car": "b62f8a52"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "2",
+     "arg": 2
+    },
+    {
+     "type": 3,
+     "value": "518",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 29,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1201,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     26
+    ]
+   },
+   "opponents": [
+    {
+     "name": "STEWART",
+     "car": "3328d419"
+    },
+    {
+     "name": "TODD",
+     "car": "ca2e351e"
+    },
+    {
+     "name": "FISH",
+     "car": "4fa5993b"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "4",
+     "arg": 2
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 30,
+   "kind": 1,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1003,
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1008,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1002,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     27,
+     28,
+     29
+    ]
+   },
+   "opponents": [
+    {
+     "name": "BRAD",
+     "car": "6c79e5d3"
+    },
+    {
+     "name": "WILL",
+     "car": "db2d97be"
+    },
+    {
+     "name": "JACKIE",
+     "car": "6b75fb86"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "12",
+     "arg": 2
+    },
+    {
+     "type": 0,
+     "value": "13",
+     "arg": 2
+    },
+    {
+     "type": 0,
+     "value": "14",
+     "arg": 2
+    },
+    {
+     "type": 3,
+     "value": "3f0",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 31,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1005,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     30
+    ]
+   },
+   "opponents": [
+    {
+     "name": "PAUL",
+     "car": "7bf9866b"
+    },
+    {
+     "name": "DESHAWN",
+     "car": "b708963a"
+    },
+    {
+     "name": "BOPPER",
+     "car": "5aa66cf4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "d",
+     "arg": 2
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 32,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1008,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     30
+    ]
+   },
+   "opponents": [
+    {
+     "name": "LAZIO",
+     "car": "f0f1052f"
+    },
+    {
+     "name": "MACK-D",
+     "car": "4c9b52c7"
+    },
+    {
+     "name": "KURT",
+     "car": "174fa6c1"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 33,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    150.0,
+    200.0,
+    250.0
+   ],
+   "stages": [
+    {
+     "track": 1303,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     31,
+     32
+    ]
+   },
+   "opponents": [
+    {
+     "name": "LOLA",
+     "car": "32d6d2f4"
+    },
+    {
+     "name": "B-DOG",
+     "car": "e8a7e7bd"
+    },
+    {
+     "name": "BRITTON",
+     "car": "3bcf59bb"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "150fb80",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 34,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1105,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     33
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JET",
+     "car": "b2461e11"
+    },
+    {
+     "name": "LEBRON",
+     "car": "ab13f2bc"
+    },
+    {
+     "name": "WILL",
+     "car": "8323a888"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "3",
+     "arg": 2
+    },
+    {
+     "type": 3,
+     "value": "451",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 35,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    150.0,
+    200.0,
+    250.0
+   ],
+   "stages": [
+    {
+     "track": 1006,
+     "laps": 6,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     33
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TANAKA",
+     "car": "e604f577"
+    },
+    {
+     "name": "VINCE",
+     "car": "541a96c5"
+    },
+    {
+     "name": "TAKASHI",
+     "car": "465bbc3f"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 36,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    150.0,
+    200.0,
+    250.0
+   ],
+   "stages": [
+    {
+     "track": 1206,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     34,
+     35
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TODD",
+     "car": "ca2e351e"
+    },
+    {
+     "name": "NUTZ",
+     "car": "e8171d01"
+    },
+    {
+     "name": "DARYL",
+     "car": "b83c0593"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 37,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1005,
+     "laps": 6,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     36
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KURT",
+     "car": "174fa6c1"
+    },
+    {
+     "name": "STAN",
+     "car": "4438edd0"
+    },
+    {
+     "name": "PAUL",
+     "car": "7bf9866b"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "16e178fa",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 38,
+   "kind": 1,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1303,
+     "laps": 4,
+     "direction": 0
+    },
+    {
+     "track": 1304,
+     "laps": 4,
+     "direction": 0
+    },
+    {
+     "track": 1305,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     37
+    ]
+   },
+   "opponents": [
+    {
+     "name": "FISH",
+     "car": "4fa5993c"
+    },
+    {
+     "name": "JET",
+     "car": "43fe5c0a"
+    },
+    {
+     "name": "AL",
+     "car": "98b598ca"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "17",
+     "arg": 2
+    },
+    {
+     "type": 0,
+     "value": "16",
+     "arg": 2
+    },
+    {
+     "type": 0,
+     "value": "11",
+     "arg": 2
+    },
+    {
+     "type": 3,
+     "value": "519",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 39,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1006,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     38
+    ]
+   },
+   "opponents": [
+    {
+     "name": "LAZIO",
+     "car": "f0f1052f"
+    },
+    {
+     "name": "MUTT",
+     "car": "a0f830fe"
+    },
+    {
+     "name": "NUTZ",
+     "car": "e8171d01"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "5",
+     "arg": 2
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 40,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1304,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     38
+    ]
+   },
+   "opponents": [
+    {
+     "name": "DIRT",
+     "car": "6f1ac102"
+    },
+    {
+     "name": "SPIN",
+     "car": "939ccbd3"
+    },
+    {
+     "name": "DESHAWN",
+     "car": "b708963a"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "16e178f9",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 41,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1103,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     38
+    ]
+   },
+   "opponents": [
+    {
+     "name": "BRAD",
+     "car": "6c79e5d3"
+    },
+    {
+     "name": "B-DOG",
+     "car": "e8a7e7bd"
+    },
+    {
+     "name": "JARED",
+     "car": "b62f8a52"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "545aec60",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 42,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    225.0,
+    300.0,
+    375.0
+   ],
+   "stages": [
+    {
+     "track": 1202,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     39,
+     40,
+     41
+    ]
+   },
+   "opponents": [
+    {
+     "name": "STEFAN",
+     "car": "4e07a75c"
+    },
+    {
+     "name": "RICCO",
+     "car": "3ea53eec"
+    },
+    {
+     "name": "BOPPER",
+     "car": "5aa66cf4"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 43,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1104,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     42
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CHAD",
+     "car": "608fd5af"
+    },
+    {
+     "name": "ROSIE",
+     "car": "f713b959"
+    },
+    {
+     "name": "LOLA",
+     "car": "32d6d2f4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "c",
+     "arg": 2
+    },
+    {
+     "type": 3,
+     "value": "450",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 44,
+   "kind": 0,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1305,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     42
+    ]
+   },
+   "opponents": [
+    {
+     "name": "WART",
+     "car": "3e438ee5"
+    },
+    {
+     "name": "BRYCE",
+     "car": "71845b7c"
+    },
+    {
+     "name": "TICKETS",
+     "car": "f5cd094d"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "9",
+     "arg": 2
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 45,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1008,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     42
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JOSE",
+     "car": "496e17a7"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "8",
+     "arg": 2
+    },
+    {
+     "type": 3,
+     "value": "3f0",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 46,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1201,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     43,
+     44,
+     45
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KLUTCH",
+     "car": "6408b98a"
+    },
+    {
+     "name": "TERRY",
+     "car": "f9ed7e05"
+    },
+    {
+     "name": "BRIAN",
+     "car": "a76ad63c"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "db7c",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 47,
+   "kind": 3,
+   "mode": 4,
+   "fee": 0.0,
+   "cash": [
+    100.0,
+    125.0,
+    150.0
+   ],
+   "stages": [
+    {
+     "track": 1103,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     46
+    ]
+   },
+   "opponents": [],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "3",
+     "arg": 4
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 48,
+   "kind": 1,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1003,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1006,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1005,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     47
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TAKASHI",
+     "car": "465bbc3f"
+    },
+    {
+     "name": "NESTO",
+     "car": "493349a8"
+    },
+    {
+     "name": "SCOTT",
+     "car": "869bd62a"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "10",
+     "arg": 2
+    },
+    {
+     "type": 0,
+     "value": "15",
+     "arg": 2
+    },
+    {
+     "type": 0,
+     "value": "18",
+     "arg": 2
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 49,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1008,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     48
+    ]
+   },
+   "opponents": [
+    {
+     "name": "WILL",
+     "car": "db2d97bf"
+    },
+    {
+     "name": "LEBRON",
+     "car": "3bd031d4"
+    },
+    {
+     "name": "MACK-D",
+     "car": "4c9b52c7"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "b",
+     "arg": 2
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 50,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1303,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     48
+    ]
+   },
+   "opponents": [
+    {
+     "name": "GEARS",
+     "car": "5c075321"
+    },
+    {
+     "name": "BRITTON",
+     "car": "3bcf59bb"
+    },
+    {
+     "name": "VIONCE",
+     "car": "541a96c5"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 51,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1210,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     50
+    ]
+   },
+   "opponents": [
+    {
+     "name": "WILL",
+     "car": "db2d97bf"
+    },
+    {
+     "name": "MUTT",
+     "car": "a0f830fe"
+    },
+    {
+     "name": "B-DOG",
+     "car": "e8a7e7bd"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "1",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 52,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1005,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     50
+    ]
+   },
+   "opponents": [
+    {
+     "name": "NESTO",
+     "car": "493349a8"
+    },
+    {
+     "name": "PRISS",
+     "car": "7335abb5"
+    },
+    {
+     "name": "LEBRON",
+     "car": "3bd031d4"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 53,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1006,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     51,
+     52
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JOSE",
+     "car": "496e17a8"
+    },
+    {
+     "name": "AL",
+     "car": "98b598ca"
+    },
+    {
+     "name": "FISH",
+     "car": "4fa5993c"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "c322f889",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 54,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1105,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     51,
+     52
+    ]
+   },
+   "opponents": [
+    {
+     "name": "NUTZ",
+     "car": "e8171d01"
+    },
+    {
+     "name": "VINCE",
+     "car": "541a96c5"
+    },
+    {
+     "name": "DESHAWN",
+     "car": "b708963a"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "2",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 55,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1206,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "any",
+    "ids": [
+     53,
+     54
+    ]
+   },
+   "opponents": [
+    {
+     "name": "MUTT",
+     "car": "a0f830fe"
+    },
+    {
+     "name": "RICCO",
+     "car": "3ea53eec"
+    },
+    {
+     "name": "BOPPER",
+     "car": "5aa66cf4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "16e178f8",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "4b6",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 56,
+   "kind": 0,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1305,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     49,
+     53,
+     54,
+     55
+    ]
+   },
+   "opponents": [
+    {
+     "name": "DARYL",
+     "car": "b83c0593"
+    },
+    {
+     "name": "HECTOR",
+     "car": "6ff2a4c1"
+    },
+    {
+     "name": "STAN",
+     "car": "4438edd0"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "4",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 57,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    300.0,
+    400.0,
+    500.0
+   ],
+   "stages": [
+    {
+     "track": 1106,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     49,
+     53,
+     54,
+     55
+    ]
+   },
+   "opponents": [
+    {
+     "name": "SKID",
+     "car": "41234aa7"
+    },
+    {
+     "name": "CHAD",
+     "car": "608fd5af"
+    },
+    {
+     "name": "BRITTON",
+     "car": "3bcf59bb"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "452",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 58,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    450.0,
+    600.0,
+    750.0
+   ],
+   "stages": [
+    {
+     "track": 1008,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     49,
+     53,
+     54,
+     55
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JET",
+     "car": "43fe5c0a"
+    },
+    {
+     "name": "PAUL",
+     "car": "7bf9866b"
+    },
+    {
+     "name": "TAKASHI",
+     "car": "465bbc3f"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "7502da84",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 59,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    375.0,
+    500.0,
+    625.0
+   ],
+   "stages": [
+    {
+     "track": 1002,
+     "laps": 4,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     56,
+     57,
+     58
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JOSE",
+     "car": "496e17a8"
+    },
+    {
+     "name": "LOLA",
+     "car": "32d6d2f4"
+    },
+    {
+     "name": "MACK-D",
+     "car": "4c9b52c7"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "16e178fb",
+     "arg": 0
+    },
+    {
+     "type": 3,
+     "value": "3ea",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 60,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    750.0,
+    1000.0,
+    1250.0
+   ],
+   "stages": [
+    {
+     "track": 1006,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     59
+    ]
+   },
+   "opponents": [
+    {
+     "name": "BRIAN",
+     "car": "a76ad63c"
+    },
+    {
+     "name": "SPIN",
+     "car": "939ccbd3"
+    },
+    {
+     "name": "LAZIO",
+     "car": "f0f1052f"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "6",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 61,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    750.0,
+    1000.0,
+    1250.0
+   ],
+   "stages": [
+    {
+     "track": 1105,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     59
+    ]
+   },
+   "opponents": [
+    {
+     "name": "STEWART",
+     "car": "3328d419"
+    },
+    {
+     "name": "BRYCE",
+     "car": "71845b7c"
+    },
+    {
+     "name": "ROSIE",
+     "car": "f713b959"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "a",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 62,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    750.0,
+    1000.0,
+    1250.0
+   ],
+   "stages": [
+    {
+     "track": 1206,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     59
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KLUTCH",
+     "car": "6408b98a"
+    },
+    {
+     "name": "JACKIE",
+     "car": "6b75fb86"
+    },
+    {
+     "name": "NESTO",
+     "car": "493349a8"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "e",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 63,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1201,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "any",
+    "ids": [
+     60,
+     61
+    ]
+   },
+   "opponents": [
+    {
+     "name": "ISHII",
+     "car": "a7feadd8"
+    },
+    {
+     "name": "JARED",
+     "car": "b62f8a52"
+    },
+    {
+     "name": "CARLA",
+     "car": "f5ea3c47"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 64,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1304,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "any",
+    "ids": [
+     60,
+     61
+    ]
+   },
+   "opponents": [
+    {
+     "name": "WU",
+     "car": "0fca18ce"
+    },
+    {
+     "name": "STAN",
+     "car": "4438edd0"
+    },
+    {
+     "name": "BRIAN",
+     "car": "a76ad63c"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "3b8c48a",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 65,
+   "kind": 0,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    1500.0,
+    2000.0,
+    2500.0
+   ],
+   "stages": [
+    {
+     "track": 1306,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     60,
+     61,
+     62,
+     63,
+     64
+    ]
+   },
+   "opponents": [
+    {
+     "name": "BOPPER",
+     "car": "5aa66cf5"
+    },
+    {
+     "name": "SPIN",
+     "car": "939ccbd3"
+    },
+    {
+     "name": "LOLA",
+     "car": "32d6d2f4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "0",
+     "arg": 3
+    },
+    {
+     "type": 3,
+     "value": "51a",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 66,
+   "kind": 1,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1103,
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1105,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1104,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     65
+    ]
+   },
+   "opponents": [
+    {
+     "name": "LAZIO",
+     "car": "f0f1052f"
+    },
+    {
+     "name": "BRIAN",
+     "car": "a76ad63c"
+    },
+    {
+     "name": "FORGE",
+     "car": "fc79d032"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "12",
+     "arg": 3
+    },
+    {
+     "type": 0,
+     "value": "13",
+     "arg": 3
+    },
+    {
+     "type": 0,
+     "value": "14",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 67,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    1875.0,
+    2500.0,
+    3125.0
+   ],
+   "stages": [
+    {
+     "track": 1104,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     66
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CHAD",
+     "car": "608fd5af"
+    },
+    {
+     "name": "RICCO",
+     "car": "3ea53eec"
+    },
+    {
+     "name": "DARYL",
+     "car": "b83c0593"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "16e178fc",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 68,
+   "kind": 3,
+   "mode": 4,
+   "fee": 0.0,
+   "cash": [
+    1875.0,
+    2500.0,
+    3125.0
+   ],
+   "stages": [
+    {
+     "track": 1106,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     67
+    ]
+   },
+   "opponents": [],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "7",
+     "arg": 4
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 69,
+   "kind": 1,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1008,
+     "laps": 3,
+     "direction": 0
+    },
+    {
+     "track": 1005,
+     "laps": 3,
+     "direction": 1
+    },
+    {
+     "track": 1002,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     68
+    ]
+   },
+   "opponents": [
+    {
+     "name": "MATT",
+     "car": "ec5c29db"
+    },
+    {
+     "name": "SLIK",
+     "car": "8837ee78"
+    },
+    {
+     "name": "JARRUS",
+     "car": "3f9cd43c"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "3a506b4",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 70,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    450.0,
+    600.0,
+    750.0
+   ],
+   "stages": [
+    {
+     "track": 1214,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     69
+    ]
+   },
+   "opponents": [
+    {
+     "name": "STAN",
+     "car": "4438edd0"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "d",
+     "arg": 3
+    },
+    {
+     "type": 3,
+     "value": "4be",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 71,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    450.0,
+    600.0,
+    750.0
+   ],
+   "stages": [
+    {
+     "track": 1004,
+     "laps": 6,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     69
+    ]
+   },
+   "opponents": [
+    {
+     "name": "JARRUS",
+     "car": "3f9cd43c"
+    },
+    {
+     "name": "JET",
+     "car": "43fe5c0a"
+    },
+    {
+     "name": "PRISS",
+     "car": "7335abb5"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "3ec",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 72,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    450.0,
+    600.0,
+    750.0
+   ],
+   "stages": [
+    {
+     "track": 1001,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     69
+    ]
+   },
+   "opponents": [
+    {
+     "name": "B-DOG",
+     "car": "e8a7e7bd"
+    },
+    {
+     "name": "WILL",
+     "car": "db2d97bf"
+    },
+    {
+     "name": "MUTT",
+     "car": "a0f830fe"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 73,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    450.0,
+    600.0,
+    750.0
+   ],
+   "stages": [
+    {
+     "track": 1304,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     70,
+     71,
+     72
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KIRBY",
+     "car": "e7a47752"
+    },
+    {
+     "name": "LEBRON",
+     "car": "3bd031d5"
+    },
+    {
+     "name": "HECTOR",
+     "car": "6ff2a4c2"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "dc00",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 74,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    450.0,
+    600.0,
+    750.0
+   ],
+   "stages": [
+    {
+     "track": 1107,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     70,
+     71,
+     72
+    ]
+   },
+   "opponents": [
+    {
+     "name": "MATT",
+     "car": "ec5c29db"
+    },
+    {
+     "name": "AL",
+     "car": "98b598cb"
+    },
+    {
+     "name": "STEWART",
+     "car": "3328d41a"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "453",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 75,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    450.0,
+    600.0,
+    750.0
+   ],
+   "stages": [
+    {
+     "track": 1008,
+     "laps": 5,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     70,
+     71,
+     72
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KURT",
+     "car": "174fa6c1"
+    },
+    {
+     "name": "STEFAN",
+     "car": "4e07a75d"
+    },
+    {
+     "name": "BRAD",
+     "car": "6c79e5d4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "ac6d1",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 76,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    450.0,
+    600.0,
+    750.0
+   ],
+   "stages": [
+    {
+     "track": 1206,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     73,
+     74,
+     75
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KLUTCH",
+     "car": "6408b98a"
+    },
+    {
+     "name": "PAUL",
+     "car": "7bf9866c"
+    },
+    {
+     "name": "SCOTT",
+     "car": "869bd62b"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 77,
+   "kind": 3,
+   "mode": 4,
+   "fee": 0.0,
+   "cash": [
+    100.0,
+    125.0,
+    150.0
+   ],
+   "stages": [
+    {
+     "track": 1107,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     76
+    ]
+   },
+   "opponents": [],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "8",
+     "arg": 4
+    },
+    {
+     "type": 3,
+     "value": "453",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 78,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    2000.0,
+    4000.0,
+    6000.0
+   ],
+   "stages": [
+    {
+     "track": 1108,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     77
+    ]
+   },
+   "opponents": [
+    {
+     "name": "SAMANTHA",
+     "car": "a4045c39"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "454",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "11_PNK",
+    "12_BUD",
+    "13_KIT"
+   ],
+   "movies": {
+    "before": "11_PNK",
+    "before_at": "race start",
+    "after_win": [
+     "13_KIT"
+    ],
+    "after_loss": "12_BUD"
+   }
+  },
+  {
+   "id": 79,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    1000.0,
+    2000.0,
+    3000.0
+   ],
+   "stages": [
+    {
+     "track": 1206,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     78
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TODD",
+     "car": "f9a6c94e"
+    },
+    {
+     "name": "KAZ",
+     "car": "4b23fd55"
+    },
+    {
+     "name": "SPARKS",
+     "car": "ba053fb6"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 2,
+     "value": "be48375e",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 80,
+   "kind": 1,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    6000.0,
+    8000.0,
+    10000.0
+   ],
+   "stages": [
+    {
+     "track": 1214,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1214,
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1214,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1214,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     79
+    ]
+   },
+   "opponents": [
+    {
+     "name": "WART",
+     "car": "3e438ee6"
+    },
+    {
+     "name": "BRITTON",
+     "car": "3bcf59bc"
+    },
+    {
+     "name": "FISH",
+     "car": "4fa5993d"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "17",
+     "arg": 3
+    },
+    {
+     "type": 0,
+     "value": "16",
+     "arg": 3
+    },
+    {
+     "type": 0,
+     "value": "11",
+     "arg": 3
+    },
+    {
+     "type": 3,
+     "value": "4be",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 81,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    900.0,
+    1200.0,
+    1500.0
+   ],
+   "stages": [
+    {
+     "track": 1004,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     80
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TAKASHI",
+     "car": "465bbc40"
+    },
+    {
+     "name": "JARED",
+     "car": "b62f8a53"
+    },
+    {
+     "name": "SPIN",
+     "car": "939ccbd4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "3",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 82,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1108,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     80
+    ]
+   },
+   "opponents": [
+    {
+     "name": "MATT",
+     "car": "ec5c29db"
+    },
+    {
+     "name": "STAN",
+     "car": "4438edd1"
+    },
+    {
+     "name": "HECTOR",
+     "car": "6ff2a4c2"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 83,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1207,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     80
+    ]
+   },
+   "opponents": [
+    {
+     "name": "ISHII",
+     "car": "a7feadd8"
+    },
+    {
+     "name": "MACK-D",
+     "car": "4c9b52c8"
+    },
+    {
+     "name": "LAZIO",
+     "car": "f0f10530"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "4b7",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 84,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    900.0,
+    1200.0,
+    1500.0
+   ],
+   "stages": [
+    {
+     "track": 1001,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     80
+    ]
+   },
+   "opponents": [
+    {
+     "name": "DESHAWN",
+     "car": "b708963b"
+    },
+    {
+     "name": "RICCO",
+     "car": "3ea53eed"
+    },
+    {
+     "name": "BRYCE",
+     "car": "71845b7d"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "5",
+     "arg": 3
+    },
+    {
+     "type": 3,
+     "value": "3e9",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 86,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1306,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     81,
+     82,
+     83,
+     84
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TAKASHI",
+     "car": "465bbc40"
+    },
+    {
+     "name": "CARLA",
+     "car": "f5ea3c48"
+    },
+    {
+     "name": "NESTO",
+     "car": "493349a9"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "16e178fd",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 87,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1004,
+     "laps": 4,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     81,
+     82,
+     83,
+     84
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TANAKA",
+     "car": "e604f578"
+    },
+    {
+     "name": "BRETT",
+     "car": "8d2d3d32"
+    },
+    {
+     "name": "NUTZ",
+     "car": "e8171d02"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "3ec",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 88,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    1500.0,
+    2000.0,
+    2500.0
+   ],
+   "stages": [
+    {
+     "track": 1210,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     86,
+     87
+    ]
+   },
+   "opponents": [
+    {
+     "name": "WART",
+     "car": "3e438ee6"
+    },
+    {
+     "name": "B-DOG",
+     "car": "e8a7e7be"
+    },
+    {
+     "name": "AMY",
+     "car": "45f16bb8"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 89,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    1500.0,
+    2000.0,
+    2500.0
+   ],
+   "stages": [
+    {
+     "track": 1004,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     86,
+     87
+    ]
+   },
+   "opponents": [
+    {
+     "name": "LAZIO",
+     "car": "f0f10530"
+    },
+    {
+     "name": "WILL",
+     "car": "db2d97c0"
+    },
+    {
+     "name": "PRISS",
+     "car": "7335abb6"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 90,
+   "kind": 0,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    900.0,
+    1200.0,
+    1500.0
+   ],
+   "stages": [
+    {
+     "track": 1307,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     86,
+     87
+    ]
+   },
+   "opponents": [
+    {
+     "name": "LOLA",
+     "car": "32d6d2f5"
+    },
+    {
+     "name": "TERRY",
+     "car": "f9ed7e06"
+    },
+    {
+     "name": "DARYL",
+     "car": "b83c0594"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "c",
+     "arg": 3
+    },
+    {
+     "type": 3,
+     "value": "51b",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 91,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1007,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     88,
+     89,
+     90
+    ]
+   },
+   "opponents": [
+    {
+     "name": "BRETT",
+     "car": "8d2d3d32"
+    },
+    {
+     "name": "SPARKS",
+     "car": "ba053fb6"
+    },
+    {
+     "name": "SLIK",
+     "car": "8837ee78"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "9",
+     "arg": 3
+    },
+    {
+     "type": 3,
+     "value": "3ef",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 92,
+   "kind": 1,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1002,
+     "laps": 3,
+     "direction": 1
+    },
+    {
+     "track": 1004,
+     "laps": 3,
+     "direction": 1
+    },
+    {
+     "track": 1007,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     91
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KURT",
+     "car": "174fa6c1"
+    },
+    {
+     "name": "CHAD",
+     "car": "608fd5af"
+    },
+    {
+     "name": "TODD",
+     "car": "f9a6c94e"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "10",
+     "arg": 3
+    },
+    {
+     "type": 0,
+     "value": "15",
+     "arg": 3
+    },
+    {
+     "type": 0,
+     "value": "18",
+     "arg": 3
+    },
+    {
+     "type": 3,
+     "value": "3ef",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "09_GBE",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": "09_GBE",
+    "before_at": "event list",
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 93,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    1500.0,
+    2000.0,
+    2500.0
+   ],
+   "stages": [
+    {
+     "track": 1307,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     92
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TANAKA",
+     "car": "e604f578"
+    },
+    {
+     "name": "TAKASHI",
+     "car": "465bbc40"
+    },
+    {
+     "name": "KIRBY",
+     "car": "e7a47752"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 94,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1109,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     92
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CHAD",
+     "car": "9f2a8223"
+    },
+    {
+     "name": "WU",
+     "car": "0fca18ce"
+    },
+    {
+     "name": "KAZ",
+     "car": "4b23fd55"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "8",
+     "arg": 3
+    },
+    {
+     "type": 3,
+     "value": "455",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 95,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    1500.0,
+    2000.0,
+    2500.0
+   ],
+   "stages": [
+    {
+     "track": 1108,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     93,
+     94
+    ]
+   },
+   "opponents": [
+    {
+     "name": "SCOTT",
+     "car": "869bd62b"
+    },
+    {
+     "name": "VINCE",
+     "car": "541a96c6"
+    },
+    {
+     "name": "SPIN",
+     "car": "939ccbd4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "454",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 96,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    750.0,
+    1000.0,
+    1250.0
+   ],
+   "stages": [
+    {
+     "track": 1001,
+     "laps": 6,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     95
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KURT",
+     "car": "174fa745"
+    },
+    {
+     "name": "AMY",
+     "car": "45f16bb8"
+    },
+    {
+     "name": "JARRUS",
+     "car": "3f9cd43c"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 97,
+   "kind": 2,
+   "mode": 4,
+   "fee": 0.0,
+   "cash": [
+    100.0,
+    125.0,
+    150.0
+   ],
+   "stages": [
+    {
+     "track": 1109,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     96
+    ]
+   },
+   "opponents": [],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "18",
+     "arg": 4
+    },
+    {
+     "type": 0,
+     "value": "10",
+     "arg": 4
+    },
+    {
+     "type": 0,
+     "value": "15",
+     "arg": 4
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 98,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    2250.0,
+    3000.0,
+    3750.0
+   ],
+   "stages": [
+    {
+     "track": 1207,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     97
+    ]
+   },
+   "opponents": [
+    {
+     "name": "HECTOR",
+     "car": "6ff2a4c2"
+    },
+    {
+     "name": "WU",
+     "car": "0fca18ce"
+    },
+    {
+     "name": "BRETT",
+     "car": "8d2d3d32"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "4b7",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 99,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    2250.0,
+    3000.0,
+    3750.0
+   ],
+   "stages": [
+    {
+     "track": 1007,
+     "laps": 6,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     97
+    ]
+   },
+   "opponents": [
+    {
+     "name": "SPARKS",
+     "car": "ba053fb6"
+    },
+    {
+     "name": "SLIK",
+     "car": "8837ee78"
+    },
+    {
+     "name": "AMY",
+     "car": "45f16bb8"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 100,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    2250.0,
+    3000.0,
+    3750.0
+   ],
+   "stages": [
+    {
+     "track": 1106,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     97
+    ]
+   },
+   "opponents": [
+    {
+     "name": "VINCE",
+     "car": "541a96c6"
+    },
+    {
+     "name": "MACK-D",
+     "car": "4c9b52c8"
+    },
+    {
+     "name": "MUTT",
+     "car": "a0f830ff"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 101,
+   "kind": 0,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    1125.0,
+    1500.0,
+    1875.0
+   ],
+   "stages": [
+    {
+     "track": 1105,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     98,
+     99,
+     100
+    ]
+   },
+   "opponents": [
+    {
+     "name": "BRIAN",
+     "car": "a76ad63d"
+    },
+    {
+     "name": "LOLA",
+     "car": "32d6d2f5"
+    },
+    {
+     "name": "BRAD",
+     "car": "6c79e5d4"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "b",
+     "arg": 3
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 102,
+   "kind": 1,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    6000.0,
+    8000.0,
+    10000.0
+   ],
+   "stages": [
+    {
+     "track": 1106,
+     "laps": 2,
+     "direction": 1
+    },
+    {
+     "track": 1107,
+     "laps": 2,
+     "direction": 0
+    },
+    {
+     "track": 1103,
+     "laps": 2,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     101
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CHAD",
+     "car": "9f2a8223"
+    },
+    {
+     "name": "TODD",
+     "car": "f9a6c94e"
+    },
+    {
+     "name": "KURT",
+     "car": "174fa745"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "f31097c5",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 103,
+   "kind": 0,
+   "mode": 5,
+   "fee": 0.0,
+   "cash": [
+    750.0,
+    1000.0,
+    1250.0
+   ],
+   "stages": [
+    {
+     "track": 1001,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     102
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KAZ",
+     "car": "4b23fd55"
+    },
+    {
+     "name": "ISHII",
+     "car": "a7feadd8"
+    },
+    {
+     "name": "KIRBY",
+     "car": "e7a47752"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 104,
+   "kind": 0,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    750.0,
+    1000.0,
+    1250.0
+   ],
+   "stages": [
+    {
+     "track": 1004,
+     "laps": 7,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     102
+    ]
+   },
+   "opponents": [
+    {
+     "name": "BRETT",
+     "car": "8d2d3d32"
+    },
+    {
+     "name": "MATT",
+     "car": "ec5c29db"
+    },
+    {
+     "name": "WU",
+     "car": "0fca18ce"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 105,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    2250.0,
+    3000.0,
+    3750.0
+   ],
+   "stages": [
+    {
+     "track": 1308,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     103,
+     104
+    ]
+   },
+   "opponents": [
+    {
+     "name": "FISH",
+     "car": "4fa5993d"
+    },
+    {
+     "name": "KAZ",
+     "car": "4b23fd55"
+    },
+    {
+     "name": "JARRUS",
+     "car": "3f9cd43c"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "51c",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 106,
+   "kind": 0,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    750.0,
+    1000.0,
+    1250.0
+   ],
+   "stages": [
+    {
+     "track": 1206,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     105
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KIRBY",
+     "car": "e7a47752"
+    },
+    {
+     "name": "AMY",
+     "car": "45f16bb8"
+    },
+    {
+     "name": "BRETT",
+     "car": "8d2d3d32"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 107,
+   "kind": 6,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1007,
+     "laps": 3,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     106
+    ]
+   },
+   "opponents": [
+    {
+     "name": "KURT",
+     "car": "174fa745"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 108,
+   "kind": 6,
+   "mode": 1,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1202,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     106
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TODD",
+     "car": "f9a6c94e"
+    },
+    {
+     "name": "SLIK",
+     "car": "8837ee78"
+    },
+    {
+     "name": "NUTZ",
+     "car": "e8171d02"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "4b2",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 109,
+   "kind": 6,
+   "mode": 3,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1308,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     106
+    ]
+   },
+   "opponents": [
+    {
+     "name": "DIRT",
+     "car": "6f1ac102"
+    },
+    {
+     "name": "RICCO",
+     "car": "3ea53eed"
+    },
+    {
+     "name": "BRIAN",
+     "car": "a76ad63d"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 110,
+   "kind": 6,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    3750.0,
+    5000.0,
+    6250.0
+   ],
+   "stages": [
+    {
+     "track": 1109,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     106
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CHAD",
+     "car": "9f2a8223"
+    },
+    {
+     "name": "JET",
+     "car": "43fe5c0b"
+    },
+    {
+     "name": "BOPPER",
+     "car": "5aa66cf5"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 3,
+     "value": "455",
+     "arg": 1
+    }
+   ],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 111,
+   "kind": 3,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    7500.0,
+    10000.0,
+    12500.0
+   ],
+   "stages": [
+    {
+     "track": 1007,
+     "laps": 5,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     107,
+     108,
+     109,
+     110
+    ]
+   },
+   "opponents": [
+    {
+     "name": "TJ",
+     "car": "33f2f54a"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 0,
+     "value": "f",
+     "arg": 4
+    }
+   ],
+   "movie_slots": [
+    "14_MUT",
+    "15_DIK",
+    "16_RES"
+   ],
+   "movies": {
+    "before": "14_MUT",
+    "before_at": "race start",
+    "after_win": [
+     "16_RES"
+    ],
+    "after_loss": "15_DIK"
+   }
+  },
+  {
+   "id": 112,
+   "kind": 5,
+   "mode": 2,
+   "fee": 0.0,
+   "cash": [
+    7500.0,
+    10000.0,
+    12500.0
+   ],
+   "stages": [
+    {
+     "track": 1108,
+     "laps": 2,
+     "direction": 1
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     111
+    ]
+   },
+   "opponents": [
+    {
+     "name": "EDDIE",
+     "car": "7a282c98"
+    }
+   ],
+   "rewards": [
+    {
+     "type": 1,
+     "value": "f31097c6",
+     "arg": 0
+    }
+   ],
+   "movie_slots": [
+    "08_EDD",
+    "",
+    "17_MET"
+   ],
+   "movies": {
+    "before": "08_EDD",
+    "before_at": "race start",
+    "after_win": [
+     "17_MET"
+    ],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 113,
+   "kind": 4,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    7500.0,
+    10000.0,
+    12500.0
+   ],
+   "stages": [
+    {
+     "track": 1001,
+     "laps": 4,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     112
+    ]
+   },
+   "opponents": [
+    {
+     "name": "MELISSA",
+     "car": "f35d35de"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    "19_FIN"
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [
+     "19_FIN"
+    ],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 120,
+   "kind": 8,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    525.0,
+    700.0,
+    825.0
+   ],
+   "stages": [
+    {
+     "track": 1001,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "LAZIO",
+     "car": "f0f1052f"
+    },
+    {
+     "name": "MUTT",
+     "car": "a0f830fe"
+    },
+    {
+     "name": "NUTZ",
+     "car": "e8171d01"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 121,
+   "kind": 8,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    525.0,
+    700.0,
+    825.0
+   ],
+   "stages": [
+    {
+     "track": 1003,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "STEFAN",
+     "car": "4e07a75c"
+    },
+    {
+     "name": "PRISS",
+     "car": "7335abb4"
+    },
+    {
+     "name": "HECTOR",
+     "car": "6ff2a4c1"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  },
+  {
+   "id": 122,
+   "kind": 8,
+   "mode": 0,
+   "fee": 0.0,
+   "cash": [
+    525.0,
+    700.0,
+    825.0
+   ],
+   "stages": [
+    {
+     "track": 1006,
+     "laps": 3,
+     "direction": 0
+    }
+   ],
+   "prereq": {
+    "rule": "all",
+    "ids": [
+     0
+    ]
+   },
+   "opponents": [
+    {
+     "name": "CARL",
+     "car": "bff2ba3c"
+    },
+    {
+     "name": "CARLA",
+     "car": "f5ea3c46"
+    },
+    {
+     "name": "DIRT",
+     "car": "6f1ac102"
+    }
+   ],
+   "rewards": [],
+   "movie_slots": [
+    "",
+    "",
+    ""
+   ],
+   "movies": {
+    "before": null,
+    "before_at": null,
+    "after_win": [],
+    "after_loss": null
+   }
+  }
+ ],
+ "order": [
+  {
+   "event": 0,
+   "open_before": [
+    0
+   ],
+   "opened": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "cash_after": 10000
+  },
+  {
+   "event": 1,
+   "open_before": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "opened": [],
+   "cash_after": 10500
+  },
+  {
+   "event": 2,
+   "open_before": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "opened": [],
+   "cash_after": 11000
+  },
+  {
+   "event": 3,
+   "open_before": [
+    3,
+    4,
+    5
+   ],
+   "opened": [],
+   "cash_after": 11500
+  },
+  {
+   "event": 4,
+   "open_before": [
+    4,
+    5
+   ],
+   "opened": [],
+   "cash_after": 12000
+  },
+  {
+   "event": 5,
+   "open_before": [
+    5
+   ],
+   "opened": [
+    6
+   ],
+   "cash_after": 12500
+  },
+  {
+   "event": 6,
+   "open_before": [
+    6
+   ],
+   "opened": [
+    7
+   ],
+   "cash_after": 17500
+  },
+  {
+   "event": 7,
+   "open_before": [
+    7
+   ],
+   "opened": [
+    8
+   ],
+   "cash_after": 17625
+  },
+  {
+   "event": 8,
+   "open_before": [
+    8
+   ],
+   "opened": [
+    9
+   ],
+   "cash_after": 18375
+  },
+  {
+   "event": 9,
+   "open_before": [
+    9
+   ],
+   "opened": [
+    10,
+    11,
+    12,
+    13
+   ],
+   "cash_after": 23375
+  },
+  {
+   "event": 10,
+   "open_before": [
+    10,
+    11,
+    12,
+    13
+   ],
+   "opened": [],
+   "cash_after": 24125
+  },
+  {
+   "event": 11,
+   "open_before": [
+    11,
+    12,
+    13
+   ],
+   "opened": [],
+   "cash_after": 24875
+  },
+  {
+   "event": 12,
+   "open_before": [
+    12,
+    13
+   ],
+   "opened": [],
+   "cash_after": 25625
+  },
+  {
+   "event": 13,
+   "open_before": [
+    13
+   ],
+   "opened": [
+    14
+   ],
+   "cash_after": 26375
+  },
+  {
+   "event": 14,
+   "open_before": [
+    14
+   ],
+   "opened": [
+    15
+   ],
+   "cash_after": 31375
+  },
+  {
+   "event": 15,
+   "open_before": [
+    15
+   ],
+   "opened": [
+    16,
+    17
+   ],
+   "cash_after": 31500
+  },
+  {
+   "event": 16,
+   "open_before": [
+    16,
+    17
+   ],
+   "opened": [
+    18,
+    19
+   ],
+   "cash_after": 31750
+  },
+  {
+   "event": 17,
+   "open_before": [
+    17,
+    18,
+    19
+   ],
+   "opened": [],
+   "cash_after": 32000
+  },
+  {
+   "event": 18,
+   "open_before": [
+    18,
+    19
+   ],
+   "opened": [],
+   "cash_after": 32250
+  },
+  {
+   "event": 19,
+   "open_before": [
+    19
+   ],
+   "opened": [
+    20
+   ],
+   "cash_after": 32500
+  },
+  {
+   "event": 20,
+   "open_before": [
+    20
+   ],
+   "opened": [
+    21,
+    22
+   ],
+   "cash_after": 37500
+  },
+  {
+   "event": 21,
+   "open_before": [
+    21,
+    22
+   ],
+   "opened": [],
+   "cash_after": 37750
+  },
+  {
+   "event": 22,
+   "open_before": [
+    22
+   ],
+   "opened": [
+    23,
+    24
+   ],
+   "cash_after": 38000
+  },
+  {
+   "event": 23,
+   "open_before": [
+    23,
+    24
+   ],
+   "opened": [],
+   "cash_after": 38300
+  },
+  {
+   "event": 24,
+   "open_before": [
+    24
+   ],
+   "opened": [
+    25
+   ],
+   "cash_after": 38600
+  },
+  {
+   "event": 25,
+   "open_before": [
+    25
+   ],
+   "opened": [
+    26
+   ],
+   "cash_after": 38850
+  },
+  {
+   "event": 26,
+   "open_before": [
+    26
+   ],
+   "opened": [
+    27,
+    28,
+    29
+   ],
+   "cash_after": 38975
+  },
+  {
+   "event": 27,
+   "open_before": [
+    27,
+    28,
+    29
+   ],
+   "opened": [],
+   "cash_after": 39275
+  },
+  {
+   "event": 28,
+   "open_before": [
+    28,
+    29
+   ],
+   "opened": [],
+   "cash_after": 39575
+  },
+  {
+   "event": 29,
+   "open_before": [
+    29
+   ],
+   "opened": [
+    30
+   ],
+   "cash_after": 39875
+  },
+  {
+   "event": 30,
+   "open_before": [
+    30
+   ],
+   "opened": [
+    31,
+    32
+   ],
+   "cash_after": 44875
+  },
+  {
+   "event": 31,
+   "open_before": [
+    31,
+    32
+   ],
+   "opened": [],
+   "cash_after": 45175
+  },
+  {
+   "event": 32,
+   "open_before": [
+    32
+   ],
+   "opened": [
+    33
+   ],
+   "cash_after": 45475
+  },
+  {
+   "event": 33,
+   "open_before": [
+    33
+   ],
+   "opened": [
+    34,
+    35
+   ],
+   "cash_after": 45675
+  },
+  {
+   "event": 34,
+   "open_before": [
+    34,
+    35
+   ],
+   "opened": [],
+   "cash_after": 45975
+  },
+  {
+   "event": 35,
+   "open_before": [
+    35
+   ],
+   "opened": [
+    36
+   ],
+   "cash_after": 46175
+  },
+  {
+   "event": 36,
+   "open_before": [
+    36
+   ],
+   "opened": [
+    37
+   ],
+   "cash_after": 46375
+  },
+  {
+   "event": 37,
+   "open_before": [
+    37
+   ],
+   "opened": [
+    38
+   ],
+   "cash_after": 46675
+  },
+  {
+   "event": 38,
+   "open_before": [
+    38
+   ],
+   "opened": [
+    39,
+    40,
+    41
+   ],
+   "cash_after": 51675
+  },
+  {
+   "event": 39,
+   "open_before": [
+    39,
+    40,
+    41
+   ],
+   "opened": [],
+   "cash_after": 51975
+  },
+  {
+   "event": 40,
+   "open_before": [
+    40,
+    41
+   ],
+   "opened": [],
+   "cash_after": 52275
+  },
+  {
+   "event": 41,
+   "open_before": [
+    41
+   ],
+   "opened": [
+    42
+   ],
+   "cash_after": 52575
+  },
+  {
+   "event": 42,
+   "open_before": [
+    42
+   ],
+   "opened": [
+    43,
+    44,
+    45
+   ],
+   "cash_after": 52875
+  },
+  {
+   "event": 43,
+   "open_before": [
+    43,
+    44,
+    45
+   ],
+   "opened": [],
+   "cash_after": 53275
+  },
+  {
+   "event": 44,
+   "open_before": [
+    44,
+    45
+   ],
+   "opened": [],
+   "cash_after": 53675
+  },
+  {
+   "event": 45,
+   "open_before": [
+    45
+   ],
+   "opened": [
+    46
+   ],
+   "cash_after": 54075
+  },
+  {
+   "event": 46,
+   "open_before": [
+    46
+   ],
+   "opened": [
+    47
+   ],
+   "cash_after": 54475
+  },
+  {
+   "event": 47,
+   "open_before": [
+    47
+   ],
+   "opened": [
+    48
+   ],
+   "cash_after": 54600
+  },
+  {
+   "event": 48,
+   "open_before": [
+    48
+   ],
+   "opened": [
+    49,
+    50
+   ],
+   "cash_after": 59600
+  },
+  {
+   "event": 49,
+   "open_before": [
+    49,
+    50
+   ],
+   "opened": [],
+   "cash_after": 60000
+  },
+  {
+   "event": 50,
+   "open_before": [
+    50
+   ],
+   "opened": [
+    51,
+    52
+   ],
+   "cash_after": 60400
+  },
+  {
+   "event": 51,
+   "open_before": [
+    51,
+    52
+   ],
+   "opened": [],
+   "cash_after": 60900
+  },
+  {
+   "event": 52,
+   "open_before": [
+    52
+   ],
+   "opened": [
+    53,
+    54
+   ],
+   "cash_after": 61300
+  },
+  {
+   "event": 53,
+   "open_before": [
+    53,
+    54
+   ],
+   "opened": [
+    55
+   ],
+   "cash_after": 61800
+  },
+  {
+   "event": 54,
+   "open_before": [
+    54,
+    55
+   ],
+   "opened": [],
+   "cash_after": 62300
+  },
+  {
+   "event": 55,
+   "open_before": [
+    55
+   ],
+   "opened": [
+    56,
+    57,
+    58
+   ],
+   "cash_after": 62700
+  },
+  {
+   "event": 56,
+   "open_before": [
+    56,
+    57,
+    58
+   ],
+   "opened": [],
+   "cash_after": 63200
+  },
+  {
+   "event": 57,
+   "open_before": [
+    57,
+    58
+   ],
+   "opened": [],
+   "cash_after": 63600
+  },
+  {
+   "event": 58,
+   "open_before": [
+    58
+   ],
+   "opened": [
+    59
+   ],
+   "cash_after": 64200
+  },
+  {
+   "event": 59,
+   "open_before": [
+    59
+   ],
+   "opened": [
+    60,
+    61,
+    62
+   ],
+   "cash_after": 64700
+  },
+  {
+   "event": 60,
+   "open_before": [
+    60,
+    61,
+    62
+   ],
+   "opened": [
+    63,
+    64
+   ],
+   "cash_after": 65700
+  },
+  {
+   "event": 61,
+   "open_before": [
+    61,
+    62,
+    63,
+    64
+   ],
+   "opened": [],
+   "cash_after": 66700
+  },
+  {
+   "event": 62,
+   "open_before": [
+    62,
+    63,
+    64
+   ],
+   "opened": [],
+   "cash_after": 67700
+  },
+  {
+   "event": 63,
+   "open_before": [
+    63,
+    64
+   ],
+   "opened": [],
+   "cash_after": 69200
+  },
+  {
+   "event": 64,
+   "open_before": [
+    64
+   ],
+   "opened": [
+    65
+   ],
+   "cash_after": 70700
+  },
+  {
+   "event": 65,
+   "open_before": [
+    65
+   ],
+   "opened": [
+    66
+   ],
+   "cash_after": 72700
+  },
+  {
+   "event": 66,
+   "open_before": [
+    66
+   ],
+   "opened": [
+    67
+   ],
+   "cash_after": 77700
+  },
+  {
+   "event": 67,
+   "open_before": [
+    67
+   ],
+   "opened": [
+    68
+   ],
+   "cash_after": 80200
+  },
+  {
+   "event": 68,
+   "open_before": [
+    68
+   ],
+   "opened": [
+    69
+   ],
+   "cash_after": 82700
+  },
+  {
+   "event": 69,
+   "open_before": [
+    69
+   ],
+   "opened": [
+    70,
+    71,
+    72
+   ],
+   "cash_after": 87700
+  },
+  {
+   "event": 70,
+   "open_before": [
+    70,
+    71,
+    72
+   ],
+   "opened": [],
+   "cash_after": 88300
+  },
+  {
+   "event": 71,
+   "open_before": [
+    71,
+    72
+   ],
+   "opened": [],
+   "cash_after": 88900
+  },
+  {
+   "event": 72,
+   "open_before": [
+    72
+   ],
+   "opened": [
+    73,
+    74,
+    75
+   ],
+   "cash_after": 89500
+  },
+  {
+   "event": 73,
+   "open_before": [
+    73,
+    74,
+    75
+   ],
+   "opened": [],
+   "cash_after": 90100
+  },
+  {
+   "event": 74,
+   "open_before": [
+    74,
+    75
+   ],
+   "opened": [],
+   "cash_after": 90700
+  },
+  {
+   "event": 75,
+   "open_before": [
+    75
+   ],
+   "opened": [
+    76
+   ],
+   "cash_after": 91300
+  },
+  {
+   "event": 76,
+   "open_before": [
+    76
+   ],
+   "opened": [
+    77
+   ],
+   "cash_after": 91900
+  },
+  {
+   "event": 77,
+   "open_before": [
+    77
+   ],
+   "opened": [
+    78
+   ],
+   "cash_after": 92025
+  },
+  {
+   "event": 78,
+   "open_before": [
+    78
+   ],
+   "opened": [
+    79
+   ],
+   "cash_after": 96025
+  },
+  {
+   "event": 79,
+   "open_before": [
+    79
+   ],
+   "opened": [
+    80
+   ],
+   "cash_after": 98025
+  },
+  {
+   "event": 80,
+   "open_before": [
+    80
+   ],
+   "opened": [
+    81,
+    82,
+    83,
+    84
+   ],
+   "cash_after": 106025
+  },
+  {
+   "event": 81,
+   "open_before": [
+    81,
+    82,
+    83,
+    84
+   ],
+   "opened": [],
+   "cash_after": 107225
+  },
+  {
+   "event": 82,
+   "open_before": [
+    82,
+    83,
+    84
+   ],
+   "opened": [],
+   "cash_after": 108725
+  },
+  {
+   "event": 83,
+   "open_before": [
+    83,
+    84
+   ],
+   "opened": [],
+   "cash_after": 110225
+  },
+  {
+   "event": 84,
+   "open_before": [
+    84
+   ],
+   "opened": [
+    86,
+    87
+   ],
+   "cash_after": 111425
+  },
+  {
+   "event": 86,
+   "open_before": [
+    86,
+    87
+   ],
+   "opened": [],
+   "cash_after": 112925
+  },
+  {
+   "event": 87,
+   "open_before": [
+    87
+   ],
+   "opened": [
+    88,
+    89,
+    90
+   ],
+   "cash_after": 114425
+  },
+  {
+   "event": 88,
+   "open_before": [
+    88,
+    89,
+    90
+   ],
+   "opened": [],
+   "cash_after": 116425
+  },
+  {
+   "event": 89,
+   "open_before": [
+    89,
+    90
+   ],
+   "opened": [],
+   "cash_after": 118425
+  },
+  {
+   "event": 90,
+   "open_before": [
+    90
+   ],
+   "opened": [
+    91
+   ],
+   "cash_after": 119625
+  },
+  {
+   "event": 91,
+   "open_before": [
+    91
+   ],
+   "opened": [
+    92
+   ],
+   "cash_after": 121125
+  },
+  {
+   "event": 92,
+   "open_before": [
+    92
+   ],
+   "opened": [
+    93,
+    94
+   ],
+   "cash_after": 126125
+  },
+  {
+   "event": 93,
+   "open_before": [
+    93,
+    94
+   ],
+   "opened": [],
+   "cash_after": 128125
+  },
+  {
+   "event": 94,
+   "open_before": [
+    94
+   ],
+   "opened": [
+    95
+   ],
+   "cash_after": 129625
+  },
+  {
+   "event": 95,
+   "open_before": [
+    95
+   ],
+   "opened": [
+    96
+   ],
+   "cash_after": 131625
+  },
+  {
+   "event": 96,
+   "open_before": [
+    96
+   ],
+   "opened": [
+    97
+   ],
+   "cash_after": 132625
+  },
+  {
+   "event": 97,
+   "open_before": [
+    97
+   ],
+   "opened": [
+    98,
+    99,
+    100
+   ],
+   "cash_after": 132750
+  },
+  {
+   "event": 98,
+   "open_before": [
+    98,
+    99,
+    100
+   ],
+   "opened": [],
+   "cash_after": 135750
+  },
+  {
+   "event": 99,
+   "open_before": [
+    99,
+    100
+   ],
+   "opened": [],
+   "cash_after": 138750
+  },
+  {
+   "event": 100,
+   "open_before": [
+    100
+   ],
+   "opened": [
+    101
+   ],
+   "cash_after": 141750
+  },
+  {
+   "event": 101,
+   "open_before": [
+    101
+   ],
+   "opened": [
+    102
+   ],
+   "cash_after": 143250
+  },
+  {
+   "event": 102,
+   "open_before": [
+    102
+   ],
+   "opened": [
+    103,
+    104
+   ],
+   "cash_after": 151250
+  },
+  {
+   "event": 103,
+   "open_before": [
+    103,
+    104
+   ],
+   "opened": [],
+   "cash_after": 152250
+  },
+  {
+   "event": 104,
+   "open_before": [
+    104
+   ],
+   "opened": [
+    105
+   ],
+   "cash_after": 153250
+  },
+  {
+   "event": 105,
+   "open_before": [
+    105
+   ],
+   "opened": [
+    106
+   ],
+   "cash_after": 156250
+  },
+  {
+   "event": 106,
+   "open_before": [
+    106
+   ],
+   "opened": [
+    107,
+    108,
+    109,
+    110
+   ],
+   "cash_after": 157250
+  },
+  {
+   "event": 107,
+   "open_before": [
+    107,
+    108,
+    109,
+    110
+   ],
+   "opened": [],
+   "cash_after": 162250
+  },
+  {
+   "event": 108,
+   "open_before": [
+    108,
+    109,
+    110
+   ],
+   "opened": [],
+   "cash_after": 167250
+  },
+  {
+   "event": 109,
+   "open_before": [
+    109,
+    110
+   ],
+   "opened": [],
+   "cash_after": 172250
+  },
+  {
+   "event": 110,
+   "open_before": [
+    110
+   ],
+   "opened": [
+    111
+   ],
+   "cash_after": 177250
+  },
+  {
+   "event": 111,
+   "open_before": [
+    111
+   ],
+   "opened": [
+    112
+   ],
+   "cash_after": 187250
+  },
+  {
+   "event": 112,
+   "open_before": [
+    112
+   ],
+   "opened": [
+    113
+   ],
+   "cash_after": 197250
+  },
+  {
+   "event": 113,
+   "open_before": [
+    113
+   ],
+   "opened": [],
+   "cash_after": 207250
+  }
+ ],
+ "never_won": [
+  120,
+  121,
+  122
+ ],
+ "story_movies": [
+  "01_DAY",
+  "02_FAN",
+  "02_FAN",
+  "05_ENG",
+  "06_SAM",
+  "07_GOD",
+  "11_PNK",
+  "12_BUD",
+  "13_KIT",
+  "09_GBE",
+  "14_MUT",
+  "15_DIK",
+  "16_RES",
+  "08_EDD",
+  "17_MET",
+  "19_FIN"
+ ]
+}

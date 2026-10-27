@@ -49,6 +49,13 @@ ROWS = {'explore_career': ','.join(f'{20000 + 4000 * i}:RETURN' for i in range(1
                             + ['3000@3:RETURN'] + ['4000@!MU_UG_ChooseCareerCar:RETURN'] * 3),
         'circuit': menu(0), 'sprint': menu(1), 'drag': menu(2), 'drift': menu(3), 'lapko': menu(4), 'freerun': menu(5)}
 
+# career_trace (docs/PLAN.md 6.1): career0's new profile and prologue, won by RN_FINISH (no 6/8: the prologue has no
+# results), RETURNs through MU_UG_NewCareerExtroFMV to MU_UG_ChooseCareerCar; then RN_CAREER (host/input.c) plays the
+# career from the game's own open list with the unlock patches off (RN_UNLOCK=0). Parse: tools/census/career_trace.py.
+ROWS['career_trace'] = ','.join(ROWS['career0'].split(',')[:ROWS['career0'].split(',').index('3000@6:RETURN')]
+                                + ['3000@6:RETURN'] * 2 + ['3000@3:RETURN'] + ['4000@!MU_UG_ChooseCareerCar:RETURN'] * 3
+                                + ['1500@=MU_UG_ChooseCareerCar:RETURN'] * 3)
+
 # After the race (flow state 6/8), RETURN walks Results -> Race Style Points -> the post-race menu (Restart, Statistics,
 # Leave Race; RETURN there opens "Restart Race? OK / Cancel", runs/leave_ret 2026-10-25). So: three RETURNs, DOWN DOWN to
 # Leave Race, RETURN, then the confirm: it starts on Cancel, LEFT moves to OK (runs/circuit.0x5678 2026-10-25: 6/8 ->
@@ -158,6 +165,7 @@ def launch(run):
     if row.startswith('explore'): env.update(RN_KEEP='120', RN_SECS='600')
     if row in OPEN: env.update(RN_OPEN=OPEN[row], RN_SECS='45', RN_KEEP='500')
     if row in CALL: env.update(RN_CALL=CALL[row])
+    if row == 'career_trace': env.update(RN_CAREER='1', RN_FINISH='1', RN_UNLOCK='0', RN_SECS='12000')
     if jmp: env.update(RN_JUMP=jmp[1], RN_SECS=str(jmp[2]), **({'RN_NEXT': jmp[3]} if len(jmp) > 3 else {}))
     if os.environ.get('RN_KEEP'): env['RN_KEEP'] = os.environ['RN_KEEP']   # a kept frame every N (look inside a long race)
     with open(f'{d}/log.txt', 'w') as log:

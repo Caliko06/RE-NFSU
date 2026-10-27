@@ -62,15 +62,29 @@ static int nobjs;
 static pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;     // buffer play state, shared with the mixer
 static int32_t master = 0;              // primary buffer volume
 
+// A dead object's slot (refs 0) is reused, and a dead buffer's PCM goes back to the guest heap once no other slot shares
+// it (DuplicateSoundBuffer copies the pointer): the table filled at career event 74 (runs/career_trace, 512 slots, a
+// few buffers per track load). The 16-byte guest object is new each time, so a stale pointer still stops in obj_of.
+static int last_new;   // the slot new_obj filled
 static uint32_t new_obj(Ctx *c, int iface) {
-    if (nobjs == MAXO) { rn_halt(c, "dsound: too many objects"); return 0; }
-    Obj *o = &objs[nobjs];
+    int k = nobjs;
+    for (int j = 0; j < nobjs && k == nobjs; j++) if (!objs[j].refs) k = j;
+    if (k == MAXO) { rn_halt(c, "dsound: too many objects"); return 0; }
+    pthread_mutex_lock(&mx);
+    Obj *o = &objs[k];
+    if (k < nobjs && o->data) {
+        int shared = 0;
+        for (int j = 0; j < nobjs; j++) shared |= j != k && objs[j].data == o->data;
+        if (!shared) guest_free(o->data);
+    }
     memset(o, 0, sizeof *o);
     o->iface = iface; o->refs = 1;
+    if (k == nobjs) nobjs++;
+    pthread_mutex_unlock(&mx);
     o->guest = guest_alloc(16);
     st(c, o->guest, vtable(iface), 4);
-    st(c, o->guest + 4, (uint32_t)nobjs + 1, 4);
-    nobjs++;
+    st(c, o->guest + 4, (uint32_t)k + 1, 4);
+    last_new = k;
     return o->guest;
 }
 static Obj *obj_of(Ctx *c, uint32_t p, int iface) {
@@ -115,7 +129,7 @@ static Obj *any_obj(Ctx *c) {
     return NULL;
 }
 static uint32_t AddRef_(Ctx *c) { Obj *o = any_obj(c); return o ? ++o->refs : 0; }
-// The last Release stops the buffer; its memory stays (guest memory, not reused). The last Release of
+// The last Release stops the buffer; its slot and memory come back on the next new_obj. The last Release of
 // an IDirectSound releases every buffer it created (DirectSound docs; Wine frees them too). Speed.exe
 // 0x653d50 lets go of its stream buffer only this way: without it the old stream loops forever.
 static uint32_t Release_(Ctx *c) {
@@ -309,17 +323,17 @@ static uint32_t IDirectSound_CreateSoundBuffer(Ctx *c) {
     uint32_t flags = ld(c, d + 4, 4), bytes = ld(c, d + 8, 4), fmt = ld(c, d + 16, 4);
     uint32_t g = new_obj(c, I_BUF);
     if (!g) return DSERR_INVALIDPARAM;
-    Obj *b = &objs[nobjs - 1];
+    Obj *b = &objs[last_new];
     b->flags = flags;
     b->owner = (int)(o - objs);
     if (flags & 1) {                    // DSBCAPS_PRIMARYBUFFER: the output, 22 kHz 8-bit stereo until SetFormat
-        if (bytes || fmt) { nobjs--; return DSERR_INVALIDPARAM; }
+        if (bytes || fmt) { b->refs = 0; return DSERR_INVALIDPARAM; }
         b->primary = 1; b->channels = 2; b->bits = 8; b->align = 2; b->rate = 22050;
         b->size = 4 * LEAD;
     } else {
         if (!fmt || bytes < 4 || bytes > 0x0fffffff || !set_format(c, b, fmt)) {
             TR("CreateSoundBuffer: format refused");
-            nobjs--;
+            b->refs = 0;
             return fmt ? DSERR_BADFORMAT : DSERR_INVALIDPARAM;
         }
         b->size = bytes - bytes % b->align;
@@ -338,7 +352,7 @@ static uint32_t IDirectSound_DuplicateSoundBuffer(Ctx *c) {
     if (!src || !out_p || src->primary) return DSERR_INVALIDCALL;
     uint32_t g = new_obj(c, I_BUF);
     if (!g) return DSERR_INVALIDPARAM;
-    Obj *b = &objs[nobjs - 1];
+    Obj *b = &objs[last_new];
     *b = *src;
     b->guest = g; b->refs = 1; b->playing = 0; b->looping = 0; b->pos = 0;
     st(c, out_p, g, 4);

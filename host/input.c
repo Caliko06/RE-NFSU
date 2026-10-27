@@ -371,10 +371,13 @@ void input_next(Ctx *c) {
     static const char *s;
     static uint32_t seen, done, raced, want, on;
 #define left rn_next_left
-    if (!s) { s = getenv("RN_NEXT"); if (!s) s = ""; else on = 1, want = (uint32_t)strtoul(s, (char **)&s, 10); }
+    extern uint32_t rn_career_stages;
+    static int career;
+    if (!s) { s = getenv("RN_NEXT"); career = getenv("RN_CAREER") != NULL; if (!s) s = "", on = career; else on = 1, want = (uint32_t)strtoul(s, (char **)&s, 10); }
     if (!on) return;
-    // The count arms when the event's first stage races, so RN_JUMP still starts it from the map
-    if ((rn_flow >> 8) == 6 && !raced) raced = 1, left = want;
+    // The count arms when the event's first stage races, so RN_JUMP still starts it from the map (RN_CAREER: the
+    // stages of the event input_career started; a single race takes one Next Race too: it leaves to the front end)
+    if ((rn_flow >> 8) == 6 && !raced) raced = 1, left = career ? rn_career_stages : want;
     if ((rn_flow >> 8) == 3 && raced && !left) {   // the event is over: the next one's count
         raced = 0;
         while (*s == '+' || *s == ',') s++;
@@ -391,14 +394,16 @@ void input_next(Ctx *c) {
     // (0x4c96f0), then 0x14141414 to leave (0x51bb50, 0x4c72d0: the hub, or the next magazine). 0x406415e3 is not one of
     // its messages (runs/cjump_8+..: it stayed up). The hook sends that pair, 60 frames apart.
     // PostRaceResults is the first screen of that list (0x49e040 / 0x49dfd0 walk it); its RETURN taps ran out on a
-    // tournament's second stage (runs/cjump_6).
+    // tournament's second stage (runs/cjump_6). Its handler 0x49ba10 has no 0x406415e3: 0xb5af2461 (accept) sets +0x40,
+    // and the next 0xc98356ba plays its out-animation (0x4f6c30) and, once done (0x4f6c80), opens the next screen
+    // (0x49dfd0). runs/career_trace stayed on it after event 3 when the RETURN taps ran out.
     static const char *const fwd[6] = {"RewardPopup", "StyleAnimator", "PostRaceResults", "MU_UG_MagazineGiveth", "MU_UG_JunkmanGiveth", "MU_UG_SamanthaGiveth"};
     static uint32_t pop[6], sent[6];
     for (int k = 0; k < 6; k++)
         if (screen_on(fwd[k])) {
             if (!pop[k]) pop[k] = rn_telem.presents;
             if (rn_telem.presents - pop[k] < 60) continue;
-            uint32_t m = k < 3 ? 0x406415e3 : sent[k]++ ? 0x14141414 : 0x911ab364;
+            uint32_t m = k < 2 ? 0x406415e3 : k == 2 ? 0xb5af2461 : sent[k]++ ? 0x14141414 : 0x911ab364;
             screen_msg(c, rdata_str(c, fwd[k]), m), pop[k] = rn_telem.presents;
         } else pop[k] = sent[k] = 0;
     static uint32_t logged;
@@ -426,6 +431,95 @@ void input_next(Ctx *c) {
     done = 1, left--;
 }
 #undef left
+
+// RN_CAREER=1: test-only trace of the Underground career as the game offers it (docs/PLAN.md 6.1 -> tools/census/
+// career_trace.py). Once a career is on (the hub MU_UG_UndergroundMenu or MU_UG_MapScreen, after event 0), each time
+// the front end rests there: read the open list the game keeps (status byte 1 at career 0x75eef8 + 0x34c + id, written
+// by 0x5a1100), take the lowest id and start it the way the map does (0x4c5df0): difficulty [0x75f240] = 1 (the
+// briefing's middle item 0x6baa2200), 0x5a0ce0 (esi = career, edi = id, ebx = record), 0x4dfa10 (eax = record); then,
+// when record +0xac names a movie, the screen swaps to MU_UG_NewCareerFMV, whose end starts the race (0x4e862f ->
+// 0x4b5df0, [0x735dc8] = 0); else 0x4b5df0 at once (ebx = race [0x7677a8]). For 7, 15 and 92 the game plays that
+// movie from the event list before the briefing (0x4c4ee0), so here too it comes before the race. RN_FINISH wins each
+// race, RN_NEXT walks the stages (the record's count +0x98) and the reward screens. Logs "career ..." lines.
+// RN_CAREER="92,113" (or "92+113", in the page's ?env=): those events in that order instead of the lowest open one (the story movies at their point in
+// Chrome, on the default unlocked career), then "career done".
+uint32_t rn_career_stages;   // stages of the event this hook started (RN_NEXT reads it when RN_CAREER is on)
+static void career_status(Ctx *c, uint8_t st[256]) { for (int k = 0; k < 256; k++) st[k] = (uint8_t)ld(c, 0x75eef8 + 0x34c + k, 1); }
+void input_career(Ctx *c) {
+    static int on = -1;
+    static uint32_t seen, last = 0, cash0, spent0, raced;   // event 0 (the prologue) starts from the new-career keys, not here
+    static uint8_t st0[256], cov0[32];
+    static const char *list;
+    if (on < 0) { list = getenv("RN_CAREER"), on = list != NULL; if (on && !strcmp(list, "1")) list = NULL; }
+    if (!on) return;
+    if ((rn_flow >> 8) == 6 && last != ~0u && !raced) {   // the race of the event started: what it really loaded
+        uint32_t race = ld(c, 0x7677a8, 4);
+        raced = 1;
+        rn_log("career race %u track %u word1 %u word2 %u mode %u stages %u opp %.8s,%.8s,%.8s (frame %u)", last, ld(c, 0x78a2f0, 4),
+               ld(c, 0x78a2fc, 4), ld(c, 0x78a31c, 4), ld(c, 0x78a300, 4), race ? ld(c, race + 0x58a0 + 0x98, 4) : 0,
+               race ? G(race + 0x58a0 + 0xd4) : "", race ? G(race + 0x58a0 + 0xf0) : "", race ? G(race + 0x58a0 + 0x10c) : "", rn_telem.presents);
+    }
+    if ((rn_flow >> 8) != 3 || !(screen_on("MU_UG_UndergroundMenu") || screen_on("MU_UG_MapScreen"))) { seen = 0; return; }
+    if (!seen) seen = rn_telem.presents;
+    if (rn_telem.presents - seen < 60) return;   // let the screen settle, and the post-race screens finish their work
+    uint8_t sb[256], cov[32];
+    // The open list is recomputed only when the event list (0x4c4a60) or the map (0x567eb0) builds: 0x5a2270 (eax = career,
+    // one arg: 12 ints of -1) runs 0x5a1100, which relocks status 1 and reopens by 0x5a0fc0. The hub does not, so call it
+    // as they do (the ints at SCREEN_ADDR + 0x100, test-only). runs/career_trace: 6 stayed locked after 1-5 were won.
+    uint32_t r0[8], buf = SCREEN_ADDR + 0x100;
+    for (int k = 0; k < 12; k++) st(c, buf + 4 * k, ~0u, 4);
+    memcpy(r0, c->r, sizeof r0);
+    c->r[EAX] = 0x75eef8, call_guest(c, 0x5a2270, 1, &buf);
+    memcpy(c->r, r0, sizeof r0);
+    career_status(c, sb);
+    for (int k = 0; k < 32; k++) cov[k] = (uint8_t)ld(c, 0x76777c + k, 1);
+    uint32_t cash = ld(c, 0x75eef8 + 0x1374, 4), spent = ld(c, 0x75eef8 + 0x137c, 4);   // 0x4c37de: a purchase moves cash to spent
+    if (last != ~0u) {   // the event before: its status, cash, what opened, the covers it gave
+        char op[512] = "", cv[128] = "";
+        size_t n = 0, m = 0;
+        for (int k = 0; k < 256; k++) if (sb[k] == 1 && st0[k] != 1 && n < sizeof op - 8) n += (size_t)snprintf(op + n, sizeof op - n, "%s%d", n ? "," : "", k);
+        for (int k = 0; k < 32; k++) if (cov[k] != cov0[k] && m < sizeof cv - 8) m += (size_t)snprintf(cv + m, sizeof cv - m, "%s%d", m ? "," : "", k);
+        rn_log("career result %u status %u cash %d gain %d spent %d opened %s covers %s beaten %u (frame %u)", last, sb[last], (int)cash,
+               (int)(cash - cash0), (int)(spent - spent0), *op ? op : "-", *cv ? cv : "-", ld(c, 0x7677ac, 4), rn_telem.presents);
+        if (sb[last] != 2) { rn_log("career stop: event %u not won", last); on = 0; return; }
+        guest_mem_log("after the event");
+    }
+    char op[512] = "";
+    size_t n = 0;
+    int id = -1;
+    for (int k = 0; k < 256; k++)
+        if (sb[k] == 1) { if (id < 0) id = k; if (n < sizeof op - 8) n += (size_t)snprintf(op + n, sizeof op - n, "%s%d", n ? "," : "", k); }
+    if (list) { while (*list == ',' || *list == '+') list++; id = *list ? (int)strtol(list, (char **)&list, 10) : -1; }
+    if (id < 0) {
+        rn_log("career done: no %s event, beaten %u, cash %d (frame %u)", list ? "listed" : "open", ld(c, 0x7677ac, 4), (int)cash, rn_telem.presents);
+#ifndef __EMSCRIPTEN__
+        fflush(NULL); _exit(0);
+#endif
+        on = 0;
+        return;
+    }
+    uint32_t rec = ld(c, 0x733ff8 + 4 * (uint32_t)id, 4);
+    rn_career_stages = ld(c, rec + 0x98, 4);
+    rn_log("career start %d open %s cash %d movie %.12s (frame %u)", id, op, (int)cash, G(rec + 0xac), rn_telem.presents);
+    memcpy(st0, sb, sizeof st0), memcpy(cov0, cov, sizeof cov0), cash0 = cash, spent0 = spent, last = (uint32_t)id, raced = 0, seen = 0;
+    uint32_t r[8];
+    memcpy(r, c->r, sizeof r);
+    st(c, 0x75f240, 1, 4);
+    c->r[ESI] = 0x75eef8, c->r[EDI] = (uint32_t)id, c->r[EBX] = rec;
+    call_guest(c, 0x5a0ce0, 0, NULL);
+    c->r[EAX] = rec;
+    call_guest(c, 0x4dfa10, 0, NULL);
+    if (ld(c, rec + 0xac, 1)) {
+        st(c, 0x735dc8, 0, 4);
+        uint32_t from = rdata_str(c, screen_on("MU_UG_MapScreen") ? "MU_UG_MapScreen" : "MU_UG_UndergroundMenu"), to = rdata_str(c, "MU_UG_NewCareerFMV");
+        c->r[EDI] = to;
+        call_guest_cdecl(c, 0x4f6360, 1, &from);
+    } else {
+        c->r[EBX] = ld(c, 0x7677a8, 4);
+        call_guest(c, 0x4b5df0, 0, NULL);
+    }
+    memcpy(c->r, r, sizeof r);
+}
 // RN_CALL="MU_Main_PC#2:41c7a0": test-only, call a game function with no arguments once, 30 frames into the n-th time
 // that screen shows. 0x41c7a0 writes <profile>.cfg and .opt (0x41e200(0x78a478), when [0x736230] names a profile), as the
 // autosave 0x4c96f0 does at 0x4c9705. Leaving Options alone saves nothing (0x4d4892: only when 0x4c9570 finds the save
