@@ -49,7 +49,8 @@ enum { SM1_U_VC = 0, SM1_U_PC = 4096, SM1_U_HP = 4224, SM1_U_FOGC = 4240, SM1_U_
 // vs 0x102e066d / ps 0x9bb3f7c7): SM1_HL_N more projectors (host/lights.c) in oT4..oT7, from VS c16..c31.
 enum { SM1_PLAIN, SM1_CAR_VS, SM1_CAR_PS, SM1_HL_VS, SM1_HL_PS };
 #define SM1_HL_N 4
-#define SM1_HL_GAIN 0.8   // another car's headlight against the player's own (1 = as bright)
+#define SM1_HL_GAIN 0.4   // another car's headlight against the player's own (1 = as bright); subtle (OWNER 2026-10-27)
+#define SM1_HL_REACH 1.5  // and shorter: its ramp read at 1.5 x depth, full to ~32 m, gone by ~65 m (the player's: 48 / 98)
 char *sm1_wgsl(const Sm1 *s, int mode);
 
 // Interpreter. A vertex: 16 inputs in, outputs out (oPos, oD0, oD1, oT0..7, oFog). A pixel: the

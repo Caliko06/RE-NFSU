@@ -17,7 +17,7 @@
 // PATCH 0x4470f0: the RNG seed reads RN_SEED at +16 (0 = the original clock seed); PATCH 0x42d4b0: RN_AUTOPILOT at +20
 // PATCH 0x42d4a9: the drag player mode at +24 (4 with RN_AUTOPILOT, else 3); PATCH 0x460a80: the steering model at +32
 // PATCH 0x4b4321: the host function that builds each race opponent (host/rivals.c) at +0x60
-// PATCH 0x40e6b5: host/lights.c headlight_clip (the headlight reach ramp) at +0x64
+// PATCH 0x57119a: host/rivals.c car_draw (racers at the LOD of the player's car) at +0x64
 #define HEAP_LO     0x00800000u
 #define HOST_BASE   0xe0000000u     // fake code addresses of host functions: HOST_BASE + 16*index
 
@@ -27,8 +27,8 @@ typedef uint32_t (*HostFn)(Ctx *c);
 typedef struct { const char *dll, *name; int nargs; HostFn fn; } Api;   // nargs < 0: cdecl
 
 extern Ctx *g_ctx;
-extern const Api win32_apis[], user32_apis[], thread_apis[], net_apis[], d3d9_apis[], dinput8_apis[], dsound_apis[], rivals_apis[], lights_apis[];
-extern const int win32_api_count, user32_api_count, thread_api_count, net_api_count, d3d9_api_count, dinput8_api_count, dsound_api_count, rivals_api_count, lights_api_count;
+extern const Api win32_apis[], user32_apis[], thread_apis[], net_apis[], d3d9_apis[], dinput8_apis[], dsound_apis[], rivals_apis[];
+extern const int win32_api_count, user32_api_count, thread_api_count, net_api_count, d3d9_api_count, dinput8_api_count, dsound_api_count, rivals_api_count;
 void lights_init(Ctx *c);   // host/lights.c
 #define LIGHTS_N 4          // other cars' headlights on the world (sm1.h SM1_HL_N, the free texcoords t4..t7)
 const float *lights_hl(Ctx *c);   // their projectors this frame: VS c16..c31 of the headlight world shaders

@@ -54,8 +54,9 @@ REA (Ghidra 12.1.4, Speed.exe sha256 c0fad450...) checked each target before the
 (0x56d9d7, ev_7cff0ca1), 0x7010ac one (0x4102ad in 0x4100a0, ev_0ee4a966), the cave 0x43a7e4 no reference and is CC
 padding after the jump table at 0x43a7d8 (ev_6a127f7b, ev_a6bf0c32).
 - Tail base 0.7 -> 0.35: a brake (16 * [car+0x1e4]) still clamps to 1.0, so braking now doubles the flare.
-- HeadlightColor (0.8, 0.8, 0.9) -> (1.0, 0.94, 0.82), warm halogen.
-- PATCH 0x40e6b5 -> cave -> headlight_clip: texels 48..55 stay 255, 56..63 fall 32 per texel: full light to ~73 m.
+- Dropped (OWNER 2026-10-27, "too bright, the game feels slow"): HeadlightColor (1.0, 0.94, 0.82) and PATCH 0x40e6b5
+  (full light to ~73 m). The player's headlight is the 2003 one again; 60 fps were steady in that session (p50 16.7 ms),
+  so the slowness was the look: a long bright beam shows the road far ahead instead of pulling it out of the dark.
 Chrome: RN_WATCH=6b5da0 reads 0.7 with RN_LIGHTS=0 and 0.35 by default.
 
 ## Part 3: projected headlights for rivals and traffic (bridge host/lights.c + host/sm1.c SM1_HL_*, web only)
@@ -74,4 +75,4 @@ REA (Ghidra 12.1.4) + runtime (RN_LIGHTSLOG, native and Chrome):
   (t1 x t2 x c0 + v0, x t0 x2); worldheadlightreflect vs 102e066d / ps 9bb3f7c7 (+ t3 reflection). Clip ramp 64x1
   (0x40e560 CreateTexture 64, 1). t4..t7 are free: 4 more projectors from VS c16..c31.
 - First try summed the cones and burnt the grid white (4 cars aim at one road); lights now combine as a screen,
-  1 - (1 - Lp) prod(1 - 0.8 h_k). A/B in Chrome at the start of race 1001: rival cones on the road, no burn.
+  1 - (1 - Lp) prod(1 - g h_k), g = SM1_HL_GAIN 0.4, each ramp read at 1.5 x depth (SM1_HL_REACH). A/B in Chrome at the start of race 1001: rival cones on the road, no burn.

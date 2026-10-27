@@ -1,15 +1,16 @@
-// BRIDGE: rivals with a soul (OWNER 2026-10-27), not in the original. The game builds each opponent in 0x4b4040: the career
-// takes a fixed preset per event (0x4b26f0, list 0x748844, FrontB.lzc chunk 0x30220: 184 presets of 0x408 bytes), quick
-// race a stock car with a random paint (0x4b3c60). Then it matches the opponent's rating to the player's (0x57f700 / 0x57f970)
-// and registers it with 0x5809c0. PATCH 0x4b4321 sends that call here first (cave 0x6736b1: jmp [SCREEN_ADDR+0x60]).
+// BRIDGE: rivals with a soul in Quick Race (OWNER 2026-10-27), not in the original. The game builds each opponent in 0x4b4040:
+// in the career ([0x78a33c] != 0) it takes the event's fixed preset (0x4b26f0, list 0x748844, FrontB.lzc chunk 0x30220: 184
+// presets of 0x408 bytes) or, past the event's records, a stock car with a random paint (0x4b3c60); quick race always the
+// latter. Then it matches the opponent's rating to the player's (0x57f700 / 0x57f970) and registers it with 0x5809c0.
+// PATCH 0x4b4321 sends that call here first (cave 0x6736b1: jmp [SCREEN_ADDR+0x60]).
 //
-// Here every opponent becomes one of POOL procedural personas (name, car, archetype, seed; the same for every save) with a
-// build of its tier made of the game's own parts (GLOBALB 0x80034602, read live from the list at 0x73ad40): kit, widebody,
-// hood, roof scoop, wing, lights, exhaust, brakes, rims, paint, vinyl layers and their colours, sponsor decals, tint, neon.
-// The build goes into a preset record of our own, and the game's preset code 0x4b26f0 applies it. 0x57f700 then matches
-// the new car to the rating the game chose, and the archetype moves one tuning category per group by +-1 (its driving).
-// Career: each preset of an event maps to one persona, so a rival comes back in the events that preset was in, and its
-// build follows the preset's tier (_1 _2 _3). The five story bosses keep their car. RN_RIVALS=0: the original.
+// The Underground career keeps the game's own rivals, always (OWNER 2026-10-27: the canon is the real cars). In Quick Race
+// every opponent becomes one of POOL procedural personas (name, car, archetype, seed) with a build of its tier made of the
+// game's own parts (GLOBALB 0x80034602, read live from the list at 0x73ad40): kit, widebody, hood, roof scoop, wing,
+// lights, exhaust, brakes, rims, paint, vinyl layers and their colours, sponsor decals, tint, neon. The build goes into a
+// preset record of our own, and the game's preset code 0x4b26f0 applies it. 0x57f700 then matches the new car to the
+// rating the game chose, and the archetype moves one tuning category per group by +-1 (its driving). RN_RIVALS=0: the
+// original in Quick Race too.
 #include "host.h"
 #include <string.h>
 
@@ -335,59 +336,39 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
     return r1 > *r0 ? r1 - *r0 : *r0 - r1;
 }
 
-static const char *BOSS[5] = {"EDDIE_SKYLINE", "SAMANTHA_CIVIC", "TJ_CIVIC", "MELISSA_350Z", "DDAY_INTEGRA"};
-static const uint8_t BOSS_ARCH[5] = {STREET, CLEAN, SHOW, SHOW, BOSO};
-
 // 0x5809c0(id, 2, ride, record, skill, ?, index) with esi = the ride slot: stdcall, 7 arguments.
 static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
     if (!on) { const char *e = getenv("RN_RIVALS"); on = e && e[0] == '0' ? -1 : 1; }
-    if (on > 0) {
+    if (on > 0 && !c->mem[0x78a33c]) {
         if (!ready) catalog(c);
-        uint32_t ride = a[2], recd = a[3], k = a[6] % NSYN, rec = syn[k];
+        uint32_t ride = a[2], k = a[6] % NSYN, rec = syn[k];
         if (a[6] <= 1) nused = 0;                                  // the first opponent of a race
         uint32_t tmp = guest_alloc(RIDE_SIZE);
         memcpy(G(tmp), G(ride), RIDE_SIZE);
-        // Career: the event's opponent record (+0 name, +0xc preset) names the preset this rival stands for.
-        uint32_t ph = c->mem[0x78a33c] && recd > 0x400000 && recd + 0x1c < c->memsz ? ld(c, recd + 0xc, 4) : 0;
-        uint32_t pp = ph ? find_preset(c, ph) : 0;
-        Persona pe, *pick_p = NULL;
-        int tier = 2, boss = -1;
-        if (pp) {
-            for (int b = 0; b < 5; b++) if (ph == hash(BOSS[b])) boss = b;
-            const char *pn = G(pp + 0x28); size_t n = strlen(pn);
-            tier = n > 2 && pn[n - 2] == '_' && pn[n - 1] >= '1' && pn[n - 1] <= '3' ? pn[n - 1] - '0' : 2;
-            if (boss >= 0) {
-                memset(&pe, 0, sizeof pe);
-                for (int i = 0; i < 20; i++) if (!strcmp(G(pp + 8), CARS[i])) pe.car = i;
-                pe.arch = BOSS_ARCH[boss]; pe.seed = ph; tier = 3; pick_p = &pe;
-            } else pick_p = fresh(ph % POOL);
-        } else {
-            // Quick race: a persona from the game's random stream; its tier from the tuning the game gave this rival.
-            int lv = 0; for (int i = 0; i < 9; i++) lv += ld(c, ride + 8 + 4 * i, 4);
-            tier = lv >= 18 ? 3 : lv >= 7 ? 2 : 1;
-            uint32_t s = ld(c, 0x6f227c, 4) ^ (a[6] * 0x85ebca6bu);
-            pick_p = fresh(rnd(&s) % POOL);
-        }
+        // A persona from the game's random stream; its tier from the tuning the game gave this rival.
+        int lv = 0; for (int i = 0; i < 9; i++) lv += ld(c, ride + 8 + 4 * i, 4);
+        int tier = lv >= 18 ? 3 : lv >= 7 ? 2 : 1;
+        uint32_t s = ld(c, 0x6f227c, 4) ^ (a[6] * 0x85ebca6bu);
+        Persona *pick_p = fresh(rnd(&s) % POOL);
         // The persona's car must reach the rating the game chose (0x57f700 can only move levels 0..3): up to 12 personas,
-        // the nearest kept. A boss keeps its car.
+        // the nearest kept.
         char nm[32]; snprintf(nm, sizeof nm, "RN_RIVAL_%u", k);
         float r0 = 0;
         Persona *best = pick_p; float bd = 1e9f;
-        for (int tries = 0; tries < (boss >= 0 ? 1 : 12); tries++) {
-            if (tries) { nused--; pick_p = fresh((int)(pick_p - pool + 1 + rnd(&ph) % 37) % POOL); }   // one slot per rival
+        for (int tries = 0; tries < 12; tries++) {
+            if (tries) { nused--; pick_p = fresh((int)(pick_p - pool + 1 + rnd(&s) % 37) % POOL); }   // one slot per rival
             float d = apply(c, ride, tmp, rec, nm, pick_p, tier, &r0);
             if (d < bd) { bd = d; best = pick_p; }
             if (d <= 12.f) break;
         }
         if (best != pick_p) { apply(c, ride, tmp, rec, nm, pick_p = best, tier, &r0); used[(nused - 1) % NSYN] = (uint32_t)(best - pool); }
         personality(c, ride, pick_p);
-        if (pp && boss < 0) snprintf(G(recd), 8, "%s", pick_p->name);
         if (getenv("RN_RIVALLOG")) {
             float r1; memcpy(&r1, G(ride + 0x428), 4);
-            rn_log("rival %u: %s %s %s tier %d (%s) rating %.1f -> %.1f", a[6], boss >= 0 ? BOSS[boss] : pick_p->name,
-                   CARS[pick_p->car], ARCH[pick_p->arch].name, tier, pp ? G(pp + 0x28) : "quick race", r0, r1);
+            rn_log("rival %u: %s %s %s tier %d rating %.1f -> %.1f", a[6], pick_p->name, CARS[pick_p->car], ARCH[pick_p->arch].name,
+                   tier, r0, r1);
             for (int sl = 0; sl < 0x78; sl++) {
                 uint32_t key = ld(c, rec + 0x4c + 8 * sl, 4);
                 for (int q = 0; key && q < nparts; q++)
@@ -403,5 +384,34 @@ static uint32_t rival_ride(Ctx *c) {
     return call_guest(c, 0x5809c0, 7, a);
 }
 
-const Api rivals_apis[] = {{"rn", "rival_ride", 7, rival_ride}};
-const int rivals_api_count = 1;
+// BRIDGE: every racer at the player's car detail (OWNER 2026-10-27: the rivals as well made as the Supra). 0x56dc30 draws
+// a car with model BODY_A..D by its size on screen, s = 3 * [view+0xc] / (distance - 3) (0x545180): s >= 120 = A,
+// >= 45 = B, >= 20 = C, else D (table 0x6b5dec, from the minimum LOD args 10 / 11 up), and ORs flag 0x800 into the draw
+// when LOD >= 1 or the car type's usage ([0x734588] + 0xc90 * [[model+4]] + 0xc54) is 2, traffic (0x56e15d). The player's
+// car is always near, so A; a rival 20-40 m ahead got B or C with the traffic flag. Two debug words of the game force the
+// body and parts LOD, 0x6f1b30 / 0x6f1b34 (-1 = by size; one reader each, 0x56e12d / 0x56e13d, no writer: REA ev_cd471810,
+// Hopper build/hopper/viewscale.txt). PATCH 0x57119a sends the race list's draw (0x571050, list [0x7361f8]) here (cave
+// 0x43a7e4: jmp [SCREEN_ADDR+0x64]); a car that is not traffic is drawn with both at 0, then they go back to -1.
+// Traffic keeps the game's LOD. RN_CARLOD=0: the original.
+static uint32_t car_draw(Ctx *c) {
+    static int lod = -1;
+    if (lod < 0) { const char *e = getenv("RN_CARLOD"); lod = !(e && e[0] == '0'); }
+    uint32_t a[12];
+    for (int k = 0; k < 12; k++) a[k] = ARG(k);
+    uint32_t m = a[0], t = m ? ld(c, m + 4, 4) : 0, tab = ld(c, 0x734588, 4);
+    int racer = lod && t && tab && ld(c, tab + 0xc90 * ld(c, t, 4) + 0xc54, 4) != 2;
+    if (getenv("RN_CARLODLOG")) {   // each model once
+        static uint32_t seen[64]; static int n;
+        int k = 0;
+        while (k < n && seen[k] != m) k++;
+        if (k == n && n < 64) seen[n++] = m, rn_log("CARLOD model %08x type %u usage %u racer %d", m, t ? ld(c, t, 4) : 0,
+                                                    t && tab ? ld(c, tab + 0xc90 * ld(c, t, 4) + 0xc54, 4) : 0, racer);
+    }
+    if (racer) { st(c, 0x6f1b30, 0, 4); st(c, 0x6f1b34, 0, 4); }
+    uint32_t r = call_guest(c, 0x56dc30, 12, a);
+    if (racer) { st(c, 0x6f1b30, 0xffffffffu, 4); st(c, 0x6f1b34, 0xffffffffu, 4); }
+    return r;
+}
+
+const Api rivals_apis[] = {{"rn", "rival_ride", 7, rival_ride}, {"rn", "car_draw", 12, car_draw}};
+const int rivals_api_count = 2;

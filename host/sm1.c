@@ -505,7 +505,7 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
                  // D3D9 samples pixels at integer positions, WebGPU at half: move by half a pixel.
                  "  o.pos.x = o.pos.x + u.hp.x * o.pos.w;\n  o.pos.y = o.pos.y - u.hp.y * o.pos.w;\n  return o;\n}\n");
     } else {
-        // Each car's cone (stage 1, projective) times its reach ramp (stage 2 at u = w * 0.005 + 0.5, as oT2.x); w <= 0.5 m
+        // Each car's cone (stage 1, projective) times its reach ramp (stage 2 at u = w * 0.005 * SM1_HL_REACH + 0.5; the player's oT2.x has no REACH); w <= 0.5 m
         // is behind or inside the car. Lights combine as a screen, 1 - (1 - Lp) prod(1 - g h_k) with Lp = t1 t2 the
         // player's, so where cars light the same road it never passes one headlight's centre (a sum burnt it white:
         // four cars on the grid). The difference over Lp goes in HeadlightColor (c0) on the diffuse (t0) x2, as Lp does.
@@ -513,8 +513,8 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
             emit(&b, "  var dark = vec3f(1.0);\n");
             for (int k = 0; k < SM1_HL_N; k++)
                 emit(&b, "  { let q = i.t%d; let ok = q.w > 0.5; let w = select(1.0, q.w, ok);\n"
-                         "    let h = textureSample(x1, s1, q.xy / w).xyz * textureSample(x2, s2, vec2f(q.w * 0.005 + 0.5, 0.5)).xyz;\n"
-                         "    dark = dark * (1.0 - select(vec3f(0.0), %.2f * h, ok)); }\n", 4 + k, SM1_HL_GAIN);
+                         "    let h = textureSample(x1, s1, q.xy / w).xyz * textureSample(x2, s2, vec2f(q.w * %.4f + 0.5, 0.5)).xyz;\n"
+                         "    dark = dark * (1.0 - select(vec3f(0.0), %.2f * h, ok)); }\n", 4 + k, 0.005 * SM1_HL_REACH, SM1_HL_GAIN);
             emit(&b, "  let lp = clamp(t1.xyz * t2.xyz, vec3f(0.0), vec3f(1.0));\n"
                      "  r0 = vec4f(r0.xyz + 2.0 * t0.xyz * (1.0 - dark) * (1.0 - lp) * u.pc[0].xyz, r0.w);\n");
         }
