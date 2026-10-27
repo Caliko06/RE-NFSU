@@ -1084,6 +1084,7 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 24, getenv("RN_AUTOPILOT") ? 4 : 3, 4);  // PATCH 0x42d4a9: drag player mode, 4 = autopilot, 3 = drag (original)
     const char *tr = getenv("RN_TRAFFIC");     // PATCH 0x57d060 (cave 0x63b270): 1 = full traffic pool, 0 = original
     st(c, SCREEN_ADDR + 28, !(tr && tr[0] == '0'), 4);
+    st(c, SCREEN_ADDR + 0x60, host_addr_of("rn", "rival_ride"), 4);   // PATCH 0x4b4321: rivals (RN_RIVALS=0 = original)
     const char *steer = getenv("RN_STEER");    // PATCH 0x460a80: 1 = the keys steer through the game's gamepad model
     st(c, SCREEN_ADDR + 32, steer && !strcmp(steer, "pad"), 4);
     // PATCH 0x63b370 (the 22 reads of the career-beaten flag) and PATCH 0x735ec1 (debug byte): 1 = everything open (the

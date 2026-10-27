@@ -199,6 +199,14 @@ PATCHES.append(dict(addr=0x585b94,
                         "0fa305c87f7000" "720e" "3c06" "750f" "a1f0617300" "833801" "7505" "e980000000",
                     when=lambda: True))
 
+# PATCH: 0x4b4321 (+ cave 0x6736b1, CC padding after the ret of 0x673690, no reference), OWNER 2026-10-27 (rivals with a
+# soul): the race setup 0x4b4040 registers each opponent with 0x5809c0(id, 2, ride, record, skill, ?, index), esi = the
+# ride slot (stdcall, ret 0x1c). That call now goes to the cave, jmp [SCREEN_ADDR+0x60] = host/rivals.c rival_ride, which
+# rebuilds the ride from a procedural persona through the game's preset code (0x4b26f0, 0x57f700) and then makes the
+# original call with the same arguments and esi. RN_RIVALS=0: the host makes only the original call.
+PATCHES.append(dict(addr=0x4b4321, old="e89ac60c00", new="e8" + _rel(0x4b4321, 0x6736b1), when=lambda: True))
+PATCHES.append(dict(addr=0x6736b1, old="cc" * 6, new="ff2560300100", entry=True, when=lambda: True))
+
 def active():
     return [p for p in PATCHES if p["when"]()]
 
