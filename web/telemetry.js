@@ -70,6 +70,26 @@ function startTelemetry(M, t0, log, logLines) {
           scripts: (e.scripts || []).slice(0, 3).map(x => `${x.invoker || x.name} ${Math.round(x.duration)}ms`) });
     }).observe({ type: 'long-animation-frame', buffered: true });
   } catch {}
+  // Display pacing: the game paces itself on QPC (limiter 0x585b40, 1/60 s), the screen on its own refresh, web/gpu.js
+  // RN_PACE counts the frames that reached the canvas. Per animation frame: none = the screen showed the previous frame
+  // again (a repeat); n > 1 = n - 1 frames never shown (drops, plus the ones the present queue threw away). Every 5 s:
+  // event 'vsync' with the refresh rate seen and both counts.
+  let vt = 0, vShown = 0, vDropped = 0, vTicks = 0, vRep = 0, vDrop = 0, vSum = 0, vMax = 0;
+  const vtick = now => {
+    const P = globalThis.RN_PACE || { shown: 0, dropped: 0 }, n = P.shown - vShown;
+    if (vt) {
+      const dt = now - vt; vTicks++; vSum += dt; vMax = Math.max(vMax, dt);
+      if (n === 0) vRep++; else vDrop += n - 1;
+      vDrop += P.dropped - vDropped;
+      if (vSum >= 5000) {
+        event('vsync', { hz: r1(1000 * vTicks / vSum), ticks: vTicks, rep: vRep, drop: vDrop, maxMs: r1(vMax) });
+        vTicks = vRep = vDrop = vSum = vMax = 0;
+      }
+    }
+    vt = now; vShown = P.shown; vDropped = P.dropped;
+    requestAnimationFrame(vtick);
+  };
+  requestAnimationFrame(vtick);
   addEventListener('visibilitychange', () => event('visibility', { state: document.visibilityState }));
   addEventListener('blur', () => event('focus', { state: 'blur' }));
   addEventListener('focus', () => event('focus', { state: 'focus' }));

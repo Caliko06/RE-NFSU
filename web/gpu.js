@@ -44,6 +44,39 @@ async function startGpu(M, canvas, report, onFrame) {
   let canvasSize = '';
   const fail = msg => { throw new Error('gpu.js: ' + msg); };
 
+  // Present queue. The game asks for vsync (CreateDevice PresentationInterval 0 = D3DPRESENT_INTERVAL_DEFAULT) and paces
+  // itself on QPC (limiter 0x585b40, 1/60 s), so on Windows Present fed D3D's queue and the screen took one frame per
+  // refresh. Writing the canvas on submit instead put each Present right at the refresh edge, its jitter picking the
+  // refresh before or after: in a 60 Hz Chrome run, windows of ~15 s every ~40 s showed 150 repeats + 150 drops per
+  // 300 refreshes (30 fps judder, the OWNER's "lagazos"). Here a Present renders into a queued texture and each animation
+  // frame shows the oldest one (at most QMAX queued: a hidden page or a slow screen drops the oldest).
+  // ?present=now = the old way (canvas on submit). RN_PACE counts what reached the screen (web/telemetry.js 'vsync').
+  const PRESENT_NOW = RN_Q.get('present') === 'now', QMAX = 3;
+  const RN_PACE = globalThis.RN_PACE = { shown: 0, dropped: 0 };
+  const shownQ = [], freeQ = [];
+  let qSize = '';
+  const queueTex = (w, h) => {
+    const s = `${w}x${h}`;
+    if (s !== qSize) { for (const q of freeQ) q.tex.destroy(); freeQ.length = 0; qSize = s; }
+    return freeQ.pop() || { w, h, tex: device.createTexture({ size: [w, h], format: 'rgba8unorm',
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC }) };
+  };
+  const recycle = q => { if (`${q.w}x${q.h}` === qSize) freeQ.push(q); else q.tex.destroy(); };
+  function showQueued() {
+    requestAnimationFrame(showQueued);
+    const q = shownQ.shift();
+    if (!q) return;
+    const tex = ctx.getCurrentTexture();
+    if (tex.width === q.w && tex.height === q.h) {
+      const e = device.createCommandEncoder();
+      e.copyTextureToTexture({ texture: q.tex }, { texture: tex }, [q.w, q.h]);
+      device.queue.submit([e.finish()]);
+      RN_PACE.shown++;
+    } else RN_PACE.dropped++;
+    recycle(q);
+  }
+  if (!PRESENT_NOW) requestAnimationFrame(showQueued);
+
   // Remaster pack (web/remaster, tools/remaster/index.py): FNV-1a 64 of a DXT level 0 -> an upscaled PNG.
   // A texture keeps its original; while its contents match the index it is drawn with the PNG (own mip chain).
   // ?remaster=0 turns it off. No index file = off.
@@ -1094,9 +1127,11 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           device.queue.writeBuffer(casU, 0, new Float32Array([w[a + 1] / cw, w[a + 2] / ch, -1 / (8 - 3 * Math.min(1, SHARP)), 0]));
           device.queue.writeBuffer(casU, 16, new Int32Array([w[a + 1] - 1, w[a + 2] - 1]));
         }
-        if (SHARP < 0) enc.copyTextureToTexture({ texture: t.tex }, { texture: ctx.getCurrentTexture() }, [w[a + 1], w[a + 2]]);
+        const q = PRESENT_NOW ? null : queueTex(cw, ch), dst = q ? q.tex : ctx.getCurrentTexture();
+        if (q) { shownQ.push(q); while (shownQ.length > QMAX) { recycle(shownQ.shift()); RN_PACE.dropped++; } } else RN_PACE.shown++;
+        if (SHARP < 0) enc.copyTextureToTexture({ texture: t.tex }, { texture: dst }, [w[a + 1], w[a + 2]]);
         else {
-          const p = enc.beginRenderPass({ timestampWrites: tsw('cas'), colorAttachments: [{ view: ctx.getCurrentTexture().createView(), loadOp: 'clear', storeOp: 'store' }] });
+          const p = enc.beginRenderPass({ timestampWrites: tsw('cas'), colorAttachments: [{ view: dst.createView(), loadOp: 'clear', storeOp: 'store' }] });
           p.setPipeline(casPipe);
           p.setBindGroup(0, device.createBindGroup({ layout: casPipe.getBindGroupLayout(0),
             entries: [{ binding: 0, resource: t.view }, { binding: 1, resource: { buffer: casU } }] }));
