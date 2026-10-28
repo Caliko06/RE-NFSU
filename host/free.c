@@ -299,8 +299,30 @@ static uint32_t free_spacing(Ctx *c) {
     return 0;
 }
 
+// TrafficAI update 0x583350 (ebp = the traffic driver): at 0x5833eb a car flagged +0x410 (no path: 0x583700 reset found none,
+// or 0x44ca70 lost it) only brakes again (0x44bcb0, vfunc 0x38), every tick, for good; it never retries 0x44cf30 and is never
+// parked, so the TrafficTeleporter (0x5988c0 moves only parked cars or ones behind the player on the route) never recycles it
+// (on the WORLD three such cars sat 1.8..2.5 km away all run). PATCH 0x5833eb (cave 0x6729f6: jmp [SCREEN_ADDR+0x84]) asks
+// here for that byte: in free mode it reads 0, so the car takes the game's own path of every other car: 0x44cf30 again, on
+// success it drives (0x583461 clears +0x410), on failure 0x5832a0 parks it and the teleporter moves it near the player.
+static uint32_t free_nopath(Ctx *c) {
+    return live ? 0 : c->mem[c->r[EBP] + 0x410];
+}
+
+// The node test of the Free Run move 0x59a2c0 (0x59a5cf, 0x59a669: call 0x4420b0, eax = road node, cl = side): bit 25 (side 0)
+// or 26 (side 1) of [node+0x84] says "traffic may spawn here". Only spawning reads it (also 0x598fb0 at 0x599025 and the
+// route move at 0x599bae). A race track sets it on a few stretches only: on 1001 none from 500 to 1750 m and 2500 to 3000 m
+// of the route (TRACKB1001, 25 sections), so with the player there the 500 m walk finds no spot and every car is parked in a
+// clump. PATCH 0x59a5cf, 0x59a669 (cave 0x439a94: jmp [SCREEN_ADDR+0x88]): in free mode every node passes; the lane
+// (0x5995e0), the 31 m spacing and the out-of-sight rules of 0x59aa60 still decide. RN_FREE=0 or a race: the node's bit.
+static uint32_t free_tnode(Ctx *c) {
+    return live ? 1 : ld(c, c->r[EAX] + 0x84, 4) >> ((c->r[ECX] & 0xff) ? 25 : 26) & 1;
+}
+
 uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
 const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traffic", 7, free_traffic},
                          {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang},
-                         {"rn", "free_place", 1, free_place}, {"rn", "free_spacing", 1, free_spacing}};
-const int free_api_count = 6;
+                         {"rn", "free_place", 1, free_place}, {"rn", "free_spacing", 1, free_spacing},
+                         {"rn", "free_nopath", 0, free_nopath},
+                         {"rn", "free_tnode", 0, free_tnode}};
+const int free_api_count = 8;

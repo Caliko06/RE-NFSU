@@ -240,6 +240,19 @@ PATCHES.append(dict(addr=0x673842, old="cc" * 6, new="ff257c300100", entry=True,
 # and the car is parked (0x5832a0), so all traffic stood still after ~60 s on 1001 and the WORLD.
 PATCHES.append(dict(addr=0x598774, old="e8672c0000", new="e8" + _rel(0x598774, 0x673848), when=lambda: True))
 PATCHES.append(dict(addr=0x673848, old="cc" * 6, new="ff2580300100", entry=True, when=lambda: True))
+# PATCH: 0x5833eb (+ cave 0x6729f6, CC padding after a ret, no reference): TrafficAI update 0x583350 reads the no-path byte
+# [ebp+0x410] (mov al, 6 bytes) and, when set, only brakes the car for good: never re-pathed, never parked, so the
+# TrafficTeleporter never recycles it. Now call host/free.c free_nopath (+ nop), which returns that byte, or 0 in free mode so
+# the car retries 0x44cf30 and is parked (0x5832a0) on failure, as every other car. RN_FREE=0: the original byte.
+PATCHES.append(dict(addr=0x5833eb, old="8a8510040000", new="e8" + _rel(0x5833eb, 0x6729f6) + "90", when=lambda: True))
+PATCHES.append(dict(addr=0x6729f6, old="cc" * 6, new="ff2584300100", entry=True, when=lambda: True))
+# PATCH: 0x59a5cf, 0x59a669 (+ cave 0x439a94, CC padding after a ret, no reference): the Free Run move 0x59a2c0 asks 0x4420b0
+# whether traffic may spawn on a road node (bit 25/26 of [node+0x84]); 1001 sets it on 40 % of its route only, so with the
+# player in the other stretches every move failed and all cars stood parked. Now host/free.c free_tnode: every node in free
+# mode, the node's bit otherwise.
+PATCHES.append(dict(addr=0x59a5cf, old="e8dc7aeaff", new="e8" + _rel(0x59a5cf, 0x439a94), when=lambda: True))
+PATCHES.append(dict(addr=0x59a669, old="e8427aeaff", new="e8" + _rel(0x59a669, 0x439a94), when=lambda: True))
+PATCHES.append(dict(addr=0x439a94, old="cc" * 6, new="ff2588300100", entry=True, when=lambda: True))
 
 # PATCH: 0x7007ec, 0x700850 (+ caves 0x6439f2, 0x6439f8: CC padding between two functions, no reference), 0x4ba207; OWNER 2026-10-28
 # (the "WORLD" entry of the Free Run list, docs/openworld/world_entry.md). 0x7007ec / 0x700850 are entries of the chunk handler table

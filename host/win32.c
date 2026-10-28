@@ -1091,6 +1091,8 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 0x6c, host_addr_of("rn", "free_traffic"), 4); // PATCH 0x4b3c2f: free mode tuned traffic
     st(c, SCREEN_ADDR + 0x7c, host_addr_of("rn", "free_place"), 4);   // PATCH 0x422b36: the traffic placer, logged
     st(c, SCREEN_ADDR + 0x80, host_addr_of("rn", "free_spacing"), 4); // PATCH 0x598774: free mode traffic spacing
+    st(c, SCREEN_ADDR + 0x84, host_addr_of("rn", "free_nopath"), 4);  // PATCH 0x5833eb: free mode retries no-path traffic
+    st(c, SCREEN_ADDR + 0x88, host_addr_of("rn", "free_tnode"), 4);   // PATCH 0x59a5cf, 0x59a669: free mode traffic on every node
     lights_init(c);                            // host/lights.c: live brake lights (RN_LIGHTS=0 = original)
     const char *steer = getenv("RN_STEER");    // PATCH 0x460a80: 1 = the keys steer through the game's gamepad model
     st(c, SCREEN_ADDR + 32, steer && !strcmp(steer, "pad"), 4);
