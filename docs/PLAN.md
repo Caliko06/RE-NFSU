@@ -2,7 +2,21 @@
 For the OWNER alone: Chrome on this Mac, tools/serve.py on 127.0.0.1:5180, saves in save/. No deploy.
 One session on main. Each milestone has one gate: the run that proves it.
 
-## Now (OWNER 2026-10-27 late): regressions before the open world
+## Now (OWNER 2026-10-28): an open world with life
+The OWNER played WORLD (remaster): invisible walls, no traffic seen, no rivals, "flat, lifeless". Wanted: rivals with
+personality (they bump you, pass close, you can chase them, they crash too), traffic around the player, no invisible
+walls. Simplest bridges and patches over the game's own AI; RE first; one check per step.
+1. Traffic recycling: in Free Run (also stock 1001) the nearest cars sit 250-600 m away in a tight group
+   (docs/openworld/re_traffic_teleport.md). Find why 0x598600 -> 0x59a2c0 fails or parks them (car+0x4d1, 0x5832a0)
+   -> verify: RN_FREELOG "traffic near" under 150 m most of a 200 s run on 1001 and 1010.
+2. Rivals: read the racer AI goal (0x455530, 0x44adc0, docs/openworld_e_re.md B) and how a racer chooses the player
+   as target/blocker; bridge a free-roam rival that drives near the player -> verify: rival distance under 100 m
+   most of a run, one contact logged.
+3. Walls: log the player position when speed drops to 0 with no visible wall; fix stub/fence there -> verify: the
+   OWNER's spots pass.
+4. Whole-city road graph (exe limits 128 sections / 255 entries) if 1-2 need streets off the tour.
+
+## Earlier (OWNER 2026-10-27 late): regressions before the open world
 The OWNER plays and sees: speed blur too strong, traffic glitches (flicker as a car loads, some still invisible, too
 few cars), "lagazos" (the game feels slow), and the road looks wet everywhere. Four RE threads, each to the cause in
 Speed.exe (the PS2 ELF for the blur), each fix behind a switch, look choices as one A/B strip for the OWNER:
