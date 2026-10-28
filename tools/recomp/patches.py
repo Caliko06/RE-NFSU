@@ -234,6 +234,12 @@ PATCHES.append(dict(addr=0x43a7ea, old="cc" * 6, new="ff256c300100", entry=True,
 # (RN_FREE=0: as shipped). Why: docs/traffic_placement.md (on 1001/1010 13 of 18 fit; now 19 of 19).
 PATCHES.append(dict(addr=0x422b36, old="e8b5601700", new="e8" + _rel(0x422b36, 0x673842), when=lambda: True))
 PATCHES.append(dict(addr=0x673842, old="cc" * 6, new="ff257c300100", entry=True, when=lambda: True))
+# PATCH: 0x598774 (+ cave 0x673848, the CC padding right after the one above): TrafficTeleporter 0x598600 asks 0x59b3e0 for the
+# spacing of each Free Run move; now host/free.c free_spacing, which calls it and in free mode turns its 99999 m (no
+# TRAFFIC_DENSITY zone under the player, or a stopped car near him) into the track's 31 m. Why: with 99999 every move fails
+# and the car is parked (0x5832a0), so all traffic stood still after ~60 s on 1001 and the WORLD.
+PATCHES.append(dict(addr=0x598774, old="e8672c0000", new="e8" + _rel(0x598774, 0x673848), when=lambda: True))
+PATCHES.append(dict(addr=0x673848, old="cc" * 6, new="ff2580300100", entry=True, when=lambda: True))
 
 # PATCH: 0x7007ec, 0x700850 (+ caves 0x6439f2, 0x6439f8: CC padding between two functions, no reference), 0x4ba207; OWNER 2026-10-28
 # (the "WORLD" entry of the Free Run list, docs/openworld/world_entry.md). 0x7007ec / 0x700850 are entries of the chunk handler table

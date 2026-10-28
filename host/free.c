@@ -39,6 +39,8 @@ static const struct { const char *name; uint32_t preset; } CANON[] = {
 
 int rn_free_now;                 // 1 while 0x4b4040 builds free mode's rivals (host/rivals.c rival_ride asks free_rival), 2 in its traffic
 static int on, live, picked[NRIV], npicked;
+static uint32_t zone_at, zone_was;     // the clear zone free_place changed (free mode, the whole race) and its value
+static int n_game, n_free;             // free_spacing: moves with the game's spacing, moves given the track's spacing
 static uint32_t names;           // NRIV guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
 
 static uint32_t rnd(uint32_t *s) { uint32_t x = *s; x ^= x << 13; x ^= x >> 17; x ^= x << 5; return *s = x ? x : 0x9e3779b9u; }
@@ -160,7 +162,13 @@ void free_tick(Ctx *c) {
     static int raced;
     if (!live) return;
     // The setup runs in the front end (state 3, runs/jump_3_1001): the race is over once state 6 went back to 3.
-    if (ld(c, 0x77a920, 4) != 6) { if (raced && ld(c, 0x77a920, 4) == 3) live = raced = 0; return; }
+    if (ld(c, 0x77a920, 4) != 6) {
+        if (raced && ld(c, 0x77a920, 4) == 3) {
+            live = raced = 0;
+            if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
+        }
+        return;
+    }
     raced = 1;
     static int log = -1;
     if (log < 0) log = getenv("RN_FREELOG") != NULL;
@@ -219,6 +227,23 @@ void free_tick(Ctx *c) {
     }
     o += snprintf(line + o, sizeof line - o, " | traffic near %.0f %.0f %.0f m", near[0], near[1], near[2]);
     rn_log("%s", line);
+    // Every 10 s, each traffic car as TrafficTeleporter 0x598600 sees it: the cars [L+0x28 + 4 i], i from L[9] to L[6]
+    // (L = [0x7361f8], 0x41f680/0x41f690), driver V = car+0x2c (0x41f5d0). Flags of V: +0x4d1 parked (0x583350, the
+    // teleporter recycles it), +0x410 no path after a reset (0x583700: braked, never parked), +0x4d0. Moved = metres since the last line.
+    if (rn_telem.presents % 600) return;
+    static float last[64][2];
+    char tl[1600]; int t = snprintf(tl, sizeof tl, "FREE tcars:");
+    uint32_t L = ld(c, 0x7361f8, 4);
+    for (uint32_t i = ld(c, L + 0x24, 4), k = 0; i < ld(c, L + 0x18, 4) && k < 64 && t < 1100; i++, k++) {
+        uint32_t r = ld(c, L + 0x28 + 4 * i, 4), v = ld(c, r + 0x2c, 4);
+        float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
+        double dx = x - ldf(c, player + 0x50), dy = y - ldf(c, player + 0x54);
+        t += snprintf(tl + t, sizeof tl - t, " %u:%.0fm/%.0f%s%s%s", i, sqrt(dx * dx + dy * dy), hypot(x - last[k][0], y - last[k][1]),
+                      c->mem[v + 0x4d1] ? "P" : "", c->mem[v + 0x410] ? "N" : "", c->mem[v + 0x4d0] ? "o" : "");
+        last[k][0] = x, last[k][1] = y;
+    }
+    t += snprintf(tl + t, sizeof tl - t, " | spacing %d game, %d free", n_game, n_free);
+    rn_log("%s", tl);
 }
 
 // The traffic placer 0x598bf0 (thiscall, ecx = [esi + 0x2f0], arg = the entrant), run step by step from race start 0x422a70
@@ -227,7 +252,11 @@ void free_tick(Ctx *c) {
 // the player's start (59aa60: [[0x736174] + side * 4 + 0xcc], 500 m, while he stands still) and on 31 m to every car already
 // placed (+0xd4, 0x59b1e0): on the base track's network (1001, and the WORLD's 1010, 520 nodes) about 13 of 18 cars fit and the
 // other tries are lost (0.1 % of 3000 tries still pass; docs/traffic_placement.md). In free mode the clear zone is FREE_ZONE
-// for the placement (RN_FREEZONE, metres) and the table is put back; RN_FREE=0 leaves the game's value.
+// for the placement (RN_FREEZONE, metres) and the whole race, and the table is put back when the race ends (free_tick);
+// RN_FREE=0 leaves the game's value. The zone must stay small after the start: the TrafficTeleporter's Free Run move
+// 0x59a2c0 walks the road graph from the player by 250 m and gives up past 500 m route distance, while 0x59aa60 rejects
+// every spot nearer than this zone (500 m), so nearly every move failed and the car was parked (0x5832a0, car+0x4d1);
+// the few that passed all landed on the same node at ~500 m (the tight groups of runs/jump_3_1001: all 19 cars parked).
 #define FREE_ZONE 100.0f
 static uint32_t free_place(Ctx *c) {
     uint32_t e = ARG(0), self = c->r[ECX], r = 0;
@@ -235,13 +264,14 @@ static uint32_t free_place(Ctx *c) {
     uint32_t tb = ld(c, 0x736174, 4) + ld(c, 0x78a2fc, 4) * 4, sp = ld(c, tb + 0xd4, 4), zn = ld(c, tb + 0xcc, 4);
     if (live) {
         float f = getenv("RN_FREEZONE") ? atof(getenv("RN_FREEZONE")) : FREE_ZONE;
+        if (zone_at != tb + 0xcc) zone_at = tb + 0xcc, zone_was = zn;
         memcpy(&c->mem[tb + 0xcc], &f, 4);
     }
     c->r[EAX] = 0x78a2f0;
     if (route) { c->r[ECX] = self; r = call_guest(c, 0x5991a0, 1, &e); step = 1; }
     if (!r) { c->r[ECX] = self; r = call_guest(c, 0x598c80, 1, &e); step = 2; }
     for (int k = 0; !r && k < (live ? 4 : 1) && (!route || ld(c, SCREEN_ADDR + 28, 4)); k++) { c->r[ECX] = self; r = call_guest(c, 0x598fb0, 1, &e); step = 3; }   // free mode: 400 tries
-    st(c, tb + 0xcc, zn, 4);
+    if (!live) st(c, tb + 0xcc, zn, 4);
     static int n, lost;
     lost += !r;
     if (getenv("RN_FREELOG")) rn_log("FREE place #%d entrant %08x route=%d spacing %.1f zone %.1f: %s (%d lost)", n++, e, route, *(float *)&sp,
@@ -249,8 +279,28 @@ static uint32_t free_place(Ctx *c) {
     return r;
 }
 
+// The spacing TrafficTeleporter 0x598600 hands each Free Run move (0x598774 call 0x59b3e0, thiscall ecx = the teleporter,
+// arg = the player, float in st0; PATCH 0x598774, cave 0x673848: jmp [SCREEN_ADDR+0x80]). 0x59b3e0 returns 99999 m unless the
+// player stands in a TRAFFIC_DENSITY zone (0x43db70: 0x4436d0 type 4 at car+0x800) and no traffic car near him is stopped
+// (0x59b8d0: speed [car+0x3d4] < 1, not parked +0x4d1, within 250 m of route); in a zone it is random between the zone's
+// two values (0x59b670 / 0x59b6a0: [zone+0x7c + i*4]). 0x599830 passes it to 0x59a2c0 -> 0x59aa60 -> 0x59b1e0, which
+// rejects a spot with any car nearer than it, so with 99999 every move fails and the car is parked for good (0x5832a0,
+// car+0x4d1). The game wants that on a race track (no new traffic outside its zones or into a jam); 1001 has two zones on
+// a 4.4 km loop (on the WORLD 1010 tour 47 of 53 moves got 99999), so after ~60 s all 19 cars stood still (runs/jump_3_1001,
+// RN_FREELOG "FREE tcars"). In free mode a 99999 becomes the track's own placement spacing ([[0x736174] + side*4 + 0xd4],
+// 31 m, the one the placer 0x598bf0 used at the start); RN_FREE=0 or a race: the game's value.
+static uint32_t free_spacing(Ctx *c) {
+    uint32_t pl = ARG(0);
+    call_guest(c, 0x59b3e0, 1, &pl);
+    if (live && c->st[c->ftop] >= 99999.0) {
+        uint32_t tb = ld(c, 0x736174, 4) + ld(c, 0x78a2fc, 4) * 4;
+        c->st[c->ftop] = ldf(c, tb + 0xd4), n_free++;
+    } else n_game++;
+    return 0;
+}
+
 uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
 const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traffic", 7, free_traffic},
                          {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang},
-                         {"rn", "free_place", 1, free_place}};
-const int free_api_count = 5;
+                         {"rn", "free_place", 1, free_place}, {"rn", "free_spacing", 1, free_spacing}};
+const int free_api_count = 6;
