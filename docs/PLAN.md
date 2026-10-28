@@ -15,9 +15,13 @@ walls. Simplest bridges and patches over the game's own AI; RE first; one check 
    c. Races (route mode 0x5999c0): same check of gaps and groups -> verify: one 1001-style race log.
    d. Phase A dense traffic with tuned street models: racer rows need baked skins (DUMMY_SKIN slots) before
       PATCH 0x57cfc7 can come back -> verify: no invisible car in a WORLD shot.
-2. Rivals: read the racer AI goal (0x455530, 0x44adc0, docs/openworld_e_re.md B) and how a racer chooses the player
-   as target/blocker; bridge a free-roam rival that drives near the player -> verify: rival distance under 100 m
-   most of a run, one contact logged.
+2. Rivals (OWNER 2026-10-28: "more rivals out of nowhere", Japan-style night driving with tuned JDM cars; by phases):
+   a. Respawn: DONE 2026-10-28, free_respawn (host/free.c): a rival > RN_RIVALFAR (400 m) is put 220..380 m of road
+      ahead or behind (a coin) with the game's reset 0x427f70. WORLD 300 s: 16 respawns, 94 % of rival samples < 400 m.
+      Open: a respawned rival drives back to its race route (it leaves again in 8..20 s) -> read the racer goal
+      (0x455530, 0x44adc0) for a roam goal near the player -> verify: fewer than 1 respawn a minute per rival.
+   b. JDM racers cruising in traffic = 1d (skins), Sonnet session.
+   c. Phase 2: 6..8 real rivals (docs/openworld/re_racer_cap.md step 0 first) -> verify: 6 named rivals in a WORLD log.
 3. Walls: log the player position when speed drops to 0 with no visible wall; fix stub/fence there -> verify: the
    OWNER's spots pass.
 4. Whole-city road graph (exe limits 128 sections / 255 entries) if 1-2 need streets off the tour.

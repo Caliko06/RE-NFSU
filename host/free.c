@@ -181,13 +181,72 @@ static uint32_t free_traffic(Ctx *c) {
 
 // Each Present (host/d3d9.c): with RN_FREELOG, every 2 s of a free mode race, each rival's distance to the player. A car of
 // the race list [0x7361f8] (next at +0, position +0x50, host/lights.c) points at its entrant at +0x14 (0x425150 reads it).
+// Respawn (OWNER 2026-10-28: rivals that leave the minimap come back "out of nowhere", ahead, behind or on a cross street).
+// Once a second, a rival farther than RN_RIVALFAR m (straight line, default 400) from the player, and not moved in the last
+// 8 s, is put on a street node 220..380 m of road from the player with the game's own AI-car reset 0x427f70, the call
+// 0x4264d0 makes when [car+0x87c] asks for a reset (stdcall, ret 0x24: car, section, node, speed, 1, dir +-1.0 along the
+// node's direction +0xc/+0x10, 0, 0, lateral 0.0); it puts the car on the node, then resets the AI to that node (ctx vt
+// 0x10, 0x30), which drives back to its route. The node: the player's (0x428150/0x428160, eax = car, arg 0, as the traffic
+// teleporter 0x59a2c0 asks it) walked with 0x4563d0 (ecx section, eax node, cdecl: &pair in/out, 1, metres, along the node
+// direction 1 / against 0, 0; 0x59a2c0 walks 250 m the same way), checked with 0x456c90 (eax = &pair). Ahead or behind is
+// a coin; the walk takes whatever link the network gives at a junction, so some land on cross streets. RN_RESPAWN=0: off.
+static uint32_t respawn_pair;
+static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
+    static int off = -1; static float far; static uint32_t seed = 0x5eed1234, done[16], when[16];
+    if (off < 0) off = getenv("RN_RESPAWN") && !atoi(getenv("RN_RESPAWN")), far = getenv("RN_RIVALFAR") ? (float)atof(getenv("RN_RIVALFAR")) : 400.0f;
+    if (off || !pc) return;
+    double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
+    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (!e || ld(c, e + 4, 4) != 2 || hypot(ldf(c, r + 0x50) - px, ldf(c, r + 0x54) - py) < far) continue;
+        int i = 0;
+        while (i < 16 && done[i] && done[i] != r) i++;
+        if (i == 16 || (done[i] == r && rn_telem.presents < when[i] + 480)) continue;
+        if (!respawn_pair) respawn_pair = guest_alloc(8);
+        uint32_t zero = 0, ft = c->ftop;
+        c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
+        c->r[EAX] = pc; uint32_t node = call_guest(c, 0x428160, 1, &zero);
+        st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
+        c->r[EAX] = respawn_pair;
+        if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; return; }
+        // along the player's node (dot of its direction and the player's motion) = ahead; the coin picks ahead or behind
+        int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, ahead = rnd(&seed) & 1;
+        float m = 220.0f + (float)(rnd(&seed) % 160);
+        uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)(along == ahead), 0};
+        memcpy(&a[2], &m, 4);
+        c->r[ECX] = sec, c->r[EAX] = node;
+        uint32_t w = call_guest_cdecl(c, 0x4563d0, 5, a);
+        uint32_t s2 = ld(c, respawn_pair, 4), n2 = ld(c, respawn_pair + 4, 4);
+        c->r[EAX] = respawn_pair;
+        if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; return; }
+        float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
+        int clear = 1;
+        for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
+            clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
+        if (!clear) { c->ftop = ft; return; }
+        float dir = ldf(c, n2 + 0xc) * vx + ldf(c, n2 + 0x10) * vy >= 0 ? 1.0f : -1.0f, cap = ldf(c, 0x700d58), v = sp < cap ? (float)sp : cap;
+        double was = hypot(ldf(c, r + 0x50) - px, ldf(c, r + 0x54) - py);
+        uint32_t p[9] = {r, s2, n2, 0, 1, 0, 0, 0, 0};
+        memcpy(&p[3], &v, 4), memcpy(&p[5], &dir, 4);
+        call_guest(c, 0x427f70, 9, p);
+        c->ftop = ft;
+        done[i] = r, when[i] = rn_telem.presents;
+        double dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py;
+        if (getenv("RN_FREELOG"))
+            rn_log("FREE respawn %s: %.0f m -> %.0f m %s (walk %s %.0f m, ret %u, node %08x dir %+.0f, %.0f m/s) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), was,
+                   hypot(dx, dy), dx * vx + dy * vy >= 0 ? "ahead" : "behind", ahead ? "ahead" : "behind", m, w, n2, dir, v, rn_telem.presents);
+        return;                                                   // one rival a second
+    }
+}
+
 void free_tick(Ctx *c) {
     static int raced;
+    static uint32_t start;           // the first race frame: respawns wait 10 s (the grid)
     if (!live) return;
     // The setup runs in the front end (state 3, runs/jump_3_1001): the race is over once state 6 went back to 3.
     if (ld(c, 0x77a920, 4) != 6) {
         if (raced && ld(c, 0x77a920, 4) == 3) {
-            live = raced = 0;
+            live = raced = 0, start = 0;
             if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
             if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
         }
@@ -199,6 +258,18 @@ void free_tick(Ctx *c) {
         st(c, 0x78a400, 1, 4);
         free_curves(c, 1);
         if (getenv("RN_FREELOG")) rn_log("FREE catch up: game %d, now 1; curve x %.0f -> %.0f m", cu_was, cu_x[0][10], ldf(c, 0x779c78 + 80));
+    }
+    if (!start) start = rn_telem.presents;
+    if (rn_telem.presents % 60 == 0) {
+        static double was[2];
+        uint32_t rh = ld(c, 0x7361f8, 4), me = 0;
+        for (uint32_t r = rh ? ld(c, rh, 4) : 0, k = 0; r && r != rh && k < 200 && !me; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4);
+            if (e && ld(c, e + 4, 4) == 1) me = r;
+        }
+        double x = me ? ldf(c, me + 0x50) : 0, y = me ? ldf(c, me + 0x54) : 0;   // m/s over the last second
+        if (me && rn_telem.presents > start + 600) free_respawn(c, rh, me, x - was[0], y - was[1]);
+        was[0] = x, was[1] = y;
     }
     static int log = -1;
     if (log < 0) log = getenv("RN_FREELOG") != NULL;
