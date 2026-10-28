@@ -227,6 +227,13 @@ PATCHES.append(dict(addr=0x6736b7, old="cc" * 6, new="ff2568300100", entry=True,
 # in a career rival's preset while free mode builds its traffic and then makes the original call.
 PATCHES.append(dict(addr=0x4b3c2f, old="e88ccd0c00", new="e8" + _rel(0x4b3c2f, 0x43a7ea), when=lambda: True))
 PATCHES.append(dict(addr=0x43a7ea, old="cc" * 6, new="ff256c300100", entry=True, when=lambda: True))
+# PATCH: 0x422b36 (+ cave 0x673842, CC padding after a ret, no reference): race start 0x422a70 calls the traffic
+# placer 0x598bf0 once per kind 3 entrant (ecx = [esi+0x2f0], push entrant); now host/free.c free_place, which runs its three
+# steps (0x5991a0 route, 0x598c80 grid, 0x598fb0 last resort) in the original order and logs which one placed the car. In free
+# mode it clears 100 m round the start instead of the game's 500 m ([[0x736174]+side*4+0xcc]) and repeats the last resort 4x
+# (RN_FREE=0: as shipped). Why: docs/traffic_placement.md (on 1001/1010 13 of 18 fit; now 19 of 19).
+PATCHES.append(dict(addr=0x422b36, old="e8b5601700", new="e8" + _rel(0x422b36, 0x673842), when=lambda: True))
+PATCHES.append(dict(addr=0x673842, old="cc" * 6, new="ff257c300100", entry=True, when=lambda: True))
 
 # PATCH: 0x7007ec, 0x700850 (+ caves 0x6439f2, 0x6439f8: CC padding between two functions, no reference), 0x4ba207; OWNER 2026-10-28
 # (the "WORLD" entry of the Free Run list, docs/openworld/world_entry.md). 0x7007ec / 0x700850 are entries of the chunk handler table
@@ -301,7 +308,7 @@ PATCHES.append(dict(addr=0x583a5b, old="e8a0300200", new="e8d1780b00", when=lamb
 
 # PATCH: 0x598c4b, OWNER 2026-10-27 (few cars). The traffic placer 0x598bf0 tries 0x5991a0 (along the route, only when
 # 0x421a50 = [0x78a344] or [0x7361a8]), then 0x598c80 (a grid slot), then 0x598fb0 (any free spot, 100 tries, 31 m apart via
-# 0x59aa60) only when 0x421a50 is false. In Free Run it is true, so with 18 entrants (the x1.5 above) 0x598c80 fails 793 of 795
+# 0x59aa60) only when 0x421a50 is false. (Measured later: in Free Run it is false, so the last resort ran anyway; see 0x422b36 above) with 18 entrants (the x1.5 above) 0x598c80 fails 793 of 795
 # tries at the start and 7 never get a car (11 cars; vanilla places 10 of 12). With [0x1301c] != 0 (RN_TRAFFIC, the switch above)
 # the last resort runs too: ecx = (al == 0 ? -1 : 0) | [0x1301c], then the original test ecx / je 0x598c69. eax is dead there.
 PATCHES.append(dict(addr=0x598c4b, old="0fb6c0f7d81bc0400fb6c8", new="3c011bc90b0d1c30010090", when=lambda: True))

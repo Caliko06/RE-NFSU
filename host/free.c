@@ -16,6 +16,7 @@
 #include <string.h>
 
 #define NRIV 3
+#define FREE_TRAFFIC 13     // free mode trackinfo traffic count (RN_FREETRAFFIC), x1.5 = 19 cars asked; the placer fits 19 to 21 with FREE_ZONE
 
 // The career's rivals (census/career_oracle.json: every event's opponents, each name with the preset of its last event).
 static const struct { const char *name; uint32_t preset; } CANON[] = {
@@ -93,7 +94,16 @@ static uint32_t free_setup(Ctx *c) {
         if (getenv("RN_FREELOG")) rn_log("FREE setup: %u entrants, %u rivals at frame %u", n, NRIV, rn_telem.presents);
         live = 1, rn_free_now = 2;                                // AddTrafficCars: free_traffic dresses the racer rows
     }
+    // The traffic count of AddTrafficCars (0x4b3b01 reads i8 [0x441fe0() + [0x78a2fc] + [0x78a300] * 2 + 0xc0], 6 on 1003 and 12 on 1001
+    // and 1010, then PATCH 0x57d060's x1.5, at most 26): set to FREE_TRAFFIC, then put back (the track table outlives the race).
+    c->r[ESI] = ld(c, 0x78a2f0, 4);                               // 0x441fe0 reads its argument in esi
+    uint32_t ti = call_guest(c, 0x441fe0, 0, NULL), cnt = ti + ld(c, 0x78a2fc, 4) + ld(c, 0x78a300, 4) * 2 + 0xc0;
+    int8_t keep = (int8_t)c->mem[cnt];
+    int base = getenv("RN_FREETRAFFIC") ? atoi(getenv("RN_FREETRAFFIC")) : FREE_TRAFFIC;
+    if (live && base > 0) c->mem[cnt] = (int8_t)base;
+    if (getenv("RN_FREELOG")) rn_log("FREE traffic asked: trackinfo count %d -> %d (x1.5, at most 26)", keep, (int8_t)c->mem[cnt]);
     uint32_t r = call_guest(c, 0x4b3ac0, 0, NULL);
+    c->mem[cnt] = (uint8_t)keep;
     rn_free_now = 0;
     return r;
 }
@@ -185,7 +195,36 @@ void free_tick(Ctx *c) {
     rn_log("%s", line);
 }
 
+// The traffic placer 0x598bf0 (thiscall, ecx = [esi + 0x2f0], arg = the entrant), run step by step from race start 0x422a70
+// (PATCH 0x422b36, cave 0x673842: jmp [SCREEN_ADDR+0x7c]): 0x5991a0 along the route (only if 0x421a50), 0x598c80 a grid slot,
+// 0x598fb0 any free spot, each with 100 random tries (free mode repeats the last one 4 times). A try fails on 0x4420a0 (node flag, 2 of 3 nodes), on the clear zone round
+// the player's start (59aa60: [[0x736174] + side * 4 + 0xcc], 500 m, while he stands still) and on 31 m to every car already
+// placed (+0xd4, 0x59b1e0): on the base track's network (1001, and the WORLD's 1010, 520 nodes) about 13 of 18 cars fit and the
+// other tries are lost (0.1 % of 3000 tries still pass; docs/traffic_placement.md). In free mode the clear zone is FREE_ZONE
+// for the placement (RN_FREEZONE, metres) and the table is put back; RN_FREE=0 leaves the game's value.
+#define FREE_ZONE 100.0f
+static uint32_t free_place(Ctx *c) {
+    uint32_t e = ARG(0), self = c->r[ECX], r = 0;
+    int route = ld(c, 0x78a344, 1) & 0xff || ld(c, 0x7361a8, 4), step = 0;
+    uint32_t tb = ld(c, 0x736174, 4) + ld(c, 0x78a2fc, 4) * 4, sp = ld(c, tb + 0xd4, 4), zn = ld(c, tb + 0xcc, 4);
+    if (live) {
+        float f = getenv("RN_FREEZONE") ? atof(getenv("RN_FREEZONE")) : FREE_ZONE;
+        memcpy(&c->mem[tb + 0xcc], &f, 4);
+    }
+    c->r[EAX] = 0x78a2f0;
+    if (route) { c->r[ECX] = self; r = call_guest(c, 0x5991a0, 1, &e); step = 1; }
+    if (!r) { c->r[ECX] = self; r = call_guest(c, 0x598c80, 1, &e); step = 2; }
+    for (int k = 0; !r && k < (live ? 4 : 1) && (!route || ld(c, SCREEN_ADDR + 28, 4)); k++) { c->r[ECX] = self; r = call_guest(c, 0x598fb0, 1, &e); step = 3; }   // free mode: 400 tries
+    st(c, tb + 0xcc, zn, 4);
+    static int n, lost;
+    lost += !r;
+    if (getenv("RN_FREELOG")) rn_log("FREE place #%d entrant %08x route=%d spacing %.1f zone %.1f: %s (%d lost)", n++, e, route, *(float *)&sp,
+                                     *(float *)&zn, r ? (step == 1 ? "route" : step == 2 ? "grid" : "last resort") : "NOT PLACED", lost);
+    return r;
+}
+
 uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
 const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traffic", 7, free_traffic},
-                         {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang}};
-const int free_api_count = 4;
+                         {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang},
+                         {"rn", "free_place", 1, free_place}};
+const int free_api_count = 5;
