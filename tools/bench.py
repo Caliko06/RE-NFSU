@@ -60,6 +60,17 @@ def report(name):
     leave = next((t for t, e in ev if hud and t > hud and e.startswith('Unloading')), None)
     if back and leave: print(f'LOAD race->menu: {leave:.2f} -> EndGameFlowLoadingFrontEnd {back:.2f} = {back - leave:.2f} s')
     if hud:   # race frames: from 3 s after the HUD (the countdown starts) to the end of the run
+        if 'holdMain' in cols:   # CPU headroom: longest main-thread GIL hold per race present (not total CPU)
+            cpu, longest = [], 0
+            for r in rows:
+                longest = max(longest, r[cols['holdMain']])
+                if r[cols['present']]:
+                    if r[cols['t']] / 1000 >= hud + 3:
+                        cpu.append(longest)
+                    longest = 0
+            cpu.sort()
+            if cpu:
+                print(f'CPU holdMain p50 {cpu[len(cpu) // 2]:.1f} ms ({len(cpu)} race presents)')
         dts = [b - a for a, b in zip(pres, pres[1:]) if a >= hud + 3]
         if dts:
             ms = sorted(d * 1000 for d in dts)

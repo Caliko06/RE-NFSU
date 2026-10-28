@@ -115,3 +115,6 @@ OWNER words: more detail in the world textures, some things more 3D, the lights 
 - Known layer gaps: GetMessageA that would wait (0x411030, window inactive), SuspendThread of a running thread
   (0x448d00, 0x5a4a50). Fix one when a run stops on it.
 - New lifter bug -> fix it in tools/recomp with the difftest (RN_ONLY trace).
+- Perf (port-nfsu2web, discarded 2026-10-28): race p50 already sits at vsync 16.7 ms, so CPU micro-ports (native
+  matrix/frustum, inlining, _ftol2, limiter sleep) move nothing; gate60 fails on spikes (max 44-81 ms), and one run
+  of the same build flips PASS/FAIL. Next perf work = profile the spike frames, and judge gate60 on several runs.
