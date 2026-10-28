@@ -871,13 +871,16 @@ static void psblur_vel(Ctx *c, uint32_t *out) {
         for (int j = 0; j < 3; j++) t[j] = m[4 * j] * v[0] + m[4 * j + 1] * v[1] + m[4 * j + 2] * v[2];
         // The car's own speed, the HUD's (+0x3d4 x 2.237 = mph, 0x6cc9f0; read so by 0x4286a0, 0x52b760): the player's node in the race
         // list [0x7361f8] (host/openworld.c player_node), next to the camera's (above).
-        uint32_t h = ld(c, 0x7361f8, 4), pn = 0;
+        // Also the cars in the list by entrant kind (+0x14 -> +4: 1 player, 3 traffic; PATCH 0x598c4b).
+        uint32_t h = ld(c, 0x7361f8, 4), pn = 0, kinds[5] = {0};
         if (h && h < GUEST_MEM - 0x1000)
             for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && r < GUEST_MEM - 0x1000 && k < 200; r = ld(c, r, 4), k++) {
-                uint32_t e = ld(c, r + 0x14, 4);
-                if (e && e < GUEST_MEM - 16 && ld(c, e + 4, 4) == 1) { pn = r; break; }
+                uint32_t e = ld(c, r + 0x14, 4), kd = e && e < GUEST_MEM - 16 ? ld(c, e + 4, 4) : 4;
+                kinds[kd < 4 ? kd : 4]++;
+                if (kd == 1 && !pn) pn = r;
             }
-        if (pn) rn_log("PSBLUR frame %u car %08x +0x3d4 %.2f m/s (%.1f mph)", dev.frames, pn, ldf(c, pn + 0x3d4), ldf(c, pn + 0x3d4) * 2.237f);
+        if (pn) rn_log("PSBLUR frame %u car %08x +0x3d4 %.2f m/s (%.1f mph) | list kinds 0:%u 1:%u 2:%u 3:%u other:%u", dev.frames, pn,
+                       ldf(c, pn + 0x3d4), ldf(c, pn + 0x3d4) * 2.237f, kinds[0], kinds[1], kinds[2], kinds[3], kinds[4]);
         rn_log("PSBLUR frame %u speed %.2f v %.2f %.2f %.2f | view1 v*R %.2f %.2f %.2f R*v %.2f %.2f %.2f | view0 v*R %.2f %.2f %.2f | nitro %u P %.4f %.4f %.4f %.4f P33 %.5f P43 %.5f",
                dev.frames, s, v[0], v[1], v[2], r[0], r[1], r[2], t[0], t[1], t[2], q[0], q[1], q[2],
                out[4], m[16], m[21], m[26], m[27], m[26], m[30]);

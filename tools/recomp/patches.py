@@ -286,6 +286,12 @@ PATCHES.append(dict(addr=0x4b3b01, old="0fbe9479c0000000", new="e80a781800909090
 PATCHES.append(dict(addr=0x583a37, old="e8c4300200", new="e8f5780b00", when=lambda: True))
 PATCHES.append(dict(addr=0x583a5b, old="e8a0300200", new="e8d1780b00", when=lambda: True))
 
+# PATCH: 0x598c4b, OWNER 2026-10-27 (few cars). The traffic placer 0x598bf0 tries 0x5991a0 (along the route, only when
+# 0x421a50 = [0x78a344] or [0x7361a8]), then 0x598c80 (a grid slot), then 0x598fb0 (any free spot, 100 tries, 31 m apart via
+# 0x59aa60) only when 0x421a50 is false. In Free Run it is true, so with 18 entrants (the x1.5 above) 0x598c80 fails 793 of 795
+# tries at the start and 7 never get a car (11 cars; vanilla places 10 of 12). With [0x1301c] != 0 (RN_TRAFFIC, the switch above)
+# the last resort runs too: ecx = (al == 0 ? -1 : 0) | [0x1301c], then the original test ecx / je 0x598c69. eax is dead there.
+PATCHES.append(dict(addr=0x598c4b, old="0fb6c0f7d81bc0400fb6c8", new="3c011bc90b0d1c30010090", when=lambda: True))
 
 def apply(img, base):
     """Patch a bytearray image mapped at base."""
