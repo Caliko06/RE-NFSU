@@ -94,6 +94,11 @@ static int build_patches(const CsIn *in, Patch **out) {
             float n[3] = {e1[1]*e2[2] - e1[2]*e2[1], e1[2]*e2[0] - e1[0]*e2[2], e1[0]*e2[1] - e1[1]*e2[0]};
             float l = sqrtf(dot3(n, n));
             if (l > 1e-12f) for (int k = 0; k < 3; k++) fn[3*t+k] = n[k] / l;
+            if (in->nrm) {   /* drawn with culling off, a face may be wound either way: its authored normals say which side is out */
+                float s = 0;
+                for (int c = 0; c < 3; c++) s += dot3(fn + 3*t, in->nrm + 3*I[3*t+c]);
+                if (s < 0) for (int k = 0; k < 3; k++) fn[3*t+k] = -fn[3*t+k];
+            }
             for (int c = 0; c < 3; c++) {
                 float a[3], b[3];
                 for (int k = 0; k < 3; k++) { a[k] = p[(c+1)%3][k] - p[c][k]; b[k] = p[(c+2)%3][k] - p[c][k]; }
@@ -119,11 +124,13 @@ static int build_patches(const CsIn *in, Patch **out) {
             for (int c = 0; c < 3; c++) {
                 int p = pid[I[3*t+c]];
                 float acc[3] = {0, 0, 0};
+                const float *own = in->nrm ? in->nrm + 3*I[3*t+c] : NULL;
                 for (int f = first[p]; f < first[p+1]; f++) {
                     int g = vf[f];
-                    if (dot3(fn + 3*g, fn + 3*t) < CREASE_COS) continue;
                     for (int k = 0; k < 3; k++) if (pid[I[3*g+k]] == p) {
-                        for (int a = 0; a < 3; a++) acc[a] += fn[3*g+a] * ang[3*g+k];
+                        const float *src = own ? in->nrm + 3*I[3*g+k] : fn + 3*g;
+                        if (own ? dot3(src, own) < CREASE_COS : dot3(fn + 3*g, fn + 3*t) < CREASE_COS) break;
+                        for (int a = 0; a < 3; a++) acc[a] += src[a] * ang[3*g+k];
                         break;
                     }
                 }
@@ -179,7 +186,9 @@ int cs_smooth(const CsIn *in, CsOut *out, int level) {
     int per = (L + 1) * (L + 2) / 2, onv = nt * per, oni = nt * L * L * 3;
     float *verts = (float *)malloc((size_t)onv * 8 * sizeof *verts);
     uint16_t *oi = (uint16_t *)malloc((size_t)oni * sizeof *oi);
-    if (!verts || !oi) { free(pt); free(verts); free(oi); return 0; }
+    int *tri = in->want_src ? (int *)malloc((size_t)onv * sizeof *tri) : NULL;
+    float *bary = in->want_src ? (float *)malloc((size_t)onv * 3 * sizeof *bary) : NULL;
+    if (!verts || !oi || (in->want_src && (!tri || !bary))) { free(pt); free(verts); free(oi); free(tri); free(bary); return 0; }
     int vo = 0, io = 0;
     for (int t = 0; t < nt; t++) {
         const Patch *q = &pt[t];
@@ -210,6 +219,7 @@ int cs_smooth(const CsIn *in, CsOut *out, int level) {
             verts[(size_t)vi*5 + 3] = UV[0][0]*u + UV[1][0]*v + UV[2][0]*w;
             verts[(size_t)vi*5 + 4] = UV[0][1]*u + UV[1][1]*v + UV[2][1]*w;
             memcpy(verts + (size_t)onv * 5 + (size_t)vi * 3, nor, sizeof nor);   /* positions + uv, then normals */
+            if (tri) { tri[vi] = t; bary[3*vi] = u; bary[3*vi+1] = v; bary[3*vi+2] = w; }
         }
         for (int r = 0; r < L; r++) for (int c = 0; c <= r; c++) {
             int a = vo + r*(r+1)/2 + c, d = vo + (r+1)*(r+2)/2 + c;
@@ -221,5 +231,6 @@ int cs_smooth(const CsIn *in, CsOut *out, int level) {
     free(pt);
     out->verts = verts; out->nverts = onv;
     out->idx = oi; out->nidx = oni;
+    out->tri = tri; out->bary = bary;
     return 1;
 }

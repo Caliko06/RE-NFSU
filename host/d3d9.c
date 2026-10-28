@@ -797,6 +797,8 @@ static void disasm_line(const char *l);
 static void geo_present(void);
 static const Obj *car_vs_obj[8];   // the car body vertex shader objects (token hash 0x4728b668); dev.vs is an internal index, not the game's handle
 static int ncar_vs;
+static const Obj *bone_vs_obj[8];  // fx\worldbone.efx's vertex shader (token hash 0x95d99bf8): the skinned NIS people (flag girl, crowd)
+static int nbone_vs;
 // Content hash of a shader's tokens: stable across runs, unlike the object id.
 static uint32_t shader_hash(const Obj *o) {
     uint32_t h = 2166136261u;
@@ -1640,6 +1642,7 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     o->hl = mode == SM1_HL_VS;
     if (getenv("RN_SMOOTH_LOG")) rn_log("SMOOTH shader %s id %x hash %08x mode %d", iface == I_VS ? "vs" : "ps", g, h, mode);
     if (mode == SM1_CAR_VS && ncar_vs < 8) car_vs_obj[ncar_vs++] = o;
+    if (iface == I_VS && h == 0x95d99bf8u && nbone_vs < 8) bone_vs_obj[nbone_vs++] = o;
     char *wgsl = sm1_wgsl(sm, mode);
     uint32_t m = (uint32_t)strlen(wgsl), nw = 21 + n + (m + 4) / 4;
     uint32_t *w = calloc(nw, 4);
@@ -1983,15 +1986,18 @@ static uint32_t IDirect3DDevice9_DrawPrimitive(Ctx *c) {
     return D3D_OK;
 }
 
-// BRIDGE: PN smoothing of the car body draws (OWNER 2026-10-20 car remaster; host/carsmooth.c). The original draws the 2003 low-poly
+// BRIDGE: PN smoothing of the car body draws (OWNER 2026-10-20 car remaster; host/carsmooth.c), and of the NIS people (worldbone.efx,
+// OWNER 2026-10-27: skin weights carried by skin_blend). The original draws the 2003 low-poly
 // meshes as authored; here a draw of the car shader (vs token hash 0x4728b668) with >= 40 triangles is curved and subdivided before
 // it goes to the GPU. Vertex offsets come from the bound declaration; results are cached by content. RN_SMOOTH=<level> (default 3, 0 = off).
 static int is_car_vs(uint32_t id) { const Obj *o = obj_k(id); for (int k = 0; k < ncar_vs; k++) if (o && car_vs_obj[k] == o) return 1; return 0; }
+static int is_bone_vs(uint32_t id) { const Obj *o = obj_k(id); for (int k = 0; k < nbone_vs; k++) if (o && bone_vs_obj[k] == o) return 1; return 0; }
 // fail: cs_smooth said no for this key (drawn as authored, not retried every frame). On the web an entry's vertices and
 // indices are resident GPU buffers SMOOTH_GPU + 2 * slot (+1), uploaded once when the entry is made.
 typedef struct { uint64_t key; uint8_t *vb; uint32_t nvert; uint16_t *idx; uint32_t nidx; int fail; } SmoothEnt;
 #define SMOOTH_GPU 0x40000000u
-static SmoothEnt smooth_cache[192];
+#define SMOOTH_N 256   // the cars' draws plus the NIS people's (a miss re-smooths a draw every frame)
+static SmoothEnt smooth_cache[SMOOTH_N];
 static uint32_t smooth_next;
 static uint64_t fnv64b(uint64_t h, const void *p, size_t n) {
     const uint8_t *b = p;
@@ -1999,9 +2005,11 @@ static uint64_t fnv64b(uint64_t h, const void *p, size_t n) {
     return h;
 }
 // Offsets of POSITION (float3), NORMAL (float3) and TEXCOORD0 (float2) in stream 0 of the bound declaration; 0 when it is not that shape.
-static int decl_offsets(int *po, int *no, int *to) {
+// sk (may be NULL) gets COLOR0 (D3DCOLOR), BLENDWEIGHT (float3) and BLENDINDICES (float3), -1 when absent: worldbone.efx's VS_INPUT.
+static int decl_offsets(int *po, int *no, int *to, int *sk) {
     Obj *d = obj_k(dev.decl);
     *po = *no = *to = -1;
+    if (sk) sk[0] = sk[1] = sk[2] = -1;
     if (!d || !d->blob) return 0;
     const uint8_t *e = (const uint8_t *)d->blob;
     for (uint32_t k = 0; k + 1 < d->nblob / 2; k++, e += 8) {
@@ -2011,8 +2019,38 @@ static int decl_offsets(int *po, int *no, int *to) {
         if (e[6] == 0 && e[7] == 0 && e[4] == 2) *po = off;        // POSITION0, D3DDECLTYPE_FLOAT3
         else if (e[6] == 3 && e[7] == 0 && e[4] == 2) *no = off;   // NORMAL0
         else if (e[6] == 5 && e[7] == 0 && e[4] == 1) *to = off;   // TEXCOORD0, FLOAT2
+        else if (sk && e[6] == 10 && e[7] == 0 && e[4] == 4) sk[0] = off;   // COLOR0, D3DCOLOR
+        else if (sk && e[6] == 1 && e[7] == 0 && e[4] == 2) sk[1] = off;    // BLENDWEIGHT, FLOAT3
+        else if (sk && e[6] == 2 && e[7] == 0 && e[4] == 2) sk[2] = off;    // BLENDINDICES, FLOAT3
     }
     return *po >= 0 && *no >= 0 && *to >= 0;
+}
+// Skin data of one smoothed vertex of a worldbone draw: the corners' bones weighted by the barycentrics, the 3 heaviest kept
+// (renormalised to the same total) heaviest first, since the shader turns the normal by index.x alone; colour interpolated.
+// Positions stay in the bind pose, so the game's own vertex shader still poses the curved mesh each frame.
+static void skin_blend(uint8_t *d, const uint8_t *const cv[3], const float *b, const int *sk) {
+    float bone[9], wt[9], total = 0, col[4] = {0, 0, 0, 0};
+    int n = 0;
+    for (int c = 0; c < 3; c++) {
+        float ww[3], ii[3];
+        memcpy(ww, cv[c] + sk[1], 12); memcpy(ii, cv[c] + sk[2], 12);
+        for (int s = 0; s < 3; s++) {
+            float w = ww[s] * b[c];
+            if (w <= 0) continue;
+            int j = 0;
+            while (j < n && bone[j] != ii[s]) j++;
+            if (j == n) { bone[n] = ii[s]; wt[n++] = 0; }
+            wt[j] += w; total += w;
+        }
+        for (int k = 0; k < 4; k++) col[k] += cv[c][sk[0] + k] * b[c];
+    }
+    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++)
+        if (wt[j] > wt[i]) { float t = wt[i]; wt[i] = wt[j]; wt[j] = t; t = bone[i]; bone[i] = bone[j]; bone[j] = t; }
+    float kept = 0, w3[3] = {0, 0, 0}, i3[3] = {0, 0, 0};
+    for (int i = 0; i < n && i < 3; i++) kept += wt[i];
+    for (int i = 0; i < n && i < 3; i++) { w3[i] = wt[i] * total / kept; i3[i] = bone[i]; }
+    if (n) { memcpy(d + sk[1], w3, 12); memcpy(d + sk[2], i3, 12); }
+    for (int k = 0; k < 4; k++) d[sk[0] + k] = (uint8_t)lrintf(col[k] < 0 ? 0 : col[k] > 255 ? 255 : col[k]);
 }
 // Tries to draw the indexed triangle list smoothed; 1 = drawn.
 static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, uint32_t nvert, uint32_t ibp, uint32_t count) {
@@ -2020,9 +2058,12 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
     if (level < 0) { const char *e = getenv("RN_SMOOTH"); level = e ? atoi(e) : 3; }
     static int slog = -1, nlog;   // RN_SMOOTH_LOG=1: why a car draw is not smoothed (first 40 draws)
     if (slog < 0) slog = getenv("RN_SMOOTH_LOG") != NULL;
-    if (!level || !is_car_vs(dev.vs)) return 0;
-    int po, no, to;
-    int dok = decl_offsets(&po, &no, &to);
+    static int npc_level = -1;   // RN_NPCSMOOTH=<level>: the same for the skinned NIS people (default 3, 0 = off)
+    if (npc_level < 0) { const char *e = getenv("RN_NPCSMOOTH"); npc_level = e ? atoi(e) : 3; }
+    int skin = npc_level && is_bone_vs(dev.vs), lv = skin ? npc_level : level;
+    if (!skin && (!level || !is_car_vs(dev.vs))) return 0;
+    int po, no, to, sk[3];
+    int dok = decl_offsets(&po, &no, &to, sk) && (!skin || (sk[0] >= 0 && sk[1] >= 0 && sk[2] >= 0));
     if (slog && nlog < 40) {
         nlog++;
         rn_log("SMOOTH draw tris %u nverts %u stride %u decl_ok %d offsets %d %d %d", count, nvert, stride, dok, po, no, to);
@@ -2033,7 +2074,7 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
             if ((e[0] | e[1] << 8) == 0xff) break;
         }
     }
-    if (count < 40 || nvert < 3 || nvert > 60000 || stride < 32 || stride > 64 || !dok) return 0;
+    if (count < (skin ? 16u : 40u) || nvert < 3 || nvert > 60000 || stride < 32 || stride > 64 || !dok) return 0;
     const uint8_t *vsrc = G(base + vmin * stride), *isrc = G(ibp);
     // Key: static buffers are named by (id, write count) and the draw's ranges, so a frame does not hash ~7 MB of car
     // vertices; dynamic ones by content.
@@ -2045,9 +2086,9 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
     } else {
         key = fnv64b(fnv64b(1469598103934665603ull, vsrc, (size_t)nvert * stride), isrc, (size_t)count * 6);
     }
-    key = fnv64b(key, &level, sizeof level) ^ ((uint64_t)vmin << 32 | stride);
+    key = fnv64b(key, &lv, sizeof lv) ^ ((uint64_t)vmin << 32 | stride);
     SmoothEnt *ent = NULL;
-    for (int k = 0; k < 192; k++) if (smooth_cache[k].key == key && (smooth_cache[k].vb || smooth_cache[k].fail)) { ent = &smooth_cache[k]; break; }
+    for (int k = 0; k < SMOOTH_N; k++) if (smooth_cache[k].key == key && (smooth_cache[k].vb || smooth_cache[k].fail)) { ent = &smooth_cache[k]; break; }
     if (ent && ent->fail) return 0;
     if (!ent) {
         float *v5 = malloc((size_t)nvert * 5 * sizeof *v5);
@@ -2062,14 +2103,22 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
             if (v < vmin || v - vmin >= nvert) { bad = 1; break; }
             ix[k] = (uint16_t)(v - vmin);
         }
-        CsIn in = {v5, (int)nvert, ix, (int)count * 3};
+        float *nr = skin ? malloc((size_t)nvert * 3 * sizeof *nr) : NULL;   // the people keep their authored normals (smoothing groups)
+        for (uint32_t k = 0; nr && k < nvert; k++) {
+            float *n = nr + 3 * k;
+            memcpy(n, vsrc + (size_t)k * stride + no, 12);
+            float l = sqrtf(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+            for (int a = 0; a < 3; a++) n[a] = l > 1e-12f ? n[a] / l : 0;
+        }
+        uint64_t t_us = now_us();
+        CsIn in = {v5, (int)nvert, ix, (int)count * 3, skin, nr};
         CsOut out;
-        int ok = !bad && cs_smooth(&in, &out, level);
-        free(v5); free(ix);
-        ent = &smooth_cache[smooth_next++ % 192];
+        int ok = !bad && cs_smooth(&in, &out, lv);
+        free(v5); free(nr);
+        ent = &smooth_cache[smooth_next++ % SMOOTH_N];
         free(ent->vb); free(ent->idx);
         ent->vb = NULL; ent->idx = NULL; ent->key = key; ent->fail = !ok;
-        if (!ok) return 0;
+        if (!ok) { free(ix); return 0; }
         ent->vb = malloc((size_t)out.nverts * stride);
         for (int k = 0; k < out.nverts; k++) {
             uint8_t *d = ent->vb + (size_t)k * stride;
@@ -2077,7 +2126,15 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
             memcpy(d + po, &out.verts[5 * k], 12);
             memcpy(d + no, &out.verts[(size_t)out.nverts * 5 + 3 * k], 12);
             memcpy(d + to, &out.verts[5 * k + 3], 8);
+            if (skin) {
+                const uint16_t *t3 = ix + 3 * out.tri[k];
+                const uint8_t *cv[3] = {vsrc + (size_t)t3[0] * stride, vsrc + (size_t)t3[1] * stride, vsrc + (size_t)t3[2] * stride};
+                skin_blend(d, cv, &out.bary[3 * k], sk);
+            }
         }
+        free(ix); free(out.tri); free(out.bary);
+        if (skin && getenv("RN_NPCLOG")) rn_log("NPC smooth entry %u: %u tris -> %d, %d verts, %.2f ms", smooth_next, count, out.nidx / 3,
+                                                out.nverts, (double)(now_us() - t_us) / 1000);
         ent->key = key; ent->nvert = (uint32_t)out.nverts; ent->idx = out.idx; ent->nidx = (uint32_t)out.nidx;
         free(out.verts);
         if (resident_on()) {
@@ -2173,6 +2230,32 @@ static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     static int smlog = -1;
     if (smlog < 0) smlog = getenv("RN_SMOOTH_LOG") != NULL;
     if (base && smlog && is_car_vs(dev.vs)) { static int nl; if (nl++ < 6) rn_log("SMOOTH call type %u i32 %d prims %u", ARG(1), i32, ARG(6)); }
+    static int npclog = -1;   // RN_NPCLOG=1: each distinct skinned draw (declaration with BLENDINDICES: fx\worldbone.efx, the NIS people)
+    if (npclog < 0) npclog = getenv("RN_NPCLOG") != NULL;
+    if (npclog) {
+        Obj *d = obj_k(dev.decl), *t = obj_k(dev.tex[0]);
+        int skin = 0;
+        if (d && d->blob) for (uint32_t k = 0; k + 1 < d->nblob / 2; k++) {
+            const uint8_t *e = (const uint8_t *)d->blob + 8 * k;
+            if ((e[0] | e[1] << 8) == 0xff) break;
+            if (e[6] == 2) skin = 1;
+        }
+        static uint64_t seen[512]; static int nseen;
+        uint64_t key = (uint64_t)dev.stream[0].vb << 40 ^ (uint64_t)ARG(5) << 20 ^ ARG(6);
+        int k = 0;
+        while (k < nseen && seen[k] != key) k++;
+        if (skin && k == nseen && nseen < 512) {
+            seen[nseen++] = key;
+            rn_log("NPC frame %u vs %x hash %08x decl %x stride %u nvert %u prims %u type %u tex %x %ux%u fmt %x",
+                   dev.frames, dev.vs, obj_k(dev.vs) ? shader_hash(obj_k(dev.vs)) : 0, dev.decl, stride, ARG(4), ARG(6), ARG(1),
+                   dev.tex[0], t ? t->w : 0, t ? t->h : 0, t ? t->fmt : 0);
+            if (nseen == 1 && d) for (uint32_t j = 0; j + 1 < d->nblob / 2; j++) {
+                const uint8_t *e = (const uint8_t *)d->blob + 8 * j;
+                if ((e[0] | e[1] << 8) == 0xff) break;
+                rn_log("NPC   elem off %u type %u usage %u idx %u", e[2] | e[3] << 8, e[4], e[6], e[7]);
+            }
+        }
+    }
     if (base && ARG(1) == 4 && !i32 && smooth_draw(c, base + (uint32_t)bv * stride, stride, ARG(3), ARG(4), lock_mem(ib) + ARG(5) * 2, ARG(6)))
         return D3D_OK;
     if (base && (ARG(1) == 4 || ARG(1) == 5) && resident(obj_k(dev.stream[0].vb)) && resident(ib)) {
