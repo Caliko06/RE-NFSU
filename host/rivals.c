@@ -340,6 +340,7 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
 static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
+    if (rn_free_now) return free_rival(c, a);                    // host/free.c: free mode's career rivals
     if (!on) { const char *e = getenv("RN_RIVALS"); on = e && e[0] == '0' ? -1 : 1; }
     if (on > 0 && !c->mem[0x78a33c]) {
         if (!ready) catalog(c);

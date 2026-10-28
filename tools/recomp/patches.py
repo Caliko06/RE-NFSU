@@ -214,6 +214,20 @@ PATCHES.append(dict(addr=0x6736b1, old="cc" * 6, new="ff2560300100", entry=True,
 PATCHES.append(dict(addr=0x57119a, old="e891caffff", new="e8" + _rel(0x57119a, 0x43a7e4), when=lambda: True))
 PATCHES.append(dict(addr=0x43a7e4, old="cc" * 6, new="ff2564300100", entry=True, when=lambda: True))
 
+# PATCH: 0x4b528d (+ cave 0x6736b7, CC padding after the rivals cave, no reference), OWNER 2026-10-27 (free mode: real
+# rivals on the track): Free Run's setup 0x4b5090 ends with AddTrafficCars 0x4b3ac0 (no arguments, no register input) and
+# never builds opponents. That call now goes to the cave, jmp [SCREEN_ADDR+0x68] = host/free.c free_setup, which builds
+# three career rivals with the game's opponent builder 0x4b4040(3, 0) and then makes the original call. RN_FREE=0: only the
+# original call.
+PATCHES.append(dict(addr=0x4b528d, old="e82ee8ffff", new="e8" + _rel(0x4b528d, 0x6736b7), when=lambda: True))
+PATCHES.append(dict(addr=0x6736b7, old="cc" * 6, new="ff2568300100", entry=True, when=lambda: True))
+# PATCH: 0x4b3c2f (+ cave 0x43a7ea, CC padding after the car_draw cave, before 0x43a7f0), same OWNER request (tuned traffic):
+# AddTrafficCars 0x4b3ac0 registers each traffic ride with 0x5809c0(0x32 + i, 3, ride, "", -1, 0, 0), esi = the ride slot
+# (stdcall). That call now goes to the cave, jmp [SCREEN_ADDR+0x6c] = host/free.c free_traffic, which dresses racer rows
+# in a career rival's preset while free mode builds its traffic and then makes the original call.
+PATCHES.append(dict(addr=0x4b3c2f, old="e88ccd0c00", new="e8" + _rel(0x4b3c2f, 0x43a7ea), when=lambda: True))
+PATCHES.append(dict(addr=0x43a7ea, old="cc" * 6, new="ff256c300100", entry=True, when=lambda: True))
+
 def active():
     return [p for p in PATCHES if p["when"]()]
 
