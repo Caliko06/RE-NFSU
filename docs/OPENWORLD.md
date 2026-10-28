@@ -55,8 +55,9 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
    section (2601..2617, one per track, hugs the route at 12-22 m: lead, probably the track's barrier geometry).
    0x34151 polygons, 0x34152 lists and the 11 prediction zones are identical in all 16 tracks and cover the whole
    city. Per track only: preload flag 0x34107 +0xa (the corridor), lookahead filter 0x34153, 0x34154. Pool = preload
-   + 2 MB (0x449996..0x4499a0), async, 3 reads in flight, LRU (0x444780), cap 256 sections per round in 0x444b50.
-   Merged set: base track, drop 0x34153 and 0x34154, keep its preload flags (the union, 341, passes the 256 cap);
+   + 2 MB (0x449996..0x4499a0), async, 3 reads in flight, LRU (0x444780), cap 256 entries in the request array of 0x444b50.
+   Merged set: base track, drop 0x34153 and 0x34154, keep its preload flags (125-203 rows). Never mark the union (341): the s16 id list of 0x444b50 is a stack array
+   (~378) with no bounds check or dedup and overflows before the 256 cap (audit R2);
    optional margin 2 -> ~6 MB at 0x4499a0. Unmeasured: load speed at top speed.
 4. Map (DONE, phase B): tools/openworld/map.py -> build/openworld/map.png + census/openworld.json. The 16 routes
    form one connected street network.
@@ -113,3 +114,9 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
   docs/openworld/audit.md (ledger + judgment list with exe replacements) and docs/openworld/d2.md (Prediction +
   UNREAD; integration only if UNREAD is empty). Next session: read both first; if absent, rerun the audit (one
   sonnet-exec). Not committed by them: review, then commit the docs and any tools/openworld changes.
+- Audit done (docs/openworld/audit.md: 41 CONFIRMED, 2 REFUTED fixed above (R1 re_coll, R2 answer 3), 16 UNREAD
+  each with its address). Next from it: fences.py has no z test, so at overpasses another deck can count as ground;
+  replace the 1-unit side probe with the exe's ground rule (0x440b50: polygons within radius 8, inclusive bbox, edge
+  test 0x4400e0, accept plane z <= zq + 1.0 from 0x6cc7bc, highest wins) with zq = wall base z, then rerun
+  fences.py -> build.py -> the D1 proof, and diff the fence set. Class choice / 5 m / 6 m in the barricade work are
+  not from the exe (J list): settle them before integrating D2.
