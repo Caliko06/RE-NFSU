@@ -976,21 +976,22 @@ static void flow_log(Ctx *c) {
 // (AI driver 0x44a310 = [driver+0x3e4], human driver 0x59bfb0 = [driver+0x44]): +4 node count, +8 node pointers, node+0x58
 // its route distance. One line a second, and one per airborne sample (car+0x3cc wheels on the ground == 0) or camera mode
 // change (ctrl+0x60). span = the node indices 0x42c4b0 chose (ctrl+0x5c8/0x5cc; -1 when its last call failed: no 5 nodes
-// over 75 m ahead).
+// over 75 m ahead). Without RN_JCLOG only the camera mode changes are logged (always on, so the OWNER's own play shows
+// in build/web.log each jump camera they got).
 static void jumpcam_log(Ctx *c) {
     static int on = -1; static uint32_t last, mode = ~0u, air;
-    if (on < 0) on = getenv("RN_JCLOG") != NULL;
-    if (!on || ld(c, 0x77a920, 4) != 6 || !ld(c, 0x7361bc, 4)) return;
+    if (on < 0) on = getenv("RN_JCLOG") != NULL ? 2 : 1;
+    if (ld(c, 0x77a920, 4) != 6 || !ld(c, 0x7361bc, 4)) return;
     uint32_t ctrl = ld(c, 0x7361bc, 4), car = ctrl ? ld(c, ctrl + 4, 4) : 0, drv = car ? ld(c, car + 0x2c, 4) : 0;
     if (!drv) return;
     uint32_t slot = ld(c, ld(c, drv, 4) + 0x20, 4), route = ld(c, drv + (slot == 0x59bfb0 ? 0x44 : 0x3e4), 4), n = route ? ld(c, route + 4, 4) : 0;
     uint32_t m = ld(c, ctrl + 0x60, 4), wheels = ld(c, car + 0x3cc, 4), now = rn_telem.presents;
-    int airborne = wheels == 0 && now >= air + 8;
-    if (now < last + 60 && m == mode && !airborne) return;
+    int airborne = on == 2 && wheels == 0 && now >= air + 8;
+    if ((on < 2 || now < last + 60) && m == mode && !airborne) return;
     if (airborne) air = now;
     last = now, mode = m;
-    rn_log("JC f%u mode %u wheels %u speed %.1f pos %.0f,%.0f drv %08x vt %08x slot20 %08x route %08x nodes %u last %.0f m "
-           "cam %08x span %d..%d 7361e8 %u 78a3fa %u", now, m, wheels, ldf(c, car + 0x3d4), ldf(c, car + 0x60), ldf(c, car + 0x64), drv,
+    rn_log("JC f%u mode %u wheels %u speed %.1f pos %.0f,%.0f,%.0f yaw %d drv %08x vt %08x slot20 %08x route %08x nodes %u last %.0f m "
+           "cam %08x span %d..%d 7361e8 %u 78a3fa %u", now, m, wheels, ldf(c, car + 0x3d4), ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), (int16_t)ld(c, car + 0x3b4, 2), drv,
            ld(c, drv, 4), slot, route, n, n && n < 4096 ? ldf(c, ld(c, route + 8 + (n - 1) * 4, 4) + 0x58) : 0.0f,
            ld(c, ctrl + 0x5c4, 4), (int)ld(c, ctrl + 0x5c8, 4), (int)ld(c, ctrl + 0x5cc, 4), ld(c, 0x7361e8, 4), ld(c, 0x78a3fa, 1));
 }

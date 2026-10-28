@@ -148,6 +148,7 @@ const t0 = Date.now();
 let text = '', seen = 0;
 const shotFe = process.env.RN_SHOT_FE, feSeen = new Set(), feDue = [], feAt = (process.env.RN_SHOT_FE_AT || '2').split(',').map(Number);
 let feN = 0;
+const shotOn = process.env.RN_SHOT_ON ? new RegExp(process.env.RN_SHOT_ON, 'g') : null, onSeen = new Set(), onDue = [];
 if (shotFe) mkdirSync(shotFe, { recursive: true });
 while (Date.now() - t0 < secs * 1000) {
   await sleep(1000);
@@ -192,6 +193,17 @@ while (Date.now() - t0 < secs * 1000) {
     const p = await send('Page.captureScreenshot', { format: 'png' });
     mkdirSync(`${shot}.d`, { recursive: true });
     if (p?.data) writeFileSync(`${shot}.d/${String(++everyN).padStart(2, '0')}.png`, Buffer.from(p.data, 'base64'));
+  }
+  // RN_SHOT_ON=regex: shots 0, 2 and 4 s after each new distinct match in the page log (e.g. "JC f\\d+ mode [67]", the jump
+  // camera) -> <shot>.on/<NN>_<s>.png, at most 30 lines.
+  if (shotOn) {
+    for (const m of text.matchAll(shotOn)) if (!onSeen.has(m[0]) && onSeen.size < 30) { onSeen.add(m[0]); for (const a of [0, 2, 4]) onDue.push({ at: Date.now() + a * 1000, n: onSeen.size, a }); }
+    for (const d of onDue.filter(d => !d.done && Date.now() >= d.at)) {
+      d.done = true;
+      const p = await send('Page.captureScreenshot', { format: 'png' });
+      mkdirSync(`${shot}.on`, { recursive: true });
+      if (p?.data) writeFileSync(`${shot}.on/${String(d.n).padStart(2, '0')}_${d.a}.png`, Buffer.from(p.data, 'base64'));
+    }
   }
   // RN_UNTIL=regex[@s]: stop s seconds (default 5) after the page log first matches (e.g. "RN_JUMP: done").
   if (until && !untilAt && until.re.test(text)) untilAt = Date.now();
