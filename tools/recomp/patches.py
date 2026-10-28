@@ -332,6 +332,18 @@ PATCHES.append(dict(addr=0x583a5b, old="e8a0300200", new="e8d1780b00", when=lamb
 # the last resort runs too: ecx = (al == 0 ? -1 : 0) | [0x1301c], then the original test ecx / je 0x598c69. eax is dead there.
 PATCHES.append(dict(addr=0x598c4b, old="0fb6c0f7d81bc0400fb6c8", new="3c011bc90b0d1c30010090", when=lambda: True))
 
+# PATCH: 0x4aa21e (+ data 0x6d3440: .rdata slack past its virtual size 0x3c439, zero, no reference), OWNER 2026-10-28:
+# the audio volumes of the OWNER's profile asas are the default. The profile/options ctor 0x4aa200 (callers 0x4a9bc0,
+# 0x4cadc0, 0x4ccab0: every new profile) set the 9 volume floats at +0x38..+0x58 to 0.9. The .opt file (save 0x41e200,
+# load 0x41e330) is dword 0x13, the 0x2e5-byte block of 0x4aaad0 (+0x39 = those floats, so file 0x3d) and its Adler-32
+# (0x41dd10). The 9 floats now come from asas.opt file 0x3d..0x60 (0.2 0.7 0.5 0.7 0.8 0.9 0.9 0.9 0.9), same bits:
+#   lea edi,[esi+0x38]; push esi; mov esi,0x6d3440; mov ecx,9; rep movsd; pop esi; nop x15
+# ecx ends 0 as before (0x4aa20d); edi and eax are set again right after (0x4aa23e, 0x4aa25e).
+PATCHES.append(dict(addr=0x4aa21e, old="b86666663f894638" + "89463c894640894644894648" + "89464c894650894654894658",
+                    new="8d7e3856be40346d00b909000000f3a55e" + "90" * 15, when=lambda: True))
+PATCHES.append(dict(addr=0x6d3440, old="00" * 36, when=lambda: True,
+                    new="c8cc4c3e3233333ffdffff3e3233333fcccc4c3f6666663f6666663f6666663f6666663f"))
+
 def apply(img, base):
     """Patch a bytearray image mapped at base."""
     for p in active():
