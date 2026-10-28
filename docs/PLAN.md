@@ -2,11 +2,19 @@
 For the OWNER alone: Chrome on this Mac, tools/serve.py on 127.0.0.1:5180, saves in save/. No deploy.
 One session on main. Each milestone has one gate: the run that proves it.
 
-## Now (OWNER 2026-10-27 night): open world
+## Now (OWNER 2026-10-27 late): regressions before the open world
+The OWNER plays and sees: speed blur too strong, traffic glitches (flicker as a car loads, some still invisible, too
+few cars), "lagazos" (the game feels slow), and the road looks wet everywhere. Four RE threads, each to the cause in
+Speed.exe (the PS2 ELF for the blur), each fix behind a switch, look choices as one A/B strip for the OWNER:
+1. Blur (e359add psblur): PS2 Z -> alpha and scale from the ELF; PS_FAR = 200 and the W/512 offsets are guesses.
+2. Lag: OWNER telemetry 2026-10-27 shows Present steady (95 % 15-18 ms, 1 frame > 33): measure sim steps per Present.
+3. Traffic: cars in the game's list vs drawn per frame (native vs Chrome); spawn, despawn, density from the exe.
+4. Road: fx\worldreflect.efx (ReflectedTexMin, ROAD_WET, PUDDLE): full reflection only where the game marks it.
+Then the open world resumes (docs/OPENWORLD.md, HANDOFF of a96d0ca).
+
+## Open world (paused, OWNER 2026-10-27 night)
 All of Olympic City (L1RA, the 16 street tracks) drivable with no fences, GTA style, apart from Free Run. Out: drag
-and drift arenas, test track, new menus, police, online. Phases and answers: docs/OPENWORLD.md; where the last
-session stopped: HANDOFF.md. Before it (see git log): Block 6 below, night lights (docs/night_re.md), Free Run with
-career rivals (host/free.c). The census is at 167/167; progress is the OWNER's playthrough and gate60 per track.
+and drift arenas, test track, new menus, police, online. Phases and answers: docs/OPENWORLD.md.
 
 ## Done
 - M0 census. M1 lifter: whole exe lifted, gate pass (census/difftest.json).
