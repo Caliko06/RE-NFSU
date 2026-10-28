@@ -63,6 +63,7 @@ static void free_curves(Ctx *c, int on) {
     saved = on;
 }
 static int n_game, n_free;             // free_spacing: moves with the game's spacing, moves given the track's spacing
+static int n_far, n_offbit, n_onbit;   // free_recycle: far cars sent to a move; free_tnode: cars placed on a node without / with the bit
 static uint32_t names;           // NRIV guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
 
 static uint32_t rnd(uint32_t *s) { uint32_t x = *s; x ^= x << 13; x ^= x >> 17; x ^= x << 5; return *s = x ? x : 0x9e3779b9u; }
@@ -227,6 +228,30 @@ void free_tick(Ctx *c) {
         if (ty > 0x15) ty = 0x15;
         if (ty != last_type[j]) acts[j][ty]++, last_type[j] = ty;
     }
+    // Each traffic car that jumped > 60 m in one frame was moved by the TrafficTeleporter (0x599830): where it landed, as the
+    // straight and route distance ([car+0x814]) from the player, and whether it is in front of the player's nose (camera side).
+    // Keyed by the car pointer: the game reorders this list, so a list index is not a car.
+    static float tpos[200][2], ppos[2]; static uint32_t tframe[200], tcar[200], ntcar;
+    uint32_t pc = 0;
+    for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !pc; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (e && ld(c, e + 4, 4) == 1) pc = r;
+    }
+    double vx = pc ? (ldf(c, pc + 0x50) - ppos[0]) * 60 : 0, vy = pc ? (ldf(c, pc + 0x54) - ppos[1]) * 60 : 0;   // m/s at 60 fps
+    if (pc) ppos[0] = ldf(c, pc + 0x50), ppos[1] = ldf(c, pc + 0x54);
+    for (uint32_t r = pc ? ld(c, h, 4) : h, k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4), i = 0;
+        if (!e || ld(c, e + 4, 4) != 3) continue;
+        while (i < ntcar && tcar[i] != r) i++;
+        if (i == ntcar) { if (ntcar == 200) continue; tcar[ntcar++] = r; tframe[i] = 0; }
+        float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
+        if (tframe[i] + 1 == rn_telem.presents && hypot(x - tpos[i][0], y - tpos[i][1]) > 60) {
+            double dx = x - ldf(c, pc + 0x50), dy = y - ldf(c, pc + 0x54);
+            rn_log("FREE tp car %u: %.0f m (route %+.0f) %s, player %.0f m/s, frame %u", i, hypot(dx, dy), ldf(c, r + 0x814) - ldf(c, pc + 0x814),
+                   dx * vx + dy * vy >= 0 ? "ahead" : "behind", hypot(vx, vy), rn_telem.presents);
+        }
+        tpos[i][0] = x, tpos[i][1] = y, tframe[i] = rn_telem.presents;
+    }
     if (rn_telem.presents % 120) return;
     int ntraffic = 0;
     for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
@@ -309,7 +334,7 @@ void free_tick(Ctx *c) {
         for (int ty = 0; ty < 0x16; ty++) if (acts[j][ty]) a += snprintf(al + a, sizeof al - a, " %x:%u", ty, acts[j][ty]);
         rn_log("%s", al);
     }
-    t += snprintf(tl + t, sizeof tl - t, " | spacing %d game, %d free", n_game, n_free);
+    t += snprintf(tl + t, sizeof tl - t, " | spacing %d game, %d free | far %d | placed on node bit %d, off %d", n_game, n_free, n_far, n_onbit, n_offbit);
     // The catch-up's gates (re_rivals_ai.md 4): 0x78a344 (byte), 0x7361a8, 0x78a320 > 0, 0x7360ac, [0x7361f0] != 9, players 0x7361c4,
     // player 0x7361bc, strength [0x78a404 + 4 slot], difficulty 0x78a40c.
     uint32_t pt = ld(c, 0x7361f0, 4);
@@ -401,7 +426,30 @@ static uint32_t free_nopath(Ctx *c) {
 // clump. PATCH 0x59a5cf, 0x59a669 (cave 0x439a94: jmp [SCREEN_ADDR+0x88]): in free mode every node passes; the lane
 // (0x5995e0), the 31 m spacing and the out-of-sight rules of 0x59aa60 still decide. RN_FREE=0 or a race: the node's bit.
 static uint32_t free_tnode(Ctx *c) {
-    return live ? 1 : ld(c, c->r[EAX] + 0x84, 4) >> ((c->r[ECX] & 0xff) ? 25 : 26) & 1;
+    uint32_t bit = ld(c, c->r[EAX] + 0x84, 4) >> ((c->r[ECX] & 0xff) ? 25 : 26) & 1;
+    if (live && ld(c, c->r[ESP], 4) == 0x59a66e) bit ? n_onbit++ : n_offbit++;   // the second call: the node the car is placed on
+    return live ? 1 : bit;
+}
+
+// TrafficTeleporter 0x598600 asks 0x5988c0 (call at 0x5987f6, thiscall ecx = the teleporter, arg = the car) whether a car
+// needs a move: only when parked (+0x4d1 of its driver) or "passed" (0x598a50: route position [car+0x814] behind or ahead
+// of the nearest player's, same section by vfunc 0x40, relative speed [car+0x3d4]) and not within 250 m of route of a player
+// (0x59ac20 -> 0x59ad90, race state 4). Every rule is along the race route, which fits a race (cars stay near the route the
+// player drives) but not free roam: a car that drove off into another street is never "passed" and drives on, 1..2.5 km
+// away, for good (WORLD 1010, RN_FREELOG: 17 of 19 cars at 600..2450 m for the whole run, 3 moves in 75 s). PATCH 0x5987f6
+// (cave 0x439a9a: jmp [SCREEN_ADDR+0x8c]): in free mode a car farther than the move's own route limit ([0x6b5a3c], 500 m)
+// in a straight line also needs a move, so the cars stay in the band the teleporter keeps around the player. RN_FREE=0 or
+// a race: the game's answer.
+static uint32_t free_recycle(Ctx *c) {
+    uint32_t car = ARG(0), r = call_guest(c, 0x5988c0, 1, &car) & 0xff, h = ld(c, 0x7361f8, 4);
+    if (!live || r || !h) return r;
+    for (uint32_t p = ld(c, h, 4), k = 0; p && p != h && k < 200; p = ld(c, p, 4), k++) {
+        uint32_t e = ld(c, p + 0x14, 4);
+        if (!e || ld(c, e + 4, 4) != 1) continue;
+        if (hypot(ldf(c, car + 0x50) - ldf(c, p + 0x50), ldf(c, car + 0x54) - ldf(c, p + 0x54)) > ldf(c, 0x6b5a3c)) r = 1, n_far++;
+        break;
+    }
+    return r;
 }
 
 uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
@@ -409,5 +457,5 @@ const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traff
                          {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang},
                          {"rn", "free_place", 1, free_place}, {"rn", "free_spacing", 1, free_spacing},
                          {"rn", "free_nopath", 0, free_nopath},
-                         {"rn", "free_tnode", 0, free_tnode}};
-const int free_api_count = 8;
+                         {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle}};
+const int free_api_count = 9;

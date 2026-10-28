@@ -253,6 +253,12 @@ PATCHES.append(dict(addr=0x6729f6, old="cc" * 6, new="ff2584300100", entry=True,
 PATCHES.append(dict(addr=0x59a5cf, old="e8dc7aeaff", new="e8" + _rel(0x59a5cf, 0x439a94), when=lambda: True))
 PATCHES.append(dict(addr=0x59a669, old="e8427aeaff", new="e8" + _rel(0x59a669, 0x439a94), when=lambda: True))
 PATCHES.append(dict(addr=0x439a94, old="cc" * 6, new="ff2588300100", entry=True, when=lambda: True))
+# PATCH: 0x5987f6 (+ cave 0x439a9a, the CC padding right after the one above): TrafficTeleporter 0x598600 asks 0x5988c0 whether a car
+# needs a move; its rules are all along the race route, so in free roam a car that drove into another street was never moved and
+# drove on 1..2.5 km away (17 of 19 cars on the WORLD). Now host/free.c free_recycle: the game's answer, or in free mode also yes
+# when the car is farther than 500 m ([0x6b5a3c], the move's route limit) in a straight line from the player.
+PATCHES.append(dict(addr=0x5987f6, old="e8c5000000", new="e8" + _rel(0x5987f6, 0x439a9a), when=lambda: True))
+PATCHES.append(dict(addr=0x439a9a, old="cc" * 6, new="ff258c300100", entry=True, when=lambda: True))
 
 # PATCH: 0x7007ec, 0x700850 (+ caves 0x6439f2, 0x6439f8: CC padding between two functions, no reference), 0x4ba207; OWNER 2026-10-28
 # (the "WORLD" entry of the Free Run list, docs/openworld/world_entry.md). 0x7007ec / 0x700850 are entries of the chunk handler table

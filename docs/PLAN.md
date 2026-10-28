@@ -6,9 +6,15 @@ One session on main. Each milestone has one gate: the run that proves it.
 The OWNER played WORLD (remaster): invisible walls, no traffic seen, no rivals, "flat, lifeless". Wanted: rivals with
 personality (they bump you, pass close, you can chase them, they crash too), traffic around the player, no invisible
 walls. Simplest bridges and patches over the game's own AI; RE first; one check per step.
-1. Traffic recycling: in Free Run (also stock 1001) the nearest cars sit 250-600 m away in a tight group
-   (docs/openworld/re_traffic_teleport.md). Find why 0x598600 -> 0x59a2c0 fails or parks them (car+0x4d1, 0x5832a0)
-   -> verify: RN_FREELOG "traffic near" under 150 m most of a 200 s run on 1001 and 1010.
+1. Traffic recycling: DONE 2026-10-28 for gaps (free_recycle, PATCH 0x5987f6: cars > 500 m also move; WORLD 1010 nearest
+   car < 150 m in 219/223 lines, docs/openworld/re_traffic_teleport.md). Open:
+   a. Odd places: 122/301 free placements land on nodes without the designer bit (free_tnode) -> verify: placed on node
+      bit only, nearest car < 150 m still in most lines on 1001 and 1010.
+   b. Groups: every move lands ~230 m ahead, one per tick; read how 0x599c80 spreads spawn objects (+0x70/+0x90) and use
+      that spread -> verify: tp straight distance spread p25..p75 > 100 m.
+   c. Races (route mode 0x5999c0): same check of gaps and groups -> verify: one 1001-style race log.
+   d. Phase A dense traffic with tuned street models: racer rows need baked skins (DUMMY_SKIN slots) before
+      PATCH 0x57cfc7 can come back -> verify: no invisible car in a WORLD shot.
 2. Rivals: read the racer AI goal (0x455530, 0x44adc0, docs/openworld_e_re.md B) and how a racer chooses the player
    as target/blocker; bridge a free-roam rival that drives near the player -> verify: rival distance under 100 m
    most of a run, one contact logged.
