@@ -10,7 +10,6 @@
 //    height is the z it was given; the height comes back on the FPU) are logged each RN_WORLD_LOG presents (default 60). No hook in d3d9.c is allowed in
 //    this phase, so a host thread takes the GIL every 20 ms (it runs when the main thread passes the GIL, as the winmm timer
 //    threads do) and calls the guest on its own context (own stack and TEB).
-#ifndef __EMSCRIPTEN__
 #include <ctype.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -31,6 +30,9 @@ static int ci_eq(const char *a, const char *b, size_t n) {
     return 1;
 }
 
+#ifdef __EMSCRIPTEN__
+static void tp_start(void) {}     // the test teleport is native only
+#else
 static void *tp_thread(void *arg);
 static void tp_start(void) {
     static int started;
@@ -40,6 +42,18 @@ static void tp_start(void) {
     pthread_create(&t, NULL, tp_thread, NULL);
     pthread_detach(t);
 }
+#endif
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+// The size of a file the server has at "/<path>", -1 when it has none.
+EM_JS(double, world_head, (const char *path), {
+    var x = new XMLHttpRequest();
+    x.open('HEAD', '/' + UTF8ToString(path), false);
+    x.send();
+    return x.status === 200 ? Number(x.getResponseHeader('Content-Length')) : -1;
+});
+#endif
 
 // gpath ends in TRACKB<id>.LZC (any case, any folder): the merged file when it exists. 1 = served (real and size are set).
 int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
@@ -52,15 +66,24 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
     unsigned id = 0;
     while (isdigit((unsigned char)*e)) id = id * 10 + (unsigned)(*e++ - '0');
     if (!ci_eq(e, ".LZC", 5)) return 0;
+#ifdef __EMSCRIPTEN__
+    // Web (?world=1): tools/serve.py serves build/openworld at /world/; host/files.c web_read fetches "<real>" by range.
+    snprintf(real, n, "world/TRACKB%u.lzc", id);
+    double len = world_head(real);
+    if (len < 0) { rn_log("OPENWORLD: no merged file /%s, the original TRACKB%u is used", real, id); return 0; }
+    *size = (uint64_t)len;
+#else
     const char *dir = getenv("RN_WORLD_DIR");
     snprintf(real, n, "%s/TRACKB%u.lzc", dir && *dir ? dir : "build/openworld", id);
     struct stat sb;
     if (stat(real, &sb) || !S_ISREG(sb.st_mode)) { rn_log("OPENWORLD: no merged file %s, the original TRACKB%u is used", real, id); return 0; }
     *size = (uint64_t)sb.st_size;
-    rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)sb.st_size);
+#endif
+    rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size);
     return 1;
 }
 
+#ifndef __EMSCRIPTEN__
 // ---- the test teleport ------------------------------------------------------------------------------------------------
 static Ctx tc;                  // the thread's guest context
 static uint32_t scratch;        // vec3 at +0, flag byte at +32

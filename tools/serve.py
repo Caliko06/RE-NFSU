@@ -134,6 +134,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return os.path.join(ROOT, "pc", "Speed.exe")
         if path.startswith("/game/"):
             return os.path.join(ROOT, "game", os.path.normpath(path[6:]).lstrip("/."))
+        if path.startswith("/world/"):    # the open world's merged TRACKB files (tools/openworld/build.py, ?world=1)
+            return os.path.join(ROOT, "build", "openworld", os.path.normpath(path[7:]).lstrip("/."))
         if path.startswith("/save/"):
             root = save_root(self.headers)
             return save_path(path, root) or os.path.join(root, "..refused")

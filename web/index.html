@@ -102,6 +102,8 @@ function line(s, cls) {
         const k = kv.indexOf('=');
         m.ENV[k < 0 ? kv : kv.slice(0, k)] = k < 0 ? '1' : kv.slice(k + 1);
       }
+      // ?world=1: the open world (docs/OPENWORLD.md): the 16 street tracks load one merged collision, no fences (host/openworld.c)
+      if (RN_Q.get('world') === '1') m.ENV.RN_WORLD = '1';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;
