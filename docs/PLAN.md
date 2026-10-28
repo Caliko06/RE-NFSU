@@ -2,6 +2,12 @@
 For the OWNER alone: Chrome on this Mac, tools/serve.py on 127.0.0.1:5180, saves in save/. No deploy.
 One session on main. Each milestone has one gate: the run that proves it.
 
+## Now (OWNER 2026-10-27 night): open world
+All of Olympic City (L1RA, the 16 street tracks) drivable with no fences, GTA style, apart from Free Run. Out: drag
+and drift arenas, test track, new menus, police, online. Phases and answers: docs/OPENWORLD.md; where the last
+session stopped: HANDOFF.md. Before it (see git log): Block 6 below, night lights (docs/night_re.md), Free Run with
+career rivals (host/free.c). The census is at 167/167; progress is the OWNER's playthrough and gate60 per track.
+
 ## Done
 - M0 census. M1 lifter: whole exe lifted, gate pass (census/difftest.json).
 - M2 boot: CRT, threads (one GIL + 20 ms quantum), timers, no-network Winsock, files on demand (host/files.c).
