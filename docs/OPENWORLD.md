@@ -39,46 +39,45 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
    Measured: the 16 tracks are cuts of ONE city mesh: 54,735 unique polygons, 97.5 % identical byte for byte across
    tracks. So the union of the 16 wsrc is a clean world collision. Flags 0x00/0x10/0x11 ground, 0x12 low walls,
    0x16 infinite walls (z -508..508). Surface byte (+2) does not mark fences.
-2. Fences (OPEN). Physically: walls in wsrc (no flag marks them). Visual: smackable props (0x34026 classes 256 B,
-   class key dword @+0x80 per 0x5952a0; 0x34027 instances 0x70 B, position @+0x60). The instance->class link is NOT
-   @+8 (0 of 4580 bind): read the users of the instance list 0x734470/0x734474 before naming any barrier prop.
-   Rejected: classifying fence walls by geometry (ground on both sides, route crossing): it flags medians and
-   islands too; the criterion has to come from the exe or from the props, not from tuning.
-3. Streaming (LEADS). 0x4496a0 opens TRACKS\STREAM%s.BUN / STREAM%s_%d.BUN; 0x446db0 parses the per-track
-   container 0x80034150 (0x34151..0x34154); string TRACK_PATH_ZONE_STREAMER_PREDICTION says zones predict the
-   sections. Hopper dumps: build/hopper/owstream.txt, owcoll.txt (every ref to 0x77b130..0x77b194), owprops.txt.
+2. Fences (ANSWERED from the data, 2026-10-27 late). A wall W of track A is a fence when another track B has ground
+   on both sides of W and B's wsrc does not hold W: the game, loading B, drives through it. tools/openworld/fences.py
+   -> census/openworld_fences.json, build/openworld/fences.png: 1,149 of 10,510 union walls (0x12: 735, 0x16: 414),
+   all at junctions where a route turns away. Walls with ground on one side only (the T-shaped stubs) are where the
+   collision mesh ends: removing them drops the car off the ground; they need new ground first (phase G).
+   The closure barricades you SEE (XO_TRACKBARRIERA, TRACKTURNBARRIER*, TRACKBARRIERNEOND) are static placements in
+   the per-track section 2601..2617 (the 0x34154 one), no instance row: dropping 0x34154 drops them. Smackables
+   (docs/openworld/re_props.md): an instance row 0x34027 (0x70 B, class key @+0, (section, index) of a base-stream
+   placement @+4/+6) makes that placement breakable; 32 smacked at once (SmokeableSlotPool), count < 0x8000.
+   Union of the 16 tracks: 77 classes, 1,122 unique instances (census/openworld_props.json).
+3. Streaming (ANSWERED, docs/openworld/re_stream.md). The streamer already follows the car city-wide: 0x445050
+   per frame, 0x48e8b0 car pos/vel, 0x444870 samples 3 points ahead, 0x446fd0/0x5679b0 find the boundary polygon,
+   0x444b50 builds the wanted set from its 0x34152 visible list + fixed 2500/2400/2600/2499 + the track's 0x34154
+   section (2601..2617, one per track, hugs the route at 12-22 m: lead, probably the track's barrier geometry).
+   0x34151 polygons, 0x34152 lists and the 11 prediction zones are identical in all 16 tracks and cover the whole
+   city. Per track only: preload flag 0x34107 +0xa (the corridor), lookahead filter 0x34153, 0x34154. Pool = preload
+   + 2 MB (0x449996..0x4499a0), async, 3 reads in flight, LRU (0x444780), cap 256 sections per round in 0x444b50.
+   Merged set: base track, drop 0x34153 and 0x34154, keep its preload flags (the union, 341, passes the 256 cap);
+   optional margin 2 -> ~6 MB at 0x4499a0. Unmeasured: load speed at top speed.
 4. Map (DONE, phase B): tools/openworld/map.py -> build/openworld/map.png + census/openworld.json. The 16 routes
    form one connected street network.
+5. Collision writer (DONE, docs/openworld/re_coll.md). wmap = 10-level quadtree over [-16384,16384)^2, 32-unit
+   leaves -> wcell -> widx u16 -> wsrc; walk 0x441530/0x441660/0x441c10. Re-derived for all 16 tracks: 100 % byte
+   match. Caps: 65,534 polygons (union 54,735), 160 per query (0x4407b0), 1024 bodies (0x4412b0, int3 when full),
+   unknown top-level chunk id = int3 (0x447ac0). .lzc = JDLZ v2 (decoder 0x58d190); 0x58d3c0 also takes raw.
+   Writer: tools/hopper/q_owcoll2_write.py, q_owcoll2_lzc.py.
+6. Visual city vs collision (DONE, docs/openworld/re_mesh.md, visual_vs_coll.png). The visible streets end where
+   the collision ends: of 77 stub ends, 67 have no street past them; 4 continue 44-87 m ((-184,-1346),
+   (-119,-1402), (933,-1549), (1423,-435)). 25 % of visual road has no ground under it, nearly all < 2 m from
+   ground (shoulders, plazas). So the drivable city IS the union of the 16 corridors.
 
-## Questions, in order (each one is answered from the exe before any run)
-1. Collision: is wsrc only the side walls, or the ground too? How does a car find the road height off the track
-   (sub_441380 -> its users)? This decides everything: per-track walls mean that off a track's corridor there is
-   either nothing to hit (fall through or float) or an invisible wall.
-2. Fences: what is a fence, physically? Candidates: wall segments in wsrc that close side streets, props
-   (0x34027: cones, barriers, signs) and/or scenery the section/zone chunks switch on. Find a fence in a frame,
-   then its source.
-3. Streaming: which of the 423 sections does a race load, and by what (route position, 0x34154, zones)? Can the
-   streamer follow the car anywhere in the city, or does it only know the track's route?
-4. Connection: overlay the 16 routes (rnode) and wall cells on one top-down map of L1RA. Which streets join
-   which tracks, which city streets belong to no track (no walls, no roads, no ground?).
-5. Traffic and AI: roads 0x34121/links are per track. Can the traffic follow a merged road graph?
-
-## Expected design (inference; the answers above may change it)
-- A merged world: at load, read all 16 TRACKB walls (and roads) and build the union collision once (a bridge in
-  host/, cached), minus the fence segments. Our own walls only where the city really ends (map edge, holes).
-- Streaming driven by the car position over all L1RA sections.
-- Props fences dropped by a filter in the props loader.
-- Launch: Free Run on any L1RA track + RN_OPEN; no lap end (already true in Free Run).
-
-## Phases and who (triage)
-| phase | class | who | done when |
-|---|---|---|---|
-| A. Questions 1-3: the mechanism | diagnosis | Opus, main session | each answer with function addresses, written here |
-| B. Census + top-down map (q4) | mechanical | haiku-mechanic, parallel | tools/openworld/map.py writes build/openworld/map.png + census/openworld.json |
-| C. Decompile the loaders and users found in A | RE | sonnet-exec | functions named, struct layouts written here |
-| D. Merged collision + no fences + streaming | design Opus, build sonnet-exec | | a native run drives from the 1001 grid into a street of 1107 |
-| E. Traffic on the merged roads | RE then build | sonnet-exec | traffic spawns and drives off the original route |
-| F. Chrome | check | Opus | webcheck --route PASS and the OWNER drives it in Chrome |
+## Phases and who (2026-10-27 late, after answers 1-6)
+| phase | who | done when |
+|---|---|---|
+| D1. Merged TRACKB per base track: union wsrc minus fences, union props 0x34026/27, 0x34153 and 0x34154 dropped; RN_WORLD overlay in host/openworld.c | sonnet-exec | native run: car on a 1001 launch driven/teleported into a 1107-only street, on ground, no wall at the fence |
+| D2. Breakable barricades at the closures: a new 26xx-like section with the barrier placements at fences, each with an instance row | RE sonnet-exec, then build | native shot: barricade at a fence, a hit knocks it |
+| E. Traffic and AI on the merged roads 0x34121/22/24 | RE then build | traffic drives off the base route |
+| F. Chrome: serve the overlay (tools/serve.py is shared with the peer session) | Opus | webcheck PASS, the OWNER drives it |
+| G. The 4 stubs that continue visually: ground from the render mesh | later | |
 
 ## Rules for this block
 - RE before runs. A run confirms a prediction. Runs are bounded (RN_SECS, head -c), muted, off-screen.
