@@ -70,10 +70,18 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
    (-119,-1402), (933,-1549), (1423,-435)). 25 % of visual road has no ground under it, nearly all < 2 m from
    ground (shoulders, plazas). So the drivable city IS the union of the 16 corridors.
 
+7. Barricades (RE DONE, docs/openworld/re_barricade.md). A 0x34107 row (56 B) gives file (+0x10), offset (+0x14),
+   size (+0x18/+0x1c); file 2 = the event BUN STREAML1RA_<id>.BUN (0 bytes on disk for L1RA; other regions read
+   section 2500 from it at offset 0). Recipe: repoint unused row 2609 to file 2, serve a small STREAML1RA_<id>.BUN
+   from the RN_WORLD overlay, 0x34154 = [2609]. Set: 690 barricades within 6 m of a fence and >= 5 m off any other
+   route (census/openworld_barricades.json); builder build/openworld/scratch_bar/mksec.py (selftest rebuilds 2609
+   byte for byte). Classes: CS_DANGERSIGN_00 for the 509 BARRIERA, ZCS_BridgeGateB for the 170 TURNBARRIER, 11 NEOND
+   static. 33rd hit at once is ignored (0x596570); smacked ones respawn when the car leaves. Unrun: hit hardness.
+
 ## Phases and who (2026-10-27 late, after answers 1-6)
 | phase | who | done when |
 |---|---|---|
-| D1. Merged TRACKB per base track: union wsrc minus fences, union props 0x34026/27, 0x34153 and 0x34154 dropped; RN_WORLD overlay in host/openworld.c | sonnet-exec | native run: car on a 1001 launch driven/teleported into a 1107-only street, on ground, no wall at the fence |
+| D1. DONE 2026-10-28: merged TRACKB (tools/openworld/build.py -> build/openworld/TRACKB<id>.lzc), RN_WORLD=1 serves it (host/openworld.c, hook in files.c gf_open); test teleport RN_WORLD_AT=x,y,z[,yaw16] via the game's Car::ResetToPosition | sonnet-exec | done: 1001 Free Run, car at (-23.8,-569.3) on a 1107-only street: GROUND h 30.58, autopilot drives 40 m; without RN_WORLD: NO GROUND (docs/openworld/d1.md) |
 | D2. Breakable barricades at the closures: a new 26xx-like section with the barrier placements at fences, each with an instance row | RE sonnet-exec, then build | native shot: barricade at a fence, a hit knocks it |
 | E. Traffic and AI on the merged roads 0x34121/22/24 | RE then build | traffic drives off the base route |
 | F. Chrome: serve the overlay (tools/serve.py is shared with the peer session) | Opus | webcheck PASS, the OWNER drives it |

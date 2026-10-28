@@ -186,13 +186,14 @@ int gf_stat(const char *gpath) {
 }
 
 void rn_race_bridge(const char *gpath);   // host/bridge.c
+int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) __attribute__((weak));   // host/openworld.c (RN_WORLD=1)
 
 // Opens a game file: id >= 0, or -1 missing, -2 outside the folder, -3 a directory.
 int gf_open(const char *gpath) {
     char real[512];
     uint64_t size = 0;
     rn_race_bridge(gpath);
-    int r = lookup(gpath, real, sizeof real, &size);
+    int r = rn_world_open && rn_world_open(gpath, real, sizeof real, &size) ? 0 : lookup(gpath, real, sizeof real, &size);
     if (r) return r == 1 ? -3 : r;
     for (int k = 0; k < MAXF; k++) {
         GFile *g = &files[k];

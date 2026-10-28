@@ -1,0 +1,329 @@
+{
+ "source": "tools/openworld/build.py",
+ "fences_removed": 1149,
+ "union_polygons": 54735,
+ "polygons": 53586,
+ "instances": 1122,
+ "files": {
+  "1001": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2702896,
+   "file": 1484283,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "aaabbe2e380cb0bcd2feeac2b38ba28d",
+   "base_file": 556152,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1002": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2666160,
+   "file": 1457805,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "901347dea54d4d36abf5179e2eb770b7",
+   "base_file": 482412,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1003": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2624688,
+   "file": 1449169,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "435c1792505454eb320c1f160e0b6efc",
+   "base_file": 433352,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1004": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2620464,
+   "file": 1449399,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "4ed19a44a6c62ecd637e90ca13862766",
+   "base_file": 441134,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1005": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2658736,
+   "file": 1453796,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "677e60d2aeaa18651020ac93eba069b7",
+   "base_file": 423196,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1006": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2638512,
+   "file": 1443282,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "201d6fe757eb7b559f47e240b198bca0",
+   "base_file": 449789,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1007": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2642864,
+   "file": 1453625,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "749eda6af146f219707ea91ab1407c20",
+   "base_file": 402183,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1008": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2605104,
+   "file": 1430796,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "5abca5c4fd1261d9d1bcd9149e1a3ef4",
+   "base_file": 398153,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1102": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2714928,
+   "file": 1502655,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "15cc0da722800e3754c2436b8916aeb7",
+   "base_file": 644372,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1103": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2832688,
+   "file": 1551934,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "e6b59f953ccbc8feca491e3ff6a41128",
+   "base_file": 718765,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1104": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2957488,
+   "file": 1612485,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "d7c76944db10c04e489528a500334197",
+   "base_file": 873077,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1105": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2977456,
+   "file": 1621801,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "37942f73bc465b8f7ecf55f0192ee792",
+   "base_file": 853671,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1106": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 3021616,
+   "file": 1655403,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "94814f854f16344353adf862217a285b",
+   "base_file": 927849,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1107": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 3093168,
+   "file": 1700746,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "fe99ddb706d8682ba2fcfd9284e17ce1",
+   "base_file": 1005788,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1108": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2949552,
+   "file": 1612955,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "33e394a3023af98bea49e3f013b86f62",
+   "base_file": 822136,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  },
+  "1109": {
+   "polygons": 53586,
+   "wmap_rows": 1265,
+   "wcell_rows": 2205,
+   "widx_u16": 76094,
+   "instances": 1122,
+   "bytes": 2878768,
+   "file": 1576996,
+   "fences_absent": 1149,
+   "union_present": 53586,
+   "query_checks": 1700,
+   "md5": "1ea10669c1728be4eb94b5da3a8d7f7b",
+   "base_file": 744101,
+   "stream_children_before": [
+    "0x34151",
+    "0x34152",
+    "0x34153",
+    "0x34154"
+   ]
+  }
+ }
+}
