@@ -88,6 +88,24 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
 | G. The 4 stubs that continue visually: ground from the render mesh | later | |
 
 ## Rules for this block
+- Shared with the regressions session (ROA): code caves 0x63b270..0x63b3bf are theirs; tools/serve.py and the web
+  lookup in host/files.c only after telling them. Traffic placement 0x5991a0/0x598fb0/0x59b130 is under their RE too.
 - RE before runs. A run confirms a prediction. Runs are bounded (RN_SECS, head -c), muted, off-screen.
 - Every patch is one line in the patch table with why; the switch off gives the shipped game.
 - Write what is learned here (addresses, layouts) and in commits.
+
+## Handoff (2026-10-27 night, session Beef; stopped for quota)
+- Done: D1 (commit 2ff1b8f, RN_WORLD=1 = merged collision). The reproducible checks were rerun: 10/10 ran, every one
+  with an expected value PASS (build/openworld/checks.md, git-ignored).
+- OWNER rule: RE with two tools (REA/Ghidra + Hopper) -> reconcile with prior claims -> written prediction with
+  addresses -> integrate -> run only to confirm. A mismatch stops the work; no variants.
+- Not yet reconciled (do first, no game runs): an independent Hopper/REA audit of answers 1-7 and docs/openworld/*.md
+  (ledger CONFIRMED/REFUTED/UNREAD). Judgment values to replace with exe reads: PROBE 1.0 in fences.py (CELL is only an
+  index); the TRS* texture rule and the stubs judged by eye in re_mesh.md; the barricade class picked by similarity and
+  the 5 m set threshold in re_barricade.md (census/openworld_barricades.json is PROVISIONAL for that reason).
+- D2 work in progress (unverified, not integrated): build/openworld/d2_wip/{d2.patch, barricades.py}. Before applying:
+  class from the 0x34026 record + hardness 0x597980, set = barricade AABB intersects a same-track fence, file 2
+  open path (0x4496a0 callers) for STREAML1RA_<id>.BUN.
+- E (roads/traffic): not started beyond reading; tools/hopper/q_owroad_refs.py is a stub. ROA (peer) is doing RE on
+  traffic placement 0x5991a0/0x598fb0/0x59b130: read their notes first and coordinate.
+- Next: audit (one sonnet-exec) -> D2 -> E -> F Chrome (tell ROA before tools/serve.py / files.c web lookup) -> G.
