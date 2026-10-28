@@ -432,19 +432,24 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
   // copy stretched along the car's velocity in camera space (x, y, z, normalised; y down, as here): rect X0 = -(x+z) o, X1 = W + (z-x) o,
   // Y0 = -(y+z) o, Y1 = H + (z-y) o, o = offset_i * c, c = 2. Vertex alpha 50 35 28 17 (/128), times t = clamp((speed - 0.1) / 24.9)
   // (speed in m/s, |[0x740500]+0x1e0|). The GS modulates the texture alpha by the vertex alpha (As = At * Af / 128) and blends
-  // Cs * As + Cd * (1 - As), 128 = 1. So the car (near, low depth) stays sharp and the far city stretches.
+  // Cs * As + Cd * (1 - As), 128 = 1.
   // Nitrous (the game's [0x73654c], the PS2's view +0x50): a counter climbs 2 a frame to 15 and falls 1 a frame; k = 2 + 13 r and
   // c = 2 + 2 r (r = counter / 15); passes 5-6 (22 and 40 px, alpha 8 r and 4 r) join, and while it is active every copy is tinted
   // (130 + 10 i, 130 + 10 i, 130 + 28 i) / 128 for pass i (the PS2's table 0x44a680; plain 130 / 128 otherwise).
-  // The PS2 had a 16-bit Z; here the depth buffer is turned into metres (z_ndc = _33 + _43 / z) and the byte is 255 * metres / PS_FAR.
+  // The depth byte (scratchpad RE 2026-10-27, SLUS FUN_00112ba8 + FUN_00113fc8, projection FUN_0010a7f8): Z24 bits 15:8, Z24 linear in
+  // 1/z, so byte = z <= 128 N ? 254 : 32768 N / z (N = camera near, lens default 0.5 m, FUN_001b1200), and the sky (no Z) 0: the near
+  // road and walls take the full copy, the far city little, the sky none. Here the depth buffer is turned into metres (z_ndc = _33 +
+  // _43 / z). ?psweight=ps2 takes that weight (?psnear=N); it also streaks the player's car, which the PS2 keeps sharp (its draw order
+  // against FUN_00113fc8 is still unread), so the default stays the reverse weight: 255 * metres / ?psfar, far = strong.
   // Offsets scale with the resolution per axis (W / 512, H / 448). It runs on the scene colour (not the FXAA target: that one holds
   // the light trails and the HUD), after the game's own blur, which must be off (web/tune.js 'PS2 depth' sets its cap to 0), before the
   // HUD. ?psblur=0 off, ?psblur=depth shows the weight (debug), ?psblur=split = the right half only (A/B in one frame),
-  // ?psspeed=57 a still scene as if driving straight at 57 m/s, ?psfar=metres the distance where the depth byte reaches 255.
+  // ?psspeed=57 a still scene as if driving straight at 57 m/s.
   const PS_DBG = RN_Q.get('psblur') === 'depth', PS_SPLIT = RN_Q.get('psblur') === 'split';   // split: the pass on the right half only (A/B in one frame)
   const PS_FORCE = Number(RN_Q.get('psspeed') || 0);   // debug: a still scene as if driving straight at this many m/s (?psspeed=57)
   const PS_OFF = [2.3, 6.4, 8.8, 11.4, 22, 40], PS_ALPHA = [50, 35, 28, 17];
-  const PS_FAR = Number(RN_Q.get('psfar') || 200);   // metres where the depth byte reaches 255 (k = 2 saturates the blur at half)
+  const PS_FAR = Number(RN_Q.get('psfar') || 200);   // metres where the depth byte reaches 255 (not with ?psweight=ps2)
+  const PS_W2 = RN_Q.get('psweight') === 'ps2', PS_NEAR = Number(RN_Q.get('psnear') || 0.5);
   const psMod = device.createShaderModule({ code: `
 struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
 @group(0) @binding(0) var src: texture_2d<f32>;
@@ -463,7 +468,9 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
   let zn = textureLoad(dep, vec2i(clamp(uv * dsz, vec2f(0.0), dsz - 1.0)), 0);
   // metres from the camera: z_ndc = _33 + _43 / z. The far clear (1.0) is the sky.
   let zv = select(u.zz.z, u.zz.y / (zn - u.zz.x), zn < 0.99999);
-  let byte = 255.0 * clamp(zv / u.zz.z, 0.0, 1.0);
+  let far = 255.0 * clamp(zv / u.zz.z, 0.0, 1.0);
+  let ps2 = select(0.0, select(min(floor(32768.0 * u.zz.z / zv), 254.0), 254.0, zv <= 128.0 * u.zz.z), zn < 0.99999);
+  let byte = select(far, ps2, u.zz.w > 0.5);
   let at = min(byte * u.par.y, 255.0);                  // CLUT alpha
   let a = min(at * u.par.x / 128.0, 255.0) / 128.0;     // x vertex alpha (par.x = Af * t), GS modulate then blend weight
   if (${PS_DBG ? 'true' : 'false'}) { return vec4f(vec3f(at / 255.0), 1.0); }
@@ -503,7 +510,7 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       device.queue.writeBuffer(psU[i], 0, new Float32Array([
         -(x + z) * ox, -(y + z) * oy, W + (z - x) * ox, Hh + (z - y) * oy,
         Math.floor((i === 4 ? 8 * r : i === 5 ? 4 * r : PS_ALPHA[i]) * t), k, PS_SPLIT ? W / 2 : 0, 0,
-        v[5], v[6], PS_FAR, 0,
+        v[5], v[6], PS_W2 ? PS_NEAR : PS_FAR, PS_W2 ? 1 : 0,
         ...(active ? [(130 + 10 * i) / 128, (130 + 10 * i) / 128, (130 + 28 * i) / 128, 0] : [130 / 128, 130 / 128, 130 / 128, 0])]));
       const p = enc.beginRenderPass({ timestampWrites: tsw('psblur'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
       p.setPipeline(pipe);
