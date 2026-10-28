@@ -844,8 +844,8 @@ static void tune_apply(Ctx *c) {
     memcpy(f, &tune[1], sizeof f);
     rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f, trails %08x", f[0], f[1], f[2], f[3], tune[5]);
 }
-// PS2-style depth speed blur (web/gpu.js psblur): out[0..2] = the player car's velocity [0x740500]+0x1e0 (what the game's own blur 0x40cd40
-// reads) in camera space, normalised, out[3] = its length (m/s); float bits, 0 when there is no car. out[4] = nitrous on ([0x73654c],
+// PS2-style depth speed blur (web/gpu.js psblur): out[0..2] = the view-1 camera's velocity [0x740500]+0x1e0 (camera 0x78d270; what the game's own blur 0x40cd40
+// reads) in camera space, normalised, out[3] = its length (m/s); float bits, 0 when there is no camera. out[4] = nitrous on ([0x73654c],
 // written by 0x4010e0 for the player's view), out[5..6] = the projection's _33 and _43 (block +0x40; z_ndc = _33 + _43 / z_view, so the
 // page can turn the depth buffer into metres). Sent with GPU_FXAA.
 // The camera block of the player's view (table 0x740460 + 0x60, +0 pointer; block +0 = View, rows 0..2 = the axes)
@@ -869,6 +869,15 @@ static void psblur_vel(Ctx *c, uint32_t *out) {
         for (int j = 0; j < 3; j++) q[j] = v[0] * n[j] + v[1] * n[4 + j] + v[2] * n[8 + j];
         float t[3];   // the transposed reading (R * v)
         for (int j = 0; j < 3; j++) t[j] = m[4 * j] * v[0] + m[4 * j + 1] * v[1] + m[4 * j + 2] * v[2];
+        // The car's own speed, the HUD's (+0x3d4 x 2.237 = mph, 0x6cc9f0; read so by 0x4286a0, 0x52b760): the player's node in the race
+        // list [0x7361f8] (host/openworld.c player_node), next to the camera's (above).
+        uint32_t h = ld(c, 0x7361f8, 4), pn = 0;
+        if (h && h < GUEST_MEM - 0x1000)
+            for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && r < GUEST_MEM - 0x1000 && k < 200; r = ld(c, r, 4), k++) {
+                uint32_t e = ld(c, r + 0x14, 4);
+                if (e && e < GUEST_MEM - 16 && ld(c, e + 4, 4) == 1) { pn = r; break; }
+            }
+        if (pn) rn_log("PSBLUR frame %u car %08x +0x3d4 %.2f m/s (%.1f mph)", dev.frames, pn, ldf(c, pn + 0x3d4), ldf(c, pn + 0x3d4) * 2.237f);
         rn_log("PSBLUR frame %u speed %.2f v %.2f %.2f %.2f | view1 v*R %.2f %.2f %.2f R*v %.2f %.2f %.2f | view0 v*R %.2f %.2f %.2f | nitro %u P %.4f %.4f %.4f %.4f P33 %.5f P43 %.5f",
                dev.frames, s, v[0], v[1], v[2], r[0], r[1], r[2], t[0], t[1], t[2], q[0], q[1], q[2],
                out[4], m[16], m[21], m[26], m[27], m[26], m[30]);

@@ -430,8 +430,8 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
   // ELF data 2026-10-27; ref/docs/re/postfx-elf.md section 4). The PS2 copies the frame into a texture whose alpha is
   // min(depth_byte * k, 255) (k = 2), then draws it back over the frame, one pass per offset (2.3 6.4 8.8 11.4 px at 512 x 448), each
   // copy stretched along the car's velocity in camera space (x, y, z, normalised; y down, as here): rect X0 = -(x+z) o, X1 = W + (z-x) o,
-  // Y0 = -(y+z) o, Y1 = H + (z-y) o, o = offset_i * c, c = 2. Vertex alpha 50 35 28 17 (/128), times t = clamp((speed - 0.1) / 24.9)
-  // (speed in m/s, |[0x740500]+0x1e0|). The GS modulates the texture alpha by the vertex alpha (As = At * Af / 128) and blends
+  // Y0 = -(y+z) o, Y1 = H + (z-y) o, o = offset_i * c, c = 2. Vertex alpha 50 35 28 17 (/128), times t, the speed ramp
+  // below (speed in m/s, |[0x740500]+0x1e0|). The GS modulates the texture alpha by the vertex alpha (As = At * Af / 128) and blends
   // Cs * As + Cd * (1 - As), 128 = 1.
   // Nitrous (the game's [0x73654c], the PS2's view +0x50): a counter climbs 2 a frame to 15 and falls 1 a frame; k = 2 + 13 r and
   // c = 2 + 2 r (r = counter / 15); passes 5-6 (22 and 40 px, alpha 8 r and 4 r) join, and while it is active every copy is tinted
@@ -446,6 +446,12 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
   // HUD. ?psblur=0 off, ?psblur=depth shows the weight (debug), ?psblur=split = the right half only (A/B in one frame),
   // ?psspeed=57 a still scene as if driving straight at 57 m/s.
   const PS_DBG = RN_Q.get('psblur') === 'depth', PS_SPLIT = RN_Q.get('psblur') === 'split';   // split: the pass on the right half only (A/B in one frame)
+  // The speed ramp. Both games read the same input, the view-1 camera's velocity |[0x740500] + 0x1e0| ([0x740500] = camera 0x78d270,
+  // set by 0x40a7f0; PC 0x40cd40, PS2 0x113fc8 via view +0x40); measured 2026-10-27 within ~1 % of the car's own speed (+0x3d4, the
+  // HUD's), 0 -> 27 m/s in 3 s from a launch. They ramp it differently: Speed.exe 0x702a38 / 0x702a3c / 0x702a40 = 25 -> 125 m/s, cap 0.65 (no blur under 90 km/h);
+  // SLUS 0x4ff95c / 0x4ff960 / 0x4ff954 = 0.1 -> 25 m/s, cap 1 (full blur ~3 s after a launch here). OWNER 2026-10-27: "agresivo desde el
+  // arranque", so the PC exe's ramp is the default; ?psramp=ps2 the PS2's.
+  const PS_RAMP = RN_Q.get('psramp') === 'ps2' ? [0.1, 25, 1] : [25, 125, 0.65];
   const PS_FORCE = Number(RN_Q.get('psspeed') || 0);   // debug: a still scene as if driving straight at this many m/s (?psspeed=57)
   const PS_OFF = [2.3, 6.4, 8.8, 11.4, 22, 40], PS_ALPHA = [50, 35, 28, 17];
   const PS_FAR = Number(RN_Q.get('psfar') || 200);   // metres where the depth byte reaches 255 (not with ?psweight=ps2)
@@ -493,7 +499,7 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
     if (PS_LOG && ++psN % 120 === 1) report(`gpu.js: psblur ds ${ds ? `${ds.w}x${ds.h} sc ${ds.sc} depth ${ds.depth}` : 'none'} rt ${rt.w}x${rt.h} v ${Array.from(v).map(x => x.toFixed(3)).join(' ')} nitro ${nitro}`);
     if (PS_FORCE) v = Float32Array.of(0, 0, 1, PS_FORCE, 0, v[5], v[6]);
     if (!ds || !ds.depth || ds.sc !== 1 || ds.w !== rt.w || ds.h !== rt.h || !psBase(v)) return;
-    const t = Math.max(0, Math.min(1, (v[3] - 0.1) / (25 - 0.1)));
+    const t = Math.min(PS_RAMP[2], Math.max(0, Math.min(1, (v[3] - PS_RAMP[0]) / (PS_RAMP[1] - PS_RAMP[0]))));
     psCount = nitro ? Math.min(15, psCount + 2) : Math.max(0, psCount - 1);   // one step per race frame
     const r = psCount / 15, active = nitro || psCount > 0, k = 2 + 13 * r, c = 2 + 2 * r;
     if (t <= 0) return;
