@@ -129,3 +129,5 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
   fits the barricade models: CS_DANGERSIGN_00 is 0.41 m off for BARRIERA; nothing within 2.9 m for TURNBARRIER/NEOND.
   OWNER decision pending: A) DANGERSIGN for BARRIERA only, B) a new class/shape (mass/limit invented), C) none.
   Patch build/openworld/d2_wip/d2.patch still unapplied.
+- OWNER decision 2026-10-27: C, no barricades. The open city is RN_WORLD=1 (fences removed). D2 is closed; its RE and
+  tools stay for reference, d2_wip/d2.patch is not to be applied. Next: fence z rule (above), then E roads/traffic.
