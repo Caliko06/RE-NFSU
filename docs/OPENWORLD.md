@@ -109,3 +109,7 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
 - E (roads/traffic): not started beyond reading; tools/hopper/q_owroad_refs.py is a stub. ROA (peer) is doing RE on
   traffic placement 0x5991a0/0x598fb0/0x59b130: read their notes first and coordinate.
 - Next: audit (one sonnet-exec) -> D2 -> E -> F Chrome (tell ROA before tools/serve.py / files.c web lookup) -> G.
+- Update (quota ~2 % left): two agents were resumed to use the rest. Their outputs, if they got that far:
+  docs/openworld/audit.md (ledger + judgment list with exe replacements) and docs/openworld/d2.md (Prediction +
+  UNREAD; integration only if UNREAD is empty). Next session: read both first; if absent, rerun the audit (one
+  sonnet-exec). Not committed by them: review, then commit the docs and any tools/openworld changes.
