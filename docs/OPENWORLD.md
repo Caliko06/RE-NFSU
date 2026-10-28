@@ -124,3 +124,8 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
   a median 5.7 units above the wall's lowest vertex; wall height median 30), so the base is not the car's z. Reverted.
   The right zq is the car's z on the drive side: the highest ground of track B there by the same 0x440b50 rule, from
   a z above the street (e.g. wall top). Write that, rerun, diff against census/openworld_fences.json (1149).
+- D2 RE done, NOT integrated (docs/openworld/d2.md): set = 1153 barricades whose placement AABB cuts a same-track
+  wall (857 BARRIERA, 292 TURNBARRIER, 4 NEOND); file 2 opens TRACKS\STREAML1RA_<id>.BUN (0x4496a0). No exe class
+  fits the barricade models: CS_DANGERSIGN_00 is 0.41 m off for BARRIERA; nothing within 2.9 m for TURNBARRIER/NEOND.
+  OWNER decision pending: A) DANGERSIGN for BARRIERA only, B) a new class/shape (mass/limit invented), C) none.
+  Patch build/openworld/d2_wip/d2.patch still unapplied.
