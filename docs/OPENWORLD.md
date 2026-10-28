@@ -120,3 +120,7 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
   test 0x4400e0, accept plane z <= zq + 1.0 from 0x6cc7bc, highest wins) with zq = wall base z, then rerun
   fences.py -> build.py -> the D1 proof, and diff the fence set. Class choice / 5 m / 6 m in the barricade work are
   not from the exe (J list): settle them before integrating D2.
+- Tried the z rule with zq = wall base z: fences 1149 -> 231. Measured why: walls sink below the street (ground sits
+  a median 5.7 units above the wall's lowest vertex; wall height median 30), so the base is not the car's z. Reverted.
+  The right zq is the car's z on the drive side: the highest ground of track B there by the same 0x440b50 rule, from
+  a z above the street (e.g. wall top). Write that, rerun, diff against census/openworld_fences.json (1149).
