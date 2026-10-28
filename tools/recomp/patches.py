@@ -304,7 +304,7 @@ PATCHES.append(dict(addr=0x63b3ad, old="68f4700001e8d9660000" + "81c40c010000c39
                     new="f7d1230d70300100c3" + "cc" * 10))
 
 
-# PATCH: 0x57d060, 0x57d0c1, 0x57cfc7, 0x4b3b01, 0x583a37, 0x583a5b (+ cave 0x63b270, a dead CRT routine: no call, jump or pointer
+# PATCH: 0x57d060, 0x57d0c1, (0x57cfc7 off), 0x4b3b01, 0x583a37, 0x583a5b (+ cave 0x63b270, a dead CRT routine: no call, jump or pointer
 # reaches 0x63b270..0x63b3bf; source tools/recomp/caves/traffic.s), OWNER 2026-10-25 (traffic alive). AddTrafficCars
 # 0x4b3ac0 spawns i8 [trackinfo + side + sel*2 + 0xc0] cars (GLOBALB 0x34201: 12 on most tracks), each of a type from
 # 0x57d000: weights f32 [row + 0xc60 + district*4] of the rows the iterator 0x57cfa0 keeps (usage +0xc54 == 2, enable
@@ -320,7 +320,12 @@ PATCHES.append(dict(addr=0x63b270, entries=(0x63b280, 0x63b28a, 0x63b310, 0x63b3
                     new="7b4002000000c03e9a99593fce339a3a5089c8e80200000058c3833d1c300100007508d984b0600c0000c3528b90540c000085d274248b90600c00000b90640c00000b90680c00000b906c0c00000b90700c00007420d9e85ac38b90500c000083fa1f77110fa31570b263007308d90574b263005ac3d9ee5ac38b88540c000039f17412833d1c30010000740e85c9750a83fe027505e9c61cf4ffe9dd1cf4ff0fbe9479c0000000833d1c30010000740f8d1452d1fa83fa1a7e05ba1a000000c3ff742404e8c6b7f6ff833d1c3001000074205089f069c0b179379ec1e81850db042458d80d7cb26300d80578b26300dec958c20400", when=lambda: True))
 PATCHES.append(dict(addr=0x57d060, old="d984b0600c0000", new="e825e20b009090", when=lambda: True))
 PATCHES.append(dict(addr=0x57d0c1, old="d984b1600c0000", new="e8bae10b009090", when=lambda: True))
-PATCHES.append(dict(addr=0x57cfc7, old="8b88540c00003bce751c", new="e91ee30b009090909090", when=lambda: True))
+# 0x57cfc7 (cave iter: the traffic pick also took racer rows, usage 0) is off since 2026-10-28: a racer model has no body
+# texture of its own. Cars/TEXTURES.BIN holds baked <MODEL>_SKIN1..8 only for traffic models (4DR_SEDAN, PICKUP, TAXI...);
+# a racer body is DUMMY_SKIN<n>, whose hash 0x4b4040 puts at ride +0x444 (+0x448 DUMMY_WHEEL<n>) for slots 1..4 only, and
+# AddTrafficCars 0x4b3ac0 -> 0x57d160 sets +0x444 = 0. So a GOLF or CIVIC in traffic drew wheels, seat and driver with no
+# body (the OWNER's "invisible cars", PLAN 6.2). The cave code stays, unused; racers in traffic need skin slots first.
+PATCHES.append(dict(addr=0x57cfc7, old="8b88540c00003bce751c", new="e91ee30b009090909090", when=lambda: False))
 PATCHES.append(dict(addr=0x4b3b01, old="0fbe9479c0000000", new="e80a781800909090", when=lambda: True))
 PATCHES.append(dict(addr=0x583a37, old="e8c4300200", new="e8f5780b00", when=lambda: True))
 PATCHES.append(dict(addr=0x583a5b, old="e8a0300200", new="e8d1780b00", when=lambda: True))

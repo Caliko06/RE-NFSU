@@ -75,9 +75,10 @@ never measured: census/completion.json names no movie.
 - For the OWNER: what the unlock patches change in the career (order, what is open). They pick the default.
 
 ### 6.2 Traffic draws whole in Chrome (open parity bug)
-Only wheels and driver show; native --shot draws it whole. Lead (a) in HANDOFF points at our own traffic patch
-(racer rows as traffic, paint alpha 0 in car_ps_tail). First check: RN_TRAFFIC=0 at a traffic spot, one shot.
-Gate: A/B shot native vs Chrome, every traffic car whole.
+Fixed 2026-10-28: the body-less cars were racer models our pool patch let into traffic. A racer body is the
+DUMMY_SKIN<n> texture whose hash 0x4b4040 sets at ride +0x444 for slots 1..4; traffic rides get 0 (0x57d160), and
+Cars/TEXTURES.BIN has baked <MODEL>_SKIN1..8 only for traffic models. PATCH 0x57cfc7 is off; tuned cars in traffic
+need skin slots of their own first (same wall as the racer cap, docs/openworld/re_racer_cap.md).
 
 ### 6.3 Driving: handling, rival AI, traffic AI
 The game's code runs, so physics and AI are the original unless a patch or the input layer changes them.

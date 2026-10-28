@@ -133,8 +133,8 @@ static uint32_t free_setup(Ctx *c) {
 }
 
 // Tuned traffic. AddTrafficCars 0x4b3ac0 builds each traffic ride stock (0x57d160 type, 0x57d340, 0x57e9a0 the first
-// paint) and registers it with 0x5809c0(0x32 + i, 3, ride, "", -1, 0, 0) at 0x4b3c2f; the traffic pool (PATCH 0x57d060)
-// also picks racer rows, type usage 0 ([0x734588] + 0xc90 * type + 0xc54). PATCH 0x4b3c2f sends that call here (cave
+// paint) and registers it with 0x5809c0(0x32 + i, 3, ride, "", -1, 0, 0) at 0x4b3c2f; with PATCH 0x57cfc7 (off since
+// 2026-10-28: racer bodies need a DUMMY_SKIN slot, tools/recomp/patches.py) the traffic pool also picks racer rows, type usage 0 ([0x734588] + 0xc90 * type + 0xc54). PATCH 0x4b3c2f sends that call here (cave
 // 0x43a7ea: jmp [SCREEN_ADDR+0x6c]). In free mode a racer row wears the preset of a career rival with the same car,
 // applied by 0x4b26f0 (it resets the ride to the preset's car, 0x57cf70 -> 0x57d160, then sets its 0x78 part slots at
 // ride +0x44c). A traffic ride has no skin of its own (0x57d160 zeroes the DUMMY_SKIN / DUMMY_WHEEL hashes at +0x444 /

@@ -6,7 +6,7 @@ driver 0x5a6ef0 run as shipped.
 
 | Patch | Area | Effect (before -> after) | Default | Keep / drop |
 |---|---|---|---|---|
-| 0x57d060, 0x57d0c1, 0x57cfc7 (cave 0x63b270) | traffic types | 6 of 12 types weighted in Quick Race district 0 -> 12 types at 1.0, + 8 compact racer rows at 0.375; run on 1001: 6 -> 18 distinct types | on (RN_TRAFFIC=0 = original) | keep: OWNER 2026-10-25 "traffic alive" |
+| 0x57d060, 0x57d0c1 (cave 0x63b270) | traffic types | 6 of 12 types weighted in Quick Race district 0 -> 12 types at 1.0. The racer rows (0x57cfc7) are off since 2026-10-28: a racer body is DUMMY_SKIN<n>, set only for slots 1..4, so in traffic it drew no body | on (RN_TRAFFIC=0 = original) | keep: OWNER 2026-10-25 "traffic alive" |
 | 0x4b3b01 | traffic count | trackinfo count x1.5: 12 -> 18 cars, cap 26 (rides cap 30 at 0x4322a0) | on | keep: same |
 | 0x583a37, 0x583a5b | traffic AI pace | lane speed from 0x5a6b00 x1.0 -> x0.85..1.15 per car (hash of its AI object, stable) | on | keep: cars no longer move in lockstep; RN_TRAFFIC=0 restores x1.0 |
 | 0x4609e3, 0x460a80, 0x460b4f, 0x460c02 | steering input | keyboard model (angle cap grows over 0.55 s held, rate limit 0x460de0) -> gamepad model (angle = speed cap at once) | off (?steer=pad) | keep as opt-in: OWNER choice 2026-10-26, default stays the game's keyboard path |
