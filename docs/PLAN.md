@@ -18,8 +18,9 @@ walls. Simplest bridges and patches over the game's own AI; RE first; one check 
 2. Rivals (OWNER 2026-10-28: "more rivals out of nowhere", Japan-style night driving with tuned JDM cars; by phases):
    a. Respawn: DONE 2026-10-28, free_respawn (host/free.c): a rival > RN_RIVALFAR (400 m) is put 220..380 m of road
       ahead or behind (a coin) with the game's reset 0x427f70. WORLD 300 s: 16 respawns, 94 % of rival samples < 400 m.
-      Open: a respawned rival drives back to its race route (it leaves again in 8..20 s) -> read the racer goal
-      (0x455530, 0x44adc0) for a roam goal near the player -> verify: fewer than 1 respawn a minute per rival.
+      Speed: [0x700d58] = 8.0 is the reset's MINIMUM (0x426617), so a rival lands at the player's speed. Racers follow
+      the tour's road graph forward (docs/openworld_e_re.md B1), so a rival faces and races the tour direction; with the
+      player stopped or driving against the tour they leave again in 8..20 s. Judge it in the OWNER's play.
    b. JDM racers cruising in traffic = 1d (skins), Sonnet session.
    c. Phase 2: 6..8 real rivals (docs/openworld/re_racer_cap.md step 0 first) -> verify: 6 named rivals in a WORLD log.
 3. Walls: log the player position when speed drops to 0 with no visible wall; fix stub/fence there -> verify: the

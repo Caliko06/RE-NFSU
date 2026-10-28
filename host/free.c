@@ -224,7 +224,7 @@ static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) 
         for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
             clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
         if (!clear) { c->ftop = ft; return; }
-        float dir = ldf(c, n2 + 0xc) * vx + ldf(c, n2 + 0x10) * vy >= 0 ? 1.0f : -1.0f, cap = ldf(c, 0x700d58), v = sp < cap ? (float)sp : cap;
+        float dir = ldf(c, n2 + 0xc) * vx + ldf(c, n2 + 0x10) * vy >= 0 ? 1.0f : -1.0f, lo = ldf(c, 0x700d58), v = sp > lo ? (float)sp : lo;   // 0x426617: 8 m/s at least
         double was = hypot(ldf(c, r + 0x50) - px, ldf(c, r + 0x54) - py);
         uint32_t p[9] = {r, s2, n2, 0, 1, 0, 0, 0, 0};
         memcpy(&p[3], &v, 4), memcpy(&p[5], &dir, 4);
