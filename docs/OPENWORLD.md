@@ -79,13 +79,30 @@ PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cc
    byte for byte). Classes: CS_DANGERSIGN_00 for the 509 BARRIERA, ZCS_BridgeGateB for the 170 TURNBARRIER, 11 NEOND
    static. 33rd hit at once is ignored (0x596570); smacked ones respawn when the car leaves. Unrun: hit hardness.
 
+8. Invisible walls (ANSWERED 2026-10-27, docs/openworld/re_zones.md, tools/openworld/zones.py). Zones 0x3414a RESET(2) and
+   RESET_TO_POINT(3) teleport the car: player 0x430730 -> 0x430e00 (types 0,1,2,3, first hit wins) -> 0x427ed0 (car+0x87c = 1
+   -> 0x4314a0 nearest base-route node; type 3: to the zone's point); AI and traffic too (0x44b1b0, 0x44b63b/55). No mode test:
+   live in Free Run. 6-32 per track, 30-75 m off the route on side streets; 35 of 344 sit on other tracks' streets. The search
+   0x4436d0 ignores the +0x80 track list. Not walls (REA ev_6572fc.., ev_911679..): 0x426930 resets at > 5000.0 m 2D from the
+   route point (0x6b7bac, more than the city) and re-finds the route point past 300 m; no-ground reset every 32 frames (0x440ce0).
+   DECISION: the merged TRACKB drops every type 2 and 3 row (0x443450 rebuilds the per-type index; an empty type range returns
+   0); falls are caught by the exe's own no-ground reset. Fences: census/openworld_fences_z.json (1,132, the exe's ground rule
+   with z, docs/openworld/fences_z.md) replaces the 1,149 set.
+   RESULT 2026-10-28 (docs/openworld/d3.md): build ALL OK (1,132 fences, 0 type 2/3 rows, other zone rows byte-equal); (b) new
+   side PASS (1005 RESET zone over other tracks' ground, ~60 m inside it by autopilot: GROUND, car+0x87c 0, no jump); (a) NOT
+   VERIFIED (native keys do not throttle, the autopilot turns away from the fence): test it by hand in Chrome after F.
+   PREDICTION (to confirm natively): (a) teleport on the base route just before a removed fence, full throttle through it: with
+   RN_WORLD the car crosses onto the other track's street (ground query GROUND all the way, no reset), without RN_WORLD it stops
+   at the wall; (b) drive into a base-track RESET zone that lies on another track's street: old merged build -> car+0x87c = 1 and
+   the car jumps to a base-route node; new build -> no jump.
+
 ## Phases and who (2026-10-27 late, after answers 1-6)
 | phase | who | done when |
 |---|---|---|
 | D1. DONE 2026-10-28: merged TRACKB (tools/openworld/build.py -> build/openworld/TRACKB<id>.lzc), RN_WORLD=1 serves it (host/openworld.c, hook in files.c gf_open); test teleport RN_WORLD_AT=x,y,z[,yaw16] via the game's Car::ResetToPosition | sonnet-exec | done: 1001 Free Run, car at (-23.8,-569.3) on a 1107-only street: GROUND h 30.58, autopilot drives 40 m; without RN_WORLD: NO GROUND (docs/openworld/d1.md) |
 | D2. Breakable barricades at the closures: a new 26xx-like section with the barrier placements at fences, each with an instance row | RE sonnet-exec, then build | native shot: barricade at a fence, a hit knocks it |
 | E. Traffic and AI on the merged roads 0x34121/22/24 | RE then build | traffic drives off the base route |
-| F. Chrome: serve the overlay (tools/serve.py is shared with the peer session) | Opus | webcheck PASS, the OWNER drives it |
+| F. Chrome: serve the overlay (tools/serve.py is shared with the peer session). Design (decided 2026-10-27): web_read (host/files.c:117) already reads any "<prefix>/<path>" by sync Range XHR, so rn_world_open gets an emscripten branch returning real = "world/TRACKB<id>.lzc" (size from /world-files.json); serve.py maps /world/ -> build/openworld in translate_path (2 lines, tell ROA); switch ?world=1. Every read is an uncached sync XHR (Cache-Control no-store): measure STREAML1RA.BUN reads per second while driving before any block cache (prior art: docs/prior_art/nfsu2web.md) | Opus | webcheck PASS, the OWNER drives it |
 | G. The 4 stubs that continue visually: ground from the render mesh | later | |
 
 ## Rules for this block

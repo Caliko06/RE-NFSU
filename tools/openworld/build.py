@@ -3,11 +3,14 @@
 
 Each file is that track's own TRACKB (roads, routes, markers, zones, preload flags, everything else) with
   - collision 0x34130..0x34134 rebuilt from the UNION of the 16 tracks' wsrc rows (polys.key identity), minus the
-    1,149 fence walls of census/openworld_fences.json (answers 1, 2, 5 and build/openworld/re_coll.md);
+    1,132 fence walls of census/openworld_fences_z.json (answers 1, 2, 5, 8; docs/openworld/fences_z.md, re_coll.md);
   - props 0x34027 = union of the 16 tracks' instance rows (0x70 B, sorted by (section, index) like each original),
     classes 0x34026 are identical in the 16 and stay (build/openworld/re_props.md);
   - the nested chunks 0x34153 (look-ahead filter) and 0x34154 (route section 2601..2617) removed from the stream
     container 0x80034150 (build/openworld/re_stream.md); the preload flags 0x34107 stay the base track's;
+  - every RESET (2) and RESET_TO_POINT (3) row of the zone chunk 0x3414a removed (answer 8, docs/openworld/re_zones.md: they
+    teleport the car in any mode and do not look at the track list); the chunk, its container 0x80034147 and the pad after
+    it are re-sized, the exe rebuilds the per-type index from the row types (0x443450, count = size / 0xb4 at 0x4434d0);
   - the tail pads re-laid so 0x34027/0x80034150 stay 16-aligned and 0x8003b000/0x3b200/0x3b300 128-aligned
     (re_coll.md section 5).
 Output: build/openworld/TRACKB<id>.lzc (JDLZ v2) and census/openworld_build.json. Self-checks every file (exit 1 on any
@@ -31,10 +34,12 @@ from lib import load, find, trackb_path, PC  # noqa: E402
 from jdlz import jdlz_decompress  # noqa: E402
 
 OUT = os.path.join(REPO, 'build', 'openworld')
-FENCES = os.path.join(REPO, 'census', 'openworld_fences.json')
+FENCES = os.path.join(REPO, 'census', 'openworld_fences_z.json')
 MANIFEST = os.path.join(REPO, 'census', 'openworld_build.json')
 TRACKS = polys.TRACKS
 DROP = (0x34153, 0x34154)
+ZONE_ROW = 0xb4
+ZONE_DROP = (2, 3)      # RESET, RESET_TO_POINT (zones.py NAMES)
 INST = 0x70
 
 
@@ -95,6 +100,27 @@ def stream_container(d, o, size):
     return struct.pack('<II', 0x80034150, len(body)) + body, [hex(k[0]) for k in kids]
 
 
+def zone_container(d, o, size):
+    """children of 0x80034147 with the type 2 and 3 rows of 0x3414a removed.
+    returns (new chunk bytes, kept rows, rows before, children ids)"""
+    kids, p, end = [], o + 8, o + 8 + size
+    while p < end:
+        cid, sz = struct.unpack_from('<II', d, p)
+        kids.append((cid, bytes(d[p + 8:p + 8 + sz])))
+        p += 8 + sz
+    assert p == end
+    body, kept, before = b'', [], 0
+    for cid, data in kids:
+        if cid == 0x3414a:
+            assert len(data) % ZONE_ROW == 0
+            allr = [data[i:i + ZONE_ROW] for i in range(0, len(data), ZONE_ROW)]
+            before = len(allr)
+            kept = [r for r in allr if struct.unpack_from('<I', r, 0)[0] not in ZONE_DROP]
+            data = b''.join(kept)
+        body += struct.pack('<II', cid, len(data)) + data
+    return struct.pack('<II', 0x80034147, len(body)) + body, kept, before, [hex(k[0]) for k in kids]
+
+
 def build_file(base, g, rows, props):
     """base: decompressed base TRACKB. g: gen.derive(rows). returns the new decompressed bytes"""
     ch = w.top_chunks(base)
@@ -102,7 +128,22 @@ def build_file(base, g, rows, props):
     i0 = ids.index(0x34130)
     assert ids[i0:i0 + 5] == list(w.COLL)
     widx = g['widx'] + (b'\0\0' if (len(g['widx']) // 2) % 2 else b'')
-    out = bytearray(base[:ch[i0][1]])
+    out = bytearray()
+    for k, (cid, o, size) in enumerate(ch[:i0]):
+        if cid == 0x80034147:
+            new_c = zone_container(base, o, size)[0]
+            out += new_c
+            # the id-0 pad after the container keeps the next chunk at the same offset mod 16 (the base files put
+            # 0x34121 at any phase mod 128, so this is only a cautious choice, not a measured need)
+            nxt = ch[k + 1]
+            assert nxt[0] == 0 and nxt[2] == 2048 and not any(base[nxt[1] + 8:nxt[1] + 8 + nxt[2]])
+            shrink = (8 + size) - len(new_c)
+            plen = nxt[2] + shrink % 16
+            out += struct.pack('<II', 0, plen) + b'\0' * plen
+        elif k > 0 and ch[k - 1][0] == 0x80034147:
+            continue                    # the pad just re-laid
+        else:
+            out += base[o:o + 8 + size]
     for cid, payload, al in ((0x34130, g['wmap'], True), (0x34131, g['wcell'], True), (0x34132, b''.join(rows), False),
                              (0x34133, widx, False), (0x34134, w.bbox_payload(rows), True)):
         out += w.chunk(cid, len(out), payload, al)
@@ -145,6 +186,17 @@ def build_file(base, g, rows, props):
             out += emit(c)
         k = j + 1
     return bytes(out)
+
+
+def zone_kids(d):
+    (cb, cs), = find(d, 0x80034147)
+    kids, p = [], cb
+    while p < cb + cs:
+        cid, sz = struct.unpack_from('<II', d, p)
+        kids.append((cid, bytes(d[p + 8:p + 8 + sz])))
+        p += 8 + sz
+    assert p == cb + cs
+    return kids
 
 
 def check(tid, base, new, blob, g, rows, props, fence_keys, union_keys, rng):
@@ -218,7 +270,21 @@ def check(tid, base, new, blob, g, rows, props, fence_keys, union_keys, rng):
         neq += q != bf
     assert neq == 0, '%d boxes differ from brute force' % neq
     facts['query_checks'] = 1700
-    # 7. props chunk
+    # 7. zones: no type 2/3 row left, the others are the base's rows byte for byte and in order, siblings untouched
+    zb, zs = zone_kids(base), zone_kids(new)
+    assert [k[0] for k in zb] == [k[0] for k in zs] == [0x34148, 0x34149, 0x3414a], 'zone container children'
+    assert zb[0][1] == zs[0][1] and zb[1][1] == zs[1][1], '0x34148/0x34149 changed'
+    rb = [zb[2][1][i:i + ZONE_ROW] for i in range(0, len(zb[2][1]), ZONE_ROW)]
+    rn = [zs[2][1][i:i + ZONE_ROW] for i in range(0, len(zs[2][1]), ZONE_ROW)]
+    assert len(zb[2][1]) % ZONE_ROW == 0 and len(zs[2][1]) % ZONE_ROW == 0
+    assert not any(struct.unpack_from('<I', r, 0)[0] in ZONE_DROP for r in rn), 'a type 2/3 zone row is still there'
+    assert rn == [r for r in rb if struct.unpack_from('<I', r, 0)[0] not in ZONE_DROP], 'kept zone rows differ from the base'
+    types = [struct.unpack_from('<I', r, 0)[0] for r in rn]
+    assert types == sorted(types), 'zone rows no longer sorted by type'
+    zc = [c for c in w.top_chunks(new) if c[0] == 0x80034147][0]
+    assert zc[2] == sum(8 + len(k[1]) for k in zs), 'container size'
+    facts.update(zone_rows_base=len(rb), zone_rows_removed=len(rb) - len(rn), zone_rows_kept=len(rn))
+    # 8. props chunk
     pb, ps = chunk_data(new, 0x34027)
     assert ps == 8 + INST * len(props) and (pb - 8) % 16 == 0 and new[pb:pb + 8] == b'\x11' * 8
     assert [bytes(new[o:o + INST]) for o in range(pb + 8, pb + ps, INST)] == props
@@ -242,7 +308,8 @@ def main():
     print('derived quadtree: %d nodes, %d cells (%.0fs)' % (g['nodes'], g['cells'], time.time() - t0), flush=True)
     os.makedirs(OUT, exist_ok=True)
     rng = random.Random(7)
-    man = dict(source='tools/openworld/build.py', fences_removed=n_fence, union_polygons=n_union, polygons=len(rows),
+    man = dict(source='tools/openworld/build.py', fences_file='census/openworld_fences_z.json', zone_types_removed=list(ZONE_DROP),
+               fences_removed=n_fence, union_polygons=n_union, polygons=len(rows),
                instances=len(props), files={})
     for t in ids:
         base = bases[t]

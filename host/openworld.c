@@ -112,12 +112,23 @@ static int ground_at(uint32_t car, uint32_t p, float *h, int *flag) {
     return *flag != 0;
 }
 
+// The game's own zone search 0x4436d0 (ecx = zone manager 0x7372b0, edx = type, eax = 0: from the first row, edi = the point
+// xy = car+0x800 as 0x430e00 passes it, stack arg = the track direction [0x78a2fc]): the first zone row of that type that
+// holds the car, 0 = none. docs/openworld/re_zones.md. Types 2 RESET and 3 RESET_TO_POINT are what 0x430e00 asks for.
+static uint32_t zone_at(uint32_t car, uint32_t type) {
+    uint32_t a[1] = {ld(&tc, 0x78a2fc, 4)};
+    tc.r[ECX] = 0x7372b0; tc.r[EDX] = type; tc.r[EAX] = 0; tc.r[EDI] = car + 0x800;
+    return call_guest(&tc, 0x4436d0, 1, a);
+}
+
+// car+0x87c is the "reset me" flag 0x427ed0 raises for a RESET zone (0x4264d0 consumes it); +0x1e0/+0x1e4 the velocity.
 static void dump(Ctx *c, const char *what, uint32_t node, uint32_t car) {
     float h = 0; int flag = 0, ok = 0;
     if (car) ok = ground_at(car, car + 0x60, &h, &flag);
-    rn_log("OPENWORLD %s: frame %u node %08x pos %.2f %.2f %.2f | car %08x (player view obj [0x740500] %08x) pos %.2f %.2f %.2f yaw16 %d | game ground query 0x440a40 at the car: %s height %.2f (flag byte %d)",
+    rn_log("OPENWORLD %s: frame %u node %08x pos %.2f %.2f %.2f | car %08x (player view obj [0x740500] %08x) pos %.2f %.2f %.2f yaw16 %d | game ground query 0x440a40 at the car: %s height %.2f (flag byte %d) | car+0x87c %u speed %.1f m/s | zone RESET %08x RESET_TO_POINT %08x",
            what, rn_telem.presents, node, ldf(c, node + 0x50), ldf(c, node + 0x54), ldf(c, node + 0x58), car, ld(c, 0x740500, 4),
-           ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), (int16_t)ld(c, car + 0x3b4, 2), ok ? "GROUND" : "NO GROUND", h, flag);
+           ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), (int16_t)ld(c, car + 0x3b4, 2), ok ? "GROUND" : "NO GROUND", h, flag,
+           ld(c, car + 0x87c, 4), hypotf(ldf(c, car + 0x1e0), ldf(c, car + 0x1e4)), zone_at(car, 2), zone_at(car, 3));
 }
 
 static void *tp_thread(void *arg) {
@@ -129,8 +140,17 @@ static void *tp_thread(void *arg) {
     if (nat >= 0 && nat < 3) { rn_log("OPENWORLD: cannot read RN_WORLD_AT \"%s\" (x,y,z[,yaw16])", getenv("RN_WORLD_AT")); return NULL; }
     const char *mv = getenv("RN_WORLD_MOVE");
     float move = mv ? (float)atof(mv) : 120;     // the race has started (the start in 0x422eb0 resets cars at GO) once the car left the grid by this much
+    const char *fl = getenv("RN_WORLD_FLOW");    // test only: count RN_WORLD_WAIT presents from when the race state (flow 6/N) reaches N (4 = GO), not from the first state 6
+    int flow_n = fl ? atoi(fl) : 0;
+    // test only, RN_WORLD_PUSH="speed,metres": after the teleport the car's velocity (car+0x70/+0x74, as RN_STEERLOG reads it) is set each poll
+    // to speed m/s along the teleport yaw until the car is that many metres from the point: a straight drive (the keys do not throttle in the native run).
+    float push_v = 0, push_d = 0;
+    if (getenv("RN_WORLD_PUSH")) sscanf(getenv("RN_WORLD_PUSH"), "%f,%f", &push_v, &push_d);
+    int pushing = 0;
     unsigned raced = 0, last = 0;
-    float p0[2] = {0, 0};
+    float p0[2] = {0, 0}, pp[2] = {0, 0};
+    uint32_t f87 = 0, z2 = 0, z3 = 0;
+    int havep = 0;
     int done = 0, made = 0, have0 = 0;
     for (;;) {
         usleep(20000);
@@ -139,15 +159,34 @@ static void *tp_thread(void *arg) {
         if (c && !c->halt) {
             if (ld(c, 0x77a920, 4) != 6) { raced = 0; }
             else {
-                if (!raced) raced = rn_telem.presents + 1;
+                if (flow_n && (rn_flow >> 8) != 6) raced = 0;
+                else if (flow_n && (rn_flow & 0xff) != (unsigned)flow_n) raced = 0;
+                else if (!raced) raced = rn_telem.presents + 1;
                 if (!made) made = ctx_make();
                 uint32_t node = made ? player_node(c) : 0;
                 uint32_t car = node;   // the list node is the car object itself (its +0x60 is the position 0x422eb0 reads from [[0x7361f8]+0x28])
                 if (car && car < GUEST_MEM - 0x1000) {
-                    unsigned age = rn_telem.presents - raced;
+                    unsigned age = rn_telem.presents + 1 - raced;
                     if (!have0) { p0[0] = ldf(c, car + 0x60); p0[1] = ldf(c, car + 0x64); have0 = 1; }
+                    // Events between the periodic lines (the reset flag is consumed within a frame or two): a jump of the
+                    // car > 15 m between two polls, car+0x87c changing, and entering or leaving a RESET / RESET_TO_POINT zone.
+                    if (made) {
+                        float cx = ldf(c, car + 0x60), cy = ldf(c, car + 0x64);
+                        uint32_t v87 = ld(c, car + 0x87c, 4), n2 = zone_at(car, 2), n3 = zone_at(car, 3);
+                        if (havep && hypotf(cx - pp[0], cy - pp[1]) > 15) { rn_log("OPENWORLD JUMP %.1f m from %.2f %.2f", hypotf(cx - pp[0], cy - pp[1]), pp[0], pp[1]); dump(c, "jump", node, car); }
+                        else if (v87 != f87 || n2 != z2 || n3 != z3) dump(c, v87 != f87 ? "flag 0x87c changed" : "zone changed", node, car);
+                        pp[0] = cx; pp[1] = cy; havep = 1; f87 = v87; z2 = n2; z3 = n3;
+                    }
+                    if (done && push_v > 0 && nat > 3) {
+                        float dx = ldf(c, car + 0x60) - at[0], dy = ldf(c, car + 0x64) - at[1];
+                        if (hypotf(dx, dy) < push_d) {
+                            float a = at[3] * 6.2831853f / 65536.f;
+                            stf(c, car + 0x70, push_v * cosf(a)); stf(c, car + 0x74, push_v * sinf(a));
+                            if (!pushing) { rn_log("OPENWORLD: push %.1f m/s for %.1f m starts at frame %u", push_v, push_d, rn_telem.presents); pushing = 1; }
+                        } else if (pushing) { rn_log("OPENWORLD: push ends at frame %u, %.1f m from the point", rn_telem.presents, hypotf(dx, dy)); pushing = 0; push_v = 0; }
+                    }
                     int moved = hypotf(ldf(c, car + 0x60) - p0[0], ldf(c, car + 0x64) - p0[1]) >= move;
-                    if (age >= wait && moved && !done && nat >= 3) {
+                    if (raced && age >= wait && moved && !done && nat >= 3) {
                         dump(c, "before", node, car);
                         stf(&tc, scratch, at[0]); stf(&tc, scratch + 4, at[1]); stf(&tc, scratch + 8, at[2]);
                         uint32_t a[2] = {0, 0};
@@ -156,7 +195,7 @@ static void *tp_thread(void *arg) {
                         // the streamer's viewer, as the start in 0x422eb0 seeds it: 0x444840(eax = 0, edx = 0x77a980, ecx = &car pos)
                         tc.r[EAX] = 0; tc.r[EDX] = 0x77a980; tc.r[ECX] = car + 0x60;
                         call_guest(&tc, 0x444840, 0, NULL);
-                        done = 1;
+                        done = 1; havep = 0;   // the teleport is not a jump to report
                         rn_log("OPENWORLD: teleport asked %.1f %.1f %.1f yaw %d, halt %u at %08x %s", at[0], at[1], at[2], nat > 3 ? (int)at[3] : -1, tc.halt, tc.halt_at, tc.why ? tc.why : "");
                         if (tc.halt) { tc.halt = 0; tc.why = NULL; tc.r[ESP] = ld(&tc, tc.fs + 4, 4) - 64; }
                         dump(c, "after", node, car);
