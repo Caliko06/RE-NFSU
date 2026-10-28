@@ -10,9 +10,9 @@ Speed.exe (the PS2 ELF for the blur), each fix behind a switch, look choices as 
 2. Lag: OWNER telemetry 2026-10-27 shows Present steady (95 % 15-18 ms, 1 frame > 33): measure sim steps per Present.
 3. Traffic: cars in the game's list vs drawn per frame (native vs Chrome); spawn, despawn, density from the exe.
 4. Road: fx\worldreflect.efx (ReflectedTexMin, ROAD_WET, PUDDLE): full reflection only where the game marks it.
-Then the open world resumes (docs/OPENWORLD.md, HANDOFF of a96d0ca).
+In parallel (OWNER 2026-10-27): another session works the open world in its own files (docs/OPENWORLD.md).
 
-## Open world (paused, OWNER 2026-10-27 night)
+## Open world (parallel session, OWNER 2026-10-27 night)
 All of Olympic City (L1RA, the 16 street tracks) drivable with no fences, GTA style, apart from Free Run. Out: drag
 and drift arenas, test track, new menus, police, online. Phases and answers: docs/OPENWORLD.md.
 
