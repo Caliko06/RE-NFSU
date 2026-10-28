@@ -31,6 +31,25 @@ Apart from Free Run (host/free.c, RN_FREE), which stays as it is.
 | props 0x34027 | inside sub_5952a0 | |
 PS2 ELF equivalents are in the ref tool docstrings (walls 0x159578, roads 0x15cca0, props 0x307908, TrackStreamer::Init 0x15f8e0).
 
+## Answers (2026-10-27, from Speed.exe; REA ghidra ev_328ced7e = props loader 0x5952a0)
+1. Collision (ANSWERED). wsrc 0x34132 = "TrackPolygon" rows of 32 B, ground AND walls; layout in
+   tools/openworld/polys.py (loader 0x441380, manager 0x77b130; body build 0x43ff30/0x43fd20). The car's ground
+   query 0x440a40 uses only these polygons (list from 0x4407b0, (flags & 0x0a) == 0) and returns "no ground" off
+   them: there is no other ground source. Bodies: "TrackPolygon%d" 0x46a440, save/restore 0x46a6e0.
+   Measured: the 16 tracks are cuts of ONE city mesh: 54,735 unique polygons, 97.5 % identical byte for byte across
+   tracks. So the union of the 16 wsrc is a clean world collision. Flags 0x00/0x10/0x11 ground, 0x12 low walls,
+   0x16 infinite walls (z -508..508). Surface byte (+2) does not mark fences.
+2. Fences (OPEN). Physically: walls in wsrc (no flag marks them). Visual: smackable props (0x34026 classes 256 B,
+   class key dword @+0x80 per 0x5952a0; 0x34027 instances 0x70 B, position @+0x60). The instance->class link is NOT
+   @+8 (0 of 4580 bind): read the users of the instance list 0x734470/0x734474 before naming any barrier prop.
+   Rejected: classifying fence walls by geometry (ground on both sides, route crossing): it flags medians and
+   islands too; the criterion has to come from the exe or from the props, not from tuning.
+3. Streaming (LEADS). 0x4496a0 opens TRACKS\STREAM%s.BUN / STREAM%s_%d.BUN; 0x446db0 parses the per-track
+   container 0x80034150 (0x34151..0x34154); string TRACK_PATH_ZONE_STREAMER_PREDICTION says zones predict the
+   sections. Hopper dumps: build/hopper/owstream.txt, owcoll.txt (every ref to 0x77b130..0x77b194), owprops.txt.
+4. Map (DONE, phase B): tools/openworld/map.py -> build/openworld/map.png + census/openworld.json. The 16 routes
+   form one connected street network.
+
 ## Questions, in order (each one is answered from the exe before any run)
 1. Collision: is wsrc only the side walls, or the ground too? How does a car find the road height off the track
    (sub_441380 -> its users)? This decides everything: per-track walls mean that off a track's corridor there is
