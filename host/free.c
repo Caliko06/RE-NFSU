@@ -40,6 +40,28 @@ static const struct { const char *name; uint32_t preset; } CANON[] = {
 int rn_free_now;                 // 1 while 0x4b4040 builds free mode's rivals (host/rivals.c rival_ride asks free_rival), 2 in its traffic
 static int on, live, picked[NRIV], npicked;
 static uint32_t zone_at, zone_was;     // the clear zone free_place changed (free mode, the whole race) and its value
+// The rubber band 0x44bd10 needs a gap from 0x44c010, which is 0 while [0x78a400] (the race options' Catch Up byte +0x1f, set by
+// the mode setups 0x4b4a56..0x4b5f47) is 0: free mode sets it to 1 for the race (RN_FREECU=0: the game's value), so rivals ahead
+// wait and rivals behind are boosted ([veh+0x404]) as in a Quick Race with Catch Up on. Put back at race end (free_tick).
+static int cu_was = -1;
+// 0x44c010 reads the gap through the curves 0x779c78/0x779dd8 (8 rows of 11 (x m, y) points, loaded at run time): a
+// leader is slowed only 3 % at 120 m and 30 % at 320 m, so in Free Run rivals settle 250 m ahead. Free mode scales the
+// x axis by RN_FREECUX (default 0.35: 30 % at 110 m) and puts the curves back at race end.
+static float cu_x[8][11];
+static void free_curves(Ctx *c, int on) {
+    static int saved;
+    float f = getenv("RN_FREECUX") ? (float)atof(getenv("RN_FREECUX")) : 0.35f;
+    for (int r = 0; r < 8; r++)
+        for (int k = 0; k < 11; k++) {
+            uint32_t a = 0x779c78 + 0x58 * r + 8 * k;
+            float x;
+            if (on) cu_x[r][k] = ldf(c, a), x = cu_x[r][k] * f;
+            else if (saved) x = cu_x[r][k];
+            else continue;
+            uint32_t u; memcpy(&u, &x, 4); st(c, a, u, 4);
+        }
+    saved = on;
+}
 static int n_game, n_free;             // free_spacing: moves with the game's spacing, moves given the track's spacing
 static uint32_t names;           // NRIV guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
 
@@ -166,14 +188,46 @@ void free_tick(Ctx *c) {
         if (raced && ld(c, 0x77a920, 4) == 3) {
             live = raced = 0;
             if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
+            if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
         }
         return;
     }
     raced = 1;
+    if (cu_was < 0 && (!getenv("RN_FREECU") || atoi(getenv("RN_FREECU")))) {
+        cu_was = (int)ld(c, 0x78a400, 4);
+        st(c, 0x78a400, 1, 4);
+        free_curves(c, 1);
+        if (getenv("RN_FREELOG")) rn_log("FREE catch up: game %d, now 1; curve x %.0f -> %.0f m", cu_was, cu_x[0][10], ldf(c, 0x779c78 + 80));
+    }
     static int log = -1;
     if (log < 0) log = getenv("RN_FREELOG") != NULL;
-    if (!log || rn_telem.presents % 120) return;
+    if (!log) return;
     uint32_t h = ld(c, 0x7361f8, 4), player = 0;
+    // A contact: a rival's centre within 4 m of the player's (car to car), 10 s after the start (the grid), at most one line per second.
+    static uint32_t first, last_contact;
+    if (!first) first = rn_telem.presents;
+    if (h && rn_telem.presents > first + 600 && rn_telem.presents > last_contact + 60) {
+        uint32_t pc = 0;
+        for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200 && !pc; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4);
+            if (e && ld(c, e + 4, 4) == 1) pc = r;
+        }
+        for (uint32_t r = pc ? ld(c, h, 4) : h, k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4);
+            if (!e || ld(c, e + 4, 4) != 2) continue;
+            double dx = ldf(c, r + 0x50) - ldf(c, pc + 0x50), dy = ldf(c, r + 0x54) - ldf(c, pc + 0x54);
+            if (dx * dx + dy * dy < 16) { rn_log("FREE contact %s %.1f m frame %u", G(e + 0x73c), sqrt(dx * dx + dy * dy), rn_telem.presents); last_contact = rn_telem.presents; }
+        }
+    }
+    // Each rival's current action (docs/openworld/re_rivals_ai.md 0: [obj+0x3f8], type +0x1f8: 0 Pass, 1 AvoidAvoidable, 5 Block,
+    // 7 JustDrive, 0xa GetUnstuck, 0xc IJustGotHit, 0xe AccidentRecovery): every change counted, printed every 10 s.
+    static uint32_t cand[64], acts[64][0x16], last_type[64]; static int ncand;
+    for (int j = 0; j < ncand; j++) {
+        uint32_t act = ld(c, cand[j], 4) == 0x6c89f0 ? ld(c, cand[j] + 0x3f8, 4) : 0, ty = act ? ld(c, act + 0x1f8, 4) : 0x15;
+        if (ty > 0x15) ty = 0x15;
+        if (ty != last_type[j]) acts[j][ty]++, last_type[j] = ty;
+    }
+    if (rn_telem.presents % 120) return;
     int ntraffic = 0;
     for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4), kind = e ? ld(c, e + 4, 4) : 0;
@@ -187,13 +241,14 @@ void free_tick(Ctx *c) {
         if (!e || ld(c, e + 4, 4) != 2) continue;
         double dx = ldf(c, r + 0x50) - ldf(c, player + 0x50), dy = ldf(c, r + 0x54) - ldf(c, player + 0x54);
         double dz = ldf(c, r + 0x58) - ldf(c, player + 0x58);
-        o += snprintf(line + o, sizeof line - o, " %s %.0f m", G(e + 0x73c), sqrt(dx * dx + dy * dy + dz * dz));
+        // route distance [car+0x814] (0x41f5f0) ahead (+) or behind (-) the player's
+        o += snprintf(line + o, sizeof line - o, " %s %.0f m (%+.0f)", G(e + 0x73c), sqrt(dx * dx + dy * dy + dz * dz),
+                      ldf(c, r + 0x814) - ldf(c, player + 0x814));
         if (o > 200) break;
     }
     // docs/openworld_e_re.md B: each rival's AI context: the racer's AIVehicle (vtable 0x6c89f0, ctor 0x4620c0 over the base 0x44a330, +4 = its vehicle, one guest memory scan) with the
     // context at +0x2c and its PATH list (ctx + 0x3a8 -> object: count +4, node objects at +8 + 4 i, section byte +0x5c, node short
     // +0x5e (short), current index +0xac).
-    static uint32_t cand[64]; static int ncand;
     if (!ncand) {
         const uint32_t *m = (const uint32_t *)c->mem;
         for (uint32_t w = 0x800000 / 4; w < GUEST_MEM / 4 - 1 && ncand < 64; w++) if (m[w] == 0x6c89f0) cand[ncand++] = w * 4;
@@ -205,8 +260,13 @@ void free_tick(Ctx *c) {
         uint32_t e = ld(c, veh + 0x14, 4);
         if (!e || ld(c, e + 4, 4) != 2) continue;
         uint32_t ctx = obj + 0x2c, path = ld(c, ctx + 0x3a8, 4), cnt = path ? ld(c, path + 4, 4) : 0;
-        char pl[400]; int q = snprintf(pl, sizeof pl, "FREE path %s pos %.0f %.0f slot %d idx %d n %u:", G(e + 0x73c), ldf(c, veh + 0x50), ldf(c, veh + 0x54),
-                                       (int8_t)c->mem[ctx + 0x388], path ? (int)ld(c, path + 0xac, 4) : -1, cnt);
+        // Catch-up 0x44bd10 (eax = this AIVehicle; docs/openworld/re_rivals_ai.md 4): the boost [veh+0x404], [obj+0x4b8], the gate byte
+        // [obj+0x46c] (1 in the base ctor 0x44a330, vslot 0x3c 0x44c920), the racer flag [[obj+0x3f8]+0x1f2], the target [obj+0x470].
+        uint32_t act = ld(c, obj + 0x3f8, 4);
+        char pl[400]; int q = snprintf(pl, sizeof pl, "FREE path %s pos %.0f %.0f cu %.2f %.2f on %u/%u tgt %08x slot %d idx %d n %u:", G(e + 0x73c),
+                                       ldf(c, veh + 0x50), ldf(c, veh + 0x54), ldf(c, veh + 0x404), ldf(c, obj + 0x4b8), c->mem[obj + 0x46c],
+                                       act ? c->mem[act + 0x1f2] : 9, ld(c, obj + 0x470, 4), (int8_t)c->mem[ctx + 0x388],
+                                       path ? (int)ld(c, path + 0xac, 4) : -1, cnt);
         int ps = -2, pn = 0, first = 0;                   // run-length: section:first-last node
         for (uint32_t i = 0; i <= cnt && i < 64 && q < 360; i++) {
             uint32_t n = i < cnt ? ld(c, path + 8 + 4 * i, 4) : 0;
@@ -242,7 +302,32 @@ void free_tick(Ctx *c) {
                       c->mem[v + 0x4d1] ? "P" : "", c->mem[v + 0x410] ? "N" : "", c->mem[v + 0x4d0] ? "o" : "");
         last[k][0] = x, last[k][1] = y;
     }
+    for (int j = 0; j < ncand; j++) {
+        uint32_t veh = ld(c, cand[j] + 4, 4), e = veh > 0x10000 && veh < 0x3fff0000 ? ld(c, veh + 0x14, 4) : 0;
+        if (!e || ld(c, e + 4, 4) != 2) continue;
+        char al[200]; int a = snprintf(al, sizeof al, "FREE actions %s:", G(e + 0x73c));
+        for (int ty = 0; ty < 0x16; ty++) if (acts[j][ty]) a += snprintf(al + a, sizeof al - a, " %x:%u", ty, acts[j][ty]);
+        rn_log("%s", al);
+    }
     t += snprintf(tl + t, sizeof tl - t, " | spacing %d game, %d free", n_game, n_free);
+    // The catch-up's gates (re_rivals_ai.md 4): 0x78a344 (byte), 0x7361a8, 0x78a320 > 0, 0x7360ac, [0x7361f0] != 9, players 0x7361c4,
+    // player 0x7361bc, strength [0x78a404 + 4 slot], difficulty 0x78a40c.
+    uint32_t pt = ld(c, 0x7361f0, 4);
+    rn_log("FREE catchup: 78a344 %u 7361a8 %u 78a320 %d 7360ac %u 7361f0 %u 7361c4 %u 7361bc %08x 78a404 %.2f %.2f 78a40c %u 78a2f0 %x 78a400 %u 77a4a0 %.1f 77a49c %.2f",
+           c->mem[0x78a344], ld(c, 0x7361a8, 4), (int)ld(c, 0x78a320, 4), ld(c, 0x7360ac, 4), pt ? ld(c, pt, 4) : 0xffffffffu,
+           ld(c, 0x7361c4, 4), ld(c, 0x7361bc, 4), ldf(c, 0x78a404), ldf(c, 0x78a408), ld(c, 0x78a40c, 4), ld(c, 0x78a2f0, 4), ld(c, 0x78a400, 4), ldf(c, 0x77a4a0), ldf(c, 0x77a49c));
+    static int curves;      // the catch-up curves 0x44c010 reads (x = route gap * [0x7372b0]): loaded at run time
+    if (!curves++) {
+        rn_log("FREE cu 7372b0 %.3f 78a318 %u 78a31c %u 78a300 %u", ldf(c, 0x7372b0), ld(c, 0x78a318, 4), ld(c, 0x78a31c, 4), ld(c, 0x78a300, 4));
+        for (uint32_t r = 0; r < 16; r++) {
+            char b[400]; int n = 0;
+            for (int k = 0; k < 22; k++) n += snprintf(b + n, sizeof b - n, " %.2f", ldf(c, 0x779c78 + 0x58 * r + 4 * k));
+            rn_log("FREE cu %08x%s", 0x779c78 + 0x58 * r, b);
+        }
+        char b[400]; int n = 0;
+        for (int k = 0; k < 32; k++) n += snprintf(b + n, sizeof b - n, " %.2f", ldf(c, 0x779f38 + 4 * k));
+        rn_log("FREE cu pos%s", b);
+    }
     rn_log("%s", tl);
 }
 
