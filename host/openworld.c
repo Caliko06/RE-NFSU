@@ -1,4 +1,5 @@
-// Open world, phase D1 (docs/OPENWORLD.md). Native only; everything is off unless RN_WORLD=1.
+// Open world, phase D1 (docs/OPENWORLD.md). The merged TRACKB for the 16 real tracks is off unless RN_WORLD=1; the WORLD entry
+// of the Free Run list (below, track id 1010) is always on.
 //
 // 1. File redirect: with RN_WORLD=1 the game's TRACKS\TRACKB<id>.LZC of the 16 L1RA street tracks is served from the merged
 //    copy tools/openworld/build.py wrote (build/openworld/TRACKB<id>.lzc, or RN_WORLD_DIR): one collision world for the whole
@@ -55,30 +56,136 @@ EM_JS(double, world_head, (const char *path), {
 });
 #endif
 
-// gpath ends in TRACKB<id>.LZC (any case, any folder): the merged file when it exists. 1 = served (real and size are set).
-int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
-    tp_start();   // RN_WORLD_AT also runs on the original TRACKB (the A/B run: RN_WORLD_AT=log only logs)
-    if (!enabled()) return 0;
+// ---- the "WORLD" entry of the Free Run list (track id 1010), docs/openworld/world_entry.md -------------------------------------
+// Always on (native and web), RN_WORLDROW=0 = the list as shipped. The game's track-info table (GLOBALB chunk 0x34201, 31 rows
+// x 0xfc, loader 0x442040: [0x736168] = rows, [0x73616c] = count) gets a 32nd row cloned from row 0 (CT1, region L1RA): id 1010,
+// mask 0x90 (0x10 = Free Run only; 0x80 = no reverse entry, PATCH 0x4ba207 skips it in the list's second pass). The chunk handler
+// pointer 0x7007ec points at a cave (PATCH, slot SCREEN_ADDR+0x74) that lands in world_rows, which runs 0x442040 and adds the row.
+// The name comes the same way: 0x700850 (language loader 0x59fce0) -> world_lang adds the pair (hash of "TRACK_NAME_1010", "WORLD")
+// to the sorted language table [0x734434] (count [0x73442c]). The minimap of the row reads its bounds at +0x8c/+0x90/+0x94
+// (0x590ad0: u = (x - X0) / S, v = (Y0 - y) / S): the picture of tools/openworld/worldmap.py, same three numbers.
+#define WORLD_ID   1010
+#define WORLD_BASE 1001            // its TRACKB is the merged city of base track 1001
+#define WORLD_X0   (-750.f)
+#define WORLD_Y0   1000.f
+#define WORLD_S    3200.f
+#define WORLD_NAME_HASH 0x5461a075u   // "TRACK_NAME_1010" with the game's hash (0x4f42f0: h = -1, h = h * 33 + c)
+
+static int worldrow_on(void) {
+    static int on = -1;
+    if (on < 0) { const char *e = getenv("RN_WORLDROW"); on = !(e && e[0] == '0'); }
+    return on;
+}
+
+static uint32_t rows_prev, lang_prev;   // the copies of the last load (the unloaders only zero the pointers): freed at the next one
+
+// Handler of chunk 0x34201: the original loader, then one more row.
+uint32_t world_rows(Ctx *c) {
+    uint32_t chunk = ARG(0), r = call_guest_cdecl(c, 0x442040, 1, &chunk);
+    if (!r || ld(c, chunk, 4) != 0x34201 || !worldrow_on()) return r;
+    uint32_t rows = ld(c, 0x736168, 4), n = ld(c, 0x73616c, 4);
+    if (!rows || n != 31 || (int16_t)ld(c, rows + 0x6c, 2) != 1001) { rn_log("OPENWORLD: track table is not the expected one (%u rows), no WORLD row", n); return r; }
+    uint32_t nr = guest_alloc((n + 1) * 0xfc);
+    if (!nr) return r;
+    memcpy(G(nr), G(rows), n * 0xfc);
+    uint32_t w = nr + n * 0xfc;
+    memcpy(G(w), G(rows), 0xfc);                                  // CT1: L1RA, the circuit values (laps, traffic counts)
+    memset(G(w), 0, 0x40);
+    snprintf(G(w), 32, "WORLD");                                  // +0x00 name, copied at +0xdc
+    memset(G(w + 0xdc), 0, 32);
+    snprintf(G(w + 0xdc), 32, "WORLD");
+    snprintf(G(w + 0x20), 32, "Location1\\Track_%d", WORLD_ID);
+    st(c, w + 0x6c, WORLD_ID, 2); st(c, w + 0x6e, WORLD_ID, 2);   // s16 id twice
+    st(c, w + 0x74, 0x90, 4);                                     // mask: Free Run (0x10) only, no reverse (0x80)
+    stf(c, w + 0x8c, WORLD_X0); stf(c, w + 0x90, WORLD_Y0); stf(c, w + 0x94, WORLD_S); st(c, w + 0x98, 0, 2);   // minimap bounds, no rotation
+    if (rows_prev) guest_free(rows_prev);
+    rows_prev = nr;
+    st(c, 0x736168, nr, 4); st(c, 0x73616c, n + 1, 4);
+    rn_log("OPENWORLD: track row %u = WORLD (id %d, mask 0x90) at %08x", n, WORLD_ID, w);
+    return r;
+}
+
+// Handler of chunk 0x39000 (the language table): the original loader, then the name of the WORLD row in sorted place.
+uint32_t world_lang(Ctx *c) {
+    uint32_t chunk = ARG(0), r = call_guest_cdecl(c, 0x59fce0, 1, &chunk);
+    if (!r || ld(c, chunk, 4) != 0x39000 || !worldrow_on()) return r;
+    uint32_t n = ld(c, 0x73442c, 4), tab = ld(c, 0x734434, 4);
+    if (!tab || !n) return r;
+    uint32_t nt = guest_alloc((n + 1) * 8), str = guest_alloc(8), k = 0;
+    if (!nt || !str) return r;
+    snprintf(G(str), 8, "WORLD");
+    while (k < n && ld(c, tab + 8 * k, 4) < WORLD_NAME_HASH) k++;
+    // English.bin already has TRACK_NAME_1010 ("Grand Station (DT 6)", a cut track): then that pair is replaced, not duplicated
+    int have = k < n && ld(c, tab + 8 * k, 4) == WORLD_NAME_HASH;
+    memcpy(G(nt), G(tab), 8 * k);
+    st(c, nt + 8 * k, WORLD_NAME_HASH, 4); st(c, nt + 8 * k + 4, str, 4);   // 0x59fce0 made the string pointers absolute
+    memcpy(G(nt + 8 * k + 8), G(tab + 8 * (k + have)), 8 * (n - k - have));
+    n -= have;
+    if (lang_prev) guest_free(lang_prev);
+    lang_prev = nt;
+    st(c, 0x734434, nt, 4); st(c, 0x73442c, n + 1, 4);
+    return r;
+}
+
+// The caves of PATCH 0x7007ec / 0x700850 jump through these slots; filled on the first file open (before GLOBALB is read), so
+// host/win32.c is untouched.
+static void world_install(void) {
+    static int done;
+    if (done || !g_ctx) return;
+    done = 1;
+    st(g_ctx, SCREEN_ADDR + 0x74, host_addr_of("rn", "world_rows"), 4);
+    st(g_ctx, SCREEN_ADDR + 0x78, host_addr_of("rn", "world_lang"), 4);
+}
+// (world_rows and world_lang are in the api table at the end of host/free.c, the last table dispatch.c searches.)
+
+// A file of the WORLD id: the same name with the id of the base track (a shipped file), 1 = it is one of those.
+int rn_world_alias(const char *gpath, char *out, size_t n) {
     const char *b = gpath;
     for (const char *p = gpath; *p; p++) if (*p == '/' || *p == '\\') b = p + 1;
+    if (!worldrow_on() || !ci_eq(b, "STREAML1RA_1010.BUN", 20)) return 0;   // STREAML1RA_<id>.BUN: 0 bytes for every L1RA track, the base one too
+    snprintf(out, n, "%.*s%s", (int)(b - gpath), gpath, "STREAML1RA_1001.BUN");
+    return 1;
+}
+
+// One file of the merged city by its name, served from build/openworld (native) or /world/ (web, tools/serve.py). 1 = served.
+static int world_file(const char *name, char *real, size_t n, uint64_t *size) {
+#ifdef __EMSCRIPTEN__
+    snprintf(real, n, "world/%s", name);
+    double len = world_head(real);
+    if (len < 0) { rn_log("OPENWORLD: no merged file /%s, the original is used", real); return 0; }
+    *size = (uint64_t)len;
+#else
+    const char *dir = getenv("RN_WORLD_DIR");
+    snprintf(real, n, "%s/%s", dir && *dir ? dir : "build/openworld", name);
+    struct stat sb;
+    if (stat(real, &sb) || !S_ISREG(sb.st_mode)) { rn_log("OPENWORLD: no merged file %s, the original is used", real); return 0; }
+    *size = (uint64_t)sb.st_size;
+#endif
+    return 1;
+}
+
+// gpath ends in TRACKB<id>.LZC (any case, any folder): the merged file when it exists; for the WORLD id (always) also
+// TEX1010TRACK.BIN, the minimap picture. 1 = served (real and size are set).
+int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
+    tp_start();   // RN_WORLD_AT also runs on the original TRACKB (the A/B run: RN_WORLD_AT=log only logs)
+    world_install();
+    const char *b = gpath;
+    for (const char *p = gpath; *p; p++) if (*p == '/' || *p == '\\') b = p + 1;
+    if (worldrow_on() && ci_eq(b, "TEX1010TRACK.BIN", 17)) {
+        if (!world_file("TEX1010TRACK.BIN", real, n, size)) return 0;
+        rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size);
+        return 1;
+    }
     if (!ci_eq(b, "TRACKB", 6) || !isdigit((unsigned char)b[6])) return 0;
     const char *e = b + 6;
     unsigned id = 0;
     while (isdigit((unsigned char)*e)) id = id * 10 + (unsigned)(*e++ - '0');
     if (!ci_eq(e, ".LZC", 5)) return 0;
-#ifdef __EMSCRIPTEN__
-    // Web (?world=1): tools/serve.py serves build/openworld at /world/; host/files.c web_read fetches "<real>" by range.
-    snprintf(real, n, "world/TRACKB%u.lzc", id);
-    double len = world_head(real);
-    if (len < 0) { rn_log("OPENWORLD: no merged file /%s, the original TRACKB%u is used", real, id); return 0; }
-    *size = (uint64_t)len;
-#else
-    const char *dir = getenv("RN_WORLD_DIR");
-    snprintf(real, n, "%s/TRACKB%u.lzc", dir && *dir ? dir : "build/openworld", id);
-    struct stat sb;
-    if (stat(real, &sb) || !S_ISREG(sb.st_mode)) { rn_log("OPENWORLD: no merged file %s, the original TRACKB%u is used", real, id); return 0; }
-    *size = (uint64_t)sb.st_size;
-#endif
+    if (id == WORLD_ID && worldrow_on()) id = WORLD_BASE;        // the WORLD row: always the merged city of the base track
+    else if (!enabled()) return 0;
+    char name[40];
+    snprintf(name, sizeof name, "TRACKB%u.lzc", id);             // web: tools/serve.py serves build/openworld at /world/; host/files.c web_read fetches "<real>" by range
+    if (!world_file(name, real, n, size)) { rn_log("OPENWORLD: the original TRACKB%u is used", id); return 0; }
     rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size);
     return 1;
 }

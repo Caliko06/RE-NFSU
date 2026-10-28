@@ -2277,6 +2277,13 @@ static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     static int smlog = -1;
     if (smlog < 0) smlog = getenv("RN_SMOOTH_LOG") != NULL;
     if (base && smlog && is_car_vs(dev.vs)) { static int nl; if (nl++ < 6) rn_log("SMOOTH call type %u i32 %d prims %u", ARG(1), i32, ARG(6)); }
+    static int carlog = -1;   // RN_CARLOG=1: every car body draw of each 600th frame (eye c17 tells the cars apart, paint c18/c19, blend state)
+    if (carlog < 0) carlog = getenv("RN_CARLOG") != NULL;
+    if (carlog && dev.frames % 600 == 0 && is_car_vs(dev.vs))
+        rn_log("CAR f%u eye %.1f %.1f %.1f c18 %.2f %.2f %.2f %.2f c19 %.2f %.2f %.2f %.2f ab %u %u/%u at %u ref %u ps %x t0 %x t1 %x prims %u",
+               dev.frames, dev.vsf[17][0], dev.vsf[17][1], dev.vsf[17][2], dev.vsf[18][0], dev.vsf[18][1], dev.vsf[18][2], dev.vsf[18][3],
+               dev.vsf[19][0], dev.vsf[19][1], dev.vsf[19][2], dev.vsf[19][3], dev.rs[27], dev.rs[19], dev.rs[20], dev.rs[15], dev.rs[24],
+               dev.ps, dev.tex[0], dev.tex[1], ARG(6));
     static int npclog = -1;   // RN_NPCLOG=1: each distinct skinned draw (declaration with BLENDINDICES: fx\worldbone.efx, the NIS people)
     if (npclog < 0) npclog = getenv("RN_NPCLOG") != NULL;
     if (npclog) {

@@ -172,8 +172,20 @@ void free_tick(Ctx *c) {
         o += snprintf(line + o, sizeof line - o, " %s %.0f m", G(e + 0x73c), sqrt(dx * dx + dy * dy + dz * dz));
         if (o > 200) break;
     }
+    // The three nearest traffic cars (kind 3): whether the game keeps traffic near the player at all.
+    double near[3] = {1e9, 1e9, 1e9};
+    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (!e || ld(c, e + 4, 4) != 3) continue;
+        double dx = ldf(c, r + 0x50) - ldf(c, player + 0x50), dy = ldf(c, r + 0x54) - ldf(c, player + 0x54);
+        double d = sqrt(dx * dx + dy * dy);
+        for (int j = 0; j < 3; j++) if (d < near[j]) { double t = near[j]; near[j] = d; d = t; }
+    }
+    o += snprintf(line + o, sizeof line - o, " | traffic near %.0f %.0f %.0f m", near[0], near[1], near[2]);
     rn_log("%s", line);
 }
 
-const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traffic", 7, free_traffic}};
-const int free_api_count = 2;
+uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
+const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traffic", 7, free_traffic},
+                         {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang}};
+const int free_api_count = 4;

@@ -166,6 +166,7 @@ def launch(run):
     if row in OPEN: env.update(RN_OPEN=OPEN[row], RN_SECS='45', RN_KEEP='500')
     if row in CALL: env.update(RN_CALL=CALL[row])
     if row == 'career_trace': env.update(RN_CAREER='1', RN_FINISH='1', RN_UNLOCK='0', RN_SECS='12000')
+    env.setdefault('RN_WORLD_DIR', f'{R}/build/openworld')   # the WORLD row's merged TRACKB and minimap (host/openworld.c); runs start in runs/<row>/
     if jmp: env.update(RN_JUMP=jmp[1], RN_SECS=str(jmp[2]), **({'RN_NEXT': jmp[3]} if len(jmp) > 3 else {}))
     if os.environ.get('RN_KEEP'): env['RN_KEEP'] = os.environ['RN_KEEP']   # a kept frame every N (look inside a long race)
     with open(f'{d}/log.txt', 'w') as log:

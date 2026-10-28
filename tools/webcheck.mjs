@@ -81,7 +81,8 @@ if (netlog) {
 }
 let profState = 0;
 const afterHud = process.env.RN_AFTER_HUD ? Number(process.env.RN_AFTER_HUD) : -1;
-let hudAt = 0, untilAt = 0;
+let hudAt = 0, untilAt = 0, everyN = 0;
+const shotEvery = Number(process.env.RN_SHOT_EVERY || 0);
 const until = process.env.RN_UNTIL && { re: new RegExp(process.env.RN_UNTIL.replace(/@\d+$/, '')), s: Number(process.env.RN_UNTIL.match(/@(\d+)$/)?.[1] ?? 5) };
 async function profile() {
   if (profState === 0 && Date.now() - t0 >= prof[0] * 1000) {
@@ -186,6 +187,12 @@ while (Date.now() - t0 < secs * 1000) {
   // shot at a fixed page time shows a different moment: camera-dependent effects then look like regressions).
   if (afterHud >= 0 && !hudAt && /d3d9 race HUD /.test(text)) hudAt = Date.now();
   if (hudAt && Date.now() - hudAt >= afterHud * 1000) break;
+  // RN_SHOT_EVERY=s (with RN_AFTER_HUD): a shot every s seconds of the race -> <shot>.d/<NN>.png, to catch passing cars.
+  if (hudAt && shotEvery && Date.now() - hudAt >= (everyN + 1) * shotEvery * 1000) {
+    const p = await send('Page.captureScreenshot', { format: 'png' });
+    mkdirSync(`${shot}.d`, { recursive: true });
+    if (p?.data) writeFileSync(`${shot}.d/${String(++everyN).padStart(2, '0')}.png`, Buffer.from(p.data, 'base64'));
+  }
   // RN_UNTIL=regex[@s]: stop s seconds (default 5) after the page log first matches (e.g. "RN_JUMP: done").
   if (until && !untilAt && until.re.test(text)) untilAt = Date.now();
   if (untilAt && Date.now() - untilAt >= until.s * 1000) break;

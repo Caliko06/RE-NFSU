@@ -228,6 +228,19 @@ PATCHES.append(dict(addr=0x6736b7, old="cc" * 6, new="ff2568300100", entry=True,
 PATCHES.append(dict(addr=0x4b3c2f, old="e88ccd0c00", new="e8" + _rel(0x4b3c2f, 0x43a7ea), when=lambda: True))
 PATCHES.append(dict(addr=0x43a7ea, old="cc" * 6, new="ff256c300100", entry=True, when=lambda: True))
 
+# PATCH: 0x7007ec, 0x700850 (+ caves 0x6439f2, 0x6439f8: CC padding between two functions, no reference), 0x4ba207; OWNER 2026-10-28
+# (the "WORLD" entry of the Free Run list, docs/openworld/world_entry.md). 0x7007ec / 0x700850 are entries of the chunk handler table
+# (0x442040 track-info table chunk 0x34201, 0x59fce0 language chunk 0x39000; cdecl, one argument = the chunk). They now point at caves,
+# jmp [SCREEN_ADDR+0x74] = host/openworld.c world_rows (original loader, then a 32nd track row: id 1010, mask 0x90, minimap bounds) and
+# jmp [SCREEN_ADDR+0x78] = world_lang (original loader, then the name pair "TRACK_NAME_1010" -> "WORLD" in the sorted language table).
+# The list builder 0x4ba100 adds each row twice (forward, then reverse: pass 2 tests `row[0x74] & 8` at 0x4ba207, test al,8): the test now
+# reads 0x88, so the new row's mask bit 0x80 means "no reverse entry". The shipped rows never have 0x80. RN_WORLDROW=0: no row, no name.
+PATCHES.append(dict(addr=0x6439f2, old="cc" * 6, new="ff2574300100", entry=True, when=lambda: True))
+PATCHES.append(dict(addr=0x6439f8, old="cc" * 6, new="ff2578300100", entry=True, when=lambda: True))
+PATCHES.append(dict(addr=0x7007ec, old="40204400", new=struct.pack("<I", 0x6439f2).hex(), when=lambda: True))
+PATCHES.append(dict(addr=0x700850, old="e0fc5900", new=struct.pack("<I", 0x6439f8).hex(), when=lambda: True))
+PATCHES.append(dict(addr=0x4ba207, old="a808", new="a888", when=lambda: True))
+
 def active():
     return [p for p in PATCHES if p["when"]()]
 

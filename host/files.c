@@ -127,9 +127,12 @@ EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
 });
 #endif
 
+int rn_world_alias(const char *gpath, char *out, size_t n) __attribute__((weak));   // host/openworld.c: a WORLD file is a shipped file of its base track
+
 // 0 = found (size set), 1 = a directory, -1 = missing, -2 = outside the game and save folders.
 static int lookup(const char *gpath, char *real, size_t n, uint64_t *size) {
-    char rel[512];
+    char rel[512], alt[512];
+    if (rn_world_alias && rn_world_alias(gpath, alt, sizeof alt)) gpath = alt;
     int save = game_rel(gpath, rel, sizeof rel);
     if (save < 0) return -2;
 #ifdef __EMSCRIPTEN__
@@ -186,7 +189,7 @@ int gf_stat(const char *gpath) {
 }
 
 void rn_race_bridge(const char *gpath);   // host/bridge.c
-int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) __attribute__((weak));   // host/openworld.c (RN_WORLD=1)
+int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) __attribute__((weak));   // host/openworld.c (RN_WORLD=1, the WORLD entry)
 
 // Opens a game file: id >= 0, or -1 missing, -2 outside the folder, -3 a directory.
 int gf_open(const char *gpath) {
