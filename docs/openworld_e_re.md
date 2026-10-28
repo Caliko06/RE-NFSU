@@ -109,3 +109,15 @@ Limits seen in the exe:
    decides limits 1 and 2. If total sections <= 128 and total entries <= 255 a pure data rewrite (no exe patch) suffices.
 2. REA: read sub_59a2c0 + sub_4563d0 (junction choice), sub_455530 + sub_44adc0 (racer goal), meaning of +0xb values.
 3. Then write the merge in the openworld build (build.py currently keeps the base track's 0x34121-24).
+
+## E. Measured counts (2026-10-28, tools/hopper lib on pc TRACKB 1001-1109, script was a scratch count)
+| | per track | sum of 16 | exe limit |
+|---|---|---|---|
+| 0x34121 sections | 12-43 (ids 1..109) | 392 | 128 slots @0x77af30 |
+| nodes | 862-3216 | 27050 | node index ushort |
+| 0x34122 path entries | 34-144 | 1193 | 255 (1-byte index) |
+| 0x34124 traffic routes | 0-7 | 61 | ? |
+Section ids are per-track, not city-global: of 65 distinct ids only 11 have the same node count and first node in
+every track. So a naive union does NOT fit: 392 > 128 sections and 1193 > 255 entries. Options: (a) dedupe identical
+streets by geometry first and re-count; (b) widen the table and the byte index in the exe (patch table); (c) swap the
+active network by region as the player drives. Decide after (a).
