@@ -181,9 +181,13 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
     unsigned id = 0;
     while (isdigit((unsigned char)*e)) id = id * 10 + (unsigned)(*e++ - '0');
     if (!ci_eq(e, ".LZC", 5)) return 0;
-    if (id == WORLD_ID && worldrow_on()) id = WORLD_BASE;        // the WORLD row: always the merged city of the base track
-    else if (!enabled()) return 0;
     char name[40];
+    if (id == WORLD_ID && worldrow_on()) {
+        // the WORLD row: its own file (tools/openworld/tour.py: the merged city with a closed road tour for the rivals, docs/openworld/tour.md);
+        // without it the merged city of the base track
+        if (world_file("TRACKB1010.lzc", real, n, size)) { rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size); return 1; }
+        id = WORLD_BASE;
+    } else if (!enabled()) return 0;
     snprintf(name, sizeof name, "TRACKB%u.lzc", id);             // web: tools/serve.py serves build/openworld at /world/; host/files.c web_read fetches "<real>" by range
     if (!world_file(name, real, n, size)) { rn_log("OPENWORLD: the original TRACKB%u is used", id); return 0; }
     rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size);

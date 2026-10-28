@@ -182,6 +182,32 @@ void free_tick(Ctx *c) {
         o += snprintf(line + o, sizeof line - o, " %s %.0f m", G(e + 0x73c), sqrt(dx * dx + dy * dy + dz * dz));
         if (o > 200) break;
     }
+    // docs/openworld_e_re.md B: each rival's AI context: the racer's AIVehicle (vtable 0x6c89f0, ctor 0x4620c0 over the base 0x44a330, +4 = its vehicle, one guest memory scan) with the
+    // context at +0x2c and its PATH list (ctx + 0x3a8 -> object: count +4, node objects at +8 + 4 i, section byte +0x5c, node short
+    // +0x5e (short), current index +0xac).
+    static uint32_t cand[64]; static int ncand;
+    if (!ncand) {
+        const uint32_t *m = (const uint32_t *)c->mem;
+        for (uint32_t w = 0x800000 / 4; w < GUEST_MEM / 4 - 1 && ncand < 64; w++) if (m[w] == 0x6c89f0) cand[ncand++] = w * 4;
+        for (int j = 0; j < ncand; j++) rn_log("FREE aivehicle %08x: +4 %08x +8 %08x", cand[j], ld(c, cand[j] + 4, 4), ld(c, cand[j] + 8, 4));
+    }
+    for (int j = 0; j < ncand; j++) {
+        uint32_t obj = cand[j], veh = ld(c, obj + 4, 4);
+        if (ld(c, obj, 4) != 0x6c89f0 || veh < 0x10000 || veh > 0x3fff0000) continue;
+        uint32_t e = ld(c, veh + 0x14, 4);
+        if (!e || ld(c, e + 4, 4) != 2) continue;
+        uint32_t ctx = obj + 0x2c, path = ld(c, ctx + 0x3a8, 4), cnt = path ? ld(c, path + 4, 4) : 0;
+        char pl[400]; int q = snprintf(pl, sizeof pl, "FREE path %s pos %.0f %.0f slot %d idx %d n %u:", G(e + 0x73c), ldf(c, veh + 0x50), ldf(c, veh + 0x54),
+                                       (int8_t)c->mem[ctx + 0x388], path ? (int)ld(c, path + 0xac, 4) : -1, cnt);
+        int ps = -2, pn = 0, first = 0;                   // run-length: section:first-last node
+        for (uint32_t i = 0; i <= cnt && i < 64 && q < 360; i++) {
+            uint32_t n = i < cnt ? ld(c, path + 8 + 4 * i, 4) : 0;
+            int sec = i < cnt ? (int8_t)c->mem[n + 0x5c] : -3, nd = i < cnt ? (int16_t)(c->mem[n + 0x5e] | c->mem[n + 0x5f] << 8) : 0;
+            if (sec != ps) { if (ps != -2) q += snprintf(pl + q, sizeof pl - q, " %d:%d-%d", ps, first, pn); ps = sec, first = nd; }
+            pn = nd;
+        }
+        rn_log("%s", pl);
+    }
     // The three nearest traffic cars (kind 3): whether the game keeps traffic near the player at all.
     double near[3] = {1e9, 1e9, 1e9};
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {

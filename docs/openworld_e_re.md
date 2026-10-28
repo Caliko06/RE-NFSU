@@ -41,21 +41,42 @@ Post-load: sub_449870 (caller 0x4494f0) calls sub_4430b0: (1) set section flags 
 (2) sub_442980 for each existing section, (3) sub_442150 fill distances, (4) sort the entries (sub_442ed0) and
 rewrite every node byte +0x81/+0x82 to the sorted index. Result: the merged file may leave 0x34122 unsorted.
 
-## B. Racer AI (rewritten 2026-10-28, second pass; still PARTIAL: Q2 fork rule and the path producer are NOT read)
+## B. Racer AI (third pass 2026-10-28: path walker, fork rule and TrackPath role read; solution in B5)
 
 Tools: REA CLI (`rea.sh xrefs ... --provider ghidra --snapshot build/hopper/rea_ghidra.json`, snapshot now built, later
 calls take seconds), Hopper export, capstone (`build/hopper/fdis.py <hex>` function listing, `build/hopper/scan.py <regex>`
 whole-.text grep; both scratch). The REA MCP was not loaded; only the CLI xrefs ran (it gave no new fact beyond the
 capstone scan). Asm offsets are trusted over Hopper types.
 
-### B1. Correction: the racer lap is NOT the 0x34122 table
-- The route the game calls TrackPath is chunks 0x34148 (header: flags 0x100 = closed, N, total length) and 0x34149
-  (20 B nodes: x, y, cumulative distance @+16), inside container 0x80034147 (sub_444200 clears manager 0x7372b0..0x7372cc;
-  count `dword_7372c0`, rows `dword_7372c4`). Debug name string "TrackPathCoordinate" (sub_444100). sub_443a10(mgr 0x7372b0,
-  node) turns a point into a TrackPath coordinate; sub_442150 uses it to give every 0x34122 entry its distance. So 0x34122
-  entries are marks placed ON the TrackPath; the TrackPath (0x34148/49) is the lap spine and has no 128/255 limit.
-- Nothing in the exe references 0x34148/0x34149 as an immediate (capstone byte scan of the dword: 0 hits), so the chunk is
-  read by a generic container loader, not by a per-id handler. NOT VERIFIED which function copies it to 0x7372c4.
+### B1. What a racer follows: the ROAD GRAPH, not the TrackPath (read in Speed.exe 2026-10-28, confirmed by a run)
+Tools: Hopper export, capstone, runtime (RN_FREELOG path dump in host/free.c `free_tick`, REA MCP not loaded).
+- Racer class = AIVehicle derived, vtable 0x6c89f0 (ctor sub_4620c0 -> base ctor sub_44a330). obj+4 = vehicle, ctx = obj+0x2c
+  (sub_44cd30). `[ctx+0x3a8]` is a POINTER (not embedded) to a path object made by sub_457060 (type 0: sub_455270 vtable
+  0x6c9030, type 1: sub_455390 vtable 0x6c8ff8; ctor sub_5a5340): count at +4, up to 40 node-object pointers from +8,
+  current index at +0xac. Node object: section id (signed byte) at +0x5c, node index (short) at +0x5e.
+- The path is grown ahead of the car by sub_5a58d0 (to a target distance, at most 0x28 nodes) using sub_5a53c0 (one step):
+  at the current node, link slot 0 then 1 (node bytes +0x81/+0x82, 0xff = none) -> 0x34122 entry (32 B). A link is taken when
+  sub_458bd0 accepts it (it first rejects a link whose entry byte +0xd (direction) does not match the walk direction, so the
+  reverse entry d=1 is skipped on a forward walk; it caches decisions in 8 slots at decider+0xc and asks the decider, vtable
+  slots 16/17/18 of 0x6c89f0 = 0x45d640, 0x462840, 0x4629e0). When no link is accepted the walker takes the NEXT NODE of the
+  same section; at a section end with no link the path cannot extend.
+- Fork rule for racers = sub_462840 on entry byte +0xb (type): type 2 ALWAYS taken; types 5 and 7 NEVER; type 8 only for the
+  player (entrant kind 1); type 9 -> 0x454a20; types 0/1/3/4: entry +0xf != 0 -> no, else a random draw (0x4216f0) against
+  per-skill thresholds at 0x779ff8 + 0x54*level (type 4 against float [0x6cc7dc]). So type 2 links make a FIXED route, the
+  rest wander at random. sub_4629e0 stores the sorted index of the last type 2 entry in ctx+0x478.
+- The TrackPath (0x34148/49) does NOT choose the route. It is used for: the distance of every entry (sub_442150 via sub_443a10,
+  then sort sub_442ed0 and remap the node bytes), the extent of every section (sub_442980, all 128 slots), the lookup by
+  distance (sub_442200, AIVehicle ctor sub_44a330 `esi[0x11d]`), the player's route point (0x4314a0 nearest node; reset at
+  more than 5000 m from it, 0x426930). Record layout: 0x34148 = one 0x28 B record per path (u32 flags 0x100 closed, u16 count
+  twice, u32 0, float length, 1.0f, start xy, end xy, 0 = runtime object pointer); 0x34149 nodes 20 B = x, y, u16 path index 0,
+  three int16 -1 (+10..+14, the spatial grid refs), float cumulative distance (+16). Writing +8..+0xf as float NaN instead of
+  `0000 ffff ffff ffff` crashes sub_443a10 (0x59d551, null object): the grid refs must be -1. No node cap found: sub_4432a0
+  allocates (count + 3) * 16 B per path.
+- Measured (RN_FREELOG, Free Run on 1010 = merged base 1001 net: 25 sections, 66 entries, 34 of type 2): the three rivals lap
+  Olympic Square (x 979..2029, y -1806..-434), varying at the random forks; their path window holds 30..40 nodes.
+- Node bytes: +0x83 = the node's own section id; +0x84 dword bits 20..24 = index of a 0x34123 record (31 = none; base 1001,
+  1007, 1008 have no 0x34123 chunk and all nodes read 31; the readers are 0x44efd0, 0x454240, 0x4543d0, 0x454420, 0x454490,
+  0x583c80, 0x5a6e10 through sub_44d570 / 0x442100).
 
 ### B2. The racer AI is an action/goal system, "JustDrive" is the racing action
 - Strings: AIGoal, AIPlan, AIDriver, AIActionJustDrive (0x6c9570, used at 0x4501a7), ...Pass (0x4506b7), ...Draft,
@@ -91,32 +112,16 @@ capstone scan). Asm offsets are trusted over Hopper types.
   not the goal.
 - Reset: sub_458f10 re-seeds the plan from the car (nearest path node, sub_4594d0 with the node's section/node/lane).
 
-### B4. NOT READ (needed before coding), in order
-1. Who FILLS the path (ctx+0x3a8 list): the creator of the node objects that sub_5a6150 walks (module 0x5a5xxx-0x5a7xxx:
-   sub_5a5340, sub_5a5730, sub_5a75c0, sub_5a7270, sub_5a7390, sub_5a6e10, sub_5a6d20). One hypothesis (inference, not read):
-   the path is built once per race from the TrackPath (0x7372c4 nodes) snapped to road nodes; a closed TrackPath wraps,
-   an open one (sprints) ends with the path and the action EndOfRace (sub_453730) fires.
-2. Fork rule (Q2) and wrap (Q2): not found in 44cf30/45c370 (they only follow the list in order). If the list is a plain
-   array of nodes, there is NO fork choice at racer level: the fork is decided when the list is built. Wrap = what the list
-   builder does at the end of a closed route.
-3. Q3 (non-lap modes): Free Run is QR_freerun (0x6c5edc, used at 0x4b7a0c in sub_4b70c0); the racer action for it was not read.
-   AIActionDriveTrafficLane (0x452807) is a traffic-lane follower and DriveTrafficLane + Obey/AvoidCrossTraffic show the engine
-   already has a "wander on lanes" action (kind 3, traffic: sub_59a2c0, node walkers sub_4563d0/sub_4561d0, successors from
-   node bytes +0x81/+0x82). Whether a racer can be given it is open.
+### B4. Answers to the open questions of the first pass
+1. Who fills the path: sub_5a58d0 / sub_5a53c0 (B1), from the road graph, as the racer drives.
+2. Fork rule: sub_462840 (B1). Wrap: none needed, a closed route is a closed link loop.
+3. Q3 (non-lap modes): the racer uses the same path walker in Free Run; measured, it never ends (RN_JUMP run of 10749 frames).
 
-### B5. Proposal (Q4), ordered by cost
-a) NO EXE PATCH, data only (preferred): since the racer reads path.count and the node objects of sections (<= 128 slots),
-   and the lap spine is TrackPath 0x34148/49 (u16 count, no 255 limit), build ONE city-wide closed TrackPath: chain
-   chosen street segments of the 16 routes (they are cuts of one mesh; the join points are where routes meet) into a loop
-   of N nodes and set the closed flag 0x100 and total length @+12. Keep all road sections the base track has plus the
-   sections of the used segments; the budget is 128 sections, so pick a loop that touches <= 128 section ids (dedupe by
-   geometry first). 0x34122 entries only need to cover that loop (<= 255).
-   Verify with: RN_TRACE on sub_45c370 (path.count at +0x3a8 and its entries) in a Free Run race, then build the loop.
-b) If the loop cannot fit: make the path producer (B4.1) wrap a custom list; patch ONE function (the producer) rather than the
-   byte index users.
-c) Widening 128 -> more is NOT needed for a racer loop; it is for traffic everywhere (about 40 users of 0x77af30).
-Next reading step (a quarter of the unknown): xrefs on sub_5a6150's node object ctor (writers of node+0x5c) with REA (the
-Ghidra snapshot is ready) to find the path builder.
+### B5. Data-only solution (built and run, docs/openworld/tour.md)
+`tools/openworld/tour.py` writes build/openworld/TRACKB1010.lzc (the WORLD file; host/openworld.c serves it, the base 1001 file
+when absent): the merged city with a new road net = a closed tour of whole sections of the street tracks joined only by type 2
+links (4 chains 1104, 1106, 1109, 1107, 76 sections, 152 entries = 76 hops x pair, 42 km, x -538..2345, y -1906..734) and a new
+closed TrackPath along it. No exe patch: 76 <= 128 sections, 152 <= 255 entries.
 
 ## C. Traffic
 
