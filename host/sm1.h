@@ -48,6 +48,11 @@ enum { SM1_U_VC = 0, SM1_U_PC = 4096, SM1_U_HP = 4224, SM1_U_FOGC = 4240, SM1_U_
 // SM1_HL_VS / SM1_HL_PS = the headlight world pairs (worldheadlight vs 0x67da8f41 / ps 0x91d5deec, worldheadlightreflect
 // vs 0x102e066d / ps 0x9bb3f7c7): SM1_HL_N more projectors (host/lights.c) in oT4..oT7, from VS c16..c31.
 enum { SM1_PLAIN, SM1_CAR_VS, SM1_CAR_PS, SM1_HL_VS, SM1_HL_PS };
+// OR-ed into mode for the two road reflection pixel shaders (worldreflect ps 0x92e7bdab, worldheadlightreflect ps 0x9bb3f7c7):
+// their weight w = texture alpha x vertex alpha goes through sm1_roadrefl()'s curve.
+#define SM1_REFL 0x100
+// RN_ROADREFL / ?roadrefl=: 0 game (unset), 1 sq (w^2), 2 cube (w^3), 3 off (the game's own level 1, PATCH 0x410c1b: no mirrored draw).
+int sm1_roadrefl(void);
 #define SM1_HL_N 4
 #define SM1_HL_GAIN 0.4   // another car's headlight against the player's own (1 = as bright); subtle (OWNER 2026-10-27)
 #define SM1_HL_REACH 1.5  // and shorter: its ramp read at 1.5 x depth, full to ~32 m, gone by ~65 m (the player's: 48 / 98)

@@ -101,6 +101,7 @@ typedef struct {
     uint32_t *blob, nblob;                  // shader tokens, vertex elements (host copy)
     Sm1 *sm;                                // shaders: decoded
     int hl;                                 // vertex shaders: SM1_HL_VS, it takes host/lights.c's projectors
+    uint8_t refl;                           // pixel shaders: 1 = worldreflect ps (reflected sample on stage 1), 2 = worldheadlightreflect ps (stage 3)
     struct Rec *rec;                        // state blocks: the recorded Set calls
     uint32_t nrec;
     uint32_t dlo, dhi;                      // resident buffers: bytes written since the last upload
@@ -958,6 +959,7 @@ static void flow_log(Ctx *c) {
     input_career(c);
     prev = lb, prev_st = st, rn_flow = st, rn_screen = scr;
 }
+static void roadrefl_frame(void);
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     tune_apply(c);
@@ -977,6 +979,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     if (cen_on > 0 && dev.frames >= cen_frame && cen_total >= 300) { census_dump(); cen_on = 0; }
     ncen = 0; cen_total = 0;
     geo_present();
+    roadrefl_frame();
     dev.frames++;
     rn_telem.presents++;
     if (dev.frames == 1) rn_log("d3d9 first Present: %ux%u", b->w, b->h);
@@ -1641,6 +1644,11 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     if (iface == I_VS && (h == 0x67da8f41u || h == 0x102e066du)) mode = SM1_HL_VS;
     if (iface == I_PS && (h == 0x91d5deecu || h == 0x9bb3f7c7u)) mode = SM1_HL_PS;
     o->hl = mode == SM1_HL_VS;
+    // The road reflection weight (sm1.c sm1_roadrefl, ?roadrefl=): worldreflect.efx ps 0x92e7bdab, worldheadlightreflect.efx ps 0x9bb3f7c7.
+    if (iface == I_PS && (h == 0x92e7bdabu || h == 0x9bb3f7c7u)) {
+        o->refl = h == 0x92e7bdabu ? 1 : 2;
+        if (sm1_roadrefl() == 1 || sm1_roadrefl() == 2) mode |= SM1_REFL;
+    }
     if (getenv("RN_SMOOTH_LOG")) rn_log("SMOOTH shader %s id %x hash %08x mode %d", iface == I_VS ? "vs" : "ps", g, h, mode);
     if (mode == SM1_CAR_VS && ncar_vs < 8) car_vs_obj[ncar_vs++] = o;
     if (iface == I_VS && h == 0x95d99bf8u && nbone_vs < 8) bone_vs_obj[nbone_vs++] = o;
@@ -1879,6 +1887,31 @@ static int draw_supported(Ctx *c, const Sm1 *ps) {
 static struct { const void *vb; uint32_t nvert; const uint16_t *idx; uint32_t nidx; } xdraw;
 // A resident draw (see resident()): set by the draw call, read by draw_cmd. vb = 0: not resident.
 static struct { uint32_t vb, voff, ib, isize, first; int32_t basev; } rdraw;
+// ROADREFL evidence (RN_ROADREFL_LOG=1): the reflection RT is the texture that the reflect pixel shaders bind on their reflected
+// stage (1 for worldreflect, 3 for worldheadlightreflect), checked to be a 320x240 render target, as sub_40a890 creates it
+// (CreateTexture 0x140 x 0xf0, RENDERTARGET, into [0x71aa28]). Per frame: draws that sample it (with the curve when the pixel
+// shader carries SM1_REFL) and draws into it (the mirrored world, sub_570950, only while ROADREFLECTION [0x700e90] > 1).
+static struct { uint32_t tex, sample, curve, mirror; } rr;
+static void roadrefl_note(const Obj *ps) {
+    if (ps && ps->refl) {
+        uint32_t k = dev.tex[ps->refl == 1 ? 1 : 3];
+        const Obj *t = obj_k(k);
+        if (t && (t->usage & U_RENDERTARGET) && t->w == 320 && t->h == 240) {
+            rr.tex = k; rr.sample++;
+            if (sm1_roadrefl() == 1 || sm1_roadrefl() == 2) rr.curve++;
+        }
+    }
+    const Obj *s = obj_k(dev.rt[0]);
+    if (rr.tex && s && s->container == rr.tex) rr.mirror++;
+}
+static void roadrefl_frame(void) {
+    static int on = -1;
+    if (on < 0) on = getenv("RN_ROADREFL_LOG") != NULL;
+    if (on && (rr.sample || rr.mirror) && dev.frames % 60 == 0)
+        rn_log("ROADREFL %s frame %u: RT tex %u 320x240, %u reflect draws sample it (%u with the curve), %u draws into it (mirrored world)",
+               (const char *[]){"game", "sq", "cube", "off"}[sm1_roadrefl()], dev.frames, rr.tex, rr.sample, rr.curve, rr.mirror);
+    rr.sample = rr.curve = rr.mirror = 0;
+}
 static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint32_t stride, uint32_t vmin, uint32_t nvert,
                      uint32_t ib, int i32, int32_t ibias) {
     TR("draw %u x%u vs %u ps %u decl %u tex %u %u %u %u blend %u %u/%u atest %u z %u/%u cull %u fog %u", type, count,
@@ -1886,6 +1919,7 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
        dev.rs[15], dev.rs[7], dev.rs[14], dev.rs[22], dev.rs[28]);
     Obj *vs = obj_k(dev.vs), *ps = obj_k(dev.ps);
     if (!draw_supported(c, ps ? ps->sm : NULL)) return;
+    roadrefl_note(ps);
     if (type <= 3) { rn_halt(c, "d3d9: point and line draws are not drawn yet"); return; }
     // Index list: given, or made for fans.
     uint32_t nidx = 0, *ix = NULL, n = verts_of(type, count);

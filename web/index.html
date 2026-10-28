@@ -119,6 +119,10 @@ function line(s, cls) {
       // ?cardetail=0: the car paint without the occlusion and grime terms (host/sm1.c car_ps_detail); =split: right half only
       const cd = RN_Q.get('cardetail');
       if (cd !== null) m.ENV.RN_CARDETAIL = cd;
+      // ?roadrefl=game|sq|cube|off: how strongly the road reflects. sq / cube: the reflection weight (vertex alpha x texture alpha) squared /
+      // cubed (host/sm1.c); off: the game's own ROADREFLECTION level 1, no mirrored world (PATCH 0x410c1b, host/win32.c). Read at boot.
+      const rr = RN_Q.get('roadrefl');
+      if (rr !== null) m.ENV.RN_ROADREFL = rr;
       const look = RN_Q.get('carlook');
       if (look !== null) m.ENV.RN_CARLOOK = look;
     }],

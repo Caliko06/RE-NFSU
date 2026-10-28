@@ -458,7 +458,18 @@ static const char *const car_ps_tail_soft =
     "  let rf = 1.0 - exp(-max(e * f.w, vec3f(0.0)));\n"
     "  r0 = vec4f(pb + rf * (1.0 - pb), f.w);\n";
 
+int sm1_roadrefl(void) {
+    static int v = -1;
+    if (v < 0) {
+        const char *e = getenv("RN_ROADREFL");
+        v = !e ? 0 : !strcmp(e, "sq") ? 1 : !strcmp(e, "cube") ? 2 : !strcmp(e, "off") ? 3 : 0;
+    }
+    return v;
+}
+
 char *sm1_wgsl(const Sm1 *s, int mode) {
+    int refl = mode & SM1_REFL;
+    mode &= ~SM1_REFL;
     Buf b = {malloc(4096), 0, 4096};
     b.p[0] = 0;
     emit(&b, "struct U { c: array<vec4f, 256>, pc: array<vec4f, 8>, hp: vec4f, fogc: vec4f, af: vec4u, ar: vec4f,"
@@ -520,6 +531,18 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
         }
         if (in->d.sat) { emit(&b, "  let n%d = clamp(%s, vec4f(0.0), vec4f(1.0));\n", i, val); snprintf(val, sizeof val, "n%d", i); }
         if (s->ps) { emit(&b, "  let p%d = clamp(%s, vec4f(-8.0), vec4f(8.0));\n", i, val); snprintf(val, sizeof val, "p%d", i); }
+        // BRIDGE: road reflection weight (OWNER 2026-10-27, "wet everywhere"; ?roadrefl=sq|cube / RN_ROADREFL). Both reflect pixel shaders
+        // compute w = tex.a * vertex.a in one `mul <t0|r0>.w, t0.wwww, v0.wwww`, and the reflected sample is added as sample * w.
+        // The curve w^2 / w^3 drops the weak general sheen and keeps the strongly marked patches (the game's own composition).
+        if (refl && s->ps && in->op == OP_MUL && in->d.mask == 8 && in->s[0].type == R_TEXTURE && in->s[1].type == R_INPUT) {
+            int www = 1;
+            for (int k = 0; k < 4; k++) www &= in->s[0].swz[k] == 3 && in->s[1].swz[k] == 3;
+            if (www) {
+                if (sm1_roadrefl() == 2) emit(&b, "  let w%d = %s * %s * %s;\n", i, val, val, val);
+                else emit(&b, "  let w%d = %s * %s;\n", i, val, val);
+                snprintf(val, sizeof val, "w%d", i);
+            }
+        }
         if (i + 1 < s->n && s->ins[i + 1].coissue) { pend = in; snprintf(pend_val, sizeof pend_val, "%s", val); continue; }
         if (in->coissue && pend) { write_result(s, pend, pend_val, &b); pend = NULL; }
         write_result(s, in, val, &b);

@@ -253,6 +253,18 @@ for a, old in [(0x4d7eb9, "8b3d"), (0x4d8077, "a1"), (0x4d8117, "a1"), (0x4d81c7
     PATCHES.append(dict(addr=a, old=old + "ac777600", new=new, when=lambda: True))
 
 
+# PATCH: 0x410c1b (+ cave 0x63b3ad, the tail of the same dead CRT routine, 19 bytes past the unlock caves, no reference), OWNER 2026-10-27
+# (?roadrefl=off, "wet everywhere"): 0x410b70 sets the hardware cap of the options, among them ROADREFLECTION [0x70105c]:
+# ecx = (2 < [0x71ad84] ? -1 : 0) & -2, + 2 -> 2 (0 if [0x71ad84] > 2); 0x410a00 then clamps [0x700e90] to it (28292 of decomp.c) and
+# 0x409580 draws the mirrored world into the 320x240 RT only while [0x700e90] > 1 (the RT is cleared black at level 1: a dry road).
+# The 5 bytes `and ecx,-2; add ecx,eax` become a call to a cave doing the same with a word in SCREEN_ADDR+0x70 for the 2:
+#   not ecx; and ecx,[0x13070]; ret      (ecx = 0 or -1 from the sbb; same result with the word = 2)
+# host/win32.c writes the word: 1 with RN_ROADREFL=off (the game's level 1), else 2.
+PATCHES.append(dict(addr=0x410c1b, old="83e1fe03c8", new="e8" + _rel(0x410c1b, 0x63b3ad), when=lambda: True))
+PATCHES.append(dict(addr=0x63b3ad, old="68f4700001e8d9660000" + "81c40c010000c39090", entry=True, when=lambda: True,
+                    new="f7d1230d70300100c3" + "cc" * 10))
+
+
 # PATCH: 0x57d060, 0x57d0c1, 0x57cfc7, 0x4b3b01, 0x583a37, 0x583a5b (+ cave 0x63b270, a dead CRT routine: no call, jump or pointer
 # reaches 0x63b270..0x63b3bf; source tools/recomp/caves/traffic.s), OWNER 2026-10-25 (traffic alive). AddTrafficCars
 # 0x4b3ac0 spawns i8 [trackinfo + side + sel*2 + 0xc0] cars (GLOBALB 0x34201: 12 on most tracks), each of a type from

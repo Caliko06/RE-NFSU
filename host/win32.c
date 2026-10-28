@@ -6,6 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "host.h"
+int sm1_roadrefl(void);   // host/sm1.c (RN_ROADREFL)
 
 #define ERROR_FILE_NOT_FOUND 2
 #define ERROR_PATH_NOT_FOUND 3
@@ -1097,6 +1098,9 @@ void win32_init(Ctx *c, uint32_t image_size) {
     int unlock = !(un && un[0] == '0');
     st(c, SCREEN_ADDR + 36, unlock, 4);
     st(c, 0x735ec1, unlock, 1);
+    // PATCH 0x410c1b (cave 0x63b3ad): the cap of ROADREFLECTION [0x70105c] is at most this word (2 = as shipped; 1 with
+    // RN_ROADREFL=off / ?roadrefl=off: the game's own level 1, the mirrored world is not drawn). sq / cube: host/sm1.c.
+    st(c, SCREEN_ADDR + 0x70, sm1_roadrefl() == 3 ? 1 : 2, 4);
     clock_gettime(CLOCK_MONOTONIC, &t0);
 #ifdef __EMSCRIPTEN__
     t0_ms = emscripten_get_now();
