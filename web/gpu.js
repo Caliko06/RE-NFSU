@@ -59,7 +59,7 @@ async function startGpu(M, canvas, report, onFrame) {
     const s = `${w}x${h}`;
     if (s !== qSize) { for (const q of freeQ) q.tex.destroy(); freeQ.length = 0; qSize = s; }
     return freeQ.pop() || { w, h, tex: device.createTexture({ size: [w, h], format: 'rgba8unorm',
-      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC }) };
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST }) };
   };
   const recycle = q => { if (`${q.w}x${q.h}` === qSize) freeQ.push(q); else q.tex.destroy(); };
   function showQueued() {
