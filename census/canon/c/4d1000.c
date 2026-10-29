@@ -9829,9 +9829,11 @@ void __thiscall FUN_004dcdb0(int param_1,int param_2,int param_3)
 }
 
 
-// ==== 0x4dcea0 FUN_004dcea0
+// ==== 0x4dcea0 InfoDialog::InfoDialog
 
-void FUN_004dcea0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void InfoDialog__InfoDialog(void)
 
 {
   undefined4 in_EAX;
@@ -9840,7 +9842,7 @@ void FUN_004dcea0(void)
   undefined4 *puVar2;
   
   FEScreen__FEScreen(unaff_ESI,in_EAX);
-  *unaff_ESI = &PTR_FUN_006c3ba8;
+  *unaff_ESI = &PTR_InfoDialog__scalar_deleting_destructor_006c3ba8;
   unaff_ESI[0x10] = 0;
   unaff_ESI[0x14] = 0;
   puVar2 = unaff_ESI + 0x15;
@@ -9860,12 +9862,14 @@ void FUN_004dcea0(void)
 }
 
 
-// ==== 0x4dcef0 FUN_004dcef0
+// ==== 0x4dcef0 InfoDialog::scalar_deleting_destructor
 
-void * __thiscall FUN_004dcef0(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall InfoDialog__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004dcf10();
+  InfoDialog___InfoDialog();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -9873,9 +9877,11 @@ void * __thiscall FUN_004dcef0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4dcf10 FUN_004dcf10
+// ==== 0x4dcf10 InfoDialog::_InfoDialog
 
-void __fastcall FUN_004dcf10(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall InfoDialog___InfoDialog(undefined4 *param_1)
 
 {
   int iVar1;
@@ -9886,7 +9892,7 @@ void __fastcall FUN_004dcf10(undefined4 *param_1)
   pcStack_8 = FUN_006879f8;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c3ba8;
+  *param_1 = &PTR_InfoDialog__scalar_deleting_destructor_006c3ba8;
   local_4 = 0;
   iVar1 = FEngFindPackage();
   if (iVar1 != 0) {
@@ -9900,9 +9906,11 @@ void __fastcall FUN_004dcf10(undefined4 *param_1)
 }
 
 
-// ==== 0x4dcf80 FUN_004dcf80
+// ==== 0x4dcf80 CreateInfoDialog
 
-void FUN_004dcf80(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CreateInfoDialog(void)
 
 {
   void *pvVar1;
@@ -9917,16 +9925,18 @@ void FUN_004dcf80(void)
   pvVar1 = _malloc(0x88);
   local_4 = 0;
   if (pvVar1 != (void *)0x0) {
-    FUN_004dcea0();
+    InfoDialog__InfoDialog();
   }
   ExceptionList = local_c;
   return;
 }
 
 
-// ==== 0x4dcfd0 FUN_004dcfd0
+// ==== 0x4dcfd0 InfoDialog::OpenModalDialog
 
-int FUN_004dcfd0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int InfoDialog__OpenModalDialog(void)
 
 {
   int iVar1;
@@ -9958,7 +9968,7 @@ LAB_004dd034:
   if (iVar2 != 0) {
     iVar2 = *(int *)(iVar2 + 0x14);
     if (iVar2 != 0) {
-      FUN_004dd080(iVar2);
+      InfoDialog__PostProduce(iVar2);
     }
     return iVar2;
   }
@@ -9966,9 +9976,11 @@ LAB_004dd034:
 }
 
 
-// ==== 0x4dd080 FUN_004dd080
+// ==== 0x4dd080 InfoDialog::PostProduce
 
-void __fastcall FUN_004dd080(undefined4 param_1,undefined4 *param_2,int param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall InfoDialog__PostProduce(undefined4 param_1,undefined4 *param_2,int param_3)
 
 {
   undefined4 in_EAX;
@@ -9995,9 +10007,11 @@ void __fastcall FUN_004dd080(undefined4 param_1,undefined4 *param_2,int param_3)
 }
 
 
-// ==== 0x4dd100 FUN_004dd100
+// ==== 0x4dd100 InfoDialog::NotificationMessage
 
-void __thiscall FUN_004dd100(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall InfoDialog__NotificationMessage(int param_1,int param_2)
 
 {
   char cVar1;
@@ -10096,7 +10110,7 @@ undefined4 * Screen_PC_Loading__Screen_PC_Loading(undefined4 *param_1,undefined4
   FEScreen__FEScreen(param_1,param_2);
   bVar1 = false;
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c3778;
+  *param_1 = &PTR_LoadingScreen__scalar_deleting_destructor_006c3778;
   param_1[0x10] = 0;
   param_1[0x11] = 0;
   if (((param_1[3] == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
@@ -10130,7 +10144,7 @@ undefined4 * Screen_PC_Loading__Screen_PC_Loading(undefined4 *param_1,undefined4
   case 6:
     bVar1 = true;
   }
-  FUN_004ddfa0(param_1[0x11]);
+  LoadingScreen__PrepToShowControllerConfig(param_1[0x11]);
   if (bVar1) {
     if (((param_1[3] == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
        (iVar2 = FUN_004ffb70(), iVar2 == 0)) {
@@ -10241,19 +10255,23 @@ undefined4 * Screen_PC_Loading__Screen_PC_Loading(undefined4 *param_1,undefined4
 }
 
 
-// ==== 0x4dd690 FUN_004dd690
+// ==== 0x4dd690 LoadingScreen::scalar_deleting_destructor
 
-undefined4 __fastcall FUN_004dd690(undefined4 param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __fastcall LoadingScreen__scalar_deleting_destructor(undefined4 param_1)
 
 {
-  FUN_004dd6a0(param_1);
+  LoadingScreen___LoadingScreen(param_1);
   return param_1;
 }
 
 
-// ==== 0x4dd6a0 FUN_004dd6a0
+// ==== 0x4dd6a0 LoadingScreen::_LoadingScreen
 
-void FUN_004dd6a0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void LoadingScreen___LoadingScreen(undefined4 *param_1)
 
 {
   void *local_c;
@@ -10263,7 +10281,7 @@ void FUN_004dd6a0(undefined4 *param_1)
   pcStack_8 = __CxxFrameHandler_wrapper;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c3778;
+  *param_1 = &PTR_LoadingScreen__scalar_deleting_destructor_006c3778;
   local_4 = 0;
   if (param_1[0x12] != 0) {
     FUN_00546060();
@@ -10275,9 +10293,11 @@ void FUN_004dd6a0(undefined4 *param_1)
 }
 
 
-// ==== 0x4dd700 FUN_004dd700
+// ==== 0x4dd700 LoadingScreen::SetupControllerConfig
 
-void FUN_004dd700(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void LoadingScreen__SetupControllerConfig(int param_1)
 
 {
   byte *pbVar1;
@@ -10356,16 +10376,18 @@ void FUN_004dd700(int param_1)
 }
 
 
-// ==== 0x4dd880 FUN_004dd880
+// ==== 0x4dd880 LoadingScreen::HideControllerConfigAndBlurb
 
-void FUN_004dd880(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void LoadingScreen__HideControllerConfigAndBlurb(void)
 
 {
   int in_EAX;
   int iVar1;
   undefined4 uVar2;
   
-  FUN_004ddbb0(in_EAX);
+  LoadingScreen__HideControllerConfig(in_EAX);
   if (*(int *)(in_EAX + 0xc) != 0) {
     iVar1 = FEngFindPackage();
     if (iVar1 != 0) {
@@ -10385,9 +10407,11 @@ LAB_004dd8d0:
 }
 
 
-// ==== 0x4dd8e0 FUN_004dd8e0
+// ==== 0x4dd8e0 LoadingScreen::ShowControllerConfig
 
-void FUN_004dd8e0(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void LoadingScreen__ShowControllerConfig(int param_1)
 
 {
   byte *pbVar1;
@@ -10535,9 +10559,11 @@ LAB_004ddb70:
 }
 
 
-// ==== 0x4ddbb0 FUN_004ddbb0
+// ==== 0x4ddbb0 LoadingScreen::HideControllerConfig
 
-void FUN_004ddbb0(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void LoadingScreen__HideControllerConfig(int param_1)
 
 {
   byte *pbVar1;
@@ -10727,15 +10753,17 @@ LAB_004ddf37:
 }
 
 
-// ==== 0x4ddf60 FUN_004ddf60
+// ==== 0x4ddf60 FinishLoadingControllerTextureCallbackBridge
 
-void FUN_004ddf60(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FinishLoadingControllerTextureCallbackBridge(int param_1)
 
 {
   if ((param_1 != 0) && (*(int *)(param_1 + 0x44) != 0)) {
     if (*(int *)(*(int *)(param_1 + 0x44) + 8) == 0) {
-      FUN_004dd700(param_1);
-      FUN_004dd8e0(param_1);
+      LoadingScreen__SetupControllerConfig(param_1);
+      LoadingScreen__ShowControllerConfig(param_1);
       return;
     }
     FUN_00495fc0();
@@ -10744,9 +10772,11 @@ void FUN_004ddf60(int param_1)
 }
 
 
-// ==== 0x4ddfa0 FUN_004ddfa0
+// ==== 0x4ddfa0 LoadingScreen::PrepToShowControllerConfig
 
-void FUN_004ddfa0(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void LoadingScreen__PrepToShowControllerConfig(int param_1)
 
 {
   int iVar1;
@@ -10755,18 +10785,18 @@ void FUN_004ddfa0(int param_1)
   undefined4 uVar3;
   
   iVar1 = param_1;
-  FUN_004dd880();
+  LoadingScreen__HideControllerConfigAndBlurb();
   if (iVar1 == 0) {
     return;
   }
   if (*(int *)(iVar1 + 8) == 0) {
-    FUN_004de0e0();
+    LoadingScreen__LoadDefaultControllerTexture();
   }
   else {
     *(int *)(in_EAX + 0x48) = *(int *)(iVar1 + 8);
     FUN_004ad7b0(*(undefined4 *)(iVar1 + 8));
     param_1 = *(int *)(iVar1 + 8);
-    FUN_0053e9e0(&DAT_00740420,&param_1,1,FUN_004ddf60,in_EAX,0);
+    FUN_0053e9e0(&DAT_00740420,&param_1,1,FinishLoadingControllerTextureCallbackBridge,in_EAX,0);
   }
   if (((*(int *)(in_EAX + 0xc) == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
      (iVar2 = FUN_004ffb70(), iVar2 == 0)) {
@@ -10801,9 +10831,11 @@ void FUN_004ddfa0(int param_1)
 }
 
 
-// ==== 0x4de0e0 FUN_004de0e0
+// ==== 0x4de0e0 LoadingScreen::LoadDefaultControllerTexture
 
-void FUN_004de0e0(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void LoadingScreen__LoadDefaultControllerTexture(void)
 
 {
   undefined4 uVar1;
@@ -10814,14 +10846,16 @@ void FUN_004de0e0(void)
   *(undefined4 *)(unaff_EBX + 0x48) = uVar1;
   FUN_004ad7b0(uVar1);
   local_4 = *(undefined4 *)(unaff_EBX + 0x48);
-  FUN_0053e9e0(&DAT_00740420,&local_4,1,FUN_004ddf60,unaff_EBX,0);
+  FUN_0053e9e0(&DAT_00740420,&local_4,1,FinishLoadingControllerTextureCallbackBridge,unaff_EBX,0);
   return;
 }
 
 
-// ==== 0x4de130 FUN_004de130
+// ==== 0x4de130 TellLoadingScreenLoadingIsDone
 
-void FUN_004de130(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TellLoadingScreenLoadingIsDone(void)
 
 {
   int iVar1;
@@ -10839,14 +10873,16 @@ void FUN_004de130(void)
 void __fastcall FUN_004de160(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c3744;
+  *param_1 = &PTR_ScreenSequenceNode__scalar_deleting_destructor_006c3744;
   return;
 }
 
 
-// ==== 0x4de170 FUN_004de170
+// ==== 0x4de170 ScreenSequenceNode::scalar_deleting_destructor
 
-void * __thiscall FUN_004de170(void *param_1,byte param_2)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall ScreenSequenceNode__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   FUN_004de160();
@@ -10857,9 +10893,11 @@ void * __thiscall FUN_004de170(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4de190 FUN_004de190
+// ==== 0x4de190 ScreenSequence::_ScreenSequence
 
-void __fastcall FUN_004de190(undefined4 *param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall ScreenSequence___ScreenSequence(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -10868,7 +10906,7 @@ void __fastcall FUN_004de190(undefined4 *param_1)
   int *piVar4;
   
   piVar1 = param_1 + 1;
-  *param_1 = &PTR_FUN_006c37f8;
+  *param_1 = &PTR_ScreenSequence__scalar_deleting_destructor_006c37f8;
   piVar2 = (int *)*piVar1;
   while (piVar2 != piVar1) {
     iVar3 = *piVar2;
@@ -10884,12 +10922,14 @@ void __fastcall FUN_004de190(undefined4 *param_1)
 }
 
 
-// ==== 0x4de1c0 FUN_004de1c0
+// ==== 0x4de1c0 ScreenSequence::scalar_deleting_destructor
 
-void * __thiscall FUN_004de1c0(void *param_1,byte param_2)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall ScreenSequence__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004de190();
+  ScreenSequence___ScreenSequence();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -10897,9 +10937,11 @@ void * __thiscall FUN_004de1c0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4de1e0 FUN_004de1e0
+// ==== 0x4de1e0 ScreenSequence::ScreenSequence
 
-undefined4 * FUN_004de1e0(undefined4 *param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined4 * ScreenSequence__ScreenSequence(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -10921,7 +10963,7 @@ undefined4 * FUN_004de1e0(undefined4 *param_1)
   local_c = ExceptionList;
   piVar1 = param_1 + 1;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c37f8;
+  *param_1 = &PTR_ScreenSequence__scalar_deleting_destructor_006c37f8;
   *piVar1 = (int)piVar1;
   param_1[2] = piVar1;
   local_4 = 0;
@@ -10934,7 +10976,7 @@ undefined4 * FUN_004de1e0(undefined4 *param_1)
       }
       else {
         puVar2 = *ppuVar11;
-        *puVar5 = &PTR_FUN_006c3744;
+        *puVar5 = &PTR_ScreenSequenceNode__scalar_deleting_destructor_006c3744;
         puVar5[3] = puVar2;
         piVar6 = puVar5 + 1;
       }
@@ -10955,7 +10997,7 @@ undefined4 * FUN_004de1e0(undefined4 *param_1)
       }
       else {
         puVar2 = *ppuVar11;
-        *puVar5 = &PTR_FUN_006c3744;
+        *puVar5 = &PTR_ScreenSequenceNode__scalar_deleting_destructor_006c3744;
         puVar5[3] = puVar2;
         piVar6 = puVar5 + 1;
       }
@@ -11020,9 +11062,11 @@ undefined4 * FUN_004de1e0(undefined4 *param_1)
 }
 
 
-// ==== 0x4de3c0 FUN_004de3c0
+// ==== 0x4de3c0 ScreenSequence::FindByName
 
-int FUN_004de3c0(byte *param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+int ScreenSequence__FindByName(byte *param_1)
 
 {
   int in_EAX;
@@ -11069,9 +11113,11 @@ int FUN_004de3c0(byte *param_1)
 }
 
 
-// ==== 0x4de440 FUN_004de440
+// ==== 0x4de440 CreateScreenSequence
 
-void FUN_004de440(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void CreateScreenSequence(void)
 
 {
   void *pvVar1;
@@ -11086,7 +11132,7 @@ void FUN_004de440(void)
   pvVar1 = _malloc(0x10);
   local_4 = 0;
   if (pvVar1 != (void *)0x0) {
-    DAT_00735e00 = FUN_004de1e0(pvVar1);
+    DAT_00735e00 = ScreenSequence__ScreenSequence(pvVar1);
     ExceptionList = local_c;
     return;
   }
@@ -11096,9 +11142,11 @@ void FUN_004de440(void)
 }
 
 
-// ==== 0x4de4a0 FUN_004de4a0
+// ==== 0x4de4a0 EAlogoBumperScreen::NextScreen
 
-void FUN_004de4a0(void)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void EAlogoBumperScreen__NextScreen(void)
 
 {
   undefined4 *puVar1;
@@ -11134,9 +11182,11 @@ void FUN_004de4a0(void)
 }
 
 
-// ==== 0x4de520 FUN_004de520
+// ==== 0x4de520 ScreenSequence_JumpToNamed
 
-void FUN_004de520(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void ScreenSequence_JumpToNamed(void)
 
 {
   int iVar1;
@@ -11147,7 +11197,7 @@ void FUN_004de520(void)
   iVar1 = DAT_00735e00;
   if (DAT_00735e00 != 0) {
     if (in_EAX != 0) {
-      uVar2 = FUN_004de3c0(in_EAX);
+      uVar2 = ScreenSequence__FindByName(in_EAX);
       *(undefined4 *)(iVar1 + 0xc) = uVar2;
     }
     iVar1 = DAT_0073578c;
@@ -11162,23 +11212,27 @@ void FUN_004de520(void)
 }
 
 
-// ==== 0x4de570 FUN_004de570
+// ==== 0x4de570 DisclaimerScreen::_DisclaimerScreen
 
-void __fastcall FUN_004de570(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall DisclaimerScreen___DisclaimerScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c37e8;
+  *param_1 = &PTR_DisclaimerScreen__scalar_deleting_destructor_006c37e8;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4de580 FUN_004de580
+// ==== 0x4de580 DisclaimerScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004de580(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall DisclaimerScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004de570();
+  DisclaimerScreen___DisclaimerScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11235,7 +11289,7 @@ Screen_LS_Disclaimer_PC__Screen_LS_Disclaimer_PC(undefined4 *param_1,undefined4 
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   bVar2 = DAT_00734998 == 1;
-  *param_1 = &PTR_FUN_006c37e8;
+  *param_1 = &PTR_DisclaimerScreen__scalar_deleting_destructor_006c37e8;
   param_1[0x10] = 0;
   local_4 = 0;
   param_1[0x10] = DAT_0073ad3c;
@@ -11258,23 +11312,27 @@ Screen_LS_Disclaimer_PC__Screen_LS_Disclaimer_PC(undefined4 *param_1,undefined4 
 }
 
 
-// ==== 0x4de6b0 FUN_004de6b0
+// ==== 0x4de6b0 DemoDiscLegalScreen::_DemoDiscLegalScreen
 
-void __fastcall FUN_004de6b0(undefined4 *param_1)
+/* [canon] hud low (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall DemoDiscLegalScreen___DemoDiscLegalScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c37b8;
+  *param_1 = &PTR_DemoDiscLegalScreen__scalar_deleting_destructor_006c37b8;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4de6c0 FUN_004de6c0
+// ==== 0x4de6c0 DemoDiscLegalScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004de6c0(void *param_1,byte param_2)
+/* [canon] hud low (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall DemoDiscLegalScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004de6b0();
+  DemoDiscLegalScreen___DemoDiscLegalScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11302,7 +11360,7 @@ undefined4 * Screen_LS_Demo_Legal__Create(undefined4 param_1)
   local_4 = 0;
   if (puVar1 != (undefined4 *)0x0) {
     FEScreen__FEScreen(puVar1,param_1);
-    *puVar1 = &PTR_FUN_006c37b8;
+    *puVar1 = &PTR_DemoDiscLegalScreen__scalar_deleting_destructor_006c37b8;
     puVar1[0x10] = 0;
     puVar1[0x10] = DAT_0073ad3c;
     *(undefined1 *)(puVar1 + 0x11) = 1;
@@ -11314,9 +11372,11 @@ undefined4 * Screen_LS_Demo_Legal__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4de760 FUN_004de760
+// ==== 0x4de760 DemoDiscLegalScreen::NotificationMessage
 
-void __thiscall FUN_004de760(int param_1,int param_2)
+/* [canon] hud low (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall DemoDiscLegalScreen__NotificationMessage(int param_1,int param_2)
 
 {
   float fVar1;
@@ -11324,7 +11384,7 @@ void __thiscall FUN_004de760(int param_1,int param_2)
   if ((param_2 == -0x367ca946) &&
      (fVar1 = (float)(DAT_0073ad3c - *(int *)(param_1 + 0x40)) * 0.00025, 7.0 < fVar1)) {
     if (14.0 <= fVar1) {
-      FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+      EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
       return;
     }
     FUN_00495f00(0x393cad4b);
@@ -11334,23 +11394,27 @@ void __thiscall FUN_004de760(int param_1,int param_2)
 }
 
 
-// ==== 0x4de7d0 FUN_004de7d0
+// ==== 0x4de7d0 LicenseScreen::_LicenseScreen
 
-void __fastcall FUN_004de7d0(undefined4 *param_1)
+/* [canon] hud low (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall LicenseScreen___LicenseScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c3788;
+  *param_1 = &PTR_LicenseScreen__scalar_deleting_destructor_006c3788;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4de7e0 FUN_004de7e0
+// ==== 0x4de7e0 LicenseScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004de7e0(void *param_1,byte param_2)
+/* [canon] hud low (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall LicenseScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004de7d0();
+  LicenseScreen___LicenseScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11378,7 +11442,7 @@ undefined4 * Screen_LS_Demo_Disclaimer__Create(undefined4 param_1)
   local_4 = 0;
   if (puVar1 != (undefined4 *)0x0) {
     FEScreen__FEScreen(puVar1,param_1);
-    *puVar1 = &PTR_FUN_006c3788;
+    *puVar1 = &PTR_LicenseScreen__scalar_deleting_destructor_006c3788;
     puVar1[0x10] = 0;
     puVar1[0x10] = DAT_0073ad3c;
     ExceptionList = local_c;
@@ -11389,36 +11453,42 @@ undefined4 * Screen_LS_Demo_Disclaimer__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4de880 FUN_004de880
+// ==== 0x4de880 DisclaimerScreen::NotificationMessage
 
-void __thiscall FUN_004de880(int param_1,int param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall DisclaimerScreen__NotificationMessage(int param_1,int param_2)
 
 {
   if ((param_2 == -0x367ca946) && (7.0 < (float)(DAT_0073ad3c - *(int *)(param_1 + 0x40)) * 0.00025)
      ) {
-    FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+    EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
   }
   return;
 }
 
 
-// ==== 0x4de8c0 FUN_004de8c0
+// ==== 0x4de8c0 IntroFMVScreen::_IntroFMVScreen
 
-void __fastcall FUN_004de8c0(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall IntroFMVScreen___IntroFMVScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c3768;
+  *param_1 = &PTR_IntroFMVScreen__scalar_deleting_destructor_006c3768;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4de8d0 FUN_004de8d0
+// ==== 0x4de8d0 IntroFMVScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004de8d0(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall IntroFMVScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004de8c0();
+  IntroFMVScreen___IntroFMVScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11476,7 +11546,7 @@ undefined4 * Screen_LS_IntroFMV__Screen_LS_IntroFMV(undefined4 *param_1,undefine
   FEScreen__FEScreen(param_1,param_2);
   bVar3 = DAT_00735e04 != 0;
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c3768;
+  *param_1 = &PTR_IntroFMVScreen__scalar_deleting_destructor_006c3768;
   if (bVar3) {
     iVar2 = FEPackageList__FindByName(&DAT_00746104);
     iVar1 = DAT_0073578c;
@@ -11492,9 +11562,11 @@ undefined4 * Screen_LS_IntroFMV__Screen_LS_IntroFMV(undefined4 *param_1,undefine
 }
 
 
-// ==== 0x4de9f0 FUN_004de9f0
+// ==== 0x4de9f0 IntroFMVScreen::NotificationMessage
 
-int __thiscall FUN_004de9f0(int param_1,int param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __thiscall IntroFMVScreen__NotificationMessage(int param_1,int param_2)
 
 {
   int iVar1;
@@ -11509,7 +11581,7 @@ int __thiscall FUN_004de9f0(int param_1,int param_2)
     DAT_00733f70 = 1;
   }
   if (DAT_00735e04 == 0) {
-    iVar3 = FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+    iVar3 = EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
   }
   else {
     iVar3 = *(int *)(param_1 + 0xc);
@@ -11529,23 +11601,27 @@ int __thiscall FUN_004de9f0(int param_1,int param_2)
 }
 
 
-// ==== 0x4dea70 FUN_004dea70
+// ==== 0x4dea70 EAlogoBumperScreen::_EAlogoBumperScreen
 
-void __fastcall FUN_004dea70(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall EAlogoBumperScreen___EAlogoBumperScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c3758;
+  *param_1 = &PTR_EAlogoBumperScreen__scalar_deleting_destructor_006c3758;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4dea80 FUN_004dea80
+// ==== 0x4dea80 EAlogoBumperScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004dea80(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall EAlogoBumperScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004dea70();
+  EAlogoBumperScreen___EAlogoBumperScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11575,7 +11651,7 @@ undefined4 * BootMovieScreen__BootMovieScreen(undefined4 *param_1,undefined4 par
   iVar1 = DAT_00734998;
   bVar3 = DAT_00734998 == 0;
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c3758;
+  *param_1 = &PTR_EAlogoBumperScreen__scalar_deleting_destructor_006c3758;
   if ((bVar3) || (iVar1 == 5)) {
     pcVar2 = "na_boot";
   }
@@ -11590,14 +11666,16 @@ undefined4 * BootMovieScreen__BootMovieScreen(undefined4 *param_1,undefined4 par
 }
 
 
-// ==== 0x4deb30 FUN_004deb30
+// ==== 0x4deb30 EAlogoBumperScreen::NotificationMessage
 
-void __thiscall FUN_004deb30(int param_1,int param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall EAlogoBumperScreen__NotificationMessage(int param_1,int param_2)
 
 {
   if (param_2 == -0x3c69f147) {
     DAT_00733f70 = 1;
-    FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+    EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
   }
   return;
 }
@@ -11632,23 +11710,27 @@ undefined4 Screen_LS_EAlogo__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4debc0 FUN_004debc0
+// ==== 0x4debc0 Screen_LS_PSAMovie::_Screen_LS_PSAMovie
 
-void __fastcall FUN_004debc0(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall Screen_LS_PSAMovie___Screen_LS_PSAMovie(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c37a8;
+  *param_1 = &PTR_Screen_LS_PSAMovie__scalar_deleting_destructor_006c37a8;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4debd0 FUN_004debd0
+// ==== 0x4debd0 Screen_LS_PSAMovie::scalar_deleting_destructor
 
-void * __thiscall FUN_004debd0(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall Screen_LS_PSAMovie__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004debc0();
+  Screen_LS_PSAMovie___Screen_LS_PSAMovie();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11673,24 +11755,26 @@ undefined4 * Screen_LS_PSAMovie__Screen_LS_PSAMovie(undefined4 *param_1,undefine
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c37a8;
+  *param_1 = &PTR_Screen_LS_PSAMovie__scalar_deleting_destructor_006c37a8;
   FUN_004c39d0(&PTR_LAB_0041534f_1_006c3afc);
   ExceptionList = local_c;
   return param_1;
 }
 
 
-// ==== 0x4dec50 FUN_004dec50
+// ==== 0x4dec50 Screen_LS_PSAMovie::NotificationMessage
 
-void __thiscall FUN_004dec50(int param_1,int param_2)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void __thiscall Screen_LS_PSAMovie__NotificationMessage(int param_1,int param_2)
 
 {
   if ((param_2 == 0x406415e3) || (param_2 == -0x4a50db9f)) {
-    FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+    EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
   }
   else if (param_2 == -0x3c69f147) {
     DAT_00733f70 = 1;
-    FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+    EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
     return;
   }
   return;
@@ -11726,23 +11810,27 @@ undefined4 Screen_LS_PSAMovie__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4decf0 FUN_004decf0
+// ==== 0x4decf0 THXMovieScreen::_THXMovieScreen
 
-void __fastcall FUN_004decf0(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall THXMovieScreen___THXMovieScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c380c;
+  *param_1 = &PTR_THXMovieScreen__scalar_deleting_destructor_006c380c;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4ded00 FUN_004ded00
+// ==== 0x4ded00 THXMovieScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004ded00(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall THXMovieScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004decf0();
+  THXMovieScreen___THXMovieScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11772,7 +11860,7 @@ undefined4 * Screen_LS_THXMovie__Create(undefined4 param_1)
   puVar2 = (undefined4 *)0x0;
   if (puVar1 != (undefined4 *)0x0) {
     FEScreen__FEScreen(puVar1,param_1);
-    *puVar1 = &PTR_FUN_006c380c;
+    *puVar1 = &PTR_THXMovieScreen__scalar_deleting_destructor_006c380c;
     puVar2 = puVar1;
   }
   ExceptionList = local_c;
@@ -11780,16 +11868,18 @@ undefined4 * Screen_LS_THXMovie__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4ded80 FUN_004ded80
+// ==== 0x4ded80 LangSelectScreen::_LangSelectScreen
 
-void __fastcall FUN_004ded80(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall LangSelectScreen___LangSelectScreen(undefined4 *param_1)
 
 {
   int *_Memory;
   int iVar1;
   int *piVar2;
   
-  *param_1 = &PTR_FUN_006c37c8;
+  *param_1 = &PTR_LangSelectScreen__scalar_deleting_destructor_006c37c8;
   DAT_007588f0 = (uint)(**(int **)(param_1[0x12] + 8) != 0);
   Player__Init(1);
   Player__Init(1);
@@ -11807,9 +11897,11 @@ void __fastcall FUN_004ded80(undefined4 *param_1)
 }
 
 
-// ==== 0x4dedf0 FUN_004dedf0
+// ==== 0x4dedf0 LangSelectScreen::NotifySoundMessage
 
-int FUN_004dedf0(void)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+int LangSelectScreen__NotifySoundMessage(void)
 
 {
   int in_stack_00000014;
@@ -11821,12 +11913,14 @@ int FUN_004dedf0(void)
 }
 
 
-// ==== 0x4dee10 FUN_004dee10
+// ==== 0x4dee10 LangSelectScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004dee10(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall LangSelectScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004ded80();
+  LangSelectScreen___LangSelectScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11886,7 +11980,7 @@ undefined4 * Screen_LS_LangSelect__Screen_LS_LangSelect(undefined4 *param_1,unde
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   puVar1 = param_1 + 0x10;
-  *param_1 = &PTR_FUN_006c37c8;
+  *param_1 = &PTR_LangSelectScreen__scalar_deleting_destructor_006c37c8;
   *puVar1 = puVar1;
   param_1[0x11] = puVar1;
   local_4 = 1;
@@ -11968,15 +12062,17 @@ LAB_004def53:
   puVar6 = (undefined4 *)0x0;
 LAB_004defd4:
   param_1[0x12] = puVar6;
-  FUN_004df080();
+  LangSelectScreen__ShowSelectedLanguage();
   ExceptionList = local_c;
   return param_1;
 }
 
 
-// ==== 0x4df000 FUN_004df000
+// ==== 0x4df000 LangSelectScreen::ChangeLanguage
 
-void FUN_004df000(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void LangSelectScreen__ChangeLanguage(void)
 
 {
   undefined4 *puVar1;
@@ -12003,16 +12099,18 @@ LAB_004df030:
   if (puVar1 != *(undefined4 **)(unaff_ESI + 0x48)) {
     FUN_004f8340(*(undefined4 *)(unaff_ESI + 0xc));
     EAXSound__ChangeLanguage();
-    FUN_004df080();
+    LangSelectScreen__ShowSelectedLanguage();
     return;
   }
   return;
 }
 
 
-// ==== 0x4df080 FUN_004df080
+// ==== 0x4df080 LangSelectScreen::ShowSelectedLanguage
 
-void FUN_004df080(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void LangSelectScreen__ShowSelectedLanguage(void)
 
 {
   int in_EAX;
@@ -12026,41 +12124,47 @@ void FUN_004df080(void)
   puVar1 = (undefined4 *)0x0;
 LAB_004df0a3:
   FUN_00495f00(*(undefined4 *)(puVar1[2] + 4));
-  uVar2 = FUN_004df120();
+  uVar2 = LangSelectScreen__GetLangHashForLanguage();
   FUN_004ad7b0(uVar2);
   return;
 }
 
 
-// ==== 0x4df0e0 FUN_004df0e0
+// ==== 0x4df0e0 LangSelectScreen::NotificationMessage
 
-void __thiscall FUN_004df0e0(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall LangSelectScreen__NotificationMessage(int param_1,int param_2)
 
 {
   if (param_2 == 0xc407210) {
-    FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+    EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
   }
   else if ((param_2 == -0x6edfbf62) || (param_2 == -0x4a68e40f)) {
-    FUN_004df000();
+    LangSelectScreen__ChangeLanguage();
     return;
   }
   return;
 }
 
 
-// ==== 0x4df100 FUN_004df100
+// ==== 0x4df100 LangSelectScreen::ChangeLanguage_thunk
 
-void FUN_004df100(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void LangSelectScreen__ChangeLanguage_thunk(void)
 
 {
-  FUN_004df000();
+  LangSelectScreen__ChangeLanguage();
   return;
 }
 
 
-// ==== 0x4df120 FUN_004df120
+// ==== 0x4df120 LangSelectScreen::GetLangHashForLanguage
 
-int __fastcall FUN_004df120(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __fastcall LangSelectScreen__GetLangHashForLanguage(int param_1,int param_2)
 
 {
   byte *pbVar1;
@@ -12137,7 +12241,7 @@ undefined4 * Screen_LS_Splash_PC__Screen_LS_Splash_PC(undefined4 *param_1,undefi
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   bVar2 = DAT_006f0880 == 0;
-  *param_1 = &PTR_FUN_006c3748;
+  *param_1 = &PTR_SplashScreen__scalar_deleting_destructor_006c3748;
   param_1[0x10] = 0;
   local_4 = 0;
   param_1[0x11] = 0;
@@ -12223,12 +12327,14 @@ LAB_004df32a:
 }
 
 
-// ==== 0x4df3d0 FUN_004df3d0
+// ==== 0x4df3d0 SplashScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004df3d0(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall SplashScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004df3f0();
+  SplashScreen___SplashScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -12236,27 +12342,31 @@ void * __thiscall FUN_004df3d0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4df3f0 FUN_004df3f0
+// ==== 0x4df3f0 SplashScreen::_SplashScreen
 
-void __fastcall FUN_004df3f0(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall SplashScreen___SplashScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c3748;
+  *param_1 = &PTR_SplashScreen__scalar_deleting_destructor_006c3748;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4df400 FUN_004df400
+// ==== 0x4df400 SplashScreen::NotificationMessage
 
-void __thiscall FUN_004df400(int param_1,uint param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall SplashScreen__NotificationMessage(int param_1,uint param_2)
 
 {
   if (param_2 < 0x406415e4) {
     if ((param_2 == 0x406415e3) || (param_2 == 0xc407210)) {
       FUN_0041e4d0();
       FUN_004f8340(*(undefined4 *)(param_1 + 0xc));
-      FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+      EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
       return;
     }
     if (param_2 == 0x35f8620b) {
@@ -12266,29 +12376,33 @@ void __thiscall FUN_004df400(int param_1,uint param_2)
   }
   else if ((param_2 == 0xc98356ba) &&
           (30.0 < (float)(DAT_0073ad3c - *(int *)(param_1 + 0x44)) * 0.00025)) {
-    FUN_004de520(*(undefined4 *)(param_1 + 0xc));
+    ScreenSequence_JumpToNamed(*(undefined4 *)(param_1 + 0xc));
   }
   return;
 }
 
 
-// ==== 0x4df4a0 FUN_004df4a0
+// ==== 0x4df4a0 MarketingScreen::_MarketingScreen
 
-void __fastcall FUN_004df4a0(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall MarketingScreen___MarketingScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c37fc;
+  *param_1 = &PTR_MarketingScreen__scalar_deleting_destructor_006c37fc;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4df4b0 FUN_004df4b0
+// ==== 0x4df4b0 MarketingScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004df4b0(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall MarketingScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004df4a0();
+  MarketingScreen___MarketingScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -12325,16 +12439,18 @@ undefined4 Screen_DiscErrorPC__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4df530 FUN_004df530
+// ==== 0x4df530 FinishLoadingMarketingCallbackBridge
 
-void FUN_004df530(undefined4 param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FinishLoadingMarketingCallbackBridge(undefined4 param_1)
 
 {
   int iVar1;
   
   iVar1 = FEPackageList__FindByName(&DAT_00746104);
   if ((iVar1 != 0) && (*(int *)(iVar1 + 0x14) != 0)) {
-    FUN_004df630(param_1);
+    MarketingScreen__FinishLoadingTexture(param_1);
   }
   return;
 }
@@ -12360,7 +12476,7 @@ undefined4 * Screen_DiscErrorPC__Screen_DiscErrorPC(undefined4 *param_1,int para
   local_c = ExceptionList;
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
-  *param_1 = &PTR_FUN_006c37fc;
+  *param_1 = &PTR_MarketingScreen__scalar_deleting_destructor_006c37fc;
   local_4 = 0;
   param_1[0x10] = 0;
   pcVar4 = "DEMO_DISC_MARKETING_BLURB";
@@ -12372,7 +12488,7 @@ undefined4 * Screen_DiscErrorPC__Screen_DiscErrorPC(undefined4 *param_1,int para
     uVar2 = (uint)*pbVar1;
     pcVar4 = pcVar4 + 1;
   } while (*pbVar1 != 0);
-  FUN_0053e9e0(&DAT_00740420,&param_2,1,FUN_004df530,0,0);
+  FUN_0053e9e0(&DAT_00740420,&param_2,1,FinishLoadingMarketingCallbackBridge,0,0);
   if (param_1[3] != 0) {
     iVar3 = FEngFindPackage();
     if (iVar3 != 0) {
@@ -12393,9 +12509,11 @@ LAB_004df611:
 }
 
 
-// ==== 0x4df630 FUN_004df630
+// ==== 0x4df630 MarketingScreen::FinishLoadingTexture
 
-void FUN_004df630(void)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void MarketingScreen__FinishLoadingTexture(void)
 
 {
   int in_EAX;
@@ -12421,9 +12539,11 @@ LAB_004df67a:
 }
 
 
-// ==== 0x4df690 FUN_004df690
+// ==== 0x4df690 MarketingScreen::NotificationMessage
 
-void __thiscall FUN_004df690(int param_1,int param_2,int param_3)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall MarketingScreen__NotificationMessage(int param_1,int param_2,int param_3)
 
 {
   char cVar1;
@@ -12432,7 +12552,7 @@ void __thiscall FUN_004df690(int param_1,int param_2,int param_3)
     if (*(int *)(param_3 + 0x10) == 0x4f876b6f) {
       cVar1 = FUN_00411ab0();
       if (cVar1 != '\0') {
-        FUN_004de4a0(*(undefined4 *)(param_1 + 0xc));
+        EAlogoBumperScreen__NextScreen(*(undefined4 *)(param_1 + 0xc));
         return;
       }
     }
@@ -13769,7 +13889,7 @@ Screen_MU_MultiplayerCarSelect__Screen_MU_MultiplayerCarSelect
     else {
       DAT_0076856c = param_2;
     }
-    FUN_004ab570();
+    FEPlayerCarDB__ValidateAllCars();
   }
   FUN_004e0d90(param_1,param_1 + 0x10,0);
   FUN_004e0d90(param_1,param_1 + 0x19,1);

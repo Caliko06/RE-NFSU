@@ -272,7 +272,7 @@ void __thiscall FUN_00551280(int param_1,uint param_2,undefined4 param_3,undefin
       local_73c = 0;
       local_738 = 0;
       local_740 = 0x639;
-      FUN_004dcfd0(&local_768,*(undefined4 *)(param_1 + 0xc));
+      InfoDialog__OpenModalDialog(&local_768,*(undefined4 *)(param_1 + 0xc));
       return;
     }
     FUN_00551b40(param_1);
@@ -2910,7 +2910,7 @@ void __thiscall FUN_00554f60(int param_1,uint param_2,int param_3)
       local_10 = 0;
       local_18 = 0x639;
       uVar2 = FUN_004134c0();
-      FUN_004dcfd0(&local_40,uVar2);
+      InfoDialog__OpenModalDialog(&local_40,uVar2);
       return;
     }
     if (param_2 == 0xabddddba) {
@@ -9401,7 +9401,7 @@ void __thiscall FUN_0055d450(int param_1,uint param_2,int param_3,uint param_4)
       uStack_c = 0;
       uStack_8 = 0;
       uStack_10 = 0x639;
-      FUN_004dcfd0(&uStack_38,*(undefined4 *)(param_1 + 0xc));
+      InfoDialog__OpenModalDialog(&uStack_38,*(undefined4 *)(param_1 + 0xc));
       return;
     }
   }
@@ -11346,7 +11346,7 @@ void FUN_0055fe30(undefined4 param_1,undefined4 param_2)
     FUN_004ef050(uVar1);
   }
   if (*(int *)(unaff_EBX + 0x98) == 0) {
-    uVar1 = FUN_0049fc90();
+    uVar1 = GetHudObjectColor();
     *(undefined4 *)(unaff_EBX + 0x9c) = uVar1;
   }
   FUN_004f75b0(param_2);

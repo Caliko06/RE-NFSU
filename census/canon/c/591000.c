@@ -12795,7 +12795,7 @@ int FUN_0059ffd0(int param_1,int param_2)
   
   iVar1 = 8;
   do {
-    FUN_004a9990();
+    FinishedRaceStatsEntry__operator_();
     iVar1 = iVar1 + -1;
   } while (iVar1 != 0);
   *(undefined4 *)(param_1 + 0xae0) = *(undefined4 *)(param_2 + 0xae0);
@@ -13561,7 +13561,7 @@ undefined4 * FUN_005a0940(undefined4 *param_1)
     iVar1 = iVar1 + 1;
   } while (iVar1 < 0xb);
   *param_1 = 0;
-  param_1[0x113] = &PTR_FUN_006c6434;
+  param_1[0x113] = &PTR_CareerMenuScreen___CareerMenuScreen_006c6434;
   puVar2 = param_1 + 0x114;
   for (iVar1 = 900; iVar1 != 0; iVar1 = iVar1 + -1) {
     *puVar2 = 0;

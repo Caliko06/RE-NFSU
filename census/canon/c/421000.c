@@ -997,7 +997,7 @@ void FUN_00421f00(int *param_1)
   FUN_00456ba0();
   FUN_0051f8a0(DAT_007356a8,iVar9);
   DAT_007361f0 = param_1;
-  FUN_004abaa0();
+  cFrontendDatabase__NotifyStartNewRace();
   iVar4 = *param_1;
   param_1[0x11] = 0;
   param_1[5] = iVar9;
@@ -1811,7 +1811,7 @@ switchD_00422eca_caseD_4:
     local_24 = DAT_0073ad3c - *(int *)(param_1 + 4);
     if ((2.0 < (float)local_24 * 0.00025) &&
        (cVar2 = StreamSections__WaitUntilIdle(&DAT_0077a980), cVar2 == '\0')) {
-      FUN_004de130();
+      TellLoadingScreenLoadingIsDone();
       FUN_00421ae0(*(undefined4 *)(param_1 + 0x14));
     }
     return 1;
@@ -2649,7 +2649,7 @@ void FUN_00423f20(void)
   iVar8 = DAT_0073619c;
   *(undefined4 *)(DAT_0073619c + 0x20) = 0;
   *(undefined4 *)(iVar8 + 0x1c) = 0;
-  FUN_004ab900(iVar8);
+  cFrontendDatabase__NotifyTheRaceIsOver(iVar8);
   cVar3 = FUN_0043a2e0();
   iVar8 = DAT_0077b244;
   if ((cVar3 != '\0') && (DAT_0077b244 != 0)) {
@@ -2658,7 +2658,7 @@ void FUN_00423f20(void)
       iVar4 = FUN_00439930(4);
       if (*(int *)(iVar8 + 0x18c + iVar4 * 4) < 1) goto LAB_0042406f;
     }
-    DAT_00735790 = FUN_004ab670(&DAT_00748f70);
+    DAT_00735790 = cFrontendDatabase__CalculateFirstFrontendScreenToSeeAfterQuitRace(&DAT_00748f70);
     iVar8 = *unaff_EDI;
     piVar5 = (int *)FUN_00567160();
     if (piVar5 == (int *)0x0) {

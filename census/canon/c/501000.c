@@ -4322,7 +4322,7 @@ void __thiscall GarageScreen__NotificationMessage(int param_1,uint param_2,undef
         local_10 = 0;
         local_c = 0;
         local_14 = 0x639;
-        FUN_004dcfd0(&local_3c,*(undefined4 *)(param_1 + 0xc));
+        InfoDialog__OpenModalDialog(&local_3c,*(undefined4 *)(param_1 + 0xc));
         return;
       }
       if (param_2 == 0xb5971bf1) {
@@ -5766,7 +5766,7 @@ void __thiscall GarageCategoryVisual__NotificationMessage(int param_1,uint param
         local_1c = 1;
         local_40 = 0xdd070611;
         local_18 = 0x639;
-        FUN_004dcfd0(&local_40,*(undefined4 *)(param_1 + 0xc));
+        InfoDialog__OpenModalDialog(&local_40,*(undefined4 *)(param_1 + 0xc));
         GarageCategoryVisual__MoveForwardPackage();
         return;
       }

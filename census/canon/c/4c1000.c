@@ -8322,7 +8322,7 @@ void __thiscall FUN_004cadc0(int param_1,int param_2)
         if (iVar3 != 0) {
           *(undefined4 *)(iVar3 + 0x1c) = 0xff;
         }
-        FUN_004aa5e0(1);
+        UserProfile__ResetSlot(1);
         DAT_007677b0 = (uint)(*(char *)(param_1 + 0xb6) != '\0');
         DAT_007677b4 = 0;
         Player__Init(1);
@@ -8358,7 +8358,7 @@ void __thiscall FUN_004cadc0(int param_1,int param_2)
       pvVar1 = (void *)0x0;
     }
     else {
-      pvVar1 = (void *)FUN_004aa200();
+      pvVar1 = (void *)UserProfile__UserProfile();
     }
     uStack_4 = 0xffffffff;
     Player__Init(1);
@@ -9891,7 +9891,7 @@ void __thiscall FUN_004ccab0(int param_1,int param_2)
           pvVar3 = (void *)0x0;
         }
         else {
-          pvVar3 = (void *)FUN_004aa200();
+          pvVar3 = (void *)UserProfile__UserProfile();
         }
         uStack_4 = 0xffffffff;
         Ugd__UnpackBlock(0);
@@ -10935,7 +10935,7 @@ void __thiscall FUN_004cd7b0(int param_1,uint param_2,int param_3)
 void FUN_004cda50(void)
 
 {
-  DAT_00735790 = FUN_004ab670(&DAT_00748f70);
+  DAT_00735790 = cFrontendDatabase__CalculateFirstFrontendScreenToSeeAfterQuitRace(&DAT_00748f70);
   FUN_00421c00(DAT_007361f0,6,3);
   return;
 }
@@ -12169,7 +12169,7 @@ OptionsMenu__NotificationMessage(int param_1,uint param_2,int param_3,undefined4
         uStack_8 = 0;
         uStack_10 = 0x639;
         uStack_34 = uVar3;
-        FUN_004dcfd0(&uStack_38,*(undefined4 *)(param_1 + 0xc));
+        InfoDialog__OpenModalDialog(&uStack_38,*(undefined4 *)(param_1 + 0xc));
       }
       else if (param_2 == 0xc98356ba) {
         OptionsMenu__HandleMouse(param_1);

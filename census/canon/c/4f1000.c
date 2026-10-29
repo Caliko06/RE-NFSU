@@ -6631,7 +6631,7 @@ void FUN_004f7c00(int param_1,undefined4 param_2,undefined4 param_3,int param_4)
       local_14 = 1;
       local_38 = 0x169268;
       local_10 = 0x639;
-      FUN_004dcfd0(&local_38,iVar2);
+      InfoDialog__OpenModalDialog(&local_38,iVar2);
     }
   }
   else if (param_1 == -0x367ca946) {
@@ -7337,7 +7337,7 @@ int FUN_004f8730(int param_1,int param_2,float param_3,undefined1 param_4)
   }
   *(undefined1 *)(piVar2 + 6) = param_3._0_1_;
   piVar2[4] = *(int *)(param_1 + 0x1c);
-  iVar3 = FUN_0049fc90();
+  iVar3 = GetHudObjectColor();
   piVar2[5] = iVar3;
   *(undefined1 *)((int)piVar2 + 0x19) = param_4;
   FUN_004f7350(piVar2 + 7,piVar2 + 8);
@@ -7516,7 +7516,7 @@ void FUN_004f89d0(void)
     *(undefined4 *)(unaff_EDI + 0x38) = 0;
   }
   iVar3 = *(int *)(unaff_EDI + 0xc);
-  uVar2 = FUN_0049fc90();
+  uVar2 = GetHudObjectColor();
   local_10 = (float)(uint)*(byte *)(iVar3 + 0x17);
   local_c = (float)(int)local_10;
   local_8 = 0x437f0000;

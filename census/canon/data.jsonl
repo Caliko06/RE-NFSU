@@ -6022,21 +6022,21 @@
 {"kind":"global","addr":"0x6c3718","block":".rdata","label":"s_P%d_Transmission_select_006c3718","type":"string","str":"P%d_Transmission_select","readers":["0x4e0380"],"writers":[]}
 {"kind":"global","addr":"0x6c3730","block":".rdata","label":"s_fade_out_006c3730","type":"string","str":"fade_out","readers":["0x4e02d0"],"writers":[]}
 {"kind":"global","addr":"0x6c373c","block":".rdata","label":"s_fade_in_006c373c","type":"string","str":"fade_in","readers":["0x4e0270"],"writers":[]}
-{"kind":"global","addr":"0x6c3744","block":".rdata","label":"PTR_FUN_006c3744","type":"pointer","str":"","readers":["0x4de160","0x4de1e0"],"writers":[]}
-{"kind":"global","addr":"0x6c3748","block":".rdata","label":"PTR_FUN_006c3748","type":"undefined *","str":"","readers":["0x4df1d0","0x4df3f0"],"writers":[]}
-{"kind":"global","addr":"0x6c3758","block":".rdata","label":"PTR_FUN_006c3758","type":"undefined *","str":"","readers":["0x4dea70","0x4deaa0"],"writers":[]}
-{"kind":"global","addr":"0x6c3768","block":".rdata","label":"PTR_FUN_006c3768","type":"undefined *","str":"","readers":["0x4de8c0","0x4de950"],"writers":[]}
-{"kind":"global","addr":"0x6c3778","block":".rdata","label":"PTR_FUN_006c3778","type":"undefined *","str":"","readers":["0x4dd290","0x4dd6a0"],"writers":[]}
-{"kind":"global","addr":"0x6c3788","block":".rdata","label":"PTR_FUN_006c3788","type":"undefined *","str":"","readers":["0x4de7d0","0x4de800"],"writers":[]}
+{"kind":"global","addr":"0x6c3744","block":".rdata","label":"PTR_ScreenSequenceNode::scalar_deleting_destructor_006c3744","type":"pointer","str":"","readers":["0x4de160","0x4de1e0"],"writers":[]}
+{"kind":"global","addr":"0x6c3748","block":".rdata","label":"PTR_SplashScreen::scalar_deleting_destructor_006c3748","type":"undefined *","str":"","readers":["0x4df1d0","0x4df3f0"],"writers":[]}
+{"kind":"global","addr":"0x6c3758","block":".rdata","label":"PTR_EAlogoBumperScreen::scalar_deleting_destructor_006c3758","type":"undefined *","str":"","readers":["0x4dea70","0x4deaa0"],"writers":[]}
+{"kind":"global","addr":"0x6c3768","block":".rdata","label":"PTR_IntroFMVScreen::scalar_deleting_destructor_006c3768","type":"undefined *","str":"","readers":["0x4de8c0","0x4de950"],"writers":[]}
+{"kind":"global","addr":"0x6c3778","block":".rdata","label":"PTR_LoadingScreen::scalar_deleting_destructor_006c3778","type":"undefined *","str":"","readers":["0x4dd290","0x4dd6a0"],"writers":[]}
+{"kind":"global","addr":"0x6c3788","block":".rdata","label":"PTR_LicenseScreen::scalar_deleting_destructor_006c3788","type":"undefined *","str":"","readers":["0x4de7d0","0x4de800"],"writers":[]}
 {"kind":"global","addr":"0x6c3798","block":".rdata","label":"PTR_FUN_006c3798","type":"undefined *","str":"","readers":["0x4e01c0","0x4e01f0"],"writers":[]}
-{"kind":"global","addr":"0x6c37a8","block":".rdata","label":"PTR_FUN_006c37a8","type":"undefined *","str":"","readers":["0x4debc0","0x4debf0"],"writers":[]}
-{"kind":"global","addr":"0x6c37b8","block":".rdata","label":"PTR_FUN_006c37b8","type":"undefined *","str":"","readers":["0x4de6b0","0x4de6e0"],"writers":[]}
-{"kind":"global","addr":"0x6c37c8","block":".rdata","label":"PTR_FUN_006c37c8","type":"undefined *","str":"","readers":["0x4ded80","0x4dee90"],"writers":[]}
+{"kind":"global","addr":"0x6c37a8","block":".rdata","label":"PTR_Screen_LS_PSAMovie::scalar_deleting_destructor_006c37a8","type":"undefined *","str":"","readers":["0x4debc0","0x4debf0"],"writers":[]}
+{"kind":"global","addr":"0x6c37b8","block":".rdata","label":"PTR_DemoDiscLegalScreen::scalar_deleting_destructor_006c37b8","type":"undefined *","str":"","readers":["0x4de6b0","0x4de6e0"],"writers":[]}
+{"kind":"global","addr":"0x6c37c8","block":".rdata","label":"PTR_LangSelectScreen::scalar_deleting_destructor_006c37c8","type":"undefined *","str":"","readers":["0x4ded80","0x4dee90"],"writers":[]}
 {"kind":"global","addr":"0x6c37d8","block":".rdata","label":"PTR_FUN_006c37d8","type":"undefined *","str":"","readers":["0x4e0000","0x4e0030"],"writers":[]}
-{"kind":"global","addr":"0x6c37e8","block":".rdata","label":"PTR_FUN_006c37e8","type":"undefined *","str":"","readers":["0x4de570","0x4de600"],"writers":[]}
-{"kind":"global","addr":"0x6c37f8","block":".rdata","label":"PTR_FUN_006c37f8","type":"pointer","str":"","readers":["0x4de190","0x4de1e0"],"writers":[]}
-{"kind":"global","addr":"0x6c37fc","block":".rdata","label":"PTR_FUN_006c37fc","type":"undefined *","str":"","readers":["0x4df4a0","0x4df560"],"writers":[]}
-{"kind":"global","addr":"0x6c380c","block":".rdata","label":"PTR_FUN_006c380c","type":"undefined *","str":"","readers":["0x4decf0","0x4ded20"],"writers":[]}
+{"kind":"global","addr":"0x6c37e8","block":".rdata","label":"PTR_DisclaimerScreen::scalar_deleting_destructor_006c37e8","type":"undefined *","str":"","readers":["0x4de570","0x4de600"],"writers":[]}
+{"kind":"global","addr":"0x6c37f8","block":".rdata","label":"PTR_ScreenSequence::scalar_deleting_destructor_006c37f8","type":"pointer","str":"","readers":["0x4de190","0x4de1e0"],"writers":[]}
+{"kind":"global","addr":"0x6c37fc","block":".rdata","label":"PTR_MarketingScreen::scalar_deleting_destructor_006c37fc","type":"undefined *","str":"","readers":["0x4df4a0","0x4df560"],"writers":[]}
+{"kind":"global","addr":"0x6c380c","block":".rdata","label":"PTR_THXMovieScreen::scalar_deleting_destructor_006c380c","type":"undefined *","str":"","readers":["0x4decf0","0x4ded20"],"writers":[]}
 {"kind":"global","addr":"0x6c381c","block":".rdata","label":"s_PCESRBScreen_006c381c","type":"string","str":"PCESRBScreen","readers":["0x687a90"],"writers":[]}
 {"kind":"global","addr":"0x6c382c","block":".rdata","label":"s_PCDemoDiscMarketingScreen_006c382c","type":"string","str":"PCDemoDiscMarketingScreen","readers":["0x687ab0"],"writers":[]}
 {"kind":"global","addr":"0x6c3a04","block":".rdata","label":"s_DEMO_DISC_MARKETING_BLURB_006c3a04","type":"string","str":"DEMO_DISC_MARKETING_BLURB","readers":["0x4df560"],"writers":[]}
@@ -6059,7 +6059,7 @@
 {"kind":"global","addr":"0x6c3b68","block":".rdata","label":"s_BootFlowManager_006c3b68","type":"string","str":"BootFlowManager","readers":["0x686bb0"],"writers":[]}
 {"kind":"global","addr":"0x6c3b78","block":".rdata","label":"s_foobar_006c3b78","type":"string","str":"foobar","readers":["0x4de1e0"],"writers":[]}
 {"kind":"global","addr":"0x6c3b98","block":".rdata","label":"s_LoadingScreen_006c3b98","type":"string","str":"LoadingScreen","readers":["0x688c30"],"writers":[]}
-{"kind":"global","addr":"0x6c3ba8","block":".rdata","label":"PTR_FUN_006c3ba8","type":"undefined *","str":"","readers":["0x4dcea0","0x4dcf10"],"writers":[]}
+{"kind":"global","addr":"0x6c3ba8","block":".rdata","label":"PTR_InfoDialog::scalar_deleting_destructor_006c3ba8","type":"undefined *","str":"","readers":["0x4dcea0","0x4dcf10"],"writers":[]}
 {"kind":"global","addr":"0x6c3bb8","block":".rdata","label":"s_InfoDialog_006c3bb8","type":"string","str":"InfoDialog","readers":["0x687b70"],"writers":[]}
 {"kind":"global","addr":"0x6c3bc4","block":".rdata","label":"PTR_FUN_006c3bc4","type":"undefined *","str":"","readers":["0x4dcac0","0x4dcb50"],"writers":[]}
 {"kind":"global","addr":"0x6c3bd4","block":".rdata","label":"s_OKDialog_006c3bd4","type":"string","str":"OKDialog","readers":["0x687b90"],"writers":[]}
@@ -6669,7 +6669,7 @@
 {"kind":"global","addr":"0x6c63fc","block":".rdata","label":"s_TRFE_ROAD02_%02d_006c63fc","type":"string","str":"TRFE_ROAD02_%02d","readers":["0x4ada60"],"writers":[]}
 {"kind":"global","addr":"0x6c6410","block":".rdata","label":"s_TRFE_ROAD02_006c6410","type":"string","str":"TRFE_ROAD02","readers":["0x4ada60"],"writers":[]}
 {"kind":"global","addr":"0x6c641c","block":".rdata","label":"s_MiniWorld_DynamicLights_006c641c","type":"string","str":"MiniWorld_DynamicLights","readers":["0x4ada60"],"writers":[]}
-{"kind":"global","addr":"0x6c6434","block":".rdata","label":"PTR_FUN_006c6434","type":"pointer","str":"","readers":["0x4a9960","0x4a9970","0x4a9d70","0x5a0940"],"writers":[]}
+{"kind":"global","addr":"0x6c6434","block":".rdata","label":"PTR_CareerMenuScreen::_CareerMenuScreen_006c6434","type":"pointer","str":"","readers":["0x4a9960","0x4a9970","0x4a9d70","0x5a0940"],"writers":[]}
 {"kind":"global","addr":"0x6c6438","block":".rdata","label":"s_REVERSE_TRACK_NAME_%d_006c6438","type":"string","str":"REVERSE_TRACK_NAME_%d","readers":["0x4ad6d0"],"writers":[]}
 {"kind":"global","addr":"0x6c6450","block":".rdata","label":"s_TRACK_NAME_%d_006c6450","type":"string","str":"TRACK_NAME_%d","readers":["0x4ad6d0","0x562690"],"writers":[]}
 {"kind":"global","addr":"0x6c6460","block":".rdata","label":"s_CUSTOMIZABLE_%s_006c6460","type":"string","str":"CUSTOMIZABLE_%s","readers":["0x4ac460"],"writers":[]}
@@ -6708,7 +6708,7 @@
 {"kind":"global","addr":"0x6c6541","block":".rdata","label":"DAT_006c6541","type":"undefined1","str":"","readers":["0x4aa670"],"writers":[]}
 {"kind":"global","addr":"0x6c6544","block":".rdata","label":"DAT_006c6544","type":"","str":"","readers":["0x4c4920"],"writers":[]}
 {"kind":"global","addr":"0x6c654c","block":".rdata","label":"s_SPRINT_006c654c","type":"string","str":"SPRINT","readers":["0x4c4920"],"writers":[]}
-{"kind":"global","addr":"0x6c65c0","block":".rdata","label":"PTR_FUN_006c65c0","type":"pointer","str":"","readers":["0x4a8e40","0x4a9290"],"writers":[]}
+{"kind":"global","addr":"0x6c65c0","block":".rdata","label":"PTR_FEngHud::scalar_deleting_destructor_006c65c0","type":"pointer","str":"","readers":["0x4a8e40","0x4a9290"],"writers":[]}
 {"kind":"global","addr":"0x6c6aac","block":".rdata","label":"s_Leaderboard_Off_006c6aac","type":"string","str":"Leaderboard_Off","readers":["0x4a9540"],"writers":[]}
 {"kind":"global","addr":"0x6c6abc","block":".rdata","label":"s_StylePointsGroup_006c6abc","type":"string","str":"StylePointsGroup","readers":["0x4a9540"],"writers":[]}
 {"kind":"global","addr":"0x6c6ad0","block":".rdata","label":"s_OnlineHUDSupport_006c6ad0","type":"string","str":"OnlineHUDSupport","readers":["0x688443"],"writers":[]}
@@ -9387,7 +9387,7 @@
 {"kind":"global","addr":"0x6e9ad8","block":".data","label":"DAT_006e9ad8","type":"","str":"","readers":["0x64d860"],"writers":[]}
 {"kind":"global","addr":"0x6e9adc","block":".data","label":"DAT_006e9adc","type":"","str":"","readers":[],"writers":["0x64f320"]}
 {"kind":"global","addr":"0x6e9ae0","block":".data","label":"DAT_006e9ae0","type":"","str":"","readers":[],"writers":["0x64f320"]}
-{"kind":"global","addr":"0x6e9ae8","block":".data","label":"PTR_FUN_006e9ae8","type":"undefined *","str":"","readers":["0x64df30"],"writers":[]}
+{"kind":"global","addr":"0x6e9ae8","block":".data","label":"PTR_SNDAEMSI_UpdateClassDestructor_006e9ae8","type":"undefined *","str":"","readers":["0x64df30"],"writers":[]}
 {"kind":"global","addr":"0x6e9b8c","block":".data","label":"PTR_thunk_FUN_00652d80_006e9b8c","type":"pointer","str":"","readers":["0x64e520","0x64e9e0","0x654a90"],"writers":["0x64e9e0"]}
 {"kind":"global","addr":"0x6e9b90","block":".data","label":"PTR_thunk_FUN_00652d90_006e9b90","type":"pointer","str":"","readers":["0x64e540","0x654a90"],"writers":["0x64e9e0"]}
 {"kind":"global","addr":"0x6e9b94","block":".data","label":"DAT_006e9b94","type":"undefined4","str":"","readers":["0x64e800"],"writers":["0x64e6e0"]}

@@ -4018,7 +4018,7 @@ LAB_00496f5d:
       piVar6 = piVar6 + 0x3e51;
     } while (iVar4 < DAT_0078a320);
   }
-  DAT_00735790 = FUN_004ab670(&DAT_00748f70);
+  DAT_00735790 = cFrontendDatabase__CalculateFirstFrontendScreenToSeeAfterQuitRace(&DAT_00748f70);
   FUN_004dfdc0();
   DAT_00778898 = 1;
   if (DAT_00777ccc != (int *)0x0) {
@@ -9773,7 +9773,7 @@ LAB_0049e1ce:
 LAB_0049e1f0:
   if ((int *)*piVar1 == piVar1) {
     DAT_006fb988 = 0;
-    DAT_00735790 = FUN_004ab670(&DAT_00748f70);
+    DAT_00735790 = cFrontendDatabase__CalculateFirstFrontendScreenToSeeAfterQuitRace(&DAT_00748f70);
     cFrontendDatabase__NotifyExitRaceToFrontend(1);
     iVar5 = DAT_007361f0;
     piVar4 = (int *)FUN_00567160();
@@ -11231,9 +11231,11 @@ float10 __fastcall FUN_0049fc50(int param_1)
 }
 
 
-// ==== 0x49fc90 FUN_0049fc90
+// ==== 0x49fc90 GetHudObjectColor
 
-void FUN_0049fc90(void)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void GetHudObjectColor(void)
 
 {
   undefined4 *puVar1;
@@ -11249,9 +11251,11 @@ void FUN_0049fc90(void)
 }
 
 
-// ==== 0x49fcf0 FUN_0049fcf0
+// ==== 0x49fcf0 GetHudCar
 
-int FUN_0049fcf0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int GetHudCar(void)
 
 {
   int iVar1;
@@ -11267,9 +11271,11 @@ int FUN_0049fcf0(void)
 }
 
 
-// ==== 0x49fd20 FUN_0049fd20
+// ==== 0x49fd20 IntervalMapClipped
 
-float10 FUN_0049fd20(float param_1,float param_2,float param_3,float param_4,float param_5)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 IntervalMapClipped(float param_1,float param_2,float param_3,float param_4,float param_5)
 
 {
   if ((param_1 < param_5) && (param_5 < param_2)) {
@@ -11295,9 +11301,11 @@ void __fastcall FUN_0049fd90(int param_1)
 }
 
 
-// ==== 0x49fda0 FUN_0049fda0
+// ==== 0x49fda0 HudElement::_HudElement
 
-void FUN_0049fda0(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void HudElement___HudElement(void)
 
 {
   FUN_00421900();
@@ -11425,12 +11433,14 @@ void HudWidget__SetVisible(uint param_1,uint param_2)
 }
 
 
-// ==== 0x49ff50 FUN_0049ff50
+// ==== 0x49ff50 HudElement::SetVerticalBarValue
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_0049ff50(undefined4 param_1,undefined4 param_2,undefined4 param_3,float param_4,
-                 float param_5)
+void HudElement__SetVerticalBarValue
+               (undefined4 param_1,undefined4 param_2,undefined4 param_3,float param_4,float param_5
+               )
 
 {
   short sVar1;
@@ -11454,7 +11464,7 @@ void FUN_0049ff50(undefined4 param_1,undefined4 param_2,undefined4 param_3,float
   sVar1 = *(short *)(iVar7 + 0x46);
   fVar4 = (float)(int)sVar1;
   fVar5 = _K_ONE / fVar4;
-  fVar8 = (float10)FUN_0049fd20(0,param_3,(fVar4 - param_4) * fVar5,param_5 * fVar5,param_2);
+  fVar8 = (float10)IntervalMapClipped(0,param_3,(fVar4 - param_4) * fVar5,param_5 * fVar5,param_2);
   *(float *)(iVar2 + 0x48) = (float)fVar8;
   local_c = *(undefined4 *)(iVar2 + 0x1c);
   local_4 = *(undefined4 *)(iVar2 + 0x24);

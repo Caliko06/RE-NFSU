@@ -4894,7 +4894,7 @@ void StyleItemTable__Update(int param_1,int param_2,undefined4 param_3)
   } while (iVar7 < 0x1f);
   if ((int ******)local_14 != &local_14) {
     if ((*(uint *)(*(int *)(param_2 + 0x95c) + 8) & 0x20000) != 0) {
-      FUN_004a85e0(*(undefined4 *)(*(int *)(param_2 + 0x95c) + 0x50));
+      CunningStuntSpread__UpdateStylePoints(*(undefined4 *)(*(int *)(param_2 + 0x95c) + 0x50));
     }
     while ((int ******)local_14 != &local_14) {
       pppppiVar2 = (int *****)*local_14;
@@ -7420,7 +7420,7 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
         Race__GetRacingCarOfRacer();
         iVar5 = FUN_00424e90();
         if (iVar5 == 0) {
-          FUN_004a8d90(puVar4);
+          HudOnlineMsgBox__PushPlayerMessage(puVar4);
           FUN_00439470(*puVar4,10);
         }
       }
@@ -7582,7 +7582,7 @@ float10 __thiscall FUN_0043a8a0(int *param_1,float param_2)
       else {
         DAT_0078eb58 = DAT_0078eb58 + 1;
         if (0xe < DAT_0078eb58) {
-          FUN_004a8e00(param_1[1]);
+          HudOnlineMsgBox__PushLocalizedMessage(param_1[1]);
         }
       }
     }
@@ -8286,7 +8286,7 @@ void __thiscall FUN_0043ba60(int *param_1,int param_2,char param_3)
       FUN_004390d0((param_3 != '\0') + '\x04');
     }
     else {
-      FUN_004a8d90(iVar1);
+      HudOnlineMsgBox__PushPlayerMessage(iVar1);
       if (*param_1 == 7) {
         FUN_00439470(0,10);
       }
@@ -9778,7 +9778,7 @@ void __thiscall FUN_0043e310(int param_1,undefined4 param_2)
     }
     DriftManager__UpdateLeaderBoard();
     FUN_00435ff0();
-    FUN_004a7c70();
+    FEngHud__SetMultiplier();
     *(undefined4 *)(param_1 + 0x18) = local_10;
   }
   else {
@@ -10128,7 +10128,7 @@ void __fastcall DriftManager__UpdateLeaderBoard(int param_1)
   if (iVar2 == 0) {
     bList__Sort(&DAT_0077b198,SortScoreList);
     FUN_00435ff0(&DAT_0077b198);
-    FUN_004a3420();
+    FEUpdateDriftLeaderBoard();
   }
   FUN_004081e0();
   iVar2 = FUN_00432c50();
@@ -10227,7 +10227,7 @@ void __fastcall FUN_0043ef30(int param_1)
         *(int *)(param_1 + 0x58) = *(int *)(param_1 + 0x58) + 1;
         ModeFlags_GetRow();
         FUN_00435ff0();
-        FUN_004a7c80();
+        FEngHud__SetTrapSpeed();
       }
     }
     FUN_00417490();

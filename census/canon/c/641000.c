@@ -8274,9 +8274,11 @@ void FUN_0064c620(void)
 }
 
 
-// ==== 0x64c650 FUN_0064c650
+// ==== 0x64c650 SNDAEMSI_UpdateClassDestructor
 
-undefined4 FUN_0064c650(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_UpdateClassDestructor(int param_1)
 
 {
   undefined4 uVar1;
@@ -8305,9 +8307,11 @@ undefined4 FUN_0064c670(int param_1)
 }
 
 
-// ==== 0x64c680 FUN_0064c680
+// ==== 0x64c680 SNDAEMSI_updatecreate
 
-undefined4 FUN_0064c680(undefined4 *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_updatecreate(undefined4 *param_1)
 
 {
   undefined4 uVar1;
@@ -8318,9 +8322,11 @@ undefined4 FUN_0064c680(undefined4 *param_1)
 }
 
 
-// ==== 0x64c690 FUN_0064c690
+// ==== 0x64c690 SNDAEMSI_updatedestroy
 
-undefined4 FUN_0064c690(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_updatedestroy(int *param_1)
 
 {
   char cVar1;
@@ -8409,9 +8415,11 @@ undefined4 FUN_0064c690(int *param_1)
 }
 
 
-// ==== 0x64c800 FUN_0064c800
+// ==== 0x64c800 UpdateCallFunction
 
-undefined4 FUN_0064c800(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 UpdateCallFunction(int param_1)
 
 {
   int iVar1;
@@ -8449,9 +8457,11 @@ undefined4 FUN_0064c800(int param_1)
 }
 
 
-// ==== 0x64c870 FUN_0064c870
+// ==== 0x64c870 UpdateControlClass
 
-int * FUN_0064c870(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int * UpdateControlClass(int *param_1)
 
 {
   char cVar1;
@@ -8539,9 +8549,11 @@ int * FUN_0064c870(int *param_1)
 }
 
 
-// ==== 0x64c9b0 FUN_0064c9b0
+// ==== 0x64c9b0 UpdateSetGlobalVariable
 
-undefined4 FUN_0064c9b0(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 UpdateSetGlobalVariable(int param_1)
 
 {
   int *piVar1;
@@ -8568,9 +8580,11 @@ undefined4 FUN_0064c9b0(int param_1)
 }
 
 
-// ==== 0x64ca00 FUN_0064ca00
+// ==== 0x64ca00 SNDAEMSI_updatecounter
 
-int FUN_0064ca00(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatecounter(int *param_1)
 
 {
   int iVar1;
@@ -8596,9 +8610,11 @@ int FUN_0064ca00(int *param_1)
 }
 
 
-// ==== 0x64ca50 FUN_0064ca50
+// ==== 0x64ca50 SNDAEMSI_updaterandom
 
-int FUN_0064ca50(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updaterandom(int *param_1)
 
 {
   uint uVar1;
@@ -8614,9 +8630,11 @@ int FUN_0064ca50(int *param_1)
 }
 
 
-// ==== 0x64ca80 FUN_0064ca80
+// ==== 0x64ca80 SNDAEMSI_updaterandomshuffle
 
-int FUN_0064ca80(ushort *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updaterandomshuffle(ushort *param_1)
 
 {
   uint uVar1;
@@ -8653,9 +8671,11 @@ int FUN_0064ca80(ushort *param_1)
 }
 
 
-// ==== 0x64cb30 FUN_0064cb30
+// ==== 0x64cb30 SNDAEMSI_updaterandomweighted
 
-int FUN_0064cb30(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updaterandomweighted(int *param_1)
 
 {
   uint uVar1;
@@ -8680,9 +8700,11 @@ int FUN_0064cb30(int *param_1)
 }
 
 
-// ==== 0x64cb90 FUN_0064cb90
+// ==== 0x64cb90 SNDAEMSI_updaterangetrig
 
-undefined4 FUN_0064cb90(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_updaterangetrig(int *param_1)
 
 {
   int iVar1;
@@ -8703,11 +8725,12 @@ undefined4 FUN_0064cb90(int *param_1)
 }
 
 
-// ==== 0x64cbd0 FUN_0064cbd0
+// ==== 0x64cbd0 SNDAEMSI_updatedelaytrig
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
 
-undefined4 FUN_0064cbd0(float *param_1)
+undefined4 SNDAEMSI_updatedelaytrig(float *param_1)
 
 {
   if (param_1[2] == 0.0) {
@@ -8728,9 +8751,11 @@ LAB_0064cc17:
 }
 
 
-// ==== 0x64cc20 FUN_0064cc20
+// ==== 0x64cc20 SNDAEMSI_updatestategen
 
-undefined4 FUN_0064cc20(ushort *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_updatestategen(ushort *param_1)
 
 {
   int iVar1;
@@ -8749,9 +8774,11 @@ undefined4 FUN_0064cc20(ushort *param_1)
 }
 
 
-// ==== 0x64cc60 FUN_0064cc60
+// ==== 0x64cc60 SNDAEMSI_updatemerge
 
-undefined4 FUN_0064cc60(byte *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_updatemerge(byte *param_1)
 
 {
   byte bVar1;
@@ -8772,11 +8799,12 @@ undefined4 FUN_0064cc60(byte *param_1)
 }
 
 
-// ==== 0x64cc90 FUN_0064cc90
+// ==== 0x64cc90 SNDAEMSI_envelopeprogramsegment
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_0064cc90(int param_1)
+void SNDAEMSI_envelopeprogramsegment(int param_1)
 
 {
   float fVar1;
@@ -8791,11 +8819,12 @@ void FUN_0064cc90(int param_1)
 }
 
 
-// ==== 0x64ccc0 FUN_0064ccc0
+// ==== 0x64ccc0 SNDAEMSI_updateenvelope
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
 
-int FUN_0064ccc0(ushort *param_1)
+int SNDAEMSI_updateenvelope(ushort *param_1)
 
 {
   float fVar1;
@@ -8838,7 +8867,7 @@ int FUN_0064ccc0(ushort *param_1)
     *(undefined4 *)(param_1 + 6) = *(undefined4 *)(param_1 + (uint)bVar2 * 4 + 0xe);
     *(byte *)((int)param_1 + 3) = bVar2 + 1;
     if ((byte)(bVar2 + 1) < (byte)param_1[8]) {
-      FUN_0064cc90(param_1);
+      SNDAEMSI_envelopeprogramsegment(param_1);
       param_1 = extraout_EDX;
       goto LAB_0064cda7;
     }
@@ -8855,11 +8884,12 @@ LAB_0064cda7:
 }
 
 
-// ==== 0x64cdd0 FUN_0064cdd0
+// ==== 0x64cdd0 SNDAEMSI_updatetable
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
 
-int FUN_0064cdd0(undefined4 *param_1)
+int SNDAEMSI_updatetable(undefined4 *param_1)
 
 {
   char cVar1;
@@ -8920,11 +8950,12 @@ int FUN_0064cdd0(undefined4 *param_1)
 }
 
 
-// ==== 0x64cef0 FUN_0064cef0
+// ==== 0x64cef0 SNDAEMSI_updatedelayline
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
 
-undefined4 FUN_0064cef0(ushort *param_1)
+undefined4 SNDAEMSI_updatedelayline(ushort *param_1)
 
 {
   ushort uVar1;
@@ -8960,9 +8991,11 @@ undefined4 FUN_0064cef0(ushort *param_1)
 }
 
 
-// ==== 0x64cf90 FUN_0064cf90
+// ==== 0x64cf90 SNDAEMSI_updatemux
 
-undefined4 FUN_0064cf90(byte *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_updatemux(byte *param_1)
 
 {
   int iVar1;
@@ -8975,9 +9008,11 @@ undefined4 FUN_0064cf90(byte *param_1)
 }
 
 
-// ==== 0x64cfb0 FUN_0064cfb0
+// ==== 0x64cfb0 SNDAEMSI_updatedemux
 
-undefined4 FUN_0064cfb0(byte *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_updatedemux(byte *param_1)
 
 {
   byte *pbVar1;
@@ -8997,9 +9032,11 @@ undefined4 FUN_0064cfb0(byte *param_1)
 }
 
 
-// ==== 0x64cff0 FUN_0064cff0
+// ==== 0x64cff0 SNDAEMSI_updatemin
 
-void FUN_0064cff0(byte *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_updatemin(byte *param_1)
 
 {
   int iVar1;
@@ -9022,9 +9059,11 @@ void FUN_0064cff0(byte *param_1)
 }
 
 
-// ==== 0x64d020 FUN_0064d020
+// ==== 0x64d020 SNDAEMSI_updatemin2
 
-int FUN_0064d020(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatemin2(int *param_1)
 
 {
   int iVar1;
@@ -9037,9 +9076,11 @@ int FUN_0064d020(int *param_1)
 }
 
 
-// ==== 0x64d030 FUN_0064d030
+// ==== 0x64d030 SNDAEMSI_updatemax
 
-void FUN_0064d030(byte *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_updatemax(byte *param_1)
 
 {
   int iVar1;
@@ -9062,9 +9103,11 @@ void FUN_0064d030(byte *param_1)
 }
 
 
-// ==== 0x64d060 FUN_0064d060
+// ==== 0x64d060 SNDAEMSI_updatemax2
 
-int FUN_0064d060(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatemax2(int *param_1)
 
 {
   int iVar1;
@@ -9077,9 +9120,11 @@ int FUN_0064d060(int *param_1)
 }
 
 
-// ==== 0x64d070 FUN_0064d070
+// ==== 0x64d070 SNDAEMSI_updatescale
 
-int FUN_0064d070(byte *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatescale(byte *param_1)
 
 {
   float fVar1;
@@ -9100,18 +9145,22 @@ int FUN_0064d070(byte *param_1)
 }
 
 
-// ==== 0x64d0b0 FUN_0064d0b0
+// ==== 0x64d0b0 SNDAEMSI_updatescale2
 
-int FUN_0064d0b0(float *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatescale2(float *param_1)
 
 {
   return (int)ROUND((float)(int)param_1[2] * (float)(int)param_1[1] * *param_1);
 }
 
 
-// ==== 0x64d0d0 FUN_0064d0d0
+// ==== 0x64d0d0 SNDAEMSI_updateadd
 
-int FUN_0064d0d0(byte *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updateadd(byte *param_1)
 
 {
   int iVar1;
@@ -9132,36 +9181,44 @@ int FUN_0064d0d0(byte *param_1)
 }
 
 
-// ==== 0x64d0f0 FUN_0064d0f0
+// ==== 0x64d0f0 SNDAEMSI_updateadd2
 
-int FUN_0064d0f0(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updateadd2(int *param_1)
 
 {
   return param_1[1] + *param_1;
 }
 
 
-// ==== 0x64d100 FUN_0064d100
+// ==== 0x64d100 SNDAEMSI_updatesubtract
 
-int FUN_0064d100(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatesubtract(int *param_1)
 
 {
   return *param_1 - param_1[1];
 }
 
 
-// ==== 0x64d110 FUN_0064d110
+// ==== 0x64d110 SNDAEMSI_updatemultiply
 
-int FUN_0064d110(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatemultiply(int *param_1)
 
 {
   return param_1[1] * *param_1;
 }
 
 
-// ==== 0x64d120 FUN_0064d120
+// ==== 0x64d120 SNDAEMSI_updatedivide
 
-int FUN_0064d120(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatedivide(int *param_1)
 
 {
   if (param_1[1] != 0) {
@@ -9171,9 +9228,11 @@ int FUN_0064d120(int *param_1)
 }
 
 
-// ==== 0x64d140 FUN_0064d140
+// ==== 0x64d140 SNDAEMSI_updatemodulo
 
-int FUN_0064d140(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updatemodulo(int *param_1)
 
 {
   if (param_1[1] != 0) {
@@ -9183,9 +9242,11 @@ int FUN_0064d140(int *param_1)
 }
 
 
-// ==== 0x64d160 FUN_0064d160
+// ==== 0x64d160 SNDAEMSI_bankpitchmult
 
-void FUN_0064d160(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_bankpitchmult(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9200,9 +9261,11 @@ void FUN_0064d160(int param_1,int param_2)
 }
 
 
-// ==== 0x64d1a0 FUN_0064d1a0
+// ==== 0x64d1a0 SNDAEMSI_banktimemult
 
-void FUN_0064d1a0(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_banktimemult(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9217,11 +9280,12 @@ void FUN_0064d1a0(int param_1,int param_2)
 }
 
 
-// ==== 0x64d1e0 FUN_0064d1e0
+// ==== 0x64d1e0 SNDAEMSI_bankvol
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_0064d1e0(int param_1,int param_2)
+void SNDAEMSI_bankvol(int param_1,int param_2)
 
 {
   short sVar1;
@@ -9256,9 +9320,11 @@ void FUN_0064d1e0(int param_1,int param_2)
 }
 
 
-// ==== 0x64d280 FUN_0064d280
+// ==== 0x64d280 SNDAEMSI_bankazimuth
 
-void FUN_0064d280(int param_1,undefined2 param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_bankazimuth(int param_1,undefined2 param_2)
 
 {
   int iVar1;
@@ -9272,9 +9338,11 @@ void FUN_0064d280(int param_1,undefined2 param_2)
 }
 
 
-// ==== 0x64d2b0 FUN_0064d2b0
+// ==== 0x64d2b0 SNDAEMSI_bankelevation
 
-void FUN_0064d2b0(int param_1,int param_2)
+/* [canon] audio low (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_bankelevation(int param_1,int param_2)
 
 {
   if (param_2 < -0x4000) {
@@ -9289,9 +9357,11 @@ void FUN_0064d2b0(int param_1,int param_2)
 }
 
 
-// ==== 0x64d300 FUN_0064d300
+// ==== 0x64d300 SNDAEMSI_bankfxwet0
 
-void FUN_0064d300(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_bankfxwet0(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9307,9 +9377,11 @@ void FUN_0064d300(int param_1,int param_2)
 }
 
 
-// ==== 0x64d350 FUN_0064d350
+// ==== 0x64d350 SNDAEMSI_banklowpass
 
-void FUN_0064d350(undefined4 param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_banklowpass(undefined4 param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9321,9 +9393,11 @@ void FUN_0064d350(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x64d380 FUN_0064d380
+// ==== 0x64d380 SNDAEMSI_bankhighpass
 
-void FUN_0064d380(undefined4 param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_bankhighpass(undefined4 param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9335,9 +9409,11 @@ void FUN_0064d380(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x64d3b0 FUN_0064d3b0
+// ==== 0x64d3b0 SNDAEMSI_bankdrylevel
 
-void FUN_0064d3b0(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_bankdrylevel(int param_1,int param_2)
 
 {
   short sVar1;
@@ -9367,9 +9443,11 @@ void FUN_0064d3b0(int param_1,int param_2)
 }
 
 
-// ==== 0x64d420 FUN_0064d420
+// ==== 0x64d420 SNDAEMSI_optpitchmult
 
-void FUN_0064d420(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_optpitchmult(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9384,9 +9462,11 @@ void FUN_0064d420(int param_1,int param_2)
 }
 
 
-// ==== 0x64d450 FUN_0064d450
+// ==== 0x64d450 SNDAEMSI_opttimemult
 
-void FUN_0064d450(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_opttimemult(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9401,9 +9481,11 @@ void FUN_0064d450(int param_1,int param_2)
 }
 
 
-// ==== 0x64d480 FUN_0064d480
+// ==== 0x64d480 SNDAEMSI_optvol
 
-void FUN_0064d480(undefined1 *param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_optvol(undefined1 *param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9418,9 +9500,11 @@ void FUN_0064d480(undefined1 *param_1,int param_2)
 }
 
 
-// ==== 0x64d4b0 FUN_0064d4b0
+// ==== 0x64d4b0 SNDAEMSI_optazimuth
 
-void FUN_0064d4b0(int param_1,undefined2 param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_optazimuth(int param_1,undefined2 param_2)
 
 {
   *(undefined2 *)(param_1 + 8) = param_2;
@@ -9428,9 +9512,11 @@ void FUN_0064d4b0(int param_1,undefined2 param_2)
 }
 
 
-// ==== 0x64d4c0 FUN_0064d4c0
+// ==== 0x64d4c0 SNDAEMSI_optelevation
 
-void FUN_0064d4c0(int param_1,int param_2)
+/* [canon] audio low (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_optelevation(int param_1,int param_2)
 
 {
   if (param_2 < -0x4000) {
@@ -9445,9 +9531,11 @@ void FUN_0064d4c0(int param_1,int param_2)
 }
 
 
-// ==== 0x64d4f0 FUN_0064d4f0
+// ==== 0x64d4f0 SNDAEMSI_optfxwet0
 
-void FUN_0064d4f0(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_optfxwet0(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9462,9 +9550,11 @@ void FUN_0064d4f0(int param_1,int param_2)
 }
 
 
-// ==== 0x64d520 FUN_0064d520
+// ==== 0x64d520 SNDAEMSI_optlowpass
 
-void FUN_0064d520(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_optlowpass(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9479,9 +9569,11 @@ void FUN_0064d520(int param_1,int param_2)
 }
 
 
-// ==== 0x64d550 FUN_0064d550
+// ==== 0x64d550 SNDAEMSI_opthighpass
 
-void FUN_0064d550(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_opthighpass(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9496,9 +9588,11 @@ void FUN_0064d550(int param_1,int param_2)
 }
 
 
-// ==== 0x64d580 FUN_0064d580
+// ==== 0x64d580 SNDAEMSI_optdrylevel
 
-void FUN_0064d580(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_optdrylevel(int param_1,int param_2)
 
 {
   if (param_2 < 0) {
@@ -9513,9 +9607,11 @@ void FUN_0064d580(int param_1,int param_2)
 }
 
 
-// ==== 0x64d5b0 FUN_0064d5b0
+// ==== 0x64d5b0 SNDAEMSI_playerplaybank
 
-void FUN_0064d5b0(int *param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_playerplaybank(int *param_1,int param_2)
 
 {
   byte *pbVar1;
@@ -9529,7 +9625,8 @@ void FUN_0064d5b0(int *param_1,int param_2)
   pbVar1 = (byte *)(param_1 + 7);
   if (*(char *)((int)param_1 + 0xe) != '\0') {
     do {
-      (*(code *)(&PTR_FUN_006e9a68)[*pbVar1])(auStack_18,*(undefined4 *)(pbVar1 + 8));
+      (*(code *)(&PTR_SNDAEMSI_optpitchmult_006e9a68)[*pbVar1])
+                (auStack_18,*(undefined4 *)(pbVar1 + 8));
       *(undefined4 *)(pbVar1 + 4) = *(undefined4 *)(pbVar1 + 8);
       pbVar1 = pbVar1 + 0xc;
       iVar2 = iVar2 + 1;
@@ -9540,9 +9637,11 @@ void FUN_0064d5b0(int *param_1,int param_2)
 }
 
 
-// ==== 0x64d630 FUN_0064d630
+// ==== 0x64d630 SNDAEMSI_playerstopbank
 
-int FUN_0064d630(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_playerstopbank(int param_1)
 
 {
   int iVar1;
@@ -9566,9 +9665,11 @@ int FUN_0064d630(int param_1)
 }
 
 
-// ==== 0x64d640 FUN_0064d640
+// ==== 0x64d640 SNDAEMSI_playerpausebank
 
-void FUN_0064d640(undefined4 param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_playerpausebank(undefined4 param_1)
 
 {
   SNDvol__map__SNDSYSI_100hzserver_(param_1,0);
@@ -9577,9 +9678,11 @@ void FUN_0064d640(undefined4 param_1)
 }
 
 
-// ==== 0x64d660 FUN_0064d660
+// ==== 0x64d660 SNDAEMSI_playerunpausebank
 
-void FUN_0064d660(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SNDAEMSI_playerunpausebank(int param_1)
 
 {
   undefined2 uVar1;
@@ -9621,14 +9724,16 @@ void FUN_0064d660(int param_1)
 LAB_0064d6cc:
   *(undefined2 *)(iVar2 * 0x8c + 0x8a + DAT_00713f48) = uVar1;
   SNDPLATFORM_setpitch(iVar2);
-  FUN_0064d1e0(iVar2,uVar5);
+  SNDAEMSI_bankvol(iVar2,uVar5);
   return;
 }
 
 
-// ==== 0x64d700 FUN_0064d700
+// ==== 0x64d700 SNDAEMSI_playerresetoutputs
 
-undefined4 FUN_0064d700(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_playerresetoutputs(int param_1)
 
 {
   undefined4 *puVar1;
@@ -9643,9 +9748,11 @@ undefined4 FUN_0064d700(int param_1)
 }
 
 
-// ==== 0x64d730 FUN_0064d730
+// ==== 0x64d730 SNDAEMSI_playerupdatebank
 
-undefined4 FUN_0064d730(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 SNDAEMSI_playerupdatebank(int param_1)
 
 {
   undefined4 *puVar1;
@@ -9670,7 +9777,7 @@ undefined4 FUN_0064d730(int param_1)
   if (*(char *)(param_1 + 0xe) != '\0') {
     do {
       if (*(int *)(pbVar6 + 8) != *(int *)(pbVar6 + 4)) {
-        (*(code *)(&PTR_FUN_006e9a38)[*pbVar6])(iVar4,*(int *)(pbVar6 + 8));
+        (*(code *)(&PTR_SNDAEMSI_bankpitchmult_006e9a38)[*pbVar6])(iVar4,*(int *)(pbVar6 + 8));
         *(int *)(pbVar6 + 4) = *(int *)(pbVar6 + 8);
       }
       pbVar6 = pbVar6 + 0xc;
@@ -9700,9 +9807,11 @@ undefined4 FUN_0064d730(int param_1)
 }
 
 
-// ==== 0x64d860 FUN_0064d860
+// ==== 0x64d860 SNDAEMSI_updateplayer
 
-int FUN_0064d860(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updateplayer(int param_1)
 
 {
   int *piVar1;
@@ -9726,7 +9835,7 @@ int FUN_0064d860(int param_1)
     if (iVar5 == 0) {
       if (-1 < cVar2) {
         (**(code **)(&DAT_006e9aa8 + cVar2 * 4))(param_1);
-        FUN_0064d700(param_1);
+        SNDAEMSI_playerresetoutputs(param_1);
       }
     }
     else if (iVar5 == 1) {
@@ -9748,7 +9857,7 @@ int FUN_0064d860(int param_1)
           iVar4 = (**(code **)(&DAT_006e9a98 + cVar2 * 4))(param_1,piVar1);
           *(int *)(param_1 + 8) = iVar4;
           if (iVar4 < 0) {
-            FUN_0064d700(param_1);
+            SNDAEMSI_playerresetoutputs(param_1);
           }
         }
       }
@@ -9772,11 +9881,12 @@ int FUN_0064d860(int param_1)
 }
 
 
-// ==== 0x64d960 FUN_0064d960
+// ==== 0x64d960 SNDAEMSI_updateoscillator
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
 
-int FUN_0064d960(char *param_1)
+int SNDAEMSI_updateoscillator(char *param_1)
 
 {
   float *pfVar1;
@@ -9829,11 +9939,12 @@ int FUN_0064d960(char *param_1)
 }
 
 
-// ==== 0x64da70 FUN_0064da70
+// ==== 0x64da70 SNDAEMSI_updateramp
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
 
-float FUN_0064da70(float *param_1)
+float SNDAEMSI_updateramp(float *param_1)
 
 {
   float fVar1;
@@ -9868,9 +9979,11 @@ LAB_0064daff:
 }
 
 
-// ==== 0x64db20 FUN_0064db20
+// ==== 0x64db20 SNDAEMSI_updateaddmax
 
-int FUN_0064db20(byte *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int SNDAEMSI_updateaddmax(byte *param_1)
 
 {
   int iVar1;
@@ -10138,7 +10251,7 @@ undefined4 __thiscall SNDAEMS_removemodulebank(undefined4 param_1,int param_2)
         puVar1 = (undefined4 *)*puVar2;
         iVar3 = *(int *)(iVar6 + 0x34) + (int)puVar2;
         *(undefined4 *)(iVar3 + 0xc) = 1;
-        FUN_0064c690(iVar3);
+        SNDAEMSI_updatedestroy(iVar3);
         puVar2 = puVar1;
       }
       iVar7 = iVar7 + 1;
@@ -10248,7 +10361,8 @@ void FUN_0064df30(int param_1,int *param_2,char *param_3,undefined4 param_4)
     do {
       iVar7 = piVar5[1];
       puVar3 = (undefined4 *)(iVar7 + param_1);
-      *puVar3 = (&PTR_FUN_006e9ae8)[*(int *)(iVar7 + param_1)] + (-4 - (int)puVar3);
+      *puVar3 = (&PTR_SNDAEMSI_UpdateClassDestructor_006e9ae8)[*(int *)(iVar7 + param_1)] +
+                (-4 - (int)puVar3);
       iVar6 = iVar6 + 1;
       piVar5 = piVar5 + 1;
     } while (iVar6 < *param_2);
@@ -11307,7 +11421,7 @@ undefined4 FUN_0064eef0(int param_1)
     }
   }
   DAT_00713c94 = puVar3;
-  uVar4 = FUN_0064d700(param_1);
+  uVar4 = SNDAEMSI_playerresetoutputs(param_1);
   return uVar4;
 }
 

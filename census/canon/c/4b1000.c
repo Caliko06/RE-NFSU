@@ -4320,7 +4320,7 @@ void FUN_004b6fe0(int param_1,int param_2,int param_3,int param_4,int param_5)
   int unaff_ESI;
   bool bVar4;
   
-  iVar2 = FUN_004ab5c0(&DAT_00748f70);
+  iVar2 = cFrontendDatabase__GetNumTracksAvailableForRaceType(&DAT_00748f70);
   if (iVar2 == 0) {
     param_2 = 1;
     FUN_004f75b0(0xff606060);
@@ -6825,7 +6825,7 @@ Screen_MU_QuickRaceTrackSelect__Screen_MU_QuickRaceTrackSelect
       (iVar2 = FUN_004ffb70(), iVar2 == 0)) && (DAT_0073578c != 0)) {
     FUN_004ef050(uVar4);
   }
-  uVar4 = FUN_0049fc90();
+  uVar4 = GetHudObjectColor();
   param_1[0x2a] = uVar4;
   switch(DAT_006ee6f0) {
   case 1:
@@ -7970,7 +7970,7 @@ LAB_004bb36d:
         aiStack_34[10] = 0;
         aiStack_34[0xb] = 0;
         aiStack_34[9] = 0x639;
-        FUN_004dcfd0(&uStack_38,*(undefined4 *)(param_1 + 0xc));
+        InfoDialog__OpenModalDialog(&uStack_38,*(undefined4 *)(param_1 + 0xc));
         return;
       }
       if (param_2 == 0xaa3f4777) goto LAB_004bb36d;
@@ -9158,7 +9158,7 @@ void __thiscall FUN_004bcb40(int param_1,uint param_2)
       auStack_34[10] = 0;
       auStack_34[0xb] = 0;
       auStack_34[9] = 0x639;
-      FUN_004dcfd0(&uStack_38,*(undefined4 *)(param_1 + 0xc));
+      InfoDialog__OpenModalDialog(&uStack_38,*(undefined4 *)(param_1 + 0xc));
     }
     else {
       if (param_2 == 0xc98356ba) {

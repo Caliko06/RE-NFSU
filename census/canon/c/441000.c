@@ -6226,7 +6226,7 @@ void GameFlow__InitSubsystems(void)
   GameFlow__LoadGlobalA();
   GameFlow__LoadGlobalB();
   FUN_00569930();
-  FUN_004ab2b0(&DAT_00748f70);
+  cFrontendDatabase__Default(&DAT_00748f70);
   DAT_00735ec4 = FUN_00565b60(0x59f0,0,0,0);
   _DAT_00735ec8 = 0;
   FUN_0058b110();
@@ -7753,7 +7753,7 @@ void GameFlow__EnterFrontEnd(void)
     }
   }
   if (DAT_00707018 != 0) {
-    FUN_004de440();
+    CreateScreenSequence();
     DAT_00707018 = 0;
   }
   iVar2 = bStrICmp();

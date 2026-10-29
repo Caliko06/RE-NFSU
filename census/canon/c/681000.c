@@ -4864,7 +4864,7 @@ void FUN_00684f6e(void)
 void Unwind_00684f80(void)
 
 {
-  FUN_004a9d60();
+  UserProfile___UserProfile();
   return;
 }
 
@@ -6570,7 +6570,7 @@ void FUN_00685981(void)
 void Unwind_00685990(void)
 
 {
-  FUN_004a9d60();
+  UserProfile___UserProfile();
   return;
 }
 
@@ -6582,7 +6582,8 @@ void Unwind_0068599b(void)
 {
   int unaff_EBP;
   
-  eh_vector_destructor_iterator((void *)(*(int *)(unaff_EBP + 4) + 0xf954),0xf944,2,FUN_004a9d60);
+  eh_vector_destructor_iterator
+            ((void *)(*(int *)(unaff_EBP + 4) + 0xf954),0xf944,2,UserProfile___UserProfile);
   return;
 }
 
@@ -20180,7 +20181,7 @@ void FUN_0068ae40(void)
 void FUN_0068ae60(void)
 
 {
-  FUN_004a9bc0(&DAT_00748f70);
+  cFrontendDatabase__cFrontendDatabase(&DAT_00748f70);
   _atexit(FUN_00696480);
   return;
 }
@@ -22726,7 +22727,7 @@ void __fastcall FUN_0068d300(byte param_1,int param_2)
 void FUN_0068d4d0(void)
 
 {
-  eh_vector_constructor_iterator(&DAT_00746118,8,0x100,FUN_0049fd90,FUN_0049fda0);
+  eh_vector_constructor_iterator(&DAT_00746118,8,0x100,FUN_0049fd90,HudElement___HudElement);
   _atexit(FUN_006964e0);
   return;
 }

@@ -5463,7 +5463,7 @@ void GaragePresetsScreen__LoadPreset(void)
   int iVar1;
   int unaff_EBX;
   
-  FUN_004abe90();
+  cFrontendDatabase__SetCurrentCarFromRide();
   DAT_00744ff8 = FUN_004ac060();
   FECarConfig__BuildRide(DAT_00744ff8,0,&DAT_00745000);
   FECarConfig__BuildRide(DAT_00744ff8,0,&DAT_00745720);

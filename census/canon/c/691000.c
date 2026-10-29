@@ -7514,7 +7514,7 @@ void FUN_00696470(void)
 void FUN_00696480(void)
 
 {
-  FUN_004a9d00(&DAT_00748f70);
+  cFrontendDatabase___cFrontendDatabase(&DAT_00748f70);
   return;
 }
 
@@ -7563,7 +7563,7 @@ void FUN_006964d0(void)
 void FUN_006964e0(void)
 
 {
-  eh_vector_destructor_iterator(&DAT_00746118,8,0x100,FUN_0049fda0);
+  eh_vector_destructor_iterator(&DAT_00746118,8,0x100,HudElement___HudElement);
   return;
 }
 
