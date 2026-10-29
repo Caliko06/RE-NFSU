@@ -107,4 +107,4 @@ Universe = the 13,739 lifted functions.
 | input | 147 | 98 | 50 | 50 | 23 | 69 |
 | TOTAL | 13739 | 6160 | 6067 | 1464 | 1094 | 5781 |
 
-Reading: tagged is 45% of the functions (6,160), not 89%; 601 of them come from census/systems_override.tsv (hand-read unknown functions, 422 of them static initializers of constants, so weak evidence). Named is 11% (1,464), named V 8% (1,094). Ran is 44.2% (6,067). Diff-tested is 42% (5,781). Names added after the audit: track 62, runtime 126, hud+input 108, misc 67, render 84.
+Reading: tagged is 45% of the functions (6,160), not 89%; 601 of them come from census/systems_override.tsv (hand-read unknown functions, 422 of them static initializers of constants, so weak evidence). Named is 11% (1,464), named V 8% (1,094). Ran is 44.2% (6,067). Diff-tested is 42% (5,781). Names added after the audit: track 62, runtime 126, hud+input 108, misc 67, render 84, gameflow 163.
