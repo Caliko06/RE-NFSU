@@ -16,6 +16,7 @@ import http.server, json, os, shutil, sys, urllib.parse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5180
+WORLD_DIR = os.path.join(ROOT, os.environ.get("RN_WORLD_DIR") or "build/openworld")
 
 
 SAVE = os.path.join(ROOT, "save")
@@ -134,8 +135,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return os.path.join(ROOT, "pc", "Speed.exe")
         if path.startswith("/game/"):
             return os.path.join(ROOT, "game", os.path.normpath(path[6:]).lstrip("/."))
-        if path.startswith("/world/"):    # the open world's merged TRACKB files (tools/openworld/build.py, ?world=1)
-            return os.path.join(ROOT, "build", "openworld", os.path.normpath(path[7:]).lstrip("/."))
+        if path.startswith("/world/"):    # the open world's merged TRACKB files (tools/openworld/build.py, ?world=1); RN_WORLD_DIR as native
+            return os.path.join(WORLD_DIR, os.path.normpath(path[7:]).lstrip("/."))
         if path.startswith("/save/"):
             root = save_root(self.headers)
             return save_path(path, root) or os.path.join(root, "..refused")
