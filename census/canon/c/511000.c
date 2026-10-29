@@ -138,7 +138,7 @@ void __thiscall GarageDecalsSlot__NotificationMessage(int param_1,uint param_2)
         }
         DAT_00735750 = *(undefined4 *)(*(int *)(param_1 + 0x40) + 8);
         GarageManager__PushScreen(*(undefined4 *)(param_1 + 0xc));
-        FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
+        FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
         return;
       }
       if (param_2 != 0x911ab364) {
@@ -1010,7 +1010,7 @@ LAB_00512737:
     else {
       puVar5 = (undefined4 *)&DAT_006b9172;
     }
-    FUN_004f6850(&DAT_006cc578,*(undefined4 *)(iVar1 + 0xc),puVar5);
+    FEngPrintf(&DAT_006cc578,*(undefined4 *)(iVar1 + 0xc),puVar5);
   }
   else {
     FUN_00495f00(*(int *)(iVar1 + 0x14));
@@ -1025,7 +1025,7 @@ LAB_005127c3:
     }
   }
   else {
-    iVar2 = FUN_004f65d0();
+    iVar2 = FEngFindPackage();
     if (iVar2 == 0) goto LAB_005127c3;
     iVar2 = FUN_004ffb70();
     if (iVar2 == 0) goto LAB_005127c3;
@@ -1041,7 +1041,7 @@ LAB_0051280d:
     }
   }
   else {
-    iVar2 = FUN_004f65d0();
+    iVar2 = FEngFindPackage();
     if (iVar2 == 0) goto LAB_0051280d;
     iVar2 = FUN_004ffb70();
     if (iVar2 == 0) goto LAB_0051280d;
@@ -1622,7 +1622,7 @@ void GarageChooseAccessoryCategoryScreen__RedrawHeader(void)
   iVar1 = *(int *)(unaff_EBX + 0x40);
   ShowHideNewlyUnlockedMarker_int_(&DAT_00744ff0);
   FUN_00495f00(*(undefined4 *)(iVar1 + 0xc));
-  if (((*(int *)(unaff_EBX + 0xc) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((*(int *)(unaff_EBX + 0xc) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c != 0) {
       uVar2 = FUN_004ef050(0xa8a3681a);
@@ -1883,7 +1883,7 @@ undefined4 * FUN_00513780(undefined4 *param_1,undefined4 param_2)
   DAT_0073576c = (char *)0x0;
   FUN_0051bad0(&DAT_007449c8);
   if (DAT_00735e5c != '\0') {
-    iVar2 = FUN_004f65d0();
+    iVar2 = FEngFindPackage();
     if (iVar2 != 0) {
       *(undefined4 *)(iVar2 + 0x1c) = 0xff;
     }
@@ -2088,14 +2088,14 @@ void __thiscall FUN_00513c90(int param_1,uint param_2)
     if (param_2 != 0x911ab364) {
       if (param_2 == 0x14141414) {
         if (DAT_00735e5c == '\0') {
-          FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
+          FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
           return;
         }
         if (DAT_00735e54 != '\0') {
-          FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
+          FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
           return;
         }
-        FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
+        FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
         return;
       }
       if (param_2 != 0x406415e3) {
@@ -2116,10 +2116,10 @@ void __thiscall FUN_00513c90(int param_1,uint param_2)
         FUN_004c96f0(0x14141414,2);
         return;
       }
-      FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
+      FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
       return;
     }
-    FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
+    FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
     return;
   }
   if (param_2 == 0xc98356ba) {
@@ -2192,7 +2192,7 @@ LAB_00513f13:
           bStrCat2(iVar13 + 0x3f0);
         }
       }
-      FUN_004f6670();
+      FEngFindObject();
       uVar9 = *(undefined4 *)(DAT_0073576c + 0x444);
       bVar4 = *(byte *)(DAT_0073576c + 0x44e);
       bVar5 = *(byte *)(DAT_0073576c + 0x44d);
@@ -2205,7 +2205,7 @@ LAB_00513f13:
       FUN_004f74f0(uVar1);
       FUN_004f7000(uVar2,uVar3);
       FUN_00415510(((bVar4 | 0xffffff00) << 8 | (uint)bVar5) << 8 | (uint)bVar6);
-      FUN_004f6850(auStack_100);
+      FEngPrintf(auStack_100);
       return;
     }
     iVar8 = FEPackageList__FindByName(&DAT_00746104);
@@ -2218,7 +2218,7 @@ LAB_00513f13:
     *(undefined4 *)(iVar8 + 0x9c) = 1;
     FUN_00414a10();
     FUN_00414a10();
-    if (((iVar13 == 0) || (iVar13 = FUN_004f65d0(), iVar13 == 0)) ||
+    if (((iVar13 == 0) || (iVar13 = FEngFindPackage(), iVar13 == 0)) ||
        (iVar13 = FUN_004ffb70(), iVar13 == 0)) {
       if (DAT_0073578c == 0) {
         iVar13 = 0;
@@ -8602,7 +8602,7 @@ void FUN_0051cc10(int param_1)
       piVar1 = piVar1 + 1;
     } while (iVar2 < 4);
     if (*(int *)(param_1 + 0x80) != 0) {
-      FUN_0052fa30();
+      EAXCollision__UpdateMasterVolume();
     }
     EAXSound__UpdateCarMasterVolumes();
     if (*(int *)(param_1 + 0xc0) != 0) {

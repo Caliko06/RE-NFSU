@@ -3566,7 +3566,7 @@ undefined4 * FEngRenderer__FEngRenderer(undefined4 *param_1)
   local_c = ExceptionList;
   puVar2 = param_1 + 4;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c1b80;
+  *param_1 = &PTR_FEngRenderer__ScalarDeletingDtor_006c1b80;
   *puVar2 = puVar2;
   param_1[5] = puVar2;
   local_4 = 0;
@@ -3593,7 +3593,7 @@ void __fastcall FUN_004f5130(undefined4 *param_1)
   pcStack_8 = FUN_006860eb;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c1b80;
+  *param_1 = &PTR_FEngRenderer__ScalarDeletingDtor_006c1b80;
   local_4 = 0;
   SlotPool__Destroy();
   DAT_00735704 = 0;
@@ -3605,9 +3605,11 @@ void __fastcall FUN_004f5130(undefined4 *param_1)
 }
 
 
-// ==== 0x4f51b0 FUN_004f51b0
+// ==== 0x4f51b0 FEngRenderer::ScalarDeletingDtor
 
-void * __thiscall FUN_004f51b0(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall FEngRenderer__ScalarDeletingDtor(void *param_1,byte param_2)
 
 {
   FUN_004f5130();
@@ -3682,7 +3684,7 @@ void FEManager__FEManager(void)
   pcStack_8 = FUN_006862b3;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  *unaff_EDI = &PTR_FUN_006c1b18;
+  *unaff_EDI = &PTR_cFEng__GetPackageData_006c1b18;
   pvVar2 = _malloc(0x5254);
   if (pvVar2 == (void *)0x0) {
     iVar3 = 0;
@@ -3718,14 +3720,16 @@ void FEManager__FEManager(void)
 }
 
 
-// ==== 0x4f5310 FUN_004f5310
+// ==== 0x4f5310 cFEng::_cFEng
 
-undefined4 * __thiscall FUN_004f5310(undefined4 *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * __thiscall cFEng___cFEng(undefined4 *param_1,byte param_2)
 
 {
   void *_Memory;
   
-  *param_1 = &PTR_FUN_006c1b18;
+  *param_1 = &PTR_cFEng__GetPackageData_006c1b18;
   if ((undefined4 *)param_1[3] != (undefined4 *)0x0) {
     (*(code *)**(undefined4 **)param_1[3])(1);
   }
@@ -3742,9 +3746,11 @@ undefined4 * __thiscall FUN_004f5310(undefined4 *param_1,byte param_2)
 }
 
 
-// ==== 0x4f5360 FUN_004f5360
+// ==== 0x4f5360 cFEng::LoadResources
 
-undefined4 FUN_004f5360(undefined4 param_1,int param_2,int param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 cFEng__LoadResources(undefined4 param_1,int param_2,int param_3)
 
 {
   byte *pbVar1;
@@ -3837,9 +3843,11 @@ LAB_004f5460:
 }
 
 
-// ==== 0x4f5490 FUN_004f5490
+// ==== 0x4f5490 cFEng::UnloadResources
 
-undefined4 FUN_004f5490(undefined4 param_1,int param_2,int param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 cFEng__UnloadResources(undefined4 param_1,int param_2,int param_3)
 
 {
   if (0 < param_2) {
@@ -3856,9 +3864,11 @@ undefined4 FUN_004f5490(undefined4 param_1,int param_2,int param_3)
 }
 
 
-// ==== 0x4f54c0 FUN_004f54c0
+// ==== 0x4f54c0 cFEng::NotificationMessage
 
-void FUN_004f54c0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__NotificationMessage(int param_1)
 
 {
   int extraout_ECX;
@@ -3883,9 +3893,11 @@ void FUN_004f54c0(int param_1)
 }
 
 
-// ==== 0x4f5530 FUN_004f5530
+// ==== 0x4f5530 cFEng::NotifySoundMessage
 
-void FUN_004f5530(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__NotifySoundMessage(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   FUN_004f3eb0(param_1,param_2,param_3);
@@ -3893,9 +3905,11 @@ void FUN_004f5530(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 }
 
 
-// ==== 0x4f5560 FUN_004f5560
+// ==== 0x4f5560 cFEng::GenerateRenderContext
 
-void FUN_004f5560(undefined4 param_1,undefined4 param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__GenerateRenderContext(undefined4 param_1,undefined4 param_2)
 
 {
   FUN_004f2e30(param_2);
@@ -3903,9 +3917,11 @@ void FUN_004f5560(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4f5580 FUN_004f5580
+// ==== 0x4f5580 cFEng::GetContextTransform
 
-undefined4 __thiscall FUN_004f5580(int param_1,ushort param_2,undefined4 *param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __thiscall cFEng__GetContextTransform(int param_1,ushort param_2,undefined4 *param_3)
 
 {
   int iVar1;
@@ -3949,9 +3965,11 @@ undefined4 __thiscall FUN_004f5580(int param_1,ushort param_2,undefined4 *param_
 }
 
 
-// ==== 0x4f5640 FUN_004f5640
+// ==== 0x4f5640 cFEng::RenderObject
 
-void __thiscall FUN_004f5640(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall cFEng__RenderObject(int param_1,int param_2)
 
 {
   if (((*(byte *)(param_2 + 0x1c) & 1) == 0) && (*(char *)(param_1 + 6) != '\0')) {
@@ -3961,9 +3979,11 @@ void __thiscall FUN_004f5640(int param_1,int param_2)
 }
 
 
-// ==== 0x4f5660 FUN_004f5660
+// ==== 0x4f5660 cFEng::GetViewTransformation
 
-void FUN_004f5660(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__GetViewTransformation(undefined4 *param_1)
 
 {
   *param_1 = 0x3f800000;
@@ -3986,9 +4006,11 @@ void FUN_004f5660(undefined4 *param_1)
 }
 
 
-// ==== 0x4f56a0 FUN_004f56a0
+// ==== 0x4f56a0 cFEng::BeginPackageRendering
 
-void __thiscall FUN_004f56a0(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall cFEng__BeginPackageRendering(int param_1,int param_2)
 
 {
   int iVar1;
@@ -4024,9 +4046,11 @@ void __thiscall FUN_004f56a0(int param_1,int param_2)
 }
 
 
-// ==== 0x4f5730 FUN_004f5730
+// ==== 0x4f5730 cFEng::EndPackageRendering
 
-void FUN_004f5730(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__EndPackageRendering(void)
 
 {
   FUN_004f2eb0();
@@ -4034,9 +4058,11 @@ void FUN_004f5730(void)
 }
 
 
-// ==== 0x4f5740 FUN_004f5740
+// ==== 0x4f5740 cFEng::InitPackage
 
-void FUN_004f5740(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__InitPackage(int param_1)
 
 {
   int iVar1;
@@ -4120,9 +4146,11 @@ void __fastcall MoviePlayer__BuildPath(undefined4 param_1)
 }
 
 
-// ==== 0x4f5860 FUN_004f5860
+// ==== 0x4f5860 FEngMovieStarter::Callback
 
-undefined4 FUN_004f5860(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 FEngMovieStarter__Callback(int param_1)
 
 {
   char cVar1;
@@ -4142,9 +4170,11 @@ undefined4 FUN_004f5860(int param_1)
 }
 
 
-// ==== 0x4f58c0 FUN_004f58c0
+// ==== 0x4f58c0 FEngHidePCObjects::Callback
 
-undefined4 FUN_004f58c0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 FEngHidePCObjects__Callback(int param_1)
 
 {
   if ((*(byte *)(param_1 + 0x1c) & 0x40) != 0) {
@@ -4158,9 +4188,11 @@ undefined4 FUN_004f58c0(int param_1)
 }
 
 
-// ==== 0x4f5900 FUN_004f5900
+// ==== 0x4f5900 FEngMovieStopper::Callback
 
-undefined4 FUN_004f5900(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 FEngMovieStopper__Callback(int param_1)
 
 {
   if (*(int *)(param_1 + 0x18) == 7) {
@@ -4171,9 +4203,11 @@ undefined4 FUN_004f5900(int param_1)
 }
 
 
-// ==== 0x4f5920 FUN_004f5920
+// ==== 0x4f5920 cFEng::PackageWasLoaded
 
-void __thiscall FUN_004f5920(undefined4 param_1,undefined4 param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall cFEng__PackageWasLoaded(undefined4 param_1,undefined4 param_2)
 
 {
   int iVar1;
@@ -4185,7 +4219,7 @@ void __thiscall FUN_004f5920(undefined4 param_1,undefined4 param_2)
   pcStack_8 = FUN_00688820;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  FUN_004f5740(param_1);
+  cFEng__InitPackage(param_1);
   iVar1 = FEPackageList__FindByName(&DAT_00746104);
   if (iVar1 != 0) {
     FEPackageData__Activate();
@@ -4199,9 +4233,11 @@ void __thiscall FUN_004f5920(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4f59a0 FUN_004f59a0
+// ==== 0x4f59a0 ObjectDirtySetter::Callback
 
-undefined4 FUN_004f59a0(void)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 ObjectDirtySetter__Callback(void)
 
 {
   FUN_004f2d60();
@@ -4209,9 +4245,11 @@ undefined4 FUN_004f59a0(void)
 }
 
 
-// ==== 0x4f59c0 FUN_004f59c0
+// ==== 0x4f59c0 cFEng::PackageWillUnload
 
-undefined4 FUN_004f59c0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 cFEng__PackageWillUnload(int param_1)
 
 {
   void *local_c;
@@ -4232,9 +4270,11 @@ undefined4 FUN_004f59c0(int param_1)
 }
 
 
-// ==== 0x4f5a50 FUN_004f5a50
+// ==== 0x4f5a50 cFEng::GetPackageData
 
-undefined4 FUN_004f5a50(undefined4 param_1,undefined4 param_2,undefined1 *param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 cFEng__GetPackageData(undefined4 param_1,undefined4 param_2,undefined1 *param_3)
 
 {
   int iVar1;
@@ -4250,9 +4290,11 @@ undefined4 FUN_004f5a50(undefined4 param_1,undefined4 param_2,undefined1 *param_
 }
 
 
-// ==== 0x4f5a80 FUN_004f5a80
+// ==== 0x4f5a80 cFEng::IsAnyJoyInputActive
 
-uint FUN_004f5a80(void)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+uint cFEng__IsAnyJoyInputActive(void)
 
 {
   uint uVar1;
@@ -4293,7 +4335,7 @@ void FEManager__AddJoyHandlers(undefined4 param_1)
       uVar1 = puVar3[-3];
       iVar2 = 0;
       do {
-        InputEvents__AddSource(uVar1,FUN_004f5b40,param_1);
+        InputEvents__AddSource(uVar1,cFEng__HandleJoy,param_1);
         iVar2 = iVar2 + 1;
       } while (iVar2 < 2);
       *puVar3 = 0;
@@ -4310,9 +4352,11 @@ void FEManager__AddJoyHandlers(undefined4 param_1)
 }
 
 
-// ==== 0x4f5b40 FUN_004f5b40
+// ==== 0x4f5b40 cFEng::HandleJoy
 
-void FUN_004f5b40(int param_1,undefined *param_2,undefined1 param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__HandleJoy(int param_1,undefined *param_2,undefined1 param_3)
 
 {
   undefined **ppuVar1;
@@ -4370,9 +4414,11 @@ void FEManager__RemoveJoyHandlers(void)
 }
 
 
-// ==== 0x4f5bf0 FUN_004f5bf0
+// ==== 0x4f5bf0 cFEng::GetJoyPadMask
 
-uint FUN_004f5bf0(byte param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+uint cFEng__GetJoyPadMask(byte param_1)
 
 {
   uint uVar1;
@@ -4436,9 +4482,11 @@ uint FUN_004f5bf0(byte param_1)
 }
 
 
-// ==== 0x4f5cd0 FUN_004f5cd0
+// ==== 0x4f5cd0 cFEng::OutputWarning
 
-void FUN_004f5cd0(undefined4 param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__OutputWarning(undefined4 param_1)
 
 {
   NullChunk__Loader(&DAT_006cc568,param_1);
@@ -4466,7 +4514,7 @@ void FEManager__PollControllers(void)
     bVar1 = (&DAT_007306c4)[iVar4];
     if (((&DAT_006f947c)[iVar4] != (uint)bVar1) && (bVar1 != 0xff)) {
       (&DAT_006f947c)[iVar4] = (uint)bVar1;
-      FUN_004f6010(unaff_EDI);
+      cFEng__MakeLoadedPackagesDirty(unaff_EDI);
     }
     iVar4 = iVar4 + 1;
   } while (iVar4 < 2);
@@ -4480,9 +4528,12 @@ void FEManager__PollControllers(void)
 }
 
 
-// ==== 0x4f5d80 FUN_004f5d80
+// ==== 0x4f5d80 FEng::AddObjectToSortList
 
-void __fastcall FUN_004f5d80(int param_1,int param_2,undefined4 param_3,undefined2 param_4)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall
+FEng__AddObjectToSortList(int param_1,int param_2,undefined4 param_3,undefined2 param_4)
 
 {
   int iVar1;
@@ -4507,9 +4558,11 @@ void __fastcall FUN_004f5d80(int param_1,int param_2,undefined4 param_3,undefine
 }
 
 
-// ==== 0x4f5e00 FUN_004f5e00
+// ==== 0x4f5e00 FEng::RenderPackage
 
-void FUN_004f5e00(int *param_1,int param_2)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void FEng__RenderPackage(int *param_1,int param_2)
 
 {
   int iVar1;
@@ -4524,7 +4577,7 @@ void FUN_004f5e00(int *param_1,int param_2)
   *puVar3 = 0;
   for (iVar2 = *(int *)(param_2 + 0x40); iVar2 != 0; iVar2 = *(int *)(iVar2 + 4)) {
     if (*(int *)(iVar2 + 0x18) != 5) {
-      FUN_004f5d80(param_1,0);
+      FEng__AddObjectToSortList(param_1,0);
     }
   }
   FUN_004f16d0(puVar3);
@@ -4534,9 +4587,11 @@ void FUN_004f5e00(int *param_1,int param_2)
 }
 
 
-// ==== 0x4f5e90 FUN_004f5e90
+// ==== 0x4f5e90 cFEng::DrawForeground
 
-void FUN_004f5e90(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__DrawForeground(void)
 
 {
   int iVar1;
@@ -4545,9 +4600,9 @@ void FUN_004f5e90(void)
   *(undefined1 *)(unaff_ESI + 5) = 1;
   iVar1 = FEPackageList__FindByName(&DAT_00746104);
   if ((iVar1 != 0) && (*(int *)(iVar1 + 0x18) != 0)) {
-    iVar1 = FUN_004f65d0();
+    iVar1 = FEngFindPackage();
     if (iVar1 != 0) {
-      FUN_004f5e00(unaff_ESI,iVar1);
+      FEng__RenderPackage(unaff_ESI,iVar1);
     }
   }
   *(undefined1 *)(unaff_ESI + 5) = 0;
@@ -4555,9 +4610,11 @@ void FUN_004f5e90(void)
 }
 
 
-// ==== 0x4f5ed0 FUN_004f5ed0
+// ==== 0x4f5ed0 cFEng::SetCurrentButton
 
-void __fastcall FUN_004f5ed0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall cFEng__SetCurrentButton(int param_1)
 
 {
   int iVar1;
@@ -4593,9 +4650,11 @@ void __fastcall FUN_004f5ed0(int param_1)
 }
 
 
-// ==== 0x4f5f80 FUN_004f5f80
+// ==== 0x4f5f80 cFEng::SetButtonState
 
-void FUN_004f5f80(undefined4 param_1,char param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__SetButtonState(undefined4 param_1,char param_2)
 
 {
   int iVar1;
@@ -4630,9 +4689,11 @@ void FUN_004f5f80(undefined4 param_1,char param_2)
 }
 
 
-// ==== 0x4f5fe0 FUN_004f5fe0
+// ==== 0x4f5fe0 FEngSetDirtyFlagsCallback::Callback
 
-undefined4 FUN_004f5fe0(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 FEngSetDirtyFlagsCallback__Callback(int param_1)
 
 {
   *(uint *)(param_1 + 0x1c) = *(uint *)(param_1 + 0x1c) | 0x400000;
@@ -4643,9 +4704,11 @@ undefined4 FUN_004f5fe0(int param_1)
 }
 
 
-// ==== 0x4f6010 FUN_004f6010
+// ==== 0x4f6010 cFEng::MakeLoadedPackagesDirty
 
-void FUN_004f6010(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__MakeLoadedPackagesDirty(int param_1)
 
 {
   int iVar1;
@@ -4670,9 +4733,11 @@ void FUN_004f6010(int param_1)
 }
 
 
-// ==== 0x4f6080 FUN_004f6080
+// ==== 0x4f6080 cFEng::GetMouseInfo
 
-void FUN_004f6080(short *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__GetMouseInfo(short *param_1)
 
 {
   *param_1 = (short)DAT_0070649c + -0x140;
@@ -4682,9 +4747,11 @@ void FUN_004f6080(short *param_1)
 }
 
 
-// ==== 0x4f60c0 FUN_004f60c0
+// ==== 0x4f60c0 cFEng::DoesPointTouchObject
 
-void FUN_004f60c0(undefined4 param_1,undefined4 param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFEng__DoesPointTouchObject(undefined4 param_1,undefined4 param_2)
 
 {
   FUN_004f7660(param_1,param_2);
@@ -4780,9 +4847,11 @@ void FEManager__ShowPackage(void)
 }
 
 
-// ==== 0x4f6240 FUN_004f6240
+// ==== 0x4f6240 FEngStopInteraction
 
-void FUN_004f6240(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngStopInteraction(void)
 
 {
   int in_EAX;
@@ -4849,14 +4918,16 @@ void FEngPushGarageMainPackage(void)
 }
 
 
-// ==== 0x4f6340 FUN_004f6340
+// ==== 0x4f6340 FEngSetControlMask
 
-void FUN_004f6340(undefined4 param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSetControlMask(undefined4 param_1)
 
 {
   int iVar1;
   
-  iVar1 = FUN_004f65d0();
+  iVar1 = FEngFindPackage();
   if (iVar1 != 0) {
     *(undefined4 *)(iVar1 + 0x1c) = param_1;
   }
@@ -4864,9 +4935,11 @@ void FUN_004f6340(undefined4 param_1)
 }
 
 
-// ==== 0x4f6360 FUN_004f6360
+// ==== 0x4f6360 FEngSwitchPackages
 
-void FUN_004f6360(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSwitchPackages(void)
 
 {
   int iVar1;
@@ -4881,9 +4954,11 @@ void FUN_004f6360(void)
 }
 
 
-// ==== 0x4f63a0 FUN_004f63a0
+// ==== 0x4f63a0 FEngPopPackage
 
-void FUN_004f63a0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngPopPackage(void)
 
 {
   int iVar1;
@@ -4898,9 +4973,11 @@ void FUN_004f63a0(void)
 }
 
 
-// ==== 0x4f63e0 FUN_004f63e0
+// ==== 0x4f63e0 FEngQueuePackagePush
 
-void FUN_004f63e0(undefined4 param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngQueuePackagePush(undefined4 param_1)
 
 {
   int iVar1;
@@ -4922,9 +4999,11 @@ void FUN_004f63e0(undefined4 param_1)
 }
 
 
-// ==== 0x4f6430 FUN_004f6430
+// ==== 0x4f6430 FEngQueuePackagePop
 
-void FUN_004f6430(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngQueuePackagePop(void)
 
 {
   int iVar1;
@@ -4937,9 +5016,11 @@ void FUN_004f6430(void)
 }
 
 
-// ==== 0x4f6460 FUN_004f6460
+// ==== 0x4f6460 FEngSetUseIdleList
 
-void FUN_004f6460(undefined4 param_1,undefined1 param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSetUseIdleList(undefined4 param_1,undefined1 param_2)
 
 {
   int iVar1;
@@ -4954,9 +5035,11 @@ void FUN_004f6460(undefined4 param_1,undefined1 param_2)
 }
 
 
-// ==== 0x4f6490 FUN_004f6490
+// ==== 0x4f6490 FEngSetPermanent
 
-void FUN_004f6490(undefined2 param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSetPermanent(undefined2 param_1)
 
 {
   int iVar1;
@@ -4969,21 +5052,25 @@ void FUN_004f6490(undefined2 param_1)
 }
 
 
-// ==== 0x4f64b0 FUN_004f64b0
+// ==== 0x4f64b0 FEngSetCurrentButton
 
-void FUN_004f64b0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSetCurrentButton(void)
 
 {
   if (DAT_0073578c != 0) {
-    FUN_004f5ed0(DAT_0073578c);
+    cFEng__SetCurrentButton(DAT_0073578c);
   }
   return;
 }
 
 
-// ==== 0x4f64d0 FUN_004f64d0
+// ==== 0x4f64d0 FEngGetCurrentButton
 
-undefined4 FUN_004f64d0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 FEngGetCurrentButton(void)
 
 {
   int iVar1;
@@ -5004,9 +5091,11 @@ undefined4 FUN_004f64d0(void)
 }
 
 
-// ==== 0x4f6510 FUN_004f6510
+// ==== 0x4f6510 FEngIsButtonEnabled
 
-uint __fastcall FUN_004f6510(undefined4 param_1)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+uint __fastcall FEngIsButtonEnabled(undefined4 param_1)
 
 {
   int iVar1;
@@ -5021,10 +5110,12 @@ uint __fastcall FUN_004f6510(undefined4 param_1)
 }
 
 
-// ==== 0x4f6540 FUN_004f6540
+// ==== 0x4f6540 FEngSendMessageToObject
+
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
 
 void __fastcall
-FUN_004f6540(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)
+FEngSendMessageToObject(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)
 
 {
   if ((DAT_0073578c != 0) && (*(int *)(DAT_0073578c + 8) != 0)) {
@@ -5034,9 +5125,11 @@ FUN_004f6540(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4
 }
 
 
-// ==== 0x4f6570 FUN_004f6570
+// ==== 0x4f6570 FEngQueueMessageToPackage
 
-void FUN_004f6570(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngQueueMessageToPackage(void)
 
 {
   int iVar1;
@@ -5054,9 +5147,11 @@ void FUN_004f6570(void)
 }
 
 
-// ==== 0x4f65d0 FUN_004f65d0
+// ==== 0x4f65d0 FEngFindPackage
 
-int FUN_004f65d0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int FEngFindPackage(void)
 
 {
   int iVar1;
@@ -5080,9 +5175,11 @@ int FUN_004f65d0(void)
 }
 
 
-// ==== 0x4f6630 FUN_004f6630
+// ==== 0x4f6630 FEngGetFirstPackage
 
-undefined4 FUN_004f6630(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+undefined4 FEngGetFirstPackage(void)
 
 {
   if (*(int *)(DAT_0073578c + 8) == 0) {
@@ -5092,9 +5189,11 @@ undefined4 FUN_004f6630(void)
 }
 
 
-// ==== 0x4f6650 FUN_004f6650
+// ==== 0x4f6650 FEngIsPackagePushed
 
-undefined4 FUN_004f6650(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 FEngIsPackagePushed(void)
 
 {
   int iVar1;
@@ -5107,16 +5206,18 @@ undefined4 FUN_004f6650(void)
 }
 
 
-// ==== 0x4f6670 FUN_004f6670
+// ==== 0x4f6670 FEngFindObject
 
-int FUN_004f6670(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int FEngFindObject(void)
 
 {
   int iVar1;
   int unaff_ESI;
   undefined4 unaff_EDI;
   
-  if (((unaff_ESI != 0) && (iVar1 = FUN_004f65d0(), iVar1 != 0)) &&
+  if (((unaff_ESI != 0) && (iVar1 = FEngFindPackage(), iVar1 != 0)) &&
      (iVar1 = FUN_004ffb70(), iVar1 != 0)) {
     return iVar1;
   }
@@ -5128,16 +5229,18 @@ int FUN_004f6670(void)
 }
 
 
-// ==== 0x4f66b0 FUN_004f66b0
+// ==== 0x4f66b0 FEngFindString
 
-int FUN_004f66b0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int FEngFindString(void)
 
 {
   int iVar1;
   int unaff_ESI;
   undefined4 unaff_EDI;
   
-  if (((((unaff_ESI != 0) && (iVar1 = FUN_004f65d0(), iVar1 != 0)) &&
+  if (((((unaff_ESI != 0) && (iVar1 = FEngFindPackage(), iVar1 != 0)) &&
        (iVar1 = FUN_004ffb70(), iVar1 != 0)) ||
       ((DAT_0073578c != 0 && (iVar1 = FUN_004ef050(unaff_EDI), iVar1 != 0)))) &&
      (*(int *)(iVar1 + 0x18) == 2)) {
@@ -5173,15 +5276,17 @@ void FEString__SetLabelHash(void)
 }
 
 
-// ==== 0x4f6720 FUN_004f6720
+// ==== 0x4f6720 FEngSetLanguageHash
 
-void __thiscall FUN_004f6720(int param_1,undefined4 param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall FEngSetLanguageHash(int param_1,undefined4 param_2)
 
 {
   undefined4 in_EAX;
   int iVar1;
   
-  if (((param_1 == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((param_1 == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       return;
@@ -5196,9 +5301,11 @@ void __thiscall FUN_004f6720(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4f6780 FUN_004f6780
+// ==== 0x4f6780 DoFEngPrintf
 
-int __fastcall FUN_004f6780(undefined4 param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __fastcall DoFEngPrintf(undefined4 param_1)
 
 {
   int iVar1;
@@ -5223,9 +5330,11 @@ int __fastcall FUN_004f6780(undefined4 param_1)
 }
 
 
-// ==== 0x4f67f0 FUN_004f67f0
+// ==== 0x4f67f0 FEngPrintf
 
-undefined4 FUN_004f67f0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 FEngPrintf(void)
 
 {
   int in_EAX;
@@ -5233,7 +5342,7 @@ undefined4 FUN_004f67f0(void)
   int iVar2;
   
   uVar1 = FEng__HashName();
-  if (((in_EAX == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if (((in_EAX == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
      (iVar2 = FUN_004ffb70(), iVar2 == 0)) {
     if (DAT_0073578c == 0) {
       return 0;
@@ -5241,16 +5350,18 @@ undefined4 FUN_004f67f0(void)
     iVar2 = FUN_004ef050(uVar1);
   }
   if ((iVar2 != 0) && (*(int *)(iVar2 + 0x18) == 2)) {
-    uVar1 = FUN_004f6780();
+    uVar1 = DoFEngPrintf();
     return uVar1;
   }
   return 0;
 }
 
 
-// ==== 0x4f6850 FUN_004f6850
+// ==== 0x4f6850 FEngPrintf
 
-undefined4 FUN_004f6850(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 FEngPrintf(void)
 
 {
   int in_EAX;
@@ -5258,7 +5369,7 @@ undefined4 FUN_004f6850(void)
   undefined4 uVar2;
   undefined4 unaff_EDI;
   
-  if (((in_EAX == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((in_EAX == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       return 0;
@@ -5266,7 +5377,7 @@ undefined4 FUN_004f6850(void)
     iVar1 = FUN_004ef050(unaff_EDI);
   }
   if ((iVar1 != 0) && (*(int *)(iVar1 + 0x18) == 2)) {
-    uVar2 = FUN_004f6780();
+    uVar2 = DoFEngPrintf();
     return uVar2;
   }
   return 0;
@@ -5284,7 +5395,7 @@ undefined4 FEObject__SetFormattedText(void)
   undefined4 uVar1;
   
   if (in_EAX != 0) {
-    uVar1 = FUN_004f6780();
+    uVar1 = DoFEngPrintf();
     return uVar1;
   }
   return 0;
@@ -5371,9 +5482,11 @@ void FEObject__SetVisible(int param_1)
 }
 
 
-// ==== 0x4f69c0 FUN_004f69c0
+// ==== 0x4f69c0 FEngSetPackageVisibility
 
-void FUN_004f69c0(byte param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSetPackageVisibility(byte param_1)
 
 {
   int iVar1;
@@ -5386,9 +5499,11 @@ void FUN_004f69c0(byte param_1)
 }
 
 
-// ==== 0x4f69e0 FUN_004f69e0
+// ==== 0x4f69e0 ObjectVisibilitySetter::Callback
 
-undefined4 __thiscall FUN_004f69e0(int param_1,undefined4 param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __thiscall ObjectVisibilitySetter__Callback(int param_1,undefined4 param_2)
 
 {
   if (*(char *)(param_1 + 4) != '\0') {
@@ -5400,9 +5515,11 @@ undefined4 __thiscall FUN_004f69e0(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4f6a10 FUN_004f6a10
+// ==== 0x4f6a10 FEngSetAllObjectsInPackageVisibility
 
-void FUN_004f6a10(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSetAllObjectsInPackageVisibility(void)
 
 {
   int iVar1;
@@ -5414,7 +5531,7 @@ void FUN_004f6a10(void)
   pcStack_8 = FUN_00686c88;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  iVar1 = FUN_004f65d0();
+  iVar1 = FEngFindPackage();
   if (iVar1 != 0) {
     local_4 = 0;
     FUN_004ffb00(iVar1);
@@ -5424,9 +5541,11 @@ void FUN_004f6a10(void)
 }
 
 
-// ==== 0x4f6a70 FUN_004f6a70
+// ==== 0x4f6a70 FEngSetRotationZ
 
-void FUN_004f6a70(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSetRotationZ(void)
 
 {
   int unaff_ESI;
@@ -5510,9 +5629,11 @@ void FEObject__SetScript(undefined4 param_1,char param_2)
 }
 
 
-// ==== 0x4f6bd0 FUN_004f6bd0
+// ==== 0x4f6bd0 FEngSetScript
 
-void FUN_004f6bd0(undefined4 param_1,undefined4 param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void FEngSetScript(undefined4 param_1,undefined4 param_2)
 
 {
   int in_EAX;
@@ -5520,7 +5641,7 @@ void FUN_004f6bd0(undefined4 param_1,undefined4 param_2)
   int iVar2;
   
   uVar1 = FEng__HashName();
-  if ((((in_EAX == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if ((((in_EAX == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
       (iVar2 = FUN_004ffb70(), iVar2 == 0)) && (DAT_0073578c != 0)) {
     FUN_004ef050(uVar1);
   }
@@ -5538,7 +5659,7 @@ void FUN_004f6c30(undefined4 param_1,undefined4 param_2)
   int iVar1;
   int unaff_ESI;
   
-  if ((((unaff_ESI == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if ((((unaff_ESI == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
       (iVar1 = FUN_004ffb70(), iVar1 == 0)) && (DAT_0073578c != 0)) {
     FUN_004ef050(in_EAX);
   }
@@ -5565,7 +5686,7 @@ LAB_004f6c9d:
     if (uVar2 == 0) goto LAB_004f6cd8;
   }
   else {
-    iVar1 = FUN_004f65d0();
+    iVar1 = FEngFindPackage();
     if (iVar1 == 0) goto LAB_004f6c9d;
     uVar2 = FUN_004ffb70();
     if (uVar2 == 0) goto LAB_004f6c9d;
@@ -6317,7 +6438,7 @@ LAB_004f795e:
     }
   }
   else {
-    iVar3 = FUN_004f65d0();
+    iVar3 = FEngFindPackage();
     if (iVar3 == 0) goto LAB_004f795e;
     iVar3 = FUN_004ffb70();
     if (iVar3 == 0) goto LAB_004f795e;
@@ -6333,7 +6454,7 @@ LAB_004f799f:
     }
   }
   else {
-    iVar3 = FUN_004f65d0();
+    iVar3 = FEngFindPackage();
     if (iVar3 == 0) goto LAB_004f799f;
     iVar3 = FUN_004ffb70();
     if (iVar3 == 0) goto LAB_004f799f;
@@ -6349,7 +6470,7 @@ LAB_004f79e0:
     }
   }
   else {
-    iVar3 = FUN_004f65d0();
+    iVar3 = FEngFindPackage();
     if (iVar3 == 0) goto LAB_004f79e0;
     iVar3 = FUN_004ffb70();
     if (iVar3 == 0) goto LAB_004f79e0;
@@ -6365,7 +6486,7 @@ LAB_004f7a21:
     }
   }
   else {
-    iVar3 = FUN_004f65d0();
+    iVar3 = FEngFindPackage();
     if (iVar3 == 0) goto LAB_004f7a21;
     iVar3 = FUN_004ffb70();
     if (iVar3 == 0) goto LAB_004f7a21;
@@ -6381,7 +6502,7 @@ LAB_004f7a68:
     cVar2 = '\0';
   }
   else {
-    iVar3 = FUN_004f65d0();
+    iVar3 = FEngFindPackage();
     if (iVar3 == 0) goto LAB_004f7a68;
     iVar3 = FUN_004ffb70();
     if (iVar3 == 0) goto LAB_004f7a68;
@@ -6401,7 +6522,7 @@ LAB_004f7a84:
         *pcVar4 = cVar2;
       } while (cVar2 != '\0');
     }
-    iVar3 = FUN_004f65d0();
+    iVar3 = FEngFindPackage();
     if (iVar3 == 0) {
       FEManager__PushPackageChecked(0x32,0);
     }
@@ -6464,7 +6585,7 @@ void __fastcall FUN_004f7b50(undefined4 *param_1)
     *(undefined4 *)param_1[6] = *(undefined4 *)(*(int *)(param_1[5] + 0x80) + 0x10);
   }
   if ((((*(char *)(param_1 + 0xe) != '\0') &&
-       (iVar2 = FUN_004f65d0(), iVar1 = DAT_0073578c, iVar2 != 0)) && (DAT_0073578c != 0)) &&
+       (iVar2 = FEngFindPackage(), iVar1 = DAT_0073578c, iVar2 != 0)) && (DAT_0073578c != 0)) &&
      ((iVar2 = FEPackageList__FindByName(&DAT_00746104), iVar2 != 0 && (*(int *)(iVar2 + 0x18) != 0)
       ))) {
     cFEng__PopPackage(*(undefined4 *)(iVar1 + 8),*(int *)(iVar2 + 0x18));
@@ -6515,7 +6636,7 @@ void FUN_004f7c00(int param_1,undefined4 param_2,undefined4 param_3,int param_4)
   }
   else if (param_1 == -0x367ca946) {
     if (((char)unaff_ESI[0xe] != '\0') && (*(int *)(param_4 + 0x1c) != 0)) {
-      cVar1 = FUN_004f6650();
+      cVar1 = FEngIsPackagePushed();
       if (cVar1 == '\0') {
         FEManager__PushPackageChecked(0x32,0);
       }
@@ -6560,7 +6681,7 @@ void FUN_004f7d30(void)
   int unaff_ESI;
   
   if ((*(char *)(unaff_ESI + 0x20) != '\0') &&
-     ((iVar4 = FUN_004f65d0(), iVar4 == 0 || (*(int *)(iVar4 + 0x1c) != 0)))) {
+     ((iVar4 = FEngFindPackage(), iVar4 == 0 || (*(int *)(iVar4 + 0x1c) != 0)))) {
     fVar1 = (float)(DAT_0070649c + -0x140);
     fVar2 = (float)(DAT_007064a0 + -0xf0);
     if (DAT_007064b2 != '\0') {
@@ -6569,18 +6690,18 @@ void FUN_004f7d30(void)
         if (cVar3 != '\0') {
           FUN_004c96c0(0x9120409e);
           iVar4 = FEng_FindObjectByHash2();
-          iVar5 = FUN_004f65d0();
+          iVar5 = FEngFindPackage();
           if ((iVar5 != 0) && (iVar4 != 0)) {
-            FUN_004f6540(0xd51d9c13,iVar4);
+            FEngSendMessageToObject(0xd51d9c13,iVar4);
           }
         }
         cVar3 = FUN_004f7660(fVar1,fVar2);
         if (cVar3 != '\0') {
           FUN_004c96c0(0xb5971bf1);
           iVar4 = FEng_FindObjectByHash2();
-          iVar5 = FUN_004f65d0();
+          iVar5 = FEngFindPackage();
           if ((iVar5 != 0) && (iVar4 != 0)) {
-            FUN_004f6540(0x793fe606,iVar4);
+            FEngSendMessageToObject(0x793fe606,iVar4);
           }
         }
       }
@@ -6642,12 +6763,12 @@ void FUN_004f7f60(void)
   int iVar1;
   int unaff_EDI;
   
-  if ((((*(int *)(unaff_EDI + 0xc) != 0) && (iVar1 = FUN_004f65d0(), iVar1 != 0)) &&
+  if ((((*(int *)(unaff_EDI + 0xc) != 0) && (iVar1 = FEngFindPackage(), iVar1 != 0)) &&
       (iVar1 = FUN_004ffb70(), iVar1 != 0)) ||
      ((DAT_0073578c != 0 && (iVar1 = FUN_004ef050(0xfd5daf49), iVar1 != 0)))) {
     FEObject__SetInvisible(iVar1);
   }
-  if (((*(int *)(unaff_EDI + 0xc) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((*(int *)(unaff_EDI + 0xc) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       return;
@@ -6943,7 +7064,7 @@ FUN_004f8370(int param_1,undefined4 *param_2,undefined4 param_3,undefined4 param
   param_2[9] = param_4;
   uVar2 = FEng__HashName();
   if (param_1 != 0) {
-    iVar3 = FUN_004f65d0();
+    iVar3 = FEngFindPackage();
     if (iVar3 != 0) {
       iVar3 = FUN_004ffb70();
       if (iVar3 != 0) goto LAB_004f8446;
@@ -7127,7 +7248,7 @@ void FUN_004f8680(void)
   int iVar2;
   int iVar3;
   
-  iVar1 = FUN_004f65d0();
+  iVar1 = FEngFindPackage();
   iVar3 = *(int *)(iVar1 + 0x40);
   iVar1 = *(int *)(iVar1 + 0x44);
   iVar2 = FEng__HashName();
@@ -7156,7 +7277,7 @@ int __fastcall FUN_004f86c0(int param_1)
   int iVar6;
   byte *pbVar7;
   
-  iVar3 = FUN_004f65d0();
+  iVar3 = FEngFindPackage();
   if (in_EAX == 0) {
     iVar4 = *(int *)(iVar3 + 0x40);
   }
@@ -7268,7 +7389,7 @@ void FUN_004f87f0(void)
   bVar3 = false;
 LAB_004f8840:
   uVar4 = FEng__HashName();
-  iVar6 = FUN_004f65d0();
+  iVar6 = FEngFindPackage();
   if ((iVar6 == 0) || (iVar6 = FUN_004ffb70(), iVar6 == 0)) {
     if (DAT_0073578c == 0) {
       iVar6 = 0;
@@ -7278,7 +7399,7 @@ LAB_004f8840:
     }
   }
   uVar4 = FEng__HashName();
-  iVar5 = FUN_004f65d0();
+  iVar5 = FEngFindPackage();
   if ((iVar5 == 0) || (iVar5 = FUN_004ffb70(), iVar5 == 0)) {
     if (DAT_0073578c == 0) {
       iVar5 = 0;
@@ -8052,7 +8173,7 @@ undefined4 * FUN_004f9420(undefined4 *param_1,undefined4 param_2)
   *param_1 = &PTR_FUN_006c1884;
   param_1[0x10] = 0;
   local_4 = 0;
-  if (((param_1[3] == 0) || (iVar4 = FUN_004f65d0(), iVar4 == 0)) ||
+  if (((param_1[3] == 0) || (iVar4 = FEngFindPackage(), iVar4 == 0)) ||
      (iVar4 = FUN_004ffb70(), iVar4 == 0)) {
     if (DAT_0073578c == 0) {
       iVar4 = 0;
@@ -8154,7 +8275,7 @@ void __thiscall FUN_004f9700(int param_1,uint param_2)
   
   if (param_2 < 0x2cbd3c6c) {
     if (param_2 == 0x2cbd3c6b) {
-      if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+      if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
          (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
         if (DAT_0073578c != 0) {
           uVar2 = FUN_004ef050(0x12dfbc68);
@@ -8192,7 +8313,7 @@ void __thiscall FUN_004f9700(int param_1,uint param_2)
   }
   else if (param_2 < 0x50fe8c16) {
     if (param_2 == 0x50fe8c15) {
-      if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+      if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
          (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
         if (DAT_0073578c == 0) {
           iVar1 = 0;
@@ -8211,7 +8332,7 @@ void __thiscall FUN_004f9700(int param_1,uint param_2)
         return;
       }
       if (param_2 == 0x2cbd3c6c) {
-        if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+        if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
            (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
           if (DAT_0073578c != 0) {
             uVar2 = FUN_004ef050(0x12dfbc68);
@@ -8226,7 +8347,7 @@ void __thiscall FUN_004f9700(int param_1,uint param_2)
         if (param_2 != 0x2cbd3c6d) {
           return;
         }
-        if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+        if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
            (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
           if (DAT_0073578c == 0) {
             iVar1 = 0;
@@ -8243,7 +8364,7 @@ LAB_004f985f:
       return;
     }
     if (param_2 == 0x2cbd3c8f) {
-      if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+      if (((*(int *)(param_1 + 0xc) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
          (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
         if (DAT_0073578c == 0) {
           iVar1 = 0;
@@ -8272,7 +8393,7 @@ LAB_004f985f:
       return;
     }
     if (param_2 == 0xa310e4c9) {
-      FUN_004f69c0(0);
+      FEngSetPackageVisibility(0);
       return;
     }
   }
@@ -8280,7 +8401,7 @@ LAB_004f985f:
     FUN_004f9c50();
   }
   else if (param_2 == 0xf7fbf050) {
-    FUN_004f69c0(1);
+    FEngSetPackageVisibility(1);
     return;
   }
   return;
@@ -8365,7 +8486,7 @@ void FUN_004f9b70(void)
   undefined4 uVar2;
   int unaff_EBX;
   
-  if (((*(int *)(unaff_EBX + 0xc) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((*(int *)(unaff_EBX + 0xc) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       iVar1 = 0;
@@ -8410,14 +8531,14 @@ void FUN_004f9c50(void)
   
   iVar2 = *(int *)(unaff_EBX + 0xc);
   uVar1 = FEng__HashName();
-  if ((((iVar2 == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if ((((iVar2 == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
       (iVar2 = FUN_004ffb70(), iVar2 == 0)) && (DAT_0073578c != 0)) {
     FUN_004ef050(uVar1);
   }
   FUN_004f75b0(0x9600ff00);
   iVar2 = *(int *)(unaff_EBX + 0xc);
   uVar1 = FEng__HashName();
-  if ((((iVar2 == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if ((((iVar2 == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
       (iVar2 = FUN_004ffb70(), iVar2 == 0)) && (DAT_0073578c != 0)) {
     FUN_004ef050(uVar1);
     FUN_004f75b0(0x9600ff00);
@@ -8439,14 +8560,14 @@ void FUN_004f9d10(void)
   
   iVar2 = *(int *)(unaff_EBX + 0xc);
   uVar1 = FEng__HashName();
-  if ((((iVar2 == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if ((((iVar2 == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
       (iVar2 = FUN_004ffb70(), iVar2 == 0)) && (DAT_0073578c != 0)) {
     FUN_004ef050(uVar1);
   }
   FUN_004f75b0(0x6478adc7);
   iVar2 = *(int *)(unaff_EBX + 0xc);
   uVar1 = FEng__HashName();
-  if ((((iVar2 == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if ((((iVar2 == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
       (iVar2 = FUN_004ffb70(), iVar2 == 0)) && (DAT_0073578c != 0)) {
     FUN_004ef050(uVar1);
     FUN_004f75b0(0x6478adc7);
@@ -8471,7 +8592,7 @@ void FUN_004f9dd0(void)
      (*(char *)(unaff_EDI + 0x44) != '\0')) {
     *(undefined1 *)(unaff_EDI + 0x44) = 0;
     if (((*(int *)(unaff_EDI + 0xc) == 0) ||
-        ((iVar1 = FUN_004f65d0(), iVar1 == 0 || (iVar1 = FUN_004ffb70(), iVar1 == 0)))) &&
+        ((iVar1 = FEngFindPackage(), iVar1 == 0 || (iVar1 = FUN_004ffb70(), iVar1 == 0)))) &&
        (DAT_0073578c != 0)) {
       FUN_004ef050(0x12dfbc68);
       FUN_004f75b0(*(undefined4 *)(unaff_EDI + 0x48));
@@ -8495,7 +8616,7 @@ void FUN_004f9e60(void)
   if (*(char *)(unaff_EDI + 0x44) == '\0') {
     uVar1 = *(uint *)(unaff_EDI + 0x48);
     *(undefined1 *)(unaff_EDI + 0x44) = 1;
-    if ((((*(int *)(unaff_EDI + 0xc) == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+    if ((((*(int *)(unaff_EDI + 0xc) == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
         (iVar2 = FUN_004ffb70(), iVar2 == 0)) && (DAT_0073578c != 0)) {
       FUN_004ef050(0x12dfbc68);
     }

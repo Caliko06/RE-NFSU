@@ -11349,7 +11349,7 @@ LAB_0059e753:
       iVar3 = 0;
     }
     else {
-      iVar3 = FUN_004f65d0();
+      iVar3 = FEngFindPackage();
       if (iVar3 == 0) goto LAB_0059e735;
       iVar3 = FUN_004ffb70();
       if (iVar3 == 0) goto LAB_0059e735;
@@ -11370,7 +11370,7 @@ LAB_0059e7a3:
       iVar3 = 0;
     }
     else {
-      iVar3 = FUN_004f65d0();
+      iVar3 = FEngFindPackage();
       if (iVar3 == 0) goto LAB_0059e785;
       iVar3 = FUN_004ffb70();
       if (iVar3 == 0) goto LAB_0059e785;
@@ -11391,7 +11391,7 @@ LAB_0059e7f3:
     iVar3 = 0;
   }
   else {
-    iVar3 = FUN_004f65d0();
+    iVar3 = FEngFindPackage();
     if (iVar3 == 0) goto LAB_0059e7d5;
     iVar3 = FUN_004ffb70();
     if (iVar3 == 0) goto LAB_0059e7d5;
@@ -11445,7 +11445,7 @@ void __thiscall FUN_0059e850(int param_1,int *param_2)
   }
   if (param_2[1] != 0) {
     uVar5 = FEng__HashName();
-    if (((((*(int *)(param_1 + 4) == 0) || (iVar6 = FUN_004f65d0(), iVar6 == 0)) ||
+    if (((((*(int *)(param_1 + 4) == 0) || (iVar6 = FEngFindPackage(), iVar6 == 0)) ||
          (iVar6 = FUN_004ffb70(), iVar6 == 0)) &&
         ((DAT_0073578c == 0 || (iVar6 = FUN_004ef050(uVar5), iVar6 == 0)))) ||
        (*(int *)(iVar6 + 0x18) != 1)) {
@@ -11455,7 +11455,7 @@ void __thiscall FUN_0059e850(int param_1,int *param_2)
   }
   if (param_2[3] != 0) {
     uVar5 = FEng__HashName();
-    if (((((*(int *)(param_1 + 4) == 0) || (iVar6 = FUN_004f65d0(), iVar6 == 0)) ||
+    if (((((*(int *)(param_1 + 4) == 0) || (iVar6 = FEngFindPackage(), iVar6 == 0)) ||
          (iVar6 = FUN_004ffb70(), iVar6 == 0)) &&
         ((DAT_0073578c == 0 || (iVar6 = FUN_004ef050(uVar5), iVar6 == 0)))) ||
        (*(int *)(iVar6 + 0x18) != 2)) {
@@ -11565,7 +11565,7 @@ void __thiscall FUN_0059eac0(int param_1,int *param_2)
   }
   if (param_2[3] != 0) {
     uVar6 = FEng__HashName();
-    if (((((*(int *)(param_1 + 4) == 0) || (iVar7 = FUN_004f65d0(), iVar7 == 0)) ||
+    if (((((*(int *)(param_1 + 4) == 0) || (iVar7 = FEngFindPackage(), iVar7 == 0)) ||
          (iVar7 = FUN_004ffb70(), iVar7 == 0)) &&
         ((DAT_0073578c == 0 || (iVar7 = FUN_004ef050(uVar6), iVar7 == 0)))) ||
        (*(int *)(iVar7 + 0x18) != 2)) {
@@ -11575,7 +11575,7 @@ void __thiscall FUN_0059eac0(int param_1,int *param_2)
   }
   if (param_2[4] != 0) {
     uVar6 = FEng__HashName();
-    if (((((*(int *)(param_1 + 4) == 0) || (iVar7 = FUN_004f65d0(), iVar7 == 0)) ||
+    if (((((*(int *)(param_1 + 4) == 0) || (iVar7 = FEngFindPackage(), iVar7 == 0)) ||
          (iVar7 = FUN_004ffb70(), iVar7 == 0)) &&
         ((DAT_0073578c == 0 || (iVar7 = FUN_004ef050(uVar6), iVar7 == 0)))) ||
        (*(int *)(iVar7 + 0x18) != 1)) {
@@ -12380,7 +12380,7 @@ LAB_0059fa5a:
       EAXSound__ReloadLanguageSpeechBank__called_by_ChangeLanguage_0x59fa20_(DAT_006ee6f0);
       DAT_007588f0 = (uint)(DAT_006ee6f0 != 0);
       if (DAT_0073578c != 0) {
-        FUN_004f6010(DAT_0073578c);
+        cFEng__MakeLoadedPackagesDirty(DAT_0073578c);
       }
     }
   }

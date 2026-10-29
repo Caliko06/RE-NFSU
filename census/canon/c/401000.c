@@ -369,10 +369,10 @@ undefined4 __fastcall DiscCheck_ModalFrameLoop(undefined4 param_1)
       cVar1 = '\0';
       (**(code **)(*DAT_0073636c + 0xe4))(DAT_0073636c,0xe,1);
       if (cVar1 != '\0') {
-        FUN_004f6240();
+        FEngStopInteraction();
         return 0;
       }
-      FUN_004f63a0("DiscErrorPC.fng");
+      FEngPopPackage("DiscErrorPC.fng");
     }
   }
   return 0;
@@ -484,7 +484,7 @@ undefined4 FUN_004016e0(void)
   if (DAT_006f9228 != 0) {
     if (DAT_0073578c != 0) {
       piStack_98 = (int *)0x401803;
-      FUN_004f5e90();
+      cFEng__DrawForeground();
     }
     if ((DAT_006f9228 != 0) && (DAT_0073578c != 0)) {
       puVar1 = (undefined1 *)(DAT_0073578c + 4);
@@ -7522,7 +7522,7 @@ LAB_00409d27:
     }
   }
   else if ((DAT_006f9228 != 0) && (DAT_0073578c != 0)) {
-    FUN_004f5e90();
+    cFEng__DrawForeground();
   }
   if (DAT_0078eb90 != 0) {
     ePoly__ePoly();

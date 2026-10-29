@@ -4179,12 +4179,12 @@
 {"kind":"global","addr":"0x6be4fc","block":".rdata","label":"PTR_EAXSND8Wrapper::scalar_deleting_destructor_006be4fc","type":"pointer","str":"","readers":["0x51cd60","0x5329e0"],"writers":[]}
 {"kind":"global","addr":"0x6be500","block":".rdata","label":"s_Csis_SlotPools_006be500","type":"string","str":"Csis SlotPools","readers":["0x532a20"],"writers":[]}
 {"kind":"global","addr":"0x6be510","block":".rdata","label":"s_CSIS_ALLOCATOR_006be510","type":"string","str":"CSIS_ALLOCATOR","readers":["0x532960"],"writers":[]}
-{"kind":"global","addr":"0x6be520","block":".rdata","label":"PTR_FUN_006be520","type":"undefined *","str":"","readers":["0x52f570","0x52f590"],"writers":[]}
-{"kind":"global","addr":"0x6be5a4","block":".rdata","label":"PTR_FUN_006be5a4","type":"undefined *","str":"","readers":["0x52f940","0x52f9b0"],"writers":[]}
-{"kind":"global","addr":"0x6be5b8","block":".rdata","label":"PTR_FUN_006be5b8","type":"undefined *","str":"","readers":["0x530570","0x5306a0"],"writers":[]}
-{"kind":"global","addr":"0x6be634","block":".rdata","label":"PTR_FUN_006be634","type":"pointer","str":"","readers":["0x5306a0"],"writers":[]}
+{"kind":"global","addr":"0x6be520","block":".rdata","label":"PTR_stWorldCollision::scalar_deleting_destructor_006be520","type":"undefined *","str":"","readers":["0x52f570","0x52f590"],"writers":[]}
+{"kind":"global","addr":"0x6be5a4","block":".rdata","label":"PTR_EAXCollision::scalar_deleting_destructor_006be5a4","type":"undefined *","str":"","readers":["0x52f940","0x52f9b0"],"writers":[]}
+{"kind":"global","addr":"0x6be5b8","block":".rdata","label":"PTR_stSoundCollision::scalar_deleting_destructor_006be5b8","type":"undefined *","str":"","readers":["0x530570","0x5306a0"],"writers":[]}
+{"kind":"global","addr":"0x6be634","block":".rdata","label":"PTR_stSoundCollision::CSISEndImpact_006be634","type":"pointer","str":"","readers":["0x5306a0"],"writers":[]}
 {"kind":"global","addr":"0x6be638","block":".rdata","label":"PTR_FUN_006be638","type":"pointer","str":"","readers":["0x5306a0"],"writers":[]}
-{"kind":"global","addr":"0x6be640","block":".rdata","label":"PTR_FUN_006be640","type":"undefined *","str":"","readers":["0x52f520","0x52f540"],"writers":[]}
+{"kind":"global","addr":"0x6be640","block":".rdata","label":"PTR_stCarOnCarCollision::scalar_deleting_destructor_006be640","type":"undefined *","str":"","readers":["0x52f520","0x52f540"],"writers":[]}
 {"kind":"global","addr":"0x6be6c8","block":".rdata","label":"PTR_FUN_006be6c8","type":"undefined *","str":"","readers":["0x532370","0x5323b0"],"writers":[]}
 {"kind":"global","addr":"0x6be750","block":".rdata","label":"s_SND_WORLDImpact_006be750","type":"string","str":"SND_WORLDImpact","readers":["0x531350"],"writers":[]}
 {"kind":"global","addr":"0x6be760","block":".rdata","label":"s_SND_SmokeableImpact_006be760","type":"string","str":"SND_SmokeableImpact","readers":["0x531350"],"writers":[]}
@@ -5393,8 +5393,8 @@
 {"kind":"global","addr":"0x6c1b00","block":".rdata","label":"PTR_FUN_006c1b00","type":"pointer","str":"","readers":["0x4f5920"],"writers":[]}
 {"kind":"global","addr":"0x6c1b08","block":".rdata","label":"PTR_FUN_006c1b08","type":"pointer","str":"","readers":["0x4e2a00","0x4f6a10"],"writers":[]}
 {"kind":"global","addr":"0x6c1b10","block":".rdata","label":"PTR_FUN_006c1b10","type":"pointer","str":"","readers":["0x4f5920"],"writers":[]}
-{"kind":"global","addr":"0x6c1b18","block":".rdata","label":"PTR_FUN_006c1b18","type":"undefined *","str":"","readers":["0x4f5240","0x4f5310"],"writers":[]}
-{"kind":"global","addr":"0x6c1b80","block":".rdata","label":"PTR_FUN_006c1b80","type":"pointer","str":"","readers":["0x4f50d0","0x4f5130"],"writers":[]}
+{"kind":"global","addr":"0x6c1b18","block":".rdata","label":"PTR_cFEng::GetPackageData_006c1b18","type":"undefined *","str":"","readers":["0x4f5240","0x4f5310"],"writers":[]}
+{"kind":"global","addr":"0x6c1b80","block":".rdata","label":"PTR_FEngRenderer::ScalarDeletingDtor_006c1b80","type":"pointer","str":"","readers":["0x4f50d0","0x4f5130"],"writers":[]}
 {"kind":"global","addr":"0x6c1b84","block":".rdata","label":"s_Message_was_queued_006c1b84","type":"string","str":"Message was queued\u000a","readers":["0x4f6570","0x54b1c0"],"writers":[]}
 {"kind":"global","addr":"0x6c1b98","block":".rdata","label":"s_Send_message[%x]_to_package_[%s]_006c1b98","type":"string","str":"Send message[%x] to package [%s]\u000a","readers":["0x4f6570","0x54b1c0"],"writers":[]}
 {"kind":"global","addr":"0x6c1bbc","block":".rdata","label":"s_cFEng_006c1bbc","type":"string","str":"cFEng","readers":["0x686430"],"writers":[]}
@@ -6907,11 +6907,11 @@
 {"kind":"global","addr":"0x6c7550","block":".rdata","label":"s_RacePositionNth_006c7550","type":"string","str":"RacePositionNth","readers":["0x4a00c0"],"writers":[]}
 {"kind":"global","addr":"0x6c7560","block":".rdata","label":"s_RacePositionNumber_006c7560","type":"string","str":"RacePositionNumber","readers":["0x4a00c0"],"writers":[]}
 {"kind":"global","addr":"0x6c7574","block":".rdata","label":"PTR_FUN_006c7574","type":"undefined *","str":"","readers":["0x49ef20","0x49efb0"],"writers":[]}
-{"kind":"global","addr":"0x6c7584","block":".rdata","label":"PTR_FUN_006c7584","type":"pointer","str":"","readers":["0x49e100","0x49e2d0"],"writers":[]}
-{"kind":"global","addr":"0x6c7588","block":".rdata","label":"PTR_FUN_006c7588","type":"undefined *","str":"","readers":["0x4961a0","0x496230"],"writers":[]}
+{"kind":"global","addr":"0x6c7584","block":".rdata","label":"PTR_cPostRaceScreenManager::_cPostRaceScreenManager_006c7584","type":"pointer","str":"","readers":["0x49e100","0x49e2d0"],"writers":[]}
+{"kind":"global","addr":"0x6c7588","block":".rdata","label":"PTR_PostRaceMenuScreen::_PostRaceMenuScreen_006c7588","type":"undefined *","str":"","readers":["0x4961a0","0x496230"],"writers":[]}
 {"kind":"global","addr":"0x6c7598","block":".rdata","label":"PTR_FUN_006c7598","type":"undefined *","str":"","readers":["0x49fa60","0x49fb20"],"writers":[]}
-{"kind":"global","addr":"0x6c75a8","block":".rdata","label":"PTR_FUN_006c75a8","type":"undefined *","str":"","readers":["0x49be50","0x49bee0"],"writers":[]}
-{"kind":"global","addr":"0x6c75b8","block":".rdata","label":"PTR_FUN_006c75b8","type":"undefined *","str":"","readers":["0x497c50","0x497e40"],"writers":[]}
+{"kind":"global","addr":"0x6c75a8","block":".rdata","label":"PTR_PostRaceStatsScreen::_PostRaceStatsScreen_006c75a8","type":"undefined *","str":"","readers":["0x49be50","0x49bee0"],"writers":[]}
+{"kind":"global","addr":"0x6c75b8","block":".rdata","label":"PTR_PostRaceResultsScreen::_PostRaceResultsScreen_006c75b8","type":"undefined *","str":"","readers":["0x497c50","0x497e40"],"writers":[]}
 {"kind":"global","addr":"0x6c75c8","block":".rdata","label":"PTR_FUN_006c75c8","type":"pointer","str":"","readers":["0x4960e0","0x49e2d0","0x49ed00"],"writers":[]}
 {"kind":"global","addr":"0x6c75cc","block":".rdata","label":"s_StyleRewardAnimator_006c75cc","type":"string","str":"StyleRewardAnimator","readers":["0x688480"],"writers":[]}
 {"kind":"global","addr":"0x6c75e0","block":".rdata","label":"s_Flashy_006c75e0","type":"string","str":"Flashy","readers":["0x49f120","0x49f2e0","0x49f7a0"],"writers":[]}

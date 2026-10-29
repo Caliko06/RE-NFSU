@@ -10815,10 +10815,10 @@ void __thiscall EAXS_3DMixer__Setup3DMix(int param_1,int param_2)
       *(int *)(param_1 + 0xbc) = param_2;
     }
     *(undefined4 *)(param_1 + 0xcc) = 0;
-    FUN_0052e540();
+    EAXS_3DMixer__UpdateDistToRef();
     if (*(int *)(*(int *)(param_1 + 0x204) + 0x188) == 1) {
       *(undefined4 *)(param_1 + 0x84) = 0xbf800000;
-      FUN_0052e540();
+      EAXS_3DMixer__UpdateDistToRef();
       if ((*(float *)(param_1 + 0x84) < *(float *)(param_1 + 0x80)) &&
          (0.0 <= *(float *)(param_1 + 0x84))) {
         *(undefined4 *)(param_1 + 0xcc) = 1;
@@ -10829,9 +10829,11 @@ void __thiscall EAXS_3DMixer__Setup3DMix(int param_1,int param_2)
 }
 
 
-// ==== 0x52e540 FUN_0052e540
+// ==== 0x52e540 EAXS_3DMixer::UpdateDistToRef
 
-void __fastcall FUN_0052e540(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXS_3DMixer__UpdateDistToRef(int param_1)
 
 {
   undefined4 uVar1;
@@ -10888,26 +10890,30 @@ void __fastcall FUN_0052e540(int param_1)
 }
 
 
-// ==== 0x52e680 FUN_0052e680
+// ==== 0x52e680 EAXS_3DMixer::UpdateAzimuthToRefs
 
-void FUN_0052e680(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void EAXS_3DMixer__UpdateAzimuthToRefs(void)
 
 {
   int in_EAX;
   
   if (*(int *)(*(int *)(in_EAX + 0x204) + 0x168 + *(int *)(in_EAX + 0xcc) * 4) != 0) {
-    FUN_0052e6d0(*(int *)(in_EAX + 0xcc));
+    EAXS_3DMixer__UpdateAzimuths(*(int *)(in_EAX + 0xcc));
   }
   if (*(int *)(*(int *)(in_EAX + 0x204) + 0x188) == 1) {
-    FUN_0052e6d0(*(int *)(in_EAX + 0xcc) - 1U & 1);
+    EAXS_3DMixer__UpdateAzimuths(*(int *)(in_EAX + 0xcc) - 1U & 1);
   }
   return;
 }
 
 
-// ==== 0x52e6d0 FUN_0052e6d0
+// ==== 0x52e6d0 EAXS_3DMixer::UpdateAzimuths
 
-void FUN_0052e6d0(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void EAXS_3DMixer__UpdateAzimuths(int param_1)
 
 {
   float fVar1;
@@ -10971,9 +10977,11 @@ void FUN_0052e6d0(int param_1)
 }
 
 
-// ==== 0x52e8c0 FUN_0052e8c0
+// ==== 0x52e8c0 EAXS_3DMixer::GenerateRotation
 
-short FUN_0052e8c0(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+short EAXS_3DMixer__GenerateRotation(void)
 
 {
   undefined4 uVar1;
@@ -11049,14 +11057,14 @@ int __thiscall EAXS_3DMixer__Update3DMix(int *param_1,int *param_2,int *param_3)
   (**(code **)(*param_1 + 0x14))(param_1[0x2f]);
   if (*(int *)(param_1[0x2f] + 0x14) != 4) {
     if ((param_1[0x81] != 0) && (*DAT_0073619c != 0)) {
-      FUN_0052e680();
+      EAXS_3DMixer__UpdateAzimuthToRefs();
       if (0.0 <= *(float *)(param_1[0x2f] + 100)) {
-        FUN_0052f030();
+        EAXS_3DMixer__GenerateDopplerFactor();
       }
-      FUN_0052f0c0();
-      FUN_0052ec60();
+      EAXS_3DMixer__SetAzimuth();
+      EAXS_3DMixer__GenerateDistanceRolloff();
       param_1[0x14] = param_1[0x2a] * param_1[0x15] >> 0xf;
-      FUN_0052e8c0();
+      EAXS_3DMixer__GenerateRotation();
       DAT_00735658 = 0;
       param_1[0x40] = param_1[0x38];
       param_1[0x41] = param_1[0x39];
@@ -11076,9 +11084,11 @@ int __thiscall EAXS_3DMixer__Update3DMix(int *param_1,int *param_2,int *param_3)
 }
 
 
-// ==== 0x52eb70 FUN_0052eb70
+// ==== 0x52eb70 EAXS_3DMixer::GenerateQuadrant
 
-void __fastcall FUN_0052eb70(ushort param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXS_3DMixer__GenerateQuadrant(ushort param_1)
 
 {
   int in_EAX;
@@ -11154,11 +11164,12 @@ float10 __fastcall EAXS_3DMixer__GetDistanceToRefObj(int param_1)
 }
 
 
-// ==== 0x52ec60 FUN_0052ec60
+// ==== 0x52ec60 EAXS_3DMixer::GenerateDistanceRolloff
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
 
-void __fastcall FUN_0052ec60(undefined4 param_1)
+void __fastcall EAXS_3DMixer__GenerateDistanceRolloff(undefined4 param_1)
 
 {
   float *pfVar1;
@@ -11178,7 +11189,7 @@ void __fastcall FUN_0052ec60(undefined4 param_1)
   float10 extraout_ST1;
   
   if ((*(int *)(unaff_ESI[0x2f] + 4) == 1) || (*(int *)(unaff_ESI[0x2f] + 4) == 2)) {
-    FUN_0052eb70(param_1);
+    EAXS_3DMixer__GenerateQuadrant(param_1);
   }
   iVar6 = unaff_ESI[0x33];
   if (*(int *)unaff_ESI[0x2f] < 2) {
@@ -11315,9 +11326,11 @@ LAB_0052ed77:
 }
 
 
-// ==== 0x52f030 FUN_0052f030
+// ==== 0x52f030 EAXS_3DMixer::GenerateDopplerFactor
 
-void __fastcall FUN_0052f030(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXS_3DMixer__GenerateDopplerFactor(int param_1)
 
 {
   int iVar1;
@@ -11346,11 +11359,12 @@ LAB_0052f054:
 }
 
 
-// ==== 0x52f0c0 FUN_0052f0c0
+// ==== 0x52f0c0 EAXS_3DMixer::SetAzimuth
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
 
-void FUN_0052f0c0(void)
+void EAXS_3DMixer__SetAzimuth(void)
 
 {
   ushort uVar1;
@@ -11408,9 +11422,11 @@ LAB_0052f271:
 }
 
 
-// ==== 0x52f2c0 FUN_0052f2c0
+// ==== 0x52f2c0 Csis_CreateImpactSmokableInstance
 
-void __fastcall FUN_0052f2c0(int param_1,int param_2,int param_3)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void __fastcall Csis_CreateImpactSmokableInstance(int param_1,int param_2,int param_3)
 
 {
   int *piVar1;
@@ -11464,9 +11480,11 @@ void __fastcall FUN_0052f2c0(int param_1,int param_2,int param_3)
 }
 
 
-// ==== 0x52f380 FUN_0052f380
+// ==== 0x52f380 Csis_CreateScrapeWorldInstance
 
-void __fastcall FUN_0052f380(int param_1,int param_2,int param_3)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void __fastcall Csis_CreateScrapeWorldInstance(int param_1,int param_2,int param_3)
 
 {
   int *piVar1;
@@ -11520,9 +11538,11 @@ void __fastcall FUN_0052f380(int param_1,int param_2,int param_3)
 }
 
 
-// ==== 0x52f440 FUN_0052f440
+// ==== 0x52f440 Csis_CreateScrapeSmokableInstance
 
-void __fastcall FUN_0052f440(int param_1,int param_2,int param_3)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void __fastcall Csis_CreateScrapeSmokableInstance(int param_1,int param_2,int param_3)
 
 {
   int *piVar1;
@@ -11594,38 +11614,44 @@ undefined4 FUN_0052f510(void)
 }
 
 
-// ==== 0x52f520 FUN_0052f520
+// ==== 0x52f520 stCarOnCarCollision::stCarOnCarCollision
 
-void FUN_0052f520(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void stCarOnCarCollision__stCarOnCarCollision(void)
 
 {
   undefined4 *in_EAX;
   
-  FUN_00530570();
+  stSoundCollision__stSoundCollision();
   in_EAX[0xd8] = 0;
   in_EAX[0xd9] = 0;
-  *in_EAX = &PTR_FUN_006be640;
+  *in_EAX = &PTR_stCarOnCarCollision__scalar_deleting_destructor_006be640;
   return;
 }
 
 
-// ==== 0x52f540 FUN_0052f540
+// ==== 0x52f540 stCarOnCarCollision::_stCarOnCarCollision
 
-void __fastcall FUN_0052f540(undefined4 *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stCarOnCarCollision___stCarOnCarCollision(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006be640;
-  FUN_005306a0();
+  *param_1 = &PTR_stCarOnCarCollision__scalar_deleting_destructor_006be640;
+  stSoundCollision___stSoundCollision();
   return;
 }
 
 
-// ==== 0x52f550 FUN_0052f550
+// ==== 0x52f550 stCarOnCarCollision::scalar_deleting_destructor
 
-void * __thiscall FUN_0052f550(void *param_1,byte param_2)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void * __thiscall stCarOnCarCollision__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_0052f540();
+  stCarOnCarCollision___stCarOnCarCollision();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11633,36 +11659,42 @@ void * __thiscall FUN_0052f550(void *param_1,byte param_2)
 }
 
 
-// ==== 0x52f570 FUN_0052f570
+// ==== 0x52f570 stWorldCollision::stWorldCollision
 
-void FUN_0052f570(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void stWorldCollision__stWorldCollision(void)
 
 {
   undefined4 *in_EAX;
   
-  FUN_00530570();
-  *in_EAX = &PTR_FUN_006be520;
+  stSoundCollision__stSoundCollision();
+  *in_EAX = &PTR_stWorldCollision__scalar_deleting_destructor_006be520;
   return;
 }
 
 
-// ==== 0x52f590 FUN_0052f590
+// ==== 0x52f590 stWorldCollision::_stWorldCollision
 
-void __fastcall FUN_0052f590(undefined4 *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stWorldCollision___stWorldCollision(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006be520;
-  FUN_005306a0();
+  *param_1 = &PTR_stWorldCollision__scalar_deleting_destructor_006be520;
+  stSoundCollision___stSoundCollision();
   return;
 }
 
 
-// ==== 0x52f5a0 FUN_0052f5a0
+// ==== 0x52f5a0 stWorldCollision::scalar_deleting_destructor
 
-void * __thiscall FUN_0052f5a0(void *param_1,byte param_2)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void * __thiscall stWorldCollision__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_0052f590();
+  stWorldCollision___stWorldCollision();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -11670,20 +11702,23 @@ void * __thiscall FUN_0052f5a0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x52f5c0 FUN_0052f5c0
+// ==== 0x52f5c0 GetSmokeableCategoryVolume
 
 /* WARNING: Switch with 1 destination removed at 0x0052f5c5 : 28 cases all go to same destination */
+/* [canon] audio low (ghidra-canon) docs/re/sound.md */
 
-undefined4 FUN_0052f5c0(void)
+undefined4 GetSmokeableCategoryVolume(void)
 
 {
   return 0x7fff;
 }
 
 
-// ==== 0x52f650 FUN_0052f650
+// ==== 0x52f650 GetCollisionObjectsDescription
 
-byte FUN_0052f650(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+byte GetCollisionObjectsDescription(void)
 
 {
   int iVar1;
@@ -11725,9 +11760,11 @@ byte FUN_0052f650(void)
 }
 
 
-// ==== 0x52f6f0 FUN_0052f6f0
+// ==== 0x52f6f0 GetCollisionSoundType
 
-undefined4 FUN_0052f6f0(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+undefined4 GetCollisionSoundType(void)
 
 {
   char cVar1;
@@ -11762,9 +11799,11 @@ undefined4 FUN_0052f6f0(void)
 }
 
 
-// ==== 0x52f750 FUN_0052f750
+// ==== 0x52f750 GetSmokaebleScrapeSndMapping
 
-undefined4 FUN_0052f750(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+undefined4 GetSmokaebleScrapeSndMapping(void)
 
 {
   undefined4 in_EAX;
@@ -11787,9 +11826,11 @@ undefined4 FUN_0052f750(void)
 }
 
 
-// ==== 0x52f7b0 FUN_0052f7b0
+// ==== 0x52f7b0 GetSmokaebleImpactSndMapping
 
-int FUN_0052f7b0(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+int GetSmokaebleImpactSndMapping(void)
 
 {
   undefined4 in_EAX;
@@ -11887,7 +11928,7 @@ void EAXCollision__EAXCollision(void)
   undefined4 *puVar1;
   undefined4 *unaff_ESI;
   
-  *unaff_ESI = &PTR_FUN_006be5a4;
+  *unaff_ESI = &PTR_EAXCollision__scalar_deleting_destructor_006be5a4;
   puVar1 = unaff_ESI + 1;
   *puVar1 = puVar1;
   unaff_ESI[2] = puVar1;
@@ -11906,14 +11947,16 @@ void EAXCollision__EAXCollision(void)
   unaff_ESI[0x11] = 0;
   unaff_ESI[0x12] = 0;
   unaff_ESI[3] = 0;
-  FUN_00530340(unaff_ESI);
+  EAXCollision__UpdateTweaker(unaff_ESI);
   return;
 }
 
 
-// ==== 0x52f990 FUN_0052f990
+// ==== 0x52f990 EAXCollision::scalar_deleting_destructor
 
-void * __thiscall FUN_0052f990(void *param_1,byte param_2)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void * __thiscall EAXCollision__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   EAXCollision___EAXCollision();
@@ -11941,7 +11984,7 @@ void __fastcall EAXCollision___EAXCollision(undefined4 *param_1)
   pvStack_c = ExceptionList;
   pcStack_8 = FUN_00686b7b;
   ExceptionList = &pvStack_c;
-  *param_1 = &PTR_FUN_006be5a4;
+  *param_1 = &PTR_EAXCollision__scalar_deleting_destructor_006be5a4;
   piVar1 = (int *)param_1[9];
   local_4 = 0;
   while (piVar1 != param_1 + 9) {
@@ -11961,9 +12004,11 @@ void __fastcall EAXCollision___EAXCollision(undefined4 *param_1)
 }
 
 
-// ==== 0x52fa30 FUN_0052fa30
+// ==== 0x52fa30 EAXCollision::UpdateMasterVolume
 
-void FUN_0052fa30(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void EAXCollision__UpdateMasterVolume(void)
 
 {
   int in_EAX;
@@ -11993,9 +12038,11 @@ LAB_0052fa46:
 }
 
 
-// ==== 0x52fa80 FUN_0052fa80
+// ==== 0x52fa80 EAXCollision::Destroy
 
-void __fastcall FUN_0052fa80(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXCollision__Destroy(int param_1)
 
 {
   int iVar1;
@@ -12038,9 +12085,11 @@ void __fastcall FUN_0052fa80(int param_1)
 }
 
 
-// ==== 0x52fb00 FUN_0052fb00
+// ==== 0x52fb00 EAXCollision::QueueImpactCollision
 
-void FUN_0052fb00(void)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+void EAXCollision__QueueImpactCollision(void)
 
 {
   undefined4 *puVar1;
@@ -12064,9 +12113,11 @@ void FUN_0052fb00(void)
 }
 
 
-// ==== 0x52fb30 FUN_0052fb30
+// ==== 0x52fb30 EAXCollision::IsInPList
 
-undefined4 FUN_0052fb30(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+undefined4 EAXCollision__IsInPList(void)
 
 {
   undefined4 *puVar1;
@@ -12087,12 +12138,13 @@ undefined4 FUN_0052fb30(void)
 }
 
 
-// ==== 0x52fb60 FUN_0052fb60
+// ==== 0x52fb60 EAXCollision::UpdateQueueImpact
 
 /* WARNING: Removing unreachable block (ram,0x0052ff63) */
 /* WARNING: Removing unreachable block (ram,0x0052ff68) */
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
 
-void FUN_0052fb60(int param_1)
+void EAXCollision__UpdateQueueImpact(int param_1)
 
 {
   undefined4 *puVar1;
@@ -12355,9 +12407,11 @@ LAB_0052fe78:
 }
 
 
-// ==== 0x52ff90 FUN_0052ff90
+// ==== 0x52ff90 EAXCollision::Update
 
-void __thiscall FUN_0052ff90(int param_1,undefined4 param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __thiscall EAXCollision__Update(int param_1,undefined4 param_2)
 
 {
   undefined4 *puVar1;
@@ -12367,7 +12421,7 @@ void __thiscall FUN_0052ff90(int param_1,undefined4 param_2)
   int *piVar5;
   int *piVar6;
   
-  FUN_0052fb60(param_1);
+  EAXCollision__UpdateQueueImpact(param_1);
   puVar1 = (undefined4 *)(param_1 + 0x24);
   if (*(int *)(param_1 + 0x24) == 0) {
     piVar5 = (int *)0x0;
@@ -12422,9 +12476,11 @@ void __thiscall FUN_0052ff90(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x530090 FUN_00530090
+// ==== 0x530090 EAXCollision::PlayScrape
 
-void __fastcall FUN_00530090(int param_1,int param_2)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXCollision__PlayScrape(int param_1,int param_2)
 
 {
   char cVar1;
@@ -12461,9 +12517,11 @@ LAB_005300ac:
 }
 
 
-// ==== 0x530100 FUN_00530100
+// ==== 0x530100 EAXCollision::CreatCollisionSample
 
-void __fastcall FUN_00530100(undefined4 param_1,int param_2,int param_3)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXCollision__CreatCollisionSample(undefined4 param_1,int param_2,int param_3)
 
 {
   int *piVar1;
@@ -12502,7 +12560,7 @@ void __fastcall FUN_00530100(undefined4 param_1,int param_2,int param_3)
       iVar3 = *(int *)(iVar3 + 0x210);
     }
   }
-  iVar3 = FUN_0052f6f0();
+  iVar3 = GetCollisionSoundType();
   if (iVar3 == 0) {
 LAB_00530189:
     pvVar4 = _malloc(0x360);
@@ -12511,7 +12569,7 @@ LAB_005301e5:
       piVar5 = (int *)0x0;
     }
     else {
-      piVar5 = (int *)FUN_0052f570();
+      piVar5 = (int *)stWorldCollision__stWorldCollision();
     }
   }
   else {
@@ -12532,7 +12590,7 @@ LAB_005301e5:
     }
     pvVar4 = _malloc(0x370);
     if (pvVar4 == (void *)0x0) goto LAB_005301e5;
-    piVar5 = (int *)FUN_0052f520();
+    piVar5 = (int *)stCarOnCarCollision__stCarOnCarCollision();
   }
   puVar7 = &DAT_006f47a0;
 LAB_005301ec:
@@ -12554,9 +12612,11 @@ LAB_005301ec:
 }
 
 
-// ==== 0x530240 FUN_00530240
+// ==== 0x530240 EAXCollision::StartCollisionSample
 
-void __fastcall FUN_00530240(undefined4 param_1,int param_2)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXCollision__StartCollisionSample(undefined4 param_1,int param_2)
 
 {
   int *piVar1;
@@ -12594,8 +12654,8 @@ LAB_00530270:
     if ((char)piVar4[0x86] == '\0') {
       (**(code **)(*piVar4 + 0x2c))(param_2);
     }
-    if ((*(char *)((int)piVar4 + 0x34e) == '\0') && (cVar2 = FUN_0052fb30(unaff_ESI), cVar2 == '\0')
-       ) {
+    if ((*(char *)((int)piVar4 + 0x34e) == '\0') &&
+       (cVar2 = EAXCollision__IsInPList(unaff_ESI), cVar2 == '\0')) {
       cVar2 = (**(code **)(*piVar4 + 0x44))();
       if (cVar2 == '\0') {
                     /* WARNING: Could not recover jumptable at 0x005302ec. Too many branches */
@@ -12603,16 +12663,18 @@ LAB_00530270:
         (**(code **)(*piVar4 + 0x4c))();
         return;
       }
-      FUN_0052fb00();
+      EAXCollision__QueueImpactCollision();
     }
   }
   return;
 }
 
 
-// ==== 0x5302f0 FUN_005302f0
+// ==== 0x5302f0 EAXCollision::ReleaseCollisionSample
 
-void __fastcall FUN_005302f0(undefined4 param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXCollision__ReleaseCollisionSample(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -12636,7 +12698,7 @@ void __fastcall FUN_005302f0(undefined4 param_1,int param_2)
       }
       if (iVar1 == iVar2) break;
       if (*(int *)(iVar1 + 0x21c) == unaff_ESI) {
-        FUN_005307e0();
+        stSoundCollision__SetUpCollisionEnding();
         return;
       }
       iVar1 = *(int *)(iVar1 + 0x210);
@@ -12646,7 +12708,7 @@ void __fastcall FUN_005302f0(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x530340 FUN_00530340
+// ==== 0x530340 EAXCollision::UpdateTweaker
 
 /* WARNING: Removing unreachable block (ram,0x005304d6) */
 /* WARNING: Removing unreachable block (ram,0x005303f8) */
@@ -12654,8 +12716,9 @@ void __fastcall FUN_005302f0(undefined4 param_1,int param_2)
 /* WARNING: Removing unreachable block (ram,0x00530467) */
 /* WARNING: Removing unreachable block (ram,0x00530547) */
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
 
-void FUN_00530340(void)
+void EAXCollision__UpdateTweaker(void)
 
 {
   _DAT_0073676c = 0;
@@ -12692,9 +12755,11 @@ void FUN_00530340(void)
 }
 
 
-// ==== 0x530570 FUN_00530570
+// ==== 0x530570 stSoundCollision::stSoundCollision
 
-void FUN_00530570(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void stSoundCollision__stSoundCollision(void)
 
 {
   undefined4 *puVar1;
@@ -12703,7 +12768,7 @@ void FUN_00530570(void)
   undefined4 *unaff_ESI;
   
   EAXS_3DMixer__EAXS_3DMixer();
-  *unaff_ESI = &PTR_FUN_006be5b8;
+  *unaff_ESI = &PTR_stSoundCollision__scalar_deleting_destructor_006be5b8;
   FUN_00532640();
   *(undefined1 *)(extraout_EDX + 0x78) = 1;
   *(undefined1 *)(unaff_ESI + 0xb4) = 4;
@@ -12747,12 +12812,14 @@ void FUN_00530570(void)
 }
 
 
-// ==== 0x530680 FUN_00530680
+// ==== 0x530680 stSoundCollision::scalar_deleting_destructor
 
-void * __thiscall FUN_00530680(void *param_1,byte param_2)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void * __thiscall stSoundCollision__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_005306a0();
+  stSoundCollision___stSoundCollision();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -12760,9 +12827,11 @@ void * __thiscall FUN_00530680(void *param_1,byte param_2)
 }
 
 
-// ==== 0x5306a0 FUN_005306a0
+// ==== 0x5306a0 stSoundCollision::_stSoundCollision
 
-void __fastcall FUN_005306a0(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision___stSoundCollision(int *param_1)
 
 {
   void *local_c;
@@ -12772,10 +12841,10 @@ void __fastcall FUN_005306a0(int *param_1)
   pcStack_8 = FUN_00684db6;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  *param_1 = (int)&PTR_FUN_006be5b8;
+  *param_1 = (int)&PTR_stSoundCollision__scalar_deleting_destructor_006be5b8;
   local_4 = 1;
   if (param_1[0xc9] != 0) {
-    FUN_00530e20();
+    stSoundCollision__CSISEndImpact();
     *(undefined1 *)((int)param_1 + 0x34e) = 0;
   }
   if (param_1[0xca] != 0) {
@@ -12833,9 +12902,11 @@ void stSoundCollision__AdjustVolume(void)
 }
 
 
-// ==== 0x5307e0 FUN_005307e0
+// ==== 0x5307e0 stSoundCollision::SetUpCollisionEnding
 
-void FUN_005307e0(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void stSoundCollision__SetUpCollisionEnding(void)
 
 {
   int in_EAX;
@@ -12854,9 +12925,11 @@ void FUN_005307e0(void)
 }
 
 
-// ==== 0x530840 FUN_00530840
+// ==== 0x530840 stSoundCollision::Initialize
 
-void __fastcall FUN_00530840(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__Initialize(int *param_1)
 
 {
   int iVar1;
@@ -12878,11 +12951,11 @@ void __fastcall FUN_00530840(int *param_1)
   param_1[0x8c] = *(int *)(iVar4 + 0x70);
   param_1[0x8d] = iVar3;
   param_1[0x8e] = iVar1;
-  iVar3 = FUN_0052f6f0();
+  iVar3 = GetCollisionSoundType();
   param_1[0xcf] = iVar3;
   iVar3 = (**(code **)(*param_1 + 0x60))();
   param_1[0xd0] = iVar3;
-  iVar3 = FUN_0052f650();
+  iVar3 = GetCollisionObjectsDescription();
   param_1[0xd1] = iVar3;
   fVar6 = (float10)FUN_00421400();
   param_1[0xc0] = (int)(float)fVar6;
@@ -12960,7 +13033,7 @@ void __thiscall stSoundCollision__UpdateQueue(int *param_1,undefined4 param_2)
         stSoundCollision__CalcCollisionPositionData();
       }
       else {
-        FUN_005307e0();
+        stSoundCollision__SetUpCollisionEnding();
       }
     }
     if (((DAT_006f1dd8 != 0) && (*(char *)((int)param_1 + 0x34e) != '\0')) && (param_1[0xc9] != 0))
@@ -12972,16 +13045,18 @@ void __thiscall stSoundCollision__UpdateQueue(int *param_1,undefined4 param_2)
     }
     stSoundCollision__UpdateScrapeParams(param_2);
     if (*(char *)((int)param_1 + 0x351) != '\0') {
-      FUN_00530b30(param_2);
+      stSoundCollision__UpdateCollisionEnding(param_2);
     }
   }
   return;
 }
 
 
-// ==== 0x530b30 FUN_00530b30
+// ==== 0x530b30 stSoundCollision::UpdateCollisionEnding
 
-void FUN_00530b30(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void stSoundCollision__UpdateCollisionEnding(void)
 
 {
   char cVar1;
@@ -13000,9 +13075,11 @@ void FUN_00530b30(void)
 }
 
 
-// ==== 0x530b80 FUN_00530b80
+// ==== 0x530b80 stSoundCollision::CSISBeginImpact
 
-void __fastcall FUN_00530b80(undefined4 *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__CSISBeginImpact(undefined4 *param_1)
 
 {
   undefined4 *puVar1;
@@ -13038,9 +13115,11 @@ void __fastcall FUN_00530b80(undefined4 *param_1)
 }
 
 
-// ==== 0x530c30 FUN_00530c30
+// ==== 0x530c30 stSoundCollision::CSISBeginScrape
 
-void __fastcall FUN_00530c30(undefined4 *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__CSISBeginScrape(undefined4 *param_1)
 
 {
   undefined4 *puVar1;
@@ -13066,7 +13145,7 @@ void __fastcall FUN_00530c30(undefined4 *param_1)
     }
     else {
       local_10 = puVar1;
-      uVar2 = FUN_0052f380(param_1[200]);
+      uVar2 = Csis_CreateScrapeWorldInstance(param_1[200]);
     }
     param_1[0xca] = uVar2;
     DAT_00735620 = DAT_00735620 + 1;
@@ -13076,9 +13155,11 @@ void __fastcall FUN_00530c30(undefined4 *param_1)
 }
 
 
-// ==== 0x530ce0 FUN_00530ce0
+// ==== 0x530ce0 stSoundCollision::CSISUpdateImpact
 
-void __fastcall FUN_00530ce0(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__CSISUpdateImpact(int param_1)
 
 {
   int *piVar1;
@@ -13126,9 +13207,11 @@ void __fastcall FUN_00530ce0(int param_1)
 }
 
 
-// ==== 0x530d80 FUN_00530d80
+// ==== 0x530d80 stSoundCollision::CSISUpdateScrape
 
-void __fastcall FUN_00530d80(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__CSISUpdateScrape(int param_1)
 
 {
   int *piVar1;
@@ -13176,9 +13259,11 @@ void __fastcall FUN_00530d80(int param_1)
 }
 
 
-// ==== 0x530e20 FUN_00530e20
+// ==== 0x530e20 stSoundCollision::CSISEndImpact
 
-void __fastcall FUN_00530e20(int *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__CSISEndImpact(int *param_1)
 
 {
   int *piVar1;
@@ -13253,9 +13338,11 @@ void __fastcall stSoundCollision__CalcCollisionPositionData(int param_1)
 }
 
 
-// ==== 0x530f80 FUN_00530f80
+// ==== 0x530f80 stSoundCollision::GenImpactIntensity
 
-void __fastcall FUN_00530f80(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__GenImpactIntensity(int param_1)
 
 {
   int iVar1;

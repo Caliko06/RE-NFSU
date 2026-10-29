@@ -2086,7 +2086,7 @@ int FUN_00494cb0(void)
   int unaff_EDI;
   
   uVar1 = FEng__HashName();
-  if (((((unaff_EDI != 0) && (iVar2 = FUN_004f65d0(), iVar2 != 0)) &&
+  if (((((unaff_EDI != 0) && (iVar2 = FEngFindPackage(), iVar2 != 0)) &&
        (iVar2 = FUN_004ffb70(), iVar2 != 0)) ||
       ((DAT_0073578c != 0 && (iVar2 = FUN_004ef050(uVar1), iVar2 != 0)))) &&
      (*(int *)(iVar2 + 0x18) == 1)) {
@@ -2239,7 +2239,7 @@ undefined4 * Screen_PreRaceStats__Screen_PreRaceStats(undefined4 *param_1,undefi
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
   *param_1 = &PTR_FUN_006c7a00;
-  iVar4 = FUN_004f65d0();
+  iVar4 = FEngFindPackage();
   if (iVar4 != 0) {
     *(undefined4 *)(iVar4 + 0x18) = 0;
   }
@@ -3089,7 +3089,7 @@ void FUN_00495f00(undefined4 param_1)
   undefined4 unaff_EDI;
   bool bVar3;
   
-  if (((in_EAX == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if (((in_EAX == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
      (iVar2 = FUN_004ffb70(), iVar2 == 0)) {
     if (DAT_0073578c == 0) {
       return;
@@ -3121,7 +3121,7 @@ void FUN_00495f70(void)
   undefined4 unaff_EDI;
   
   if (unaff_ESI != 0) {
-    iVar1 = FUN_004f65d0();
+    iVar1 = FEngFindPackage();
     if (iVar1 != 0) {
       iVar1 = FUN_004ffb70();
       if (iVar1 != 0) goto LAB_00495faa;
@@ -3150,7 +3150,7 @@ void FUN_00495fc0(void)
   undefined4 unaff_EDI;
   
   if (unaff_ESI != 0) {
-    iVar1 = FUN_004f65d0();
+    iVar1 = FEngFindPackage();
     if (iVar1 != 0) {
       iVar1 = FUN_004ffb70();
       if (iVar1 != 0) goto LAB_00495ffa;
@@ -3324,7 +3324,7 @@ undefined4 * Screen_PostRaceMenu__Screen_PostRaceMenu(undefined4 *param_1,undefi
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c7588;
+  *param_1 = &PTR_PostRaceMenuScreen___PostRaceMenuScreen_006c7588;
   *(undefined1 *)(param_1 + 0x10) = 0;
   *(undefined1 *)((int)param_1 + 0x41) = 0;
   *(undefined1 *)((int)param_1 + 0x42) = 0;
@@ -3334,18 +3334,20 @@ undefined4 * Screen_PostRaceMenu__Screen_PostRaceMenu(undefined4 *param_1,undefi
   *(undefined1 *)((int)param_1 + 0x46) = 0;
   *(undefined1 *)((int)param_1 + 0x47) = 0;
   *(undefined1 *)(param_1 + 0x12) = 0;
-  FUN_00496240(param_1);
+  PostRaceMenuScreen__Setup(param_1);
   ExceptionList = local_c;
   return param_1;
 }
 
 
-// ==== 0x496210 FUN_00496210
+// ==== 0x496210 PostRaceMenuScreen::_PostRaceMenuScreen
 
-void * __thiscall FUN_00496210(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall PostRaceMenuScreen___PostRaceMenuScreen(void *param_1,byte param_2)
 
 {
-  FUN_00496230();
+  PostRaceMenuScreen___PostRaceMenuScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -3353,20 +3355,24 @@ void * __thiscall FUN_00496210(void *param_1,byte param_2)
 }
 
 
-// ==== 0x496230 FUN_00496230
+// ==== 0x496230 PostRaceMenuScreen::_PostRaceMenuScreen
 
-void __fastcall FUN_00496230(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall PostRaceMenuScreen___PostRaceMenuScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c7588;
+  *param_1 = &PTR_PostRaceMenuScreen___PostRaceMenuScreen_006c7588;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x496240 FUN_00496240
+// ==== 0x496240 PostRaceMenuScreen::Setup
 
-void FUN_00496240(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceMenuScreen__Setup(int param_1)
 
 {
   byte *pbVar1;
@@ -3531,7 +3537,7 @@ LAB_0049646b:
     uVar9 = 0x2e4350c6;
     if (DAT_00777ccc == (int *)0x0) {
 LAB_00496658:
-      local_68 = FUN_00497110;
+      local_68 = PostRaceMenuScreen__RestartRace;
       local_58 = (code *)0x0;
       local_a8 = 3;
       local_9c = 0x80833fc2;
@@ -3550,24 +3556,24 @@ LAB_00496658:
       if (piVar6[0x1629] != 1) goto LAB_00496658;
       if (((piVar6 != (int *)0x0) && (cVar3 = (**(code **)(*piVar6 + 4))(), cVar3 != '\0')) &&
          ((DAT_00777ccc == (int *)0x0 || (cVar3 = FUN_005a2ba0(), cVar3 != '\0')))) {
-        local_68 = FUN_00497180;
-        local_58 = FUN_00497110;
+        local_68 = PostRaceMenuScreen__RestartEvent;
+        local_58 = PostRaceMenuScreen__RestartRace;
         local_a8 = 5;
         local_a4 = 0x5fca71b2;
         local_9c = 0x1269c0d9;
         local_98 = 0x4888e03e;
         local_94 = 0x1c8dfaf9;
         local_4c = 0;
-        local_48[0] = FUN_004971f0;
+        local_48[0] = PostRaceMenuScreen__ContinueEvent;
         local_48[3] = (code *)0x0;
         goto LAB_004966e7;
       }
       local_4c = 0;
-      local_68 = FUN_00497180;
+      local_68 = PostRaceMenuScreen__RestartEvent;
       local_a8 = 4;
       local_9c = 0x1269c0d9;
       local_98 = 0x4888e03e;
-      local_58 = FUN_00497110;
+      local_58 = PostRaceMenuScreen__RestartRace;
       local_a4 = uVar9;
     }
     local_48[0] = (code *)0x0;
@@ -3586,7 +3592,7 @@ LAB_004966e7:
     local_7c = 0;
     local_80 = 0;
     local_84 = 0;
-    local_88 = FUN_00496e00;
+    local_88 = PostRaceMenuScreen__Quit;
     local_8c = 0;
     local_a0 = 0x3b7f8ae;
     local_48[4] = (code *)0x0;
@@ -3595,12 +3601,12 @@ LAB_004966e7:
     local_48[5] = (code *)0x0;
     local_48[6] = (code *)0x0;
     local_48[7] = (code *)0x0;
-    FUN_004969e0(param_1,&local_a8);
+    PostRaceMenuScreen__Setup(param_1,&local_a8);
     return;
   case 2:
   case 4:
     if ((DAT_00777ccc == (int *)0x0) || (DAT_00777ccc[0x1629] != 1)) {
-      local_68 = FUN_00497110;
+      local_68 = PostRaceMenuScreen__RestartRace;
       local_58 = (code *)0x0;
       local_a8 = 3;
       local_9c = 0x80833fc2;
@@ -3616,22 +3622,22 @@ LAB_00496896:
       if ((DAT_00777ccc == (int *)0x0) ||
          (cVar3 = (**(code **)(*DAT_00777ccc + 4))(), cVar3 == '\0')) {
         local_4c = 0;
-        local_68 = FUN_00497180;
+        local_68 = PostRaceMenuScreen__RestartEvent;
         local_a8 = 4;
         local_9c = 0x1269c0d9;
         local_98 = 0x4888e03e;
-        local_58 = FUN_00497110;
+        local_58 = PostRaceMenuScreen__RestartRace;
         goto LAB_00496896;
       }
-      local_68 = FUN_00497180;
+      local_68 = PostRaceMenuScreen__RestartEvent;
       local_4c = 0;
-      local_58 = FUN_00497110;
+      local_58 = PostRaceMenuScreen__RestartRace;
       local_a8 = 5;
       local_a4 = 0x5fca71b2;
       local_9c = 0x1269c0d9;
       local_98 = 0x4888e03e;
       local_94 = 0x1c8dfaf9;
-      local_48[0] = FUN_004971f0;
+      local_48[0] = PostRaceMenuScreen__ContinueEvent;
       local_48[3] = (code *)0x0;
     }
     local_48[2] = (code *)0x0;
@@ -3671,18 +3677,20 @@ LAB_00496896:
   local_7c = 0;
   local_80 = 0;
   local_84 = 0;
-  local_88 = FUN_00496e00;
+  local_88 = PostRaceMenuScreen__Quit;
   local_8c = 0;
   local_a0 = 0x3b7f8ae;
-  FUN_004969e0(param_1,&local_a8);
+  PostRaceMenuScreen__Setup(param_1,&local_a8);
 switchD_004964d3_caseD_3:
   return;
 }
 
 
-// ==== 0x4969e0 FUN_004969e0
+// ==== 0x4969e0 PostRaceMenuScreen::Setup
 
-void FUN_004969e0(int param_1,int *param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceMenuScreen__Setup(int param_1,int *param_2)
 
 {
   byte *pbVar1;
@@ -3859,7 +3867,7 @@ LAB_00496c37:
       bVar4 = pcVar8[1];
       pcVar8 = pcVar8 + 1;
     } while (bVar4 != 0);
-    if (((*(int *)(param_1 + 0xc) == 0) || (iVar5 = FUN_004f65d0(), iVar5 == 0)) ||
+    if (((*(int *)(param_1 + 0xc) == 0) || (iVar5 = FEngFindPackage(), iVar5 == 0)) ||
        (iVar5 = FUN_004ffb70(), iVar5 == 0)) {
       if (DAT_0073578c == 0) goto LAB_00496ddd;
       iVar5 = FUN_004ef050(iVar11);
@@ -3902,9 +3910,11 @@ LAB_00496ddd:
 }
 
 
-// ==== 0x496e00 FUN_00496e00
+// ==== 0x496e00 PostRaceMenuScreen::Quit
 
-void __fastcall FUN_00496e00(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall PostRaceMenuScreen__Quit(int param_1)
 
 {
   int iVar1;
@@ -3960,9 +3970,11 @@ LAB_00496ea9:
 }
 
 
-// ==== 0x496f00 FUN_00496f00
+// ==== 0x496f00 PostRaceMenuScreen::DoQuitRace
 
-void FUN_00496f00(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceMenuScreen__DoQuitRace(void)
 
 {
   char cVar1;
@@ -4032,9 +4044,11 @@ LAB_00496f5d:
 }
 
 
-// ==== 0x4970f0 FUN_004970f0
+// ==== 0x4970f0 PostRaceMenuScreen::EnterFrontendAfterQuit
 
-void FUN_004970f0(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void PostRaceMenuScreen__EnterFrontendAfterQuit(void)
 
 {
   DAT_00735ed4 = 0;
@@ -4043,9 +4057,11 @@ void FUN_004970f0(void)
 }
 
 
-// ==== 0x497110 FUN_00497110
+// ==== 0x497110 PostRaceMenuScreen::RestartRace
 
-void __fastcall FUN_00497110(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall PostRaceMenuScreen__RestartRace(int param_1)
 
 {
   undefined4 uStack_24;
@@ -4074,9 +4090,11 @@ void __fastcall FUN_00497110(int param_1)
 }
 
 
-// ==== 0x497180 FUN_00497180
+// ==== 0x497180 PostRaceMenuScreen::RestartEvent
 
-void __fastcall FUN_00497180(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall PostRaceMenuScreen__RestartEvent(int param_1)
 
 {
   undefined4 uStack_24;
@@ -4105,9 +4123,11 @@ void __fastcall FUN_00497180(int param_1)
 }
 
 
-// ==== 0x4971f0 FUN_004971f0
+// ==== 0x4971f0 PostRaceMenuScreen::ContinueEvent
 
-void __fastcall FUN_004971f0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall PostRaceMenuScreen__ContinueEvent(int param_1)
 
 {
   undefined4 uStack_24;
@@ -4136,9 +4156,11 @@ void __fastcall FUN_004971f0(int param_1)
 }
 
 
-// ==== 0x497260 FUN_00497260
+// ==== 0x497260 PostRaceMenuScreen::DoRestartRace
 
-void FUN_00497260(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceMenuScreen__DoRestartRace(void)
 
 {
   int iVar1;
@@ -4191,9 +4213,11 @@ LAB_004972dd:
 }
 
 
-// ==== 0x4973d0 FUN_004973d0
+// ==== 0x4973d0 PostRaceMenuScreen::DoRestartEvent
 
-void FUN_004973d0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceMenuScreen__DoRestartEvent(void)
 
 {
   DAT_00735ed4 = 0;
@@ -4207,9 +4231,11 @@ void FUN_004973d0(void)
 }
 
 
-// ==== 0x497410 FUN_00497410
+// ==== 0x497410 PostRaceMenuScreen::DoNextRaceInEvent
 
-void FUN_00497410(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceMenuScreen__DoNextRaceInEvent(void)
 
 {
   int iVar1;
@@ -4283,9 +4309,13 @@ undefined4 PostRaceResults__NextScreenIsNotGiveth(void)
 }
 
 
-// ==== 0x4975c0 FUN_004975c0
+// ==== 0x4975c0 PostRaceMenuScreen::NotificationMessage
 
-void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 param_4,int param_5)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall
+PostRaceMenuScreen__NotificationMessage
+          (int param_1,uint param_2,int param_3,undefined4 param_4,int param_5)
 
 {
   char cVar1;
@@ -4306,7 +4336,7 @@ void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 par
     }
     if (param_2 == 0x12347780) {
       DAT_006fb988 = 1;
-      FUN_004f6430("DemoDisc_Marketing.fng");
+      FEngQueuePackagePop("DemoDisc_Marketing.fng");
       DAT_00735ed4 = 0;
       FUN_00421c00(DAT_007361f0,10,0);
       return;
@@ -4345,7 +4375,7 @@ void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 par
       else if (param_2 == 0x35f8620b) {
         bSPrintf_regdst(0x20,"Button%d",*(undefined4 *)(param_1 + 0x4c));
         FEng__HashName();
-        FUN_004f64b0(*(undefined4 *)(param_1 + 0xc));
+        FEngSetCurrentButton(*(undefined4 *)(param_1 + 0xc));
         return;
       }
     }
@@ -4359,13 +4389,13 @@ void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 par
   }
   else if (param_2 == 0xc98356ba) {
     if (((*(char *)(param_1 + 0x40) == '\0') || (*(char *)(param_1 + 0x42) != '\0')) &&
-       (cVar1 = FUN_004f6650(), cVar1 == '\0')) {
+       (cVar1 = FEngIsPackagePushed(), cVar1 == '\0')) {
       FEManager__PushPackageChecked(0x32,0);
     }
     iVar2 = FEPackageList__FindByName(&DAT_00746104);
     if (((iVar2 == 0) || (*(int *)(iVar2 + 0x18) == 0)) &&
-       ((cVar1 = FUN_004f6650(), cVar1 == '\0' &&
-        ((cVar1 = FUN_004f6650(), cVar1 == '\0' && (*(int *)(param_5 + 0x1c) == 0)))))) {
+       ((cVar1 = FEngIsPackagePushed(), cVar1 == '\0' &&
+        ((cVar1 = FEngIsPackagePushed(), cVar1 == '\0' && (*(int *)(param_5 + 0x1c) == 0)))))) {
       *(undefined4 *)(param_5 + 0x1c) = 0xff;
     }
     if (*(char *)(param_1 + 0x42) == '\0') {
@@ -4377,7 +4407,7 @@ void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 par
                 if (*(char *)(param_1 + 0x47) == '\0') goto LAB_0049798c;
                 cVar1 = FUN_004f6c80("FadeOut");
                 if (cVar1 == '\0') {
-                  FUN_0049e040();
+                  cPostRaceScreenManager__ChangeToPrevScreen();
                   return;
                 }
               }
@@ -4386,7 +4416,7 @@ void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 par
               if (*(char *)(param_1 + 0x47) == '\0') goto LAB_0049798c;
               cVar1 = FUN_004f6c80("FadeOut");
               if (cVar1 == '\0') {
-                FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
+                FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
                 return;
               }
             }
@@ -4395,7 +4425,7 @@ void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 par
             if (*(char *)(param_1 + 0x47) == '\0') goto LAB_0049798c;
             cVar1 = FUN_004f6c80("FadeOut");
             if (cVar1 == '\0') {
-              FUN_004973d0(param_1);
+              PostRaceMenuScreen__DoRestartEvent(param_1);
               return;
             }
           }
@@ -4404,7 +4434,7 @@ void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 par
           if (*(char *)(param_1 + 0x47) == '\0') goto LAB_0049798c;
           cVar1 = FUN_004f6c80("FadeOut");
           if (cVar1 == '\0') {
-            FUN_00497410(param_1);
+            PostRaceMenuScreen__DoNextRaceInEvent(param_1);
             return;
           }
         }
@@ -4413,7 +4443,7 @@ void __thiscall FUN_004975c0(int param_1,uint param_2,int param_3,undefined4 par
         if (*(char *)(param_1 + 0x47) == '\0') goto LAB_0049798c;
         cVar1 = FUN_004f6c80("FadeOut");
         if (cVar1 == '\0') {
-          FUN_00497260(param_1);
+          PostRaceMenuScreen__DoRestartRace(param_1);
           return;
         }
       }
@@ -4430,13 +4460,13 @@ LAB_0049798c:
         *(undefined1 *)(param_1 + 0x42) = 0;
         *(undefined1 *)(param_1 + 0x40) = 1;
         if (*(char *)(param_1 + 0x48) == '\0') {
-          FUN_00496f00(param_1);
+          PostRaceMenuScreen__DoQuitRace(param_1);
           *(undefined1 *)(param_1 + 0x48) = 1;
         }
         cVar1 = PostRaceResults__NextScreenIsNotGiveth();
         if (cVar1 == '\0') {
           *(undefined1 *)(param_1 + 0x40) = 0;
-          FUN_004970f0(param_1);
+          PostRaceMenuScreen__EnterFrontendAfterQuit(param_1);
           return;
         }
         FUN_004c96f0(0x12347770,2);
@@ -4452,9 +4482,11 @@ LAB_0049798c:
 }
 
 
-// ==== 0x497a00 FUN_00497a00
+// ==== 0x497a00 PostRaceStatsScreen::SetupRepWonLoss
 
-void __fastcall FUN_00497a00(int param_1)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall PostRaceStatsScreen__SetupRepWonLoss(int param_1)
 
 {
   undefined4 *puVar1;
@@ -4467,14 +4499,14 @@ void __fastcall FUN_00497a00(int param_1)
   bool bVar7;
   
   uVar3 = FEng__HashName();
-  if (((((param_1 == 0) || (iVar4 = FUN_004f65d0(), iVar4 == 0)) ||
+  if (((((param_1 == 0) || (iVar4 = FEngFindPackage(), iVar4 == 0)) ||
        (iVar4 = FUN_004ffb70(), iVar4 == 0)) &&
       ((DAT_0073578c == 0 || (iVar4 = FUN_004ef050(uVar3), iVar4 == 0)))) ||
      (*(int *)(iVar4 + 0x18) != 2)) {
     iVar4 = 0;
   }
   uVar3 = FEng__HashName();
-  if (((((param_1 == 0) || (iVar5 = FUN_004f65d0(), iVar5 == 0)) ||
+  if (((((param_1 == 0) || (iVar5 = FEngFindPackage(), iVar5 == 0)) ||
        (iVar5 = FUN_004ffb70(), iVar5 == 0)) &&
       ((DAT_0073578c == 0 || (iVar5 = FUN_004ef050(uVar3), iVar5 == 0)))) ||
      (*(int *)(iVar5 + 0x18) != 2)) {
@@ -4600,7 +4632,7 @@ undefined4 * Screen_PostRaceResults__Screen_PostRaceResults(undefined4 *param_1,
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c75b8;
+  *param_1 = &PTR_PostRaceResultsScreen___PostRaceResultsScreen_006c75b8;
   *(undefined1 *)((int)param_1 + 0x42) = 0;
   cVar2 = FUN_0043a2e0();
   if (cVar2 == '\0') {
@@ -4610,10 +4642,10 @@ undefined4 * Screen_PostRaceResults__Screen_PostRaceResults(undefined4 *param_1,
     iVar3 = DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320;
   }
   if ((DAT_0078a345 == '\0') && (DAT_007361a4 == 0)) {
-    FUN_00497eb0(param_1,4);
+    PostRaceResultsScreen__SetupRacers(param_1,4);
   }
   else {
-    FUN_00498d90(param_1,4,iVar3);
+    PostRaceResultsScreen__SetupRacers(param_1,4,iVar3);
   }
   piVar1 = DAT_00777ccc;
   if (DAT_00777b4c == 1) {
@@ -4631,10 +4663,10 @@ joined_r0x00497d69:
           iVar3 = DAT_0078a32c + DAT_0078a328 + DAT_0078a324 + DAT_0078a320;
         }
         if (DAT_00735ed4 == '\x01') {
-          FUN_0049ab60(param_1,4,iVar3,piVar1);
+          PostRaceResultsScreen__SetupTourneyPoints(param_1,4,iVar3,piVar1);
         }
         else if (DAT_00735ed4 == '\x02') {
-          FUN_0049af90(param_1,4,iVar3,piVar1);
+          PostRaceResultsScreen__SetupTourneyPoints(param_1,4,iVar3,piVar1);
         }
         goto LAB_00497df5;
       }
@@ -4642,10 +4674,11 @@ joined_r0x00497d69:
   }
   else if (DAT_00777cc8 == 4) goto joined_r0x00497d69;
   if ((DAT_0078a345 == '\0') && (DAT_007361a4 == 0)) {
-    FUN_00499aa0(param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320);
+    PostRaceResultsScreen__SetupRaceTimes
+              (param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320);
   }
   else {
-    FUN_0049a3e0(param_1,4,iVar3);
+    PostRaceResultsScreen__SetupRaceTimes(param_1,4,iVar3);
   }
 LAB_00497df5:
   *(undefined1 *)(param_1 + 0x10) = 0;
@@ -4655,12 +4688,14 @@ LAB_00497df5:
 }
 
 
-// ==== 0x497e20 FUN_00497e20
+// ==== 0x497e20 PostRaceResultsScreen::_PostRaceResultsScreen
 
-void * __thiscall FUN_00497e20(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall PostRaceResultsScreen___PostRaceResultsScreen(void *param_1,byte param_2)
 
 {
-  FUN_00497e40(param_1);
+  PostRaceResultsScreen___PostRaceResultsScreen(param_1);
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -4668,9 +4703,11 @@ void * __thiscall FUN_00497e20(void *param_1,byte param_2)
 }
 
 
-// ==== 0x497e40 FUN_00497e40
+// ==== 0x497e40 PostRaceResultsScreen::_PostRaceResultsScreen
 
-void FUN_00497e40(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceResultsScreen___PostRaceResultsScreen(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -4681,7 +4718,7 @@ void FUN_00497e40(undefined4 *param_1)
   pcStack_8 = __CxxFrameHandler_wrapper;
   pvStack_c = ExceptionList;
   ExceptionList = &pvStack_c;
-  *param_1 = &PTR_FUN_006c75b8;
+  *param_1 = &PTR_PostRaceResultsScreen___PostRaceResultsScreen_006c75b8;
   local_4 = 0;
   if ((*(int *)(DAT_007356a8 + 0x104) != 0) &&
      (piVar1 = *(int **)(*(int *)(DAT_007356a8 + 0x104) + 0x24), piVar1 != (int *)0x0)) {
@@ -4694,9 +4731,11 @@ void FUN_00497e40(undefined4 *param_1)
 }
 
 
-// ==== 0x497eb0 FUN_00497eb0
+// ==== 0x497eb0 PostRaceResultsScreen::SetupRacers
 
-void FUN_00497eb0(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceResultsScreen__SetupRacers(int param_1,int param_2)
 
 {
   byte *pbVar1;
@@ -4750,7 +4789,7 @@ LAB_00497f20:
       iVar9 = *(int *)(iVar11 + 0x14);
       local_78 = iVar11;
       bSPrintf_regdst(0x20,"Pos%d",local_a4);
-      FUN_004f67f0(&PTR_FUN_006c7968,*local_a8);
+      FEngPrintf(&PTR_FUN_006c7968,*local_a8);
       bSPrintf_regdst(0x20,"Name%d",local_a4);
       if ((*(int *)(*(int *)(iVar11 + 0x14) + 4) == 1) &&
          (*(char *)(*(int *)(iVar11 + 0x14) + 0x734) == '\0')) {
@@ -4773,7 +4812,7 @@ LAB_00497f20:
           iVar11 = iVar11 + 0x19;
         }
       }
-      FUN_004f67f0(&DAT_006cc568,iVar11);
+      FEngPrintf(&DAT_006cc568,iVar11);
       bSPrintf_regdst(0x20,"Rep_%d",local_a4);
       if ((DAT_00777b4c == 1) && (*(int *)(iVar9 + 4) == 1)) {
         iVar9 = -1;
@@ -4788,7 +4827,7 @@ LAB_00497f20:
           pbVar10 = pbVar10 + 1;
           bVar4 = *pbVar1;
         }
-        if (((*(int *)(param_1 + 0xc) == 0) || (iVar11 = FUN_004f65d0(), iVar11 == 0)) ||
+        if (((*(int *)(param_1 + 0xc) == 0) || (iVar11 = FEngFindPackage(), iVar11 == 0)) ||
            (iVar11 = FUN_004ffb70(), iVar11 == 0)) {
           if (DAT_0073578c != 0) {
             uVar6 = FUN_004ef050(iVar9);
@@ -4812,7 +4851,7 @@ LAB_00497f20:
           pbVar10 = pbVar10 + 1;
           bVar4 = *pbVar1;
         }
-        if (((*(int *)(param_1 + 0xc) == 0) || (iVar11 = FUN_004f65d0(), iVar11 == 0)) ||
+        if (((*(int *)(param_1 + 0xc) == 0) || (iVar11 = FEngFindPackage(), iVar11 == 0)) ||
            (iVar11 = FUN_004ffb70(), iVar11 == 0)) {
           if (DAT_0073578c == 0) {
             iVar11 = 0;
@@ -5432,9 +5471,11 @@ LAB_00498d22:
 }
 
 
-// ==== 0x498d90 FUN_00498d90
+// ==== 0x498d90 PostRaceResultsScreen::SetupRacers
 
-void FUN_00498d90(int param_1,int param_2,int param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceResultsScreen__SetupRacers(int param_1,int param_2,int param_3)
 
 {
   byte *pbVar1;
@@ -5461,7 +5502,7 @@ void FUN_00498d90(int param_1,int param_2,int param_3)
     iVar11 = 0;
     do {
       bSPrintf_regdst(0x20,"Pos%d",iVar12);
-      FUN_004f67f0(&PTR_FUN_006c7968,iVar12);
+      FEngPrintf(&PTR_FUN_006c7968,iVar12);
       local_64 = 0;
       cVar2 = FUN_0043a2e0();
       if (cVar2 == '\0') {
@@ -5503,7 +5544,7 @@ LAB_00498e18:
         }
       }
       bSPrintf_regdst(0x20,"Name%d",iVar12);
-      FUN_004f67f0(&DAT_006cc568,local_64);
+      FEngPrintf(&DAT_006cc568,local_64);
       bSPrintf_regdst(0x20,"CarModel_%d",iVar12);
       uVar6 = GetCarModelNameHash();
       FUN_00416bb0(uVar6);
@@ -6100,9 +6141,11 @@ LAB_00499a5a:
 }
 
 
-// ==== 0x499aa0 FUN_00499aa0
+// ==== 0x499aa0 PostRaceResultsScreen::SetupRaceTimes
 
-void FUN_00499aa0(int param_1,undefined4 param_2,int param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceResultsScreen__SetupRaceTimes(int param_1,undefined4 param_2,int param_3)
 
 {
   byte *pbVar1;
@@ -6470,7 +6513,7 @@ LAB_0049a0a3:
           pbVar7 = pbVar7 + 1;
           bVar4 = *pbVar1;
         }
-        if (((*(int *)(param_1 + 0xc) == 0) || (iVar6 = FUN_004f65d0(), iVar6 == 0)) ||
+        if (((*(int *)(param_1 + 0xc) == 0) || (iVar6 = FEngFindPackage(), iVar6 == 0)) ||
            (iVar6 = FUN_004ffb70(), iVar6 == 0)) {
           if (DAT_0073578c == 0) {
             iVar6 = 0;
@@ -6495,7 +6538,7 @@ LAB_0049a0a3:
           pbVar7 = pbVar7 + 1;
           bVar4 = *pbVar1;
         }
-        if (((((*(int *)(param_1 + 0xc) != 0) && (iVar6 = FUN_004f65d0(), iVar6 != 0)) &&
+        if (((((*(int *)(param_1 + 0xc) != 0) && (iVar6 = FEngFindPackage(), iVar6 != 0)) &&
              (iVar6 = FUN_004ffb70(), iVar6 != 0)) ||
             ((DAT_0073578c != 0 && (iVar6 = FUN_004ef050(iVar10), iVar6 != 0)))) &&
            (*(uint *)(iVar6 + 0x1c) = *(uint *)(iVar6 + 0x1c) & 0xfffffffe | 0x400000,
@@ -6510,7 +6553,7 @@ LAB_0049a0a3:
             } while (iVar10 != 0);
           }
         }
-        FUN_004f67f0(local_20);
+        FEngPrintf(local_20);
       }
       if (local_50 == 0) {
         pcVar11 = "Time%d";
@@ -6524,7 +6567,7 @@ LAB_0049a0a3:
       if ((&DAT_00777cd8)[local_50 * 0x57] == 1) {
         if (local_50 == 0) {
           FUN_00586580(local_20);
-          FUN_004f67f0(&DAT_006cc568,local_20);
+          FEngPrintf(&DAT_006cc568,local_20);
         }
         else {
           if ((float)(iVar9 - iVar3) * 0.00025 < 0.0) {
@@ -6532,7 +6575,7 @@ LAB_0049a0a3:
             goto LAB_0049a386;
           }
           FUN_00586580(local_20);
-          FUN_004f67f0(&DAT_006cc568,local_20);
+          FEngPrintf(&DAT_006cc568,local_20);
         }
       }
       else {
@@ -6565,9 +6608,11 @@ LAB_0049a386:
 }
 
 
-// ==== 0x49a3e0 FUN_0049a3e0
+// ==== 0x49a3e0 PostRaceResultsScreen::SetupRaceTimes
 
-void FUN_0049a3e0(int param_1,undefined4 param_2,int param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceResultsScreen__SetupRaceTimes(int param_1,undefined4 param_2,int param_3)
 
 {
   byte *pbVar1;
@@ -6913,9 +6958,9 @@ LAB_0049a9c3:
 LAB_0049aadd:
         bSPrintf_regdst(0x20,"Time%d",iVar7);
         uVar11 = _ftol_nocw();
-        FUN_004f67f0(&DAT_006ca778,uVar11);
+        FEngPrintf(&DAT_006ca778,uVar11);
         bSPrintf_regdst(0x20,"Lead%d",iVar7);
-        FUN_004f67f0(&DAT_006ca778,uVar11);
+        FEngPrintf(&DAT_006ca778,uVar11);
       }
       else {
         if ((&DAT_00777cd8)[local_2c * 0x57] == 9) {
@@ -6937,9 +6982,11 @@ LAB_0049aadd:
 }
 
 
-// ==== 0x49ab60 FUN_0049ab60
+// ==== 0x49ab60 PostRaceResultsScreen::SetupTourneyPoints
 
-void FUN_0049ab60(int param_1,int param_2,int param_3,int param_4)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceResultsScreen__SetupTourneyPoints(int param_1,int param_2,int param_3,int param_4)
 
 {
   byte *pbVar1;
@@ -6979,7 +7026,7 @@ void FUN_0049ab60(int param_1,int param_2,int param_3,int param_4)
         pbVar6 = pbVar6 + 1;
         bVar3 = *pbVar1;
       }
-      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FUN_004f65d0(), iVar4 == 0)) ||
+      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FEngFindPackage(), iVar4 == 0)) ||
          (iVar4 = FUN_004ffb70(), iVar4 == 0)) {
         if (DAT_0073578c == 0) {
           iVar4 = 0;
@@ -7002,7 +7049,7 @@ void FUN_0049ab60(int param_1,int param_2,int param_3,int param_4)
         pbVar6 = pbVar6 + 1;
         bVar3 = *pbVar1;
       }
-      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FUN_004f65d0(), iVar4 == 0)) ||
+      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FEngFindPackage(), iVar4 == 0)) ||
          (iVar4 = FUN_004ffb70(), iVar4 == 0)) {
         if (DAT_0073578c == 0) {
           iVar4 = 0;
@@ -7025,7 +7072,7 @@ void FUN_0049ab60(int param_1,int param_2,int param_3,int param_4)
         pbVar6 = pbVar6 + 1;
         bVar3 = *pbVar1;
       }
-      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FUN_004f65d0(), iVar4 == 0)) ||
+      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FEngFindPackage(), iVar4 == 0)) ||
          (iVar4 = FUN_004ffb70(), iVar4 == 0)) {
         if (DAT_0073578c == 0) {
           iVar4 = 0;
@@ -7079,7 +7126,7 @@ LAB_0049ad81:
         pbVar6 = pbVar6 + 1;
         bVar3 = *pbVar1;
       }
-      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FUN_004f65d0(), iVar4 == 0)) ||
+      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FEngFindPackage(), iVar4 == 0)) ||
          (iVar4 = FUN_004ffb70(), iVar4 == 0)) {
         if (DAT_0073578c == 0) {
           iVar4 = 0;
@@ -7093,7 +7140,7 @@ LAB_0049ad81:
       if (iVar11 == 0) {
         iVar11 = LanguageStrings__FindByHash();
       }
-      FUN_004f67f0("%s %d",iVar11,uVar10);
+      FEngPrintf("%s %d",iVar11,uVar10);
       bSPrintf_regdst(0x20,"TotalPoints_%d",uVar2);
       iVar11 = -1;
       pbVar6 = &local_20;
@@ -7107,7 +7154,7 @@ LAB_0049ad81:
         pbVar6 = pbVar6 + 1;
         bVar3 = *pbVar1;
       }
-      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FUN_004f65d0(), iVar4 == 0)) ||
+      if (((*(int *)(param_1 + 0xc) == 0) || (iVar4 = FEngFindPackage(), iVar4 == 0)) ||
          (iVar4 = FUN_004ffb70(), iVar4 == 0)) {
         if (DAT_0073578c == 0) {
           iVar4 = 0;
@@ -7121,7 +7168,7 @@ LAB_0049ad81:
       if (iVar11 == 0) {
         iVar11 = LanguageStrings__FindByHash();
       }
-      FUN_004f67f0("%s %d",iVar11,uVar5);
+      FEngPrintf("%s %d",iVar11,uVar5);
       local_28 = local_28 + 0xc;
       local_2c = iVar9;
     } while (iVar9 < param_3);
@@ -7141,9 +7188,11 @@ bool Screen_PostRaceStats__CompareByScoreDesc(int param_1,int param_2)
 }
 
 
-// ==== 0x49af90 FUN_0049af90
+// ==== 0x49af90 PostRaceResultsScreen::SetupTourneyPoints
 
-void FUN_0049af90(int param_1,int param_2,int param_3,int param_4)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceResultsScreen__SetupTourneyPoints(int param_1,int param_2,int param_3,int param_4)
 
 {
   byte *pbVar1;
@@ -7513,9 +7562,9 @@ LAB_0049b60c:
         }
         local_a0 = (int ***)ppppiVar14;
         bSPrintf_regdst(0x20,"Pos%d",iVar11);
-        FUN_004f67f0(&PTR_FUN_006c7968,iVar11);
+        FEngPrintf(&PTR_FUN_006c7968,iVar11);
         bSPrintf_regdst(0x20,"Name%d",iVar11);
-        FUN_004f67f0(&DAT_006cc568,ppppiVar14[3]);
+        FEngPrintf(&DAT_006cc568,ppppiVar14[3]);
         if ((DAT_0078a345 == '\0') && (DAT_007361a4 == 0)) {
           iVar15 = 0;
           if (0 < *(int *)(DAT_007361f8 + 0x18)) {
@@ -7539,7 +7588,7 @@ LAB_0049b60c:
             pbVar12 = pbVar12 + 1;
             bVar3 = *pbVar1;
           }
-          if (((*(int *)(param_1 + 0xc) == 0) || (iVar5 = FUN_004f65d0(), iVar5 == 0)) ||
+          if (((*(int *)(param_1 + 0xc) == 0) || (iVar5 = FEngFindPackage(), iVar5 == 0)) ||
              (iVar5 = FUN_004ffb70(), iVar5 == 0)) {
             if (DAT_0073578c == 0) goto LAB_0049b80e;
             iVar5 = FUN_004ef050(iVar15);
@@ -7613,7 +7662,7 @@ LAB_0049b8df:
         if (iVar15 == 0) {
           iVar15 = LanguageStrings__FindByHash();
         }
-        FUN_004f67f0("%s %d",iVar15,local_a0[5]);
+        FEngPrintf("%s %d",iVar15,local_a0[5]);
         local_9c = iVar11;
       } while (iVar11 < param_3);
     }
@@ -7632,9 +7681,11 @@ LAB_0049b8df:
 }
 
 
-// ==== 0x49ba10 FUN_0049ba10
+// ==== 0x49ba10 PostRaceResultsScreen::NotificationMessage
 
-void __thiscall FUN_0049ba10(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall PostRaceResultsScreen__NotificationMessage(int param_1,int param_2)
 
 {
   char cVar1;
@@ -7658,12 +7709,13 @@ void __thiscall FUN_0049ba10(int param_1,int param_2)
         }
         cVar1 = IsDriftMode();
         if (cVar1 != '\0') {
-          FUN_00498d90(param_1,4,iVar2);
-          FUN_00499aa0(param_1,4,iVar2);
+          PostRaceResultsScreen__SetupRacers(param_1,4,iVar2);
+          PostRaceResultsScreen__SetupRaceTimes(param_1,4,iVar2);
           return;
         }
-        FUN_00497eb0(param_1,4);
-        FUN_00499aa0(param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320);
+        PostRaceResultsScreen__SetupRacers(param_1,4);
+        PostRaceResultsScreen__SetupRaceTimes
+                  (param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320);
       }
       else {
         if (DAT_00735ed4 == '\x01') {
@@ -7676,17 +7728,19 @@ void __thiscall FUN_0049ba10(int param_1,int param_2)
           }
           cVar1 = IsDriftMode();
           if (cVar1 != '\0') {
-            FUN_00498d90(param_1,4,iVar2);
-            FUN_0049ab60(param_1,4,iVar2,piVar3);
+            PostRaceResultsScreen__SetupRacers(param_1,4,iVar2);
+            PostRaceResultsScreen__SetupTourneyPoints(param_1,4,iVar2,piVar3);
             return;
           }
-          FUN_00497eb0(param_1,4);
-          FUN_0049ab60(param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320,piVar3);
+          PostRaceResultsScreen__SetupRacers(param_1,4);
+          PostRaceResultsScreen__SetupTourneyPoints
+                    (param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320,piVar3);
           return;
         }
         if (DAT_00735ed4 == '\x02') {
 LAB_0049bcc6:
-          FUN_0049af90(param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320,piVar3);
+          PostRaceResultsScreen__SetupTourneyPoints
+                    (param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320,piVar3);
           return;
         }
       }
@@ -7708,12 +7762,13 @@ LAB_0049bcc6:
           }
           cVar1 = IsDriftMode();
           if (cVar1 != '\0') {
-            FUN_00498d90(param_1,4,iVar2);
-            FUN_0049ab60(param_1,4,iVar2,piVar3);
+            PostRaceResultsScreen__SetupRacers(param_1,4,iVar2);
+            PostRaceResultsScreen__SetupTourneyPoints(param_1,4,iVar2,piVar3);
             return;
           }
-          FUN_00497eb0(param_1,4);
-          FUN_0049ab60(param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320,piVar3);
+          PostRaceResultsScreen__SetupRacers(param_1,4);
+          PostRaceResultsScreen__SetupTourneyPoints
+                    (param_1,4,DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320,piVar3);
           return;
         }
         if (DAT_00735ed4 == '\x02') {
@@ -7732,7 +7787,7 @@ LAB_0049bcc6:
           }
           cVar1 = IsDriftMode();
           if (cVar1 != '\0') {
-            FUN_0049af90(param_1,4,iVar2,piVar3);
+            PostRaceResultsScreen__SetupTourneyPoints(param_1,4,iVar2,piVar3);
             return;
           }
           goto LAB_0049bcc6;
@@ -7754,11 +7809,11 @@ LAB_0049bcc6:
       else {
         cVar1 = FUN_004f6c80("FadeOut");
         if (cVar1 == '\0') {
-          FUN_0049dfd0();
+          cPostRaceScreenManager__ChangeToNextScreen();
         }
       }
     }
-    if (((*(char *)(param_1 + 0x42) == '\0') && (cVar1 = FUN_004f6650(), cVar1 == '\0')) &&
+    if (((*(char *)(param_1 + 0x42) == '\0') && (cVar1 = FEngIsPackagePushed(), cVar1 == '\0')) &&
        ((DAT_00777b4c == 1 &&
         ((DAT_007677a8 != 0 && (cVar1 = Race__DidPlayerWin(DAT_007677a8,0), cVar1 != '\0')))))) {
       FUN_004cd3e0();
@@ -7770,23 +7825,27 @@ LAB_0049bcc6:
 }
 
 
-// ==== 0x49be50 FUN_0049be50
+// ==== 0x49be50 PostRaceStatsScreen::_PostRaceStatsScreen
 
-void __fastcall FUN_0049be50(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall PostRaceStatsScreen___PostRaceStatsScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c75a8;
+  *param_1 = &PTR_PostRaceStatsScreen___PostRaceStatsScreen_006c75a8;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x49be60 FUN_0049be60
+// ==== 0x49be60 PostRaceStatsScreen::_PostRaceStatsScreen
 
-void * __thiscall FUN_0049be60(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall PostRaceStatsScreen___PostRaceStatsScreen(void *param_1,byte param_2)
 
 {
-  FUN_0049be50();
+  PostRaceStatsScreen___PostRaceStatsScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -7841,7 +7900,7 @@ undefined4 * Screen_PostRaceStats__Screen_PostRaceStats(undefined4 *param_1,unde
   local_c = ExceptionList;
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
-  *param_1 = &PTR_FUN_006c75a8;
+  *param_1 = &PTR_PostRaceStatsScreen___PostRaceStatsScreen_006c75a8;
   local_4 = 0;
   if (DAT_007361b4 == 0) {
     param_1[0x4f] = 1;
@@ -7849,8 +7908,8 @@ undefined4 * Screen_PostRaceStats__Screen_PostRaceStats(undefined4 *param_1,unde
   else {
     param_1[0x4f] = (int)*(char *)(*(int *)(*(int *)(DAT_007361b4 + 4) + 0x1c) + 0xc);
   }
-  FUN_0049c0e0(param_1);
-  FUN_0049c820(param_1,param_1[0x4f]);
+  PostRaceStatsScreen__Init(param_1);
+  PostRaceStatsScreen__Setup(param_1,param_1[0x4f]);
   *(undefined1 *)(param_1 + 8) = 1;
   param_1[0x10] = 0;
   param_1[0x11] = 0;
@@ -7864,14 +7923,14 @@ LAB_0049bf7f:
     }
   }
   else {
-    iVar2 = FUN_004f65d0();
+    iVar2 = FEngFindPackage();
     if (iVar2 == 0) goto LAB_0049bf7f;
     iVar2 = FUN_004ffb70();
     if (iVar2 == 0) goto LAB_0049bf7f;
   }
   param_1[0x10] = iVar2;
   if (param_1[3] != 0) {
-    iVar2 = FUN_004f65d0();
+    iVar2 = FEngFindPackage();
     if (iVar2 != 0) {
       iVar2 = FUN_004ffb70();
       if (iVar2 != 0) goto LAB_0049bfdb;
@@ -7903,9 +7962,11 @@ LAB_0049bfdb:
 }
 
 
-// ==== 0x49c050 FUN_0049c050
+// ==== 0x49c050 PostRaceStatsScreen::NotificationMessage
 
-void FUN_0049c050(uint param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__NotificationMessage(uint param_1)
 
 {
   int iVar1;
@@ -7938,14 +7999,16 @@ void FUN_0049c050(uint param_1)
     FUN_00563cb0();
     return;
   }
-  FUN_0049cbd0();
+  PostRaceStatsScreen__Scroll();
   return;
 }
 
 
-// ==== 0x49c0e0 FUN_0049c0e0
+// ==== 0x49c0e0 PostRaceStatsScreen::Init
 
-void FUN_0049c0e0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__Init(int param_1)
 
 {
   byte *pbVar1;
@@ -7965,7 +8028,7 @@ void FUN_0049c0e0(int param_1)
   
   iVar5 = *(int *)(param_1 + 0xc);
   uVar4 = FEng__HashName();
-  if (((((iVar5 == 0) || (iVar5 = FUN_004f65d0(), iVar5 == 0)) ||
+  if (((((iVar5 == 0) || (iVar5 = FEngFindPackage(), iVar5 == 0)) ||
        (iVar5 = FUN_004ffb70(), iVar5 == 0)) &&
       ((DAT_0073578c == 0 || (iVar5 = FUN_004ef050(uVar4), iVar5 == 0)))) ||
      (*(int *)(iVar5 + 0x18) != 2)) {
@@ -7974,7 +8037,7 @@ void FUN_0049c0e0(int param_1)
   iVar9 = *(int *)(param_1 + 0xc);
   *(int *)(param_1 + 0x4c) = iVar5;
   uVar4 = FEng__HashName();
-  if (((((iVar9 == 0) || (iVar5 = FUN_004f65d0(), iVar5 == 0)) ||
+  if (((((iVar9 == 0) || (iVar5 = FEngFindPackage(), iVar5 == 0)) ||
        (iVar5 = FUN_004ffb70(), iVar5 == 0)) &&
       ((DAT_0073578c == 0 || (iVar5 = FUN_004ef050(uVar4), iVar5 == 0)))) ||
      (*(int *)(iVar5 + 0x18) != 2)) {
@@ -7983,7 +8046,7 @@ void FUN_0049c0e0(int param_1)
   iVar9 = *(int *)(param_1 + 0xc);
   *(int *)(param_1 + 0x50) = iVar5;
   uVar4 = FEng__HashName();
-  if (((((iVar9 == 0) || (iVar5 = FUN_004f65d0(), iVar5 == 0)) ||
+  if (((((iVar9 == 0) || (iVar5 = FEngFindPackage(), iVar5 == 0)) ||
        (iVar5 = FUN_004ffb70(), iVar5 == 0)) &&
       ((DAT_0073578c == 0 || (iVar5 = FUN_004ef050(uVar4), iVar5 == 0)))) ||
      (*(int *)(iVar5 + 0x18) != 2)) {
@@ -7992,7 +8055,7 @@ void FUN_0049c0e0(int param_1)
   iVar9 = *(int *)(param_1 + 0xc);
   *(int *)(param_1 + 0x54) = iVar5;
   uVar4 = FEng__HashName();
-  if (((((iVar9 == 0) || (iVar5 = FUN_004f65d0(), iVar5 == 0)) ||
+  if (((((iVar9 == 0) || (iVar5 = FEngFindPackage(), iVar5 == 0)) ||
        (iVar5 = FUN_004ffb70(), iVar5 == 0)) &&
       ((DAT_0073578c == 0 || (iVar5 = FUN_004ef050(uVar4), iVar5 == 0)))) ||
      (*(int *)(iVar5 + 0x18) != 2)) {
@@ -8001,7 +8064,7 @@ void FUN_0049c0e0(int param_1)
   iVar9 = *(int *)(param_1 + 0xc);
   *(int *)(param_1 + 0x120) = iVar5;
   uVar4 = FEng__HashName();
-  if (((((iVar9 == 0) || (iVar5 = FUN_004f65d0(), iVar5 == 0)) ||
+  if (((((iVar9 == 0) || (iVar5 = FEngFindPackage(), iVar5 == 0)) ||
        (iVar5 = FUN_004ffb70(), iVar5 == 0)) &&
       ((DAT_0073578c == 0 || (iVar5 = FUN_004ef050(uVar4), iVar5 == 0)))) ||
      (*(int *)(iVar5 + 0x18) != 2)) {
@@ -8276,9 +8339,11 @@ LAB_0049c7ef:
 }
 
 
-// ==== 0x49c820 FUN_0049c820
+// ==== 0x49c820 PostRaceStatsScreen::Setup
 
-void FUN_0049c820(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__Setup(int param_1,int param_2)
 
 {
   byte *pbVar1;
@@ -8295,7 +8360,7 @@ void FUN_0049c820(int param_1,int param_2)
   undefined4 *puVar10;
   int iVar11;
   
-  FUN_0049d370();
+  PostRaceStatsScreen__HideLaps();
   puVar10 = (undefined4 *)(param_1 + 0xf8);
   iVar11 = 9;
   do {
@@ -8312,14 +8377,14 @@ void FUN_0049c820(int param_1,int param_2)
   }
   if ((DAT_0078a344 == '\0') && (DAT_007361a8 == 0)) {
     if ((DAT_0078a345 == '\0') && (DAT_007361a4 == 0)) {
-      FUN_0049cee0(param_1,uVar7);
+      PostRaceStatsScreen__SetupCircuit(param_1,uVar7);
     }
     else {
-      FUN_0049cd90(uVar7);
+      PostRaceStatsScreen__SetupDrift(uVar7);
     }
   }
   else {
-    FUN_0049cc70(param_1,uVar7);
+    PostRaceStatsScreen__SetupDrag(param_1,uVar7);
   }
   pcVar8 = "mouse_over_L";
   iVar11 = -1;
@@ -8433,7 +8498,7 @@ LAB_0049ca79:
       pcVar8 = pcVar8 + 1;
     } while (bVar2 != 0);
     if (((*(int *)(param_1 + 0xc) == 0) ||
-        (iVar4 = FUN_004f65d0(), iVar6 = DAT_0073578c, iVar4 == 0)) ||
+        (iVar4 = FEngFindPackage(), iVar6 = DAT_0073578c, iVar4 == 0)) ||
        (iVar4 = FUN_004ffb70(), iVar6 = DAT_0073578c, iVar4 == 0)) {
       if (iVar6 == 0) {
         iVar4 = 0;
@@ -8481,7 +8546,7 @@ LAB_0049ca79:
       pcVar8 = pcVar8 + 1;
     } while (*pbVar1 != 0);
   }
-  if (((iVar11 == 0) || (iVar11 = FUN_004f65d0(), iVar6 = DAT_0073578c, iVar11 == 0)) ||
+  if (((iVar11 == 0) || (iVar11 = FEngFindPackage(), iVar6 = DAT_0073578c, iVar11 == 0)) ||
      (iVar11 = FUN_004ffb70(), iVar6 = DAT_0073578c, iVar11 == 0)) {
     if (iVar6 != 0) {
       uVar7 = FUN_004ef050(iVar4);
@@ -8495,9 +8560,11 @@ LAB_0049ca79:
 }
 
 
-// ==== 0x49cbd0 FUN_0049cbd0
+// ==== 0x49cbd0 PostRaceStatsScreen::Scroll
 
-void FUN_0049cbd0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__Scroll(void)
 
 {
   int iVar1;
@@ -8517,7 +8584,7 @@ void FUN_0049cbd0(void)
           (*(int *)(unaff_ESI + 0x13c) = iVar2 + 1, iVar1 < iVar2 + 1)) {
     *(int *)(unaff_ESI + 0x13c) = iVar1;
   }
-  FUN_0049c820(unaff_ESI,*(undefined4 *)(unaff_ESI + 0x13c));
+  PostRaceStatsScreen__Setup(unaff_ESI,*(undefined4 *)(unaff_ESI + 0x13c));
   if (iVar2 != *(int *)(unaff_ESI + 0x13c)) {
     if (unaff_EBX == -0x6edfbf62) {
       FUN_004f8340(*(undefined4 *)(unaff_ESI + 0xc));
@@ -8529,9 +8596,11 @@ void FUN_0049cbd0(void)
 }
 
 
-// ==== 0x49cc70 FUN_0049cc70
+// ==== 0x49cc70 PostRaceStatsScreen::SetupDrag
 
-void FUN_0049cc70(int param_1,undefined4 param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__SetupDrag(int param_1,undefined4 param_2)
 
 {
   int iVar1;
@@ -8542,9 +8611,9 @@ void FUN_0049cc70(int param_1,undefined4 param_2)
   int *piVar4;
   
   iVar1 = param_1;
-  FUN_0049d3e0(param_1);
+  PostRaceStatsScreen__DrawRacerName(param_1);
   FEObject__SetFormattedText(&PTR_FUN_006c7804,*(undefined4 *)(param_1 + 0x13c));
-  FUN_0049d370();
+  PostRaceStatsScreen__HideLaps();
   piVar4 = (int *)(param_1 + 0xf8);
   param_1 = 5;
   do {
@@ -8579,19 +8648,21 @@ void FUN_0049cc70(int param_1,undefined4 param_2)
     piVar4 = piVar4 + 1;
     param_1 = param_1 + -1;
   } while (param_1 != 0);
-  FUN_0049d4c0(iVar1,param_2);
-  FUN_0049d5b0(iVar1);
-  FUN_0049db30(param_2);
+  PostRaceStatsScreen__DrawFinishTime(iVar1,param_2);
+  PostRaceStatsScreen__DrawTimeBehind(iVar1);
+  PostRaceStatsScreen__DrawMaxSpeed(param_2);
   PostRaceStatsScreen__DrawNumLapsLed(param_2);
-  FUN_0049de80(param_2);
-  FUN_00497a00();
+  PostRaceStatsScreen__DrawPercentage(param_2);
+  PostRaceStatsScreen__SetupRepWonLoss();
   return;
 }
 
 
-// ==== 0x49cd90 FUN_0049cd90
+// ==== 0x49cd90 PostRaceStatsScreen::SetupDrift
 
-void FUN_0049cd90(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__SetupDrift(int param_1)
 
 {
   undefined4 *puVar1;
@@ -8604,7 +8675,7 @@ void FUN_0049cd90(int param_1)
   bool bVar5;
   int local_4;
   
-  FUN_0049d3e0(in_EAX);
+  PostRaceStatsScreen__DrawRacerName(in_EAX);
   FEObject__SetFormattedText(&PTR_FUN_006c7804,*(undefined4 *)(in_EAX + 0x13c));
   piVar4 = (int *)(in_EAX + 0xf8);
   local_4 = 2;
@@ -8640,8 +8711,8 @@ void FUN_0049cd90(int param_1)
     piVar4 = piVar4 + 1;
     local_4 = local_4 + -1;
   } while (local_4 != 0);
-  FUN_0049d1d0(in_EAX);
-  FUN_0049d940(in_EAX);
+  PostRaceStatsScreen__ShowLaps(in_EAX);
+  PostRaceStatsScreen__DrawLapScores(in_EAX);
   iVar3 = *(int *)(in_EAX + 0xd0);
   if (iVar3 != 0) {
     *(uint *)(iVar3 + 0x1c) = *(uint *)(iVar3 + 0x1c) | 0x400000;
@@ -8655,15 +8726,17 @@ void FUN_0049cd90(int param_1)
   }
   FEObject__SetFormattedText
             (&DAT_006ca778,*(undefined4 *)(&DAT_00777cbc + *(char *)(param_1 + 10) * 0x15c));
-  FUN_0049df30(param_1);
-  FUN_00497a00();
+  PostRaceStatsScreen__DrawLongestDrift(param_1);
+  PostRaceStatsScreen__SetupRepWonLoss();
   return;
 }
 
 
-// ==== 0x49cee0 FUN_0049cee0
+// ==== 0x49cee0 PostRaceStatsScreen::SetupCircuit
 
-void FUN_0049cee0(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__SetupCircuit(int param_1,int param_2)
 
 {
   undefined4 *puVar1;
@@ -8679,7 +8752,7 @@ void FUN_0049cee0(int param_1,int param_2)
   int iVar5;
   bool bVar6;
   
-  FUN_0049d3e0(param_1);
+  PostRaceStatsScreen__DrawRacerName(param_1);
   FEObject__SetFormattedText(&PTR_FUN_006c7804,*(undefined4 *)(param_1 + 0x13c));
   piVar3 = (int *)(param_1 + 0xf8);
   iVar4 = 5;
@@ -8715,19 +8788,19 @@ void FUN_0049cee0(int param_1,int param_2)
     piVar3 = piVar3 + 1;
     iVar4 = iVar4 + -1;
   } while (iVar4 != 0);
-  FUN_0049d1d0(param_1);
-  FUN_0049d760(param_1);
+  PostRaceStatsScreen__ShowLaps(param_1);
+  PostRaceStatsScreen__DrawLapTimes(param_1);
   iVar5 = 0;
   iVar4 = DAT_00736168;
   if (0 < DAT_0073616c) {
     do {
       if (*(short *)(iVar4 + 0x6c) == DAT_0078a2f0) {
         if ((*(byte *)(iVar4 + 0x74) & 4) != 0) {
-          FUN_0049d4c0(param_1,param_2);
-          FUN_0049d5b0(param_1);
-          FUN_0049db30(param_2);
-          FUN_0049dc20(param_2);
-          FUN_0049dd10(param_2);
+          PostRaceStatsScreen__DrawFinishTime(param_1,param_2);
+          PostRaceStatsScreen__DrawTimeBehind(param_1);
+          PostRaceStatsScreen__DrawMaxSpeed(param_2);
+          PostRaceStatsScreen__DrawAverageSpeed(param_2);
+          PostRaceStatsScreen__DrawOdometer(param_2);
           goto LAB_0049d176;
         }
         break;
@@ -8792,12 +8865,12 @@ void FUN_0049cee0(int param_1,int param_2)
       } while (iVar4 != 0);
     }
   }
-  FUN_0049d4c0(param_1,param_2);
-  FUN_0049d5b0(param_1);
-  FUN_0049da50(param_1,param_2);
-  FUN_0049db30(param_2);
-  FUN_0049dc20(param_2);
-  FUN_0049dd10(param_2);
+  PostRaceStatsScreen__DrawFinishTime(param_1,param_2);
+  PostRaceStatsScreen__DrawTimeBehind(param_1);
+  PostRaceStatsScreen__DrawBestLapTime(param_1,param_2);
+  PostRaceStatsScreen__DrawMaxSpeed(param_2);
+  PostRaceStatsScreen__DrawAverageSpeed(param_2);
+  PostRaceStatsScreen__DrawOdometer(param_2);
   iVar4 = *(int *)(param_1 + 0xe8);
   if (iVar4 != 0) {
     *(uint *)(iVar4 + 0x1c) = *(uint *)(iVar4 + 0x1c) | 0x400000;
@@ -8812,14 +8885,16 @@ void FUN_0049cee0(int param_1,int param_2)
   FEObject__SetFormattedText
             (&PTR_FUN_006c7968,*(undefined4 *)(&DAT_00777c1c + *(char *)(param_2 + 10) * 0x15c));
 LAB_0049d176:
-  FUN_00497a00();
+  PostRaceStatsScreen__SetupRepWonLoss();
   return;
 }
 
 
-// ==== 0x49d1d0 FUN_0049d1d0
+// ==== 0x49d1d0 PostRaceStatsScreen::ShowLaps
 
-void FUN_0049d1d0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__ShowLaps(int param_1)
 
 {
   int extraout_EDX;
@@ -8933,9 +9008,11 @@ void FUN_0049d1d0(int param_1)
 }
 
 
-// ==== 0x49d370 FUN_0049d370
+// ==== 0x49d370 PostRaceStatsScreen::HideLaps
 
-void FUN_0049d370(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__HideLaps(void)
 
 {
   int unaff_EBX;
@@ -8964,9 +9041,11 @@ void FUN_0049d370(void)
 }
 
 
-// ==== 0x49d3e0 FUN_0049d3e0
+// ==== 0x49d3e0 PostRaceStatsScreen::DrawRacerName
 
-void FUN_0049d3e0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawRacerName(void)
 
 {
   int iVar1;
@@ -9016,9 +9095,11 @@ void FUN_0049d3e0(void)
 }
 
 
-// ==== 0x49d4c0 FUN_0049d4c0
+// ==== 0x49d4c0 PostRaceStatsScreen::DrawFinishTime
 
-void FUN_0049d4c0(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawFinishTime(int param_1,int param_2)
 
 {
   int iVar1;
@@ -9058,9 +9139,11 @@ void FUN_0049d4c0(int param_1,int param_2)
 }
 
 
-// ==== 0x49d5b0 FUN_0049d5b0
+// ==== 0x49d5b0 PostRaceStatsScreen::DrawTimeBehind
 
-void FUN_0049d5b0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawTimeBehind(int param_1)
 
 {
   int iVar1;
@@ -9137,9 +9220,11 @@ void FUN_0049d5b0(int param_1)
 }
 
 
-// ==== 0x49d760 FUN_0049d760
+// ==== 0x49d760 PostRaceStatsScreen::DrawLapTimes
 
-void FUN_0049d760(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawLapTimes(int param_1)
 
 {
   int in_EAX;
@@ -9217,9 +9302,11 @@ LAB_0049d8ec:
 }
 
 
-// ==== 0x49d940 FUN_0049d940
+// ==== 0x49d940 PostRaceStatsScreen::DrawLapScores
 
-void FUN_0049d940(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawLapScores(int param_1)
 
 {
   char cVar1;
@@ -9268,9 +9355,11 @@ void FUN_0049d940(int param_1)
 }
 
 
-// ==== 0x49da50 FUN_0049da50
+// ==== 0x49da50 PostRaceStatsScreen::DrawBestLapTime
 
-void FUN_0049da50(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawBestLapTime(int param_1,int param_2)
 
 {
   int iVar1;
@@ -9310,9 +9399,11 @@ void FUN_0049da50(int param_1,int param_2)
 }
 
 
-// ==== 0x49db30 FUN_0049db30
+// ==== 0x49db30 PostRaceStatsScreen::DrawMaxSpeed
 
-void FUN_0049db30(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawMaxSpeed(int param_1)
 
 {
   undefined4 *puVar1;
@@ -9352,9 +9443,11 @@ void FUN_0049db30(int param_1)
 }
 
 
-// ==== 0x49dc20 FUN_0049dc20
+// ==== 0x49dc20 PostRaceStatsScreen::DrawAverageSpeed
 
-void FUN_0049dc20(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawAverageSpeed(int param_1)
 
 {
   undefined4 *puVar1;
@@ -9394,9 +9487,11 @@ void FUN_0049dc20(int param_1)
 }
 
 
-// ==== 0x49dd10 FUN_0049dd10
+// ==== 0x49dd10 PostRaceStatsScreen::DrawOdometer
 
-void FUN_0049dd10(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawOdometer(int param_1)
 
 {
   undefined4 *puVar1;
@@ -9467,9 +9562,11 @@ void PostRaceStatsScreen__DrawNumLapsLed(int param_1)
 }
 
 
-// ==== 0x49de80 FUN_0049de80
+// ==== 0x49de80 PostRaceStatsScreen::DrawPercentage
 
-void FUN_0049de80(float param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawPercentage(float param_1)
 
 {
   char *pcVar1;
@@ -9503,9 +9600,11 @@ void FUN_0049de80(float param_1)
 }
 
 
-// ==== 0x49df30 FUN_0049df30
+// ==== 0x49df30 PostRaceStatsScreen::DrawLongestDrift
 
-void FUN_0049df30(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void PostRaceStatsScreen__DrawLongestDrift(int param_1)
 
 {
   undefined4 *puVar1;
@@ -9536,9 +9635,11 @@ void FUN_0049df30(int param_1)
 }
 
 
-// ==== 0x49dfd0 FUN_0049dfd0
+// ==== 0x49dfd0 cPostRaceScreenManager::ChangeToNextScreen
 
-void FUN_0049dfd0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cPostRaceScreenManager__ChangeToNextScreen(void)
 
 {
   undefined4 *puVar1;
@@ -9554,7 +9655,7 @@ void FUN_0049dfd0(void)
     iVar4 = bStrICmp();
     iVar3 = DAT_0073578c;
     if (iVar4 == 0) {
-      FUN_0049eee0(in_EAX + 0x10,uVar2);
+      cPostRaceScreenManager__ShowRewardPopup(in_EAX + 0x10,uVar2);
       return;
     }
     if (((DAT_0073578c != 0) && (iVar4 = FEPackageList__FindByName(&DAT_00746104), iVar4 != 0)) &&
@@ -9566,9 +9667,11 @@ void FUN_0049dfd0(void)
 }
 
 
-// ==== 0x49e040 FUN_0049e040
+// ==== 0x49e040 cPostRaceScreenManager::ChangeToPrevScreen
 
-void FUN_0049e040(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cPostRaceScreenManager__ChangeToPrevScreen(void)
 
 {
   int iVar1;
@@ -9583,7 +9686,7 @@ void FUN_0049e040(void)
     iVar3 = bStrICmp();
     iVar1 = DAT_0073578c;
     if (iVar3 == 0) {
-      FUN_0049eee0(in_EAX + 0x10,uVar2);
+      cPostRaceScreenManager__ShowRewardPopup(in_EAX + 0x10,uVar2);
       return;
     }
     if (((DAT_0073578c != 0) && (iVar3 = FEPackageList__FindByName(&DAT_00746104), iVar3 != 0)) &&
@@ -9595,9 +9698,11 @@ void FUN_0049e040(void)
 }
 
 
-// ==== 0x49e0b0 FUN_0049e0b0
+// ==== 0x49e0b0 cPostRaceScreenManager::NeedToSeePostRaceStyle
 
-bool FUN_0049e0b0(void)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+bool cPostRaceScreenManager__NeedToSeePostRaceStyle(void)
 
 {
   int iVar1;
@@ -9616,9 +9721,11 @@ bool FUN_0049e0b0(void)
 }
 
 
-// ==== 0x49e100 FUN_0049e100
+// ==== 0x49e100 cPostRaceScreenManager::cPostRaceScreenManager
 
-undefined4 * FUN_0049e100(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * cPostRaceScreenManager__cPostRaceScreenManager(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -9634,17 +9741,17 @@ undefined4 * FUN_0049e100(undefined4 *param_1)
   local_c = ExceptionList;
   piVar1 = param_1 + 1;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c7584;
+  *param_1 = &PTR_cPostRaceScreenManager___cPostRaceScreenManager_006c7584;
   *piVar1 = (int)piVar1;
   param_1[2] = piVar1;
   local_4 = 0;
-  FUN_0049ed00(param_1 + 4);
+  PostRaceRewardList__PostRaceRewardList(param_1 + 4);
   local_4 = CONCAT31(local_4._1_3_,1);
   if ((DAT_00777b4c != 1) || (*(int *)(DAT_007677a8 + 0x58a0) != 0)) {
     HudWidget__RegisterObject(PTR_s_PostRaceResults_fng_006fb98c);
   }
   iVar5 = DAT_007677a8;
-  cVar3 = FUN_0049e0b0(param_1);
+  cVar3 = cPostRaceScreenManager__NeedToSeePostRaceStyle(param_1);
   if (cVar3 != '\0') {
     HudWidget__RegisterObject(PTR_s_StyleAnimator_fng_006fb994);
     iVar5 = DAT_007677a8;
@@ -9696,12 +9803,14 @@ LAB_0049e1f0:
 }
 
 
-// ==== 0x49e2b0 FUN_0049e2b0
+// ==== 0x49e2b0 cPostRaceScreenManager::_cPostRaceScreenManager
 
-void * __thiscall FUN_0049e2b0(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall cPostRaceScreenManager___cPostRaceScreenManager(void *param_1,byte param_2)
 
 {
-  FUN_0049e2d0();
+  cPostRaceScreenManager___cPostRaceScreenManager();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -9709,9 +9818,11 @@ void * __thiscall FUN_0049e2b0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x49e2d0 FUN_0049e2d0
+// ==== 0x49e2d0 cPostRaceScreenManager::_cPostRaceScreenManager
 
-void __fastcall FUN_0049e2d0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall cPostRaceScreenManager___cPostRaceScreenManager(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -9726,7 +9837,7 @@ void __fastcall FUN_0049e2d0(undefined4 *param_1)
   local_c = ExceptionList;
   pcStack_8 = FUN_00686cb6;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c7584;
+  *param_1 = &PTR_cPostRaceScreenManager___cPostRaceScreenManager_006c7584;
   puVar2 = (undefined4 *)param_1[1];
   local_4 = 1;
   for (; puVar2 != param_1 + 1; puVar2 = (undefined4 *)*puVar2) {
@@ -9753,9 +9864,11 @@ void __fastcall FUN_0049e2d0(undefined4 *param_1)
 }
 
 
-// ==== 0x49e390 FUN_0049e390
+// ==== 0x49e390 cPostRaceScreenManager::CreateInstance
 
-void FUN_0049e390(void)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void cPostRaceScreenManager__CreateInstance(void)
 
 {
   void *pvVar1;
@@ -9773,20 +9886,22 @@ void FUN_0049e390(void)
     DAT_00735ed0 = 0;
   }
   else {
-    DAT_00735ed0 = FUN_0049e100(pvVar1);
+    DAT_00735ed0 = cPostRaceScreenManager__cPostRaceScreenManager(pvVar1);
   }
   ExceptionList = local_c;
   return;
 }
 
 
-// ==== 0x49e3e0 FUN_0049e3e0
+// ==== 0x49e3e0 cPostRaceScreenManager::EndInteraction
 
-void FUN_0049e3e0(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void cPostRaceScreenManager__EndInteraction(void)
 
 {
   if (DAT_00735ed0 != 0) {
-    FUN_004f6240();
+    FEngStopInteraction();
   }
   return;
 }
@@ -9812,9 +9927,11 @@ undefined4 __fastcall PostRaceRewardList__GetItemLabelHash(int param_1)
 }
 
 
-// ==== 0x49e420 FUN_0049e420
+// ==== 0x49e420 PostRaceRewardList::AddRewardItem
 
-void FUN_0049e420(int param_1)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void PostRaceRewardList__AddRewardItem(int param_1)
 
 {
   char cVar1;
@@ -10040,9 +10157,11 @@ void PostRaceRewardList__AddMessage(int param_1)
 }
 
 
-// ==== 0x49e7e0 FUN_0049e7e0
+// ==== 0x49e7e0 PostRaceRewardList::AddUniqueEventReward
 
-void FUN_0049e7e0(int param_1)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void PostRaceRewardList__AddUniqueEventReward(int param_1)
 
 {
   char cVar1;
@@ -10163,9 +10282,11 @@ void PostRaceRewardList__AddMessageWith2Strings(int param_1)
 }
 
 
-// ==== 0x49e9d0 FUN_0049e9d0
+// ==== 0x49e9d0 PostRaceRewardList::AddNewlyUnlockedMessages
 
-void FUN_0049e9d0(int param_1)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void PostRaceRewardList__AddNewlyUnlockedMessages(int param_1)
 
 {
   char cVar1;
@@ -10275,9 +10396,11 @@ LAB_0049ea06:
 }
 
 
-// ==== 0x49ebf0 FUN_0049ebf0
+// ==== 0x49ebf0 PostRaceRewardList::AddCareerUnlockMessages
 
-void __thiscall FUN_0049ebf0(undefined4 param_1,int param_2)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void __thiscall PostRaceRewardList__AddCareerUnlockMessages(undefined4 param_1,int param_2)
 
 {
   undefined4 *puVar1;
@@ -10326,9 +10449,11 @@ void __thiscall FUN_0049ebf0(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x49ed00 FUN_0049ed00
+// ==== 0x49ed00 PostRaceRewardList::PostRaceRewardList
 
-undefined4 * FUN_0049ed00(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+undefined4 * PostRaceRewardList__PostRaceRewardList(undefined4 *param_1)
 
 {
   undefined4 *puVar1;
@@ -10353,7 +10478,7 @@ undefined4 * FUN_0049ed00(undefined4 *param_1)
   iVar6 = 0;
   local_4 = 0;
   if (DAT_00777b4c != 4) {
-    FUN_0049e9d0(param_1);
+    PostRaceRewardList__AddNewlyUnlockedMessages(param_1);
   }
   piVar5 = DAT_007677a8;
   if (DAT_00777b4c == 1) {
@@ -10363,7 +10488,7 @@ undefined4 * FUN_0049ed00(undefined4 *param_1)
       bVar8 = cVar2 == '\0';
 LAB_0049ede4:
       if (bVar8) {
-        FUN_0049ebf0(param_1);
+        PostRaceRewardList__AddCareerUnlockMessages(param_1);
       }
       goto LAB_0049edec;
     }
@@ -10412,7 +10537,7 @@ LAB_0049edec:
           bVar8 = true;
         }
         else {
-          FUN_0049e420(param_1);
+          PostRaceRewardList__AddRewardItem(param_1);
         }
         iVar6 = iVar6 + 1;
         piVar7 = piVar7 + 3;
@@ -10422,7 +10547,7 @@ LAB_0049edec:
       PostRaceRewardList__AddMessageWith2Strings(param_1);
     }
     if (bVar8) {
-      FUN_0049e7e0(param_1);
+      PostRaceRewardList__AddUniqueEventReward(param_1);
     }
   }
 LAB_0049eeaf:
@@ -10432,9 +10557,11 @@ LAB_0049eeaf:
 }
 
 
-// ==== 0x49eee0 FUN_0049eee0
+// ==== 0x49eee0 cPostRaceScreenManager::ShowRewardPopup
 
-void FUN_0049eee0(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void cPostRaceScreenManager__ShowRewardPopup(void)
 
 {
   int iVar1;
@@ -10535,7 +10662,7 @@ void FUN_0049f000(int param_1)
   int iVar2;
   int iVar3;
   
-  if (((*(int *)(param_1 + 0xc) == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if (((*(int *)(param_1 + 0xc) == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
      (iVar2 = FUN_004ffb70(), iVar2 == 0)) {
     if (DAT_0073578c == 0) goto LAB_0049f08b;
     iVar2 = FUN_004ef050(0x7c34f6db);
@@ -10558,7 +10685,7 @@ void FUN_0049f000(int param_1)
   }
 LAB_0049f08b:
   iVar2 = *(int *)(DAT_00735ed0 + 0x1c);
-  FUN_004f6850(iVar2 + 0xc);
+  FEngPrintf(iVar2 + 0xc);
   FUN_00495f00(*(undefined4 *)(iVar2 + 8));
   return;
 }
@@ -10575,12 +10702,12 @@ void __thiscall FUN_0049f0c0(undefined4 param_1,int param_2)
       FUN_0049f000(param_1);
       return;
     }
-    FUN_0049dfd0();
+    cPostRaceScreenManager__ChangeToNextScreen();
     return;
   }
   if (param_2 == -0x6ee54c9c) {
     if (*(int *)(DAT_00735ed0 + 0x1c) == *(int *)(DAT_00735ed0 + 0x14)) {
-      FUN_0049e040();
+      cPostRaceScreenManager__ChangeToPrevScreen();
       return;
     }
     *(undefined4 *)(DAT_00735ed0 + 0x1c) = *(undefined4 *)(*(int *)(DAT_00735ed0 + 0x1c) + 4);
@@ -10601,7 +10728,7 @@ void __fastcall FUN_0049f120(int param_1)
   int iVar3;
   
   *(undefined4 *)(param_1 + 8) = DAT_0073ad3c;
-  if (((in_EAX == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((in_EAX == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       return;
@@ -10701,9 +10828,9 @@ void FUN_0049f2e0(void)
       }
       FUN_004f6c30("Flashy",1);
     }
-    FUN_004f6850(&DAT_006cc568,*(int *)(unaff_EBX + 0xc) + 0xc);
-    FUN_004f6850(&DAT_006cc568,local_20);
-    FUN_004f6850(&DAT_006ca778,*(int *)(unaff_EBX + 0x28) + iVar3);
+    FEngPrintf(&DAT_006cc568,*(int *)(unaff_EBX + 0xc) + 0xc);
+    FEngPrintf(&DAT_006cc568,local_20);
+    FEngPrintf(&DAT_006ca778,*(int *)(unaff_EBX + 0x28) + iVar3);
     FUN_00495f70();
     FUN_00495f70();
     FUN_0049f690(unaff_EBX,*(undefined4 *)(unaff_EBX + 0x34));
@@ -10711,7 +10838,7 @@ void FUN_0049f2e0(void)
   case 1:
     FUN_00495fc0();
     FUN_00495f70();
-    FUN_004f6850(&DAT_006ca778,*(undefined4 *)(unaff_EBX + 0x24));
+    FEngPrintf(&DAT_006ca778,*(undefined4 *)(unaff_EBX + 0x24));
     if (_K_HALF < (float)(DAT_0073ad3c - *(int *)(unaff_EBX + 0x1c)) * 0.00025) {
       *(int *)(unaff_EBX + 0x20) = DAT_0073ad3c;
       *(undefined4 *)(unaff_EBX + 8) = 2;
@@ -10740,16 +10867,16 @@ void FUN_0049f2e0(void)
     else {
       FUN_00565da0(&DAT_006ca778,*(undefined4 *)(unaff_EBX + 0x28));
     }
-    FUN_004f6850(&DAT_006cc568,local_20);
+    FEngPrintf(&DAT_006cc568,local_20);
     return;
   case 3:
     FUN_00495fc0();
     FUN_00495fc0();
-    FUN_004f6850(&DAT_006cc568,*(int *)(unaff_EBX + 0xc) + 0xc);
-    FUN_004f6850(&DAT_006ca778,*(undefined4 *)(*(int *)(unaff_EBX + 0xc) + 0x4c));
-    FUN_004f6850(&DAT_006ca778,*(undefined4 *)(unaff_EBX + 0x30));
-    FUN_004f6850(&DAT_006ca778,*(undefined4 *)(unaff_EBX + 0x24));
-    FUN_004f6850(&DAT_006ca778,*(int *)(unaff_EBX + 0x24) * *(int *)(unaff_EBX + 0x30));
+    FEngPrintf(&DAT_006cc568,*(int *)(unaff_EBX + 0xc) + 0xc);
+    FEngPrintf(&DAT_006ca778,*(undefined4 *)(*(int *)(unaff_EBX + 0xc) + 0x4c));
+    FEngPrintf(&DAT_006ca778,*(undefined4 *)(unaff_EBX + 0x30));
+    FEngPrintf(&DAT_006ca778,*(undefined4 *)(unaff_EBX + 0x24));
+    FEngPrintf(&DAT_006ca778,*(int *)(unaff_EBX + 0x24) * *(int *)(unaff_EBX + 0x30));
     FUN_0049f690(unaff_EBX,
                  *(int *)(unaff_EBX + 0x24) * *(int *)(unaff_EBX + 0x30) +
                  *(int *)(unaff_EBX + 0x34));
@@ -10780,7 +10907,7 @@ void FUN_0049f690(int param_1,float param_2)
       param_2 = 0.0;
     }
   }
-  if ((((*(int *)(param_1 + 0x10) == 0) || (iVar2 = FUN_004f65d0(), iVar2 == 0)) ||
+  if ((((*(int *)(param_1 + 0x10) == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
       (iVar2 = FUN_004ffb70(), iVar2 == 0)) && (DAT_0073578c != 0)) {
     FUN_004ef050(0x282d2c0a);
   }
@@ -10803,7 +10930,7 @@ void FUN_0049f7a0(void)
   int iVar3;
   
   *(undefined4 *)(unaff_EBX + 8) = 3;
-  if (((*(int *)(unaff_EBX + 0x10) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((*(int *)(unaff_EBX + 0x10) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) goto LAB_0049f826;
     iVar1 = FUN_004ef050(0x11bbe03f);
@@ -10825,7 +10952,7 @@ void FUN_0049f7a0(void)
     }
   }
 LAB_0049f826:
-  if (((*(int *)(unaff_EBX + 0x10) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((*(int *)(unaff_EBX + 0x10) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       return;
@@ -11053,7 +11180,7 @@ undefined4 * Screen_StyleAnimator__Screen_StyleAnimator(undefined4 *param_1,unde
   else {
     iVar2 = DAT_0077b244 + 0x19;
   }
-  FUN_004f6850(&DAT_006cc568,iVar2);
+  FEngPrintf(&DAT_006cc568,iVar2);
   ExceptionList = local_c;
   return param_1;
 }
@@ -11072,11 +11199,11 @@ FUN_0049fbc0(int param_1,int param_2,undefined4 param_3,undefined4 param_4,int p
       FUN_0049f7a0();
       return;
     }
-    FUN_0049dfd0();
+    cPostRaceScreenManager__ChangeToNextScreen();
   }
   else {
     if (param_2 == -0x6ee54c9c) {
-      FUN_0049e040();
+      cPostRaceScreenManager__ChangeToPrevScreen();
       return;
     }
     if (param_2 == -0x367ca946) {
@@ -11188,7 +11315,7 @@ int __fastcall HudWidget__RegisterString(int param_1)
   undefined4 in_EAX;
   int iVar1;
   
-  if (((*(int *)(param_1 + 8) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((*(int *)(param_1 + 8) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       return 0;
@@ -11213,7 +11340,7 @@ int __fastcall HudElement__RegisterImage(int param_1)
   undefined4 in_EAX;
   int iVar1;
   
-  if (((*(int *)(param_1 + 8) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((*(int *)(param_1 + 8) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       return 0;
@@ -11238,7 +11365,7 @@ void HudWidget__RegisterObjectByHash(undefined4 param_1)
   int in_EAX;
   int iVar1;
   
-  if (((*(int *)(in_EAX + 8) == 0) || (iVar1 = FUN_004f65d0(), iVar1 == 0)) ||
+  if (((*(int *)(in_EAX + 8) == 0) || (iVar1 = FEngFindPackage(), iVar1 == 0)) ||
      (iVar1 = FUN_004ffb70(), iVar1 == 0)) {
     if (DAT_0073578c == 0) {
       return;
@@ -12178,7 +12305,7 @@ void HudTach__Update(int param_1)
     FEObject__SetFormattedText(&DAT_006c740c,uVar7);
     if (DAT_0078a320 == 1) {
       fVar11 = (float10)CalcAngleForRPM(local_14,iVar5 + 0xc00);
-      FUN_004f6a70((float)fVar11);
+      FEngSetRotationZ((float)fVar11);
     }
     else {
       FUN_004f6d10(&local_10,&local_8);

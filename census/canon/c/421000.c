@@ -1795,14 +1795,14 @@ undefined4 __thiscall FUN_00422eb0(int param_1,undefined4 param_2)
       StreamSections__SeedViewer();
       FUN_0047bb10(&DAT_00779800,DAT_0078a2f0);
     }
-    if ((DAT_006fb988 != '\0') && (cVar2 = FUN_004f6650(), cVar2 == '\0')) {
+    if ((DAT_006fb988 != '\0') && (cVar2 = FEngIsPackagePushed(), cVar2 == '\0')) {
       FEManager__ShowPackage();
     }
 switchD_00422eca_caseD_4:
     return 1;
   case 2:
     if (DAT_006fb988 != '\0') {
-      FUN_004f6240();
+      FEngStopInteraction();
     }
     DAT_006fb988 = 1;
     FUN_00434b50(DAT_0073619c,*(undefined4 *)(param_1 + 0x18));
@@ -2236,7 +2236,7 @@ undefined4 __thiscall FUN_004237a0(int param_1,undefined4 param_2)
 switchD_004237b8_caseD_3:
     return 1;
   case 2:
-    FUN_004f6240();
+    FEngStopInteraction();
     Players_AssignTypeFromTable();
     return 1;
   case 3:
@@ -2260,7 +2260,7 @@ switchD_004237b8_caseD_3:
 undefined4 switchD_004237b8::caseD_2(void)
 
 {
-  FUN_004f6240();
+  FEngStopInteraction();
   Players_AssignTypeFromTable();
   return 1;
 }
@@ -2276,7 +2276,7 @@ undefined4 __thiscall FUN_00423870(int param_1,undefined4 param_2,int param_3)
     FEManager__ShowPackage();
     return 1;
   case 2:
-    FUN_004f6240();
+    FEngStopInteraction();
     Players_AssignTypeFromTable();
     return 1;
   case 3:
@@ -2327,7 +2327,7 @@ undefined4 __thiscall FUN_00423870(int param_1,undefined4 param_2,int param_3)
 undefined4 switchD_00423881::caseD_2(void)
 
 {
-  FUN_004f6240();
+  FEngStopInteraction();
   Players_AssignTypeFromTable();
   return 1;
 }
@@ -2720,7 +2720,7 @@ LAB_0042406f:
     iVar8 = 0;
   }
   else {
-    iVar8 = FUN_0049e390();
+    iVar8 = cPostRaceScreenManager__CreateInstance();
   }
   iVar4 = *unaff_EDI;
   unaff_EDI[0x12] = iVar8;
@@ -2805,7 +2805,7 @@ undefined4 __thiscall CameraMover_CreateByType(int param_1,int param_2,undefined
     break;
   case 2:
     ExceptionList = &local_10;
-    FUN_0049e3e0(*(undefined4 *)(param_1 + 0x48));
+    cPostRaceScreenManager__EndInteraction(*(undefined4 *)(param_1 + 0x48));
     if (*(undefined4 **)(param_1 + 0x40) != (undefined4 *)0x0) {
       (**(code **)**(undefined4 **)(param_1 + 0x40))(1);
       *(undefined4 *)(param_1 + 0x40) = 0;

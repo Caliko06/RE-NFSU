@@ -5416,7 +5416,7 @@ void FUN_006852c8(void)
 void Unwind_006852e0(void)
 
 {
-  FUN_005306a0();
+  stSoundCollision___stSoundCollision();
   return;
 }
 

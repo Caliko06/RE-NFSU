@@ -3217,7 +3217,7 @@ void __fastcall FUN_00465640(undefined4 param_1,int *param_2)
     unaff_ESI[8] = iVar3;
     unaff_ESI[10] = iVar4;
     if (bVar5) {
-      FUN_00530100(unaff_ESI);
+      EAXCollision__CreatCollisionSample(unaff_ESI);
     }
   }
   iVar4 = DAT_0073ad34;
@@ -3258,7 +3258,7 @@ void FUN_00465700(void)
   *piVar1 = iVar4;
   *(int **)(iVar4 + 4) = piVar1;
   if (DAT_006f1dd8 != 0) {
-    FUN_005302f0();
+    EAXCollision__ReleaseCollisionSample();
   }
   cVar2 = Collision__IsWallInvolved();
   if (cVar2 != '\0') {
@@ -3380,8 +3380,9 @@ void FUN_00465830(int param_1,undefined4 *param_2,float *param_3,float param_4)
     }
     bNormalize3();
     fVar7 = (float10)FUN_00421400();
-    if (((fVar7 < (float10)100.0) && (DAT_006f1dd8 != 0)) && (FUN_00530240(), DAT_006f1dd8 != 0)) {
-      FUN_00530090();
+    if (((fVar7 < (float10)100.0) && (DAT_006f1dd8 != 0)) &&
+       (EAXCollision__StartCollisionSample(), DAT_006f1dd8 != 0)) {
+      EAXCollision__PlayScrape();
     }
   }
   cVar3 = Collision__IsPlayerInvolved();

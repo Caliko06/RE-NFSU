@@ -1,6 +1,8 @@
-// ==== 0x531030 FUN_00531030
+// ==== 0x531030 stSoundCollision::GenScrapeIntensity
 
-void __fastcall FUN_00531030(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__GenScrapeIntensity(int param_1)
 
 {
   undefined4 uVar1;
@@ -75,18 +77,22 @@ void __fastcall FUN_00531150(int param_1)
 }
 
 
-// ==== 0x531160 FUN_00531160
+// ==== 0x531160 stSoundCollision::ShouldBeginImpact
 
-bool __fastcall FUN_00531160(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+bool __fastcall stSoundCollision__ShouldBeginImpact(int param_1)
 
 {
   return *(char *)(param_1 + 0x219) == '\0';
 }
 
 
-// ==== 0x531170 FUN_00531170
+// ==== 0x531170 stSoundCollision::ShouldBeginScrape
 
-int __fastcall FUN_00531170(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+int __fastcall stSoundCollision__ShouldBeginScrape(int param_1)
 
 {
   float fVar1;
@@ -105,9 +111,11 @@ int __fastcall FUN_00531170(int param_1)
 }
 
 
-// ==== 0x531190 FUN_00531190
+// ==== 0x531190 stSoundCollision::IsHighSpeedPlayerHit
 
-uint __fastcall FUN_00531190(int param_1)
+/* [canon] audio low (ghidra-canon) docs/re/sound.md */
+
+uint __fastcall stSoundCollision__IsHighSpeedPlayerHit(int param_1)
 
 {
   float fVar1;
@@ -303,9 +311,11 @@ void __fastcall stSoundCollision__BeginImpact(int *param_1)
 }
 
 
-// ==== 0x531460 FUN_00531460
+// ==== 0x531460 stSoundCollision::SetImpactSampleIndex
 
-void __fastcall FUN_00531460(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSoundCollision__SetImpactSampleIndex(int param_1)
 
 {
   *(undefined4 *)(param_1 + 0x334) = 0;
@@ -313,9 +323,11 @@ void __fastcall FUN_00531460(int param_1)
 }
 
 
-// ==== 0x531470 FUN_00531470
+// ==== 0x531470 stSoundCollision::SetScrapeSampleIndex
 
-int __fastcall FUN_00531470(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+int __fastcall stSoundCollision__SetScrapeSampleIndex(int param_1)
 
 {
   *(undefined4 *)(param_1 + 0x338) = 0;
@@ -323,28 +335,32 @@ int __fastcall FUN_00531470(int param_1)
 }
 
 
-// ==== 0x531490 FUN_00531490
+// ==== 0x531490 stSmokableCollision::GetRuntimeVolume
 
-int FUN_00531490(void)
+/* [canon] audio low (ghidra-canon) docs/re/sound.md */
+
+int stSmokableCollision__GetRuntimeVolume(void)
 
 {
   int iVar1;
   int extraout_ECX;
   
-  iVar1 = FUN_0052f5c0();
+  iVar1 = GetSmokeableCategoryVolume();
   return iVar1 * *(int *)(extraout_ECX + 0x240) >> 0xf;
 }
 
 
-// ==== 0x5314b0 FUN_005314b0
+// ==== 0x5314b0 stSmokableCollision::SetImpactSampleIndex
 
-void FUN_005314b0(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void stSmokableCollision__SetImpactSampleIndex(void)
 
 {
   undefined4 uVar1;
   int extraout_ECX;
   
-  uVar1 = FUN_0052f7b0();
+  uVar1 = GetSmokaebleImpactSndMapping();
   *(undefined4 *)(extraout_ECX + 0x334) = uVar1;
   return;
 }
@@ -361,9 +377,11 @@ undefined1 EAXS_3DMixer__IsThisObjectIntheLead__default_returns_0_(void)
 }
 
 
-// ==== 0x5314e0 FUN_005314e0
+// ==== 0x5314e0 stSmokableCollision::ShouldBeginImpact
 
-undefined1 __fastcall FUN_005314e0(int param_1)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+undefined1 __fastcall stSmokableCollision__ShouldBeginImpact(int param_1)
 
 {
   int iVar1;
@@ -423,29 +441,33 @@ undefined1 __fastcall FUN_005314e0(int param_1)
 }
 
 
-// ==== 0x5315d0 FUN_005315d0
+// ==== 0x5315d0 stSmokableCollision::SetScrapeSampleIndex
 
-void FUN_005315d0(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void stSmokableCollision__SetScrapeSampleIndex(void)
 
 {
   undefined4 uVar1;
   int extraout_ECX;
   
-  uVar1 = FUN_0052f750();
+  uVar1 = GetSmokaebleScrapeSndMapping();
   *(undefined4 *)(extraout_ECX + 0x338) = uVar1;
   return;
 }
 
 
-// ==== 0x5315f0 FUN_005315f0
+// ==== 0x5315f0 stSmokableCollision::Initialize
 
-void __thiscall FUN_005315f0(int param_1,undefined4 param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __thiscall stSmokableCollision__Initialize(int param_1,undefined4 param_2)
 
 {
   int iVar1;
   uint uVar2;
   
-  FUN_00530840(param_2);
+  stSoundCollision__Initialize(param_2);
   *(undefined **)(param_1 + 0x2f8) = &DAT_0073676c;
   *(undefined **)(param_1 + 0x2fc) = &DAT_00736788;
   iVar1 = *(int *)(*(int *)(param_1 + 0x21c) + 100);
@@ -462,9 +484,11 @@ void __thiscall FUN_005315f0(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x531670 FUN_00531670
+// ==== 0x531670 stSmokableCollision::GenImpactIntensity
 
-void __fastcall FUN_00531670(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSmokableCollision__GenImpactIntensity(int param_1)
 
 {
   float fVar1;
@@ -522,9 +546,11 @@ undefined4 FUN_00531750(void)
 }
 
 
-// ==== 0x531760 FUN_00531760
+// ==== 0x531760 stSmokableCollision::CSISBeginImpact
 
-void __fastcall FUN_00531760(undefined4 *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSmokableCollision__CSISBeginImpact(undefined4 *param_1)
 
 {
   undefined4 *puVar1;
@@ -550,7 +576,7 @@ void __fastcall FUN_00531760(undefined4 *param_1)
     }
     else {
       local_10 = puVar1;
-      uVar2 = FUN_0052f2c0(param_1[199]);
+      uVar2 = Csis_CreateImpactSmokableInstance(param_1[199]);
     }
     param_1[0xc9] = uVar2;
     DAT_00735624 = DAT_00735624 + 1;
@@ -560,9 +586,11 @@ void __fastcall FUN_00531760(undefined4 *param_1)
 }
 
 
-// ==== 0x531810 FUN_00531810
+// ==== 0x531810 stSmokableCollision::CSISBeginScrape
 
-void __fastcall FUN_00531810(undefined4 *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall stSmokableCollision__CSISBeginScrape(undefined4 *param_1)
 
 {
   undefined4 *puVar1;
@@ -588,7 +616,7 @@ void __fastcall FUN_00531810(undefined4 *param_1)
     }
     else {
       local_10 = puVar1;
-      uVar2 = FUN_0052f440(param_1[200]);
+      uVar2 = Csis_CreateScrapeSmokableInstance(param_1[200]);
     }
     param_1[0xca] = uVar2;
     DAT_00735620 = DAT_00735620 + 1;
@@ -848,7 +876,7 @@ void __thiscall FUN_00531d70(int param_1,int param_2)
   if (*(char *)(iVar1 + 0x15) == '\0') {
     *(undefined4 *)(param_1 + 0x364) = *(undefined4 *)(iVar1 + 0x140);
   }
-  FUN_00530840(param_2);
+  stSoundCollision__Initialize(param_2);
   *(undefined **)(param_1 + 0x2f8) = &DAT_007367dc;
   return;
 }
@@ -911,12 +939,12 @@ undefined4 __fastcall FUN_00531dd0(int param_1)
 }
 
 
-// ==== 0x531f50 thunk_FUN_00530840
+// ==== 0x531f50 stSoundCollision::Initialize
 
-void thunk_FUN_00530840(void)
+void stSoundCollision__Initialize(void)
 
 {
-  FUN_00530840();
+  stSoundCollision__Initialize();
   return;
 }
 
@@ -1113,7 +1141,7 @@ void FUN_00532370(void)
 {
   undefined4 *in_EAX;
   
-  FUN_00530570();
+  stSoundCollision__stSoundCollision();
   *in_EAX = &PTR_FUN_006be6c8;
   in_EAX[0xdb] = 0;
   return;
@@ -1163,7 +1191,7 @@ void __fastcall FUN_005323b0(undefined4 *param_1)
   }
   param_1[0xdb] = 0;
   local_4 = 0xffffffff;
-  FUN_005306a0();
+  stSoundCollision___stSoundCollision();
   ExceptionList = pvStack_c;
   return;
 }
