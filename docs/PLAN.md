@@ -1,8 +1,13 @@
 # Plan: NFSU PC 1:1 in Chrome
-For the OWNER alone: Chrome on this Mac, tools/serve.py on 127.0.0.1:5180, saves in save/. No deploy.
+For the OWNER alone: Chrome on this Mac, tools/serve.py on 127.0.0.1:5180, saves in save/. Deploy is the OWNER's call.
 One session on main. Each milestone has one gate: the run that proves it.
 
-## Now (OWNER 2026-10-28): an open world with life
+## Now (OWNER 2026-10-29): reverse engineer to 100 %, not publish
+Every system accounted for: canon, free tracks, traffic, rivals, tuning, sound, assets, blur, cameras, props. Method and
+checks: docs/re_scoreboard.md §4 (honest coverage, systems.tsv, names.tsv, scoreboard). The open world block below keeps
+going as the free-tracks/traffic/rivals thread. Branch `publish` is parked.
+
+## Open world with life (OWNER 2026-10-28)
 The OWNER played WORLD (remaster): invisible walls, no traffic seen, no rivals, "flat, lifeless". Wanted: rivals with
 personality (they bump you, pass close, you can chase them, they crash too), traffic around the player, no invisible
 walls. Simplest bridges and patches over the game's own AI; RE first; one check per step.
