@@ -14,7 +14,7 @@ Marks: V = I re-ran it or read the code this session, D = a doc or the ledger sa
 | Lifted to C | 13,739, failed 0, trap sites 7,655 (dead SIMD paths) | `census/lift_report.json` |
 | Compared against Unicorn | 5,813 of 13,800; 5,809 match; gate FAIL | `census/difftest.json` |
 | Unexplained difftest mismatch | 1 (`0x67a337`); 3 others are documented QEMU deviations | D `docs/coverage.md` §2 |
-| Functions with a real name | 52 of 14,333 (0.4 %; 31 rows have an empty name) | `awk` over `funcs.tsv`, names neither empty nor starting `sub_` (corrected by the names-seed agent) |
+| Functions with a real name | 52 of 14,333 in funcs.tsv (582 in census/names_*.tsv, 493 V, 2026-10-29) (0.4 %; 31 rows have an empty name) | `awk` over `funcs.tsv`, names neither empty nor starting `sub_` (corrected by the names-seed agent) |
 | Active patches | 122 | `census/lift_report.json` |
 | Career rows | 167/167, a regression guard only | `census/rows.json` |
 | Hopper query scripts | 131 `tools/hopper/q_*.py`, 85 frozen PS2/NFSU1 RE notes in `ref/docs/re` | `ls` |
@@ -78,3 +78,28 @@ Evidence marks are about the docs named; none of these was re-run here.
 6. **Scoreboard script** `tools/census/scoreboard.py`: per system, functions, lifted, ran, named, diff-tested.
    "100 %" per system means every function is tagged, every function that ran is named or marked trivial, and every
    one that never ran is proven dead (SIMD path, online, installer) or has a scenario that reaches it.
+
+## 5. Four numbers per system (tools/census/scoreboard.py, 2026-10-29, V)
+
+Universe = the 13,739 lifted functions. tagged = systems.tsv (draft: ~12% of tags wrong in a manual read, see docs/re/systems_method.md); ran = RN_COV union, a floor (prologue only); named = census/names_*.tsv (V = second tool agrees); diff-tested = U per system, difftest.json keeps only the total (5,813 compared, 5,809 equal).
+
+| system | lifted | tagged | ran | named | named V | diff-tested |
+|---|---|---|---|---|---|---|
+| render | 2243 | 2243 | 949 | 28 | 20 | U |
+| canon | 2056 | 2056 | 682 | 93 | 80 | U |
+| runtime | 1771 | 1771 | 716 | 27 | 23 | U |
+| unknown | 1560 | 0 | 905 | 16 | 10 | U |
+| audio | 1299 | 1299 | 789 | 178 | 167 | U |
+| rivals | 1085 | 1085 | 604 | 24 | 23 | U |
+| car | 964 | 964 | 335 | 130 | 112 | U |
+| track | 792 | 792 | 449 | 45 | 31 | U |
+| online | 691 | 691 | 28 | 2 | 2 | U |
+| hud | 354 | 354 | 178 | 6 | 4 | U |
+| camera | 261 | 261 | 79 | 20 | 10 | U |
+| traffic | 197 | 197 | 140 | 5 | 4 | U |
+| props | 183 | 183 | 103 | 2 | 1 | U |
+| assets | 154 | 154 | 46 | 6 | 6 | U |
+| input | 129 | 129 | 35 | 0 | 0 | U |
+| TOTAL | 13739 | 12179 | 6038 | 582 | 493 | 5813 (no split) |
+
+Reading: "unknown" (1,154) is the untagged remainder. Named is under 4% in every system; audio and car lead because of the night block. Ran 44% overall; online (23 of 797) is mostly dead by scope.
