@@ -62,6 +62,7 @@ static void free_curves(Ctx *c, int on) {
         }
     saved = on;
 }
+static struct { uint32_t drv, dir; } rdir[16];   // free_dir's table, see free_respawn
 static int n_game, n_free;             // free_spacing: moves with the game's spacing, moves given the track's spacing
 static int n_far, n_offbit, n_onbit;   // free_recycle: far cars sent to a move; free_tnode: cars placed on a node without / with the bit
 static uint32_t names;           // NRIV guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
@@ -123,6 +124,8 @@ static uint32_t free_setup(Ctx *c) {
         c->mem[0x78a334] = 1;
         st(c, 0x78a324, NRIV, 4);
         npicked = 0, rn_free_now = 1;
+        memset(rdir, 0, sizeof rdir);
+        st(c, 0x6c89f0 + 0x40, host_addr_of("rn", "free_dir"), 4);   // racer vtable slot +0x40: each rival's own route direction
         uint32_t args[2] = {NRIV, 0};
         call_guest_cdecl(c, 0x4b4040, 2, args);
         rn_free_now = 0;
@@ -203,9 +206,34 @@ static uint32_t free_traffic(Ctx *c) {
 // teleporter 0x59a2c0 asks it) walked with 0x4563d0 (ecx section, eax node, cdecl: &pair in/out, 1, metres, along the node
 // direction 1 / against 0, 0; 0x59a2c0 walks 250 m the same way), checked with 0x456c90 (eax = &pair). Ahead or behind is
 // a coin; the walk takes whatever link the network gives at a junction, so some land on cross streets. RN_RESPAWN=0: off.
+// Each rival's own walk direction (docs/openworld/re_rival_turnback.md, Follow-up). The racer class (vtable 0x6c89f0) answers its
+// route direction at slot +0x40 = 0x45d640, `mov eax,[0x78a2fc]`, the same for all; 0x44b85d (per frame, into the path grower
+// 0x458cc0) and the reset 0x44adff (forward flag = dir == 0) ask it. The slot now points here (written by free_setup): the
+// driver's own value from the table below, else the game's. dir 0 = along the nodes' direction +0xc/+0x10, 1 = against.
+// Flipping a racer is the traffic decider's own recipe (0x59c210..0x59c28b): 0x457060(path) with edi = dir, 0x5a5340 (esi =
+// the new path) to empty it, bit 0 of the 8 decision slots driver+0xc..+0x28 cleared; the path is ctx+0x3a8, ctx = driver+0x2c.
+static uint32_t free_dir(Ctx *c) {
+    uint32_t drv = c->r[ECX];
+    for (int i = 0; i < 16 && rdir[i].drv; i++)
+        if (rdir[i].drv == drv) return rdir[i].dir;
+    return ld(c, 0x78a2fc, 4);
+}
+static void rival_flip(Ctx *c, uint32_t drv, uint32_t dir) {
+    int i = 0;
+    while (i < 15 && rdir[i].drv && rdir[i].drv != drv) i++;
+    rdir[i].drv = drv, rdir[i].dir = dir;
+    uint32_t pa = drv + 0x2c + 0x3a8, edi = c->r[EDI], arg = pa;
+    c->r[EDI] = dir;
+    call_guest_cdecl(c, 0x457060, 1, &arg);
+    c->r[EDI] = edi;
+    uint32_t path = ld(c, pa, 4), esi = c->r[ESI];
+    if (path) c->r[ESI] = path, call_guest(c, 0x5a5340, 0, NULL), c->r[ESI] = esi;
+    for (int k = 0; k < 8; k++) st(c, drv + 0xc + 4 * k, ld(c, drv + 0xc + 4 * k, 4) & ~1u, 4);
+}
 static uint32_t respawn_pair;
 static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
-    static int off = -1; static float far; static uint32_t seed = 0x5eed1234, done[16], when[16];
+    static int off = -1, rev; static float far; static uint32_t seed = 0x5eed1234, done[16], when[16];
+    if (off < 0) rev = getenv("RN_RESPAWNREV") != NULL;   // test-only: every respawn drives the way opposite to the player's (the flipped racer AI on its own)
     if (off < 0) off = getenv("RN_RESPAWN") && !atoi(getenv("RN_RESPAWN")), far = getenv("RN_RIVALFAR") ? (float)atof(getenv("RN_RIVALFAR")) : 400.0f;
     if (off || !pc) return;
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
@@ -237,7 +265,13 @@ static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) 
         for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
             clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
         if (!clear) { c->ftop = ft; return; }
-        float dir = ldf(c, n2 + 0xc) * vx + ldf(c, n2 + 0x10) * vy >= 0 ? 1.0f : -1.0f, lo = ldf(c, 0x700d58), v = sp > lo ? (float)sp : lo;   // 0x426617: 8 m/s at least
+        // dir: the player's way along the road (`along`, at the player's own node; the node 300 m on may bend past 90 degrees from the
+        // player's heading, its direction vector says nothing about the way); a stopped player: the rival keeps its own. The racer's
+        // route flag is 0 along the node direction, 1 against (forward flag = dir == 0, 0x44ae02).
+        uint32_t drv = ld(c, r + 0x2c, 4), had = drv ? ld(c, drv, 4) : 0, flag = !along ^ rev;
+        if (sp < 2.0) { c->r[ECX] = drv; flag = free_dir(c) != 0; }
+        float dir = flag ? -1.0f : 1.0f, lo = ldf(c, 0x700d58), v = sp > lo ? (float)sp : lo;   // 0x426617: 8 m/s at least
+        if (drv && on > 0) rival_flip(c, drv, flag);
         double was = hypot(ldf(c, r + 0x50) - px, ldf(c, r + 0x54) - py);
         uint32_t p[9] = {r, s2, n2, 0, 1, 0, 0, 0, 0};
         memcpy(&p[3], &v, 4), memcpy(&p[5], &dir, 4);
@@ -246,8 +280,8 @@ static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) 
         done[i] = r, when[i] = rn_telem.presents;
         double dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py;
         if (getenv("RN_FREELOG"))
-            rn_log("FREE respawn %s: %.0f m -> %.0f m %s (walk %s %.0f m, ret %u, node %08x dir %+.0f, %.0f m/s) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), was,
-                   hypot(dx, dy), dx * vx + dy * vy >= 0 ? "ahead" : "behind", ahead ? "ahead" : "behind", m, w, n2, dir, v, rn_telem.presents);
+            rn_log("FREE respawn %s: %.0f m -> %.0f m %s (walk %s %.0f m, ret %u, node %08x dir %+.0f flag %u vt %08x, %.0f m/s) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), was,
+                   hypot(dx, dy), dx * vx + dy * vy >= 0 ? "ahead" : "behind", ahead ? "ahead" : "behind", m, w, n2, dir, flag, had, v, rn_telem.presents);
         return;                                                   // one rival a second
     }
 }
@@ -260,6 +294,7 @@ void free_tick(Ctx *c) {
     if (ld(c, 0x77a920, 4) != 6) {
         if (raced && ld(c, 0x77a920, 4) == 3) {
             live = raced = 0, start = 0;
+            memset(rdir, 0, sizeof rdir);
             if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
             if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
         }
@@ -281,6 +316,11 @@ void free_tick(Ctx *c) {
             if (e && ld(c, e + 4, 4) == 1) me = r;
         }
         double x = me ? ldf(c, me + 0x50) : 0, y = me ? ldf(c, me + 0x54) : 0;   // m/s over the last second
+        static int shown;
+        if (me && !shown && getenv("RN_FREELOG")) {       // one line: the racer vtable slot and the player's driver class
+            uint32_t pd = ld(c, me + 0x2c, 4), pv = pd ? ld(c, pd, 4) : 0;
+            rn_log("FREE vtable 0x6c89f0+0x40 = %08x; player driver %08x vt %08x slot40 %08x", ld(c, 0x6c89f0 + 0x40, 4), pd, pv, pv ? ld(c, pv + 0x40, 4) : 0), shown = 1;
+        }
         if (me && rn_telem.presents > start + 600) free_respawn(c, rh, me, x - was[0], y - was[1]);
         was[0] = x, was[1] = y;
     }
@@ -584,5 +624,5 @@ const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traff
                          {"rn", "free_place", 1, free_place}, {"rn", "free_spacing", 1, free_spacing},
                          {"rn", "free_nopath", 0, free_nopath},
                          {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle},
-                         {"rn", "free_hud", 1, free_hud}};
-const int free_api_count = 10;
+                         {"rn", "free_hud", 1, free_hud}, {"rn", "free_dir", 0, free_dir}};
+const int free_api_count = 11;
