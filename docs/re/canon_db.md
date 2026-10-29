@@ -67,3 +67,9 @@ census/canon/systems_tu.tsv, read by the scoreboard as med. 767 stay unknown (35
 - Round 5 (file batches): R 24/33, B 21/38 taken. AIAction family 0x44e260-0x4512f0 was labelled AICarController.cpp by a
   bad alignment stretch; the round's own names re-anchored it to AIPlan.cpp (GC split 0x8004bb5c-0x80055ed8). Overloads
   (same Class::method twice in GC) anchor when the evidence cites the mangled name. Holdout 1/2 after: file 293/304, A 92/94.
+- Rounds 7-9 (canon-sonnet-c1): 2,511 -> 3,051 named, anchors 1,147. Hints are good where PC and GC order agree
+  (CollisionBody, saems, CameraMover) and fail where the PC reorders (FEPkg_PostRace R 28 %, Race 0 %, MU_Options):
+  workers name those from vtable slot order and dispatch tables. "GC free in file" now lists 16 candidates (was 8).
+- tools/canon/vtables.py (experimental, not in the queue): slot propagation across vtable families. `--check` agrees
+  with existing names 5/18 only: the vtable scan finds 216 tables, folded stubs link unrelated classes, stub names are
+  descriptive. Lead for later: a full vtable scan (ctor writes of the vtable address), then re-check.

@@ -272,7 +272,7 @@ def show(args):
         j0 = idx.get(x, {})
         if r and r["tu"] in by_tu and j0.get("size", 0) >= 24:
             ps = j0["size"] / 0.88   # PC/GC size ratio (gcalign.py)
-            near = sorted(by_tu[r["tu"]], key=lambda t: abs(math.log(max(t[0], 1) / ps)))[:8]
+            near = sorted(by_tu[r["tu"]], key=lambda t: abs(math.log(max(t[0], 1) / ps)))[:16]
             print(f"// GC free in file ({len(by_tu[r['tu']])}): " + " | ".join(f"{n} ({sz}B)" for sz, n in near))
         r = gcrow.get(x)
         if r and gsyms:
