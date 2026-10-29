@@ -28,6 +28,16 @@ until a row in `census/names_tuning.tsv` says V.
   2.9°/7° at 160), a 6-point factor and a 0..1 return scale. They are read by the steering limiter
   `0x460a80`/`0x460de0`, not by the garage. V (G, D)
 
+## Corrections to older notes (for the orchestrator to apply)
+
+| Note | Says | This RE shows | Evidence |
+|---|---|---|---|
+| `docs/driving_patches.md:4` | "the speed caps 0x583ea0, tuning 0x705f48..0x705f84" | `0x583ea0` is the generic lookup in a sampled float table (with clamping and linear interpolation; no cap of its own). `0x705f48..0x705f98` are four of those table headers for **steering vs speed**, read by `0x460a80`/`0x460de0`. Car tuning lives in GLOBALB chunk 0x34600 | V (G, D) |
+| `docs/PLAN.md:114` | "speed caps 0x583ea0 on 0x705f48..0x705f84 (lead); bought upgrades really change the tuning values" | Same correction. Upgrades do change the physics, through `0x57f2b0` → `0x575960` with the table rows in §1. The 0x705f48 tables are the steering limit (relevant to the "rigid, late" handling item, not to upgrades) | V (G) |
+| `docs/re_scoreboard.md:57` | tuning block `0x705f48..`, speed caps `0x583ea0` | Point it to this doc and to chunk 0x34600 / `0x57f2b0` | V |
+| `ref/docs/re/out/x86-ps2-map.tsv` row 0x473fc0 | `PhysicsUpgradeSpecification::GetUpgradeLevel` (tier I) | `0x473fc0` picks a row of the drift/drag blend table `0x6f0fc0` by a float vs 0.2/0.8; not GetUpgradeLevel | V (G, H) |
+| `docs/openworld/re_rivals_ai.md:107` | position curve "through sub_4175c0 / sub_583ea0" | Consistent: 0x583ea0 is the table lookup that reads that curve. No change needed | V |
+
 ## 1. Data: CarTypeInfo (chunk 0x34600)
 
 Loader `0x57c8b0` (V, G+H): if the chunk id is `0x34600`, it sets `[0x734588] = (chunk+0x17) & ~0xf` and, for each
@@ -124,10 +134,26 @@ Reader: `tools/re/carinfo.py check` re-packs every decoded table and every part 
 file. The result is 1435/1435 tables and 4537/4537 parts byte-equal, with all 8,113 attributes referenced.
 V (D, 2026-10-29).
 
+## 4. Unlocks (paint as the read example)
+
+`0x4d7eb0` (map: IsPaintLocked, V-graph) and `0x4d8180` (IsPaintOwned). V (G), with the arguments partly lost by
+Ghidra:
+- A paint part with level byte (`part+0x11`) ≤ 1 is never locked.
+- Otherwise the code asks `0x5a1550(&0x75eef8, key)` five times, once per level 0..4, and the part is locked when
+  the answer for its own level is false. `0x75eef8` is the career/unlock state object (I).
+- `[0x7677ac]` bypasses the lock entirely. It is the "career beaten" flag: `0x5a0dc0` writes 1 when the last
+  event (0x71) is won, and the new-profile code `0x41cf40` clears it. V (G xref + patches.py:311 note). So beating
+  the career unlocks every part. `[0x735ec1]` also bypasses (U).
+- "Owned" first looks for the level in the list at `[0x737668]` (count `[0x73766c]`, 0x34-byte entries, type 1).
+  It then accepts when any of `[0x7677ac]`, `[0x735e12]`, `[0x735ec1]` is set. Otherwise it compares the level
+  with 2 or 3, using the flags `[0x735e10]`/`[0x735e11]` and the same `0x5a1550` queries.
+
+So the level byte in the part DB is the unlock tier: tier n opens when the career reaches it.
+No price field exists anywhere in the record or its attributes (D: no attribute varies like a price).
+
 ## Open (U)
-- The unlock rule: which career counter the part level byte (and the perf package level) is compared with. The
-  candidates use attribute hash 0x10c98090: 0x4bbd70, 0x4bc790, 0x4c7790, 0x50d420, 0x580b00. Names are in
-  `census/names_tuning.tsv` once verified.
+- The keys passed to `0x5a1550` (which career milestones open tiers 2..4) and the perf-package unlock (same object?).
+  Candidates that use attribute hash 0x10c98090: 0x4bbd70, 0x4bc790, 0x4c7790, 0x50d420, 0x580b00.
 - Who writes spec levels 9/10 (spoiler/ground effects). The garage leaves them 0 on PS2. On PC only the
   RebuildPhysicsInfo aero top-up (step 3) is seen.
 - The exact meaning of the out+0x1c0 float that picks the drift row (it is copied from the gear-set row +0x10).
