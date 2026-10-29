@@ -1,0 +1,602 @@
+addr	system	evidence
+0x401050	runtime	I: bump allocator on 0x7355b4/0x7355b8 like ScratchAlloc16 0x401010: size=(n<<6)+15&~15, flag 0x7355c4 on overflow
+0x4016e0	render	I: guarded by dword_73636c (D3D device), calls 0x408b20/0x40abd0/0x40e6d0 and SceneRTSelect, then re-selects Input action map; sole caller Texture::ReleaseD3D
+0x401c10	runtime	I: x*65536.0 -> _ftol 0x674898 -> /360 by magic 0xb60b60b7: float-to-angle16 style math, no game state
+0x401cb0	runtime	I: copies 3 floats ecx[0..2] and w ecx[3] into eax: vec3/vec4 copy
+0x401f70	runtime	I: 20 fld/fmul of 4x4 matrix element pairs: matrix cofactor helper, no globals
+0x4020b0	runtime	I: calls 0x401f70 (cofactor/determinant), 1.0/det via fdivr, then 16 cofactor products stored; 1099 bytes of pure float math
+0x402500	runtime	I: squares of 4 args, calls 0x4020b0 (matrix inverse): matrix build from quaternion-like args
+0x4055e0	runtime	V: x * 0x3c8efa35 (0.0174533 = pi/180), single fmul and ret (capstone bytes agree)
+0x405610	runtime	I: x*65536/360 style scale + _ftol 0x674898 then table call 0x564b10 (sin/cos table)
+0x408160	runtime	I: eax[i] = ecx[i]*arg_0 for i=0..2
+0x408210	rivals	I: returns dword_7361bc[idx] (player table, 0x7361bc is "the player object" in rivals doc); callers NearestPlayer, PickLane, Teleporter_PickPlayer, TrafficTeleporter::DoTimestep
+0x408220	render	I: two calls through *(*dword_73636c + 0x158) (IDirect3DDevice9 slot 86) with static tables 0x71a058/0x71a078
+0x40c4b0	assets	V: switch on chunk id ecx[3] against 0x89f23a14, 0x3ed70c43, 0x23e6a3f4, 0x12c9453c ...; sole caller LightPack_Load
+0x411be0	audio	I: takes CriticalSection, pops free list edi[0x20], counts 0x100 bytes into 0x71b7c4; caller SNDSTRMI_queue 0x412930
+0x411c50	audio	I: CriticalSection, appends node to list edi[0x1d..0x1f]; caller SNDSTRMI_queue
+0x411ec0	audio	I: arg+0x64 handle -> 0x639c00 then 0x412160 (audio stream) with arg+0x14
+0x411ef0	audio	I: sibling of 0x411ec0: 0x63a5d0 create + 0x639f20 with callback 0x411ec0
+0x412020	audio	I: CriticalSection loop over request list, calls 0x412160 (audio) and 0x63a690, caller SNDSTRMI_queue
+0x4124d0	audio	V: arg0*0x128 + (arg4*3+0x7b)*4 + (arg8<<4): same formula SNDSTRMI_create 0x4124f0 uses to size its buffer; caller SNDSTRM_overhead
+0x412890	audio	I: checks object magic 0x4d525453 ('STRM'), updates read pointers eax[0x15]=eax[0x16], threshold 0x6000
+0x412900	audio	I: checks magic 'STRM', index 1..ecx[0xd], returns ecx[0xc]+(idx<<4)-0x10 else 0
+0x4134a0	runtime	V: tail-calls _malloc 0x67121a (10 bytes); caller TrafficCar_Place
+0x4134d0	canon	I: 0x4f65d0/0x4ffb70/0x4ef050 lookup chain identical to HudWidget::RegisterObjectByHash; callers GarageMainScreen, HudManager ctors
+0x4149d0	canon	I: same 0x4f65d0/0x4ffb70/0x4ef050 chain, 62 bytes, no register step
+0x41e860	runtime	V: pushfd/xor 0x200000/popfd (CPUID presence test) then cpuid switch (capstone shows cpuid)
+0x41f0c0	canon	I: zeroes UI-screen fields (+0x19c,+0x1fc,+0x204=1) after eh_vector_constructor; callers all FEng screens (canon, online)
+0x41f160	canon	I: stores FEng package ptr, looks object up via 0x4f65d0/0x4ffb70/0x4ef050
+0x41f240	canon	I: FEng message handler: compares msg hash 0xc98356ba, uses bStrLen/bStrCpy, string buffer 0x73639c
+0x41f4d0	canon	I: starts text-entry state: 0x73639c=esi+0x1a4, 0x7363a8=1, 0x7363ac=esi[0x7b]
+0x41f9b0	track	I: shutdown: SlotPool::Destroy, bMemoryPool_Validate, calls 0x421900/0x421980/0x4219b0 (track tagged)
+0x421a80	rivals	I: returns eax[0x734]!=0 (same field as 0x424d60)
+0x424160	camera	I: switch on arg-1, calls Player::ChangeCameraMover and _malloc: builds a mover object per type
+0x424c50	traffic	I: idx*0xc90 + dword_734588 (traffic car array, stride 0xc90); caller TrafficCar_Place
+0x424d50	rivals	I: *(eax[5]+4)==1 flag read; callers RaceManager::UpdateAIScore, Teleporter_MoveCar
+0x424d60	rivals	I: eax[5][1]==1 && eax[0x734]==0; callers RaceManager::UpdateAIScore, SpecialCamCaller
+0x424f30	traffic	I: selects 0x4422b0 or 0x442330 by edx; caller TrafficCar_Place
+0x424f40	traffic	I: offset +0xc or +0x14 selected by ecx; caller TrafficCar_Place
+0x425af0	car	I: formats "Car%d" via 0x565da0 and runs 0x571c20 field read/write calls over car struct (args +0x830..): per-car save/load block; caller 0x41fc00
+0x4267a0	track	I: calls GroundQuery::RefillCache and FindSurfaceBelow with float tolerance
+0x42a4d0	car	I: calls GroundQuery 0x440a40 with car fields +0x540/+0x60 when esi[0xf3]==4; only caller Car::ServiceResetRequest
+0x42a530	car	I: state machine on ecx[0xe] and ecx[0xf3]; only caller Car::ServiceResetRequest
+0x42ab30	hud	I: returns whether eax[0x56] or dword_7361a0 set; caller Player::ComputeHudFlags
+0x42ac10	hud	I: returns *eax in {7,0xb}; caller Player::ComputeHudFlags
+0x42ac30	hud	I: *ecx in {7,0xb} with sub-state ecx[8] in {2,3}; caller Player::ComputeHudFlags
+0x42ac60	rivals	I: sign_extend(eax[9]) accessor; caller RaceManager::UpdateAIScore
+0x42ad10	camera	V: zeroes/initializes fields eax[0..0x47] of a camera mover; callers: CubicCameraMover::ctor, DragRaceCameraMover::ctor, DragRaceAheadCameraMover::ctor, DragRaceLeaderCameraMover (5 named camera ctors)
+0x42c340	camera	I: calls RearViewMirrorCameraMover ctor path and _malloc, releases esi[0xa2] via virtual dtor; caller HudManager::SetFlags
+0x42f650	camera	I: 1454-byte routine calling Atan2ToAngle16, only caller Player::StartRaceCameras
+0x4300f0	camera	I: 1376-byte camera positioner: Atan2ToAngle16 + bDistance3, indexes table by ebx[0x4a]<5; sole caller Player::StartRaceCameras
+0x430650	hud	I: reads byte_78a346 and dword_7361a0, ecx[0x45]; sole caller HudSmokeApplause::Update
+0x431190	rivals	I: loops player table 0x7361bc/count 0x7361c4, writes per-player ecx[3] from ecx[2]
+0x4312a0	camera	I: reads camera fields ecx+0x3d4 and time dword_73ad34, ftol; only caller Player::StartRaceCameras
+0x432c50	rivals	I: sign_extend(eax[0xd]) accessor; caller RaceManager::UpdateAIScore
+0x4353e0	hud	I: computes time delta arg_10c-ecx[0x44] then ftol; caller HudLeaderboard::Update
+0x439030	camera	I: calls SpecialCamCooldown and _ftol; guards on ecx[3]
+0x4491a0	car	I: calls RideInfo::RebuildPhysicsInfo using byte_78a3f5 as car slot
+0x455760	car	I: calls GroundQuery::FindSurfaceBelow after 0x440740 with car object fields at esi
+0x4791f0	car	I: uses LinearTable::Lookup11 on car object fields edx[0x17]; branches on ecx[0xe] in {1,2}
+0x479e20	car	I: 619 bytes: checks eax[0x734]==0 on the car owner and RideInfo::GetTheoreticalTopSpeed, then _ftol
+0x47c580	car	I: 1115 bytes: Car_SetMode, TrackPath::UpdateCursor, Atan2ToAngle16, _ftol over per-car arrays at 0x7798f0
+0x47c9e0	car	I: loops table dword_779904 with Car_SetMode over players dword_7361f0; 209 bytes
+0x480020	car	I: writes ebx+0xccc = table[0x540+idx*4]*const*dword_7372b0: per-car scale; sole caller GameFlow::TrackWorldInit
+0x483b90	camera	I: 667 bytes: builds a probe from the mover (ecx) and calls GroundQuery::RefillCache and CameraMover::EnforceMinGapToWall; callers include camera movers
+0x4859f0	camera	I: copies 0x30-byte header and fields +0x30.. from edx to eax (mover state copy); sole caller TrackCarCameraMover::ctor
+0x487680	camera	I: writes basis vector (1,0,0,0) then calls CameraMover::ComputeBankedUpVector and _ftol
+0x489300	camera	I: arg & 0xffff sign-fixed to +-0x8000, abs, to float (angle diff) + Atan2ToAngle16; sole caller DriveCameraMover::Update
+0x492e70	car	I: calls RideInfo::RebuildPhysicsInfo then _ftol scaling of tuning floats
+0x494d00	hud	I: initializes a list header (arg_0[1]=arg_0+4, [2]=arg_0+4, byte 0) and calls HudWidget::RegisterObject
+0x4a57d0	hud	I: arg_4/eax[8] ratio clamped 0..1: gauge fraction; sole caller HudTachDrag::Update
+0x4a7b00	hud	I: float clamp then FEObject::SetFormattedText and _ftol: formats a number into a HUD text; sole caller HudSpeedTrapDrift::Update
+0x4a8b10	hud	I: mallocs a node and calls HudWidget::RegisterObject when ebx[3]==ebx[2]; caller HudOnline::Update
+0x4a9810	hud	I: float compare / lerp over a widget array arg_0 (count>1); sole caller HudSmokeApplause::Update
+0x4abe90	car	I: FECarConfig::FillFromRide then stores car id eax[0xd1] into esi[0]/esi[1] by dword_777b4c==8; sole caller GaragePresetsScreen::LoadPreset
+0x4aef50	car	I: FEng object fetch 0x4f6970 then FEObject::SetVisible scaled by edx[0x10]; sole caller GarageMainScreen::UpdateCarStatistics
+0x4b01c0	audio	I: calls EAXFrontEnd::PlayDriveOnSnd with float constants: front-end drive-on sound trigger
+0x4bca40	car	I: calls RideInfo::Init, RideInfo::operator=, CarPartDatabase::GetCarPart and Ride_Init with a stack RideInfo of 0x700 bytes
+0x4d9a40	car	I: loop building "COLORELEMENT_%d" names via 0x4f42f0 and looking up FEng objects via 0x4ef050 (garage color picker); caller 0x4da1a0
+0x4f08f0	canon	I: _malloc(0x20), fills 0xabadcafe markers at +4/+8, vtable 0x6c2c64, links node into list at ebx[0x104b/0x104c]; 16 callers from FEng screens
+0x4f3c40	assets	I: compares header word ecx with 0x30203 / 0x30210 and calls DecompressCOMP on the payload; 5 callers
+0x4f8960	canon	I: walks a list (esi[1], next at *node, key at node[2]) for edx, sets current item esi[3], resets slide state eax[0x16]; 27 callers all garage/option FEng screens
+0x4f89d0	canon	I: calls FEng helpers 0x4f8b80/0x4f7260/0x4f73f0 and 0x593ec0(dword_73ad38 = frame dt), 422 bytes of scroll animation; 27 callers all FEng screens
+0x504010	runtime	I: if (*ecx) call _free 0x671102; 11 callers (canon, online)
+0x504080	runtime	I: copies a wchar_t string into edi's buffer, calls WString_Grow 0x5040e0 when length+1 > edi[1]; caller ControlsScreen::SetBindingLabel
+0x5040e0	runtime	I: wchar_t buffer: counts length until 0, if new cap edx > len allocs 2*edx+2 via _malloc, copies wchars, frees old via _free; callers ControlsScreen path 0x504080
+0x52bc50	audio	I: esi[0xad]/esi[0xac] mode test, esi[0x6a0] = esi[0x8f]*dword_6f4ed8 >> 15 (fixed point volume scale)
+0x532bb0	audio	I: sequence of 0x64e8e0/0x64b560/0x64b500(0x705810)/0x64e5f0(0x20) mixer-library calls guarded by dword_6f1dd8; callers LoadFrontEndSoundBanks and LoadInGameSoundBanks
+0x536450	audio	I: calls 0x5326f0 twice on the sound object then adds a pitch/volume float term; sole caller EAXSound sound update 0x536800
+0x5365e0	audio	I: ftol(ecx[8]*const) stored at edi[0xf88]; EAX sound-object field update
+0x536800	audio	I: nested loops (11 x n) calling 0x536450(ebx) on sound objects; sole caller EAXSound::Update
+0x536870	audio	I: calls 0x5368b0(edi,esi,arg_0,t) for t=0..3: all four EAXMixMgr::SetMixType types
+0x5396a0	audio	I: reads stream parameters esi[0x8c..0x9a] (start offset/fallbacks); sole caller EAXS_Streams::SetupStartParameters
+0x53e4f0	runtime	I: walks list at arg0+0x18 comparing strings byte by byte against arg_4; returns node or 0; 7 callers
+0x53f3e0	assets	I: finds entry with 0x53e4f0 (string compare list), calls UnloadResourceFile and _free
+0x5411b0	render	I: reads light node fields edx[7]==1, edx[0x10], edx[4]&0xf: per-light distance test; sole caller LightTree_Query
+0x542360	render	I: ftol(x*65536) then Angle16SinCos 0x564bd0 twice: rotation by angle for the car renderer
+0x542c20	render	I: 402 bytes: Vec3Normalize on light vectors (0x5ac8e5 matrix helper); same module as 0x5437f0
+0x542e40	render	I: 2455 bytes: LightTree_Query, bNormalize3, _ftol; alternate branch of 0x544390 (other path 0x5437f0)
+0x5437f0	render	I: 2951 bytes: LightTree_Query, bNormalize3, Vec3Normalize, CallNTimes; chosen by dword_73554c in CarRenderInfo::Render helper 0x544390
+0x544390	render	I: branches on dword_73554c to 0x5437f0 or 0x542400 with 4 args; sole caller CarRenderInfo::Render
+0x54cfe0	online	I: scans 0x2c-stride table starting at "tsmiInvalid master account name" for id match; callers 0x54bda0/0x54c5b0/0x54cac0
+0x564a50	runtime	V: r=state 0x6f227c; return r % arg_0; state updated with xor 0x1d872b41 and shifts (5, 27): LCG-like PRNG; callers CameraMover::VelocityNoise, EAXTrafficCar::Update/UpdateDriveBy
+0x564bd0	runtime	I: arg & 0xffff scaled by 2pi/65536 (dword 0x3b..), range-reduced by pi/2 steps, then polynomial: sin/cos from a 16-bit angle; callers 0x42a860 0x42f0c0 0x456a80 0x456de0 0x458340 0x480ff0
+0x567ca0	runtime	V: loop eax=eax*0x21+byte over C string, returns eax: the bStringHash loop with the seed passed in eax (same 33x hash as 0x692ce0's static init, init 0xffffffff); callers 0x432a30, 0x57fb80
+0x5693d0	render	I: table at 0x704670 stride 0x50, normalizes vectors with bNormalize3 in a loop; sole caller CarRenderInfo::CarRenderInfo
+0x5708f0	render	I: looks up rect from table 0x6f1b38/0x6f1b40 clamped by dword_734608/73460c then 0x56dc30; sole caller DrawShowcaseCarList
+0x570db0	render	I: gated by dword_6f1ad0 and game state 0x77a920==6; calls CarRenderInfo::Render and CallNTimes; sole caller RenderFrameMain
+0x5715d0	track	I: Placement::UnpackMatrix + Sections::FindSectionBySolid + Solid_FindInAllLists: resolves a solid in the loaded sections
+0x574190	input	I: twice calls 0x5740b0(1) and 0x574020(1,cb 0x574150,0) then InputEvents::AddSource: device source registration loop
+0x579590	runtime	V: body is sub_589260(); return (capstone call to 0x589260); callers include CarRenderInfo::CarRenderInfo
+0x58adf0	assets	I: checks dword_7301e4 pool, free size via 0x565810 minus 0x58, caps 0xf80 for 0x565b60 alloc; sole caller CarLoader::AllocateSkin
+0x58b330	assets	I: calls bOpenFile, CreateResourceFile and ResourceFile::BeginLoading (0x58cac0 with 0x20000 chunk)
+0x592280	props	I: sets vtable 0x6c85b8, ++0x736010 instance count, tracks peak in 0x736038; string "World Object" is its pool name
+0x59b5d0	traffic	I: calls TrafficCar_PickPaint chain 0x59b590(0x4134c0) and 0x569c30; sole caller TrafficCar_Move
+0x63a3f0	runtime	I: size from counts (x*0x30+ x*0x24+0x1580), allocates through 0x6e75ec with pool label "File System", then 0x6397e0
+0x6897f0	assets	I: static initializer/funclet: 0x78e974 read by Particle_Load; 0x78e974 read by ParticleEmitter_Bind [votes {'assets': 2}]
+0x689850	input	I: static initializer/funclet: 0x78daa8 read by Input::GetState; 0x78daa8 read by Input::SelectActionMapForGameState [votes {'input': 5, 'canon': 1}]
+0x689930	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6cc7bc]; fdiv dword ptr [0x6b7c78]; fld dword ptr [0x6cca94]; fmul st(1); fstp dword ptr [0x7; written global has no code reader
+0x689bb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7c40]; fadd st(0), st(0); fstp dword ptr [0x78a46c]; ret ; written global has no code reader
+0x689bc0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7c40]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x78a468]; ret ; written global has no code reader
+0x689be0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7c48]; fadd st(0), st(0); fstp qword ptr [0x78a460]; ret ; written global has no code reader
+0x689bf0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7c48]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x78a470]; ret ; written global has no code reader
+0x689c10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7c14]; fadd st(0), st(0); fstp dword ptr [0x78a454]; ret ; written global has no code reader
+0x689c20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7c14]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x78a450]; ret ; written global has no code reader
+0x689c40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7c18]; fadd st(0), st(0); fstp qword ptr [0x78a448]; ret ; written global has no code reader
+0x689c50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7c18]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x78a458]; ret ; written global has no code reader
+0x689c70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7b38]; fadd st(0), st(0); fstp dword ptr [0x78a444]; ret ; written global has no code reader
+0x689c80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7b38]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x78a440]; ret ; written global has no code reader
+0x689ca0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7b40]; fadd st(0), st(0); fstp qword ptr [0x78a438]; ret ; written global has no code reader
+0x689cb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7b40]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x78a430]; ret ; written global has no code reader
+0x689cd0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6cc7bc]; fsub dword ptr [0x6b7be4]; fstp dword ptr [0x78a428]; ret ; written global has no code reader
+0x689d80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): push ebp; mov ebp, esp; fld dword ptr [0x6b7950]; fdiv dword ptr [0x6ccc00]; fstp dword ptr [0x77c778]; written global has no code reader
+0x689e50	rivals	I: static initializer/funclet: 0x77b198 read by RaceManager::UpdateAIScores [votes {'rivals': 1}]
+0x689eb0	traffic	I: static initializer/funclet: 0x77af20 read by TrafficAI::Reset; 0x77af20 read by PlaceCar_SpawnRecord [votes {'traffic': 13, 'assets': 2}]
+0x689f40	assets	I: static initializer/funclet: 0x77a924 read by FindResourceFile; 0x77a924 read by ServiceResourceLoading [votes {'assets': 3}]
+0x689f70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov word ptr [0x77a8fc], 0xc000; ret ; written global has no code reader
+0x68a040	assets	I: static initializer/funclet: 0x779bd8 read by CarShape_Load; 0x779bd8 read by CarShape_Find [votes {'assets': 2}]
+0x68a060	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b718c]; fadd st(0), st(0); fstp dword ptr [0x779bd4]; ret ; written global has no code reader
+0x68a070	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b718c]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779bd0]; ret ; written global has no code reader
+0x68a090	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7190]; fadd st(0), st(0); fstp qword ptr [0x779bc8]; ret ; written global has no code reader
+0x68a0a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7190]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779bc0]; ret ; written global has no code reader
+0x68a0c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b70d4]; fadd st(0), st(0); fstp dword ptr [0x779ad4]; ret ; written global has no code reader
+0x68a0d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b70d4]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779ad0]; ret ; written global has no code reader
+0x68a0f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b70d8]; fadd st(0), st(0); fstp qword ptr [0x779ac8]; ret ; written global has no code reader
+0x68a100	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b70d8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779ac0]; ret ; written global has no code reader
+0x68a120	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x779ab0], 0x3db2b8c2; ret ; written global has no code reader
+0x68a130	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x779b70], 0; mov dword ptr [0x779b74], 0; mov dword ptr [0x779b78], 0x3f490fdb; mov dword ptr ; written global has no code reader
+0x68a1a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x779ab4], 0x779b70; mov dword ptr [0x779ab8], 5; ret ; written global has no code reader
+0x68a230	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x779aa8], 0x779b98; mov dword ptr [0x779aac], 5; ret ; written global has no code reader
+0x68a250	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b70c0]; fadd st(0), st(0); fstp dword ptr [0x779aa4]; ret ; written global has no code reader
+0x68a260	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b70c0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779aa0]; ret ; written global has no code reader
+0x68a280	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b70c8]; fadd st(0), st(0); fstp qword ptr [0x779a98]; ret ; written global has no code reader
+0x68a290	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b70c8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779a90]; ret ; written global has no code reader
+0x68a2b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b70b0]; fadd st(0), st(0); fstp dword ptr [0x779a7c]; ret ; written global has no code reader
+0x68a2c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b70b0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779a78]; ret ; written global has no code reader
+0x68a2e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b70b8]; fadd st(0), st(0); fstp qword ptr [0x779a70]; ret ; written global has no code reader
+0x68a2f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b70b8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779a68]; ret ; written global has no code reader
+0x68a460	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b70a0]; fadd st(0), st(0); fstp dword ptr [0x779a54]; ret ; written global has no code reader
+0x68a470	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b70a0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779a50]; ret ; written global has no code reader
+0x68a490	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b70a8]; fadd st(0), st(0); fstp qword ptr [0x779a48]; ret ; written global has no code reader
+0x68a4a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b70a8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779a40]; ret ; written global has no code reader
+0x68a4c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7090]; fadd st(0), st(0); fstp dword ptr [0x779a3c]; ret ; written global has no code reader
+0x68a4d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7090]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779a38]; ret ; written global has no code reader
+0x68a4f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7098]; fadd st(0), st(0); fstp qword ptr [0x779a30]; ret ; written global has no code reader
+0x68a500	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7098]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779a28]; ret ; written global has no code reader
+0x68a520	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7080]; fadd st(0), st(0); fstp dword ptr [0x779a24]; ret ; written global has no code reader
+0x68a530	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7080]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779a20]; ret ; written global has no code reader
+0x68a550	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7088]; fadd st(0), st(0); fstp qword ptr [0x779a18]; ret ; written global has no code reader
+0x68a560	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7088]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779a10]; ret ; written global has no code reader
+0x68a580	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7070]; fadd st(0), st(0); fstp dword ptr [0x779a0c]; ret ; written global has no code reader
+0x68a590	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7070]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779a08]; ret ; written global has no code reader
+0x68a5b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7078]; fadd st(0), st(0); fstp qword ptr [0x779a00]; ret ; written global has no code reader
+0x68a5c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7078]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7799f8]; ret ; written global has no code reader
+0x68a5e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7060]; fadd st(0), st(0); fstp dword ptr [0x7799f4]; ret ; written global has no code reader
+0x68a5f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7060]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7799f0]; ret ; written global has no code reader
+0x68a610	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7068]; fadd st(0), st(0); fstp qword ptr [0x7799e8]; ret ; written global has no code reader
+0x68a620	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7068]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7799e0]; ret ; written global has no code reader
+0x68a640	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7040]; fadd st(0), st(0); fstp dword ptr [0x7797ec]; ret ; written global has no code reader
+0x68a650	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7040]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7797e8]; ret ; written global has no code reader
+0x68a670	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7048]; fadd st(0), st(0); fstp qword ptr [0x7797e0]; ret ; written global has no code reader
+0x68a680	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7048]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7797d8]; ret ; written global has no code reader
+0x68a760	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x7797f4], 0x904; ret ; written global has no code reader
+0x68a770	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x779958], 0x922; ret ; written global has no code reader
+0x68a780	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x7797d4], 0x920; ret ; written global has no code reader
+0x68a790	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x7797f0], 0x921; ret ; written global has no code reader
+0x68a7a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x779950], 0x912; ret ; written global has no code reader
+0x68a7b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x77995c], 0x912; ret ; written global has no code reader
+0x68a7c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x7797c8], 0x912; ret ; written global has no code reader
+0x68a7d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x779954], 0x916; ret ; written global has no code reader
+0x68a7e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x7797cc], 0x912; ret ; written global has no code reader
+0x68a7f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x7797d0], 0x913; ret ; written global has no code reader
+0x68a800	camera	I: static initializer/funclet: 0x779800 read by IntroNisCoordinator [votes {'camera': 1}]
+0x68ab00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7030]; fadd st(0), st(0); fstp dword ptr [0x7797bc]; ret ; written global has no code reader
+0x68ab10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7030]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7797b8]; ret ; written global has no code reader
+0x68ab30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7038]; fadd st(0), st(0); fstp qword ptr [0x7797b0]; ret ; written global has no code reader
+0x68ab40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7038]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7797a8]; ret ; written global has no code reader
+0x68ab60	camera	V: hash of rdata string "Bip01" (read at its rdata address, 33x hash from 0xffffffff) stored in 0x7797a0; sits with NIS names (IntroNisCoordinator reads 0x779800)
+0x68abc0	camera	V: hash of rdata string "SALLY" stored in 0x7797c0, same NIS block as Bip01
+0x68abf0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7020]; fadd st(0), st(0); fstp dword ptr [0x779794]; ret ; written global has no code reader
+0x68ac00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7020]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779790]; ret ; written global has no code reader
+0x68ac20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7028]; fadd st(0), st(0); fstp qword ptr [0x779788]; ret ; written global has no code reader
+0x68ac30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7028]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779780]; ret ; written global has no code reader
+0x68ac50	assets	I: static initializer/funclet: 0x779798 read by AnimBank_Unload; 0x779798 read by AnimBank_Load [votes {'assets': 2}]
+0x68ac70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov word ptr [0x779720], 0x2aaa; ret ; written global has no code reader
+0x68ac80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7004]; fadd st(0), st(0); fstp dword ptr [0x77971c]; ret ; written global has no code reader
+0x68ac90	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b7004]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x779718]; ret ; written global has no code reader
+0x68acb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7008]; fadd st(0), st(0); fstp qword ptr [0x779710]; ret ; written global has no code reader
+0x68acc0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b7008]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x779708]; ret ; written global has no code reader
+0x68ad20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b6c4c]; fadd st(0), st(0); fstp dword ptr [0x7788d4]; ret ; written global has no code reader
+0x68ad30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b6c4c]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7788d0]; ret ; written global has no code reader
+0x68ad50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b6c50]; fadd st(0), st(0); fstp qword ptr [0x7788c8]; ret ; written global has no code reader
+0x68ad60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b6c50]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7788c0]; ret ; written global has no code reader
+0x68adb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov word ptr [0x7788b8], 0x38e; ret ; written global has no code reader
+0x68adc0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov word ptr [0x7789e4], 0xbbb; ret ; written global has no code reader
+0x68ade0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov word ptr [0x7789e8], 0x38e; ret ; written global has no code reader
+0x68adf0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov word ptr [0x7788bc], 0x3555; ret ; written global has no code reader
+0x68ae00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x700b64]; mov eax, dword ptr [0x700b64]; fadd dword ptr [0x6cc79c]; mov dword ptr [0x706788], ; written global has no code reader
+0x68ae40	hud	I: static initializer/funclet: 0x77889c read by HudSmokeApplause::Update [votes {'hud': 1}]
+0x68aea0	car	I: static initializer/funclet: 0x748850 read by GarageManager::SyncActualToEditing; 0x748850 read by GaragePerfTuner::~GaragePerfTuner [votes {'car': 9, 'assets': 2, 'rivals': 1}]
+0x68aeb0	assets	I: static initializer/funclet: 0x748844 read by PresetRide::Unloader; 0x748844 read by PresetRide::FindByKeyHash [votes {'assets': 2, 'rivals': 1}]
+0x68aec0	assets	I: static initializer/funclet: 0x748844 read by PresetRide::Unloader; 0x748844 read by PresetRide::FindByKeyHash [votes {'assets': 2, 'rivals': 1}]
+0x68d500	car	I: static initializer/funclet: 0x746104 read by GarageVinylBrowserScreen::RedrawHeading; 0x746104 read by GameFlow::TrackWorldInit [votes {'car': 39, 'track': 1, 'hud': 7, 'assets': 3}]
+0x691ba0	audio	I: static initializer/funclet: 0x7441f8 read by EAXSound::UpdateLoopedMusic (FE looped music Csis class FEDriveOn); 0x7441f8 read by EAXFrontEnd::PlayDriveOnSnd [votes {'audio': 2}]
+0x691bb0	audio	I: static initializer/funclet: 0x7441f8 read by EAXSound::UpdateLoopedMusic (FE looped music Csis class FEDriveOn); 0x7441f8 read by EAXFrontEnd::PlayDriveOnSnd [votes {'audio': 2}]
+0x691c50	audio	I: static initializer/funclet: 0x7441c8 read by EAXTunerCar::Create_Reflection; 0x7441c8 read by EAXTunerCar::InitializeEngine [votes {'audio': 2}]
+0x691e70	audio	I: static initializer/funclet: 0x705848 read by EAXTires::GenerateRoadNoise; 0x70585c read by EAXTires::GenerateRoadNoise [votes {'audio': 2}]
+0x692070	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b6394]; fadd st(0), st(0); fstp dword ptr [0x743c9c]; ret ; written global has no code reader
+0x692080	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b6394]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x743c98]; ret ; written global has no code reader
+0x6920a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b6398]; fadd st(0), st(0); fstp qword ptr [0x743c90]; ret ; written global has no code reader
+0x6920b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b6398]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x743ca0]; ret ; written global has no code reader
+0x692190	assets	I: static initializer/funclet: 0x743c58 read by Solid_FindInAllLists [votes {'assets': 1}]
+0x692210	assets	I: static initializer/funclet: 0x740a60 read by LightPack_Load [votes {'assets': 1}]
+0x692230	assets	I: static initializer/funclet: 0x740a68 read by LightPack_Load; 0x740a68 read by LightTree_Query [votes {'assets': 2}]
+0x6924f0	car	I: static initializer/funclet: 0x73d7cc read by CarRenderInfo::UpdateDecalTextures [votes {'car': 1}]
+0x692500	car	I: static initializer/funclet: 0x73d764 read by CarRenderInfo::UpdateDecalTextures [votes {'car': 1}]
+0x692530	car	V: hash of rdata string "EXHAUST_TIP_DECAL" stored in 0x73d760 (car decal/exhaust slot name; CarRenderInfo::UpdateDecalTextures reads 0x73d7cc nearby)
+0x6929d0	track	I: static initializer/funclet: 0x73c1c8 read by StreamSections::Update [votes {'track': 1}]
+0x6929f0	track	I: static initializer/funclet: 0x73c1b0 read by StreamSections::Update [votes {'track': 1}]
+0x692c50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b5c24]; fadd st(0), st(0); fstp dword ptr [0x73b0d4]; ret ; written global has no code reader
+0x692c60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b5c24]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x73b0d0]; ret ; written global has no code reader
+0x692c80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b5c28]; fadd st(0), st(0); fstp qword ptr [0x73b0c8]; ret ; written global has no code reader
+0x692c90	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b5c28]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x73b0c0]; ret ; written global has no code reader
+0x692cb0	car	I: hash of "Rotate_360_t" stored in 0x73b0bc, partner of 0x692ce0 "Rotate_360_q" (translation/quaternion animation channel names of a turntable rotation)
+0x692ce0	car	I: hash of "Rotate_360_q" stored in 0x73b0b8, partner of 0x692cb0
+0x692f70	car	I: static initializer/funclet: 0x73ad40 read by GarageVinylBrowserScreen::GarageVinylBrowserScreen; 0x73ad40 read by RideInfo::UpdatePartsEnabled [votes {'car': 14, 'canon': 1, 'assets': 1, 'rivals': 2}]
+0x692fb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov dword ptr [0x73ad30], 0x3e64c388; ret ; written global has no code reader
+0x692fe0	assets	I: static initializer/funclet: 0x73ad08 read by TriggerVolume::Loader [votes {'assets': 1}]
+0x693180	assets	I: static initializer/funclet: 0x737b48 read by Unused34030_Load [votes {'assets': 1}]
+0x6931c0	assets	I: static initializer/funclet: 0x737b38 read by WorldZone_Load [votes {'assets': 1}]
+0x6931e0	assets	I: static initializer/funclet: 0x737b20 read by WorldZone_Load; 0x737b20 read by WorldZone_Query [votes {'assets': 2}]
+0x693260	props	I: static initializer/funclet: calls SurfaceTable::Init [votes {'props': 2}]
+0x693350	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov eax, dword ptr [0x7043a0]; mov ecx, dword ptr [0x7043a4]; mov edx, dword ptr [0x7043a8]; mov dword ptr [0x; written global has no code reader
+0x6933a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): mov eax, dword ptr [0x6b5a94]; fld dword ptr [0x6b5a94]; fchs ; mov ecx, eax; mov edx, eax; written global has no code reader
+0x693420	assets	I: static initializer/funclet: 0x73769c read by SplineSet::Unloader; 0x73769c read by SplineSet::Loader [votes {'assets': 2}]
+0x694740	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b5938]; fadd st(0), st(0); fstp dword ptr [0x73731c]; ret ; written global has no code reader
+0x694750	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6b5938]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x737318]; ret ; written global has no code reader
+0x694770	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b5940]; fadd st(0), st(0); fstp qword ptr [0x737310]; ret ; written global has no code reader
+0x694780	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6b5940]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x737308]; ret ; written global has no code reader
+0x6947c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a6fe8]; fadd st(0), st(0); fstp dword ptr [0x7094e4]; ret ; written global has no code reader
+0x6947d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a6fe8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7094e0]; ret ; written global has no code reader
+0x6947f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a6ff0]; fadd st(0), st(0); fstp qword ptr [0x7094d8]; ret ; written global has no code reader
+0x694800	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a6ff0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7094d0]; ret ; written global has no code reader
+0x694880	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a76e0]; fadd st(0), st(0); fstp dword ptr [0x70954c]; ret ; written global has no code reader
+0x694890	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a76e0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709548]; ret ; written global has no code reader
+0x6948b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a76e8]; fadd st(0), st(0); fstp qword ptr [0x709540]; ret ; written global has no code reader
+0x6948c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a76e8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709538]; ret ; written global has no code reader
+0x6948e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a76f0]; fadd st(0), st(0); fstp dword ptr [0x70956c]; ret ; written global has no code reader
+0x6948f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a76f0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709568]; ret ; written global has no code reader
+0x694910	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a76f8]; fadd st(0), st(0); fstp qword ptr [0x709560]; ret ; written global has no code reader
+0x694920	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a76f8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709558]; ret ; written global has no code reader
+0x694940	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7718]; fadd st(0), st(0); fstp dword ptr [0x70958c]; ret ; written global has no code reader
+0x694950	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7718]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709588]; ret ; written global has no code reader
+0x694970	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7720]; fadd st(0), st(0); fstp qword ptr [0x709580]; ret ; written global has no code reader
+0x694980	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7720]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709578]; ret ; written global has no code reader
+0x6949a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7730]; fadd st(0), st(0); fstp dword ptr [0x7095a4]; ret ; written global has no code reader
+0x6949b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7730]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7095a0]; ret ; written global has no code reader
+0x6949d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7738]; fadd st(0), st(0); fstp qword ptr [0x709598]; ret ; written global has no code reader
+0x6949e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7738]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709590]; ret ; written global has no code reader
+0x694a00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7778]; fadd st(0), st(0); fstp dword ptr [0x7095c4]; ret ; written global has no code reader
+0x694a10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7778]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7095c0]; ret ; written global has no code reader
+0x694a30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7780]; fadd st(0), st(0); fstp qword ptr [0x7095b8]; ret ; written global has no code reader
+0x694a40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7780]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7095b0]; ret ; written global has no code reader
+0x694a60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7788]; fadd st(0), st(0); fstp dword ptr [0x7095dc]; ret ; written global has no code reader
+0x694a70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7788]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7095d8]; ret ; written global has no code reader
+0x694a90	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7790]; fadd st(0), st(0); fstp qword ptr [0x7095d0]; ret ; written global has no code reader
+0x694aa0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7790]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7095c8]; ret ; written global has no code reader
+0x694ac0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7798]; fadd st(0), st(0); fstp dword ptr [0x7096c4]; ret ; written global has no code reader
+0x694ad0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7798]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x7096c0]; ret ; written global has no code reader
+0x694af0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a77a0]; fadd st(0), st(0); fstp qword ptr [0x7096b8]; ret ; written global has no code reader
+0x694b00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a77a0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x7096b0]; ret ; written global has no code reader
+0x694b20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a77b0]; fadd st(0), st(0); fstp dword ptr [0x709dbc]; ret ; written global has no code reader
+0x694b30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a77b0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709db8]; ret ; written global has no code reader
+0x694b50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a77b8]; fadd st(0), st(0); fstp qword ptr [0x709db0]; ret ; written global has no code reader
+0x694b60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a77b8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709da8]; ret ; written global has no code reader
+0x694bf0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78a8]; fadd st(0), st(0); fstp dword ptr [0x709dd4]; ret ; written global has no code reader
+0x694c00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78a8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709dd0]; ret ; written global has no code reader
+0x694c20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a78b0]; fadd st(0), st(0); fstp qword ptr [0x709dc8]; ret ; written global has no code reader
+0x694c30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a78b0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709dc0]; ret ; written global has no code reader
+0x694c50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78c0]; fadd st(0), st(0); fstp dword ptr [0x709dec]; ret ; written global has no code reader
+0x694c60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78c0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709de8]; ret ; written global has no code reader
+0x694c80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a78c8]; fadd st(0), st(0); fstp qword ptr [0x709de0]; ret ; written global has no code reader
+0x694c90	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a78c8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709dd8]; ret ; written global has no code reader
+0x694cb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78d8]; fadd st(0), st(0); fstp dword ptr [0x709e84]; ret ; written global has no code reader
+0x694cc0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78d8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709e80]; ret ; written global has no code reader
+0x694ce0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a78e0]; fadd st(0), st(0); fstp qword ptr [0x709e78]; ret ; written global has no code reader
+0x694cf0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a78e0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709e70]; ret ; written global has no code reader
+0x694d10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78e8]; fadd st(0), st(0); fstp dword ptr [0x709e9c]; ret ; written global has no code reader
+0x694d20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78e8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709e98]; ret ; written global has no code reader
+0x694d40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a78f0]; fadd st(0), st(0); fstp qword ptr [0x709e90]; ret ; written global has no code reader
+0x694d50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a78f0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709e88]; ret ; written global has no code reader
+0x694d70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78f8]; fadd st(0), st(0); fstp dword ptr [0x709f0c]; ret ; written global has no code reader
+0x694d80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a78f8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709f08]; ret ; written global has no code reader
+0x694da0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7900]; fadd st(0), st(0); fstp qword ptr [0x709f00]; ret ; written global has no code reader
+0x694db0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7900]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709ef8]; ret ; written global has no code reader
+0x694dd0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7910]; fadd st(0), st(0); fstp dword ptr [0x709f6c]; ret ; written global has no code reader
+0x694de0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7910]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709f68]; ret ; written global has no code reader
+0x694e00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7918]; fadd st(0), st(0); fstp qword ptr [0x709f60]; ret ; written global has no code reader
+0x694e10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7918]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709f58]; ret ; written global has no code reader
+0x694e30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7928]; fadd st(0), st(0); fstp dword ptr [0x709f8c]; ret ; written global has no code reader
+0x694e40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7928]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709f88]; ret ; written global has no code reader
+0x694e60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7930]; fadd st(0), st(0); fstp qword ptr [0x709f80]; ret ; written global has no code reader
+0x694e70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7930]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709f78]; ret ; written global has no code reader
+0x694e90	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7940]; fadd st(0), st(0); fstp dword ptr [0x709fa4]; ret ; written global has no code reader
+0x694ea0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7940]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x709fa0]; ret ; written global has no code reader
+0x694ec0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7948]; fadd st(0), st(0); fstp qword ptr [0x709f98]; ret ; written global has no code reader
+0x694ed0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7948]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x709f90]; ret ; written global has no code reader
+0x694ef0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7950]; fadd st(0), st(0); fstp dword ptr [0x70a1e4]; ret ; written global has no code reader
+0x694f00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7950]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70a1e0]; ret ; written global has no code reader
+0x694f20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7958]; fadd st(0), st(0); fstp qword ptr [0x70a1d8]; ret ; written global has no code reader
+0x694f30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7958]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70a1d0]; ret ; written global has no code reader
+0x694f90	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7970]; fadd st(0), st(0); fstp dword ptr [0x70a484]; ret ; written global has no code reader
+0x694fa0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7970]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70a480]; ret ; written global has no code reader
+0x694fc0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7978]; fadd st(0), st(0); fstp qword ptr [0x70a478]; ret ; written global has no code reader
+0x694fd0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7978]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70a470]; ret ; written global has no code reader
+0x694ff0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7980]; fadd st(0), st(0); fstp dword ptr [0x70a4c4]; ret ; written global has no code reader
+0x695000	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7980]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70a4c0]; ret ; written global has no code reader
+0x695020	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7988]; fadd st(0), st(0); fstp qword ptr [0x70a4b8]; ret ; written global has no code reader
+0x695030	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7988]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70a4b0]; ret ; written global has no code reader
+0x695050	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a79d0]; fadd st(0), st(0); fstp dword ptr [0x70a4f4]; ret ; written global has no code reader
+0x695060	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a79d0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70a4f0]; ret ; written global has no code reader
+0x695080	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a79d8]; fadd st(0), st(0); fstp qword ptr [0x70a4e8]; ret ; written global has no code reader
+0x695090	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a79d8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70a4e0]; ret ; written global has no code reader
+0x6950b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a79e0]; fadd st(0), st(0); fstp dword ptr [0x70a514]; ret ; written global has no code reader
+0x6950c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a79e0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70a510]; ret ; written global has no code reader
+0x6950e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a79e8]; fadd st(0), st(0); fstp qword ptr [0x70a508]; ret ; written global has no code reader
+0x6950f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a79e8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70a500]; ret ; written global has no code reader
+0x695110	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a79f8]; fadd st(0), st(0); fstp dword ptr [0x70a754]; ret ; written global has no code reader
+0x695120	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a79f8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70a750]; ret ; written global has no code reader
+0x695140	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a00]; fadd st(0), st(0); fstp qword ptr [0x70a748]; ret ; written global has no code reader
+0x695150	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a00]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70a740]; ret ; written global has no code reader
+0x695190	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a08]; fadd st(0), st(0); fstp dword ptr [0x70cbf4]; ret ; written global has no code reader
+0x6951a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a08]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70cbf0]; ret ; written global has no code reader
+0x6951c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a10]; fadd st(0), st(0); fstp qword ptr [0x70cbe8]; ret ; written global has no code reader
+0x6951d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a10]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70cbe0]; ret ; written global has no code reader
+0x695210	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a20]; fadd st(0), st(0); fstp dword ptr [0x70cddc]; ret ; written global has no code reader
+0x695220	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a20]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70cdd8]; ret ; written global has no code reader
+0x695240	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a28]; fadd st(0), st(0); fstp qword ptr [0x70cdd0]; ret ; written global has no code reader
+0x695250	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a28]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70cdc8]; ret ; written global has no code reader
+0x695270	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a38]; fadd st(0), st(0); fstp dword ptr [0x70cecc]; ret ; written global has no code reader
+0x695280	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a38]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70cec8]; ret ; written global has no code reader
+0x6952a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a40]; fadd st(0), st(0); fstp qword ptr [0x70cec0]; ret ; written global has no code reader
+0x6952b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a40]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70ceb8]; ret ; written global has no code reader
+0x6952d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a48]; fadd st(0), st(0); fstp dword ptr [0x70cee4]; ret ; written global has no code reader
+0x6952e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a48]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70cee0]; ret ; written global has no code reader
+0x695300	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a50]; fadd st(0), st(0); fstp qword ptr [0x70ced8]; ret ; written global has no code reader
+0x695310	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a50]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70ced0]; ret ; written global has no code reader
+0x695330	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a58]; fadd st(0), st(0); fstp dword ptr [0x70d38c]; ret ; written global has no code reader
+0x695340	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a58]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d388]; ret ; written global has no code reader
+0x695360	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a60]; fadd st(0), st(0); fstp qword ptr [0x70d380]; ret ; written global has no code reader
+0x695370	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7a60]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d378]; ret ; written global has no code reader
+0x695390	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a84]; fsub dword ptr [0x6a7a80]; fstp dword ptr [0x70d36c]; ret ; written global has no code reader
+0x6953b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a7c]; fadd st(0), st(0); fstp dword ptr [0x70d370]; ret ; written global has no code reader
+0x6953c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a70]; fadd st(0), st(0); fstp dword ptr [0x70d390]; ret ; written global has no code reader
+0x6953d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7a78]; fadd st(0), st(0); fstp dword ptr [0x70d368]; ret ; written global has no code reader
+0x6953e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7f48]; fadd st(0), st(0); fstp dword ptr [0x70d3ac]; ret ; written global has no code reader
+0x6953f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7f48]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d3a8]; ret ; written global has no code reader
+0x695410	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7f50]; fadd st(0), st(0); fstp qword ptr [0x70d3a0]; ret ; written global has no code reader
+0x695420	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7f50]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d398]; ret ; written global has no code reader
+0x695440	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7fb0]; fadd st(0), st(0); fstp dword ptr [0x70d3c4]; ret ; written global has no code reader
+0x695450	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7fb0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d3c0]; ret ; written global has no code reader
+0x695470	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7fb8]; fadd st(0), st(0); fstp qword ptr [0x70d3b8]; ret ; written global has no code reader
+0x695480	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7fb8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d3b0]; ret ; written global has no code reader
+0x6954a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7fc8]; fadd st(0), st(0); fstp dword ptr [0x70d3e4]; ret ; written global has no code reader
+0x6954b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7fc8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d3e0]; ret ; written global has no code reader
+0x6954d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7fd0]; fadd st(0), st(0); fstp qword ptr [0x70d3d8]; ret ; written global has no code reader
+0x6954e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7fd0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d3d0]; ret ; written global has no code reader
+0x695500	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7fd8]; fadd st(0), st(0); fstp dword ptr [0x70d3fc]; ret ; written global has no code reader
+0x695510	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7fd8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d3f8]; ret ; written global has no code reader
+0x695530	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7fe0]; fadd st(0), st(0); fstp qword ptr [0x70d3f0]; ret ; written global has no code reader
+0x695540	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7fe0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d3e8]; ret ; written global has no code reader
+0x695560	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7ff0]; fadd st(0), st(0); fstp dword ptr [0x70d414]; ret ; written global has no code reader
+0x695570	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a7ff0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d410]; ret ; written global has no code reader
+0x695590	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7ff8]; fadd st(0), st(0); fstp qword ptr [0x70d408]; ret ; written global has no code reader
+0x6955a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a7ff8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d400]; ret ; written global has no code reader
+0x6955c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8000]; fadd st(0), st(0); fstp dword ptr [0x70d42c]; ret ; written global has no code reader
+0x6955d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8000]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d428]; ret ; written global has no code reader
+0x6955f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8008]; fadd st(0), st(0); fstp qword ptr [0x70d420]; ret ; written global has no code reader
+0x695600	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8008]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d418]; ret ; written global has no code reader
+0x695620	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8058]; fadd st(0), st(0); fstp dword ptr [0x70d444]; ret ; written global has no code reader
+0x695630	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8058]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d440]; ret ; written global has no code reader
+0x695650	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8060]; fadd st(0), st(0); fstp qword ptr [0x70d438]; ret ; written global has no code reader
+0x695660	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8060]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d430]; ret ; written global has no code reader
+0x695680	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8070]; fadd st(0), st(0); fstp dword ptr [0x70d45c]; ret ; written global has no code reader
+0x695690	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8070]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d458]; ret ; written global has no code reader
+0x6956b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8078]; fadd st(0), st(0); fstp qword ptr [0x70d450]; ret ; written global has no code reader
+0x6956c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8078]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d448]; ret ; written global has no code reader
+0x6956e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8080]; fadd st(0), st(0); fstp dword ptr [0x70d474]; ret ; written global has no code reader
+0x6956f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8080]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d470]; ret ; written global has no code reader
+0x695710	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8088]; fadd st(0), st(0); fstp qword ptr [0x70d468]; ret ; written global has no code reader
+0x695720	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8088]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d460]; ret ; written global has no code reader
+0x695740	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8098]; fadd st(0), st(0); fstp dword ptr [0x70d48c]; ret ; written global has no code reader
+0x695750	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8098]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d488]; ret ; written global has no code reader
+0x695770	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80a0]; fadd st(0), st(0); fstp qword ptr [0x70d480]; ret ; written global has no code reader
+0x695780	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80a0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d478]; ret ; written global has no code reader
+0x6957a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a80b0]; fadd st(0), st(0); fstp dword ptr [0x70d4a4]; ret ; written global has no code reader
+0x6957b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a80b0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d4a0]; ret ; written global has no code reader
+0x6957d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80b8]; fadd st(0), st(0); fstp qword ptr [0x70d498]; ret ; written global has no code reader
+0x6957e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80b8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d490]; ret ; written global has no code reader
+0x695800	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a80c0]; fadd st(0), st(0); fstp dword ptr [0x70d4bc]; ret ; written global has no code reader
+0x695810	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a80c0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d4b8]; ret ; written global has no code reader
+0x695830	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80c8]; fadd st(0), st(0); fstp qword ptr [0x70d4b0]; ret ; written global has no code reader
+0x695840	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80c8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d4a8]; ret ; written global has no code reader
+0x695860	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a80d8]; fadd st(0), st(0); fstp dword ptr [0x70d4d4]; ret ; written global has no code reader
+0x695870	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a80d8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d4d0]; ret ; written global has no code reader
+0x695890	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80e0]; fadd st(0), st(0); fstp qword ptr [0x70d4c8]; ret ; written global has no code reader
+0x6958a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80e0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d4c0]; ret ; written global has no code reader
+0x6958c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a80f0]; fadd st(0), st(0); fstp dword ptr [0x70d4ec]; ret ; written global has no code reader
+0x6958d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a80f0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d4e8]; ret ; written global has no code reader
+0x6958f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80f8]; fadd st(0), st(0); fstp qword ptr [0x70d4e0]; ret ; written global has no code reader
+0x695900	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a80f8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d4d8]; ret ; written global has no code reader
+0x695920	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8108]; fadd st(0), st(0); fstp dword ptr [0x70d504]; ret ; written global has no code reader
+0x695930	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8108]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d500]; ret ; written global has no code reader
+0x695950	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8110]; fadd st(0), st(0); fstp qword ptr [0x70d4f8]; ret ; written global has no code reader
+0x695960	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8110]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d4f0]; ret ; written global has no code reader
+0x695980	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8120]; fadd st(0), st(0); fstp dword ptr [0x70d51c]; ret ; written global has no code reader
+0x695990	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8120]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d518]; ret ; written global has no code reader
+0x6959b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8128]; fadd st(0), st(0); fstp qword ptr [0x70d510]; ret ; written global has no code reader
+0x6959c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8128]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d508]; ret ; written global has no code reader
+0x6959e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8138]; fadd st(0), st(0); fstp dword ptr [0x70d554]; ret ; written global has no code reader
+0x6959f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8138]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d550]; ret ; written global has no code reader
+0x695a10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8140]; fadd st(0), st(0); fstp qword ptr [0x70d548]; ret ; written global has no code reader
+0x695a20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8140]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d540]; ret ; written global has no code reader
+0x695a40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8168]; fadd st(0), st(0); fstp dword ptr [0x70d574]; ret ; written global has no code reader
+0x695a50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8168]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d570]; ret ; written global has no code reader
+0x695a70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8170]; fadd st(0), st(0); fstp qword ptr [0x70d568]; ret ; written global has no code reader
+0x695a80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8170]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d560]; ret ; written global has no code reader
+0x695aa0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8194]; fsub dword ptr [0x6a8190]; fstp dword ptr [0x70d558]; ret ; written global has no code reader
+0x695ac0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a81e0]; fadd st(0), st(0); fstp dword ptr [0x70d59c]; ret ; written global has no code reader
+0x695ad0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a81e0]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d598]; ret ; written global has no code reader
+0x695af0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a81e8]; fadd st(0), st(0); fstp qword ptr [0x70d590]; ret ; written global has no code reader
+0x695b00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a81e8]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d588]; ret ; written global has no code reader
+0x695b20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a820c]; fsub dword ptr [0x6a8208]; fstp dword ptr [0x70d57c]; ret ; written global has no code reader
+0x695b40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8204]; fadd st(0), st(0); fstp dword ptr [0x70d580]; ret ; written global has no code reader
+0x695b50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a81f8]; fadd st(0), st(0); fstp dword ptr [0x70d5a0]; ret ; written global has no code reader
+0x695b60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8200]; fadd st(0), st(0); fstp dword ptr [0x70d578]; ret ; written global has no code reader
+0x695b70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8258]; fadd st(0), st(0); fstp dword ptr [0x70d5c4]; ret ; written global has no code reader
+0x695b80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8258]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d5c0]; ret ; written global has no code reader
+0x695ba0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8260]; fadd st(0), st(0); fstp qword ptr [0x70d5b8]; ret ; written global has no code reader
+0x695bb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8260]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d5b0]; ret ; written global has no code reader
+0x695bd0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8284]; fsub dword ptr [0x6a8280]; fstp dword ptr [0x70d5a8]; ret ; written global has no code reader
+0x695bf0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a82d8]; fadd st(0), st(0); fstp dword ptr [0x70d5e4]; ret ; written global has no code reader
+0x695c00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a82d8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d5e0]; ret ; written global has no code reader
+0x695c20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a82e0]; fadd st(0), st(0); fstp qword ptr [0x70d5d8]; ret ; written global has no code reader
+0x695c30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a82e0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d5d0]; ret ; written global has no code reader
+0x695c50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8304]; fsub dword ptr [0x6a8300]; fstp dword ptr [0x70d5c8]; ret ; written global has no code reader
+0x695c70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8360]; fadd st(0), st(0); fstp dword ptr [0x70d5fc]; ret ; written global has no code reader
+0x695c80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8360]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d5f8]; ret ; written global has no code reader
+0x695ca0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8368]; fadd st(0), st(0); fstp qword ptr [0x70d5f0]; ret ; written global has no code reader
+0x695cb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8368]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d5e8]; ret ; written global has no code reader
+0x695cd0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a83d8]; fadd st(0), st(0); fstp dword ptr [0x70d61c]; ret ; written global has no code reader
+0x695ce0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a83d8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d618]; ret ; written global has no code reader
+0x695d00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a83e0]; fadd st(0), st(0); fstp qword ptr [0x70d610]; ret ; written global has no code reader
+0x695d10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a83e0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d608]; ret ; written global has no code reader
+0x695d30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a84d8]; fadd st(0), st(0); fstp dword ptr [0x70d634]; ret ; written global has no code reader
+0x695d40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a84d8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d630]; ret ; written global has no code reader
+0x695d60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a84e0]; fadd st(0), st(0); fstp qword ptr [0x70d628]; ret ; written global has no code reader
+0x695d70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a84e0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d620]; ret ; written global has no code reader
+0x695d90	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8528]; fadd st(0), st(0); fstp dword ptr [0x70d674]; ret ; written global has no code reader
+0x695da0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8528]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d670]; ret ; written global has no code reader
+0x695dc0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8530]; fadd st(0), st(0); fstp qword ptr [0x70d668]; ret ; written global has no code reader
+0x695dd0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8530]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d660]; ret ; written global has no code reader
+0x695e10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8538]; fadd st(0), st(0); fstp dword ptr [0x70d68c]; ret ; written global has no code reader
+0x695e20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8538]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d688]; ret ; written global has no code reader
+0x695e40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8540]; fadd st(0), st(0); fstp qword ptr [0x70d680]; ret ; written global has no code reader
+0x695e50	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8540]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d678]; ret ; written global has no code reader
+0x695e70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8548]; fadd st(0), st(0); fstp dword ptr [0x70d6a4]; ret ; written global has no code reader
+0x695e80	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8548]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d6a0]; ret ; written global has no code reader
+0x695ea0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8550]; fadd st(0), st(0); fstp qword ptr [0x70d698]; ret ; written global has no code reader
+0x695eb0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8550]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d690]; ret ; written global has no code reader
+0x695ed0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8558]; fadd st(0), st(0); fstp dword ptr [0x70d6bc]; ret ; written global has no code reader
+0x695ee0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8558]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d6b8]; ret ; written global has no code reader
+0x695f00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8560]; fadd st(0), st(0); fstp qword ptr [0x70d6b0]; ret ; written global has no code reader
+0x695f10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8560]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d6a8]; ret ; written global has no code reader
+0x695f30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8568]; fadd st(0), st(0); fstp dword ptr [0x70d6d4]; ret ; written global has no code reader
+0x695f40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8568]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d6d0]; ret ; written global has no code reader
+0x695f60	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8570]; fadd st(0), st(0); fstp qword ptr [0x70d6c8]; ret ; written global has no code reader
+0x695f70	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8570]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d6c0]; ret ; written global has no code reader
+0x695f90	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8578]; fadd st(0), st(0); fstp dword ptr [0x70d6ec]; ret ; written global has no code reader
+0x695fa0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8578]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d6e8]; ret ; written global has no code reader
+0x695fc0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8580]; fadd st(0), st(0); fstp qword ptr [0x70d6e0]; ret ; written global has no code reader
+0x695fd0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8580]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d6d8]; ret ; written global has no code reader
+0x695ff0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a85d8]; fadd st(0), st(0); fstp dword ptr [0x70d704]; ret ; written global has no code reader
+0x696000	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a85d8]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d700]; ret ; written global has no code reader
+0x696020	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a85e0]; fadd st(0), st(0); fstp qword ptr [0x70d6f8]; ret ; written global has no code reader
+0x696030	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a85e0]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d6f0]; ret ; written global has no code reader
+0x696050	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8638]; fadd st(0), st(0); fstp dword ptr [0x70d754]; ret ; written global has no code reader
+0x696060	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8638]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d750]; ret ; written global has no code reader
+0x696080	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8640]; fadd st(0), st(0); fstp qword ptr [0x70d748]; ret ; written global has no code reader
+0x696090	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8640]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d740]; ret ; written global has no code reader
+0x6960e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8650]; fadd st(0), st(0); fstp dword ptr [0x70d7a4]; ret ; written global has no code reader
+0x6960f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8650]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70d7a0]; ret ; written global has no code reader
+0x696110	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8658]; fadd st(0), st(0); fstp qword ptr [0x70d798]; ret ; written global has no code reader
+0x696120	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8658]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70d790]; ret ; written global has no code reader
+0x696170	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8660]; fadd st(0), st(0); fstp dword ptr [0x70f34c]; ret ; written global has no code reader
+0x696180	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld dword ptr [0x6a8660]; fmul dword ptr [0x6cc7dc]; fstp dword ptr [0x70f348]; ret ; written global has no code reader
+0x6961a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8668]; fadd st(0), st(0); fstp qword ptr [0x70f340]; ret ; written global has no code reader
+0x6961b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): fld qword ptr [0x6a8668]; fmul qword ptr [0x6cc850]; fstp qword ptr [0x70f338]; ret ; written global has no code reader
+0x696200	assets	I: static initializer/funclet: 0x78e974 read by Particle_Load; 0x78e974 read by ParticleEmitter_Bind [votes {'assets': 2}]
+0x696230	input	I: static initializer/funclet: 0x78daa8 read by Input::GetState; 0x78daa8 read by Input::SelectActionMapForGameState [votes {'input': 5, 'canon': 1}]
+0x696250	assets	I: static initializer/funclet: 0x78daa0 read by Texture::ReleaseD3D [votes {'assets': 1}]
+0x696260	assets	I: static initializer/funclet: 0x78bc40 read by Mesh_Load [votes {'assets': 1}]
+0x696290	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6962a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6962b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6962c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6962d0	hud	I: static initializer/funclet: 0x77b240 read by TrackCarCameraMover::Update; 0x77b240 read by Player::ComputeHudFlags [votes {'camera': 1, 'hud': 6, 'rivals': 1}]
+0x696380	assets	I: static initializer/funclet: 0x77a924 read by FindResourceFile; 0x77a924 read by ServiceResourceLoading [votes {'assets': 3}]
+0x696390	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6963c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6963f0	assets	I: static initializer/funclet: 0x779bd8 read by CarShape_Load; 0x779bd8 read by CarShape_Find [votes {'assets': 2}]
+0x696420	camera	I: static initializer/funclet: 0x779800 read by IntroNisCoordinator [votes {'camera': 1}]
+0x696440	assets	I: static initializer/funclet: 0x779798 read by AnimBank_Unload; 0x779798 read by AnimBank_Load [votes {'assets': 2}]
+0x696470	traffic	I: static initializer/funclet: 0x748f70 read by RaceSetup_Circuit [votes {'traffic': 1}]
+0x696480	traffic	I: static initializer/funclet: 0x748f70 read by RaceSetup_Circuit [votes {'traffic': 1}]
+0x6964c0	assets	I: static initializer/funclet: 0x748844 read by PresetRide::Unloader; 0x748844 read by PresetRide::FindByKeyHash [votes {'assets': 2, 'rivals': 1}]
+0x6964d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696500	car	I: static initializer/funclet: 0x746104 read by GarageVinylBrowserScreen::RedrawHeading; 0x746104 read by GameFlow::TrackWorldInit [votes {'car': 39, 'track': 1, 'hud': 7, 'assets': 5}]
+0x696510	assets	I: static initializer/funclet: 0x7460fc read by FEngFont_Load; 0x7460fc read by FEngFont_ResolveTextures [votes {'assets': 2}]
+0x696560	car	I: static initializer/funclet: 0x744ff0 read by GaragePerfBrandPackage::NotificationMessage; 0x744ff0 read by GarageVinylBrowserScreen::RedrawHeading [votes {'car': 30}]
+0x696570	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696580	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6965a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6965c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6965d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6965e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6965f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696600	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696610	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696620	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696630	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696640	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696650	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696660	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696670	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696680	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696690	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6966a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6966b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6966c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6966d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696750	assets	I: static initializer/funclet: 0x743c58 read by Solid_FindInAllLists [votes {'assets': 1}]
+0x696780	assets	I: static initializer/funclet: 0x740a60 read by LightPack_Load [votes {'assets': 1}]
+0x696790	assets	I: static initializer/funclet: 0x740a68 read by LightPack_Load; 0x740a68 read by LightTree_Query [votes {'assets': 2}]
+0x6967b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696830	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696840	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696863	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696880	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696890	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6968a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6968b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6968c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6968e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696960	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696970	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696980	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696990	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6969a0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6969b0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6969c0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6969d0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6969e0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x6969f0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696a00	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696a10	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696a20	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696a30	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696a40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696a70	camera	I: static initializer/funclet: calls NullUpdate_ret; 0x73b220 read by MaybeCameraShake [votes {'camera': 4}]
+0x696aa0	assets	I: static initializer/funclet: 0x73b118 read by WorldObjectCohort::Launch [votes {'assets': 1}]
+0x696b20	car	I: static initializer/funclet: 0x73ad40 read by GarageVinylBrowserScreen::GarageVinylBrowserScreen; 0x73ad40 read by RideInfo::UpdatePartsEnabled [votes {'car': 14, 'canon': 1, 'assets': 1, 'rivals': 2}]
+0x696b90	car	I: static initializer/funclet: 0x73ad40 read by GarageVinylBrowserScreen::GarageVinylBrowserScreen; 0x73ad40 read by RideInfo::UpdatePartsEnabled [votes {'car': 14, 'canon': 1, 'assets': 1, 'rivals': 2}]
+0x696ba0	assets	I: static initializer/funclet: 0x73ad08 read by TriggerVolume::Loader [votes {'assets': 1}]
+0x696c80	assets	I: static initializer/funclet: 0x737b48 read by Unused34030_Load [votes {'assets': 1}]
+0x696ca0	assets	I: static initializer/funclet: 0x737b38 read by WorldZone_Load [votes {'assets': 1}]
+0x696cb0	assets	I: static initializer/funclet: 0x737b20 read by WorldZone_Load; 0x737b20 read by WorldZone_Query [votes {'assets': 2}]
+0x696d90	assets	I: static initializer/funclet: 0x73769c read by SplineSet::Unloader; 0x73769c read by SplineSet::Loader [votes {'assets': 2}]
+0x696da0	car	I: static initializer/funclet: 0x73765c read by IsPaintOwned; 0x73765c read by ColorPicker::GetHighestUpgradeLevel [votes {'car': 7}]
+0x696db0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696dc0	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader
+0x696de0	assets	I: static initializer/funclet: 0x737300 read by AnimSkeleton_Unload [votes {'assets': 1}]
+0x696e40	runtime	I: static const-expr initializer (compiler-generated, runs at startup): ret ; written global has no code reader

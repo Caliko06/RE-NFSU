@@ -1,12 +1,20 @@
 addr	name	system	confidence	tool	doc	from	aliases	kind
 0x401010	ScratchAlloc16	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x401050	ScratchAlloc64xN	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
 0x4010a0	CallNTimes	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x4010e0	SetSpecialCameraFlag	blur	I	C	docs/re/blur.md	blur		func
+0x401520	DiscCheck_ModalFrameLoop	render	I	hopper+ghidra+capstone	docs/re/render.md	render		func
+0x401d70	GameFlow::IsInFrontEnd	canon	V	capstone	docs/re/gameflow.md	gameflow		func
+0x401e50	QuadBuffers_Create	render	V	hopper+ghidra+capstone	docs/re/render.md	render		func
+0x4020b0	Matrix4_Invert	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
 0x402820	Particle_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x4028f0	Particle_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x402b40	ParticleEmitter_Bind	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x402bd0	ParticleEmitter_Queue	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x403a60	Particles_UpdateSystem	render	I	hopper	docs/re/render.md	render		func
+0x404110	Particles_DrawSystem	render	I	ghidra+capstone	docs/re/render.md	render		func
 0x405570	InputDevice::IsKeyboardType	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x4055e0	DegToRad	runtime	V	hopper+capstone	docs/re/misc.md	misc		func
 0x405630	Input::EnumDevicesBySemanticsCallback	input	I	capstone	docs/re/hud_input.md	input		func
 0x405660	Input::Init	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
 0x4057c0	Input::SelectActionMapForGameState	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
@@ -27,15 +35,31 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x407ca0	InputKeyboard::CopyDefaultActionTables	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
 0x407db0	Texture::CreateD3D	assets	V	Ghidra FUN_00407db0 + capstone	docs/re/assets.md	assets		func
 0x408010	Texture::ReleaseD3D	assets	V	Ghidra FUN_00408010	docs/re/assets.md	assets		func
+0x408160	Vec3_Scale	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
+0x408210	GetPlayerObject	rivals	I	hopper+capstone	docs/re/misc.md	misc		func
+0x408220	VertexDecls_CreateDefault	render	I	hopper+ghidra+capstone	docs/re/render.md	render		func
+0x408610	RVM_LookupTextures	render	V	hopper+ghidra	docs/re/render.md	render		func
+0x408b20	RenderState_ResetDefaults	render	V	hopper+ghidra+capstone	docs/re/render.md	render		func
+0x409180	DrawScreenQuadTextured	render	V	hopper+ghidra+capstone	docs/re/render.md	render		func
 0x409580	RenderFrameMain	blur	V	G+H+C	docs/re/blur.md	blur		func
 0x409b70	LightStreakPath	blur	U	C	docs/re/blur.md	blur		func
 0x409cd0	Hud::RenderPass	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x40a4e0	Device_HandleLost	render	V	hopper+ghidra+capstone	docs/re/render.md	render		func
+0x40a510	Device_ResetAndRecreate	render	V	hopper+capstone	docs/re/render.md	render		func
+0x40a580	RenderFrame	render	V	hopper+ghidra+capstone	docs/re/render.md	render		func
 0x40a7f0	SetBlurCameraObject	blur	V	C	docs/re/blur.md	blur		func
 0x40a880	NullUpdate_ret	camera	V	C	docs/re/camera.md	camera	nullsub (shared empty ret, 510 refs)@sound	func
 0x40a890	SceneRTCreate	blur	V	G+C	docs/re/blur.md	blur		func
+0x40aa20	RenderTargetTable_Init	render	I	ghidra+capstone	docs/re/render.md	render		func
 0x40abd0	SceneRTSelect	blur	V	C	docs/re/blur.md	blur		func
+0x40ac80	RenderViews_InitLists	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x40ad60	View_BuildMatrices	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x40b340	ReflectionCube_Create	render	V	hopper+ghidra+capstone	docs/re/render.md	render		func
 0x40b3f0	RenderSetupBlurFlags	blur	V	G+C	docs/re/blur.md	blur		data
 0x40b4e0	ReleaseSceneRTs	blur	I	C	docs/re/blur.md	blur		func
+0x40b5e0	ViewMatrix_InitIdentity	render	V	hopper+ghidra	docs/re/render.md	render		func
+0x40c4b0	LightPack_ChunkDispatch	assets	V	hopper+capstone	docs/re/misc.md	misc		func
+0x40c600	eLightMaterialPlatInfo_PoolCreate	render	V	hopper+ghidra	docs/re/render.md	render		func
 0x40c690	Mesh_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x40c840	Mesh_Free	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x40cb80	BlurCreateRTs	blur	V	G+C	docs/re/blur.md	blur		data
@@ -45,10 +69,41 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x40d370	BlurDownsample4Tap	blur	V	G+C	docs/re/blur.md	blur		func
 0x40d6e0	BlurComposite	blur	V	G+C	docs/re/blur.md	blur		func
 0x40dd00	BuildProjection	camera	I	C	docs/re/camera.md	camera		func
+0x40e180	Effects_CreateAll	render	I	ghidra	docs/re/render.md	render		func
+0x40e560	RampTexture_Create	render	V	ghidra+capstone	docs/re/render.md	render		func
+0x40e6d0	Effect_Select	render	V	hopper+ghidra+capstone	docs/re/render.md	render		func
+0x40e7b0	Effect_BindSceneParams	render	I	ghidra	docs/re/render.md	render		func
+0x40ed70	RenderQueue_Flush	render	V	hopper+capstone	docs/re/render.md	render		func
+0x40f0f0	RenderQueue_GetBucket	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x40f1e0	RenderQueue_GetBucketAlt	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x40f2e0	RenderQueue_PoolsCreate	render	V	hopper+ghidra	docs/re/render.md	render		func
+0x40f7c0	RenderQueue_ApplyLights	render	I	hopper+ghidra+capstone	docs/re/render.md	render		func
+0x4100a0	Effect_SetObjectParams	render	I	ghidra	docs/re/render.md	render		func
+0x4102f0	BonePalette_Load	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x410c50	Display_ProbeResolutions	render	V	hopper+ghidra	docs/re/render.md	render		func
+0x410e50	DeviceCaps_Init	render	V	hopper+ghidra+capstone	docs/re/render.md	render		func
+0x410ed0	GraphicsQuality_Set	render	V	ghidra+capstone	docs/re/render.md	render		data
+0x411be0	SNDSTRM_AllocRequest	audio	I	hopper+capstone	docs/re/misc.md	misc		func
+0x411c50	SNDSTRM_PushRequest	audio	I	hopper+capstone	docs/re/misc.md	misc		func
+0x4124d0	SNDSTRM_OverheadBytes	audio	V	hopper+capstone	docs/re/misc.md	misc		func
+0x412900	SNDSTRM_GetEntry	audio	I	hopper+capstone	docs/re/misc.md	misc		func
 0x413000	Input::CreateDirectInput8	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x4134b0	FEScreen::MessageStub	hud	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4134d0	FEng_FindObjectByHash	canon	I	hopper+capstone	docs/re/misc.md	misc		func
+0x413550	Screen_PC_Controller_Config::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4135b0	Screen_PC_Controller_Config::Screen_PC_Controller_Config	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x414830	ControlsScreen::SetBindingLabel	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x4149d0	FEng_FindObjectByHash2	canon	I	hopper+capstone	docs/re/misc.md	misc		func
+0x414be0	Screen_PC_Graphics::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x414c40	Screen_PC_Graphics::Screen_PC_Graphics	canon	I	capstone	docs/re/gameflow.md	gameflow		func
+0x415550	Screen_PC_Customize_Graphics::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4155b0	Screen_PC_Customize_Graphics::Screen_PC_Customize_Graphics	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x416cb0	Screen_PC_LoadSave::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x416d10	Screen_PC_LoadSave::Screen_PC_LoadSave	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4175c0	LinearTable::Init	rivals	I	capstone	docs/re/rivals.md	rivals		func
 0x417600	RideInfo::Init	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4176a0	Screen_MU_UG_NewOrLoad_PC2::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x417700	Screen_MU_UG_NewOrLoad_PC2::Screen_MU_UG_NewOrLoad_PC2	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x418d10	EZWheel::ReleaseChannel	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
 0x418d70	EZWheel::ClearChannels	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
 0x418e10	EZWheel::CreateDInputAndEnumerate	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
@@ -89,11 +144,16 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x41dd60	Profile::Delete	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
 0x41e200	Opt::Write	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
 0x41e330	Opt::Read	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41e860	CpuDetect	runtime	V	hopper+capstone	docs/re/misc.md	misc		func
 0x420050	SlowMoStart	camera	I	C	docs/re/camera.md	camera		func
 0x421a30	SpecialCamCooldown	camera	I	C	docs/re/camera.md	camera		func
 0x422410	Grid::BuildRacerCar	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x422580	Grid::GetStartPositions	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
 0x422a70	Grid::PlaceAllRacers	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x422bb0	Race::OnFlowMessage	canon	I	capstone	docs/re/gameflow.md	gameflow		func
+0x424160	CameraMover_CreateByType	camera	I	hopper+capstone	docs/re/misc.md	misc		func
+0x424c50	TrafficCar_AtIndex	traffic	I	hopper+capstone	docs/re/misc.md	misc		func
+0x425af0	Car_SerializeFields	car	I	hopper+capstone	docs/re/misc.md	misc		func
 0x426110	Car_SetMode	traffic	U	H+G	docs/re/traffic.md	traffic		func
 0x4264d0	Car::ServiceResetRequest	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
 0x426930	JumpCamTrigger	camera	V	G+C	docs/re/camera.md	camera		func
@@ -101,6 +161,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x429b10	Racer::UpdateTwoHumanCatchUp	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x429cf0	JumpCamPredict	camera	I	C	docs/re/camera.md	camera		func
 0x42ab50	IsCar1099InMode4	other	U	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x42ad10	CameraMoverBase_InitFields	camera	V	hopper+capstone	docs/re/misc.md	misc		func
 0x42ae10	TrackRow_Current	traffic	V	H+G	docs/re/traffic.md	traffic		func
 0x42ae20	SpawnRecord_Get	traffic	V	H+G	docs/re/traffic.md	traffic		func
 0x42ae30	SpawnRecord_Count	traffic	V	H+G	docs/re/traffic.md	traffic		func
@@ -132,6 +193,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x435fe0	ModeFlags_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x436000	ModeFlags_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
 0x436020	ModeFlags_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x43ada0	Race::RequestStartOrRestart	canon	I	capstone	docs/re/gameflow.md	gameflow		func
 0x43db70	Zone_FindTrafficDensity	traffic	I	G+H	docs/re/traffic.md	traffic		func
 0x43eb00	RaceManager::UpdateAIScores	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x43fb50	Commentator::ShortcutZoneEntered	track	V	hopper+ghidra	docs/re/track.md	track		func
@@ -216,11 +278,15 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x446140	Section::WalkBvh	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x446400	StreamBoundaries::BuildDrawList	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
 0x4465b0	StreamSections::DrawVisible	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x446730	WorldSections_QueueForView	render	I	hopper+ghidra	docs/re/render.md	render		func
 0x446aa0	StreamBoundaries_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x446ab0	StreamBoundaries_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x446db0	StreamBoundaries_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x446fd0	StreamBoundaries::FindContaining	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x447160	InitZDirArchive	assets	V	hopper	docs/re/assets.md	assets		func
+0x4471b0	GameFlow::InitSubsystems	canon	I	hopper	docs/re/gameflow.md	gameflow		func
+0x4472e0	GameFlow::Run	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x447600	GameFlow::MainLoop	canon	V	ghidra+capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x447ab0	PaddingChunk::Loader	assets	V	capstone	docs/re/assets.md	assets		func
 0x447ac0	bChunkLoader::LoadChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
 0x447b10	bChunkLoader::UnloadChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
@@ -236,14 +302,33 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x448370	UnloadResourceFile	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
 0x4483c0	ServiceResourceLoading	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
 0x448440	FindResourceFile	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x448530	GameFlow::SetNextUnloadingFrontEnd	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x448560	GameFlow::SetNextLoadingTrackCommon	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
 0x448600	GameFlow::LoadGlobalA	assets	V	hopper	docs/re/assets.md	assets		func
 0x448650	GameFlow::LoadGlobalB	assets	V	hopper	docs/re/assets.md	assets		func
+0x448a10	GameFlow::EndLoadingFrontEnd	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x448a40	GameFlow::LoadingFrontEndPart3	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x448ac0	GameFlow::LoadingFrontEndPart2	canon	I	capstone	docs/re/gameflow.md	gameflow		data
 0x448b10	GameFlow::LoadingFrontEndPart1	assets	V	hopper	docs/re/assets.md	assets		func
+0x448c40	GameFlow::EnterFrontEnd	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x448d10	GameFlow::UnloadingFrontEnd	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x448ee0	GameFlow::BeginLoadingTrackSpecific	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x448f70	GameFlow_CreateRides	traffic	I	H	docs/re/traffic.md	traffic		func
+0x4491a0	GameFlow::QueueRaceCars	canon	I	ghidra+hopper	docs/re/gameflow.md	gameflow		func
+0x449250	GameFlow::LoadingTrackCommon	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		data
+0x4493a0	GameFlow::UnloadingTrackCommon	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x4494f0	GameFlow::EndLoadingTrackSpecific	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x449520	GameFlow::LoadingTrackSpecificPart6Entry	canon	I	capstone	docs/re/gameflow.md	gameflow		data
 0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	V	hopper	docs/re/assets.md	assets		func
+0x449590	GameFlow::LoadingTrackSpecificCarsDone	canon	I	capstone	docs/re/gameflow.md	gameflow		data
+0x4495c0	GameFlow::LoadingTrackSpecificPart3	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x449600	GameFlow::LoadingTrackSpecificPart2	canon	V	capstone	docs/re/gameflow.md	gameflow		func
 0x4496a0	GameFlow::SetStreamPaths	track	I	hopper	docs/re/track.md	track		func
+0x449760	GameFlow::LoadingTrackSpecific	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x449765	GameFlow::LoadingTrackSpecificPart1	assets	V	hopper	docs/re/assets.md	assets		func
+0x449840	GameFlow::Racing	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
 0x449870	GameFlow::TrackWorldInit	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x449a10	GameFlow::UnloadingTrackSpecific	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
 0x44aa10	AIGoal::Create	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals		func
 0x44bd10	RacerAI::UpdateRubberBand	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x44c010	RacerAI::GetCatchUpTerms	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
@@ -309,6 +394,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x483640	Camera::ApplyNoise	camera	I	M+C	docs/re/camera.md	camera		func
 0x483860	CameraMover::ComputeBankedUpVector	camera	I	M	docs/re/camera.md	camera		func
 0x4838e0	CameraMover::EnforceMinGapToWalls	camera	V	G+C	docs/re/camera.md	camera		func
+0x483b90	CameraMover_ClipAgainstWorld	camera	I	hopper+capstone	docs/re/misc.md	misc		func
 0x4840c0	OrbitCarCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
 0x4852a0	RearViewMirrorCameraMover::ctor	camera	V	C+D+M	docs/re/camera.md	camera		func
 0x4852e0	CameraMover::TrivialDtor	camera	I	D	docs/re/camera.md	camera		data
@@ -316,6 +402,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4854e0	TrackCarCameraMover::ctor	camera	I	G+M	docs/re/camera.md	camera		func
 0x485c00	TrackCarCameraMover::Update	camera	I	G+M	docs/re/camera.md	camera		func
 0x486c80	SelectCarCameraMover::ctor	camera	I	M	docs/re/camera.md	camera		func
+0x487680	CameraMover_BuildBankedFrame	camera	I	hopper+capstone	docs/re/misc.md	misc		func
 0x488420	DebugWorldCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
 0x4892c0	NullCameraMover::ctor	camera	V	C+D	docs/re/camera.md	camera		func
 0x489360	DriveCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
@@ -331,6 +418,20 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x48e8b0	Players::UpdateStreamViewers	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x48f090	ZoneFreezeCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
 0x490ea0	ZonePreviewCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
+0x494910	Screen_Options::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x494970	Screen_Options::Screen_Options	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x494de0	Screen_PreRaceStats::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x496140	Screen_PostRaceMenu::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4961a0	Screen_PostRaceMenu::Screen_PostRaceMenu	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x497bf0	Screen_PostRaceResults::Create	canon	I	capstone	docs/re/gameflow.md	gameflow		data
+0x497c50	Screen_PostRaceResults::Screen_PostRaceResults	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x49be80	Screen_PostRaceStats::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x49bee0	Screen_PostRaceStats::Screen_PostRaceStats	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x49ef50	Screen_RewardPopup::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x49efb0	Screen_RewardPopup::Screen_RewardPopup	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x49fac0	Screen_StyleAnimator::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x49fb20	Screen_StyleAnimator::Screen_StyleAnimator	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x49fdb0	HudWidget::RegisterString	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x49fe10	HudElement::RegisterImage	fe	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x49fe70	HudWidget::RegisterObjectByHash	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
@@ -383,6 +484,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4ac750	FECarConfig::FillFromRide	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4acce0	FECarConfig::GetCarType	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4ae650	DrawEmitters	blur	I	C	docs/re/blur.md	blur		func
+0x4ae7d0	Emitters_DrawFlares	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x4ae830	Emitter_DrawFlareQuad	render	I	hopper	docs/re/render.md	render		func
 0x4af0e0	GarageCarLoader::LoadRideInfo	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4af140	GarageCarLoader::Update	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4af420	GetGarageCarLoader	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -393,11 +496,15 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4b0fd0	GarageMainScreen::DisplayReputation	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4b1530	GarageMainScreen::SetCarType	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4b1590	GarageMainScreen::CarLoadingHasStarted	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4b1f10	Screen_background::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4b25b0	PresetRide::Loader	assets	V	Hopper sub_4b25b0 + Ghidra make FUN_004b25b0: H+G agree	docs/re/assets.md	assets		func
 0x4b2600	PresetRide::Unloader	assets	V	Ghidra make FUN_004b2600 (Hopper export lacks it)	docs/re/assets.md	assets		data
 0x4b2640	PresetRide::FindByKeyHash	rivals	I	capstone	docs/re/rivals.md	rivals		func
 0x4b2660	PresetRide::FindByHash	assets	V	Hopper sub_4b2660	docs/re/assets.md	assets		func
 0x4b26f0	PresetRide::ApplyToRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x4b2b70	Screen_MU_Main_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4b2c30	Screen_MU_Main_PC::Screen_MU_Main_PC	canon	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4b38d0	Screen_MU_UG_Explained::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4b3a20	Race::PickOpponentNames	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals		func
 0x4b3ac0	Race::SpawnTraffic	traffic	V	H+G+C+file	docs/re/traffic.md	traffic		func
 0x4b3c60	Race::BuildRandomOpponentRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
@@ -407,26 +514,74 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4b4610	Race::ShuffleGrid	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals		func
 0x4b47a0	ApplyOptionsToPlayerSettings	camera	V	G+C	docs/re/camera.md	camera		func
 0x4b49e0	RaceSetup_Circuit	traffic	I	H	docs/re/traffic.md	traffic		func
+0x4b5c00	QuickRace::StartRaceByMode	canon	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
 0x4b5df0	Career::StartRaceFromEvent	canon	V	ghidra+capstone	docs/re/canon.md	canon		func
 0x4b6300	Race::SetPlayerGridSlot	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4b6390	QuickRace::LaunchFromSetupGlobals	canon	V	ghidra+capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4b6820	Screen_MU_QuickRaceModeSelect::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4b6880	Screen_MU_QuickRaceModeSelect::Screen_MU_QuickRaceModeSelect	canon	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4b7ee0	Screen_MU_QuickRaceOptions_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4b7f40	Screen_MU_QuickRaceOptions_PC::Screen_MU_QuickRaceOptions_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4b9ae0	Screen_MU_QuickRaceTrackSelect::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4b9b40	Screen_MU_QuickRaceTrackSelect::Screen_MU_QuickRaceTrackSelect	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4bb5d0	Screen_MU_TrackMapScroller::Screen_MU_TrackMapScroller	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4bbc30	Screen_MU_TrackMapScroller::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4bbd70	CarPart::GetNameAttribute	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4bbda0	Screen_MU_QuickRaceCarSelect::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4bbe00	Screen_MU_QuickRaceCarSelect::Screen_MU_QuickRaceCarSelect	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4bca40	Ride_BuildFromPartDatabase	car	I	hopper+capstone	docs/re/misc.md	misc		func
+0x4bd310	Screen_MU_QuickRaceLapPopup_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4bd370	Screen_MU_QuickRaceLapPopup_PC::Screen_MU_QuickRaceLapPopup_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4bd8a0	Screen_MU_PauseOptions_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4bd900	Screen_MU_PauseOptions_PC::Screen_MU_PauseOptions_PC	canon	I	capstone	docs/re/gameflow.md	gameflow		func
 0x4be6c0	OptionsCameraUI	camera	I	C	docs/re/camera.md	camera		func
+0x4c25d0	Screen_MU_PauseOptionsSelector::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4c2630	Screen_MU_PauseOptionsSelector::Screen_MU_PauseOptionsSelector	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4c2a50	GetCarModelNameHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4c2b00	GetSecondaryLogoHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c3a40	Screen_MU_UG_MovieTheaterViewer::Screen_MU_UG_MovieTheaterViewer	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4c3d50	Screen_MU_UG_MovieTheaterViewer::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4c3db0	Screen_MU_UG_ChooseCareerCar::Screen_MU_UG_ChooseCareerCar	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4c40a0	(unknown garage screen)::NotificationMessage	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		data
+0x4c4640	Screen_MU_UG_ChooseCareerCar::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4c46a0	Screen_MU_UG_MapScreen::Screen_MU_UG_MapScreen	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4c4920	EventMap::SetModeIcon	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
 0x4c49f0	EventMap::GetModeLabelHash	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
 0x4c4c60	EventMap::ShowEventSummary	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4c5100	Screen_MU_UG_MapScreen::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4c53c0	Screen_MU_UG_EventBriefing::Screen_MU_UG_EventBriefing	canon	I	capstone	docs/re/gameflow.md	gameflow		data
 0x4c55f0	Briefing::GetHostName	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
 0x4c5680	Briefing::Build	canon	V	ghidra	docs/re/canon.md	canon		func
 0x4c5ce0	Briefing::ShowDescription	canon	V	ghidra	docs/re/canon.md	canon		func
 0x4c5f20	Briefing::HasRequiredRideRating	canon	V	capstone+ghidra+hopper	docs/re/canon.md	canon		func
+0x4c6400	Screen_MU_UG_EventBriefing::Create	canon	I	capstone	docs/re/gameflow.md	gameflow		func
 0x4c6970	GetCarManufacturerNameHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4c6bc0	UndergroundJunkmanGiveth::vslot3 (swallow-input filter)	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4c6c00	GetJunkmanRewardSpeech	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4c6cb0	UndergroundJunkmanGiveth::UndergroundJunkmanGiveth	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4c7150	UndergroundJunkmanGiveth::ApplyJunkmanPartToEditingRide	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4c7670	CreateUndergroundJunkmanGiveth	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c95f0	Screen_MU_PlayerLogin::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4c9740	Screen_MU_PlayerLogin::Screen_MU_PlayerLogin	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4cd2a0	FEScreenBase::FEScreenBase	hud	I	ghidra	docs/re/gameflow.md	gameflow		func
+0x4cd5b0	Screen_MU_Pause_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4cd660	Screen_MU_Pause_PC::Screen_MU_Pause_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4ce700	Screen_MU_Options_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4ce760	Screen_MU_Options_PC::Screen_MU_Options_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d4310	Screen_MU_OptionsSelector_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d4370	Screen_MU_OptionsSelector_PC::Screen_MU_OptionsSelector_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d4610	OptionsSelectorScreen::NotificationMessage	hud	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	hud	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4d49c0	Screen_EA_TRAX_Jukebox::Create	canon	I	capstone	docs/re/gameflow.md	gameflow		data
+0x4d4b10	Screen_EA_TRAX_Jukebox::Screen_EA_TRAX_Jukebox	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d5fb0	Screen_TrailerMovie::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d6010	Screen_TrailerMovie::Screen_TrailerMovie	canon	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4d6210	Screen_MU_OptionsHUD::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d6270	Screen_MU_OptionsHUD::Screen_MU_OptionsHUD	canon	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4d71e0	Screen_Credits::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d7240	Screen_Credits::Screen_Credits	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d7380	Screen_MU_ScreenPos::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d7450	Screen_Chyron::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4d77a0	GetPartColor	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4d7980	ColorElement::SetPart	fe	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4d7eb0	IsPaintLocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -434,8 +589,34 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4d8270	IsLevel2PaintsOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4d82f0	IsLevel3PaintsOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4d8440	ColorPicker::GetHighestUpgradeLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d9960	Screen_PC_ColorPicker::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4d9a40	ColorPicker_BindElements	car	I	hopper+capstone	docs/re/misc.md	misc		func
 0x4d9fa0	GetDefaultVinylColors	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4dab10	Screen_PC_ColorPicker::Screen_PC_ColorPicker	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4dd230	Screen_PC_Loading::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4dd290	Screen_PC_Loading::Screen_PC_Loading	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4de5a0	Screen_LS_Disclaimer_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4de600	Screen_LS_Disclaimer_PC::Screen_LS_Disclaimer_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4de6e0	Screen_LS_Demo_Legal::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4de800	Screen_LS_Demo_Disclaimer::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4de8f0	Screen_LS_IntroFMV::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4de950	Screen_LS_IntroFMV::Screen_LS_IntroFMV	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4deaa0	BootMovieScreen::BootMovieScreen	canon	V	hopper	docs/re/canon.md	canon		func
+0x4deb60	Screen_LS_EAlogo::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4debf0	Screen_LS_PSAMovie::Screen_LS_PSAMovie	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4dec90	Screen_LS_PSAMovie::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4ded20	Screen_LS_THXMovie::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4dee30	Screen_LS_LangSelect::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4dee90	Screen_LS_LangSelect::Screen_LS_LangSelect	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4df170	Screen_LS_Splash_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4df1d0	Screen_LS_Splash_PC::Screen_LS_Splash_PC	canon	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4df4d0	Screen_DiscErrorPC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4df560	Screen_DiscErrorPC::Screen_DiscErrorPC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e0030	Screen_DemoDisc_Marketing::Screen_DemoDisc_Marketing	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e0160	Screen_DemoDisc_Marketing::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e01f0	Screen_LS_ESRB_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e0740	Screen_MU_MultiplayerCarSelect::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e07a0	Screen_MU_MultiplayerCarSelect::Screen_MU_MultiplayerCarSelect	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4e1c60	MPChooseGarageScreen::~MPChooseGarageScreen	fe	I	ghidra+hopper	docs/re/tuning.md	tuning		data
 0x4e1c90	CreateMPChooseGarageScreen	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e1cf0	MPChooseGarageScreen::MPChooseGarageScreen	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -459,23 +640,59 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4e62b0	IsVinylUnlocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e6390	GarageVinylBrowserScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e6600	CreateGarageVinylBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		data
+0x4e66e0	Screen_PC_MenuBar::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e6740	Screen_PC_MenuBar::Screen_PC_MenuBar	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4e79e0	GaragePresetsScreen::~GaragePresetsScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e7a40	GaragePresetsScreen::GaragePresetsScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e7c80	GaragePresetsScreen::Redraw	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e7f60	GaragePresetsScreen::LoadPreset	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e8120	CreateGaragePresetsScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e8180	Screen_MU_UG_NewCareerFMV::Screen_MU_UG_NewCareerFMV	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e8640	Screen_MU_UG_NewCareerFMV::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e86d0	Screen_MU_UG_NewCareerExtroFMV::Screen_MU_UG_NewCareerExtroFMV	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e8ab0	Screen_MU_UG_NewCareerExtroFMV::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4e9ce0	Screen_MU_UG_RankScreen::Screen_MU_UG_RankScreen	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4e9e90	UrlRankScreen::Show	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4ea1b0	Screen_MU_UG_RankScreen::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4ea210	Screen_MU_UG_StatsScreen::Screen_MU_UG_StatsScreen	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4eab60	Screen_MU_UG_StatsScreen::Create	canon	I	capstone	docs/re/gameflow.md	gameflow		data
+0x4eabc0	Screen_MU_UG_UndergroundMenu::Screen_MU_UG_UndergroundMenu	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4eb390	Screen_MU_UG_UndergroundMenu::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4ec410	Screen_Keyboard::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4ec470	Screen_Keyboard::Screen_Keyboard	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4ee700	cFEng::cFEng	hud	I	ghidra+capstone	docs/re/gameflow.md	gameflow		func
+0x4eebf0	cFEng::PopPackage	hud	I	ghidra+hopper	docs/re/gameflow.md	gameflow		func
+0x4eede0	cFEng::PushPackage	hud	I	ghidra	docs/re/gameflow.md	gameflow		func
+0x4f08f0	UIListNode_Alloc	canon	I	hopper+capstone	docs/re/misc.md	misc		func
 0x4f3030	FEng::RenderPackages	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x4f37e0	FEScreenRegistry::CreateScreen	hud	V	ghidra+capstone	docs/re/gameflow.md	gameflow		func
+0x4f3940	FEScreenRegistry::FindEntry	hud	I	ghidra	docs/re/gameflow.md	gameflow		func
+0x4f39a0	FEScreenRegistry::SetFactory	hud	I	ghidra	docs/re/gameflow.md	gameflow		func
 0x4f3a00	FEPackage::FEPackage	assets	V	Ghidra make FUN_004f3a00	docs/re/assets.md	assets		func
+0x4f3b60	FEPackageData::Activate	hud	V	ghidra+capstone	docs/re/gameflow.md	gameflow		func
+0x4f3bd0	FEPackageData::Deactivate	hud	V	ghidra+hopper	docs/re/gameflow.md	gameflow		func
+0x4f3c40	Resource_DecompressIfCOMP	assets	I	hopper+capstone	docs/re/misc.md	misc		func
+0x4f3dc0	FEManager::BroadcastMessage	hud	I	ghidra	docs/re/gameflow.md	gameflow		func
+0x4f3f90	FEPackageList::FindByName	hud	V	ghidra+capstone	docs/re/gameflow.md	gameflow		func
 0x4f4120	FEngLibrary::AddPackage	assets	V	Hopper sub_4f4120 + Ghidra make: H+G agree	docs/re/assets.md	assets		func
 0x4f4190	FEngLibrary::RemovePackage	assets	V	Ghidra make FUN_004f4190	docs/re/assets.md	assets		func
 0x4f4290	FEngPackage::Loader	assets	V	Ghidra make FUN_004f4290 (Hopper export lacks it; capstone agrees)	docs/re/assets.md	assets		data
 0x4f42c0	FEngPackage::Unloader	assets	V	Hopper sub_4f42c0 + Ghidra export FUN_004f42c0: H+G agree	docs/re/assets.md	assets		func
+0x4f4360	FEngMemoryPool::Init	hud	V	ghidra+capstone	docs/re/gameflow.md	gameflow		func
 0x4f4420	FEngFont_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x4f4470	FEngFont_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x4f44c0	FEngFont_Init	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x4f46c0	FEngFont_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x4f50d0	FEngRenderer::FEngRenderer	hud	I	ghidra+capstone	docs/re/gameflow.md	gameflow		func
+0x4f5240	FEManager::FEManager	hud	V	ghidra	docs/re/gameflow.md	gameflow		func
 0x4f57a0	MoviePlayer::BuildPath	canon	V	hopper	docs/re/canon.md	canon		func
+0x4f5ab0	FEManager::AddJoyHandlers	hud	I	ghidra+hopper	docs/re/gameflow.md	gameflow		func
+0x4f5b90	FEManager::RemoveJoyHandlers	hud	I	hopper	docs/re/gameflow.md	gameflow		func
+0x4f5cf0	FEManager::PollControllers	hud	I	ghidra	docs/re/gameflow.md	gameflow		func
+0x4f60e0	FEManager::Init	hud	V	hopper	docs/re/gameflow.md	gameflow		func
+0x4f6170	FEManager::Update	hud	I	hopper+ghidra	docs/re/gameflow.md	gameflow		func
+0x4f61f0	FEManager::ShowPackage	hud	V	hopper+capstone	docs/re/gameflow.md	gameflow		func
+0x4f62a0	FEManager::PushPackageChecked	hud	I	capstone	docs/re/gameflow.md	gameflow		func
 0x4f62f0	FEngPushGarageMainPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4f68a0	FEObject::SetFormattedText	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x4f68c0	bSPrintf_regdst	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
@@ -483,7 +700,13 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4f6970	FEObject::SetVisible	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x4f6b70	FEObject::SetScript	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x4f7840	MovieNameToId	canon	V	hopper+capstone	docs/re/canon.md	canon		func
+0x4f78e0	FEScreen::FEScreen	hud	V	ghidra+capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4f7b30	FEScreen::ScalarDeletingDtor	hud	I	capstone	docs/re/gameflow.md	gameflow		func
+0x4f9ff0	Screen_DiscError::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4fd230	FEng::HashName	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x504010	WString_Free	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
+0x504080	WString_Assign	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
+0x5040e0	WString_Grow	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
 0x504260	GarageManager::GetMsgForNumScreensInList	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x5042d0	GarageManager::GetMsgForUpgradeLevel	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x504320	GarageManager::PushScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -711,6 +934,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x532960	EA::Allocator::DefaultIAllocatorImpl::Allocate	other	V	ghidra+hopper	docs/re/tuning.md	tuning		data
 0x532a20	EAXSND8Wrapper::Initialize	audio.engine	V	ghidra	docs/re/sound.md	sound		func
 0x532ad7	(not a function: mid-instruction inside EAXSND8Wrapper::Initialize 0x532a20)	other	V	ghidra	docs/re/sound.md	sound		data
+0x532bb0	EAXSound_InitMixerBanks	audio	I	hopper+capstone	docs/re/misc.md	misc		func
 0x5336c0	SoundObject::SoundObject(WorldObject*)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
 0x5337f0	SoundObject::SoundObject(bVector3 const&)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
 0x5338c0	SoundObject::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
@@ -722,6 +946,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x536250	EAXChannel::ReceiveEnvelopeEvent	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
 0x5362a0	EAXChannel::GenerateEnvelope	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
 0x5364e0	EAXMixMgr::EAXMixMgr	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x536870	EAXMix_SetupAllTypes	audio	I	hopper+capstone	docs/re/misc.md	misc		func
 0x5368b0	EAXMixMgr::SetMixType	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
 0x536a70	EAXMixMgr::EndMixType	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
 0x536c80	EAXMixMgr::ReceiveTrigger	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
@@ -740,7 +965,12 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x53ba10	EAXS_AmbStereoStream::UpdateFadeTransition	audio.stream	V	ghidra	docs/re/sound.md	sound		data
 0x53bfc0	EAXS_MusicStream::InitializeEATRAX	audio.stream	V	ghidra	docs/re/sound.md	sound		func
 0x53d640	EAXS_TCMStream::PlayStream	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x53e020	Render_InitSubsystem	render	V	hopper+ghidra	docs/re/render.md	render		func
+0x53e210	DynamicFrameMemory_Swap	render	V	hopper+ghidra	docs/re/render.md	render		func
+0x53e330	FrameLists_Recycle	render	I	hopper+ghidra	docs/re/render.md	render		func
 0x53e400	BinarySearch_Hash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x53e4f0	StringList_Find	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
+0x53f3e0	ResourceFileList_Remove	assets	I	hopper+capstone	docs/re/misc.md	misc		func
 0x53f6e0	Solid_ResolvePending	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x53f9b0	Solid_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x53fef0	SolidList_LoadContainer	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
@@ -756,6 +986,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x540f10	LightPack_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x5410b0	LightPack_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x5413e0	LightTree_Query	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x542e40	CarRender_LitBodyPathB	render	I	hopper+capstone	docs/re/misc.md	misc		func
+0x5437f0	CarRender_LitBodyPathA	render	I	hopper+capstone	docs/re/misc.md	misc		func
 0x544f30	LampFlares_Draw	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x5453d0	TexturePack_LoadIndex	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x545520	TexturePack_Remove	assets	I	Hopper export has no block (inside another sub_); Ghidra export block; capstone only	docs/re/assets.md	assets		data
@@ -780,6 +1012,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x546570	TrackSkyInfo_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x549130	EAXMod::NopArg1 (ret 4 stub shared by ~200 slots)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
 0x564990	bList::Sort	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x564a50	RandomInt	runtime	V	hopper+capstone	docs/re/misc.md	misc		func
+0x564bd0	Angle16SinCos	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
 0x564db0	Atan2ToAngle16	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x565230	bMatrixCopy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x565310	bInitMemoryPool	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
@@ -798,6 +1032,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x567450	Vec3Normalize	blur	I	C	docs/re/blur.md	blur		func
 0x567600	Aabb2D::GrowByCircle	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x5679b0	PointInPolygon2D	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x567ca0	bStringHashSeeded	runtime	V	hopper+capstone	docs/re/misc.md	misc		func
 0x567cc0	bStrLen	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x567ce0	bStrCpy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x567d30	bStrCmp	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
@@ -810,8 +1045,11 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x56a130	CarRenderInfo::CarRenderInfo	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x56c3d0	CarRenderInfo::UpdateDecalTextures	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x56dc30	CarRenderInfo::Render	other	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5707b0	Views_UpdatePerFrame	render	I	hopper+ghidra	docs/re/render.md	render		func
 0x570950	DrawShowcaseCarList	blur	I	C	docs/re/blur.md	blur		func
+0x570db0	RenderFrame_DrawCars	render	I	hopper+capstone	docs/re/misc.md	misc		func
 0x571050	DrawRaceCarList	blur	V	G+C	docs/re/blur.md	blur		func
+0x571870	CarOverlays_QueueByView	render	I	hopper+ghidra	docs/re/render.md	render		func
 0x573150	Chunk39100::Loader	assets	V	Hopper sub_573150 + Ghidra make FUN_00573150: H+G agree	docs/re/assets.md	assets		func
 0x573160	Chunk39100::Unloader	assets	V	Hopper sub_573160 + Ghidra make FUN_00573160: H+G agree	docs/re/assets.md	assets		func
 0x573ab0	InputEvents::MatchBindings	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
@@ -829,6 +1067,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5787e0	WorldObjectCohort::Loader	assets	V	Ghidra make FUN_005787e0 (Hopper export lacks it)	docs/re/assets.md	assets		data
 0x578800	WorldObjectCohort::Unloader	assets	V	Ghidra make FUN_00578800	docs/re/assets.md	assets		data
 0x578880	WorldObjectCohort::Launch	assets	V	Ghidra make FUN_00578880	docs/re/assets.md	assets		func
+0x579590	IList_InitEmpty_Thunk	runtime	V	hopper+capstone	docs/re/misc.md	misc		func
 0x57c8b0	CarData_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x57cb70	CarData_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
 0x57ce10	CarPartDatabase::GetCarPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -863,6 +1102,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x58ae80	LoadedSkin::LoadedSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x58af10	LoadedWheel::LoadedWheel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x58b050	LoadedCar::LoadedCar	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58b330	ResourceFile_OpenAndStart	assets	I	hopper+capstone	docs/re/misc.md	misc		func
 0x58b750	CarLoader::AllocateWheel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x58bb50	CarLoader::AllocateSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x58c3b0	CarLoader::AllocateRideInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -890,6 +1130,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5912b0	TrackMap::InitModeTable	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x592100	RenderWorldModels	blur	V	G+C	docs/re/blur.md	blur		func
 0x592230	SurfaceTable::Init	props	I	hopper+ghidra	docs/re/props.md	props		func
+0x592280	WorldObject_ctor	props	I	hopper+capstone	docs/re/misc.md	misc		func
 0x5927d0	WorldObject::CanCollide	props	I	capstone	docs/re/props.md	props		func
 0x592a50	Table34300::Loader	assets	V	Hopper sub_592a50 + Ghidra make FUN_00592a50: H+G agree	docs/re/assets.md	assets		func
 0x592ab0	Table34300::Unloader	assets	V	Hopper sub_592ab0 + Ghidra make: H+G agree	docs/re/assets.md	assets		func
@@ -1031,8 +1272,29 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5ab5a0	MovieSubtitles::Update	assets	V	Hopper sub_5ab5a0	docs/re/assets.md	assets		func
 0x5ab640	MovieSubtitles::Loader	assets	V	Ghidra make FUN_005ab640 (Hopper export lacks it)	docs/re/assets.md	assets		data
 0x5ab700	MovieSubtitles::Unloader	assets	V	Hopper sub_5ab700 + Ghidra make FUN_005ab700: H+G agree	docs/re/assets.md	assets		func
+0x5ab730	Direct3DCreate9_Thunk	render	V	hopper+capstone	docs/re/render.md	render		func
+0x5abdaf	D3DXVec3Transform	render	I	capstone	docs/re/render.md	render		func
 0x5ac449	Vec4TransformInPlace	blur	I	C	docs/re/blur.md	blur		func
+0x5ac68f	D3DXMatrixMultiply_Entry	render	I	hopper+capstone	docs/re/render.md	render		data
+0x5ac69c	D3DXMatrixMultiply	render	I	capstone	docs/re/render.md	render		func
+0x5ac8e5	D3DXMatrixTranspose	render	I	capstone	docs/re/render.md	render		func
+0x5b065b	D3DXPSGP_Init	render	I	hopper+capstone	docs/re/render.md	render		func
+0x61e010	EAGL::DynamicLoader::LoadSymbols	render	I	hopper+ghidra	docs/re/render.md	render		func
 0x61e790	GetFirstAnimBank	other	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x61e850	EAGL::DynamicLoader::RunDestructors	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x61ea00	EAGL::DynamicLoader::DumpRuntimeAllocs	render	I	ghidra	docs/re/render.md	render		func
+0x61f050	EAGL::RenderContext::New	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x61f1b0	EAGL::SymbolPool::Lookup	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x61fe20	EAGL::PC::CreateCapsWindow	render	V	hopper+ghidra	docs/re/render.md	render		func
+0x620bc0	EAGL::RenderContext::Ctor	render	I	ghidra	docs/re/render.md	render		func
+0x620ed0	EAGL::PC::InitCaps	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x621020	EAGL::PC::GetDirectDraw	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x622cd0	EAGL::VertexBuffer::New	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x6232f0	EAGL::IndexBuffer::New	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x627360	EAGLAnim::MemoryPool_Create	render	I	hopper+ghidra	docs/re/render.md	render		data
+0x627b90	EAGLAnim::FnAnimFactory::New	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x638c30	SHP_FormatName	render	I	hopper+ghidra	docs/re/render.md	render		func
+0x63a3f0	FileSystem_Create	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
 0x63f150	CriticalSection::Init	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x63f190	CriticalSection::Enter	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x63f1a0	CriticalSection::Leave	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
@@ -1198,6 +1460,33 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x6860d3	EAXSND8Wrapper::EAXSND8Wrapper (SEH unwind funclet, not the ctor)	other	V	ghidra	docs/re/sound.md	sound		data
 0x688528	__CxxFrameHandler_wrapper	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x688888	(not a function: SEH frame handler thunk)	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x6897f0	StaticInit_ParticleEmitter_G78e974_6897f0	assets	I	capstone+refs	docs/re/misc.md	misc		func
+0x689f40	StaticInit_CreateResourceFile_G77a924_689f40	assets	I	capstone+refs	docs/re/misc.md	misc		func
+0x68a040	StaticInit_CarShape_G779bd8_68a040	assets	I	capstone+refs	docs/re/misc.md	misc		data
+0x68ab60	StaticInit_Hash_Bip01	camera	V	hopper+capstone	docs/re/misc.md	misc		data
+0x68abc0	StaticInit_Hash_SALLY	camera	V	hopper+capstone	docs/re/misc.md	misc		data
+0x68ac50	StaticInit_AnimBank_G779798_68ac50	assets	I	capstone+refs	docs/re/misc.md	misc		func
+0x691ba0	StaticInit_EAXFrontEnd_G7441f8_691ba0	audio	I	capstone+refs	docs/re/misc.md	misc		data
+0x691bb0	StaticInit_EAXFrontEnd_G7441f8_691bb0	audio	I	capstone+refs	docs/re/misc.md	misc		data
+0x691c50	StaticInit_EAXTunerCar_G7441c8_691c50	audio	I	capstone+refs	docs/re/misc.md	misc		data
+0x691e70	StaticInit_EAXTires_G70585c_691e70	audio	I	capstone+refs	docs/re/misc.md	misc		func
+0x692230	StaticInit_LightTree_G740a68_692230	assets	I	capstone+refs	docs/re/misc.md	misc		data
+0x692530	StaticInit_Hash_EXHAUST_TIP_DECAL	car	V	hopper+capstone	docs/re/misc.md	misc		data
+0x692cb0	StaticInit_Hash_Rotate_360_t	car	I	hopper+capstone	docs/re/misc.md	misc		func
+0x692ce0	StaticInit_Hash_Rotate_360_q	car	I	hopper+capstone	docs/re/misc.md	misc		data
+0x6931e0	StaticInit_WorldZone_G737b20_6931e0	assets	I	capstone+refs	docs/re/misc.md	misc		data
+0x693420	StaticInit_SplineSet_G73769c_693420	assets	I	capstone+refs	docs/re/misc.md	misc		func
+0x696200	StaticInit_ParticleEmitter_G78e974_696200	assets	I	capstone+refs	docs/re/misc.md	misc		func
+0x696380	StaticInit_CreateResourceFile_G77a924_696380	assets	I	capstone+refs	docs/re/misc.md	misc		func
+0x6963f0	StaticInit_CarShape_G779bd8_6963f0	assets	I	capstone+refs	docs/re/misc.md	misc		data
+0x696440	StaticInit_AnimBank_G779798_696440	assets	I	capstone+refs	docs/re/misc.md	misc		data
+0x696510	StaticInit_FEngFont_G7460fc_696510	assets	I	capstone+refs	docs/re/misc.md	misc		func
+0x696560	StaticInit_GaragePaintModScreen_G744ff0_696560	car	I	capstone+refs	docs/re/misc.md	misc		data
+0x696790	StaticInit_LightTree_G740a68_696790	assets	I	capstone+refs	docs/re/misc.md	misc		data
+0x696a70	StaticInit_ApplyCameraShake_G73b220_696a70	camera	I	capstone+refs	docs/re/misc.md	misc		func
+0x696cb0	StaticInit_WorldZone_G737b20_696cb0	assets	I	capstone+refs	docs/re/misc.md	misc		data
+0x696d90	StaticInit_SplineSet_G73769c_696d90	assets	I	capstone+refs	docs/re/misc.md	misc		func
+0x696da0	StaticInit_GaragePaintModScreen_G73765c_696da0	car	I	capstone+refs	docs/re/misc.md	misc		func
 0x6b5a30	TeleportInterval_Free	traffic	V	G+file	docs/re/traffic.md	traffic		data
 0x6b5a34	TeleportInterval_Route	traffic	V	G+file	docs/re/traffic.md	traffic		data
 0x6b5a38	TeleportFirstStep	traffic	V	G+file	docs/re/traffic.md	traffic		data
@@ -1290,14 +1579,25 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x7062cc	JumpCam_HeightCurve	camera	V	G+C	docs/re/camera.md	camera		data
 0x7062e4	JumpCam_DistCurve	camera	V	G+C	docs/re/camera.md	camera		data
 0x7062fc	JumpCam_SpeedCurve	camera	V	G+C	docs/re/camera.md	camera		data
+0x71a96c	gPresentParams	render	V	hopper+ghidra	docs/re/render.md	render		data
 0x71ab9c	gBlurTexA	blur	V	C	docs/re/blur.md	blur		data
 0x71aba0	gBlurTexB	blur	V	C	docs/re/blur.md	blur		data
 0x71aba4	gStreakTex	blur	V	C	docs/re/blur.md	blur		data
 0x71aba8	gBlurSurfA	blur	V	C	docs/re/blur.md	blur		data
 0x71abac	gBlurSurfB	blur	V	C	docs/re/blur.md	blur		data
 0x71abb0	gStreakSurf	blur	V	C	docs/re/blur.md	blur		data
+0x71abb4	gRampTexture	render	V	ghidra+capstone	docs/re/render.md	render		data
+0x71abb8	gEffectTable	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x71b1dc	gStatFlushCalls	render	I	hopper+ghidra	docs/re/render.md	render		data
+0x71b1e8	gStatStreamSourceChanges	render	I	hopper	docs/re/render.md	render		data
+0x71b1ec	gStatIndexBufferChanges	render	I	hopper	docs/re/render.md	render		data
+0x71b1f0	gEffectTableEnd	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x71b204	gStatEffectSwitches	render	I	hopper	docs/re/render.md	render		data
 0x73457c	FrameDt	camera	I	C	docs/re/camera.md	camera		data
 0x734588	CarTypeInfoTable	traffic	V	H+G+file	docs/re/traffic.md	traffic		data
+0x7355b4	gScratchCursor	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x7355b8	gScratchLimit	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x7355cc	gScratchHighWater	render	V	hopper+ghidra	docs/re/render.md	render		data
 0x735ee8	CamTweakerEnable	camera	I	C	docs/re/camera.md	camera		data
 0x735f5c	gCamFlag735f5c	camera	I	G+C	docs/re/camera.md	camera		data
 0x736150	RoadEntries_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic		data
@@ -1311,13 +1611,26 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x7361a4	CamGateFlagB	camera	I	C	docs/re/camera.md	camera		data
 0x7361f0	gGameModePtr	camera	I	C	docs/re/camera.md	camera		data
 0x7361f8	WorldCarList	traffic	I	H+G	docs/re/traffic.md	traffic		data
+0x736334	gGraphicsQualityLevel	render	V	ghidra+capstone	docs/re/render.md	render		data
+0x736368	gD3D9	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x73636c	gD3DDevice	render	V	hopper+ghidra+capstone	docs/re/render.md	render		data
+0x736380	gGameHwnd	render	V	hopper+ghidra	docs/re/render.md	render		data
 0x736384	gBlurOrStreaksActive	blur	V	C	docs/re/blur.md	blur		data
+0x7363e8	gBoundVertexBuffer	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x7363ec	gBoundIndexBuffer	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x7363fc	gRenderQueueCount	render	I	hopper+ghidra	docs/re/render.md	render		data
+0x73640c	gCurrentEffect	render	V	hopper+ghidra	docs/re/render.md	render		data
 0x73641c	gBlurSpecialN	blur	V	G+C	docs/re/blur.md	blur		data
 0x73645c	gSceneRTMode	blur	V	C	docs/re/blur.md	blur		data
 0x736460	gSceneTex	blur	V	C	docs/re/blur.md	blur		data
 0x736464	gSceneSurf	blur	V	C	docs/re/blur.md	blur		data
+0x73646c	gReflectionCube	render	V	ghidra	docs/re/render.md	render		data
 0x7364a0	gViewCountKind	camera	I	G+C	docs/re/camera.md	camera		data
+0x7364ac	gTexRVM	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x7364b0	gTexRVMMask	render	V	hopper+ghidra	docs/re/render.md	render		data
+0x7364b4	gTexWhite16NoAlpha	render	V	hopper+ghidra	docs/re/render.md	render		data
 0x73654c	gSpecialCameraActive	blur	V	G+C	docs/re/blur.md	blur		data
+0x740460	gViews	render	V	hopper+ghidra	docs/re/render.md	render		data
 0x740500	gBlurCameraObj	blur	V	C	docs/re/blur.md	blur		data
 0x758938	POVSaveTable	camera	I	C	docs/re/camera.md	camera		data
 0x758948	POVIndexPerPlayer	camera	I	C	docs/re/camera.md	camera		data
@@ -1334,3 +1647,4 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x78a3fc	TrafficDriverMode	traffic	I	G	docs/re/traffic.md	traffic		data
 0x78a418	Entrants_Ptr	traffic	V	H+G	docs/re/traffic.md	traffic		data
 0x78d270	gCameraObj	blur	V	C	docs/re/blur.md	blur		data
+0x78e980	gParticleSystemA	render	I	hopper	docs/re/render.md	render		data

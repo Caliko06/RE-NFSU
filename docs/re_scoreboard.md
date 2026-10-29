@@ -79,32 +79,32 @@ Evidence marks are about the docs named; none of these was re-run here.
    "100 %" per system means every function is tagged, every function that ran is named or marked trivial, and every
    one that never ran is proven dead (SIMD path, online, installer) or has a scenario that reaches it.
 
-## 5. Four numbers per system (tools/census/scoreboard.py, 2026-10-29 10:20, V; changed after the external audit)
+## 5. Four numbers per system (tools/census/scoreboard.py, 2026-10-29 12:40, V; changed after the external audit and the unknown/render passes)
 
 Universe = the 13,739 lifted functions.
 - tagged = a system tag of confidence med/high in census/systems.tsv, or a name in names_*.tsv. The name's system overrides the graph tag (the audit found 47% of named functions had a different system in the graph). Before this change `tagged` counted every non-unknown function (12,179) and told nothing.
 - ran = RN_COV union, a floor (prologue only), 22 scenarios (12 first, 10 more tracks and career rows later the same day added only 29 functions: 6,038 -> 6,067).
 - named = a row in census/names_*.tsv with a system (V or I); named V = a second tool agrees (an automatic recheck of the 328 one-tool V rows: 259 hold, 69 inconclusive, 0 contradicted (docs/re/audit/v_recheck.tsv)).
 - diff-tested = lifted functions compared against Unicorn with all cases equal (census/difftest.json `compared_funcs`, rerun 2026-10-29 with 8 cases: 5,798 compared, 5,794 equal, gate FAIL on the same 4 functions as before: 3 documented QEMU deviations and 0x67a337, whose reference retires into 0x6728cc where nothing was lifted).
-- Names land in the system of the night's work: track, input, runtime and hud have almost no names because nobody named them yet (free tracks were never done).
+- Names land in the system of the night's work. Still thin: online (out of scope), rivals (29), camera, props; free tracks were never done.
 
 | system | lifted | tagged | ran | named | named V | diff-tested |
 |---|---|---|---|---|---|---|
-| render | 2230 | 907 | 935 | 24 | 15 | 834 |
-| canon | 1980 | 938 | 653 | 66 | 62 | 643 |
-| runtime | 1747 | 579 | 695 | 126 | 90 | 949 |
-| unknown | 1516 | 0 | 870 | 0 | 0 | 874 |
-| audio | 1329 | 528 | 825 | 209 | 197 | 554 |
-| car | 1037 | 531 | 371 | 216 | 189 | 323 |
-| rivals | 1030 | 584 | 552 | 28 | 21 | 370 |
-| online | 688 | 296 | 26 | 1 | 1 | 329 |
-| track | 664 | 274 | 340 | 62 | 48 | 243 |
-| hud | 349 | 181 | 172 | 61 | 51 | 110 |
-| assets | 328 | 227 | 217 | 182 | 168 | 221 |
-| camera | 287 | 123 | 92 | 51 | 20 | 83 |
-| traffic | 230 | 155 | 173 | 82 | 37 | 120 |
-| props | 177 | 82 | 97 | 22 | 16 | 59 |
-| input | 147 | 97 | 49 | 50 | 23 | 69 |
-| TOTAL | 13739 | 5502 | 6067 | 1180 | 938 | 5781 |
+| render | 2246 | 933 | 953 | 83 | 34 | 851 |
+| runtime | 2179 | 1019 | 1073 | 140 | 95 | 1381 |
+| canon | 2002 | 987 | 665 | 204 | 179 | 642 |
+| audio | 1347 | 546 | 844 | 219 | 198 | 565 |
+| car | 1060 | 556 | 384 | 224 | 190 | 334 |
+| rivals | 1035 | 589 | 558 | 29 | 21 | 375 |
+| unknown | 910 | 0 | 363 | 0 | 0 | 369 |
+| online | 689 | 297 | 26 | 1 | 1 | 330 |
+| track | 662 | 273 | 338 | 62 | 48 | 242 |
+| hud | 379 | 214 | 198 | 87 | 60 | 123 |
+| assets | 364 | 263 | 235 | 201 | 169 | 224 |
+| camera | 303 | 139 | 103 | 58 | 23 | 92 |
+| traffic | 237 | 162 | 178 | 83 | 37 | 124 |
+| props | 179 | 84 | 99 | 23 | 16 | 60 |
+| input | 147 | 98 | 50 | 50 | 23 | 69 |
+| TOTAL | 13739 | 6160 | 6067 | 1464 | 1094 | 5781 |
 
-Reading: tagged is 39% of the functions, not 89%. Named is 9% (1,180), named V 7% (938). Ran is 44.2% (6,067). Diff-tested is 42% (5,781). Names added after the audit: track 62, runtime 126, hud+input 108.
+Reading: tagged is 45% of the functions (6,160), not 89%; 601 of them come from census/systems_override.tsv (hand-read unknown functions, 422 of them static initializers of constants, so weak evidence). Named is 11% (1,464), named V 8% (1,094). Ran is 44.2% (6,067). Diff-tested is 42% (5,781). Names added after the audit: track 62, runtime 126, hud+input 108, misc 67, render 84.

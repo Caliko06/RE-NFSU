@@ -39,8 +39,8 @@ Marks: V = read in the binary and a second tool agrees; I = inferred; U = unknow
 - **Rivals.** Rating match `0x57f700/0x57f970` (303 of 313 rivals match the player), spawn `0x4b5df0 -> 0x4b4040 -> 0x4b26f0`, AI table of 523 floats copied to `0x779c78` (chunk 0x34b00), rubber band `0x44bd10` every 0.3 s with strength from EventDesc +0x12c. Skill vs aggression bytes (+0x735/+0x736) are I.
 
 ## Numbers (python3 tools/census/scoreboard.py; tables in docs/re_scoreboard.md §5)
-13,739 functions lifted; 6,067 (44.2%) ran in 22 scenarios (a floor: prologue only; ten extra scenarios on other tracks and career rows added only 29, so the rest is mostly code these scenarios never reach: SEH funclets, network, SIMD paths); 1,180 carry a name, 938 of them V; 5,502 are tagged by a med/high graph tag or a name.
-Names: `census/names.tsv` (1,335 addresses, aliases and func/data kind). The graph's system tags are unreliable (38% strict agreement); a name's system overrides them.
+13,739 functions lifted; 6,067 (44.2%) ran in 22 scenarios (a floor: prologue only; ten extra scenarios on other tracks and career rows added only 29, so the rest is mostly code these scenarios never reach: SEH funclets, network, SIMD paths); 1,464 carry a name, 1,094 of them V; 6,160 are tagged by a med/high graph tag or a name.
+Names: `census/names.tsv` (1,649 addresses, aliases and func/data kind). The graph's system tags are unreliable (38% strict agreement); a name's system overrides them.
 
 ## One finding that touches the game (OWNER's call, nothing applied)
 Our patch `0x735ec1=1` ("everything available") also makes `0x5a1520` return 1e9 cash, so garage purchases drive the balance negative (asas0.ugd: -9,875). Proposal `?cash=real` in `docs/re/proposals.md`.

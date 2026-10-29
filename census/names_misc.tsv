@@ -1,0 +1,68 @@
+addr	name	system	confidence	evidence	tool	doc
+0x401050	ScratchAlloc64xN	runtime	med	I: bump allocator on 0x7355b4/0x7355b8 like ScratchAlloc16 0x401010: size=(n<<6)+15&~15, flag 0x7355c4 on overflow	hopper+capstone	docs/re/misc.md
+0x4020b0	Matrix4_Invert	runtime	med	I: calls 0x401f70 (cofactor/determinant), 1.0/det via fdivr, then 16 cofactor products stored; 1099 bytes of pure float math	hopper+capstone	docs/re/misc.md
+0x4055e0	DegToRad	runtime	high	V: x * 0x3c8efa35 (0.0174533 = pi/180), single fmul and ret (capstone bytes agree)	hopper+capstone	docs/re/misc.md
+0x408160	Vec3_Scale	runtime	med	I: eax[i] = ecx[i]*arg_0 for i=0..2	hopper+capstone	docs/re/misc.md
+0x408210	GetPlayerObject	rivals	med	I: returns dword_7361bc[idx] (player table, 0x7361bc is "the player object" in rivals doc); callers NearestPlayer, PickLane, Teleporter_PickPlayer, TrafficTeleporter::DoTimestep	hopper+capstone	docs/re/misc.md
+0x40c4b0	LightPack_ChunkDispatch	assets	high	V: switch on chunk id ecx[3] against 0x89f23a14, 0x3ed70c43, 0x23e6a3f4, 0x12c9453c ...; sole caller LightPack_Load	hopper+capstone	docs/re/misc.md
+0x411be0	SNDSTRM_AllocRequest	audio	med	I: takes CriticalSection, pops free list edi[0x20], counts 0x100 bytes into 0x71b7c4; caller SNDSTRMI_queue 0x412930	hopper+capstone	docs/re/misc.md
+0x411c50	SNDSTRM_PushRequest	audio	med	I: CriticalSection, appends node to list edi[0x1d..0x1f]; caller SNDSTRMI_queue	hopper+capstone	docs/re/misc.md
+0x4124d0	SNDSTRM_OverheadBytes	audio	high	V: arg0*0x128 + (arg4*3+0x7b)*4 + (arg8<<4): same formula SNDSTRMI_create 0x4124f0 uses to size its buffer; caller SNDSTRM_overhead	hopper+capstone	docs/re/misc.md
+0x412900	SNDSTRM_GetEntry	audio	med	I: checks magic 'STRM', index 1..ecx[0xd], returns ecx[0xc]+(idx<<4)-0x10 else 0	hopper+capstone	docs/re/misc.md
+0x4134d0	FEng_FindObjectByHash	canon	med	I: 0x4f65d0/0x4ffb70/0x4ef050 lookup chain identical to HudWidget::RegisterObjectByHash; callers GarageMainScreen, HudManager ctors	hopper+capstone	docs/re/misc.md
+0x4149d0	FEng_FindObjectByHash2	canon	med	I: same 0x4f65d0/0x4ffb70/0x4ef050 chain, 62 bytes, no register step	hopper+capstone	docs/re/misc.md
+0x41e860	CpuDetect	runtime	high	V: pushfd/xor 0x200000/popfd (CPUID presence test) then cpuid switch (capstone shows cpuid)	hopper+capstone	docs/re/misc.md
+0x424160	CameraMover_CreateByType	camera	med	I: switch on arg-1, calls Player::ChangeCameraMover and _malloc: builds a mover object per type	hopper+capstone	docs/re/misc.md
+0x424c50	TrafficCar_AtIndex	traffic	med	I: idx*0xc90 + dword_734588 (traffic car array, stride 0xc90); caller TrafficCar_Place	hopper+capstone	docs/re/misc.md
+0x425af0	Car_SerializeFields	car	med	I: formats "Car%d" via 0x565da0 and runs 0x571c20 field read/write calls over car struct (args +0x830..): per-car save/load block; caller 0x41fc00	hopper+capstone	docs/re/misc.md
+0x42ad10	CameraMoverBase_InitFields	camera	high	V: zeroes/initializes fields eax[0..0x47] of a camera mover; callers: CubicCameraMover::ctor, DragRaceCameraMover::ctor, DragRaceAheadCameraMover::ctor, DragRaceLeaderCameraMover (5 named camera ctors)	hopper+capstone	docs/re/misc.md
+0x483b90	CameraMover_ClipAgainstWorld	camera	med	I: 667 bytes: builds a probe from the mover (ecx) and calls GroundQuery::RefillCache and CameraMover::EnforceMinGapToWall; callers include camera movers	hopper+capstone	docs/re/misc.md
+0x487680	CameraMover_BuildBankedFrame	camera	med	I: writes basis vector (1,0,0,0) then calls CameraMover::ComputeBankedUpVector and _ftol	hopper+capstone	docs/re/misc.md
+0x4bca40	Ride_BuildFromPartDatabase	car	med	I: calls RideInfo::Init, RideInfo::operator=, CarPartDatabase::GetCarPart and Ride_Init with a stack RideInfo of 0x700 bytes	hopper+capstone	docs/re/misc.md
+0x4d9a40	ColorPicker_BindElements	car	med	I: loop building "COLORELEMENT_%d" names via 0x4f42f0 and looking up FEng objects via 0x4ef050 (garage color picker); caller 0x4da1a0	hopper+capstone	docs/re/misc.md
+0x4f08f0	UIListNode_Alloc	canon	med	I: _malloc(0x20), fills 0xabadcafe markers at +4/+8, vtable 0x6c2c64, links node into list at ebx[0x104b/0x104c]; 16 callers from FEng screens	hopper+capstone	docs/re/misc.md
+0x4f3c40	Resource_DecompressIfCOMP	assets	med	I: compares header word ecx with 0x30203 / 0x30210 and calls DecompressCOMP on the payload; 5 callers	hopper+capstone	docs/re/misc.md
+0x504010	WString_Free	runtime	med	I: if (*ecx) call _free 0x671102; 11 callers (canon, online)	hopper+capstone	docs/re/misc.md
+0x504080	WString_Assign	runtime	med	I: copies a wchar_t string into edi's buffer, calls WString_Grow 0x5040e0 when length+1 > edi[1]; caller ControlsScreen::SetBindingLabel	hopper+capstone	docs/re/misc.md
+0x5040e0	WString_Grow	runtime	med	I: wchar_t buffer: counts length until 0, if new cap edx > len allocs 2*edx+2 via _malloc, copies wchars, frees old via _free; callers ControlsScreen path 0x504080	hopper+capstone	docs/re/misc.md
+0x532bb0	EAXSound_InitMixerBanks	audio	med	I: sequence of 0x64e8e0/0x64b560/0x64b500(0x705810)/0x64e5f0(0x20) mixer-library calls guarded by dword_6f1dd8; callers LoadFrontEndSoundBanks and LoadInGameSoundBanks	hopper+capstone	docs/re/misc.md
+0x536870	EAXMix_SetupAllTypes	audio	med	I: calls 0x5368b0(edi,esi,arg_0,t) for t=0..3: all four EAXMixMgr::SetMixType types	hopper+capstone	docs/re/misc.md
+0x53e4f0	StringList_Find	runtime	med	I: walks list at arg0+0x18 comparing strings byte by byte against arg_4; returns node or 0; 7 callers	hopper+capstone	docs/re/misc.md
+0x53f3e0	ResourceFileList_Remove	assets	med	I: finds entry with 0x53e4f0 (string compare list), calls UnloadResourceFile and _free	hopper+capstone	docs/re/misc.md
+0x542e40	CarRender_LitBodyPathB	render	med	I: 2455 bytes: LightTree_Query, bNormalize3, _ftol; alternate branch of 0x544390 (other path 0x5437f0)	hopper+capstone	docs/re/misc.md
+0x5437f0	CarRender_LitBodyPathA	render	med	I: 2951 bytes: LightTree_Query, bNormalize3, Vec3Normalize, CallNTimes; chosen by dword_73554c in CarRenderInfo::Render helper 0x544390	hopper+capstone	docs/re/misc.md
+0x564a50	RandomInt	runtime	high	V: r=state 0x6f227c; return r % arg_0; state updated with xor 0x1d872b41 and shifts (5, 27): LCG-like PRNG; callers CameraMover::VelocityNoise, EAXTrafficCar::Update/UpdateDriveBy	hopper+capstone	docs/re/misc.md
+0x564bd0	Angle16SinCos	runtime	med	I: arg & 0xffff scaled by 2pi/65536 (dword 0x3b..), range-reduced by pi/2 steps, then polynomial: sin/cos from a 16-bit angle; callers 0x42a860 0x42f0c0 0x456a80 0x456de0 0x458340 0x480ff0	hopper+capstone	docs/re/misc.md
+0x567ca0	bStringHashSeeded	runtime	high	V: loop eax=eax*0x21+byte over C string, returns eax: the bStringHash loop with the seed passed in eax (same 33x hash as 0x692ce0's static init, init 0xffffffff); callers 0x432a30, 0x57fb80	hopper+capstone	docs/re/misc.md
+0x570db0	RenderFrame_DrawCars	render	med	I: gated by dword_6f1ad0 and game state 0x77a920==6; calls CarRenderInfo::Render and CallNTimes; sole caller RenderFrameMain	hopper+capstone	docs/re/misc.md
+0x579590	IList_InitEmpty_Thunk	runtime	high	V: body is sub_589260(); return (capstone call to 0x589260); callers include CarRenderInfo::CarRenderInfo	hopper+capstone	docs/re/misc.md
+0x58b330	ResourceFile_OpenAndStart	assets	med	I: calls bOpenFile, CreateResourceFile and ResourceFile::BeginLoading (0x58cac0 with 0x20000 chunk)	hopper+capstone	docs/re/misc.md
+0x592280	WorldObject_ctor	props	med	I: sets vtable 0x6c85b8, ++0x736010 instance count, tracks peak in 0x736038; string "World Object" is its pool name	hopper+capstone	docs/re/misc.md
+0x63a3f0	FileSystem_Create	runtime	med	I: size from counts (x*0x30+ x*0x24+0x1580), allocates through 0x6e75ec with pool label "File System", then 0x6397e0	hopper+capstone	docs/re/misc.md
+0x6897f0	StaticInit_ParticleEmitter_G78e974_6897f0	assets	med	I: static initializer/funclet: 0x78e974 read by Particle_Load; 0x78e974 read by ParticleEmitter_Bind [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x689f40	StaticInit_CreateResourceFile_G77a924_689f40	assets	med	I: static initializer/funclet: 0x77a924 read by FindResourceFile; 0x77a924 read by ServiceResourceLoading [votes {'assets': 3}]	capstone+refs	docs/re/misc.md
+0x68a040	StaticInit_CarShape_G779bd8_68a040	assets	med	I: static initializer/funclet: 0x779bd8 read by CarShape_Load; 0x779bd8 read by CarShape_Find [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x68ab60	StaticInit_Hash_Bip01	camera	high	V: hash of rdata string "Bip01" (read at its rdata address, 33x hash from 0xffffffff) stored in 0x7797a0; sits with NIS names (IntroNisCoordinator reads 0x779800)	hopper+capstone	docs/re/misc.md
+0x68abc0	StaticInit_Hash_SALLY	camera	high	V: hash of rdata string "SALLY" stored in 0x7797c0, same NIS block as Bip01	hopper+capstone	docs/re/misc.md
+0x68ac50	StaticInit_AnimBank_G779798_68ac50	assets	med	I: static initializer/funclet: 0x779798 read by AnimBank_Unload; 0x779798 read by AnimBank_Load [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x691ba0	StaticInit_EAXFrontEnd_G7441f8_691ba0	audio	med	I: static initializer/funclet: 0x7441f8 read by EAXSound::UpdateLoopedMusic (FE looped music Csis class FEDriveOn); 0x7441f8 read by EAXFrontEnd::PlayDriveOnSnd [votes {'audio': 2}]	capstone+refs	docs/re/misc.md
+0x691bb0	StaticInit_EAXFrontEnd_G7441f8_691bb0	audio	med	I: static initializer/funclet: 0x7441f8 read by EAXSound::UpdateLoopedMusic (FE looped music Csis class FEDriveOn); 0x7441f8 read by EAXFrontEnd::PlayDriveOnSnd [votes {'audio': 2}]	capstone+refs	docs/re/misc.md
+0x691c50	StaticInit_EAXTunerCar_G7441c8_691c50	audio	med	I: static initializer/funclet: 0x7441c8 read by EAXTunerCar::Create_Reflection; 0x7441c8 read by EAXTunerCar::InitializeEngine [votes {'audio': 2}]	capstone+refs	docs/re/misc.md
+0x691e70	StaticInit_EAXTires_G70585c_691e70	audio	med	I: static initializer/funclet: 0x705848 read by EAXTires::GenerateRoadNoise; 0x70585c read by EAXTires::GenerateRoadNoise [votes {'audio': 2}]	capstone+refs	docs/re/misc.md
+0x692230	StaticInit_LightTree_G740a68_692230	assets	med	I: static initializer/funclet: 0x740a68 read by LightPack_Load; 0x740a68 read by LightTree_Query [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x692530	StaticInit_Hash_EXHAUST_TIP_DECAL	car	high	V: hash of rdata string "EXHAUST_TIP_DECAL" stored in 0x73d760 (car decal/exhaust slot name; CarRenderInfo::UpdateDecalTextures reads 0x73d7cc nearby)	hopper+capstone	docs/re/misc.md
+0x692cb0	StaticInit_Hash_Rotate_360_t	car	med	I: hash of "Rotate_360_t" stored in 0x73b0bc, partner of 0x692ce0 "Rotate_360_q" (translation/quaternion animation channel names of a turntable rotation)	hopper+capstone	docs/re/misc.md
+0x692ce0	StaticInit_Hash_Rotate_360_q	car	med	I: hash of "Rotate_360_q" stored in 0x73b0b8, partner of 0x692cb0	hopper+capstone	docs/re/misc.md
+0x6931e0	StaticInit_WorldZone_G737b20_6931e0	assets	med	I: static initializer/funclet: 0x737b20 read by WorldZone_Load; 0x737b20 read by WorldZone_Query [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x693420	StaticInit_SplineSet_G73769c_693420	assets	med	I: static initializer/funclet: 0x73769c read by SplineSet::Unloader; 0x73769c read by SplineSet::Loader [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x696200	StaticInit_ParticleEmitter_G78e974_696200	assets	med	I: static initializer/funclet: 0x78e974 read by Particle_Load; 0x78e974 read by ParticleEmitter_Bind [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x696380	StaticInit_CreateResourceFile_G77a924_696380	assets	med	I: static initializer/funclet: 0x77a924 read by FindResourceFile; 0x77a924 read by ServiceResourceLoading [votes {'assets': 3}]	capstone+refs	docs/re/misc.md
+0x6963f0	StaticInit_CarShape_G779bd8_6963f0	assets	med	I: static initializer/funclet: 0x779bd8 read by CarShape_Load; 0x779bd8 read by CarShape_Find [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x696440	StaticInit_AnimBank_G779798_696440	assets	med	I: static initializer/funclet: 0x779798 read by AnimBank_Unload; 0x779798 read by AnimBank_Load [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x696510	StaticInit_FEngFont_G7460fc_696510	assets	med	I: static initializer/funclet: 0x7460fc read by FEngFont_Load; 0x7460fc read by FEngFont_ResolveTextures [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x696560	StaticInit_GaragePaintModScreen_G744ff0_696560	car	med	I: static initializer/funclet: 0x744ff0 read by GaragePerfBrandPackage::NotificationMessage; 0x744ff0 read by GarageVinylBrowserScreen::RedrawHeading [votes {'car': 30}]	capstone+refs	docs/re/misc.md
+0x696790	StaticInit_LightTree_G740a68_696790	assets	med	I: static initializer/funclet: 0x740a68 read by LightPack_Load; 0x740a68 read by LightTree_Query [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x696a70	StaticInit_ApplyCameraShake_G73b220_696a70	camera	med	I: static initializer/funclet: calls NullUpdate_ret; 0x73b220 read by MaybeCameraShake [votes {'camera': 4}]	capstone+refs	docs/re/misc.md
+0x696cb0	StaticInit_WorldZone_G737b20_696cb0	assets	med	I: static initializer/funclet: 0x737b20 read by WorldZone_Load; 0x737b20 read by WorldZone_Query [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x696d90	StaticInit_SplineSet_G73769c_696d90	assets	med	I: static initializer/funclet: 0x73769c read by SplineSet::Unloader; 0x73769c read by SplineSet::Loader [votes {'assets': 2}]	capstone+refs	docs/re/misc.md
+0x696da0	StaticInit_GaragePaintModScreen_G73765c_696da0	car	med	I: static initializer/funclet: 0x73765c read by IsPaintOwned; 0x73765c read by ColorPicker::GetHighestUpgradeLevel [votes {'car': 7}]	capstone+refs	docs/re/misc.md
