@@ -5,21 +5,25 @@ funcs.jsonl or queue.tsv whole; `canon.py show` and `canon.py batch` print only 
 
 ## Orchestrator, one round
 1. `.venv/bin/python tools/canon/canon.py queue` (prints per-system total/done/ready/blocked; read only that table).
-2. Pick up to 3 systems with the most ready rows (never online). For each: `canon.py batch <system> 60`.
-3. Launch one `sonnet-exec` per system in parallel with the worker brief below (systems disjoint = files disjoint).
+2. Batches by GameCube source file (since round 5; system tags are graph guesses, files come from link order):
+   `canon.py batchfile 60 1`, then `canon.py batchfile 60 2 <files of batch 1>`, then 3 skipping both (the skip list is
+   comma-separated file paths, from the `# files:` header line). Functions without a GC file: `canon.py batch <system> 60`.
+3. Launch one `sonnet-exec` per batch in parallel with the worker brief below (different files = no overlap); each worker
+   writes census/names_<system>.tsv per function, so two workers may append to one file: append only, never rewrite.
 4. When all return: check each report against "Done when", then `canon.py apply && canon.py export -j 4 && canon.py queue`
    (only the orchestrator runs these: one Ghidra project, one writer), then `tools/census/scoreboard.py`.
 5. Commit with exact paths (`git add census/names_<system>.tsv ...`, never -A), one line to docs/re/night_log.md.
 6. After 3 rounds, or when context passes ~60 %: write HANDOFF.md and message the Opus session the round summary.
 
 ## Worker brief (paste with <system> filled)
-Objective: name the 60 functions in build/canon/batch_<system>.txt with evidence.
+Objective: name the 60 functions in build/canon/batch_<file or system>.txt with evidence.
 Context: docs/re/canon_wave.md (this file), docs/re/canon_db.md "GameCube alignment" grades.
 Read the batch with `.venv/bin/python tools/canon/canon.py show @build/canon/batch_<system>.txt` (named pseudocode +
 index line: size, callers, prior hint, strings, globals). Read more of one function only with `canon.py show <addr>`.
 Full GC signatures: `grep '<Name>__' build/prior/nfsug/symbols.txt`.
 Scope: append rows only to census/names_<system>.tsv (columns addr name system confidence evidence tool doc).
 Per function:
+- Order of sources: "GC free in file" line, then the GC window, then the file's range in build/prior/nfsug/symbols.txt.
 - Prior hint fits the code (strings, callees, field use, argument count vs the GC signature): GC name as
   `Class::method`, confidence high, evidence `V: <what matches>`, tool `ghidra-canon+nfsug`.
 - Hint does not fit, or no hint: name from the code, confidence med (read and clear) or low (guess), evidence says why

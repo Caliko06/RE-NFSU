@@ -6,6 +6,7 @@
   canon.py export [-j N]   named pseudocode + index -> census/canon/{c/*.c,funcs.jsonl}, data.jsonl
   canon.py queue           census/canon/queue.tsv: unnamed functions bottom-up (callees named first) + coverage
   canon.py batch <system> <n> [skip]   next n ready rows of one system -> build/canon/batch_<system>.txt (addrs)
+  canon.py batchfile <n> [k] [skip,files]  next n unnamed functions grouped by GC source file -> build/canon/batch_file_<k>.txt
   canon.py show <addr|@file>...        named pseudocode of just those functions, with a one-line index each
 """
 import csv, glob, json, math, os, re, shutil, subprocess, sys, tempfile
@@ -196,10 +197,43 @@ def batch(system, n, skip=0):
     print(f"batch {system}: {len(pick)} of {len(rows)} ready -> build/canon/batch_{system}.txt")
 
 
+def batchfile(n, k="1", skip_files=""):
+    """Next batch by GameCube source file: unnamed functions whose aligned or sandwiched file is the same, whole files
+    first (largest open file), address order. A worker then reads one class/file at a time."""
+    q = {a(r["addr"]): r for r in csv.DictReader(open(OUT + "/queue.tsv"), delimiter="\t")}
+    gcr = {a(r["addr"]): r["tu"] for r in csv.DictReader(open(OUT + "/prior_gc.tsv"), delimiter="\t")}
+    ga = sorted(gcr)
+    import bisect
+    tu = {}
+    for x in q:
+        if x in gcr:
+            tu[x] = gcr[x]
+        else:
+            i = bisect.bisect_left(ga, x)
+            if 0 < i < len(ga) and gcr[ga[i - 1]] == gcr[ga[i]]:
+                tu[x] = gcr[ga[i]]
+    skip = set(skip_files.split(",")) if skip_files else set()
+    files = {}
+    for x, t in tu.items():
+        if t and "GameCube" not in t and not t.startswith("libc") and t not in skip and q[x]["system"] != "online":
+            files.setdefault(t, []).append(x)
+    pick, names = [], []
+    for t, xs in sorted(files.items(), key=lambda kv: -len(kv[1])):
+        if len(pick) >= int(n):
+            break
+        pick += sorted(xs)[: int(n) - len(pick)]
+        names.append(f"{t} ({len(xs)})")
+    path = f"build/canon/batch_file_{k}.txt"
+    with open(path, "w") as o:
+        o.write("# files: " + "; ".join(names) + "\n" + "\n".join(f"{x:#x}" for x in pick) + "\n")
+    print(f"batchfile {k}: {len(pick)} functions from {names} -> {path}; {len(files)} files open, "
+          f"{sum(map(len, files.values()))} functions with a file")
+
+
 def show(args):
     want = []
     for x in args:
-        want += [l.split()[0] for l in open(x[1:]) if l.strip()] if x.startswith("@") else [x]
+        want += [l.split()[0] for l in open(x[1:]) if l.strip() and not l.startswith("#")] if x.startswith("@") else [x]
     want = [hex(a(x)) for x in want]
     hint = {r["addr"]: r["prior"] for r in csv.DictReader(open(OUT + "/queue.tsv"), delimiter="\t")}
     idx = {j["addr"]: j for j in map(json.loads, open(OUT + "/funcs.jsonl")) if j["addr"] in set(want)}
@@ -261,6 +295,8 @@ if __name__ == "__main__":
         export(int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[2] == "-j" else 4)
     elif cmd == "batch":
         batch(*sys.argv[2:5])
+    elif cmd == "batchfile":
+        batchfile(*sys.argv[2:5])
     elif cmd == "show":
         show(sys.argv[2:])
     else:
