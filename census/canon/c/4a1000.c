@@ -67,7 +67,7 @@ void __fastcall HudTurbo__Update(int param_1)
   undefined4 uVar3;
   
   if ((DAT_006fbf14 == 0) && (*(int *)(in_EAX + 0x10) == 0)) {
-    FUN_0041ffe0();
+    RaceManager__FindRacerById();
   }
   fVar1 = (float10)FUN_0042a6b0();
   if ((*(uint *)(param_1 + 0x18) & *(uint *)(param_1 + 0x10)) != 0 ||
@@ -308,7 +308,7 @@ void HudLapCounter__Update(int param_1)
   
   iVar4 = *(int *)(param_1 + 4);
   if (((DAT_006fbf14 == 0) && (*(int *)(param_1 + 0x10) == 0)) &&
-     (iVar2 = FUN_0041ffe0(), iVar2 != 0)) {
+     (iVar2 = RaceManager__FindRacerById(), iVar2 != 0)) {
     iVar4 = iVar2;
   }
   iVar4 = *(int *)(iVar4 + 0x1c);
@@ -451,7 +451,8 @@ void HudSplitTime__Update(int param_1)
     *(undefined4 *)(unaff_ESI + 0x34) = 0;
     *(undefined4 *)(unaff_ESI + 0x30) = 0;
     iVar2 = *(int *)(param_1 + 4);
-    if (((bVar3) && (*(int *)(param_1 + 0x10) == 0)) && (iVar1 = FUN_0041ffe0(), iVar1 != 0)) {
+    if (((bVar3) && (*(int *)(param_1 + 0x10) == 0)) &&
+       (iVar1 = RaceManager__FindRacerById(), iVar1 != 0)) {
       iVar2 = iVar1;
     }
     iVar2 = *(int *)(iVar2 + 0x1c);
@@ -1224,7 +1225,7 @@ void HudLeaderboard__Update(void)
             *(undefined1 *)(unaff_ESI + 0x141) = 1;
           }
         }
-        cVar1 = FUN_0041f600();
+        cVar1 = IsDriftMode();
         if (cVar1 == '\0') {
           FUN_004a31e0(unaff_ESI);
         }
@@ -1239,7 +1240,7 @@ void HudLeaderboard__Update(void)
           *(undefined1 *)(unaff_ESI + 0x140) = 0;
           *(undefined1 *)(unaff_ESI + 0x142) = 1;
         }
-        cVar1 = FUN_0041f600();
+        cVar1 = IsDriftMode();
         if (cVar1 == '\0') {
           FUN_004a2ef0(unaff_ESI);
         }
@@ -1367,7 +1368,7 @@ void FUN_004a2ef0(int param_1)
   iVar2 = param_1;
   iVar6 = *(int *)(in_EAX + 4);
   if (((DAT_006fbf14 == 0) && (*(int *)(in_EAX + 0x10) == 0)) &&
-     (iVar3 = FUN_0041ffe0(), iVar3 != 0)) {
+     (iVar3 = RaceManager__FindRacerById(), iVar3 != 0)) {
     iVar6 = iVar3;
   }
   if (*(int *)(iVar6 + 0x1c) != 0) {
@@ -1435,7 +1436,7 @@ void FUN_004a3020(int param_1)
   
   iVar7 = *(int *)(in_EAX + 4);
   if (((DAT_006fbf14 == 0) && (*(int *)(in_EAX + 0x10) == 0)) &&
-     (iVar3 = FUN_0041ffe0(), iVar3 != 0)) {
+     (iVar3 = RaceManager__FindRacerById(), iVar3 != 0)) {
     iVar7 = iVar3;
   }
   if (*(int *)(iVar7 + 0x1c) != 0) {
@@ -1528,7 +1529,7 @@ void FUN_004a31e0(int param_1)
   iVar3 = param_1;
   iVar6 = *(int *)(in_EAX + 4);
   if (((DAT_006fbf14 == 0) && (*(int *)(in_EAX + 0x10) == 0)) &&
-     (iVar4 = FUN_0041ffe0(), iVar4 != 0)) {
+     (iVar4 = RaceManager__FindRacerById(), iVar4 != 0)) {
     iVar6 = iVar4;
   }
   if (*(int *)(iVar6 + 0x1c) != 0) {
@@ -1757,7 +1758,7 @@ LAB_004a357f:
 LAB_004a359a:
   iVar10 = 0;
   cVar3 = FUN_0043a2e0();
-  if (((cVar3 != '\0') && (piVar5 = (int *)FUN_0043b850(*local_8), piVar5 != (int *)0x0)) &&
+  if (((cVar3 != '\0') && (piVar5 = (int *)Race__GetPlayer(*local_8), piVar5 != (int *)0x0)) &&
      (((iVar7 = *piVar5, iVar7 == 3 || (((iVar7 == 4 || (iVar7 == 5)) || (iVar7 == 0)))) ||
       (iVar7 == 6)))) {
     if (piVar5[0xc] == 9) {
@@ -1991,7 +1992,7 @@ void FUN_004a3930(int param_1,int param_2)
   
   iVar8 = *(int *)(param_2 + 4);
   if (((DAT_006fbf14 == 0) && (*(int *)(param_2 + 0x10) == 0)) &&
-     (iVar4 = FUN_0041ffe0(), iVar4 != 0)) {
+     (iVar4 = RaceManager__FindRacerById(), iVar4 != 0)) {
     iVar8 = iVar4;
   }
   iVar8 = *(int *)(iVar8 + 0x1c);
@@ -2021,7 +2022,7 @@ LAB_004a3a2b:
             bSPrintf_regdst(0x20,puVar6);
           }
           else {
-            iVar4 = FUN_0043b850((int)*(short *)(iVar4 + 10));
+            iVar4 = Race__GetPlayer((int)*(short *)(iVar4 + 10));
             if (iVar4 != 0) {
               puVar6 = (undefined1 *)(iVar4 + 0x19);
               goto LAB_004a3a2b;
@@ -2068,7 +2069,7 @@ void FUN_004a3aa0(int param_1)
   
   iVar3 = *(int *)(in_EAX + 4);
   if (((DAT_006fbf14 == 0) && (*(int *)(in_EAX + 0x10) == 0)) &&
-     (iVar2 = FUN_0041ffe0(), iVar2 != 0)) {
+     (iVar2 = RaceManager__FindRacerById(), iVar2 != 0)) {
     iVar3 = iVar2;
   }
   iVar2 = 0;
@@ -2894,7 +2895,7 @@ void HudTachDrag__Update(float param_1,int param_2)
   iVar11 = (int)param_1;
   local_34 = *(int *)(param_2 + 4);
   if (((DAT_006fbf14 == 0) && (*(int *)(param_2 + 0x10) == 0)) &&
-     (iVar13 = FUN_0041ffe0(), iVar13 != 0)) {
+     (iVar13 = RaceManager__FindRacerById(), iVar13 != 0)) {
     local_34 = iVar13;
   }
   *(undefined4 *)((int)param_1 + 0x80) = *(undefined4 *)(local_34 + 0x3d8);
@@ -3550,7 +3551,7 @@ void __fastcall HudEngineHeat__Update(undefined4 param_1,int param_2)
       (*(uint *)(in_EAX + 0x1c) & *(uint *)(in_EAX + 0x14)) != 0) {
     iVar2 = *(int *)(param_2 + 4);
     if (((DAT_006fbf14 == 0) && (*(int *)(param_2 + 0x10) == 0)) &&
-       (iVar1 = FUN_0041ffe0(), iVar1 != 0)) {
+       (iVar1 = RaceManager__FindRacerById(), iVar1 != 0)) {
       iVar2 = iVar1;
     }
     if (*(int *)(iVar2 + 0x28) == 1) {
@@ -4079,7 +4080,7 @@ void __fastcall HudNos__Update(undefined4 param_1,int param_2)
       (*(uint *)(in_EAX + 0x1c) & *(uint *)(in_EAX + 0x14)) != 0) {
     iVar2 = *(int *)(param_2 + 4);
     if ((DAT_006fbf14 == 0) && (*(int *)(param_2 + 0x10) == 0)) {
-      iVar1 = FUN_0041ffe0();
+      iVar1 = RaceManager__FindRacerById();
       if (iVar1 != 0) {
         iVar2 = iVar1;
       }
@@ -4221,7 +4222,7 @@ void HudSmokeApplause__Update(int param_1)
       else {
         fVar10 = (float10)FUN_0049fc50();
         local_30 = (int *)(float)fVar10;
-        FUN_00454f30(&local_2c,local_30);
+        Curve_Evaluate(&local_2c,local_30);
         if (local_2c * _K_HALF <= DAT_0073457c) {
           local_2c = *(float *)(in_EAX + 0x20);
           fVar10 = (float10)(int)local_2c * (float10)_K_HALF;
@@ -4719,7 +4720,7 @@ void HudSpeedTrapDrift__Update(int param_1)
     FEObject__SetInvisible(*(undefined4 *)(unaff_EBX + 0x6c));
     iVar8 = *(int *)(param_1 + 4);
     if ((DAT_006fbf14 == 0) && (*(int *)(param_1 + 0x10) == 0)) {
-      iVar3 = FUN_0041ffe0();
+      iVar3 = RaceManager__FindRacerById();
       if (iVar3 != 0) {
         iVar8 = iVar3;
       }
@@ -5060,7 +5061,7 @@ void __fastcall HudRaceOver__Update(undefined4 param_1,int param_2,int param_3)
   }
   iVar6 = *(int *)(param_2 + 4);
   if (((DAT_006fbf14 == 0) && (*(int *)(param_2 + 0x10) == 0)) &&
-     (iVar4 = FUN_0041ffe0(), iVar4 != 0)) {
+     (iVar4 = RaceManager__FindRacerById(), iVar4 != 0)) {
     iVar6 = iVar4;
   }
   if (*(int *)(iVar6 + 0x1c) == 0) {
@@ -5130,7 +5131,7 @@ LAB_004a7f31:
       return;
     }
     if (sVar2 == 10) {
-      FUN_0043a340();
+      IsFlag7346c8Set();
       FUN_004f66f0();
     }
   }
@@ -5185,7 +5186,7 @@ void FUN_004a8000(void)
   
   if ((*(uint *)(unaff_EDI + 0x18) & *(uint *)(unaff_EDI + 0x10)) != 0 ||
       (*(uint *)(unaff_EDI + 0x1c) & *(uint *)(unaff_EDI + 0x14)) != 0) {
-    iVar2 = FUN_00434d10();
+    iVar2 = TimedMessage__GetPhase();
     if (iVar2 == 0) {
       FEObject__SetInvisible(*(undefined4 *)(unaff_EDI + 0x20));
       return;
@@ -8731,19 +8732,19 @@ undefined * FUN_004abd40(void)
   case 0:
     break;
   case 1:
-    cVar1 = FUN_00438a60();
+    cVar1 = Obj_GetByte19();
     if (cVar1 == '\0') {
       return &DAT_006c64f8;
     }
     return &DAT_006c64fc;
   case 2:
-    cVar1 = FUN_00438a60();
+    cVar1 = Obj_GetByte19();
     if (cVar1 == '\0') {
       return &DAT_006c64f0;
     }
     return &DAT_006c64f4;
   case 3:
-    cVar1 = FUN_00438a60();
+    cVar1 = Obj_GetByte19();
     if (cVar1 == '\0') {
       return &DAT_006c64e8;
     }
@@ -8751,7 +8752,7 @@ undefined * FUN_004abd40(void)
   default:
     return &DAT_006c64e4;
   }
-  cVar1 = FUN_00438a60();
+  cVar1 = Obj_GetByte19();
   if (cVar1 == '\0') {
     return &DAT_006c6500;
   }
@@ -9826,7 +9827,7 @@ void FUN_004acd20(int *param_1,char param_2)
     param_1 = *(int **)(iVar7 + 0x18);
   }
   if ((((*(char *)(*(int *)(iVar7 + 0x14) + 0x734) != '\0') && (param_2 == '\0')) &&
-      (piVar4 = (int *)FUN_0043b850((int)*(short *)(iVar7 + 10)), piVar4 != (int *)0x0)) &&
+      (piVar4 = (int *)Race__GetPlayer((int)*(short *)(iVar7 + 10)), piVar4 != (int *)0x0)) &&
      (((iVar5 = *piVar4, iVar5 == 3 || (iVar5 == 4)) ||
       ((iVar5 == 5 || ((iVar5 == 0 || (iVar5 == 6)))))))) {
     FUN_004a9990();
@@ -10332,9 +10333,11 @@ void FUN_004ad7b0(int param_1)
 }
 
 
-// ==== 0x4ad810 FUN_004ad810
+// ==== 0x4ad810 MiniWorld::MiniWorld
 
-int FUN_004ad810(int param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/tuning.md */
+
+int MiniWorld__MiniWorld(int param_1)
 
 {
   int iVar1;
@@ -10353,7 +10356,9 @@ int FUN_004ad810(int param_1)
   local_4 = 0;
   eh_vector_constructor_iterator((void *)(param_1 + 0x50),0x68,0x20,FUN_004ad8d0,NullUpdate_ret);
   local_4 = CONCAT31(local_4._1_3_,1);
-  eh_vector_constructor_iterator((void *)(param_1 + 0xd50),0x2e0,2,FUN_004ad8e0,FUN_004ad920);
+  eh_vector_constructor_iterator
+            ((void *)(param_1 + 0xd50),0x2e0,2,MiniWorldSegment__MiniWorldSegment,
+             MiniWorldSegment___MiniWorldSegment);
   *(undefined4 *)(param_1 + 0x1318) = 0;
   *(undefined4 *)(param_1 + 0x131c) = 0;
   *(undefined4 *)(param_1 + 0x18) = 0;
@@ -10362,9 +10367,11 @@ int FUN_004ad810(int param_1)
 }
 
 
-// ==== 0x4ad8a0 FUN_004ad8a0
+// ==== 0x4ad8a0 IList_FreeNodes_Member2C
 
-void FUN_004ad8a0(void)
+/* [canon] car low (ghidra-canon+nfsug) docs/re/tuning.md */
+
+void IList_FreeNodes_Member2C(void)
 
 {
   int *_Memory;
@@ -10394,14 +10401,16 @@ undefined4 __fastcall FUN_004ad8d0(undefined4 param_1)
 }
 
 
-// ==== 0x4ad8e0 FUN_004ad8e0
+// ==== 0x4ad8e0 MiniWorldSegment::MiniWorldSegment
 
-void * __fastcall FUN_004ad8e0(void *param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/tuning.md */
+
+void * __fastcall MiniWorldSegment__MiniWorldSegment(void *param_1)
 
 {
   int iVar1;
   
-  eh_vector_constructor_iterator(param_1,0x18,0x1e,FUN_0042ac70,FUN_0042ac80);
+  eh_vector_constructor_iterator(param_1,0x18,0x1e,ListRef_Init,ListRef_Release);
   iVar1 = (int)param_1 + 0x2d0;
   *(int *)iVar1 = iVar1;
   *(int *)((int)param_1 + 0x2d4) = iVar1;
@@ -10412,9 +10421,11 @@ void * __fastcall FUN_004ad8e0(void *param_1)
 }
 
 
-// ==== 0x4ad920 FUN_004ad920
+// ==== 0x4ad920 MiniWorldSegment::_MiniWorldSegment
 
-void __fastcall FUN_004ad920(void *param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/tuning.md */
+
+void __fastcall MiniWorldSegment___MiniWorldSegment(void *param_1)
 
 {
   int *piVar1;
@@ -10439,14 +10450,16 @@ void __fastcall FUN_004ad920(void *param_1)
     _free(piVar1);
     piVar1 = *(int **)((int)param_1 + 0x2d0);
   }
-  eh_vector_destructor_iterator(param_1,0x18,0x1e,FUN_0042ac80);
+  eh_vector_destructor_iterator(param_1,0x18,0x1e,ListRef_Release);
   return;
 }
 
 
-// ==== 0x4ad990 FUN_004ad990
+// ==== 0x4ad990 MiniWorld::_MiniWorld
 
-void FUN_004ad990(int param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/tuning.md */
+
+void MiniWorld___MiniWorld(int param_1)
 
 {
   int iVar1;
@@ -10471,7 +10484,8 @@ void FUN_004ad990(int param_1)
   *(undefined4 *)(param_1 + 0x1318) = 0;
   *(undefined4 *)(param_1 + 0x1320) = 0;
   *(undefined4 *)(param_1 + 0x1324) = 0;
-  eh_vector_destructor_iterator((void *)(param_1 + 0xd50),0x2e0,2,FUN_004ad920);
+  eh_vector_destructor_iterator
+            ((void *)(param_1 + 0xd50),0x2e0,2,MiniWorldSegment___MiniWorldSegment);
   local_4 = local_4 & 0xffffff00;
   eh_vector_destructor_iterator((void *)(param_1 + 0x50),0x68,0x20,NullUpdate_ret);
   piVar2 = *(int **)(param_1 + 0x48);
@@ -10887,9 +10901,11 @@ LAB_004adea0:
 }
 
 
-// ==== 0x4ae070 FUN_004ae070
+// ==== 0x4ae070 MiniWorld::Close
 
-void FUN_004ae070(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/tuning.md */
+
+void MiniWorld__Close(int param_1)
 
 {
   int *piVar1;
@@ -11070,7 +11086,7 @@ void FUN_004ae1f0(void)
     _DAT_00748110 = (float)fVar11;
     _DAT_00748114 = 0;
     _DAT_00748118 = 0;
-    iVar6 = FUN_004ae530(&DAT_007404c0);
+    iVar6 = MiniWorld__SetupRenderParameters(&DAT_007404c0);
     fVar4 = DAT_00735e90;
     fVar3 = DAT_006fb044;
     if (iVar6 != 0) {
@@ -11134,9 +11150,11 @@ void FUN_004ae1f0(void)
 }
 
 
-// ==== 0x4ae530 FUN_004ae530
+// ==== 0x4ae530 MiniWorld::SetupRenderParameters
 
-undefined4 FUN_004ae530(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/tuning.md */
+
+undefined4 MiniWorld__SetupRenderParameters(int param_1)
 
 {
   int iVar1;
@@ -11221,7 +11239,7 @@ void DrawEmitters(int param_1,undefined4 param_2)
   int iVar10;
   int iVar11;
   
-  iVar6 = FUN_004ae530(param_2);
+  iVar6 = MiniWorld__SetupRenderParameters(param_2);
   uVar5 = DAT_00735e90;
   uVar4 = DAT_006fb044;
   if (iVar6 != 0) {
@@ -11235,7 +11253,7 @@ void DrawEmitters(int param_1,undefined4 param_2)
       if (DAT_007355b4 < DAT_007355b8) {
         uVar8 = DAT_007355b4;
         if (uVar2 != 0) {
-          FUN_00401cd0();
+          bMatrixCopy_b();
           *(float *)(uVar2 + 0x30) = -fVar1;
           *(undefined4 *)(uVar2 + 0x34) = uVar5;
           *(undefined4 *)(uVar2 + 0x38) = uVar4;
@@ -11285,7 +11303,7 @@ void Emitters_DrawFlares(int param_1,undefined4 param_2)
   int iVar8;
   uint uVar9;
   
-  iVar8 = FUN_004ae530(param_2);
+  iVar8 = MiniWorld__SetupRenderParameters(param_2);
   uVar7 = DAT_00735e90;
   uVar6 = DAT_006fb044;
   if (iVar8 != 0) {
@@ -11304,7 +11322,7 @@ void Emitters_DrawFlares(int param_1,undefined4 param_2)
       if (uVar5 == 0) {
         return;
       }
-      FUN_00401cd0();
+      bMatrixCopy_b();
       *(float *)(uVar5 + 0x30) = -fVar2;
       puVar1 = (undefined4 *)(uVar9 * 0x2e0 + param_1 + 0x1020);
       *(undefined4 *)(uVar5 + 0x34) = uVar7;
@@ -11335,9 +11353,11 @@ void FUN_004ae910(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 }
 
 
-// ==== 0x4ae930 FUN_004ae930
+// ==== 0x4ae930 CarOrbiter::CarOrbiter
 
-void FUN_004ae930(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/tuning.md */
+
+void CarOrbiter__CarOrbiter(void)
 
 {
   undefined4 uVar1;
@@ -12073,7 +12093,7 @@ GarageMainScreen__GarageMainScreen
   local_4._0_1_ = 1;
   local_4._1_3_ = 0;
   param_1[0x1a] = param_5;
-  FUN_004ae930();
+  CarOrbiter__CarOrbiter();
   param_1[0x25] = 1;
   param_1[0x26] = 1;
   param_1[0x28] = 1;
@@ -12317,7 +12337,7 @@ void FUN_004afe40(undefined4 *param_1)
   ExceptionList = &pvStack_c;
   *param_1 = &PTR_GarageMainScreen___GarageMainScreen_006c61e0;
   local_4 = 2;
-  FUN_004ae070(&DAT_00746dd0);
+  MiniWorld__Close(&DAT_00746dd0);
   if ((undefined4 *)param_1[0x18] != (undefined4 *)0x0) {
     (*(code *)**(undefined4 **)param_1[0x18])(1);
   }
@@ -12635,7 +12655,7 @@ LAB_004b04a2:
       fVar1 = DAT_0073ad38 + *(float *)(unaff_EBX + 0x100);
       *(float *)(unaff_EBX + 0x100) = fVar1;
       if (fVar1 <= 1.5) {
-        FUN_00401c10((fVar1 / 1.5) * 45.0 + 225.0);
+        bDegreesToAngle16((fVar1 / 1.5) * 45.0 + 225.0);
         fVar9 = (float10)FUN_00564b10();
         fVar9 = -((fVar9 + (float10)_K_ONE) * (float10)3.4142137 * (float10)15.0);
 LAB_004b05bb:

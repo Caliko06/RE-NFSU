@@ -15,7 +15,7 @@ void FUN_00431020(int param_1)
   *(int *)(in_EAX + 0x18) = param_1;
   *(int *)(in_EAX + 0x400) = (int)*(char *)(param_1 + 0x22);
   if (*(int *)(in_EAX + 0x24) == 1) {
-    FUN_00461520();
+    RealDriver__SetManualTransmission();
   }
   *(undefined4 *)(param_1 + 0x2a0) = 0xffffffff;
   *(undefined4 *)(param_1 + 0x29c) = 0xffffffff;
@@ -86,7 +86,7 @@ void FUN_00431100(void)
   puVar1 = *(undefined4 **)(unaff_ESI + 400);
   *(undefined4 *)(unaff_ESI + 4) = 0;
   if (puVar1 != (undefined4 *)0x0) {
-    FUN_0042ac80();
+    ListRef_Release();
     iVar3 = DAT_0073557c;
     iVar2 = *(int *)(DAT_0073557c + 0x18);
     *puVar1 = *(undefined4 *)(DAT_0073557c + 0x10);
@@ -163,7 +163,7 @@ uint __fastcall FUN_00431230(int param_1)
                      (ushort)(fVar1 < 60.0) << 8 | (ushort)NAN(fVar1) << 10 |
                      (ushort)(fVar1 == 60.0) << 0xe);
     if (fVar1 < 60.0 || (fVar1 == 60.0) != 0) {
-      uVar2 = FUN_004280a0();
+      uVar2 = Car__IsResetGraceActive();
       if ((char)uVar2 == '\0') {
         uVar2 = 0;
         if (DAT_0078a368 != 0) {
@@ -374,7 +374,7 @@ void Player__ResetToRoute(void)
   fStack_304 = 0.0;
   if ((DAT_0078a344 != '\0') || (DAT_007361a8 != 0)) {
     iVar5 = (**(code **)(**(int **)(iVar2 + 0x2c) + 0x40))();
-    iVar6 = FUN_00456e90(iVar2,iVar5,0xff,0xff);
+    iVar6 = GetNearestTrafficLane(iVar2,iVar5,0xff,0xff);
     if (iVar5 == 1) {
       if (iVar6 < 5) {
         iVar6 = iVar6 + 5;
@@ -500,9 +500,11 @@ undefined4 FUN_00431900(void)
 }
 
 
-// ==== 0x431920 FUN_00431920
+// ==== 0x431920 Player::StartHonkHorn
 
-void FUN_00431920(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void Player__StartHonkHorn(void)
 
 {
   int *piVar1;
@@ -519,9 +521,11 @@ void FUN_00431920(void)
 }
 
 
-// ==== 0x431940 FUN_00431940
+// ==== 0x431940 Player::StopHonkHorn
 
-void FUN_00431940(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void Player__StopHonkHorn(void)
 
 {
   int *piVar1;
@@ -603,14 +607,14 @@ void __thiscall SpecialCamCaller_431960(int param_1,undefined4 param_2,char para
     iVar1 = *(int *)(param_1 + 4);
     iVar2 = *(int *)(iVar1 + 0xc);
     if (param_3 == '\0') {
-      FUN_00431940();
+      Player__StopHonkHorn();
       if (*(int *)(iVar2 + 0xc54) != 1) {
         *(undefined1 *)(iVar1 + 0x855) = 0;
         return;
       }
     }
     else {
-      FUN_00431920();
+      Player__StartHonkHorn();
       if (*(int *)(iVar2 + 0xc54) != 1) {
         *(undefined1 *)(iVar1 + 0x855) = 1;
         return;
@@ -629,12 +633,12 @@ void __thiscall SpecialCamCaller_431960(int param_1,undefined4 param_2,char para
     break;
   case 0x9b:
   case 0x9c:
-    cVar3 = FUN_0041f600();
+    cVar3 = IsDriftMode();
     if ((cVar3 == '\0') && (cVar3 = FUN_0042ab30(), cVar3 == '\0')) {
       if (param_3 == '\0') {
         cVar3 = FUN_004318d0();
         if ((cVar3 != '\0') && (DAT_007000e8 != 0)) {
-          FUN_00465530();
+          CarState__StopTimer();
         }
       }
       else {
@@ -673,7 +677,7 @@ void __thiscall SpecialCamCaller_431960(int param_1,undefined4 param_2,char para
   case 0xab:
     cVar3 = FUN_004318d0();
     if (cVar3 != '\0') {
-      FUN_00465530();
+      CarState__StopTimer();
     }
     FUN_00421c00(DAT_007361f0,5,param_2);
     return;
@@ -721,14 +725,14 @@ void switchD_0043197d::caseD_9b(void)
   char unaff_BL;
   int unaff_ESI;
   
-  cVar1 = FUN_0041f600();
+  cVar1 = IsDriftMode();
   if (cVar1 == '\0') {
     cVar1 = FUN_0042ab30();
     if (cVar1 == '\0') {
       if (unaff_BL == '\0') {
         cVar1 = FUN_004318d0();
         if ((cVar1 != '\0') && (DAT_007000e8 != 0)) {
-          FUN_00465530();
+          CarState__StopTimer();
         }
       }
       else {
@@ -1177,7 +1181,7 @@ undefined4 * FUN_00432540(undefined4 *param_1,undefined4 *param_2)
   param_1[0x45] = param_2[0x45];
   param_1[0x46] = param_2[0x46];
   param_1[0x47] = param_2[0x47];
-  FUN_00401cd0();
+  bMatrixCopy_b();
   param_1[0x58] = param_2[0x58];
   param_1[0x59] = param_2[0x59];
   param_1[0x5a] = param_2[0x5a];
@@ -2253,7 +2257,7 @@ void __thiscall FUN_004337a0(int *param_1,char param_2)
     }
     else if ((*(char *)(*(int *)(iVar3 + 0x14) + 0x734) != '\0') &&
             (*(int *)(*(int *)(iVar3 + 0x14) + 4) == 1)) {
-      iVar3 = FUN_0043b850((int)*(short *)(iVar3 + 10));
+      iVar3 = Race__GetPlayer((int)*(short *)(iVar3 + 10));
       fVar2 = (float)*(int *)(iVar3 + 0xc);
     }
     iVar3 = (int)*(char *)((int)param_1 + 9);
@@ -3009,8 +3013,8 @@ void FUN_00434a80(void)
       iVar2 = iVar2 + 1;
     } while (iVar2 < *(int *)(iVar1 + 0x20) - *(int *)(iVar1 + 0x1c));
   }
-  FUN_00434ed0();
-  FUN_00434ed0();
+  Race__UpdatePlayerRanks();
+  Race__UpdatePlayerRanks();
   return;
 }
 
@@ -3108,9 +3112,11 @@ LAB_00434bf9:
 }
 
 
-// ==== 0x434d10 FUN_00434d10
+// ==== 0x434d10 TimedMessage::GetPhase
 
-undefined4 __fastcall FUN_00434d10(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __fastcall TimedMessage__GetPhase(int param_1)
 
 {
   float fVar1;
@@ -3191,9 +3197,11 @@ float10 __fastcall FUN_00434dd0(int param_1)
 }
 
 
-// ==== 0x434ed0 FUN_00434ed0
+// ==== 0x434ed0 Race::UpdatePlayerRanks
 
-void __fastcall FUN_00434ed0(undefined4 param_1,int param_2)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall Race__UpdatePlayerRanks(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -3393,7 +3401,7 @@ LAB_0043514a:
     if (((*(int *)(*(int *)(iVar5 + 0x14) + 4) == 1) && (param_4 == 1)) &&
        ((char)piVar1[3] == '\x01')) {
       iVar6 = SpecialCamCooldown();
-      if (((iVar6 == 0) && (iVar5 = FUN_0043b850((int)*(short *)(iVar5 + 10)), iVar5 != 0)) &&
+      if (((iVar6 == 0) && (iVar5 = Race__GetPlayer((int)*(short *)(iVar5 + 10)), iVar5 != 0)) &&
          (cVar3 = FUN_00432e40(), cVar3 != '\0')) {
         *(int *)(param_1 + 0x1c) = *(int *)(iVar5 + 0x34) + *(int *)(param_1 + 0x10);
         *(undefined4 *)(param_1 + 0x20) = 0x41f00000;
@@ -3482,7 +3490,7 @@ void __fastcall FUN_00435570(undefined4 param_1)
   int *unaff_ESI;
   undefined4 uVar9;
   
-  if ((*unaff_ESI == 3) && (iVar3 = FUN_00434d10(param_1), iVar3 == 4)) {
+  if ((*unaff_ESI == 3) && (iVar3 = TimedMessage__GetPhase(param_1), iVar3 == 4)) {
     iVar3 = FEPackageList__FindByName(&DAT_00746104);
     if ((iVar3 != 0) && ((*(int *)(iVar3 + 0x18) != 0 && (*(int **)(iVar3 + 0x14) != (int *)0x0))))
     {
@@ -3529,7 +3537,7 @@ void __fastcall FUN_00435570(undefined4 param_1)
       piVar6 = piVar6 + 1;
     } while (iVar4 < unaff_ESI[9]);
   }
-  FUN_00434ed0();
+  Race__UpdatePlayerRanks();
   FUN_00434f80(unaff_ESI);
   if ((DAT_0078a30c == 3) && (0 < unaff_ESI[9])) {
     piVar6 = unaff_ESI + 0x148;
@@ -3741,7 +3749,7 @@ void FUN_00435a70(void)
         piVar2 = piVar2 + 1;
       } while (iVar1 < *(int *)(unaff_ESI + 0x24));
     }
-    FUN_00434ed0();
+    Race__UpdatePlayerRanks();
     *(undefined4 *)(unaff_ESI + 0x534) = 0;
     *(undefined4 *)(unaff_ESI + 0x538) = 0;
   }
@@ -3991,7 +3999,7 @@ LAB_00435dcf:
           (**(code **)(*piVar1 + 0x2c))(0);
           uVar4 = (**(code **)(*piVar1 + 0x40))(0xff,0xff);
           (**(code **)(*piVar1 + 0x18))(1,uVar4);
-          uVar4 = FUN_00456e90(iVar2);
+          uVar4 = GetNearestTrafficLane(iVar2);
           iVar6 = *piVar1;
           uVar4 = (**(code **)(iVar6 + 0x18))(1,uVar4);
           uVar4 = (**(code **)(*piVar1 + 0x14))(1,uVar4);
@@ -4665,9 +4673,11 @@ void FUN_004367e0(int param_1)
 }
 
 
-// ==== 0x4368e0 FUN_004368e0
+// ==== 0x4368e0 Player::FreeMember960
 
-void FUN_004368e0(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void Player__FreeMember960(void)
 
 {
   void *pvVar1;
@@ -4955,9 +4965,11 @@ void FUN_00436d40(void)
 }
 
 
-// ==== 0x436d60 FUN_00436d60
+// ==== 0x436d60 bLength3
 
-float10 FUN_00436d60(void)
+/* [canon] runtime high (ghidra-canon) docs/re/runtime.md */
+
+float10 bLength3(void)
 
 {
   float *in_EAX;
@@ -5537,7 +5549,7 @@ void __thiscall FUN_004375e0(int param_1,undefined4 param_2,float param_3)
   }
   cVar3 = FUN_00465430();
   if (cVar3 != '\0') {
-    FUN_00465530();
+    CarState__StopTimer();
   }
 LAB_00437d4f:
   iVar6 = *(int *)(param_1 + 4);
@@ -5561,9 +5573,9 @@ LAB_00437d4f:
   *(undefined4 *)(iVar6 + 0x60) = uVar1;
   *(undefined4 *)(iVar6 + 0x68) = uVar4;
   FUN_00566b10();
-  FUN_00401cd0();
+  bMatrixCopy_b();
   FUN_00465390();
-  FUN_00424cf0();
+  RigidBody__SetVelocity();
   iVar6 = *(int *)(param_1 + 4);
   *(float *)(iVar6 + 0x3d0) =
        *(float *)(iVar6 + 0x90) * *(float *)(param_1 + 0x20) +
@@ -5710,9 +5722,9 @@ int * FUN_00438030(float param_1)
         fVar10 = fVar6 - *(float *)(iVar4 + 0x68);
         if (0.0 < fVar8 * *(float *)(in_EAX + 0x240) +
                   fVar10 * *(float *)(in_EAX + 0x248) + fVar9 * *(float *)(in_EAX + 0x244)) {
-          fVar12 = (float10)FUN_00436d60();
+          fVar12 = (float10)bLength3();
           if ((float10)0.1 * (float10)0.2 < fVar12) {
-            fVar13 = (float10)FUN_00436d60();
+            fVar13 = (float10)bLength3();
             fVar12 = ((float10)(float)fVar12 - fVar13) / (float10)(float)fVar12;
             fVar1 = (float)fVar12;
             if (((float10)0.0 < fVar12) && (fVar1 < _K_ONE)) {
@@ -5726,16 +5738,16 @@ int * FUN_00438030(float param_1)
         *(float *)(in_EAX + 0x218) = fVar6;
         *(float *)(in_EAX + 0x210) = fVar7;
         *(float *)(in_EAX + 0x214) = fVar5;
-        fVar12 = (float10)FUN_00436d60();
+        fVar12 = (float10)bLength3();
         if ((float10)0.1 <= fVar12) {
           if (fVar10 < 0.0) {
             *(undefined4 *)(in_EAX + 0x218) = *(undefined4 *)(*(int *)(in_EAX + 4) + 0x68);
           }
-          piVar11 = (int *)FUN_004653e0();
+          piVar11 = (int *)Vec3_TransformSub();
           return piVar11;
         }
         FUN_00437fe0();
-        piVar11 = (int *)FUN_004653e0();
+        piVar11 = (int *)Vec3_TransformSub();
         return piVar11;
       }
       uVar2 = *(undefined4 *)(iVar4 + 100);
@@ -5859,7 +5871,7 @@ void FUN_00438440(float param_1)
   if (DAT_0077b240 != 6) {
     return;
   }
-  iVar6 = FUN_0043b850((int)*(short *)(*(int *)(unaff_ESI + 4) + 10));
+  iVar6 = Race__GetPlayer((int)*(short *)(*(int *)(unaff_ESI + 4) + 10));
   if (*(float *)(unaff_ESI + 0x254) == 0.0) {
     local_28 = (float)(**(uint **)(unaff_ESI + 0x298) ^ *(uint *)(unaff_ESI + 0x294)) -
                (float)*(int *)(unaff_ESI + 0x29c);
@@ -5955,11 +5967,12 @@ float10 __fastcall FUN_004387e0(undefined4 param_1)
 }
 
 
-// ==== 0x438800 FUN_00438800
+// ==== 0x438800 bCeil
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
 
-float10 FUN_00438800(float param_1)
+float10 bCeil(float param_1)
 
 {
   int iVar1;
@@ -5974,9 +5987,11 @@ float10 FUN_00438800(float param_1)
 }
 
 
-// ==== 0x438840 FUN_00438840
+// ==== 0x438840 int_NotEqual
 
-bool __thiscall FUN_00438840(int *param_1,int *param_2)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+bool __thiscall int_NotEqual(int *param_1,int *param_2)
 
 {
   return *param_1 != *param_2;
@@ -5988,12 +6003,12 @@ bool __thiscall FUN_00438840(int *param_1,int *param_2)
 int __fastcall FUN_00438860(int param_1)
 
 {
-  FUN_00405550();
-  FUN_00405550();
-  CallNTimes(param_1 + 0x20,4,0xb,FUN_00405550);
-  CallNTimes(param_1 + 0x4c,4,0xb,FUN_00405550);
-  FUN_00405550();
-  FUN_00405550();
+  Ptr_SetNull();
+  Ptr_SetNull();
+  CallNTimes(param_1 + 0x20,4,0xb,Ptr_SetNull);
+  CallNTimes(param_1 + 0x4c,4,0xb,Ptr_SetNull);
+  Ptr_SetNull();
+  Ptr_SetNull();
   return param_1;
 }
 
@@ -6011,11 +6026,12 @@ void FUN_004388d0(void)
 }
 
 
-// ==== 0x438920 FUN_00438920
+// ==== 0x438920 Float2_ToIntPair
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
 
-void FUN_00438920(void)
+void Float2_ToIntPair(void)
 
 {
   _ftol_nocw();
@@ -6085,18 +6101,22 @@ undefined1 __fastcall FUN_00438a40(int param_1)
 }
 
 
-// ==== 0x438a60 FUN_00438a60
+// ==== 0x438a60 Obj_GetByte19
 
-undefined1 __fastcall FUN_00438a60(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+undefined1 __fastcall Obj_GetByte19(int param_1)
 
 {
   return *(undefined1 *)(param_1 + 0x19);
 }
 
 
-// ==== 0x438a80 FUN_00438a80
+// ==== 0x438a80 Race::HasPlayer
 
-bool __thiscall FUN_00438a80(int param_1,int param_2)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+bool __thiscall Race__HasPlayer(int param_1,int param_2)
 
 {
   return *(int *)(param_1 + 8 + param_2 * 4) != 0;
@@ -6112,18 +6132,22 @@ undefined4 __fastcall FUN_00438aa0(int param_1)
 }
 
 
-// ==== 0x438ac0 FUN_00438ac0
+// ==== 0x438ac0 Obj_GetField34
 
-undefined4 __fastcall FUN_00438ac0(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __fastcall Obj_GetField34(int param_1)
 
 {
   return *(undefined4 *)(param_1 + 0x34);
 }
 
 
-// ==== 0x438ae0 FUN_00438ae0
+// ==== 0x438ae0 GetNetModeCode
 
-undefined1 FUN_00438ae0(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+undefined1 GetNetModeCode(void)
 
 {
   char cVar1;
@@ -6288,10 +6312,10 @@ undefined4 * __thiscall
 FUN_00438ec0(undefined4 *param_1,undefined1 param_2,undefined1 param_3,int param_4)
 
 {
-  FUN_00405550();
+  Ptr_SetNull();
   FUN_00438860();
-  FUN_00405550();
-  FUN_00405550();
+  Ptr_SetNull();
+  Ptr_SetNull();
   *(undefined1 *)(param_1 + 1) = param_2;
   *(undefined1 *)((int)param_1 + 5) = 0xff;
   param_1[0x69] = 0xbf800000;
@@ -6357,8 +6381,8 @@ void __thiscall FUN_00439030(int param_1,int param_2)
     iVar1 = SpecialCamCooldown();
     if (iVar1 != 0) {
       fVar3 = (float)(param_2 - *(int *)(param_1 + 0xc));
-      FUN_0041f0b0(param_1 + 0x14);
-      FUN_0040ed00(fVar3);
+      int_Sub(param_1 + 0x14);
+      bTickerToSeconds(fVar3);
       uVar2 = _ftol_nocw();
       *(undefined4 *)(param_1 + 0x10) = uVar2;
     }
@@ -6593,13 +6617,13 @@ void __fastcall FUN_004394f0(int param_1)
   if (iVar3 != 0) {
     fVar6 = (float10)FUN_00432c80();
     uVar4 = FUN_00432c70();
-    FUN_0041f0b0(uVar4);
-    fVar7 = (float10)FUN_0040ed00();
+    int_Sub(uVar4);
+    fVar7 = (float10)bTickerToSeconds();
     *(float *)(param_1 + 0x1bc) = (float)((float10)(float)fVar6 - fVar7);
   }
   cVar2 = FUN_00432e40();
   if ((cVar2 != '\0') || (DAT_0077b259 == '\0')) goto LAB_004397af;
-  cVar2 = FUN_0041f600();
+  cVar2 = IsDriftMode();
   if (cVar2 == '\0') {
     cVar2 = FUN_00424f20();
     if (cVar2 == '\0') {
@@ -6629,8 +6653,8 @@ LAB_00439615:
   }
   iVar3 = SpecialCamCooldown();
   if (iVar3 != 0) {
-    FUN_0041f0b0(param_1 + 0x1ac);
-    fVar6 = (float10)FUN_0040ed00();
+    int_Sub(param_1 + 0x1ac);
+    fVar6 = (float10)bTickerToSeconds();
     fVar1 = (float)fVar6;
     if (fVar1 <= _DAT_0077c788) {
       if (2.0 < fVar1) {
@@ -6644,8 +6668,8 @@ LAB_00439615:
   }
   iVar3 = SpecialCamCooldown();
   if (iVar3 != 0) {
-    FUN_0041f0b0(param_1 + 0x1b0);
-    fVar6 = (float10)FUN_0040ed00();
+    int_Sub(param_1 + 0x1b0);
+    fVar6 = (float10)bTickerToSeconds();
     fVar1 = (float)fVar6;
     if (fVar1 <= _DAT_0077c788) {
       if (2.0 < fVar1) {
@@ -6837,13 +6861,13 @@ undefined4 * __fastcall FUN_00439aa0(undefined4 *param_1)
   pcStack_c = FUN_00684c70;
   local_10 = ExceptionList;
   ExceptionList = &local_10;
-  FUN_00405550();
-  FUN_00405550();
-  FUN_00405550();
-  FUN_00405550();
-  FUN_00405550();
-  FUN_00405550();
-  FUN_00405550();
+  Ptr_SetNull();
+  Ptr_SetNull();
+  Ptr_SetNull();
+  Ptr_SetNull();
+  Ptr_SetNull();
+  Ptr_SetNull();
+  Ptr_SetNull();
   FUN_00549100();
   local_8 = 0;
   FUN_00549100();
@@ -7060,7 +7084,7 @@ void __thiscall FUN_0043a220(int *param_1,char param_2)
   for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
     if (param_1[local_8 + 2] != 0) {
       uVar1 = 0;
-      FUN_0043b850(local_8);
+      Race__GetPlayer(local_8);
       FUN_004390d0(uVar1);
     }
   }
@@ -7095,9 +7119,11 @@ undefined1 __fastcall FUN_0043a2e0(int param_1)
 }
 
 
-// ==== 0x43a340 FUN_0043a340
+// ==== 0x43a340 IsFlag7346c8Set
 
-bool FUN_0043a340(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+bool IsFlag7346c8Set(void)
 
 {
   return DAT_007346c8 != 0;
@@ -7139,7 +7165,7 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
       FUN_0043af80();
     }
     else if ((0.0 < (float)param_1[7]) &&
-            (fVar6 = (float10)FUN_0040ed00(), (float10)(float)param_1[7] <= fVar6)) {
+            (fVar6 = (float10)bTickerToSeconds(), (float10)(float)param_1[7] <= fVar6)) {
       FUN_0043af80();
     }
     break;
@@ -7147,7 +7173,7 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
     iVar5 = FUN_00424ea0();
     if ((iVar5 != 0) && (iVar5 = FUN_00435b30(DAT_0073619c), iVar5 == 0)) {
       for (local_c = 0; local_c < 4; local_c = local_c + 1) {
-        iVar5 = FUN_0043b850(local_c);
+        iVar5 = Race__GetPlayer(local_c);
         if (iVar5 != 0) {
           iVar5 = FUN_00439130();
           iVar5 = *(int *)(iVar5 + 0x830);
@@ -7168,7 +7194,7 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
     }
     bVar1 = true;
     for (local_1c = 0; local_1c < 4; local_1c = local_1c + 1) {
-      puVar4 = (undefined4 *)FUN_0043b850(local_1c);
+      puVar4 = (undefined4 *)Race__GetPlayer(local_1c);
       if (puVar4 != (undefined4 *)0x0) {
         cVar2 = FUN_00432e40();
         if (cVar2 == '\0') {
@@ -7187,12 +7213,12 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
       FUN_0043ac10(0);
     }
     else {
-      cVar2 = FUN_0043a340();
+      cVar2 = IsFlag7346c8Set();
       if ((cVar2 != '\0') && (iVar5 = FUN_00586640(DAT_0073ad38), iVar5 == 0)) {
         FUN_0043cef0();
         FUN_00424cd0(param_1 + 0x11,0x3f800000);
       }
-      cVar2 = FUN_0041f600();
+      cVar2 = IsDriftMode();
       if ((cVar2 != '\0') && (iVar5 = FUN_00586640(DAT_0073ad38), iVar5 == 0)) {
         FUN_0043d030();
         FUN_00424cd0(param_1 + 0x12,0x3f800000);
@@ -7202,8 +7228,8 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
         FUN_0043d5f0();
         FUN_00424cd0(param_1 + 0x13,0x40a00000);
       }
-      FUN_0041f0b0(param_1 + 0x25);
-      fVar6 = (float10)FUN_0040ed00();
+      int_Sub(param_1 + 0x25);
+      fVar6 = (float10)bTickerToSeconds();
       if ((float10)2.0 < fVar6) {
         FUN_0043d4f0();
         FUN_00405560();
@@ -7215,7 +7241,7 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
       fVar6 = (float10)FUN_00439a80();
       if (fVar6 < -(float10)3.0) {
         for (local_24 = 0; local_24 < 4; local_24 = local_24 + 1) {
-          iVar5 = FUN_0043b850(local_24);
+          iVar5 = Race__GetPlayer(local_24);
           if ((iVar5 != 0) && (cVar2 = FUN_00432e40(), cVar2 == '\0')) {
             FUN_004399a0(0x10);
             FUN_00439470(3,9);
@@ -7305,7 +7331,7 @@ void __fastcall FUN_0043a830(int param_1)
   
   FUN_00439470(5,10);
   for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
-    iVar1 = FUN_0043b850(local_8);
+    iVar1 = Race__GetPlayer(local_8);
     if ((iVar1 != 0) && (iVar1 != *(int *)(param_1 + 4))) {
       FUN_00439470(0,10);
     }
@@ -7344,25 +7370,25 @@ float10 __thiscall FUN_0043a8a0(int *param_1,float param_2)
         }
       }
     }
-    cVar2 = FUN_0043a340();
+    cVar2 = IsFlag7346c8Set();
     if (cVar2 == '\0') {
       iVar3 = SpecialCamCooldown();
       if (iVar3 != 0) {
-        FUN_0041f0b0(param_1 + 0x14);
-        fVar4 = (float10)FUN_0040ed00();
+        int_Sub(param_1 + 0x14);
+        fVar4 = (float10)bTickerToSeconds();
         FUN_00424c90((float)fVar4);
         FUN_00424cb0();
       }
       FUN_00405560();
       if ((param_2 <= 0.0) || (*param_1 != 6)) {
         FUN_00405560();
-        fVar4 = (float10)FUN_0040ed00();
+        fVar4 = (float10)bTickerToSeconds();
         _DAT_006f0898 = (float)fVar4;
         DAT_0073014c = '\0';
       }
       else if (DAT_0073014c != '\0') {
-        fVar4 = (float10)FUN_0040ed00();
-        fVar5 = (float10)FUN_0040ed00();
+        fVar4 = (float10)bTickerToSeconds();
+        fVar5 = (float10)bTickerToSeconds();
         fVar1 = (float)((float10)(float)fVar4 - fVar5);
         fVar4 = (float10)FUN_00405600(fVar1);
         if (fVar4 <= (float10)0.25) {
@@ -7371,14 +7397,14 @@ float10 __thiscall FUN_0043a8a0(int *param_1,float param_2)
             DAT_0073014c = '\0';
           }
           else {
-            fVar4 = (float10)FUN_00401c80(param_2 + fVar1,param_2 * 0.85,param_2 * 1.2);
+            fVar4 = (float10)bClampF(param_2 + fVar1,param_2 * 0.85,param_2 * 1.2);
             local_8 = (float)fVar4;
           }
         }
         else {
           FUN_0043aae0(fVar1,0);
           FUN_00405560();
-          fVar4 = (float10)FUN_0040ed00();
+          fVar4 = (float10)bTickerToSeconds();
           _DAT_006f0898 = (float)fVar4;
           DAT_0073014c = '\0';
         }
@@ -7442,9 +7468,9 @@ void __fastcall FUN_0043aba0(int *param_1)
   
   if (*param_1 == 2) {
     puVar3 = &DAT_00734718;
-    uVar2 = FUN_0043a340(&DAT_00734718);
+    uVar2 = IsFlag7346c8Set(&DAT_00734718);
     FUN_0043b560(0,0,uVar2,puVar3);
-    if ((DAT_0073465c == 0) && (cVar1 = FUN_0043a340(), cVar1 != '\0')) {
+    if ((DAT_0073465c == 0) && (cVar1 = IsFlag7346c8Set(), cVar1 != '\0')) {
       FUN_0043b900();
     }
     FUN_00546600();
@@ -7482,14 +7508,14 @@ void __thiscall FUN_0043ac10(int *param_1,char param_2)
       }
       for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
         if (param_1[local_8 + 2] != 0) {
-          iVar2 = FUN_0043b850(local_8);
+          iVar2 = Race__GetPlayer(local_8);
           if (iVar2 != param_1[1]) {
-            FUN_0043b850(local_8);
+            Race__GetPlayer(local_8);
             cVar1 = FUN_00432e40();
             if (cVar1 == '\0') {
               uVar5 = 10;
               uVar4 = 0;
-              FUN_0043b850(local_8);
+              Race__GetPlayer(local_8);
               FUN_00439470(uVar4,uVar5);
             }
           }
@@ -7499,9 +7525,9 @@ void __thiscall FUN_0043ac10(int *param_1,char param_2)
     for (local_c = 0; local_c < 4; local_c = local_c + 1) {
       if (param_1[local_c + 2] != 0) {
         FUN_00421a90();
-        fVar3 = (float10)FUN_0040ed00();
+        fVar3 = (float10)bTickerToSeconds();
         fVar6 = (float)fVar3;
-        FUN_0043b850(local_c);
+        Race__GetPlayer(local_c);
         FUN_00439860(fVar6);
       }
     }
@@ -7537,7 +7563,7 @@ void __fastcall Race__RequestStartOrRestart(int param_1)
     FUN_00549980();
     FUN_004abc90();
   }
-  cVar1 = FUN_0041f600();
+  cVar1 = IsDriftMode();
   if (cVar1 != '\0') {
     FUN_0043de90(0);
   }
@@ -7635,11 +7661,11 @@ void __fastcall FUN_0043af80(int param_1)
   
   for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
     if (*(int *)(param_1 + 8 + local_8 * 4) != 0) {
-      FUN_0043b850(local_8);
+      Race__GetPlayer(local_8);
       cVar1 = FUN_00432e20();
       if (cVar1 != '\0') {
         uVar3 = 2;
-        FUN_0043b850(local_8);
+        Race__GetPlayer(local_8);
         FUN_004390d0(uVar3);
       }
     }
@@ -7729,7 +7755,7 @@ void __thiscall FUN_0043b210(int param_1,undefined4 param_2)
     FUN_00548840((undefined1)DAT_0078a400);
     FUN_00436f10();
     FUN_00436f10();
-    local_9 = FUN_0041f600();
+    local_9 = IsDriftMode();
   }
   if ((int)DAT_00779814 < 0) {
     if (local_9 == '\0') {
@@ -7786,7 +7812,7 @@ void __thiscall FUN_0043b4e0(int param_1,int param_2,undefined4 param_3)
   
   iVar1 = FUN_004327d0();
   if ((iVar1 != 0) && (FUN_0043ca70(iVar1,param_3), *(int *)(param_1 + 8 + param_2 * 4) != 0)) {
-    FUN_0043b850(param_2);
+    Race__GetPlayer(param_2);
     FUN_0042ae40();
     FUN_00548a00(param_3);
   }
@@ -7826,9 +7852,9 @@ FUN_0043b560(int param_1,uint param_2,undefined4 param_3,undefined1 param_4,unde
     *(char *)(param_1 + 0x18) = *(char *)(param_1 + 0x18) + '\x01';
   }
   else {
-    iVar1 = FUN_0043b850(param_2);
+    iVar1 = Race__GetPlayer(param_2);
     if (*(char *)(iVar1 + 0x18) != '\0') {
-      FUN_0043b850(param_2);
+      Race__GetPlayer(param_2);
       FUN_00438fe0(param_5);
     }
   }
@@ -7850,7 +7876,7 @@ void __fastcall FUN_0043b680(int param_1)
   }
   for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
     if (*(int *)(param_1 + 8 + local_8 * 4) != 0) {
-      FUN_0043b850(local_8);
+      Race__GetPlayer(local_8);
       cVar1 = FUN_00432e20();
       if (cVar1 == '\0') {
         if (*(int *)(param_1 + 8 + local_8 * 4) != 0) {
@@ -7879,9 +7905,9 @@ int __fastcall FUN_0043b770(int param_1)
   local_8 = 0;
   for (local_c = 0; local_c < 4; local_c = local_c + 1) {
     if (*(int *)(param_1 + 8 + local_c * 4) != 0) {
-      iVar2 = FUN_0043b850(local_c);
+      iVar2 = Race__GetPlayer(local_c);
       if (iVar2 != *(int *)(param_1 + 4)) {
-        FUN_0043b850(local_c);
+        Race__GetPlayer(local_c);
         cVar1 = FUN_00432e20();
         if (cVar1 != '\0') {
           local_8 = local_8 + 1;
@@ -7911,9 +7937,11 @@ int __fastcall FUN_0043b7f0(int param_1)
 }
 
 
-// ==== 0x43b850 FUN_0043b850
+// ==== 0x43b850 Race::GetPlayer
 
-undefined4 __thiscall FUN_0043b850(int param_1,int param_2)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __thiscall Race__GetPlayer(int param_1,int param_2)
 
 {
   undefined4 uVar1;
@@ -7943,10 +7971,10 @@ undefined4 __fastcall FUN_0043b890(int param_1)
       return 0;
     }
     if ((*(int *)(param_1 + 8 + local_8 * 4) != 0) &&
-       (iVar1 = FUN_0043b850(local_8), *(char *)(iVar1 + 0x18) != '\0')) break;
+       (iVar1 = Race__GetPlayer(local_8), *(char *)(iVar1 + 0x18) != '\0')) break;
     local_8 = local_8 + 1;
   }
-  uVar2 = FUN_0043b850(local_8);
+  uVar2 = Race__GetPlayer(local_8);
   return uVar2;
 }
 
@@ -8022,17 +8050,17 @@ void __thiscall FUN_0043ba60(int *param_1,int param_2,char param_3)
   int local_c;
   
   if (param_1[param_2 + 2] != 0) {
-    iVar1 = FUN_0043b850(param_2);
+    iVar1 = Race__GetPlayer(param_2);
     if (*param_1 == 3) {
       FUN_004390d0(0);
       FUN_00432710((int)*(char *)(iVar1 + 4));
       if (*(char *)(iVar1 + 0x18) != '\0') {
         for (local_c = 0; local_c < 4; local_c = local_c + 1) {
-          if ((param_1[local_c + 2] != 0) && (iVar2 = FUN_0043b850(local_c), iVar2 != iVar1)) {
+          if ((param_1[local_c + 2] != 0) && (iVar2 = Race__GetPlayer(local_c), iVar2 != iVar1)) {
             uVar3 = 0;
-            FUN_0043b850(local_c);
+            Race__GetPlayer(local_c);
             FUN_004390d0(uVar3);
-            iVar2 = FUN_0043b850(local_c);
+            iVar2 = Race__GetPlayer(local_c);
             FUN_00432710((int)*(char *)(iVar2 + 4));
           }
         }
@@ -8051,10 +8079,10 @@ void __thiscall FUN_0043ba60(int *param_1,int param_2,char param_3)
       }
       if (*(char *)(iVar1 + 0x18) != '\0') {
         for (local_10 = 0; local_10 < 4; local_10 = local_10 + 1) {
-          if ((param_1[local_10 + 2] != 0) && (iVar2 = FUN_0043b850(local_10), iVar2 != iVar1)) {
+          if ((param_1[local_10 + 2] != 0) && (iVar2 = Race__GetPlayer(local_10), iVar2 != iVar1)) {
             uVar4 = 10;
             uVar3 = 0;
-            FUN_0043b850(local_10);
+            Race__GetPlayer(local_10);
             FUN_00439470(uVar3,uVar4);
           }
         }
@@ -8072,7 +8100,7 @@ void __thiscall FUN_0043bc30(int param_1,undefined4 param_2)
 {
   FUN_005488d0(8);
   if (*(int *)(param_1 + 8) != 0) {
-    FUN_0043b850(0);
+    Race__GetPlayer(0);
     FUN_004392c0(param_2);
   }
   return;
@@ -8092,7 +8120,7 @@ void FUN_0043bc90(void)
   uVar1 = FUN_00436d90();
   uVar2 = FUN_00436f20();
   uVar3 = FUN_00436f20();
-  iVar4 = FUN_0043b850(uVar1);
+  iVar4 = Race__GetPlayer(uVar1);
   if ((iVar4 != 0) && (*(uint *)(iVar4 + 0x1a8) < uVar2)) {
     *(uint *)(iVar4 + 0x1a8) = uVar2;
     FUN_00439030(uVar3);
@@ -8131,7 +8159,7 @@ void __fastcall FUN_0043bd10(int *param_1)
         else {
           FUN_0057a160();
         }
-        fVar5 = (float10)FUN_0040ed00();
+        fVar5 = (float10)bTickerToSeconds();
         FUN_00579f90((float)fVar4 + (float)(fVar5 - (float10)(float)fVar3));
       }
     }
@@ -8155,11 +8183,11 @@ FUN_0043be30(int param_1,int param_2,undefined4 param_3,undefined1 param_4,int p
   
   local_5 = '\0';
   if (*(int *)(param_1 + 8 + param_2 * 4) != 0) {
-    iVar2 = FUN_0043b850(param_2);
+    iVar2 = Race__GetPlayer(param_2);
     local_5 = FUN_00432e40();
     if ((local_5 == '\0') && (iVar2 == *(int *)(param_1 + 4))) {
       if ((param_5 == 1) &&
-         (((cVar1 = FUN_0041f600(), cVar1 == '\0' && (cVar1 = FUN_00421a50(), cVar1 == '\0')) &&
+         (((cVar1 = IsDriftMode(), cVar1 == '\0' && (cVar1 = FUN_00421a50(), cVar1 == '\0')) &&
           (DAT_0078a318 == 0)))) {
         FUN_004390f0();
         iVar3 = FUN_0042ac60();
@@ -8176,7 +8204,7 @@ FUN_0043be30(int param_1,int param_2,undefined4 param_3,undefined1 param_4,int p
           return '\0';
         }
       }
-      cVar1 = FUN_0041f600();
+      cVar1 = IsDriftMode();
       if (cVar1 != '\0') {
         FUN_0043d030();
       }
@@ -8184,7 +8212,7 @@ FUN_0043be30(int param_1,int param_2,undefined4 param_3,undefined1 param_4,int p
       local_5 = '\x01';
       if ((param_5 == 9) && (iVar3 = FUN_00421ac0(iVar2), 0 < iVar3)) {
         for (local_18 = 0; local_18 < 4; local_18 = local_18 + 1) {
-          iVar3 = FUN_0043b850(local_18);
+          iVar3 = Race__GetPlayer(local_18);
           if ((iVar3 != 0) && (iVar3 != iVar2)) {
             FUN_00439470(0,10);
           }
@@ -8224,7 +8252,7 @@ void __fastcall FUN_0043bfe0(int param_1)
   local_18 = 0;
   for (local_34[5] = 0; local_34[5] < 4; local_34[5] = local_34[5] + 1) {
     if (*(int *)(param_1 + 8 + local_34[5] * 4) != 0) {
-      iVar4 = FUN_0043b850(local_34[5]);
+      iVar4 = Race__GetPlayer(local_34[5]);
       aiStack_14[local_18] = iVar4;
       local_18 = local_18 + 1;
     }
@@ -8248,11 +8276,11 @@ void __fastcall FUN_0043bfe0(int param_1)
       }
       if (local_34[2] == local_34[3]) {
         local_44 = 0xffffffff;
-        cVar3 = FUN_0041f600();
+        cVar3 = IsDriftMode();
         if (cVar3 == '\0') {
           if (local_34[2] == 0) {
             if (*(int *)(local_34[0] + 0xc) != *(int *)(local_34[1] + 0xc)) {
-              iVar5 = FUN_0042ab10();
+              iVar5 = int_Less();
               local_44 = (uint)(iVar5 != 0);
             }
           }
@@ -8340,7 +8368,7 @@ void __fastcall FUN_0043c300(int param_1)
   local_420 = 0;
   cVar2 = FUN_00421a50();
   if (cVar2 == '\0') {
-    cVar2 = FUN_0041f600();
+    cVar2 = IsDriftMode();
     if (cVar2 == '\0') {
       if (DAT_0078a318 != 0) {
         local_420 = 1;
@@ -8362,7 +8390,7 @@ void __fastcall FUN_0043c300(int param_1)
   FUN_00548840(DAT_0078a31c & 0xff);
   for (local_424 = 0; local_424 < 4; local_424 = local_424 + 1) {
     if (*(int *)(param_1 + 8 + local_424 * 4) != 0) {
-      local_594 = (int *)FUN_0043b850(local_424);
+      local_594 = (int *)Race__GetPlayer(local_424);
       FUN_00438860();
       local_590 = (undefined4 *)FUN_00432e70();
       if ((local_594 != *(int **)(param_1 + 4)) && (local_598 = FUN_004390f0(), local_598 != 0)) {
@@ -8382,25 +8410,25 @@ void __fastcall FUN_0043c300(int param_1)
       FUN_00548840(*(undefined1 *)local_590);
       FUN_00548840(*(undefined1 *)(local_590 + 2));
       FUN_00548a80(local_590[0x1f]);
-      fVar4 = (float10)FUN_0040ed00();
+      fVar4 = (float10)bTickerToSeconds();
       FUN_00548a80((float)fVar4);
       if (local_590[0x1e] == 0) {
         FUN_00548a80(0);
       }
       else {
-        fVar4 = (float10)FUN_0040ed00();
+        fVar4 = (float10)bTickerToSeconds();
         FUN_00548a80((float)fVar4);
       }
       for (local_5a0 = 1; local_5a0 <= (int)DAT_0078a31c; local_5a0 = local_5a0 + 1) {
-        fVar4 = (float10)FUN_0040ed00();
+        fVar4 = (float10)bTickerToSeconds();
         FUN_00548a80((float)fVar4);
       }
       FUN_00548a80(local_590[7]);
       FUN_00548a80(local_590[6]);
       FUN_00548a80(local_590[0x2b]);
-      fVar4 = (float10)FUN_0040ed00();
+      fVar4 = (float10)bTickerToSeconds();
       FUN_00548a80((float)fVar4);
-      fVar4 = (float10)FUN_0040ed00();
+      fVar4 = (float10)bTickerToSeconds();
       FUN_00548a80((float)fVar4);
       FUN_00548a80(local_590[0x2e]);
       FUN_00436f10();
@@ -8594,7 +8622,7 @@ void __fastcall FUN_0043cef0(int param_1)
   if (*(char *)(param_1 + 0x40) != '\0') {
     FUN_00548820();
     FUN_00548840(*(undefined1 *)(param_1 + 0x40));
-    fVar2 = (float10)FUN_0040ed00();
+    fVar2 = (float10)bTickerToSeconds();
     FUN_00436dc0((float)fVar2);
     for (local_418 = 0; local_418 < (int)(uint)*(byte *)(param_1 + 0x40); local_418 = local_418 + 1)
     {
@@ -8712,7 +8740,7 @@ void __fastcall FUN_0043d220(int param_1)
   for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
     if (*(char *)(param_1 + 0x5c + local_8 * 0xd) != '\0') {
       for (local_c = 0; local_c < 4; local_c = local_c + 1) {
-        iVar1 = FUN_0043b850(local_c);
+        iVar1 = Race__GetPlayer(local_c);
         if (iVar1 != 0) {
           FUN_0042ae40();
           iVar2 = bStrICmp();
@@ -8744,13 +8772,13 @@ void __thiscall FUN_0043d2d0(int param_1,int param_2,undefined4 param_3,undefine
   float10 fVar3;
   float10 fVar4;
   
-  if ((*(int *)(param_1 + 8 + param_2 * 4) != 0) && (iVar2 = FUN_00438920(), 1 < iVar2)) {
-    FUN_0043b850(param_2);
+  if ((*(int *)(param_1 + 8 + param_2 * 4) != 0) && (iVar2 = Float2_ToIntPair(), 1 < iVar2)) {
+    Race__GetPlayer(param_2);
     fVar3 = (float10)FUN_00435f70();
     cVar1 = FUN_00432e40();
     if ((cVar1 == '\0') &&
        ((*(float *)(param_1 + 0x1c) == 0.0 ||
-        (fVar4 = (float10)FUN_0040ed00(),
+        (fVar4 = (float10)bTickerToSeconds(),
         fVar4 < (float10)(float)fVar3 + (float10)*(float *)(param_1 + 0x1c))))) {
       FUN_004399a0(1);
     }
@@ -8776,12 +8804,12 @@ void __thiscall FUN_0043d3d0(int param_1,int param_2,undefined4 param_3)
   
   if (((DAT_0073619c == 0) || (iVar2 = FUN_00421960(), 3 < iVar2)) &&
      (*(int *)(param_1 + 8 + param_2 * 4) != 0)) {
-    FUN_0043b850(param_2);
+    Race__GetPlayer(param_2);
     fVar3 = (float10)FUN_00435f70();
     cVar1 = FUN_00432e40();
     if ((cVar1 == '\0') &&
        ((*(float *)(param_1 + 0x1c) == 0.0 ||
-        (fVar4 = (float10)FUN_0040ed00(),
+        (fVar4 = (float10)bTickerToSeconds(),
         fVar4 < (float10)(float)fVar3 + (float10)*(float *)(param_1 + 0x1c))))) {
       FUN_004399a0(1);
     }
@@ -8806,10 +8834,10 @@ void __fastcall FUN_0043d4f0(int param_1)
   
   iVar1 = SpecialCamCooldown();
   if (iVar1 != 0) {
-    FUN_0041f0b0(param_1 + 0x90);
-    fVar2 = (float10)FUN_0040ed00();
-    FUN_0041f0b0(param_1 + 0x94);
-    fVar3 = (float10)FUN_0040ed00();
+    int_Sub(param_1 + 0x90);
+    fVar2 = (float10)bTickerToSeconds();
+    int_Sub(param_1 + 0x94);
+    fVar3 = (float10)bTickerToSeconds();
     fVar2 = (float10)FUN_00405600((float)fVar2 - (float)fVar3);
     if (((((float10)0.25 * (float10)2.0 < fVar2) && (iVar1 = FUN_0043b890(), iVar1 != 0)) &&
         (FUN_004399a0(2), iVar1 == *(int *)(param_1 + 4))) &&
@@ -8864,7 +8892,7 @@ void __fastcall FUN_0043d6e0(int param_1)
   cVar1 = FUN_00436d90();
   iVar2 = FUN_00436f20();
   if (*(int *)(param_1 + 8 + cVar1 * 4) != 0) {
-    FUN_0043b850((int)cVar1);
+    Race__GetPlayer((int)cVar1);
     iVar3 = FUN_004399f0(0);
     if (iVar2 != iVar3) {
       FUN_004399a0(0x20);
@@ -8885,7 +8913,7 @@ undefined1 __fastcall FUN_0043d760(int *param_1)
   if (*param_1 == 7) {
     for (local_c = 0; local_c < 4; local_c = local_c + 1) {
       if ((param_1[local_c + 2] != 0) &&
-         (iVar1 = FUN_0043b850(local_c), *(int *)(iVar1 + 0x188) != 0)) {
+         (iVar1 = Race__GetPlayer(local_c), *(int *)(iVar1 + 0x188) != 0)) {
         return 1;
       }
     }
@@ -8909,14 +8937,14 @@ void FUN_0043d7e0(void)
   int local_8;
   
   for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
-    iVar2 = FUN_0043b850(local_8);
+    iVar2 = Race__GetPlayer(local_8);
     if (iVar2 != 0) {
       FUN_0042ae40();
       iVar3 = FUN_0054a1b0();
       if (iVar3 == 0) {
         cVar1 = FUN_00421a50();
         if (cVar1 == '\0') {
-          cVar1 = FUN_0041f600();
+          cVar1 = IsDriftMode();
           if (cVar1 == '\0') {
             if (DAT_0078a318 == 0) {
               *(undefined4 *)(iVar2 + 8) = local_70;
@@ -8959,7 +8987,7 @@ uint __thiscall FUN_0043d8c0(int *param_1,undefined4 param_2,uint param_3)
   uint local_c;
   
   local_c = 0;
-  iVar4 = FUN_0043b850(param_2);
+  iVar4 = Race__GetPlayer(param_2);
   if (iVar4 != 0) {
     if (param_3 == 0) {
       puVar5 = (uint *)FUN_00432e70();
@@ -8970,7 +8998,7 @@ uint __thiscall FUN_0043d8c0(int *param_1,undefined4 param_2,uint param_3)
     local_18 = 0;
     cVar3 = FUN_00421a50();
     if (cVar3 == '\0') {
-      cVar3 = FUN_0041f600();
+      cVar3 = IsDriftMode();
       if (cVar3 == '\0') {
         if (DAT_0078a318 != 0) {
           local_18 = 1;
@@ -8995,7 +9023,7 @@ uint __thiscall FUN_0043d8c0(int *param_1,undefined4 param_2,uint param_3)
       else if (local_c < uVar1) {
         bVar2 = false;
         for (local_20 = 0; local_20 < 4; local_20 = local_20 + 1) {
-          iVar6 = FUN_0043b850(local_20);
+          iVar6 = Race__GetPlayer(local_20);
           if (((iVar6 != 0) && (iVar6 != iVar4)) &&
              (iVar6 = FUN_00432e70(), *(int *)(iVar6 + 8) == 1)) {
             bVar2 = true;
@@ -9024,7 +9052,7 @@ int __fastcall FUN_0043da30(int param_1)
   local_8 = 0;
   for (local_c = 0; local_c < 4; local_c = local_c + 1) {
     if (*(int *)(param_1 + 8 + local_c * 4) != 0) {
-      iVar1 = FUN_0043b850(local_c);
+      iVar1 = Race__GetPlayer(local_c);
       local_8 = local_8 + *(int *)(iVar1 + 8);
     }
   }
@@ -9047,8 +9075,8 @@ undefined4 __fastcall FUN_0043da90(int *param_1)
     if ((cVar1 == '\0') && (*(int *)param_1[1] != 5)) {
       iVar2 = SpecialCamCooldown();
       if (iVar2 != 0) {
-        FUN_0041f0b0(param_1 + 0x15);
-        fVar3 = (float10)FUN_0040ed00();
+        int_Sub(param_1 + 0x15);
+        fVar3 = (float10)bTickerToSeconds();
         if ((float10)3.0 < fVar3) {
           return 1;
         }
@@ -9207,8 +9235,8 @@ undefined4 * __fastcall FUN_0043dc40(undefined4 *param_1)
   int iVar1;
   undefined4 *puVar2;
   
-  FUN_00405550();
-  FUN_00405550();
+  Ptr_SetNull();
+  Ptr_SetNull();
   param_1[1] = 0;
   *param_1 = 0;
   param_1[6] = 1;
@@ -9241,9 +9269,9 @@ void __fastcall FUN_0043dd10(undefined4 param_1)
   int iVar1;
   
   while( true ) {
-    iVar1 = FUN_00401bd0(param_1);
+    iVar1 = bList__IsEmpty(param_1);
     if (iVar1 != 0) break;
-    FUN_00401be0();
+    bList__RemoveHead();
   }
   return;
 }
@@ -9335,8 +9363,8 @@ void FUN_0043de90(int param_1)
   float local_18;
   int *local_14;
   
-  while (iVar2 = FUN_00401bd0(), iVar2 == 0) {
-    FUN_00401be0();
+  while (iVar2 = bList__IsEmpty(), iVar2 == 0) {
+    bList__RemoveHead();
   }
   local_14 = (int *)0x0;
   local_18 = 99.9;
@@ -9350,7 +9378,7 @@ void FUN_0043de90(int param_1)
     if ((cVar1 == '\0') || (cVar1 = FUN_00421a80(), cVar1 != '\0')) {
       cVar1 = FUN_00421a80();
       if ((cVar1 != '\0') && (cVar1 = FUN_00424c80(), cVar1 == '\0')) {
-        local_34 = FUN_0043b850((int)*(char *)(local_28 + 1));
+        local_34 = Race__GetPlayer((int)*(char *)(local_28 + 1));
         local_30 = FUN_0042ae40();
       }
     }
@@ -9395,12 +9423,12 @@ void FUN_0043de90(int param_1)
       uVar6 = 1;
       FUN_00421a70(1,0,0x41200000);
       fVar5 = (float10)RideInfo__GetPerformanceMeasure(uVar6);
-      fVar5 = (float10)FUN_00401c80((float)fVar5);
+      fVar5 = (float10)bClampF((float)fVar5);
       local_18 = (float)fVar5;
     }
   }
   DAT_00700a18 = (_K_ONE - 0.65) * (local_18 / 1.0) + 0.65;
-  fVar5 = (float10)FUN_00401c80(DAT_00700a18,0x3f266666,0x3f800000);
+  fVar5 = (float10)bClampF(DAT_00700a18,0x3f266666,0x3f800000);
   DAT_00700a18 = (float)fVar5;
   cVar1 = FUN_0043a2e0();
   if (cVar1 == '\0') {
@@ -9675,8 +9703,8 @@ int __fastcall FUN_0043e790(int param_1)
     }
     else {
       *(undefined1 *)(param_1 + 0x13) = 1;
-      FUN_0041f0b0(param_1 + 0x20);
-      fVar3 = (float10)FUN_0040ed00();
+      int_Sub(param_1 + 0x20);
+      fVar3 = (float10)bTickerToSeconds();
       if ((float10)1.5 < fVar3) {
         FUN_00424cc0();
       }
@@ -9686,8 +9714,8 @@ int __fastcall FUN_0043e790(int param_1)
     *(undefined1 *)(param_1 + 0x12) = 1;
     iVar1 = SpecialCamCooldown();
     if (iVar1 != 0) {
-      FUN_0041f0b0(param_1 + 0x20);
-      fVar3 = (float10)FUN_0040ed00();
+      int_Sub(param_1 + 0x20);
+      fVar3 = (float10)bTickerToSeconds();
       if (fVar3 <= (float10)1.5) goto LAB_0043e97c;
     }
     local_c = *(int *)(param_1 + 0x18) + -1;
@@ -9753,9 +9781,11 @@ int __thiscall FUN_0043ea50(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x43eaa0 FUN_0043eaa0
+// ==== 0x43eaa0 RaceManager::GetRacerRank
 
-int FUN_0043eaa0(int param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+int RaceManager__GetRacerRank(int param_1)
 
 {
   int iVar1;
@@ -9808,7 +9838,7 @@ void __fastcall RaceManager__UpdateAIScores(int param_1)
         iVar2 = FUN_00424d80();
         if (iVar2 != 0) {
           uVar3 = FUN_0041f5c0();
-          FUN_0043b850(uVar3);
+          Race__GetPlayer(uVar3);
           iVar2 = FUN_004134c0();
           uVar3 = FUN_0041f5c0();
           iVar4 = FUN_0043ea50(uVar3);
@@ -9859,7 +9889,7 @@ void __fastcall RaceManager__UpdateAIScores(int param_1)
       }
     }
   }
-  iVar2 = FUN_00401bd0();
+  iVar2 = bList__IsEmpty();
   if (iVar2 == 0) {
     bList__Sort(&DAT_0077b198,FUN_0043f130);
     FUN_00435ff0(&DAT_0077b198);
@@ -9872,7 +9902,7 @@ void __fastcall RaceManager__UpdateAIScores(int param_1)
     iVar2 = FUN_0042ac60();
     if (iVar2 < 0xb) {
       uVar3 = FUN_0041f5c0();
-      uVar3 = FUN_0043eaa0(uVar3);
+      uVar3 = RaceManager__GetRacerRank(uVar3);
       FUN_004081e0();
       iVar2 = FUN_0042ac60();
       *(undefined4 *)(param_1 + 0x28 + iVar2 * 4) = uVar3;
@@ -9908,8 +9938,8 @@ void __fastcall FUN_0043ede0(int param_1)
     if (iVar4 == 0) {
       FUN_00405560();
     }
-    FUN_0041f0b0(param_1 + 0x24);
-    fVar5 = (float10)FUN_0040ed00();
+    int_Sub(param_1 + 0x24);
+    fVar5 = (float10)bTickerToSeconds();
     fVar1 = (float)fVar5;
     if (4.0 < fVar1) {
       FUN_00424cc0();
@@ -10026,8 +10056,8 @@ void __fastcall FUN_0043f160(undefined4 param_1)
   int iVar1;
   void *_Memory;
   
-  while (iVar1 = FUN_00401bd0(), iVar1 == 0) {
-    _Memory = (void *)FUN_00401be0();
+  while (iVar1 = bList__IsEmpty(), iVar1 == 0) {
+    _Memory = (void *)bList__RemoveHead();
     if (_Memory != (void *)0x0) {
       EAXMod__NopArg1__ret_4_stub_shared_by__200_slots_(_Memory);
       _free(_Memory);
@@ -10111,7 +10141,7 @@ void FUN_0043f240(void)
 LAB_0043f355:
       cVar2 = FUN_0043a2e0();
       if (cVar2 != '\0') goto LAB_0043f380;
-      iVar3 = FUN_0043eaa0((int)*(short *)(*piVar1 + 10));
+      iVar3 = RaceManager__GetRacerRank((int)*(short *)(*piVar1 + 10));
       if (iVar3 != 1) goto LAB_0043f39d;
       iVar3 = *(int *)(in_EAX[1] + 0x34);
       goto LAB_0043f38c;
@@ -10225,7 +10255,7 @@ void FUN_0043f430(void)
       uVar2 = (uint)(*(char *)((int)piVar1 + 10) == '\x01');
     }
     else {
-      uVar2 = FUN_0043eaa0((int)*(short *)(*piVar1 + 10));
+      uVar2 = RaceManager__GetRacerRank((int)*(short *)(*piVar1 + 10));
     }
     if (uVar2 == 0) {
       if (*(char *)(*(int *)(unaff_ESI[1] + 0x40) + 0x14) != '\0') {
@@ -10329,13 +10359,14 @@ LAB_0043f8a5:
              (*(char *)(*(int *)(iVar7 + 0x25c) + 0x15) == '\0')))) &&
            ((((*(int *)(*(int *)(iVar7 + 600) + 0x140) == iVar4 ||
               (*(int *)(*(int *)(iVar7 + 0x25c) + 0x140) == iVar4)) &&
-             (cVar3 = FUN_004280a0(), cVar3 == '\0')) &&
-            ((cVar3 = FUN_004280a0(), cVar3 == '\0' && (*(float *)(iVar7 + 0x10) < 1.5)))))) {
+             (cVar3 = Car__IsResetGraceActive(), cVar3 == '\0')) &&
+            ((cVar3 = Car__IsResetGraceActive(), cVar3 == '\0' && (*(float *)(iVar7 + 0x10) < 1.5)))
+            ))) {
           piVar2 = *(int **)(iVar7 + 600);
           (**(code **)(*extraout_EDX + 0xc))();
           (**(code **)(*piVar2 + 0xc))();
-          FUN_00424b70();
-          fVar8 = (float10)FUN_00436d60();
+          Vec3_Sub();
+          fVar8 = (float10)bLength3();
           if ((float10)40.232456 < fVar8) {
             unaff_ESI[6] = iVar7;
             unaff_ESI[7] = *(int *)(iVar7 + 600);
@@ -11055,9 +11086,11 @@ void FUN_004406d0(void)
 }
 
 
-// ==== 0x440710 FUN_00440710
+// ==== 0x440710 RefArray_DecrementAll
 
-void FUN_00440710(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void RefArray_DecrementAll(void)
 
 {
   int iVar1;
@@ -11462,7 +11495,7 @@ undefined4 GroundQuery__SweepSegment(float *param_1)
     uVar4 = FUN_00440d30(in_EAX,param_1,unaff_ESI,0x3f000000);
     return uVar4;
   }
-  FUN_00438800(fVar1 / 30.0);
+  bCeil(fVar1 / 30.0);
   iVar5 = _ftol_nocw();
   local_40 = *unaff_ESI;
   local_3c = unaff_ESI[1];

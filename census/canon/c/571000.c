@@ -5395,7 +5395,7 @@ void FUN_00577010(void)
   else {
     iVar2 = DAT_0073b14c + -4;
   }
-  iVar1 = FUN_0040cb70();
+  iVar1 = Ptr_BaseAdjustMinus4();
   while (iVar2 != iVar1) {
     FUN_005772f0(iVar2);
     if (*(int *)(iVar2 + 4) == 0) {
@@ -5444,7 +5444,7 @@ float10 FUN_00577060(undefined1 *param_1,float *param_2,float param_3,int param_
   else {
     iVar3 = DAT_0073b14c + -4;
   }
-  local_34 = FUN_0040cb70();
+  local_34 = Ptr_BaseAdjustMinus4();
   while (iVar3 != local_34) {
     if (*(int *)(iVar3 + 4) == 0) {
       iVar3 = 0;
@@ -6789,7 +6789,7 @@ undefined4 * FUN_00578060(undefined4 *param_1,undefined4 *param_2)
   local_14 = CONCAT31(local_14._1_3_,1);
   FUN_00578500(param_2 + 0x14,param_2[0x24] != 0);
   iVar4 = param_1[7];
-  FUN_00401cd0();
+  bMatrixCopy_b();
   if (*(int *)(iVar4 + 0xe4) == 0) {
     FUN_00579190();
   }
@@ -7715,9 +7715,9 @@ void __fastcall FUN_00578e10(int param_1)
 {
   int iVar1;
   
-  FUN_00401cd0();
+  bMatrixCopy_b();
   iVar1 = *(int *)(param_1 + 0x10);
-  FUN_00401cd0();
+  bMatrixCopy_b();
   if (*(int *)(iVar1 + 0xe4) == 0) {
     FUN_00579190();
   }
@@ -8052,7 +8052,7 @@ void __fastcall FUN_005791c0(int param_1)
     *(undefined4 *)(param_1 + 0xe4) = 0;
     return;
   }
-  FUN_00401cd0();
+  bMatrixCopy_b();
   *(undefined4 *)(param_1 + 0x90) = *(undefined4 *)(param_1 + 0xa0);
   *(undefined4 *)(param_1 + 0x94) = *(undefined4 *)(param_1 + 0xa4);
   *(undefined4 *)(param_1 + 0x98) = *(undefined4 *)(param_1 + 0xa8);
@@ -8070,7 +8070,7 @@ void FUN_00579310(undefined4 param_1)
   undefined1 local_50 [76];
   
   if (*(int *)(unaff_EDI + 0xe0) == 0) {
-    FUN_00401cd0();
+    bMatrixCopy_b();
   }
   else {
     if (*(int *)(*(int *)(unaff_EDI + 0xe0) + 0xe4) != 0) {
@@ -8521,7 +8521,7 @@ undefined4 * FUN_00579750(undefined4 *param_1,int param_2,int *param_3)
     pvVar9 = (void *)0x0;
   }
   else {
-    pvVar9 = (void *)FUN_0047b040();
+    pvVar9 = (void *)CAnimCtrl__InitFields();
   }
   *(undefined4 *)((int)pvVar9 + 8) = *(undefined4 *)(param_2 + 0xd0);
   fVar3 = (float)param_3[5];
@@ -8605,7 +8605,7 @@ LAB_0057994f:
   else {
     param_1[5] = pvVar9;
   }
-  FUN_00401cd0();
+  bMatrixCopy_b();
   if (bVar4) {
     D3DXMatrixMultiply(local_320,local_320,&DAT_00779860);
     D3DXMatrixMultiply(&local_32c,&local_32c,&DAT_007798a0);
@@ -8629,7 +8629,7 @@ LAB_0057994f:
       } while (iVar7 < iStack_40);
     }
   }
-  FUN_00401cd0();
+  bMatrixCopy_b();
   ExceptionList = pvStack_1c;
   return param_1;
 }
@@ -8757,7 +8757,7 @@ void __thiscall FUN_00579c00(int param_1,float param_2)
   if (*(int *)(param_1 + 0x14) == 0) {
     iVar3 = *(int *)(param_1 + 0x10);
     ExceptionList = &local_1c;
-    FUN_00401cd0();
+    bMatrixCopy_b();
     iVar3 = *(int *)(iVar3 + 0xe4);
     goto joined_r0x00579f61;
   }
@@ -8766,7 +8766,7 @@ void __thiscall FUN_00579c00(int param_1,float param_2)
   local_378 = *(float *)(iVar3 + 0x84);
   local_374 = *(float *)(iVar3 + 0x88);
   ExceptionList = &local_1c;
-  FUN_0047b290(param_2);
+  CAnimCtrl__AdvanceAnimTime(param_2);
   FUN_0047b3d0();
   iVar3 = *(int *)(*(int *)(param_1 + 0x14) + 0x1c);
   if ((*(uint *)(*(int *)(param_1 + 0x14) + 0x34) & 1) == 0) {
@@ -8790,7 +8790,7 @@ void __thiscall FUN_00579c00(int param_1,float param_2)
     D3DXMatrixMultiply(&local_370,iVar3 + 0x40,param_1 + 0x20);
 LAB_00579e9d:
     iVar3 = *(int *)(param_1 + 0x10);
-    FUN_00401cd0();
+    bMatrixCopy_b();
     if (*(int *)(iVar3 + 0xe4) == 0) {
       FUN_00579190();
     }
@@ -8798,7 +8798,7 @@ LAB_00579e9d:
   else {
     *(int *)(*(int *)(param_1 + 0x10) + 0xe8) = iVar3;
     if (*(char *)(param_1 + 0x71) == '\0') goto LAB_00579e9d;
-    FUN_00401cd0();
+    bMatrixCopy_b();
     if (0 < DAT_007361c4) {
       iVar4 = 0;
       do {
@@ -8838,7 +8838,7 @@ LAB_00579e9d:
     iVar3 = *(int *)(param_1 + 0x10);
     local_338 = *(undefined4 *)(param_1 + 0x6c);
     *(undefined1 *)(param_1 + 0x72) = 1;
-    FUN_00401cd0();
+    bMatrixCopy_b();
     if (*(int *)(iVar3 + 0xe4) == 0) {
       FUN_00579190();
     }
@@ -9222,9 +9222,9 @@ void FUN_0057a380(void)
   undefined4 uVar4;
   int unaff_ESI;
   
-  FUN_00401cd0();
+  bMatrixCopy_b();
   iVar2 = *(int *)(unaff_ESI + 0x10);
-  FUN_00401cd0();
+  bMatrixCopy_b();
   if (*(int *)(iVar2 + 0xe4) == 0) {
     FUN_00579190();
   }
@@ -9567,10 +9567,10 @@ undefined1 FUN_0057a8a0(void)
   
   iVar2 = FUN_00647b70();
   if ((iVar2 == 6) && (*(int *)(*(int *)(unaff_ESI + 0x1d4) + 0x90) != 0)) {
-    uVar1 = FUN_004280a0();
+    uVar1 = Car__IsResetGraceActive();
     return uVar1;
   }
-  piVar3 = (int *)FUN_00438ac0();
+  piVar3 = (int *)Obj_GetField34();
   iVar2 = (**(code **)(*piVar3 + 0x68))();
   return iVar2 != 0;
 }

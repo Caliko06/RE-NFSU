@@ -1353,7 +1353,7 @@ void FUN_00583910(undefined4 *param_1,undefined4 *param_2)
   fStack_8 = 99999.0;
   fVar3 = (float10)FUN_005a6bc0(unaff_ESI[0xf9],fStack_c,&fStack_8);
   if (fVar3 < (float10)-0.1) {
-    FUN_00454f30(&fStack_4,fStack_8);
+    Curve_Evaluate(&fStack_4,fStack_8);
     param_2 = (undefined4 *)((_K_ONE - fStack_4) * ((float)param_2 - 10.0) + 10.0);
   }
   fVar1 = *(float *)(*(char *)(unaff_ESI[0xf8] + 0x388) * 0x38 + 0x18 + unaff_ESI[0xf8]);
@@ -1408,7 +1408,7 @@ void __thiscall FUN_00583b20(int *param_1,int param_2,int param_3,int param_4)
     }
     if (param_4 == -1) {
       uVar1 = (**(code **)(*param_1 + 0x40))(0xff,0xff);
-      param_4 = FUN_00456e90(param_1[1],uVar1);
+      param_4 = GetNearestTrafficLane(param_1[1],uVar1);
       if (param_4 < 1) {
         param_4 = 0;
       }
@@ -1438,7 +1438,7 @@ ushort FUN_00583bb0(int param_1)
   uVar3 = in_AX & 0xff00;
   if (cVar1 != '\x02') {
     if (((cVar1 != '\x05') && (cVar1 != '\a')) && (cVar1 == '\x04')) {
-      fVar4 = (float10)FUN_004216f0(0x3f800000);
+      fVar4 = (float10)Random_NextFloat(0x3f800000);
       fVar2 = (float10)_K_HALF;
       uVar3 = (ushort)(fVar4 < fVar2) << 8 | (ushort)(NAN(fVar4) || NAN(fVar2)) << 10 |
               (ushort)(fVar4 == fVar2) << 0xe;
@@ -2206,7 +2206,7 @@ void FUN_005847b0(void)
   *unaff_ESI = *unaff_EDI;
   unaff_ESI[1] = uVar1;
   unaff_ESI[2] = uVar2;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   uVar1 = unaff_EDI[0x15];
   uVar2 = unaff_EDI[0x16];
   unaff_ESI[0x14] = unaff_EDI[0x14];
@@ -2406,7 +2406,7 @@ void RigidBody__SetMassInertia(void)
   *(float *)(unaff_ESI + 0x144) = fVar1;
   *(float *)(unaff_ESI + 0x148) = _K_ONE / fVar1;
   FUN_00565060();
-  FUN_00401cd0();
+  bMatrixCopy_b();
   FUN_00565060();
   return;
 }
@@ -2446,7 +2446,7 @@ void __fastcall FUN_00584b80(undefined4 param_1,int param_2,float *param_3,undef
   *(undefined4 *)(param_2 + 0x24) = in_EAX[1];
   *(undefined4 *)(param_2 + 0x20) = uVar4;
   *(undefined4 *)(param_2 + 0x28) = uVar1;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   fVar2 = *(float *)(param_2 + 0x144);
   fVar3 = param_3[1];
   fVar5 = param_3[2];
@@ -3572,7 +3572,7 @@ float10 FUN_00586690(float param_1)
   if (_K_HALF <= fVar1 - local_4) {
     fVar2 = (float10)local_4 + (float10)_K_ONE;
   }
-  fVar2 = (float10)FUN_00438800((float)(fVar2 * (float10)param_1 * (float10)4000.0));
+  fVar2 = (float10)bCeil((float)(fVar2 * (float10)param_1 * (float10)4000.0));
   return fVar2 * (float10)0.00025;
 }
 
@@ -3895,7 +3895,7 @@ void FUN_00586bb0(undefined4 param_1,undefined4 param_2,undefined2 param_3,undef
   *(undefined4 *)(unaff_ESI + 0x2c0 + iVar8 * 4) = param_1;
   *(undefined4 *)(unaff_ESI + 0x300 + iVar8 * 4) = param_4;
   FUN_00465150(unaff_ESI);
-  FUN_00401cd0();
+  bMatrixCopy_b();
   local_1c = *(undefined4 *)(unaff_ESI + 0x24);
   local_20 = *(undefined4 *)(unaff_ESI + 0x20);
   local_18 = *(undefined4 *)(unaff_ESI + 0x28);
@@ -4910,7 +4910,7 @@ void __fastcall FUN_00588580(int param_1)
   uStack_8c = *puVar1;
   fStack_84 = *(float *)(param_1 + 0x38);
   fStack_80 = 1.0;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   if (*(int *)(param_1 + 0xa8) != 0) {
     D3DXMatrixMultiply(&uStack_bc,
                        *(int *)(param_1 + 0xac) * 0x40 + *(int *)(*(int *)(param_1 + 0xa8) + 8),
@@ -5643,7 +5643,7 @@ LAB_0058965d:
       iVar7 = FUN_00402a70(puVar1);
       if (iVar7 != 0) {
         *(undefined4 *)(iVar7 + 0x10) = 1;
-        FUN_00401cd0();
+        bMatrixCopy_b();
         ParticleEmitter_Queue();
         FUN_00589f70(iVar7);
       }
@@ -5773,7 +5773,7 @@ void FUN_00589a30(int param_1,float *param_2,undefined4 param_3,int param_4,unde
     local_38 = 0;
     pfVar8 = param_2;
     if ((*(int *)(param_1 + 0x18) != 0) &&
-       (cVar5 = FUN_004306c0(), pfVar8 = extraout_EDX, cVar5 != '\0')) {
+       (cVar5 = Player__CheckDriftTimeout(), pfVar8 = extraout_EDX, cVar5 != '\0')) {
       local_38 = 1;
     }
     iVar6 = *unaff_EDI;
@@ -9451,9 +9451,9 @@ int FUN_0058d010(int param_1)
   *(undefined4 *)(param_1 + 200) = 0;
   *(undefined4 *)(param_1 + 0xcc) = 0;
   *(undefined4 *)(param_1 + 0xd0) = 0;
-  eh_vector_constructor_iterator((void *)(param_1 + 0xe0),0x18,2,FUN_0042ac70,FUN_0042ac80);
+  eh_vector_constructor_iterator((void *)(param_1 + 0xe0),0x18,2,ListRef_Init,ListRef_Release);
   local_4 = 0;
-  eh_vector_constructor_iterator((void *)(param_1 + 0x110),0x18,2,FUN_0042ac70,FUN_0042ac80);
+  eh_vector_constructor_iterator((void *)(param_1 + 0x110),0x18,2,ListRef_Init,ListRef_Release);
   ExceptionList = local_c;
   return param_1;
 }
@@ -9472,9 +9472,9 @@ void FUN_0058d0d0(int param_1)
   local_c = ExceptionList;
   local_4 = 0;
   ExceptionList = &local_c;
-  eh_vector_destructor_iterator((void *)(param_1 + 0x110),0x18,2,FUN_0042ac80);
+  eh_vector_destructor_iterator((void *)(param_1 + 0x110),0x18,2,ListRef_Release);
   local_4 = 0xffffffff;
-  eh_vector_destructor_iterator((void *)(param_1 + 0xe0),0x18,2,FUN_0042ac80);
+  eh_vector_destructor_iterator((void *)(param_1 + 0xe0),0x18,2,ListRef_Release);
   ExceptionList = local_c;
   return;
 }
@@ -11071,7 +11071,7 @@ void TrackMap__Draw(undefined4 param_1)
         iVar3 = *(int *)(in_EAX + 0xc4) * 0x3c;
         iVar5 = 0;
         if ((&DAT_00737882)[iVar3] != '\0') {
-          iVar5 = FUN_00401c10(0x42b40000);
+          iVar5 = bDegreesToAngle16(0x42b40000);
           iVar5 = iVar5 + ((uint)(ushort)(*(short *)(*(int *)(in_EAX + 0xa4) + 0x98) -
                                          *(short *)(iVar2 + 0x3b4)) - (int)local_58);
         }
@@ -11128,7 +11128,7 @@ void TrackMap__Draw(undefined4 param_1)
     iVar5 = *(int *)(in_EAX + 0xc4) * 0x3c;
     iVar2 = 0;
     if ((&DAT_00737882)[iVar5] != '\0') {
-      iVar2 = FUN_00401c10(0x42b40000);
+      iVar2 = bDegreesToAngle16(0x42b40000);
       iVar2 = iVar2 + ((uint)(ushort)(*(short *)(*(int *)(in_EAX + 0xa4) + 0x98) -
                                      *(short *)(local_50 + 0x3b4)) - (int)puVar4);
     }
@@ -11159,7 +11159,7 @@ void TrackMap__Draw(undefined4 param_1)
       iVar5 = *(int *)(in_EAX + 0xc4) * 0x3c;
       iVar2 = 0;
       if ((&DAT_00737882)[iVar5] != '\0') {
-        iVar2 = FUN_00401c10(0x42b40000);
+        iVar2 = bDegreesToAngle16(0x42b40000);
         iVar2 = iVar2 + ((uint)(ushort)(*(short *)(*(int *)(in_EAX + 0xa4) + 0x98) -
                                        *(short *)(local_4c + 0x3b4)) - (int)puVar4);
       }
@@ -11180,7 +11180,7 @@ void TrackMap__Draw(undefined4 param_1)
     iVar5 = *(int *)(in_EAX + 0xc4) * 0x3c;
     iVar2 = 0;
     if ((&DAT_00737882)[iVar5] != '\0') {
-      iVar2 = FUN_00401c10(0x42b40000);
+      iVar2 = bDegreesToAngle16(0x42b40000);
       iVar2 = iVar2 + ((uint)(ushort)(*(short *)(*(int *)(in_EAX + 0xa4) + 0x98) -
                                      *(short *)(local_58 + 0x3b4)) - (int)puVar4);
     }
@@ -12466,7 +12466,7 @@ void FUN_00590dd0(int param_1,float *param_2,float *param_3,float *param_4)
   local_58 = 0;
   local_54 = 0x3f800000;
   FUN_0040b990(&local_90,&local_90);
-  FUN_00401cd0();
+  bMatrixCopy_b();
   D3DXVec3Transform();
   D3DXVec3Transform(param_2,param_2,&local_5c);
   pfVar3 = param_3;

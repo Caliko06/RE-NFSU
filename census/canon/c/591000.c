@@ -423,7 +423,7 @@ void FUN_00591a40(void)
   *(undefined4 *)(unaff_ESI + 0x20d4) = 0;
   *(undefined4 *)(unaff_ESI + 0x20dc) = 0;
   *(undefined4 *)(unaff_ESI + 0x20e0) = 0;
-  eh_vector_destructor_iterator((int *)(unaff_ESI + 0x2084),0x18,4,FUN_0042ac80);
+  eh_vector_destructor_iterator((int *)(unaff_ESI + 0x2084),0x18,4,ListRef_Release);
   return;
 }
 
@@ -533,7 +533,7 @@ void FUN_00591c90(int *param_1)
   iVar3 = DAT_0073557c;
   puVar1 = (undefined4 *)param_1[2];
   if (puVar1 != (undefined4 *)0x0) {
-    FUN_0042ac80();
+    ListRef_Release();
     iVar2 = *(int *)(iVar3 + 0x18);
     *puVar1 = *(undefined4 *)(iVar3 + 0x10);
     *(int *)(iVar3 + 0x18) = iVar2 + -1;
@@ -541,7 +541,7 @@ void FUN_00591c90(int *param_1)
   }
   puVar1 = (undefined4 *)param_1[3];
   if (puVar1 != (undefined4 *)0x0) {
-    FUN_0042ac80();
+    ListRef_Release();
     iVar2 = *(int *)(iVar3 + 0x18);
     *puVar1 = *(undefined4 *)(iVar3 + 0x10);
     *(int *)(iVar3 + 0x18) = iVar2 + -1;
@@ -705,7 +705,7 @@ void FUN_00591e40(int param_1,int param_2)
       goto LAB_00591ef7;
     }
   }
-  FUN_00401cd0();
+  bMatrixCopy_b();
 LAB_00591ef7:
   iVar2 = FUN_00545180(0x420c0000);
   if ((1 < iVar2) && (iVar2 = FUN_00591b40(param_2,local_50), iVar2 != 0)) {
@@ -722,7 +722,7 @@ LAB_00591ef7:
     }
     puVar3 = (undefined1 *)ScratchAlloc16();
     if (puVar3 != (undefined1 *)0x0) {
-      FUN_00401cd0();
+      bMatrixCopy_b();
       if (local_a4 != 0) {
         *(float *)(puVar3 + 0x28) = -*(float *)(puVar3 + 0x28);
       }
@@ -746,7 +746,7 @@ LAB_00591ef7:
           local_b8 = *(undefined4 *)(iVar5 + 0x78);
           local_b4 = *(undefined4 *)(iVar5 + 0x7c);
           thunk_FUN_005ac436(&local_c0,&local_c0,puVar3);
-          FUN_00401cd0();
+          bMatrixCopy_b();
           uStack_5c = local_bc;
           uStack_60 = local_c0;
           uStack_58 = local_b8;
@@ -794,7 +794,7 @@ void RenderWorldModels(int param_1)
     if ((puVar1[4] != 0) && ((bVar4 || (puVar1[5] != 0)))) {
       if (puVar1[6] != 0) {
         FUN_00424ba0();
-        FUN_0040bc10();
+        Matrix_InvertRigid();
         FUN_0053f5f0();
         D3DXVec3Transform(local_80,*(int *)(param_1 + 0x40) + 0x40,local_50);
         iVar3 = FUN_00567940(0);
@@ -1373,7 +1373,7 @@ FUN_005929c0(int param_1,undefined4 param_2,undefined4 *param_3,undefined4 param
   undefined4 local_18;
   
   *(undefined4 *)(param_1 + 0x408) = 1;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   local_20 = *param_3;
   local_1c = param_3[1];
   local_18 = param_3[2];
@@ -1556,7 +1556,7 @@ void FUN_00592c50(void)
   else {
     iVar2 = DAT_00779c70 + -4;
   }
-  iVar1 = FUN_0040cb70();
+  iVar1 = Ptr_BaseAdjustMinus4();
   while (iVar2 != iVar1) {
     if ((*(char *)(iVar2 + 0x16) != '\0') && (*(char *)(iVar2 + 0x1d) != '\0')) {
       FUN_00593170(unaff_EDI,iVar2,0);
@@ -1670,7 +1670,7 @@ float10 FUN_00592d50(void)
     else {
       piVar5 = (int *)(DAT_00779c70 + -4);
     }
-    piVar4 = (int *)FUN_0040cb70();
+    piVar4 = (int *)Ptr_BaseAdjustMinus4();
     while (piVar2 = piVar5, piVar2 != piVar4) {
       if (piVar2[1] == 0) {
         piVar5 = (int *)0x0;
@@ -1885,7 +1885,7 @@ void FUN_00593170(int param_1,int *param_2,undefined4 param_3)
   else {
     piVar9 = (int *)(param_2[2] + -4);
   }
-  piVar6 = (int *)FUN_0040cb70();
+  piVar6 = (int *)Ptr_BaseAdjustMinus4();
   while ((piVar9 != piVar6 && (fVar2 <= (float)piVar9[0xb]))) {
     if (piVar9[2] == 0) {
       piVar9 = (int *)0x0;
@@ -4302,9 +4302,9 @@ undefined4 Smackable__Loader(int *param_1)
     uVar4 = ((param_1[1] - ((int)param_1 + 0x17U & 0xfffffff0)) + 8 + (int)param_1) / 0x70;
     DAT_00734474 = uVar4;
     for (; uVar4 != 0; uVar4 = uVar4 - 1) {
-      FUN_00401cd0();
+      bMatrixCopy_b();
       FUN_0040bd40();
-      FUN_00401cd0();
+      bMatrixCopy_b();
     }
     return 1;
   }
@@ -4445,7 +4445,7 @@ void FUN_00595530(void)
   }
   ExceptionList = &pvStack_14;
   local_20 = (int ***)ppppiVar6;
-  ppppiVar5 = (int ****)FUN_0040cb70();
+  ppppiVar5 = (int ****)Ptr_BaseAdjustMinus4();
   if (ppppiVar8 != ppppiVar5) {
     do {
       pppiVar4 = local_1c;
@@ -4532,7 +4532,7 @@ void Smackables__CleanupPool(void)
     else {
       iVar5 = DAT_00779c70 + -4;
     }
-    iVar2 = FUN_0040cb70();
+    iVar2 = Ptr_BaseAdjustMinus4();
     while (iVar1 = iVar5, iVar1 != iVar2) {
       if (*(int *)(iVar1 + 4) == 0) {
         iVar5 = 0;
@@ -4622,7 +4622,7 @@ void Smackables__ForceCleanup(char param_1)
           pppppppiVar7 = DAT_00779c70 + -1;
         }
         ExceptionList = &local_14;
-        pppppppiVar9 = (int *******)FUN_0040cb70();
+        pppppppiVar9 = (int *******)Ptr_BaseAdjustMinus4();
         while (pppppppiVar1 = pppppppiVar7, pppppppiVar1 != pppppppiVar9) {
           pppppppiVar2 = pppppppiVar1 + 1;
           if (pppppppiVar1[1] == (int ******)0x0) {
@@ -4671,7 +4671,7 @@ void Smackables__ForceCleanup(char param_1)
           local_34 = DAT_00779c70 + -1;
         }
         ExceptionList = &local_14;
-        pppppppiVar7 = (int *******)FUN_0040cb70();
+        pppppppiVar7 = (int *******)Ptr_BaseAdjustMinus4();
         while (pppppppiVar9 = local_34, pppppppiVar9 != pppppppiVar7) {
           pppppppiVar1 = pppppppiVar9 + 1;
           if (pppppppiVar9[1] == (int ******)0x0) {
@@ -4711,7 +4711,7 @@ void Smackables__ForceCleanup(char param_1)
       else {
         local_34 = DAT_00779c70 + -1;
       }
-      pppppppiVar7 = (int *******)FUN_0040cb70();
+      pppppppiVar7 = (int *******)Ptr_BaseAdjustMinus4();
       while (pppppppiVar9 = local_34, pppppppiVar9 != pppppppiVar7) {
         pppppppiVar1 = pppppppiVar9 + 1;
         if (pppppppiVar9[1] == (int ******)0x0) {
@@ -5084,7 +5084,7 @@ void Smackables__SaveState(uint param_1)
     else {
       piVar3 = (int *)(DAT_00779c70 + -4);
     }
-    piVar5 = (int *)FUN_0040cb70();
+    piVar5 = (int *)Ptr_BaseAdjustMinus4();
     while (piVar3 != piVar5) {
       if (*(char *)((int)piVar3 + 0x15) == '\x02') {
         param_1 = (piVar3[0x18] - DAT_00734470) / 0x70;
@@ -5393,7 +5393,7 @@ int * VirginSmokeable__Wake(void)
   undefined4 uStack_14;
   
   if (*(int *)(DAT_00734468 + 0x18) != *(int *)(DAT_00734468 + 0x2c)) {
-    FUN_00401cd0();
+    bMatrixCopy_b();
     piVar2 = (int *)(*DAT_0073168c)(*(uint *)(DAT_00736070 + 8) & 0xffff,
                                     *(undefined4 *)(unaff_EDI + 100),
                                     *(undefined4 *)(*(int *)(unaff_EDI + 0x60) + 8));
@@ -5629,7 +5629,7 @@ undefined4 * Smokeable__Smokeable(undefined4 *param_1,undefined4 param_2,int par
         if (param_2[7] != 0) {
           *(int *)((int)pvVar11 + 0x1c) = param_2[7];
         }
-        FUN_00401cd0();
+        bMatrixCopy_b();
         bVar18 = DAT_007349b4 == 0;
         *(undefined4 *)((int)pvVar11 + 0x10) = 1;
         if (bVar18) {
@@ -5687,7 +5687,7 @@ undefined4 * Smokeable__Smokeable(undefined4 *param_1,undefined4 param_2,int par
         if (piVar12[7] != 0) {
           *(int *)((int)pvVar11 + 0x1c) = piVar12[7];
         }
-        FUN_00401cd0();
+        bMatrixCopy_b();
         iVar7 = DAT_007349b4;
         bVar18 = DAT_007349b4 == 0;
         *(undefined4 *)((int)pvVar11 + 0x10) = 1;
@@ -5991,7 +5991,7 @@ void __thiscall FUN_00597140(int param_1,int param_2,undefined4 *param_3)
   
   local_dc = *(undefined4 *)(param_2 + 0x34);
   local_d8 = *(undefined4 *)(param_2 + 0x38);
-  FUN_00401cd0();
+  bMatrixCopy_b();
   local_70 = 0;
   local_6c = 0;
   local_68 = 0;
@@ -6017,15 +6017,15 @@ void __thiscall FUN_00597140(int param_1,int param_2,undefined4 *param_3)
   fVar4 = local_b8 + unaff_EBX;
   local_64 = fStack_b4 + fStack_e4;
   FUN_00584b80(&local_cc,&local_dc);
-  FUN_00401cd0();
+  bMatrixCopy_b();
   fStack_24 = fStack_24 - *(float *)(param_1 + 0x174);
   iVar1 = *(int *)(param_1 + 0x4a0);
   *(undefined4 *)(param_1 + 0x450) = 1;
   if (iVar1 == 0) {
-    FUN_00401cd0();
+    bMatrixCopy_b();
   }
   else {
-    FUN_00401cd0();
+    bMatrixCopy_b();
     if (*(int *)(iVar1 + 0xe4) == 0) {
       FUN_00579190();
     }
@@ -6033,7 +6033,7 @@ void __thiscall FUN_00597140(int param_1,int param_2,undefined4 *param_3)
   *(float *)(param_1 + 0xc0) = fVar3;
   *(float *)(param_1 + 0xc4) = fVar4;
   *(float *)(param_1 + 200) = fStack_b4 + fStack_e4;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   *(undefined4 *)(param_1 + 0xd0) = 0;
   *(undefined4 *)(param_1 + 0xd4) = 0;
   *(undefined4 *)(param_1 + 0xd8) = 0;
@@ -6043,13 +6043,13 @@ void __thiscall FUN_00597140(int param_1,int param_2,undefined4 *param_3)
   piVar5 = *(int **)(param_1 + 0x4b0);
   if (piVar5 != (int *)(param_1 + 0x4b0)) {
     do {
-      FUN_00401cd0();
+      bMatrixCopy_b();
       piVar5 = (int *)*piVar5;
     } while (piVar5 != (int *)(param_1 + 0x4b0));
   }
   for (puVar2 = *(undefined4 **)(param_1 + 0x4b8); puVar2 != (undefined4 *)(param_1 + 0x4b8);
       puVar2 = (undefined4 *)*puVar2) {
-    FUN_00401cd0();
+    bMatrixCopy_b();
   }
   return;
 }
@@ -6118,7 +6118,7 @@ void __thiscall Smokeable__Update(int *param_1,float param_2)
     }
   }
   D3DXVec3Transform(local_70,param_1[0x56] + 0xb0,param_1[0x1b] + 0x30);
-  FUN_00401cd0();
+  bMatrixCopy_b();
   iVar2 = param_1[0x1b];
   fStack_2c = *(float *)(iVar2 + 0x20) - fStack_7c;
   uStack_20 = 0x3f800000;
@@ -6130,10 +6130,10 @@ void __thiscall Smokeable__Update(int *param_1,float param_2)
     iVar2 = param_1[0x128];
     param_1[0x114] = 1;
     if (iVar2 == 0) {
-      FUN_00401cd0();
+      bMatrixCopy_b();
     }
     else {
-      FUN_00401cd0();
+      bMatrixCopy_b();
       if (*(int *)(iVar2 + 0xe4) == 0) {
         FUN_00579190();
       }
@@ -6207,7 +6207,7 @@ void FUN_00597730(int *param_1)
     puVar5 = (undefined4 *)(**(code **)(*param_1 + 0xc))();
     for (piVar2 = (int *)param_1[0x12e]; piVar2 != param_1 + 0x12e; piVar2 = (int *)*piVar2) {
       iVar3 = piVar2[2];
-      FUN_00401cd0();
+      bMatrixCopy_b();
       uVar1 = puVar5[2];
       uVar4 = *puVar5;
       *(undefined4 *)(iVar3 + 0x74) = puVar5[1];
@@ -6767,7 +6767,7 @@ void __fastcall FUN_00598260(undefined4 param_1,int param_2,int param_3,float pa
     piVar3 = (int *)NullUpdate_ret();
     if (piVar4 != piVar3) {
       do {
-        FUN_00401cd0();
+        bMatrixCopy_b();
         iVar1 = unaff_EDI[2];
         iVar2 = *unaff_EDI;
         piVar4[0x1d] = unaff_EDI[1];
@@ -7222,7 +7222,7 @@ undefined4 PlaceCar_SpawnRecord(undefined4 param_1)
     local_10 = (float)fVar3;
     local_c = DAT_0078a300;
     for (local_14 = 0; local_14 < 100; local_14 = local_14 + 1) {
-      fVar3 = (float10)FUN_004216f0(0x3f800000);
+      fVar3 = (float10)Random_NextFloat(0x3f800000);
       local_19 = fVar3 < (float10)0.5;
       uVar7 = (uint)local_19;
       local_20 = (uint)local_19;
@@ -7250,8 +7250,8 @@ undefined4 PlaceCar_SpawnRecord(undefined4 param_1)
           cVar1 = FUN_0059b130(local_38,uVar6,0,1);
           if (cVar1 == '\0') {
             fVar4 = *(float *)(local_18 + 0xb0 + local_c * 8 + DAT_0078a2fc * 4);
-            fVar3 = (float10)FUN_0042adf0();
-            fVar3 = (float10)FUN_00401c60(fVar4 * 0.44702727,(float)fVar3);
+            fVar3 = (float10)RoadNode_GetLaneSpeedCap();
+            fVar3 = (float10)bMin(fVar4 * 0.44702727,(float)fVar3);
             uVar6 = TrafficCar_Place(param_1,uVar8,local_2c,(float)fVar3,local_18);
             return uVar6;
           }
@@ -7316,7 +7316,7 @@ undefined4 __thiscall PlaceCar_RandomNode(int param_1,undefined4 param_2)
           cVar2 = Spot_IsClear(&local_c,*(undefined4 *)(iVar3 + 0xd4 + DAT_0078a2fc * 4),0,1);
           if ((cVar2 != '\0') && (iVar3 = PickLaneEitherSide(local_8,uVar1), iVar3 != -1)) {
             uVar6 = 0;
-            fVar5 = (float10)FUN_0042adf0(0);
+            fVar5 = (float10)RoadNode_GetLaneSpeedCap(0);
             uVar6 = TrafficCar_Place(param_2,local_8,iVar3,(float)fVar5,uVar6);
             return uVar6;
           }
@@ -7367,7 +7367,7 @@ undefined4 PlaceCar_Route(int param_1)
       cVar2 = Spot_IsClear(&local_10,fVar1,0,1);
       if (cVar2 != '\0') {
         uVar7 = 0;
-        fVar6 = (float10)FUN_0042adf0(0);
+        fVar6 = (float10)RoadNode_GetLaneSpeedCap(0);
         uVar7 = TrafficCar_Place(param_1,iVar3,iVar5,(float)fVar6,uVar7);
         return uVar7;
       }
@@ -7446,7 +7446,7 @@ undefined4 TrafficCar_Place(int param_1,undefined4 param_2,int param_3,float par
   uVar3 = TrafficCar_AtIndex();
   uVar2 = TrafficCar_PickPaint(uVar3);
   *(undefined1 *)(param_1 + 0x17) = uVar2;
-  iVar4 = FUN_004134a0(&PTR_DAT_006cae38,0);
+  iVar4 = bMalloc_regarg(&PTR_DAT_006cae38,0);
   local_14 = 0;
   if (iVar4 == 0) {
     local_78 = 0;
@@ -7475,7 +7475,7 @@ undefined4 TrafficCar_Place(int param_1,undefined4 param_2,int param_3,float par
     FUN_005673e0();
   }
   FUN_00424dd0();
-  FUN_00424cf0();
+  RigidBody__SetVelocity();
   FUN_00432d30(0);
   Car_SetMode();
   ExceptionList = local_1c;
@@ -7523,7 +7523,7 @@ int PickLane(undefined4 param_1,char param_2)
   iVar2 = (-(uint)(param_2 != '\0') & 0xfffffffa) + 0x11;
   cVar1 = FUN_00421a50();
   if (((cVar1 != '\0') && (iVar3 = FUN_00408200(), 0 < iVar3)) &&
-     (fVar7 = (float10)FUN_004216f0(0x3f800000), fVar7 < (float10)0.5)) {
+     (fVar7 = (float10)Random_NextFloat(0x3f800000), fVar7 < (float10)0.5)) {
     iVar3 = FUN_00408200();
     FUN_004216b0(iVar3 * 100000);
     GetPlayerObject();
@@ -7591,7 +7591,7 @@ undefined4 Teleporter_MoveCar(undefined4 param_1,int param_2)
   if (fVar4 < (float10)_TeleportSpawnObjSpeed) {
     local_14 = 0.35;
   }
-  fVar4 = (float10)FUN_004216f0(0x3f800000);
+  fVar4 = (float10)Random_NextFloat(0x3f800000);
   if (((float10)local_14 <= fVar4) ||
      (cVar1 = Teleporter_MoveToSpawnRecord(param_1,uVar2), cVar1 == '\0')) {
     iVar3 = FUN_00424d50();
@@ -7665,7 +7665,7 @@ undefined4 Teleporter_MoveRoute(undefined4 param_1,undefined4 param_2,undefined4
     cVar2 = Spot_IsClear(&local_10,param_3,param_1,0);
     if (cVar2 != '\0') {
       uVar4 = 0;
-      fVar9 = (float10)FUN_0042adf0(0);
+      fVar9 = (float10)RoadNode_GetLaneSpeedCap(0);
       TrafficCar_Move(param_1,local_c,0,iVar7,0x41c4b127,(float)fVar9,uVar4);
       return 1;
     }
@@ -7776,7 +7776,7 @@ undefined4 Teleporter_MoveToSpawnRecord(undefined4 param_1)
     FUN_0041f5d0();
     FUN_0044d660();
     FUN_00583270();
-    fVar10 = (float10)FUN_004216f0(0x3f800000);
+    fVar10 = (float10)Random_NextFloat(0x3f800000);
     iVar4 = DAT_0078a300;
     bVar1 = fVar10 < (float10)0.5;
     local_6c = (uint)bVar1;
@@ -7801,8 +7801,8 @@ undefined4 Teleporter_MoveToSpawnRecord(undefined4 param_1)
       iVar9 = PickLane(uVar8,CONCAT31((int3)(-local_6c >> 8),'\x01' - bVar1));
       if (iVar9 != -1) {
         fVar12 = *(float *)(iVar7 + 0x70 + iVar4 * 8 + iVar6 * 4);
-        fVar10 = (float10)FUN_004216f0(*(float *)(iVar7 + 0x90 + iVar4 * 8 + iVar6 * 4) -
-                                       *(float *)(iVar7 + 0x70 + iVar4 * 8 + iVar6 * 4));
+        fVar10 = (float10)Random_NextFloat(*(float *)(iVar7 + 0x90 + iVar4 * 8 + iVar6 * 4) -
+                                           *(float *)(iVar7 + 0x70 + iVar4 * 8 + iVar6 * 4));
         if (local_15) {
           local_70 = *(undefined4 *)(iVar7 + 8 + (uint)bVar1 * 4);
         }
@@ -7810,8 +7810,8 @@ undefined4 Teleporter_MoveToSpawnRecord(undefined4 param_1)
           local_70 = 0;
         }
         fVar2 = *(float *)(iVar7 + 0xb0 + DAT_0078a300 * 8 + iVar6 * 4) * 0.44702727;
-        fVar11 = (float10)FUN_0042adf0();
-        fVar11 = (float10)FUN_00401c60(fVar2,(float)fVar11);
+        fVar11 = (float10)RoadNode_GetLaneSpeedCap();
+        fVar11 = (float10)bMin(fVar2,(float)fVar11);
         cVar3 = FUN_0059afa0(uVar8,iVar9,local_70,(float)(fVar10 + (float10)fVar12),param_1,0);
         if (cVar3 == '\0') {
           TrafficCar_Move(param_1,uVar8,local_70,iVar9,fVar2,(float)fVar11,iVar7);
@@ -7981,7 +7981,7 @@ undefined2 Teleporter_MoveFreeRun(undefined4 param_1,undefined4 param_2,undefine
       }
     }
     else {
-      fVar6 = (float10)FUN_004216f0(0x3f800000);
+      fVar6 = (float10)Random_NextFloat(0x3f800000);
       if (fVar6 < (float10)_K_HALF) {
         local_22 = !(bool)local_22;
       }
@@ -8012,7 +8012,7 @@ undefined2 Teleporter_MoveFreeRun(undefined4 param_1,undefined4 param_2,undefine
         }
         FUN_004420b0();
         uVar8 = 0;
-        fVar6 = (float10)FUN_0042adf0(0);
+        fVar6 = (float10)RoadNode_GetLaneSpeedCap(0);
         TrafficCar_Move(param_1,local_8,0,iVar4,0x41c4b127,(float)fVar6,uVar8);
         return 1;
       }
@@ -8344,7 +8344,7 @@ bool PickTravelSide(void)
   float10 fVar1;
   undefined4 local_8;
   
-  fVar1 = (float10)FUN_004216f0(0x3f800000);
+  fVar1 = (float10)Random_NextFloat(0x3f800000);
   if ((float10)_TrafficSameSideProb <= fVar1) {
     if (DAT_0078a2fc == 0) {
       local_8 = 1;
@@ -8594,7 +8594,7 @@ float10 Teleporter_Spacing(undefined4 param_1)
   if ((iVar2 != 0) && (cVar1 = Teleporter_SlowCarNear(param_1), cVar1 == '\0')) {
     fVar3 = (float10)Zone_SpacingMin(iVar2,DAT_0078a300);
     fVar4 = (float10)Zone_SpacingMax(iVar2,DAT_0078a300);
-    fVar4 = (float10)FUN_004216f0((float)(fVar4 - (float10)(float)fVar3));
+    fVar4 = (float10)Random_NextFloat((float)(fVar4 - (float10)(float)fVar3));
     local_8 = (float)(fVar4 + (float10)(float)fVar3);
   }
   return (float10)local_8;
@@ -8911,9 +8911,9 @@ void __fastcall FUN_0059b9c0(undefined4 param_1)
   void *_Memory;
   
   while( true ) {
-    iVar1 = FUN_00401bd0(param_1);
+    iVar1 = bList__IsEmpty(param_1);
     if (iVar1 != 0) break;
-    _Memory = (void *)FUN_00401be0();
+    _Memory = (void *)bList__RemoveHead();
     _free(_Memory);
   }
   EAXMod__NopArg1__ret_4_stub_shared_by__200_slots_(param_1);
@@ -9447,7 +9447,8 @@ int FUN_0059c1b0(void)
   int unaff_ESI;
   
   if (((DAT_0078a344 != '\0') || (DAT_007361a8 != 0)) &&
-     (iVar1 = FUN_00456e90(*(undefined4 *)(unaff_ESI + 4),DAT_0078a2fc,0xff,0xff), iVar1 != -1)) {
+     (iVar1 = GetNearestTrafficLane(*(undefined4 *)(unaff_ESI + 4),DAT_0078a2fc,0xff,0xff),
+     iVar1 != -1)) {
     return iVar1;
   }
   iVar1 = *(int *)(*(int *)(unaff_ESI + 4) + 0x10);

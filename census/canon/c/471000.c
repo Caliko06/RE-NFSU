@@ -75,8 +75,8 @@ float10 FUN_00471de0(void)
   float fStack_110;
   float fStack_f8;
   
-  FUN_004665e0();
-  FUN_004665e0();
+  Struct_ClearHeader();
+  Struct_ClearHeader();
   if (*(int *)(unaff_EDI + 0x138) == 0) {
     iVar3 = (**(code **)(*(int *)(unaff_EDI + 0x244) + 0xc))
                       (*(int *)(unaff_EDI + 0x244),0,local_150);
@@ -505,7 +505,7 @@ void FUN_00472830(undefined4 param_1,undefined4 param_2,undefined4 *param_3)
   *(undefined1 *)(unaff_ESI + 0x240) = 1;
 LAB_0047288d:
   if (*(char *)(unaff_ESI + 0x240) != '\0') {
-    FUN_00401cd0();
+    bMatrixCopy_b();
     bMatrixCopy();
     fVar1 = unaff_EDI[1];
     fVar2 = unaff_EDI[2];
@@ -513,7 +513,7 @@ LAB_0047288d:
     *(float *)(unaff_ESI + 0x174) = fVar1;
     *(float *)(unaff_ESI + 0x178) = fVar2;
     *(undefined4 *)(unaff_ESI + 0x17c) = 0x3f800000;
-    FUN_00401cd0();
+    bMatrixCopy_b();
     bMatrixCopy();
     uVar3 = param_3[1];
     uVar4 = param_3[2];
@@ -813,7 +813,7 @@ void FUN_00472cf0(int param_1,int param_2)
   else {
     piVar5 = piVar4 + 4;
     *piVar4 = iVar7;
-    eh_vector_constructor_iterator(piVar5,0x30,iVar7,FUN_004665e0,NullUpdate_ret);
+    eh_vector_constructor_iterator(piVar5,0x30,iVar7,Struct_ClearHeader,NullUpdate_ret);
   }
   *(int **)(param_1 + 0x54) = piVar5;
   pvVar6 = _malloc((int)*(short *)(param_1 + 0x3c) << 1);
@@ -986,7 +986,7 @@ int FUN_00472f30(int param_1,undefined4 param_2,int param_3,undefined4 param_4,u
   float fStack_24;
   undefined1 local_20 [28];
   
-  FUN_00445720();
+  bList__bList();
   uVar3 = (ulonglong)DAT_006f227c;
   uVar8 = DAT_006f227c ^ 0x1d872b41;
   uVar5 = uVar8 >> 5 ^ uVar8;
@@ -1183,7 +1183,8 @@ void FUN_00473410(void)
   *(undefined4 *)(unaff_ESI + 0xc) = 0;
   *(undefined4 *)(unaff_ESI + 0x10) = 0;
   *(undefined4 *)(unaff_ESI + 0x14) = 0;
-  eh_vector_constructor_iterator((void *)(unaff_ESI + 0x20),0x30,9,FUN_004665e0,NullUpdate_ret);
+  eh_vector_constructor_iterator
+            ((void *)(unaff_ESI + 0x20),0x30,9,Struct_ClearHeader,NullUpdate_ret);
   *(undefined4 *)(unaff_ESI + 0x14) = 0;
   *(undefined4 *)(unaff_ESI + 0x1d4) = 0;
   *(undefined1 *)(unaff_ESI + 0x1d0) = 0;
@@ -1611,7 +1612,7 @@ void FUN_00473ea0(void)
   undefined4 *unaff_EDI;
   
   FUN_00472a90();
-  FUN_004665e0();
+  Struct_ClearHeader();
   *(code **)(unaff_ESI + 8) = FUN_00473f20;
   *(code **)(unaff_ESI + 0xc) = FUN_00473ef0;
   uVar1 = unaff_EDI[1];
@@ -2247,7 +2248,7 @@ void FUN_00474730(float param_1)
     *(undefined4 *)(iVar7 + 0x20) = *(undefined4 *)(iVar12 + 0x20);
     *(undefined4 *)(iVar7 + 0x24) = uVar10;
     *(undefined4 *)(iVar7 + 0x28) = uVar2;
-    FUN_00401cd0();
+    bMatrixCopy_b();
     FUN_00465390();
     iVar12 = *(int *)(unaff_EBX + 0x20);
     uVar10 = *(undefined4 *)(iVar12 + 0xa4);
@@ -4408,7 +4409,7 @@ LAB_00477d56:
         _DAT_00779ae4 = *(float *)(iVar13 + 0x24);
         _DAT_00779ae8 = *(float *)(iVar13 + 0x28);
         DAT_00779ae0 = *(float *)(iVar13 + 0x20);
-        FUN_00401cd0();
+        bMatrixCopy_b();
       }
       _DAT_006f0738 = param_2 / fVar5;
       QueryPerformanceCounter(&LStack_20);
@@ -4829,7 +4830,7 @@ void FUN_004789d0(float param_1)
   *(undefined4 *)(iVar9 + 0x24) = *(undefined4 *)(iVar10 + 0x24);
   *(undefined4 *)(iVar9 + 0x20) = uVar7;
   *(undefined4 *)(iVar9 + 0x28) = uVar1;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   FUN_00465390();
   iVar10 = *(int *)(in_EAX + 0x20);
   uVar7 = *(undefined4 *)(iVar10 + 0xa0);
@@ -5225,7 +5226,7 @@ void FUN_00479350(void)
     uVar6 = 2;
   }
   if (0.0 < local_2c * fVar2) {
-    FUN_00454f30(local_24,ABS(local_2c));
+    Curve_Evaluate(local_24,ABS(local_2c));
     iVar1 = *(int *)(unaff_EDI + 0x5c);
     fVar4 = *(float *)(&DAT_006f0fc0 + (uVar6 * 0x1b + DAT_0078a3fc) * 4) * local_24[0] * fVar2;
     local_1c = *(float *)(iVar1 + 0xb4) * fVar4;
@@ -5274,7 +5275,7 @@ void FUN_00479510(void)
   }
   fVar2 = *(float *)(*(int *)(unaff_EDI + 0x58) + 0x98);
   if (0.0 < local_2c * fVar2) {
-    FUN_00454f30(local_24,ABS(local_2c));
+    Curve_Evaluate(local_24,ABS(local_2c));
     iVar1 = *(int *)(unaff_EDI + 0x5c);
     fVar4 = local_24[0] * -25.0 * fVar2;
     local_1c = *(float *)(iVar1 + 0xb4) * fVar4;
@@ -5318,7 +5319,7 @@ void FUN_00479640(float param_1)
   iVar2 = *(int *)((int)param_1 + 0x5c);
   iVar3 = *(int *)(iVar2 + 0x24);
   if ((((iVar3 != 1) && (iVar3 != 2)) && (iVar3 != 3)) ||
-     ((cVar9 = FUN_004280a0(), cVar9 != '\0' ||
+     ((cVar9 = Car__IsResetGraceActive(), cVar9 != '\0' ||
       (param_1 = 1.4013e-45, *(float *)(iVar2 + 0x3d0) <= 0.0)))) {
     param_1 = 0.0;
   }
@@ -5405,7 +5406,7 @@ void FUN_00479640(float param_1)
           local_c = fVar4;
         }
         if (_K_HALF < local_c) {
-          FUN_00454f30(&param_1,local_c);
+          Curve_Evaluate(&param_1,local_c);
           *(float *)(iVar2 + 0x3d0) = (_K_ONE / fVar1) * param_1;
           param_1 = (float)(uVar11 & 1);
           uVar10 = _ftol_nocw();
@@ -5605,7 +5606,7 @@ void FUN_00479e20(float param_1)
       if (*(float *)(iVar2 + 0x2a0) + 0.1 < local_8) {
         local_8 = *(float *)(iVar2 + 0x2a0);
         *(undefined4 *)(*(int *)(unaff_EDI + 0x58) + 0x3b8) = 0;
-        FUN_00465530();
+        CarState__StopTimer();
       }
       fVar3 = *(float *)(*(int *)(unaff_EDI + 0x5c) + 0x3d0);
       fVar10 = (float10)RideInfo__GetTheoreticalTopSpeed();
@@ -5852,16 +5853,16 @@ void FUN_0047a090(int param_1,undefined4 param_2)
       }
       FUN_00584610(_DAT_0078f104 * 0.44702727 - *(float *)(*(int *)(param_1 + 0x5c) + 0x3d4),param_2
                    ,0,0);
-      fVar14 = (float10)FUN_00401c80(DAT_0078f17c,-DAT_00700524,DAT_00700524);
+      fVar14 = (float10)bClampF(DAT_0078f17c,-DAT_00700524,DAT_00700524);
       fVar15 = (float10)FUN_0045db00();
       fVar16 = (float10)_DAT_0078f19c;
       fVar17 = (float10)FUN_00583ea0(ABS(*(float *)(*(int *)(param_1 + 0x5c) + 0x3d4)));
       iVar8 = *(int *)(param_1 + 4);
-      fVar14 = (float10)FUN_00401c80((float)(fVar16 * (float10)0.1 +
-                                            (fVar15 + (float10)(float)fVar14) * (float10)0.02),
-                                     -(float)fVar17,(float)fVar17,-_DAT_007003f8,0x3f800000);
-      fVar14 = (float10)FUN_00401c80((float)(((float10)_DAT_0078f118 -
-                                             (float10)*(float *)(iVar8 + 0x1e4)) + fVar14));
+      fVar14 = (float10)bClampF((float)(fVar16 * (float10)0.1 +
+                                       (fVar15 + (float10)(float)fVar14) * (float10)0.02),
+                                -(float)fVar17,(float)fVar17,-_DAT_007003f8,0x3f800000);
+      fVar14 = (float10)bClampF((float)(((float10)_DAT_0078f118 - (float10)*(float *)(iVar8 + 0x1e4)
+                                        ) + fVar14));
       if (fVar14 <= (float10)0.0) {
         fVar14 = (float10)0.0;
       }
@@ -5961,7 +5962,7 @@ undefined4 __fastcall FUN_0047aa40(undefined4 param_1,int param_2,int param_3,in
     if (((fVar1 <= 0.7) && (fVar2 <= 0.7)) &&
        (((ABS(*(float *)(param_2 + 0x38)) <= 0.15 && (ABS(*(float *)(param_2 + 0x48)) <= 0.15)) ||
         (*(int *)(param_3 + 0x3cc) < 1)))) {
-      cVar4 = FUN_004280a0();
+      cVar4 = Car__IsResetGraceActive();
       if (cVar4 == '\0') {
         iVar5 = FUN_0042aa70();
         if ((iVar5 != 0) || (param_4 == 2)) {
@@ -6112,18 +6113,22 @@ undefined4 __fastcall FUN_0047ae80(int param_1)
 }
 
 
-// ==== 0x47ae90 FUN_0047ae90
+// ==== 0x47ae90 CAnimBank::GetAnimByIndex
 
-undefined4 __thiscall FUN_0047ae90(int param_1,int param_2)
+/* [canon] assets med (ghidra-canon+nfsug) docs/re/assets.md */
+
+undefined4 __thiscall CAnimBank__GetAnimByIndex(int param_1,int param_2)
 
 {
   return *(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0xc) + param_2 * 4);
 }
 
 
-// ==== 0x47aea0 FUN_0047aea0
+// ==== 0x47aea0 CAnimBank::GetAnimByIndex_Table2
 
-undefined4 __thiscall FUN_0047aea0(int param_1,int param_2)
+/* [canon] assets low (ghidra-canon+nfsug) docs/re/assets.md */
+
+undefined4 __thiscall CAnimBank__GetAnimByIndex_Table2(int param_1,int param_2)
 
 {
   return *(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x10) + param_2 * 4);
@@ -6166,9 +6171,12 @@ undefined4 __fastcall FUN_0047aef0(int param_1)
 }
 
 
-// ==== 0x47af00 FUN_0047af00
+// ==== 0x47af00 CAnimBank_Loader::scalar_deleting_destructor
 
-undefined4 * __thiscall FUN_0047af00(undefined4 *param_1,byte param_2)
+/* [canon] assets med (ghidra-canon+nfsug) docs/re/assets.md */
+
+undefined4 * __thiscall
+CAnimBank_Loader__scalar_deleting_destructor(undefined4 *param_1,byte param_2)
 
 {
   *param_1 = &PTR_FUN_006c82f8;
@@ -6253,9 +6261,11 @@ void FUN_0047afc0(void)
 }
 
 
-// ==== 0x47b020 FUN_0047b020
+// ==== 0x47b020 EAGLAnim::Pool_Free
 
-void FUN_0047b020(undefined4 param_1)
+/* [canon] assets med (ghidra-canon+nfsug) docs/re/assets.md */
+
+void EAGLAnim__Pool_Free(undefined4 param_1)
 
 {
   (**(code **)(*DAT_0070d364 + 0x2c))(param_1);
@@ -6263,9 +6273,11 @@ void FUN_0047b020(undefined4 param_1)
 }
 
 
-// ==== 0x47b040 FUN_0047b040
+// ==== 0x47b040 CAnimCtrl::InitFields
 
-void FUN_0047b040(void)
+/* [canon] assets med (ghidra-canon+nfsug) docs/re/assets.md */
+
+void CAnimCtrl__InitFields(void)
 
 {
   int in_EAX;
@@ -6443,11 +6455,12 @@ undefined4 __fastcall FUN_0047b220(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x47b290 FUN_0047b290
+// ==== 0x47b290 CAnimCtrl::AdvanceAnimTime
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] assets high (ghidra-canon+nfsug) docs/re/assets.md */
 
-undefined4 __thiscall FUN_0047b290(int param_1,float param_2)
+undefined4 __thiscall CAnimCtrl__AdvanceAnimTime(int param_1,float param_2)
 
 {
   uint uVar1;
@@ -6630,7 +6643,7 @@ void FUN_0047b500(undefined4 param_1)
     (**(code **)(**(int **)(in_EAX + 0x38) + 0x18))(param_1,uVar2,0);
   }
   FUN_00628b30(uVar2,uVar1,0);
-  FUN_00401cd0();
+  bMatrixCopy_b();
   return;
 }
 
@@ -6740,9 +6753,11 @@ void FUN_0047b6d0(void)
 }
 
 
-// ==== 0x47b730 FUN_0047b730
+// ==== 0x47b730 PostRaceScene_ShuffleList
 
-void FUN_0047b730(int param_1,int param_2)
+/* [canon] assets high (ghidra-canon+nfsug) docs/re/assets.md */
+
+void PostRaceScene_ShuffleList(int param_1,int param_2)
 
 {
   int iVar1;
@@ -7170,8 +7185,8 @@ void FUN_0047bb10(int param_1,undefined4 param_2)
               }
             }
             bVar3 = false;
-            FUN_0047b730(DAT_00735f64,iVar10);
-            FUN_0047b730(iVar11,iVar9);
+            PostRaceScene_ShuffleList(DAT_00735f64,iVar10);
+            PostRaceScene_ShuffleList(iVar11,iVar9);
             piVar1 = (int *)(iVar11 + iVar10 * 4);
             iVar6 = 0;
             do {
@@ -7214,7 +7229,7 @@ void FUN_0047bb10(int param_1,undefined4 param_2)
     else if (((*(int *)(DAT_007361b4 + 4) != 0) &&
              (iVar11 = *(int *)(*(int *)(DAT_007361b4 + 4) + 0x14), iVar11 != 0)) &&
             ((cVar4 = *(char *)(iVar11 + 3), '\0' < cVar4 && (cVar4 < '\x05')))) {
-      cVar5 = FUN_0041f600();
+      cVar5 = IsDriftMode();
       iVar11 = *(int *)(param_1 + 0x14);
       if (cVar5 == '\0') {
         if ((-1 < iVar11) && (iVar11 < 2)) {
@@ -7342,7 +7357,7 @@ undefined4 FUN_0047c020(int param_1)
           puVar5 = (undefined4 *)0x0;
         }
         else {
-          puVar5 = (undefined4 *)FUN_0047b040();
+          puVar5 = (undefined4 *)CAnimCtrl__InitFields();
         }
         uVar2 = DAT_007797c4;
         puVar5[2] = uVar1;
@@ -7532,7 +7547,7 @@ undefined4 FUN_0047c310(int param_1)
             pvVar2 = (void *)0x0;
           }
           else {
-            pvVar2 = (void *)FUN_0047b040();
+            pvVar2 = (void *)CAnimCtrl__InitFields();
           }
           *(uint *)((int)pvVar2 + 0x34) = *(uint *)((int)pvVar2 + 0x34) | 0x20;
           *(int *)((int)pvVar2 + 8) = iVar1;
@@ -7552,7 +7567,7 @@ undefined4 FUN_0047c310(int param_1)
           local_18 = local_18 + 1;
         } while (local_18 < 2);
         if (*local_1c != 0) {
-          FUN_0047b290(0x3f800000);
+          CAnimCtrl__AdvanceAnimTime(0x3f800000);
         }
       }
       local_14 = local_14 + 1;
@@ -7672,7 +7687,7 @@ void FUN_0047c580(int param_1,float param_2)
         if (fVar7 * *(float *)(iVar6 + 100) * *(float *)(iVar6 + 0x5c) + param_2 <=
             fVar7 * *(float *)(iVar6 + 0x60) * *(float *)(iVar6 + 0x5c)) {
           fStack_f4 = param_2;
-          FUN_0047b290();
+          CAnimCtrl__AdvanceAnimTime();
           fStack_f4 = 6.591446e-39;
           FUN_0047b3d0();
         }
@@ -7683,7 +7698,7 @@ void FUN_0047c580(int param_1,float param_2)
         }
         if (fVar7 * fVar3 * fVar4 + param_2 <= fVar7 * fVar1 * fVar2) {
           fStack_f4 = param_2;
-          FUN_0047b290();
+          CAnimCtrl__AdvanceAnimTime();
         }
         else {
           *(undefined4 *)(iVar9 + 100) = *(undefined4 *)(iVar9 + 0x60);
@@ -7691,7 +7706,7 @@ void FUN_0047c580(int param_1,float param_2)
         fStack_f4 = 6.591508e-39;
         FUN_0047b3d0();
         fStack_f4 = 6.591529e-39;
-        FUN_00401cd0();
+        bMatrixCopy_b();
         fStack_f4 = (float)(param_1 + 0x60);
         D3DXMatrixMultiply(&local_b0,&local_b0);
         D3DXMatrixMultiply();
@@ -7710,7 +7725,7 @@ void FUN_0047c580(int param_1,float param_2)
         (**(code **)(**(int **)(iVar6 + 0x2c) + 0x2c))(1);
         (**(code **)(**(int **)(iVar6 + 0x2c) + 0x30))();
         *(undefined4 *)(iVar6 + 0x884) = 0;
-        FUN_00401cd0();
+        bMatrixCopy_b();
         uVar15 = param_1 + 0x60;
         puVar13 = auStack_6c;
         D3DXMatrixMultiply();
@@ -7957,15 +7972,15 @@ void FUN_0047cb50(int param_1)
     FUN_0040bbc0();
     FUN_00565020();
     if (*(int *)(*(int *)(param_1 + 0x10) + 0x60) == 0) {
-      FUN_00401c10(0x42b40000);
+      bDegreesToAngle16(0x42b40000);
     }
     else {
-      FUN_00401c10(0x42b40000);
+      bDegreesToAngle16(0x42b40000);
     }
     FUN_0040baf0(auStack_350,auStack_350);
-    FUN_00401cd0();
+    bMatrixCopy_b();
     D3DXMatrixMultiply(local_358,auStack_350,(undefined4 *)(param_1 + 0xa0));
-    FUN_00440710();
+    RefArray_DecrementAll();
   }
   ExceptionList = local_1c;
   return;
@@ -8255,7 +8270,7 @@ void Camera__SetCameraMatrix(undefined4 *param_1,undefined4 param_2,undefined4 p
       local_58[0] = local_58[0] * 0.01;
       local_58[1] = 1.0;
     }
-    FUN_00401cd0();
+    bMatrixCopy_b();
     D3DXMatrixTranspose(local_50,param_1);
     pfVar1 = (float *)(param_1 + 0x10);
     uStack_4c = 0;
@@ -8364,7 +8379,7 @@ void FUN_0047d630(void)
   char local_67 [99];
   
   if (DAT_00734958 == 0) {
-    FUN_00401cd0(&DAT_00779730,0);
+    bMatrixCopy_b(&DAT_00779730,0);
     if (*unaff_ESI != '\0') {
       pcVar2 = &local_68;
       do {
@@ -8657,7 +8672,7 @@ void FUN_0047dc40(undefined4 param_1)
   else {
     piVar2 = (int *)(DAT_007796fc + -4);
   }
-  piVar1 = (int *)FUN_0040cb70();
+  piVar1 = (int *)Ptr_BaseAdjustMinus4();
   while (piVar2 != piVar1) {
     if (piVar2[4] == 0) {
       (**(code **)(*piVar2 + 4))(param_1);
@@ -8687,7 +8702,7 @@ void FUN_0047dc90(void)
   else {
     iVar2 = DAT_007796fc + -4;
   }
-  iVar1 = FUN_0040cb70();
+  iVar1 = Ptr_BaseAdjustMinus4();
   while (iVar2 != iVar1) {
     *(undefined4 *)(iVar2 + 0x18) = 1;
     if (*(int *)(iVar2 + 4) == 0) {
@@ -9168,7 +9183,7 @@ void __fastcall FUN_0047e300(int param_1)
     *(undefined4 *)(param_1 + 0x30) = 0;
     TrackPath__UpdateCursor(&DAT_007372b0,&DAT_00737280);
     uVar8 = Atan2ToAngle16(0x3f800000,0);
-    fVar17 = (float10)FUN_00428100(uVar8);
+    fVar17 = (float10)Car_GetLaneSpeedCapFraction(uVar8);
     FUN_00427c50(&DAT_00737280,(float)fVar17,uVar8);
     TrackPath__UpdateCursor(&DAT_007372b0,iVar1 + 0x60);
     (**(code **)(**(int **)(iVar1 + 0x2c) + 0x2c))(1);
@@ -9665,7 +9680,7 @@ void __fastcall FUN_0047ee50(int param_1)
   undefined1 local_c4 [32];
   undefined1 auStack_a4 [164];
   
-  iVar1 = FUN_00434d10();
+  iVar1 = TimedMessage__GetPhase();
   if (iVar1 != *(int *)(param_1 + 0x20)) {
     if (*(undefined4 **)(param_1 + 0xc) != (undefined4 *)0x0) {
       (**(code **)**(undefined4 **)(param_1 + 0xc))(1);
@@ -11514,7 +11529,7 @@ void FUN_00480ff0(int param_1)
   local_c8 = local_a8 + local_98;
   if (*(char *)(*(int *)(param_1 + 0xcb4) * 0x4c + 0xd4 + param_1) != '\0') {
     FUN_00424ba0();
-    FUN_0040bc10();
+    Matrix_InvertRigid();
     D3DXVec3Transform(&local_d0,&local_d0,local_50);
     iVar1 = local_d8;
   }

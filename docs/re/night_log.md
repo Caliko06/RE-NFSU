@@ -93,3 +93,4 @@ Open: see each doc's Open list (traffic: writer of [ebx+0x59d4], Free Run x1.5, 
 12:01 heartbeat: account 5 5h window reset (session 0%, week 97%); the three agents (render, gameflow, unknown bucket) died on 429 at ~11:25 with no output and were resumed. Relay hook ignored again (no Ghostty; session is at 0%). scoreboard.py now reads census/systems_override.tsv.
 12:15 unknown bucket (601 hand-read, census/systems_override.tsv, names_misc 67) and render (84 names, docs/re/render.md) verified and merged: names.tsv 1,649; scoreboard named 1,464 (1,094 V), tagged 6,160; verify_re --quick ALL PASS. Gameflow worker still running.
 12:25 gameflow done and merged (163 names, 123 V; state handlers 1..8 at [0x77a920] re-checked with capstone; docs/re/gameflow.md). Next: classify remaining unknown, close Open items.
+13:12 canon wave round 1 (canon-sonnet): render/runtime/canon 60 rows each; named 1,464 -> 1,644; 106 apply failures (mid-function .part_ addresses in queue)

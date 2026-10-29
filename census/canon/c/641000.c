@@ -2674,13 +2674,13 @@ FUN_00644b88(undefined4 *param_1,undefined4 param_2,undefined4 param_3,undefined
     param_1[0xd] = uVar3;
     NullUpdate_ret(param_1[0xd],0x98,0x34);
     NullUpdate_ret(param_1[0xc],0x98,0x34);
-    FUN_004127a0(param_1[0xc],1,0xff,0x4d,1);
-    FUN_004127a0(param_1[0xc],3,0,0,0xfffffffe);
+    StrmDef_SetEntry(param_1[0xc],1,0xff,0x4d,1);
+    StrmDef_SetEntry(param_1[0xc],3,0,0,0xfffffffe);
     if (param_1[7] == 0) {
-      FUN_004127a0(param_1[0xc],2,0xffff,0x4353,2);
+      StrmDef_SetEntry(param_1[0xc],2,0xffff,0x4353,2);
     }
     else {
-      FUN_004127a0(param_1[0xc],2,0xffff,0x4353,0xffffffff);
+      StrmDef_SetEntry(param_1[0xc],2,0xffff,0x4353,0xffffffff);
     }
     if (param_1[6] == 1) {
       uVar3 = FUN_006836a0(param_2,DAT_00712028);
@@ -2727,15 +2727,15 @@ FUN_00644b88(undefined4 *param_1,undefined4 param_2,undefined4 param_3,undefined
     param_1[0xd] = uVar3;
     NullUpdate_ret(param_1[0xd],0x98,0x34);
     NullUpdate_ret(param_1[0xc],0x98,0x34);
-    FUN_004127a0(param_1[0xc],1,0xff,0x4d,1);
-    FUN_004127a0(param_1[0xc],2,0,0,0xfffffffe);
+    StrmDef_SetEntry(param_1[0xc],1,0xff,0x4d,1);
+    StrmDef_SetEntry(param_1[0xc],2,0,0,0xfffffffe);
     if (param_1[7] == 0) {
-      FUN_004127a0(param_1[0xd],1,0xffff,0x4353,1);
+      StrmDef_SetEntry(param_1[0xd],1,0xffff,0x4353,1);
     }
     else {
-      FUN_004127a0(param_1[0xd],1,0xffff,0x4353,0xffffffff);
+      StrmDef_SetEntry(param_1[0xd],1,0xffff,0x4353,0xffffffff);
     }
-    FUN_004127a0(param_1[0xd],2,0,0,0xfffffffe);
+    StrmDef_SetEntry(param_1[0xd],2,0,0,0xfffffffe);
     if (param_1[6] == 1) {
       uVar3 = FUN_006836a0(param_6,DAT_00712028);
       param_1[0xb] = uVar3;

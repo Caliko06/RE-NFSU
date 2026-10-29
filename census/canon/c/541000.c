@@ -820,9 +820,9 @@ void __fastcall FUN_00542940(undefined4 param_1)
   int unaff_ESI;
   int unaff_EDI;
   
-  FUN_00401cd0(param_1);
-  FUN_00401cd0();
-  FUN_00401cd0();
+  bMatrixCopy_b(param_1);
+  bMatrixCopy_b();
+  bMatrixCopy_b();
   uVar1 = *(undefined4 *)(unaff_EDI + 200);
   uVar2 = *(undefined4 *)(unaff_EDI + 0xcc);
   uVar3 = *(undefined4 *)(unaff_EDI + 0xc0);
@@ -834,7 +834,7 @@ void __fastcall FUN_00542940(undefined4 param_1)
   *(undefined4 *)(unaff_ESI + 0xd4) = *(undefined4 *)(unaff_EDI + 0xd4);
   *(undefined4 *)(unaff_ESI + 0xd8) = *(undefined4 *)(unaff_EDI + 0xd8);
   *(undefined4 *)(unaff_ESI + 0xdc) = *(undefined4 *)(unaff_EDI + 0xdc);
-  FUN_00401cd0(uVar2);
+  bMatrixCopy_b(uVar2);
   uVar1 = *(undefined4 *)(unaff_EDI + 0x128);
   uVar2 = *(undefined4 *)(unaff_EDI + 300);
   uVar3 = *(undefined4 *)(unaff_EDI + 0x120);
@@ -1567,13 +1567,13 @@ undefined4 CarRender_LitBodyPathA(float *param_1,int param_2,int param_3,float *
       fStack_4d4 = param_4[2];
       uStack_4c8 = *(undefined4 *)(param_2 + 0x34);
       uStack_4c4 = *(undefined4 *)(param_2 + 0x38);
-      FUN_0040b780(&stack0xfffffa54);
+      Matrix4_BuildLookAt(&stack0xfffffa54);
       FUN_0040be40();
       puVar14 = (undefined4 *)(puStack_594 + 0x14);
       iVar16 = 0;
     }
     else {
-      FUN_00401cd0();
+      bMatrixCopy_b();
       puVar14 = (undefined4 *)(puStack_594 + 0x14);
       iVar16 = 0;
     }
@@ -1938,7 +1938,7 @@ FUN_005447c0(int param_1,int param_2,undefined4 param_3,int param_4,int param_5,
         else {
           *(undefined4 *)(param_2 + 0x1c) = 0x461c3c00;
         }
-        FUN_00440710();
+        RefArray_DecrementAll();
       }
     }
     else {
@@ -2206,7 +2206,7 @@ void FUN_005450c0(void)
     piVar2 = (int *)_Memory[1];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_004ad8a0();
+    IList_FreeNodes_Member2C();
     _free(_Memory);
     _Memory = (int *)*unaff_EDI;
   }
@@ -4131,7 +4131,7 @@ void FUN_00547020(int param_1)
     FUN_00438980(&DAT_007402b0);
     FUN_005488d0(0x20);
     uVar1 = *puVar4;
-    iVar3 = FUN_0043b850(uVar1);
+    iVar3 = Race__GetPlayer(uVar1);
     if ((iVar3 != 0) && (*(float *)(iVar3 + 0x1a4) < 0.0)) {
       *(undefined4 *)(iVar3 + 0x1a4) = 0;
       FUN_0043d2d0(uVar1,in_EAX,0);
@@ -4346,7 +4346,7 @@ void FUN_00547450(undefined4 param_1,undefined4 param_2)
   undefined1 local_40c [1036];
   
   if (DAT_007361f8 != 0) {
-    cVar2 = FUN_00438a80(DAT_006f3da0);
+    cVar2 = Race__HasPlayer(DAT_006f3da0);
     if (cVar2 != '\0') {
       FUN_004392a0();
       FUN_004389b0(4);
@@ -4767,7 +4767,7 @@ void FUN_00547c60(void)
      ((0 < DAT_006f3d8c &&
       (fVar1 = (float)(DAT_0073ad3c - _DAT_00740294) * 0.00025,
       _K_ONE / (float)DAT_006f3d8c < fVar1 != (_K_ONE / (float)DAT_006f3d8c == fVar1))))) {
-    cVar3 = FUN_00438a80(DAT_006f3d94);
+    cVar3 = Race__HasPlayer(DAT_006f3d94);
     if (cVar3 != '\0') {
       FUN_004392a0();
       FUN_004389b0(2);
@@ -4930,7 +4930,7 @@ void FUN_00548000(undefined4 param_1)
   if (DAT_007361f8 != 0) {
     iVar1 = FUN_00438980(&DAT_007402b0);
     FUN_005488d0(0x20);
-    iVar2 = FUN_0043b850(iVar1);
+    iVar2 = Race__GetPlayer(iVar1);
     if ((iVar2 != 0) && (*(float *)(iVar2 + 0x1a4) < 0.0)) {
       *(undefined4 *)(iVar2 + 0x1a4) = 0;
       FUN_0043d2d0(iVar1,in_EAX,param_1);
@@ -6838,7 +6838,7 @@ undefined4 FUN_00549ed0(undefined4 param_1,undefined4 param_2)
         local_50d = cVar2 - 0x37;
       }
     }
-    cVar2 = FUN_00438ae0();
+    cVar2 = GetNetModeCode();
     if ((byte)(local_50d + cVar5) == cVar2) {
       pcVar3 = (char *)(unaff_ESI + 0xfa);
       do {
@@ -7159,7 +7159,7 @@ FUN_0054a370(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4
     local_200[0] = 0;
     iVar2 = RaceOptions_Get();
     uVar6 = 0;
-    cVar1 = FUN_00438a60();
+    cVar1 = Obj_GetByte19();
     if (cVar1 != '\0') {
       uVar6 = 0x40000;
     }
@@ -7460,7 +7460,7 @@ void FUN_0054aa70(void)
     RideInfo__Init();
     cFrontendDatabase__BuildRideForCarHandle(local_730);
     FUN_0043cb60(local_730,local_b40,1);
-    FUN_00438ae0();
+    GetNetModeCode();
     uVar1 = FUN_00549580();
     FUN_00565da0(uVar1);
     uVar1 = FUN_004388d0(local_dbe,0xfe,1);
@@ -7583,14 +7583,14 @@ void __fastcall FUN_0054ad50(undefined4 param_1,undefined4 param_2,undefined4 pa
     *(undefined4 *)(in_EAX + 0x544) = param_3;
     local_200[0] = 0;
     FUN_00667950(local_200,0x200,&DAT_006bd3c4,param_2);
-    iVar1 = FUN_00449e20();
+    iVar1 = GetCountryCode();
     if (iVar1 != 0) {
-      uVar2 = FUN_00449e20();
+      uVar2 = GetCountryCode();
       FUN_00667950(local_200,0x200,&DAT_006bd380,uVar2);
     }
-    iVar1 = FUN_00449d80();
+    iVar1 = GetLanguageCode();
     if (iVar1 != 0) {
-      uVar2 = FUN_00449d80();
+      uVar2 = GetLanguageCode();
       FUN_00667950(local_200,0x200,&DAT_006bd378,uVar2);
     }
     if (DAT_0073d8d0 != 0) {
@@ -7687,7 +7687,7 @@ void __thiscall FUN_0054af80(int param_1,undefined4 param_2)
     *(int *)(in_EAX + 0x38) = param_1;
     *(undefined4 *)(in_EAX + 0x3c) = param_2;
     uVar5 = 0;
-    iVar3 = FUN_00449d80();
+    iVar3 = GetLanguageCode();
     pcVar4 = "EN";
     do {
       cVar1 = pcVar4[iVar3 + -0x6c9af0];
@@ -8370,7 +8370,7 @@ bool FUN_0054bc50(undefined4 param_1,undefined4 param_2,int param_3)
       bVar3 = cVar4 - 0x37;
     }
   }
-  cVar4 = FUN_00438ae0();
+  cVar4 = GetNetModeCode();
   return (byte)(bVar3 + cVar2) == cVar4;
 }
 
@@ -9125,7 +9125,7 @@ void FUN_0054c9e0(undefined4 param_1,int param_2)
       if (iVar2 == 0) {
         _DAT_0073dda4 = DAT_0073dda0;
         DAT_0073dda0 = 0xf;
-        cVar1 = FUN_00438a60();
+        cVar1 = Obj_GetByte19();
         if (cVar1 == '\0') {
           FUN_00666f60(DAT_0073d8d8,0,0,FUN_0054ba10);
         }
@@ -9854,14 +9854,14 @@ FUN_0054d6b0(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4
   FUN_00667950(&local_408,0x400,&DAT_006bd1bc,&local_418);
   FUN_00667950(&local_408,0x400,&DAT_006bd1b4,&local_420);
   FUN_00667950(&local_408,0x400,&DAT_006bd1ac,&local_41c);
-  iVar2 = FUN_00449e20();
+  iVar2 = GetCountryCode();
   if (iVar2 != 0) {
-    uVar1 = FUN_00449e20();
+    uVar1 = GetCountryCode();
     FUN_00667950(&local_408,0x400,&DAT_006bd380,uVar1);
   }
-  iVar2 = FUN_00449d80();
+  iVar2 = GetLanguageCode();
   if (iVar2 != 0) {
-    uVar1 = FUN_00449d80();
+    uVar1 = GetLanguageCode();
     FUN_00667950(&local_408,0x400,&DAT_006bd378,uVar1);
   }
   if (param_6 != 0) {
@@ -9997,14 +9997,14 @@ void FUN_0054da90(undefined4 param_1,undefined4 param_2)
   *(undefined1 *)((int)puVar3 + 2) = 0;
   local_208 = 0;
   FUN_00667950(&local_208,0x200,&DAT_006bd3bc,param_1);
-  iVar2 = FUN_00449e20();
+  iVar2 = GetCountryCode();
   if (iVar2 != 0) {
-    uVar1 = FUN_00449e20();
+    uVar1 = GetCountryCode();
     FUN_00667950(&local_208,0x200,&DAT_006bd380,uVar1);
   }
-  iVar2 = FUN_00449d80();
+  iVar2 = GetLanguageCode();
   if (iVar2 != 0) {
-    uVar1 = FUN_00449d80();
+    uVar1 = GetLanguageCode();
     FUN_00667950(&local_208,0x200,&DAT_006bd378,uVar1);
   }
   FUN_00664e00(DAT_00734f80,0x6c6f7374,&local_208,FUN_0054dc50,0);
@@ -10033,14 +10033,14 @@ void FUN_0054db50(undefined4 param_1,undefined4 param_2)
   *(undefined1 *)((int)puVar3 + 2) = 0;
   local_208 = 0;
   FUN_00667950(&local_208,0x200,&DAT_006bd1c4,param_1);
-  iVar2 = FUN_00449e20();
+  iVar2 = GetCountryCode();
   if (iVar2 != 0) {
-    uVar1 = FUN_00449e20();
+    uVar1 = GetCountryCode();
     FUN_00667950(&local_208,0x200,&DAT_006bd380,uVar1);
   }
-  iVar2 = FUN_00449d80();
+  iVar2 = GetLanguageCode();
   if (iVar2 != 0) {
-    uVar1 = FUN_00449d80();
+    uVar1 = GetLanguageCode();
     FUN_00667950(&local_208,0x200,&DAT_006bd378,uVar1);
   }
   FUN_00664e00(DAT_00734f80,0x6c6f7374,&local_208,FUN_0054dc50,0);
@@ -10166,14 +10166,14 @@ void FUN_0054dd30(void)
   
   *unaff_EBX = 0;
   FUN_0054df00();
-  iVar2 = FUN_00449e20();
+  iVar2 = GetCountryCode();
   if (iVar2 != 0) {
-    FUN_00449e20();
+    GetCountryCode();
     FUN_00667950();
   }
-  iVar2 = FUN_00449d80();
+  iVar2 = GetLanguageCode();
   if (iVar2 != 0) {
-    FUN_00449d80();
+    GetLanguageCode();
     FUN_00667950();
   }
   switch(DAT_00734998) {
@@ -10202,7 +10202,7 @@ switchD_0054dda0_default:
   *(undefined1 *)((int)puVar3 + 2) = 0;
   FUN_00565da0(&DAT_006ca778,DAT_00734994);
   FUN_00667950();
-  uVar1 = FUN_00438ae0();
+  uVar1 = GetNetModeCode();
   FUN_00565da0(&DAT_006ca778,uVar1);
   FUN_00667950();
   return;
@@ -10223,14 +10223,14 @@ void FUN_0054de70(void)
   FUN_00667690();
   FUN_00662960();
   FUN_00667950();
-  iVar1 = FUN_00449e20();
+  iVar1 = GetCountryCode();
   if (iVar1 != 0) {
-    FUN_00449e20();
+    GetCountryCode();
     FUN_00667950();
   }
-  iVar1 = FUN_00449d80();
+  iVar1 = GetLanguageCode();
   if (iVar1 != 0) {
-    FUN_00449d80();
+    GetLanguageCode();
     FUN_00667950();
   }
   FUN_0054df00();
@@ -10288,7 +10288,7 @@ void FUN_0054df00(undefined4 param_1,undefined4 param_2)
   pcVar2[0] = '\0';
   pcVar2[1] = '\0';
   pcVar2[2] = '\0';
-  pcVar2 = (char *)FUN_00401b30();
+  pcVar2 = (char *)GetSkuString();
   cStack_1d0 = *pcVar2;
   if (*pcVar2 != '\0') {
     pcVar4 = &cStack_1d0;
@@ -11850,7 +11850,7 @@ void FUN_0054fd50(int param_1)
   bool bVar10;
   
   iVar3 = param_1;
-  cVar2 = FUN_00438a60();
+  cVar2 = Obj_GetByte19();
   if (cVar2 == '\0') {
     iVar4 = *(int *)(param_1 + 100);
     if (iVar4 != 0) {
@@ -11869,7 +11869,7 @@ void FUN_0054fd50(int param_1)
     iVar5 = 1;
     puVar9 = (undefined4 *)(iVar3 + 0x44);
     do {
-      iVar3 = FUN_0043b850(param_1);
+      iVar3 = Race__GetPlayer(param_1);
       if (iVar3 != 0) {
         FUN_00439130();
         if (iVar4 == iVar3) {
@@ -12235,7 +12235,7 @@ LAB_0055041a:
       FEObject__SetVisible();
     }
   }
-  if (((param_3 == '\0') || (unaff_EDI != 0)) || (cVar3 = FUN_00438a60(), cVar3 == '\0')) {
+  if (((param_3 == '\0') || (unaff_EDI != 0)) || (cVar3 = Obj_GetByte19(), cVar3 == '\0')) {
     cVar3 = '\0';
   }
   else {
@@ -12435,7 +12435,7 @@ void __fastcall FUN_00550730(undefined4 *param_1)
   undefined4 in_EAX;
   
   param_1[7] = in_EAX;
-  cVar2 = FUN_00438a60();
+  cVar2 = Obj_GetByte19();
   if ((cVar2 == '\0') || (bVar1 = true, param_1[7] == 1)) {
     bVar1 = false;
   }

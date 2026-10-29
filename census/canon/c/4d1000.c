@@ -3678,10 +3678,10 @@ LAB_004d5b42:
           ppuVar17 = (undefined **)&DAT_006ca778;
         }
         bSPrintf_regdst(0x20,ppuVar17,iVar16);
-        FUN_004174b0(piVar10,&local_2c);
-        FUN_004174b0(piVar10,(&PTR_s_Overseer_006f4d0c)[(&DAT_00758b58)[iVar13 * 2] * 4]);
-        FUN_004174b0(piVar10,(&PTR_s__Doomsday__006f4d08)[(&DAT_00758b58)[iVar13 * 2] * 4]);
-        FUN_004174b0(piVar10,(&PTR_s_Wreckage_006f4d10)[(&DAT_00758b58)[iVar13 * 2] * 4]);
+        StringList__AddEntry(piVar10,&local_2c);
+        StringList__AddEntry(piVar10,(&PTR_s_Overseer_006f4d0c)[(&DAT_00758b58)[iVar13 * 2] * 4]);
+        StringList__AddEntry(piVar10,(&PTR_s__Doomsday__006f4d08)[(&DAT_00758b58)[iVar13 * 2] * 4]);
+        StringList__AddEntry(piVar10,(&PTR_s_Wreckage_006f4d10)[(&DAT_00758b58)[iVar13 * 2] * 4]);
         piVar10[4] = (&DAT_00758b58)[iVar13 * 2];
         uVar4 = (&DAT_00758b5c)[iVar13 * 8];
         *(undefined1 *)(piVar10 + 5) = uVar4;
@@ -3707,7 +3707,7 @@ LAB_004d5b42:
           if (cVar5 == '\0') break;
           pcVar15 = pcVar15 + 1;
         } while (iVar11 != 0);
-        FUN_004174b0(piVar10,local_3c);
+        StringList__AddEntry(piVar10,local_3c);
         iVar13 = iVar16;
         if (0x19 < iVar16) {
           FUN_004f9240(puVar3);

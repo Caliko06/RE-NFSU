@@ -1774,10 +1774,10 @@ LAB_006338e1:
         goto LAB_006339d3;
       }
       if (*(int *)(param_1 + 0x20) != 0) {
-        FUN_0047b020(*(int *)(param_1 + 0x20));
+        EAGLAnim__Pool_Free(*(int *)(param_1 + 0x20));
       }
       if (*(int *)(param_1 + 0x24) != 0) {
-        FUN_0047b020(*(int *)(param_1 + 0x24));
+        EAGLAnim__Pool_Free(*(int *)(param_1 + 0x24));
       }
       uVar3 = (**(code **)(*DAT_0070d364 + 0x24))
                         (*(undefined4 *)(*(int *)(param_1 + 0x14) + local_8 * 4));

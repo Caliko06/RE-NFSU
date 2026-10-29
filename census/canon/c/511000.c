@@ -338,7 +338,7 @@ void BuildDecalList(int *param_1)
   uVar7 = 0;
 LAB_00511c37:
   if (uVar7 != 0) {
-    iVar4 = FUN_0040cb70();
+    iVar4 = Ptr_BaseAdjustMinus4();
     do {
       if (*param_1 == 0) {
         iVar8 = 0;
@@ -7151,7 +7151,7 @@ undefined4 FUN_0051b720(void)
   undefined4 uVar8;
   
   cVar2 = FUN_0043a2e0();
-  if ((cVar2 == '\0') || (cVar2 = FUN_00438a60(), cVar2 == '\0')) {
+  if ((cVar2 == '\0') || (cVar2 = Obj_GetByte19(), cVar2 == '\0')) {
     return 0;
   }
   FUN_00647b70();

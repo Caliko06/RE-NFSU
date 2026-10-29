@@ -650,14 +650,14 @@ void FUN_00562420(int param_1)
         if (((DAT_0073d8d0 == 0) || (DAT_0073d8a8 == 0)) ||
            (iVar5 = FUN_00666f30(DAT_0073d8a8,iVar5), iVar5 == 0)) {
           local_35 = 0;
-          FUN_004174b0(piVar4,&local_35);
-          FUN_004174b0(piVar4,&local_35);
-          FUN_004174b0(piVar4,&local_35);
+          StringList__AddEntry(piVar4,&local_35);
+          StringList__AddEntry(piVar4,&local_35);
+          StringList__AddEntry(piVar4,&local_35);
           puVar6 = &local_35;
         }
         else {
           FUN_006682f0(iVar5 + 0x28,local_2c,0xc,&DAT_006bc79c);
-          FUN_004174b0(piVar4,iVar5 + 8);
+          StringList__AddEntry(piVar4,iVar5 + 8);
           if (*(int *)(param_1 + 0x84) == 3) {
             FUN_00565da0(&DAT_006ca778,local_2c[0]);
           }
@@ -666,19 +666,19 @@ void FUN_00562420(int param_1)
                          ((local_2c[0] % 60000) % 1000) / 10);
             iVar7 = local_30;
           }
-          FUN_004174b0(piVar4,auStack_20);
+          StringList__AddEntry(piVar4,auStack_20);
           GetCarModelNameHash();
           iVar5 = LanguageStrings__FindByHash();
           if (iVar5 == 0) {
             iVar5 = LanguageStrings__FindByHash();
           }
-          FUN_004174b0(piVar4,iVar5);
+          StringList__AddEntry(piVar4,iVar5);
           puVar6 = (undefined1 *)LanguageStrings__FindByHash();
           if (puVar6 == (undefined1 *)0x0) {
             puVar6 = (undefined1 *)LanguageStrings__FindByHash();
           }
         }
-        FUN_004174b0(piVar4,puVar6);
+        StringList__AddEntry(piVar4,puVar6);
         local_34 = local_34 + 1;
       } while (local_34 < *(int *)(param_1 + 0x78));
     }
@@ -7180,7 +7180,7 @@ void __thiscall FUN_00569a00(int param_1,int param_2,float param_3,uint param_4,
         (puVar7 = (undefined4 *)(param_2 + 0x60), 8 < local_e4)))) {
       puVar7 = (undefined4 *)(param_2 + 0x50);
     }
-    FUN_00401cd0();
+    bMatrixCopy_b();
     local_5c = puVar7[1];
     local_60 = *puVar7;
     local_58 = puVar7[2];
@@ -7192,7 +7192,7 @@ void __thiscall FUN_00569a00(int param_1,int param_2,float param_3,uint param_4,
     local_e8 = (undefined4 *)*local_e8;
     puVar5 = (undefined4 *)NullUpdate_ret();
     for (; local_e8 != puVar5; local_e8 = (undefined4 *)*local_e8) {
-      FUN_00401cd0();
+      bMatrixCopy_b();
       piVar6 = (int *)(iVar2 + 0x62c + *(int *)(local_e8[7] + 0x58) * 8);
       if (local_e4 != 0) {
         piVar6 = (int *)(iVar2 + 0x62c + local_e4 * 8);
@@ -7214,7 +7214,7 @@ void __thiscall FUN_00569a00(int param_1,int param_2,float param_3,uint param_4,
           local_98 = local_e0;
           local_94 = 0x3f800000;
           D3DXMatrixMultiply(local_50,local_d0,local_90);
-          FUN_00401cd0();
+          bMatrixCopy_b();
           uVar1 = puVar7[2];
           uVar4 = *puVar7;
           local_e8[0x1d] = puVar7[1];
@@ -7225,7 +7225,7 @@ void __thiscall FUN_00569a00(int param_1,int param_2,float param_3,uint param_4,
           piVar8 = (int *)*piVar8;
         } while (piVar8 != piVar6);
       }
-      FUN_00401cd0();
+      bMatrixCopy_b();
     }
   }
   return;
@@ -7481,7 +7481,7 @@ void FUN_0056a0d0(void)
   }
   puVar1 = (undefined4 *)in_EAX[0x264];
   if (puVar1 != (undefined4 *)0x0) {
-    FUN_0042ac80();
+    ListRef_Release();
     iVar4 = DAT_0073557c;
     iVar2 = *(int *)(DAT_0073557c + 0x18);
     *puVar1 = *(undefined4 *)(DAT_0073557c + 0x10);
@@ -7630,7 +7630,7 @@ int * CarRenderInfo__CarRenderInfo(int *param_1,int param_2,int param_3)
     iVar20 = iVar20 + -1;
   } while (iVar20 != 0);
   local_a8 = param_1 + 0x39b;
-  eh_vector_constructor_iterator(local_a8,0x18,0x78,FUN_0042ac70,FUN_0042ac80);
+  eh_vector_constructor_iterator(local_a8,0x18,0x78,ListRef_Init,ListRef_Release);
   piVar17 = param_1 + 0x676;
   *piVar17 = (int)piVar17;
   param_1[0x677] = (int)piVar17;
@@ -8436,7 +8436,7 @@ LAB_0056b528:
   if (DAT_00743c18 != 0) {
     piVar17 = (int *)(DAT_00743c18 + -4);
   }
-  local_28 = (int *)FUN_0040cb70();
+  local_28 = (int *)Ptr_BaseAdjustMinus4();
   while ((piVar18 = (int *)PTR_DAT_006f3df0, piVar17 != local_28 &&
          (piVar18 = piVar17, (int *)piVar17[3] != local_38))) {
     if (piVar17[1] == 0) {
@@ -9150,7 +9150,7 @@ void FUN_0056c140(int param_1)
   }
   local_4._1_3_ = (uint3)((uint)local_4 >> 8);
   local_4._0_1_ = 2;
-  eh_vector_destructor_iterator((void *)(param_1 + 0xe6c),0x18,0x78,FUN_0042ac80);
+  eh_vector_destructor_iterator((void *)(param_1 + 0xe6c),0x18,0x78,ListRef_Release);
   local_4._0_1_ = 1;
   eh_vector_destructor_iterator((void *)(param_1 + 0x62c),8,0x1c,FUN_00571560);
   local_4 = (uint)local_4._1_3_ << 8;
@@ -10439,7 +10439,7 @@ void FUN_0056d8d0(int *param_1,undefined4 param_2,undefined4 param_3,uint param_
     return;
   }
   DAT_007355b4 = uVar1;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   *(undefined4 *)(iVar6 + 0x30) = *in_EAX;
   *(undefined4 *)(iVar6 + 0x34) = in_EAX[1];
   *(undefined4 *)(iVar6 + 0x38) = in_EAX[2];
@@ -10766,7 +10766,7 @@ void CarRenderInfo__Render
     return;
   }
   pfStack_984 = (float *)0x56de2d;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   pfStack_988 = (float *)&DAT_0073d720;
   piStack_990 = (int *)0x56de39;
   pfStack_98c = pfVar15;
@@ -10794,7 +10794,7 @@ void CarRenderInfo__Render
     pfVar15[0xd] = param_3[1];
     pfVar15[0xf] = 1.0;
     piStack_990 = (int *)0x56deb2;
-    FUN_00440710();
+    RefArray_DecrementAll();
   }
   puVar18 = param_1 + 4;
   piStack_990 = (int *)param_2;
@@ -10815,7 +10815,7 @@ void CarRenderInfo__Render
     FUN_004833a0();
   }
   piStack_990 = (int *)0x56df58;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   pfVar12[0xc] = *param_3;
   pfVar12[0xd] = param_3[1];
   pfVar12[0xe] = param_3[2];
@@ -10839,7 +10839,7 @@ void CarRenderInfo__Render
   FUN_00544390(&DAT_0078ea40,&uStack_8ac,param_2,afStack_2dc);
   param_1[0x13b] = DAT_007364dc;
   piStack_990 = (int *)0x56dff3;
-  FUN_00401cb0();
+  bVector4Copy();
   piStack_990 = (int *)0x56dff8;
   cVar9 = FUN_004081c0();
   if (cVar9 != '\0') {
@@ -10922,7 +10922,7 @@ LAB_0056e108:
   }
   iVar11 = uStack_95c;
   pfStack_99c = (float *)0x56e238;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   pfVar12 = local_950[0];
   pfStack_99c = (float *)0x56e24a;
   FUN_00424ba0();
@@ -10980,7 +10980,7 @@ LAB_0056e108:
   else {
     fVar28 = (float)((fVar27 - (float10)0.0) / ((float10)3.0 - (float10)0.0));
   }
-  fVar27 = (float10)FUN_00401c80(fVar28,0,0x3f800000);
+  fVar27 = (float10)bClampF(fVar28,0,0x3f800000);
   fVar28 = (float)fVar27;
   if (DAT_007345e0 != 0.0) {
     fVar28 = DAT_007345e0;
@@ -11008,7 +11008,7 @@ LAB_0056e108:
     pfStack_99c = pfVar12;
     FUN_0056d700();
     FUN_00540b40();
-    FUN_004665e0();
+    Struct_ClearHeader();
     fVar3 = param_3[2];
     iVar11 = 0;
     piStack_90c = DAT_007306b4;
@@ -11074,7 +11074,7 @@ LAB_0056e108:
               FUN_00410910(0,0);
               FUN_00410910(0x3e1eb852,0);
               FUN_00410910(0x3e1eb852,0);
-              FUN_004109c0(param_2);
+              RenderQueue_SelectDefaultBucket(param_2);
               pfVar17 = pfStack_954;
             }
             pfStack_998 = (float *)((int)pfStack_998 + 2);
@@ -11091,7 +11091,7 @@ LAB_0056e108:
           FUN_00410910(0x3e1eb852,0);
           FUN_00410910(0,0);
           FUN_00410910(0x3e1eb852,0);
-          FUN_004109c0(param_2);
+          RenderQueue_SelectDefaultBucket(param_2);
         }
         pfVar17 = (float *)((int)pfStack_99c / 3);
         uStack_904 = (int)pfVar17 * 0x10;
@@ -11135,7 +11135,7 @@ LAB_0056e108:
             FUN_00410970(uVar23);
             FUN_00410910(0x3e1eb852,0);
             FUN_00410910(0x3f800000,0);
-            FUN_004109c0(param_2);
+            RenderQueue_SelectDefaultBucket(param_2);
             pfVar17 = pfStack_954;
           }
           piStack_990 = (int *)((int)piStack_990 + (int)pfVar17);
@@ -11285,7 +11285,7 @@ LAB_0056e108:
   }
   iVar11 = iStack_908;
   pfStack_988 = (float *)(_K_ONE - fVar28);
-  fVar27 = (float10)FUN_00401c80(pfVar15[10],0,0x3f800000);
+  fVar27 = (float10)bClampF(pfVar15[10],0,0x3f800000);
   local_958 = (float)(fVar27 * (float10)(float)pfStack_988);
   piStack_994 = (int *)((-(uint)(iVar11 != 0) & 0xffffffea) + 0x72);
   iVar11 = _ftol_nocw();
@@ -12211,15 +12211,15 @@ LAB_005709de:
           local_220 = puVar3[0x1d0];
           local_218 = puVar3[0x1d2];
           CallNTimes(local_110,0x40,4,FUN_004ad8d0);
-          FUN_00401cd0();
-          FUN_00401cd0();
-          FUN_00401cd0();
-          FUN_00401cd0();
+          bMatrixCopy_b();
+          bMatrixCopy_b();
+          bMatrixCopy_b();
+          bMatrixCopy_b();
           CallNTimes(local_210,0x40,4,FUN_004ad8d0);
-          FUN_00401cd0();
-          FUN_00401cd0();
-          FUN_00401cd0();
-          FUN_00401cd0();
+          bMatrixCopy_b();
+          bMatrixCopy_b();
+          bMatrixCopy_b();
+          bMatrixCopy_b();
           _DAT_0073462c = puVar3[0x267];
           bVar5 = 0;
           if (_DAT_0073462c == 0) {
@@ -12256,7 +12256,7 @@ uint FUN_00570b90(int param_1)
      ) {
     uVar3 = (uint)*(byte *)(unaff_EDI + 0x8a8);
     if ((1 << ((byte)*(undefined4 *)(param_1 + 4) & 0x1f) & *(uint *)(unaff_EDI + 0x530)) == 0) {
-      cVar2 = FUN_004280a0();
+      cVar2 = Car__IsResetGraceActive();
       if (((cVar2 != '\0') || ((*(uint *)(unaff_EDI + 0x538) & extraout_EDX) != 0)) &&
          (ABS(DAT_0073457c) < 0.001 == (ABS(DAT_0073457c) == 0.001))) {
         uVar3 = DAT_007364dc & 1;
@@ -12396,7 +12396,7 @@ void RenderFrame_DrawCars(void)
           CallNTimes(local_210,0x40,4,FUN_004ad8d0);
           FUN_0042a120(iVar1);
           uVar2 = *(undefined4 *)(iVar1 + 0x4d4);
-          FUN_00401cd0();
+          bMatrixCopy_b();
           if (*(int *)(iVar1 + 0x3cc) < 3) {
             FUN_00565020();
             local_228 = -local_228;

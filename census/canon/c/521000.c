@@ -2647,7 +2647,7 @@ EAXAITunerCar__UpdateGearShiftState__map_names_are_swapped_with_0x529530_(int pa
       *(undefined4 *)(param_1 + 0x1d14) = 6;
       fVar3 = (float10)FUN_00532640();
       uVar4 = 0;
-      FUN_00401c80((float)ABS(fVar3),0,0x44480000,0);
+      bClampF((float)ABS(fVar3),0,0x44480000,0);
       uVar2 = _ftol_nocw();
       FUN_00532670(*(undefined4 *)(param_1 + 0x1f1c),*(undefined4 *)(param_1 + 0x1f20),uVar2,uVar4);
       FUN_00584310(*(undefined4 *)(param_1 + 0x1f90));
@@ -2922,8 +2922,8 @@ void EAXAITunerCar__UpdateNIS(float param_1)
       *(int *)(unaff_EDI + 0x1fc0) = iVar8;
       *(float **)(unaff_EDI + 0x1fbc) = pfVar3 + 3;
       if (0x1e < iVar8) {
-        FUN_00401c80(fVar4 / 2.1,0x3f800000,0x40400000);
-        fVar9 = (float10)FUN_004216f0(0x3fa66666);
+        bClampF(fVar4 / 2.1,0x3f800000,0x40400000);
+        fVar9 = (float10)Random_NextFloat(0x3fa66666);
         *(undefined1 *)(unaff_EDI + 0x1fac) = 0;
         *(float *)(unaff_EDI + 0x1fb0) = (float)(fVar9 / extraout_ST1 + (float10)0.5);
       }
@@ -3738,7 +3738,7 @@ void __fastcall EAXTrafficCar__UpdateDriveBy(int *param_1)
     iVar1 = FUN_00524da0(0x40a00000);
     if (((iVar1 != 0) && ((float10)25.0 < fVar4)) &&
        ((float)param_1[0xc3] + 3.0 < (float)param_1[0x90])) {
-      FUN_00401c80(((float)local_14 - 25.0) / 75.0,0,0x3f800000);
+      bClampF(((float)local_14 - 25.0) / 75.0,0,0x3f800000);
       _ftol_nocw();
       iVar1 = DAT_006f4f04;
       local_14 = (int *)(DAT_006f4f00 - DAT_006f4f04);
@@ -7178,7 +7178,7 @@ void __fastcall EAXTunerCar__UpdateGearShiftState__map_names_swapped_with_0x523e
       fStack_48 = 0.0;
       fStack_4c = (float)ABS(fVar6);
       iStack_50 = 0x529867;
-      FUN_00401c80();
+      bClampF();
       iStack_44 = 0x52986f;
       iStack_44 = _ftol_nocw();
       fStack_4c = *(float *)(param_1 + 0x1f1c);

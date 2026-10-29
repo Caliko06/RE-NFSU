@@ -1370,7 +1370,7 @@ void __thiscall FUN_00452d20(int param_1,int *param_2)
           local_2c = 0;
           local_14 = 0x3f800000;
           local_34 = 4;
-          FUN_00454f30(&local_4c,*(undefined4 *)(param_1 + 0x204));
+          Curve_Evaluate(&local_4c,*(undefined4 *)(param_1 + 0x204));
           if (_K_ONE <= local_4c) {
             fVar6 = (float10)(**(code **)(*piVar2 + 0x5c))();
             *(float *)(param_1 + 0x1e4) = (float)fVar6;
@@ -1502,11 +1502,11 @@ void __thiscall FUN_00453120(int param_1,int *param_2)
       piVar11 = piVar11 + 0xe;
     } while (iVar9 < param_2[1]);
   }
-  iVar9 = FUN_00456e90(iVar10,uVar7,0xff,0xff);
+  iVar9 = GetNearestTrafficLane(iVar10,uVar7,0xff,0xff);
   if (*(int *)(*(int *)(*(int *)(*(int *)(param_1 + 0x200) + 0x1d4) + 0x1c) + 0xe4) != 0) {
     FUN_005791c0();
   }
-  iVar10 = FUN_00456e90(iVar10,uVar7,0xff,0xff);
+  iVar10 = GetNearestTrafficLane(iVar10,uVar7,0xff,0xff);
   if ((iVar9 == -1) || (iVar10 == -1)) {
     if (*piVar1 == 0) {
       *piVar1 = 1;
@@ -1710,7 +1710,7 @@ void __thiscall FUN_00453600(int param_1,int *param_2)
     piVar2[0x141] = 0xff;
     piVar2[0x142] = 0xff;
   }
-  iVar4 = FUN_00456e90(iVar4,uVar3,0xff,0xff);
+  iVar4 = GetNearestTrafficLane(iVar4,uVar3,0xff,0xff);
   if (iVar4 == -1) {
     if (*piVar1 != 0) goto LAB_004536da;
   }
@@ -2080,7 +2080,7 @@ LAB_00453ccf:
     if (((int)fStack_40 < 0xb) || (0x10 < (int)fStack_40)) {
       uVar6 = (**(code **)(*piStack_2c + 4))(0xff,0xff);
       FUN_0044a2c0(uVar6);
-      fStack_40 = (float)FUN_00456e90(iVar2);
+      fStack_40 = (float)GetNearestTrafficLane(iVar2);
     }
     if (fVar1 <= 0.0) {
       iStack_20 = (int)fStack_40 + 1;
@@ -2161,7 +2161,7 @@ LAB_00453e05:
         iStack_30 = *(short *)(iStack_30 + 0x5e) * 0x88 + 0x27c + iVar5;
       }
       uVar6 = (**(code **)(*piStack_2c + 4))(0xff,0xff);
-      iVar5 = FUN_00456e90(iVar2,uVar6);
+      iVar5 = GetNearestTrafficLane(iVar2,uVar6);
       if (iVar5 != -1) {
         param_2[0xe5] = iVar5;
         *piStack_34 = 1;
@@ -3323,16 +3323,17 @@ void FUN_00454ee0(int *param_1)
 float10 FUN_00454f10(undefined4 param_1,float param_2)
 
 {
-  FUN_00454f30(&param_2,param_2);
+  Curve_Evaluate(&param_2,param_2);
   return (float10)param_2;
 }
 
 
-// ==== 0x454f30 FUN_00454f30
+// ==== 0x454f30 Curve_Evaluate
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
 
-void FUN_00454f30(float *param_1,float param_2)
+void Curve_Evaluate(float *param_1,float param_2)
 
 {
   int iVar1;
@@ -4430,10 +4431,10 @@ void __thiscall FUN_00455b50(int param_1,int param_2,int param_3)
   iVar2 = *(int *)(iVar1 + 0x60);
   *(undefined4 *)(iVar1 + 0x10) = 1;
   if (iVar2 == 0) {
-    FUN_00401cd0();
+    bMatrixCopy_b();
   }
   else {
-    FUN_00401cd0();
+    bMatrixCopy_b();
     if (*(int *)(iVar2 + 0xe4) == 0) {
       FUN_00579190();
       return;
@@ -5385,11 +5386,13 @@ void __fastcall FUN_00456de0(undefined4 param_1,float *param_2)
 }
 
 
-// ==== 0x456e90 FUN_00456e90
+// ==== 0x456e90 GetNearestTrafficLane
 
 /* WARNING: Removing unreachable block (ram,0x00456ec0) */
+/* [canon] runtime high (ghidra-canon+nfsug) docs/re/runtime.md */
 
-uint __thiscall FUN_00456e90(float *param_1,undefined4 param_2,int param_3,int param_4,int param_5)
+uint __thiscall
+GetNearestTrafficLane(float *param_1,undefined4 param_2,int param_3,int param_4,int param_5)
 
 {
   uint uVar1;
@@ -8184,10 +8187,10 @@ void __thiscall FUN_0045a930(undefined4 *param_1,int param_2)
   iVar4 = *(int *)(*(int *)(param_2 + 0x4c) + 0x60);
   *(undefined4 *)(*(int *)(param_2 + 0x4c) + 0x10) = 1;
   if (iVar4 == 0) {
-    FUN_00401cd0();
+    bMatrixCopy_b();
   }
   else {
-    FUN_00401cd0();
+    bMatrixCopy_b();
     if (*(int *)(iVar4 + 0xe4) == 0) {
       FUN_00579190();
       ExceptionList = pvStack_28;
@@ -9863,7 +9866,7 @@ undefined4 FUN_0045cff0(undefined4 param_1,undefined4 *param_2,undefined4 param_
     uVar4 = (**(code **)(*(int *)param_2[0xea] + 4))();
   }
   uVar1 = puVar2[0xe4];
-  iVar5 = FUN_00456e90(*puVar2,uVar4,0xff,0xff);
+  iVar5 = GetNearestTrafficLane(*puVar2,uVar4,0xff,0xff);
   if (iVar5 != -1) {
     uStack_1c = puVar2[0xe3];
     uStack_20 = 0;
@@ -10265,7 +10268,7 @@ void __thiscall FUN_0045d800(int *param_1,undefined4 param_2)
      (*(int *)(param_1[0xf9] + 4) != 0)) {
     iVar3 = param_1[1];
     uVar2 = (**(code **)(*param_1 + 0x40))(0xff,0xff);
-    iVar3 = FUN_00456e90(iVar3,uVar2);
+    iVar3 = GetNearestTrafficLane(iVar3,uVar2);
     if ((iVar3 < param_1[0x141]) || (param_1[0x142] < iVar3)) {
       fStack_8 = 0.0;
       FUN_005a6700(auStack_4,&fStack_8,iVar3);
@@ -10302,7 +10305,7 @@ void FUN_0045d920(void)
   if (**(int **)(unaff_ESI + 0x3d8) != 0) {
     uVar1 = (**(code **)(**(int **)(*(int *)(unaff_ESI + 4) + 0x2c) + 0x40))
                       (*(undefined4 *)(unaff_ESI + 0x504),*(undefined4 *)(unaff_ESI + 0x508));
-    uVar1 = FUN_00456e90(*(undefined4 *)(unaff_ESI + 4),uVar1);
+    uVar1 = GetNearestTrafficLane(*(undefined4 *)(unaff_ESI + 4),uVar1);
     *(undefined4 *)(*(int *)(unaff_ESI + 0x3d8) + 8) = uVar1;
   }
   return;
@@ -10329,7 +10332,7 @@ bool __fastcall FUN_0045d970(int *param_1)
   bVar7 = false;
   if ((*(int *)param_1[0xf6] != 0) && (*(int *)(param_1[0xf9] + 4) != 0)) {
     uVar4 = (**(code **)(*param_1 + 0x40))(0xff,0xff);
-    iVar5 = FUN_00456e90(param_1[1],uVar4);
+    iVar5 = GetNearestTrafficLane(param_1[1],uVar4);
     iVar6 = iVar5;
     if (iVar5 < 0xc) {
       iVar6 = 0xb;
@@ -10412,9 +10415,11 @@ float10 FUN_0045db00(void)
 }
 
 
-// ==== 0x45db30 FUN_0045db30
+// ==== 0x45db30 PsychoDriver::SetSteerToPoint
 
-void __thiscall FUN_0045db30(int param_1,undefined4 *param_2)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __thiscall PsychoDriver__SetSteerToPoint(int param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -10855,11 +10860,13 @@ void FUN_0045e080(undefined4 *param_1)
 }
 
 
-// ==== 0x45e180 FUN_0045e180
+// ==== 0x45e180 PsychoDriver::SetDesiredSpeed
+
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __thiscall
-FUN_0045e180(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined1 param_5
-            )
+PsychoDriver__SetDesiredSpeed
+          (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined1 param_5)
 
 {
   *(undefined4 *)(param_1 + 0x200) = param_2;
@@ -11806,7 +11813,7 @@ LAB_0045f96e:
   else {
     fStack_4 = (float)(DAT_0073ad34 - iVar14);
     if ((float)*(int *)(param_1[0x7c] + 0x3f8) * 0.00025 < (float)(int)fStack_4 * 0.00025) {
-      FUN_00465530();
+      CarState__StopTimer();
       goto LAB_0045f96e;
     }
     if (*(char *)((int)param_1 + 0x229) == '\0') {
@@ -12082,7 +12089,7 @@ LAB_0045ffb0:
     *pfVar8 = 0.0;
     cVar9 = FUN_00465430();
     if (cVar9 != '\0') {
-      FUN_00465530();
+      CarState__StopTimer();
       (**(code **)(*piVar6 + 0x80))();
     }
   }
@@ -12107,9 +12114,11 @@ LAB_0045ffb0:
 }
 
 
-// ==== 0x460090 FUN_00460090
+// ==== 0x460090 PsychoDriver::StartHonkHorn
 
-void __fastcall FUN_00460090(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall PsychoDriver__StartHonkHorn(int param_1)
 
 {
   int *piVar1;
@@ -12125,9 +12134,11 @@ void __fastcall FUN_00460090(int param_1)
 }
 
 
-// ==== 0x4600b0 FUN_004600b0
+// ==== 0x4600b0 PsychoDriver::StopHonkHorn
 
-void __fastcall FUN_004600b0(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall PsychoDriver__StopHonkHorn(int param_1)
 
 {
   int *piVar1;
@@ -12143,9 +12154,11 @@ void __fastcall FUN_004600b0(int param_1)
 }
 
 
-// ==== 0x4600d0 FUN_004600d0
+// ==== 0x4600d0 PsychoDriver::IsHonking
 
-uint __fastcall FUN_004600d0(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+uint __fastcall PsychoDriver__IsHonking(int param_1)
 
 {
   int *piVar1;
@@ -12171,9 +12184,11 @@ int __fastcall FUN_004600ec(int param_1)
 }
 
 
-// ==== 0x4600f0 FUN_004600f0
+// ==== 0x4600f0 PsychoDriver::GetDriverNumber
 
-int __fastcall FUN_004600f0(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+int __fastcall PsychoDriver__GetDriverNumber(int param_1)
 
 {
   return (int)*(short *)(*(int *)(param_1 + 0x1f0) + 10);
@@ -12201,9 +12216,11 @@ undefined4 FUN_00460100(void)
 }
 
 
-// ==== 0x460150 FUN_00460150
+// ==== 0x460150 PsychoDriver::GetForceYaw
 
-int __fastcall FUN_00460150(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+int __fastcall PsychoDriver__GetForceYaw(int param_1)
 
 {
   int iVar1;
@@ -12375,7 +12392,7 @@ undefined4 * __thiscall FUN_004602c0(int param_1,undefined4 *param_2)
     (**(code **)(param_2[0x94] + 0x20))();
   }
   if (*(int *)(param_1 + 0x18) != 0) {
-    FUN_00461520();
+    RealDriver__SetManualTransmission();
   }
   *(undefined1 *)(param_2 + 0x144) = 0;
   ExceptionList = pvStack_c;
@@ -12540,7 +12557,7 @@ LAB_004606b6:
             piVar1[0x142] = 0xff;
             uVar3 = (**(code **)(*piVar1 + 0x40))(0xff,0xff);
             (**(code **)(*piVar1 + 0x18))(0,uVar3);
-            iVar4 = FUN_00456e90(iVar4);
+            iVar4 = GetNearestTrafficLane(iVar4);
             cVar2 = FUN_0045d970();
             if ((cVar2 != '\0') && (0xb < iVar4)) {
               piVar1[0x141] = iVar4;
@@ -12566,7 +12583,7 @@ LAB_004606b6:
             piVar1[0x142] = 0xff;
             uVar3 = (**(code **)(*piVar1 + 0x40))(0xff,0xff);
             (**(code **)(*piVar1 + 0x18))(0,uVar3);
-            iVar4 = FUN_00456e90(iVar4);
+            iVar4 = GetNearestTrafficLane(iVar4);
             cVar2 = FUN_0045d970();
             if ((cVar2 != '\0') && (iVar4 < 0x10)) {
               piVar1[0x142] = iVar4;

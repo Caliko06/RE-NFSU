@@ -125,3 +125,63 @@ addr	name	system	confidence	evidence	tool	doc
 0x64b5a0	Mutex::Unlock	runtime	high	V: ReleaseMutex([0x713c50]); 101 callers	ghidra+hopper	docs/re/runtime.md
 0x642450	Log_Printf	runtime	med	V: vsprintf (0x671077) into a 0x200 stack buffer then hook [0x6e76ac](channel 0x6cc568, text); 46 callers	ghidra+hopper	docs/re/runtime.md
 0x6424a0	Error_Printf	runtime	high	V: vsprintf 0x671077 then 0x642e60(2,'ERROR: %s',text) and, if [0x70fe30], 'FILE %s LINE %d'; then 0x642540; assert/log path; strings in G (Ghidra only, Hopper has no entry here)	ghidra+hopper	docs/re/runtime.md
+0x401b30	GetSkuString	runtime	med	V: switch [0x734998] returns '14705' / by language [0x6ee6f0] one of EAE/EAF/EAD/EAI/EAS/EAH/EAN08004144 / 'SKU_KOREA' / 'EMW-4139' / 'SKU_TAIWAN'; 1 caller	ghidra-canon	docs/re/runtime.md
+0x401bd0	bList::IsEmpty	runtime	med	trivial: eax list head, returns head->next == head (circular list); 8 callers	ghidra-canon	docs/re/runtime.md
+0x401be0	bList::RemoveHead	runtime	med	trivial: unlinks node [eax]->first from the circular {next,prev} list; 7 callers; sibling of bList::AddTail 0x567270	ghidra-canon	docs/re/runtime.md
+0x401c10	bDegreesToAngle16	runtime	med	ftol(x87 arg)/360 with [0x6cc840]=65536.0: degrees -> 16-bit angle; 6 callers (TrackMap::Draw, camera)	ghidra-canon	docs/re/runtime.md
+0x401c60	bMin	runtime	high	trivial: returns the smaller of two floats; 4 callers	ghidra-canon	docs/re/runtime.md
+0x401c80	bClampF	runtime	high	trivial: min(max(param_2,param_1),param_3) float clamp; 16 callers	ghidra-canon	docs/re/runtime.md
+0x401cb0	bVector4Copy	runtime	med	trivial: __fastcall copies 4 dwords from ecx-arg to eax	ghidra-canon	docs/re/runtime.md
+0x401cd0	bMatrixCopy_b	runtime	med	trivial: copies 16 dwords from ecx-arg to eax; same job as bMatrixCopy 0x565230 but 63 callers (MSVC emitted a second copy)	ghidra-canon	docs/re/runtime.md
+0x401f70	Matrix4_Determinant	runtime	med	V: sum of signed 4-term products over the 16 floats at eax = 4x4 determinant; Matrix4_Invert 0x4020b0 is its only caller	ghidra-canon	docs/re/runtime.md
+0x402500	Spline_BuildCubicBasis	runtime	low	I: builds rows t^3,t^2,t,1 for 4 knots (param_3..6) and constant Hermite coefficients (2,-2,1,1,-3,3,-2,-1), Matrix4_Invert then 3 D3DXMatrixMultiply; caller Particles_UpdateSystem	ghidra-canon	docs/re/runtime.md
+0x405550	Ptr_SetNull	runtime	low	trivial: __fastcall *ecx = 0; 5 callers	ghidra-canon	docs/re/runtime.md
+0x408100	RefList_ReleaseAll	runtime	low	I: pops every node of global circular list 0x78daa0, calls node[6] vtable+8 (release) until it returns 0, nulls it, resets list head	ghidra-canon	docs/re/runtime.md
+0x408180	Vec3_ScaleTo	runtime	med	trivial: eax[i] = ecx[i]*arg for i=0..2; same math as Vec3_Scale 0x408160, other register layout	ghidra-canon	docs/re/runtime.md
+0x40b780	Matrix4_BuildLookAt	runtime	med	I: forward = eax-edi, three bNormalize3 with cross products against up (param_1), writes a 4x4 rotation to esi then D3DXMatrixMultiply; 17 callers incl. View_BuildMatrices, camera movers	ghidra-canon	docs/re/runtime.md
+0x40cb70	Ptr_BaseAdjustMinus4	runtime	low	trivial: eax ? eax-4 : 0, NULL-safe base-subobject pointer adjust; 24 callers	ghidra-canon	docs/re/runtime.md
+0x40ed00	bTickerToSeconds	runtime	med	trivial: *eax * [0x6cca38]=0.00025 (4000 ticks per second); 19 callers	ghidra-canon	docs/re/runtime.md
+0x410400	Device_SetWorldMatrix	runtime	med	V: counts calls ([0x71b1f4]++), skips if same matrix/state cached, else device vtable+0xb0 (SetTransform) with 0x100 (D3DTS_WORLD) and D3DXMatrixMultiply with per-slot view/proj matrices	ghidra-canon	docs/re/runtime.md
+0x4115f0	Char_IsAllowedSymbol	runtime	med	V: loops a 55-byte table of punctuation and accented chars (space . , _ @ - ... 0xe5 0xe4 ...) and returns whether the arg char is in it	ghidra-canon	docs/re/runtime.md
+0x411720	Cursor_MoveClamped	runtime	low	I: if [0x7363a8] then [0x7363a4] += delta clamped to [0,[0x7363a0]]; 1 caller	ghidra-canon	docs/re/runtime.md
+0x4127a0	StrmDef_SetEntry	runtime	low	I: object with magic 0x4d525453 ('STRM'), index range checks vs +0x2c, third value >0/-1/-2 vs +0x34, not locked (+0x48 == 0), writes 3 ints at entry (+0x28)+12*i; caller 0x644b88	ghidra-canon	docs/re/runtime.md
+0x4131f0	Struct_ClearFields8	runtime	low	trivial: zeroes six dwords at eax+8..+0x1c; 1 caller (static init)	ghidra-canon	docs/re/runtime.md
+0x4134a0	bMalloc_regarg	runtime	low	trivial: _malloc(eax); 3 callers (TrafficCar_Place)	ghidra-canon	docs/re/runtime.md
+0x41e9b0	Cpu_DetectFamily	runtime	med	V: toggles EFLAGS.ID (bit 21) to test CPUID, cpuid(1) family nibble -> [0x71dae8] in {0,2,3,5}; caller CpuDetect 0x41e860	ghidra-canon	docs/re/runtime.md
+0x41f0b0	int_Sub	runtime	low	trivial: *eax = *p1 - *p2 (__thiscall, STL-style iterator difference)	ghidra-canon	docs/re/runtime.md
+0x41f600	IsDriftMode	runtime	med	V: returns 1 if byte this+0x55 or [0x7361a4] (drift flag per docs/openworld/re_zones.md); callers Player::ComputeHudFlags, Race::RequestStartOrRestart	ghidra-canon	docs/re/runtime.md
+0x41ffe0	RaceManager::FindRacerById	runtime	med	V: scans [0x7361f8]+0x28 array (count +0x18) for entry with short +10 == edi, returns pointer or 0; [0x7361f8] is the RaceManager of UpdateAIScores	ghidra-canon	docs/re/runtime.md
+0x420010	RaceManager::RacerLess	runtime	low	I: compares float +0x60 then short +10 of two racers (a<b true, ties by id); only caller 0x420b40	ghidra-canon	docs/re/runtime.md
+0x420400	InFunc_00420380_L420400	runtime	low	not a function start: lies inside 0x420380 (1285 bytes), preceded by fld/fcomp/fnstsw compare chain; census/speed_exe_functions.tsv marks it data	ghidra-canon	docs/re/runtime.md
+0x421aa0	FloatPair_LessEqual	runtime	low	trivial: returns this+0x24 <= this+0x2c; caller 0x423280	ghidra-canon	docs/re/runtime.md
+0x421b10	Race::PumpFlowMessages	runtime	med	V: drains message list at +8, msg 1 sets state *p=msg[3], calls per-state handler table at 0x700db8 (PTR_Race__OnFlowMessage), msg 2 resets state, returns node to pool [0x7361f4]; 5 callers	ghidra-canon	docs/re/runtime.md
+0x424200	InFunc_00423f20_L424200	runtime	low	not a function start: lies inside 0x423f20 (next function 0x4244b0), preceded by a loop body; census/speed_exe_functions.tsv marks it data	ghidra-canon	docs/re/runtime.md
+0x424b70	Vec3_Sub	runtime	med	trivial: eax = param_2 - param_1 for three floats	ghidra-canon	docs/re/runtime.md
+0x424cf0	RigidBody::SetVelocity	runtime	low	I: copies vec3 at eax to this+0x30..0x38, clears byte +0x420, stores its length in +0x394	ghidra-canon	docs/re/runtime.md
+0x4280a0	Car::IsResetGraceActive	runtime	low	I: stamp car+0x884 valid and (ticker-stamp)*0.00025 < car+0x888; caller Car::ServiceResetRequest, render code 0x570b90	ghidra-canon	docs/re/runtime.md
+0x42ab10	int_Less	runtime	low	trivial: returns *eax < *param_2 (__fastcall); 2 callers	ghidra-canon	docs/re/runtime.md
+0x42ac70	ListRef_Init	runtime	low	trivial: zeroes +8,+0xc; rejected mw FEGeometryModel::FEGeometryModel: no vtable store, 7 callers include list holders	ghidra-canon	docs/re/runtime.md
+0x42ac80	ListRef_Release	runtime	low	I: if +8 or +0xc set unlinks node from {next,prev} list, zeroes +8..+0x14; 23 callers incl. StreamSection_Unload	ghidra-canon	docs/re/runtime.md
+0x430060	RacerState::GetLapProgress	runtime	med	V: (+0x184 - +0x188)/route length, wrapped into [0,1) with K_HALF/K_ONE, plus lap count +0x18c when >= 0	ghidra-canon	docs/re/runtime.md
+0x4306c0	Player::CheckDriftTimeout	runtime	low	I: 1 if byte +0x124; 0 if drift flags [0x78a346] and [0x7361a0] both 0; else 1 when (ticker-stamp +0x114)*0.00025 >= [0x700b64]=5.0; rejected C Player::PostDriftPenalty: no float arg, returns a predicate	ghidra-canon	docs/re/runtime.md
+0x434d10	TimedMessage::GetPhase	runtime	low	I: two stamps +4/+8 and duration +0xc (0.00025 s ticks), returns phase 0..4; callers HUD message 0x4a8000	ghidra-canon	docs/re/runtime.md
+0x434ed0	Race::UpdatePlayerRanks	runtime	med	V: bubble-sorts player pointers at this+0x520 (count +0x24) by finished flag +0xc then float +0x20, then writes rank +10 (previous rank to +0xb); rejected B Player::JustReset: sorts, not a reset	ghidra-canon	docs/re/runtime.md
+0x436d60	bLength3	runtime	high	V: sqrt(x^2+y^2+z^2) of float3 at eax; sibling of bDistance3 0x567280; 5 callers	ghidra-canon	docs/re/runtime.md
+0x438800	bCeil	runtime	med	V: ftol(x), adds 1.0 if the truncation is below x = ceil; 3 callers	ghidra-canon	docs/re/runtime.md
+0x438840	int_NotEqual	runtime	low	trivial: returns *p1 != *p2 (__thiscall); rejected B cPlayerSettings::ToggleLapInfo: no toggle, pure compare	ghidra-canon	docs/re/runtime.md
+0x438920	Float2_ToIntPair	runtime	low	trivial: two _ftol_nocw back to back on x87 stack values; 1 caller	ghidra-canon	docs/re/runtime.md
+0x438a60	Obj_GetByte19	runtime	low	trivial: getter of byte this+0x19; 10 callers	ghidra-canon	docs/re/runtime.md
+0x438a80	Race::HasPlayer	runtime	low	trivial: this[8+idx*4] != 0; same layout as 0x43b850; callers 0x547450, 0x547c60	ghidra-canon	docs/re/runtime.md
+0x438ac0	Obj_GetField34	runtime	low	trivial: getter of dword this+0x34; 1 caller	ghidra-canon	docs/re/runtime.md
+0x438ae0	GetNetModeCode	runtime	low	I: returns 5, or 6 if stub 0x452d10(&0x78e948) is nonzero (the stub returns 0); rejected B RaceParameters::IsFreeRun: returns 5/6 not a bool	ghidra-canon	docs/re/runtime.md
+0x43a340	IsFlag7346c8Set	runtime	low	trivial: returns [0x7346c8] != 0; 5 callers incl. HudRaceOver::Update	ghidra-canon	docs/re/runtime.md
+0x43b850	Race::GetPlayer	runtime	med	V: returns this[8+idx*4] or 0 (4 player slots, loop in 0x43a220 walks idx 0..3); rejected B Race::GetMostRecentlyFinishedPlayer: GC has no index arg	ghidra-canon	docs/re/runtime.md
+0x43eaa0	RaceManager::GetRacerRank	runtime	med	V: walks list (0x421960 next, NullUpdate_ret end) for node +8 == id, returns 1-based index or 0; callers UpdateAIScores, HudPosition::Update; rejected R DriftManager::GetLeaderBoardPos: used for all races	ghidra-canon	docs/re/runtime.md
+0x440710	RefArray_DecrementAll	runtime	low	I: for count +0x2a0 entries at +0x20 decrements byte +8 of each pointee; 18 callers mostly unwind funclets (destructor body); rejected R TopologyCoordinate::~TopologyCoordinate: no topology data	ghidra-canon	docs/re/runtime.md
+0x445720	bList::bList	runtime	med	trivial: thunk to 0x589260 which sets head.next = head.prev = head; 56 callers are StaticInit_* functions	ghidra-canon	docs/re/runtime.md
+0x454f30	Curve_Evaluate	runtime	med	V: table of (x,y) float pairs at *eax count eax[1]; clamps to first/last y outside range, else linear interpolation between neighbours; rejected R AIActionGetUnstuck::~AIActionGetUnstuck: no destructor shape	ghidra-canon	docs/re/runtime.md
+0x456e90	GetNearestTrafficLane	runtime	high	V: R hint fits: 6 args (route point eax, vec2 ecx, Car unused, direction, two ints) vs GC (Car*,bVector2*,TrackRoutePoint*,eTrackDirection,int,int); lateral offset by cross product, scans 6 lanes gated by track enable bytes [0x77af30]+0x265	ghidra-canon+nfsug	docs/re/runtime.md
+0x461520	RealDriver::SetManualTransmission	runtime	high	V: R hint fits: one int arg (ecx) 0..3 stored in this+0x284, copies car+0x3d8 to +0x1d4 for modes 1/3, mirrors mode into car physics +0x60; callers Player::DragPilotOn/Off	ghidra-canon+nfsug	docs/re/runtime.md
+0x4653e0	Vec3_TransformSub	runtime	low	I: D3DXVec3Transform then esi[4..6] = edi[0..2] - result; caller camera mover 0x438030; rejected B CarState::CalculateGeometryPosition: caller is a camera, no CarState	ghidra-canon	docs/re/runtime.md
+0x465530	CarState::StopTimer	runtime	low	I: if stamp +0x3bc valid, +0x3b8 = ftol(elapsed), +0x3b4 = 0, +0x3bc = 0; rejected B CarState::GetMaxEngineTorque: writes state, returns nothing	ghidra-canon	docs/re/runtime.md
+0x4665e0	Struct_ClearHeader	runtime	low	trivial: zeroes four shorts +8..+0xe and three dwords +0x10..+0x18; 6 callers; rejected R Collision::GetSmokeable: setter not getter	ghidra-canon	docs/re/runtime.md

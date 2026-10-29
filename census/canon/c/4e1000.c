@@ -8339,7 +8339,7 @@ undefined4 * __thiscall FUN_004eb7c0(int param_1,undefined4 *param_2)
   FEScreen__FEScreen(param_2,param_1);
   local_4 = 0;
   *param_2 = &PTR_FUN_006c2d28;
-  FUN_0041f0c0();
+  FEMenuData__FEMenuData();
   local_4 = CONCAT31(local_4._1_3_,1);
   param_2[0x11] = *(undefined4 *)(param_1 + 4);
   FUN_004ebf20(&DAT_00777c10);
@@ -11250,9 +11250,11 @@ LAB_004ee989:
 }
 
 
-// ==== 0x4eea10 FUN_004eea10
+// ==== 0x4eea10 FEObjectPool_Allocate
 
-void FUN_004eea10(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/hud.md */
+
+void FEObjectPool_Allocate(int param_1)
 
 {
   void *pvVar1;
@@ -12738,7 +12740,7 @@ void FUN_004f0800(int param_1,int param_2)
 void * __thiscall FUN_004f08b0(void *param_1,byte param_2)
 
 {
-  FUN_004f08d0();
+  FEBufferBase_DtorBody();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -12746,9 +12748,11 @@ void * __thiscall FUN_004f08b0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4f08d0 FUN_004f08d0
+// ==== 0x4f08d0 FEBufferBase_DtorBody
 
-void FUN_004f08d0(void)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void FEBufferBase_DtorBody(void)
 
 {
   undefined4 *unaff_ESI;

@@ -18626,6 +18626,38 @@ void FUN_0067ff8a(void)
 }
 
 
+// ==== 0x68005e FUN_0068005e
+
+void FUN_0068005e(void)
+
+{
+  LPCSTR unaff_ESI;
+  
+  _strcat();
+  _strcat();
+  _strcat();
+  _strcat();
+  ___crtMessageBoxA(unaff_ESI,"Microsoft Visual C++ Runtime Library",0x12010);
+                    /* WARNING: Subroutine does not return */
+  __exit(3);
+}
+
+
+// ==== 0x68006b FUN_0068006b
+
+void FUN_0068006b(void)
+
+{
+  LPCSTR unaff_ESI;
+  
+  _strcat();
+  _strcat();
+  ___crtMessageBoxA(unaff_ESI,"Microsoft Visual C++ Runtime Library",0x12010);
+                    /* WARNING: Subroutine does not return */
+  __exit(3);
+}
+
+
 // ==== 0x680095 ___crtInitCritSecNoSpinCount@8
 
 /* Library Function - Single Match

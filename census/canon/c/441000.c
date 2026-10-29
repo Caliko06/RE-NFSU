@@ -4440,9 +4440,11 @@ void FUN_00445660(void)
 }
 
 
-// ==== 0x445720 FUN_00445720
+// ==== 0x445720 bList::bList
 
-void FUN_00445720(void)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void bList__bList(void)
 
 {
   FUN_00589260();
@@ -4773,7 +4775,7 @@ undefined4 StreamSection_Unload(int *param_1)
           }
           puVar1 = (undefined4 *)*piVar7;
           if (puVar1 != (undefined4 *)0x0) {
-            FUN_0042ac80();
+            ListRef_Release();
             iVar2 = DAT_0073557c;
             iVar4 = *(int *)(DAT_0073557c + 0x18);
             *puVar1 = *(undefined4 *)(DAT_0073557c + 0x10);
@@ -6413,7 +6415,7 @@ void GameFlow__MainLoop(void)
     pcVar2 = DAT_0077a904;
     uVar11 = DAT_0077a908;
     if (DAT_007361f0 != (int *)0x0) {
-      FUN_00421b10(DAT_007361f0);
+      Race__PumpFlowMessages(DAT_007361f0);
       FUN_00421bc0(3,0);
       pcVar2 = DAT_0077a904;
       uVar11 = DAT_0077a908;
@@ -8591,9 +8593,11 @@ LAB_00449c20:
 }
 
 
-// ==== 0x449d80 FUN_00449d80
+// ==== 0x449d80 GetLanguageCode
 
-undefined1 * FUN_00449d80(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+undefined1 * GetLanguageCode(void)
 
 {
   switch(DAT_00734998) {
@@ -8634,9 +8638,11 @@ switchD_00449d8a_default:
 }
 
 
-// ==== 0x449e20 FUN_00449e20
+// ==== 0x449e20 GetCountryCode
 
-undefined * FUN_00449e20(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+undefined * GetCountryCode(void)
 
 {
   switch(DAT_00734998) {
@@ -9796,8 +9802,8 @@ void __thiscall FUN_0044b1b0(int *param_1,float param_2)
       ExceptionList = &pvStack_1c;
       uVar4 = (**(code **)(*param_1 + 0x58))();
       iVar5 = (uVar4 & ((int)uVar4 < 1) - 1) * 0x54;
-      fVar11 = (float10)FUN_004216f0(*(float *)(&DAT_0077a018 + iVar5) -
-                                     *(float *)(&DAT_0077a014 + iVar5));
+      fVar11 = (float10)Random_NextFloat(*(float *)(&DAT_0077a018 + iVar5) -
+                                         *(float *)(&DAT_0077a014 + iVar5));
       param_1[0x128] = (int)(float)(fVar11 + extraout_ST1 + (float10)0.001);
     }
     piVar9 = DAT_0073619c;
@@ -9873,7 +9879,7 @@ LAB_0044b3e8:
       FUN_00424cd0(param_1 + 0x10b,0x3fc00000);
       FUN_00584270(ABS(*(float *)(*(int *)(param_1[1] + 0x1c) + 0x18)) * DAT_007372b0);
       FUN_00421400();
-      cVar3 = FUN_004280a0();
+      cVar3 = Car__IsResetGraceActive();
       if ((cVar3 == '\0') &&
          (((iVar5 = param_1[0x10c], *(char *)(iVar5 + 6) == *(char *)(iVar5 + 5) &&
            (*(float *)(iVar5 + 0xc) < 0.2)) && (extraout_DL == '\0')))) {
@@ -9916,7 +9922,7 @@ LAB_0044b707:
         if ((((*(int *)(iVar6 + 4) == 2) && (cVar3 = FUN_00465430(), cVar3 != '\0')) &&
             (cVar3 = FUN_0044cac0(param_1), cVar3 == '\0')) &&
            (cVar3 = (**(code **)(*param_1 + 0x8c))(), cVar3 != '\0')) {
-          FUN_00465530();
+          CarState__StopTimer();
           (**(code **)(*param_1 + 0x80))();
         }
         if (*(int *)(param_1[1] + 0x28) == 4) {
@@ -9998,7 +10004,7 @@ LAB_0044b707:
            (cVar3 = FUN_00465430(), cVar3 != '\0')) &&
           (cVar3 = (**(code **)(*param_1 + 0x78))(piVar9), cVar3 == '\0')) &&
          (cVar3 = (**(code **)(*param_1 + 0x8c))(), cVar3 != '\0')) {
-        FUN_00465530();
+        CarState__StopTimer();
         (**(code **)(*param_1 + 0x80))();
       }
       if (DAT_00736090 == 0) {
@@ -10525,11 +10531,11 @@ void TrafficCar_HonkAtPlayer(int param_1)
       return;
     }
     local_10 = 0;
-    fVar5 = (float10)FUN_004216f0(0x3ecccccd);
-    fVar6 = (float10)FUN_004216f0(0x3e4ccccd);
-    fVar7 = (float10)FUN_004216f0(0x3ecccccd);
+    fVar5 = (float10)Random_NextFloat(0x3ecccccd);
+    fVar6 = (float10)Random_NextFloat(0x3e4ccccd);
+    fVar7 = (float10)Random_NextFloat(0x3ecccccd);
     local_c = (float)((fVar7 + (float10)0.3) - (float10)0.2);
-    fVar7 = (float10)FUN_004216f0(0x3f800000);
+    fVar7 = (float10)Random_NextFloat(0x3f800000);
     bVar1 = fVar7 < (float10)_K_HALF;
     if (*(float *)(iVar4 + 4) <= 50.0) {
       if ((*(int *)(*(int *)(*(int *)(param_1 + 4) + 0x14) + 4) != 3) ||
@@ -10541,13 +10547,13 @@ void TrafficCar_HonkAtPlayer(int param_1)
       bVar1 = true;
       local_c = local_c + 0.6;
     }
-    fVar7 = (float10)FUN_004216f0(0x3f800000);
+    fVar7 = (float10)Random_NextFloat(0x3f800000);
     if (extraout_ST1 <= fVar7) {
       uStack00000008 = 0;
     }
     else {
       uStack00000008 = 1;
-      fVar7 = (float10)FUN_004216f0(0x3f800000);
+      fVar7 = (float10)Random_NextFloat(0x3f800000);
       local_10 = 1;
       if (extraout_ST1_00 <= fVar7) {
         local_10 = 0;
@@ -11266,7 +11272,7 @@ LAB_0044d337:
           local_2c = (float)((int)local_2c + 1);
         } while ((int)local_2c < 6);
         uVar7 = (**(code **)(*(int *)param_1[0xea] + 4))(0xff,0xff);
-        iVar8 = FUN_00456e90(iVar2,uVar7);
+        iVar8 = GetNearestTrafficLane(iVar2,uVar7);
         if (iVar8 != -1) {
           param_1[0xe5] = iVar8;
         }
@@ -12793,7 +12799,7 @@ undefined4 FUN_0044f0d0(void)
   }
   iVar2 = *in_EAX;
   uVar1 = (**(code **)(**(int **)(iVar2 + 0x2c) + 0x40))(0xff,0xff);
-  iVar2 = FUN_00456e90(iVar2,uVar1);
+  iVar2 = GetNearestTrafficLane(iVar2,uVar1);
   if (iVar2 != -1) {
     in_EAX[0xe5] = iVar2;
     in_EAX[0xe7] = 0;

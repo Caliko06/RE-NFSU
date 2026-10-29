@@ -76,9 +76,11 @@ void __fastcall FUN_00461510(int *param_1)
 }
 
 
-// ==== 0x461520 FUN_00461520
+// ==== 0x461520 RealDriver::SetManualTransmission
 
-void __fastcall FUN_00461520(int param_1)
+/* [canon] runtime high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+void __fastcall RealDriver__SetManualTransmission(int param_1)
 
 {
   int in_EAX;
@@ -277,7 +279,7 @@ void FUN_004618b0(undefined4 param_1,float param_2,byte param_3,int param_4)
   param_2 = (float)bVar3 * _K_BLUR_MIN_T;
   *(float *)(iVar1 + 0x294) = param_2;
   if (*(int *)(*(int *)(iVar1 + 0x26c) + 0x3d8) == 1) {
-    FUN_00454f30(&param_2,param_2);
+    Curve_Evaluate(&param_2,param_2);
     *(float *)(iVar1 + 0x294) = param_2;
   }
   return;
@@ -991,7 +993,7 @@ undefined4 __thiscall Racer__PersonalityDraw(int *param_1,int param_2)
     param_1[0x134] = 0;
   }
   if (param_2 != param_1[0x134]) {
-    fVar5 = (float10)FUN_004216f0(0x3f800000);
+    fVar5 = (float10)Random_NextFloat(0x3f800000);
     fVar1 = (float)fVar5;
     iVar4 = (**(code **)(*param_1 + 0x58))();
     if (iVar4 == -2) {
@@ -1077,7 +1079,7 @@ bool __thiscall Racer__ShouldTakeFork(int *param_1,int param_2)
   cVar1 = FUN_0044bad0(param_1);
   if (cVar1 == '\0') {
     if (*(char *)(param_2 + 0xb) == '\x04') {
-      fVar3 = (float10)FUN_004216f0(0x3f800000);
+      fVar3 = (float10)Random_NextFloat(0x3f800000);
       if (fVar3 < (float10)_K_HALF) {
         return true;
       }
@@ -1090,7 +1092,7 @@ bool __thiscall Racer__ShouldTakeFork(int *param_1,int param_2)
       else if (9 < iVar2) {
         iVar2 = 9;
       }
-      fVar3 = (float10)FUN_004216f0(0x3f800000);
+      fVar3 = (float10)Random_NextFloat(0x3f800000);
       iVar2 = iVar2 * 0x54;
       if (fVar3 < (float10)*(float *)(&DAT_00779ff8 + iVar2) !=
           (fVar3 == (float10)*(float *)(&DAT_00779ff8 + iVar2))) {
@@ -2960,8 +2962,8 @@ void FUN_00465150(int *param_1)
   local_58 = *(float *)(iVar3 + 0x18 + iVar2) + (float)param_1[in_EAX + 0xc0];
   local_94 = 0x3f800000;
   local_98 = (float)puVar1[2] + (float)param_1[in_EAX + 0xc0];
-  FUN_00401cd0();
-  FUN_00401cd0();
+  bMatrixCopy_b();
+  bMatrixCopy_b();
   return;
 }
 
@@ -2984,9 +2986,11 @@ void FUN_00465390(void)
 }
 
 
-// ==== 0x4653e0 FUN_004653e0
+// ==== 0x4653e0 Vec3_TransformSub
 
-void FUN_004653e0(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void Vec3_TransformSub(void)
 
 {
   float fVar1;
@@ -3029,7 +3033,7 @@ uint FUN_00465430(void)
                                       (ushort)(NAN(fVar2) || NAN(fVar1)) << 10 |
                                       (ushort)(fVar2 == fVar1) << 0xe) >> 8),1);
     }
-    uVar4 = FUN_00465530();
+    uVar4 = CarState__StopTimer();
   }
   return uVar4 & 0xffffff00;
 }
@@ -3082,9 +3086,11 @@ void FUN_004654f0(void)
 }
 
 
-// ==== 0x465530 FUN_00465530
+// ==== 0x465530 CarState::StopTimer
 
-void FUN_00465530(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void CarState__StopTimer(void)
 
 {
   undefined4 uVar1;
@@ -3613,8 +3619,8 @@ LAB_004661ed:
           fStack_108 = 0.0;
           fStack_f8 = fVar3 * 4.1;
           fStack_10c = 0.0;
-          fVar12 = (float10)FUN_00401c80(ABS(fStack_124) * 0.0675 * fStack_120 * fVar3,-fStack_f8,
-                                         fStack_f8);
+          fVar12 = (float10)bClampF(ABS(fStack_124) * 0.0675 * fStack_120 * fVar3,-fStack_f8,
+                                    fStack_f8);
           fStack_104 = (float)fVar12;
           (**(code **)(*piVar1 + 0x4c))(&fStack_10c,auStack_11c);
         }
@@ -3870,9 +3876,11 @@ void FUN_004665a0(void)
 }
 
 
-// ==== 0x4665e0 FUN_004665e0
+// ==== 0x4665e0 Struct_ClearHeader
 
-void __fastcall FUN_004665e0(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall Struct_ClearHeader(int param_1)
 
 {
   *(undefined2 *)(param_1 + 8) = 0;
@@ -3942,7 +3950,7 @@ void FUN_00466690(undefined4 *param_1)
   undefined4 uVar1;
   undefined4 uVar2;
   
-  FUN_00401cd0();
+  bMatrixCopy_b();
   uVar2 = _DAT_007372a8;
   uVar1 = _DAT_007372a4;
   *param_1 = DAT_007372a0;
@@ -4840,7 +4848,7 @@ undefined4 FUN_00467390(int param_1,float *param_2)
         *param_2 = fVar2;
         param_2[2] = fVar1;
         fVar15 = (float10)(**(code **)(**(int **)(param_1 + 600) + 0x20))();
-        pfVar11 = (float *)FUN_00408180((float)fVar15);
+        pfVar11 = (float *)Vec3_ScaleTo((float)fVar15);
         fVar1 = pfVar11[1];
         fVar2 = pfVar11[2];
         *param_2 = *pfVar11 + *param_2;
@@ -4852,7 +4860,7 @@ undefined4 FUN_00467390(int param_1,float *param_2)
         in_EAX[1] = fVar1;
         in_EAX[2] = fVar2;
         fVar15 = (float10)(**(code **)(**(int **)(param_1 + 0x25c) + 0x20))();
-        pfVar11 = (float *)FUN_00408180((float)-fVar15);
+        pfVar11 = (float *)Vec3_ScaleTo((float)-fVar15);
         fVar1 = pfVar11[1];
         fVar2 = pfVar11[2];
         *in_EAX = *pfVar11 + *in_EAX;
@@ -5511,7 +5519,7 @@ void FUN_004685a0(float param_1)
       else {
         iVar3 = DAT_00779c70 + -4;
       }
-      iVar2 = FUN_0040cb70();
+      iVar2 = Ptr_BaseAdjustMinus4();
       _DAT_00736054 = param_1;
       while (iVar3 != iVar2) {
         param_1 = _DAT_00736054;
@@ -5561,7 +5569,7 @@ void FUN_00468680(int param_1,float *param_2)
   if (fVar2 == *in_EAX) {
     return;
   }
-  iVar4 = FUN_0040cb70();
+  iVar4 = Ptr_BaseAdjustMinus4();
   piVar1 = (int *)(param_1 + 4);
   do {
     while( true ) {
@@ -5841,7 +5849,7 @@ void FUN_00468a50(void)
   local_94 = 0.0;
   local_7c = 0.0;
   local_8c = 0.0;
-  FUN_004665e0();
+  Struct_ClearHeader();
   iVar4 = 0;
   if (0 < *(int *)(*(int *)(unaff_EDI + 0x10) + 0x14)) {
     do {
@@ -6016,7 +6024,7 @@ void FUN_00468f70(int param_1)
   int *unaff_ESI;
   
   (**(code **)(*unaff_ESI + 0x14))();
-  FUN_00401cd0();
+  bMatrixCopy_b();
   piVar3 = (int *)(**(code **)(*unaff_ESI + 8))();
   iVar1 = piVar3[1];
   iVar2 = piVar3[2];
@@ -6089,7 +6097,7 @@ void __thiscall FUN_00468fe0(int *param_1,float *param_2,float *param_3,float pa
     *param_2 = *pfVar40;
     param_2[1] = fVar1;
     param_2[2] = fVar2;
-    FUN_00401cd0();
+    bMatrixCopy_b();
     return;
   }
   fVar39 = ((float)param_1[0x1c] - param_4) / (float)param_1[0x1c];
@@ -6231,7 +6239,7 @@ void __thiscall FUN_00469390(int *param_1,undefined4 param_2)
     *(undefined4 *)(iVar2 + 0x20) = uStack_6c;
     *(undefined4 *)(iVar2 + 0x24) = uStack_68;
     *(undefined4 *)(iVar2 + 0x28) = uStack_64;
-    FUN_00401cd0();
+    bMatrixCopy_b();
     iVar2 = param_1[0x1b];
     *(float *)(iVar2 + 0x74) = unaff_EBX * fVar1;
     *(float *)(iVar2 + 0x70) = unaff_ESI * fVar1;
@@ -6355,7 +6363,7 @@ void WorldObjects__Broadphase(int *param_1)
     else {
       piVar7 = (int *)(param_1[2] + -4);
     }
-    piVar5 = (int *)FUN_0040cb70();
+    piVar5 = (int *)Ptr_BaseAdjustMinus4();
     while ((piVar7 != piVar5 && (fVar2 <= (float)piVar7[0xb]))) {
       if (piVar7[2] == 0) {
         piVar7 = (int *)0x0;
@@ -7371,7 +7379,7 @@ void AllTrackPolygonCollisionBodies__Serialize(int param_1)
     else {
       piVar3 = (int *)(DAT_00779c70 + -4);
     }
-    piVar4 = (int *)FUN_0040cb70();
+    piVar4 = (int *)Ptr_BaseAdjustMinus4();
     while (piVar3 != piVar4) {
       if (*(char *)((int)piVar3 + 0x15) == '\x03') {
         local_1c = *(int *)(piVar3[0x18] + 0xc) - DAT_0077b140 >> 5;
@@ -8025,7 +8033,7 @@ void __fastcall FUN_0046b070(int param_1,float *param_2,int param_3)
         iVar4 = 0;
       }
       if (iVar4 == 0) {
-        FUN_00424b70();
+        Vec3_Sub();
         if (local_20 * fVar1 + local_1c * fVar2 + local_18 * fVar3 < 0.0) {
           unaff_ESI[2] = -fVar3;
           *unaff_ESI = -fVar1;
@@ -9140,7 +9148,7 @@ void FUN_0046ccc0(void)
         if (fVar8 < (float10)0.3) {
           pfVar2 = *(float **)(unaff_ESI + 0x18);
           fVar6 = (fVar3 - *pfVar2) / (pfVar2[2] - *pfVar2);
-          fVar8 = (float10)FUN_00401c60(0x3f800000,fVar6 + fVar6);
+          fVar8 = (float10)bMin(0x3f800000,fVar6 + fVar6);
           *(float *)(unaff_ESI + 0xa4) = (float)(fVar8 * (float10)fVar5);
           return;
         }
@@ -9152,11 +9160,11 @@ void FUN_0046ccc0(void)
         if ((float10)0.3 <= fVar8) {
           pfVar2 = *(float **)(unaff_ESI + 0x18);
           fVar8 = (float10)FUN_0046cfc0();
-          fVar8 = (float10)FUN_00401c60(0x3f800000,(float)fVar8);
-          fVar8 = (float10)FUN_00401c60(fVar4,(float)((((float10)fVar3 - (float10)*pfVar2) /
-                                                      ((float10)pfVar2[2] - (float10)*pfVar2)) *
-                                                      fVar8 * (float10)2.0 * (float10)fVar6 +
-                                                     (float10)*(float *)(unaff_ESI + 0xa4)));
+          fVar8 = (float10)bMin(0x3f800000,(float)fVar8);
+          fVar8 = (float10)bMin(fVar4,(float)((((float10)fVar3 - (float10)*pfVar2) /
+                                              ((float10)pfVar2[2] - (float10)*pfVar2)) * fVar8 *
+                                              (float10)2.0 * (float10)fVar6 +
+                                             (float10)*(float *)(unaff_ESI + 0xa4)));
           *(float *)(unaff_ESI + 0xa4) = (float)fVar8;
           return;
         }
@@ -9173,10 +9181,9 @@ void FUN_0046ccc0(void)
         bVar7 = false;
         fVar8 = (float10)FUN_00405610(fVar3 * fVar3 * 6.5,fVar5 + fVar5,
                                       *(undefined4 *)(unaff_ESI + 0xb0));
-        fVar8 = (float10)FUN_00401c80((float)((((float10)*(float *)(unaff_ESI + 0xb0) /
-                                               (float10)fVar4) /
-                                              (float10)*(float *)(unaff_ESI + 0xb4)) * fVar8 *
-                                              (float10)0.015 + (float10)fVar5));
+        fVar8 = (float10)bClampF((float)((((float10)*(float *)(unaff_ESI + 0xb0) / (float10)fVar4) /
+                                         (float10)*(float *)(unaff_ESI + 0xb4)) * fVar8 *
+                                         (float10)0.015 + (float10)fVar5));
         if (*(float *)(unaff_ESI + 0xb8) == 0.0) {
           *(float *)(unaff_ESI + 0xb8) = (float)fVar8;
         }
@@ -10178,15 +10185,15 @@ void FUN_0046e440(void)
          (fVar3 = (float10)FUN_0046d830(), fVar3 <= (float10)0.0)))) && (local_4 < 0.0)) {
       fVar3 = (float10)FUN_0046cff0();
       iVar2 = *(int *)(unaff_ESI + 0x20);
-      fVar3 = (float10)FUN_00401c80(local_4 * *(float *)(*(int *)(unaff_ESI + 0x18) + 0x14),
-                                    -(float)ABS(fVar3 + fVar3),(float)ABS(fVar3 + fVar3));
+      fVar3 = (float10)bClampF(local_4 * *(float *)(*(int *)(unaff_ESI + 0x18) + 0x14),
+                               -(float)ABS(fVar3 + fVar3),(float)ABS(fVar3 + fVar3));
       *(float *)(iVar2 + 0x7c) = (float)(fVar3 + (float10)*(float *)(iVar2 + 0x7c));
     }
     fVar3 = (float10)FUN_0046cff0();
     iVar2 = *(int *)(unaff_ESI + 0x20);
     fVar1 = (float)((float10)*(float *)(iVar2 + 0x7c) + fVar3);
     if (((float10)*(float *)(iVar2 + 0x7c) < fVar3) && (fVar1 < 0.0)) {
-      FUN_00454f30(&local_4,fVar1);
+      Curve_Evaluate(&local_4,fVar1);
       *(float *)(iVar2 + 0x7c) =
            local_4 * *(float *)(unaff_ESI + 0xe4) * fVar1 + *(float *)(iVar2 + 0x7c);
     }

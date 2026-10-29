@@ -184,7 +184,7 @@ void FUN_004b1760(int param_1,int param_2,int param_3)
       }
       FUN_0040b930();
       D3DXMatrixMultiply(local_2d0,local_2d0,local_90);
-      FUN_00401cd0();
+      bMatrixCopy_b();
       CallNTimes(auStack_29c,0x40,4,FUN_004ad8d0);
       CallNTimes(auStack_19c,0x40,4,FUN_004ad8d0);
       _ftol_nocw();
@@ -255,12 +255,12 @@ void FUN_004b1760(int param_1,int param_2,int param_3)
       } while (iVar8 < 0x100);
       iVar6 = 4;
       do {
-        FUN_00401cd0();
+        bMatrixCopy_b();
         iVar6 = iVar6 + -1;
       } while (iVar6 != 0);
       iVar6 = 4;
       do {
-        FUN_00401cd0();
+        bMatrixCopy_b();
         iVar6 = iVar6 + -1;
       } while (iVar6 != 0);
       *(float *)(param_2 + 0x9a8) = fStack_2e4;
@@ -288,11 +288,11 @@ void FUN_004b1b70(int param_1)
       *(undefined4 *)(iVar2 + 0x30) = 0;
       *(undefined4 *)(iVar2 + 0x34) = 0;
       *(undefined4 *)(iVar2 + 0x38) = 0;
-      FUN_00401c10(0);
+      bDegreesToAngle16(0);
       FUN_0040baf0(iVar2,iVar2);
-      FUN_00401c10(0);
+      bDegreesToAngle16(0);
       FUN_0040b990(iVar2,iVar2);
-      FUN_00401c10(0);
+      bDegreesToAngle16(0);
       FUN_0040ba40(iVar2,iVar2);
       if (DAT_006fb038 == 0) {
         FUN_0040c910(&DAT_00740460 + iVar1 * 0x18,param_1 + 0x48,iVar2,0,0);
@@ -6949,7 +6949,7 @@ void FUN_004b9fd0(int *param_1)
   int iVar9;
   int local_8;
   
-  iVar4 = FUN_0040cb70();
+  iVar4 = Ptr_BaseAdjustMinus4();
   do {
     local_8 = 0;
     if (*param_1 == 0) {
@@ -9772,11 +9772,11 @@ void __fastcall FUN_004bd850(undefined4 *param_1)
 
 {
   *param_1 = &PTR_FUN_006c56c8;
-  param_1[0x4c] = &PTR_FUN_006cbe74;
-  param_1[0x40] = &PTR_FUN_006cbe74;
-  param_1[0x34] = &PTR_FUN_006cbe74;
-  param_1[0x28] = &PTR_FUN_006cbe74;
-  param_1[0x1c] = &PTR_FUN_006cbe74;
+  param_1[0x4c] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
+  param_1[0x40] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
+  param_1[0x34] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
+  param_1[0x28] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
+  param_1[0x1c] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
   FUN_004f7b50();
   return;
 }
@@ -9856,7 +9856,7 @@ undefined4 * Screen_MU_PauseOptions_PC__Screen_MU_PauseOptions_PC(undefined4 *pa
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   *param_1 = &PTR_FUN_006c56c8;
-  param_1[0x1c] = &PTR_FUN_006cbe74;
+  param_1[0x1c] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
   param_1[0x1d] = &DAT_006b9172;
   param_1[0x1e] = 0;
   param_1[0x1f] = 0;
@@ -9868,7 +9868,7 @@ undefined4 * Screen_MU_PauseOptions_PC__Screen_MU_PauseOptions_PC(undefined4 *pa
   param_1[0x25] = 0;
   param_1[0x26] = 0;
   param_1[0x27] = 0;
-  param_1[0x28] = &PTR_FUN_006cbe74;
+  param_1[0x28] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
   param_1[0x29] = &DAT_006b9172;
   param_1[0x2a] = 0;
   param_1[0x2b] = 0;
@@ -9880,7 +9880,7 @@ undefined4 * Screen_MU_PauseOptions_PC__Screen_MU_PauseOptions_PC(undefined4 *pa
   param_1[0x31] = 0;
   param_1[0x32] = 0;
   param_1[0x33] = 0;
-  param_1[0x34] = &PTR_FUN_006cbe74;
+  param_1[0x34] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
   param_1[0x35] = &DAT_006b9172;
   param_1[0x36] = 0;
   param_1[0x37] = 0;
@@ -9892,7 +9892,7 @@ undefined4 * Screen_MU_PauseOptions_PC__Screen_MU_PauseOptions_PC(undefined4 *pa
   param_1[0x3d] = 0;
   param_1[0x3e] = 0;
   param_1[0x3f] = 0;
-  param_1[0x40] = &PTR_FUN_006cbe74;
+  param_1[0x40] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
   param_1[0x41] = &DAT_006b9172;
   param_1[0x42] = 0;
   param_1[0x43] = 0;
@@ -9904,7 +9904,7 @@ undefined4 * Screen_MU_PauseOptions_PC__Screen_MU_PauseOptions_PC(undefined4 *pa
   param_1[0x49] = 0;
   param_1[0x4a] = 0;
   param_1[0x4b] = 0;
-  param_1[0x4c] = &PTR_FUN_006cbe74;
+  param_1[0x4c] = &PTR_Slider__scalar_deleting_destructor_006cbe74;
   param_1[0x4d] = &DAT_006b9172;
   param_1[0x4e] = 0;
   param_1[0x4f] = 0;
@@ -10672,7 +10672,7 @@ void FUN_004beca0(int param_1)
   
   if ((param_1 == -0x6edfbf62) || (param_1 == -0x4a68e40f)) {
     FUN_004cd610();
-    FUN_00461520();
+    RealDriver__SetManualTransmission();
     FUN_004cd610();
     FUN_00494b90();
     FUN_004be9a0();

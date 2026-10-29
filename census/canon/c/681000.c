@@ -5932,7 +5932,7 @@ void Unwind_006855d0(void)
 {
   int unaff_EBP;
   
-  eh_vector_destructor_iterator((void *)(*(int *)(unaff_EBP + 4) + 0xe0),0x18,2,FUN_0042ac80);
+  eh_vector_destructor_iterator((void *)(*(int *)(unaff_EBP + 4) + 0xe0),0x18,2,ListRef_Release);
   return;
 }
 
@@ -6068,7 +6068,8 @@ void Unwind_006856be(void)
 {
   int unaff_EBP;
   
-  eh_vector_destructor_iterator((void *)(*(int *)(unaff_EBP + 4) + 0xe6c),0x18,0x78,FUN_0042ac80);
+  eh_vector_destructor_iterator((void *)(*(int *)(unaff_EBP + 4) + 0xe6c),0x18,0x78,ListRef_Release)
+  ;
   return;
 }
 
@@ -6078,7 +6079,7 @@ void Unwind_006856be(void)
 void Unwind_006856d6(void)
 
 {
-  FUN_004ad8a0();
+  IList_FreeNodes_Member2C();
   return;
 }
 
@@ -6534,7 +6535,7 @@ void FUN_00685952(void)
 void Unwind_00685960(void)
 
 {
-  FUN_004ad8a0();
+  IList_FreeNodes_Member2C();
   return;
 }
 
@@ -6944,7 +6945,7 @@ void Unwind_00685b70(void)
 void Unwind_00685b78(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -7524,7 +7525,7 @@ void Unwind_00685eb0(void)
 void Unwind_00685ebb(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -7554,7 +7555,7 @@ void Unwind_00685ee0(void)
 void Unwind_00685ee8(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -7754,7 +7755,7 @@ void FUN_00685feb(void)
 void Unwind_00686000(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -7814,7 +7815,7 @@ void FUN_00686048(void)
 void Unwind_00686060(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -8068,7 +8069,7 @@ void Unwind_006861d6(void)
 void Unwind_006861e1(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -8178,7 +8179,7 @@ void FUN_0068626c(void)
 void Unwind_00686280(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -8320,7 +8321,7 @@ void Unwind_0068634c(void)
 void Unwind_0068635d(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -8370,7 +8371,7 @@ void Unwind_00686399(void)
 void Unwind_006863a7(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -9051,7 +9052,7 @@ void Unwind_00686797(void)
   int unaff_EBP;
   
   eh_vector_destructor_iterator
-            ((void *)(*(int *)(*(int *)(unaff_EBP + -0x10) + 8) + 0xe6c),0x18,0x78,FUN_0042ac80);
+            ((void *)(*(int *)(*(int *)(unaff_EBP + -0x10) + 8) + 0xe6c),0x18,0x78,ListRef_Release);
   return;
 }
 
@@ -9061,7 +9062,7 @@ void Unwind_00686797(void)
 void Unwind_006867b2(void)
 
 {
-  FUN_004ad8a0();
+  IList_FreeNodes_Member2C();
   return;
 }
 
@@ -9356,7 +9357,7 @@ void FUN_0068696c(void)
 void Unwind_00686980(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -9474,7 +9475,7 @@ void Unwind_00686a18(void)
 void Unwind_00686a41(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -9546,7 +9547,7 @@ void Unwind_00686a98(void)
 void Unwind_00686aa6(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -10859,7 +10860,7 @@ void Unwind_0068720d(void)
 void Unwind_0068721b(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -10869,7 +10870,7 @@ void Unwind_0068721b(void)
 void Unwind_00687229(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -10879,7 +10880,7 @@ void Unwind_00687229(void)
 void Unwind_00687237(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -10889,7 +10890,7 @@ void Unwind_00687237(void)
 void Unwind_00687245(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -10899,7 +10900,7 @@ void Unwind_00687245(void)
 void Unwind_00687253(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -10909,7 +10910,7 @@ void Unwind_00687253(void)
 void Unwind_00687261(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -10919,7 +10920,7 @@ void Unwind_00687261(void)
 void Unwind_0068726f(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -10929,7 +10930,7 @@ void Unwind_0068726f(void)
 void Unwind_0068727d(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -10939,7 +10940,7 @@ void Unwind_0068727d(void)
 void Unwind_0068728b(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -11179,7 +11180,7 @@ void Unwind_006873b0(void)
 void Unwind_006873b8(void)
 
 {
-  FUN_0042ac80();
+  ListRef_Release();
   return;
 }
 
@@ -11339,7 +11340,7 @@ void Unwind_00687490(void)
 void Unwind_00687498(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -11349,7 +11350,7 @@ void Unwind_00687498(void)
 void Unwind_006874a3(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -11359,7 +11360,7 @@ void Unwind_006874a3(void)
 void Unwind_006874ae(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -11369,7 +11370,7 @@ void Unwind_006874ae(void)
 void Unwind_006874bc(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -13579,7 +13580,7 @@ void Unwind_00687fb0(void)
 void Unwind_00687fb8(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -14563,7 +14564,7 @@ void FUN_00688573(void)
 void Unwind_00688580(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -14583,7 +14584,7 @@ void Unwind_0068858d(void)
 void Unwind_0068859b(void)
 
 {
-  FUN_004368e0();
+  Player__FreeMember960();
   return;
 }
 
@@ -15261,7 +15262,7 @@ void Unwind_0068896d(void)
 void Unwind_0068897b(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15271,7 +15272,7 @@ void Unwind_0068897b(void)
 void Unwind_00688989(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15281,7 +15282,7 @@ void Unwind_00688989(void)
 void Unwind_00688997(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15291,7 +15292,7 @@ void Unwind_00688997(void)
 void Unwind_006889a5(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15301,7 +15302,7 @@ void Unwind_006889a5(void)
 void Unwind_006889b3(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15311,7 +15312,7 @@ void Unwind_006889b3(void)
 void Unwind_006889c1(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15321,7 +15322,7 @@ void Unwind_006889c1(void)
 void Unwind_006889cf(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15331,7 +15332,7 @@ void Unwind_006889cf(void)
 void Unwind_006889dd(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15341,7 +15342,7 @@ void Unwind_006889dd(void)
 void Unwind_006889eb(void)
 
 {
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 
@@ -15551,7 +15552,7 @@ void FUN_00688b13(void)
 void Unwind_00688b20(void)
 
 {
-  FUN_00440710();
+  RefArray_DecrementAll();
   return;
 }
 
@@ -15571,7 +15572,7 @@ void Unwind_00688b2d(void)
 void Unwind_00688b3b(void)
 
 {
-  FUN_004368e0();
+  Player__FreeMember960();
   return;
 }
 
@@ -17053,7 +17054,7 @@ void Unwind_00689310(void)
 void Unwind_00689318(void)
 
 {
-  FUN_0042ac80();
+  ListRef_Release();
   return;
 }
 
@@ -17922,7 +17923,7 @@ void FUN_006897e6(void)
 void StaticInit_ParticleEmitter_G78e974_6897f0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(StaticInit_ParticleEmitter_G78e974_696200);
   return;
 }
@@ -17966,7 +17967,7 @@ void FUN_00689850(void)
 void FUN_00689880(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696250);
   return;
 }
@@ -18093,7 +18094,7 @@ void FUN_00689930(void)
 void FUN_00689ab0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696260);
   return;
 }
@@ -18150,7 +18151,8 @@ void FUN_00689b00(void)
 void FUN_00689b30(void)
 
 {
-  eh_vector_constructor_iterator(&DAT_0078a4e8,0x38,0x10,FUN_0040ed20,FUN_0040ed40);
+  eh_vector_constructor_iterator
+            (&DAT_0078a4e8,0x38,0x10,RenderQueueBuckets_Construct,RenderQueueBuckets_Destruct);
   _atexit(FUN_00696270);
   return;
 }
@@ -18181,7 +18183,7 @@ void FUN_00689b70(void)
 void FUN_00689b80(void)
 
 {
-  FUN_004131f0();
+  Struct_ClearFields8();
   _atexit(FUN_006962b0);
   return;
 }
@@ -18493,7 +18495,7 @@ void FUN_00689e50(void)
 void FUN_00689e70(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696310);
   return;
 }
@@ -18547,7 +18549,7 @@ void FUN_00689ee0(void)
 void FUN_00689f00(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696360);
   return;
 }
@@ -18571,7 +18573,7 @@ void FUN_00689f20(void)
 void StaticInit_CreateResourceFile_G77a924_689f40(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(StaticInit_CreateResourceFile_G77a924_696380);
   return;
 }
@@ -18658,7 +18660,7 @@ void FUN_00689ff0(void)
 void FUN_0068a000(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_006963d0);
   return;
 }
@@ -18669,7 +18671,7 @@ void FUN_0068a000(void)
 void FUN_0068a020(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_006963e0);
   return;
 }
@@ -18682,7 +18684,7 @@ void FUN_0068a020(void)
 void StaticInit_CarShape_G779bd8_68a040(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(StaticInit_CarShape_G779bd8_6963f0);
   return;
 }
@@ -19556,7 +19558,7 @@ void FUN_0068a800(void)
 void FUN_0068a820(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696430);
   return;
 }
@@ -19941,7 +19943,7 @@ void FUN_0068ac30(void)
 void StaticInit_AnimBank_G779798_68ac50(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(StaticInit_AnimBank_G779798_696440);
   return;
 }
@@ -20010,7 +20012,7 @@ void FUN_0068acc0(void)
 void FUN_0068ace0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696450);
   return;
 }
@@ -20184,7 +20186,7 @@ void FUN_0068ae60(void)
 void FUN_0068ae80(void)
 
 {
-  FUN_004ad810(&DAT_00746dd0);
+  MiniWorld__MiniWorld(&DAT_00746dd0);
   _atexit(FUN_00696490);
   return;
 }
@@ -20215,7 +20217,7 @@ void FUN_0068aeb0(void)
 void FUN_0068aec0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_006964c0);
   return;
 }
@@ -22741,7 +22743,7 @@ void FUN_0068d500(void)
 void FUN_0068d520(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(StaticInit_FEngFont_G7460fc_696510);
   return;
 }

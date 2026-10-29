@@ -1370,7 +1370,7 @@ void FUN_005530e0(void)
   char local_40;
   char local_3f [63];
   
-  cVar1 = FUN_00438a60();
+  cVar1 = Obj_GetByte19();
   if (cVar1 == '\0') {
     iVar2 = LanguageStrings__FindByHash();
     if (iVar2 == 0) {
@@ -2454,7 +2454,7 @@ undefined4 FUN_00554420(undefined4 param_1)
   pcStack_c = FUN_006881d3;
   local_10 = ExceptionList;
   ExceptionList = &local_10;
-  iVar1 = FUN_004134a0("OnlineGameRoomChallenge",0);
+  iVar1 = bMalloc_regarg("OnlineGameRoomChallenge",0);
   local_8 = 0;
   if (iVar1 == 0) {
     local_20 = 0;
@@ -2504,8 +2504,8 @@ undefined4 * __thiscall FUN_005544a0(undefined4 *param_1,undefined4 param_2)
   FUN_00589260(param_1,param_1 + 0x16);
   local_8 = CONCAT31(local_8._1_3_,1);
   param_1[0x1a] = 0x33650b60;
-  FUN_00405550();
-  FUN_00405550();
+  Ptr_SetNull();
+  Ptr_SetNull();
   iVar2 = FUN_00549480();
   if (iVar2 == 0) {
     cVar1 = FUN_00452d10(&DAT_0078e948);
@@ -2566,8 +2566,8 @@ void __fastcall FUN_00554650(undefined4 *param_1)
   ExceptionList = &local_10;
   *param_1 = &PTR_FUN_006bcdec;
   local_8 = 1;
-  while (iVar1 = FUN_00401bd0(), iVar1 == 0) {
-    iVar1 = FUN_00401be0();
+  while (iVar1 = bList__IsEmpty(), iVar1 == 0) {
+    iVar1 = bList__RemoveHead();
     if (iVar1 == 0) {
       local_3c = (undefined4 *)0x0;
     }
@@ -2871,7 +2871,7 @@ void __thiscall FUN_00554f60(int param_1,uint param_2,int param_3)
       }
       cVar1 = FUN_005494d0();
       if ((cVar1 == '\x01') &&
-         ((iVar3 = SpecialCamCooldown(), iVar3 != 0 && (iVar3 = FUN_0042ab10(), iVar3 != 0)))) {
+         ((iVar3 = SpecialCamCooldown(), iVar3 != 0 && (iVar3 = int_Less(), iVar3 != 0)))) {
         iVar3 = FUN_005543d0();
         if (iVar3 != 0) {
           return;
@@ -3256,7 +3256,7 @@ void __thiscall FUN_00555ce0(int param_1,undefined4 param_2,undefined4 param_3)
   pcStack_c = FUN_00684cd3;
   local_10 = ExceptionList;
   ExceptionList = &local_10;
-  iVar1 = FUN_004134a0("OnlineSelectableTrack",0);
+  iVar1 = bMalloc_regarg("OnlineSelectableTrack",0);
   local_8 = 0;
   if (iVar1 != 0) {
     FUN_00554360(param_2,param_3);
@@ -3315,7 +3315,7 @@ void __fastcall FUN_00555dd0(int param_1)
       local_1c = local_1c + 1;
     }
   }
-  FUN_00401bd0();
+  bList__IsEmpty();
   iVar2 = RaceOptions_Get();
   if (*(int *)(iVar2 + 8) == -1) {
     local_2c = FUN_00421960();
@@ -3581,7 +3581,7 @@ void FUN_00556460(void)
     FUN_004f64b0(uVar3);
     FUN_004134c0();
     FUN_00495f70();
-    fVar4 = (float10)FUN_0040ed00();
+    fVar4 = (float10)bTickerToSeconds();
     FUN_00424cd0(DAT_00734f60 + 0x14c,(float)(fVar4 + (float10)30.0));
   }
   else if (iVar1 == 0x696e676d) {
@@ -3642,7 +3642,7 @@ void FUN_005566a0(int param_1)
     FUN_004f6340();
     FUN_004134c0();
     FUN_004ebcb0();
-    fVar1 = (float10)FUN_0040ed00();
+    fVar1 = (float10)bTickerToSeconds();
     FUN_00424cd0(DAT_00734f60 + 0x154,(float)(fVar1 + (float10)15.0));
   }
   return;
@@ -3723,8 +3723,8 @@ void __fastcall FUN_005567f0(undefined4 param_1)
   local_10 = ExceptionList;
   local_8 = 0;
   ExceptionList = &local_10;
-  while (iVar1 = FUN_00401bd0(), iVar1 == 0) {
-    iVar1 = FUN_00401be0();
+  while (iVar1 = bList__IsEmpty(), iVar1 == 0) {
+    iVar1 = bList__RemoveHead();
     if (iVar1 == 0) {
       local_2c = (undefined4 *)0x0;
     }
@@ -3785,7 +3785,7 @@ int FUN_00556910(void)
 {
   undefined4 local_18;
   
-  local_18 = FUN_00401be0();
+  local_18 = bList__RemoveHead();
   if (local_18 == 0) {
     local_18 = 0;
   }
@@ -5192,13 +5192,13 @@ undefined4 * FUN_005583f0(undefined4 *param_1,undefined4 param_2)
   }
   local_4 = 0;
   *param_1 = &PTR_FUN_006bcab4;
-  FUN_0041f0c0();
+  FEMenuData__FEMenuData();
   local_4._0_1_ = 1;
-  FUN_0041f0c0();
+  FEMenuData__FEMenuData();
   local_4._0_1_ = 2;
-  FUN_0041f0c0();
+  FEMenuData__FEMenuData();
   local_4._0_1_ = 3;
-  FUN_0041f0c0();
+  FEMenuData__FEMenuData();
   local_4 = CONCAT31(local_4._1_3_,4);
   param_1[0x10] = &DAT_007787b4;
   FUN_005591a0();
@@ -6907,9 +6907,9 @@ undefined4 * FUN_0055a610(undefined4 *param_1,undefined4 param_2)
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
   *param_1 = &PTR_FUN_006bca5c;
-  FUN_0041f0c0();
+  FEMenuData__FEMenuData();
   local_4._0_1_ = 1;
-  FUN_0041f0c0();
+  FEMenuData__FEMenuData();
   iVar4 = param_1[3];
   local_4 = CONCAT31(local_4._1_3_,2);
   uVar3 = FEng__HashName();
@@ -7747,7 +7747,7 @@ undefined4 * FUN_0055b6d0(undefined4 *param_1,undefined4 param_2)
   }
   local_4 = 0;
   *param_1 = &PTR_FUN_006bca18;
-  FUN_0041f0c0();
+  FEMenuData__FEMenuData();
   local_4 = CONCAT31(local_4._1_3_,1);
   param_1[0x10] = &DAT_007787b4;
   FUN_0055bb80();
@@ -8250,7 +8250,7 @@ undefined4 * FUN_0055bfc0(undefined4 *param_1,int param_2)
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
   *param_1 = &PTR_FUN_006bc99c;
-  eh_vector_constructor_iterator(param_1 + 0x1e,0x208,4,FUN_0041f0c0,FUN_0041f140);
+  eh_vector_constructor_iterator(param_1 + 0x1e,0x208,4,FEMenuData__FEMenuData,FUN_0041f140);
   local_4 = CONCAT31(local_4._1_3_,1);
   FUN_0055c550(param_1);
   param_1[0x14] = 0xffffffff;
@@ -10989,12 +10989,12 @@ void FUN_0055f380(void)
           iVar12 = FUN_00666f30(DAT_0073d8a8,local_114);
         }
         if ((local_114 == *(int *)(in_EAX + 0x7c)) && (*(char *)(in_EAX + 0x135) == '\x01')) {
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
           FUN_004f9240(iVar1);
           return;
         }
@@ -11020,7 +11020,7 @@ void FUN_0055f380(void)
           }
         }
         bSPrintf_regdst(8,&DAT_006ca778,iVar9);
-        FUN_004174b0(local_118,local_10);
+        StringList__AddEntry(local_118,local_10);
         if (iVar12 == 0) {
           if (*(int *)(in_EAX + 0x7c) <= local_114) {
             piVar10 = (int *)(in_EAX + 0xa0);
@@ -11030,7 +11030,7 @@ void FUN_0055f380(void)
               piVar10 = piVar10 + 1;
               piVar13 = piVar13 + 1;
             }
-            FUN_004174b0(local_118,&DAT_00734718);
+            StringList__AddEntry(local_118,&DAT_00734718);
             local_50[0] = DAT_00734718;
             if (DAT_00734718 != '\0') {
               iVar12 = 0;
@@ -11042,16 +11042,16 @@ void FUN_0055f380(void)
             }
             goto LAB_0055f5e1;
           }
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
-          FUN_004174b0(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
+          StringList__AddEntry(local_118,&DAT_0078ea8d);
         }
         else {
           FUN_006682f0(iVar12 + 0x28,local_e0,0x8c,&DAT_006bd444);
           pcVar11 = (char *)(iVar12 + 8);
-          FUN_004174b0(local_118,pcVar11);
+          StringList__AddEntry(local_118,pcVar11);
           local_50[0] = *pcVar11;
           if (*pcVar11 != '\0') {
             pcVar8 = local_50;
@@ -11105,12 +11105,12 @@ LAB_0055f81c:
                 goto LAB_0055f81c;
               }
             }
-            FUN_004174b0(local_118,local_30);
-            FUN_004174b0(local_118,local_f4);
-            FUN_004174b0(local_118,local_10c);
+            StringList__AddEntry(local_118,local_30);
+            StringList__AddEntry(local_118,local_f4);
+            StringList__AddEntry(local_118,local_10c);
             puVar14 = local_fc;
 LAB_0055fa8c:
-            FUN_004174b0(local_118,puVar14);
+            StringList__AddEntry(local_118,puVar14);
           }
           else if (*(int *)(in_EAX + 0x88) == 1) {
             iVar12 = *(int *)(in_EAX + 0x78);
@@ -11151,9 +11151,9 @@ LAB_0055fa3d:
                 goto LAB_0055fa3d;
               }
             }
-            FUN_004174b0(local_118,local_40);
-            FUN_004174b0(local_118,local_20);
-            FUN_004174b0(local_118,&DAT_0078ea8d);
+            StringList__AddEntry(local_118,local_40);
+            StringList__AddEntry(local_118,local_20);
+            StringList__AddEntry(local_118,&DAT_0078ea8d);
             puVar14 = local_104;
             goto LAB_0055fa8c;
           }

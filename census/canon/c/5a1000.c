@@ -1958,19 +1958,19 @@ void __fastcall FUN_005a31a0(int param_1)
     iVar4 = iVar1 + 0x28;
     if (*(int *)(param_1 + 0x58a8) == 3) {
       puVar5 = (undefined4 *)(*(int *)(iVar1 + 0xb08) * 0x15c + iVar4);
-      uVar2 = FUN_0043eaa0(100);
+      uVar2 = RaceManager__GetRacerRank(100);
       *puVar5 = uVar2;
       puVar5[1] = 100;
       iVar3 = *(int *)(iVar1 + 0xb08) + 1;
       *(int *)(iVar1 + 0xb08) = iVar3;
       puVar5 = (undefined4 *)(iVar3 * 0x15c + iVar4);
-      uVar2 = FUN_0043eaa0(0x65);
+      uVar2 = RaceManager__GetRacerRank(0x65);
       *puVar5 = uVar2;
       puVar5[1] = 0x65;
       iVar3 = *(int *)(iVar1 + 0xb08) + 1;
       *(int *)(iVar1 + 0xb08) = iVar3;
       puVar5 = (undefined4 *)(iVar3 * 0x15c + iVar4);
-      uVar2 = FUN_0043eaa0(0x66);
+      uVar2 = RaceManager__GetRacerRank(0x66);
       *puVar5 = uVar2;
       puVar5[1] = 0x66;
       *(int *)(iVar1 + 0xb08) = *(int *)(iVar1 + 0xb08) + 1;
@@ -2013,19 +2013,19 @@ void __fastcall FUN_005a3280(int param_1)
   iVar4 = iVar1 + 0x28;
   if (*(int *)(param_1 + 0x58a8) == 3) {
     puVar5 = (undefined4 *)(*(int *)(iVar1 + 0xb08) * 0x15c + iVar4);
-    uVar2 = FUN_0043eaa0(100);
+    uVar2 = RaceManager__GetRacerRank(100);
     *puVar5 = uVar2;
     puVar5[1] = 100;
     iVar3 = *(int *)(iVar1 + 0xb08) + 1;
     *(int *)(iVar1 + 0xb08) = iVar3;
     puVar5 = (undefined4 *)(iVar3 * 0x15c + iVar4);
-    uVar2 = FUN_0043eaa0(0x65);
+    uVar2 = RaceManager__GetRacerRank(0x65);
     *puVar5 = uVar2;
     puVar5[1] = 0x65;
     iVar3 = *(int *)(iVar1 + 0xb08) + 1;
     *(int *)(iVar1 + 0xb08) = iVar3;
     puVar5 = (undefined4 *)(iVar3 * 0x15c + iVar4);
-    uVar2 = FUN_0043eaa0(0x66);
+    uVar2 = RaceManager__GetRacerRank(0x66);
     *puVar5 = uVar2;
     puVar5[1] = 0x66;
     *(int *)(iVar1 + 0xb08) = *(int *)(iVar1 + 0xb08) + 1;

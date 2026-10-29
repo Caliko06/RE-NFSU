@@ -998,13 +998,13 @@ undefined4 __fastcall FUN_00531ff0(int param_1)
       iVar2 = *(int *)(param_1 + 0x21c);
       FUN_004655b0();
       if ((0.95 < local_20 * local_20 + local_1c * local_1c + local_18 * local_18) &&
-         (pfVar4 = (float *)FUN_00408180(0x3f733333),
+         (pfVar4 = (float *)Vec3_ScaleTo(0x3f733333),
          SQRT(pfVar4[2] * pfVar4[2] + pfVar4[1] * pfVar4[1] + *pfVar4 * *pfVar4) <
          SQRT(_DAT_00736730 * _DAT_00736730 +
               _DAT_00736734 * _DAT_00736734 + _DAT_00736738 * _DAT_00736738))) {
-        fVar7 = (float10)FUN_00436d60();
-        FUN_00408180(0x3f866666);
-        fVar8 = (float10)FUN_00436d60();
+        fVar7 = (float10)bLength3();
+        Vec3_ScaleTo(0x3f866666);
+        fVar8 = (float10)bLength3();
         if (((float10)(float)fVar7 < fVar8) &&
            ((fVar7 = (float10)bDistance3(), fVar7 < (float10)_K_ONE &&
             (K_BLUR_S_MUL < ABS(*(float *)(iVar2 + 0x78)))))) {
@@ -13305,7 +13305,7 @@ void FUN_0053f970(void)
     iVar3 = *piVar1;
     *piVar2 = iVar3;
     *(int **)(iVar3 + 4) = piVar2;
-    FUN_0042ac80();
+    ListRef_Release();
     iVar3 = *(int *)(iVar4 + 0x18);
     *piVar1 = *(int *)(iVar4 + 0x10);
     *(int *)(iVar4 + 0x18) = iVar3 + -1;
@@ -13708,7 +13708,7 @@ uint Solid_Load(int *param_1,int param_2)
   iVar11 = (int)*(char *)(uVar9 + 0x1a);
   piVar10 = *(int **)(uVar9 + 0x3c);
   if (0 < iVar11) {
-    puVar5 = (undefined *)FUN_0040cb70();
+    puVar5 = (undefined *)Ptr_BaseAdjustMinus4();
     puVar4 = PTR_DAT_006f3df0;
     do {
       if (DAT_00743c18 == 0) {
@@ -14105,7 +14105,7 @@ int __fastcall Solid_FindInAllLists(int param_1)
     else {
       iVar3 = DAT_00743c58 + -4;
     }
-    iVar4 = FUN_0040cb70();
+    iVar4 = Ptr_BaseAdjustMinus4();
     while (iVar3 != iVar4) {
       if (*(int *)(iVar3 + 0x10) == param_1) {
         QueryPerformanceCounter(&local_8);

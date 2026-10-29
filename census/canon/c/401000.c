@@ -467,7 +467,7 @@ undefined4 FUN_004016e0(void)
   D3DXMatrixMultiply();
   ppuStack_7c = &puStack_68;
   uStack_80 = 0x4017b8;
-  FUN_00410400();
+  Device_SetWorldMatrix();
   ppuStack_7c = (undefined4 **)0x0;
   uStack_80 = 7;
   piStack_84 = DAT_0073636c;
@@ -643,9 +643,11 @@ bool FUN_00401a10(void)
 }
 
 
-// ==== 0x401b30 FUN_00401b30
+// ==== 0x401b30 GetSkuString
 
-char * FUN_00401b30(void)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+char * GetSkuString(void)
 
 {
   switch(DAT_00734998) {
@@ -680,9 +682,11 @@ char * FUN_00401b30(void)
 }
 
 
-// ==== 0x401bd0 FUN_00401bd0
+// ==== 0x401bd0 bList::IsEmpty
 
-bool FUN_00401bd0(void)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+bool bList__IsEmpty(void)
 
 {
   int *in_EAX;
@@ -691,9 +695,11 @@ bool FUN_00401bd0(void)
 }
 
 
-// ==== 0x401be0 FUN_00401be0
+// ==== 0x401be0 bList::RemoveHead
 
-void FUN_00401be0(void)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void bList__RemoveHead(void)
 
 {
   int iVar1;
@@ -725,9 +731,11 @@ int __fastcall FUN_00401bf0(undefined4 param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x401c10 FUN_00401c10
+// ==== 0x401c10 bDegreesToAngle16
 
-int FUN_00401c10(void)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+int bDegreesToAngle16(void)
 
 {
   int iVar1;
@@ -749,9 +757,11 @@ float10 FUN_00401c40(float param_1,float param_2)
 }
 
 
-// ==== 0x401c60 FUN_00401c60
+// ==== 0x401c60 bMin
 
-float10 FUN_00401c60(float param_1,float param_2)
+/* [canon] runtime high (ghidra-canon) docs/re/runtime.md */
+
+float10 bMin(float param_1,float param_2)
 
 {
   if (param_1 < param_2) {
@@ -781,9 +791,11 @@ float10 __thiscall FUN_00401c79(float param_1,float param_2)
 }
 
 
-// ==== 0x401c80 FUN_00401c80
+// ==== 0x401c80 bClampF
 
-float10 FUN_00401c80(float param_1,float param_2,float param_3)
+/* [canon] runtime high (ghidra-canon) docs/re/runtime.md */
+
+float10 bClampF(float param_1,float param_2,float param_3)
 
 {
   float10 fVar1;
@@ -799,9 +811,11 @@ float10 FUN_00401c80(float param_1,float param_2,float param_3)
 }
 
 
-// ==== 0x401cb0 FUN_00401cb0
+// ==== 0x401cb0 bVector4Copy
 
-void __fastcall FUN_00401cb0(undefined4 *param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall bVector4Copy(undefined4 *param_1)
 
 {
   undefined4 uVar1;
@@ -820,9 +834,11 @@ void __fastcall FUN_00401cb0(undefined4 *param_1)
 }
 
 
-// ==== 0x401cd0 FUN_00401cd0
+// ==== 0x401cd0 bMatrixCopy_b
 
-void __fastcall FUN_00401cd0(undefined4 *param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall bMatrixCopy_b(undefined4 *param_1)
 
 {
   undefined4 uVar1;
@@ -1057,9 +1073,11 @@ float10 __fastcall FUN_00401f30(undefined4 param_1,uint *param_2,float param_3)
 }
 
 
-// ==== 0x401f70 FUN_00401f70
+// ==== 0x401f70 Matrix4_Determinant
 
-float10 FUN_00401f70(void)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+float10 Matrix4_Determinant(void)
 
 {
   float *in_EAX;
@@ -1113,7 +1131,7 @@ void Matrix4_Invert(void)
   float10 extraout_ST0;
   float10 fVar2;
   
-  pfVar1 = (float *)FUN_00401f70();
+  pfVar1 = (float *)Matrix4_Determinant();
   fVar2 = (float10)_K_ONE / extraout_ST0;
   *extraout_ECX =
        (float)(((float10)pfVar1[5] * (float10)pfVar1[0xf] * (float10)pfVar1[10] +
@@ -1231,10 +1249,13 @@ void Matrix4_Invert(void)
 }
 
 
-// ==== 0x402500 FUN_00402500
+// ==== 0x402500 Spline_BuildCubicBasis
 
-void FUN_00402500(undefined4 param_1,undefined4 param_2,float param_3,float param_4,float param_5,
-                 float param_6)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void Spline_BuildCubicBasis
+               (undefined4 param_1,undefined4 param_2,float param_3,float param_4,float param_5,
+               float param_6)
 
 {
   undefined1 *puStack_15c;
@@ -1566,7 +1587,7 @@ void * FUN_00402a70(int param_1)
     if (*(int *)(param_1 + 0x1c) != 0) {
       *(int *)((int)pvVar1 + 0x1c) = *(int *)(param_1 + 0x1c);
     }
-    FUN_00401cd0();
+    bMatrixCopy_b();
     pvVar2 = pvVar1;
   }
   return pvVar2;
@@ -1921,8 +1942,8 @@ void FUN_00402d30(int param_1,int param_2,float param_3,int param_4)
           local_1cc = *(float *)(iVar1 + 0x78);
           fVar4 = *(float *)(iVar1 + 0x74);
           fVar5 = *(float *)(iVar1 + 0x70);
-          FUN_00401cd0();
-          FUN_00401cd0();
+          bMatrixCopy_b();
+          bMatrixCopy_b();
           local_120 = 0;
           local_11c = 0;
           local_118 = 0;
@@ -2283,10 +2304,12 @@ void Particles_UpdateSystem(int *param_1,float param_2)
       local_3c = (float)puVar6[0x3d] * 182.04445;
       local_2c = (float)puVar6[0x3e] * 182.04445;
       local_1c = (float)puVar6[0x3f] * 182.04445;
-      FUN_00402500(puVar6 + 0x40,puVar6 + 0x28,fVar3 * 0.33333334,fVar1 * 0.33333334,
-                   fVar2 * 0.33333334,fVar4 * 0.33333334);
-      FUN_00402500(puVar6 + 0x50,&local_50,fVar3 * 0.33333334,fVar1 * 0.33333334,fVar2 * 0.33333334,
-                   fVar4 * 0.33333334);
+      Spline_BuildCubicBasis
+                (puVar6 + 0x40,puVar6 + 0x28,fVar3 * 0.33333334,fVar1 * 0.33333334,
+                 fVar2 * 0.33333334,fVar4 * 0.33333334);
+      Spline_BuildCubicBasis
+                (puVar6 + 0x50,&local_50,fVar3 * 0.33333334,fVar1 * 0.33333334,fVar2 * 0.33333334,
+                 fVar4 * 0.33333334);
     }
   }
   piVar16 = (int *)*param_1;
@@ -2504,7 +2527,7 @@ void Particles_DrawSystem(int *param_1,int param_2)
     local_144 = *(undefined4 **)(param_2 + 0x40);
     local_194 = local_144[0xa0];
     uStack_1f4 = 0x40416c;
-    FUN_00401cd0();
+    bMatrixCopy_b();
     pfVar6 = DAT_0073636c;
     local_128 = local_c0;
     local_118 = local_bc[0];
@@ -2570,14 +2593,14 @@ LAB_004042e1:
             Effect_Select();
             puStack_200 = &DAT_0078bcc0;
             pfStack_204 = (float *)0x404330;
-            FUN_00410400();
+            Device_SetWorldMatrix();
             pfStack_208 = (float *)0x40433a;
             pfStack_204 = (float *)iVar13;
             FUN_0040f3d0();
             puStack_200 = (undefined *)0x40434f;
-            FUN_00401cd0();
+            bMatrixCopy_b();
             puStack_200 = (undefined *)0x404361;
-            FUN_00401cd0();
+            bMatrixCopy_b();
             bVar2 = *(byte *)(iVar8 + 0x19);
             puStack_160 = (undefined4 *)(int)(char)bVar2;
             puStack_200 = (undefined *)0x2000;
@@ -3594,9 +3617,11 @@ void FUN_004054f0(void)
 }
 
 
-// ==== 0x405550 FUN_00405550
+// ==== 0x405550 Ptr_SetNull
 
-void __fastcall FUN_00405550(undefined4 *param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall Ptr_SetNull(undefined4 *param_1)
 
 {
   *param_1 = 0;
@@ -5796,9 +5821,11 @@ void __fastcall Texture__ReleaseD3D(int *param_1)
 }
 
 
-// ==== 0x408100 FUN_00408100
+// ==== 0x408100 RefList_ReleaseAll
 
-void FUN_00408100(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void RefList_ReleaseAll(void)
 
 {
   int *piVar1;
@@ -5848,9 +5875,11 @@ void __thiscall Vec3_Scale(float *param_1,float param_2)
 }
 
 
-// ==== 0x408180 FUN_00408180
+// ==== 0x408180 Vec3_ScaleTo
 
-void __thiscall FUN_00408180(float *param_1,float param_2)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void __thiscall Vec3_ScaleTo(float *param_1,float param_2)
 
 {
   float fVar1;
@@ -6033,11 +6062,12 @@ void FUN_00408370(void)
 }
 
 
-// ==== 0x408410 FUN_00408410
+// ==== 0x408410 Views_UpdateViewCountAndEnables
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] render med (ghidra-canon) docs/re/render.md */
 
-void FUN_00408410(void)
+void Views_UpdateViewCountAndEnables(void)
 
 {
   undefined4 *puVar1;
@@ -6714,9 +6744,11 @@ void FUN_00408f00(void)
 }
 
 
-// ==== 0x409090 FUN_00409090
+// ==== 0x409090 RenderFrameMain_HeadlightItemCallback
 
-void FUN_00409090(int param_1)
+/* [canon] render low (ghidra-canon) docs/re/render.md */
+
+void RenderFrameMain_HeadlightItemCallback(int param_1)
 
 {
   *(undefined2 *)(*(int *)(param_1 + 8) + 0x2e) = 0x200;
@@ -6933,7 +6965,7 @@ void DrawScreenQuadTextured(undefined4 param_1)
   puStack_160 = auStack_13c;
   DAT_007010b8 = 0xffffffff;
   uStack_164 = 0x4093bd;
-  FUN_00410400();
+  Device_SetWorldMatrix();
   puStack_160 = (undefined1 *)0x3;
   uStack_164 = 1;
   uStack_168 = 0;
@@ -7041,7 +7073,7 @@ void DrawScreenQuadTextured(undefined4 param_1)
   }
   _DAT_007070d0 = 0;
   D3DXMatrixMultiply(uStack_21c,puVar1,puVar1 + 0x10);
-  FUN_00410400(&uStack_224);
+  Device_SetWorldMatrix(&uStack_224);
   return;
 }
 
@@ -7148,7 +7180,7 @@ void RenderFrameMain(void)
       FUN_004090a0();
       SceneRTSelect(DAT_0073645c == 1);
       if (DAT_00700e80 != 0) {
-        FUN_004468a0(FUN_00409090);
+        FUN_004468a0(RenderFrameMain_HeadlightItemCallback);
       }
       if (((DAT_0077a920 == 6) && (*DAT_007361f0 != 1)) ||
          ((DAT_006fb038 != 0 && (DAT_0077a920 == 3)))) {
@@ -7426,7 +7458,7 @@ LAB_00409d27:
   D3DXMatrixMultiply();
   ppiStack_11c = &piStack_108;
   uStack_120 = 0x409e41;
-  FUN_00410400();
+  Device_SetWorldMatrix();
   ppiStack_11c = (int **)0x0;
   uStack_120 = 0xe;
   piStack_124 = DAT_0073636c;
@@ -7604,7 +7636,7 @@ void __fastcall FUN_0040a140(int param_1)
   local_90 = local_b0 + local_d0;
   local_8c = local_ac + local_cc;
   local_88 = local_a8 + local_c8;
-  FUN_0040b780(&local_c0);
+  Matrix4_BuildLookAt(&local_c0);
   Camera__SetCameraMatrix(iVar2,local_50,0);
   iVar6 = DAT_00735f5c;
   if (DAT_00735f5c == 0) {
@@ -7673,7 +7705,7 @@ void RenderFrame(void)
   undefined4 uStack_10;
   undefined4 uStack_c;
   
-  FUN_00408410();
+  Views_UpdateViewCountAndEnables();
   iVar1 = 0;
   if (DAT_00700eb4 == 0) {
     DAT_00734608 = 1;
@@ -8119,7 +8151,7 @@ void View_BuildMatrices(int param_1)
   local_ec = 0;
   local_e8 = 0;
   apuStack_1ac[1] = (undefined *)0x40add3;
-  FUN_0040b780();
+  Matrix4_BuildLookAt();
   apuStack_1ac[1] = &DAT_007064d0;
   local_44 = 0;
   local_34 = 0;
@@ -8129,7 +8161,7 @@ void View_BuildMatrices(int param_1)
   local_18 = 0;
   local_14 = 0x3f800000;
   apuStack_1ac[0] = (undefined *)0x40ae36;
-  FUN_0040b780();
+  Matrix4_BuildLookAt();
   local_84 = 0;
   local_74 = 0;
   local_64 = 0;
@@ -8138,7 +8170,7 @@ void View_BuildMatrices(int param_1)
   local_58 = 0;
   local_54 = 0x3f800000;
   apuStack_1ac[2] = (undefined *)0x40ae97;
-  FUN_00401cd0();
+  bMatrixCopy_b();
   apuStack_1ac[2] = local_50;
   apuStack_1ac[1] = local_d0;
   apuStack_1ac[0] = (undefined *)0x40aeac;
@@ -8498,9 +8530,11 @@ void FUN_0040b6a0(void)
 }
 
 
-// ==== 0x40b780 FUN_0040b780
+// ==== 0x40b780 Matrix4_BuildLookAt
 
-void FUN_0040b780(float *param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void Matrix4_BuildLookAt(float *param_1)
 
 {
   float fVar1;
@@ -8751,9 +8785,11 @@ void __fastcall FUN_0040bbc0(undefined4 param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x40bc10 FUN_0040bc10
+// ==== 0x40bc10 Matrix_InvertRigid
 
-void FUN_0040bc10(void)
+/* [canon] render med (ghidra-canon+capstone) docs/re/render.md */
+
+void Matrix_InvertRigid(void)
 
 {
   D3DXMatrixMultiply();
@@ -9076,7 +9112,7 @@ void FUN_0040c300(undefined4 param_1,undefined4 param_2)
   local_c = *(undefined4 *)(in_EAX + 0x78);
   local_10 = *(undefined4 *)(in_EAX + 0x74);
   FUN_0040f3d0(param_1);
-  FUN_00410400(param_2);
+  Device_SetWorldMatrix(param_2);
   if (DAT_00736450 != 0) {
     (**(code **)(**(int **)(DAT_0073640c + 0x18) + 0xd0))
               (*(int **)(DAT_0073640c + 0x18),*(undefined4 *)(DAT_0073640c + 0x40),DAT_00736450);
@@ -9492,7 +9528,7 @@ void FUN_0040caa0(undefined4 param_1)
   else {
     iVar2 = DAT_00743c58 + -4;
   }
-  iVar1 = FUN_0040cb70();
+  iVar1 = Ptr_BaseAdjustMinus4();
   while (iVar2 != iVar1) {
     FUN_0053f9f0(iVar2,unaff_EBX,param_1);
     if (*(int *)(iVar2 + 4) == 0) {
@@ -9506,9 +9542,11 @@ void FUN_0040caa0(undefined4 param_1)
 }
 
 
-// ==== 0x40caf0 FUN_0040caf0
+// ==== 0x40caf0 D3DResourceList_ReleaseAll
 
-void FUN_0040caf0(void)
+/* [canon] render med (ghidra-canon) docs/re/render.md */
+
+void D3DResourceList_ReleaseAll(void)
 
 {
   int *piVar1;
@@ -9544,9 +9582,11 @@ void FUN_0040caf0(void)
 }
 
 
-// ==== 0x40cb70 FUN_0040cb70
+// ==== 0x40cb70 Ptr_BaseAdjustMinus4
 
-int FUN_0040cb70(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+int Ptr_BaseAdjustMinus4(void)
 
 {
   int in_EAX;
@@ -10237,9 +10277,11 @@ void BlurComposite(int param_1,int param_2,int param_3,undefined4 param_4)
 }
 
 
-// ==== 0x40da30 FUN_0040da30
+// ==== 0x40da30 AABB_TransformByMatrix
 
-void FUN_0040da30(float *param_1,float *param_2)
+/* [canon] render med (ghidra-canon) docs/re/render.md */
+
+void AABB_TransformByMatrix(float *param_1,float *param_2)
 
 {
   float fVar1;
@@ -10339,7 +10381,7 @@ char __fastcall FUN_0040db20(float *param_1,float *param_2,int *param_3)
   local_3c = param_1[1];
   local_38 = param_1[2];
   if (in_EAX != 0) {
-    FUN_0040da30(&local_20,&local_40);
+    AABB_TransformByMatrix(&local_20,&local_40);
   }
   bVar6 = false;
   iVar8 = 1;
@@ -10465,7 +10507,7 @@ void BuildProjection(int param_1,float param_2,float param_3)
     unaff_ESI[0x1f] = 0x3f800000;
     return;
   }
-  FUN_00401cd0();
+  bMatrixCopy_b();
   local_c = *(float *)(iVar4 + 0xbc);
   if (param_2 != 0.0) {
     local_c = param_2;
@@ -10836,9 +10878,11 @@ void Effect_Select(void)
 }
 
 
-// ==== 0x40e740 FUN_0040e740
+// ==== 0x40e740 Effect_BindHeadlightTextures
 
-void FUN_0040e740(void)
+/* [canon] render med (ghidra-canon) docs/re/render.md */
+
+void Effect_BindHeadlightTextures(void)
 
 {
   byte *pbVar1;
@@ -10902,9 +10946,11 @@ void Effect_BindSceneParams(void)
 }
 
 
-// ==== 0x40e900 FUN_0040e900
+// ==== 0x40e900 Effect_BindHeadlightParams
 
-void FUN_0040e900(void)
+/* [canon] render med (ghidra-canon) docs/re/render.md */
+
+void Effect_BindHeadlightParams(void)
 
 {
   byte *pbVar1;
@@ -10991,9 +11037,11 @@ void FUN_0040e900(void)
 }
 
 
-// ==== 0x40eb30 FUN_0040eb30
+// ==== 0x40eb30 Effect_BindReflectionCube
 
-void FUN_0040eb30(void)
+/* [canon] render high (ghidra-canon) docs/re/render.md */
+
+void Effect_BindReflectionCube(void)
 
 {
   (**(code **)(**(int **)(DAT_0073640c + 0x18) + 0xd0))
@@ -11002,9 +11050,11 @@ void FUN_0040eb30(void)
 }
 
 
-// ==== 0x40eb60 FUN_0040eb60
+// ==== 0x40eb60 TextureStages_DisableTransform
 
-void FUN_0040eb60(void)
+/* [canon] render high (ghidra-canon) docs/re/render.md */
+
+void TextureStages_DisableTransform(void)
 
 {
   (**(code **)(*DAT_0073636c + 0x10c))(DAT_0073636c,0,0x18,0);
@@ -11042,30 +11092,11 @@ void FUN_0040ebc0(void)
 }
 
 
-// ==== 0x40ec20 FUN_0040ec20
+// ==== 0x40ec20 FlareAnim_FractionalPhase
 
-float10 __fastcall FUN_0040ec20(int param_1)
+/* [canon] render low (ghidra-canon) docs/re/render.md */
 
-{
-  int iVar1;
-  int unaff_ESI;
-  float10 extraout_ST0;
-  
-  if (*(char *)(unaff_ESI + 0x52) == '\0') {
-    return (float10)0.0;
-  }
-  if (*(char *)(unaff_ESI + 0x52) == '\x02') {
-    param_1 = (int)*(short *)(unaff_ESI + 0x58);
-    _ftol_nocw(param_1);
-  }
-  iVar1 = _ftol_nocw(param_1);
-  return extraout_ST0 - (float10)iVar1;
-}
-
-
-// ==== 0x40ec90 FUN_0040ec90
-
-float10 __fastcall FUN_0040ec90(int param_1)
+float10 __fastcall FlareAnim_FractionalPhase(int param_1)
 
 {
   int iVar1;
@@ -11084,9 +11115,34 @@ float10 __fastcall FUN_0040ec90(int param_1)
 }
 
 
-// ==== 0x40ed00 FUN_0040ed00
+// ==== 0x40ec90 FlareAnim_FractionalPhase_B
 
-float10 FUN_0040ed00(void)
+/* [canon] render low (ghidra-canon) docs/re/render.md */
+
+float10 __fastcall FlareAnim_FractionalPhase_B(int param_1)
+
+{
+  int iVar1;
+  int unaff_ESI;
+  float10 extraout_ST0;
+  
+  if (*(char *)(unaff_ESI + 0x52) == '\0') {
+    return (float10)0.0;
+  }
+  if (*(char *)(unaff_ESI + 0x52) == '\x02') {
+    param_1 = (int)*(short *)(unaff_ESI + 0x58);
+    _ftol_nocw(param_1);
+  }
+  iVar1 = _ftol_nocw(param_1);
+  return extraout_ST0 - (float10)iVar1;
+}
+
+
+// ==== 0x40ed00 bTickerToSeconds
+
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+float10 bTickerToSeconds(void)
 
 {
   int *in_EAX;
@@ -11105,9 +11161,11 @@ void FUN_0040ed10(void)
 }
 
 
-// ==== 0x40ed20 FUN_0040ed20
+// ==== 0x40ed20 RenderQueueBuckets_Construct
 
-void * __fastcall FUN_0040ed20(void *param_1)
+/* [canon] render med (ghidra-canon) docs/re/render.md */
+
+void * __fastcall RenderQueueBuckets_Construct(void *param_1)
 
 {
   eh_vector_constructor_iterator(param_1,8,7,IList_InitEmpty_Thunk,FUN_00410740);
@@ -11115,9 +11173,11 @@ void * __fastcall FUN_0040ed20(void *param_1)
 }
 
 
-// ==== 0x40ed40 FUN_0040ed40
+// ==== 0x40ed40 RenderQueueBuckets_Destruct
 
-void __fastcall FUN_0040ed40(void *param_1)
+/* [canon] render med (ghidra-canon) docs/re/render.md */
+
+void __fastcall RenderQueueBuckets_Destruct(void *param_1)
 
 {
   eh_vector_destructor_iterator(param_1,8,7,FUN_00410740);
@@ -11181,7 +11241,7 @@ void FUN_0040ed50(void)
                 piVar1 = (int *)piVar7[1];
                 *piVar1 = iVar3;
                 *(int **)(iVar3 + 4) = piVar1;
-                FUN_00410400(piVar7[9]);
+                Device_SetWorldMatrix(piVar7[9]);
                 if (*(int *)(piVar7[6] + 0x44) != 0) {
                   Effect_SetObjectParams();
                 }
@@ -11189,7 +11249,7 @@ void FUN_0040ed50(void)
                   RenderQueue_ApplyLights(piVar7[9]);
                 }
                 if (piVar7[8] != 0) {
-                  FUN_0040fae0();
+                  RenderQueue_ApplyMaterialColors();
                 }
                 if (piVar7[3] == 0) {
                   iVar3 = piVar7[2];
@@ -11542,9 +11602,9 @@ void FUN_0040f3d0(int *param_1)
             fVar4 = (float10)(int)(short)param_1[0x18] * (float10)-3.0517578e-05;
           }
           else if ((_DAT_007363e0 == 0.0) && (_DAT_007363e4 == 0.0)) {
-            fVar4 = (float10)FUN_0040ec20(fVar1);
+            fVar4 = (float10)FlareAnim_FractionalPhase(fVar1);
             fVar5 = (float)fVar4;
-            fVar4 = (float10)FUN_0040ec90(fVar1);
+            fVar4 = (float10)FlareAnim_FractionalPhase_B(fVar1);
           }
           else {
             fVar4 = (float10)FUN_00546180(param_1,fVar1,
@@ -11731,11 +11791,12 @@ void RenderQueue_ApplyLights(undefined4 param_1)
 }
 
 
-// ==== 0x40fae0 FUN_0040fae0
+// ==== 0x40fae0 RenderQueue_ApplyMaterialColors
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] render med (ghidra-canon+capstone) docs/re/render.md */
 
-void __fastcall FUN_0040fae0(int param_1)
+void __fastcall RenderQueue_ApplyMaterialColors(int param_1)
 
 {
   int iVar1;
@@ -11966,7 +12027,7 @@ void Effect_SetObjectParams(void)
     pfVar4 = afStack_a8;
   }
   else {
-    FUN_0040bc10();
+    Matrix_InvertRigid();
     D3DXMatrixMultiply(&local_e8,iVar1 + 0x80,&fStack_138);
     D3DXMatrixMultiply(&local_f4,auStack_74,&local_f4);
     (**(code **)(**(int **)(DAT_0073640c + 0x18) + 0x98))
@@ -12079,11 +12140,12 @@ void BonePalette_Load(int param_1)
 }
 
 
-// ==== 0x410400 FUN_00410400
+// ==== 0x410400 Device_SetWorldMatrix
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
 
-void FUN_00410400(undefined *param_1)
+void Device_SetWorldMatrix(undefined *param_1)
 
 {
   int iVar1;
@@ -12400,9 +12462,11 @@ void FUN_00410970(uint param_1)
 }
 
 
-// ==== 0x4109c0 FUN_004109c0
+// ==== 0x4109c0 RenderQueue_SelectDefaultBucket
 
-undefined4 FUN_004109c0(void)
+/* [canon] render low (ghidra-canon) docs/re/render.md */
+
+undefined4 RenderQueue_SelectDefaultBucket(void)
 
 {
   undefined4 *puVar1;
@@ -12465,7 +12529,7 @@ void FUN_00410a00(void)
     DAT_00700e98 = 0;
     DAT_00700e9c = 0;
     DAT_00700eac = 0;
-    FUN_00410ce0();
+    RenderOptions_ClampToLimits();
     return;
   }
   DAT_00700eac = 1;
@@ -12483,7 +12547,7 @@ void FUN_00410a00(void)
     DAT_00700e98 = 0;
     DAT_00700e9c = 0;
     DAT_00700eb0 = 3;
-    FUN_00410ce0();
+    RenderOptions_ClampToLimits();
     return;
   }
   DAT_00700e98 = 1;
@@ -12491,14 +12555,16 @@ void FUN_00410a00(void)
   DAT_00736334 = 3;
   DAT_00700e74 = 3;
   DAT_00700eb0 = 3;
-  FUN_00410ce0();
+  RenderOptions_ClampToLimits();
   return;
 }
 
 
-// ==== 0x410b70 FUN_00410b70
+// ==== 0x410b70 RenderOptions_LimitsFromDeviceCaps
 
-void FUN_00410b70(void)
+/* [canon] render high (ghidra-canon) docs/re/render.md */
+
+void RenderOptions_LimitsFromDeviceCaps(void)
 
 {
   if ((DAT_0071b648 == 0x8086) && (DAT_0071b64c == 0x2572)) {
@@ -12575,9 +12641,11 @@ void Display_ProbeResolutions(void)
 }
 
 
-// ==== 0x410ce0 FUN_00410ce0
+// ==== 0x410ce0 RenderOptions_ClampToLimits
 
-void FUN_00410ce0(void)
+/* [canon] render high (ghidra-canon) docs/re/render.md */
+
+void RenderOptions_ClampToLimits(void)
 
 {
   int iVar1;
@@ -12657,7 +12725,7 @@ void DeviceCaps_Init(void)
   if (DAT_00736390 == 0) {
     (**(code **)(*DAT_0073636c + 0x1c))(DAT_0073636c,&DAT_0071b670);
     (**(code **)(*DAT_00736368 + 0x14))(DAT_00736368,DAT_00736398,2,0x71b220);
-    FUN_00410b70();
+    RenderOptions_LimitsFromDeviceCaps();
     FUN_00410a00();
     if ((DAT_0071b710 != 0xffffffff) && (uVar1 = 0, DAT_0071b710 != 0)) {
       do {
@@ -12698,7 +12766,7 @@ void __fastcall GraphicsQuality_Set(undefined4 param_1,int param_2)
     DAT_00700e70 = 0;
     DAT_00700eb0 = 1;
     DAT_00700eb4 = 0;
-    FUN_00410ce0();
+    RenderOptions_ClampToLimits();
     return;
   }
   DAT_00700eb4 = 1;
@@ -12718,7 +12786,7 @@ void __fastcall GraphicsQuality_Set(undefined4 param_1,int param_2)
     DAT_00700e9c = 0;
     DAT_00700eac = 0;
     DAT_00700eb0 = 1;
-    FUN_00410ce0();
+    RenderOptions_ClampToLimits();
     return;
   }
   DAT_00700eac = 1;
@@ -12735,14 +12803,14 @@ void __fastcall GraphicsQuality_Set(undefined4 param_1,int param_2)
     DAT_00700e98 = 0;
     DAT_00700e9c = 0;
     DAT_00700eb0 = 3;
-    FUN_00410ce0();
+    RenderOptions_ClampToLimits();
     return;
   }
   DAT_00700e74 = 3;
   DAT_00700e98 = 1;
   DAT_00700e9c = 1;
   DAT_00700eb0 = 3;
-  FUN_00410ce0();
+  RenderOptions_ClampToLimits();
   return;
 }
 

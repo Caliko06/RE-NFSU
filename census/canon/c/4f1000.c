@@ -3606,9 +3606,11 @@ void * __thiscall FUN_004f51b0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4f51d0 FUN_004f51d0
+// ==== 0x4f51d0 GetBaseName
 
-void FUN_004f51d0(void)
+/* [canon] runtime high (ghidra-canon+nfsmw) docs/re/misc.md */
+
+void GetBaseName(void)
 
 {
   char *pcVar1;
@@ -3678,7 +3680,7 @@ void FEManager__FEManager(void)
   }
   unaff_EDI[2] = iVar3;
   *(undefined4 **)(iVar3 + 0x10c) = unaff_EDI;
-  FUN_004eea10(unaff_EDI[2]);
+  FEObjectPool_Allocate(unaff_EDI[2]);
   FUN_004eeab0();
   puVar1 = (undefined1 *)unaff_EDI[2];
   iVar3 = *(int *)(puVar1 + 0xe4);
@@ -3748,7 +3750,7 @@ undefined4 FUN_004f5360(undefined4 param_1,int param_2,int param_3)
     piVar8 = (int *)(param_3 + 0x10);
     iStack_104 = param_2;
     do {
-      FUN_004f51d0();
+      GetBaseName();
       if (abStack_100[0] != 0) {
         pbVar5 = abStack_100;
         do {
@@ -8873,9 +8875,11 @@ int __fastcall FUN_004fa3d0(int param_1)
 }
 
 
-// ==== 0x4fa3f0 FUN_004fa3f0
+// ==== 0x4fa3f0 FEGrid_GetCell
 
-int FUN_004fa3f0(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/hud.md */
+
+int FEGrid_GetCell(int param_1)
 
 {
   int iVar1;
@@ -9068,7 +9072,7 @@ void FUN_004fa650(void)
   *(undefined4 *)(in_EAX + 0x8c) = 0;
   *(undefined4 *)(in_EAX + 0x94) = 0;
   *(undefined4 *)(in_EAX + 0x90) = 0;
-  FUN_004fad70(*(undefined4 *)(unaff_EDI + 0x8c),*(undefined4 *)(unaff_EDI + 0x90));
+  FEGrid_AllocStringBuffers(*(undefined4 *)(unaff_EDI + 0x8c),*(undefined4 *)(unaff_EDI + 0x90));
   uVar4 = *(int *)(in_EAX + 0x60) * *(int *)(in_EAX + 0x5c);
   local_8 = 0;
   if (uVar4 != 0) {
@@ -9354,9 +9358,11 @@ void FUN_004fab90(void)
 }
 
 
-// ==== 0x4fabf0 FUN_004fabf0
+// ==== 0x4fabf0 FEGrid_ForEachCellInRect
 
-uint FUN_004fabf0(void)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/hud.md */
+
+uint FEGrid_ForEachCellInRect(void)
 
 {
   uint uVar1;
@@ -9471,9 +9477,11 @@ uint FUN_004fabf0(void)
 }
 
 
-// ==== 0x4fad70 FUN_004fad70
+// ==== 0x4fad70 FEGrid_AllocStringBuffers
 
-void FUN_004fad70(uint param_1,int param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/hud.md */
+
+void FEGrid_AllocStringBuffers(uint param_1,int param_2)
 
 {
   void *_Memory;
@@ -10186,7 +10194,7 @@ void FUN_004fb9e0(uint param_1,uint param_2,undefined4 param_3,int param_4,int p
   uVar2 = param_5 + param_2;
   for (; uVar1 = param_1, param_2 < uVar2; param_2 = param_2 + 1) {
     for (; uVar1 < param_4 + param_1; uVar1 = uVar1 + 1) {
-      puVar3 = (undefined4 *)FUN_004fa3f0(param_2);
+      puVar3 = (undefined4 *)FEGrid_GetCell(param_2);
       *puVar3 = param_3;
     }
   }
@@ -10206,7 +10214,7 @@ void FUN_004fba30(uint param_1,uint param_2,undefined4 *param_3,int param_4,int 
   uVar2 = param_5 + param_2;
   for (; uVar1 = param_1, param_2 < uVar2; param_2 = param_2 + 1) {
     for (; uVar1 < param_4 + param_1; uVar1 = uVar1 + 1) {
-      iVar3 = FUN_004fa3f0(param_2);
+      iVar3 = FEGrid_GetCell(param_2);
       *(undefined4 *)(iVar3 + 4) = *param_3;
       *(undefined4 *)(iVar3 + 8) = param_3[1];
     }
@@ -10227,7 +10235,7 @@ void FUN_004fbaa0(uint param_1,uint param_2,undefined4 param_3,int param_4,int p
   uVar2 = param_5 + param_2;
   for (; uVar1 = param_1, param_2 < uVar2; param_2 = param_2 + 1) {
     for (; uVar1 < param_4 + param_1; uVar1 = uVar1 + 1) {
-      iVar3 = FUN_004fa3f0(param_2);
+      iVar3 = FEGrid_GetCell(param_2);
       *(undefined4 *)(iVar3 + 0x1c) = param_3;
     }
   }

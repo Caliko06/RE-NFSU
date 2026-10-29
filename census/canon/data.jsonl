@@ -1841,7 +1841,7 @@
 {"kind":"global","addr":"0x6ac1c8","block":".rdata","label":"DAT_006ac1c8","type":"","str":"","readers":["0x6745c2"],"writers":[]}
 {"kind":"global","addr":"0x6ac1d8","block":".rdata","label":"DAT_006ac1d8","type":"","str":"","readers":["0x674839"],"writers":[]}
 {"kind":"global","addr":"0x6ac1e4","block":".rdata","label":"DAT_006ac1e4","type":"","str":"","readers":["0x674f09"],"writers":[]}
-{"kind":"global","addr":"0x6ac1e8","block":".rdata","label":"s_Microsoft_Visual_C++_Runtime_Lib_006ac1e8","type":"string","str":"Microsoft Visual C++ Runtime Library","readers":["0x674f09"],"writers":[]}
+{"kind":"global","addr":"0x6ac1e8","block":".rdata","label":"s_Microsoft_Visual_C++_Runtime_Lib_006ac1e8","type":"string","str":"Microsoft Visual C++ Runtime Library","readers":["0x674f09","0x68006b"],"writers":[]}
 {"kind":"global","addr":"0x6ac210","block":".rdata","label":"s_<program_name_unknown>_006ac210","type":"string","str":"<program name unknown>","readers":["0x674f09"],"writers":[]}
 {"kind":"global","addr":"0x6ac238","block":".rdata","label":"DAT_006ac238","type":"","str":"","readers":["0x6749ca"],"writers":[]}
 {"kind":"global","addr":"0x6ac248","block":".rdata","label":"DAT_006ac248","type":"","str":"","readers":["0x674e91"],"writers":[]}
@@ -1967,6 +1967,7 @@
 {"kind":"global","addr":"0x6b1aec","block":".rdata","label":"s_GetActiveWindow_006b1aec","type":"string","str":"GetActiveWindow","readers":["0x67fc58"],"writers":[]}
 {"kind":"global","addr":"0x6b1afc","block":".rdata","label":"s_MessageBoxA_006b1afc","type":"string","str":"MessageBoxA","readers":["0x67fc58"],"writers":[]}
 {"kind":"global","addr":"0x6b1b08","block":".rdata","label":"s_user32.dll_006b1b08","type":"string","str":"user32.dll","readers":["0x67fc58"],"writers":[]}
+{"kind":"global","addr":"0x6b1bd8","block":".rdata","label":"s_A_security_error_of_unknown_caus_006b1bd8","type":"string","str":"A security error of unknown cause has been detected which has\u000acorrupted the program's internal state.  The program cannot safely\u000acontinue execution and must now be terminated.\u000a","readers":["0x68006b"],"writers":[]}
 {"kind":"global","addr":"0x6b1cb0","block":".rdata","label":"DAT_006b1cb0","type":"","str":"","readers":["0x67ff4b"],"writers":[]}
 {"kind":"global","addr":"0x6b1cbc","block":".rdata","label":"s_InitializeCriticalSectionAndSpin_006b1cbc","type":"string","str":"InitializeCriticalSectionAndSpinCount","readers":["0x6800a5"],"writers":[]}
 {"kind":"global","addr":"0x6b1ce8","block":".rdata","label":"DAT_006b1ce8","type":"","str":"","readers":["0x6800a5"],"writers":[]}
@@ -3348,7 +3349,7 @@
 {"kind":"global","addr":"0x6b8a28","block":".rdata","label":"s_DrivingLocation_006b8a28","type":"string","str":"DrivingLocation","readers":["0x59ba20"],"writers":[]}
 {"kind":"global","addr":"0x6b8a38","block":".rdata","label":"s_backwards_006b8a38","type":"string","str":"backwards","readers":["0x5991a0","0x5999c0","0x599c80","0x59a2c0"],"writers":[]}
 {"kind":"global","addr":"0x6b8a44","block":".rdata","label":"s_forwards_006b8a44","type":"string","str":"forwards","readers":["0x5991a0","0x5999c0","0x599c80","0x59a2c0"],"writers":[]}
-{"kind":"global","addr":"0x6b8a50","block":".rdata","label":"DAT_006b8a50","type":"","str":"","readers":["0x674f09"],"writers":[]}
+{"kind":"global","addr":"0x6b8a50","block":".rdata","label":"DAT_006b8a50","type":"","str":"","readers":["0x674f09","0x68005e"],"writers":[]}
 {"kind":"global","addr":"0x6b8a54","block":".rdata","label":"PTR_DAT_006b8a54","type":"pointer","str":"","readers":["0x5988c0"],"writers":[]}
 {"kind":"global","addr":"0x6b8a58","block":".rdata","label":"s_TrafficTeleporter::DoTimestep()_006b8a58","type":"string","str":"TrafficTeleporter::DoTimestep()","readers":["0x598600"],"writers":[]}
 {"kind":"global","addr":"0x6b8a78","block":".rdata","label":"s_TerrainEffectEmitters_006b8a78","type":"string","str":"TerrainEffectEmitters","readers":["0x686200"],"writers":[]}
@@ -7691,7 +7692,7 @@
 {"kind":"global","addr":"0x6cbe34","block":".rdata","label":"s_CarenvmapSliderBase_1_006cbe34","type":"string","str":"CarenvmapSliderBase_1","readers":["0x4155b0"],"writers":[]}
 {"kind":"global","addr":"0x6cbe4c","block":".rdata","label":"s_CustomizeGraphicsConfig_006cbe4c","type":"string","str":"CustomizeGraphicsConfig","readers":["0x6874e0"],"writers":[]}
 {"kind":"global","addr":"0x6cbe64","block":".rdata","label":"PTR_FUN_006cbe64","type":"undefined *","str":"","readers":["0x414ba0","0x414c40"],"writers":[]}
-{"kind":"global","addr":"0x6cbe74","block":".rdata","label":"PTR_FUN_006cbe74","type":"pointer","str":"","readers":["0x414ab0","0x414b20","0x414b40","0x4bd850","0x4bd900","0x4ce760","0x4cf110"],"writers":[]}
+{"kind":"global","addr":"0x6cbe74","block":".rdata","label":"PTR_Slider::scalar_deleting_destructor_006cbe74","type":"pointer","str":"","readers":["0x414ab0","0x414b20","0x414b40","0x4bd850","0x4bd900","0x4ce760","0x4cf110"],"writers":[]}
 {"kind":"global","addr":"0x6cbe7c","block":".rdata","label":"PTR_FUN_006cbe7c","type":"pointer","str":"","readers":["0x4bd900","0x4ce760"],"writers":[]}
 {"kind":"global","addr":"0x6cbe88","block":".rdata","label":"PTR_FUN_006cbe88","type":"undefined *","str":"","readers":["0x414b40","0x414c40","0x4155b0","0x4ce760"],"writers":[]}
 {"kind":"global","addr":"0x6cbe94","block":".rdata","label":"PTR_FUN_006cbe94","type":"pointer","str":"","readers":["0x414c40","0x4155b0"],"writers":[]}

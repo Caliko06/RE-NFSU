@@ -251,7 +251,7 @@ LAB_005015fd:
           FUN_004fddb0();
         }
         else if (iVar4 == 6) {
-          FUN_004fabf0();
+          FEGrid_ForEachCellInRect();
         }
         for (iVar4 = *(int *)(param_1[3] + 0x4c); iVar4 != 0; iVar4 = *(int *)(iVar4 + 4)) {
           if (*(int *)(iVar4 + 0x18) != 0) {
@@ -742,7 +742,7 @@ void __fastcall FUN_00501da0(undefined4 param_1,ushort *param_2)
       return;
     }
     if (uVar2 == 0x4953) {
-      FUN_004fad70(*(undefined4 *)(param_2 + 2),*(undefined4 *)(param_2 + 4));
+      FEGrid_AllocStringBuffers(*(undefined4 *)(param_2 + 2),*(undefined4 *)(param_2 + 4));
       return;
     }
     if (uVar2 == 0x6343) {
@@ -3187,7 +3187,7 @@ void __fastcall FUN_005041a0(undefined4 *param_1)
     _free(_Memory);
     _Memory = (int *)*piVar1;
   }
-  FUN_00414b40();
+  ListSlider___ListSlider();
   return;
 }
 

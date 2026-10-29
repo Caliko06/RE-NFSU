@@ -1016,7 +1016,7 @@ void FUN_00692020(void)
 void FUN_00692030(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_006966e0);
   return;
 }
@@ -1091,7 +1091,7 @@ void FUN_006920b0(void)
 void FUN_006920d0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_006966f0);
   return;
 }
@@ -1102,7 +1102,7 @@ void FUN_006920d0(void)
 void FUN_006920f0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696700);
   return;
 }
@@ -1113,7 +1113,7 @@ void FUN_006920f0(void)
 void FUN_00692110(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696710);
   return;
 }
@@ -1124,7 +1124,7 @@ void FUN_00692110(void)
 void FUN_00692130(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696720);
   return;
 }
@@ -1135,7 +1135,7 @@ void FUN_00692130(void)
 void FUN_00692150(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696730);
   return;
 }
@@ -1146,7 +1146,7 @@ void FUN_00692150(void)
 void FUN_00692170(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696740);
   return;
 }
@@ -1157,7 +1157,7 @@ void FUN_00692170(void)
 void FUN_00692190(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696750);
   return;
 }
@@ -1190,7 +1190,7 @@ void FUN_006921f0(void)
 void FUN_00692210(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696780);
   return;
 }
@@ -1203,7 +1203,7 @@ void FUN_00692210(void)
 void StaticInit_LightTree_G740a68_692230(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(StaticInit_LightTree_G740a68_696790);
   return;
 }
@@ -1214,7 +1214,7 @@ void StaticInit_LightTree_G740a68_692230(void)
 void FUN_00692250(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_006967a0);
   return;
 }
@@ -1235,7 +1235,7 @@ void FUN_00692270(void)
 void FUN_00692280(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_006967c0);
   return;
 }
@@ -1257,7 +1257,7 @@ void FUN_006922a0(void)
 void FUN_006922d0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_006967f0);
   return;
 }
@@ -1268,7 +1268,7 @@ void FUN_006922d0(void)
 void FUN_006922f0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696800);
   return;
 }
@@ -1279,7 +1279,7 @@ void FUN_006922f0(void)
 void FUN_00692310(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696810);
   return;
 }
@@ -1807,7 +1807,7 @@ void FUN_00692980(void)
 void FUN_00692990(void)
 
 {
-  FUN_0042ac70();
+  ListRef_Init();
   _atexit(FUN_006968f0);
   return;
 }
@@ -1818,7 +1818,7 @@ void FUN_00692990(void)
 void FUN_006929b0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696900);
   return;
 }
@@ -1829,7 +1829,7 @@ void FUN_006929b0(void)
 void FUN_006929d0(void)
 
 {
-  FUN_0042ac70();
+  ListRef_Init();
   _atexit(FUN_00696910);
   return;
 }
@@ -1840,7 +1840,7 @@ void FUN_006929d0(void)
 void FUN_006929f0(void)
 
 {
-  FUN_0042ac70();
+  ListRef_Init();
   _atexit(FUN_00696920);
   return;
 }
@@ -2045,7 +2045,7 @@ void FUN_00692b80(void)
 void FUN_00692bb0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696a90);
   return;
 }
@@ -2078,7 +2078,7 @@ void FUN_00692c00(void)
 void FUN_00692c30(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696ac0);
   return;
 }
@@ -2222,7 +2222,7 @@ void FUN_00692d40(void)
 void FUN_00692d70(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696ae0);
   return;
 }
@@ -2409,7 +2409,7 @@ void FUN_00693010(void)
 void FUN_00693030(void)
 
 {
-  eh_vector_constructor_iterator(&DAT_0073ac70,0x18,5,FUN_0042ac70,FUN_0042ac80);
+  eh_vector_constructor_iterator(&DAT_0073ac70,0x18,5,ListRef_Init,ListRef_Release);
   _atexit(FUN_00696bd0);
   return;
 }
@@ -2453,7 +2453,7 @@ void FUN_006930a0(void)
 void FUN_006930c0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696c20);
   return;
 }
@@ -2464,7 +2464,7 @@ void FUN_006930c0(void)
 void FUN_006930e0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696c30);
   return;
 }
@@ -2475,7 +2475,7 @@ void FUN_006930e0(void)
 void FUN_00693100(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696c40);
   return;
 }
@@ -2486,7 +2486,7 @@ void FUN_00693100(void)
 void FUN_00693120(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696c50);
   return;
 }
@@ -2508,7 +2508,7 @@ void FUN_00693140(void)
 void FUN_00693160(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696c70);
   return;
 }
@@ -2519,7 +2519,7 @@ void FUN_00693160(void)
 void FUN_00693180(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696c80);
   return;
 }
@@ -2530,7 +2530,7 @@ void FUN_00693180(void)
 void FUN_006931a0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696c90);
   return;
 }
@@ -2541,7 +2541,7 @@ void FUN_006931a0(void)
 void FUN_006931c0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696ca0);
   return;
 }
@@ -2554,7 +2554,7 @@ void FUN_006931c0(void)
 void StaticInit_WorldZone_G737b20_6931e0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(StaticInit_WorldZone_G737b20_696cb0);
   return;
 }
@@ -2565,7 +2565,7 @@ void StaticInit_WorldZone_G737b20_6931e0(void)
 void FUN_00693200(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696cc0);
   return;
 }
@@ -2576,7 +2576,7 @@ void FUN_00693200(void)
 void FUN_00693220(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696cd0);
   return;
 }
@@ -2587,7 +2587,7 @@ void FUN_00693220(void)
 void FUN_00693240(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696ce0);
   return;
 }
@@ -2619,7 +2619,7 @@ void FUN_00693270(void)
 void FUN_00693290(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696d00);
   return;
 }
@@ -2630,7 +2630,7 @@ void FUN_00693290(void)
 void FUN_006932b0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696d10);
   return;
 }
@@ -2641,7 +2641,7 @@ void FUN_006932b0(void)
 void FUN_006932d0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696d20);
   return;
 }
@@ -2652,7 +2652,7 @@ void FUN_006932d0(void)
 void FUN_006932f0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696d30);
   return;
 }
@@ -2663,7 +2663,7 @@ void FUN_006932f0(void)
 void FUN_00693310(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696d40);
   return;
 }
@@ -2674,7 +2674,7 @@ void FUN_00693310(void)
 void FUN_00693330(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696d50);
   return;
 }
@@ -2700,7 +2700,7 @@ void FUN_00693350(void)
 void FUN_00693380(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696d60);
   return;
 }
@@ -2730,7 +2730,7 @@ void FUN_006933a0(void)
 void FUN_006933e0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696d70);
   return;
 }
@@ -3772,7 +3772,7 @@ void FUN_00694710(void)
 void FUN_00694720(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696dd0);
   return;
 }
@@ -3831,7 +3831,7 @@ void FUN_00694780(void)
 void FUN_006947a0(void)
 
 {
-  FUN_00445720();
+  bList__bList();
   _atexit(FUN_00696de0);
   return;
 }
@@ -7187,7 +7187,7 @@ void FUN_00696260(void)
 void FUN_00696270(void)
 
 {
-  eh_vector_destructor_iterator(&DAT_0078a4e8,0x38,0x10,FUN_0040ed40);
+  eh_vector_destructor_iterator(&DAT_0078a4e8,0x38,0x10,RenderQueueBuckets_Destruct);
   return;
 }
 
@@ -7523,7 +7523,7 @@ void FUN_00696480(void)
 void FUN_00696490(void)
 
 {
-  FUN_004ad990(&DAT_00746dd0);
+  MiniWorld___MiniWorld(&DAT_00746dd0);
   return;
 }
 
@@ -8207,7 +8207,7 @@ void FUN_006968e0(void)
 void FUN_006968f0(void)
 
 {
-  FUN_0042ac80();
+  ListRef_Release();
   return;
 }
 
@@ -8227,7 +8227,7 @@ void FUN_00696900(void)
 void FUN_00696910(void)
 
 {
-  FUN_0042ac80();
+  ListRef_Release();
   return;
 }
 
@@ -8237,7 +8237,7 @@ void FUN_00696910(void)
 void FUN_00696920(void)
 
 {
-  FUN_0042ac80();
+  ListRef_Release();
   return;
 }
 
@@ -8247,7 +8247,7 @@ void FUN_00696920(void)
 void FUN_00696930(void)
 
 {
-  FUN_004ad8a0();
+  IList_FreeNodes_Member2C();
   return;
 }
 
@@ -8614,7 +8614,7 @@ void FUN_00696bc0(void)
 void FUN_00696bd0(void)
 
 {
-  eh_vector_destructor_iterator(&DAT_0073ac70,0x18,5,FUN_0042ac80);
+  eh_vector_destructor_iterator(&DAT_0073ac70,0x18,5,ListRef_Release);
   return;
 }
 
@@ -8624,7 +8624,7 @@ void FUN_00696bd0(void)
 void FUN_00696bf0(void)
 
 {
-  FUN_0042ac80();
+  ListRef_Release();
   return;
 }
 
