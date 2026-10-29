@@ -56,5 +56,7 @@ census/canon/systems_tu.tsv, read by the scoreboard as med. 767 stay unknown (35
 ## Round 1 lessons (canon-sonnet, 180 rows)
 - GC hints on small leaves were mostly wrong (2 A hints were 16-byte getters matched to constructors): the holdout was
   measured on named anchors, which are larger. Queue now hides GC hints under 48 bytes.
+- Round 2 (>= 48 B): hints taken/rejected A 0/1, R 10/16, B 6/23; wrong B hints were often the neighbour. `canon.py show`
+  now prints a GC window (aligned symbol +-3, mangled names with argument types) instead of trusting one name.
 - 888 lifted starts are not Ghidra functions (882 inside another function): census/canon/fragments.tsv with the parent;
   out of the queue. They count as parts of their parent, not as work.

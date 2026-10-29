@@ -208,7 +208,26 @@ def show(args):
         d = json.loads(l)
         if d.get("str"):
             strs[d["addr"]] = d["str"][:60]
+    # GC window: the aligned GC symbol +-3 inside the same source file (alignment is often off by one; the file is
+    # right 94 %), with full mangled names, which carry the argument types
+    gcrow = {}
+    if os.path.exists(OUT + "/prior_gc.tsv"):
+        gcrow = {r["addr"]: r for r in csv.DictReader(open(OUT + "/prior_gc.tsv"), delimiter="\t")}
+    gsyms = []
+    if gcrow:
+        for l in open("build/prior/nfsug/symbols.txt"):
+            if "type:function" in l and ".text:" in l:
+                m = re.search(r"\.text:(0x\w+).*size:(0x\w+)", l)
+                gsyms.append((int(m.group(1), 16), int(m.group(2), 16), l.split(" = ")[0]))
+        gsyms.sort()
+    gaddr = [g[0] for g in gsyms]
     for x in want:
+        r = gcrow.get(x)
+        if r and gsyms:
+            import bisect
+            i = bisect.bisect_left(gaddr, a(r["gc_addr"]))
+            win = [f"{'>' if k == i else ' '}{gsyms[k][2]} ({gsyms[k][1]}B)" for k in range(max(0, i - 3), min(len(gsyms), i + 4))]
+            print(f"// GC window ({r['grade']}, file {r['tu']}): " + " | ".join(win))
         lo = 0x401000 + (a(x) - 0x401000) // 0x10000 * 0x10000
         txt = open(f"{OUT}/c/{lo:x}.c").read()
         i = txt.find(f"// ==== {x} ")
