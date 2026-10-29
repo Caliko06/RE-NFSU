@@ -61,6 +61,7 @@ static void *watchdog(void *arg) {
 // RN_POKE=76778b=1,...: with RN_WATCH, also write each byte at every tick (a state a save cannot reach yet, such as a
 // won magazine; the load overwrites it once, the next tick sets it again).
 static void *memwatch(void *arg) {
+    if (!arg) arg = "";
     uint32_t a[12], off[12], step[12], cnt[12], pa[12], pv[12]; int n = 0, np = 0;
     for (char *s = getenv("RN_POKE"); s && *s && np < 12; s += *s == ',') {
         pa[np] = (uint32_t)strtoul(s, &s, 16);
@@ -73,8 +74,29 @@ static void *memwatch(void *arg) {
         n++;
     }
     uint64_t t0 = now_us();
-    for (;;) {
+    for (unsigned tick = 0;; tick++) {
+        // RN_CARPOS=1: every 2 s, each car of the game's vehicle list L = [0x7361f8] (cars [L+0x28 + 4 i], i from L[9] to L[6], as
+        // 0x41f680/0x41f690): index, kind ([[car+0x14]+4]: 1 player, 2 rival, 3 traffic), x y, and the driver V = car+0x2c flags
+        // (+0x4d1 parked, +0x410 no path, +0x4d0). Where a traffic car sits when it stops (re_citygraph.md, step 3).
+        if (getenv("RN_CARPOS") && tick % 8 == 0) {
+            uint32_t L; memcpy(&L, g_ctx->mem + 0x7361f8, 4);
+            if (L && L < GUEST_MEM - 0x2c) {
+                uint32_t lo, hi; memcpy(&lo, g_ctx->mem + L + 0x24, 4); memcpy(&hi, g_ctx->mem + L + 0x18, 4);
+                for (uint32_t i = lo; i < hi && i < lo + 64; i++) {
+                    uint32_t r, e, v, kind = 0; float x, y;
+                    memcpy(&r, g_ctx->mem + L + 0x28 + 4 * i, 4);
+                    if (r < 0x10000 || r > GUEST_MEM - 0x900) continue;
+                    memcpy(&e, g_ctx->mem + r + 0x14, 4); memcpy(&v, g_ctx->mem + r + 0x2c, 4);
+                    if (e && e < GUEST_MEM - 8) memcpy(&kind, g_ctx->mem + e + 4, 4);
+                    memcpy(&x, g_ctx->mem + r + 0x50, 4); memcpy(&y, g_ctx->mem + r + 0x54, 4);
+                    rn_log("carpos %6.2f %u k%u %.1f %.1f%s%s%s", (now_us() - t0) / 1e6, i, kind, x, y,
+                           v && v < GUEST_MEM - 0x4d2 && g_ctx->mem[v + 0x4d1] ? " P" : "", v && v < GUEST_MEM - 0x4d2 && g_ctx->mem[v + 0x410] ? " N" : "",
+                           v && v < GUEST_MEM - 0x4d2 && g_ctx->mem[v + 0x4d0] ? " o" : "");
+                }
+            }
+        }
         char line[1024]; int k = snprintf(line, sizeof line, "watch %6.2f", (now_us() - t0) / 1e6);
+        if (!n && !np) { usleep(250000); continue; }
         for (int i = 0; i < n && k < (int)sizeof line - 64; i++) {
             uint32_t v, p; memcpy(&v, g_ctx->mem + a[i], 4); p = v;
             for (uint32_t j = 0; j < cnt[i]; j++) {
@@ -161,7 +183,7 @@ int main(int argc, char **argv) {
     c->r[ESP] = STACK_HI - 16;
     c->r[ESP] -= 4;
     st(c, c->r[ESP], host_addr_of("rn", "entry_returned"), 4);
-    if (getenv("RN_WATCH")) { pthread_t mw; pthread_create(&mw, NULL, memwatch, getenv("RN_WATCH")); pthread_detach(mw); }
+    if (getenv("RN_WATCH") || getenv("RN_CARPOS")) { pthread_t mw; pthread_create(&mw, NULL, memwatch, getenv("RN_WATCH")); pthread_detach(mw); }
     rn_steerlog = getenv("RN_STEERLOG") != NULL;
     // RN_CARLOOK=2003 (car.efx as shipped) and 2 (host/sm1.c car_ps_sharp): the car's cube reflection at the game's 0.5,
     // not PATCH 0x40fbb7's 0.35 (the float it reads at 0x707fc4).
