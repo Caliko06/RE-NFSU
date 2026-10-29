@@ -109,10 +109,50 @@ Picker `0x53c3a0` (V, G). It reads `p = player`, `order = 0x758b58[pos*2]`, wher
 - Names and the 20 corrections to the x86-ps2 map: agent TSV (night_log.md handoff), to be merged into
   `census/names_sound.tsv`.
 
+## 5. Engine patch: from RPM to the three loops (night-opus-a2)
+
+- **Parameters.** `0x52bf70` writes the engine Csis instance (`[this+0x1760]`) every frame. Then `0x64bc30`
+  commits it. V (H, 2026-10-29). The Csis param slots are ints:
+  | slot | value | scale |
+  |---|---|---|
+  | `+0x14`, `+0x18` | RPM `this+0x1f1c` | × 0.1024, clamped 0..0x400 (0x400 = 10,000 rpm) |
+  | `+0x1c`, `+0x20` | torque/load `this+0x1f8c` | × 10.24, clamped 0..0x400 (0x400 = 100) |
+  | `+0x24`, `+0x28` | volume L/R `this+0x238`/`+0x23c` | clamped 0..0x7fff |
+  | `+0x44` | `this+0x2ac` (the load used by UpdateEngineVol) | clamped 0..0x400 |
+  | `+0x48` | `this+0x6c` | clamped 0..0x10000 |
+  | `+0x4c` | pan from the car's i16 `+0x52` | −0x3fff..0x3fff |
+
+  The constants 0.1024 and 10.24 come from `0x3dd1b717` and `0x4123d70a`.
+- **The patch is a node graph, not code with formulas.** The ENG module (for example `C0U0_M0_ENG_MB.abk`, module
+  id 121576) has one patch function at `+0xa8`. It is 0x5a2 bytes of straight-line code: `push esi; call node; mov
+  [esi+k],eax; add esi,size`. Each call evaluates one node whose state block lives in the instance, and each result
+  is written into the input slots of later nodes. V (C, capstone on the relocated header, `tools/recomp/abk.py`
+  relocate). The node functions live in Speed.exe:
+  | node | what it does (H, C) |
+  |---|---|
+  | `0x64cdd0` (27 uses) | curve: clamps the input to [min,max] of a curve record, then reads an int8/int16 table at `+0x10`, with a float scale at `+0xc` |
+  | `0x64d0b0` (23) | product: `a * b * scale` |
+  | `0x64db50` (10) | pass-through/copy of three values |
+  | `0x64cb90` (4) | gate with hysteresis: on inside window [a,b], off inside window [c,d] |
+  | `0x64cf90` (4) | select: `list[index]` |
+  | `0x64da70` (4) | ramp/slew toward a target over N steps |
+  | `0x64d960` (3) | oscillator (phase wrap, sine through `0x713ca0`) |
+  | `0x64d860` (3) | voice node: state 0 stop / 1 start / 2 update; picks the sample from a list by index `+0x14`, then calls the voice-type handlers `0x6e9a98` (start), `0x6e9aa8` (stop), `0x6e9ab8` (update) |
+- **Shape (V, C).** First the inputs are fanned out to the nodes (`+0xc2..+0x143`). Then come four RPM/load curves
+  and two pairs of hysteresis gates (on/off windows), three oscillators and the shared curves. Then there are three
+  identical voice chains, `curve → sum → select → ramp → curve → product → voice 0x64d860`, one for each of the
+  bank's three mono loops. So **pitch and volume of each loop are designer curves of RPM and load**, crossfaded by
+  the gates. There is no formula in Speed.exe. The curve tables sit in the instance state built from the bank
+  header, and their values are not dumped yet (U).
+- **Speech (FE).** `PlaySpeechStream 0x51c830` with event `0x59` reads the table `0x6f8728[id*2 + variant]`. Only
+  7 entries are set: id 2 → lines 0/1, 5 → 2, 6 → 3, 7 → 4, 11 → 5/6. The others are −1, which means stop. It then
+  calls stream-manager vfunc `+0x98(0x59, line)`. The callers are FE screens (`0x4c3db0`, `0x4c5320`, `0x4c5fa0`,
+  `0x4c6cb0`, `0x4c7790`, `0x4cd3e0`, `0x4cd490`, `0x50a5d0`). V (H, D). Which code plays the other ~270 lines of
+  `SpeechStreams` (in race?) is U.
+
 ## Open (U)
 - `entrant+0x435` (turbo variant); the 0x520320 switch read byte by byte.
-- The engine Csis/ABK module's internal RPM → pitch/loop mapping (the code is lifted in `abk.py`; its semantics
-  are not read yet).
-- Speech: which event picks which of the 277 lines (STRMBANK descriptors?).
+- The values of the engine curve tables (RPM → pitch/volume per loop). The graph is read (§5), the numbers are not.
+- Speech: the code path for the ~270 non-FE lines (in-race?) and the role of STRM_English_Speech_MB.abk (module 1497).
 - Mixer path to dsound: the categories and sliders are in `docs/re_audio_default.md`. The voice/3D mixer names
   are in `census/names_sound.tsv` (EAXS_3DMixer, EAXMixMgr, EAXSND8Wrapper).

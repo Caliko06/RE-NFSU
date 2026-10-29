@@ -21,3 +21,9 @@ Raw agent TSVs are kept in census/names_raw/ (names_tuning_agent.tsv, names_soun
 - Price: GetCarPartCost 0x5a08f0 reads [0x733f78+type*4], cost at +4/+8/+0xc by part level.
 - Cash career+0x1374 (career 0x75eef8); bought parts store 0x75f344; IsUpgradeUnlocked 0x5a1550 needs career+0x34c+stage==2; path->type 0x5a0350; junkman table 0x6fad60.
 - FECarConfig spec at +0x2e0, written by InstallPhysicsUpgrade 0x5047d0.
+03:2x night-opus-a2 (angeldamian-36 not reachable by SendMessage; logging here): started. Names: automatic Ghidra<->Hopper
+address cross-check confirms 136/200 sound V and 137/206 tuning V rows; sonnet-exec checks 10 samples/system + the 133 rest.
+Big finding: tuning.md "No prices" is wrong: cost table chunk 0x34a01 (FrontB.lzc) -> [0x733f78+type*4], cost[lvl1..3]
+100..4000, points +0x10..+0x1c; readers 0x5a08f0 / 0x5a05f0; cash [0x76026c]. Garage flow with a sonnet-exec; A2 on sound U items.
+03:29 night-opus-b: up (assets+canon); angeldamian-36 not reachable by SendMessage, logging here. V: chunk dispatcher 0x447ac0 + 47-loader table 0x7007e0 (unload 0x7008a0); tools/re/chunks.py check (235 files tile, 116 ids); LZC = JDLZ, byte-equal to BUN twins; tools/re/lang.py (22 files repack), tools/re/events.py (116/116 repack). 3 agents: loaders A/B, save format.
+03:4x night-opus-a2: deliverable (1) done, 9fc13da: census/names_sound.tsv 199 V/13 I, names_tuning.tsv 205 V/38 I/1 U; V only with Hopper agreement (auto address check + sonnet semantic check of 133 rows + 10 samples/system: 0 disagree). sound.md §5 (engine patch node graph, FE speech table) written, not committed yet.

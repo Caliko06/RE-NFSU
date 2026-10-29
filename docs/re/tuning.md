@@ -20,8 +20,11 @@ until a row in `census/names_tuning.tsv` says V.
   table. Each part has a car hash, a slot/type byte, a level byte (0..4) and a list of (bStringHash, value)
   attributes (colour, texture, rim size...). The visual parts do not touch physics. The only link is the aero
   term in RebuildPhysicsInfo, which grows with the *handling* levels, not with the kit. V (G, D)
-- **No prices.** NFSU1 has no money. Visual parts unlock by level byte vs career progress, and performance
-  parts by package level 1..3. The exact unlock comparison is U (see Open).
+- **Prices and cash exist** (corrected 2026-10-29 by night-opus-a2; the earlier "no prices" was wrong). Cash is
+  `[0x76026c]` (career+0x1374). The cost table is chunk `0x34a01` in `FrontEnd/FrontB.lzc` → `[0x733f78+4*type]`,
+  with cost L1/L2/L3 at +4/+8/+0xc (100..4000) and rating points at +0x10..+0x1c. Readers are `0x5a08f0` (visual)
+  and `0x5a08b0` (perf); the payment is `0x5a2620`/`0x5a25a0`. A tier unlocks when a career event whose reward is
+  {type 0, price type, level} is won (`0x5a1550`). V (C, G, D). Full flow: `docs/re/garage.md`.
 - **Two old labels were wrong.** `0x583ea0` is not a speed cap. It is the generic lookup in a uniformly sampled
   float table `{n, xmin, xmax, 1/step, data*}` with linear interpolation and clamping, V (G). The "tuning block"
   `0x705f48..0x705f84` is four of those tables for **steering**: maximum wheel angle vs speed (45° at 0 down to
@@ -149,10 +152,11 @@ Ghidra:
   with 2 or 3, using the flags `[0x735e10]`/`[0x735e11]` and the same `0x5a1550` queries.
 
 So the level byte in the part DB is the unlock tier: tier n opens when the career reaches it.
-No price field exists anywhere in the record or its attributes (D: no attribute varies like a price).
+The part record has no price field; the price comes from the per-type cost table (see garage.md §3). V (D)
 
 ## Open (U)
-- The keys passed to `0x5a1550` (which career milestones open tiers 2..4) and the perf-package unlock (same object?).
+- Answered in garage.md §2: `0x5a1550` keys are price types; a tier opens when an event with reward {0, type, level} is won.
+  Old note: the keys passed to `0x5a1550` and the perf-package unlock (same object?).
   Candidates that use attribute hash 0x10c98090: 0x4bbd70, 0x4bc790, 0x4c7790, 0x50d420, 0x580b00.
 - Who writes spec levels 9/10 (spoiler/ground effects). The garage leaves them 0 on PS2. On PC only the
   RebuildPhysicsInfo aero top-up (step 3) is seen.
