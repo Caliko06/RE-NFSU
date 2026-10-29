@@ -1,0 +1,127 @@
+addr	name	system	confidence	evidence	tool	doc
+0x671102	_free	runtime	high	V: SEH frame; NULL ignored; if [0x793220]==3 (small-block heap) __lock(4), __sbh_find_block 0x67744c, __sbh_free_block 0x677477, else HeapFree([0x79321c],0,p); Ghidra FID _free Single Match; 635 callers (most called function in the exe)	ghidra+hopper	docs/re/runtime.md
+0x67121a	_malloc	runtime	high	V: tail call __nh_malloc(size,[0x717d74]) (_newmode); H+G agree; 484 callers	ghidra+hopper	docs/re/runtime.md
+0x6711ee	__nh_malloc	runtime	high	V: size<0xffffffe1 guard, __heap_alloc then __callnewh retry loop; G body + FID	ghidra+hopper	docs/re/runtime.md
+0x671173	__heap_alloc	runtime	high	V: if [0x793220]==3 and size<=[0x79320c] small-block path 0x677c2b else HeapAlloc([0x79321c]); G body + FID	ghidra+hopper	docs/re/runtime.md
+0x677f27	__callnewh	runtime	med	I: calls the new-handler [0x717d70] if set; G FID Single Match	ghidra+hopper	docs/re/runtime.md
+0x67906d	_calloc	runtime	high	V: size=count*size, malloc then memset 0 (0x67ef80) in the small-block path; G FID; used by __getptd (calloc(1,0x88))	ghidra+hopper	docs/re/runtime.md
+0x675c84	_realloc	runtime	med	I: G FID Single Match; body not read; 2 callers	ghidra+hopper	docs/re/runtime.md
+0x675b30	__heap_init	runtime	med	V: G body: HeapCreate(flags,0x1000,0) -> [0x79321c]; FID Single Match	ghidra+hopper	docs/re/runtime.md
+0x673078	___CxxFrameHandler	runtime	high	V: 'cld; call ___InternalCxxFrameHandler 0x67b827(...)' (eax = FuncInfo set by the caller stub); every C++ function with EH registers it; the 10-byte 'mov eax,FuncInfo; jmp 0x673078' stubs sit in 0x686e00..0x6896e0; 456 callers	ghidra+hopper	docs/re/runtime.md
+0x67b827	___InternalCxxFrameHandler	runtime	med	I: only caller of the C++ EH core is 0x673078 (3 callers incl. 0x688528 wrapper); G FID Single Match	ghidra+hopper	docs/re/runtime.md
+0x688528	__CxxFrameHandler_wrapper	runtime	low	I: 6-byte stub: calls 0x673078(saved_fp,arg0,arg4,arg8); 51 callers = unwind-table entries; not a CRT name	ghidra+hopper	docs/re/runtime.md
+0x675b84	__SEH_prolog	runtime	high	V: builds the 0xc-byte SEH frame from (handler, locals size): saves [fs:0], links new record, returns frame ptr; 57 callers; H shows 'decomp_var_8 = *0x0 ... *0x0 = &frame'	ghidra+hopper	docs/re/runtime.md
+0x675bbf	__SEH_epilog	runtime	high	V: 'mov fs:[0], saved' restore of the SEH chain; 53 callers, mate of 0x675b84	ghidra+hopper	docs/re/runtime.md
+0x672188	eh_vector_destructor_iterator	runtime	high	V: ptr+=size*count then count--: dtor(ptr-=size) in reverse; SEH funclet __ArrayUnwind 0x67212a; G FID; 99 callers (=__ehvec_dtor)	ghidra+hopper	docs/re/runtime.md
+0x6721e8	eh_vector_constructor_iterator	runtime	high	V: for i<count: ctor(ptr); ptr+=size, SEH cleanup 0x672232; G FID; 53 callers (=__ehvec_ctor)	ghidra+hopper	docs/re/runtime.md
+0x674ec2	__security_check_cookie	runtime	high	V: 'cmp ecx,[0x6eb720]; jne -> report_failure 0x674e91 -> int3' (/GS cookie, DAT_006eb720); 47 callers; FID has no lib tag but body is the stock one	ghidra+hopper	docs/re/runtime.md
+0x6734a0	__chkstk	runtime	high	V: eax=frame size; probes one 0x1000 page at a time down the stack ('test [ecx],eax') then sets esp; 33 callers; FID Single	ghidra+hopper	docs/re/runtime.md
+0x670cb5	WinMainCRTStartup	runtime	med	I: PE entry point (EntryPoint in H, 'entry' in G): GetVersionEx (0x94 struct), heap init, _ioinit, GetCommandLine, then WinMain; body not fully read; 201 lines	ghidra+hopper	docs/re/runtime.md
+0x670c6c	__amsg_exit	runtime	high	V: G body: if [0x717a7c]!=2 __FF_MSGBANNER(); __NMSG_WRITE(n); __exit(255); 7 callers	ghidra+hopper	docs/re/runtime.md
+0x674f09	__NMSG_WRITE	runtime	high	V: scans table 0x6eb728 (0x12 entries {num,char*}: R6002 'floating point not loaded' etc., strings at 0x6ac4d0..0x6ac5xx); console WriteFile(GetStdHandle(-12)) or MessageBox with GetModuleFileNameA prefix 'Microsoft Visual C++ Runtime Library'; no FID	ghidra+hopper	docs/re/runtime.md
+0x675080	__FF_MSGBANNER	runtime	high	V: G body: if console/GUI flags then __NMSG_WRITE(0xfc) '\r\n' banner, hook [0x717b08], then __NMSG_WRITE(0xff); FID Single	ghidra+hopper	docs/re/runtime.md
+0x6720fb	__exit	runtime	high	V: tail call 0x672017(code,1,0) (_doexit); 6 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x672017	__cexit_doexit	runtime	med	I: G body: __lock(8), runs onexit/atexit tables, ExitProcess path; the VS2003 name is _doexit (static)	ghidra+hopper	docs/re/runtime.md
+0x67100d	_atexit	runtime	high	V: G: p=__onexit(fn); return (p!=0)-1; 189 callers (static-init registrations); FID	ghidra+hopper	docs/re/runtime.md
+0x670fd5	__onexit	runtime	med	I: G FID Single Match; __onexit_lk 0x670f2d takes the lock	ghidra+hopper	docs/re/runtime.md
+0x6758cb	__getptd	runtime	high	V: TlsGetValue([0x6eb864]) ; if NULL calloc(1,0x88) 0x67906d + TlsSetValue + __initptd 0x6758b8; GetLastError saved/restored; 36 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x6773d3	__lock	runtime	high	V: table of CRITICAL_SECTION* at 0x6eb878+n*8; if empty create via 0x677354; EnterCriticalSection (IAT 0x69722c); 28 callers	ghidra+hopper	docs/re/runtime.md
+0x67733f	__unlock	runtime	high	V: LeaveCriticalSection([0x6eb878+n*8]) (IAT 0x697230); 29 callers; no FID hit in G (FUN_), H+capstone read	ghidra+hopper	docs/re/runtime.md
+0x677354	__mtinitlocknum	runtime	med	I: creates the CRITICAL_SECTION (malloc 0x18 via 0x67121a) for lock n, 0x6773d3 calls it lazily; no FID	ghidra+hopper	docs/re/runtime.md
+0x677f42	__errno	runtime	high	V: __getptd()+8 (ptd._terrno); 26 callers; no FID hit in G (FUN_), H+capstone read	ghidra+hopper	docs/re/runtime.md
+0x677f4b	___doserrno	runtime	high	V: __getptd()+0xc (ptd._tdoserrno); 12 callers; G decomp 'return &p->_tdoserrno'	ghidra+hopper	docs/re/runtime.md
+0x677f54	__dosmaperr	runtime	high	V: stores the Win32 error in ptd+0xc then maps it with table 0x6eb998 (0x2d pairs) into errno; 8 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x6800a5	___crtInitCritSecAndSpinCount	runtime	med	I: dynamic GetProcAddress of InitializeCriticalSectionAndSpinCount else plain; FID	ghidra+hopper	docs/re/runtime.md
+0x674c30	_strlen	runtime	high	V: dword scan with 0x7efefeff add/xor test 0x81010100 after aligning ecx to 4; 21 callers; FID Single	ghidra+hopper	docs/re/runtime.md
+0x67efe0	_strcmp	runtime	high	V: 2 args; compares bytes with per-dword unrolling (al/ah/shr 16); 7 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x67ef80	_memset	runtime	high	V: (dst,c,n): al replicated by shl 8/16, aligned dword fill (rep stosd tail); 8 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x6723c0	_strncpy	runtime	high	V: (dst,src,n): copies bytes until NUL then zero-pads to n; aligned dword path; 18 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x674800	_strncmp	runtime	high	V: repne scasb for src length then repe cmpsb, returns by last bytes; 4 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x67f980	_memcmp	runtime	high	V: (a,b,n) dword compare when both aligned, byte tail; 1 caller; FID	ghidra+hopper	docs/re/runtime.md
+0x672630	_memmove	runtime	high	V: forward/backward copy by overlap (jump-table tail 0x6727f6); diag docs/re/audit/diag_67a337.md; 12 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x678d30	_memcpy	runtime	high	V: copy used by FILE/stdio buffers and calloc; brief + diag_67a337; 6 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x670f00	_strrchr	runtime	high	V: repne scasb to find length, std; repne scasb backwards (cld after) for char; 2 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x672a10	_strchr	runtime	med	V: shl 8 broadcast of the char into 4 bytes, dword scan for char/NUL; 14 callers; G body returns ptr or 0; no FID name (FUN_)	ghidra+hopper	docs/re/runtime.md
+0x67e1d0	_strcpy	runtime	med	V: loads src [esp+8] and jumps into the dword copy loop shared with strcat; __NMSG_WRITE 0x674f09 uses it for '<program name unknown>' after GetModuleFileNameA fails; no FID	ghidra+hopper	docs/re/runtime.md
+0x67e1e0	_strcat	runtime	med	I: scans dst for NUL (dword trick) then falls into the copy loop of 0x67e1d0; 4 callers; no FID	ghidra+hopper	docs/re/runtime.md
+0x673c3b	__stricmp	runtime	high	V: ptd->locinfo (+0x64) vs [0x6eb554]; if lc_ctype==0 tail to ___ascii_stricmp 0x67e180 else tolower both bytes; 23 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x67e180	___ascii_stricmp	runtime	med	I: C-locale case-insensitive compare; called only by __stricmp; FID Single Match	ghidra+hopper	docs/re/runtime.md
+0x682073	__strnicmp	runtime	med	I: FID Single Match; 3 callers	ghidra+hopper	docs/re/runtime.md
+0x673ca4	__strdup	runtime	med	I: FID Single Match (malloc+memcpy); 2 callers	ghidra+hopper	docs/re/runtime.md
+0x67ef30	_strcspn	runtime	med	I: FID; 32-byte bitmap on stack from the reject set	ghidra+hopper	docs/re/runtime.md
+0x67fc00	_strpbrk	runtime	med	I: FID; same 32-byte bitmap	ghidra+hopper	docs/re/runtime.md
+0x674839	_vfprintf	runtime	high	V: __lock_file(f); __stbuf; _output 0x67604e(f,fmt,args); __ftbuf; unlock via SEH; narrow _output, so FID 'FID_conflict:_vfwprintf' is wrong; H+G+capstone	ghidra+hopper	docs/re/runtime.md
+0x67147f	_printf	runtime	high	V: __lock_file2(1,&_iob[1]=0x6eb1e0); __stbuf; _output 0x67604e; __ftbuf; narrow, so FID 'FID_conflict:_wprintf' is wrong; 8 callers	ghidra+hopper	docs/re/runtime.md
+0x67101f	_sprintf	runtime	high	V: FILE on stack {flag 0x42,cnt 0x7fffffff,base=ptr=buf}; _output 0x67604e; then NUL via --cnt/__flsbuf; 27 callers; no FID hit; H+G agree	ghidra+hopper	docs/re/runtime.md
+0x671077	_vsprintf	runtime	high	V: same as _sprintf but va_list passed in (arg2); 6 callers; H+G agree	ghidra+hopper	docs/re/runtime.md
+0x673533	_snprintf	runtime	high	V: FILE{flag 0x42,cnt=count}; _output; NUL via __flsbuf; 10 callers; H+G agree	ghidra+hopper	docs/re/runtime.md
+0x6734dd	_vsnprintf	runtime	high	V: _snprintf with va_list; 12 callers; H+G agree	ghidra+hopper	docs/re/runtime.md
+0x675fc0	write_char	runtime	med	I: static helper of _output; FID Single Match; 4 callers	ghidra+hopper	docs/re/runtime.md
+0x675ea7	__flsbuf	runtime	high	V: FID + callers: _sprintf family call __flsbuf(0,&FILE) when cnt<0; 6 callers	ghidra+hopper	docs/re/runtime.md
+0x6718b6	__lock_file	runtime	high	V: G: if FILE in _iob (0x6eb1c0..0x6eb420) __lock(((f-0x6eb1c0)>>5)+0x10) else EnterCriticalSection(f+0x20); 6 callers; _iob base 0x6eb1c0 stride 0x20	ghidra+hopper	docs/re/runtime.md
+0x671908	__unlock_file	runtime	med	I: mate of __lock_file; FID; 7 callers	ghidra+hopper	docs/re/runtime.md
+0x671a61	_fwrite	runtime	high	V: __lock_file; __fwrite_lk 0x67195a; __unlock_file; 9 callers	ghidra+hopper	docs/re/runtime.md
+0x67163d	_fread	runtime	high	V: lock_file/__fread_lk 0x671554/unlock_file; 7 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x671541	_fopen	runtime	high	V: tail call __fsopen 0x6714e5(name,mode,0x40=_SHFLAG DENYNO); 13 callers; no FID hit	ghidra+hopper	docs/re/runtime.md
+0x671f1f	_fclose	runtime	high	V: G body: flag&0x40 check, __lock_file, __fclose_lk 0x671ed3, unlock; 14 callers; FID	ghidra+hopper	docs/re/runtime.md
+0x671e94	_getenv	runtime	high	V: G body: __lock(7); __getenv_lk 0x671e13; unlock; 7 callers	ghidra+hopper	docs/re/runtime.md
+0x6716c8	_isdigit	runtime	high	V: ptd->locinfo; if mb_cur_max>1 -> _isctype 0x675bd0(c,4) else ctype[c] & 4 (table at locinfo+0x48); 18 callers	ghidra+hopper	docs/re/runtime.md
+0x675bd0	_isctype	runtime	high	V: (locinfo,c,mask): ctype table idx c+1<0x101 else __crtGetStringTypeA; _isdigit/_isalpha call it with mask 4/0x103; no FID name	ghidra+hopper	docs/re/runtime.md
+0x671689	_isalpha	runtime	high	V: same shape as _isdigit, asm pushes mask 0x103 to _isctype 0x675bd0; FID; 9 callers	ghidra+hopper	docs/re/runtime.md
+0x671741	_isspace	runtime	high	V: same shape, asm pushes mask 8 to _isctype 0x675bd0; FID; 5 callers	ghidra+hopper	docs/re/runtime.md
+0x67145d	_tolower	runtime	med	I: G FID Single Match; 10 callers	ghidra+hopper	docs/re/runtime.md
+0x670efa	_atoi	runtime	high	V: single 'jmp 0x670e72' (the shared _atol body); FID says _atol for both (identical bytes); 27 callers	ghidra+hopper	docs/re/runtime.md
+0x670e72	_atol	runtime	med	I: FID _atol; shared body of atoi/atol (Ghidra only: Hopper folds it into the preceding function)	ghidra+hopper	docs/re/runtime.md
+0x673463	_atof	runtime	high	V: G body: skips _isspace chars, then __atodbl on the rest; double result in st0; FID	ghidra+hopper	docs/re/runtime.md
+0x674e7a	_strtol	runtime	med	I: FID; wraps strtoxl 0x674cbb	ghidra+hopper	docs/re/runtime.md
+0x67490d	_bsearch	runtime	high	V: 5 args (key,base,num,width,cmp), binary search with the compare callback; 6 callers; G prototype	ghidra+hopper	docs/re/runtime.md
+0x672b40	_qsort	runtime	med	I: (base,num,width,cmp) with 0x100-byte stack arrays lostk/histk and shortsort 0x672ad0 for small partitions; 4 callers; no FID hit	ghidra+hopper	docs/re/runtime.md
+0x672ad0	shortsort	runtime	med	I: FID; qsort helper	ghidra+hopper	docs/re/runtime.md
+0x6849a0	__allshr	runtime	high	V: cl>=0x40 -> sign fill; >=0x20 -> eax=edx sar; else shrd/sar; 31 callers (int64 >>); FID	ghidra+hopper	docs/re/runtime.md
+0x6849d0	__allshl	runtime	med	I: 64-bit shift left helper; FID; cl pattern identical to __allshr; 1 caller	ghidra+hopper	docs/re/runtime.md
+0x675c50	__allmul	runtime	med	I: 64-bit multiply; FID	ghidra+hopper	docs/re/runtime.md
+0x674b00	__aulldiv	runtime	med	I: unsigned 64-bit divide; FID; 4 callers	ghidra+hopper	docs/re/runtime.md
+0x680230	__aulldvrm	runtime	med	I: unsigned 64-bit divide+remainder; FID	ghidra+hopper	docs/re/runtime.md
+0x679f00	__aullrem	runtime	med	I: unsigned 64-bit remainder; FID	ghidra+hopper	docs/re/runtime.md
+0x672f00	__isnan	runtime	high	V: exponent (word@+6 &0x7ff8)==0x7ff0 with nonzero mantissa -> NaN; FID Single	ghidra+hopper	docs/re/runtime.md
+0x672eeb	_finite	runtime	med	V: (hi word & 0x7ff0) != 0x7ff0; 5 callers; no FID hit	ghidra+hopper	docs/re/runtime.md
+0x67224a	__abstract_cw	runtime	med	I: translates _MCW flags to the hardware control word; FID	ghidra+hopper	docs/re/runtime.md
+0x67a297	__cftog	runtime	high	V: _fltout2 0x6818c6 + _fptostr 0x681795; exponent <-4 or >= precision -> _cftoe2 0x67a071; diag_67a337.md + FID name __cftog confirmed by listing	ghidra+hopper	docs/re/runtime.md
+0x67a071	__cftoe2	runtime	high	V: g_fmt path calls _shift 0x67a054 to open the decimal point slot; diag_67a337.md + FID	ghidra+hopper	docs/re/runtime.md
+0x67a054	__shift	runtime	high	V: strlen then memmove(s+1,s,len+1); diag_67a337.md + FID	ghidra+hopper	docs/re/runtime.md
+0x67a11f	__cftoe	runtime	med	V: H: _fltout2 6818c6, _fptostr 681795, then _cftoe2(0x67a071,...), /GS epilogue; 1 caller (_cfltcvt)	ghidra+hopper	docs/re/runtime.md
+0x67a22f	__cftof	runtime	med	V: H: _fltout2, _fptostr(.. var_10+arg_8), then 0x67a193 (_cftof2); 1 caller (_cfltcvt)	ghidra+hopper	docs/re/runtime.md
+0x6818c6	__fltout2	runtime	med	I: producer of digits/exponent in a STRFLT, called by _cftoe/_cftof/_cftog; name from diag_67a337.md; no FID hit	ghidra+hopper	docs/re/runtime.md
+0x681795	__fptostr	runtime	med	I: rounds digit buffer to the requested precision; called after _fltout2; name from diag_67a337.md; no FID hit	ghidra+hopper	docs/re/runtime.md
+0x67a8fb	__raise_exc	runtime	med	I: FID; libm exception raiser	ghidra+hopper	docs/re/runtime.md
+0x679519	_inconsistency	runtime	med	V: G body: calls [terminate] hook then terminate(); 5 callers	ghidra+hopper	docs/re/runtime.md
+0x67c200	__fdiv_x87_ld	runtime	low	I: 80-bit x87 divide with exponent-class table [0x6ebeb0] and mask-widened CW (or 0x33f, and 0xf3ff); 46 callers: the 0x67c35f..0x67c767 stubs; 0x67c7b6/0x67c7c9 are fstp/call adapters; exact MSVC name unknown	ghidra+hopper	docs/re/runtime.md
+0x401010	ScratchAlloc16	runtime	high	V: size=(size+15)&~15; bump [0x7355b4]+=size while < limit [0x7355b8]; else sets overflow flag [0x7355c4] and adds to [0x7355c8], returns 0; H+G agree	ghidra+hopper	docs/re/runtime.md
+0x4010a0	CallNTimes	runtime	low	I: loops count times calling the callback; 31 callers; H+G	ghidra+hopper	docs/re/runtime.md
+0x565310	bInitMemoryPool	runtime	high	V: G: three circular list heads at +4,+0xc,+0x14, counters +0x1c..0x34 cleared, CRITICAL_SECTION at +0x3c via 0x63f150, name arg 'Main Pool'; 6 callers	ghidra+hopper	docs/re/runtime.md
+0x565850	bMemoryPool_Validate	runtime	high	V: lock; walks the block list testing links with IsBadReadPtr/IsBadWritePtr; int3 (swi 3) on a bad link; 3 callers	ghidra+hopper	docs/re/runtime.md
+0x5657d0	bMemoryPool_TotalAllocated	runtime	med	V: lock; sums block field +8 over the list at +4; unlock; 9 callers	ghidra+hopper	docs/re/runtime.md
+0x565d70	bLargestFreeBlock	runtime	med	I: pool index eax: 0 -> 0x6300000, else LargestBlock-0x58 or 0; 3 callers	ghidra+hopper	docs/re/runtime.md
+0x4f68c0	bSPrintf_regdst	runtime	med	I: same body as bSPrintf with the destination arriving in esi; 183 callers	ghidra+hopper	docs/re/runtime.md
+0x565df0	bVPrintf	runtime	high	V: the engine's own printf core; strings 'bPrintf:invalid pointer', 'bPrintf:invalid bVector', '[%*.*f,%*.*f,%*.*f]' (vector print); 4 callers	ghidra+hopper	docs/re/runtime.md
+0x566e20	SlotPool::BuildFreeList	runtime	high	V: head +0x10 = first slot; every slot's first dword points to the next (stride +0x28); per node chain +8; 3 callers	ghidra+hopper	docs/re/runtime.md
+0x567220	SlotPool::Destroy	runtime	med	V: unlink from pool list, 0x566f20 if flag&8, frees the +8 chain with 0x565ce0; 24 callers	ghidra+hopper	docs/re/runtime.md
+0x567270	bList::AddTail	runtime	high	V: node eax inserted before head ecx on the circular list {next,prev}; 5 callers	ghidra+hopper	docs/re/runtime.md
+0x564990	bList::Sort	runtime	med	V: insertion sort over a circular list with a compare callback (arg 2), relinking nodes in place; 14 callers	ghidra+hopper	docs/re/runtime.md
+0x567cc0	bStrLen	runtime	med	V: null-safe strlen (eax|ecx); 9 callers	ghidra+hopper	docs/re/runtime.md
+0x567ce0	bStrCpy	runtime	high	V: ecx=src to eax=dst including NUL; 13 callers	ghidra+hopper	docs/re/runtime.md
+0x567d30	bStrCmp	runtime	high	V: byte compare returning difference, stops at NUL; 10 callers	ghidra+hopper	docs/re/runtime.md
+0x567da0	bStrICmp	runtime	high	V: folds 'a'..'z' with &0x5f then compares; 13 callers	ghidra+hopper	docs/re/runtime.md
+0x567de0	bStrCat2	runtime	low	I: copies string 1 then appends string 2 into dst (strcpy+strcat); 10 callers	ghidra+hopper	docs/re/runtime.md
+0x565230	bMatrixCopy	runtime	high	V: __fastcall copies 16 dwords from ecx-arg to eax; 16 callers	ghidra+hopper	docs/re/runtime.md
+0x5672b0	bNormalize2	runtime	high	V: x/len, y/len; (1,0) when length 0; fastcall; 9 callers	ghidra+hopper	docs/re/runtime.md
+0x567370	bNormalize3	runtime	high	V: xyz/len; (1,0,0) when length 0; 65 callers	ghidra+hopper	docs/re/runtime.md
+0x567310	bScaleToLength2	runtime	med	V: normalized direction times arg3 (len/param3 inverse); 3 callers	ghidra+hopper	docs/re/runtime.md
+0x567280	bDistance3	runtime	high	V: sqrt(dx^2+dy^2+dz^2) between two float3; 5 callers	ghidra+hopper	docs/re/runtime.md
+0x63f150	CriticalSection::Init	runtime	high	V: InitializeCriticalSection(obj+4); 14 callers	ghidra+hopper	docs/re/runtime.md
+0x63f190	CriticalSection::Enter	runtime	high	V: EnterCriticalSection(obj+4); used by bMemoryPool lock	ghidra+hopper	docs/re/runtime.md
+0x63f1a0	CriticalSection::Leave	runtime	high	V: LeaveCriticalSection(obj+4); 77 callers	ghidra+hopper	docs/re/runtime.md
+0x64b580	Mutex::Lock	runtime	high	V: WaitForSingleObject([0x713c50],INFINITE); 101 callers	ghidra+hopper	docs/re/runtime.md
+0x64b5a0	Mutex::Unlock	runtime	high	V: ReleaseMutex([0x713c50]); 101 callers	ghidra+hopper	docs/re/runtime.md
+0x642450	Log_Printf	runtime	med	V: vsprintf (0x671077) into a 0x200 stack buffer then hook [0x6e76ac](channel 0x6cc568, text); 46 callers	ghidra+hopper	docs/re/runtime.md
+0x6424a0	Error_Printf	runtime	high	V: vsprintf 0x671077 then 0x642e60(2,'ERROR: %s',text) and, if [0x70fe30], 'FILE %s LINE %d'; then 0x642540; assert/log path; strings in G (Ghidra only, Hopper has no entry here)	ghidra+hopper	docs/re/runtime.md
