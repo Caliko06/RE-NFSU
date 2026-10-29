@@ -23,6 +23,7 @@ addr	name	system	confidence	tool	doc	from
 0x40d370	BlurDownsample4Tap	blur	V	G+C	docs/re/blur.md	blur
 0x40d6e0	BlurComposite	blur	V	G+C	docs/re/blur.md	blur
 0x40dd00	BuildProjection	camera	I	C	docs/re/camera.md	camera
+0x4175c0	LinearTable::Init	rivals	I	capstone	docs/re/rivals.md	rivals
 0x417600	RideInfo::Init	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x41c420	Config::OpenCfgFile	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
 0x41c680	Settings::Load	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
@@ -44,7 +45,11 @@ addr	name	system	confidence	tool	doc	from
 0x41e330	Opt::Read	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
 0x420050	SlowMoStart	camera	I	C	docs/re/camera.md	camera
 0x421a30	SpecialCamCooldown	camera	I	C	docs/re/camera.md	camera
+0x422410	Grid::BuildRacerCar	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
+0x422580	Grid::GetStartPositions	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
+0x422a70	Grid::PlaceAllRacers	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x426930	JumpCamTrigger	camera	V	G+C	docs/re/camera.md	camera
+0x429b10	Racer::UpdateTwoHumanCatchUp	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x429cf0	JumpCamPredict	camera	I	C	docs/re/camera.md	camera
 0x42ab50	IsCar1099InMode4	other	U	ghidra+hopper	docs/re/tuning.md	tuning
 0x42c3c0	Player::CreateRearViewMirror_call	camera	V	C	docs/re/camera.md	camera
@@ -62,11 +67,13 @@ addr	name	system	confidence	tool	doc	from
 0x430730	Player::StartRaceCameras	camera	I	C	docs/re/camera.md	camera
 0x431960	SpecialCamCaller_431960	camera	I	C	docs/re/camera.md	camera
 0x431a2e	JoyEvent_CAMERA_POV_CHANGE_case	camera	V	C+D	docs/re/camera.md	camera
+0x4322a0	RaceStatus::AddEntrant	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals
 0x432360	DriverInfo::operator=	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4323f0	RideInfo::operator=	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x435fe0	ModeFlags_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x436000	ModeFlags_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x436020	ModeFlags_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x43eb00	RaceManager::UpdateAIScores	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x43feb0	TrackMarker_Count	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x43fef0	TrackMarker_Get	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x441380	TrackCollision_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
@@ -116,8 +123,20 @@ addr	name	system	confidence	tool	doc	from
 0x448b10	GameFlow::LoadingFrontEndPart1	assets	V	hopper	docs/re/assets.md	assets
 0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	V	hopper	docs/re/assets.md	assets
 0x449765	GameFlow::LoadingTrackSpecificPart1	assets	V	hopper	docs/re/assets.md	assets
+0x44aa10	AIGoal::Create	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals
+0x44bd10	RacerAI::UpdateRubberBand	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
+0x44c010	RacerAI::GetCatchUpTerms	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
+0x44c550	RacerAI::UpdateDesiredSpeed	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
+0x44ca10	Racer::GetSkillLevel	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals
+0x44d8b0	RaceGoal::SelectAction	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
+0x44dd30	DragGoal::SelectAction	rivals	I	Ghidra+capstone	docs/re/rivals.md	rivals
+0x45d640	Racer::GetDirection	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals
 0x462070	RacerAITuning::Loader	assets	V	Hopper sub_462070 + Ghidra make FUN_00462070: H+G agree	docs/re/assets.md	assets
 0x4620a0	RacerAITuning::Unloader	assets	V	Ghidra make FUN_004620a0 (Hopper export lacks it)	docs/re/assets.md	assets
+0x4623d0	Racer::ChooseGoal	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals
+0x462740	Racer::PersonalityDraw	rivals	V	capstone	docs/re/rivals.md	rivals
+0x462840	Racer::ShouldTakeFork	rivals	I	capstone	docs/re/rivals.md	rivals
+0x462aa0	Racer::GetUnstuckReady	rivals	I	capstone	docs/re/rivals.md	rivals
 0x465d00	SpecialCamCaller_465d00	camera	I	G+C	docs/re/camera.md	camera
 0x466840	Virtual::ReturnOne (float constant getter)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x469580	WorldObjects::Broadphase	props	V	hopper+ghidra	docs/re/props.md	props
@@ -202,8 +221,16 @@ addr	name	system	confidence	tool	doc	from
 0x4b1590	GarageMainScreen::CarLoadingHasStarted	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4b25b0	PresetRide::Loader	assets	V	Hopper sub_4b25b0 + Ghidra make FUN_004b25b0: H+G agree	docs/re/assets.md	assets
 0x4b2600	PresetRide::Unloader	assets	V	Ghidra make FUN_004b2600 (Hopper export lacks it)	docs/re/assets.md	assets
+0x4b2640	PresetRide::FindByKeyHash	rivals	I	capstone	docs/re/rivals.md	rivals
 0x4b2660	PresetRide::FindByHash	assets	V	Hopper sub_4b2660	docs/re/assets.md	assets
+0x4b26f0	PresetRide::ApplyToRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
+0x4b3a20	Race::PickOpponentNames	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals
+0x4b3ac0	Race::SpawnTraffic	rivals	I	Ghidra+Hopper	docs/re/rivals.md	rivals
+0x4b3c60	Race::BuildRandomOpponentRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x4b4040	Race::SpawnOpponents	canon	V	ghidra	docs/re/canon.md	canon
+0x4b4380	Race::MatchOpponentRatings	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
+0x4b4590	Race::RollOpponentSkill	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals
+0x4b4610	Race::ShuffleGrid	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals
 0x4b47a0	ApplyOptionsToPlayerSettings	camera	V	G+C	docs/re/camera.md	camera
 0x4b5df0	Career::StartRaceFromEvent	canon	V	ghidra+capstone	docs/re/canon.md	canon
 0x4b6300	Race::SetPlayerGridSlot	canon	V	ghidra	docs/re/canon.md	canon
@@ -609,6 +636,7 @@ addr	name	system	confidence	tool	doc	from
 0x5809c0	DriverInfo::DriverInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x580b00	GetUsedCarTextureInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x581b30	MakeAccelerationTable	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x583f20	LinearTable::Lookup11	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
 0x584b10	RigidBody::SetMassInertia	props	V	hopper+ghidra	docs/re/props.md	props
 0x588d10	TriggerVolume::Loader	assets	V	Hopper sub_588d10 + Ghidra make FUN_00588d10: H+G agree	docs/re/assets.md	assets
 0x588d70	TriggerVolume::Unloader	assets	V	Hopper sub_588d70 + Ghidra make FUN_00588d70: H+G agree	docs/re/assets.md	assets

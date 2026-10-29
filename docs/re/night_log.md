@@ -68,3 +68,4 @@ Next: (a) map the Csis params to patch inputs in0..in17 (read the SND dispatcher
 one bounded RN_WATCH run); (b) any garage run needs a scratch game dir whose ../save is not the repo save/
 (host/files.c:30; a symlinked game/ dir resolves .. to the repo) — build a dir of per-entry symlinks + copied saves;
 (c) listen/label the 95 speech events.
+09:05 night-opus-b: rivals done: docs/re/rivals.md, census/names_rivals.tsv 28 names (20 V / 8 I). Spawn 0x4b5df0 -> 0x4b4040 -> 0x4b26f0 preset; 303/313 rivals match the player's rating (-1); rubber band 0x44bd10 every 0.3 s, strength EventDesc +0x12c; AI clock 4000 ticks/s; direction is one global 0x78a2fc.

@@ -1,0 +1,29 @@
+addr	name	system	confidence	evidence	tool	doc
+0x4b4380	Race::MatchOpponentRatings	rivals	I	I: default branch: every rival 0x57f700 (match best player ride) unless forced model/rating globals [0x6f1db8..dd4] != -1 then 0x57f970	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x4b4590	Race::RollOpponentSkill	rivals	V	V: reads cumulative table 0x77a400+difficulty*0x28 (10 f32) with roll rand*4.6566e-10; first index with roll<=cum is the skill	capstone+Ghidra	docs/re/rivals.md
+0x4b3a20	Race::PickOpponentNames	rivals	V	V: picks 4 distinct of 48 names at 0x6faf08 with RNG [0x6f227c]; stack array of 4	capstone+Ghidra	docs/re/rivals.md
+0x4b3c60	Race::BuildRandomOpponentRide	rivals	V	V: walks shuffled 20 car ids at 0x6fafc8, skips player model, doubles rating window 7.5, random paint slot 0x1e	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x4b26f0	PresetRide::ApplyToRide	rivals	V	V: hash in eax -> 0x4b2640 node; node+8 car name -> 0x57cf70; 0x57d160 default ride; 0x78 pairs at preset+0x48 -> 0x57ce10 -> ride+0x44c+slot*4; 0x57ea80	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x4b2640	PresetRide::FindByKeyHash	rivals	I	I: walks list head 0x748844; compares upper-case hash of key at node+0x28	capstone	docs/re/rivals.md
+0x4322a0	RaceStatus::AddEntrant	rivals	V	V: copies a 0x750 entrant into [0x78a418] array, count [0x78a41c], cap 30	Ghidra+Hopper	docs/re/rivals.md
+0x44bd10	RacerAI::UpdateRubberBand	rivals	V	V: gates [ai+0x46c],[car+0x18],[0x78a344],[0x7361a8]; period 0x77a49c 0.3 s; scale=1+out1+S*out2, x max((f-1)v+1,rec+0x18); stores [car+0x404]=max(scale,1) and [ai+0x4b8]	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x44c010	RacerAI::GetCatchUpTerms	rivals	V	V: d=(car[+0x14]-target[+0x14])*[0x7372b0]; 11-point curves at 0x779c78/0x779dd8 by k=2*(laps>=4)+(class 2/3); position curves 0x779f38/0x779f78	Ghidra+capstone	docs/re/rivals.md
+0x44c550	RacerAI::UpdateDesiredSpeed	rivals	V	V: node speed byte * rec+0x14 * [ai+0x4b8], jitter re-rolled every 0x77a498=5.0 s, fallback 30.0, caps by vt+0x10, calls 0x44bd10	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x422410	Grid::BuildRacerCar	rivals	V	V: per kind 1/3/0; kind 3 sets driver+0x1fc = 0x6b7c20[[0x78a40c]] (0.93/0.97/1.0)	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x422a70	Grid::PlaceAllRacers	rivals	V	V: loops slots 1..4, finds entrant with grid byte==slot, kind 1->1 2->3 remote->0, positions from 0x422580	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x422580	Grid::GetStartPositions	rivals	V	V: markers ForwardStartingPosition/BackwardStartingPosition else row (i/2)*17+100 m, lateral +-3 m (0x6b7c2c..38)	Ghidra+capstone	docs/re/rivals.md
+0x4b4610	Race::ShuffleGrid	rivals	V	V: quick race: swap player grid byte with random entrant rand%(opp+1); two-human pair variant	Ghidra+Hopper	docs/re/rivals.md
+0x43eb00	RaceManager::UpdateAIScores	rivals	I	I: for racer ids 100+k: rec+0x10 += pointsTable*lerp(rec+0x44,rec+0x48)*[0x78a380]*[0x700a18]; role inferred	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x44aa10	AIGoal::Create	rivals	V	V: type 1..5 -> ctors 0x44a150/190/1c0/200/230, default object vtable 0x6c97b4	Ghidra+Hopper	docs/re/rivals.md
+0x4623d0	Racer::ChooseGoal	rivals	V	V: non-drag -> goal 1; drag -> goal 3 for kind 1 else 2; racer vtable 0x6c89f0 slot +0x60	capstone+Hopper	docs/re/rivals.md
+0x462740	Racer::PersonalityDraw	rivals	V	V: needs >=1.0 s since [ai+0x4d4]; same target as [ai+0x4d0] returns false; else rand01 < rec+0xc	capstone	docs/re/rivals.md
+0x462840	Racer::ShouldTakeFork	rivals	I	I: fork type [fork+0xb]: 8 human only, 2 true, 5/7 false, 9 asks 0x454a20; roll vs rec+0/+4/+8	capstone	docs/re/rivals.md
+0x44ca10	Racer::GetSkillLevel	rivals	V	V: returns [[this+4]+0x14]+0x735 (entrant skill byte)	capstone+Hopper	docs/re/rivals.md
+0x44d8b0	RaceGoal::SelectAction	rivals	V	V: cascade GetUnstuck 500, 0x13 600, JustGotHit 400, AvoidCrossTraffic 400, AvoidAvoidable 300, AccidentRecovery 500, Block table 0x77a340[entrant+0x736], Pass 200	Ghidra+capstone	docs/re/rivals.md
+0x45d640	Racer::GetDirection	rivals	V	V: mov eax,[0x78a2fc]; racer vtable slot +0x40	capstone+Hopper	docs/re/rivals.md
+0x462aa0	Racer::GetUnstuckReady	rivals	I	I: elapsed*0.00025 >= 6.0 s ([0x6b7358]) since last unstuck	capstone	docs/re/rivals.md
+0x4175c0	LinearTable::Init	rivals	I	I: builds 2-point x 0..9 table used by 0x44bd10 with lookup 0x583ea0	capstone	docs/re/rivals.md
+0x583f20	LinearTable::Lookup11	rivals	V	V: clamped piecewise-linear lookup over n (x,y) points	Ghidra+capstone	docs/re/rivals.md
+0x429b10	Racer::UpdateTwoHumanCatchUp	rivals	V	V: kind 1 local human, [0x78a400]!=0, [0x7361c4]==2: veh+0x404 = curve 0x77a478 (-600,1.08)..(-50,1.0) of distance to the other player	Ghidra+Hopper+capstone	docs/re/rivals.md
+0x44dd30	DragGoal::SelectAction	rivals	I	I: drag goal selector; reads rec+0x10 at 0x44df02	Ghidra+capstone	docs/re/rivals.md
+0x4b3ac0	Race::SpawnTraffic	rivals	I	I: called from 0x4b5df0 after rivals; traffic entrants kind 3 skill 0xfe	Ghidra+Hopper	docs/re/rivals.md
