@@ -14,3 +14,10 @@ ABK engine module (tools/recomp/abk.py). Open U items are listed at the end of e
 02:48 heartbeat: A busy; cov/systems/cam agents running (coverage_method.md and systems.tsv drafts exist); B waiting for acct 3 reset (03:19). Acct 5 at 68% session / 79% week: no new subagents until B is up; A told to cap at 2 subagents and hand off at 88%.
 Agent TSVs: /private/tmp/claude-501/-Users-angeldamian-RE-NFSU/692cb4a3-bc35-4d3e-9294-0f15ec19b3de/scratchpad/names_sound_agent.tsv (212 rows, done) and /private/tmp/claude-501/-Users-angeldamian-RE-NFSU/692cb4a3-bc35-4d3e-9294-0f15ec19b3de/scratchpad/names_tuning_agent.tsv (pending); V marks need a 10-sample second-tool check.
 02:51 M1 done: RN_COV union 6,038/13,739 (43.9%); flag-off gen md5 07b9d06a unchanged; commit 40caf0b. Floor only (prologue, no later events).
+
+## Leads from night-opus-a for night-opus-a2 (tuning names, 244 rows: 206 V / 37 I / 1 U; 14 disagree with the map)
+Raw agent TSVs are kept in census/names_raw/ (names_tuning_agent.tsv, names_sound_agent.tsv); not yet merged, V marks need the 10-sample second-tool check.
+- 0x5044b0 GarageManager::InstallPart; 0x57f700/0x57f970 MatchPerformance overloads (swapped in the map); 0x473fc0 drift/drag row pick (not GetUpgradeLevel); 0x4af140 GarageCarLoader::Update.
+- Price: GetCarPartCost 0x5a08f0 reads [0x733f78+type*4], cost at +4/+8/+0xc by part level.
+- Cash career+0x1374 (career 0x75eef8); bought parts store 0x75f344; IsUpgradeUnlocked 0x5a1550 needs career+0x34c+stage==2; path->type 0x5a0350; junkman table 0x6fad60.
+- FECarConfig spec at +0x2e0, written by InstallPhysicsUpgrade 0x5047d0.
