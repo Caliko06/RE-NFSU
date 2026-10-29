@@ -2427,7 +2427,7 @@ LAB_00474af2:
       _DAT_006f0738 = (float)local_20.s.LowPart;
       QueryPerformanceCounter(&LStack_18);
       FUN_0046aa40(param_1 + 8,local_20.s.LowPart);
-      FUN_0040bd40();
+      eOrthonormalizeMatrix();
       QueryPerformanceCounter(&LStack_10);
       iVar3 = iVar3 + -1;
     } while (iVar3 != 0);
@@ -4327,7 +4327,7 @@ LAB_004776da:
         fStack_34 = 0.0;
       }
       iVar9 = *(int *)(param_1 + 0x54);
-      fVar15 = (float10)FUN_0042a0c0();
+      fVar15 = (float10)Car_StampCurveFactor();
       fVar15 = (float10)FUN_004773f0(fStack_34,uVar3,uVar2,*(undefined4 *)(iVar9 + 0x280),
                                      *(undefined4 *)(iVar9 + 0x284),uVar11,(float)fVar15);
       fStack_40 = (float)(((fVar15 - (float10)_K_ONE) * (float10)fStack_44 + (float10)_K_ONE) *
@@ -4422,7 +4422,7 @@ LAB_00477d56:
       _DAT_006f0738 = param_2 / fVar5;
       QueryPerformanceCounter(&LStack_20);
       FUN_0046aa40(param_1 + 8,param_2 / fVar5);
-      FUN_0040bd40();
+      eOrthonormalizeMatrix();
       fVar1 = DAT_00779ae0;
       piVar14 = DAT_0073619c;
       if (*DAT_0073619c == 4) {
@@ -5598,7 +5598,7 @@ void FUN_00479e20(float param_1)
              *puVar1 ^ (uint)(*(float *)(iVar2 + 0x3d0) + (float)(iVar7 - iVar6));
         if (*(float *)(unaff_EDI + 0x80) == 0.0) {
           iVar2 = *(int *)(iVar2 + 0x20);
-          fVar10 = (float10)FUN_0042ab80();
+          fVar10 = (float10)CarState__GetNitrousStoredSeconds();
           *(uint *)(unaff_EDI + 0x80) =
                *puVar1 ^ (uint)(float)(((float10)*(float *)(iVar2 + 0x2a0) - fVar10) +
                                       (float10)*(int *)(unaff_EDI + 0x8c));
@@ -5862,7 +5862,7 @@ void FUN_0047a090(int param_1,undefined4 param_2)
       FUN_00584610(_DAT_0078f104 * 0.44702727 - *(float *)(*(int *)(param_1 + 0x5c) + 0x3d4),param_2
                    ,0,0);
       fVar14 = (float10)bClampF(DAT_0078f17c,-DAT_00700524,DAT_00700524);
-      fVar15 = (float10)FUN_0045db00();
+      fVar15 = (float10)PsychoDriver_ScaledRatioTerm();
       fVar16 = (float10)_DAT_0078f19c;
       fVar17 = (float10)FUN_00583ea0(ABS(*(float *)(*(int *)(param_1 + 0x5c) + 0x3d4)));
       iVar8 = *(int *)(param_1 + 4);
@@ -5987,7 +5987,7 @@ LAB_0047abb7:
           if (0 < iVar6) {
             do {
               iVar7 = FUN_00468820(iVar5);
-              cVar4 = FUN_00466550();
+              cVar4 = Collision_IsFlatSurfaceInvolved();
               if (cVar4 != '\0') {
                 iVar8 = FUN_0041f5e0();
                 if (_DAT_006fff0c < *(float *)(iVar8 + 8) - *(float *)(iVar7 + 0x38)) {
@@ -6749,7 +6749,7 @@ void FUN_0047b6d0(void)
     cVar1 = FUN_0061e6d0("Skeleton",&local_14,local_10);
     if (cVar1 != '\0') {
       *(undefined4 *)(unaff_ESI + 0xc) = local_10[0];
-      uVar2 = FUN_00567c70();
+      uVar2 = bStringHash();
       *(undefined4 *)(unaff_ESI + 0x10) = uVar2;
       *(int *)(unaff_ESI + 0x20) = local_8;
       *(uint *)(unaff_ESI + 8) = (uint)(local_8 != 0);
@@ -7001,8 +7001,8 @@ uint FUN_0047ba30(uint param_1)
   
   uVar1 = *(uint *)(unaff_ESI + 0x1c);
   if (uVar1 == param_1) {
-    FUN_004444f0();
-    FUN_004444f0();
+    TrackStreamer__AddSpecialSection();
+    TrackStreamer__AddSpecialSection();
     uVar1 = 0xffffffff;
     DAT_0077aaf9 = 1;
     DAT_0077aa6c = 0xffffffff;
@@ -7010,12 +7010,12 @@ uint FUN_0047ba30(uint param_1)
   }
   else if (param_1 != 0) {
     if (uVar1 != 0) {
-      FUN_00444550();
-      FUN_00444550();
-      FUN_00445450(*(undefined4 *)(unaff_ESI + 0x1c));
+      TrackStreamer__RemoveSpecialSection();
+      TrackStreamer__RemoveSpecialSection();
+      TrackStreamer__ForceSectionToUnload(*(undefined4 *)(unaff_ESI + 0x1c));
     }
-    FUN_004444f0();
-    FUN_004444f0();
+    TrackStreamer__AddSpecialSection();
+    TrackStreamer__AddSpecialSection();
     DAT_0077aa6c = 0xffffffff;
     DAT_0077aab0 = 0xffffffff;
     DAT_0077aaf9 = 1;
@@ -7035,7 +7035,7 @@ void FUN_0047bae0(void)
   
   iVar1 = *(int *)(in_EAX + 0x1c);
   if (iVar1 == 0) {
-    FUN_00444590();
+    TrackStreamer__RemoveAllSpecialSections();
     return;
   }
   if (*(int *)(in_EAX + 0x18) != 0) {
@@ -7316,8 +7316,8 @@ void FUN_0047bfc0(void)
   int unaff_ESI;
   
   if (*(int *)(unaff_ESI + 0x18) != 0) {
-    FUN_00444550();
-    FUN_00444550();
+    TrackStreamer__RemoveSpecialSection();
+    TrackStreamer__RemoveSpecialSection();
     DAT_0077aa6c = 0xffffffff;
     DAT_0077aab0 = 0xffffffff;
     DAT_0077aaf9 = 1;
@@ -7843,9 +7843,11 @@ void FUN_0047c9e0(int param_1)
 }
 
 
-// ==== 0x47cac0 FUN_0047cac0
+// ==== 0x47cac0 NisSceneManager::FindNisSceneOriginPosition
 
-undefined4 FUN_0047cac0(undefined4 param_1,short *param_2)
+/* [canon] camera med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 NisSceneManager__FindNisSceneOriginPosition(undefined4 param_1,short *param_2)
 
 {
   byte *pbVar1;
@@ -7967,18 +7969,18 @@ void FUN_0047cb50(int param_1)
   local_36c = 0;
   local_368 = 0.0;
   local_37c = 0;
-  iVar1 = FUN_0047cac0(param_1,&local_37c);
+  iVar1 = NisSceneManager__FindNisSceneOriginPosition(param_1,&local_37c);
   if (iVar1 != 0) {
     FUN_004406d0();
     uStack_14 = 0;
     fVar2 = (float10)GroundQuery__FindSurfaceBelow(local_2e0,&local_370,0,0,0);
     local_368 = (float)fVar2;
-    FUN_004440c0(&local_370);
+    TrackPathCoordinate__TrackPathCoordinate(&local_370);
     uStack_378 = uStack_2f0;
     uStack_374 = uStack_2ec;
     Atan2ToAngle16(uStack_2f0,uStack_2ec);
-    FUN_0040bbc0();
-    FUN_00565020();
+    eCreateTranslationMatrix();
+    eIdentity();
     if (*(int *)(*(int *)(param_1 + 0x10) + 0x60) == 0) {
       bDegreesToAngle16(0x42b40000);
     }
@@ -8507,9 +8509,11 @@ void __fastcall FUN_0047d7f0(undefined4 param_1)
 }
 
 
-// ==== 0x47d840 FUN_0047d840
+// ==== 0x47d840 Camera_SetShakeBasisFromMatrix
 
-void __fastcall FUN_0047d840(int param_1)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void __fastcall Camera_SetShakeBasisFromMatrix(int param_1)
 
 {
   undefined4 uVar1;
@@ -8638,7 +8642,7 @@ void FUN_0047d940(float param_1,float param_2)
 void * __thiscall FUN_0047dbf0(void *param_1,byte param_2)
 
 {
-  FUN_0047dc10();
+  BaseCameraCoordinator___BaseCameraCoordinator();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -8646,9 +8650,11 @@ void * __thiscall FUN_0047dbf0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x47dc10 FUN_0047dc10
+// ==== 0x47dc10 BaseCameraCoordinator::_BaseCameraCoordinator
 
-void __fastcall FUN_0047dc10(undefined4 *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall BaseCameraCoordinator___BaseCameraCoordinator(undefined4 *param_1)
 
 {
   int iVar1;
@@ -8666,9 +8672,11 @@ void __fastcall FUN_0047dc10(undefined4 *param_1)
 }
 
 
-// ==== 0x47dc40 FUN_0047dc40
+// ==== 0x47dc40 UpdateCameraCoordinators
 
-void FUN_0047dc40(undefined4 param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void UpdateCameraCoordinators(undefined4 param_1)
 
 {
   int *piVar1;
@@ -8696,9 +8704,11 @@ void FUN_0047dc40(undefined4 param_1)
 }
 
 
-// ==== 0x47dc90 FUN_0047dc90
+// ==== 0x47dc90 MarkCameraDataAsNeedingToBeReloaded
 
-void FUN_0047dc90(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void MarkCameraDataAsNeedingToBeReloaded(void)
 
 {
   int iVar1;
@@ -8759,7 +8769,7 @@ undefined4 __fastcall CameraTables_LoadChunk(int *param_1)
         }
         param_1 = (int *)((int)param_1 + param_1[1] + 8);
       } while (param_1 < piVar1);
-      FUN_0047dc90();
+      MarkCameraDataAsNeedingToBeReloaded();
       return 1;
     }
   }
@@ -8775,7 +8785,7 @@ undefined4 __fastcall CameraTables_LoadChunk(int *param_1)
         }
         param_1 = (int *)((int)param_1 + param_1[1] + 8);
       } while (param_1 < piVar1);
-      FUN_0047dc90();
+      MarkCameraDataAsNeedingToBeReloaded();
       return 1;
     }
   }
@@ -8791,7 +8801,7 @@ undefined4 __fastcall CameraTables_LoadChunk(int *param_1)
         }
         param_1 = (int *)((int)param_1 + param_1[1] + 8);
       } while (param_1 < piVar1);
-      FUN_0047dc90();
+      MarkCameraDataAsNeedingToBeReloaded();
       return 1;
     }
   }
@@ -8807,7 +8817,7 @@ undefined4 __fastcall CameraTables_LoadChunk(int *param_1)
         }
         param_1 = (int *)((int)param_1 + param_1[1] + 8);
       } while (param_1 < piVar1);
-      FUN_0047dc90();
+      MarkCameraDataAsNeedingToBeReloaded();
       return 1;
     }
   }
@@ -8822,7 +8832,7 @@ undefined4 __fastcall CameraTables_LoadChunk(int *param_1)
         }
         param_1 = (int *)((int)param_1 + param_1[1] + 8);
       } while (param_1 < piVar1);
-      FUN_0047dc90();
+      MarkCameraDataAsNeedingToBeReloaded();
       return 1;
     }
   }
@@ -8833,7 +8843,7 @@ undefined4 __fastcall CameraTables_LoadChunk(int *param_1)
     unaff_ESI[0x27f] = (uint)param_1[1] / 0x230;
     unaff_ESI[0x280] = (int)param_1 + 0x17U & 0xfffffff0;
   }
-  FUN_0047dc90();
+  MarkCameraDataAsNeedingToBeReloaded();
   return 1;
 }
 
@@ -8918,9 +8928,11 @@ undefined4 CameraTables_Unload_Impl(undefined4 *param_1,int *param_2)
 }
 
 
-// ==== 0x47e080 FUN_0047e080
+// ==== 0x47e080 CameraLoader::FindRandomCameraShake
 
-int FUN_0047e080(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+int CameraLoader__FindRandomCameraShake(int param_1)
 
 {
   int in_EAX;
@@ -9007,7 +9019,7 @@ int FUN_0047e130(int *param_1,byte *param_2)
     iVar7 = 0;
     if (0 < iVar5) {
       do {
-        FUN_0047f9e0();
+        CameraDataItems__CameraDataItems();
         pbVar3 = param_2;
         pbVar6 = local_a0;
         do {
@@ -9060,9 +9072,11 @@ void CameraTables_Unload(undefined4 param_1)
 }
 
 
-// ==== 0x47e270 FUN_0047e270
+// ==== 0x47e270 DemoCameraCoordinator::DemoCameraCoordinator
 
-void __thiscall FUN_0047e270(undefined4 param_1,undefined4 param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __thiscall DemoCameraCoordinator__DemoCameraCoordinator(undefined4 param_1,undefined4 param_2)
 
 {
   undefined4 *puVar1;
@@ -9092,9 +9106,11 @@ void __thiscall FUN_0047e270(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x47e2d0 FUN_0047e2d0
+// ==== 0x47e2d0 DemoCameraCoordinator::_DemoCameraCoordinator
 
-void FUN_0047e2d0(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void DemoCameraCoordinator___DemoCameraCoordinator(void)
 
 {
   int iVar1;
@@ -9207,9 +9223,9 @@ void __fastcall FUN_0047e300(int param_1)
   }
   if ((local_334 != -1) && (!bVar5)) {
     *(int *)(param_1 + 0x30) = *(int *)(param_1 + 0x30) + 1;
-    FUN_0047f9e0();
+    CameraDataItems__CameraDataItems();
     if (local_2f8[0] == 0) {
-      FUN_0047e080(uStack_258);
+      CameraLoader__FindRandomCameraShake(uStack_258);
       puVar16 = auStack_250;
       for (iVar13 = 0x8c; iVar13 != 0; iVar13 = iVar13 + -1) {
         *puVar16 = 0;
@@ -9310,15 +9326,17 @@ LAB_0047e7ab:
 void FUN_0047e7e0(undefined4 param_1,undefined4 param_2)
 
 {
-  FUN_0047f9e0();
-  FUN_0047e820(param_1,param_2);
+  CameraDataItems__CameraDataItems();
+  DemoCameraCoordinator__WillLookGood(param_1,param_2);
   return;
 }
 
 
-// ==== 0x47e820 FUN_0047e820
+// ==== 0x47e820 DemoCameraCoordinator::WillLookGood
 
-undefined4 FUN_0047e820(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+undefined4 DemoCameraCoordinator__WillLookGood(void)
 
 {
   undefined4 *puVar1;
@@ -9376,7 +9394,7 @@ int FUN_0047e8c0(undefined4 param_1)
   local_8 = 0;
   if (0 < DAT_00736870) {
     do {
-      FUN_0047f9e0();
+      CameraDataItems__CameraDataItems();
       bVar3 = DAT_0078a2fc == 1;
       bVar1 = false;
       iVar2 = (**(code **)(**(int **)(unaff_ESI + 0x2c) + 0x18))(0);
@@ -9392,7 +9410,7 @@ int FUN_0047e8c0(undefined4 param_1)
         bVar1 = true;
       }
       if (!bVar1 == (local_74 == 0)) {
-        iVar2 = FUN_0047e820(param_1,unaff_ESI);
+        iVar2 = DemoCameraCoordinator__WillLookGood(param_1,unaff_ESI);
         if (iVar2 != 0) {
           return local_8;
         }
@@ -9404,9 +9422,11 @@ int FUN_0047e8c0(undefined4 param_1)
 }
 
 
-// ==== 0x47e9d0 FUN_0047e9d0
+// ==== 0x47e9d0 FlyByCameraCoordinator::FlyByCameraCoordinator
 
-void __fastcall FUN_0047e9d0(undefined4 param_1)
+/* [canon] camera med (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall FlyByCameraCoordinator__FlyByCameraCoordinator(undefined4 param_1)
 
 {
   undefined4 *puVar1;
@@ -9455,7 +9475,7 @@ void __fastcall FUN_0047ea20(int param_1)
     *(undefined4 *)(param_1 + 0x20) = 0;
   }
   *(int *)(param_1 + 0x24) = *(int *)(param_1 + 0x24) + 1;
-  FUN_0047f9e0();
+  CameraDataItems__CameraDataItems();
   if (*(undefined4 **)(param_1 + 0xc) != (undefined4 *)0x0) {
     (**(code **)**(undefined4 **)(param_1 + 0xc))(1);
     *(undefined4 *)(param_1 + 0xc) = 0;
@@ -9588,7 +9608,8 @@ void __fastcall FUN_0047eca0(int param_1)
   if ((*(int *)(param_1 + 0x1c) == -1) || (*(int *)(param_1 + 0x18) != 0)) {
     *(undefined4 *)(param_1 + 0x18) = 0;
   }
-  else if ((*(int *)(param_1 + 0xc) != 0) && (iVar1 = FUN_00484cd0(), iVar1 == 0)) {
+  else if ((*(int *)(param_1 + 0xc) != 0) && (iVar1 = BumperCameraMover__IsFinished(), iVar1 == 0))
+  {
     return;
   }
   if (*(undefined4 **)(param_1 + 0xc) != (undefined4 *)0x0) {
@@ -9610,7 +9631,7 @@ void __fastcall FUN_0047eca0(int param_1)
     *(undefined4 *)(param_1 + 0x2c) = 0;
   }
   *(int *)(param_1 + 0x20) = *(int *)(param_1 + 0x20) + 1;
-  FUN_0047f9e0();
+  CameraDataItems__CameraDataItems();
   pvVar2 = _malloc(0x45c);
   if (pvVar2 == (void *)0x0) {
     uVar3 = 0;
@@ -9668,7 +9689,7 @@ CountdownCameraCoordinator__ctor(undefined4 *param_1,undefined4 param_2,undefine
 void * __thiscall FUN_0047ee30(void *param_1,byte param_2)
 
 {
-  FUN_0047e2d0();
+  DemoCameraCoordinator___DemoCameraCoordinator();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -9697,7 +9718,7 @@ void __fastcall FUN_0047ee50(int param_1)
     FUN_00565da0("COUNTDOWN_%d",iVar1);
     iVar2 = FUN_0047e130(&DAT_00736870,local_c4);
     if (iVar2 != 0) {
-      FUN_0047f9e0();
+      CameraDataItems__CameraDataItems();
       pvVar3 = _malloc(0x45c);
       if (pvVar3 != (void *)0x0) {
         uVar4 = FUN_004848f0(pvVar3,*(undefined4 *)(*(int *)(param_1 + 0x1c) + 4),auStack_a4);
@@ -10326,9 +10347,11 @@ void __thiscall FUN_0047f8c0(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x47f9e0 FUN_0047f9e0
+// ==== 0x47f9e0 CameraDataItems::CameraDataItems
 
-void __fastcall FUN_0047f9e0(int *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall CameraDataItems__CameraDataItems(int *param_1)
 
 {
   int *in_EAX;
@@ -10447,14 +10470,16 @@ void __fastcall FUN_0047f9e0(int *param_1)
 void FUN_0047fca0(void)
 
 {
-  FUN_00481720(&stack0x00000008,4);
+  DragCameraManager__AddUndo(&stack0x00000008,4);
   return;
 }
 
 
-// ==== 0x47fcc0 FUN_0047fcc0
+// ==== 0x47fcc0 DragCameraData::LoadFromVersion
 
-void __fastcall FUN_0047fcc0(uint *param_1,uint *param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall DragCameraData__LoadFromVersion(uint *param_1,uint *param_2)
 
 {
   undefined4 in_EAX;
@@ -10598,9 +10623,11 @@ void __fastcall FUN_0047fcc0(uint *param_1,uint *param_2)
 }
 
 
-// ==== 0x47ff30 FUN_0047ff30
+// ==== 0x47ff30 DragCameraManager::DragCameraManager
 
-void FUN_0047ff30(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void DragCameraManager__DragCameraManager(void)
 
 {
   int in_EAX;
@@ -10717,9 +10744,11 @@ void FUN_00480020(int param_1)
 }
 
 
-// ==== 0x480120 FUN_00480120
+// ==== 0x480120 DragCameraManager::ClearVelocities
 
-void FUN_00480120(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void DragCameraManager__ClearVelocities(void)
 
 {
   int in_EAX;
@@ -10733,9 +10762,11 @@ void FUN_00480120(void)
 }
 
 
-// ==== 0x480150 FUN_00480150
+// ==== 0x480150 DragCameraManager::GetDragIndex
 
-int FUN_00480150(float param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+int DragCameraManager__GetDragIndex(float param_1)
 
 {
   int in_EAX;
@@ -10757,9 +10788,11 @@ int FUN_00480150(float param_1)
 }
 
 
-// ==== 0x480190 FUN_00480190
+// ==== 0x480190 DragCameraManager::GetDistance
 
-float10 FUN_00480190(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+float10 DragCameraManager__GetDistance(void)
 
 {
   uint uVar1;
@@ -11026,10 +11059,10 @@ void FUN_00480660(int param_1,int param_2)
     if (param_2 == iVar1) {
       bVar5 = (byte)param_2;
       param_2 = CONCAT22(0x50,(ushort)bVar5 << 8);
-      FUN_00481720(&param_2,4);
+      DragCameraManager__AddUndo(&param_2,4);
       iVar2 = iVar3 * 0x4c + param_1;
       puVar7 = (undefined4 *)(iVar2 + 0xd0);
-      FUN_00481720(puVar7,0x4c);
+      DragCameraManager__AddUndo(puVar7,0x4c);
       iVar3 = (*(int *)(param_1 + 0xcb0) - iVar3) + -1;
       if (iVar3 != 0) {
         puVar6 = (undefined4 *)(iVar2 + 0x11c);
@@ -11046,7 +11079,7 @@ void FUN_00480660(int param_1,int param_2)
       }
       iVar3 = *(int *)(param_1 + 0xcb0);
       *(int *)(param_1 + 0xcb0) = iVar3 + -1;
-      iVar2 = FUN_00480150(*(undefined4 *)(param_1 + 0xcc0));
+      iVar2 = DragCameraManager__GetDragIndex(*(undefined4 *)(param_1 + 0xcc0));
       *(int *)(param_1 + 0xcb4) = iVar2;
       if ((iVar2 == 0) && (*(int *)(param_1 + 0xcb8) == 3)) {
         *(undefined4 *)(param_1 + 0xcb8) = 1;
@@ -11182,9 +11215,11 @@ void FUN_00480930(int param_1,int param_2)
 }
 
 
-// ==== 0x480a20 FUN_00480a20
+// ==== 0x480a20 DragCameraManager::Paste
 
-void __fastcall FUN_00480a20(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall DragCameraManager__Paste(int param_1)
 
 {
   undefined4 uVar1;
@@ -11253,7 +11288,7 @@ void __fastcall FUN_00480a50(undefined4 param_1,int param_2,int param_3,char par
       cStack00000009 = (char)param_2 + '\x01';
       param_4 = 1;
       uStack0000000a = 4;
-      FUN_00481720(&param_4,4);
+      DragCameraManager__AddUndo(&param_4,4);
     }
     iVar1 = *(int *)(param_3 + 0xcb0) + -1;
     if (0 < iVar1) {
@@ -11271,9 +11306,11 @@ void __fastcall FUN_00480a50(undefined4 param_1,int param_2,int param_3,char par
 }
 
 
-// ==== 0x480b40 FUN_00480b40
+// ==== 0x480b40 DragCameraManager::EnforceSpacing
 
-void FUN_00480b40(float param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void DragCameraManager__EnforceSpacing(float param_1)
 
 {
   float fVar1;
@@ -11383,7 +11420,7 @@ void __thiscall FUN_00480ca0(int param_1,float param_2)
     fVar2 = fVar3;
   }
   *pfVar1 = fVar2;
-  FUN_00480b40(param_1);
+  DragCameraManager__EnforceSpacing(param_1);
   return;
 }
 
@@ -11417,7 +11454,7 @@ void __fastcall FUN_00480d40(int param_1,int param_2)
       local_64 = *(undefined4 *)(uVar5 * 0x4c + 0xd8 + in_EAX);
     }
     FUN_00481160(in_EAX,local_64);
-    FUN_00424ba0();
+    bMatrix4_SetRotationAndTranslation();
     D3DXVec3Transform();
     return;
   }
@@ -11458,7 +11495,7 @@ void __fastcall FUN_00480e20(int param_1,int param_2)
       local_64 = *(undefined4 *)(uVar4 * 0x4c + 0xd8 + param_1);
     }
     FUN_00481160(param_1,local_64);
-    FUN_00424ba0();
+    bMatrix4_SetRotationAndTranslation();
     D3DXVec3Transform();
     return;
   }
@@ -11540,7 +11577,7 @@ void FUN_00480ff0(int param_1)
   local_cc = local_ac + local_9c;
   local_c8 = local_a8 + local_98;
   if (*(char *)(*(int *)(param_1 + 0xcb4) * 0x4c + 0xd4 + param_1) != '\0') {
-    FUN_00424ba0();
+    bMatrix4_SetRotationAndTranslation();
     Matrix_InvertRigid();
     D3DXVec3Transform(&local_d0,&local_d0,local_50);
     iVar1 = local_d8;

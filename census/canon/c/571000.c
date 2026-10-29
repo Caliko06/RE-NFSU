@@ -52,7 +52,7 @@ void DrawRaceCarList(int param_1)
           local_218 = local_218 + -1;
           CallNTimes(local_110,0x40,4,FUN_004ad8d0);
           CallNTimes(local_210,0x40,4,FUN_004ad8d0);
-          FUN_0042a120(piVar7);
+          Car__GetRenderingWheelAndBrakeMatrices(piVar7);
           piVar3 = piVar7 + 0x138;
           piVar6 = piVar7 + 0x148;
           if ((piVar7[0x14c] & 1 << ((byte)*(undefined4 *)(param_1 + 4) & 0x1f)) == 0) {
@@ -356,7 +356,7 @@ undefined4 __thiscall FUN_005715d0(int param_1,undefined4 param_2)
       in_EAX[0xc] = uVar2;
       in_EAX[0xf] = 0x3f800000;
       in_EAX[0xe] = uVar1;
-      iVar6 = FUN_00445c60();
+      iVar6 = FindSceneryInfo();
       piVar7 = (int *)(iVar6 + 0x24);
       iVar6 = 6;
       do {
@@ -5581,7 +5581,7 @@ void __fastcall FUN_00577290(undefined4 *param_1)
   piVar5 = (int *)param_1[2];
   *piVar5 = iVar4;
   *(int **)(iVar4 + 4) = piVar5;
-  FUN_00441fa0();
+  TrackPolygonList__Clear();
   return;
 }
 
@@ -9297,7 +9297,7 @@ void FUN_0057a420(undefined4 param_1)
       if (*(int *)(iVar3 + 0xe4) != 0) {
         FUN_005791c0();
       }
-      uVar2 = FUN_004440c0(iVar3 + 0x40);
+      uVar2 = TrackPathCoordinate__TrackPathCoordinate(iVar3 + 0x40);
     }
     unaff_ESI[0x74] = uVar2;
   }
@@ -10586,15 +10586,15 @@ undefined4 * FUN_0057bb10(undefined4 *param_1)
   iVar3 = *(int *)(param_1[0xc] + 0xc);
   if (iVar2 != 0) {
     iVar8 = *(int *)(iVar2 + 0xc);
-    if ((iVar8 != 0) && (iVar4 = FUN_00567c70(), **(int **)(iVar8 + 0x2c) == iVar4)) {
+    if ((iVar8 != 0) && (iVar4 = bStringHash(), **(int **)(iVar8 + 0x2c) == iVar4)) {
       uVar5 = DAT_006f227c ^ 0x1d872b41;
       uVar6 = uVar5 >> 5 ^ uVar5;
       uVar9 = DAT_006f227c & 1;
       DAT_006f227c = uVar6 << 0x1b ^ uVar6 ^ uVar5;
       if (uVar9 != 0) {
-        uVar7 = FUN_00567c70();
+        uVar7 = bStringHash();
         *puVar1 = uVar7;
-        iVar8 = FUN_00567c70();
+        iVar8 = bStringHash();
         if (iVar8 != param_1[0x25]) {
           param_1[0x25] = iVar8;
           param_1[0x26] = 0xffffffff;
@@ -10602,7 +10602,7 @@ undefined4 * FUN_0057bb10(undefined4 *param_1)
         *(undefined4 **)(iVar2 + 0x10) = puVar1;
         *(undefined4 *)(iVar2 + 0x14) = 1;
         if (((iVar3 != 0) && (iVar8 = *(int *)(iVar3 + 0xc), iVar8 != 0)) &&
-           (iVar4 = FUN_00567c70(), **(int **)(iVar8 + 0x2c) == iVar4)) {
+           (iVar4 = bStringHash(), **(int **)(iVar8 + 0x2c) == iVar4)) {
           *(undefined4 **)(iVar3 + 0x10) = puVar1;
           *(undefined4 *)(iVar3 + 0x14) = 1;
         }
@@ -10610,14 +10610,14 @@ undefined4 * FUN_0057bb10(undefined4 *param_1)
     }
     uVar5 = DAT_006f227c;
     iVar8 = *(int *)(iVar2 + 0xc);
-    if ((iVar8 != 0) && (iVar4 = FUN_00567c70(), **(int **)(iVar8 + 0x2c) == iVar4)) {
+    if ((iVar8 != 0) && (iVar4 = bStringHash(), **(int **)(iVar8 + 0x2c) == iVar4)) {
       uVar9 = uVar5 ^ 0x1d872b41;
       uVar6 = uVar9 >> 5 ^ uVar9;
       DAT_006f227c = uVar6 << 0x1b ^ uVar6 ^ uVar9;
       if ((uVar5 & 1) != 0) {
-        uVar7 = FUN_00567c70();
+        uVar7 = bStringHash();
         *puVar1 = uVar7;
-        iVar8 = FUN_00567c70();
+        iVar8 = bStringHash();
         if (iVar8 != param_1[0x25]) {
           param_1[0x25] = iVar8;
           param_1[0x26] = 0xffffffff;
@@ -10625,7 +10625,7 @@ undefined4 * FUN_0057bb10(undefined4 *param_1)
         *(undefined4 **)(iVar2 + 0x10) = puVar1;
         *(undefined4 *)(iVar2 + 0x14) = 1;
         if (((iVar3 != 0) && (iVar2 = *(int *)(iVar3 + 0xc), iVar2 != 0)) &&
-           (iVar8 = FUN_00567c70(), **(int **)(iVar2 + 0x2c) == iVar8)) {
+           (iVar8 = bStringHash(), **(int **)(iVar2 + 0x2c) == iVar8)) {
           *(undefined4 **)(iVar3 + 0x10) = puVar1;
           *(undefined4 *)(iVar3 + 0x14) = 1;
         }
@@ -11969,7 +11969,7 @@ FUN_0057ced0(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
     if (param_1 * 0xc90 + DAT_00734588 == 0) {
       return 0;
     }
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
   }
   uVar1 = CarPartDatabase__GetCarPart(uVar1,param_3,param_4,param_5,param_6);
   return uVar1;
@@ -14437,7 +14437,7 @@ void FUN_0057fb80(int *param_1,int *param_2)
       break;
     case 0x10:
       uVar10 = param_1[10];
-      iVar8 = FUN_00567c70();
+      iVar8 = bStringHash();
       piVar16 = DAT_0073ad40;
       piVar12 = (int *)NullUpdate_ret();
       if (piVar16 != piVar12) {
@@ -14462,7 +14462,7 @@ LAB_0057fcd2:
           uVar24 = 0xffffffff;
           uVar23 = 0;
           uVar22 = 0x10;
-          uVar9 = FUN_00567c70(0x10,0,uVar18,0xffffffff);
+          uVar9 = bStringHash(0x10,0,uVar18,0xffffffff);
           uVar18 = CarPartDatabase__GetCarPart(uVar9,uVar22,uVar23,uVar18,uVar24);
         }
       }

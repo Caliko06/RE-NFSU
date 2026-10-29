@@ -2953,9 +2953,11 @@ void FEColor__FEColor(uint param_1)
 }
 
 
-// ==== 0x503f60 FUN_00503f60
+// ==== 0x503f60 FEColor::operator_unsigned_long
 
-uint FUN_00503f60(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+uint FEColor__operator_unsigned_long(void)
 
 {
   byte *in_EAX;
@@ -3579,7 +3581,7 @@ int FindPartWithLevel(undefined4 param_1,uint param_2)
     if (unaff_EDI * 0xc90 + DAT_00734588 == 0) {
       return 0;
     }
-    uVar4 = FUN_00567c70();
+    uVar4 = bStringHash();
   }
   iVar5 = CarPartDatabase__GetCarPart(uVar4,param_1,0,0,0xffffffff);
   while( true ) {
@@ -5878,7 +5880,7 @@ undefined4 IsMagicSpoilerSpecialCase(void)
       uVar11 = 0;
       goto LAB_00507405;
     }
-    iVar10 = FUN_00567c70();
+    iVar10 = bStringHash();
   }
   puVar5 = DAT_0073ad40;
   puVar8 = (undefined4 *)NullUpdate_ret();
@@ -7046,8 +7048,8 @@ LAB_00508fa3:
     return;
   }
   if ((DAT_00735724 == 4) && (DAT_0074546c != 0)) {
-    iVar5 = FUN_00567c70();
-    iVar6 = FUN_00567c70();
+    iVar5 = bStringHash();
+    iVar6 = bStringHash();
     if (iVar5 == iVar6) goto LAB_00508bb7;
     if (DAT_00745be8 == 0) {
       cVar2 = '\0';
@@ -7098,14 +7100,14 @@ LAB_00508c37:
 LAB_00508bb7:
     cVar2 = GaragePartsBrowser__IsInstallingPart();
     cStack_5 = GaragePartsBrowser__IsBuyingPart();
-    iVar5 = FUN_00567c70();
-    iVar6 = FUN_00567c70();
+    iVar5 = bStringHash();
+    iVar6 = bStringHash();
     bVar10 = iVar5 == iVar6;
-    iVar5 = FUN_00567c70();
-    iVar6 = FUN_00567c70();
+    iVar5 = bStringHash();
+    iVar6 = bStringHash();
     if (iVar5 != iVar6) {
-      FUN_00567c70();
-      FUN_00567c70();
+      bStringHash();
+      bStringHash();
     }
     cVar4 = FUN_005087e0();
     if ((cVar4 != '\0') && ((extraout_CL != '\0' || (bVar10)))) {
@@ -8336,7 +8338,7 @@ undefined4 * GaragePerfTuner__GaragePerfTuner(undefined4 *param_1,undefined4 par
   default:
     goto switchD_0050a6bd_default;
   }
-  FUN_00567c70();
+  bStringHash();
 switchD_0050a6bd_default:
   bVar5 = DAT_007677ac == 0;
   if (DAT_00745e40 == 1) {
@@ -10050,11 +10052,11 @@ int FUN_0050c870(void)
         pcVar4 = pcVar4 + 1;
       } while (*pbVar1 != 0);
       if (unaff_ESI != iVar3) {
-        iVar3 = FUN_00567c70();
+        iVar3 = bStringHash();
         if (unaff_ESI != iVar3) {
-          iVar3 = FUN_00567c70();
+          iVar3 = bStringHash();
           if (unaff_ESI != iVar3) {
-            iVar3 = FUN_00567c70();
+            iVar3 = bStringHash();
             if (unaff_ESI != iVar3) {
               return unaff_ESI;
             }
@@ -10118,13 +10120,13 @@ undefined4 FUN_0050c930(void)
         pcVar4 = pcVar4 + 1;
       } while (*pbVar1 != 0);
       if (unaff_ESI != iVar3) {
-        iVar3 = FUN_00567c70();
+        iVar3 = bStringHash();
         if (unaff_ESI != iVar3) {
-          iVar3 = FUN_00567c70();
+          iVar3 = bStringHash();
           if (unaff_ESI != iVar3) {
-            iVar3 = FUN_00567c70();
+            iVar3 = bStringHash();
             if (unaff_ESI != iVar3) {
-              iVar3 = FUN_00567c70();
+              iVar3 = bStringHash();
               if (unaff_ESI != iVar3) {
                 return 0;
               }
@@ -10753,7 +10755,7 @@ uint FUN_0050d360(void)
     if (iVar2 * 0xc90 + DAT_00734588 == 0) {
       return 0;
     }
-    iVar5 = FUN_00567c70();
+    iVar5 = bStringHash();
   }
   puVar1 = DAT_0073ad40;
   puVar3 = (undefined4 *)NullUpdate_ret();
@@ -11444,25 +11446,25 @@ undefined4 FUN_0050dee0(void)
   
   switch(in_EAX) {
   case 0xf:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x10:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x11:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x12:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x13:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x14:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x15:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   default:
     return 0;
@@ -13579,8 +13581,8 @@ switchD_00510372_caseD_0:
   case 6:
     local_5 = '\0';
     if (DAT_0074546c != 0) {
-      local_10 = FUN_00567c70();
-      iVar6 = FUN_00567c70();
+      local_10 = bStringHash();
+      iVar6 = bStringHash();
       if (iVar6 != local_10) {
         local_24 = 0xed716986;
         local_20 = 0xed716986;
@@ -13725,24 +13727,24 @@ undefined4 * GarageDecalLayout__GarageDecalLayout(undefined4 *param_1,undefined4
   case 4:
     uVar4 = 0;
     uVar3 = 0x8c1ed0ae;
-    FUN_00567c70(0x8c1ed0ae,0);
+    bStringHash(0x8c1ed0ae,0);
     FUN_005117b0(0,uVar3,uVar4);
     break;
   case 5:
     uVar4 = 0;
     uVar3 = 0x8c1ed0ae;
-    FUN_00567c70(0x8c1ed0ae,0);
+    bStringHash(0x8c1ed0ae,0);
     FUN_005117b0(0,uVar3,uVar4);
     break;
   case 6:
     uVar4 = 0;
     uVar3 = 0x8c1ed0ae;
-    FUN_00567c70(0x8c1ed0ae,0);
+    bStringHash(0x8c1ed0ae,0);
     FUN_005117b0(0,uVar3,uVar4);
   }
   uVar4 = 0;
   uVar3 = 0x8c1ed0af;
-  FUN_00567c70(0x8c1ed0af,0);
+  bStringHash(0x8c1ed0af,0);
   FUN_005117b0(1,uVar3,uVar4);
 switchD_00510773_caseD_0:
   puVar1 = (undefined4 *)param_1[0x11];
@@ -14103,7 +14105,7 @@ int FUN_00510e70(void)
         iVar3 = 0;
       }
       else {
-        iVar3 = FUN_00567c70();
+        iVar3 = bStringHash();
       }
     }
     puVar4 = DAT_007449c0;
@@ -14126,7 +14128,7 @@ int FUN_00510e70(void)
         iVar3 = 0;
       }
       else {
-        iVar3 = FUN_00567c70();
+        iVar3 = bStringHash();
       }
     }
     puVar4 = DAT_007449c0;
@@ -14189,27 +14191,27 @@ undefined4 * GarageDecalsSlot__GarageDecalsSlot(undefined4 *param_1,uint param_2
     if (cVar4 == '\0') {
       uVar10 = 0;
       uVar8 = 0x6bc2ecf0;
-      FUN_00567c70(0x6bc2ecf0,0);
+      bStringHash(0x6bc2ecf0,0);
       FUN_005117b0(0,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf1;
-      FUN_00567c70(0x6bc2ecf1,0);
+      bStringHash(0x6bc2ecf1,0);
       FUN_005117b0(1,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf2;
-      FUN_00567c70(0x6bc2ecf2,0);
+      bStringHash(0x6bc2ecf2,0);
       FUN_005117b0(2,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf3;
-      FUN_00567c70(0x6bc2ecf3,0);
+      bStringHash(0x6bc2ecf3,0);
       FUN_005117b0(3,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf4;
-      FUN_00567c70(0x6bc2ecf4,0);
+      bStringHash(0x6bc2ecf4,0);
       FUN_005117b0(4,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf5;
-      FUN_00567c70(0x6bc2ecf5,0);
+      bStringHash(0x6bc2ecf5,0);
       FUN_005117b0(5,uVar8,uVar10);
       goto switchD_00510ffa_caseD_0;
     }
@@ -14257,27 +14259,27 @@ undefined4 * GarageDecalsSlot__GarageDecalsSlot(undefined4 *param_1,uint param_2
     if (cVar4 == '\0') {
       uVar10 = 0;
       uVar8 = 0x6bc2ecf0;
-      FUN_00567c70(0x6bc2ecf0,0);
+      bStringHash(0x6bc2ecf0,0);
       FUN_005117b0(0,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf1;
-      FUN_00567c70(0x6bc2ecf1,0);
+      bStringHash(0x6bc2ecf1,0);
       FUN_005117b0(1,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf2;
-      FUN_00567c70(0x6bc2ecf2,0);
+      bStringHash(0x6bc2ecf2,0);
       FUN_005117b0(2,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf3;
-      FUN_00567c70(0x6bc2ecf3,0);
+      bStringHash(0x6bc2ecf3,0);
       FUN_005117b0(3,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf4;
-      FUN_00567c70(0x6bc2ecf4,0);
+      bStringHash(0x6bc2ecf4,0);
       FUN_005117b0(4,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf5;
-      FUN_00567c70(0x6bc2ecf5,0);
+      bStringHash(0x6bc2ecf5,0);
       FUN_005117b0(5,uVar8,uVar10);
       goto switchD_00510ffa_caseD_0;
     }
@@ -14326,14 +14328,14 @@ undefined4 * GarageDecalsSlot__GarageDecalsSlot(undefined4 *param_1,uint param_2
       if (DAT_0073574c == 0) {
         uVar10 = 0;
         uVar8 = 0x6bc2ecf0;
-        FUN_00567c70(0x6bc2ecf0,0);
+        bStringHash(0x6bc2ecf0,0);
         FUN_005117b0(0,uVar8,uVar10);
         goto switchD_00510ffa_caseD_0;
       }
       if (DAT_0073574c != 1) goto switchD_00510ffa_caseD_0;
       uVar10 = 0;
       uVar8 = 0x6bc2ecf0;
-      FUN_00567c70(0x6bc2ecf0,0);
+      bStringHash(0x6bc2ecf0,0);
       FUN_005117b0(0,uVar8,uVar10);
       goto LAB_005115d2;
     }
@@ -14344,13 +14346,13 @@ undefined4 * GarageDecalsSlot__GarageDecalsSlot(undefined4 *param_1,uint param_2
     else {
       uVar10 = 0;
       uVar8 = 0x6bc2ecf0;
-      FUN_00567c70(0x6bc2ecf0,0);
+      bStringHash(0x6bc2ecf0,0);
       FUN_005117b0(0,uVar8,uVar10);
     }
     if (iVar5 < 2) goto switchD_00510ffa_caseD_0;
     uVar9 = 0;
     uVar10 = 0x6bc2ecf1;
-    FUN_00567c70(0x6bc2ecf1,0);
+    bStringHash(0x6bc2ecf1,0);
     uVar8 = 1;
     break;
   case 5:
@@ -14358,14 +14360,14 @@ undefined4 * GarageDecalsSlot__GarageDecalsSlot(undefined4 *param_1,uint param_2
       if (DAT_0073574c == 0) {
         uVar10 = 0;
         uVar8 = 0x6bc2ecf0;
-        FUN_00567c70(0x6bc2ecf0,0);
+        bStringHash(0x6bc2ecf0,0);
         FUN_005117b0(0,uVar8,uVar10);
         goto switchD_00510ffa_caseD_0;
       }
       if (DAT_0073574c != 1) goto switchD_00510ffa_caseD_0;
       uVar10 = 0;
       uVar8 = 0x6bc2ecf0;
-      FUN_00567c70(0x6bc2ecf0,0);
+      bStringHash(0x6bc2ecf0,0);
       FUN_005117b0(0,uVar8,uVar10);
     }
     else {
@@ -14395,7 +14397,7 @@ undefined4 * GarageDecalsSlot__GarageDecalsSlot(undefined4 *param_1,uint param_2
         else {
           uVar10 = 0;
           uVar8 = 0x6bc2ecf0;
-          FUN_00567c70(0x6bc2ecf0,0);
+          bStringHash(0x6bc2ecf0,0);
           FUN_005117b0(0,uVar8,uVar10);
         }
       }
@@ -14404,60 +14406,60 @@ undefined4 * GarageDecalsSlot__GarageDecalsSlot(undefined4 *param_1,uint param_2
 LAB_005115d2:
     uVar10 = 0;
     uVar8 = 0x6bc2ecf1;
-    FUN_00567c70(0x6bc2ecf1,0);
+    bStringHash(0x6bc2ecf1,0);
     FUN_005117b0(1,uVar8,uVar10);
     goto switchD_00510ffa_caseD_0;
   case 6:
     if (DAT_0073574c == 0) {
       uVar10 = 0;
       uVar8 = 0x6bc2ecf0;
-      FUN_00567c70(0x6bc2ecf0,0);
+      bStringHash(0x6bc2ecf0,0);
       FUN_005117b0(0,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf1;
-      FUN_00567c70(0x6bc2ecf1,0);
+      bStringHash(0x6bc2ecf1,0);
       FUN_005117b0(1,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf2;
-      FUN_00567c70(0x6bc2ecf2,0);
+      bStringHash(0x6bc2ecf2,0);
       FUN_005117b0(2,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf3;
-      FUN_00567c70(0x6bc2ecf3,0);
+      bStringHash(0x6bc2ecf3,0);
       FUN_005117b0(3,uVar8,uVar10);
     }
     else if (DAT_0073574c == 1) {
       uVar10 = 0;
       uVar8 = 0x6bc2ecf0;
-      FUN_00567c70(0x6bc2ecf0,0);
+      bStringHash(0x6bc2ecf0,0);
       FUN_005117b0(0,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf1;
-      FUN_00567c70(0x6bc2ecf1,0);
+      bStringHash(0x6bc2ecf1,0);
       FUN_005117b0(1,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf2;
-      FUN_00567c70(0x6bc2ecf2,0);
+      bStringHash(0x6bc2ecf2,0);
       FUN_005117b0(2,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf3;
-      FUN_00567c70(0x6bc2ecf3,0);
+      bStringHash(0x6bc2ecf3,0);
       FUN_005117b0(3,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf4;
-      FUN_00567c70(0x6bc2ecf4,0);
+      bStringHash(0x6bc2ecf4,0);
       FUN_005117b0(4,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf5;
-      FUN_00567c70(0x6bc2ecf5,0);
+      bStringHash(0x6bc2ecf5,0);
       FUN_005117b0(5,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf6;
-      FUN_00567c70(0x6bc2ecf6,0);
+      bStringHash(0x6bc2ecf6,0);
       FUN_005117b0(6,uVar8,uVar10);
       uVar10 = 0;
       uVar8 = 0x6bc2ecf7;
-      FUN_00567c70(0x6bc2ecf7,0);
+      bStringHash(0x6bc2ecf7,0);
       FUN_005117b0(7,uVar8,uVar10);
     }
     goto switchD_00510ffa_caseD_0;

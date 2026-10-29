@@ -6046,9 +6046,11 @@ void VertexDecls_CreateDefault(void)
 }
 
 
-// ==== 0x408370 FUN_00408370
+// ==== 0x408370 ViewList_UpdateViewCountKind
 
-void FUN_00408370(void)
+/* [canon] camera med (ghidra-canon) docs/re/canon.md */
+
+void ViewList_UpdateViewCountKind(void)
 
 {
   if ((undefined4 **)DAT_00740504 != &DAT_00740504) {
@@ -6754,7 +6756,7 @@ void FUN_00408f00(void)
       FUN_0053e290(iVar1 * 0xd0 + in_EAX);
     }
   }
-  FUN_00446620();
+  GrandSceneryCullInfo__DoCulling();
   return;
 }
 
@@ -7036,9 +7038,9 @@ void DrawScreenQuadTextured(undefined4 param_1)
   (**(code **)(*DAT_0073636c + 0x104))();
   uStack_1ec = 1;
   uStack_1f0 = 0x40947e;
-  FUN_00410550();
+  Render_SetAlphaBlend();
   uStack_1ec = 0x40948a;
-  FUN_00410650();
+  Render_SetAlphaTest();
   uStack_1ec = 0;
   uStack_1f0 = 7;
   piStack_1f4 = DAT_0073636c;
@@ -7195,7 +7197,7 @@ void RenderFrameMain(void)
       FUN_004090a0();
       SceneRTSelect(DAT_0073645c == 1);
       if (DAT_00700e80 != 0) {
-        FUN_004468a0(RenderFrameMain_HeadlightItemCallback);
+        GrandSceneryCullInfo__CallbackScenery(RenderFrameMain_HeadlightItemCallback);
       }
       if (((DAT_0077a920 == 6) && (*DAT_007361f0 != 1)) ||
          ((DAT_006fb038 != 0 && (DAT_0077a920 == 3)))) {
@@ -7500,7 +7502,7 @@ LAB_00409d27:
       } while (iVar2 < DAT_007361c4);
     }
     if (DAT_00740588 != '\0') {
-      FUN_0040be70();
+      ePoly__ePoly();
       local_f0[8] = 0x43dc0000;
       local_f0[9] = 0x41700000;
       local_f0[0xc] = 0x43480000;
@@ -7512,8 +7514,8 @@ LAB_00409d27:
       (**(code **)(*DAT_0073636c + 0x104))(DAT_0073636c,0,DAT_00736470);
       (**(code **)(*DAT_0073636c + 0x114))(DAT_0073636c,0,1,3);
       (**(code **)(*DAT_0073636c + 0x114))(DAT_0073636c,0,2,3);
-      FUN_00410650();
-      FUN_00410550(1);
+      Render_SetAlphaTest();
+      Render_SetAlphaBlend(1);
       FUN_0040bef0();
       (**(code **)(*DAT_0073636c + 0x114))(DAT_0073636c,0,1,1);
       (**(code **)(*DAT_0073636c + 0x114))(DAT_0073636c,0,2,1);
@@ -7523,7 +7525,7 @@ LAB_00409d27:
     FUN_004f5e90();
   }
   if (DAT_0078eb90 != 0) {
-    FUN_0040be70();
+    ePoly__ePoly();
     uStack_60 = 0x7f7f7f7f;
     uStack_5c = 0x7f7f7f7f;
     uStack_58 = 0x7f7f7f7f;
@@ -7558,9 +7560,11 @@ LAB_0040a106:
 }
 
 
-// ==== 0x40a140 FUN_0040a140
+// ==== 0x40a140 eUpdateHeadlightCamera
 
-void __fastcall FUN_0040a140(int param_1)
+/* [canon] render high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall eUpdateHeadlightCamera(int param_1)
 
 {
   float fVar1;
@@ -7747,7 +7751,7 @@ void RenderFrame(void)
   }
   do {
     if (iVar1 == 8) {
-      FUN_0040a140();
+      eUpdateHeadlightCamera();
     }
     if (((&DAT_00740468)[iVar1 * 0x60] != '\0') || (9 < iVar1)) {
       BuildProjection(&DAT_00740460 + iVar1 * 0x18,0,0,0);
@@ -8729,9 +8733,11 @@ void FUN_0040baf0(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x40bb20 FUN_0040bb20
+// ==== 0x40bb20 eTranslate
 
-void FUN_0040bb20(undefined4 param_1,undefined4 param_2)
+/* [canon] render high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void eTranslate(undefined4 param_1,undefined4 param_2)
 
 {
   undefined4 *in_EAX;
@@ -8773,9 +8779,11 @@ void FUN_0040bb20(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x40bbc0 FUN_0040bbc0
+// ==== 0x40bbc0 eCreateTranslationMatrix
 
-void __fastcall FUN_0040bbc0(undefined4 param_1,undefined4 *param_2)
+/* [canon] render high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall eCreateTranslationMatrix(undefined4 param_1,undefined4 *param_2)
 
 {
   undefined4 *in_EAX;
@@ -8812,9 +8820,11 @@ void Matrix_InvertRigid(void)
 }
 
 
-// ==== 0x40bd40 FUN_0040bd40
+// ==== 0x40bd40 eOrthonormalizeMatrix
 
-void FUN_0040bd40(void)
+/* [canon] render high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void eOrthonormalizeMatrix(void)
 
 {
   float fVar1;
@@ -8855,9 +8865,11 @@ void FUN_0040bd40(void)
 }
 
 
-// ==== 0x40be40 FUN_0040be40
+// ==== 0x40be40 eInvertRotationMatrix
 
-void FUN_0040be40(void)
+/* [canon] render high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void eInvertRotationMatrix(void)
 
 {
   int unaff_ESI;
@@ -8874,9 +8886,11 @@ void FUN_0040be40(void)
 }
 
 
-// ==== 0x40be70 FUN_0040be70
+// ==== 0x40be70 ePoly::ePoly
 
-void __fastcall FUN_0040be70(int param_1)
+/* [canon] render high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall ePoly__ePoly(int param_1)
 
 {
   *(undefined4 *)(param_1 + 0x20) = 0x42800000;
@@ -9260,9 +9274,11 @@ void eLightMaterialPlatInfo_PoolCreate(void)
 }
 
 
-// ==== 0x40c650 FUN_0040c650
+// ==== 0x40c650 bVector4Scale
 
-void __thiscall FUN_0040c650(float *param_1,float param_2)
+/* [canon] runtime med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall bVector4Scale(float *param_1,float param_2)
 
 {
   float fVar1;
@@ -9329,7 +9345,7 @@ undefined4 Mesh_Load(undefined4 *param_1)
       puVar7[6] = (int)piVar1 + 0x17U & 0xfffffff0;
       puVar7[7] = (piVar1[1] - ((int)piVar1 + 0x17U & 0xfffffff0)) + 8 + (int)piVar1;
       uStack_20 = 0x40c730;
-      FUN_0040c890();
+      Mesh_FixupGroups();
       if (puVar7[7] != 0) {
         uStack_20 = 0;
         uStack_28 = 1;
@@ -9422,9 +9438,11 @@ undefined4 Mesh_Free(void)
 }
 
 
-// ==== 0x40c890 FUN_0040c890
+// ==== 0x40c890 Mesh_FixupGroups
 
-void __fastcall FUN_0040c890(int param_1)
+/* [canon] assets med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall Mesh_FixupGroups(int param_1)
 
 {
   int in_EAX;
@@ -10233,7 +10251,7 @@ void BlurComposite(int param_1,int param_2,int param_3,undefined4 param_4)
   }
   piStack_134 = (int *)param_4;
   uStack_138 = 0x40d8fd;
-  FUN_00410550();
+  Render_SetAlphaBlend();
   if (DAT_0073640c == 0) {
     piStack_134 = DAT_0073636c;
     uStack_138 = 0x40d91c;
@@ -10422,9 +10440,11 @@ char __fastcall AABB_ClassifyAgainstFrustum(float *param_1,float *param_2,int *p
 }
 
 
-// ==== 0x40dc60 FUN_0040dc60
+// ==== 0x40dc60 eView_IsPointInFrustum
 
-undefined4 FUN_0040dc60(void)
+/* [canon] render med (ghidra-canon) docs/re/render.md */
+
+undefined4 eView_IsPointInFrustum(void)
 
 {
   int *in_EAX;
@@ -11172,7 +11192,7 @@ float10 bTickerToSeconds(void)
 void FUN_0040ed10(void)
 
 {
-  FUN_00410700();
+  bList__FreeAllToSlotPool();
   return;
 }
 
@@ -11574,7 +11594,7 @@ void FUN_0040f3d0(int *param_1)
       else {
         (**(code **)(*(int *)DAT_0073640c[6] + 0xd0))((int *)DAT_0073640c[6],DAT_0073640c[0x10]);
       }
-      FUN_00410650();
+      Render_SetAlphaTest();
       if (*(char *)((int)param_1 + 0x56) == '\0') {
         _DAT_007070cc = 0xffffffff;
         _DAT_007070c8 = 0xffffffff;
@@ -11589,7 +11609,7 @@ void FUN_0040f3d0(int *param_1)
         }
       }
       else {
-        FUN_00410550(1);
+        Render_SetAlphaBlend(1);
       }
       if (*(char *)((int)param_1 + 0x56) == '\0') {
         if (*DAT_0073640c == 5) {
@@ -11634,7 +11654,7 @@ void FUN_0040f3d0(int *param_1)
           }
           fStack_74 = (float)fVar4;
         }
-        FUN_00565020();
+        eIdentity();
         fStack_44 = fStack_74;
         fStack_48 = fVar5;
         (**(code **)(*(int *)piVar3[6] + 0x98))((int *)piVar3[6],piVar3[0x35],auStack_68);
@@ -11647,11 +11667,12 @@ void FUN_0040f3d0(int *param_1)
 }
 
 
-// ==== 0x40f6e0 FUN_0040f6e0
+// ==== 0x40f6e0 Color4f::Clamp01
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] render med (ghidra-canon) docs/re/canon.md */
 
-void __fastcall FUN_0040f6e0(float *param_1)
+void __fastcall Color4f__Clamp01(float *param_1)
 
 {
   float fVar1;
@@ -11745,7 +11766,7 @@ void RenderQueue_ApplyLights(undefined4 param_1)
   
   if ((*DAT_0073640c == 5) && (DAT_0073640c[3] != 0)) {
     fVar1 = _DAT_00701098 * in_EAX[0x4b];
-    FUN_0040f6e0();
+    Color4f__Clamp01();
     iVar2 = _ftol_nocw();
     uVar3 = _ftol_nocw();
     uVar4 = _ftol_nocw();
@@ -12206,11 +12227,12 @@ void Device_SetWorldMatrix(undefined *param_1)
 }
 
 
-// ==== 0x410550 FUN_00410550
+// ==== 0x410550 Render_SetAlphaBlend
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] render med (ghidra-canon) docs/re/canon.md */
 
-void FUN_00410550(int param_1)
+void Render_SetAlphaBlend(int param_1)
 
 {
   undefined4 unaff_ESI;
@@ -12254,11 +12276,12 @@ void FUN_00410550(int param_1)
 }
 
 
-// ==== 0x410650 FUN_00410650
+// ==== 0x410650 Render_SetAlphaTest
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] render med (ghidra-canon) docs/re/canon.md */
 
-void FUN_00410650(void)
+void Render_SetAlphaTest(void)
 
 {
   undefined4 unaff_ESI;
@@ -12296,9 +12319,11 @@ void FUN_00410650(void)
 }
 
 
-// ==== 0x410700 FUN_00410700
+// ==== 0x410700 bList::FreeAllToSlotPool
 
-void FUN_00410700(void)
+/* [canon] render med (ghidra-canon) docs/re/canon.md */
+
+void bList__FreeAllToSlotPool(void)
 
 {
   int *piVar1;

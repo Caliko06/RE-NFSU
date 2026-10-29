@@ -3390,9 +3390,11 @@ int __fastcall FUN_00454ff0(int param_1)
 }
 
 
-// ==== 0x455000 FUN_00455000
+// ==== 0x455000 AIAction::AIAction
 
-undefined4 * __fastcall FUN_00455000(undefined4 param_1,undefined4 *param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * __fastcall AIAction__AIAction(undefined4 param_1,undefined4 *param_2)
 
 {
   undefined4 in_EAX;
@@ -3645,7 +3647,7 @@ void FUN_004551e0(float *param_1,float *param_2,float param_3,float param_4)
 void FUN_00455230(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)
 
 {
-  FUN_00442330(param_3,param_4);
+  TrackRoutePoint__GetForwardPosition(param_3,param_4);
   return;
 }
 
@@ -3738,7 +3740,7 @@ undefined4 * FUN_004552d0(int param_1)
   if (*(char *)(iVar1 + 0x15) == '\0') {
     puVar2 = (undefined4 *)FUN_00567160();
     if (puVar2 != (undefined4 *)0x0) {
-      FUN_00455000();
+      AIAction__AIAction();
       *puVar2 = &PTR_FUN_006c8f90;
       return puVar2;
     }
@@ -3746,7 +3748,7 @@ undefined4 * FUN_004552d0(int param_1)
   else {
     puVar2 = (undefined4 *)FUN_00567160();
     if (puVar2 != (undefined4 *)0x0) {
-      FUN_00455000();
+      AIAction__AIAction();
       *puVar2 = &PTR_FUN_006c8f5c;
       return puVar2;
     }
@@ -3894,7 +3896,7 @@ undefined4 * FUN_00455410(int param_1)
   if (*(char *)(iVar1 + 0x15) == '\0') {
     puVar2 = (undefined4 *)FUN_00567160();
     if (puVar2 != (undefined4 *)0x0) {
-      FUN_00455000();
+      AIAction__AIAction();
       *puVar2 = &PTR_FUN_006c8f5c;
       return puVar2;
     }
@@ -3902,7 +3904,7 @@ undefined4 * FUN_00455410(int param_1)
   else {
     puVar2 = (undefined4 *)FUN_00567160();
     if (puVar2 != (undefined4 *)0x0) {
-      FUN_00455000();
+      AIAction__AIAction();
       *puVar2 = &PTR_FUN_006c8f90;
       return puVar2;
     }
@@ -3919,7 +3921,7 @@ undefined4 * FUN_00455441(void)
   undefined4 *unaff_ESI;
   
   if (unaff_ESI != (undefined4 *)0x0) {
-    FUN_00455000();
+    AIAction__AIAction();
     *unaff_ESI = &PTR_FUN_006c8f5c;
     return unaff_ESI;
   }
@@ -3934,7 +3936,7 @@ void FUN_00455445(void)
 {
   undefined4 *unaff_ESI;
   
-  FUN_00455000();
+  AIAction__AIAction();
   *unaff_ESI = &PTR_FUN_006c8f5c;
   return;
 }
@@ -3947,7 +3949,7 @@ void FUN_00455449(void)
 {
   undefined4 *unaff_ESI;
   
-  FUN_00455000();
+  AIAction__AIAction();
   *unaff_ESI = &PTR_FUN_006c8f5c;
   return;
 }
@@ -4972,15 +4974,15 @@ LAB_00456538:
       FUN_00442110();
       iVar6 = FUN_00442630();
       if (iVar6 != 0) {
-        FUN_00457450();
+        Vec3Ring20__PushFront();
       }
       if (*(char *)(iVar5 + 0xb) != '\0') {
-        FUN_004573f0();
+        Vec3Ring20__PushBack();
         bVar3 = false;
         bVar2 = true;
         goto LAB_00456615;
       }
-      FUN_00457450();
+      Vec3Ring20__PushFront();
       bVar2 = true;
       iVar8 = iVar8 + 1;
       bVar3 = false;
@@ -5454,9 +5456,11 @@ GetNearestTrafficLane(float *param_1,undefined4 param_2,int param_3,int param_4,
 }
 
 
-// ==== 0x456fe0 FUN_00456fe0
+// ==== 0x456fe0 IsForwardsTrafficLane
 
-undefined4 FUN_00456fe0(void)
+/* [canon] traffic med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 IsForwardsTrafficLane(void)
 
 {
   int in_EAX;
@@ -5585,11 +5589,12 @@ float10 FUN_004570d0(float param_1)
 }
 
 
-// ==== 0x457180 FUN_00457180
+// ==== 0x457180 bSegmentsIntersect2
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] traffic med (ghidra-canon+nfsug) docs/re/canon.md */
 
-undefined4 __fastcall FUN_00457180(float *param_1,float *param_2,float *param_3)
+undefined4 __fastcall bSegmentsIntersect2(float *param_1,float *param_2,float *param_3)
 
 {
   float fVar1;
@@ -5678,7 +5683,7 @@ undefined4 __thiscall FUN_00457300(int param_1,undefined4 param_2,undefined4 par
       FUN_005a7270(&local_20,*(undefined4 *)(iVar1 + 0x58),*(undefined4 *)(iVar1 + 0x3c),0);
       local_38 = local_20;
       local_34 = local_1c;
-      cVar2 = FUN_00457180(&local_40);
+      cVar2 = bSegmentsIntersect2(&local_40);
       if (cVar2 == '\0') break;
       in_EAX = in_EAX + 1;
       piVar3 = piVar3 + 1;
@@ -5691,9 +5696,11 @@ undefined4 __thiscall FUN_00457300(int param_1,undefined4 param_2,undefined4 par
 }
 
 
-// ==== 0x4573f0 FUN_004573f0
+// ==== 0x4573f0 Vec3Ring20::PushBack
 
-void __fastcall FUN_004573f0(undefined4 param_1,undefined4 *param_2)
+/* [canon] traffic med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall Vec3Ring20__PushBack(undefined4 param_1,undefined4 *param_2)
 
 {
   undefined4 *puVar1;
@@ -5716,9 +5723,11 @@ void __fastcall FUN_004573f0(undefined4 param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x457450 FUN_00457450
+// ==== 0x457450 Vec3Ring20::PushFront
 
-void FUN_00457450(void)
+/* [canon] traffic med (ghidra-canon) docs/re/canon.md */
+
+void Vec3Ring20__PushFront(void)
 
 {
   undefined4 *puVar1;
@@ -10378,9 +10387,11 @@ bool __fastcall FUN_0045d970(int *param_1)
 }
 
 
-// ==== 0x45da90 FUN_0045da90
+// ==== 0x45da90 SmallBufferTriple_dtor
 
-void FUN_0045da90(void)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+void SmallBufferTriple_dtor(void)
 
 {
   undefined4 *unaff_ESI;
@@ -10404,9 +10415,11 @@ void FUN_0045da90(void)
 }
 
 
-// ==== 0x45db00 FUN_0045db00
+// ==== 0x45db00 PsychoDriver_ScaledRatioTerm
 
-float10 FUN_0045db00(void)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+float10 PsychoDriver_ScaledRatioTerm(void)
 
 {
   int in_EAX;
@@ -10472,9 +10485,11 @@ void __fastcall FUN_0045db80(int param_1)
 }
 
 
-// ==== 0x45db90 FUN_0045db90
+// ==== 0x45db90 PsychoDriver::ClearFlag228AndCallSlot34
 
-void __fastcall FUN_0045db90(int *param_1)
+/* [canon] rivals low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall PsychoDriver__ClearFlag228AndCallSlot34(int *param_1)
 
 {
   *(undefined1 *)(param_1 + 0x8a) = 0;
@@ -10485,9 +10500,11 @@ void __fastcall FUN_0045db90(int *param_1)
 }
 
 
-// ==== 0x45dba0 FUN_0045dba0
+// ==== 0x45dba0 PsychoDriver::ResetField1D4
 
-void __fastcall FUN_0045dba0(int param_1)
+/* [canon] rivals low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall PsychoDriver__ResetField1D4(int param_1)
 
 {
   *(undefined4 *)(param_1 + 0x1d4) = 0xffffffff;
@@ -10823,27 +10840,27 @@ void FUN_0045e080(undefined4 *param_1)
   pvVar1 = (void *)param_1[0x8c];
   local_4 = 0;
   if (pvVar1 != (void *)0x0) {
-    FUN_0045da90();
+    SmallBufferTriple_dtor();
     _free(pvVar1);
   }
   pvVar1 = (void *)param_1[0x8d];
   if (pvVar1 != (void *)0x0) {
-    FUN_0045da90();
+    SmallBufferTriple_dtor();
     _free(pvVar1);
   }
   pvVar1 = (void *)param_1[0x8e];
   if (pvVar1 != (void *)0x0) {
-    FUN_0045da90();
+    SmallBufferTriple_dtor();
     _free(pvVar1);
   }
   pvVar1 = (void *)param_1[0x8f];
   if (pvVar1 != (void *)0x0) {
-    FUN_0045da90();
+    SmallBufferTriple_dtor();
     _free(pvVar1);
   }
   pvVar1 = (void *)param_1[0x90];
   if (pvVar1 != (void *)0x0) {
-    FUN_0045da90();
+    SmallBufferTriple_dtor();
     _free(pvVar1);
   }
   puVar2 = (undefined4 *)param_1[0x91];

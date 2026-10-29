@@ -72,7 +72,7 @@ void __fastcall HudTurbo__Update(int param_1)
   fVar1 = (float10)Car__GetTurboBoost();
   if ((*(uint *)(param_1 + 0x18) & *(uint *)(param_1 + 0x10)) != 0 ||
       (*(uint *)(param_1 + 0x1c) & *(uint *)(param_1 + 0x14)) != 0) {
-    FUN_004a14d0();
+    HudLapCounter__SetVisible();
     if ((DAT_0078a344 == '\0') && (DAT_007361a8 == 0)) {
       uVar3 = 0x435b0000;
       uVar2 = 0x41f00000;
@@ -81,18 +81,19 @@ void __fastcall HudTurbo__Update(int param_1)
       uVar3 = 0x42700000;
       uVar2 = 0x43960000;
     }
-    fVar1 = (float10)FUN_004a1460(param_1,(float)fVar1,uVar2,uVar3);
+    fVar1 = (float10)TurboMeter__CalcNeedleAngle(param_1,(float)fVar1,uVar2,uVar3);
     FUN_004f6a70((float)fVar1);
   }
   return;
 }
 
 
-// ==== 0x4a1460 FUN_004a1460
+// ==== 0x4a1460 TurboMeter::CalcNeedleAngle
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
-float10 FUN_004a1460(undefined4 param_1,float param_2,float param_3,float param_4)
+float10 TurboMeter__CalcNeedleAngle(undefined4 param_1,float param_2,float param_3,float param_4)
 
 {
   float10 fVar1;
@@ -114,9 +115,11 @@ float10 FUN_004a1460(undefined4 param_1,float param_2,float param_3,float param_
 }
 
 
-// ==== 0x4a14d0 FUN_004a14d0
+// ==== 0x4a14d0 HudLapCounter::SetVisible
 
-void FUN_004a14d0(void)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void HudLapCounter__SetVisible(void)
 
 {
   char in_AL;
@@ -510,11 +513,11 @@ void __fastcall FUN_004a1d00(int param_1)
   }
   uVar2 = 0;
 LAB_004a1d3c:
-  FUN_004353e0((int *)(in_EAX + 0x34),param_1,uVar2);
+  Race__CalcTimeGapBetween((int *)(in_EAX + 0x34),param_1,uVar2);
   if ((float)*(int *)(in_EAX + 0x34) * 0.00025 != 0.0) {
     FUN_00586580(local_20);
     FEObject__SetFormattedText(&DAT_006cc568,local_20);
-    FUN_004a1ee0();
+    HudSplitTime__Show();
   }
   return;
 }
@@ -541,7 +544,7 @@ void __fastcall FUN_004a1d90(int param_1)
     }
     FUN_00586580(local_20);
     FEObject__SetFormattedText(&DAT_006cc568,local_20);
-    FUN_004a1ee0();
+    HudSplitTime__Show();
   }
   return;
 }
@@ -560,7 +563,7 @@ void __fastcall FUN_004a1e20(int param_1)
          *(undefined4 *)(in_EAX + 0x38 + *(char *)(DAT_0073619c + 0x53f) * 4);
     FUN_00586580(local_20);
     FEObject__SetFormattedText(&DAT_006cc568,local_20);
-    FUN_004a1ee0();
+    HudSplitTime__Show();
   }
   return;
 }
@@ -580,15 +583,17 @@ void __fastcall FUN_004a1e80(int param_1)
          *(int *)(param_1 + 0x88 + iVar1 * 4) - *(int *)(param_1 + 0x84 + iVar1 * 4);
     FUN_00586580(local_20);
     FEObject__SetFormattedText(&DAT_006cc568,local_20);
-    FUN_004a1ee0();
+    HudSplitTime__Show();
   }
   return;
 }
 
 
-// ==== 0x4a1ee0 FUN_004a1ee0
+// ==== 0x4a1ee0 HudSplitTime::Show
 
-void FUN_004a1ee0(void)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void HudSplitTime__Show(void)
 
 {
   int unaff_ESI;
@@ -1318,7 +1323,7 @@ void HudLeaderboard__Update(void)
     uVar7 = *(undefined4 *)(iVar4 + 0x1c);
     if (((*(int *)(in_EAX + 0x10) == 0) ||
         (uVar7 = uVar8, uVar8 = *(undefined4 *)(iVar4 + 0x1c), *(int *)(in_EAX + 0x10) == 1)) &&
-       (FUN_004353e0(&local_24,uVar7,uVar8), local_24 < 0)) {
+       (Race__CalcTimeGapBetween(&local_24,uVar7,uVar8), local_24 < 0)) {
       FUN_00586580(local_20);
     }
     else {
@@ -1665,7 +1670,7 @@ void FUN_004a3440(int param_1)
   iVar1 = FUN_0043f1f0();
   puVar4 = (undefined4 *)(param_1 + 0x148);
   do {
-    iVar2 = FUN_0043f1d0();
+    iVar2 = bTList__EndOfList();
     if (iVar1 == iVar2) {
       return;
     }
@@ -2030,7 +2035,7 @@ LAB_004a3a2b:
           }
           iVar7 = DAT_0073619c;
           if ((short)piVar1[4] == 0) {
-            FUN_004353e0(iVar9 + -4,piVar1,iVar8);
+            Race__CalcTimeGapBetween(iVar9 + -4,piVar1,iVar8);
           }
           else {
             *(undefined4 *)(iVar9 + -4) = 0;
@@ -2716,7 +2721,7 @@ LAB_004a4726:
     RideInfo__RebuildPhysicsInfo(1);
   }
   if ((iVar12 != 0) && (iVar12 != -0x260)) {
-    FUN_00432a30(*(undefined4 *)(iVar12 + 0x10),(int)DAT_0078a3f5,&local_44);
+    HudTach_PickFaceHashes(*(undefined4 *)(iVar12 + 0x10),(int)DAT_0078a3f5,&local_44);
     iVar12 = local_44;
     iVar6 = Texture_FindByHash(local_44,0,0);
     if (iVar6 == 0) {
@@ -2757,7 +2762,7 @@ LAB_004a4726:
     local_30 = puVar3[3];
     local_34 = puVar3[2];
   }
-  uVar5 = FUN_00503f60();
+  uVar5 = FEColor__operator_unsigned_long();
   *(undefined4 *)(param_1 + 0x94) = uVar5;
   if (*(int *)(param_1 + 0x20) == 0) {
     local_30 = 0;
@@ -2772,7 +2777,7 @@ LAB_004a4726:
     local_34 = puVar3[2];
     local_30 = puVar3[3];
   }
-  uVar5 = FUN_00503f60();
+  uVar5 = FEColor__operator_unsigned_long();
   *(undefined4 *)(param_1 + 0x98) = uVar5;
   if (*(int *)(param_1 + 0x60) == 0) {
     local_30 = 0;
@@ -2787,7 +2792,7 @@ LAB_004a4726:
     local_34 = puVar3[2];
     local_30 = puVar3[3];
   }
-  uVar5 = FUN_00503f60();
+  uVar5 = FEColor__operator_unsigned_long();
   *(undefined4 *)(param_1 + 0x9c) = uVar5;
   *(undefined4 *)(param_1 + 0x8c) = 0;
   *(undefined1 *)(param_1 + 0xa1) = 1;
@@ -2933,7 +2938,7 @@ void HudTachDrag__Update(float param_1,int param_2)
   FEObject__SetFormattedText(&DAT_006c740c,uVar14);
   iVar13 = *(int *)(local_34 + 0x20);
   if (DAT_0078a320 == 1) {
-    fVar17 = (float10)FUN_004a57d0(iVar11,param_1);
+    fVar17 = (float10)DragTachometer__CalcAngleForRPMDrag(iVar11,param_1);
     FUN_004f6a70((float)fVar17);
   }
   else {
@@ -3190,14 +3195,14 @@ LAB_004a51fc:
           }
           FUN_004a4900(iVar11,(param_1 - local_30) * 0.00066666666);
           if (DAT_0078a320 == 1) {
-            uVar14 = FUN_004a0080();
+            uVar14 = Hud_PackColorFromFloats();
           }
           else {
-            uVar14 = FUN_004a0080();
+            uVar14 = Hud_PackColorFromFloats();
             FUN_004f75b0(uVar14);
-            uVar14 = FUN_004a0080();
+            uVar14 = Hud_PackColorFromFloats();
             FUN_004f75b0(uVar14);
-            uVar14 = FUN_004a0080();
+            uVar14 = Hud_PackColorFromFloats();
           }
           goto LAB_004a569c;
         }
@@ -3305,11 +3310,12 @@ LAB_004a5799:
 }
 
 
-// ==== 0x4a57d0 FUN_004a57d0
+// ==== 0x4a57d0 DragTachometer::CalcAngleForRPMDrag
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
-float10 __thiscall FUN_004a57d0(int param_1,undefined4 param_2,float param_3)
+float10 __thiscall DragTachometer__CalcAngleForRPMDrag(int param_1,undefined4 param_2,float param_3)
 
 {
   float fVar1;
@@ -3900,7 +3906,7 @@ LAB_004a61f0:
     *local_44 = iVar11;
     local_44 = local_44 + 1;
     if (1 < iVar6) {
-      uVar5 = FUN_00503f60();
+      uVar5 = FEColor__operator_unsigned_long();
       *(undefined4 *)(param_1 + 0x30) = uVar5;
       *(undefined1 *)(param_1 + 0x2e) = 0;
       HudWidget__SetVisible(0,0);
@@ -4212,7 +4218,7 @@ void HudSmokeApplause__Update(int param_1)
       (*(uint *)(in_EAX + 0x1c) & *(uint *)(in_EAX + 0x14)) != 0) {
     if (*(int *)(in_EAX + 0x24) != 0) {
       FUN_0049ff50(in_EAX,*(undefined4 *)(param_1 + 0x110),0x40a00000,0x41200000,&DAT_41900000);
-      fVar10 = (float10)FUN_00430650();
+      fVar10 = (float10)Player__GetTimeUntilOnFire();
       if (fVar10 < (float10)0.0) {
         local_20 = 0x80;
         local_14 = 0x80;
@@ -4235,7 +4241,7 @@ void HudSmokeApplause__Update(int param_1)
         }
         local_30 = (int *)(float)fVar10;
         FUN_004a9810(&PTR_DAT_00705ae8,local_30);
-        local_2c = (float)FUN_004a0080();
+        local_2c = (float)Hud_PackColorFromFloats();
         local_14 = (uint)local_2c >> 0x18;
         local_1c = (uint)local_2c >> 8 & 0xff;
         local_18 = (uint)local_2c >> 0x10 & 0xff;
@@ -4351,9 +4357,11 @@ void HudSmokeApplause__Update(int param_1)
 }
 
 
-// ==== 0x4a6eb0 FUN_004a6eb0
+// ==== 0x4a6eb0 HudStylePoints::FillMoment
 
-void __fastcall FUN_004a6eb0(int param_1)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall HudStylePoints__FillMoment(int param_1)
 
 {
   int iVar1;
@@ -4796,9 +4804,11 @@ void HudSpeedTrapDrift__Update(int param_1)
 }
 
 
-// ==== 0x4a7920 FUN_004a7920
+// ==== 0x4a7920 DriftGauge::SetTrapSpeed
 
-void FUN_004a7920(undefined4 param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void DriftGauge__SetTrapSpeed(undefined4 param_1)
 
 {
   int iVar1;
@@ -4994,7 +5004,7 @@ void FUN_004a7c80(void)
 {
   undefined4 in_EAX;
   
-  FUN_004a7920(in_EAX);
+  DriftGauge__SetTrapSpeed(in_EAX);
   return;
 }
 
@@ -5143,9 +5153,11 @@ LAB_004a7f31:
 }
 
 
-// ==== 0x4a7f90 FUN_004a7f90
+// ==== 0x4a7f90 HudWidget::HudWidget
 
-int FUN_004a7f90(int param_1,undefined4 param_2)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+int HudWidget__HudWidget(int param_1,undefined4 param_2)
 
 {
   undefined4 uVar1;
@@ -5491,7 +5503,7 @@ void FUN_004a85e0(int param_1)
               puVar6 = (undefined4 *)0x0;
             }
             else {
-              puVar6 = (undefined4 *)FUN_004a6eb0();
+              puVar6 = (undefined4 *)HudStylePoints__FillMoment();
             }
             puVar4 = *(undefined4 **)(param_1 + 0x24);
             *puVar4 = puVar6;
@@ -5508,7 +5520,7 @@ void FUN_004a85e0(int param_1)
               piRam00000004 = piVar9;
             }
             else {
-              piVar8 = (int *)FUN_004a6eb0();
+              piVar8 = (int *)HudStylePoints__FillMoment();
               iVar2 = *piVar9;
               *piVar9 = (int)piVar8;
               *(int **)(iVar2 + 4) = piVar8;
@@ -5521,7 +5533,7 @@ void FUN_004a85e0(int param_1)
       else {
         iVar2 = *(int *)(*(int *)((&DAT_007361b4)[*(int *)(param_1 + 0x54)] + 0x95c) + 0x2c);
         uVar3 = *(undefined4 *)(iVar2 + 0x2c);
-        puVar6 = (undefined4 *)FUN_004a6eb0();
+        puVar6 = (undefined4 *)HudStylePoints__FillMoment();
         *(undefined4 *)(iVar2 + 0x20) = *puVar6;
         *(undefined4 *)(iVar2 + 0x24) = puVar6[1];
         *(undefined1 *)(iVar2 + 0x28) = *(undefined1 *)(puVar6 + 2);
@@ -6140,7 +6152,7 @@ LAB_004a8ea2:
     uVar5 = 0;
   }
   else {
-    uVar5 = FUN_004a7f90(pvVar4,param_1,param_2);
+    uVar5 = HudWidget__HudWidget(pvVar4,param_1,param_2);
   }
   local_4 = 0xffffffff;
   unaff_ESI[0x16] = uVar5;
@@ -6370,7 +6382,7 @@ HudManager__SetFlags(undefined4 param_1,int param_2,int param_3,uint param_4,uin
   uVar3 = *(uint *)(param_3 + 0xc) ^ param_5;
   uVar2 = *(uint *)(param_3 + 8) ^ uVar4;
   if ((param_2 != 0) && ((uVar2 & 0x1000) != 0)) {
-    FUN_0042c340(param_4 & 0x1000);
+    Player__SetRearViewMirrorCameraMover(param_4 & 0x1000);
   }
   if ((*(int *)(param_3 + 0x18) != 0) && ((uVar2 & 0x40) != 0)) {
     HudWidget__SetVisible(uVar4,param_5);

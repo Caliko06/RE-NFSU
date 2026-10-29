@@ -1532,7 +1532,7 @@ undefined4 CarRender_LitBodyPathA(float *param_1,int param_2,int param_3,float *
         fVar19 = 2.78;
       }
       Vec3Normalize();
-      FUN_0040c650(fVar19);
+      bVector4Scale(fVar19);
       param_1[0x30] = fVar1 - fVar2;
       param_1[0x31] = fVar3 - fVar4;
       param_1[0x32] = fVar5 - fVar6;
@@ -1568,7 +1568,7 @@ undefined4 CarRender_LitBodyPathA(float *param_1,int param_2,int param_3,float *
       uStack_4c8 = *(undefined4 *)(param_2 + 0x34);
       uStack_4c4 = *(undefined4 *)(param_2 + 0x38);
       Matrix4_BuildLookAt(&stack0xfffffa54);
-      FUN_0040be40();
+      eInvertRotationMatrix();
       puVar14 = (undefined4 *)(puStack_594 + 0x14);
       iVar16 = 0;
     }
@@ -1839,7 +1839,7 @@ void FUN_005443f0(void)
     }
     fVar2 = ((float10)unaff_ESI[1] - (float10)*unaff_ESI) * fVar2 + (float10)*unaff_ESI;
     if (fVar2 < (float10)0.0 == (fVar2 == (float10)0.0)) {
-      FUN_0040be70();
+      ePoly__ePoly();
       _ftol_nocw();
       _ftol_nocw();
       _ftol_nocw();
@@ -2054,7 +2054,7 @@ LAB_00544a80:
       }
     }
     else {
-      iVar4 = FUN_0040dc60(0);
+      iVar4 = eView_IsPointInFrustum(0);
       if (iVar4 != 0) {
         FUN_00540a30();
         goto LAB_00544a80;
@@ -2264,11 +2264,12 @@ void __fastcall FUN_00545150(int param_1)
 }
 
 
-// ==== 0x545180 FUN_00545180
+// ==== 0x545180 eView::CalcSphereScreenSize
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] render med (ghidra-canon) docs/re/canon.md */
 
-undefined4 __fastcall FUN_00545180(float *param_1,int param_2,float param_3)
+undefined4 __fastcall eView__CalcSphereScreenSize(float *param_1,int param_2,float param_3)
 
 {
   int iVar1;
@@ -2294,11 +2295,12 @@ undefined4 __fastcall FUN_00545180(float *param_1,int param_2,float param_3)
 }
 
 
-// ==== 0x545210 FUN_00545210
+// ==== 0x545210 eView::CalcBoxScreenSize
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] render med (ghidra-canon) docs/re/canon.md */
 
-undefined4 __fastcall FUN_00545210(float *param_1,float *param_2)
+undefined4 __fastcall eView__CalcBoxScreenSize(float *param_1,float *param_2)
 
 {
   int iVar1;
@@ -2319,9 +2321,11 @@ undefined4 __fastcall FUN_00545210(float *param_1,float *param_2)
 }
 
 
-// ==== 0x5452f0 FUN_005452f0
+// ==== 0x5452f0 Car_ScaleMatrixTowardCamera
 
-void __fastcall FUN_005452f0(int param_1)
+/* [canon] render med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall Car_ScaleMatrixTowardCamera(int param_1)
 
 {
   int in_EAX;
@@ -2428,7 +2432,7 @@ void __fastcall TexturePack_Remove(int param_1)
   }
   TexturePackHandle__UnmapData(piVar2[0x1c],0,*(undefined4 *)(piVar2[0x1c] + 0x80));
   if (piVar2[0x1c] != 0) {
-    FUN_005458f0();
+    bList__Remove();
     _free(_Memory);
   }
   piVar2[0x1c] = 0;
@@ -2671,9 +2675,11 @@ void __fastcall TexturePack_Register(undefined4 param_1,char *param_2,int param_
 }
 
 
-// ==== 0x5458f0 FUN_005458f0
+// ==== 0x5458f0 bList::Remove
 
-void __fastcall FUN_005458f0(int *param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall bList__Remove(int *param_1)
 
 {
   int iVar1;
@@ -3326,7 +3332,7 @@ void FUN_00546270(void)
     iVar3 = *piVar1;
     *piVar2 = iVar3;
     *(int **)(iVar3 + 4) = piVar2;
-    FUN_005458f0();
+    bList__Remove();
     _free(_Memory);
     piVar1 = (int *)*unaff_ESI;
   }

@@ -11502,9 +11502,11 @@ void FUN_0041e600(float param_1,float param_2)
 }
 
 
-// ==== 0x41e650 FUN_0041e650
+// ==== 0x41e650 Hud_HideObject736220
 
-void FUN_0041e650(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void Hud_HideObject736220(void)
 
 {
   FEObject__SetInvisible(DAT_00736220);
@@ -11566,7 +11568,7 @@ void FUN_0041e670(void)
                (cVar1 = FUN_004f7660(local_14 - 320.0,local_18 - 240.0), cVar1 != '\0')) {
               uVar3 = FUN_0041e4b0();
               _sprintf(local_11c,"PCHELP_%s",uVar3);
-              uVar3 = FUN_00567c70();
+              uVar3 = bStringHash();
               FUN_0041e600(local_14,local_18,uVar3);
               local_5 = '\x01';
             }
@@ -11580,7 +11582,7 @@ void FUN_0041e670(void)
   }
 LAB_0041e84e:
   if (local_5 == '\0') {
-    FUN_0041e650();
+    Hud_HideObject736220();
   }
   return;
 }
@@ -13218,9 +13220,11 @@ void FUN_00420080(void)
 }
 
 
-// ==== 0x420090 FUN_00420090
+// ==== 0x420090 SetGlobal_006ffdbc_30f
 
-void FUN_00420090(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void SetGlobal_006ffdbc_30f(void)
 
 {
   DAT_006ffdbc = 0x41f00000;

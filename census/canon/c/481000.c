@@ -107,7 +107,7 @@ void FUN_004812b0(int param_1,uint param_2,char param_3)
     local_74 = *(undefined4 *)(uVar4 * 0x4c + 0xd8 + param_1);
   }
   FUN_00481160(param_1,local_74);
-  FUN_00424ba0();
+  bMatrix4_SetRotationAndTranslation();
   if (bVar3 != 0) {
     Matrix_InvertRigid();
   }
@@ -125,7 +125,7 @@ void FUN_004812b0(int param_1,uint param_2,char param_3)
     uStack_80 = *(undefined4 *)(uVar4 * 0x4c + 0xd8 + param_1);
   }
   FUN_00481160(param_1,uStack_80);
-  FUN_00424ba0();
+  bMatrix4_SetRotationAndTranslation();
   if (uStack_84._3_1_ != '\0') {
     Matrix_InvertRigid();
   }
@@ -265,9 +265,11 @@ switchD_00481555_default:
 }
 
 
-// ==== 0x481720 FUN_00481720
+// ==== 0x481720 DragCameraManager::AddUndo
 
-void FUN_00481720(undefined4 *param_1,uint param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void DragCameraManager__AddUndo(undefined4 *param_1,uint param_2)
 
 {
   int in_EAX;
@@ -417,9 +419,9 @@ undefined2 FUN_00481850(void)
         local_8 = 4;
         local_7 = (undefined1)iVar1;
         local_6 = (undefined2)iVar4;
-        FUN_00481720(&local_8,4);
+        DragCameraManager__AddUndo(&local_8,4);
         local_4 = *(undefined4 *)(*(int *)(unaff_EDI + 0x4c) + iVar1 * 4);
-        FUN_00481720(&local_4,4);
+        DragCameraManager__AddUndo(&local_4,4);
         iVar4 = iVar4 + -8;
       }
       iVar1 = iVar1 + 1;
@@ -449,8 +451,8 @@ undefined4 FUN_00481970(void)
     if (*in_EAX != in_EAX[*piVar1 * 0x4c + 0xd0]) {
       _local_4 = CONCAT31((uint3)*piVar1 & 0xff,3);
       _local_4 = CONCAT22(0x50,_local_4);
-      uVar2 = FUN_00481720(&local_4,4);
-      FUN_00481720(uVar2,0x4c);
+      uVar2 = DragCameraManager__AddUndo(&local_4,4);
+      DragCameraManager__AddUndo(uVar2,0x4c);
       return 1;
     }
     uVar3 = uVar3 + 1;
@@ -460,9 +462,11 @@ undefined4 FUN_00481970(void)
 }
 
 
-// ==== 0x4819d0 FUN_004819d0
+// ==== 0x4819d0 DragCameraManager_LoadWorkingFromCurrentKey
 
-void FUN_004819d0(void)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void DragCameraManager_LoadWorkingFromCurrentKey(void)
 
 {
   undefined4 *in_EAX;
@@ -479,9 +483,11 @@ void FUN_004819d0(void)
 }
 
 
-// ==== 0x4819f0 FUN_004819f0
+// ==== 0x4819f0 DragCameraManager_StoreWorkingToCurrentKey
 
-void FUN_004819f0(void)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void DragCameraManager_StoreWorkingToCurrentKey(void)
 
 {
   undefined4 *in_EAX;
@@ -498,9 +504,11 @@ void FUN_004819f0(void)
 }
 
 
-// ==== 0x481a10 FUN_00481a10
+// ==== 0x481a10 DragCameraManager::BackupDistance
 
-void __fastcall FUN_00481a10(undefined4 param_1,int param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall DragCameraManager__BackupDistance(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -710,20 +718,20 @@ LAB_00481c93:
     InputEvents__AddSource(0x16,0,0);
     return;
   case 3:
-    FUN_00481a10();
+    DragCameraManager__BackupDistance();
     InputEvents__AddSource(0x60,FUN_00482850,0);
     uVar11 = 0x24;
     break;
   case 4:
-    FUN_00481a10();
+    DragCameraManager__BackupDistance();
     InputEvents__AddSource(0x60,FUN_00482850,0);
     uVar11 = 0x25;
     break;
   case 5:
   case 6:
     FUN_00480f10();
-    FUN_004819d0();
-    FUN_00480120();
+    DragCameraManager_LoadWorkingFromCurrentKey();
+    DragCameraManager__ClearVelocities();
     *(undefined1 *)(param_1 + 0xd08) = 1;
     InputEvents__AddSource(9,FUN_00482850,0);
     InputEvents__AddSource(0xb,FUN_00482850,0);
@@ -788,9 +796,9 @@ void __fastcall FUN_00482230(undefined4 param_1,byte param_2,undefined4 param_3,
     case 0xc:
       param_4._0_2_ = CONCAT11(*(undefined1 *)(in_EAX + 0xcb4),3);
       param_4 = CONCAT22(0x50,(undefined2)param_4);
-      FUN_00481720(&param_4,4);
-      FUN_00481720(*(int *)(in_EAX + 0xcb4) * 0x4c + 0xd0 + in_EAX,0x4c);
-      FUN_00480a20();
+      DragCameraManager__AddUndo(&param_4,4);
+      DragCameraManager__AddUndo(*(int *)(in_EAX + 0xcb4) * 0x4c + 0xd0 + in_EAX,0x4c);
+      DragCameraManager__Paste();
       return;
     case 0x22:
       if (param_2 != 0) {
@@ -859,7 +867,7 @@ void __fastcall FUN_00482230(undefined4 param_1,byte param_2,undefined4 param_3,
           *(byte *)(iVar3 + 0xd0 + in_EAX) = (cVar2 != '\0') - 1U & 0x14;
           param_4._0_2_ = CONCAT11(*(undefined1 *)(in_EAX + 0xcb4),2);
           param_4 = CONCAT22(8,(undefined2)param_4);
-          FUN_00481720(&param_4,4);
+          DragCameraManager__AddUndo(&param_4,4);
           FUN_0047fca0(in_EAX,cVar2);
           return;
         case 1:
@@ -900,7 +908,7 @@ void __fastcall FUN_00482230(undefined4 param_1,byte param_2,undefined4 param_3,
         }
         param_4._0_2_ = CONCAT11(*(undefined1 *)(in_EAX + 0xcb4),(undefined1)param_4);
         param_4 = CONCAT22(4,(undefined2)param_4);
-        FUN_00481720(&param_4,4);
+        DragCameraManager__AddUndo(&param_4,4);
         return;
       }
     }
@@ -926,8 +934,8 @@ void __fastcall FUN_00482230(undefined4 param_1,byte param_2,undefined4 param_3,
     case 0xc:
       param_4._0_2_ = CONCAT11(*(undefined1 *)(in_EAX + 0xcb4),3);
       param_4 = CONCAT22(0x50,(undefined2)param_4);
-      FUN_00481720(&param_4,4);
-      FUN_00481720(*(int *)(in_EAX + 0xcb4) * 0x4c + 0xd0 + in_EAX,0x4c);
+      DragCameraManager__AddUndo(&param_4,4);
+      DragCameraManager__AddUndo(*(int *)(in_EAX + 0xcb4) * 0x4c + 0xd0 + in_EAX,0x4c);
       FUN_00480930(*(undefined4 *)(in_EAX + 0xcb4),iVar5);
       return;
     case 0x24:
@@ -953,7 +961,7 @@ void __fastcall FUN_00482230(undefined4 param_1,byte param_2,undefined4 param_3,
   case 6:
     if (param_4 != 9) {
       if (param_4 != 0xb) break;
-      FUN_004819f0();
+      DragCameraManager_StoreWorkingToCurrentKey();
     }
 switchD_004823c9_caseD_b:
     FUN_00481ab0(1);
@@ -977,9 +985,11 @@ void FUN_00482850(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x482870 FUN_00482870
+// ==== 0x482870 GetAnalogInput
 
-float10 FUN_00482870(void)
+/* [canon] camera med (ghidra-canon+nfsug) docs/re/camera.md */
+
+float10 GetAnalogInput(void)
 
 {
   int in_EAX;
@@ -991,11 +1001,14 @@ float10 FUN_00482870(void)
 }
 
 
-// ==== 0x4828a0 FUN_004828a0
+// ==== 0x4828a0 DragCameraManager::GetNewVelocity
+
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
 float10 __fastcall
-FUN_004828a0(undefined4 param_1,int param_2,undefined4 param_3,float param_4,float param_5,
-            float param_6,float param_7)
+DragCameraManager__GetNewVelocity
+          (undefined4 param_1,int param_2,undefined4 param_3,float param_4,float param_5,
+          float param_6,float param_7)
 
 {
   int in_EAX;
@@ -1078,19 +1091,19 @@ LAB_004829e3:
                                 *(float *)(unaff_EDI + 0xcc0),*(float *)(unaff_EDI + 0xccc) + -25.0,
                                 *(float *)(unaff_EDI + 0xcd0) + 100.0);
       *(float *)(unaff_EDI + 0xcc0) = (float)fVar12;
-      uVar9 = FUN_00480150((float)fVar12);
+      uVar9 = DragCameraManager__GetDragIndex((float)fVar12);
       *(undefined4 *)(unaff_EDI + 0xcb4) = uVar9;
       FUN_00481160(unaff_EDI,*(undefined4 *)(unaff_EDI + 0xcc0));
       return;
     case 3:
       FUN_00480ca0(*(float *)(unaff_EDI + 0xce4) * 400.0 * DAT_0073ad38);
-      fVar12 = (float10)FUN_00480190();
+      fVar12 = (float10)DragCameraManager__GetDistance();
       *(float *)(unaff_EDI + 0xcc0) = (float)(fVar12 + (float10)0.01);
       FUN_00481160(unaff_EDI,*(undefined4 *)(unaff_EDI + 0xcc0));
       return;
     case 4:
       FUN_00480ca0(*(float *)(unaff_EDI + 0xce4) * 400.0 * DAT_0073ad38);
-      fVar12 = (float10)FUN_00480190();
+      fVar12 = (float10)DragCameraManager__GetDistance();
       *(float *)(unaff_EDI + 0xcc0) = (float)(fVar12 - (float10)0.01);
       FUN_00481160(unaff_EDI,*(undefined4 *)(unaff_EDI + 0xcc0));
       return;
@@ -1106,29 +1119,33 @@ LAB_004829e3:
          (DAT_0073b4c9 == '\0')) {
         *(undefined1 *)(unaff_EDI + 0xd08) = 0;
       }
-      fVar12 = (float10)FUN_004828a0(unaff_EDI,*(undefined4 *)(unaff_EDI + 0xcdc),0x42480000,
-                                     0x42480000,0x42c80000);
+      fVar12 = (float10)DragCameraManager__GetNewVelocity
+                                  (unaff_EDI,*(undefined4 *)(unaff_EDI + 0xcdc),0x42480000,
+                                   0x42480000,0x42c80000);
       *(float *)(unaff_EDI + 0xcdc) = (float)fVar12;
       if (*(char *)(unaff_EDI + 0xd08) == '\0') {
-        fVar13 = (float10)FUN_004828a0(unaff_EDI,*(undefined4 *)(unaff_EDI + 0xce0),0x42c80000,
-                                       0x41200000,0x42c80000);
+        fVar13 = (float10)DragCameraManager__GetNewVelocity
+                                    (unaff_EDI,*(undefined4 *)(unaff_EDI + 0xce0),0x42c80000,
+                                     0x41200000,0x42c80000);
         *(float *)(unaff_EDI + 0xce0) = (float)fVar13;
       }
-      fVar13 = (float10)FUN_004828a0(unaff_EDI,*(undefined4 *)(unaff_EDI + 0xce8),0x42480000,
-                                     0x41c80000,0x42480000);
+      fVar13 = (float10)DragCameraManager__GetNewVelocity
+                                  (unaff_EDI,*(undefined4 *)(unaff_EDI + 0xce8),0x42480000,
+                                   0x41c80000,0x42480000);
       *(float *)(unaff_EDI + 0xce8) = (float)fVar13;
-      fVar14 = (float10)FUN_004828a0(unaff_EDI,*(undefined4 *)(unaff_EDI + 0xcec),0x42480000,
-                                     0x41c80000,0x42480000);
+      fVar14 = (float10)DragCameraManager__GetNewVelocity
+                                  (unaff_EDI,*(undefined4 *)(unaff_EDI + 0xcec),0x42480000,
+                                   0x41c80000,0x42480000);
       *(float *)(unaff_EDI + 0xcec) = (float)fVar14;
-      fVar14 = (float10)FUN_00482870();
+      fVar14 = (float10)GetAnalogInput();
       uVar6 = bDegreesToAngle16(0x42b40000);
       fVar4 = (float)uVar6 * (float)-fVar14 * DAT_0073ad38;
-      fVar14 = (float10)FUN_00482870();
+      fVar14 = (float10)GetAnalogInput();
       fVar2 = (float)(fVar14 * (float10)50.0 * (float10)DAT_0073ad38);
-      fVar14 = (float10)FUN_00482870();
+      fVar14 = (float10)GetAnalogInput();
       fVar3 = (float)(-fVar14 * (float10)50.0 * (float10)DAT_0073ad38);
       bDegreesToAngle16(0x42b40000);
-      FUN_00482870();
+      GetAnalogInput();
       uVar7 = _ftol_nocw();
       *(undefined2 *)(unaff_EDI + 0xcd4) = uVar7;
       sVar8 = bDegreesToAngle16(0x42aa0000);
@@ -1213,7 +1230,7 @@ LAB_00482f51:
     *(int *)(param_2 + 0xcb0) = iVar2;
     if (0 < iVar2) {
       do {
-        FUN_0047fcc0();
+        DragCameraData__LoadFromVersion();
         iVar1 = iVar1 + 1;
       } while (iVar1 < *(int *)(param_2 + 0xcb0));
     }
@@ -1253,7 +1270,7 @@ void __thiscall FUN_00482f06(int *param_1,undefined4 param_2,undefined4 param_3,
         return;
       }
       do {
-        FUN_0047fcc0();
+        DragCameraData__LoadFromVersion();
         unaff_EBX = unaff_EBX + 1;
       } while ((int)unaff_EBX < *(int *)(param_4 + 0xcb0));
       return;
@@ -1468,9 +1485,11 @@ int __fastcall FUN_004832c0(int param_1)
 }
 
 
-// ==== 0x4832d0 FUN_004832d0
+// ==== 0x4832d0 DriveCameraMover::SetPovType
 
-void __thiscall FUN_004832d0(int param_1,undefined4 param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __thiscall DriveCameraMover__SetPovType(int param_1,undefined4 param_2)
 
 {
   *(undefined4 *)(param_1 + 0x30) = param_2;
@@ -1478,9 +1497,11 @@ void __thiscall FUN_004832d0(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4832e0 FUN_004832e0
+// ==== 0x4832e0 DriveCameraMover::SetLookBack
 
-void __thiscall FUN_004832e0(int param_1,char param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __thiscall DriveCameraMover__SetLookBack(int param_1,char param_2)
 
 {
   if (param_2 != '\0') {
@@ -1705,16 +1726,18 @@ void __fastcall FUN_00483550(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
 }
 
 
-// ==== 0x483590 FUN_00483590
+// ==== 0x483590 CameraMover::GetCarToFollow
 
-undefined4 __fastcall FUN_00483590(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+undefined4 __fastcall CameraMover__GetCarToFollow(int param_1)
 
 {
   if (*(int *)(param_1 + 0x20) != 0) {
@@ -1749,7 +1772,7 @@ void __fastcall FUN_004835a0(int param_1)
     *(int **)(iVar2 + 4) = piVar1;
     *(int **)(param_1 + 8) = piVar3;
     *piVar1 = iVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     *(undefined4 *)(*(int *)(extraout_EDX + 0x1c) + 0xbc) = 0x3f000000;
   }
   return;
@@ -1772,7 +1795,7 @@ void __fastcall FUN_00483600(int param_1)
     piVar2 = *(int **)(param_1 + 8);
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
@@ -1838,7 +1861,7 @@ void Camera__ApplyNoise(int param_1,undefined4 param_2,float *param_3,int param_
     bScaleToLength2(0x3e999998);
     fStack_28 = (((ABS(fStack_7c) + 1.5) - _K_ONE) * fVar1 + _K_ONE) * fStack_28;
     fStack_24 = (((ABS(local_78) + 1.5) - _K_ONE) * fVar1 + _K_ONE) * fStack_24;
-    FUN_0047d840();
+    Camera_SetShakeBasisFromMatrix();
     FUN_0047d940((float)DAT_0073ad34 * 0.00025,uStack_84);
   }
   return;
@@ -1930,7 +1953,7 @@ void CameraMover__EnforceMinGapToWalls
     do {
       iVar1 = *local_48;
       if (((&DAT_006ef2dd)[*(char *)(iVar1 + 0xb) * 0x94] == '\0') &&
-         (cVar3 = FUN_00440200(&local_4c), cVar3 != '\0')) {
+         (cVar3 = TrackPolygon__PointInShaft(&local_4c), cVar3 != '\0')) {
         if ((*(byte *)(iVar1 + 10) & 2) == 0) {
           fVar5 = (float10)_CamWallPushOut;
         }
@@ -2298,7 +2321,7 @@ void __fastcall FUN_004841e0(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
@@ -2420,7 +2443,7 @@ void __fastcall FUN_004843e0(int param_1)
     local_98 = 0.0;
     local_94 = 0x3f800000;
     if (iVar6 == 0) {
-      FUN_00565020();
+      eIdentity();
       local_d8 = -_DAT_006fbe3c;
     }
     else {
@@ -2504,7 +2527,7 @@ void __fastcall FUN_004843e0(int param_1)
       D3DXMatrixMultiply(local_110,local_110,auStack_90);
       FUN_0040ba40(auStack_11c,auStack_11c);
     }
-    FUN_0040bb20(auStack_11c,auStack_11c);
+    eTranslate(auStack_11c,auStack_11c);
     FUN_0040b990(auStack_11c,auStack_11c);
     FUN_0040ba40(auStack_11c,auStack_11c);
     if (DAT_00735f5c == 0) {
@@ -2806,14 +2829,16 @@ void __fastcall FUN_00484ba0(undefined4 *param_1)
   piVar2 = (int *)param_1[2];
   *piVar2 = iVar3;
   *(int **)(iVar3 + 4) = piVar2;
-  FUN_00408370();
+  ViewList_UpdateViewCountKind();
   return;
 }
 
 
-// ==== 0x484cd0 FUN_00484cd0
+// ==== 0x484cd0 BumperCameraMover::IsFinished
 
-undefined4 __fastcall FUN_00484cd0(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+undefined4 __fastcall BumperCameraMover__IsFinished(int param_1)
 
 {
   float fVar1;
@@ -3152,7 +3177,7 @@ TrackCarCameraMover__ctor
     puVar9 = puVar9 + 1;
     puVar10 = puVar10 + 1;
   }
-  FUN_004859f0();
+  CameraDataItems__CameraDataItems_copy();
   param_1[0xd2] = 0;
   param_1[0xd3] = 0;
   param_1[0xd4] = 0;
@@ -3325,9 +3350,11 @@ void * __thiscall FUN_004859d0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4859f0 FUN_004859f0
+// ==== 0x4859f0 CameraDataItems::CameraDataItems_copy
 
-void __fastcall FUN_004859f0(undefined4 param_1,undefined4 *param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall CameraDataItems__CameraDataItems_copy(undefined4 param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -3418,7 +3445,7 @@ void __fastcall FUN_00485a50(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
@@ -3886,7 +3913,7 @@ void __fastcall FUN_00486740(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
@@ -4439,7 +4466,7 @@ void CameraMover_BuildBankedFrame(undefined4 *param_1)
   D3DXMatrixMultiply(param_1,param_1,local_50);
   _ftol_nocw();
   FUN_0040b990(param_1,param_1);
-  FUN_0040bb20(param_1,param_1);
+  eTranslate(param_1,param_1);
   Matrix_InvertRigid();
   _ftol_nocw();
   CameraMover__ComputeBankedUpVector(auStack_ac);
@@ -5049,7 +5076,7 @@ void __fastcall FUN_00488500(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
@@ -5485,9 +5512,11 @@ int __fastcall FUN_004892e0(int param_1)
 }
 
 
-// ==== 0x489300 FUN_00489300
+// ==== 0x489300 DriveCameraMover::GetCorrectionYaw
 
-float10 FUN_00489300(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+float10 DriveCameraMover__GetCorrectionYaw(void)
 
 {
   ushort in_AX;
@@ -5634,7 +5663,7 @@ void __fastcall FUN_004894b0(undefined4 *param_1)
   piVar2 = (int *)param_1[2];
   *piVar2 = iVar3;
   *(int **)(iVar3 + 4) = piVar2;
-  FUN_00408370();
+  ViewList_UpdateViewCountKind();
   return;
 }
 
@@ -6265,7 +6294,7 @@ LAB_00489dcd:
     else {
       param_1[0x1a] = 0x3f800000;
     }
-    FUN_00489300();
+    DriveCameraMover__GetCorrectionYaw();
     iVar13 = _ftol_nocw();
     iVar11 = param_1[0x13];
     fVar18 = (float10)FUN_00564b10();
@@ -6350,7 +6379,7 @@ LAB_00489dcd:
     fStack_2d8 = -(float)puVar21;
     fStack_2dc = fStack_2f0;
     psStack_2e0 = psVar22;
-    FUN_0040bb20(auStack_1b0,&uStack_260);
+    eTranslate(auStack_1b0,&uStack_260);
     D3DXMatrixMultiply(auStack_1b0,auStack_b0,auStack_1b0);
     Matrix_InvertRigid();
     pfVar12 = (float *)(psVar22 + 0x30);
@@ -6396,7 +6425,7 @@ LAB_00489dcd:
   fStack_268 = -(float)puVar21;
   psStack_270 = psVar22;
   fStack_26c = fVar15;
-  FUN_0040bb20(&uStack_260,&uStack_260);
+  eTranslate(&uStack_260,&uStack_260);
   uStack_2c4 = (uStack_2c4 & 0xffff) - ((uint)uStack_2f4 & 0xffff);
   _ftol_nocw();
   FUN_0040ba40(&uStack_260,&uStack_260);
@@ -6767,7 +6796,7 @@ void __fastcall FUN_0048b310(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
   }
   ExceptionList = pvStack_c;
   return;
@@ -7003,7 +7032,7 @@ int FUN_0048b7a0(void)
     unaff_ESI[0xe] = fVar2;
     return iVar4 + 0x50;
   }
-  iVar4 = FUN_00424ba0();
+  iVar4 = bMatrix4_SetRotationAndTranslation();
   return iVar4;
 }
 
@@ -7510,7 +7539,7 @@ void __fastcall FUN_0048c390(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
@@ -7851,7 +7880,7 @@ void __fastcall FUN_0048cb00(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
   }
   ExceptionList = pvStack_c;
   return;
@@ -8357,7 +8386,7 @@ DragRaceAheadCameraMover__ctor(undefined4 *param_1,undefined4 param_2,undefined4
   param_1[0x1c] = 0;
   param_1[0x1d] = 0;
   param_1[0x1e] = 0;
-  FUN_0040bb20(param_1 + 0x10,local_110);
+  eTranslate(param_1 + 0x10,local_110);
   Matrix_InvertRigid();
   uVar4 = param_1[0x22];
   uVar1 = param_1[0x21];
@@ -8427,7 +8456,7 @@ void __fastcall FUN_0048d9a0(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
@@ -8882,7 +8911,7 @@ void __fastcall FUN_0048e380(undefined4 *param_1)
     piVar3 = (int *)param_1[2];
     *piVar3 = iVar4;
     *(int **)(iVar4 + 4) = piVar3;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
   }
   ExceptionList = pvStack_c;
   return;
@@ -8985,7 +9014,7 @@ void __fastcall FUN_0048e490(float param_1)
         uVar6 = bDegreesToAngle16((float)uVar5 * 0.010986328);
         *(undefined2 *)(*(int *)((int)param_1 + 0x1c) + 0xc4) = uVar6;
       }
-      FUN_00565020();
+      eIdentity();
       if (iVar9 == 0) {
         *(undefined4 *)(*(int *)((int)param_1 + 0x1c) + 0x280) = 0;
       }
@@ -9453,9 +9482,11 @@ void * __thiscall FUN_0048eda0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x48edc0 FUN_0048edc0
+// ==== 0x48edc0 ZoneCamera_GetLetterboxSpan
 
-float10 __fastcall FUN_0048edc0(int param_1)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+float10 __fastcall ZoneCamera_GetLetterboxSpan(int param_1)
 
 {
   int iVar1;
@@ -10296,7 +10327,7 @@ void __fastcall FUN_004900f0(undefined4 *param_1)
   piVar2 = (int *)param_1[2];
   *piVar2 = iVar3;
   *(int **)(iVar3 + 4) = piVar2;
-  FUN_00408370();
+  ViewList_UpdateViewCountKind();
   return;
 }
 
@@ -10341,9 +10372,9 @@ void __fastcall FUN_004901e0(int param_1)
     if (0.4 <= fVar4) {
       if (fVar4 <= 2.4) {
         fVar1 = (fVar4 - 0.4) / 2.0;
-        fVar8 = (float10)FUN_0048edc0();
+        fVar8 = (float10)ZoneCamera_GetLetterboxSpan();
         FUN_005829e0((float)(fVar8 * (float10)fVar1));
-        fVar8 = (float10)FUN_0048edc0();
+        fVar8 = (float10)ZoneCamera_GetLetterboxSpan();
         FUN_005829e0((float)(fVar8 * (float10)fVar1));
         fVar7 = DAT_0073ad38;
       }
@@ -10680,7 +10711,7 @@ void FUN_00490770(int *param_1,undefined4 param_2,float param_3,int param_4)
   bVar14 = DAT_007355b4 != (undefined4 *)0x0;
   DAT_007355b4 = puVar1;
   if (bVar14) {
-    FUN_0040be70();
+    ePoly__ePoly();
     local_1b4 = 0;
     local_168 = 1;
     if (param_4 == 0) {

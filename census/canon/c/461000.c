@@ -1224,9 +1224,10 @@ undefined1 __thiscall FUN_00462b30(int *param_1,int *param_2)
     return 0;
   }
   if ((DAT_0078a344 == '\0') && (DAT_007361a8 == 0)) {
-    fVar11 = (float10)FUN_00443db0(*(float *)(iVar2 + 0x810) * 100.0,
-                                   *(undefined4 *)
-                                    (DAT_0073619c + 0x540 + *(char *)(DAT_0073619c + 0x53e) * 4));
+    fVar11 = (float10)TrackPathManager__ComparePercentDistances
+                                (*(float *)(iVar2 + 0x810) * 100.0,
+                                 *(undefined4 *)
+                                  (DAT_0073619c + 0x540 + *(char *)(DAT_0073619c + 0x53e) * 4));
     if (fVar11 < (float10)0.0) {
       fVar11 = fVar11 + (float10)100.0;
     }
@@ -1263,7 +1264,7 @@ undefined1 __thiscall FUN_00462b30(int *param_1,int *param_2)
     bVar10 = false;
     bVar4 = false;
     fVar11 = (float10)FUN_0059bab0();
-    cVar5 = FUN_00456fe0();
+    cVar5 = IsForwardsTrafficLane();
     if (cVar5 == '\0') {
       if (0.001 < (float)fVar11) {
         if (0.8 <= *(float *)(iVar2 + 0x3d4) / (float)fVar11) {
@@ -2851,7 +2852,7 @@ int FUN_00464f20(void)
     *(undefined4 *)(unaff_EDI + 0x418) = 0;
     *(undefined4 *)(unaff_EDI + 0x414) = 0;
     *(undefined4 *)(unaff_EDI + 0x410) = 0;
-    FUN_0040bd40();
+    eOrthonormalizeMatrix();
     *(undefined1 *)(unaff_EDI + 0x420) = 1;
   }
   return unaff_EDI + 0x3e0;
@@ -3227,7 +3228,7 @@ void __fastcall FUN_00465640(undefined4 param_1,int *param_2)
   unaff_ESI[0x1c] = 0;
   unaff_ESI[0x1d] = 0;
   unaff_ESI[0x1e] = 0;
-  cVar2 = FUN_00466500();
+  cVar2 = Collision__IsWallInvolved();
   if (cVar2 != '\0') {
     iVar4 = *(int *)(unaff_ESI[0x19] + 600);
     if (*(char *)(iVar4 + 0x15) == '\x03') {
@@ -3259,7 +3260,7 @@ void FUN_00465700(void)
   if (DAT_006f1dd8 != 0) {
     FUN_005302f0();
   }
-  cVar2 = FUN_00466500();
+  cVar2 = Collision__IsWallInvolved();
   if (cVar2 != '\0') {
     iVar4 = *(int *)(in_EAX[0x19] + 600);
     if (*(char *)(iVar4 + 0x15) == '\x03') {
@@ -3346,7 +3347,7 @@ void FUN_00465830(int param_1,undefined4 *param_2,float *param_3,float param_4)
   SpecialCamCaller_465d00(param_1,param_2,param_3);
   fVar7 = (float10)FUN_004212f0();
   if (fVar7 < (float10)50.0) {
-    iVar4 = FUN_00466350();
+    iVar4 = Collision__GetTerrainType();
     iVar5 = iVar4 * 0x94;
     if (*(float *)(&DAT_006ef35c + iVar5) < param_4) {
       if ((ABS(*(float *)(&DAT_006ef360 + iVar5) - *(float *)(&DAT_006ef35c + iVar5)) <=
@@ -3383,7 +3384,7 @@ void FUN_00465830(int param_1,undefined4 *param_2,float *param_3,float param_4)
       FUN_00530090();
     }
   }
-  cVar3 = FUN_004664b0();
+  cVar3 = Collision__IsPlayerInvolved();
   if (cVar3 != '\0') {
     iVar4 = *(int *)(*(int *)(param_1 + 100) + 600);
     iStack_20 = 0;
@@ -3547,7 +3548,7 @@ void SpecialCamCaller_465d00(int param_1,float *param_2,float *param_3)
       if (((30.0 <= local_114) && (*(int *)(piVar1[0x50] + 0x38) == 0)) &&
          (((*(char *)(*(int *)(*(int *)(param_1 + 100) + 600) + 0x15) == '\0' &&
            (*(char *)(*(int *)(*(int *)(param_1 + 100) + 0x25c) + 0x15) == '\0')) ||
-          (cVar5 = FUN_004663d0(), cVar5 != '\0')))) {
+          (cVar5 = Collision__IsCarWorldObjectCollision(), cVar5 != '\0')))) {
         *(undefined4 *)(param_1 + 0x10) = 1;
         iVar6 = piVar1[0x50];
         *(undefined4 *)(iVar6 + 0x38) = 1;
@@ -3605,7 +3606,7 @@ void SpecialCamCaller_465d00(int param_1,float *param_2,float *param_3)
         D3DXVec3Transform(&fStack_110,&fStack_110,auStack_50);
         fStack_108 = 0.0;
         if (-0.97 <= fStack_118) {
-          cVar5 = FUN_004663a0();
+          cVar5 = Collision__IsTwoCarCollision();
           if (cVar5 != '\0') {
             fVar3 = ABS(*(float *)(*(int *)(piVar1[0x50] + 0x20) + 0x14) -
                         *(float *)(*(int *)(piVar1[0x50] + 0x20) + 0x44)) * 1.19 * _K_HALF;
@@ -3644,14 +3645,14 @@ LAB_004661ed:
           (**(code **)(*piVar1 + 0x4c))(&fStack_10c,auStack_11c);
         }
         if ((((DAT_0078a345 == '\0') && (DAT_007361a4 == 0)) &&
-            (cVar5 = FUN_004663a0(), cVar5 != '\0')) && (35.0 <= local_114)) {
+            (cVar5 = Collision__IsTwoCarCollision(), cVar5 != '\0')) && (35.0 <= local_114)) {
           iVar6 = piVar1[0x50];
           iVar10 = RacerNode__IsLocalHuman();
           if (((iVar10 != 0) && (iVar6 = *(int *)(*(int *)(iVar6 + 0x18) + 0x60), iVar6 != 6)) &&
              ((iVar6 != 7 && (cVar5 = JumpCamBuildSpline(), cVar5 != '\0')))) {
             cVar5 = Player__StartSpecialCamera(6,0,1,1);
             if (cVar5 == '\0') {
-              FUN_0042c640();
+              Player__CleanUpJumpCam();
             }
             else {
               iVar6 = *(int *)(piVar1[0x50] + 0x868);
@@ -3672,9 +3673,11 @@ LAB_004661ed:
 }
 
 
-// ==== 0x466350 FUN_00466350
+// ==== 0x466350 Collision::GetTerrainType
 
-int FUN_00466350(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+int Collision__GetTerrainType(void)
 
 {
   int iVar1;
@@ -3690,9 +3693,11 @@ int FUN_00466350(void)
 }
 
 
-// ==== 0x4663a0 FUN_004663a0
+// ==== 0x4663a0 Collision::IsTwoCarCollision
 
-undefined4 FUN_004663a0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+undefined4 Collision__IsTwoCarCollision(void)
 
 {
   int in_EAX;
@@ -3705,9 +3710,11 @@ undefined4 FUN_004663a0(void)
 }
 
 
-// ==== 0x4663d0 FUN_004663d0
+// ==== 0x4663d0 Collision::IsCarWorldObjectCollision
 
-uint FUN_004663d0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+uint Collision__IsCarWorldObjectCollision(void)
 
 {
   char cVar1;
@@ -3727,9 +3734,11 @@ uint FUN_004663d0(void)
 }
 
 
-// ==== 0x466410 FUN_00466410
+// ==== 0x466410 Collision::GetCollidingCars
 
-void __fastcall FUN_00466410(undefined4 *param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall Collision__GetCollidingCars(undefined4 *param_1,int param_2)
 
 {
   int iVar1;
@@ -3779,9 +3788,11 @@ void __fastcall FUN_00466450(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x4664b0 FUN_004664b0
+// ==== 0x4664b0 Collision::IsPlayerInvolved
 
-uint FUN_004664b0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+uint Collision__IsPlayerInvolved(void)
 
 {
   int in_EAX;
@@ -3808,9 +3819,11 @@ uint FUN_004664b0(void)
 }
 
 
-// ==== 0x466500 FUN_00466500
+// ==== 0x466500 Collision::IsWallInvolved
 
-uint FUN_00466500(void)
+/* [canon] car med (ghidra-canon) docs/re/car.md */
+
+uint Collision__IsWallInvolved(void)
 
 {
   int iVar1;
@@ -3841,9 +3854,11 @@ LAB_00466549:
 }
 
 
-// ==== 0x466550 FUN_00466550
+// ==== 0x466550 Collision_IsFlatSurfaceInvolved
 
-uint FUN_00466550(void)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+uint Collision_IsFlatSurfaceInvolved(void)
 
 {
   int iVar1;
@@ -6662,7 +6677,7 @@ float10 FUN_00469ad0(void)
   float10 fVar1;
   float10 fVar2;
   
-  fVar1 = (float10)FUN_00585200();
+  fVar1 = (float10)RigidBody__GetTestImpulseEnergy();
   fVar2 = (float10)FUN_005851a0();
   return (float10)(float)fVar1 - fVar2;
 }
@@ -8723,7 +8738,7 @@ LAB_0046c09b:
     fStack_1a0 = fStack_180 * fVar2;
     fStack_19c = fStack_17c * fVar2;
     fStack_198 = fStack_178 * fVar2;
-    cVar5 = FUN_00466500();
+    cVar5 = Collision__IsWallInvolved();
     fStack_1c8 = fStack_158;
     if (cVar5 != '\0') {
       fStack_1c8 = fStack_158 * 1.0;

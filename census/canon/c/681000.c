@@ -5992,7 +5992,7 @@ void FUN_0068562e(void)
 void Unwind_00685640(void)
 
 {
-  FUN_00441fa0();
+  TrackPolygonList__Clear();
   return;
 }
 
@@ -6989,7 +6989,7 @@ void FUN_00685b98(void)
 void Unwind_00685bb0(void)
 
 {
-  FUN_0047dc10();
+  BaseCameraCoordinator___BaseCameraCoordinator();
   return;
 }
 
@@ -11255,7 +11255,7 @@ void FUN_00687413(void)
 void Unwind_00687420(void)
 
 {
-  FUN_0047dc10();
+  BaseCameraCoordinator___BaseCameraCoordinator();
   return;
 }
 
@@ -14599,7 +14599,7 @@ void Unwind_0068859b(void)
 void Unwind_006885a9(void)
 
 {
-  FUN_0043dd10();
+  DriftManager___DriftManager();
   return;
 }
 
@@ -15587,7 +15587,7 @@ void Unwind_00688b3b(void)
 void Unwind_00688b49(void)
 
 {
-  FUN_0043dd10();
+  DriftManager___DriftManager();
   return;
 }
 
@@ -18478,7 +18478,7 @@ void FUN_00689e00(void)
 void FUN_00689e20(void)
 
 {
-  eh_vector_constructor_iterator(&DAT_0077b1a0,0x28,4,FUN_0043db80,FUN_0043dc20);
+  eh_vector_constructor_iterator(&DAT_0077b1a0,0x28,4,FUN_0043db80,RacerRecord___RacerRecord);
   _atexit(FUN_006962e0);
   return;
 }
@@ -18511,7 +18511,7 @@ void FUN_00689e70(void)
 void FUN_00689e90(void)
 
 {
-  FUN_00441270();
+  TopologyTree__TopologyTree();
   _atexit(FUN_00696320);
   return;
 }
@@ -18522,7 +18522,7 @@ void FUN_00689e90(void)
 void FUN_00689eb0(void)
 
 {
-  FUN_00442b00();
+  TrackRouteManager__TrackRouteManager();
   _atexit(FUN_00696330);
   return;
 }
@@ -18543,7 +18543,7 @@ void FUN_00689ed0(void)
 void FUN_00689ee0(void)
 
 {
-  FUN_00444340();
+  TrackStreamer__TrackStreamer();
   _atexit(FUN_00696350);
   return;
 }
@@ -18565,7 +18565,7 @@ void FUN_00689f00(void)
 void FUN_00689f20(void)
 
 {
-  FUN_00446900();
+  VisibleSectionManager__VisibleSectionManager();
   _atexit(FUN_00696370);
   return;
 }
@@ -20028,7 +20028,7 @@ void FUN_0068ace0(void)
 void FUN_0068ad00(void)
 
 {
-  FUN_0047ff30();
+  DragCameraManager__DragCameraManager();
   _atexit(FUN_00696460);
   return;
 }
@@ -22737,7 +22737,7 @@ void FUN_0068d4d0(void)
 void FUN_0068d500(void)
 
 {
-  FUN_004f3d30();
+  FEngLibrary__FEngLibrary();
   _atexit(FUN_00696500);
   return;
 }

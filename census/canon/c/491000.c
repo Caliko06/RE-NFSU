@@ -89,7 +89,7 @@ void __fastcall FUN_004922c0(undefined4 *param_1)
     piVar2 = (int *)param_1[2];
     *piVar2 = iVar3;
     *(int **)(iVar3 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
   }
   ExceptionList = local_c;
   return;
@@ -234,7 +234,7 @@ void __fastcall FUN_004926b0(int param_1)
     piVar2 = *(int **)(param_1 + 8);
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_00408370();
+    ViewList_UpdateViewCountKind();
     return;
   }
   return;
@@ -313,10 +313,10 @@ void __fastcall FUN_00492700(int param_1)
             }
             fVar4 = _K_ONE - (((*(float *)(param_1 + 0x48) - 0.25) - *(float *)(param_1 + 0x50)) -
                              0.4) / *(float *)(param_1 + 0x54);
-            fVar11 = (float10)FUN_0048edc0();
+            fVar11 = (float10)ZoneCamera_GetLetterboxSpan();
             FUN_005829e0((float)(((float10)fVar4 * (float10)*(float *)(param_1 + 300) +
                                  (float10)*(float *)(param_1 + 0x130)) * fVar11));
-            fVar11 = (float10)FUN_0048edc0();
+            fVar11 = (float10)ZoneCamera_GetLetterboxSpan();
             FUN_005829e0((float)(((float10)fVar4 * (float10)*(float *)(param_1 + 0x134) +
                                  (float10)*(float *)(param_1 + 0x138)) * fVar11));
             fVar10 = DAT_0073ad38;
@@ -343,13 +343,13 @@ void __fastcall FUN_00492700(int param_1)
       else {
         fVar5 = _K_ONE / *(float *)(param_1 + 0x50);
         fVar10 = (*(float *)(param_1 + 0x48) - 0.25) * fVar5;
-        fVar11 = (float10)FUN_0048edc0();
+        fVar11 = (float10)ZoneCamera_GetLetterboxSpan();
         fVar1 = (float)(((float10)fVar10 * (float10)*(float *)(param_1 + 0x134) +
                         (float10)*(float *)(param_1 + 0x138)) * fVar11);
-        fVar11 = (float10)FUN_0048edc0();
+        fVar11 = (float10)ZoneCamera_GetLetterboxSpan();
         fVar2 = *(float *)(param_1 + 0x134);
         fVar3 = *(float *)(param_1 + 0x138);
-        fVar12 = (float10)FUN_0048edc0();
+        fVar12 = (float10)ZoneCamera_GetLetterboxSpan();
         FUN_005829e0((float)(((float10)fVar10 * (float10)*(float *)(param_1 + 300) +
                              (float10)*(float *)(param_1 + 0x130)) * fVar12));
         FUN_005829e0(fVar1);
@@ -2096,9 +2096,11 @@ int FUN_00494cb0(void)
 }
 
 
-// ==== 0x494d00 FUN_00494d00
+// ==== 0x494d00 tPreRaceScreenManager::tPreRaceScreenManager
 
-undefined1 * FUN_00494d00(undefined1 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined1 * tPreRaceScreenManager__tPreRaceScreenManager(undefined1 *param_1)
 
 {
   undefined4 *puVar1;
@@ -3033,7 +3035,7 @@ void FUN_00495e20(void)
     pvVar1 = _malloc(0x10);
     local_4 = 0;
     if (pvVar1 != (void *)0x0) {
-      DAT_00735ed8 = FUN_00494d00(pvVar1);
+      DAT_00735ed8 = tPreRaceScreenManager__tPreRaceScreenManager(pvVar1);
       ExceptionList = local_c;
       return;
     }
@@ -3262,9 +3264,11 @@ void * __thiscall FUN_00496110(void *param_1,byte param_2)
 }
 
 
-// ==== 0x496130 FUN_00496130
+// ==== 0x496130 PostRaceRewardList::SetFlag46
 
-void __fastcall FUN_00496130(int param_1)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall PostRaceRewardList__SetFlag46(int param_1)
 
 {
   if (*(char *)(param_1 + 0x41) == '\0') {
@@ -3578,7 +3582,7 @@ LAB_004966e7:
     local_6c = 0;
     local_70 = 0;
     local_74 = 0;
-    local_78 = FUN_00496130;
+    local_78 = PostRaceRewardList__SetFlag46;
     local_7c = 0;
     local_80 = 0;
     local_84 = 0;
@@ -3663,7 +3667,7 @@ LAB_00496896:
   local_6c = 0;
   local_70 = 0;
   local_74 = 0;
-  local_78 = FUN_00496130;
+  local_78 = PostRaceRewardList__SetFlag46;
   local_7c = 0;
   local_80 = 0;
   local_84 = 0;
@@ -11110,10 +11114,10 @@ void FUN_0049fc90(void)
   
   if (in_EAX != 0) {
     puVar1 = *(undefined4 **)(in_EAX + 0x2c);
-    FUN_00503f60(*puVar1,puVar1[1],puVar1[2],puVar1[3]);
+    FEColor__operator_unsigned_long(*puVar1,puVar1[1],puVar1[2],puVar1[3]);
     return;
   }
-  FUN_00503f60(0,0,0,0);
+  FEColor__operator_unsigned_long(0,0,0,0);
   return;
 }
 
@@ -11343,7 +11347,7 @@ void FUN_0049ff50(undefined4 param_1,undefined4 param_2,undefined4 param_3,float
     FUN_004ff1f0(unaff_ESI,4,&local_18,0);
   }
   if (*(int *)(unaff_ESI + 0x18) < 0x100) {
-    cVar6 = FUN_004fea10();
+    cVar6 = FEVector3__operator__();
     if (cVar6 == '\0') {
       *(uint *)(unaff_ESI + 0x1c) = *(uint *)(unaff_ESI + 0x1c) | 0x400000;
     }
@@ -11353,9 +11357,11 @@ void FUN_0049ff50(undefined4 param_1,undefined4 param_2,undefined4 param_3,float
 }
 
 
-// ==== 0x4a0080 FUN_004a0080
+// ==== 0x4a0080 Hud_PackColorFromFloats
 
-uint FUN_004a0080(void)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+uint Hud_PackColorFromFloats(void)
 
 {
   int iVar1;
@@ -12045,7 +12051,7 @@ LAB_004a0ddd:
       RideInfo__RebuildPhysicsInfo(1);
     }
     if ((iVar6 != -0x70) && (iVar6 != -0x260)) {
-      FUN_00432a30(*(undefined4 *)(iVar6 + 0x10),(int)DAT_0078a3f5,&local_40);
+      HudTach_PickFaceHashes(*(undefined4 *)(iVar6 + 0x10),(int)DAT_0078a3f5,&local_40);
       iVar6 = local_40;
       iVar8 = Texture_FindByHash(local_40,0,0);
       if (iVar8 == 0) {
@@ -12072,11 +12078,12 @@ LAB_004a0ddd:
 }
 
 
-// ==== 0x4a0ea0 FUN_004a0ea0
+// ==== 0x4a0ea0 CalcAngleForRPM
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
-float10 __thiscall FUN_004a0ea0(int param_1,float param_2)
+float10 __thiscall CalcAngleForRPM(int param_1,float param_2)
 
 {
   float10 fVar1;
@@ -12170,7 +12177,7 @@ void HudTach__Update(int param_1)
     uVar7 = _ftol_nocw();
     FEObject__SetFormattedText(&DAT_006c740c,uVar7);
     if (DAT_0078a320 == 1) {
-      fVar11 = (float10)FUN_004a0ea0(local_14,iVar5 + 0xc00);
+      fVar11 = (float10)CalcAngleForRPM(local_14,iVar5 + 0xc00);
       FUN_004f6a70((float)fVar11);
     }
     else {

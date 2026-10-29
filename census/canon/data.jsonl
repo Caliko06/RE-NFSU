@@ -6066,7 +6066,7 @@
 {"kind":"global","addr":"0x6c3be0","block":".rdata","label":"PTR_FUN_006c3be0","type":"undefined *","str":"","readers":["0x4dc580","0x4dc600"],"writers":[]}
 {"kind":"global","addr":"0x6c3bf0","block":".rdata","label":"s_PC_menubar.fng_006c3bf0","type":"string","str":"PC_menubar.fng","readers":["0x416f00","0x416f40","0x4bbe00","0x4bd0f0","0x4dc840","0x4dcdb0","0x4e6ac0"],"writers":[]}
 {"kind":"global","addr":"0x6c3c00","block":".rdata","label":"s_ConfirmDialog_006c3c00","type":"string","str":"ConfirmDialog","readers":["0x687bb0"],"writers":[]}
-{"kind":"global","addr":"0x6c3c10","block":".rdata","label":"PTR_FUN_006c3c10","type":"pointer","str":"","readers":["0x4d7750","0x4d7770"],"writers":[]}
+{"kind":"global","addr":"0x6c3c10","block":".rdata","label":"PTR_ColorElement::scalar_deleting_destructor_006c3c10","type":"pointer","str":"","readers":["0x4d7750","0x4d7770"],"writers":[]}
 {"kind":"global","addr":"0x6c3c14","block":".rdata","label":"PTR_FUN_006c3c14","type":"undefined *","str":"","readers":["0x4dab10","0x4dae20"],"writers":[]}
 {"kind":"global","addr":"0x6c3c24","block":".rdata","label":"s_%s_%i_006c3c24","type":"string","str":"%s %i","readers":["0x4da1a0"],"writers":[]}
 {"kind":"global","addr":"0x6c3c2c","block":".rdata","label":"s_NUMREMAPCOLOURS_006c3c2c","type":"string","str":"NUMREMAPCOLOURS","readers":["0x4da1a0","0x4e3320"],"writers":[]}
@@ -7410,7 +7410,7 @@
 {"kind":"global","addr":"0x6ca478","block":".rdata","label":"s_QuantCarPartID_006ca478","type":"string","str":"QuantCarPartID","readers":["0x439aa0"],"writers":[]}
 {"kind":"global","addr":"0x6ca488","block":".rdata","label":"s_OnlineRacer_006ca488","type":"string","str":"OnlineRacer","readers":["0x43b560"],"writers":[]}
 {"kind":"global","addr":"0x6ca494","block":".rdata","label":"PTR_FUN_006ca494","type":"undefined *","str":"","readers":["0x436f60","0x436ff0"],"writers":[]}
-{"kind":"global","addr":"0x6ca4a4","block":".rdata","label":"PTR_FUN_006ca4a4","type":"undefined *","str":"","readers":["0x436f40","0x436f60","0x436fe0","0x436ff0"],"writers":[]}
+{"kind":"global","addr":"0x6ca4a4","block":".rdata","label":"PTR_PidCarController::scalar_deleting_destructor_006ca4a4","type":"undefined *","str":"","readers":["0x436f40","0x436f60","0x436fe0","0x436ff0"],"writers":[]}
 {"kind":"global","addr":"0x6ca4b0","block":".rdata","label":"s_StyleMoment_006ca4b0","type":"string","str":"StyleMoment","readers":["0x685000"],"writers":[]}
 {"kind":"global","addr":"0x6ca4bc","block":".rdata","label":"s_ClosePass_006ca4bc","type":"string","str":"ClosePass","readers":["0x434f80"],"writers":[]}
 {"kind":"global","addr":"0x6ca4c8","block":".rdata","label":"s_LosePosition_006ca4c8","type":"string","str":"LosePosition","readers":["0x434f80"],"writers":[]}

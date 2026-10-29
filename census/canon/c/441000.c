@@ -87,9 +87,11 @@ FUN_00441030(int param_1,int param_2,undefined4 param_3,float *param_4,float par
 }
 
 
-// ==== 0x441270 FUN_00441270
+// ==== 0x441270 TopologyTree::TopologyTree
 
-void FUN_00441270(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TopologyTree__TopologyTree(void)
 
 {
   undefined4 *puVar1;
@@ -145,9 +147,11 @@ void TrackPolygonSlotPool__Init(void)
 }
 
 
-// ==== 0x441320 FUN_00441320
+// ==== 0x441320 TopologyTree::CloseTree
 
-void FUN_00441320(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TopologyTree__CloseTree(void)
 
 {
   int *piVar1;
@@ -747,9 +751,11 @@ bool TrackPositionMarker_Unload(int *param_1)
 }
 
 
-// ==== 0x441fa0 FUN_00441fa0
+// ==== 0x441fa0 TrackPolygonList::Clear
 
-void FUN_00441fa0(void)
+/* [canon] track med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TrackPolygonList__Clear(void)
 
 {
   int *piVar1;
@@ -951,9 +957,11 @@ void RoadEntries_FillDistances(void)
 }
 
 
-// ==== 0x442200 FUN_00442200
+// ==== 0x442200 Signpost::GetIndex
 
-uint FUN_00442200(float param_1)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+uint Signpost__GetIndex(float param_1)
 
 {
   uint uVar1;
@@ -1028,9 +1036,11 @@ void __thiscall FUN_004422b0(float *param_1,float param_2,float param_3)
 }
 
 
-// ==== 0x442330 FUN_00442330
+// ==== 0x442330 TrackRoutePoint::GetForwardPosition
 
-void __thiscall FUN_00442330(float *param_1,float param_2,float param_3)
+/* [canon] track med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall TrackRoutePoint__GetForwardPosition(float *param_1,float param_2,float param_3)
 
 {
   float fVar1;
@@ -1090,11 +1100,12 @@ float10 __thiscall FUN_004423b0(float *param_1,float param_2)
 }
 
 
-// ==== 0x442460 FUN_00442460
+// ==== 0x442460 TrackRoutePoint::GetDistanceAway
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
 
-float10 FUN_00442460(float param_1)
+float10 TrackRoutePoint__GetDistanceAway(float param_1)
 
 {
   int in_EAX;
@@ -1203,9 +1214,11 @@ LAB_0044255b:
 }
 
 
-// ==== 0x442570 FUN_00442570
+// ==== 0x442570 TrackRoutePoint::GetDistanceAroundTrack
 
-float10 FUN_00442570(void)
+/* [canon] track med (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 TrackRoutePoint__GetDistanceAroundTrack(void)
 
 {
   int in_EAX;
@@ -1345,7 +1358,7 @@ int FUN_00442820(float param_1,float param_2,float param_3)
   if (0 < sVar2) {
     do {
       if (unaff_EDI == 0) {
-        fVar5 = (float10)FUN_00442460(param_2);
+        fVar5 = (float10)TrackRoutePoint__GetDistanceAway(param_2);
         iVar3 = extraout_EDX_00;
       }
       else {
@@ -1405,11 +1418,12 @@ undefined4 __fastcall Section_HasLane(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x442980 FUN_00442980
+// ==== 0x442980 TrackRoute::SetFirstAndLast
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_00442980(void)
+void TrackRoute__SetFirstAndLast(void)
 
 {
   float fVar1;
@@ -1480,9 +1494,11 @@ void FUN_00442980(void)
 }
 
 
-// ==== 0x442b00 FUN_00442b00
+// ==== 0x442b00 TrackRouteManager::TrackRouteManager
 
-int __fastcall FUN_00442b00(undefined4 param_1,int param_2)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __fastcall TrackRouteManager__TrackRouteManager(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -1502,9 +1518,11 @@ int __fastcall FUN_00442b00(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x442b20 FUN_00442b20
+// ==== 0x442b20 TrackRouteManager::_TrackRouteManager
 
-void FUN_00442b20(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TrackRouteManager___TrackRouteManager(void)
 
 {
   int *piVar1;
@@ -1908,9 +1926,11 @@ void RoadEntries_Sort(undefined4 *param_1,uint param_2,code *param_3)
 }
 
 
-// ==== 0x443090 FUN_00443090
+// ==== 0x443090 CompareSignposts
 
-float10 FUN_00443090(undefined4 *param_1,undefined4 *param_2)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 CompareSignposts(undefined4 *param_1,undefined4 *param_2)
 
 {
   return (float10)*(float *)*param_1 - (float10)*(float *)*param_2;
@@ -1957,7 +1977,7 @@ void RoadNetwork_PostLoad(void)
   uVar6 = 0;
   do {
     if ((-1 < (int)uVar6) && (*(int *)((int)&DAT_0077af30 + uVar6) != 0)) {
-      FUN_00442980();
+      TrackRoute__SetFirstAndLast();
     }
     uVar6 = uVar6 + 4;
   } while (uVar6 < 0x200);
@@ -1974,7 +1994,7 @@ void RoadNetwork_PostLoad(void)
       puVar1 = puVar1 + 8;
     } while (uVar3 < uVar6);
   }
-  RoadEntries_Sort(_Memory,8,FUN_00443090);
+  RoadEntries_Sort(_Memory,8,CompareSignposts);
   uVar6 = DAT_00736154;
   uVar3 = 0;
   if (DAT_00736154 != 0) {
@@ -2430,11 +2450,12 @@ int ZoneManager__FindFromTypeMask(int param_1,undefined4 param_2,int param_3)
 }
 
 
-// ==== 0x4437e0 FUN_004437e0
+// ==== 0x4437e0 TrackPathManager::FindClosestPoint
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
 
-float * FUN_004437e0(float *param_1,float param_2)
+float * TrackPathManager__FindClosestPoint(float *param_1,float param_2)
 
 {
   float fVar1;
@@ -2740,9 +2761,11 @@ float10 __thiscall TrackPath__WrapDistance(float *param_1,float param_2,float pa
 }
 
 
-// ==== 0x443db0 FUN_00443db0
+// ==== 0x443db0 TrackPathManager::ComparePercentDistances
 
-float10 FUN_00443db0(float param_1,float param_2)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 TrackPathManager__ComparePercentDistances(float param_1,float param_2)
 
 {
   int in_EAX;
@@ -2761,11 +2784,12 @@ float10 FUN_00443db0(float param_1,float param_2)
 }
 
 
-// ==== 0x443e00 FUN_00443e00
+// ==== 0x443e00 TrackPathZone::GetIntercept
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
 
-undefined4 FUN_00443e00(int param_1,float *param_2,float *param_3)
+undefined4 TrackPathZone__GetIntercept(int param_1,float *param_2,float *param_3)
 
 {
   float *pfVar1;
@@ -2855,9 +2879,11 @@ undefined4 FUN_00443e00(int param_1,float *param_2,float *param_3)
 }
 
 
-// ==== 0x4440c0 FUN_004440c0
+// ==== 0x4440c0 TrackPathCoordinate::TrackPathCoordinate
 
-void FUN_004440c0(undefined4 param_1)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TrackPathCoordinate__TrackPathCoordinate(undefined4 param_1)
 
 {
   undefined4 *in_EAX;
@@ -2912,7 +2938,7 @@ void FUN_004441b0(undefined4 param_1,undefined4 param_2)
   int unaff_EDI;
   
   *(undefined4 *)(unaff_EDI + 8) = 0;
-  iVar1 = FUN_004437e0(param_1,param_2);
+  iVar1 = TrackPathManager__FindClosestPoint(param_1,param_2);
   if (iVar1 != 0) {
     TrackPath__UpdateCursor(&DAT_007372b0,iVar1);
   }
@@ -3021,9 +3047,11 @@ undefined4 StreamSections__Unloader(int *param_1)
 }
 
 
-// ==== 0x444340 FUN_00444340
+// ==== 0x444340 TrackStreamer::TrackStreamer
 
-void FUN_00444340(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TrackStreamer__TrackStreamer(void)
 
 {
   undefined4 *puVar1;
@@ -3126,9 +3154,11 @@ void __fastcall StreamSections__Init(int param_1)
 }
 
 
-// ==== 0x4444f0 FUN_004444f0
+// ==== 0x4444f0 TrackStreamer::AddSpecialSection
 
-void FUN_004444f0(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TrackStreamer__AddSpecialSection(void)
 
 {
   undefined4 *puVar1;
@@ -3187,9 +3217,11 @@ void FUN_00444548(void)
 }
 
 
-// ==== 0x444550 FUN_00444550
+// ==== 0x444550 TrackStreamer::RemoveSpecialSection
 
-void __fastcall FUN_00444550(int param_1,int param_2)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall TrackStreamer__RemoveSpecialSection(int param_1,int param_2)
 
 {
   int iVar1;
@@ -3214,9 +3246,11 @@ void __fastcall FUN_00444550(int param_1,int param_2)
 }
 
 
-// ==== 0x444590 FUN_00444590
+// ==== 0x444590 TrackStreamer::RemoveAllSpecialSections
 
-void FUN_00444590(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TrackStreamer__RemoveAllSpecialSections(void)
 
 {
   int *piVar1;
@@ -3354,7 +3388,7 @@ void StreamSections__IssueRead(void)
   *(int *)(unaff_ESI + 0x28) = iVar1;
   DAT_00735554 = DAT_00735554 + 1;
   *(undefined4 *)(iVar1 + 0x9c) = *(undefined4 *)(unaff_ESI + 0x2c);
-  FUN_00448070(unaff_ESI);
+  ResourceFile__SetPoolInfo(unaff_ESI);
   ResourceFile__BeginLoading();
   return;
 }
@@ -3578,9 +3612,11 @@ LAB_00444a51:
 }
 
 
-// ==== 0x444ab0 FUN_00444ab0
+// ==== 0x444ab0 TrackStreamer::ClearStreamingPositions
 
-void FUN_00444ab0(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TrackStreamer__ClearStreamingPositions(void)
 
 {
   int in_EAX;
@@ -4280,9 +4316,11 @@ void StreamSections__Shutdown(void)
 }
 
 
-// ==== 0x445450 FUN_00445450
+// ==== 0x445450 TrackStreamer::ForceSectionToUnload
 
-void FUN_00445450(short param_1)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void TrackStreamer__ForceSectionToUnload(short param_1)
 
 {
   int iVar1;
@@ -4406,9 +4444,11 @@ void __fastcall Placement__UnpackMatrix(int param_1)
 }
 
 
-// ==== 0x445660 FUN_00445660
+// ==== 0x445660 SceneryInstance::SetTransform
 
-void FUN_00445660(void)
+/* [canon] track med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void SceneryInstance__SetTransform(void)
 
 {
   undefined2 uVar1;
@@ -4796,9 +4836,11 @@ undefined4 StreamSection_Unload(int *param_1)
 }
 
 
-// ==== 0x445c60 FUN_00445c60
+// ==== 0x445c60 FindSceneryInfo
 
-int * FUN_00445c60(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int * FindSceneryInfo(void)
 
 {
   undefined4 *puVar1;
@@ -4921,15 +4963,17 @@ void StreamBoundaries__DebugDump(void)
   for (; puVar2 != puVar4; puVar2 = (undefined4 *)*puVar2) {
     FUN_00446bb0(1);
     FUN_00446c90();
-    FUN_00446b70();
+    DrivableScenerySection__SortVisibleSections();
   }
   return;
 }
 
 
-// ==== 0x445e10 FUN_00445e10
+// ==== 0x445e10 eView_SphereBehindPlane
 
-undefined4 __thiscall FUN_00445e10(int param_1,float param_2)
+/* [canon] render low (ghidra-canon) docs/re/render.md */
+
+undefined4 __thiscall eView_SphereBehindPlane(int param_1,float param_2)
 
 {
   float *in_EAX;
@@ -4974,7 +5018,7 @@ void __thiscall Section__DrawPlacement(int param_1,int param_2,int param_3)
         return;
       }
     }
-    iVar3 = FUN_00445e10(*(float *)(iVar5 + 0x44) + 4.0);
+    iVar3 = eView_SphereBehindPlane(*(float *)(iVar5 + 0x44) + 4.0);
     if (1 < iVar3) {
       local_38 = -1;
       local_3c = 0;
@@ -5186,7 +5230,7 @@ void FUN_004462a0(int param_1)
         local_20 = *(undefined4 *)(iVar2 + 0x10);
         local_18 = *(undefined4 *)(iVar2 + 0x18);
         local_14 = 0x3f800000;
-        FUN_00445660();
+        SceneryInstance__SetTransform();
       }
       local_94 = local_94 + 1;
       iVar1 = iVar1 + 0x30;
@@ -5319,9 +5363,11 @@ void __thiscall StreamSections__DrawVisible(undefined4 param_1,undefined4 param_
 }
 
 
-// ==== 0x446620 FUN_00446620
+// ==== 0x446620 GrandSceneryCullInfo::DoCulling
 
-void FUN_00446620(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void GrandSceneryCullInfo__DoCulling(void)
 
 {
   undefined4 uVar1;
@@ -5444,9 +5490,11 @@ LAB_0044685a:
 }
 
 
-// ==== 0x4468a0 FUN_004468a0
+// ==== 0x4468a0 GrandSceneryCullInfo::CallbackScenery
 
-void __fastcall FUN_004468a0(undefined4 param_1,int param_2,code *param_3)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall GrandSceneryCullInfo__CallbackScenery(undefined4 param_1,int param_2,code *param_3)
 
 {
   int *piVar1;
@@ -5476,9 +5524,11 @@ void __fastcall FUN_004468a0(undefined4 param_1,int param_2,code *param_3)
 }
 
 
-// ==== 0x446900 FUN_00446900
+// ==== 0x446900 VisibleSectionManager::VisibleSectionManager
 
-void FUN_00446900(void)
+/* [canon] track med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void VisibleSectionManager__VisibleSectionManager(void)
 
 {
   int iVar1;
@@ -5514,9 +5564,11 @@ void FUN_00446900(void)
 }
 
 
-// ==== 0x446950 FUN_00446950
+// ==== 0x446950 VisibleSectionManager::_VisibleSectionManager
 
-void FUN_00446950(void)
+/* [canon] track med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void VisibleSectionManager___VisibleSectionManager(void)
 
 {
   int *piVar1;
@@ -5648,9 +5700,11 @@ undefined4 StreamBoundaries_Unload(int *param_1)
 }
 
 
-// ==== 0x446b10 FUN_00446b10
+// ==== 0x446b10 DrivableScenerySection::RemoveVisibleSection
 
-void FUN_00446b10(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void DrivableScenerySection__RemoveVisibleSection(void)
 
 {
   int in_EAX;
@@ -5685,9 +5739,11 @@ void FUN_00446b10(void)
 }
 
 
-// ==== 0x446b70 FUN_00446b70
+// ==== 0x446b70 DrivableScenerySection::SortVisibleSections
 
-void FUN_00446b70(void)
+/* [canon] track high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void DrivableScenerySection__SortVisibleSections(void)
 
 {
   short sVar1;
@@ -5748,7 +5804,7 @@ void __thiscall FUN_00446bb0(int param_1,char param_2)
             psVar5 = (short *)(param_1 + 0x14);
             do {
               if (*psVar5 == iVar4) {
-                FUN_00446b10();
+                DrivableScenerySection__RemoveVisibleSection();
                 local_4 = local_4 + -1;
                 psVar6 = psVar6 + -1;
                 break;
@@ -5806,7 +5862,7 @@ void FUN_00446c90(void)
       iVar4 = (int)*psVar5 % 100;
       cVar1 = (char)((int)*psVar5 / 100) + '@';
       if ((('@' < cVar1) && (cVar1 < 'U')) && ((iVar4 == 0 || (iVar4 == 10)))) {
-        FUN_00446b10();
+        DrivableScenerySection__RemoveVisibleSection();
         iVar6 = iVar6 + -1;
         psVar5 = psVar5 + -1;
       }
@@ -6514,7 +6570,7 @@ LAB_0044798b:
     FUN_0043a360(uVar11);
     FEManager__Update();
     Players__UpdateAll();
-    FUN_0047dc40(DAT_0073ad38);
+    UpdateCameraCoordinators(DAT_0073ad38);
     Players__UpdateStreamViewers();
     if (DAT_007356a8 != 0) {
       EAXSound__Update(DAT_0073ad38);
@@ -6917,7 +6973,7 @@ ResourceFile__ResourceFile(undefined4 param_1,undefined4 param_2,char *param_3,u
   *(undefined4 *)(unaff_EDI + 0xb0) = 0;
   *(undefined4 *)(unaff_EDI + 0x94) = 0;
   *(undefined4 *)(unaff_EDI + 0x98) = 0;
-  FUN_00448070(param_3);
+  ResourceFile__SetPoolInfo(param_3);
   *(undefined1 *)(unaff_EDI + 0x40) = 0;
   iVar4 = bOpenFile(pcVar1,1,1);
   if (iVar4 == 0) {
@@ -6939,9 +6995,11 @@ ResourceFile__ResourceFile(undefined4 param_1,undefined4 param_2,char *param_3,u
 }
 
 
-// ==== 0x448070 FUN_00448070
+// ==== 0x448070 ResourceFile::SetPoolInfo
 
-void __thiscall FUN_00448070(undefined4 param_1,int param_2)
+/* [canon] assets med (ghidra-canon) docs/re/canon.md */
+
+void __thiscall ResourceFile__SetPoolInfo(undefined4 param_1,int param_2)
 
 {
   char cVar1;
@@ -7296,9 +7354,11 @@ void FUN_004484b0(void)
 }
 
 
-// ==== 0x4484f0 FUN_004484f0
+// ==== 0x4484f0 TrackInfo_SetLoadedById
 
-void FUN_004484f0(void)
+/* [canon] track med (ghidra-canon) docs/re/canon.md */
+
+void TrackInfo_SetLoadedById(void)
 
 {
   int iVar1;
@@ -7987,7 +8047,7 @@ LAB_004491e9:
     RideInfo__RebuildPhysicsInfo(1);
   }
   if ((pcVar1 != (char *)0x0) && (*pcVar1 < '\x01')) {
-    FUN_00432a30(*(undefined4 *)(pcVar1 + 0x10),iVar2,local_8);
+    HudTach_PickFaceHashes(*(undefined4 *)(pcVar1 + 0x10),iVar2,local_8);
     FUN_0053e9e0(&DAT_00740420,local_8,2,param_1,0,0);
   }
   return;
@@ -8274,7 +8334,7 @@ void GameFlow__LoadingTrackSpecific(void)
   else {
     DAT_007364f4 = (uint)(DAT_00700eb0 == 1);
   }
-  FUN_004484f0();
+  TrackInfo_SetLoadedById();
   DAT_00735564 = 1;
   if (DAT_0077a904 != 0) {
     DAT_0077a904 = 0;
@@ -8325,7 +8385,7 @@ void GameFlow__LoadingTrackSpecificPart1(void)
   else {
     DAT_007364f4 = (uint)(in_EAX == 1);
   }
-  FUN_004484f0();
+  TrackInfo_SetLoadedById();
   DAT_00735564 = 1;
   if (DAT_0077a904 != 0) {
     DAT_0077a904 = 0;
@@ -8511,7 +8571,7 @@ void GameFlow__UnloadingTrackSpecific(void)
   SlotPool__Destroy();
   DAT_007306c8 = 0;
   DAT_007306cc = 0;
-  FUN_00441320();
+  TopologyTree__CloseTree();
   TrackPath__FreeSplines();
   SlotPool__Destroy();
   DAT_00735fe4 = 0;
@@ -8554,7 +8614,7 @@ LAB_00449c20:
     EAXSound__UnLoadInGameSoundBanks();
   }
   FUN_00573240(&DAT_0073c17c);
-  FUN_004484f0();
+  TrackInfo_SetLoadedById();
   iVar6 = DAT_0073448c;
   for (puVar2 = DAT_0073d818; DAT_0073448c = iVar6, (undefined4 **)puVar2 != &DAT_0073d818;
       puVar2 = (undefined4 *)*puVar2) {
@@ -9246,7 +9306,7 @@ undefined4 * FUN_0044a330(undefined4 *param_1,int param_2)
   param_1[0x102] = 0;
   *(undefined1 *)(param_1 + 0x11b) = 1;
   param_1[0x103] = 0x4b189680;
-  uVar2 = FUN_00442200(*(undefined4 *)(param_1[1] + 0x814));
+  uVar2 = Signpost__GetIndex(*(undefined4 *)(param_1[1] + 0x814));
   param_1[0x11d] = uVar2;
   param_1[0x11f] = 0;
   *(undefined1 *)(param_1 + 0x107) = 1;
@@ -9582,7 +9642,7 @@ void __fastcall FUN_0044ad00(int param_1)
   *(uint *)(param_1 + 0x24) = *(uint *)(param_1 + 0x24) & 0xfffffffe;
   *(uint *)(param_1 + 0x28) = *(uint *)(param_1 + 0x28) & 0xfffffffe;
   *(undefined1 *)(param_1 + 0x410) = 0;
-  uVar1 = FUN_00442200(*(undefined4 *)(*(int *)(param_1 + 4) + 0x814));
+  uVar1 = Signpost__GetIndex(*(undefined4 *)(*(int *)(param_1 + 4) + 0x814));
   *(undefined4 *)(param_1 + 0x474) = uVar1;
   return;
 }
@@ -10877,7 +10937,7 @@ undefined1 FUN_0044cac0(int *param_1)
           return 0;
         }
         FUN_00468820(iVar5);
-        cVar2 = FUN_00466500();
+        cVar2 = Collision__IsWallInvolved();
         iVar5 = iVar5 + 1;
       } while (iVar5 < iVar4);
       if (cVar2 != '\0') {

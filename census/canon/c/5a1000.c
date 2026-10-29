@@ -2504,93 +2504,91 @@ void UnlockTeller__SetVinylGroupNewlyStyleUnlocked(byte param_1)
         puVar4 = puVar4 + 1;
       } while (*pbVar1 != 0);
       if (unaff_ESI != iVar3) {
-        iVar3 = FUN_00567c70();
-        if (((unaff_ESI == iVar3) || (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) ||
-           (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) {
+        iVar3 = bStringHash();
+        if (((unaff_ESI == iVar3) || (iVar3 = bStringHash(), unaff_ESI == iVar3)) ||
+           (iVar3 = bStringHash(), unaff_ESI == iVar3)) {
           cVar5 = '\x01';
         }
         else {
-          iVar3 = FUN_00567c70();
-          if (((unaff_ESI == iVar3) || (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) ||
-             (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) {
+          iVar3 = bStringHash();
+          if (((unaff_ESI == iVar3) || (iVar3 = bStringHash(), unaff_ESI == iVar3)) ||
+             (iVar3 = bStringHash(), unaff_ESI == iVar3)) {
             cVar5 = '\x02';
           }
           else {
-            iVar3 = FUN_00567c70();
-            if ((unaff_ESI == iVar3) || (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) {
+            iVar3 = bStringHash();
+            if ((unaff_ESI == iVar3) || (iVar3 = bStringHash(), unaff_ESI == iVar3)) {
               cVar5 = '\x03';
             }
             else {
-              iVar3 = FUN_00567c70();
+              iVar3 = bStringHash();
               if ((unaff_ESI == iVar3) ||
-                 ((iVar3 = FUN_00567c70(), unaff_ESI == iVar3 ||
-                  (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)))) {
+                 ((iVar3 = bStringHash(), unaff_ESI == iVar3 ||
+                  (iVar3 = bStringHash(), unaff_ESI == iVar3)))) {
                 cVar5 = '\x04';
               }
               else {
-                iVar3 = FUN_00567c70();
+                iVar3 = bStringHash();
                 if ((unaff_ESI == iVar3) ||
-                   ((iVar3 = FUN_00567c70(), unaff_ESI == iVar3 ||
-                    (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)))) {
+                   ((iVar3 = bStringHash(), unaff_ESI == iVar3 ||
+                    (iVar3 = bStringHash(), unaff_ESI == iVar3)))) {
                   cVar5 = '\x05';
                 }
                 else {
-                  iVar3 = FUN_00567c70();
+                  iVar3 = bStringHash();
                   if ((unaff_ESI == iVar3) ||
-                     ((iVar3 = FUN_00567c70(), unaff_ESI == iVar3 ||
-                      (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)))) {
+                     ((iVar3 = bStringHash(), unaff_ESI == iVar3 ||
+                      (iVar3 = bStringHash(), unaff_ESI == iVar3)))) {
                     cVar5 = '\x06';
                   }
                   else {
-                    iVar3 = FUN_00567c70();
+                    iVar3 = bStringHash();
                     if ((unaff_ESI == iVar3) ||
-                       ((iVar3 = FUN_00567c70(), unaff_ESI == iVar3 ||
-                        (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)))) {
+                       ((iVar3 = bStringHash(), unaff_ESI == iVar3 ||
+                        (iVar3 = bStringHash(), unaff_ESI == iVar3)))) {
                       cVar5 = '\a';
                     }
                     else {
-                      iVar3 = FUN_00567c70();
+                      iVar3 = bStringHash();
                       if ((unaff_ESI == iVar3) ||
-                         ((iVar3 = FUN_00567c70(), unaff_ESI == iVar3 ||
-                          (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)))) {
+                         ((iVar3 = bStringHash(), unaff_ESI == iVar3 ||
+                          (iVar3 = bStringHash(), unaff_ESI == iVar3)))) {
                         cVar5 = '\b';
                       }
                       else {
-                        iVar3 = FUN_00567c70();
+                        iVar3 = bStringHash();
                         if ((unaff_ESI == iVar3) ||
-                           ((iVar3 = FUN_00567c70(), unaff_ESI == iVar3 ||
-                            (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)))) {
+                           ((iVar3 = bStringHash(), unaff_ESI == iVar3 ||
+                            (iVar3 = bStringHash(), unaff_ESI == iVar3)))) {
                           cVar5 = '\t';
                         }
                         else {
-                          iVar3 = FUN_00567c70();
+                          iVar3 = bStringHash();
                           if (unaff_ESI != iVar3) {
-                            iVar3 = FUN_00567c70();
-                            if (((unaff_ESI == iVar3) ||
-                                (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) ||
-                               (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) {
+                            iVar3 = bStringHash();
+                            if (((unaff_ESI == iVar3) || (iVar3 = bStringHash(), unaff_ESI == iVar3)
+                                ) || (iVar3 = bStringHash(), unaff_ESI == iVar3)) {
                               cVar5 = '\v';
                             }
                             else {
-                              iVar3 = FUN_00567c70();
+                              iVar3 = bStringHash();
                               if (((unaff_ESI == iVar3) ||
-                                  (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) ||
-                                 (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) {
+                                  (iVar3 = bStringHash(), unaff_ESI == iVar3)) ||
+                                 (iVar3 = bStringHash(), unaff_ESI == iVar3)) {
                                 cVar5 = '\f';
                               }
                               else {
-                                iVar3 = FUN_00567c70();
+                                iVar3 = bStringHash();
                                 if (((unaff_ESI == iVar3) ||
-                                    (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) ||
-                                   (iVar3 = FUN_00567c70(), unaff_ESI == iVar3)) {
+                                    (iVar3 = bStringHash(), unaff_ESI == iVar3)) ||
+                                   (iVar3 = bStringHash(), unaff_ESI == iVar3)) {
                                   cVar5 = '\r';
                                 }
                                 else {
-                                  iVar3 = FUN_00567c70();
+                                  iVar3 = bStringHash();
                                   if (((unaff_ESI != iVar3) &&
-                                      (iVar3 = FUN_00567c70(), unaff_ESI != iVar3)) &&
-                                     (iVar3 = FUN_00567c70(), unaff_ESI != iVar3))
-                                  goto LAB_005a3aab;
+                                      (iVar3 = bStringHash(), unaff_ESI != iVar3)) &&
+                                     (iVar3 = bStringHash(), unaff_ESI != iVar3)) goto LAB_005a3aab;
                                   cVar5 = '\x0e';
                                 }
                               }
@@ -2755,7 +2753,7 @@ uint FUN_005a3d50(void)
     }
     else if ((((cVar2 == '\x02') || (cVar2 == '\x03')) || (cVar2 == '\x04')) ||
             (in_EAX = uVar3, cVar2 == '\x05')) {
-      uVar3 = FUN_00567c70();
+      uVar3 = bStringHash();
       in_EAX = uVar3;
     }
   }
@@ -8256,16 +8254,16 @@ undefined4 CompositeSkin(int param_1)
     return 1;
   }
   uVar17 = 0;
-  FUN_00567c70(0);
+  bStringHash(0);
   iVar4 = FUN_0057cc70(uVar17);
   uVar17 = 0;
-  FUN_00567c70(0);
+  bStringHash(0);
   uVar5 = FUN_0057cc70(uVar17);
   uVar17 = 0;
-  FUN_00567c70(0);
+  bStringHash(0);
   uVar6 = FUN_0057cc70(uVar17);
   uVar17 = 0;
-  FUN_00567c70(0);
+  bStringHash(0);
   uVar7 = FUN_0057cc70(uVar17);
   uVar7 = ((iVar4 << 8 | uVar5) << 8 | uVar6) << 8 | uVar7;
   local_384[0] = 0x25;
@@ -8419,11 +8417,11 @@ LAB_005a9fdb:
             else {
               if (((0 < local_3a0) && (local_3a0 < 5)) &&
                  (*(int *)(param_1 + 0x4c4 + local_3a0 * 4) != 0)) {
-                FUN_00567c70();
+                bStringHash();
                 iVar4 = FUN_0057cbf0();
                 if (iVar4 != 0) {
                   uVar17 = 0;
-                  FUN_00567c70(0);
+                  bStringHash(0);
                   iVar4 = FUN_0057cc70(uVar17);
                   piVar15[8] = iVar4;
                   if (iVar4 != 0) {
@@ -8436,16 +8434,16 @@ LAB_005a9fdb:
                       }
                       else {
                         uVar17 = 0;
-                        FUN_00567c70(0);
+                        bStringHash(0);
                         iVar13 = FUN_0057cc70(uVar17);
                         uVar17 = 0;
-                        FUN_00567c70(0);
+                        bStringHash(0);
                         uVar5 = FUN_0057cc70(uVar17);
                         uVar17 = 0;
-                        FUN_00567c70(0);
+                        bStringHash(0);
                         uVar6 = FUN_0057cc70(uVar17);
                         uVar17 = 0;
-                        FUN_00567c70(0);
+                        bStringHash(0);
                         uVar8 = FUN_0057cc70(uVar17);
                         *puVar14 = ((iVar13 << 8 | uVar5) << 8 | uVar6) << 8 | uVar8;
                         piVar15 = local_38c;
@@ -8894,16 +8892,16 @@ undefined4 CompositeWheel(void)
     uVar8 = 0xffffffff;
     if (*(int *)(in_EAX + 0x4f0) != 0) {
       uVar2 = 0;
-      FUN_00567c70(0);
+      bStringHash(0);
       iVar5 = FUN_0057cc70(uVar2);
       uVar2 = 0;
-      FUN_00567c70(0);
+      bStringHash(0);
       uVar6 = FUN_0057cc70(uVar2);
       uVar2 = 0;
-      FUN_00567c70(0);
+      bStringHash(0);
       uVar7 = FUN_0057cc70(uVar2);
       uVar2 = 0;
-      FUN_00567c70(0);
+      bStringHash(0);
       uVar8 = FUN_0057cc70(uVar2);
       uVar8 = ((iVar5 << 8 | uVar6) << 8 | uVar7) << 8 | uVar8;
     }

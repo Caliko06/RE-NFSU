@@ -7244,7 +7244,7 @@ void FUN_006962d0(void)
 void FUN_006962e0(void)
 
 {
-  eh_vector_destructor_iterator(&DAT_0077b1a0,0x28,4,FUN_0043dc20);
+  eh_vector_destructor_iterator(&DAT_0077b1a0,0x28,4,RacerRecord___RacerRecord);
   return;
 }
 
@@ -7254,7 +7254,7 @@ void FUN_006962e0(void)
 void FUN_00696300(void)
 
 {
-  FUN_0043f160();
+  _GLOBAL__D___12DriftManager();
   return;
 }
 
@@ -7274,7 +7274,7 @@ void FUN_00696310(void)
 void FUN_00696320(void)
 
 {
-  FUN_00441fa0();
+  TrackPolygonList__Clear();
   return;
 }
 
@@ -7284,7 +7284,7 @@ void FUN_00696320(void)
 void FUN_00696330(void)
 
 {
-  FUN_00442b20();
+  TrackRouteManager___TrackRouteManager();
   return;
 }
 
@@ -7338,7 +7338,7 @@ void FUN_00696360(void)
 void FUN_00696370(void)
 
 {
-  FUN_00446950();
+  VisibleSectionManager___VisibleSectionManager();
   return;
 }
 
@@ -7430,7 +7430,7 @@ void StaticInit_CarShape_G779bd8_6963f0(void)
 void FUN_00696400(void)
 
 {
-  FUN_0045da90();
+  SmallBufferTriple_dtor();
   return;
 }
 
@@ -8757,7 +8757,7 @@ void StaticInit_WorldZone_G737b20_696cb0(void)
 void FUN_00696cc0(void)
 
 {
-  FUN_0058e4c0();
+  _GLOBAL__D_EventSlotPool();
   return;
 }
 

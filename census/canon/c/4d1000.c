@@ -4636,7 +4636,7 @@ undefined4 FUN_004d6b80(void)
         iVar7 = iVar3;
         iVar3 = iVar7 + 1;
       } while ("$HEADERSMALL$"[iVar7 + 1] != '\0');
-      iVar5 = FUN_00567c70();
+      iVar5 = bStringHash();
       iVar3 = *(int *)(unaff_EDI + 8);
       if ((iVar3 != 0) && (*(int *)(iVar3 + 0x24) != iVar5)) {
         *(int *)(iVar3 + 0x24) = iVar5;
@@ -5298,12 +5298,14 @@ LAB_004d7717:
 }
 
 
-// ==== 0x4d7750 FUN_004d7750
+// ==== 0x4d7750 ColorElement::ColorElement
 
-void __fastcall FUN_004d7750(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall ColorElement__ColorElement(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c3c10;
+  *param_1 = &PTR_ColorElement__scalar_deleting_destructor_006c3c10;
   param_1[3] = 0;
   param_1[4] = 0;
   param_1[9] = 0;
@@ -5320,14 +5322,16 @@ void __fastcall FUN_004d7750(undefined4 *param_1)
 void __fastcall FUN_004d7770(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c3c10;
+  *param_1 = &PTR_ColorElement__scalar_deleting_destructor_006c3c10;
   return;
 }
 
 
-// ==== 0x4d7780 FUN_004d7780
+// ==== 0x4d7780 ColorElement::scalar_deleting_destructor
 
-void * __thiscall FUN_004d7780(void *param_1,byte param_2)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall ColorElement__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   FUN_004d7770();
@@ -8047,11 +8051,11 @@ undefined4 * Screen_PC_ColorPicker__Screen_PC_ColorPicker(undefined4 *param_1,un
   FEScreen__FEScreen(param_1,param_2);
   local_8 = 0;
   *param_1 = &PTR_FUN_006c3c14;
-  eh_vector_constructor_iterator(param_1 + 0x17,0x2c,10,FUN_004d7750,FUN_004d7770);
+  eh_vector_constructor_iterator(param_1 + 0x17,0x2c,10,ColorElement__ColorElement,FUN_004d7770);
   local_8._0_1_ = 1;
-  eh_vector_constructor_iterator(param_1 + 0x85,0x2c,0x14,FUN_004d7750,FUN_004d7770);
+  eh_vector_constructor_iterator(param_1 + 0x85,0x2c,0x14,ColorElement__ColorElement,FUN_004d7770);
   local_8._0_1_ = 2;
-  eh_vector_constructor_iterator(param_1 + 0x161,0x2c,0x1e,FUN_004d7750,FUN_004d7770);
+  eh_vector_constructor_iterator(param_1 + 0x161,0x2c,0x1e,ColorElement__ColorElement,FUN_004d7770);
   puVar1 = param_1 + 0x2cb;
   param_1[0x2bf] = 0;
   *puVar1 = puVar1;
@@ -10774,7 +10778,7 @@ void FUN_004de0e0(void)
   int unaff_EBX;
   undefined4 local_4;
   
-  uVar1 = FUN_00567c70();
+  uVar1 = bStringHash();
   *(undefined4 *)(unaff_EBX + 0x48) = uVar1;
   FUN_004ad7b0(uVar1);
   local_4 = *(undefined4 *)(unaff_EBX + 0x48);

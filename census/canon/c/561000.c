@@ -2854,9 +2854,11 @@ uint __fastcall FUN_00564fa0(int param_1)
 }
 
 
-// ==== 0x565020 FUN_00565020
+// ==== 0x565020 eIdentity
 
-void FUN_00565020(void)
+/* [canon] render high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void eIdentity(void)
 
 {
   undefined4 *in_EAX;
@@ -5545,9 +5547,11 @@ LAB_00567c22:
 }
 
 
-// ==== 0x567c70 FUN_00567c70
+// ==== 0x567c70 bStringHash
 
-int __fastcall FUN_00567c70(undefined4 param_1,byte *param_2)
+/* [canon] runtime high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __fastcall bStringHash(undefined4 param_1,byte *param_2)
 
 {
   byte *pbVar1;
@@ -7639,7 +7643,7 @@ int * CarRenderInfo__CarRenderInfo(int *param_1,int param_2,int param_3)
   local_14._0_1_ = 4;
   eh_vector_constructor_iterator(param_1 + 0x678,0x68,2,FUN_004ad8d0,NullUpdate_ret);
   local_14._0_1_ = 5;
-  eh_vector_constructor_iterator(param_1 + 0x6b0,0xa0,2,FUN_0040be70,NullUpdate_ret);
+  eh_vector_constructor_iterator(param_1 + 0x6b0,0xa0,2,ePoly__ePoly,NullUpdate_ret);
   local_2c = param_1 + 0x700;
   piVar17 = local_2c;
   for (iVar20 = 0x70; iVar20 != 0; iVar20 = iVar20 + -1) {
@@ -10444,7 +10448,7 @@ void FUN_0056d8d0(int *param_1,undefined4 param_2,undefined4 param_3,uint param_
   *(undefined4 *)(iVar6 + 0x34) = in_EAX[1];
   *(undefined4 *)(iVar6 + 0x38) = in_EAX[2];
   *(undefined4 *)(iVar6 + 0x3c) = 0x3f800000;
-  iVar8 = FUN_00545180(0x40400000);
+  iVar8 = eView__CalcSphereScreenSize(0x40400000);
   if (DAT_007364a0 == 3) {
     iVar8 = _ftol_nocw();
   }
@@ -10688,7 +10692,7 @@ void CarRenderInfo__Render
   
   pfStack_984 = (float *)0x40400000;
   pfStack_988 = (float *)0x56dc56;
-  local_970 = FUN_00545180();
+  local_970 = eView__CalcSphereScreenSize();
   if ((DAT_007364a0 == 3) && (DAT_0077a920 != 3)) {
     pfStack_984 = (float *)0x56dc7b;
     local_970 = _ftol_nocw();
@@ -10925,15 +10929,15 @@ LAB_0056e108:
   bMatrixCopy_b();
   pfVar12 = local_950[0];
   pfStack_99c = (float *)0x56e24a;
-  FUN_00424ba0();
+  bMatrix4_SetRotationAndTranslation();
   *(float *)(iVar11 + 0x38) = *(float *)(iVar11 + 0x38) + 0.01;
   pfVar15 = (float *)((fVar28 - 0.0) / fVar28);
   pfStack_99c = pfVar15;
-  FUN_005452f0();
+  Car_ScaleMatrixTowardCamera();
   pfStack_99c = pfVar15;
-  FUN_005452f0();
+  Car_ScaleMatrixTowardCamera();
   pfStack_99c = (float *)0x56e293;
-  FUN_00565020();
+  eIdentity();
   fStack_7e8 = -*param_3;
   pfStack_99c = pfVar12;
   fStack_7e4 = -param_3[1];
@@ -12394,11 +12398,11 @@ void RenderFrame_DrawCars(void)
            ((*(uint *)(iVar1 + 0x534) & 1 << ((byte)*(undefined4 *)(unaff_ESI + 4) & 0x1f)) != 0)) {
           CallNTimes(local_110,0x40,4,FUN_004ad8d0);
           CallNTimes(local_210,0x40,4,FUN_004ad8d0);
-          FUN_0042a120(iVar1);
+          Car__GetRenderingWheelAndBrakeMatrices(iVar1);
           uVar2 = *(undefined4 *)(iVar1 + 0x4d4);
           bMatrixCopy_b();
           if (*(int *)(iVar1 + 0x3cc) < 3) {
-            FUN_00565020();
+            eIdentity();
             local_228 = -local_228;
             D3DXMatrixMultiply(local_290,local_290,local_250);
           }

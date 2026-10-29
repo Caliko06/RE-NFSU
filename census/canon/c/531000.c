@@ -1780,7 +1780,7 @@ int * FUN_00532d40(int param_1,undefined4 param_2)
     }
     else {
       ExceptionList = &local_c;
-      iVar7 = FUN_00567c70();
+      iVar7 = bStringHash();
       if (param_1 == iVar7) {
         if (DAT_00735600 != 0) {
           DAT_00735600 = DAT_00735600 + 1;
@@ -1807,7 +1807,7 @@ int * FUN_00532d40(int param_1,undefined4 param_2)
         (**(code **)(*piVar9 + 0x24))();
       }
       else {
-        iVar7 = FUN_00567c70();
+        iVar7 = bStringHash();
         if (param_1 == iVar7) {
           pvVar6 = _malloc(0x290);
           if (pvVar6 == (void *)0x0) {
@@ -1819,7 +1819,7 @@ int * FUN_00532d40(int param_1,undefined4 param_2)
           (**(code **)(*piVar9 + 0x10))(&DAT_006f4650);
           (**(code **)(*piVar9 + 0x24))();
         }
-        iVar7 = FUN_00567c70();
+        iVar7 = bStringHash();
         if (param_1 == iVar7) {
           pvVar6 = _malloc(0x290);
           local_4 = 2;
@@ -2035,11 +2035,11 @@ void FUN_00533140(void)
   switch(unaff_EDI) {
   case 0x3e9:
   case 0x450:
-    uVar4 = FUN_00567c70(0);
+    uVar4 = bStringHash(0);
     uVar4 = FUN_00532d40(uVar4);
     (&DAT_0072f568)[DAT_00735604] = uVar4;
     DAT_00735604 = DAT_00735604 + 1;
-    uVar4 = FUN_00567c70(0);
+    uVar4 = bStringHash(0);
     uVar4 = FUN_00532d40(uVar4);
     (&DAT_0072f568)[DAT_00735604] = uVar4;
     DAT_00735604 = DAT_00735604 + 1;
@@ -2167,7 +2167,7 @@ void FUN_00533140(void)
     goto switchD_00533206_caseD_3ea;
   case 0x4b1:
     uVar4 = 0;
-    iVar3 = FUN_00567c70(0);
+    iVar3 = bStringHash(0);
   }
   uVar4 = FUN_00532d40(iVar3,uVar4);
   (&DAT_0072f568)[DAT_00735604] = uVar4;
@@ -12859,7 +12859,7 @@ LAB_0053f301:
       *(undefined1 *)(param_3 + 0x8a) = 0;
     }
   }
-  FUN_00448070(auStack_400);
+  ResourceFile__SetPoolInfo(auStack_400);
   ResourceFile__BeginLoading();
 LAB_0053f351:
   if (*(int *)(param_3 + 0x98) == 0) {

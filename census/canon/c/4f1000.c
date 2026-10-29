@@ -1007,9 +1007,11 @@ void FUN_004f25f0(int param_1)
 }
 
 
-// ==== 0x4f27d0 FUN_004f27d0
+// ==== 0x4f27d0 FEQuad::SortCorners
 
-void __fastcall FUN_004f27d0(float *param_1)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall FEQuad__SortCorners(float *param_1)
 
 {
   float fVar1;
@@ -1165,7 +1167,7 @@ void FUN_004f2810(undefined4 param_1,int param_2)
     *(uint *)(param_2 + 0xb0) = uVar6 | 1;
     fVar13 = fVar12;
   }
-  FUN_004f27d0();
+  FEQuad__SortCorners();
   fVar12 = fVar13;
 LAB_004f2ba7:
   iStack_b4 = (int)local_5c - (param_2 + 0x60);
@@ -1442,9 +1444,11 @@ void FUN_004f2eb0(void)
 }
 
 
-// ==== 0x4f2fd0 FUN_004f2fd0
+// ==== 0x4f2fd0 FEObject::SetAlphaClamped
 
-void FUN_004f2fd0(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void FEObject__SetAlphaClamped(void)
 
 {
   undefined4 in_EAX;
@@ -1777,7 +1781,7 @@ void FEng__RenderPackages(int param_1,int param_2)
     puStack_298 = (undefined4 *)0x0;
     puStack_294 = (undefined4 *)0x0;
     local_27c = 0x3f800000;
-    FUN_0040be70();
+    ePoly__ePoly();
     local_d8 = (float)(*(short *)(iVar1 + 0x44) + param_1);
     uStack_78 = 0x80808080;
     uStack_74 = 0x80808080;
@@ -2194,9 +2198,11 @@ void __fastcall FUN_004f3d00(undefined4 *param_1)
 }
 
 
-// ==== 0x4f3d30 FUN_004f3d30
+// ==== 0x4f3d30 FEngLibrary::FEngLibrary
 
-void FUN_004f3d30(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void FEngLibrary__FEngLibrary(void)
 
 {
   undefined4 *puVar1;
@@ -3464,9 +3470,11 @@ LAB_004f4ff7:
 }
 
 
-// ==== 0x4f5000 FUN_004f5000
+// ==== 0x4f5000 FEngFont::CalculateXOffset
 
-float10 FUN_004f5000(undefined4 param_1,byte param_2,float param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 FEngFont__CalculateXOffset(undefined4 param_1,byte param_2,float param_3)
 
 {
   if ((param_2 & 1) != 0) {
@@ -3479,9 +3487,11 @@ float10 FUN_004f5000(undefined4 param_1,byte param_2,float param_3)
 }
 
 
-// ==== 0x4f5030 FUN_004f5030
+// ==== 0x4f5030 FEngFont::CalculateYOffset
 
-float10 FUN_004f5030(undefined4 param_1,byte param_2,float param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 FEngFont__CalculateYOffset(undefined4 param_1,byte param_2,float param_3)
 
 {
   if ((param_2 & 4) != 0) {
@@ -3945,7 +3955,7 @@ void __thiscall FUN_004f5640(int param_1,int param_2)
 
 {
   if (((*(byte *)(param_2 + 0x1c) & 1) == 0) && (*(char *)(param_1 + 6) != '\0')) {
-    FUN_004f2fd0();
+    FEObject__SetAlphaClamped();
   }
   return;
 }
@@ -5622,11 +5632,13 @@ void FUN_004f6d10(float *param_1,float *param_2)
         fVar6 = (float10)FUN_004f4f10(iVar4,*(undefined4 *)(unaff_ESI + 0x60),
                                       *(undefined4 *)(unaff_ESI + 0x6c));
         fVar2 = *(float *)(iVar3 + 0x3c);
-        fVar5 = (float10)FUN_004f5000(iVar4,*(undefined4 *)(unaff_ESI + 0x68),
-                                      (float)(fVar5 * (float10)fVar1));
+        fVar5 = (float10)FEngFont__CalculateXOffset
+                                   (iVar4,*(undefined4 *)(unaff_ESI + 0x68),
+                                    (float)(fVar5 * (float10)fVar1));
         *param_1 = (float)(fVar5 + (float10)*(float *)(iVar3 + 0x1c));
-        fVar5 = (float10)FUN_004f5030(iVar4,*(undefined4 *)(unaff_ESI + 0x68),
-                                      (float)(fVar6 * (float10)fVar2));
+        fVar5 = (float10)FEngFont__CalculateYOffset
+                                   (iVar4,*(undefined4 *)(unaff_ESI + 0x68),
+                                    (float)(fVar6 * (float10)fVar2));
         *param_2 = (float)(fVar5 + (float10)*(float *)(iVar3 + 0x20));
         return;
       }
@@ -5693,9 +5705,9 @@ LAB_004f6eb3:
   fVar1 = (float)(fVar7 * (float10)*(float *)(iVar3 + 0x38));
   fVar7 = (float10)FUN_004f4f10(iVar5,puVar6,*(undefined4 *)(param_1 + 0x6c));
   fVar2 = (float)(fVar7 * (float10)*(float *)(iVar3 + 0x3c));
-  fVar7 = (float10)FUN_004f5000(iVar5,*(undefined4 *)(param_1 + 0x68),fVar1);
+  fVar7 = (float10)FEngFont__CalculateXOffset(iVar5,*(undefined4 *)(param_1 + 0x68),fVar1);
   *param_2 = (float)(((float10)*(float *)(iVar3 + 0x1c) - fVar7) + (float10)fVar1);
-  fVar7 = (float10)FUN_004f5030(iVar5,*(undefined4 *)(param_1 + 0x68),fVar2);
+  fVar7 = (float10)FEngFont__CalculateYOffset(iVar5,*(undefined4 *)(param_1 + 0x68),fVar2);
   *param_3 = (float)(((float10)*(float *)(iVar3 + 0x20) - fVar7) + (float10)fVar2);
   return;
 }
@@ -5731,7 +5743,7 @@ void FUN_004f6f60(float param_1,float param_2)
       local_14 = param_2;
     }
     if (iVar2 < 0x100) {
-      cVar3 = FUN_004fea10();
+      cVar3 = FEVector3__operator__();
       if (cVar3 == '\0') {
         *(uint *)(unaff_ESI + 0x1c) = *(uint *)(unaff_ESI + 0x1c) | 0x400000;
       }
@@ -5785,10 +5797,10 @@ void FUN_004f7000(float param_1,float param_2)
         fVar5 = (float10)FUN_004f4f10(iVar3,*(undefined4 *)(unaff_ESI + 0x60),
                                       *(undefined4 *)(unaff_ESI + 0x6c));
         fVar1 = (float10)local_8;
-        fVar6 = (float10)FUN_004f5000(iVar3,*(undefined4 *)(unaff_ESI + 0x68),(float)(fVar4 * fVar6)
-                                     );
+        fVar6 = (float10)FEngFont__CalculateXOffset
+                                   (iVar3,*(undefined4 *)(unaff_ESI + 0x68),(float)(fVar4 * fVar6));
         local_18 = (float)((float10)param_1 - fVar6);
-        fVar6 = (float10)FUN_004f5030(iVar3,extraout_ECX,(float)(fVar5 * fVar1));
+        fVar6 = (float10)FEngFont__CalculateYOffset(iVar3,extraout_ECX,(float)(fVar5 * fVar1));
         local_14 = (float)((float10)param_2 - fVar6);
       }
       break;
@@ -5797,7 +5809,7 @@ void FUN_004f7000(float param_1,float param_2)
       local_14 = param_2;
     }
     if (*(int *)(unaff_ESI + 0x18) < 0x100) {
-      cVar2 = FUN_004fea10();
+      cVar2 = FEVector3__operator__();
       if (cVar2 == '\0') {
         *(uint *)(unaff_ESI + 0x1c) = *(uint *)(unaff_ESI + 0x1c) | 0x400000;
       }
@@ -5845,14 +5857,14 @@ void FUN_004f7140(float param_1,float param_2)
         fVar6 = (float10)FUN_004f4f10(iVar5,*(undefined4 *)(unaff_ESI + 0x60),
                                       *(undefined4 *)(unaff_ESI + 0x6c));
         fVar2 = (float)(fVar6 * (float10)*(float *)(iVar3 + 0x3c));
-        fVar6 = (float10)FUN_004f5000(iVar5,*(undefined4 *)(unaff_ESI + 0x68),fVar1);
+        fVar6 = (float10)FEngFont__CalculateXOffset(iVar5,*(undefined4 *)(unaff_ESI + 0x68),fVar1);
         local_c = (float)((float10)param_1 - ((float10)fVar1 * (float10)_K_HALF + fVar6));
-        fVar6 = (float10)FUN_004f5030(iVar5,extraout_ECX,fVar2);
+        fVar6 = (float10)FEngFont__CalculateYOffset(iVar5,extraout_ECX,fVar2);
         local_8 = (float)((float10)param_2 - ((float10)fVar2 * (float10)_K_HALF + fVar6));
       }
     }
     if (*(int *)(unaff_ESI + 0x18) < 0x100) {
-      cVar4 = FUN_004fea10();
+      cVar4 = FEVector3__operator__();
       if (cVar4 == '\0') {
         *(uint *)(unaff_ESI + 0x1c) = *(uint *)(unaff_ESI + 0x1c) | 0x400000;
       }
@@ -5892,10 +5904,10 @@ void FUN_004f7260(float *param_1,float *param_2)
         fVar5 = (float10)FUN_004f4f10(iVar4,*(undefined4 *)(unaff_ESI + 0x60),
                                       *(undefined4 *)(unaff_ESI + 0x6c));
         fVar2 = (float)(fVar5 * (float10)*(float *)(iVar3 + 0x3c));
-        fVar5 = (float10)FUN_004f5000(iVar4,*(undefined4 *)(unaff_ESI + 0x68),fVar1);
+        fVar5 = (float10)FEngFont__CalculateXOffset(iVar4,*(undefined4 *)(unaff_ESI + 0x68),fVar1);
         *param_1 = (float)((float10)fVar1 * (float10)_K_HALF + fVar5 +
                           (float10)*(float *)(iVar3 + 0x1c));
-        fVar5 = (float10)FUN_004f5030(iVar4,*(undefined4 *)(unaff_ESI + 0x68),fVar2);
+        fVar5 = (float10)FEngFont__CalculateYOffset(iVar4,*(undefined4 *)(unaff_ESI + 0x68),fVar2);
         *param_2 = (float)((float10)fVar2 * (float10)_K_HALF + fVar5 +
                           (float10)*(float *)(iVar3 + 0x20));
         return;
@@ -7515,7 +7527,7 @@ LAB_004f8cad:
         local_8 = puVar7[2];
         local_4 = puVar7[3];
       }
-      uVar8 = FUN_00503f60();
+      uVar8 = FEColor__operator_unsigned_long();
       iVar9 = _ftol_nocw();
       FUN_004f75b0(iVar9 << 0x18 | uVar8 & 0xffffff);
       piVar10 = (int *)*piVar10;
@@ -8125,7 +8137,7 @@ LAB_004f9641:
     FUN_004ef050(0x12dfbc68);
   }
 LAB_004f96d5:
-  uVar5 = FUN_00503f60();
+  uVar5 = FEColor__operator_unsigned_long();
   param_1[0x12] = uVar5;
   ExceptionList = local_c;
   return param_1;
@@ -8226,7 +8238,7 @@ void __thiscall FUN_004f9700(int param_1,uint param_2)
         FEObject__SetVisible(iVar1);
       }
 LAB_004f985f:
-      uVar2 = FUN_00567c70();
+      uVar2 = bStringHash();
       FUN_004ad7b0(uVar2);
       return;
     }
@@ -8241,7 +8253,7 @@ LAB_004f985f:
         }
       }
       FEObject__SetVisible(iVar1);
-      uVar2 = FUN_00567c70();
+      uVar2 = bStringHash();
       FUN_004ad7b0(uVar2);
       return;
     }
@@ -8380,7 +8392,7 @@ void FUN_004f9b70(void)
   default:
     goto switchD_004f9bc0_default;
   }
-  uVar2 = FUN_00567c70();
+  uVar2 = bStringHash();
   FUN_004ad7b0(uVar2);
 switchD_004f9bc0_default:
   return;
@@ -13362,9 +13374,11 @@ void FEEventList__SetCount(int param_1,uint param_2)
 }
 
 
-// ==== 0x4fea10 FUN_004fea10
+// ==== 0x4fea10 FEVector3::operator__
 
-ushort __fastcall FUN_004fea10(float *param_1,float *param_2)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+ushort __fastcall FEVector3__operator__(float *param_1,float *param_2)
 
 {
   float fVar1;
@@ -15360,7 +15374,7 @@ void FUN_00500870(void)
   undefined4 uVar1;
   int unaff_ESI;
   
-  uVar1 = FUN_00503f60();
+  uVar1 = FEColor__operator_unsigned_long();
   *(undefined4 *)
    ((*(int *)(unaff_ESI + 0x88) * *(int *)(unaff_ESI + 0x5c) + *(int *)(unaff_ESI + 0x84)) * 0x30 +
    *(int *)(unaff_ESI + 0x8c)) = uVar1;

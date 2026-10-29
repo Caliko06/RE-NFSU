@@ -1084,7 +1084,7 @@ void FUN_00422130(void)
   local_8 = 0;
   if (0 < DAT_007361c4) {
     do {
-      FUN_00431100();
+      Player__CleanupAfterRace();
       local_8 = local_8 + 1;
     } while (local_8 < DAT_007361c4);
   }
@@ -1129,7 +1129,7 @@ void FUN_00422130(void)
       iVar2 = DAT_007361c4;
     }
   }
-  FUN_00444590();
+  TrackStreamer__RemoveAllSpecialSections();
   return;
 }
 
@@ -1659,7 +1659,7 @@ void FUN_00422c40(void)
   if (*(int *)(unaff_ESI + 0x30) == 0) {
     pvVar1 = _malloc(0x34);
     if (pvVar1 != (void *)0x0) {
-      uVar2 = FUN_0047e270(*(undefined4 *)(DAT_007361bc + 4));
+      uVar2 = DemoCameraCoordinator__DemoCameraCoordinator(*(undefined4 *)(DAT_007361bc + 4));
       *(undefined4 *)(unaff_ESI + 0x30) = uVar2;
       return;
     }
@@ -1776,7 +1776,7 @@ undefined4 __thiscall FUN_00422eb0(int param_1,undefined4 param_2)
   
   switch(param_2) {
   case 1:
-    FUN_00444ab0();
+    TrackStreamer__ClearStreamingPositions();
     if (*(int *)(param_1 + 0x14) == 8) {
       if (*(undefined4 **)(param_1 + 0x3c) != (undefined4 *)0x0) {
         (**(code **)**(undefined4 **)(param_1 + 0x3c))(1);
@@ -1786,7 +1786,7 @@ undefined4 __thiscall FUN_00422eb0(int param_1,undefined4 param_2)
       local_1c = *(undefined4 *)(iVar1 + 100);
       local_20 = *(undefined4 *)(iVar1 + 0x60);
       local_18 = *(undefined4 *)(iVar1 + 0x68);
-      FUN_0047cac0(&DAT_00779800,&local_24);
+      NisSceneManager__FindNisSceneOriginPosition(&DAT_00779800,&local_24);
       FUN_00427e60(0,0);
       StreamSections__SeedViewer();
       FUN_0047bed0(DAT_0078a2f0);
@@ -1853,7 +1853,7 @@ undefined4 __thiscall FUN_00423070(undefined4 *param_1,undefined4 param_2,undefi
       ExceptionList = &local_c;
       pvVar5 = _malloc(0x28);
       if (pvVar5 != (void *)0x0) {
-        uVar6 = FUN_0047e9d0();
+        uVar6 = FlyByCameraCoordinator__FlyByCameraCoordinator();
         param_1[0xd] = uVar6;
         ExceptionList = local_c;
         return 1;
@@ -2833,7 +2833,8 @@ undefined4 __thiscall CameraMover_CreateByType(int param_1,int param_2,undefined
     if (cVar2 != '\0') {
       pvVar3 = _malloc(0x34);
       if (pvVar3 != (void *)0x0) {
-        uVar4 = FUN_0047e270(*(undefined4 *)(DAT_007361f8 + 0x28 + *(int *)(param_1 + 0xac) * 4));
+        uVar4 = DemoCameraCoordinator__DemoCameraCoordinator
+                          (*(undefined4 *)(DAT_007361f8 + 0x28 + *(int *)(param_1 + 0xac) * 4));
         *(undefined4 *)(param_1 + 0x30) = uVar4;
         ExceptionList = local_10;
         return 1;
@@ -2904,7 +2905,7 @@ undefined4 __thiscall CameraMover_CreateByType(int param_1,int param_2,undefined
     *(undefined4 *)(param_1 + 0x3c) = 0;
   }
   if (DAT_0077981c == 0) {
-    FUN_00444590();
+    TrackStreamer__RemoveAllSpecialSections();
   }
   else {
     DAT_00779818 = DAT_0077981c;
@@ -3235,9 +3236,11 @@ void __fastcall Vec3_Sub(float *param_1,float *param_2)
 }
 
 
-// ==== 0x424ba0 FUN_00424ba0
+// ==== 0x424ba0 bMatrix4_SetRotationAndTranslation
 
-void __fastcall FUN_00424ba0(undefined4 *param_1,undefined4 *param_2)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall bMatrix4_SetRotationAndTranslation(undefined4 *param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -3663,9 +3666,11 @@ bool __fastcall FUN_00424ea0(int *param_1)
 }
 
 
-// ==== 0x424eb0 FUN_00424eb0
+// ==== 0x424eb0 Car::GetMatrixRows01
 
-void __fastcall FUN_00424eb0(undefined4 *param_1,undefined4 *param_2)
+/* [canon] car low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall Car__GetMatrixRows01(undefined4 *param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -3734,7 +3739,7 @@ void __fastcall FUN_00424f30(undefined4 param_1,int param_2)
     FUN_004422b0();
     return;
   }
-  FUN_00442330();
+  TrackRoutePoint__GetForwardPosition();
   return;
 }
 
@@ -4233,7 +4238,8 @@ int FUN_00425350(int param_1,int param_2,undefined4 *param_3,undefined2 param_4,
     *(undefined4 *)(param_1 + 0x494) = uVar5;
   }
   *(undefined4 *)(param_1 + 0x808) = 0;
-  if ((0.0 <= param_5) && (iVar4 = FUN_004437e0(&local_30,param_5), iVar4 != 0)) {
+  if ((0.0 <= param_5) &&
+     (iVar4 = TrackPathManager__FindClosestPoint(&local_30,param_5), iVar4 != 0)) {
     TrackPath__UpdateCursor(&DAT_007372b0,iVar4);
   }
   TrackPath__UpdateCursor(&DAT_007372b0,&local_30);
@@ -4485,7 +4491,7 @@ void FUN_00425990(int param_1)
     FUN_0051d950(param_1);
     *(undefined4 *)(param_1 + 0x878) = 0;
   }
-  FUN_0058dfa0();
+  emRemoveHandler();
   iVar3 = *(int *)(param_1 + 0x7e0);
   if (0 < iVar3) {
     piVar2 = (int *)(param_1 + 0x560);
@@ -5018,7 +5024,7 @@ void FUN_004267a0(float param_1)
       ) && (*DAT_0073619c == 4)) {
     iVar3 = FUN_00435b30(DAT_0073619c);
     if (iVar3 == 0) {
-      FUN_00437fa0(*(undefined4 *)(unaff_ESI + 0x830),param_1);
+      RemoteCarState__ClearStaleInput(*(undefined4 *)(unaff_ESI + 0x830),param_1);
     }
   }
   iVar3 = DAT_006f0fb8;
@@ -5185,7 +5191,7 @@ LAB_00426c65:
          (fVar14 = (float10)LinearTable__Lookup11(&PTR_DAT_007062e4,fVar3),
          fVar14 < (float10)local_34)) && (cVar6 = JumpCamBuildSpline(), cVar6 != '\0')) &&
        (cVar6 = Player__StartSpecialCamera(6,0,1,1), cVar6 == '\0')) {
-      FUN_0042c640();
+      Player__CleanUpJumpCam();
     }
   }
   if (((*(int *)(iVar8 + 0x60) == 6) && (*(float *)(in_EAX + 0x78) < 0.0)) &&
@@ -5240,7 +5246,7 @@ LAB_00426c65:
   }
   *(undefined4 *)(iVar8 + 0xa0) = DAT_0073ad3c;
   *(int *)(iVar8 + 0x8c) = DAT_0073ad34;
-  SlowMoStart(0x3ecccccd,0x41000000,FUN_0042da30,iVar8);
+  SlowMoStart(0x3ecccccd,0x41000000,SlowMoEndCallback_EndSpecialCamera,iVar8);
   iVar10 = GameMode__BlocksSpecialCameras();
   if (iVar10 == 0) {
     Player__ChangeCameraMover(iVar8,0x10,1);
@@ -5315,7 +5321,7 @@ LAB_004270d9:
       FUN_00572970(0x3f800000,"CarSlidingSideways");
     }
     iVar8 = FUN_00468820(0);
-    if (((iVar8 != 0) && (cVar6 = FUN_004664b0(), cVar6 != '\0')) &&
+    if (((iVar8 != 0) && (cVar6 = Collision__IsPlayerInvolved(), cVar6 != '\0')) &&
        (local_30 = (float)(DAT_0073ad34 - *(int *)(iVar8 + 0xc)),
        (float)(int)local_30 * 0.00025 < 0.5)) {
       iVar8 = *(int *)(iVar8 + 100);
@@ -6039,7 +6045,7 @@ LAB_00428354:
         }
         else if (*(int *)(*(int *)(unaff_EDI + 0x14) + 4) == 1) {
 LAB_00428427:
-          uVar11 = FUN_00567c70();
+          uVar11 = bStringHash();
           iVar10 = FUN_00577d10(uVar11);
           if (iVar10 == 0) {
 LAB_00428440:
@@ -7041,7 +7047,7 @@ float10 JumpCamPredict(float param_1,float *param_2,float *param_3,char param_4)
   iVar7 = *(int *)(in_EAX + 0x20);
   local_cc = ((*(float *)(iVar7 + 0x268) + *(float *)(iVar7 + 0x264)) * 0.3 * local_88) /
              *(float *)(iVar7 + 0x110) + _DAT_007000ac;
-  FUN_00424ba0();
+  bMatrix4_SetRotationAndTranslation();
   local_b0 = 0.0;
   local_ac = 0.0;
   local_a8 = 0.0;
@@ -7133,9 +7139,11 @@ float10 JumpCamPredict(float param_1,float *param_2,float *param_3,char param_4)
 }
 
 
-// ==== 0x42a0c0 FUN_0042a0c0
+// ==== 0x42a0c0 Car_StampCurveFactor
 
-float10 FUN_0042a0c0(void)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+float10 Car_StampCurveFactor(void)
 
 {
   int iVar1;
@@ -7155,9 +7163,11 @@ float10 FUN_0042a0c0(void)
 }
 
 
-// ==== 0x42a120 FUN_0042a120
+// ==== 0x42a120 Car::GetRenderingWheelAndBrakeMatrices
 
-void __fastcall FUN_0042a120(byte param_1,undefined4 *param_2,int param_3)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall Car__GetRenderingWheelAndBrakeMatrices(byte param_1,undefined4 *param_2,int param_3)
 
 {
   undefined4 uVar1;
@@ -7777,9 +7787,11 @@ int __fastcall FUN_0042ab20(int param_1)
 }
 
 
-// ==== 0x42ab30 FUN_0042ab30
+// ==== 0x42ab30 Player::IsDriftHudActive
 
-undefined4 FUN_0042ab30(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+undefined4 Player__IsDriftHudActive(void)
 
 {
   int in_EAX;
@@ -7807,9 +7819,11 @@ undefined4 IsCar1099InMode4(void)
 }
 
 
-// ==== 0x42ab80 FUN_0042ab80
+// ==== 0x42ab80 CarState::GetNitrousStoredSeconds
 
-float10 __fastcall FUN_0042ab80(int param_1)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+float10 __fastcall CarState__GetNitrousStoredSeconds(int param_1)
 
 {
   if ((*(int *)(param_1 + 0x3b8) != 0) && (*(int *)(param_1 + 0x3b8) != 0x7fffffff)) {
@@ -7819,9 +7833,11 @@ float10 __fastcall FUN_0042ab80(int param_1)
 }
 
 
-// ==== 0x42abb0 FUN_0042abb0
+// ==== 0x42abb0 Thunk_to_SpecialCamCaller_431960
 
-void FUN_0042abb0(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void Thunk_to_SpecialCamCaller_431960(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   SpecialCamCaller_431960(param_1,param_3);
@@ -7853,9 +7869,11 @@ void FUN_0042abf0(void)
 }
 
 
-// ==== 0x42ac10 FUN_0042ac10
+// ==== 0x42ac10 GameMode::IsMode7Or11
 
-undefined4 FUN_0042ac10(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+undefined4 GameMode__IsMode7Or11(void)
 
 {
   int *in_EAX;
@@ -7867,9 +7885,11 @@ undefined4 FUN_0042ac10(void)
 }
 
 
-// ==== 0x42ac30 FUN_0042ac30
+// ==== 0x42ac30 GameMode::IsMode7Or11InSubState2Or3
 
-undefined4 __fastcall FUN_0042ac30(int *param_1)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall GameMode__IsMode7Or11InSubState2Or3(int *param_1)
 
 {
   if (((*param_1 == 7) || (*param_1 == 0xb)) && ((param_1[8] == 2 || (param_1[8] == 3)))) {
@@ -8290,7 +8310,7 @@ undefined4 * FUN_0042b0d0(undefined4 *param_1,int param_2,int param_3)
   param_1[0x255] = 0;
   FUN_004367e0(param_1 + 600);
   local_14._0_1_ = 2;
-  FUN_0043dc40();
+  DriftManager__DriftManager();
   param_1[0x299] = 0;
   param_1[0x291] = param_1 + 600;
   param_1[0x290] = param_1;
@@ -8812,7 +8832,7 @@ void FUN_0042bb60(int param_1)
   }
   _free(*(void **)(param_1 + 0x108));
   local_8._0_1_ = 2;
-  FUN_0043dd10();
+  DriftManager___DriftManager();
   local_8 = CONCAT31(local_8._1_3_,1);
   Player__FreeMember960();
   _free(*(void **)(param_1 + 0x8ec));
@@ -8984,9 +9004,11 @@ void FUN_0042c1f0(void)
 }
 
 
-// ==== 0x42c340 FUN_0042c340
+// ==== 0x42c340 Player::SetRearViewMirrorCameraMover
 
-void FUN_0042c340(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void Player__SetRearViewMirrorCameraMover(int param_1)
 
 {
   undefined4 *puVar1;
@@ -9020,9 +9042,11 @@ void FUN_0042c340(int param_1)
 }
 
 
-// ==== 0x42c3e0 FUN_0042c3e0
+// ==== 0x42c3e0 Player::BeginCountdownCameras
 
-void FUN_0042c3e0(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void Player__BeginCountdownCameras(void)
 
 {
   void *pvVar1;
@@ -9053,9 +9077,11 @@ void FUN_0042c3e0(void)
 }
 
 
-// ==== 0x42c450 FUN_0042c450
+// ==== 0x42c450 Player::RestoreCameraMover
 
-void FUN_0042c450(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void Player__RestoreCameraMover(void)
 
 {
   int *piVar1;
@@ -9142,9 +9168,11 @@ LAB_0042c524:
 }
 
 
-// ==== 0x42c640 FUN_0042c640
+// ==== 0x42c640 Player::CleanUpJumpCam
 
-void FUN_0042c640(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void Player__CleanUpJumpCam(void)
 
 {
   int unaff_ESI;
@@ -9388,7 +9416,7 @@ LAB_0042d2c5:
     uVar14 = uVar6;
     fVar13 = (float10)FUN_005a7450(uVar6);
     FUN_005a7270(&fStack_5c4,uVar9,(float)fVar13,uVar14);
-    FUN_004440c0(&fStack_5c4);
+    TrackPathCoordinate__TrackPathCoordinate(&fStack_5c4);
     *(undefined4 *)(*(int *)(param_1 + 0x55c) + 0xc) =
          *(undefined4 *)(*(int *)(param_1 + 4) + 0x810);
     *(undefined4 *)(*(int *)(param_1 + 0x55c) + 0x28) =
@@ -9864,22 +9892,22 @@ void Player__SetInputMode(undefined4 param_1)
   case 3:
   case 4:
     if (*DAT_007361f0 == 4) {
-      InputEvents__AddSource(0xab,FUN_0042abb0);
-      InputEvents__AddSource(0x75,FUN_0042abb0);
-      InputEvents__AddSource(0xaa,FUN_0042abb0);
+      InputEvents__AddSource(0xab,Thunk_to_SpecialCamCaller_431960);
+      InputEvents__AddSource(0x75,Thunk_to_SpecialCamCaller_431960);
+      InputEvents__AddSource(0xaa,Thunk_to_SpecialCamCaller_431960);
     }
-    InputEvents__AddSource(0x76,FUN_0042abb0);
-    InputEvents__AddSource(0x9a,FUN_0042abb0);
-    InputEvents__AddSource(0x99,FUN_0042abb0);
-    InputEvents__AddSource(0x9b,FUN_0042abb0);
-    InputEvents__AddSource(0x9c,FUN_0042abb0);
-    InputEvents__AddSource(0x77,FUN_0042abb0);
-    InputEvents__AddSource(0x78,FUN_0042abb0);
-    InputEvents__AddSource(0x79,FUN_0042abb0);
-    InputEvents__AddSource(0x7a,FUN_0042abb0);
+    InputEvents__AddSource(0x76,Thunk_to_SpecialCamCaller_431960);
+    InputEvents__AddSource(0x9a,Thunk_to_SpecialCamCaller_431960);
+    InputEvents__AddSource(0x99,Thunk_to_SpecialCamCaller_431960);
+    InputEvents__AddSource(0x9b,Thunk_to_SpecialCamCaller_431960);
+    InputEvents__AddSource(0x9c,Thunk_to_SpecialCamCaller_431960);
+    InputEvents__AddSource(0x77,Thunk_to_SpecialCamCaller_431960);
+    InputEvents__AddSource(0x78,Thunk_to_SpecialCamCaller_431960);
+    InputEvents__AddSource(0x79,Thunk_to_SpecialCamCaller_431960);
+    InputEvents__AddSource(0x7a,Thunk_to_SpecialCamCaller_431960);
     if (*(int *)(in_EAX + 0x278) == 4) {
-      InputEvents__AddSource(0xa0,FUN_0042abb0);
-      InputEvents__AddSource(0xa1,FUN_0042abb0);
+      InputEvents__AddSource(0xa0,Thunk_to_SpecialCamCaller_431960);
+      InputEvents__AddSource(0xa1,Thunk_to_SpecialCamCaller_431960);
       InputEvents__AddSource(0xa2,0,0);
       FUN_0042e230(in_EAX);
       Player__ChangeCameraMover(in_EAX,0x12,0);
@@ -9899,7 +9927,7 @@ void Player__SetInputMode(undefined4 param_1)
     }
     break;
   case 5:
-    InputEvents__AddSource(0xab,FUN_0042abb0);
+    InputEvents__AddSource(0xab,Thunk_to_SpecialCamCaller_431960);
     break;
   case 7:
     InputEvents__AddSource(0xac,FUN_0042d9a0);
@@ -9952,9 +9980,11 @@ void FUN_0042d9d0(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x42da30 FUN_0042da30
+// ==== 0x42da30 SlowMoEndCallback_EndSpecialCamera
 
-void FUN_0042da30(void)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void SlowMoEndCallback_EndSpecialCamera(void)
 
 {
   Player__EndSpecialCamera(1);
@@ -10053,35 +10083,35 @@ Player__StartSpecialCamera(int param_1,int param_2,char param_3,undefined4 param
     Player__ChangeCameraMover(param_1,0xe,1);
     cVar1 = FUN_00492c00();
     if (cVar1 != '\0') {
-      FUN_0042c450();
+      Player__RestoreCameraMover();
       return 0;
     }
     fVar3 = (float10)FUN_00492560();
 LAB_0042dc52:
     iVar2 = DAT_007361f8;
     *(float *)(DAT_007361f8 + 0x2d4) = (float)(fVar3 - (float10)DAT_0073457c);
-    *(code **)(iVar2 + 0x2e8) = FUN_0042da30;
+    *(code **)(iVar2 + 0x2e8) = SlowMoEndCallback_EndSpecialCamera;
     *(int *)(iVar2 + 0x2ec) = param_1;
     break;
   case 2:
-    SlowMoStart(0x3eaa7efa,0x41000000,FUN_0042da30,param_1);
+    SlowMoStart(0x3eaa7efa,0x41000000,SlowMoEndCallback_EndSpecialCamera,param_1);
     break;
   case 3:
-    SlowMoStart(0x3eaa7efa,0x40000000,FUN_0042da30,param_1);
+    SlowMoStart(0x3eaa7efa,0x40000000,SlowMoEndCallback_EndSpecialCamera,param_1);
     break;
   case 4:
-    SlowMoStart(0x40000000,0x40800000,FUN_0042da30,param_1);
+    SlowMoStart(0x40000000,0x40800000,SlowMoEndCallback_EndSpecialCamera,param_1);
     break;
   case 5:
-    SlowMoStart(0x3ecccccd,0x41000000,FUN_0042da30,param_1);
+    SlowMoStart(0x3ecccccd,0x41000000,SlowMoEndCallback_EndSpecialCamera,param_1);
     iVar2 = GameMode__BlocksSpecialCameras();
     if (iVar2 == 0) {
       Player__ChangeCameraMover(param_1,0xf,1);
     }
-    FUN_0042c640();
+    Player__CleanUpJumpCam();
     break;
   case 6:
-    SlowMoStart(0x3ecccccd,0x41000000,FUN_0042da30,param_1);
+    SlowMoStart(0x3ecccccd,0x41000000,SlowMoEndCallback_EndSpecialCamera,param_1);
     iVar2 = GameMode__BlocksSpecialCameras();
     if (iVar2 == 0) {
       Player__ChangeCameraMover(param_1,0x10,1);
@@ -10123,7 +10153,7 @@ void __thiscall Player__EndSpecialCamera(int param_1,char param_2)
     case 7:
       iVar1 = *DAT_007361f0;
       if (((iVar1 != 5) && (iVar1 != 6)) && (iVar1 != 10)) {
-        FUN_0042c450();
+        Player__RestoreCameraMover();
       }
       if (((param_2 != '\0') && (*(char *)(*(int *)(param_1 + 4) + 0x874) == '\0')) &&
          ((iVar1 = *(int *)(*(int *)(param_1 + 4) + 0x868), iVar1 != 0 &&
@@ -10633,10 +10663,10 @@ LAB_0042eb7b:
   if ((iVar1 == 3) && (DAT_007361c4 == 1)) {
     uVar7 = 0x2040000;
     uVar6 = 0;
-    iVar3 = FUN_0042ac10();
+    iVar3 = GameMode__IsMode7Or11();
     if (iVar3 == 0) {
       if ((*(byte *)(param_1 + 0x30) & 0x40) != 0) {
-        uVar6 = FUN_0042ebb0();
+        uVar6 = Player__GetGaugeMode();
         uVar7 = uVar6 | 0x2040000;
         uVar6 = (int)uVar6 >> 0x1f | 0x40000;
       }
@@ -10657,9 +10687,9 @@ LAB_0042eb7b:
     uVar7 = 0x40005;
     goto LAB_0042eb7b;
   }
-  iVar4 = FUN_0042ac10();
+  iVar4 = GameMode__IsMode7Or11();
   if (iVar4 != 0) {
-    cVar2 = FUN_0042ac30();
+    cVar2 = GameMode__IsMode7Or11InSubState2Or3();
     if (cVar2 != '\0') {
       uVar7 = 0x2040000;
     }
@@ -10708,7 +10738,7 @@ LAB_0042eb7b:
     }
     if (((((uVar8 & 0x200) != 0) && (DAT_0078a368 == 0)) &&
         (iVar3 = SpecialCamCooldown(), iVar3 == 0)) &&
-       (((cVar2 = FUN_00432a10(), cVar2 == '\0' && (DAT_0078a3f9 != '\0')) &&
+       (((cVar2 = Player__IsPlainType1(), cVar2 == '\0' && (DAT_0078a3f9 != '\0')) &&
         (cVar2 = FUN_00421a50(), cVar2 == '\0')))) {
       uVar6 = uVar6 | 0x800000;
     }
@@ -10720,25 +10750,26 @@ LAB_0042eb7b:
       uVar7 = uVar7 & 0xfffffdff;
     }
     if (((DAT_0078a328 + DAT_0078a32c + DAT_0078a324 + DAT_0078a320 == 1) ||
-        (cVar2 = FUN_00432a10(), cVar2 != '\0')) && (cVar2 = IsDriftMode(), cVar2 == '\0')) {
+        (cVar2 = Player__IsPlainType1(), cVar2 != '\0')) && (cVar2 = IsDriftMode(), cVar2 == '\0'))
+    {
       uVar7 = uVar7 & 0xfffffdff;
     }
     if ((uVar8 & 0x400) != 0) {
       uVar7 = uVar7 | 0x20000;
     }
-    cVar2 = FUN_00432a10();
+    cVar2 = Player__IsPlainType1();
     if ((((cVar2 != '\0') || ((DAT_0078a368 != 0 && (DAT_007361c4 == 2)))) ||
         (*(int *)(param_1 + 0x50) == 0)) ||
        ((cVar2 = IsDriftMode(), cVar2 == '\0' && (DAT_007361c4 == 2)))) {
       uVar7 = uVar7 & 0xfffdffff;
     }
-    uVar5 = FUN_0042ebb0();
+    uVar5 = Player__GetGaugeMode();
     if ((uVar8 & 0x40) == 0) {
       uVar7 = uVar7 & ~uVar5;
       uVar6 = 0;
       cVar2 = FUN_00421a50();
       if ((cVar2 == '\0') && (cVar2 = IsDriftMode(), cVar2 == '\0')) {
-        FUN_0042ab30();
+        Player__IsDriftHudActive();
       }
     }
     else {
@@ -10748,7 +10779,7 @@ LAB_0042eb7b:
       if (cVar2 == '\0') {
         cVar2 = IsDriftMode();
         if (cVar2 == '\0') {
-          cVar2 = FUN_0042ab30();
+          cVar2 = Player__IsDriftHudActive();
           if (cVar2 != '\0') {
             uVar7 = uVar7 | 0x10000;
           }
@@ -10761,7 +10792,7 @@ LAB_0042eb7b:
         uVar7 = uVar7 | 0x20000000;
       }
     }
-    cVar2 = FUN_0042ab30();
+    cVar2 = Player__IsDriftHudActive();
     if (cVar2 != '\0') {
       uVar7 = uVar7 & 0xffffefff;
     }
@@ -10787,7 +10818,7 @@ LAB_0042eb7b:
     if ((DAT_0078a350 != 0) && (DAT_0078a368 == 0)) {
       uVar7 = 0x4040000;
     }
-    uVar8 = FUN_0042ebb0();
+    uVar8 = Player__GetGaugeMode();
     uVar6 = (int)uVar8 >> 0x1f;
     uVar7 = uVar7 | uVar8;
   }
@@ -10818,9 +10849,11 @@ LAB_0042eb7d:
 }
 
 
-// ==== 0x42ebb0 FUN_0042ebb0
+// ==== 0x42ebb0 Player::GetGaugeMode
 
-undefined4 __fastcall FUN_0042ebb0(undefined4 param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __fastcall Player__GetGaugeMode(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -10842,9 +10875,11 @@ undefined4 __fastcall FUN_0042ebb0(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x42ec10 FUN_0042ec10
+// ==== 0x42ec10 Player::SetHudFeaturesTrackMap
 
-void __thiscall FUN_0042ec10(int param_1,uint param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall Player__SetHudFeaturesTrackMap(int param_1,uint param_2)
 
 {
   void *pvVar1;
@@ -10903,7 +10938,7 @@ void Player__SetHudFlags(undefined4 param_1,undefined4 param_2)
   }
   *(uint *)(unaff_ESI + 0x4b0) = *(uint *)(unaff_ESI + 0x4b0) & 0xffffff9f;
   *(undefined4 *)(unaff_ESI + 0x4b4) = *(undefined4 *)(unaff_ESI + 0x4b4);
-  FUN_0042ec10(param_1,param_2);
+  Player__SetHudFeaturesTrackMap(param_1,param_2);
   *(undefined4 *)(unaff_ESI + 0x4b4) = param_2;
   *(undefined4 *)(unaff_ESI + 0x4b0) = param_1;
   return;
@@ -10945,9 +10980,11 @@ void FUN_0042eda0(undefined4 param_1,float param_2)
 }
 
 
-// ==== 0x42ee40 FUN_0042ee40
+// ==== 0x42ee40 Player::IsAimLocked
 
-undefined4 __fastcall FUN_0042ee40(int param_1)
+/* [canon] camera med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __fastcall Player__IsAimLocked(int param_1)
 
 {
   float fVar1;
@@ -10977,11 +11014,12 @@ undefined4 __fastcall FUN_0042ee40(int param_1)
 }
 
 
-// ==== 0x42eee0 FUN_0042eee0
+// ==== 0x42eee0 Player::FindAimTarget
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/canon.md */
 
-int FUN_0042eee0(void)
+int Player__FindAimTarget(void)
 
 {
   int iVar1;
@@ -11115,7 +11153,7 @@ void FUN_0042f0c0(undefined4 param_1)
   uVar5 = (uint3)uStack_104;
   Car__MakeFlatMatrix();
   Matrix_InvertRigid();
-  cVar6 = FUN_0042ee40();
+  cVar6 = Player__IsAimLocked();
   if (cVar6 == '\0') {
     sVar9 = *(short *)(unaff_EBX + 0x1c6);
     uVar7 = _ftol_nocw();
@@ -11153,7 +11191,7 @@ void FUN_0042f0c0(undefined4 param_1)
   }
   *(float *)(unaff_EBX + 0x238) = fVar3;
   uStack_104 = (float)(uint)(uint3)uStack_104;
-  cVar6 = FUN_0042ee40();
+  cVar6 = Player__IsAimLocked();
   if ((cVar6 == '\0') || ((&DAT_0073b3ba)[*(int *)(unaff_EBX + 8) * 0x18c] == '\0')) {
     *(undefined2 *)(unaff_EBX + 0x1c8) = 0x32dc;
   }
@@ -11221,7 +11259,7 @@ void FUN_0042f0c0(undefined4 param_1)
   puStack_e8 = puVar14;
   iStack_e4 = iVar11;
   thunk_FUN_005ac436(&puStack_e8,&puStack_e8,auStack_a8);
-  uVar10 = FUN_0042eee0(unaff_EBX);
+  uVar10 = Player__FindAimTarget(unaff_EBX);
   *(undefined4 *)(unaff_EBX + 0x1dc) = uVar10;
   *(undefined4 *)(unaff_EBX + 0x1d8) = *(undefined4 *)(unaff_EBX + 0x1d0);
   *(undefined4 *)(unaff_EBX + 0x1d4) = *(undefined4 *)(unaff_EBX + 0x1cc);
@@ -11250,9 +11288,11 @@ void __thiscall FUN_0042f5f0(int param_1,float param_2)
 }
 
 
-// ==== 0x42f650 FUN_0042f650
+// ==== 0x42f650 Player::UpdateDriftRace
 
-void FUN_0042f650(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/rivals.md */
+
+void Player__UpdateDriftRace(void)
 
 {
   short sVar1;
@@ -11909,9 +11949,11 @@ void FUN_004300f0(void)
 }
 
 
-// ==== 0x430650 FUN_00430650
+// ==== 0x430650 Player::GetTimeUntilOnFire
 
-float10 __fastcall FUN_00430650(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 __fastcall Player__GetTimeUntilOnFire(int param_1)
 
 {
   float10 fVar1;
@@ -12039,7 +12081,7 @@ void Player__StartRaceCameras(void)
           iVar3 = DAT_007361f8;
           _gSpecialCameraActive = 1;
           fVar1 = 3.0 - DAT_0073457c;
-          *(code **)(DAT_007361f8 + 0x2e8) = FUN_0042da30;
+          *(code **)(DAT_007361f8 + 0x2e8) = SlowMoEndCallback_EndSpecialCamera;
           *(int *)(iVar3 + 0x2ec) = in_EAX;
           *(float *)(iVar3 + 0x2d4) = fVar1;
           *(undefined1 *)(in_EAX + 0x270) = 1;
@@ -12069,7 +12111,7 @@ LAB_00430a7a:
     Player__UpdateDragRace();
   }
   if ((DAT_0078a345 != '\0') || (DAT_007361a4 != 0)) {
-    FUN_0042f650();
+    Player__UpdateDriftRace();
   }
   FUN_0043f240(DAT_0073457c);
   if ((DAT_0078a345 != '\0') || (DAT_007361a4 != 0)) {
@@ -12135,7 +12177,7 @@ void Player__UpdateFrame(void)
      (*(int *)(*(int *)(in_EAX + 0x2a8) + 0x44) == 0)) {
     if (*DAT_0073619c == 3) {
       if (DAT_0078a368 == 0) {
-        FUN_0042c3e0();
+        Player__BeginCountdownCameras();
         piVar2 = DAT_007361f0;
       }
       else {

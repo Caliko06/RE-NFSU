@@ -546,7 +546,7 @@ LAB_00511f21:
       iVar2 = 0;
       goto LAB_00511f93;
     }
-    uVar3 = FUN_00567c70();
+    uVar3 = bStringHash();
   }
   iVar2 = CarPartDatabase__GetCarPart(uVar3,puVar4[1],local_8,0,0xffffffff);
 LAB_00511f93:
@@ -2514,7 +2514,7 @@ LAB_00514589:
     piVar5 = (int *)0x0;
   }
   else {
-    FUN_0040be70();
+    ePoly__ePoly();
   }
   piVar5[0x2c] = 0;
   puVar4 = *(undefined4 **)(in_EAX + 0x1c);
@@ -2745,7 +2745,7 @@ void FUN_005146d0(int param_1,undefined4 param_2,undefined4 param_3,undefined4 p
           piVar11 = (int *)0x0;
         }
         else {
-          FUN_0040be70();
+          ePoly__ePoly();
         }
         piVar11[0x2c] = 0;
         puVar6 = *(undefined4 **)(param_1 + 0x1c);
@@ -6524,7 +6524,7 @@ undefined4 FUN_0051acb0(void)
         pcVar4 = pcVar4 + 1;
       } while (*pbVar1 != 0);
       if (unaff_ESI != iVar3) {
-        iVar3 = FUN_00567c70();
+        iVar3 = bStringHash();
         if (unaff_ESI != iVar3) {
           return 0;
         }
@@ -7697,14 +7697,14 @@ bool FUN_0051beb0(void)
         uVar2 = (uint)*pbVar1;
         pcVar4 = pcVar4 + 1;
       } while (*pbVar1 != 0);
-      if ((((((unaff_ESI != iVar3) && (iVar3 = FUN_00567c70(), unaff_ESI != iVar3)) &&
-            (iVar3 = FUN_00567c70(), unaff_ESI != iVar3)) &&
-           ((iVar3 = FUN_00567c70(), unaff_ESI != iVar3 &&
-            (iVar3 = FUN_00567c70(), unaff_ESI != iVar3)))) &&
-          ((iVar3 = FUN_00567c70(), unaff_ESI != iVar3 &&
-           ((iVar3 = FUN_00567c70(), unaff_ESI != iVar3 &&
-            (iVar3 = FUN_00567c70(), unaff_ESI != iVar3)))))) &&
-         (iVar3 = FUN_00567c70(), unaff_ESI != iVar3)) {
+      if ((((((unaff_ESI != iVar3) && (iVar3 = bStringHash(), unaff_ESI != iVar3)) &&
+            (iVar3 = bStringHash(), unaff_ESI != iVar3)) &&
+           ((iVar3 = bStringHash(), unaff_ESI != iVar3 &&
+            (iVar3 = bStringHash(), unaff_ESI != iVar3)))) &&
+          ((iVar3 = bStringHash(), unaff_ESI != iVar3 &&
+           ((iVar3 = bStringHash(), unaff_ESI != iVar3 &&
+            (iVar3 = bStringHash(), unaff_ESI != iVar3)))))) &&
+         (iVar3 = bStringHash(), unaff_ESI != iVar3)) {
         iVar3 = GarageRimsBrandBrowser___GarageRimsBrandBrowser();
         if (iVar3 != -1) {
           return ((&DAT_00760158)[iVar3 * 4] & 3) != 0;

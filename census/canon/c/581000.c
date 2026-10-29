@@ -2683,11 +2683,12 @@ float10 FUN_005851a0(void)
 }
 
 
-// ==== 0x585200 FUN_00585200
+// ==== 0x585200 RigidBody::GetTestImpulseEnergy
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-float10 __fastcall FUN_00585200(float *param_1)
+float10 __fastcall RigidBody__GetTestImpulseEnergy(float *param_1)
 
 {
   float *in_EAX;
@@ -5662,7 +5663,7 @@ void FUN_00589810(void)
   int unaff_EDI;
   
   if (((&DAT_00731120)[*(int *)(unaff_EDI + 0x38)] != 0) &&
-     (FUN_0040be70(), *(int *)(unaff_EDI + 0xf0) != 1 && -1 < *(int *)(unaff_EDI + 0xf0) + -1)) {
+     (ePoly__ePoly(), *(int *)(unaff_EDI + 0xf0) != 1 && -1 < *(int *)(unaff_EDI + 0xf0) + -1)) {
     iVar1 = 0;
     do {
       FUN_00589350();
@@ -6257,7 +6258,7 @@ void FUN_0058a240(void)
   piVar5 = (int *)NullUpdate_ret();
   while (piVar3 = piVar1, piVar3 != piVar5) {
     piVar1 = (int *)*piVar3;
-    iVar6 = FUN_00545210();
+    iVar6 = eView__CalcBoxScreenSize();
     if ((10 < iVar6) && (iVar6 = AABB_ClassifyAgainstFrustum(in_EAX), iVar6 != 0)) {
       if (300 < DAT_006f089c - piVar3[5]) {
         piVar2 = (int *)piVar3[1];
@@ -7542,7 +7543,7 @@ void ResourceFile_OpenAndStart(int param_1)
   if (iVar3 != 0) {
     *(undefined1 *)(unaff_EDI + 0x5b) = 1;
   }
-  FUN_00448070(iVar1);
+  ResourceFile__SetPoolInfo(iVar1);
   *(undefined1 *)(unaff_EDI + 0x5a) = 1;
   *(undefined4 *)(param_1 + 0x14) = 1;
   ResourceFile__BeginLoading();
@@ -10530,9 +10531,11 @@ undefined4 FUN_0058df00(int param_1)
 }
 
 
-// ==== 0x58dfa0 FUN_0058dfa0
+// ==== 0x58dfa0 emRemoveHandler
 
-void FUN_0058dfa0(void)
+/* [canon] runtime high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void emRemoveHandler(void)
 
 {
   int iVar1;
@@ -10832,9 +10835,11 @@ undefined4 * WorldZone_Query(byte param_1)
 }
 
 
-// ==== 0x58e4c0 FUN_0058e4c0
+// ==== 0x58e4c0 _GLOBAL__D_EventSlotPool
 
-void FUN_0058e4c0(void)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+void _GLOBAL__D_EventSlotPool(void)
 
 {
   int *piVar1;
@@ -10931,28 +10936,28 @@ void TrackMap__TrackMap(int param_1,int param_2,int param_3)
       unaff_EBX[2] = 0;
       unaff_EBX[3] = 0;
       FUN_00565da0("TRACK%d_MAP",(int)*(short *)(unaff_EBX[0x29] + 0x6c));
-      uVar2 = FUN_00567c70(0,0);
+      uVar2 = bStringHash(0,0);
       iVar3 = Texture_FindByHash(uVar2);
       unaff_EBX[0x1e] = iVar3;
       if (iVar3 == 0) {
         unaff_EBX[0x2f] = 0;
       }
-      uVar2 = FUN_00567c70(1,0);
+      uVar2 = bStringHash(1,0);
       uVar2 = Texture_FindByHash(uVar2);
       unaff_EBX[0x1f] = uVar2;
-      uVar2 = FUN_00567c70(1,0);
+      uVar2 = bStringHash(1,0);
       uVar2 = Texture_FindByHash(uVar2);
       unaff_EBX[0x20] = uVar2;
-      uVar2 = FUN_00567c70(1,0);
+      uVar2 = bStringHash(1,0);
       uVar2 = Texture_FindByHash(uVar2);
       unaff_EBX[0x21] = uVar2;
-      uVar2 = FUN_00567c70(1,0);
+      uVar2 = bStringHash(1,0);
       uVar2 = Texture_FindByHash(uVar2);
       unaff_EBX[0x22] = uVar2;
-      uVar2 = FUN_00567c70(1,0);
+      uVar2 = bStringHash(1,0);
       uVar2 = Texture_FindByHash(uVar2);
       unaff_EBX[0x25] = uVar2;
-      uVar2 = FUN_00567c70(1,0);
+      uVar2 = bStringHash(1,0);
       uVar2 = Texture_FindByHash(uVar2);
       unaff_EBX[0x26] = uVar2;
       if (((unaff_EBX[0x1f] == 0) || (unaff_EBX[0x20] == 0)) ||
@@ -10962,7 +10967,7 @@ void TrackMap__TrackMap(int param_1,int param_2,int param_3)
       if ((DAT_0078a318 == 0) && (unaff_EBX[0x25] == 0)) {
         unaff_EBX[0x2f] = 0;
       }
-      uVar2 = FUN_00565020();
+      uVar2 = eIdentity();
       FUN_0040baf0(uVar2,uVar2);
       if (unaff_EBX[0x2f] == 0) {
         return;
@@ -11343,7 +11348,7 @@ void TrackMap__DrawMapQuad(int param_1,undefined4 param_2,float *param_3,undefin
       }
       FUN_00414a60();
     }
-    FUN_0040be70();
+    ePoly__ePoly();
     local_118 = 0;
     local_114 = 0.0;
     TrackMap__WorldToMap();
@@ -11524,7 +11529,7 @@ void TrackMap__DrawIcon(int param_1,undefined4 param_2,undefined4 param_3,float 
     TrackMap__WorldToMap();
     cVar3 = PointInPolygon2D(param_6,4);
     if (cVar3 != '\0') {
-      FUN_0040be70();
+      ePoly__ePoly();
       local_170 = 0x3f800000;
       local_16c = 0;
       local_168 = 0;
@@ -11608,7 +11613,7 @@ void TrackMap__DrawBackdrop(void)
   
   iVar1 = *(int *)(in_EAX + 0xc4) * 0x3c;
   if ((&DAT_00737889)[iVar1] != '\0') {
-    FUN_0040be70();
+    ePoly__ePoly();
     if ((&DAT_00737888)[iVar1] != '\0') {
       FUN_0040bef0();
     }
@@ -12193,7 +12198,7 @@ void Poly2D__ClipToRect(undefined4 param_1,int param_2,undefined4 param_3,int pa
     local_1b4 = (int)&local_130 + (1 - param_2);
     local_1e8 = (int)&local_130 + (2 - param_2);
     do {
-      FUN_0040be70();
+      ePoly__ePoly();
       local_12c[3] = local_1b0[local_228 * 2];
       local_12c[4] = local_1b0[local_228 * 2 + 1];
       local_118[0] = (float)param_4;

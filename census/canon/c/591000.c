@@ -707,7 +707,7 @@ void FUN_00591e40(int param_1,int param_2)
   }
   bMatrixCopy_b();
 LAB_00591ef7:
-  iVar2 = FUN_00545180(0x420c0000);
+  iVar2 = eView__CalcSphereScreenSize(0x420c0000);
   if ((1 < iVar2) && (iVar2 = FUN_00591b40(param_2,local_50), iVar2 != 0)) {
     if (iVar5 != 0) {
       iVar2 = *(int *)(iVar4 + 0xc);
@@ -793,7 +793,7 @@ void RenderWorldModels(int param_1)
     }
     if ((puVar1[4] != 0) && ((bVar4 || (puVar1[5] != 0)))) {
       if (puVar1[6] != 0) {
-        FUN_00424ba0();
+        bMatrix4_SetRotationAndTranslation();
         Matrix_InvertRigid();
         Solid_GetBounds();
         D3DXVec3Transform(local_80,*(int *)(param_1 + 0x40) + 0x40,local_50);
@@ -2285,7 +2285,7 @@ void FUN_00593740(void)
 void FUN_00593780(void)
 
 {
-  FUN_00445660();
+  SceneryInstance__SetTransform();
   return;
 }
 
@@ -4303,7 +4303,7 @@ undefined4 Smackable__Loader(int *param_1)
     DAT_00734474 = uVar4;
     for (; uVar4 != 0; uVar4 = uVar4 - 1) {
       bMatrixCopy_b();
-      FUN_0040bd40();
+      eOrthonormalizeMatrix();
       bMatrixCopy_b();
     }
     return 1;
@@ -4826,7 +4826,7 @@ uint Smackables__IsExcluded(void)
   uVar3 = *(uint *)(unaff_EDI + 8);
   uVar4 = 0;
   if (uVar3 != uVar6) {
-    uVar4 = FUN_00567c70();
+    uVar4 = bStringHash();
     if (uVar3 != uVar4) goto LAB_00595beb;
   }
   fVar2 = ABS(*(float *)(unaff_EDI + 0x60) - 660.0);
@@ -5411,7 +5411,7 @@ int * VirginSmokeable__Wake(void)
                                  (auStack_2d0,auStack_2f0,0,auStack_340,&cStack_345);
       fStack_344 = (float)fVar4;
       if (cStack_345 != '\0') {
-        FUN_00424eb0();
+        Car__GetMatrixRows01();
         fVar1 = (fStack_344 -
                 ((fStack_328 + *(float *)(piVar2[0x56] + 0xb8)) * fStack_338 + fStack_2e8)) + 0.05;
         if (0.0 < fVar1) {
@@ -6106,7 +6106,7 @@ void __thiscall Smokeable__Update(int *param_1,float param_2)
           FUN_00597390();
         }
         FUN_0046aa40(param_1 + 0x50,local_74);
-        FUN_0040bd40();
+        eOrthonormalizeMatrix();
         iVar2 = iVar2 + -1;
       } while (iVar2 != 0);
     }
@@ -7416,7 +7416,7 @@ undefined4 TrafficCar_Place(int param_1,undefined4 param_2,int param_3,float par
   local_1c = ExceptionList;
   local_28 = 0;
   ExceptionList = &local_1c;
-  cVar1 = FUN_00456fe0();
+  cVar1 = IsForwardsTrafficLane();
   local_2c = (uint)(cVar1 == '\0');
   local_30 = FUN_0044d3e0();
   local_34 = (undefined4 *)0x0;
@@ -7452,7 +7452,7 @@ undefined4 TrafficCar_Place(int param_1,undefined4 param_2,int param_3,float par
     local_78 = 0;
   }
   else {
-    fVar6 = (float10)FUN_00442570();
+    fVar6 = (float10)TrackRoutePoint__GetDistanceAroundTrack();
     local_78 = FUN_00425350(iVar4,param_1,local_60,CONCAT22(extraout_var,local_38),(float)fVar6);
   }
   local_14 = 0xffffffff;
@@ -7532,7 +7532,7 @@ int PickLane(undefined4 param_1,char param_2)
     local_1c = (**(code **)(*piVar4 + 0x1c))(0);
     cVar1 = FUN_00457000();
     if (cVar1 != '\0') {
-      cVar1 = FUN_00456fe0();
+      cVar1 = IsForwardsTrafficLane();
       if (cVar1 == '\0') {
         local_1c = local_1c + -0x11;
       }
@@ -7704,7 +7704,7 @@ int FindNodeAtRoute(undefined4 param_1,undefined4 param_2,undefined4 param_3,und
         cVar2 = FUN_00599c40(iVar4,iVar3,param_5);
         if (cVar2 != '\0') {
           uVar7 = param_2;
-          fVar6 = (float10)FUN_00442570(param_2);
+          fVar6 = (float10)TrackRoutePoint__GetDistanceAroundTrack(param_2);
           fVar6 = (float10)TrackPath__WrapDistance((float)fVar6,uVar7);
           fVar1 = (float)fVar6;
           if ((0.0 < fVar1) && (fVar1 < local_8)) {
@@ -7796,7 +7796,7 @@ undefined4 Teleporter_MoveToSpawnRecord(undefined4 param_1)
     iVar7 = SpawnRecord_Find(local_14,local_24,fVar12,(float)fVar10,(uint)bVar1,local_15,iVar6);
     if (iVar7 != 0) {
       uVar8 = SpawnRecord_GetNode(local_15);
-      fVar10 = (float10)FUN_00442570(fVar12);
+      fVar10 = (float10)TrackRoutePoint__GetDistanceAroundTrack(fVar12);
       TrackPath__WrapDistance((float)fVar10,fVar12);
       iVar9 = PickLane(uVar8,CONCAT31((int3)(-local_6c >> 8),'\x01' - bVar1));
       if (iVar9 != -1) {
@@ -7991,7 +7991,7 @@ undefined2 Teleporter_MoveFreeRun(undefined4 param_1,undefined4 param_2,undefine
     while ((local_10 == 1 && (local_14 != local_8))) {
       fVar6 = (float10)FUN_0041f5f0();
       fVar7 = (float)fVar6;
-      fVar6 = (float10)FUN_00442570(fVar7);
+      fVar6 = (float10)TrackRoutePoint__GetDistanceAroundTrack(fVar7);
       fVar6 = (float10)TrackPath__WrapDistance((float)fVar6,fVar7);
       fVar7 = (float)fVar6;
       if (_TeleportRouteLimit < fVar7) {
@@ -8051,7 +8051,7 @@ void TrafficCar_Move(undefined4 param_1,undefined4 param_2,undefined4 param_3,in
   int local_30;
   undefined4 local_2c;
   
-  cVar1 = FUN_00456fe0();
+  cVar1 = IsForwardsTrafficLane();
   uVar3 = FUN_0044d3e0();
   uVar2 = TrafficDriverMode_Map();
   iVar4 = FUN_0041f5d0();
@@ -8160,7 +8160,7 @@ undefined1 Spot_IsClear(undefined4 param_1,undefined4 param_2,undefined4 param_3
     fVar5 = (float10)FUN_00432d00();
     fVar5 = (float10)FUN_00432d20((float)fVar5);
     fVar6 = (float)fVar5;
-    fVar5 = (float10)FUN_00442570(fVar6);
+    fVar5 = (float10)TrackRoutePoint__GetDistanceAroundTrack(fVar6);
     fVar5 = (float10)TrackPath__WrapDistance((float)fVar5,fVar6);
     fVar5 = (float10)FUN_00405600((float)fVar5);
     if (fVar5 < (float10)fVar1) {
@@ -8168,11 +8168,11 @@ undefined1 Spot_IsClear(undefined4 param_1,undefined4 param_2,undefined4 param_3
     }
   }
   if (!bVar2) {
-    fVar5 = (float10)FUN_00442570();
+    fVar5 = (float10)TrackRoutePoint__GetDistanceAroundTrack();
     local_7 = Spot_NearPlayerRoute((float)fVar5);
     if (local_7 == '\0') {
       uVar4 = (uint)param_4;
-      fVar5 = (float10)FUN_00442570(param_2,param_3,uVar4);
+      fVar5 = (float10)TrackRoutePoint__GetDistanceAroundTrack(param_2,param_3,uVar4);
       local_6 = Spot_NearOtherCar((float)fVar5,param_2,param_3,uVar4);
     }
   }
@@ -12301,7 +12301,7 @@ LAB_0059f7eb:
       if (((&DAT_007301d4)[DAT_006ee4a4] != 0) && (DAT_006ee4a4 != 0)) {
         FUN_00565810();
       }
-      FUN_00448070(puVar3[2]);
+      ResourceFile__SetPoolInfo(puVar3[2]);
       ResourceFile__BeginLoading();
       if (param_4 != '\0') {
         while (DAT_007360e8 != 0) {

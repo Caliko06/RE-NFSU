@@ -1070,7 +1070,7 @@ int ComputeVinylIconHash(undefined4 param_1)
   default:
     goto switchD_004e24cc_default;
   }
-  iVar3 = FUN_00567c70();
+  iVar3 = bStringHash();
 switchD_004e24cc_default:
   if ((unaff_ESI != 0) && (*(byte *)(unaff_ESI + 0x12) < 0x13)) {
     iVar3 = *(int *)(&DAT_00746918 + (uint)*(byte *)(unaff_ESI + 0x12) * 4);
@@ -1102,7 +1102,7 @@ byte FUN_004e2520(int param_1)
     return 0;
   }
   puVar9 = &DAT_006c3454;
-  iVar3 = FUN_00567c70();
+  iVar3 = bStringHash();
   uVar4 = 0x5f;
   do {
     iVar3 = iVar3 * 0x21 + uVar4;
@@ -1111,7 +1111,7 @@ byte FUN_004e2520(int param_1)
     puVar9 = puVar9 + 1;
   } while (*pbVar1 != 0);
   puVar9 = &DAT_006c344c;
-  iVar5 = FUN_00567c70();
+  iVar5 = bStringHash();
   uVar4 = 0x5f;
   do {
     pbVar1 = puVar9 + 1;
@@ -1120,7 +1120,7 @@ byte FUN_004e2520(int param_1)
     uVar4 = (uint)*pbVar1;
   } while (*pbVar1 != 0);
   puVar9 = &DAT_006c3444;
-  iVar6 = FUN_00567c70();
+  iVar6 = bStringHash();
   uVar4 = 0x5f;
   do {
     iVar6 = iVar6 * 0x21 + uVar4;
@@ -1129,7 +1129,7 @@ byte FUN_004e2520(int param_1)
     puVar9 = puVar9 + 1;
   } while (*pbVar1 != 0);
   puVar9 = &DAT_006c343c;
-  iVar7 = FUN_00567c70();
+  iVar7 = bStringHash();
   uVar4 = 0x5f;
   do {
     pbVar1 = puVar9 + 1;
@@ -1138,7 +1138,7 @@ byte FUN_004e2520(int param_1)
     uVar4 = (uint)*pbVar1;
   } while (*pbVar1 != 0);
   puVar9 = &DAT_006c3434;
-  iVar8 = FUN_00567c70();
+  iVar8 = bStringHash();
   uVar4 = 0x5f;
   do {
     pbVar1 = puVar9 + 1;
@@ -1208,33 +1208,33 @@ undefined4 IsHiddenUnique(int param_1)
         pcVar5 = pcVar5 + 1;
       } while (*pbVar1 != 0);
       if (iVar2 != iVar4) {
-        iVar4 = FUN_00567c70();
+        iVar4 = bStringHash();
         if (iVar2 != iVar4) {
-          iVar4 = FUN_00567c70();
+          iVar4 = bStringHash();
           if (iVar2 != iVar4) {
-            iVar4 = FUN_00567c70();
+            iVar4 = bStringHash();
             if (iVar2 != iVar4) {
-              iVar4 = FUN_00567c70();
+              iVar4 = bStringHash();
               if (iVar2 != iVar4) {
-                iVar4 = FUN_00567c70();
+                iVar4 = bStringHash();
                 if (iVar2 != iVar4) {
-                  iVar4 = FUN_00567c70();
+                  iVar4 = bStringHash();
                   if (iVar2 != iVar4) {
-                    iVar4 = FUN_00567c70();
+                    iVar4 = bStringHash();
                     if (iVar2 != iVar4) {
-                      iVar4 = FUN_00567c70();
+                      iVar4 = bStringHash();
                       if (iVar2 != iVar4) {
-                        iVar4 = FUN_00567c70();
+                        iVar4 = bStringHash();
                         if (iVar2 != iVar4) {
-                          iVar4 = FUN_00567c70();
+                          iVar4 = bStringHash();
                           if (iVar2 != iVar4) {
-                            iVar4 = FUN_00567c70();
+                            iVar4 = bStringHash();
                             if (iVar2 != iVar4) {
-                              iVar4 = FUN_00567c70();
+                              iVar4 = bStringHash();
                               if (iVar2 != iVar4) {
-                                iVar4 = FUN_00567c70();
+                                iVar4 = bStringHash();
                                 if (iVar2 != iVar4) {
-                                  iVar4 = FUN_00567c70();
+                                  iVar4 = bStringHash();
                                   if (iVar2 != iVar4) {
                                     return 0;
                                   }
@@ -1301,12 +1301,11 @@ undefined4 IsSamanthaUnique(int param_1)
         uVar3 = (uint)*pbVar1;
         pcVar5 = pcVar5 + 1;
       } while (*pbVar1 != 0);
-      if (((((iVar2 != iVar4) && (iVar4 = FUN_00567c70(), iVar2 != iVar4)) &&
-           (iVar4 = FUN_00567c70(), iVar2 != iVar4)) &&
-          ((iVar4 = FUN_00567c70(), iVar2 != iVar4 && (iVar4 = FUN_00567c70(), iVar2 != iVar4)))) &&
-         ((iVar4 = FUN_00567c70(), iVar2 != iVar4 &&
-          ((iVar4 = FUN_00567c70(), iVar2 != iVar4 && (iVar4 = FUN_00567c70(), iVar2 != iVar4))))))
-      {
+      if (((((iVar2 != iVar4) && (iVar4 = bStringHash(), iVar2 != iVar4)) &&
+           (iVar4 = bStringHash(), iVar2 != iVar4)) &&
+          ((iVar4 = bStringHash(), iVar2 != iVar4 && (iVar4 = bStringHash(), iVar2 != iVar4)))) &&
+         ((iVar4 = bStringHash(), iVar2 != iVar4 &&
+          ((iVar4 = bStringHash(), iVar2 != iVar4 && (iVar4 = bStringHash(), iVar2 != iVar4)))))) {
         return 0;
       }
     }
@@ -1690,7 +1689,7 @@ void FUN_004e3060(void)
     local_8 = *(undefined4 *)(*(int *)(iVar2 + 0x2c) + 0x20);
     local_4 = *(undefined4 *)(*(int *)(iVar2 + 0x2c) + 0x24);
     if (*(int *)(iVar2 + 0x18) < 0x100) {
-      cVar1 = FUN_004fea10();
+      cVar1 = FEVector3__operator__();
       if (cVar1 == '\0') {
         *(uint *)(iVar2 + 0x1c) = *(uint *)(iVar2 + 0x1c) | 0x400000;
       }
@@ -1744,7 +1743,7 @@ void FUN_004e31c0(void)
     pcVar1 = pcVar4 + 1;
     pcVar4 = pcVar4 + 1;
   } while (*pcVar1 != '\0');
-  iVar3 = FUN_00567c70();
+  iVar3 = bStringHash();
   if ((DAT_007454d4 != 0) && (*(byte *)(DAT_007454d4 + 0x12) < 0x13)) {
     iVar3 = *(int *)(&DAT_00746918 + (uint)*(byte *)(DAT_007454d4 + 0x12) * 4);
   }
@@ -1758,7 +1757,7 @@ void FUN_004e31c0(void)
     pcVar1 = pcVar4 + 1;
     pcVar4 = pcVar4 + 1;
   } while (*pcVar1 != '\0');
-  iVar3 = FUN_00567c70();
+  iVar3 = bStringHash();
   if ((DAT_007454d0 != 0) && (*(byte *)(DAT_007454d0 + 0x12) < 0x13)) {
     iVar3 = *(int *)(&DAT_00746918 + (uint)*(byte *)(DAT_007454d0 + 0x12) * 4);
   }
@@ -1772,7 +1771,7 @@ void FUN_004e31c0(void)
     pcVar1 = pcVar4 + 1;
     pcVar4 = pcVar4 + 1;
   } while (*pcVar1 != '\0');
-  iVar3 = FUN_00567c70();
+  iVar3 = bStringHash();
   if ((DAT_007454cc != 0) && (*(byte *)(DAT_007454cc + 0x12) < 0x13)) {
     iVar3 = *(int *)(&DAT_00746918 + (uint)*(byte *)(DAT_007454cc + 0x12) * 4);
   }
@@ -1786,7 +1785,7 @@ void FUN_004e31c0(void)
     pcVar1 = pcVar4 + 1;
     pcVar4 = pcVar4 + 1;
   } while (*pcVar1 != '\0');
-  iVar3 = FUN_00567c70();
+  iVar3 = bStringHash();
   if ((DAT_007454c8 != 0) && (*(byte *)(DAT_007454c8 + 0x12) < 0x13)) {
     iVar3 = *(int *)(&DAT_00746918 + (uint)*(byte *)(DAT_007454c8 + 0x12) * 4);
   }
@@ -1942,7 +1941,7 @@ void __thiscall FUN_004e3320(int param_1,uint param_2)
         }
         else {
           uVar5 = 0;
-          FUN_00567c70(0);
+          bStringHash(0);
           iVar3 = FUN_0057cc70(uVar5);
           if (0 < iVar3) {
             if ((DAT_006f1dd8 != 0) && (*(int **)(DAT_007356a8 + 0xbc) != (int *)0x0)) {
@@ -2251,7 +2250,7 @@ joined_r0x004e3b70:
           default:
             goto switchD_004e3b8e_default;
           }
-          uVar5 = FUN_00567c70();
+          uVar5 = bStringHash();
           uVar5 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar5);
           uVar6 = (undefined3)((uint)uVar5 >> 8);
           if (((char)uVar5 != '\0') &&
@@ -2356,7 +2355,7 @@ LAB_004e3e69:
       goto LAB_004e3e69;
     }
   }
-  uVar2 = FUN_00567c70();
+  uVar2 = bStringHash();
   cVar1 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,0,uVar2);
   if (cVar1 != '\0') {
     if ((char)param_3 != '\0') {
@@ -2471,7 +2470,7 @@ LAB_004e402e:
         default:
           goto switchD_004e3fca_default;
         }
-        uVar6 = FUN_00567c70();
+        uVar6 = bStringHash();
         uVar6 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar6);
         uVar7 = (undefined3)((uint)uVar6 >> 8);
         if ((char)uVar6 != '\0') {
@@ -2604,7 +2603,7 @@ undefined4 * GarageVinylTypeScreen__GarageVinylTypeScreen(undefined4 *param_1,ui
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar8 = 2;
       uVar7 = 0xd3f477de;
-      FUN_00567c70(0xd3f477de,2,"MU_GarageVinylBrowser.fng",param_2,0);
+      bStringHash(0xd3f477de,2,"MU_GarageVinylBrowser.fng",param_2,0);
       FUN_004e2250(uVar7,uVar8,pcVar6,param_2,uVar9);
     }
     cVar3 = FUN_004e3b10(0);
@@ -2614,7 +2613,7 @@ undefined4 * GarageVinylTypeScreen__GarageVinylTypeScreen(undefined4 *param_1,ui
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar8 = 3;
       uVar7 = 0xfd7d6bf;
-      FUN_00567c70(0xfd7d6bf,3,"MU_GarageVinylBrowser.fng",param_2,0);
+      bStringHash(0xfd7d6bf,3,"MU_GarageVinylBrowser.fng",param_2,0);
       FUN_004e2250(uVar7,uVar8,pcVar6,param_2,uVar9);
     }
     cVar3 = FUN_004e3b10(0);
@@ -2625,7 +2624,7 @@ undefined4 * GarageVinylTypeScreen__GarageVinylTypeScreen(undefined4 *param_1,ui
     pcVar6 = "MU_GarageVinylBrowser.fng";
     uVar8 = 4;
     uVar7 = 0x916b1508;
-    FUN_00567c70(0x916b1508,4,"MU_GarageVinylBrowser.fng",param_2,0);
+    bStringHash(0x916b1508,4,"MU_GarageVinylBrowser.fng",param_2,0);
   }
   FUN_004e2250(uVar7,uVar8,pcVar6,param_2,uVar10);
 LAB_004e4582:
@@ -2683,8 +2682,8 @@ bool __fastcall GarageVinylTypeScreen__OptionChosen(int param_1)
   }
   if (DAT_00735df0 == 1) {
     if (DAT_00745b8c != 0) {
-      iVar2 = FUN_00567c70();
-      iVar3 = FUN_00567c70();
+      iVar2 = bStringHash();
+      iVar3 = bStringHash();
       if (iVar2 != iVar3) {
         uStack_24 = 0x780885f9;
         uStack_1c = 0x780885f9;
@@ -2817,7 +2816,7 @@ void GarageVinylTypeScreen__NotificationMessage
     iVar6 = 0;
     if (iVar7 != 0x23) {
       if (iVar7 * 0xc90 + DAT_00734588 == 0) goto LAB_004e4a53;
-      iVar6 = FUN_00567c70();
+      iVar6 = bStringHash();
     }
     piVar9 = DAT_0073ad40;
     local_8 = DAT_0073ad40;
@@ -3124,7 +3123,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 0;
       uVar4 = 0x695654a8;
-      FUN_00567c70(0x695654a8,0,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+      bStringHash(0x695654a8,0,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       if ((((DAT_00760288 & 0x80) == 0) && ((DAT_00760288 & 0x100) == 0)) &&
          ((DAT_00760288 & 0x200) == 0)) {
@@ -3138,7 +3137,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 2;
       uVar4 = 0x17019c53;
-      FUN_00567c70(0x17019c53,2,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+      bStringHash(0x17019c53,2,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       if ((((DAT_00760288 & 0x2000) == 0) && ((DAT_00760288 & 0x4000) == 0)) &&
          ((DAT_00760288 & 0x8000) == 0)) {
@@ -3152,7 +3151,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 4;
       uVar4 = 0x16b5ce67;
-      FUN_00567c70(0x16b5ce67,4,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+      bStringHash(0x16b5ce67,4,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       if ((((DAT_00760288 & 0x10000) == 0) && ((DAT_00760288 & 0x20000) == 0)) &&
          ((DAT_00760288 & 0x40000) == 0)) {
@@ -3166,7 +3165,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 5;
       uVar4 = 0x8a07001;
-      FUN_00567c70(0x8a07001,5,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+      bStringHash(0x8a07001,5,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       if ((((DAT_00760288 & 0x400000) == 0) && ((DAT_00760288 & 0x800000) == 0)) &&
          ((DAT_00760288 & 0x1000000) == 0)) {
@@ -3180,7 +3179,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 7;
       uVar4 = 0x932768e1;
-      FUN_00567c70(0x932768e1,7,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+      bStringHash(0x932768e1,7,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       if ((((DAT_00760288 & 0x10000000) == 0) && ((DAT_00760288 & 0x20000000) == 0)) &&
          ((DAT_00760288 & 0x40000000) == 0)) {
@@ -3194,7 +3193,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 9;
       uVar4 = 0xf2173020;
-      FUN_00567c70(0xf2173020,9,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+      bStringHash(0xf2173020,9,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       if ((((DAT_0076028c & 2) == 0) && ((DAT_0076028c & 4) == 0)) && ((DAT_0076028c & 8) == 0)) {
         uVar3 = 0;
@@ -3207,7 +3206,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 0xb;
       uVar4 = 0x694ec516;
-      FUN_00567c70(0x694ec516,0xb,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+      bStringHash(0x694ec516,0xb,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       if ((((DAT_0076028c & 0x10) == 0) && ((DAT_0076028c & 0x20) == 0)) &&
          ((DAT_0076028c & 0x40) == 0)) {
@@ -3221,7 +3220,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 0xc;
       uVar4 = 0x192d84da;
-      FUN_00567c70(0x192d84da,0xc,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+      bStringHash(0x192d84da,0xc,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       if ((((DAT_0076028c & 0x400) == 0) && ((DAT_0076028c & 0x800) == 0)) &&
          ((DAT_0076028c & 0x1000) == 0)) {
@@ -3247,7 +3246,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 0;
         uVar4 = 0x695654a8;
-        FUN_00567c70(0x695654a8,0,"MU_GarageVinylBrowser.fng",uVar3,0);
+        bStringHash(0x695654a8,0,"MU_GarageVinylBrowser.fng",uVar3,0);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3263,7 +3262,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 2;
         uVar4 = 0x17019c53;
-        FUN_00567c70(0x17019c53,2,"MU_GarageVinylBrowser.fng",uVar3,0);
+        bStringHash(0x17019c53,2,"MU_GarageVinylBrowser.fng",uVar3,0);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3279,7 +3278,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 4;
         uVar4 = 0x16b5ce67;
-        FUN_00567c70(0x16b5ce67,4,"MU_GarageVinylBrowser.fng",uVar3,0);
+        bStringHash(0x16b5ce67,4,"MU_GarageVinylBrowser.fng",uVar3,0);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3289,7 +3288,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 5;
         uVar4 = 0x8a07001;
-        FUN_00567c70(0x8a07001,5,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0x8a07001,5,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3299,7 +3298,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 7;
         uVar4 = 0x932768e1;
-        FUN_00567c70(0x932768e1,7,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0x932768e1,7,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3309,7 +3308,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 9;
         uVar4 = 0xf2173020;
-        FUN_00567c70(0xf2173020,9,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0xf2173020,9,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3319,7 +3318,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 0xb;
         uVar4 = 0x694ec516;
-        FUN_00567c70(0x694ec516,0xb,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0x694ec516,0xb,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3329,7 +3328,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 0xc;
         uVar4 = 0x192d84da;
-        FUN_00567c70(0x192d84da,0xc,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0x192d84da,0xc,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3348,7 +3347,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       uVar3 = FUN_004e4b70(1,uVar8);
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar4 = 0x20693e72;
-      FUN_00567c70(0x20693e72,1,"MU_GarageVinylBrowser.fng",uVar3);
+      bStringHash(0x20693e72,1,"MU_GarageVinylBrowser.fng",uVar3);
       FUN_004e2250(uVar4,iVar2,pcVar6,uVar3,uVar8);
       cVar1 = FUN_004e3f00(0);
       uVar8 = (uint)(byte)(1 - (cVar1 != '\0'));
@@ -3356,7 +3355,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 3;
       uVar4 = 0xbc76639d;
-      FUN_00567c70(0xbc76639d,3,"MU_GarageVinylBrowser.fng",uVar3);
+      bStringHash(0xbc76639d,3,"MU_GarageVinylBrowser.fng",uVar3);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       cVar1 = FUN_004e3f00(0);
       uVar8 = (uint)(byte)(1 - (cVar1 != '\0'));
@@ -3364,7 +3363,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 6;
       uVar4 = 0x43935e4b;
-      FUN_00567c70(0x43935e4b,6,"MU_GarageVinylBrowser.fng",uVar3);
+      bStringHash(0x43935e4b,6,"MU_GarageVinylBrowser.fng",uVar3);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       cVar1 = FUN_004e3f00(0);
       uVar8 = (uint)(byte)(1 - (cVar1 != '\0'));
@@ -3372,7 +3371,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
       pcVar6 = "MU_GarageVinylBrowser.fng";
       uVar5 = 8;
       uVar4 = 0x38abc72b;
-      FUN_00567c70(0x38abc72b,8,"MU_GarageVinylBrowser.fng",uVar3);
+      bStringHash(0x38abc72b,8,"MU_GarageVinylBrowser.fng",uVar3);
       FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
       cVar1 = FUN_004e3f00(0);
       uVar8 = (uint)(byte)(1 - (cVar1 != '\0'));
@@ -3386,7 +3385,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 1;
         uVar4 = 0x20693e72;
-        FUN_00567c70(0x20693e72,1,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0x20693e72,1,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3396,7 +3395,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 3;
         uVar4 = 0xbc76639d;
-        FUN_00567c70(0xbc76639d,3,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0xbc76639d,3,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3406,7 +3405,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 6;
         uVar4 = 0x43935e4b;
-        FUN_00567c70(0x43935e4b,6,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0x43935e4b,6,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3416,7 +3415,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
         pcVar6 = "MU_GarageVinylBrowser.fng";
         uVar5 = 8;
         uVar4 = 0x38abc72b;
-        FUN_00567c70(0x38abc72b,8,"MU_GarageVinylBrowser.fng",uVar3);
+        bStringHash(0x38abc72b,8,"MU_GarageVinylBrowser.fng",uVar3);
         FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar7);
       }
       cVar1 = FUN_004e3f00(0);
@@ -3428,7 +3427,7 @@ undefined4 * GarageVinylGroupScreen__GarageVinylGroupScreen(undefined4 *param_1,
     uVar4 = 0x4be137a4;
   }
   pcVar6 = "MU_GarageVinylBrowser.fng";
-  FUN_00567c70(uVar4,uVar5,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
+  bStringHash(uVar4,uVar5,"MU_GarageVinylBrowser.fng",uVar3,uVar8);
   FUN_004e2250(uVar4,uVar5,pcVar6,uVar3,uVar8);
 LAB_004e5567:
   FUN_004e23d0();
@@ -3768,7 +3767,7 @@ LAB_004e5c3c:
         default:
           goto switchD_004e5afd_default;
         }
-        uVar9 = FUN_00567c70();
+        uVar9 = bStringHash();
         cVar4 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar9);
         local_1c = CONCAT31(local_1c._1_3_,'\x01' - (cVar4 != '\0'));
 switchD_004e5afd_default:
@@ -4047,7 +4046,7 @@ LAB_004e635d:
     default:
       goto switchD_004e62e6_default;
     }
-    uVar4 = FUN_00567c70();
+    uVar4 = bStringHash();
     cVar2 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar4);
   }
   if (cVar2 != '\0') {
@@ -6420,85 +6419,85 @@ undefined4 FUN_004e93b0(void)
   
   switch(in_EAX) {
   case 0:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 1:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 2:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 3:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 4:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 5:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 6:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 7:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 8:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 9:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 10:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0xb:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0xc:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0xd:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0xe:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0xf:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x10:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x11:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x12:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x13:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x14:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x15:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x16:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x17:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x18:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x19:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   case 0x1a:
-    uVar1 = FUN_00567c70();
+    uVar1 = bStringHash();
     return uVar1;
   default:
     return 0;

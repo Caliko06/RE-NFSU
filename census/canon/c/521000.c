@@ -4610,12 +4610,12 @@ EAXTunerCar__ProcessSoundSphere
         }
       }
       else {
-        iVar6 = FUN_00567c70();
+        iVar6 = bStringHash();
         if (param_3 == iVar6) {
           piVar7 = (int *)(param_1 + 0x810);
         }
         else {
-          iVar6 = FUN_00567c70();
+          iVar6 = bStringHash();
           if (param_3 != iVar6) {
             return;
           }
@@ -8732,8 +8732,8 @@ void EAXTunerCar__Refl_Update(undefined4 param_1)
     local_14 = *(float *)(DAT_00740500 + 0x54);
     local_10 = -local_8;
     local_c = -local_14;
-    FUN_00443e00(iVar5,local_1c,*(int *)(in_EAX + 0x234) + 0x60);
-    FUN_00443e00(iVar5,&local_14,*(int *)(in_EAX + 0x234) + 0x60);
+    TrackPathZone__GetIntercept(iVar5,local_1c,*(int *)(in_EAX + 0x234) + 0x60);
+    TrackPathZone__GetIntercept(iVar5,&local_14,*(int *)(in_EAX + 0x234) + 0x60);
     fVar2 = *(float *)(*(int *)(in_EAX + 0x234) + 0x60) - local_14;
     fVar3 = *(float *)(*(int *)(in_EAX + 0x234) + 100) - local_10;
     local_8 = SQRT(fVar2 * fVar2 + fVar3 * fVar3);
@@ -11695,7 +11695,7 @@ byte FUN_0052f650(void)
   int unaff_EDI;
   byte bVar7;
   
-  cVar3 = FUN_004664b0();
+  cVar3 = Collision__IsPlayerInvolved();
   bVar7 = cVar3 != '\0';
   iVar1 = *(int *)(unaff_EDI + 100);
   iVar2 = *(int *)(iVar1 + 600);
@@ -11703,7 +11703,7 @@ byte FUN_0052f650(void)
   if ((cVar3 == '\x01') || (*(char *)(*(int *)(iVar1 + 0x25c) + 0x15) == '\x01')) {
     bVar7 = bVar7 | 2;
   }
-  cVar4 = FUN_00466500();
+  cVar4 = Collision__IsWallInvolved();
   if (cVar4 != '\0') {
     bVar7 = bVar7 | 4;
   }
@@ -12898,7 +12898,7 @@ void __fastcall FUN_00530840(int *param_1)
     uVar2 = 0;
   }
   *(undefined1 *)((int)param_1 + 0x34d) = uVar2;
-  uVar2 = FUN_004664b0();
+  uVar2 = Collision__IsPlayerInvolved();
   *(undefined1 *)(param_1 + 0xd3) = uVar2;
   param_1[0xd2] = DAT_0078eab0;
   DAT_0078eab0 = DAT_0078eab0 + 1;

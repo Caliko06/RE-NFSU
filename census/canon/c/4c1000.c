@@ -5367,7 +5367,7 @@ LAB_004c78f7:
         ppppppiVar10 = (int ******)0x0;
         goto LAB_004c7938;
       }
-      uVar11 = FUN_00567c70();
+      uVar11 = bStringHash();
     }
     ppppppiVar10 = (int ******)CarPartDatabase__GetCarPart(uVar11,iVar9,0,0,0xffffffff);
   }
@@ -5459,7 +5459,7 @@ LAB_004c7aa4:
         goto LAB_004c7af6;
       }
       if (((local_20 != 0xb) || (local_12 == '\0')) ||
-         (pppppiVar13 = (int *****)FUN_00567c70(), ppppppiVar10[3] != pppppiVar13)) {
+         (pppppiVar13 = (int *****)bStringHash(), ppppppiVar10[3] != pppppiVar13)) {
         piVar23 = &DAT_00706540;
         do {
           if (*piVar23 == (int)*(char *)(ppppppiVar10 + 4)) break;
@@ -6056,7 +6056,7 @@ void FUN_004c8720(void)
     if (*(int *)(iVar3 + 0xc) == iVar4) {
       FECarConfig__GetCarType();
       pcVar5 = "_STYLE03_SPOILER";
-      iVar4 = FUN_00567c70();
+      iVar4 = bStringHash();
       uVar2 = 0x5f;
       do {
         iVar4 = iVar4 * 0x21 + uVar2;
