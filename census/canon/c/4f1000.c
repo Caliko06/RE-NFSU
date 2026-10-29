@@ -1965,11 +1965,11 @@ void FEScreenRegistry__SetFactory(byte *param_1,undefined *param_2)
 }
 
 
-// ==== 0x4f3a00 FEPackage::FEPackage
+// ==== 0x4f3a00 FEPackageData::FEPackageData
 
-/* [canon] assets high (Ghidra make FUN_004f3a00) docs/re/assets.md */
+/* [canon] assets med (Ghidra make FUN_004f3a00) docs/re/assets.md */
 
-undefined4 * __fastcall FEPackage__FEPackage(undefined4 *param_1)
+undefined4 * __fastcall FEPackageData__FEPackageData(undefined4 *param_1)
 
 {
   int *in_EAX;
@@ -2595,7 +2595,7 @@ void FEngLibrary__AddPackage(void)
   pvVar2 = _malloc(0x2c);
   local_4 = 0;
   if (pvVar2 != (void *)0x0) {
-    iVar3 = FEPackage__FEPackage(pvVar2);
+    iVar3 = FEPackageData__FEPackageData(pvVar2);
     if (iVar3 != 0) {
       puVar4 = (undefined4 *)(iVar3 + 4);
       goto LAB_004f4166;
@@ -2785,7 +2785,7 @@ void FEngMemoryPool__Init(void)
 
 // ==== 0x4f43d0 FEPackageList::FindByKeyWithAlias
 
-/* [canon] hud low (ghidra-canon) docs/re/runtime.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 * FEPackageList__FindByKeyWithAlias(void)
 
@@ -5139,7 +5139,7 @@ int FUN_004f66b0(void)
 
 // ==== 0x4f66f0 FEString::SetLabelHash
 
-/* [canon] hud low (ghidra-canon) docs/re/runtime.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void FEString__SetLabelHash(void)
 
@@ -10258,7 +10258,7 @@ void FECodeListBox__SetCellJustification
 
 // ==== 0x4fbaf0 FEListEntryArray::SetCount
 
-/* [canon] hud low (ghidra-canon) docs/re/hud.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/hud.md */
 
 void FEListEntryArray__SetCount(int *param_1,int param_2)
 
@@ -11426,7 +11426,7 @@ void FUN_004fcda0(void)
 
 // ==== 0x4fcdf0 FEKeyNode::StaticPoolInit
 
-/* [canon] hud low (ghidra-canon) docs/re/hud.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/hud.md */
 
 undefined4 * FEKeyNode__StaticPoolInit(undefined4 *param_1)
 
@@ -13446,7 +13446,7 @@ ushort __fastcall FUN_004feab0(float *param_1,float *param_2)
 
 // ==== 0x4feb50 FEColor_NearlyEqual
 
-/* [canon] hud low (ghidra-canon) docs/re/runtime.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/runtime.md */
 
 uint __fastcall FEColor_NearlyEqual(int *param_1)
 
@@ -14211,7 +14211,7 @@ void __fastcall FEListBox__SetCurrentRow(int param_1,uint param_2)
 
 // ==== 0x4ff6f0 FEListBox::SetCellResource
 
-/* [canon] hud low (ghidra-canon) docs/re/hud.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/hud.md */
 
 void __thiscall
 FEListBox__SetCellResource(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)
@@ -15165,7 +15165,7 @@ void __fastcall FUN_00500640(int param_1)
 
 // ==== 0x5006a0 FETypeNode::GetFieldAt
 
-/* [canon] hud low (ghidra-canon) docs/re/hud.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/hud.md */
 
 void __fastcall FETypeNode__GetFieldAt(undefined4 param_1,int param_2)
 
@@ -15274,7 +15274,7 @@ undefined4 * __thiscall FUN_005007a0(undefined4 *param_1,byte param_2)
 
 // ==== 0x5007d0 FEPackage::AddResponse
 
-/* [canon] hud low (ghidra-canon) docs/re/hud.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/hud.md */
 
 void __fastcall FEPackage__AddResponse(undefined4 param_1,int param_2)
 
@@ -15314,7 +15314,7 @@ void __fastcall FEPackage__AddResponse(undefined4 param_1,int param_2)
 
 // ==== 0x500820 FEPackage::AddObject
 
-/* [canon] hud low (ghidra-canon) docs/re/hud.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/hud.md */
 
 void __fastcall FEPackage__AddObject(undefined4 param_1,int param_2)
 
@@ -15388,7 +15388,7 @@ void __fastcall FEListBox__SetCurrentCellScale(int param_1,undefined4 *param_2)
 
 // ==== 0x5008d0 FEListBox::SetCellImageUV
 
-/* [canon] hud low (ghidra-canon) docs/re/hud.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/hud.md */
 
 void __fastcall FEListBox__SetCellImageUV(undefined4 *param_1,int param_2)
 

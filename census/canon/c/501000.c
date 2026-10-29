@@ -4796,7 +4796,7 @@ void FUN_00505e60(int param_1)
         break;
       case 5:
       }
-      FUN_0051c770();
+      EAXSound__PlayUISoundFX();
       GarageManager__PushScreen(*(undefined4 *)(param_1 + 0xc));
       FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
     }

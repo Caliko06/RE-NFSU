@@ -2802,7 +2802,7 @@ LAB_00545a6a:
     } while (local_4 < *(int *)(in_EAX + 0x7c));
   }
   FUN_0040caa0(1);
-  FUN_004029a0(1);
+  Particle_ResolveTextures(1);
   FEngFont_ResolveTextures();
   DAT_0073556c = 1;
   return;
@@ -2859,7 +2859,7 @@ void TexturePackHandle__UnmapData(int param_1,int param_2,int param_3)
     } while (local_4 < *(int *)(iVar2 + 0x7c));
   }
   FUN_0040caa0(0);
-  FUN_004029a0(0);
+  Particle_ResolveTextures(0);
   FEngFont_ResolveTextures(iVar2,0);
   DAT_0073556c = 1;
   return;
@@ -3547,13 +3547,13 @@ void FUN_00546680(void)
 {
   char cVar1;
   
-  cVar1 = FUN_00438b10();
+  cVar1 = Counter_7354e0_IsPositive();
   if (cVar1 != '\0') {
     FUN_00547ae0();
   }
-  cVar1 = FUN_00438b30();
+  cVar1 = Counter_735500_IsPositive();
   if (cVar1 != '\0') {
-    cVar1 = FUN_00438b30();
+    cVar1 = Counter_735500_IsPositive();
     if (cVar1 != '\0') {
       FUN_00547390();
       FUN_00548fa0();
@@ -3576,14 +3576,14 @@ undefined1 FUN_005466e0(void)
   char cVar1;
   undefined1 uVar2;
   
-  cVar1 = FUN_00438b10();
+  cVar1 = Counter_7354e0_IsPositive();
   if (cVar1 != '\0') {
-    uVar2 = FUN_00438b10();
+    uVar2 = Counter_7354e0_IsPositive();
     return uVar2;
   }
-  cVar1 = FUN_00438b30();
+  cVar1 = Counter_735500_IsPositive();
   if (cVar1 != '\0') {
-    uVar2 = FUN_00438b30();
+    uVar2 = Counter_735500_IsPositive();
     return uVar2;
   }
   return 0;
@@ -3600,14 +3600,14 @@ void FUN_00546710(void)
   char cVar1;
   
   if (DAT_006f3da4 != '\0') {
-    cVar1 = FUN_00438b10();
+    cVar1 = Counter_7354e0_IsPositive();
     if (cVar1 != '\0') {
       FUN_0054e020();
     }
-    cVar1 = FUN_00438b30();
+    cVar1 = Counter_735500_IsPositive();
     if (cVar1 != '\0') {
       FUN_0054e370();
-      cVar1 = FUN_00438b30();
+      cVar1 = Counter_735500_IsPositive();
       if (cVar1 != '\0') {
         FUN_00546980();
       }
@@ -3626,11 +3626,11 @@ void FUN_00546750(void)
   char cVar1;
   
   if (DAT_006f3da4 != '\0') {
-    cVar1 = FUN_00438b10();
+    cVar1 = Counter_7354e0_IsPositive();
     if (cVar1 != '\0') {
       FUN_00547ba0();
     }
-    cVar1 = FUN_00438b30();
+    cVar1 = Counter_735500_IsPositive();
     if (cVar1 != '\0') {
       FUN_00546c40();
       return;
@@ -3650,16 +3650,16 @@ void FUN_00546780(void)
   char cVar1;
   
   if (DAT_0073550c != '\0') {
-    cVar1 = FUN_00438b10();
+    cVar1 = Counter_7354e0_IsPositive();
     if ((cVar1 != '\0') && (DAT_00734964 != 0)) {
-      FUN_00438b10();
+      Counter_7354e0_IsPositive();
     }
-    cVar1 = FUN_00438b30();
+    cVar1 = Counter_735500_IsPositive();
     if ((cVar1 != '\0') && (DAT_00734964 != 0)) {
-      FUN_00438b30();
+      Counter_735500_IsPositive();
     }
-    cVar1 = FUN_00438b10();
-    if ((cVar1 == '\0') && (cVar1 = FUN_00438b30(), cVar1 == '\0')) {
+    cVar1 = Counter_7354e0_IsPositive();
+    if ((cVar1 == '\0') && (cVar1 = Counter_735500_IsPositive(), cVar1 == '\0')) {
       return;
     }
     if ((DAT_00734964 != 0) && (cVar1 = FUN_0043d760(), cVar1 != '\0')) {
@@ -3677,7 +3677,7 @@ void FUN_005467f0(void)
 {
   char cVar1;
   
-  cVar1 = FUN_00438b30();
+  cVar1 = Counter_735500_IsPositive();
   if (cVar1 != '\0') {
     FUN_00547560();
     return;
@@ -3694,7 +3694,7 @@ void FUN_00546810(void)
 {
   char cVar1;
   
-  cVar1 = FUN_00438b30();
+  cVar1 = Counter_735500_IsPositive();
   if (cVar1 != '\0') {
     FUN_005475c0();
     return;
@@ -3711,7 +3711,7 @@ void FUN_00546830(void)
 {
   char cVar1;
   
-  cVar1 = FUN_00438b30();
+  cVar1 = Counter_735500_IsPositive();
   if (cVar1 != '\0') {
     FUN_00547620();
     return;
@@ -3728,7 +3728,7 @@ void FUN_00546850(void)
 {
   char cVar1;
   
-  cVar1 = FUN_00438b30();
+  cVar1 = Counter_735500_IsPositive();
   if (cVar1 != '\0') {
     FUN_00547690();
     return;
@@ -3773,7 +3773,7 @@ void FUN_00546880(void)
 {
   char cVar1;
   
-  cVar1 = FUN_00438b30();
+  cVar1 = Counter_735500_IsPositive();
   if (cVar1 != '\0') {
     FUN_00547700();
     return;
@@ -3889,7 +3889,7 @@ void FUN_00546980(void)
     FUN_00547910(0xd,local_40c,1);
   }
 LAB_00546b8f:
-  cVar3 = FUN_00438b30();
+  cVar3 = Counter_735500_IsPositive();
   if (cVar3 != '\0') {
     puVar5 = &DAT_0073ddc0;
     do {
@@ -4007,7 +4007,7 @@ void FUN_00546d70(int param_1)
   FUN_005490a0();
   FUN_0043ba60(uVar1,0);
   FUN_005473e0(param_1,uVar1,0);
-  if ((DAT_006f1e08 == 0) && (cVar2 = FUN_00438b30(), cVar2 != '\0')) {
+  if ((DAT_006f1e08 == 0) && (cVar2 = Counter_735500_IsPositive(), cVar2 != '\0')) {
     FUN_00547390();
     FUN_00548fa0();
     DAT_006f3da0 = 0xffffffff;
@@ -4031,7 +4031,7 @@ void FUN_00546e00(void)
     if ((DAT_007301cc != (code *)0x0) && ((*DAT_007301cc)(), DAT_006f1e08 != 0)) {
       return;
     }
-    cVar1 = FUN_00438b30();
+    cVar1 = Counter_735500_IsPositive();
     if (cVar1 != '\0') {
       FUN_00547390();
       FUN_00548fa0();
@@ -4691,7 +4691,7 @@ void FUN_00547ae0(void)
 {
   char cVar1;
   
-  cVar1 = FUN_00438b10();
+  cVar1 = Counter_7354e0_IsPositive();
   if (cVar1 != '\0') {
     if (DAT_007354e4 != '\0') {
       FUN_00548780(9);
@@ -4963,7 +4963,7 @@ void FUN_00548090(void)
     FUN_00548000(0);
     _DAT_007354dc = _ftol_nocw();
     fVar2 = (float)(extraout_ST0 + (float10)0.0) - (float)DAT_0073ad34 * 0.00025;
-    FUN_00438b50();
+    Flag_73014c_Get();
     fVar1 = ABS(fVar2);
     if (0.25 < fVar1) {
       _DAT_0073ddbc = _ftol_nocw();
@@ -11137,7 +11137,7 @@ void __thiscall FUN_0054ee60(int param_1,uint param_2)
       } while (iVar6 != 0);
       bSPrintf_regdst(0x21,acStack_48,&DAT_00734718);
       puVar7 = auStack_24;
-      uVar3 = FUN_004abd40(&DAT_00748f70);
+      uVar3 = FE_GetSlotPrefix(&DAT_00748f70);
       bSPrintf_regdst(0x40,&DAT_006cc578,uVar3,puVar7);
       FUN_0054a5e0(FUN_0054f7a0);
       return;
@@ -11270,7 +11270,7 @@ void FUN_0054f200(int param_1)
     iVar5 = LanguageStrings__FindByHash();
   }
   FUN_004f67f0(&DAT_006cc568,iVar5);
-  uVar6 = FUN_004abd40(&DAT_00748f70);
+  uVar6 = FE_GetSlotPrefix(&DAT_00748f70);
   FUN_00549c40();
   FUN_004f9f30();
   local_2c = FUN_00549c40();
@@ -11413,7 +11413,7 @@ LAB_0054f51b:
             *pcVar12 = cVar4;
           } while (cVar4 != '\0');
         }
-        uVar10 = FUN_004abcd0(&DAT_00748f70);
+        uVar10 = LanguageStrings_FindByRegionName(&DAT_00748f70);
         FUN_004f67f0(&DAT_006cc568,uVar10);
         FUN_00549d30(uVar6,local_30,&local_28,&local_2c);
         if (iVar5 < 10) {

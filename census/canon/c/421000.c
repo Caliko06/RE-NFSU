@@ -369,7 +369,7 @@ void FUN_004218a0(int param_1)
       if ((*(int *)(*(int *)(iVar4 + iVar2) + 0x24) == 1) &&
          (iVar1 = (**(code **)(**(int **)(*(int *)(iVar4 + iVar2) + 0x30) + 0xc))(),
          iVar2 = DAT_007361f8, iVar1 == param_1)) {
-        FUN_004617d0();
+        RealDriver__ResetJoyValues();
         iVar2 = DAT_007361f8;
       }
       iVar3 = iVar3 + 1;
@@ -567,9 +567,11 @@ int FUN_00421a70(void)
 }
 
 
-// ==== 0x421a80 FUN_00421a80
+// ==== 0x421a80 DriverInfo::IsRemote
 
-bool FUN_00421a80(void)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+bool DriverInfo__IsRemote(void)
 
 {
   int in_EAX;
@@ -591,7 +593,7 @@ int FUN_00421a90(void)
 
 // ==== 0x421aa0 FloatPair_LessEqual
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 FloatPair_LessEqual(void)
 
@@ -873,7 +875,7 @@ void FUN_00421d60(int *param_1)
   FUN_00422130();
   FUN_004244b0();
   SlotPool__Destroy();
-  FUN_00424b10();
+  FlowMessageList__FreeAll();
   ExceptionList = local_c;
   return;
 }
@@ -1153,8 +1155,9 @@ void FUN_004222a0(void)
   local_c = ExceptionList;
   ExceptionList = &local_c;
   if (((((-1 < DAT_0078a410) &&
-        (ExceptionList = &local_c, pcVar2 = (char *)FUN_004327d0(), pcVar2 != (char *)0x0)) &&
-       (*(int *)(pcVar2 + 4) == 1)) && (*pcVar2 < '\x01')) || (DAT_0078a308 != '\0')) {
+        (ExceptionList = &local_c, pcVar2 = (char *)RaceStatus__FindEntrantById(),
+        pcVar2 != (char *)0x0)) && (*(int *)(pcVar2 + 4) == 1)) && (*pcVar2 < '\x01')) ||
+     (DAT_0078a308 != '\0')) {
     uVar1 = DAT_0078a348;
     pvVar3 = _malloc(0xa70);
     local_4 = 0;
@@ -1164,8 +1167,8 @@ void FUN_004222a0(void)
     local_4 = 0xffffffff;
   }
   if (((-1 < DAT_0078a414) &&
-      (pcVar2 = (char *)FUN_004327d0(), uVar1 = DAT_0078a34c, pcVar2 != (char *)0x0)) &&
-     ((*(int *)(pcVar2 + 4) == 1 && (*pcVar2 < '\x01')))) {
+      (pcVar2 = (char *)RaceStatus__FindEntrantById(), uVar1 = DAT_0078a34c, pcVar2 != (char *)0x0))
+     && ((*(int *)(pcVar2 + 4) == 1 && (*pcVar2 < '\x01')))) {
     pvVar3 = _malloc(0xa70);
     local_4 = 1;
     if (pvVar3 != (void *)0x0) {
@@ -1242,7 +1245,7 @@ void Grid__BuildRacerCar(int param_1,int param_2,int param_3)
   local_4 = 0xffffffff;
   FUN_00425fe0();
   if (param_3 == 3) {
-    FUN_00425150();
+    RacerNode__GetControlMode();
     Car_SetMode();
     *(undefined4 *)(piVar5[0xc] + 0x1fc) = *(undefined4 *)(&DAT_006b7c20 + DAT_0078a40c * 4);
   }
@@ -1558,7 +1561,7 @@ void Grid__PlaceAllRacers(void)
     iVar7 = iVar7 + 1;
     puVar5 = puVar5 + 0x20;
     if (4 < iVar7) {
-      FUN_0041fe50();
+      RaceManager__SortRacersByKind();
       iVar7 = 0;
       if (0 < DAT_0078a41c) {
         iVar8 = 0;
@@ -1579,7 +1582,7 @@ void Grid__PlaceAllRacers(void)
           iVar4 = iVar6;
         } while (iVar7 < DAT_0078a41c);
       }
-      FUN_0041fe50();
+      RaceManager__SortRacersByKind();
       return;
     }
   } while( true );
@@ -2166,7 +2169,7 @@ undefined4 __thiscall FUN_00423530(undefined4 *param_1,undefined4 param_2,undefi
       ExceptionList = local_10;
       return 1;
     }
-    iVar3 = FUN_00435b90(DAT_0073619c);
+    iVar3 = Players_FindNisPlayer(DAT_0073619c);
     if (DAT_006f08a0 <= *(int *)(iVar3 + 0x5c) + *(int *)(iVar3 + 0x58)) {
       ExceptionList = local_10;
       return 1;
@@ -2234,7 +2237,7 @@ switchD_004237b8_caseD_3:
     return 1;
   case 2:
     FUN_004f6240();
-    FUN_00431190();
+    Players_AssignTypeFromTable();
     return 1;
   case 3:
     goto switchD_004237b8_caseD_3;
@@ -2258,7 +2261,7 @@ undefined4 switchD_004237b8::caseD_2(void)
 
 {
   FUN_004f6240();
-  FUN_00431190();
+  Players_AssignTypeFromTable();
   return 1;
 }
 
@@ -2274,7 +2277,7 @@ undefined4 __thiscall FUN_00423870(int param_1,undefined4 param_2,int param_3)
     return 1;
   case 2:
     FUN_004f6240();
-    FUN_00431190();
+    Players_AssignTypeFromTable();
     return 1;
   case 3:
     return 1;
@@ -2325,7 +2328,7 @@ undefined4 switchD_00423881::caseD_2(void)
 
 {
   FUN_004f6240();
-  FUN_00431190();
+  Players_AssignTypeFromTable();
   return 1;
 }
 
@@ -3164,9 +3167,11 @@ void FUN_00424680(int param_1)
 }
 
 
-// ==== 0x424b10 FUN_00424b10
+// ==== 0x424b10 FlowMessageList::FreeAll
 
-void FUN_00424b10(void)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+void FlowMessageList__FreeAll(void)
 
 {
   int *piVar1;
@@ -3192,9 +3197,11 @@ void FUN_00424b10(void)
 }
 
 
-// ==== 0x424b50 FUN_00424b50
+// ==== 0x424b50 bAlmostEqual_float
 
-undefined4 FUN_00424b50(float param_1,float param_2,float param_3)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+undefined4 bAlmostEqual_float(float param_1,float param_2,float param_3)
 
 {
   if (ABS(param_1 - param_2) < param_3 != (ABS(param_1 - param_2) == param_3)) {
@@ -3326,18 +3333,22 @@ int FUN_00424c60(void)
 }
 
 
-// ==== 0x424c70 FUN_00424c70
+// ==== 0x424c70 DriverInfo::IsPlayerKind
 
-bool __fastcall FUN_00424c70(int param_1)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+bool __fastcall DriverInfo__IsPlayerKind(int param_1)
 
 {
   return *(int *)(param_1 + 4) == 1;
 }
 
 
-// ==== 0x424c80 FUN_00424c80
+// ==== 0x424c80 DriverInfo::IsRivalKind
 
-bool __fastcall FUN_00424c80(int param_1)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+bool __fastcall DriverInfo__IsRivalKind(int param_1)
 
 {
   return *(int *)(param_1 + 4) == 2;
@@ -3397,7 +3408,7 @@ void FUN_00424cd0(undefined4 *param_1)
 
 // ==== 0x424cf0 RigidBody::SetVelocity
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall RigidBody__SetVelocity(int param_1)
 
@@ -3432,9 +3443,11 @@ undefined4 __fastcall FUN_00424d40(int param_1)
 }
 
 
-// ==== 0x424d50 FUN_00424d50
+// ==== 0x424d50 RacerNode::IsPlayerKind
 
-bool FUN_00424d50(void)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+bool RacerNode__IsPlayerKind(void)
 
 {
   int in_EAX;
@@ -3458,9 +3471,11 @@ undefined4 FUN_00424d5f(void)
 }
 
 
-// ==== 0x424d60 FUN_00424d60
+// ==== 0x424d60 RacerNode::IsLocalHuman
 
-undefined4 FUN_00424d60(void)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+undefined4 RacerNode__IsLocalHuman(void)
 
 {
   int in_EAX;
@@ -3473,9 +3488,11 @@ undefined4 FUN_00424d60(void)
 }
 
 
-// ==== 0x424d80 FUN_00424d80
+// ==== 0x424d80 RacerNode::IsRemote
 
-bool FUN_00424d80(void)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+bool RacerNode__IsRemote(void)
 
 {
   int in_EAX;
@@ -3756,7 +3773,7 @@ void FUN_00424f60(void)
   undefined4 *unaff_ESI;
   undefined4 *puVar2;
   
-  *unaff_ESI = &PTR_FUN_006caa58;
+  *unaff_ESI = &PTR_PsychoDriver__scalar_deleting_dtor_006caa58;
   unaff_ESI[0x6d] = 0;
   unaff_ESI[0x6e] = 0;
   puVar2 = unaff_ESI + 4;
@@ -3781,7 +3798,7 @@ void FUN_00424f60(void)
 void __fastcall FUN_00424fd0(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006caa58;
+  *param_1 = &PTR_PsychoDriver__scalar_deleting_dtor_006caa58;
   return;
 }
 
@@ -3833,9 +3850,11 @@ void __thiscall FUN_00425020(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x425030 FUN_00425030
+// ==== 0x425030 PsychoDriver::SetTuning
 
-void __thiscall FUN_00425030(int param_1,undefined4 *param_2)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+void __thiscall PsychoDriver__SetTuning(int param_1,undefined4 *param_2)
 
 {
   int iVar1;
@@ -3860,9 +3879,11 @@ undefined2 FUN_00425050(void)
 }
 
 
-// ==== 0x425060 FUN_00425060
+// ==== 0x425060 PsychoDriver::scalar_deleting_dtor
 
-void * __thiscall FUN_00425060(void *param_1,byte param_2)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+void * __thiscall PsychoDriver__scalar_deleting_dtor(void *param_1,byte param_2)
 
 {
   FUN_00424fd0();
@@ -3880,7 +3901,7 @@ void FUN_00425080(void)
 {
   undefined4 *in_EAX;
   
-  *in_EAX = &PTR_FUN_006caa58;
+  *in_EAX = &PTR_PsychoDriver__scalar_deleting_dtor_006caa58;
   return;
 }
 
@@ -3894,9 +3915,11 @@ undefined4 FUN_00425090(void)
 }
 
 
-// ==== 0x4250a0 FUN_004250a0
+// ==== 0x4250a0 PsychoDriver::scalar_deleting_dtor_b
 
-void * __thiscall FUN_004250a0(void *param_1,byte param_2)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+void * __thiscall PsychoDriver__scalar_deleting_dtor_b(void *param_1,byte param_2)
 
 {
   FUN_00425080();
@@ -3912,17 +3935,19 @@ void * __thiscall FUN_004250a0(void *param_1,byte param_2)
 void __fastcall FUN_004250c0(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006caadc;
+  *param_1 = &PTR_PsychoDriverDerived__scalar_deleting_dtor_006caadc;
   return;
 }
 
 
-// ==== 0x4250d0 FUN_004250d0
+// ==== 0x4250d0 PsychoDriverDerived::scalar_deleting_dtor
 
-undefined4 * __thiscall FUN_004250d0(undefined4 *param_1,byte param_2)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+undefined4 * __thiscall PsychoDriverDerived__scalar_deleting_dtor(undefined4 *param_1,byte param_2)
 
 {
-  *param_1 = &PTR_FUN_006caadc;
+  *param_1 = &PTR_PsychoDriverDerived__scalar_deleting_dtor_006caadc;
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -3930,9 +3955,12 @@ undefined4 * __thiscall FUN_004250d0(undefined4 *param_1,byte param_2)
 }
 
 
-// ==== 0x4250f0 FUN_004250f0
+// ==== 0x4250f0 PsychoDriverDerived::scalar_deleting_dtor_pooled
 
-undefined4 * __thiscall FUN_004250f0(undefined4 *param_1,byte param_2)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+undefined4 * __thiscall
+PsychoDriverDerived__scalar_deleting_dtor_pooled(undefined4 *param_1,byte param_2)
 
 {
   int iVar1;
@@ -3979,9 +4007,11 @@ void __fastcall FUN_00425140(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x425150 FUN_00425150
+// ==== 0x425150 RacerNode::GetControlMode
 
-undefined4 FUN_00425150(void)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+undefined4 RacerNode__GetControlMode(void)
 
 {
   bool bVar1;
@@ -4061,7 +4091,7 @@ void FUN_00425290(void)
   puVar1 = _malloc(0x1f0);
   if (puVar1 != (undefined4 *)0x0) {
     FUN_00424f60();
-    *puVar1 = &PTR_FUN_006cab60;
+    *puVar1 = &PTR_PsychoDriver__scalar_deleting_dtor_b_006cab60;
     unaff_EDI[2] = puVar1;
     return;
   }
@@ -4070,9 +4100,11 @@ void FUN_00425290(void)
 }
 
 
-// ==== 0x4252d0 FUN_004252d0
+// ==== 0x4252d0 Class6CAB08::dtor
 
-void FUN_004252d0(undefined4 *param_1)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+void Class6CAB08__dtor(undefined4 *param_1)
 
 {
   void *local_c;
@@ -4107,7 +4139,7 @@ undefined4 FUN_00425320(void)
 void * __thiscall FUN_00425330(void *param_1,byte param_2)
 
 {
-  FUN_004252d0(param_1);
+  Class6CAB08__dtor(param_1);
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -4265,7 +4297,7 @@ LAB_00425665:
     }
     else {
       FUN_00424f60();
-      *puVar7 = &PTR_FUN_006cab60;
+      *puVar7 = &PTR_PsychoDriver__scalar_deleting_dtor_b_006cab60;
       puVar6[2] = puVar7;
     }
   }
@@ -4277,7 +4309,7 @@ LAB_00425665:
   }
   else {
     puVar6[1] = 0;
-    *puVar6 = &PTR_FUN_006caaf0;
+    *puVar6 = &PTR_PsychoDriverDerived__scalar_deleting_dtor_pooled_006caaf0;
     puVar6[2] = param_1 + 0x40;
   }
   *(undefined4 **)(param_1 + 0x34) = puVar6;
@@ -4677,7 +4709,7 @@ void __fastcall Car_SetMode(int param_1)
     puVar1 = (undefined4 *)FUN_00567160();
     if (puVar1 != (undefined4 *)0x0) {
       puVar1[1] = 0;
-      *puVar1 = &PTR_FUN_006caaf0;
+      *puVar1 = &PTR_PsychoDriverDerived__scalar_deleting_dtor_pooled_006caaf0;
       puVar1[2] = unaff_ESI + 0x40;
       *(undefined4 **)(unaff_ESI + 0x34) = puVar1;
       *(undefined4 *)(*(int *)(unaff_ESI + 0x3c) + 0x60) = 0;
@@ -4737,16 +4769,18 @@ LAB_004261fd:
     *(undefined4 *)(unaff_ESI + 0x34) = uVar5;
     *(undefined4 *)(*(int *)(unaff_ESI + 0x3c) + 0x60) = 0;
   }
-  FUN_00469f30();
+  CarCollisionBody__SetupPhysicsPointers();
   *(undefined4 *)(*(int *)(unaff_ESI + 0x34) + 4) = *(undefined4 *)(unaff_ESI + 0x30);
   ExceptionList = local_c;
   return;
 }
 
 
-// ==== 0x4262c0 FUN_004262c0
+// ==== 0x4262c0 Car::SetModeViaDriver
 
-void __fastcall FUN_004262c0(undefined4 param_1,undefined4 param_2)
+/* [canon] car low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall Car__SetModeViaDriver(undefined4 param_1,undefined4 param_2)
 
 {
   int in_EAX;
@@ -4873,7 +4907,7 @@ float10 Car__ServiceResetRequest(int param_1,float param_2)
   int iStack_8;
   int iStack_4;
   
-  FUN_0042a530();
+  Car__UpdateResetState();
   Racer__UpdateTwoHumanCatchUp();
   fVar8 = (float10)(**(code **)(**(int **)(param_1 + 0x34) + 4))();
   fVar1 = (float)fVar8;
@@ -5100,7 +5134,7 @@ void JumpCamTrigger(float param_1)
   else if (DAT_00736090 == 0) {
     *(undefined4 *)(in_EAX + 0x87c) = 1;
   }
-  FUN_00429190();
+  Car__UpdateHeadlightsAndHorn();
   iVar8 = *(int *)(in_EAX + 0x18);
   if (iVar8 == 0) {
     return;
@@ -5812,7 +5846,7 @@ void FUN_00428080(void)
 
 // ==== 0x4280a0 Car::IsResetGraceActive
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 __fastcall Car__IsResetGraceActive(int param_1)
 
@@ -5838,7 +5872,7 @@ undefined1 FUN_004280f0(void)
 
 // ==== 0x428100 Car_GetLaneSpeedCapFraction
 
-/* [canon] traffic low (ghidra-canon) docs/re/traffic.md */
+/* [canon] traffic med (ghidra-canon+hopper) docs/re/traffic.md */
 
 float10 __fastcall Car_GetLaneSpeedCapFraction(int param_1)
 
@@ -6364,7 +6398,7 @@ LAB_00428df0:
     if ((iVar5 == 0) || (iVar5 == 0x7fffffff)) goto LAB_00428e63;
     local_44 = (float)(DAT_0073ad34 - iVar5);
     if ((float)*(int *)(unaff_EBX + 0x3f8) * 0.00025 < (float)(int)local_44 * 0.00025) {
-      CarState__StopTimer();
+      CarState__StopNitrous();
       goto LAB_00428e63;
     }
   }
@@ -6410,7 +6444,7 @@ LAB_00428e63:
       }
     }
     else {
-      CarState__StopTimer();
+      CarState__StopNitrous();
     }
   }
   if (*(char *)(unaff_EBX + 0x86d) != '\0') {
@@ -6447,11 +6481,14 @@ LAB_00428e63:
 }
 
 
-// ==== 0x429100 FUN_00429100
+// ==== 0x429100 Car::HonkAndOrBlinkHeadlights
+
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __thiscall
-FUN_00429100(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined1 param_5
-            ,undefined1 param_6,undefined1 param_7)
+Car__HonkAndOrBlinkHeadlights
+          (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined1 param_5,
+          undefined1 param_6,undefined1 param_7)
 
 {
   if (*(float *)(param_1 + 0x84c) + *(float *)(param_1 + 0x848) + *(float *)(param_1 + 0x850) <
@@ -6468,9 +6505,11 @@ FUN_00429100(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
 }
 
 
-// ==== 0x429190 FUN_00429190
+// ==== 0x429190 Car::UpdateHeadlightsAndHorn
 
-void FUN_00429190(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Car__UpdateHeadlightsAndHorn(void)
 
 {
   float fVar1;
@@ -6830,9 +6869,11 @@ LAB_0042993e:
 }
 
 
-// ==== 0x429ac0 FUN_00429ac0
+// ==== 0x429ac0 Car::GetWheelFlagFraction
 
-float10 FUN_00429ac0(void)
+/* [canon] car low (ghidra-canon) docs/re/canon.md */
+
+float10 Car__GetWheelFlagFraction(void)
 
 {
   int in_EAX;
@@ -6888,11 +6929,12 @@ void Racer__UpdateTwoHumanCatchUp(void)
 }
 
 
-// ==== 0x429ba0 FUN_00429ba0
+// ==== 0x429ba0 Car::CalcBearingToPoint
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car low (ghidra-canon) docs/re/canon.md */
 
-void __fastcall FUN_00429ba0(int param_1,float *param_2)
+void __fastcall Car__CalcBearingToPoint(int param_1,float *param_2)
 
 {
   float fVar1;
@@ -6915,9 +6957,11 @@ void __fastcall FUN_00429ba0(int param_1,float *param_2)
 }
 
 
-// ==== 0x429c50 FUN_00429c50
+// ==== 0x429c50 bLength3_or_DotNormalized
 
-float10 FUN_00429c50(float param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+float10 bLength3_or_DotNormalized(float param_1)
 
 {
   float *unaff_ESI;
@@ -6936,9 +6980,11 @@ float10 FUN_00429c50(float param_1)
 }
 
 
-// ==== 0x429cc0 FUN_00429cc0
+// ==== 0x429cc0 Car::GetForwardAcceleration
 
-float10 FUN_00429cc0(void)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 Car__GetForwardAcceleration(void)
 
 {
   int in_EAX;
@@ -7334,9 +7380,11 @@ void FUN_0042a4d0(void)
 }
 
 
-// ==== 0x42a530 FUN_0042a530
+// ==== 0x42a530 Car::UpdateResetState
 
-void __fastcall FUN_0042a530(int param_1)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+void __fastcall Car__UpdateResetState(int param_1)
 
 {
   int iVar1;
@@ -7377,11 +7425,12 @@ void __fastcall FUN_0042a530(int param_1)
 }
 
 
-// ==== 0x42a5c0 FUN_0042a5c0
+// ==== 0x42a5c0 Car::MakeFlatMatrix
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void __fastcall FUN_0042a5c0(undefined4 param_1,float *param_2)
+void __fastcall Car__MakeFlatMatrix(undefined4 param_1,float *param_2)
 
 {
   float fVar1;
@@ -7430,9 +7479,11 @@ void __fastcall FUN_0042a5c0(undefined4 param_1,float *param_2)
 }
 
 
-// ==== 0x42a690 FUN_0042a690
+// ==== 0x42a690 Car::GetNitroFlag
 
-uint FUN_0042a690(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+uint Car__GetNitroFlag(void)
 
 {
   uint in_EAX;
@@ -7444,9 +7495,11 @@ uint FUN_0042a690(void)
 }
 
 
-// ==== 0x42a6b0 FUN_0042a6b0
+// ==== 0x42a6b0 Car::GetTurboBoost
 
-float10 __fastcall FUN_0042a6b0(undefined1 *param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 __fastcall Car__GetTurboBoost(undefined1 *param_1)
 
 {
   int iVar1;
@@ -7470,9 +7523,11 @@ float10 __fastcall FUN_0042a6b0(undefined1 *param_1)
 }
 
 
-// ==== 0x42a710 FUN_0042a710
+// ==== 0x42a710 Car::CalculateWheelPosition
 
-void FUN_0042a710(undefined4 *param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Car__CalculateWheelPosition(undefined4 *param_1)
 
 {
   int in_EAX;
@@ -7528,9 +7583,11 @@ void FUN_0042a790(void)
 }
 
 
-// ==== 0x42a810 FUN_0042a810
+// ==== 0x42a810 Car::SetArtificialColour
 
-void __fastcall FUN_0042a810(int param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall Car__SetArtificialColour(int param_1,int param_2)
 
 {
   undefined4 uVar1;
@@ -7609,9 +7666,11 @@ void FUN_0042a860(void)
 }
 
 
-// ==== 0x42aa10 FUN_0042aa10
+// ==== 0x42aa10 Car::WheelFlagsAllowSteer
 
-undefined4 __fastcall FUN_0042aa10(undefined4 param_1,int param_2)
+/* [canon] car low (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall Car__WheelFlagsAllowSteer(undefined4 param_1,int param_2)
 
 {
   float fVar1;
@@ -7682,9 +7741,11 @@ undefined4 FUN_0042aa70(void)
 }
 
 
-// ==== 0x42ab00 FUN_0042ab00
+// ==== 0x42ab00 int_Greater
 
-bool __fastcall FUN_0042ab00(undefined4 param_1,int *param_2)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+bool __fastcall int_Greater(undefined4 param_1,int *param_2)
 
 {
   int *in_EAX;
@@ -7695,7 +7756,7 @@ bool __fastcall FUN_0042ab00(undefined4 param_1,int *param_2)
 
 // ==== 0x42ab10 int_Less
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 bool __fastcall int_Less(undefined4 param_1,int *param_2)
 
@@ -7831,7 +7892,7 @@ int FUN_0042ac60(void)
 
 // ==== 0x42ac70 ListRef_Init
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall ListRef_Init(int param_1)
 
@@ -7844,7 +7905,7 @@ void __fastcall ListRef_Init(int param_1)
 
 // ==== 0x42ac80 ListRef_Release
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall ListRef_Release(int *param_1)
 
@@ -7937,9 +7998,11 @@ CameraMoverBase_InitFields
 }
 
 
-// ==== 0x42ad90 FUN_0042ad90
+// ==== 0x42ad90 PlayerInput::SyncBlocks
 
-void FUN_0042ad90(void)
+/* [canon] camera low (ghidra-canon) docs/re/canon.md */
+
+void PlayerInput__SyncBlocks(void)
 
 {
   undefined4 *in_EAX;
@@ -8633,7 +8696,7 @@ LAB_0042b48e:
 
 // ==== 0x42bac0 Struct0x38::Copy
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall Struct0x38__Copy(undefined1 *param_1)
 
@@ -8914,7 +8977,7 @@ void FUN_0042c1f0(void)
     uVar8 = _ftol_nocw();
     *(undefined4 *)(in_EAX + 0x5c) = uVar8;
     if (*(int *)(in_EAX + 4) != 0) {
-      CarState__StopTimer();
+      CarState__StopNitrous();
     }
   }
   return;
@@ -9658,9 +9721,11 @@ void FUN_0042d3e0(void)
 }
 
 
-// ==== 0x42d470 FUN_0042d470
+// ==== 0x42d470 Player::DetermineInputMode
 
-void FUN_0042d470(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Player__DetermineInputMode(void)
 
 {
   int in_EAX;
@@ -10076,7 +10141,7 @@ void __thiscall Player__EndSpecialCamera(int param_1,char param_2)
       *(undefined4 *)(param_1 + 0x60) = 0;
       *(undefined1 *)(param_1 + 0x98) = 0;
       *(undefined4 *)(param_1 + 0x9c) = 0;
-      FUN_0042d470();
+      Player__DetermineInputMode();
     }
   }
   return;
@@ -10232,9 +10297,11 @@ int Player__CyclePOV(void)
 }
 
 
-// ==== 0x42e150 FUN_0042e150
+// ==== 0x42e150 Player::NotifyCameraMovers
 
-void FUN_0042e150(void)
+/* [canon] camera low (ghidra-canon) docs/re/canon.md */
+
+void Player__NotifyCameraMovers(void)
 
 {
   int unaff_ESI;
@@ -10324,7 +10391,7 @@ void FUN_0042e230(int param_1)
     }
     *(undefined4 *)(param_1 + 0x1dc) = 0;
     if ((*(int *)(param_1 + 0x27c) != 0) && (*(int *)(*(int *)(param_1 + 0x27c) + 0xc) != 0x12)) {
-      FUN_0042a5c0();
+      Car__MakeFlatMatrix();
       Matrix_InvertRigid();
       local_60 = 1.0;
       local_5c = 0.0;
@@ -10349,8 +10416,8 @@ void FUN_0042e230(int param_1)
       FUN_00483fb0(uVar2,iVar7);
       cVar1 = *(char *)(param_1 + 0x24);
       if (((cVar1 != '\x01') && (cVar1 != '\0')) && (cVar1 != '\x04')) {
-        FUN_0042ad90();
-        FUN_0042ad90();
+        PlayerInput__SyncBlocks();
+        PlayerInput__SyncBlocks();
       }
     }
   }
@@ -11046,7 +11113,7 @@ void FUN_0042f0c0(undefined4 param_1)
   undefined1 local_50 [76];
   
   uVar5 = (uint3)uStack_104;
-  FUN_0042a5c0();
+  Car__MakeFlatMatrix();
   Matrix_InvertRigid();
   cVar6 = FUN_0042ee40();
   if (cVar6 == '\0') {
@@ -11393,11 +11460,12 @@ LAB_0042f6ac:
 }
 
 
-// ==== 0x42fc00 FUN_0042fc00
+// ==== 0x42fc00 Player::UpdateDragRace
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals med (ghidra-canon+nfsug) docs/re/rivals.md */
 
-void FUN_0042fc00(void)
+void Player__UpdateDragRace(void)
 
 {
   float fVar1;
@@ -11479,7 +11547,7 @@ void FUN_0042fc00(void)
 
 // ==== 0x42fdf0 Player::ResetMatrix140
 
-/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/camera.md */
 
 void Player__ResetMatrix140(void)
 
@@ -11508,7 +11576,7 @@ void Player__ResetMatrix140(void)
 
 // ==== 0x42fe60 Player::InitAimTuning
 
-/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/camera.md */
 
 void __fastcall Player__InitAimTuning(undefined4 param_1,int param_2)
 
@@ -11716,7 +11784,7 @@ void FUN_004300f0(void)
       *(float *)(unaff_EBX + 0x180) = (float)fVar11;
       local_98 = 0;
       do {
-        FUN_0042a710(local_70);
+        Car__CalculateWheelPosition(local_70);
         D3DXVec3Transform(local_70,local_70,local_50);
         fVar11 = (float10)FUN_0059d740(*(undefined4 *)(unaff_EBX + 0x184),0,0x3ba3d70a);
         local_94[local_98 + 5] = (float)fVar11;
@@ -11863,7 +11931,7 @@ float10 __fastcall FUN_00430650(int param_1)
 
 // ==== 0x4306c0 Player::CheckDriftTimeout
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 __fastcall Player__CheckDriftTimeout(int param_1)
 
@@ -11998,7 +12066,7 @@ LAB_00430a7a:
     *(undefined1 *)(in_EAX + 0x4af) = 0;
   }
   else {
-    FUN_0042fc00();
+    Player__UpdateDragRace();
   }
   if ((DAT_0078a345 != '\0') || (DAT_007361a4 != 0)) {
     FUN_0042f650();

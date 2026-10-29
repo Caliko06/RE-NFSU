@@ -7126,7 +7126,7 @@ void FUN_006961f0(void)
 void StaticInit_ParticleEmitter_G78e974_696200(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7136,7 +7136,7 @@ void StaticInit_ParticleEmitter_G78e974_696200(void)
 void FUN_00696210(void)
 
 {
-  FUN_004049f0();
+  List_DeleteAllNodes();
   FUN_00404a30();
   return;
 }
@@ -7147,7 +7147,7 @@ void FUN_00696210(void)
 void FUN_00696220(void)
 
 {
-  FUN_004049f0();
+  List_DeleteAllNodes();
   FUN_00404a30();
   return;
 }
@@ -7168,7 +7168,7 @@ void FUN_00696230(void)
 void FUN_00696250(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7178,7 +7178,7 @@ void FUN_00696250(void)
 void FUN_00696260(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7264,7 +7264,7 @@ void FUN_00696300(void)
 void FUN_00696310(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7328,7 +7328,7 @@ void FUN_00696350(void)
 void FUN_00696360(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7408,7 +7408,7 @@ void FUN_006963d0(void)
 void FUN_006963e0(void)
 
 {
-  FUN_0046a930();
+  _GLOBAL__D_TheCollisionStats();
   return;
 }
 
@@ -7474,7 +7474,7 @@ void FUN_00696430(void)
 void StaticInit_AnimBank_G779798_696440(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7544,7 +7544,7 @@ void FUN_006964a0(void)
 void FUN_006964c0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7637,7 +7637,7 @@ void FUN_00696550(void)
 void StaticInit_GaragePaintModScreen_G744ff0_696560(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7665,7 +7665,7 @@ void FUN_00696580(void)
 void FUN_00696590(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7906,7 +7906,7 @@ void FUN_00696720(void)
 void FUN_00696730(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7981,7 +7981,7 @@ void FUN_00696780(void)
 void StaticInit_LightTree_G740a68_696790(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -8050,7 +8050,7 @@ void FUN_00696800(void)
 void FUN_00696810(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -8585,7 +8585,7 @@ void FUN_00696b80(void)
 void FUN_00696b90(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -8635,7 +8635,7 @@ void FUN_00696bf0(void)
 void FUN_00696c00(void)
 
 {
-  FUN_004049f0();
+  List_DeleteAllNodes();
   return;
 }
 
@@ -8715,7 +8715,7 @@ void FUN_00696c70(void)
 void FUN_00696c80(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -8735,7 +8735,7 @@ void FUN_00696c90(void)
 void FUN_00696ca0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -8747,7 +8747,7 @@ void FUN_00696ca0(void)
 void StaticInit_WorldZone_G737b20_696cb0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -8930,7 +8930,7 @@ void FUN_00696dc0(void)
 void FUN_00696dd0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -8940,7 +8940,7 @@ void FUN_00696dd0(void)
 void FUN_00696de0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 

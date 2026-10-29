@@ -123,7 +123,7 @@ float10 FUN_00471de0(void)
       fStack_f8 = fStack_188;
 LAB_00472175:
       local_194 = local_198;
-      FUN_004723a0();
+      SCEA_GJKsimplexPair__SCEA_GJKsimplexPair_copy_();
       do {
         fStack_120 = -fStack_190;
         fStack_11c = -fStack_18c;
@@ -172,18 +172,18 @@ LAB_00472295:
         bVar1 = true;
 LAB_00472303:
         if (!bVar1 && !bVar2) goto LAB_00472378;
-        fVar6 = (float10)FUN_0046ea50();
+        fVar6 = (float10)SCEA_GJKsimplexPair__DistanceSqr();
         local_198 = (undefined4 *)(float)fVar6;
         if (fVar6 == (float10)0.0) break;
         if ((float)local_194 <= (float)local_198) {
           local_198 = local_194;
-          FUN_004724b0();
+          SCEA_GJKsimplexPair__operator_();
 LAB_00472378:
           bNormalize3();
           return SQRT((float10)(float)local_198);
         }
         local_194 = local_198;
-        FUN_004724b0();
+        SCEA_GJKsimplexPair__operator_();
       } while( true );
     }
   }
@@ -228,7 +228,7 @@ LAB_00472378:
         puVar4 = puVar4 + 4;
       } while ((int)local_194 < *(int *)(unaff_EDI + 0x134));
     }
-    fVar6 = (float10)FUN_0046ea50();
+    fVar6 = (float10)SCEA_GJKsimplexPair__DistanceSqr();
     local_198 = (undefined4 *)(float)fVar6;
     if (fVar6 < (float10)0.001 == (fVar6 == (float10)0.001)) goto LAB_00472175;
   }
@@ -236,9 +236,11 @@ LAB_00472378:
 }
 
 
-// ==== 0x4723a0 FUN_004723a0
+// ==== 0x4723a0 SCEA_GJKsimplexPair::SCEA_GJKsimplexPair_copy_
 
-void __fastcall FUN_004723a0(undefined4 param_1,int param_2)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall SCEA_GJKsimplexPair__SCEA_GJKsimplexPair_copy_(undefined4 param_1,int param_2)
 
 {
   undefined4 uVar1;
@@ -308,9 +310,11 @@ void __fastcall FUN_004723a0(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x4724b0 FUN_004724b0
+// ==== 0x4724b0 SCEA_GJKsimplexPair::operator_
 
-void __fastcall FUN_004724b0(undefined4 param_1,undefined4 *param_2)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall SCEA_GJKsimplexPair__operator_(undefined4 param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -1726,9 +1730,11 @@ undefined4 FUN_00474010(void)
 }
 
 
-// ==== 0x474020 FUN_00474020
+// ==== 0x474020 Mellovator::GetState
 
-void __thiscall FUN_00474020(int param_1,undefined4 *param_2)
+/* [canon] car low (ghidra-canon+nfsug) docs/re/car.md */
+
+void __thiscall Mellovator__GetState(int param_1,undefined4 *param_2)
 
 {
   *param_2 = *(undefined4 *)(param_1 + 0x24);
@@ -1739,9 +1745,11 @@ void __thiscall FUN_00474020(int param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x474040 FUN_00474040
+// ==== 0x474040 Mellovator::SetState
 
-void __thiscall FUN_00474040(int param_1,undefined4 *param_2)
+/* [canon] car low (ghidra-canon+nfsug) docs/re/car.md */
+
+void __thiscall Mellovator__SetState(int param_1,undefined4 *param_2)
 
 {
   *(undefined4 *)(param_1 + 0x24) = *param_2;
@@ -2098,8 +2106,8 @@ void FUN_00474460(undefined4 *param_1)
     iVar3 = iVar3 + -1;
   } while (iVar3 != 0);
   local_4 = local_4 & 0xffffff00;
-  FUN_0046a9b0();
-  *param_1 = &PTR_FUN_006caadc;
+  PhysicsSystem___PhysicsSystem();
+  *param_1 = &PTR_PsychoDriverDerived__scalar_deleting_dtor_006caadc;
   ExceptionList = pvStack_c;
   return;
 }
@@ -2437,11 +2445,11 @@ void __fastcall FUN_00474ca0(int *param_1)
   int iVar1;
   float10 fVar2;
   
-  FUN_0046abd0();
+  PhysicsSystem__ComputeAuxiliaries();
   iVar1 = FUN_0047ac00(param_1[0xb],param_1 + 0x10,param_1 + 0x11);
   fVar2 = (float10)FUN_00476240(param_1[7]);
   if ((iVar1 != 0) || ((float10)0.0 < fVar2)) {
-    FUN_0046abd0();
+    PhysicsSystem__ComputeAuxiliaries();
   }
   if (param_1[0x11] == 2) {
     *(undefined4 *)(param_1[7] + 300) = 0x3f800000;
@@ -4022,8 +4030,8 @@ void FUN_00477250(undefined4 *param_1)
   *(undefined4 **)(iVar3 + 0x10) = puVar1;
   *(int *)(iVar3 + 0x18) = iVar2 + -1;
   local_4 = local_4 & 0xffffff00;
-  FUN_0046a9b0();
-  *param_1 = &PTR_FUN_006caadc;
+  PhysicsSystem___PhysicsSystem();
+  *param_1 = &PTR_PsychoDriverDerived__scalar_deleting_dtor_006caadc;
   ExceptionList = pvStack_c;
   return;
 }
@@ -4034,7 +4042,7 @@ void FUN_00477250(undefined4 *param_1)
 void __fastcall FUN_004772e0(int *param_1)
 
 {
-  FUN_0046abd0();
+  PhysicsSystem__ComputeAuxiliaries();
   FUN_00477300(param_1 + -2);
                     /* WARNING: Could not recover jumptable at 0x004772f6. Too many branches */
                     /* WARNING: Treating indirect jump as call */
@@ -4079,7 +4087,7 @@ void FUN_00477300(int param_1)
     FUN_00584e30();
   }
   _DAT_006f0738 = 0;
-  FUN_0046abd0();
+  PhysicsSystem__ComputeAuxiliaries();
   return;
 }
 
@@ -4291,7 +4299,7 @@ LAB_004776da:
     else {
       if (0.2 < fVar1) {
         if (1.0 <= *(float *)(*(int *)(param_1 + 0x58) + 0x390)) {
-          fVar15 = (float10)FUN_00464ed0();
+          fVar15 = (float10)CarState__GetYaw();
           fVar4 = (float)fVar15;
         }
         else {
@@ -4312,7 +4320,7 @@ LAB_004776da:
       uVar2 = *(undefined4 *)(iVar9 + 0x394);
       uVar3 = *(undefined4 *)(*(int *)(iVar13 + param_1) + 0x174);
       if (1.0 <= *(float *)(iVar9 + 0x390)) {
-        fVar15 = (float10)FUN_00464ed0();
+        fVar15 = (float10)CarState__GetYaw();
         fStack_34 = (float)fVar15;
       }
       else {
@@ -4360,7 +4368,7 @@ LAB_004776da:
     if (fStack_38 == 0.0) {
       iVar13 = *(int *)(param_1 + 0x20);
       if (1.0 <= *(float *)(*(int *)(param_1 + 0x58) + 0x390)) {
-        fVar15 = (float10)FUN_00464ed0();
+        fVar15 = (float10)CarState__GetYaw();
       }
       else {
         fVar15 = (float10)0.0;
@@ -5185,8 +5193,8 @@ void FUN_00479290(void)
   
   if (((3 < *(int *)(*(int *)(unaff_EDI + 0x5c) + 0x3cc)) &&
       (*(int *)(*(int *)(unaff_EDI + 0x5c) + 0x38) == 0)) &&
-     (fVar1 = (float10)FUN_00464ed0(), ABS(fVar1 * (float10)57.295776) < (float10)5.0)) {
-    FUN_00429cc0();
+     (fVar1 = (float10)CarState__GetYaw(), ABS(fVar1 * (float10)57.295776) < (float10)5.0)) {
+    Car__GetForwardAcceleration();
     FUN_00584e00();
   }
   return;
@@ -5418,7 +5426,7 @@ void FUN_00479640(float param_1)
     }
     else {
       if (1.0 <= *(float *)(iVar2 + 0x390)) {
-        fVar13 = (float10)FUN_00464ed0();
+        fVar13 = (float10)CarState__GetYaw();
       }
       else {
         fVar13 = (float10)0.0;
@@ -5606,7 +5614,7 @@ void FUN_00479e20(float param_1)
       if (*(float *)(iVar2 + 0x2a0) + 0.1 < local_8) {
         local_8 = *(float *)(iVar2 + 0x2a0);
         *(undefined4 *)(*(int *)(unaff_EDI + 0x58) + 0x3b8) = 0;
-        CarState__StopTimer();
+        CarState__StopNitrous();
       }
       fVar3 = *(float *)(*(int *)(unaff_EDI + 0x5c) + 0x3d0);
       fVar10 = (float10)RideInfo__GetTheoreticalTopSpeed();
@@ -6076,7 +6084,7 @@ LAB_0047aca6:
   }
   else {
     if (*(int *)(*(int *)(param_1 + 0x14) + 4) == 1) {
-      uVar2 = FUN_0042aa10();
+      uVar2 = Car__WheelFlagsAllowSteer();
       param_1 = (int)((ulonglong)uVar2 >> 0x20);
       if ((int)uVar2 != 0) goto LAB_0047aca6;
     }
@@ -6126,7 +6134,7 @@ undefined4 __thiscall CAnimBank__GetAnimByIndex(int param_1,int param_2)
 
 // ==== 0x47aea0 CAnimBank::GetAnimByIndex_Table2
 
-/* [canon] assets low (ghidra-canon+nfsug) docs/re/assets.md */
+/* [canon] assets med (ghidra-canon+hopper) docs/re/assets.md */
 
 undefined4 __thiscall CAnimBank__GetAnimByIndex_Table2(int param_1,int param_2)
 
@@ -10809,7 +10817,7 @@ float10 FUN_004801c0(void)
 
 // ==== 0x480230 KeyframeTrack_FindSegment
 
-/* [canon] camera low (ghidra-canon) docs/re/runtime.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/runtime.md */
 
 int KeyframeTrack_FindSegment(int param_1,undefined4 *param_2,undefined4 *param_3)
 

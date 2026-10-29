@@ -68,7 +68,7 @@ void DrawRaceCarList(int param_1)
                  (iVar5 = DAT_007361c0, *(int *)(param_1 + 4) != *(int *)(DAT_007361c0 + 0x18)))))
                || (iVar5 = *(int *)(iVar5 + 0x60), iVar5 == 0)))) || ((iVar5 != 6 && (iVar5 != 7))))
           {
-            FUN_00429ba0(param_1);
+            Car__CalcBearingToPoint(param_1);
           }
         }
         piVar7 = (int *)*piVar7;
@@ -4289,7 +4289,7 @@ void FUN_00575390(void)
 {
   undefined4 *in_EAX;
   
-  *in_EAX = &PTR_FUN_006caadc;
+  *in_EAX = &PTR_PsychoDriverDerived__scalar_deleting_dtor_006caadc;
   return;
 }
 
@@ -9395,7 +9395,7 @@ void FUN_0057a5f0(void)
   if (*(int *)(*(int *)(*(int *)(unaff_EDI + 0x1d4) + 0x1c) + 0xe4) != 0) {
     FUN_005791c0();
   }
-  FUN_00429c50(SQRT(fVar1 * fVar1 + fVar2 * fVar2 + fVar3 * fVar3));
+  bLength3_or_DotNormalized(SQRT(fVar1 * fVar1 + fVar2 * fVar2 + fVar3 * fVar3));
   return;
 }
 

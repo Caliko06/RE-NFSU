@@ -1492,7 +1492,7 @@ undefined4 Screen_MU_Main_PC__MenuBitToObjectHash(void)
 
 // ==== 0x4b31b0 Screen_MU_Main_PC::ObjectHashToTextHash
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 Screen_MU_Main_PC__ObjectHashToTextHash(void)
 
@@ -1881,7 +1881,7 @@ FUN_004b3940(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
 
 // ==== 0x4b3990 RaceSubObject586c::RaceSubObject586c
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall RaceSubObject586c__RaceSubObject586c(undefined4 *param_1)
 
@@ -6113,7 +6113,7 @@ void FUN_004b91e0(void)
 
 // ==== 0x4b9240 GenericDialogData::GenericDialogData
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 * __fastcall GenericDialogData__GenericDialogData(undefined4 param_1,undefined4 *param_2)
 
@@ -6209,7 +6209,7 @@ undefined4 FUN_004b92a0(void)
 
 // ==== 0x4b9370 TournamentTrackList::_TournamentTrackList
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall TournamentTrackList___TournamentTrackList(undefined4 *param_1)
 
@@ -6238,7 +6238,7 @@ void __fastcall TournamentTrackList___TournamentTrackList(undefined4 *param_1)
 
 // ==== 0x4b93a0 TournamentTrackList::IsFull
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 bool TournamentTrackList__IsFull(void)
 
@@ -9291,7 +9291,7 @@ LAB_004bcc6b:
 
 // ==== 0x4bcfd0 Screen_MU_QuickRaceCarSelect::IsSelectedCarInGarage
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 uint Screen_MU_QuickRaceCarSelect__IsSelectedCarInGarage(void)
 
@@ -10539,7 +10539,7 @@ void OptionsCameraUI(int param_1)
       DAT_00700b5c = 1;
       iVar2 = FindCameraRow();
       if (iVar2 != 0) {
-        FUN_0042e150();
+        Player__NotifyCameraMovers();
       }
     }
     DAT_00758950 = DAT_00700b5c == 0;
@@ -12186,7 +12186,7 @@ void __thiscall FUN_004c08c0(int param_1,int param_2)
       }
     }
     else if (param_2 == 0xc407210) {
-      FUN_00433620(*(undefined4 *)(param_1 + 0x1e8));
+      HudMeter__SetLevel(*(undefined4 *)(param_1 + 0x1e8));
     }
   }
   FUN_004c0500();

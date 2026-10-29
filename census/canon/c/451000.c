@@ -480,7 +480,7 @@ undefined4 FUN_00451b00(int *param_1)
   int iVar8;
   
   bVar3 = false;
-  cVar4 = FUN_00435ca0(DAT_0073619c,*param_1);
+  cVar4 = RaceManager__IsInRaceStartWindow(DAT_0073619c,*param_1);
   if (cVar4 != '\0') {
     return 0xffffffff;
   }
@@ -523,8 +523,8 @@ LAB_00451be0:
       iVar7 = FUN_0044ecd0();
       if (((iVar7 == 0) && (0.4 <= (float)(DAT_0073ad34 - *(int *)(iVar6 + 8)) * 0.00025)) &&
          ((*(float *)(*param_1 + 0x3d4) < 5.0 ||
-          (iVar6 = FUN_00424b50(*(float *)(*param_1 + 0x3d4),0x40a00000,0x3a83126f), iVar6 != 0))))
-      {
+          (iVar6 = bAlmostEqual_float(*(float *)(*param_1 + 0x3d4),0x40a00000,0x3a83126f),
+          iVar6 != 0)))) {
         bVar3 = true;
       }
       iVar8 = iVar8 + 1;
@@ -685,8 +685,8 @@ char __thiscall FUN_00451f10(int param_1,int *param_2)
           iVar5 = FUN_0044ecd0();
           if (((iVar5 == 1) && (0.4 <= (float)(DAT_0073ad34 - *(int *)(iVar4 + 8)) * 0.00025)) &&
              ((ABS(*(float *)(*param_2 + 0x3d4)) < 5.0 ||
-              (iVar4 = FUN_00424b50(*(float *)(*param_2 + 0x3d4),0x40a00000,0x3a83126f), iVar4 != 0)
-              ))) {
+              (iVar4 = bAlmostEqual_float(*(float *)(*param_2 + 0x3d4),0x40a00000,0x3a83126f),
+              iVar4 != 0)))) {
             cVar2 = '\x01';
           }
           iVar6 = iVar6 + 1;
@@ -1347,7 +1347,7 @@ void __thiscall FUN_00452d20(int param_1,int *param_2)
             local_3c = local_40[1];
             local_48 = local_40[4] - (float)param_2[(char)param_2[0xe2] * 0xe + 6];
             local_40 = (float *)*local_40;
-            fVar6 = (float10)FUN_00429cc0();
+            fVar6 = (float10)Car__GetForwardAcceleration();
             if ((fVar6 * (float10)*(float *)(param_1 + 0x204) * (float10)_K_HALF + (float10)local_3c
                 ) * (float10)*(float *)(param_1 + 0x204) + (float10)local_48 <= (float10)3.0) {
               fVar6 = (float10)(**(code **)(*piVar2 + 0x5c))();
@@ -4512,7 +4512,7 @@ LAB_00455c9a:
       local_18 = *(undefined4 *)(pcVar1 + 0x18);
       local_1c = *(undefined4 *)(pcVar1 + 0x14);
       local_20 = *(undefined4 *)(pcVar1 + 0x10);
-      iVar2 = FUN_00424b50(local_18,0,0x3a83126f);
+      iVar2 = bAlmostEqual_float(local_18,0,0x3a83126f);
       if (iVar2 != 0) {
         FUN_00455760(&local_20);
       }
@@ -5949,7 +5949,7 @@ LAB_0045777e:
      (fVar20 = (float10)(**(code **)(**(int **)(param_5 + 0x2c) + 0x28))(), fVar20 <= (float10)-0.25
      )) {
     if (*(int *)(*(int *)(param_5 + 0x14) + 4) != 1) {
-      FUN_00459710(*(undefined4 *)(param_5 + 0x3d0),param_5 + 0x60,param_5 + 0x70);
+      DriveTarget__GetFirstPoint(*(undefined4 *)(param_5 + 0x3d0),param_5 + 0x60,param_5 + 0x70);
       FUN_0045a5b0(param_5 + 0x60,param_5 + 0x80);
     }
   }
@@ -6050,7 +6050,8 @@ LAB_0045777e:
   FUN_00458220(param_2,local_1020,uStack_10d4);
   FUN_00458290(param_2,local_e60,afStack_ca0,fStack_10e0);
   fStack_10b8 = 0.0;
-  iVar18 = FUN_00459710(*(undefined4 *)(param_5 + 0x3d0),(float *)(param_5 + 0x60),param_5 + 0x70);
+  iVar18 = DriveTarget__GetFirstPoint
+                     (*(undefined4 *)(param_5 + 0x3d0),(float *)(param_5 + 0x60),param_5 + 0x70);
   local_10d8 = FUN_004596b0(local_e60,param_1);
   fStack_10ac = *(float *)(param_5 + 0x60);
   fStack_10a8 = *(float *)(param_5 + 100);
@@ -6873,7 +6874,8 @@ void FUN_00458f10(int param_1,float param_2)
         else {
           if (-1 < iVar7) goto LAB_00459071;
 LAB_00459028:
-          iVar7 = FUN_00459710(*(undefined4 *)(param_1 + 0x3d0),param_1 + 0x60,param_1 + 0x70);
+          iVar7 = DriveTarget__GetFirstPoint
+                            (*(undefined4 *)(param_1 + 0x3d0),param_1 + 0x60,param_1 + 0x70);
           cVar1 = *(char *)(iVar7 + 0x150 + (int)in_EAX);
           uVar6 = (uint)*(short *)((int)in_EAX + iVar7 * 2 + 0x164);
           uVar5 = (uint)*(char *)(iVar7 + 0x18c + (int)in_EAX);
@@ -6937,7 +6939,7 @@ int __thiscall FUN_004590a0(char *param_1,float param_2,float *param_3)
     return 0;
   }
   pfVar13 = (float *)(in_EAX + 0x60);
-  iVar10 = FUN_00459710(*(undefined4 *)(in_EAX + 0x3d0),pfVar13,in_EAX + 0x70);
+  iVar10 = DriveTarget__GetFirstPoint(*(undefined4 *)(in_EAX + 0x3d0),pfVar13,in_EAX + 0x70);
   iVar11 = (iVar10 + 1) * 0x10;
   fVar1 = *(float *)(param_1 + iVar11 + 4) - *(float *)(in_EAX + 100);
   fVar2 = *(float *)(param_1 + iVar11 + 8) - *(float *)(in_EAX + 0x68);
@@ -7223,16 +7225,17 @@ void FUN_004596b0(undefined4 param_1,int param_2)
   iVar2 = iVar2 + 0x90;
   iVar1 = iVar1 + 0x40;
   fVar3 = (float10)FUN_00457520(iVar1,iVar2);
-  FUN_00459710((float)fVar3,iVar1,iVar2);
+  DriveTarget__GetFirstPoint((float)fVar3,iVar1,iVar2);
   return;
 }
 
 
-// ==== 0x459710 FUN_00459710
+// ==== 0x459710 DriveTarget::GetFirstPoint
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-int FUN_00459710(undefined4 param_1,float *param_2)
+int DriveTarget__GetFirstPoint(undefined4 param_1,float *param_2)
 
 {
   int iVar1;
@@ -7484,7 +7487,8 @@ float10 FUN_00459b30(char *param_1,int param_2)
     fVar11 = *(float *)(param_2 + 100) - *(float *)(param_1 + 0x14);
     afStack_54[1] = SQRT(fVar5 * fVar5 + fVar11 * fVar11);
   }
-  fVar5 = (float)FUN_00459710(*(undefined4 *)(param_2 + 0x3d0),param_2 + 0x60,param_2 + 0x70);
+  fVar5 = (float)DriveTarget__GetFirstPoint
+                           (*(undefined4 *)(param_2 + 0x3d0),param_2 + 0x60,param_2 + 0x70);
   local_a4[0] = fVar5;
   if ((int)fVar5 < (int)*param_1) {
     local_ac = (float *)(param_1 + (int)fVar5 * 0x10 + 0x14);
@@ -7839,7 +7843,7 @@ void FUN_0045a4c0(void)
   int in_EAX;
   
   if (*(int *)(*(int *)(in_EAX + 0x14) + 4) != 1) {
-    FUN_00459710(*(undefined4 *)(in_EAX + 0x3d0),in_EAX + 0x60,in_EAX + 0x70);
+    DriveTarget__GetFirstPoint(*(undefined4 *)(in_EAX + 0x3d0),in_EAX + 0x60,in_EAX + 0x70);
     FUN_0045a5b0(in_EAX + 0x60,in_EAX + 0x80);
   }
   return;
@@ -8363,7 +8367,7 @@ FUN_0045ae10(int *param_1,undefined4 *param_2,int *param_3,undefined4 param_4,un
       puVar6 = puVar6 + 1;
       puVar7 = puVar7 + 1;
     }
-    FUN_00459710(*(undefined4 *)(iVar1 + 0x3d0),iVar1 + 0x60,iVar1 + 0x70);
+    DriveTarget__GetFirstPoint(*(undefined4 *)(iVar1 + 0x3d0),iVar1 + 0x60,iVar1 + 0x70);
     FUN_0045a7d0(1);
     uVar4 = 1;
     if (ABS((float)param_1[2]) < 0.001 != (ABS((float)param_1[2]) == 0.001)) {
@@ -9668,7 +9672,7 @@ LAB_0045cb3b:
         iVar3 = FUN_005a6150(param_3,param_2 + cVar2 * 0x10,1);
         if (iVar3 != -1) {
           fVar7 = (float10)FUN_005a7560(param_2 + cVar2 * 0x10);
-          fVar7 = (float10)FUN_00401c40(local_50,(float)fVar7);
+          fVar7 = (float10)bMax_float(local_50,(float)fVar7);
           local_50 = (float)fVar7;
         }
       }
@@ -10854,7 +10858,7 @@ void FUN_0045e080(undefined4 *param_1)
   if (*(int **)(param_1[0x7c] + 0x878) != (int *)0x0) {
     (**(code **)(**(int **)(param_1[0x7c] + 0x878) + 0x4c))();
   }
-  *param_1 = &PTR_FUN_006caa58;
+  *param_1 = &PTR_PsychoDriver__scalar_deleting_dtor_006caa58;
   ExceptionList = local_c;
   return;
 }
@@ -11813,7 +11817,7 @@ LAB_0045f96e:
   else {
     fStack_4 = (float)(DAT_0073ad34 - iVar14);
     if ((float)*(int *)(param_1[0x7c] + 0x3f8) * 0.00025 < (float)(int)fStack_4 * 0.00025) {
-      CarState__StopTimer();
+      CarState__StopNitrous();
       goto LAB_0045f96e;
     }
     if (*(char *)((int)param_1 + 0x229) == '\0') {
@@ -12089,7 +12093,7 @@ LAB_0045ffb0:
     *pfVar8 = 0.0;
     cVar9 = CarState__IsNitrousOn();
     if (cVar9 != '\0') {
-      CarState__StopTimer();
+      CarState__StopNitrous();
       (**(code **)(*piVar6 + 0x80))();
     }
   }
@@ -12620,9 +12624,11 @@ LAB_004606b6:
 }
 
 
-// ==== 0x4607a0 FUN_004607a0
+// ==== 0x4607a0 RealDriver::IsDriftModeActive
 
-undefined4 FUN_004607a0(void)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+undefined4 RealDriver__IsDriftModeActive(void)
 
 {
   int in_EAX;
@@ -12635,9 +12641,11 @@ undefined4 FUN_004607a0(void)
 }
 
 
-// ==== 0x4607e0 FUN_004607e0
+// ==== 0x4607e0 RealDriver::SetJoystickPort
 
-void __thiscall FUN_004607e0(int param_1,undefined4 param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __thiscall RealDriver__SetJoystickPort(int param_1,undefined4 param_2)
 
 {
   *(undefined4 *)(param_1 + 0x270) = param_2;
@@ -12645,9 +12653,11 @@ void __thiscall FUN_004607e0(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4607f0 FUN_004607f0
+// ==== 0x4607f0 RealDriver::EnableStartLineState
 
-void __fastcall FUN_004607f0(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall RealDriver__EnableStartLineState(int param_1)
 
 {
   *(undefined4 *)(param_1 + 0x278) = 1;
@@ -12655,9 +12665,11 @@ void __fastcall FUN_004607f0(int param_1)
 }
 
 
-// ==== 0x460800 FUN_00460800
+// ==== 0x460800 RealDriver::GetDriverNumber
 
-int __fastcall FUN_00460800(int param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
+
+int __fastcall RealDriver__GetDriverNumber(int param_1)
 
 {
   return (int)*(short *)(*(int *)(param_1 + 0x26c) + 10);
@@ -12673,9 +12685,11 @@ undefined4 __fastcall FUN_00460810(int param_1)
 }
 
 
-// ==== 0x460820 FUN_00460820
+// ==== 0x460820 StringBufPair_Destroy
 
-void FUN_00460820(void)
+/* [canon] runtime low (ghidra-canon) docs/re/car.md */
+
+void StringBufPair_Destroy(void)
 
 {
   int unaff_ESI;
@@ -12828,7 +12842,7 @@ float10 FUN_00460a80(float param_1,float param_2)
   }
   cVar10 = DAT_00736514;
   if (1.0 <= *(float *)(*unaff_EDI + 0x3d0)) {
-    fVar13 = (float10)FUN_00464ed0();
+    fVar13 = (float10)CarState__GetYaw();
   }
   else {
     fVar13 = (float10)0.0;
@@ -12854,7 +12868,7 @@ float10 FUN_00460a80(float param_1,float param_2)
   else {
     if (((char)unaff_EDI[1] == '\0') && (fVar2 <= local_14)) goto LAB_00460dac;
     if (cVar10 == '\0') {
-      FUN_004607a0();
+      RealDriver__IsDriftModeActive();
       fVar13 = (float10)FUN_00583ea0(ABS(param_1));
     }
     else {
@@ -12919,7 +12933,7 @@ void FUN_00460e70(void)
   in_EAX[0x9b] = unaff_EDI;
   in_EAX[0x9c] = 0xffffffff;
   in_EAX[0x9d] = 0;
-  FUN_004617d0();
+  RealDriver__ResetJoyValues();
   in_EAX[0x9e] = 1;
   in_EAX[0x75] = 1;
   *(undefined1 *)(in_EAX + 0xae) = 1;
@@ -12965,8 +12979,8 @@ void FUN_00460f50(undefined4 *param_1)
     _gSpecialCameraActive = 0;
   }
   FUN_004613b0();
-  FUN_00460820();
-  *param_1 = &PTR_FUN_006caa58;
+  StringBufPair_Destroy();
+  *param_1 = &PTR_PsychoDriver__scalar_deleting_dtor_006caa58;
   ExceptionList = local_c;
   return;
 }

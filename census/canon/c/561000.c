@@ -589,12 +589,12 @@ void __thiscall FUN_00562390(undefined4 param_1,int param_2,undefined4 param_3)
   }
   if (DAT_0073578c != 0) {
     uVar1 = FUN_004ef050(uVar1);
-    FUN_00417530(param_3,uVar1);
+    PtrList__PushBack(param_3,uVar1);
     return;
   }
   iVar2 = 0;
 LAB_00562401:
-  FUN_00417530(param_3,iVar2);
+  PtrList__PushBack(param_3,iVar2);
   return;
 }
 
@@ -7583,7 +7583,7 @@ int * CarRenderInfo__CarRenderInfo(int *param_1,int param_2,int param_3)
   param_1[0x141] = (int)piVar17;
   local_b0 = param_1 + 0x151;
   local_14 = 0;
-  eh_vector_constructor_iterator(local_b0,8,0x1d,IList_InitEmpty_Thunk,FUN_004049f0);
+  eh_vector_constructor_iterator(local_b0,8,0x1d,IList_InitEmpty_Thunk,List_DeleteAllNodes);
   local_40 = param_1 + 0x18b;
   local_14._0_1_ = 1;
   eh_vector_constructor_iterator(local_40,8,0x1c,FUN_0049fd90,FUN_00571560);
@@ -9154,7 +9154,7 @@ void FUN_0056c140(int param_1)
   local_4._0_1_ = 1;
   eh_vector_destructor_iterator((void *)(param_1 + 0x62c),8,0x1c,FUN_00571560);
   local_4 = (uint)local_4._1_3_ << 8;
-  eh_vector_destructor_iterator((void *)(param_1 + 0x544),8,0x1d,FUN_004049f0);
+  eh_vector_destructor_iterator((void *)(param_1 + 0x544),8,0x1d,List_DeleteAllNodes);
   piVar1 = *(int **)(param_1 + 0x500);
   while (piVar1 != (int *)(param_1 + 0x500)) {
     iVar2 = *piVar1;
@@ -11062,18 +11062,18 @@ LAB_0056e108:
           do {
             cVar9 = FUN_004107e0(param_1[0x12e],4);
             if (cVar9 != '\0') {
-              FUN_00410940();
-              FUN_00410940();
-              FUN_00410940();
-              FUN_00410940();
-              FUN_004108d0(uVar23);
-              FUN_004108d0(uVar23);
-              FUN_004108d0(uVar23);
-              FUN_004108d0(uVar23);
-              FUN_00410910(0x3e1eb852,0);
-              FUN_00410910(0,0);
-              FUN_00410910(0x3e1eb852,0);
-              FUN_00410910(0x3e1eb852,0);
+              ImmBuf_PushPosition();
+              ImmBuf_PushPosition();
+              ImmBuf_PushPosition();
+              ImmBuf_PushPosition();
+              ImmBuf_PushColor(uVar23);
+              ImmBuf_PushColor(uVar23);
+              ImmBuf_PushColor(uVar23);
+              ImmBuf_PushColor(uVar23);
+              ImmBuf_PushTexCoord(0x3e1eb852,0);
+              ImmBuf_PushTexCoord(0,0);
+              ImmBuf_PushTexCoord(0x3e1eb852,0);
+              ImmBuf_PushTexCoord(0x3e1eb852,0);
               RenderQueue_SelectDefaultBucket(param_2);
               pfVar17 = pfStack_954;
             }
@@ -11082,15 +11082,15 @@ LAB_0056e108:
         }
         if ((((uint)pfStack_99c & 1) != 0) &&
            (cVar9 = FUN_004107e0(param_1[0x12e],3), cVar9 != '\0')) {
-          FUN_00410940();
-          FUN_00410940();
-          FUN_00410940();
-          FUN_004108d0(uVar23);
-          FUN_004108d0(uVar23);
-          FUN_004108d0(uVar23);
-          FUN_00410910(0x3e1eb852,0);
-          FUN_00410910(0,0);
-          FUN_00410910(0x3e1eb852,0);
+          ImmBuf_PushPosition();
+          ImmBuf_PushPosition();
+          ImmBuf_PushPosition();
+          ImmBuf_PushColor(uVar23);
+          ImmBuf_PushColor(uVar23);
+          ImmBuf_PushColor(uVar23);
+          ImmBuf_PushTexCoord(0x3e1eb852,0);
+          ImmBuf_PushTexCoord(0,0);
+          ImmBuf_PushTexCoord(0x3e1eb852,0);
           RenderQueue_SelectDefaultBucket(param_2);
         }
         pfVar17 = (float *)((int)pfStack_99c / 3);
@@ -11116,12 +11116,12 @@ LAB_0056e108:
                 pfStack_8fc = (float *)puVar13[1];
                 pfStack_900 = (float *)*puVar13;
                 fStack_8f8 = (float)puVar13[2];
-                FUN_00410940();
-                FUN_00410940();
-                FUN_00410970(uVar23);
-                FUN_00410970(uVar23);
-                FUN_00410910(0x3e1eb852,0);
-                FUN_00410910(0x3f800000,0);
+                ImmBuf_PushPosition();
+                ImmBuf_PushPosition();
+                ImmBuf_PushColor2(uVar23);
+                ImmBuf_PushColor2(uVar23);
+                ImmBuf_PushTexCoord(0x3e1eb852,0);
+                ImmBuf_PushTexCoord(0x3f800000,0);
                 iStack_964 = iStack_964 + -1;
               } while (iStack_964 != 0);
             }
@@ -11129,12 +11129,12 @@ LAB_0056e108:
             pfStack_8fc = (float *)puVar13[1];
             pfStack_900 = (float *)*puVar13;
             fStack_8f8 = (float)puVar13[2];
-            FUN_00410940();
-            FUN_00410940();
-            FUN_00410970(uVar23);
-            FUN_00410970(uVar23);
-            FUN_00410910(0x3e1eb852,0);
-            FUN_00410910(0x3f800000,0);
+            ImmBuf_PushPosition();
+            ImmBuf_PushPosition();
+            ImmBuf_PushColor2(uVar23);
+            ImmBuf_PushColor2(uVar23);
+            ImmBuf_PushTexCoord(0x3e1eb852,0);
+            ImmBuf_PushTexCoord(0x3f800000,0);
             RenderQueue_SelectDefaultBucket(param_2);
             pfVar17 = pfStack_954;
           }
@@ -11382,7 +11382,7 @@ LAB_0056f1b0:
               *pfVar26 = pfVar12[1];
               *pfVar21 = pfVar12[2];
               DAT_007363c8 = DAT_007363c8 + 1;
-              FUN_00410970(piStack_990);
+              ImmBuf_PushColor2(piStack_990);
               fVar28 = pfStack_99c[1];
               *unaff_ESI = *pfStack_99c;
               *pfVar17 = fVar28;
@@ -11394,7 +11394,7 @@ LAB_0056f1b0:
               pfVar24 = pfVar24 + 0xc;
               pfVar26 = pfVar26 + 0xc;
               pfVar21 = pfVar21 + 0xc;
-              FUN_00410970(piStack_990);
+              ImmBuf_PushColor2(piStack_990);
               fVar28 = pfStack_998[1];
               unaff_ESI[6] = *pfStack_998;
               pfVar17[6] = fVar28;
@@ -12077,7 +12077,7 @@ void Views_UpdatePerFrame(void)
      (DAT_00740504 == (undefined4 *)0x4)) {
 LAB_0057080c:
     piVar3 = DAT_007361f8;
-    iVar2 = FUN_0041ff50();
+    iVar2 = RaceManager__FindRacerByIdIn();
     if (iVar2 == 0) {
       iVar2 = *piVar3;
     }
@@ -12372,7 +12372,7 @@ void RenderFrame_DrawCars(void)
   
   if (((DAT_006f1ad0 != 0) && (DAT_0077a920 == 6)) && (*DAT_007361f0 != 1)) {
     iVar6 = (&DAT_007361bc)[*(int *)(unaff_ESI + 4) != 4];
-    iVar3 = FUN_0041ff50();
+    iVar3 = RaceManager__FindRacerByIdIn();
     local_2a8 = (int)*(short *)(iVar3 + 8);
     iVar3 = *(int *)(iVar6 + 0x27c);
     iVar4 = FUN_00421c40();

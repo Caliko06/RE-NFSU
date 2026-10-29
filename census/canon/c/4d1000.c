@@ -3740,12 +3740,12 @@ void __thiscall FUN_004d5cf0(undefined4 param_1,int param_2,undefined4 param_3)
   }
   if (DAT_0073578c != 0) {
     uVar1 = FUN_004ef050(uVar1);
-    FUN_00417530(param_3,uVar1);
+    PtrList__PushBack(param_3,uVar1);
     return;
   }
   iVar2 = 0;
 LAB_004d5d61:
-  FUN_00417530(param_3,iVar2);
+  PtrList__PushBack(param_3,iVar2);
   return;
 }
 
@@ -8356,7 +8356,7 @@ void __thiscall FUN_004dafa0(int param_1,uint param_2,undefined4 param_3)
       *(int *)(param_1 + 0xafc) = DAT_0073ad3c;
       FUN_004db8a0();
       DAT_00735e14 = 0;
-      FUN_0051c770();
+      EAXSound__PlayUISoundFX();
       return;
     }
     if (((param_2 != 0xb5971bf1) && (param_2 != 0x911c0a4b)) && (param_2 != 0x9120409e)) {

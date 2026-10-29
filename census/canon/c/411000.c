@@ -351,7 +351,7 @@ uint __fastcall Char_IsAllowedSymbol(char param_1)
 
 // ==== 0x411720 Cursor_MoveClamped
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall Cursor_MoveClamped(int param_1)
 
@@ -1313,7 +1313,7 @@ LAB_004126b7:
 
 // ==== 0x4127a0 StrmDef_SetEntry
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void StrmDef_SetEntry(int *param_1,int param_2,int param_3,int param_4,int param_5)
 
@@ -2178,7 +2178,7 @@ void __thiscall FUN_00413310(int param_1,int *param_2)
 
 // ==== 0x4134a0 bMalloc_regarg
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void bMalloc_regarg(void)
 
@@ -3144,7 +3144,7 @@ void FUN_00414441(void)
 
 // ==== 0x4145c0 Screen_PC_Controller_Config::GetObjectMessageHash
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 Screen_PC_Controller_Config__GetObjectMessageHash(void)
 
@@ -3487,7 +3487,7 @@ undefined4 * __thiscall Slider__scalar_deleting_destructor(undefined4 *param_1,b
 
 // ==== 0x414b40 ListSlider::_ListSlider
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall ListSlider___ListSlider(undefined4 *param_1)
 
@@ -5698,9 +5698,11 @@ void StringList__AddEntry(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x417530 FUN_00417530
+// ==== 0x417530 PtrList::PushBack
 
-void FUN_00417530(int param_1,int param_2)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void PtrList__PushBack(int param_1,int param_2)
 
 {
   undefined4 *puVar1;
@@ -5733,9 +5735,11 @@ void FUN_00417560(void)
 }
 
 
-// ==== 0x417580 FUN_00417580
+// ==== 0x417580 StringList::GetSelectedString
 
-int __fastcall FUN_00417580(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+int __fastcall StringList__GetSelectedString(int param_1)
 
 {
   if ((*(int *)(param_1 + 8) != param_1 + 8) && (*(int *)(param_1 + 0x10) != 0)) {
@@ -6506,7 +6510,7 @@ void FUN_00418230(void)
 
 // ==== 0x418330 Screen_MU_UG_NewOrLoad_PC2::ContainsProfileName
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 uint Screen_MU_UG_NewOrLoad_PC2__ContainsProfileName(byte *param_1)
 
@@ -6576,7 +6580,7 @@ FUN_004183b0(int param_1,uint param_2,undefined4 param_3,undefined4 param_4,unde
     }
     if (0x12349880 < param_2) {
       if (param_2 == 0x12349990) {
-        FUN_00417580();
+        StringList__GetSelectedString();
         cVar1 = Profile__DeleteAndReloadCfg();
         if (cVar1 == '\0') {
           FUN_00418cc0();
@@ -6593,7 +6597,7 @@ FUN_004183b0(int param_1,uint param_2,undefined4 param_3,undefined4 param_4,unde
       if (*(int *)(param_1 + 0x274) == param_1 + 0x274) {
         return;
       }
-      iVar2 = FUN_00417580();
+      iVar2 = StringList__GetSelectedString();
       if (iVar2 == 0) {
         return;
       }
@@ -6767,7 +6771,7 @@ FUN_004183b0(int param_1,uint param_2,undefined4 param_3,undefined4 param_4,unde
       return;
     }
     if (*(int *)(param_1 + 0x274) != param_1 + 0x274) {
-      FUN_00417580();
+      StringList__GetSelectedString();
       Profile__Load();
       *(undefined1 *)(param_1 + 0x25c) = 0;
       FUN_004c96c0(0x12349660);
@@ -10414,7 +10418,7 @@ void Profile__CreateNew(undefined4 param_1)
   ProfileList__Touch(&DAT_0078a478,param_1);
   Ugd__Write(&DAT_0078a478,"auto");
   Config__OpenCfgFile(param_1);
-  FUN_004aa670(0,1);
+  UserProfile__Default(0,1);
   Settings__Save();
   return;
 }
@@ -11480,7 +11484,7 @@ void FUN_0041e540(float param_1,float param_2)
   if (240.0 < local_c) {
     param_2 = param_2 - (local_c - 240.0);
   }
-  fVar1 = (float10)FUN_00401c40(0xc3700000,param_2);
+  fVar1 = (float10)bMax_float(0xc3700000,param_2);
   FUN_004f7000(param_1,(float)fVar1);
   return;
 }
@@ -12115,7 +12119,7 @@ void FUN_0041f060(int param_1)
 
 // ==== 0x41f0b0 int_Sub
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __thiscall int_Sub(int *param_1,int *param_2)
 
@@ -12129,7 +12133,7 @@ void __thiscall int_Sub(int *param_1,int *param_2)
 
 // ==== 0x41f0c0 FEMenuData::FEMenuData
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 * __fastcall FEMenuData__FEMenuData(undefined4 *param_1)
 
@@ -12560,7 +12564,7 @@ undefined4 __fastcall FUN_0041f690(undefined4 param_1,int param_2)
 
 // ==== 0x41f6a0 GameMode::BlocksSpecialCameras
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 GameMode__BlocksSpecialCameras(void)
 
@@ -12801,7 +12805,7 @@ void FUN_0041f9b0(int param_1)
   }
   pvVar1 = DAT_00734460;
   if (DAT_00734460 != (void *)0x0) {
-    eh_vector_destructor_iterator(DAT_00734460,8,0xcb,FUN_004049f0);
+    eh_vector_destructor_iterator(DAT_00734460,8,0xcb,List_DeleteAllNodes);
     _free(pvVar1);
     DAT_00734460 = (void *)0x0;
   }
@@ -12966,9 +12970,11 @@ void FUN_0041fc00(undefined4 *param_1)
 }
 
 
-// ==== 0x41fe50 FUN_0041fe50
+// ==== 0x41fe50 RaceManager::SortRacersByKind
 
-void FUN_0041fe50(void)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+void RaceManager__SortRacersByKind(void)
 
 {
   undefined4 *puVar1;
@@ -13026,9 +13032,11 @@ void FUN_0041fe50(void)
 }
 
 
-// ==== 0x41ff50 FUN_0041ff50
+// ==== 0x41ff50 RaceManager::FindRacerByIdIn
 
-int FUN_0041ff50(void)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+int RaceManager__FindRacerByIdIn(void)
 
 {
   int in_EAX;
@@ -13068,7 +13076,7 @@ void FUN_0041ff80(void)
   FUN_00571c20(in_EAX,&local_4,1,4,0);
   if (*(char *)(in_EAX + 0x3d) != '\0') {
     if (-1 < local_4) {
-      iVar1 = FUN_0041ff50();
+      iVar1 = RaceManager__FindRacerByIdIn();
       *unaff_ESI = iVar1;
       return;
     }

@@ -5206,7 +5206,7 @@ void FUN_0068514b(void)
 void Unwind_00685160(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -5806,7 +5806,7 @@ void Unwind_00685510(void)
 void Unwind_00685518(void)
 
 {
-  FUN_00460820();
+  StringBufPair_Destroy();
   return;
 }
 
@@ -6032,7 +6032,7 @@ void FUN_00685668(void)
 void Unwind_00685680(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -6044,7 +6044,8 @@ void Unwind_0068568e(void)
 {
   int unaff_EBP;
   
-  eh_vector_destructor_iterator((void *)(*(int *)(unaff_EBP + 4) + 0x544),8,0x1d,FUN_004049f0);
+  eh_vector_destructor_iterator
+            ((void *)(*(int *)(unaff_EBP + 4) + 0x544),8,0x1d,List_DeleteAllNodes);
   return;
 }
 
@@ -6838,7 +6839,7 @@ void FUN_00685ad3(void)
 void Unwind_00685ae0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7686,7 +7687,7 @@ void FUN_00685f90(void)
 void Unwind_00685fa0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7696,7 +7697,7 @@ void Unwind_00685fa0(void)
 void Unwind_00685fab(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -7944,7 +7945,7 @@ void FUN_0068610b(void)
 void Unwind_00686120(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -9016,7 +9017,7 @@ void FUN_00686740(void)
 void Unwind_00686750(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -9029,7 +9030,8 @@ void Unwind_00686761(void)
   int unaff_EBP;
   
   eh_vector_destructor_iterator
-            ((void *)(*(int *)(*(int *)(unaff_EBP + -0x10) + 8) + 0x544),8,0x1d,FUN_004049f0);
+            ((void *)(*(int *)(*(int *)(unaff_EBP + -0x10) + 8) + 0x544),8,0x1d,List_DeleteAllNodes)
+  ;
   return;
 }
 
@@ -9468,7 +9470,7 @@ void Unwind_00686a18(void)
   else {
     *(int *)(unaff_EBP + -0x14) = *(int *)(unaff_EBP + -0x10) + 0x140;
   }
-  FUN_0046a9b0();
+  PhysicsSystem___PhysicsSystem();
   return;
 }
 
@@ -9540,7 +9542,7 @@ void Unwind_00686a90(void)
 void Unwind_00686a98(void)
 
 {
-  FUN_0046a9b0();
+  PhysicsSystem___PhysicsSystem();
   return;
 }
 
@@ -9642,7 +9644,7 @@ void FUN_00686b1b(void)
 void Unwind_00686b30(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -10723,7 +10725,7 @@ void Unwind_00687136(void)
 void Unwind_0068714e(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -11083,7 +11085,7 @@ void Unwind_00687330(void)
 void Unwind_00687338(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -12755,7 +12757,7 @@ void FUN_00687bc3(void)
 void Unwind_00687bd0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -12765,7 +12767,7 @@ void Unwind_00687bd0(void)
 void Unwind_00687bd8(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -12775,7 +12777,7 @@ void Unwind_00687bd8(void)
 void Unwind_00687be0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -12967,7 +12969,7 @@ void Unwind_00687d00(void)
 void Unwind_00687d08(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -13337,7 +13339,7 @@ void FUN_00687e78(void)
 void Unwind_00687e90(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -14355,7 +14357,7 @@ void Unwind_00688460(void)
 void Unwind_00688468(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -14415,7 +14417,7 @@ void FUN_006884b3(void)
 void Unwind_006884c0(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -15067,7 +15069,7 @@ void Unwind_00688858(void)
 void Unwind_00688863(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -15165,7 +15167,7 @@ void Unwind_006888d6(void)
 void Unwind_006888ee(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -15435,7 +15437,7 @@ void Unwind_00688a70(void)
 void Unwind_00688a78(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -15827,7 +15829,7 @@ void Unwind_00688ca0(void)
 void Unwind_00688ca8(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -15867,7 +15869,7 @@ void Unwind_00688cd0(void)
 void Unwind_00688cd8(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -15947,7 +15949,7 @@ void Unwind_00688d40(void)
 void Unwind_00688d48(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -16077,7 +16079,7 @@ void Unwind_00688dee(void)
 void Unwind_00688dfc(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -16187,7 +16189,7 @@ void Unwind_00688e83(void)
 void Unwind_00688e8e(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -16757,7 +16759,7 @@ void Unwind_00689193(void)
 void Unwind_0068919e(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -16767,7 +16769,7 @@ void Unwind_0068919e(void)
 void Unwind_006891a6(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -16777,7 +16779,7 @@ void Unwind_006891a6(void)
 void Unwind_006891ae(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -16827,7 +16829,7 @@ void Unwind_006891e0(void)
 void Unwind_006891e8(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -16857,7 +16859,7 @@ void Unwind_00689200(void)
 void Unwind_00689208(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -16957,7 +16959,7 @@ void Unwind_00689290(void)
 void Unwind_00689298(void)
 
 {
-  FUN_00436d40();
+  std__list__clear__free_every_node__head_in_ESI_();
   return;
 }
 
@@ -17720,7 +17722,7 @@ void FUN_006896b3(void)
 void Unwind_006896c0(void)
 
 {
-  FUN_00424b10();
+  FlowMessageList__FreeAll();
   return;
 }
 
@@ -17937,7 +17939,7 @@ void StaticInit_ParticleEmitter_G78e974_6897f0(void)
 void FUN_00689810(void)
 
 {
-  FUN_00402b90();
+  ParticleLists_Init();
   _atexit(FUN_00696210);
   return;
 }
@@ -17948,7 +17950,7 @@ void FUN_00689810(void)
 void FUN_00689830(void)
 
 {
-  FUN_00402b90();
+  ParticleLists_Init();
   _atexit(FUN_00696220);
   return;
 }

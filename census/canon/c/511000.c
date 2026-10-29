@@ -8175,7 +8175,7 @@ void EAXSound__ReloadLanguageSpeechBank__called_by_ChangeLanguage_0x59fa20_(unde
     case 9:
       uVar2 = 9;
     }
-    FUN_005218c0(*(undefined4 *)(unaff_EDI + 0xb4));
+    EAXAemsManager__ResetLoadQueue(*(undefined4 *)(unaff_EDI + 0xb4));
     *(undefined4 *)(*(int *)(unaff_EDI + 0x56c) * 0x1c + 0x1f0 + unaff_EDI) = uVar2;
     DAT_0073568c = 0;
     DAT_00735690 = 0;
@@ -8222,9 +8222,11 @@ void __fastcall FUN_0051c720(undefined4 param_1,int param_2,int param_3)
 }
 
 
-// ==== 0x51c770 FUN_0051c770
+// ==== 0x51c770 EAXSound::PlayUISoundFX
 
-void __fastcall FUN_0051c770(undefined4 param_1,int param_2)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXSound__PlayUISoundFX(undefined4 param_1,int param_2)
 
 {
   int in_EAX;
@@ -8244,9 +8246,11 @@ void __fastcall FUN_0051c770(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x51c7b0 FUN_0051c7b0
+// ==== 0x51c7b0 EAXSound::GetNewSongInfo
 
-void __fastcall FUN_0051c7b0(int param_1)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXSound__GetNewSongInfo(int param_1)
 
 {
   int iVar1;
@@ -8263,9 +8267,11 @@ void __fastcall FUN_0051c7b0(int param_1)
 }
 
 
-// ==== 0x51c7f0 FUN_0051c7f0
+// ==== 0x51c7f0 EAXSound::UpdateSongInfo
 
-char FUN_0051c7f0(void)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+char EAXSound__UpdateSongInfo(void)
 
 {
   int iVar1;
@@ -8327,9 +8333,11 @@ void __fastcall EAXSound__PlaySpeechStream(int param_1,int param_2,int param_3)
 }
 
 
-// ==== 0x51c8e0 FUN_0051c8e0
+// ==== 0x51c8e0 EAXSound::EAXSound
 
-undefined4 * __fastcall FUN_0051c8e0(undefined4 param_1,undefined4 *param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+undefined4 * __fastcall EAXSound__EAXSound(undefined4 param_1,undefined4 *param_2)
 
 {
   undefined4 *puVar1;
@@ -8490,9 +8498,11 @@ void __fastcall FUN_0051ca30(undefined4 *param_1)
 }
 
 
-// ==== 0x51cb70 FUN_0051cb70
+// ==== 0x51cb70 EAXSound::GetMasterVolume
 
-undefined4 __fastcall FUN_0051cb70(undefined4 param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+undefined4 __fastcall EAXSound__GetMasterVolume(undefined4 param_1)
 
 {
   undefined4 uVar1;
@@ -8558,7 +8568,7 @@ void FUN_0051cc10(int param_1)
     if (*(int *)(param_1 + 0x80) != 0) {
       FUN_0052fa30();
     }
-    FUN_0051d860();
+    EAXSound__UpdateCarMasterVolumes();
     if (*(int *)(param_1 + 0xc0) != 0) {
       (**(code **)(*(int *)(*(int *)(param_1 + 0xc0) + 0x20) + 0x24))();
     }
@@ -8589,9 +8599,11 @@ void FUN_0051ccf0(void)
 }
 
 
-// ==== 0x51cd20 FUN_0051cd20
+// ==== 0x51cd20 EAXSound::Random
 
-uint FUN_0051cd20(undefined4 param_1,uint param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+uint EAXSound__Random(undefined4 param_1,uint param_2)
 
 {
   uint uVar1;
@@ -8648,7 +8660,7 @@ void EAXSound__InitializeDriver(void)
       puVar2 = (undefined4 *)0x0;
     }
     else {
-      *puVar2 = &PTR_FUN_006bf5a8;
+      *puVar2 = &PTR_EAXSound_base_class_scalar_deleting_destructor__vtable_0x6bf5a8__006bf5a8;
       puVar2[1] = 0;
       *(undefined1 *)(puVar2 + 4) = 0;
       puVar2[2] = 0;
@@ -8896,9 +8908,11 @@ void FUN_0051d080(void)
 }
 
 
-// ==== 0x51d1b0 FUN_0051d1b0
+// ==== 0x51d1b0 EAXSound::UpdateQueuedEngines
 
-void FUN_0051d1b0(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void EAXSound__UpdateQueuedEngines(void)
 
 {
   char cVar1;
@@ -9004,7 +9018,7 @@ void EAXSound__Update(undefined4 param_1)
     param_1 = 0;
   }
   if (*(int *)(in_EAX + 0x60) != 0) {
-    FUN_0051d1b0();
+    EAXSound__UpdateQueuedEngines();
   }
   iVar4 = 0;
   if (0 < *(int *)(in_EAX + 0xcc)) {
@@ -9214,9 +9228,11 @@ undefined4 FUN_0051d6b0(undefined4 param_1)
 }
 
 
-// ==== 0x51d860 FUN_0051d860
+// ==== 0x51d860 EAXSound::UpdateCarMasterVolumes
 
-void FUN_0051d860(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void EAXSound__UpdateCarMasterVolumes(void)
 
 {
   int in_EAX;
@@ -9502,7 +9518,7 @@ void EAXSound__UnloadFrontEndSoundBanks(int param_1)
         iVar1 = *(int *)(iVar4 + 0xb4);
         if (DAT_006f1dd8 == 1) {
           *(int *)(iVar1 + 0x40) = piVar5[1];
-          FUN_00521f80();
+          EAXAemsManager__SetCurrentFullBankIndex();
           iVar3 = DAT_00735684;
           iVar2 = *(int *)(iVar1 + 0x200 + DAT_00735684 * 4);
           if (iVar2 < 2) {
@@ -10066,7 +10082,7 @@ void EAXSound__UnLoadInGameSoundBanks(void)
         iVar1 = *(int *)(unaff_EDI + 0xb4);
         if (DAT_006f1dd8 == 1) {
           *(undefined4 *)(iVar1 + 0x40) = *(undefined4 *)(iVar4 + 4);
-          FUN_00521f80();
+          EAXAemsManager__SetCurrentFullBankIndex();
           iVar3 = DAT_00735684;
           iVar2 = *(int *)(iVar1 + 0x200 + DAT_00735684 * 4);
           if (iVar2 < 2) {
@@ -11021,9 +11037,11 @@ undefined4 FUN_00520320(void)
 }
 
 
-// ==== 0x520430 FUN_00520430
+// ==== 0x520430 EAXSound::SetTrainObjectPositions
 
-void __fastcall FUN_00520430(undefined4 *param_1)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXSound__SetTrainObjectPositions(undefined4 *param_1)
 
 {
   undefined4 uVar1;
@@ -11052,7 +11070,7 @@ void FUN_00520460(void)
   
   pvVar1 = _malloc(0x570);
   if (pvVar1 != (void *)0x0) {
-    DAT_007356a8 = FUN_0051c8e0();
+    DAT_007356a8 = EAXSound__EAXSound();
     EAXSound__InitializeDriver();
     return;
   }
@@ -11062,12 +11080,15 @@ void FUN_00520460(void)
 }
 
 
-// ==== 0x5204a0 FUN_005204a0
+// ==== 0x5204a0 EAXSound_base_class_scalar_deleting_destructor__vtable_0x6bf5a8_
 
-undefined4 * __thiscall FUN_005204a0(undefined4 *param_1,byte param_2)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+undefined4 * __thiscall
+EAXSound_base_class_scalar_deleting_destructor__vtable_0x6bf5a8_(undefined4 *param_1,byte param_2)
 
 {
-  *param_1 = &PTR_FUN_006bf5a8;
+  *param_1 = &PTR_EAXSound_base_class_scalar_deleting_destructor__vtable_0x6bf5a8__006bf5a8;
   if ((void *)param_1[1] != (void *)0x0) {
     _free((void *)param_1[1]);
     param_1[1] = 0;
@@ -11080,9 +11101,11 @@ undefined4 * __thiscall FUN_005204a0(undefined4 *param_1,byte param_2)
 }
 
 
-// ==== 0x5204e0 FUN_005204e0
+// ==== 0x5204e0 EAXSound::FreeRacerSlotBuffer
 
-void __fastcall FUN_005204e0(int param_1)
+/* [canon] audio low (ghidra-canon) docs/re/sound.md */
+
+void __fastcall EAXSound__FreeRacerSlotBuffer(int param_1)
 
 {
   *(undefined1 *)(param_1 + 0x10) = 0;
@@ -11094,9 +11117,11 @@ void __fastcall FUN_005204e0(int param_1)
 }
 
 
-// ==== 0x520500 FUN_00520500
+// ==== 0x520500 EAXSound::AllocRacerSlotBuffer
 
-void __fastcall FUN_00520500(int param_1)
+/* [canon] audio low (ghidra-canon) docs/re/sound.md */
+
+void __fastcall EAXSound__AllocRacerSlotBuffer(int param_1)
 
 {
   void *pvVar1;
@@ -11738,9 +11763,11 @@ void FUN_00520f50(void)
 }
 
 
-// ==== 0x520f80 FUN_00520f80
+// ==== 0x520f80 EAXAemsManager::BindFXClassHandles
 
-uint FUN_00520f80(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+uint EAXAemsManager__BindFXClassHandles(void)
 
 {
   uint uVar1;
@@ -11756,9 +11783,11 @@ uint FUN_00520f80(void)
 }
 
 
-// ==== 0x520fd0 FUN_00520fd0
+// ==== 0x520fd0 EAXAemsManager::BindCarClassHandles
 
-uint FUN_00520fd0(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+uint EAXAemsManager__BindCarClassHandles(void)
 
 {
   uint uVar1;

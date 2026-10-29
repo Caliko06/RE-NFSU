@@ -95,3 +95,4 @@ Open: see each doc's Open list (traffic: writer of [ebx+0x59d4], Free Run x1.5, 
 12:25 gameflow done and merged (163 names, 123 V; state handlers 1..8 at [0x77a920] re-checked with capstone; docs/re/gameflow.md). Next: classify remaining unknown, close Open items.
 13:12 canon wave round 1 (canon-sonnet): render/runtime/canon 60 rows each; named 1,464 -> 1,644; 106 apply failures (mid-function .part_ addresses in queue)
 13:31 canon wave round 2 (canon-sonnet): render 60, runtime 59, canon 59; named 1,644 -> 1,822; queue excludes 888 fragments
+13:50 canon wave round 3 (canon-sonnet): sound 58, car 60, rivals 60; Hopper second reading of 113 low rows (86 agreed->med, 1 renamed); 3 side fixes; named 1,822 -> 2,000

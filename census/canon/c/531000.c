@@ -1456,7 +1456,7 @@ void __fastcall EAX_linear_ramp_evaluate__not_SetCsisName_(float *param_1)
 
 // ==== 0x5328b0 EAX_NearestListenerToPoint
 
-/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+/* [canon] audio med (ghidra-canon+hopper) docs/re/runtime.md */
 
 int EAX_NearestListenerToPoint(void)
 
@@ -3507,13 +3507,13 @@ void __fastcall FUN_005348e0(int param_1)
       *(undefined1 *)(param_1 + 0x280) = 1;
       uVar4 = FUN_00578710();
       FUN_00578710(uVar4);
-      FUN_00520430(uVar4);
+      EAXSound__SetTrainObjectPositions(uVar4);
       ExceptionList = local_c;
       return;
     }
     uVar4 = FUN_00578710();
     FUN_00578710(uVar4);
-    FUN_00520430(uVar4);
+    EAXSound__SetTrainObjectPositions(uVar4);
     *(undefined1 *)(extraout_EDX + 0x70) = 0;
   }
   ExceptionList = local_c;
@@ -3901,7 +3901,8 @@ void __thiscall FUN_00534df0(int param_1,int *param_2,undefined4 *param_3)
         uVar3 = 0;
       }
       else {
-        uVar3 = FUN_00524870(*(undefined4 *)(*(int *)(param_1 + 0x480) * 0x230 + 0x6c + param_1),0);
+        uVar3 = Csis_CreateEnvStaticSample
+                          (*(undefined4 *)(*(int *)(param_1 + 0x480) * 0x230 + 0x6c + param_1),0);
       }
       *(undefined4 *)((*(int *)(param_1 + 0x480) + 1) * 0x230 + param_1) = uVar3;
       QueryPerformanceCounter(&local_18);
@@ -6722,7 +6723,7 @@ void FUN_00538360(void)
       }
       *(bool *)(in_EAX + 0x219) = bVar8;
       if (iVar7 == 1) {
-        uVar5 = FUN_0042a690();
+        uVar5 = Car__GetNitroFlag();
         *(undefined1 *)(in_EAX + 0x21a) = uVar5;
       }
       cVar1 = *(char *)(*(int *)(*(int *)(iVar2 + 4) + 0x168) + 0x874);
@@ -7814,7 +7815,7 @@ LAB_005397da:
     iVar3 = local_8 * 4;
     iVar7 = *(int *)(iVar3 + *(int *)(in_EAX + 0x2a8));
     if (iVar7 < 1) goto LAB_005397da;
-    uVar2 = FUN_0051cd20(DAT_007356a8,iVar7);
+    uVar2 = EAXSound__Random(DAT_007356a8,iVar7);
     *(undefined4 *)(in_EAX + 0x26c) = uVar2;
     break;
   case 4:
@@ -7822,14 +7823,14 @@ LAB_005397da:
       *(undefined4 *)(in_EAX + 0x268) = 0;
     }
     else {
-      uVar2 = FUN_0051cd20(DAT_007356a8,*(int *)(in_EAX + 0x2a0));
+      uVar2 = EAXSound__Random(DAT_007356a8,*(int *)(in_EAX + 0x2a0));
       *(undefined4 *)(in_EAX + 0x268) = uVar2;
     }
     local_8 = *(int *)(in_EAX + 0x268);
     iVar3 = local_8 * 4;
     iVar7 = *(int *)(iVar3 + *(int *)(in_EAX + 0x2a8));
     if (iVar7 < 1) goto LAB_005397da;
-    uVar2 = FUN_0051cd20(iVar8,iVar7);
+    uVar2 = EAXSound__Random(iVar8,iVar7);
     *(undefined4 *)(in_EAX + 0x26c) = uVar2;
   }
   if (local_8 < 0) {
@@ -7855,7 +7856,7 @@ LAB_005397da:
         *(undefined4 *)(iVar1 + (iVar3 + iVar7) * 4) = 0;
         goto LAB_00539a89;
       }
-      uVar4 = FUN_0051cd20(iVar8,10);
+      uVar4 = EAXSound__Random(iVar8,10);
       iVar8 = *(int *)(in_EAX + 0x26c);
       if (uVar4 < 6) {
         if (iVar8 < local_4) {
@@ -8376,7 +8377,7 @@ void __fastcall FUN_0053a130(int *param_1)
   if ((local_14[0][5] == 1) && (iVar3 = param_1[1], *(int *)(iVar3 + 0x58) != -1)) {
     if ((int *)param_1[0x10] == (int *)0x0) {
       if ((*(char *)(iVar3 + 0x68) == '\x01') && (*(int *)(iVar3 + 0x18) < 0x13)) {
-        iVar3 = FUN_0051cd20(DAT_007356a8,4);
+        iVar3 = EAXSound__Random(DAT_007356a8,4);
         *(undefined4 *)(param_1[1] + 0x50) =
              *(undefined4 *)(&DAT_006f660c + (iVar3 + *(int *)(param_1[1] + 0x54) * 5) * 4);
         *(undefined4 *)(param_1[0xc4] + 0x50) = *(undefined4 *)(param_1[1] + 0x50);
@@ -9437,7 +9438,7 @@ void __fastcall FUN_0053b5e0(int param_1)
 
 // ==== 0x53b630 EAXS_AmbStereoStream::RequestStopCurrent
 
-/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+/* [canon] audio med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall EAXS_AmbStereoStream__RequestStopCurrent(int param_1)
 
@@ -9508,7 +9509,7 @@ void __fastcall FUN_0053b670(int param_1)
 
 // ==== 0x53b740 EAXS_AmbStereoStream::ApplyParamsAndPlay
 
-/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+/* [canon] audio med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall EAXS_AmbStereoStream__ApplyParamsAndPlay(int *param_1)
 
@@ -9758,7 +9759,7 @@ void __fastcall FUN_0053bbb0(int param_1)
 
 // ==== 0x53bca0 CsisHandle::GetRefCount
 
-/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+/* [canon] audio med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 __fastcall CsisHandle__GetRefCount(int *param_1)
 
@@ -10269,7 +10270,7 @@ void __fastcall FUN_0053c3a0(int *param_1)
       }
     }
     if (0 < piVar2[0x18]) {
-      FUN_0051c7b0();
+      EAXSound__GetNewSongInfo();
     }
     *(int *)(param_1[1] + 0xf8) = *(int *)(param_1[1] + 0xf8) + 1;
     if (0x19 < *(int *)(param_1[1] + 0xf8)) {
@@ -10306,7 +10307,7 @@ LAB_0053c689:
     }
     *(int *)(param_1[1] + 0xfc) = *(int *)(iVar3 + 0x4c) + -1;
     if (0 < piVar2[0x18]) {
-      FUN_0051c7b0();
+      EAXSound__GetNewSongInfo();
     }
   }
   if (piVar2[0x18] == 0) {
@@ -12521,7 +12522,7 @@ void FUN_0053ed20(undefined4 param_1)
 
 // ==== 0x53ed70 ResourceFileList_IsLoadedByName
 
-/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+/* [canon] assets med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 ResourceFileList_IsLoadedByName(int param_1,int param_2)
 
@@ -13032,7 +13033,7 @@ void FUN_0053f500(void)
 
 // ==== 0x53f540 Solid_BindTextureRefs
 
-/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+/* [canon] assets med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void Solid_BindTextureRefs(void)
 
@@ -13093,7 +13094,7 @@ void Solid_BindTextureRefs(void)
 
 // ==== 0x53f5f0 Solid_GetBounds
 
-/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+/* [canon] assets med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 __fastcall Solid_GetBounds(undefined4 *param_1,undefined4 *param_2)
 
@@ -13133,7 +13134,7 @@ undefined4 __fastcall Solid_GetBounds(undefined4 *param_1,undefined4 *param_2)
 
 // ==== 0x53f660 Solid_ReplaceTextureForHash
 
-/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+/* [canon] assets med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall Solid_ReplaceTextureForHash(undefined4 param_1,int param_2)
 
@@ -14051,7 +14052,7 @@ void FUN_00540580(undefined4 param_1,undefined4 param_2,int param_3)
 
 // ==== 0x5405b0 Solid_InitIteratorPtrs
 
-/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+/* [canon] assets med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void Solid_InitIteratorPtrs(int param_1)
 
@@ -14252,7 +14253,7 @@ float10 FUN_00540830(void)
 
 // ==== 0x540860 Vec4_SubXYZ
 
-/* [canon] render low (ghidra-canon) docs/re/render.md */
+/* [canon] render med (ghidra-canon+hopper) docs/re/render.md */
 
 void __thiscall Vec4_SubXYZ(float *param_1,float param_2,float param_3,float param_4)
 
@@ -14274,7 +14275,7 @@ void __thiscall Vec4_SubXYZ(float *param_1,float param_2,float param_3,float par
 
 // ==== 0x5408b0 Vec4_DotPack
 
-/* [canon] render low (ghidra-canon) docs/re/render.md */
+/* [canon] render med (ghidra-canon+hopper) docs/re/render.md */
 
 void __thiscall Vec4_DotPack(float *param_1,float param_2,float param_3,float param_4,float param_5)
 
@@ -14291,7 +14292,7 @@ void __thiscall Vec4_DotPack(float *param_1,float param_2,float param_3,float pa
 
 // ==== 0x5408f0 Vec4_SetXYZ
 
-/* [canon] render low (ghidra-canon) docs/re/render.md */
+/* [canon] render med (ghidra-canon+hopper) docs/re/render.md */
 
 void __thiscall
 Vec4_SetXYZ(undefined4 *param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)

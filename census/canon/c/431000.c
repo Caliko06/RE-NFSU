@@ -98,9 +98,11 @@ void FUN_00431100(void)
 }
 
 
-// ==== 0x431190 FUN_00431190
+// ==== 0x431190 Players_AssignTypeFromTable
 
-void FUN_00431190(void)
+/* [canon] camera low (ghidra-canon) docs/re/canon.md */
+
+void Players_AssignTypeFromTable(void)
 
 {
   int *piVar1;
@@ -202,7 +204,7 @@ void FUN_004312a0(void)
   fVar2 = (float)(DAT_0073ad34 - *(int *)(*(int *)(*(int *)(unaff_EDI + 4) + 0x3c) + 0x144)) *
           0.00025;
   if (((60.0 < fVar1) && (fVar2 < 3.0)) &&
-     (fVar7 = (float10)FUN_00464ed0(), (float10)50.0 < ABS(fVar7 * (float10)57.295776))) {
+     (fVar7 = (float10)CarState__GetYaw(), (float10)50.0 < ABS(fVar7 * (float10)57.295776))) {
     *(int *)(unaff_EDI + 0xb4) = DAT_0073ad34;
   }
   fVar3 = (float)(DAT_0073ad34 - *(int *)(unaff_EDI + 0xc0)) * 0.00025;
@@ -638,7 +640,7 @@ void __thiscall SpecialCamCaller_431960(int param_1,undefined4 param_2,char para
       if (param_3 == '\0') {
         cVar3 = FUN_004318d0();
         if ((cVar3 != '\0') && (DAT_007000e8 != 0)) {
-          CarState__StopTimer();
+          CarState__StopNitrous();
         }
       }
       else {
@@ -677,7 +679,7 @@ void __thiscall SpecialCamCaller_431960(int param_1,undefined4 param_2,char para
   case 0xab:
     cVar3 = FUN_004318d0();
     if (cVar3 != '\0') {
-      CarState__StopTimer();
+      CarState__StopNitrous();
     }
     FUN_00421c00(DAT_007361f0,5,param_2);
     return;
@@ -732,7 +734,7 @@ void switchD_0043197d::caseD_9b(void)
       if (unaff_BL == '\0') {
         cVar1 = FUN_004318d0();
         if ((cVar1 != '\0') && (DAT_007000e8 != 0)) {
-          CarState__StopTimer();
+          CarState__StopNitrous();
         }
       }
       else {
@@ -775,9 +777,11 @@ int FUN_00431d30(int param_1)
 }
 
 
-// ==== 0x431d60 FUN_00431d60
+// ==== 0x431d60 LinearTable::CopyFrom
 
-void __fastcall FUN_00431d60(int param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall LinearTable__CopyFrom(int param_1)
 
 {
   undefined4 *in_EAX;
@@ -809,9 +813,11 @@ void __fastcall FUN_00431d60(int param_1)
 }
 
 
-// ==== 0x431dd0 FUN_00431dd0
+// ==== 0x431dd0 DriverInfo::InitDefault
 
-undefined1 * __fastcall FUN_00431dd0(undefined1 *param_1)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+undefined1 * __fastcall DriverInfo__InitDefault(undefined1 *param_1)
 
 {
   *param_1 = 0;
@@ -1084,8 +1090,8 @@ undefined4 * RideInfo__operator_(undefined4 *param_1,undefined4 *param_2)
     puVar3 = puVar3 + 1;
     puVar4 = puVar4 + 1;
   }
-  FUN_00432540(param_1 + 0x18,param_2 + 0x18);
-  FUN_00431d60();
+  CarPhysicsInfo__operator_(param_1 + 0x18,param_2 + 0x18);
+  LinearTable__CopyFrom();
   *(undefined1 *)(param_1 + 0x109) = *(undefined1 *)(param_2 + 0x109);
   *(undefined1 *)((int)param_1 + 0x425) = *(undefined1 *)((int)param_2 + 0x425);
   *(undefined1 *)((int)param_1 + 0x426) = *(undefined1 *)((int)param_2 + 0x426);
@@ -1126,9 +1132,11 @@ undefined4 * RideInfo__operator_(undefined4 *param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x432540 FUN_00432540
+// ==== 0x432540 CarPhysicsInfo::operator_
 
-undefined4 * FUN_00432540(undefined4 *param_1,undefined4 *param_2)
+/* [canon] car med (ghidra-canon) docs/re/canon.md */
+
+undefined4 * CarPhysicsInfo__operator_(undefined4 *param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -1233,9 +1241,11 @@ undefined4 * FUN_00432540(undefined4 *param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x432710 FUN_00432710
+// ==== 0x432710 RaceStatus::RemoveEntrant
 
-void FUN_00432710(int param_1)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+void RaceStatus__RemoveEntrant(int param_1)
 
 {
   int iVar1;
@@ -1279,9 +1289,11 @@ LAB_0043277d:
 }
 
 
-// ==== 0x4327c0 FUN_004327c0
+// ==== 0x4327c0 RaceStatus::GetEntrantAt
 
-int __fastcall FUN_004327c0(int param_1)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+int __fastcall RaceStatus__GetEntrantAt(int param_1)
 
 {
   int in_EAX;
@@ -1290,9 +1302,11 @@ int __fastcall FUN_004327c0(int param_1)
 }
 
 
-// ==== 0x4327d0 FUN_004327d0
+// ==== 0x4327d0 RaceStatus::FindEntrantById
 
-int __fastcall FUN_004327d0(int param_1)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+int __fastcall RaceStatus__FindEntrantById(int param_1)
 
 {
   int iVar1;
@@ -1323,7 +1337,7 @@ undefined4 __fastcall FUN_00432810(int param_1)
   undefined4 uVar1;
   
   if (-1 < *(int *)(param_1 + 0x120 + in_EAX * 4)) {
-    uVar1 = FUN_004327d0();
+    uVar1 = RaceStatus__FindEntrantById();
     return uVar1;
   }
   return 0;
@@ -1799,9 +1813,11 @@ int FUN_00432e00(void)
 }
 
 
-// ==== 0x432e10 FUN_00432e10
+// ==== 0x432e10 PtrArray_GetOrNull
 
-undefined4 __fastcall FUN_00432e10(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall PtrArray_GetOrNull(int param_1)
 
 {
   int in_EAX;
@@ -1813,9 +1829,11 @@ undefined4 __fastcall FUN_00432e10(int param_1)
 }
 
 
-// ==== 0x432e20 FUN_00432e20
+// ==== 0x432e20 GameMode::IsNotMode0456
 
-undefined4 FUN_00432e20(void)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+undefined4 GameMode__IsNotMode0456(void)
 
 {
   int iVar1;
@@ -1829,9 +1847,11 @@ undefined4 FUN_00432e20(void)
 }
 
 
-// ==== 0x432e40 FUN_00432e40
+// ==== 0x432e40 GameMode::IsMode03456
 
-undefined4 FUN_00432e40(void)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+undefined4 GameMode__IsMode03456(void)
 
 {
   int iVar1;
@@ -2027,9 +2047,11 @@ float * FUN_00432e80(float *param_1,int param_2)
 }
 
 
-// ==== 0x433340 FUN_00433340
+// ==== 0x433340 CurveTable::Evaluate
 
-void __fastcall FUN_00433340(undefined4 param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall CurveTable__Evaluate(undefined4 param_1)
 
 {
   undefined4 uVar1;
@@ -2153,9 +2175,11 @@ void FUN_004334a0(void)
 }
 
 
-// ==== 0x433620 FUN_00433620
+// ==== 0x433620 HudMeter::SetLevel
 
-void FUN_00433620(int param_1)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void HudMeter__SetLevel(int param_1)
 
 {
   char cVar1;
@@ -2169,11 +2193,12 @@ void FUN_00433620(int param_1)
 }
 
 
-// ==== 0x433650 FUN_00433650
+// ==== 0x433650 RaceManager::DetectOvertake
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
 
-undefined4 FUN_00433650(int param_1,float param_2,float param_3)
+undefined4 RaceManager__DetectOvertake(int param_1,float param_2,float param_3)
 
 {
   undefined4 uVar1;
@@ -2310,8 +2335,9 @@ void FUN_004338c0(void)
     if (0 < *(short *)(DAT_0073619c + 0x53c)) {
       piVar8 = unaff_EDI + 0xe;
       do {
-        iVar4 = FUN_00433650(unaff_EDI,fVar2,
-                             *(undefined4 *)((int)piVar8 + iVar7 + (0x508 - (int)unaff_EDI)));
+        iVar4 = RaceManager__DetectOvertake
+                          (unaff_EDI,fVar2,
+                           *(undefined4 *)((int)piVar8 + iVar7 + (0x508 - (int)unaff_EDI)));
         if (iVar4 != 0) {
           if (local_c == 0) {
             if (local_18 == (float)(int)*(char *)(iVar7 + 0x53f)) {
@@ -2485,8 +2511,8 @@ void FUN_00433e20(int param_1,int param_2,int *param_3)
     *(undefined4 *)(param_1 + 0x110) = uVar4;
   }
   else {
-    FUN_00433340(*(undefined4 *)(param_1 + 0x20));
-    FUN_00433340((float)(int)*(char *)(iVar3 + 9));
+    CurveTable__Evaluate(*(undefined4 *)(param_1 + 0x20));
+    CurveTable__Evaluate((float)(int)*(char *)(iVar3 + 9));
     iVar3 = _ftol_nocw();
     *(int *)(param_1 + 0x110) = (DAT_0073ad34 - iVar3) - *param_3;
   }
@@ -2555,9 +2581,11 @@ void FUN_00433e20(int param_1,int param_2,int *param_3)
 }
 
 
-// ==== 0x434150 FUN_00434150
+// ==== 0x434150 Floats11_Max
 
-void FUN_00434150(void)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+void Floats11_Max(void)
 
 {
   float fVar1;
@@ -2628,7 +2656,7 @@ void FUN_00434270(void)
   in_EAX[7] = 0;
   iVar1 = 4;
   do {
-    FUN_00434360();
+    RaceStatus__Reset();
     iVar1 = iVar1 + -1;
   } while (iVar1 != 0);
   *in_EAX = 0;
@@ -2668,9 +2696,11 @@ void FUN_00434270(void)
 }
 
 
-// ==== 0x434360 FUN_00434360
+// ==== 0x434360 RaceStatus::Reset
 
-int __fastcall FUN_00434360(int param_1)
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
+
+int __fastcall RaceStatus__Reset(int param_1)
 
 {
   int iVar1;
@@ -3114,7 +3144,7 @@ LAB_00434bf9:
 
 // ==== 0x434d10 TimedMessage::GetPhase
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 __fastcall TimedMessage__GetPhase(int param_1)
 
@@ -3356,13 +3386,13 @@ LAB_0043514a:
   if (cVar3 == '\0') {
     if (param_2 == 0) {
       if ((int)*(char *)((int)piVar1 + 9) == *(int *)(param_1 + 0x530)) {
-        uVar4 = FUN_00435bd0(param_1);
+        uVar4 = Race_FindFirstMissingRank(param_1);
         iVar5 = DAT_0073619c;
         *(undefined1 *)(piVar1 + 3) = uVar4;
         piVar1[0x44] = piVar1[*(char *)(iVar5 + 0x53f) + 9] - *(int *)(param_1 + 0x10);
         goto LAB_004352bc;
       }
-      uVar4 = FUN_00435bd0(param_1);
+      uVar4 = Race_FindFirstMissingRank(param_1);
       *(undefined1 *)(piVar1 + 3) = uVar4;
     }
     else if ((param_2 < 0) || (*(char *)(piVar1 + 3) = (char)param_2, DAT_0078a30c != 3))
@@ -3379,7 +3409,7 @@ LAB_0043514a:
     }
     if ((char)piVar1[3] == '\0') {
       if (param_4 == 1) {
-        uVar4 = FUN_00435bd0(param_1);
+        uVar4 = Race_FindFirstMissingRank(param_1);
       }
       else {
         uVar4 = FUN_00435c10();
@@ -3402,7 +3432,7 @@ LAB_0043514a:
        ((char)piVar1[3] == '\x01')) {
       iVar6 = SpecialCamCooldown();
       if (((iVar6 == 0) && (iVar5 = Race__GetPlayer((int)*(short *)(iVar5 + 10)), iVar5 != 0)) &&
-         (cVar3 = FUN_00432e40(), cVar3 != '\0')) {
+         (cVar3 = GameMode__IsMode03456(), cVar3 != '\0')) {
         *(int *)(param_1 + 0x1c) = *(int *)(iVar5 + 0x34) + *(int *)(param_1 + 0x10);
         *(undefined4 *)(param_1 + 0x20) = 0x41f00000;
       }
@@ -3450,8 +3480,8 @@ void FUN_004353e0(int *param_1,int param_2,int param_3)
   }
   if (sVar1 != 1) {
     if (*(short *)(param_3 + 0x10) == 1) {
-      FUN_00433340((float)(int)*(char *)(param_3 + 9));
-      FUN_00433340(*(undefined4 *)(param_2 + 0x20));
+      CurveTable__Evaluate((float)(int)*(char *)(param_3 + 9));
+      CurveTable__Evaluate(*(undefined4 *)(param_2 + 0x20));
       iVar2 = _ftol_nocw();
       *param_1 = ((iVar2 - *(int *)(param_3 + 0x110)) - *(int *)(unaff_EBX + 0x10)) + DAT_0073ad34;
       return;
@@ -3459,15 +3489,15 @@ void FUN_004353e0(int *param_1,int param_2,int param_3)
     if (sVar1 != 1) goto LAB_00435513;
   }
   if (*(short *)(param_3 + 0x10) != 1) {
-    FUN_00433340(*(undefined4 *)(param_3 + 0x20));
-    FUN_00433340((float)(int)*(char *)(param_2 + 9));
+    CurveTable__Evaluate(*(undefined4 *)(param_3 + 0x20));
+    CurveTable__Evaluate((float)(int)*(char *)(param_2 + 9));
     iVar2 = _ftol_nocw();
     *param_1 = (iVar2 + *(int *)(param_2 + 0x110) + *(int *)(unaff_EBX + 0x10)) - DAT_0073ad34;
     return;
   }
 LAB_00435513:
-  FUN_00433340(*(undefined4 *)(param_3 + 0x20));
-  FUN_00433340(*(undefined4 *)(param_2 + 0x20));
+  CurveTable__Evaluate(*(undefined4 *)(param_3 + 0x20));
+  CurveTable__Evaluate(*(undefined4 *)(param_2 + 0x20));
   iVar2 = _ftol_nocw();
   *param_1 = iVar2;
   return;
@@ -3593,7 +3623,7 @@ void __fastcall FUN_00435570(undefined4 param_1)
               piVar8 = piVar8 + -1;
             } while (0 < iVar5);
           }
-          iVar5 = FUN_00435bd0(unaff_ESI);
+          iVar5 = Race_FindFirstMissingRank(unaff_ESI);
 LAB_00435842:
           uVar9 = 6;
           goto LAB_00435844;
@@ -3616,7 +3646,7 @@ LAB_00435842:
             piVar8 = piVar8 + -1;
           } while (0 < iVar5);
         }
-        iVar5 = FUN_00435bd0(unaff_ESI);
+        iVar5 = Race_FindFirstMissingRank(unaff_ESI);
 LAB_004357ee:
         uVar9 = 7;
 LAB_00435844:
@@ -3684,7 +3714,7 @@ LAB_00435844:
             piVar8 = piVar8 + -1;
           } while (0 < iVar5);
         }
-        iVar5 = FUN_00435bd0(unaff_ESI);
+        iVar5 = Race_FindFirstMissingRank(unaff_ESI);
 LAB_004359fe:
         FUN_004350d0(iVar5,0,9);
       }
@@ -3784,9 +3814,11 @@ undefined4 FUN_00435b30(void)
 }
 
 
-// ==== 0x435b90 FUN_00435b90
+// ==== 0x435b90 Players_FindNisPlayer
 
-int FUN_00435b90(void)
+/* [canon] camera low (ghidra-canon) docs/re/canon.md */
+
+int Players_FindNisPlayer(void)
 
 {
   int iVar1;
@@ -3811,9 +3843,11 @@ int FUN_00435b90(void)
 }
 
 
-// ==== 0x435bd0 FUN_00435bd0
+// ==== 0x435bd0 Race_FindFirstMissingRank
 
-void FUN_00435bd0(int param_1)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+void Race_FindFirstMissingRank(int param_1)
 
 {
   int iVar1;
@@ -3868,7 +3902,7 @@ void FUN_00435c10(void)
       piVar4 = piVar4 + -1;
     } while (0 < iVar2);
   }
-  FUN_00435bd0(unaff_EDI);
+  Race_FindFirstMissingRank(unaff_EDI);
   return;
 }
 
@@ -3901,11 +3935,12 @@ FUN_00435c50(int param_1,int param_2,int param_3,undefined4 param_4,undefined4 p
 }
 
 
-// ==== 0x435ca0 FUN_00435ca0
+// ==== 0x435ca0 RaceManager::IsInRaceStartWindow
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals med (ghidra-canon) docs/re/rivals.md */
 
-uint FUN_00435ca0(int param_1,int param_2)
+uint RaceManager__IsInRaceStartWindow(int param_1,int param_2)
 
 {
   float fVar1;
@@ -4026,9 +4061,11 @@ LAB_00435f2b:
 }
 
 
-// ==== 0x435f70 FUN_00435f70
+// ==== 0x435f70 Countdown::GetTotalSeconds
 
-float10 FUN_00435f70(void)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+float10 Countdown__GetTotalSeconds(void)
 
 {
   int in_EAX;
@@ -4037,9 +4074,11 @@ float10 FUN_00435f70(void)
 }
 
 
-// ==== 0x435f80 FUN_00435f80
+// ==== 0x435f80 Countdown::GetSecondsRemaining
 
-float10 FUN_00435f80(void)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+float10 Countdown__GetSecondsRemaining(void)
 
 {
   int iVar1;
@@ -4124,7 +4163,7 @@ int __fastcall FUN_00436040(int param_1)
   *(undefined1 *)(param_1 + 0x15) = 1;
   *(undefined4 *)(param_1 + 0xc) = 0xffffffff;
   *(undefined4 *)(param_1 + 8) = 0;
-  FUN_00436580();
+  StyleItem__Reset();
   return param_1;
 }
 
@@ -4151,13 +4190,13 @@ void FUN_00436070(float param_1)
         FUN_004364d0(0);
       }
       else if (*(int *)(in_EAX + 0x10) == 1) {
-        FUN_00436460(0);
+        StyleItem__Finish(0);
         FUN_00436600();
       }
     }
     if (((*(int *)(in_EAX + 0x10) == 0) || (*(int *)(in_EAX + 0x10) == 1)) &&
        (fVar1 < param_1 + param_1)) {
-      fVar6 = (float10)FUN_004361b0(param_1);
+      fVar6 = (float10)StyleItem__AccumulateStep(param_1);
       *(float *)(in_EAX + 0x20) = (float)fVar6;
     }
     if (((*(int *)(in_EAX + 0x10) == 1) &&
@@ -4187,9 +4226,11 @@ void FUN_00436070(float param_1)
 }
 
 
-// ==== 0x4361b0 FUN_004361b0
+// ==== 0x4361b0 StyleItem::AccumulateStep
 
-void __fastcall FUN_004361b0(undefined4 param_1,int param_2,float param_3)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall StyleItem__AccumulateStep(undefined4 param_1,int param_2,float param_3)
 
 {
   float fVar1;
@@ -4249,7 +4290,7 @@ void __thiscall FUN_00436230(int *param_1,int param_2)
   param_1[0xe] = param_2;
   param_1[0xf] = DAT_0073ad34;
   if (*(char *)(param_1[2] + 6) == '\0') {
-    fVar8 = (float10)FUN_004361b0(0x3f800000);
+    fVar8 = (float10)StyleItem__AccumulateStep(0x3f800000);
     iVar5 = param_1[2];
     if (((*(float *)(iVar5 + 0x18) < 0.0) && (fVar8 < (float10)*(float *)(iVar5 + 0x10))) ||
        ((piVar6 = DAT_0073618c, 0.0 < *(float *)(iVar5 + 0x18) &&
@@ -4322,9 +4363,11 @@ LAB_0043640d:
 }
 
 
-// ==== 0x436460 FUN_00436460
+// ==== 0x436460 StyleItem::Finish
 
-void __thiscall FUN_00436460(int param_1,undefined1 param_2)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void __thiscall StyleItem__Finish(int param_1,undefined1 param_2)
 
 {
   int iVar1;
@@ -4400,9 +4443,11 @@ void __thiscall FUN_004364d0(undefined4 *param_1,undefined4 param_2)
 }
 
 
-// ==== 0x436580 FUN_00436580
+// ==== 0x436580 StyleItem::Reset
 
-void __fastcall FUN_00436580(int param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall StyleItem__Reset(int param_1)
 
 {
   int iVar1;
@@ -4466,7 +4511,7 @@ void FUN_00436600(void)
     }
     if (*(int *)(in_EAX + 0x10) == 3) {
       *(int *)(in_EAX + 0x1c) = *(int *)(in_EAX + 0x1c) + 1;
-      FUN_004366c0();
+      StyleItem__AdvanceLevel();
       fVar2 = (float)(DAT_0073ad34 - *(int *)(in_EAX + 0x40)) * 0.00025;
       if (*(float *)(in_EAX + 0x2c) < fVar2) {
         *(float *)(in_EAX + 0x2c) = fVar2;
@@ -4501,9 +4546,11 @@ void FUN_00436600(void)
 }
 
 
-// ==== 0x4366c0 FUN_004366c0
+// ==== 0x4366c0 StyleItem::AdvanceLevel
 
-void __fastcall FUN_004366c0(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall StyleItem__AdvanceLevel(int param_1)
 
 {
   int iVar1;
@@ -4572,9 +4619,11 @@ void FUN_00436720(undefined4 param_1)
 }
 
 
-// ==== 0x436780 FUN_00436780
+// ==== 0x436780 StyleItem::ResetLevel
 
-void FUN_00436780(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void StyleItem__ResetLevel(void)
 
 {
   int iVar1;
@@ -4642,7 +4691,7 @@ void FUN_004367e0(int param_1)
       *(undefined1 *)((int)pvVar3 + 0x14) = 0;
       *(undefined1 *)((int)pvVar3 + 0x15) = 1;
       *(int *)((int)pvVar3 + 0xc) = iVar5;
-      FUN_00436580();
+      StyleItem__Reset();
     }
     *(void **)(param_1 + iVar5 * 4) = pvVar3;
     iVar1 = DAT_007361a4;
@@ -4675,7 +4724,7 @@ void FUN_004367e0(int param_1)
 
 // ==== 0x4368e0 Player::FreeMember960
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void Player__FreeMember960(void)
 
@@ -4831,7 +4880,7 @@ void __fastcall FUN_00436b40(int param_1)
   iVar1 = *(int *)(in_EAX + param_1 * 4);
   if ((*(char *)(iVar1 + 0x14) != '\0') &&
      ((iVar1 = *(int *)(iVar1 + 0x10), iVar1 == 0 || (iVar1 == 1)))) {
-    FUN_00436460(1);
+    StyleItem__Finish(1);
   }
   return;
 }
@@ -4845,7 +4894,7 @@ void __fastcall FUN_00436b60(int param_1)
   int in_EAX;
   
   if (*(char *)(*(int *)(in_EAX + param_1 * 4) + 0x14) != '\0') {
-    FUN_00436780();
+    StyleItem__ResetLevel();
     return;
   }
   return;
@@ -4870,7 +4919,7 @@ void FUN_00436b70(void)
         FUN_004364d0(1);
       }
       else if (iVar1 == 1) {
-        FUN_00436460(1);
+        StyleItem__Finish(1);
       }
     }
     iVar2 = iVar2 + 1;
@@ -4879,9 +4928,11 @@ void FUN_00436b70(void)
 }
 
 
-// ==== 0x436ba0 FUN_00436ba0
+// ==== 0x436ba0 StyleSet::RecomputeTotal
 
-float10 FUN_00436ba0(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+float10 StyleSet__RecomputeTotal(void)
 
 {
   char in_AL;
@@ -4942,9 +4993,11 @@ float10 FUN_00436ba0(void)
 }
 
 
-// ==== 0x436d40 FUN_00436d40
+// ==== 0x436d40 std::list::clear__free_every_node__head_in_ESI_
 
-void FUN_00436d40(void)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+void std__list__clear__free_every_node__head_in_ESI_(void)
 
 {
   int *_Memory;
@@ -5253,7 +5306,7 @@ undefined4 * FUN_00436ff0(undefined4 *param_1,undefined4 param_2)
       *(undefined4 *)(iVar6 + 0x34) = uVar4;
       *(undefined4 *)(*(int *)(iVar6 + 0x3c) + 0x60) = 1;
       local_14._0_1_ = 1;
-      FUN_00469f30();
+      CarCollisionBody__SetupPhysicsPointers();
       *(undefined4 *)(*(int *)(iVar6 + 0x34) + 4) = *(undefined4 *)(iVar6 + 0x30);
     }
     *(undefined4 *)(*(int *)(param_1[1] + 0x30) + 0x1e4) = 0x3f800000;
@@ -5549,7 +5602,7 @@ void __thiscall FUN_004375e0(int param_1,undefined4 param_2,float param_3)
   }
   cVar3 = CarState__IsNitrousOn();
   if (cVar3 != '\0') {
-    CarState__StopTimer();
+    CarState__StopNitrous();
   }
 LAB_00437d4f:
   iVar6 = *(int *)(param_1 + 4);
@@ -5914,7 +5967,7 @@ void FUN_00438440(float param_1)
                    *(float *)(iVar7 + 0x68),
          100.0 < SQRT(fVar3 * fVar3 + fVar4 * fVar4 + fVar1 * fVar1))) {
         FUN_004399a0(8);
-        iVar7 = FUN_00424d60();
+        iVar7 = RacerNode__IsLocalHuman();
         if (iVar7 != 0) {
           FUN_0043a830();
         }
@@ -5923,7 +5976,7 @@ void FUN_00438440(float param_1)
     if (((DAT_0078a345 != '\0') || (DAT_007361a4 != 0)) && (10000.0 < (float)*(int *)(iVar6 + 0x10))
        ) {
       FUN_004399a0(0x10);
-      iVar6 = FUN_00424d60();
+      iVar6 = RacerNode__IsLocalHuman();
       if (iVar6 != 0) {
         FUN_0043a830();
       }
@@ -5989,7 +6042,7 @@ float10 bCeil(float param_1)
 
 // ==== 0x438840 int_NotEqual
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 bool __thiscall int_NotEqual(int *param_1,int *param_2)
 
@@ -6103,7 +6156,7 @@ undefined1 __fastcall FUN_00438a40(int param_1)
 
 // ==== 0x438a60 Obj_GetByte19
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined1 __fastcall Obj_GetByte19(int param_1)
 
@@ -6114,7 +6167,7 @@ undefined1 __fastcall Obj_GetByte19(int param_1)
 
 // ==== 0x438a80 Race::HasPlayer
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 bool __thiscall Race__HasPlayer(int param_1,int param_2)
 
@@ -6134,7 +6187,7 @@ undefined4 __fastcall FUN_00438aa0(int param_1)
 
 // ==== 0x438ac0 Obj_GetField34
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 __fastcall Obj_GetField34(int param_1)
 
@@ -6145,7 +6198,7 @@ undefined4 __fastcall Obj_GetField34(int param_1)
 
 // ==== 0x438ae0 GetNetModeCode
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined1 GetNetModeCode(void)
 
@@ -6162,38 +6215,47 @@ undefined1 GetNetModeCode(void)
 }
 
 
-// ==== 0x438b10 FUN_00438b10
+// ==== 0x438b10 Counter_7354e0_IsPositive
 
-bool FUN_00438b10(void)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+bool Counter_7354e0_IsPositive(void)
 
 {
   return 0 < DAT_007354e0;
 }
 
 
-// ==== 0x438b30 FUN_00438b30
+// ==== 0x438b30 Counter_735500_IsPositive
 
-bool FUN_00438b30(void)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+bool Counter_735500_IsPositive(void)
 
 {
   return 0 < DAT_00735500;
 }
 
 
-// ==== 0x438b50 FUN_00438b50
+// ==== 0x438b50 Flag_73014c_Get
 
-undefined1 FUN_00438b50(void)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+undefined1 Flag_73014c_Get(void)
 
 {
   return DAT_0073014c;
 }
 
 
-// ==== 0x438b60 FUN_00438b60
+// ==== 0x438b60 Career_ComputeCashAfterRace
+
+/* [canon] car med (ghidra-canon) docs/re/car.md */
 
 undefined4
-FUN_00438b60(uint param_1,char param_2,uint param_3,byte param_4,byte param_5,char param_6,
-            ushort param_7)
+Career_ComputeCashAfterRace
+          (uint param_1,char param_2,uint param_3,byte param_4,byte param_5,char param_6,
+          ushort param_7)
 
 {
   undefined4 uVar1;
@@ -6363,7 +6425,7 @@ void __thiscall FUN_00438fe0(int param_1,undefined4 *param_2)
 void FUN_00439010(void)
 
 {
-  FUN_004327d0();
+  RaceStatus__FindEntrantById();
   return;
 }
 
@@ -6435,7 +6497,7 @@ undefined4 FUN_00439130(void)
   
   local_8 = 0;
   if ((DAT_0073619c != 0) && (DAT_007361f8 != 0)) {
-    local_8 = FUN_0041ff50();
+    local_8 = RaceManager__FindRacerByIdIn();
   }
   return local_8;
 }
@@ -6559,7 +6621,7 @@ void __thiscall FUN_00439470(undefined4 param_1,undefined4 param_2,undefined4 pa
   undefined4 uVar4;
   undefined4 uVar5;
   
-  cVar1 = FUN_00432e20(param_1);
+  cVar1 = GameMode__IsNotMode0456(param_1);
   if (cVar1 != '\0') {
     FUN_004390d0(param_2);
   }
@@ -6568,7 +6630,7 @@ void __thiscall FUN_00439470(undefined4 param_1,undefined4 param_2,undefined4 pa
     iVar2 = FUN_00424e90();
     if (iVar2 == 0) {
       FUN_00439010(param_3);
-      uVar3 = FUN_00421a80();
+      uVar3 = DriverInfo__IsRemote();
       uVar5 = 0;
       uVar4 = FUN_00421960(0,uVar3);
       FUN_00435c50(uVar4,uVar5,uVar3,param_3);
@@ -6621,7 +6683,7 @@ void __fastcall FUN_004394f0(int param_1)
     fVar7 = (float10)bTickerToSeconds();
     *(float *)(param_1 + 0x1bc) = (float)((float10)(float)fVar6 - fVar7);
   }
-  cVar2 = FUN_00432e40();
+  cVar2 = GameMode__IsMode03456();
   if ((cVar2 != '\0') || (DAT_0077b259 == '\0')) goto LAB_004397af;
   cVar2 = IsDriftMode();
   if (cVar2 == '\0') {
@@ -6810,9 +6872,11 @@ float10 __thiscall FUN_00439a50(int param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x439a80 FUN_00439a80
+// ==== 0x439a80 Race::GetClockSeconds
 
-float10 __fastcall FUN_00439a80(int param_1)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+float10 __fastcall Race__GetClockSeconds(int param_1)
 
 {
   return (float10)*(float *)(param_1 + 0x1bc);
@@ -7121,7 +7185,7 @@ undefined1 __fastcall FUN_0043a2e0(int param_1)
 
 // ==== 0x43a340 IsFlag7346c8Set
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 bool IsFlag7346c8Set(void)
 
@@ -7189,14 +7253,14 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
       }
     }
     iVar5 = FUN_0043b770();
-    if ((iVar5 == 0) && (cVar2 = FUN_00432e40(), cVar2 == '\0')) {
+    if ((iVar5 == 0) && (cVar2 = GameMode__IsMode03456(), cVar2 == '\0')) {
       FUN_00439470(0,10);
     }
     bVar1 = true;
     for (local_1c = 0; local_1c < 4; local_1c = local_1c + 1) {
       puVar4 = (undefined4 *)Race__GetPlayer(local_1c);
       if (puVar4 != (undefined4 *)0x0) {
-        cVar2 = FUN_00432e40();
+        cVar2 = GameMode__IsMode03456();
         if (cVar2 == '\0') {
           bVar1 = false;
           break;
@@ -7235,14 +7299,14 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
         FUN_00405560();
       }
     }
-    cVar2 = FUN_00432e20();
+    cVar2 = GameMode__IsNotMode0456();
     if (cVar2 != '\0') {
       FUN_004394f0(DAT_0073457c);
-      fVar6 = (float10)FUN_00439a80();
+      fVar6 = (float10)Race__GetClockSeconds();
       if (fVar6 < -(float10)3.0) {
         for (local_24 = 0; local_24 < 4; local_24 = local_24 + 1) {
           iVar5 = Race__GetPlayer(local_24);
-          if ((iVar5 != 0) && (cVar2 = FUN_00432e40(), cVar2 == '\0')) {
+          if ((iVar5 != 0) && (cVar2 = GameMode__IsMode03456(), cVar2 == '\0')) {
             FUN_004399a0(0x10);
             FUN_00439470(3,9);
           }
@@ -7511,7 +7575,7 @@ void __thiscall FUN_0043ac10(int *param_1,char param_2)
           iVar2 = Race__GetPlayer(local_8);
           if (iVar2 != param_1[1]) {
             Race__GetPlayer(local_8);
-            cVar1 = FUN_00432e40();
+            cVar1 = GameMode__IsMode03456();
             if (cVar1 == '\0') {
               uVar5 = 10;
               uVar4 = 0;
@@ -7662,7 +7726,7 @@ void __fastcall FUN_0043af80(int param_1)
   for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
     if (*(int *)(param_1 + 8 + local_8 * 4) != 0) {
       Race__GetPlayer(local_8);
-      cVar1 = FUN_00432e20();
+      cVar1 = GameMode__IsNotMode0456();
       if (cVar1 != '\0') {
         uVar3 = 2;
         Race__GetPlayer(local_8);
@@ -7784,7 +7848,7 @@ void FUN_0043b400(int param_1,undefined4 param_2)
   char local_76d;
   undefined1 local_3c;
   
-  FUN_00431dd0();
+  DriverInfo__InitDefault();
   iVar2 = FUN_00432830();
   if (param_1 != iVar2) {
     FUN_0043cad0(&local_770,param_2);
@@ -7792,8 +7856,8 @@ void FUN_0043b400(int param_1,undefined4 param_2)
     local_3c = 1;
     local_76d = local_76f + '\x01';
     RaceStatus__AddEntrant(&DAT_0078a2f0);
-    cVar1 = FUN_00424c70();
-    if ((cVar1 != '\0') || (cVar1 = FUN_00424c80(), cVar1 != '\0')) {
+    cVar1 = DriverInfo__IsPlayerKind();
+    if ((cVar1 != '\0') || (cVar1 = DriverInfo__IsRivalKind(), cVar1 != '\0')) {
       FUN_0043b560((int)local_76f,param_2,0,local_780);
     }
   }
@@ -7810,7 +7874,7 @@ void __thiscall FUN_0043b4e0(int param_1,int param_2,undefined4 param_3)
 {
   int iVar1;
   
-  iVar1 = FUN_004327d0();
+  iVar1 = RaceStatus__FindEntrantById();
   if ((iVar1 != 0) && (FUN_0043ca70(iVar1,param_3), *(int *)(param_1 + 8 + param_2 * 4) != 0)) {
     Race__GetPlayer(param_2);
     FUN_0042ae40();
@@ -7871,13 +7935,13 @@ void __fastcall FUN_0043b680(int param_1)
   char cVar1;
   int local_8;
   
-  if ((*(int *)(param_1 + 4) != 0) && (cVar1 = FUN_00432e20(), cVar1 == '\0')) {
+  if ((*(int *)(param_1 + 4) != 0) && (cVar1 = GameMode__IsNotMode0456(), cVar1 == '\0')) {
     *(undefined4 *)(param_1 + 4) = 0;
   }
   for (local_8 = 0; local_8 < 4; local_8 = local_8 + 1) {
     if (*(int *)(param_1 + 8 + local_8 * 4) != 0) {
       Race__GetPlayer(local_8);
-      cVar1 = FUN_00432e20();
+      cVar1 = GameMode__IsNotMode0456();
       if (cVar1 == '\0') {
         if (*(int *)(param_1 + 8 + local_8 * 4) != 0) {
           FUN_006497d0();
@@ -7908,7 +7972,7 @@ int __fastcall FUN_0043b770(int param_1)
       iVar2 = Race__GetPlayer(local_c);
       if (iVar2 != *(int *)(param_1 + 4)) {
         Race__GetPlayer(local_c);
-        cVar1 = FUN_00432e20();
+        cVar1 = GameMode__IsNotMode0456();
         if (cVar1 != '\0') {
           local_8 = local_8 + 1;
         }
@@ -8053,7 +8117,7 @@ void __thiscall FUN_0043ba60(int *param_1,int param_2,char param_3)
     iVar1 = Race__GetPlayer(param_2);
     if (*param_1 == 3) {
       FUN_004390d0(0);
-      FUN_00432710((int)*(char *)(iVar1 + 4));
+      RaceStatus__RemoveEntrant((int)*(char *)(iVar1 + 4));
       if (*(char *)(iVar1 + 0x18) != '\0') {
         for (local_c = 0; local_c < 4; local_c = local_c + 1) {
           if ((param_1[local_c + 2] != 0) && (iVar2 = Race__GetPlayer(local_c), iVar2 != iVar1)) {
@@ -8061,7 +8125,7 @@ void __thiscall FUN_0043ba60(int *param_1,int param_2,char param_3)
             Race__GetPlayer(local_c);
             FUN_004390d0(uVar3);
             iVar2 = Race__GetPlayer(local_c);
-            FUN_00432710((int)*(char *)(iVar2 + 4));
+            RaceStatus__RemoveEntrant((int)*(char *)(iVar2 + 4));
           }
         }
       }
@@ -8184,7 +8248,7 @@ FUN_0043be30(int param_1,int param_2,undefined4 param_3,undefined1 param_4,int p
   local_5 = '\0';
   if (*(int *)(param_1 + 8 + param_2 * 4) != 0) {
     iVar2 = Race__GetPlayer(param_2);
-    local_5 = FUN_00432e40();
+    local_5 = GameMode__IsMode03456();
     if ((local_5 == '\0') && (iVar2 == *(int *)(param_1 + 4))) {
       if ((param_5 == 1) &&
          (((cVar1 = IsDriftMode(), cVar1 == '\0' && (cVar1 = FUN_00421a50(), cVar1 == '\0')) &&
@@ -8405,7 +8469,7 @@ void __fastcall FUN_0043c300(int param_1)
       }
       FUN_00548840(*(undefined1 *)((int)local_594 + 5));
       FUN_00439010();
-      uVar3 = FUN_00424c80();
+      uVar3 = DriverInfo__IsRivalKind();
       FUN_00548840(uVar3);
       FUN_00548840(*(undefined1 *)local_590);
       FUN_00548840(*(undefined1 *)(local_590 + 2));
@@ -8728,7 +8792,7 @@ void __thiscall FUN_0043d1f0(int param_1,undefined4 *param_2)
 
 // ==== 0x43d220 Race::ApplyPendingSlotNames
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall Race__ApplyPendingSlotNames(int param_1)
 
@@ -8776,15 +8840,15 @@ void __thiscall FUN_0043d2d0(int param_1,int param_2,undefined4 param_3,undefine
   
   if ((*(int *)(param_1 + 8 + param_2 * 4) != 0) && (iVar2 = Float2_ToIntPair(), 1 < iVar2)) {
     Race__GetPlayer(param_2);
-    fVar3 = (float10)FUN_00435f70();
-    cVar1 = FUN_00432e40();
+    fVar3 = (float10)Countdown__GetTotalSeconds();
+    cVar1 = GameMode__IsMode03456();
     if ((cVar1 == '\0') &&
        ((*(float *)(param_1 + 0x1c) == 0.0 ||
         (fVar4 = (float10)bTickerToSeconds(),
         fVar4 < (float10)(float)fVar3 + (float10)*(float *)(param_1 + 0x1c))))) {
       FUN_004399a0(1);
     }
-    if ((DAT_007361f8 != 0) && (iVar2 = FUN_0041ff50(), iVar2 != 0)) {
+    if ((DAT_007361f8 != 0) && (iVar2 = RaceManager__FindRacerByIdIn(), iVar2 != 0)) {
       (**(code **)(**(int **)(iVar2 + 0x830) + 0xc))(param_3,param_4);
     }
   }
@@ -8807,15 +8871,15 @@ void __thiscall FUN_0043d3d0(int param_1,int param_2,undefined4 param_3)
   if (((DAT_0073619c == 0) || (iVar2 = FUN_00421960(), 3 < iVar2)) &&
      (*(int *)(param_1 + 8 + param_2 * 4) != 0)) {
     Race__GetPlayer(param_2);
-    fVar3 = (float10)FUN_00435f70();
-    cVar1 = FUN_00432e40();
+    fVar3 = (float10)Countdown__GetTotalSeconds();
+    cVar1 = GameMode__IsMode03456();
     if ((cVar1 == '\0') &&
        ((*(float *)(param_1 + 0x1c) == 0.0 ||
         (fVar4 = (float10)bTickerToSeconds(),
         fVar4 < (float10)(float)fVar3 + (float10)*(float *)(param_1 + 0x1c))))) {
       FUN_004399a0(1);
     }
-    if ((DAT_007361f8 != 0) && (iVar2 = FUN_0041ff50(), iVar2 != 0)) {
+    if ((DAT_007361f8 != 0) && (iVar2 = RaceManager__FindRacerByIdIn(), iVar2 != 0)) {
       (**(code **)(**(int **)(iVar2 + 0x830) + 4))(param_3);
     }
   }
@@ -9014,7 +9078,7 @@ uint __thiscall FUN_0043d8c0(int *param_1,undefined4 param_2,uint param_3)
       local_18 = 2;
     }
     uVar7 = FUN_0043b7f0((undefined1)DAT_0078a31c,local_18,(undefined2)DAT_0078a2f0);
-    local_c = FUN_00438b60(uVar1,param_3 & 0xff,iVar6 - uVar1,uVar7);
+    local_c = Career_ComputeCashAfterRace(uVar1,param_3 & 0xff,iVar6 - uVar1,uVar7);
     if (*param_1 == 7) {
       if (uVar1 < local_c) {
         iVar4 = FUN_00432e70();
@@ -9073,7 +9137,7 @@ undefined4 __fastcall FUN_0043da90(int *param_1)
   undefined4 local_14;
   
   if (*param_1 == 7) {
-    cVar1 = FUN_00432e20();
+    cVar1 = GameMode__IsNotMode0456();
     if ((cVar1 == '\0') && (*(int *)param_1[1] != 5)) {
       iVar2 = SpecialCamCooldown();
       if (iVar2 != 0) {
@@ -9122,9 +9186,11 @@ float10 FUN_0043db40(void)
 }
 
 
-// ==== 0x43db50 FUN_0043db50
+// ==== 0x43db50 RacerRecord::SetRank
 
-void FUN_0043db50(undefined2 param_1)
+/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+
+void RacerRecord__SetRank(undefined2 param_1)
 
 {
   int in_EAX;
@@ -9373,13 +9439,13 @@ void FUN_0043de90(int param_1)
   local_1c = 999;
   local_20 = 0;
   for (local_24 = 0; local_24 < DAT_0078a320 + DAT_0078a328; local_24 = local_24 + 1) {
-    local_28 = FUN_004327c0();
+    local_28 = RaceStatus__GetEntrantAt();
     local_29 = 0;
     local_30 = 0;
-    cVar1 = FUN_00424c70();
-    if ((cVar1 == '\0') || (cVar1 = FUN_00421a80(), cVar1 != '\0')) {
-      cVar1 = FUN_00421a80();
-      if ((cVar1 != '\0') && (cVar1 = FUN_00424c80(), cVar1 == '\0')) {
+    cVar1 = DriverInfo__IsPlayerKind();
+    if ((cVar1 == '\0') || (cVar1 = DriverInfo__IsRemote(), cVar1 != '\0')) {
+      cVar1 = DriverInfo__IsRemote();
+      if ((cVar1 != '\0') && (cVar1 = DriverInfo__IsRivalKind(), cVar1 == '\0')) {
         local_34 = Race__GetPlayer((int)*(char *)(local_28 + 1));
         local_30 = FUN_0042ae40();
       }
@@ -9542,7 +9608,7 @@ void __thiscall FUN_0043e310(int param_1,undefined4 param_2)
       FUN_00436b40();
       if (5.0 < fVar1) {
         FUN_00432d50();
-        FUN_0043f420();
+        MiscStyleManager__ClearFlags();
         if (*(char *)(param_1 + 0x11) != '\0') {
           FUN_00436b20(fVar1);
         }
@@ -9620,7 +9686,7 @@ LAB_0043e60f:
 LAB_0043e6aa:
   FUN_004081e0();
   fVar5 = (float10)FUN_00424e80();
-  fVar5 = (float10)FUN_00401c40(*(undefined4 *)(param_1 + 0x54),(float)fVar5);
+  fVar5 = (float10)bMax_float(*(undefined4 *)(param_1 + 0x54),(float)fVar5);
   *(float *)(param_1 + 0x54) = (float)fVar5;
   return (float10)local_8;
 }
@@ -9746,7 +9812,7 @@ float10 __fastcall FUN_0043e9d0(int param_1)
   
   local_8 = 0.0;
   FUN_00432d50();
-  fVar2 = (float10)FUN_0043f3f0();
+  fVar2 = (float10)MiscStyleManager__GetTimeSinceLastCollision();
   if ((float10)0.5 <= fVar2) {
     *(undefined1 *)(param_1 + 0x11) = 0;
   }
@@ -9833,11 +9899,11 @@ void __fastcall RaceManager__UpdateAIScores(int param_1)
     iVar2 = FUN_004081e0();
     if (iVar2 <= local_c) break;
     FUN_00401d80();
-    iVar2 = FUN_00424d60();
+    iVar2 = RacerNode__IsLocalHuman();
     if (iVar2 == 0) {
-      iVar2 = FUN_00424d50();
+      iVar2 = RacerNode__IsPlayerKind();
       if (iVar2 != 0) {
-        iVar2 = FUN_00424d80();
+        iVar2 = RacerNode__IsRemote();
         if (iVar2 != 0) {
           uVar3 = FUN_0041f5c0();
           Race__GetPlayer(uVar3);
@@ -9868,7 +9934,7 @@ void __fastcall RaceManager__UpdateAIScores(int param_1)
       iVar5 = FUN_0042ac60();
       if (iVar4 <= iVar5) {
         iVar4 = FUN_0043db60();
-        FUN_0043db50(iVar4 + 1);
+        RacerRecord__SetRank(iVar4 + 1);
         iVar4 = FUN_004081e0();
         for (local_28 = 0; local_28 < 4 - iVar4; local_28 = local_28 + 1) {
           iVar5 = FUN_0043ea50(local_28 + 100);
@@ -10090,9 +10156,11 @@ void __fastcall FUN_0043f1f0(undefined4 param_1)
 }
 
 
-// ==== 0x43f210 FUN_0043f210
+// ==== 0x43f210 MiscStyleManager::IsAirTimeActive
 
-undefined4 __fastcall FUN_0043f210(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __fastcall MiscStyleManager__IsAirTimeActive(int param_1)
 
 {
   if ((((*(int *)(param_1 + 0x1c) == 2) && (*(int *)(param_1 + 0x20) != 0)) &&
@@ -10148,7 +10216,7 @@ LAB_0043f355:
       iVar3 = *(int *)(in_EAX[1] + 0x34);
       goto LAB_0043f38c;
     }
-    cVar2 = FUN_0043f210();
+    cVar2 = MiscStyleManager__IsAirTimeActive();
     if (((cVar2 == '\0') || (DAT_0078a310 <= piVar1[0x44])) ||
        (*(char *)(*(int *)(in_EAX[1] + 0x6c) + 0x14) == '\0')) goto LAB_0043f39d;
     fVar6 = (float)(DAT_0078a310 - piVar1[0x44]) * 0.00025;
@@ -10164,7 +10232,7 @@ LAB_0043f38c:
   }
   FUN_00436230(fVar6);
 LAB_0043f39d:
-  fVar5 = (float10)FUN_00436ba0();
+  fVar5 = (float10)StyleSet__RecomputeTotal();
   if ((float10)0.0 < fVar5) {
     if ((short)piVar1[4] == 7) {
       iVar3 = in_EAX[1];
@@ -10185,9 +10253,11 @@ LAB_0043f39d:
 }
 
 
-// ==== 0x43f3f0 FUN_0043f3f0
+// ==== 0x43f3f0 MiscStyleManager::GetTimeSinceLastCollision
 
-float10 __fastcall FUN_0043f3f0(int param_1)
+/* [canon] runtime med (ghidra-canon+nfsug) docs/re/runtime.md */
+
+float10 __fastcall MiscStyleManager__GetTimeSinceLastCollision(int param_1)
 
 {
   float10 fVar1;
@@ -10200,9 +10270,11 @@ float10 __fastcall FUN_0043f3f0(int param_1)
 }
 
 
-// ==== 0x43f420 FUN_0043f420
+// ==== 0x43f420 MiscStyleManager::ClearFlags
 
-void FUN_0043f420(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void MiscStyleManager__ClearFlags(void)
 
 {
   int in_EAX;
@@ -10232,7 +10304,7 @@ void FUN_0043f430(void)
     if ((char)unaff_ESI[2] == '\0') {
       *(undefined1 *)(unaff_ESI + 2) = 1;
       if (*(char *)(*(int *)(unaff_ESI[1] + 0x44) + 0x14) != '\0') {
-        FUN_00436780();
+        StyleItem__ResetLevel();
       }
     }
     else if (*(char *)(*(int *)(unaff_ESI[1] + 0x44) + 0x14) != '\0') {
@@ -10247,7 +10319,7 @@ void FUN_0043f430(void)
     if (*(char *)((int)unaff_ESI + 9) == '\0') {
       *(undefined1 *)((int)unaff_ESI + 9) = 1;
       if (*(char *)(*(int *)(unaff_ESI[1] + 0x48) + 0x14) != '\0') {
-        FUN_00436780();
+        StyleItem__ResetLevel();
       }
     }
     else if (*(char *)(*(int *)(unaff_ESI[1] + 0x48) + 0x14) != '\0') {
@@ -10261,7 +10333,7 @@ void FUN_0043f430(void)
     }
     if (uVar2 == 0) {
       if (*(char *)(*(int *)(unaff_ESI[1] + 0x40) + 0x14) != '\0') {
-        FUN_00436780();
+        StyleItem__ResetLevel();
         return;
       }
     }
@@ -10425,7 +10497,7 @@ void FUN_0043f8b0(int *param_1)
   
   iVar1 = *(int *)(*param_1 + 4);
   if (1.0 <= *(float *)(iVar1 + 0x3d0)) {
-    fVar2 = (float10)FUN_00464ed0();
+    fVar2 = (float10)CarState__GetYaw();
   }
   else {
     fVar2 = (float10)0.0;
@@ -10439,9 +10511,11 @@ void FUN_0043f8b0(int *param_1)
 }
 
 
-// ==== 0x43f980 FUN_0043f980
+// ==== 0x43f980 AngleDiffDegrees
 
-float10 FUN_0043f980(float param_1,float param_2)
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
+
+float10 AngleDiffDegrees(float param_1,float param_2)
 
 {
   float10 fVar1;
@@ -10478,7 +10552,7 @@ void FUN_0043f9b0(void)
     *(undefined1 *)((int)unaff_ESI + 0xe) = 1;
   }
   else if ((('\0' < cVar1) && (cVar1 < '\x03')) &&
-          (fVar4 = (float10)FUN_0043f980(fVar3,unaff_ESI[4]), (float10)170.0 <= ABS(fVar4))) {
+          (fVar4 = (float10)AngleDiffDegrees(fVar3,unaff_ESI[4]), (float10)170.0 <= ABS(fVar4))) {
     *(char *)((int)unaff_ESI + 0xe) = cVar1 + '\x01';
     unaff_ESI[4] = (int)fVar3;
   }
@@ -10575,7 +10649,7 @@ void __thiscall FUN_0043fbb0(int param_1,float param_2)
         }
       }
       if (*(char *)(*(int *)(unaff_EDI[1] + 0x58) + 0x14) != '\0') {
-        FUN_00436780();
+        StyleItem__ResetLevel();
       }
       unaff_EDI[0xb] = 0;
     }
@@ -11090,7 +11164,7 @@ void FUN_004406d0(void)
 
 // ==== 0x440710 RefArray_DecrementAll
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void RefArray_DecrementAll(void)
 

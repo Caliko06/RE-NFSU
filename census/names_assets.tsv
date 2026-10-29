@@ -149,7 +149,7 @@ addr	name	system	confidence	evidence	tool	doc
 0x4f42c0	FEngPackage::Unloader	assets	high	V: unloader #33 -> FEngLibrary::RemovePackage	Hopper sub_4f42c0 + Ghidra export FUN_004f42c0: H+G agree	docs/re/assets.md
 0x4f4120	FEngLibrary::AddPackage	assets	high	V: new package object + list insert	Hopper sub_4f4120 + Ghidra make: H+G agree	docs/re/assets.md
 0x4f4190	FEngLibrary::RemovePackage	assets	high	V: find package by chunk ptr, print 'UNLOAD PACKAGE(%x)', destroy	Ghidra make FUN_004f4190	docs/re/assets.md
-0x4f3a00	FEPackage::FEPackage	assets	high	V: package ctor: chunk ptr at +0x10, data ptr at +0xc	Ghidra make FUN_004f3a00	docs/re/assets.md
+0x4f3a00	FEPackageData::FEPackageData	assets	med	read: ctor builds a package-data object from chunk (0x30203/0x30210), prints "Load Package[%x]", registers via FEScreenRegistry; 0x4ff780 holds FEPackage::FEPackage; renamed from FEPackage::FEPackage	Ghidra make FUN_004f3a00	docs/re/assets.md
 0x59dd90	SplineSet::Loader	assets	high	V: loader #34 (0x8003b000)	Hopper sub_59dd90 + Ghidra export FUN_0059dd90: H+G agree	docs/re/assets.md
 0x59de20	SplineSet::Unloader	assets	high	V: unloader #34: unlink matching splines and free pool	Hopper sub_59de20 + Ghidra export FUN_0059de20: H+G agree	docs/re/assets.md
 0x59c850	Spline::InitBasis	assets	high	V: fill the default basis matrices at 0x7376b0.. once	Ghidra make FUN_0059c850	docs/re/assets.md

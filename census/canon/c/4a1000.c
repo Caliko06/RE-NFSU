@@ -69,7 +69,7 @@ void __fastcall HudTurbo__Update(int param_1)
   if ((DAT_006fbf14 == 0) && (*(int *)(in_EAX + 0x10) == 0)) {
     RaceManager__FindRacerById();
   }
-  fVar1 = (float10)FUN_0042a6b0();
+  fVar1 = (float10)Car__GetTurboBoost();
   if ((*(uint *)(param_1 + 0x18) & *(uint *)(param_1 + 0x10)) != 0 ||
       (*(uint *)(param_1 + 0x1c) & *(uint *)(param_1 + 0x14)) != 0) {
     FUN_004a14d0();
@@ -4725,7 +4725,7 @@ void HudSpeedTrapDrift__Update(int param_1)
         iVar8 = iVar3;
       }
     }
-    fVar9 = (float10)FUN_00464ed0();
+    fVar9 = (float10)CarState__GetYaw();
     FUN_004a7b00((float)(fVar9 * (float10)57.295776),*(undefined4 *)(iVar8 + 0x3d0));
     if (*(char *)(unaff_EBX + 0xac) == '\0') {
       FUN_004a7b80(*(undefined1 *)(param_1 + 0x9f3));
@@ -5867,12 +5867,12 @@ void HudOnline__Update(void)
   float10 fVar6;
   
   piVar1 = DAT_0077b244;
-  fVar6 = (float10)FUN_00439a80();
+  fVar6 = (float10)Race__GetClockSeconds();
   if (fVar6 < (float10)0.0) {
     FEObject__SetInvisible();
   }
   else {
-    fVar6 = (float10)FUN_00439a80();
+    fVar6 = (float10)Race__GetClockSeconds();
     FEObject__SetVisible();
     FEObject__SetFormattedText("%1.1f",(double)(float)fVar6);
     iVar4 = *piVar1;
@@ -6713,7 +6713,7 @@ void FUN_004a9d00(int param_1)
   ExceptionList = &local_c;
   eh_vector_destructor_iterator((void *)(param_1 + 0xf954),0xf944,2,FUN_004a9d60);
   local_4 = 0xffffffff;
-  FUN_004a9d70(param_1 + 0x6644);
+  Career___Career(param_1 + 0x6644);
   ExceptionList = local_c;
   return;
 }
@@ -6724,14 +6724,16 @@ void FUN_004a9d00(int param_1)
 void __fastcall FUN_004a9d60(int param_1)
 
 {
-  FUN_004a9d70(param_1 + 0x6634);
+  Career___Career(param_1 + 0x6634);
   return;
 }
 
 
-// ==== 0x4a9d70 FUN_004a9d70
+// ==== 0x4a9d70 Career::_Career
 
-void FUN_004a9d70(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void Career___Career(int param_1)
 
 {
   void *local_c;
@@ -6749,9 +6751,11 @@ void FUN_004a9d70(int param_1)
 }
 
 
-// ==== 0x4a9dd0 FUN_004a9dd0
+// ==== 0x4a9dd0 Opt::ResetGeneralBlock
 
-undefined1 * __fastcall FUN_004a9dd0(undefined1 *param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined1 * __fastcall Opt__ResetGeneralBlock(undefined1 *param_1)
 
 {
   int iVar1;
@@ -6781,9 +6785,11 @@ undefined1 * __fastcall FUN_004a9dd0(undefined1 *param_1)
 }
 
 
-// ==== 0x4a9e30 FUN_004a9e30
+// ==== 0x4a9e30 HighScoresDatabase::FindHighScore
 
-int __fastcall FUN_004a9e30(undefined4 param_1,int param_2)
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __fastcall HighScoresDatabase__FindHighScore(undefined4 param_1,int param_2)
 
 {
   char *pcVar1;
@@ -6818,7 +6824,7 @@ undefined1 FUN_004a9e70(int param_1,undefined1 param_2,undefined1 param_3,int pa
   undefined2 *puVar4;
   undefined8 uVar5;
   
-  uVar5 = FUN_004a9e30();
+  uVar5 = HighScoresDatabase__FindHighScore();
   iVar3 = (int)((ulonglong)uVar5 >> 0x20);
   puVar4 = (undefined2 *)uVar5;
   if (puVar4 == (undefined2 *)0x0) {
@@ -6991,7 +6997,7 @@ void FUN_004aa1c0(void)
 int __fastcall FUN_004aa200(int param_1)
 
 {
-  FUN_004a9dd0();
+  Opt__ResetGeneralBlock();
   *(undefined4 *)(param_1 + 0x60) = 0;
   *(undefined4 *)(param_1 + 100) = 0;
   *(undefined4 *)(param_1 + 0x68) = 0;
@@ -7108,7 +7114,7 @@ int __fastcall FUN_004aa200(int param_1)
   *(undefined1 *)(param_1 + 0x20c) = 0;
   *(undefined1 *)(param_1 + 0x20d) = 0;
   *(undefined1 *)(param_1 + 0x20f) = 0;
-  FUN_004abe00();
+  HighScoresDatabase__Default();
   FUN_005a0940(param_1 + 0x6634);
   return param_1;
 }
@@ -7247,9 +7253,11 @@ void FUN_004aa5e0(void)
 }
 
 
-// ==== 0x4aa670 FUN_004aa670
+// ==== 0x4aa670 UserProfile::Default
 
-void FUN_004aa670(void)
+/* [canon] canon med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UserProfile__Default(void)
 
 {
   char cVar1;
@@ -7398,7 +7406,7 @@ void FUN_004aa670(void)
 
 // ==== 0x4aa970 ThresholdTable_MarkReached
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void ThresholdTable_MarkReached(undefined4 param_1,int param_2)
 
@@ -7433,9 +7441,11 @@ void ThresholdTable_MarkReached(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x4aa9d0 FUN_004aa9d0
+// ==== 0x4aa9d0 UserProfile::IsStyleRewardUnlocked
 
-bool FUN_004aa9d0(int param_1,int param_2,int param_3)
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
+
+bool UserProfile__IsStyleRewardUnlocked(int param_1,int param_2,int param_3)
 
 {
   int iVar1;
@@ -8188,9 +8198,9 @@ void FUN_004ab2b0(undefined4 *param_1)
     puVar3 = puVar3 + 1;
   }
   param_1[0xb860] = 0;
-  FUN_004aa670(0,1);
-  FUN_004aa670(0,1);
-  FUN_004aa670(1,1);
+  UserProfile__Default(0,1);
+  UserProfile__Default(0,1);
+  UserProfile__Default(1,1);
   param_1[0xbb52] = 0;
   param_1[0xbb53] = 0;
   param_1[0xbb54] = 0;
@@ -8684,7 +8694,7 @@ LAB_004abc58:
 
 // ==== 0x4abc90 cFrontendDatabase::ResetRaceSlotState
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void cFrontendDatabase__ResetRaceSlotState(void)
 
@@ -8703,9 +8713,11 @@ void cFrontendDatabase__ResetRaceSlotState(void)
 }
 
 
-// ==== 0x4abcd0 FUN_004abcd0
+// ==== 0x4abcd0 LanguageStrings_FindByRegionName
 
-void FUN_004abcd0(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void LanguageStrings_FindByRegionName(void)
 
 {
   char cVar1;
@@ -8740,9 +8752,11 @@ void FUN_004abcd0(void)
 }
 
 
-// ==== 0x4abd40 FUN_004abd40
+// ==== 0x4abd40 FE_GetSlotPrefix
 
-undefined * FUN_004abd40(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined * FE_GetSlotPrefix(void)
 
 {
   char cVar1;
@@ -8780,9 +8794,11 @@ undefined * FUN_004abd40(void)
 }
 
 
-// ==== 0x4abde0 FUN_004abde0
+// ==== 0x4abde0 cFrontendDatabase::SetString2ED20
 
-void __fastcall FUN_004abde0(undefined4 param_1,char *param_2)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall cFrontendDatabase__SetString2ED20(undefined4 param_1,char *param_2)
 
 {
   char cVar1;
@@ -8805,9 +8821,11 @@ void __fastcall FUN_004abde0(undefined4 param_1,char *param_2)
 }
 
 
-// ==== 0x4abe00 FUN_004abe00
+// ==== 0x4abe00 HighScoresDatabase::Default
 
-void FUN_004abe00(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void HighScoresDatabase__Default(void)
 
 {
   undefined4 *in_EAX;
@@ -9005,7 +9023,7 @@ LAB_004abff8:
 
 // ==== 0x4ac040 FEPlayerCarDB::HasCarHandle
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 uint __fastcall FEPlayerCarDB__HasCarHandle(int param_1,int param_2)
 
@@ -9859,7 +9877,7 @@ void FUN_004acd20(int *param_1,char param_2)
   unaff_ESI[1] = (int)*(short *)(*piVar2 + 10);
   unaff_ESI[2] = (int)(short)piVar2[4];
   unaff_ESI[3] = piVar2[0x44];
-  FUN_00434150();
+  Floats11_Max();
   iVar5 = _ftol_nocw();
   unaff_ESI[0x31] = iVar5;
   unaff_ESI[6] = piVar2[0x46];
@@ -10010,7 +10028,7 @@ void FUN_004ad210(int param_1)
 
 // ==== 0x4ad270 RacingCars_FindByKey
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 int RacingCars_FindByKey(void)
 
@@ -10317,7 +10335,7 @@ void FUN_004ad730(void)
 
 // ==== 0x4ad780 Struct_InitHashPair
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void Struct_InitHashPair(void)
 

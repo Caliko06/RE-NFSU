@@ -1,6 +1,8 @@
-// ==== 0x521010 FUN_00521010
+// ==== 0x521010 EAXAemsManager::BindCollisionClassHandles
 
-uint FUN_00521010(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+uint EAXAemsManager__BindCollisionClassHandles(void)
 
 {
   uint uVar1;
@@ -34,9 +36,11 @@ uint FUN_00521060(void)
 }
 
 
-// ==== 0x5210b0 FUN_005210b0
+// ==== 0x5210b0 EAXAemsManager::BindAmbientClassHandles
 
-uint FUN_005210b0(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+uint EAXAemsManager__BindAmbientClassHandles(void)
 
 {
   uint uVar1;
@@ -50,9 +54,11 @@ uint FUN_005210b0(void)
 }
 
 
-// ==== 0x5210f0 FUN_005210f0
+// ==== 0x5210f0 EAXAemsManager::BindStreamClassHandles
 
-uint FUN_005210f0(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+uint EAXAemsManager__BindStreamClassHandles(void)
 
 {
   uint uVar1;
@@ -206,7 +212,7 @@ void EAXAemsManager__Initialize(int param_1)
   *(undefined4 *)(param_1 + 0x5a4) = 0x46;
   *(undefined4 *)(param_1 + 0x5a8) = 0x5a;
   if (bVar8) {
-    FUN_005218c0(param_1);
+    EAXAemsManager__ResetLoadQueue(param_1);
     iVar1 = param_1 + 0x5bc;
     iVar3 = 0;
     cVar5 = 's';
@@ -431,7 +437,7 @@ void FUN_00521850(void)
   undefined4 in_EAX;
   int iVar1;
   
-  iVar1 = FUN_00521980(in_EAX);
+  iVar1 = EAXAemsManager__AreAllBanksLoaded(in_EAX);
   if (iVar1 == 0) {
     FUN_005219c0(in_EAX);
   }
@@ -439,11 +445,11 @@ void FUN_00521850(void)
     (*DAT_0073568c)(DAT_00735690);
     DAT_0073568c = (code *)0x0;
     DAT_00735690 = 0;
-    FUN_005210f0();
-    FUN_00520f80();
-    FUN_00520fd0();
-    FUN_00521010();
-    FUN_005210b0();
+    EAXAemsManager__BindStreamClassHandles();
+    EAXAemsManager__BindFXClassHandles();
+    EAXAemsManager__BindCarClassHandles();
+    EAXAemsManager__BindCollisionClassHandles();
+    EAXAemsManager__BindAmbientClassHandles();
     Csis__ClassHandle__Set(&PTR_s_FX_TURBO_01_006f81b0);
     FUN_00521060();
     return;
@@ -452,11 +458,12 @@ void FUN_00521850(void)
 }
 
 
-// ==== 0x5218c0 FUN_005218c0
+// ==== 0x5218c0 EAXAemsManager::ResetLoadQueue
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
 
-void FUN_005218c0(int param_1)
+void EAXAemsManager__ResetLoadQueue(int param_1)
 
 {
   int iVar1;
@@ -504,9 +511,11 @@ void FUN_005218c0(int param_1)
 }
 
 
-// ==== 0x521980 FUN_00521980
+// ==== 0x521980 EAXAemsManager::AreAllBanksLoaded
 
-undefined4 FUN_00521980(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+undefined4 EAXAemsManager__AreAllBanksLoaded(void)
 
 {
   int *piVar1;
@@ -560,7 +569,7 @@ int FUN_005219c0(void)
         DAT_006f870c = iVar2;
         (&DAT_0072ce58)[iVar2 * 3] = 1;
         (&DAT_0072ce54)[iVar2 * 3] = 0xffffffff;
-        FUN_00522330();
+        EAXAemsManager__StartSlotBankLoad();
         if (iVar2 < 0x20) {
           DAT_00735694 = 0;
         }
@@ -616,7 +625,7 @@ void FUN_00521ab0(int param_1)
     DAT_00735698 = 6;
   }
   if (DAT_006f1dd8 == 1) {
-    uVar1 = FUN_005222e0();
+    uVar1 = EAXAemsManager__GetCurrentBankHandle();
     FUN_0064b5c0(uVar1);
     DAT_00735674 = 1;
   }
@@ -797,9 +806,11 @@ void EAXAemsManager__SetCurrentBankPath__bank_name_resolver_(void)
 }
 
 
-// ==== 0x521f80 FUN_00521f80
+// ==== 0x521f80 EAXAemsManager::SetCurrentFullBankIndex
 
-void __fastcall FUN_00521f80(int param_1,int param_2)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXAemsManager__SetCurrentFullBankIndex(int param_1,int param_2)
 
 {
   int in_EAX;
@@ -844,7 +855,7 @@ EAXAemsManager__LoadAemsBank(undefined4 param_1,undefined4 param_2,undefined4 pa
     return 0;
   }
   *(undefined4 *)(unaff_ESI + 0x40) = param_1;
-  FUN_00521f80();
+  EAXAemsManager__SetCurrentFullBankIndex();
   EAXAemsManager__SetCurrentBankPath__bank_name_resolver_();
   if (*(int *)(unaff_ESI + 0x2c) != 0) {
     iVar2 = *(int *)(unaff_ESI + 0x200 + DAT_00735684 * 4);
@@ -919,7 +930,7 @@ void FUN_00522220(undefined4 param_1)
   
   if (DAT_006f1dd8 == 1) {
     *(undefined4 *)(unaff_ESI + 0x40) = param_1;
-    FUN_00521f80();
+    EAXAemsManager__SetCurrentFullBankIndex();
     iVar2 = DAT_00735684;
     iVar1 = *(int *)(unaff_ESI + 0x200 + DAT_00735684 * 4);
     if (iVar1 < 2) {
@@ -962,9 +973,11 @@ void FUN_00522280(void)
 }
 
 
-// ==== 0x5222e0 FUN_005222e0
+// ==== 0x5222e0 EAXAemsManager::GetCurrentBankHandle
 
-undefined4 FUN_005222e0(void)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+undefined4 EAXAemsManager__GetCurrentBankHandle(void)
 
 {
   int in_EAX;
@@ -990,9 +1003,11 @@ undefined4 FUN_005222e0(void)
 }
 
 
-// ==== 0x522330 FUN_00522330
+// ==== 0x522330 EAXAemsManager::StartSlotBankLoad
 
-void FUN_00522330(void)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void EAXAemsManager__StartSlotBankLoad(void)
 
 {
   int iVar1;
@@ -1020,12 +1035,14 @@ void FUN_00522330(void)
 }
 
 
-// ==== 0x5223d0 FUN_005223d0
+// ==== 0x5223d0 EAXMod::_scalar_deleting_destructor_
 
-undefined4 * __thiscall FUN_005223d0(undefined4 *param_1,byte param_2)
+/* [canon] audio high (ghidra-canon) docs/re/sound.md */
+
+undefined4 * __thiscall EAXMod___scalar_deleting_destructor_(undefined4 *param_1,byte param_2)
 
 {
-  *param_1 = &PTR_FUN_006bf478;
+  *param_1 = &PTR_EAXMod___scalar_deleting_destructor__006bf478;
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -1038,7 +1055,7 @@ undefined4 * __thiscall FUN_005223d0(undefined4 *param_1,byte param_2)
 void __fastcall FUN_005223f0(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006bf478;
+  *param_1 = &PTR_EAXMod___scalar_deleting_destructor__006bf478;
   return;
 }
 
@@ -1092,9 +1109,11 @@ void FUN_00522460(int param_1)
 }
 
 
-// ==== 0x522480 FUN_00522480
+// ==== 0x522480 Csis_CreatePlayCommonSample
 
-void __fastcall FUN_00522480(int param_1,int param_2)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void __fastcall Csis_CreatePlayCommonSample(int param_1,int param_2)
 
 {
   int *piVar1;
@@ -1141,9 +1160,11 @@ void __fastcall FUN_00522480(int param_1,int param_2)
 }
 
 
-// ==== 0x522520 FUN_00522520
+// ==== 0x522520 Csis_CreatePlayFrontEndSample
 
-void __fastcall FUN_00522520(int param_1,int param_2)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void __fastcall Csis_CreatePlayFrontEndSample(int param_1,int param_2)
 
 {
   int *piVar1;
@@ -1202,7 +1223,7 @@ int __fastcall EAXS_3DMixer__UpdateMasterVolume__virtual__base_(int param_1)
   
   iVar2 = *(int *)(param_1 + 0xbc);
   if (iVar2 != 0) {
-    iVar1 = FUN_0051cb70();
+    iVar1 = EAXSound__GetMasterVolume();
     iVar2 = iVar1 * **(int **)(iVar2 + 0x60) >> 0xf;
     *(int *)(param_1 + 0xa4) = iVar2;
     *(int *)(param_1 + 0xa8) = iVar2;
@@ -1288,7 +1309,7 @@ undefined4 * FUN_00522600(undefined4 *param_1)
 void * __thiscall FUN_00522730(void *param_1,byte param_2)
 
 {
-  FUN_00522750();
+  EAXFrontEnd___EAXFrontEnd();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -1296,9 +1317,11 @@ void * __thiscall FUN_00522730(void *param_1,byte param_2)
 }
 
 
-// ==== 0x522750 FUN_00522750
+// ==== 0x522750 EAXFrontEnd::_EAXFrontEnd
 
-void __fastcall FUN_00522750(undefined4 *param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXFrontEnd___EAXFrontEnd(undefined4 *param_1)
 
 {
   void *local_c;
@@ -1313,7 +1336,7 @@ void __fastcall FUN_00522750(undefined4 *param_1)
   local_4 = 1;
   eh_vector_destructor_iterator(param_1 + 0xab,0x7c,6,NullUpdate_ret);
   param_1[8] = &PTR_FUN_006be7c4;
-  *param_1 = &PTR_FUN_006bf478;
+  *param_1 = &PTR_EAXMod___scalar_deleting_destructor__006bf478;
   ExceptionList = local_c;
   return;
 }
@@ -1533,7 +1556,7 @@ undefined4 __thiscall FUN_00522b40(int *param_1,int param_2)
       piVar2 = (int *)0x0;
     }
     else {
-      piVar2 = (int *)FUN_00522520();
+      piVar2 = (int *)Csis_CreatePlayFrontEndSample();
       param_1 = local_10;
     }
     puStack_4 = (undefined4 *)0xffffffff;
@@ -1635,9 +1658,11 @@ LAB_00522db9:
 }
 
 
-// ==== 0x522c70 FUN_00522c70
+// ==== 0x522c70 EAXFrontEnd::GetEventPointer
 
-undefined * FUN_00522c70(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+undefined * EAXFrontEnd__GetEventPointer(int param_1)
 
 {
   if (param_1 < 0x17) {
@@ -1811,7 +1836,7 @@ void FUN_00523060(undefined4 param_1)
 void * __thiscall FUN_00523090(void *param_1,byte param_2)
 
 {
-  FUN_005230b0();
+  EAXCommon___EAXCommon();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -1819,14 +1844,16 @@ void * __thiscall FUN_00523090(void *param_1,byte param_2)
 }
 
 
-// ==== 0x5230b0 FUN_005230b0
+// ==== 0x5230b0 EAXCommon::_EAXCommon
 
-void __fastcall FUN_005230b0(undefined4 *param_1)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXCommon___EAXCommon(undefined4 *param_1)
 
 {
   param_1[8] = &PTR_FUN_006bf36c;
   param_1[8] = &PTR_FUN_006be7c4;
-  *param_1 = &PTR_FUN_006bf478;
+  *param_1 = &PTR_EAXMod___scalar_deleting_destructor__006bf478;
   return;
 }
 
@@ -1842,7 +1869,7 @@ void __fastcall FUN_005230d0(int param_1)
   (**(code **)(*(int *)(param_1 + 0x20) + 0x10))(&DAT_006f43b0);
   iVar2 = *(int *)(param_1 + 0xdc);
   if (iVar2 != 0) {
-    iVar1 = FUN_0051cb70();
+    iVar1 = EAXSound__GetMasterVolume();
     iVar2 = iVar1 * **(int **)(iVar2 + 0x60) >> 0xf;
     *(int *)(param_1 + 0xc4) = iVar2;
     *(int *)(param_1 + 200) = iVar2;
@@ -1956,7 +1983,7 @@ undefined4 __thiscall FUN_005232b0(int *param_1,int param_2)
       piVar2 = (int *)0x0;
     }
     else {
-      piVar2 = (int *)FUN_00522480();
+      piVar2 = (int *)Csis_CreatePlayCommonSample();
       param_1 = local_10;
     }
     puStack_4 = (undefined4 *)0xffffffff;
@@ -1977,9 +2004,11 @@ undefined4 __thiscall FUN_005232b0(int *param_1,int param_2)
 }
 
 
-// ==== 0x5233d0 FUN_005233d0
+// ==== 0x5233d0 EAXCommon::GetEventPointer
 
-undefined * FUN_005233d0(int param_1)
+/* [canon] audio med (ghidra-canon+nfsug) docs/re/sound.md */
+
+undefined * EAXCommon__GetEventPointer(int param_1)
 
 {
   if (param_1 < 8) {
@@ -2151,9 +2180,11 @@ void __fastcall EAXAITunerCar__RotationUpdate(int param_1)
 }
 
 
-// ==== 0x523580 FUN_00523580
+// ==== 0x523580 EAXAITunerCar::UpdateMasterVolume
 
-void __fastcall FUN_00523580(int param_1)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void __fastcall EAXAITunerCar__UpdateMasterVolume(int param_1)
 
 {
   if (*(int *)(param_1 + 0x1f80) != 0) {
@@ -2328,9 +2359,11 @@ void __fastcall FUN_005236d0(int param_1)
 }
 
 
-// ==== 0x523890 FUN_00523890
+// ==== 0x523890 EAXAITunerCar::InitializeSkids
 
-void __fastcall FUN_00523890(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void __fastcall EAXAITunerCar__InitializeSkids(int param_1)
 
 {
   void *pvVar1;
@@ -2486,11 +2519,12 @@ LAB_00523be3:
 }
 
 
-// ==== 0x523c30 FUN_00523c30
+// ==== 0x523c30 EAXAITunerCar::UpdateEngineInputs
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
 
-void __fastcall FUN_00523c30(int param_1)
+void __fastcall EAXAITunerCar__UpdateEngineInputs(int param_1)
 
 {
   int iVar1;
@@ -2559,9 +2593,11 @@ LAB_00523d6a:
 }
 
 
-// ==== 0x523e20 EAXTunerCar::UpdateRPM
+// ==== 0x523e20 EAXAITunerCar::UpdateRPM
 
-void EAXTunerCar__UpdateRPM(void)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/sound.md */
+
+void EAXAITunerCar__UpdateRPM(void)
 
 {
   EAXTunerCar__UpdateRPM();
@@ -2865,9 +2901,9 @@ void EAXAITunerCar__UpdateNIS(float param_1)
     if (*DAT_0073619c != 3) {
       return;
     }
-    fVar9 = (float10)FUN_00435f80();
+    fVar9 = (float10)Countdown__GetSecondsRemaining();
     if (fVar9 <= (float10)_DAT_006f81d0) {
-      fVar9 = (float10)FUN_00435f80();
+      fVar9 = (float10)Countdown__GetSecondsRemaining();
       if ((float10)_DAT_006f81d0 <= fVar9) {
         return;
       }
@@ -3010,9 +3046,11 @@ void FUN_00524780(void)
 }
 
 
-// ==== 0x524790 FUN_00524790
+// ==== 0x524790 Csis_CreateRoadNoiseSample
 
-void __fastcall FUN_00524790(int param_1,int param_2,int param_3,int param_4)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void __fastcall Csis_CreateRoadNoiseSample(int param_1,int param_2,int param_3,int param_4)
 
 {
   int *piVar1;
@@ -3073,9 +3111,11 @@ void __fastcall FUN_00524790(int param_1,int param_2,int param_3,int param_4)
 }
 
 
-// ==== 0x524870 FUN_00524870
+// ==== 0x524870 Csis_CreateEnvStaticSample
 
-void __fastcall FUN_00524870(int param_1,int param_2,int param_3,int param_4)
+/* [canon] audio med (ghidra-canon) docs/re/sound.md */
+
+void __fastcall Csis_CreateEnvStaticSample(int param_1,int param_2,int param_3,int param_4)
 
 {
   int *piVar1;
@@ -3271,7 +3311,7 @@ void __thiscall FUN_00524a70(int *param_1,undefined4 *param_2)
   param_2[0xc9] = 0;
   param_2[8] = &PTR_FUN_006be7d8;
   param_2[8] = &PTR_FUN_006be7c4;
-  *param_2 = &PTR_FUN_006bf478;
+  *param_2 = &PTR_EAXMod___scalar_deleting_destructor__006bf478;
   ExceptionList = pvStack_c;
   return;
 }
@@ -3755,7 +3795,7 @@ void __fastcall EAXTrafficCar__UpdateDriveBy(int *param_1)
         iVar1 = param_1[0x1b];
         uVar5 = 0;
         RandomInt(3,iVar1,0);
-        iVar2 = FUN_00524870(iVar1,uVar5);
+        iVar2 = Csis_CreateEnvStaticSample(iVar1,uVar5);
       }
       param_1[0xc1] = iVar2;
       param_1[0xc3] = param_1[0x90];
@@ -4519,7 +4559,7 @@ void __fastcall FUN_00526190(undefined4 *param_1)
   FUN_00535530();
   param_1[8] = &PTR_FUN_006be7d8;
   param_1[8] = &PTR_FUN_006be7c4;
-  *param_1 = &PTR_FUN_006bf478;
+  *param_1 = &PTR_EAXMod___scalar_deleting_destructor__006bf478;
   ExceptionList = local_c;
   return;
 }
@@ -4710,7 +4750,7 @@ void __thiscall EAXTunerCar__Initialize(int *param_1,int param_2,int param_3)
   param_1[0xa2] = 0x455ac000;
   param_1[0xa3] = 0x455de000;
   param_1[0xa4] = 0x45610000;
-  fVar10 = (float10)FUN_004647c0();
+  fVar10 = (float10)Float9_Max_Off10();
   param_1[0x7e0] = (int)(float)fVar10;
   iVar8 = *(int *)(param_2 + 0x10);
   if (*(char *)(iVar8 + 0x424) == -1) {
@@ -4744,7 +4784,7 @@ void __thiscall EAXTunerCar__Initialize(int *param_1,int param_2,int param_3)
     if (*(char *)(*(int *)(param_1[0x8d] + 0x10) + 0x424) == -1) {
       RideInfo__RebuildPhysicsInfo(1);
     }
-    fVar10 = (float10)FUN_0046c6d0();
+    fVar10 = (float10)Float9_Max_Off34();
     *(bool *)(param_1 + 0x4ac) = (float10)0.0 < fVar10;
     if ((float10)0.0 < fVar10) {
       pvVar6 = _malloc(0x350);
@@ -4758,7 +4798,7 @@ void __thiscall EAXTunerCar__Initialize(int *param_1,int param_2,int param_3)
       param_1[0x49d] = (int)piVar7;
       uStack_4 = 0xffffffff;
       (**(code **)(*piVar7 + 4))(param_1,param_1[0x7c1]);
-      fVar10 = (float10)FUN_0046c6d0();
+      fVar10 = (float10)Float9_Max_Off34();
       param_1[0x4ab] = (int)(float)(fVar10 * (float10)4.0);
     }
     if (*(int *)(*(int *)(param_1[0x8d] + 0x14) + 4) != 2) {
@@ -5130,7 +5170,7 @@ void EAXTunerCar__BottomOutUpdate(void)
   
   if ((*(int *)(*(int *)(in_EAX[0x8d] + 0x14) + 4) == 1) &&
      (*(char *)(*(int *)(in_EAX[0x8d] + 0x14) + 0x734) == '\0')) {
-    fVar5 = (float10)FUN_00429ac0();
+    fVar5 = (float10)Car__GetWheelFlagFraction();
     if (fVar5 == (float10)0.0) {
       if ((char)in_EAX[0xb1] == '\0') {
         *(undefined1 *)(in_EAX + 0xb1) = 1;
@@ -5156,7 +5196,7 @@ void EAXTunerCar__BottomOutUpdate(void)
       in_EAX[0xb2] = 0;
       *(undefined1 *)(in_EAX + 0xb1) = 0;
     }
-    fVar5 = (float10)FUN_00429ac0();
+    fVar5 = (float10)Car__GetWheelFlagFraction();
     if ((fVar5 == (float10)_K_ONE) && ((char)in_EAX[0xb1] != '\0')) {
       in_EAX[0xb2] = 0;
       *(undefined1 *)(in_EAX + 0xb1) = 0;
@@ -5950,7 +5990,7 @@ void __fastcall FUN_00527ca0(undefined4 param_1,undefined4 param_2,int param_3,u
     }
     *(int *)(*(int *)(in_EAX + 0x230) + 0x1c) = iVar1;
     if (1.0 <= *(float *)(*(int *)(*(int *)(in_EAX + 4) + 0x234) + 0x3d0)) {
-      FUN_00464ed0();
+      CarState__GetYaw();
     }
     iVar1 = _ftol_nocw();
     if (iVar1 < 0) {
@@ -6135,7 +6175,7 @@ undefined4 * FUN_005281f0(undefined4 *param_1)
   (**(code **)(param_1[8] + 0x24))();
   iVar2 = param_1[0x37];
   if (iVar2 != 0) {
-    iVar1 = FUN_0051cb70();
+    iVar1 = EAXSound__GetMasterVolume();
     iVar2 = iVar1 * **(int **)(iVar2 + 0x60) >> 0xf;
     param_1[0x31] = iVar2;
     param_1[0x32] = iVar2;
@@ -8129,7 +8169,7 @@ void __thiscall FUN_0052a810(int param_1,int param_2,int param_3)
   (**(code **)(*(int *)(param_1 + 0x20) + 0x24))();
   iVar2 = *(int *)(param_1 + 0xdc);
   if (iVar2 != 0) {
-    iVar1 = FUN_0051cb70();
+    iVar1 = EAXSound__GetMasterVolume();
     iVar2 = iVar1 * **(int **)(iVar2 + 0x60) >> 0xf;
     *(int *)(param_1 + 0xc4) = iVar2;
     *(int *)(param_1 + 200) = iVar2;
@@ -8430,7 +8470,7 @@ void EAXRoadNoise__PlayTransition(int *param_1,undefined4 param_2,int *param_3)
         iVar3 = 0;
       }
       else {
-        iVar3 = FUN_00524790(1,0);
+        iVar3 = Csis_CreateRoadNoiseSample(1,0);
       }
       piVar2[0x8e] = iVar3;
     }
@@ -8455,7 +8495,7 @@ void EAXRoadNoise__PlayTransition(int *param_1,undefined4 param_2,int *param_3)
         piVar2[0x8f] = 0;
       }
       else {
-        iVar3 = FUN_00524790(1,0);
+        iVar3 = Csis_CreateRoadNoiseSample(1,0);
         piVar2[0x8f] = iVar3;
       }
     }
@@ -9551,7 +9591,7 @@ int __fastcall EAXTunerCar__UpdateMasterVolume(int param_1)
   }
   iVar2 = *(int *)(param_1 + 0xbc);
   if (iVar2 != 0) {
-    iVar1 = FUN_0051cb70();
+    iVar1 = EAXSound__GetMasterVolume();
     iVar2 = iVar1 * **(int **)(iVar2 + 0x60) >> 0xf;
     *(int *)(param_1 + 0xa4) = iVar2;
     *(int *)(param_1 + 0xa8) = iVar2;
@@ -9720,7 +9760,7 @@ void __fastcall FUN_0052c910(undefined4 *param_1)
 {
   param_1[8] = &PTR_FUN_006be7d8;
   param_1[8] = &PTR_FUN_006be7c4;
-  *param_1 = &PTR_FUN_006bf478;
+  *param_1 = &PTR_EAXMod___scalar_deleting_destructor__006bf478;
   return;
 }
 
@@ -10211,13 +10251,13 @@ LAB_0052d286:
   D3DXVec3Transform(&local_90,iVar6 + 0x80,local_50);
   bNormalize3();
   if (1.0 <= *(float *)(iVar6 + 0x3d0)) {
-    fVar12 = (float10)FUN_00464ed0();
+    fVar12 = (float10)CarState__GetYaw();
   }
   else {
     fVar12 = (float10)0.0;
   }
   if (1.0 <= *(float *)(iVar6 + 0x3d0)) {
-    FUN_00464ed0();
+    CarState__GetYaw();
   }
   puVar9 = &DAT_00705880;
   if (*(int *)(in_EAX + 0x38) != 0) {

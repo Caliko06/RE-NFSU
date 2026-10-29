@@ -311,7 +311,7 @@ void __thiscall FUN_00551280(int param_1,uint param_2,undefined4 param_3,undefin
     DAT_007301c8 = 0;
     return;
   }
-  FUN_004abde0();
+  cFrontendDatabase__SetString2ED20();
   DAT_00777b58 = 1;
   uVar3 = *(undefined4 *)(param_1 + 0xc);
 LAB_0055186b:
@@ -1402,7 +1402,7 @@ void FUN_005530e0(void)
     } while (iVar5 != 0);
   }
   FUN_004f6850(&DAT_006cc568,local_80);
-  pcVar3 = (char *)FUN_004abcd0(&DAT_00748f70);
+  pcVar3 = (char *)LanguageStrings_FindByRegionName(&DAT_00748f70);
   local_40 = *pcVar3;
   if (*pcVar3 != '\0') {
     pcVar4 = &local_40;
@@ -2885,7 +2885,7 @@ void __thiscall FUN_00554f60(int param_1,uint param_2,int param_3)
       }
       iVar3 = SpecialCamCooldown();
       if ((iVar3 != 0) &&
-         ((iVar3 = FUN_0042ab00(), iVar3 != 0 && (iVar3 = FUN_004f65d0(), iVar3 != 0)))) {
+         ((iVar3 = int_Greater(), iVar3 != 0 && (iVar3 = FUN_004f65d0(), iVar3 != 0)))) {
         FUN_00424cc0();
         FUN_004ec3c0();
         FUN_004134c0();
@@ -3960,7 +3960,7 @@ void FUN_00556c10(void)
   int iVar2;
   
   if (DAT_00777b58 == 0) {
-    uVar1 = FUN_004abcd0(&DAT_00748f70);
+    uVar1 = LanguageStrings_FindByRegionName(&DAT_00748f70);
     FUN_004f6850(uVar1);
   }
   else {

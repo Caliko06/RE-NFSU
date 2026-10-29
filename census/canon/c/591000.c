@@ -2446,7 +2446,7 @@ void __fastcall FUN_00593960(int param_1)
 void FUN_00593970(void)
 
 {
-  FUN_004049f0();
+  List_DeleteAllNodes();
   return;
 }
 
@@ -5625,7 +5625,7 @@ undefined4 * Smokeable__Smokeable(undefined4 *param_1,undefined4 param_2,int par
           puVar16 = puVar16 + 1;
         }
         DAT_00736538 = DAT_00736538 + 1;
-        FUN_00401dc0();
+        Node_SetNameAndHash();
         if (param_2[7] != 0) {
           *(int *)((int)pvVar11 + 0x1c) = param_2[7];
         }
@@ -5884,7 +5884,7 @@ LAB_00596d41:
     } while (iVar4 != 0);
   }
   local_4 = (uint)local_4._1_3_ << 8;
-  FUN_0046a9b0();
+  PhysicsSystem___PhysicsSystem();
   *param_1 = &PTR_FUN_006c85b8;
   DAT_00736010 = DAT_00736010 + -1;
   local_4 = 0xffffffff;
@@ -6566,7 +6566,7 @@ void __fastcall FUN_00597fa0(int param_1)
 {
   int iVar1;
   
-  FUN_0046abd0();
+  PhysicsSystem__ComputeAuxiliaries();
   iVar1 = FUN_00597ea0();
   *(int *)(param_1 + 900) = iVar1;
   if (iVar1 == 0) {
@@ -6586,7 +6586,7 @@ void __fastcall FUN_00597fa0(int param_1)
       *(undefined4 *)(iVar1 + 0x88) = 0;
       *(undefined4 *)(*(int *)(param_1 + -0xd4) + 0x140) = 0;
       *(undefined1 *)(param_1 + -0x123) = 0;
-      FUN_0046abd0();
+      PhysicsSystem__ComputeAuxiliaries();
     }
     return;
   }
@@ -6600,7 +6600,7 @@ void __fastcall FUN_00597fa0(int param_1)
   *(float *)(iVar1 + 0x84) = *(float *)(iVar1 + 0x84) * 0.95;
   *(undefined4 *)(*(int *)(param_1 + -0xd4) + 0x140) = 1;
   *(undefined1 *)(param_1 + -0x123) = 1;
-  FUN_0046abd0();
+  PhysicsSystem__ComputeAuxiliaries();
   return;
 }
 
@@ -6672,8 +6672,8 @@ void FUN_00598130(void)
 void FUN_00598160(void)
 
 {
-  FUN_004049f0();
-  FUN_004049f0();
+  List_DeleteAllNodes();
+  List_DeleteAllNodes();
   return;
 }
 
@@ -6699,7 +6699,7 @@ void * FUN_00598190(void *param_1)
   int iVar4;
   undefined **ppuVar5;
   
-  eh_vector_constructor_iterator(param_1,8,0xcb,IList_InitEmpty_Thunk,FUN_004049f0);
+  eh_vector_constructor_iterator(param_1,8,0xcb,IList_InitEmpty_Thunk,List_DeleteAllNodes);
   ppuVar5 = &PTR_DAT_006ef2d0;
   do {
     iVar4 = 0;
@@ -7519,7 +7519,7 @@ int PickLane(undefined4 param_1,char param_2)
   int local_c;
   
   FUN_00424f50();
-  FUN_00432e10();
+  PtrArray_GetOrNull();
   iVar2 = (-(uint)(param_2 != '\0') & 0xfffffffa) + 0x11;
   cVar1 = FUN_00421a50();
   if (((cVar1 != '\0') && (iVar3 = FUN_00408200(), 0 < iVar3)) &&
@@ -7594,7 +7594,7 @@ undefined4 Teleporter_MoveCar(undefined4 param_1,int param_2)
   fVar4 = (float10)Random_NextFloat(0x3f800000);
   if (((float10)local_14 <= fVar4) ||
      (cVar1 = Teleporter_MoveToSpawnRecord(param_1,uVar2), cVar1 == '\0')) {
-    iVar3 = FUN_00424d50();
+    iVar3 = RacerNode__IsPlayerKind();
     if (iVar3 == 0) {
       fVar4 = (float10)Teleporter_Spacing(uVar2);
       local_1c = (float)fVar4;
@@ -7697,7 +7697,7 @@ int FindNodeAtRoute(undefined4 param_1,undefined4 param_2,undefined4 param_3,und
   local_c = 0;
   local_8 = 999999.0;
   for (local_10 = 0; local_10 < 99; local_10 = local_10 + 1) {
-    iVar3 = FUN_00432e10();
+    iVar3 = PtrArray_GetOrNull();
     if ((iVar3 != 0) && (iVar4 = Section_HasLane(), iVar4 != 0)) {
       iVar4 = FUN_00442820(iVar3,param_2,param_4,param_3,0);
       if ((iVar4 != 0) && (iVar5 = FUN_004420b0(), iVar5 != 0)) {
@@ -7869,11 +7869,11 @@ int SpawnRecord_Find(float param_1,float param_2,undefined4 param_3,float param_
         local_78 = 0.0;
         local_80 = 0.0;
         if (param_6 != '\0') {
-          fVar4 = (float10)FUN_00401c40(param_4 * *(float *)(iVar2 + 0x10 + iVar3 * 8 + param_7 * 4)
-                                        ,0x41a00000);
+          fVar4 = (float10)bMax_float(param_4 * *(float *)(iVar2 + 0x10 + iVar3 * 8 + param_7 * 4),
+                                      0x41a00000);
           local_78 = (float)fVar4;
-          fVar4 = (float10)FUN_00401c40(param_4 * *(float *)(iVar2 + 0xe0 + iVar3 * 8 + param_7 * 4)
-                                        ,0x42f00000);
+          fVar4 = (float10)bMax_float(param_4 * *(float *)(iVar2 + 0xe0 + iVar3 * 8 + param_7 * 4),
+                                      0x42f00000);
           local_80 = (float)fVar4;
         }
         fVar5 = param_1;
@@ -8017,7 +8017,7 @@ undefined2 Teleporter_MoveFreeRun(undefined4 param_1,undefined4 param_2,undefine
         return 1;
       }
       fVar6 = (float10)FUN_00449fe0();
-      fVar6 = (float10)FUN_00401c40(param_3,(float)fVar6);
+      fVar6 = (float10)bMax_float(param_3,(float)fVar6);
       iVar4 = local_8;
       local_3c = (float)fVar6;
       while (((iVar4 == local_8 || (local_10 == 0)) && (local_14 != local_8))) {
@@ -8082,7 +8082,7 @@ void TrafficCar_Move(undefined4 param_1,undefined4 param_2,undefined4 param_3,in
     AIGoal__Create(5);
   }
   FUN_00427f70(param_1,uVar3,param_2,param_6,0,local_2c,0,param_3,(float)fVar5);
-  FUN_0042a810();
+  Car__SetArtificialColour();
   Car_SetMode();
   FUN_0059b5d0(param_1);
   return;
@@ -8123,7 +8123,7 @@ void FUN_0059a960(undefined4 param_1)
     }
     FUN_00427f70(param_1,uVar4,uVar5,(float)fVar6,0,local_34,0,(float)fVar7,0);
     Car_SetMode();
-    FUN_004262c0();
+    Car__SetModeViaDriver();
   }
   return;
 }
@@ -8243,7 +8243,8 @@ uint FUN_0059acd0(void)
   
   uVar2 = FUN_00421960();
   if (uVar2 == 4) {
-    if (((DAT_00734454 == 0) || (DAT_006fbf14 != 0)) || (iVar3 = FUN_0041ff50(), iVar3 == 0)) {
+    if (((DAT_00734454 == 0) || (DAT_006fbf14 != 0)) ||
+       (iVar3 = RaceManager__FindRacerByIdIn(), iVar3 == 0)) {
       fVar4 = (float10)FUN_004212f0();
       fVar1 = (float10)250.0;
       uVar2 = CONCAT31((int3)(CONCAT22(extraout_var_00,
@@ -8284,7 +8285,8 @@ uint Spot_NearPlayerRoute(undefined4 param_1)
   
   uVar1 = FUN_00421960();
   if (uVar1 == 4) {
-    if (((DAT_00734454 != 0) && (DAT_006fbf14 == 0)) && (iVar2 = FUN_0041ff50(), iVar2 != 0)) {
+    if (((DAT_00734454 != 0) && (DAT_006fbf14 == 0)) &&
+       (iVar2 = RaceManager__FindRacerByIdIn(), iVar2 != 0)) {
       fVar3 = (float10)FUN_0041f5f0();
       fVar3 = (float10)TrackPath__WrapDistance(param_1,(float)fVar3);
       fVar4 = (float10)FUN_00405600((float)fVar3);
@@ -8370,7 +8372,7 @@ void __thiscall FUN_0059af20(int param_1,int param_2)
   
   *(undefined4 *)(param_1 + 0xc) = 0;
   for (local_8 = 0; local_8 < 100; local_8 = local_8 + 1) {
-    iVar1 = FUN_00432e10();
+    iVar1 = PtrArray_GetOrNull();
     if (iVar1 != 0) {
       iVar1 = Section_HasLane();
       if (iVar1 != 0) {
@@ -8537,12 +8539,12 @@ void __thiscall PickRandomSection(int param_1,undefined4 *param_2)
     if (99 < local_10) {
       return;
     }
-    iVar2 = FUN_00432e10();
+    iVar2 = PtrArray_GetOrNull();
     if ((iVar2 != 0) && (iVar2 = Section_HasLane(), iVar2 != 0)) {
       iVar2 = FUN_00432e00();
       local_c = local_c + iVar2;
       if (iVar1 < local_c) {
-        uVar3 = FUN_00432e10();
+        uVar3 = PtrArray_GetOrNull();
         *param_2 = uVar3;
         uVar3 = FUN_00432df0();
         param_2[1] = uVar3;
@@ -8564,7 +8566,8 @@ int Teleporter_PickPlayer(void)
   int iVar1;
   undefined4 uVar2;
   
-  if (((DAT_00734454 == 0) || (DAT_006fbf14 != 0)) || (iVar1 = FUN_0041ff50(), iVar1 == 0)) {
+  if (((DAT_00734454 == 0) || (DAT_006fbf14 != 0)) ||
+     (iVar1 = RaceManager__FindRacerByIdIn(), iVar1 == 0)) {
     uVar2 = FUN_00408200();
     FUN_004216b0(uVar2);
     GetPlayerObject();
@@ -8619,7 +8622,8 @@ int NearestPlayer(void)
   int local_8;
   
   local_8 = 0;
-  if (((DAT_00734454 == 0) || (DAT_006fbf14 != 0)) || (local_8 = FUN_0041ff50(), local_8 == 0)) {
+  if (((DAT_00734454 == 0) || (DAT_006fbf14 != 0)) ||
+     (local_8 = RaceManager__FindRacerByIdIn(), local_8 == 0)) {
     local_c = 99999.0;
     local_10 = 0;
     for (local_14 = 0; iVar1 = FUN_00408200(), local_14 < iVar1; local_14 = local_14 + 1) {

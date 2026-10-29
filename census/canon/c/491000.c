@@ -3063,7 +3063,7 @@ void FUN_00495e90(void)
 
 // ==== 0x495ec0 tPreRaceScreenManager::RequestStatsScreen
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void tPreRaceScreenManager__RequestStatsScreen(void)
 
@@ -4261,7 +4261,7 @@ LAB_0049746d:
 
 // ==== 0x497590 PostRaceResults::NextScreenIsNotGiveth
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 PostRaceResults__NextScreenIsNotGiveth(void)
 
@@ -9790,7 +9790,7 @@ void FUN_0049e3e0(void)
 
 // ==== 0x49e400 PostRaceRewardList::GetItemLabelHash
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 __fastcall PostRaceRewardList__GetItemLabelHash(int param_1)
 
@@ -10653,7 +10653,7 @@ undefined4 __fastcall FUN_0049f1b0(int param_1)
 
 // ==== 0x49f2b0 Screen_RewardPopup::HasDisplayTimeElapsed
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 __fastcall Screen_RewardPopup__HasDisplayTimeElapsed(int param_1)
 

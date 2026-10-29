@@ -1,21 +1,23 @@
-// ==== 0x4611f0 FUN_004611f0
+// ==== 0x4611f0 RealDriver::AddJoyHandlers
 
-void __fastcall FUN_004611f0(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall RealDriver__AddJoyHandlers(int param_1)
 
 {
   if (*(int *)(param_1 + 0x274) == 0) {
     if (*(char *)(param_1 + 0x2b8) != '\0') {
-      InputEvents__AddSource(0x87,FUN_00461840,param_1);
-      InputEvents__AddSource(0x88,FUN_00461840,param_1);
+      InputEvents__AddSource(0x87,RealDriver__JoyHandler_Steer,param_1);
+      InputEvents__AddSource(0x88,RealDriver__JoyHandler_Steer,param_1);
     }
-    InputEvents__AddSource(0x89,FUN_004618b0,param_1);
-    InputEvents__AddSource(0x8a,FUN_004618b0,param_1);
-    InputEvents__AddSource(0x8b,FUN_004618b0,param_1);
-    InputEvents__AddSource(0x8c,FUN_00461da0,param_1);
-    InputEvents__AddSource(0x8d,FUN_00461da0,param_1);
-    InputEvents__AddSource(0x8e,FUN_00461da0,param_1);
-    InputEvents__AddSource(0x8f,FUN_004619c0,param_1);
-    InputEvents__AddSource(0x90,FUN_004619c0,param_1);
+    InputEvents__AddSource(0x89,RealDriver__JoyHandler_Throttle,param_1);
+    InputEvents__AddSource(0x8a,RealDriver__JoyHandler_Throttle,param_1);
+    InputEvents__AddSource(0x8b,RealDriver__JoyHandler_Throttle,param_1);
+    InputEvents__AddSource(0x8c,RealDriver__JoyHandler_Brake,param_1);
+    InputEvents__AddSource(0x8d,RealDriver__JoyHandler_Brake,param_1);
+    InputEvents__AddSource(0x8e,RealDriver__JoyHandler_Brake,param_1);
+    InputEvents__AddSource(0x8f,RealDriver__JoyHandler_Reverse,param_1);
+    InputEvents__AddSource(0x90,RealDriver__JoyHandler_Reverse,param_1);
     InputEvents__AddSource(0x91,FUN_00461e10,param_1);
     InputEvents__AddSource(0x92,FUN_00461e10,param_1);
     InputEvents__AddSource(0x93,FUN_00461e70,param_1);
@@ -63,9 +65,11 @@ void __fastcall FUN_004613b0(int *param_1)
 }
 
 
-// ==== 0x461510 FUN_00461510
+// ==== 0x461510 RealDriver::DisableStartLineState
 
-void __fastcall FUN_00461510(int *param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall RealDriver__DisableStartLineState(int *param_1)
 
 {
   param_1[0x9e] = 0;
@@ -110,9 +114,11 @@ void __fastcall RealDriver__SetManualTransmission(int param_1)
 }
 
 
-// ==== 0x4615b0 FUN_004615b0
+// ==== 0x4615b0 RealDriver::SetLowGear
 
-void __fastcall FUN_004615b0(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall RealDriver__SetLowGear(int param_1)
 
 {
   if ((*(int *)(param_1 + 0x284) != 1) && (*(int *)(param_1 + 0x284) != 3)) {
@@ -140,7 +146,7 @@ void __thiscall FUN_004615e0(int param_1,undefined4 param_2)
     RideInfo__RebuildPhysicsInfo(1);
   }
   if ((&DAT_007306c4)[*(int *)(param_1 + 0x270)] == -1) {
-    FUN_004617d0();
+    RealDriver__ResetJoyValues();
   }
   if (*(int *)(param_1 + 0x27c) != 0) {
     *(undefined4 *)(param_1 + 0x294) = 0;
@@ -174,7 +180,7 @@ void __thiscall FUN_004615e0(int param_1,undefined4 param_2)
     }
     if (*(int *)(param_1 + 0x284) == 3) {
       *(undefined4 *)(iVar2 + 0x60) = 3;
-      FUN_0046dac0(*(undefined4 *)(param_1 + 0x2b4));
+      DriveTrain__SetManualClutchEngaged(*(undefined4 *)(param_1 + 0x2b4));
       return;
     }
     if (((DAT_0078a344 == '\0') && (DAT_007361a8 == 0)) &&
@@ -190,9 +196,11 @@ void __thiscall FUN_004615e0(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4617d0 FUN_004617d0
+// ==== 0x4617d0 RealDriver::ResetJoyValues
 
-void FUN_004617d0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void RealDriver__ResetJoyValues(void)
 
 {
   int in_EAX;
@@ -218,9 +226,11 @@ void FUN_004617d0(void)
 }
 
 
-// ==== 0x461840 FUN_00461840
+// ==== 0x461840 RealDriver::JoyHandler_Steer
 
-void FUN_00461840(undefined4 param_1,int param_2,undefined1 param_3,int param_4)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void RealDriver__JoyHandler_Steer(undefined4 param_1,int param_2,undefined1 param_3,int param_4)
 
 {
   byte bVar1;
@@ -244,11 +254,12 @@ void FUN_00461840(undefined4 param_1,int param_2,undefined1 param_3,int param_4)
 }
 
 
-// ==== 0x4618b0 FUN_004618b0
+// ==== 0x4618b0 RealDriver::JoyHandler_Throttle
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-void FUN_004618b0(undefined4 param_1,float param_2,byte param_3,int param_4)
+void RealDriver__JoyHandler_Throttle(undefined4 param_1,float param_2,byte param_3,int param_4)
 
 {
   int iVar1;
@@ -286,12 +297,13 @@ void FUN_004618b0(undefined4 param_1,float param_2,byte param_3,int param_4)
 }
 
 
-// ==== 0x4619c0 FUN_004619c0
+// ==== 0x4619c0 RealDriver::JoyHandler_Reverse
 
 /* WARNING: Removing unreachable block (ram,0x004619f3) */
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
 
-void FUN_004619c0(undefined4 param_1,int param_2,byte param_3,int param_4)
+void RealDriver__JoyHandler_Reverse(undefined4 param_1,int param_2,byte param_3,int param_4)
 
 {
   byte bVar1;
@@ -434,11 +446,12 @@ LAB_00461d3f:
 }
 
 
-// ==== 0x461da0 FUN_00461da0
+// ==== 0x461da0 RealDriver::JoyHandler_Brake
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
 
-void FUN_00461da0(undefined4 param_1,int param_2,undefined1 param_3,int param_4)
+void RealDriver__JoyHandler_Brake(undefined4 param_1,int param_2,undefined1 param_3,int param_4)
 
 {
   byte bVar1;
@@ -1067,7 +1080,7 @@ bool __thiscall Racer__ShouldTakeFork(int *param_1,int param_2)
     return false;
   }
   if (*(short *)(DAT_00736174 + 0xb8) == -1) {
-    cVar1 = FUN_00435ca0(DAT_0073619c,param_1[1]);
+    cVar1 = RaceManager__IsInRaceStartWindow(DAT_0073619c,param_1[1]);
     if (cVar1 != '\0') {
       return false;
     }
@@ -1076,7 +1089,7 @@ bool __thiscall Racer__ShouldTakeFork(int *param_1,int param_2)
            (float)(int)*(short *)(DAT_00736174 + 0xb8)) {
     return false;
   }
-  cVar1 = FUN_0044bad0(param_1);
+  cVar1 = Msg_ReadOnOffByType(param_1);
   if (cVar1 == '\0') {
     if (*(char *)(param_2 + 0xb) == '\x04') {
       fVar3 = (float10)Random_NextFloat(0x3f800000);
@@ -1772,7 +1785,7 @@ void FUN_00463630(undefined4 *param_1)
     piVar2 = piVar2 + 1;
     iVar1 = iVar1 + -1;
   } while (iVar1 != 0);
-  *param_1 = &PTR_FUN_006caadc;
+  *param_1 = &PTR_PsychoDriverDerived__scalar_deleting_dtor_006caadc;
   ExceptionList = pvStack_c;
   return;
 }
@@ -2438,9 +2451,11 @@ void FUN_004646d0(float param_1)
 }
 
 
-// ==== 0x4647c0 FUN_004647c0
+// ==== 0x4647c0 Float9_Max_Off10
 
-float10 __fastcall FUN_004647c0(int param_1)
+/* [canon] car med (ghidra-canon) docs/re/car.md */
+
+float10 __fastcall Float9_Max_Off10(int param_1)
 
 {
   float10 fVar1;
@@ -2733,14 +2748,16 @@ float10 FUN_00464ea0(void)
   if (*(float *)(in_EAX + 0x390) < 1.0) {
     return (float10)0.0;
   }
-  fVar1 = (float10)FUN_00464ed0();
+  fVar1 = (float10)CarState__GetYaw();
   return fVar1;
 }
 
 
-// ==== 0x464ed0 FUN_00464ed0
+// ==== 0x464ed0 CarState::GetYaw
 
-float10 __fastcall FUN_00464ed0(undefined4 param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
+
+float10 __fastcall CarState__GetYaw(undefined4 param_1)
 
 {
   short sVar1;
@@ -2988,7 +3005,7 @@ void FUN_00465390(void)
 
 // ==== 0x4653e0 Vec3_TransformSub
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void Vec3_TransformSub(void)
 
@@ -3035,7 +3052,7 @@ uint CarState__IsNitrousOn(void)
                                       (ushort)(NAN(fVar2) || NAN(fVar1)) << 10 |
                                       (ushort)(fVar2 == fVar1) << 0xe) >> 8),1);
     }
-    uVar4 = CarState__StopTimer();
+    uVar4 = CarState__StopNitrous();
   }
   return uVar4 & 0xffffff00;
 }
@@ -3088,11 +3105,11 @@ void FUN_004654f0(void)
 }
 
 
-// ==== 0x465530 CarState::StopTimer
+// ==== 0x465530 CarState::StopNitrous
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon) docs/re/runtime.md */
 
-void CarState__StopTimer(void)
+void CarState__StopNitrous(void)
 
 {
   undefined4 uVar1;
@@ -3629,7 +3646,7 @@ LAB_004661ed:
         if ((((DAT_0078a345 == '\0') && (DAT_007361a4 == 0)) &&
             (cVar5 = FUN_004663a0(), cVar5 != '\0')) && (35.0 <= local_114)) {
           iVar6 = piVar1[0x50];
-          iVar10 = FUN_00424d60();
+          iVar10 = RacerNode__IsLocalHuman();
           if (((iVar10 != 0) && (iVar6 = *(int *)(*(int *)(iVar6 + 0x18) + 0x60), iVar6 != 6)) &&
              ((iVar6 != 7 && (cVar5 = JumpCamBuildSpline(), cVar5 != '\0')))) {
             cVar5 = Player__StartSpecialCamera(6,0,1,1);
@@ -3880,7 +3897,7 @@ void FUN_004665a0(void)
 
 // ==== 0x4665e0 Struct_ClearHeader
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall Struct_ClearHeader(int param_1)
 
@@ -5034,7 +5051,7 @@ LAB_00467c35:
             }
             fVar12 = (float10)(float)piVar1;
             if (fVar12 < (float10)0.0) {
-              fVar12 = (float10)FUN_00401c40(piVar4,local_b8);
+              fVar12 = (float10)bMax_float(piVar4,local_b8);
             }
           }
         }
@@ -6845,7 +6862,7 @@ void __thiscall FUN_00469e20(int param_1,int param_2)
     FUN_00571c20(iVar2,&param_2,1,1,1);
   }
   if (*(char *)(iVar2 + 0x3d) != '\0') {
-    FUN_00469f30();
+    CarCollisionBody__SetupPhysicsPointers();
   }
   if (*(char *)(iVar2 + 0x3c) != '\0' || *(char *)(iVar2 + 0x3d) != '\0') {
     FUN_00468ec0();
@@ -6870,9 +6887,11 @@ void __thiscall FUN_00469e20(int param_1,int param_2)
 }
 
 
-// ==== 0x469f30 FUN_00469f30
+// ==== 0x469f30 CarCollisionBody::SetupPhysicsPointers
 
-int __fastcall FUN_00469f30(undefined4 param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+int __fastcall CarCollisionBody__SetupPhysicsPointers(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -6937,7 +6956,7 @@ void __thiscall FUN_00469fb0(int param_1,int param_2)
   piVar1 = *(int **)(*(int *)(param_1 + 0x140) + 0x2c);
   if (piVar1 != (int *)0x0) {
     (**(code **)(*piVar1 + 0x34))(uVar3,0);
-    FUN_00469f30();
+    CarCollisionBody__SetupPhysicsPointers();
     *(undefined1 *)(param_1 + 0x1d) = 1;
     return;
   }
@@ -6945,7 +6964,7 @@ void __thiscall FUN_00469fb0(int param_1,int param_2)
   if ((iVar2 != 1) && (iVar2 != 3)) {
     Car_SetMode();
   }
-  FUN_00469f30();
+  CarCollisionBody__SetupPhysicsPointers();
   *(undefined1 *)(param_1 + 0x1d) = 1;
   return;
 }
@@ -7496,9 +7515,11 @@ float10 __fastcall FUN_0046a910(int param_1)
 }
 
 
-// ==== 0x46a930 FUN_0046a930
+// ==== 0x46a930 _GLOBAL__D_TheCollisionStats
 
-void FUN_0046a930(void)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+void _GLOBAL__D_TheCollisionStats(void)
 
 {
   int *piVar1;
@@ -7521,9 +7542,11 @@ void FUN_0046a930(void)
 }
 
 
-// ==== 0x46a960 FUN_0046a960
+// ==== 0x46a960 PhysicsComponent::scalar_deleting_destructor
 
-void * __thiscall FUN_0046a960(void *param_1,byte param_2)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+void * __thiscall PhysicsComponent__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   FUN_0046a980();
@@ -7539,7 +7562,7 @@ void * __thiscall FUN_0046a960(void *param_1,byte param_2)
 void __fastcall FUN_0046a980(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c8584;
+  *param_1 = &PTR_PhysicsComponent__scalar_deleting_destructor_006c8584;
   return;
 }
 
@@ -7549,7 +7572,7 @@ void __fastcall FUN_0046a980(undefined4 *param_1)
 void * __thiscall FUN_0046a990(void *param_1,byte param_2)
 
 {
-  FUN_0046a9b0();
+  PhysicsSystem___PhysicsSystem();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -7557,9 +7580,11 @@ void * __thiscall FUN_0046a990(void *param_1,byte param_2)
 }
 
 
-// ==== 0x46a9b0 FUN_0046a9b0
+// ==== 0x46a9b0 PhysicsSystem::_PhysicsSystem
 
-void __fastcall FUN_0046a9b0(undefined4 *param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall PhysicsSystem___PhysicsSystem(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -7716,9 +7741,11 @@ LAB_0046ab8d:
 }
 
 
-// ==== 0x46abd0 FUN_0046abd0
+// ==== 0x46abd0 PhysicsSystem::ComputeAuxiliaries
 
-void __fastcall FUN_0046abd0(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __fastcall PhysicsSystem__ComputeAuxiliaries(int param_1)
 
 {
   int *piVar1;
@@ -7749,7 +7776,7 @@ LAB_0046abe1:
 
 // ==== 0x46ac10 CarState::IsTimedFlagActive
 
-/* [canon] car low (ghidra-canon) docs/re/runtime.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 CarState__IsTimedFlagActive(void)
 
@@ -8348,11 +8375,12 @@ void FUN_0046b790(void)
 }
 
 
-// ==== 0x46b8c0 FUN_0046b8c0
+// ==== 0x46b8c0 Contact::FindContactPointAndNormal
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-void __fastcall FUN_0046b8c0(float *param_1)
+void __fastcall Contact__FindContactPointAndNormal(float *param_1)
 
 {
   float fVar1;
@@ -8416,9 +8444,11 @@ void __fastcall FUN_0046b8c0(float *param_1)
 }
 
 
-// ==== 0x46ba50 FUN_0046ba50
+// ==== 0x46ba50 DenominatorTerm
 
-float10 FUN_0046ba50(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+float10 DenominatorTerm(void)
 
 {
   float in_EAX;
@@ -8539,7 +8569,7 @@ void FUN_0046bae0(int param_1)
   float fStack_30;
   
   pfStack_204 = (float *)0x46bb07;
-  FUN_0046b8c0();
+  Contact__FindContactPointAndNormal();
   iVar7 = *(int *)(param_1 + 0x14);
   if (*(int *)(iVar7 + 0x264) == 0) {
     pfStack_204 = &local_130;
@@ -8588,7 +8618,7 @@ void FUN_0046bae0(int param_1)
     if ((float10)(float)fVar12 <= fVar13) {
       fStack_1a8 = (float)fVar13;
     }
-    cVar5 = FUN_0046c620(param_1,&fStack_1f0,&fStack_1e0);
+    cVar5 = Contact_IsSideSwipeCandidate(param_1,&fStack_1f0,&fStack_1e0);
     if (cVar5 != '\0') {
       fStack_1a8 = fStack_1a8 * 0.5;
     }
@@ -8598,10 +8628,10 @@ void FUN_0046bae0(int param_1)
     fVar1 = (float)fVar12;
     fStack_1a4 = -((fStack_1a8 + _K_ONE) * fVar16);
     (**(code **)(**(int **)(param_1 + 0xc) + 0x5c))();
-    fVar13 = (float10)FUN_0046ba50();
+    fVar13 = (float10)DenominatorTerm();
     fVar12 = (float10)fStack_1c4;
     (**(code **)(**(int **)(param_1 + 0x10) + 0x5c))();
-    fVar14 = (float10)FUN_0046ba50();
+    fVar14 = (float10)DenominatorTerm();
     fVar15 = (float)(fVar14 + (float10)(float)((float10)fVar1 + fVar12 + fVar13));
     if (fVar1 < fStack_1c4) {
       fVar1 = fStack_1c4;
@@ -8792,10 +8822,13 @@ LAB_0046c09b:
 }
 
 
-// ==== 0x46c620 FUN_0046c620
+// ==== 0x46c620 Contact_IsSideSwipeCandidate
+
+/* [canon] car low (ghidra-canon) docs/re/car.md */
 
 uint __fastcall
-FUN_0046c620(undefined4 param_1,int *param_2,undefined4 param_3,int param_4,int param_5)
+Contact_IsSideSwipeCandidate
+          (undefined4 param_1,int *param_2,undefined4 param_3,int param_4,int param_5)
 
 {
   float fVar1;
@@ -8845,9 +8878,11 @@ LAB_0046c6c1:
 }
 
 
-// ==== 0x46c6d0 FUN_0046c6d0
+// ==== 0x46c6d0 Float9_Max_Off34
 
-float10 __fastcall FUN_0046c6d0(int param_1)
+/* [canon] car med (ghidra-canon) docs/re/car.md */
+
+float10 __fastcall Float9_Max_Off34(int param_1)
 
 {
   float10 fVar1;
@@ -8893,9 +8928,11 @@ int __fastcall FUN_0046c770(int param_1)
 }
 
 
-// ==== 0x46c780 FUN_0046c780
+// ==== 0x46c780 Engine::GetState
 
-void __thiscall FUN_0046c780(int param_1,undefined4 *param_2)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
+
+void __thiscall Engine__GetState(int param_1,undefined4 *param_2)
 
 {
   *param_2 = *(undefined4 *)(param_1 + 0x14);
@@ -8903,9 +8940,11 @@ void __thiscall FUN_0046c780(int param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x46c790 FUN_0046c790
+// ==== 0x46c790 Engine::SetState
 
-void __thiscall FUN_0046c790(int param_1,undefined4 *param_2)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
+
+void __thiscall Engine__SetState(int param_1,undefined4 *param_2)
 
 {
   *(undefined4 *)(param_1 + 0x14) = *param_2;
@@ -8945,7 +8984,7 @@ void __thiscall FUN_0046c7c0(float *param_1,undefined4 param_2)
   undefined4 *unaff_ESI;
   float10 fVar6;
   
-  *unaff_ESI = &PTR_FUN_006c8508;
+  *unaff_ESI = &PTR_Engine__scalar_deleting_destructor_006c8508;
   fVar2 = param_1[2];
   fVar3 = *param_1;
   unaff_ESI[10] = fVar3;
@@ -8993,7 +9032,7 @@ void __thiscall FUN_0046c7c0(float *param_1,undefined4 param_2)
   unaff_ESI[0x2e] = 0;
   unaff_ESI[0x2c] = 0;
   unaff_ESI[0x2f] = 0;
-  fVar6 = (float10)FUN_0046c6d0();
+  fVar6 = (float10)Float9_Max_Off34();
   unaff_ESI[0x2a] = (float)fVar6;
   pcVar1 = (char *)(unaff_ESI + 3);
   unaff_ESI[8] = 0;
@@ -9008,9 +9047,11 @@ void __thiscall FUN_0046c7c0(float *param_1,undefined4 param_2)
 }
 
 
-// ==== 0x46c920 FUN_0046c920
+// ==== 0x46c920 Engine::scalar_deleting_destructor
 
-void FUN_0046c920(byte param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
+
+void Engine__scalar_deleting_destructor(byte param_1)
 
 {
   int iVar1;
@@ -9165,7 +9206,7 @@ void FUN_0046ccc0(void)
       fVar4 = *(float *)(unaff_ESI + 0xa8) / 0.19;
       fVar5 = -(fVar4 * 0.25);
       if (iVar1 == 0) {
-        fVar8 = (float10)FUN_0046cfc0();
+        fVar8 = (float10)Engine__GetEffectiveThrottle();
         if (fVar8 < (float10)0.3) {
           pfVar2 = *(float **)(unaff_ESI + 0x18);
           fVar6 = (fVar3 - *pfVar2) / (pfVar2[2] - *pfVar2);
@@ -9177,10 +9218,10 @@ void FUN_0046ccc0(void)
         return;
       }
       if (iVar1 == 1) {
-        fVar8 = (float10)FUN_0046cfc0();
+        fVar8 = (float10)Engine__GetEffectiveThrottle();
         if ((float10)0.3 <= fVar8) {
           pfVar2 = *(float **)(unaff_ESI + 0x18);
-          fVar8 = (float10)FUN_0046cfc0();
+          fVar8 = (float10)Engine__GetEffectiveThrottle();
           fVar8 = (float10)bMin(0x3f800000,(float)fVar8);
           fVar8 = (float10)bMin(fVar4,(float)((((float10)fVar3 - (float10)*pfVar2) /
                                               ((float10)pfVar2[2] - (float10)*pfVar2)) * fVar8 *
@@ -9254,9 +9295,11 @@ undefined4 __thiscall FUN_0046cf80(int param_1,float *param_2)
 }
 
 
-// ==== 0x46cfc0 FUN_0046cfc0
+// ==== 0x46cfc0 Engine::GetEffectiveThrottle
 
-float10 __fastcall FUN_0046cfc0(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+float10 __fastcall Engine__GetEffectiveThrottle(int param_1)
 
 {
   if (*(float *)(param_1 + 0x9c) == 0.0) {
@@ -9428,7 +9471,7 @@ DriveTrain__DriveTrain
   local_c = ExceptionList;
   ExceptionList = &local_c;
   param_3[7] = param_2;
-  *param_3 = &PTR_FUN_006c84e4;
+  *param_3 = &PTR_DriveTrain__scalar_deleting_destructor_006c84e4;
   param_3[6] = param_4;
   param_3[0x38] = 3;
   param_3[8] = param_1;
@@ -9474,9 +9517,11 @@ DriveTrain__DriveTrain
 }
 
 
-// ==== 0x46d4e0 FUN_0046d4e0
+// ==== 0x46d4e0 DriveTrain::scalar_deleting_destructor
 
-undefined4 * __thiscall FUN_0046d4e0(undefined4 *param_1,byte param_2)
+/* [canon] car med (ghidra-canon) docs/re/car.md */
+
+undefined4 * __thiscall DriveTrain__scalar_deleting_destructor(undefined4 *param_1,byte param_2)
 
 {
   int iVar1;
@@ -9632,9 +9677,11 @@ void __fastcall FUN_0046d760(int param_1)
 }
 
 
-// ==== 0x46d830 FUN_0046d830
+// ==== 0x46d830 DriveTrain::GetDifferentialAngularVelocity
 
-float10 __fastcall FUN_0046d830(int param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/car.md */
+
+float10 __fastcall DriveTrain__GetDifferentialAngularVelocity(int param_1)
 
 {
   float fVar1;
@@ -9724,11 +9771,12 @@ void FUN_0046d8b0(float param_1)
 }
 
 
-// ==== 0x46d9f0 FUN_0046d9f0
+// ==== 0x46d9f0 DriveTrain::GetDifferentialAngularAcceleration
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-float10 __fastcall FUN_0046d9f0(undefined4 param_1,int param_2)
+float10 __fastcall DriveTrain__GetDifferentialAngularAcceleration(undefined4 param_1,int param_2)
 
 {
   float fVar1;
@@ -9769,11 +9817,12 @@ float10 __fastcall FUN_0046d9f0(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x46dac0 FUN_0046dac0
+// ==== 0x46dac0 DriveTrain::SetManualClutchEngaged
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-void __thiscall FUN_0046dac0(int param_1,float param_2)
+void __thiscall DriveTrain__SetManualClutchEngaged(int param_1,float param_2)
 
 {
   *(undefined4 *)(param_1 + 0x60) = 3;
@@ -9835,7 +9884,7 @@ void __fastcall FUN_0046db60(int param_1)
       if (*(int *)(param_1 + 0x3c) != 1) {
         fVar2 = *(float *)(param_1 + 0x4c) - *(float *)(iVar4 + 0x14);
         if ((*(float *)(iVar4 + 0x78) <= 0.2) ||
-           (fVar5 = (float10)FUN_0046d830(), fVar5 <= (float10)0.0)) {
+           (fVar5 = (float10)DriveTrain__GetDifferentialAngularVelocity(), fVar5 <= (float10)0.0)) {
           if ((0.0 < fVar2) || (DAT_006fff2c == 0)) {
             *(float *)(iVar4 + 0x14) = fVar2 * 0.04 + *(float *)(iVar4 + 0x14);
           }
@@ -9875,7 +9924,7 @@ void __fastcall FUN_0046db60(int param_1)
       }
       *(float *)(*(int *)(param_1 + 0x20) + 0x80) = fVar2;
       *(undefined4 *)(param_1 + 0x3c) = *(undefined4 *)(param_1 + 0x38);
-      if ((*(int *)(param_1 + 0x48) != 0) || (iVar4 = FUN_0046e540(), iVar4 == 0)) {
+      if ((*(int *)(param_1 + 0x48) != 0) || (iVar4 = DriveTrain__Idling(), iVar4 == 0)) {
         *(undefined4 *)(param_1 + 0x48) = 0;
         if (*(char *)(param_1 + 0x74) == '\0') {
           *(undefined4 *)(param_1 + 0x44) = 2;
@@ -9891,12 +9940,12 @@ void __fastcall FUN_0046db60(int param_1)
       *(float *)(*(int *)(param_1 + 0x20) + 0x80) = fVar2;
       if (_K_ONE <= *(float *)(param_1 + 0x14)) {
         *(undefined4 *)(param_1 + 0x14) = 0x3f800000;
-        iVar4 = FUN_0046e580();
+        iVar4 = DriveTrain__ClutchMatched();
         if ((iVar4 != 0) || (*(int *)(param_1 + 0x3c) == 1)) {
           *(undefined4 *)(param_1 + 0x44) = 3;
         }
       }
-      iVar4 = FUN_0046e540();
+      iVar4 = DriveTrain__Idling();
       if ((iVar4 != 0) && (*(int *)(param_1 + 0x3c) != 1)) {
         *(undefined4 *)(param_1 + 0x44) = 0;
       }
@@ -9908,7 +9957,7 @@ void __fastcall FUN_0046db60(int param_1)
       if ((0.0 < *(float *)(param_1 + 0x68)) && (*(float *)(param_1 + 100) == 0.0)) {
         *(float *)(param_1 + 100) = (float)DAT_0073ad34 * 0.00025;
       }
-      cVar3 = FUN_004607a0();
+      cVar3 = RealDriver__IsDriftModeActive();
       if (cVar3 == '\0') {
         uVar1 = *(undefined4 *)(*(int *)(param_1 + 0x1c) + 0x60);
       }
@@ -9921,7 +9970,7 @@ void __fastcall FUN_0046db60(int param_1)
         iVar4 = *(int *)(param_1 + 0x20);
         fVar2 = *(float *)(param_1 + 0x4c) - *(float *)(iVar4 + 0x14);
         if ((*(float *)(iVar4 + 0x78) <= 0.2) ||
-           (fVar5 = (float10)FUN_0046d830(), fVar5 <= (float10)0.0)) {
+           (fVar5 = (float10)DriveTrain__GetDifferentialAngularVelocity(), fVar5 <= (float10)0.0)) {
           if ((0.0 < fVar2) || (DAT_006fff2c == 0)) {
             *(float *)(iVar4 + 0x14) = fVar2 * 0.04 + *(float *)(iVar4 + 0x14);
           }
@@ -9931,7 +9980,7 @@ void __fastcall FUN_0046db60(int param_1)
           *(undefined4 *)(param_1 + 0x4c) = uVar1;
           FUN_0046d8b0(uVar1);
         }
-        iVar4 = FUN_0046e540();
+        iVar4 = DriveTrain__Idling();
         if (iVar4 != 0) {
           *(undefined4 *)(param_1 + 0x44) = 0;
         }
@@ -9974,11 +10023,12 @@ void __fastcall FUN_0046db60(int param_1)
 }
 
 
-// ==== 0x46dfa0 FUN_0046dfa0
+// ==== 0x46dfa0 DriveTrain::GetDerivative
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-undefined4 __thiscall FUN_0046dfa0(int param_1,float *param_2)
+undefined4 __thiscall DriveTrain__GetDerivative(int param_1,float *param_2)
 
 {
   float fVar1;
@@ -10001,11 +10051,12 @@ undefined4 __thiscall FUN_0046dfa0(int param_1,float *param_2)
 }
 
 
-// ==== 0x46e020 FUN_0046e020
+// ==== 0x46e020 DriveTrain::ApplyClutchTorque
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-void __thiscall FUN_0046e020(int param_1,float param_2)
+void __thiscall DriveTrain__ApplyClutchTorque(int param_1,float param_2)
 
 {
   int iVar1;
@@ -10130,11 +10181,11 @@ void FUN_0046e270(void)
       fVar1 = fVar1 * 0.3;
     }
     *(float *)(unaff_ESI + 0x58) = fVar3;
-    FUN_0046e020(fVar1 * *(float *)(unaff_ESI + 0x14) * fVar4);
+    DriveTrain__ApplyClutchTorque(fVar1 * *(float *)(unaff_ESI + 0x14) * fVar4);
   }
   else if (iVar2 == 3) {
     fVar5 = (float10)FUN_0046cff0();
-    FUN_0046e020((float)fVar5);
+    DriveTrain__ApplyClutchTorque((float)fVar5);
     return;
   }
   return;
@@ -10165,7 +10216,7 @@ void FUN_0046e360(void)
       fVar4 = fVar4 * (float10)1.0;
     }
     fVar6 = (float)((fVar3 + (float10)*(float *)(iVar1 + 0x7c)) / fVar4);
-    fVar3 = (float10)FUN_0046d9f0(fVar6);
+    fVar3 = (float10)DriveTrain__GetDifferentialAngularAcceleration(fVar6);
     fVar4 = (float10)_K_ONE / (float10)*(float *)(*(int *)(*(int *)(unaff_ESI + 0x20) + 0x18) + 0xc)
     ;
     iVar1 = *(int *)(unaff_ESI + 0x18);
@@ -10182,7 +10233,7 @@ void FUN_0046e360(void)
       fVar4 = (fVar5 / (float10)*(float *)(*(int *)(unaff_ESI + 0x2c) + 0x2c)) * fVar5 *
               (float10)*(float *)(iVar1 + 0x10) * (float10)_K_HALF + fVar4;
     }
-    FUN_0046e020((float)(((float10)fVar6 - fVar3) / fVar4));
+    DriveTrain__ApplyClutchTorque((float)(((float10)fVar6 - fVar3) / fVar4));
   }
   return;
 }
@@ -10203,7 +10254,8 @@ void FUN_0046e440(void)
     if ((((*(int *)(unaff_ESI + 0x3c) != 1) && (*(int *)(unaff_ESI + 0x44) == 3)) &&
         ((local_4 = *(float *)(unaff_ESI + 0x4c) - *(float *)(*(int *)(unaff_ESI + 0x20) + 0x14),
          *(float *)(*(int *)(unaff_ESI + 0x20) + 0x78) <= 0.2 ||
-         (fVar3 = (float10)FUN_0046d830(), fVar3 <= (float10)0.0)))) && (local_4 < 0.0)) {
+         (fVar3 = (float10)DriveTrain__GetDifferentialAngularVelocity(), fVar3 <= (float10)0.0))))
+       && (local_4 < 0.0)) {
       fVar3 = (float10)FUN_0046cff0();
       iVar2 = *(int *)(unaff_ESI + 0x20);
       fVar3 = (float10)bClampF(local_4 * *(float *)(*(int *)(unaff_ESI + 0x18) + 0x14),
@@ -10223,9 +10275,11 @@ void FUN_0046e440(void)
 }
 
 
-// ==== 0x46e540 FUN_0046e540
+// ==== 0x46e540 DriveTrain::Idling
 
-undefined4 __fastcall FUN_0046e540(undefined4 param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+undefined4 __fastcall DriveTrain__Idling(undefined4 param_1,int param_2)
 
 {
   if ((*(float *)(*(int *)(param_2 + 0x20) + 0x78) < 0.3) &&
@@ -10237,11 +10291,12 @@ undefined4 __fastcall FUN_0046e540(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x46e580 FUN_0046e580
+// ==== 0x46e580 DriveTrain::ClutchMatched
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-undefined4 FUN_0046e580(void)
+undefined4 DriveTrain__ClutchMatched(void)
 
 {
   float fVar1;
@@ -10482,9 +10537,11 @@ void __thiscall FUN_0046e940(int param_1,float param_2)
 }
 
 
-// ==== 0x46ea30 FUN_0046ea30
+// ==== 0x46ea30 DriveTrain::SetState
 
-void __thiscall FUN_0046ea30(int param_1,undefined4 *param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
+
+void __thiscall DriveTrain__SetState(int param_1,undefined4 *param_2)
 
 {
   *(undefined4 *)(param_1 + 0x14) = *param_2;
@@ -10493,11 +10550,12 @@ void __thiscall FUN_0046ea30(int param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x46ea50 FUN_0046ea50
+// ==== 0x46ea50 SCEA_GJKsimplexPair::DistanceSqr
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/car.md */
 
-float * __fastcall FUN_0046ea50(undefined4 param_1,float *param_2)
+float * __fastcall SCEA_GJKsimplexPair__DistanceSqr(undefined4 param_1,float *param_2)
 
 {
   int iVar1;

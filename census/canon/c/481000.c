@@ -4450,7 +4450,7 @@ void CameraMover_BuildBankedFrame(undefined4 *param_1)
 
 // ==== 0x4877d0 CameraMover_SetTransitionParamA
 
-/* [canon] camera low (ghidra-canon) docs/re/runtime.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __thiscall CameraMover_SetTransitionParamA(int param_1,undefined4 param_2)
 
@@ -4465,7 +4465,7 @@ void __thiscall CameraMover_SetTransitionParamA(int param_1,undefined4 param_2)
 
 // ==== 0x4877f0 CameraMover_SetTransitionParamB
 
-/* [canon] camera low (ghidra-canon) docs/re/runtime.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __thiscall CameraMover_SetTransitionParamB(int param_1,undefined4 param_2)
 
@@ -4614,7 +4614,7 @@ FUN_00487980(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
 
 // ==== 0x487b20 CameraMover_SetupSpline
 
-/* [canon] camera low (ghidra-canon) docs/re/runtime.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void CameraMover_SetupSpline
                (undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,

@@ -1515,7 +1515,7 @@ void FUN_00583c80(float param_1)
       param_1 = 99999.0;
     }
     else {
-      fVar5 = (float10)FUN_00401c40(fVar1 / fVar4,0);
+      fVar5 = (float10)bMax_float(fVar1 / fVar4,0);
       param_1 = (float)fVar5;
     }
     FUN_005aadf0(fVar1,param_1);
@@ -2323,7 +2323,7 @@ void FUN_00584950(void)
 {
   undefined4 *in_EAX;
   
-  *in_EAX = &PTR_FUN_006c8584;
+  *in_EAX = &PTR_PhysicsComponent__scalar_deleting_destructor_006c8584;
   return;
 }
 
@@ -3770,7 +3770,7 @@ void __fastcall FUN_00586990(undefined4 param_1,undefined4 *param_2)
     **(undefined4 **)(iVar1 + 0x34) = 0;
     *(undefined4 *)(iVar1 + 0x34) = 0;
   }
-  *param_2 = &PTR_FUN_006c8584;
+  *param_2 = &PTR_PhysicsComponent__scalar_deleting_destructor_006c8584;
   return;
 }
 

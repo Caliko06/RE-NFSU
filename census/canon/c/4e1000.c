@@ -2208,7 +2208,8 @@ uint FUN_004e3b10(char param_1)
 LAB_004e3c4a:
       if (uVar10 == 0) goto LAB_004e3c0a;
       while (((*(byte *)(uVar10 + 0x12) != unaff_EDI ||
-              (((uVar5 = FUN_004aa9d0(&DAT_007588c4,2,*(undefined4 *)(uVar10 + 8)),
+              (((uVar5 = UserProfile__IsStyleRewardUnlocked
+                                   (&DAT_007588c4,2,*(undefined4 *)(uVar10 + 8)),
                 (char)uVar5 == '\0' && (cVar2 == '\0')) &&
                (uVar5 = PartStore__HasPart(&DAT_0075f344), (char)uVar5 == '\0')))) ||
              (((uVar6 = (undefined3)((uint)uVar5 >> 8), param_1 != '\0' && (cVar2 == '\0')) &&
@@ -2251,7 +2252,7 @@ joined_r0x004e3b70:
             goto switchD_004e3b8e_default;
           }
           uVar5 = FUN_00567c70();
-          uVar5 = FUN_004aa9d0(&DAT_007588c4,2,uVar5);
+          uVar5 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar5);
           uVar6 = (undefined3)((uint)uVar5 >> 8);
           if (((char)uVar5 != '\0') &&
              ((param_1 == '\0' || (FUN_004e3af0(), uVar6 = extraout_var, extraout_AL != '\0'))))
@@ -2356,7 +2357,7 @@ LAB_004e3e69:
     }
   }
   uVar2 = FUN_00567c70();
-  cVar1 = FUN_004aa9d0(&DAT_007588c4,0,uVar2);
+  cVar1 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,0,uVar2);
   if (cVar1 != '\0') {
     if ((char)param_3 != '\0') {
       uVar2 = FUN_004e3b10(param_3);
@@ -2442,7 +2443,7 @@ LAB_004e402e:
     }
     else {
       if (bVar1 < 0x11) {
-        uVar6 = FUN_004aa9d0(&DAT_007588c4,2,*(undefined4 *)(uVar9 + 8));
+        uVar6 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,*(undefined4 *)(uVar9 + 8));
         if ((((char)uVar6 == '\0') && (cVar10 == '\0')) &&
            (uVar6 = PartStore__HasPart(&DAT_0075f344), (char)uVar6 == '\0'))
         goto switchD_004e3fca_default;
@@ -2471,7 +2472,7 @@ LAB_004e402e:
           goto switchD_004e3fca_default;
         }
         uVar6 = FUN_00567c70();
-        uVar6 = FUN_004aa9d0(&DAT_007588c4,2,uVar6);
+        uVar6 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar6);
         uVar7 = (undefined3)((uint)uVar6 >> 8);
         if ((char)uVar6 != '\0') {
           if (((char)param_1 == '\0') || (cVar10 != '\0')) goto LAB_004e402e;
@@ -3719,13 +3720,13 @@ LAB_004e5c3c:
         if (bVar3) goto LAB_004e5d19;
         if (DAT_00745e40 != 1) {
           if ((DAT_00745e40 != 2) ||
-             (((cVar4 = FUN_004aa9d0(&DAT_007588c4,2,uVar9), local_2c = local_20, cVar4 == '\0' &&
-               (DAT_00735ec1 == '\0')) &&
+             (((cVar4 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar9),
+               local_2c = local_20, cVar4 == '\0' && (DAT_00735ec1 == '\0')) &&
               (cVar4 = PartStore__HasPart(&DAT_0075f344), local_2c = local_20, uVar10 = local_18,
               cVar4 == '\0')))) goto LAB_004e5d19;
           goto LAB_004e5d03;
         }
-        cVar4 = FUN_004aa9d0(&DAT_007588c4,2,uVar9);
+        cVar4 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar9);
         if (((cVar4 == '\0') && (DAT_00735ec1 == '\0')) &&
            (cVar4 = PartStore__HasPart(&DAT_0075f344), uVar10 = local_18, cVar4 == '\0'))
         goto LAB_004e5d19;
@@ -3768,7 +3769,7 @@ LAB_004e5c3c:
           goto switchD_004e5afd_default;
         }
         uVar9 = FUN_00567c70();
-        cVar4 = FUN_004aa9d0(&DAT_007588c4,2,uVar9);
+        cVar4 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar9);
         local_1c = CONCAT31(local_1c._1_3_,'\x01' - (cVar4 != '\0'));
 switchD_004e5afd_default:
         bVar5 = FUN_005a3d50();
@@ -4020,7 +4021,7 @@ LAB_004e635d:
   }
   else {
     if (bVar1 < 0x11) {
-      cVar2 = FUN_004aa9d0(&DAT_007588c4,2,*(undefined4 *)(unaff_ESI + 8));
+      cVar2 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,*(undefined4 *)(unaff_ESI + 8));
       if (((cVar2 == '\0') && (DAT_00735ec1 == '\0')) &&
          (cVar2 = PartStore__HasPart(&DAT_0075f344), cVar2 == '\0')) {
         return 0;
@@ -4047,7 +4048,7 @@ LAB_004e635d:
       goto switchD_004e62e6_default;
     }
     uVar4 = FUN_00567c70();
-    cVar2 = FUN_004aa9d0(&DAT_007588c4,2,uVar4);
+    cVar2 = UserProfile__IsStyleRewardUnlocked(&DAT_007588c4,2,uVar4);
   }
   if (cVar2 != '\0') {
     return 1;
@@ -12746,7 +12747,7 @@ void FUN_004f0800(int param_1,int param_2)
 void * __thiscall FUN_004f08b0(void *param_1,byte param_2)
 
 {
-  FEBufferBase_DtorBody();
+  FENode__DtorBody();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -12754,11 +12755,11 @@ void * __thiscall FUN_004f08b0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4f08d0 FEBufferBase_DtorBody
+// ==== 0x4f08d0 FENode::DtorBody
 
 /* [canon] hud med (ghidra-canon) docs/re/hud.md */
 
-void FEBufferBase_DtorBody(void)
+void FENode__DtorBody(void)
 
 {
   undefined4 *unaff_ESI;

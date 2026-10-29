@@ -745,9 +745,11 @@ int bDegreesToAngle16(void)
 }
 
 
-// ==== 0x401c40 FUN_00401c40
+// ==== 0x401c40 bMax_float
 
-float10 FUN_00401c40(float param_1,float param_2)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+float10 bMax_float(float param_1,float param_2)
 
 {
   if (param_2 < param_1) {
@@ -779,7 +781,7 @@ float10 __thiscall FUN_00401c79(float param_1,float param_2)
   float10 fVar1;
   float unaff_retaddr;
   
-  FUN_00401e23();
+  Thunk_JumpViaRetAddrTable();
   if (unaff_retaddr < param_1) {
     unaff_retaddr = param_1;
   }
@@ -939,9 +941,11 @@ void FUN_00401db0(void)
 }
 
 
-// ==== 0x401dc0 FUN_00401dc0
+// ==== 0x401dc0 Node_SetNameAndHash
 
-void FUN_00401dc0(void)
+/* [canon] runtime med (ghidra-canon) docs/re/car.md */
+
+void Node_SetNameAndHash(void)
 
 {
   byte *pbVar1;
@@ -988,14 +992,16 @@ void FUN_00401e10(void)
   
   *(undefined4 *)(in_EAX + 0xc) = 0;
   *(undefined4 *)(in_EAX + 8) = 0;
-  FUN_00404a70();
+  List_ReleaseAllToPool();
   return;
 }
 
 
-// ==== 0x401e23 FUN_00401e23
+// ==== 0x401e23 Thunk_JumpViaRetAddrTable
 
-void FUN_00401e23(void)
+/* [canon] runtime low (ghidra-canon) docs/re/car.md */
+
+void Thunk_JumpViaRetAddrTable(void)
 
 {
   int unaff_retaddr;
@@ -1056,11 +1062,12 @@ void QuadBuffers_Create(undefined4 *param_1)
 }
 
 
-// ==== 0x401f30 FUN_00401f30
+// ==== 0x401f30 Random_NextFloatSeeded
 
 /* WARNING: Removing unreachable block (ram,0x00401f5b) */
+/* [canon] runtime med (ghidra-canon) docs/re/car.md */
 
-float10 __fastcall FUN_00401f30(undefined4 param_1,uint *param_2,float param_3)
+float10 __fastcall Random_NextFloatSeeded(undefined4 param_1,uint *param_2,float param_3)
 
 {
   uint uVar1;
@@ -1251,7 +1258,7 @@ void Matrix4_Invert(void)
 
 // ==== 0x402500 Spline_BuildCubicBasis
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void Spline_BuildCubicBasis
                (undefined4 param_1,undefined4 param_2,float param_3,float param_4,float param_5,
@@ -1521,9 +1528,11 @@ undefined4 Particle_Unload(int *param_1)
 }
 
 
-// ==== 0x4029a0 FUN_004029a0
+// ==== 0x4029a0 Particle_ResolveTextures
 
-void FUN_004029a0(char param_1)
+/* [canon] render med (ghidra-canon) docs/re/car.md */
+
+void Particle_ResolveTextures(char param_1)
 
 {
   undefined4 uVar1;
@@ -1583,7 +1592,7 @@ void * FUN_00402a70(int param_1)
       puVar4 = puVar4 + 1;
     }
     DAT_00736538 = DAT_00736538 + 1;
-    FUN_00401dc0();
+    Node_SetNameAndHash();
     if (*(int *)(param_1 + 0x1c) != 0) {
       *(int *)((int)pvVar1 + 0x1c) = *(int *)(param_1 + 0x1c);
     }
@@ -1661,9 +1670,11 @@ undefined4 ParticleEmitter_Bind(int param_1)
 }
 
 
-// ==== 0x402b90 FUN_00402b90
+// ==== 0x402b90 ParticleLists_Init
 
-void FUN_00402b90(void)
+/* [canon] render low (ghidra-canon) docs/re/car.md */
+
+void ParticleLists_Init(void)
 
 {
   int iVar1;
@@ -1728,7 +1739,7 @@ void ParticleEmitter_Queue(void)
       }
       fVar8 = (float10)fVar1;
       if (fVar8 != (float10)0.0) {
-        fVar7 = (float10)FUN_00401f30((float)((float10)fVar2 * fVar8));
+        fVar7 = (float10)Random_NextFloatSeeded((float)((float10)fVar2 * fVar8));
         fVar8 = ((float10)fVar1 - (float10)(float)((float10)fVar2 * fVar8)) + fVar7;
       }
       unaff_ESI[5] = (int)(float)fVar8;
@@ -2136,7 +2147,7 @@ void FUN_00402d30(int param_1,int param_2,float param_3,int param_4)
             *(int **)(iVar1 + 4) = piVar7;
             local_238[3] = 0;
             local_238[2] = 0;
-            FUN_00404a70();
+            List_ReleaseAllToPool();
             iVar1 = *(int *)(iVar20 + 0x18);
             *local_238 = *(int *)(iVar20 + 0x10);
             *(int *)(iVar20 + 0x18) = iVar1 + -1;
@@ -2278,7 +2289,7 @@ void Particles_UpdateSystem(int *param_1,float param_2)
           piVar16[6] = 0;
         }
         else {
-          fVar19 = (float10)FUN_00401f30(fVar2 * fVar1);
+          fVar19 = (float10)Random_NextFloatSeeded(fVar2 * fVar1);
           piVar16[4] = uVar15;
           piVar16[6] = 0;
           piVar16[5] = (int)(float)(((float10)fVar1 - (float10)(fVar2 * fVar1)) + fVar19 +
@@ -2816,9 +2827,11 @@ LAB_00404987:
 }
 
 
-// ==== 0x4049f0 FUN_004049f0
+// ==== 0x4049f0 List_DeleteAllNodes
 
-void __fastcall FUN_004049f0(int *param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/car.md */
+
+void __fastcall List_DeleteAllNodes(int *param_1)
 
 {
   int *_Memory;
@@ -2868,9 +2881,11 @@ void FUN_00404a30(void)
 }
 
 
-// ==== 0x404a70 FUN_00404a70
+// ==== 0x404a70 List_ReleaseAllToPool
 
-void FUN_00404a70(void)
+/* [canon] runtime med (ghidra-canon) docs/re/car.md */
+
+void List_ReleaseAllToPool(void)
 
 {
   int *piVar1;
@@ -3619,7 +3634,7 @@ void FUN_004054f0(void)
 
 // ==== 0x405550 Ptr_SetNull
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall Ptr_SetNull(undefined4 *param_1)
 
@@ -5823,7 +5838,7 @@ void __fastcall Texture__ReleaseD3D(int *param_1)
 
 // ==== 0x408100 RefList_ReleaseAll
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void RefList_ReleaseAll(void)
 
@@ -6746,7 +6761,7 @@ void FUN_00408f00(void)
 
 // ==== 0x409090 RenderFrameMain_HeadlightItemCallback
 
-/* [canon] render low (ghidra-canon) docs/re/render.md */
+/* [canon] render med (ghidra-canon+hopper) docs/re/render.md */
 
 void RenderFrameMain_HeadlightItemCallback(int param_1)
 
@@ -7608,17 +7623,17 @@ void __fastcall FUN_0040a140(int param_1)
   }
   else if (((DAT_0077a920 == 6) && (*DAT_007361f0 != 1)) && (in_EAX < *(int *)(DAT_007361f8 + 0x1c))
           ) {
-    iVar6 = FUN_0041ff50();
+    iVar6 = RaceManager__FindRacerByIdIn();
     fVar1 = *(float *)(iVar6 + 0x58);
-    iVar6 = FUN_0041ff50();
+    iVar6 = RaceManager__FindRacerByIdIn();
     local_ac = *(float *)(iVar6 + 0x94);
     local_b0 = *(float *)(iVar6 + 0x90);
     local_a8 = *(float *)(iVar6 + 0x98);
-    iVar6 = FUN_0041ff50();
+    iVar6 = RaceManager__FindRacerByIdIn();
     local_bc = *(float *)(iVar6 + 0x94);
     local_b8 = *(float *)(iVar6 + 0x98);
     fVar8 = extraout_ST1;
-    iVar6 = FUN_0041ff50();
+    iVar6 = RaceManager__FindRacerByIdIn();
     local_9c = *(float *)(iVar6 + 0xb4);
     local_98 = *(float *)(iVar6 + 0xb8);
     local_a0 = *(float *)(iVar6 + 0xb0);
@@ -9584,7 +9599,7 @@ void D3DResourceList_ReleaseAll(void)
 
 // ==== 0x40cb70 Ptr_BaseAdjustMinus4
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 int Ptr_BaseAdjustMinus4(void)
 
@@ -11095,7 +11110,7 @@ void FUN_0040ebc0(void)
 
 // ==== 0x40ec20 FlareAnim_FractionalPhase
 
-/* [canon] render low (ghidra-canon) docs/re/render.md */
+/* [canon] render med (ghidra-canon+hopper) docs/re/render.md */
 
 float10 __fastcall FlareAnim_FractionalPhase(int param_1)
 
@@ -11118,7 +11133,7 @@ float10 __fastcall FlareAnim_FractionalPhase(int param_1)
 
 // ==== 0x40ec90 FlareAnim_FractionalPhase_B
 
-/* [canon] render low (ghidra-canon) docs/re/render.md */
+/* [canon] render med (ghidra-canon+hopper) docs/re/render.md */
 
 float10 __fastcall FlareAnim_FractionalPhase_B(int param_1)
 
@@ -12406,9 +12421,11 @@ undefined4 FUN_004107e0(undefined4 param_1)
 }
 
 
-// ==== 0x4108d0 FUN_004108d0
+// ==== 0x4108d0 ImmBuf_PushColor
 
-void FUN_004108d0(uint param_1)
+/* [canon] render med (ghidra-canon) docs/re/car.md */
+
+void ImmBuf_PushColor(uint param_1)
 
 {
   *(uint *)(DAT_007363bc + 0x10 + DAT_007363d0 * 0x18) =
@@ -12419,9 +12436,11 @@ void FUN_004108d0(uint param_1)
 }
 
 
-// ==== 0x410910 FUN_00410910
+// ==== 0x410910 ImmBuf_PushTexCoord
 
-void FUN_00410910(undefined4 param_1,undefined4 param_2)
+/* [canon] render med (ghidra-canon) docs/re/car.md */
+
+void ImmBuf_PushTexCoord(undefined4 param_1,undefined4 param_2)
 
 {
   int iVar1;
@@ -12434,9 +12453,11 @@ void FUN_00410910(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x410940 FUN_00410940
+// ==== 0x410940 ImmBuf_PushPosition
 
-void __fastcall FUN_00410940(undefined4 *param_1)
+/* [canon] render med (ghidra-canon) docs/re/car.md */
+
+void __fastcall ImmBuf_PushPosition(undefined4 *param_1)
 
 {
   int iVar1;
@@ -12450,9 +12471,11 @@ void __fastcall FUN_00410940(undefined4 *param_1)
 }
 
 
-// ==== 0x410970 FUN_00410970
+// ==== 0x410970 ImmBuf_PushColor2
 
-void FUN_00410970(uint param_1)
+/* [canon] render med (ghidra-canon) docs/re/car.md */
+
+void ImmBuf_PushColor2(uint param_1)
 
 {
   *(uint *)(DAT_007363bc + 0x10 + DAT_007363d0 * 0x18) =
@@ -12465,7 +12488,7 @@ void FUN_00410970(uint param_1)
 
 // ==== 0x4109c0 RenderQueue_SelectDefaultBucket
 
-/* [canon] render low (ghidra-canon) docs/re/render.md */
+/* [canon] render med (ghidra-canon+hopper) docs/re/render.md */
 
 undefined4 RenderQueue_SelectDefaultBucket(void)
 

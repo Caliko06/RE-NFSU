@@ -6441,7 +6441,7 @@ void GameFlow__MainLoop(void)
     iVar6 = 0;
     if (0 < DAT_007361c4) {
       do {
-        FUN_0042d470();
+        Player__DetermineInputMode();
         iVar6 = iVar6 + 1;
       } while (iVar6 < DAT_007361c4);
     }
@@ -7973,14 +7973,14 @@ void GameFlow__QueueRaceCars(undefined4 param_1)
   
   iVar2 = (int)DAT_0078a3f5;
   if (-1 < DAT_0078a410) {
-    pcVar1 = (char *)FUN_004327d0();
+    pcVar1 = (char *)RaceStatus__FindEntrantById();
     if ((pcVar1 != (char *)0x0) && (*pcVar1 < '\x01')) goto LAB_004491e9;
   }
   if (DAT_0078a414 < 0) {
     pcVar1 = (char *)0x0;
   }
   else {
-    pcVar1 = (char *)FUN_004327d0();
+    pcVar1 = (char *)RaceStatus__FindEntrantById();
   }
 LAB_004491e9:
   if (pcVar1[0x434] == -1) {
@@ -9822,7 +9822,7 @@ void __thiscall FUN_0044b1b0(int *param_1,float param_2)
       }
     }
     else {
-      fVar11 = (float10)FUN_00435f80();
+      fVar11 = (float10)Countdown__GetSecondsRemaining();
       if ((fVar11 < -(float10)(float)param_1[0x128]) && (*piVar9 != 4)) {
         (**(code **)(*(int *)param_1[2] + 0x38))(0x42c80000,0,0,1);
         FUN_0044bcb0();
@@ -9849,7 +9849,7 @@ void __thiscall FUN_0044b1b0(int *param_1,float param_2)
         param_1[0x10a] = 4000;
         goto LAB_0044b3e8;
       }
-      FUN_00425150();
+      RacerNode__GetControlMode();
       goto LAB_0044b3e3;
     }
   }
@@ -9889,7 +9889,7 @@ LAB_0044b3e8:
   }
   if ((param_1[0x109] != 0) && (param_1[0x109] != 0x7fffffff)) {
     if (*(int *)(param_1[1] + 0x28) == 4) {
-      FUN_00425150();
+      RacerNode__GetControlMode();
       Car_SetMode();
     }
     FUN_00586640(param_2);
@@ -9922,7 +9922,7 @@ LAB_0044b707:
         if ((((*(int *)(iVar6 + 4) == 2) && (cVar3 = CarState__IsNitrousOn(), cVar3 != '\0')) &&
             (cVar3 = FUN_0044cac0(param_1), cVar3 == '\0')) &&
            (cVar3 = (**(code **)(*param_1 + 0x8c))(), cVar3 != '\0')) {
-          CarState__StopTimer();
+          CarState__StopNitrous();
           (**(code **)(*param_1 + 0x80))();
         }
         if (*(int *)(param_1[1] + 0x28) == 4) {
@@ -10004,7 +10004,7 @@ LAB_0044b707:
            (cVar3 = CarState__IsNitrousOn(), cVar3 != '\0')) &&
           (cVar3 = (**(code **)(*param_1 + 0x78))(piVar9), cVar3 == '\0')) &&
          (cVar3 = (**(code **)(*param_1 + 0x8c))(), cVar3 != '\0')) {
-        CarState__StopTimer();
+        CarState__StopNitrous();
         (**(code **)(*param_1 + 0x80))();
       }
       if (DAT_00736090 == 0) {
@@ -10056,7 +10056,7 @@ LAB_0044b707:
       RacerAI__UpdateDesiredSpeed(param_1);
       if ((DAT_00700740 == 0) || (cVar3 = FUN_0044b060(param_1), cVar3 == '\0')) {
         if (*(int *)(param_1[1] + 0x28) == 4) {
-          FUN_00425150();
+          RacerNode__GetControlMode();
           Car_SetMode();
         }
       }
@@ -10079,7 +10079,7 @@ LAB_0044b707:
           *(undefined4 *)(iVar5 + 0x34) = uVar7;
           *(undefined4 *)(*(int *)(iVar5 + 0x3c) + 0x60) = 0;
           uStack_14 = 0xffffffff;
-          FUN_00469f30();
+          CarCollisionBody__SetupPhysicsPointers();
           *(undefined4 *)(*(int *)(iVar5 + 0x34) + 4) = *(undefined4 *)(iVar5 + 0x30);
         }
         FUN_00463b30();
@@ -10098,9 +10098,11 @@ LAB_0044bab2:
 }
 
 
-// ==== 0x44bad0 FUN_0044bad0
+// ==== 0x44bad0 Msg_ReadOnOffByType
 
-bool __fastcall FUN_0044bad0(int param_1,undefined1 *param_2)
+/* [canon] car low (ghidra-canon) docs/re/car.md */
+
+bool __fastcall Msg_ReadOnOffByType(int param_1,undefined1 *param_2)
 
 {
   char cVar1;
@@ -10347,12 +10349,12 @@ LAB_0044bf11:
     }
     LinearTable__Init(puVar10,0,0x41100000);
     fVar9 = (float10)FUN_00583ea0((float)(int)fStack_20);
-    fVar9 = (float10)FUN_00401c40((float)(((float10)fVar4 - (float10)_K_ONE) * fVar9 +
-                                         (float10)_K_ONE),fStack_18);
+    fVar9 = (float10)bMax_float((float)(((float10)fVar4 - (float10)_K_ONE) * fVar9 + (float10)_K_ONE
+                                       ),fStack_18);
     fStack_28 = (float)(fVar9 * (float10)fStack_28);
   }
 LAB_0044bfdf:
-  fVar9 = (float10)FUN_00401c40(fStack_28,0x3f800000);
+  fVar9 = (float10)bMax_float(fStack_28,0x3f800000);
   *(float *)(in_EAX[1] + 0x404) = (float)fVar9;
   in_EAX[0x12e] = (int)fStack_28;
   return;
@@ -10559,9 +10561,10 @@ void TrafficCar_HonkAtPlayer(int param_1)
         local_10 = 0;
       }
     }
-    FUN_00429100((float)((fVar5 + (float10)0.3) - (float10)0.2),
-                 (float)((fVar6 + (float10)0.15) - (float10)0.1),local_c,local_10,uStack00000008,
-                 bVar1);
+    Car__HonkAndOrBlinkHeadlights
+              ((float)((fVar5 + (float10)0.3) - (float10)0.2),
+               (float)((fVar6 + (float10)0.15) - (float10)0.1),local_c,local_10,uStack00000008,bVar1
+              );
   }
   return;
 }
@@ -10626,7 +10629,7 @@ void RacerAI__UpdateDesiredSpeed(int *param_1)
             iVar6 = FUN_0059bb80();
             fStack_24 = (float)((uint)*(byte *)(uVar7 * 0x88 + iVar6 + 0x2e6 + iVar5) << 0x10) *
                         1.5258789e-05;
-            iVar5 = FUN_00424b50(fStack_24,0,0x3a83126f);
+            iVar5 = bAlmostEqual_float(fStack_24,0,0x3a83126f);
             if (iVar5 != 0) {
               fStack_24 = 30.0;
             }
@@ -10695,7 +10698,7 @@ void __thiscall FUN_0044c860(int param_1,int param_2,char param_3)
     *(undefined4 *)(param_1 + 0x424) = uVar2;
   }
   if (((param_2 == 0) || (*(int *)(param_2 + 0x18) == 0)) && (param_3 == '\0')) {
-    iVar3 = FUN_00425150();
+    iVar3 = RacerNode__GetControlMode();
   }
   else {
     iVar3 = 1;
@@ -13308,7 +13311,7 @@ LAB_0044fbb8:
   }
 LAB_0044fc44:
   bVar7 = false;
-  cVar9 = FUN_00435ca0(DAT_0073619c,*param_2);
+  cVar9 = RaceManager__IsInRaceStartWindow(DAT_0073619c,*param_2);
   if (cVar9 == '\0') {
 LAB_0044fcc9:
     bVar6 = true;
@@ -14674,7 +14677,7 @@ undefined4 FUN_00450ec0(undefined4 *param_1)
   iVar8 = in_EAX[0xe2];
   iVar2 = in_EAX[0xea];
   iVar3 = *(int *)(*in_EAX + 0x2c);
-  cVar6 = FUN_00435ca0(DAT_0073619c,*in_EAX);
+  cVar6 = RaceManager__IsInRaceStartWindow(DAT_0073619c,*in_EAX);
   if (cVar6 == '\0') {
     local_14 = (int *)0x0;
     local_4 = (int *)0x0;

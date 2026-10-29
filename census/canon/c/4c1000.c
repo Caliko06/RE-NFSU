@@ -2365,7 +2365,7 @@ LAB_004c40c6:
     }
     if (param_2 == 0xc407210) {
       if (((DAT_0076029c & 0x200000) != 0) && ((DAT_0076029c & 0x400000) == 0)) {
-        iVar1 = FUN_0051c7f0();
+        iVar1 = EAXSound__UpdateSongInfo();
         if (iVar1 == 0) {
           iVar1 = FUN_004cd440();
           if (iVar1 != -1) {
@@ -2389,7 +2389,7 @@ LAB_004c40c6:
     if ((*(char *)(param_1 + 0x88) != '\0') &&
        (iVar1 = *(int *)(param_1 + 0x90) + 1, *(int *)(param_1 + 0x90) = iVar1,
        *(int *)(param_1 + 0x8c) < iVar1)) {
-      iVar1 = FUN_0051c7f0();
+      iVar1 = EAXSound__UpdateSongInfo();
       if (iVar1 == 0) {
         *(undefined1 *)(param_1 + 0x94) = 1;
       }
@@ -2428,7 +2428,7 @@ void FUN_004c4154(void)
     if ((*(char *)(unaff_EBX + 0x88) != '\0') &&
        (iVar1 = *(int *)(unaff_EBX + 0x90) + 1, *(int *)(unaff_EBX + 0x90) = iVar1,
        *(int *)(unaff_EBX + 0x8c) < iVar1)) {
-      iVar1 = FUN_0051c7f0();
+      iVar1 = EAXSound__UpdateSongInfo();
       if (iVar1 == 0) {
         *(undefined1 *)(unaff_EBX + 0x94) = 1;
       }
@@ -4170,7 +4170,7 @@ void __thiscall FUN_004c5fa0(int param_1,uint param_2,int param_3)
     if ((((((param_2 == 0xc98356ba) &&
            (DAT_00735e60 = DAT_00735e60 + 1, DAT_006fae28 < DAT_00735e60)) &&
           (*(char *)(param_1 + 0x4e) == '\0')) &&
-         ((iVar2 = FUN_0051c7f0(), *(char *)(param_1 + 0x4f) != '\0' &&
+         ((iVar2 = EAXSound__UpdateSongInfo(), *(char *)(param_1 + 0x4f) != '\0' &&
           (*(char *)(param_1 + 0x4e) == '\0')))) &&
         ((*(char *)(param_1 + 0x4c) != '\0' || (*(char *)(param_1 + 0x4d) != '\0')))) &&
        (iVar2 == 0)) {
@@ -8041,7 +8041,7 @@ void __thiscall FUN_004ca8f0(int param_1,uint param_2)
         return;
       }
       if (param_2 == 0x406415e3) {
-        iVar8 = FUN_00417580();
+        iVar8 = StringList__GetSelectedString();
         pcVar10 = (char *)(param_1 + 0x69);
         iVar11 = 0x20;
         iVar8 = iVar8 - (int)pcVar10;
@@ -8384,7 +8384,7 @@ void __thiscall FUN_004cadc0(int param_1,int param_2)
     uVar2 = FUN_00565b60(0xf660,0,0,0);
     *(undefined4 *)(param_1 + 0xb0) = uVar2;
     Ugd__PackBlock(pvVar1,0xf660);
-    FUN_004a9d70((int)pvVar1 + 0x6634);
+    Career___Career((int)pvVar1 + 0x6634);
     _free(pvVar1);
     FUN_004eb560(0x12312300,&DAT_00777b74,*(undefined4 *)(param_1 + 0xb0),0xf660);
   }
@@ -9897,7 +9897,7 @@ void __thiscall FUN_004ccab0(int param_1,int param_2)
         Ugd__UnpackBlock(0);
         FUN_004cc770();
         if (pvVar3 != (void *)0x0) {
-          FUN_004a9d70((int)pvVar3 + 0x6634);
+          Career___Career((int)pvVar3 + 0x6634);
           _free(pvVar3);
         }
         *(code **)(param_1 + 0x40) = FUN_004ccc40;
@@ -9962,9 +9962,11 @@ void __fastcall FUN_004ccc60(int param_1)
 }
 
 
-// ==== 0x4ccc70 FUN_004ccc70
+// ==== 0x4ccc70 FEScreenSound_FindScreenRow
 
-int __fastcall FUN_004ccc70(undefined4 param_1,int param_2)
+/* [canon] hud med (ghidra-canon) docs/re/hud_input.md */
+
+int __fastcall FEScreenSound_FindScreenRow(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -9983,9 +9985,11 @@ int __fastcall FUN_004ccc70(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x4ccc90 FUN_004ccc90
+// ==== 0x4ccc90 FEScreenSound_MapEventFromRow
 
-undefined4 __fastcall FUN_004ccc90(undefined4 param_1)
+/* [canon] hud med (ghidra-canon) docs/re/hud_input.md */
+
+undefined4 __fastcall FEScreenSound_MapEventFromRow(undefined4 param_1)
 
 {
   int in_EAX;
@@ -10019,9 +10023,11 @@ undefined4 __fastcall FUN_004ccc90(undefined4 param_1)
 }
 
 
-// ==== 0x4ccd20 FUN_004ccd20
+// ==== 0x4ccd20 FEScreenSound_MapEventDefault
 
-undefined4 FUN_004ccd20(void)
+/* [canon] hud med (ghidra-canon) docs/re/hud_input.md */
+
+undefined4 FEScreenSound_MapEventDefault(void)
 
 {
   undefined4 in_EAX;
@@ -10089,7 +10095,7 @@ undefined4 FUN_004ccda0(void)
 
 // ==== 0x4cce10 PostRaceSpeech_MapRewardType2
 
-/* [canon] hud low (ghidra-canon) docs/re/runtime.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 PostRaceSpeech_MapRewardType2(void)
 
@@ -10390,7 +10396,7 @@ void __fastcall FUN_004cd180(byte *param_1)
       uVar6 = FUN_004cd0d0();
       switch(uVar6) {
       case 1:
-        iVar9 = FUN_004ccd20();
+        iVar9 = FEScreenSound_MapEventDefault();
         break;
       case 2:
         iVar9 = PostRaceSpeech_MapRewardType2();
@@ -10405,11 +10411,11 @@ void __fastcall FUN_004cd180(byte *param_1)
         iVar9 = FUN_004ccf90();
         break;
       case 6:
-        iVar9 = FUN_004ccc70();
+        iVar9 = FEScreenSound_FindScreenRow();
         if (iVar9 == -1) {
           return;
         }
-        iVar9 = FUN_004ccc90();
+        iVar9 = FEScreenSound_MapEventFromRow();
         break;
       case 7:
         iVar9 = FUN_004ccda0();
@@ -10418,7 +10424,7 @@ void __fastcall FUN_004cd180(byte *param_1)
         goto switchD_004cd213_default;
       }
       if (iVar9 != -1) {
-        FUN_0051c770();
+        EAXSound__PlayUISoundFX();
         return;
       }
     }
