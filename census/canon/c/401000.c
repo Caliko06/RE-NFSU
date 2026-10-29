@@ -9481,14 +9481,14 @@ void FUN_0040c910(undefined4 param_1,int param_2,undefined4 param_3,undefined4 p
       *(undefined4 *)(iVar2 + 0x38) = 0;
     }
     if (*(int *)(param_2 + 0x10) != 0) {
-      FUN_0053f540();
+      Solid_BindTextureRefs();
     }
     if ((local_10[4] != 0) && (local_8 = 0, 0 < *(int *)(iVar2 + 0x10))) {
       local_c = 0;
       do {
         iVar6 = *(int *)(iVar2 + 0x14) + local_c;
         if (((((in_EAX & 4) != 0) || ((*(byte *)(iVar6 + 0x38) & 1) != 0)) ||
-            (iVar3 = FUN_0040db20(param_1), iVar3 != 0)) &&
+            (iVar3 = AABB_ClassifyAgainstFrustum(param_1), iVar3 != 0)) &&
            (iVar3 = *(int *)(piVar1[0xb] + 4 + (uint)*(byte *)(iVar6 + 0x1c) * 8),
            *(int *)(iVar3 + 0x24) != DAT_0078a4e0)) {
           uVar5 = 0;
@@ -10351,11 +10351,12 @@ void AABB_TransformByMatrix(float *param_1,float *param_2)
 }
 
 
-// ==== 0x40db20 FUN_0040db20
+// ==== 0x40db20 AABB_ClassifyAgainstFrustum
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] render med (ghidra-canon) docs/re/runtime.md */
 
-char __fastcall FUN_0040db20(float *param_1,float *param_2,int *param_3)
+char __fastcall AABB_ClassifyAgainstFrustum(float *param_1,float *param_2,int *param_3)
 
 {
   float fVar1;
@@ -12497,7 +12498,7 @@ void FUN_00410a00(void)
   int iVar1;
   float10 fVar2;
   
-  fVar2 = (float10)FUN_0041eff0();
+  fVar2 = (float10)MachinePerformanceScore();
   _DAT_00701088 = (float)fVar2;
   if (DAT_0071daf0 < 0x400) {
     iVar1 = FUN_00411b00();

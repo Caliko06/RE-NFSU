@@ -4176,7 +4176,7 @@
 {"kind":"global","addr":"0x6be4dc","block":".rdata","label":"s_TrolleySoundObject_006be4dc","type":"string","str":"TrolleySoundObject","readers":["0x532d40"],"writers":[]}
 {"kind":"global","addr":"0x6be4dd","block":".rdata","label":"s_rolleySoundObject_006be4dc+1","type":"","str":"","readers":["0x532d40"],"writers":[]}
 {"kind":"global","addr":"0x6be4de","block":".rdata","label":"s_olleySoundObject_006be4dc+2","type":"","str":"","readers":["0x532d40"],"writers":[]}
-{"kind":"global","addr":"0x6be4fc","block":".rdata","label":"PTR_FUN_006be4fc","type":"pointer","str":"","readers":["0x51cd60","0x5329e0"],"writers":[]}
+{"kind":"global","addr":"0x6be4fc","block":".rdata","label":"PTR_EAXSND8Wrapper::scalar_deleting_destructor_006be4fc","type":"pointer","str":"","readers":["0x51cd60","0x5329e0"],"writers":[]}
 {"kind":"global","addr":"0x6be500","block":".rdata","label":"s_Csis_SlotPools_006be500","type":"string","str":"Csis SlotPools","readers":["0x532a20"],"writers":[]}
 {"kind":"global","addr":"0x6be510","block":".rdata","label":"s_CSIS_ALLOCATOR_006be510","type":"string","str":"CSIS_ALLOCATOR","readers":["0x532960"],"writers":[]}
 {"kind":"global","addr":"0x6be520","block":".rdata","label":"PTR_FUN_006be520","type":"undefined *","str":"","readers":["0x52f570","0x52f590"],"writers":[]}
@@ -6507,7 +6507,7 @@
 {"kind":"global","addr":"0x6c5b94","block":".rdata","label":"s_QRCarSelectScreen_006c5b94","type":"string","str":"QRCarSelectScreen","readers":["0x689230"],"writers":[]}
 {"kind":"global","addr":"0x6c5ba8","block":".rdata","label":"PTR_FUN_006c5ba8","type":"undefined *","str":"","readers":["0x4b9b40","0x4b9e80"],"writers":[]}
 {"kind":"global","addr":"0x6c5bb8","block":".rdata","label":"PTR_FUN_006c5bb8","type":"pointer","str":"","readers":["0x4b9370","0x4b9420"],"writers":[]}
-{"kind":"global","addr":"0x6c5bbc","block":".rdata","label":"PTR_FUN_006c5bbc","type":"pointer","str":"","readers":["0x4b9270","0x4b9500","0x4b9f40","0x4bbc90"],"writers":[]}
+{"kind":"global","addr":"0x6c5bbc","block":".rdata","label":"PTR_SelectableTrack::scalar_deleting_destructor_006c5bbc","type":"pointer","str":"","readers":["0x4b9270","0x4b9500","0x4b9f40","0x4bbc90"],"writers":[]}
 {"kind":"global","addr":"0x6c5bc0","block":".rdata","label":"PTR_FUN_006c5bc0","type":"undefined *","str":"","readers":["0x4bb5d0","0x4bb870"],"writers":[]}
 {"kind":"global","addr":"0x6c5bd0","block":".rdata","label":"s_TrackMapScroller_006c5bd0","type":"string","str":"TrackMapScroller","readers":["0x687cc0"],"writers":[]}
 {"kind":"global","addr":"0x6c5be4","block":".rdata","label":"s_PULSE_006c5be4","type":"string","str":"PULSE","readers":["0x4bb5d0","0x4bb980"],"writers":[]}
@@ -7694,7 +7694,7 @@
 {"kind":"global","addr":"0x6cbe64","block":".rdata","label":"PTR_FUN_006cbe64","type":"undefined *","str":"","readers":["0x414ba0","0x414c40"],"writers":[]}
 {"kind":"global","addr":"0x6cbe74","block":".rdata","label":"PTR_Slider::scalar_deleting_destructor_006cbe74","type":"pointer","str":"","readers":["0x414ab0","0x414b20","0x414b40","0x4bd850","0x4bd900","0x4ce760","0x4cf110"],"writers":[]}
 {"kind":"global","addr":"0x6cbe7c","block":".rdata","label":"PTR_FUN_006cbe7c","type":"pointer","str":"","readers":["0x4bd900","0x4ce760"],"writers":[]}
-{"kind":"global","addr":"0x6cbe88","block":".rdata","label":"PTR_FUN_006cbe88","type":"undefined *","str":"","readers":["0x414b40","0x414c40","0x4155b0","0x4ce760"],"writers":[]}
+{"kind":"global","addr":"0x6cbe88","block":".rdata","label":"PTR_ListSlider::scalar_deleting_destructor_006cbe88","type":"undefined *","str":"","readers":["0x414b40","0x414c40","0x4155b0","0x4ce760"],"writers":[]}
 {"kind":"global","addr":"0x6cbe94","block":".rdata","label":"PTR_FUN_006cbe94","type":"pointer","str":"","readers":["0x414c40","0x4155b0"],"writers":[]}
 {"kind":"global","addr":"0x6cbe98","block":".rdata","label":"PTR_FUN_006cbe98","type":"pointer","str":"","readers":["0x414c40","0x4155b0"],"writers":[]}
 {"kind":"global","addr":"0x6cbe9c","block":".rdata","label":"PTR_FUN_006cbe9c","type":"pointer","str":"","readers":["0x414c40","0x4155b0","0x4ce760"],"writers":[]}

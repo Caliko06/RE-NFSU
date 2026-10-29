@@ -4969,7 +4969,7 @@ void __thiscall Section__DrawPlacement(int param_1,int param_2,int param_3)
     iVar5 = *(int *)(param_1 + 0x18) + *(short *)(iVar8 + 0xc) * 0x48;
     if (param_3 == 1) {
       Placement__UnpackAabb();
-      param_3 = FUN_0040db20(*(undefined4 *)(param_2 + 0x80));
+      param_3 = AABB_ClassifyAgainstFrustum(*(undefined4 *)(param_2 + 0x80));
       if (param_3 == 0) {
         return;
       }
@@ -5101,7 +5101,7 @@ void Section__WalkBvh(int param_1,int param_2)
     piVar3 = piVar3 + -1;
     local_174 = local_174 + -1;
     if (cVar2 == '\x01') {
-      cVar2 = FUN_0040db20(*(undefined4 *)(param_2 + 0x80));
+      cVar2 = AABB_ClassifyAgainstFrustum(*(undefined4 *)(param_2 + 0x80));
     }
     if ((cVar2 != '\0') && (local_17c = 0, 0 < *(short *)(iVar1 + 0xc))) {
       local_178 = (short *)(iVar1 + 0xe);
@@ -7459,10 +7459,10 @@ void GameFlow__LoadGlobalB(void)
   }
   FUN_0053eed0(&DAT_00740420,PTR_s_GLOBAL_DYNTEX_BIN_007007b0,0,0,0);
   puVar3 = PTR_s_GLOBAL_DYNTEX_BIN_007007b0;
-  iVar4 = FUN_0053ed70(&DAT_00740420,PTR_s_GLOBAL_DYNTEX_BIN_007007b0);
+  iVar4 = ResourceFileList_IsLoadedByName(&DAT_00740420,PTR_s_GLOBAL_DYNTEX_BIN_007007b0);
   while (iVar4 != 0) {
     ServiceResourceLoading();
-    iVar4 = FUN_0053ed70(&DAT_00740420,puVar3);
+    iVar4 = ResourceFileList_IsLoadedByName(&DAT_00740420,puVar3);
   }
   EAXSound__ChangeLanguage();
   iVar7 = Texture_FindByHash(0xab0e817d,0,0);
@@ -9919,7 +9919,7 @@ LAB_0044b6d9:
     if (((float)(DAT_0073ad34 - param_1[0x130]) * 0.00025 < 0.2) || (!bVar10)) {
 LAB_0044b707:
       if (param_1[0xfe] != 0) {
-        if ((((*(int *)(iVar6 + 4) == 2) && (cVar3 = FUN_00465430(), cVar3 != '\0')) &&
+        if ((((*(int *)(iVar6 + 4) == 2) && (cVar3 = CarState__IsNitrousOn(), cVar3 != '\0')) &&
             (cVar3 = FUN_0044cac0(param_1), cVar3 == '\0')) &&
            (cVar3 = (**(code **)(*param_1 + 0x8c))(), cVar3 != '\0')) {
           CarState__StopTimer();
@@ -10001,7 +10001,7 @@ LAB_0044b707:
     }
     else {
       if ((((*(int *)(*(int *)(param_1[1] + 0x14) + 4) == 2) &&
-           (cVar3 = FUN_00465430(), cVar3 != '\0')) &&
+           (cVar3 = CarState__IsNitrousOn(), cVar3 != '\0')) &&
           (cVar3 = (**(code **)(*param_1 + 0x78))(piVar9), cVar3 == '\0')) &&
          (cVar3 = (**(code **)(*param_1 + 0x8c))(), cVar3 != '\0')) {
         CarState__StopTimer();
@@ -10666,7 +10666,7 @@ LAB_0044c7b7:
   }
   (**(code **)(*(int *)param_1[2] + 0x38))(fStack_24,fStack_20,fStack_1c,uVar2);
   if ((param_1[0xfe] != 0) && (*(char *)(param_1[0xfe] + 499) != '\0')) {
-    cVar3 = FUN_00465430();
+    cVar3 = CarState__IsNitrousOn();
     if (cVar3 == '\0') {
       (**(code **)(*param_1 + 0x7c))();
     }
@@ -13010,7 +13010,7 @@ void FUN_0044f6c0(int param_1)
   *(undefined1 *)(param_1 + 499) = 0;
   if (*(int *)(*(int *)(*unaff_EDI + 0x14) + 4) == 2) {
     piVar1 = *(int **)(*unaff_EDI + 0x2c);
-    cVar2 = FUN_00465430();
+    cVar2 = CarState__IsNitrousOn();
     if ((cVar2 == '\0') && (cVar2 = (**(code **)(*piVar1 + 0x78))(), cVar2 != '\0')) {
       *(undefined1 *)(param_1 + 499) = 1;
     }
@@ -14069,7 +14069,7 @@ LAB_00450393:
   *(undefined1 *)(param_1 + 499) = 0;
   if (*(int *)(*(int *)(*param_2 + 0x14) + 4) == 2) {
     piVar1 = *(int **)(*param_2 + 0x2c);
-    cVar2 = FUN_00465430();
+    cVar2 = CarState__IsNitrousOn();
     if ((cVar2 == '\0') && (cVar2 = (**(code **)(*piVar1 + 0x78))(param_2), cVar2 != '\0')) {
       *(undefined1 *)(param_1 + 499) = 1;
     }

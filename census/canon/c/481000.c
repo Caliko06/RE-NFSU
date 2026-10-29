@@ -1819,7 +1819,7 @@ void Camera__ApplyNoise(int param_1,undefined4 param_2,float *param_3,int param_
     param_3 = param_3 + 1;
     pfVar6 = pfVar6 + 1;
   }
-  if (((param_4 != 0) && (param_4 != -0x40)) && (cVar3 = FUN_00465430(), cVar3 != '\0')) {
+  if (((param_4 != 0) && (param_4 != -0x40)) && (cVar3 = CarState__IsNitrousOn(), cVar3 != '\0')) {
     local_78 = local_74 + 0.2;
     local_60[0] = local_60[0] * 1.8;
     local_50 = local_50 * 1.8;
@@ -4448,9 +4448,11 @@ void CameraMover_BuildBankedFrame(undefined4 *param_1)
 }
 
 
-// ==== 0x4877d0 FUN_004877d0
+// ==== 0x4877d0 CameraMover_SetTransitionParamA
 
-void __thiscall FUN_004877d0(int param_1,undefined4 param_2)
+/* [canon] camera low (ghidra-canon) docs/re/runtime.md */
+
+void __thiscall CameraMover_SetTransitionParamA(int param_1,undefined4 param_2)
 
 {
   if ((*(int *)(param_1 + 0x2c) != 2) && (*(int *)(param_1 + 0x2c) != 0)) {
@@ -4461,9 +4463,11 @@ void __thiscall FUN_004877d0(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4877f0 FUN_004877f0
+// ==== 0x4877f0 CameraMover_SetTransitionParamB
 
-void __thiscall FUN_004877f0(int param_1,undefined4 param_2)
+/* [canon] camera low (ghidra-canon) docs/re/runtime.md */
+
+void __thiscall CameraMover_SetTransitionParamB(int param_1,undefined4 param_2)
 
 {
   if ((*(int *)(param_1 + 0x2c) != 2) && (*(int *)(param_1 + 0x2c) != 0)) {
@@ -4608,11 +4612,14 @@ FUN_00487980(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
 }
 
 
-// ==== 0x487b20 FUN_00487b20
+// ==== 0x487b20 CameraMover_SetupSpline
 
-void FUN_00487b20(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,
-                 undefined4 param_5,undefined4 param_6,undefined4 param_7,undefined4 param_8,
-                 undefined4 param_9,undefined4 param_10,undefined4 param_11)
+/* [canon] camera low (ghidra-canon) docs/re/runtime.md */
+
+void CameraMover_SetupSpline
+               (undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,
+               undefined4 param_5,undefined4 param_6,undefined4 param_7,undefined4 param_8,
+               undefined4 param_9,undefined4 param_10,undefined4 param_11)
 
 {
   int in_EAX;
@@ -7998,7 +8005,7 @@ void FUN_0048ce30(int param_1,char param_2)
   undefined4 local_3c;
   
   FUN_0048cbd0(in_EAX);
-  iVar4 = FUN_00480230(*(undefined4 *)(param_1 + 0x2c),param_1 + 0x48,param_1 + 0x4c);
+  iVar4 = KeyframeTrack_FindSegment(*(undefined4 *)(param_1 + 0x2c),param_1 + 0x48,param_1 + 0x4c);
   bVar7 = *(int *)(param_1 + 0x54) != iVar4;
   if ((param_2 != '\0') || (bVar7)) {
     *(int *)(param_1 + 0x54) = iVar4;

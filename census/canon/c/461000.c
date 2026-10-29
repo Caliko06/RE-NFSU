@@ -1230,8 +1230,8 @@ undefined1 __thiscall FUN_00462b30(int *param_1,int *param_2)
       return 0;
     }
     fVar3 = *(float *)(&DAT_0077a038 + iVar9);
-    FUN_00465430();
-    cVar5 = FUN_00465430();
+    CarState__IsNitrousOn();
+    cVar5 = CarState__IsNitrousOn();
     if ((cVar5 != '\0') && (fVar3 <= (float)(DAT_0073ad34 - param_1[0x138]) * 0.00025)) {
       return 0;
     }
@@ -1242,7 +1242,7 @@ undefined1 __thiscall FUN_00462b30(int *param_1,int *param_2)
     if (bVar4) {
       fStack_14 = 0.0;
     }
-    cVar5 = FUN_00465430();
+    cVar5 = CarState__IsNitrousOn();
     if ((cVar5 == '\0') && ((float)(DAT_0073ad34 - param_1[0x139]) * 0.00025 <= fStack_14)) {
       return 0;
     }
@@ -3011,9 +3011,11 @@ void Vec3_TransformSub(void)
 }
 
 
-// ==== 0x465430 FUN_00465430
+// ==== 0x465430 CarState::IsNitrousOn
 
-uint FUN_00465430(void)
+/* [canon] runtime high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+uint CarState__IsNitrousOn(void)
 
 {
   float fVar1;
@@ -4052,9 +4054,11 @@ void __fastcall FUN_004667a0(undefined4 *param_1)
 }
 
 
-// ==== 0x4667c0 FUN_004667c0
+// ==== 0x4667c0 Object_SetVec3ViaVtable8
 
-void __thiscall FUN_004667c0(int *param_1,undefined4 *param_2)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void __thiscall Object_SetVec3ViaVtable8(int *param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -4089,9 +4093,11 @@ float10 __fastcall FUN_004667f0(int param_1)
 }
 
 
-// ==== 0x466800 FUN_00466800
+// ==== 0x466800 CarCollisionBody::GetTransformPtr
 
-int __fastcall FUN_00466800(int param_1)
+/* [canon] car low (ghidra-canon) docs/re/runtime.md */
+
+int __fastcall CarCollisionBody__GetTransformPtr(int param_1)
 
 {
   int iVar1;
@@ -4142,9 +4148,11 @@ bool __fastcall FUN_00466850(int param_1)
 }
 
 
-// ==== 0x466890 FUN_00466890
+// ==== 0x466890 CarState::IsResetGraceOrLockActive
 
-undefined4 __fastcall FUN_00466890(int param_1)
+/* [canon] car low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __fastcall CarState__IsResetGraceOrLockActive(int param_1)
 
 {
   int iVar1;
@@ -6989,11 +6997,12 @@ float10 __fastcall FUN_0046a080(int param_1)
 }
 
 
-// ==== 0x46a0c0 FUN_0046a0c0
+// ==== 0x46a0c0 CarCollisionBody::UpdateScaledMatrix
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car low (ghidra-canon) docs/re/runtime.md */
 
-void __fastcall FUN_0046a0c0(int param_1)
+void __fastcall CarCollisionBody__UpdateScaledMatrix(int param_1)
 
 {
   float fVar1;
@@ -7056,9 +7065,11 @@ int __fastcall FUN_0046a1c0(int param_1)
 }
 
 
-// ==== 0x46a1e0 FUN_0046a1e0
+// ==== 0x46a1e0 CarCollisionBody::GetStatePtrA
 
-int __fastcall FUN_0046a1e0(int param_1)
+/* [canon] car low (ghidra-canon) docs/re/runtime.md */
+
+int __fastcall CarCollisionBody__GetStatePtrA(int param_1)
 
 {
   if (*(int *)(param_1 + 0x60) != 0) {
@@ -7068,9 +7079,11 @@ int __fastcall FUN_0046a1e0(int param_1)
 }
 
 
-// ==== 0x46a200 FUN_0046a200
+// ==== 0x46a200 CarCollisionBody::GetStatePtrB
 
-int __fastcall FUN_0046a200(int param_1)
+/* [canon] car low (ghidra-canon) docs/re/runtime.md */
+
+int __fastcall CarCollisionBody__GetStatePtrB(int param_1)
 
 {
   if (*(int *)(param_1 + 0x60) != 0) {
@@ -7609,7 +7622,7 @@ void FUN_0046aa40(int *param_1,float param_2)
   int local_234;
   float local_230 [140];
   
-  FUN_0046ab70(param_1,local_230);
+  PhysicsSystem__GetDerivative(param_1,local_230);
   iVar5 = param_1[3];
   local_234 = 0;
   while( true ) {
@@ -7665,9 +7678,11 @@ void FUN_0046aa40(int *param_1,float param_2)
 }
 
 
-// ==== 0x46ab70 FUN_0046ab70
+// ==== 0x46ab70 PhysicsSystem::GetDerivative
 
-void FUN_0046ab70(int param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+void PhysicsSystem__GetDerivative(int param_1,int param_2)
 
 {
   int *piVar1;
@@ -7732,9 +7747,11 @@ LAB_0046abe1:
 }
 
 
-// ==== 0x46ac10 FUN_0046ac10
+// ==== 0x46ac10 CarState::IsTimedFlagActive
 
-undefined4 FUN_0046ac10(void)
+/* [canon] car low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 CarState__IsTimedFlagActive(void)
 
 {
   int in_EAX;
@@ -7768,9 +7785,11 @@ void FUN_0046ac40(void)
 }
 
 
-// ==== 0x46ac90 FUN_0046ac90
+// ==== 0x46ac90 Contact::RemoveContacts
 
-void FUN_0046ac90(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+void Contact__RemoveContacts(void)
 
 {
   int *piVar1;
@@ -7815,7 +7834,7 @@ float10 FUN_0046ace0(void)
   
   if (*(char *)(*(int *)(unaff_EDI + 0xc) + 0x15) == '\x03') {
     if (*(char *)(*(int *)(unaff_EDI + 0x10) + 0x16) != '\0') {
-      FUN_0046b070(unaff_EDI);
+      FindWaferNormal(unaff_EDI);
       *unaff_EBX = 1;
       pfVar1 = (float *)(**(code **)(**(int **)(unaff_EDI + 0x10) + 8))();
       return (float10)local_30 * (float10)*pfVar1 +
@@ -7824,7 +7843,7 @@ float10 FUN_0046ace0(void)
   }
   else if ((*(char *)(*(int *)(unaff_EDI + 0x10) + 0x15) == '\x03') &&
           (*(char *)(*(int *)(unaff_EDI + 0xc) + 0x16) != '\0')) {
-    FUN_0046b070(unaff_EDI);
+    FindWaferNormal(unaff_EDI);
     *unaff_EBX = 1;
     pfVar1 = (float *)(**(code **)(**(int **)(unaff_EDI + 0xc) + 8))();
     return (float10)-local_30 * (float10)*pfVar1 +
@@ -7994,9 +8013,11 @@ LAB_0046b020:
 }
 
 
-// ==== 0x46b070 FUN_0046b070
+// ==== 0x46b070 FindWaferNormal
 
-void __fastcall FUN_0046b070(int param_1,float *param_2,int param_3)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/runtime.md */
+
+void __fastcall FindWaferNormal(int param_1,float *param_2,int param_3)
 
 {
   float fVar1;
@@ -8118,12 +8139,12 @@ void FUN_0046b260(int param_1,float param_2)
   (**(code **)(**(int **)(param_1 + 0x10) + 0x30))(auStack_fc,auStack_9c,param_2);
   cVar1 = *(char *)((int)*(int **)(param_1 + 0xc) + 0x15);
   if (cVar1 == '\x03') {
-    FUN_0046b070(param_1);
+    FindWaferNormal(param_1);
     goto LAB_0046b3f2;
   }
   cVar2 = *(char *)((int)*(int **)(param_1 + 0x10) + 0x15);
   if (cVar2 == '\x03') {
-    FUN_0046b070(param_1);
+    FindWaferNormal(param_1);
     puStack_158 = (undefined1 *)-(float)puStack_158;
     fStack_154 = -param_2;
     unaff_EDI = -unaff_EDI;
@@ -8357,11 +8378,11 @@ void __fastcall FUN_0046b8c0(float *param_1)
   param_1[1] = (fVar3 + fVar1) * _K_HALF;
   param_1[2] = (fVar4 + fVar2) * _K_HALF;
   if (*(char *)(*(int *)(unaff_EDI + 0xc) + 0x16) == '\0') {
-    FUN_0046b070(unaff_EDI);
+    FindWaferNormal(unaff_EDI);
     return;
   }
   if (*(char *)(*(int *)(unaff_EDI + 0x10) + 0x16) == '\0') {
-    FUN_0046b070(unaff_EDI);
+    FindWaferNormal(unaff_EDI);
     in_EAX[2] = -in_EAX[2];
     *in_EAX = -*in_EAX;
     in_EAX[1] = -in_EAX[1];

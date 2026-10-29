@@ -5967,7 +5967,7 @@ void FUN_00589da0(int param_1)
       piVar2 = (int *)puVar1[2];
       if (((piVar2[9] == 0) ||
           ((*(uint *)(piVar2[9] + 0x534) & 1 << ((byte)*(undefined4 *)(unaff_ESI + 4) & 0x1f)) != 0)
-          ) && (iVar6 = FUN_0040db20(unaff_ESI), iVar6 != 0)) {
+          ) && (iVar6 = AABB_ClassifyAgainstFrustum(unaff_ESI), iVar6 != 0)) {
         iVar6 = _ftol_nocw();
         if (4.0 < (float)iVar6) {
           if ((float)iVar6 <= 10.0) {
@@ -6258,7 +6258,7 @@ void FUN_0058a240(void)
   while (piVar3 = piVar1, piVar3 != piVar5) {
     piVar1 = (int *)*piVar3;
     iVar6 = FUN_00545210();
-    if ((10 < iVar6) && (iVar6 = FUN_0040db20(in_EAX), iVar6 != 0)) {
+    if ((10 < iVar6) && (iVar6 = AABB_ClassifyAgainstFrustum(in_EAX), iVar6 != 0)) {
       if (300 < DAT_006f089c - piVar3[5]) {
         piVar2 = (int *)piVar3[1];
         piVar3[5] = DAT_006f089c;

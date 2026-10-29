@@ -1168,7 +1168,7 @@ void FUN_00692190(void)
 void FUN_006921b0(void)
 
 {
-  FUN_0053e480(0x80,FUN_00540580,FUN_005405b0,FUN_005405d0,FUN_00540620);
+  FUN_0053e480(0x80,FUN_00540580,Solid_InitIteratorPtrs,FUN_005405d0,FUN_00540620);
   _atexit(FUN_00696760);
   return;
 }
@@ -1290,7 +1290,8 @@ void FUN_00692310(void)
 void FUN_00692330(void)
 
 {
-  FUN_0053e480(0x80,TexturePack__SectionUnmap,FUN_005405b0,TexturePack__SectionHeader,FUN_00546170);
+  FUN_0053e480(0x80,TexturePack__SectionUnmap,Solid_InitIteratorPtrs,TexturePack__SectionHeader,
+               FUN_00546170);
   _atexit(FUN_00696820);
   return;
 }

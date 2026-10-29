@@ -48,9 +48,11 @@ LAB_00501163:
 }
 
 
-// ==== 0x5011e0 FUN_005011e0
+// ==== 0x5011e0 FEPackage::ReadResourceRequests
 
-uint FUN_005011e0(uint *param_1)
+/* [canon] assets med (ghidra-canon) docs/re/runtime.md */
+
+uint FEPackage__ReadResourceRequests(uint *param_1)
 
 {
   int *piVar1;
@@ -248,7 +250,7 @@ LAB_005015fd:
       if (param_1[3] != 0) {
         iVar4 = *(int *)(param_1[3] + 0x18);
         if (iVar4 == 4) {
-          FUN_004fddb0();
+          FEListBox__RecalculateCummulative();
         }
         else if (iVar4 == 6) {
           FEGrid_ForEachCellInRect();
@@ -278,10 +280,10 @@ LAB_005015fd:
           } while ((uint)bVar8 < *(uint *)(iVar5 + 0x1c));
         }
         if (param_1[5] == 0) {
-          FUN_00500820();
+          FEPackage__AddObject();
         }
         else {
-          FUN_004fbc30();
+          FEGroup__AddChild();
         }
       }
     }
@@ -326,7 +328,7 @@ int FUN_00501610(int param_1)
   default:
     pvVar1 = _malloc(0x58);
     if (pvVar1 != (void *)0x0) {
-      iVar2 = FUN_004febb0();
+      iVar2 = FEObject__FEObject();
       goto LAB_00501736;
     }
     break;
@@ -475,7 +477,7 @@ uint FUN_005017d0(int *param_1,ushort *param_2,int param_3)
           else {
             iVar5 = (**(code **)(*(int *)*piVar1 + 4))(1);
           }
-          FUN_004fefb0();
+          FEObject__SetName();
           *(undefined4 *)(iVar5 + 0xc) = *(undefined4 *)(param_1[3] + 0xc);
           *(undefined4 *)(iVar5 + 0x10) = *(undefined4 *)(param_1[3] + 0x10);
           *(undefined4 *)(iVar5 + 0x1c) = *(undefined4 *)(param_1[3] + 0x1c);
@@ -520,7 +522,7 @@ uint FUN_005017d0(int *param_1,ushort *param_2,int param_3)
     }
     else if (uVar2 == 0x6e4f) {
       if (*(char *)((int)param_1 + 9) != '\0') {
-        FUN_004fefb0();
+        FEObject__SetName();
       }
     }
     else if (uVar2 == 0x744f) {
@@ -645,21 +647,21 @@ void FUN_00501b80(int param_1)
         *(undefined4 *)(param_1 + 0x2c) = 0xffffffff;
         *(undefined4 *)(param_1 + 0x28) = 0xffffffff;
         *(undefined4 *)(param_1 + 0x24) = 0xffffffff;
-        FUN_004ff690();
-        FUN_004ff6c0();
+        FEListBox__SetCurrentColumn();
+        FEListBox__SetCurrentRow();
         return;
       }
       if (uVar4 == 0x5443) {
-        FUN_004fd770();
+        FEListBox__SetCellType();
         return;
       }
       if (uVar4 == 0x6343) {
         piVar1 = (int *)(param_1 + 0x2c);
         *piVar1 = *piVar1 + 1;
         if (*piVar1 != 0) {
-          FUN_004fd840();
+          FEListBox__IncrementCellByColumn();
         }
-        FUN_00503f30(*(undefined4 *)(in_EAX + 2));
+        FEColor__FEColor(*(undefined4 *)(in_EAX + 2));
         FUN_00500870();
         return;
       }
@@ -674,22 +676,22 @@ void FUN_00501b80(int param_1)
     }
     else {
       if (uVar4 == 0x6943) {
-        FUN_005008d0();
+        FEListBox__SetCellImageUV();
         return;
       }
       if (uVar4 == 0x7243) {
-        FUN_004ff6f0(0,0,*(undefined4 *)(in_EAX + 2));
+        FEListBox__SetCellResource(0,0,*(undefined4 *)(in_EAX + 2));
         return;
       }
     }
   }
   else if (uVar4 < 0x7444) {
     if (uVar4 == 0x7443) {
-      FUN_004fd7c0();
+      FEListBox__SetCellString();
       return;
     }
     if (uVar4 == 0x7343) {
-      FUN_005008a0();
+      FEListBox__SetCurrentCellScale();
       return;
     }
     if (uVar4 == 0x734c) {
@@ -733,8 +735,9 @@ void __fastcall FUN_00501da0(undefined4 param_1,ushort *param_2)
   iVar3 = *(int *)(in_EAX + 0xc);
   if (uVar2 < 0x6a4d) {
     if (uVar2 == 0x6a4c) {
-      FUN_004fbaa0(0,0,*(undefined4 *)(param_2 + 2),*(undefined4 *)(iVar3 + 0x5c),
-                   *(undefined4 *)(iVar3 + 0x60));
+      FECodeListBox__SetCellJustification
+                (0,0,*(undefined4 *)(param_2 + 2),*(undefined4 *)(iVar3 + 0x5c),
+                 *(undefined4 *)(iVar3 + 0x60));
       return;
     }
     if (uVar2 == 0x444c) {
@@ -746,15 +749,17 @@ void __fastcall FUN_00501da0(undefined4 param_1,ushort *param_2)
       return;
     }
     if (uVar2 == 0x6343) {
-      FUN_004fb9e0(0,0,*(undefined4 *)(param_2 + 2),*(undefined4 *)(iVar3 + 0x5c),
-                   *(undefined4 *)(iVar3 + 0x60));
+      FECodeListBox__SetCellColor
+                (0,0,*(undefined4 *)(param_2 + 2),*(undefined4 *)(iVar3 + 0x5c),
+                 *(undefined4 *)(iVar3 + 0x60));
       return;
     }
   }
   else if (uVar2 == 0x7343) {
     local_8 = *(undefined4 *)(param_2 + 2);
     local_4 = *(undefined4 *)(param_2 + 4);
-    FUN_004fba30(0,0,&local_8,*(undefined4 *)(iVar3 + 0x5c),*(undefined4 *)(iVar3 + 0x60));
+    FECodeListBox__SetCellScale
+              (0,0,&local_8,*(undefined4 *)(iVar3 + 0x5c),*(undefined4 *)(iVar3 + 0x60));
   }
   else {
     if (uVar2 == 0x744c) {
@@ -843,12 +848,12 @@ undefined4 FUN_00501ea0(int param_1,ushort *param_2,undefined4 *param_3)
           cVar6 = cVar6 + ((byte)puVar14[1] >> 2);
         }
         else if (uVar1 == 0x4953) {
-          param_3 = (undefined4 *)FUN_004ff010();
+          param_3 = (undefined4 *)FEObject__FindScript();
           puVar14 = (undefined1 *)0x0;
         }
         else if (uVar1 == 0x5645) {
           uVar15 = param_2[1] / 0xc;
-          FUN_004fbaf0(param_3 + 9,uVar15);
+          FEListEntryArray__SetCount(param_3 + 9,uVar15);
           puVar8 = (undefined4 *)param_3[10];
           puVar16 = param_2 + 2;
           do {
@@ -959,7 +964,7 @@ undefined4 FUN_00501ea0(int param_1,ushort *param_2,undefined4 *param_3)
         param_3[8] = 0;
         param_3[4] = 0;
         if (*(char *)(param_1 + 10) != '\0') {
-          FUN_00502b90();
+          FEScript__SetName();
         }
         local_20 = -1;
         cVar6 = '\0';
@@ -968,11 +973,11 @@ undefined4 FUN_00501ea0(int param_1,ushort *param_2,undefined4 *param_3)
         param_3[0xc] = *(undefined4 *)(param_2 + 2);
         param_3[3] = *(undefined4 *)(param_2 + 4);
         param_3[5] = *(undefined4 *)(param_2 + 6);
-        FUN_00502bf0(param_3);
+        FEScript__SetTrackCount(param_3);
       }
       else if (uVar1 == 0x6954) {
         if ((param_3 != (undefined4 *)0x0) &&
-           (puVar14 = (undefined1 *)FUN_00502c90(), puVar14 == (undefined1 *)0x0)) {
+           (puVar14 = (undefined1 *)FEScript__FindTrack(), puVar14 == (undefined1 *)0x0)) {
           iVar12 = param_3[7] + 1;
           piVar10 = _malloc(iVar12 * 0x38 + 4);
           local_4 = 0;
@@ -982,11 +987,12 @@ undefined4 FUN_00501ea0(int param_1,ushort *param_2,undefined4 *param_3)
           else {
             local_24 = piVar10 + 1;
             *piVar10 = iVar12;
-            eh_vector_constructor_iterator(local_24,0x38,iVar12,FUN_005006f0,FUN_00502450);
+            eh_vector_constructor_iterator(local_24,0x38,iVar12,FEKeyTrack__FEKeyTrack,FUN_00502450)
+            ;
           }
           local_4 = 0xffffffff;
-          FUN_00503df0();
-          iVar11 = FUN_005006a0();
+          FETypeLib__FindType();
+          iVar11 = FETypeNode__GetFieldAt();
           iVar12 = param_3[8];
           local_28 = 0;
           local_18 = 0;
@@ -1124,7 +1130,7 @@ undefined4 FUN_005024b0(int param_1,ushort *param_2,char param_3)
     uVar2 = *puVar1;
     if (uVar2 < 0x7353) {
       if (uVar2 == 0x7352) {
-        FUN_004fe2e0(param_2);
+        Variant_SetString(param_2);
       }
       else if (uVar2 == 0x434d) {
         FUN_004fe3d0(puVar7,*(undefined4 *)(puVar1 + 2));
@@ -1139,7 +1145,8 @@ undefined4 FUN_005024b0(int param_1,ushort *param_2,char param_3)
           if (puVar7 != (undefined4 *)0x0) {
             pvVar3 = (void *)puVar7[5];
             if (pvVar3 != (void *)0x0) {
-              eh_vector_destructor_iterator(pvVar3,0xc,*(int *)((int)pvVar3 + -4),FUN_004fe230);
+              eh_vector_destructor_iterator
+                        (pvVar3,0xc,*(int *)((int)pvVar3 + -4),FEResponse__ReleaseParam);
               _free((void *)((int)pvVar3 + -4));
             }
             puVar7[5] = 0;
@@ -1161,7 +1168,7 @@ undefined4 FUN_005024b0(int param_1,ushort *param_2,char param_3)
           iVar6 = -1;
         }
         else {
-          FUN_005007d0();
+          FEPackage__AddResponse();
           iVar6 = -1;
         }
       }
@@ -1232,7 +1239,7 @@ undefined4 FUN_00502650(int *param_1)
           if (piVar7 != (int *)0x0) {
             piVar5 = piVar7 + 1;
             *piVar7 = iVar2;
-            eh_vector_constructor_iterator(piVar5,0x10,iVar2,FUN_004fe960,FUN_004fe970);
+            eh_vector_constructor_iterator(piVar5,0x10,iVar2,FEEventList__FEEventList,FUN_004fe970);
           }
           local_4 = 0xffffffff;
           *(int **)(*piVar4 + 100) = piVar5;
@@ -1241,7 +1248,7 @@ undefined4 FUN_00502650(int *param_1)
           uVar1 = *(ushort *)((int)piVar10 + 2);
           *(int *)(*(int *)(*piVar4 + 100) + (int)param_1) = piVar10[1];
           uVar8 = (uVar1 >> 2) - 1;
-          FUN_004fe980(*(int *)(*piVar4 + 100) + (int)param_1,uVar8);
+          FEEventList__SetCount(*(int *)(*piVar4 + 100) + (int)param_1,uVar8);
           local_28 = 0;
           if (uVar8 != 0) {
             do {
@@ -1252,7 +1259,7 @@ undefined4 FUN_00502650(int *param_1)
               iVar9 = iVar2 + (int)param_1;
               local_4 = 0xffffffff;
               if (*(int *)(iVar2 + 8 + (int)param_1) == iVar3) {
-                FUN_004fe980(iVar9,iVar3 + 1);
+                FEEventList__SetCount(iVar9,iVar3 + 1);
               }
               *(undefined4 *)(*(int *)(iVar9 + 0xc) + *(int *)(iVar9 + 8) * 4) = 0;
               local_28 = local_28 + 1;
@@ -1298,7 +1305,7 @@ bool FUN_00502840(int *param_1,int *param_2,int *param_3)
       }
     }
     if (piVar2 + uVar3 * 3 != (int *)0x0) {
-      iVar4 = FUN_004ef000();
+      iVar4 = UIList__FindNodeByNameHash();
       *param_3 = iVar4;
       if (iVar4 != 0) {
         iVar4 = FUN_004ffbe0();
@@ -1311,9 +1318,11 @@ bool FUN_00502840(int *param_1,int *param_2,int *param_3)
 }
 
 
-// ==== 0x5028d0 FUN_005028d0
+// ==== 0x5028d0 FEScript::_FEScript
 
-void __fastcall FUN_005028d0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+mw) docs/re/hud.md */
+
+void __fastcall FEScript___FEScript(undefined4 *param_1)
 
 {
   void *pvVar1;
@@ -1375,11 +1384,11 @@ undefined4 * FUN_00502970(undefined4 *param_1,int param_2,char param_3)
   param_1[7] = 0;
   param_1[8] = 0;
   local_4 = 1;
-  FUN_00502b90();
+  FEScript__SetName();
   param_1[3] = *(undefined4 *)(param_2 + 0xc);
   param_1[4] = *(undefined4 *)(param_2 + 0x10);
   param_1[5] = *(undefined4 *)(param_2 + 0x14);
-  FUN_00502bf0(param_1);
+  FEScript__SetTrackCount(param_1);
   if (param_3 == '\0') {
     if (param_1[7] != 0) {
       iVar4 = 0;
@@ -1439,7 +1448,7 @@ undefined4 * FUN_00502970(undefined4 *param_1,int param_2,char param_3)
       } while (_param_3 < (uint)param_1[7]);
     }
   }
-  FUN_004fbaf0(param_1 + 9,*(undefined4 *)(param_2 + 0x24));
+  FEListEntryArray__SetCount(param_1 + 9,*(undefined4 *)(param_2 + 0x24));
   puVar5 = *(undefined4 **)(param_2 + 0x28);
   puVar6 = (undefined4 *)param_1[10];
   for (uVar3 = param_1[9] * 3 & 0x3fffffff; uVar3 != 0; uVar3 = uVar3 - 1) {
@@ -1470,9 +1479,11 @@ void FUN_00502b70(void)
 }
 
 
-// ==== 0x502b90 FUN_00502b90
+// ==== 0x502b90 FEScript::SetName
 
-void FUN_00502b90(void)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void FEScript__SetName(void)
 
 {
   char cVar1;
@@ -1507,9 +1518,11 @@ void FUN_00502b90(void)
 }
 
 
-// ==== 0x502bf0 FUN_00502bf0
+// ==== 0x502bf0 FEScript::SetTrackCount
 
-void FUN_00502bf0(int param_1)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void FEScript__SetTrackCount(int param_1)
 
 {
   void *pvVar1;
@@ -1541,7 +1554,7 @@ void FUN_00502bf0(int param_1)
     else {
       piVar3 = piVar2 + 1;
       *piVar2 = unaff_ESI;
-      eh_vector_constructor_iterator(piVar3,0x38,unaff_ESI,FUN_005006f0,FUN_00502450);
+      eh_vector_constructor_iterator(piVar3,0x38,unaff_ESI,FEKeyTrack__FEKeyTrack,FUN_00502450);
     }
     *(int **)(param_1 + 0x20) = piVar3;
   }
@@ -1550,9 +1563,11 @@ void FUN_00502bf0(int param_1)
 }
 
 
-// ==== 0x502c90 FUN_00502c90
+// ==== 0x502c90 FEScript::FindTrack
 
-int __fastcall FUN_00502c90(undefined4 param_1,int param_2)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+int __fastcall FEScript__FindTrack(undefined4 param_1,int param_2)
 
 {
   int in_EAX;
@@ -1601,7 +1616,7 @@ void FUN_00502cd0(void)
     iVar3 = 0;
   }
   else {
-    iVar3 = FUN_00502dd0(pvVar2);
+    iVar3 = FEScript__StaticPoolInit(pvVar2);
   }
   if (iVar3 != 0) {
     iVar1 = *(int *)(unaff_EDI + 8);
@@ -1656,9 +1671,11 @@ void FUN_00502d80(void)
 }
 
 
-// ==== 0x502dd0 FUN_00502dd0
+// ==== 0x502dd0 FEScript::StaticPoolInit
 
-undefined4 * FUN_00502dd0(undefined4 *param_1)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+undefined4 * FEScript__StaticPoolInit(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -1677,7 +1694,7 @@ undefined4 * FUN_00502dd0(undefined4 *param_1)
   param_1[2] = 0xabadcafe;
   local_4 = 0;
   *param_1 = &PTR_FUN_006c17b8;
-  eh_vector_constructor_iterator(param_1 + 3,0x34,0x20,FUN_00500760,FUN_005028d0);
+  eh_vector_constructor_iterator(param_1 + 3,0x34,0x20,FEScript__FEScript,FEScript___FEScript);
   param_1[0x1a3] = &PTR_FUN_006c2c4c;
   param_1[0x1a5] = 0;
   param_1[0x1a6] = 0;
@@ -1835,7 +1852,7 @@ void FUN_00502fd0(undefined4 *param_1)
   param_1[0x1a3] = &PTR_FUN_006c2c4c;
   FUN_004ee5e0();
   local_4 = local_4 & 0xffffff00;
-  eh_vector_destructor_iterator(param_1 + 3,0x34,0x20,FUN_005028d0);
+  eh_vector_destructor_iterator(param_1 + 3,0x34,0x20,FEScript___FEScript);
   *param_1 = &PTR_FUN_006c2c50;
   ExceptionList = local_c;
   return;
@@ -1855,9 +1872,11 @@ void * __thiscall FUN_005030b0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x5030d0 FUN_005030d0
+// ==== 0x5030d0 FESlotNode::FESlotNode
 
-void FUN_005030d0(void)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void FESlotNode__FESlotNode(void)
 
 {
   ushort in_AX;
@@ -1877,9 +1896,11 @@ void FUN_005030d0(void)
 }
 
 
-// ==== 0x503110 FUN_00503110
+// ==== 0x503110 FESlotNode::_FESlotNode
 
-void FUN_00503110(void)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void FESlotNode___FESlotNode(void)
 
 {
   undefined4 *unaff_ESI;
@@ -1896,7 +1917,7 @@ void FUN_00503110(void)
 void * __thiscall FUN_00503130(void *param_1,byte param_2)
 
 {
-  FUN_00503110();
+  FESlotNode___FESlotNode();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -1938,9 +1959,11 @@ void FUN_00503170(undefined4 *param_1)
 }
 
 
-// ==== 0x5031c0 FUN_005031c0
+// ==== 0x5031c0 FESlotNode::AllocBlock
 
-int FUN_005031c0(void)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+int FESlotNode__AllocBlock(void)
 
 {
   char *pcVar1;
@@ -1992,7 +2015,7 @@ void FUN_00503250(void)
     iVar3 = 0;
   }
   else {
-    iVar3 = FUN_005030d0();
+    iVar3 = FESlotNode__FESlotNode();
   }
   if (iVar3 != 0) {
     iVar1 = *(int *)(unaff_EDI + 0x14);
@@ -2008,7 +2031,7 @@ void FUN_00503250(void)
     *(int *)(unaff_EDI + 0x10) = *(int *)(unaff_EDI + 0x10) + 1;
   }
 LAB_005032b4:
-  FUN_005031c0();
+  FESlotNode__AllocBlock();
   return;
 }
 
@@ -2149,7 +2172,7 @@ undefined4 * FUN_00503410(void)
     puVar2[5] = &PTR_FUN_006c2c4c;
     puVar6 = puVar2;
   }
-  FUN_004fd180();
+  FENode__SetName();
   FUN_00503ed0(puVar6);
   FUN_00503ed0(puVar6);
   FUN_00503ed0(puVar6);
@@ -2788,9 +2811,11 @@ undefined4 FUN_005037e0(int param_1)
 }
 
 
-// ==== 0x503df0 FUN_00503df0
+// ==== 0x503df0 FETypeLib::FindType
 
-void __fastcall FUN_00503df0(int param_1)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void __fastcall FETypeLib__FindType(int param_1)
 
 {
   int iVar1;
@@ -2803,9 +2828,11 @@ void __fastcall FUN_00503df0(int param_1)
 }
 
 
-// ==== 0x503e10 FUN_00503e10
+// ==== 0x503e10 FEFieldNode::_FEFieldNode
 
-void FUN_00503e10(void)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void FEFieldNode___FEFieldNode(void)
 
 {
   undefined4 *unaff_ESI;
@@ -2826,7 +2853,7 @@ void FUN_00503e10(void)
 void * __thiscall FUN_00503e40(void *param_1,byte param_2)
 
 {
-  FUN_00503e10();
+  FEFieldNode___FEFieldNode();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -2834,9 +2861,11 @@ void * __thiscall FUN_00503e40(void *param_1,byte param_2)
 }
 
 
-// ==== 0x503e60 FUN_00503e60
+// ==== 0x503e60 FETypeNode::AddField
 
-void __fastcall FUN_00503e60(undefined4 param_1,int param_2)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void __fastcall FETypeNode__AddField(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -2899,17 +2928,19 @@ void FUN_00503ed0(void)
     *puVar1 = &PTR_FUN_006c16b0;
     puVar2 = puVar1;
   }
-  FUN_004fd180();
+  FENode__SetName();
   puVar2[5] = unaff_EBX;
   puVar2[6] = *(undefined4 *)(&DAT_006b6718 + unaff_EBX * 4);
-  FUN_00503e60();
+  FETypeNode__AddField();
   return;
 }
 
 
-// ==== 0x503f30 FUN_00503f30
+// ==== 0x503f30 FEColor::FEColor
 
-void FUN_00503f30(uint param_1)
+/* [canon] hud med (ghidra-canon) docs/re/hud.md */
+
+void FEColor__FEColor(uint param_1)
 
 {
   uint *in_EAX;
@@ -4249,7 +4280,7 @@ void __thiscall GarageScreen__NotificationMessage(int param_1,uint param_2,undef
     if (param_2 < 0xc519bfc4) {
       if (param_2 == 0xc519bfc3) {
         FUN_004f8340(*(undefined4 *)(param_1 + 0xc));
-        FUN_004b9240();
+        GenericDialogData__GenericDialogData();
         if (DAT_00777b4c == 1) {
           local_38 = -0x45ad421f;
         }
@@ -4902,9 +4933,11 @@ undefined4 CreateGarageCategoryVisual(undefined4 param_1)
 }
 
 
-// ==== 0x506160 FUN_00506160
+// ==== 0x506160 GarageCategoryVisual::IsWidebodyInstalled
 
-uint FUN_00506160(void)
+/* [canon] car med (ghidra-canon) docs/re/tuning.md */
+
+uint GarageCategoryVisual__IsWidebodyInstalled(void)
 
 {
   byte bVar1;
@@ -5463,7 +5496,7 @@ void GarageCategoryVisual__RefreshGrayedThumbsForWidebodyConflict(void)
   int in_EAX;
   int *piVar3;
   
-  cVar2 = FUN_00506160();
+  cVar2 = GarageCategoryVisual__IsWidebodyInstalled();
   puVar1 = *(undefined4 **)(in_EAX + 0x44);
   piVar3 = *(int **)(in_EAX + 0x50);
   if (piVar3 != (int *)(in_EAX + 0x50)) {
@@ -5570,7 +5603,7 @@ void FUN_00506f30(void)
   int iVar4;
   
   iVar3 = *(int *)(in_EAX + 0x40);
-  cVar2 = FUN_00506160();
+  cVar2 = GarageCategoryVisual__IsWidebodyInstalled();
   if (((cVar2 == '\0') || (*(int *)(iVar3 + 8) < 0)) || (2 < *(int *)(iVar3 + 8))) {
     if (*(int *)(iVar3 + 0x10) != 0) {
       uVar1 = *(undefined4 *)(iVar3 + 8);
@@ -5663,9 +5696,9 @@ void __thiscall FUN_00507070(int param_1,uint param_2)
       if (iVar2 < 1) {
         return;
       }
-      cVar1 = FUN_00506160();
+      cVar1 = GarageCategoryVisual__IsWidebodyInstalled();
       if (((cVar1 != '\0') && (-1 < iVar3)) && (iVar3 < 3)) {
-        FUN_004b9240();
+        GenericDialogData__GenericDialogData();
         local_14 = 0;
         local_10 = 0;
         local_3c = 0x16a674de;
@@ -6059,7 +6092,7 @@ void FUN_00507540(undefined4 *param_1,undefined4 param_2)
 LAB_0050768a:
   uVar3 = local_1c[4];
   if (iVar9 == 0xc) {
-    cVar6 = FUN_00506160();
+    cVar6 = GarageCategoryVisual__IsWidebodyInstalled();
     puVar14 = DAT_0073ad40;
     if (cVar6 == '\0') {
 LAB_005077db:
@@ -7495,7 +7528,7 @@ LAB_0050969d:
       if (((iVar8 == 8) || (iVar8 == 5)) || (iVar8 == -1)) {
 LAB_00509733:
         if ((iVar7 != 0) && (*(int *)(iVar7 + 0x18) < 0x100)) {
-          cVar5 = FUN_004feb50();
+          cVar5 = FEColor_NearlyEqual();
           if (cVar5 == '\0') {
             *(uint *)(iVar7 + 0x1c) = *(uint *)(iVar7 + 0x1c) | 0x400000;
           }
@@ -7517,7 +7550,7 @@ LAB_00509774:
         }
 LAB_00509951:
         if ((iVar7 != 0) && (*(int *)(iVar7 + 0x18) < 0x100)) {
-          cVar5 = FUN_004feb50();
+          cVar5 = FEColor_NearlyEqual();
           if (cVar5 == '\0') {
             *(uint *)(iVar7 + 0x1c) = *(uint *)(iVar7 + 0x1c) | 0x400000;
           }
@@ -13508,7 +13541,7 @@ switchD_00510372_caseD_0:
   local_5 = '\x01';
   bVar2 = false;
   DAT_00735748 = uVar8;
-  cVar3 = FUN_00506160();
+  cVar3 = GarageCategoryVisual__IsWidebodyInstalled();
   bVar7 = cVar3 != '\0';
   switch(uVar8) {
   case 0:
@@ -14148,7 +14181,7 @@ undefined4 * GarageDecalsSlot__GarageDecalsSlot(undefined4 *param_1,uint param_2
   if (((iVar5 != 0) && (*(int *)(iVar5 + 0x18) != 0)) && (*(int **)(iVar5 + 0x14) != (int *)0x0)) {
     (**(code **)(**(int **)(iVar5 + 0x14) + 8))(0xe8e61aab,0,0,*(int *)(iVar5 + 0x18));
   }
-  cVar4 = FUN_00506160();
+  cVar4 = GarageCategoryVisual__IsWidebodyInstalled();
   switch(DAT_00735748) {
   default:
     goto switchD_00510ffa_caseD_0;

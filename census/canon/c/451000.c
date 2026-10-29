@@ -12087,7 +12087,7 @@ LAB_0045ffb0:
      (piVar6 = *(int **)(iVar5 + 0x2c),
      _DAT_006ffff0 <= *(float *)(*(int *)(*(int *)(iVar5 + 0x34) + 0x48) + 0x8c))) {
     *pfVar8 = 0.0;
-    cVar9 = FUN_00465430();
+    cVar9 = CarState__IsNitrousOn();
     if (cVar9 != '\0') {
       CarState__StopTimer();
       (**(code **)(*piVar6 + 0x80))();
@@ -12262,9 +12262,11 @@ LAB_0046021a:
 }
 
 
-// ==== 0x460230 FUN_00460230
+// ==== 0x460230 DragDriver::GetPort
 
-void __fastcall FUN_00460230(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__GetPort(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x00460238. Too many branches */
@@ -12274,9 +12276,11 @@ void __fastcall FUN_00460230(int param_1)
 }
 
 
-// ==== 0x460240 FUN_00460240
+// ==== 0x460240 DragDriver::SetJoystickPort
 
-void __fastcall FUN_00460240(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__SetJoystickPort(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x0046024c. Too many branches */
@@ -12286,9 +12290,11 @@ void __fastcall FUN_00460240(int param_1)
 }
 
 
-// ==== 0x460250 FUN_00460250
+// ==== 0x460250 DragDriver::EnableStartLineState
 
-void __fastcall FUN_00460250(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__EnableStartLineState(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x0046025c. Too many branches */
@@ -12298,9 +12304,11 @@ void __fastcall FUN_00460250(int param_1)
 }
 
 
-// ==== 0x460260 FUN_00460260
+// ==== 0x460260 DragDriver::DisableStartLineState
 
-void __fastcall FUN_00460260(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__DisableStartLineState(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x0046026c. Too many branches */
@@ -12310,9 +12318,11 @@ void __fastcall FUN_00460260(int param_1)
 }
 
 
-// ==== 0x460270 FUN_00460270
+// ==== 0x460270 DragDriver::SetSportGear
 
-void __fastcall FUN_00460270(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__SetSportGear(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x0046027c. Too many branches */
@@ -12322,9 +12332,11 @@ void __fastcall FUN_00460270(int param_1)
 }
 
 
-// ==== 0x460280 FUN_00460280
+// ==== 0x460280 DragDriver::GetSportGear
 
-void __fastcall FUN_00460280(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__GetSportGear(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x00460288. Too many branches */
@@ -12334,9 +12346,11 @@ void __fastcall FUN_00460280(int param_1)
 }
 
 
-// ==== 0x460290 FUN_00460290
+// ==== 0x460290 DragDriver::SetDesiredGear
 
-void __fastcall FUN_00460290(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__SetDesiredGear(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x0046029c. Too many branches */
@@ -12346,9 +12360,11 @@ void __fastcall FUN_00460290(int param_1)
 }
 
 
-// ==== 0x4602a0 FUN_004602a0
+// ==== 0x4602a0 DragDriver::GetDesiredGear
 
-void __fastcall FUN_004602a0(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__GetDesiredGear(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x004602a8. Too many branches */
@@ -12358,9 +12374,11 @@ void __fastcall FUN_004602a0(int param_1)
 }
 
 
-// ==== 0x4602b0 FUN_004602b0
+// ==== 0x4602b0 DragDriver::SetLowGear
 
-void __fastcall FUN_004602b0(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall DragDriver__SetLowGear(int param_1)
 
 {
                     /* WARNING: Could not recover jumptable at 0x004602bc. Too many branches */
@@ -12477,9 +12495,11 @@ void __thiscall FUN_00460450(int param_1,int param_2)
 }
 
 
-// ==== 0x4604d0 FUN_004604d0
+// ==== 0x4604d0 DragDriver::AddJoyHandlers
 
-void __fastcall FUN_004604d0(int *param_1)
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall DragDriver__AddJoyHandlers(int *param_1)
 
 {
   (**(code **)(param_1[0x94] + 0x14))();

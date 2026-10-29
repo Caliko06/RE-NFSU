@@ -2880,7 +2880,7 @@ LAB_004e49a4:
   }
 LAB_004e4a53:
   if (DAT_00735df4 != '\0') {
-    FUN_004aa970(&DAT_007588c4,DAT_00758ad4);
+    ThresholdTable_MarkReached(&DAT_007588c4,DAT_00758ad4);
     DAT_00735df4 = '\0';
   }
   FUN_005043f0("MU_GarageVinylGroup.fng");
@@ -2973,7 +2973,7 @@ LAB_004e49a4:
     GarageManager__InstallPart(piVar6,0);
   }
   if (DAT_00735df4 != '\0') {
-    FUN_004aa970(&DAT_007588c4);
+    ThresholdTable_MarkReached(&DAT_007588c4);
     DAT_00735df4 = '\0';
   }
   FUN_005043f0();
@@ -7980,7 +7980,7 @@ void __thiscall FUN_004eb1e0(int param_1,uint param_2,int param_3)
       }
     }
     else if (param_2 == 0xabc08912) {
-      cVar1 = FUN_004b2af0();
+      cVar1 = Career__IsFinalEventWon();
       if (cVar1 != '\0') {
         FUN_00415510(0x60606060);
         FUN_00415510(0x60606060);
@@ -10220,7 +10220,7 @@ void FUN_004edb30(void)
   iVar1 = *(int *)(unaff_EBX + 0x5c + unaff_EDI * 4);
   if (in_AL == '\0') {
     if (*(int *)(iVar1 + 0x18) < 0x100) {
-      cVar2 = FUN_004feb50();
+      cVar2 = FEColor_NearlyEqual();
       if (cVar2 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -10228,7 +10228,7 @@ void FUN_004edb30(void)
     }
     iVar1 = *(int *)(unaff_EBX + 0x118 + unaff_EDI * 4);
     if (*(int *)(iVar1 + 0x18) < 0x100) {
-      cVar2 = FUN_004feb50();
+      cVar2 = FEColor_NearlyEqual();
       if (cVar2 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -10237,7 +10237,7 @@ void FUN_004edb30(void)
   }
   else {
     if (*(int *)(iVar1 + 0x18) < 0x100) {
-      cVar2 = FUN_004feb50();
+      cVar2 = FEColor_NearlyEqual();
       if (cVar2 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -10245,7 +10245,7 @@ void FUN_004edb30(void)
     }
     iVar1 = *(int *)(unaff_EBX + 0x118 + unaff_EDI * 4);
     if (*(int *)(iVar1 + 0x18) < 0x100) {
-      cVar2 = FUN_004feb50();
+      cVar2 = FEColor_NearlyEqual();
       if (cVar2 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -10271,7 +10271,7 @@ void FUN_004edc10(void)
   iVar1 = *(int *)(unaff_EBX + 0x1d4 + unaff_EDI * 4);
   if (in_AL == '\0') {
     if (*(int *)(iVar1 + 0x18) < 0x100) {
-      cVar2 = FUN_004feb50();
+      cVar2 = FEColor_NearlyEqual();
       if (cVar2 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -10279,7 +10279,7 @@ void FUN_004edc10(void)
     }
     iVar1 = *(int *)(unaff_EBX + 0x1e8 + unaff_EDI * 4);
     if (*(int *)(iVar1 + 0x18) < 0x100) {
-      cVar2 = FUN_004feb50();
+      cVar2 = FEColor_NearlyEqual();
       if (cVar2 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -10288,7 +10288,7 @@ void FUN_004edc10(void)
   }
   else {
     if (*(int *)(iVar1 + 0x18) < 0x100) {
-      cVar2 = FUN_004feb50();
+      cVar2 = FEColor_NearlyEqual();
       if (cVar2 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -10296,7 +10296,7 @@ void FUN_004edc10(void)
     }
     iVar1 = *(int *)(unaff_EBX + 0x1e8 + unaff_EDI * 4);
     if (*(int *)(iVar1 + 0x18) < 0x100) {
-      cVar2 = FUN_004feb50();
+      cVar2 = FEColor_NearlyEqual();
       if (cVar2 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -11277,7 +11277,7 @@ void FEObjectPool_Allocate(int param_1)
       pvVar1 = (void *)0x0;
     }
     else {
-      CallNTimes(pvVar1,0x88,(uint)unaff_BL,FUN_004fbdd0);
+      CallNTimes(pvVar1,0x88,(uint)unaff_BL,FEJoyPad__FEJoyPad);
     }
     *(void **)(param_1 + 8) = pvVar1;
   }
@@ -11435,7 +11435,7 @@ LAB_004eec74:
         return 1;
       }
       for (iVar2 = puVar7[0x1c]; iVar2 != 0; iVar2 = *(int *)(iVar2 + 4)) {
-        iVar5 = FUN_004ef000();
+        iVar5 = UIList__FindNodeByNameHash();
         if (iVar5 != 0) {
           iVar6 = *(int *)(iVar5 + 0x18) + -1;
           if (iVar6 < 1) {
@@ -11474,7 +11474,7 @@ void FUN_004eed80(void)
   
   cVar1 = (**(code **)(**(int **)(unaff_EDI + 0x10c) + 0x14))();
   if (cVar1 != '\0') {
-    FUN_004eefa0();
+    UIList__RemoveNode();
     if (*(int **)(unaff_EDI + 0x10c) == (int *)0x0) {
       cVar1 = '\x01';
     }
@@ -11602,9 +11602,11 @@ void __fastcall FUN_004eef40(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x4eefa0 FUN_004eefa0
+// ==== 0x4eefa0 UIList::RemoveNode
 
-void __fastcall FUN_004eefa0(int param_1)
+/* [canon] hud med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall UIList__RemoveNode(int param_1)
 
 {
   int in_EAX;
@@ -11630,9 +11632,11 @@ void __fastcall FUN_004eefa0(int param_1)
 }
 
 
-// ==== 0x4ef000 FUN_004ef000
+// ==== 0x4ef000 UIList::FindNodeByNameHash
 
-int FUN_004ef000(void)
+/* [canon] hud med (ghidra-canon) docs/re/runtime.md */
+
+int UIList__FindNodeByNameHash(void)
 
 {
   byte *pbVar1;
@@ -12426,7 +12430,7 @@ LAB_004f0151:
       if (((local_c & uVar5) != 0) && (param_1 == 0)) {
         if ((*(int *)(unaff_ESI + 0x94) == iVar1) && (iVar1 != 0)) {
           *(undefined4 *)(unaff_ESI + 0x94) = 0;
-          iVar9 = FUN_004ff1d0();
+          iVar9 = FEObject__FindResponse();
           if (iVar9 != 0) {
             FUN_004f0700(extraout_ECX,0,iVar6,iVar1,1);
             FUN_004f0700(0x936a6a7f,iVar1,iVar6,0xfffffffb,1);
@@ -12529,7 +12533,7 @@ void FUN_004f0390(void)
         FUN_004f04e0(iVar2,&stack0xffffff78,&local_48,0);
       }
       else {
-        FUN_004f0660(0);
+        FEObjectSorter__AddObject(0);
       }
     }
     FUN_004f16d0(puVar1);
@@ -12555,7 +12559,7 @@ FUN_004f04e0(char *param_1,int param_2,undefined4 param_3,undefined4 param_4,und
   iVar2 = *(int *)(param_2 + 0x2c);
   if ((*(int *)(iVar2 + 0xc) != 0) && ((*param_1 != '\0' || (-1 < *(int *)(param_2 + 0x1c))))) {
     FUN_004fde50();
-    FUN_004fe170();
+    Mat4_TransformPoint();
     local_48[0] = *(float *)(iVar2 + 0x24) + *(float *)(iVar2 + 0x18) + 0.0;
     FUN_004fdf40();
     FUN_004fdf40();
@@ -12568,7 +12572,7 @@ FUN_004f04e0(char *param_1,int param_2,undefined4 param_3,undefined4 param_4,und
         FUN_004f04e0(iVar2,local_48,param_2,uVar1);
       }
       else {
-        FUN_004f0660(uVar1);
+        FEObjectSorter__AddObject(uVar1);
       }
     }
   }
@@ -12576,9 +12580,11 @@ FUN_004f04e0(char *param_1,int param_2,undefined4 param_3,undefined4 param_4,und
 }
 
 
-// ==== 0x4f0660 FUN_004f0660
+// ==== 0x4f0660 FEObjectSorter::AddObject
 
-void __fastcall FUN_004f0660(int param_1,int param_2,undefined2 param_3)
+/* [canon] hud med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall FEObjectSorter__AddObject(int param_1,int param_2,undefined2 param_3)
 
 {
   int iVar1;
@@ -12706,7 +12712,7 @@ void FUN_004f0800(int param_1,int param_2)
   puVar3[7] = param_2;
   puVar3[6] = *(undefined4 *)(param_2 + 0x1c);
   puVar3[5] = 3;
-  FUN_004fd180();
+  FENode__SetName();
   iVar1 = *(int *)(param_1 + 0x4130);
   if (iVar1 == 0) {
     iVar2 = *(int *)(param_1 + 0x412c);
@@ -12791,7 +12797,7 @@ void UIListNode_Alloc(int param_1,int param_2,uint param_3)
   puVar4[7] = param_2;
   puVar4[6] = param_3;
   puVar4[5] = 2;
-  FUN_004fd180();
+  FENode__SetName();
   iVar1 = *(int *)(param_1 + 0x4130);
   if (iVar1 == 0) {
     iVar2 = *(int *)(param_1 + 0x412c);

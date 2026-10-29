@@ -10451,7 +10451,7 @@ void FUN_0056d8d0(int *param_1,undefined4 param_2,undefined4 param_3,uint param_
   if (iVar8 < 4) {
     return;
   }
-  iVar8 = FUN_0040db20(param_2);
+  iVar8 = AABB_ClassifyAgainstFrustum(param_2);
   if (iVar8 == 0) {
     return;
   }
@@ -10799,7 +10799,7 @@ void CarRenderInfo__Render
   puVar18 = param_1 + 4;
   piStack_990 = (int *)param_2;
   piStack_994 = (int *)0x56dee8;
-  iVar11 = FUN_0040db20();
+  iVar11 = AABB_ClassifyAgainstFrustum();
   if (iVar11 == 0) {
     return;
   }
@@ -11438,7 +11438,7 @@ LAB_0056f475:
       if (((param_9 == 0) && ((int)puVar18 < 2)) &&
          ((local_96c == 0 || ((*(uint *)(local_96c + 0xe0) >> ((iStack_964 != 3) << 1) & 3) < 2))))
       {
-        FUN_0053f660();
+        Solid_ReplaceTextureForHash();
         FUN_0040c910(param_2,param_1 + iStack_964 * 0x18 + (int)puVar18 * 6 + 0x39b,uStack_974,
                      local_970,0);
       }

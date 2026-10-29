@@ -341,7 +341,7 @@ void HudLapCounter__Update(int param_1)
     iVar2 = *(int *)(iVar4 + 0x24 + *(char *)(DAT_0073619c + 0x53e) * 4);
     if ((iVar2 == 0) || (iVar2 == 0x7fffffff)) {
 LAB_004a1a58:
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       goto LAB_004a1a65;
     }
     local_2c = (float)((iVar2 - DAT_0073ad34) + DAT_0078a310);
@@ -2211,7 +2211,7 @@ void HudWrongWay__Update(int param_1,int param_2)
   else {
     FUN_00439a50();
     if (0 < param_1) {
-      fVar6 = (float10)FUN_004f66f0();
+      fVar6 = (float10)FEString__SetLabelHash();
       FEObject__SetFormattedText("%1.1f",(double)fVar6);
       FEObject__SetVisible(*(undefined4 *)(param_1 + 0x28));
       goto LAB_004a3d3d;
@@ -3019,7 +3019,7 @@ LAB_004a4e67:
     if (*(char *)(iVar11 + 0x84) != '\0') goto LAB_004a4e67;
     if (*(int *)(local_34 + 0x3d8) == *(int *)(iVar11 + 0x7c)) goto LAB_004a4e5d;
     if (local_30 < _K_HALF == (local_30 == _K_HALF)) {
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       if (((((DAT_00777b4c == 1) && (DAT_0073619c != (int *)0x0)) && (*DAT_0073619c == 4)) &&
           ((*(char *)(iVar11 + 0xa1) == '\0' && (1 < *(int *)(local_34 + 0x3d8))))) &&
          (*(char *)(iVar11 + 0xa2) == '\x01')) {
@@ -3027,7 +3027,7 @@ LAB_004a4e67:
       }
     }
     else {
-      FUN_004f66f0();
+      FEString__SetLabelHash();
     }
     FEObject__SetScript("ZoomIn",1);
     FEObject__SetVisible(*(undefined4 *)(iVar11 + 0x70));
@@ -3059,13 +3059,13 @@ LAB_004a4ffd:
         ((*(char *)(iVar11 + 0x84) != '\0' || (*(char *)(iVar11 + 0x85) != '\0'))))))
     goto LAB_004a5128;
     if ((local_30 == 0.0) && (*(char *)(iVar11 + 0x86) == '\0')) {
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       FEObject__SetScript("ZoomIn",1);
       FEObject__SetVisible(*(undefined4 *)(iVar11 + 0x70));
       *(undefined1 *)(iVar11 + 0x86) = 1;
     }
     else if ((local_30 < 0.0) && (*(char *)(iVar11 + 0x87) == '\0')) {
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       FEObject__SetScript("ZoomIn",1);
       FEObject__SetVisible(*(undefined4 *)(iVar11 + 0x70));
       *(undefined1 *)(iVar11 + 0x87) = 1;
@@ -3078,7 +3078,7 @@ LAB_004a4ffd:
   }
   else {
     if (*(char *)(iVar11 + 0x85) != '\0') goto LAB_004a4f9b;
-    FUN_004f66f0();
+    FEString__SetLabelHash();
     FEObject__SetScript("ZoomIn",1);
     FEObject__SetVisible(*(undefined4 *)(iVar11 + 0x70));
     *(undefined1 *)(iVar11 + 0x85) = 1;
@@ -4049,7 +4049,7 @@ void FUN_004a64b0(int param_1)
       do {
         iVar5 = *piVar4;
         if ((iVar5 != 0) && (*(int *)(iVar5 + 0x18) < 0x100)) {
-          cVar3 = FUN_004feb50();
+          cVar3 = FEColor_NearlyEqual();
           if (cVar3 == '\0') {
             *(uint *)(iVar5 + 0x1c) = *(uint *)(iVar5 + 0x1c) | 0x400000;
           }
@@ -4243,7 +4243,7 @@ void HudSmokeApplause__Update(int param_1)
       }
       iVar1 = *(int *)(in_EAX + 0x24);
       if (*(int *)(iVar1 + 0x18) < 0x100) {
-        cVar3 = FUN_004feb50();
+        cVar3 = FEColor_NearlyEqual();
         if (cVar3 == '\0') {
           *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
         }
@@ -4266,7 +4266,7 @@ void HudSmokeApplause__Update(int param_1)
       local_14 = (uint)local_2c >> 0x18;
       local_20 = local_20 & 0xff;
       if (*(int *)(iVar1 + 0x18) < 0x100) {
-        cVar3 = FUN_004feb50();
+        cVar3 = FEColor_NearlyEqual();
         if (cVar3 == '\0') {
           *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
         }
@@ -4292,7 +4292,7 @@ void HudSmokeApplause__Update(int param_1)
         local_1c = local_28 >> 8 & 0xff;
         local_20 = local_20 & 0xff;
         if (*(int *)(iVar8 + 0x18) < 0x100) {
-          cVar3 = FUN_004feb50();
+          cVar3 = FEColor_NearlyEqual();
           if (cVar3 == '\0') {
             *(uint *)(iVar8 + 0x1c) = *(uint *)(iVar8 + 0x1c) | 0x400000;
           }
@@ -4739,7 +4739,7 @@ void HudSpeedTrapDrift__Update(int param_1)
       iVar3 = _ftol_nocw();
       if (iVar8 < 1) {
         FEObject__SetFormattedText(&DAT_006c6d7c);
-        FUN_004f66f0();
+        FEString__SetLabelHash();
         FUN_004f75b0(0xffffff00);
       }
       else {
@@ -4782,8 +4782,8 @@ void HudSpeedTrapDrift__Update(int param_1)
         }
       }
     }
-    FUN_004a7a10();
-    FUN_004a7aa0();
+    DriftGauge__UpdateCountdown();
+    DriftGauge__UpdateDriftMessage();
     if (((DAT_0078a345 != '\0') || (DAT_007361a4 != 0)) &&
        (*(int *)(*(int *)(param_1 + 0x960) + 0x10) == 3)) {
       uVar5 = _ftol_nocw();
@@ -4854,9 +4854,11 @@ void FUN_004a7990(int param_1,int param_2)
 }
 
 
-// ==== 0x4a7a10 FUN_004a7a10
+// ==== 0x4a7a10 DriftGauge::UpdateCountdown
 
-void __fastcall FUN_004a7a10(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+void __fastcall DriftGauge__UpdateCountdown(int param_1)
 
 {
   float fVar1;
@@ -4876,9 +4878,11 @@ void __fastcall FUN_004a7a10(int param_1)
 }
 
 
-// ==== 0x4a7aa0 FUN_004a7aa0
+// ==== 0x4a7aa0 DriftGauge::UpdateDriftMessage
 
-void __fastcall FUN_004a7aa0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+void __fastcall DriftGauge__UpdateDriftMessage(int param_1)
 
 {
   if (*(char *)(param_1 + 0xad) == '\0') {
@@ -5122,17 +5126,17 @@ LAB_004a7e18:
     }
     if ((sVar2 != 6) && (sVar2 != 7)) goto LAB_004a7f31;
   }
-  FUN_004f66f0();
+  FEString__SetLabelHash();
 LAB_004a7f31:
   cVar3 = FUN_0043a2e0();
   if (cVar3 != '\0') {
     if (sVar2 == 9) {
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       return;
     }
     if (sVar2 == 10) {
       IsFlag7346c8Set();
-      FUN_004f66f0();
+      FEString__SetLabelHash();
     }
   }
   return;
@@ -5193,7 +5197,7 @@ void FUN_004a8000(void)
     }
     FEObject__SetVisible(*(undefined4 *)(unaff_EDI + 0x20));
     if (extraout_EDX == 4) {
-      FUN_004f66f0();
+      FEString__SetLabelHash();
     }
     else {
       FEObject__SetFormattedText(&DAT_006ca778,extraout_EDX);
@@ -7392,9 +7396,11 @@ void FUN_004aa670(void)
 }
 
 
-// ==== 0x4aa970 FUN_004aa970
+// ==== 0x4aa970 ThresholdTable_MarkReached
 
-void FUN_004aa970(undefined4 param_1,int param_2)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void ThresholdTable_MarkReached(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -8197,9 +8203,11 @@ void FUN_004ab2b0(undefined4 *param_1)
 }
 
 
-// ==== 0x4ab470 FUN_004ab470
+// ==== 0x4ab470 cFrontendDatabase::IsTrackAvailableForRaceType
 
-uint FUN_004ab470(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+uint cFrontendDatabase__IsTrackAvailableForRaceType(void)
 
 {
   int iVar1;
@@ -8315,7 +8323,7 @@ int FUN_004ab5c0(void)
   iVar2 = 0;
   if (0 < DAT_0073616c) {
     do {
-      iVar2 = FUN_004ab470(&DAT_00748f70);
+      iVar2 = cFrontendDatabase__IsTrackAvailableForRaceType(&DAT_00748f70);
       if (iVar2 != 0) {
         local_4 = local_4 + 1;
       }
@@ -8327,9 +8335,11 @@ int FUN_004ab5c0(void)
 }
 
 
-// ==== 0x4ab640 FUN_004ab640
+// ==== 0x4ab640 FERaceEvent::HasMagazineReward
 
-uint __fastcall FUN_004ab640(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+uint __fastcall FERaceEvent__HasMagazineReward(int param_1)
 
 {
   uint uVar1;
@@ -8404,7 +8414,7 @@ LAB_004ab7e2:
           if (cVar4 == '\0') goto LAB_004ab771;
         }
         else if (cVar4 == '\0') goto LAB_004ab7e2;
-        cVar3 = FUN_004ab640();
+        cVar3 = FERaceEvent__HasMagazineReward();
         if ((cVar3 != '\0') || (cVar3 = FUN_0051ba80(), cVar3 != '\0')) {
           return "MU_UG_MagazineGiveth.fng";
         }
@@ -8431,9 +8441,11 @@ LAB_004ab6a4:
 }
 
 
-// ==== 0x4ab880 FUN_004ab880
+// ==== 0x4ab880 cFrontendDatabase::CalcRaceTypeForHighScores
 
-undefined4 FUN_004ab880(void)
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 cFrontendDatabase__CalcRaceTypeForHighScores(void)
 
 {
   uint uVar1;
@@ -8485,7 +8497,7 @@ void FUN_004ab900(undefined4 param_1)
   
   FUN_004ad210(param_1);
   bVar7 = *(int *)(in_EAX + 0x2ebdc) == 4;
-  FUN_004ab880(in_EAX);
+  cFrontendDatabase__CalcRaceTypeForHighScores(in_EAX);
   uVar3 = DAT_0078a31c;
   uVar2 = DAT_0078a2fc;
   uVar1 = DAT_0078a2f0;
@@ -8536,9 +8548,11 @@ LAB_004ab9d1:
 }
 
 
-// ==== 0x4aba80 FUN_004aba80
+// ==== 0x4aba80 cFrontendDatabase::NotifyRestartRace
 
-void FUN_004aba80(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void cFrontendDatabase__NotifyRestartRace(void)
 
 {
   int in_EAX;
@@ -8564,7 +8578,7 @@ void FUN_004abaa0(void)
   int *unaff_ESI;
   
   iVar1 = *unaff_ESI;
-  iVar2 = FUN_004ab880(unaff_ESI);
+  iVar2 = cFrontendDatabase__CalcRaceTypeForHighScores(unaff_ESI);
   if (unaff_ESI[0xbaf7] == 1) {
     if (*(int *)(unaff_ESI[0xbb57] + 0x58a0) == 0) goto LAB_004abb12;
     unaff_ESI[0x7c93] = unaff_ESI[0x7c93] + 1;
@@ -8591,9 +8605,11 @@ LAB_004abb12:
 }
 
 
-// ==== 0x4abb50 FUN_004abb50
+// ==== 0x4abb50 cFrontendDatabase::NotifyExitRaceToFrontend
 
-void FUN_004abb50(int param_1)
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFrontendDatabase__NotifyExitRaceToFrontend(int param_1)
 
 {
   int iVar1;
@@ -8634,9 +8650,11 @@ void FUN_004abb50(int param_1)
 }
 
 
-// ==== 0x4abc20 FUN_004abc20
+// ==== 0x4abc20 cFrontendDatabase::NotifyChangeToNextRace
 
-void FUN_004abc20(void)
+/* [canon] canon med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void cFrontendDatabase__NotifyChangeToNextRace(void)
 
 {
   int *piVar1;
@@ -8664,9 +8682,11 @@ LAB_004abc58:
 }
 
 
-// ==== 0x4abc90 FUN_004abc90
+// ==== 0x4abc90 cFrontendDatabase::ResetRaceSlotState
 
-void FUN_004abc90(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void cFrontendDatabase__ResetRaceSlotState(void)
 
 {
   int in_EAX;
@@ -8983,9 +9003,11 @@ LAB_004abff8:
 }
 
 
-// ==== 0x4ac040 FUN_004ac040
+// ==== 0x4ac040 FEPlayerCarDB::HasCarHandle
 
-uint __fastcall FUN_004ac040(int param_1,int param_2)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+uint __fastcall FEPlayerCarDB__HasCarHandle(int param_1,int param_2)
 
 {
   uint uVar1;
@@ -9986,9 +10008,11 @@ void FUN_004ad210(int param_1)
 }
 
 
-// ==== 0x4ad270 FUN_004ad270
+// ==== 0x4ad270 RacingCars_FindByKey
 
-int FUN_004ad270(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+int RacingCars_FindByKey(void)
 
 {
   int iVar1;
@@ -10125,7 +10149,7 @@ void FUN_004ad2d0(void)
       iVar3 = 0xb;
     }
     if (iVar3 < DAT_00735ecc) break;
-    bList__Sort(&local_20,FUN_004ad5d0);
+    bList__Sort(&local_20,SortRacingCarByTime);
     ppppiVar5 = (int ****)local_20;
     ppiVar9 = (int **)0x1;
     ppppiVar6 = (int ****)NullUpdate_ret();
@@ -10156,7 +10180,7 @@ void FUN_004ad2d0(void)
         iVar8 = 0xb;
       }
       if (iVar8 < DAT_00735ecc) break;
-      bList__Sort(&local_20,FUN_004ad660);
+      bList__Sort(&local_20,SortRacingCarByTable2);
       ppppiVar5 = (int ****)local_20;
       ppiVar9 = (int **)0x1;
       ppppiVar6 = (int ****)NullUpdate_ret();
@@ -10186,9 +10210,11 @@ void FUN_004ad2d0(void)
 }
 
 
-// ==== 0x4ad5d0 FUN_004ad5d0
+// ==== 0x4ad5d0 SortRacingCarByTime
 
-bool FUN_004ad5d0(int param_1,int param_2)
+/* [canon] runtime high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+bool SortRacingCarByTime(int param_1,int param_2)
 
 {
   uint uVar1;
@@ -10210,9 +10236,11 @@ bool FUN_004ad5d0(int param_1,int param_2)
 }
 
 
-// ==== 0x4ad660 FUN_004ad660
+// ==== 0x4ad660 SortRacingCarByTable2
 
-bool FUN_004ad660(int param_1,int param_2)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+bool SortRacingCarByTable2(int param_1,int param_2)
 
 {
   uint uVar1;
@@ -10287,9 +10315,11 @@ void FUN_004ad730(void)
 }
 
 
-// ==== 0x4ad780 FUN_004ad780
+// ==== 0x4ad780 Struct_InitHashPair
 
-void FUN_004ad780(void)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void Struct_InitHashPair(void)
 
 {
   undefined4 *in_EAX;
@@ -11548,7 +11578,7 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
     switch(param_2) {
     case 0x3a:
       if (DAT_0078eb38 != 0) {
-        FUN_004877f0((float)(int)-(uint)param_3 * _K_BLUR_MIN_T);
+        CameraMover_SetTransitionParamB((float)(int)-(uint)param_3 * _K_BLUR_MIN_T);
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
         DAT_0074810c = DAT_0073ad3c;
@@ -11557,7 +11587,7 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
       return;
     case 0x3b:
       if (DAT_0078eb34 != 0) {
-        FUN_004877f0((float)param_3 * _K_BLUR_MIN_T);
+        CameraMover_SetTransitionParamB((float)param_3 * _K_BLUR_MIN_T);
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
         DAT_0074810c = DAT_0073ad3c;
@@ -11566,7 +11596,7 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
       return;
     case 0x3c:
       if (DAT_0078eb2c != 0) {
-        FUN_004877d0((float)param_3 * _K_BLUR_MIN_T);
+        CameraMover_SetTransitionParamA((float)param_3 * _K_BLUR_MIN_T);
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
         DAT_0074810c = DAT_0073ad3c;
@@ -11575,7 +11605,7 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
       return;
     case 0x3d:
       if (DAT_0078eb28 != 0) {
-        FUN_004877d0((float)(int)-(uint)param_3 * _K_BLUR_MIN_T);
+        CameraMover_SetTransitionParamA((float)(int)-(uint)param_3 * _K_BLUR_MIN_T);
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
         DAT_0074810c = DAT_0073ad3c;
@@ -11588,8 +11618,8 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
         DAT_0074810c = DAT_0073ad3c;
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
-        FUN_004877f0(0);
-        FUN_004877d0(0);
+        CameraMover_SetTransitionParamB(0);
+        CameraMover_SetTransitionParamA(0);
       }
       DAT_0078eb20 = DAT_0078eb20 + 1;
       return;
@@ -11599,14 +11629,14 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
         DAT_0074810c = DAT_0073ad3c;
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
-        FUN_004877f0(0);
-        FUN_004877d0(0);
+        CameraMover_SetTransitionParamB(0);
+        CameraMover_SetTransitionParamA(0);
       }
       DAT_0078eb1c = DAT_0078eb1c + 1;
       return;
     case 0x40:
       if (DAT_0078eb30 != 0) {
-        FUN_004877f0(-(((float)param_3 - 128.0) * 0.0078125));
+        CameraMover_SetTransitionParamB(-(((float)param_3 - 128.0) * 0.0078125));
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
         DAT_0074810c = DAT_0073ad3c;
@@ -11615,7 +11645,7 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
       return;
     case 0x41:
       if (DAT_0078eb24 != 0) {
-        FUN_004877d0(-(((float)param_3 - 128.0) * 0.0078125));
+        CameraMover_SetTransitionParamA(-(((float)param_3 - 128.0) * 0.0078125));
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
         DAT_0074810c = DAT_0073ad3c;
@@ -11628,8 +11658,8 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
         DAT_0074810c = DAT_0073ad3c;
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
-        FUN_004877f0(0);
-        FUN_004877d0(0);
+        CameraMover_SetTransitionParamB(0);
+        CameraMover_SetTransitionParamA(0);
       }
       DAT_0078eb18 = DAT_0078eb18 + 1;
     }
@@ -12776,12 +12806,14 @@ LAB_004b0665:
     local_104 = 0x42340000;
     cVar2 = FUN_005136f0(&local_108,&local_104);
     if ((DAT_00735f0c == '\0') && (cVar2 != '\0')) {
-      FUN_00487b20(local_f0,local_ec,local_e8,local_e0,local_dc,local_d8,local_108,local_104,
-                   local_100,local_fc,local_f8);
+      CameraMover_SetupSpline
+                (local_f0,local_ec,local_e8,local_e0,local_dc,local_d8,local_108,local_104,local_100
+                 ,local_fc,local_f8);
     }
     else {
-      FUN_00487b20(DAT_006fbe58,DAT_006fbe54,DAT_006fbe5c,DAT_00735f14,DAT_006fbe64,DAT_00735f18,
-                   local_108,local_104,local_100,local_fc,local_f8);
+      CameraMover_SetupSpline
+                (DAT_006fbe58,DAT_006fbe54,DAT_006fbe5c,DAT_00735f14,DAT_006fbe64,DAT_00735f18,
+                 local_108,local_104,local_100,local_fc,local_f8);
     }
   }
   if (DAT_00777b4c == 1) {
@@ -12859,7 +12891,7 @@ LAB_004b0a48:
   }
   if ((*(int *)(unaff_EBX + 0x124) == 4) && (DAT_006fb02c != 0)) {
     if (*(int *)(*(int *)(unaff_EBX + 0x60) + 0x34) == 0) {
-      FUN_004877f0(0x3e19999a);
+      CameraMover_SetTransitionParamB(0x3e19999a);
       local_108 = (float)(DAT_0073ad3c - DAT_00748840);
       FUN_00564ad0((float)(int)local_108 * 0.00025,0x41e80000);
       _ftol_nocw();
@@ -12872,7 +12904,7 @@ LAB_004b0a48:
       else {
         fVar9 = (float10)_K_HALF;
       }
-      FUN_004877d0((float)((float10)0.05 * fVar9));
+      CameraMover_SetTransitionParamA((float)((float10)0.05 * fVar9));
     }
     else {
       FUN_004878c0();
@@ -12944,7 +12976,7 @@ void FUN_004b0c00(void)
          (*(int *)(iVar4 + 0x18) != 0)))) && (*(int *)(in_EAX + 0x84) != 0)) {
       if ((*(int *)(in_EAX + 0x8c) == 4) && (cVar3 = FUN_004aeac0(iVar1), cVar3 != '\0')) {
         if (DAT_0078eb30 != 0) {
-          FUN_004877f0(0);
+          CameraMover_SetTransitionParamB(0);
           DAT_006fb02c = 0;
           DAT_00735e84 = 0;
           DAT_0074810c = DAT_0073ad3c;
@@ -12954,7 +12986,7 @@ void FUN_004b0c00(void)
       if (*(int *)(in_EAX + 0x84) != 0) {
         if ((*(int *)(in_EAX + 0x8c) == 4) && (cVar3 = FUN_004aeac0(iVar1), cVar3 != '\0')) {
           if (DAT_0078eb24 != 0) {
-            FUN_004877d0(0);
+            CameraMover_SetTransitionParamA(0);
             DAT_006fb02c = 0;
             DAT_00735e84 = 0;
             DAT_0074810c = DAT_0073ad3c;
@@ -12968,8 +13000,8 @@ void FUN_004b0c00(void)
             DAT_0074810c = DAT_0073ad3c;
             DAT_006fb02c = 0;
             DAT_00735e84 = 0;
-            FUN_004877f0(0);
-            FUN_004877d0(0);
+            CameraMover_SetTransitionParamB(0);
+            CameraMover_SetTransitionParamA(0);
           }
           DAT_0078eb18 = DAT_0078eb18 + 1;
         }

@@ -440,7 +440,7 @@ FUN_00511d70(undefined4 *param_1,undefined4 *param_2,undefined4 *param_3,undefin
   int local_c;
   char local_5;
   
-  local_5 = FUN_00506160();
+  local_5 = GarageCategoryVisual__IsWidebodyInstalled();
   iVar1 = DAT_00735748;
   iVar3 = 0;
   piVar2 = &DAT_007066a0;
@@ -7386,10 +7386,11 @@ void FUN_0051bad0(void)
   if (iVar2 == 0) {
     FUN_0053eed0(&DAT_00740420,puVar1,0,0,0);
     puVar1 = PTR_s_FRONTEND_MAGAZINE_TEXTURES_BIN_006f8860;
-    iVar2 = FUN_0053ed70(&DAT_00740420,PTR_s_FRONTEND_MAGAZINE_TEXTURES_BIN_006f8860);
+    iVar2 = ResourceFileList_IsLoadedByName
+                      (&DAT_00740420,PTR_s_FRONTEND_MAGAZINE_TEXTURES_BIN_006f8860);
     while (iVar2 != 0) {
       ServiceResourceLoading();
-      iVar2 = FUN_0053ed70(&DAT_00740420,puVar1);
+      iVar2 = ResourceFileList_IsLoadedByName(&DAT_00740420,puVar1);
     }
     while (DAT_007360e8 != 0) {
       ServiceResourceLoading();
@@ -7423,11 +7424,12 @@ void FUN_0051bb50(void)
   in_EAX[3] = 0;
   *in_EAX = 0;
   puVar2 = PTR_s_FRONTEND_MAGAZINE_TEXTURES_BIN_006f8860;
-  iVar3 = FUN_0053ed70(&DAT_00740420,PTR_s_FRONTEND_MAGAZINE_TEXTURES_BIN_006f8860);
+  iVar3 = ResourceFileList_IsLoadedByName
+                    (&DAT_00740420,PTR_s_FRONTEND_MAGAZINE_TEXTURES_BIN_006f8860);
   puVar1 = puVar2;
   while (iVar3 != 0) {
     ServiceResourceLoading();
-    iVar3 = FUN_0053ed70(&DAT_00740420,puVar2);
+    iVar3 = ResourceFileList_IsLoadedByName(&DAT_00740420,puVar2);
     puVar1 = PTR_s_FRONTEND_MAGAZINE_TEXTURES_BIN_006f8860;
   }
   iVar3 = StringList_Find(&DAT_00740420,puVar1);
@@ -8628,7 +8630,7 @@ void EAXSound__InitializeDriver(void)
       puVar2 = (undefined4 *)0x0;
     }
     else {
-      *puVar2 = &PTR_FUN_006be4fc;
+      *puVar2 = &PTR_EAXSND8Wrapper__scalar_deleting_destructor_006be4fc;
       puVar2[1] = 0;
       puVar2[2] = 0;
       DAT_0072d558 = 0;
@@ -9946,7 +9948,7 @@ LAB_0051e5c5:
         uVar6 = 0;
       }
       else {
-        uVar6 = FUN_005374a0(pvVar5);
+        uVar6 = EAXS_AmbStereoStream__EAXS_AmbStereoStream(pvVar5);
       }
       *(undefined4 *)(iVar9 + 0x18) = uVar6;
       *(undefined4 *)(iVar9 + 0x2c) = 1;
@@ -11117,9 +11119,11 @@ void __fastcall FUN_00520500(int param_1)
 }
 
 
-// ==== 0x520580 FUN_00520580
+// ==== 0x520580 EAXSound::BuildRacerSlots
 
-void __fastcall FUN_00520580(int param_1)
+/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall EAXSound__BuildRacerSlots(int param_1)
 
 {
   int iVar1;

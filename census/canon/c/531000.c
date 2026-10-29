@@ -1454,9 +1454,11 @@ void __fastcall EAX_linear_ramp_evaluate__not_SetCsisName_(float *param_1)
 }
 
 
-// ==== 0x5328b0 FUN_005328b0
+// ==== 0x5328b0 EAX_NearestListenerToPoint
 
-int FUN_005328b0(void)
+/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+
+int EAX_NearestListenerToPoint(void)
 
 {
   int iVar1;
@@ -1509,9 +1511,11 @@ void __thiscall EA__Allocator__DefaultIAllocatorImpl__Allocate(int param_1,uint 
 }
 
 
-// ==== 0x5329b0 FUN_005329b0
+// ==== 0x5329b0 SlotPool::Free
 
-void FUN_005329b0(undefined4 *param_1)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+void SlotPool__Free(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -1528,12 +1532,14 @@ void FUN_005329b0(undefined4 *param_1)
 }
 
 
-// ==== 0x5329e0 FUN_005329e0
+// ==== 0x5329e0 EAXSND8Wrapper::scalar_deleting_destructor
 
-undefined4 * __thiscall FUN_005329e0(undefined4 *param_1,byte param_2)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+undefined4 * __thiscall EAXSND8Wrapper__scalar_deleting_destructor(undefined4 *param_1,byte param_2)
 
 {
-  *param_1 = &PTR_FUN_006be4fc;
+  *param_1 = &PTR_EAXSND8Wrapper__scalar_deleting_destructor_006be4fc;
   SlotPool__Destroy();
   DAT_0072d558 = 0;
   if ((param_2 & 1) != 0) {
@@ -5727,9 +5733,11 @@ float10 FUN_00537490(void)
 }
 
 
-// ==== 0x5374a0 FUN_005374a0
+// ==== 0x5374a0 EAXS_AmbStereoStream::EAXS_AmbStereoStream
 
-undefined4 * FUN_005374a0(undefined4 *param_1)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+undefined4 * EAXS_AmbStereoStream__EAXS_AmbStereoStream(undefined4 *param_1)
 
 {
   void *local_c;
@@ -6180,7 +6188,7 @@ void FUN_00537a60(int param_1,undefined4 param_2,undefined4 param_3,undefined4 p
         uVar2 = 0;
       }
       else {
-        uVar2 = FUN_005374a0(pvVar1);
+        uVar2 = EAXS_AmbStereoStream__EAXS_AmbStereoStream(pvVar1);
       }
       *(undefined4 *)(unaff_ESI + 0x18) = uVar2;
       iVar4 = 1;
@@ -7567,7 +7575,7 @@ EAXS_Streams__InitializeStream
   *(undefined4 *)(param_1 + 0x288) = uVar1;
   *(undefined4 *)(param_1 + 0x2a0) = param_5;
   *(undefined4 *)(param_1 + 0x23c) = 0x7fff;
-  FUN_00539d10(param_5);
+  EAXS_Streams__CreateChannelMaps(param_5);
   return;
 }
 
@@ -8097,9 +8105,11 @@ LAB_00539ca0:
 }
 
 
-// ==== 0x539d10 FUN_00539d10
+// ==== 0x539d10 EAXS_Streams::CreateChannelMaps
 
-void FUN_00539d10(int param_1)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+void EAXS_Streams__CreateChannelMaps(int param_1)
 
 {
   void *pvVar1;
@@ -8125,9 +8135,11 @@ void FUN_00539d10(int param_1)
 }
 
 
-// ==== 0x539d80 FUN_00539d80
+// ==== 0x539d80 EAXS_Streams::DestroyStream
 
-void FUN_00539d80(void)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+void EAXS_Streams__DestroyStream(void)
 
 {
   int unaff_ESI;
@@ -8757,9 +8769,11 @@ void __fastcall FUN_0053a8a0(int param_1)
 }
 
 
-// ==== 0x53a8c0 FUN_0053a8c0
+// ==== 0x53a8c0 EAXS_AmbStream::IsTransitionPair
 
-undefined4 __fastcall FUN_0053a8c0(int param_1)
+/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __fastcall EAXS_AmbStream__IsTransitionPair(int param_1)
 
 {
   int iVar1;
@@ -8788,9 +8802,11 @@ undefined4 __fastcall FUN_0053a8c0(int param_1)
 }
 
 
-// ==== 0x53a950 FUN_0053a950
+// ==== 0x53a950 Csis_CreateAmbientStereoStreamInstance
 
-void __fastcall FUN_0053a950(int param_1,int param_2,int param_3)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall Csis_CreateAmbientStereoStreamInstance(int param_1,int param_2,int param_3)
 
 {
   int *piVar1;
@@ -8844,11 +8860,14 @@ void __fastcall FUN_0053a950(int param_1,int param_2,int param_3)
 }
 
 
-// ==== 0x53aa10 FUN_0053aa10
+// ==== 0x53aa10 EAXS_AmbStereoStream::InitializeStreams
+
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/runtime.md */
 
 void __thiscall
-FUN_0053aa10(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5
-            ,undefined4 param_6,undefined4 param_7,undefined4 param_8)
+EAXS_AmbStereoStream__InitializeStreams
+          (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5,
+          undefined4 param_6,undefined4 param_7,undefined4 param_8)
 
 {
   int *piVar1;
@@ -8934,15 +8953,17 @@ void __fastcall FUN_0053ab60(int *param_1)
     param_1[200] = 0;
   }
   param_1[5] = 0;
-  FUN_00539d80();
-  FUN_00539d80();
+  EAXS_Streams__DestroyStream();
+  EAXS_Streams__DestroyStream();
   return;
 }
 
 
-// ==== 0x53ac00 FUN_0053ac00
+// ==== 0x53ac00 EAXS_AmbStereoStream::GetStartPriority
 
-undefined4 __fastcall FUN_0053ac00(int param_1)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __fastcall EAXS_AmbStereoStream__GetStartPriority(int param_1)
 
 {
   if (*(int *)(*(int *)(param_1 + 0x2c) + 0xc) == 2) {
@@ -9110,9 +9131,11 @@ void __fastcall FUN_0053aed0(int *param_1)
 }
 
 
-// ==== 0x53af90 FUN_0053af90
+// ==== 0x53af90 EAXS_AmbStereoStream::EnteringGame
 
-void __fastcall FUN_0053af90(int param_1)
+/* [canon] audio high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+void __fastcall EAXS_AmbStereoStream__EnteringGame(int param_1)
 
 {
   if (*(int *)(param_1 + 0x40) != 0) {
@@ -9371,7 +9394,7 @@ void __fastcall FUN_0053b430(int param_1)
       iVar3 = 0;
     }
     else {
-      iVar3 = FUN_0053a950(ppiVar4[0xc]);
+      iVar3 = Csis_CreateAmbientStereoStreamInstance(ppiVar4[0xc]);
       ppiVar4 = ppiStack_28;
     }
     *piVar1 = iVar3;
@@ -9412,9 +9435,11 @@ void __fastcall FUN_0053b5e0(int param_1)
 }
 
 
-// ==== 0x53b630 FUN_0053b630
+// ==== 0x53b630 EAXS_AmbStereoStream::RequestStopCurrent
 
-void __fastcall FUN_0053b630(int param_1)
+/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall EAXS_AmbStereoStream__RequestStopCurrent(int param_1)
 
 {
   int *piVar1;
@@ -9481,9 +9506,11 @@ void __fastcall FUN_0053b670(int param_1)
 }
 
 
-// ==== 0x53b740 FUN_0053b740
+// ==== 0x53b740 EAXS_AmbStereoStream::ApplyParamsAndPlay
 
-void __fastcall FUN_0053b740(int *param_1)
+/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall EAXS_AmbStereoStream__ApplyParamsAndPlay(int *param_1)
 
 {
   (**(code **)(param_1[param_1[8] * 0xb8 + 0x14] + 0x28))(0,0);
@@ -9582,9 +9609,11 @@ void __fastcall FUN_0053b780(int *param_1)
 }
 
 
-// ==== 0x53b980 FUN_0053b980
+// ==== 0x53b980 EAXS_AmbStereoStream::GetPlayTimeRemaining
 
-float10 __thiscall FUN_0053b980(int param_1,int param_2)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+float10 __thiscall EAXS_AmbStereoStream__GetPlayTimeRemaining(int param_1,int param_2)
 
 {
   int iVar1;
@@ -9727,9 +9756,11 @@ void __fastcall FUN_0053bbb0(int param_1)
 }
 
 
-// ==== 0x53bca0 FUN_0053bca0
+// ==== 0x53bca0 CsisHandle::GetRefCount
 
-undefined4 __fastcall FUN_0053bca0(int *param_1)
+/* [canon] audio low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __fastcall CsisHandle__GetRefCount(int *param_1)
 
 {
   undefined4 uVar1;
@@ -9839,8 +9870,8 @@ void __fastcall FUN_0053be20(int *param_1)
     param_1[0xcc] = 0;
   }
   param_1[5] = 0;
-  FUN_00539d80();
-  FUN_00539d80();
+  EAXS_Streams__DestroyStream();
+  EAXS_Streams__DestroyStream();
   return;
 }
 
@@ -10352,7 +10383,7 @@ LAB_0053c689:
   *piVar2 = iVar6;
   *(undefined4 *)(iVar3 + 0x78) = 0;
   uStack_4 = 0xffffffff;
-  iVar6 = FUN_0053bca0();
+  iVar6 = CsisHandle__GetRefCount();
   param_1[5] = iVar6;
   ExceptionList = pvStack_c;
   return;
@@ -10475,7 +10506,7 @@ LAB_0053c9dc:
       if (*piVar1 == 0) {
         return;
       }
-      iVar5 = FUN_0053bca0();
+      iVar5 = CsisHandle__GetRefCount();
       param_1[6] = iVar5;
       if (iVar5 < param_1[5]) goto LAB_0053c9dc;
     }
@@ -10818,8 +10849,8 @@ void __fastcall FUN_0053cf70(int *param_1)
     param_1[200] = 0;
   }
   param_1[5] = 0;
-  FUN_00539d80();
-  FUN_00539d80();
+  EAXS_Streams__DestroyStream();
+  EAXS_Streams__DestroyStream();
   return;
 }
 
@@ -11356,9 +11387,11 @@ void FUN_0053d910(undefined4 param_1)
 }
 
 
-// ==== 0x53d940 FUN_0053d940
+// ==== 0x53d940 Csis_CreateSpeechStreamInstance
 
-void __fastcall FUN_0053d940(int param_1,int param_2,int param_3)
+/* [canon] audio med (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall Csis_CreateSpeechStreamInstance(int param_1,int param_2,int param_3)
 
 {
   int *piVar1;
@@ -11611,7 +11644,7 @@ void __fastcall FUN_0053dd40(int **param_1)
       piVar5 = (int *)0x0;
     }
     else {
-      piVar5 = (int *)FUN_0053d940(piVar2[0xc]);
+      piVar5 = (int *)Csis_CreateSpeechStreamInstance(piVar2[0xc]);
       param_1 = ppiStack_28;
     }
     *ppiVar1 = piVar5;
@@ -12054,9 +12087,11 @@ int * StringList_Find(int param_1,int param_2)
 }
 
 
-// ==== 0x53e560 FUN_0053e560
+// ==== 0x53e560 SolidListSet_FindListByHash
 
-int * FUN_0053e560(int param_1,undefined4 param_2)
+/* [canon] assets med (ghidra-canon) docs/re/runtime.md */
+
+int * SolidListSet_FindListByHash(int param_1,undefined4 param_2)
 
 {
   int *piVar1;
@@ -12161,7 +12196,7 @@ void FUN_0053e6c0(undefined4 *param_1,int param_2,byte *param_3)
   
   uVar1 = *param_1;
   piVar2 = *(int **)(param_3 + 0xc);
-  iVar3 = FUN_0053e560(piVar2,uVar1);
+  iVar3 = SolidListSet_FindListByHash(piVar2,uVar1);
   *(byte *)((int)param_1 + 0xd) = *(byte *)((int)param_1 + 0xd) & 0xef;
   if (param_2 == 0) {
     piVar2[0xc] = piVar2[0xc] + 1;
@@ -12328,7 +12363,7 @@ void FUN_0053e9e0(undefined4 param_1,int param_2,int param_3,code *param_4,undef
       piVar10 = (int *)(iVar7 + 8);
       do {
         uVar1 = *(undefined4 *)(param_2 + _param_6 * 4);
-        iVar7 = FUN_0053e560(param_1,uVar1);
+        iVar7 = SolidListSet_FindListByHash(param_1,uVar1);
         if ((((iVar7 != 0) && (*(char *)(iVar7 + 0x8b) == '\0')) && (*(int *)(iVar7 + 0x9c) != 0))
            && (iVar8 = BinarySearch_Hash(uVar1,*(int *)(iVar7 + 0x9c),0), iVar8 != 0)) {
           uVar2 = *(uint *)(iVar8 + 4);
@@ -12406,7 +12441,7 @@ void __thiscall FUN_0053ec30(undefined4 param_1,int param_2)
   int iVar1;
   
   if (param_2 != 0) {
-    if ((in_EAX == 0) && (in_EAX = FUN_0053e560(param_1,param_2), in_EAX == 0)) {
+    if ((in_EAX == 0) && (in_EAX = SolidListSet_FindListByHash(param_1,param_2), in_EAX == 0)) {
       return;
     }
     iVar1 = FUN_0053e5e0(param_1,param_2);
@@ -12436,7 +12471,7 @@ void FUN_0053ec90(undefined4 param_1,int param_2,int param_3)
   if (0 < param_3) {
     do {
       iVar2 = *(int *)(param_2 + iVar3 * 4);
-      if ((((iVar2 != 0) && (iVar1 = FUN_0053e560(param_1,iVar2), iVar1 != 0)) &&
+      if ((((iVar2 != 0) && (iVar1 = SolidListSet_FindListByHash(param_1,iVar2), iVar1 != 0)) &&
           (*(char *)(iVar1 + 0x8b) == '\0')) &&
          (((*(int *)(iVar1 + 0x9c) != 0 &&
            (iVar2 = BinarySearch_Hash(iVar2,*(int *)(iVar1 + 0x9c),0), iVar2 != 0)) &&
@@ -12484,9 +12519,11 @@ void FUN_0053ed20(undefined4 param_1)
 }
 
 
-// ==== 0x53ed70 FUN_0053ed70
+// ==== 0x53ed70 ResourceFileList_IsLoadedByName
 
-undefined4 FUN_0053ed70(int param_1,int param_2)
+/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 ResourceFileList_IsLoadedByName(int param_1,int param_2)
 
 {
   char cVar1;
@@ -12993,9 +13030,11 @@ void FUN_0053f500(void)
 }
 
 
-// ==== 0x53f540 FUN_0053f540
+// ==== 0x53f540 Solid_BindTextureRefs
 
-void FUN_0053f540(void)
+/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+
+void Solid_BindTextureRefs(void)
 
 {
   char cVar1;
@@ -13052,9 +13091,11 @@ void FUN_0053f540(void)
 }
 
 
-// ==== 0x53f5f0 FUN_0053f5f0
+// ==== 0x53f5f0 Solid_GetBounds
 
-undefined4 __fastcall FUN_0053f5f0(undefined4 *param_1,undefined4 *param_2)
+/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 __fastcall Solid_GetBounds(undefined4 *param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -13090,9 +13131,11 @@ undefined4 __fastcall FUN_0053f5f0(undefined4 *param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x53f660 FUN_0053f660
+// ==== 0x53f660 Solid_ReplaceTextureForHash
 
-void __fastcall FUN_0053f660(undefined4 param_1,int param_2)
+/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall Solid_ReplaceTextureForHash(undefined4 param_1,int param_2)
 
 {
   int in_EAX;
@@ -14006,9 +14049,11 @@ void FUN_00540580(undefined4 param_1,undefined4 param_2,int param_3)
 }
 
 
-// ==== 0x5405b0 FUN_005405b0
+// ==== 0x5405b0 Solid_InitIteratorPtrs
 
-void FUN_005405b0(int param_1)
+/* [canon] assets low (ghidra-canon) docs/re/runtime.md */
+
+void Solid_InitIteratorPtrs(int param_1)
 
 {
   int iVar1;
@@ -14205,9 +14250,11 @@ float10 FUN_00540830(void)
 }
 
 
-// ==== 0x540860 FUN_00540860
+// ==== 0x540860 Vec4_SubXYZ
 
-void __thiscall FUN_00540860(float *param_1,float param_2,float param_3,float param_4)
+/* [canon] render low (ghidra-canon) docs/re/render.md */
+
+void __thiscall Vec4_SubXYZ(float *param_1,float param_2,float param_3,float param_4)
 
 {
   float fVar1;
@@ -14225,9 +14272,11 @@ void __thiscall FUN_00540860(float *param_1,float param_2,float param_3,float pa
 }
 
 
-// ==== 0x5408b0 FUN_005408b0
+// ==== 0x5408b0 Vec4_DotPack
 
-void __thiscall FUN_005408b0(float *param_1,float param_2,float param_3,float param_4,float param_5)
+/* [canon] render low (ghidra-canon) docs/re/render.md */
+
+void __thiscall Vec4_DotPack(float *param_1,float param_2,float param_3,float param_4,float param_5)
 
 {
   float *in_EAX;
@@ -14240,10 +14289,12 @@ void __thiscall FUN_005408b0(float *param_1,float param_2,float param_3,float pa
 }
 
 
-// ==== 0x5408f0 FUN_005408f0
+// ==== 0x5408f0 Vec4_SetXYZ
+
+/* [canon] render low (ghidra-canon) docs/re/render.md */
 
 void __thiscall
-FUN_005408f0(undefined4 *param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)
+Vec4_SetXYZ(undefined4 *param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)
 
 {
   undefined4 *in_EAX;

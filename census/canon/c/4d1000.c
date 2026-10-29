@@ -2377,7 +2377,7 @@ void __thiscall OptionsSelectorScreen__NotificationMessage(int param_1,uint para
     else {
       if (param_2 == 0xabc08912) {
         FUN_004d44d0(param_1);
-        FUN_004f66f0();
+        FEString__SetLabelHash();
         FEObject__SetScript("FadeIn",1);
         return;
       }
@@ -5509,7 +5509,7 @@ void __fastcall ColorElement__SetPart(undefined4 param_1,int param_2)
   }
   iVar1 = *(int *)(in_EAX + 0xc);
   if ((iVar1 != 0) && (*(int *)(iVar1 + 0x18) < 0x100)) {
-    cVar2 = FUN_004feb50();
+    cVar2 = FEColor_NearlyEqual();
     if (cVar2 == '\0') {
       *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
     }
@@ -7278,7 +7278,7 @@ LAB_004d9b20:
     puVar9[1] = 0;
     *puVar9 = 0;
     if ((iVar6 != 0) && (*(int *)(iVar6 + 0x18) < 0x100)) {
-      cVar3 = FUN_004feb50();
+      cVar3 = FEColor_NearlyEqual();
       if (cVar3 == '\0') {
         *(uint *)(iVar6 + 0x1c) = *(uint *)(iVar6 + 0x1c) | 0x400000;
       }
@@ -7331,7 +7331,7 @@ LAB_004d9c38:
     puVar9[1] = 0;
     *puVar9 = 0;
     if ((iVar6 != 0) && (*(int *)(iVar6 + 0x18) < 0x100)) {
-      cVar3 = FUN_004feb50();
+      cVar3 = FEColor_NearlyEqual();
       if (cVar3 == '\0') {
         *(uint *)(iVar6 + 0x1c) = *(uint *)(iVar6 + 0x1c) | 0x400000;
       }
@@ -7438,7 +7438,7 @@ void FUN_004d9e40(int param_1)
     puVar5[1] = 0;
     *puVar5 = 0;
     if ((iVar4 != 0) && (*(int *)(iVar4 + 0x18) < 0x100)) {
-      cVar3 = FUN_004feb50();
+      cVar3 = FEColor_NearlyEqual();
       if (cVar3 == '\0') {
         *(uint *)(iVar4 + 0x1c) = *(uint *)(iVar4 + 0x1c) | 0x400000;
       }
@@ -7456,7 +7456,7 @@ void FUN_004d9e40(int param_1)
     puVar5[1] = 0;
     *puVar5 = 0;
     if ((iVar1 != 0) && (*(int *)(iVar1 + 0x18) < 0x100)) {
-      cVar3 = FUN_004feb50();
+      cVar3 = FEColor_NearlyEqual();
       if (cVar3 == '\0') {
         *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
       }
@@ -8652,7 +8652,7 @@ void FUN_004db8a0(void)
   FEObject__SetInvisible(iVar4);
   iVar4 = *(int *)(unaff_EBX + 0xaf8);
   if ((iVar4 != 0) && (*(int *)(iVar4 + 0x18) < 0x100)) {
-    cVar3 = FUN_004feb50();
+    cVar3 = FEColor_NearlyEqual();
     if (cVar3 == '\0') {
       *(uint *)(iVar4 + 0x1c) = *(uint *)(iVar4 + 0x1c) | 0x400000;
     }

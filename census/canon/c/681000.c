@@ -4752,7 +4752,7 @@ void FUN_00684ec1(void)
 void Unwind_00684ed0(void)
 
 {
-  FUN_004fd150();
+  FENode___FENode();
   return;
 }
 
@@ -5546,7 +5546,7 @@ void FUN_00685398(void)
 void Unwind_006853b0(void)
 
 {
-  FUN_004fd150();
+  FENode___FENode();
   return;
 }
 
@@ -6445,7 +6445,9 @@ void Unwind_006858d8(void)
 {
   int unaff_EBP;
   
-  eh_vector_destructor_iterator((void *)(*(int *)(unaff_EBP + 4) + 0xc),0x18,0x40,FUN_004fe350);
+  eh_vector_destructor_iterator
+            ((void *)(*(int *)(unaff_EBP + 4) + 0xc),0x18,0x40,FEMessageResponse___FEMessageResponse
+            );
   return;
 }
 
@@ -6705,7 +6707,8 @@ void Unwind_00685a48(void)
 {
   int unaff_EBP;
   
-  eh_vector_destructor_iterator((void *)(*(int *)(unaff_EBP + 4) + 0xc),0x34,0x20,FUN_005028d0);
+  eh_vector_destructor_iterator
+            ((void *)(*(int *)(unaff_EBP + 4) + 0xc),0x34,0x20,FEScript___FEScript);
   return;
 }
 
@@ -9911,7 +9914,7 @@ void Unwind_00686ca0(void)
 void Unwind_00686cab(void)
 
 {
-  FUN_004960e0();
+  PostRaceRewardList___PostRaceRewardList();
   return;
 }
 
@@ -9941,7 +9944,7 @@ void Unwind_00686cc0(void)
 void Unwind_00686ccb(void)
 
 {
-  FUN_004960e0();
+  PostRaceRewardList___PostRaceRewardList();
   return;
 }
 
@@ -11130,7 +11133,7 @@ void Unwind_00687363(void)
 void Unwind_0068736e(void)
 
 {
-  FUN_004b9370();
+  TournamentTrackList___TournamentTrackList();
   return;
 }
 

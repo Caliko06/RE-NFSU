@@ -124,7 +124,7 @@ void __thiscall FUN_00551280(int param_1,uint param_2,undefined4 param_3,undefin
             DAT_007301c8 = 0;
             return;
           }
-          FUN_004ad780();
+          Struct_InitHashPair();
           local_768 = 0;
           local_764 = 0x8d09b827;
           local_75c = 0xc33fc7d3;
@@ -265,7 +265,7 @@ void __thiscall FUN_00551280(int param_1,uint param_2,undefined4 param_3,undefin
         DAT_007301c8 = 0;
         return;
       }
-      FUN_004b9240();
+      GenericDialogData__GenericDialogData();
       local_764 = *(undefined4 *)(param_1 + 0x7a8);
       local_744 = 1;
       local_768 = 0x169268;
@@ -2902,7 +2902,7 @@ void __thiscall FUN_00554f60(int param_1,uint param_2,int param_3)
       return;
     }
     if (param_2 == 0xc519bfc3) {
-      FUN_004b9240();
+      GenericDialogData__GenericDialogData();
       local_3c = *(undefined4 *)(param_1 + 0x68);
       local_1c = 1;
       local_40 = 0x169268;
@@ -3289,7 +3289,7 @@ void __fastcall FUN_00555dd0(int param_1)
     iVar2 = FUN_004a9950();
     if (iVar2 <= local_14) break;
     iVar2 = TrackInfo_GetRow();
-    iVar3 = FUN_004ab470(&DAT_00748f70);
+    iVar3 = cFrontendDatabase__IsTrackAvailableForRaceType(&DAT_00748f70);
     if (iVar3 != 0) {
       cVar1 = FUN_00554400(param_1,(int)*(short *)(iVar2 + 0x6c),0);
       if (cVar1 != '\0') {
@@ -3305,7 +3305,7 @@ void __fastcall FUN_00555dd0(int param_1)
       iVar2 = FUN_004a9950();
       if (iVar2 <= local_1c) break;
       iVar2 = TrackInfo_GetRow();
-      iVar3 = FUN_004ab470(&DAT_00748f70);
+      iVar3 = cFrontendDatabase__IsTrackAvailableForRaceType(&DAT_00748f70);
       if (iVar3 != 0) {
         cVar1 = FUN_00554400(param_1,(int)*(short *)(iVar2 + 0x6c),1);
         if (cVar1 != '\0') {
@@ -4275,7 +4275,7 @@ void __thiscall FUN_005570a0(int param_1,uint param_2,int param_3)
     else if ((uVar1 != 0x88e7a4ee) && (uVar1 != 0xee360ed5)) {
       return;
     }
-    FUN_004f66f0();
+    FEString__SetLabelHash();
     FEObject__SetScript("FadeIn",1);
   }
   else if (param_2 == 0xc98356ba) {
@@ -4776,7 +4776,7 @@ LAB_00557a8d:
       if ((param_3 != 0) &&
          (((iVar9 = *(int *)(param_3 + 0x10), iVar9 == 0x448e93e0 || (iVar9 == 0x5e4efa1b)) ||
           (iVar9 == -0x4255a42e)))) {
-        FUN_004f66f0();
+        FEString__SetLabelHash();
         FEObject__SetScript("FadeIn",1);
         return;
       }
@@ -7165,7 +7165,7 @@ FUN_0055ab00(int param_1,uint param_2,int param_3,undefined4 param_4,undefined4 
       else if ((uVar1 != 0x740db178) && (uVar1 != 0x8ac75312)) {
         return;
       }
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       FEObject__SetScript("FadeIn",1);
       return;
     }
@@ -9394,7 +9394,7 @@ void __thiscall FUN_0055d450(int param_1,uint param_2,int param_3,uint param_4)
       if (param_2 != 0xc519bfc3) {
         return;
       }
-      FUN_004b9240();
+      GenericDialogData__GenericDialogData();
       uStack_34 = *(undefined4 *)(param_1 + 0x78);
       uStack_14 = 1;
       uStack_38 = 0x169268;
@@ -9936,7 +9936,7 @@ void FUN_0055e170(int param_1)
       else {
         iVar3 = local_4 + DAT_00736168;
       }
-      iVar1 = FUN_004ab470(&DAT_00748f70);
+      iVar1 = cFrontendDatabase__IsTrackAvailableForRaceType(&DAT_00748f70);
       if (iVar1 != 0) {
         FUN_0055e0d0(iVar3,0);
       }
@@ -9955,7 +9955,7 @@ void FUN_0055e170(int param_1)
         else {
           iVar3 = DAT_00736168 + iVar4;
         }
-        iVar1 = FUN_004ab470(&DAT_00748f70);
+        iVar1 = cFrontendDatabase__IsTrackAvailableForRaceType(&DAT_00748f70);
         if (iVar1 != 0) {
           FUN_0055e0d0(iVar3,1);
         }
@@ -10395,7 +10395,7 @@ void FUN_0055ea40(int param_1)
         if (*(int *)(param_1 + 8) < iVar2) {
           if (*(int *)(param_1 + 0xc) < iVar2) {
             if (*(int *)(iVar1 + 0x18) < 0x100) {
-              cVar3 = FUN_004feb50();
+              cVar3 = FEColor_NearlyEqual();
               if (cVar3 == '\0') {
                 *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
               }
@@ -10403,7 +10403,7 @@ void FUN_0055ea40(int param_1)
             }
           }
           else if (*(int *)(iVar1 + 0x18) < 0x100) {
-            cVar3 = FUN_004feb50();
+            cVar3 = FEColor_NearlyEqual();
             if (cVar3 == '\0') {
               *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
             }
@@ -10412,7 +10412,7 @@ LAB_0055eb84:
           }
         }
         else if (*(int *)(iVar1 + 0x18) < 0x100) {
-          cVar3 = FUN_004feb50();
+          cVar3 = FEColor_NearlyEqual();
           if (cVar3 == '\0') {
             *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
           }
@@ -10420,7 +10420,7 @@ LAB_0055eb84:
         }
       }
       else if (*(int *)(iVar1 + 0x18) < 0x100) {
-        cVar3 = FUN_004feb50();
+        cVar3 = FEColor_NearlyEqual();
         if (cVar3 == '\0') {
           *(uint *)(iVar1 + 0x1c) = *(uint *)(iVar1 + 0x1c) | 0x400000;
         }
@@ -11758,7 +11758,7 @@ int __thiscall FUN_005607b0(int param_1,int param_2,int param_3)
   else if (((param_2 == -0x543f76ee) && (param_2 = param_3, param_3 != 0)) &&
           ((param_2 = *(int *)(param_3 + 0x10), param_2 == 0x97f4b79 || (param_2 == -0x3c47dc1c))))
   {
-    FUN_004f66f0();
+    FEString__SetLabelHash();
     iVar1 = FEObject__SetScript("FadeIn",1);
     return iVar1;
   }

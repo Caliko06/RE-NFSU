@@ -2125,9 +2125,11 @@ void __fastcall FUN_004c3c60(undefined4 *param_1)
 }
 
 
-// ==== 0x4c3cd0 FUN_004c3cd0
+// ==== 0x4c3cd0 Screen_MU_UG_MovieTheaterViewer::NotificationMessage
 
-uint __thiscall FUN_004c3cd0(int param_1,uint param_2)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+uint __thiscall Screen_MU_UG_MovieTheaterViewer__NotificationMessage(int param_1,uint param_2)
 
 {
   int iVar1;
@@ -3140,9 +3142,11 @@ LAB_004c4e12:
 }
 
 
-// ==== 0x4c4e90 FUN_004c4e90
+// ==== 0x4c4e90 Screen_MU_UG_MapScreen::SummonEventBriefing
 
-void FUN_004c4e90(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void Screen_MU_UG_MapScreen__SummonEventBriefing(void)
 
 {
   int iVar1;
@@ -3166,9 +3170,11 @@ void FUN_004c4e90(void)
 }
 
 
-// ==== 0x4c4ee0 FUN_004c4ee0
+// ==== 0x4c4ee0 Screen_MU_UG_MapScreen::EventHasFMV
 
-undefined4 FUN_004c4ee0(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined4 Screen_MU_UG_MapScreen__EventHasFMV(void)
 
 {
   int in_EAX;
@@ -3180,9 +3186,11 @@ undefined4 FUN_004c4ee0(void)
 }
 
 
-// ==== 0x4c4f00 FUN_004c4f00
+// ==== 0x4c4f00 Screen_MU_UG_MapScreen::SummonNewCareerFMV
 
-void FUN_004c4f00(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void Screen_MU_UG_MapScreen__SummonNewCareerFMV(void)
 
 {
   int iVar1;
@@ -3245,9 +3253,9 @@ LAB_004c501a:
     FUN_00414a10();
     FUN_004f6bd0(&DAT_006c619c,1);
     FUN_004f6bd0(&DAT_006c619c,1);
-    cVar1 = FUN_004c4ee0();
+    cVar1 = Screen_MU_UG_MapScreen__EventHasFMV();
     if (cVar1 != '\0') {
-      FUN_004c4f00();
+      Screen_MU_UG_MapScreen__SummonNewCareerFMV();
       return;
     }
   }
@@ -3269,7 +3277,7 @@ LAB_004c501a:
       FUN_004f09b0(*(int *)(iVar2 + 0x18));
     }
   }
-  FUN_004c4e90();
+  Screen_MU_UG_MapScreen__SummonEventBriefing();
   return;
 }
 
@@ -10079,9 +10087,11 @@ undefined4 FUN_004ccda0(void)
 }
 
 
-// ==== 0x4cce10 FUN_004cce10
+// ==== 0x4cce10 PostRaceSpeech_MapRewardType2
 
-undefined4 FUN_004cce10(void)
+/* [canon] hud low (ghidra-canon) docs/re/runtime.md */
+
+undefined4 PostRaceSpeech_MapRewardType2(void)
 
 {
   undefined4 in_EAX;
@@ -10383,7 +10393,7 @@ void __fastcall FUN_004cd180(byte *param_1)
         iVar9 = FUN_004ccd20();
         break;
       case 2:
-        iVar9 = FUN_004cce10();
+        iVar9 = PostRaceSpeech_MapRewardType2();
         break;
       case 3:
         iVar9 = FUN_004cce70();
@@ -11667,7 +11677,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0x60] = 0;
   param_1[0x61] = 0;
   param_1[0x62] = 0;
-  param_1[0x57] = &PTR_FUN_006cbe88;
+  param_1[0x57] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar6 = puVar6;
   param_1[100] = puVar6;
   param_1[0x65] = 0;
@@ -11683,7 +11693,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0x6f] = 0;
   param_1[0x70] = 0;
   param_1[0x71] = 0;
-  param_1[0x66] = &PTR_FUN_006cbe88;
+  param_1[0x66] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar6 = puVar6;
   param_1[0x73] = puVar6;
   param_1[0x74] = 0;
@@ -11699,7 +11709,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0x7e] = 0;
   param_1[0x7f] = 0;
   param_1[0x80] = 0;
-  param_1[0x75] = &PTR_FUN_006cbe88;
+  param_1[0x75] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar6 = puVar6;
   param_1[0x82] = puVar6;
   param_1[0x83] = 0;
@@ -11715,7 +11725,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0x8d] = 0;
   param_1[0x8e] = 0;
   param_1[0x8f] = 0;
-  param_1[0x84] = &PTR_FUN_006cbe88;
+  param_1[0x84] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar6 = puVar6;
   param_1[0x91] = puVar6;
   param_1[0x92] = 0;
@@ -11730,7 +11740,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0x9c] = 0;
   param_1[0x9d] = 0;
   param_1[0x9e] = 0;
-  param_1[0x93] = &PTR_FUN_006cbe88;
+  param_1[0x93] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   puVar6 = param_1 + 0x9f;
   *puVar6 = puVar6;
   param_1[0xa0] = puVar6;
@@ -11747,7 +11757,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0xab] = 0;
   param_1[0xac] = 0;
   param_1[0xad] = 0;
-  param_1[0xa2] = &PTR_FUN_006cbe88;
+  param_1[0xa2] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar6 = puVar6;
   param_1[0xaf] = puVar6;
   param_1[0xb0] = 0;
@@ -11763,7 +11773,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0xba] = 0;
   param_1[0xbb] = 0;
   param_1[0xbc] = 0;
-  param_1[0xb1] = &PTR_FUN_006cbe88;
+  param_1[0xb1] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar6 = puVar6;
   param_1[0xbe] = puVar6;
   param_1[0xbf] = 0;
@@ -11779,7 +11789,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0xc9] = 0;
   param_1[0xca] = 0;
   param_1[0xcb] = 0;
-  param_1[0xc0] = &PTR_FUN_006cbe88;
+  param_1[0xc0] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar6 = puVar6;
   param_1[0xcd] = puVar6;
   param_1[0xce] = 0;
@@ -11795,7 +11805,7 @@ undefined4 * Screen_MU_Options_PC__Screen_MU_Options_PC(undefined4 *param_1,char
   param_1[0xd8] = 0;
   param_1[0xd9] = 0;
   param_1[0xda] = 0;
-  param_1[0xcf] = &PTR_FUN_006cbe88;
+  param_1[0xcf] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar6 = puVar6;
   param_1[0xdc] = puVar6;
   param_1[0xdd] = 0;
@@ -12137,7 +12147,7 @@ void __thiscall FUN_004cf240(int param_1,uint param_2,int param_3,undefined4 par
           uVar3 = 0x7a340c18;
         }
         FUN_004f8340(*(undefined4 *)(param_1 + 0xc));
-        FUN_004b9240();
+        GenericDialogData__GenericDialogData();
         uStack_14 = 1;
         uStack_38 = 0x169268;
         uStack_c = 0;

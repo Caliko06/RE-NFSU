@@ -1173,9 +1173,11 @@ LAB_004b2a59:
 }
 
 
-// ==== 0x4b2aa0 FUN_004b2aa0
+// ==== 0x4b2aa0 Career::IsEventWon
 
-uint __fastcall FUN_004b2aa0(uint param_1,int param_2)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+uint __fastcall Career__IsEventWon(uint param_1,int param_2)
 
 {
   char *pcVar1;
@@ -1192,9 +1194,11 @@ uint __fastcall FUN_004b2aa0(uint param_1,int param_2)
 }
 
 
-// ==== 0x4b2af0 FUN_004b2af0
+// ==== 0x4b2af0 Career::IsFinalEventWon
 
-uint __fastcall FUN_004b2af0(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+uint __fastcall Career__IsFinalEventWon(int param_1)
 
 {
   int *piVar1;
@@ -1221,9 +1225,11 @@ void __fastcall FUN_004b2b40(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x4b2b50 FUN_004b2b50
+// ==== 0x4b2b50 Screen_MU_Main_PC::OnInputActivity
 
-void FUN_004b2b50(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void Screen_MU_Main_PC__OnInputActivity(void)
 
 {
   int in_stack_00000010;
@@ -1335,8 +1341,8 @@ void Screen_MU_Main_PC__Screen_MU_Main_PC(undefined4 *param_1,undefined4 param_2
   local_14 = 0;
   DAT_00735e78 = 0;
   param_1[0x11] = DAT_0073ad3c;
-  InputEvents__AddSource(0x2f,FUN_004b2b50,param_1);
-  InputEvents__AddSource(0x2f,FUN_004b2b50,param_1);
+  InputEvents__AddSource(0x2f,Screen_MU_Main_PC__OnInputActivity,param_1);
+  InputEvents__AddSource(0x2f,Screen_MU_Main_PC__OnInputActivity,param_1);
   iVar4 = param_1[3];
   local_24 = FEng__HashName();
   if (((((iVar4 == 0) || (iVar4 = FUN_004f65d0(), iVar4 == 0)) ||
@@ -1432,7 +1438,7 @@ void Screen_MU_Main_PC__Screen_MU_Main_PC(undefined4 *param_1,undefined4 param_2
     cFEng__PopPackage(*(undefined4 *)(iVar4 + 8),*(int *)(iVar5 + 0x18));
   }
   iVar4 = param_1[3];
-  uVar7 = FUN_004b30b0(param_1);
+  uVar7 = Screen_MU_Main_PC__MenuBitToObjectHash(param_1);
   if (((((iVar4 != 0) && (iVar4 = FUN_004f65d0(), iVar4 != 0)) &&
        (iVar4 = FUN_004ffb70(), iVar4 != 0)) ||
       ((DAT_0073578c != 0 && (iVar4 = FUN_004ef050(uVar7), iVar4 != 0)))) &&
@@ -1454,9 +1460,11 @@ void Screen_MU_Main_PC__Screen_MU_Main_PC(undefined4 *param_1,undefined4 param_2
 }
 
 
-// ==== 0x4b30b0 FUN_004b30b0
+// ==== 0x4b30b0 Screen_MU_Main_PC::MenuBitToObjectHash
 
-undefined4 FUN_004b30b0(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+undefined4 Screen_MU_Main_PC__MenuBitToObjectHash(void)
 
 {
   undefined4 in_EAX;
@@ -1482,9 +1490,11 @@ undefined4 FUN_004b30b0(void)
 }
 
 
-// ==== 0x4b31b0 FUN_004b31b0
+// ==== 0x4b31b0 Screen_MU_Main_PC::ObjectHashToTextHash
 
-undefined4 FUN_004b31b0(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined4 Screen_MU_Main_PC__ObjectHashToTextHash(void)
 
 {
   uint in_EAX;
@@ -1608,8 +1618,8 @@ void __thiscall FUN_004b3240(int param_1,uint param_2,int param_3)
         else {
           if (uVar1 == 0xd7ba6011) {
             DAT_00777b4c = 1;
-            cVar3 = FUN_004b2af0();
-            cVar4 = FUN_004b2aa0();
+            cVar3 = Career__IsFinalEventWon();
+            cVar4 = Career__IsEventWon();
             if ((cVar4 != '\0') && (cVar3 == '\0')) {
               FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
               return;
@@ -1665,7 +1675,7 @@ void __thiscall FUN_004b3240(int param_1,uint param_2,int param_3)
     }
   }
   else if (param_2 == 0xabc08912) {
-    uVar6 = FUN_004b31b0(param_1);
+    uVar6 = Screen_MU_Main_PC__ObjectHashToTextHash(param_1);
     iVar5 = *(int *)(param_1 + 0x40);
     if (iVar5 != 0) {
       *(uint *)(iVar5 + 0x1c) = *(uint *)(iVar5 + 0x1c) | 0x400000;
@@ -1707,9 +1717,11 @@ void __thiscall FUN_004b3240(int param_1,uint param_2,int param_3)
 }
 
 
-// ==== 0x4b3780 FUN_004b3780
+// ==== 0x4b3780 Screen_MU_Main_PC::NotifySoundMessage
 
-int FUN_004b3780(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+int Screen_MU_Main_PC__NotifySoundMessage(void)
 
 {
   int in_stack_00000014;
@@ -1867,9 +1879,11 @@ FUN_004b3940(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
 }
 
 
-// ==== 0x4b3990 FUN_004b3990
+// ==== 0x4b3990 RaceSubObject586c::RaceSubObject586c
 
-void __fastcall FUN_004b3990(undefined4 *param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall RaceSubObject586c__RaceSubObject586c(undefined4 *param_1)
 
 {
   *param_1 = &PTR_FUN_006c5fb8;
@@ -2969,11 +2983,12 @@ LAB_004b4f35:
 }
 
 
-// ==== 0x4b5090 FUN_004b5090
+// ==== 0x4b5090 RaceStarter::SetupFreeRun
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_004b5090(void)
+void RaceStarter__SetupFreeRun(void)
 
 {
   byte *pbVar1;
@@ -3449,7 +3464,7 @@ void QuickRace__StartRaceByMode(void)
     FUN_004b4e60();
     break;
   case 3:
-    FUN_004b5090();
+    RaceStarter__SetupFreeRun();
     break;
   case 4:
     FUN_004b52a0();
@@ -3501,7 +3516,7 @@ void FUN_004b5d20(void)
     FUN_004b4e60();
     break;
   case 3:
-    FUN_004b5090();
+    RaceStarter__SetupFreeRun();
     break;
   case 4:
     FUN_004b52a0();
@@ -4344,9 +4359,12 @@ void FUN_004b6fe0(int param_1,int param_2,int param_3,int param_4,int param_5)
 }
 
 
-// ==== 0x4b70a0 FUN_004b70a0
+// ==== 0x4b70a0 Screen_MU_QuickRaceModeSelect::FindRaceMode_ByObject
 
-undefined4 * __fastcall FUN_004b70a0(int param_1,int param_2)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+undefined4 * __fastcall
+Screen_MU_QuickRaceModeSelect__FindRaceMode_ByObject(int param_1,int param_2)
 
 {
   undefined4 *puVar1;
@@ -4827,9 +4845,11 @@ LAB_004b7173:
 }
 
 
-// ==== 0x4b7a30 FUN_004b7a30
+// ==== 0x4b7a30 Screen_MU_QuickRaceModeSelect::DrawRaceMode
 
-void __fastcall FUN_004b7a30(undefined4 param_1,int param_2)
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall Screen_MU_QuickRaceModeSelect__DrawRaceMode(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -4898,7 +4918,7 @@ uint __thiscall FUN_004b7a90(int param_1,uint param_2,int param_3)
       }
     }
     else if (param_2 == 0xc407210) {
-      param_2 = FUN_004b70a0();
+      param_2 = Screen_MU_QuickRaceModeSelect__FindRaceMode_ByObject();
       DAT_00777cc8 = *(undefined4 *)(param_2 + 8);
       if (*(int *)(param_2 + 0xc) == 0) goto LAB_004b7b99;
     }
@@ -4943,14 +4963,14 @@ LAB_004b7d9d:
     DAT_00777cc8 = puVar6[2];
     FUN_00414a60();
     FUN_00414a60();
-    param_2 = FUN_004b7a30();
+    param_2 = Screen_MU_QuickRaceModeSelect__DrawRaceMode();
   }
   else if (param_2 == 0xc519bfc8) {
     param_2 = FEPackageList__FindByName(&DAT_00746104);
     if (((param_2 == 0) || (*(int *)(param_2 + 0x18) == 0)) &&
        (param_2 = FUN_004f6650(), (char)param_2 == '\0')) {
       FUN_004f64d0(*(undefined4 *)(param_1 + 0xc));
-      iVar3 = FUN_004b70a0();
+      iVar3 = Screen_MU_QuickRaceModeSelect__FindRaceMode_ByObject();
       param_2 = *(uint *)(iVar3 + 8);
       if (param_2 == 5) {
         DAT_006faefc = param_2;
@@ -5016,9 +5036,11 @@ void FUN_004b7dd0(void)
 }
 
 
-// ==== 0x4b7e80 FUN_004b7e80
+// ==== 0x4b7e80 Screen_MU_QuickRaceModeSelect::NotifySoundMessage
 
-undefined4 FUN_004b7e80(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+undefined4 Screen_MU_QuickRaceModeSelect__NotifySoundMessage(int param_1)
 
 {
   undefined4 uVar1;
@@ -5243,9 +5265,11 @@ void __thiscall FUN_004b8050(int param_1,uint param_2,int param_3)
 }
 
 
-// ==== 0x4b81c0 FUN_004b81c0
+// ==== 0x4b81c0 Screen_MU_QuickRaceOptions_PC::NotifySoundMessage
 
-undefined4 FUN_004b81c0(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+undefined4 Screen_MU_QuickRaceOptions_PC__NotifySoundMessage(int param_1)
 
 {
   undefined4 in_stack_00000014;
@@ -6087,9 +6111,11 @@ void FUN_004b91e0(void)
 }
 
 
-// ==== 0x4b9240 FUN_004b9240
+// ==== 0x4b9240 GenericDialogData::GenericDialogData
 
-undefined4 * __fastcall FUN_004b9240(undefined4 param_1,undefined4 *param_2)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined4 * __fastcall GenericDialogData__GenericDialogData(undefined4 param_1,undefined4 *param_2)
 
 {
   int iVar1;
@@ -6114,14 +6140,16 @@ undefined4 * __fastcall FUN_004b9240(undefined4 param_1,undefined4 *param_2)
 void __fastcall FUN_004b9270(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c5bbc;
+  *param_1 = &PTR_SelectableTrack__scalar_deleting_destructor_006c5bbc;
   return;
 }
 
 
-// ==== 0x4b9280 FUN_004b9280
+// ==== 0x4b9280 SelectableTrack::scalar_deleting_destructor
 
-void * __thiscall FUN_004b9280(void *param_1,byte param_2)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall SelectableTrack__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   FUN_004b9270();
@@ -6179,9 +6207,11 @@ undefined4 FUN_004b92a0(void)
 }
 
 
-// ==== 0x4b9370 FUN_004b9370
+// ==== 0x4b9370 TournamentTrackList::_TournamentTrackList
 
-void __fastcall FUN_004b9370(undefined4 *param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall TournamentTrackList___TournamentTrackList(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -6206,9 +6236,11 @@ void __fastcall FUN_004b9370(undefined4 *param_1)
 }
 
 
-// ==== 0x4b93a0 FUN_004b93a0
+// ==== 0x4b93a0 TournamentTrackList::IsFull
 
-bool FUN_004b93a0(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+bool TournamentTrackList__IsFull(void)
 
 {
   undefined4 *puVar1;
@@ -6224,9 +6256,11 @@ bool FUN_004b93a0(void)
 }
 
 
-// ==== 0x4b93d0 FUN_004b93d0
+// ==== 0x4b93d0 TournamentTrackList::IsEmpty
 
-bool __fastcall FUN_004b93d0(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+bool __fastcall TournamentTrackList__IsEmpty(int param_1)
 
 {
   undefined4 *puVar1;
@@ -6246,7 +6280,7 @@ bool __fastcall FUN_004b93d0(int param_1)
 void * __thiscall FUN_004b9400(void *param_1,byte param_2)
 
 {
-  FUN_004b9370();
+  TournamentTrackList___TournamentTrackList();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -6336,7 +6370,7 @@ void FUN_004b9500(int param_1,undefined4 param_2)
     puVar4 = (undefined4 *)0x0;
   }
   else {
-    *puVar4 = &PTR_FUN_006c5bbc;
+    *puVar4 = &PTR_SelectableTrack__scalar_deleting_destructor_006c5bbc;
     puVar4[3] = *(undefined4 *)(in_EAX + 0xc);
     puVar4[5] = *(undefined4 *)(in_EAX + 0x14);
     puVar4[6] = *(undefined4 *)(in_EAX + 0x18);
@@ -6419,9 +6453,11 @@ LAB_004b96c9:
 }
 
 
-// ==== 0x4b96e0 FUN_004b96e0
+// ==== 0x4b96e0 TournamentTrackList::CopyToRaceSetup
 
-void FUN_004b96e0(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void TournamentTrackList__CopyToRaceSetup(void)
 
 {
   int in_EAX;
@@ -6857,7 +6893,7 @@ void FUN_004b9e80(undefined4 *param_1)
     cFEng__PopPackage(*(undefined4 *)(iVar2 + 8),*(int *)(iVar4 + 0x18));
   }
   local_4._0_1_ = 2;
-  FUN_004b9370();
+  TournamentTrackList___TournamentTrackList();
   FUN_004f84d0();
   piVar1 = (int *)param_1[0x10];
   local_4 = (uint)local_4._1_3_ << 8;
@@ -6878,9 +6914,11 @@ void FUN_004b9e80(undefined4 *param_1)
 }
 
 
-// ==== 0x4b9f40 FUN_004b9f40
+// ==== 0x4b9f40 Screen_MU_QuickRaceTrackSelect::AddTrack
 
-void __fastcall FUN_004b9f40(undefined4 param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall Screen_MU_QuickRaceTrackSelect__AddTrack(undefined4 param_1)
 
 {
   char cVar1;
@@ -6897,7 +6935,7 @@ void __fastcall FUN_004b9f40(undefined4 param_1)
   }
   else {
     puVar2[5] = 0;
-    *puVar2 = &PTR_FUN_006c5bbc;
+    *puVar2 = &PTR_SelectableTrack__scalar_deleting_destructor_006c5bbc;
     puVar2[3] = param_1;
     puVar2[6] = in_EAX;
     piVar3 = puVar2 + 1;
@@ -6933,9 +6971,11 @@ undefined1 FUN_004b9fa0(void)
 }
 
 
-// ==== 0x4b9fd0 FUN_004b9fd0
+// ==== 0x4b9fd0 Screen_MU_QuickRaceTrackSelect::SortTracks
 
-void FUN_004b9fd0(int *param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void Screen_MU_QuickRaceTrackSelect__SortTracks(int *param_1)
 
 {
   int iVar1;
@@ -7060,9 +7100,9 @@ void FUN_004ba100(int param_1)
         iVar9 = local_4 + DAT_00736168;
       }
       sVar2 = *(short *)(iVar9 + 0x6c);
-      iVar9 = FUN_004ab470(&DAT_00748f70);
+      iVar9 = cFrontendDatabase__IsTrackAvailableForRaceType(&DAT_00748f70);
       if ((iVar9 != 0) && ((DAT_0073494c == 0 || (sVar2 != 1099)))) {
-        FUN_004b9f40();
+        Screen_MU_QuickRaceTrackSelect__AddTrack();
       }
       local_8 = local_8 + 1;
       local_4 = local_4 + 0xfc;
@@ -7079,17 +7119,17 @@ void FUN_004ba100(int param_1)
         iVar9 = local_8 + DAT_00736168;
       }
       sVar2 = *(short *)(iVar9 + 0x6c);
-      iVar3 = FUN_004ab470(&DAT_00748f70);
+      iVar3 = cFrontendDatabase__IsTrackAvailableForRaceType(&DAT_00748f70);
       if (((iVar3 != 0) && ((*(uint *)(iVar9 + 0x74) & 8) == 0)) &&
          ((DAT_0073494c == 0 || ((sVar2 != 1099 && ((*(uint *)(iVar9 + 0x74) & 6) == 0)))))) {
-        FUN_004b9f40();
+        Screen_MU_QuickRaceTrackSelect__AddTrack();
       }
       local_4 = local_4 + 1;
       local_8 = local_8 + 0xfc;
     } while (local_4 < DAT_0073616c);
   }
   piVar10 = (int *)(param_1 + 0x40);
-  FUN_004b9fd0(piVar10);
+  Screen_MU_QuickRaceTrackSelect__SortTracks(piVar10);
   if (*piVar10 == 0) {
     iVar9 = 0;
   }
@@ -7811,7 +7851,7 @@ void __fastcall FUN_004bb1c0(int param_1)
     if ((in_EAX != 0xc407210) && (in_EAX != 0x406415e3)) {
       return;
     }
-    cVar1 = FUN_004b93a0();
+    cVar1 = TournamentTrackList__IsFull();
     if (cVar1 != '\0') goto LAB_004bb244;
   }
   else {
@@ -7819,7 +7859,7 @@ void __fastcall FUN_004bb1c0(int param_1)
       if (DAT_00777cc8 != 4) {
         return;
       }
-      cVar1 = FUN_004b93d0();
+      cVar1 = TournamentTrackList__IsEmpty();
       if (cVar1 != '\0') {
         if (DAT_00777b4c != 4) {
           FUN_004f6360(*(undefined4 *)(param_1 + 0xc));
@@ -7836,7 +7876,7 @@ void __fastcall FUN_004bb1c0(int param_1)
     }
   }
   FUN_004b9500(param_1 + 0x88,DAT_00758a14);
-  cVar1 = FUN_004b93a0();
+  cVar1 = TournamentTrackList__IsFull();
   if (cVar1 == '\0') {
     return;
   }
@@ -7864,7 +7904,7 @@ void __thiscall FUN_004bb2b0(int param_1,uint param_2,undefined4 param_3,undefin
         if (param_2 < 0x7e9d0308) {
           if (param_2 == 0x7e9d0307) {
             if (DAT_00777cc8 == 4) {
-              FUN_004b96e0();
+              TournamentTrackList__CopyToRaceSetup();
             }
             QuickRace__StartRaceByMode();
             return;
@@ -9054,9 +9094,11 @@ void Ride_BuildFromPartDatabase(void)
 }
 
 
-// ==== 0x4bcb00 FUN_004bcb00
+// ==== 0x4bcb00 Screen_MU_QuickRaceCarSelect::MaskButtonFlags
 
-uint __thiscall FUN_004bcb00(int param_1,uint param_2)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+uint __thiscall Screen_MU_QuickRaceCarSelect__MaskButtonFlags(int param_1,uint param_2)
 
 {
   int *piVar1;
@@ -9090,7 +9132,7 @@ void __thiscall FUN_004bcb40(int param_1,uint param_2)
   if (0xa1c41aef < param_2) {
     if (param_2 < 0xc519bfc1) {
       if (param_2 == 0xc519bfc0) {
-        cVar1 = FUN_004bcfd0();
+        cVar1 = Screen_MU_QuickRaceCarSelect__IsSelectedCarInGarage();
         if (cVar1 != '\0') {
           iVar2 = SpecialCamCooldown();
           if (iVar2 != 0) {
@@ -9228,7 +9270,7 @@ LAB_004bcede:
   }
   auStack_34[6] = 0;
   auStack_34[7] = 0;
-  cVar1 = FUN_004ac040();
+  cVar1 = FEPlayerCarDB__HasCarHandle();
   if (cVar1 != '\0') {
     iVar2 = FUN_004ac1f0();
     uStack_38 = 0x84c276d9;
@@ -9247,9 +9289,11 @@ LAB_004bcc6b:
 }
 
 
-// ==== 0x4bcfd0 FUN_004bcfd0
+// ==== 0x4bcfd0 Screen_MU_QuickRaceCarSelect::IsSelectedCarInGarage
 
-uint FUN_004bcfd0(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+uint Screen_MU_QuickRaceCarSelect__IsSelectedCarInGarage(void)
 
 {
   int in_EAX;
@@ -9744,9 +9788,11 @@ void __thiscall FUN_004bd710(int param_1,uint param_2)
 }
 
 
-// ==== 0x4bd810 FUN_004bd810
+// ==== 0x4bd810 Screen_MU_QuickRaceLapPopup_PC::NotifySoundMessage
 
-undefined4 FUN_004bd810(uint param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+undefined4 Screen_MU_QuickRaceLapPopup_PC__NotifySoundMessage(uint param_1)
 
 {
   undefined4 in_stack_00000014;
@@ -10109,9 +10155,11 @@ void __thiscall FUN_004bdd10(int param_1,uint param_2,int param_3)
 }
 
 
-// ==== 0x4bdf20 FUN_004bdf20
+// ==== 0x4bdf20 Screen_MU_PauseOptions_PC::NotifySoundMessage
 
-int FUN_004bdf20(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+int Screen_MU_PauseOptions_PC__NotifySoundMessage(void)
 
 {
   int in_stack_00000014;

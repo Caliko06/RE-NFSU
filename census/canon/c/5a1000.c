@@ -1374,7 +1374,8 @@ void FUN_005a2930(void)
     puVar2 = puVar2 + 0x2c3;
     iVar1 = iVar1 + -1;
   } while (iVar1 != 0);
-  eh_vector_constructor_iterator(unaff_EDI + 0x161b,0xc,4,FUN_004b3990,FUN_004b39a0);
+  eh_vector_constructor_iterator
+            (unaff_EDI + 0x161b,0xc,4,RaceSubObject586c__RaceSubObject586c,FUN_004b39a0);
   unaff_EDI[0x161a] = 0;
   unaff_EDI[0x1619] = unaff_EDI + 1;
   unaff_EDI[0x1627] = 0;
@@ -9706,7 +9707,7 @@ void MovieSubtitles__Update(void)
       }
       if (fVar3 < fVar2 * 0.001) {
         DAT_00733f28 = DAT_00733f28 + 1;
-        FUN_004f66f0();
+        FEString__SetLabelHash();
         return;
       }
     }

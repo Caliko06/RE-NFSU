@@ -473,7 +473,7 @@ undefined4 FUN_004318d0(void)
   int in_EAX;
   
   if ((*(int *)(in_EAX + 4) != 0) && (*(int *)(in_EAX + 4) != -0x40)) {
-    cVar1 = FUN_00465430();
+    cVar1 = CarState__IsNitrousOn();
     if (cVar1 != '\0') {
       return 1;
     }
@@ -5330,7 +5330,7 @@ void __fastcall FUN_004373d0(int param_1)
   FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0xd8));
   FUN_00548840((uint)*(ushort *)(*(int *)(param_1 + 4) + 0x3b4) << 0x10);
   FUN_00548840(*(undefined2 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1d0));
-  uVar1 = FUN_00465430();
+  uVar1 = CarState__IsNitrousOn();
   FUN_00548840(uVar1);
   FUN_00436dc0(*(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1dc));
   FUN_00436dc0(*(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1e4));
@@ -5540,14 +5540,14 @@ void __thiscall FUN_004375e0(int param_1,undefined4 param_2,float param_3)
     *(undefined4 *)(param_1 + 0x90) = 1;
   }
   if (*(char *)(param_1 + 0x74) != '\0') {
-    cVar3 = FUN_00465430();
+    cVar3 = CarState__IsNitrousOn();
     if (cVar3 == '\0') {
       FUN_004654f0();
       goto LAB_00437d4f;
     }
     if (*(char *)(param_1 + 0x74) != '\0') goto LAB_00437d4f;
   }
-  cVar3 = FUN_00465430();
+  cVar3 = CarState__IsNitrousOn();
   if (cVar3 != '\0') {
     CarState__StopTimer();
   }
@@ -5875,7 +5875,7 @@ void FUN_00438440(float param_1)
   if (*(float *)(unaff_ESI + 0x254) == 0.0) {
     local_28 = (float)(**(uint **)(unaff_ESI + 0x298) ^ *(uint *)(unaff_ESI + 0x294)) -
                (float)*(int *)(unaff_ESI + 0x29c);
-    if ((*(char *)(unaff_ESI + 0x74) != '\0') || (cVar5 = FUN_00465430(), cVar5 != '\0')) {
+    if ((*(char *)(unaff_ESI + 0x74) != '\0') || (cVar5 = CarState__IsNitrousOn(), cVar5 != '\0')) {
       local_28 = local_28 + param_1;
       iVar7 = *(int *)(*(int *)(unaff_ESI + 4) + 0x3f0);
       if ((iVar7 == 0) || (iVar7 == 0x7fffffff)) {
@@ -7558,10 +7558,10 @@ void __fastcall Race__RequestStartOrRestart(int param_1)
   undefined4 uVar2;
   
   if (DAT_006f1f64 != 0) {
-    FUN_0043d220();
+    Race__ApplyPendingSlotNames();
     FUN_0043d7e0();
     FUN_00549980();
-    FUN_004abc90();
+    cFrontendDatabase__ResetRaceSlotState();
   }
   cVar1 = IsDriftMode();
   if (cVar1 != '\0') {
@@ -8726,9 +8726,11 @@ void __thiscall FUN_0043d1f0(int param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x43d220 FUN_0043d220
+// ==== 0x43d220 Race::ApplyPendingSlotNames
 
-void __fastcall FUN_0043d220(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+
+void __fastcall Race__ApplyPendingSlotNames(int param_1)
 
 {
   int iVar1;

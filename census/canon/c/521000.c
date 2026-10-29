@@ -3313,7 +3313,7 @@ undefined2 EAXTrafficCar__IsPlayerCarInRange(void)
   float local_1c;
   
   iVar3 = *(int *)(in_EAX + 0x234);
-  iVar8 = FUN_005328b0();
+  iVar8 = EAX_NearestListenerToPoint();
   fVar1 = *(float *)(iVar3 + 100);
   fVar2 = *(float *)(iVar3 + 0x68);
   fVar4 = *(float *)(iVar8 + 0x60) - *(float *)(iVar3 + 0x60);
@@ -3643,7 +3643,7 @@ void __thiscall EAXTrafficCar__Update(int param_1,float param_2)
           if (cVar1 != '\0') {
             fVar3 = (float10)FUN_00564a80(0x3f800000);
             if ((fVar3 < (float10)0.3) || (_DAT_0073565c + 5.0 < *(float *)(param_1 + 0x240))) {
-              iVar2 = FUN_005328b0();
+              iVar2 = EAX_NearestListenerToPoint();
               *(int *)(param_1 + 0x2f8) = iVar2;
               if ((iVar2 != 0) && (*(int *)(iVar2 + 0x878) != 0)) {
                 *(undefined4 *)(param_1 + 0x2fc) = *(undefined4 *)(*(int *)(iVar2 + 0x878) + 0x264);
@@ -3699,7 +3699,7 @@ float10 EAXTrafficCar__GetPlayerSpeedRelativeToUs(void)
   float10 fVar4;
   
   iVar1 = *(int *)(in_EAX + 0x234);
-  iVar2 = FUN_005328b0();
+  iVar2 = EAX_NearestListenerToPoint();
   if (iVar2 == 0) {
     return (float10)0.0;
   }
@@ -5671,14 +5671,14 @@ void EAXTunerCar__UpdateNitrous(void)
   if ((cVar1 != '\0') && ((char)unaff_EDI[0x478] != '\0')) {
     FUN_005326f0(unaff_retaddr);
     if (unaff_EDI[0x47b] == 0) {
-      cVar1 = FUN_00465430();
+      cVar1 = CarState__IsNitrousOn();
       if (cVar1 != '\0') {
         EAXNitrous__Play(0,0,0x1000,unaff_EDI[0xab]);
         EAXMixMgr__SetMixType(DAT_007356ac,5,0xbf800000,unaff_EDI[0x99]);
         FUN_00532610(0,0x3f800000,400);
       }
     }
-    else if ((unaff_EDI[0x47b] == 1) && (cVar1 = FUN_00465430(), cVar1 == '\0')) {
+    else if ((unaff_EDI[0x47b] == 1) && (cVar1 = CarState__IsNitrousOn(), cVar1 == '\0')) {
       EAXNitrous__Stop();
       EAXMixMgr__EndMixType(DAT_007356ac,5,unaff_EDI[0x99]);
       FUN_00532610(unaff_EDI[0x49b],0,1000);

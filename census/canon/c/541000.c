@@ -1957,7 +1957,7 @@ FUN_005447c0(int param_1,int param_2,undefined4 param_3,int param_4,int param_5,
       if ((local_3ac != 0x4479c000) && (local_3ac != 0x461c3c00)) {
         FUN_00567710();
         FUN_005677d0(DAT_006f3df4);
-        iVar4 = FUN_0040db20(param_1);
+        iVar4 = AABB_ClassifyAgainstFrustum(param_1);
         if (iVar4 != 0) {
           FUN_00540a30();
           FUN_00540990();
@@ -1971,7 +1971,7 @@ FUN_005447c0(int param_1,int param_2,undefined4 param_3,int param_4,int param_5,
     else if (param_5 == 1) {
       FUN_00567710();
       FUN_005677d0(DAT_006f41a8);
-      iVar4 = FUN_0040db20(param_1);
+      iVar4 = AABB_ClassifyAgainstFrustum(param_1);
       if (iVar4 != 0) {
 LAB_00544a80:
         local_390 = 0;
@@ -1985,9 +1985,9 @@ LAB_00544a80:
         local_378 = 0;
         FUN_00540a30();
         fVar3 = local_3b4;
-        puVar5 = (undefined4 *)FUN_00540860(local_3b4,local_3b0,local_3ac,local_3a8);
-        FUN_005408f0(*puVar5,puVar5[1],puVar5[2],puVar5[3]);
-        FUN_005408b0(local_380,local_37c,local_378,local_374);
+        puVar5 = (undefined4 *)Vec4_SubXYZ(local_3b4,local_3b0,local_3ac,local_3a8);
+        Vec4_SetXYZ(*puVar5,puVar5[1],puVar5[2],puVar5[3]);
+        Vec4_DotPack(local_380,local_37c,local_378,local_374);
         fVar1 = 32000.0;
         fVar2 = 40000.0;
         local_3a4 = 1.0;
@@ -2004,10 +2004,10 @@ LAB_00544a80:
             local_3a4 = _K_ONE - (local_3d0 - fVar1) / (fVar2 - fVar1);
           }
           puVar5 = (undefined4 *)FUN_00540a60(local_350,local_3a0,local_39c,local_398,local_394);
-          FUN_005408f0(*puVar5,puVar5[1],puVar5[2],puVar5[3]);
+          Vec4_SetXYZ(*puVar5,puVar5[1],puVar5[2],puVar5[3]);
           puVar5 = (undefined4 *)FUN_005409c0();
-          FUN_005408f0(*puVar5,puVar5[1],puVar5[2],puVar5[3]);
-          pfVar6 = (float *)FUN_005408b0(local_3e0,local_3dc,local_3d8,local_3d4);
+          Vec4_SetXYZ(*puVar5,puVar5[1],puVar5[2],puVar5[3]);
+          pfVar6 = (float *)Vec4_DotPack(local_3e0,local_3dc,local_3d8,local_3d4);
           local_3a0 = *pfVar6;
           local_3d4 = pfVar6[3];
           if (((uint)local_3b8 & 1) == 0) {
@@ -2030,7 +2030,7 @@ LAB_00544a80:
           local_38c = 0;
           local_388 = 0;
           puVar7 = (undefined4 *)FUN_00540ae0(fVar3,local_3b0,local_3ac,local_3a8);
-          FUN_005408f0(*puVar7,puVar7[1],puVar7[2],puVar7[3]);
+          Vec4_SetXYZ(*puVar7,puVar7[1],puVar7[2],puVar7[3]);
           iVar8 = FUN_00540990();
           iVar4 = local_354;
           local_3b8 = *(float *)(iVar8 + 8) / local_3b8;
@@ -2081,7 +2081,7 @@ int FUN_00544e90(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefi
   iVar1 = in_EAX % 100 + (in_EAX / 100) * 10;
   if (((&DAT_00740b58)[iVar1 * 0xc] != 0) && ((&DAT_00740b50)[iVar1 * 0xc] != 1)) {
     (&DAT_00740b50)[iVar1 * 0xc] = 1;
-    iVar2 = FUN_0040db20(param_1);
+    iVar2 = AABB_ClassifyAgainstFrustum(param_1);
     if (iVar2 != 0) {
       iVar2 = 0;
       puVar3 = (undefined4 *)(&DAT_00740b5c)[iVar1 * 0xc];
@@ -3168,7 +3168,7 @@ void FUN_00546060(void)
   int iVar1;
   int iVar2;
   
-  if ((((in_EAX != 0) && (iVar1 = FUN_0053e560(&DAT_00740420,in_EAX), iVar1 != 0)) &&
+  if ((((in_EAX != 0) && (iVar1 = SolidListSet_FindListByHash(&DAT_00740420,in_EAX), iVar1 != 0)) &&
       (*(char *)(iVar1 + 0x8b) == '\0')) &&
      (((*(int *)(iVar1 + 0x9c) != 0 && (iVar2 = BinarySearch_Hash(), iVar2 != 0)) &&
       (*(short *)(iVar2 + 0xe) = *(short *)(iVar2 + 0xe) + -1, *(short *)(iVar2 + 0xe) == 0)))) {

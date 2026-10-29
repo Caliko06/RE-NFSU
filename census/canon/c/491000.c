@@ -1787,9 +1787,11 @@ void FUN_00494890(void)
 }
 
 
-// ==== 0x4948c0 FUN_004948c0
+// ==== 0x4948c0 Screen_Options::ItemList::_ItemList
 
-void __fastcall FUN_004948c0(undefined4 *param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void __fastcall Screen_Options__ItemList___ItemList(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -1819,7 +1821,7 @@ void __fastcall FUN_004948c0(undefined4 *param_1)
 void * __thiscall FUN_004948f0(void *param_1,byte param_2)
 
 {
-  FUN_004948c0();
+  Screen_Options__ItemList___ItemList();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -1987,7 +1989,7 @@ void FUN_00494b10(undefined4 *param_1)
   ExceptionList = &local_c;
   *param_1 = &PTR_FUN_006c7ad8;
   local_4 = 0;
-  FUN_004948c0();
+  Screen_Options__ItemList___ItemList();
   local_4 = 0xffffffff;
   FUN_004f7b50();
   ExceptionList = local_c;
@@ -3059,9 +3061,11 @@ void FUN_00495e90(void)
 }
 
 
-// ==== 0x495ec0 FUN_00495ec0
+// ==== 0x495ec0 tPreRaceScreenManager::RequestStatsScreen
 
-void FUN_00495ec0(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+void tPreRaceScreenManager__RequestStatsScreen(void)
 
 {
   if ((((DAT_00735ed8 != 0) && (DAT_0078a345 == '\0')) && (DAT_007361a4 == 0)) &&
@@ -3218,9 +3222,11 @@ float10 FUN_004960a0(void)
 }
 
 
-// ==== 0x4960e0 FUN_004960e0
+// ==== 0x4960e0 PostRaceRewardList::_PostRaceRewardList
 
-void __fastcall FUN_004960e0(undefined4 *param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall PostRaceRewardList___PostRaceRewardList(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -3248,7 +3254,7 @@ void __fastcall FUN_004960e0(undefined4 *param_1)
 void * __thiscall FUN_00496110(void *param_1,byte param_2)
 
 {
-  FUN_004960e0();
+  PostRaceRewardList___PostRaceRewardList();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -3533,7 +3539,7 @@ LAB_00496658:
       cVar3 = Race__DidPlayerWin(DAT_00777ccc,0);
       if ((cVar3 != '\0') &&
          ((((piVar6[0x1629] == 2 || (piVar6[0x1629] == 3)) ||
-           (cVar3 = FUN_004ab640(), cVar3 != '\0')) ||
+           (cVar3 = FERaceEvent__HasMagazineReward(), cVar3 != '\0')) ||
           ((cVar3 = FUN_0051ba80(), cVar3 != '\0' && (iVar8 != 8)))))) {
         uVar9 = 0x3d82312b;
       }
@@ -3990,7 +3996,7 @@ LAB_00496f5d:
         if (*piVar6 < 0) {
           *piVar6 = 0;
         }
-        FUN_004aa970(piVar6 + -0x84,*piVar6);
+        ThresholdTable_MarkReached(piVar6 + -0x84,*piVar6);
       }
       iVar4 = iVar4 + 1;
       piVar6 = piVar6 + 0x3e51;
@@ -4170,7 +4176,7 @@ LAB_004972dd:
         if (*piVar5 < 0) {
           *piVar5 = 0;
         }
-        FUN_004aa970(piVar5 + -0x84,*piVar5);
+        ThresholdTable_MarkReached(piVar5 + -0x84,*piVar5);
       }
       iVar3 = iVar3 + 1;
       piVar5 = piVar5 + 0x3e51;
@@ -4190,7 +4196,7 @@ void FUN_004973d0(void)
   DAT_00778898 = 3;
   if (DAT_00777ccc != (int *)0x0) {
     (**(code **)(*DAT_00777ccc + 0x10))();
-    FUN_004abc20();
+    cFrontendDatabase__NotifyChangeToNextRace();
   }
   FUN_00421c00(DAT_007361f0,9,0);
   return;
@@ -4237,7 +4243,7 @@ LAB_0049746d:
         if (*piVar5 < 0) {
           *piVar5 = 0;
         }
-        FUN_004aa970(piVar5 + -0x84,*piVar5);
+        ThresholdTable_MarkReached(piVar5 + -0x84,*piVar5);
       }
       iVar3 = iVar3 + 1;
       piVar5 = piVar5 + 0x3e51;
@@ -4246,16 +4252,18 @@ LAB_0049746d:
   DAT_00778898 = 0;
   if (DAT_00777ccc != (int *)0x0) {
     (**(code **)(*DAT_00777ccc + 0x18))();
-    FUN_004abc20();
+    cFrontendDatabase__NotifyChangeToNextRace();
   }
   FUN_00421c00(DAT_007361f0,9,0);
   return;
 }
 
 
-// ==== 0x497590 FUN_00497590
+// ==== 0x497590 PostRaceResults::NextScreenIsNotGiveth
 
-undefined4 FUN_00497590(void)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined4 PostRaceResults__NextScreenIsNotGiveth(void)
 
 {
   int iVar1;
@@ -4421,7 +4429,7 @@ LAB_0049798c:
           FUN_00496f00(param_1);
           *(undefined1 *)(param_1 + 0x48) = 1;
         }
-        cVar1 = FUN_00497590();
+        cVar1 = PostRaceResults__NextScreenIsNotGiveth();
         if (cVar1 == '\0') {
           *(undefined1 *)(param_1 + 0x40) = 0;
           FUN_004970f0(param_1);
@@ -4487,14 +4495,14 @@ void __fastcall FUN_00497a00(int param_1)
       FEObject__SetFormattedText(&DAT_006ca778,iVar4);
       if (iVar6 < 1) {
         if (iVar6 != 0) {
-          FUN_004f66f0();
+          FEString__SetLabelHash();
           return;
         }
-        FUN_004f66f0();
+        FEString__SetLabelHash();
         FEObject__SetInvisible(iVar5);
         return;
       }
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       return;
     }
     if (iVar4 != 0) {
@@ -4513,9 +4521,11 @@ void __fastcall FUN_00497a00(int param_1)
 }
 
 
-// ==== 0x497ba0 FUN_00497ba0
+// ==== 0x497ba0 Screen_PostRaceResults::NotifySoundMessage
 
-int FUN_00497ba0(void)
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int Screen_PostRaceResults__NotifySoundMessage(void)
 
 {
   int in_stack_00000014;
@@ -4830,7 +4840,7 @@ LAB_004981ba:
           iVar7 = FUN_004ef050(iVar9);
 LAB_004981c9:
           if ((iVar7 != 0) && (FUN_00495ce0(local_50), *(int *)(iVar7 + 0x18) < 0x100)) {
-            cVar3 = FUN_004feb50();
+            cVar3 = FEColor_NearlyEqual();
             if (cVar3 == '\0') {
               *(uint *)(iVar7 + 0x1c) = *(uint *)(iVar7 + 0x1c) | 0x400000;
             }
@@ -7116,9 +7126,11 @@ LAB_0049ad81:
 }
 
 
-// ==== 0x49af70 FUN_0049af70
+// ==== 0x49af70 Screen_PostRaceStats::CompareByScoreDesc
 
-bool FUN_0049af70(int param_1,int param_2)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+bool Screen_PostRaceStats__CompareByScoreDesc(int param_1,int param_2)
 
 {
   return *(int *)(param_2 + 0x14) <= *(int *)(param_1 + 0x14);
@@ -7292,7 +7304,7 @@ LAB_0049b1d2:
         local_ac = local_ac + 0xc;
       } while ((int)local_a0 < param_3);
     }
-    bList__Sort(&local_a8,FUN_0049af70);
+    bList__Sort(&local_a8,Screen_PostRaceStats__CompareByScoreDesc);
     local_9c = 0;
     if (0 < param_3) {
       do {
@@ -7529,7 +7541,7 @@ LAB_0049b60c:
             iVar5 = FUN_004ef050(iVar15);
           }
           if ((iVar5 != 0) && (FUN_00495ce0(local_3c), *(int *)(iVar5 + 0x18) < 0x100)) {
-            cVar4 = FUN_004feb50();
+            cVar4 = FEColor_NearlyEqual();
             if (cVar4 == '\0') {
               *(uint *)(iVar5 + 0x1c) = *(uint *)(iVar5 + 0x1c) | 0x400000;
             }
@@ -8566,7 +8578,7 @@ void FUN_0049cc70(int param_1,undefined4 param_2)
   FUN_0049d4c0(iVar1,param_2);
   FUN_0049d5b0(iVar1);
   FUN_0049db30(param_2);
-  FUN_0049de00(param_2);
+  PostRaceStatsScreen__DrawNumLapsLed(param_2);
   FUN_0049de80(param_2);
   FUN_00497a00();
   return;
@@ -9420,9 +9432,11 @@ void FUN_0049dd10(int param_1)
 }
 
 
-// ==== 0x49de00 FUN_0049de00
+// ==== 0x49de00 PostRaceStatsScreen::DrawNumLapsLed
 
-void FUN_0049de00(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/runtime.md */
+
+void PostRaceStatsScreen__DrawNumLapsLed(int param_1)
 
 {
   int iVar1;
@@ -9592,7 +9606,7 @@ bool FUN_0049e0b0(void)
   else if (DAT_00777b4c == 4) {
     return false;
   }
-  FUN_004ad270();
+  RacingCars_FindByKey();
   iVar1 = _ftol_nocw();
   return iVar1 != 0;
 }
@@ -9649,7 +9663,7 @@ LAB_0049e1f0:
   if ((int *)*piVar1 == piVar1) {
     DAT_006fb988 = 0;
     DAT_00735790 = FUN_004ab670(&DAT_00748f70);
-    FUN_004abb50(1);
+    cFrontendDatabase__NotifyExitRaceToFrontend(1);
     iVar5 = DAT_007361f0;
     piVar4 = (int *)FUN_00567160();
     if (piVar4 == (int *)0x0) {
@@ -9774,9 +9788,11 @@ void FUN_0049e3e0(void)
 }
 
 
-// ==== 0x49e400 FUN_0049e400
+// ==== 0x49e400 PostRaceRewardList::GetItemLabelHash
 
-undefined4 __fastcall FUN_0049e400(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall PostRaceRewardList__GetItemLabelHash(int param_1)
 
 {
   int iVar1;
@@ -9814,7 +9830,7 @@ void FUN_0049e420(int param_1)
     FUN_004f42f0("EVENT_REWARD_%s_LEVEL_%d",(&PTR_s_PAINT_006fb9a0)[in_EAX[1]],in_EAX[2]);
     break;
   case 1:
-    FUN_0049e400();
+    PostRaceRewardList__GetItemLabelHash();
     break;
   case 2:
     pcVar6 = (char *)GetCarTypeInfo();
@@ -9930,9 +9946,11 @@ switchD_0049e438_caseD_4:
 }
 
 
-// ==== 0x49e6a0 FUN_0049e6a0
+// ==== 0x49e6a0 PostRaceRewardList::AddValueMessage
 
-void FUN_0049e6a0(int param_1,undefined4 param_2)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void PostRaceRewardList__AddValueMessage(int param_1,undefined4 param_2)
 
 {
   char cVar1;
@@ -9973,9 +9991,11 @@ void FUN_0049e6a0(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x49e740 FUN_0049e740
+// ==== 0x49e740 PostRaceRewardList::AddMessage
 
-void FUN_0049e740(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void PostRaceRewardList__AddMessage(int param_1)
 
 {
   char cVar1;
@@ -10060,9 +10080,11 @@ void FUN_0049e7e0(int param_1)
 }
 
 
-// ==== 0x49e890 FUN_0049e890
+// ==== 0x49e890 PostRaceRewardList::AddMessageWith2Strings
 
-void FUN_0049e890(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void PostRaceRewardList__AddMessageWith2Strings(int param_1)
 
 {
   char cVar1;
@@ -10187,7 +10209,7 @@ LAB_0049ea06:
   }
   _ftol_nocw();
   iVar2 = _ftol_nocw();
-  FUN_004aa970(&DAT_007588c4,iVar2 + iVar7);
+  ThresholdTable_MarkReached(&DAT_007588c4,iVar2 + iVar7);
   DAT_00760288 = 0;
   DAT_0076028c = 0;
   DAT_00760290 = 0;
@@ -10371,12 +10393,12 @@ LAB_0049edec:
   if ((cVar2 == '\0') || (cVar2 = (**(code **)(*piVar5 + 4))(), cVar2 != '\0')) {
     cVar2 = FUN_005a3340();
     if (cVar2 != '\0') {
-      FUN_0049e740(param_1);
+      PostRaceRewardList__AddMessage(param_1);
     }
   }
   else if ((char)piVar5[0x167b] == '\0') {
     uVar4 = _ftol_nocw();
-    FUN_0049e6a0(param_1,uVar4);
+    PostRaceRewardList__AddValueMessage(param_1,uVar4);
     bVar8 = false;
     if (0 < piVar5[0x1645]) {
       piVar7 = piVar5 + 0x1636;
@@ -10393,7 +10415,7 @@ LAB_0049edec:
       } while (iVar6 < piVar5[0x1645]);
     }
     if (piVar5[0x1629] == 6) {
-      FUN_0049e890(param_1);
+      PostRaceRewardList__AddMessageWith2Strings(param_1);
     }
     if (bVar8) {
       FUN_0049e7e0(param_1);
@@ -10629,9 +10651,11 @@ undefined4 __fastcall FUN_0049f1b0(int param_1)
 }
 
 
-// ==== 0x49f2b0 FUN_0049f2b0
+// ==== 0x49f2b0 Screen_RewardPopup::HasDisplayTimeElapsed
 
-undefined4 __fastcall FUN_0049f2b0(int param_1)
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall Screen_RewardPopup__HasDisplayTimeElapsed(int param_1)
 
 {
   if (2.55 < (float)(DAT_0073ad3c - *(int *)(param_1 + 8)) * 0.00025) {
@@ -10658,7 +10682,7 @@ void FUN_0049f2e0(void)
   switch(*(undefined4 *)(unaff_EBX + 8)) {
   case 0:
     iVar3 = FUN_0049f1b0();
-    cVar2 = FUN_0049f2b0();
+    cVar2 = Screen_RewardPopup__HasDisplayTimeElapsed();
     if (cVar2 != '\0') {
       *(int *)(unaff_EBX + 0x28) = *(int *)(unaff_EBX + 0x28) + *(int *)(extraout_EDX + 0x4c);
       if (*(undefined4 **)(unaff_EBX + 0xc) == *(undefined4 **)(unaff_EBX + 4)) {

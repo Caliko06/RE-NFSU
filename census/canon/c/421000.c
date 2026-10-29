@@ -2046,7 +2046,7 @@ undefined4 __thiscall FUN_00423280(int param_1,undefined4 param_2,undefined4 par
     ExceptionList = &local_10;
     if (DAT_0078a320 == 1) {
       ExceptionList = &local_10;
-      FUN_00495ec0();
+      tPreRaceScreenManager__RequestStatsScreen();
       piVar4 = DAT_0073619c;
     }
     goto LAB_0042347b;
@@ -2087,7 +2087,7 @@ LAB_00423468:
     }
   }
   if (DAT_0078a320 == 1) {
-    FUN_00495ec0();
+    tPreRaceScreenManager__RequestStatsScreen();
   }
 LAB_0042347b:
   FUN_00434b50(piVar4,3);
@@ -2155,7 +2155,7 @@ undefined4 __thiscall FUN_00423530(undefined4 *param_1,undefined4 param_2,undefi
       }
     }
     if (param_1[0xf] != 0) {
-      uVar4 = FUN_0047f4c0();
+      uVar4 = IntroNisCoordinator__IsFinished();
       if ((int)uVar4 != 0) {
         (**(code **)*(undefined4 *)((ulonglong)uVar4 >> 0x20))(1);
         param_1[0xf] = 0;
@@ -2296,10 +2296,10 @@ undefined4 __thiscall FUN_00423870(int param_1,undefined4 param_2,int param_3)
   if (param_3 != 4) {
     if (param_3 != 3) {
       if (param_3 == 2) {
-        FUN_004aba80();
+        cFrontendDatabase__NotifyRestartRace();
         FUN_00495e20();
         if (DAT_0078a320 == 1) {
-          FUN_00495ec0();
+          tPreRaceScreenManager__RequestStatsScreen();
         }
         FUN_00421ae0(0);
         FUN_00421bc0(8,0);
@@ -2307,7 +2307,7 @@ undefined4 __thiscall FUN_00423870(int param_1,undefined4 param_2,int param_3)
       *(undefined1 *)(param_1 + 0x24) = 0;
       return 1;
     }
-    FUN_004abb50(0);
+    cFrontendDatabase__NotifyExitRaceToFrontend(0);
     FUN_00421ae0(0);
     FUN_00421bc0(10,0);
     *(undefined1 *)(param_1 + 0x24) = 0;
@@ -2845,7 +2845,7 @@ undefined4 __thiscall CameraMover_CreateByType(int param_1,int param_2,undefined
     ExceptionList = &local_10;
     FUN_00495e20();
     if (DAT_0078a320 == 1) {
-      FUN_00495ec0();
+      tPreRaceScreenManager__RequestStatsScreen();
     }
     FUN_00421ae0(0);
     FUN_00421bc0(8,0);
@@ -11984,7 +11984,7 @@ void Player__StartRaceCameras(void)
   }
 LAB_00430a7a:
   if ((((*(int *)(in_EAX + 4) == 0) || (*(int *)(in_EAX + 4) == -0x40)) ||
-      (cVar2 = FUN_00465430(), cVar2 == '\0')) && (*(char *)(in_EAX + 0x270) != '\0')) {
+      (cVar2 = CarState__IsNitrousOn(), cVar2 == '\0')) && (*(char *)(in_EAX + 0x270) != '\0')) {
     _gSpecialCameraActive = 0;
     *(undefined1 *)(in_EAX + 0x270) = 0;
   }

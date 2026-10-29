@@ -67,7 +67,7 @@ LRESULT FUN_004110d0(HWND param_1,uint param_2,HWND param_3,LPARAM param_4)
   }
   if (param_2 == 0x102) {
     DAT_007363b1 = param_3._0_1_;
-    FUN_00411340();
+    TextEntry_HandleChar();
     return 0;
   }
   if (param_2 < 0x11) {
@@ -141,9 +141,11 @@ switchD_004111fc_caseD_26:
 }
 
 
-// ==== 0x411340 FUN_00411340
+// ==== 0x411340 TextEntry_HandleChar
 
-void FUN_00411340(void)
+/* [canon] input med (ghidra-canon) docs/re/runtime.md */
+
+void TextEntry_HandleChar(void)
 
 {
   int iVar1;
@@ -3064,7 +3066,7 @@ LAB_00414452:
         }
         FUN_00414010();
 LAB_004143e2:
-        FUN_004f66f0();
+        FEString__SetLabelHash();
         FEObject__SetScript("FadeIn",1);
         return;
       }
@@ -3102,7 +3104,7 @@ LAB_004143e2:
         *(undefined4 *)(iVar1 + 0x1c) = 0xff;
       }
       *(undefined1 *)(param_1 + 0x88) = 0;
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       FEObject__SetScript("FadeIn",1);
     }
     if ((*(char *)(param_1 + 0x80) != '\0') &&
@@ -3132,7 +3134,7 @@ void FUN_00414441(void)
   
   if (!in_ZF) {
     Screen_PC_Controller_Config__GetObjectMessageHash(unaff_EBP);
-    FUN_004f66f0();
+    FEString__SetLabelHash();
     FEObject__SetScript("FadeIn",1);
     return;
   }
@@ -3496,7 +3498,7 @@ void __fastcall ListSlider___ListSlider(undefined4 *param_1)
   int *piVar3;
   
   piVar1 = param_1 + 0xc;
-  *param_1 = &PTR_FUN_006cbe88;
+  *param_1 = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   _Memory = (int *)*piVar1;
   while (_Memory != piVar1) {
     iVar2 = *_Memory;
@@ -3511,9 +3513,11 @@ void __fastcall ListSlider___ListSlider(undefined4 *param_1)
 }
 
 
-// ==== 0x414b80 FUN_00414b80
+// ==== 0x414b80 ListSlider::scalar_deleting_destructor
 
-void * __thiscall FUN_00414b80(void *param_1,byte param_2)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall ListSlider__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   ListSlider___ListSlider();
@@ -3624,7 +3628,7 @@ undefined4 * Screen_PC_Graphics__Screen_PC_Graphics(undefined4 *param_1,undefine
   param_1[0x19] = 0;
   param_1[0x1a] = 0;
   param_1[0x1b] = 0;
-  *piVar1 = (int)&PTR_FUN_006cbe88;
+  *piVar1 = (int)&PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar4 = puVar4;
   param_1[0x1d] = puVar4;
   param_1[0x1e] = 0;
@@ -4155,7 +4159,7 @@ int Screen_PC_Customize_Graphics__Screen_PC_Customize_Graphics
   param_1[0x19] = 0;
   param_1[0x1a] = 0;
   param_1[0x1b] = 0;
-  *piVar1 = (int)&PTR_FUN_006cbe88;
+  *piVar1 = (int)&PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar7 = puVar7;
   param_1[0x1d] = puVar7;
   param_1[0x1e] = 0;
@@ -4172,7 +4176,7 @@ int Screen_PC_Customize_Graphics__Screen_PC_Customize_Graphics
   param_1[0x28] = 0;
   param_1[0x29] = 0;
   param_1[0x2a] = 0;
-  *piVar2 = (int)&PTR_FUN_006cbe88;
+  *piVar2 = (int)&PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar7 = puVar7;
   param_1[0x2c] = puVar7;
   param_1[0x2d] = 0;
@@ -4189,7 +4193,7 @@ int Screen_PC_Customize_Graphics__Screen_PC_Customize_Graphics
   param_1[0x37] = 0;
   param_1[0x38] = 0;
   param_1[0x39] = 0;
-  *piVar6 = (int)&PTR_FUN_006cbe88;
+  *piVar6 = (int)&PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   *puVar7 = puVar7;
   param_1[0x3b] = puVar7;
   param_1[0x3c] = 0;
@@ -4204,7 +4208,7 @@ int Screen_PC_Customize_Graphics__Screen_PC_Customize_Graphics
   param_1[0x46] = 0;
   param_1[0x47] = 0;
   param_1[0x48] = 0;
-  param_1[0x3d] = &PTR_FUN_006cbe88;
+  param_1[0x3d] = &PTR_ListSlider__scalar_deleting_destructor_006cbe88;
   puVar7 = param_1 + 0x49;
   *puVar7 = puVar7;
   param_1[0x4a] = puVar7;
@@ -6705,7 +6709,7 @@ FUN_004183b0(int param_1,uint param_2,undefined4 param_3,undefined4 param_4,unde
       return;
     }
     if (param_2 == 0xabc08912) {
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       FEObject__SetScript("FadeIn",1);
       FUN_00418a00(param_3);
       FUN_00416f00();
@@ -6751,7 +6755,7 @@ FUN_004183b0(int param_1,uint param_2,undefined4 param_3,undefined4 param_4,unde
       FUN_004f6c30("UnHighLight",1);
       FUN_004f8dd0(*(undefined4 *)(param_1 + 0x284));
       FUN_004f9240(param_1 + 0x26c);
-      FUN_004f66f0();
+      FEString__SetLabelHash();
       FEObject__SetScript("FadeIn",1);
       FUN_00416f00();
       return;
@@ -11487,7 +11491,7 @@ void FUN_0041e540(float param_1,float param_2)
 void FUN_0041e600(float param_1,float param_2)
 
 {
-  FUN_004f66f0();
+  FEString__SetLabelHash();
   FUN_0041e540(param_1 - 320.0,param_2 - 240.0);
   FEObject__SetVisible(DAT_00736220);
   return;
@@ -12068,9 +12072,11 @@ switchD_0041ed1a_caseD_1003:
 }
 
 
-// ==== 0x41eff0 FUN_0041eff0
+// ==== 0x41eff0 MachinePerformanceScore
 
-float10 FUN_0041eff0(void)
+/* [canon] render med (ghidra-canon) docs/re/render.md */
+
+float10 MachinePerformanceScore(void)
 
 {
   float fVar1;
@@ -13473,10 +13479,10 @@ void FUN_00420380(int param_1)
       uVar15 = pppppiVar4[4];
       LStack_48.s.LowPart = uVar15;
       if (*(char *)((int)pppppiVar3 + 0x16) != '\0') {
-        FUN_0046ac90();
+        Contact__RemoveContacts();
       }
       if (*(char *)(uVar15 + 0x16) != '\0') {
-        FUN_0046ac90();
+        Contact__RemoveContacts();
       }
       if ((*(char *)((int)pppppiVar3 + 0x15) == '\x01') && ((float)pppppiVar3[0x58] == -1.0)) {
         iStack_54 = Smokeable__BuildChildren(appppiStack_38);

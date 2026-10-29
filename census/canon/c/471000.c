@@ -558,7 +558,7 @@ float10 FUN_00472950(void)
     }
     if (cVar2 == *(char *)(in_EAX + 0x241)) goto LAB_004729a1;
 LAB_004729da:
-    uVar3 = FUN_0046ac10();
+    uVar3 = CarState__IsTimedFlagActive();
     *(undefined1 *)(in_EAX + 0x241) = uVar3;
     *(undefined4 *)(in_EAX + 0x138) = 0;
   }
@@ -4197,11 +4197,11 @@ LAB_00477500:
     }
     *(int *)(iVar13 + 0x54) = iVar9;
   }
-  cVar8 = FUN_00465430();
+  cVar8 = CarState__IsNitrousOn();
   if ((cVar8 != '\0') && (*(int *)(*(int *)(iStack_4c + 0x48) + 0x84) == 0)) {
     *(float *)(*(int *)(iStack_4c + 0x48) + 0x88) = (float)DAT_0073ad34 * 0.00025;
   }
-  uVar10 = FUN_00465430();
+  uVar10 = CarState__IsNitrousOn();
   *(uint *)(*(int *)(iStack_4c + 0x48) + 0x84) = uVar10 & 0xff;
   iVar13 = **(int **)(iStack_4c + 4);
   uVar11 = (**(code **)(iVar13 + 0x24))();
@@ -5598,7 +5598,7 @@ void FUN_00479e20(float param_1)
       }
       local_8 = (float)(**(uint **)(unaff_EDI + 0x88) ^ *(uint *)(unaff_EDI + 0x80)) -
                 (float)*(int *)(unaff_EDI + 0x8c);
-      cVar4 = FUN_00465430();
+      cVar4 = CarState__IsNitrousOn();
       if (cVar4 != '\0') {
         local_8 = local_8 + param_1;
       }
@@ -10040,9 +10040,11 @@ LAB_0047f39e:
 }
 
 
-// ==== 0x47f4c0 FUN_0047f4c0
+// ==== 0x47f4c0 IntroNisCoordinator::IsFinished
 
-undefined4 FUN_0047f4c0(void)
+/* [canon] camera med (ghidra-canon) docs/re/canon.md */
+
+undefined4 IntroNisCoordinator__IsFinished(void)
 
 {
   int in_EAX;
@@ -10805,9 +10807,11 @@ float10 FUN_004801c0(void)
 }
 
 
-// ==== 0x480230 FUN_00480230
+// ==== 0x480230 KeyframeTrack_FindSegment
 
-int FUN_00480230(int param_1,undefined4 *param_2,undefined4 *param_3)
+/* [canon] camera low (ghidra-canon) docs/re/runtime.md */
+
+int KeyframeTrack_FindSegment(int param_1,undefined4 *param_2,undefined4 *param_3)
 
 {
   float fVar1;

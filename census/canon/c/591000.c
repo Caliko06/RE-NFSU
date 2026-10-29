@@ -435,8 +435,8 @@ bool FUN_00591b40(undefined4 param_1)
 {
   int iVar1;
   
-  FUN_0053f5f0();
-  iVar1 = FUN_0040db20(param_1);
+  Solid_GetBounds();
+  iVar1 = AABB_ClassifyAgainstFrustum(param_1);
   return iVar1 != 0;
 }
 
@@ -795,7 +795,7 @@ void RenderWorldModels(int param_1)
       if (puVar1[6] != 0) {
         FUN_00424ba0();
         Matrix_InvertRigid();
-        FUN_0053f5f0();
+        Solid_GetBounds();
         D3DXVec3Transform(local_80,*(int *)(param_1 + 0x40) + 0x40,local_50);
         iVar3 = FUN_00567940(0);
         if (iVar3 != 0) goto LAB_005921d4;
@@ -1068,7 +1068,7 @@ undefined4 * FUN_00592470(undefined4 *param_1,undefined4 param_2)
     pcVar2 = pcVar2 + 1;
   } while (iVar6 != 0);
   *(undefined1 *)((int)param_1 + 0x5b) = 0;
-  FUN_0053f5f0();
+  Solid_GetBounds();
   pvVar3 = _malloc(0x40);
   if (pvVar3 == (void *)0x0) {
     uVar4 = 0;
@@ -12224,10 +12224,10 @@ LAB_0059f688:
         FUN_00565410(puVar5,uVar1);
       }
       FUN_0053eed0(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN",0,0,0);
-      iVar4 = FUN_0053ed70(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN");
+      iVar4 = ResourceFileList_IsLoadedByName(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN");
       while (iVar4 != 0) {
         ServiceResourceLoading();
-        iVar4 = FUN_0053ed70(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN");
+        iVar4 = ResourceFileList_IsLoadedByName(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN");
       }
       return;
     }
@@ -12319,10 +12319,10 @@ LAB_0059f7eb:
     *(undefined4 *)(puVar3[3] + 100) = 1;
   }
   if (param_4 != '\0') {
-    iVar2 = FUN_0053ed70(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN");
+    iVar2 = ResourceFileList_IsLoadedByName(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN");
     while (iVar2 != 0) {
       ServiceResourceLoading();
-      iVar2 = FUN_0053ed70(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN");
+      iVar2 = ResourceFileList_IsLoadedByName(&DAT_00740420,"LANGUAGES\\LANGUAGETEXTURES.BIN");
     }
   }
   return;
