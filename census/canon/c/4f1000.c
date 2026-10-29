@@ -3664,11 +3664,11 @@ void GetBaseName(void)
 }
 
 
-// ==== 0x4f5240 FEManager::FEManager
+// ==== 0x4f5240 cFEng::cFEng
 
-/* [canon] hud high (ghidra) docs/re/gameflow.md */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/gameflow.md */
 
-void FEManager__FEManager(void)
+void cFEng__cFEng(void)
 
 {
   undefined1 *puVar1;
@@ -3690,7 +3690,7 @@ void FEManager__FEManager(void)
     iVar3 = 0;
   }
   else {
-    iVar3 = cFEng__cFEng();
+    iVar3 = FEngine__FEngine();
   }
   unaff_EDI[2] = iVar3;
   *(undefined4 **)(iVar3 + 0x10c) = unaff_EDI;
@@ -4784,7 +4784,7 @@ void __fastcall FEManager__Init(undefined4 param_1)
     DAT_0073578c = 0;
   }
   else {
-    DAT_0073578c = FEManager__FEManager();
+    DAT_0073578c = cFEng__cFEng();
   }
   if (DAT_0073578c != 0) {
     *(undefined4 *)(*(int *)(DAT_0073578c + 8) + 0xd0) = 2;

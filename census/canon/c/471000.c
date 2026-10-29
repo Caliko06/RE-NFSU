@@ -9709,7 +9709,7 @@ void __fastcall FUN_0047ee50(int param_1)
   undefined1 local_c4 [32];
   undefined1 auStack_a4 [164];
   
-  iVar1 = TimedMessage__GetPhase();
+  iVar1 = Race__GetCountdownNumberToDisplay();
   if (iVar1 != *(int *)(param_1 + 0x20)) {
     if (*(undefined4 **)(param_1 + 0xc) != (undefined4 *)0x0) {
       (**(code **)**(undefined4 **)(param_1 + 0xc))(1);

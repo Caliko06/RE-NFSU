@@ -11068,11 +11068,11 @@ undefined4 * __thiscall FUN_004ee6e0(undefined4 *param_1,byte param_2)
 }
 
 
-// ==== 0x4ee700 cFEng::cFEng
+// ==== 0x4ee700 FEngine::FEngine
 
-/* [canon] hud med (ghidra+capstone) docs/re/gameflow.md */
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/gameflow.md */
 
-void cFEng__cFEng(void)
+void FEngine__FEngine(void)
 
 {
   int iVar1;

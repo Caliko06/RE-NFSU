@@ -4137,11 +4137,11 @@ float10 __fastcall DynamicCollisionBody__GetMassInverse(int param_1)
 }
 
 
-// ==== 0x466800 CarCollisionBody::GetTransformPtr
+// ==== 0x466800 DynamicCollisionBody::GetInertiaTensorInverse
 
-/* [canon] car low (ghidra-canon) docs/re/runtime.md */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/runtime.md */
 
-int __fastcall CarCollisionBody__GetTransformPtr(int param_1)
+int __fastcall DynamicCollisionBody__GetInertiaTensorInverse(int param_1)
 
 {
   int iVar1;
@@ -4166,12 +4166,12 @@ void DynamicCollisionBody__ApplyImpulse(void)
 }
 
 
-// ==== 0x466840 Virtual::ReturnOne__float_constant_getter_
+// ==== 0x466840 CarCollisionBody::ConsiderImpulse
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-/* [canon] car med (ghidra+hopper) docs/re/tuning.md */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/tuning.md */
 
-float10 Virtual__ReturnOne__float_constant_getter_(void)
+float10 CarCollisionBody__ConsiderImpulse(void)
 
 {
   return (float10)_K_ONE;
@@ -4196,11 +4196,11 @@ bool __fastcall CarCollisionBody__IsMoveable(int param_1)
 }
 
 
-// ==== 0x466890 CarState::IsResetGraceOrLockActive
+// ==== 0x466890 CarCollisionBody::IsBlinking
 
-/* [canon] car low (ghidra-canon) docs/re/runtime.md */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/runtime.md */
 
-undefined4 __fastcall CarState__IsResetGraceOrLockActive(int param_1)
+undefined4 __fastcall CarCollisionBody__IsBlinking(int param_1)
 
 {
   int iVar1;
@@ -5766,11 +5766,11 @@ LAB_0046876c:
 }
 
 
-// ==== 0x468800 CarBody_DisableCountInc
+// ==== 0x468800 CollisionBody::DisableCollisions
 
-/* [canon] traffic low (H+G) docs/re/traffic.md */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/traffic.md */
 
-void CarBody_DisableCountInc(void)
+void CollisionBody__DisableCollisions(void)
 
 {
   int in_EAX;

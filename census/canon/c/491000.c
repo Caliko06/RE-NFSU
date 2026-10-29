@@ -8651,7 +8651,7 @@ void PostRaceStatsScreen__SetupDrag(int param_1,undefined4 param_2)
   PostRaceStatsScreen__DrawFinishTime(iVar1,param_2);
   PostRaceStatsScreen__DrawTimeBehind(iVar1);
   PostRaceStatsScreen__DrawMaxSpeed(param_2);
-  PostRaceStatsScreen__DrawNumLapsLed(param_2);
+  PostRaceStatsScreen__DrawPerfectShiftRatio(param_2);
   PostRaceStatsScreen__DrawPercentage(param_2);
   PostRaceStatsScreen__SetupRepWonLoss();
   return;
@@ -9531,11 +9531,11 @@ void PostRaceStatsScreen__DrawOdometer(int param_1)
 }
 
 
-// ==== 0x49de00 PostRaceStatsScreen::DrawNumLapsLed
+// ==== 0x49de00 PostRaceStatsScreen::DrawPerfectShiftRatio
 
 /* [canon] hud high (ghidra-canon+nfsug) docs/re/runtime.md */
 
-void PostRaceStatsScreen__DrawNumLapsLed(int param_1)
+void PostRaceStatsScreen__DrawPerfectShiftRatio(int param_1)
 
 {
   int iVar1;

@@ -639,17 +639,17 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e7940	canon	0	19	0	1	0	
 0x4e7980	canon	0	84	2	0	0	B FEOnl_WaitSync::NotificationMessage
 0x4e7a20	canon	0	30	2	1	0	
-0x4e93b0	canon	0	289	1	3	27	R FEngine::ReleaseAll
+0x4e93b0	canon	0	289	1	3	27	
 0x4eb170	canon	0	97	0	1	0	
 0x4eb420	canon	0	137	2	1	1	
 0x4eb4b0	canon	0	170	2	1	1	
 0x4eb560	canon	0	170	2	2	1	
-0x4eb610	canon	0	170	2	2	1	B FEngine::RenderObject
+0x4eb610	canon	0	170	2	2	1	
 0x4eb6c0	canon	0	158	2	1	1	
 0x4eeb70	canon	0	32	2	10	0	
-0x4f0700	canon	0	202	1	34	0	
-0x4f0a50	canon	0	168	1	1	0	B __static_initialization_and_destruction_0
-0x4f1620	canon	0	88	0	1	0	
+0x4f0700	canon	0	202	1	34	0	B FEngine::QueueMessage
+0x4f0a50	canon	0	168	1	1	0	R FEngine::QueuePackageUserTransfer
+0x4f1620	canon	0	88	0	1	0	B FEngine::RecordLastPackageButton
 0x4f1680	canon	0	32	0	1	0	
 0x4f16a0	canon	0	35	0	1	0	
 0x4f3cb0	canon	0	71	2	1	0	B FEPackageData::GetDataChunk
@@ -1077,7 +1077,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4bc790	car	0	156	2	1	0	R QRCarSelectScreen::QRCarSelectScreen
 0x4bc830	car	0	525	1	1	0	R QRCarSelectScreen::BuildSelectableCarList
 0x4c0180	car	0	216	2	2	3	R PauseOptionsMenu::DrawNOS
-0x4c2bc0	car	0	208	0	4	0	A UndergroundTheatreViewer::NotificationMessage
+0x4c2bc0	car	0	208	0	4	0	C UndergroundTheatreViewer::NotificationMessage
 0x4c2c90	car	0	37	1	1	0	
 0x4c3230	car	0	12	0	1	0	
 0x4c7360	car	0	115	1	1	0	B UndergroundJunkmanGiveth::MakeChoice
@@ -1971,7 +1971,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x626d50	render	0	25	0	1	0	
 0x626dc0	render	0	28	0	1	0	
 0x626ed0	render	0	28	0	3	0	
-0x626f20	render	0	58	0	1	0	C EAGL::Transform::AppendMatrix
+0x626f20	render	0	58	0	1	0	B EAGL::Transform::BuildMatrix
 0x626f70	render	0	43	0	1	0	
 0x626fd0	render	0	34	0	1	0	
 0x627180	render	0	55	0	1	0	R EAGLAnim::GetMemoryUsage
@@ -2039,9 +2039,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x62e980	render	0	172	0	2	0	
 0x62ec30	render	0	104	0	2	0	
 0x62fe70	render	0	199	0	1	0	C DecompressValues__CQ28EAGLAnim19DeltaCompressedDataiiiPCfPfiPCUs
-0x62ff40	render	0	169	0	4	0	C DecompressValuesIndexed__CQ28EAGLAnim19DeltaCompressedDataiiPCfPfiPUsfiPCUs
-0x62fff0	render	0	165	0	6	0	R EAGLAnim::FnEventBlender::Eval
-0x6300a0	render	0	86	0	1	0	R EAGLAnim::FnEventBlender::~FnEventBlender
+0x62ff40	render	0	169	0	4	0	B EAGLAnim::FnEventBlender::Eval
+0x62fff0	render	0	165	0	6	0	C EAGLAnim::FnEventBlender::~FnEventBlender
+0x6300a0	render	0	86	0	1	0	B EAGLAnim::FnRawPoseChannel::~FnRawPoseChannel
 0x630d80	render	0	12	0	1	0	
 0x631180	render	0	137	0	2	0	
 0x631210	render	0	111	0	3	0	
@@ -2327,8 +2327,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x572b50	rivals	0	88	0	13	0	R ReplayManager::FindSnapshot
 0x572bb0	rivals	0	24	0	1	0	
 0x572d60	rivals	0	33	0	1	0	
-0x573040	rivals	0	53	0	1	0	B DemoModeReplay::DemoModeReplay
-0x573240	rivals	0	133	3	2	0	B DemoModeReplay::LoadResourceFile
+0x573040	rivals	0	53	0	1	0	R ReplayManager::RestoreSnapshot
+0x573240	rivals	0	133	3	2	0	R DemoModeReplay::Unloader
 0x5732d0	rivals	0	13	0	1	0	
 0x573970	rivals	0	30	0	1	0	
 0x57a350	rivals	0	38	0	1	0	
@@ -2460,8 +2460,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4bdfb0	runtime	0	101	3	2	1	R PauseOptionsMenu::DrawAmbientVol
 0x4be660	runtime	0	95	3	2	1	R PauseOptionsMenu::DrawJumpCamera
 0x4bf270	runtime	0	86	3	1	1	R PauseOptionsMenu::DrawUnits
-0x4eed80	runtime	0	90	1	1	0	
-0x4f0800	runtime	0	173	2	72	0	B cFEngRender::GenerateRenderContext
+0x4eed80	runtime	0	90	1	1	0	R FEngine::UnloadLibraryPackage
+0x4f0800	runtime	0	173	2	72	0	B FEngine::QueuePackageSwitch
 0x534c45	runtime	0	11	0	0	0	
 0x542940	runtime	0	723	1	1	0	
 0x542dc0	runtime	0	127	0	1	0	
@@ -3586,10 +3586,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4cd0d0	unknown	0	161	0	1	0	C IsPackageADialogBox
 0x4d99c0	unknown	0	97	1	1	0	
 0x4ee6e0	unknown	0	31	1	1	0	
-0x4eef40	unknown	0	87	0	1	0	
+0x4eef40	unknown	0	87	0	1	0	R FEngine::AddToIdleList
 0x4f07d0	unknown	0	32	2	1	0	
 0x4f08b0	unknown	0	30	2	1	0	
-0x4f16d0	unknown	0	311	0	2	0	
+0x4f16d0	unknown	0	311	0	2	0	B cFEngRender::MakeRenderMatrix
 0x4f6ce0	unknown	0	44	1	3	0	
 0x4f73f0	unknown	0	59	0	2	0	R FEngSetSize
 0x4f7430	unknown	0	164	1	3	0	R FEngSetScaleX
@@ -4470,9 +4470,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e8580	canon	1	190	4	1	3	
 0x4e86a0	canon	1	11	1	1	0	
 0x4e86b0	canon	1	30	2	1	0	
-0x4e89b0	canon	1	241	3	1	3	B FEngine::FEngine
+0x4e89b0	canon	1	241	3	1	3	
 0x4e96b0	canon	1	30	2	1	0	
-0x4e9c80	canon	1	91	2	0	0	B FEngine::LoadPackage
+0x4e9c80	canon	1	91	2	0	0	
 0x4e9e60	canon	1	30	2	1	0	
 0x4e9e80	canon	1	11	1	1	0	
 0x4ea430	canon	1	30	2	1	0	
@@ -4481,9 +4481,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4eafc0	canon	1	30	2	1	0	
 0x4eafe0	canon	1	11	1	1	0	
 0x4eb3f0	canon	1	36	1	2	0	
-0x4eb8e0	canon	1	109	2	1	0	R FEngine::QueuePackageSwitch
-0x4f0eb0	canon	1	95	1	1	0	
-0x4f1430	canon	1	473	3	1	0	
+0x4eb8e0	canon	1	109	2	1	0	
+0x4f0eb0	canon	1	95	1	1	0	R FEngine::ProcessListBoxResponses
+0x4f1430	canon	1	473	3	1	0	B FEngine::ProcessPackageCommands
 0x4f3eb0	canon	1	99	1	1	0	B FEPackageManager::NotifySoundMessage
 0x4f4220	canon	1	75	2	1	0	B FEPkgMgr_NotifySoundMessage
 0x4f46b0	canon	1	11	1	2	0	
@@ -5006,10 +5006,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c4810	hud	1	30	2	1	0	
 0x4d74c0	hud	1	184	3	1	1	B Chyron::Start
 0x4f1810	hud	1	1382	2	6	0	
-0x4f2810	hud	1	1179	5	1	0	
-0x4f2d60	hud	1	66	1	3	0	
-0x4f2db0	hud	1	124	1	4	0	
-0x4f2e30	hud	1	119	1	1	0	
+0x4f2810	hud	1	1179	5	1	0	B cFEngRender::GenerateClipInfo
+0x4f2d60	hud	1	66	1	3	0	B cFEngRender::RemoveCachedRender
+0x4f2db0	hud	1	124	1	4	0	B cFEngRender::CreateCachedRender
+0x4f2e30	hud	1	119	1	1	0	B cFEngRender::GenerateRenderContext
 0x4f3b10	hud	1	30	2	1	0	
 0x4f3b30	hud	1	45	1	1	0	
 0x4f3d40	hud	1	30	2	1	0	
@@ -5671,11 +5671,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x62d4e0	render	1	2731	1	1	0	
 0x62ea30	render	1	54	1	1	0	B EAGLAnim::FnKeyLerpChan::Eval
 0x62eca0	render	1	90	2	1	0	R EAGLAnim::FnKeyQuatChan::Eval
-0x630100	render	1	66	1	1	0	R EAGLAnim::FnEventBlender::__dl
-0x630150	render	1	167	1	1	0	C EAGLAnim::FnRawPoseChannel::~FnRawPoseChannel
-0x630200	render	1	186	1	1	0	C GetLength__CQ28EAGLAnim16FnRawPoseChannelRf
+0x630100	render	1	66	1	1	0	R GetLength__CQ28EAGLAnim16FnRawPoseChannelRf
+0x630150	render	1	167	1	1	0	C EAGLAnim::FnRawPoseChannel::Eval
+0x630200	render	1	186	1	1	0	C EAGLAnim::FnRawPoseChannel::EvalSQT
 0x630400	render	1	214	1	1	0	
-0x6304e0	render	1	228	1	1	0	R EAGLAnim::RawPoseChannel::Eval
+0x6304e0	render	1	228	1	1	0	C EAGLAnim::RawPoseChannel::Eval
 0x630760	render	1	120	1	1	0	R EAGLAnim::StatelessQ::InitAnimMemoryMap
 0x6307e0	render	1	60	2	1	0	R EAGLAnim::StatelessF3::InitAnimMemoryMap
 0x6308e0	render	1	15	1	1	0	
@@ -5856,8 +5856,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x572bd0	rivals	1	241	3	1	0	R ReplayManager::SortSnapshots
 0x572d20	rivals	1	49	1	4	0	R ReplayManager::DeleteSnapshot
 0x573010	rivals	1	45	1	2	0	
-0x573170	rivals	1	71	1	1	2	B UnloaderDemoModeReplay
-0x5731c0	rivals	1	119	3	1	2	B DemoModeReplay::GenerateFilename
+0x573170	rivals	1	71	1	1	2	R DemoModeReplay::DemoModeReplay
+0x5731c0	rivals	1	119	3	1	2	R DemoModeReplay::Loader
 0x5735a0	rivals	1	117	1	1	2	B DemoModeReplay::SaveSnapshots
 0x578710	rivals	1	26	1	1	0	
 0x578730	rivals	1	167	1	11	0	B WorldObject::GetRotation
@@ -5959,7 +5959,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x496040	runtime	1	87	1	4	0	B feStartRaceScreensShowStats
 0x4c006c	runtime	1	35	1	0	0	
 0x4c44c0	runtime	1	145	4	2	1	R UndergroundStatsScreen::DrawSprintStats
-0x4eeb90	runtime	1	89	1	2	0	
+0x4eeb90	runtime	1	89	1	2	0	R FEngine::LoadPackage
 0x4f75b0	runtime	1	102	2	26	0	R FEngSetColor
 0x4f7620	runtime	1	49	2	1	0	R FEngSetColor
 0x4f8340	runtime	1	48	1	56	0	B TranslateLeftRightIntoSound
@@ -6054,7 +6054,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x594d40	runtime	1	80	1	19	0	B bFileSize
 0x5b0189	runtime	1	62	1	0	0	P localeconv
 0x5b01c7	runtime	1	701	1	0	0	P sn_fmod
-0x5b05b6	runtime	1	58	2	1	1	P __do_global_ctors
+0x5b05b6	runtime	1	58	2	1	1	
 0x5e9081	runtime	1	287	1	1	0	
 0x5e9207	runtime	1	80	1	1	0	P GXSetTevKAlphaSel
 0x5ee000	runtime	1	607	1	1	0	P EXIGetID
@@ -6469,7 +6469,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4d9e40	unknown	1	351	2	1	0	
 0x4da0d0	unknown	1	188	2	1	0	
 0x4ee6c0	unknown	1	30	2	1	0	
-0x4ee910	unknown	1	253	2	1	0	
+0x4ee910	unknown	1	253	2	1	0	B FEngine::ReleaseAll
 0x4f4790	unknown	1	279	1	1	0	R FEngFont::HandleJoyEventTexture
 0x4f9fd0	unknown	1	30	2	1	0	
 0x4fcc70	unknown	1	56	1	2	0	B FEInterpNone
@@ -6775,16 +6775,16 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e1a10	canon	2	53	2	1	0	B MPCarSelectScreen::ScrollCars
 0x4e3960	canon	2	247	3	1	0	B GarageNewVinylScreen::RefreshHeader
 0x4e7e00	canon	2	162	2	1	1	A GaragePresetsScreen::PresetAction
-0x4e8380	canon	2	145	3	1	1	B GaragePresetsScreen::~GaragePresetsScreen
+0x4e8380	canon	2	145	3	1	1	
 0x4e8b10	canon	2	640	5	2	0	
-0x4e96d0	canon	2	92	2	1	0	R FEngine::SetInitialState
+0x4e96d0	canon	2	92	2	1	0	
 0x4ea150	canon	2	81	3	1	1	
-0x4ea650	canon	2	85	3	5	2	C FEngine::RemoveFromLibraryList
-0x4ea990	canon	2	116	3	1	2	B FindObject__C7FEngineUlPCc
-0x4eaff0	canon	2	373	5	1	8	B FEngine::Render
-0x4ee840	canon	2	195	2	1	0	
-0x4ef050	canon	2	86	2	244	0	
-0x4f0f10	canon	2	187	2	1	0	
+0x4ea650	canon	2	85	3	5	2	
+0x4ea990	canon	2	116	3	1	2	B GaragePresetsScreen::~GaragePresetsScreen
+0x4eaff0	canon	2	373	5	1	8	
+0x4ee840	canon	2	195	2	1	0	B FEngine::~FEngine
+0x4ef050	canon	2	86	2	244	0	R FindObject__C7FEngineUlPCc
+0x4f0f10	canon	2	187	2	1	0	R FEngine::ProcessCodeListBoxResponses
 0x4f6c30	canon	2	77	4	10	0	R FEngSetScript
 0x4f6c80	canon	2	92	4	4	0	R FEngIsScriptFinished
 0x4f7d30	canon	2	380	5	32	3	B MenuScreen::BaseNotifySound
@@ -6843,7 +6843,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4b2070	car	2	392	7	1	0	R GarageMainScreen::NotificationMessage
 0x4b2480	car	2	147	3	18	2	R GarageMainScreen2P::NotificationMessage
 0x4bc0c0	car	2	169	4	1	1	C CreateQRCarSelectScreen
-0x4c30d0	car	2	66	3	1	0	B UndergroundTheatreViewer::NotifySoundMessage
+0x4c30d0	car	2	66	3	1	0	B ChooseCareerCarScreen::~ChooseCareerCarScreen
 0x4c3ff0	car	2	169	4	1	1	R UndergroundStatsScreen::ScrollStats
 0x4c70b0	car	2	153	3	1	0	B UndergroundJunkmanGiveth::AddPickable
 0x4c84b0	car	2	161	3	1	0	
@@ -6892,8 +6892,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x41a8c0	input	2	569	6	1	2	
 0x41af40	input	2	525	6	3	2	
 0x41b210	input	2	966	7	3	2	
-0x4ed930	input	2	407	5	5	1	B FEngine::ProcessPackageCommands
-0x4edad0	input	2	87	2	3	0	B FEngine::RecordLastPackageButton
+0x4ed930	input	2	407	5	5	1	
+0x4edad0	input	2	87	2	3	0	
 0x584960	props	2	428	2	3	1	S RigidBody::CalculateInertiaTensor
 0x585410	props	2	1021	4	1	0	B RigidBody::GetDerivative
 0x5929c0	props	2	140	3	1	0	R WorldObjectCollisionBody::DoSomethingMoreClever
@@ -7106,7 +7106,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x62c280	render	2	33	2	1	0	
 0x62d460	render	2	33	2	1	0	
 0x62ea70	render	2	448	2	2	0	
-0x6302c0	render	2	307	2	1	0	B EAGLAnim::RawPoseChannel::InitAnimMemoryMap
+0x6302c0	render	2	307	2	1	0	R EAGLAnim::RawPoseChannel::InitAnimMemoryMap
 0x6305d0	render	2	387	2	1	0	R EAGLAnim::RawPoseChannel::EvalFrame
 0x630820	render	2	180	2	1	0	
 0x633200	render	2	193	2	1	0	B BlendVel__CQ28EAGLAnim13FnTurnBlenderffPf
@@ -7380,7 +7380,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x480310	unknown	2	846	2	1	0	R DragCameraManager::GetSlope
 0x4ad210	unknown	2	81	2	1	0	R cFinishedRaceStats::Construct
 0x4c06b0	unknown	2	143	2	1	0	R PauseOptionsMenu::ToggleTrackMapDebug
-0x4f0390	unknown	2	336	3	3	0	B cFEngRender::RenderObject
+0x4f0390	unknown	2	336	3	3	0	R FEngine::Render
 0x5467f0	unknown	2	19	3	1	0	
 0x546810	unknown	2	19	3	1	0	
 0x546830	unknown	2	21	3	1	0	
@@ -7521,17 +7521,17 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e1b90	canon	3	198	5	3	0	B MPCarSelectScreen::~MPCarSelectScreen
 0x4e6ac0	canon	3	525	5	6	1	B GarageVinylPrompt::NotificationMessage
 0x4e7d70	canon	3	132	4	1	0	A GaragePresetsScreen::ScrollPreset
-0x4ea090	canon	3	177	4	1	2	B FEngine::UnloadLibraryPackage
+0x4ea090	canon	3	177	4	1	2	
 0x4ea5d0	canon	3	124	4	1	3	
 0x4ea6b0	canon	3	98	3	1	0	
 0x4ea720	canon	3	121	3	1	0	
 0x4ea7a0	canon	3	98	3	1	0	
-0x4ea810	canon	3	98	3	1	0	B FindLibraryPackage__C7FEngineUl
-0x4ebb80	canon	3	302	5	1	0	A FEngine::ProcessMessageQueue
+0x4ea810	canon	3	98	3	1	0	
+0x4ebb80	canon	3	302	5	1	0	
 0x4ebe60	canon	3	179	4	1	0	
-0x4eff20	canon	3	1128	4	1	0	B cFEngRender::GenerateClipInfo
-0x4f0b00	canon	3	934	3	3	0	
-0x4f0fd0	canon	3	101	3	1	0	
+0x4eff20	canon	3	1128	4	1	0	R FEngine::ProcessMouseForPackage
+0x4f0b00	canon	3	934	3	3	0	R FEngine::ProcessMessageQueue
+0x4f0fd0	canon	3	101	3	1	0	R FEngine::ProcessObjectMessage
 0x4f76c0	canon	3	346	3	2	0	B FEngGet2DExtents
 0x4f8000	canon	3	216	4	6	0	C ListPicker::SetCurrentItem
 0x4f9060	canon	3	200	3	3	0	B ScrollerSlot::UnHighlight
@@ -7576,7 +7576,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x479c30	car	3	484	4	1	0	R PhysicsMover::CalcWheelieBarMoment
 0x47c580	car	3	1115	11	3	0	R NisSceneManager::UpdateAnimatedCars
 0x4acb90	car	3	326	9	4	2	B FECarConfig::SetDefaults
-0x4c3120	car	3	264	7	2	1	B ChooseCareerCarScreen::ChooseCareerCarScreen
+0x4c3120	car	3	264	7	2	1	B ChooseCareerCarScreen::NotificationMessage
 0x4c4a60	car	3	371	8	2	2	R UndergroundStatusScreen::UndergroundStatusScreen
 0x4c66d0	car	3	667	8	1	2	B MainMenuCarCustomize::NotificationMessage
 0x4c69f0	car	3	179	5	1	0	B MemcardInterface::LoadProfile
@@ -7762,7 +7762,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x47c4d0	rivals	3	168	4	2	0	R NisSceneManager::ClearCarAnimationControllers
 0x572380	rivals	3	422	3	1	2	R ReplayManager::MaybeTakeInstantReplaySnapshot
 0x572590	rivals	3	249	4	1	0	R ReplayManager::DoChecksumSnapshot
-0x5732e0	rivals	3	138	3	1	2	B DemoModeReplay::BeginDemoMode
+0x5732e0	rivals	3	138	3	1	2	B DemoModeReplay::GenerateFilename
 0x578500	rivals	3	133	3	1	0	B WorldObject::SetModel
 0x57a420	rivals	3	203	5	1	0	B CarWorldObjectMover::CopyInfoFromCar
 0x583850	rivals	3	179	3	2	0	R TrafficController::ExecuteCurrentAction
@@ -7898,7 +7898,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x421740	traffic	3	341	4	1	0	
 0x454a20	traffic	3	419	4	2	0	R AIActionPickRouteToAvoidAnimation::CanThisCarBeatThisAnimation
 0x58bce0	traffic	3	220	3	1	0	R CarLoader::UnloadEverything
-0x58be70	traffic	3	203	3	1	0	B CarLoader::LoadingDoneCallback
+0x58be70	traffic	3	203	3	1	0	C CarLoader::LoadingDoneCallback
 0x5a81b0	traffic	3	574	3	1	0	R learn
 0x42bb60	unknown	3	512	9	1	0	B Player::~Player
 0x439470	unknown	3	119	9	5	0	
@@ -7908,7 +7908,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4bf0c0	unknown	3	181	3	1	0	R PauseOptionsMenu::ToggleVibration
 0x4c0600	unknown	3	176	3	1	0	R PauseOptionsMenu::ScrollNOS
 0x4c7200	unknown	3	198	4	1	0	C UndergroundJunkmanGiveth::RedrawHeading
-0x4f04e0	unknown	3	370	5	2	0	
+0x4f04e0	unknown	3	370	5	2	0	R FEngine::RenderGroup
 0x4fc640	unknown	3	669	5	1	0	
 0x5133d0	unknown	3	326	6	1	0	B GarageChooseAccessoryCategoryScreen::MoveForwardPackage
 0x547210	unknown	3	82	3	1	0	
@@ -7984,10 +7984,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4db8a0	canon	4	423	7	2	1	
 0x4e6cd0	canon	4	505	5	1	0	
 0x4e7600	canon	4	273	5	1	4	B __static_initialization_and_destruction_0
-0x4e9540	canon	4	364	8	1	1	A FEngine::SetNumJoyPads
+0x4e9540	canon	4	364	8	1	1	
 0x4ea460	canon	4	162	4	1	2	
 0x4ea880	canon	4	268	5	1	0	
-0x4ef330	canon	4	3002	4	1	0	
+0x4ef330	canon	4	3002	4	1	0	R FEngine::ProcessPadsForPackage
 0x514280	canon	4	96	4	1	1	B CreateMagazineScreen
 0x5146d0	canon	4	1206	7	3	0	B MagazineScreen::NotificationMessage
 0x53e9e0	canon	4	468	9	12	0	
@@ -8000,8 +8000,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4648c0	car	4	954	4	1	1	S CarState::DoSnapshot
 0x474500	car	4	176	4	1	1	S MellowMover::DoSnapshot
 0x4afe40	car	4	215	6	1	0	B GarageMainScreen::InitNebula
-0x4c2d20	car	4	421	8	3	2	
-0x4c3240	car	4	318	7	1	2	B ChooseCareerCarScreen::NotificationMessage
+0x4c2d20	car	4	421	8	3	2	B ChooseCareerCarScreen::ChooseCareerCarScreen
+0x4c3240	car	4	318	7	1	2	C ChooseCareerCarScreen::ShouldCarBeSelectable
 0x4c42d0	car	4	473	9	1	2	C UndergroundStatsScreen::AddStatsLine
 0x4e2430	car	4	98	5	4	0	R SideScrollScreen::NotificationMessage
 0x4f9b70	car	4	191	7	1	7	R Scrollerina::DeleteScrollerDatum
@@ -8055,7 +8055,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x617c5c	render	4	734	4	1	1	B madinit
 0x624880	render	4	201	5	1	0	
 0x624a90	render	4	110	5	1	0	B EAGL::TextureRenderContext::~TextureRenderContext
-0x624bf0	render	4	132	5	1	0	R EAGLInternal::ViewPortPrivate::ViewPortPrivate
+0x624bf0	render	4	132	5	1	0	B EAGLInternal::ViewPortPrivate::ViewPortPrivate
 0x625260	render	4	216	5	1	0	
 0x625440	render	4	238	5	1	0	R EAGL::DrawArray::SetUpGeoPrim
 0x625ad0	render	4	204	5	1	0	R EAGL::DrawGouraud::Begin
@@ -8211,8 +8211,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4cb480	canon	5	367	8	4	0	
 0x4cb920	canon	5	278	7	1	0	
 0x4d5970	canon	5	865	10	1	6	R ControllerMenu::DrawButtons
-0x4ea510	canon	5	53	5	2	0	B FEngine::AddToLibraryList
-0x4eaa10	canon	5	292	6	1	0	B FEngine::Update
+0x4ea510	canon	5	53	5	2	0	
+0x4eaa10	canon	5	292	6	1	0	
 0x51b720	canon	5	429	8	1	2	
 0x54fd50	canon	5	845	13	1	2	
 0x5a4a50	canon	5	199	6	2	0	R MovieStart
@@ -8226,11 +8226,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x579b30	car	5	195	6	1	0	B AnimationMover::~AnimationMover
 0x4c1b50	hud	5	328	5	1	12	C PauseOptionsSelectorMenu::PauseOptionsSelectorMenu
 0x4c1dc0	hud	5	177	5	1	0	B SelectableCar::SelectableCar
-0x4f1d80	hud	5	629	6	1	0	
-0x4f2000	hud	5	632	7	1	0	
-0x4f2280	hud	5	877	7	1	0	
-0x4f25f0	hud	5	476	8	1	0	
-0x4f2cb0	hud	5	137	5	1	0	
+0x4f1d80	hud	5	629	6	1	0	R cFEngRender::RenderMovie
+0x4f2000	hud	5	632	7	1	0	R cFEngRender::RenderImage
+0x4f2280	hud	5	877	7	1	0	R cFEngRender::RenderCBVImage
+0x4f25f0	hud	5	476	8	1	0	R cFEngRender::RenderString
+0x4f2cb0	hud	5	137	5	1	0	B cFEngRender::RenderObject
 0x413a70	input	5	1373	9	2	2	P Phil_YUV_Convert
 0x465830	props	5	1227	13	1	0	R Collision::AddImpulse
 0x5013a0	render	5	615	11	1	0	R FEPackageReader::ReadObjectChunk
@@ -8361,7 +8361,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e6f00	canon	6	1048	9	1	3	
 0x4e7320	canon	6	726	9	1	3	
 0x4e8d90	canon	6	1562	7	1	0	
-0x4eb1e0	canon	6	431	12	1	5	B FEngine::RenderGroup
+0x4eb1e0	canon	6	431	12	1	5	
 0x4ebf20	canon	6	1177	12	1	2	
 0x4f89d0	canon	6	422	8	27	0	
 0x4ffeb0	canon	6	738	6	3	0	R FEPackage::UpdateObject
@@ -8401,8 +8401,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x621910	render	6	479	7	1	0	
 0x624950	render	6	187	7	1	0	B Use__CQ24EAGL8TevStageUi
 0x624b00	render	6	138	7	2	0	
-0x624c80	render	6	160	7	1	0	R EAGLInternal::ViewPortPrivate::EnactFogSettings
-0x624d20	render	6	165	7	1	0	R __static_initialization_and_destruction_0
+0x624c80	render	6	160	7	1	0	B __static_initialization_and_destruction_0
+0x624d20	render	6	165	7	1	0	B GetShape__CQ24EAGL8ViewPortRfN51
 0x625340	render	6	192	6	1	0	B EAGL::Profiler::~Profiler
 0x625530	render	6	261	7	1	0	R EAGL::DrawGouraud::DrawGouraud
 0x62f590	render	6	2253	6	1	0	C DecompressValuesIndexed__CQ28EAGLAnim19DeltaCompressedDataiiiiPCfPfiPUsf
@@ -8454,7 +8454,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e67e0	canon	7	736	9	1	1	
 0x4e8020	canon	7	247	11	1	0	A GaragePresetsScreen::NotificationMessage
 0x4e9730	canon	7	1260	9	1	4	
-0x4ef0b0	canon	7	627	7	2	0	B cFEngRender::RenderCBVImage
+0x4ef0b0	canon	7	627	7	2	0	R FEngine::Update
 0x4fc100	canon	7	1154	8	3	0	
 0x513780	canon	7	757	19	1	3	
 0x45c370	car	7	394	7	8	0	R DrivingChoice::FillUpDriveTarget
@@ -8568,7 +8568,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x482230	camera	10	1203	13	1	0	A DragCameraManager::JoyHandler
 0x4c8b70	canon	10	1102	14	1	6	
 0x4e3320	canon	10	1529	16	1	6	
-0x4f1040	canon	10	957	13	2	0	
+0x4f1040	canon	10	957	13	2	0	B FEngine::ProcessResponses
 0x4783c0	car	10	422	10	2	0	B PhysicsMover::IterateForces
 0x4f9700	car	10	833	14	1	5	R Scrollerina::MoveSelected
 0x5b710e	render	10	603	12	3	3	P __OSUnhandledException
@@ -8637,7 +8637,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x513c90	canon	14	1192	24	1	8	
 0x5a4750	canon	14	478	15	2	1	R RCMP_Manager::UpdateFunction
 0x429620	input	14	1117	17	1	0	B Car::CalcForceParameters
-0x4ec5f0	input	14	907	15	1	0	B FEngine::ProcessResponses
+0x4ec5f0	input	14	907	15	1	0	
 0x5bd234	render	14	4782	20	1	3	
 0x5c238d	render	14	1227	15	2	6	
 0x60c503	render	14	823	14	1	2	

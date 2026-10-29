@@ -8777,7 +8777,7 @@ void __fastcall Teleporter_Disable(int param_1)
       FUN_0041f690();
       FUN_00432d30(0);
       FUN_00424dc0();
-      CarBody_DisableCountInc();
+      CollisionBody__DisableCollisions();
       Car_SetMode();
     }
     *(undefined1 *)(param_1 + 8) = 0;

@@ -5249,7 +5249,7 @@ void HudTimedMessage__Update(void)
   
   if ((*(uint *)(unaff_EDI + 0x18) & *(uint *)(unaff_EDI + 0x10)) != 0 ||
       (*(uint *)(unaff_EDI + 0x1c) & *(uint *)(unaff_EDI + 0x14)) != 0) {
-    iVar2 = TimedMessage__GetPhase();
+    iVar2 = Race__GetCountdownNumberToDisplay();
     if (iVar2 == 0) {
       FEObject__SetInvisible(*(undefined4 *)(unaff_EDI + 0x20));
       return;

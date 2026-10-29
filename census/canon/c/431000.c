@@ -2205,12 +2205,12 @@ void HudMeter__SetLevel(int param_1)
 }
 
 
-// ==== 0x433650 RaceManager::DetectOvertake
+// ==== 0x433650 RacingCar::CheckBoundaryCrossing
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-/* [canon] rivals med (ghidra-canon+hopper) docs/re/rivals.md */
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/rivals.md */
 
-undefined4 RaceManager__DetectOvertake(int param_1,float param_2,float param_3)
+undefined4 RacingCar__CheckBoundaryCrossing(int param_1,float param_2,float param_3)
 
 {
   undefined4 uVar1;
@@ -2350,7 +2350,7 @@ void RacingCar__UpdateLapCounts(void)
     if (0 < *(short *)(DAT_0073619c + 0x53c)) {
       piVar8 = unaff_EDI + 0xe;
       do {
-        iVar4 = RaceManager__DetectOvertake
+        iVar4 = RacingCar__CheckBoundaryCrossing
                           (unaff_EDI,fVar2,
                            *(undefined4 *)((int)piVar8 + iVar7 + (0x508 - (int)unaff_EDI)));
         if (iVar4 != 0) {
@@ -3178,11 +3178,11 @@ LAB_00434bf9:
 }
 
 
-// ==== 0x434d10 TimedMessage::GetPhase
+// ==== 0x434d10 Race::GetCountdownNumberToDisplay
 
-/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+nfsug) docs/re/runtime.md */
 
-undefined4 __fastcall TimedMessage__GetPhase(int param_1)
+undefined4 __fastcall Race__GetCountdownNumberToDisplay(int param_1)
 
 {
   float fVar1;
@@ -3565,7 +3565,7 @@ void __fastcall Race__Update(undefined4 param_1)
   int *unaff_ESI;
   undefined4 uVar9;
   
-  if ((*unaff_ESI == 3) && (iVar3 = TimedMessage__GetPhase(param_1), iVar3 == 4)) {
+  if ((*unaff_ESI == 3) && (iVar3 = Race__GetCountdownNumberToDisplay(param_1), iVar3 == 4)) {
     iVar3 = FEPackageList__FindByName(&DAT_00746104);
     if ((iVar3 != 0) && ((*(int *)(iVar3 + 0x18) != 0 && (*(int **)(iVar3 + 0x14) != (int *)0x0))))
     {
