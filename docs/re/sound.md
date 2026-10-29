@@ -163,15 +163,63 @@ Picker `0x53c3a0` (V, G). It reads `p = player`, `order = 0x758b58[pos*2]`, wher
   selectors over 0..32767 that pick a loop. Upgrade levels of one family share the ENG curves (C0U0 = C0U1); EXH
   differs. Which Csis param is `in3` (RPM or load) is U: a dispatcher in the SND layer sits between `0x52bf70`'s
   block and the patch argument (`0x64bc30` calls `node+8` with `H+4`).
-- **Speech (FE).** `PlaySpeechStream 0x51c830` with event `0x59` reads the table `0x6f8728[id*2 + variant]`. Only
-  7 entries are set: id 2 → lines 0/1, 5 → 2, 6 → 3, 7 → 4, 11 → 5/6. The others are −1, which means stop. It then
-  calls stream-manager vfunc `+0x98(0x59, line)`. The callers are FE screens (`0x4c3db0`, `0x4c5320`, `0x4c5fa0`,
-  `0x4c6cb0`, `0x4c7790`, `0x4cd3e0`, `0x4cd490`, `0x50a5d0`). V (H, D). Which code plays the other ~270 lines of
-  `SpeechStreams` (in race?) is U.
+
+## 6. Speech: who plays the 277 lines (night-opus-a2 + sonnet-exec)
+
+- All 277 lines are played by ONE path: `EAXSound::PlaySpeechStream 0x51c830` and 3 direct callers. All are front-end
+  screens (map, garage, Junkman, perf tuner). No race code touches the speech stream. V (C, H)
+- The unit is an EVENT id 0..94, not a line. Table `0x6f6bc8` (95 dwords) = number of lines per event. It sums to 277.
+  Stream index = sum(count[0..event)) + line. V (D, C 0x539b10)
+- Two ways in:
+  1. Normal events, vfunc `+0x90(event)`: the line is chosen at random inside the event. 90 events, 244 streams.
+  2. Event `0x59` (89), vfunc `+0x98(0x59, line)`: the line is fixed by table `0x6f8728`. 15 lines (streams 236..250).
+- Reachable: 259 of 277. Never asked for: events 10, 27, 86, 87 (streams 39-40, 102-105, 231-234) and lines 15..22 of
+  event 0x59 (streams 251..258). 18 streams. V (D) for the tables; I that no other table feeds them.
+- `0x6f8728` has 15 set entries (lines 0..14). An earlier version of this doc said 7, from reading only 24 dwords. V (D)
+- `STRM_English_Speech_MB.abk` (id 1497) holds NO event/line table. It is a stream directory: u32 count 277 at file
+  `+0x1d0`, then 277 records {1, AST byte offset, 0} at `+0x1d4`. All 277 offsets equal `ast.py list` offsets. V (D)
+
+### Evidence
+1. Class and manager. V (C, H)
+   - Stream manager = `EAXSound+0x104` (ctor `0x537930`); `mgr+0x24` = speech stream. `0x537a60` makes it for type
+     4..9 (ctor `0x537830`, vtable `0x6bde10`, name `EAXS_SpeechStream` at `0x6be21c`). Other types: 0 music, 1 stereo
+     ambient, 2 mono ambient (`0x6be150`), 3 TCM.
+   - It is created at front-end load `0x51dce4` (args: type 4, 0x5f groups, `[0x6f6d44]`=0x6f6bc8, `0x6f6f9c[slot]`)
+     and at in-game load `0x51eb5b`. Created in race, never called in race.
+   - Vtable slots: `+0x90 = 0x53dc30` (mode 1), `+0x98 = 0x53db60` (mode 0). `+0x14` of the manager is the MUSIC stream;
+     its `+0x98` callers (0x4afe00, 0x4cf194, 0x4d4aa6, 0x4d4bd4, 0x51c749, 0x53c200, 0x5a45e2) are not speech.
+   - String xrefs: "SPEECHSTREAMS\" `0x6bf4a8` only in the path resolver `0x521e8c`; "STRM_English_Speech_MB" `0x6bec7c`
+     only in the name table `0x6f7f30`. "EAXS_SpeechStream" only in an unwind funclet `0x68520e`.
+2. How the line is chosen. V (C 0x5396a0, 0x53dc30, 0x53db60), partly I
+   - Play stores: `obj+0x268 = event`, `obj+0x26c = line`, `obj+0x230 = mode` (0 for `+0x98`, 1 for `+0x90`).
+   - `0x5396a0` jump table `0x539aac`: mode 0 = use the given line; mode 1 = line = PRNG(`[0x7356d8]`) mod count[event]
+     (inline xorshift); modes 2..4 = repeat / other random picks (not used by speech callers).
+   - A flag array (`obj+0x2b0`) marks lines already played; code at `0x539833` skips played lines and resets with
+     `0x539dd0`. I: no repeats until the event is used up.
+   - Final index: `0x539b10` adds count[0..event) to the line and stores it at `obj+0x270`. Streams `0..276` = AST order.
+   - Per-event gain table: `0x6f6e48` / `0x6f6ec8` via `0x6f6f9c[slot]` (volumes, 0x7fff = full). I
+3. Callers and tables (event sets by D read of each table). V
+   | Caller (screen) | Source of the event | Events | Streams |
+   |---|---|---|---|
+   | `0x4c5320` career map | table `0x6fa5d0`, 45 pairs {key, event} | 43 | 151 |
+   | `0x4c5320`/`0x4c5fa0` | switch `0x4c52d0` (calls 0x4c55a2, 0x4c634c) | 23,25,29,31,46,47,52,59,61 | 29 |
+   | `0x4c6cb0` Junkman | switch `0x4c6c00` (`GetJunkmanRewardSpeech`) | 24,26,28,30,32 | 12 |
+   | `0x4c7790` | switch `0x4c76d0` | 48,53,60 | 10 |
+   | `0x4c3db0` garage, `0x4cd490`, `0x50a5d0` perf tuner | table `0x6fa7f0`, 25 pairs {flag bit, event}; one-shot, bit set in `[0x76029c]` after play | 62..85, 88 | 30 |
+   | `0x4cd3e0` | table `0x6fa738`, 15 pairs {key, event} | 5,12,19,22,39,45,49,50,51,54..58,94 | 48 |
+   | `0x4c5fa0` (0x4c6319), `0x4c5320` (0x4c54ec) | `0x4c5200` returns id; `0x6f8728[id*2+variant]` = line of event 0x59 | 0x59 | 15 lines |
+   | `0x513780` (called by 0x513610) | ids from `0x6f88f8` (27 entries) -> `0x6f872c[id*2]` -> `+0x98(0x59, line)` | 0x59 | same 15 |
+   - Union of the event sets (events overlap between callers): 90 events, 244 streams. Plus 15 lines of event 0x59 = 259.
+   - Screen meaning is I (names from `census/names*.tsv`: 0x4c3db0 garage main, 0x4c6cb0 Junkman, 0x50a5d0 perf tuner;
+     0x4c5320 / 0x4c5fa0 are career map openers per `tools/hopper/q_hub.py`). Race start, rival taunts: no caller found.
+4. Event 0x59 table `0x6f8728[id*2+v]` (id 1..26): id2 -> 0,1; id5 -> v1 2; id6 -> v1 3; id7 -> v1 4; id11 -> 5,6;
+   id12 -> 7,8; id13 -> 9,10; id15 -> v1 11; id16 -> v1 12; id17 -> 13,14; all else -1 = stop (`+0x90(0x59)`). Entry 0
+   holds two string pointers ("Fabolous" ...), skipped because the caller tests `id >= 1`. V (D)
 
 ## Open (U)
 - `entrant+0x435` (turbo variant); the 0x520320 switch read byte by byte.
 - Engine patch: which Csis param feeds each patch input (in0..in17); the curve values are dumped (§5), their roles are I.
-- Speech: the code path for the ~270 non-FE lines (in-race?) and the role of STRM_English_Speech_MB.abk (module 1497).
+- Speech: what each of the 95 events says (needs a listen); modes 2..4 of 0x5396a0; whether any caller reaches the
+  speech object without its `+0x90`/`+0x98` slots (§6 scanned only those).
 - Mixer path to dsound: the categories and sliders are in `docs/re_audio_default.md`. The voice/3D mixer names
   are in `census/names_sound.tsv` (EAXS_3DMixer, EAXMixMgr, EAXSND8Wrapper).
