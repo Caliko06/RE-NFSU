@@ -73,7 +73,7 @@ The gate field in `census/difftest.json` says **FAIL**, and it is not a lie: 4 f
 | `0x642774` | `F6 /1` is `TEST` on real CPUs (undocumented alias); QEMU 5 calls it invalid | documented reference deviation |
 | `0x673824` | `FPREM` with invalid operands: the SDM gives −NaN, QEMU 5 gives +NaN | documented reference deviation |
 | `0x67ca06` | `FPREM` on unsupported 80-bit encodings: the SDM gives −NaN, QEMU 5 gives +NaN | documented reference deviation |
-| `0x67a337` | the reference retires into `0x6728cc`; there is no lifted function there | **unexplained** |
+| `0x67a337` | the reference retires into `0x6728cc`; there is no lifted function there | **explained 2026-10-29: real lifter gap, not applied.** CRT memmove `0x672630` copies backward and jumps through a table that is indexed negatively (`neg ecx; jmp [ecx*4+0x6728c8]`, entries at `0x6728ac..0x6728c8`); `Lifter.table()` (lift.py:177) reads only forward, so those 7 labels are missing and the case falls to `rn_call`. Same pattern in the second CRT copy `0x678d30` (table `0x678fac`). Direct memmove probe: 224 of 312 overlapping backward copies of 4..34 bytes stop. Evidence: docs/re/audit/diag_67a337.md |
 
 So the port's honest number is 5,809 of 5,812 explained comparisons, with one open item that has never shown up in a run
 (the game does not reach it in the career census or the route).
