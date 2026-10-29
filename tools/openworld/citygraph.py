@@ -475,6 +475,35 @@ def cond_scc(L, flip, links):
     return (wt[best] if best >= 0 else 0), best, comp, vs
 
 
+PLAN_AHEAD = 1.0                                   # planning margin over AHEAD: the written heading of a node is the track's own
+
+
+def heading(xs, p, flip):
+    """unit heading of node p (original index) of a run written reversed when flip"""
+    n = len(xs)
+    a, b = (p, p + 1) if not flip else (p, p - 1)
+    if not 0 <= b < n:
+        a, b = (p - 1, p) if not flip else (p + 1, p)
+    dx, dy = xs[b][0] - xs[a][0], xs[b][1] - xs[a][1]
+    l = math.hypot(dx, dy) or 1.0
+    return dx / l, dy / l
+
+
+def ahead_source(runs_xy, a, b, flip):
+    """the source node for link a -> b on a run written reversed when flip: a itself or up to 3 nodes before it (in walk order)
+    from which b lies > PLAN_AHEAD m ahead (the grower's rule, AHEAD); None when there is none (original index)"""
+    (r, p), (r2, p2) = a, b
+    xs, (tx, ty) = runs_xy[r], runs_xy[r2][p2]
+    for k in range(4):
+        q = p + k if flip else p - k
+        if not 0 <= q < len(xs):
+            break
+        hx, hy = heading(xs, q, flip)
+        if (tx - xs[q][0]) * hx + (ty - xs[q][1]) * hy > PLAN_AHEAD:
+            return q
+    return None
+
+
 def plan_net(runs_xy, D=JUNCTION_D, budget=LINK_BUDGET, flips_s=SA_FLIPS_S, links_s=SA_LINKS_S, seed=3):
     """(flip per run, [((r, p), (r2, p2))] directed links in original positions, nodes of the biggest SCC). Phase 1 anneals the
     orientation with every candidate link (both ways) on; the links that add nothing are dropped, the least useful ones one by one
@@ -484,10 +513,12 @@ def plan_net(runs_xy, D=JUNCTION_D, budget=LINK_BUDGET, flips_s=SA_FLIPS_S, link
     for r, p, r2, p2, d in junction_pairs(runs_xy, D):
         DL.append(((r, p), (r2, p2)))
         DL.append(((r2, p2), (r, p)))
+    SRC = [{f: ahead_source(runs_xy, a, b, f) for f in (False, True)} for a, b in DL]
     rng = random.Random(seed)
     flip = [False] * len(L)
     keep = set(range(len(DL)))
-    W = lambda: cond_scc(L, flip, [DL[i] for i in sorted(keep)])[0]
+    real = lambda ks: [((DL[i][0][0], SRC[i][flip[DL[i][0][0]]]), DL[i][1]) for i in sorted(ks) if SRC[i][flip[DL[i][0][0]]] is not None]
+    W = lambda: cond_scc(L, flip, real(keep))[0]
     cur = best = W()
     bf, t0 = flip[:], time.time()
     while time.time() - t0 < flips_s:
@@ -543,7 +574,7 @@ def plan_net(runs_xy, D=JUNCTION_D, budget=LINK_BUDGET, flips_s=SA_FLIPS_S, link
         if cur > best:
             best, bst = cur, (flip[:], set(keep))
     flip, keep = bst[0], bst[1]
-    links = [DL[i] for i in sorted(keep)]
+    links = real(keep)
     w, bc, comp, vs = cond_scc(L, flip, links)
     ends = {v for v, c in zip(vs, comp) if c == bc}     # (run, oriented position) of the link ends inside the SCC
     inside = lambda a: (a[0], L[a[0]] - 1 - a[1] if flip[a[0]] else a[1]) in ends
@@ -610,21 +641,27 @@ OUT_DIR = os.path.join(T.B.REPO, 'build', 'openworld_city')
 
 def assign_slots(runs, link_list):
     """each link = 2 entries (forward d=0 on the source, reverse d=1 on the target); a node holds 2. A node that is full or
-    would be landed on at a run end shifts by up to 2 nodes along its run. Returns (placed links, dropped count)"""
+    would be landed on at a run end shifts by up to 2 nodes along its run; the source only to a node the landing stays ahead of.
+    Returns (placed links, dropped count)"""
     used, placed, dropped = collections.defaultdict(list), [], 0
 
-    def pick(r, p, landing_fwd, landing_back):
-        for sh in (0, 1, -1, 2, -2):
+    def pick(r, p, landing_fwd, landing_back, ok=lambda q: True):
+        for sh in (0, -1, 1, -2, 2):
             q = p + sh
             if not 0 <= q < len(runs[r]) or len(used[(r, q)]) >= 2:
                 continue
-            if landing_fwd and q + 1 >= len(runs[r]) or landing_back and q < 1:
+            if landing_fwd and q + 1 >= len(runs[r]) or landing_back and q < 1 or not ok(q):
                 continue
             return q
         return None
 
+    def ahead(r, q, b):
+        hx, hy = heading([PXY[(r, i)] for i in range(len(runs[r]))], q, False)
+        return (PXY[b][0] - PXY[(r, q)][0]) * hx + (PXY[b][1] - PXY[(r, q)][1]) * hy > PLAN_AHEAD
+
     for (ra, pa), (rb, pb), ty, lane in sorted(link_list, key=lambda l: (l[0], l[1])):
-        qa, qb = pick(ra, pa, False, True), pick(rb, pb, True, False)
+        qb = pick(rb, pb, True, False)
+        qa = pick(ra, pa, False, True, lambda q: qb is not None and ahead(ra, q, (rb, qb)))
         if qa is None or qb is None or (ra == rb and qa == qb):
             dropped += 1
             continue
@@ -716,10 +753,40 @@ def city_chunks(g):
                 struct.pack_into('<f', nd, 0x20, seglen[r][p - 1])
             nodes.append(nd)
         secs.append((hdr, nodes))
-    ent, kinds = [], collections.Counter()
+    def ahead(sr, sp, dr, dp, d):                       # the grower's test on the written bytes (behind_entries)
+        nd = secs[sr][1][sp]
+        x, y = struct.unpack_from('<2f', nd, 0)
+        hx, hy = struct.unpack_from('<2f', nd, 0x14 if d else 0xc)
+        tx, ty_ = struct.unpack_from('<2f', secs[dr][1][dp], 0)
+        return (tx - x) * hx + (ty_ - y) * hy > AHEAD
+
+    # the planned heading is the run's polyline; a node keeps the track's own heading unless it is a join, so a source can still
+    # miss by a little: move it back along its run (a node with a free slot) until the written bytes pass, else drop the link
+    nslot = collections.Counter(n for a, b_, _, _ in placed for n in (a, b_))
+    fixed, moved, cut = [], 0, 0
+    for (ra, pa), (rb, pb), ty, lane in placed:
+        q = pa
+        while q >= 0 and not ahead(ra, q, rb, pb, 0):
+            q -= 1
+            while q >= 0 and nslot[(ra, q)] >= 2:
+                q -= 1
+        if q < 0 or pa - q > 3 or (ra == rb and q == pb):
+            cut += 1
+            continue
+        if q != pa:
+            nslot[(ra, pa)] -= 1
+            nslot[(ra, q)] += 1
+            moved += 1
+        fixed.append(((ra, q), (rb, pb), ty, lane))
+    placed = fixed
+
+    ent, kinds, no_rev = [], collections.Counter(), 0
     for (ra, pa), (rb, pb), ty, lane in placed:
         kinds[(ty, lane)] += 1
         for (sr, sp), (dr, dp), d in (((ra, pa), (rb, pb), 0), ((rb, pb), (ra, pa), 1)):
+            if d and not ahead(sr, sp, dr, dp, d):          # a backward driver would land behind: no reverse entry
+                no_rev += 1
+                continue
             e = bytearray(32)
             struct.pack_into('<fHH', e, 0, 0.0, dp, sp)
             e[8], e[9], e[0xa], e[0xb], e[0xc], e[0xd] = 0, dr, sr, ty, lane, d
@@ -731,7 +798,7 @@ def city_chunks(g):
             ent.append(bytes(e))
     assert len(ent) <= MAX_ENT, '%d entries > %d' % (len(ent), MAX_ENT)
     p21 = b''.join(bytes(h) + b''.join(bytes(n) for n in ns) for h, ns in secs)
-    return p21, b''.join(ent), dict(sections=len(runs), entries=len(ent), links=len(placed), dropped_links=dropped, kinds=dict(kinds),
+    return p21, b''.join(ent), dict(sections=len(runs), entries=len(ent), links=len(placed), dropped_links=dropped, src_moved=moved, src_cut=cut, no_reverse=no_rev, kinds=dict(kinds),
                                     nodes=sum(len(r) for r in runs), route_max=round(max(off[r] + cum[r][-1] for r in range(len(runs)))))
 
 
@@ -764,6 +831,32 @@ def parse_net(d):
     assert p == b + s
     (b, s), = T.find(d, 0x34122)
     return secs, [bytes(d[o:o + 32]) for o in range(b, b + s, 32)]
+
+
+AHEAD = 0.1                                       # [0x6cc7b8]: the grower 0x5a58d0 appends a link's landing only this far ahead
+
+
+def behind_entries(secs, ent):
+    """[(entry, source sec, node, proj)] of every entry whose landing node is not > AHEAD m ahead of its source along the source's
+    heading for that direction (d=0 node+0xc/+0x10, d=1 +0x14/+0x18; vt+0x10 0x4550d0 / 0x455490). The grower then re-steps from
+    the landing without appending, a 2nd link leaves a node with +0x60 set that its predecessor has no link to -> 0x5a6d20 NULL ->
+    fault at 0x462a06"""
+    bad = []
+    for s, ns in enumerate(secs):
+        for i, nd in enumerate(ns):
+            for k in (0x81, 0x82):
+                if nd[k] == 0xff:
+                    continue
+                e = ent[nd[k]]
+                if e[0xb] == 3:
+                    continue
+                x, y = struct.unpack_from('<2f', nd, 0)
+                hx, hy = struct.unpack_from('<2f', nd, 0x14 if e[0xd] else 0xc)
+                tx, ty = struct.unpack_from('<2f', secs[e[9]][struct.unpack_from('<H', e, 4)[0]], 0)
+                pr = (tx - x) * hx + (ty - y) * hy
+                if not pr > AHEAD:
+                    bad.append((nd[k], s, i, pr))
+    return bad
 
 
 def walk_stats(secs, ent, dist=250.0):
@@ -816,6 +909,8 @@ def write(radius=10.0):
     base2 = T.make_base(base, p21, p22, head, body)
     secs, ent = parse_net(base2)
     assert len(secs) == st['sections'] and len(ent) == st['entries']
+    bad = behind_entries(secs, ent)
+    assert not bad, 'entries landing behind their source: %s' % bad[:8]
     scc, nn = scc_of_file(secs, ent)
     print('SCC: biggest strongly connected part %d of %d nodes (%.1f%%)' % (scc, nn, 100.0 * scc / nn), flush=True)
     assert scc >= 0.9 * nn, 'SCC %d < 90%% of %d nodes' % (scc, nn)
@@ -838,7 +933,7 @@ def write(radius=10.0):
     open(path, 'wb').write(blob)
     f = B.check(T.OUT_ID, base2, new, blob, gg, rows, props, fence_keys, union_keys, T.random.Random(7))
     secs, ent = parse_net(new)
-    assert len(secs) <= MAX_SEC and len(ent) <= MAX_ENT
+    assert len(secs) <= MAX_SEC and len(ent) <= MAX_ENT and not behind_entries(secs, ent)
     print('wrote', path, len(blob), 'bytes', dict(f), 'sections %d entries %d' % (len(secs), len(ent)), '(%.0fs)' % (time.time() - t0))
 
 

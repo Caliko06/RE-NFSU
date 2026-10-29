@@ -737,11 +737,19 @@ static uint32_t free_hud(Ctx *c) {
     return (uint32_t)m;
 }
 
+// The jump and crash cameras (PATCH 0x426dd7, 0x4662e0, cave 0x5567e3: jmp [SCREEN_ADDR+0x94]) ask 0x42c4b0 (esi = camera ctrl) for the
+// JUMPVIEW spline, built from TrackPath route nodes with no collision after placement: in the city it sits inside buildings. In free
+// mode the answer is 0 (no spline: the chase camera, which sweeps the world collision, stays); RN_FREE=0 or a race: the original call.
+static uint32_t free_jumpcam(Ctx *c) {
+    return live ? 0 : call_guest(c, 0x42c4b0, 0, NULL);
+}
+
 uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
 const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traffic", 7, free_traffic},
                          {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang},
                          {"rn", "free_place", 1, free_place}, {"rn", "free_spacing", 1, free_spacing},
                          {"rn", "free_nopath", 0, free_nopath},
                          {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle},
-                         {"rn", "free_hud", 1, free_hud}, {"rn", "free_dir", 0, free_dir}};
-const int free_api_count = 11;
+                         {"rn", "free_hud", 1, free_hud}, {"rn", "free_dir", 0, free_dir},
+                         {"rn", "free_jumpcam", 0, free_jumpcam}};
+const int free_api_count = 12;

@@ -382,6 +382,15 @@ PATCHES.append(dict(addr=0x4aa21e, old="b86666663f894638" + "89463c8946408946448
 PATCHES.append(dict(addr=0x6d3440, old="00" * 36, when=lambda: True,
                     new="c8cc4c3e3233333ffdffff3e3233333fcccc4c3f6666663f6666663f6666663f6666663f"))
 
+# PATCH: 0x426dd7, 0x4662e0 (+ cave 0x5567e3, CC padding after a ret, no reference: REA xrefs), OWNER 2026-10-28 (camera breaks on
+# jumps in WORLD): the jump trigger 0x426930 and the crash camera 0x465d00 both ask 0x42c4b0 (esi = camera ctrl, returns al) to build
+# the JUMPVIEW spline from the player's route nodes (mode 6, mover 0x485c00: a point 2 m off the road edge, no collision after
+# placement), which in the city lands inside buildings. Both calls now go to the cave, jmp [SCREEN_ADDR+0x94] = host/free.c
+# free_jumpcam: 0 in free mode (the chase camera stays), else the original call. docs/openworld/re_answers_0b.md "Chase / jump camera".
+PATCHES.append(dict(addr=0x426dd7, old="e8d4560000", new="e8" + _rel(0x426dd7, 0x5567e3), when=lambda: True))
+PATCHES.append(dict(addr=0x4662e0, old="e8cb61fcff", new="e8" + _rel(0x4662e0, 0x5567e3), when=lambda: True))
+PATCHES.append(dict(addr=0x5567e3, old="cc" * 6, new="ff2594300100", entry=True, when=lambda: True))
+
 def apply(img, base):
     """Patch a bytearray image mapped at base."""
     for p in active():
