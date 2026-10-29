@@ -108,7 +108,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x52cf80	audio	0	133	0	3	0	B EAXTires::CalcTireNoiseVolume
 0x52e540	audio	0	317	0	1	0	B EAXS_3DMixer::UpdateDistToRef
 0x52e6d0	audio	0	482	2	1	0	B EAXS_3DMixer::UpdateAzimuths
-0x52eb70	audio	0	110	0	1	0	B EAXS_3DMixer::GenerateQuadrant
+0x52eb70	audio	0	110	0	1	0	
 0x52f030	audio	0	140	0	1	0	B EAXS_3DMixer::GenerateDopplerFactor
 0x52f0c0	audio	0	501	1	1	0	B EAXS_3DMixer::SetAzimuth
 0x52f2c0	audio	0	185	2	1	0	
@@ -657,7 +657,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e0bf0	canon	0	86	0	3	0	R CreateMPCarSelectScreen
 0x4e0cb0	canon	0	84	0	1	0	R MPCarSelectData::MPCarSelectData
 0x4e1c70	canon	0	30	2	1	0	
-0x4e1f70	canon	0	130	1	1	0	B CarPortSelector::Show
+0x4e1f70	canon	0	130	1	1	0	B CarPortSelector::Init
 0x4e2000	canon	0	39	1	4	0	
 0x4e6ed0	canon	0	40	1	2	1	
 0x4e77c0	canon	0	154	1	1	0	B GarageVinylTypeScreen::~GarageVinylTypeScreen
@@ -787,7 +787,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x59e360	canon	0	31	1	1	0	
 0x59e380	canon	0	44	0	1	0	
 0x59e460	canon	0	165	0	1	0	R ElipseTable::Init
-0x59e510	canon	0	161	0	3	0	R LoaderElipseTable
+0x59e510	canon	0	161	0	3	0	A LoaderElipseTable
 0x59e5f0	canon	0	47	0	1	0	
 0x59ef50	canon	0	213	4	3	0	R cVolSlider::Draw
 0x59f2b0	canon	0	79	2	1	0	R cSlider::Toggle
@@ -1159,8 +1159,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x564cd0	car	0	216	1	8	0	R bASin
 0x5673e0	car	0	109	0	16	0	R bNormalize
 0x56ce90	car	0	32	0	1	0	
-0x56ceb0	car	0	95	0	2	0	R ch2d
-0x56d0c0	car	0	1600	0	1	0	C smooth_shadow_corners
+0x56ceb0	car	0	95	0	2	0	B ch2d
+0x56d0c0	car	0	1600	0	1	0	
 0x56d700	car	0	368	2	1	0	R sh_Setup
 0x56d870	car	0	59	0	1	0	R CarRenderInfo::CalculateTireBlur
 0x56d8b0	car	0	26	0	1	0	
@@ -1562,7 +1562,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x503250	render	0	107	3	1	0	R FESlotPool::Alloc
 0x503e40	render	0	30	2	1	0	
 0x503ed0	render	0	84	3	3	0	B FETypeNode::GetField
-0x51beb0	render	0	280	2	1	7	B FERenderObject::ClipAligned
+0x51beb0	render	0	280	2	1	7	B FEString::SetLabel
 0x540930	render	0	38	0	1	0	
 0x540960	render	0	43	0	1	0	
 0x540990	render	0	43	0	2	0	
@@ -1667,7 +1667,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5ad5a3	render	0	13	1	2	0	
 0x5ad5e5	render	0	13	1	2	0	
 0x5ad5f2	render	0	308	0	1	0	B CompletePCreadAsync
-0x5ad746	render	0	92	1	1	0	B CompleteAsync
+0x5ad746	render	0	92	1	1	0	B PCrwAsyncNextPh
 0x5ad7d6	render	0	217	0	1	0	B EXI2TCHandler
 0x5ad8af	render	0	13	1	2	0	
 0x5ad8c2	render	0	150	0	1	0	B SNInitEXI2TCHandler
@@ -1950,20 +1950,20 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x61c39b	render	0	70	0	1	0	
 0x61df50	render	0	59	0	1	0	
 0x61e4d0	render	0	287	0	2	0	
-0x61eee0	render	0	70	2	2	0	
+0x61eee0	render	0	70	2	2	0	B GetNextSymbol__CQ24EAGL13DynamicLoaderPCcRiRQ34EAGL13DynamicLoader6Symbol
 0x61ef60	render	0	14	1	15	0	
 0x61ef70	render	0	12	1	55	0	
-0x61ef80	render	0	96	0	1	0	
+0x61ef80	render	0	96	0	1	0	R EAGL::ConstructorPool::~ConstructorPool
 0x61f000	render	0	17	0	1	0	
 0x61f020	render	0	10	0	1	0	
 0x61f030	render	0	10	0	1	0	
 0x61f160	render	0	22	0	3	0	
-0x61f180	render	0	48	0	1	0	
-0x61f500	render	0	60	1	3	0	
-0x61f720	render	0	61	0	1	0	B EAGL::ConstructorPool::FindConstructor
+0x61f180	render	0	48	0	1	0	B EAGL::ConstructorPool::FindDestructor
+0x61f500	render	0	60	1	3	0	R EAGL::RuntimeAllocConstructorPool::FindDestructor
+0x61f720	render	0	61	0	1	0	B EAGLInternal::RenderContextPrivate::GPBreak::ReleaseGPBreak
 0x61f760	render	0	17	0	1	0	
 0x61f7e0	render	0	1402	1	2	0	
-0x61fd80	render	0	110	1	2	0	B EAGL::RuntimeAllocConstructorPool::~RuntimeAllocConstructorPool
+0x61fd80	render	0	110	1	2	0	B EAGL::RenderContextExtension::StuffData
 0x61fdf0	render	0	40	1	1	0	
 0x61fea0	render	0	906	0	3	0	
 0x6202b0	render	0	18	0	1	0	
@@ -1973,40 +1973,40 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x620330	render	0	20	0	1	0	
 0x620ba0	render	0	31	1	1	0	
 0x6212a0	render	0	226	0	1	0	
-0x621390	render	0	116	0	2	0	B EAGLInternal::RenderContextPrivate::ReleaseGPBreakPoint
-0x6218b0	render	0	84	0	2	0	B EAGLInternal::RenderContextPrivate::GPBreak::ReleaseGPBreak
+0x621390	render	0	116	0	2	0	
+0x6218b0	render	0	84	0	2	0	B EAGL::RenderContextBase::NewViewPort
 0x621bc0	render	0	575	0	2	0	
 0x621e00	render	0	13	0	2	0	
 0x621e10	render	0	136	0	1	0	
-0x621fb0	render	0	109	0	1	0	B EAGL::RenderContextExtension::StartDataStuffing
-0x622380	render	0	115	0	1	0	B EAGL::RenderContextExtension::StuffData
-0x622490	render	0	380	0	1	0	
+0x621fb0	render	0	109	0	1	0	
+0x622380	render	0	115	0	1	0	
+0x622490	render	0	380	0	1	0	B EAGL::GeoPrimStateExtension::SetCurrentVertex
 0x6226d0	render	0	42	1	2	0	
 0x622700	render	0	30	0	5	0	
-0x622720	render	0	52	0	5	0	A EAGL::RenderContextExtensionBase::GetMipMapModeOverride
+0x622720	render	0	52	0	5	0	R EAGL::GeoPrimState::SetPrimitiveType
 0x622760	render	0	10	0	2	0	
 0x622770	render	0	10	0	5	0	
-0x622780	render	0	62	0	5	0	
+0x622780	render	0	62	0	5	0	R EAGL::GeoPrimStateExtension::GeoPrimStateExtension
 0x6227c0	render	0	36	0	2	0	
 0x6227f0	render	0	36	0	1	0	
 0x622820	render	0	30	0	2	0	
 0x622840	render	0	32	0	4	0	
-0x622860	render	0	57	0	5	0	B EAGL::RenderContextBase::NewViewPort
+0x622860	render	0	57	0	5	0	
 0x6228a0	render	0	26	0	1	0	
-0x6228c0	render	0	75	0	2	0	R EAGL::RenderContextBase::DeleteViewPort
+0x6228c0	render	0	75	0	2	0	
 0x622910	render	0	17	0	4	0	
 0x622940	render	0	36	0	1	0	
-0x622970	render	0	159	2	1	0	R EAGL::GeoPrimStateExtension::SetRenderContextStates
+0x622970	render	0	159	2	1	0	
 0x622b40	render	0	10	0	2	0	
 0x622b50	render	0	25	0	1	0	
-0x622c10	render	0	79	0	2	0	B EAGL::GeoPrimState::GeoPrimState
+0x622c10	render	0	79	0	2	0	
 0x622c60	render	0	106	0	5	0	
-0x622d40	render	0	94	2	1	0	B EAGL::GeoPrimState::SetPrimitiveType
+0x622d40	render	0	94	2	1	0	R EAGL::TAR::~TAR
 0x622da0	render	0	31	0	1	0	
 0x622dc0	render	0	9	0	1	0	
-0x623780	render	0	1021	1	1	0	B EAGL::TevStage::ResetToDefault
-0x624000	render	0	175	0	1	0	B __static_initialization_and_destruction_0
-0x6240b0	render	0	249	0	1	0	B EAGL::TevStage::TevStage
+0x623780	render	0	1021	1	1	0	
+0x624000	render	0	175	0	1	0	B EAGL::TevStage::TevStage
+0x6240b0	render	0	249	0	1	0	
 0x6242d0	render	0	409	0	1	0	
 0x624a20	render	0	35	0	2	0	
 0x624a50	render	0	15	0	1	0	
@@ -2602,18 +2602,18 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5f4d50	runtime	0	57	0	2	0	P __SISteeringDisable
 0x5f4d89	runtime	0	100	0	2	0	
 0x6046ad	runtime	0	289	0	1	0	P DumpName
-0x61f690	runtime	0	49	0	1	0	B EAGL::ConstructorPool::AddType
+0x61f690	runtime	0	49	0	1	0	B EAGLInternal::RenderContextPrivate::SetGPBreakPoint
 0x61f780	runtime	0	17	0	1	0	
 0x620250	runtime	0	46	0	3	0	
 0x620350	runtime	0	20	0	1	0	
 0x6203c0	runtime	0	31	1	1	0	
-0x621ea0	runtime	0	82	0	1	0	C EAGL::RenderContextExtension::GetCurrentVolatileBuffer
+0x621ea0	runtime	0	82	0	1	0	B _GLOBAL_.I._Q24EAGL13RenderContext.gCurrentFrameNumber
 0x622dd0	runtime	0	94	0	2	0	
-0x622e30	runtime	0	91	0	2	0	B EAGL::GeoPrimStateExtension::GeoPrimStateExtension
+0x622e30	runtime	0	91	0	2	0	
 0x622e90	runtime	0	97	0	1	0	
-0x622fb0	runtime	0	57	0	1	0	B EAGL::GeoPrimStateExtension::GetCurrentVertex
-0x623060	runtime	0	49	0	1	0	R EAGL::GeoPrimStateExtension::SetAttributeFormat
-0x6230a0	runtime	0	49	0	1	0	R _GLOBAL_.I._Q24EAGL21GeoPrimStateExtension.gStateInitialized
+0x622fb0	runtime	0	57	0	1	0	R EAGL::TARExtension::SetNumTexGens
+0x623060	runtime	0	49	0	1	0	R EAGL::TARExtension::~TARExtension
+0x6230a0	runtime	0	49	0	1	0	R _GLOBAL_.I._Q24EAGL12TARExtension.gNumTexGens
 0x623590	runtime	0	46	0	1	0	
 0x6245e0	runtime	0	585	0	1	0	
 0x6390f0	runtime	0	19	0	5	0	
@@ -3745,8 +3745,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x518460	unknown	0	4286	0	1	0	
 0x519520	unknown	0	4299	0	1	0	
 0x51a830	unknown	0	30	2	1	0	
-0x51bfd0	unknown	0	71	0	1	0	B FEMouse::HeldFor
-0x51c020	unknown	0	306	1	2	0	B ScreenPrintf
+0x51bfd0	unknown	0	71	0	1	0	B FERenderObject::FERenderObject
+0x51c020	unknown	0	306	1	2	0	B FERenderObject::AddPoly
 0x51c5d0	unknown	0	26	0	1	0	
 0x51d950	unknown	0	318	0	1	0	B EAXSound::DestroyEAXCar
 0x530090	unknown	0	106	0	1	0	
@@ -3908,8 +3908,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x61b900	unknown	0	247	0	3	0	R IdctRow
 0x61bee0	unknown	0	252	0	9	0	R idctcompute
 0x61bfe0	unknown	0	254	0	3	0	R EAGL::DynamicLoader::RunConstructors
-0x622400	unknown	0	95	0	1	0	C EAGL::RenderContextExtension::StopDataStuffing
-0x6236d0	unknown	0	167	0	3	0	B EAGL::TevStage::SetHardware
+0x622400	unknown	0	95	0	1	0	
+0x6236d0	unknown	0	167	0	3	0	B __static_initialization_and_destruction_0
 0x6241b0	unknown	0	280	0	1	0	
 0x624470	unknown	0	357	0	1	0	
 0x636974	unknown	0	373	0	0	0	
@@ -4487,7 +4487,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x45faf0	canon	1	55	1	2	0	B PsychoDriver::SetTarget
 0x460350	canon	1	31	2	1	0	
 0x4603d0	canon	1	124	1	1	0	
-0x460560	canon	1	117	1	2	0	
+0x460560	canon	1	117	1	2	0	B PlayerSteering::DoSteering
 0x494890	canon	1	41	2	7	0	
 0x494af0	canon	1	31	2	1	0	
 0x494b10	canon	1	81	2	1	0	R FEng_PauseDragOptions::DisplayRearview
@@ -4702,8 +4702,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e0120	canon	1	54	1	1	0	
 0x4e01c0	canon	1	11	1	1	0	
 0x4e01d0	canon	1	30	2	1	0	
-0x4e0270	canon	1	83	2	1	1	
-0x4e02d0	canon	1	161	2	1	2	C MPLoginScreen::LoadingPlayer1List
+0x4e0270	canon	1	83	2	1	1	R MPLoginScreen::ClearPlayer2List
+0x4e02d0	canon	1	161	2	1	2	A MPLoginScreen::LoadingPlayer1List
 0x4e0680	canon	1	30	2	1	0	
 0x4e06a0	canon	1	114	2	1	0	B MPLoginScreen::ShowPlayer2List
 0x4e0720	canon	1	30	2	1	0	
@@ -4837,8 +4837,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x57b7b0	canon	1	88	2	1	0	B NearbyAvoidableList::GetIndex
 0x57b810	canon	1	98	2	1	0	B NearbyAvoidableList::GetIndex
 0x57b880	canon	1	99	2	1	0	B NearbyAvoidableList::GetNearbyAvoidable
-0x57b8f0	canon	1	88	2	1	0	B NearbyAvoidableList::GetNearbyAvoidable
-0x57b960	canon	1	98	2	1	0	B NearbyAvoidableList::GetAvoidableAhead
+0x57b8f0	canon	1	88	2	1	0	B NearbyAvoidableList::GetAvoidableAhead
+0x57b960	canon	1	98	2	1	0	B __static_initialization_and_destruction_0
 0x57c5a0	canon	1	77	1	9	0	R SampleMover::~SampleMover
 0x593fc0	canon	1	48	1	2	0	R cPoint::~cPoint
 0x594220	canon	1	167	1	3	0	R bRepeat::RemoveData
@@ -5181,7 +5181,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x57bad0	car	1	11	1	1	0	
 0x57bae0	car	1	30	2	1	0	
 0x57bb00	car	1	11	1	1	0	
-0x57bb10	car	1	417	2	1	0	B NISCrowd::NISCrowd
+0x57bb10	car	1	417	2	1	0	R NISCrowd::NISCrowd
 0x57bcc0	car	1	30	2	1	0	
 0x57bce0	car	1	11	1	1	0	
 0x57bd70	car	1	30	2	1	0	
@@ -5651,7 +5651,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5ba278	render	1	86	2	10	0	P __OSLockSramEx
 0x5ba2ce	render	1	49	1	2	1	
 0x5ba35f	render	1	128	1	1	1	
-0x5ba894	render	1	174	1	8	0	P OSSetWirelessID
+0x5ba894	render	1	174	1	8	0	P OSGetWirelessID
 0x5bae82	render	1	64	1	1	1	P OSGetGbsMode
 0x5baec2	render	1	267	1	2	0	P OSSetGbsMode
 0x5bb05e	render	1	119	1	3	0	P __OSInitSystemCall
@@ -5920,22 +5920,22 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x61df90	render	1	113	1	1	0	B EAGL::DynamicLoader::~DynamicLoader
 0x61e6d0	render	1	178	1	2	0	B EAGL::DynamicLoader::Release
 0x61e7d0	render	1	118	1	1	0	
-0x61f090	render	1	59	1	1	0	
+0x61f090	render	1	59	1	1	0	B EAGL::ConstructorPool::FindConstructor
 0x61f0e0	render	1	115	2	2	0	
-0x61f2e0	render	1	92	2	1	1	mw EAGL4::SymbolPool::AddSymbol
-0x61f340	render	1	252	1	3	0	B GetNextAddr__CQ24EAGL13DynamicLoaderPCcRiRPv
+0x61f2e0	render	1	92	2	1	1	B EAGL::RuntimeAllocConstructorPool::~RuntimeAllocConstructorPool
+0x61f340	render	1	252	1	3	0	
 0x61f440	render	1	133	1	1	0	
 0x61f540	render	1	38	1	1	0	
 0x61f570	render	1	28	1	2	0	
 0x61f590	render	1	31	1	2	0	
-0x61f7a0	render	1	49	1	2	0	B EAGL::ConstructorPool::FindDestructor
-0x622610	render	1	120	1	2	0	B EAGLInternal::RenderContextPrivate::~RenderContextPrivate
-0x622690	render	1	51	1	1	0	B EAGL::RenderContextExtensionBase::~RenderContextExtensionBase
+0x61f7a0	render	1	49	1	2	0	B EAGL::RenderContextExtension::StartDataStuffing
+0x622610	render	1	120	1	2	0	
+0x622690	render	1	51	1	1	0	B __static_initialization_and_destruction_0
 0x622b70	render	1	153	3	1	0	
-0x623260	render	1	61	1	1	0	R __static_initialization_and_destruction_0
-0x6232a0	render	1	66	1	2	0	R EAGL::TAR::~TAR
-0x623350	render	1	400	1	2	0	
-0x623500	render	1	134	1	4	0	R EAGL::TARExtension::Use
+0x623260	render	1	61	1	1	0	
+0x6232a0	render	1	66	1	2	0	
+0x623350	render	1	400	1	2	0	B EAGL::TevStage::ResetToDefault
+0x623500	render	1	134	1	4	0	
 0x623f40	render	1	1127	2	1	0	
 0x624830	render	1	35	1	4	0	
 0x624860	render	1	32	1	1	0	
@@ -6453,13 +6453,13 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x60783e	runtime	1	480	1	2	1	P ReceiveConfigureAck
 0x61f5f0	runtime	1	9	1	1	0	
 0x61f600	runtime	1	19	1	1	0	
-0x61f6d0	runtime	1	78	1	0	0	
-0x620370	runtime	1	65	2	1	0	
-0x621f00	runtime	1	172	3	1	0	
-0x622f00	runtime	1	175	3	1	0	
-0x622ff0	runtime	1	104	2	1	0	
-0x6235d0	runtime	1	121	1	1	0	R EAGL::TARExtension::SetTexCoordGen
-0x623650	runtime	1	117	1	1	0	C _GLOBAL_.I._Q24EAGL12TARExtension.gNumTexGens
+0x61f6d0	runtime	1	78	1	0	0	B EAGLInternal::RenderContextPrivate::ReleaseGPBreakPoint
+0x620370	runtime	1	65	2	1	0	B EAGL::RenderContextExtension::SetEFBCopy
+0x621f00	runtime	1	172	3	1	0	B EAGL::GeoPrimStateExtension::SetRenderContextStates
+0x622f00	runtime	1	175	3	1	0	R EAGL::TARExtension::Use
+0x622ff0	runtime	1	104	2	1	0	R EAGL::TARExtension::SetTexCoordGen
+0x6235d0	runtime	1	121	1	1	0	
+0x623650	runtime	1	117	1	1	0	
 0x63a190	runtime	1	35	2	1	0	
 0x63c290	runtime	1	39	1	5	0	
 0x63d470	runtime	1	82	1	1	0	
@@ -6729,7 +6729,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x445770	track	1	79	1	1	0	B GetScenerySectionName
 0x446bb0	track	1	217	2	2	0	B DrivableScenerySection::CalculateVisibleLODSections
 0x447030	track	1	9	1	30	0	
-0x447bb0	track	1	72	1	4	0	R UnloadChunks
+0x447bb0	track	1	72	1	4	0	B UnloadChunks
 0x4480b0	track	1	59	1	1	0	B ResourceFile::FreeMemory
 0x4480f0	track	1	26	1	1	0	
 0x4594d0	track	1	470	1	8	0	B DriveTarget::AddPointToTarget
@@ -7088,7 +7088,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5307e0	audio	2	88	2	2	0	R stSoundCollision::~stSoundCollision
 0x531ff0	audio	2	627	6	1	0	R stWorldCollision::GetSurfaceType
 0x5323b0	audio	2	142	5	1	0	B stWorldCollision::ShouldBeginImpact
-0x532440	audio	2	417	11	1	0	B __static_initialization_and_destruction_0
+0x532440	audio	2	417	11	1	0	C __static_initialization_and_destruction_0
 0x532610	audio	2	41	2	4	0	
 0x533f70	audio	2	254	7	1	0	R TrolleySoundObject::PlayBellSnd
 0x534df0	audio	2	805	8	1	0	B EAXS_Lamppost::SetupSoundSphere
@@ -7224,7 +7224,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4de9f0	canon	2	118	3	1	1	B LangSelectScreen::NotificationMessage
 0x4df000	canon	2	116	3	1	0	C IntroFMVScreen::~IntroFMVScreen
 0x4df690	canon	2	69	2	1	0	R MarketingScreen::NotifySoundMessage
-0x4e0560	canon	2	232	3	1	2	B MPLoginScreen::ShowPlayer1List
+0x4e0560	canon	2	232	3	1	2	R MPLoginScreen::ShowPlayer1List
 0x4e1a10	canon	2	53	2	1	0	B MPCarSelectScreen::ScrollCars
 0x4e3960	canon	2	247	3	1	0	B GarageNewVinylScreen::RefreshHeader
 0x4e7e00	canon	2	162	2	1	1	A GaragePresetsScreen::PresetAction
@@ -7299,7 +7299,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c3ff0	car	2	169	4	1	1	B UndergroundStatsScreen::AddStatsLine
 0x4c70b0	car	2	153	3	1	0	B UndergroundJunkmanGiveth::AddPickable
 0x4c84b0	car	2	161	3	1	0	
-0x4e2170	car	2	66	3	6	0	R MPChooseGarageScreen::~MPChooseGarageScreen
+0x4e2170	car	2	66	3	6	0	
 0x4e3f40	car	2	376	7	1	5	
 0x50c800	car	2	66	3	1	0	
 0x50cd90	car	2	148	3	1	0	A GarageRimsBrandBrowser::ScrollPickables
@@ -7314,7 +7314,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x548650	car	2	77	2	1	0	
 0x562b50	car	2	109	5	1	1	B bFunkServerPlatform::Service
 0x568250	car	2	80	5	1	0	B MapScreenV2::EnterAndWinEvent
-0x56cf10	car	2	425	3	1	0	R convex_hull
+0x56cf10	car	2	425	3	1	0	B smooth_shadow_corners
 0x57bcf0	car	2	120	2	1	0	B NISFlagGirl::NISFlagGirl
 0x57c240	car	2	90	2	1	0	R SemiWheel::SemiWheel
 0x57d340	car	2	1298	6	8	8	
@@ -7425,10 +7425,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5b8fac	render	2	206	2	1	0	
 0x5b9096	render	2	83	2	1	0	P __OSDoHotReset
 0x5ba5ee	render	2	147	2	8	1	P __OSReadROM
-0x5ba70c	render	2	110	2	8	1	P OSGetProgressiveMode
-0x5ba799	render	2	114	2	9	1	P OSSetProgressiveMode
-0x5ba80b	render	2	137	2	13	1	P OSGetWirelessID
-0x5bac05	render	2	200	2	2	1	
+0x5ba70c	render	2	110	2	8	1	P OSGetSoundMode
+0x5ba799	render	2	114	2	9	1	P OSGetProgressiveMode
+0x5ba80b	render	2	137	2	13	1	P OSSetProgressiveMode
+0x5bac05	render	2	200	2	2	1	P OSSetWirelessID
 0x5bb22e	render	2	103	3	3	1	P OSDisableScheduler
 0x5bb385	render	2	25	2	1	0	
 0x5bb43f	render	2	245	4	1	0	
@@ -7546,7 +7546,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x61f4d0	render	2	41	2	2	0	
 0x620d60	render	2	36	2	1	0	
 0x622460	render	2	45	2	2	0	
-0x622a10	render	2	291	5	1	0	B EAGL::GeoPrimStateExtension::SetCurrentVertex
+0x622a10	render	2	291	5	1	0	B EAGL::TARExtension::SetTextureLODStates
 0x625e80	render	2	103	2	2	0	A EAGL::DrawArray::SetLocalMatrix
 0x625ef0	render	2	103	2	2	0	R EAGL::DrawGouraud::InternalFlush
 0x625fd0	render	2	103	2	2	0	C RenderSingleDrawGouraud
@@ -7661,7 +7661,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x43a810	runtime	2	31	2	2	0	
 0x43ca70	runtime	2	92	2	1	0	B StylePointsAccumulator::TriggerMoment
 0x440560	runtime	2	359	2	2	0	A TrackPolygon::TestSegmentToPoly
-0x447ee0	runtime	2	92	3	2	0	R PostLoadFixup
+0x447ee0	runtime	2	92	3	2	0	B EndianSwapChunkHeadersRecursive
 0x46b260	runtime	2	893	4	2	0	A Contact::Crowbar
 0x47bed0	runtime	2	240	2	1	0	R NisSceneManager::LoadEndingNis
 0x4c44c0	runtime	2	145	4	2	1	R UndergroundStatsScreen::DrawSplitScreenStats
@@ -7697,15 +7697,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5ba2ff	runtime	2	96	3	2	1	
 0x5e54f8	runtime	2	50	2	3	0	P GXGetTexObjWidth
 0x5e98b0	runtime	2	63	2	1	0	P GXSetTevSwapMode
-0x6204e0	runtime	2	204	2	2	0	
-0x621240	runtime	2	73	2	1	0	R EAGLInternal::RenderContextPrivate::SetGPBreakPoint
+0x6204e0	runtime	2	204	2	2	0	B EAGL::RenderContextExtension::GetEFBAsTAR
+0x621240	runtime	2	73	2	1	0	B __static_initialization_and_destruction_0
 0x639040	runtime	2	167	2	1	0	B FILESYS_write
 0x639150	runtime	2	62	3	1	0	C FILESYS_size
 0x6391e0	runtime	2	175	4	1	0	R FILESYS_atomic
 0x63a020	runtime	2	64	2	2	0	A __static_initialization_and_destruction_0
 0x63aad0	runtime	2	208	5	1	3	R finishrequest
 0x63aba0	runtime	2	43	2	2	0	
-0x63abd0	runtime	2	159	2	1	0	R loadfilereadcallback
+0x63abd0	runtime	2	159	2	1	0	C loadfilereadcallback
 0x63c0c0	runtime	2	153	2	2	0	C loadfileopencallback
 0x63c160	runtime	2	149	2	1	0	B ASYNCFILE_init
 0x63cdd0	runtime	2	77	2	1	0	R FILE_save
@@ -7808,7 +7808,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x436e20	track	2	52	2	1	0	
 0x43e540	track	2	413	13	1	0	A DriftManager::CalcDriftIntensity
 0x440d30	track	2	196	2	1	0	A TopologyCoordinate::SegmentIntersects
-0x443c90	track	2	198	3	2	0	R TrackPathManager::UpdatePosition
+0x443c90	track	2	198	3	2	0	A TrackPathManager::UpdatePosition
 0x457300	track	2	238	3	1	0	B HowLongForThisCarToCoverThisDistance
 0x465770	track	2	181	2	1	1	S Collision::DoSnapshot
 0x468410	track	2	213	2	8	0	B CollisionBody::~CollisionBody
@@ -8095,7 +8095,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x419cc0	car	3	158	3	1	0	B FEKeyboard::FEKeyboard
 0x41c9e0	car	3	953	5	1	2	
 0x441030	car	3	547	3	5	0	A TopologyCoordinate::ConstrainToTopology
-0x460890	car	3	154	3	1	1	S PlayerSteering::DoSteering
+0x460890	car	3	154	3	1	1	
 0x461a60	car	3	829	3	1	1	A RealDriver::DoThrottleBrakeReverse
 0x463260	car	3	934	5	2	0	
 0x469d70	car	3	166	4	1	0	B CarCollisionBody::~CarCollisionBody
@@ -8137,7 +8137,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c1e80	hud	3	65	3	1	0	B GetCarTypeLogoHash
 0x4c4830	hud	3	234	6	1	1	B UndergroundStatusScreen::ScrollPickables
 0x4d74c0	hud	3	184	3	1	1	B Chyron::Start
-0x4e1d70	hud	3	499	5	1	0	C CarPortSelector::Init
+0x4e1d70	hud	3	499	5	1	0	
 0x4f6e10	hud	3	304	6	4	0	R FEngGetBottomRight
 0x4f7140	hud	3	257	7	4	0	R FEngSetCenter
 0x55fb60	hud	3	181	3	1	0	
@@ -8156,7 +8156,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5024b0	render	3	406	7	2	0	B FEPackageReader::ReadMessageResponseTags
 0x5037e0	render	3	1542	6	1	15	B FETypeLib::Startup
 0x5722d0	render	3	167	3	1	1	R ReplayManager::MaybeTakeDummySnapshot
-0x57b9f0	render	3	187	3	1	2	R __static_initialization_and_destruction_0
+0x57b9f0	render	3	187	3	1	2	S Barrel::Barrel
 0x5afb2f	render	3	381	5	2	0	P add_separators
 0x5b26f6	render	3	259	4	1	0	B VDevice_DownloadEffect
 0x5b2838	render	3	227	3	1	2	
@@ -8171,7 +8171,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5b82c5	render	3	127	3	1	0	P ExternalInterruptHandler
 0x5b8344	render	3	128	3	1	0	P OnReset
 0x5b83c4	render	3	128	3	1	0	P MEMIntrruptHandler
-0x5ba681	render	3	139	3	1	2	P OSGetSoundMode
+0x5ba681	render	3	139	3	1	2	
 0x5ba942	render	3	591	4	2	22	
 0x5bc1ad	render	3	167	3	4	3	P __OSGetEffectivePriority
 0x5c0e2d	render	3	103	3	6	0	
@@ -8243,9 +8243,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x61a5d9	render	3	195	3	5	0	
 0x61a7fa	render	3	300	3	2	5	
 0x61af1a	render	3	472	3	7	1	B MAD_decodemacroblock
-0x61ef30	render	3	45	3	2	0	mw ??1DynamicLoader@EAGL4@@QAE@XZ
-0x622020	render	3	861	6	9	0	
-0x6230e0	render	3	380	3	2	0	R EAGL::TARExtension::SetTextureLODStates
+0x61ef30	render	3	45	3	2	0	
+0x622020	render	3	861	6	9	0	B Use__CQ24EAGL21GeoPrimStateExtension
+0x6230e0	render	3	380	3	2	0	R EAGL::TevStage::SetHardware
 0x625c10	render	3	199	3	2	0	R EAGL::DrawGouraud::AddVertex
 0x625ce0	render	3	199	3	2	0	R EAGL::DrawArray::SetVar
 0x625db0	render	3	199	3	2	0	R EAGL::DrawArray::Draw
@@ -8538,7 +8538,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4dd880	canon	4	91	5	1	0	R LoadingScreen::ShowControllerConfig
 0x4dd8e0	canon	4	714	7	1	1	C LoadingScreen::HideControllerConfig
 0x4ddbb0	canon	4	929	7	1	1	
-0x4e0380	canon	4	473	7	1	2	B MPLoginScreen::LoadingPlayer2List
+0x4e0380	canon	4	473	7	1	2	R MPLoginScreen::LoadingPlayer2List
 0x4e1b90	canon	4	198	5	3	0	B MPCarSelectScreen::~MPCarSelectScreen
 0x4e6ac0	canon	4	525	5	6	1	B GarageVinylPrompt::NotificationMessage
 0x4e7600	canon	4	273	5	1	4	B __static_initialization_and_destruction_0
@@ -8700,7 +8700,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x585b40	runtime	4	557	6	1	0	B RigidBody::ComputeAuxiliaries
 0x58a2e0	runtime	4	274	4	3	0	
 0x5e8fb1	runtime	4	208	4	8	4	P GXSetTevKColor
-0x61f620	runtime	4	101	5	1	0	B EAGL::ConstructorPool::~ConstructorPool
+0x61f620	runtime	4	101	5	1	0	B EAGL::RenderContextBase::~RenderContextBase
 0x63a310	runtime	4	218	5	7	1	R FILESYS_opensync
 0x63a690	runtime	4	100	5	5	0	R queueadd
 0x63a700	runtime	4	121	5	5	0	R queuefetch
@@ -8872,9 +8872,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x615991	render	5	354	6	2	0	B MAD_CODEC_INTERNAL::~MAD_CODEC_INTERNAL
 0x618431	render	5	350	6	3	0	
 0x618a35	render	5	516	6	3	0	
-0x620970	render	5	535	5	1	0	B EAGLInternal::RenderContextPrivate::DrawMotionBlurPoly
+0x620970	render	5	535	5	1	0	
 0x621670	render	5	567	5	2	0	
-0x621b00	render	5	151	6	1	0	B EAGLInternal::RenderContextPrivate::GPBreak::SetGPBreak
+0x621b00	render	5	151	6	1	0	B EAGL::RenderContextBase::DeleteViewPort
 0x626820	render	5	151	5	1	0	B EAGL::PrintMessage
 0x62aa30	render	5	874	5	1	0	B EAGLAnim::FnDeltaQFast::UpdateNextQsMask
 0x6308f0	render	5	1167	5	1	0	B EAGLAnim::FnPoseBlender::Blend
@@ -8897,7 +8897,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5894e0	runtime	5	812	10	2	0	R SkidSet::AddSegment
 0x59eac0	runtime	5	961	9	2	0	A cIllusionSlider::Init
 0x5b0506	runtime	5	176	5	2	1	P memchr
-0x620d90	runtime	5	297	5	1	0	A EAGL::RenderContextBase::~RenderContextBase
+0x620d90	runtime	5	297	5	1	0	
 0x63a450	runtime	5	183	7	1	0	R FILESYS_closesync
 0x63a5d0	runtime	5	190	7	6	0	R FILESYS_existssync
 0x63e850	runtime	5	82	5	2	0	R _GLOBAL_.D._6Realmc.ROOT_DIRECTORY_NAME
@@ -9049,7 +9049,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x54f050	runtime	6	418	7	1	0	
 0x562420	runtime	6	520	10	1	1	
 0x5e9257	runtime	6	1625	7	1	0	
-0x6203e0	runtime	6	242	7	1	0	B EAGL::RenderContext::~RenderContext
+0x6203e0	runtime	6	242	7	1	0	
 0x6397e0	runtime	6	221	7	1	0	B reserveop
 0x643010	runtime	6	115	6	0	0	R Realmc::GCDriver::DeleteFile
 0x64595f	runtime	6	280	7	1	0	
@@ -9238,7 +9238,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5e6ae3	render	9	544	13	1	2	P __GXSetSUTexRegs
 0x601ecc	render	9	623	9	1	0	P TCPShutdown
 0x619309	render	9	1611	12	1	2	
-0x621160	render	9	210	9	1	0	R EAGLInternal::RenderContextPrivate::BreakPtCallback
+0x621160	render	9	210	9	1	0	
 0x4350d0	rivals	9	782	15	3	0	B RacingCar::UpdateLapCounts
 0x639d70	runtime	9	288	9	7	0	R FILESYS_getopts
 0x63a1e0	runtime	9	298	11	2	1	R syncblockio

@@ -119,8 +119,18 @@ def anchors(pc, gc, hide=0):
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import canon   # same merge of census/names_*.tsv as the queue, so wave names become anchors
     _, rows = canon.merged()
-    an = sorted((x, by[r["name"]][0], r["name"]) for x, r in rows.items()
-                if r["name"] in by and len(by[r["name"]]) == 1 and x in pcset)
+    mangled = {g["name"]: g["addr"] for g in gc if len(g["name"]) > 6}
+    an = []
+    for x, r in rows.items():
+        if x not in pcset:
+            continue
+        if r["name"] in by and len(by[r["name"]]) == 1:
+            an.append((x, by[r["name"]][0], r["name"]))
+        elif r["name"] in by:   # overloads: the worker cites the exact mangled name in the evidence
+            hit = [m for m in re.findall(r"[\w.]+__[\w.]+", r.get("evidence", "")) if m in mangled]
+            if len(set(hit)) == 1:
+                an.append((x, mangled[hit[0]], r["name"]))
+    an.sort()
     keep = lis(an)
     hidden = keep[hide - 1::hide] if hide else []
     return [a for a in keep if a not in hidden], hidden

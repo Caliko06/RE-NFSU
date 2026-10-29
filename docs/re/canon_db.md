@@ -64,3 +64,6 @@ census/canon/systems_tu.tsv, read by the scoreboard as med. 767 stay unknown (35
   was often outside the window. `canon.py show` now also lists "GC free in file": GC methods of the same source file not
   yet taken by any PC name, nearest size first. gcalign reads the merged names_*.tsv (wave names become anchors:
   321 -> 443) and demangles nested scopes (Q<n>), so Realmc::GCInterface names anchor too.
+- Round 5 (file batches): R 24/33, B 21/38 taken. AIAction family 0x44e260-0x4512f0 was labelled AICarController.cpp by a
+  bad alignment stretch; the round's own names re-anchored it to AIPlan.cpp (GC split 0x8004bb5c-0x80055ed8). Overloads
+  (same Class::method twice in GC) anchor when the evidence cites the mangled name. Holdout 1/2 after: file 293/304, A 92/94.

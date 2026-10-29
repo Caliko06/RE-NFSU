@@ -65,6 +65,7 @@ def merged():
             t = (r.get("system") or "").strip().split(".")[0]
             t = TOP.get(t, t)
             rows[x] = dict(name=r["name"].strip(), system=t if t in SYSTEMS and c != "U" else None, conf=c,
+                           evidence=(r.get("evidence") or ""),
                            tool=(r.get("tool") or "").strip(), doc=(r.get("doc") or "").strip())
     return system, rows
 
