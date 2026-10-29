@@ -12,7 +12,7 @@ Marks: V = I re-ran it or read the code this session, D = a doc or the ledger sa
 |---|---|---|
 | Function starts in the Hopper export | 14,333 | `census/hopper/funcs.tsv` |
 | Lifted to C | 13,739, failed 0, trap sites 7,655 (dead SIMD paths) | `census/lift_report.json` |
-| Compared against Unicorn | 5,813 of 13,800; 5,809 match; gate FAIL | `census/difftest.json` |
+| Compared against Unicorn | 5,798 of 13,823; 5,794 match; gate FAIL (rerun 2026-10-29, 8 cases) | `census/difftest.json` |
 | Unexplained difftest mismatch | 1 (`0x67a337`); 3 others are documented QEMU deviations | D `docs/coverage.md` §2 |
 | Functions with a real name | 52 of 14,333 in funcs.tsv; census/names.tsv has 1,039 addresses (819 V, 198 I, 22 U), of which 841 are Hopper function starts and 886 lifted functions carry a name (2026-10-29) (31 funcs.tsv rows have an empty name) | `awk` over `funcs.tsv`, names neither empty nor starting `sub_` (corrected by the names-seed agent) |
 | Active patches | 122 | `census/lift_report.json` |
@@ -85,26 +85,26 @@ Universe = the 13,739 lifted functions.
 - tagged = a system tag of confidence med/high in census/systems.tsv, or a name in names_*.tsv. The name's system overrides the graph tag (the audit found 47% of named functions had a different system in the graph). Before this change `tagged` counted every non-unknown function (12,179) and told nothing.
 - ran = RN_COV union, a floor (prologue only), 12 scenarios.
 - named = a row in census/names_*.tsv with a system (V or I); named V = a second tool agrees (the audit estimates about 42 of 848 V rows cite one tool only; they are due a recheck).
-- diff-tested = U per system: difftest.json keeps only the total (5,813 compared, 5,809 equal). The fourth number does not exist per system yet.
+- diff-tested = lifted functions compared against Unicorn with all cases equal (census/difftest.json `compared_funcs`, rerun 2026-10-29 with 8 cases: 5,798 compared, 5,794 equal, gate FAIL on the same 4 functions as before: 3 documented QEMU deviations and 0x67a337, whose reference retires into 0x6728cc where nothing was lifted).
 - Names land in the system of the night's work: track, input, runtime and hud have almost no names because nobody named them yet (free tracks were never done).
 
 | system | lifted | tagged | ran | named | named V | diff-tested |
 |---|---|---|---|---|---|---|
-| render | 2235 | 907 | 940 | 24 | 15 | U |
-| canon | 1999 | 947 | 658 | 66 | 62 | U |
-| runtime | 1740 | 521 | 686 | 2 | 1 | U |
-| unknown | 1525 | 0 | 875 | 0 | 0 | U |
-| audio | 1330 | 529 | 818 | 209 | 197 | U |
-| car | 1040 | 533 | 374 | 216 | 189 | U |
-| rivals | 1034 | 588 | 555 | 28 | 21 | U |
-| online | 690 | 297 | 27 | 1 | 1 | U |
-| track | 662 | 269 | 333 | 0 | 0 | U |
-| hud | 331 | 161 | 156 | 3 | 1 | U |
-| assets | 329 | 227 | 218 | 182 | 168 | U |
-| camera | 288 | 124 | 93 | 51 | 20 | U |
-| traffic | 231 | 156 | 174 | 82 | 37 | U |
-| props | 177 | 82 | 97 | 22 | 16 | U |
-| input | 128 | 61 | 34 | 0 | 0 | U |
-| TOTAL | 13739 | 5402 | 6038 | 886 | 728 | 5813 (no split) |
+| render | 2235 | 907 | 940 | 24 | 15 | 839 |
+| canon | 1999 | 947 | 658 | 66 | 62 | 651 |
+| runtime | 1740 | 521 | 686 | 2 | 1 | 942 |
+| unknown | 1525 | 0 | 875 | 0 | 0 | 880 |
+| audio | 1330 | 529 | 818 | 209 | 197 | 554 |
+| car | 1040 | 533 | 374 | 216 | 189 | 325 |
+| rivals | 1034 | 588 | 555 | 28 | 21 | 372 |
+| online | 690 | 297 | 27 | 1 | 1 | 330 |
+| track | 662 | 269 | 333 | 0 | 0 | 242 |
+| hud | 331 | 161 | 156 | 3 | 1 | 105 |
+| assets | 329 | 227 | 218 | 182 | 168 | 222 |
+| camera | 288 | 124 | 93 | 51 | 20 | 83 |
+| traffic | 231 | 156 | 174 | 82 | 37 | 121 |
+| props | 177 | 82 | 97 | 22 | 16 | 59 |
+| input | 128 | 61 | 34 | 0 | 0 | 56 |
+| TOTAL | 13739 | 5402 | 6038 | 886 | 728 | 5781 |
 
-Reading: tagged is 39% of the functions, not 89%. Named is 6% (886), named V 5% (728). Ran is 44%.
+Reading: tagged is 39% of the functions, not 89%. Named is 6% (886), named V 5% (728). Ran is 44%. Diff-tested is 42% (5,781).
