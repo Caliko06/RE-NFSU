@@ -43,3 +43,17 @@ census/systems.tsv, docs/re/blur.md, tools/census/sys*.py, tools/hopper/q_*.py, 
 07:01 orchestrator back after account-5 5h limit (03:0x-07:00): subagents a6d97/a2d5c died on 429 and were resumed at 07:01; B and a2 delivered de61702/5103257/9fc13da then hit account 3 limit; relay hook ignored (Ghostty forbidden, session now 0%).
 07:04 M2 systems (146c21f), M3 names.tsv (8a50517), M4 camera+blur (bd5fa4f), M5 scoreboard (677289f) committed by the orchestrator; HANDOFF rewritten. B and a2 resume 08:20. Next: props/traffic/rivals only on account 3.
 07:17 heartbeat: nothing running; webcheck --route PASS (needs tools/serve.py up); account 5 week 85% so no subagents; B and a2 resume 08:20. tools/re/tpk.py untracked (b/a2 work in progress).
+
+## HANDOFF night-opus-b (quota 100%, 2026-10-29 ~04:20)
+Done (commits de61702 + this): tools/re/{chunks,lang,events,save}.py (each `check` passes on real files), tools/re/tpk.py
+(texture packs; `list`/`dds` work; record offsets fixed at the end, full `check` NOT re-run: ~3 min, run it first),
+docs/re/canon.md (events, progression, rewards decoded 31/31, text, movies, saves), census/names_canon.tsv (46),
+census/names_assets.tsv (26 resource-layer names), census/chunks.json (116 ids).
+Raw agent output to merge: census/names_raw/assets_loadersA.tsv (191 rows, loaders 2..23 + collision/camera ids) and
+assets_loadersB.tsv (136 rows, loaders 4, 24..46 incl. full TPK record layout). Both kind=chunk|func, marked V/I/U.
+Next, in order: (1) `tools/re/tpk.py check` until 0 bad; (2) fix LOADERS in tools/re/chunks.py from the TSVs (loader 2
+also takes 0x34130..0x34134 via 0x441380; loader 4 takes 0xb3300000/0xb3320000/0xb0300100; loader 18 0x80034405..25 +
+0x34492); (3) write docs/re/assets.md (pipeline from names_assets.tsv rows + chunk table from the two TSVs) and append
+func rows to census/names_assets.tsv; (4) 10-sample second-tool check per system (canon done for 8: H+G agree);
+(5) EventDesc unknown fields (+0x18..0x24, +0x34, +0xd0, +0x128..0x148), reward types 0/2/3/4 appliers, 0x34a01
+(agent stopped on quota: resume or redo; canon.md "Open"). angeldamian-36 was not reachable by SendMessage all night.
