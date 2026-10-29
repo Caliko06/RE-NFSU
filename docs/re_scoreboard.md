@@ -14,7 +14,7 @@ Marks: V = I re-ran it or read the code this session, D = a doc or the ledger sa
 | Lifted to C | 13,739, failed 0, trap sites 7,655 (dead SIMD paths) | `census/lift_report.json` |
 | Compared against Unicorn | 5,813 of 13,800; 5,809 match; gate FAIL | `census/difftest.json` |
 | Unexplained difftest mismatch | 1 (`0x67a337`); 3 others are documented QEMU deviations | D `docs/coverage.md` §2 |
-| Functions with a real name | 84 of 14,333 (0.6 %) | `awk` over `funcs.tsv`, names not starting `sub_` |
+| Functions with a real name | 52 of 14,333 (0.4 %; 31 rows have an empty name) | `awk` over `funcs.tsv`, names neither empty nor starting `sub_` (corrected by the names-seed agent) |
 | Active patches | 122 | `census/lift_report.json` |
 | Career rows | 167/167, a regression guard only | `census/rows.json` |
 | Hopper query scripts | 131 `tools/hopper/q_*.py`, 85 frozen PS2/NFSU1 RE notes in `ref/docs/re` | `ls` |
