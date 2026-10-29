@@ -3,7 +3,8 @@
   tpk.py list FILE               packs and textures: name, hash, size, format, mips, data offset
   tpk.py dds FILE NAME OUT.dds   write one texture as a .dds (DXT1/DXT3/A8R8G8B8 as stored; P8 expanded to A8R8G8B8)
   tpk.py check                   every pack in game/: data ranges inside the blob, size = sum of the mip sizes,
-                                 hash index = record hashes, JDLZ streams (car packs) unpack to the record size
+                                 hash index = record hashes, JDLZ streams (car packs) unpack to the record's
+                                 pixel..palette range
 
 Layout (loader 0x5455c0 -> 0x5453d0 for the header container, 0x545900 binds records, 0x5459f0 maps the pixels):
   0xb3300000 pack
@@ -50,8 +51,7 @@ def packs(d):
     for depth, off, cid, size, parent in out:
         p = off + 8
         if cid == 0xb3300000:
-            cur = {"off": off, "recs": [], "gpu": [], "index": [], "streams": {}}
-            yield_list = cur
+            cur = {"off": off, "recs": [], "gpu": [], "index": [], "streams": {}, "blob": None}
             datas.setdefault("packs", []).append(cur)
         elif cid == 0x33310001:
             cur["name"] = d[p + 4:p + 0x20].split(b"\0")[0].decode("latin1")
@@ -75,19 +75,21 @@ def packs(d):
             cur["gpu"] = [struct.unpack_from("<I", d, p + 0x20 * k + 0x14)[0] for k in range(size // 0x20)]
         elif cid == 0x33320001:
             node_key = struct.unpack_from("<I", d, p + 0xc)[0]
-        elif cid == 0x33320002:
-            datas[node_key] = ((p + 0x7f) & ~0x7f, p + size)
-    for pk in datas.get("packs", []):
-        pk["blob"] = datas.get(pk.get("key"))
-        yield pk
+        elif cid == 0x33320002:   # binds to the latest pack with this key, as the loader meets them (0x545660)
+            for pk in reversed(datas.get("packs", [])):
+                if pk.get("key") == node_key:
+                    pk["blob"] = ((p + 0x7f) & ~0x7f, p + size)
+                    break
+    yield from datas.get("packs", [])
 
 
 def pixels(d, pk, r):
     """-> (pixel bytes, palette bytes) of record r."""
     if pk["streams"]:
         o, n = pk["streams"][r["hash"]]
-        u = jdlz_decompress(d[o:o + n])
-        return u[:r["npix"]], u[r["npix"]:r["npix"] + r["npal"]]
+        u = jdlz_decompress(d[o:o + n])   # same layout as the blob, starting at the record's pixel offset
+        q = r["pal"] - r["pix"]
+        return u[:r["npix"]], u[q:q + r["npal"]] if r["npal"] else b""
     base = pk["blob"][0]
     return d[base + r["pix"]:base + r["pix"] + r["npix"]], d[base + r["pal"]:base + r["pal"] + r["npal"]]
 
@@ -155,7 +157,7 @@ def main():
                     if pk["streams"]:
                         o, n = pk["streams"][r["hash"]]
                         u = jdlz_decompress(d[o:o + n])
-                        ok = len(u) == r["npix"] + r["npal"] or len(u) == r["npix"]
+                        ok = len(u) == (r["pal"] - r["pix"] + r["npal"] if r["npal"] else r["npix"])
                     else:
                         lo, hi = pk["blob"]
                         ok = lo + r["pix"] + r["npix"] <= hi and lo + r["pal"] + r["npal"] <= hi

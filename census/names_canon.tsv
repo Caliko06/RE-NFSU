@@ -45,3 +45,26 @@ addr	name	system	confidence	evidence	tool	doc
 0x5a1550	Career::IsUpgradeUnlocked	canon	high	V: scans reward triples for status 2 (docs/re/tuning.md)	hopper+ghidra+capstone	docs/re/canon.md
 0x5a3630	PartStore::Has	canon	high	V: row = path*0x90, 0x24 keys, compare edx	hopper+ghidra+capstone	docs/re/canon.md
 0x5a3570	PartStore::HasPart	canon	med	V: maps part type to row through 0x5a03d0, forwards to 0x5a3630	hopper+ghidra+capstone	docs/re/canon.md
+0x4c4920	EventMap::SetModeIcon	canon	high	V: MODE_ICON_%s%s with CIRCUIT/DRAG/SPRINT/DRIFT/TIME_TRIAL/LAP_KNOCKOUT by rec+8, "_TOURNAMENT" when rec+4==1; H+G agree	ghidra+hopper	docs/re/canon.md
+0x4c49f0	EventMap::GetModeLabelHash	canon	high	V: rec+4==1 -> UG_MODE_TOURNAMENT; else rec+8 0..5 -> UG_MODE_CIRCUIT/DRAG/SPRINT/DRIFT/TIME_TRIAL/LAP_KO (hashes resolved with lang.py)	ghidra+hopper	docs/re/canon.md
+0x4c4c60	EventMap::ShowEventSummary	canon	med	V: EVENT_%d_TITLE, "Entry Fee: %d", laps from rec+0x7a, direction rec+0x7b, 5a1da0 count	ghidra	docs/re/canon.md
+0x4c55f0	Briefing::GetHostName	canon	high	V: hash [rec+0x130] -> Jose/Dirt/Klutch/Samantha/Eddie/Chad/Todd/TJ/Kurt/Melissa; H+G agree	ghidra+hopper	docs/re/canon.md
+0x4c5680	Briefing::Build	canon	med	V: passes [rec+0x130] to 0x4c55f0, EVENT_%d_REWARD_BLURB	ghidra	docs/re/canon.md
+0x4c5ce0	Briefing::ShowDescription	canon	med	V: EVENT_%d_DESCRIPTION; mode 4 prints the target time from +0x1c	ghidra	docs/re/canon.md
+0x4c5f20	Briefing::HasRequiredRideRating	canon	high	V: ride rating 0x5a05b0 >= (float)rec+0x18; asm checked; H+G agree	capstone+ghidra+hopper	docs/re/canon.md
+0x4b4040	Race::SpawnOpponents	canon	high	V: loops [obj+0x59c8] rivals; rival+0xc hash -> preset car, +0x10[difficulty] skill 0..9, +0x16 rating, +0x18 byte; G read, H present	ghidra	docs/re/canon.md
+0x4b5df0	Career::StartRaceFromEvent	canon	high	V: copies kind/mode/+0x1c/+0x128/+0x12c/+0x134/+0x138/+0x13c/+0x148/+0xd0 into 0x78a300..0x78a40c; G read, H present	ghidra+capstone	docs/re/canon.md
+0x4b6300	Race::SetPlayerGridSlot	canon	med	V: swaps racer byte +3 with the player (slot [rec+0x138]); G read, H present	ghidra	docs/re/canon.md
+0x5a1340	Career::GetUrlRank	canon	high	V: kind 6, rec+0x34 league == arg, lowest +0x36 among won; H+G agree	ghidra+hopper	docs/re/canon.md
+0x4e9e90	UrlRankScreen::Show	canon	med	V: RANK_DATA_%02d, PLAYERNAME_DATA_%02d, CARNAME_DATA_%02d, table 0x6fa18c RANK_CAT_CIRCUIT/SPRINT/DRAG/DRIFT	ghidra	docs/re/canon.md
+0x5a1630	Career::IsCarUnlocked	canon	high	V: reward type 2 value == car hash -> status 2; default 1; G read, H present	ghidra	docs/re/canon.md
+0x5a16f0	Career::IsTrackUnlocked	canon	high	V: reward type 3 value == track id, arg == direction; caller 0x4b9f40; G read, H present	ghidra	docs/re/canon.md
+0x5a1850	Career::OpenNextCashEvent	canon	high	V: rotates kind-8 events (status 0 -> 1, else reset all to 0 and open first)	ghidra	docs/re/canon.md
+0x5a1b10	Career::ScaleCashEvent	canon	med	V: first open non-kind-8 id = progress; writes +0x28..+0x30 cash (225/300/375, 530/700/825, ...) and rival skills +0x10..+0x14 by progress band <0x32, <0x4e, <0x72	ghidra	docs/re/canon.md
+0x5a2040	Career::IsPlayerStuck	canon	med	V: no non-tournament event open, a tournament open, cash < price of unlocked unbought upgrades	ghidra	docs/re/canon.md
+0x5a2270	Career::RefreshOpenEvents	canon	high	V: 0x5a1100 then 0x5a2040 -> 0x5a1850/0x5a1b10, returns the ids with status 1 (12 slots); callers 0x4c4a60, 0x567eb0	ghidra	docs/re/canon.md
+0x5a1da0	Career::CountFinishedEvents	canon	med	V: counts non-kind-8 events with status 2 or 4	ghidra	docs/re/canon.md
+0x5a2690	Career::GetLastWonEventTextRow	canon	low	V: highest-id won non-kind-8 event (0x71 -> 0x70) -> 0x2c-byte row at [0x734414]; field offsets 4/0xe/0x18/0x22 by arg; caller 0x4e9e90	ghidra	docs/re/canon.md
+0x5a2350	Career::CreateRaceObject	canon	high	V: copies rec 0x53 dwords to obj+0x58a0, builds stages from +0x78	ghidra	docs/re/canon.md
+0x5a2f10	Race::DidPlayerWin	canon	high	V: by kind 1 (points 0x5a2ab0), mode 4 (time < [0x78a310]), kind 7, else first place in every stage	ghidra	docs/re/canon.md
+0x5a0320	Career::EventGivesLevel4Part	canon	med	V: any reward type 0 with arg 4; used by 0x4ab670 to choose SamanthaGiveth	ghidra	docs/re/canon.md

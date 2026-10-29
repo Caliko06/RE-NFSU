@@ -30,9 +30,9 @@ Readers (each has a `check` that passes on the real files):
   |---|---|---|---|---|
   | 0 | part category 0..0x18 | level (1..4) | 67 | performance/visual upgrade unlock; `0x5a3f00` folds them into a bit set for the reward screen (V G) |
   | 1 | hash of `MAGAZINE_RACE_n` | 0 | 11 | magazine cover (given in `0x5a0dc0`, V G) |
-  | 2 | hash of a car name (`MIATA`, `SKYLINE`...) | 0 | 20 | car unlock |
-  | 3 | track id (1001..1308) | 0/1 | 47 | track unlock for Quick Race; arg = reverse direction (I) |
-  | 4 | 0 | 0 | 2 | U |
+  | 2 | hash of a car name (`MIATA`, `SKYLINE`...) | 0 | 20 | car unlock, queried by `0x5a1630` (G) |
+  | 3 | track id (1001..1308) | 0/1 | 47 | track unlock for Quick Race, queried by `0x5a16f0` (G); arg = reverse direction (I) |
+  | 4 | 0 | 0 | 2 | U: no reader found |
 - **Text** is 3,846 strings per language keyed by bStringHash of a label; `Languages/Labels.bin` holds the labels
   themselves (3,843/3,846 re-hash). V (D, H for the loader `0x59fce0`)
 - **Movies**: 23 `.mad` files ship; the game knows 42 movie names (`0x6f90d8`, name -> id by `0x4f7840`). V (C, H)
@@ -42,13 +42,13 @@ Readers (each has a `check` that passes on the real files):
 | Off | Type | Field | Mark | Where read |
 |---|---|---|---|---|
 | +0x00 | u32 | id (< 0x100) | V | loader 0x5a00a0 indexes by it |
-| +0x04 | u32 | kind: 0 race, 1 tournament (stages), 2 / 3 Junkman / Samantha events, 6 (40 events), 8 never opens; 4, 5 single | V for 1/2/3/8 (career.py, 0x5a0fc0 G), U for 0/4/5/6 meaning | 0x5a0fc0, 0x4ab670 |
-| +0x08 | u32 | race mode 0..5 | V field, I names | 0x4b5df0 |
+| +0x04 | u32 | kind: 0 single race, 1 tournament, 2 Junkman, 3 Samantha, 6 URL ladder, 8 repeatable cash race (opens when the player cannot afford the open tournament's parts); 4 (event 113), 5 (event 112) no reader | V 0/1/2/3/6/8 (0x5a2040, 0x5a1850, 0x5a1b10, G), U 4/5 | 0x5a0fc0, 0x4ab670 |
+| +0x08 | u32 | race mode: 0 Circuit, 1 Drag, 2 Sprint, 3 Drift, 4 Time Trial, 5 Lap Knockout | V (H+G) | 0x4b5df0, 0x4c4920, 0x4c49f0 |
 | +0x10 | f32 | entry fee | V | 0x5a0d43 |
-| +0x18 | u32 | 0..4 on 10 events | U | |
-| +0x1c..+0x24 | 3 f32 | values 95..172 on 7 events (score / time targets?) | U | |
+| +0x18 | u32 | minimum ride rating to enter (10 tournaments) | I (G; whether it blocks entry is U) | 0x4c5f20 (H+G+C) |
+| +0x1c..+0x24 | 3 f32 | target time per difficulty, mode 4 only | I | 0x4b5fe9 -> [0x78a310] (G) |
 | +0x28 | 3 f32 | cash for a win, by difficulty (career+0x348) | V | 0x5a0e3b |
-| +0x34 | u32 | `0xa000n` on 40 events | U | |
+| +0x34 / +0x36 | u16, u16 | URL league (0 circuit, 1 sprint, 2 drag, 3 drift) / rank defended | V (H+G) | 0x5a1340 |
 | +0x38 | 5 x 12 | rewards (type, value, arg) | V | 0x5a0dc0, 0x5a3f00 |
 | +0x74 | u32 | reward count | V | 0x5a3f00 (G: `param_1 + 0x1d`) |
 | +0x78 | 8 x 4 | stages: u16 track, u8 laps, u8 direction | V | 0x4b5df0 |
@@ -57,9 +57,9 @@ Readers (each has a `check` that passes on the real files):
 | +0xa8 | i16 | prerequisite rule 0 all / 1 any | V | 0x5a0fc0 (G) |
 | +0xaa | i16 | prerequisite count | V | 0x5a0fc0 (G) |
 | +0xac / +0xb8 / +0xc4 | 12 s | movie before / after a loss / after a win | V | 0x4c5df0, 0x4e86d0 (career.py) |
-| +0xd0 | u32 | set on one event only | U | |
+| +0xd0 | u32 | fixed player car hash, event 0 only | I (G) | |
 | +0xd4 | 3 x 0x1c | rivals: name[8], u32, u32 car preset hash (= FEHashUpper of a 0x30220 preset label), 12 bytes | V name+hash | PS2 note: 212/212 keys match |
-| +0x128..+0x148 | 9 x 4 | 0..3, a float 0.8..1.2, a hash, 0..3, 1/2, floats 0.25..1, 1.0, 1.0, 0/2 | U (AI skill / traffic density?) | |
+| +0x128..+0x148 | 9 x 4 | +0x128 AI opponent count, +0x130 host character hash (Jose, Dirt, Samantha, Eddie, Melissa...; name via 0x4c55f0, H+G), +0x138 player grid slot; +0x12c, +0x134, +0x13c..+0x144, +0x148 copied to race globals 0x78a300..0x78a40c | V +0x130, I rest | 0x4b5df0 (G) |
 
 `tools/re/events.py fields` prints the value spread of every unnamed range.
 
@@ -177,9 +177,17 @@ dword 0x13, and use one checksum: Adler-32 (a=1, b=0, mod 0xfff1, result b<<16|a
 | 0x88b0 | 4 | pointer to the live race/event object (its +0x58a0 holds an event id that overrides the table); 0 in menus | V | 0x5a0cf5, 0x5a0f98 |
 
 
+## Second-tool agreement (10 sampled names)
+H and G show the same entry, compares and callees for `0x59fb80`, `0x5a1100`, `0x5a0fc0`, `0x5a0dc0`, `0x5a0f60`,
+`0x5a0ce0`, `0x4c4920`, `0x4c55f0`, `0x5a1340`, `0x4c5f20` (+C). 10/10 agree. `0x5a00a0` has no Ghidra function
+(C only); `0x41dd10` Adler-32 is also checked by recomputing it over 9 files (F).
+
 ## Open
 
-- U: event kinds 0/4/5/6 by name; fields +0x18..+0x24, +0x34, +0xd0, +0x128..+0x148; reward type 4.
-- U: who applies reward types 0, 2, 3 (unlock queries scanning won events).
-- U: `0x34a01` rows (25 x 0x20, values like 300/600/900): `0x5a08f0` reads `[0x733f78 + type*4]` as a price table
+- U: event kinds 4/5 (no reader); reward type 4; whether 0x4c5f20 blocks entry; +0x12c/+0x13c/+0x148 use in
+  0x44bd10, 0x43eb00, 0x422410; rival +8..+0xb, +0x18 byte (0..2), +0x19..+0x1b.
+- Resolved: reward types 0/2/3 are unlock queries `0x5a1550`/`0x5a1630`/`0x5a16f0` that scan the won events
+  (an item no event rewards counts as unlocked; G).
+- I: `0x34a01` = 25 rows by part category: +4/+8/+0xc price of levels 1..3, +0x10..+0x1c ride-rating points of
+  levels 1..4 (readers 0x5a08f0, 0x5a08b0, 0x5a25a0, 0x5a2620, 0x5a05b0, 0x5a2040). Earlier note: rows (25 x 0x20, values like 300/600/900): `0x5a08f0` reads `[0x733f78 + type*4]` as a price table
   (night-opus-a lead) while the career cash is real; reconcile with docs/re/tuning.md "No prices".

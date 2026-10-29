@@ -25,3 +25,164 @@ addr	name	system	confidence	evidence	tool	doc
 0x449765	GameFlow::LoadingTrackSpecificPart1	assets	high	V: sprintf TRACKS\TRACKB%d.LZC then TRACKB%d.BUN; H	hopper	docs/re/assets.md
 0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	high	V: sprintf TRACKS\TEX%dTRACK.BIN; H	hopper	docs/re/assets.md
 0x594c60	bOpenFile	assets	low	I: (name<200 chars, mode, flags) -> file object with size at +4; G	ghidra	docs/re/assets.md
+0x441ed0	TrackPositionMarker_Load	assets	high	V: loader 2: 0x34146 -> link records into list; calls 0x441380 for 0x34130..0x34134	Hopper export + Ghidra export	docs/re/assets.md
+0x441f40	TrackPositionMarker_Unload	assets	high	V: unloader 2: unlinks the list and calls 0x441480	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x441380	TrackCollision_LoadChunk	assets	high	V: stores pointers/counts of 0x34130..0x34134 into the manager	Hopper export + Ghidra export	docs/re/assets.md
+0x441480	TrackCollision_Unload	assets	high	V: clears the collision manager	Hopper export + Ghidra export	docs/re/assets.md
+0x442010	TrackInfo_GetRow	assets	high	V: bounds-checked row getter: index*0xfc + base	Hopper export + Ghidra export	docs/re/assets.md
+0x442040	TrackInfoTable_Load	assets	high	V: loader 3: 0x34201 -> rows ptr + count (size/0xfc)	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x442080	TrackInfoTable_Unload	assets	high	V: unloader 3: clears pointer and count	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x5455c0	TexturePack_Load	assets	high	V: loader 4: accepts 0xb3300000, 0xb3320000 and 0xb0300100; calls 0x5453d0 for 0xb3310000 children	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x545770	TexturePack_Unload	assets	high	V: unloader 4: for 0xb3310000 children calls 0x545520 (unregisters pack)	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x5453d0	TexturePack_LoadIndex	assets	high	V: parses 0x33310001..5 of one 0xb3310000, validates counts, creates TexturePack object	Hopper export + Ghidra export	docs/re/assets.md
+0x545580	TexturePack_BindPixels	assets	high	V: finds the pack whose header[0x60] matches the pixel block and binds data	Hopper export + Ghidra export	docs/re/assets.md
+0x545900	TexturePack_FixEntries	assets	high	V: per-entry fix-up: sets default texture 0x66994f4a, entry pointers	Hopper export + Ghidra export	docs/re/assets.md
+0x5459f0	TexturePack_AttachPixels	assets	high	V: adds an aligned pixel address to the entry offsets +0x30/+0x34 -> +0x70/+0x74	Hopper export + Ghidra export	docs/re/assets.md
+0x545520	TexturePack_Remove	assets	med	I: removes a pack from the list and releases it (called by unloader)	Hopper export has no block (inside another sub_); Ghidra export block; capstone only	docs/re/assets.md
+0x5457f0	TexturePack_Register	assets	high	V: copies name/path, hashes the name, inserts the pack in MRU list ('TexturePack,%s')	Hopper export + Ghidra export	docs/re/assets.md
+0x545c60	TexAnim_Register	assets	high	V: stores animation set/frame pointers from 0xb0300100	Hopper export + Ghidra export	docs/re/assets.md
+0x5461c0	Texture_FindByHash	assets	high	V: looks up a texture entry by name hash across all packs (binary search 0x53e400 in 0x33310002 index)	Hopper export + Ghidra export	docs/re/assets.md
+0x4f4420	FEngFont_Load	assets	high	V: loader 5: 0x30201 -> allocates 0x30 B node, builds via 0x4f44c0, inserts in font list	Hopper export + Ghidra export	docs/re/assets.md
+0x4f4470	FEngFont_Unload	assets	high	V: unloader 5: removes node(s) for the chunk	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x4f44c0	FEngFont_Init	assets	high	V: node constructor: stores chunk+8 (font name block) and chunk+0x108 (bitmap name block), hashes names	Hopper export + Ghidra export	docs/re/assets.md
+0x4f46c0	FEngFont_ResolveTextures	assets	high	V: walks the font list and resolves each bitmap hash via 0x5461c0	Hopper export + Ghidra export	docs/re/assets.md
+0x540420	SolidList_Load	assets	high	V: loader 6: top-level 0x80134001 -> 0x53fef0	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x540440	SolidList_Unload	assets	high	V: unloader 6: 0x540270 on the list container	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x53fef0	SolidList_LoadContainer	assets	high	V: loads one 0x80134001: header, hash index, extra table	Hopper export + Ghidra export	docs/re/assets.md
+0x540270	SolidList_Unload_Impl	assets	high	V: unlinks list header(s) for one container	Hopper export + Ghidra export	docs/re/assets.md
+0x5402f0	SolidList_Release	assets	med	I: frees pending/unreferenced solid lists	Hopper export + Ghidra export	docs/re/assets.md
+0x540460	SolidPack_Load	assets	high	V: loader 7: top-level 0x80134000 (lists + solids) and 0x80134010	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x5404e0	SolidPack_Unload	assets	high	V: unloader 7	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x53ffd0	Solid_Load	assets	high	V: loads one 0x80134010 solid (all child chunks, texture/material resolution, hands mesh to 0x40c690)	Hopper export + Ghidra export	docs/re/assets.md
+0x53f9b0	Solid_ResolveTextures	assets	high	V: fills 0x134012 pairs through 0x5461c0	Hopper export + Ghidra export	docs/re/assets.md
+0x53f6e0	Solid_ResolvePending	assets	med	I: reorders/resolves solids that were waiting for their list	Hopper export + Ghidra export	docs/re/assets.md
+0x540630	Solid_FindByHash	assets	high	V: binary-searches the list index (0x134003)	Hopper export + Ghidra export	docs/re/assets.md
+0x540680	Solid_FindInAllLists	assets	high	V: hash lookup across all solid lists, caches last hit	Hopper export + Ghidra export	docs/re/assets.md
+0x40c690	Mesh_Load	assets	high	V: loads 0x80134100: builds D3D vertex/index buffers	Hopper export + Ghidra export	docs/re/assets.md
+0x40c840	Mesh_Free	assets	high	V: releases D3D buffers of a mesh	Hopper export + Ghidra export	docs/re/assets.md
+0x540f10	LightPack_Load	assets	high	V: loader 8: 0x80135000, 0x80135100, 0x135200 (also called per top-level chunk)	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x5410b0	LightPack_Unload	assets	high	V: unloader 8	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x5413e0	LightTree_Query	assets	med	I: sums light colours near a point from the 0x740a68 trees	Hopper export + Ghidra export	docs/re/assets.md
+0x544f30	LampFlares_Draw	assets	med	I: draws the 'Track lamps' flare list	Hopper export + Ghidra export	docs/re/assets.md
+0x402820	Particle_Load	assets	high	V: loader 9: accepts 0x80035000/0x80035010 as no-ops, parses 0x35020 and 0x35021	Hopper export + Ghidra export	docs/re/assets.md
+0x4028f0	Particle_Unload	assets	high	V: unloader 9: unlinks emitters/definitions of the chunk	Hopper export + Ghidra export	docs/re/assets.md
+0x402b40	ParticleEmitter_Bind	assets	med	I: links an emitter record to its definition by key	Hopper export + Ghidra export	docs/re/assets.md
+0x402bd0	ParticleEmitter_Queue	assets	med	I: queues an emitter by type	Hopper export + Ghidra export	docs/re/assets.md
+0x58dde0	WorldZone_Load	assets	high	V: loader 10: 0x80036000 -> header, nodes, entries	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x58deb0	WorldZone_Unload	assets	high	V: unloader 10 (calls 0x58de10 per container)	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x58de10	WorldZone_Unload_Impl	assets	high	V: detaches one zone tree	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x58dff0	WorldZone_CreateObject	assets	med	I: creates the runtime object for a hit zone entry	Hopper export + Ghidra export	docs/re/assets.md
+0x58e2e0	WorldZone_Query	assets	high	V: tree walk with sphere test and direction mask	Hopper export + Ghidra export	docs/re/assets.md
+0x58dca0	WorldZone_NodeWalk	assets	high	V: node walk helper (stride 0x30, short +0xe)	Hopper export + Ghidra export	docs/re/assets.md
+0x472b00	CarShape_Load	assets	high	V: loader 11: 0x80034020 -> triples 0x39200/1/2 into node list	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md
+0x472c00	CarShape_Unload	assets	high	V: unloader 11	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x472c60	CarShape_Find	assets	high	V: finds a shape by key	Hopper export + Ghidra export	docs/re/assets.md
+0x4457c0	StreamSection_Load	assets	high	V: loader 12: 0x80034100 section (0x34101..4)	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x445b60	StreamSection_Unload	assets	high	V: unloader 12: clears slot, unbinds solids	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x446aa0	StreamBoundaries_Load	assets	high	V: loader 13: thunk (push 0x77a930; call 0x446db0)	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x446ab0	StreamBoundaries_Unload	assets	high	V: unloader 13: re-inits the five list heads	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x446db0	StreamBoundaries_LoadChunk	assets	high	V: parses 0x34151..0x34154 into manager lists	Hopper export + Ghidra export	docs/re/assets.md
+0x47ce50	AnimBank_Load	assets	high	V: loader 14: 0xe34010 -> 0x47af20	Hopper export + Ghidra export	docs/re/assets.md
+0x47ced0	AnimBank_Unload	assets	high	V: unloader 14	Hopper export + Ghidra export	docs/re/assets.md
+0x47af20	AnimBank_DynamicLoad	assets	high	V: EAGL::DynamicLoader CAnimBank: loads the ELF, resolves 'AnimationBank'	Hopper export + Ghidra export	docs/re/assets.md
+0x5a4de0	AnimSkeleton_Load	assets	high	V: loader 15: 0xe34009 -> EAGL::DynamicLoader CAnimSkeleton	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md
+0x5a4e90	AnimSkeleton_Unload	assets	high	V: unloader 15	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x47b890	NisScene_Load	assets	high	V: loader 16: 0x34035	Hopper export + Ghidra export	docs/re/assets.md
+0x47b8d0	NisScene_Unload	assets	high	V: unloader 16	Hopper export + Ghidra export	docs/re/assets.md
+0x47b7b0	PostRaceScene_Load	assets	high	V: loader 17: 0x34036 -> rewrite 12 list pointers	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x47b7f0	PostRaceScene_Unload	assets	high	V: unloader 17	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x47e230	CameraTables_Load	assets	high	V: loader 18: thunk to 0x47dcd0 (accepts 5 containers)	Hopper export + Ghidra export	docs/re/assets.md
+0x47e250	CameraTables_Unload	assets	high	V: unloader 18: thunk to 0x47df00	Hopper export + Ghidra export	docs/re/assets.md
+0x47dcd0	CameraTables_LoadChunk	assets	high	V: parses 0x80034405/10/15/20/25 containers and the 0x34492 shake table	Hopper export + Ghidra export	docs/re/assets.md
+0x47de30	CameraTables_LoadChildren	assets	high	V: child-chunk parser 0x34440..0x34490	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x47df00	CameraTables_Unload_Impl	assets	high	V: resets counts of the camera tables	Hopper export + Ghidra export	docs/re/assets.md
+0x5462d0	TrackSkyInfo_Load	assets	high	V: loader 19: 0x34202 -> rows, count, selected row	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x546570	TrackSkyInfo_Unload	assets	high	V: unloader 19	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x546310	TrackSkyInfo_Select	assets	high	V: finds the row with matching hash (version 2)	Hopper export + Ghidra export	docs/re/assets.md
+0x57c8b0	CarData_Load	assets	high	V: loader 20: 0x34600, 0x34601, 0x80034602 (car info, colours, part database)	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x57cb70	CarData_Unload	assets	high	V: unloader 20	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x436000	ModeFlags_Load	assets	high	V: loader 21: 0x34a07 -> table pointer	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x436020	ModeFlags_Unload	assets	high	V: unloader 21	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x435fe0	ModeFlags_GetRow	assets	high	V: getter idx*0x20 + base	Hopper export + Ghidra export	docs/re/assets.md
+0x58d4c0	Unused34030_Load	assets	high	V: loader 22: 0x34030 (links node, absent from game files)	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x58d500	Unused34030_Unload	assets	high	V: unloader 22	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x442dd0	RoadNetwork_Load	assets	high	V: loader 23: 0x34121..0x34124	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x442e60	RoadNetwork_Unload	assets	high	V: unloader 23 (calls 0x442bd0)	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md
+0x442b70	RoadSections_Parse	assets	high	V: parses one 0x34121 chunk into 128 slots and two lists	Hopper export + Ghidra export	docs/re/assets.md
+0x442bd0	RoadSections_Unload	assets	high	V: clears the 0x80 slots	Hopper export + Ghidra export	docs/re/assets.md
+0x43feb0	TrackMarker_Count	assets	high	V: counts 0x34146 records with a given type hash	Hopper export + Ghidra export	docs/re/assets.md
+0x43fef0	TrackMarker_Get	assets	high	V: returns the n-th record with a given type hash	Hopper export + Ghidra export	docs/re/assets.md
+0x53e400	BinarySearch_Hash	assets	high	V: generic binary search (key, base, offset, stride) used by texture/solid indexes	Hopper export + Ghidra export	docs/re/assets.md
+0x545af0	TexturePackHandle::UnmapData	assets	high	V: inverse: clear +0x70/+0x74, release D3D texture (0x408010), clear hash-index slot, reset 0x73551c	Hopper sub_545af0 + Ghidra FUN_00545af0: H+G agree	docs/re/assets.md
+0x545c10	TexturePackHandle::FindRecordByHash	assets	high	V: binary search records at key offset 0x24 stride 0x7c, linear fallback	Ghidra FUN_00545c10 + Hopper sub_545c10	docs/re/assets.md
+0x407db0	Texture::CreateD3D	assets	high	V: create the IDirect3DTexture9 for a record: power-of-two check, P8 palette -> A8R8G8B8 expansion, honours texture-quality mip skip [0x7364f4], copies each mip level	Ghidra FUN_00407db0 + capstone	docs/re/assets.md
+0x408010	Texture::ReleaseD3D	assets	high	V: Release() the entry's D3D texture and unlink it	Ghidra FUN_00408010	docs/re/assets.md
+0x545cc0	TexAnim::Unregister	assets	high	V: return pooled blocks to the free list and unlink the manager node	Ghidra FUN_00545cc0	docs/re/assets.md
+0x545d50	TexAnim::ResolveFrames	assets	high	V: resolve every frame hash to a TextureRecord through the newest pack's hash index, take a pooled block holding the D3D texture pointer	Ghidra FUN_00545d50	docs/re/assets.md
+0x545ea0	TexAnim::Update	assets	high	V: each frame: choose frame = time % count and write that frame's D3D texture into the animated record's entry+0x18	Ghidra FUN_00545ea0 (called from 0x40a752)	docs/re/assets.md
+0x545fb0	TexturePack::SectionMap	assets	med	I: streaming-section callback: for a section's texture range call MapData with the record's offsets	capstone asm (no decompile in either export)	docs/re/assets.md
+0x546010	TexturePack::SectionUnmap	assets	med	I: streaming-section callback: UnmapData for the same range	capstone asm	docs/re/assets.md
+0x5460e0	TexturePack::SectionHeader	assets	med	I: streaming-section callback that parses a header chunk (0x447bb0 walk then 0x5453d0)	capstone asm	docs/re/assets.md
+0x4441f0	TrackPath::Loader	assets	high	V: loader #24: tail-calls 0x4434d0(&0x7372b0)	Hopper sub_4441f0 + Ghidra make FUN_004441f0: H+G agree	docs/re/assets.md
+0x444200	TrackPath::Unloader	assets	high	V: unloader #24: free splines (0x4433f0), zero the object	Hopper sub_444200 + Ghidra make FUN_00444200: H+G agree	docs/re/assets.md
+0x4434d0	TrackPath::Parse	assets	high	V: walk the three children, derive counts, call Init	Hopper sub_4434d0 + Ghidra FUN_004434d0: H+G agree	docs/re/assets.md
+0x443450	TrackPath::Init	assets	high	V: store counts/pointers, build 11-entry zone-type index table, call BuildSplines	Hopper sub_443450 + capstone	docs/re/assets.md
+0x4432a0	TrackPath::BuildSplines	assets	high	V: allocate a runtime spline (0x2c B) per path from its nodes, store at path+0x24	Hopper sub_4432a0	docs/re/assets.md
+0x4433f0	TrackPath::FreeSplines	assets	high	V: free each path's spline (+0x24) and its buffer	Hopper sub_4433f0	docs/re/assets.md
+0x58d140	Chunk37010::Accept	assets	high	V: loader #25 and unloader #25 are the same function: returns (id == 0x37010)	Ghidra make FUN_0058d140 (H export lacks it; capstone agrees)	docs/re/assets.md
+0x592a50	Table34300::Loader	assets	high	V: loader #26 (0x34300, 0x34301)	Hopper sub_592a50 + Ghidra make FUN_00592a50: H+G agree	docs/re/assets.md
+0x592ab0	Table34300::Unloader	assets	high	V: unloader #26: zero the four globals	Hopper sub_592ab0 + Ghidra make: H+G agree	docs/re/assets.md
+0x462070	RacerAITuning::Loader	assets	high	V: loader #27: memcpy 0x20b dwords to 0x779c78	Hopper sub_462070 + Ghidra make FUN_00462070: H+G agree	docs/re/assets.md
+0x4620a0	RacerAITuning::Unloader	assets	high	V: unloader #27: only returns id match (data stays)	Ghidra make FUN_004620a0 (Hopper export lacks it)	docs/re/assets.md
+0x59fce0	LanguageStrings::Loader	assets	high	V: loader #28: set globals, relocate offsets	Hopper sub_59fce0 + Ghidra make FUN_0059fce0: H+G agree	docs/re/assets.md
+0x59fd40	LanguageStrings::Unloader	assets	high	V: unloader #28: zero globals	Ghidra make FUN_0059fd40 (Hopper export lacks it)	docs/re/assets.md
+0x59fb80	LanguageStrings::FindByHash	assets	high	V: binary search on 8-byte {hash,ptr} entries	Hopper sub_59fb80	docs/re/assets.md
+0x5952a0	Smackable::Loader	assets	high	V: loader #29 (0x34026 defs, 0x34027 props)	Hopper sub_5952a0 + Ghidra export FUN_005952a0: H+G agree	docs/re/assets.md
+0x5954c0	Smackable::Unloader	assets	high	V: unloader #29: unlink all 0x34026 records / clear 0x34027 pointers	Ghidra make FUN_005954c0 (Hopper export lacks it)	docs/re/assets.md
+0x588d10	TriggerVolume::Loader	assets	high	V: loader #30	Hopper sub_588d10 + Ghidra make FUN_00588d10: H+G agree	docs/re/assets.md
+0x588d70	TriggerVolume::Unloader	assets	high	V: unloader #30: clears 0x73ac60..0x73ac6c,0x734534 and unlinks the records	Hopper sub_588d70 + Ghidra make FUN_00588d70: H+G agree	docs/re/assets.md
+0x573150	Chunk39100::Loader	assets	high	V: loader #31 (0x39100, 0x39101, 0x39102)	Hopper sub_573150 + Ghidra make FUN_00573150: H+G agree	docs/re/assets.md
+0x573160	Chunk39100::Unloader	assets	high	V: unloader #31	Hopper sub_573160 + Ghidra make FUN_00573160: H+G agree	docs/re/assets.md
+0x59e620	Table3A000::Loader	assets	high	V: loader #32	Hopper sub_59e620 + Ghidra make FUN_0059e620: H+G agree	docs/re/assets.md
+0x59e660	Table3A000::Unloader	assets	high	V: unloader #32	Ghidra make FUN_0059e660 (Hopper export lacks it)	docs/re/assets.md
+0x4f4290	FEngPackage::Loader	assets	high	V: loader #33 (0x30203, 0x30210) -> FEngLibrary::AddPackage	Ghidra make FUN_004f4290 (Hopper export lacks it; capstone agrees)	docs/re/assets.md
+0x4f42c0	FEngPackage::Unloader	assets	high	V: unloader #33 -> FEngLibrary::RemovePackage	Hopper sub_4f42c0 + Ghidra export FUN_004f42c0: H+G agree	docs/re/assets.md
+0x4f4120	FEngLibrary::AddPackage	assets	high	V: new package object + list insert	Hopper sub_4f4120 + Ghidra make: H+G agree	docs/re/assets.md
+0x4f4190	FEngLibrary::RemovePackage	assets	high	V: find package by chunk ptr, print 'UNLOAD PACKAGE(%x)', destroy	Ghidra make FUN_004f4190	docs/re/assets.md
+0x4f3a00	FEPackage::FEPackage	assets	high	V: package ctor: chunk ptr at +0x10, data ptr at +0xc	Ghidra make FUN_004f3a00	docs/re/assets.md
+0x59dd90	SplineSet::Loader	assets	high	V: loader #34 (0x8003b000)	Hopper sub_59dd90 + Ghidra export FUN_0059dd90: H+G agree	docs/re/assets.md
+0x59de20	SplineSet::Unloader	assets	high	V: unloader #34: unlink matching splines and free pool	Hopper sub_59de20 + Ghidra export FUN_0059de20: H+G agree	docs/re/assets.md
+0x59c850	Spline::InitBasis	assets	high	V: fill the default basis matrices at 0x7376b0.. once	Ghidra make FUN_0059c850	docs/re/assets.md
+0x59db60	Spline::Finalize	assets	med	I: clamp/check control points, mark corners	Ghidra make FUN_0059db60	docs/re/assets.md
+0x4442a0	StreamSections::Loader	assets	high	V: loader #35 (0x34107, 0x34108)	Hopper sub_4442a0 + Ghidra make FUN_004442a0: H+G agree	docs/re/assets.md
+0x4442f0	StreamSections::Unloader	assets	high	V: unloader #35	Hopper sub_4442f0 + Ghidra make FUN_004442f0: H+G agree	docs/re/assets.md
+0x445350	StreamSections::Shutdown	assets	high	V: wait for in-flight reads, free every loaded section buffer (state 3), free path list	Ghidra make FUN_00445350	docs/re/assets.md
+0x483080	DragCameras::Loader	assets	high	V: loader #36	Ghidra make FUN_00483080 (Hopper export lacks it)	docs/re/assets.md
+0x4830b0	DragCameras::Unloader	assets	high	V: unloader #36: id check only	Hopper sub_4830b0 + Ghidra make: H+G agree	docs/re/assets.md
+0x482f00	DragCameras::Parse	assets	high	V: size/version -> record count	Ghidra make FUN_00482f00	docs/re/assets.md
+0x5a00a0	CareerEvents::Loader	assets	high	V: loader #37	Hopper sub_5a00a0 + Ghidra make FUN_005a00a0: H+G agree	docs/re/assets.md
+0x5a0130	CareerEvents::Unloader	assets	high	V: unloader #37	Hopper sub_5a0130 + Ghidra make FUN_005a0130: H+G agree	docs/re/assets.md
+0x5a0060	CareerEvents::IndexEventDesc	assets	high	V: index 0x34a02 rows by id	Hopper sub_5a0060	docs/re/assets.md
+0x5787e0	WorldObjectCohort::Loader	assets	high	V: loader #38	Ghidra make FUN_005787e0 (Hopper export lacks it)	docs/re/assets.md
+0x578800	WorldObjectCohort::Unloader	assets	high	V: unloader #38	Ghidra make FUN_00578800	docs/re/assets.md
+0x578880	WorldObjectCohort::Launch	assets	high	V: create all objects of a cohort id	Ghidra make FUN_00578880	docs/re/assets.md
+0x4b25b0	PresetRide::Loader	assets	high	V: loader #39	Hopper sub_4b25b0 + Ghidra make FUN_004b25b0: H+G agree	docs/re/assets.md
+0x4b2600	PresetRide::Unloader	assets	high	V: unloader #39: unlink all	Ghidra make FUN_004b2600 (Hopper export lacks it)	docs/re/assets.md
+0x4b2660	PresetRide::FindByHash	assets	high	V: list search by upper-cased name hash	Hopper sub_4b2660	docs/re/assets.md
+0x51c180	MagazineTables::Loader	assets	high	V: loader #40	Hopper sub_51c180 + Ghidra make FUN_0051c180: H+G agree	docs/re/assets.md
+0x51c340	MagazineTables::Unloader	assets	high	V: unloader #40: unlink all lists	Hopper sub_51c340 + Ghidra make FUN_0051c340: H+G agree	docs/re/assets.md
+0x51bd70	CarDecalSlots::Loader	assets	high	V: loader #41	Hopper sub_51bd70 + Ghidra make FUN_0051bd70: H+G agree	docs/re/assets.md
+0x51bdc0	CarDecalSlots::Unloader	assets	high	V: unloader #41	Hopper sub_51bdc0 + Ghidra make FUN_0051bdc0: H+G agree	docs/re/assets.md
+0x5a01d0	Table34A08::Loader	assets	high	V: loader #42	Hopper sub_5a01d0 + Ghidra make FUN_005a01d0: H+G agree	docs/re/assets.md
+0x5a0200	Table34A08::Unloader	assets	high	V: unloader #42: id check only	Hopper sub_5a0200 + Ghidra make: H+G agree	docs/re/assets.md
+0x5a36a0	CharacterRoster::Loader	assets	high	V: loader #43	Hopper sub_5a36a0 + Ghidra make FUN_005a36a0: H+G agree	docs/re/assets.md
+0x5a36d0	CharacterRoster::Unloader	assets	high	V: unloader #43	Hopper sub_5a36d0 + Ghidra make FUN_005a36d0: H+G agree	docs/re/assets.md
+0x5a0270	Table34A09::Loader	assets	high	V: loader #44	Hopper sub_5a0270 + Ghidra make FUN_005a0270: H+G agree	docs/re/assets.md
+0x5a0290	Table34A09::Unloader	assets	high	V: unloader #44: zeroes the first dword of the table	Hopper sub_5a0290 + Ghidra make FUN_005a0290: H+G agree	docs/re/assets.md
+0x5a02c0	Table34A0A::Loader	assets	high	V: loader #45	Ghidra make FUN_005a02c0 (Hopper export lacks it)	docs/re/assets.md
+0x5a02f0	Table34A0A::Unloader	assets	high	V: unloader #45: zero first dword	Hopper sub_5a02f0 + Ghidra make: H+G agree	docs/re/assets.md
+0x5a0220	Table34A0A::Find	assets	high	V: find row by three u16 keys	Ghidra make FUN_005a0220	docs/re/assets.md
+0x5ab640	MovieSubtitles::Loader	assets	high	V: loader #46: build runtime entry table	Ghidra make FUN_005ab640 (Hopper export lacks it)	docs/re/assets.md
+0x5ab700	MovieSubtitles::Unloader	assets	high	V: unloader #46: free table	Hopper sub_5ab700 + Ghidra make FUN_005ab700: H+G agree	docs/re/assets.md
+0x5ab550	MovieSubtitles::FindByName	assets	high	V: index of the entry whose name equals the argument, -1 if none	Hopper sub_5ab550	docs/re/assets.md
+0x5ab5a0	MovieSubtitles::Update	assets	high	V: advance the current subtitle line by playback time	Hopper sub_5ab5a0	docs/re/assets.md

@@ -44,16 +44,13 @@ census/systems.tsv, docs/re/blur.md, tools/census/sys*.py, tools/hopper/q_*.py, 
 07:04 M2 systems (146c21f), M3 names.tsv (8a50517), M4 camera+blur (bd5fa4f), M5 scoreboard (677289f) committed by the orchestrator; HANDOFF rewritten. B and a2 resume 08:20. Next: props/traffic/rivals only on account 3.
 07:17 heartbeat: nothing running; webcheck --route PASS (needs tools/serve.py up); account 5 week 85% so no subagents; B and a2 resume 08:20. tools/re/tpk.py untracked (b/a2 work in progress).
 
-## HANDOFF night-opus-b (quota 100%, 2026-10-29 ~04:20)
-Done (commits de61702 + this): tools/re/{chunks,lang,events,save}.py (each `check` passes on real files), tools/re/tpk.py
-(texture packs; `list`/`dds` work; record offsets fixed at the end, full `check` NOT re-run: ~3 min, run it first),
-docs/re/canon.md (events, progression, rewards decoded 31/31, text, movies, saves), census/names_canon.tsv (46),
-census/names_assets.tsv (26 resource-layer names), census/chunks.json (116 ids).
-Raw agent output to merge: census/names_raw/assets_loadersA.tsv (191 rows, loaders 2..23 + collision/camera ids) and
-assets_loadersB.tsv (136 rows, loaders 4, 24..46 incl. full TPK record layout). Both kind=chunk|func, marked V/I/U.
-Next, in order: (1) `tools/re/tpk.py check` until 0 bad; (2) fix LOADERS in tools/re/chunks.py from the TSVs (loader 2
-also takes 0x34130..0x34134 via 0x441380; loader 4 takes 0xb3300000/0xb3320000/0xb0300100; loader 18 0x80034405..25 +
-0x34492); (3) write docs/re/assets.md (pipeline from names_assets.tsv rows + chunk table from the two TSVs) and append
-func rows to census/names_assets.tsv; (4) 10-sample second-tool check per system (canon done for 8: H+G agree);
-(5) EventDesc unknown fields (+0x18..0x24, +0x34, +0xd0, +0x128..0x148), reward types 0/2/3/4 appliers, 0x34a01
-(agent stopped on quota: resume or redo; canon.md "Open"). angeldamian-36 was not reachable by SendMessage all night.
+## HANDOFF night-opus-b (2026-10-29 ~08:45, after the quota reset)
+assets done: docs/re/assets.md (pipeline, TPK layout, 137 chunk ids: 94 V / 22 I / 21 U), census/names_assets.tsv
+(187 names: 171 high / 15 med / 1 low), readers tools/re/chunks.py (LOADERS fixed: loader 2 takes 0x34130..4 via
+0x441380, loader 4 0xb3300000/0xb3320000/0xb0300100, loader 18 0x34492 + 0x80034405..25; every top-level id has a
+loader) and tools/re/tpk.py (check: 347 packs, 27,458 textures, 0 bad; JDLZ streams hold pixel..palette range).
+canon done: EventDesc unknowns resolved in docs/re/canon.md (+0x18 min ride rating, +0x1c target times, +0x34 URL
+league/rank, +0x130 host, modes 0..5 named, kinds 0/1/2/3/6/8, reward queries 0x5a1550/0x5a1630/0x5a16f0, 0x34a01 =
+prices + rating points per part category); census/names_canon.tsv 69 names. Second-tool check 10/10 in both docs.
+Open (U): 0x33310003 consumer, event kinds 4/5, reward type 4, 0x34a07, 0x3a000, rival +0x18 byte; save block U rows.
+angeldamian-36 not reachable (ListAgents shows only night-opus-a2).
