@@ -54,3 +54,5 @@ league/rank, +0x130 host, modes 0..5 named, kinds 0/1/2/3/6/8, reward queries 0x
 prices + rating points per part category); census/names_canon.tsv 69 names. Second-tool check 10/10 in both docs.
 Open (U): 0x33310003 consumer, event kinds 4/5, reward type 4, 0x34a07, 0x3a000, rival +0x18 byte; save block U rows.
 angeldamian-36 not reachable (ListAgents shows only night-opus-a2).
+08:49 night-opus-b: got the orchestrator's props/traffic/rivals block (typed in this window); traffic and rivals agents running, props by me.
+08:50 night-opus-b: props done: docs/re/props.md, census/names_props.tsv 28 names (19 high V H+G, 9 med/low I), 10/10 second-tool agree. Corrections to re_props.md: 8 placed classes have a release limit > 0 (not 1), 44 classes unused (not 41). Respawn 0x5977f0: Virgin rebuilt after 2.0 s at rest.

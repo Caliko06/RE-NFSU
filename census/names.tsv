@@ -1,5 +1,11 @@
 addr	name	system	confidence	tool	doc	from
 0x4010e0	SetSpecialCameraFlag	blur	I	C	docs/re/blur.md	blur
+0x402820	Particle_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x4028f0	Particle_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x402b40	ParticleEmitter_Bind	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x402bd0	ParticleEmitter_Queue	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x407db0	Texture::CreateD3D	assets	V	Ghidra FUN_00407db0 + capstone	docs/re/assets.md	assets
+0x408010	Texture::ReleaseD3D	assets	V	Ghidra FUN_00408010	docs/re/assets.md	assets
 0x409580	RenderFrameMain	blur	V	G+H+C	docs/re/blur.md	blur
 0x409b70	LightStreakPath	blur	U	C	docs/re/blur.md	blur
 0x40a7f0	SetBlurCameraObject	blur	V	C	docs/re/blur.md	blur
@@ -8,6 +14,8 @@ addr	name	system	confidence	tool	doc	from
 0x40abd0	SceneRTSelect	blur	V	C	docs/re/blur.md	blur
 0x40b3f0	RenderSetupBlurFlags	blur	V	G+C	docs/re/blur.md	blur
 0x40b4e0	ReleaseSceneRTs	blur	I	C	docs/re/blur.md	blur
+0x40c690	Mesh_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x40c840	Mesh_Free	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x40cb80	BlurCreateRTs	blur	V	G+C	docs/re/blur.md	blur
 0x40cce0	BlurReleaseRTs	blur	I	C	docs/re/blur.md	blur
 0x40cd40	SpeedBlurPass	blur	V	G+H+C	docs/re/blur.md	blur
@@ -56,6 +64,37 @@ addr	name	system	confidence	tool	doc	from
 0x431a2e	JoyEvent_CAMERA_POV_CHANGE_case	camera	V	C+D	docs/re/camera.md	camera
 0x432360	DriverInfo::operator=	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4323f0	RideInfo::operator=	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x435fe0	ModeFlags_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x436000	ModeFlags_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x436020	ModeFlags_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x43feb0	TrackMarker_Count	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x43fef0	TrackMarker_Get	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x441380	TrackCollision_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x441480	TrackCollision_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x441ed0	TrackPositionMarker_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x441f40	TrackPositionMarker_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x442010	TrackInfo_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x442040	TrackInfoTable_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x442080	TrackInfoTable_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x442b70	RoadSections_Parse	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x442bd0	RoadSections_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x442dd0	RoadNetwork_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x442e60	RoadNetwork_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x4432a0	TrackPath::BuildSplines	assets	V	Hopper sub_4432a0	docs/re/assets.md	assets
+0x4433f0	TrackPath::FreeSplines	assets	V	Hopper sub_4433f0	docs/re/assets.md	assets
+0x443450	TrackPath::Init	assets	V	Hopper sub_443450 + capstone	docs/re/assets.md	assets
+0x4434d0	TrackPath::Parse	assets	V	Hopper sub_4434d0 + Ghidra FUN_004434d0: H+G agree	docs/re/assets.md	assets
+0x4441f0	TrackPath::Loader	assets	V	Hopper sub_4441f0 + Ghidra make FUN_004441f0: H+G agree	docs/re/assets.md	assets
+0x444200	TrackPath::Unloader	assets	V	Hopper sub_444200 + Ghidra make FUN_00444200: H+G agree	docs/re/assets.md	assets
+0x4442a0	StreamSections::Loader	assets	V	Hopper sub_4442a0 + Ghidra make FUN_004442a0: H+G agree	docs/re/assets.md	assets
+0x4442f0	StreamSections::Unloader	assets	V	Hopper sub_4442f0 + Ghidra make FUN_004442f0: H+G agree	docs/re/assets.md	assets
+0x445350	StreamSections::Shutdown	assets	V	Ghidra make FUN_00445350	docs/re/assets.md	assets
+0x4457c0	StreamSection_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x445b00	Section::SyncSmackableVisibility	props	I	capstone	docs/re/props.md	props
+0x445b60	StreamSection_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x446aa0	StreamBoundaries_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x446ab0	StreamBoundaries_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x446db0	StreamBoundaries_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x447160	InitZDirArchive	assets	V	hopper	docs/re/assets.md	assets
 0x447ab0	PaddingChunk::Loader	assets	V	capstone	docs/re/assets.md	assets
 0x447ac0	bChunkLoader::LoadChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets
@@ -77,19 +116,42 @@ addr	name	system	confidence	tool	doc	from
 0x448b10	GameFlow::LoadingFrontEndPart1	assets	V	hopper	docs/re/assets.md	assets
 0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	V	hopper	docs/re/assets.md	assets
 0x449765	GameFlow::LoadingTrackSpecificPart1	assets	V	hopper	docs/re/assets.md	assets
+0x462070	RacerAITuning::Loader	assets	V	Hopper sub_462070 + Ghidra make FUN_00462070: H+G agree	docs/re/assets.md	assets
+0x4620a0	RacerAITuning::Unloader	assets	V	Ghidra make FUN_004620a0 (Hopper export lacks it)	docs/re/assets.md	assets
 0x465d00	SpecialCamCaller_465d00	camera	I	G+C	docs/re/camera.md	camera
 0x466840	Virtual::ReturnOne (float constant getter)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x469580	WorldObjects::Broadphase	props	V	hopper+ghidra	docs/re/props.md	props
+0x469670	WorldObjects::TestObject	props	I	ghidra+capstone	docs/re/props.md	props
 0x46d390	DriveTrain::DriveTrain	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4727c0	GJKWitness::Initialize	car.physics	I	ghidra+hopper	docs/re/tuning.md	tuning
+0x472b00	CarShape_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x472b30	CollisionShapes::LoadChunk	props	I	hopper	docs/re/props.md	props
+0x472c00	CarShape_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x472c60	CarShape_Find	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x473cf0	CollisionShapes::DefaultBox	props	I	hopper+ghidra	docs/re/props.md	props
 0x473fc0	SelectDriveClassTuningRow (not GetUpgradeLevel)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4740d0	MellowMover::MellowMover	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x475070	Mellovator::Mellovator	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x476840	PhysicsMover::PhysicsMover	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x47af20	CAnimBank::Initialize	other	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x47af20	AnimBank_DynamicLoad	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x47b7b0	PostRaceScene_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x47b7f0	PostRaceScene_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x47b890	NisScene_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x47b8d0	NisScene_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x47ce50	AnimBank_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x47ced0	AnimBank_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x47d070	Camera::SetCameraMatrix	blur	V	C+M	docs/re/blur.md	blur
 0x47d680	FindCameraRow	camera	V	G+H+C	docs/re/camera.md	camera
+0x47dcd0	CameraTables_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x47de30	CameraTables_LoadChildren	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x47df00	CameraTables_Unload_Impl	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x47e230	CameraTables_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x47e250	CameraTables_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x47edb0	CountdownCameraCoordinator::ctor	camera	I	M+C	docs/re/camera.md	camera
 0x47ef00	IntroNisCoordinator	camera	I	M+C	docs/re/camera.md	camera
+0x482f00	DragCameras::Parse	assets	V	Ghidra make FUN_00482f00	docs/re/assets.md	assets
+0x483080	DragCameras::Loader	assets	V	Ghidra make FUN_00483080 (Hopper export lacks it)	docs/re/assets.md	assets
+0x4830b0	DragCameras::Unloader	assets	V	Hopper sub_4830b0 + Ghidra make: H+G agree	docs/re/assets.md	assets
 0x4834e0	CameraMover::ctor	camera	I	M	docs/re/camera.md	camera
 0x483640	Camera::ApplyNoise	camera	I	M+C	docs/re/camera.md	camera
 0x483860	CameraMover::ComputeBankedUpVector	camera	I	M	docs/re/camera.md	camera
@@ -138,12 +200,25 @@ addr	name	system	confidence	tool	doc	from
 0x4b0fd0	GarageMainScreen::DisplayReputation	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
 0x4b1530	GarageMainScreen::SetCarType	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4b1590	GarageMainScreen::CarLoadingHasStarted	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x4b25b0	PresetRide::Loader	assets	V	Hopper sub_4b25b0 + Ghidra make FUN_004b25b0: H+G agree	docs/re/assets.md	assets
+0x4b2600	PresetRide::Unloader	assets	V	Ghidra make FUN_004b2600 (Hopper export lacks it)	docs/re/assets.md	assets
+0x4b2660	PresetRide::FindByHash	assets	V	Hopper sub_4b2660	docs/re/assets.md	assets
+0x4b4040	Race::SpawnOpponents	canon	V	ghidra	docs/re/canon.md	canon
 0x4b47a0	ApplyOptionsToPlayerSettings	camera	V	G+C	docs/re/camera.md	camera
+0x4b5df0	Career::StartRaceFromEvent	canon	V	ghidra+capstone	docs/re/canon.md	canon
+0x4b6300	Race::SetPlayerGridSlot	canon	V	ghidra	docs/re/canon.md	canon
 0x4bbd70	CarPart::GetNameAttribute	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4be6c0	OptionsCameraUI	camera	I	C	docs/re/camera.md	camera
 0x4c2a50	GetCarModelNameHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4c2b00	GetSecondaryLogoHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4c40a0	(unknown garage screen)::NotificationMessage	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
+0x4c4920	EventMap::SetModeIcon	canon	V	ghidra+hopper	docs/re/canon.md	canon
+0x4c49f0	EventMap::GetModeLabelHash	canon	V	ghidra+hopper	docs/re/canon.md	canon
+0x4c4c60	EventMap::ShowEventSummary	canon	V	ghidra	docs/re/canon.md	canon
+0x4c55f0	Briefing::GetHostName	canon	V	ghidra+hopper	docs/re/canon.md	canon
+0x4c5680	Briefing::Build	canon	V	ghidra	docs/re/canon.md	canon
+0x4c5ce0	Briefing::ShowDescription	canon	V	ghidra	docs/re/canon.md	canon
+0x4c5f20	Briefing::HasRequiredRideRating	canon	V	capstone+ghidra+hopper	docs/re/canon.md	canon
 0x4c6970	GetCarManufacturerNameHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4c6bc0	UndergroundJunkmanGiveth::vslot3 (swallow-input filter)	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4c6c00	GetJunkmanRewardSpeech	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
@@ -187,6 +262,16 @@ addr	name	system	confidence	tool	doc	from
 0x4e7c80	GaragePresetsScreen::Redraw	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4e7f60	GaragePresetsScreen::LoadPreset	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4e8120	CreateGaragePresetsScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x4e9e90	UrlRankScreen::Show	canon	V	ghidra	docs/re/canon.md	canon
+0x4f3a00	FEPackage::FEPackage	assets	V	Ghidra make FUN_004f3a00	docs/re/assets.md	assets
+0x4f4120	FEngLibrary::AddPackage	assets	V	Hopper sub_4f4120 + Ghidra make: H+G agree	docs/re/assets.md	assets
+0x4f4190	FEngLibrary::RemovePackage	assets	V	Ghidra make FUN_004f4190	docs/re/assets.md	assets
+0x4f4290	FEngPackage::Loader	assets	V	Ghidra make FUN_004f4290 (Hopper export lacks it; capstone agrees)	docs/re/assets.md	assets
+0x4f42c0	FEngPackage::Unloader	assets	V	Hopper sub_4f42c0 + Ghidra export FUN_004f42c0: H+G agree	docs/re/assets.md	assets
+0x4f4420	FEngFont_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x4f4470	FEngFont_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x4f44c0	FEngFont_Init	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x4f46c0	FEngFont_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x4f57a0	MoviePlayer::BuildPath	canon	V	hopper	docs/re/canon.md	canon
 0x4f62f0	FEngPushGarageMainPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4f7840	MovieNameToId	canon	V	hopper+capstone	docs/re/canon.md	canon
@@ -289,7 +374,11 @@ addr	name	system	confidence	tool	doc	from
 0x513210	GarageChooseAccessoryCategoryScreen::AddCategory	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x513310	GarageChooseAccessoryCategoryScreen::RedrawHeader	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x51ad30	Career::AnnounceReward	canon	I	ghidra+capstone	docs/re/canon.md	canon
+0x51bd70	CarDecalSlots::Loader	assets	V	Hopper sub_51bd70 + Ghidra make FUN_0051bd70: H+G agree	docs/re/assets.md	assets
+0x51bdc0	CarDecalSlots::Unloader	assets	V	Hopper sub_51bdc0 + Ghidra make FUN_0051bdc0: H+G agree	docs/re/assets.md	assets
 0x51be80	GarageRimsBrandBrowser::~GarageRimsBrandBrowser	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
+0x51c180	MagazineTables::Loader	assets	V	Hopper sub_51c180 + Ghidra make FUN_0051c180: H+G agree	docs/re/assets.md	assets
+0x51c340	MagazineTables::Unloader	assets	V	Hopper sub_51c340 + Ghidra make FUN_0051c340: H+G agree	docs/re/assets.md	assets
 0x51c5f0	EAXSound::ReloadLanguageSpeechBank (called by ChangeLanguage 0x59fa20)	audio.bank	V	ghidra	docs/re/sound.md	sound
 0x51c830	EAXSound::PlaySpeechStream	audio.stream	V	ghidra	docs/re/sound.md	sound
 0x51cd60	EAXSound::InitializeDriver	audio.engine	V	ghidra	docs/re/sound.md	sound
@@ -442,6 +531,44 @@ addr	name	system	confidence	tool	doc	from
 0x53ba10	EAXS_AmbStereoStream::UpdateFadeTransition	audio.stream	V	ghidra	docs/re/sound.md	sound
 0x53bfc0	EAXS_MusicStream::InitializeEATRAX	audio.stream	V	ghidra	docs/re/sound.md	sound
 0x53d640	EAXS_TCMStream::PlayStream	audio.stream	V	ghidra	docs/re/sound.md	sound
+0x53e400	BinarySearch_Hash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x53f6e0	Solid_ResolvePending	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x53f9b0	Solid_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x53fef0	SolidList_LoadContainer	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x53ffd0	Solid_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x540270	SolidList_Unload_Impl	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x5402f0	SolidList_Release	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x540420	SolidList_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x540440	SolidList_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x540460	SolidPack_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x5404e0	SolidPack_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x540630	Solid_FindByHash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x540680	Solid_FindInAllLists	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x540f10	LightPack_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x5410b0	LightPack_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x5413e0	LightTree_Query	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x544f30	LampFlares_Draw	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x5453d0	TexturePack_LoadIndex	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x545520	TexturePack_Remove	assets	I	Hopper export has no block (inside another sub_); Ghidra export block; capstone only	docs/re/assets.md	assets
+0x545580	TexturePack_BindPixels	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x5455c0	TexturePack_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x545770	TexturePack_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x5457f0	TexturePack_Register	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x545900	TexturePack_FixEntries	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x5459f0	TexturePack_AttachPixels	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x545af0	TexturePackHandle::UnmapData	assets	V	Hopper sub_545af0 + Ghidra FUN_00545af0: H+G agree	docs/re/assets.md	assets
+0x545c10	TexturePackHandle::FindRecordByHash	assets	V	Ghidra FUN_00545c10 + Hopper sub_545c10	docs/re/assets.md	assets
+0x545c60	TexAnim_Register	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x545cc0	TexAnim::Unregister	assets	V	Ghidra FUN_00545cc0	docs/re/assets.md	assets
+0x545d50	TexAnim::ResolveFrames	assets	V	Ghidra FUN_00545d50	docs/re/assets.md	assets
+0x545ea0	TexAnim::Update	assets	V	Ghidra FUN_00545ea0 (called from 0x40a752)	docs/re/assets.md	assets
+0x545fb0	TexturePack::SectionMap	assets	I	capstone asm (no decompile in either export)	docs/re/assets.md	assets
+0x546010	TexturePack::SectionUnmap	assets	I	capstone asm	docs/re/assets.md	assets
+0x5460e0	TexturePack::SectionHeader	assets	I	capstone asm	docs/re/assets.md	assets
+0x5461c0	Texture_FindByHash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x5462d0	TrackSkyInfo_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x546310	TrackSkyInfo_Select	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x546570	TrackSkyInfo_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x549130	EAXMod::Stop (ret 4 stub)	audio.sfx	V	ghidra	docs/re/sound.md	sound
 0x567450	Vec3Normalize	blur	I	C	docs/re/blur.md	blur
 0x569460	CarPartCuller::CullParts	other	I	ghidra+hopper	docs/re/tuning.md	tuning
@@ -453,11 +580,18 @@ addr	name	system	confidence	tool	doc	from
 0x56dc30	CarRenderInfo::Render	other	I	ghidra+hopper	docs/re/tuning.md	tuning
 0x570950	DrawShowcaseCarList	blur	I	C	docs/re/blur.md	blur
 0x571050	DrawRaceCarList	blur	V	G+C	docs/re/blur.md	blur
+0x573150	Chunk39100::Loader	assets	V	Hopper sub_573150 + Ghidra make FUN_00573150: H+G agree	docs/re/assets.md	assets
+0x573160	Chunk39100::Unloader	assets	V	Hopper sub_573160 + Ghidra make FUN_00573160: H+G agree	docs/re/assets.md	assets
 0x575040	ApplyCameraShake	camera	I	G+C+M	docs/re/camera.md	camera
 0x575200	MaybeCameraShake	camera	I	M+C	docs/re/camera.md	camera
 0x575940	NullChunk::Loader	assets	V	capstone	docs/re/assets.md	assets
 0x575960	CompleatCarPhysicsInfo::BuildCarPhysicsInfo	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x576250	CompleatCarPhysicsInfo::BuildBodyInfo	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x5787e0	WorldObjectCohort::Loader	assets	V	Ghidra make FUN_005787e0 (Hopper export lacks it)	docs/re/assets.md	assets
+0x578800	WorldObjectCohort::Unloader	assets	V	Ghidra make FUN_00578800	docs/re/assets.md	assets
+0x578880	WorldObjectCohort::Launch	assets	V	Ghidra make FUN_00578880	docs/re/assets.md	assets
+0x57c8b0	CarData_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x57cb70	CarData_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x57ce10	CarPartDatabase::GetCarPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x57cf70	GetCarTypeInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x57d860	RideInfo::SyncPartsToPhysicsForAI	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -475,6 +609,9 @@ addr	name	system	confidence	tool	doc	from
 0x5809c0	DriverInfo::DriverInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x580b00	GetUsedCarTextureInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x581b30	MakeAccelerationTable	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x584b10	RigidBody::SetMassInertia	props	V	hopper+ghidra	docs/re/props.md	props
+0x588d10	TriggerVolume::Loader	assets	V	Hopper sub_588d10 + Ghidra make FUN_00588d10: H+G agree	docs/re/assets.md	assets
+0x588d70	TriggerVolume::Unloader	assets	V	Hopper sub_588d70 + Ghidra make FUN_00588d70: H+G agree	docs/re/assets.md	assets
 0x58ae80	LoadedSkin::LoadedSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x58af10	LoadedWheel::LoadedWheel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x58b050	LoadedCar::LoadedCar	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -483,21 +620,68 @@ addr	name	system	confidence	tool	doc	from
 0x58c3b0	CarLoader::AllocateRideInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x58c5a0	CarLoader::UnloadRideInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x58c760	CarLoader::DeleteUnusedRideInfos	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x58d140	Chunk37010::Accept	assets	V	Ghidra make FUN_0058d140 (H export lacks it; capstone agrees)	docs/re/assets.md	assets
 0x58d2c0	DecompressCOMP	assets	I	hopper	docs/re/assets.md	assets
 0x58d3c0	IsCompressedBuffer	assets	V	hopper+ghidra	docs/re/assets.md	assets
 0x58d3f0	DecompressBuffer	assets	V	hopper+data	docs/re/assets.md	assets
+0x58d4c0	Unused34030_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x58d500	Unused34030_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x58dca0	WorldZone_NodeWalk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x58dde0	WorldZone_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x58de10	WorldZone_Unload_Impl	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x58deb0	WorldZone_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x58dff0	WorldZone_CreateObject	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
+0x58e2e0	WorldZone_Query	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x592100	RenderWorldModels	blur	V	G+C	docs/re/blur.md	blur
+0x592230	SurfaceTable::Init	props	I	hopper+ghidra	docs/re/props.md	props
+0x5927d0	WorldObject::CanCollide	props	I	capstone	docs/re/props.md	props
+0x592a50	Table34300::Loader	assets	V	Hopper sub_592a50 + Ghidra make FUN_00592a50: H+G agree	docs/re/assets.md	assets
+0x592ab0	Table34300::Unloader	assets	V	Hopper sub_592ab0 + Ghidra make: H+G agree	docs/re/assets.md	assets
 0x594c60	bOpenFile	assets	I	ghidra	docs/re/assets.md	assets
+0x595230	Smackables::Factory	props	V	hopper+ghidra	docs/re/props.md	props
+0x5952a0	Smackable::Loader	assets	V	Hopper sub_5952a0 + Ghidra export FUN_005952a0: H+G agree	docs/re/assets.md	assets
+0x5954c0	Smackable::Unloader	assets	V	Ghidra make FUN_005954c0 (Hopper export lacks it)	docs/re/assets.md	assets
+0x595670	Smackables::CleanupPool	props	V	hopper+ghidra	docs/re/props.md	props
+0x595750	Smackables::ForceCleanup	props	V	hopper+ghidra	docs/re/props.md	props
+0x595b70	Smackables::IsExcluded	props	V	hopper+ghidra	docs/re/props.md	props
+0x595bf0	Smackables::Init	props	V	hopper+ghidra	docs/re/props.md	props
+0x595d80	Smackables::CreateVirgins	props	I	ghidra+capstone	docs/re/props.md	props
+0x595f70	Smackables::SaveState	props	V	hopper+ghidra	docs/re/props.md	props
+0x5962e0	VirginSmokeable::VirginSmokeable	props	V	hopper+ghidra	docs/re/props.md	props
+0x5964c0	VirginSmokeable::~VirginSmokeable	props	V	hopper+ghidra	docs/re/props.md	props
+0x596570	VirginSmokeable::Wake	props	V	hopper+ghidra	docs/re/props.md	props
+0x5966d0	Smokeable::Smokeable	props	V	hopper+ghidra	docs/re/props.md	props
+0x596f50	Smackables::RestoreState	props	V	hopper+ghidra	docs/re/props.md	props
+0x597420	Smokeable::Update	props	V	hopper+ghidra	docs/re/props.md	props
+0x5977f0	Smokeable::RespawnOrExpire	props	V	hopper+ghidra	docs/re/props.md	props
+0x597980	Smokeable::OnHit	props	V	hopper+ghidra	docs/re/props.md	props
+0x597c90	Smokeable::Release	props	I	ghidra	docs/re/props.md	props
+0x597d10	Smokeable::BuildChildren	props	I	hopper+ghidra	docs/re/props.md	props
+0x597e10	Smokeable::BuildChildPart	props	I	hopper+ghidra	docs/re/props.md	props
 0x598b60	TrafficTeleporter::IsPrimaryTeleportationSpotAllowed	other	I	ghidra+hopper	docs/re/tuning.md	tuning
+0x59c850	Spline::InitBasis	assets	V	Ghidra make FUN_0059c850	docs/re/assets.md	assets
+0x59db60	Spline::Finalize	assets	I	Ghidra make FUN_0059db60	docs/re/assets.md	assets
+0x59dd90	SplineSet::Loader	assets	V	Hopper sub_59dd90 + Ghidra export FUN_0059dd90: H+G agree	docs/re/assets.md	assets
+0x59de20	SplineSet::Unloader	assets	V	Hopper sub_59de20 + Ghidra export FUN_0059de20: H+G agree	docs/re/assets.md	assets
 0x59e5c0	EasterEggs::IsPartUnlocked	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning
+0x59e620	Table3A000::Loader	assets	V	Hopper sub_59e620 + Ghidra make FUN_0059e620: H+G agree	docs/re/assets.md	assets
+0x59e660	Table3A000::Unloader	assets	V	Ghidra make FUN_0059e660 (Hopper export lacks it)	docs/re/assets.md	assets
 0x59fa20	EAXSound::ChangeLanguage	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x59fb80	GetLocalizedStringByHash	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x59fce0	LanguagePack::Loader	canon	V	hopper+ghidra	docs/re/canon.md	canon
-0x59fd40	LanguagePack::Unloader	canon	V	capstone	docs/re/canon.md	canon
+0x59fb80	LanguageStrings::FindByHash	assets	V	Hopper sub_59fb80	docs/re/assets.md	assets
+0x59fce0	LanguageStrings::Loader	assets	V	Hopper sub_59fce0 + Ghidra make FUN_0059fce0: H+G agree	docs/re/assets.md	assets
+0x59fd40	LanguageStrings::Unloader	assets	V	Ghidra make FUN_0059fd40 (Hopper export lacks it)	docs/re/assets.md	assets
 0x59fd70	GetLocalizedLogoMovie	canon	I	hopper	docs/re/canon.md	canon
-0x5a0060	EventDescPack::IndexEvents	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x5a00a0	EventDescPack::Loader	canon	V	capstone+hopper (Ghidra made no function here: reached only through the table)	docs/re/canon.md	canon
-0x5a0130	EventDescPack::Unloader	canon	V	capstone	docs/re/canon.md	canon
+0x5a0060	CareerEvents::IndexEventDesc	assets	V	Hopper sub_5a0060	docs/re/assets.md	assets
+0x5a00a0	CareerEvents::Loader	assets	V	Hopper sub_5a00a0 + Ghidra make FUN_005a00a0: H+G agree	docs/re/assets.md	assets
+0x5a0130	CareerEvents::Unloader	assets	V	Hopper sub_5a0130 + Ghidra make FUN_005a0130: H+G agree	docs/re/assets.md	assets
+0x5a01d0	Table34A08::Loader	assets	V	Hopper sub_5a01d0 + Ghidra make FUN_005a01d0: H+G agree	docs/re/assets.md	assets
+0x5a0200	Table34A08::Unloader	assets	V	Hopper sub_5a0200 + Ghidra make: H+G agree	docs/re/assets.md	assets
+0x5a0220	Table34A0A::Find	assets	V	Ghidra make FUN_005a0220	docs/re/assets.md	assets
+0x5a0270	Table34A09::Loader	assets	V	Hopper sub_5a0270 + Ghidra make FUN_005a0270: H+G agree	docs/re/assets.md	assets
+0x5a0290	Table34A09::Unloader	assets	V	Hopper sub_5a0290 + Ghidra make FUN_005a0290: H+G agree	docs/re/assets.md	assets
+0x5a02c0	Table34A0A::Loader	assets	V	Ghidra make FUN_005a02c0 (Hopper export lacks it)	docs/re/assets.md	assets
+0x5a02f0	Table34A0A::Unloader	assets	V	Hopper sub_5a02f0 + Ghidra make: H+G agree	docs/re/assets.md	assets
+0x5a0320	Career::EventGivesLevel4Part	canon	V	ghidra	docs/re/canon.md	canon
 0x5a03d0	MapCarPartIDToCareerUpgrade	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a05b0	CalculateRideReputationPoints	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a08f0	GetCarPartCost	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -507,16 +691,31 @@ addr	name	system	confidence	tool	doc	from
 0x5a0f60	Career::QuitEvent	canon	V	ghidra+hopper	docs/re/canon.md	canon
 0x5a0fc0	Career::ArePrerequisitesDone	canon	V	ghidra+hopper	docs/re/canon.md	canon
 0x5a1100	Career::OpenAvailableEvents	canon	V	ghidra+hopper	docs/re/canon.md	canon
+0x5a1340	Career::GetUrlRank	canon	V	ghidra+hopper	docs/re/canon.md	canon
 0x5a1520	Career::GetCash	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
 0x5a1550	Career::IsUpgradeUnlocked	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
+0x5a1630	Career::IsCarUnlocked	canon	V	ghidra	docs/re/canon.md	canon
+0x5a16f0	Career::IsTrackUnlocked	canon	V	ghidra	docs/re/canon.md	canon
+0x5a1850	Career::OpenNextCashEvent	canon	V	ghidra	docs/re/canon.md	canon
+0x5a1b10	Career::ScaleCashEvent	canon	V	ghidra	docs/re/canon.md	canon
+0x5a1da0	Career::CountFinishedEvents	canon	V	ghidra	docs/re/canon.md	canon
 0x5a1fa0	FECareerManager::AreAllUnlockedPhysicsUpgradesPurchased	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x5a2040	Career::IsPlayerStuck	canon	V	ghidra	docs/re/canon.md	canon
+0x5a2270	Career::RefreshOpenEvents	canon	V	ghidra	docs/re/canon.md	canon
+0x5a2350	Career::CreateRaceObject	canon	V	ghidra	docs/re/canon.md	canon
+0x5a2690	Career::GetLastWonEventTextRow	canon	V	ghidra	docs/re/canon.md	canon
+0x5a2f10	Race::DidPlayerWin	canon	V	ghidra	docs/re/canon.md	canon
 0x5a3570	PartStore::HasPart	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
 0x5a3630	PartStore::Has	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
+0x5a36a0	CharacterRoster::Loader	assets	V	Hopper sub_5a36a0 + Ghidra make FUN_005a36a0: H+G agree	docs/re/assets.md	assets
+0x5a36d0	CharacterRoster::Unloader	assets	V	Hopper sub_5a36d0 + Ghidra make FUN_005a36d0: H+G agree	docs/re/assets.md	assets
 0x5a3750	UnlockTeller::GetVinylUnlockBits	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a3780	UnlockTeller::SetSingleVinylNewlyStyleUnlocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a3850	UnlockTeller::SetVinylGroupNewlyStyleUnlocked	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a3f00	Career::BuildRewardSummary	canon	V	ghidra	docs/re/canon.md	canon
 0x5a4420	UnlockTeller::GetNewlyUnlockedPartLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x5a4de0	AnimSkeleton_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x5a4e90	AnimSkeleton_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x5a96b0	GetDoorLineHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a97f0	GetDoorLineMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a9930	GetHoodSpoilerHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -528,6 +727,10 @@ addr	name	system	confidence	tool	doc	from
 0x5a9ce0	CompositeSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5aa2d0	GetTempCarSkinTextures	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5aa800	CompositeWheel	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning
+0x5ab550	MovieSubtitles::FindByName	assets	V	Hopper sub_5ab550	docs/re/assets.md	assets
+0x5ab5a0	MovieSubtitles::Update	assets	V	Hopper sub_5ab5a0	docs/re/assets.md	assets
+0x5ab640	MovieSubtitles::Loader	assets	V	Ghidra make FUN_005ab640 (Hopper export lacks it)	docs/re/assets.md	assets
+0x5ab700	MovieSubtitles::Unloader	assets	V	Hopper sub_5ab700 + Ghidra make FUN_005ab700: H+G agree	docs/re/assets.md	assets
 0x5ac449	Vec4TransformInPlace	blur	I	C	docs/re/blur.md	blur
 0x61e790	GetFirstAnimBank	other	I	ghidra+hopper	docs/re/tuning.md	tuning
 0x64b510	Csis::System::GetAllocator	audio.engine	V	ghidra	docs/re/sound.md	sound
