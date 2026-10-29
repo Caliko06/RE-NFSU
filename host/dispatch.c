@@ -128,7 +128,14 @@ void rn_call(Ctx *c, uint32_t target) {
     uint32_t b = (target - rn_fn_addr[0]) >> BUCKET_SHIFT;
     if (target >= rn_fn_addr[0] && b + 1 < nbucket)
         for (uint32_t k = bucket[b]; k < bucket[b + 1]; k++)
-            if (rn_fn_addr[k] == target) { rn_fn_ptr[k](c); return; }
+            if (rn_fn_addr[k] == target) {
+#ifdef RN_COV
+                extern uint8_t rn_cov_viacall[];
+                rn_cov_viacall[k] = 1;
+#endif
+                rn_fn_ptr[k](c);
+                return;
+            }
     uint32_t mb;
     void (*mod)(Ctx *) = rn_mod_find(c, target, &mb);
     if (mod) { c->mb = mb; mod(c); return; }
@@ -149,6 +156,7 @@ void dispatch_report(void) {
     int used = 0;
     for (int k = 0; k < nhosts; k++) used += hosts[k].calls != 0;
     rn_log("distinct APIs called: %d of %d imported", used, nhosts);
+    rn_cov_report();
 }
 
 uint64_t rn_rdtsc(Ctx *c) {

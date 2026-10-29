@@ -72,6 +72,7 @@ extern const char *rn_fe;       // RN_FLOWLOG: the front end's active packages, 
 extern int rn_screen_w, rn_screen_h;   // the desktop the game sees: RN_SCREEN=WxH (the page passes its window size)
 void rn_log(const char *fmt, ...);
 void input_jump(Ctx *c);        // RN_JUMP (host/input.c), from the RN_FLOWLOG pass at each Present
+void rn_cov_report(void);   // host/cov.c: the coverage bitmap (RN_COV=1 build); empty otherwise
 void input_finish(Ctx *c);      // RN_FINISH (host/input.c), same place
 void input_open(Ctx *c);        // RN_OPEN (host/input.c), same place
 void input_next(Ctx *c);        // RN_NEXT (host/input.c), same place

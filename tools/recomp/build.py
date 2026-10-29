@@ -14,7 +14,10 @@ from lift import Lifter, Unsupported
 import abk, patches
 
 CHUNKS = 160
-GEN = "build/gen"
+# RN_COV=1: a coverage build (docs/re/coverage_method.md). Every lifted function stores one byte at its ENTRY, so direct
+# calls count. It lives apart (build/gen_cov, build/obj_cov, build/speed_cov): the normal build and its files are untouched.
+COV = os.environ.get("RN_COV") == "1"
+GEN = "build/gen_cov" if COV else "build/gen"
 FUNCS = {int(l.split()[0], 16): l.split()[1] for l in open("census/speed_exe_functions.tsv")}
 # The census reads the unpatched exe: a PATCH cave reached by a call is a function entry of its own.
 FUNCS.update({p["addr"]: "call" for p in patches.active() if p.get("entry")})
@@ -27,6 +30,7 @@ JOBS = int(os.environ.get("RN_JOBS") or os.cpu_count())
 def init():
     global L
     L = Lifter("pc/Speed.exe", FUNCS)
+    L.cov = COV
 
 
 def work(e):
@@ -65,6 +69,9 @@ def lift_all():
         for t in info["traps"]:
             traps[t.split(" 0x")[0]] += 1
     protos = "".join(f"void f_{e:x}(Ctx *c);\n" for e, _ in out)
+    if COV:     # RNI_<addr> = position in the sorted table (rn_fn_addr); RN_COV(k) marks it (host/cov.c)
+        protos += ("extern uint8_t rn_cov_map[];\n#define RN_COV(k) (rn_cov_map[k] = 1)\nenum {"
+                   + ",".join(f"RNI_{e:x}={k}" for k, (e, _) in enumerate(out)) + "};\n")
     write_if_changed(f"{GEN}/funcs.h", '#pragma once\n#include "rt.h"\n' + protos)
     per = (len(out) + CHUNKS - 1) // CHUNKS
     for k in range(CHUNKS):
@@ -81,7 +88,8 @@ def lift_all():
     write_if_changed(f"{GEN}/abk.c", src)
     rep = {"functions": len(out), **mods, "patches": [f"{p['addr']:#x}" for p in patches.active()], "data_seeds_inside_instructions": dropped, "failed": failed,
            "trap_sites_by_reason": dict(traps.most_common())}
-    json.dump(rep, open("census/lift_report.json", "w"), indent=1)
+    if not COV:     # a coverage build lifts the same functions: it leaves the report alone
+        json.dump(rep, open("census/lift_report.json", "w"), indent=1)
     print(f"patches active: {len(patches.active())}")
     print(f"lifted {len(out)} functions, dropped {dropped} false data seeds, failed {len(failed)}, "
           f"trap sites {sum(traps.values())}")
@@ -90,23 +98,26 @@ def lift_all():
 
 
 HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c",
-        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c", "host/abk.c", "host/bridge.c", "host/carsmooth.c", "host/rivals.c", "host/free.c", "host/lights.c", "host/openworld.c"]
+        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c", "host/abk.c", "host/bridge.c", "host/carsmooth.c", "host/rivals.c", "host/free.c", "host/lights.c", "host/openworld.c", "host/cov.c"]
 
 
 def compile_native():
     srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c", f"{GEN}/abk.c"]
-    os.makedirs("build/obj", exist_ok=True)
+    obj = "build/obj_cov" if COV else "build/obj"
+    os.makedirs(obj, exist_ok=True)
     flags = ["-O2", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing"]
     jobs = []
     for s in srcs:
-        o = "build/obj/" + os.path.basename(s)[:-2] + ".o"
-        if not os.path.exists(o) or os.path.getmtime(o) < max(os.path.getmtime(s), os.path.getmtime("host/rt.h")):
+        o = obj + "/" + os.path.basename(s)[:-2] + ".o"
+        dep = [s, "host/rt.h"] + ([f"{GEN}/funcs.h"] if COV else [])     # funcs.h holds the RNI_ indexes of a coverage build
+        if not os.path.exists(o) or os.path.getmtime(o) < max(map(os.path.getmtime, dep)):
             jobs.append(["clang", *flags, "-c", s, "-o", o])
     run_jobs(jobs)
-    objs = ["build/obj/" + os.path.basename(s)[:-2] + ".o" for s in srcs]
-    subprocess.run(["clang", "-O2", "-g", "-Wall", "-Wno-unused-function", "-Ihost", f"-I{GEN}", *HOST, *objs,
-                    "-lm", "-o", "build/speed"], check=True)
-    print("built build/speed")
+    objs = [obj + "/" + os.path.basename(s)[:-2] + ".o" for s in srcs]
+    out = "build/speed_cov" if COV else "build/speed"
+    subprocess.run(["clang", "-O2", "-g", "-Wall", "-Wno-unused-function", "-Ihost", f"-I{GEN}", *(["-DRN_COV"] if COV else []), *HOST, *objs,
+                    "-lm", "-o", out], check=True)
+    print("built " + out)
 
 
 def compile_web():
@@ -148,6 +159,8 @@ def run_jobs(jobs):
 
 if __name__ == "__main__":
     what = sys.argv[1] if len(sys.argv) > 1 else "native"
+    if COV and what == "web":
+        sys.exit("RN_COV=1 is a native-only build")
     lift_all()
     if what == "native":
         compile_native()

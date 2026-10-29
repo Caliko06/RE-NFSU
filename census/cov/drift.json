@@ -1,0 +1,9 @@
+{
+ "scenario": "drift",
+ "hits": 5106,
+ "via_call": 1580,
+ "total": 13739,
+ "secs": 80.3,
+ "rn_secs": 420,
+ "end": "RN_JUMP: done, back in the front end at frame 8819"
+}

@@ -1,0 +1,9 @@
+{
+ "scenario": "options",
+ "hits": 3263,
+ "via_call": 1121,
+ "total": 13739,
+ "secs": 45.1,
+ "rn_secs": 45,
+ "end": "RN_SECS: stopped after 45 s (no stop reached)"
+}

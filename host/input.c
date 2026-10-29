@@ -248,7 +248,7 @@ void input_jump(Ctx *c) {
         static int done;
         if (!done++) rn_log("RN_JUMP: done, back in the front end at frame %u", rn_telem.presents);
 #ifndef __EMSCRIPTEN__
-        fflush(NULL); _exit(0);
+        fflush(NULL); rn_cov_report(); _exit(0);
 #endif
         return;
     }
@@ -493,7 +493,7 @@ void input_career(Ctx *c) {
     if (id < 0) {
         rn_log("career done: no %s event, beaten %u, cash %d (frame %u)", list ? "listed" : "open", ld(c, 0x7677ac, 4), (int)cash, rn_telem.presents);
 #ifndef __EMSCRIPTEN__
-        fflush(NULL); _exit(0);
+        fflush(NULL); rn_cov_report(); _exit(0);
 #endif
         on = 0;
         return;

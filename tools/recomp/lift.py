@@ -1026,5 +1026,7 @@ class Lifter:
         return (f"void f_{entry:x}(Ctx *restrict c) {{\n{regs} {flags}\n"
                 "uint32_t ea=0,t1=0,t2=0,res=0,n=0,k=0; uint64_t u=0; int64_t w=0;\n"
                 "(void)ea;(void)t1;(void)t2;(void)res;(void)n;(void)k;(void)u;(void)w;\n"
+                # RN_COV build (build.py sets `cov`): one byte store per function ENTRY, direct calls and tail jumps included.
+                + (f"RN_COV(RNI_{entry:x});\n" if getattr(self, "cov", False) else "") +
                 f"goto L{entry:x};\n" + "\n".join(self.out) +
                 f"\ndone: {self.save()} return;\ntrap: c->halt=1; {self.save()} return;\n}}\n")

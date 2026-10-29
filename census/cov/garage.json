@@ -1,0 +1,9 @@
+{
+ "scenario": "garage",
+ "hits": 3325,
+ "via_call": 1117,
+ "total": 13739,
+ "secs": 45.0,
+ "rn_secs": 45,
+ "end": "RN_SECS: stopped after 45 s (no stop reached)"
+}
