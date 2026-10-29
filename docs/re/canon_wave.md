@@ -1,27 +1,32 @@
-# Naming wave brief (one Sonnet session per wave)
+# Naming waves (Sonnet orchestrator + sonnet-exec workers)
 
-Objective: name one batch of ready functions of one system from census/canon/queue.tsv, with evidence, so the canon
-export reads named. Method and grades: docs/re/canon_db.md.
+Method, grades and measured precision: docs/re/canon_db.md. Context is the cost: nobody opens census/canon/c/*.c,
+funcs.jsonl or queue.tsv whole; `canon.py show` and `canon.py batch` print only what a batch needs.
 
-Context: census/canon/c/<range>.c holds the named pseudocode (`// ==== 0x<addr> <name>` headers; range file = the
-0x10000 block from 0x401000). funcs.jsonl gives callers/callees/globals/strings; data.jsonl gives globals and strings.
-The `prior` column is a hint: grade + GameCube (or MW) name. GC full signatures: build/prior/nfsug/symbols.txt.
+## Orchestrator, one round
+1. `.venv/bin/python tools/canon/canon.py queue` (prints per-system total/done/ready/blocked; read only that table).
+2. Pick up to 3 systems with the most ready rows (never online). For each: `canon.py batch <system> 60`.
+3. Launch one `sonnet-exec` per system in parallel with the worker brief below (systems disjoint = files disjoint).
+4. When all return: check each report against "Done when", then `canon.py apply && canon.py export -j 4 && canon.py queue`
+   (only the orchestrator runs these: one Ghidra project, one writer), then `tools/census/scoreboard.py`.
+5. Commit with exact paths (`git add census/names_<system>.tsv ...`, never -A), one line to docs/re/night_log.md.
+6. After 3 rounds, or when context passes ~60 %: write HANDOFF.md and message the Opus session the round summary.
 
-Scope: write only census/names_<system>.tsv (columns addr name system confidence evidence tool doc) and, for system
-changes of unknown rows, census/systems_override.tsv. Read anything.
-
+## Worker brief (paste with <system> filled)
+Objective: name the 60 functions in build/canon/batch_<system>.txt with evidence.
+Context: docs/re/canon_wave.md (this file), docs/re/canon_db.md "GameCube alignment" grades.
+Read the batch with `.venv/bin/python tools/canon/canon.py show @build/canon/batch_<system>.txt` (named pseudocode +
+index line: size, callers, prior hint, strings, globals). Read more of one function only with `canon.py show <addr>`.
+Full GC signatures: `grep '<Name>__' build/prior/nfsug/symbols.txt`.
+Scope: append rows only to census/names_<system>.tsv (columns addr name system confidence evidence tool doc).
 Per function:
-1. Read its pseudocode and the names of its callees and callers.
-2. If the prior hint fits what the code does (strings, callees, field use, argument count vs the GC signature), take
-   the GC name as `Class::method` (confidence high, evidence `V: <what in the code matches>`, tool `ghidra-canon+nfsug`).
-   If it does not fit, say why in one clause and name it from the code (confidence med/low).
-3. Trivial functions (EH funclets, thunks, `return this->f`, scalar deleting destructors): one row each with kind of
-   trivial in the evidence, named after their target or owner.
-
-Done when: `canon.py apply && canon.py export -j 4 && canon.py queue` runs clean, the system's done count rose by the
-batch size, and `.venv/bin/python tools/census/scoreboard.py` still runs.
-
-Limits: batch of 150 functions or 2 hours; no commit, no deletes, no game runs. A hint that is wrong twice in a row
-in one source file: stop trusting hints in that file and say so in the report.
-
-Report: append one line to docs/re/night_log.md + a summary of 10 lines max (named, hints taken/rejected per grade).
+- Prior hint fits the code (strings, callees, field use, argument count vs the GC signature): GC name as
+  `Class::method`, confidence high, evidence `V: <what matches>`, tool `ghidra-canon+nfsug`.
+- Hint does not fit, or no hint: name from the code, confidence med (read and clear) or low (guess), evidence says why
+  in one clause; a rejected hint is named in the evidence (`rejected B Foo::Bar: no string`).
+- Trivial (EH funclet, thunk, getter, scalar deleting destructor): one row, evidence starts `trivial:`.
+Done when: every address of the batch has one row, each row has 7 columns, no address repeats one already in another
+census/names_*.tsv (`grep -h <addr> census/names_*.tsv`).
+Limits: no canon.py apply/export/queue, no commit, no game runs, no deletes. A hint wrong twice in one source file:
+stop trusting hints in that file.
+Report (<= 10 lines): rows written, hints taken/rejected per grade, anything odd.

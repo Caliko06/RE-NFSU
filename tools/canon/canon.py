@@ -5,6 +5,8 @@
   canon.py apply           clone build/ghidra/proj -> build/ghidra/canon once, create missing functions, apply names
   canon.py export [-j N]   named pseudocode + index -> census/canon/{c/*.c,funcs.jsonl}, data.jsonl
   canon.py queue           census/canon/queue.tsv: unnamed functions bottom-up (callees named first) + coverage
+  canon.py batch <system> <n> [skip]   next n ready rows of one system -> build/canon/batch_<system>.txt (addrs)
+  canon.py show <addr|@file>...        named pseudocode of just those functions, with a one-line index each
 """
 import csv, glob, json, os, re, shutil, subprocess, sys, tempfile
 from collections import Counter
@@ -169,9 +171,45 @@ def queue():
     print(f"queue: {len(out)} rows -> {OUT}/queue.tsv; missing from export: {len(L - set(F))}")
 
 
+def batch(system, n, skip=0):
+    rows = [r for r in csv.DictReader(open(OUT + "/queue.tsv"), delimiter="\t")
+            if r["system"] == system and r["open_callees"] == "0"]
+    pick = [r["addr"] for r in rows[int(skip):int(skip) + int(n)]]
+    os.makedirs("build/canon", exist_ok=True)
+    open(f"build/canon/batch_{system}.txt", "w").write("\n".join(pick) + "\n")
+    print(f"batch {system}: {len(pick)} of {len(rows)} ready -> build/canon/batch_{system}.txt")
+
+
+def show(args):
+    want = []
+    for x in args:
+        want += [l.split()[0] for l in open(x[1:]) if l.strip()] if x.startswith("@") else [x]
+    want = [hex(a(x)) for x in want]
+    hint = {r["addr"]: r["prior"] for r in csv.DictReader(open(OUT + "/queue.tsv"), delimiter="\t")}
+    idx = {j["addr"]: j for j in map(json.loads, open(OUT + "/funcs.jsonl")) if j["addr"] in set(want)}
+    strs = {}
+    for l in open(OUT + "/data.jsonl"):
+        d = json.loads(l)
+        if d.get("str"):
+            strs[d["addr"]] = d["str"][:60]
+    for x in want:
+        lo = 0x401000 + (a(x) - 0x401000) // 0x10000 * 0x10000
+        txt = open(f"{OUT}/c/{lo:x}.c").read()
+        i = txt.find(f"// ==== {x} ")
+        body = txt[i:txt.find("\n// ==== ", i + 1)] if i >= 0 else f"// ==== {x} not exported\n"
+        j = idx.get(x, {})
+        print(f"// index: size {j.get('size')} callers {len(j.get('callers', []))} prior [{hint.get(x, '')}] "
+              f"strings {[strs.get(s, s) for s in j.get('strings', [])][:6]} globals {j.get('globals', [])[:8]}")
+        print(body.rstrip() + "\n")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "seed"
     if cmd == "export":
         export(int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[2] == "-j" else 4)
+    elif cmd == "batch":
+        batch(*sys.argv[2:5])
+    elif cmd == "show":
+        show(sys.argv[2:])
     else:
         {"seed": seed, "apply": apply, "queue": queue}[cmd]()
