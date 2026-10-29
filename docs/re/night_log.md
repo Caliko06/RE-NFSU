@@ -69,3 +69,12 @@ one bounded RN_WATCH run); (b) any garage run needs a scratch game dir whose ../
 (host/files.c:30; a symlinked game/ dir resolves .. to the repo) — build a dir of per-entry symlinks + copied saves;
 (c) listen/label the 95 speech events.
 09:05 night-opus-b: rivals done: docs/re/rivals.md, census/names_rivals.tsv 28 names (20 V / 8 I). Spawn 0x4b5df0 -> 0x4b4040 -> 0x4b26f0 preset; 303/313 rivals match the player's rating (-1); rubber band 0x44bd10 every 0.3 s, strength EventDesc +0x12c; AI clock 4000 ticks/s; direction is one global 0x78a2fc.
+
+## HANDOFF night-opus-b (2026-10-29, props/traffic/rivals block closed)
+Done: docs/re/props.md + names_props.tsv (28), docs/re/rivals.md + names_rivals.tsv (28: 20 V / 8 I),
+docs/re/traffic.md + names_traffic.tsv (120: 67 V / 49 I / 4 U). Each doc has a 10-name second-tool section.
+names_merge: 1039 addresses (819 V / 198 I / 22 U). Scoreboard named V: rivals 58, traffic 29, props 20.
+Key facts: smackable respawn 0x5977f0 (2.0 s at rest); rivals match the player's rating (303/313), rubber band
+0x44bd10; traffic has no spawner, cars are moved by teleporter 0x598600 (0.3 s route / 1.0 s Free Run), 6 models.
+Open: see each doc's Open list (traffic: writer of [ebx+0x59d4], Free Run x1.5, intersection states; rivals:
+42 floats 0x77a358..0x77a3ff unread, quick race S=0; props: smack type +0xd8 consumer).

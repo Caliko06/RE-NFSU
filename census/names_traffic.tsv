@@ -1,0 +1,121 @@
+addr	name	system	confidence	evidence	tool	doc
+0x422a70	Grid::PlaceAllRacers	traffic	high	V: places kinds 1/2 via 0x422410, then every entrant of kind 3 via 0x598bf0 and links the result into [0x7361f8] (name from another names_*.tsv)	H+G	docs/re/traffic.md
+0x426110	Car_SetMode	traffic	low	U: sets car state 0..4 (vtable per state); 0x5832a0 sets 0 when parking; meaning of each state not read	H+G	docs/re/traffic.md
+0x42ae10	TrackRow_Current	traffic	high	V: returns [0x736174], the pointer to the current TrackInfo row (0xfc bytes)	H+G	docs/re/traffic.md
+0x42ae20	SpawnRecord_Get	traffic	high	V: i*0x108 + [0x736160]	H+G	docs/re/traffic.md
+0x42ae30	SpawnRecord_Count	traffic	high	V: returns [0x736164]	H+G	docs/re/traffic.md
+0x4322a0	RaceStatus::AddEntrant	traffic	high	V: cap 30 entrants (cmp [+0x12c], 0x1e); counts human/AI slots (name from another names_*.tsv)	H+G+C	docs/re/traffic.md
+0x43db70	Zone_FindTrafficDensity	traffic	med	I: thunk to 0x4436d0 with zone type 4; tests the player bbox then polygon 0x5679b0	G+H	docs/re/traffic.md
+0x441fe0	TrackRow_FindById	traffic	high	V: walks [0x736168] rows of 0xfc by s16 +0x6c == esi (track id [0x78a2f0] in 0x4b3ac0)	G+C	docs/re/traffic.md
+0x442100	RoadIntersection_Get	traffic	high	V: eax*0x170 + [0x736158]	H+G	docs/re/traffic.md
+0x442150	RoadEntries_FillDistances	traffic	med	I: fills entry +0 (f32) from the node route distance at load (file has 0 there); sorted by 0x442ed0	H	docs/re/traffic.md
+0x4424d0	Node_IsDriveFwd	traffic	med	I: tests bits 6, 25, 27 of [node+0x84]; zero = the walker treats the node as a dead end (re_citygraph.md)	G	docs/re/traffic.md
+0x442520	Node_IsDriveBack	traffic	med	I: tests bits 19, 26, 28 of [node+0x84]	G	docs/re/traffic.md
+0x442950	Section_HasLane	traffic	high	V: any of 6 lane flag bytes at section+0x270 (side 1) or +0x276 (side 0) is nonzero	G+H	docs/re/traffic.md
+0x442b70	RoadSections_Parse	traffic	high	V: slot table [0x77af20+0x10+4*s16(+0xa)], list by int +0xc (0 -> head +0, 1 -> head +8), next record = +0x27c + s16(+0x10)*0x88; file: 504 sections in 31 TRACKB tile exactly	H+G+C+file	docs/re/traffic.md
+0x442bd0	RoadSections_Unload	traffic	high	V: clears 0x80 slots from manager+0x10	H+G	docs/re/traffic.md
+0x442dd0	RoadNetwork_Load	traffic	high	V: loader 23, chunk ids 0x34121..0x34124 -> 0x77af20 sections, 0x736150/54 entries (size>>5), 0x736158/5c intersections (size/0x170), 0x736160/64 spawn records (size/0x108)	H+C	docs/re/traffic.md
+0x442e60	RoadNetwork_Unload	traffic	high	V: zeroes the pointer and count pairs of 0x34122/23/24 and calls 0x442bd0 for 0x34121	H+C	docs/re/traffic.md
+0x442ed0	RoadEntries_Sort	traffic	med	I: sorts 0x34122 entries by distance, then 0x4430b0 rewrites node link bytes +0x81/+0x82	H	docs/re/traffic.md
+0x4430b0	RoadNetwork_PostLoad	traffic	med	I: sets section flags from type-5 entries, fills distances, sorts, remaps link bytes (docs/openworld_e_re.md A)	H	docs/re/traffic.md
+0x4436d0	Zone_Find	traffic	med	I: scans 0xb4-byte zone rows: selector byte +0x18 (-1 or track dir), bbox +0x28..+0x34, polygon +0x3c	G	docs/re/traffic.md
+0x448f70	GameFlow_CreateRides	traffic	med	I: one ride (0x58c3b0) per entrant; for car usage 2 sets entrant byte +0x17 = 0xff (no tuner skin slot)	H	docs/re/traffic.md
+0x44aa10	AIGoal::Create	traffic	med	I: 1 Win road race, 2 Win drag race, 3 Steer player in drag, 4 Be traffic car, 5 Be ambient traffic car (placers push 4 or 5) (name from another names_*.tsv)	H	docs/re/traffic.md
+0x44c2e0	TrafficCar_HonkAtPlayer	traffic	med	I: traffic car, player in slot list within 50 m, random 0.2-0.3 / 0.1-0.15 s	H	docs/re/traffic.md
+0x44d570	Node_GetIntersection	traffic	high	V: node (section byte +0x5c, node short +0x5e) -> bits 20..24 of [node+0x84] -> index * 0x170 + [0x736158]; 31 = none; file: records match flagged nodes 49/49	H+G+file	docs/re/traffic.md
+0x44e020	TrafficGoal_Select_BeTraffic	traffic	high	V: type != 0x12 and ceiling <= 600: finder 0x4543d0 (intersections); type != 3 and ceiling <= 300: finder 0x453920; else default lane	H+C	docs/re/traffic.md
+0x44e140	TrafficGoal_Select_BeAmbient	traffic	high	V: same cascade as 0x44e020 (cmp 0x12, 0x258, 3, 0x12c)	H+C	docs/re/traffic.md
+0x44efd0	TrafficCar_IsIntersectionObstacle	traffic	med	I: true unless the other car is traffic on the same intersection and 0x5aad10 allows it	G	docs/re/traffic.md
+0x453920	Finder_AvoidAsTraffic	traffic	med	I: nearest car in my lane ahead (0x44f470); priority 300 if dist < 5 m and 0x44efd0	H	docs/re/traffic.md
+0x453c60	Action_AvoidAvoidableAsTraffic::Update	traffic	med	I: lane change among 5 lanes, speed target 6 m/s at 15..30 m, 0 at <= 15 m	H	docs/re/traffic.md
+0x4543d0	Finder_ObeyIntersections	traffic	high	V: path object +0xb8 current node valid -> 0x44d570 record, returns priority 600 else -1	G	docs/re/traffic.md
+0x454490	Action_ObeyTrafficIntersections::Update	traffic	med	I: record found; section +4/+5 decides which street the car is on; 0x5aaca0 gate; sets speed target / stop; debug tint +0x88c	G	docs/re/traffic.md
+0x4563d0	RoadGraph_Walk	traffic	med	I: traffic walker over entries with a direction flag (d=0 forward, d=1 back); only callers 0x59a2c0 (0x59a4b8, 0x59a763); returns count, wants exactly 1	H+C	docs/re/traffic.md
+0x458bd0	RoadPath_LinkAccepted	traffic	med	I: racer decider; rejects entry whose +0xd does not match walk direction, never type 3 (docs/openworld_e_re.md B1)	H	docs/re/traffic.md
+0x468800	CarBody_DisableCountInc	traffic	low	U: [obj+0x1b]++; paired with 0x468810 (dec); who tests the counter not found	H+G	docs/re/traffic.md
+0x4ab510	RaceOptions_Get	traffic	low	U: returns the per-mode options block (ecx+0xfa10 ..); +0x18 is the traffic level read by 0x4b49e0	C+H	docs/re/traffic.md
+0x4b3ac0	Race::SpawnTraffic	traffic	high	V: n = s8 row[0xc0 + dir + level*2] (0 if level 0); per car: type 0x57d000, dedupe vs entrants up to 100 tries, paint = rand mod [type+0xd9] -> [type+0xc80+i], entrant kind 3 id 0x32+i, 0x4322a0; no x1.5 here (name from another names_*.tsv)	H+G+C+file	docs/re/traffic.md
+0x4b49e0	RaceSetup_Circuit	traffic	med	I: [0x78a300] = options+0x18 (traffic level), [0x78a304] = 0.5, then 0x4b3ac0	H	docs/re/traffic.md
+0x4b5df0	Career::StartRaceFromEvent	traffic	med	I: [0x78a300] = switch on [ebx+0x59d4] (0..3), [0x78a304] = 0.5; then 0x4b3ac0 (name from another names_*.tsv)	G	docs/re/traffic.md
+0x57cfa0	CarTypeInfo_NextOfUsage	traffic	high	V: iterator over 0x23 records: usage == filter, name byte +0x40 != 0, and (usage 1 or paint count +0xd9 > 0)	H+G	docs/re/traffic.md
+0x57d000	TrafficCar_PickType	traffic	high	V: weighted pick over CarTypeInfo with usage 2: weight [type+0xc60+4*district]; district = 0 for track ids >= 1000 (all shipped ids), else id/10-1 (60 -> 4); returns [type+0xc50]	H+G+C+file	docs/re/traffic.md
+0x57d160	Ride_Init	traffic	med	I: zeroes the ride block (incl. skin hash +0x444, wheel +0x448 and spec +0x4c4) for a new entrant	G	docs/re/traffic.md
+0x5809c0	DriverInfo::DriverInfo	traffic	med	I: entrant +1 id, +3, +4 kind, +0x10 ride, +0x734 = 0, copies a 16-char name (name from another names_*.tsv)	G	docs/re/traffic.md
+0x582f90	TrafficAI::ctor	traffic	med	I: base 0x44a330, vtable 0x6b96b0, slot 3 update 0x583350, slot 0xc 0x583700, +0x4d4 direction, +0x4d8 mode, +0x4dc target speed	C+H	docs/re/traffic.md
+0x5832a0	TrafficCar_Park	traffic	high	V: once (+0x4d2): [[veh+0x3c]+0x1b]++, veh+0x4d0 = 0, state 0 (0x426110), +0x4d2 = 1	G+C	docs/re/traffic.md
+0x583350	TrafficAI::Update	traffic	high	V: timer +0x3f0; kind-3 round robin ([0x6f08a4] mod 2n); +0x410 set -> brake only; 0x44cf30 route update; failure or 0x5a6ce0 -> +0x4d1 = 1 and park; picks the action by goal	H+G	docs/re/traffic.md
+0x583700	TrafficAI::Reset	traffic	med	I: clears +0x410, +0x4d0, +0x4d1; new path 0x5a5340; new action; failure -> +0x410 = 1	H	docs/re/traffic.md
+0x5983d0	SpawnRecord_Allowed	traffic	high	V: s16 rec[4+2*district] != -1 and byte rec[0xd0 + dir + level*4 + district*2] != 0	G+H	docs/re/traffic.md
+0x598510	Teleporter_RestoreState	traffic	med	I: replay/save restore: spawn record state 0x5ab010, car +0x4d0	H	docs/re/traffic.md
+0x598600	TrafficTeleporter::DoTimestep	traffic	high	V: per frame: 0x59b6d0 intersections; if [0x78a300] != 0, cars exist, players exist, this+8 on: timer this+0 -= dt; at <= 0 reload (0x59ae60), check 22 cars (route mode) or 1, round robin from this+4; need 0x5988c0, move 0x599830, failure -> park 0x5832a0 and +0x4d1 = 1	H+G	docs/re/traffic.md
+0x5988c0	Teleporter_NeedsMove	traffic	high	V: if goal vt+0xc false: parked +0x4d1, or (0x598a50 passed and not 0x59ac20 hidden); else +0x4d0 and 0x598b60, or not (+0x4d1 == 0 and 0x59ac80)	H+G	docs/re/traffic.md
+0x598a50	Teleporter_IsPassed	traffic	high	V: route difference to the nearest player 0x59b490 via 0x443d60; compares section (vt+0x40) and speed	H+G	docs/re/traffic.md
+0x598b60	TrafficTeleporter::IsPrimaryTeleportationSpotAllowed	traffic	high	V: returns 0 if some player is slower than 20 m/s ([0x6b5a50]) and within 50 m of route ([0x6b5a54]) of the given route position, else 1 (name from another names_*.tsv)	G+file	docs/re/traffic.md
+0x598bf0	TrafficTeleporter::PlaceCar	traffic	high	V: tries route 0x5991a0 (only if 0x421a50), then spawn records 0x598c80, then (not route) random nodes 0x598fb0	H+G	docs/re/traffic.md
+0x598c80	PlaceCar_SpawnRecord	traffic	med	I: up to 100 tries: random side (rand < 0.5), record 0x599fc0, lane 0x599660, uses rec +0x70/+0x90 (min/max distance) and +0xb0 (speed mph x 0.447), calls 0x5992f0	G	docs/re/traffic.md
+0x598fb0	PlaceCar_RandomNode	traffic	med	I: up to 100 tries: random section weighted by node count 0x59b2c0, node valid 0x456c90 / 0x4420a0 / 0x4420d0, spacing 0x59aa60, lane, place; Free Run last resort	H+G	docs/re/traffic.md
+0x5991a0	PlaceCar_Route	traffic	med	I: up to 100 tries: node at route offset (try-50 + [ent+1]) * spacing [row+0xd4+dir*4] via 0x599b20, lane 0x5995e0, clear 0x59aa60, place 0x5992f0	G	docs/re/traffic.md
+0x5992f0	TrafficCar_Place	traffic	med	I: builds the car at node/lane (driver kind 3), sets driver +0x4d8 mode (0x59b620), paint +0x17 (0x59b590), goal 0x44aa10(4 or 5), initial speed if > 1e-5	G	docs/re/traffic.md
+0x5995e0	PickLaneEitherSide	traffic	med	I: lane for side s, else the other side	G	docs/re/traffic.md
+0x599660	PickLane	traffic	med	I: lane index 0xb..0x10 (against) or 0x11..0x16 (with); first prefers the lane of a random player's path, else 10 random tries of 6, then scan	G	docs/re/traffic.md
+0x599830	Teleporter_MoveCar	traffic	high	V: player 0x59b370; p = 1.0 (0.35 if player < 20 m/s); if rand < p try spawn records 0x599c80; else route 0x5999c0 if 0x421a50 else Free Run 0x59a2c0; dead debug branch (if 0 != 0) in Hopper	H+G	docs/re/traffic.md
+0x5999c0	Teleporter_MoveRoute	traffic	med	I: route mode: node 250 m ahead along the route (0x599b20), lane, 0x59aa60, 0x59a7c0 with start speed 24.5865	G	docs/re/traffic.md
+0x599b20	FindNodeAtRoute	traffic	med	I: up to 99 random-section tries for a node at a route distance with a lane; keeps the nearest ahead	G	docs/re/traffic.md
+0x599c80	Teleporter_MoveToSpawnRecord	traffic	high	V: needs 0x42ae30 > 0; side rand < 0.5; window = player route pos (+-60 m if a slow player is near, else ahead); record via 0x599fc0; distance rec+0x70 + rand(rec+0x90 - rec+0x70); speed rec+0xb0 x 0.447 capped by row byte; 0x59a7c0	H+G	docs/re/traffic.md
+0x599fc0	SpawnRecord_Find	traffic	high	V: filters records: rec+0x100 < 6, node s16 != -1, byte allowed; ahead window min = max(speed*rec[0x10+..], 20 m), max = max(speed*rec[0xe0+..], 120 m); picks one at random	H+G	docs/re/traffic.md
+0x59a2c0	Teleporter_MoveFreeRun	traffic	high	V: player node 0x428150/60, side random below 24.5865 m/s, walk 0x4563d0 by 250 m then doubling, give up past 500 m, needs lane, node flag 0x4420b0, 0x59aa60; places with 0x59a7c0	G+C+H	docs/re/traffic.md
+0x59a7c0	TrafficCar_Move	traffic	med	I: reposition an existing car: lane, speed, 0x427f70 teleport, goal 4/5, 0x42a810	G	docs/re/traffic.md
+0x59aa60	Spot_IsClear	traffic	high	V: rejects when (row byte +0xc8+dir == 0 and (no race list or player speed <= 0)) and route distance < row f32 +0xcc+4*dir (500 m); then 0x59ad90 (<250 m of a player route), then 0x59b1e0 (spacing to every car)	H+G+file	docs/re/traffic.md
+0x59ac20	Teleporter_NearPlayerRoute	traffic	med	I: race state 4: 0x59ad90 on the car route position	H+G	docs/re/traffic.md
+0x59ac80	Teleporter_CarInRange	traffic	med	I: 0x421550(route pos) < 250.0 ([0x6ccb20])	G	docs/re/traffic.md
+0x59ad90	Spot_NearPlayerRoute	traffic	high	V: race state 4 and route distance to a player < 250 m ([0x6b5a38])	H+G	docs/re/traffic.md
+0x59ae60	Teleporter_ReloadTimer	traffic	high	V: [0x6b5a34] 0.3 if 0x421a50 else [0x6b5a30] 1.0	H+G	docs/re/traffic.md
+0x59aea0	PickTravelSide	traffic	med	I: rand < [0x78a304] -> side = [0x78a2fc] else opposite	G	docs/re/traffic.md
+0x59b1e0	Spot_NearOtherCar	traffic	high	V: any other car in the list with route distance < spacing (or abs < spacing when dir flag)	H+G	docs/re/traffic.md
+0x59b2c0	PickRandomSection	traffic	med	I: random section weighted by node count (this+0xc total), needs a lane (0x442950)	G	docs/re/traffic.md
+0x59b370	Teleporter_PickPlayer	traffic	med	I: random player (or the one with id [0x41ff50])	G	docs/re/traffic.md
+0x59b3e0	Teleporter_Spacing	traffic	high	V: 99999 m unless the player is in a TRAFFIC_DENSITY zone (0x43db70, type 4) and 0x59b8d0 finds no slow car; then min + rand(max - min) from zone +0x7c+4*(2L-2) / (2L-1)	H+G+file	docs/re/traffic.md
+0x59b490	NearestPlayer	traffic	med	I: player with the smallest route distance to a position	G	docs/re/traffic.md
+0x59b590	TrafficCar_PickPaint	traffic	med	I: random pick of one of [0x57d100] items via 0x57d120	G	docs/re/traffic.md
+0x59b620	TrafficDriverMode_Map	traffic	med	I: [0x78a3fc] 0/1/2 -> 9/4/0	G	docs/re/traffic.md
+0x59b670	Zone_SpacingMin	traffic	high	V: zone[0x7c + 4*(2*level-2)]	C+G	docs/re/traffic.md
+0x59b6a0	Zone_SpacingMax	traffic	high	V: zone[0x7c + 4*(2*level-1)]	C+G	docs/re/traffic.md
+0x59b6d0	Intersections_UpdateAll	traffic	high	V: for i < [0x73615c]: 0x442100(i), 0x5aaf10	H+G	docs/re/traffic.md
+0x59b710	Teleporter_Disable	traffic	med	I: cars +0x4d0 = 0, counter +0x1b++ (0x468800), this+8 = 0	G	docs/re/traffic.md
+0x59b790	Teleporter_Enable	traffic	med	I: counter +0x1b-- (0x468810), this+8 = 1	G	docs/re/traffic.md
+0x59b8d0	Teleporter_SlowCarNear	traffic	med	I: a car slower than 1.0 ([0x6b5a6c]), not parked, within 250 m of route	G	docs/re/traffic.md
+0x5a53c0	RoadPath_Step	traffic	high	V: link byte node+0x81/+0x82 -> entry = byte*0x20+[0x736150]; dest section = byte +9, dest node = u16 +4; entry type +0xb, direction +0xd; file: 1433/1433 link bytes point at an entry whose source (+0xa, +6) is the node	G+file	docs/re/traffic.md
+0x5aa970	TrafficIntersection_SavePtr	traffic	med	I: converts the record pointer to an index (/0x170) and back around a save; checks index against [0x73615c]	H	docs/re/traffic.md
+0x5aa9f0	TrafficIntersection_Save	traffic	high	V: saves rec +0xc (int), +6/+7 (2 bytes) and 22 'IncomingTrafficCar' items of 0x10 bytes from +0x10	H+C	docs/re/traffic.md
+0x5aaa90	IncomingTrafficCar_Save	traffic	high	V: item = byte +0, then (if set) int +4, ptr +8, ptr +0xc	H+C	docs/re/traffic.md
+0x5aaf10	Intersection_Update	traffic	med	I: for 11 pairs of 16-byte items at rec+0x10: flag byte, state idx 0..3, f32 time < 12.0 s -> mark state; clears rec+0xc (current state) to -1 if its state has no live item	G	docs/re/traffic.md
+0x5ab210	SpawnRecord_GetNode	traffic	high	V: node = [0x77af30+4*[rec]] + 0x27c + s16(rec+4+2*district)*0x88; district 0/1	G+H	docs/re/traffic.md
+0x6b5a30	TeleportInterval_Free	traffic	high	V: 1.0 s timer reload when 0x421a50 is false (Free Run)	G+file	docs/re/traffic.md
+0x6b5a34	TeleportInterval_Route	traffic	high	V: 0.3 s timer reload when 0x421a50 is true	G+file	docs/re/traffic.md
+0x6b5a38	TeleportFirstStep	traffic	high	V: 250.0 m: first walk step, also the player exclusion in route distance (0x59ad90, 0x59b8d0)	G+file	docs/re/traffic.md
+0x6b5a3c	TeleportRouteLimit	traffic	high	V: 500.0 m: the walk in 0x59a2c0 gives up past this route distance	G+file	docs/re/traffic.md
+0x6b5a50	TeleportSlowPlayerSpeed	traffic	high	V: 20.0 m/s: 0x598b60 treats a player below it as 'slow'; [0x6b5a54] = 50.0 m	G+file	docs/re/traffic.md
+0x6b5a5c	TeleportSpawnObjSpeed	traffic	high	V: 20.0 m/s: below it 0x599830 uses spawn records with p = 0.35 ([0x6b5a64]), at or above with p = 1.0 ([0x6b5a60])	G+file	docs/re/traffic.md
+0x6b5a68	SpawnRecordWindow	traffic	high	V: 60.0 m: window half width around the player route position in 0x599c80 when a slow player is near	G+file	docs/re/traffic.md
+0x6b9690	TrafficAI_ClassNames	traffic	low	U: strings 'PidError' (0x6b969c) and 'Average' (0x6b96a8) sit next to the TrafficAI vtable; use not read	C+file	docs/re/traffic.md
+0x6b96b0	TrafficAI_vtable	traffic	med	I: slot 3 0x583350 update, slot 12 0x583700 reset, slot 16 0x582f50 direction ([+0x4d4])	C+file	docs/re/traffic.md
+0x6cc988	TeleportSpeedFlip	traffic	high	V: 24.5865 m/s (55 mph): at or above it a Free Run move goes the player's way, below it random (0x6cc7dc = 0.5)	G+file	docs/re/traffic.md
+0x734588	CarTypeInfoTable	traffic	high	V: 35 records of 0xc90 (loader 0x57c8b0); +0xc50 index, +0xc54 usage (0 tuner, 2 traffic), +0xc60 5 floats traffic weight per district, +0xc80 paint list, +0xd9 paint count	H+G+file	docs/re/traffic.md
+0x736150	RoadEntries_Ptr	traffic	high	V: 0x34122 payload (+8); count [0x736154] = size>>5; 32-byte entries; 10+ readers	H+C+file	docs/re/traffic.md
+0x736154	RoadEntries_Count	traffic	high	V: size>>5 (shr ecx,5 at 0x442dfa)	H+C	docs/re/traffic.md
+0x736158	RoadIntersections_Ptr	traffic	high	V: 0x34123 payload; stride 0x170	H+C+file	docs/re/traffic.md
+0x73615c	RoadIntersections_Count	traffic	high	V: size/0x170 (mul 0xb21642c9, shr 8)	H+C	docs/re/traffic.md
+0x736160	SpawnRecords_Ptr	traffic	high	V: 0x34124 payload; stride 0x108	H+C+file	docs/re/traffic.md
+0x736164	SpawnRecords_Count	traffic	high	V: size/0x108 (mul 0x3e0f83e1, shr 6)	H+C	docs/re/traffic.md
+0x736168	TrackRows_Ptr	traffic	high	V: TrackInfo rows (chunk 0x34201, 31 rows x 0xfc, GlobalB); count [0x73616c]	H+G+file	docs/re/traffic.md
+0x736174	TrackRow_CurrentPtr	traffic	high	V: pointer to the row of the loaded track; row +0x6c = track id, +0x20 = name	H+G	docs/re/traffic.md
+0x7361f8	WorldCarList	traffic	med	I: list of placed cars: count 0x41f680, car i 0x41f690; 0x422a70 links each placed traffic car into it	H+G	docs/re/traffic.md
+0x77af20	RoadSectionManager	traffic	high	V: two circular lists (heads +0 and +8) then slot table +0x10 (128 slots); list 1 = the 94 sections that carry a 0x34124 spawn record (file, 94/94, 0 in list 0)	H+C+file	docs/re/traffic.md
+0x77af30	RoadSectionTable	traffic	high	V: 128 pointers (manager+0x10); id = s16 section +0xa	H+C	docs/re/traffic.md
+0x78a2f0	TrackId	traffic	high	V: loaded track id (1001..1308); 0x57d000 picks district column 0 for ids >= 1000	H+G	docs/re/traffic.md
+0x78a2fc	TrackDirection	traffic	high	V: 0 forward, 1 reverse; selects the dir column of every traffic table and the walk side	H+G	docs/re/traffic.md
+0x78a300	TrafficLevel	traffic	high	V: 0 none, 1..3 set by the race setups (0x4b49e0 from options struct +0x18, 0x4b5df0 from [ebx+0x59d4]); indexes every traffic table (count, spawn tables, zone spacing)	H+G	docs/re/traffic.md
+0x78a304	TrafficSameSideProb	traffic	med	I: float 0.5 set by 0x4b49e0 and 0x4b5df0; 0x59aea0 returns the travel side: rand < this -> track direction, else opposite	H+G	docs/re/traffic.md
+0x78a347	TrafficOffFlag	traffic	high	V: when nonzero 0x4b3ac0 adds no traffic	H+G	docs/re/traffic.md
+0x78a3fc	TrafficDriverMode	traffic	med	I: 0/1/2 (copied from [0x75f240]); 0x59b620 maps it to 9/4/0, stored in the traffic driver at +0x4d8; strings 'Traffic mode' / 'Traffic in mellow mode' have no direct xref	G	docs/re/traffic.md
+0x78a418	Entrants_Ptr	traffic	high	V: array of 0x750-byte entrants, count [0x78a41c]; entrant +1 id, +3 grid, +4 kind (1 human, 2 racer, 3 traffic), +0x10 car type, +0x17 paint, +0x734 flag	H+G	docs/re/traffic.md

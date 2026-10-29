@@ -48,10 +48,14 @@ addr	name	system	confidence	tool	doc	from
 0x422410	Grid::BuildRacerCar	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x422580	Grid::GetStartPositions	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
 0x422a70	Grid::PlaceAllRacers	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
+0x426110	Car_SetMode	traffic	U	H+G	docs/re/traffic.md	traffic
 0x426930	JumpCamTrigger	camera	V	G+C	docs/re/camera.md	camera
 0x429b10	Racer::UpdateTwoHumanCatchUp	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x429cf0	JumpCamPredict	camera	I	C	docs/re/camera.md	camera
 0x42ab50	IsCar1099InMode4	other	U	ghidra+hopper	docs/re/tuning.md	tuning
+0x42ae10	TrackRow_Current	traffic	V	H+G	docs/re/traffic.md	traffic
+0x42ae20	SpawnRecord_Get	traffic	V	H+G	docs/re/traffic.md	traffic
+0x42ae30	SpawnRecord_Count	traffic	V	H+G	docs/re/traffic.md	traffic
 0x42c3c0	Player::CreateRearViewMirror_call	camera	V	C	docs/re/camera.md	camera
 0x42c4b0	JumpCamBuildSpline	camera	I	C	docs/re/camera.md	camera
 0x42c670	Player::DefaultDriveCamera	camera	V	G+C	docs/re/camera.md	camera
@@ -73,6 +77,7 @@ addr	name	system	confidence	tool	doc	from
 0x435fe0	ModeFlags_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x436000	ModeFlags_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x436020	ModeFlags_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x43db70	Zone_FindTrafficDensity	traffic	I	G+H	docs/re/traffic.md	traffic
 0x43eb00	RaceManager::UpdateAIScores	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x43feb0	TrackMarker_Count	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x43fef0	TrackMarker_Get	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
@@ -80,17 +85,26 @@ addr	name	system	confidence	tool	doc	from
 0x441480	TrackCollision_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x441ed0	TrackPositionMarker_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x441f40	TrackPositionMarker_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x441fe0	TrackRow_FindById	traffic	V	G+C	docs/re/traffic.md	traffic
 0x442010	TrackInfo_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x442040	TrackInfoTable_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x442080	TrackInfoTable_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x442100	RoadIntersection_Get	traffic	V	H+G	docs/re/traffic.md	traffic
+0x442150	RoadEntries_FillDistances	traffic	I	H	docs/re/traffic.md	traffic
+0x4424d0	Node_IsDriveFwd	traffic	I	G	docs/re/traffic.md	traffic
+0x442520	Node_IsDriveBack	traffic	I	G	docs/re/traffic.md	traffic
+0x442950	Section_HasLane	traffic	V	G+H	docs/re/traffic.md	traffic
 0x442b70	RoadSections_Parse	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x442bd0	RoadSections_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
 0x442dd0	RoadNetwork_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x442e60	RoadNetwork_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x442ed0	RoadEntries_Sort	traffic	I	H	docs/re/traffic.md	traffic
+0x4430b0	RoadNetwork_PostLoad	traffic	I	H	docs/re/traffic.md	traffic
 0x4432a0	TrackPath::BuildSplines	assets	V	Hopper sub_4432a0	docs/re/assets.md	assets
 0x4433f0	TrackPath::FreeSplines	assets	V	Hopper sub_4433f0	docs/re/assets.md	assets
 0x443450	TrackPath::Init	assets	V	Hopper sub_443450 + capstone	docs/re/assets.md	assets
 0x4434d0	TrackPath::Parse	assets	V	Hopper sub_4434d0 + Ghidra FUN_004434d0: H+G agree	docs/re/assets.md	assets
+0x4436d0	Zone_Find	traffic	I	G	docs/re/traffic.md	traffic
 0x4441f0	TrackPath::Loader	assets	V	Hopper sub_4441f0 + Ghidra make FUN_004441f0: H+G agree	docs/re/assets.md	assets
 0x444200	TrackPath::Unloader	assets	V	Hopper sub_444200 + Ghidra make FUN_00444200: H+G agree	docs/re/assets.md	assets
 0x4442a0	StreamSections::Loader	assets	V	Hopper sub_4442a0 + Ghidra make FUN_004442a0: H+G agree	docs/re/assets.md	assets
@@ -121,15 +135,27 @@ addr	name	system	confidence	tool	doc	from
 0x448600	GameFlow::LoadGlobalA	assets	V	hopper	docs/re/assets.md	assets
 0x448650	GameFlow::LoadGlobalB	assets	V	hopper	docs/re/assets.md	assets
 0x448b10	GameFlow::LoadingFrontEndPart1	assets	V	hopper	docs/re/assets.md	assets
+0x448f70	GameFlow_CreateRides	traffic	I	H	docs/re/traffic.md	traffic
 0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	V	hopper	docs/re/assets.md	assets
 0x449765	GameFlow::LoadingTrackSpecificPart1	assets	V	hopper	docs/re/assets.md	assets
 0x44aa10	AIGoal::Create	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals
 0x44bd10	RacerAI::UpdateRubberBand	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x44c010	RacerAI::GetCatchUpTerms	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
+0x44c2e0	TrafficCar_HonkAtPlayer	traffic	I	H	docs/re/traffic.md	traffic
 0x44c550	RacerAI::UpdateDesiredSpeed	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x44ca10	Racer::GetSkillLevel	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals
+0x44d570	Node_GetIntersection	traffic	V	H+G+file	docs/re/traffic.md	traffic
 0x44d8b0	RaceGoal::SelectAction	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
 0x44dd30	DragGoal::SelectAction	rivals	I	Ghidra+capstone	docs/re/rivals.md	rivals
+0x44e020	TrafficGoal_Select_BeTraffic	traffic	V	H+C	docs/re/traffic.md	traffic
+0x44e140	TrafficGoal_Select_BeAmbient	traffic	V	H+C	docs/re/traffic.md	traffic
+0x44efd0	TrafficCar_IsIntersectionObstacle	traffic	I	G	docs/re/traffic.md	traffic
+0x453920	Finder_AvoidAsTraffic	traffic	I	H	docs/re/traffic.md	traffic
+0x453c60	Action_AvoidAvoidableAsTraffic::Update	traffic	I	H	docs/re/traffic.md	traffic
+0x4543d0	Finder_ObeyIntersections	traffic	V	G	docs/re/traffic.md	traffic
+0x454490	Action_ObeyTrafficIntersections::Update	traffic	I	G	docs/re/traffic.md	traffic
+0x4563d0	RoadGraph_Walk	traffic	I	H+C	docs/re/traffic.md	traffic
+0x458bd0	RoadPath_LinkAccepted	traffic	I	H	docs/re/traffic.md	traffic
 0x45d640	Racer::GetDirection	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals
 0x462070	RacerAITuning::Loader	assets	V	Hopper sub_462070 + Ghidra make FUN_00462070: H+G agree	docs/re/assets.md	assets
 0x4620a0	RacerAITuning::Unloader	assets	V	Ghidra make FUN_004620a0 (Hopper export lacks it)	docs/re/assets.md	assets
@@ -139,6 +165,7 @@ addr	name	system	confidence	tool	doc	from
 0x462aa0	Racer::GetUnstuckReady	rivals	I	capstone	docs/re/rivals.md	rivals
 0x465d00	SpecialCamCaller_465d00	camera	I	G+C	docs/re/camera.md	camera
 0x466840	Virtual::ReturnOne (float constant getter)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x468800	CarBody_DisableCountInc	traffic	U	H+G	docs/re/traffic.md	traffic
 0x469580	WorldObjects::Broadphase	props	V	hopper+ghidra	docs/re/props.md	props
 0x469670	WorldObjects::TestObject	props	I	ghidra+capstone	docs/re/props.md	props
 0x46d390	DriveTrain::DriveTrain	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -203,6 +230,7 @@ addr	name	system	confidence	tool	doc	from
 0x4aac70	Opt::Deserialize	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
 0x4ab120	Ugd::PackBlock	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
 0x4ab200	Ugd::UnpackBlock	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
+0x4ab510	RaceOptions_Get	traffic	U	C+H	docs/re/traffic.md	traffic
 0x4ac0f0	cFrontendDatabase::BuildRideForCarHandle	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x4ac460	CustomizationDB::Init	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
 0x4ac5a0	FECarConfig::BuildRide	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -225,13 +253,14 @@ addr	name	system	confidence	tool	doc	from
 0x4b2660	PresetRide::FindByHash	assets	V	Hopper sub_4b2660	docs/re/assets.md	assets
 0x4b26f0	PresetRide::ApplyToRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x4b3a20	Race::PickOpponentNames	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals
-0x4b3ac0	Race::SpawnTraffic	rivals	I	Ghidra+Hopper	docs/re/rivals.md	rivals
+0x4b3ac0	Race::SpawnTraffic	traffic	V	H+G+C+file	docs/re/traffic.md	traffic
 0x4b3c60	Race::BuildRandomOpponentRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x4b4040	Race::SpawnOpponents	canon	V	ghidra	docs/re/canon.md	canon
 0x4b4380	Race::MatchOpponentRatings	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
 0x4b4590	Race::RollOpponentSkill	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals
 0x4b4610	Race::ShuffleGrid	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals
 0x4b47a0	ApplyOptionsToPlayerSettings	camera	V	G+C	docs/re/camera.md	camera
+0x4b49e0	RaceSetup_Circuit	traffic	I	H	docs/re/traffic.md	traffic
 0x4b5df0	Career::StartRaceFromEvent	canon	V	ghidra+capstone	docs/re/canon.md	canon
 0x4b6300	Race::SetPlayerGridSlot	canon	V	ghidra	docs/re/canon.md	canon
 0x4bbd70	CarPart::GetNameAttribute	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -621,6 +650,9 @@ addr	name	system	confidence	tool	doc	from
 0x57cb70	CarData_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x57ce10	CarPartDatabase::GetCarPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x57cf70	GetCarTypeInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x57cfa0	CarTypeInfo_NextOfUsage	traffic	V	H+G	docs/re/traffic.md	traffic
+0x57d000	TrafficCar_PickType	traffic	V	H+G+C+file	docs/re/traffic.md	traffic
+0x57d160	Ride_Init	traffic	I	G	docs/re/traffic.md	traffic
 0x57d860	RideInfo::SyncPartsToPhysicsForAI	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x57ea80	RideInfo::UpdatePartsEnabled	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x57f170	GetStockPerformanceMeasure	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -636,6 +668,10 @@ addr	name	system	confidence	tool	doc	from
 0x5809c0	DriverInfo::DriverInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x580b00	GetUsedCarTextureInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x581b30	MakeAccelerationTable	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x582f90	TrafficAI::ctor	traffic	I	C+H	docs/re/traffic.md	traffic
+0x5832a0	TrafficCar_Park	traffic	V	G+C	docs/re/traffic.md	traffic
+0x583350	TrafficAI::Update	traffic	V	H+G	docs/re/traffic.md	traffic
+0x583700	TrafficAI::Reset	traffic	I	H	docs/re/traffic.md	traffic
 0x583f20	LinearTable::Lookup11	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
 0x584b10	RigidBody::SetMassInertia	props	V	hopper+ghidra	docs/re/props.md	props
 0x588d10	TriggerVolume::Loader	assets	V	Hopper sub_588d10 + Ghidra make FUN_00588d10: H+G agree	docs/re/assets.md	assets
@@ -686,7 +722,45 @@ addr	name	system	confidence	tool	doc	from
 0x597c90	Smokeable::Release	props	I	ghidra	docs/re/props.md	props
 0x597d10	Smokeable::BuildChildren	props	I	hopper+ghidra	docs/re/props.md	props
 0x597e10	Smokeable::BuildChildPart	props	I	hopper+ghidra	docs/re/props.md	props
-0x598b60	TrafficTeleporter::IsPrimaryTeleportationSpotAllowed	other	I	ghidra+hopper	docs/re/tuning.md	tuning
+0x5983d0	SpawnRecord_Allowed	traffic	V	G+H	docs/re/traffic.md	traffic
+0x598510	Teleporter_RestoreState	traffic	I	H	docs/re/traffic.md	traffic
+0x598600	TrafficTeleporter::DoTimestep	traffic	V	H+G	docs/re/traffic.md	traffic
+0x5988c0	Teleporter_NeedsMove	traffic	V	H+G	docs/re/traffic.md	traffic
+0x598a50	Teleporter_IsPassed	traffic	V	H+G	docs/re/traffic.md	traffic
+0x598b60	TrafficTeleporter::IsPrimaryTeleportationSpotAllowed	traffic	V	G+file	docs/re/traffic.md	traffic
+0x598bf0	TrafficTeleporter::PlaceCar	traffic	V	H+G	docs/re/traffic.md	traffic
+0x598c80	PlaceCar_SpawnRecord	traffic	I	G	docs/re/traffic.md	traffic
+0x598fb0	PlaceCar_RandomNode	traffic	I	H+G	docs/re/traffic.md	traffic
+0x5991a0	PlaceCar_Route	traffic	I	G	docs/re/traffic.md	traffic
+0x5992f0	TrafficCar_Place	traffic	I	G	docs/re/traffic.md	traffic
+0x5995e0	PickLaneEitherSide	traffic	I	G	docs/re/traffic.md	traffic
+0x599660	PickLane	traffic	I	G	docs/re/traffic.md	traffic
+0x599830	Teleporter_MoveCar	traffic	V	H+G	docs/re/traffic.md	traffic
+0x5999c0	Teleporter_MoveRoute	traffic	I	G	docs/re/traffic.md	traffic
+0x599b20	FindNodeAtRoute	traffic	I	G	docs/re/traffic.md	traffic
+0x599c80	Teleporter_MoveToSpawnRecord	traffic	V	H+G	docs/re/traffic.md	traffic
+0x599fc0	SpawnRecord_Find	traffic	V	H+G	docs/re/traffic.md	traffic
+0x59a2c0	Teleporter_MoveFreeRun	traffic	V	G+C+H	docs/re/traffic.md	traffic
+0x59a7c0	TrafficCar_Move	traffic	I	G	docs/re/traffic.md	traffic
+0x59aa60	Spot_IsClear	traffic	V	H+G+file	docs/re/traffic.md	traffic
+0x59ac20	Teleporter_NearPlayerRoute	traffic	I	H+G	docs/re/traffic.md	traffic
+0x59ac80	Teleporter_CarInRange	traffic	I	G	docs/re/traffic.md	traffic
+0x59ad90	Spot_NearPlayerRoute	traffic	V	H+G	docs/re/traffic.md	traffic
+0x59ae60	Teleporter_ReloadTimer	traffic	V	H+G	docs/re/traffic.md	traffic
+0x59aea0	PickTravelSide	traffic	I	G	docs/re/traffic.md	traffic
+0x59b1e0	Spot_NearOtherCar	traffic	V	H+G	docs/re/traffic.md	traffic
+0x59b2c0	PickRandomSection	traffic	I	G	docs/re/traffic.md	traffic
+0x59b370	Teleporter_PickPlayer	traffic	I	G	docs/re/traffic.md	traffic
+0x59b3e0	Teleporter_Spacing	traffic	V	H+G+file	docs/re/traffic.md	traffic
+0x59b490	NearestPlayer	traffic	I	G	docs/re/traffic.md	traffic
+0x59b590	TrafficCar_PickPaint	traffic	I	G	docs/re/traffic.md	traffic
+0x59b620	TrafficDriverMode_Map	traffic	I	G	docs/re/traffic.md	traffic
+0x59b670	Zone_SpacingMin	traffic	V	C+G	docs/re/traffic.md	traffic
+0x59b6a0	Zone_SpacingMax	traffic	V	C+G	docs/re/traffic.md	traffic
+0x59b6d0	Intersections_UpdateAll	traffic	V	H+G	docs/re/traffic.md	traffic
+0x59b710	Teleporter_Disable	traffic	I	G	docs/re/traffic.md	traffic
+0x59b790	Teleporter_Enable	traffic	I	G	docs/re/traffic.md	traffic
+0x59b8d0	Teleporter_SlowCarNear	traffic	I	G	docs/re/traffic.md	traffic
 0x59c850	Spline::InitBasis	assets	V	Ghidra make FUN_0059c850	docs/re/assets.md	assets
 0x59db60	Spline::Finalize	assets	I	Ghidra make FUN_0059db60	docs/re/assets.md	assets
 0x59dd90	SplineSet::Loader	assets	V	Hopper sub_59dd90 + Ghidra export FUN_0059dd90: H+G agree	docs/re/assets.md	assets
@@ -744,6 +818,7 @@ addr	name	system	confidence	tool	doc	from
 0x5a4420	UnlockTeller::GetNewlyUnlockedPartLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a4de0	AnimSkeleton_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets
 0x5a4e90	AnimSkeleton_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
+0x5a53c0	RoadPath_Step	traffic	V	G+file	docs/re/traffic.md	traffic
 0x5a96b0	GetDoorLineHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a97f0	GetDoorLineMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5a9930	GetHoodSpoilerHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
@@ -755,6 +830,11 @@ addr	name	system	confidence	tool	doc	from
 0x5a9ce0	CompositeSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5aa2d0	GetTempCarSkinTextures	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
 0x5aa800	CompositeWheel	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning
+0x5aa970	TrafficIntersection_SavePtr	traffic	I	H	docs/re/traffic.md	traffic
+0x5aa9f0	TrafficIntersection_Save	traffic	V	H+C	docs/re/traffic.md	traffic
+0x5aaa90	IncomingTrafficCar_Save	traffic	V	H+C	docs/re/traffic.md	traffic
+0x5aaf10	Intersection_Update	traffic	I	G	docs/re/traffic.md	traffic
+0x5ab210	SpawnRecord_GetNode	traffic	V	G+H	docs/re/traffic.md	traffic
 0x5ab550	MovieSubtitles::FindByName	assets	V	Hopper sub_5ab550	docs/re/assets.md	assets
 0x5ab5a0	MovieSubtitles::Update	assets	V	Hopper sub_5ab5a0	docs/re/assets.md	assets
 0x5ab640	MovieSubtitles::Loader	assets	V	Ghidra make FUN_005ab640 (Hopper export lacks it)	docs/re/assets.md	assets
@@ -822,6 +902,13 @@ addr	name	system	confidence	tool	doc	from
 0x684aa8	EAX_CarFX::~EAX_CarFX	audio.engine	I	ghidra	docs/re/sound.md	sound
 0x6860d3	EAXSND8Wrapper::EAXSND8Wrapper (SEH unwind funclet, not the ctor)	other	V	ghidra	docs/re/sound.md	sound
 0x688888	(not a function: SEH frame handler thunk)	other	V	ghidra+hopper	docs/re/tuning.md	tuning
+0x6b5a30	TeleportInterval_Free	traffic	V	G+file	docs/re/traffic.md	traffic
+0x6b5a34	TeleportInterval_Route	traffic	V	G+file	docs/re/traffic.md	traffic
+0x6b5a38	TeleportFirstStep	traffic	V	G+file	docs/re/traffic.md	traffic
+0x6b5a3c	TeleportRouteLimit	traffic	V	G+file	docs/re/traffic.md	traffic
+0x6b5a50	TeleportSlowPlayerSpeed	traffic	V	G+file	docs/re/traffic.md	traffic
+0x6b5a5c	TeleportSpawnObjSpeed	traffic	V	G+file	docs/re/traffic.md	traffic
+0x6b5a68	SpawnRecordWindow	traffic	V	G+file	docs/re/traffic.md	traffic
 0x6b6c5c	CamBlend_Dist_A	camera	I	D	docs/re/camera.md	camera
 0x6b6c60	CamBlend_Height_A	camera	I	D	docs/re/camera.md	camera
 0x6b6c64	CamBlend_Dist_B	camera	I	D	docs/re/camera.md	camera
@@ -833,6 +920,8 @@ addr	name	system	confidence	tool	doc	from
 0x6b6cc0	RearView_Param_192	camera	V	C+D	docs/re/camera.md	camera
 0x6b7a7c	SlowMoArg1	camera	I	D	docs/re/camera.md	camera
 0x6b7aac	JumpCam_EdgeOffset	camera	V	C+D	docs/re/camera.md	camera
+0x6b9690	TrafficAI_ClassNames	traffic	U	C+file	docs/re/traffic.md	traffic
+0x6b96b0	TrafficAI_vtable	traffic	I	C+file	docs/re/traffic.md	traffic
 0x6c7fc8	vtable_DriveCameraMover	camera	V	G+D	docs/re/camera.md	camera
 0x6c8060	Str_SpeedCam	camera	V	D	docs/re/camera.md	camera
 0x6c806c	Str_DragCameras_bin	camera	V	D	docs/re/camera.md	camera
@@ -841,6 +930,7 @@ addr	name	system	confidence	tool	doc	from
 0x6cc7bc	K_ONE	blur	V	C+D	docs/re/blur.md	blur
 0x6cc7dc	K_HALF	blur	V	C+D	docs/re/blur.md	blur
 0x6cc970	K_BLUR_MIN_T	blur	V	C+D	docs/re/blur.md	blur
+0x6cc988	TeleportSpeedFlip	traffic	V	G+file	docs/re/traffic.md	traffic
 0x6cc9d8	K_BLUR_PASS2_MUL	blur	V	C+D	docs/re/blur.md	blur
 0x6ccb7c	K_EPS_SPEED	blur	V	C+D	docs/re/blur.md	blur
 0x6ccc0c	K_BLUR_W_MUL	blur	V	C+D	docs/re/blur.md	blur
@@ -911,10 +1001,20 @@ addr	name	system	confidence	tool	doc	from
 0x71abac	gBlurSurfB	blur	V	C	docs/re/blur.md	blur
 0x71abb0	gStreakSurf	blur	V	C	docs/re/blur.md	blur
 0x73457c	FrameDt	camera	I	C	docs/re/camera.md	camera
+0x734588	CarTypeInfoTable	traffic	V	H+G+file	docs/re/traffic.md	traffic
 0x735ee8	CamTweakerEnable	camera	I	C	docs/re/camera.md	camera
 0x735f5c	gCamFlag735f5c	camera	I	G+C	docs/re/camera.md	camera
+0x736150	RoadEntries_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic
+0x736154	RoadEntries_Count	traffic	V	H+C	docs/re/traffic.md	traffic
+0x736158	RoadIntersections_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic
+0x73615c	RoadIntersections_Count	traffic	V	H+C	docs/re/traffic.md	traffic
+0x736160	SpawnRecords_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic
+0x736164	SpawnRecords_Count	traffic	V	H+C	docs/re/traffic.md	traffic
+0x736168	TrackRows_Ptr	traffic	V	H+G+file	docs/re/traffic.md	traffic
+0x736174	TrackRow_CurrentPtr	traffic	V	H+G	docs/re/traffic.md	traffic
 0x7361a4	CamGateFlagB	camera	I	C	docs/re/camera.md	camera
 0x7361f0	gGameModePtr	camera	I	C	docs/re/camera.md	camera
+0x7361f8	WorldCarList	traffic	I	H+G	docs/re/traffic.md	traffic
 0x736384	gBlurOrStreaksActive	blur	V	C	docs/re/blur.md	blur
 0x73641c	gBlurSpecialN	blur	V	G+C	docs/re/blur.md	blur
 0x73645c	gSceneRTMode	blur	V	C	docs/re/blur.md	blur
@@ -925,7 +1025,16 @@ addr	name	system	confidence	tool	doc	from
 0x740500	gBlurCameraObj	blur	V	C	docs/re/blur.md	blur
 0x758938	POVSaveTable	camera	I	C	docs/re/camera.md	camera
 0x758948	POVIndexPerPlayer	camera	I	C	docs/re/camera.md	camera
+0x77af20	RoadSectionManager	traffic	V	H+C+file	docs/re/traffic.md	traffic
+0x77af30	RoadSectionTable	traffic	V	H+C	docs/re/traffic.md	traffic
+0x78a2f0	TrackId	traffic	V	H+G	docs/re/traffic.md	traffic
+0x78a2fc	TrackDirection	traffic	V	H+G	docs/re/traffic.md	traffic
+0x78a300	TrafficLevel	traffic	V	H+G	docs/re/traffic.md	traffic
+0x78a304	TrafficSameSideProb	traffic	I	H+G	docs/re/traffic.md	traffic
 0x78a345	CamGateFlagA	camera	I	C	docs/re/camera.md	camera
+0x78a347	TrafficOffFlag	traffic	V	H+G	docs/re/traffic.md	traffic
 0x78a3fa	OPT_JumpCamEnabled	camera	I	C	docs/re/camera.md	camera
 0x78a3fb	OPT_SpecialSlowmoEnabled	camera	I	C	docs/re/camera.md	camera
+0x78a3fc	TrafficDriverMode	traffic	I	G	docs/re/traffic.md	traffic
+0x78a418	Entrants_Ptr	traffic	V	H+G	docs/re/traffic.md	traffic
 0x78d270	gCameraObj	blur	V	C	docs/re/blur.md	blur
