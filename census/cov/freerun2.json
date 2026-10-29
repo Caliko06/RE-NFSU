@@ -1,0 +1,9 @@
+{
+ "scenario": "freerun2",
+ "hits": 5438,
+ "via_call": 1735,
+ "total": 13739,
+ "secs": 31.6,
+ "rn_secs": 420,
+ "end": "RN_JUMP: done, back in the front end at frame 4638"
+}

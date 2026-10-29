@@ -1,0 +1,9 @@
+{
+ "scenario": "cj25",
+ "hits": 4932,
+ "via_call": 1545,
+ "total": 13739,
+ "secs": 420.0,
+ "rn_secs": 420,
+ "end": "RN_SECS: stopped after 420 s (no stop reached)"
+}

@@ -1,0 +1,9 @@
+{
+ "scenario": "lapko2",
+ "hits": 5477,
+ "via_call": 1719,
+ "total": 13739,
+ "secs": 68.7,
+ "rn_secs": 420,
+ "end": "RN_JUMP: done, back in the front end at frame 9234"
+}

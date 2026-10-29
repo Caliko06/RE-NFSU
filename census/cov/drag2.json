@@ -1,0 +1,9 @@
+{
+ "scenario": "drag2",
+ "hits": 3212,
+ "via_call": 1100,
+ "total": 13739,
+ "secs": 31.8,
+ "rn_secs": 420,
+ "end": "STOP in thread c at 004b585b: d3d9: Present with rects/window (00000010 00000000 00000000 00000000)"
+}

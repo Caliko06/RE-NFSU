@@ -88,3 +88,4 @@ Open: see each doc's Open list (traffic: writer of [ebx+0x59d4], Free Run x1.5, 
 10:58 track done (sonnet-exec): docs/re/track.md + names_track.tsv 62 names (48 V), 10/10 second-tool; names.tsv 1,101 addresses; scoreboard named 948 (776 V). OWNER lifted the 92% quota stop (message at 10:5x): continue past it.
 11:20 hud+input (108 names, 73 V; docs/re/hud_input.md) and runtime (126 names; docs/re/runtime.md) done and merged: names.tsv 1,335 addresses, scoreboard named 1,180 (938 V). V-recheck of 69 inconclusive rows still running. verify_re.py 35 claims ALL PASS.
 11:45 V-name recheck of the 69 inconclusive rows read by hand: 66 hold, 2 corrected (0x700b44 -> SpecialCamModeTable I, 0x549130 -> EAXMod::NopArg1), 1 still open (0x537460 now I). Wave-2 coverage (10 scenarios) running.
+11:55 wave-2 coverage done: 22 scenarios, union 6,067 (44.2%, +29). drag2 (track 1203) stops at d3d9 Present with rects/window.

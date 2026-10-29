@@ -83,7 +83,7 @@ Evidence marks are about the docs named; none of these was re-run here.
 
 Universe = the 13,739 lifted functions.
 - tagged = a system tag of confidence med/high in census/systems.tsv, or a name in names_*.tsv. The name's system overrides the graph tag (the audit found 47% of named functions had a different system in the graph). Before this change `tagged` counted every non-unknown function (12,179) and told nothing.
-- ran = RN_COV union, a floor (prologue only), 12 scenarios.
+- ran = RN_COV union, a floor (prologue only), 22 scenarios (12 first, 10 more tracks and career rows later the same day added only 29 functions: 6,038 -> 6,067).
 - named = a row in census/names_*.tsv with a system (V or I); named V = a second tool agrees (an automatic recheck of the 328 one-tool V rows: 259 hold, 69 inconclusive, 0 contradicted (docs/re/audit/v_recheck.tsv)).
 - diff-tested = lifted functions compared against Unicorn with all cases equal (census/difftest.json `compared_funcs`, rerun 2026-10-29 with 8 cases: 5,798 compared, 5,794 equal, gate FAIL on the same 4 functions as before: 3 documented QEMU deviations and 0x67a337, whose reference retires into 0x6728cc where nothing was lifted).
 - Names land in the system of the night's work: track, input, runtime and hud have almost no names because nobody named them yet (free tracks were never done).
@@ -91,20 +91,20 @@ Universe = the 13,739 lifted functions.
 | system | lifted | tagged | ran | named | named V | diff-tested |
 |---|---|---|---|---|---|---|
 | render | 2230 | 907 | 935 | 24 | 15 | 834 |
-| canon | 1980 | 938 | 643 | 66 | 62 | 643 |
-| runtime | 1747 | 579 | 694 | 126 | 90 | 949 |
-| unknown | 1516 | 0 | 866 | 0 | 0 | 874 |
-| audio | 1329 | 528 | 817 | 209 | 197 | 554 |
+| canon | 1980 | 938 | 653 | 66 | 62 | 643 |
+| runtime | 1747 | 579 | 695 | 126 | 90 | 949 |
+| unknown | 1516 | 0 | 870 | 0 | 0 | 874 |
+| audio | 1329 | 528 | 825 | 209 | 197 | 554 |
 | car | 1037 | 531 | 371 | 216 | 189 | 323 |
-| rivals | 1030 | 584 | 551 | 28 | 21 | 370 |
+| rivals | 1030 | 584 | 552 | 28 | 21 | 370 |
 | online | 688 | 296 | 26 | 1 | 1 | 329 |
-| track | 664 | 274 | 335 | 62 | 48 | 243 |
+| track | 664 | 274 | 340 | 62 | 48 | 243 |
 | hud | 349 | 181 | 172 | 61 | 51 | 110 |
 | assets | 328 | 227 | 217 | 182 | 168 | 221 |
 | camera | 287 | 123 | 92 | 51 | 20 | 83 |
 | traffic | 230 | 155 | 173 | 82 | 37 | 120 |
 | props | 177 | 82 | 97 | 22 | 16 | 59 |
 | input | 147 | 97 | 49 | 50 | 23 | 69 |
-| TOTAL | 13739 | 5502 | 6038 | 1180 | 938 | 5781 |
+| TOTAL | 13739 | 5502 | 6067 | 1180 | 938 | 5781 |
 
-Reading: tagged is 39% of the functions, not 89%. Named is 9% (1,180), named V 7% (938). Ran is 44%. Diff-tested is 42% (5,781). Names added after the audit: track 62, runtime 126, hud+input 108.
+Reading: tagged is 39% of the functions, not 89%. Named is 9% (1,180), named V 7% (938). Ran is 44.2% (6,067). Diff-tested is 42% (5,781). Names added after the audit: track 62, runtime 126, hud+input 108.

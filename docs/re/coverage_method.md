@@ -40,3 +40,5 @@ Entry of a function, not instructions inside it. ABK modules (`M_` functions, bu
 write the map without a lock (byte stores). A run killed by the OS writes nothing.
 
 Copies of the 12 raw bitmaps (3,444 B each: header, `entered`, `seen by rn_call`) are kept in census/cov/bitmaps/ so the union can be rebuilt after build/ is cleaned (external audit 2026-10-29: census/cov/<s>.json keep only counts).
+
+Second wave (2026-10-29 later): 10 more scenarios (circuit2 1006, sprint2 1108, lapko2 1005, freerun2 1004, drag2 1203, drift2 1301, cj3, cj12, cj25, cj60). Union 6,038 -> 6,067 (44.2%): more tracks of the same modes add almost nothing, so the ceiling of this method is near. drag2 stops at `d3d9: Present with rects/window` (host 0x4b585b), 3,212 functions. cj3 and cj25 ran to the 420 s bound without finishing. Bitmaps for all 22 are in census/cov/bitmaps/.

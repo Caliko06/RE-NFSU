@@ -1,0 +1,9 @@
+{
+ "scenario": "cj12",
+ "hits": 5578,
+ "via_call": 1754,
+ "total": 13739,
+ "secs": 408.0,
+ "rn_secs": 420,
+ "end": "RN_JUMP: done, back in the front end at frame 7915"
+}
