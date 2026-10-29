@@ -626,8 +626,11 @@ static uint32_t IDirect3D9_CreateDevice(Ctx *c) {
     uint32_t window = p[7] ? p[7] : focus;
     uint32_t r = take_pp(c, pp, window);
     if (r != D3D_OK) return r;
-    // Without D3DCREATE_FPU_PRESERVE the runtime sets the calling thread's FPU to single precision, round to nearest.
-    if (!(flags & 2)) c->fcw &= ~0xf00u;
+    // Without D3DCREATE_FPU_PRESERVE the runtime sets the calling thread's FPU to single precision, round to nearest, and
+    // masks every exception (Wine wined3d setup_fpu: cw = (cw & ~0xf3f) | 0x3f). The game's _controlfp(3, 0x8001f) at
+    // 0x40884d leaves invalid/zero/overflow unmasked (0x232); on Windows CreateDevice masks them again, so a NaN into
+    // pow 0x5443f0 gives a quiet NaN instead of c0000090 (docs/openworld/re_answers_0b.md Q6).
+    if (!(flags & 2)) c->fcw = (c->fcw & ~0xf3fu) | 0x3f;
     dev.flags = flags;
     dev.window = window;
     dev.guest = new_obj(c, I_DEVICE);
