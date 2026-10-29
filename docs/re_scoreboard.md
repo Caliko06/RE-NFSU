@@ -79,27 +79,27 @@ Evidence marks are about the docs named; none of these was re-run here.
    "100 %" per system means every function is tagged, every function that ran is named or marked trivial, and every
    one that never ran is proven dead (SIMD path, online, installer) or has a scenario that reaches it.
 
-## 5. Four numbers per system (tools/census/scoreboard.py, 2026-10-29, V)
+## 5. Four numbers per system (tools/census/scoreboard.py, 2026-10-29 09:20, V)
 
 Universe = the 13,739 lifted functions. tagged = systems.tsv (draft: ~12% of tags wrong in a manual read, see docs/re/systems_method.md); ran = RN_COV union, a floor (prologue only); named = census/names_*.tsv (V = second tool agrees); diff-tested = U per system, difftest.json keeps only the total (5,813 compared, 5,809 equal).
 
 | system | lifted | tagged | ran | named | named V | diff-tested |
 |---|---|---|---|---|---|---|
-| render | 2243 | 2243 | 949 | 28 | 20 | U |
-| canon | 2056 | 2056 | 682 | 93 | 80 | U |
-| runtime | 1771 | 1771 | 716 | 27 | 23 | U |
-| unknown | 1560 | 0 | 905 | 16 | 10 | U |
+| render | 2243 | 2243 | 949 | 32 | 22 | U |
+| canon | 2056 | 2056 | 682 | 123 | 107 | U |
+| runtime | 1771 | 1771 | 716 | 33 | 28 | U |
+| unknown | 1560 | 0 | 905 | 35 | 28 | U |
 | audio | 1299 | 1299 | 789 | 178 | 167 | U |
-| rivals | 1085 | 1085 | 604 | 24 | 23 | U |
-| car | 964 | 964 | 335 | 130 | 112 | U |
-| track | 792 | 792 | 449 | 45 | 31 | U |
+| rivals | 1085 | 1085 | 604 | 79 | 58 | U |
+| car | 964 | 964 | 335 | 140 | 119 | U |
+| track | 792 | 792 | 449 | 130 | 106 | U |
 | online | 691 | 691 | 28 | 2 | 2 | U |
-| hud | 354 | 354 | 178 | 6 | 4 | U |
-| camera | 261 | 261 | 79 | 20 | 10 | U |
-| traffic | 197 | 197 | 140 | 5 | 4 | U |
-| props | 183 | 183 | 103 | 2 | 1 | U |
-| assets | 154 | 154 | 46 | 6 | 6 | U |
-| input | 129 | 129 | 35 | 0 | 0 | U |
-| TOTAL | 13739 | 12179 | 6038 | 582 | 493 | 5813 (no split) |
+| hud | 354 | 354 | 178 | 26 | 20 | U |
+| camera | 261 | 261 | 79 | 24 | 14 | U |
+| traffic | 197 | 197 | 140 | 48 | 29 | U |
+| props | 183 | 183 | 103 | 28 | 20 | U |
+| assets | 154 | 154 | 46 | 7 | 7 | U |
+| input | 129 | 129 | 35 | 1 | 1 | U |
+| TOTAL | 13739 | 12179 | 6038 | 886 | 728 | 5813 (no split) |
 
-Reading: "unknown" (1,154) is the untagged remainder. Named is under 4% in every system; audio and car lead because of the night block. Ran 44% overall; online (23 of 797) is mostly dead by scope.
+Reading: "unknown" is the untagged remainder. Named is still low in every system; audio, car, rivals, traffic, props, canon and camera moved during the night block. Ran is 44% overall.
