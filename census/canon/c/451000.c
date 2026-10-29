@@ -1,13 +1,15 @@
-// ==== 0x451190 FUN_00451190
+// ==== 0x451190 AIActionBlock::HasBeenAccomplished
 
-undefined4 __fastcall FUN_00451190(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __fastcall AIActionBlock__HasBeenAccomplished(int param_1)
 
 {
   int iVar1;
   uint uStack_4;
   
   uStack_4 = 0;
-  iVar1 = FUN_00450ec0(&uStack_4);
+  iVar1 = AIActionBlock__CalculateScore(&uStack_4);
   if (-1 < iVar1) {
     if (uStack_4 != *(uint *)(param_1 + 0x200)) {
       *(uint *)(param_1 + 0x200) = uStack_4;
@@ -18,9 +20,11 @@ undefined4 __fastcall FUN_00451190(int param_1)
 }
 
 
-// ==== 0x4511e0 FUN_004511e0
+// ==== 0x4511e0 AIActionBlock::HasFailed
 
-uint __thiscall FUN_004511e0(int param_1,int param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+uint __thiscall AIActionBlock__HasFailed(int param_1,int param_2)
 
 {
   float fVar1;
@@ -42,9 +46,11 @@ uint __thiscall FUN_004511e0(int param_1,int param_2)
 }
 
 
-// ==== 0x451230 FUN_00451230
+// ==== 0x451230 AIActionBlock::CalculatePointsToDrive
 
-void __thiscall FUN_00451230(int param_1,int *param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionBlock__CalculatePointsToDrive(int param_1,int *param_2)
 
 {
   int *piVar1;
@@ -157,16 +163,19 @@ void __thiscall FUN_004512f0(undefined4 param_1)
 }
 
 
-// ==== 0x451400 FUN_00451400
+// ==== 0x451400 AIActionPullOver::AIActionPullOver
 
-void __thiscall FUN_00451400(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall
+AIActionPullOver__AIActionPullOver(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   float *pfVar1;
   undefined4 *unaff_ESI;
   int *unaff_EDI;
   
-  FUN_0044e2b0(9,param_1,param_2);
+  AIAction__AIAction(9,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c925c;
   unaff_ESI[0x80] = 0;
   unaff_ESI[0x81] = 0;
@@ -193,16 +202,18 @@ void __thiscall FUN_00451400(undefined4 param_1,undefined4 param_2,undefined4 pa
 }
 
 
-// ==== 0x4514c0 FUN_004514c0
+// ==== 0x4514c0 AIActionPullOver::DoSnapshot
 
-void __thiscall FUN_004514c0(int param_1,int param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionPullOver__DoSnapshot(int param_1,int param_2)
 
 {
   int iVar1;
   char cVar2;
   
   FUN_00571ea0(0,"AIActionPullOver");
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   FUN_00571c20(param_2,param_1 + 0x200,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x204,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x208,1,1,0);
@@ -339,7 +350,7 @@ void __thiscall FUN_004515c0(int param_1,int *param_2)
     local_1e8 = *(float *)(*param_2 + 0x3d4);
     if (local_1e2 == '\0') {
       if ((param_2[0xe3] == 0) || (*(char *)(param_1 + 0x208) == '\0')) {
-        FUN_0044e950(0x3e4ccccd);
+        AIAction__SetDesiredSpeedToMaxDeceleration(0x3e4ccccd);
       }
       else if (local_1e8 <= 15.0) {
         fVar10 = (float10)FUN_00451590(param_1);
@@ -427,7 +438,7 @@ void __thiscall FUN_004519f0(undefined4 param_1,undefined4 param_2,float param_3
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(10,param_1,param_2);
+  AIAction__AIAction(10,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c916c;
   unaff_ESI[0x80] = 0;
   unaff_ESI[0x80] = DAT_0073ad34;
@@ -453,7 +464,7 @@ void __thiscall FUN_00451a70(int param_1,int param_2)
   FUN_00571c20(param_2,param_1 + 0x200,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x204,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x208,1,1,0);
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10;
   *(int *)(iVar1 + param_2 + 0x58) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0x58 + param_2);
   cVar2 = *(char *)(param_2 + 0x40) + -1;
@@ -499,7 +510,7 @@ LAB_00451b94:
          (*(float *)(iVar5 + 0x3d4) < 25.0 == (*(float *)(iVar5 + 0x3d4) == 25.0))) &&
         ((*(int *)(iVar5 + 0x24) != 4 ||
          (*(float *)(iVar5 + 0x3d4) < 20.0 == (*(float *)(iVar5 + 0x3d4) == 20.0))))) ||
-       (iVar5 = FUN_0044e9c0(1), iVar5 != 1)) goto LAB_00451be0;
+       (iVar5 = AIAction__GetHeadingClassification(1), iVar5 != 1)) goto LAB_00451be0;
   }
   else {
     fVar2 = (*(float *)(*param_1 + 0x60) - *pfVar1) * pfVar1[4] -
@@ -520,7 +531,7 @@ LAB_00451be0:
     do {
       if (bVar3) goto LAB_00451c8b;
       iVar6 = FUN_00468820(iVar8);
-      iVar7 = FUN_0044ecd0();
+      iVar7 = AIAction__GetCollisionClassification();
       if (((iVar7 == 0) && (0.4 <= (float)(DAT_0073ad34 - *(int *)(iVar6 + 8)) * 0.00025)) &&
          ((*(float *)(*param_1 + 0x3d4) < 5.0 ||
           (iVar6 = bAlmostEqual_float(*(float *)(*param_1 + 0x3d4),0x40a00000,0x3a83126f),
@@ -632,7 +643,7 @@ undefined4 __thiscall FUN_00451dc0(int param_1,int *param_2)
     iVar7 = 0;
     do {
       iVar5 = FUN_00468820(iVar7);
-      iVar6 = FUN_0044ecd0();
+      iVar6 = AIAction__GetCollisionClassification();
       if ((iVar6 == 0) && (0.4 <= (float)(DAT_0073ad34 - *(int *)(iVar5 + 8)) * 0.00025)) {
         fVar2 = *(float *)(*param_2 + 0x3d4);
         if (fVar2 < 5.0) {
@@ -670,7 +681,7 @@ char __thiscall FUN_00451f10(int param_1,int *param_2)
     if ((*(char *)(param_1 + 0x208) == '\0') ||
        (*(float *)(param_1 + 0x204) <= (float)(DAT_0073ad34 - *(int *)(param_1 + 0x200)) * 0.00025))
     {
-      iVar3 = FUN_0044e9c0(1);
+      iVar3 = AIAction__GetHeadingClassification(1);
       if (iVar3 == 2) {
         return '\x01';
       }
@@ -682,7 +693,7 @@ char __thiscall FUN_00451f10(int param_1,int *param_2)
             return cVar2;
           }
           iVar4 = FUN_00468820(iVar6);
-          iVar5 = FUN_0044ecd0();
+          iVar5 = AIAction__GetCollisionClassification();
           if (((iVar5 == 1) && (0.4 <= (float)(DAT_0073ad34 - *(int *)(iVar4 + 8)) * 0.00025)) &&
              ((ABS(*(float *)(*param_2 + 0x3d4)) < 5.0 ||
               (iVar4 = bAlmostEqual_float(*(float *)(*param_2 + 0x3d4),0x40a00000,0x3a83126f),
@@ -761,7 +772,7 @@ void __thiscall FUN_004521c0(undefined4 param_1,undefined4 param_2,undefined4 pa
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(0xc,param_1,param_2);
+  AIAction__AIAction(0xc,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c90cc;
   unaff_ESI[0x81] = 0;
   unaff_ESI[0x81] = 0;
@@ -779,7 +790,7 @@ void __thiscall FUN_00452200(int param_1,int param_2)
   char cVar2;
   
   FUN_00571ea0(0,"AIActionIJustGotHit");
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   FUN_00571c20(param_2,param_1 + 0x204,4,0xffffffff,0);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10;
   *(int *)(iVar1 + param_2 + 0x58) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0x58 + param_2);
@@ -799,7 +810,7 @@ void __thiscall FUN_00452270(int param_1,undefined4 param_2)
 {
   int iVar1;
   
-  iVar1 = FUN_0044ed70(param_2,0xbf800000,1);
+  iVar1 = AIAction__GetMostImportantNearbyCollidingAvoidable(param_2,0xbf800000,1);
   if (iVar1 != 0) {
     *(undefined4 *)(param_1 + 0x200) = *(undefined4 *)(iVar1 + 0x34);
   }
@@ -868,9 +879,9 @@ LAB_00452352:
     piVar3[0xe8] = 0;
   }
   FUN_0045ae10(piVar1,param_1 + 0x20,piVar3,0,0);
-  iVar4 = FUN_0044e9c0(0);
+  iVar4 = AIAction__GetHeadingClassification(0);
   if ((iVar4 == 1) && (0.0 < (float)piVar7[4] - (float)piVar3[(char)piVar3[0xe2] * 0xe + 6])) {
-    FUN_0044e950(0x3e4ccccd);
+    AIAction__SetDesiredSpeedToMaxDeceleration(0x3e4ccccd);
     goto LAB_004523df;
   }
   iVar4 = *(int *)(param_1 + 0x200);
@@ -880,7 +891,7 @@ LAB_00452352:
      (*(int *)(*(int *)(*piVar3 + 0x14) + 4) != 3)) {
     if (((float)piVar3[(char)piVar3[0xe2] * 0xe + 5] + (float)piVar7[3]) - 2.8 <
         (float)piVar7[4] - (float)piVar3[(char)piVar3[0xe2] * 0xe + 6]) {
-      FUN_0044e850(param_1,0x40c00000,0x3e4ccccd);
+      AIAction__SetDesiredSpeedSlowerThanThisAvoidable(param_1,0x40c00000,0x3e4ccccd);
       goto LAB_004523df;
     }
     if (2.8 - ((float)piVar3[(char)piVar3[0xe2] * 0xe + 5] + (float)piVar7[3]) <=
@@ -894,7 +905,7 @@ LAB_004524bf:
     if ((*(int *)(*(int *)(iVar4 + 0x14) + 4) != 3) ||
        (pfVar6 = (float *)FUN_00578730(),
        0.0 <= *(float *)(iVar4 + 0x90) * *pfVar6 + *(float *)(iVar4 + 0x94) * pfVar6[1])) {
-      FUN_0044e850(param_1,0x3dcccccd,0x3e4ccccd);
+      AIAction__SetDesiredSpeedSlowerThanThisAvoidable(param_1,0x3dcccccd,0x3e4ccccd);
       goto LAB_004523df;
     }
     *(undefined1 *)(param_1 + 0x1f1) = 0;
@@ -918,7 +929,7 @@ void __thiscall FUN_00452570(undefined4 param_1,undefined4 param_2)
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(0xe,param_1,param_2);
+  AIAction__AIAction(0xe,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c934c;
   unaff_ESI[0x80] = 0;
   unaff_ESI[0x80] = DAT_0073ad34;
@@ -938,7 +949,7 @@ void __thiscall FUN_004525b0(int param_1,int param_2)
   FUN_00571ea0(0,"AIActionAccidentRecovery");
   FUN_00571c20(param_2,param_1 + 0x200,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x204,1,1,0);
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10 + 0x4c + param_2;
   *(int *)(iVar1 + 0xc) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0xc);
   cVar2 = *(char *)(param_2 + 0x40) + -1;
@@ -1048,7 +1059,7 @@ void __thiscall FUN_004527d0(undefined4 param_1,undefined4 param_2)
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(8,param_1,param_2);
+  AIAction__AIAction(8,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c920c;
   unaff_ESI[0x80] = 0;
   unaff_ESI[0x80] = 0;
@@ -1066,7 +1077,7 @@ void __thiscall FUN_00452800(int param_1,int param_2)
   
   FUN_00571ea0(0,"AIActionDriveTrafficLane");
   FUN_00571c20(param_2,param_1 + 0x200,4,0xffffffff,0);
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10;
   *(int *)(iVar1 + param_2 + 0x58) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0x58 + param_2);
   cVar2 = *(char *)(param_2 + 0x40) + -1;
@@ -1116,7 +1127,7 @@ void __thiscall FUN_004528b0(int param_1,int *param_2)
   *(float *)(param_1 + 0x1e4) = (float)fVar4;
   if (((DAT_0078a344 != '\0') || (DAT_007361a8 != 0)) && (*(int *)(*(int *)(iVar1 + 0x14) + 4) == 2)
      ) {
-    FUN_0044f6c0(param_1);
+    AIAction__MaybeUseNitrous(param_1);
   }
   *(undefined4 *)(param_1 + 0x1ec) = 0x40000000;
   *(undefined1 *)(param_1 + 0x1f1) = 1;
@@ -1144,7 +1155,7 @@ FUN_00452990(undefined4 param_1,undefined4 *param_2,undefined4 param_3,undefined
   pcStack_8 = FUN_00686048;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  FUN_0044e2b0(2,param_1,param_3);
+  AIAction__AIAction(2,param_1,param_3);
   *param_2 = &PTR_FUN_006c911c;
   iVar2 = 0;
   param_2[0x84] = 0;
@@ -1180,7 +1191,7 @@ void __thiscall FUN_00452a80(int param_1,int param_2)
   char cVar2;
   
   FUN_00571ea0(0,"AIActionAvoidCrossTraffic");
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   FUN_00571c20(param_2,param_1 + 0x204,4,0xffffffff,0);
   FUN_005aaf90();
   FUN_00571c20(param_2,param_1 + 0x20c,4,0xffffffff,0);
@@ -1354,7 +1365,7 @@ void __thiscall FUN_00452d20(int param_1,int *param_2)
               *(float *)(param_1 + 0x1e4) = (float)(fVar6 + fVar6);
               *(undefined4 *)(param_1 + 0x1ec) = 0;
               *(undefined4 *)(param_1 + 0x1e8) = 0;
-              FUN_0044f6c0(param_1);
+              AIAction__MaybeUseNitrous(param_1);
               goto LAB_00452dad;
             }
           }
@@ -1436,7 +1447,7 @@ void __thiscall FUN_00453090(undefined4 param_1,undefined4 param_2,undefined4 pa
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(0xd,param_1,param_2);
+  AIAction__AIAction(0xd,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c92fc;
   unaff_ESI[0x80] = param_3;
   return;
@@ -1452,7 +1463,7 @@ void FUN_004530c0(int param_1)
   char cVar2;
   
   FUN_00571ea0(0,"AIActionIJustGotHitDragRace");
-  FUN_0044e370(param_1);
+  AIAction__DoSnapshot(param_1);
   iVar1 = *(char *)(param_1 + 0x40) * 0x10;
   *(int *)(iVar1 + param_1 + 0x58) = *(int *)(param_1 + 0x150) - *(int *)(iVar1 + 0x58 + param_1);
   cVar2 = *(char *)(param_1 + 0x40) + -1;
@@ -1592,7 +1603,7 @@ void __thiscall FUN_00453470(undefined4 param_1,undefined4 param_2)
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(0x10,param_1,param_2);
+  AIAction__AIAction(0x10,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c9194;
   return;
 }
@@ -1607,7 +1618,7 @@ void FUN_00453490(int param_1)
   char cVar2;
   
   FUN_00571ea0(0,"AIActionHitWallDragRace");
-  FUN_0044e370(param_1);
+  AIAction__DoSnapshot(param_1);
   iVar1 = *(char *)(param_1 + 0x40) * 0x10;
   *(int *)(iVar1 + param_1 + 0x58) = *(int *)(param_1 + 0x150) - *(int *)(iVar1 + 0x58 + param_1);
   cVar2 = *(char *)(param_1 + 0x40) + -1;
@@ -1742,7 +1753,7 @@ void __thiscall FUN_00453730(undefined4 param_1,undefined4 param_2)
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(0x11,param_1,param_2);
+  AIAction__AIAction(0x11,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c92d4;
   unaff_ESI[0x80] = 0;
   return;
@@ -1759,7 +1770,7 @@ void __thiscall FUN_00453760(int param_1,int param_2)
   
   FUN_00571ea0(0,"AIActionEndOfRace");
   FUN_00571c20(param_2,param_1 + 0x200,4,0xffffffff,0);
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10;
   *(int *)(iVar1 + param_2 + 0x58) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0x58 + param_2);
   cVar2 = *(char *)(param_2 + 0x40) + -1;
@@ -1815,7 +1826,7 @@ FUN_00453860(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(3,param_1,param_2);
+  AIAction__AIAction(3,param_1,param_2);
   unaff_ESI[0x81] = param_4;
   *unaff_ESI = &PTR_FUN_006c939c;
   unaff_ESI[0x80] = param_3;
@@ -1833,7 +1844,7 @@ void __thiscall FUN_004538a0(int param_1,int param_2)
   char cVar2;
   
   FUN_00571ea0(0,"AIActionAvoidAvoidableAsTraffic");
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   FUN_00571c20(param_2,param_1 + 0x204,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x208,4,0xffffffff,0);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10;
@@ -1881,7 +1892,7 @@ undefined4 Finder_AvoidAsTraffic(int *param_1,float *param_2,undefined4 *param_3
   else {
     param_1 = (int *)unaff_ESI[(char)unaff_ESI[0xe2] * 0xe + 7];
   }
-  iVar4 = FUN_0044f470(iVar4,param_1,0x47c34f80,&local_8,&local_4);
+  iVar4 = AIAction__IsSomeoneAheadInThisLane(iVar4,param_1,0x47c34f80,&local_8,&local_4);
   cVar3 = (**(code **)(**(int **)(iVar5 + 0x3fc) + 0xc))();
   if ((cVar3 != '\0') && (iVar4 != 0)) {
     iVar5 = FUN_00647b70();
@@ -1949,7 +1960,8 @@ char __thiscall FUN_00453a60(int param_1,int param_2)
         else {
           param_2 = *(undefined4 *)(iVar1 + 0x1c);
         }
-        iVar3 = FUN_0044f470(iVar3,param_2,*(undefined4 *)(param_1 + 0x208),&fStack_4,&param_2);
+        iVar3 = AIAction__IsSomeoneAheadInThisLane
+                          (iVar3,param_2,*(undefined4 *)(param_1 + 0x208),&fStack_4,&param_2);
         if (iVar3 == 0) {
           return '\x01';
         }
@@ -2003,7 +2015,8 @@ undefined4 __thiscall FUN_00453ba0(int param_1,int param_2)
     return 0;
   }
   local_8 = 0.0;
-  iVar2 = FUN_0044f470(param_1,0,*(undefined4 *)(param_2 + 0x208),&local_8,local_4);
+  iVar2 = AIAction__IsSomeoneAheadInThisLane
+                    (param_1,0,*(undefined4 *)(param_2 + 0x208),&local_8,local_4);
   if ((((iVar2 != 0) && (cVar1 = TrafficCar_IsIntersectionObstacle(iVar2), cVar1 != '\0')) &&
       (local_8 < 5.0 != (local_8 == 5.0))) &&
      ((local_8 < *(float *)(param_2 + 0x204) != (local_8 == *(float *)(param_2 + 0x204)) ||
@@ -2128,7 +2141,8 @@ LAB_00453e05:
   }
   fStack_44 = 0.0;
   fStack_40 = 0.0;
-  iVar5 = FUN_0044f470(iVar5,piStack_3c,*(undefined4 *)(param_1 + 0x208),&fStack_40,&fStack_44);
+  iVar5 = AIAction__IsSomeoneAheadInThisLane
+                    (iVar5,piStack_3c,*(undefined4 *)(param_1 + 0x208),&fStack_40,&fStack_44);
   if (iVar5 == 0) {
     if (bVar3) goto LAB_00454051;
   }
@@ -2236,7 +2250,7 @@ FUN_00454170(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(0x12,param_1,param_2);
+  AIAction__AIAction(0x12,param_1,param_2);
   unaff_ESI[0x82] = param_4;
   *unaff_ESI = &PTR_FUN_006c92ac;
   unaff_ESI[0x80] = param_3;
@@ -2257,7 +2271,7 @@ void __thiscall FUN_004541b0(int param_1,int param_2)
   FUN_00571c20(param_2,param_1 + 0x204,1,1,0);
   FUN_00571c20(param_2,param_1 + 0x208,1,4,1);
   TrafficIntersection_SavePtr();
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10 + 0x4c + param_2;
   *(int *)(iVar1 + 0xc) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0xc);
   cVar2 = *(char *)(param_2 + 0x40) + -1;
@@ -2499,7 +2513,7 @@ void __thiscall Action_ObeyTrafficIntersections__Update(int param_1,float *param
   }
   fStack_18 = 0.0;
   local_20 = (float *)0x0;
-  iVar6 = FUN_0044f470(fVar2,fStack_24,0x41f00000,&fStack_18,&local_20);
+  iVar6 = AIAction__IsSomeoneAheadInThisLane(fVar2,fStack_24,0x41f00000,&fStack_18,&local_20);
   if (((iVar6 != 0) && (cVar4 = TrafficCar_IsIntersectionObstacle(iVar6), cVar4 != '\0')) &&
      ((fStack_18 < 1.5 || ((float)local_20 < 30.0)))) {
     fVar2 = *(float *)(param_1 + 0x1e4);
@@ -2651,7 +2665,7 @@ void __thiscall FUN_00454930(undefined4 param_1,undefined4 param_2)
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(0x13,param_1,param_2);
+  AIAction__AIAction(0x13,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c91e4;
   *(undefined1 *)(unaff_ESI + 0x80) = 0;
   return;
@@ -2667,7 +2681,7 @@ void __thiscall FUN_00454960(int param_1,int param_2)
   char cVar2;
   
   FUN_00571ea0(0,"AIActionPickRouteToAvoidAnimation");
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   FUN_00571c20(param_2,param_1 + 0x200,1,1,0);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10;
   *(int *)(iVar1 + param_2 + 0x58) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0x58 + param_2);
@@ -2701,10 +2715,10 @@ void __fastcall FUN_004549f0(int *param_1)
   
   cVar1 = (**(code **)(*param_1 + 0x14))();
   if (cVar1 != '\0') {
-    FUN_0044f0d0();
+    AIAction__GetNewTrafficLane();
     return;
   }
-  FUN_0044f070();
+  AIAction__GetNewBestLine();
   return;
 }
 

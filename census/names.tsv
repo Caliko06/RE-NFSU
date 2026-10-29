@@ -166,7 +166,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x42ae20	SpawnRecord_Get	traffic	V	H+G	docs/re/traffic.md	traffic		func
 0x42ae30	SpawnRecord_Count	traffic	V	H+G	docs/re/traffic.md	traffic		func
 0x42c3c0	Player::CreateRearViewMirror_call	camera	V	C	docs/re/camera.md	camera		data
-0x42c4b0	JumpCamBuildSpline	camera	I	C	docs/re/camera.md	camera		func
+0x42c4b0	Player::IsJumpCamAvailable	camera	I	C	docs/re/camera.md	camera		func
 0x42c670	Player::DefaultDriveCamera	camera	V	G+C	docs/re/camera.md	camera		func
 0x42c6d0	Player::ChangeCameraMover	camera	V	G+C	docs/re/camera.md	camera		func
 0x42d2f4	ChangeCameraMover_JumpTable	camera	V	G+C	docs/re/camera.md	camera		data
@@ -195,7 +195,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x436020	ModeFlags_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x43ada0	Race::RequestStartOrRestart	canon	I	capstone	docs/re/gameflow.md	gameflow		func
 0x43db70	Zone_FindTrafficDensity	traffic	I	G+H	docs/re/traffic.md	traffic		func
-0x43eb00	RaceManager::UpdateAIScores	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x43eb00	DriftManager::UpdateLeaderBoard	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x43fb50	Commentator::ShortcutZoneEntered	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x43fd20	TrackPolyRow::UnpackVertices	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x43fe70	TrackPolyBody::FromSlotIndex	track	V	hopper+ghidra	docs/re/track.md	track		func
@@ -208,7 +208,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x440a40	GroundQuery::FindSurfaceBelow	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x440ce0	GroundQuery::HasGroundAt	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x440e00	GroundQuery::SweepSegment	track	I	hopper+ghidra	docs/re/track.md	track		func
-0x4412b0	TrackPolygonSlotPool::Init	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x4412b0	TopologyTree::InitTree	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x441380	TrackCollision_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x441480	TrackCollision_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x441500	CollisionGrid::Floor32	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func

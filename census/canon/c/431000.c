@@ -7667,7 +7667,7 @@ void __fastcall Race__RequestStartOrRestart(int param_1)
   }
   cVar1 = IsDriftMode();
   if (cVar1 != '\0') {
-    FUN_0043de90(0);
+    DriftManager__BuildLeaderBoard(0);
   }
   FUN_004390d0(4);
   cVar1 = GameFlow__IsInFrontEnd();
@@ -9439,12 +9439,13 @@ void __thiscall FUN_0043dd40(undefined4 *param_1,undefined4 param_2)
 }
 
 
-// ==== 0x43de90 FUN_0043de90
+// ==== 0x43de90 DriftManager::BuildLeaderBoard
 
 /* WARNING: Removing unreachable block (ram,0x0043e1e4) */
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] runtime med (ghidra-canon+nfsug) docs/re/runtime.md */
 
-void FUN_0043de90(int param_1)
+void DriftManager__BuildLeaderBoard(int param_1)
 
 {
   char cVar1;
@@ -9660,7 +9661,7 @@ void __thiscall FUN_0043e310(int param_1,undefined4 param_2)
         }
       }
     }
-    RaceManager__UpdateAIScores();
+    DriftManager__UpdateLeaderBoard();
     FUN_00435ff0();
     FUN_004a7c70();
     *(undefined4 *)(param_1 + 0x18) = local_10;
@@ -9668,7 +9669,7 @@ void __thiscall FUN_0043e310(int param_1,undefined4 param_2)
   else {
     iVar2 = FUN_00424ea0();
     if (iVar2 != 0) {
-      RaceManager__UpdateAIScores();
+      DriftManager__UpdateLeaderBoard();
     }
   }
   return;
@@ -9926,12 +9927,12 @@ int RaceManager__GetRacerRank(int param_1)
 }
 
 
-// ==== 0x43eb00 RaceManager::UpdateAIScores
+// ==== 0x43eb00 DriftManager::UpdateLeaderBoard
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-/* [canon] rivals I (Ghidra+Hopper+capstone) docs/re/rivals.md */
+/* [canon] rivals med (Ghidra+Hopper+capstone) docs/re/rivals.md */
 
-void __fastcall RaceManager__UpdateAIScores(int param_1)
+void __fastcall DriftManager__UpdateLeaderBoard(int param_1)
 
 {
   char cVar1;

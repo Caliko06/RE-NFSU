@@ -908,7 +908,7 @@ void __thiscall FUN_004624d0(int param_1,undefined4 *param_2,int param_3)
     }
     puVar2 = (undefined4 *)FUN_00567160();
     if (puVar2 != (undefined4 *)0x0) {
-      FUN_0044e2b0(8,0,0xbf800000);
+      AIAction__AIAction(8,0,0xbf800000);
       *puVar2 = &PTR_FUN_006c920c;
       puVar2[0x80] = 0;
       puVar2[0x80] = 0;
@@ -922,7 +922,7 @@ void __thiscall FUN_004624d0(int param_1,undefined4 *param_2,int param_3)
   case 4:
     iVar3 = FUN_00567160();
     if (iVar3 != 0) {
-      uVar1 = FUN_00450400(0xbf800000);
+      uVar1 = AIActionDraft__AIActionDraft(0xbf800000);
       *param_2 = uVar1;
       return;
     }
@@ -930,7 +930,7 @@ void __thiscall FUN_004624d0(int param_1,undefined4 *param_2,int param_3)
   default:
     iVar3 = FUN_00567160();
     if (iVar3 != 0) {
-      uVar1 = FUN_00451400(0xbf800000,DAT_007006fc);
+      uVar1 = AIActionPullOver__AIActionPullOver(0xbf800000,DAT_007006fc);
       *param_2 = uVar1;
       return;
     }
@@ -938,7 +938,7 @@ void __thiscall FUN_004624d0(int param_1,undefined4 *param_2,int param_3)
   case 7:
     iVar3 = FUN_00567160();
     if (iVar3 != 0) {
-      uVar1 = FUN_00450170(0xbf800000);
+      uVar1 = AIActionJustDrive__AIActionJustDrive(0xbf800000);
       *param_2 = uVar1;
       return;
     }
@@ -949,7 +949,7 @@ void __thiscall FUN_004624d0(int param_1,undefined4 *param_2,int param_3)
       uVar1 = 0;
     }
     else {
-      uVar1 = FUN_00451400(0xbf800000,*(undefined4 *)(param_1 + 0x40c));
+      uVar1 = AIActionPullOver__AIActionPullOver(0xbf800000,*(undefined4 *)(param_1 + 0x40c));
     }
     *param_2 = uVar1;
     *(undefined4 *)(param_1 + 0x40c) = 0x4b189680;
@@ -3649,7 +3649,7 @@ LAB_004661ed:
           iVar6 = piVar1[0x50];
           iVar10 = RacerNode__IsLocalHuman();
           if (((iVar10 != 0) && (iVar6 = *(int *)(*(int *)(iVar6 + 0x18) + 0x60), iVar6 != 6)) &&
-             ((iVar6 != 7 && (cVar5 = JumpCamBuildSpline(), cVar5 != '\0')))) {
+             ((iVar6 != 7 && (cVar5 = Player__IsJumpCamAvailable(), cVar5 != '\0')))) {
             cVar5 = Player__StartSpecialCamera(6,0,1,1);
             if (cVar5 == '\0') {
               Player__CleanUpJumpCam();

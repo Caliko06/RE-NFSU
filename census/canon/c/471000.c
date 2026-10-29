@@ -9244,12 +9244,12 @@ LAB_0047e63a:
     else if (local_2f8[0] == 1) {
       pvVar9 = _malloc(0x45c);
       if (pvVar9 == (void *)0x0) goto LAB_0047e63a;
-      piVar10 = (int *)FUN_004848f0(pvVar9,iVar1,local_2f8);
+      piVar10 = (int *)BumperCameraMover__BumperCameraMover(pvVar9,iVar1,local_2f8);
     }
     else if (local_2f8[0] == 2) {
       pvVar9 = _malloc(0x19c);
       if (pvVar9 == (void *)0x0) goto LAB_0047e63a;
-      piVar10 = (int *)FUN_004864e0(pvVar9,local_2f8,iVar1);
+      piVar10 = (int *)TrackFlyCameraMover__TrackFlyCameraMover(pvVar9,local_2f8,iVar1);
     }
     (**(code **)(*piVar10 + 0x3c))();
     (**(code **)(*piVar10 + 4))();
@@ -9468,7 +9468,7 @@ void __fastcall FUN_0047ea20(int param_1)
     *(undefined4 *)(param_1 + 0x18) = 0;
   }
   else if (((*(int *)(param_1 + 0xc) != 0) && (*(int *)(*(int *)(param_1 + 0xc) + 0xc) == 9)) &&
-          (iVar1 = FUN_00486c00(), iVar1 == 0)) {
+          (iVar1 = TrackFlyCameraMover__IsFinished(), iVar1 == 0)) {
     return;
   }
   if (DAT_00737074 <= *(int *)(param_1 + 0x20)) {
@@ -9485,7 +9485,7 @@ void __fastcall FUN_0047ea20(int param_1)
     uVar3 = 0;
   }
   else {
-    uVar3 = FUN_004864e0(pvVar2,auStack_a4,0);
+    uVar3 = TrackFlyCameraMover__TrackFlyCameraMover(pvVar2,auStack_a4,0);
   }
   *(undefined4 *)(param_1 + 0xc) = uVar3;
   *(int *)(param_1 + 0x1c) = *(int *)(param_1 + 0x20);
@@ -9637,7 +9637,7 @@ void __fastcall FUN_0047eca0(int param_1)
     uVar3 = 0;
   }
   else {
-    uVar3 = FUN_004848f0(pvVar2,uVar3,auStack_a4);
+    uVar3 = BumperCameraMover__BumperCameraMover(pvVar2,uVar3,auStack_a4);
   }
   *(undefined4 *)(param_1 + 0xc) = uVar3;
   *(undefined4 *)(param_1 + 0x1c) = *(undefined4 *)(param_1 + 0x2c);
@@ -9721,7 +9721,8 @@ void __fastcall FUN_0047ee50(int param_1)
       CameraDataItems__CameraDataItems();
       pvVar3 = _malloc(0x45c);
       if (pvVar3 != (void *)0x0) {
-        uVar4 = FUN_004848f0(pvVar3,*(undefined4 *)(*(int *)(param_1 + 0x1c) + 4),auStack_a4);
+        uVar4 = BumperCameraMover__BumperCameraMover
+                          (pvVar3,*(undefined4 *)(*(int *)(param_1 + 0x1c) + 4),auStack_a4);
         *(int *)(param_1 + 0x20) = iVar1;
         *(undefined4 *)(param_1 + 0xc) = uVar4;
         return;

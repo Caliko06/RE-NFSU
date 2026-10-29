@@ -5189,7 +5189,7 @@ LAB_00426c65:
     fVar14 = (float10)LinearTable__Lookup11(&PTR_DAT_007062cc,fVar3);
     if ((((fVar14 < (float10)local_30) &&
          (fVar14 = (float10)LinearTable__Lookup11(&PTR_DAT_007062e4,fVar3),
-         fVar14 < (float10)local_34)) && (cVar6 = JumpCamBuildSpline(), cVar6 != '\0')) &&
+         fVar14 < (float10)local_34)) && (cVar6 = Player__IsJumpCamAvailable(), cVar6 != '\0')) &&
        (cVar6 = Player__StartSpecialCamera(6,0,1,1), cVar6 == '\0')) {
       Player__CleanUpJumpCam();
     }
@@ -9104,11 +9104,11 @@ void Player__RestoreCameraMover(void)
 }
 
 
-// ==== 0x42c4b0 JumpCamBuildSpline
+// ==== 0x42c4b0 Player::IsJumpCamAvailable
 
-/* [canon] camera I (C) docs/re/camera.md */
+/* [canon] camera med (C) docs/re/camera.md */
 
-undefined4 __fastcall JumpCamBuildSpline(undefined4 param_1)
+undefined4 __fastcall Player__IsJumpCamAvailable(undefined4 param_1)
 
 {
   float fVar1;
@@ -10442,8 +10442,8 @@ void FUN_0042e230(int param_1)
       *(undefined2 *)(param_1 + 0x1c6) = uVar5;
       uVar2 = *(undefined4 *)(param_1 + 0x1e0);
       iVar7 = *(int *)(param_1 + 4) + 0x70;
-      FUN_00483ea0(*(undefined4 *)(param_1 + 0x1e4),iVar7);
-      FUN_00483fb0(uVar2,iVar7);
+      CameraMover__EyeCubicInit(*(undefined4 *)(param_1 + 0x1e4),iVar7);
+      CameraMover__LookCubicInit(uVar2,iVar7);
       cVar1 = *(char *)(param_1 + 0x24);
       if (((cVar1 != '\x01') && (cVar1 != '\0')) && (cVar1 != '\x04')) {
         PlayerInput__SyncBlocks();
@@ -11971,11 +11971,11 @@ float10 __fastcall Player__GetTimeUntilOnFire(int param_1)
 }
 
 
-// ==== 0x4306c0 Player::CheckDriftTimeout
+// ==== 0x4306c0 Player::IsOnFire
 
 /* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
-undefined4 __fastcall Player__CheckDriftTimeout(int param_1)
+undefined4 __fastcall Player__IsOnFire(int param_1)
 
 {
   if (*(char *)(param_1 + 0x124) != '\0') {

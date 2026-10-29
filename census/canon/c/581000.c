@@ -1125,7 +1125,7 @@ int __thiscall TrafficAI__Update(int *param_1,float param_2)
     puVar4 = (undefined4 *)(**(code **)(*(int *)param_1[0xff] + 0x18))();
   }
   else {
-    FUN_0044f700();
+    AIAction__UpdateStatus();
     iVar2 = param_1[0xfe];
     cVar1 = FUN_0044a0e0();
     if (cVar1 == '\0') {
@@ -1271,7 +1271,7 @@ void __fastcall TrafficAI__Reset(int param_1)
     puVar3 = (undefined4 *)0x0;
   }
   else {
-    FUN_0044e2b0(8,0,0xbf800000);
+    AIAction__AIAction(8,0,0xbf800000);
     *puVar3 = &PTR_FUN_006c920c;
     puVar3[0x80] = 0;
     puVar3[0x80] = 0;
@@ -1563,7 +1563,7 @@ void FUN_00583da0(void)
   if ('\0' < *(char *)(iVar1 + 0x1c)) {
     do {
       iVar2 = FUN_00468820(iVar3);
-      FUN_0044ecd0();
+      AIAction__GetCollisionClassification();
       if (local_8 <= *(float *)(iVar2 + 0x60)) {
         local_8 = *(float *)(iVar2 + 0x60);
       }
@@ -5774,7 +5774,7 @@ void FUN_00589a30(int param_1,float *param_2,undefined4 param_3,int param_4,unde
     local_38 = 0;
     pfVar8 = param_2;
     if ((*(int *)(param_1 + 0x18) != 0) &&
-       (cVar5 = Player__CheckDriftTimeout(), pfVar8 = extraout_EDX, cVar5 != '\0')) {
+       (cVar5 = Player__IsOnFire(), pfVar8 = extraout_EDX, cVar5 != '\0')) {
       local_38 = 1;
     }
     iVar6 = *unaff_EDI;

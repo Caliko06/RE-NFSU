@@ -13,7 +13,7 @@ void __fastcall FUN_004b14e0(int param_1)
     _DAT_00746de0 = 0x42480000;
   }
   *(int *)(param_1 + 0x8c) = in_EAX;
-  FUN_00487ba0();
+  SelectCarCameraMover__SetDramaticMode();
   DAT_006fb02c = 0;
   DAT_00735e84 = 0;
   DAT_0074810c = DAT_0073ad3c;
@@ -3431,7 +3431,7 @@ LAB_004b5a8b:
   }
   cVar1 = FUN_0043a2e0();
   if (cVar1 == '\0') {
-    FUN_0043de90(0);
+    DriftManager__BuildLeaderBoard(0);
   }
   Race__ShuffleGrid();
   return;
@@ -3749,7 +3749,7 @@ LAB_004b5efb:
       *(undefined4 *)(iVar4 + 4) = 0x66;
       *(undefined4 *)(iVar4 + 8) = 1;
     }
-    FUN_0043de90();
+    DriftManager__BuildLeaderBoard();
     local_14 = (uint)local_14._1_3_ << 8;
   }
   Race__SpawnTraffic();
@@ -3920,7 +3920,7 @@ void QuickRace__LaunchFromSetupGlobals(void)
   }
   if (DAT_007346c4 == 0) {
     if ((DAT_0078a345 != '\0') || (DAT_007361a4 != 0)) {
-      FUN_0043de90(0);
+      DriftManager__BuildLeaderBoard(0);
     }
     Race__SpawnOpponents(DAT_0078a324,0);
     Race__SpawnTraffic();
@@ -9351,7 +9351,7 @@ void FUN_004bd0c0(void)
 
 {
   FUN_004ac060("MU_Garage.fng",0);
-  FUN_00504990(2);
+  LaunchPartsBrowser(2);
   return;
 }
 

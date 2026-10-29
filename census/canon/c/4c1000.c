@@ -4565,7 +4565,7 @@ void __thiscall FUN_004c6ab0(int param_1,uint param_2)
           FUN_004b23b0(*(int *)(param_1 + 0x48) + 0x10,1);
         }
         FUN_004ac060("MU_Garage.fng",0);
-        FUN_00504990(2);
+        LaunchPartsBrowser(2);
         return;
       }
       if (param_2 != 0x911ab364) {

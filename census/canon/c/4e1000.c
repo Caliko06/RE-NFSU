@@ -1019,7 +1019,7 @@ void __thiscall FUN_004e2430(undefined4 param_1,uint param_2)
       if (param_2 != 0x911ab364) {
         return;
       }
-      FUN_00507020(param_1);
+      GarageCategoryVisual__MoveBackPackage(param_1);
       return;
     }
   }
@@ -1361,11 +1361,11 @@ undefined4 FUN_004e2940(int param_1)
   int iVar2;
   undefined4 uVar3;
   
-  FUN_005043f0("MU_GarageVinylType.fng");
-  FUN_005043f0("MU_GarageVinylGroup.fng");
-  FUN_005043f0("MU_GarageVinylBrowser.fng");
-  FUN_005043f0("MU_GarageVinylLayerV2.fng");
-  FUN_005043f0("ColorPicker.fng");
+  GarageManager__PopAllScreensOfCertainName("MU_GarageVinylType.fng");
+  GarageManager__PopAllScreensOfCertainName("MU_GarageVinylGroup.fng");
+  GarageManager__PopAllScreensOfCertainName("MU_GarageVinylBrowser.fng");
+  GarageManager__PopAllScreensOfCertainName("MU_GarageVinylLayerV2.fng");
+  GarageManager__PopAllScreensOfCertainName("ColorPicker.fng");
   iVar1 = DAT_0073578c;
   uVar3 = *(undefined4 *)(param_1 + 0xc);
   if (DAT_0073578c != 0) {
@@ -2883,9 +2883,9 @@ LAB_004e4a53:
     ThresholdTable_MarkReached(&DAT_007588c4,DAT_00758ad4);
     DAT_00735df4 = '\0';
   }
-  FUN_005043f0("MU_GarageVinylGroup.fng");
-  FUN_005043f0("MU_GarageVinylLayerV2.fng");
-  FUN_005043f0("MU_GarageVinylBrowser.fng");
+  GarageManager__PopAllScreensOfCertainName("MU_GarageVinylGroup.fng");
+  GarageManager__PopAllScreensOfCertainName("MU_GarageVinylLayerV2.fng");
+  GarageManager__PopAllScreensOfCertainName("MU_GarageVinylBrowser.fng");
   GarageManager__PushScreen("MU_GarageVinylLayerV2.fng");
   FUN_004e2430(param_1,param_2,param_3,param_4);
   return;
@@ -2976,9 +2976,9 @@ LAB_004e49a4:
     ThresholdTable_MarkReached(&DAT_007588c4);
     DAT_00735df4 = '\0';
   }
-  FUN_005043f0();
-  FUN_005043f0();
-  FUN_005043f0();
+  GarageManager__PopAllScreensOfCertainName();
+  GarageManager__PopAllScreensOfCertainName();
+  GarageManager__PopAllScreensOfCertainName();
   GarageManager__PushScreen();
   FUN_004e2430(*(undefined4 *)(unaff_EBP + 8),*(undefined4 *)(unaff_EBP + 0xc),
                *(undefined4 *)(unaff_EBP + 0x10));
@@ -5771,7 +5771,7 @@ void __thiscall FUN_004e8580(int param_1,int param_2)
     if (DAT_00735dc4 != '\0') {
       uVar1 = *(undefined4 *)(param_1 + 0xc);
 LAB_004e85f2:
-      FUN_00504a20(1,uVar1,"MU_Garage.fng","MU_UG_UndergroundMenu.fng");
+      LaunchPartsBrowserNoShowFlag(1,uVar1,"MU_Garage.fng","MU_UG_UndergroundMenu.fng");
       DAT_00735dc4 = 0;
       return;
     }
@@ -7876,7 +7876,7 @@ undefined4 __fastcall FUN_004eaff0(uint param_1)
           return uVar3;
         }
         FUN_004c96c0(0x6c6603df);
-        uVar3 = FUN_00504990(1,"MU_Garage.fng",0);
+        uVar3 = LaunchPartsBrowser(1,"MU_Garage.fng",0);
         return uVar3;
       }
     }

@@ -1,5 +1,5 @@
 addr	name	system	confidence	evidence	tool	doc
-0x4412b0	TrackPolygonSlotPool::Init	track	high	V: creates pool "TrackPolygonSlotPool" (slot 0x80) in 0x736184, clears 0x736178/0x73617c (G string; H same pool call + globals)	hopper+ghidra	docs/re/track.md
+0x4412b0	TopologyTree::InitTree	track	high	V: creates pool "TrackPolygonSlotPool" in 0x736184 and clears 0x736178/0x73617c; GC window A InitTree__12TopologyTree (80 B) between __12TopologyTree and CloseTree; renamed from TrackPolygonSlotPool::Init	hopper+ghidra	docs/re/track.md
 0x43fd20	TrackPolyRow::UnpackVertices	track	high	V: decodes a 32-byte wsrc row into 4 float xyz vertices (stride 0x10): x,y = s16<<13 scaled, z = (s16@+4*256+s16@+0x18)*256 scaled	hopper+ghidra	docs/re/track.md
 0x43fe70	TrackPolyBody::FromSlotIndex	track	high	V: walks the pool list at 0x736184: node +8 next, +0x24 count, +0x28 stride, data at +0x30; returns body address for slot index	hopper+ghidra	docs/re/track.md
 0x566ed0	SlotPool::IndexOfSlot	track	high	V: inverse of 0x43fe70: (ptr - node - 0x30) / stride + running count, -1 if not found; used by 0x43ff30 to store the body slot in wsrc +6	hopper+ghidra	docs/re/track.md

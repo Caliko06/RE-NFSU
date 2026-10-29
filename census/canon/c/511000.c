@@ -136,7 +136,7 @@ void __thiscall FUN_005119b0(int param_1,uint param_2)
       if (param_2 != 0x911ab364) {
         return;
       }
-      FUN_00507020(param_1);
+      GarageCategoryVisual__MoveBackPackage(param_1);
       return;
     }
   }
@@ -1133,7 +1133,7 @@ LAB_00512aeb:
       }
     }
     else if (param_2 == 0x911ab364) {
-      FUN_00507020(param_1);
+      GarageCategoryVisual__MoveBackPackage(param_1);
       return;
     }
   }
@@ -1146,7 +1146,7 @@ LAB_00512aeb:
       GarageDecalsBrand__RedrawHeading(param_1);
       FUN_004f7d30();
       if (*(char *)(param_1 + 0x92) != '\0') {
-        FUN_00507020(param_1);
+        GarageCategoryVisual__MoveBackPackage(param_1);
       }
       DAT_0073575c = DAT_0073575c + 1;
       if ((*(char *)(param_1 + 0x93) != '\0') && (0xf < DAT_0073575c)) {
@@ -1415,7 +1415,7 @@ GarageChooseAccessoryCategoryScreen__GarageChooseAccessoryCategoryScreen
   param_1[0x12] = piVar10;
   piVar10[1] = (int)puVar5;
   *piVar10 = (int)puVar2;
-  if ((bVar15) || (cVar6 = FUN_005056c0(0xd), cVar6 != '\0')) {
+  if ((bVar15) || (cVar6 = AnyPartOwnedInCategory(0xd), cVar6 != '\0')) {
     iVar7 = FUN_004f8730(puVar13,1,0,1);
     if ((iVar7 != 0) && (*(int *)(iVar7 + 0x24) != -0x9653c7c)) {
       *(undefined4 *)(iVar7 + 0x24) = 0xf69ac384;
@@ -1459,10 +1459,10 @@ LAB_0051311a:
   }
   else {
 LAB_0051309e:
-    cVar6 = FUN_005056c0(0xe);
+    cVar6 = AnyPartOwnedInCategory(0xe);
     if (cVar6 != '\0') goto LAB_005130ac;
 LAB_0051310c:
-    cVar6 = FUN_005056c0(0xf);
+    cVar6 = AnyPartOwnedInCategory(0xf);
     if (cVar6 != '\0') goto LAB_0051311a;
   }
   iVar7 = FUN_004f8730(puVar13,4,0,1);

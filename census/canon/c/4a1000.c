@@ -11532,12 +11532,13 @@ void __fastcall FUN_004aea50(undefined4 param_1,int param_2)
     if (*piVar1 == param_2) {
       iVar2 = iVar2 * 0x30;
       if (iVar2 != -0x6fb0b0) {
-        FUN_00487830(*(undefined4 *)(iVar2 + 0x6fb0b4),*(undefined4 *)(iVar2 + 0x6fb0b8),
-                     *(undefined4 *)(iVar2 + 0x6fb0bc),*(undefined4 *)(iVar2 + 0x6fb0c0),
-                     *(undefined4 *)(iVar2 + 0x6fb0c4),*(undefined4 *)(iVar2 + 0x6fb0c8),
-                     *(undefined4 *)(iVar2 + 0x6fb0cc),*(undefined4 *)(iVar2 + 0x6fb0d0),
-                     *(undefined4 *)(iVar2 + 0x6fb0d4),*(undefined4 *)(iVar2 + 0x6fb0d8),
-                     *(undefined4 *)(iVar2 + 0x6fb0dc));
+        SelectCarCameraMover__SetMagazineOrientation
+                  (*(undefined4 *)(iVar2 + 0x6fb0b4),*(undefined4 *)(iVar2 + 0x6fb0b8),
+                   *(undefined4 *)(iVar2 + 0x6fb0bc),*(undefined4 *)(iVar2 + 0x6fb0c0),
+                   *(undefined4 *)(iVar2 + 0x6fb0c4),*(undefined4 *)(iVar2 + 0x6fb0c8),
+                   *(undefined4 *)(iVar2 + 0x6fb0cc),*(undefined4 *)(iVar2 + 0x6fb0d0),
+                   *(undefined4 *)(iVar2 + 0x6fb0d4),*(undefined4 *)(iVar2 + 0x6fb0d8),
+                   *(undefined4 *)(iVar2 + 0x6fb0dc));
       }
       return;
     }
@@ -11644,7 +11645,7 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
       return;
     case 0x3e:
       if (DAT_0078eb20 != 0) {
-        FUN_00487810((float)(int)-(uint)param_3 * _K_BLUR_MIN_T);
+        SelectCarCameraMover__SetZoomSpeed((float)(int)-(uint)param_3 * _K_BLUR_MIN_T);
         DAT_0074810c = DAT_0073ad3c;
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
@@ -11655,7 +11656,7 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
       return;
     case 0x3f:
       if (DAT_0078eb1c != 0) {
-        FUN_00487810((float)param_3 * _K_BLUR_MIN_T);
+        SelectCarCameraMover__SetZoomSpeed((float)param_3 * _K_BLUR_MIN_T);
         DAT_0074810c = DAT_0073ad3c;
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
@@ -11684,7 +11685,7 @@ void FUN_004aeb60(undefined4 param_1,undefined4 param_2,byte param_3)
       return;
     case 0x42:
       if (DAT_0078eb18 != 0) {
-        FUN_00487810(((float)param_3 - 128.0) * 0.0078125);
+        SelectCarCameraMover__SetZoomSpeed(((float)param_3 - 128.0) * 0.0078125);
         DAT_0074810c = DAT_0073ad3c;
         DAT_006fb02c = 0;
         DAT_00735e84 = 0;
@@ -12311,7 +12312,7 @@ LAB_004afbee:
   }
   param_1[0x18] = uVar5;
   param_1[0x20] = uVar5;
-  FUN_00487ba0();
+  SelectCarCameraMover__SetDramaticMode();
   param_1[0x21] = 1;
   pcVar9 = "PLATFORM";
   uVar8 = 0x50;
@@ -12578,7 +12579,7 @@ void FUN_004b01c0(void)
   DAT_00735e84 = 0;
   *(undefined4 *)(unaff_EDI + 0xf4) = 0x41b1c71c;
   DAT_0074810c = DAT_0073ad3c;
-  FUN_00487da0();
+  SelectCarCameraMover__SetPresetB();
   iVar2 = DAT_007356a8;
   if (((*(int *)(DAT_007356a8 + 0xbc) != 0) && (*(int *)(*(int *)(unaff_EDI + 0x114) + 0x1ca8) != 0)
       ) && (puVar1 = (undefined4 *)(*(int *)(unaff_EDI + 0x114) + 0x1570),
@@ -12607,7 +12608,7 @@ void FUN_004b0270(void)
   *(undefined4 *)(unaff_EDI + 0xfc) = 0xc1700000;
   *(undefined4 *)(unaff_EDI + 0xf0) = 0xc1700000;
   DAT_0074810c = DAT_0073ad3c;
-  FUN_00487e20();
+  SelectCarCameraMover__SetPresetC();
   if (((*(int *)(DAT_007356a8 + 0xbc) != 0) && (*(int *)(*(int *)(unaff_EDI + 0x114) + 0x1ca8) != 0)
       ) && (puVar1 = (undefined4 *)(*(int *)(unaff_EDI + 0x114) + 0x1570),
            puVar1 != (undefined4 *)0x0)) {
@@ -12668,7 +12669,7 @@ void FUN_004b0340(void)
       if (*(int *)(*(int *)(unaff_EBX + 0x60) + 0x2c) != 1) {
         *(undefined4 *)(*(int *)(unaff_EBX + 0x60) + 0x2c) = 2;
       }
-      iVar3 = FUN_00487d70();
+      iVar3 = SelectCarCameraMover__IsPresetDone();
       if (iVar3 != 0) {
         FUN_004b01c0();
         *(undefined4 *)(unaff_EBX + 0xec) = 1;
@@ -12722,7 +12723,7 @@ LAB_004b05bb:
         *(float *)(unaff_EBX + 0xf0) = (float)fVar9;
       }
       else {
-        FUN_00487eb0();
+        SelectCarCameraMover__EndPreset();
         *(undefined4 *)(unaff_EBX + 0xf0) = 0;
         *(undefined4 *)(unaff_EBX + 0xec) = 4;
       }
@@ -12736,14 +12737,14 @@ LAB_004b05bb:
             bVar7 = true;
           }
           else {
-            FUN_00487cc0();
+            SelectCarCameraMover__SetPresetA();
             *(undefined4 *)(unaff_EBX + 0xec) = 0;
           }
         }
       }
       else {
         if ((*(int *)(iVar3 + 0x1ca8) == 0) || (*(int *)(iVar3 + 0x1cb0) == 0)) goto LAB_004b04a2;
-        FUN_00487cc0();
+        SelectCarCameraMover__SetPresetA();
         *(undefined4 *)(unaff_EBX + 0xec) = 0;
       }
     }
@@ -12937,7 +12938,7 @@ LAB_004b0a48:
       CameraMover_SetTransitionParamA((float)((float10)0.05 * fVar9));
     }
     else {
-      FUN_004878c0();
+      SelectCarCameraMover__ApplyMagazineOrientation();
     }
   }
   FUN_004b1760(unaff_EBX,*(undefined4 *)(unaff_EBX + 0x40),0);
@@ -13026,7 +13027,7 @@ void FUN_004b0c00(void)
         if (((*(int *)(in_EAX + 0x84) != 0) && (*(int *)(in_EAX + 0x8c) == 4)) &&
            (cVar3 = FUN_004aeac0(iVar1), cVar3 != '\0')) {
           if (DAT_0078eb18 != 0) {
-            FUN_00487810(0);
+            SelectCarCameraMover__SetZoomSpeed(0);
             DAT_0074810c = DAT_0073ad3c;
             DAT_006fb02c = 0;
             DAT_00735e84 = 0;

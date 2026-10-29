@@ -211,7 +211,7 @@ LAB_004925d1:
 void __fastcall FUN_00492690(int param_1)
 
 {
-  FUN_004835a0();
+  CameraMover__Enable();
   FUN_004906d0(param_1 + 0x13c);
   return;
 }

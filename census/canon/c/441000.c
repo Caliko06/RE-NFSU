@@ -119,12 +119,12 @@ void TopologyTree__TopologyTree(void)
 }
 
 
-// ==== 0x4412b0 TrackPolygonSlotPool::Init
+// ==== 0x4412b0 TopologyTree::InitTree
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
 /* [canon] track high (hopper+ghidra) docs/re/track.md */
 
-void TrackPolygonSlotPool__Init(void)
+void TopologyTree__InitTree(void)
 
 {
   uint uVar1;
@@ -8469,7 +8469,7 @@ void GameFlow__TrackWorldInit(void)
   FUN_004655f0();
   FUN_00466970();
   FUN_0046ac40();
-  TrackPolygonSlotPool__Init(&DAT_0077b130);
+  TopologyTree__InitTree(&DAT_0077b130);
   FUN_00576f80();
   FUN_004764e0();
   FUN_00546590();
@@ -9391,7 +9391,7 @@ void __thiscall FUN_0044a6f0(int param_1,int param_2)
   FUN_00571c20(param_2,param_1 + 0x3f0,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x4c0,4,0xffffffff,0);
   FUN_0044d760();
-  FUN_0044e480(param_1 + 0x3f8);
+  AIAction__DoSnapshot(param_1 + 0x3f8);
   FUN_00571c20(param_2,param_1 + 0x400,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x404,4,4,1);
   FUN_00571c20(param_2,param_1 + 0x420,4,0xffffffff,0);
@@ -10068,7 +10068,7 @@ LAB_0044b707:
         (**(code **)(*param_1 + 0x80))();
       }
       if (DAT_00736090 == 0) {
-        FUN_0044f700();
+        AIAction__UpdateStatus();
         piVar1 = (int *)param_1[0xfe];
         cVar3 = FUN_0044a0e0();
         if (cVar3 == '\0') {
@@ -10100,7 +10100,7 @@ LAB_0044b707:
             param_1[0xfe] = 0;
           }
           else {
-            iVar5 = FUN_00450170(0xbf800000);
+            iVar5 = AIActionJustDrive__AIActionJustDrive(0xbf800000);
             param_1[0xfe] = iVar5;
           }
         }
@@ -10212,7 +10212,7 @@ void FUN_0044baf0(int param_1,undefined4 param_2,undefined4 param_3,undefined4 *
   *(undefined4 *)(param_1 + 0x3bc) = param_3;
   *(int *)(param_1 + 0x3c0) = (int)cVar2;
   if (*(int **)(param_1 + 0x3f8) == (int *)0x0) {
-    FUN_0044f070();
+    AIAction__GetNewBestLine();
   }
   else {
     (**(code **)(**(int **)(param_1 + 0x3f8) + 0x10))(param_1 + 0x2c);
@@ -11555,7 +11555,7 @@ char * FUN_0044d520(void)
 void FUN_0044d530(void)
 
 {
-  FUN_0044f070();
+  AIAction__GetNewBestLine();
   return;
 }
 
@@ -11574,7 +11574,7 @@ char * FUN_0044d540(void)
 void FUN_0044d550(void)
 
 {
-  FUN_0044f0d0();
+  AIAction__GetNewTrafficLane();
   return;
 }
 
@@ -11854,11 +11854,13 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
        ((*(int *)(piVar2[0xea] + 0xc0) == -1 || (*(int *)(*(int *)(*piVar2 + 0x2c) + 0x4ec) == 0))))
     {
       if (((param_3 == 0xc) || (400 < iVar5)) ||
-         (iVar4 = FUN_0044ed70(piVar2,0xbf800000,1), iVar4 == 0)) {
+         (iVar4 = AIAction__GetMostImportantNearbyCollidingAvoidable(piVar2,0xbf800000,1),
+         iVar4 == 0)) {
         if (((param_3 == 2) || (400 < iVar5)) ||
            (iStack_30 = FUN_00452b40(&local_34), iVar5 = (int)param_4, iStack_30 < 0)) {
           if (((param_3 != 1) && (iVar5 < 0x12d)) &&
-             (iStack_30 = FUN_0044f8a0(&local_38,&local_1c,&local_34,&param_2,&local_28),
+             (iStack_30 = AIActionAvoidAvoidable__CalculateScore
+                                    (&local_38,&local_1c,&local_34,&param_2,&local_28),
              uVar6 = local_38, -1 < iStack_30)) {
             TrafficCar_HonkAtPlayer(piVar1,piVar2);
             cVar3 = (**(code **)(*piVar1 + 0x74))(uVar6,local_34);
@@ -11874,7 +11876,8 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
                 return 0;
               }
               param_4 = (float)((uint)param_2 & 0xff);
-              uVar6 = FUN_0044f750(0xbf800000,uVar6,(float)(int)param_4,local_28,0);
+              uVar6 = AIActionAvoidAvoidable__AIActionAvoidAvoidable
+                                (0xbf800000,uVar6,(float)(int)param_4,local_28,0);
               ExceptionList = pvStack_c;
               return uVar6;
             }
@@ -11883,9 +11886,10 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
              (iVar4 = FUN_00452630(), iVar5 = (int)param_4, iVar4 < 0)) {
             if (((param_3 == 5) ||
                 (*(int *)(&DAT_0077a340 + *(char *)(*(int *)(piVar1[1] + 0x14) + 0x736) * 8) < iVar5
-                )) || (iVar4 = FUN_00450ec0(&local_24), iVar5 = (int)param_4, iVar4 < 0)) {
+                )) || (iVar4 = AIActionBlock__CalculateScore(&local_24), iVar5 = (int)param_4,
+                      iVar4 < 0)) {
               if (((param_3 == 0) || (200 < iVar5)) ||
-                 ((iVar5 = FUN_00450730(&local_2c,&local_1c,&param_4), iVar5 < 0 ||
+                 ((iVar5 = AIActionPass__CalculateScore(&local_2c,&local_1c,&param_4), iVar5 < 0 ||
                   (cVar3 = (**(code **)(*piVar1 + 0x74))(local_2c,0xbf800000), cVar3 == '\0')))) {
                 uVar6 = (**(code **)(*local_20 + 0x18))();
                 ExceptionList = pvStack_c;
@@ -11897,7 +11901,7 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
               piVar2[0xe9] = local_10;
               iVar5 = FUN_00567160();
               if (iVar5 != 0) {
-                uVar6 = FUN_00450660(0x40a00000,local_2c,0);
+                uVar6 = AIActionPass__AIActionPass(0x40a00000,local_2c,0);
                 ExceptionList = pvStack_c;
                 return uVar6;
               }
@@ -11905,7 +11909,7 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
             else {
               iVar5 = FUN_00567160();
               if (iVar5 != 0) {
-                uVar6 = FUN_00450e20(0xbf800000,local_24);
+                uVar6 = AIActionBlock__AIActionBlock(0xbf800000,local_24);
                 ExceptionList = pvStack_c;
                 return uVar6;
               }
@@ -11977,7 +11981,7 @@ undefined4 * FUN_0044dce0(void)
   
   puVar1 = (undefined4 *)FUN_00567160();
   if (puVar1 != (undefined4 *)0x0) {
-    FUN_0044e2b0(7,0,0xbf800000);
+    AIAction__AIAction(7,0,0xbf800000);
     *puVar1 = &PTR_FUN_006c9374;
     puVar1[0x80] = 0;
     puVar1[0x80] = 0;
@@ -12020,7 +12024,7 @@ undefined4 * DragGoal__SelectAction(int *param_1,int param_2,int param_3)
        ) {
       iVar4 = FUN_004534f0();
       if (iVar4 < 0) {
-        iVar4 = FUN_0044ed70(param_1,0x41055532,1);
+        iVar4 = AIAction__GetMostImportantNearbyCollidingAvoidable(param_1,0x41055532,1);
         if (iVar4 == 0) {
           if (((param_2 == 2) || (400 < param_3)) || (iVar4 = FUN_00452b40(&local_14), iVar4 < 0)) {
             puVar5 = (undefined4 *)(**(code **)(*local_10 + 0x18))();
@@ -12051,7 +12055,7 @@ undefined4 * DragGoal__SelectAction(int *param_1,int param_2,int param_3)
       else {
         puVar5 = (undefined4 *)FUN_00567160();
         if (puVar5 != (undefined4 *)0x0) {
-          FUN_0044e2b0(0x10,iVar4,0xbf800000);
+          AIAction__AIAction(0x10,iVar4,0xbf800000);
           *puVar5 = &PTR_FUN_006c9194;
           ExceptionList = pvStack_c;
           return puVar5;
@@ -12061,7 +12065,7 @@ undefined4 * DragGoal__SelectAction(int *param_1,int param_2,int param_3)
     else {
       puVar5 = (undefined4 *)FUN_00567160();
       if (puVar5 != (undefined4 *)0x0) {
-        FUN_0044e2b0(0x13,600,0xbf800000);
+        AIAction__AIAction(0x13,600,0xbf800000);
         *puVar5 = &PTR_FUN_006c91e4;
         *(undefined1 *)(puVar5 + 0x80) = 0;
         ExceptionList = pvStack_c;
@@ -12084,9 +12088,12 @@ undefined4 * DragGoal__SelectAction(int *param_1,int param_2,int param_3)
 }
 
 
-// ==== 0x44df70 FUN_0044df70
+// ==== 0x44df70 AIGoalSteerPlayerInDragRace::ChooseNewAction
 
-undefined4 * __thiscall FUN_0044df70(int *param_1,undefined4 param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * __thiscall
+AIGoalSteerPlayerInDragRace__ChooseNewAction(int *param_1,undefined4 param_2)
 
 {
   undefined4 uVar1;
@@ -12095,7 +12102,7 @@ undefined4 * __thiscall FUN_0044df70(int *param_1,undefined4 param_2)
   
   iVar2 = FUN_004534f0();
   if (iVar2 < 0) {
-    iVar2 = FUN_0044ed70(param_2,0x41055532,1);
+    iVar2 = AIAction__GetMostImportantNearbyCollidingAvoidable(param_2,0x41055532,1);
     if (iVar2 == 0) {
       puVar3 = (undefined4 *)(**(code **)(*param_1 + 0x18))();
       return puVar3;
@@ -12103,7 +12110,7 @@ undefined4 * __thiscall FUN_0044df70(int *param_1,undefined4 param_2)
     uVar1 = *(undefined4 *)(iVar2 + 0x34);
     puVar3 = (undefined4 *)FUN_00567160();
     if (puVar3 != (undefined4 *)0x0) {
-      FUN_0044e2b0(0xd,400,0xbf800000);
+      AIAction__AIAction(0xd,400,0xbf800000);
       puVar3[0x80] = uVar1;
       *puVar3 = &PTR_FUN_006c92fc;
       return puVar3;
@@ -12112,7 +12119,7 @@ undefined4 * __thiscall FUN_0044df70(int *param_1,undefined4 param_2)
   else {
     puVar3 = (undefined4 *)FUN_00567160();
     if (puVar3 != (undefined4 *)0x0) {
-      FUN_0044e2b0(0x10,iVar2,0xbf800000);
+      AIAction__AIAction(0x10,iVar2,0xbf800000);
       *puVar3 = &PTR_FUN_006c9194;
       return puVar3;
     }
@@ -12222,16 +12229,18 @@ TrafficGoal_Select_BeAmbient(int *param_1,int *param_2,int param_3,int param_4)
 }
 
 
-// ==== 0x44e260 FUN_0044e260
+// ==== 0x44e260 AIGoal::CreateDefaultAction
 
-undefined4 * FUN_0044e260(void)
+/* [canon] rivals med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * AIGoal__CreateDefaultAction(void)
 
 {
   undefined4 *puVar1;
   
   puVar1 = (undefined4 *)FUN_00567160();
   if (puVar1 != (undefined4 *)0x0) {
-    FUN_0044e2b0(8,0,0xbf800000);
+    AIAction__AIAction(8,0,0xbf800000);
     *puVar1 = &PTR_FUN_006c920c;
     puVar1[0x80] = 0;
     puVar1[0x80] = 0;
@@ -12241,9 +12250,11 @@ undefined4 * FUN_0044e260(void)
 }
 
 
-// ==== 0x44e2b0 FUN_0044e2b0
+// ==== 0x44e2b0 AIAction::AIAction
 
-void FUN_0044e2b0(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIAction__AIAction(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 *in_EAX;
@@ -12251,7 +12262,7 @@ void FUN_0044e2b0(undefined4 param_1,undefined4 param_2,undefined4 param_3)
   undefined4 *puVar2;
   
   FUN_0044a080(param_3);
-  *in_EAX = &PTR_FUN_006c91bc;
+  *in_EAX = &PTR_AIAction__scalar_deleting_destructor_006c91bc;
   in_EAX[0x71] = 0;
   in_EAX[0x72] = 0;
   puVar2 = in_EAX + 8;
@@ -12274,9 +12285,11 @@ void FUN_0044e2b0(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 }
 
 
-// ==== 0x44e340 FUN_0044e340
+// ==== 0x44e340 AIAction::scalar_deleting_destructor
 
-void FUN_0044e340(byte param_1)
+/* [canon] rivals med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIAction__scalar_deleting_destructor(byte param_1)
 
 {
   int iVar1;
@@ -12295,9 +12308,11 @@ void FUN_0044e340(byte param_1)
 }
 
 
-// ==== 0x44e370 FUN_0044e370
+// ==== 0x44e370 AIAction::DoSnapshot
 
-void __thiscall FUN_0044e370(int param_1,int param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIAction__DoSnapshot(int param_1,int param_2)
 
 {
   int iVar1;
@@ -12326,9 +12341,11 @@ void __thiscall FUN_0044e370(int param_1,int param_2)
 }
 
 
-// ==== 0x44e480 FUN_0044e480
+// ==== 0x44e480 AIAction::DoSnapshot
 
-void FUN_0044e480(int *param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIAction__DoSnapshot(int *param_1)
 
 {
   int *piVar1;
@@ -12365,13 +12382,13 @@ LAB_0044e7a6:
         piVar2 = (int *)0x0;
       }
       else {
-        piVar2 = (int *)FUN_00450660(0,0,0);
+        piVar2 = (int *)AIActionPass__AIActionPass(0,0,0);
       }
       break;
     case 1:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_0044f750(0,0,0,0,0);
+      piVar2 = (int *)AIActionAvoidAvoidable__AIActionAvoidAvoidable(0,0,0,0,0);
       break;
     case 2:
       local_10 = FUN_00567160();
@@ -12393,22 +12410,22 @@ LAB_0044e7a6:
     case 4:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00450400(0);
+      piVar2 = (int *)AIActionDraft__AIActionDraft(0);
       break;
     case 5:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00450e20(0,0);
+      piVar2 = (int *)AIActionBlock__AIActionBlock(0,0);
       break;
     case 6:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00450d20(0,0);
+      piVar2 = (int *)AIActionNudgeAvoidable__AIActionNudgeAvoidable(0,0);
       break;
     case 7:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00450170(0);
+      piVar2 = (int *)AIActionJustDrive__AIActionJustDrive(0);
       break;
     case 8:
       iVar3 = FUN_00567160();
@@ -12418,7 +12435,7 @@ LAB_0044e7a6:
     case 9:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00451400(0,0);
+      piVar2 = (int *)AIActionPullOver__AIActionPullOver(0,0);
       break;
     case 10:
       iVar3 = FUN_00567160();
@@ -12486,9 +12503,11 @@ LAB_0044e7ba:
 }
 
 
-// ==== 0x44e850 FUN_0044e850
+// ==== 0x44e850 AIAction::SetDesiredSpeedSlowerThanThisAvoidable
 
-void FUN_0044e850(int param_1,float param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIAction__SetDesiredSpeedSlowerThanThisAvoidable(int param_1,float param_2)
 
 {
   float fVar1;
@@ -12530,11 +12549,12 @@ void FUN_0044e850(int param_1,float param_2)
 }
 
 
-// ==== 0x44e950 FUN_0044e950
+// ==== 0x44e950 AIAction::SetDesiredSpeedToMaxDeceleration
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void __fastcall FUN_0044e950(int param_1,int param_2,float param_3)
+void __fastcall AIAction__SetDesiredSpeedToMaxDeceleration(int param_1,int param_2,float param_3)
 
 {
   float fVar1;
@@ -12557,11 +12577,13 @@ void __fastcall FUN_0044e950(int param_1,int param_2,float param_3)
 }
 
 
-// ==== 0x44e9c0 FUN_0044e9c0
+// ==== 0x44e9c0 AIAction::GetHeadingClassification
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
-undefined4 __fastcall FUN_0044e9c0(undefined4 param_1,int param_2,char param_3)
+undefined4 __fastcall
+AIAction__GetHeadingClassification(undefined4 param_1,int param_2,char param_3)
 
 {
   float fVar1;
@@ -12653,9 +12675,11 @@ undefined4 __fastcall FUN_0044e9c0(undefined4 param_1,int param_2,char param_3)
 }
 
 
-// ==== 0x44ecd0 FUN_0044ecd0
+// ==== 0x44ecd0 AIAction::GetCollisionClassification
 
-undefined4 __fastcall FUN_0044ecd0(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __fastcall AIAction__GetCollisionClassification(int param_1)
 
 {
   undefined4 uVar1;
@@ -12681,9 +12705,11 @@ undefined4 __fastcall FUN_0044ecd0(int param_1)
 }
 
 
-// ==== 0x44ed70 FUN_0044ed70
+// ==== 0x44ed70 AIAction::GetMostImportantNearbyCollidingAvoidable
 
-int * FUN_0044ed70(int *param_1,float param_2,char param_3)
+/* [canon] rivals med (ghidra-canon+nfsug) docs/re/canon.md */
+
+int * AIAction__GetMostImportantNearbyCollidingAvoidable(int *param_1,float param_2,char param_3)
 
 {
   int iVar1;
@@ -12810,9 +12836,11 @@ undefined4 TrafficCar_IsIntersectionObstacle(int param_1)
 }
 
 
-// ==== 0x44f070 FUN_0044f070
+// ==== 0x44f070 AIAction::GetNewBestLine
 
-undefined4 FUN_0044f070(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 AIAction__GetNewBestLine(void)
 
 {
   int iVar1;
@@ -12833,9 +12861,11 @@ undefined4 FUN_0044f070(void)
 }
 
 
-// ==== 0x44f0d0 FUN_0044f0d0
+// ==== 0x44f0d0 AIAction::GetNewTrafficLane
 
-undefined4 FUN_0044f0d0(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 AIAction__GetNewTrafficLane(void)
 
 {
   int *in_EAX;
@@ -12875,11 +12905,12 @@ undefined4 FUN_0044f0d0(void)
 }
 
 
-// ==== 0x44f1b0 FUN_0044f1b0
+// ==== 0x44f1b0 AIAction::GetWorldSpaceDistanceAndTimeToAvoidable
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_0044f1b0(int param_1,float *param_2,float *param_3)
+void AIAction__GetWorldSpaceDistanceAndTimeToAvoidable(int param_1,float *param_2,float *param_3)
 
 {
   float fVar1;
@@ -12969,10 +13000,13 @@ void FUN_0044f1b0(int param_1,float *param_2,float *param_3)
 }
 
 
-// ==== 0x44f470 FUN_0044f470
+// ==== 0x44f470 AIAction::IsSomeoneAheadInThisLane
+
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
 float __thiscall
-FUN_0044f470(int *param_1,int param_2,float param_3,float param_4,float *param_5,float *param_6)
+AIAction__IsSomeoneAheadInThisLane
+          (int *param_1,int param_2,float param_3,float param_4,float *param_5,float *param_6)
 
 {
   float fVar1;
@@ -13028,7 +13062,7 @@ FUN_0044f470(int *param_1,int param_2,float param_3,float param_4,float *param_5
         }
         local_2c = 99999.0;
         local_20 = 99999.0;
-        FUN_0044f1b0(local_1c,&local_2c,&local_20);
+        AIAction__GetWorldSpaceDistanceAndTimeToAvoidable(local_1c,&local_2c,&local_20);
         if (local_24 < local_20) {
           local_20 = local_24;
         }
@@ -13061,9 +13095,11 @@ LAB_0044f668:
 }
 
 
-// ==== 0x44f6c0 FUN_0044f6c0
+// ==== 0x44f6c0 AIAction::MaybeUseNitrous
 
-void FUN_0044f6c0(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIAction__MaybeUseNitrous(int param_1)
 
 {
   int *piVar1;
@@ -13082,9 +13118,11 @@ void FUN_0044f6c0(int param_1)
 }
 
 
-// ==== 0x44f700 FUN_0044f700
+// ==== 0x44f700 AIAction::UpdateStatus
 
-void FUN_0044f700(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIAction__UpdateStatus(void)
 
 {
   char cVar1;
@@ -13107,16 +13145,19 @@ void FUN_0044f700(void)
 }
 
 
-// ==== 0x44f750 FUN_0044f750
+// ==== 0x44f750 AIActionAvoidAvoidable::AIActionAvoidAvoidable
+
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __thiscall
-FUN_0044f750(undefined4 param_1,undefined4 param_2,undefined4 param_3,float param_4,
-            undefined1 param_5,undefined1 param_6)
+AIActionAvoidAvoidable__AIActionAvoidAvoidable
+          (undefined4 param_1,undefined4 param_2,undefined4 param_3,float param_4,undefined1 param_5
+          ,undefined1 param_6)
 
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(1,param_1,param_2);
+  AIAction__AIAction(1,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c9324;
   unaff_ESI[0x83] = 0;
   unaff_ESI[0x84] = 0;
@@ -13131,9 +13172,11 @@ FUN_0044f750(undefined4 param_1,undefined4 param_2,undefined4 param_3,float para
 }
 
 
-// ==== 0x44f7d0 FUN_0044f7d0
+// ==== 0x44f7d0 AIActionAvoidAvoidable::DoSnapshot
 
-void __thiscall FUN_0044f7d0(int param_1,int param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionAvoidAvoidable__DoSnapshot(int param_1,int param_2)
 
 {
   int iVar1;
@@ -13146,7 +13189,7 @@ void __thiscall FUN_0044f7d0(int param_1,int param_2)
   FUN_00571c20(param_2,param_1 + 0x20c,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x210,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x214,4,0xffffffff,0);
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10;
   *(int *)(iVar1 + param_2 + 0x58) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0x58 + param_2);
   cVar2 = *(char *)(param_2 + 0x40) + -1;
@@ -13158,10 +13201,13 @@ void __thiscall FUN_0044f7d0(int param_1,int param_2)
 }
 
 
-// ==== 0x44f8a0 FUN_0044f8a0
+// ==== 0x44f8a0 AIActionAvoidAvoidable::CalculateScore
+
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
 undefined4
-FUN_0044f8a0(int *param_1,int *param_2,float *param_3,undefined1 *param_4,undefined1 *param_5)
+AIActionAvoidAvoidable__CalculateScore
+          (int *param_1,int *param_2,float *param_3,undefined1 *param_4,undefined1 *param_5)
 
 {
   int *piVar1;
@@ -13255,9 +13301,11 @@ FUN_0044f8a0(int *param_1,int *param_2,float *param_3,undefined1 *param_4,undefi
 }
 
 
-// ==== 0x44faf0 FUN_0044faf0
+// ==== 0x44faf0 AIActionAvoidAvoidable::HasBeenAccomplished
 
-int __fastcall FUN_0044faf0(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __fastcall AIActionAvoidAvoidable__HasBeenAccomplished(int param_1)
 
 {
   float fVar1;
@@ -13278,11 +13326,12 @@ int __fastcall FUN_0044faf0(int param_1)
 }
 
 
-// ==== 0x44fb30 FUN_0044fb30
+// ==== 0x44fb30 AIActionAvoidAvoidable::CalculatePointsToDrive
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void __thiscall FUN_0044fb30(int param_1,int *param_2)
+void __thiscall AIActionAvoidAvoidable__CalculatePointsToDrive(int param_1,int *param_2)
 
 {
   int *piVar1;
@@ -13541,7 +13590,7 @@ LAB_004500b5:
     *(undefined1 *)(param_1 + 0x1f0) = 1;
   }
   else {
-    FUN_0044e850(param_1,0x3dcccccd,0x3dcccccd);
+    AIAction__SetDesiredSpeedSlowerThanThisAvoidable(param_1,0x3dcccccd,0x3dcccccd);
   }
   cVar9 = FUN_0057a720();
   if ((cVar9 != '\0') || (cVar9 = FUN_0057a760(), cVar9 != '\0')) {
@@ -13682,7 +13731,7 @@ LAB_00450049:
   }
   *(undefined1 *)(in_stack_00000014 + 0x1f0) = 0;
   if (in_stack_00000038 == '\0') {
-    FUN_0044e850(in_stack_00000014,0x3dcccccd,0x3dcccccd);
+    AIAction__SetDesiredSpeedSlowerThanThisAvoidable(in_stack_00000014,0x3dcccccd,0x3dcccccd);
   }
   else {
     *(undefined1 *)(in_stack_00000014 + 0x1f0) = 1;
@@ -13736,7 +13785,7 @@ LAB_0045004b:
        *(float *)(unaff_EBP + 8) + *(float *)(in_stack_00000020 + 8) + _K_ONE) && (bVar2)) {
     *(undefined1 *)(in_stack_00000014 + 0x1f0) = 0;
     if (in_stack_00000038 == '\0') {
-      FUN_0044e850(in_stack_00000014,0x3dcccccd,0x3dcccccd);
+      AIAction__SetDesiredSpeedSlowerThanThisAvoidable(in_stack_00000014,0x3dcccccd,0x3dcccccd);
     }
     else {
       *(undefined1 *)(in_stack_00000014 + 0x1f0) = 1;
@@ -13785,7 +13834,7 @@ void FUN_00450038(void)
   }
   *(undefined1 *)(in_stack_00000014 + 0x1f0) = 0;
   if (in_stack_00000038 == '\0') {
-    FUN_0044e850(in_stack_00000014,0x3dcccccd,0x3dcccccd);
+    AIAction__SetDesiredSpeedSlowerThanThisAvoidable(in_stack_00000014,0x3dcccccd,0x3dcccccd);
   }
   else {
     *(undefined1 *)(in_stack_00000014 + 0x1f0) = 1;
@@ -13828,7 +13877,7 @@ void FUN_00450044(void)
   }
   *(undefined1 *)(in_stack_00000014 + 0x1f0) = 0;
   if (in_stack_00000038 == '\0') {
-    FUN_0044e850(in_stack_00000014,0x3dcccccd,0x3dcccccd);
+    AIAction__SetDesiredSpeedSlowerThanThisAvoidable(in_stack_00000014,0x3dcccccd,0x3dcccccd);
   }
   else {
     *(undefined1 *)(in_stack_00000014 + 0x1f0) = 1;
@@ -13868,7 +13917,7 @@ void __thiscall FUN_00450053(char param_1)
      (param_1 != '\0')) {
     *(undefined1 *)(in_stack_00000014 + 0x1f0) = 0;
     if (in_stack_00000038 == '\0') {
-      FUN_0044e850(in_stack_00000014,0x3dcccccd,0x3dcccccd);
+      AIAction__SetDesiredSpeedSlowerThanThisAvoidable(in_stack_00000014,0x3dcccccd,0x3dcccccd);
     }
     else {
       *(undefined1 *)(in_stack_00000014 + 0x1f0) = 1;
@@ -13908,7 +13957,7 @@ void __thiscall FUN_00450065(char param_1)
   if (((in_EAX & 0x4100) == 0) && (param_1 != '\0')) {
     *(undefined1 *)(in_stack_00000014 + 0x1f0) = 0;
     if (in_stack_00000038 == '\0') {
-      FUN_0044e850(in_stack_00000014,0x3dcccccd,0x3dcccccd);
+      AIAction__SetDesiredSpeedSlowerThanThisAvoidable(in_stack_00000014,0x3dcccccd,0x3dcccccd);
     }
     else {
       *(undefined1 *)(in_stack_00000014 + 0x1f0) = 1;
@@ -13950,7 +13999,7 @@ void __thiscall FUN_0045006e(char param_1)
   }
   *(undefined1 *)(in_stack_00000014 + 0x1f0) = 0;
   if (in_stack_00000038 == '\0') {
-    FUN_0044e850(in_stack_00000014,0x3dcccccd,0x3dcccccd);
+    AIAction__SetDesiredSpeedSlowerThanThisAvoidable(in_stack_00000014,0x3dcccccd,0x3dcccccd);
   }
   else {
     *(undefined1 *)(in_stack_00000014 + 0x1f0) = 1;
@@ -14001,9 +14050,11 @@ void __fastcall FUN_00450100(int param_1)
 }
 
 
-// ==== 0x450160 FUN_00450160
+// ==== 0x450160 AIAction::CleanUp
 
-void FUN_00450160(int *param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIAction__CleanUp(int *param_1)
 
 {
   *(undefined1 *)(*param_1 + 0x88c) = 0;
@@ -14011,14 +14062,16 @@ void FUN_00450160(int *param_1)
 }
 
 
-// ==== 0x450170 FUN_00450170
+// ==== 0x450170 AIActionJustDrive::AIActionJustDrive
 
-void __thiscall FUN_00450170(undefined4 param_1,undefined4 param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionJustDrive__AIActionJustDrive(undefined4 param_1,undefined4 param_2)
 
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(7,param_1,param_2);
+  AIAction__AIAction(7,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c9374;
   unaff_ESI[0x80] = 0;
   unaff_ESI[0x80] = 0;
@@ -14026,16 +14079,18 @@ void __thiscall FUN_00450170(undefined4 param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4501a0 FUN_004501a0
+// ==== 0x4501a0 AIActionJustDrive::DoSnapshot
 
-void __thiscall FUN_004501a0(int param_1,int param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionJustDrive__DoSnapshot(int param_1,int param_2)
 
 {
   int iVar1;
   char cVar2;
   
   FUN_00571ea0(0,"AIActionJustDrive");
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   FUN_00571c20(param_2,param_1 + 0x200,4,0xffffffff,0);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10;
   *(int *)(iVar1 + param_2 + 0x58) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0x58 + param_2);
@@ -14048,9 +14103,11 @@ void __thiscall FUN_004501a0(int param_1,int param_2)
 }
 
 
-// ==== 0x450210 FUN_00450210
+// ==== 0x450210 AIActionJustDrive::CalculatePointsToDrive
 
-void __thiscall FUN_00450210(int param_1,int *param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionJustDrive__CalculatePointsToDrive(int param_1,int *param_2)
 
 {
   int *piVar1;
@@ -14146,29 +14203,33 @@ LAB_00450393:
 }
 
 
-// ==== 0x450400 FUN_00450400
+// ==== 0x450400 AIActionDraft::AIActionDraft
 
-void __thiscall FUN_00450400(undefined4 param_1,undefined4 param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionDraft__AIActionDraft(undefined4 param_1,undefined4 param_2)
 
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(4,param_1,param_2);
+  AIAction__AIAction(4,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c9144;
   return;
 }
 
 
-// ==== 0x450420 FUN_00450420
+// ==== 0x450420 AIActionDraft::DoSnapshot
 
-void FUN_00450420(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIActionDraft__DoSnapshot(int param_1)
 
 {
   int iVar1;
   char cVar2;
   
   FUN_00571ea0(0,"AIActionDraft");
-  FUN_0044e370(param_1);
+  AIAction__DoSnapshot(param_1);
   iVar1 = *(char *)(param_1 + 0x40) * 0x10;
   *(int *)(iVar1 + param_1 + 0x58) = *(int *)(param_1 + 0x150) - *(int *)(iVar1 + 0x58 + param_1);
   cVar2 = *(char *)(param_1 + 0x40) + -1;
@@ -14180,9 +14241,11 @@ void FUN_00450420(int param_1)
 }
 
 
-// ==== 0x450480 FUN_00450480
+// ==== 0x450480 AIActionDraft::CalculatePointsToDrive
 
-void __thiscall FUN_00450480(int param_1,int *param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionDraft__CalculatePointsToDrive(int param_1,int *param_2)
 
 {
   int *piVar1;
@@ -14246,15 +14309,18 @@ LAB_00450643:
 }
 
 
-// ==== 0x450660 FUN_00450660
+// ==== 0x450660 AIActionPass::AIActionPass
+
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __thiscall
-FUN_00450660(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)
+AIActionPass__AIActionPass
+          (undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4)
 
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(0,param_1,param_2);
+  AIAction__AIAction(0,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c9234;
   unaff_ESI[0x82] = 0;
   unaff_ESI[0x81] = param_4;
@@ -14264,9 +14330,11 @@ FUN_00450660(undefined4 param_1,undefined4 param_2,undefined4 param_3,undefined4
 }
 
 
-// ==== 0x4506b0 FUN_004506b0
+// ==== 0x4506b0 AIActionPass::DoSnapshot
 
-void __thiscall FUN_004506b0(int param_1,int param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionPass__DoSnapshot(int param_1,int param_2)
 
 {
   int iVar1;
@@ -14275,7 +14343,7 @@ void __thiscall FUN_004506b0(int param_1,int param_2)
   FUN_00571ea0(0,"AIActionPass");
   FUN_00571c20(param_2,param_1 + 0x208,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x204,4,0xffffffff,0);
-  FUN_0044e370(param_2);
+  AIAction__DoSnapshot(param_2);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10 + 0x4c + param_2;
   *(int *)(iVar1 + 0xc) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0xc);
   cVar2 = *(char *)(param_2 + 0x40) + -1;
@@ -14287,9 +14355,11 @@ void __thiscall FUN_004506b0(int param_1,int param_2)
 }
 
 
-// ==== 0x450730 FUN_00450730
+// ==== 0x450730 AIActionPass::CalculateScore
 
-undefined4 FUN_00450730(int *param_1,int *param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 AIActionPass__CalculateScore(int *param_1,int *param_2)
 
 {
   bool bVar1;
@@ -14329,7 +14399,8 @@ undefined4 FUN_00450730(int *param_1,int *param_2)
           local_1e4 = local_1e4 & 0xffffff00;
           cVar2 = FUN_0045bae0(param_2,local_1d0,&local_1e4,piVar3 + -0xd,unaff_EDI,0,DAT_007006ec,1
                               );
-          if ((cVar2 != '\0') && (cVar2 = FUN_00450b40(param_2,local_1e4), cVar2 != '\0')) {
+          if ((cVar2 != '\0') &&
+             (cVar2 = AIActionPass__SideOfAvoidableIsOkay(param_2,local_1e4), cVar2 != '\0')) {
             *param_1 = *piVar3;
             bVar1 = true;
           }
@@ -14346,9 +14417,11 @@ undefined4 FUN_00450730(int *param_1,int *param_2)
 }
 
 
-// ==== 0x4508f0 FUN_004508f0
+// ==== 0x4508f0 AIActionPass::HasBeenAccomplished
 
-int __thiscall FUN_004508f0(int param_1,int param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __thiscall AIActionPass__HasBeenAccomplished(int param_1,int param_2)
 
 {
   undefined4 *puVar1;
@@ -14372,7 +14445,7 @@ int __thiscall FUN_004508f0(int param_1,int param_2)
     local_8 = 0;
     local_4 = local_4 & 0xffffff00;
     param_2 = 0;
-    iVar7 = FUN_00450730(&param_2,&local_10,&param_2);
+    iVar7 = AIActionPass__CalculateScore(&param_2,&local_10,&param_2);
     if ((-1 < iVar7) && (cVar6 = FUN_0045add0(), cVar6 == '\0')) {
       *puVar1 = local_10;
       *(undefined4 *)(iVar2 + 0x39c) = local_c;
@@ -14418,9 +14491,11 @@ int __thiscall FUN_004508f0(int param_1,int param_2)
 }
 
 
-// ==== 0x450a30 FUN_00450a30
+// ==== 0x450a30 AIActionPass::HasExpired
 
-uint __fastcall FUN_00450a30(int param_1)
+/* [canon] rivals med (ghidra-canon+nfsug) docs/re/canon.md */
+
+uint __fastcall AIActionPass__HasExpired(int param_1)
 
 {
   float fVar1;
@@ -14442,9 +14517,11 @@ uint __fastcall FUN_00450a30(int param_1)
 }
 
 
-// ==== 0x450a70 FUN_00450a70
+// ==== 0x450a70 AIActionPass::HasFailed
 
-undefined4 __thiscall FUN_00450a70(int param_1,undefined4 *param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __thiscall AIActionPass__HasFailed(int param_1,undefined4 *param_2)
 
 {
   undefined4 *puVar1;
@@ -14477,11 +14554,12 @@ undefined4 __thiscall FUN_00450a70(int param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x450b40 FUN_00450b40
+// ==== 0x450b40 AIActionPass::SideOfAvoidableIsOkay
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
-undefined4 FUN_00450b40(int *param_1,char param_2)
+undefined4 AIActionPass__SideOfAvoidableIsOkay(int *param_1,char param_2)
 
 {
   int iVar1;
@@ -14514,9 +14592,11 @@ undefined4 FUN_00450b40(int *param_1,char param_2)
 }
 
 
-// ==== 0x450bb0 FUN_00450bb0
+// ==== 0x450bb0 AIActionPass::CalculatePointsToDrive
 
-void __thiscall FUN_00450bb0(int param_1,uint param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIActionPass__CalculatePointsToDrive(int param_1,uint param_2)
 
 {
   int *piVar1;
@@ -14559,7 +14639,7 @@ void __thiscall FUN_00450bb0(int param_1,uint param_2)
           if (ABS(*(float *)(iVar3 + 4)) < 5.0 == (ABS(*(float *)(iVar3 + 4)) == 5.0)) {
             return;
           }
-          FUN_0044f6c0(param_1);
+          AIAction__MaybeUseNitrous(param_1);
           return;
         }
         break;
@@ -14596,30 +14676,36 @@ void FUN_00450d00(void)
 }
 
 
-// ==== 0x450d20 FUN_00450d20
+// ==== 0x450d20 AIActionNudgeAvoidable::AIActionNudgeAvoidable
 
-void __thiscall FUN_00450d20(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall
+AIActionNudgeAvoidable__AIActionNudgeAvoidable
+          (undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(6,param_1,param_2);
+  AIAction__AIAction(6,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c90f4;
   unaff_ESI[0x80] = param_3;
   return;
 }
 
 
-// ==== 0x450d50 FUN_00450d50
+// ==== 0x450d50 AIActionNudgeAvoidable::DoSnapshot
 
-void FUN_00450d50(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIActionNudgeAvoidable__DoSnapshot(int param_1)
 
 {
   int iVar1;
   char cVar2;
   
   FUN_00571ea0(0,"AIActionNudgeAvoidable");
-  FUN_0044e370(param_1);
+  AIAction__DoSnapshot(param_1);
   iVar1 = *(char *)(param_1 + 0x40) * 0x10;
   *(int *)(iVar1 + param_1 + 0x58) = *(int *)(param_1 + 0x150) - *(int *)(iVar1 + 0x58 + param_1);
   cVar2 = *(char *)(param_1 + 0x40) + -1;
@@ -14640,9 +14726,11 @@ undefined1 FUN_00450db0(void)
 }
 
 
-// ==== 0x450dc0 FUN_00450dc0
+// ==== 0x450dc0 AIActionNudgeAvoidable::HasExpired
 
-undefined4 __fastcall FUN_00450dc0(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __fastcall AIActionNudgeAvoidable__HasExpired(int param_1)
 
 {
   float fVar1;
@@ -14664,9 +14752,11 @@ undefined4 __fastcall FUN_00450dc0(int param_1)
 }
 
 
-// ==== 0x450e10 FUN_00450e10
+// ==== 0x450e10 AIActionNudgeAvoidable::CalculatePointsToDrive
 
-void __fastcall FUN_00450e10(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall AIActionNudgeAvoidable__CalculatePointsToDrive(int param_1)
 
 {
   *(undefined1 *)(param_1 + 0x1e0) = 1;
@@ -14674,23 +14764,28 @@ void __fastcall FUN_00450e10(int param_1)
 }
 
 
-// ==== 0x450e20 FUN_00450e20
+// ==== 0x450e20 AIActionBlock::AIActionBlock
 
-void __thiscall FUN_00450e20(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall
+AIActionBlock__AIActionBlock(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined4 *unaff_ESI;
   
-  FUN_0044e2b0(5,param_1,param_2);
+  AIAction__AIAction(5,param_1,param_2);
   *unaff_ESI = &PTR_FUN_006c9284;
   unaff_ESI[0x80] = param_3;
   return;
 }
 
 
-// ==== 0x450e50 FUN_00450e50
+// ==== 0x450e50 AIActionBlock::DoSnapshot
 
-void FUN_00450e50(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIActionBlock__DoSnapshot(int param_1)
 
 {
   int iVar1;
@@ -14698,7 +14793,7 @@ void FUN_00450e50(int param_1)
   
   FUN_00571ea0(0,"AIActionBlock");
   FUN_0041ff80(DAT_007361f8);
-  FUN_0044e370(param_1);
+  AIAction__DoSnapshot(param_1);
   iVar1 = *(char *)(param_1 + 0x40) * 0x10;
   *(int *)(iVar1 + param_1 + 0x58) = *(int *)(param_1 + 0x150) - *(int *)(iVar1 + 0x58 + param_1);
   cVar2 = *(char *)(param_1 + 0x40) + -1;
@@ -14710,9 +14805,11 @@ void FUN_00450e50(int param_1)
 }
 
 
-// ==== 0x450ec0 FUN_00450ec0
+// ==== 0x450ec0 AIActionBlock::CalculateScore
 
-undefined4 FUN_00450ec0(undefined4 *param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 AIActionBlock__CalculateScore(undefined4 *param_1)
 
 {
   float fVar1;

@@ -1578,9 +1578,11 @@ undefined4 __fastcall FUN_00483360(int param_1)
 }
 
 
-// ==== 0x483370 FUN_00483370
+// ==== 0x483370 CubicCameraMover::SetLookBack
 
-void __thiscall FUN_00483370(int param_1,undefined1 param_2)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void __thiscall CubicCameraMover__SetLookBack(int param_1,undefined1 param_2)
 
 {
   *(undefined1 *)(param_1 + 0x45) = param_2;
@@ -1588,9 +1590,11 @@ void __thiscall FUN_00483370(int param_1,undefined1 param_2)
 }
 
 
-// ==== 0x483380 FUN_00483380
+// ==== 0x483380 CubicCameraMover::SetDisableLag
 
-void __thiscall FUN_00483380(int param_1,char param_2)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void __thiscall CubicCameraMover__SetDisableLag(int param_1,char param_2)
 
 {
   *(bool *)(param_1 + 0x44) = param_2 == '\0';
@@ -1598,18 +1602,22 @@ void __thiscall FUN_00483380(int param_1,char param_2)
 }
 
 
-// ==== 0x483390 FUN_00483390
+// ==== 0x483390 CubicCameraMover::GetLookbackAngle
 
-uint __fastcall FUN_00483390(int param_1)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+uint __fastcall CubicCameraMover__GetLookbackAngle(int param_1)
 
 {
   return -(uint)(*(char *)(param_1 + 0x45) != '\0') & 0x8000;
 }
 
 
-// ==== 0x4833a0 FUN_004833a0
+// ==== 0x4833a0 eView::GetMatrixForPlayer
 
-int __fastcall FUN_004833a0(byte param_1)
+/* [canon] render low (ghidra-canon) docs/re/camera.md */
+
+int __fastcall eView__GetMatrixForPlayer(byte param_1)
 
 {
   int in_EAX;
@@ -1621,11 +1629,12 @@ int __fastcall FUN_004833a0(byte param_1)
 }
 
 
-// ==== 0x4833c0 FUN_004833c0
+// ==== 0x4833c0 ConvertLensDeltaToFovDelta
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
-float10 FUN_004833c0(float param_1,float param_2)
+float10 ConvertLensDeltaToFovDelta(float param_1,float param_2)
 
 {
   short sVar1;
@@ -1637,9 +1646,11 @@ float10 FUN_004833c0(float param_1,float param_2)
 }
 
 
-// ==== 0x483430 FUN_00483430
+// ==== 0x483430 bClamp
 
-float * __fastcall FUN_00483430(float *param_1,float *param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+float * __fastcall bClamp(float *param_1,float *param_2)
 
 {
   float fVar1;
@@ -1704,14 +1715,16 @@ void __fastcall CameraMover__ctor(undefined4 param_1,undefined4 param_2)
   *(undefined4 *)(iVar1 + 0xc0) = 0x461c4000;
   unaff_ESI[9] = *(undefined4 *)(unaff_ESI[7] + 0x280);
   unaff_ESI[10] = *(undefined4 *)(unaff_ESI[7] + 0x284);
-  FUN_004835a0();
+  CameraMover__Enable();
   return;
 }
 
 
-// ==== 0x483550 FUN_00483550
+// ==== 0x483550 CameraMover::_CameraMover
 
-void __fastcall FUN_00483550(undefined4 *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall CameraMover___CameraMover(undefined4 *param_1)
 
 {
   int iVar1;
@@ -1747,9 +1760,11 @@ undefined4 __fastcall CameraMover__GetCarToFollow(int param_1)
 }
 
 
-// ==== 0x4835a0 FUN_004835a0
+// ==== 0x4835a0 CameraMover::Enable
 
-void __fastcall FUN_004835a0(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall CameraMover__Enable(int param_1)
 
 {
   int *piVar1;
@@ -1779,9 +1794,11 @@ void __fastcall FUN_004835a0(int param_1)
 }
 
 
-// ==== 0x483600 FUN_00483600
+// ==== 0x483600 CameraMover::Disable
 
-void __fastcall FUN_00483600(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall CameraMover__Disable(int param_1)
 
 {
   int iVar1;
@@ -1986,9 +2003,11 @@ void CameraMover__EnforceMinGapToWalls
 }
 
 
-// ==== 0x483ad0 FUN_00483ad0
+// ==== 0x483ad0 CameraMover::IsoProjectionMatrix
 
-void FUN_00483ad0(undefined4 param_1,undefined4 param_2,undefined4 param_3)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void CameraMover__IsoProjectionMatrix(undefined4 param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined1 local_c0 [16];
@@ -2097,7 +2116,7 @@ CameraMover_ClipAgainstWorld(float *param_1,undefined4 param_2,undefined4 param_
       fStack_304 = SQRT(fVar4 * fVar4 - (fVar2 + fVar3)) + param_1[2];
     }
   }
-  FUN_00483ad0(param_2,param_3,param_1,&fStack_35c);
+  CameraMover__IsoProjectionMatrix(param_2,param_3,param_1,&fStack_35c);
   iVar5 = 0;
   if (0 < iStack_4c) {
     do {
@@ -2111,9 +2130,11 @@ CameraMover_ClipAgainstWorld(float *param_1,undefined4 param_2,undefined4 param_
 }
 
 
-// ==== 0x483e30 FUN_00483e30
+// ==== 0x483e30 CameraMover::FovCubicInit
 
-void __fastcall FUN_00483e30(float *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall CameraMover__FovCubicInit(float *param_1)
 
 {
   float fVar1;
@@ -2135,9 +2156,11 @@ void __fastcall FUN_00483e30(float *param_1)
 }
 
 
-// ==== 0x483ea0 FUN_00483ea0
+// ==== 0x483ea0 CameraMover::EyeCubicInit
 
-void FUN_00483ea0(int param_1,float *param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void CameraMover__EyeCubicInit(int param_1,float *param_2)
 
 {
   int iVar1;
@@ -2182,9 +2205,11 @@ void FUN_00483ea0(int param_1,float *param_2)
 }
 
 
-// ==== 0x483fb0 FUN_00483fb0
+// ==== 0x483fb0 CameraMover::LookCubicInit
 
-void FUN_00483fb0(int param_1,float *param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void CameraMover__LookCubicInit(int param_1,float *param_2)
 
 {
   int iVar1;
@@ -2257,7 +2282,7 @@ OrbitCarCameraMover__ctor
   param_1[0xb] = 0x40a00000;
   param_1[0x12] = 0x40a00000;
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c8018;
+  *param_1 = &PTR_OrbitCarCameraMover__scalar_deleting_destructor_006c8018;
   *(undefined2 *)(param_1 + 0xc) = 26000;
   param_1[0xe] = 0;
   param_1[0xf] = 0;
@@ -2279,18 +2304,20 @@ OrbitCarCameraMover__ctor
     *(undefined2 *)(param_1[7] + 0xc4) = DAT_006fbe34;
   }
   param_1[0x30] = 0;
-  FUN_00484270();
+  OrbitCarCameraMover__AddJoyHandlers();
   ExceptionList = local_c;
   return param_1;
 }
 
 
-// ==== 0x4841c0 FUN_004841c0
+// ==== 0x4841c0 OrbitCarCameraMover::scalar_deleting_destructor
 
-void * __thiscall FUN_004841c0(void *param_1,byte param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void * __thiscall OrbitCarCameraMover__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004841e0();
+  OrbitCarCameraMover___OrbitCarCameraMover();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -2298,16 +2325,18 @@ void * __thiscall FUN_004841c0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4841e0 FUN_004841e0
+// ==== 0x4841e0 OrbitCarCameraMover::_OrbitCarCameraMover
 
-void __fastcall FUN_004841e0(undefined4 *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall OrbitCarCameraMover___OrbitCarCameraMover(undefined4 *param_1)
 
 {
   int iVar1;
   int *piVar2;
   
-  *param_1 = &PTR_FUN_006c8018;
-  FUN_00484340();
+  *param_1 = &PTR_OrbitCarCameraMover__scalar_deleting_destructor_006c8018;
+  OrbitCarCameraMover__RemoveJoyHandlers();
   if (DAT_00735f5c == 0) {
     *(undefined4 *)(param_1[7] + 0xb4) = 0;
     *(undefined4 *)(param_1[7] + 0xb8) = 0;
@@ -2328,9 +2357,11 @@ void __fastcall FUN_004841e0(undefined4 *param_1)
 }
 
 
-// ==== 0x484250 FUN_00484250
+// ==== 0x484250 OrbitCarCameraMover::GetTarget
 
-int __fastcall FUN_00484250(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+int __fastcall OrbitCarCameraMover__GetTarget(int param_1)
 
 {
   if (*(int *)(param_1 + 0xb0) != 0) {
@@ -2340,30 +2371,34 @@ int __fastcall FUN_00484250(int param_1)
 }
 
 
-// ==== 0x484270 FUN_00484270
+// ==== 0x484270 OrbitCarCameraMover::AddJoyHandlers
 
-void __fastcall FUN_00484270(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall OrbitCarCameraMover__AddJoyHandlers(int param_1)
 
 {
   if (*(int *)(param_1 + 0xc0) == 0) {
-    InputEvents__AddSource(0x45,FUN_004847b0,param_1);
-    InputEvents__AddSource(0x46,FUN_004847b0,param_1);
-    InputEvents__AddSource(0x47,FUN_004847b0,param_1);
-    InputEvents__AddSource(0x48,FUN_004847b0,param_1);
-    InputEvents__AddSource(0x49,FUN_004847b0,param_1);
-    InputEvents__AddSource(0x4a,FUN_004847b0,param_1);
-    InputEvents__AddSource(0x4b,FUN_004847b0,param_1);
-    InputEvents__AddSource(0x4c,FUN_004847b0,param_1);
-    InputEvents__AddSource(0x4d,FUN_004847b0,param_1);
+    InputEvents__AddSource(0x45,OrbitCarCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x46,OrbitCarCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x47,OrbitCarCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x48,OrbitCarCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x49,OrbitCarCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x4a,OrbitCarCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x4b,OrbitCarCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x4c,OrbitCarCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x4d,OrbitCarCameraMover__JoyHandler,param_1);
     *(undefined4 *)(param_1 + 0xc0) = 1;
   }
   return;
 }
 
 
-// ==== 0x484340 FUN_00484340
+// ==== 0x484340 OrbitCarCameraMover::RemoveJoyHandlers
 
-void __fastcall FUN_00484340(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall OrbitCarCameraMover__RemoveJoyHandlers(int param_1)
 
 {
   if (*(int *)(param_1 + 0xc0) != 0) {
@@ -2382,11 +2417,12 @@ void __fastcall FUN_00484340(int param_1)
 }
 
 
-// ==== 0x4843e0 FUN_004843e0
+// ==== 0x4843e0 OrbitCarCameraMover::Update
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
-void __fastcall FUN_004843e0(int param_1)
+void __fastcall OrbitCarCameraMover__Update(int param_1)
 
 {
   ushort uVar1;
@@ -2542,9 +2578,11 @@ void __fastcall FUN_004843e0(int param_1)
 }
 
 
-// ==== 0x4847b0 FUN_004847b0
+// ==== 0x4847b0 OrbitCarCameraMover::JoyHandler
 
-void FUN_004847b0(undefined4 param_1,undefined4 param_2,char param_3,int param_4)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void OrbitCarCameraMover__JoyHandler(undefined4 param_1,undefined4 param_2,char param_3,int param_4)
 
 {
   int iVar1;
@@ -2638,9 +2676,12 @@ void __thiscall FUN_0048485a(int param_1)
 }
 
 
-// ==== 0x4848f0 FUN_004848f0
+// ==== 0x4848f0 BumperCameraMover::BumperCameraMover
 
-undefined4 * FUN_004848f0(undefined4 *param_1,undefined4 param_2,undefined4 *param_3)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+undefined4 *
+BumperCameraMover__BumperCameraMover(undefined4 *param_1,undefined4 param_2,undefined4 *param_3)
 
 {
   undefined4 uVar1;
@@ -2650,7 +2691,7 @@ undefined4 * FUN_004848f0(undefined4 *param_1,undefined4 param_2,undefined4 *par
   bool bVar5;
   
   CameraMover__ctor();
-  *param_1 = &PTR_FUN_006c7f38;
+  *param_1 = &PTR_BumperCameraMover__scalar_deleting_destructor_006c7f38;
   puVar4 = param_1 + 0xb;
   for (iVar3 = 0x29; iVar3 != 0; iVar3 = iVar3 + -1) {
     *puVar4 = *param_3;
@@ -2755,12 +2796,14 @@ undefined4 * FUN_004848f0(undefined4 *param_1,undefined4 param_2,undefined4 *par
 }
 
 
-// ==== 0x484b80 FUN_00484b80
+// ==== 0x484b80 BumperCameraMover::scalar_deleting_destructor
 
-void * __thiscall FUN_00484b80(void *param_1,byte param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void * __thiscall BumperCameraMover__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_00484ba0();
+  BumperCameraMover___BumperCameraMover();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -2768,9 +2811,11 @@ void * __thiscall FUN_00484b80(void *param_1,byte param_2)
 }
 
 
-// ==== 0x484ba0 FUN_00484ba0
+// ==== 0x484ba0 BumperCameraMover::_BumperCameraMover
 
-void __fastcall FUN_00484ba0(undefined4 *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall BumperCameraMover___BumperCameraMover(undefined4 *param_1)
 
 {
   int iVar1;
@@ -2779,7 +2824,7 @@ void __fastcall FUN_00484ba0(undefined4 *param_1)
   bool bVar4;
   
   bVar4 = DAT_00735f5c == 0;
-  *param_1 = &PTR_FUN_006c7f38;
+  *param_1 = &PTR_BumperCameraMover__scalar_deleting_destructor_006c7f38;
   if (bVar4) {
     *(undefined4 *)(param_1[7] + 0xb4) = 0;
     *(undefined4 *)(param_1[7] + 0xb8) = 0;
@@ -2864,11 +2909,12 @@ undefined4 __fastcall BumperCameraMover__IsFinished(int param_1)
 }
 
 
-// ==== 0x484d50 FUN_00484d50
+// ==== 0x484d50 BumperCameraMover::Update
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
-void __fastcall FUN_00484d50(int param_1)
+void __fastcall BumperCameraMover__Update(int param_1)
 
 {
   float fVar1;
@@ -3079,7 +3125,7 @@ undefined4 * __fastcall RearViewMirrorCameraMover__ctor(undefined4 *param_1)
 void * __thiscall CameraMover__TrivialDtor(void *param_1,byte param_2)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -3169,7 +3215,7 @@ TrackCarCameraMover__ctor
   bool bVar11;
   
   CameraMover__ctor();
-  *param_1 = &PTR_FUN_006c7d28;
+  *param_1 = &PTR_TrackCarCameraMover__scalar_deleting_destructor_006c7d28;
   puVar9 = param_3;
   puVar10 = param_1 + 0x1a;
   for (iVar5 = 0x29; iVar5 != 0; iVar5 = iVar5 + -1) {
@@ -3337,12 +3383,14 @@ TrackCarCameraMover__ctor
 }
 
 
-// ==== 0x4859d0 FUN_004859d0
+// ==== 0x4859d0 TrackCarCameraMover::scalar_deleting_destructor
 
-void * __thiscall FUN_004859d0(void *param_1,byte param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void * __thiscall TrackCarCameraMover__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_00485a50();
+  TrackCarCameraMover___TrackCarCameraMover();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -3392,9 +3440,11 @@ void __fastcall CameraDataItems__CameraDataItems_copy(undefined4 param_1,undefin
 }
 
 
-// ==== 0x485a50 FUN_00485a50
+// ==== 0x485a50 TrackCarCameraMover::_TrackCarCameraMover
 
-void __fastcall FUN_00485a50(undefined4 *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall TrackCarCameraMover___TrackCarCameraMover(undefined4 *param_1)
 
 {
   int iVar1;
@@ -3403,7 +3453,7 @@ void __fastcall FUN_00485a50(undefined4 *param_1)
   bool bVar4;
   
   bVar4 = DAT_00735f5c == 0;
-  *param_1 = &PTR_FUN_006c7d28;
+  *param_1 = &PTR_TrackCarCameraMover__scalar_deleting_destructor_006c7d28;
   if (bVar4) {
     *(undefined4 *)(param_1[7] + 0xb4) = 0;
     *(undefined4 *)(param_1[7] + 0xb8) = 0;
@@ -3452,9 +3502,11 @@ void __fastcall FUN_00485a50(undefined4 *param_1)
 }
 
 
-// ==== 0x485b70 FUN_00485b70
+// ==== 0x485b70 TrackCarCameraMover::GetTarget
 
-int __fastcall FUN_00485b70(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+int __fastcall TrackCarCameraMover__GetTarget(int param_1)
 
 {
   if (*(int *)(param_1 + 0x438) != 0) {
@@ -3464,9 +3516,11 @@ int __fastcall FUN_00485b70(int param_1)
 }
 
 
-// ==== 0x485b90 FUN_00485b90
+// ==== 0x485b90 TrackCarCameraMover::CalcSpringForce
 
-void __fastcall FUN_00485b90(float *param_1,float *param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall TrackCarCameraMover__CalcSpringForce(float *param_1,float *param_2)
 
 {
   float fVar1;
@@ -3703,7 +3757,7 @@ void __fastcall TrackCarCameraMover__Update(int param_1)
     fVar4 = *(float *)(param_1 + 0x34);
     fVar5 = *(float *)(param_1 + 0x38);
     bNormalize3();
-    pfVar13 = (float *)FUN_00485b90();
+    pfVar13 = (float *)TrackCarCameraMover__CalcSpringForce();
     *pfVar13 = *pfVar13 - local_bc;
     pfVar13[1] = pfVar13[1] - local_b8;
     pfVar13[2] = pfVar13[2] - fStack_b4;
@@ -3745,9 +3799,12 @@ void __fastcall TrackCarCameraMover__Update(int param_1)
 }
 
 
-// ==== 0x4864e0 FUN_004864e0
+// ==== 0x4864e0 TrackFlyCameraMover::TrackFlyCameraMover
 
-undefined4 * FUN_004864e0(undefined4 *param_1,undefined4 *param_2,undefined4 param_3)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+undefined4 *
+TrackFlyCameraMover__TrackFlyCameraMover(undefined4 *param_1,undefined4 *param_2,undefined4 param_3)
 
 {
   undefined4 uVar1;
@@ -3756,7 +3813,7 @@ undefined4 * FUN_004864e0(undefined4 *param_1,undefined4 *param_2,undefined4 par
   undefined4 *puVar4;
   
   CameraMover__ctor();
-  *param_1 = &PTR_FUN_006c7ef0;
+  *param_1 = &PTR_TrackFlyCameraMover__scalar_deleting_destructor_006c7ef0;
   puVar4 = param_1 + 0xb;
   for (iVar3 = 0x29; iVar3 != 0; iVar3 = iVar3 + -1) {
     *puVar4 = *param_2;
@@ -3847,12 +3904,14 @@ undefined4 * FUN_004864e0(undefined4 *param_1,undefined4 *param_2,undefined4 par
 }
 
 
-// ==== 0x486720 FUN_00486720
+// ==== 0x486720 TrackFlyCameraMover::scalar_deleting_destructor
 
-void * __thiscall FUN_00486720(void *param_1,byte param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void * __thiscall TrackFlyCameraMover__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_00486740();
+  TrackFlyCameraMover___TrackFlyCameraMover();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -3860,9 +3919,11 @@ void * __thiscall FUN_00486720(void *param_1,byte param_2)
 }
 
 
-// ==== 0x486740 FUN_00486740
+// ==== 0x486740 TrackFlyCameraMover::_TrackFlyCameraMover
 
-void __fastcall FUN_00486740(undefined4 *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall TrackFlyCameraMover___TrackFlyCameraMover(undefined4 *param_1)
 
 {
   int iVar1;
@@ -3871,7 +3932,7 @@ void __fastcall FUN_00486740(undefined4 *param_1)
   bool bVar4;
   
   bVar4 = DAT_00735f5c == 0;
-  *param_1 = &PTR_FUN_006c7ef0;
+  *param_1 = &PTR_TrackFlyCameraMover__scalar_deleting_destructor_006c7ef0;
   if (bVar4) {
     *(undefined4 *)(param_1[7] + 0xb4) = 0;
     *(undefined4 *)(param_1[7] + 0xb8) = 0;
@@ -3920,9 +3981,11 @@ void __fastcall FUN_00486740(undefined4 *param_1)
 }
 
 
-// ==== 0x486860 FUN_00486860
+// ==== 0x486860 TrackFlyCameraMover::GetTarget
 
-int __fastcall FUN_00486860(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+int __fastcall TrackFlyCameraMover__GetTarget(int param_1)
 
 {
   if (*(int *)(param_1 + 0x198) != 0) {
@@ -3932,11 +3995,12 @@ int __fastcall FUN_00486860(int param_1)
 }
 
 
-// ==== 0x486880 FUN_00486880
+// ==== 0x486880 TrackFlyCameraMover::Update
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
-void __fastcall FUN_00486880(int param_1)
+void __fastcall TrackFlyCameraMover__Update(int param_1)
 
 {
   float fVar1;
@@ -4061,9 +4125,11 @@ void __fastcall FUN_00486880(int param_1)
 }
 
 
-// ==== 0x486c00 FUN_00486c00
+// ==== 0x486c00 TrackFlyCameraMover::IsFinished
 
-undefined4 __fastcall FUN_00486c00(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+undefined4 __fastcall TrackFlyCameraMover__IsFinished(int param_1)
 
 {
   float fVar1;
@@ -4211,9 +4277,11 @@ undefined4 * __fastcall SelectCarCameraMover__ctor(undefined4 *param_1)
 }
 
 
-// ==== 0x487070 FUN_00487070
+// ==== 0x487070 SelectCarCameraMover::CopyPovParams
 
-void __fastcall FUN_00487070(undefined4 *param_1)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void __fastcall SelectCarCameraMover__CopyPovParams(undefined4 *param_1)
 
 {
   undefined4 uVar1;
@@ -4239,11 +4307,12 @@ void __fastcall FUN_00487070(undefined4 *param_1)
 }
 
 
-// ==== 0x4870c0 FUN_004870c0
+// ==== 0x4870c0 SelectCarCameraMover::Update
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
-void __fastcall FUN_004870c0(int param_1)
+void __fastcall SelectCarCameraMover__Update(int param_1)
 
 {
   float fVar1;
@@ -4296,7 +4365,7 @@ void __fastcall FUN_004870c0(int param_1)
       if (*(float *)(param_1 + 0x48) < 6.0) {
         *(undefined4 *)(param_1 + 0x48) = 0x40c00000;
       }
-      FUN_00487f50();
+      SelectCarCameraMover__MoveNonOrbitValuesToDefault();
     }
     else if (iVar5 == 1) {
       if (*(int *)(param_1 + 0x30) < 4) {
@@ -4401,11 +4470,12 @@ void __fastcall FUN_004870c0(int param_1)
 }
 
 
-// ==== 0x487590 FUN_00487590
+// ==== 0x487590 SelectCarCameraMover::GetDefaultEye
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
 
-void FUN_00487590(void)
+void SelectCarCameraMover__GetDefaultEye(void)
 
 {
   undefined4 uVar1;
@@ -4505,9 +4575,11 @@ void __thiscall CameraMover_SetTransitionParamB(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x487810 FUN_00487810
+// ==== 0x487810 SelectCarCameraMover::SetZoomSpeed
 
-void __thiscall FUN_00487810(int param_1,undefined4 param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __thiscall SelectCarCameraMover__SetZoomSpeed(int param_1,undefined4 param_2)
 
 {
   if ((*(int *)(param_1 + 0x2c) != 2) && (*(int *)(param_1 + 0x2c) != 0)) {
@@ -4518,12 +4590,15 @@ void __thiscall FUN_00487810(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x487830 FUN_00487830
+// ==== 0x487830 SelectCarCameraMover::SetMagazineOrientation
+
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
 void __thiscall
-FUN_00487830(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5
-            ,undefined4 param_6,undefined4 param_7,undefined4 param_8,undefined4 param_9,
-            undefined4 param_10,undefined4 param_11,undefined4 param_12)
+SelectCarCameraMover__SetMagazineOrientation
+          (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5,
+          undefined4 param_6,undefined4 param_7,undefined4 param_8,undefined4 param_9,
+          undefined4 param_10,undefined4 param_11,undefined4 param_12)
 
 {
   *(undefined4 *)(param_1 + 0x100) = param_2;
@@ -4539,51 +4614,60 @@ FUN_00487830(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
   *(undefined4 *)(param_1 + 0x138) = param_12;
   *(undefined4 *)(param_1 + 0x34) = 1;
   if (*(int *)(param_1 + 0x2c) != 2) {
-    FUN_004878c0();
+    SelectCarCameraMover__ApplyMagazineOrientation();
   }
   return;
 }
 
 
-// ==== 0x4878c0 FUN_004878c0
+// ==== 0x4878c0 SelectCarCameraMover::ApplyMagazineOrientation
 
-void __fastcall FUN_004878c0(int param_1)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void __fastcall SelectCarCameraMover__ApplyMagazineOrientation(int param_1)
 
 {
   if (*(int *)(param_1 + 0x34) != 0) {
-    FUN_00487980(*(undefined4 *)(param_1 + 0x100),*(undefined4 *)(param_1 + 0x104),
-                 *(undefined4 *)(param_1 + 0x108),*(undefined4 *)(param_1 + 0x10c),
-                 *(undefined4 *)(param_1 + 0x110),*(undefined4 *)(param_1 + 0x120),
-                 *(undefined4 *)(param_1 + 0x124),*(undefined4 *)(param_1 + 0x128),
-                 *(undefined4 *)(param_1 + 0x130),*(undefined4 *)(param_1 + 0x134),
-                 *(undefined4 *)(param_1 + 0x138));
+    SelectCarCameraMover__SetDesiredOrientation
+              (*(undefined4 *)(param_1 + 0x100),*(undefined4 *)(param_1 + 0x104),
+               *(undefined4 *)(param_1 + 0x108),*(undefined4 *)(param_1 + 0x10c),
+               *(undefined4 *)(param_1 + 0x110),*(undefined4 *)(param_1 + 0x120),
+               *(undefined4 *)(param_1 + 0x124),*(undefined4 *)(param_1 + 0x128),
+               *(undefined4 *)(param_1 + 0x130),*(undefined4 *)(param_1 + 0x134),
+               *(undefined4 *)(param_1 + 0x138));
   }
   return;
 }
 
 
-// ==== 0x487920 FUN_00487920
+// ==== 0x487920 SelectCarCameraMover::ResetAfterMagazine
 
-void FUN_00487920(void)
+/* [canon] camera med (ghidra-canon+nfsug) docs/re/camera.md */
+
+void SelectCarCameraMover__ResetAfterMagazine(void)
 
 {
   int unaff_ESI;
   
   if (*(int *)(unaff_ESI + 0x34) != 0) {
-    FUN_00487980(0x42ba0000,*(undefined4 *)(unaff_ESI + 0x44),0x40c00000,0,0x42340000,0,0x3f400000,0
-                 ,0,0,0x3f400000);
+    SelectCarCameraMover__SetDesiredOrientation
+              (0x42ba0000,*(undefined4 *)(unaff_ESI + 0x44),0x40c00000,0,0x42340000,0,0x3f400000,0,0
+               ,0,0x3f400000);
     *(undefined4 *)(unaff_ESI + 0x34) = 0;
   }
   return;
 }
 
 
-// ==== 0x487980 FUN_00487980
+// ==== 0x487980 SelectCarCameraMover::SetDesiredOrientation
+
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
 void __thiscall
-FUN_00487980(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5
-            ,undefined4 param_6,undefined4 param_7,undefined4 param_8,undefined4 param_9,
-            undefined4 param_10,undefined4 param_11,undefined4 param_12)
+SelectCarCameraMover__SetDesiredOrientation
+          (int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5,
+          undefined4 param_6,undefined4 param_7,undefined4 param_8,undefined4 param_9,
+          undefined4 param_10,undefined4 param_11,undefined4 param_12)
 
 {
   int extraout_ECX;
@@ -4625,16 +4709,19 @@ FUN_00487980(int param_1,undefined4 param_2,undefined4 param_3,undefined4 param_
   *(undefined4 *)(param_1 + 0xf0) = param_10;
   *(undefined4 *)(param_1 + 0xf8) = param_12;
   *(undefined4 *)(param_1 + 0xf4) = param_11;
-  fVar1 = (float10)FUN_00488380(param_1,*(undefined4 *)(param_1 + 0x80),
-                                *(undefined4 *)(param_1 + 0xc0));
+  fVar1 = (float10)SelectCarCameraMover__FindBestAngleGoal
+                             (param_1,*(undefined4 *)(param_1 + 0x80),
+                              *(undefined4 *)(param_1 + 0xc0));
   *(float *)(extraout_ECX + 0xc0) = (float)fVar1;
-  fVar1 = (float10)FUN_00488380(extraout_ECX,*(undefined4 *)(extraout_ECX + 0x84),
-                                *(undefined4 *)(extraout_ECX + 0xc4));
+  fVar1 = (float10)SelectCarCameraMover__FindBestAngleGoal
+                             (extraout_ECX,*(undefined4 *)(extraout_ECX + 0x84),
+                              *(undefined4 *)(extraout_ECX + 0xc4));
   *(float *)(extraout_ECX_00 + 0xc4) = (float)fVar1;
-  fVar1 = (float10)FUN_00488380(extraout_ECX_00,*(undefined4 *)(extraout_ECX_00 + 0x8c),
-                                *(undefined4 *)(extraout_ECX_00 + 0xcc));
+  fVar1 = (float10)SelectCarCameraMover__FindBestAngleGoal
+                             (extraout_ECX_00,*(undefined4 *)(extraout_ECX_00 + 0x8c),
+                              *(undefined4 *)(extraout_ECX_00 + 0xcc));
   *(float *)(extraout_ECX_01 + 0xcc) = (float)fVar1;
-  FUN_00487ee0();
+  SelectCarCameraMover__FindAnimSpeed();
   return;
 }
 
@@ -4667,9 +4754,11 @@ void CameraMover_SetupSpline
 }
 
 
-// ==== 0x487ba0 FUN_00487ba0
+// ==== 0x487ba0 SelectCarCameraMover::SetDramaticMode
 
-void FUN_00487ba0(void)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void SelectCarCameraMover__SetDramaticMode(void)
 
 {
   float *pfVar1;
@@ -4685,10 +4774,10 @@ void FUN_00487ba0(void)
   if (*(int *)(unaff_ESI + 0x2c) == 1) {
     *(undefined4 *)(unaff_ESI + 0x2c) = 0;
     if (*(int *)(unaff_ESI + 0x30) < 4) {
-      FUN_00487070();
+      SelectCarCameraMover__CopyPovParams();
     }
     pfVar1 = (float *)(unaff_ESI + 0xc0);
-    FUN_00487070();
+    SelectCarCameraMover__CopyPovParams();
     *pfVar1 = 93.0;
     *(undefined4 *)(unaff_ESI + 0xc4) = 0x42e60000;
     *(undefined4 *)(unaff_ESI + 0xcc) = 0;
@@ -4700,24 +4789,29 @@ void FUN_00487ba0(void)
     *(undefined4 *)(unaff_ESI + 0xf4) = 0;
     *(undefined4 *)(unaff_ESI + 0xf0) = 0;
     *(undefined4 *)(unaff_ESI + 0xf8) = 0x3f400000;
-    fVar2 = (float10)FUN_00488380(unaff_ESI,*(undefined4 *)(unaff_ESI + 0x80),*pfVar1);
+    fVar2 = (float10)SelectCarCameraMover__FindBestAngleGoal
+                               (unaff_ESI,*(undefined4 *)(unaff_ESI + 0x80),*pfVar1);
     *pfVar1 = (float)fVar2;
-    fVar2 = (float10)FUN_00488380(unaff_ESI,*(undefined4 *)(unaff_ESI + 0x84),
-                                  *(undefined4 *)(unaff_ESI + 0xc4));
+    fVar2 = (float10)SelectCarCameraMover__FindBestAngleGoal
+                               (unaff_ESI,*(undefined4 *)(unaff_ESI + 0x84),
+                                *(undefined4 *)(unaff_ESI + 0xc4));
     *(float *)(unaff_ESI + 0xc4) = (float)fVar2;
-    fVar2 = (float10)FUN_00488380(unaff_ESI,*(undefined4 *)(unaff_ESI + 0x8c),
-                                  *(undefined4 *)(unaff_ESI + 0xcc));
+    fVar2 = (float10)SelectCarCameraMover__FindBestAngleGoal
+                               (unaff_ESI,*(undefined4 *)(unaff_ESI + 0x8c),
+                                *(undefined4 *)(unaff_ESI + 0xcc));
     *(float *)(unaff_ESI + 0xcc) = (float)fVar2;
-    FUN_00487ee0();
+    SelectCarCameraMover__FindAnimSpeed();
     *(undefined4 *)(unaff_ESI + 0x30) = 4;
   }
   return;
 }
 
 
-// ==== 0x487cc0 FUN_00487cc0
+// ==== 0x487cc0 SelectCarCameraMover::SetPresetA
 
-void FUN_00487cc0(void)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void SelectCarCameraMover__SetPresetA(void)
 
 {
   int unaff_ESI;
@@ -4728,7 +4822,8 @@ void FUN_00487cc0(void)
     if (95.0 < *(float *)(unaff_ESI + 0x40)) {
       local_4 = *(undefined4 *)(unaff_ESI + 0x40);
     }
-    FUN_00487980(local_4,0x425c0000,0x40c00000,0,0x42340000,0,0x3f400000,0,0,0,0x3f400000);
+    SelectCarCameraMover__SetDesiredOrientation
+              (local_4,0x425c0000,0x40c00000,0,0x42340000,0,0x3f400000,0,0,0,0x3f400000);
     *(undefined4 *)(unaff_ESI + 0x184) = 0;
     *(undefined4 *)(unaff_ESI + 0x188) = 0;
     *(float *)(unaff_ESI + 400) = *(float *)(unaff_ESI + 400) * 2.0;
@@ -4738,9 +4833,11 @@ void FUN_00487cc0(void)
 }
 
 
-// ==== 0x487d70 FUN_00487d70
+// ==== 0x487d70 SelectCarCameraMover::IsPresetDone
 
-undefined4 __fastcall FUN_00487d70(int param_1)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+undefined4 __fastcall SelectCarCameraMover__IsPresetDone(int param_1)
 
 {
   if ((*(int *)(param_1 + 0x2c) != 1) &&
@@ -4752,15 +4849,18 @@ undefined4 __fastcall FUN_00487d70(int param_1)
 }
 
 
-// ==== 0x487da0 FUN_00487da0
+// ==== 0x487da0 SelectCarCameraMover::SetPresetB
 
-void FUN_00487da0(void)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void SelectCarCameraMover__SetPresetB(void)
 
 {
   int unaff_ESI;
   
   if (*(int *)(unaff_ESI + 0x2c) != 1) {
-    FUN_00487980(0x42e60000,0,0x40c00000,0,0x42340000,0,0x3f400000,0,0,0,0x3f400000);
+    SelectCarCameraMover__SetDesiredOrientation
+              (0x42e60000,0,0x40c00000,0,0x42340000,0,0x3f400000,0,0,0,0x3f400000);
     *(undefined4 *)(unaff_ESI + 0x184) = 0;
     *(undefined4 *)(unaff_ESI + 0x188) = 0;
     *(float *)(unaff_ESI + 400) = *(float *)(unaff_ESI + 400) * 3.2;
@@ -4770,16 +4870,19 @@ void FUN_00487da0(void)
 }
 
 
-// ==== 0x487e20 FUN_00487e20
+// ==== 0x487e20 SelectCarCameraMover::SetPresetC
 
-void FUN_00487e20(void)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void SelectCarCameraMover__SetPresetC(void)
 
 {
   float fVar1;
   int unaff_ESI;
   
   if (*(int *)(unaff_ESI + 0x2c) != 1) {
-    FUN_00487980(0x42ba0000,0x42e60000,0x40c00000,0,0x42340000,0,0x3f400000,0,0,0,0x3f400000);
+    SelectCarCameraMover__SetDesiredOrientation
+              (0x42ba0000,0x42e60000,0x40c00000,0,0x42340000,0,0x3f400000,0,0,0,0x3f400000);
     fVar1 = *(float *)(unaff_ESI + 400) * 2.0;
     *(undefined4 *)(unaff_ESI + 0x184) = 0;
     *(undefined4 *)(unaff_ESI + 0x188) = 0;
@@ -4791,9 +4894,11 @@ void FUN_00487e20(void)
 }
 
 
-// ==== 0x487eb0 FUN_00487eb0
+// ==== 0x487eb0 SelectCarCameraMover::EndPreset
 
-void __fastcall FUN_00487eb0(int param_1)
+/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+
+void __fastcall SelectCarCameraMover__EndPreset(int param_1)
 
 {
   if (*(int *)(param_1 + 0x2c) != 1) {
@@ -4803,7 +4908,7 @@ void __fastcall FUN_00487eb0(int param_1)
       *(undefined4 *)(param_1 + 0x2c) = 3;
     }
     if (*(int *)(param_1 + 0x34) != 0) {
-      FUN_004878c0();
+      SelectCarCameraMover__ApplyMagazineOrientation();
       return;
     }
   }
@@ -4811,9 +4916,11 @@ void __fastcall FUN_00487eb0(int param_1)
 }
 
 
-// ==== 0x487ee0 FUN_00487ee0
+// ==== 0x487ee0 SelectCarCameraMover::FindAnimSpeed
 
-void __fastcall FUN_00487ee0(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall SelectCarCameraMover__FindAnimSpeed(int param_1)
 
 {
   float fVar1;
@@ -4830,11 +4937,12 @@ void __fastcall FUN_00487ee0(int param_1)
 }
 
 
-// ==== 0x487f50 FUN_00487f50
+// ==== 0x487f50 SelectCarCameraMover::MoveNonOrbitValuesToDefault
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
-void FUN_00487f50(void)
+void SelectCarCameraMover__MoveNonOrbitValuesToDefault(void)
 
 {
   float fVar1;
@@ -4846,7 +4954,8 @@ void FUN_00487f50(void)
   float local_48;
   float local_44;
   
-  fVar5 = (float10)FUN_00488380(unaff_ESI,*(undefined4 *)(unaff_ESI + 0x4c),0);
+  fVar5 = (float10)SelectCarCameraMover__FindBestAngleGoal
+                             (unaff_ESI,*(undefined4 *)(unaff_ESI + 0x4c),0);
   fVar1 = (float)fVar5;
   if (*(float *)(unaff_ESI + 0x4c) == fVar1) {
     local_48 = 0.0;
@@ -4872,9 +4981,11 @@ void FUN_00487f50(void)
       local_44 = local_44 / (DAT_0073ad38 * 50.0);
     }
   }
-  fVar5 = (float10)FUN_00488190(unaff_ESI,DAT_0073ad38 * 2.2);
+  fVar5 = (float10)SelectCarCameraMover__FindNumberOfStepsToMoveVectorToDefault
+                             (unaff_ESI,DAT_0073ad38 * 2.2);
   fVar2 = (float)fVar5;
-  fVar5 = (float10)FUN_00488190(unaff_ESI,DAT_0073ad38 * 2.2);
+  fVar5 = (float10)SelectCarCameraMover__FindNumberOfStepsToMoveVectorToDefault
+                             (unaff_ESI,DAT_0073ad38 * 2.2);
   fVar3 = (float)fVar5;
   fVar4 = local_48;
   if (local_48 < local_44) {
@@ -4890,17 +5001,22 @@ void FUN_00487f50(void)
     return;
   }
   fVar4 = _K_ONE / fVar4;
-  FUN_00488220(unaff_ESI,fVar1,fVar4 * local_48 * DAT_0073ad38 * 75.0);
-  FUN_00488220(unaff_ESI,0x42340000,fVar4 * local_44 * 50.0 * DAT_0073ad38);
-  FUN_00488280(unaff_ESI,fVar4 * fVar2 * 2.2 * DAT_0073ad38);
-  FUN_00488280(unaff_ESI,fVar4 * fVar3 * 2.2 * DAT_0073ad38);
+  SelectCarCameraMover__MoveFloatToDefault(unaff_ESI,fVar1,fVar4 * local_48 * DAT_0073ad38 * 75.0);
+  SelectCarCameraMover__MoveFloatToDefault
+            (unaff_ESI,0x42340000,fVar4 * local_44 * 50.0 * DAT_0073ad38);
+  SelectCarCameraMover__MoveVectorToDefault(unaff_ESI,fVar4 * fVar2 * 2.2 * DAT_0073ad38);
+  SelectCarCameraMover__MoveVectorToDefault(unaff_ESI,fVar4 * fVar3 * 2.2 * DAT_0073ad38);
   return;
 }
 
 
-// ==== 0x488190 FUN_00488190
+// ==== 0x488190 SelectCarCameraMover::FindNumberOfStepsToMoveVectorToDefault
 
-float10 __fastcall FUN_00488190(float *param_1,float *param_2,undefined4 param_3,float param_4)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+float10 __fastcall
+SelectCarCameraMover__FindNumberOfStepsToMoveVectorToDefault
+          (float *param_1,float *param_2,undefined4 param_3,float param_4)
 
 {
   if ((((0.001 < ABS(*param_2 - *param_1)) || (0.001 < ABS(param_2[1] - param_1[1]))) ||
@@ -4916,9 +5032,13 @@ float10 __fastcall FUN_00488190(float *param_1,float *param_2,undefined4 param_3
 }
 
 
-// ==== 0x488220 FUN_00488220
+// ==== 0x488220 SelectCarCameraMover::MoveFloatToDefault
 
-void __thiscall FUN_00488220(float *param_1,undefined4 param_2,float param_3,float param_4)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __thiscall
+SelectCarCameraMover__MoveFloatToDefault
+          (float *param_1,undefined4 param_2,float param_3,float param_4)
 
 {
   float fVar1;
@@ -4941,11 +5061,14 @@ void __thiscall FUN_00488220(float *param_1,undefined4 param_2,float param_3,flo
 }
 
 
-// ==== 0x488280 FUN_00488280
+// ==== 0x488280 SelectCarCameraMover::MoveVectorToDefault
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
-void __fastcall FUN_00488280(float *param_1,float *param_2,undefined4 param_3,float param_4)
+void __fastcall
+SelectCarCameraMover__MoveVectorToDefault
+          (float *param_1,float *param_2,undefined4 param_3,float param_4)
 
 {
   float fVar1;
@@ -4976,9 +5099,11 @@ void __fastcall FUN_00488280(float *param_1,float *param_2,undefined4 param_3,fl
 }
 
 
-// ==== 0x488380 FUN_00488380
+// ==== 0x488380 SelectCarCameraMover::FindBestAngleGoal
 
-float10 FUN_00488380(undefined4 param_1,float param_2,float param_3)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+float10 SelectCarCameraMover__FindBestAngleGoal(undefined4 param_1,float param_2,float param_3)
 
 {
   float fVar1;
@@ -5017,7 +5142,7 @@ DebugWorldCameraMover__ctor
   ExceptionList = &local_10;
   CameraMover__ctor();
   param_1[0x10] = param_4;
-  *param_1 = &PTR_FUN_006c7d80;
+  *param_1 = &PTR_DebugWorldCameraMover__scalar_deleting_destructor_006c7d80;
   param_1[0xb] = 0;
   param_1[0xc] = 0;
   param_1[0xd] = 0;
@@ -5038,18 +5163,20 @@ DebugWorldCameraMover__ctor
   DAT_00735f38 = 0;
   param_1[0x11] = 0x80000000;
   param_1[0x12] = 0;
-  FUN_00488550();
+  DebugWorldCameraMover__AddJoyHandlers();
   ExceptionList = local_10;
   return param_1;
 }
 
 
-// ==== 0x4884e0 FUN_004884e0
+// ==== 0x4884e0 DebugWorldCameraMover::scalar_deleting_destructor
 
-void * __thiscall FUN_004884e0(void *param_1,byte param_2)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void * __thiscall DebugWorldCameraMover__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_00488500();
+  DebugWorldCameraMover___DebugWorldCameraMover();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -5057,16 +5184,18 @@ void * __thiscall FUN_004884e0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x488500 FUN_00488500
+// ==== 0x488500 DebugWorldCameraMover::_DebugWorldCameraMover
 
-void __fastcall FUN_00488500(undefined4 *param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall DebugWorldCameraMover___DebugWorldCameraMover(undefined4 *param_1)
 
 {
   int iVar1;
   int *piVar2;
   
-  *param_1 = &PTR_FUN_006c7d80;
-  FUN_004886c0();
+  *param_1 = &PTR_DebugWorldCameraMover__scalar_deleting_destructor_006c7d80;
+  DebugWorldCameraMover__RemoveJoyHandlers();
   *param_1 = &PTR_CameraMover__TrivialDtor_006c7c50;
   if (param_1[5] != 0) {
     param_1[5] = 0;
@@ -5083,41 +5212,45 @@ void __fastcall FUN_00488500(undefined4 *param_1)
 }
 
 
-// ==== 0x488550 FUN_00488550
+// ==== 0x488550 DebugWorldCameraMover::AddJoyHandlers
 
-void __fastcall FUN_00488550(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall DebugWorldCameraMover__AddJoyHandlers(int param_1)
 
 {
   if (*(int *)(param_1 + 0x48) == 0) {
-    InputEvents__AddSource(0x4e,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x4f,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x50,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x51,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x52,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x53,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x54,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x55,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x56,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x57,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x58,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x59,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x5a,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x5b,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x5c,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x5d,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x5e,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x5f,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x60,FUN_004887b0,param_1);
-    InputEvents__AddSource(0x61,FUN_004887b0,param_1);
+    InputEvents__AddSource(0x4e,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x4f,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x50,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x51,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x52,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x53,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x54,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x55,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x56,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x57,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x58,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x59,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x5a,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x5b,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x5c,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x5d,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x5e,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x5f,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x60,DebugWorldCameraMover__JoyHandler,param_1);
+    InputEvents__AddSource(0x61,DebugWorldCameraMover__JoyHandler,param_1);
     *(undefined4 *)(param_1 + 0x48) = 1;
   }
   return;
 }
 
 
-// ==== 0x4886c0 FUN_004886c0
+// ==== 0x4886c0 DebugWorldCameraMover::RemoveJoyHandlers
 
-void __fastcall FUN_004886c0(int param_1)
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
+
+void __fastcall DebugWorldCameraMover__RemoveJoyHandlers(int param_1)
 
 {
   if (*(int *)(param_1 + 0x48) != 0) {
@@ -5147,11 +5280,13 @@ void __fastcall FUN_004886c0(int param_1)
 }
 
 
-// ==== 0x4887b0 FUN_004887b0
+// ==== 0x4887b0 DebugWorldCameraMover::JoyHandler
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] camera high (ghidra-canon+nfsug) docs/re/camera.md */
 
-void FUN_004887b0(undefined4 param_1,undefined4 param_2,byte param_3,int param_4)
+void DebugWorldCameraMover__JoyHandler
+               (undefined4 param_1,undefined4 param_2,byte param_3,int param_4)
 
 {
   undefined2 uVar1;
@@ -6444,7 +6579,7 @@ LAB_00489dcd:
     FUN_0040ba40(auStack_170,auStack_170);
   }
   else {
-    FUN_00483ad0(param_1,auStack_170,(int)fVar24 + 0x60,&fStack_2e8);
+    CameraMover__IsoProjectionMatrix(param_1,auStack_170,(int)fVar24 + 0x60,&fStack_2e8);
   }
   iVar16 = DAT_00735f5c;
   if (DAT_00735f5c == 0) {
@@ -6714,9 +6849,9 @@ CubicCameraMover__ctor
   iVar5 = param_1[0xb];
   local_24 = param_1[0xe];
   local_28 = iVar5 + 0x70;
-  FUN_00483e30();
-  FUN_00483ea0(local_2c,iVar5 + 0x70);
-  FUN_00483fb0(local_24,local_28);
+  CameraMover__FovCubicInit();
+  CameraMover__EyeCubicInit(local_2c,iVar5 + 0x70);
+  CameraMover__LookCubicInit(local_24,local_28);
   pfVar1 = (float *)param_1[0xd];
   if (20.0 < SQRT((*pfVar1 - pfVar1[2]) * (*pfVar1 - pfVar1[2]) +
                   (pfVar1[0xc] - pfVar1[0xe]) * (pfVar1[0xc] - pfVar1[0xe]) +
@@ -7127,7 +7262,7 @@ void __fastcall FUN_0048b8c0(undefined4 param_1,int *param_2,short *param_3,int 
   fStack_60 = local_70 * *(float *)(param_4 + 0x10);
   fStack_5c = local_6c * *(float *)(param_4 + 0x14);
   fStack_58 = local_68 * *(float *)(param_4 + 0x18);
-  FUN_00483430();
+  bClamp();
   fVar5 = fStack_80;
   fVar6 = fStack_7c;
   if (((*(int *)(param_2[0xb] + 0x38) != 0) && (*(int *)(param_2[0xb] + 0x3cc) < 3)) &&
@@ -7144,7 +7279,7 @@ void __fastcall FUN_0048b8c0(undefined4 param_1,int *param_2,short *param_3,int 
   fStack_60 = local_70 * *(float *)(param_4 + 0x40);
   fStack_5c = local_6c * *(float *)(param_4 + 0x44);
   fStack_58 = local_68 * *(float *)(param_4 + 0x48);
-  FUN_00483430();
+  bClamp();
   fStack_60 = fStack_60 + fStack_88;
   fStack_58 = fStack_58 + local_84;
   FUN_004831c0(fStack_60,fStack_5c,fStack_58);
@@ -7498,9 +7633,9 @@ undefined4 * __fastcall DragRaceCameraMover__ctor(undefined4 *param_1)
   }
   uVar1 = param_1[0xc];
   param_1[0xd] = uVar4;
-  FUN_00483e30();
-  FUN_00483ea0(uVar1,0);
-  FUN_00483fb0(uVar4,0);
+  CameraMover__FovCubicInit();
+  CameraMover__EyeCubicInit(uVar1,0);
+  CameraMover__LookCubicInit(uVar4,0);
   return param_1;
 }
 
@@ -8051,7 +8186,7 @@ void FUN_0048ce30(int param_1,char param_2)
     if (fVar1 != pfVar2[2]) {
       *(undefined2 *)(pfVar2 + 0xb) = 2;
     }
-    fVar8 = (float10)FUN_004833c0(*(undefined4 *)(iVar4 + 0x3c),local_1bc);
+    fVar8 = (float10)ConvertLensDeltaToFovDelta(*(undefined4 *)(iVar4 + 0x3c),local_1bc);
     iVar6 = *(int *)(param_1 + 0x30);
     *(float *)(iVar6 + 4) = (float)fVar8;
     if (fVar8 != (float10)*(float *)(iVar6 + 0xc)) {
@@ -8064,7 +8199,7 @@ void FUN_0048ce30(int param_1,char param_2)
     if (fVar1 != *pfVar2) {
       *(undefined2 *)(pfVar2 + 0xb) = 2;
     }
-    fVar8 = (float10)FUN_004833c0(*(undefined4 *)(iVar4 + 0x40),local_1b8);
+    fVar8 = (float10)ConvertLensDeltaToFovDelta(*(undefined4 *)(iVar4 + 0x40),local_1b8);
     *(float *)(*(int *)(param_1 + 0x30) + 0xc) = (float)fVar8;
     FUN_00483160(*(undefined4 *)(iVar4 + 0xc),*(undefined4 *)(iVar4 + 0x10),
                  *(undefined4 *)(iVar4 + 0x14));
@@ -8097,21 +8232,21 @@ void FUN_0048ce30(int param_1,char param_2)
       local_182 = 1;
       CameraMoverBase_InitFields(0x3f800000,0x3f800000);
       CameraMoverBase_InitFields(0x3f800000,0x3f800000);
-      FUN_00483e30();
+      CameraMover__FovCubicInit();
       if (*(char *)(iVar4 + 4) == '\0') {
         iVar6 = 0;
       }
       else {
         iVar6 = *(int *)(param_1 + 0x2c) + 0x70;
       }
-      FUN_00483ea0(&local_130,iVar6);
+      CameraMover__EyeCubicInit(&local_130,iVar6);
       if (*(char *)(iVar4 + 5) == '\0') {
         iVar6 = 0;
       }
       else {
         iVar6 = *(int *)(param_1 + 0x2c) + 0x70;
       }
-      FUN_00483fb0(&local_a0,iVar6);
+      CameraMover__LookCubicInit(&local_a0,iVar6);
       fVar1 = _DAT_007796b0;
       if (DAT_007796a8 < 1) {
         fVar1 = *(float *)(*(int *)(param_1 + 0x2c) + 0x814);
@@ -8390,9 +8525,9 @@ DragRaceAheadCameraMover__ctor(undefined4 *param_1,undefined4 param_2,undefined4
   Matrix_InvertRigid();
   uVar4 = param_1[0x22];
   uVar1 = param_1[0x21];
-  FUN_00483e30();
-  FUN_00483ea0(uVar1,0);
-  FUN_00483fb0(uVar4,0);
+  CameraMover__FovCubicInit();
+  CameraMover__EyeCubicInit(uVar1,0);
+  CameraMover__LookCubicInit(uVar4,0);
   puVar2 = (undefined4 *)param_1[0x20];
   *puVar2 = puVar2[2];
   puVar2[1] = puVar2[3];
@@ -8611,12 +8746,12 @@ void __thiscall FUN_0048dd00(int param_1,undefined4 param_2,undefined4 param_3,i
   fVar1 = *(float *)(param_4 + 0x10);
   fVar2 = *(float *)(param_4 + 0x14);
   fVar3 = *(float *)(param_4 + 0x18);
-  FUN_00483430();
+  bClamp();
   FUN_004831c0(fVar1 * 0.0 + fVar6,fVar2 * 0.0 + fVar7,fVar3 * 0.0 + fVar8);
   fVar1 = *(float *)(param_4 + 0x40);
   fVar2 = *(float *)(param_4 + 0x44);
   fVar3 = *(float *)(param_4 + 0x48);
-  FUN_00483430();
+  bClamp();
   FUN_004831c0(fVar1 * 0.0 + fVar9,fVar2 * 0.0 + fVar10,fVar3 * 0.0 + fVar11);
   uVar12 = (uint)DAT_007788bc;
   pfVar4 = *(float **)(param_1 + 0x80);

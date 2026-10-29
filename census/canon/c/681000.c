@@ -6879,7 +6879,7 @@ void FUN_00685b0b(void)
 void Unwind_00685b20(void)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   return;
 }
 
@@ -6939,7 +6939,7 @@ void FUN_00685b5d(void)
 void Unwind_00685b70(void)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   return;
 }
 
@@ -6969,7 +6969,7 @@ void FUN_00685b83(void)
 void Unwind_00685b90(void)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   return;
 }
 
@@ -7779,7 +7779,7 @@ void FUN_0068600b(void)
 void Unwind_00686020(void)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   return;
 }
 
@@ -8265,7 +8265,7 @@ void FUN_006862ee(void)
 void Unwind_00686300(void)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   return;
 }
 
@@ -8345,7 +8345,7 @@ void FUN_0068636d(void)
 void Unwind_00686380(void)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   return;
 }
 
@@ -9186,7 +9186,7 @@ void FUN_00686863(void)
 void Unwind_00686870(void)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   return;
 }
 
@@ -9966,7 +9966,7 @@ void FUN_00686cd6(void)
 void Unwind_00686ce0(void)
 
 {
-  FUN_00483550();
+  CameraMover___CameraMover();
   return;
 }
 
@@ -22803,7 +22803,7 @@ void FUN_0068d5a0(void)
 void FUN_0068d5c0(void)
 
 {
-  FUN_00504220();
+  GarageManager__GarageManager();
   _atexit(StaticInit_GaragePaintModScreen_G744ff0_696560);
   return;
 }

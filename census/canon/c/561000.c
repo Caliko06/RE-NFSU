@@ -10816,7 +10816,7 @@ void CarRenderInfo__Render
   }
   if (pfStack_954 != (float *)0x0) {
     piStack_990 = (int *)0x56df4a;
-    FUN_004833a0();
+    eView__GetMatrixForPlayer();
   }
   piStack_990 = (int *)0x56df58;
   bMatrixCopy_b();
@@ -12105,7 +12105,7 @@ LAB_00570822:
     local_30 = DAT_007365a0;
     local_2c = (float)DAT_007365a4;
     local_28 = (float)DAT_007365a8;
-    FUN_00487590();
+    SelectCarCameraMover__GetDefaultEye();
     View_BuildMatrices(&DAT_0078bd50,&local_20,&local_30);
     return;
   }
