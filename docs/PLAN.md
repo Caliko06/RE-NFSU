@@ -26,6 +26,14 @@ walls. Simplest bridges and patches over the game's own AI; RE first; one check 
 3. Walls: log the player position when speed drops to 0 with no visible wall; fix stub/fence there -> verify: the
    OWNER's spots pass.
 4. Whole-city road graph (exe limits 128 sections / 255 entries) if 1-2 need streets off the tour.
+OWNER play 2026-10-28 evening (WORLD): SELECT LOCATION page black; WRONG WAY still shows; a green gap to another car
+shows at the top; only 3 rivals and they vanish fast (wants more, each with a personality: clumsy, aggressive); no
+traffic in many zones; handling feels odd ONLY in WORLD. Baseline (autopilot on the tour, Chrome 300 s): traffic
+nearest < 150 m in 124/130 lines, rivals < 400 m in 374/390 samples, so the gaps are OFF the tour, where no road graph exists.
+5. WORLD picture on SELECT LOCATION -> verify: FE shot of the WORLD page shows the city; 1001's page unchanged.
+6. DONE: no WRONG WAY and no gap HUD in free mode (PATCH 0x430dbd, free_hud) -> verified: FREE hud mask 0x144589 cleared, WORLD shot.
+7. Handling in WORLD = 1001 -> verify: RN_BODYLOG A/B (z jitter, heading) on both tracks within noise.
+8. City road graph (docs/openworld/re_citygraph.md), then 6..8 rivals with personalities (docs/openworld/re_rivals_personality.md).
 
 ## Earlier (OWNER 2026-10-27 late): regressions before the open world
 The OWNER plays and sees: speed blur too strong, traffic glitches (flicker as a car loads, some still invisible, too

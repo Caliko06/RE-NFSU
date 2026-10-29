@@ -271,6 +271,16 @@ void free_tick(Ctx *c) {
         if (me && rn_telem.presents > start + 600) free_respawn(c, rh, me, x - was[0], y - was[1]);
         was[0] = x, was[1] = y;
     }
+    // RN_BODYLOG: the player's position every frame (WORLD vs 1001 handling A/B: z jitter = bumps, xy = speed and turns).
+    static int body = -1;
+    if (body < 0) body = getenv("RN_BODYLOG") != NULL;
+    if (body) {
+        uint32_t rh = ld(c, 0x7361f8, 4);
+        for (uint32_t r = rh ? ld(c, rh, 4) : 0, k = 0; r && r != rh && k < 200; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4);
+            if (e && ld(c, e + 4, 4) == 1) { rn_log("BODY %u %.3f %.3f %.3f", rn_telem.presents, ldf(c, r + 0x50), ldf(c, r + 0x54), ldf(c, r + 0x58)); break; }
+        }
+    }
     static int log = -1;
     if (log < 0) log = getenv("RN_FREELOG") != NULL;
     if (!log) return;
@@ -523,10 +533,29 @@ static uint32_t free_recycle(Ctx *c) {
     return r;
 }
 
+// The HUD mask: 0x430730 (player update) asks 0x42e620(player) (stdcall, edx:eax) at 0x430dbd for the 64-bit mask of the
+// widgets this race shows and, when it changed, pushes it to every widget with 0x42ed40 (a widget updates only when its
+// ctor mask meets it). Free mode has no route direction and no opponent to time against, yet the race's mask keeps
+// WRONG_WAY (lo 0x4000, widget 0x4a3ba0, from player+0x4ac by 0x430e00) and SPLIT_TIME / LIVE_SPLIT (lo 0x80 / 0x800000,
+// the green gap at the top). PATCH 0x430dbd (cave 0x554495: jmp [SCREEN_ADDR+0x90]): in free mode those three bits are
+// cleared; player+0x4ac stays (traffic 0x59a2c0 and the camera read it). RN_FREE=0 or a race: the game's mask.
+// docs/openworld/re_hud_free.md.
+static uint32_t free_hud(Ctx *c) {
+    uint32_t pl = ARG(0);
+    uint64_t m = call_guest64(c, 0x42e620, 1, &pl);
+    static uint64_t was;
+    if (m != was && getenv("RN_FREELOG")) rn_log("FREE hud mask %016llx live %d", (unsigned long long)m, live);
+    was = m;
+    if (live) m &= ~(uint64_t)(0x4000 | 0x80 | 0x800000);
+    c->r[EDX] = (uint32_t)(m >> 32);
+    return (uint32_t)m;
+}
+
 uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
 const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traffic", 7, free_traffic},
                          {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang},
                          {"rn", "free_place", 1, free_place}, {"rn", "free_spacing", 1, free_spacing},
                          {"rn", "free_nopath", 0, free_nopath},
-                         {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle}};
-const int free_api_count = 9;
+                         {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle},
+                         {"rn", "free_hud", 1, free_hud}};
+const int free_api_count = 10;

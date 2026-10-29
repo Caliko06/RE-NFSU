@@ -259,6 +259,11 @@ PATCHES.append(dict(addr=0x439a94, old="cc" * 6, new="ff2588300100", entry=True,
 # when the car is farther than 500 m ([0x6b5a3c], the move's route limit) in a straight line from the player.
 PATCHES.append(dict(addr=0x5987f6, old="e8c5000000", new="e8" + _rel(0x5987f6, 0x439a9a), when=lambda: True))
 PATCHES.append(dict(addr=0x439a9a, old="cc" * 6, new="ff258c300100", entry=True, when=lambda: True))
+# PATCH: 0x430dbd (+ cave 0x554495, CC padding after a ret, no reference): the player update 0x430730 asks 0x42e620
+# (stdcall 1, edx:eax) for the HUD widget mask; now host/free.c free_hud, which calls it and in free mode clears WRONG_WAY
+# (lo 0x4000) and SPLIT_TIME / LIVE_SPLIT (lo 0x80 / 0x800000, the green gap). Why: docs/openworld/re_hud_free.md.
+PATCHES.append(dict(addr=0x430dbd, old="e85ed8ffff", new="e8" + _rel(0x430dbd, 0x554495), when=lambda: True))
+PATCHES.append(dict(addr=0x554495, old="cc" * 6, new="ff2590300100", entry=True, when=lambda: True))
 
 # PATCH: 0x7007ec, 0x700850 (+ caves 0x6439f2, 0x6439f8: CC padding between two functions, no reference), 0x4ba207; OWNER 2026-10-28
 # (the "WORLD" entry of the Free Run list, docs/openworld/world_entry.md). 0x7007ec / 0x700850 are entries of the chunk handler table

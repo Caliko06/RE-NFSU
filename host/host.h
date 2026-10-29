@@ -61,6 +61,7 @@ Handle *get_handle(uint32_t h);
 
 const Api *find_api(const char *dll, const char *name);
 uint32_t call_guest(Ctx *c, uint32_t fn, int n, const uint32_t *args);
+uint64_t call_guest64(Ctx *c, uint32_t fn, int n, const uint32_t *args);   // stdcall, edx:eax
 uint32_t call_guest_cdecl(Ctx *c, uint32_t fn, int n, const uint32_t *args);   // the caller pops the args
 uint32_t host_addr_of(const char *dll, const char *name);     // HOST_BASE address, registering if needed
 void rn_halt(Ctx *c, const char *fmt, ...);
