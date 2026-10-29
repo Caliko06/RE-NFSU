@@ -92,10 +92,23 @@ uint32_t free_rival(Ctx *c, uint32_t *a) {
         snprintf(G(nm), 16, "%s", CANON[k].name);
         a[3] = nm;
     }
+    // Personalities: the AI's skill level 1..9 is this call's 5th argument (0x5809c0 stores it in entrant+0x735 at 0x5809f6,
+    // the racer AI reads it through vtable +0x58 = 0x44ca10) and picks its record 0x779ff8 + 0x54 * level (wander chance,
+    // speed fractions, catch-up; docs/openworld/re_rival_personality.md). Free mode gives each rival its own level,
+    // RN_FREESKILL (default "2,5,9": clumsy, steady, aggressive); "0" keeps the game's.
+    uint32_t game_skill = a[4];
+    const char *sk = getenv("RN_FREESKILL");
+    if (!sk) sk = "2,5,9";
+    if (strcmp(sk, "0")) {
+        const char *q = sk;
+        for (int j = 0; j < npicked % NRIV && q; j++) q = strchr(q, ','), q = q ? q + 1 : NULL;
+        int lv = q ? atoi(q) : 0;
+        if (lv >= 1 && lv <= 9) a[4] = (uint32_t)lv;
+    }
     if (npicked < NRIV) picked[npicked++] = k;
     if (getenv("RN_FREELOG"))
-        rn_log("FREE rival %u: %s preset %08x %s (%s)", a[6], CANON[k].name, CANON[k].preset, rec ? "applied" : "MISSING",
-               rec ? G(rec + 0x28) : "-");
+        rn_log("FREE rival %u: %s preset %08x %s (%s) skill %d -> %d", a[6], CANON[k].name, CANON[k].preset, rec ? "applied" : "MISSING",
+               rec ? G(rec + 0x28) : "-", (int)game_skill, (int)a[4]);
     return call_guest(c, 0x5809c0, 7, a);
 }
 
@@ -285,6 +298,20 @@ void free_tick(Ctx *c) {
     if (log < 0) log = getenv("RN_FREELOG") != NULL;
     if (!log) return;
     uint32_t h = ld(c, 0x7361f8, 4), player = 0;
+    // Every 5 s: each rival's skill level (entrant+0x735) and speed over those 5 s (personality A/B).
+    if (h && rn_telem.presents % 300 == 0) {
+        static double rp[8][2];
+        char b[256];
+        int n = 0, i = 0;
+        for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200 && i < 8; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4);
+            if (!e || ld(c, e + 4, 4) != 2) continue;
+            double x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
+            n += snprintf(b + n, sizeof b - n, " %s L%d %.0f", G(e + 0x73c), (int8_t)c->mem[e + 0x735], hypot(x - rp[i][0], y - rp[i][1]) / 5);
+            rp[i][0] = x, rp[i][1] = y, i++;
+        }
+        if (i) rn_log("FREE rivals%s m/s frame %u", b, rn_telem.presents);
+    }
     // A contact: a rival's centre within 4 m of the player's (car to car), 10 s after the start (the grid), at most one line per second.
     static uint32_t first, last_contact;
     if (!first) first = rn_telem.presents;
