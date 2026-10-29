@@ -8,7 +8,7 @@
   canon.py batch <system> <n> [skip]   next n ready rows of one system -> build/canon/batch_<system>.txt (addrs)
   canon.py show <addr|@file>...        named pseudocode of just those functions, with a one-line index each
 """
-import csv, glob, json, os, re, shutil, subprocess, sys, tempfile
+import csv, glob, json, math, os, re, shutil, subprocess, sys, tempfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 
@@ -221,7 +221,24 @@ def show(args):
                 gsyms.append((int(m.group(1), 16), int(m.group(2), 16), l.split(" = ")[0]))
         gsyms.sort()
     gaddr = [g[0] for g in gsyms]
+    # Free GC methods of the same source file: not yet taken by any PC name, nearest size first (what workers did by
+    # grepping symbols.txt by class in round 3)
+    taken, by_tu = set(), {}
+    if gcrow:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from gcalign import demangle
+        taken = {r["name"] for r in merged()[1].values()}
+        tu_of = {a(r["gc_addr"]): r["tu"] for r in gcrow.values()}
+        for ga_, sz, n in gsyms:
+            if ga_ in tu_of and demangle(n) not in taken:
+                by_tu.setdefault(tu_of[ga_], []).append((sz, n))
     for x in want:
+        r = gcrow.get(x)
+        j0 = idx.get(x, {})
+        if r and r["tu"] in by_tu and j0.get("size", 0) >= 24:
+            ps = j0["size"] / 0.88   # PC/GC size ratio (gcalign.py)
+            near = sorted(by_tu[r["tu"]], key=lambda t: abs(math.log(max(t[0], 1) / ps)))[:8]
+            print(f"// GC free in file ({len(by_tu[r['tu']])}): " + " | ".join(f"{n} ({sz}B)" for sz, n in near))
         r = gcrow.get(x)
         if r and gsyms:
             import bisect

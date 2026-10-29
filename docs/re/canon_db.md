@@ -60,3 +60,7 @@ census/canon/systems_tu.tsv, read by the scoreboard as med. 767 stay unknown (35
   now prints a GC window (aligned symbol +-3, mangled names with argument types) instead of trusting one name.
 - 888 lifted starts are not Ghidra functions (882 inside another function): census/canon/fragments.tsv with the parent;
   out of the queue. They count as parts of their parent, not as work.
+- Round 3 (>= 48 B, with GC window): R 17/27, B 6/15; car aligned well (R 15/19), audio and rivals badly; the right name
+  was often outside the window. `canon.py show` now also lists "GC free in file": GC methods of the same source file not
+  yet taken by any PC name, nearest size first. gcalign reads the merged names_*.tsv (wave names become anchors:
+  321 -> 443) and demangles nested scopes (Q<n>), so Realmc::GCInterface names anchor too.

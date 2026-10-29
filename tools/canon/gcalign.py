@@ -18,25 +18,36 @@ GC_LO, GC_HI = 0x80003100, 0x80240000   # .text
 
 
 def demangle(n):
-    """CodeWarrior/GCC2 names to Class::method (enough to compare with ours; args dropped)."""
-    m = re.match(r"^(_\._|__)(\d+)(\w+)", n)
-    if m and not n.startswith("__Q"):
-        c = m.group(3)[:int(m.group(2))]
-        return c + "::" + ("~" if m.group(1) == "_._" else "") + c
-    m = re.match(r"^(\w+?)__Q(\d)((?:\d+\w+?)+?)(?:F|$|[A-Z]|P|i|f|v|b)", n)
-    if m:   # nested class: method__Q<n><len>A<len>B...
-        parts, rest = [], n[len(m.group(1)) + 3:]
-        for _ in range(int(m.group(2))):
-            k = re.match(r"(\d+)", rest)
-            if not k:
-                break
-            L = int(k.group(1))
-            parts.append(rest[len(k.group(1)):len(k.group(1)) + L])
-            rest = rest[len(k.group(1)) + L:]
-        return "::".join(parts + [m.group(1)])
-    m = re.match(r"^(\w+?)__(\d+)(\w+)", n)
+    """CodeWarrior/GCC2 names to Class::method (enough to compare with ours; args dropped).
+    method__<len>Class..., method__Q<k><len>A<len>B..., __<class> = ctor, _._<class> = dtor, func__F... = free."""
+
+    def scope(t):
+        if t[:1] == "Q" and t[1:2].isdigit():
+            k, t, parts = int(t[1]), t[2:], []
+            for _ in range(k):
+                m = re.match(r"(\d+)", t)
+                if not m:
+                    return None
+                L = int(m.group(1))
+                parts.append(t[len(m.group(1)):len(m.group(1)) + L])
+                t = t[len(m.group(1)) + L:]
+            return parts
+        m = re.match(r"(\d+)", t)
+        if not m:
+            return None
+        L = int(m.group(1))
+        return [t[len(m.group(1)):len(m.group(1)) + L]]
+
+    for pre, dtor in (("_._", True), ("__", False)):
+        if n.startswith(pre):
+            p = scope(n[len(pre):])
+            if p:
+                return "::".join(p + [("~" if dtor else "") + p[-1]])
+    m = re.match(r"^(\w+?)__(?=[Q\d])", n)
     if m:
-        return m.group(3)[:int(m.group(2))] + "::" + m.group(1)
+        p = scope(n[len(m.group(0)):])
+        if p:
+            return "::".join(p + [m.group(1)])
     m = re.match(r"^(\w+?)__F", n)
     return m.group(1) if m else n
 
@@ -105,9 +116,11 @@ def anchors(pc, gc, hide=0):
     for g in gc:
         by.setdefault(g["dm"], []).append(g["addr"])
     pcset = {f["addr"] for f in pc}
-    rows = list(csv.DictReader((l for l in open("census/names.tsv") if not l.startswith("#")), delimiter="\t"))
-    an = sorted((int(r["addr"], 16), by[r["name"]][0], r["name"]) for r in rows
-                if r["name"] in by and len(by[r["name"]]) == 1 and int(r["addr"], 16) in pcset)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import canon   # same merge of census/names_*.tsv as the queue, so wave names become anchors
+    _, rows = canon.merged()
+    an = sorted((x, by[r["name"]][0], r["name"]) for x, r in rows.items()
+                if r["name"] in by and len(by[r["name"]]) == 1 and x in pcset)
     keep = lis(an)
     hidden = keep[hide - 1::hide] if hide else []
     return [a for a in keep if a not in hidden], hidden
