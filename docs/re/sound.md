@@ -138,12 +138,31 @@ Picker `0x53c3a0` (V, G). It reads `p = player`, `order = 0x758b58[pos*2]`, wher
   | `0x64da70` (4) | ramp/slew toward a target over N steps |
   | `0x64d960` (3) | oscillator (phase wrap, sine through `0x713ca0`) |
   | `0x64d860` (3) | voice node: state 0 stop / 1 start / 2 update; picks the sample from a list by index `+0x14`, then calls the voice-type handlers `0x6e9a98` (start), `0x6e9aa8` (stop), `0x6e9ab8` (update) |
-- **Shape (V, C).** First the inputs are fanned out to the nodes (`+0xc2..+0x143`). Then come four RPM/load curves
-  and two pairs of hysteresis gates (on/off windows), three oscillators and the shared curves. Then there are three
-  identical voice chains, `curve → sum → select → ramp → curve → product → voice 0x64d860`, one for each of the
-  bank's three mono loops. So **pitch and volume of each loop are designer curves of RPM and load**, crossfaded by
-  the gates. There is no formula in Speed.exe. The curve tables sit in the instance state built from the bank
-  header, and their values are not dumped yet (U).
+- **Shape (V, C; `tools/re/csiscurves.py`).** The patch instance is a copy of a template in the module header
+  (`T = hdr+0x664` for ENG, `+0x65c` for EXH). Every curve node's block starts with a relocated pointer to its curve
+  record, so the reader finds T from the relocation table and dumps every curve. The order of the patch is:
+  1. A fan-out of the inputs `in0..in17` (`P+0x2c..`).
+  2. Two pairs of hysteresis gates on `in0`/`in1`, feeding the trigger node `0x64cc60`.
+  3. Three oscillators (`in8..in13`).
+  4. A copy node `N194` (from `in3`) that drives 11 curves.
+  5. Four identical voice chains: `curve → select → ramp → curve → product → voice 0x64d860` (4 voice nodes,
+     corrected from 3).
+  `python3 tools/re/csiscurves.py check` reports 32 ENG/EXH patches and 864 curves, every table the length its
+  record states.
+- **The curves (V, D; meaning I).** Seven curves take input 0..1024, which is the 0..0x400 scale of `0x52bf70`, as
+  128 int16 points. ENG `C0U0`, 8 samples from input 0 to 1024:
+  | node | values | reads as (I) |
+  |---|---|---|
+  | N1a0 | 11526 → 30862 → 30005 | loop gain, rising |
+  | N1b0 | 25333 → 32767 | loop gain, saturating |
+  | N1c0, N1d0 | 1024 → 0 by ~60 % | low loop fades out |
+  | N1e0 | 861 → 1024 | high loop fades in |
+  | N1f0 | 0 → 190 | small added term (detune?) |
+  | N200 | 691 → 20994, linear | pitch ramp |
+  Other curves: `0x1bd0` has 1024 points from 32767 down (a crossfade law), and `0x23e0`/`0x2470` are int8 0/1
+  selectors over 0..32767 that pick a loop. Upgrade levels of one family share the ENG curves (C0U0 = C0U1); EXH
+  differs. Which Csis param is `in3` (RPM or load) is U: a dispatcher in the SND layer sits between `0x52bf70`'s
+  block and the patch argument (`0x64bc30` calls `node+8` with `H+4`).
 - **Speech (FE).** `PlaySpeechStream 0x51c830` with event `0x59` reads the table `0x6f8728[id*2 + variant]`. Only
   7 entries are set: id 2 → lines 0/1, 5 → 2, 6 → 3, 7 → 4, 11 → 5/6. The others are −1, which means stop. It then
   calls stream-manager vfunc `+0x98(0x59, line)`. The callers are FE screens (`0x4c3db0`, `0x4c5320`, `0x4c5fa0`,
@@ -152,7 +171,7 @@ Picker `0x53c3a0` (V, G). It reads `p = player`, `order = 0x758b58[pos*2]`, wher
 
 ## Open (U)
 - `entrant+0x435` (turbo variant); the 0x520320 switch read byte by byte.
-- The values of the engine curve tables (RPM → pitch/volume per loop). The graph is read (§5), the numbers are not.
+- Engine patch: which Csis param feeds each patch input (in0..in17); the curve values are dumped (§5), their roles are I.
 - Speech: the code path for the ~270 non-FE lines (in-race?) and the role of STRM_English_Speech_MB.abk (module 1497).
 - Mixer path to dsound: the categories and sliders are in `docs/re_audio_default.md`. The voice/3D mixer names
   are in `census/names_sound.tsv` (EAXS_3DMixer, EAXMixMgr, EAXSND8Wrapper).
