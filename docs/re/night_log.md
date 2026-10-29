@@ -79,3 +79,4 @@ Key facts: smackable respawn 0x5977f0 (2.0 s at rest); rivals match the player's
 Open: see each doc's Open list (traffic: writer of [ebx+0x59d4], Free Run x1.5, intersection states; rivals:
 42 floats 0x77a358..0x77a3ff unread, quick race S=0; props: smack type +0xd8 consumer).
 09:20 heartbeat: b delivered props/traffic/rivals (7340114, 9339318, db85f89), a2 csiscurves/garage §7/sound §6 (d63dc41, e5cb5ae, c176f74); csiscurves re-run OK (needs .venv/bin/python); scoreboard named 886 (728 V), names.tsv 1039. Account 3 session 69% at 09:17: both windows told to stop at 90%.
+09:47 heartbeat: B and a2 idle (no commits since 4accc2e); OWNER asked for a full reconciliation: external Opus auditor + 2 haiku (names ledgers done: 12 V/V alias conflicts resolved by file order, 143 non-function rows, 7 camera field rows dropped by merge; numbers re-run pending). Account 5 session 17% / week 86%. No stop condition.
