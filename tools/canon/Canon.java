@@ -2,13 +2,17 @@
 // build/ghidra/canon (never on build/ghidra/proj, which stays the pristine analysis).
 //   apply  <seed.tsv> <report.txt>          seed lines: addr kind name system conf tool doc (tools/canon/canon.py seed)
 //   export <lo> <hi> <out_prefix>           functions with entry in [lo,hi): <prefix>.c (named pseudocode) + <prefix>.jsonl
-//   data   <out.jsonl>                      globals (data referenced from code) and vtable candidates in .rdata
+//   vtscan <report.txt>                     create functions at vtable slots that lack one (writable project)
+//   data   <out.jsonl>                      globals (data referenced from code) and vtables (constructor writes)
 import ghidra.app.script.GhidraScript;
 import ghidra.app.decompiler.*;
 import ghidra.program.model.address.*;
 import ghidra.program.model.data.*;
 import ghidra.program.model.listing.*;
 import ghidra.program.model.mem.*;
+import ghidra.program.model.lang.OperandType;
+import ghidra.program.model.lang.Register;
+import ghidra.program.model.scalar.Scalar;
 import ghidra.program.model.symbol.*;
 import java.io.*;
 import java.nio.file.*;
@@ -32,6 +36,7 @@ public class Canon extends GhidraScript {
         if (args[0].equals("apply")) apply(args[1], args[2]);
         else if (args[0].equals("export")) export(toAddr(args[1]), toAddr(args[2]), args[3]);
         else if (args[0].equals("data")) data(args[1]);
+        else if (args[0].equals("vtscan")) vtscan(args[1]);
         else throw new IllegalArgumentException("mode " + args[0]);
     }
 
@@ -129,7 +134,7 @@ public class Canon extends GhidraScript {
     }
 
     // Globals: every non-code address in initialized/uninitialized data that code references, with readers/writers.
-    // Vtables: runs of >=2 consecutive dwords in non-executable blocks that point at function entries.
+    // Vtables: see vtableStarts.
     private void data(String out) throws Exception {
         Memory mem = currentProgram.getMemory();
         FunctionManager fm = currentProgram.getFunctionManager();
@@ -154,30 +159,81 @@ public class Canon extends GhidraScript {
                              q(dd == null ? "" : dd.getDataType().getName()),
                              q(dd != null && dd.hasStringValue() ? String.valueOf(dd.getValue()) : ""), arr(rd), arr(wr));
                 }
-                if (!b.isInitialized()) continue;
-                Address a = b.getStart().add((4 - b.getStart().getOffset() % 4) % 4);
-                while (a.compareTo(b.getEnd().subtract(3)) <= 0) {
-                    List<String> slots = new ArrayList<>();
-                    Address p = a;
-                    while (p.compareTo(b.getEnd().subtract(3)) <= 0) {
-                        Address t;
-                        try { t = toAddr(mem.getInt(p) & 0xffffffffL); } catch (Exception e) { break; }
-                        if (fm.getFunctionAt(t) == null) break;
-                        slots.add(hex(t));
-                        p = p.add(4);
-                    }
-                    if (slots.size() >= 2) {
-                        Set<String> users = new TreeSet<>();
-                        for (Reference r : rm.getReferencesTo(a)) {
-                            Function g = getFunctionContaining(r.getFromAddress());
-                            if (g != null) users.add(hex(g.getEntryPoint()) + (r.getReferenceType().isWrite() || r.getReferenceType().isData() ? "" : "?"));
-                        }
-                        o.printf("{\"kind\":\"vtable\",\"addr\":%s,\"slots\":%s,\"users\":%s}%n",
-                                 q(hex(a)), q(String.join(",", slots)), arr(users));
-                        a = p;
-                    } else a = a.add(4);
-                }
             }
+            TreeMap<Address, Set<String>> vt = vtableStarts();
+            for (Map.Entry<Address, Set<String>> e : vt.entrySet()) {
+                List<String> slots = new ArrayList<>();
+                for (Address t : slotsOf(e.getKey(), vt)) slots.add(hex(t));
+                o.printf("{\"kind\":\"vtable\",\"addr\":%s,\"slots\":%s,\"users\":%s}%n",
+                         q(hex(e.getKey())), q(String.join(",", slots)), arr(e.getValue()));
+            }
+        }
+    }
+
+    // Vtables: a data address that code stores into an object field (mov [reg+off], imm: a constructor or destructor
+    // setting the vptr) and whose first dword points into code. Writers are the functions doing the store.
+    private TreeMap<Address, Set<String>> vtableStarts() throws Exception {
+        TreeMap<Address, Set<String>> m = new TreeMap<>();
+        Memory mem = currentProgram.getMemory();
+        for (Instruction i : currentProgram.getListing().getInstructions(true)) {
+            if (!i.getMnemonicString().equals("MOV") || i.getNumOperands() != 2
+                || (i.getOperandType(0) & OperandType.DYNAMIC) == 0) continue;
+            Scalar s = i.getScalar(1);
+            if (s == null) continue;
+            boolean stack = false;
+            for (Object x : i.getOpObjects(0))
+                if (x instanceof Register r && (r.getName().equals("ESP") || r.getName().equals("EBP"))) stack = true;
+            if (stack) continue;
+            Address t = toAddr(s.getUnsignedValue());
+            MemoryBlock b = mem.getBlock(t);
+            if (b == null || b.isExecute() || !b.isInitialized() || t.getOffset() % 4 != 0 || codePtr(t) == null) continue;
+            Function g = getFunctionContaining(i.getAddress());
+            m.computeIfAbsent(t, k -> new TreeSet<>()).add(g != null ? hex(g.getEntryPoint()) : "i" + hex(i.getAddress()));
+        }
+        return m;
+    }
+
+    private Address codePtr(Address p) {
+        try {
+            MemoryBlock b = currentProgram.getMemory().getBlock(p);
+            if (b == null || p.add(3).compareTo(b.getEnd()) > 0) return null;
+            Address t = toAddr(currentProgram.getMemory().getInt(p) & 0xffffffffL);
+            MemoryBlock tb = currentProgram.getMemory().getBlock(t);
+            return tb != null && tb.isExecute() ? t : null;
+        } catch (Exception e) { return null; }
+    }
+
+    // Slots run while each dword points into code, up to the next vtable start or the next address code references.
+    private List<Address> slotsOf(Address v, TreeMap<Address, Set<String>> vt) {
+        List<Address> out = new ArrayList<>();
+        ReferenceManager rm = currentProgram.getReferenceManager();
+        for (Address p = v; ; p = p.add(4)) {
+            if (!p.equals(v) && (vt.containsKey(p) || rm.hasReferencesTo(p))) break;
+            Address t = codePtr(p);
+            if (t == null) break;
+            out.add(t);
+        }
+        return out;
+    }
+
+    // Every vtable slot is an entry point (called indirectly): create the function where Ghidra has none.
+    private void vtscan(String report) throws Exception {
+        FunctionManager fm = currentProgram.getFunctionManager();
+        TreeMap<Address, Set<String>> vt = vtableStarts();
+        int slots = 0, made = 0, inside = 0, failed = 0;
+        try (PrintWriter o = new PrintWriter(new FileWriter(report))) {
+            Set<Address> todo = new TreeSet<>();
+            for (Address v : vt.keySet())
+                for (Address t : slotsOf(v, vt)) { slots++; if (fm.getFunctionAt(t) == null) todo.add(t); }
+            for (Address t : todo) {
+                Function c = fm.getFunctionContaining(t);
+                if (getInstructionAt(t) == null) disassemble(t);
+                Function f = createFunction(t, null);
+                if (f == null) { failed++; o.println("fail " + hex(t) + (c != null ? " inside " + hex(c.getEntryPoint()) : "")); }
+                else { made++; if (c != null) { inside++; o.println("split " + hex(t) + " from " + hex(c.getEntryPoint())); } }
+            }
+            o.printf("vtables %d slots %d made %d (split %d) failed %d functions_now %d%n",
+                     vt.size(), slots, made, inside, failed, fm.getFunctionCount());
         }
     }
 }

@@ -68,13 +68,13 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x43f9b0	audio	0	213	2	1	0	R MiscStyleManager::Detect360
 0x4cc580	audio	0	79	2	2	0	B GetPreRaceSpeech
 0x520460	audio	0	56	3	1	0	B InitializeSoundDriver
-0x522730	audio	0	30	2	2	0	
-0x523090	audio	0	30	2	2	0	
+0x522730	audio	0	30	2	2	0	vt EAXFrontEnd::~EAXFrontEnd
+0x523090	audio	0	30	2	2	0	vt EAXCommon::~EAXCommon
 0x5230d0	audio	0	65	1	2	0	
 0x524148	audio	0	218	4	0	0	B EAXAITunerCar::UpdateGearShiftState
 0x524200	audio	0	17	1	0	0	
 0x524940	audio	0	28	0	1	0	
-0x524b80	audio	0	37	0	1	0	
+0x524b80	audio	0	37	0	1	0	vt EAXTrafficCar::Initialize
 0x524da0	audio	0	149	0	1	0	B __static_initialization_and_destruction_0
 0x524e40	audio	0	95	0	1	0	B __static_initialization_and_destruction_0
 0x5256f0	audio	0	49	3	11	0	
@@ -87,7 +87,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x525bc0	audio	0	31	1	1	0	
 0x525bf0	audio	0	31	1	1	0	
 0x527220	audio	0	33	0	1	0	
-0x527f30	audio	0	216	2	1	0	
+0x527f30	audio	0	216	2	1	0	vt EAXTunerCar::InitializeSkids
 0x528010	audio	0	178	1	1	0	R EAXTunerCar::InitializeSkids
 0x5282e0	audio	0	30	2	2	0	
 0x529500	audio	0	45	1	2	0	
@@ -100,7 +100,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x52a780	audio	0	130	0	1	0	
 0x52a810	audio	0	122	1	1	0	C EAXRoadNoise::Initialize
 0x52be40	audio	0	206	2	1	0	B EAXWheels::CompUpdate
-0x52c140	audio	0	141	0	1	0	B EAXTunerCar::RotationUpdate
+0x52c140	audio	0	141	0	1	0	vt EAXTunerCar::RotationUpdate
 0x52c910	audio	0	21	0	4	0	
 0x52c990	audio	0	542	0	1	0	
 0x52ce40	audio	0	90	0	3	0	B EAXTires::GetTerrainType
@@ -110,11 +110,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5319a0	audio	0	50	1	4	0	R stSmokableCollision::CSISImpactsExist
 0x5319e0	audio	0	50	1	4	0	R stSmokableCollision::CSISScrapesExist
 0x531a80	audio	0	62	0	1	0	R stSmokableCollision::CSISEndScrape
-0x531d10	audio	0	88	0	1	0	
-0x531d70	audio	0	95	1	1	0	B stCarOnCarCollision::SetImpactSampleIndex
+0x531d10	audio	0	88	0	1	0	vt stCarOnCarCollision::SetImpactSampleIndex
+0x531d70	audio	0	95	1	1	0	vt stCarOnCarCollision::Initialize
 0x531dd0	audio	0	382	1	1	0	
-0x531f50	audio	0	5	1	1	0	
-0x531f60	audio	0	119	0	1	0	R stCarOnCarCollision::Initialize
+0x531f50	audio	0	5	1	1	0	vt stWorldCollision::Initialize
+0x531f60	audio	0	119	0	1	0	vt stWorldCollision::SetImpactSampleIndex
 0x532270	audio	0	62	0	1	0	R stWorldCollision::Initialize
 0x532370	audio	0	28	1	1	0	
 0x5325f0	audio	0	13	0	6	0	
@@ -176,7 +176,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x539320	audio	0	114	0	1	0	R EAXS_Streams::DelayStartCountdown
 0x5393a0	audio	0	141	1	1	0	R EAXS_Streams::FadeStopStream
 0x539430	audio	0	160	1	1	0	R EAXS_Streams::FadeInStream
-0x5394d0	audio	0	91	0	1	0	R EAXS_Streams::PlayUpdate
+0x5394d0	audio	0	91	0	1	0	vt EAXS_Streams::Update
 0x539530	audio	0	34	0	1	0	
 0x539b10	audio	0	87	0	1	0	A EAXS_Streams::UpdateVolume
 0x539ef0	audio	0	189	2	1	0	R EAXS_AmbMonoStream::InitializeStreams
@@ -188,13 +188,13 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x53a860	audio	0	24	0	4	0	
 0x53a880	audio	0	24	0	4	0	
 0x53a8a0	audio	0	28	0	4	0	
-0x53bcc0	audio	0	339	0	1	0	B EAXS_MusicStream::InitializeStreams
+0x53bcc0	audio	0	339	0	1	0	vt EAXS_MusicStream::InitializeStreams
 0x53bec0	audio	0	22	0	1	0	
 0x53bee0	audio	0	223	0	1	0	
-0x53c020	audio	0	116	2	1	0	C EAXS_MusicStream::EnterPostRace
-0x53c150	audio	0	86	0	1	0	B EAXS_MusicStream::EnteringPause
+0x53c020	audio	0	116	2	1	0	vt EAXS_MusicStream::UpdateStreams
+0x53c150	audio	0	86	0	1	0	vt EAXS_MusicStream::EnteringGame
 0x53c1b0	audio	0	87	0	1	0	B EAXS_MusicStream::ResumeFromPause
-0x53c350	audio	0	22	0	1	0	
+0x53c350	audio	0	22	0	1	0	vt EAXS_MusicStream::EnterRaceCountDown
 0x53c370	audio	0	36	0	5	0	
 0x53cb30	audio	0	20	0	1	0	
 0x53cb50	audio	0	23	0	1	0	
@@ -204,12 +204,12 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x53cbd0	audio	0	258	1	1	0	
 0x53cce0	audio	0	143	0	1	0	B EAXS_MusicStream::~EAXS_MusicStream
 0x53cd70	audio	0	186	2	1	0	
-0x53ce30	audio	0	312	0	1	0	B EAXS_TCMStream::InitializeStreams
+0x53ce30	audio	0	312	0	1	0	vt EAXS_TCMStream::InitializeStreams
 0x53d010	audio	0	37	0	1	0	
 0x53d100	audio	0	230	0	1	0	B EAXS_TCMStream::UpdateStreams
-0x53d1f0	audio	0	40	0	1	0	
-0x53d2c0	audio	0	98	0	1	0	
-0x53d3f0	audio	0	24	0	1	0	
+0x53d1f0	audio	0	40	0	1	0	vt EAXS_TCMStream::GetPlayTimeRemaining
+0x53d2c0	audio	0	98	0	1	0	vt EAXS_TCMStream::EnteringGame
+0x53d3f0	audio	0	24	0	1	0	vt EAXS_TCMStream::EnterRaceCountDown
 0x53d410	audio	0	12	0	1	0	
 0x53d830	audio	0	43	0	1	0	
 0x53d860	audio	0	50	0	1	0	C EAXS_TCMStream::GetStrmDelayableTime
@@ -2343,11 +2343,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x57f150	rivals	0	27	1	3	0	
 0x5808e0	rivals	0	210	1	3	0	
 0x582f70	rivals	0	28	0	1	0	
-0x583230	rivals	0	12	1	1	0	
+0x583230	rivals	0	12	1	1	0	vt TrafficAI::ChooseGoal
 0x583690	rivals	0	105	0	1	0	R TrafficController::GetRouteNumbersToUse
 0x583b20	rivals	0	130	1	1	0	R TrafficController::SetCurrentRoute
-0x583bb0	rivals	0	70	1	1	0	R TrafficController::WantToTakeSignpost
-0x583c30	rivals	0	50	0	1	0	B TrafficController::DealWithBeingOutOfBounds
+0x583bb0	rivals	0	70	1	1	0	vt TrafficAI::ShouldTakeFork
+0x583c30	rivals	0	50	0	1	0	vt TrafficAI::GetUnstuckReady
 0x583d70	rivals	0	12	0	3	0	
 0x583d80	rivals	0	28	0	1	0	
 0x583e80	rivals	0	20	1	1	0	
@@ -3553,8 +3553,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x459870	unknown	0	258	2	1	0	R DriveTarget::GetPoint
 0x465390	unknown	0	70	1	3	0	B CarState::CalculateWheelMatrices
 0x466450	unknown	0	90	0	1	0	A Collision::GetCollidingCarAndWorldObject
-0x46a060	unknown	0	23	0	1	0	
-0x46a080	unknown	0	57	0	1	0	B CarCollisionBody::GetMassInverse
+0x46a060	unknown	0	23	0	1	0	vt CarCollisionBody::CanCollide
+0x46a080	unknown	0	57	0	1	0	vt CarCollisionBody::GetMassInverse
 0x46a1c0	unknown	0	24	0	1	0	
 0x46a220	unknown	0	26	0	1	0	
 0x46a240	unknown	0	28	0	1	0	
@@ -3996,17 +3996,17 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5233f0	audio	1	8	1	1	0	
 0x523400	audio	1	8	1	1	0	
 0x523420	audio	1	60	1	1	0	B EAXFrontEnd::UpdateMasterVolume
-0x523460	audio	1	30	2	2	0	
+0x523460	audio	1	30	2	2	0	vt EAXAITunerCar::~EAXAITunerCar
 0x523480	audio	1	18	1	1	0	
 0x5236d0	audio	1	440	2	1	0	B EAXAITunerCar::SetEngineVol
 0x524780	audio	1	8	1	1	0	
-0x524a50	audio	1	31	2	2	0	
+0x524a50	audio	1	31	2	2	0	vt EAXTrafficCar::~EAXTrafficCar
 0x524a70	audio	1	260	4	1	0	
 0x525080	audio	1	99	4	1	0	B EAXTrafficCar::EAXTrafficCar
 0x5250f0	audio	1	174	2	1	0	B EAXTrafficCar::~EAXTrafficCar
 0x5251a0	audio	1	44	1	1	0	
 0x5256e0	audio	1	8	1	1	0	
-0x526170	audio	1	30	2	2	0	
+0x526170	audio	1	30	2	2	0	vt EAXTunerCar::~EAXTunerCar
 0x526aa0	audio	1	72	1	2	0	B EAXTunerCar::AdjustVolume
 0x527250	audio	1	30	2	1	0	
 0x527270	audio	1	127	4	3	0	C EAXSparkChatter::~EAXSparkChatter
@@ -4017,7 +4017,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x527af0	audio	1	356	6	1	1	B EAXSkids::Play
 0x527c60	audio	1	64	1	1	0	
 0x5281f0	audio	1	238	4	1	0	R EAXTunerCar::UpdateSkidFX
-0x529cd0	audio	1	450	2	1	0	A EAXTunerCar::UpdateEngineVol
+0x529cd0	audio	1	450	2	1	0	vt EAXTunerCar::UpdateEngineVol
 0x52a630	audio	1	30	2	2	0	
 0x52a650	audio	1	299	4	3	0	B EAXRoadNoise::~EAXRoadNoise
 0x52bf70	audio	1	453	2	1	0	B EAXTunerCar::SetEngineVol
@@ -4027,12 +4027,12 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x52c8d0	audio	1	8	1	1	0	
 0x52c8e0	audio	1	8	1	1	0	
 0x52cbb0	audio	1	30	2	1	0	
-0x5318c0	audio	1	112	1	1	0	R stSmokableCollision::CSISUpdateImpact
-0x531930	audio	1	112	1	1	0	R stSmokableCollision::CSISUpdateScrape
+0x5318c0	audio	1	112	1	1	0	vt stSmokableCollision::CSISUpdateImpact
+0x531930	audio	1	112	1	1	0	vt stSmokableCollision::CSISUpdateScrape
 0x531a20	audio	1	84	4	5	0	R stSmokableCollision::CSISEndImpact
 0x531ac0	audio	1	592	2	1	0	R stCarOnCarCollision::GetSurfaceType
 0x5322b0	audio	1	183	6	1	0	R stWorldCollision::SetImpactSampleIndex
-0x532390	audio	1	30	2	1	0	
+0x532390	audio	1	30	2	1	0	vt stSmokableCollision::~stSmokableCollision
 0x5323b0	audio	1	142	5	1	0	B stWorldCollision::ShouldBeginImpact
 0x532600	audio	1	14	1	1	0	
 0x532cb0	audio	1	81	3	1	0	B __static_initialization_and_destruction_0
@@ -4088,11 +4088,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x53c210	audio	1	315	4	1	0	
 0x53c870	audio	1	69	1	1	0	R EAXS_MusicStream::PauseStream
 0x53c8c0	audio	1	152	5	1	0	R EAXS_MusicStream::StopStream
-0x53c960	audio	1	232	7	1	0	R EAXS_MusicStream::PlayStream
+0x53c960	audio	1	232	7	1	0	vt EAXS_MusicStream::PlayStream
 0x53ca50	audio	1	218	1	1	0	R EAXS_MusicStream::UpdateCsisParams
 0x53cf70	audio	1	154	5	3	0	B EAXS_TCMStream::DestroyStreams
 0x53d040	audio	1	178	5	1	0	
-0x53d220	audio	1	151	6	1	0	
+0x53d220	audio	1	151	6	1	0	vt EAXS_TCMStream::UpdateStreams
 0x53d330	audio	1	163	4	3	0	
 0x53d590	audio	1	69	1	1	0	R EAXS_TCMStream::PauseStream
 0x53d5e0	audio	1	93	4	2	0	R EAXS_TCMStream::StopStream
@@ -4786,7 +4786,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x45c550	car	1	230	3	1	0	R DrivingChoice::GetLateralSpeed
 0x4605e0	car	1	419	2	1	0	
 0x460a80	car	1	856	5	1	0	R PlayerSteering::CalculateMaxSteering
-0x460f30	car	1	31	2	1	0	
+0x460f30	car	1	31	2	1	0	vt RealDriver::~RealDriver
 0x460f50	car	1	107	2	3	0	B RealDriver::~RealDriver
 0x4613b0	car	1	340	1	2	0	A RealDriver::RemoveJoyHandlers
 0x4646d0	car	1	234	1	1	0	R BeltMover::GetSecondDerivative
@@ -4815,7 +4815,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4772e0	car	1	25	2	0	0	
 0x4791f0	car	1	160	2	1	0	R PhysicsMover::JumpStabilizer
 0x479290	car	1	192	3	1	0	R PhysicsMover::ExagerateLurch
-0x47ae70	car	1	39	2	1	0	
 0x4aeb60	car	1	779	4	1	0	
 0x4af020	car	1	10	1	4	0	
 0x4af030	car	1	175	2	4	0	
@@ -5835,6 +5834,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4645d0	rivals	1	142	1	2	0	R BeltMover::GetPoint
 0x464660	rivals	1	98	1	3	0	R BeltMover::GetDerivative
 0x4650d0	rivals	1	113	3	4	0	B CarState::WorldToCar
+0x476f80	rivals	1	31	2	2	0	
 0x477100	rivals	1	324	2	2	0	R PhysicsMover::Calibrate
 0x4782c0	rivals	1	250	1	2	0	B PhysicsMover::InitializeStateFromCar
 0x479350	rivals	1	444	3	1	0	R PhysicsMover::DriftStabilizer
@@ -5978,7 +5978,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x53b430	runtime	1	423	8	1	0	B EAXS_AmbStereoStream::StartStream
 0x53b5e0	runtime	1	75	1	1	0	B EAXS_AmbStereoStream::PauseStream
 0x53b670	runtime	1	204	5	1	0	B EAXS_AmbStereoStream::StopStream
-0x53b780	runtime	1	502	6	1	0	B EAXS_AmbStereoStream::PlayStream
+0x53b780	runtime	1	502	6	1	0	vt EAXS_AmbStereoStream::PlayStream
 0x53bbb0	runtime	1	228	1	1	0	B EAXS_AmbStereoStream::UpdateCsisParams
 0x53ec90	runtime	1	142	3	9	0	B EAXS_SpeechStream::PlayByStreamID
 0x53f690	runtime	1	71	1	1	1	
@@ -6627,15 +6627,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x524ea0	audio	2	71	2	1	0	B __static_initialization_and_destruction_0
 0x524ef0	audio	2	51	2	1	0	B IsLargeTrafficCarType
 0x527ca0	audio	2	628	4	2	0	B EAXSkids::Update
-0x5280d0	audio	2	281	2	1	0	R DebugPrintSkidBar
+0x5280d0	audio	2	281	2	1	0	vt EAXTunerCar::UpdateTireSounds
 0x529970	audio	2	144	2	2	0	B EAXTunerCar::PostShiftFX_Init
 0x52a0a0	audio	2	76	2	2	0	R EAXTunerCar::GenerateRampUpTime
 0x52a190	audio	2	202	3	1	0	R EAXTunerCar::DynLoadCruiseInit
 0x52a2c0	audio	2	72	2	2	0	R EAXTunerCar::DynLoadDownShiftRevInit
 0x52bc50	audio	2	484	3	1	0	B EAXTunerCar::Refl_UpdateParams
 0x52bf10	audio	2	86	2	1	0	B EAXWheels::CompressionCalculate
-0x531ff0	audio	2	627	6	1	0	R stWorldCollision::GetSurfaceType
-0x532440	audio	2	417	11	1	0	C __static_initialization_and_destruction_0
+0x531ff0	audio	2	627	6	1	0	vt stWorldCollision::ShouldBeginImpact
+0x532440	audio	2	417	11	1	0	vt stSmokableCollision::BeginImpact
 0x532610	audio	2	41	2	4	0	
 0x533f70	audio	2	254	7	1	0	R TrolleySoundObject::PlayBellSnd
 0x534df0	audio	2	805	8	1	0	B EAXS_Lamppost::SetupSoundSphere
@@ -7376,7 +7376,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x43d7e0	unknown	2	218	5	1	0	
 0x4596b0	unknown	2	96	3	3	0	R DriveTarget::GetFirstPoint
 0x465150	unknown	2	573	5	9	0	B CarState::CalculateWheelMatrices
-0x46a260	unknown	2	267	4	1	0	B TrackPolygonCollisionBody::TrackPolygonCollisionBody
+0x46a260	unknown	2	267	4	1	0	vt CarCollisionBody::ApplyImpulse
 0x480310	unknown	2	846	2	1	0	R DragCameraManager::GetSlope
 0x4ad210	unknown	2	81	2	1	0	R cFinishedRaceStats::Construct
 0x4c06b0	unknown	2	143	2	1	0	R PauseOptionsMenu::ToggleTrackMapDebug
@@ -7435,11 +7435,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4be0c0	audio	3	356	4	1	0	R PauseOptionsMenu::ScrollMusicVol
 0x4be230	audio	3	356	4	1	0	R PauseOptionsMenu::ScrollAmbientVol
 0x4be3a0	audio	3	356	4	1	0	R PauseOptionsMenu::ScrollSpeechVol
-0x522c60	audio	3	371	5	1	0	B EAXFrontEnd::Play
+0x522c60	audio	3	371	5	1	0	vt EAXFrontEnd::Pause
 0x524f30	audio	3	328	8	1	0	
 0x5272f0	audio	3	393	8	1	1	R EAXSparkChatter::Play
 0x529100	audio	3	429	7	3	1	A EAXShifting::Play
-0x5293e0	audio	3	279	3	1	0	
+0x5293e0	audio	3	279	3	1	0	vt EAXTunerCar::BeginDownShift
 0x52a0f0	audio	3	150	4	1	0	R EAXTunerCar::DynLoadShiftResumeInit
 0x52a260	audio	3	85	4	1	0	R EAXTunerCar::DynLoadResumeInit
 0x5384e0	audio	3	420	4	2	0	

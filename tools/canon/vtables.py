@@ -4,18 +4,30 @@ every derived vtable; vtables linked that way form a family. In a family, slot k
 function there); the function at slot k of a vtable whose class is C is C::M.
 
   vtables.py [--check]   -> census/canon/prior_vt.tsv (addr, name, vtable, slot, evidence)
---check: run on named functions only and report how often the proposal equals the existing name.
+--check: run on named functions only and report how often the proposal equals the existing name (-v lists the rest).
 """
-import json, os, sys
+import json, os, re, sys
 from collections import Counter, defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import canon   # noqa: E402  (chdir to the repo root)
 
-V = [json.loads(l) for l in open("census/canon/data.jsonl") if '"vtable"' in l]
+V = [json.loads(l) for l in open("census/canon/data.jsonl") if '"vtable"' in l]   # constructor-write scan (Canon.java)
 V = [(int(v["addr"], 16), [int(s, 16) for s in v["slots"].split(",")]) for v in V]
 _, rows = canon.merged()
 name = {x: r["name"] for x, r in rows.items()}
+DESCR = re.compile(r"(Field|Flag|Slot|Arg|Off)_?[0-9A-Fa-f]+|^(Nop|Stub|Ret|Return)|^sub_|^FUN_|Unk")
+
+
+def split(n):
+    """Class::method without notes; every destructor form (~X, scalar deleting destructor, _b) is one method '~'."""
+    c, m = n.split(" (")[0].strip().rsplit("::", 1)
+    return c, "~" if m.startswith("~") or "deleting" in m else m
+
+
+def real(f):
+    """A name that can vote: Class::method, not a descriptive placeholder (NopArg1, ResetField1D4)."""
+    return "::" in name.get(f, "") and not DESCR.search(split(name[f])[1])
 
 # families: union vtables sharing a function at the same slot
 par = list(range(len(V)))
@@ -40,7 +52,7 @@ use = Counter(f for _, slots in V for f in set(slots))   # functions shared by s
 
 def cls_of(i):
     """Class of vtable i: the class of its own (not shared) named slots, if they agree."""
-    c = Counter(name[f].rsplit("::", 1)[0] for f in V[i][1] if use[f] == 1 and "::" in name.get(f, ""))
+    c = Counter(split(name[f])[0] for f in V[i][1] if use[f] == 1 and "::" in name.get(f, ""))
     if not c:
         return None
     top, n = c.most_common(1)[0]
@@ -48,8 +60,7 @@ def cls_of(i):
 
 
 def method_at(fam, k, skip):
-    m = Counter(name[f].rsplit("::", 1)[1] for j in fam for f in V[j][1][k:k + 1]
-                if f != skip and "::" in name.get(f, ""))
+    m = Counter(split(name[f])[1] for j in fam for f in V[j][1][k:k + 1] if f != skip and real(f))
     if not m:
         return None, 0
     top, n = m.most_common(1)[0]
@@ -72,10 +83,13 @@ for i, (va, slots) in enumerate(V):
         m, n = method_at(fam, k, f)
         if not m:
             continue
-        prop = f"{c}::{m}"
+        prop = f"{c}::~{c.rsplit('::', 1)[-1]}" if m == "~" else f"{c}::{m}"
         if check and f in name:
             total += 1
-            agree += name[f] == prop
+            ok = split(name[f]) == (c, m)
+            agree += ok
+            if not ok and "-v" in sys.argv:
+                print(f"{f:#x} have {name[f]} | vtable says {prop} ({va:#x} slot {k})")
         elif not check and f not in name and f not in out:
             out[f] = (prop, va, k, f"vtable {va:#x} slot {k}: class {c} (own named slots), method {m} ({n} named in family)")
 if check:

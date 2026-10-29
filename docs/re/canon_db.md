@@ -70,6 +70,10 @@ census/canon/systems_tu.tsv, read by the scoreboard as med. 767 stay unknown (35
 - Rounds 7-9 (canon-sonnet-c1): 2,511 -> 3,051 named, anchors 1,147. Hints are good where PC and GC order agree
   (CollisionBody, saems, CameraMover) and fail where the PC reorders (FEPkg_PostRace R 28 %, Race 0 %, MU_Options):
   workers name those from vtable slot order and dispatch tables. "GC free in file" now lists 16 candidates (was 8).
-- tools/canon/vtables.py (experimental, not in the queue): slot propagation across vtable families. `--check` agrees
-  with existing names 5/18 only: the vtable scan finds 216 tables, folded stubs link unrelated classes, stub names are
-  descriptive. Lead for later: a full vtable scan (ctor writes of the vtable address), then re-check.
+- Vtables (2026-10-29, Opus slice): Canon.java finds them by constructor writes (`mov [reg+off], imm` of a data address
+  whose first dword points into code; ESP/EBP stores skipped), sized up to the next vtable or referenced address:
+  434 tables, 3,948 slots (old run scan: 216, merged neighbours). `canon.py apply` runs `vtscan`, which creates slot
+  functions Ghidra lacks (only 1 was missing). tools/canon/vtables.py --check: 79/88 = 90 % (was 5/18) after
+  normalizing notes "(...)", destructor forms (~X, scalar deleting) and keeping descriptive placeholders (NopArg1,
+  ResetField1D4) out of the vote. Wired: queue.tsv prior "vt <name>" (40 rows: 19 new, 9 equal GC, 12 replace GC),
+  shown for every size. The 9 disagreements (sibling classes naming one slot differently) are in census/canon/vt_check.txt.

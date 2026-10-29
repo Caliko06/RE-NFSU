@@ -2,7 +2,7 @@
 """Canon database of Speed.exe (docs/re/canon_db.md).
 
   canon.py seed            build/canon/seed.tsv: every lifted start + merged names/systems
-  canon.py apply           clone build/ghidra/proj -> build/ghidra/canon once, create missing functions, apply names
+  canon.py apply           clone build/ghidra/proj -> build/ghidra/canon once, create missing functions (lifted starts, vtable slots), apply names
   canon.py export [-j N]   named pseudocode + index -> census/canon/{c/*.c,funcs.jsonl}, data.jsonl
   canon.py queue           census/canon/queue.tsv: unnamed functions bottom-up (callees named first) + coverage
   canon.py batch <system> <n> [skip]   next n ready rows of one system -> build/canon/batch_<system>.txt (addrs)
@@ -85,7 +85,7 @@ def seed():
 
 def headless(proj, *script_args, log):
     env = dict(os.environ, JAVA_HOME=JAVA, PATH=JAVA + "/bin:" + os.environ["PATH"])
-    ro = [] if script_args[0] == "apply" else ["-readOnly"]
+    ro = [] if script_args[0] in ("apply", "vtscan") else ["-readOnly"]
     cmd = [HEADLESS, proj, "nfsu", "-process", "Speed.exe", "-noanalysis", *ro, "-scriptPath", ROOT + "/tools/canon",
            "-postScript", "Canon.java", *script_args]
     with open(log, "w") as f:
@@ -102,6 +102,9 @@ def apply():
     headless(ROOT + "/" + CANON, "apply", ROOT + "/build/canon/seed.tsv", ROOT + "/build/canon/apply.txt",
              log="build/canon/apply.log")
     print(open("build/canon/apply.txt").read().splitlines()[-1])
+    # vtable slots are entries reached only by indirect calls: create the functions the seed lacks
+    headless(ROOT + "/" + CANON, "vtscan", ROOT + "/build/canon/vtscan.txt", log="build/canon/vtscan.log")
+    print(open("build/canon/vtscan.txt").read().splitlines()[-1])
 
 
 def export(jobs=4):
@@ -142,11 +145,12 @@ def queue():
     auto = re.compile(r"^(FUN|thunk_FUN|LAB|SUB)_")
     trivial = {x for x, j in F.items() if j["size"] <= 8 and not j["callees"]}
     done = named | trivial
-    hint = {}   # prior art (tools/canon/gcalign.py, prior.py): addr -> "grade name"
-    for f, k, g in (("prior_mw.tsv", 2, None), ("prior_gc.tsv", 3, 6)):
+    hint = {}   # prior art (tools/canon/gcalign.py, prior.py, vtables.py): addr -> "grade name"
+    # vtable slot names last: they win over GC (vtables.py --check 79/88 agree vs GC R/B 60-80 %)
+    for f, k, g in (("prior_mw.tsv", 2, "mw"), ("prior_gc.tsv", 3, 6), ("prior_vt.tsv", 1, "vt")):
         if os.path.exists(f"{OUT}/{f}"):
             for r in list(csv.reader(open(f"{OUT}/{f}"), delimiter="\t"))[1:]:
-                hint[a(r[0])] = (r[g] if g else "mw") + " " + r[k]
+                hint[a(r[0])] = (r[g] if isinstance(g, int) else g) + " " + r[k]
     # lifter starts that are not Ghidra functions (inside another function, or creation failed): a ledger, not work
     parent = {}
     for l in open("build/canon/apply.txt"):
@@ -177,7 +181,7 @@ def queue():
                     len((j or {}).get("strings", [])),
                     # GC hints on < 48-byte functions are noise: MSVC emits header inlines out of line, the GC build
                     # inlines them, so small PC leaves have no GC twin (round 1: 2 A hints on 16-byte getters wrong)
-                    hint.get(x, "") if hint.get(x, "").startswith("mw") or (j or {}).get("size", 0) >= 48 else ""))
+                    hint.get(x, "") if hint.get(x, "").startswith(("mw", "vt")) or (j or {}).get("size", 0) >= 48 else ""))
     out.sort(key=lambda t: (t[0], t[1], t[2]))
     with open(OUT + "/queue.tsv", "w") as o:
         o.write("addr\tsystem\topen_callees\tsize\tcallees\tcallers\tstrings\tprior\n")

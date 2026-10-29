@@ -1,0 +1,10 @@
+0x531190 have stSoundCollision::IsHighSpeedPlayerHit | vtable says stSoundCollision::IsThisObjectIntheLead (0x6be5b8 slot 21)
+0x5251d0 have EAXTrafficCar::IsHonking | vtable says EAXTrafficCar::IsThisObjectIntheLead (0x6bf150 slot 20)
+0x466800 have DynamicCollisionBody::GetInertiaTensorInverse | vtable says DynamicCollisionBody::UpdateScaledMatrix (0x6c85b8 slot 23)
+0x46a030 have CarCollisionBody::Move | vtable says CarCollisionBody::Update (0x6c8798 slot 10)
+0x46a0c0 have CarCollisionBody::UpdateScaledMatrix | vtable says CarCollisionBody::GetInertiaTensorInverse (0x6c8798 slot 23)
+0x466890 have CarCollisionBody::IsBlinking | vtable says CarCollisionBody::Loader (0x6c8798 slot 26)
+0x45db90 have PsychoDriver::ClearFlag228AndCallSlot34 | vtable says PsychoDriver::DisableStartLineState (0x6c8c18 slot 8)
+0x45dba0 have PsychoDriver::ResetField1D4 | vtable says PsychoDriver::SetLowGear (0x6c8c18 slot 13)
+0x44df70 have AIGoalSteerPlayerInDragRace::ChooseNewAction | vtable says AIGoalSteerPlayerInDragRace::SelectAction (0x6c97fc slot 5)
+vtables --check: 79/88 proposals equal the existing name

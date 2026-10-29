@@ -3541,7 +3541,7 @@ PhysicsMover__PhysicsMover
   param_3[6] = puVar9;
   param_3[7] = 0;
   *piVar1 = (int)&PTR_FUN_006c84a0;
-  *param_3 = &PTR_LAB_006c8364;
+  *param_3 = &PTR_FUN_006c8364;
   *piVar1 = (int)&PTR_FUN_006c8358;
   param_3[0x18] = 0;
   param_3[0x19] = 0;
@@ -3886,6 +3886,19 @@ LAB_00476efa:
 }
 
 
+// ==== 0x476f80 FUN_00476f80
+
+void * __thiscall FUN_00476f80(void *param_1,byte param_2)
+
+{
+  FUN_00477250(param_1);
+  if ((param_2 & 1) != 0) {
+    _free(param_1);
+  }
+  return param_1;
+}
+
+
 // ==== 0x476fa0 FUN_00476fa0
 
 void __thiscall FUN_00476fa0(int param_1,int param_2)
@@ -4015,7 +4028,7 @@ void FUN_00477250(undefined4 *param_1)
   pcStack_8 = FUN_00685bff;
   pvStack_c = ExceptionList;
   ExceptionList = &pvStack_c;
-  *param_1 = &PTR_LAB_006c8364;
+  *param_1 = &PTR_FUN_006c8364;
   param_1[2] = &PTR_FUN_006c8358;
   *(undefined1 *)(*(int *)(param_1[0x17] + 0x3c) + 0x1d) = 1;
   *(undefined4 *)(param_1[8] + 0x140) = 1;
