@@ -27,3 +27,15 @@ Big finding: tuning.md "No prices" is wrong: cost table chunk 0x34a01 (FrontB.lz
 100..4000, points +0x10..+0x1c; readers 0x5a08f0 / 0x5a05f0; cash [0x76026c]. Garage flow with a sonnet-exec; A2 on sound U items.
 03:29 night-opus-b: up (assets+canon); angeldamian-36 not reachable by SendMessage, logging here. V: chunk dispatcher 0x447ac0 + 47-loader table 0x7007e0 (unload 0x7008a0); tools/re/chunks.py check (235 files tile, 116 ids); LZC = JDLZ, byte-equal to BUN twins; tools/re/lang.py (22 files repack), tools/re/events.py (116/116 repack). 3 agents: loaders A/B, save format.
 03:4x night-opus-a2: deliverable (1) done, 9fc13da: census/names_sound.tsv 199 V/13 I, names_tuning.tsv 205 V/38 I/1 U; V only with Hopper agreement (auto address check + sonnet semantic check of 133 rows + 10 samples/system: 0 disagree). sound.md §5 (engine patch node graph, FE speech table) written, not committed yet.
+
+## HANDOFF night-opus-a2 (block done)
+Done: 9fc13da names_sound.tsv (199 V/13 I) + names_tuning.tsv (205 V/38 I/1 U), V only with Hopper agreement
+(tools/census/names_xcheck.py + semantic check, 0 disagree). 5103257 docs/re/garage.md (screens, part list, prices,
+purchase, preview/cancel, save), sound.md §5 (engine Csis params 0x52bf70, ENG patch node graph, FE speech 0x6f8728),
+tuning.md "no prices" corrected, 5 proposal rows. angeldamian-36 was not reachable by SendMessage; this log is the report.
+Next, in order: (1) reader tools/re/csiscurves.py: dump the ENG patch curve records (RPM -> pitch/volume per loop);
+(2) garage.md Open 3/4/7 need one bounded run each (engine-bay slot after reload, cash after career beaten, reload of a
+bought part), test profile only; (3) speech: who plays the ~270 non-FE lines; (4) census/names.tsv merge (M3) of
+names_sound/tuning with seed/blur/camera.
+Not mine (dirty, untouched): census/lift_report.json, docs/openworld/re_answers_0b.md, untracked census/names_{blur,camera}.tsv,
+census/systems.tsv, docs/re/blur.md, tools/census/sys*.py, tools/hopper/q_*.py, docs/re_*.md.

@@ -75,7 +75,7 @@ Picker `0x53c3a0` (V, G). It reads `p = player`, `order = 0x758b58[pos*2]`, wher
 - It then sets `stream = order+1` into the stream request (+0x4c/+0x54/+0x58) and `p+0xfc = stream-1`, and
   advances `pos`.
 
-## 4. Engine sound chain (sonnet-exec agent, Ghidra; the 10-sample check with a second tool is pending)
+## 4. Engine sound chain (sonnet-exec agent, Ghidra; names checked against Hopper, census/names_sound.tsv)
 
 - **Bank choice.**
   - `0x51dec0` (LoadInGameSoundBanks) walks the race entrants: 0x750 bytes each at `[0x78a418]`, `+0x10` RideInfo.
