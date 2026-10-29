@@ -12,3 +12,4 @@ system with the other tool (Ghidra gpar vs census/hopper/decomp.c) and mark V on
 picks Car_n (request +0x3c) and Eng_UG_n (+0x40) for classes 0xc/0xd in resolver 0x521c80, then RPM -> pitch/volume in the
 ABK engine module (tools/recomp/abk.py). Open U items are listed at the end of each doc.
 02:48 heartbeat: A busy; cov/systems/cam agents running (coverage_method.md and systems.tsv drafts exist); B waiting for acct 3 reset (03:19). Acct 5 at 68% session / 79% week: no new subagents until B is up; A told to cap at 2 subagents and hand off at 88%.
+Agent TSVs: /private/tmp/claude-501/-Users-angeldamian-RE-NFSU/692cb4a3-bc35-4d3e-9294-0f15ec19b3de/scratchpad/names_sound_agent.tsv (212 rows, done) and /private/tmp/claude-501/-Users-angeldamian-RE-NFSU/692cb4a3-bc35-4d3e-9294-0f15ec19b3de/scratchpad/names_tuning_agent.tsv (pending); V marks need a 10-sample second-tool check.

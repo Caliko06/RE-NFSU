@@ -75,11 +75,44 @@ Picker `0x53c3a0` (V, G). It reads `p = player`, `order = 0x758b58[pos*2]`, wher
 - It then sets `stream = order+1` into the stream request (+0x4c/+0x54/+0x58) and `p+0xfc = stream-1`, and
   advances `pos`.
 
+## 4. Engine sound chain (sonnet-exec agent, Ghidra; the 10-sample check with a second tool is pending)
+
+- **Bank choice.**
+  - `0x51dec0` (LoadInGameSoundBanks) walks the race entrants: 0x750 bytes each at `[0x78a418]`, `+0x10` RideInfo.
+    It keeps local human entrants only (`+4==1`, `+0x734==0`). When `[0x734658]!=0`, every level is forced to 3.
+  - **Family A** (classes 12/13) = fixed table `0x6f8100` indexed by car index (`RideInfo+0`, mapped by the
+    20-case switch `0x520320`; the switch bytes at 0x5203d4 are not read byte by byte, I). It is not a
+    CarTypeInfo field. Car index→family: 0→2, 1→0, 2→0, 3→0, 4→0, 5→0, 6→2, 7→2, 8→1, 9→3, 10→2, 11→2, 12→3,
+    13→2, 14→2, 15→3, 16→1, 17→0, 18→2, 19→1.
+  - **Level B** = spec `level[2]`, the engine path. TunerCar::Initialize `0x526420` stores it at `this+0x1efc`
+    (`mov eax,[edx+0x20]` at 0x526494) and the family at `+0x1ef4`.
+  - Turbo: B = `level[3]`, A = `clamp(byte [entrant+0x435], 0..3)` (field U).
+  - Nitrous: B = `level[4]`. Skids: B = `level[7]`.
+  - The shifting class 0xa is never queued: its `0x521c80` branch is dead, and shift sounds come from the engine
+    bank.
+  - AI and traffic cars reuse one of two already loaded engine banks (`[mgr+0x68+k*4]`, alternating by
+    `[0x78eae4]`, 0x526500..0x526516).
+- **Per frame.**
+  - `EAXTunerCar::Update 0x52c620` → `0x52c3f0` reads RPM `car+0x3e0` (/ `this+0x1f24`) into `this+0x1f20` and
+    torque `car+0x3ec` into `this+0x1f90`.
+  - `UpdateTorque 0x527080` / `UpdateRPM 0x527180` smooth them with curve `0x5326f0`.
+  - `UpdateEngineVol 0x529cd0` (AI `0x5235a0`) crossfades two volume layers by load `this+0x2ac` (0..0x400) with
+    table `0x6f7220`.
+  - `0x52bf70` pushes L/R volume, four 0..0x400 values, load and pan to the engine's Csis instance
+    (`this+0x1760`, created by `InitializeEngine 0x529b60` in class `0x7441c8`).
+- **Down to dsound.**
+  - EA's SND software mixer owns the buffers: `DirectSoundCreate` from `0x654340`/`0x654880`, primary `0x71406c`,
+    500 ms streaming secondary `0x714070`.
+  - The pump `0x654050` runs the 100 Hz server `0x64e330`, then the mixer `0x656d70`, then Lock/Unlock.
+  - `EAXSND8Wrapper::Initialize 0x532a20` sets 32 voices and 22,050/44,100 Hz from `0x6f7e88`.
+  - `EAXMixMgr 0x5364e0` holds 4 groups × 11 channels, with presets at `0x743ca8` (stride 0x6c).
+- Names and the 20 corrections to the x86-ps2 map: agent TSV (night_log.md handoff), to be merged into
+  `census/names_sound.tsv`.
+
 ## Open (U)
-- Engine family per car: which CarTypeInfo/RideInfo field feeds request A for classes 12/13, and B (engine level =
-  spec level[2]?). Turbo variant (A×5+B) vs turbo level.
-- The engine-sound model inside the ABK code (RPM → loop crossfade/pitch). The code is lifted in `abk.py`; its
-  semantics are not read yet.
+- `entrant+0x435` (turbo variant); the 0x520320 switch read byte by byte.
+- The engine Csis/ABK module's internal RPM → pitch/loop mapping (the code is lifted in `abk.py`; its semantics
+  are not read yet).
 - Speech: which event picks which of the 277 lines (STRMBANK descriptors?).
 - Mixer path to dsound: the categories and sliders are in `docs/re_audio_default.md`. The voice/3D mixer names
   are in `census/names_sound.tsv` (EAXS_3DMixer, EAXMixMgr, EAXSND8Wrapper).
