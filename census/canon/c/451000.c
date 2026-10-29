@@ -396,7 +396,7 @@ void __thiscall AIActionPullOver__CalculatePointsToDrive(int param_1,int *param_
       local_1e8 = (float)(int)*(char *)(*(int *)(*param_2 + 0x3c) + 0x1c);
       if (0 < (int)local_1e8) {
         do {
-          iVar6 = FUN_00468820(iVar5);
+          iVar6 = CollisionBody__GetCollision(iVar5);
           iVar6 = *(int *)(iVar6 + 100);
           cVar2 = *(char *)(*(int *)(iVar6 + 600) + 0x15);
           if ((cVar2 == '\0') && (*(char *)(*(int *)(iVar6 + 0x25c) + 0x15) == '\0')) {
@@ -542,7 +542,7 @@ LAB_00451be0:
   if ('\0' < *(char *)(iVar5 + 0x1c)) {
     do {
       if (bVar3) goto LAB_00451c8b;
-      iVar6 = FUN_00468820(iVar8);
+      iVar6 = CollisionBody__GetCollision(iVar8);
       iVar7 = AIAction__GetCollisionClassification();
       if (((iVar7 == 0) && (0.4 <= (float)(DAT_0073ad34 - *(int *)(iVar6 + 8)) * 0.00025)) &&
          ((*(float *)(*param_1 + 0x3d4) < 5.0 ||
@@ -660,7 +660,7 @@ undefined4 __thiscall AIActionGetUnstuck__HasBeenAccomplished(int param_1,int *p
   if ('\0' < cVar3) {
     iVar7 = 0;
     do {
-      iVar5 = FUN_00468820(iVar7);
+      iVar5 = CollisionBody__GetCollision(iVar7);
       iVar6 = AIAction__GetCollisionClassification();
       if ((iVar6 == 0) && (0.4 <= (float)(DAT_0073ad34 - *(int *)(iVar5 + 8)) * 0.00025)) {
         fVar2 = *(float *)(*param_2 + 0x3d4);
@@ -712,7 +712,7 @@ char __thiscall AIActionGetUnstuck__HasFailed(int param_1,int *param_2)
           if (cVar2 != '\0') {
             return cVar2;
           }
-          iVar4 = FUN_00468820(iVar6);
+          iVar4 = CollisionBody__GetCollision(iVar6);
           iVar5 = AIAction__GetCollisionClassification();
           if (((iVar5 == 1) && (0.4 <= (float)(DAT_0073ad34 - *(int *)(iVar4 + 8)) * 0.00025)) &&
              ((ABS(*(float *)(*param_2 + 0x3d4)) < 5.0 ||
@@ -1733,7 +1733,7 @@ undefined4 AIActionHitWallDragRace__CalculateScore(void)
       if (bVar2) {
         return 300;
       }
-      iVar3 = FUN_00468820(iVar5);
+      iVar3 = CollisionBody__GetCollision(iVar5);
       iVar1 = *(int *)(*(int *)(iVar3 + 100) + 600);
       if (((*(char *)(iVar1 + 0x15) == '\x03') &&
           (ABS(*(float *)(*(int *)(iVar1 + 0x60) + 0x78)) < 0.1)) ||
@@ -1772,7 +1772,7 @@ bool AIActionHitWallDragRace__HasBeenAccomplished(int *param_1)
       if (!bVar2) {
         return bVar2;
       }
-      iVar3 = FUN_00468820(iVar5);
+      iVar3 = CollisionBody__GetCollision(iVar5);
       iVar1 = *(int *)(*(int *)(iVar3 + 100) + 600);
       if (((*(char *)(iVar1 + 0x15) == '\x03') &&
           (ABS(*(float *)(*(int *)(iVar1 + 0x60) + 0x78)) < 0.1)) ||
@@ -7437,7 +7437,7 @@ void FUN_00459870(float param_1)
   if ((float)(*unaff_EDI + -1) < param_1) {
     param_1 = (float)(*unaff_EDI + -1);
   }
-  FUN_004387e0(param_1);
+  Float_Truncate(param_1);
   iVar4 = _ftol_nocw();
   if ((float10)param_1 == extraout_ST0) {
     iVar4 = (iVar4 + 1) * 0x10;
@@ -11715,7 +11715,7 @@ LAB_0045eb6a:
       iVar12 = 0;
       if (0 < iVar14) {
         do {
-          iVar10 = FUN_00468820(iVar12);
+          iVar10 = CollisionBody__GetCollision(iVar12);
           iVar3 = *(int *)(*(int *)(iVar10 + 100) + 600);
           if ((((*(char *)(iVar3 + 0x15) == '\x03') &&
                (ABS(*(float *)(*(int *)(iVar3 + 0x60) + 0x78)) < 0.1)) ||

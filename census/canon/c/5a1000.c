@@ -1078,7 +1078,7 @@ int __thiscall Career__CreateRaceObject(uint param_1,int param_2)
     }
     iVar7 = 8;
     do {
-      FUN_00438860();
+      PtrSlots__PtrSlots();
       iVar7 = iVar7 + -1;
     } while (iVar7 != 0);
     iVar7 = 0;
@@ -1370,7 +1370,7 @@ void FUN_005a2930(void)
   iVar1 = 8;
   do {
     puVar2[-6] = 0;
-    CallNTimes(puVar2,0x15c,8,FUN_00438860);
+    CallNTimes(puVar2,0x15c,8,PtrSlots__PtrSlots);
     puVar2 = puVar2 + 0x2c3;
     iVar1 = iVar1 + -1;
   } while (iVar1 != 0);
@@ -2087,7 +2087,7 @@ void FUN_005a3380(void)
   iVar5 = RaceOptions_Get();
   iVar7 = 8;
   do {
-    FUN_00438860();
+    PtrSlots__PtrSlots();
     iVar7 = iVar7 + -1;
   } while (iVar7 != 0);
   iVar7 = 0;

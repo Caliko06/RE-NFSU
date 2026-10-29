@@ -998,7 +998,7 @@ LAB_0049378f:
         fVar1 = 0.0;
       }
       fVar1 = (*(float *)(param_3 + iVar5 * 4) / fVar1) * (float)(iVar3 + -1);
-      fVar6 = (float10)FUN_004387e0(fVar1);
+      fVar6 = (float10)Float_Truncate(fVar1);
       if ((float10)fVar1 < fVar6) {
         fVar6 = fVar6 - (float10)_K_ONE;
       }
@@ -1006,7 +1006,7 @@ LAB_0049378f:
         fVar6 = (float10)bCeil(fVar1);
       }
       else {
-        fVar6 = (float10)FUN_004387e0();
+        fVar6 = (float10)Float_Truncate();
         if ((float10)fVar1 < fVar6) {
           fVar6 = fVar6 - (float10)_K_ONE;
         }
@@ -1426,7 +1426,7 @@ LAB_00493e8a:
         fVar4 = 0.0;
       }
       fVar4 = (fVar13 * *param_8 + param_8[1]) * fVar4;
-      fVar17 = (float10)FUN_004387e0(fVar4);
+      fVar17 = (float10)Float_Truncate(fVar4);
       if ((float10)fVar4 < fVar17) {
         fVar17 = fVar17 - (float10)_K_ONE;
       }
@@ -3218,7 +3218,7 @@ float10 FUN_004960a0(void)
   int unaff_ESI;
   float10 extraout_ST0;
   
-  FUN_004387e0(*(undefined4 *)(unaff_ESI + 0xc0));
+  Float_Truncate(*(undefined4 *)(unaff_ESI + 0xc0));
   iVar1 = _ftol_nocw();
   return extraout_ST0 * (float10)iVar1;
 }
@@ -4002,10 +4002,10 @@ void PostRaceMenuScreen__DoQuitRace(void)
       }
       puVar5 = (undefined4 *)0x0;
 LAB_00496f5d:
-      FUN_004387e0(puVar5[0x30]);
+      Float_Truncate(puVar5[0x30]);
       iVar2 = _ftol_nocw();
       if (((float10)0.0 < (float10)iVar2 * extraout_ST0) || (DAT_00735ec0 != '\0')) {
-        FUN_004387e0(puVar5[0x30]);
+        Float_Truncate(puVar5[0x30]);
         _ftol_nocw();
         iVar2 = _ftol_nocw();
         *piVar6 = *piVar6 + iVar2;
@@ -4192,10 +4192,10 @@ void PostRaceMenuScreen__DoRestartRace(void)
       }
       puVar4 = (undefined4 *)0x0;
 LAB_004972dd:
-      FUN_004387e0(puVar4[0x30]);
+      Float_Truncate(puVar4[0x30]);
       iVar1 = _ftol_nocw();
       if (((float10)0.0 < (float10)iVar1 * extraout_ST0) || (DAT_00735ec0 != '\0')) {
-        FUN_004387e0(puVar4[0x30]);
+        Float_Truncate(puVar4[0x30]);
         _ftol_nocw();
         iVar1 = _ftol_nocw();
         *piVar5 = *piVar5 + iVar1;
@@ -4263,10 +4263,10 @@ void PostRaceMenuScreen__DoNextRaceInEvent(void)
       }
       puVar4 = (undefined4 *)0x0;
 LAB_0049746d:
-      FUN_004387e0(puVar4[0x30]);
+      Float_Truncate(puVar4[0x30]);
       iVar1 = _ftol_nocw();
       if (((float10)0.0 < (float10)iVar1 * extraout_ST0) || (DAT_00735ec0 != '\0')) {
-        FUN_004387e0(puVar4[0x30]);
+        Float_Truncate(puVar4[0x30]);
         _ftol_nocw();
         iVar1 = _ftol_nocw();
         *piVar5 = *piVar5 + iVar1;
@@ -5540,7 +5540,7 @@ LAB_00498e18:
         iVar4 = Race__GetPlayer(puVar5[1]);
         if (iVar4 != 0) {
           local_64 = iVar4 + 0x19;
-          FUN_00439130();
+          Race__FindRacerById();
         }
       }
       bSPrintf_regdst(0x20,"Name%d",iVar12);
@@ -10317,7 +10317,7 @@ void PostRaceRewardList__AddNewlyUnlockedMessages(int param_1)
   }
   puVar6 = (undefined4 *)0x0;
 LAB_0049ea06:
-  FUN_004387e0(puVar6[0x30]);
+  Float_Truncate(puVar6[0x30]);
   puVar6 = &DAT_00758ad8;
   pcVar4 = local_180;
   for (iVar2 = 0x20; iVar2 != 0; iVar2 = iVar2 + -1) {
@@ -10501,7 +10501,7 @@ LAB_0049ede4:
         do {
           if (*piVar5 == 1) {
             if ((iVar3 * 0x15c != -0x777cd0) && (DAT_0077b244 != 0)) {
-              cVar2 = FUN_00438a40();
+              cVar2 = Obj_GetByte4();
               iVar3 = FUN_004ad2a0();
               bVar8 = *(int *)(iVar3 + 4) == (int)cVar2;
               goto LAB_0049ede4;
@@ -11026,7 +11026,7 @@ undefined4 * FUN_0049f8b0(undefined4 *param_1,undefined4 param_2)
 LAB_0049f91a:
   uVar5 = _ftol_nocw();
   param_1[9] = uVar5;
-  FUN_004387e0(puVar9[0x30]);
+  Float_Truncate(puVar9[0x30]);
   piVar7 = (int *)(iVar6 + 0x960);
   param_1[0xc] = 0;
   local_14 = 0x1f;

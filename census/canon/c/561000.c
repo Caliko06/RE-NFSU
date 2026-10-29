@@ -2573,7 +2573,7 @@ float10 FUN_00564ad0(float param_1,float param_2)
   float10 fVar1;
   
   param_1 = param_1 / ABS(param_2);
-  fVar1 = (float10)FUN_004387e0(param_1);
+  fVar1 = (float10)Float_Truncate(param_1);
   if ((float10)param_1 < fVar1) {
     fVar1 = fVar1 - (float10)_K_ONE;
   }

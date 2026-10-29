@@ -535,7 +535,7 @@ void __thiscall FUN_005829e0(undefined4 param_1,float param_2)
   float10 fVar3;
   float fVar4;
   
-  fVar3 = (float10)FUN_004387e0(param_2,param_1);
+  fVar3 = (float10)Float_Truncate(param_2,param_1);
   fVar4 = (float)fVar3;
   if ((float10)param_2 < fVar3) {
     fVar4 = fVar4 - _K_ONE;
@@ -562,7 +562,7 @@ void __thiscall FUN_00582a90(undefined4 param_1,float param_2)
   float10 fVar3;
   float fVar4;
   
-  fVar3 = (float10)FUN_004387e0(param_2,param_1);
+  fVar3 = (float10)Float_Truncate(param_2,param_1);
   fVar4 = (float)fVar3;
   if ((float10)param_2 < fVar3) {
     fVar4 = fVar4 - _K_ONE;
@@ -589,7 +589,7 @@ void __thiscall FUN_00582b50(undefined4 param_1,float param_2)
   float10 fVar3;
   float fVar4;
   
-  fVar3 = (float10)FUN_004387e0(param_2,param_1);
+  fVar3 = (float10)Float_Truncate(param_2,param_1);
   fVar4 = (float)fVar3;
   if ((float10)param_2 < fVar3) {
     fVar4 = fVar4 - _K_ONE;
@@ -1562,7 +1562,7 @@ void FUN_00583da0(void)
   local_8 = -1.0;
   if ('\0' < *(char *)(iVar1 + 0x1c)) {
     do {
-      iVar2 = FUN_00468820(iVar3);
+      iVar2 = CollisionBody__GetCollision(iVar3);
       AIAction__GetCollisionClassification();
       if (local_8 <= *(float *)(iVar2 + 0x60)) {
         local_8 = *(float *)(iVar2 + 0x60);
@@ -1620,7 +1620,7 @@ float10 FUN_00583ea0(float param_1)
   if (iVar2 + -1 <= iVar4) {
     return (float10)*(float *)(unaff_ESI[4] + -4 + iVar2 * 4);
   }
-  fVar5 = (float10)FUN_004387e0(fVar3);
+  fVar5 = (float10)Float_Truncate(fVar3);
   if ((float10)fVar3 < fVar5) {
     fVar5 = fVar5 - (float10)_K_ONE;
   }
@@ -3565,7 +3565,7 @@ float10 FUN_00586690(float param_1)
   undefined4 local_4;
   
   fVar1 = ((float)*in_EAX * 0.00025) / param_1;
-  fVar2 = (float10)FUN_004387e0(fVar1);
+  fVar2 = (float10)Float_Truncate(fVar1);
   if ((float10)fVar1 < fVar2) {
     fVar2 = fVar2 - (float10)_K_ONE;
   }

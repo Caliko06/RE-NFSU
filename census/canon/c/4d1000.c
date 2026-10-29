@@ -1,6 +1,8 @@
-// ==== 0x4d1600 FUN_004d1600
+// ==== 0x4d1600 OptionsMenu::ShowOptionRow
 
-void FUN_004d1600(undefined4 param_1,char param_2,char param_3)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__ShowOptionRow(undefined4 param_1,char param_2,char param_3)
 
 {
   int iVar1;
@@ -28,9 +30,11 @@ void FUN_004d1600(undefined4 param_1,char param_2,char param_3)
 }
 
 
-// ==== 0x4d16d0 FUN_004d16d0
+// ==== 0x4d16d0 OptionsMenu::ShowOptionArrows
 
-void FUN_004d16d0(undefined4 param_1,char param_2)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__ShowOptionArrows(undefined4 param_1,char param_2)
 
 {
   char *pcVar1;
@@ -55,9 +59,11 @@ void FUN_004d16d0(undefined4 param_1,char param_2)
 }
 
 
-// ==== 0x4d1790 FUN_004d1790
+// ==== 0x4d1790 OptionsMenu::SetupMouseTargets
 
-void FUN_004d1790(void)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__SetupMouseTargets(void)
 
 {
   int iVar1;
@@ -408,9 +414,11 @@ LAB_004d1d8d:
 }
 
 
-// ==== 0x4d1da0 FUN_004d1da0
+// ==== 0x4d1da0 OptionsMenu::HandleMouse
 
-void FUN_004d1da0(int param_1)
+/* [canon] hud med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__HandleMouse(int param_1)
 
 {
   uint uVar1;
@@ -469,9 +477,11 @@ LAB_004d1e8d:
 }
 
 
-// ==== 0x4d1f30 FUN_004d1f30
+// ==== 0x4d1f30 OptionsMenu::SetupAudio
 
-void FUN_004d1f30(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__SetupAudio(int param_1)
 
 {
   byte *pbVar1;
@@ -794,23 +804,23 @@ LAB_004d2436:
       (**(code **)(*(int *)(param_1 + 0x24c) + 0xc))(1);
       (**(code **)(*(int *)(param_1 + 0x288) + 0xc))(1);
       *(undefined4 *)(param_1 + 0x378) = 1;
-      *(code **)(param_1 + 0x40) = FUN_004cf810;
-      FUN_004cf570();
+      *(code **)(param_1 + 0x40) = OptionsMenu__ScrollMasterVol;
+      OptionsMenu__DrawMasterVol();
       *(undefined4 *)(param_1 + 0x37c) = 2;
-      *(code **)(param_1 + 0x44) = FUN_004cf8e0;
-      FUN_004cf5e0();
+      *(code **)(param_1 + 0x44) = OptionsMenu__ScrollSpeechVol;
+      OptionsMenu__DrawSpeechVol();
       *(undefined4 *)(param_1 + 0x380) = 3;
-      *(code **)(param_1 + 0x48) = FUN_004cf9c0;
-      FUN_004cf650();
+      *(code **)(param_1 + 0x48) = OptionsMenu__ScrollMusicVol;
+      OptionsMenu__DrawMusicVol();
       *(undefined4 *)(param_1 + 900) = 4;
-      *(code **)(param_1 + 0x4c) = FUN_004cfa90;
-      FUN_004cf6c0();
+      *(code **)(param_1 + 0x4c) = OptionsMenu__ScrollSoundEffectsVol;
+      OptionsMenu__DrawSoundEffectsVol();
       *(undefined4 *)(param_1 + 0x388) = 5;
-      *(code **)(param_1 + 0x50) = FUN_004cfb60;
-      FUN_004cf730();
+      *(code **)(param_1 + 0x50) = OptionsMenu__ScrollEngineVol;
+      OptionsMenu__DrawEngineVol();
       *(undefined4 *)(param_1 + 0x38c) = 6;
-      *(code **)(param_1 + 0x54) = FUN_004cfc30;
-      FUN_004cf7a0();
+      *(code **)(param_1 + 0x54) = OptionsMenu__ScrollTireVol;
+      OptionsMenu__DrawTireVol();
       FUN_00414a10();
       FUN_00414a10();
       FUN_00414a10();
@@ -821,9 +831,11 @@ LAB_004d2436:
 }
 
 
-// ==== 0x4d2700 FUN_004d2700
+// ==== 0x4d2700 OptionsMenu::SetupCamera
 
-void FUN_004d2700(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__SetupCamera(int param_1)
 
 {
   int iVar1;
@@ -834,7 +846,7 @@ void FUN_004d2700(int param_1)
     iVar1 = LanguageStrings__FindByHash();
   }
   FEngPrintf(iVar1);
-  FUN_004d1600(1,1,0);
+  OptionsMenu__ShowOptionRow(1,1,0);
   bSPrintf_regdst(0x20,"OptionName_%d",2);
   FUN_00414a60();
   iVar1 = DAT_0073578c;
@@ -845,24 +857,26 @@ void FUN_004d2700(int param_1)
   }
   bSPrintf_regdst(0x20,"OptionNametext_%d",2);
   FUN_00414a60();
-  FUN_004d16d0(param_1,0);
-  FUN_004d16d0(param_1,1);
+  OptionsMenu__ShowOptionArrows(param_1,0);
+  OptionsMenu__ShowOptionArrows(param_1,1);
   (**(code **)(*(int *)(param_1 + 0x6c) + 0xc))(1);
   *(undefined4 *)(param_1 + 0x3ac) = 2;
-  *(code **)(param_1 + 0x44) = FUN_004cfec0;
-  FUN_004cfdb0();
-  *(code **)(param_1 + 0x40) = FUN_004cfe10;
+  *(code **)(param_1 + 0x44) = OptionsMenu__ScrollJumpCamera;
+  OptionsMenu__DrawJumpCamera();
+  *(code **)(param_1 + 0x40) = OptionsMenu__ScrollDriveCamera1;
   *(undefined4 *)(param_1 + 0x3a0) = 1;
   *(undefined4 *)(param_1 + 0x3a4) = 0;
   *(undefined4 *)(param_1 + 0x3a8) = 0;
-  FUN_004cfd00(1);
+  OptionsMenu__DrawDriveCamera(1);
   return;
 }
 
 
-// ==== 0x4d2820 FUN_004d2820
+// ==== 0x4d2820 OptionsMenu::SetupCar
 
-void FUN_004d2820(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__SetupCar(int param_1)
 
 {
   byte *pbVar1;
@@ -1204,20 +1218,22 @@ LAB_004d2da7:
     }
     if (1 < iVar3) {
       *(undefined4 *)(param_1 + 0x3b8) = 1;
-      *(code **)(param_1 + 0x40) = FUN_004d00e0;
-      FUN_004cff80();
+      *(code **)(param_1 + 0x40) = OptionsMenu__ToggleTransmission;
+      OptionsMenu__DrawTransmission();
       *(undefined4 *)(param_1 + 0x3c0) = 2;
-      *(code **)(param_1 + 0x44) = FUN_004d0180;
-      FUN_004d0030();
+      *(code **)(param_1 + 0x44) = OptionsMenu__ToggleDamage;
+      OptionsMenu__DrawDamage();
       return;
     }
   } while( true );
 }
 
 
-// ==== 0x4d2f60 FUN_004d2f60
+// ==== 0x4d2f60 OptionsMenu::SetupController
 
-void FUN_004d2f60(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__SetupController(int param_1)
 
 {
   byte bVar1;
@@ -1244,13 +1260,13 @@ void FUN_004d2f60(int param_1)
   }
   bSPrintf_regdst(0x20,"OptionNametext_%d",1);
   FUN_00414a60();
-  FUN_004d1600(2,1,0);
-  FUN_004d16d0(param_1,0);
+  OptionsMenu__ShowOptionRow(2,1,0);
+  OptionsMenu__ShowOptionArrows(param_1,0);
   *(undefined4 *)(param_1 + 0x3d0) = 1;
-  *(code **)(param_1 + 0x40) = FUN_004d0350;
+  *(code **)(param_1 + 0x40) = OptionsMenu__SwitchToConfigP1;
   *(undefined4 *)(param_1 + 0x3c8) = 2;
-  *(code **)(param_1 + 0x44) = FUN_004d02c0;
-  FUN_004d0210(param_1);
+  *(code **)(param_1 + 0x44) = OptionsMenu__ToggleHandling;
+  OptionsMenu__DrawHandling(param_1);
   bSPrintf_regdst(0x20,"%s%1d",param_1 + 0x42c,*(undefined4 *)(param_1 + 0x3d0));
   iVar2 = LanguageStrings__FindByHash();
   if (iVar2 == 0) {
@@ -1365,9 +1381,11 @@ void FUN_004d2f60(int param_1)
 }
 
 
-// ==== 0x4d32e0 FUN_004d32e0
+// ==== 0x4d32e0 OptionsMenu::SetupDisplay
 
-void FUN_004d32e0(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__SetupDisplay(int param_1)
 
 {
   byte *pbVar1;
@@ -1728,32 +1746,34 @@ LAB_004d3867:
       }
       bSPrintf_regdst(0x20,"OptionNametext_%d",4);
       FUN_00414a60();
-      FUN_004d1600(5,1,0);
-      FUN_004d16d0(param_1,0);
+      OptionsMenu__ShowOptionRow(5,1,0);
+      OptionsMenu__ShowOptionArrows(param_1,0);
       *(undefined4 *)(param_1 + 0x3ec) = 1;
-      *(code **)(param_1 + 0x40) = FUN_004d0760;
-      FUN_004d04b0();
+      *(code **)(param_1 + 0x40) = OptionsMenu__ScrollTrackMap;
+      OptionsMenu__DrawTrackMap();
       *(undefined4 *)(param_1 + 0x3e4) = 2;
-      *(code **)(param_1 + 0x44) = FUN_004d06e0;
-      FUN_004d0400();
+      *(code **)(param_1 + 0x44) = OptionsMenu__ToggleUnits;
+      OptionsMenu__DrawUnits();
       *(undefined4 *)(param_1 + 0x3f0) = 3;
-      *(code **)(param_1 + 0x48) = FUN_004d0850;
-      FUN_004d0620();
+      *(code **)(param_1 + 0x48) = OptionsMenu__SwitchToHUDP1;
+      OptionsMenu__DrawHUDP1();
       *(undefined4 *)(param_1 + 0x3f4) = 4;
-      *(code **)(param_1 + 0x4c) = FUN_004d08b0;
-      FUN_004d0680();
+      *(code **)(param_1 + 0x4c) = OptionsMenu__SwitchToHUDP2;
+      OptionsMenu__DrawHUDP2();
       *(undefined4 *)(param_1 + 0x404) = 5;
-      *(code **)(param_1 + 0x50) = FUN_004d0820;
-      FUN_004d0570();
+      *(code **)(param_1 + 0x50) = OptionsMenu__ToggleHudFlag;
+      OptionsMenu__DrawHudFlag();
       return;
     }
   } while( true );
 }
 
 
-// ==== 0x4d3b60 FUN_004d3b60
+// ==== 0x4d3b60 OptionsMenu::SetupSaveLoad
 
-void FUN_004d3b60(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__SetupSaveLoad(int param_1)
 
 {
   byte *pbVar1;
@@ -1936,20 +1956,22 @@ LAB_004d3e25:
     }
     if (1 < iVar3) {
       *(undefined4 *)(param_1 + 0x40c) = 1;
-      *(code **)(param_1 + 0x40) = FUN_004d0a10;
-      FUN_004d0900();
+      *(code **)(param_1 + 0x40) = OptionsMenu__SaveGameOption;
+      OptionsMenu__DrawSaveOption();
       *(undefined4 *)(param_1 + 0x410) = 2;
-      *(code **)(param_1 + 0x44) = FUN_004d0a60;
-      FUN_004d0940();
+      *(code **)(param_1 + 0x44) = OptionsMenu__LoadGameOption;
+      OptionsMenu__DrawLoadOption();
       return;
     }
   } while( true );
 }
 
 
-// ==== 0x4d3f30 FUN_004d3f30
+// ==== 0x4d3f30 OptionsMenu::SetupTrailers
 
-void FUN_004d3f30(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OptionsMenu__SetupTrailers(int param_1)
 
 {
   byte *pbVar1;
@@ -2132,8 +2154,8 @@ LAB_004d41f5:
     }
     if (0 < iVar3) {
       *(undefined4 *)(param_1 + 0x420) = 1;
-      *(code **)(param_1 + 0x40) = FUN_004d0b20;
-      FUN_004d0ab0();
+      *(code **)(param_1 + 0x40) = OptionsMenu__SwitchToMovie1;
+      OptionsMenu__DrawMovie1();
       FUN_004b2480();
       return;
     }
@@ -2141,23 +2163,27 @@ LAB_004d41f5:
 }
 
 
-// ==== 0x4d42e0 FUN_004d42e0
+// ==== 0x4d42e0 OptionsSelectorMenu::_OptionsSelectorMenu
 
-void __fastcall FUN_004d42e0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall OptionsSelectorMenu___OptionsSelectorMenu(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c3e4c;
+  *param_1 = &PTR_OptionsSelectorMenu__scalar_deleting_destructor_006c3e4c;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4d42f0 FUN_004d42f0
+// ==== 0x4d42f0 OptionsSelectorMenu::scalar_deleting_destructor
 
-void * __thiscall FUN_004d42f0(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall OptionsSelectorMenu__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004d42e0();
+  OptionsSelectorMenu___OptionsSelectorMenu();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -2215,7 +2241,7 @@ Screen_MU_OptionsSelector_PC__Screen_MU_OptionsSelector_PC(undefined4 *param_1,u
   FEScreen__FEScreen(param_1,param_2);
   iVar2 = param_1[3];
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c3e4c;
+  *param_1 = &PTR_OptionsSelectorMenu__scalar_deleting_destructor_006c3e4c;
   uVar1 = FEng__HashName();
   if (((((iVar2 == 0) || (iVar2 = FEngFindPackage(), iVar2 == 0)) ||
        (iVar2 = FUN_004ffb70(), iVar2 == 0)) &&
@@ -2254,9 +2280,11 @@ Screen_MU_OptionsSelector_PC__Screen_MU_OptionsSelector_PC(undefined4 *param_1,u
 }
 
 
-// ==== 0x4d44d0 FUN_004d44d0
+// ==== 0x4d44d0 OptionsSelectorMenu::GetBlurbHashFromName
 
-undefined4 FUN_004d44d0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 OptionsSelectorMenu__GetBlurbHashFromName(void)
 
 {
   uint in_EAX;
@@ -2376,7 +2404,7 @@ void __thiscall OptionsSelectorScreen__NotificationMessage(int param_1,uint para
     }
     else {
       if (param_2 == 0xabc08912) {
-        FUN_004d44d0(param_1);
+        OptionsSelectorMenu__GetBlurbHashFromName(param_1);
         FEString__SetLabelHash();
         FEObject__SetScript("FadeIn",1);
         return;
@@ -2557,9 +2585,11 @@ undefined4 Screen_EA_TRAX_Jukebox__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4d4a20 FUN_004d4a20
+// ==== 0x4d4a20 EATraxScreen::_EATraxScreen
 
-void FUN_004d4a20(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void EATraxScreen___EATraxScreen(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -2571,7 +2601,7 @@ void FUN_004d4a20(undefined4 *param_1)
   pcStack_8 = FUN_00688276;
   pvStack_c = ExceptionList;
   ExceptionList = &pvStack_c;
-  *param_1 = &PTR_FUN_006c3e2c;
+  *param_1 = &PTR_EATraxScreen__scalar_deleting_destructor_006c3e2c;
   iVar2 = DAT_007356a8;
   local_4 = 1;
   EAXSound__InitEATraxMasks(DAT_007356a8,0,1);
@@ -2595,12 +2625,14 @@ void FUN_004d4a20(undefined4 *param_1)
 }
 
 
-// ==== 0x4d4af0 FUN_004d4af0
+// ==== 0x4d4af0 EATraxScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004d4af0(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall EATraxScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004d4a20(param_1);
+  EATraxScreen___EATraxScreen(param_1);
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -2630,7 +2662,7 @@ undefined4 * Screen_EA_TRAX_Jukebox__Screen_EA_TRAX_Jukebox(undefined4 *param_1,
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   puVar1 = param_1 + 0x26;
-  *param_1 = &PTR_FUN_006c3e2c;
+  *param_1 = &PTR_EATraxScreen__scalar_deleting_destructor_006c3e2c;
   puVar5 = param_1 + 0x28;
   *puVar1 = puVar1;
   param_1[0x27] = puVar1;

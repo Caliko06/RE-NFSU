@@ -2137,14 +2137,16 @@ void __fastcall FUN_004333c0(int *param_1)
   *(undefined2 *)(param_1 + 1) = 0xffff;
   *(undefined2 *)((int)param_1 + 6) = 0xffff;
   *(undefined1 *)((int)param_1 + 9) = 0;
-  FUN_004338c0();
+  RacingCar__UpdateLapCounts();
   return;
 }
 
 
-// ==== 0x4334a0 FUN_004334a0
+// ==== 0x4334a0 RacingCar::DoSnapshot
 
-void FUN_004334a0(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void RacingCar__DoSnapshot(void)
 
 {
   int in_EAX;
@@ -2262,9 +2264,11 @@ undefined4 RaceManager__DetectOvertake(int param_1,float param_2,float param_3)
 }
 
 
-// ==== 0x4337a0 FUN_004337a0
+// ==== 0x4337a0 RacingCar::UpdateLapScore
 
-void __thiscall FUN_004337a0(int *param_1,char param_2)
+/* [canon] rivals med (ghidra-canon) docs/re/canon.md */
+
+void __thiscall RacingCar__UpdateLapScore(int *param_1,char param_2)
 
 {
   int *piVar1;
@@ -2279,8 +2283,8 @@ void __thiscall FUN_004337a0(int *param_1,char param_2)
         FUN_0043e310(0);
         FUN_0043f240(0);
         piVar1 = (int *)(iVar3 + 0x960);
-        FUN_00436b70();
-        FUN_00436940(piVar1,iVar3,0);
+        StyleItemTable__FinishAll();
+        StyleItemTable__Update(piVar1,iVar3,0);
         *(undefined1 *)(*piVar1 + 0x14) = 0;
       }
     }
@@ -2314,11 +2318,12 @@ void __thiscall FUN_004337a0(int *param_1,char param_2)
 }
 
 
-// ==== 0x4338c0 FUN_004338c0
+// ==== 0x4338c0 RacingCar::UpdateLapCounts
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_004338c0(void)
+void RacingCar__UpdateLapCounts(void)
 
 {
   float fVar1;
@@ -2492,18 +2497,19 @@ void FUN_004338c0(void)
     unaff_EDI[7] = (int)fVar2;
     if ((*(char *)((int)unaff_EDI + 0xd) == '\0') ||
        ((int)*(char *)((int)unaff_EDI + 9) < *(int *)(iVar7 + 0x530))) {
-      FUN_004337a0(0);
+      RacingCar__UpdateLapScore(0);
     }
   }
   return;
 }
 
 
-// ==== 0x433e20 FUN_00433e20
+// ==== 0x433e20 RacingCar::ExtrapolateRaceTime
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_00433e20(int param_1,int param_2,int *param_3)
+void RacingCar__ExtrapolateRaceTime(int param_1,int param_2,int *param_3)
 
 {
   char cVar1;
@@ -2649,9 +2655,11 @@ void Floats11_Max(void)
 }
 
 
-// ==== 0x434270 FUN_00434270
+// ==== 0x434270 Race::Race
 
-void FUN_00434270(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Race__Race(void)
 
 {
   undefined4 *in_EAX;
@@ -2700,7 +2708,7 @@ void FUN_00434270(void)
   in_EAX[0x156] = 0;
   in_EAX[0x157] = 0;
   in_EAX[0x158] = 0;
-  FUN_00434810();
+  Race__FigureOutBoundaries();
   in_EAX[0x159] = 0;
   return;
 }
@@ -2758,9 +2766,11 @@ int __fastcall RaceStatus__Reset(int param_1)
 }
 
 
-// ==== 0x4343f0 FUN_004343f0
+// ==== 0x4343f0 Race::DoSnapshot
 
-void __fastcall FUN_004343f0(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall Race__DoSnapshot(int param_1)
 
 {
   int in_EAX;
@@ -2789,7 +2799,7 @@ void __fastcall FUN_004343f0(int param_1)
     local_4 = param_1 + 0x30;
     piVar3 = (int *)(param_1 + 0x520);
     do {
-      FUN_004334a0();
+      RacingCar__DoSnapshot();
       iVar2 = (*piVar3 - param_1) + -0x30;
       local_5 = ((char)(iVar2 / 0x13c) + (char)(iVar2 >> 0x1f)) -
                 (char)((longlong)iVar2 * 0x67b23a55 >> 0x3f);
@@ -2814,9 +2824,11 @@ void __fastcall FUN_004343f0(int param_1)
 }
 
 
-// ==== 0x434590 FUN_00434590
+// ==== 0x434590 Race::Init
 
-void __thiscall FUN_00434590(int param_1,undefined4 param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall Race__Init(int param_1,undefined4 param_2)
 
 {
   char cVar1;
@@ -2831,9 +2843,9 @@ void __thiscall FUN_00434590(int param_1,undefined4 param_2)
   pcStack_8 = FUN_00689773;
   pvStack_c = ExceptionList;
   ExceptionList = &pvStack_c;
-  FUN_00434a80();
-  FUN_00435d30(param_1);
-  FUN_00434b50(param_1,param_2);
+  Race__AddRacingCars();
+  Race__SetInitialRoutesForAI(param_1);
+  Race__SetRaceStage(param_1,param_2);
   if ((DAT_0078a368 == 0) || (DAT_0078a320 != 2)) {
     iVar2 = *(int *)(param_1 + 0x30);
   }
@@ -2941,9 +2953,11 @@ int Race__AddMarkerPoint(int param_1,undefined4 *param_2,float param_3,int param
 }
 
 
-// ==== 0x434810 FUN_00434810
+// ==== 0x434810 Race::FigureOutBoundaries
 
-void FUN_00434810(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Race__FigureOutBoundaries(void)
 
 {
   float fVar1;
@@ -3028,9 +3042,11 @@ float10 Race__GetFractionFromMarker(float param_1)
 }
 
 
-// ==== 0x434a80 FUN_00434a80
+// ==== 0x434a80 Race::AddRacingCars
 
-void FUN_00434a80(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Race__AddRacingCars(void)
 
 {
   int iVar1;
@@ -3067,9 +3083,11 @@ void FUN_00434a80(void)
 }
 
 
-// ==== 0x434b50 FUN_00434b50
+// ==== 0x434b50 Race::SetRaceStage
 
-void __thiscall FUN_00434b50(undefined4 param_1,int *param_2,int param_3)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall Race__SetRaceStage(undefined4 param_1,int *param_2,int param_3)
 
 {
   int *piVar1;
@@ -3196,11 +3214,12 @@ undefined4 __fastcall TimedMessage__GetPhase(int param_1)
 }
 
 
-// ==== 0x434dd0 FUN_00434dd0
+// ==== 0x434dd0 TimedMessage::GetPhaseProgress
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
 
-float10 __fastcall FUN_00434dd0(int param_1)
+float10 __fastcall TimedMessage__GetPhaseProgress(int param_1)
 
 {
   int iVar1;
@@ -3294,9 +3313,11 @@ LAB_00434f15:
 }
 
 
-// ==== 0x434f80 FUN_00434f80
+// ==== 0x434f80 Race::MonitorLeadership
 
-void FUN_00434f80(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Race__MonitorLeadership(int param_1)
 
 {
   float fVar1;
@@ -3360,9 +3381,11 @@ void FUN_00434f80(int param_1)
 }
 
 
-// ==== 0x4350d0 FUN_004350d0
+// ==== 0x4350d0 Race::FinishCar
 
-void __thiscall FUN_004350d0(int param_1,int param_2,undefined4 param_3,int param_4)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall Race__FinishCar(int param_1,int param_2,undefined4 param_3,int param_4)
 
 {
   int *piVar1;
@@ -3398,7 +3421,7 @@ LAB_0043514a:
   }
   *(short *)(piVar1 + 4) = (short)param_4;
   piVar1[8] = piVar1[5];
-  FUN_004337a0(1);
+  RacingCar__UpdateLapScore(1);
   cVar3 = FUN_0043a2e0();
   iVar5 = DAT_0077b244;
   if (cVar3 == '\0') {
@@ -3415,7 +3438,7 @@ LAB_0043514a:
     }
     else if ((param_2 < 0) || (*(char *)(piVar1 + 3) = (char)param_2, DAT_0078a30c != 3))
     goto LAB_004352bc;
-    FUN_00433e20(piVar1,*(undefined4 *)(param_1 + 0x530),param_1 + 0x10);
+    RacingCar__ExtrapolateRaceTime(piVar1,*(undefined4 *)(param_1 + 0x530),param_1 + 0x10);
   }
   else {
     if ((((DAT_0078a345 != '\0') || (DAT_007361a4 != 0)) &&
@@ -3430,7 +3453,7 @@ LAB_0043514a:
         uVar4 = Race_FindFirstMissingRank(param_1);
       }
       else {
-        uVar4 = FUN_00435c10();
+        uVar4 = Race__GetLastAvailableRank();
       }
       *(undefined1 *)(piVar1 + 3) = uVar4;
     }
@@ -3524,9 +3547,11 @@ LAB_00435513:
 }
 
 
-// ==== 0x435570 FUN_00435570
+// ==== 0x435570 Race::Update
 
-void __fastcall FUN_00435570(undefined4 param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall Race__Update(undefined4 param_1)
 
 {
   int *piVar1;
@@ -3546,7 +3571,7 @@ void __fastcall FUN_00435570(undefined4 param_1)
     {
       (**(code **)(**(int **)(iVar3 + 0x14) + 8))(0xd8692111,0,0,*(int *)(iVar3 + 0x18));
     }
-    FUN_00434b50(unaff_ESI,4);
+    Race__SetRaceStage(unaff_ESI,4);
   }
   if (*unaff_ESI == 4) {
     unaff_ESI[5] = DAT_0073ad34 - unaff_ESI[4];
@@ -3559,8 +3584,9 @@ void __fastcall FUN_00435570(undefined4 param_1)
     piVar6 = unaff_ESI + 0x148;
     do {
       piVar8 = (int *)*piVar6;
-      if ((((short)piVar8[4] == 0) && (FUN_004338c0(), *(int *)(*(int *)(*piVar8 + 0x14) + 4) == 1))
-         && (piVar8[*(char *)(DAT_0073619c + 0x53f) + 0x18] < unaff_ESI[6])) {
+      if ((((short)piVar8[4] == 0) &&
+          (RacingCar__UpdateLapCounts(), *(int *)(*(int *)(*piVar8 + 0x14) + 4) == 1)) &&
+         (piVar8[*(char *)(DAT_0073619c + 0x53f) + 0x18] < unaff_ESI[6])) {
         unaff_ESI[6] = piVar8[*(char *)(DAT_0073619c + 0x53f) + 0x18];
       }
       iVar3 = iVar3 + 1;
@@ -3576,7 +3602,7 @@ void __fastcall FUN_00435570(undefined4 param_1)
       if ((((short)piVar8[4] == 0) && (*piVar8 != 0)) &&
          ((iVar5 = *(int *)(*piVar8 + 0x18), iVar5 != 0 &&
           (unaff_ESI[0x14e] == *(int *)(iVar5 + 0x10))))) {
-        FUN_004350d0(iVar3,0,1);
+        Race__FinishCar(iVar3,0,1);
         if (((DAT_0078a345 != '\0') || (DAT_007361a4 != 0)) && (iVar3 == 1)) {
           piVar8[unaff_ESI[0x14c] + 0x38] = 0x497423fe;
           *(undefined4 *)(iVar5 + 0xa08 + unaff_ESI[0x14c] * 4) = 1;
@@ -3588,7 +3614,7 @@ void __fastcall FUN_00435570(undefined4 param_1)
     } while (iVar4 < unaff_ESI[9]);
   }
   Race__UpdatePlayerRanks();
-  FUN_00434f80(unaff_ESI);
+  Race__MonitorLeadership(unaff_ESI);
   if ((DAT_0078a30c == 3) && (0 < unaff_ESI[9])) {
     piVar6 = unaff_ESI + 0x148;
     iVar3 = 1;
@@ -3607,7 +3633,7 @@ void __fastcall FUN_00435570(undefined4 param_1)
             else {
               iVar5 = *(int *)(iVar5 + 0x18);
             }
-            FUN_004350d0(iVar4 + 1,iVar5 == 0,3);
+            Race__FinishCar(iVar4 + 1,iVar5 == 0,3);
           }
           iVar4 = iVar4 + 1;
           piVar8 = piVar8 + 1;
@@ -3670,7 +3696,7 @@ LAB_00435842:
 LAB_004357ee:
         uVar9 = 7;
 LAB_00435844:
-        FUN_004350d0(iVar5,0,uVar9);
+        Race__FinishCar(iVar5,0,uVar9);
       }
       iVar3 = iVar3 + 1;
       piVar6 = piVar6 + 1;
@@ -3689,7 +3715,7 @@ LAB_00435844:
         piVar6 = unaff_ESI + 0x148;
         do {
           if (iVar3 == *piVar6) {
-            FUN_004350d0(1,0,8);
+            Race__FinishCar(1,0,8);
             break;
           }
           iVar4 = iVar4 + 1;
@@ -3705,7 +3731,7 @@ LAB_00435844:
       if ((((*(char *)(iVar4 + 0xd) != '\0') && (*(short *)(iVar4 + 0x10) == 0)) &&
           (iVar4 = *(int *)(iVar4 + 0x38 + *(char *)(DAT_0073619c + 0x53f) * 4), iVar4 != 0)) &&
          ((iVar4 != 0x7fffffff && (iVar4 <= DAT_0078a310)))) {
-        FUN_004350d0(0,0,1);
+        Race__FinishCar(0,0,1);
       }
       iVar3 = iVar3 + 1;
       piVar6 = piVar6 + 1;
@@ -3736,7 +3762,7 @@ LAB_00435844:
         }
         iVar5 = Race_FindFirstMissingRank(unaff_ESI);
 LAB_004359fe:
-        FUN_004350d0(iVar5,0,9);
+        Race__FinishCar(iVar5,0,9);
       }
       iVar3 = iVar3 + 1;
       piVar6 = piVar6 + 1;
@@ -3746,7 +3772,7 @@ LAB_004359fe:
     piVar6 = unaff_ESI + 0x148;
     do {
       if ((*(short *)(*piVar6 + 0x10) == 0) && ((int)*(char *)(*piVar6 + 9) == unaff_ESI[0x14c])) {
-        FUN_004350d0(0,0,1);
+        Race__FinishCar(0,0,1);
       }
       iVar3 = iVar3 + 1;
       piVar6 = piVar6 + 1;
@@ -3756,9 +3782,11 @@ LAB_004359fe:
 }
 
 
-// ==== 0x435a70 FUN_00435a70
+// ==== 0x435a70 Race::SimulateRaceFinish
 
-void FUN_00435a70(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Race__SimulateRaceFinish(void)
 
 {
   int iVar1;
@@ -3778,7 +3806,7 @@ void FUN_00435a70(void)
           iVar3 = *piVar2;
         }
         if (*(short *)(iVar3 + 0x10) == 0) {
-          FUN_004350d0(iVar1,0,(iVar1 != 1) * '\x02' + '\x01');
+          Race__FinishCar(iVar1,0,(iVar1 != 1) * '\x02' + '\x01');
           *(char *)(iVar3 + 9) = '\x04' - (char)iVar1;
         }
         iVar1 = iVar1 + -1;
@@ -3793,7 +3821,7 @@ void FUN_00435a70(void)
       piVar2 = (int *)(unaff_ESI + 0x520);
       do {
         if (*(short *)(*piVar2 + 0x10) == 0) {
-          FUN_004350d0(0,0,1);
+          Race__FinishCar(0,0,1);
         }
         iVar1 = iVar1 + 1;
         piVar2 = piVar2 + 1;
@@ -3807,9 +3835,11 @@ void FUN_00435a70(void)
 }
 
 
-// ==== 0x435b30 FUN_00435b30
+// ==== 0x435b30 Race::AreAllPlayersFinishedRacing
 
-undefined4 FUN_00435b30(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 Race__AreAllPlayersFinishedRacing(void)
 
 {
   char cVar1;
@@ -3893,9 +3923,11 @@ void Race_FindFirstMissingRank(int param_1)
 }
 
 
-// ==== 0x435c10 FUN_00435c10
+// ==== 0x435c10 Race::GetLastAvailableRank
 
-void FUN_00435c10(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Race__GetLastAvailableRank(void)
 
 {
   int iVar1;
@@ -3927,10 +3959,12 @@ void FUN_00435c10(void)
 }
 
 
-// ==== 0x435c50 FUN_00435c50
+// ==== 0x435c50 Race::FinishCar
+
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __thiscall
-FUN_00435c50(int param_1,int param_2,int param_3,undefined4 param_4,undefined4 param_5)
+Race__FinishCar(int param_1,int param_2,int param_3,undefined4 param_4,undefined4 param_5)
 
 {
   int iVar1;
@@ -3949,7 +3983,7 @@ FUN_00435c50(int param_1,int param_2,int param_3,undefined4 param_4,undefined4 p
     if (param_3 == 0) {
       param_3 = (int)*(char *)(*(int *)(param_2 + 0x1c) + 10);
     }
-    FUN_004350d0(param_3,param_4,param_5);
+    Race__FinishCar(param_3,param_4,param_5);
   }
   return;
 }
@@ -3987,9 +4021,11 @@ uint RaceManager__IsInRaceStartWindow(int param_1,int param_2)
 }
 
 
-// ==== 0x435d30 FUN_00435d30
+// ==== 0x435d30 Race::SetInitialRoutesForAI
 
-void FUN_00435d30(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void Race__SetInitialRoutesForAI(void)
 
 {
   int *piVar1;
@@ -4172,9 +4208,11 @@ undefined4 ModeFlags_Unload(int *param_1)
 }
 
 
-// ==== 0x436040 FUN_00436040
+// ==== 0x436040 StyleItem::StyleItem
 
-int __fastcall FUN_00436040(int param_1)
+/* [canon] audio med (ghidra-canon) docs/re/canon.md */
+
+int __fastcall StyleItem__StyleItem(int param_1)
 
 {
   *(undefined4 *)(param_1 + 0x3c) = 0;
@@ -4188,9 +4226,11 @@ int __fastcall FUN_00436040(int param_1)
 }
 
 
-// ==== 0x436070 FUN_00436070
+// ==== 0x436070 StyleItem::Update
 
-void FUN_00436070(float param_1)
+/* [canon] audio med (ghidra-canon) docs/re/canon.md */
+
+void StyleItem__Update(float param_1)
 
 {
   float fVar1;
@@ -4207,11 +4247,11 @@ void FUN_00436070(float param_1)
     fVar1 = (float)(DAT_0073ad34 - *(int *)(in_EAX + 0x3c)) * 0.00025;
     if (*(float *)(*(int *)(in_EAX + 8) + 0xc) < fVar1) {
       if (*(int *)(in_EAX + 0x10) == 0) {
-        FUN_004364d0(0);
+        StyleItem__Cancel(0);
       }
       else if (*(int *)(in_EAX + 0x10) == 1) {
         StyleItem__Finish(0);
-        FUN_00436600();
+        StyleItem__Rearm();
       }
     }
     if (((*(int *)(in_EAX + 0x10) == 0) || (*(int *)(in_EAX + 0x10) == 1)) &&
@@ -4277,9 +4317,11 @@ LAB_00436209:
 }
 
 
-// ==== 0x436230 FUN_00436230
+// ==== 0x436230 StyleItem::Trigger
 
-void __thiscall FUN_00436230(int *param_1,int param_2)
+/* [canon] audio med (ghidra-canon) docs/re/canon.md */
+
+void __thiscall StyleItem__Trigger(int *param_1,int param_2)
 
 {
   int *piVar1;
@@ -4317,7 +4359,7 @@ void __thiscall FUN_00436230(int *param_1,int param_2)
         ((float10)*(float *)(iVar5 + 0x10) < fVar8)))) {
       param_1[8] = (int)(float)fVar8;
       param_1[4] = 0;
-      FUN_004364d0(0);
+      StyleItem__Cancel(0);
       piVar6 = DAT_0073618c;
     }
     goto LAB_0043640d;
@@ -4344,7 +4386,7 @@ void __thiscall FUN_00436230(int *param_1,int param_2)
     else {
       piVar6 = piVar3 + 1;
       *piVar3 = iVar5;
-      eh_vector_constructor_iterator(piVar6,0x44,iVar5,FUN_00436040,NullUpdate_ret);
+      eh_vector_constructor_iterator(piVar6,0x44,iVar5,StyleItem__StyleItem,NullUpdate_ret);
     }
     iVar5 = ((int)piVar6 << 7) % DAT_00736190;
     local_4 = 0xffffffff;
@@ -4375,7 +4417,7 @@ LAB_0043640d:
       iVar5 = -iVar5;
     }
     if (param_1 != piVar6 + iVar5 * 0x11) {
-      FUN_00436230(param_2);
+      StyleItem__Trigger(param_2);
     }
   }
   ExceptionList = local_c;
@@ -4422,9 +4464,11 @@ void __thiscall StyleItem__Finish(int param_1,undefined1 param_2)
 }
 
 
-// ==== 0x4364d0 FUN_004364d0
+// ==== 0x4364d0 StyleItem::Cancel
 
-void __thiscall FUN_004364d0(undefined4 *param_1,undefined4 param_2)
+/* [canon] audio med (ghidra-canon) docs/re/canon.md */
+
+void __thiscall StyleItem__Cancel(undefined4 *param_1,undefined4 param_2)
 
 {
   int iVar1;
@@ -4440,7 +4484,7 @@ void __thiscall FUN_004364d0(undefined4 *param_1,undefined4 param_2)
       iVar1 = -iVar1;
     }
     if (param_1 != (undefined4 *)(iVar1 * 0x44 + DAT_0073618c)) {
-      FUN_004364d0(param_2);
+      StyleItem__Cancel(param_2);
       iVar2 = (DAT_0073618c << 7) % DAT_00736190;
       iVar1 = iVar2;
       if (iVar2 < 0) {
@@ -4508,9 +4552,11 @@ void __fastcall StyleItem__Reset(int param_1)
 }
 
 
-// ==== 0x436600 FUN_00436600
+// ==== 0x436600 StyleItem::Rearm
 
-void FUN_00436600(void)
+/* [canon] audio med (ghidra-canon) docs/re/canon.md */
+
+void StyleItem__Rearm(void)
 
 {
   char cVar1;
@@ -4679,9 +4725,11 @@ void StyleItem__ResetLevel(void)
 }
 
 
-// ==== 0x4367e0 FUN_004367e0
+// ==== 0x4367e0 StyleItemTable::StyleItemTable
 
-void FUN_004367e0(int param_1)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void StyleItemTable__StyleItemTable(int param_1)
 
 {
   int iVar1;
@@ -4775,9 +4823,11 @@ void Player__FreeMember960(void)
 }
 
 
-// ==== 0x436940 FUN_00436940
+// ==== 0x436940 StyleItemTable::Update
 
-void FUN_00436940(int param_1,int param_2,undefined4 param_3)
+/* [canon] audio med (ghidra-canon) docs/re/canon.md */
+
+void StyleItemTable__Update(int param_1,int param_2,undefined4 param_3)
 
 {
   int ******ppppppiVar1;
@@ -4857,9 +4907,9 @@ void FUN_00436940(int param_1,int param_2,undefined4 param_3)
   do {
     iVar5 = *(int *)(*(int *)(param_1 + iVar7 * 4) + 0x10);
     if ((iVar5 == 3) || (iVar5 == 4)) {
-      FUN_00436600();
+      StyleItem__Rearm();
     }
-    FUN_00436070(param_3);
+    StyleItem__Update(param_3);
     iVar7 = iVar7 + 1;
   } while (iVar7 < 0x1f);
   if ((int ******)local_14 != &local_14) {
@@ -4876,15 +4926,17 @@ void FUN_00436940(int param_1,int param_2,undefined4 param_3)
 }
 
 
-// ==== 0x436b20 FUN_00436b20
+// ==== 0x436b20 StyleItemTable::TriggerItem
 
-void __fastcall FUN_00436b20(int param_1)
+/* [canon] audio med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall StyleItemTable__TriggerItem(int param_1)
 
 {
   int in_EAX;
   
   if (*(char *)(*(int *)(in_EAX + param_1 * 4) + 0x14) != '\0') {
-    FUN_00436230();
+    StyleItem__Trigger();
     return;
   }
   return;
@@ -4927,9 +4979,11 @@ void __fastcall StyleItemTable__ResetItemLevel(int param_1)
 }
 
 
-// ==== 0x436b70 FUN_00436b70
+// ==== 0x436b70 StyleItemTable::FinishAll
 
-void FUN_00436b70(void)
+/* [canon] unknown med (ghidra-canon) docs/re/canon.md */
+
+void StyleItemTable__FinishAll(void)
 
 {
   int iVar1;
@@ -4942,7 +4996,7 @@ void FUN_00436b70(void)
     if (*(char *)(iVar1 + 0x14) != '\0') {
       iVar1 = *(int *)(iVar1 + 0x10);
       if (iVar1 == 0) {
-        FUN_004364d0(1);
+        StyleItem__Cancel(1);
       }
       else if (iVar1 == 1) {
         StyleItem__Finish(1);
@@ -5058,9 +5112,11 @@ float10 bLength3(void)
 }
 
 
-// ==== 0x436d90 FUN_00436d90
+// ==== 0x436d90 BitStream::ReadBitsValue
 
-undefined4 FUN_00436d90(void)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+undefined4 BitStream__ReadBitsValue(void)
 
 {
   undefined4 in_EAX;
@@ -5081,9 +5137,11 @@ undefined4 FUN_00436db0(void)
 }
 
 
-// ==== 0x436dc0 FUN_00436dc0
+// ==== 0x436dc0 BitStream::WriteFloatRounded
 
-void FUN_00436dc0(void)
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
+
+void BitStream__WriteFloatRounded(void)
 
 {
   undefined4 uVar1;
@@ -5094,9 +5152,11 @@ void FUN_00436dc0(void)
 }
 
 
-// ==== 0x436e20 FUN_00436e20
+// ==== 0x436e20 BitStream::ReadQuantizedFloat
 
-void FUN_00436e20(float *param_1,int param_2)
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
+
+void BitStream__ReadQuantizedFloat(float *param_1,int param_2)
 
 {
   float10 fVar1;
@@ -5108,9 +5168,11 @@ void FUN_00436e20(float *param_1,int param_2)
 }
 
 
-// ==== 0x436e60 FUN_00436e60
+// ==== 0x436e60 BitStream::WriteClampedInt
 
-void __fastcall FUN_00436e60(int param_1)
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall BitStream__WriteClampedInt(int param_1)
 
 {
   int iVar1;
@@ -5128,9 +5190,11 @@ void __fastcall FUN_00436e60(int param_1)
 }
 
 
-// ==== 0x436e90 FUN_00436e90
+// ==== 0x436e90 BitStream::ReadQuantizedInt
 
-void FUN_00436e90(undefined4 *param_1,int param_2)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+void BitStream__ReadQuantizedInt(undefined4 *param_1,int param_2)
 
 {
   FUN_005488d0(*(undefined4 *)(param_2 + 300));
@@ -5139,9 +5203,11 @@ void FUN_00436e90(undefined4 *param_1,int param_2)
 }
 
 
-// ==== 0x436ed0 FUN_00436ed0
+// ==== 0x436ed0 BitStream::WriteByteBits
 
-void FUN_00436ed0(void)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+void BitStream__WriteByteBits(void)
 
 {
   undefined1 in_AL;
@@ -5151,9 +5217,11 @@ void FUN_00436ed0(void)
 }
 
 
-// ==== 0x436ee0 FUN_00436ee0
+// ==== 0x436ee0 BitStream::ReadBool
 
-undefined4 FUN_00436ee0(void)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+undefined4 BitStream__ReadBool(void)
 
 {
   FUN_005488d0(1);
@@ -5161,9 +5229,11 @@ undefined4 FUN_00436ee0(void)
 }
 
 
-// ==== 0x436f10 FUN_00436f10
+// ==== 0x436f10 BitStream::WriteBitsThunk
 
-void FUN_00436f10(void)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+void BitStream__WriteBitsThunk(void)
 
 {
   undefined4 in_EAX;
@@ -5173,9 +5243,11 @@ void FUN_00436f10(void)
 }
 
 
-// ==== 0x436f20 FUN_00436f20
+// ==== 0x436f20 BitStream::ReadU32
 
-undefined4 FUN_00436f20(void)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+undefined4 BitStream__ReadU32(void)
 
 {
   FUN_005488d0(0x20);
@@ -5206,7 +5278,7 @@ PidCarController__scalar_deleting_destructor(undefined4 *param_1,byte param_2)
 void __fastcall PidCarController___PidCarController(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006ca494;
+  *param_1 = &PTR_PidCarController__scalar_deleting_destructor_006ca494;
   param_1[0x96] = &PTR_FUN_006b9694;
   if ((undefined4 *)param_1[0x9a] != param_1 + 0x9b) {
     _free((undefined4 *)param_1[0x9a]);
@@ -5217,9 +5289,11 @@ void __fastcall PidCarController___PidCarController(undefined4 *param_1)
 }
 
 
-// ==== 0x436fa0 FUN_00436fa0
+// ==== 0x436fa0 PidCarController::scalar_deleting_destructor
 
-void * __thiscall FUN_00436fa0(void *param_1,byte param_2)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall PidCarController__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   PidCarController___PidCarController();
@@ -5254,9 +5328,11 @@ void __fastcall FUN_00436fe0(undefined4 *param_1)
 }
 
 
-// ==== 0x436ff0 FUN_00436ff0
+// ==== 0x436ff0 PidCarController::PidCarController
 
-undefined4 * FUN_00436ff0(undefined4 *param_1,undefined4 param_2)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+undefined4 * PidCarController__PidCarController(undefined4 *param_1,undefined4 param_2)
 
 {
   undefined4 uVar1;
@@ -5275,7 +5351,7 @@ undefined4 * FUN_00436ff0(undefined4 *param_1,undefined4 param_2)
   pvStack_1c = ExceptionList;
   ExceptionList = &pvStack_1c;
   *param_1 = &PTR_PidCarController__scalar_deleting_destructor_006ca4a4;
-  *param_1 = &PTR_FUN_006ca494;
+  *param_1 = &PTR_PidCarController__scalar_deleting_destructor_006ca494;
   param_1[0x25] = 0;
   param_1[0x26] = 0;
   param_1[0x2c] = 0;
@@ -5365,7 +5441,7 @@ undefined4 * FUN_00436ff0(undefined4 *param_1,undefined4 param_2)
   param_1[0x8f] = 0;
   param_1[0x8e] = 0;
   param_1[0x94] = 0x3f800000;
-  iVar6 = FUN_00439010();
+  iVar6 = RaceStatus__FindCurrentEntrant();
   uVar7 = DAT_006f227c % 0x2ac;
   uVar8 = DAT_006f227c ^ 0x1d872b41;
   uVar5 = uVar8 >> 5 ^ uVar8;
@@ -5387,9 +5463,11 @@ undefined4 * FUN_00436ff0(undefined4 *param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4373d0 FUN_004373d0
+// ==== 0x4373d0 RemoteCarState::WriteState
 
-void __fastcall FUN_004373d0(int param_1)
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall RemoteCarState__WriteState(int param_1)
 
 {
   undefined1 uVar1;
@@ -5400,34 +5478,34 @@ void __fastcall FUN_004373d0(int param_1)
   undefined4 uStack_8;
   float fStack_4;
   
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0x60));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 100));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0x68));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0x70));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0x74));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0x78));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 0x60));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 100));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 0x68));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 0x70));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 0x74));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 0x78));
   FUN_00566bf0();
-  FUN_00436dc0(uStack_10);
-  FUN_00436dc0(uStack_c);
-  FUN_00436dc0(uStack_8);
-  FUN_00436dc0(-fStack_4);
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0xd0));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0xd4));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(param_1 + 4) + 0xd8));
+  BitStream__WriteFloatRounded(uStack_10);
+  BitStream__WriteFloatRounded(uStack_c);
+  BitStream__WriteFloatRounded(uStack_8);
+  BitStream__WriteFloatRounded(-fStack_4);
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 0xd0));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 0xd4));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(param_1 + 4) + 0xd8));
   FUN_00548840((uint)*(ushort *)(*(int *)(param_1 + 4) + 0x3b4) << 0x10);
   FUN_00548840(*(undefined2 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1d0));
   uVar1 = CarState__IsNitrousOn();
   FUN_00548840(uVar1);
-  FUN_00436dc0(*(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1dc));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1e4));
-  FUN_00436dc0(*(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1e0));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1dc));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1e4));
+  BitStream__WriteFloatRounded(*(undefined4 *)(*(int *)(*(int *)(param_1 + 4) + 0x30) + 0x1e0));
   if (DAT_007000e4 == 100.0) {
     fStack00000004 = *(float *)(*(int *)(param_1 + 4) + 0x3e0);
   }
   else {
     fStack00000004 = DAT_007000e4;
   }
-  FUN_00436dc0(fStack00000004);
+  BitStream__WriteFloatRounded(fStack00000004);
   iVar2 = *(int *)(*(int *)(param_1 + 4) + 0x3d8);
   if (iVar2 < DAT_0077c758) {
     iVar2 = DAT_0077c758;
@@ -5440,7 +5518,7 @@ void __fastcall FUN_004373d0(int param_1)
 }
 
 
-// ==== 0x4375e0 FUN_004375e0
+// ==== 0x4375e0 RemoteCarState::ApplyState
 
 /* WARNING: Removing unreachable block (ram,0x00437bff) */
 /* WARNING: Removing unreachable block (ram,0x00437b33) */
@@ -5457,8 +5535,9 @@ void __fastcall FUN_004373d0(int param_1)
 /* WARNING: Removing unreachable block (ram,0x00437b99) */
 /* WARNING: Removing unreachable block (ram,0x00437c65) */
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
 
-void __thiscall FUN_004375e0(int param_1,undefined4 param_2,float param_3)
+void __thiscall RemoteCarState__ApplyState(int param_1,undefined4 param_2,float param_3)
 
 {
   undefined4 uVar1;
@@ -5482,9 +5561,9 @@ void __thiscall FUN_004375e0(int param_1,undefined4 param_2,float param_3)
   uVar4 = _ftol_nocw();
   *(undefined4 *)(param_1 + 0x94) = uVar4;
   FUN_00584270((float)*(int *)(param_1 + 0x94));
-  FUN_00436e20(param_1 + 0x10,&DAT_0077ba7c);
-  FUN_00436e20(param_1 + 0x14,&DAT_0077bbc8);
-  FUN_00436e20(param_1 + 0x18,&DAT_0077bd14);
+  BitStream__ReadQuantizedFloat(param_1 + 0x10,&DAT_0077ba7c);
+  BitStream__ReadQuantizedFloat(param_1 + 0x14,&DAT_0077bbc8);
+  BitStream__ReadQuantizedFloat(param_1 + 0x18,&DAT_0077bd14);
   FUN_005488d0(DAT_0077bf8c);
   fVar2 = _DAT_0077bf9c * 0.0 + _DAT_0077bf90;
   if (fVar2 < _DAT_0077bf90) {
@@ -5675,7 +5754,7 @@ LAB_00437d4f:
   *(undefined4 *)(iVar6 + 0xd8) = uVar4;
   *(undefined4 *)(*(int *)(param_1 + 4) + 0x3d8) = *(undefined4 *)(param_1 + 0x80);
   *(undefined4 *)(*(int *)(param_1 + 4) + 0x3e0) = *(undefined4 *)(param_1 + 0x7c);
-  FUN_00438390(param_3);
+  Car__SyncWheelsToSpeed(param_3);
   Car_SetMode();
   iVar6 = *(int *)(*(int *)(param_1 + 4) + 0x30);
   *(undefined4 *)(iVar6 + 0x1dc) = *(undefined4 *)(param_1 + 0x6c);
@@ -5760,11 +5839,12 @@ void CarTracker_CapturePosVel(void)
 }
 
 
-// ==== 0x438030 FUN_00438030
+// ==== 0x438030 RemoteCarState::SmoothPosition
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
 
-int * FUN_00438030(float param_1)
+int * RemoteCarState__SmoothPosition(float param_1)
 
 {
   float fVar1;
@@ -5786,8 +5866,8 @@ int * FUN_00438030(float param_1)
   float local_28;
   
   piVar11 = DAT_0073619c;
-  if ((*DAT_0073619c == 4) && (piVar11 = (int *)FUN_00435b30(DAT_0073619c), piVar11 == (int *)0x0))
-  {
+  if ((*DAT_0073619c == 4) &&
+     (piVar11 = (int *)Race__AreAllPlayersFinishedRacing(DAT_0073619c), piVar11 == (int *)0x0)) {
     iVar4 = *(int *)(in_EAX + 4);
     piVar11 = *(int **)(iVar4 + 0x14);
     if (((char)piVar11[0x1cd] != '\0') &&
@@ -5857,11 +5937,12 @@ int * FUN_00438030(float param_1)
 }
 
 
-// ==== 0x438300 FUN_00438300
+// ==== 0x438300 RemoteCarState::DelayNextApply
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
 
-void FUN_00438300(float param_1)
+void RemoteCarState__DelayNextApply(float param_1)
 
 {
   int iVar1;
@@ -5877,9 +5958,11 @@ void FUN_00438300(float param_1)
 }
 
 
-// ==== 0x438390 FUN_00438390
+// ==== 0x438390 Car::SyncWheelsToSpeed
 
-void FUN_00438390(void)
+/* [canon] car med (ghidra-canon) docs/re/canon.md */
+
+void Car__SyncWheelsToSpeed(void)
 
 {
   float fVar1;
@@ -5937,9 +6020,11 @@ void FUN_00438390(void)
 }
 
 
-// ==== 0x438440 FUN_00438440
+// ==== 0x438440 RemoteCarState::AntiCheatCheck
 
-void FUN_00438440(float param_1)
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
+
+void RemoteCarState__AntiCheatCheck(float param_1)
 
 {
   float fVar1;
@@ -6017,7 +6102,7 @@ void FUN_00438440(float param_1)
         FUN_0043a830();
       }
     }
-    iVar7 = FUN_00439010();
+    iVar7 = RaceStatus__FindCurrentEntrant();
     uVar10 = DAT_006f227c % 0x2ac;
     uVar11 = DAT_006f227c ^ 0x1d872b41;
     uVar8 = uVar11 >> 5 ^ uVar11;
@@ -6044,9 +6129,11 @@ void FUN_00438440(float param_1)
 }
 
 
-// ==== 0x4387e0 FUN_004387e0
+// ==== 0x4387e0 Float_Truncate
 
-float10 __fastcall FUN_004387e0(undefined4 param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+float10 __fastcall Float_Truncate(undefined4 param_1)
 
 {
   int iVar1;
@@ -6087,9 +6174,11 @@ bool __thiscall int_NotEqual(int *param_1,int *param_2)
 }
 
 
-// ==== 0x438860 FUN_00438860
+// ==== 0x438860 PtrSlots::PtrSlots
 
-int __fastcall FUN_00438860(int param_1)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+int __fastcall PtrSlots__PtrSlots(int param_1)
 
 {
   Ptr_SetNull();
@@ -6102,11 +6191,12 @@ int __fastcall FUN_00438860(int param_1)
 }
 
 
-// ==== 0x4388d0 FUN_004388d0
+// ==== 0x4388d0 BitStream::GetSizeInBytes
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
 
-void FUN_004388d0(void)
+void BitStream__GetSizeInBytes(void)
 
 {
   _ftol_nocw();
@@ -6129,21 +6219,25 @@ void Float2_ToIntPair(void)
 }
 
 
-// ==== 0x438980 FUN_00438980
+// ==== 0x438980 BitStream::ReadRangedInt
 
-void FUN_00438980(void)
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
+
+void BitStream__ReadRangedInt(void)
 
 {
   FUN_00436db0();
-  FUN_00436d90();
+  BitStream__ReadBitsValue();
   FUN_005491b0();
   return;
 }
 
 
-// ==== 0x4389b0 FUN_004389b0
+// ==== 0x4389b0 BitStream::WriteByte
 
-void FUN_004389b0(undefined1 param_1)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+void BitStream__WriteByte(undefined1 param_1)
 
 {
   FUN_00548840(param_1);
@@ -6151,19 +6245,23 @@ void FUN_004389b0(undefined1 param_1)
 }
 
 
-// ==== 0x4389e0 FUN_004389e0
+// ==== 0x4389e0 BitStream::ReadByte
 
-void FUN_004389e0(void)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+void BitStream__ReadByte(void)
 
 {
-  FUN_00436d90();
+  BitStream__ReadBitsValue();
   return;
 }
 
 
-// ==== 0x438a00 FUN_00438a00
+// ==== 0x438a00 BitStream::WriteShort
 
-void FUN_00438a00(short param_1)
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
+
+void BitStream__WriteShort(short param_1)
 
 {
   FUN_00548840((int)param_1);
@@ -6171,9 +6269,11 @@ void FUN_00438a00(short param_1)
 }
 
 
-// ==== 0x438a30 FUN_00438a30
+// ==== 0x438a30 bFree_Thunk
 
-void FUN_00438a30(void)
+/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+
+void bFree_Thunk(void)
 
 {
   FUN_00565ce0();
@@ -6181,9 +6281,11 @@ void FUN_00438a30(void)
 }
 
 
-// ==== 0x438a40 FUN_00438a40
+// ==== 0x438a40 Obj_GetByte4
 
-undefined1 __fastcall FUN_00438a40(int param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+undefined1 __fastcall Obj_GetByte4(int param_1)
 
 {
   return *(undefined1 *)(param_1 + 4);
@@ -6212,9 +6314,11 @@ bool __thiscall Race__HasPlayer(int param_1,int param_2)
 }
 
 
-// ==== 0x438aa0 FUN_00438aa0
+// ==== 0x438aa0 Obj_GetField830
 
-undefined4 __fastcall FUN_00438aa0(int param_1)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall Obj_GetField830(int param_1)
 
 {
   return *(undefined4 *)(param_1 + 0x830);
@@ -6411,7 +6515,7 @@ FUN_00438ec0(undefined4 *param_1,undefined1 param_2,undefined1 param_3,int param
 
 {
   Ptr_SetNull();
-  FUN_00438860();
+  PtrSlots__PtrSlots();
   Ptr_SetNull();
   Ptr_SetNull();
   *(undefined1 *)(param_1 + 1) = param_2;
@@ -6456,9 +6560,11 @@ void __thiscall FUN_00438fe0(int param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x439010 FUN_00439010
+// ==== 0x439010 RaceStatus::FindCurrentEntrant
 
-void FUN_00439010(void)
+/* [canon] rivals low (ghidra-canon) docs/re/canon.md */
+
+void RaceStatus__FindCurrentEntrant(void)
 
 {
   RaceStatus__FindEntrantById();
@@ -6509,16 +6615,18 @@ void __thiscall FUN_004390d0(int *param_1,int param_2)
 }
 
 
-// ==== 0x4390f0 FUN_004390f0
+// ==== 0x4390f0 Race::GetRacingCarOfRacer
 
-undefined4 __fastcall FUN_004390f0(undefined4 param_1)
+/* [canon] rivals low (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall Race__GetRacingCarOfRacer(undefined4 param_1)
 
 {
   int iVar1;
   undefined4 local_c;
   
   local_c = 0;
-  iVar1 = FUN_00439130(param_1);
+  iVar1 = Race__FindRacerById(param_1);
   if (iVar1 != 0) {
     local_c = FUN_004081e0();
   }
@@ -6526,9 +6634,11 @@ undefined4 __fastcall FUN_004390f0(undefined4 param_1)
 }
 
 
-// ==== 0x439130 FUN_00439130
+// ==== 0x439130 Race::FindRacerById
 
-undefined4 FUN_00439130(void)
+/* [canon] rivals low (ghidra-canon) docs/re/canon.md */
+
+undefined4 Race__FindRacerById(void)
 
 {
   undefined4 local_8;
@@ -6541,11 +6651,13 @@ undefined4 FUN_00439130(void)
 }
 
 
-// ==== 0x439170 FUN_00439170
+// ==== 0x439170 NetPlayer::SendFinishMessage
 
 /* WARNING: Removing unreachable block (ram,0x0043925d) */
+/* [canon] online low (ghidra-canon) docs/re/canon.md */
 
-void __thiscall FUN_00439170(int param_1,undefined1 param_2,char param_3,uint param_4)
+void __thiscall
+NetPlayer__SendFinishMessage(int param_1,undefined1 param_2,char param_3,uint param_4)
 
 {
   char cVar1;
@@ -6575,9 +6687,11 @@ void __thiscall FUN_00439170(int param_1,undefined1 param_2,char param_3,uint pa
 }
 
 
-// ==== 0x4392a0 FUN_004392a0
+// ==== 0x4392a0 BitStream::BitStream
 
-undefined4 __fastcall FUN_004392a0(undefined4 param_1)
+/* [canon] online med (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall BitStream__BitStream(undefined4 param_1)
 
 {
   FUN_00548820();
@@ -6618,13 +6732,13 @@ void __fastcall FUN_004392c0(int param_1)
     *(undefined4 *)(param_1 + 0x18c + local_30 * 4) = uVar1;
   }
   FUN_004390d0(3);
-  iVar2 = FUN_004390f0();
+  iVar2 = Race__GetRacingCarOfRacer();
   if ((iVar2 != 0) && (iVar2 = FUN_00424e90(), iVar2 == 0)) {
     uVar4 = 0;
     uVar3 = (uint)(local_5 != '\0');
     uVar5 = 0;
     uVar1 = FUN_00421960(0,uVar3,0);
-    FUN_00435c50(uVar1,uVar5,uVar3,uVar4);
+    Race__FinishCar(uVar1,uVar5,uVar3,uVar4);
   }
   if (*(int *)(param_1 + 0x184) == 0) {
     FUN_004399a0(0x20);
@@ -6642,7 +6756,7 @@ void FUN_00439440(void)
   undefined4 uVar2;
   
   uVar2 = 1;
-  uVar1 = FUN_004390f0(1);
+  uVar1 = Race__GetRacingCarOfRacer(1);
   FUN_004acd20(uVar1,uVar2);
   return;
 }
@@ -6663,15 +6777,15 @@ void __thiscall FUN_00439470(undefined4 param_1,undefined4 param_2,undefined4 pa
   if (cVar1 != '\0') {
     FUN_004390d0(param_2);
   }
-  iVar2 = FUN_004390f0();
+  iVar2 = Race__GetRacingCarOfRacer();
   if (iVar2 != 0) {
     iVar2 = FUN_00424e90();
     if (iVar2 == 0) {
-      FUN_00439010(param_3);
+      RaceStatus__FindCurrentEntrant(param_3);
       uVar3 = DriverInfo__IsRemote();
       uVar5 = 0;
       uVar4 = FUN_00421960(0,uVar3);
-      FUN_00435c50(uVar4,uVar5,uVar3,param_3);
+      Race__FinishCar(uVar4,uVar5,uVar3,param_3);
       FUN_00439440();
     }
   }
@@ -6704,7 +6818,7 @@ void __fastcall FUN_004394f0(int param_1)
   if (DAT_0073619c == 0) {
     return;
   }
-  iVar3 = FUN_00435b30(DAT_0073619c);
+  iVar3 = Race__AreAllPlayersFinishedRacing(DAT_0073619c);
   if (iVar3 != 0) {
     return;
   }
@@ -6781,13 +6895,13 @@ LAB_00439615:
       FUN_004399a0(4);
       uVar9 = 9;
       uVar8 = 0;
-      uVar4 = FUN_00435c10(0,9);
+      uVar4 = Race__GetLastAvailableRank(0,9);
       uVar5 = FUN_00417490(uVar4);
-      FUN_00435c50(uVar5,uVar4,uVar8,uVar9);
+      Race__FinishCar(uVar5,uVar4,uVar8,uVar9);
     }
   }
 LAB_004397af:
-  FUN_004390f0();
+  Race__GetRacingCarOfRacer();
   iVar3 = FUN_00432c60();
   if ((iVar3 != 0) && (iVar3 = FUN_005647d0(), iVar3 != 0x238562c5)) {
     FUN_004399a0(0x20);
@@ -6890,7 +7004,7 @@ undefined4 __thiscall FUN_004399f0(int param_1,char param_2)
   undefined4 uVar1;
   
   if ((*(int *)(param_1 + 0x184) == 0) || (param_2 != '\0')) {
-    FUN_00439010();
+    RaceStatus__FindCurrentEntrant();
     FUN_00421a70();
     uVar1 = FUN_0057f130();
     uVar1 = FUN_00576440(param_1,uVar1);
@@ -7273,11 +7387,11 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
     break;
   case 6:
     iVar5 = FUN_00424ea0();
-    if ((iVar5 != 0) && (iVar5 = FUN_00435b30(DAT_0073619c), iVar5 == 0)) {
+    if ((iVar5 != 0) && (iVar5 = Race__AreAllPlayersFinishedRacing(DAT_0073619c), iVar5 == 0)) {
       for (local_c = 0; local_c < 4; local_c = local_c + 1) {
         iVar5 = Race__GetPlayer(local_c);
         if (iVar5 != 0) {
-          iVar5 = FUN_00439130();
+          iVar5 = Race__FindRacerById();
           iVar5 = *(int *)(iVar5 + 0x830);
           AntiTamper__DecodeFloat(**(undefined4 **)(iVar5 + 0x298),*(undefined4 *)(iVar5 + 0x29c));
           iVar3 = _ftol_nocw();
@@ -7303,7 +7417,7 @@ void __thiscall FUN_0043a360(undefined4 *param_1,char param_2)
           bVar1 = false;
           break;
         }
-        FUN_004390f0();
+        Race__GetRacingCarOfRacer();
         iVar5 = FUN_00424e90();
         if (iVar5 == 0) {
           FUN_004a8d90(puVar4);
@@ -7775,7 +7889,7 @@ void __fastcall FUN_0043af80(int param_1)
   FUN_004390d0(6);
   if ((DAT_007361f8 != 0) && (DAT_0073619c != 0)) {
     SetGlobal_006ffdbc_30f(DAT_007361f8);
-    FUN_00434b50(DAT_0073619c,3);
+    Race__SetRaceStage(DAT_0073619c,3);
     FUN_0043aae0(0,1);
   }
   DAT_00779814 = 0xffffffff;
@@ -7820,7 +7934,7 @@ void FUN_0043b090(undefined4 param_1,undefined4 param_2)
   }
   FUN_0043b930(param_1);
   FUN_0043b560(param_2,0,1,0);
-  uVar2 = FUN_00436d90();
+  uVar2 = BitStream__ReadBitsValue();
   DAT_00779814 = uVar2 & 0xff;
   return;
 }
@@ -7846,8 +7960,8 @@ void __thiscall FUN_0043b210(int param_1,undefined4 param_2)
     FUN_00548840((int)*(short *)(iVar1 + 8));
     FUN_00548840(*(undefined1 *)(iVar1 + 0xc));
     FUN_00548840(*(undefined1 *)(iVar1 + 0x1f));
-    FUN_00436f10();
-    FUN_00436f10();
+    BitStream__WriteBitsThunk();
+    BitStream__WriteBitsThunk();
     local_9 = DAT_00777cc8 == 6;
   }
   else {
@@ -7855,8 +7969,8 @@ void __thiscall FUN_0043b210(int param_1,undefined4 param_2)
     FUN_00548840((int)(short)DAT_0078a2f0);
     FUN_00548840((undefined1)DAT_0078a2fc);
     FUN_00548840((undefined1)DAT_0078a400);
-    FUN_00436f10();
-    FUN_00436f10();
+    BitStream__WriteBitsThunk();
+    BitStream__WriteBitsThunk();
     local_9 = IsDriftMode();
   }
   if ((int)DAT_00779814 < 0) {
@@ -8219,9 +8333,9 @@ void FUN_0043bc90(void)
   undefined4 uVar3;
   int iVar4;
   
-  uVar1 = FUN_00436d90();
-  uVar2 = FUN_00436f20();
-  uVar3 = FUN_00436f20();
+  uVar1 = BitStream__ReadBitsValue();
+  uVar2 = BitStream__ReadU32();
+  uVar3 = BitStream__ReadU32();
   iVar4 = Race__GetPlayer(uVar1);
   if ((iVar4 != 0) && (*(uint *)(iVar4 + 0x1a8) < uVar2)) {
     *(uint *)(iVar4 + 0x1a8) = uVar2;
@@ -8244,16 +8358,16 @@ void __fastcall FUN_0043bd10(int *param_1)
   int local_10;
   
   if ((*param_1 == 6) || (*param_1 == 5)) {
-    bVar1 = FUN_00436d90();
+    bVar1 = BitStream__ReadBitsValue();
     FUN_00436db0();
-    FUN_00436d90();
+    BitStream__ReadBitsValue();
     fVar3 = (float10)FUN_00548c30();
     if (bVar1 == *(byte *)(param_1 + 0x10)) {
       for (local_10 = 0; local_10 < (int)(uint)bVar1; local_10 = local_10 + 1) {
         FUN_00417490();
-        cVar2 = FUN_00436ee0();
+        cVar2 = BitStream__ReadBool();
         FUN_00436db0();
-        FUN_00436d90();
+        BitStream__ReadBitsValue();
         fVar4 = (float10)FUN_00548c30();
         if (cVar2 == '\0') {
           FUN_0057a170();
@@ -8291,7 +8405,7 @@ FUN_0043be30(int param_1,int param_2,undefined4 param_3,undefined1 param_4,int p
       if ((param_5 == 1) &&
          (((cVar1 = IsDriftMode(), cVar1 == '\0' && (cVar1 = FUN_00421a50(), cVar1 == '\0')) &&
           (DAT_0078a318 == 0)))) {
-        FUN_004390f0();
+        Race__GetRacingCarOfRacer();
         iVar3 = FUN_0042ac60();
         if (iVar3 < DAT_0078a31c) {
           FUN_004399a0(0x10);
@@ -8310,7 +8424,7 @@ FUN_0043be30(int param_1,int param_2,undefined4 param_3,undefined1 param_4,int p
       if (cVar1 != '\0') {
         FUN_0043d030();
       }
-      FUN_00439170(param_3,param_4,param_5);
+      NetPlayer__SendFinishMessage(param_3,param_4,param_5);
       local_5 = '\x01';
       if ((param_5 == 9) && (iVar3 = FUN_00421ac0(iVar2), 0 < iVar3)) {
         for (local_18 = 0; local_18 < 4; local_18 = local_18 + 1) {
@@ -8414,20 +8528,20 @@ void __fastcall FUN_0043bfe0(int param_1)
     iVar4 = aiStack_14[local_50];
     piVar6 = (int *)FUN_00432e70();
     *piVar6 = local_50 + 1;
-    iVar7 = FUN_004390f0();
+    iVar7 = Race__GetRacingCarOfRacer();
     *(char *)(iVar7 + 0xc) = (char)local_50 + '\x01';
     if (local_50 == 0) {
       iVar7 = FUN_00432e70();
       *(float *)(iVar7 + 0xbc) = *(float *)(iVar7 + 0xbc) + *(float *)(DAT_00736198 + 0x1b8);
       if (iVar4 == *(int *)(param_1 + 4)) {
-        FUN_00439130();
+        Race__FindRacerById();
         uVar8 = FUN_00424db0();
         uVar9 = 0x3f800000;
         FUN_00432d40(0x3f800000);
-        FUN_00436b20(uVar9);
+        StyleItemTable__TriggerItem(uVar9);
         uVar10 = 0;
         uVar9 = FUN_00432d40(uVar8,0);
-        FUN_00436940(uVar9,uVar8,uVar10);
+        StyleItemTable__Update(uVar9,uVar8,uVar10);
       }
     }
   }
@@ -8493,9 +8607,10 @@ void __fastcall FUN_0043c300(int param_1)
   for (local_424 = 0; local_424 < 4; local_424 = local_424 + 1) {
     if (*(int *)(param_1 + 8 + local_424 * 4) != 0) {
       local_594 = (int *)Race__GetPlayer(local_424);
-      FUN_00438860();
+      PtrSlots__PtrSlots();
       local_590 = (undefined4 *)FUN_00432e70();
-      if ((local_594 != *(int **)(param_1 + 4)) && (local_598 = FUN_004390f0(), local_598 != 0)) {
+      if ((local_594 != *(int **)(param_1 + 4)) &&
+         (local_598 = Race__GetRacingCarOfRacer(), local_598 != 0)) {
         FUN_004acd20(local_598,1);
         local_584[0] = *local_590;
         auStack_490[DAT_0078a31c] = local_590[DAT_0078a31c + 0x3d];
@@ -8506,7 +8621,7 @@ void __fastcall FUN_0043c300(int param_1)
         local_590 = local_584;
       }
       FUN_00548840(*(undefined1 *)((int)local_594 + 5));
-      FUN_00439010();
+      RaceStatus__FindCurrentEntrant();
       uVar3 = DriverInfo__IsRivalKind();
       FUN_00548840(uVar3);
       FUN_00548840(*(undefined1 *)local_590);
@@ -8533,12 +8648,12 @@ void __fastcall FUN_0043c300(int param_1)
       fVar4 = (float10)bTickerToSeconds();
       FUN_00548a80((float)fVar4);
       FUN_00548a80(local_590[0x2e]);
-      FUN_00436f10();
-      FUN_00436f10();
+      BitStream__WriteBitsThunk();
+      BitStream__WriteBitsThunk();
       for (local_5a4 = 1; local_5a4 <= (int)DAT_0078a31c; local_5a4 = local_5a4 + 1) {
-        FUN_00436f10();
+        BitStream__WriteBitsThunk();
       }
-      FUN_00436f10();
+      BitStream__WriteBitsThunk();
       FUN_00548840(local_594[0x62] & 0xff);
       iVar1 = *local_594;
       if (iVar1 == 4) {
@@ -8554,7 +8669,7 @@ void __fastcall FUN_0043c300(int param_1)
         local_585 = 0;
       }
       FUN_00548840(local_585);
-      FUN_00439010();
+      RaceStatus__FindCurrentEntrant();
       local_58c = (undefined1 *)FUN_00421a70();
       FUN_00548840(*local_58c);
       RideInfo__GetAccelRating();
@@ -8569,7 +8684,7 @@ void __fastcall FUN_0043c300(int param_1)
     }
   }
   local_8 = local_41c;
-  local_c = FUN_004388d0();
+  local_c = BitStream__GetSizeInBytes();
   if (DAT_006f1f64 != 0) {
     FUN_005ab2b0(local_8,local_c,local_9a4,0x400,1);
     FUN_0054b170(&DAT_0073d868);
@@ -8618,21 +8733,21 @@ void FUN_0043cb60(undefined4 param_1,undefined4 param_2,char param_3)
   int local_14;
   int local_10;
   
-  FUN_004388d0();
-  FUN_00436e60();
+  BitStream__GetSizeInBytes();
+  BitStream__WriteClampedInt();
   for (local_10 = 0; local_10 < 0xb; local_10 = local_10 + 1) {
     FUN_00424c60();
     FUN_00575950();
-    FUN_00436e60();
+    BitStream__WriteClampedInt();
     FUN_00424c60();
     FUN_00424c40();
-    FUN_00436ed0();
+    BitStream__WriteByteBits();
   }
   if (param_3 == '\0') {
-    FUN_00436e60();
+    BitStream__WriteClampedInt();
   }
   else {
-    FUN_00436e60();
+    BitStream__WriteClampedInt();
     local_14 = 0;
     for (local_18 = 0; local_18 < 0x78; local_18 = local_18 + 1) {
       if ((local_14 < 0xc) && (local_18 == *(int *)(&DAT_00700a28 + local_14 * 4))) {
@@ -8641,11 +8756,11 @@ void FUN_0043cb60(undefined4 param_1,undefined4 param_2,char param_3)
       else {
         iVar1 = FUN_0057ea40();
         if (iVar1 == 0) {
-          FUN_00436e60();
+          BitStream__WriteClampedInt();
         }
         else {
           FUN_0057ccb0((int)*(char *)(iVar1 + 0x10),*(undefined4 *)(iVar1 + 8));
-          FUN_00436e60();
+          BitStream__WriteClampedInt();
         }
       }
     }
@@ -8667,7 +8782,7 @@ void __thiscall FUN_0043ccf0(int param_1,undefined4 param_2,undefined4 param_3,u
   int local_2c [9];
   undefined1 local_8 [4];
   
-  FUN_00436e90(local_8,param_1 + 0x1e0);
+  BitStream__ReadQuantizedInt(local_8,param_1 + 0x1e0);
   Ride_Init(param_4,0,0);
   FUN_00565da0("DUMMY_SKIN%d",param_4);
   bStringHash();
@@ -8676,7 +8791,7 @@ void __thiscall FUN_0043ccf0(int param_1,undefined4 param_2,undefined4 param_3,u
   bStringHash();
   FUN_0057f010();
   for (local_3c = 0; local_3c < 0xb; local_3c = local_3c + 1) {
-    FUN_00436e90(local_8,param_1 + 0x468);
+    BitStream__ReadQuantizedInt(local_8,param_1 + 0x468);
     FUN_00424c60();
     FUN_004175a0();
     FUN_005488d0(1);
@@ -8684,7 +8799,7 @@ void __thiscall FUN_0043ccf0(int param_1,undefined4 param_2,undefined4 param_3,u
     FUN_004175b0();
   }
   RideInfo__RebuildPhysicsInfo(1);
-  FUN_00436e90(local_2c,param_1 + 0x9c);
+  BitStream__ReadQuantizedInt(local_2c,param_1 + 0x9c);
   if (local_2c[0] == 0) {
     FUN_0057d340(param_2);
   }
@@ -8698,7 +8813,7 @@ void __thiscall FUN_0043ccf0(int param_1,undefined4 param_2,undefined4 param_3,u
       }
       else {
         FUN_00436db0();
-        FUN_00436d90();
+        BitStream__ReadBitsValue();
         iVar1 = FUN_005491b0();
         if ((iVar1 < 0x1ffe) && (iVar1 = FUN_0057cd30(), iVar1 != 0)) {
           FUN_0057ea50();
@@ -8725,14 +8840,14 @@ void __fastcall FUN_0043cef0(int param_1)
     FUN_00548820();
     FUN_00548840(*(undefined1 *)(param_1 + 0x40));
     fVar2 = (float10)bTickerToSeconds();
-    FUN_00436dc0((float)fVar2);
+    BitStream__WriteFloatRounded((float)fVar2);
     for (local_418 = 0; local_418 < (int)(uint)*(byte *)(param_1 + 0x40); local_418 = local_418 + 1)
     {
       FUN_00417490();
       FUN_0057a180();
-      FUN_00436ed0();
+      BitStream__WriteByteBits();
       fVar2 = (float10)FUN_00579fc0();
-      FUN_00436dc0((float)fVar2);
+      BitStream__WriteFloatRounded((float)fVar2);
     }
     cVar1 = FUN_005466e0();
     if (cVar1 != '\0') {
@@ -8760,9 +8875,9 @@ void __fastcall FUN_0043d030(int param_1)
   FUN_00548820();
   FUN_00548840(*(undefined1 *)(*(int *)(param_1 + 4) + 4));
   *(int *)(*(int *)(param_1 + 4) + 0x1a8) = *(int *)(*(int *)(param_1 + 4) + 0x1a8) + 1;
-  FUN_00436f10();
+  BitStream__WriteBitsThunk();
   FUN_004134c0();
-  FUN_00436f10();
+  BitStream__WriteBitsThunk();
   cVar1 = FUN_005466e0();
   if (cVar1 != '\0') {
     FUN_00546850();
@@ -8969,7 +9084,7 @@ void __fastcall FUN_0043d5f0(int param_1)
     FUN_00548820();
     FUN_00548840(*(undefined1 *)(*(int *)(param_1 + 4) + 4));
     FUN_004399f0(1);
-    FUN_00436f10();
+    BitStream__WriteBitsThunk();
     cVar1 = FUN_005466e0();
     if (cVar1 != '\0') {
       FUN_00546880();
@@ -8993,8 +9108,8 @@ void __fastcall FUN_0043d6e0(int param_1)
   int iVar2;
   int iVar3;
   
-  cVar1 = FUN_00436d90();
-  iVar2 = FUN_00436f20();
+  cVar1 = BitStream__ReadBitsValue();
+  iVar2 = BitStream__ReadU32();
   if (*(int *)(param_1 + 8 + cVar1 * 4) != 0) {
     Race__GetPlayer((int)cVar1);
     iVar3 = FUN_004399f0(0);
@@ -9627,7 +9742,7 @@ void __thiscall FUN_0043e310(int param_1,undefined4 param_2)
       if (0.0 < (float)fVar3) {
         FUN_00575950();
         StyleItem__SetLevel(local_10);
-        FUN_00436230((float)fVar3 * 1.0 * (float)fVar4);
+        StyleItem__Trigger((float)fVar3 * 1.0 * (float)fVar4);
         iVar2 = FUN_0041e4c0();
         if (iVar2 == 0) {
           FUN_00417490();
@@ -9642,7 +9757,7 @@ void __thiscall FUN_0043e310(int param_1,undefined4 param_2)
               FUN_00417490();
               fVar3 = (float10)FUN_00424e10();
               if ((float10)17.88109 < fVar3) {
-                FUN_00436b20(0x3f800000);
+                StyleItemTable__TriggerItem(0x3f800000);
               }
             }
             *(float *)(param_1 + 0x5c) = fVar1;
@@ -9657,7 +9772,7 @@ void __thiscall FUN_0043e310(int param_1,undefined4 param_2)
         FUN_00432d50();
         MiscStyleManager__ClearFlags();
         if (*(char *)(param_1 + 0x11) != '\0') {
-          FUN_00436b20(fVar1);
+          StyleItemTable__TriggerItem(fVar1);
         }
       }
     }
@@ -10101,14 +10216,14 @@ void __fastcall FUN_0043ef30(int param_1)
   iVar2 = FUN_0041e4c0();
   if (iVar2 == 0) {
     if (1 < *(int *)(param_1 + 0x14)) {
-      FUN_00436b20((float)*(int *)(param_1 + 0x14) / 2.0);
+      StyleItemTable__TriggerItem((float)*(int *)(param_1 + 0x14) / 2.0);
     }
     if (*(int *)(param_1 + 0x58) < 7) {
       FUN_00575950();
       fVar3 = (float10)FUN_00432c80();
       iVar2 = ModeFlags_GetRow();
       if (*(float *)(iVar2 + 8) < (float)fVar3) {
-        FUN_00436230(0x3f800000);
+        StyleItem__Trigger(0x3f800000);
         *(int *)(param_1 + 0x58) = *(int *)(param_1 + 0x58) + 1;
         ModeFlags_GetRow();
         FUN_00435ff0();
@@ -10258,7 +10373,7 @@ void FUN_0043f240(void)
   if (((*(char *)((int)in_EAX + 10) != '\0') && (*(char *)((int)piVar1 + 9) == DAT_0078a31c)) &&
      (*(undefined1 *)((int)in_EAX + 10) = 0, *(char *)(*(int *)(in_EAX[1] + 0x4c) + 0x14) != '\0'))
   {
-    FUN_00436230(0x3f800000);
+    StyleItem__Trigger(0x3f800000);
   }
   if (*(char *)((int)in_EAX + 0xd) != '\0') {
     return;
@@ -10290,7 +10405,7 @@ LAB_0043f38c:
     if (*(char *)(iVar3 + 0x14) == '\0') goto LAB_0043f39d;
     fVar6 = 1.0;
   }
-  FUN_00436230(fVar6);
+  StyleItem__Trigger(fVar6);
 LAB_0043f39d:
   fVar5 = (float10)StyleSet__RecomputeTotal();
   if ((float10)0.0 < fVar5) {
@@ -10306,7 +10421,7 @@ LAB_0043f39d:
       iVar4 = *(int *)(iVar3 + 0x78);
     }
     if (*(char *)(iVar4 + 0x14) != '\0') {
-      FUN_00436230(*(undefined4 *)(iVar3 + 0x7c));
+      StyleItem__Trigger(*(undefined4 *)(iVar3 + 0x7c));
     }
   }
   return;
@@ -10368,7 +10483,7 @@ void FUN_0043f430(void)
       }
     }
     else if (*(char *)(*(int *)(unaff_ESI[1] + 0x44) + 0x14) != '\0') {
-      FUN_00436230(0x3f800000);
+      StyleItem__Trigger(0x3f800000);
     }
   }
   if ((*(char *)((int)piVar1 + 0xd) == '\0') || ((char)unaff_ESI[3] != '\0')) {
@@ -10383,7 +10498,7 @@ void FUN_0043f430(void)
       }
     }
     else if (*(char *)(*(int *)(unaff_ESI[1] + 0x48) + 0x14) != '\0') {
-      FUN_00436230(0x3f800000);
+      StyleItem__Trigger(0x3f800000);
     }
     if ((DAT_0078a345 == '\0') && (DAT_007361a4 == 0)) {
       uVar2 = (uint)(*(char *)((int)piVar1 + 10) == '\x01');
@@ -10398,7 +10513,7 @@ void FUN_0043f430(void)
       }
     }
     else if (*(char *)(*(int *)(unaff_ESI[1] + 0x40) + 0x14) != '\0') {
-      FUN_00436230(0x3f800000);
+      StyleItem__Trigger(0x3f800000);
       return;
     }
   }
@@ -10436,7 +10551,7 @@ void FUN_0043f550(void)
   fVar5 = (float10)GroundQuery__FindSurfaceBelow(iVar3 + 0x540,iVar3 + 0x60,0,0,0);
   if (((bVar4) && ((float10)0.75 < (float10)(fVar1 - fVar2) - fVar5)) &&
      (*(char *)(*(int *)(unaff_ESI[1] + 0x30) + 0x14) != '\0')) {
-    FUN_00436230(0x3f800000);
+    StyleItem__Trigger(0x3f800000);
     return;
   }
   return;
@@ -10487,7 +10602,7 @@ LAB_0043f8a5:
       }
       iVar5 = FUN_00421970();
       while (iVar7 != iVar5) {
-        iVar6 = FUN_00467300();
+        iVar6 = CollisionBodyWitness__HasExpired();
         if ((((iVar6 == 0) && (*(char *)(iVar7 + 0x14) == '\0')) &&
             ((*(char *)(*(int *)(iVar7 + 600) + 0x15) == '\0' &&
              (*(char *)(*(int *)(iVar7 + 0x25c) + 0x15) == '\0')))) &&
@@ -10526,7 +10641,7 @@ LAB_0043f8a5:
       }
       if (*(int *)(iVar4 + 0x264) != 0) goto LAB_0043f8a5;
       fVar1 = *(float *)(iVar4 + 0x10);
-      iVar4 = FUN_00467300();
+      iVar4 = CollisionBodyWitness__HasExpired();
       if ((iVar4 == 0) && (fVar1 <= 1.875)) goto LAB_0043f733;
     }
     *(char *)(unaff_ESI + 5) = (char)unaff_ESI[5] + '\x01';
@@ -10534,7 +10649,7 @@ LAB_0043f8a5:
 LAB_0043f733:
   if ((char)unaff_ESI[5] == '\x02') {
     if (*(char *)(*(int *)(unaff_ESI[1] + 0x58) + 0x14) != '\0') {
-      FUN_00436230(0x3f800000);
+      StyleItem__Trigger(0x3f800000);
     }
     *(undefined1 *)(unaff_ESI + 5) = 0;
     unaff_ESI[6] = 0;
@@ -10564,7 +10679,7 @@ void FUN_0043f8b0(int *param_1)
   }
   if ((((0.08726646 < (float)ABS(fVar2)) && (25.0 < *(float *)(iVar1 + 0x3d4))) &&
       (*(int *)(iVar1 + 0x3cc) == 4)) && (*(char *)(*(int *)(param_1[1] + 0x2c) + 0x14) != '\0')) {
-    FUN_00436230();
+    StyleItem__Trigger();
     return;
   }
   return;
@@ -10618,7 +10733,7 @@ void FUN_0043f9b0(void)
   }
   if (*(char *)((int)unaff_ESI + 0xe) == '\x03') {
     if (*(char *)(*(int *)(unaff_ESI[1] + 100) + 0x14) != '\0') {
-      FUN_00436230(0x3f800000);
+      StyleItem__Trigger(0x3f800000);
     }
     *(undefined1 *)((int)unaff_ESI + 0xe) = 0;
   }
@@ -10640,11 +10755,11 @@ void FUN_0043fa90(void)
       ((1.0 < (float)DAT_0073619c[5] * 0.00025 && ((float)DAT_0073619c[5] * 0.00025 < 1.5)))) &&
      ((*(char *)(*(int *)(iVar1 + 0x1c) + 10) == '\x01' &&
       (*(char *)(*(int *)(unaff_ESI[1] + 0x70) + 0x14) != '\0')))) {
-    FUN_00436230(0x3f800000);
+    StyleItem__Trigger(0x3f800000);
   }
   if (((20.0 < *(float *)(iVar1 + 0x3d4)) && (0.25 < *(float *)(iVar1 + 0x47c))) &&
      (*(char *)(*(int *)(unaff_ESI[1] + 0x68) + 0x14) != '\0')) {
-    FUN_00436230(*(undefined4 *)(iVar1 + 0x47c));
+    StyleItem__Trigger(*(undefined4 *)(iVar1 + 0x47c));
   }
   return;
 }
@@ -10664,7 +10779,7 @@ void Commentator__ShortcutZoneEntered(int *param_1)
   iVar2 = Zone_Find(uVar1);
   if (((iVar2 != 0) && (*(short *)(iVar2 + 0x1a) == 0)) &&
      (*(undefined2 *)(iVar2 + 0x1a) = 1, *(char *)(*(int *)(param_1[1] + 0x50) + 0x14) != '\0')) {
-    FUN_00436230();
+    StyleItem__Trigger();
     return;
   }
   return;
@@ -10706,7 +10821,7 @@ void __thiscall FUN_0043fbb0(int param_1,float param_2)
         }
         if ((*(short *)(*(int *)(*(int *)(*unaff_EDI + 4) + 0x1c) + 0x10) == 0) &&
            (*(char *)(*(int *)(unaff_EDI[1] + 0x3c) + 0x14) != '\0')) {
-          FUN_00436230(param_2);
+          StyleItem__Trigger(param_2);
         }
       }
       if (*(char *)(*(int *)(unaff_EDI[1] + 0x58) + 0x14) != '\0') {

@@ -6604,7 +6604,7 @@ void Career__AnnounceReward(undefined4 param_1,undefined1 *param_2)
     FECarConfig__BuildRide(param_2 + 4,1,local_730);
   }
   else {
-    iVar4 = FUN_00439130();
+    iVar4 = Race__FindRacerById();
     RideInfo__operator_(local_730,*(undefined4 *)(iVar4 + 0x10));
     FECarConfig__FillFromRide(param_2 + 4,local_730);
   }
@@ -7192,7 +7192,7 @@ undefined4 FUN_0051b720(void)
   }
   FUN_00647b70();
   uVar8 = 0;
-  cVar2 = FUN_00438a40(0);
+  cVar2 = Obj_GetByte4(0);
   uVar3 = FUN_0043d8c0((int)cVar2,uVar8);
   uVar8 = 0;
   if ((499 < uVar3) && (DAT_007677a4 == '\0')) {

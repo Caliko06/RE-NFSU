@@ -7105,7 +7105,7 @@ void FUN_00685c58(void)
 void Unwind_00685c70(void)
 
 {
-  FUN_004688c0();
+  DynamicCollisionBody___DynamicCollisionBody();
   return;
 }
 
@@ -7519,7 +7519,7 @@ void FUN_00685e9e(void)
 void Unwind_00685eb0(void)
 
 {
-  FUN_004688c0();
+  DynamicCollisionBody___DynamicCollisionBody();
   return;
 }
 
@@ -7549,7 +7549,7 @@ void FUN_00685ecb(void)
 void Unwind_00685ee0(void)
 
 {
-  FUN_004688c0();
+  DynamicCollisionBody___DynamicCollisionBody();
   return;
 }
 
@@ -8021,7 +8021,7 @@ void Unwind_006861a0(void)
 {
   int unaff_EBP;
   
-  FUN_00438a30(*(undefined4 *)(unaff_EBP + -0x14));
+  bFree_Thunk(*(undefined4 *)(unaff_EBP + -0x14));
   return;
 }
 
@@ -9452,7 +9452,7 @@ void FUN_00686a03(void)
 void Unwind_00686a10(void)
 
 {
-  FUN_004688c0();
+  DynamicCollisionBody___DynamicCollisionBody();
   return;
 }
 
@@ -9532,7 +9532,7 @@ void FUN_00686a79(void)
 void Unwind_00686a90(void)
 
 {
-  FUN_004688c0();
+  DynamicCollisionBody___DynamicCollisionBody();
   return;
 }
 

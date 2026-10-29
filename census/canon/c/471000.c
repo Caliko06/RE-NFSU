@@ -2410,7 +2410,7 @@ LAB_00474af2:
   *(float *)(*(int *)(param_1 + 0x28) + 0x14) =
        (float)*(int *)(*(int *)(param_1 + 0x30) + 0x38c) * 0.25;
   if (*(char *)(*(int *)(*(int *)(param_1 + 0x34) + 0x14) + 0x734) != '\0') {
-    iVar3 = FUN_00438aa0();
+    iVar3 = Obj_GetField830();
     *(undefined4 *)(*(int *)(param_1 + 0x24) + 0x1e0) = *(undefined4 *)(iVar3 + 0x23c);
   }
   iVar3 = *(int *)(param_1 + 0x30);
@@ -5986,7 +5986,7 @@ LAB_0047abb7:
           bVar3 = false;
           if (0 < iVar6) {
             do {
-              iVar7 = FUN_00468820(iVar5);
+              iVar7 = CollisionBody__GetCollision(iVar5);
               cVar4 = Collision_IsFlatSurfaceInvolved();
               if (cVar4 != '\0') {
                 iVar8 = FUN_0041f5e0();
@@ -7836,7 +7836,7 @@ void FUN_0047c9e0(int param_1)
       }
       piVar3 = piVar3 + 6;
     } while ((int)piVar3 < 0x779964);
-    FUN_00435d30(DAT_0073619c);
+    Race__SetInitialRoutesForAI(DAT_0073619c);
     *(undefined4 *)(param_1 + 0xe0) = 0;
   }
   return;
@@ -8451,7 +8451,7 @@ float10 __thiscall FUN_0047d6c0(undefined4 param_1,float param_2)
   uint uVar2;
   uint uVar3;
   
-  FUN_004387e0(param_2,param_1);
+  Float_Truncate(param_2,param_1);
   uVar1 = _ftol_nocw();
   uVar3 = uVar1 << 0xd ^ uVar1;
   uVar2 = uVar1 + 1 ^ (uVar1 + 1) * 0x2000;

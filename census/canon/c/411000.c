@@ -12812,7 +12812,7 @@ void FUN_0041f9b0(int param_1)
     DAT_00734460 = (void *)0x0;
   }
   if (DAT_00736200 == 0) {
-    FUN_004682c0();
+    CollisionBodyWitness__EliminateAllWitnesses();
   }
   else {
     FUN_00593620();
@@ -12871,7 +12871,7 @@ void FUN_0041f9b0(int param_1)
   pvVar1 = *(void **)(param_1 + 0x1794);
   DAT_007361f8 = 0;
   if (pvVar1 != (void *)0x0) {
-    FUN_004665a0();
+    PtrList_FreeAllPayloadsAndClear();
     _free(pvVar1);
   }
   local_4._0_1_ = 3;
@@ -12935,7 +12935,7 @@ void FUN_0041fc00(undefined4 *param_1)
   }
   if (*(char *)(in_EAX + 0x3d) != '\0') {
     if (DAT_00736200 == 0) {
-      FUN_004682c0();
+      CollisionBodyWitness__EliminateAllWitnesses();
     }
     else {
       FUN_00593620();
@@ -12951,7 +12951,7 @@ void FUN_0041fc00(undefined4 *param_1)
   if ((int)cVar2 < *(int *)(in_EAX + 0x44)) {
     *(undefined4 *)(in_EAX + 0x44) = 0xffffffff;
   }
-  FUN_00467010();
+  CollisionBodyWitness__SnapshotEverything();
   iVar1 = DAT_0073615c;
   iVar3 = DAT_00736158;
   if (0 < DAT_0073615c) {
@@ -13470,7 +13470,7 @@ void FUN_00420380(int param_1)
   }
   while (puVar13 != puVar8) {
     puVar13[0x98] = 0;
-    FUN_00468060(&pppppiStack_40);
+    CollisionBodyWitness__TestForContact(&pppppiStack_40);
     if (puVar13[0x94] == 0) {
       puVar13 = (undefined4 *)0x0;
     }
@@ -13533,7 +13533,7 @@ void FUN_00420380(int param_1)
             if ((((int ****)puVar13[0x96] == appppiStack_38[iVar9]) ||
                 ((int ****)puVar13[0x97] == appppiStack_38[iVar9])) &&
                ((int)puVar13[0x98] < DAT_00700e60)) {
-              FUN_00468060(&pppppiStack_40);
+              CollisionBodyWitness__TestForContact(&pppppiStack_40);
             }
             iVar9 = iVar9 + 1;
           } while (iVar9 < iStack_54);
@@ -13659,7 +13659,7 @@ void FUN_00420890(int param_1,undefined4 param_2)
     iVar7 = iVar6;
     iVar6 = DAT_00779c70;
     if (*pcVar1 != '\0') {
-      FUN_00468d70(param_2);
+      DynamicCollisionBody__UpdateProjectedBBox(param_2);
       puVar3 = DAT_007377e8;
       iVar6 = DAT_00779c70;
     }
@@ -14052,7 +14052,7 @@ joined_r0x004210dd:
   }
   FUN_005793e0();
   if (DAT_0073619c != 0) {
-    FUN_00435570();
+    Race__Update();
   }
   return;
 }

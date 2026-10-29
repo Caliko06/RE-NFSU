@@ -4236,7 +4236,7 @@ void HudSmokeApplause__Update(int param_1)
         }
         else {
           local_30 = (int *)((float)local_30 / local_2c);
-          fVar10 = (float10)FUN_004387e0(local_30);
+          fVar10 = (float10)Float_Truncate(local_30);
           fVar10 = (float10)(float)local_30 - fVar10;
         }
         local_30 = (int *)(float)fVar10;
@@ -5214,7 +5214,7 @@ void FUN_004a8000(void)
     else {
       FEObject__SetFormattedText(&DAT_006ca778,extraout_EDX);
     }
-    fVar4 = (float10)FUN_00434dd0();
+    fVar4 = (float10)TimedMessage__GetPhaseProgress();
     _ftol_nocw();
     FUN_00564b10();
     iVar2 = _ftol_nocw();
@@ -6690,7 +6690,7 @@ int FUN_004a9bc0(int param_1)
   *(undefined4 *)(param_1 + 0x2ecb8) = 0;
   *(undefined4 *)(param_1 + 0x2ecbc) = 0;
   do {
-    FUN_00438860();
+    PtrSlots__PtrSlots();
     iVar1 = iVar1 + -1;
   } while (iVar1 != 0);
   *(undefined4 *)(param_1 + 0x2f914) = 1;

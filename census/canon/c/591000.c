@@ -903,8 +903,8 @@ undefined4 * WorldObject_ctor(undefined4 *param_1,undefined4 param_2,int param_3
   pcStack_8 = FUN_00685ef5;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  FUN_00468340(param_1,4);
-  *param_1 = &PTR_FUN_006c85b8;
+  CollisionBody__CollisionBody(param_1,4);
+  *param_1 = &PTR_DynamicCollisionBody___DynamicCollisionBody_006c85b8;
   param_1[0x19] = param_1 + 0x51;
   DAT_00736010 = DAT_00736010 + 1;
   if (DAT_00736038 < DAT_00736010) {
@@ -965,8 +965,8 @@ undefined4 * WorldObject_ctor(undefined4 *param_1,undefined4 param_2,int param_3
       }
       param_1[4] = uVar6;
 LAB_00592414:
-      FUN_00468a50();
-      FUN_00468ec0();
+      DynamicCollisionBody__BuildBoundingVolumes();
+      DynamicCollisionBody__UpdatePosition();
       ExceptionList = local_c;
       return param_1;
     }
@@ -1025,8 +1025,8 @@ undefined4 * FUN_00592470(undefined4 *param_1,undefined4 param_2)
   pcStack_18 = FUN_00685ecb;
   local_1c = ExceptionList;
   ExceptionList = &local_1c;
-  FUN_00468340(param_1,4);
-  *param_1 = &PTR_FUN_006c85b8;
+  CollisionBody__CollisionBody(param_1,4);
+  *param_1 = &PTR_DynamicCollisionBody___DynamicCollisionBody_006c85b8;
   param_1[0x19] = param_1 + 0x51;
   DAT_00736010 = DAT_00736010 + 1;
   if (DAT_00736038 < DAT_00736010) {
@@ -1081,8 +1081,8 @@ undefined4 * FUN_00592470(undefined4 *param_1,undefined4 param_2)
     uVar4 = CollisionShapes__DefaultBox(local_40,local_3c,local_38,local_30,local_2c,local_28);
   }
   param_1[4] = uVar4;
-  FUN_00468a50();
-  FUN_00468ec0();
+  DynamicCollisionBody__BuildBoundingVolumes();
+  DynamicCollisionBody__UpdatePosition();
   ExceptionList = local_1c;
   return param_1;
 }
@@ -1113,9 +1113,9 @@ void FUN_00592610(void)
       *(char *)(iVar1 + 8) = *(char *)(iVar1 + 8) + -1;
     } while (iVar3 != 0);
   }
-  *unaff_ESI = &PTR_FUN_006c85b8;
+  *unaff_ESI = &PTR_DynamicCollisionBody___DynamicCollisionBody_006c85b8;
   DAT_00736010 = DAT_00736010 + -1;
-  FUN_00468410();
+  CollisionBody___CollisionBody();
   return;
 }
 
@@ -1131,7 +1131,7 @@ void __thiscall FUN_00592670(int param_1,int param_2)
   
   iVar2 = param_2;
   FUN_00571ea0(param_1,"WorldObjectCollisionBody");
-  FUN_004688e0(iVar2);
+  DynamicCollisionBody__DoSnapshot(iVar2);
   param_2 = *(undefined4 *)(*(int *)(param_1 + 0x140) + 0x10);
   if ((*(char *)(iVar2 + 0x3e) != '\0') || (*(char *)(iVar2 + 0x3f) != '\0')) {
     FUN_00571c20(iVar2,&param_2,4,4,1);
@@ -1145,7 +1145,7 @@ void __thiscall FUN_00592670(int param_1,int param_2)
     }
   }
   if (*(char *)(iVar2 + 0x3c) != '\0' || *(char *)(iVar2 + 0x3d) != '\0') {
-    FUN_00468ec0();
+    DynamicCollisionBody__UpdatePosition();
   }
   if ((*(char *)(iVar2 + 0x3e) != '\0') || (*(char *)(iVar2 + 0x3f) != '\0')) {
     FUN_00571c20(iVar2,param_1 + 0x24,8,0xffffffff,0);
@@ -1193,7 +1193,7 @@ void __thiscall FUN_00592770(int param_1,undefined4 param_2)
 {
   int *piVar1;
   
-  FUN_00468f70(param_2);
+  DynamicCollisionBody__BeginMove(param_2);
   if (*(int *)(param_1 + 0x408) == 0) {
     piVar1 = *(int **)(*(int *)(param_1 + 0x140) + 0x20);
     if (piVar1 == (int *)0x0) goto LAB_005927b0;
@@ -1207,7 +1207,7 @@ void __thiscall FUN_00592770(int param_1,undefined4 param_2)
   (**(code **)(*piVar1 + 4))(param_2);
 LAB_005927b0:
   if (DAT_00736200 == 0) {
-    FUN_00468ec0();
+    DynamicCollisionBody__UpdatePosition();
   }
   return;
 }
@@ -1726,12 +1726,12 @@ void FUN_00592e80(void)
               ((iVar3 != *(int *)(iVar2 + 600) && (iVar3 != *(int *)(iVar2 + 0x25c))))) &&
              ((iVar3 = *(int *)(unaff_EBX + 0x25c), *(char *)(iVar3 + 0x16) == '\0' ||
               ((iVar3 != *(int *)(iVar2 + 600) && (iVar3 != *(int *)(iVar2 + 0x25c))))))) {
-            fVar5 = (float10)FUN_00467700(0xbf800000);
+            fVar5 = (float10)CollisionBodyWitness__GetTOI(0xbf800000);
           }
           else {
 LAB_00592f33:
             fVar4 = *(float *)(unaff_EDI + 8) - *(float *)(unaff_EDI + 0xc);
-            fVar5 = (float10)FUN_00467700(fVar4);
+            fVar5 = (float10)CollisionBodyWitness__GetTOI(fVar4);
             if (((float10)fVar4 < fVar5) &&
                (fVar5 < (float10)_DAT_006ef2cc * (float10)5.0 !=
                 (fVar5 == (float10)_DAT_006ef2cc * (float10)5.0))) {
@@ -1767,10 +1767,10 @@ void FUN_00592fd0(void)
   undefined4 *puVar4;
   float10 fVar5;
   
-  puVar4 = (undefined4 *)FUN_00467df0();
+  puVar4 = (undefined4 *)CollisionBodyWitness__TestForContact();
   if (puVar4 == (undefined4 *)0x0) {
     fVar2 = *(float *)(in_EAX + 8) - *(float *)(in_EAX + 0xc);
-    fVar5 = (float10)FUN_00467700(fVar2);
+    fVar5 = (float10)CollisionBodyWitness__GetTOI(fVar2);
     if ((fVar5 != (float10)-1.0) && ((float)fVar5 <= fVar2)) {
       *(float *)(in_EAX + 0x10) = (float)fVar5 + *(float *)(in_EAX + 0xc);
       FUN_00593100();
@@ -1788,12 +1788,12 @@ void FUN_00592fd0(void)
     *(undefined4 **)(iVar3 + 0x10) = puVar4;
     iVar1 = *(int *)(*(int *)(in_EAX + 0x18) + 600);
     if ((*(char *)(iVar1 + 0x16) != '\0') && (*(char *)(iVar1 + 0x1d) != '\0')) {
-      FUN_00468d70(*(float *)(in_EAX + 8) - *(float *)(in_EAX + 0xc));
+      DynamicCollisionBody__UpdateProjectedBBox(*(float *)(in_EAX + 8) - *(float *)(in_EAX + 0xc));
       FUN_00593170(in_EAX,*(undefined4 *)(*(int *)(in_EAX + 0x18) + 600),1);
     }
     iVar1 = *(int *)(*(int *)(in_EAX + 0x18) + 0x25c);
     if ((*(char *)(iVar1 + 0x16) != '\0') && (*(char *)(iVar1 + 0x1d) != '\0')) {
-      FUN_00468d70(*(float *)(in_EAX + 8) - *(float *)(in_EAX + 0xc));
+      DynamicCollisionBody__UpdateProjectedBBox(*(float *)(in_EAX + 8) - *(float *)(in_EAX + 0xc));
       FUN_00593170(in_EAX,*(undefined4 *)(*(int *)(in_EAX + 0x18) + 0x25c),1);
     }
     if (*(char *)(in_EAX + 0x24) != '\0') {
@@ -1876,7 +1876,7 @@ void FUN_00593170(int param_1,int *param_2,undefined4 param_3)
     return;
   }
   iVar5 = 0;
-  FUN_00469810();
+  DynamicCollisionBody__CreateTrackPolygonCollisionBodies();
   fVar3 = DAT_007344b4;
   fVar2 = (float)param_2[9] - DAT_007344b4;
   if (param_2[2] == 0) {
@@ -1954,7 +1954,7 @@ LAB_00593274:
         iVar10 = piVar9[3];
         iVar4 = param_2[3];
         piVar9 = piStack_88;
-      } while ((bVar11) || (iVar7 = FUN_00469770(), iVar7 == 0));
+      } while ((bVar11) || (iVar7 = DynamicCollisionBody__MaybeCreateWitness(), iVar7 == 0));
       if (*(int *)(iVar4 + 0x14) == 0) break;
       if (iVar10 != iVar4) {
         if (*(int *)(iVar10 + 0x14) == 1) {
@@ -2115,7 +2115,7 @@ void FUN_00593570(char param_1)
   *(int *)(*(int *)(unaff_EDI + 600) + 0xc) = unaff_EBX;
   *(int *)(*(int *)(unaff_EDI + 0x25c) + 0xc) = unaff_EBX;
   if (param_1 != '\0') {
-    FUN_00467700(*(float *)(unaff_EBX + 8) - *(float *)(unaff_EBX + 0xc));
+    CollisionBodyWitness__GetTOI(*(float *)(unaff_EBX + 8) - *(float *)(unaff_EBX + 0xc));
   }
   iVar1 = *(int *)(unaff_EBX + 0x1c);
   *(undefined4 *)(unaff_EBX + 0x1c) = piVar2;
@@ -2199,7 +2199,7 @@ void FUN_00593620(void)
     *(int **)(iVar4 + 0x10) = piVar7;
     piVar7 = piVar1;
   }
-  FUN_004682c0();
+  CollisionBodyWitness__EliminateAllWitnesses();
   return;
 }
 
@@ -5238,7 +5238,7 @@ undefined4 * VirginSmokeable__VirginSmokeable(undefined4 *param_1,int *param_2)
   pcStack_18 = FUN_00685cbb;
   local_1c = ExceptionList;
   ExceptionList = &local_1c;
-  FUN_00468340(param_1,2);
+  CollisionBody__CollisionBody(param_1,2);
   *param_1 = &PTR_FUN_006c8720;
   DAT_0073600c = DAT_0073600c + 1;
   if (DAT_00736034 < DAT_0073600c) {
@@ -5285,7 +5285,7 @@ LAB_005963b5:
   param_1[4] = 0;
   *(undefined1 *)((int)param_1 + 0x1b) = 0;
   *(undefined1 *)((int)param_1 + 0x1d) = 0;
-  FUN_00468680(param_1,param_1[0x18] + 0x10);
+  CollisionBody__SetBBoxMinMax(param_1,param_1[0x18] + 0x10);
   iVar3 = param_1[0x18];
   fVar4 = *(float *)(iVar3 + 0x20) - *(float *)(iVar3 + 0x10);
   fVar5 = *(float *)(iVar3 + 0x24) - *(float *)(iVar3 + 0x14);
@@ -5336,7 +5336,7 @@ void __fastcall VirginSmokeable___VirginSmokeable(undefined4 *param_1)
   DAT_00736020 = DAT_00736020 + -1;
   *param_1 = &PTR_FUN_006c8720;
   DAT_0073600c = DAT_0073600c + -1;
-  FUN_00468410();
+  CollisionBody___CollisionBody();
   return;
 }
 
@@ -5350,7 +5350,7 @@ void FUN_00596510(int param_1)
   char cVar2;
   
   FUN_00571ea0(0,"VirginSmokeable");
-  FUN_004684f0(param_1);
+  CollisionBody__DoSnapshot(param_1);
   iVar1 = *(char *)(param_1 + 0x40) * 0x10;
   *(int *)(iVar1 + param_1 + 0x58) = *(int *)(param_1 + 0x150) - *(int *)(iVar1 + 0x58 + param_1);
   cVar2 = *(char *)(param_1 + 0x40) + -1;
@@ -5469,8 +5469,8 @@ undefined4 * Smokeable__Smokeable(undefined4 *param_1,undefined4 param_2,int par
   pcStack_8 = FUN_00686ade;
   pvStack_c = ExceptionList;
   ExceptionList = &pvStack_c;
-  FUN_00468340(param_1,1);
-  *param_1 = &PTR_FUN_006c85b8;
+  CollisionBody__CollisionBody(param_1,1);
+  *param_1 = &PTR_DynamicCollisionBody___DynamicCollisionBody_006c85b8;
   param_1[0x19] = param_1 + 0x5e;
   DAT_00736010 = DAT_00736010 + 1;
   if (DAT_00736038 < DAT_00736010) {
@@ -5585,7 +5585,7 @@ undefined4 * Smokeable__Smokeable(undefined4 *param_1,undefined4 param_2,int par
     }
   }
   param_1[4] = iVar7;
-  FUN_00468a50();
+  DynamicCollisionBody__BuildBoundingVolumes();
   piVar12 = (int *)param_1[0x1b];
   if (piVar12 == (int *)0x0) {
     piVar13 = (int *)0x0;
@@ -5885,10 +5885,10 @@ LAB_00596d41:
   }
   local_4 = (uint)local_4._1_3_ << 8;
   PhysicsSystem___PhysicsSystem();
-  *param_1 = &PTR_FUN_006c85b8;
+  *param_1 = &PTR_DynamicCollisionBody___DynamicCollisionBody_006c85b8;
   DAT_00736010 = DAT_00736010 + -1;
   local_4 = 0xffffffff;
-  FUN_00468410();
+  CollisionBody___CollisionBody();
   ExceptionList = local_c;
   return;
 }
@@ -5907,7 +5907,7 @@ void __thiscall Smackables__RestoreState(int param_1,int param_2)
   
   iVar1 = param_2;
   FUN_00571ea0(param_1,"Smokeable");
-  FUN_004688e0(iVar1);
+  DynamicCollisionBody__DoSnapshot(iVar1);
   FUN_00571c20(iVar1,param_1 + 0x4c2,1,1,1);
   FUN_00571c20(iVar1,param_1 + 0x4c3,1,1,1);
   if ((*(char *)(iVar1 + 0x3e) != '\0') || (*(char *)(iVar1 + 0x3f) != '\0')) {
@@ -5939,7 +5939,7 @@ void __thiscall Smackables__RestoreState(int param_1,int param_2)
   }
   FUN_00584960();
   if (*(char *)(iVar1 + 0x3c) != '\0' || *(char *)(iVar1 + 0x3d) != '\0') {
-    FUN_00468ec0();
+    DynamicCollisionBody__UpdatePosition();
   }
   if ((*(char *)(iVar1 + 0x3e) != '\0') || (*(char *)(iVar1 + 0x3f) != '\0')) {
     FUN_00571c20(iVar1,param_1 + 0x24,8,0xffffffff,0);
@@ -6039,7 +6039,7 @@ void __thiscall FUN_00597140(int param_1,int param_2,undefined4 *param_3)
   *(undefined4 *)(param_1 + 0xd8) = 0;
   *(undefined4 *)(param_1 + 0x70) = 0x459c4000;
   (**(code **)(*(int *)(param_1 + 0x140) + 4))();
-  FUN_00468ec0();
+  DynamicCollisionBody__UpdatePosition();
   piVar5 = *(int **)(param_1 + 0x4b0);
   if (piVar5 != (int *)(param_1 + 0x4b0)) {
     do {
@@ -6088,7 +6088,7 @@ void __thiscall Smokeable__Update(int *param_1,float param_2)
   float fStack_24;
   undefined4 uStack_20;
   
-  FUN_00468f70(param_2);
+  DynamicCollisionBody__BeginMove(param_2);
   if (*(char *)((int)param_1 + 0x4c2) != '\0') {
     RigidBody__SetMassInertia();
     *(undefined4 *)(param_1[0x1b] + 0x130) = 1;
@@ -6186,7 +6186,7 @@ void FUN_00597670(void)
   uVar3 = (**(code **)(*in_EAX + 8))();
   GroundQuery__RefillCache(uVar3,fStack_8 + local_4,uVar2);
   if (DAT_00736200 == 0) {
-    FUN_00468ec0();
+    DynamicCollisionBody__UpdatePosition();
   }
   return;
 }
@@ -6383,7 +6383,7 @@ void FUN_00597b80(void)
   iVar1 = DAT_0073ad34;
   if ((0.1 < (float)(DAT_0073ad34 - *(int *)(in_EAX + 0x16c)) * 0.00025) &&
      (*(char *)(in_EAX + 0x1c) != '\0')) {
-    iVar2 = FUN_00468820(0);
+    iVar2 = CollisionBody__GetCollision(0);
     if ((0.025 < (float)(iVar1 - *(int *)(iVar2 + 8)) * 0.00025) &&
        ((iVar1 = *(int *)(in_EAX + 0x6c),
         SQRT(*(float *)(iVar1 + 0xa8) * *(float *)(iVar1 + 0xa8) +
@@ -6622,7 +6622,7 @@ undefined4 FUN_005980d0(void)
   iVar6 = 0;
   if (0 < cVar1) {
     do {
-      iVar3 = FUN_00468820(iVar6);
+      iVar3 = CollisionBody__GetCollision(iVar6);
       iVar2 = *(int *)(*(int *)(iVar3 + 100) + 600);
       iVar5 = 0;
       iVar4 = 0;
@@ -8801,7 +8801,7 @@ void __fastcall Teleporter_Enable(int param_1)
     for (local_8 = 0; iVar1 = FUN_0041f680(), local_8 < iVar1; local_8 = local_8 + 1) {
       FUN_0041f690();
       piVar2 = (int *)FUN_00424dc0();
-      FUN_00468810();
+      CollisionBody__EnableCollisions();
       iVar1 = (**(code **)(*piVar2 + 0x50))();
       if (iVar1 == 0) {
         FUN_00432d30(0);
@@ -10025,7 +10025,7 @@ float10 __thiscall FUN_0059ce10(int param_1,float param_2)
   if (*(int *)(param_1 + 4) == 0) {
     fVar1 = *(float *)(param_1 + 0xc);
     param_2 = param_2 / ABS(fVar1);
-    fVar2 = (float10)FUN_004387e0(param_2);
+    fVar2 = (float10)Float_Truncate(param_2);
     if ((float10)param_2 < fVar2) {
       fVar2 = fVar2 - (float10)_K_ONE;
     }
@@ -10225,7 +10225,7 @@ undefined4 * FUN_0059d350(undefined4 *param_1,undefined4 param_2)
     return param_1;
   }
   fVar3 = (float10)FUN_0059ce10(param_2);
-  FUN_004387e0((float)fVar3);
+  Float_Truncate((float)fVar3);
   iVar1 = _ftol_nocw();
   if ((*(int *)(in_EAX + 4) == 2) &&
      ((iVar1 < 0 || ((int)(*(ushort *)(in_EAX + 0x1e) - 1) <= iVar1)))) {

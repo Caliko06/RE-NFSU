@@ -9528,7 +9528,7 @@ void __thiscall tTable_CubicPovData___GetValue(int *param_1,float param_2)
     }
     return;
   }
-  fVar5 = (float10)FUN_004387e0(fVar1);
+  fVar5 = (float10)Float_Truncate(fVar1);
   if ((float10)fVar1 < fVar5) {
     fVar5 = fVar5 - (float10)_K_ONE;
   }
@@ -10978,7 +10978,7 @@ void FUN_00490770(int *param_1,undefined4 param_2,float param_3,int param_4)
     fVar16 = (float10)LinearTable__Lookup11(param_1 + 0xb,param_3);
     iVar2 = *(int *)(param_1[2] + 4);
     fVar5 = param_3 * *(float *)(param_1[2] + 8);
-    fVar17 = (float10)FUN_004387e0(fVar5);
+    fVar17 = (float10)Float_Truncate(fVar5);
     if ((float10)fVar5 < fVar17) {
       fVar17 = fVar17 - (float10)_K_ONE;
     }

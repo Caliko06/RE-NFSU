@@ -661,12 +661,12 @@ float10 FUN_00441d80(float param_1)
   fVar5 = *(float *)(&DAT_006ef2e8 + iVar8) * *in_EAX;
   fVar3 = in_EAX[1];
   fVar4 = *(float *)(&DAT_006ef2e8 + iVar8);
-  fVar9 = (float10)FUN_004387e0(fVar5);
+  fVar9 = (float10)Float_Truncate(fVar5);
   param_1 = (float)fVar9;
   if ((float10)fVar5 < fVar9) {
     param_1 = param_1 - _K_ONE;
   }
-  FUN_004387e0(fVar3 * fVar4);
+  Float_Truncate(fVar3 * fVar4);
   iVar6 = _ftol_nocw();
   iVar7 = _ftol_nocw();
   fVar5 = fVar5 - param_1;
@@ -6313,7 +6313,7 @@ void FUN_00447360(void)
             if (DAT_006fbf18 == *(short *)(*(int *)(iVar5 + iVar2) + 10)) {
 LAB_00447460:
               if (iVar3 != 0) {
-                FUN_00435b30(iVar3);
+                Race__AreAllPlayersFinishedRacing(iVar3);
                 iVar2 = DAT_007361f8;
                 iVar3 = DAT_0073619c;
                 iVar4 = DAT_00734964;
@@ -8467,7 +8467,7 @@ void GameFlow__TrackWorldInit(void)
     _DAT_00735570 = 0;
   }
   FUN_004655f0();
-  FUN_00466970();
+  InitCollisionBody();
   FUN_0046ac40();
   TopologyTree__InitTree(&DAT_0077b130);
   FUN_00576f80();
@@ -8575,7 +8575,7 @@ void GameFlow__UnloadingTrackSpecific(void)
   TrackPath__FreeSplines();
   SlotPool__Destroy();
   DAT_00735fe4 = 0;
-  FUN_00466bf0();
+  CloseCollisionBody();
   SlotPool__Destroy();
   DAT_00736088 = 0;
   StreamSections__Shutdown();
@@ -10450,7 +10450,7 @@ void RacerAI__GetCatchUpTerms(int *param_1,int *param_2,float *param_3,float *pa
     fVar7 = (float10)(float)param_1[5] - (float10)(float)param_2[5];
     if ((DAT_0078a368 != 0) || ((DAT_0073465c != 0 && (DAT_0073466c != 0)))) {
       fVar1 = (float)(fVar7 + (float10)_K_HALF);
-      fVar7 = (float10)FUN_004387e0(fVar1);
+      fVar7 = (float10)Float_Truncate(fVar1);
       if ((float10)fVar1 < fVar7) {
         fVar7 = fVar7 - (float10)_K_ONE;
       }
@@ -10936,7 +10936,7 @@ undefined1 FUN_0044cac0(int *param_1)
         if (cVar2 != '\0') {
           return 0;
         }
-        FUN_00468820(iVar5);
+        CollisionBody__GetCollision(iVar5);
         cVar2 = Collision__IsWallInvolved();
         iVar5 = iVar5 + 1;
       } while (iVar5 < iVar4);
@@ -12747,7 +12747,7 @@ int * AIAction__GetMostImportantNearbyCollidingAvoidable(int *param_1,float para
   piVar6 = (int *)0x0;
   if ('\0' < *(char *)(iVar1 + 0x1c)) {
     do {
-      iVar5 = FUN_00468820(local_c);
+      iVar5 = CollisionBody__GetCollision(local_c);
       if (param_2 <= *(float *)(iVar5 + 0x60)) {
         iVar5 = *(int *)(iVar5 + 100);
         cVar4 = *(char *)(*(int *)(iVar5 + 600) + 0x15);

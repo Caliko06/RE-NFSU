@@ -3441,12 +3441,12 @@ void FUN_00465830(int param_1,undefined4 *param_2,float *param_3,float param_4)
   }
   if ((iVar5 != 0) && (*(char *)(*(int *)(iVar5 + 0x14) + 0x734) != '\0')) {
     fVar8 = fVar9;
-    FUN_00438aa0(fVar9);
-    FUN_00438300(fVar8);
+    Obj_GetField830(fVar9);
+    RemoteCarState__DelayNextApply(fVar8);
   }
   if ((iVar6 != 0) && (*(char *)(*(int *)(iVar6 + 0x14) + 0x734) != '\0')) {
-    FUN_00438aa0(fVar9);
-    FUN_00438300(fVar9);
+    Obj_GetField830(fVar9);
+    RemoteCarState__DelayNextApply(fVar9);
   }
   return;
 }
@@ -3890,9 +3890,11 @@ LAB_00466599:
 }
 
 
-// ==== 0x4665a0 FUN_004665a0
+// ==== 0x4665a0 PtrList_FreeAllPayloadsAndClear
 
-void FUN_004665a0(void)
+/* [canon] runtime med (ghidra-canon) docs/re/canon.md */
+
+void PtrList_FreeAllPayloadsAndClear(void)
 
 {
   undefined4 *puVar1;
@@ -3929,9 +3931,11 @@ void __fastcall Struct_ClearHeader(int param_1)
 }
 
 
-// ==== 0x466600 FUN_00466600
+// ==== 0x466600 CollisionBody_BBoxesOverlap
 
-undefined4 __fastcall FUN_00466600(int param_1,int param_2,float param_3)
+/* [canon] car med (ghidra-canon) docs/re/canon.md */
+
+undefined4 __fastcall CollisionBody_BBoxesOverlap(int param_1,int param_2,float param_3)
 
 {
   float fVar1;
@@ -3975,11 +3979,12 @@ float10 FUN_00466680(void)
 }
 
 
-// ==== 0x466690 FUN_00466690
+// ==== 0x466690 StaticCollisionBody::Interpolate
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_00466690(undefined4 *param_1)
+void StaticCollisionBody__Interpolate(undefined4 *param_1)
 
 {
   undefined4 uVar1;
@@ -3995,11 +4000,12 @@ void FUN_00466690(undefined4 *param_1)
 }
 
 
-// ==== 0x4666d0 FUN_004666d0
+// ==== 0x4666d0 StaticCollisionBody::GetCurrentVelocities
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_004666d0(undefined4 *param_1,undefined4 *param_2)
+void StaticCollisionBody__GetCurrentVelocities(undefined4 *param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -4019,11 +4025,12 @@ void FUN_004666d0(undefined4 *param_1,undefined4 *param_2)
 }
 
 
-// ==== 0x466720 FUN_00466720
+// ==== 0x466720 StaticCollisionBody::GetTestImpulseVelocities
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_00466720(undefined4 *param_1,undefined4 *param_2)
+void StaticCollisionBody__GetTestImpulseVelocities(undefined4 *param_1,undefined4 *param_2)
 
 {
   undefined4 uVar1;
@@ -4061,9 +4068,11 @@ undefined4 * FUN_00466780(void)
 }
 
 
-// ==== 0x466790 FUN_00466790
+// ==== 0x466790 StaticCollisionBody::ChangeInEnergy
 
-float10 FUN_00466790(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 StaticCollisionBody__ChangeInEnergy(void)
 
 {
   return (float10)0.0;
@@ -4117,9 +4126,11 @@ float10 __fastcall FUN_004667e0(int param_1)
 }
 
 
-// ==== 0x4667f0 FUN_004667f0
+// ==== 0x4667f0 DynamicCollisionBody::GetMassInverse
 
-float10 __fastcall FUN_004667f0(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 __fastcall DynamicCollisionBody__GetMassInverse(int param_1)
 
 {
   return (float10)*(float *)(*(int *)(param_1 + 0x6c) + 0x148);
@@ -4143,9 +4154,11 @@ int __fastcall CarCollisionBody__GetTransformPtr(int param_1)
 }
 
 
-// ==== 0x466820 FUN_00466820
+// ==== 0x466820 DynamicCollisionBody::ApplyImpulse
 
-void FUN_00466820(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void DynamicCollisionBody__ApplyImpulse(void)
 
 {
   FUN_00584e30();
@@ -4165,9 +4178,11 @@ float10 Virtual__ReturnOne__float_constant_getter_(void)
 }
 
 
-// ==== 0x466850 FUN_00466850
+// ==== 0x466850 CarCollisionBody::IsMoveable
 
-bool __fastcall FUN_00466850(int param_1)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/canon.md */
+
+bool __fastcall CarCollisionBody__IsMoveable(int param_1)
 
 {
   int iVar1;
@@ -4227,9 +4242,11 @@ float10 FUN_00466910(void)
 }
 
 
-// ==== 0x466920 FUN_00466920
+// ==== 0x466920 NumberAllocator::AllocateNumber
 
-void FUN_00466920(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void NumberAllocator__AllocateNumber(void)
 
 {
   int iVar1;
@@ -4253,11 +4270,12 @@ void FUN_00466920(void)
 }
 
 
-// ==== 0x466970 FUN_00466970
+// ==== 0x466970 InitCollisionBody
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_00466970(void)
+void InitCollisionBody(void)
 
 {
   undefined4 *puVar1;
@@ -4368,9 +4386,11 @@ void FUN_00466970(void)
 }
 
 
-// ==== 0x466bf0 FUN_00466bf0
+// ==== 0x466bf0 CloseCollisionBody
 
-void FUN_00466bf0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CloseCollisionBody(void)
 
 {
   int *piVar1;
@@ -4408,9 +4428,11 @@ void FUN_00466bf0(void)
 }
 
 
-// ==== 0x466ce0 FUN_00466ce0
+// ==== 0x466ce0 CollisionBodyWitness::CollisionBodyWitness
 
-void FUN_00466ce0(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CollisionBodyWitness__CollisionBodyWitness(int param_1)
 
 {
   undefined4 *puVar1;
@@ -4423,7 +4445,7 @@ void FUN_00466ce0(int param_1)
   undefined4 *unaff_ESI;
   
   unaff_ESI[0x4e] = 0;
-  *unaff_ESI = &PTR_FUN_006c8810;
+  *unaff_ESI = &PTR_CollisionBodyWitness___CollisionBodyWitness_006c8810;
   if ((*(int *)(in_EAX + 0x10) != 0) && (*(int *)(param_1 + 0x10) != 0)) {
     GJKWitness__Initialize();
   }
@@ -4457,15 +4479,18 @@ void FUN_00466ce0(int param_1)
 }
 
 
-// ==== 0x466df0 FUN_00466df0
+// ==== 0x466df0 CollisionBodyWitness::_CollisionBodyWitness
 
-undefined4 * __thiscall FUN_00466df0(undefined4 *param_1,byte param_2)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * __thiscall
+CollisionBodyWitness___CollisionBodyWitness(undefined4 *param_1,byte param_2)
 
 {
   int iVar1;
   int iVar2;
   
-  FUN_00466e20(param_1);
+  CollisionBodyWitness___CollisionBodyWitness(param_1);
   iVar2 = DAT_0072cc00;
   if ((param_2 & 1) != 0) {
     iVar1 = *(int *)(DAT_0072cc00 + 0x18);
@@ -4477,9 +4502,11 @@ undefined4 * __thiscall FUN_00466df0(undefined4 *param_1,byte param_2)
 }
 
 
-// ==== 0x466e20 FUN_00466e20
+// ==== 0x466e20 CollisionBodyWitness::_CollisionBodyWitness
 
-void FUN_00466e20(undefined4 *param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CollisionBodyWitness___CollisionBodyWitness(undefined4 *param_1)
 
 {
   byte *pbVar1;
@@ -4494,11 +4521,11 @@ void FUN_00466e20(undefined4 *param_1)
   pcStack_8 = FUN_006854f8;
   pvStack_c = ExceptionList;
   ExceptionList = &pvStack_c;
-  *param_1 = &PTR_FUN_006c8810;
+  *param_1 = &PTR_CollisionBodyWitness___CollisionBodyWitness_006c8810;
   DAT_00736000 = DAT_00736000 + -1;
   local_4 = 0;
   if (param_1[0x99] != 0) {
-    FUN_004672a0();
+    CollisionBodyWitness__EndCollision();
   }
   piVar2 = (int *)param_1[0x95];
   iVar3 = param_1[0x94];
@@ -4536,9 +4563,11 @@ void FUN_00466e20(undefined4 *param_1)
 }
 
 
-// ==== 0x466f70 FUN_00466f70
+// ==== 0x466f70 CollisionBodyWitness::DoSnapshot
 
-void FUN_00466f70(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CollisionBodyWitness__DoSnapshot(int param_1)
 
 {
   int iVar1;
@@ -4553,7 +4582,7 @@ void FUN_00466f70(int param_1)
   FUN_00571c20(iVar2,&param_1,1,1,1);
   if ((char)param_1 != '\0') {
     if (*(char *)(iVar2 + 0x3d) != '\0') {
-      FUN_00467220(0);
+      CollisionBodyWitness__BeginCollision(0);
     }
     FUN_00465770();
   }
@@ -4568,9 +4597,11 @@ void FUN_00466f70(int param_1)
 }
 
 
-// ==== 0x467010 FUN_00467010
+// ==== 0x467010 CollisionBodyWitness::SnapshotEverything
 
-void FUN_00467010(uint param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CollisionBodyWitness__SnapshotEverything(uint param_1)
 
 {
   undefined4 *puVar1;
@@ -4603,7 +4634,7 @@ void FUN_00467010(uint param_1)
       local_4 = (uint)*(ushort *)(*(int *)(iVar7 + 0x25c) + 0x18);
       FUN_00571c20(iVar4,&param_1,2,2,1);
       FUN_00571c20(iVar4,&local_4,2,2,1);
-      FUN_00466f70(iVar4);
+      CollisionBodyWitness__DoSnapshot(iVar4);
       if (*(int *)(iVar7 + 0x250) == 0) {
         iVar7 = 0;
       }
@@ -4652,9 +4683,9 @@ void FUN_00467010(uint param_1)
               puVar8 = puVar8 + 1;
             }
           }
-          FUN_00466ce0(local_c);
+          CollisionBodyWitness__CollisionBodyWitness(local_c);
         }
-        FUN_00466f70(iVar4);
+        CollisionBodyWitness__DoSnapshot(iVar4);
         local_4 = local_4 + 1;
       } while ((int)local_4 < (int)(short)param_1);
     }
@@ -4670,9 +4701,11 @@ void FUN_00467010(uint param_1)
 }
 
 
-// ==== 0x467220 FUN_00467220
+// ==== 0x467220 CollisionBodyWitness::BeginCollision
 
-void FUN_00467220(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CollisionBodyWitness__BeginCollision(void)
 
 {
   char *pcVar1;
@@ -4707,9 +4740,11 @@ void FUN_00467220(void)
 }
 
 
-// ==== 0x4672a0 FUN_004672a0
+// ==== 0x4672a0 CollisionBodyWitness::EndCollision
 
-void FUN_004672a0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CollisionBodyWitness__EndCollision(void)
 
 {
   char *pcVar1;
@@ -4736,9 +4771,11 @@ void FUN_004672a0(void)
 }
 
 
-// ==== 0x467300 FUN_00467300
+// ==== 0x467300 CollisionBodyWitness::HasExpired
 
-undefined4 FUN_00467300(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 CollisionBodyWitness__HasExpired(void)
 
 {
   int *piVar1;
@@ -4751,7 +4788,7 @@ undefined4 FUN_00467300(void)
   }
   iVar3 = *(int *)(unaff_EDI + 0x25c);
   piVar1 = *(int **)(unaff_EDI + 600);
-  iVar2 = FUN_00466600(0);
+  iVar2 = CollisionBody_BBoxesOverlap(0);
   if ((iVar2 != 0) && ((*(char *)((int)piVar1 + 0x1d) != '\0' || (*(char *)(iVar3 + 0x1d) != '\0')))
      ) {
     iVar3 = (**(code **)(*piVar1 + 0x50))();
@@ -4766,9 +4803,11 @@ undefined4 FUN_00467300(void)
 }
 
 
-// ==== 0x467360 FUN_00467360
+// ==== 0x467360 IsYawControlInducingCollisionBody
 
-uint __fastcall FUN_00467360(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+uint __fastcall IsYawControlInducingCollisionBody(int param_1)
 
 {
   char cVar1;
@@ -4786,9 +4825,11 @@ uint __fastcall FUN_00467360(int param_1)
 }
 
 
-// ==== 0x467390 FUN_00467390
+// ==== 0x467390 CollisionBodyWitness::EstimateClosestPoints
 
-undefined4 FUN_00467390(int param_1,float *param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 CollisionBodyWitness__EstimateClosestPoints(int param_1,float *param_2)
 
 {
   float fVar1;
@@ -4915,11 +4956,12 @@ undefined4 FUN_00467390(int param_1,float *param_2)
 }
 
 
-// ==== 0x467700 FUN_00467700
+// ==== 0x467700 CollisionBodyWitness::GetTOI
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-float10 FUN_00467700(float param_1)
+float10 CollisionBodyWitness__GetTOI(float param_1)
 
 {
   int *piVar1;
@@ -4962,7 +5004,8 @@ float10 FUN_00467700(float param_1)
     *(undefined4 *)(in_EAX + 0x268) = 0xbf800000;
     iVar11 = 0;
     do {
-      if ((iVar11 == 0) && (cVar6 = FUN_00467390(in_EAX,&local_60), cVar6 != '\0')) {
+      if ((iVar11 == 0) &&
+         (cVar6 = CollisionBodyWitness__EstimateClosestPoints(in_EAX,&local_60), cVar6 != '\0')) {
         local_90 = local_70 - local_60;
         local_8c = local_6c - local_5c;
         local_88 = local_68 - local_58;
@@ -5094,9 +5137,11 @@ LAB_00467c3c:
 }
 
 
-// ==== 0x467ca0 FUN_00467ca0
+// ==== 0x467ca0 CollisionBodyWitness_UpdatePolygonSideFlag
 
-void __thiscall FUN_00467ca0(int param_1,char param_2)
+/* [canon] car low (ghidra-canon) docs/re/canon.md */
+
+void __thiscall CollisionBodyWitness_UpdatePolygonSideFlag(int param_1,char param_2)
 
 {
   float fVar1;
@@ -5142,9 +5187,11 @@ void __thiscall FUN_00467ca0(int param_1,char param_2)
 }
 
 
-// ==== 0x467db0 FUN_00467db0
+// ==== 0x467db0 CollisionBodyWitness_ClearPolygonSideFlag
 
-void __fastcall FUN_00467db0(int param_1)
+/* [canon] car med (ghidra-canon) docs/re/canon.md */
+
+void __fastcall CollisionBodyWitness_ClearPolygonSideFlag(int param_1)
 
 {
   if (*(char *)(*(int *)(param_1 + 600) + 0x15) == '\x03') {
@@ -5158,9 +5205,11 @@ void __fastcall FUN_00467db0(int param_1)
 }
 
 
-// ==== 0x467df0 FUN_00467df0
+// ==== 0x467df0 CollisionBodyWitness::TestForContact
 
-undefined4 __fastcall FUN_00467df0(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __fastcall CollisionBodyWitness__TestForContact(int param_1)
 
 {
   char cVar1;
@@ -5202,7 +5251,7 @@ undefined4 __fastcall FUN_00467df0(int param_1)
         uVar7 = CONCAT31((int3)((uint)uVar7 >> 8),1);
       }
     }
-    FUN_00467ca0(uVar7);
+    CollisionBodyWitness_UpdatePolygonSideFlag(uVar7);
     piVar3 = *(int **)(param_1 + 0x25c);
     piVar4 = *(int **)(param_1 + 600);
     uVar7 = (**(code **)(*piVar3 + 8))();
@@ -5212,7 +5261,7 @@ undefined4 __fastcall FUN_00467df0(int param_1)
     FUN_00472830(uVar9,uVar8,uVar7);
     FUN_00472950();
     cVar1 = *(char *)(param_1 + 0x14);
-    FUN_00467db0();
+    CollisionBodyWitness_ClearPolygonSideFlag();
     if (cVar1 != '\0') {
       iVar6 = (**(code **)(**(int **)(param_1 + 600) + 0x68))();
       if ((((iVar6 == 0) &&
@@ -5220,14 +5269,14 @@ undefined4 __fastcall FUN_00467df0(int param_1)
           (iVar6 = *(int *)(param_1 + 600), *(char *)(iVar6 + 0x16) == '\0')) ||
          (*(char *)(*(int *)(param_1 + 0x25c) + 0x16) == '\0')) {
         if (*(char *)(*(int *)(param_1 + 600) + 0x15) == '\0') {
-          uVar11 = FUN_00467360();
+          uVar11 = IsYawControlInducingCollisionBody();
           if ((int)uVar11 != 0) {
             *(int *)((int)((ulonglong)uVar11 >> 0x20) + 0x14c) = DAT_0073ad34;
           }
           *(int *)(*(int *)(param_1 + 600) + 0x144) = DAT_0073ad34;
         }
         if (*(char *)(*(int *)(param_1 + 0x25c) + 0x15) == '\0') {
-          uVar11 = FUN_00467360();
+          uVar11 = IsYawControlInducingCollisionBody();
           if ((int)uVar11 != 0) {
             *(int *)((int)((ulonglong)uVar11 >> 0x20) + 0x14c) = DAT_0073ad34;
           }
@@ -5259,9 +5308,11 @@ undefined4 __fastcall FUN_00467df0(int param_1)
 }
 
 
-// ==== 0x468060 FUN_00468060
+// ==== 0x468060 CollisionBodyWitness::TestForContact
 
-void __thiscall FUN_00468060(int param_1,undefined4 param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall CollisionBodyWitness__TestForContact(int param_1,undefined4 param_2)
 
 {
   char cVar1;
@@ -5299,7 +5350,7 @@ void __thiscall FUN_00468060(int param_1,undefined4 param_2)
         uVar7 = CONCAT31((int3)((uint)uVar7 >> 8),1);
       }
     }
-    FUN_00467ca0(uVar7);
+    CollisionBodyWitness_UpdatePolygonSideFlag(uVar7);
     piVar3 = *(int **)(param_1 + 0x25c);
     piVar4 = *(int **)(param_1 + 600);
     uVar7 = (**(code **)(*piVar3 + 8))();
@@ -5309,7 +5360,7 @@ void __thiscall FUN_00468060(int param_1,undefined4 param_2)
     FUN_00472830(uVar9,uVar8,uVar7);
     FUN_00472950();
     cVar1 = *(char *)(param_1 + 0x15);
-    FUN_00467db0();
+    CollisionBodyWitness_ClearPolygonSideFlag();
     if (cVar1 != '\0') {
       iVar6 = (**(code **)(**(int **)(param_1 + 600) + 0x68))();
       if ((((iVar6 == 0) &&
@@ -5317,14 +5368,14 @@ void __thiscall FUN_00468060(int param_1,undefined4 param_2)
           (iVar6 = *(int *)(param_1 + 600), *(char *)(iVar6 + 0x16) == '\0')) ||
          (*(char *)(*(int *)(param_1 + 0x25c) + 0x16) == '\0')) {
         if (*(char *)(*(int *)(param_1 + 600) + 0x15) == '\0') {
-          uVar10 = FUN_00467360();
+          uVar10 = IsYawControlInducingCollisionBody();
           if ((int)uVar10 != 0) {
             *(int *)((int)((ulonglong)uVar10 >> 0x20) + 0x14c) = DAT_0073ad34;
           }
           *(int *)(*(int *)(param_1 + 600) + 0x144) = DAT_0073ad34;
         }
         if (*(char *)(*(int *)(param_1 + 0x25c) + 0x15) == '\0') {
-          uVar10 = FUN_00467360();
+          uVar10 = IsYawControlInducingCollisionBody();
           if ((int)uVar10 != 0) {
             *(int *)((int)((ulonglong)uVar10 >> 0x20) + 0x14c) = DAT_0073ad34;
           }
@@ -5355,9 +5406,11 @@ void __thiscall FUN_00468060(int param_1,undefined4 param_2)
 }
 
 
-// ==== 0x4682c0 FUN_004682c0
+// ==== 0x4682c0 CollisionBodyWitness::EliminateAllWitnesses
 
-void FUN_004682c0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CollisionBodyWitness__EliminateAllWitnesses(void)
 
 {
   undefined4 *puVar1;
@@ -5375,9 +5428,11 @@ void FUN_004682c0(void)
 }
 
 
-// ==== 0x468300 FUN_00468300
+// ==== 0x468300 CollisionBodyWitness::DoesWitnessExist
 
-uint __fastcall FUN_00468300(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+uint __fastcall CollisionBodyWitness__DoesWitnessExist(int param_1)
 
 {
   int in_EAX;
@@ -5391,9 +5446,11 @@ uint __fastcall FUN_00468300(int param_1)
 }
 
 
-// ==== 0x468340 FUN_00468340
+// ==== 0x468340 CollisionBody::CollisionBody
 
-undefined4 * FUN_00468340(undefined4 *param_1,undefined1 param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * CollisionBody__CollisionBody(undefined4 *param_1,undefined1 param_2)
 
 {
   int *piVar1;
@@ -5401,14 +5458,14 @@ undefined4 * FUN_00468340(undefined4 *param_1,undefined1 param_2)
   int iVar3;
   int in_EAX;
   
-  *param_1 = &PTR_FUN_006c86a8;
+  *param_1 = &PTR_CollisionBody___CollisionBody_006c86a8;
   *(short *)(param_1 + 6) = (short)in_EAX;
   *(undefined1 *)((int)param_1 + 0x15) = param_2;
   param_1[4] = 0;
   *(undefined1 *)(param_1 + 5) = 0;
   param_1[3] = &DAT_007377f0;
   if (-1 < in_EAX) {
-    FUN_00466920();
+    NumberAllocator__AllocateNumber();
     *(undefined4 **)(DAT_00736050 + *(short *)(param_1 + 6) * 4) = param_1;
   }
   DAT_00736008 = DAT_00736008 + 1;
@@ -5436,12 +5493,14 @@ undefined4 * FUN_00468340(undefined4 *param_1,undefined1 param_2)
 }
 
 
-// ==== 0x4683f0 FUN_004683f0
+// ==== 0x4683f0 CollisionBody::_CollisionBody
 
-void * __thiscall FUN_004683f0(void *param_1,byte param_2)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall CollisionBody___CollisionBody(void *param_1,byte param_2)
 
 {
-  FUN_00468410();
+  CollisionBody___CollisionBody();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -5449,9 +5508,11 @@ void * __thiscall FUN_004683f0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x468410 FUN_00468410
+// ==== 0x468410 CollisionBody::_CollisionBody
 
-void __fastcall FUN_00468410(undefined4 *param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall CollisionBody___CollisionBody(undefined4 *param_1)
 
 {
   int iVar1;
@@ -5461,9 +5522,9 @@ void __fastcall FUN_00468410(undefined4 *param_1)
   int iVar5;
   undefined4 *puVar6;
   
-  *param_1 = &PTR_FUN_006c86a8;
+  *param_1 = &PTR_CollisionBody___CollisionBody_006c86a8;
   DAT_00736008 = DAT_00736008 + -1;
-  FUN_004685a0(0);
+  CollisionBody__UpdateMaxCollisionBodyWidth(0);
   iVar1 = param_1[1];
   piVar2 = (int *)param_1[2];
   *piVar2 = iVar1;
@@ -5503,9 +5564,11 @@ void __fastcall FUN_00468410(undefined4 *param_1)
 }
 
 
-// ==== 0x4684f0 FUN_004684f0
+// ==== 0x4684f0 CollisionBody::DoSnapshot
 
-void __thiscall FUN_004684f0(int param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall CollisionBody__DoSnapshot(int param_1,int param_2)
 
 {
   int iVar1;
@@ -5534,11 +5597,12 @@ void __thiscall FUN_004684f0(int param_1,int param_2)
 }
 
 
-// ==== 0x4685a0 FUN_004685a0
+// ==== 0x4685a0 CollisionBody::UpdateMaxCollisionBodyWidth
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_004685a0(float param_1)
+void CollisionBody__UpdateMaxCollisionBodyWidth(float param_1)
 
 {
   float fVar1;
@@ -5583,9 +5647,11 @@ void FUN_004685a0(float param_1)
 }
 
 
-// ==== 0x468680 FUN_00468680
+// ==== 0x468680 CollisionBody::SetBBoxMinMax
 
-void FUN_00468680(int param_1,float *param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CollisionBody__SetBBoxMinMax(int param_1,float *param_2)
 
 {
   int *piVar1;
@@ -5599,7 +5665,7 @@ void FUN_00468680(int param_1,float *param_2)
   int iVar8;
   int iVar9;
   
-  FUN_004685a0(*in_EAX - *param_2);
+  CollisionBody__UpdateMaxCollisionBodyWidth(*in_EAX - *param_2);
   fVar2 = *(float *)(param_1 + 0x2c);
   fVar3 = param_2[1];
   *(float *)(param_1 + 0x24) = *param_2;
@@ -5714,9 +5780,11 @@ void CarBody_DisableCountInc(void)
 }
 
 
-// ==== 0x468810 FUN_00468810
+// ==== 0x468810 CollisionBody::EnableCollisions
 
-void __fastcall FUN_00468810(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall CollisionBody__EnableCollisions(int param_1)
 
 {
   if (*(char *)(param_1 + 0x1b) != '\0') {
@@ -5726,9 +5794,11 @@ void __fastcall FUN_00468810(int param_1)
 }
 
 
-// ==== 0x468820 FUN_00468820
+// ==== 0x468820 CollisionBody::GetCollision
 
-undefined4 FUN_00468820(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 CollisionBody__GetCollision(int param_1)
 
 {
   int iVar1;
@@ -5765,12 +5835,14 @@ undefined4 FUN_00468820(int param_1)
 }
 
 
-// ==== 0x4688a0 FUN_004688a0
+// ==== 0x4688a0 DynamicCollisionBody::_DynamicCollisionBody
 
-void * __thiscall FUN_004688a0(void *param_1,byte param_2)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/canon.md */
+
+void * __thiscall DynamicCollisionBody___DynamicCollisionBody(void *param_1,byte param_2)
 
 {
-  FUN_004688c0();
+  DynamicCollisionBody___DynamicCollisionBody();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -5778,21 +5850,25 @@ void * __thiscall FUN_004688a0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4688c0 FUN_004688c0
+// ==== 0x4688c0 DynamicCollisionBody::_DynamicCollisionBody
 
-void __fastcall FUN_004688c0(undefined4 *param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall DynamicCollisionBody___DynamicCollisionBody(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c85b8;
+  *param_1 = &PTR_DynamicCollisionBody___DynamicCollisionBody_006c85b8;
   DAT_00736010 = DAT_00736010 + -1;
-  FUN_00468410();
+  CollisionBody___CollisionBody();
   return;
 }
 
 
-// ==== 0x4688e0 FUN_004688e0
+// ==== 0x4688e0 DynamicCollisionBody::DoSnapshot
 
-void __thiscall FUN_004688e0(int param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall DynamicCollisionBody__DoSnapshot(int param_1,int param_2)
 
 {
   char cVar1;
@@ -5800,7 +5876,7 @@ void __thiscall FUN_004688e0(int param_1,int param_2)
   undefined4 *puVar3;
   
   FUN_00571ea0(param_1,"DynamicCollisionBody");
-  FUN_004684f0(param_2);
+  CollisionBody__DoSnapshot(param_2);
   FUN_00571c20(param_2,param_1 + 0x60,1,4,0);
   if (*(char *)(param_2 + 0x3c) != '\0' || *(char *)(param_2 + 0x3d) != '\0') {
     FUN_00440740();
@@ -5847,11 +5923,12 @@ void __thiscall FUN_004688e0(int param_1,int param_2)
 }
 
 
-// ==== 0x468a50 FUN_00468a50
+// ==== 0x468a50 DynamicCollisionBody::BuildBoundingVolumes
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_00468a50(void)
+void DynamicCollisionBody__BuildBoundingVolumes(void)
 
 {
   int iVar1;
@@ -5977,11 +6054,12 @@ void FUN_00468a50(void)
 }
 
 
-// ==== 0x468d70 FUN_00468d70
+// ==== 0x468d70 DynamicCollisionBody::UpdateProjectedBBox
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_00468d70(float param_1)
+void DynamicCollisionBody__UpdateProjectedBBox(float param_1)
 
 {
   float fVar1;
@@ -6022,14 +6100,16 @@ void FUN_00468d70(float param_1)
   if (fStack_1c < (float)unaff_ESI[0x3a] + pfVar4[1]) {
     fStack_1c = (float)unaff_ESI[0x3a] + pfVar4[1];
   }
-  FUN_00468680(unaff_ESI,&fStack_28);
+  CollisionBody__SetBBoxMinMax(unaff_ESI,&fStack_28);
   return;
 }
 
 
-// ==== 0x468ec0 FUN_00468ec0
+// ==== 0x468ec0 DynamicCollisionBody::UpdatePosition
 
-void FUN_00468ec0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void DynamicCollisionBody__UpdatePosition(void)
 
 {
   float *pfVar1;
@@ -6045,7 +6125,7 @@ void FUN_00468ec0(void)
   fStack_2c = pfVar1[1] - (float)unaff_ESI[0x3a];
   fStack_28 = (float)unaff_ESI[0x3a] + *pfVar1;
   fStack_24 = pfVar1[1] + (float)unaff_ESI[0x3a];
-  FUN_00468680(unaff_ESI,&fStack_30);
+  CollisionBody__SetBBoxMinMax(unaff_ESI,&fStack_30);
   D3DXVec3Transform(auStack_20,unaff_ESI + 0x48,unaff_ESI + 0x20);
   unaff_ESI[0x44] = (int)(fStack_2c + (float)unaff_ESI[0x30]);
   unaff_ESI[0x46] = (int)((float)unaff_ESI[0x32] + fStack_24);
@@ -6054,9 +6134,11 @@ void FUN_00468ec0(void)
 }
 
 
-// ==== 0x468f70 FUN_00468f70
+// ==== 0x468f70 DynamicCollisionBody::BeginMove
 
-void FUN_00468f70(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void DynamicCollisionBody__BeginMove(int param_1)
 
 {
   int iVar1;
@@ -6083,9 +6165,12 @@ void FUN_00468f70(int param_1)
 }
 
 
-// ==== 0x468fe0 FUN_00468fe0
+// ==== 0x468fe0 DynamicCollisionBody::Interpolate
 
-void __thiscall FUN_00468fe0(int *param_1,float *param_2,float *param_3,float param_4)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall
+DynamicCollisionBody__Interpolate(int *param_1,float *param_2,float *param_3,float param_4)
 
 {
   float fVar1;
@@ -6215,9 +6300,11 @@ void __thiscall FUN_00468fe0(int *param_1,float *param_2,float *param_3,float pa
 }
 
 
-// ==== 0x4692f0 FUN_004692f0
+// ==== 0x4692f0 DynamicCollisionBody::InterpolateVelocity
 
-void FUN_004692f0(float param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void DynamicCollisionBody__InterpolateVelocity(float param_1)
 
 {
   float fVar1;
@@ -6255,9 +6342,11 @@ void FUN_004692f0(float param_1)
 }
 
 
-// ==== 0x469390 FUN_00469390
+// ==== 0x469390 DynamicCollisionBody::Backup
 
-void __thiscall FUN_00469390(int *param_1,undefined4 param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall DynamicCollisionBody__Backup(int *param_1,undefined4 param_2)
 
 {
   float fVar1;
@@ -6273,7 +6362,7 @@ void __thiscall FUN_00469390(int *param_1,undefined4 param_2)
   undefined1 local_50 [76];
   
   (**(code **)(*param_1 + 0x30))(local_60,local_50,param_2);
-  FUN_004692f0(param_2);
+  DynamicCollisionBody__InterpolateVelocity(param_2);
   iVar2 = param_1[0x1b];
   if (iVar2 != 0) {
     fVar1 = *(float *)(iVar2 + 0x144);
@@ -6292,9 +6381,11 @@ void __thiscall FUN_00469390(int *param_1,undefined4 param_2)
 }
 
 
-// ==== 0x469460 FUN_00469460
+// ==== 0x469460 DynamicCollisionBody::RecomputeAuxilliaries
 
-void __fastcall FUN_00469460(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall DynamicCollisionBody__RecomputeAuxilliaries(int param_1)
 
 {
   if (*(int *)(param_1 + 0x60) != 0) {
@@ -6307,9 +6398,12 @@ void __fastcall FUN_00469460(int param_1)
 }
 
 
-// ==== 0x469470 FUN_00469470
+// ==== 0x469470 DynamicCollisionBody::GetCurrentVelocities
 
-void __thiscall FUN_00469470(int *param_1,undefined4 *param_2,undefined4 *param_3)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall
+DynamicCollisionBody__GetCurrentVelocities(int *param_1,undefined4 *param_2,undefined4 *param_3)
 
 {
   undefined4 uVar1;
@@ -6348,9 +6442,12 @@ void __thiscall FUN_00469470(int *param_1,undefined4 *param_2,undefined4 *param_
 }
 
 
-// ==== 0x469510 FUN_00469510
+// ==== 0x469510 DynamicCollisionBody::GetTestImpulseVelocities
 
-void __thiscall FUN_00469510(int *param_1,undefined4 *param_2,undefined4 *param_3)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall
+DynamicCollisionBody__GetTestImpulseVelocities(int *param_1,undefined4 *param_2,undefined4 *param_3)
 
 {
   undefined4 uVar1;
@@ -6396,7 +6493,7 @@ void WorldObjects__Broadphase(int *param_1)
   piVar3 = param_1;
   iVar4 = (**(code **)(*param_1 + 0x50))();
   if (iVar4 != 0) {
-    FUN_00469810();
+    DynamicCollisionBody__CreateTrackPolygonCollisionBodies();
     fVar2 = (float)param_1[9];
     if (param_1[2] == 0) {
       piVar7 = (int *)0x0;
@@ -6461,9 +6558,9 @@ void WorldObjects__Broadphase(int *param_1)
           piVar6 = (int *)VirginSmokeable__Wake();
           (**(code **)*piVar7)(1);
         }
-        if (((piVar6 != (int *)0x0) && (iVar4 = FUN_00466600(0), iVar4 != 0)) &&
+        if (((piVar6 != (int *)0x0) && (iVar4 = CollisionBody_BBoxesOverlap(0), iVar4 != 0)) &&
            (iVar4 = FUN_00567160(), iVar4 != 0)) {
-          FUN_00466ce0(piVar6);
+          CollisionBodyWitness__CollisionBodyWitness(piVar6);
         }
       }
     }
@@ -6472,9 +6569,11 @@ void WorldObjects__Broadphase(int *param_1)
 }
 
 
-// ==== 0x469770 FUN_00469770
+// ==== 0x469770 DynamicCollisionBody::MaybeCreateWitness
 
-undefined4 * FUN_00469770(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * DynamicCollisionBody__MaybeCreateWitness(void)
 
 {
   int *in_EAX;
@@ -6487,15 +6586,15 @@ undefined4 * FUN_00469770(void)
     return (undefined4 *)0x0;
   }
   puVar2 = (undefined4 *)0x0;
-  iVar1 = FUN_00466600(0);
-  if (((iVar1 != 0) && (iVar1 = FUN_00468300(), iVar1 == 0)) &&
+  iVar1 = CollisionBody_BBoxesOverlap(0);
+  if (((iVar1 != 0) && (iVar1 = CollisionBodyWitness__DoesWitnessExist(), iVar1 == 0)) &&
      (iVar1 = (**(code **)(*in_EAX + 0x50))(), iVar1 != 0)) {
     if (*(char *)((int)in_EAX + 0x15) == '\x02') {
       in_EAX = (int *)FUN_005962c0();
       if (in_EAX == (int *)0x0) {
         return (undefined4 *)0x0;
       }
-      iVar1 = FUN_00466600(0);
+      iVar1 = CollisionBody_BBoxesOverlap(0);
       if (iVar1 == 0) {
         return (undefined4 *)0x0;
       }
@@ -6505,9 +6604,9 @@ undefined4 * FUN_00469770(void)
       puVar2 = (undefined4 *)0x0;
     }
     else {
-      puVar2 = (undefined4 *)FUN_00466ce0(in_EAX);
+      puVar2 = (undefined4 *)CollisionBodyWitness__CollisionBodyWitness(in_EAX);
     }
-    iVar1 = FUN_00467300();
+    iVar1 = CollisionBodyWitness__HasExpired();
     if (iVar1 != 0) {
       if (puVar2 != (undefined4 *)0x0) {
         (**(code **)*puVar2)(1);
@@ -6519,9 +6618,11 @@ undefined4 * FUN_00469770(void)
 }
 
 
-// ==== 0x469810 FUN_00469810
+// ==== 0x469810 DynamicCollisionBody::CreateTrackPolygonCollisionBodies
 
-int __fastcall FUN_00469810(int param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __fastcall DynamicCollisionBody__CreateTrackPolygonCollisionBodies(int param_1)
 
 {
   undefined2 uVar1;
@@ -6556,7 +6657,7 @@ int __fastcall FUN_00469810(int param_1)
           ((*(float *)(param_1 + 0x28) < *(float *)(iVar5 + 0x20) !=
             (*(float *)(param_1 + 0x28) == *(float *)(iVar5 + 0x20)) &&
            (*(float *)(iVar5 + 0x18) <= *(float *)(param_1 + 0x30))))) &&
-         ((iVar4 = FUN_00469a00(), iVar4 != 0 && (local_e0 < 0x30)))) {
+         ((iVar4 = DynamicCollisionBody__TrackPolygonCheck(), iVar4 != 0 && (local_e0 < 0x30)))) {
         aiStack_cc[local_e0] = iVar5;
         local_e0 = local_e0 + 1;
       }
@@ -6632,11 +6733,12 @@ int __fastcall FUN_00469810(int param_1)
 }
 
 
-// ==== 0x469a00 FUN_00469a00
+// ==== 0x469a00 DynamicCollisionBody::TrackPolygonCheck
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
 
-bool FUN_00469a00(void)
+bool DynamicCollisionBody__TrackPolygonCheck(void)
 
 {
   float fVar1;
@@ -6670,9 +6772,11 @@ bool FUN_00469a00(void)
 }
 
 
-// ==== 0x469ad0 FUN_00469ad0
+// ==== 0x469ad0 DynamicCollisionBody::ChangeInEnergy
 
-float10 FUN_00469ad0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+float10 DynamicCollisionBody__ChangeInEnergy(void)
 
 {
   float10 fVar1;
@@ -6684,9 +6788,11 @@ float10 FUN_00469ad0(void)
 }
 
 
-// ==== 0x469b00 FUN_00469b00
+// ==== 0x469b00 CarCollisionBody::CarCollisionBody
 
-undefined4 * FUN_00469b00(undefined4 *param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * CarCollisionBody__CarCollisionBody(undefined4 *param_1,int param_2)
 
 {
   char cVar1;
@@ -6706,8 +6812,8 @@ undefined4 * FUN_00469b00(undefined4 *param_1,int param_2)
   pcStack_8 = FUN_00685c78;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  FUN_00468340(param_1,0);
-  *param_1 = &PTR_FUN_006c85b8;
+  CollisionBody__CollisionBody(param_1,0);
+  *param_1 = &PTR_DynamicCollisionBody___DynamicCollisionBody_006c85b8;
   param_1[0x19] = param_2 + 0x540;
   DAT_00736010 = DAT_00736010 + 1;
   if (DAT_00736038 < DAT_00736010) {
@@ -6718,7 +6824,7 @@ undefined4 * FUN_00469b00(undefined4 *param_1,int param_2)
   *(undefined1 *)((int)param_1 + 0x16) = 1;
   param_1[0x18] = 0;
   param_1[0x4c] = 0;
-  *param_1 = &PTR_FUN_006c8798;
+  *param_1 = &PTR_CarCollisionBody___CarCollisionBody_006c8798;
   param_1[0x51] = 0;
   param_1[0x52] = 0;
   param_1[0x53] = 0;
@@ -6771,8 +6877,8 @@ undefined4 * FUN_00469b00(undefined4 *param_1,int param_2)
         *(undefined1 *)(param_1 + 5) = 1;
       }
 LAB_00469d19:
-      FUN_00468a50();
-      FUN_00468ec0();
+      DynamicCollisionBody__BuildBoundingVolumes();
+      DynamicCollisionBody__UpdatePosition();
       ExceptionList = local_c;
       return param_1;
     }
@@ -6804,15 +6910,17 @@ LAB_00469cac:
 }
 
 
-// ==== 0x469d40 FUN_00469d40
+// ==== 0x469d40 CarCollisionBody::_CarCollisionBody
 
-undefined4 * __thiscall FUN_00469d40(undefined4 *param_1,byte param_2)
+/* [canon] car med (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * __thiscall CarCollisionBody___CarCollisionBody(undefined4 *param_1,byte param_2)
 
 {
   int iVar1;
   int iVar2;
   
-  FUN_00469d70(param_1);
+  CarCollisionBody___CarCollisionBody(param_1);
   iVar2 = DAT_0072cbf0;
   if ((param_2 & 1) != 0) {
     iVar1 = *(int *)(DAT_0072cbf0 + 0x18);
@@ -6824,9 +6932,11 @@ undefined4 * __thiscall FUN_00469d40(undefined4 *param_1,byte param_2)
 }
 
 
-// ==== 0x469d70 FUN_00469d70
+// ==== 0x469d70 CarCollisionBody::_CarCollisionBody
 
-void FUN_00469d70(undefined4 *param_1)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void CarCollisionBody___CarCollisionBody(undefined4 *param_1)
 
 {
   void *local_c;
@@ -6836,7 +6946,7 @@ void FUN_00469d70(undefined4 *param_1)
   pcStack_8 = FUN_00685c78;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c8798;
+  *param_1 = &PTR_CarCollisionBody___CarCollisionBody_006c8798;
   DAT_00736018 = DAT_00736018 + -1;
   local_4 = 0;
   if (*(char *)(param_1 + 5) == '\0') {
@@ -6852,18 +6962,20 @@ void FUN_00469d70(undefined4 *param_1)
       _free((void *)param_1[4]);
     }
   }
-  *param_1 = &PTR_FUN_006c85b8;
+  *param_1 = &PTR_DynamicCollisionBody___DynamicCollisionBody_006c85b8;
   DAT_00736010 = DAT_00736010 + -1;
   local_4 = 0xffffffff;
-  FUN_00468410();
+  CollisionBody___CollisionBody();
   ExceptionList = local_c;
   return;
 }
 
 
-// ==== 0x469e20 FUN_00469e20
+// ==== 0x469e20 CarCollisionBody::DoSnapshot
 
-void __thiscall FUN_00469e20(int param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall CarCollisionBody__DoSnapshot(int param_1,int param_2)
 
 {
   int iVar1;
@@ -6872,7 +6984,7 @@ void __thiscall FUN_00469e20(int param_1,int param_2)
   
   iVar2 = param_2;
   FUN_00571ea0(param_1,"CarCollisionBody");
-  FUN_004688e0(iVar2);
+  DynamicCollisionBody__DoSnapshot(iVar2);
   param_2 = CONCAT31(param_2._1_3_,*(undefined1 *)(*(int *)(param_1 + 0x140) + 10));
   if ((*(char *)(iVar2 + 0x3e) != '\0') || (*(char *)(iVar2 + 0x3f) != '\0')) {
     FUN_00571c20(iVar2,&param_2,1,1,1);
@@ -6881,7 +6993,7 @@ void __thiscall FUN_00469e20(int param_1,int param_2)
     CarCollisionBody__SetupPhysicsPointers();
   }
   if (*(char *)(iVar2 + 0x3c) != '\0' || *(char *)(iVar2 + 0x3d) != '\0') {
-    FUN_00468ec0();
+    DynamicCollisionBody__UpdatePosition();
   }
   if ((*(char *)(iVar2 + 0x3e) != '\0') || (*(char *)(iVar2 + 0x3f) != '\0')) {
     FUN_00571c20(iVar2,param_1 + 0x24,8,0xffffffff,0);
@@ -6954,9 +7066,11 @@ int __fastcall CarCollisionBody__SetupPhysicsPointers(undefined4 param_1,int par
 }
 
 
-// ==== 0x469fb0 FUN_00469fb0
+// ==== 0x469fb0 CarCollisionBody::SetToPhysicsMode
 
-void __thiscall FUN_00469fb0(int param_1,int param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall CarCollisionBody__SetToPhysicsMode(int param_1,int param_2)
 
 {
   int *piVar1;
@@ -6986,15 +7100,17 @@ void __thiscall FUN_00469fb0(int param_1,int param_2)
 }
 
 
-// ==== 0x46a030 FUN_0046a030
+// ==== 0x46a030 CarCollisionBody::Move
 
-void __thiscall FUN_0046a030(int param_1,undefined4 param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall CarCollisionBody__Move(int param_1,undefined4 param_2)
 
 {
-  FUN_00468f70(param_2);
+  DynamicCollisionBody__BeginMove(param_2);
   Car__ServiceResetRequest(*(undefined4 *)(param_1 + 0x140),param_2);
   if (DAT_00736200 == 0) {
-    FUN_00468ec0();
+    DynamicCollisionBody__UpdatePosition();
   }
   return;
 }
@@ -7236,17 +7352,17 @@ void __fastcall FUN_0046a410(undefined4 *param_1)
 {
   *param_1 = &PTR_FUN_006c8720;
   DAT_0073600c = DAT_0073600c + -1;
-  FUN_00468410();
+  CollisionBody___CollisionBody();
   return;
 }
 
 
-// ==== 0x46a430 thunk_FUN_004684f0
+// ==== 0x46a430 CollisionBody::DoSnapshot
 
-void thunk_FUN_004684f0(void)
+void CollisionBody__DoSnapshot(void)
 
 {
-  FUN_004684f0();
+  CollisionBody__DoSnapshot();
   return;
 }
 
@@ -7274,7 +7390,7 @@ undefined4 * FUN_0046a440(undefined4 *param_1,undefined4 param_2,int param_3)
   pcStack_18 = FUN_00685d59;
   local_1c = ExceptionList;
   ExceptionList = &local_1c;
-  FUN_00468340(param_1,3);
+  CollisionBody__CollisionBody(param_1,3);
   *param_1 = &PTR_FUN_006c8720;
   DAT_0073600c = DAT_0073600c + 1;
   if (DAT_00736034 < DAT_0073600c) {
@@ -7309,7 +7425,7 @@ undefined4 * FUN_0046a440(undefined4 *param_1,undefined4 param_2,int param_3)
   local_2c = 0;
   local_28 = 0;
   FUN_00473480(param_1[0x18],0x3f800000);
-  FUN_00468680(param_1,param_1[0x18] + 0x14);
+  CollisionBody__SetBBoxMinMax(param_1,param_1[0x18] + 0x14);
   ExceptionList = local_1c;
   return param_1;
 }
@@ -7356,7 +7472,7 @@ void FUN_0046a5b0(undefined4 *param_1)
   *param_1 = &PTR_FUN_006c8720;
   DAT_0073600c = DAT_0073600c + -1;
   local_8 = 0xffffffff;
-  FUN_00468410();
+  CollisionBody___CollisionBody();
   ExceptionList = local_10;
   return;
 }
@@ -7371,7 +7487,7 @@ void __thiscall FUN_0046a640(int param_1,int param_2)
   char cVar2;
   
   FUN_00571ea0(param_1,"TrackPolygonCollisionBody");
-  FUN_004684f0(param_2);
+  CollisionBody__DoSnapshot(param_2);
   if ((*(char *)(param_2 + 0x3e) != '\0') || (*(char *)(param_2 + 0x3f) != '\0')) {
     FUN_00571c20(param_2,param_1 + 0x24,8,0xffffffff,0);
   }
@@ -8020,7 +8136,7 @@ float10 FUN_0046ae60(void)
     fStack_c0 = (float)fVar4;
   }
   fStack_b8 = 0.0;
-  FUN_00467ca0(1);
+  CollisionBodyWitness_UpdatePolygonSideFlag(1);
   iStack_b4 = 0;
   do {
     fVar3 = (fStack_c0 - fStack_b8) * _K_HALF + fStack_b8;
@@ -8590,7 +8706,7 @@ void FUN_0046bae0(int param_1)
   if (*(int *)(iVar7 + 0x264) == 0) {
     pfStack_204 = &local_130;
     uStack_208 = (float *)0x46bb21;
-    FUN_00467220();
+    CollisionBodyWitness__BeginCollision();
   }
   local_114 = *(undefined4 *)(iVar7 + 0x264);
   pfStack_204 = (float *)0x46bb36;

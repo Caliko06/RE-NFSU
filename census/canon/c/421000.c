@@ -892,7 +892,7 @@ void FUN_00421e80(void)
   
   FUN_00571ea0(0,"RaceCoordinator");
   FUN_0041fc00(DAT_007361f8);
-  FUN_004343f0();
+  Race__DoSnapshot();
   iVar2 = 0;
   if (0 < DAT_007361c4) {
     do {
@@ -955,7 +955,7 @@ void FUN_00421f00(int *param_1)
     DAT_0073619c = 0;
   }
   else {
-    DAT_0073619c = FUN_00434270();
+    DAT_0073619c = Race__Race();
   }
   pvVar5 = _malloc(0x17a0);
   iVar4 = 1;
@@ -993,7 +993,7 @@ void FUN_00421f00(int *param_1)
     }
   }
   param_1[6] = iVar4;
-  FUN_00434590(0);
+  Race__Init(0);
   FUN_00456ba0();
   FUN_0051f8a0(DAT_007356a8,iVar9);
   DAT_007361f0 = param_1;
@@ -1805,7 +1805,7 @@ switchD_00422eca_caseD_4:
       FEngStopInteraction();
     }
     DAT_006fb988 = 1;
-    FUN_00434b50(DAT_0073619c,*(undefined4 *)(param_1 + 0x18));
+    Race__SetRaceStage(DAT_0073619c,*(undefined4 *)(param_1 + 0x18));
     return 1;
   case 3:
     local_24 = DAT_0073ad3c - *(int *)(param_1 + 4);
@@ -2003,7 +2003,7 @@ undefined4 __thiscall FUN_00423280(int param_1,undefined4 param_2,undefined4 par
       if (*(int *)(param_1 + 0x38) == 0) {
         iVar3 = FindResourceFile("GLOBAL\\PRERACEANIM.LZC");
         if (iVar3 == 0) {
-          FUN_00434b50(DAT_0073619c,3);
+          Race__SetRaceStage(DAT_0073619c,3);
           FUN_00421ae0(4);
           FUN_00495e20();
           ExceptionList = local_10;
@@ -2093,7 +2093,7 @@ LAB_00423468:
     tPreRaceScreenManager__RequestStatsScreen();
   }
 LAB_0042347b:
-  FUN_00434b50(piVar4,3);
+  Race__SetRaceStage(piVar4,3);
   FUN_00421ae0(4);
   ExceptionList = local_10;
   return 1;
@@ -2164,7 +2164,7 @@ undefined4 __thiscall FUN_00423530(undefined4 *param_1,undefined4 param_2,undefi
         param_1[0xf] = 0;
       }
     }
-    iVar3 = FUN_00435b30(DAT_0073619c);
+    iVar3 = Race__AreAllPlayersFinishedRacing(DAT_0073619c);
     if (iVar3 == 0) {
       ExceptionList = local_10;
       return 1;
@@ -2179,7 +2179,7 @@ undefined4 __thiscall FUN_00423530(undefined4 *param_1,undefined4 param_2,undefi
     return 1;
   case 4:
     ExceptionList = &local_10;
-    iVar3 = FUN_00435b30(DAT_0073619c);
+    iVar3 = Race__AreAllPlayersFinishedRacing(DAT_0073619c);
     if (iVar3 == 0) {
       ExceptionList = local_10;
       return 1;
@@ -2645,7 +2645,7 @@ void FUN_00423f20(void)
   pcStack_8 = FUN_00689713;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  FUN_00435a70();
+  Race__SimulateRaceFinish();
   iVar8 = DAT_0073619c;
   *(undefined4 *)(DAT_0073619c + 0x20) = 0;
   *(undefined4 *)(iVar8 + 0x1c) = 0;
@@ -2653,7 +2653,7 @@ void FUN_00423f20(void)
   cVar3 = FUN_0043a2e0();
   iVar8 = DAT_0077b244;
   if ((cVar3 != '\0') && (DAT_0077b244 != 0)) {
-    iVar4 = FUN_004390f0();
+    iVar4 = Race__GetRacingCarOfRacer();
     if (*(short *)(iVar4 + 0x10) != 10) {
       iVar4 = FUN_00439930(4);
       if (*(int *)(iVar8 + 0x18c + iVar4 * 4) < 1) goto LAB_0042406f;
@@ -4351,7 +4351,7 @@ LAB_00425665:
     uVar5 = 0;
   }
   else {
-    uVar5 = FUN_00469b00(iVar4,param_1);
+    uVar5 = CarCollisionBody__CarCollisionBody(iVar4,param_1);
   }
   local_14._0_1_ = 0;
   *(undefined4 *)(param_1 + 0x3c) = uVar5;
@@ -4423,7 +4423,7 @@ LAB_00425665:
       uVar5 = 0;
     }
     else {
-      uVar5 = FUN_00436ff0(pvVar9,param_1);
+      uVar5 = PidCarController__PidCarController(pvVar9,param_1);
     }
     *(undefined4 *)(param_1 + 0x830) = uVar5;
   }
@@ -5022,7 +5022,7 @@ void FUN_004267a0(float param_1)
   }
   if (((*(char *)(*(int *)(unaff_ESI + 0x14) + 0x734) != '\0') && (*(int *)(unaff_ESI + 0x830) != 0)
       ) && (*DAT_0073619c == 4)) {
-    iVar3 = FUN_00435b30(DAT_0073619c);
+    iVar3 = Race__AreAllPlayersFinishedRacing(DAT_0073619c);
     if (iVar3 == 0) {
       RemoteCarState__ClearStaleInput(*(undefined4 *)(unaff_ESI + 0x830),param_1);
     }
@@ -5071,11 +5071,11 @@ void JumpCamTrigger(float param_1)
   float local_18;
   
   if (((*(int *)(in_EAX + 0x830) != 0) && (*DAT_0073619c == 4)) &&
-     (iVar8 = FUN_00435b30(DAT_0073619c), iVar8 == 0)) {
+     (iVar8 = Race__AreAllPlayersFinishedRacing(DAT_0073619c), iVar8 == 0)) {
     if (*(char *)(*(int *)(in_EAX + 0x14) + 0x734) != '\0') {
-      FUN_00438030(param_1);
+      RemoteCarState__SmoothPosition(param_1);
     }
-    FUN_00438440(param_1);
+    RemoteCarState__AntiCheatCheck(param_1);
   }
   if (0.0 < param_1) {
     fVar2 = _K_ONE / param_1;
@@ -5320,7 +5320,7 @@ LAB_004270d9:
     if (0.3925 < ABS(fVar3)) {
       FUN_00572970(0x3f800000,"CarSlidingSideways");
     }
-    iVar8 = FUN_00468820(0);
+    iVar8 = CollisionBody__GetCollision(0);
     if (((iVar8 != 0) && (cVar6 = Collision__IsPlayerInvolved(), cVar6 != '\0')) &&
        (local_30 = (float)(DAT_0073ad34 - *(int *)(iVar8 + 0xc)),
        (float)(int)local_30 * 0.00025 < 0.5)) {
@@ -7736,7 +7736,7 @@ undefined4 FUN_0042aa70(void)
   iVar4 = 0;
   if (0 < iVar3) {
     do {
-      iVar2 = FUN_00468820(iVar4);
+      iVar2 = CollisionBody__GetCollision(iVar4);
       iVar1 = *(int *)(*(int *)(iVar2 + 100) + 600);
       if (((*(char *)(iVar1 + 0x15) == '\x03') &&
           (0.7 < ABS(*(float *)(*(int *)(iVar1 + 0x60) + 0x78)))) ||
@@ -7863,7 +7863,7 @@ void FUN_0042abf0(void)
   int in_EAX;
   
   if (*(char *)(*(int *)(in_EAX + 0x998) + 0x14) != '\0') {
-    FUN_00436230(0x3f800000);
+    StyleItem__Trigger(0x3f800000);
   }
   return;
 }
@@ -8308,7 +8308,7 @@ undefined4 * FUN_0042b0d0(undefined4 *param_1,int param_2,int param_3)
   param_1[0x245] = 0;
   local_14._0_1_ = 1;
   param_1[0x255] = 0;
-  FUN_004367e0(param_1 + 600);
+  StyleItemTable__StyleItemTable(param_1 + 600);
   local_14._0_1_ = 2;
   DriftManager__DriftManager();
   param_1[0x299] = 0;
@@ -8992,7 +8992,7 @@ void FUN_0042c1f0(void)
         }
         FUN_00572970(((float)local_4 - _K_ONE) * 7.5 + 10.0,"CrossFinishLine");
       }
-      FUN_00435b30(iVar7);
+      Race__AreAllPlayersFinishedRacing(iVar7);
     }
     uVar8 = _ftol_nocw();
     *(undefined4 *)(in_EAX + 0x5c) = uVar8;
@@ -9970,7 +9970,7 @@ void FUN_0042d9d0(undefined4 param_1,int param_2)
   
   if ((((param_2 == 0xab) && (iVar2 = *DAT_007361f0, iVar2 != 5)) && (iVar2 != 6)) && (iVar2 != 10))
   {
-    iVar2 = FUN_00435b30(DAT_0073619c);
+    iVar2 = Race__AreAllPlayersFinishedRacing(DAT_0073619c);
     if ((iVar2 == 0) && (cVar1 = FUN_0043a2e0(), cVar1 == '\0')) {
       return;
     }
@@ -12120,7 +12120,7 @@ LAB_00430a7a:
   if ((DAT_0078a346 != '\0') || (DAT_007361a0 != 0)) {
     FUN_004300f0();
   }
-  FUN_00436940(in_EAX + 0x960,in_EAX,DAT_0073457c);
+  StyleItemTable__Update(in_EAX + 0x960,in_EAX,DAT_0073457c);
   return;
 }
 

@@ -100,3 +100,4 @@ Open: see each doc's Open list (traffic: writer of [ebx+0x59d4], Free Run x1.5, 
 14:20 canon wave round 5 by GC file (canon-sonnet): PartsBrowser 60, CameraMover 59, AIAction family 49; 5 corrections; named 2,174 -> 2,343; anchors 657
 15:13 canon wave round 6 by GC file (canon-sonnet-c1): AIPlan 49, PartsBrowser 60, CameraMover 59; Hopper 65/77 low rows agreed; 2 corrections; named 2,343 -> 2,511; anchors 788
 15:24 canon wave round 7 by GC file (canon-sonnet-c1): EAX3DS 60, FEngInterface 60, FEPkg_PostRace 60; named 2,511 -> 2,691; anchors 921
+15:34 canon wave round 8 by GC file (canon-sonnet-c1): CollisionBody 60, RaceParameters(Race) 60, FEPkg_MU_Options 60; named 2,691 -> 2,871; anchors 1,032

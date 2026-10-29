@@ -3754,16 +3754,16 @@ void thunk_FUN_00547770(void)
   int iVar3;
   undefined1 auStack_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(6);
+  BitStream__BitStream();
+  BitStream__WriteByte(6);
   DAT_00735508 = DAT_00735508 + 1;
   FUN_00548840(DAT_00735508);
-  iVar1 = FUN_004388d0();
+  iVar1 = BitStream__GetSizeInBytes();
   iVar2 = FUN_006497c0();
   iVar3 = 0;
   if (0 < iVar1) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar3 + iVar2));
+      BitStream__WriteByte(*(undefined1 *)(iVar3 + iVar2));
       iVar3 = iVar3 + 1;
     } while (iVar3 < iVar1);
   }
@@ -3811,8 +3811,8 @@ void FUN_005468a0(void)
   DAT_00730178 = FUN_00546e60;
   _DAT_0073de20 = FUN_00662a90(0x61646472,0,0);
   DAT_00735500 = 1;
-  FUN_004392a0();
-  FUN_004389b0(0xd);
+  BitStream__BitStream();
+  BitStream__WriteByte(0xd);
   FUN_00548840(DAT_00735500);
   FUN_00547910(0xd,local_40c,1);
   DAT_006f3da0 = FUN_00546cb0();
@@ -3848,8 +3848,8 @@ void FUN_00546980(void)
     if ((iVar6 == DAT_006f1e08) && (0 < DAT_006f1e08)) {
       Race__RequestStartOrRestart();
       DAT_00735500 = 2;
-      FUN_004392a0();
-      FUN_004389b0(0xd);
+      BitStream__BitStream();
+      BitStream__WriteByte(0xd);
       FUN_00548840(DAT_00735500);
       FUN_00547910(0xd,local_40c,1);
       FUN_0054e440();
@@ -3868,8 +3868,8 @@ void FUN_00546980(void)
       if (iVar6 != DAT_007354d0) goto LAB_00546b8f;
       _DAT_007402a4 = DAT_0073ad3c;
       DAT_00735500 = 5;
-      FUN_004392a0();
-      FUN_004389b0(0xd);
+      BitStream__BitStream();
+      BitStream__WriteByte(0xd);
       iVar6 = DAT_00735500;
     }
     else {
@@ -3886,8 +3886,8 @@ void FUN_00546980(void)
       } while ((int)puVar5 < 0x73de20);
       FUN_0043af50(fVar2 * 0.004 + (float)DAT_0073ad34 * 0.00025 + 0.25);
       DAT_00735500 = 6;
-      FUN_004392a0();
-      FUN_004389b0(0xd);
+      BitStream__BitStream();
+      BitStream__WriteByte(0xd);
       FUN_00548840(DAT_00735500);
       iVar6 = DAT_0077b25c;
     }
@@ -4063,7 +4063,7 @@ void FUN_00546e60(undefined4 param_1,undefined4 *param_2,uint param_3,undefined4
   int iStack_c;
   undefined1 uStack_4;
   
-  FUN_004392a0();
+  BitStream__BitStream();
   puVar3 = auStack_40c;
   for (uVar2 = param_3 >> 2; uVar2 != 0; uVar2 = uVar2 - 1) {
     *puVar3 = *param_2;
@@ -4077,9 +4077,9 @@ void FUN_00546e60(undefined4 param_1,undefined4 *param_2,uint param_3,undefined4
   }
   iStack_c = param_3 << 3;
   uStack_4 = 0;
-  bVar1 = FUN_004389e0();
+  bVar1 = BitStream__ReadByte();
   if (bVar1 < 0xf) {
-    FUN_004388d0(param_4);
+    BitStream__GetSizeInBytes(param_4);
     FUN_00548dd0(bVar1);
     switch(bVar1) {
     case 1:
@@ -4134,7 +4134,7 @@ void FUN_00547020(int param_1)
   } while ((int)puVar2 < 0x73de20);
   if ((2 < DAT_00735500) && (puVar4 != (undefined4 *)0x0)) {
     FUN_005488d0(0x20);
-    FUN_00438980(&DAT_007402b0);
+    BitStream__ReadRangedInt(&DAT_007402b0);
     FUN_005488d0(0x20);
     uVar1 = *puVar4;
     iVar3 = Race__GetPlayer(uVar1);
@@ -4300,8 +4300,8 @@ void FUN_005472f0(void)
     puVar3 = (undefined4 *)0x0;
   } while ((int)puVar2 < 0x73de20);
   uVar1 = *puVar3;
-  FUN_004392a0();
-  FUN_004389b0(0);
+  BitStream__BitStream();
+  BitStream__WriteByte(0);
   FUN_00548840(unaff_EBX);
   FUN_00548840(uVar1);
   uVar1 = DAT_006f3da0;
@@ -4319,8 +4319,8 @@ void FUN_00547390(void)
 {
   undefined1 local_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(10);
+  BitStream__BitStream();
+  BitStream__WriteByte(10);
   FUN_00548840(DAT_00735504);
   FUN_00547910(10,local_40c,1);
   return;
@@ -4332,8 +4332,8 @@ void FUN_00547390(void)
 void FUN_005473e0(undefined4 param_1,undefined4 param_2,undefined1 param_3)
 
 {
-  FUN_004392a0();
-  FUN_004389b0(0xb);
+  BitStream__BitStream();
+  BitStream__WriteByte(0xb);
   FUN_00548840(param_2);
   FUN_00548840(param_3);
   FUN_005478d0(param_1,0xb);
@@ -4354,8 +4354,8 @@ void FUN_00547450(undefined4 param_1,undefined4 param_2)
   if (DAT_007361f8 != 0) {
     cVar2 = Race__HasPlayer(DAT_006f3da0);
     if (cVar2 != '\0') {
-      FUN_004392a0();
-      FUN_004389b0(4);
+      BitStream__BitStream();
+      BitStream__WriteByte(4);
       FUN_00548840(param_2);
       FUN_00548840((float)DAT_0073ad34 * 0.00025);
       iVar1 = DAT_006f3da0;
@@ -4384,8 +4384,8 @@ void FUN_00547560(void)
   undefined1 local_40c [1036];
   
   DAT_00735500 = 3;
-  FUN_004392a0();
-  FUN_004389b0(0xd);
+  BitStream__BitStream();
+  BitStream__WriteByte(0xd);
   FUN_00548840(DAT_00735500);
   FUN_00547910(0xd,local_40c,1);
   return;
@@ -4400,8 +4400,8 @@ void FUN_005475c0(void)
   undefined1 local_40c [1036];
   
   DAT_00735500 = 4;
-  FUN_004392a0();
-  FUN_004389b0(0xd);
+  BitStream__BitStream();
+  BitStream__WriteByte(0xd);
   FUN_00548840(DAT_00735500);
   FUN_00547910(0xd,local_40c,1);
   return;
@@ -4418,14 +4418,14 @@ void FUN_00547620(void)
   int iVar3;
   undefined1 local_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(7);
-  iVar1 = FUN_004388d0();
+  BitStream__BitStream();
+  BitStream__WriteByte(7);
+  iVar1 = BitStream__GetSizeInBytes();
   iVar2 = FUN_006497c0();
   iVar3 = 0;
   if (0 < iVar1) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar3 + iVar2));
+      BitStream__WriteByte(*(undefined1 *)(iVar3 + iVar2));
       iVar3 = iVar3 + 1;
     } while (iVar3 < iVar1);
   }
@@ -4444,14 +4444,14 @@ void FUN_00547690(void)
   int iVar3;
   undefined1 local_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(5);
-  iVar1 = FUN_004388d0();
+  BitStream__BitStream();
+  BitStream__WriteByte(5);
+  iVar1 = BitStream__GetSizeInBytes();
   iVar2 = FUN_006497c0();
   iVar3 = 0;
   if (0 < iVar1) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar3 + iVar2));
+      BitStream__WriteByte(*(undefined1 *)(iVar3 + iVar2));
       iVar3 = iVar3 + 1;
     } while (iVar3 < iVar1);
   }
@@ -4470,14 +4470,14 @@ void FUN_00547700(void)
   int iVar3;
   undefined1 local_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(0xe);
-  iVar1 = FUN_004388d0();
+  BitStream__BitStream();
+  BitStream__WriteByte(0xe);
+  iVar1 = BitStream__GetSizeInBytes();
   iVar2 = FUN_006497c0();
   iVar3 = 0;
   if (0 < iVar1) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar3 + iVar2));
+      BitStream__WriteByte(*(undefined1 *)(iVar3 + iVar2));
       iVar3 = iVar3 + 1;
     } while (iVar3 < iVar1);
   }
@@ -4496,16 +4496,16 @@ void FUN_00547770(void)
   int iVar3;
   undefined1 local_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(6);
+  BitStream__BitStream();
+  BitStream__WriteByte(6);
   DAT_00735508 = DAT_00735508 + 1;
   FUN_00548840(DAT_00735508);
-  iVar1 = FUN_004388d0();
+  iVar1 = BitStream__GetSizeInBytes();
   iVar2 = FUN_006497c0();
   iVar3 = 0;
   if (0 < iVar1) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar3 + iVar2));
+      BitStream__WriteByte(*(undefined1 *)(iVar3 + iVar2));
       iVar3 = iVar3 + 1;
     } while (iVar3 < iVar1);
   }
@@ -4557,8 +4557,8 @@ void FUN_00547870(undefined4 param_1)
   undefined4 in_EAX;
   undefined1 local_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(1);
+  BitStream__BitStream();
+  BitStream__WriteByte(1);
   FUN_00548840(in_EAX);
   FUN_0043b4e0(in_EAX,local_40c);
   FUN_005479e0(param_1,1,1);
@@ -4599,15 +4599,15 @@ void FUN_00547910(undefined4 param_1,undefined4 param_2,undefined4 param_3)
   do {
     iVar2 = puVar3[1];
     if ((iVar2 != -1) && (puVar3 != (undefined4 *)0x0)) {
-      FUN_004388d0(param_3);
+      BitStream__GetSizeInBytes(param_3);
       uVar1 = FUN_006497c0();
       iVar2 = FUN_0054e480(iVar2,uVar1);
       if (iVar2 != 0) {
         if (2 < DAT_006f3d88) {
-          FUN_004388d0();
+          BitStream__GetSizeInBytes();
           FUN_006497c0();
         }
-        FUN_004388d0(param_3);
+        BitStream__GetSizeInBytes(param_3);
         FUN_00548d70(param_1);
       }
     }
@@ -4624,8 +4624,8 @@ void FUN_005479a0(undefined4 param_1)
 {
   undefined1 local_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(param_1);
+  BitStream__BitStream();
+  BitStream__WriteByte(param_1);
   FUN_00547910(param_1,local_40c,1);
   return;
 }
@@ -4639,15 +4639,15 @@ void FUN_005479e0(undefined4 param_1,undefined4 param_2,undefined4 param_3)
   undefined4 uVar1;
   int iVar2;
   
-  FUN_004388d0(param_3);
+  BitStream__GetSizeInBytes(param_3);
   uVar1 = FUN_006497c0();
   iVar2 = FUN_0054e480(param_1,uVar1);
   if (iVar2 != 0) {
     if (2 < DAT_006f3d88) {
-      FUN_004388d0();
+      BitStream__GetSizeInBytes();
       FUN_006497c0();
     }
-    FUN_004388d0(param_3);
+    BitStream__GetSizeInBytes(param_3);
     FUN_00548d70(param_2);
   }
   return;
@@ -4775,11 +4775,11 @@ void FUN_00547c60(void)
       _K_ONE / (float)DAT_006f3d8c < fVar1 != (_K_ONE / (float)DAT_006f3d8c == fVar1))))) {
     cVar3 = Race__HasPlayer(DAT_006f3d94);
     if (cVar3 != '\0') {
-      FUN_004392a0();
-      FUN_004389b0(2);
+      BitStream__BitStream();
+      BitStream__WriteByte(2);
       FUN_00548840((float)DAT_0073ad34 * 0.00025);
       iVar2 = DAT_006f3d94;
-      FUN_00436e60();
+      BitStream__WriteClampedInt();
       FUN_00548840((float)DAT_0073ad3c * 0.00025);
       FUN_0043d3d0(iVar2,local_40c);
       FUN_005487c0(2,0);
@@ -4853,7 +4853,7 @@ void FUN_00547e00(undefined4 *param_1,uint param_2,undefined4 param_3)
   int iStack_c;
   undefined1 uStack_4;
   
-  FUN_004392a0();
+  BitStream__BitStream();
   puVar3 = auStack_40c;
   for (uVar2 = param_2 >> 2; uVar2 != 0; uVar2 = uVar2 - 1) {
     *puVar3 = *param_1;
@@ -4867,9 +4867,9 @@ void FUN_00547e00(undefined4 *param_1,uint param_2,undefined4 param_3)
   }
   iStack_c = param_2 << 3;
   uStack_4 = 0;
-  bVar1 = FUN_004389e0();
+  bVar1 = BitStream__ReadByte();
   if (bVar1 < 0xf) {
-    FUN_004388d0(param_3);
+    BitStream__GetSizeInBytes(param_3);
     FUN_00548dd0(bVar1);
     switch(bVar1) {
     case 0:
@@ -4934,7 +4934,7 @@ void FUN_00548000(undefined4 param_1)
   int iVar2;
   
   if (DAT_007361f8 != 0) {
-    iVar1 = FUN_00438980(&DAT_007402b0);
+    iVar1 = BitStream__ReadRangedInt(&DAT_007402b0);
     FUN_005488d0(0x20);
     iVar2 = Race__GetPlayer(iVar1);
     if ((iVar2 != 0) && (*(float *)(iVar2 + 0x1a4) < 0.0)) {
@@ -5032,8 +5032,8 @@ void FUN_00548250(void)
   FUN_0043b090(0,0,in_EAX);
   FUN_00548340();
   DAT_007354e0 = 3;
-  FUN_004392a0();
-  FUN_004389b0(0xc);
+  BitStream__BitStream();
+  BitStream__WriteByte(0xc);
   FUN_00548840(DAT_007354e0);
   FUN_005487c0(0xc,1);
   return;
@@ -5061,8 +5061,8 @@ void FUN_00548340(void)
   undefined4 uVar1;
   undefined1 local_40c [1036];
   
-  FUN_004392a0();
-  FUN_004389b0(1);
+  BitStream__BitStream();
+  BitStream__WriteByte(1);
   uVar1 = DAT_006f3d94;
   FUN_00548840(DAT_006f3d94);
   FUN_0043b4e0(uVar1,local_40c);
@@ -5076,8 +5076,8 @@ void FUN_00548340(void)
 void FUN_005483a0(undefined4 param_1)
 
 {
-  FUN_004392a0();
-  FUN_004389b0(3);
+  BitStream__BitStream();
+  BitStream__WriteByte(3);
   FUN_00548840(param_1);
   FUN_005487c0(3,0);
   return;
@@ -5090,8 +5090,8 @@ void FUN_00548400(void)
 
 {
   DAT_007354e0 = 5;
-  FUN_004392a0();
-  FUN_004389b0(0xc);
+  BitStream__BitStream();
+  BitStream__WriteByte(0xc);
   FUN_00548840(DAT_007354e0);
   FUN_005487c0(0xc,1);
   return;
@@ -5104,8 +5104,8 @@ void FUN_00548460(void)
 
 {
   DAT_007354e0 = 6;
-  FUN_004392a0();
-  FUN_004389b0(0xc);
+  BitStream__BitStream();
+  BitStream__WriteByte(0xc);
   FUN_00548840(DAT_007354e0);
   FUN_005487c0(0xc,1);
   return;
@@ -5121,14 +5121,14 @@ void FUN_005484c0(void)
   int iVar2;
   int iVar3;
   
-  FUN_004392a0();
-  FUN_004389b0(7);
-  iVar1 = FUN_004388d0();
+  BitStream__BitStream();
+  BitStream__WriteByte(7);
+  iVar1 = BitStream__GetSizeInBytes();
   iVar2 = FUN_006497c0();
   iVar3 = 0;
   if (0 < iVar1) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar3 + iVar2));
+      BitStream__WriteByte(*(undefined1 *)(iVar3 + iVar2));
       iVar3 = iVar3 + 1;
     } while (iVar3 < iVar1);
   }
@@ -5146,14 +5146,14 @@ void FUN_00548530(void)
   int iVar2;
   int iVar3;
   
-  FUN_004392a0();
-  FUN_004389b0(5);
-  iVar1 = FUN_004388d0();
+  BitStream__BitStream();
+  BitStream__WriteByte(5);
+  iVar1 = BitStream__GetSizeInBytes();
   iVar2 = FUN_006497c0();
   iVar3 = 0;
   if (0 < iVar1) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar3 + iVar2));
+      BitStream__WriteByte(*(undefined1 *)(iVar3 + iVar2));
       iVar3 = iVar3 + 1;
     } while (iVar3 < iVar1);
   }
@@ -5171,14 +5171,14 @@ void FUN_005485a0(void)
   int iVar2;
   int iVar3;
   
-  FUN_004392a0();
-  FUN_004389b0(0xe);
-  iVar1 = FUN_004388d0();
+  BitStream__BitStream();
+  BitStream__WriteByte(0xe);
+  iVar1 = BitStream__GetSizeInBytes();
   iVar2 = FUN_006497c0();
   iVar3 = 0;
   if (0 < iVar1) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar3 + iVar2));
+      BitStream__WriteByte(*(undefined1 *)(iVar3 + iVar2));
       iVar3 = iVar3 + 1;
     } while (iVar3 < iVar1);
   }
@@ -5234,8 +5234,8 @@ void FUN_005486a0(void)
 void FUN_00548780(undefined4 param_1)
 
 {
-  FUN_004392a0();
-  FUN_004389b0(param_1);
+  BitStream__BitStream();
+  BitStream__WriteByte(param_1);
   FUN_005487c0(param_1,1);
   return;
 }
@@ -5249,15 +5249,15 @@ void FUN_005487c0(undefined4 param_1,undefined4 param_2)
   undefined4 uVar1;
   int iVar2;
   
-  FUN_004388d0(param_2);
+  BitStream__GetSizeInBytes(param_2);
   uVar1 = FUN_006497c0();
   iVar2 = FUN_0054e260(uVar1);
   if (iVar2 != 0) {
     if (2 < DAT_006f3d88) {
-      FUN_004388d0();
+      BitStream__GetSizeInBytes();
       FUN_006497c0();
     }
-    FUN_004388d0(param_2);
+    BitStream__GetSizeInBytes(param_2);
     FUN_00548d70(param_1);
   }
   return;
@@ -5386,11 +5386,11 @@ void FUN_00548980(undefined4 param_1,int param_2)
   int iVar1;
   int unaff_EDI;
   
-  FUN_00438a00(unaff_EDI);
+  BitStream__WriteShort(unaff_EDI);
   iVar1 = 0;
   if (0 < unaff_EDI) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar1 + param_2));
+      BitStream__WriteByte(*(undefined1 *)(iVar1 + param_2));
       iVar1 = iVar1 + 1;
     } while (iVar1 < unaff_EDI);
   }
@@ -5460,7 +5460,7 @@ void FUN_00548a50(undefined4 param_1,int param_2)
   iVar1 = 0;
   if (0 < unaff_EDI) {
     do {
-      FUN_004389b0(*(undefined1 *)(iVar1 + param_2));
+      BitStream__WriteByte(*(undefined1 *)(iVar1 + param_2));
       iVar1 = iVar1 + 1;
     } while (iVar1 < unaff_EDI);
   }
@@ -6853,7 +6853,7 @@ undefined4 FUN_00549ed0(undefined4 param_1,undefined4 param_2)
       } while (cVar2 != '\0');
       iVar4 = FUN_005ab3e0((int)pcVar3 - (unaff_ESI + 0xfb),local_50c,0x100);
       if (iVar4 != 0) {
-        FUN_004392a0();
+        BitStream__BitStream();
         FUN_00548a50(local_40c,local_50c);
         FUN_0043ccf0(param_2,local_40c,0x2a);
         return param_2;
@@ -7462,14 +7462,14 @@ void FUN_0054aa70(void)
   undefined1 local_730 [1836];
   
   if (*(int *)(in_EAX + 0x68) != 0) {
-    FUN_004392a0();
+    BitStream__BitStream();
     RideInfo__Init();
     cFrontendDatabase__BuildRideForCarHandle(local_730);
     FUN_0043cb60(local_730,local_b40,1);
     GetNetModeCode();
     uVar1 = FUN_00549580();
     FUN_00565da0(uVar1);
-    uVar1 = FUN_004388d0(local_dbe,0xfe,1);
+    uVar1 = BitStream__GetSizeInBytes(local_dbe,0xfe,1);
     uVar1 = FUN_006497c0(uVar1);
     FUN_005ab2b0(uVar1);
     local_cc0[0] = 0;
@@ -11870,14 +11870,14 @@ void FUN_0054fd50(int param_1)
       *(uint *)(iVar4 + 0x1c) = *(uint *)(iVar4 + 0x1c) & 0xfffffffd | 0x400000;
     }
     iVar4 = DAT_0077b244;
-    FUN_00439130();
+    Race__FindRacerById();
     param_1 = 0;
     iVar5 = 1;
     puVar9 = (undefined4 *)(iVar3 + 0x44);
     do {
       iVar3 = Race__GetPlayer(param_1);
       if (iVar3 != 0) {
-        FUN_00439130();
+        Race__FindRacerById();
         if (iVar4 == iVar3) {
           FEObject__SetFormattedText("%d) %s",iVar5,iVar3 + 0x19);
         }
@@ -11922,7 +11922,7 @@ void FUN_0054fd50(int param_1)
     if (0 < iVar4) {
       do {
         iVar4 = iVar5;
-        cVar2 = FUN_00438a40(iVar5);
+        cVar2 = Obj_GetByte4(iVar5);
         iVar4 = FUN_0043d8c0((int)cVar2,iVar4);
         iVar4 = iVar4 - iVar3;
         if (iVar4 < 1) {
