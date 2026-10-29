@@ -67,6 +67,7 @@ static struct { uint32_t drv, dir; } rdir[16];   // free_dir's table, see free_r
 static int n_game, n_free;             // free_spacing: moves with the game's spacing, moves given the track's spacing
 static int n_far, n_offbit, n_onbit;   // free_recycle: far cars sent to a move; free_tnode: cars placed on a node without / with the bit
 static uint32_t xrec[12], nxrec;       // the extra racers' records (rm_records, outside the RaceManager) and how many there are
+static uint32_t tele;            // the TrafficTeleporter, cached by free_recycle (ecx of its call) for free_tmove
 static uint32_t names;           // NRIV_MAX guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
 
 static uint32_t rnd(uint32_t *s) { uint32_t x = *s; x ^= x << 13; x ^= x >> 17; x ^= x << 5; return *s = x ? x : 0x9e3779b9u; }
@@ -259,9 +260,19 @@ static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) 
     if (off < 0) off = getenv("RN_RESPAWN") && !atoi(getenv("RN_RESPAWN")), far = getenv("RN_RIVALFAR") ? (float)atof(getenv("RN_RIVALFAR")) : 400.0f;
     if (off || !pc) return;
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
+    // Stuck (OWNER 2026-10-28, MW's AIPursuit/AITrafficManager rule): a rival under 2 m/s for 5 s in a row (this runs once a
+    // second, after the grid) is respawned like a far one, whatever its distance.
+    static struct { uint32_t r; float x, y; int slow; } st5[16];
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4);
-        if (!e || ld(c, e + 4, 4) != 2 || hypot(ldf(c, r + 0x50) - px, ldf(c, r + 0x54) - py) < far) continue;
+        if (!e || ld(c, e + 4, 4) != 2) continue;
+        int s = 0;
+        while (s < 15 && st5[s].r && st5[s].r != r) s++;
+        float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
+        st5[s].slow = st5[s].r == r && hypot(x - st5[s].x, y - st5[s].y) < 2.0 ? st5[s].slow + 1 : 0;
+        st5[s].r = r, st5[s].x = x, st5[s].y = y;
+        int stuck = st5[s].slow >= 5;
+        if (!stuck && hypot(x - px, y - py) < far) continue;
         int i = 0;
         while (i < 16 && done[i] && done[i] != r) i++;
         if (i == 16 || (done[i] == r && rn_telem.presents < when[i] + 480)) continue;
@@ -299,13 +310,92 @@ static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) 
         memcpy(&p[3], &v, 4), memcpy(&p[5], &dir, 4);
         call_guest(c, 0x427f70, 9, p);
         c->ftop = ft;
-        done[i] = r, when[i] = rn_telem.presents;
+        done[i] = r, when[i] = rn_telem.presents, st5[s].slow = 0;
         double dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py;
         if (getenv("RN_FREELOG"))
-            rn_log("FREE respawn %s: %.0f m -> %.0f m %s (walk %s %.0f m, ret %u, node %08x dir %+.0f flag %u vt %08x, %.0f m/s) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), was,
+            rn_log("FREE respawn %s%s: %.0f m -> %.0f m %s (walk %s %.0f m, ret %u, node %08x dir %+.0f flag %u vt %08x, %.0f m/s) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), stuck ? " (stuck)" : "", was,
                    hypot(dx, dy), dx * vx + dy * vy >= 0 ? "ahead" : "behind", ahead ? "ahead" : "behind", m, w, n2, dir, flag, had, v, rn_telem.presents);
         return;                                                   // one rival a second
     }
+}
+
+// Traffic (OWNER 2026-10-28: "traffic like MW"): the TrafficTeleporter keeps cars only along the race route, so in the open
+// world the player outruns them and drives empty streets. MW's AITrafficManager rule, with this game's own placer: every
+// 30 frames, while fewer than TMOVE_NEAR cars are within 250 m, one car that is parked (driver +0x4d1), farther than 400 m,
+// or behind the player (dot with his motion < 0) and > 130 m away for 4 s, goes to a node TMOVE_AHEAD +-50 m + 1 s of speed
+// ahead on the road (0x4563d0 from the player's node, as free_respawn), at least 150 m away in a straight line (out of view
+// distance) and 20 m from every car. The move is the Free Run move's own tail (0x59a2c0 at 0x59a5ac..0x59a6c6): lane =
+// 0x5995e0(ecx = teleporter; node, side = 0x59aea0's coin on [0x78a304]), -1 = none; speed = 0x42adf0 (eax node, ecx lane:
+// byte [node + lane + 0x6a]); 0x59a7c0(car, node, 0, lane, 0x41c4b127, speed, 0) (thiscall, ret 0x1c: a lane >= 6 drives
+// against the node direction, then 0x427f70 places the car and its AI). RN_FREETMOVE=0: off.
+#define TMOVE_NEAR 10
+#define TMOVE_AHEAD 200.0f
+static int n_tmove, n_tfail;
+static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
+    static int off = -1; static uint32_t seed = 0x7a11c0de;
+    static struct { uint32_t car, since; } bh[64];
+    if (off < 0) off = getenv("RN_FREETMOVE") && !atoi(getenv("RN_FREETMOVE"));
+    if (off || !tele || !pc) return;
+    double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
+    uint32_t pick = 0; int prio = 0, near = 0;
+    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
+        if (!e || ld(c, e + 4, 4) != 3 || !v) continue;
+        double dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py, d = hypot(dx, dy);
+        near += d < 250;
+        int b = 0;
+        while (b < 63 && bh[b].car && bh[b].car != r) b++;
+        if (bh[b].car != r) bh[b].car = r, bh[b].since = 0;
+        int behind = sp > 2 && dx * vx + dy * vy < 0 && d > 130;
+        if (!behind) bh[b].since = 0;
+        else if (!bh[b].since) bh[b].since = rn_telem.presents;
+        int p = c->mem[v + 0x4d1] ? 3 : d > 400 ? 2 : behind && rn_telem.presents >= bh[b].since + 240 ? 1 : 0;
+        if (p > prio) prio = p, pick = r;
+    }
+    if (near >= TMOVE_NEAR || !pick) return;
+    if (!respawn_pair) respawn_pair = guest_alloc(8);
+    uint32_t zero = 0, ft = c->ftop;
+    c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
+    c->r[EAX] = pc; uint32_t node = call_guest(c, 0x428160, 1, &zero);
+    st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
+    c->r[EAX] = respawn_pair;
+    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_tfail++; return; }
+    int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0;
+    float m = TMOVE_AHEAD - 50.0f + (float)(rnd(&seed) % 101) + (float)sp;
+    uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)along, 0};
+    memcpy(&a[2], &m, 4);
+    c->r[ECX] = sec, c->r[EAX] = node;
+    call_guest_cdecl(c, 0x4563d0, 5, a);
+    uint32_t n2 = ld(c, respawn_pair + 4, 4);
+    c->r[EAX] = respawn_pair;
+    if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_tfail++; return; }
+    float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
+    int ok = hypot(nx - px, ny - py) >= 150;
+    for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++)
+        ok = o == pick || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= 20;
+    if (!ok) { c->ftop = ft; n_tfail++; return; }
+    c->r[ECX] = tele;
+    uint32_t side = call_guest(c, 0x59aea0, 0, NULL) & 0xff, la[2] = {n2, side};
+    c->r[ECX] = tele;
+    int lane = (int)call_guest(c, 0x5995e0, 2, la);
+    if (lane == -1) { c->ftop = ft; n_tfail++; return; }
+    c->r[EAX] = n2, c->r[ECX] = (uint32_t)lane;
+    call_guest(c, 0x42adf0, 0, NULL);
+    float v = (float)c->st[c->ftop];
+    fpop(c);    // a pop, not ftop = ft: the slot's tag stays set otherwise, and 0x59a7c0's next push (0x442590) reads it as a stack overflow -> NaN
+
+    uint32_t p[7] = {pick, n2, 0, (uint32_t)lane, 0x41c4b127, 0, 0};
+    memcpy(&p[5], &v, 4);
+    double was = hypot(ldf(c, pick + 0x50) - px, ldf(c, pick + 0x54) - py);
+    c->r[ECX] = tele;
+    call_guest(c, 0x59a7c0, 7, p);
+    c->ftop = ft;
+    for (int b = 0; b < 64; b++) if (bh[b].car == pick) bh[b].since = 0;
+    n_tmove++;
+    static int shown;
+    if (getenv("RN_FREELOG") && shown++ < 40)
+        rn_log("FREE tmove %s %.0f m -> %.0f m (walk %.0f m, lane %d, %.1f m/s, %d near) frame %u", prio == 3 ? "parked" : prio == 2 ? "far" : "behind", was,
+               hypot(ldf(c, pick + 0x50) - px, ldf(c, pick + 0x54) - py), m, lane, v, near, rn_telem.presents);
 }
 
 void free_tick(Ctx *c) {
@@ -315,7 +405,7 @@ void free_tick(Ctx *c) {
     // The setup runs in the front end (state 3, runs/jump_3_1001): the race is over once state 6 went back to 3.
     if (ld(c, 0x77a920, 4) != 6) {
         if (raced && ld(c, 0x77a920, 4) == 3) {
-            live = raced = 0, start = 0;
+            live = raced = 0, start = 0, tele = 0;
             memset(rdir, 0, sizeof rdir);
             if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
             if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
@@ -327,9 +417,20 @@ void free_tick(Ctx *c) {
     // +4/+6/+8) for each record of its own, so the extra records get the same call (RN_FREEXREC=0: not).
     static int xr = -1;
     if (xr < 0) xr = !getenv("RN_FREEXREC") || atoi(getenv("RN_FREEXREC"));
+    // The RM never ranks an extra record (position +0xa stays 0), and the catch-up 0x44c010 reads its position curve 0x779f38/0x779f78
+    // at index (pos[player rec] - pos[rival rec]) + 7 (or + 8 when < 0): an extra at 0 against a player at 1..4 got a leader's slowdown
+    // or a tail's boost by rank alone. Each extra gets the player's position, so the index is 7 (equal ranks) and the route gap decides.
+    uint32_t prec = 0, rl = ld(c, 0x7361f8, 4);
+    for (uint32_t r = rl ? ld(c, rl, 4) : 0, k = 0; r && r != rl && k < 200 && !prec; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (e && ld(c, e + 4, 4) == 1) prec = ld(c, r + 0x1c, 4);
+    }
     for (uint32_t k = 0; xr && k < nxrec; k++) {
         uint32_t keep[4] = {c->r[EBX], c->r[ESI], c->r[EDI], c->r[EBP]};
-        if (ld(c, ld(c, xrec[k], 4) + 0x1c, 4) == xrec[k] && ld(c, xrec[k] + 0x10, 2) == 0) c->r[EDI] = xrec[k], call_guest(c, 0x4338c0, 0, NULL);
+        if (ld(c, ld(c, xrec[k], 4) + 0x1c, 4) == xrec[k] && ld(c, xrec[k] + 0x10, 2) == 0) {
+            c->r[EDI] = xrec[k], call_guest(c, 0x4338c0, 0, NULL);
+            if (prec) c->mem[xrec[k] + 0xa] = c->mem[prec + 0xa];
+        }
         c->r[EBX] = keep[0], c->r[ESI] = keep[1], c->r[EDI] = keep[2], c->r[EBP] = keep[3];
     }
     if (cu_was < 0 && (!getenv("RN_FREECU") || atoi(getenv("RN_FREECU")))) {
@@ -346,6 +447,16 @@ void free_tick(Ctx *c) {
             if (kind == 1 || kind == 2) rn_log("FREE grid +%u: %s kind %u grid %d at %.1f %.1f %.1f rec %08x", rn_telem.presents - start, G(e + 0x73c), kind, (int8_t)c->mem[e + 3],
                                                ldf(c, r + 0x50), ldf(c, r + 0x54), ldf(c, r + 0x58), ld(c, r + 0x1c, 4));
         }
+    }
+    if (rn_telem.presents % 30 == 0 && rn_telem.presents > start + 300) {   // traffic, after the grid
+        static double tw[2];
+        uint32_t rh = ld(c, 0x7361f8, 4), me = 0;
+        for (uint32_t r = rh ? ld(c, rh, 4) : 0, k = 0; r && r != rh && k < 200 && !me; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4);
+            if (e && ld(c, e + 4, 4) == 1) me = r;
+        }
+        if (me && (tw[0] || tw[1])) free_tmove(c, rh, me, (ldf(c, me + 0x50) - tw[0]) * 2, (ldf(c, me + 0x54) - tw[1]) * 2);
+        if (me) tw[0] = ldf(c, me + 0x50), tw[1] = ldf(c, me + 0x54);
     }
     if (rn_telem.presents % 60 == 0) {
         static double was[2];
@@ -503,7 +614,7 @@ void free_tick(Ctx *c) {
         double d = sqrt(dx * dx + dy * dy);
         for (int j = 0; j < 3; j++) if (d < near[j]) { double t = near[j]; near[j] = d; d = t; }
     }
-    o += snprintf(line + o, sizeof line - o, " | traffic near %.0f %.0f %.0f m", near[0], near[1], near[2]);
+    o += snprintf(line + o, sizeof line - o, " | traffic near %.0f %.0f %.0f m | tmove %d fail %d", near[0], near[1], near[2], n_tmove, n_tfail);
     rn_log("%s", line);
     // Every 10 s, each traffic car as TrafficTeleporter 0x598600 sees it: the cars [L+0x28 + 4 i], i from L[9] to L[6]
     // (L = [0x7361f8], 0x41f680/0x41f690), driver V = car+0x2c (0x41f5d0). Flags of V: +0x4d1 parked (0x583350, the
@@ -708,6 +819,7 @@ static uint32_t grid_fix(Ctx *c) {
 // in a straight line also needs a move, so the cars stay in the band the teleporter keeps around the player. RN_FREE=0 or
 // a race: the game's answer.
 static uint32_t free_recycle(Ctx *c) {
+    tele = c->r[ECX];
     uint32_t car = ARG(0), r = call_guest(c, 0x5988c0, 1, &car) & 0xff, h = ld(c, 0x7361f8, 4);
     if (!live || r || !h) return r;
     for (uint32_t p = ld(c, h, 4), k = 0; p && p != h && k < 200; p = ld(c, p, 4), k++) {

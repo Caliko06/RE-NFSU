@@ -739,6 +739,13 @@ def city_chunks(g):
             if rev[r]:                                  # written against the section's own order: swap what is "next" and "back"
                 for a_, b_, w_ in ((0xc, 0x14, 8), (0x1c, 0x20, 4), (0x24, 0x28, 4), (0x30, 0x34, 4)):
                     nd[a_:a_ + w_], nd[b_:b_ + w_] = nd[b_:b_ + w_], nd[a_:a_ + w_]
+                # and the lanes with them (re_answers_0b Q1): per lane id k an offset s16 [+0x3c + 2k] (1/256 m, right of the driver)
+                # and a speed byte [+0x6a + k]; ids 0..4 / 11..16 drive along the node order, 5..9 / 17..22 against it. The driver who now
+                # goes along is the old "against" one: swap k <-> k+5 and k <-> k+6, no negation (offsets are in the driver's frame).
+                for k, k2 in [(k, k + 5) for k in range(5)] + [(k, k + 6) for k in range(11, 17)]:
+                    o1, o2 = 0x3c + 2 * k, 0x3c + 2 * k2
+                    nd[o1:o1 + 2], nd[o2:o2 + 2] = nd[o2:o2 + 2], nd[o1:o1 + 2]
+                    nd[0x6a + k], nd[0x6a + k2] = nd[0x6a + k2], nd[0x6a + k]
             nd[0x81] = nd[0x82] = 0xff
             nd[0x83] = r
             struct.pack_into('<I', nd, 0x84, struct.unpack_from('<I', nd, 0x84)[0] | (0x1f << 20))
@@ -752,6 +759,11 @@ def city_chunks(g):
             if p > 0 and run[p - 1] != (t, sid, i - d_):
                 struct.pack_into('<f', nd, 0x20, seglen[r][p - 1])
             nodes.append(nd)
+        # The traffic lane picker 0x599660 takes lane id k only if hdr[0x265 + k] != 0 (0x454ff0); the header was copied from the run's
+        # first source section, so a run made of other sections' nodes could get no traffic at all (v2b: 31 of 80). The shipped table:
+        # the traffic ids 11..13 / 17..19 that any node of the run has (offset != -1), the others 0.
+        for k in range(23):
+            hdr[0x265 + k] = int(11 <= k <= 13 or 17 <= k <= 19) and int(any(struct.unpack_from('<h', nd, 0x3c + 2 * k)[0] != -1 for nd in nodes))
         secs.append((hdr, nodes))
     def ahead(sr, sp, dr, dp, d):                       # the grower's test on the written bytes (behind_entries)
         nd = secs[sr][1][sp]
