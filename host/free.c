@@ -69,6 +69,8 @@ static uint32_t names;           // NRIV guest strings of 16 bytes: 0x5809c0 cop
 
 static uint32_t rnd(uint32_t *s) { uint32_t x = *s; x ^= x << 13; x ^= x >> 17; x ^= x << 5; return *s = x ? x : 0x9e3779b9u; }
 static uint32_t ghash(Ctx *c, uint32_t p) { uint32_t h = 0xffffffffu; for (uint8_t b; (b = c->mem[p]); p++) h = h * 33 + b; return h; }
+static uint32_t nhash(const char *p) { uint32_t h = 0xffffffffu; for (; *p; p++) h = h * 33 + (uint8_t)*p; return h; }
+extern int rn_tex_overlay;      // host/openworld.c: Cars/TEXTURES.BIN came from the overlay
 static uint32_t preset_named(Ctx *c, uint32_t h) {   // the game's preset list 0x748844 (0x4b2640 finds them the same way)
     for (uint32_t p = ld(c, 0x748844, 4); p && p != 0x748844; p = ld(c, p, 4))
         if (ghash(c, p + 0x28) == h) return p;
@@ -189,7 +191,18 @@ static uint32_t free_traffic(Ctx *c) {
                     c->mem[ride + 0x62c + sl]++;
                 }
             call_guest(c, 0x57ea80, 1, &one);
-            if (getenv("RN_FREELOG")) rn_log("FREE traffic %u: type %u wears %s's preset %08x", a[0], type, CANON[k].name, CANON[k].preset);
+            // The body is drawn with the texture at ride +0x444 (DUMMY_SKIN<n>) and the rims with +0x448 (DUMMY_WHEEL<n>), which the loader
+            // 0x58cbb0 -> 0x58be50 -> 0x5a9ce0 bakes the paint into (docs/openworld/re_traffic_racers.md). 0x57d160 zeroed them; the slots 1..4
+            // are the player's and the career rivals', 5..12 are the overlay's (Cars/TEXTURES.BIN, tools/remaster/world_overlays.py): one per racer.
+            static int slot;
+            if (a[0] == 0x32) slot = 0;
+            if (rn_tex_overlay && slot < 8) {
+                char nm[24];
+                snprintf(nm, sizeof nm, "DUMMY_SKIN%d", 5 + slot); st(c, ride + 0x444, nhash(nm), 4);
+                snprintf(nm, sizeof nm, "DUMMY_WHEEL%d", 5 + slot); st(c, ride + 0x448, nhash(nm), 4);
+                slot++;
+            }
+            if (getenv("RN_FREELOG")) rn_log("FREE traffic %u: type %u wears %s's preset %08x skin %08x", a[0], type, CANON[k].name, CANON[k].preset, ld(c, ride + 0x444, 4));
         }
     }
     return call_guest(c, 0x5809c0, 7, a);

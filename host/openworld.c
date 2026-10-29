@@ -71,6 +71,8 @@ EM_JS(double, world_head, (const char *path), {
 #define WORLD_S    3200.f
 #define WORLD_NAME_HASH 0x5461a075u   // "TRACK_NAME_1010" with the game's hash (0x4f42f0: h = -1, h = h * 33 + c)
 
+int rn_tex_overlay;   // 1 once Cars/TEXTURES.BIN was served from the overlay with the DUMMY_SKIN5..12 targets (host/free.c checks it)
+
 static int worldrow_on(void) {
     static int on = -1;
     if (on < 0) { const char *e = getenv("RN_WORLDROW"); on = !(e && e[0] == '0'); }
@@ -175,6 +177,21 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
         if (!world_file("TEX1010TRACK.BIN", real, n, size)) return 0;
         rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size);
         return 1;
+    }
+    // Overlays of two shipped TPK files (tools/remaster/world_overlays.py, tpkwrite.py): Cars/TEXTURES.BIN with the render targets
+    // DUMMY_SKIN5..12 / DUMMY_WHEEL5..12 for the traffic racers (free mode, host/free.c), Global/DYNTEX.BIN with the SELECT LOCATION
+    // pictures of the WORLD row. A missing overlay file leaves the original.
+    {
+        const char *par = b - 1;
+        while (par > gpath && par[-1] != '/' && par[-1] != '\\') par--;
+        if (b > gpath && ci_eq(b, "TEXTURES.BIN", 13) && ci_eq(par, "CARS", 4) && (par[4] == '/' || par[4] == '\\')) {
+            if (world_file("CARS_TEXTURES.BIN", real, n, size)) { rn_tex_overlay = 1; rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size); return 1; }
+            return 0;
+        }
+        if (worldrow_on() && ci_eq(b, "DYNTEX.BIN", 11) && world_file("DYNTEX.BIN", real, n, size)) {
+            rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size);
+            return 1;
+        }
     }
     if (!ci_eq(b, "TRACKB", 6) || !isdigit((unsigned char)b[6])) return 0;
     const char *e = b + 6;
