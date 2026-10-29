@@ -152,6 +152,27 @@ Physics effect itself is in docs/re/tuning.md (spec level -> table rows in 0x57f
 - Autosave: hub back message 0x911ab364 (0x505330) calls `0x4c9570` (compares the garage-entry snapshot [0x735e38], taken in the hub ctor 0x504be0, with a fresh 0xf660 serialization); if changed -> `0x4c96f0(msg,1)` -> `0x41d8a0(&0x78a478,"auto")` + `0x41c7a0` (.cfg). V (G)
 - Reload: the profile load is the inverse of 0x4ab120; BuildRide 0x4ac5a0 rebuilds the ride from cfg. Not read here. savegate.py only checks event status bytes. NOT VERIFIED for parts.
 
+## 7. Open items 3, 4, 7 answered by reading (night-opus-a2, sonnet-exec; no run)
+
+- **Reload (7).** Profile load `0x41da40` → `0x4ab200` (V G+C) is the exact inverse of the writer `0x4ab120`.
+  - It checks version 0x13 and the checksum `0x41dd10`.
+  - It copies the 0x88b4-byte career block back to `0x75eef8` with `rep movsd`, then restores `[0x7677ac]`.
+  - The FECarConfig is career+0: type bytes +0x10, car index +0x88, name hashes +0x100, spec +0x2e0. It returns
+    byte for byte.
+  - BuildRide `0x4ac5a0` rebuilds the ride only from that config.
+  - So bought parts and perf levels survive a reload. V (code); there was no run.
+- **Engine-bay part (3).** Slot 12 (ride+0x47c, type 0xc) is set only by `0x5047d0`, `0x5046d0` and, at race start,
+  `0x422410`/`0x57d860`. BuildRide never derives it from spec level[2]. The save bytes agree:
+  `save/asas_autosave.ugd` has engine level 3 and an empty slot 12. So the engine-bay visual is missing in the garage
+  after a reload and comes back in a race. Code and bytes are V; what the screen shows is I until a run.
+- **Negative cash (4).** The spend writers `0x5a2620`, `0x5a25a0`, `0x5a2540` (car) and `0x4c3730` subtract with no
+  check of their own. The check is in the UI, which reads cash through `0x5a1520`. That function returns 1e9 when any
+  of `[0x735ec1]`, `[0x73494c]`, `[0x73440c]` is set. No retail code writes those flags. **Our patch
+  `0x735ec1 = 1` (`tools/recomp/patches.py:71`, OWNER 2026-10-20 "everything available") turns the check off, so
+  purchases drive cash below zero.** That is the most likely source of the −9,875 in `save/asas0.ugd`
+  (earned 10,625, spent 20,500). I (strong). `[0x7677ac]` and the mode `[0x745e40]` do not touch cash. Event entry
+  fees are all 0 (D). `0x4c8720` and `0x4e6390` were not read for their own check (U).
+
 ## Functions
 
 | addr | name | mark | tool | evidence |
