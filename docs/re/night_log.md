@@ -56,3 +56,15 @@ Open (U): 0x33310003 consumer, event kinds 4/5, reward type 4, 0x34a07, 0x3a000,
 angeldamian-36 not reachable (ListAgents shows only night-opus-a2).
 08:49 night-opus-b: got the orchestrator's props/traffic/rivals block (typed in this window); traffic and rivals agents running, props by me.
 08:50 night-opus-b: props done: docs/re/props.md, census/names_props.tsv 28 names (19 high V H+G, 9 med/low I), 10/10 second-tool agree. Corrections to re_props.md: 8 placed classes have a release limit > 0 (not 1), 44 classes unused (not 41). Respawn 0x5977f0: Virgin rebuilt after 2.0 s at rest.
+08:51 night-opus-a2: (1) done d63dc41: tools/re/csiscurves.py (check: 32 ENG/EXH patches, 864 curves), sound.md §5 curves table; 4 voice chains (not 3); Csis param->patch input map U (SND dispatcher between 0x52bf70 and the patch).
+09:01 night-opus-a2: (2) e5cb5ae answered by reading (no run): reload restores career block byte for byte (0x41da40->0x4ab200); engine-bay slot 12 missing in garage after reload (save bytes agree); FINDING for OWNER: our patch 0x735ec1=1 makes 0x5a1520 return cash 1e9, purchases drive cash negative (asas0.ugd -9875); proposal ?cash=real. Runs not done: they would write save/ (OWNER's), needs a scratch save root first.
+09:02 night-opus-a2: (3) c176f74 speech: all 277 lines via 0x51c830 + FE callers, 95 events (0x6f6bc8), random line per event, 259 reachable, no race caller (scan of +0x90/+0x98 sites); STRM_English_Speech abk is only a stream directory.
+## HANDOFF night-opus-a2 (second stretch done)
+Done since cfb7c63: d63dc41 tools/re/csiscurves.py (curve dump, check passes); garage.md §7 (reload, slot 12, negative
+cash); sound.md §6 (speech). (4) names_merge.py not rerun: no new names_*.tsv this stretch.
+For the OWNER (morning): our patch 0x735ec1=1 (everything available) also disables the cash check via 0x5a1520, so
+garage purchases drive cash negative (asas0.ugd -9875). Proposal row `?cash=real` in proposals.md; their call.
+Next: (a) map the Csis params to patch inputs in0..in17 (read the SND dispatcher between 0x64bc30 and the patch, or
+one bounded RN_WATCH run); (b) any garage run needs a scratch game dir whose ../save is not the repo save/
+(host/files.c:30; a symlinked game/ dir resolves .. to the repo) — build a dir of per-entry symlinks + copied saves;
+(c) listen/label the 95 speech events.

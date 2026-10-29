@@ -109,7 +109,7 @@ Picker `0x53c3a0` (V, G). It reads `p = player`, `order = 0x758b58[pos*2]`, wher
 - Names and the 20 corrections to the x86-ps2 map: agent TSV (night_log.md handoff), to be merged into
   `census/names_sound.tsv`.
 
-## 5. Engine patch: from RPM to the three loops (night-opus-a2)
+## 5. Engine patch: from RPM to the four voice chains (night-opus-a2)
 
 - **Parameters.** `0x52bf70` writes the engine Csis instance (`[this+0x1760]`) every frame. Then `0x64bc30`
   commits it. V (H, 2026-10-29). The Csis param slots are ints:
