@@ -15,7 +15,8 @@
 #include <math.h>
 #include <string.h>
 
-#define NRIV 3
+#define NRIV_MAX 9          // rivals: the race start's 10 grid slots (PATCH 0x422a78) hold the player and 9; 1 + 9 + 19 traffic <= the entrant table's 30
+static int nriv = 6;        // RN_FREERIV (default 6, 0..NRIV_MAX): 0x4b4040's count; RN_FREERIV=3 is the first free mode
 #define FREE_TRAFFIC 13     // free mode trackinfo traffic count (RN_FREETRAFFIC), x1.5 = 19 cars asked; the placer fits 19 to 21 with FREE_ZONE
 
 // The career's rivals (census/career_oracle.json: every event's opponents, each name with the preset of its last event).
@@ -38,7 +39,7 @@ static const struct { const char *name; uint32_t preset; } CANON[] = {
 #define NCANON (int)(sizeof CANON / sizeof *CANON)
 
 int rn_free_now;                 // 1 while 0x4b4040 builds free mode's rivals (host/rivals.c rival_ride asks free_rival), 2 in its traffic
-static int on, live, picked[NRIV], npicked;
+static int on, live, picked[NRIV_MAX], npicked;
 static uint32_t zone_at, zone_was;     // the clear zone free_place changed (free mode, the whole race) and its value
 // The rubber band 0x44bd10 needs a gap from 0x44c010, which is 0 while [0x78a400] (the race options' Catch Up byte +0x1f, set by
 // the mode setups 0x4b4a56..0x4b5f47) is 0: free mode sets it to 1 for the race (RN_FREECU=0: the game's value), so rivals ahead
@@ -65,7 +66,8 @@ static void free_curves(Ctx *c, int on) {
 static struct { uint32_t drv, dir; } rdir[16];   // free_dir's table, see free_respawn
 static int n_game, n_free;             // free_spacing: moves with the game's spacing, moves given the track's spacing
 static int n_far, n_offbit, n_onbit;   // free_recycle: far cars sent to a move; free_tnode: cars placed on a node without / with the bit
-static uint32_t names;           // NRIV guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
+static uint32_t xrec[12], nxrec;       // the extra racers' records (rm_records, outside the RaceManager) and how many there are
+static uint32_t names;           // NRIV_MAX guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
 
 static uint32_t rnd(uint32_t *s) { uint32_t x = *s; x ^= x << 13; x ^= x >> 17; x ^= x << 5; return *s = x ? x : 0x9e3779b9u; }
 static uint32_t ghash(Ctx *c, uint32_t p) { uint32_t h = 0xffffffffu; for (uint8_t b; (b = c->mem[p]); p++) h = h * 33 + b; return h; }
@@ -91,24 +93,28 @@ uint32_t free_rival(Ctx *c, uint32_t *a) {
         uint32_t one = ride;
         c->r[EAX] = CANON[k].preset;
         call_guest_cdecl(c, 0x4b26f0, 1, &one);
-        uint32_t nm = names + 16 * (npicked % NRIV);
-        snprintf(G(nm), 16, "%s", CANON[k].name);
-        a[3] = nm;
     }
+    // 0x4b4040 hands the builder's own 4 names (0x4b3a20) to its first 4 rivals; the 5th and later read the next stack slots
+    // (a sprintf buffer): the name is always ours.
+    uint32_t nm = names + 16 * (npicked % NRIV_MAX);
+    snprintf(G(nm), 16, "%s", CANON[k].name);
+    a[3] = nm;
     // Personalities: the AI's skill level 1..9 is this call's 5th argument (0x5809c0 stores it in entrant+0x735 at 0x5809f6,
     // the racer AI reads it through vtable +0x58 = 0x44ca10) and picks its record 0x779ff8 + 0x54 * level (wander chance,
     // speed fractions, catch-up; docs/openworld/re_rival_personality.md). Free mode gives each rival its own level,
-    // RN_FREESKILL (default "2,5,9": clumsy, steady, aggressive); "0" keeps the game's.
+    // RN_FREESKILL (default "2,5,9,...": clumsy, steady, aggressive, then the others); "0" keeps the game's.
     uint32_t game_skill = a[4];
     const char *sk = getenv("RN_FREESKILL");
-    if (!sk) sk = "2,5,9";
+    if (!sk) sk = "2,5,9,4,7,3,6,8,1";            // the first three are the first free mode's
     if (strcmp(sk, "0")) {
+        int len = 1;
+        for (const char *z = sk; *z; z++) len += *z == ',';
         const char *q = sk;
-        for (int j = 0; j < npicked % NRIV && q; j++) q = strchr(q, ','), q = q ? q + 1 : NULL;
+        for (int j = 0; j < npicked % len && q; j++) q = strchr(q, ','), q = q ? q + 1 : NULL;
         int lv = q ? atoi(q) : 0;
         if (lv >= 1 && lv <= 9) a[4] = (uint32_t)lv;
     }
-    if (npicked < NRIV) picked[npicked++] = k;
+    if (npicked < NRIV_MAX) picked[npicked++] = k;
     if (getenv("RN_FREELOG"))
         rn_log("FREE rival %u: %s preset %08x %s (%s) skill %d -> %d", a[6], CANON[k].name, CANON[k].preset, rec ? "applied" : "MISSING",
                rec ? G(rec + 0x28) : "-", (int)game_skill, (int)a[4]);
@@ -119,22 +125,25 @@ uint32_t free_rival(Ctx *c, uint32_t *a) {
 static uint32_t free_setup(Ctx *c) {
     if (!on) { const char *e = getenv("RN_FREE"); on = e && e[0] == '0' ? -1 : 1; }
     if (on > 0 && ld(c, 0x777cc8, 4) == 3 && !c->mem[0x78a347]) {
-        if (!names) names = guest_alloc(16 * NRIV);
+        if (!names) names = guest_alloc(16 * NRIV_MAX);
+        const char *fr = getenv("RN_FREERIV");
+        nriv = fr ? atoi(fr) : 6;
+        nriv = nriv < 0 ? 0 : nriv > NRIV_MAX ? NRIV_MAX : nriv;
         uint32_t tab = ld(c, 0x78a418, 4), n = ld(c, 0x78a41c, 4);
         for (uint32_t i = 0; i < n; i++)                          // the player leads the grid (0x422a70 slot 1 = the front)
             if (ld(c, tab + 0x750 * i + 4, 4) == 1) c->mem[tab + 0x750 * i + 3] = 1;
         c->mem[0x78a334] = 1;
-        st(c, 0x78a324, NRIV, 4);
+        st(c, 0x78a324, nriv, 4);
         npicked = 0, rn_free_now = 1;
         memset(rdir, 0, sizeof rdir);
         st(c, 0x6c89f0 + 0x40, host_addr_of("rn", "free_dir"), 4);   // racer vtable slot +0x40: each rival's own route direction
-        uint32_t args[2] = {NRIV, 0};
+        uint32_t args[2] = {(uint32_t)nriv, 0};
         call_guest_cdecl(c, 0x4b4040, 2, args);
         rn_free_now = 0;
         tab = ld(c, 0x78a418, 4), n = ld(c, 0x78a41c, 4);
-        for (uint32_t i = 0, g = 2; i < n; i++)                   // 0x4b4040 numbered them 1..3: behind the player, 2..4
+        for (uint32_t i = 0, g = 2; i < n; i++)                   // 0x4b4040 numbered them 1..N: behind the player, 2..N+1
             if (ld(c, tab + 0x750 * i + 4, 4) == 2) c->mem[tab + 0x750 * i + 3] = g++;
-        if (getenv("RN_FREELOG")) rn_log("FREE setup: %u entrants, %u rivals at frame %u", n, NRIV, rn_telem.presents);
+        if (getenv("RN_FREELOG")) rn_log("FREE setup: %u entrants, %u rivals at frame %u", n, nriv, rn_telem.presents);
         live = 1, rn_free_now = 2;                                // AddTrafficCars: free_traffic dresses the racer rows
     }
     // The traffic count of AddTrafficCars (0x4b3b01 reads i8 [0x441fe0() + [0x78a2fc] + [0x78a300] * 2 + 0xc0], 6 on 1003 and 12 on 1001
@@ -193,13 +202,13 @@ static uint32_t free_traffic(Ctx *c) {
             call_guest(c, 0x57ea80, 1, &one);
             // The body is drawn with the texture at ride +0x444 (DUMMY_SKIN<n>) and the rims with +0x448 (DUMMY_WHEEL<n>), which the loader
             // 0x58cbb0 -> 0x58be50 -> 0x5a9ce0 bakes the paint into (docs/openworld/re_traffic_racers.md). 0x57d160 zeroed them; the slots 1..4
-            // are the player's and the career rivals', 5..12 are the overlay's (Cars/TEXTURES.BIN, tools/remaster/world_overlays.py): one per racer.
+            // are the player's and the first rivals', 5..20 are the overlay's (rivals 4+: 5..10, traffic racers 13..20) (Cars/TEXTURES.BIN, tools/remaster/world_overlays.py): one per racer.
             static int slot;
             if (a[0] == 0x32) slot = 0;
             if (rn_tex_overlay && slot < 8) {
-                char nm[24];
-                snprintf(nm, sizeof nm, "DUMMY_SKIN%d", 5 + slot); st(c, ride + 0x444, nhash(nm), 4);
-                snprintf(nm, sizeof nm, "DUMMY_WHEEL%d", 5 + slot); st(c, ride + 0x448, nhash(nm), 4);
+                char nm[24];     // 13..20: the rivals take DUMMY_SKIN2..N+1 by name (0x4b4040), up to 10
+                snprintf(nm, sizeof nm, "DUMMY_SKIN%d", 13 + slot); st(c, ride + 0x444, nhash(nm), 4);
+                snprintf(nm, sizeof nm, "DUMMY_WHEEL%d", 13 + slot); st(c, ride + 0x448, nhash(nm), 4);
                 slot++;
             }
             if (getenv("RN_FREELOG")) rn_log("FREE traffic %u: type %u wears %s's preset %08x skin %08x", a[0], type, CANON[k].name, CANON[k].preset, ld(c, ride + 0x444, 4));
@@ -314,6 +323,15 @@ void free_tick(Ctx *c) {
         return;
     }
     raced = 1;
+    // The RaceManager's frame 0x435570 calls the record update 0x4338c0 (edi = record: route progress +0x14/+0x1c/+0x20, checkpoint
+    // +4/+6/+8) for each record of its own, so the extra records get the same call (RN_FREEXREC=0: not).
+    static int xr = -1;
+    if (xr < 0) xr = !getenv("RN_FREEXREC") || atoi(getenv("RN_FREEXREC"));
+    for (uint32_t k = 0; xr && k < nxrec; k++) {
+        uint32_t keep[4] = {c->r[EBX], c->r[ESI], c->r[EDI], c->r[EBP]};
+        if (ld(c, ld(c, xrec[k], 4) + 0x1c, 4) == xrec[k] && ld(c, xrec[k] + 0x10, 2) == 0) c->r[EDI] = xrec[k], call_guest(c, 0x4338c0, 0, NULL);
+        c->r[EBX] = keep[0], c->r[ESI] = keep[1], c->r[EDI] = keep[2], c->r[EBP] = keep[3];
+    }
     if (cu_was < 0 && (!getenv("RN_FREECU") || atoi(getenv("RN_FREECU")))) {
         cu_was = (int)ld(c, 0x78a400, 4);
         st(c, 0x78a400, 1, 4);
@@ -321,6 +339,14 @@ void free_tick(Ctx *c) {
         if (getenv("RN_FREELOG")) rn_log("FREE catch up: game %d, now 1; curve x %.0f -> %.0f m", cu_was, cu_x[0][10], ldf(c, 0x779c78 + 80));
     }
     if (!start) start = rn_telem.presents;
+    if (getenv("RN_FREELOG") && (rn_telem.presents == start + 2 || rn_telem.presents == start + 300)) {   // the grid: every racer's place
+        uint32_t rh = ld(c, 0x7361f8, 4);
+        for (uint32_t r = rh ? ld(c, rh, 4) : 0, k = 0; r && r != rh && k < 200; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4), kind = e ? ld(c, e + 4, 4) : 0;
+            if (kind == 1 || kind == 2) rn_log("FREE grid +%u: %s kind %u grid %d at %.1f %.1f %.1f rec %08x", rn_telem.presents - start, G(e + 0x73c), kind, (int8_t)c->mem[e + 3],
+                                               ldf(c, r + 0x50), ldf(c, r + 0x54), ldf(c, r + 0x58), ld(c, r + 0x1c, 4));
+        }
+    }
     if (rn_telem.presents % 60 == 0) {
         static double was[2];
         uint32_t rh = ld(c, 0x7361f8, 4), me = 0;
@@ -354,13 +380,19 @@ void free_tick(Ctx *c) {
     // Every 5 s: each rival's skill level (entrant+0x735) and speed over those 5 s (personality A/B).
     if (h && rn_telem.presents % 300 == 0) {
         static double rp[8][2];
-        char b[256];
+        char b[640];
         int n = 0, i = 0;
+        for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4), rec = ld(c, r + 0x1c, 4);
+            if (e && ld(c, e + 4, 4) == 1) n += snprintf(b + n, sizeof b - n, " PLAYER [rec14 %.0f route %.0f pos %d] |", rec ? ldf(c, rec + 0x14) : -1.0, ldf(c, r + 0x814), rec ? c->mem[rec + 0xa] : -1);
+        }
         for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200 && i < 8; r = ld(c, r, 4), k++) {
             uint32_t e = ld(c, r + 0x14, 4);
             if (!e || ld(c, e + 4, 4) != 2) continue;
             double x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
-            n += snprintf(b + n, sizeof b - n, " %s L%d %.0f", G(e + 0x73c), (int8_t)c->mem[e + 0x735], hypot(x - rp[i][0], y - rp[i][1]) / 5);
+            uint32_t rec = ld(c, r + 0x1c, 4);
+            n += snprintf(b + n, sizeof b - n, " %s L%d %.0f @%.0f,%.0f [rec14 %.0f route %.0f pos %d cu %.2f]", G(e + 0x73c), (int8_t)c->mem[e + 0x735], hypot(x - rp[i][0], y - rp[i][1]) / 5, x, y,
+                          rec ? ldf(c, rec + 0x14) : -1.0, ldf(c, r + 0x814), rec ? c->mem[rec + 0xa] : -1, ldf(c, r + 0x404));
             rp[i][0] = x, rp[i][1] = y, i++;
         }
         if (i) rn_log("FREE rivals%s m/s frame %u", b, rn_telem.presents);
@@ -531,6 +563,11 @@ void free_tick(Ctx *c) {
 #define FREE_ZONE 100.0f
 static uint32_t free_place(Ctx *c) {
     uint32_t e = ARG(0), self = c->r[ECX], r = 0;
+    static int gridlog;     // RN_FREELOG: the start positions 0x422580 made, still in 0x422a70's frame (PATCH 0x422a78: 10 slots of 0x20 end at ebp & -16)
+    if (!gridlog++ && getenv("RN_FREELOG")) {
+        uint32_t b = (c->r[EBP] & ~15u) - 0x140;
+        for (int k = 0; k < 10; k++) rn_log("FREE start slot %d: %.1f %.1f %.1f dir %04x", k + 1, ldf(c, b + 0x20 * k), ldf(c, b + 0x20 * k + 4), ldf(c, b + 0x20 * k + 8), ld(c, b + 0x20 * k + 0x10, 2));
+    }
     int route = ld(c, 0x78a344, 1) & 0xff || ld(c, 0x7361a8, 4), step = 0;
     uint32_t tb = ld(c, 0x736174, 4) + ld(c, 0x78a2fc, 4) * 4, sp = ld(c, tb + 0xd4, 4), zn = ld(c, tb + 0xcc, 4);
     if (live) {
@@ -586,10 +623,79 @@ static uint32_t free_nopath(Ctx *c) {
 // of the route (TRACKB1001, 25 sections), so with the player there the 500 m walk finds no spot and every car is parked in a
 // clump. PATCH 0x59a5cf, 0x59a669 (cave 0x439a94: jmp [SCREEN_ADDR+0x88]): in free mode every node passes; the lane
 // (0x5995e0), the 31 m spacing and the out-of-sight rules of 0x59aa60 still decide. RN_FREE=0 or a race: the node's bit.
+static uint32_t rm_records(Ctx *c), grid_fix(Ctx *c);
 static uint32_t free_tnode(Ctx *c) {
+    uint32_t ret = ld(c, c->r[ESP], 4);
+    if (ret == 0x4345ae) return rm_records(c);   // PATCH 0x4345a9: the RaceManager's records, same cave
+    if (ret == 0x422a8b) return grid_fix(c);     // PATCH 0x422a86: the start positions
     uint32_t bit = ld(c, c->r[EAX] + 0x84, 4) >> ((c->r[ECX] & 0xff) ? 25 : 26) & 1;
     if (live && ld(c, c->r[ESP], 4) == 0x59a66e) bit ? n_onbit++ : n_offbit++;   // the second call: the node the car is placed on
     return live ? 1 : bit;
+}
+
+// PATCH 0x4345a9 (cave 0x439a94 as above, ret 0x4345ae): 0x434590 calls 0x434a80 (esi = the RaceManager) to add a record for each
+// racer of the car list L = [0x7361f8] (L[7] players, L[8] players + opponents, cars at L + 0x28 + 4 i). The RM holds 4 records
+// (+0x30, 0x13c each; the pointer array at +0x520 follows), so the call sees at most 4 racers (L[8] lowered for its duration),
+// and every other racer gets a record of its own made by the record ctor 0x4333c0 (eax = car, ecx = record; it sets car+0x1c) in
+// spare memory: the racer AI 0x44b1b0 reads car+0x1c without a null test, but the RM never ranks it (position byte +0xa stays 0).
+static uint32_t rm_records(Ctx *c) {
+    uint32_t keep[4] = {c->r[EBX], c->r[ESI], c->r[EDI], c->r[EBP]};
+    uint32_t h = ld(c, 0x7361f8, 4), n = ld(c, h + 0x20, 4), pl = ld(c, h + 0x1c, 4);
+    static uint32_t spare;
+    nxrec = 0;
+    uint32_t cap = 4;   // the RaceManager holds 4 records (0x434a80 fills 0x13c * 4 + the pointer array at +0x520)
+    if (n > cap) st(c, h + 0x20, cap, 4);
+    call_guest(c, 0x434a80, 0, NULL);
+    if (n > cap) {
+        st(c, h + 0x20, n, 4);
+        if (!spare) spare = guest_alloc(0x13c * 8);
+        for (uint32_t i = cap; i < n && i < 12; i++) {
+            c->r[EAX] = ld(c, h + 0x28 + 4 * i, 4), c->r[ECX] = spare + 0x13c * (i - cap);
+            call_guest(c, 0x4333c0, 0, NULL);
+            xrec[nxrec++] = spare + 0x13c * (i - cap);
+        }
+        if (getenv("RN_FREELOG")) rn_log("FREE racemanager: %u racers (%u players), RM records %u, extra records for %u", n, pl, ld(c, ld(c, 0x73619c, 4) + 0x24, 4), n - cap);
+    }
+    c->r[EBX] = keep[0], c->r[ESI] = keep[1], c->r[EDI] = keep[2], c->r[EBP] = keep[3];
+    return 0;
+}
+
+// PATCH 0x422a86 (same cave, ret 0x422a8b): the race start 0x422a70 calls 0x422580(n, buf) for the start positions (slots of 0x20:
+// x, y, z, ... heading word at +0x10) of the grid slots 1..n and builds each entrant's car at the slot of its grid number. On the
+// WORLD the positions are the track's markers, in two interleaved columns: the even slots are a line of cars 35 m apart on a road,
+// the odd ones lie 1..10 m from each other (slots 1, 3, 5, 7, 9 are within 14 m), so the cars of the 5th racer on spawn inside each
+// other and their physics blows up a minute later (NaN position, then the flare pow 0x5443f0 raises 0xc0000090). With more than
+// 3 rivals (RN_FREERIV) the slots are compacted: slot 1 stays, then each slot at least GRID_GAP m from every slot kept, in order;
+// the ones left over follow. Up to 3 rivals nothing moves (the slots the free mode always had).
+#define GRID_GAP 8.0
+static uint32_t grid_fix(Ctx *c) {
+    // The patched builder asks for 10 slots (push 10, loop to 10); outside a Free Run with more than 3 rivals the original 4 are asked,
+    // so career and Quick Race get the same start places as before (the loop's slots 5..10 find no car with that grid index).
+    uint32_t a[2] = {(live && nriv > 3) ? ARG(0) : 4, ARG(1)};
+    call_guest_cdecl(c, 0x422580, 2, a);
+    if (getenv("RN_FREELOG") && !(live && nriv > 3)) {
+        char b[200]; int o = snprintf(b, sizeof b, "FREE start slots: original %u (live %d)", a[0], live);
+        for (uint32_t k = 0; k < a[0] && k < 4; k++) o += snprintf(b + o, sizeof b - o, " %.1f,%.1f", ldf(c, a[1] + 0x20 * k), ldf(c, a[1] + 0x20 * k + 4));
+        rn_log("%s", b);
+    }
+    if (!live || nriv <= 3 || a[0] > 12 || a[0] < 2) return 0;
+    uint32_t n = a[0], buf = a[1], tmp[12 * 8], order[12];
+    int kept = 0, rest = 0, ro[12];
+    for (uint32_t k = 0; k < n; k++) {
+        int ok = 1;
+        for (int j = 0; j < kept && ok; j++)
+            ok = hypot(ldf(c, buf + 0x20 * k) - ldf(c, buf + 0x20 * order[j]), ldf(c, buf + 0x20 * k + 4) - ldf(c, buf + 0x20 * order[j] + 4)) >= GRID_GAP;
+        if (ok) order[kept++] = k; else ro[rest++] = k;
+    }
+    for (int j = 0; j < rest; j++) order[kept + j] = ro[j];
+    for (uint32_t k = 0; k < n; k++) for (int w = 0; w < 8; w++) tmp[k * 8 + w] = ld(c, buf + 0x20 * order[k] + 4 * w, 4);
+    for (uint32_t k = 0; k < n; k++) for (int w = 0; w < 8; w++) st(c, buf + 0x20 * k + 4 * w, tmp[k * 8 + w], 4);
+    if (getenv("RN_FREELOG")) {
+        char b[200]; int o = 0;
+        for (uint32_t k = 0; k < n; k++) o += snprintf(b + o, sizeof b - o, " %u", order[k] + 1);
+        rn_log("FREE start slots: %d of %u apart, order%s", kept, n, b);
+    }
+    return 0;
 }
 
 // TrafficTeleporter 0x598600 asks 0x5988c0 (call at 0x5987f6, thiscall ecx = the teleporter, arg = the car) whether a car

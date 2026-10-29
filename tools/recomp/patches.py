@@ -278,6 +278,26 @@ PATCHES.append(dict(addr=0x7007ec, old="40204400", new=struct.pack("<I", 0x6439f
 PATCHES.append(dict(addr=0x700850, old="e0fc5900", new=struct.pack("<I", 0x6439f8).hex(), when=lambda: True))
 PATCHES.append(dict(addr=0x4ba207, old="a808", new="a888", when=lambda: True))
 
+# PATCH: 0x422a78, 0x422a85, 0x422afa, 0x4345a9, OWNER 2026-10-28 (Free Run with 6 rivals, docs/openworld/re_racer_cap_probe.md 4):
+# the game never has more than 4 racers, two places stop more. (a) The race start 0x422a70 asks 0x422580 for 4 start positions
+# into a 4 x 0x20 byte stack buffer and builds the car of the entrant with grid 1..4: the frame 0x84 -> 0x144, `push 4` -> 10 and
+# `cmp edi,4` -> 10 make room for 10 slots (the buffer still ends at the saved ebp; 0x422580 is generic in n). (b) The
+# RaceManager 0x421f00 keeps 4 records of 0x13c at +0x30 and a pointer array at +0x520: 0x434590 calls 0x434a80 (esi = RM) at
+# 0x4345a9, which adds a record (ctor 0x4333c0, eax = car, ecx = record; it sets car+0x1c) for every racer of the car list
+# [0x7361f8] (+0x1c players, +0x20 players + opponents): a 5th record would overwrite the pointers and the laps at +0x530. The
+# racer AI reads car+0x1c unguarded (0x44b1b0 at 0x44b37e: `cmp word [rec+0x10],0`; a recordless 5th racer faults on its first
+# frame). The call now goes to the existing cave 0x439a94 (jmp [SCREEN_ADDR+0x88] = host/free.c free_tnode, which tells this
+# call by its return address 0x4345ae): rm_records lowers [list+0x20] to 4 for the call, and gives the other racers a record of
+# their own outside the RM (0x4333c0 on spare memory), so they race but are not ranked.
+PATCHES.append(dict(addr=0x422a78, old="84000000", new="44010000", when=lambda: True))
+PATCHES.append(dict(addr=0x422a85, old="04", new="0a", when=lambda: True))
+PATCHES.append(dict(addr=0x422afa, old="04", new="0a", when=lambda: True))
+PATCHES.append(dict(addr=0x4345a9, old="e8d2040000", new="e8" + _rel(0x4345a9, 0x439a94), when=lambda: True))
+# PATCH: 0x422a86 (same cave): the call 0x422580(n, buf) of the start positions goes to free_tnode too (return address 0x422a8b),
+# host/free.c grid_fix: the game's call, then with more than 3 rivals the slots that lie within 8 m of an earlier one move to the end
+# (the WORLD's odd marker slots overlap; docs/openworld/re_racer_cap_probe.md Implemented).
+PATCHES.append(dict(addr=0x422a86, old="e8f5faffff", new="e8" + _rel(0x422a86, 0x439a94), when=lambda: True))
+
 def active():
     return [p for p in PATCHES if p["when"]()]
 

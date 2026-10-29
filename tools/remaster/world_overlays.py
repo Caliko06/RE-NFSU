@@ -1,7 +1,7 @@
 """Overlays of two shipped TPK files for the WORLD / Free Run layer (the game/ folder is read-only; the layer serves these from
 build/openworld, host/openworld.c rn_world_open). Built with tools/remaster/tpkwrite.py; no pixels need cutting for the cars.
-  build/openworld/CARS_TEXTURES.BIN  Cars/TEXTURES.BIN + DUMMY_SKIN5..12 and DUMMY_WHEEL5..12 (clones of 1 / 1): the render
-                                     targets the traffic racers' bodies and rims are baked into (docs/openworld/re_traffic_racers.md).
+  build/openworld/CARS_TEXTURES.BIN  Cars/TEXTURES.BIN + DUMMY_SKIN5..20 and DUMMY_WHEEL5..20 (clones of 1 / 1): the render
+                                     targets the rivals' (5..10) and traffic racers' (13..20) bodies and rims are baked into (docs/openworld/re_traffic_racers.md).
   build/openworld/DYNTEX.BIN         Global/DYNTEX.BIN + TRACK_1010_SPLINE and TRACK_1010 (SELECT LOCATION page, re_select_picture.md 3b),
                                      drawn by tools/openworld/worldmap.py's tour when its picture exists.
 usage: python3 tools/remaster/world_overlays.py cars | select   (select needs build/openworld/TRACKB1010.lzc: tools/openworld/tour.py)"""
@@ -17,7 +17,7 @@ def cars():
     t = Tpk(os.path.join(root, 'game', 'Cars', 'TEXTURES.BIN'))
     end = t.pool_end()                                 # the new targets get virtual pool offsets past every shipped one
     for fam, src, size in (('DUMMY_SKIN', 'DUMMY_SKIN1', 0x100000), ('DUMMY_WHEEL', 'DUMMY_WHEEL1', 0x10000)):
-        for k in range(5, 13):
+        for k in range(5, 21):
             off = (end + 0xffff) & ~0xffff
             end = off + size
             t.clone(f'{fam}{k}', src, fields={0x30: struct.pack('<II', off, off + size)})
