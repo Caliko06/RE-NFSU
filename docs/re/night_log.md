@@ -39,3 +39,6 @@ bought part), test profile only; (3) speech: who plays the ~270 non-FE lines; (4
 names_sound/tuning with seed/blur/camera.
 Not mine (dirty, untouched): census/lift_report.json, docs/openworld/re_answers_0b.md, untracked census/names_{blur,camera}.tsv,
 census/systems.tsv, docs/re/blur.md, tools/census/sys*.py, tools/hopper/q_*.py, docs/re_*.md.
+03:43 night-opus-b: save format done (tools/re/save.py, 9 files re-pack, Adler-32 0x41dd10; block 0xf660 from player 0x7588c4); canon.md + names_canon.tsv (46 names) + names_assets.tsv (26) committed de61702. Waiting on loader meanings A/B, EventDesc unknown fields.
+07:01 orchestrator back after account-5 5h limit (03:0x-07:00): subagents a6d97/a2d5c died on 429 and were resumed at 07:01; B and a2 delivered de61702/5103257/9fc13da then hit account 3 limit; relay hook ignored (Ghostty forbidden, session now 0%).
+07:04 M2 systems (146c21f), M3 names.tsv (8a50517), M4 camera+blur (bd5fa4f), M5 scoreboard (677289f) committed by the orchestrator; HANDOFF rewritten. B and a2 resume 08:20. Next: props/traffic/rivals only on account 3.
