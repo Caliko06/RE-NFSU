@@ -49,7 +49,7 @@ addr	name	system	confidence	evidence	tool	doc
 0x4b47a0	ApplyOptionsToPlayerSettings	camera	V	copies option bytes to player settings: [0x78a3fa]=[0x758951]; [0x78a388]=(&0x758938)[[0x758948]*4] (index 3 reset to 0 unless [0x78a345]/[0x7361a4]); player 1 uses 0x78a3c0 and index 0x75894c	G+C	docs/re/camera.md
 0x4be6c0	OptionsCameraUI	camera	I	options screen touching POV arrays	C	docs/re/camera.md
 0x700b1c	SpecialCamNameTable	camera	V	names of special modes	D	docs/re/camera.md
-0x700b44	SpecialCamEnableTable	camera	V	bytes [0,0,0,1,1,1,1,1]	D	docs/re/camera.md
+0x700b44	SpecialCamModeTable (flags [0,0,0,1,1,1,1,1]; 5 readers; recheck: 0x42da40 refuses a new special camera when a player's byte is non-zero, so 'busy' not 'enable'; I)	camera	I	bytes [0,0,0,1,1,1,1,1]	D	docs/re/camera.md
 0x700b3c	SpecialCamTable3	camera	I	third special-mode table	D	docs/re/camera.md
 0x6c7fc8	vtable_DriveCameraMover	camera	V	slot0 0x489490 slot1 0x489690; xrefs: ctor 0x489360 and 0x4894b0	G+D	docs/re/camera.md
 0x42d2f4	ChangeCameraMover_JumpTable	camera	V	switch in 0x42c6d0	G+C	docs/re/camera.md

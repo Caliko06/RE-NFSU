@@ -43,6 +43,13 @@ def scenarios():
     # movies: career0 = a new profile, MU_UG_NewCareerFMV (01_DAY.mad, 02_FAN_S.mad), the 1003 race, NewCareerExtroFMV; the
     # title movie E3_TITLE.mad plays in every scenario
     s['movies'] = (dict(RN_KEYS=C.ROWS['career0'], RN_AUTOPILOT='1', RN_FINISH='1'), 420)
+    # second wave (2026-10-29 audit): other tracks of the same modes and four career rows, to raise `ran` above the first 12 scenarios
+    for name, jmp in [('circuit2', 'jump_0_1006'), ('sprint2', 'jump_1_1108'), ('lapko2', 'jump_2_1005'), ('freerun2', 'jump_3_1004'),
+                      ('drag2', 'jump_5_1203'), ('drift2', 'jump_6_1301')]:
+        s[name] = jumprun(name and jmp)
+    for name, cj in [('cj3', 'cjump_3'), ('cj12', 'cjump_12'), ('cj25', 'cjump_25'), ('cj60', 'cjump_60')]:
+        k, j, secs = C.cjump(cj)[:3]
+        s[name] = (dict(RN_KEYS=k, RN_JUMP=j), min(secs, 420))
     return s
 
 

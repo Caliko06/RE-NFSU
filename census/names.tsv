@@ -725,7 +725,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5368b0	EAXMixMgr::SetMixType	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
 0x536a70	EAXMixMgr::EndMixType	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
 0x536c80	EAXMixMgr::ReceiveTrigger	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
-0x537460	EAXMod::SetOwner (this+0x10 = arg; map: Initialize(void))	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x537460	EAXMod::SetOwner (this+0x10 = arg; owner meaning unproven)	audio.sfx	I	ghidra	docs/re/sound.md	sound		func
 0x538770	EAXS_StreamManager::SetupWorldDataTransitionData	audio.stream	V	ghidra	docs/re/sound.md	sound		func
 0x5387c0	EAXS_StreamManager::GetCurrentAmbientZone	audio.stream	V	ghidra	docs/re/sound.md	sound		func
 0x538ed0	EAXS_StreamControl::SetMasterVolume	audio.stream	V	ghidra	docs/re/sound.md	sound		func
@@ -778,7 +778,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5462d0	TrackSkyInfo_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x546310	TrackSkyInfo_Select	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x546570	TrackSkyInfo_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
-0x549130	EAXMod::Stop (ret 4 stub)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x549130	EAXMod::NopArg1 (ret 4 stub shared by ~200 slots)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
 0x564990	bList::Sort	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x564db0	Atan2ToAngle16	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x565230	bMatrixCopy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
@@ -1266,7 +1266,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x700aa4	OPT_CubicCamera	camera	I	C	docs/re/camera.md	camera		data
 0x700b1c	SpecialCamNameTable	camera	V	D	docs/re/camera.md	camera		data
 0x700b3c	SpecialCamTable3	camera	I	D	docs/re/camera.md	camera		data
-0x700b44	SpecialCamEnableTable	camera	V	D	docs/re/camera.md	camera		data
+0x700b44	SpecialCamModeTable (flags [0,0,0,1,1,1,1,1]; 5 readers; recheck: 0x42da40 refuses a new special camera when a player's byte is non-zero, so 'busy' not 'enable'; I)	camera	I	D	docs/re/camera.md	camera		data
 0x700e98	OPT_MOTIONBLUR	blur	V	G+C	docs/re/blur.md	blur		data
 0x700e9c	OPT_LIGHTSTREAKS	blur	V	C	docs/re/blur.md	blur		data
 0x701034	gBackbufW	blur	V	C+D	docs/re/blur.md	blur		data
