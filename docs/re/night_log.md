@@ -1,0 +1,1 @@
+02:46 night-opus-a: tuning+sound docs and readers (b7f006d) verified by orchestrator: carinfo 1435/1435 tables + 4537/4537 parts byte-equal, ast/abkbank 100% byte coverage. Refutes: 0x583ea0 is a generic table lookup, 0x705f48.. is steering-vs-speed (0x460a80), not tuning. Next A: names_*.tsv, corrections list, proposals, garage UI + engine sound model.
