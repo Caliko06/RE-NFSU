@@ -4359,7 +4359,7 @@ void HudSmokeApplause__Update(int param_1)
 
 // ==== 0x4a6eb0 HudStylePoints::FillMoment
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall HudStylePoints__FillMoment(int param_1)
 
@@ -5155,7 +5155,7 @@ LAB_004a7f31:
 
 // ==== 0x4a7f90 HudWidget::HudWidget
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 int HudWidget__HudWidget(int param_1,undefined4 param_2)
 
@@ -6765,7 +6765,7 @@ void Career___Career(int param_1)
 
 // ==== 0x4a9dd0 Opt::ResetGeneralBlock
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined1 * __fastcall Opt__ResetGeneralBlock(undefined1 *param_1)
 
@@ -8835,7 +8835,7 @@ void __fastcall cFrontendDatabase__SetString2ED20(undefined4 param_1,char *param
 
 // ==== 0x4abe00 HighScoresDatabase::Default
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void HighScoresDatabase__Default(void)
 

@@ -957,7 +957,7 @@ void __thiscall FUN_004624d0(int param_1,undefined4 *param_2,int param_3)
   case 10:
     iVar3 = FUN_00567160();
     if (iVar3 != 0) {
-      uVar1 = FUN_004519f0(0x40a00000,0xbf800000);
+      uVar1 = AIActionGetUnstuck__AIActionGetUnstuck(0x40a00000,0xbf800000);
       *param_2 = uVar1;
       return;
     }
@@ -965,7 +965,7 @@ void __thiscall FUN_004624d0(int param_1,undefined4 *param_2,int param_3)
   case 0xe:
     iVar3 = FUN_00567160();
     if (iVar3 != 0) {
-      uVar1 = FUN_00452570(0xbf800000);
+      uVar1 = AIActionAccidentRecovery__AIActionAccidentRecovery(0xbf800000);
       *param_2 = uVar1;
       return;
     }
@@ -975,7 +975,7 @@ LAB_00462704:
   case 0x11:
     iVar3 = FUN_00567160();
     if (iVar3 != 0) {
-      uVar1 = FUN_00453730(0xbf800000,*(undefined4 *)(param_1 + 4));
+      uVar1 = AIActionEndOfRace__AIActionEndOfRace(0xbf800000,*(undefined4 *)(param_1 + 4));
       *param_2 = uVar1;
       return;
     }
@@ -3856,7 +3856,7 @@ LAB_00466549:
 
 // ==== 0x466550 Collision_IsFlatSurfaceInvolved
 
-/* [canon] car low (ghidra-canon) docs/re/car.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/car.md */
 
 uint Collision_IsFlatSurfaceInvolved(void)
 
@@ -7532,7 +7532,7 @@ float10 __fastcall FUN_0046a910(int param_1)
 
 // ==== 0x46a930 _GLOBAL__D_TheCollisionStats
 
-/* [canon] car low (ghidra-canon) docs/re/car.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/car.md */
 
 void _GLOBAL__D_TheCollisionStats(void)
 

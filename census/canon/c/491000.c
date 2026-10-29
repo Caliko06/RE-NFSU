@@ -50,7 +50,7 @@ void __fastcall FUN_004922c0(undefined4 *param_1)
       iVar3 = iVar3 + -1;
     } while (iVar3 != 0);
   }
-  FUN_00490730();
+  PreviewComet__DisableEmitters();
   pvVar1 = *(void **)(extraout_EDX + 0xc);
   if (pvVar1 != (void *)0x0) {
     eh_vector_destructor_iterator(pvVar1,0xc0,*(int *)((int)pvVar1 + -0x10),FUN_00401db0);
@@ -212,7 +212,7 @@ void __fastcall FUN_00492690(int param_1)
 
 {
   CameraMover__Enable();
-  FUN_004906d0(param_1 + 0x13c);
+  PreviewComet__EnableEmitters(param_1 + 0x13c);
   return;
 }
 
@@ -225,7 +225,7 @@ void __fastcall FUN_004926b0(int param_1)
   int iVar1;
   int *piVar2;
   
-  FUN_00490730();
+  PreviewComet__DisableEmitters();
   if (*(int *)(param_1 + 0x14) != 0) {
     *(undefined4 *)(param_1 + 0x14) = 0;
     *(undefined4 *)(param_1 + 0x24) = *(undefined4 *)(*(int *)(param_1 + 0x1c) + 0x280);
@@ -305,7 +305,7 @@ void __fastcall FUN_00492700(int param_1)
             local_a0 = *pfVar9;
             local_9c = pfVar9[0xc];
             local_98 = pfVar9[0x18];
-            FUN_0048eed0(param_1 + 0x170,param_1 + 0x430,&local_80,param_1 + 0x440);
+            EnsureTopology(param_1 + 0x170,param_1 + 0x430,&local_80,param_1 + 0x440);
           }
           else {
             if (fVar4 < fVar2) {
@@ -384,7 +384,7 @@ void __fastcall FUN_00492700(int param_1)
       local_a0 = *pfVar9;
       local_9c = pfVar9[0xc];
       local_98 = pfVar9[0x18];
-      FUN_0048eed0(param_1 + 0x170,param_1 + 0x430,&local_80,param_1 + 0x440);
+      EnsureTopology(param_1 + 0x170,param_1 + 0x430,&local_80,param_1 + 0x440);
     }
 LAB_00492b2d:
     FUN_00593ec0(fVar10,0,0);
@@ -1779,7 +1779,7 @@ void FUN_00494890(void)
     piVar2 = (int *)_Memory[1];
     *piVar2 = iVar1;
     *(int **)(iVar1 + 4) = piVar2;
-    FUN_0048edf0();
+    bTList___bTList();
     _free(_Memory);
     _Memory = (int *)*unaff_EDI;
   }
@@ -3266,7 +3266,7 @@ void * __thiscall FUN_00496110(void *param_1,byte param_2)
 
 // ==== 0x496130 PostRaceRewardList::SetFlag46
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall PostRaceRewardList__SetFlag46(int param_1)
 

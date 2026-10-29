@@ -98,3 +98,4 @@ Open: see each doc's Open list (traffic: writer of [ebx+0x59d4], Free Run x1.5, 
 13:50 canon wave round 3 (canon-sonnet): sound 58, car 60, rivals 60; Hopper second reading of 113 low rows (86 agreed->med, 1 renamed); 3 side fixes; named 1,822 -> 2,000
 14:07 canon wave round 4 (canon-sonnet): hud 59, camera 57, track 58; named 2,000 -> 2,174; gcalign + queue rerun
 14:20 canon wave round 5 by GC file (canon-sonnet): PartsBrowser 60, CameraMover 59, AIAction family 49; 5 corrections; named 2,174 -> 2,343; anchors 657
+15:13 canon wave round 6 by GC file (canon-sonnet-c1): AIPlan 49, PartsBrowser 60, CameraMover 59; Hopper 65/77 low rows agreed; 2 corrections; named 2,343 -> 2,511; anchors 788

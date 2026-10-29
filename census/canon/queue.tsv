@@ -15,7 +15,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x58b420	assets	0	102	2	2	0	B CarLoader::CarLoader
 0x58c160	assets	0	25	0	1	0	
 0x58c1c0	assets	0	92	0	6	0	B __static_initialization_and_destruction_0
-0x58cf10	assets	0	49	0	2	0	R BodyDamage::DoSnapshot
+0x58cf10	assets	0	49	0	2	0	A BodyDamage::DoSnapshot
 0x5c7f2f	assets	0	18	0	1	0	
 0x5c80ae	assets	0	472	2	2	0	P DVDInit
 0x63d140	assets	0	5	1	1	0	
@@ -142,10 +142,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x533980	audio	0	14	0	1	0	
 0x533e80	audio	0	225	5	1	0	R TrolleySoundObject::PlaySnd
 0x534110	audio	0	39	1	1	0	
-0x5342b0	audio	0	211	5	1	0	R BridgeWarningSoundObject::PlaySnd
+0x5342b0	audio	0	211	5	1	0	B BridgeWarningSoundObject::PlaySnd
 0x534490	audio	0	32	2	1	0	
-0x5344d0	audio	0	48	1	1	0	B FountainSoundObject::FountainSoundObject
-0x534550	audio	0	208	5	1	0	B FountainSoundObject::PlaySnd
+0x5344d0	audio	0	48	1	1	0	B FountainSoundObject::EndSnd
+0x534550	audio	0	208	5	1	0	
 0x534730	audio	0	203	2	1	0	B PlaneSoundObject::Update
 0x534800	audio	0	36	1	1	0	
 0x534850	audio	0	100	0	1	0	B TrainSoundObject::~TrainSoundObject
@@ -207,7 +207,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x53bcc0	audio	0	339	0	1	0	B EAXS_MusicStream::InitializeStreams
 0x53bec0	audio	0	22	0	1	0	
 0x53bee0	audio	0	223	0	1	0	
-0x53c020	audio	0	116	2	1	0	B EAXS_MusicStream::EnterPostRace
+0x53c020	audio	0	116	2	1	0	C EAXS_MusicStream::EnterPostRace
 0x53c150	audio	0	86	0	1	0	B EAXS_MusicStream::EnteringPause
 0x53c1b0	audio	0	87	0	1	0	B EAXS_MusicStream::ResumeFromPause
 0x53c350	audio	0	22	0	1	0	
@@ -370,7 +370,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x658440	audio	0	36	0	1	0	
 0x658470	audio	0	34	0	3	0	
 0x6584a0	audio	0	49	0	2	0	
-0x658e60	audio	0	148	4	2	0	B SNDARAM_free
+0x658e60	audio	0	148	4	2	0	B SFILTER_timestretchinit
 0x6590b0	audio	0	125	0	3	0	R SNDCTRL_filteradd
 0x659230	audio	0	21	1	1	0	
 0x6598a0	audio	0	49	0	3	0	B SFILTER_createLPFRC
@@ -387,11 +387,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x65aad0	audio	0	159	0	1	0	
 0x65ada0	audio	0	261	0	2	0	
 0x65afe0	audio	0	95	0	1	0	B SNDLINKI_pushtail
-0x65b3f0	audio	0	122	0	1	0	B SNDSYS_linkmaincpumixer
+0x65b3f0	audio	0	122	0	1	0	R SNDCTRL_lowpass
 0x65b470	audio	0	18	0	2	0	
-0x65b490	audio	0	110	0	1	0	R SNDCTRL_lowpass
-0x65b500	audio	0	61	0	1	0	R SNDMEM_gethighwater
-0x65b540	audio	0	61	0	1	0	R mixc
+0x65b490	audio	0	110	0	1	0	
+0x65b500	audio	0	61	0	1	0	B mixc
+0x65b540	audio	0	61	0	1	0	B MIX_getframe
 0x65b5d0	audio	0	10	0	1	0	
 0x65b5e0	audio	0	10	0	1	0	
 0x65b730	audio	0	744	0	1	0	
@@ -552,8 +552,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x480ca0	camera	0	155	1	1	0	R DragCameraManager::MoveDistance
 0x481850	camera	0	265	1	1	0	R DragCameraManager::CheckForDistanceChanges
 0x481970	camera	0	96	1	1	0	R DragCameraManager::CheckForDataChanges
-0x490730	camera	0	63	0	7	0	R PreviewComet::DisableEmitters
+0x4922c0	camera	0	429	4	1	0	R ZonePreviewCameraMover::~ZonePreviewCameraMover
 0x492560	camera	0	301	0	1	0	R ZonePreviewCameraMover::Duration
+0x492690	camera	0	22	2	1	0	
+0x4926b0	camera	0	68	2	1	0	R ZonePreviewCameraMover::Disable
 0x59bc20	camera	0	30	2	1	0	
 0x59bc50	camera	0	68	0	1	0	R TrackedController::Think
 0x59bd50	camera	0	31	0	2	0	
@@ -588,6 +590,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x414441	canon	0	26	1	0	0	
 0x4318d0	canon	0	35	1	2	0	
 0x4367e0	canon	0	243	2	1	0	R Race::SortRacingCarsByLeadership
+0x494890	canon	0	41	2	7	0	
 0x4948f0	canon	0	30	2	1	0	
 0x495e20	canon	0	105	2	3	0	B PreRaceStatsScreen::DrawCars
 0x496110	canon	0	30	2	1	0	
@@ -611,7 +614,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4cb110	canon	0	21	0	2	0	
 0x4cb780	canon	0	21	0	1	0	
 0x4cbe30	canon	0	148	0	1	0	R GetCarSelectSound
-0x4cd060	canon	0	107	0	1	0	R GetSpeechForHistoryFlag
+0x4cd060	canon	0	107	0	1	0	C GetSpeechForHistoryFlag
 0x4cd3e0	canon	0	52	1	1	0	R GetPlayerToEdit
 0x4cd420	canon	0	28	0	1	0	
 0x4cd440	canon	0	29	0	3	0	
@@ -645,14 +648,14 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4de130	canon	0	34	1	1	1	
 0x4de170	canon	0	30	2	1	0	
 0x4de190	canon	0	47	0	1	0	
-0x4de3c0	canon	0	117	0	1	0	R LicenseScreen::NotificationMessage
+0x4de3c0	canon	0	117	0	1	0	
 0x4dedf0	canon	0	17	0	8	0	
-0x4df120	canon	0	62	0	1	0	R EAlogoBumperScreen::~EAlogoBumperScreen
+0x4df120	canon	0	62	0	1	0	B FinishLoadingMarketingCallbackBridge
 0x4df6e0	canon	0	42	0	1	0	
-0x4df710	canon	0	119	0	1	0	R MPLoginScreen::MPLoginScreen
-0x4dfd70	canon	0	68	0	1	0	B MPLoginScreen::PrintIODescription
-0x4dfdc0	canon	0	543	1	1	0	B MPLoginScreen::InitPlayer1List
-0x4e00d0	canon	0	73	1	1	1	
+0x4df710	canon	0	119	0	1	0	
+0x4dfd70	canon	0	68	0	1	0	B THXMovieScreen::~THXMovieScreen
+0x4dfdc0	canon	0	543	1	1	0	
+0x4e00d0	canon	0	73	1	1	1	B SplashScreen::HandleJoyBridge
 0x4e0650	canon	0	43	1	3	0	
 0x4e0bf0	canon	0	86	0	3	0	R CreateMPCarSelectScreen
 0x4e0cb0	canon	0	84	0	1	0	R MPCarSelectData::MPCarSelectData
@@ -685,7 +688,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4f4070	canon	0	78	0	1	0	B FEPackageManager::CloseAllPackages
 0x4f40c0	canon	0	81	1	3	0	B FEPackageManager::GetVisibility
 0x4f4270	canon	0	21	1	1	0	
-0x4f42f0	canon	0	109	1	42	0	B LoaderFEngPackage
+0x4f42f0	canon	0	109	1	42	0	R LoaderFEngPackage
 0x4f5090	canon	0	40	0	1	0	
 0x4f5580	canon	0	190	0	1	0	R cFEng::GetContextTransform
 0x4f5640	canon	0	28	1	1	0	
@@ -707,6 +710,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4f78c0	canon	0	30	2	1	0	
 0x4f84d0	canon	0	223	1	44	0	B ThumbnailScroller::ThumbnailScroller
 0x4f8fb0	canon	0	161	1	1	0	B ScrollerSlot::Highlight
+0x4f9340	canon	0	65	2	4	0	B ScrollerSlot::Hide
 0x4fa050	canon	0	38	0	2	0	
 0x4fa080	canon	0	47	0	1	0	
 0x4fa310	canon	0	135	1	1	0	R FEButtonMap::ComputeButtonLocation
@@ -719,7 +723,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4fd880	canon	0	927	0	1	0	B FEListBox::ScrollSelection
 0x4fde00	canon	0	66	0	1	0	B FEListBox::CompleteScroll
 0x5041a0	canon	0	53	2	8	0	B FEWideString::AllocateString
-0x50d100	canon	0	24	0	35	0	
 0x5136f0	canon	0	142	0	1	0	B GarageChooseAccessoryCategoryScreen::NotificationMessage
 0x5141b0	canon	0	146	3	1	1	B GarageChooseAccessoryCategoryScreen::GetNumPartsAvailable
 0x5142e0	canon	0	26	0	1	0	
@@ -1098,7 +1101,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x476760	car	0	213	1	1	0	B ClosePhysics
 0x477250	car	0	143	1	1	0	R PhysicsMover::~PhysicsMover
 0x480020	car	0	246	1	1	0	B DragCameraManager::Init
-0x48ad90	car	0	561	0	1	0	B Blend__t6tTable1Z12CubicPovDataP12CubicPovDataN21f
 0x4ae9a0	car	0	90	1	2	0	
 0x4aea50	car	0	98	1	2	0	
 0x4aeac0	car	0	159	1	2	3	
@@ -1134,24 +1136,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4f69c0	car	0	25	1	1	0	
 0x4f9ed0	car	0	89	0	3	0	B HorizontalBrowserBackScreen::SetCarSelectColor
 0x4f9f30	car	0	134	0	5	0	B HorizontalBrowserBackScreen::HandleScreenTick
-0x50b660	car	0	30	2	1	0	
-0x50c070	car	0	30	2	1	0	
-0x50c870	car	0	174	1	1	5	B HackHackHack_GetRimsBrandHash
-0x50c930	car	0	162	1	4	5	B IsNFSUBrand
-0x50d1f0	car	0	192	1	4	0	
-0x50d340	car	0	30	2	1	0	
-0x50d360	car	0	190	4	2	0	
-0x50dee0	car	0	88	1	3	7	
-0x50e5c0	car	0	57	2	1	0	
-0x50e7a0	car	0	30	2	1	0	
-0x50ee90	car	0	72	0	2	0	
-0x50f9f0	car	0	27	0	1	0	
-0x50fa10	car	0	27	0	1	0	
-0x510650	car	0	30	2	1	0	
-0x510e70	car	0	223	3	1	0	B GetNumSlotsForWidebodySituation
-0x511a80	car	0	30	2	1	0	
-0x511d40	car	0	35	0	1	0	
-0x512c90	car	0	30	2	1	0	
 0x51be40	car	0	55	1	2	0	B GaragePaintModScreen::NotifySoundMessage
 0x547a40	car	0	34	1	1	0	
 0x548820	car	0	24	0	6	0	
@@ -1358,7 +1342,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x591b40	hud	0	54	2	1	0	B EvalCubic
 0x5abd45	hud	0	93	0	1	0	B fn_8018FF28
 0x5abda2	hud	0	13	1	3	0	
-0x5abdb5	hud	0	139	0	2	0	B fn_8018FF8C
+0x5abdb5	hud	0	139	0	2	0	C fn_8018FF8C
 0x5ac5c5	hud	0	202	0	1	0	B fn_80191980
 0x5ac6a2	hud	0	566	0	1	0	
 0x68572c	hud	0	10	1	1	0	
@@ -1442,9 +1426,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x41b630	input	0	60	0	1	0	B FEKeyboard::GetLetterMap
 0x41ba80	input	0	45	0	1	0	
 0x41bc20	input	0	58	0	16	0	B FEKeyboard::~FEKeyboard
-0x472cf0	input	0	253	2	1	0	R GJKPrimitive::GetBoundingBox
-0x472df0	input	0	68	2	1	0	R GJKPolytope::~GJKPolytope
-0x472e40	input	0	92	0	3	0	R GJKPolytope::MemoryImageLoad
+0x472cf0	input	0	253	2	1	0	
+0x472df0	input	0	68	2	1	0	B GJKPolytope::MemoryImageLoad
+0x472e40	input	0	92	0	3	0	B GJKPolytope::MoveCenterOfGravity
 0x4ec4d0	input	0	124	2	1	0	
 0x4edd90	input	0	25	0	1	0	
 0x4eddb0	input	0	25	0	1	0	
@@ -1497,7 +1481,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5927e0	props	0	60	0	1	0	R WorldObjectCollisionBody::GetMassInverse
 0x592820	props	0	38	0	1	0	
 0x5928c0	props	0	22	0	1	0	
-0x595050	props	0	49	0	1	0	R __nw
+0x595050	props	0	49	0	1	0	R __builtin_vec_new
 0x5950b0	props	0	10	0	1	0	
 0x5950f0	props	0	9	0	1	0	
 0x595100	props	0	9	0	1	0	
@@ -1539,6 +1523,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x693260	props	0	11	1	1	0	
 0x6933e0	props	0	26	2	1	0	
 0x40ed10	render	0	13	1	2	0	
+0x42fee0	render	0	318	8	2	0	R Player::NewSmokeShape
 0x4fa4a0	render	0	176	1	1	0	B FECodeListBox::FECodeListBox
 0x4fa8c0	render	0	691	3	2	0	R FECodeListBox::Initialize
 0x4fd130	render	0	30	2	1	0	
@@ -1787,20 +1772,20 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5d6501	render	0	32	0	1	0	
 0x5d6521	render	0	10	0	2	0	
 0x5d652b	render	0	10	0	2	0	
-0x5d6551	render	0	71	0	1	0	P __AI_set_stream_sample_rate
+0x5d6551	render	0	71	0	1	0	P AISetDSPSampleRate
 0x5d6598	render	0	24	0	1	0	
 0x5d6613	render	0	13	0	1	0	
-0x5d662e	render	0	366	0	1	0	P AIInit
-0x5d679c	render	0	356	0	1	0	P __AISHandler
-0x5d6d10	render	0	139	0	1	0	P GXCPInterruptHandler
-0x5d6d9b	render	0	95	0	1	0	P GXInitFifoBase
-0x5d6dfa	render	0	153	0	1	0	P GXInitFifoPtrs
-0x5d6e93	render	0	202	0	1	0	P GXSetCPUFifo
-0x5d6f5d	render	0	227	0	1	0	P GXSetGPFifo
-0x5d7040	render	0	142	0	1	0	P __GXSaveCPUFifoAux
-0x5d70ce	render	0	69	0	1	0	P GXGetGPStatus
-0x5d7113	render	0	229	0	4	0	
-0x5d71f8	render	0	952	0	2	0	
+0x5d662e	render	0	366	0	1	0	
+0x5d679c	render	0	356	0	1	0	P AIInit
+0x5d6d10	render	0	139	0	1	0	P __AIDHandler
+0x5d6d9b	render	0	95	0	1	0	P __AICallbackStackSwitch
+0x5d6dfa	render	0	153	0	1	0	P __GXDefaultTexRegionCallback
+0x5d6e93	render	0	202	0	1	0	P __GXShutdown
+0x5d6f5d	render	0	227	0	1	0	P GXCPInterruptHandler
+0x5d7040	render	0	142	0	1	0	P GXInitFifoBase
+0x5d70ce	render	0	69	0	1	0	P GXInitFifoPtrs
+0x5d7113	render	0	229	0	4	0	P GXSetCPUFifo
+0x5d71f8	render	0	952	0	2	0	P GXSetGPFifo
 0x5d7700	render	0	156	0	11	1	P GXEnableBreakPt
 0x5d779c	render	0	77	0	1	1	P GXDisableBreakPt
 0x5d77e9	render	0	26	0	5	0	
@@ -1916,7 +1901,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x60adc6	render	0	66	0	1	0	
 0x60b24d	render	0	92	0	1	0	P PPPDown
 0x60b4e1	render	0	533	0	1	0	P PPPTimeout
-0x60cda0	render	0	87	0	1	0	P MWCallback
+0x60cda0	render	0	87	0	1	0	P DBGReadStatus
 0x60d4e8	render	0	32	0	1	0	
 0x60d851	render	0	74	0	1	0	
 0x60dbb2	render	0	86	0	1	0	
@@ -2005,7 +1990,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x622da0	render	0	31	0	1	0	
 0x622dc0	render	0	9	0	1	0	
 0x623780	render	0	1021	1	1	0	
-0x624000	render	0	175	0	1	0	B EAGL::TevStage::TevStage
+0x624000	render	0	175	0	1	0	
 0x6240b0	render	0	249	0	1	0	
 0x6242d0	render	0	409	0	1	0	
 0x624a20	render	0	35	0	2	0	
@@ -2035,7 +2020,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x626d50	render	0	25	0	1	0	
 0x626dc0	render	0	28	0	1	0	
 0x626ed0	render	0	28	0	3	0	
-0x626f20	render	0	58	0	1	0	C EAGL::Transform::AppendMatrix
+0x626f20	render	0	58	0	1	0	B EAGL::Transform::BuildMatrix
 0x626f70	render	0	43	0	1	0	
 0x626fd0	render	0	34	0	1	0	
 0x627180	render	0	55	0	1	0	R EAGLAnim::GetMemoryUsage
@@ -2231,6 +2216,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x6964e0	render	0	23	1	1	0	
 0x696e60	render	0	10	0	1	0	
 0x425330	rivals	0	31	2	1	0	
+0x42d350	rivals	0	130	1	2	0	B Player::RemoveCameraMovers
+0x42d3e0	rivals	0	130	1	2	0	B Player::DisableCameraMovers
 0x431df0	rivals	0	333	2	5	0	B RaceParameters::InitWithDefaults
 0x432810	rivals	0	24	1	1	0	
 0x432e80	rivals	0	1213	4	1	0	
@@ -2274,25 +2261,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x450065	rivals	0	9	0	0	0	
 0x4500ed	rivals	0	19	0	0	0	
 0x450100	rivals	0	31	0	0	0	
-0x451580	rivals	0	16	0	1	0	
-0x451590	rivals	0	47	0	1	0	
-0x4519f0	rivals	0	117	1	4	0	B AIActionGetUnstuck::AIActionGetUnstuck
-0x451cb0	rivals	0	157	0	1	0	B AIActionGetUnstuck::GetGoalPoint
-0x452190	rivals	0	40	0	1	0	
-0x4521c0	rivals	0	50	1	2	0	R AIActionIJustGotHit::AIActionIJustGotHit
-0x452270	rivals	0	47	1	2	0	
-0x452570	rivals	0	52	1	3	0	B AIActionAccidentRecovery::AIActionAccidentRecovery
-0x452630	rivals	0	82	1	1	0	B AIActionAccidentRecovery::CalculateScore
-0x452690	rivals	0	64	1	1	0	B AIActionAccidentRecovery::HasBeenAccomplished
-0x4527d0	rivals	0	40	1	1	0	
-0x452870	rivals	0	55	0	3	0	B AIActionDriveTrafficLane::HasExpired
-0x453060	rivals	0	45	0	1	0	
-0x453090	rivals	0	36	1	2	0	
-0x453470	rivals	0	26	1	1	0	
-0x453730	rivals	0	36	1	2	0	
-0x453830	rivals	0	45	0	1	0	
-0x453860	rivals	0	58	1	3	0	R AIActionAvoidAvoidableAsTraffic::AIActionAvoidAvoidableAsTraffic
-0x453a60	rivals	0	298	2	1	0	R AIActionAvoidAvoidableAsTraffic::HasBeenAccomplished
+0x453a60	rivals	0	298	2	1	0	B AIActionAvoidAvoidableAsTraffic::HasBeenAccomplished
 0x453b80	rivals	0	20	0	0	0	
 0x454170	rivals	0	53	1	3	0	R AIActionAvoidAvoidableAsTraffic::CleanUp
 0x454200	rivals	0	54	0	0	0	B AIActionObeyTrafficIntersections::ResetForNewIntersection
@@ -2336,7 +2305,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x457570	rivals	0	23	0	1	0	
 0x458150	rivals	0	196	0	2	0	B CollisionPredictor::IsThisAvoidableStoppedDirectlyInFrontOfMe
 0x458340	rivals	0	422	1	2	0	R CollisionPredictor::MakeOBBsForDriveTarget
-0x4584f0	rivals	0	418	0	1	0	R IntervalOverlap
+0x4584f0	rivals	0	418	0	1	0	A IntervalOverlap
 0x4586a0	rivals	0	173	0	1	0	R TimeIntervalForSeparatingAxis
 0x458a50	rivals	0	107	0	4	0	R CarController::CarController
 0x458ac0	rivals	0	31	1	1	0	
@@ -2379,14 +2348,13 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x47eae0	rivals	0	437	0	1	0	B PreRaceCameraCoordinator::PreRaceCameraCoordinator
 0x47eca0	rivals	0	258	4	0	0	R PreRaceCameraCoordinator::Update
 0x483160	rivals	0	85	0	4	0	R LoaderDragCameras
-0x48cd40	rivals	0	234	1	2	0	R DragRaceLeaderCameraMover::MakeSpace
 0x4939e0	rivals	0	164	0	1	0	R EnforceMaximumSlope
 0x493a90	rivals	0	136	0	1	0	R PreviewPause::GetPoint
 0x493b20	rivals	0	166	1	1	0	R PreviewPause::AddPoint
 0x493c60	rivals	0	13	0	1	0	
 0x4959d0	rivals	0	783	2	1	0	B PreRaceStatsScreen::PreRaceStatsScreen
-0x49d1d0	rivals	0	406	1	2	0	R PostRaceStatsScreen::SetupCircuit
-0x49d370	rivals	0	111	1	2	0	R PostRaceStatsScreen::ShowLaps
+0x49d1d0	rivals	0	406	1	2	0	R PostRaceStatsScreen::Setup
+0x49d370	rivals	0	111	1	2	0	R PostRaceStatsScreen::Scroll
 0x49d940	rivals	0	257	2	1	0	R PostRaceStatsScreen::DrawLapTimes
 0x4a3aa0	rivals	0	250	1	1	0	R LeaderBoard::SortLists
 0x4a7b80	rivals	0	238	3	1	2	B DriftGauge::SetTextAngleColor
@@ -2413,8 +2381,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x572b50	rivals	0	88	0	13	0	R ReplayManager::FindSnapshot
 0x572bb0	rivals	0	24	0	1	0	
 0x572d60	rivals	0	33	0	1	0	
-0x573040	rivals	0	53	0	1	0	R ReplayManager::GetData
-0x573240	rivals	0	133	3	2	0	B DemoModeReplay::LoadResourceFile
+0x573040	rivals	0	53	0	1	0	R ReplayManager::RestoreSnapshot
+0x573240	rivals	0	133	3	2	0	R DemoModeReplay::Unloader
 0x5732d0	rivals	0	13	0	1	0	
 0x573970	rivals	0	30	0	1	0	
 0x57a350	rivals	0	38	0	1	0	
@@ -2592,9 +2560,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5b04e1	runtime	0	37	0	1	0	
 0x5b05f0	runtime	0	12	0	1	0	
 0x5b0602	runtime	0	20	0	1	0	
-0x5d6900	runtime	0	228	0	1	2	P __AIDHandler
-0x5d6c72	runtime	0	105	0	1	0	P __GXDefaultTexRegionCallback
-0x5d6cdb	runtime	0	53	0	1	0	P __GXDefaultTlutRegionCallback
+0x5d6900	runtime	0	228	0	1	2	
+0x5d6c72	runtime	0	105	0	1	0	P __AISHandler
+0x5d6cdb	runtime	0	53	0	1	0	
 0x5eb9cc	runtime	0	267	0	2	0	
 0x5edf40	runtime	0	149	0	1	0	P EXIUnlock
 0x5ee680	runtime	0	137	0	1	0	P InitializeUART
@@ -2629,7 +2597,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x64006b	runtime	0	70	1	0	0	R Realmc::GCInterface::Seek
 0x640af0	runtime	0	128	3	1	0	R Realmc::GCInterface::FindFile
 0x641b50	runtime	0	159	0	4	0	B Realmc::GCInterface::UpdateTaskCardExists
-0x641bf0	runtime	0	71	1	2	0	B Realmc::GCInterface::UpdateTaskGetCardInfo
+0x641bf0	runtime	0	71	1	2	0	C Realmc::GCInterface::UpdateTaskGetCardInfo
 0x641c40	runtime	0	73	0	1	0	C Realmc::GCInterface::UpdateTaskMount
 0x641cb0	runtime	0	63	2	3	0	C Realmc::GCInterface::UpdateTaskUnmount
 0x641cf0	runtime	0	70	2	1	0	C Realmc::GCInterface::UpdateTaskClose
@@ -3338,11 +3306,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x446c90	track	0	286	1	1	0	B DrivableScenerySection::CalculateVisibleLibrarySections
 0x45504f	track	0	10	0	0	0	
 0x455059	track	0	16	0	0	0	
-0x4574b0	track	0	98	0	1	0	R __static_initialization_and_destruction_0
+0x4574b0	track	0	98	0	1	0	
 0x45c640	track	0	286	0	1	0	R DrivingChoice::ReduceCurrentL
 0x4629e0	track	0	31	0	2	0	
 0x462a00	track	0	82	1	2	0	R AIDriver::JustCrossedSignpost
-0x465490	track	0	89	0	2	0	C CarState::IsNitrousAvailable
+0x465490	track	0	89	0	2	0	B CarState::StartNitrous
 0x4655b0	track	0	44	1	2	0	
 0x466920	track	0	75	0	1	0	
 0x466bf0	track	0	231	2	1	0	B CloseCollisionBody
@@ -3362,31 +3330,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x483300	track	0	14	0	1	0	
 0x483310	track	0	13	0	1	0	
 0x48485a	track	0	40	0	0	0	
-0x4892e0	track	0	18	0	1	0	
-0x4894b0	track	0	136	1	1	0	B DriveCameraMover::~DriveCameraMover
-0x4895d0	track	0	39	0	1	0	
-0x48b310	track	0	168	2	1	0	B CubicCameraMover::~CubicCameraMover
-0x48b3c0	track	0	68	1	1	0	B CubicCameraMover::OutsidePOV
-0x48b410	track	0	80	0	1	0	R CubicCameraMover::SetPovType
-0x48b460	track	0	203	0	1	0	R CubicCameraMover::ResetState
-0x48b7a0	track	0	278	2	1	0	R CubicCameraMover::MakeSpace
-0x48c390	track	0	99	2	1	0	R DragRaceCameraMover::~DragRaceCameraMover
-0x48cb00	track	0	199	2	1	0	R DragRaceLeaderCameraMover::~DragRaceLeaderCameraMover
-0x48d9a0	track	0	120	2	1	0	R DragRaceAheadCameraMover::~DragRaceAheadCameraMover
-0x48dc10	track	0	237	1	1	0	R DragRaceAheadCameraMover::MakeSpace
-0x48e380	track	0	235	2	1	0	R AnimationControllerCameraMover::~AnimationControllerCameraMover
-0x48e470	track	0	23	0	1	0	
-0x48e760	track	0	70	0	2	0	R AnimationControllerCameraMover::ResetToBeginning
-0x48e7b0	track	0	235	1	4	0	R AnimationControllerCameraMover::JumpAhead
-0x48ea10	track	0	31	1	1	0	
-0x48ea30	track	0	37	0	1	0	
-0x48ea60	track	0	30	2	1	0	
-0x48eb70	track	0	109	1	2	0	A LinController::~LinController
-0x48ebe0	track	0	25	1	1	0	
-0x48ec00	track	0	219	0	2	0	
-0x48ece0	track	0	192	0	0	0	
-0x4900f0	track	0	231	2	1	0	B ZoneFreezeCameraMover::~ZoneFreezeCameraMover
-0x4906d0	track	0	87	1	3	0	R PreviewComet::EnableEmitters
 0x524740	track	0	51	0	1	0	
 0x52cbd0	track	0	247	1	3	0	B EAXTires::EAXTires
 0x52dc70	track	0	436	0	3	0	B __static_initialization_and_destruction_0
@@ -3421,15 +3364,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5843f0	track	0	50	1	1	0	R AverageWindow::~AverageWindow
 0x58a460	track	0	43	0	1	0	
 0x58a490	track	0	24	0	1	0	
-0x58a4c0	track	0	135	0	2	0	R Clan::~Clan
-0x58a640	track	0	181	1	1	0	C _GLOBAL_.D.ClanSlotPool
-0x58a790	track	0	184	0	1	0	R QueuedFile::BeginRead
+0x58a4c0	track	0	135	0	2	0	B Clan::~Clan
+0x58a640	track	0	181	1	1	0	
+0x58a790	track	0	184	0	1	0	B QueuedFile::BeginRead
 0x58ab00	track	0	71	1	1	0	R FindQueuedFile
 0x58acb0	track	0	49	0	2	0	R ChangeQueuedFileParams
 0x58d0d0	track	0	102	1	2	0	R BodyDamage::GetVisibleDamageAmount
-0x58d190	track	0	304	0	2	0	R BodyDamage::ApplyDamage
-0x58d420	track	0	156	1	2	0	R CarDamage::CarDamage
-0x58d5d0	track	0	80	1	1	0	
+0x58d190	track	0	304	0	2	0	
+0x58d420	track	0	156	1	2	0	B __static_initialization_and_destruction_0
+0x58d5d0	track	0	80	1	1	0	R CarDamage::~CarDamage
 0x58d620	track	0	251	0	4	0	
 0x58d9e0	track	0	128	0	2	0	R CarDamage::RecalculateBreakableDamage
 0x592af0	track	0	33	0	1	0	
@@ -3444,10 +3387,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5a6f50	track	0	42	0	1	0	
 0x5a6f80	track	0	155	0	1	0	R FuturePoints::AreDrivingLineSpeedsIncreasingMonotonically
 0x5ab080	track	0	212	0	1	0	B TrafficIntersection::MaybeReleaseBaton
-0x5ab160	track	0	78	0	2	0	B TrafficIntersection::GetIntersectionRoute
-0x5ab1b0	track	0	91	0	1	0	R CrossTrafficEmitter::DoSnapshot
-0x5ab2b0	track	0	298	0	2	0	R CrossTrafficEmitter::GetDAT
-0x5ab3e0	track	0	358	0	1	0	R CrossTrafficEmitter::GetRoutePoint
+0x5ab160	track	0	78	0	2	0	R CrossTrafficEmitter::DoSnapshot
+0x5ab1b0	track	0	91	0	1	0	R CrossTrafficEmitter::ChooseNewPrimarySpotMaxTimeAhead
+0x5ab2b0	track	0	298	0	2	0	R CrossTrafficEmitter::GetRoutePoint
+0x5ab3e0	track	0	358	0	1	0	
 0x5f087f	track	0	57	0	1	0	
 0x5f08b8	track	0	210	0	1	0	P SITransfer
 0x5f098a	track	0	181	0	1	0	P GetTypeCallback
@@ -3459,7 +3402,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5f4338	track	0	455	0	3	0	
 0x5f4cfb	track	0	85	0	2	0	P __SISteeringEnable
 0x643350	track	0	229	0	1	0	R Realmc::GCDriver::FindNext
-0x643550	track	0	389	0	1	0	R Realmc::GCDriver::SetAttributes
+0x643550	track	0	389	0	1	0	A Realmc::GCDriver::SetAttributes
 0x6436f0	track	0	180	0	2	0	R Realmc::GCDriver::FindFileNumber
 0x6437b0	track	0	176	0	2	0	R Realmc::GCDriver::NGCSportsBioSeek
 0x643860	track	0	176	0	2	0	R Realmc::GCDriver::NGCSportsBioRead
@@ -3579,8 +3522,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5a7e70	traffic	0	246	0	1	0	R contest
 0x5a7f70	traffic	0	142	0	1	0	R altersingle
 0x5a8000	traffic	0	428	0	1	0	R alterneigh
-0x5a8400	traffic	0	119	0	1	0	R nqGetPaletteEntry
-0x5a8490	traffic	0	86	0	1	0	C ScaleColours
+0x5a8400	traffic	0	119	0	1	0	
+0x5a8490	traffic	0	86	0	1	0	B nqGetPaletteEntry
 0x5a8500	traffic	0	82	0	1	0	C GetBlendColour
 0x5aab20	traffic	0	384	0	1	0	B TrafficIntersection::GetLength
 0x5aad10	traffic	0	123	0	1	0	B TrafficIntersection::AllowedToProceed
@@ -3604,7 +3547,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x41f130	unknown	0	16	0	2	0	
 0x41f140	unknown	0	19	1	18	0	
 0x420080	unknown	0	13	0	1	0	
-0x4200a0	unknown	0	103	0	1	0	R World::IsWorldPaused
+0x4200a0	unknown	0	103	0	1	0	B World::UpdateWorldPaused
 0x421170	unknown	0	124	1	2	0	R World::CalculateDebugChecksum
 0x421c40	unknown	0	44	0	1	0	
 0x424c90	unknown	0	28	1	1	0	
@@ -3617,6 +3560,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x42ab20	unknown	0	15	0	1	0	
 0x42acf0	unknown	0	29	0	1	0	
 0x42add0	unknown	0	22	0	1	0	mw GameFlowManager::IsLoading
+0x42b040	unknown	0	133	3	2	0	B VisibleDrivingLine::Render
 0x42f5f0	unknown	0	86	0	1	0	B Player::ImpactDamage
 0x430020	unknown	0	51	0	1	0	R WrapSubtract
 0x431810	unknown	0	146	1	1	0	B Player::JustReset
@@ -3682,7 +3626,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4801c0	unknown	0	101	0	1	0	R DragCameraManager::GetIntervalSize
 0x481790	unknown	0	180	0	1	0	B DragCameraManager::KeysEqual
 0x483220	unknown	0	155	0	1	0	C __static_initialization_and_destruction_0
-0x48edf0	unknown	0	43	1	2	0	
 0x495ce0	unknown	0	312	0	2	1	B PreRaceStatsScreen::NotificationMessage
 0x49fc50	unknown	0	53	0	1	0	R PostRaceResultsScreen::NotifySoundMessage
 0x49fc90	unknown	0	81	1	7	0	R PostRaceStatsScreen::~PostRaceStatsScreen
@@ -3703,7 +3646,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4ccda0	unknown	0	59	0	1	0	R PlayPostRaceSpeech_Results
 0x4cce70	unknown	0	54	0	1	0	R SoundImplementer::SoundImplementer
 0x4cced0	unknown	0	101	0	1	0	R SoundImplementer::~SoundImplementer
-0x4ccf90	unknown	0	119	0	1	0	A GetHistoryFlagForScreen
+0x4ccf90	unknown	0	119	0	1	0	C GetHistoryFlagForScreen
 0x4cd0d0	unknown	0	161	0	1	0	C IsPackageADialogBox
 0x4d99c0	unknown	0	97	1	1	0	
 0x4ee6e0	unknown	0	31	1	1	0	
@@ -3821,14 +3764,14 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5935e0	unknown	0	57	0	1	0	R SubWorld::PrintCollidingSubworlds
 0x5936d0	unknown	0	46	1	2	0	
 0x593e60	unknown	0	83	0	1	0	R cPoint::SplineSeek
-0x594ff0	unknown	0	84	1	1	0	C __builtin_vec_new
+0x594ff0	unknown	0	84	1	1	0	C __builtin_new
 0x59ba10	unknown	0	10	0	1	0	
 0x59bae0	unknown	0	155	0	1	0	R DrivingLocation::IsEqualTo
 0x59e690	unknown	0	84	0	2	0	R cSlider::cSlider
 0x5a0160	unknown	0	98	0	1	0	B UnloaderCareerChunk
 0x5a7340	unknown	0	65	0	2	0	R FuturePoint::GetPosition
-0x5a8570	unknown	0	193	1	2	0	R RemapColour
-0x5a8640	unknown	0	1032	1	4	0	R CompositeSkin32
+0x5a8570	unknown	0	193	1	2	0	B RemapColour
+0x5a8640	unknown	0	1032	1	4	0	B CompositeSkin32
 0x5b1797	unknown	0	32	0	1	0	
 0x5e9b42	unknown	0	298	0	1	0	
 0x5e9c6c	unknown	0	378	0	14	0	P GXSetTevOrder
@@ -3909,7 +3852,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x61bee0	unknown	0	252	0	9	0	R idctcompute
 0x61bfe0	unknown	0	254	0	3	0	R EAGL::DynamicLoader::RunConstructors
 0x622400	unknown	0	95	0	1	0	
-0x6236d0	unknown	0	167	0	3	0	B __static_initialization_and_destruction_0
+0x6236d0	unknown	0	167	0	3	0	
 0x6241b0	unknown	0	280	0	1	0	
 0x624470	unknown	0	357	0	1	0	
 0x636974	unknown	0	373	0	0	0	
@@ -3967,6 +3910,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x68a020	unknown	0	26	2	1	0	
 0x68a820	unknown	0	26	2	1	0	
 0x68ad00	unknown	0	22	2	1	0	
+0x68ad80	unknown	0	39	2	1	0	
 0x68e780	unknown	0	12	1	1	0	
 0x68f1e0	unknown	0	12	1	1	0	
 0x691c60	unknown	0	10	0	1	0	
@@ -4098,7 +4042,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4cc970	audio	1	308	1	1	0	
 0x4ccc40	audio	1	27	1	1	0	
 0x4cf110	audio	1	302	3	1	0	C OptionsMenu::OptionsMenu
-0x4ded80	audio	1	105	3	1	0	
+0x4ded80	audio	1	105	3	1	0	B CreateTHXMovieScreen
 0x51ca10	audio	1	30	2	1	0	
 0x51ccf0	audio	1	40	2	6	0	
 0x51d510	audio	1	404	2	1	0	B EAXSound::CreatePlayerCar
@@ -4197,13 +4141,13 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x534070	audio	1	69	4	1	0	A TrolleySoundObject::EndSnd
 0x5340c0	audio	1	73	4	4	0	R BridgeWarningSoundObject::BridgeWarningSoundObject
 0x534140	audio	1	31	2	1	0	
-0x534160	audio	1	71	1	1	0	R BridgeWarningSoundObject::~BridgeWarningSoundObject
-0x5341b0	audio	1	250	3	1	0	R BridgeWarningSoundObject::Update
-0x534390	audio	1	73	4	2	0	R BridgeWarningSoundObject::EndSnd
-0x5343e0	audio	1	168	2	1	0	
+0x534160	audio	1	71	1	1	0	B BridgeWarningSoundObject::~BridgeWarningSoundObject
+0x5341b0	audio	1	250	3	1	0	B BridgeWarningSoundObject::Update
+0x534390	audio	1	73	4	2	0	B FountainSoundObject::FountainSoundObject
+0x5343e0	audio	1	168	2	1	0	B FountainSoundObject::PlaySnd
 0x5344b0	audio	1	31	2	1	0	
-0x534500	audio	1	71	1	1	0	B FountainSoundObject::~FountainSoundObject
-0x534620	audio	1	250	3	1	0	B FountainSoundObject::Update
+0x534500	audio	1	71	1	1	0	B PlaneSoundObject::~PlaneSoundObject
+0x534620	audio	1	250	3	1	0	
 0x534830	audio	1	31	2	1	0	
 0x5348e0	audio	1	318	6	1	0	B TrainSoundObject::Update
 0x534a70	audio	1	30	2	1	0	
@@ -4310,8 +4254,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x6577a0	audio	1	54	2	1	0	
 0x657910	audio	1	39	1	1	0	
 0x657c50	audio	1	123	1	2	0	
-0x658cf0	audio	1	125	3	1	0	B SND3dpos
-0x658d80	audio	1	213	3	1	0	B SNDARAM_alloc
+0x658cf0	audio	1	125	3	1	0	B transferframes
+0x658d80	audio	1	213	3	1	0	B SFILTER_timestretch
 0x658f00	audio	1	103	3	1	0	B SNDI_equalpower
 0x658f70	audio	1	103	3	1	0	R iSNDdetunetolinear
 0x658fe0	audio	1	191	3	1	0	R iSNDcalcpitch
@@ -4322,7 +4266,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x65a720	audio	1	23	1	1	0	
 0x65aeb0	audio	1	290	1	1	0	
 0x65b040	audio	1	225	1	1	0	
-0x65b580	audio	1	66	1	1	0	R MIX_getframe
+0x65b580	audio	1	66	1	1	0	
 0x65ba20	audio	1	144	1	1	0	
 0x65bb50	audio	1	35	1	1	0	
 0x65bd60	audio	1	78	1	1	0	R SNDI_cos
@@ -4404,6 +4348,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x47d780	camera	1	101	1	1	0	R Noise
 0x47f130	camera	1	31	2	1	0	
 0x47f810	camera	1	31	2	1	0	
+0x47f8c0	camera	1	277	3	0	0	B EndingNisCameraCoordinator::Update
 0x47ffe0	camera	1	28	1	1	0	
 0x480000	camera	1	28	1	1	0	
 0x480750	camera	1	474	2	1	0	R DragCameraManager::CopyKey
@@ -4413,14 +4358,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x480ff0	camera	1	356	5	1	0	R DragCameraManager::FromBubble
 0x4812b0	camera	1	602	4	3	0	R DragCameraManager::ToggleSpace
 0x482850	camera	1	25	1	1	0	
-0x48ee20	camera	1	170	1	2	0	R ConstrainToTopology
-0x48eed0	camera	1	439	2	1	0	R EnsureTopology
-0x4900d0	camera	1	30	2	1	0	
 0x4922a0	camera	1	30	2	1	0	
-0x4922c0	camera	1	429	4	1	0	R ZonePreviewCameraMover::~ZonePreviewCameraMover
 0x492520	camera	1	57	1	1	0	R ZonePreviewCameraMover::Render
-0x492690	camera	1	22	2	1	0	
-0x4926b0	camera	1	68	2	1	0	R ZonePreviewCameraMover::Disable
 0x4c0420	camera	1	109	2	2	3	R PauseOptionsMenu::DrawDebugCameras
 0x4c0500	camera	1	242	2	2	3	R PauseOptionsMenu::DrawSetLap
 0x59c080	camera	1	30	2	1	0	
@@ -4488,7 +4427,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x460350	canon	1	31	2	1	0	
 0x4603d0	canon	1	124	1	1	0	
 0x460560	canon	1	117	1	2	0	B PlayerSteering::DoSteering
-0x494890	canon	1	41	2	7	0	
 0x494af0	canon	1	31	2	1	0	
 0x494b10	canon	1	81	2	1	0	R FEng_PauseDragOptions::DisplayRearview
 0x494b70	canon	1	31	1	1	0	
@@ -4499,14 +4437,14 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4970f0	canon	1	25	1	1	0	
 0x4973d0	canon	1	61	2	1	0	R PostRaceMenuScreen::DoRestartEvent
 0x497e20	canon	1	31	2	1	0	
-0x497e40	canon	1	105	1	1	0	R PostRaceResultsScreen::PostRaceResultsScreen
+0x497e40	canon	1	105	1	1	0	B PostRaceStyleScreen::NotificationMessage
 0x49be50	canon	1	11	1	1	0	
 0x49be60	canon	1	30	2	1	0	
 0x49e2b0	canon	1	30	2	1	0	
 0x49e2d0	canon	1	178	3	1	0	R PostRaceStatsScreen::DrawLongestDrift
 0x49e3e0	canon	1	23	1	1	0	
 0x49e420	canon	1	610	6	1	8	
-0x49e7e0	canon	1	164	4	1	1	B cPostRaceScreenManager::NeedToSeePostRaceRewards
+0x49e7e0	canon	1	164	4	1	1	C cPostRaceScreenManager::NeedToSeePostRaceRewards
 0x49e9d0	canon	1	543	8	1	0	
 0x49ebf0	canon	1	250	4	1	0	B cPostRaceScreenManager::~cPostRaceScreenManager
 0x49eee0	canon	1	58	2	2	1	B cPostRaceScreenManager::Suspend
@@ -4640,16 +4578,16 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4d6160	canon	1	83	2	1	1	R ControllerMenu::FinishLoadingControllerTextureCallback
 0x4d61e0	canon	1	11	1	1	0	
 0x4d61f0	canon	1	30	2	1	0	
-0x4d6870	canon	1	72	2	1	0	R HUDMenu::DrawTitle
-0x4d68c0	canon	1	72	2	1	0	R HUDMenu::DrawGauges
-0x4d6910	canon	1	72	2	1	0	R HUDMenu::DrawPosition
-0x4d6960	canon	1	103	2	2	0	R HUDMenu::DrawLapInfo
-0x4d69e0	canon	1	72	2	1	0	B HUDMenu::ToggleGauges
-0x4d6a30	canon	1	61	1	1	0	B HUDMenu::TogglePosition
-0x4d6a70	canon	1	61	1	1	0	B HUDMenu::ToggleLapInfo
-0x4d6ab0	canon	1	61	1	1	0	B HUDMenu::~HUDMenu
-0x4d6af0	canon	1	79	1	1	0	B CreditsLine::SetLanguageID
-0x4d6b40	canon	1	61	1	1	0	B CreditsLine::Animate
+0x4d6870	canon	1	72	2	1	0	B HUDMenu::DrawTitle
+0x4d68c0	canon	1	72	2	1	0	B HUDMenu::DrawPosition
+0x4d6910	canon	1	72	2	1	0	B HUDMenu::DrawLapInfo
+0x4d6960	canon	1	103	2	2	0	B HUDMenu::ToggleGauges
+0x4d69e0	canon	1	72	2	1	0	B HUDMenu::TogglePosition
+0x4d6a30	canon	1	61	1	1	0	B HUDMenu::ToggleLapInfo
+0x4d6a70	canon	1	61	1	1	0	B HUDMenu::~HUDMenu
+0x4d6ab0	canon	1	61	1	1	0	B CreditsLine::SetLanguageID
+0x4d6af0	canon	1	79	1	1	0	B CreditsLine::Animate
+0x4d6b40	canon	1	61	1	1	0	B CreditsLine::PleaseResetMe
 0x4d6e40	canon	1	108	2	1	0	R CreditsScroller::CreditsScroller
 0x4d7010	canon	1	115	1	1	0	R CreditsScroller::GetMaxY
 0x4d71c0	canon	1	31	2	1	0	
@@ -4669,15 +4607,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4dcf80	canon	1	77	2	1	0	R CreateInfoDialog
 0x4dd690	canon	1	15	1	1	0	
 0x4de1c0	canon	1	30	2	1	0	
-0x4de440	canon	1	96	2	1	0	R CreateDisclaimerScreen
-0x4de4a0	canon	1	119	2	8	0	R DisclaimerScreen::DisclaimerScreen
+0x4de440	canon	1	96	2	1	0	
+0x4de4a0	canon	1	119	2	8	0	B LoadingScreen::PrepToShowControllerConfig
 0x4de570	canon	1	11	1	1	0	
 0x4de580	canon	1	30	2	1	0	
 0x4de6b0	canon	1	11	1	1	0	
 0x4de6c0	canon	1	30	2	1	0	
 0x4de7d0	canon	1	11	1	1	0	
 0x4de7e0	canon	1	30	2	1	0	
-0x4de880	canon	1	58	1	3	0	R THXMovieScreen::THXMovieScreen
+0x4de880	canon	1	58	1	3	0	B CreateIntroFMVScreen
 0x4de8c0	canon	1	11	1	1	0	
 0x4de8d0	canon	1	30	2	1	0	
 0x4dea70	canon	1	11	1	1	0	
@@ -4685,27 +4623,27 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4deb30	canon	1	33	1	2	0	
 0x4debc0	canon	1	11	1	1	0	
 0x4debd0	canon	1	30	2	1	0	
-0x4dec50	canon	1	63	1	1	0	B FinishLoadingMarketingCallbackBridge
+0x4dec50	canon	1	63	1	1	0	R CreateEALogoBumperScreen
 0x4decf0	canon	1	11	1	1	0	
 0x4ded00	canon	1	30	2	1	0	
 0x4dee10	canon	1	30	2	1	0	
-0x4df0e0	canon	1	48	1	1	0	R DemoDiscLegalScreen::~DemoDiscLegalScreen
+0x4df0e0	canon	1	48	1	1	0	B SplashScreen::~SplashScreen
 0x4df100	canon	1	10	1	0	0	
 0x4df3d0	canon	1	30	2	1	0	
 0x4df3f0	canon	1	11	1	1	0	
 0x4df4b0	canon	1	30	2	1	0	
 0x4df530	canon	1	37	2	1	1	
-0x4df790	canon	1	620	1	2	0	R MPLoginScreen::~MPLoginScreen
+0x4df790	canon	1	620	1	2	0	
 0x4dfa10	canon	1	830	1	1	0	
 0x4e0000	canon	1	11	1	1	0	
 0x4e0010	canon	1	30	2	1	0	
-0x4e0120	canon	1	54	1	1	0	
+0x4e0120	canon	1	54	1	1	0	B SplashScreen::NotifySoundMessage
 0x4e01c0	canon	1	11	1	1	0	
 0x4e01d0	canon	1	30	2	1	0	
-0x4e0270	canon	1	83	2	1	1	R MPLoginScreen::ClearPlayer2List
-0x4e02d0	canon	1	161	2	1	2	A MPLoginScreen::LoadingPlayer1List
+0x4e0270	canon	1	83	2	1	1	B CreateMPLoginScreen
+0x4e02d0	canon	1	161	2	1	2	B MPLoginScreen::MPLoginScreen
 0x4e0680	canon	1	30	2	1	0	
-0x4e06a0	canon	1	114	2	1	0	B MPLoginScreen::ShowPlayer2List
+0x4e06a0	canon	1	114	2	1	0	B MPLoginScreen::ClearPlayer1List
 0x4e0720	canon	1	30	2	1	0	
 0x4e0d90	canon	1	1272	11	2	0	R MPCarSelectScreen::NotificationMessage
 0x4e19a0	canon	1	98	2	3	0	B MPCarSelectData::DrawCarName
@@ -4775,7 +4713,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4f8dd0	canon	1	233	1	11	1	B thumbnail_scale
 0x4f8ec0	canon	1	233	1	8	1	B ThumbnailScroller::MoveObjectsTo
 0x4f9240	canon	1	252	4	15	0	C ScrollerSlot::Show
-0x4f9340	canon	1	65	2	4	0	B ScrollerSlot::Hide
 0x4f9390	canon	1	11	1	1	0	
 0x4f93a0	canon	1	30	2	1	0	
 0x4f93c0	canon	1	91	2	0	0	
@@ -4788,13 +4725,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4ffa60	canon	1	71	1	1	0	R FEPackage::Startup
 0x4ffe70	canon	1	56	1	1	0	R FEPackage::UpdateGroup
 0x500350	canon	1	107	1	1	0	R FEPackage::Update
-0x50d130	canon	1	188	2	2	1	
-0x50e600	canon	1	120	2	1	1	B GarageRimsStyleBrowser::NotificationMessage
-0x50ed90	canon	1	121	2	1	1	B GarageRimsBrowser::IsInstallingPart
-0x5118b0	canon	1	220	2	2	1	B GarageDecalsSlot::RedrawHeading
-0x512500	canon	1	78	2	1	0	
-0x512550	canon	1	35	1	1	0	
-0x512580	canon	1	109	2	1	0	B GarageDecalsBrand::AddPickable
 0x513530	canon	1	97	3	1	0	
 0x513610	canon	1	91	2	0	0	B GarageChooseAccessoryCategoryScreen::MoveBackPackage
 0x514150	canon	1	91	2	0	0	
@@ -4845,7 +4775,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x594310	canon	1	21	1	2	0	
 0x59df20	canon	1	164	1	2	0	B StompEntry::Clear
 0x59e020	canon	1	57	1	2	0	B DisableRenderEggs
-0x59e3b0	canon	1	173	1	1	0	B __static_initialization_and_destruction_0
+0x59e3b0	canon	1	173	1	1	0	C __static_initialization_and_destruction_0
 0x59f5b0	canon	1	161	3	1	1	B cVolSlider::~cVolSlider
 0x59fc60	canon	1	38	2	1	0	
 0x59ffd0	canon	1	65	1	4	0	B UnloaderLanguage
@@ -5110,7 +5040,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4b1fa0	car	1	90	2	0	0	R GarageMainScreen::HandleHideStats
 0x4b2200	car	1	30	2	1	0	
 0x4b2220	car	1	91	2	1	1	R BackgroundScreen::BackgroundScreen
-0x4b2280	car	1	100	1	1	0	R BackgroundScreen::~BackgroundScreen
+0x4b2280	car	1	100	1	1	0	C BackgroundScreen::~BackgroundScreen
 0x4b23b0	car	1	90	3	5	0	R GarageMainScreen2P::GarageMainScreen2P
 0x4b2520	car	1	139	2	2	2	R CarViewer::FindWhichScreenToUpdate
 0x4bd0c0	car	1	41	2	1	1	
@@ -5141,22 +5071,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e4b50	car	1	30	2	1	0	
 0x4f6340	car	1	17	1	5	0	
 0x4f9fc0	car	1	11	1	1	0	
-0x50bb70	car	1	76	2	1	0	B GaragePerfBrandPackage::IsInstallingUpgrade
-0x50bbc0	car	1	65	2	1	0	B GaragePerfBrandPackage::IsBuyingUpgrade
-0x50c850	car	1	30	2	1	0	
-0x50ced0	car	1	85	3	1	0	A GarageRimsBrandBrowser::MoveForwardPackage
-0x50cf30	car	1	92	3	1	0	A GarageRimsBrandBrowser::MoveBackPackage
-0x50dd40	car	1	223	2	1	1	R GarageRimsStyleBrowser::AddPickable
-0x50de20	car	1	85	3	1	0	R GarageRimsStyleBrowser::MoveForwardPackage
-0x50de80	car	1	82	3	1	0	R GarageRimsStyleBrowser::MoveBackPackage
-0x50ed30	car	1	83	3	1	0	B GarageRimsBrowser::CanPlayerPurchasePart
-0x50f0e0	car	1	139	2	1	1	B GarageRimsBrowser::AddPickable
-0x50fa80	car	1	30	2	1	0	
-0x510d40	car	1	30	2	1	0	
-0x5117b0	car	1	95	2	2	0	B GarageDecalsSlot::AddPickable
-0x511d70	car	1	359	4	2	0	
-0x511f00	car	1	227	6	4	0	
-0x5123c0	car	1	30	2	1	0	
 0x513a80	car	1	30	2	1	0	
 0x514250	car	1	30	2	1	0	
 0x564bb0	car	1	20	2	1	0	
@@ -5181,7 +5095,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x57bad0	car	1	11	1	1	0	
 0x57bae0	car	1	30	2	1	0	
 0x57bb00	car	1	11	1	1	0	
-0x57bb10	car	1	417	2	1	0	R NISCrowd::NISCrowd
+0x57bb10	car	1	417	2	1	0	B NISCrowd::NISCrowd
 0x57bcc0	car	1	30	2	1	0	
 0x57bce0	car	1	11	1	1	0	
 0x57bd70	car	1	30	2	1	0	
@@ -5393,7 +5307,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x41af00	input	1	57	2	1	0	B FEKeyboard::IsControlButton
 0x41b5f0	input	1	57	2	2	0	B FEKeyboard::AppendLetter
 0x41b970	input	1	261	3	1	0	R FEKeyboard::AppendChar
-0x472cb0	input	1	51	1	1	0	
+0x472cb0	input	1	51	1	1	0	R GJKPolytope::~GJKPolytope
 0x4d0350	input	1	161	2	1	1	R OptionsMenu::ToggleHandling
 0x4ec3e0	input	1	11	1	1	0	
 0x4ec3f0	input	1	30	2	1	0	
@@ -5488,8 +5402,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4fd340	render	1	30	2	1	0	
 0x4fe200	render	1	43	2	1	0	
 0x4fe3d0	render	1	293	5	2	0	B FEMessageResponse::__nw
-0x4fe570	render	1	173	3	2	0	R FEMessageResponse::SetCount
-0x4fe860	render	1	207	2	1	0	R __static_initialization_and_destruction_0
+0x4fe570	render	1	173	3	2	0	B FEMessageResponse::SetCount
+0x4fe860	render	1	207	2	1	0	B FindConditionBranchTarget__C17FEMessageResponseUl
 0x4fe940	render	1	31	2	1	0	
 0x4fec10	render	1	30	2	1	0	
 0x4ff5f0	render	1	101	2	0	0	B __static_initialization_and_destruction_0
@@ -5712,17 +5626,17 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5d2276	render	1	400	1	1	0	P __VIInit
 0x5d2406	render	1	24	1	1	0	
 0x5d2cae	render	1	394	1	1	0	P setVerticalRegs
-0x5d3d47	render	1	559	1	1	0	P UpdateOrigin
-0x5d402e	render	1	198	1	1	0	P PADOriginUpdateCallback
-0x5d4218	render	1	213	1	1	0	P PADProbeCallback
-0x5d4425	render	1	187	1	1	0	
-0x5d4618	render	1	187	1	1	0	P PADReset
-0x5d553b	render	1	299	1	1	0	P SamplingHandler
-0x5d5835	render	1	253	1	1	0	P __PADDisableRecalibration
+0x5d3d47	render	1	559	1	1	0	P __VIDisplayPositionToXY
+0x5d402e	render	1	198	1	1	0	
+0x5d4218	render	1	213	1	1	0	P PADClamp
+0x5d4425	render	1	187	1	1	0	P PADOriginCallback
+0x5d4618	render	1	187	1	1	0	P PADProbeCallback
+0x5d553b	render	1	299	1	1	0	P SPEC1_MakeStatus
+0x5d5835	render	1	253	1	1	0	P OnReset
 0x5d6535	render	1	28	2	1	0	
-0x5d65b0	render	1	94	2	6	0	
+0x5d65b0	render	1	94	2	6	0	P __AI_set_stream_sample_rate
 0x5d6620	render	1	14	1	1	0	
-0x5d75b0	render	1	181	1	1	0	P GXGetFifoPtrs
+0x5d75b0	render	1	181	1	1	0	P __GXSaveCPUFifoAux
 0x5d7846	render	1	31	2	1	0	
 0x5d795a	render	1	130	2	1	0	P __GXSetVCD
 0x5d7b0e	render	1	47	2	1	0	
@@ -5847,7 +5761,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x60c89d	render	1	28	2	1	0	
 0x60cd67	render	1	25	1	1	0	
 0x60cd80	render	1	32	1	1	0	
-0x60cdf7	render	1	302	1	1	1	P DBGReadStatus
+0x60cdf7	render	1	302	1	1	1	
 0x60cf25	render	1	459	1	1	4	
 0x60d0f0	render	1	210	1	1	0	P DBGWrite
 0x60d1c2	render	1	210	1	1	0	P DBGRead
@@ -5935,7 +5849,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x623260	render	1	61	1	1	0	
 0x6232a0	render	1	66	1	2	0	
 0x623350	render	1	400	1	2	0	B EAGL::TevStage::ResetToDefault
-0x623500	render	1	134	1	4	0	
+0x623500	render	1	134	1	4	0	B __static_initialization_and_destruction_0
 0x623f40	render	1	1127	2	1	0	
 0x624830	render	1	35	1	4	0	
 0x624860	render	1	32	1	1	0	
@@ -5945,7 +5859,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x624dd0	render	1	45	2	2	0	
 0x624e00	render	1	35	1	2	0	
 0x625ba0	render	1	104	2	1	0	C EAGL::DrawGouraud::End
-0x625f60	render	1	99	2	2	0	B EAGLInternal::DefaultMalloc
+0x625f60	render	1	99	2	2	0	C EAGLInternal::DefaultMalloc
 0x626040	render	1	99	2	2	0	R __static_initialization_and_destruction_0
 0x6260b0	render	1	99	2	2	0	A _GLOBAL_.I._25GeoPrim_SingleDrawGouraud.gNumVolatiles
 0x6269a0	render	1	40	1	9	0	
@@ -6004,7 +5918,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x630150	render	1	167	1	1	0	C EAGLAnim::FnRawPoseChannel::Eval
 0x630200	render	1	186	1	1	0	C EAGLAnim::FnRawPoseChannel::EvalSQT
 0x630400	render	1	214	1	1	0	
-0x6304e0	render	1	228	1	1	0	R EAGLAnim::RawPoseChannel::Eval
+0x6304e0	render	1	228	1	1	0	C EAGLAnim::RawPoseChannel::Eval
 0x630760	render	1	120	1	1	0	R EAGLAnim::StatelessQ::InitAnimMemoryMap
 0x6307e0	render	1	60	2	1	0	R EAGLAnim::StatelessF3::InitAnimMemoryMap
 0x6308e0	render	1	15	1	1	0	
@@ -6091,8 +6005,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x426450	rivals	1	123	1	1	0	B Car::CalculateDraftFactor
 0x42a790	rivals	1	118	2	1	0	A CheckForCarTuningUpdates
 0x42aa70	rivals	1	130	1	1	0	
-0x42d350	rivals	1	130	1	2	0	B Player::RemoveCameraMovers
-0x42d3e0	rivals	1	130	1	2	0	B Player::DisableCameraMovers
 0x42d9a0	rivals	1	42	1	1	0	
 0x42e190	rivals	1	71	2	1	0	R Player::DragPilotOn
 0x42e1e0	rivals	1	67	2	1	0	R Player::DragPilotOff
@@ -6125,18 +6037,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x44ca70	rivals	1	74	1	1	0	R AICarController::IsPlanningToTakeRoute
 0x44ce60	rivals	1	74	1	2	0	B DrivingInformation::Clear
 0x44d5f0	rivals	1	71	1	7	0	
-0x44dce0	rivals	1	65	2	1	0	R AIGoalWinRoadRace::CreateDefaultAction
 0x450d00	rivals	1	30	1	0	0	
-0x451d50	rivals	1	111	1	1	0	B AIActionGetUnstuck::GetGoalPoint
-0x4526d0	rivals	1	61	1	1	0	B AIActionAccidentRecovery::HasExpired
-0x452710	rivals	1	181	1	1	0	B AIActionAccidentRecovery::CalculatePointsToDrive
-0x452990	rivals	1	228	2	3	0	B AIActionAvoidCrossTraffic::AIActionAvoidCrossTraffic
-0x4530c0	rivals	1	86	2	1	1	S AIActionIJustGotHitDragRace::HasExpired
-0x453490	rivals	1	86	2	1	1	S AIActionHitWallDragRace::DoSnapshot
-0x4534f0	rivals	1	129	1	2	0	B AIActionHitWallDragRace::CalculateScore
-0x453580	rivals	1	127	1	1	0	B AIActionHitWallDragRace::HasBeenAccomplished
-0x453600	rivals	1	295	2	1	0	B AIActionHitWallDragRace::CalculatePointsToDrive
-0x4537d0	rivals	1	94	1	1	0	B AIActionEndOfRace::HasExpired
 0x453ba0	rivals	1	187	3	1	0	R AIActionAvoidAvoidableAsTraffic::TryLane
 0x454330	rivals	1	156	1	2	0	B AIActionObeyTrafficIntersections::HasBeenAccomplished
 0x45444f	rivals	1	49	1	0	0	
@@ -6144,7 +6045,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x455160	rivals	1	26	1	2	0	
 0x455270	rivals	1	47	1	3	0	
 0x4552a0	rivals	1	11	1	1	0	
-0x4552d0	rivals	1	115	2	1	0	B AIActionEndOfRace::~AIActionEndOfRace
+0x4552d0	rivals	1	115	2	1	0	B AIActionObeyTrafficIntersections::~AIActionObeyTrafficIntersections
 0x455360	rivals	1	41	1	1	0	
 0x455390	rivals	1	47	1	2	0	
 0x4553c0	rivals	1	11	1	1	0	
@@ -6175,6 +6076,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x460100	rivals	1	75	1	1	0	
 0x462230	rivals	1	31	2	1	0	
 0x462250	rivals	1	102	1	4	0	R AIDriver::~AIDriver
+0x4624d0	rivals	1	578	8	2	0	R AIDriver::ChooseNewAction
 0x462f90	rivals	1	715	2	2	0	B Aerodynamics::ResolveForces
 0x463610	rivals	1	31	2	1	0	
 0x463630	rivals	1	177	2	1	0	B BeltMover::~BeltMover
@@ -6186,13 +6088,12 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x477100	rivals	1	324	2	2	0	R PhysicsMover::Calibrate
 0x4782c0	rivals	1	250	1	2	0	R PhysicsMover::InitializeStateFromCar
 0x479350	rivals	1	444	3	1	0	R PhysicsMover::DriftStabilizer
-0x48cbd0	rivals	1	358	3	1	0	R DragRaceLeaderCameraMover::SetForward
 0x493190	rivals	1	322	1	2	0	B PreviewRoute::ClosestDistance
-0x493420	rivals	1	690	1	1	0	R EnforceHeightGap
+0x493420	rivals	1	690	1	1	0	C EnforceHeightGap
 0x493bd0	rivals	1	131	3	1	0	R PreviewRoute::AddPointOfInterest
 0x495940	rivals	1	30	2	1	0	
 0x495960	rivals	1	11	1	1	0	
-0x49d4c0	rivals	1	229	2	2	0	R PostRaceStatsScreen::DrawRacerName
+0x49d4c0	rivals	1	229	2	2	0	B PostRaceStatsScreen::SetupCircuit
 0x49d5b0	rivals	1	394	2	2	0	R PostRaceStatsScreen::DrawFinishTime
 0x49d760	rivals	1	471	3	1	0	R PostRaceStatsScreen::DrawTimeBehind
 0x49da50	rivals	1	223	2	1	0	R PostRaceStatsScreen::DrawLapScores
@@ -6208,16 +6109,16 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c0300	rivals	1	164	2	2	4	R PauseOptionsMenu::DrawRaceFinish
 0x566dc0	rivals	1	92	2	32	0	B SlotPool::NewSlotPool
 0x566e60	rivals	1	110	1	24	0	B SlotPool::ExpandSlotPool
-0x567000	rivals	1	337	1	4	0	R SlotPool::CleanupExpandedSlotPools
-0x567160	rivals	1	89	1	76	0	R SlotPool::Malloc
+0x567000	rivals	1	337	1	4	0	B SlotPool::CleanupExpandedSlotPools
+0x567160	rivals	1	89	1	76	0	B SlotPool::Malloc
 0x5720f0	rivals	1	254	2	1	0	R ReplayManager::~ReplayManager
 0x572800	rivals	1	358	1	1	4	R ReplayManager::DoFancyJoylogDebugging
 0x572ac0	rivals	1	138	1	1	0	R ReplayManager::CheckForSpecialEvents
 0x572bd0	rivals	1	241	3	1	0	R ReplayManager::SortSnapshots
 0x572d20	rivals	1	49	1	4	0	R ReplayManager::DeleteSnapshot
 0x573010	rivals	1	45	1	2	0	
-0x573170	rivals	1	71	1	1	2	B UnloaderDemoModeReplay
-0x5731c0	rivals	1	119	3	1	2	B DemoModeReplay::GenerateFilename
+0x573170	rivals	1	71	1	1	2	R DemoModeReplay::DemoModeReplay
+0x5731c0	rivals	1	119	3	1	2	R DemoModeReplay::Loader
 0x5735a0	rivals	1	117	1	1	2	B DemoModeReplay::SaveSnapshots
 0x578710	rivals	1	26	1	1	0	
 0x578730	rivals	1	167	1	11	0	B WorldObject::GetRotation
@@ -6323,7 +6224,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x46b5e0	runtime	1	419	1	1	0	A Contact::Resolve
 0x472f30	runtime	1	1133	4	2	0	R GJKPolytope::GetSPImpl
 0x496040	runtime	1	87	1	4	0	B feStartRaceScreensShowStats
-0x49d3e0	runtime	1	211	5	3	1	R PostRaceStatsScreen::HideLaps
+0x49d3e0	runtime	1	211	5	3	1	R PostRaceStatsScreen::SetupDrag
 0x49db30	runtime	1	230	3	2	2	R PostRaceStatsScreen::DrawBestLapTime
 0x49dc20	runtime	1	230	3	1	2	R PostRaceStatsScreen::DrawMaxSpeed
 0x49dd10	runtime	1	233	3	1	2	R PostRaceStatsScreen::DrawAverageSpeed
@@ -6380,7 +6281,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x549ca0	runtime	1	129	2	1	0	
 0x549d30	runtime	1	143	2	1	0	B InternalUnloaderSolidHeaderChunks
 0x54a070	runtime	1	65	2	1	0	B UnloaderSolidHeaderChunks
-0x54d4a0	runtime	1	59	1	16	1	B flareCheck
+0x54d4a0	runtime	1	59	1	16	1	C flareCheck
 0x54e440	runtime	1	59	1	1	0	
 0x5530e0	runtime	1	535	4	1	1	
 0x553300	runtime	1	86	2	2	1	
@@ -6458,7 +6359,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x621f00	runtime	1	172	3	1	0	B EAGL::GeoPrimStateExtension::SetRenderContextStates
 0x622f00	runtime	1	175	3	1	0	R EAGL::TARExtension::Use
 0x622ff0	runtime	1	104	2	1	0	R EAGL::TARExtension::SetTexCoordGen
-0x6235d0	runtime	1	121	1	1	0	
+0x6235d0	runtime	1	121	1	1	0	B EAGL::TevStage::TevStage
 0x623650	runtime	1	117	1	1	0	
 0x63a190	runtime	1	35	2	1	0	
 0x63c290	runtime	1	39	1	5	0	
@@ -6467,7 +6368,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x63db00	runtime	1	55	1	5	0	B AyncDVDCallback
 0x63e510	runtime	1	52	1	1	0	B Realmc::GCInterface::ClearTask
 0x63e5c0	runtime	1	14	1	11	0	
-0x63e600	runtime	1	57	1	3	0	R Realmc::GCInterface::CalculateBlockSize
+0x63e600	runtime	1	57	1	3	0	B Realmc::GCInterface::CalculateBlockSize
 0x63f170	runtime	1	23	1	8	0	
 0x63f340	runtime	1	129	1	1	0	B Realmc::GCInterface::Read
 0x64010a	runtime	1	92	2	0	0	R Realmc::GCInterface::Flush
@@ -6733,7 +6634,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4480b0	track	1	59	1	1	0	B ResourceFile::FreeMemory
 0x4480f0	track	1	26	1	1	0	
 0x4594d0	track	1	470	1	8	0	B DriveTarget::AddPointToTarget
-0x4654f0	track	1	59	1	3	0	B CarState::StartNitrous
+0x4654f0	track	1	59	1	3	0	
 0x4655f0	track	1	74	1	1	1	B InitCollision
 0x465640	track	1	180	2	1	0	R Collision::Collision
 0x465700	track	1	100	2	3	0	R Collision::~Collision
@@ -6748,20 +6649,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x46a430	track	1	5	1	1	0	
 0x46a580	track	1	42	1	1	0	
 0x47bae0	track	1	46	2	2	0	
-0x489490	track	1	30	2	1	0	
-0x489540	track	1	138	1	1	0	B DriveCameraMover::ResetState
-0x48b2f0	track	1	30	2	1	0	
-0x48b530	track	1	616	3	1	0	R CubicCameraMover::SetForward
-0x48c220	track	1	94	2	1	0	B AutoPilotCameraMover::Update
-0x48c370	track	1	30	2	1	0	
-0x48cae0	track	1	30	2	1	0	
-0x48d980	track	1	30	2	1	0	
-0x48da20	track	1	492	3	1	0	R DragRaceAheadCameraMover::SetForward
-0x48e360	track	1	30	2	1	0	
-0x48ea90	track	1	50	2	1	0	R SinController::~SinController
-0x48eda0	track	1	30	2	1	0	
-0x4904f0	track	1	61	1	1	0	B PreviewComet::PreviewComet
-0x490560	track	1	364	5	3	0	R PreviewComet::Init
 0x4b92a0	track	1	162	1	1	5	R MultiTrackSelector::SetupTournamentTracks
 0x4bb160	track	1	90	2	1	1	A QRTrackSelectScreen::DoMultiTrackConfirm
 0x52db90	track	1	223	1	3	0	B EAXTires::GetTireParameters
@@ -6786,7 +6673,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x577f60	track	1	99	2	2	0	R WorldEntityType::GetWorldEntity_GoUpALevel
 0x578290	track	1	30	2	1	0	
 0x58d160	track	1	40	2	1	0	
-0x58d520	track	1	54	1	2	0	B CarDamage::SetVisibleDamageEnabled
+0x58d520	track	1	54	1	2	0	R _GLOBAL_.D.LoaderBodyDamage__FP6bChunk
 0x58d720	track	1	41	2	1	0	
 0x58df00	track	1	148	2	1	0	B emAddHandler
 0x592440	track	1	41	1	1	0	
@@ -6872,7 +6759,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x42abd0	unknown	1	25	1	1	0	
 0x42abf0	unknown	1	24	1	1	0	
 0x42acb0	unknown	1	55	1	1	0	B NullMover::~NullMover
-0x42b040	unknown	1	133	3	2	0	B VisibleDrivingLine::Render
 0x435a70	unknown	1	185	2	1	0	
 0x436b70	unknown	1	48	2	1	0	
 0x436d90	unknown	1	27	1	7	0	
@@ -6899,7 +6785,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x469510	unknown	1	101	1	4	0	R DynamicCollisionBody::GetTestImpulseVelocities
 0x46a5b0	unknown	1	138	2	1	0	C StaticCollisionBody::GetTestImpulseVelocities
 0x472830	unknown	1	282	3	6	0	
-0x472ea0	unknown	1	62	1	2	0	R GJKPolytope::MoveCenterOfGravity
+0x472ea0	unknown	1	62	1	2	0	
 0x4733a0	unknown	1	100	1	4	0	R GJKPolytope::GetBoundingBox
 0x479510	unknown	1	304	3	1	0	R PhysicsMover::SmokeshowStabilizer
 0x47cd70	unknown	1	40	2	1	0	
@@ -6939,7 +6825,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x54e650	unknown	1	83	2	1	0	
 0x562630	unknown	1	33	1	1	0	
 0x562970	unknown	1	30	2	1	0	
-0x564ad0	unknown	1	63	1	2	0	B bPlatEndianSwap
+0x564ad0	unknown	1	63	1	2	0	B bDiv
 0x569930	unknown	1	92	2	1	0	B InitStandardModels
 0x5715a0	unknown	1	41	2	1	0	
 0x572a90	unknown	1	44	1	1	0	
@@ -6965,7 +6851,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x594470	unknown	1	87	2	2	0	R CachedRealFileHandle::RemoveUnusedHandle
 0x594f40	unknown	1	52	1	1	0	B _GLOBAL_.I.bFileSlotPool
 0x5ae18b	unknown	1	617	1	1	0	
-0x5d69e4	unknown	1	654	1	1	0	P __AI_SRC_INIT
+0x5d69e4	unknown	1	654	1	1	0	
 0x5e9fec	unknown	1	398	2	1	0	
 0x5ea17a	unknown	1	358	2	1	0	P GXInitFogAdjTable
 0x5ea2e0	unknown	1	272	2	1	0	P GXSetFogRangeAdj
@@ -7005,7 +6891,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x65f9d0	unknown	1	245	1	1	0	
 0x65fad0	unknown	1	245	1	1	0	
 0x689cf0	unknown	1	40	1	1	0	
-0x68ad80	unknown	1	39	2	1	0	
 0x6912b0	unknown	1	22	2	1	0	
 0x6921b0	unknown	1	52	2	1	0	
 0x6921f0	unknown	1	22	2	1	0	
@@ -7118,8 +7003,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x651a50	audio	2	440	2	2	0	
 0x651c60	audio	2	701	2	1	0	
 0x651fd0	audio	2	96	3	1	0	
-0x652e40	audio	2	85	2	2	0	B SNDSTRM_modifyhold
-0x652ea0	audio	2	69	2	1	0	B SNDSTRM_lowpass
+0x652e40	audio	2	85	2	2	0	
+0x652ea0	audio	2	69	2	1	0	R SNDSTRM_modifyhold
 0x653420	audio	2	24	3	1	0	
 0x653ec0	audio	2	216	2	1	0	
 0x654210	audio	2	296	2	2	0	
@@ -7136,7 +7021,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x659fa0	audio	2	396	3	1	0	
 0x65a130	audio	2	251	3	2	0	B iSNDcalcvol
 0x65a740	audio	2	300	3	1	0	
-0x65b380	audio	2	112	3	2	0	B SNDLINKI_remove
+0x65b380	audio	2	112	3	2	0	R SNDSYS_linkmaincpumixer
 0x65fc80	audio	2	88	2	1	0	
 0x65fdf0	audio	2	210	2	1	0	
 0x65ff10	audio	2	236	2	1	0	
@@ -7150,6 +7035,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4602c0	camera	2	143	3	1	0	B PlayerSteering::PlayerSteering
 0x47d7f0	camera	2	72	2	1	0	R bScale
 0x47ee50	camera	2	176	6	1	1	R CountdownCameraCoordinator::Update
+0x47f4e0	camera	2	406	5	0	0	B IntroNisCameraCoordinator::Update
 0x47f830	camera	2	142	3	1	0	B EndingNisCameraCoordinator::~EndingNisCameraCoordinator
 0x480f10	camera	2	223	3	1	0	R DragCameraManager::ToBubble
 0x492470	camera	2	162	4	1	0	R ZonePreviewCameraMover::FindRoute
@@ -7169,8 +7055,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x418c00	canon	2	190	4	1	1	
 0x41e4d0	canon	2	100	5	1	2	P LoadSaveGame::LoadTrcFile
 0x45e5c0	canon	2	133	2	2	0	R PsychoDriver::ClearSteeringDerivativeMemory
-0x45e650	canon	2	189	2	2	0	R PsychoDriver::ClearSteeringMemory
-0x49cbd0	canon	2	148	2	1	0	R PostRaceStatsScreen::Scroll
+0x45e650	canon	2	189	2	2	0	C PsychoDriver::ClearSteeringMemory
+0x49cbd0	canon	2	148	2	1	0	
 0x49dfd0	canon	2	103	4	3	0	R PostRaceStatsScreen::DrawQuarterMileTime
 0x49e040	canon	2	104	4	3	0	A PostRaceStatsScreen::DrawQuarterMileSpeed
 0x49f8b0	canon	2	425	5	1	0	
@@ -7185,7 +7071,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4beb80	canon	2	277	4	2	2	R PauseOptionsMenu::DrawHandling
 0x4bf580	canon	2	136	2	1	0	R PauseOptionsMenu::ToggleUnits
 0x4bf770	canon	2	89	3	1	1	R PauseOptionsMenu::ToggleRearview
-0x4c0000	canon	2	93	2	1	0	R PauseOptionsMenu::ScrollSplitTime
+0x4c0000	canon	2	93	2	1	0	C PauseOptionsMenu::ScrollSplitTime
 0x4c0740	canon	2	128	2	1	0	R PauseOptionsMenu::ToggleScreenPrintf
 0x4c07c0	canon	2	128	2	1	0	R PauseOptionsMenu::ToggleDebugCameras
 0x4c0840	canon	2	128	2	1	0	R PauseOptionsMenu::ToggleEasyAI
@@ -7207,24 +7093,24 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4d0760	canon	2	189	2	1	0	B OptionsMenu::DrawScreenPosY
 0x4d0980	canon	2	137	4	1	2	R OptionsMenu::ScrollTrackMap
 0x4d1600	canon	2	195	4	3	4	B OptionsMenu::DrawAutoSave
-0x4d4a20	canon	2	197	3	1	0	R EATraxScreen::EATraxScreen
+0x4d4a20	canon	2	197	3	1	0	B EATraxScreen::HandleScrollHorizontal
 0x4d6eb0	canon	2	139	3	1	0	R CreditsScroller::~CreditsScroller
 0x4d7160	canon	2	82	2	1	0	R CreditsScroller::NotificationMessage
 0x4d72a0	canon	2	135	3	1	1	R CreditsScreen::~CreditsScreen
-0x4d7580	canon	2	143	3	1	2	B SummonChyron
+0x4d7580	canon	2	143	3	1	2	B Chyron::Start
 0x4dae20	canon	2	230	4	1	1	B ColorPicker::~ColorPicker
 0x4dc3f0	canon	2	341	3	1	0	B __static_initialization_and_destruction_0
 0x4dcf10	canon	2	107	3	1	0	R InfoDialog::~InfoDialog
 0x4dd080	canon	2	120	2	1	0	R InfoDialog::PostProduce
-0x4dd6a0	canon	2	85	2	1	0	R LoadingScreen::~LoadingScreen
-0x4de0e0	canon	2	71	3	1	2	B FinishLoadingControllerTextureCallbackBridge
+0x4dd6a0	canon	2	85	2	1	0	B InitLoadingScreen
+0x4de0e0	canon	2	71	3	1	2	R LoadingScreen::ShowControllerConfig
 0x4de1e0	canon	2	469	5	1	2	
-0x4de520	canon	2	78	3	1	0	R DisclaimerScreen::NotificationMessage
-0x4de760	canon	2	110	2	1	0	B CreateDemoDiscLegalScreen
-0x4de9f0	canon	2	118	3	1	1	B LangSelectScreen::NotificationMessage
-0x4df000	canon	2	116	3	1	0	C IntroFMVScreen::~IntroFMVScreen
-0x4df690	canon	2	69	2	1	0	R MarketingScreen::NotifySoundMessage
-0x4e0560	canon	2	232	3	1	2	R MPLoginScreen::ShowPlayer1List
+0x4de520	canon	2	78	3	1	0	B LoadingScreen::ClearLoadedControllerTexture
+0x4de760	canon	2	110	2	1	0	B LicenseScreen::NotificationMessage
+0x4de9f0	canon	2	118	3	1	1	B DemoDiscLegalScreen::DemoDiscLegalScreen
+0x4df000	canon	2	116	3	1	0	B LangSelectScreen::GetLangHashForLanguage
+0x4df690	canon	2	69	2	1	0	B DemoDiscLegalScreen::~DemoDiscLegalScreen
+0x4e0560	canon	2	232	3	1	2	B MPLoginScreen::InitPlayer2List
 0x4e1a10	canon	2	53	2	1	0	B MPCarSelectScreen::ScrollCars
 0x4e3960	canon	2	247	3	1	0	B GarageNewVinylScreen::RefreshHeader
 0x4e7e00	canon	2	162	2	1	1	A GaragePresetsScreen::PresetAction
@@ -7245,8 +7131,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4f85b0	canon	2	202	3	1	0	B ThumbnailScroller::~ThumbnailScroller
 0x4f8960	canon	2	102	2	27	0	B ThumbnailScroller::SnapToItem
 0x4ffc30	canon	2	566	2	1	0	R FEPackage::IssueScriptMessages
-0x50e680	canon	2	97	3	1	1	
-0x5125f0	canon	2	152	3	1	0	B GarageDecalsBrand::ScrollPickables
 0x513670	canon	2	128	3	1	0	
 0x514510	canon	2	17	2	3	0	
 0x51bc80	canon	2	226	3	2	0	
@@ -7301,12 +7185,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c84b0	car	2	161	3	1	0	
 0x4e2170	car	2	66	3	6	0	
 0x4e3f40	car	2	376	7	1	5	
-0x50c800	car	2	66	3	1	0	
-0x50cd90	car	2	148	3	1	0	A GarageRimsBrandBrowser::ScrollPickables
-0x50f170	car	2	138	6	1	0	B GarageRimsBrowser::MoveBackPackage
-0x50fa30	car	2	66	3	1	0	B IsEnginePainting
-0x510cf0	car	2	66	3	1	0	
-0x510dc0	car	2	152	3	1	0	
 0x547dc0	car	2	58	2	2	0	
 0x547fd0	car	2	43	2	1	0	
 0x548210	car	2	56	2	1	0	
@@ -7360,7 +7238,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5929c0	props	2	140	3	1	0	R WorldObjectCollisionBody::DoSomethingMoreClever
 0x597b80	props	2	256	2	1	0	B Smokeable::ConsiderSleeping
 0x413310	render	2	391	5	1	1	P AcidEffectSystem::UpdateInterestPoints
-0x42fee0	render	2	318	8	2	0	R Player::NewSmokeShape
 0x43aae0	render	2	140	3	2	0	
 0x47afc0	render	2	89	3	1	0	R CAnimBank::Cleanup
 0x47b0b0	render	2	177	3	6	0	R CAnimCtrl::Clear
@@ -7371,7 +7248,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4fbf10	render	2	71	2	1	0	R FEJoyPad::Update
 0x4fcda0	render	2	72	2	1	0	
 0x4fd360	render	2	20	2	1	0	
-0x4fe620	render	2	72	2	1	0	R FindResponse__C17FEMessageResponseUl
+0x4fe620	render	2	72	2	1	0	B FindResponse__C17FEMessageResponseUl
 0x4fef10	render	2	149	3	11	0	B FEObject::~FEObject
 0x502970	render	2	507	5	1	0	B FEScript::FEScript
 0x502d80	render	2	72	2	2	0	B __static_initialization_and_destruction_0
@@ -7461,15 +7338,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5d21d9	render	2	157	2	1	0	P getTiming
 0x5d241e	render	2	491	4	1	0	
 0x5d2a0a	render	2	158	2	1	0	P VIWaitForRetrace
-0x5d46d3	render	2	635	2	1	0	P PADInit
-0x5d494e	render	2	629	2	1	0	P PADRead
-0x5d4bc3	render	2	430	2	1	0	
-0x5d4d71	render	2	228	2	1	0	P PADControlAllMotors
-0x5d4e55	render	2	376	2	1	0	P SPEC0_MakeStatus
-0x5d4fcd	render	2	319	2	1	0	P SPEC1_MakeStatus
-0x5d510c	render	2	374	2	1	0	P SPEC2_MakeStatus
-0x5d5282	render	2	300	2	1	0	
-0x5d7665	render	2	155	2	2	0	P GXSetBreakPtCallback
+0x5d46d3	render	2	635	2	1	0	P PADTypeAndStatusCallback
+0x5d494e	render	2	629	2	1	0	
+0x5d4bc3	render	2	430	2	1	0	P PADReceiveCheckCallback
+0x5d4d71	render	2	228	2	1	0	P PADReset
+0x5d4e55	render	2	376	2	1	0	P PADInit
+0x5d4fcd	render	2	319	2	1	0	
+0x5d510c	render	2	374	2	1	0	P PADRead
+0x5d5282	render	2	300	2	1	0	P PADControlAllMotors
+0x5d7665	render	2	155	2	2	0	P GXGetFifoPtrs
 0x5d7902	render	2	88	2	1	0	P GXRedirectWriteGatherPipe
 0x5d7aec	render	2	34	2	1	0	
 0x5d7bb5	render	2	62	2	1	0	P __GXSetVAT
@@ -7512,8 +7389,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x60a9c6	render	2	316	2	1	0	P ReceiveCodeReject
 0x60ab02	render	2	284	2	1	0	P ReceiveProtocolReject
 0x60ac1e	render	2	324	2	1	0	P ControlIn
-0x60b913	render	2	361	2	1	1	
-0x60ba7c	render	2	126	3	1	0	P DBRead
+0x60b913	render	2	361	2	1	1	P DBRead
+0x60ba7c	render	2	126	3	1	0	P DBQueryData
 0x60d508	render	2	30	2	2	0	
 0x60d89b	render	2	791	7	1	12	P EXI2_ReadN
 0x60eafe	render	2	376	2	1	1	P AmcEXISync
@@ -7586,26 +7463,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x43cad0	rivals	2	143	2	1	0	
 0x44adc0	rivals	2	672	2	1	0	B AICarController::FindClosestTrackRoute
 0x44cd30	rivals	2	165	3	1	0	R AICarController::ThrowOutDriveTarget
-0x44d670	rivals	2	142	2	2	1	S AIPlan::DoSnapshot
-0x44d700	rivals	2	86	2	5	1	S AIGoal::DoSnapshot
 0x45006e	rivals	2	130	3	0	0	
 0x4512f0	rivals	2	266	3	0	0	
-0x451a70	rivals	2	143	3	1	1	S AIActionGetUnstuck::DoSnapshot
-0x451b00	rivals	2	428	6	2	0	B AIActionGetUnstuck::AreWeStuckBehindSomeone
-0x451dc0	rivals	2	321	4	1	0	B AIActionGetUnstuck::HasBeenAccomplished
-0x451f10	rivals	2	342	5	1	0	R AIActionGetUnstuck::HasFailed
-0x452200	rivals	2	105	3	1	1	S AIActionIJustGotHit::DoSnapshot
-0x4525b0	rivals	2	121	3	1	1	S AIActionAccidentRecovery::DoSnapshot
-0x452800	rivals	2	105	3	1	1	S AIActionDriveTrafficLane::DoSnapshot
-0x4528b0	rivals	2	220	3	1	0	B AIActionDriveTrafficLane::CalculatePointsToDrive
-0x453760	rivals	2	105	3	1	1	S AIActionEndOfRace::DoSnapshot
 0x4541b0	rivals	2	80	4	1	1	S AIActionObeyTrafficIntersections::AIActionObeyTrafficIntersections
 0x454960	rivals	2	105	3	1	1	S AIActionPickRouteToAvoidAnimation::DoSnapshot
 0x4561d0	rivals	2	511	3	1	0	R GetNearestRoutePoint
 0x456830	rivals	2	304	4	4	0	R CalculateMaxAcceleration
 0x456de0	rivals	2	170	4	4	0	R StraightLinePredict
-0x457520	rivals	2	74	2	2	0	R _GLOBAL_.I.InitAI__Fv
-0x457590	rivals	2	279	2	5	0	R CollisionPredictor::WhoWillThisDriveTargetHit
+0x457520	rivals	2	74	2	2	0	B _GLOBAL_.I.InitAI__Fv
+0x457590	rivals	2	279	2	5	0	B CollisionPredictor::WhoWillThisDriveTargetHit
 0x458750	rivals	2	762	2	1	0	R WhenWillOverlapOccur2D
 0x458dc0	rivals	2	322	2	2	1	S DriveTarget::DoSnapshot
 0x459b30	rivals	2	1088	4	1	0	R DriveTarget::EstimateScore
@@ -7632,7 +7498,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4a34c0	rivals	2	464	5	1	1	A LeaderBoard::DrawDriftScores
 0x4a3930	rivals	2	361	7	1	0	R LeaderBoard::SetupLists
 0x4b52a0	rivals	2	765	11	2	0	R RaceStarter::SetupTournament
-0x566f20	rivals	2	206	3	2	0	R SlotPool::GetAllocatedSlot
+0x566f20	rivals	2	206	3	2	0	B SlotPool::GetAllocatedSlot
 0x572530	rivals	2	79	2	1	1	R ReplayManager::MaybeDoChecksumSnapshot
 0x572690	rivals	2	275	2	1	1	R ReplayManager::MaybeTakeLapSnapshot
 0x572cd0	rivals	2	71	2	3	0	R ReplayManager::RestoreSnapshot
@@ -7676,7 +7542,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5540b0	runtime	2	99	3	1	1	
 0x55e770	runtime	2	80	2	1	1	
 0x564830	runtime	2	35	2	1	0	
-0x565ce0	runtime	2	135	3	64	0	C bMemoryPrintAllocations
+0x565ce0	runtime	2	135	3	64	0	
 0x571ea0	runtime	2	115	2	91	0	R ReplaySnapshot::BeginSection
 0x576f30	runtime	2	76	2	2	0	B CloseMobileTopology
 0x5772f0	runtime	2	114	2	2	0	B MobileTopology::Update
@@ -7701,15 +7567,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x621240	runtime	2	73	2	1	0	B __static_initialization_and_destruction_0
 0x639040	runtime	2	167	2	1	0	B FILESYS_write
 0x639150	runtime	2	62	3	1	0	C FILESYS_size
-0x6391e0	runtime	2	175	4	1	0	R FILESYS_atomic
-0x63a020	runtime	2	64	2	2	0	A __static_initialization_and_destruction_0
+0x6391e0	runtime	2	175	4	1	0	B FILESYS_atomic
+0x63a020	runtime	2	64	2	2	0	R _GLOBAL_.I.FILESYS_getopts
 0x63aad0	runtime	2	208	5	1	3	R finishrequest
 0x63aba0	runtime	2	43	2	2	0	
 0x63abd0	runtime	2	159	2	1	0	C loadfilereadcallback
 0x63c0c0	runtime	2	153	2	2	0	C loadfileopencallback
 0x63c160	runtime	2	149	2	1	0	B ASYNCFILE_init
 0x63cdd0	runtime	2	77	2	1	0	R FILE_save
-0x63e6f0	runtime	2	164	2	2	0	C Realmc::GCInterface::CalculateBlockSize
+0x63e6f0	runtime	2	164	2	2	0	
 0x63f3f0	runtime	2	138	3	1	0	B Realmc::GCInterface::Write
 0x640030	runtime	2	21	2	2	0	
 0x642de0	runtime	2	123	4	2	0	R Realmc::GCDriver::CloseFile
@@ -7815,7 +7681,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x46a370	track	2	113	4	1	0	B TrackPolygonCollisionBody::DoSnapshot
 0x46d510	track	2	361	2	1	1	S DriveTrain::DoSnapshot
 0x47bfc0	track	2	79	3	1	0	R NisSceneManager::UnloadNis
-0x48ead0	track	2	154	3	2	0	R SinController::Function
 0x52b760	track	2	349	9	1	0	A EAXTunerCar::PlayTunnelEntranceSnd
 0x52b8c0	track	2	388	10	1	0	A EAXTunerCar::PlayTunnelExitSnd
 0x54cb30	track	2	157	2	2	0	
@@ -7824,8 +7689,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5782b0	track	2	181	2	2	0	B WorldObject::WorldObject
 0x578490	track	2	107	2	1	0	B WorldObject::ResolveParent
 0x578590	track	2	208	3	1	0	B WorldObject::SetCollisionVolume
-0x58a600	track	2	53	2	1	0	R _GLOBAL_.I.ClanSlotPool
-0x58a700	track	2	130	3	1	0	R QueuedFile::QueuedFile
+0x58a600	track	2	53	2	1	0	B _GLOBAL_.D.ClanSlotPool
+0x58a700	track	2	130	3	1	0	B QueuedFile::QueuedFile
 0x58aba0	track	2	125	2	4	0	R AddQueuedFile
 0x58ac20	track	2	139	2	3	0	R AddQueuedFile2
 0x58da60	track	2	186	2	2	0	R CarDamage::AddDamageToSector
@@ -7959,8 +7824,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x438440	camera	3	915	8	1	0	
 0x43ba60	camera	3	464	5	6	0	
 0x47e300	camera	3	1234	14	0	0	A DemoCameraCoordinator::Update
-0x47f150	camera	3	435	6	1	0	B IntroNisCameraCoordinator::IntroNisCameraCoordinator
-0x47f8c0	camera	3	277	3	0	0	B EndingNisCameraCoordinator::Update
+0x47f150	camera	3	435	6	1	0	B PostRaceCameraCoordinator::Update
 0x481160	camera	3	336	5	4	0	R DragCameraManager::PlaceCar
 0x481510	camera	3	466	3	1	0	B DragCameraManager::Undo
 0x482fc0	camera	3	178	5	1	1	B DragCameraManager::LoadData
@@ -7981,7 +7845,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x460450	canon	3	121	3	1	1	
 0x495f00	canon	3	111	3	75	0	B PreRaceStatsScreen::DrawTaunts
 0x496f00	canon	3	495	8	1	0	B PostRaceMenuScreen::DoQuitRace
-0x49c050	canon	3	130	4	1	1	R PostRaceStatsScreen::NotificationMessage
+0x49c050	canon	3	130	4	1	1	B PostRaceResultsScreen::PostRaceResultsScreen
 0x49f0c0	canon	3	89	3	1	0	B cPostRaceScreenMgrInterface::Suspend
 0x4b1c50	canon	3	87	4	3	0	B GarageMainScreen::HandleShowPackage
 0x4b1cb0	canon	3	97	4	2	0	
@@ -7993,8 +7857,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4b9190	canon	3	76	3	1	0	B SelectableTrack::CalcIconHash
 0x4b91e0	canon	3	88	4	3	0	B SelectableTrack::CalcIdentifier
 0x4b9420	canon	3	146	4	1	0	B MultiTrackSelector::Redraw
-0x4b9900	canon	3	83	4	1	0	R QRTrackSelectScreen::CheckUsageFlags
-0x4b9960	canon	3	83	4	1	0	C QRTrackSelectScreen::IsTrackLocked
+0x4b9900	canon	3	83	4	1	0	B QRTrackSelectScreen::FindTrack
+0x4b9960	canon	3	83	4	1	0	B QRTrackSelectScreen::CheckUsageFlags
 0x4bf4a0	canon	3	213	3	1	0	R PauseOptionsMenu::ToggleGauges
 0x4bfcb0	canon	3	213	3	5	0	R PauseOptionsMenu::DrawScore
 0x4bfd90	canon	3	224	3	3	0	R PauseOptionsMenu::TogglePosition
@@ -8023,8 +7887,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4cd490	canon	3	229	4	1	0	C PauseMenu::DrawResume
 0x4cda80	canon	3	219	6	2	1	
 0x4ce690	canon	3	105	4	1	0	B PauseMenu::SetFadeOut
-0x4d1790	canon	3	1548	3	1	0	B OptionsMenu::Setup
-0x4d5447	canon	3	60	3	0	0	B EATraxScreen::AddNewSlot
+0x4d1790	canon	3	1548	3	1	0	C OptionsMenu::Setup
+0x4d5447	canon	3	60	3	0	0	
 0x4d6690	canon	3	286	3	1	0	B ControllerMenu::ScrollControllerConfig
 0x4d6b80	canon	3	530	6	1	3	
 0x4d6f40	canon	3	207	6	1	2	R CreditsScroller::BuildCredits
@@ -8037,10 +7901,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4dccc0	canon	3	112	3	8	0	R ConfirmDialog::NotifySoundMessage
 0x4dcd30	canon	3	113	3	1	0	
 0x4dcfd0	canon	3	166	6	9	0	R InfoDialog::OpenModalDialog
-0x4ddf60	canon	3	54	3	2	0	B LoadingScreen::FinishLoadingControllerTextureCallback
-0x4df080	canon	3	91	3	2	0	C IntroFMVScreen::NotifySoundMessage
-0x4df630	canon	3	87	4	1	0	R MarketingScreen::~MarketingScreen
-0x4e0c50	canon	3	93	4	1	0	A MPCarSelectScreen::MPCarSelectScreen
+0x4ddf60	canon	3	54	3	2	0	R LoadingScreen::~LoadingScreen
+0x4df080	canon	3	91	3	2	0	B CreateSplashScreen
+0x4df630	canon	3	87	4	1	0	C IntroFMVScreen::NotifySoundMessage
+0x4e0c50	canon	3	93	4	1	0	C MPCarSelectScreen::MPCarSelectScreen
 0x4e0d10	canon	3	121	4	1	0	A MPCarSelectScreen::BuildSelectableCarList
 0x4e1a50	canon	3	206	3	1	0	B MPCarSelectData::ScrollCars
 0x4e7d70	canon	3	132	4	1	0	A GaragePresetsScreen::ScrollPreset
@@ -8071,7 +7935,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4fb210	canon	3	1980	3	2	0	B FECodeListBox::ScrollSelection
 0x4fbf60	canon	3	89	3	1	0	R FEJoyPad::WasPressed
 0x5001b0	canon	3	398	3	1	0	R FEPackage::UpdateObjectTracks
-0x50ee10	canon	3	113	4	1	1	B GarageRimsBrowser::IsBuyingPart
 0x514350	canon	3	177	4	1	0	
 0x53e830	canon	3	378	4	1	1	
 0x5576f0	canon	3	104	4	2	1	B TexturePack::GetTextureIndexEntry
@@ -8090,7 +7953,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x649628	canon	3	111	4	1	1	R SHAPE_create
 0x649697	canon	3	111	4	1	1	R SHAPE_clut
 0x649706	canon	3	129	3	1	3	
-0x649930	canon	3	101	3	1	0	B SHAPE_size
+0x649930	canon	3	101	3	1	0	C SHAPE_size
 0x649d90	canon	3	201	3	1	0	B Csis::FunctionHandle::SetFast
 0x419cc0	car	3	158	3	1	0	B FEKeyboard::FEKeyboard
 0x41c9e0	car	3	953	5	1	2	
@@ -8111,8 +7974,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c69f0	car	3	179	5	1	0	B MemcardInterface::LoadProfile
 0x4e3b10	car	3	601	8	2	5	B GarageNewVinylScreen::NotificationMessage
 0x4f9a60	car	3	258	6	1	1	R Scrollerina::Print
-0x511810	car	3	151	3	1	0	B GarageDecalsSlot::ScrollPickables
-0x513270	car	3	160	4	1	0	A GarageChooseAccessoryCategoryScreen::ScrollPartsCategory
 0x533140	car	3	1183	4	1	5	
 0x547ba0	car	3	190	4	1	0	
 0x548090	car	3	373	5	1	0	
@@ -8136,7 +7997,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c1500	hud	3	1242	3	1	0	B PauseOptionsMenu::SetupHud
 0x4c1e80	hud	3	65	3	1	0	B GetCarTypeLogoHash
 0x4c4830	hud	3	234	6	1	1	B UndergroundStatusScreen::ScrollPickables
-0x4d74c0	hud	3	184	3	1	1	B Chyron::Start
+0x4d74c0	hud	3	184	3	1	1	B Chyron::NotificationMessage
 0x4e1d70	hud	3	499	5	1	0	
 0x4f6e10	hud	3	304	6	4	0	R FEngGetBottomRight
 0x4f7140	hud	3	257	7	4	0	R FEngSetCenter
@@ -8154,7 +8015,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x501b80	render	3	535	12	1	0	B FEPackageReader::ProcessListBoxTag
 0x501ea0	render	3	1453	14	1	0	B FEPackageReader::ReadScriptTags
 0x5024b0	render	3	406	7	2	0	B FEPackageReader::ReadMessageResponseTags
-0x5037e0	render	3	1542	6	1	15	B FETypeLib::Startup
+0x5037e0	render	3	1542	6	1	15	C FETypeLib::Startup
 0x5722d0	render	3	167	3	1	1	R ReplayManager::MaybeTakeDummySnapshot
 0x57b9f0	render	3	187	3	1	2	S Barrel::Barrel
 0x5afb2f	render	3	381	5	2	0	P add_separators
@@ -8165,7 +8026,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5b7369	render	3	318	4	37	0	P GetFontCode
 0x5b8048	render	3	127	3	1	0	P OSRestoreInterrupts
 0x5b80c7	render	3	127	3	1	0	P __OSInterruptInit
-0x5b8146	render	3	128	3	1	0	P SetInterruptMask
+0x5b8146	render	3	128	3	1	0	
 0x5b81c6	render	3	128	3	1	0	P __OSMaskInterrupts
 0x5b8246	render	3	127	3	1	0	P __OSUnmaskInterrupts
 0x5b82c5	render	3	127	3	1	0	P ExternalInterruptHandler
@@ -8201,17 +8062,17 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5d2aa8	render	3	518	3	1	0	P setFbbRegs
 0x5d2f5d	render	3	216	3	1	0	P VISetNextFrameBuffer
 0x5d315a	render	3	216	3	1	0	P VISetBlack
-0x5d3357	render	3	216	3	1	0	P VIGetNextField
-0x5d3554	render	3	216	3	1	0	P VIGetTvFormat
-0x5d3741	render	3	196	3	1	0	P __VIGetCurrentPosition
-0x5d391a	render	3	196	3	1	0	P PADClamp
+0x5d3357	render	3	216	3	1	0	P getCurrentFieldEvenOdd
+0x5d3554	render	3	216	3	1	0	P VIGetNextField
+0x5d3741	render	3	196	3	1	0	P VIGetCurrentLine
+0x5d391a	render	3	196	3	1	0	P VIGetTvFormat
 0x5d39de	render	3	873	3	1	0	
-0x5d3f76	render	3	184	3	1	0	P PADOriginCallback
-0x5d40f4	render	3	292	3	1	0	
-0x5d42ed	render	3	312	3	1	0	P PADTypeAndStatusCallback
-0x5d44e0	render	3	312	3	1	0	P PADReceiveCheckCallback
-0x5d53ae	render	3	397	3	1	0	P OnReset
-0x5d5666	render	3	463	3	1	0	
+0x5d3f76	render	3	184	3	1	0	P __VIGetCurrentPosition
+0x5d40f4	render	3	292	3	1	0	P ClampStick
+0x5d42ed	render	3	312	3	1	0	P UpdateOrigin
+0x5d44e0	render	3	312	3	1	0	P PADOriginUpdateCallback
+0x5d53ae	render	3	397	3	1	0	P SPEC0_MakeStatus
+0x5d5666	render	3	463	3	1	0	P SPEC2_MakeStatus
 0x5d88ba	render	3	122	3	1	0	P __GXSendFlushPrim
 0x5d9f14	render	3	141	3	1	0	P GXSetChanCtrl
 0x5da7de	render	3	1467	5	1	0	
@@ -8234,7 +8095,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x602b25	render	3	111	3	3	0	P TCPCancel
 0x603b2e	render	3	709	3	1	0	
 0x60ae08	render	3	1093	8	1	14	
-0x60c83a	render	3	99	3	1	0	P DBQueryData
+0x60c83a	render	3	99	3	1	0	P DBInitComm
 0x60d6b0	render	3	417	3	1	0	
 0x60de67	render	3	378	4	1	0	P AmcEXIImm
 0x611acc	render	3	120	4	1	1	
@@ -8246,12 +8107,12 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x61ef30	render	3	45	3	2	0	
 0x622020	render	3	861	6	9	0	B Use__CQ24EAGL21GeoPrimStateExtension
 0x6230e0	render	3	380	3	2	0	R EAGL::TevStage::SetHardware
-0x625c10	render	3	199	3	2	0	R EAGL::DrawGouraud::AddVertex
+0x625c10	render	3	199	3	2	0	C EAGL::DrawGouraud::AddVertex
 0x625ce0	render	3	199	3	2	0	R EAGL::DrawArray::SetVar
 0x625db0	render	3	199	3	2	0	R EAGL::DrawArray::Draw
 0x629a80	render	3	413	3	1	0	C EAGLAnim::FnCompoundChannel::SetAnimMemoryMap
 0x62cb50	render	3	1545	3	1	0	R EAGLAnim::FnKeyQuatChan::EvalSQTMask
-0x632a40	render	3	165	4	1	1	A EAGLAnim::FnRunBlender::Eval
+0x632a40	render	3	165	4	1	1	C EAGLAnim::FnRunBlender::Eval
 0x632af0	render	3	165	4	1	1	R CycleTime__CQ28EAGLAnim12FnRunBlenderfff
 0x632ba0	render	3	83	3	1	0	R ComputeCycleIdx__CQ28EAGLAnim12FnRunBlenderfff
 0x633640	render	3	217	3	2	0	C BlendEndFacing__CQ28EAGLAnim13FnTurnBlenderPf
@@ -8270,8 +8131,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x44a330	rivals	3	781	6	2	0	B AICarController::AICarController
 0x44c940	rivals	3	113	3	3	0	R AICarController::CleanUpAfterThink
 0x44cac0	rivals	3	196	4	2	0	R AICarController::ShortTermCanUseNitrousRightNow
-0x452a80	rivals	3	177	4	1	1	S AIActionAvoidCrossTraffic::DoSnapshot
-0x452b40	rivals	3	172	3	2	0	B AIActionAvoidCrossTraffic::CalculateScore
 0x454240	rivals	3	232	5	1	0	B AIActionObeyTrafficIntersections::CalculateScore
 0x454d55	rivals	3	192	3	0	0	C AIActionDraft::~AIActionDraft
 0x454e4f	rivals	3	145	3	0	0	B AIActionNudgeAvoidable::~AIActionNudgeAvoidable
@@ -8292,7 +8151,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4936e0	rivals	3	767	7	2	0	R DownSampleXY
 0x572380	rivals	3	422	3	1	2	R ReplayManager::MaybeTakeInstantReplaySnapshot
 0x572590	rivals	3	249	4	1	0	R ReplayManager::DoChecksumSnapshot
-0x5732e0	rivals	3	138	3	1	2	B DemoModeReplay::BeginDemoMode
+0x5732e0	rivals	3	138	3	1	2	B DemoModeReplay::GenerateFilename
 0x578500	rivals	3	133	3	1	0	B WorldObject::SetModel
 0x57a420	rivals	3	203	5	1	0	B CarWorldObjectMover::CopyInfoFromCar
 0x583850	rivals	3	179	3	2	0	R TrafficController::ExecuteCurrentAction
@@ -8330,9 +8189,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x591e40	runtime	3	697	9	1	0	B WorldModel::Render
 0x5b0484	runtime	3	93	3	2	0	P sn_log10
 0x5dc613	runtime	3	122	3	4	0	
-0x6398f0	runtime	3	162	3	2	0	B freeop
-0x639c00	runtime	3	310	4	14	1	B reservehandle
-0x639f20	runtime	3	242	4	10	2	R FILESYS_setopts
+0x6398f0	runtime	3	162	3	2	0	R FILESYS_checkerror
+0x639c00	runtime	3	310	4	14	1	R FILESYS_getopts
+0x639f20	runtime	3	242	4	10	2	R __static_initialization_and_destruction_0
 0x63c2c0	runtime	3	58	3	12	0	
 0x63f2a0	runtime	3	104	3	1	1	B Realmc::GCInterface::CloseFile
 0x642920	runtime	3	173	3	1	0	R Realmc::GCDriver::FlushWriteBuffer
@@ -8412,16 +8271,12 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x6829be	runtime	3	184	5	1	0	
 0x682a7a	runtime	3	116	6	0	0	
 0x682ba1	runtime	3	123	6	0	0	
-0x422c80	track	3	188	3	1	0	R RaceCoordinator::ResumeDemoCameras
+0x422c80	track	3	188	3	1	0	C RaceCoordinator::ResumeDemoCameras
 0x4286a0	track	3	2649	8	1	2	B Car::TriggerCarTerrainEffects
 0x4373d0	track	3	528	4	1	0	B Race::CalculateSplitTime
 0x444100	track	3	175	3	1	1	S TrackPathCoordinate::DoSnapshot
 0x462430	track	3	147	4	2	0	R AIDriver::Think
 0x469810	track	3	489	3	2	0	R DynamicCollisionBody::CreateTrackPolygonCollisionBodies
-0x48c400	track	3	1047	6	1	0	R DragRaceCameraMover::SetDesired
-0x48c820	track	3	366	7	1	0	R DragRaceCameraMover::Update
-0x48dd00	track	3	507	4	2	0	R DragRaceAheadCameraMover::SetDesired
-0x48df00	track	3	784	11	1	0	R DragRaceAheadCameraMover::Update
 0x4bbc90	track	3	218	4	2	2	B TrackMapScroller::NewData
 0x53f220	track	3	372	6	1	1	
 0x54c9e0	track	3	221	4	3	1	B eFindSolid
@@ -8431,8 +8286,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x578370	track	3	278	4	14	0	B WorldObject::~WorldObject
 0x57bf90	track	3	327	3	1	1	X TrainEngine::TrainEngine
 0x584430	track	3	121	3	1	1	X AverageWindow::DoSnapshot
-0x58a550	track	3	172	4	1	0	R __static_initialization_and_destruction_0
-0x58d560	track	3	109	3	1	1	
+0x58a550	track	3	172	4	1	0	B __static_initialization_and_destruction_0
+0x58d560	track	3	109	3	1	1	X CarDamage::CarDamage
 0x58d930	track	3	171	3	1	0	R CarDamage::AddDamage
 0x594750	track	3	201	5	3	0	R bFile::~bFile
 0x594dd0	track	3	84	3	4	0	R bIsAsyncDone
@@ -8445,6 +8300,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x58bce0	traffic	3	220	3	1	0	R CarLoader::UnloadEverything
 0x58be70	traffic	3	203	3	1	0	B CarLoader::LoadingDoneCallback
 0x5a81b0	traffic	3	574	3	1	0	R learn
+0x42bb60	unknown	3	512	9	1	0	B Player::~Player
 0x436ff0	unknown	3	987	8	1	0	
 0x4399f0	unknown	3	82	4	3	0	
 0x43d8c0	unknown	3	360	7	3	0	
@@ -8492,15 +8348,14 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x6593b0	audio	4	173	5	2	0	B SFILTER_modifyECHO
 0x659550	audio	4	494	4	1	0	B calcFIRCoeffs
 0x6598e0	audio	4	98	5	1	0	B SFILTER_lpfFIR8
-0x65b2d0	audio	4	169	4	1	0	
+0x65b2d0	audio	4	169	4	1	0	R SNDLINKI_remove
 0x65bab0	audio	4	150	4	1	0	B MIX_sethighpass
 0x660250	audio	4	141	4	1	0	
 0x660a80	audio	4	121	5	1	0	
 0x660c60	audio	4	124	5	1	0	
 0x660ce0	audio	4	234	4	1	0	
 0x47d940	camera	4	681	6	1	0	B Camera::ApplyNoise
-0x47f4e0	camera	4	406	5	0	0	R IntroNisCameraCoordinator::Update
-0x47f680	camera	4	386	8	1	2	R EndingNisCameraCoordinator::EndingNisCameraCoordinator
+0x47f680	camera	4	386	8	1	2	B EndingNisCameraCoordinator::EndingNisCameraCoordinator
 0x4829a0	camera	4	1339	14	1	0	B DragCameraManager::Update
 0x492c00	camera	4	613	5	1	0	R ZonePreviewCameraMover::ViolatesTopology
 0x59bfc0	camera	4	183	5	1	0	B RealController::RealController
@@ -8509,6 +8364,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x416f40	canon	4	125	5	2	1	R getfreerequest
 0x423870	canon	4	266	8	1	1	B RaceCoordinator::RCStatePauseCallback
 0x45e1b0	canon	4	436	4	2	1	S PsychoDriver::DoSnapshot
+0x47f310	canon	4	422	5	1	1	X IntroNisCameraCoordinator::IntroNisCameraCoordinator
 0x49e100	canon	4	415	8	1	4	R PostRaceStatsScreen::DrawPercentage
 0x49f120	canon	4	143	5	2	1	C cPostRaceScreenMgrInterface::Resume
 0x49f7a0	canon	4	265	5	1	1	
@@ -8516,7 +8372,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4b1b70	canon	4	224	7	1	0	B GarageMainScreen::HandleRender
 0x4b8f40	canon	4	154	4	1	0	R QROptionsScreen::SetupFreeRun
 0x4b8fe0	canon	4	129	4	1	0	B QROptionsScreen::SetupDrag
-0x4b99c0	canon	4	278	4	6	2	R QRTrackSelectScreen::BuildTrackList
+0x4b99c0	canon	4	278	4	6	2	B QRTrackSelectScreen::BuildTrackList
 0x4bb1c0	canon	4	234	6	1	2	R QRTrackSelectScreen::DoStartRace
 0x4c2230	canon	4	140	4	1	0	B UndergroundTradeCarScreen::ScrollCars
 0x4c6530	canon	4	404	10	1	4	B MainMenuCarCustomize::BuildSelectableCarList
@@ -8530,15 +8386,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4cc400	canon	4	382	6	1	2	
 0x4cc5d0	canon	4	401	6	1	2	
 0x4ce5f0	canon	4	157	5	1	1	B PauseMenu::SetupTournament
-0x4d6da0	canon	4	149	6	2	0	C CreditsLine::PleaseResetMe
+0x4d6da0	canon	4	149	6	2	0	
 0x4d7090	canon	4	201	4	1	0	R CreditsScroller::Tock
 0x4dcbe0	canon	4	216	7	19	0	R ConfirmDialog::NotificationMessage
 0x4dcdb0	canon	4	227	5	1	2	
-0x4dd700	canon	4	368	7	1	1	R LoadingScreen::SetupControllerConfig
-0x4dd880	canon	4	91	5	1	0	R LoadingScreen::ShowControllerConfig
-0x4dd8e0	canon	4	714	7	1	1	C LoadingScreen::HideControllerConfig
-0x4ddbb0	canon	4	929	7	1	1	
-0x4e0380	canon	4	473	7	1	2	R MPLoginScreen::LoadingPlayer2List
+0x4dd700	canon	4	368	7	1	1	
+0x4dd880	canon	4	91	5	1	0	C CreateLoadingScreen
+0x4dd8e0	canon	4	714	7	1	1	
+0x4ddbb0	canon	4	929	7	1	1	R LoadingScreen::LoadingScreen
+0x4e0380	canon	4	473	7	1	2	B MPLoginScreen::~MPLoginScreen
 0x4e1b90	canon	4	198	5	3	0	B MPCarSelectScreen::~MPCarSelectScreen
 0x4e6ac0	canon	4	525	5	6	1	B GarageVinylPrompt::NotificationMessage
 0x4e7600	canon	4	273	5	1	4	B __static_initialization_and_destruction_0
@@ -8550,8 +8406,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4ef330	canon	4	3002	4	1	0	
 0x4f67f0	canon	4	92	5	71	0	B FEngPrintf
 0x4f7d30	canon	4	380	5	32	3	B MenuScreen::BaseNotifySound
-0x50b8f0	canon	4	240	6	1	1	B GaragePerfBrandPackage::ScrollPickables
-0x5123e0	canon	4	287	7	1	0	
 0x514280	canon	4	96	4	1	1	B CreateMagazineScreen
 0x5146d0	canon	4	1206	7	3	0	B MagazineScreen::NotificationMessage
 0x53e9e0	canon	4	468	9	12	0	
@@ -8576,21 +8430,21 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c2d20	car	4	421	8	3	2	B ChooseCareerCarScreen::ChooseCareerCarScreen
 0x4c3120	car	4	264	7	2	1	B ChooseCareerCarScreen::NotificationMessage
 0x4c3240	car	4	318	7	1	2	C ChooseCareerCarScreen::ShouldCarBeSelectable
-0x4c42d0	car	4	473	9	1	2	A UndergroundStatsScreen::DrawCircuitStats
+0x4c42d0	car	4	473	9	1	2	C UndergroundStatsScreen::DrawCircuitStats
 0x4e2430	car	4	98	5	4	0	R SideScrollScreen::NotificationMessage
 0x4f9c50	car	4	185	5	1	2	B RecyclingThumbnailScroller::~RecyclingThumbnailScroller
 0x4f9d10	car	4	185	5	1	2	B HorizontalBrowserBackScreen::HorizontalBrowserBackScreen
 0x4f9dd0	car	4	142	4	1	0	B HorizontalBrowserBackScreen::SetupBreadCrumbs
 0x4f9e60	car	4	112	4	1	0	B HorizontalBrowserBackScreen::SetCustomizeColor
-0x5119b0	car	4	192	6	1	1	B GarageDecalsSlot::NotificationMessage
+0x5135a0	car	4	107	5	1	0	
 0x547ae0	car	4	186	5	4	0	
 0x548000	car	4	137	5	2	0	
-0x5483a0	car	4	81	4	1	0	
+0x5483a0	car	4	81	4	1	0	B eModel::RestoreReplacementTextureTable
 0x5487c0	car	4	85	4	11	0	B eModel::GetBoundingBox
-0x57bdd0	car	4	373	5	1	1	R TrainCar::TrainCar
+0x57bdd0	car	4	373	5	1	1	B TrainCar::TrainCar
 0x588580	car	4	1285	8	1	0	B Suspension::ComputeAuxiliaries
 0x592670	car	4	213	4	1	1	S WorldObjectCollisionBody::DoSnapshot
-0x4d7610	hud	4	143	5	1	1	B GetBrandHashForMaterialCategory
+0x4d7610	hud	4	143	5	1	1	B SummonChyron
 0x4f8b80	hud	4	577	8	2	0	B ThumbnailScroller::Update
 0x55fd00	hud	4	292	6	3	0	
 0x5600c0	hud	4	646	6	2	6	
@@ -8616,10 +8470,10 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5d1c1b	render	4	265	5	1	0	
 0x5d2e38	render	4	293	4	1	0	P VIFlush
 0x5d3035	render	4	293	4	1	0	
-0x5d3232	render	4	293	4	1	0	P getCurrentFieldEvenOdd
-0x5d342f	render	4	293	4	1	0	P VIGetCurrentLine
-0x5d362c	render	4	277	4	1	0	P __VIDisplayPositionToXY
-0x5d3805	render	4	277	4	1	0	P ClampStick
+0x5d3232	render	4	293	4	1	0	
+0x5d342f	render	4	293	4	1	0	
+0x5d362c	render	4	277	4	1	0	
+0x5d3805	render	4	277	4	1	0	
 0x5dbee8	render	4	323	4	2	0	P GXGetTexBufferSize
 0x5dc68d	render	4	211	4	2	0	P __GetImageTileCount
 0x5e505d	render	4	452	5	2	3	P GXInitTexObjLOD
@@ -8641,7 +8495,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x617c5c	render	4	734	4	1	1	B madinit
 0x624880	render	4	201	5	1	0	
 0x624a90	render	4	110	5	1	0	B EAGL::TextureRenderContext::~TextureRenderContext
-0x624bf0	render	4	132	5	1	0	R EAGLInternal::ViewPortPrivate::ViewPortPrivate
+0x624bf0	render	4	132	5	1	0	B EAGLInternal::ViewPortPrivate::ViewPortPrivate
 0x625260	render	4	216	5	1	0	
 0x625440	render	4	238	5	1	0	R EAGL::DrawArray::SetUpGeoPrim
 0x625ad0	render	4	204	5	1	0	R EAGL::DrawGouraud::Begin
@@ -8665,22 +8519,17 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4337a0	rivals	4	281	5	2	0	
 0x434590	rivals	4	167	6	1	0	
 0x44ceb0	rivals	4	126	4	1	1	S DrivingInformation::DoSnapshot
-0x452070	rivals	4	287	4	1	0	R AIActionGetUnstuck::CalculatePointsToDrive
-0x452bf0	rivals	4	281	6	1	0	B AIActionAvoidCrossTraffic::HasBeenAccomplished
-0x452d20	rivals	4	821	7	1	0	B AIActionAvoidCrossTraffic::CalculatePointsToDrive
-0x453120	rivals	4	833	5	1	0	B AIActionIJustGotHitDragRace::CalculatePointsToDrive
 0x455c50	rivals	4	244	5	4	0	B DriveTargetRenderer::SetTargetToRender
 0x456d50	rivals	4	143	5	2	0	R StraightLinePredict
 0x45a250	rivals	4	152	5	2	0	R DriveTarget::FillWithCurrentAcceleration
 0x45a510	rivals	4	148	4	1	0	R DriveTarget::BlendWithCurrentAcceleration
 0x45d800	rivals	4	277	5	1	0	R DragController::Think
 0x45fb30	rivals	4	343	5	1	0	B PsychoDriver::CalcSteerToPoint
-0x4624d0	rivals	4	578	8	2	0	R AIDriver::ChooseNewAction
 0x462b30	rivals	4	700	8	2	0	R AIDriver::CanUseNitrousRightNow
 0x462e60	rivals	4	122	4	1	0	R AnimationToAvoidInfo::SetAnimation
 0x463910	rivals	4	530	5	1	0	R BeltMover::FindCoordinates
 0x47c020	rivals	4	306	6	2	0	B NisSceneManager::CreateCameraAnimationControllers
-0x49c0e0	rivals	4	1845	7	1	11	C PostRaceStatsScreen::Init
+0x49c0e0	rivals	4	1845	7	1	11	B PostRaceResultsScreen::SetupRacers
 0x572d90	rivals	4	134	5	6	1	R ReplayManager::HandleSnapshot
 0x573620	rivals	4	460	5	1	2	B DemoModeReplay::Save
 0x57a530	rivals	4	185	5	1	0	
@@ -8752,7 +8601,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x43ef30	track	4	428	13	1	0	
 0x4474a0	track	4	352	4	1	0	B VerifyJoylogChecksum
 0x458f10	track	4	390	7	22	0	B DriveTarget::Clear
-0x488ae0	track	4	2007	9	1	0	B DebugWorldCameraMover::Update
 0x4bb0d0	track	4	134	5	1	1	R QRTrackSelectScreen::NeedToGetRaceLength
 0x53e6c0	track	4	355	7	1	1	
 0x53ede0	track	4	239	4	1	0	B EAXS_SpeechStream::PlayByChannelID
@@ -8766,7 +8614,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x598f00	traffic	4	168	6	1	0	R TrafficTeleporter::ChooseRandomPointFromStartingRoute
 0x59ba20	traffic	4	133	4	2	1	S DrivingLocation::DoSnapshot
 0x420110	unknown	4	507	5	1	0	R World::GetTimestep
-0x42bb60	unknown	4	512	9	1	0	B Player::~Player
+0x42ae50	unknown	4	481	7	1	0	B VisibleDrivingLine::VisibleDrivingLine
 0x43b210	unknown	4	486	8	1	0	
 0x43bfe0	unknown	4	798	10	1	0	
 0x43cb60	unknown	4	398	8	2	0	
@@ -8794,16 +8642,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x646100	audio	5	246	7	1	4	B PRINT_movechannel
 0x657b50	audio	5	242	5	1	0	
 0x659250	audio	5	187	6	2	0	B SFILTER_bpfFIR8
-0x4901e0	camera	5	783	9	1	0	B ZoneFreezeCameraMover::Update
+0x492700	camera	5	1274	10	1	0	R ZonePreviewCameraMover::Update
 0x59c100	camera	5	148	5	1	1	S RealController::DoSnapshot
 0x401190	canon	5	659	7	1	10	
 0x42b0d0	canon	5	2531	10	1	6	B Player::Player
 0x435570	canon	5	1265	10	1	1	
-0x47f310	canon	5	422	5	1	1	X IntroNisCameraCoordinator::JumpToCountDown
 0x4a9fd0	canon	5	484	6	1	0	B HighScoresDatabase::CommitHighScoresPostRace
 0x4b8e60	canon	5	204	5	1	0	R QROptionsScreen::SetupLapKO
 0x4b9500	canon	5	471	8	1	3	B QRTrackSelectScreen::QRTrackSelectScreen
-0x4b9750	canon	5	426	7	2	3	R QRTrackSelectScreen::AddTrack
+0x4b9750	canon	5	426	7	2	3	B QRTrackSelectScreen::~QRTrackSelectScreen
 0x4c09b0	canon	5	236	5	1	1	R PauseOptionsMenu::ForceRaceFinish
 0x4c2190	canon	5	152	5	1	0	B UndergroundTradeCarScreen::Redraw
 0x4c2440	canon	5	122	5	1	0	B UndergroundTradeConfirmScreen::ExecuteTrade
@@ -8824,12 +8671,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4bc170	car	5	1550	16	1	4	
 0x4e3060	car	5	225	6	1	0	
 0x4f9b70	car	5	191	7	1	7	R Scrollerina::DeleteScrollerDatum
-0x5135a0	car	5	107	5	1	0	
 0x548340	car	5	90	5	1	0	
 0x579b30	car	5	195	6	1	0	B AnimationMover::~AnimationMover
 0x4c1b50	hud	5	328	5	1	12	C PauseOptionsSelectorMenu::PauseOptionsSelectorMenu
 0x4c1dc0	hud	5	177	5	1	0	B SelectableCar::SelectableCar
-0x4df400	hud	5	153	5	1	2	C LangSelectScreen::~LangSelectScreen
+0x4df400	hud	5	153	5	1	2	C LicenseScreen::~LicenseScreen
 0x4f1d80	hud	5	629	6	1	0	
 0x4f2000	hud	5	632	7	1	0	
 0x4f2280	hud	5	877	7	1	0	
@@ -8880,7 +8726,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x6308f0	render	5	1167	5	1	0	B EAGLAnim::FnPoseBlender::Blend
 0x422130	rivals	5	349	8	2	0	R RaceCoordinator::CleanupAfterRace
 0x425990	rivals	5	339	7	2	0	R Car::~Car
-0x4522a0	rivals	5	712	8	1	0	B AIActionIJustGotHit::CalculatePointsToDrive
 0x455d60	rivals	5	1082	6	2	0	B FuturePointsRenderer::SetPointsToRender
 0x45ae10	rivals	5	446	6	18	0	R DrivingChoice::BuildDriveTarget
 0x45cea0	rivals	5	257	5	1	0	R DrivingChoice::DecideLateralDistance
@@ -8925,15 +8770,11 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x682466	runtime	5	660	7	1	4	
 0x68461d	runtime	5	193	5	1	0	
 0x46a440	track	5	317	6	2	1	B StaticCollisionBody::Interpolate
-0x48b8c0	track	5	1000	10	2	0	R CubicCameraMover::SetDesired
-0x48bcb0	track	5	1344	15	1	0	R CubicCameraMover::Update
-0x48e490	track	5	712	13	1	0	R AnimationControllerCameraMover::Update
 0x4ba100	track	5	1034	9	1	5	
 0x594970	track	5	201	7	1	1	B bFile::HandleCompletedCallbacks
 0x59d350	track	5	221	7	13	0	R QuickSpline::GetPoint
-0x42ae50	unknown	5	481	7	1	0	B VisibleDrivingLine::VisibleDrivingLine
 0x43bd10	unknown	5	286	9	1	0	B StylePointsAccumulator::Update
-0x49cd90	unknown	5	329	7	1	0	C PostRaceStatsScreen::SetupDrift
+0x49cd90	unknown	5	329	7	1	0	B PostRaceResultsScreen::NotificationMessage
 0x4f9420	unknown	5	728	10	1	1	C Scrollerina::Scroll
 0x59e850	unknown	5	611	9	5	0	R cVolSlider::Init
 0x66af50	unknown	5	172	5	1	0	
@@ -8944,7 +8785,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x546d70	assets	6	141	7	1	0	R eStreamPackLoader::IsLoading
 0x5c52f4	assets	6	423	6	1	1	P __OSReboot
 0x683460	assets	6	239	7	1	3	
-0x525c10	audio	6	1362	9	2	0	B EAXTunerCar::EAXTunerCar
+0x525c10	audio	6	1362	9	2	0	C EAXTunerCar::EAXTunerCar
 0x526190	audio	6	388	8	2	0	B EAXTunerCar::~EAXTunerCar
 0x529ea0	audio	6	173	8	2	0	A EAXTunerCar::DynLoadUpdate
 0x64c690	audio	6	367	6	2	0	R SNDAEMSI_updatedestroy
@@ -8958,16 +8799,15 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x660b00	audio	6	319	6	1	0	
 0x4300f0	camera	6	1376	12	1	0	B Player::UpdateSmokeShow
 0x481ab0	camera	6	1855	13	5	0	A DragCameraManager::SetState
-0x490770	camera	6	1825	12	1	0	R PreviewComet::Render
-0x492700	camera	6	1274	10	1	0	R ZonePreviewCameraMover::Update
+0x490770	camera	6	1825	12	1	0	B PreviewComet::Render
 0x414f60	canon	6	413	11	1	4	P LGWheels::PlayDirtRoadEffect
 0x415970	canon	6	302	12	1	1	P LGWheels::PlayCarAirborne
 0x4164d0	canon	6	1048	6	2	0	
 0x418ac0	canon	6	286	7	1	0	B STREAM_release
 0x423530	canon	6	553	11	1	0	B RaceCoordinator::RCStateRaceInProgressCallback
 0x496240	canon	6	1912	11	1	2	
-0x497a00	canon	6	407	13	3	2	B PostRaceStyleScreen::AnimateScores
-0x49ab60	canon	6	1027	10	2	6	B PostRaceResultsScreen::SetupRaceTimes
+0x497a00	canon	6	407	13	3	2	
+0x49ab60	canon	6	1027	10	2	6	B PostRaceStyleScreen::SetupPlayer
 0x49f000	canon	6	191	7	2	1	
 0x4b1dd0	canon	6	316	6	1	0	
 0x4b70c0	canon	6	2416	11	1	11	R QRModeSelectScreen::BuildModeList
@@ -9001,7 +8841,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5486a0	car	6	210	7	1	0	B eModel::ApplyReplacementTextureTable
 0x45dbb0	hud	6	1190	7	3	1	B PsychoDriver::PsychoDriver
 0x4969e0	hud	6	1041	9	1	4	B PostRaceMenuScreen::Setup
-0x49a3e0	hud	6	1902	11	1	5	B PostRaceResultsScreen::SetupRacers
+0x49a3e0	hud	6	1902	11	1	5	
 0x4c19e0	hud	6	362	6	1	0	B PauseOptionsMenu::SetupDebug
 0x4f48b0	hud	6	1090	7	1	0	R FEngFont::RenderString
 0x41b670	input	6	433	8	1	2	
@@ -9031,8 +8871,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x621910	render	6	479	7	1	0	
 0x624950	render	6	187	7	1	0	B Use__CQ24EAGL8TevStageUi
 0x624b00	render	6	138	7	2	0	
-0x624c80	render	6	160	7	1	0	R EAGLInternal::ViewPortPrivate::EnactFogSettings
-0x624d20	render	6	165	7	1	0	R __static_initialization_and_destruction_0
+0x624c80	render	6	160	7	1	0	B __static_initialization_and_destruction_0
+0x624d20	render	6	165	7	1	0	B GetShape__CQ24EAGL8ViewPortRfN51
 0x625340	render	6	192	6	1	0	B EAGL::Profiler::~Profiler
 0x625530	render	6	261	7	1	0	R EAGL::DrawGouraud::DrawGouraud
 0x62f590	render	6	2253	6	1	0	C DecompressValuesIndexed__CQ28EAGLAnim19DeltaCompressedDataiiiiPCfPfiPUsf
@@ -9042,6 +8882,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x634010	render	6	270	6	1	0	B CycleTime__CQ28EAGLAnim13FnTurnBlenderfff
 0x42bd60	rivals	6	1164	7	1	1	S Player::DoSnapshot
 0x43b090	rivals	6	370	7	1	0	
+0x44a6f0	rivals	6	795	8	3	1	S AICarController::DoSnapshot
 0x45bfb0	rivals	6	274	6	2	0	R DrivingChoice::FixupAvoidableToExcludeFromCollisionPrediction
 0x45e970	rivals	6	4476	12	2	0	R PsychoDriver::Drive
 0x5721f0	rivals	6	130	6	1	0	R ReplayManager::BeginFrame
@@ -9050,7 +8891,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x562420	runtime	6	520	10	1	1	
 0x5e9257	runtime	6	1625	7	1	0	
 0x6203e0	runtime	6	242	7	1	0	
-0x6397e0	runtime	6	221	7	1	0	B reserveop
+0x6397e0	runtime	6	221	7	1	0	B reservehandle
 0x643010	runtime	6	115	6	0	0	R Realmc::GCDriver::DeleteFile
 0x64595f	runtime	6	280	7	1	0	
 0x654b50	runtime	6	374	8	1	0	
@@ -9065,7 +8906,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x6754f2	runtime	6	290	9	1	0	
 0x6820f2	runtime	6	315	11	1	0	
 0x467010	track	6	515	6	1	1	B CollisionBodyWitness::SnapshotEverything
-0x48d3b0	track	6	815	13	1	0	R DragRaceLeaderCameraMover::Update
 0x53f070	track	6	420	6	1	2	B EAXS_SpeechStream::StartStream
 0x5754b0	traffic	6	1163	8	1	0	R TrafficMover::Move
 0x412810	unknown	6	119	6	2	0	P PlatformInitJoystick
@@ -9096,7 +8936,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4d2820	canon	7	1847	13	1	7	
 0x4d3b60	canon	7	969	13	1	3	B OptionsMenu::SetupController
 0x4d3f30	canon	7	941	13	1	3	B OptionsMenu::SetupDisplay
-0x4d5120	canon	7	711	7	1	0	C EATraxScreen::HandleScrollVertical
+0x4d5120	canon	7	711	7	1	0	B EATraxScreen::SetupList
 0x4dbc70	canon	7	776	12	2	0	C ColorPicker::SetupColorTable
 0x4dbf90	canon	7	637	11	3	0	B ColorPicker::RepositionCursor
 0x4e67e0	canon	7	736	9	1	1	
@@ -9109,7 +8949,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x45c370	car	7	394	7	8	0	R DrivingChoice::FillUpDriveTarget
 0x4c2ed0	car	7	473	15	1	3	
 0x4f8370	car	7	305	10	28	0	
-0x50eee0	car	7	498	11	1	0	B GarageRimsBrowser::ScrollPickables
 0x513aa0	car	7	482	14	1	1	
 0x548250	car	7	191	7	1	0	
 0x4c1ca0	hud	7	279	8	1	8	B PauseOptionsSelectorMenu::NotificationMessage
@@ -9131,10 +8970,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x62a520	render	7	1287	7	1	0	B EAGLAnim::FnDeltaQFast::EvalSQTMask
 0x62ed00	render	7	2176	7	1	0	R DecompressValues__CQ28EAGLAnim19DeltaCompressedDataiiiiPCfPf
 0x427c50	rivals	7	523	9	6	1	R Car::ResetCore
-0x44a6f0	rivals	7	795	8	3	1	S AICarController::DoSnapshot
 0x45c760	rivals	7	925	7	1	0	R DrivingChoice::BuildDriveTargetAroundAvoidable
 0x47a090	rivals	7	2471	11	1	0	B PhysicsMover::RunPerformanceSim
-0x48ce30	rivals	7	1397	15	2	0	R DragRaceLeaderCameraMover::SetDesired
 0x493c70	rivals	7	1286	13	1	0	R PreviewRoute::MakePauseSpline
 0x494180	rivals	7	1797	10	2	0	R PreviewRoute::MakeSplines
 0x51eee0	rivals	7	2254	8	3	0	C EAXSound::StartingRace
@@ -9147,7 +8984,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x476fa0	traffic	7	340	7	1	1	S PhysicsMover::DoSnapshot
 0x422d70	unknown	7	263	7	1	0	B RaceCoordinator::RCStateAIDemoModeCallback
 0x467df0	unknown	7	616	7	1	0	R CollisionBodyWitness::TestForContact
-0x49cc70	unknown	7	278	10	1	0	R PostRaceStatsScreen::SetupDrag
+0x49cc70	unknown	7	278	10	1	0	B PostRaceResultsScreen::SetupTourneyPoints
 0x58acf0	unknown	7	137	7	1	0	R __static_initialization_and_destruction_0
 0x592fd0	unknown	7	300	7	1	0	R SubWorld::ResolveCollision
 0x593170	unknown	7	811	8	2	0	R SubWorld::PredictCollisions
@@ -9160,7 +8997,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x654340	audio	8	512	9	1	0	B SNDSTRM_requeststatus
 0x660870	audio	8	491	8	1	0	
 0x439170	camera	8	292	8	1	0	
-0x49c820	canon	8	927	11	2	2	R PostRaceStatsScreen::Setup
+0x49c820	canon	8	927	11	2	2	B PostRaceResultsScreen::SetupRaceTimes
 0x49f2e0	canon	8	925	10	1	1	
 0x4b5d20	canon	8	173	10	1	0	R RaceStarter::SetControllerConfig
 0x4bd710	canon	8	254	9	1	0	R QRLapPopupScreen::DoStartRace
@@ -9173,7 +9010,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x513780	canon	8	757	19	1	3	
 0x647cb0	canon	8	1255	9	1	0	
 0x43ccf0	car	8	507	17	2	2	
-0x5101f0	car	8	970	17	1	5	
 0x4a8000	hud	8	308	14	1	0	R RaceOverMessage::Update
 0x419f50	input	8	723	9	3	0	R FEKeyboard::NotificationMessage
 0x43d5f0	render	8	234	8	1	0	
@@ -9194,8 +9030,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x632ef0	render	8	363	8	1	0	B EAGLAnim::FnTurnBlender::SetWeight
 0x633e70	render	8	401	8	1	0	
 0x4239c0	rivals	8	349	8	1	3	B RaceCoordinator::RCStateInstantReplayCallback
-0x44d760	rivals	8	303	8	1	1	R AIGoal::DoSnapshot
-0x4515c0	rivals	8	1061	9	1	0	B AIActionPullOver::CalculatePointsToDrive
 0x59c460	rivals	8	415	8	1	0	R RealController::UpdateFuturePoints
 0x5a5730	rivals	8	184	8	2	0	R FuturePoints::AddPoint
 0x4110d0	runtime	8	532	11	1	0	
@@ -9225,8 +9059,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4b3240	canon	9	1331	17	1	14	B __static_initialization_and_destruction_0
 0x4bd0f0	canon	9	537	16	2	5	B QRCarSelectScreen::ScrollCars
 0x4c4f50	canon	9	422	14	1	6	
-0x4d5420	canon	9	237	9	1	1	B EATraxScreen::HandleScrollTriggers
-0x512900	canon	9	826	12	1	3	B GarageDecalsChoose::Decalize
+0x4d5420	canon	9	237	9	1	1	B EATraxScreen::AddNewSlot
 0x64a28a	canon	9	868	9	1	0	
 0x465830	props	9	1227	13	1	0	R Collision::AddImpulse
 0x579750	render	9	946	15	1	1	B AnimationMover::AnimationMover
@@ -9240,7 +9073,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x619309	render	9	1611	12	1	2	
 0x621160	render	9	210	9	1	0	
 0x4350d0	rivals	9	782	15	3	0	B RacingCar::UpdateLapCounts
-0x639d70	runtime	9	288	9	7	0	R FILESYS_getopts
+0x639d70	runtime	9	288	9	7	0	R FILESYS_setopts
 0x63a1e0	runtime	9	298	11	2	1	R syncblockio
 0x63f7c0	runtime	9	1204	11	1	9	
 0x669060	runtime	9	968	11	2	0	
@@ -9250,13 +9083,12 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x482230	camera	10	1203	13	1	0	A DragCameraManager::JoyHandler
 0x4c8900	canon	10	426	10	1	1	
 0x4c8b70	canon	10	1102	14	1	6	
-0x4ddfa0	canon	10	312	11	1	0	
+0x4ddfa0	canon	10	312	11	1	0	R LoadingScreen::SetupControllerConfig
 0x4eb1e0	canon	10	431	12	1	5	B FEngine::RenderGroup
 0x4ebf20	canon	10	1177	12	1	2	
 0x4f1040	canon	10	957	13	2	0	
 0x41fc00	car	10	586	15	1	2	S World::DoSnapshot
 0x4783c0	car	10	422	10	2	0	R PhysicsMover::ResolveForces
-0x50e340	car	10	636	14	1	2	
 0x5b710e	render	10	603	12	3	3	P __OSUnhandledException
 0x5b9b78	render	10	1270	11	1	6	
 0x5c1248	render	10	555	11	1	3	
@@ -9266,9 +9098,9 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x421f00	rivals	10	556	13	2	0	R RaceCoordinator::InitForRace
 0x4281e0	rivals	10	1183	18	1	4	B Car::TriggerEvents
 0x497eb0	rivals	10	3801	17	2	12	
-0x49cee0	rivals	10	742	12	1	0	
+0x49cee0	rivals	10	742	12	1	0	R PostRaceStatsScreen::Init
 0x5dc760	runtime	10	778	10	5	2	
-0x639690	runtime	10	289	10	1	0	R iFILE_CommandCompleteCallback
+0x639690	runtime	10	289	10	1	0	B reserveop
 0x63ec20	runtime	10	606	12	1	6	R Realmc::GCInterface::TrcListFiles
 0x653440	runtime	10	778	12	1	0	
 0x66c900	runtime	10	1358	12	2	0	
@@ -9282,7 +9114,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x6568d0	audio	11	492	12	1	0	
 0x417290	canon	11	454	11	1	2	R startnextrequest
 0x49af90	canon	11	2664	22	2	10	
-0x49ba10	canon	11	1074	13	1	2	B PostRaceResultsScreen::SetupTourneyPoints
+0x49ba10	canon	11	1074	13	1	2	B PostRaceStyleScreen::AnimateScores
 0x4b8750	canon	11	1195	14	1	4	
 0x4c9240	canon	11	458	12	1	1	
 0x4d0b70	canon	11	2648	14	1	10	
@@ -9334,7 +9166,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x552bb0	runtime	13	1273	18	4	0	
 0x4ba530	track	13	2730	19	2	9	
 0x43c300	unknown	13	1898	23	1	0	
-0x4975c0	canon	14	1065	19	1	7	B PostRaceStyleScreen::SetupPlayer
+0x4975c0	canon	14	1065	19	1	7	R PostRaceMenuScreen::NotificationMessage
 0x4bcb40	canon	14	1159	17	1	5	R QRCarSelectScreen::NotificationMessage
 0x4c5fa0	canon	14	1117	21	1	2	C UndergroundBriefScreen::Redraw
 0x4d32e0	canon	14	2165	21	1	7	
@@ -9367,14 +9199,14 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e1290	canon	17	1799	19	1	7	
 0x5c7212	render	17	911	18	1	4	P C_MTX44Inverse
 0x5ffbd5	track	17	5074	19	1	0	
+0x4da1a0	canon	18	2380	25	1	5	B ColorPicker::ColorPicker
 0x513c90	canon	18	1192	24	1	8	
 0x55c840	canon	18	1262	21	1	2	
 0x5e2a38	render	18	7979	20	8	7	
-0x6392f0	runtime	18	869	19	1	1	R iFILE_ExecCommand
+0x6392f0	runtime	18	869	19	1	1	B iFILE_ExecCommand
 0x65a240	audio	19	1188	20	1	0	
 0x5e85e1	render	19	1137	22	1	7	
 0x627920	render	19	531	19	1	0	C EAGLAnim::FnRawStateChan::FindTime
-0x4da1a0	canon	20	2380	25	1	5	B ColorPicker::ColorPicker
 0x420b40	rivals	21	1546	32	1	0	R World::DoTimestep
 0x4dafa0	canon	23	2266	28	1	1	B ColorPicker::NotificationMessage
 0x5c19bf	render	23	2510	24	1	37	

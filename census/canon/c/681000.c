@@ -20087,7 +20087,7 @@ void FUN_0068ad60(void)
 void FUN_0068ad80(void)
 
 {
-  FUN_0048ea30(0xbfc90fdb,0,0x3cf5c28f,0x3dcccccd);
+  SinController__SinController(0xbfc90fdb,0,0x3cf5c28f,0x3dcccccd);
   _atexit(FUN_00696470);
   return;
 }

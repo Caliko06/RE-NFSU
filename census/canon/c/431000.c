@@ -101,7 +101,7 @@ void Player__CleanupAfterRace(void)
 
 // ==== 0x431190 Players_AssignTypeFromTable
 
-/* [canon] camera low (ghidra-canon) docs/re/canon.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/canon.md */
 
 void Players_AssignTypeFromTable(void)
 
@@ -1475,7 +1475,7 @@ void cPlayerSettings__ResetToDefaults(void)
 
 // ==== 0x432a10 Player::IsPlainType1
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 Player__IsPlainType1(void)
 
@@ -2059,7 +2059,7 @@ float * FUN_00432e80(float *param_1,int param_2)
 
 // ==== 0x433340 CurveTable::Evaluate
 
-/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall CurveTable__Evaluate(undefined4 param_1)
 
@@ -2206,7 +2206,7 @@ void HudMeter__SetLevel(int param_1)
 // ==== 0x433650 RaceManager::DetectOvertake
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+/* [canon] rivals med (ghidra-canon+hopper) docs/re/rivals.md */
 
 undefined4 RaceManager__DetectOvertake(int param_1,float param_2,float param_3)
 
@@ -2593,7 +2593,7 @@ void FUN_00433e20(int param_1,int param_2,int *param_3)
 
 // ==== 0x434150 Floats11_Max
 
-/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/canon.md */
 
 void Floats11_Max(void)
 
@@ -3836,7 +3836,7 @@ undefined4 FUN_00435b30(void)
 
 // ==== 0x435b90 Players_FindNisPlayer
 
-/* [canon] camera low (ghidra-canon) docs/re/canon.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/canon.md */
 
 int Players_FindNisPlayer(void)
 
@@ -3865,7 +3865,7 @@ int Players_FindNisPlayer(void)
 
 // ==== 0x435bd0 Race_FindFirstMissingRank
 
-/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+/* [canon] rivals med (ghidra-canon+hopper) docs/re/rivals.md */
 
 void Race_FindFirstMissingRank(int param_1)
 
@@ -4096,7 +4096,7 @@ float10 Countdown__GetTotalSeconds(void)
 
 // ==== 0x435f80 Countdown::GetSecondsRemaining
 
-/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/canon.md */
 
 float10 Countdown__GetSecondsRemaining(void)
 
@@ -4248,7 +4248,7 @@ void FUN_00436070(float param_1)
 
 // ==== 0x4361b0 StyleItem::AccumulateStep
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall StyleItem__AccumulateStep(undefined4 param_1,int param_2,float param_3)
 
@@ -4385,7 +4385,7 @@ LAB_0043640d:
 
 // ==== 0x436460 StyleItem::Finish
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __thiscall StyleItem__Finish(int param_1,undefined1 param_2)
 
@@ -4568,7 +4568,7 @@ void FUN_00436600(void)
 
 // ==== 0x4366c0 StyleItem::AdvanceLevel
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __fastcall StyleItem__AdvanceLevel(int param_1)
 
@@ -4956,7 +4956,7 @@ void FUN_00436b70(void)
 
 // ==== 0x436ba0 StyleSet::RecomputeTotal
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 float10 StyleSet__RecomputeTotal(void)
 
@@ -5201,7 +5201,7 @@ PidCarController__scalar_deleting_destructor(undefined4 *param_1,byte param_2)
 
 // ==== 0x436f60 PidCarController::_PidCarController
 
-/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall PidCarController___PidCarController(undefined4 *param_1)
 
@@ -5713,7 +5713,7 @@ LAB_00437d4f:
 // ==== 0x437fa0 RemoteCarState::ClearStaleInput
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-/* [canon] online low (ghidra-canon) docs/re/canon.md */
+/* [canon] online med (ghidra-canon+hopper) docs/re/canon.md */
 
 void RemoteCarState__ClearStaleInput(int param_1)
 
@@ -5733,7 +5733,7 @@ void RemoteCarState__ClearStaleInput(int param_1)
 
 // ==== 0x437fe0 CarTracker_CapturePosVel
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void CarTracker_CapturePosVel(void)
 
@@ -6468,7 +6468,7 @@ void FUN_00439010(void)
 
 // ==== 0x439030 Race_TickTrackerSet
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 void __thiscall Race_TickTrackerSet(int param_1,int param_2)
 
@@ -10218,7 +10218,7 @@ void __fastcall FUN_0043f1f0(undefined4 param_1)
 
 // ==== 0x43f210 MiscStyleManager::IsAirTimeActive
 
-/* [canon] runtime low (ghidra-canon) docs/re/runtime.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/runtime.md */
 
 undefined4 __fastcall MiscStyleManager__IsAirTimeActive(int param_1)
 

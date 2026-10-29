@@ -4971,7 +4971,7 @@ void StreamBoundaries__DebugDump(void)
 
 // ==== 0x445e10 eView_SphereBehindPlane
 
-/* [canon] render low (ghidra-canon) docs/re/render.md */
+/* [canon] render med (ghidra-canon+hopper) docs/re/render.md */
 
 undefined4 __thiscall eView_SphereBehindPlane(int param_1,float param_2)
 
@@ -9390,7 +9390,7 @@ void __thiscall FUN_0044a6f0(int param_1,int param_2)
   FUN_00571c20(param_2,param_1 + 0x3ec,1,1,1);
   FUN_00571c20(param_2,param_1 + 0x3f0,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x4c0,4,0xffffffff,0);
-  FUN_0044d760();
+  AIGoal__DoSnapshot();
   AIAction__DoSnapshot(param_1 + 0x3f8);
   FUN_00571c20(param_2,param_1 + 0x400,4,0xffffffff,0);
   FUN_00571c20(param_2,param_1 + 0x404,4,4,1);
@@ -10160,7 +10160,7 @@ LAB_0044bab2:
 
 // ==== 0x44bad0 Msg_ReadOnOffByType
 
-/* [canon] car low (ghidra-canon) docs/re/car.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/car.md */
 
 bool __fastcall Msg_ReadOnOffByType(int param_1,undefined1 *param_2)
 
@@ -11683,9 +11683,11 @@ undefined4 FUN_0044d660(void)
 }
 
 
-// ==== 0x44d670 FUN_0044d670
+// ==== 0x44d670 AIPlan::DoSnapshot
 
-void __thiscall FUN_0044d670(int param_1,int param_2)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall AIPlan__DoSnapshot(int param_1,int param_2)
 
 {
   int iVar1;
@@ -11707,16 +11709,18 @@ void __thiscall FUN_0044d670(int param_1,int param_2)
 }
 
 
-// ==== 0x44d700 FUN_0044d700
+// ==== 0x44d700 AIGoal::DoSnapshot
 
-void FUN_0044d700(int param_1)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIGoal__DoSnapshot(int param_1)
 
 {
   int iVar1;
   char cVar2;
   
   FUN_00571ea0(0,"AIGoal");
-  FUN_0044d670(param_1);
+  AIPlan__DoSnapshot(param_1);
   iVar1 = *(char *)(param_1 + 0x40) * 0x10;
   *(int *)(iVar1 + param_1 + 0x58) = *(int *)(param_1 + 0x150) - *(int *)(iVar1 + 0x58 + param_1);
   cVar2 = *(char *)(param_1 + 0x40) + -1;
@@ -11728,9 +11732,11 @@ void FUN_0044d700(int param_1)
 }
 
 
-// ==== 0x44d760 FUN_0044d760
+// ==== 0x44d760 AIGoal::DoSnapshot
 
-void FUN_0044d760(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void AIGoal__DoSnapshot(void)
 
 {
   int *piVar1;
@@ -11849,7 +11855,7 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
   local_20 = param_1;
   if ((((param_3 == 10) || (ExceptionList = &pvStack_c, 500 < (int)param_4)) ||
       (ExceptionList = &pvStack_c, cVar3 = (**(code **)(*piVar1 + 0x6c))(), cVar3 == '\0')) ||
-     (iVar4 = FUN_00451b00(piVar2), iVar5 = (int)param_4, iVar4 < 0)) {
+     (iVar4 = AIActionGetUnstuck__CalculateScore(piVar2), iVar5 = (int)param_4, iVar4 < 0)) {
     if (((param_3 == 0x13) || (600 < iVar5)) ||
        ((*(int *)(piVar2[0xea] + 0xc0) == -1 || (*(int *)(*(int *)(*piVar2 + 0x2c) + 0x4ec) == 0))))
     {
@@ -11857,7 +11863,8 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
          (iVar4 = AIAction__GetMostImportantNearbyCollidingAvoidable(piVar2,0xbf800000,1),
          iVar4 == 0)) {
         if (((param_3 == 2) || (400 < iVar5)) ||
-           (iStack_30 = FUN_00452b40(&local_34), iVar5 = (int)param_4, iStack_30 < 0)) {
+           (iStack_30 = AIActionAvoidCrossTraffic__CalculateScore(&local_34), iVar5 = (int)param_4,
+           iStack_30 < 0)) {
           if (((param_3 != 1) && (iVar5 < 0x12d)) &&
              (iStack_30 = AIActionAvoidAvoidable__CalculateScore
                                     (&local_38,&local_1c,&local_34,&param_2,&local_28),
@@ -11883,7 +11890,8 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
             }
           }
           if (((param_3 == 0xe) || (500 < iVar5)) ||
-             (iVar4 = FUN_00452630(), iVar5 = (int)param_4, iVar4 < 0)) {
+             (iVar4 = AIActionAccidentRecovery__CalculateScore(), iVar5 = (int)param_4, iVar4 < 0))
+          {
             if (((param_3 == 5) ||
                 (*(int *)(&DAT_0077a340 + *(char *)(*(int *)(piVar1[1] + 0x14) + 0x736) * 8) < iVar5
                 )) || (iVar4 = AIActionBlock__CalculateScore(&local_24), iVar5 = (int)param_4,
@@ -11918,7 +11926,7 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
           else {
             iVar5 = FUN_00567160();
             if (iVar5 != 0) {
-              uVar6 = FUN_00452570(0xbf800000);
+              uVar6 = AIActionAccidentRecovery__AIActionAccidentRecovery(0xbf800000);
               ExceptionList = pvStack_c;
               return uVar6;
             }
@@ -11930,7 +11938,8 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
           param_4 = (float)FUN_00567160();
           uStack_4 = 0;
           if (param_4 != 0.0) {
-            uVar6 = FUN_00452990(param_4,0xbf800000,0x40000000,local_34);
+            uVar6 = AIActionAvoidCrossTraffic__AIActionAvoidCrossTraffic
+                              (param_4,0xbf800000,0x40000000,local_34);
             ExceptionList = pvStack_c;
             return uVar6;
           }
@@ -11941,7 +11950,7 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
         TrafficCar_HonkAtPlayer(piVar1,piVar2);
         iVar5 = FUN_00567160();
         if (iVar5 != 0) {
-          uVar6 = FUN_004521c0(0xbf800000,uVar6);
+          uVar6 = AIActionIJustGotHit__AIActionIJustGotHit(0xbf800000,uVar6);
           ExceptionList = pvStack_c;
           return uVar6;
         }
@@ -11962,7 +11971,7 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
     piVar1[0x102] = DAT_0073ad34;
     iVar5 = FUN_00567160();
     if (iVar5 != 0) {
-      uVar6 = FUN_004519f0(0x40a00000,param_4);
+      uVar6 = AIActionGetUnstuck__AIActionGetUnstuck(0x40a00000,param_4);
       ExceptionList = pvStack_c;
       return uVar6;
     }
@@ -11972,9 +11981,11 @@ undefined4 __thiscall RaceGoal__SelectAction(int *param_1,int *param_2,int param
 }
 
 
-// ==== 0x44dce0 FUN_0044dce0
+// ==== 0x44dce0 AIGoalWinRoadRace::CreateDefaultAction
 
-undefined4 * FUN_0044dce0(void)
+/* [canon] rivals high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 * AIGoalWinRoadRace__CreateDefaultAction(void)
 
 {
   undefined4 *puVar1;
@@ -12019,14 +12030,15 @@ undefined4 * DragGoal__SelectAction(int *param_1,int param_2,int param_3)
   ExceptionList = &pvStack_c;
   if ((((param_2 == 10) || (ExceptionList = &pvStack_c, 500 < param_3)) ||
       (ExceptionList = &pvStack_c, cVar3 = (**(code **)(*piVar1 + 0x6c))(), cVar3 == '\0')) ||
-     (iVar4 = FUN_00451b00(param_1), iVar4 < 0)) {
+     (iVar4 = AIActionGetUnstuck__CalculateScore(param_1), iVar4 < 0)) {
     if ((*(int *)(param_1[0xea] + 0xc0) == -1) || (*(int *)(*(int *)(*param_1 + 0x2c) + 0x4ec) == 0)
        ) {
-      iVar4 = FUN_004534f0();
+      iVar4 = AIActionHitWallDragRace__CalculateScore();
       if (iVar4 < 0) {
         iVar4 = AIAction__GetMostImportantNearbyCollidingAvoidable(param_1,0x41055532,1);
         if (iVar4 == 0) {
-          if (((param_2 == 2) || (400 < param_3)) || (iVar4 = FUN_00452b40(&local_14), iVar4 < 0)) {
+          if (((param_2 == 2) || (400 < param_3)) ||
+             (iVar4 = AIActionAvoidCrossTraffic__CalculateScore(&local_14), iVar4 < 0)) {
             puVar5 = (undefined4 *)(**(code **)(*local_10 + 0x18))();
             ExceptionList = pvStack_c;
             return puVar5;
@@ -12037,7 +12049,9 @@ undefined4 * DragGoal__SelectAction(int *param_1,int param_2,int param_3)
           iVar4 = FUN_00567160();
           uStack_4 = 0;
           if (iVar4 != 0) {
-            puVar5 = (undefined4 *)FUN_00452990(iVar4,0xbf800000,uVar2,local_14);
+            puVar5 = (undefined4 *)
+                     AIActionAvoidCrossTraffic__AIActionAvoidCrossTraffic
+                               (iVar4,0xbf800000,uVar2,local_14);
             ExceptionList = pvStack_c;
             return puVar5;
           }
@@ -12046,7 +12060,8 @@ undefined4 * DragGoal__SelectAction(int *param_1,int param_2,int param_3)
           uVar2 = *(undefined4 *)(iVar4 + 0x34);
           iVar4 = FUN_00567160();
           if (iVar4 != 0) {
-            puVar5 = (undefined4 *)FUN_00453090(0xbf800000,uVar2);
+            puVar5 = (undefined4 *)
+                     AIActionIJustGotHitDragRace__AIActionIJustGotHitDragRace(0xbf800000,uVar2);
             ExceptionList = pvStack_c;
             return puVar5;
           }
@@ -12078,7 +12093,7 @@ undefined4 * DragGoal__SelectAction(int *param_1,int param_2,int param_3)
     piVar1[0x102] = DAT_0073ad34;
     iVar4 = FUN_00567160();
     if (iVar4 != 0) {
-      puVar5 = (undefined4 *)FUN_004519f0(0x40a00000,(float)fVar7);
+      puVar5 = (undefined4 *)AIActionGetUnstuck__AIActionGetUnstuck(0x40a00000,(float)fVar7);
       ExceptionList = pvStack_c;
       return puVar5;
     }
@@ -12100,7 +12115,7 @@ AIGoalSteerPlayerInDragRace__ChooseNewAction(int *param_1,undefined4 param_2)
   int iVar2;
   undefined4 *puVar3;
   
-  iVar2 = FUN_004534f0();
+  iVar2 = AIActionHitWallDragRace__CalculateScore();
   if (iVar2 < 0) {
     iVar2 = AIAction__GetMostImportantNearbyCollidingAvoidable(param_2,0x41055532,1);
     if (iVar2 == 0) {
@@ -12175,7 +12190,8 @@ TrafficGoal_Select_BeTraffic(int *param_1,int *param_2,int param_3,int param_4)
     if (iVar2 == 0) {
       return 0;
     }
-    uVar3 = FUN_00453860(0xbf800000,uVar1,uStack_8,uStack_c);
+    uVar3 = AIActionAvoidAvoidableAsTraffic__AIActionAvoidAvoidableAsTraffic
+                      (0xbf800000,uVar1,uStack_8,uStack_c);
     return uVar3;
   }
   uVar3 = (**(code **)(*piStack_4 + 0x18))();
@@ -12221,7 +12237,8 @@ TrafficGoal_Select_BeAmbient(int *param_1,int *param_2,int param_3,int param_4)
     if (iVar2 == 0) {
       return 0;
     }
-    uVar3 = FUN_00453860(0xbf800000,uVar1,uStack_8,uStack_c);
+    uVar3 = AIActionAvoidAvoidableAsTraffic__AIActionAvoidAvoidableAsTraffic
+                      (0xbf800000,uVar1,uStack_8,uStack_c);
     return uVar3;
   }
   uVar3 = (**(code **)(*piStack_4 + 0x18))();
@@ -12329,7 +12346,7 @@ void __thiscall AIAction__DoSnapshot(int param_1,int param_2)
   FUN_00571c20(param_2,param_1 + 0x1f1,1,1,0);
   FUN_00571c20(param_2,param_1 + 499,1,1,0);
   FUN_00571c20(param_2,param_1 + 500,4,4,1);
-  FUN_0044d670(param_2);
+  AIPlan__DoSnapshot(param_2);
   iVar1 = *(char *)(param_2 + 0x40) * 0x10 + 0x4c + param_2;
   *(int *)(iVar1 + 0xc) = *(int *)(param_2 + 0x150) - *(int *)(iVar1 + 0xc);
   cVar2 = *(char *)(param_2 + 0x40) + -1;
@@ -12398,14 +12415,14 @@ LAB_0044e7a6:
         local_4 = 0xffffffff;
       }
       else {
-        piVar2 = (int *)FUN_00452990(local_10,0,0,0);
+        piVar2 = (int *)AIActionAvoidCrossTraffic__AIActionAvoidCrossTraffic(local_10,0,0,0);
         local_4 = 0xffffffff;
       }
       break;
     case 3:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00453860(0,0,0,0);
+      piVar2 = (int *)AIActionAvoidAvoidableAsTraffic__AIActionAvoidAvoidableAsTraffic(0,0,0,0);
       break;
     case 4:
       iVar3 = FUN_00567160();
@@ -12430,7 +12447,7 @@ LAB_0044e7a6:
     case 8:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_004527d0(0);
+      piVar2 = (int *)AIActionDriveTrafficLane__AIActionDriveTrafficLane(0);
       break;
     case 9:
       iVar3 = FUN_00567160();
@@ -12440,7 +12457,7 @@ LAB_0044e7a6:
     case 10:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_004519f0(0,0xbf800000);
+      piVar2 = (int *)AIActionGetUnstuck__AIActionGetUnstuck(0,0xbf800000);
       break;
     case 0xb:
     case 0xf:
@@ -12448,27 +12465,27 @@ LAB_0044e7a6:
     case 0xc:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_004521c0(0,0);
+      piVar2 = (int *)AIActionIJustGotHit__AIActionIJustGotHit(0,0);
       break;
     case 0xd:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00453090(0,0);
+      piVar2 = (int *)AIActionIJustGotHitDragRace__AIActionIJustGotHitDragRace(0,0);
       break;
     case 0xe:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00452570(0);
+      piVar2 = (int *)AIActionAccidentRecovery__AIActionAccidentRecovery(0);
       break;
     case 0x10:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00453470(0);
+      piVar2 = (int *)AIActionHitWallDragRace__AIActionHitWallDragRace(0);
       break;
     case 0x11:
       iVar3 = FUN_00567160();
       if (iVar3 == 0) goto LAB_0044e7a6;
-      piVar2 = (int *)FUN_00453730(0,0);
+      piVar2 = (int *)AIActionEndOfRace__AIActionEndOfRace(0,0);
       break;
     case 0x12:
       iVar3 = FUN_00567160();

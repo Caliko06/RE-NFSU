@@ -1,6 +1,8 @@
-// ==== 0x5117b0 FUN_005117b0
+// ==== 0x5117b0 GarageDecalsSlot::AddPickable
 
-void FUN_005117b0(int param_1,int param_2,undefined4 param_3)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
+
+void GarageDecalsSlot__AddPickable(int param_1,int param_2,undefined4 param_3)
 
 {
   undefined4 *puVar1;
@@ -26,9 +28,11 @@ void FUN_005117b0(int param_1,int param_2,undefined4 param_3)
 }
 
 
-// ==== 0x511810 FUN_00511810
+// ==== 0x511810 GarageDecalsSlot::ScrollPickables
 
-void FUN_00511810(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
+
+void GarageDecalsSlot__ScrollPickables(void)
 
 {
   int iVar1;
@@ -48,7 +52,7 @@ void FUN_00511810(void)
   }
   if (iVar1 != *(int *)(in_EAX + 0x40)) {
     FUN_004f8910();
-    FUN_005118b0();
+    GarageDecalsSlot__RedrawHeading();
     if (unaff_EDI == -0x6edfbf62) {
       FUN_004f8340(*(undefined4 *)(in_EAX + 0xc));
       return;
@@ -59,9 +63,11 @@ void FUN_00511810(void)
 }
 
 
-// ==== 0x5118b0 FUN_005118b0
+// ==== 0x5118b0 GarageDecalsSlot::RedrawHeading
 
-void FUN_005118b0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
+
+void GarageDecalsSlot__RedrawHeading(void)
 
 {
   int iVar1;
@@ -117,9 +123,11 @@ void FUN_005118b0(void)
 }
 
 
-// ==== 0x5119b0 FUN_005119b0
+// ==== 0x5119b0 GarageDecalsSlot::NotificationMessage
 
-void __thiscall FUN_005119b0(int param_1,uint param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
+
+void __thiscall GarageDecalsSlot__NotificationMessage(int param_1,uint param_2)
 
 {
   if (param_2 < 0x9120409f) {
@@ -151,7 +159,7 @@ void __thiscall FUN_005119b0(int param_1,uint param_2)
     FUN_004f7d30();
     return;
   }
-  FUN_00511810();
+  GarageDecalsSlot__ScrollPickables();
   return;
 }
 
@@ -161,14 +169,16 @@ void __thiscall FUN_005119b0(int param_1,uint param_2)
 void __fastcall FUN_00511a70(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c0274;
+  *param_1 = &PTR_DecalBrandEntry__scalar_deleting_destructor_006c0274;
   return;
 }
 
 
-// ==== 0x511a80 FUN_00511a80
+// ==== 0x511a80 DecalBrandEntry::scalar_deleting_destructor
 
-void * __thiscall FUN_00511a80(void *param_1,byte param_2)
+/* [canon] car low (ghidra-canon) docs/re/canon_db.md */
+
+void * __thiscall DecalBrandEntry__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   FUN_00511a70();
@@ -373,7 +383,7 @@ LAB_00511c37:
         puVar5 = (undefined4 *)0x0;
       }
       else {
-        *puVar5 = &PTR_FUN_006c0274;
+        *puVar5 = &PTR_DecalBrandEntry__scalar_deleting_destructor_006c0274;
         puVar5[5] = 0;
         puVar5[6] = 0;
         puVar5[4] = 0;
@@ -404,9 +414,11 @@ LAB_00511d14:
 }
 
 
-// ==== 0x511d40 FUN_00511d40
+// ==== 0x511d40 FindDecalZoneInfo
 
-undefined4 * __fastcall FUN_00511d40(undefined4 param_1,int param_2)
+/* [canon] car med (ghidra-canon) docs/re/canon_db.md */
+
+undefined4 * __fastcall FindDecalZoneInfo(undefined4 param_1,int param_2)
 
 {
   int iVar1;
@@ -425,10 +437,13 @@ undefined4 * __fastcall FUN_00511d40(undefined4 param_1,int param_2)
 }
 
 
-// ==== 0x511d70 FUN_00511d70
+// ==== 0x511d70 GetDecalPartHashesForZone
+
+/* [canon] car low (ghidra-canon) docs/re/canon_db.md */
 
 undefined4
-FUN_00511d70(undefined4 *param_1,undefined4 *param_2,undefined4 *param_3,undefined4 *param_4)
+GetDecalPartHashesForZone
+          (undefined4 *param_1,undefined4 *param_2,undefined4 *param_3,undefined4 *param_4)
 
 {
   int iVar1;
@@ -510,10 +525,12 @@ switchD_00511de9_default:
 }
 
 
-// ==== 0x511f00 FUN_00511f00
+// ==== 0x511f00 ApplyDecalToZone
+
+/* [canon] car low (ghidra-canon) docs/re/canon_db.md */
 
 void __fastcall
-FUN_00511f00(undefined4 param_1,int param_2,undefined4 param_3,undefined4 param_4,char param_5)
+ApplyDecalToZone(undefined4 param_1,int param_2,undefined4 param_3,undefined4 param_4,char param_5)
 
 {
   int *piVar1;
@@ -538,7 +555,7 @@ FUN_00511f00(undefined4 param_1,int param_2,undefined4 param_3,undefined4 param_
   puVar4 = (undefined4 *)0x0;
 LAB_00511f21:
   local_8 = 0;
-  FUN_00511d70(local_14,local_10,&local_8,local_c);
+  GetDecalPartHashesForZone(local_14,local_10,&local_8,local_c);
   iVar2 = FECarConfig__GetCarType();
   uVar3 = 0;
   if (iVar2 != 0x23) {
@@ -603,7 +620,7 @@ undefined4 * GarageDecalsBrand__GarageDecalsBrand(undefined4 *param_1,int param_
   ExceptionList = &local_10;
   FEScreen__FEScreen(param_1,param_2);
   puVar17 = param_1 + 0x11;
-  *param_1 = &PTR_FUN_006c019c;
+  *param_1 = &PTR_GarageDecalsBrand__scalar_deleting_destructor_006c019c;
   *puVar17 = puVar17;
   param_1[0x12] = puVar17;
   local_8._0_1_ = 1;
@@ -616,7 +633,7 @@ undefined4 * GarageDecalsBrand__GarageDecalsBrand(undefined4 *param_1,int param_
   param_2 = 0;
   local_14 = 0;
   *(undefined1 *)((int)param_1 + 0x93) = 0;
-  FUN_00511d70(&param_2,&local_14,local_1c,local_18);
+  GetDecalPartHashesForZone(&param_2,&local_14,local_1c,local_18);
   if (((&DAT_00745b6c)[param_2] == 0) || ((&DAT_00745b6c)[DAT_00735750 + local_14] == 0)) {
     uVar7 = 0;
   }
@@ -659,7 +676,7 @@ LAB_00512145:
     uVar15 = (uint)*pbVar2;
     puVar16 = puVar16 + 1;
   } while (*pbVar2 != 0);
-  FUN_00512580(iVar9,0x7a45b5c5,0,0,0);
+  GarageDecalsBrand__AddPickable(iVar9,0x7a45b5c5,0,0,0);
   BuildDecalList(param_1 + 0x22);
   bVar3 = *(byte *)(param_2 + 0xc0);
   iVar9 = param_2 + 0xc0;
@@ -697,7 +714,7 @@ LAB_0051223a:
           if ((piVar11[1] == iVar9) || (piVar11 = piVar11 + 6, 0x7449c7 < (int)piVar11)) break;
         }
 LAB_005122bb:
-        FUN_00512580(iVar9,0,*(undefined4 *)puVar17[5],puVar17,0);
+        GarageDecalsBrand__AddPickable(iVar9,0,*(undefined4 *)puVar17[5],puVar17,0);
       }
     }
     else if ((bVar6) || (DAT_00735758 != '\0')) {
@@ -735,7 +752,7 @@ LAB_00512305:
         uVar19 = 0;
         uVar18 = DAT_0073574c;
         uVar12 = CarPartDatabase__GetCarPart(0,0x3a,uVar12,0,0xffffffff);
-        FUN_00511f00(uVar12,uVar18,uVar19);
+        ApplyDecalToZone(uVar12,uVar18,uVar19);
       }
       *(undefined1 *)(param_1 + 8) = 1;
       if ((int *****)local_24 != &local_24) {
@@ -759,12 +776,14 @@ LAB_00512305:
 }
 
 
-// ==== 0x5123c0 FUN_005123c0
+// ==== 0x5123c0 GarageDecalsBrand::scalar_deleting_destructor
 
-void * __thiscall FUN_005123c0(void *param_1,byte param_2)
+/* [canon] car high (ghidra-canon) docs/re/canon_db.md */
+
+void * __thiscall GarageDecalsBrand__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_005123e0();
+  GarageDecalsBrand___GarageDecalsBrand();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -772,11 +791,12 @@ void * __thiscall FUN_005123c0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x5123e0 FUN_005123e0
+// ==== 0x5123e0 GarageDecalsBrand::_GarageDecalsBrand
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
 
-void __fastcall FUN_005123e0(undefined4 *param_1)
+void __fastcall GarageDecalsBrand___GarageDecalsBrand(undefined4 *param_1)
 
 {
   int *piVar1;
@@ -789,10 +809,10 @@ void __fastcall FUN_005123e0(undefined4 *param_1)
   pcStack_8 = FUN_00688bdc;
   pvStack_c = ExceptionList;
   ExceptionList = &pvStack_c;
-  *param_1 = &PTR_FUN_006c019c;
+  *param_1 = &PTR_GarageDecalsBrand__scalar_deleting_destructor_006c019c;
   local_4 = 3;
   if (*(char *)(param_1 + 0x24) != '\0') {
-    FUN_00511f00(0,DAT_0073574c,*(char *)(param_1 + 0x24));
+    ApplyDecalToZone(0,DAT_0073574c,*(char *)(param_1 + 0x24));
   }
   RideInfo__operator_(&DAT_00745000,&DAT_00745720);
   iVar3 = FUN_004b2330();
@@ -830,9 +850,11 @@ void __fastcall FUN_005123e0(undefined4 *param_1)
 }
 
 
-// ==== 0x512500 FUN_00512500
+// ==== 0x512500 GarageDecalsBrand::PreviewBrandDecal
 
-void __fastcall FUN_00512500(undefined4 param_1,undefined4 param_2)
+/* [canon] car low (ghidra-canon) docs/re/canon_db.md */
+
+void __fastcall GarageDecalsBrand__PreviewBrandDecal(undefined4 param_1,undefined4 param_2)
 
 {
   int in_EAX;
@@ -848,25 +870,30 @@ void __fastcall FUN_00512500(undefined4 param_1,undefined4 param_2)
     }
     uVar2 = DAT_0073574c;
     uVar1 = CarPartDatabase__GetCarPart(0,0x3a,uVar1,0,0xffffffff);
-    FUN_00511f00(uVar1,uVar2,param_2);
+    ApplyDecalToZone(uVar1,uVar2,param_2);
   }
   return;
 }
 
 
-// ==== 0x512550 FUN_00512550
+// ==== 0x512550 GarageDecalsBrand::ClearBrandDecal
 
-void FUN_00512550(void)
+/* [canon] car low (ghidra-canon) docs/re/canon_db.md */
+
+void GarageDecalsBrand__ClearBrandDecal(void)
 
 {
-  FUN_00511f00(0,DAT_0073574c);
+  ApplyDecalToZone(0,DAT_0073574c);
   return;
 }
 
 
-// ==== 0x512580 FUN_00512580
+// ==== 0x512580 GarageDecalsBrand::AddPickable
 
-void FUN_00512580(int param_1,int param_2,int param_3,int param_4,undefined4 param_5)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
+
+void GarageDecalsBrand__AddPickable
+               (int param_1,int param_2,int param_3,int param_4,undefined4 param_5)
 
 {
   undefined4 *puVar1;
@@ -894,9 +921,11 @@ void FUN_00512580(int param_1,int param_2,int param_3,int param_4,undefined4 par
 }
 
 
-// ==== 0x5125f0 FUN_005125f0
+// ==== 0x5125f0 GarageDecalsBrand::ScrollPickables
 
-void FUN_005125f0(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
+
+void GarageDecalsBrand__ScrollPickables(void)
 
 {
   int iVar1;
@@ -1050,9 +1079,11 @@ LAB_0051288e:
 }
 
 
-// ==== 0x512900 FUN_00512900
+// ==== 0x512900 GarageDecalsBrand::NotificationMessage
 
-void __thiscall FUN_00512900(int param_1,uint param_2)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
+
+void __thiscall GarageDecalsBrand__NotificationMessage(int param_1,uint param_2)
 
 {
   int iVar1;
@@ -1075,7 +1106,7 @@ void __thiscall FUN_00512900(int param_1,uint param_2)
   if (param_2 < 0x9120409f) {
     if (param_2 == 0x9120409e) {
 LAB_00512aeb:
-      FUN_005125f0();
+      GarageDecalsBrand__ScrollPickables();
       return;
     }
     if (param_2 < 0x7a45b5c6) {
@@ -1094,7 +1125,7 @@ LAB_00512aeb:
             local_30 = 0x7a45b5c5;
           }
           else {
-            iVar2 = FUN_00511d40();
+            iVar2 = FindDecalZoneInfo();
             iVar3 = *(int *)(iVar3 + 0x10);
             if (*(char *)(iVar3 + 0xc) == '\0') {
               iVar3 = *(int *)(iVar3 + 0x18);
@@ -1126,7 +1157,7 @@ LAB_00512aeb:
         }
       }
       else if (param_2 == 0x5583d1ce) {
-        FUN_00512500(param_1);
+        GarageDecalsBrand__PreviewBrandDecal(param_1);
         *(undefined1 *)(param_1 + 0x91) = 1;
         *(undefined1 *)(param_1 + 0x92) = 1;
         return;
@@ -1151,12 +1182,12 @@ LAB_00512aeb:
       DAT_0073575c = DAT_0073575c + 1;
       if ((*(char *)(param_1 + 0x93) != '\0') && (0xf < DAT_0073575c)) {
         if (*(int *)(*(int *)(param_1 + 0x40) + 0x10) != 0) {
-          FUN_00512500(param_1);
+          GarageDecalsBrand__PreviewBrandDecal(param_1);
           *(undefined1 *)(param_1 + 0x93) = 0;
           DAT_0073575c = 0;
           return;
         }
-        FUN_00512550(param_1);
+        GarageDecalsBrand__ClearBrandDecal(param_1);
         *(undefined1 *)(param_1 + 0x93) = 0;
         DAT_0073575c = 0;
         return;
@@ -1176,7 +1207,7 @@ LAB_00512aeb:
             uVar4 = 0x54c56cbe;
           }
           FUN_004c96c0(uVar4);
-          FUN_00512500(param_1);
+          GarageDecalsBrand__PreviewBrandDecal(param_1);
           return;
         }
       }
@@ -1206,7 +1237,7 @@ GarageChooseAccessoryCategoryScreen___GarageChooseAccessoryCategoryScreen(undefi
   int iVar1;
   int *piVar2;
   
-  *param_1 = &PTR_FUN_006c018c;
+  *param_1 = &PTR_GarageChooseAccessoryCategoryScreen__scalar_deleting_destructor_006c018c;
   FUN_004f84d0();
   _Memory = (int *)param_1[0x11];
   while (_Memory != param_1 + 0x11) {
@@ -1222,9 +1253,12 @@ GarageChooseAccessoryCategoryScreen___GarageChooseAccessoryCategoryScreen(undefi
 }
 
 
-// ==== 0x512c90 FUN_00512c90
+// ==== 0x512c90 GarageChooseAccessoryCategoryScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_00512c90(void *param_1,byte param_2)
+/* [canon] car high (ghidra-canon) docs/re/canon_db.md */
+
+void * __thiscall
+GarageChooseAccessoryCategoryScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
   GarageChooseAccessoryCategoryScreen___GarageChooseAccessoryCategoryScreen();
@@ -1300,7 +1334,7 @@ GarageChooseAccessoryCategoryScreen__GarageChooseAccessoryCategoryScreen
   ExceptionList = &local_10;
   FEScreen__FEScreen(param_1,param_2);
   puVar13 = param_1 + 0x11;
-  *param_1 = &PTR_FUN_006c018c;
+  *param_1 = &PTR_GarageChooseAccessoryCategoryScreen__scalar_deleting_destructor_006c018c;
   *puVar13 = puVar13;
   param_1[0x12] = puVar13;
   puVar13 = param_1 + 0x13;
@@ -1534,9 +1568,11 @@ void GarageChooseAccessoryCategoryScreen__AddCategory(int param_1,int param_2,un
 }
 
 
-// ==== 0x513270 FUN_00513270
+// ==== 0x513270 GarageChooseAccessoryCategoryScreen::ScrollPartsCategory
 
-void FUN_00513270(void)
+/* [canon] car high (ghidra-canon+nfsug) docs/re/canon_db.md */
+
+void GarageChooseAccessoryCategoryScreen__ScrollPartsCategory(void)
 
 {
   int iVar1;
@@ -1726,7 +1762,7 @@ void __thiscall FUN_005135a0(undefined4 param_1,uint param_2,undefined4 param_3)
     FUN_004f7d30();
     return;
   }
-  FUN_00513270(param_3);
+  GarageChooseAccessoryCategoryScreen__ScrollPartsCategory(param_3);
   return;
 }
 
@@ -11119,7 +11155,7 @@ void __fastcall EAXSound__FreeRacerSlotBuffer(int param_1)
 
 // ==== 0x520500 EAXSound::AllocRacerSlotBuffer
 
-/* [canon] audio low (ghidra-canon) docs/re/sound.md */
+/* [canon] audio med (ghidra-canon+hopper) docs/re/sound.md */
 
 void __fastcall EAXSound__AllocRacerSlotBuffer(int param_1)
 

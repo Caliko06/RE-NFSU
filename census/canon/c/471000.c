@@ -1732,7 +1732,7 @@ undefined4 FUN_00474010(void)
 
 // ==== 0x474020 Mellovator::GetState
 
-/* [canon] car low (ghidra-canon+nfsug) docs/re/car.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/car.md */
 
 void __thiscall Mellovator__GetState(int param_1,undefined4 *param_2)
 
@@ -1747,7 +1747,7 @@ void __thiscall Mellovator__GetState(int param_1,undefined4 *param_2)
 
 // ==== 0x474040 Mellovator::SetState
 
-/* [canon] car low (ghidra-canon+nfsug) docs/re/car.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/car.md */
 
 void __thiscall Mellovator__SetState(int param_1,undefined4 *param_2)
 
@@ -8511,7 +8511,7 @@ void __fastcall FUN_0047d7f0(undefined4 param_1)
 
 // ==== 0x47d840 Camera_SetShakeBasisFromMatrix
 
-/* [canon] camera low (ghidra-canon) docs/re/camera.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/camera.md */
 
 void __fastcall Camera_SetShakeBasisFromMatrix(int param_1)
 
@@ -10049,7 +10049,7 @@ LAB_0047f39e:
         do {
           if ((*(int *)((&DAT_007361bc)[iVar9] + 0x27c) != 0) &&
              (*(int *)(*(int *)((&DAT_007361bc)[iVar9] + 0x27c) + 0xc) == 0x16)) {
-            FUN_0048e7b0(fVar3,1);
+            AnimationControllerCameraMover__JumpAhead(fVar3,1);
           }
           iVar9 = iVar9 + 1;
         } while (iVar9 < DAT_007361c4);
@@ -10142,8 +10142,8 @@ void __thiscall FUN_0047f4e0(int param_1,undefined4 param_2)
       if ((*(int *)((&DAT_007361bc)[iVar4] + 0x27c) != 0) &&
          (*(int *)(*(int *)((&DAT_007361bc)[iVar4] + 0x27c) + 0xc) == 0x16)) {
         uVar1 = *(undefined4 *)(param_1 + 0x2c);
-        FUN_0048e760();
-        FUN_0048e7b0(uVar1,0);
+        AnimationControllerCameraMover__ResetToBeginning();
+        AnimationControllerCameraMover__JumpAhead(uVar1,0);
       }
       iVar4 = iVar4 + 1;
     } while (iVar4 < DAT_007361c4);
@@ -10318,8 +10318,8 @@ void __thiscall FUN_0047f8c0(int param_1,undefined4 param_2)
       do {
         iVar2 = *(int *)((&DAT_007361bc)[iVar3] + 0x27c);
         if (((iVar2 != 0) && (*(int *)(iVar2 + 0xc) == 0x16)) && (*(int *)(iVar2 + 0x2c) == 0)) {
-          FUN_0048e760();
-          FUN_0048e7b0(*(undefined4 *)(param_1 + 0x20),1);
+          AnimationControllerCameraMover__ResetToBeginning();
+          AnimationControllerCameraMover__JumpAhead(*(undefined4 *)(param_1 + 0x20),1);
         }
         iVar3 = iVar3 + 1;
       } while (iVar3 < DAT_007361c4);
@@ -10336,8 +10336,8 @@ void __thiscall FUN_0047f8c0(int param_1,undefined4 param_2)
         if ((*(int *)((&DAT_007361bc)[iVar2] + 0x27c) != 0) &&
            (*(int *)(*(int *)((&DAT_007361bc)[iVar2] + 0x27c) + 0xc) == 0x16)) {
           uVar1 = *(undefined4 *)(param_1 + 0x28);
-          FUN_0048e760();
-          FUN_0048e7b0(uVar1,0);
+          AnimationControllerCameraMover__ResetToBeginning();
+          AnimationControllerCameraMover__JumpAhead(uVar1,0);
         }
         iVar2 = iVar2 + 1;
       } while (iVar2 < DAT_007361c4);

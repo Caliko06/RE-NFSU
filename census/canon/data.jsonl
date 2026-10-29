@@ -4851,28 +4851,28 @@
 {"kind":"global","addr":"0x6c0130","block":".rdata","label":"PTR_FUN_006c0130","type":"pointer","str":"","readers":["0x51a850","0x51a8d0"],"writers":[]}
 {"kind":"global","addr":"0x6c0134","block":".rdata","label":"s_FEEPolySlotPool_006c0134","type":"string","str":"FEEPolySlotPool","readers":["0x514480"],"writers":[]}
 {"kind":"global","addr":"0x6c0144","block":".rdata","label":"s_FERenderObjectSlotPool_006c0144","type":"string","str":"FERenderObjectSlotPool","readers":["0x514480"],"writers":[]}
-{"kind":"global","addr":"0x6c015c","block":".rdata","label":"PTR_FUN_006c015c","type":"undefined *","str":"","readers":["0x50e750","0x50e7c0"],"writers":[]}
-{"kind":"global","addr":"0x6c016c","block":".rdata","label":"PTR_FUN_006c016c","type":"undefined *","str":"","readers":["0x50c020","0x50c0f0"],"writers":[]}
-{"kind":"global","addr":"0x6c017c","block":".rdata","label":"PTR_FUN_006c017c","type":"undefined *","str":"","readers":["0x510cf0","0x510f50"],"writers":[]}
-{"kind":"global","addr":"0x6c018c","block":".rdata","label":"PTR_FUN_006c018c","type":"undefined *","str":"","readers":["0x512c40","0x512d10"],"writers":[]}
-{"kind":"global","addr":"0x6c019c","block":".rdata","label":"PTR_FUN_006c019c","type":"undefined *","str":"","readers":["0x511ff0","0x5123e0"],"writers":[]}
+{"kind":"global","addr":"0x6c015c","block":".rdata","label":"PTR_GarageRimsBrowser::scalar_deleting_destructor_006c015c","type":"undefined *","str":"","readers":["0x50e750","0x50e7c0"],"writers":[]}
+{"kind":"global","addr":"0x6c016c","block":".rdata","label":"PTR_GaragePaintModScreen::scalar_deleting_destructor_006c016c","type":"undefined *","str":"","readers":["0x50c020","0x50c0f0"],"writers":[]}
+{"kind":"global","addr":"0x6c017c","block":".rdata","label":"PTR_GarageDecalsSlot::scalar_deleting_destructor_006c017c","type":"undefined *","str":"","readers":["0x510cf0","0x510f50"],"writers":[]}
+{"kind":"global","addr":"0x6c018c","block":".rdata","label":"PTR_GarageChooseAccessoryCategoryScreen::scalar_deleting_destructor_006c018c","type":"undefined *","str":"","readers":["0x512c40","0x512d10"],"writers":[]}
+{"kind":"global","addr":"0x6c019c","block":".rdata","label":"PTR_GarageDecalsBrand::scalar_deleting_destructor_006c019c","type":"undefined *","str":"","readers":["0x511ff0","0x5123e0"],"writers":[]}
 {"kind":"global","addr":"0x6c01ac","block":".rdata","label":"PTR_FUN_006c01ac","type":"undefined *","str":"","readers":["0x513780","0x513aa0"],"writers":[]}
-{"kind":"global","addr":"0x6c01bc","block":".rdata","label":"PTR_FUN_006c01bc","type":"undefined *","str":"","readers":["0x50d2b0","0x50d420"],"writers":[]}
+{"kind":"global","addr":"0x6c01bc","block":".rdata","label":"PTR_GarageRimsStyleBrowser::scalar_deleting_destructor_006c01bc","type":"undefined *","str":"","readers":["0x50d2b0","0x50d420"],"writers":[]}
 {"kind":"global","addr":"0x6c01cc","block":".rdata","label":"PTR_GaragePerfTuner::scalar_deleting_destructor_006c01cc","type":"undefined *","str":"","readers":["0x50a5d0","0x50a9a0"],"writers":[]}
 {"kind":"global","addr":"0x6c01dc","block":".rdata","label":"PTR_FUN_006c01dc","type":"undefined *","str":"","readers":["0x5141b0","0x514270"],"writers":[]}
-{"kind":"global","addr":"0x6c01ec","block":".rdata","label":"PTR_FUN_006c01ec","type":"undefined *","str":"","readers":["0x50c800","0x50c9e0"],"writers":[]}
+{"kind":"global","addr":"0x6c01ec","block":".rdata","label":"PTR_GarageRimsBrandBrowser::scalar_deleting_destructor_006c01ec","type":"undefined *","str":"","readers":["0x50c800","0x50c9e0"],"writers":[]}
 {"kind":"global","addr":"0x6c01fc","block":".rdata","label":"PTR_StatBarSlider::scalar_deleting_destructor_006c01fc","type":"undefined *","str":"","readers":["0x5041a0","0x509060"],"writers":[]}
 {"kind":"global","addr":"0x6c0214","block":".rdata","label":"PTR_FUN_006c0214","type":"pointer","str":"","readers":["0x509060"],"writers":[]}
 {"kind":"global","addr":"0x6c0224","block":".rdata","label":"PTR_PerfStatsScreen::scalar_deleting_destructor_006c0224","type":"undefined *","str":"","readers":["0x509060","0x5093b0"],"writers":[]}
 {"kind":"global","addr":"0x6c0234","block":".rdata","label":"PTR_GaragePartsBrowser::scalar_deleting_destructor_006c0234","type":"undefined *","str":"","readers":["0x5071b0","0x507540"],"writers":[]}
 {"kind":"global","addr":"0x6c0244","block":".rdata","label":"PTR_ChooseGaragePerfPath::scalar_deleting_destructor_006c0244","type":"undefined *","str":"","readers":["0x509ca0","0x509dd0"],"writers":[]}
-{"kind":"global","addr":"0x6c0254","block":".rdata","label":"PTR_FUN_006c0254","type":"undefined *","str":"","readers":["0x510600","0x5106d0"],"writers":[]}
+{"kind":"global","addr":"0x6c0254","block":".rdata","label":"PTR_GarageDecalLayout::scalar_deleting_destructor_006c0254","type":"undefined *","str":"","readers":["0x510600","0x5106d0"],"writers":[]}
 {"kind":"global","addr":"0x6c0264","block":".rdata","label":"PTR_GarageScreen::scalar_deleting_destructor_006c0264","type":"undefined *","str":"","readers":["0x504ab0","0x504be0"],"writers":[]}
-{"kind":"global","addr":"0x6c0274","block":".rdata","label":"PTR_FUN_006c0274","type":"pointer","str":"","readers":["0x511a70","0x511bf0"],"writers":[]}
+{"kind":"global","addr":"0x6c0274","block":".rdata","label":"PTR_DecalBrandEntry::scalar_deleting_destructor_006c0274","type":"pointer","str":"","readers":["0x511a70","0x511bf0"],"writers":[]}
 {"kind":"global","addr":"0x6c0278","block":".rdata","label":"PTR_GarageChooseVisualCategoryScreen::scalar_deleting_destructor_006c0278","type":"undefined *","str":"","readers":["0x5055c0","0x505780"],"writers":[]}
-{"kind":"global","addr":"0x6c0288","block":".rdata","label":"PTR_FUN_006c0288","type":"undefined *","str":"","readers":["0x50b610","0x50b6e0"],"writers":[]}
+{"kind":"global","addr":"0x6c0288","block":".rdata","label":"PTR_GaragePerfBrandPackage::scalar_deleting_destructor_006c0288","type":"undefined *","str":"","readers":["0x50b610","0x50b6e0"],"writers":[]}
 {"kind":"global","addr":"0x6c0298","block":".rdata","label":"PTR_GarageCategoryVisual::scalar_deleting_destructor_006c0298","type":"undefined *","str":"","readers":["0x506090","0x506210"],"writers":[]}
-{"kind":"global","addr":"0x6c02a8","block":".rdata","label":"PTR_FUN_006c02a8","type":"undefined *","str":"","readers":["0x50fa30","0x50fb00"],"writers":[]}
+{"kind":"global","addr":"0x6c02a8","block":".rdata","label":"PTR_GarageDecalsZone::scalar_deleting_destructor_006c02a8","type":"undefined *","str":"","readers":["0x50fa30","0x50fb00"],"writers":[]}
 {"kind":"global","addr":"0x6c02b8","block":".rdata","label":"s_MagazineBack_006c02b8","type":"string","str":"MagazineBack","readers":["0x514280"],"writers":[]}
 {"kind":"global","addr":"0x6c02c8","block":".rdata","label":"s_MagazineScreenBack_006c02c8","type":"string","str":"MagazineScreenBack","readers":["0x687900"],"writers":[]}
 {"kind":"global","addr":"0x6c02dc","block":".rdata","label":"s_ERROR_006c02dc","type":"string","str":"ERROR","readers":["0x513c90"],"writers":[]}
@@ -7014,26 +7014,26 @@
 {"kind":"global","addr":"0x6c7b30","block":".rdata","label":"s_Option1Display_006c7b30","type":"string","str":"Option1Display","readers":["0x494970"],"writers":[]}
 {"kind":"global","addr":"0x6c7b40","block":".rdata","label":"s_OptionsScreen_006c7b40","type":"string","str":"OptionsScreen","readers":["0x687400"],"writers":[]}
 {"kind":"global","addr":"0x6c7b50","block":".rdata","label":"PTR_FUN_006c7b50","type":"undefined *","str":"","readers":["0x490ea0","0x4922c0"],"writers":[]}
-{"kind":"global","addr":"0x6c7b98","block":".rdata","label":"PTR_FUN_006c7b98","type":"undefined *","str":"","readers":["0x48f090","0x4900f0"],"writers":[]}
+{"kind":"global","addr":"0x6c7b98","block":".rdata","label":"PTR_ZoneFreezeCameraMover::scalar_deleting_destructor_006c7b98","type":"undefined *","str":"","readers":["0x48f090","0x4900f0"],"writers":[]}
 {"kind":"global","addr":"0x6c7be0","block":".rdata","label":"s_ZonePreview_Emitters_006c7be0","type":"string","str":"ZonePreview Emitters","readers":["0x685490"],"writers":[]}
-{"kind":"global","addr":"0x6c7c08","block":".rdata","label":"PTR_FUN_006c7c08","type":"undefined *","str":"","readers":["0x48e210","0x48e380"],"writers":[]}
+{"kind":"global","addr":"0x6c7c08","block":".rdata","label":"PTR_AnimationControllerCameraMover::scalar_deleting_destructor_006c7c08","type":"undefined *","str":"","readers":["0x48e210","0x48e380"],"writers":[]}
 {"kind":"global","addr":"0x6c7c50","block":".rdata","label":"PTR_CameraMover::TrivialDtor_006c7c50","type":"undefined *","str":"","readers":["0x4834e0","0x483550","0x4841e0","0x484ba0","0x485a50","0x486740","0x488500","0x4892c0","0x4894b0","0x48b310","0x48c390","0x48cb00","0x48d9a0","0x48e380","0x4900f0","0x4922c0"],"writers":[]}
 {"kind":"global","addr":"0x6c7c98","block":".rdata","label":"PTR_CameraMover::TrivialDtor_006c7c98","type":"undefined *","str":"","readers":["0x486c80"],"writers":[]}
-{"kind":"global","addr":"0x6c7ce0","block":".rdata","label":"PTR_FUN_006c7ce0","type":"undefined *","str":"","readers":["0x48d6e0","0x48d9a0"],"writers":[]}
+{"kind":"global","addr":"0x6c7ce0","block":".rdata","label":"PTR_DragRaceAheadCameraMover::scalar_deleting_destructor_006c7ce0","type":"undefined *","str":"","readers":["0x48d6e0","0x48d9a0"],"writers":[]}
 {"kind":"global","addr":"0x6c7d28","block":".rdata","label":"PTR_TrackCarCameraMover::scalar_deleting_destructor_006c7d28","type":"undefined *","str":"","readers":["0x4854e0","0x485a50"],"writers":[]}
-{"kind":"global","addr":"0x6c7d70","block":".rdata","label":"PTR_FUN_006c7d70","type":"pointer","str":"","readers":["0x48eb70","0x48ebe0"],"writers":[]}
+{"kind":"global","addr":"0x6c7d70","block":".rdata","label":"PTR_tAverage_bVector3_::scalar_deleting_destructor_006c7d70","type":"pointer","str":"","readers":["0x48eb70","0x48ebe0"],"writers":[]}
 {"kind":"global","addr":"0x6c7d78","block":".rdata","label":"PTR_FUN_006c7d78","type":"pointer","str":"","readers":["0x436f60","0x45da90","0x460820","0x4830d0","0x48ebe0","0x526190","0x52cbd0","0x5306a0","0x5841f0","0x5843f0"],"writers":[]}
 {"kind":"global","addr":"0x6c7d80","block":".rdata","label":"PTR_DebugWorldCameraMover::scalar_deleting_destructor_006c7d80","type":"undefined *","str":"","readers":["0x488420","0x488500"],"writers":[]}
-{"kind":"global","addr":"0x6c7dc8","block":".rdata","label":"PTR_FUN_006c7dc8","type":"undefined *","str":"","readers":["0x48c990","0x48cb00"],"writers":[]}
+{"kind":"global","addr":"0x6c7dc8","block":".rdata","label":"PTR_DragRaceLeaderCameraMover::scalar_deleting_destructor_006c7dc8","type":"undefined *","str":"","readers":["0x48c990","0x48cb00"],"writers":[]}
 {"kind":"global","addr":"0x6c7e10","block":".rdata","label":"PTR_CameraMover::TrivialDtor_006c7e10","type":"undefined *","str":"","readers":["0x4852a0"],"writers":[]}
-{"kind":"global","addr":"0x6c7e58","block":".rdata","label":"PTR_FUN_006c7e58","type":"undefined *","str":"","readers":["0x48afd0","0x48b310"],"writers":[]}
-{"kind":"global","addr":"0x6c7ea0","block":".rdata","label":"PTR_FUN_006c7ea0","type":"undefined *","str":"","readers":["0x48ea30"],"writers":[]}
-{"kind":"global","addr":"0x6c7ea8","block":".rdata","label":"PTR_FUN_006c7ea8","type":"undefined *","str":"","readers":["0x48c280","0x48c390"],"writers":[]}
+{"kind":"global","addr":"0x6c7e58","block":".rdata","label":"PTR_CubicCameraMover::scalar_deleting_destructor_006c7e58","type":"undefined *","str":"","readers":["0x48afd0","0x48b310"],"writers":[]}
+{"kind":"global","addr":"0x6c7ea0","block":".rdata","label":"PTR_SinController::scalar_deleting_destructor_006c7ea0","type":"undefined *","str":"","readers":["0x48ea30"],"writers":[]}
+{"kind":"global","addr":"0x6c7ea8","block":".rdata","label":"PTR_DragRaceCameraMover::scalar_deleting_destructor_006c7ea8","type":"undefined *","str":"","readers":["0x48c280","0x48c390"],"writers":[]}
 {"kind":"global","addr":"0x6c7ef0","block":".rdata","label":"PTR_TrackFlyCameraMover::scalar_deleting_destructor_006c7ef0","type":"undefined *","str":"","readers":["0x4864e0","0x486740"],"writers":[]}
 {"kind":"global","addr":"0x6c7f38","block":".rdata","label":"PTR_BumperCameraMover::scalar_deleting_destructor_006c7f38","type":"undefined *","str":"","readers":["0x4848f0","0x484ba0"],"writers":[]}
 {"kind":"global","addr":"0x6c7f80","block":".rdata","label":"PTR_CameraMover::TrivialDtor_006c7f80","type":"undefined *","str":"","readers":["0x48c1f0"],"writers":[]}
-{"kind":"global","addr":"0x6c7fc8","block":".rdata","label":"PTR_FUN_006c7fc8","type":"undefined *","str":"","readers":["0x489360","0x4894b0"],"writers":[]}
-{"kind":"global","addr":"0x6c8010","block":".rdata","label":"PTR_FUN_006c8010","type":"pointer","str":"","readers":["0x48ea10","0x48ea80"],"writers":[]}
+{"kind":"global","addr":"0x6c7fc8","block":".rdata","label":"PTR_DriveCameraMover::scalar_deleting_destructor_006c7fc8","type":"undefined *","str":"","readers":["0x489360","0x4894b0"],"writers":[]}
+{"kind":"global","addr":"0x6c8010","block":".rdata","label":"PTR_Controller::_Controller_006c8010","type":"pointer","str":"","readers":["0x48ea10","0x48ea80"],"writers":[]}
 {"kind":"global","addr":"0x6c8018","block":".rdata","label":"PTR_OrbitCarCameraMover::scalar_deleting_destructor_006c8018","type":"undefined *","str":"","readers":["0x4840c0","0x4841e0"],"writers":[]}
 {"kind":"global","addr":"0x6c8060","block":".rdata","label":"s_SpeedCam_006c8060","type":"string","str":"SpeedCam","readers":["0x48e8b0"],"writers":[]}
 {"kind":"global","addr":"0x6c806c","block":".rdata","label":"s_..\\..\\World\\Location1\\Track_%04d_006c806c","type":"string","str":"..\\..\\World\\Location1\\Track_%04d\\DragCameras.bin","readers":["0x482fc0"],"writers":[]}

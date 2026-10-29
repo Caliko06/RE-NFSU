@@ -7710,9 +7710,9 @@ void FUN_004da1a0(void)
   }
   else {
 LAB_004da37d:
-    cVar2 = FUN_0050f9f0();
+    cVar2 = IsEnginePainting();
     if (cVar2 == '\0') {
-      cVar2 = FUN_0050fa10();
+      cVar2 = IsCaliperPainting();
       uVar5 = DAT_006fa1a0;
       if (cVar2 == '\0') {
         if ((extraout_EDX == 5) && (DAT_00735ddc == 3)) {

@@ -5700,7 +5700,7 @@ void StringList__AddEntry(int param_1,undefined4 param_2)
 
 // ==== 0x417530 PtrList::PushBack
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 void PtrList__PushBack(int param_1,int param_2)
 
@@ -5737,7 +5737,7 @@ void FUN_00417560(void)
 
 // ==== 0x417580 StringList::GetSelectedString
 
-/* [canon] canon low (ghidra-canon) docs/re/canon.md */
+/* [canon] canon med (ghidra-canon+hopper) docs/re/canon.md */
 
 int __fastcall StringList__GetSelectedString(int param_1)
 

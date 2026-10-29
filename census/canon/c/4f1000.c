@@ -1009,7 +1009,7 @@ void FUN_004f25f0(int param_1)
 
 // ==== 0x4f27d0 FEQuad::SortCorners
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall FEQuad__SortCorners(float *param_1)
 
@@ -1446,7 +1446,7 @@ void FUN_004f2eb0(void)
 
 // ==== 0x4f2fd0 FEObject::SetAlphaClamped
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 void FEObject__SetAlphaClamped(void)
 
@@ -7964,7 +7964,7 @@ void FUN_004f9340(int param_1)
     piVar4 = (int *)piVar2[1];
     *piVar4 = iVar3;
     *(int **)(iVar3 + 4) = piVar4;
-    FUN_0048edf0();
+    bTList___bTList();
     _free(piVar2);
     piVar2 = (int *)*piVar1;
   }

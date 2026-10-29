@@ -3668,7 +3668,7 @@ bool __fastcall FUN_00424ea0(int *param_1)
 
 // ==== 0x424eb0 Car::GetMatrixRows01
 
-/* [canon] car low (ghidra-canon) docs/re/canon.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall Car__GetMatrixRows01(undefined4 *param_1,undefined4 *param_2)
 
@@ -4107,7 +4107,7 @@ void FUN_00425290(void)
 
 // ==== 0x4252d0 Class6CAB08::dtor
 
-/* [canon] rivals low (ghidra-canon) docs/re/rivals.md */
+/* [canon] rivals med (ghidra-canon+hopper) docs/re/rivals.md */
 
 void Class6CAB08__dtor(undefined4 *param_1)
 
@@ -4784,7 +4784,7 @@ LAB_004261fd:
 
 // ==== 0x4262c0 Car::SetModeViaDriver
 
-/* [canon] car low (ghidra-canon) docs/re/canon.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall Car__SetModeViaDriver(undefined4 param_1,undefined4 param_2)
 
@@ -6877,7 +6877,7 @@ LAB_0042993e:
 
 // ==== 0x429ac0 Car::GetWheelFlagFraction
 
-/* [canon] car low (ghidra-canon) docs/re/canon.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/canon.md */
 
 float10 Car__GetWheelFlagFraction(void)
 
@@ -6938,7 +6938,7 @@ void Racer__UpdateTwoHumanCatchUp(void)
 // ==== 0x429ba0 Car::CalcBearingToPoint
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
-/* [canon] car low (ghidra-canon) docs/re/canon.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/canon.md */
 
 void __fastcall Car__CalcBearingToPoint(int param_1,float *param_2)
 
@@ -6965,7 +6965,7 @@ void __fastcall Car__CalcBearingToPoint(int param_1,float *param_2)
 
 // ==== 0x429c50 bLength3_or_DotNormalized
 
-/* [canon] runtime low (ghidra-canon) docs/re/canon.md */
+/* [canon] runtime med (ghidra-canon+hopper) docs/re/canon.md */
 
 float10 bLength3_or_DotNormalized(float param_1)
 
@@ -7141,7 +7141,7 @@ float10 JumpCamPredict(float param_1,float *param_2,float *param_3,char param_4)
 
 // ==== 0x42a0c0 Car_StampCurveFactor
 
-/* [canon] car low (ghidra-canon) docs/re/car.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/car.md */
 
 float10 Car_StampCurveFactor(void)
 
@@ -7392,7 +7392,7 @@ void FUN_0042a4d0(void)
 
 // ==== 0x42a530 Car::UpdateResetState
 
-/* [canon] car low (ghidra-canon) docs/re/car.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/car.md */
 
 void __fastcall Car__UpdateResetState(int param_1)
 
@@ -7789,7 +7789,7 @@ int __fastcall FUN_0042ab20(int param_1)
 
 // ==== 0x42ab30 Player::IsDriftHudActive
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 Player__IsDriftHudActive(void)
 
@@ -7821,7 +7821,7 @@ undefined4 IsCar1099InMode4(void)
 
 // ==== 0x42ab80 CarState::GetNitrousStoredSeconds
 
-/* [canon] car low (ghidra-canon) docs/re/car.md */
+/* [canon] car med (ghidra-canon+hopper) docs/re/car.md */
 
 float10 __fastcall CarState__GetNitrousStoredSeconds(int param_1)
 
@@ -7871,7 +7871,7 @@ void FUN_0042abf0(void)
 
 // ==== 0x42ac10 GameMode::IsMode7Or11
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 GameMode__IsMode7Or11(void)
 
@@ -7887,7 +7887,7 @@ undefined4 GameMode__IsMode7Or11(void)
 
 // ==== 0x42ac30 GameMode::IsMode7Or11InSubState2Or3
 
-/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+/* [canon] hud med (ghidra-canon+hopper) docs/re/canon.md */
 
 undefined4 __fastcall GameMode__IsMode7Or11InSubState2Or3(int *param_1)
 
@@ -8020,7 +8020,7 @@ CameraMoverBase_InitFields
 
 // ==== 0x42ad90 PlayerInput::SyncBlocks
 
-/* [canon] camera low (ghidra-canon) docs/re/canon.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/canon.md */
 
 void PlayerInput__SyncBlocks(void)
 
@@ -8174,7 +8174,7 @@ int * FUN_0042ae50(int *param_1,int param_2,int param_3,int *param_4)
   param_1[0x1b] = iVar6;
   param_1[0xf] = (int)piVar1;
   param_1[0x10] = 0;
-  FUN_00490560(param_1 + 0xf,puVar4);
+  PreviewComet__Init(param_1 + 0xf,puVar4);
   fVar3 = _K_ONE;
   *param_1 = param_2;
   fVar2 = _K_ONE;
@@ -8239,7 +8239,7 @@ void FUN_0042b040(int param_1)
   local_c = ExceptionList;
   local_4 = 0;
   ExceptionList = &local_c;
-  FUN_00490730();
+  PreviewComet__DisableEmitters();
   pvVar1 = *(void **)(extraout_EDX + 0xc);
   if (pvVar1 != (void *)0x0) {
     eh_vector_destructor_iterator(pvVar1,0xc0,*(int *)((int)pvVar1 + -0x10),FUN_00401db0);
@@ -8822,7 +8822,7 @@ void FUN_0042bb60(int param_1)
   _free(*(void **)(param_1 + 0x1e4));
   pvVar1 = *(void **)(param_1 + 0x130);
   if (pvVar1 != (void *)0x0) {
-    FUN_00490730();
+    PreviewComet__DisableEmitters();
     pvVar2 = *(void **)((int)pvVar1 + 0xc);
     if (pvVar2 != (void *)0x0) {
       eh_vector_destructor_iterator(pvVar2,0xc0,*(int *)((int)pvVar2 + -0x10),FUN_00401db0);
@@ -9707,7 +9707,7 @@ void FUN_0042d350(void)
     }
   }
   if (*(int *)(in_EAX + 0x298) != 0) {
-    FUN_004906d0(*(int *)(in_EAX + 0x298) + 0x3c);
+    PreviewComet__EnableEmitters(*(int *)(in_EAX + 0x298) + 0x3c);
   }
   return;
 }
@@ -9742,7 +9742,7 @@ void FUN_0042d3e0(void)
     }
   }
   if (*(int *)(in_EAX + 0x298) != 0) {
-    FUN_00490730();
+    PreviewComet__DisableEmitters();
     return;
   }
   return;
@@ -10329,7 +10329,7 @@ int Player__CyclePOV(void)
 
 // ==== 0x42e150 Player::NotifyCameraMovers
 
-/* [canon] camera low (ghidra-canon) docs/re/canon.md */
+/* [canon] camera med (ghidra-canon+hopper) docs/re/canon.md */
 
 void Player__NotifyCameraMovers(void)
 
@@ -11670,7 +11670,7 @@ void FUN_0042fee0(int param_1)
   ExceptionList = &local_c;
   if (pvVar4 != (void *)0x0) {
     ExceptionList = &local_c;
-    FUN_00490730();
+    PreviewComet__DisableEmitters();
     pvVar1 = *(void **)((int)pvVar4 + 0xc);
     if (pvVar1 != (void *)0x0) {
       eh_vector_destructor_iterator(pvVar1,0xc0,*(int *)((int)pvVar1 + -0x10),FUN_00401db0);
@@ -11699,7 +11699,7 @@ LAB_0042ff72:
       uVar5 = 0;
     }
     else {
-      uVar5 = FUN_004904f0(piVar6);
+      uVar5 = PreviewComet__PreviewComet(piVar6);
     }
     *(undefined4 *)(unaff_EDI + 0x130) = uVar5;
   }
