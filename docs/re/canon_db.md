@@ -52,3 +52,9 @@ prior hint, write rows to census/names_<system>.tsv (V when read, with the GC na
 143 of 910 unknown functions get a system from their GameCube source file (file vote >= 4 and >= 70 %, else directory
 vote; GameCube-only files skipped: an earlier pass that kept dolphinsdk gave 111 weak "render" rows). Written to
 census/canon/systems_tu.tsv, read by the scoreboard as med. 767 stay unknown (357 > 64 bytes): they need reading.
+
+## Round 1 lessons (canon-sonnet, 180 rows)
+- GC hints on small leaves were mostly wrong (2 A hints were 16-byte getters matched to constructors): the holdout was
+  measured on named anchors, which are larger. Queue now hides GC hints under 48 bytes.
+- 888 lifted starts are not Ghidra functions (882 inside another function): census/canon/fragments.tsv with the parent;
+  out of the queue. They count as parts of their parent, not as work.

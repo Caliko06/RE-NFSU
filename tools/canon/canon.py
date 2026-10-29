@@ -145,8 +145,21 @@ def queue():
         if os.path.exists(f"{OUT}/{f}"):
             for r in list(csv.reader(open(f"{OUT}/{f}"), delimiter="\t"))[1:]:
                 hint[a(r[0])] = (r[g] if g else "mw") + " " + r[k]
+    # lifter starts that are not Ghidra functions (inside another function, or creation failed): a ledger, not work
+    parent = {}
+    for l in open("build/canon/apply.txt"):
+        f = l.split()
+        if f and f[0] in ("inside", "fail"):
+            parent[a(f[1])] = f[2] if len(f) > 2 else "?"
+    frag = [x for x in sorted(L) if x not in F]
+    with open(OUT + "/fragments.tsv", "w") as o:
+        o.write("addr\tparent\twhy\n")
+        for x in frag:
+            o.write(f"{x:#x}\t{parent.get(x, '?')}\t{'inside' if parent.get(x, '?') != '?' else 'not a Ghidra function'}\n")
     out, stat = [], Counter()
     for x in sorted(L):
+        if x not in F:
+            continue
         s = (rows.get(x) or {}).get("system") or system.get(x, ("unknown", "low"))[0]
         j = F.get(x)
         stat[s, "total"] += 1
@@ -159,7 +172,10 @@ def queue():
         open_callees = sum(c not in done for c in cal)
         stat[s, "ready" if not open_callees else "blocked"] += 1
         out.append((open_callees, s, x, (j or {}).get("size", 0), len(cal), len((j or {}).get("callers", [])),
-                    len((j or {}).get("strings", [])), hint.get(x, "")))
+                    len((j or {}).get("strings", [])),
+                    # GC hints on < 48-byte functions are noise: MSVC emits header inlines out of line, the GC build
+                    # inlines them, so small PC leaves have no GC twin (round 1: 2 A hints on 16-byte getters wrong)
+                    hint.get(x, "") if hint.get(x, "").startswith("mw") or (j or {}).get("size", 0) >= 48 else ""))
     out.sort(key=lambda t: (t[0], t[1], t[2]))
     with open(OUT + "/queue.tsv", "w") as o:
         o.write("addr\tsystem\topen_callees\tsize\tcallees\tcallers\tstrings\tprior\n")
@@ -168,7 +184,7 @@ def queue():
     print("system\ttotal\tdone\tready\tblocked")
     for s in sorted({k[0] for k in stat}, key=lambda s: -stat[s, "total"]):
         print(f"{s}\t{stat[s,'total']}\t{stat[s,'done']}\t{stat[s,'ready']}\t{stat[s,'blocked']}")
-    print(f"queue: {len(out)} rows -> {OUT}/queue.tsv; missing from export: {len(L - set(F))}")
+    print(f"queue: {len(out)} rows -> {OUT}/queue.tsv; {len(frag)} lifter-only starts -> {OUT}/fragments.tsv")
 
 
 def batch(system, n, skip=0):
