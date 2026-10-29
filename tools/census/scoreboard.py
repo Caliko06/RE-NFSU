@@ -52,6 +52,19 @@ for p in glob.glob("census/names_*.tsv"):
         if c in ("V", "high") or e.startswith("V"):
             named_v.add(x)
 
+# hand-read reassignments (census/systems_override.tsv: addr, system, evidence) win over the graph; a name still wins over both
+import os
+if os.path.exists("census/systems_override.tsv"):
+    for line in open("census/systems_override.tsv"):
+        f = line.rstrip("\n").split("\t")
+        if len(f) >= 2 and not line.startswith(("#", "addr")):
+            try:
+                x = a(f[0])
+            except ValueError:
+                continue
+            if f[1] in ("render", "canon", "runtime", "audio", "rivals", "car", "track", "online", "hud", "camera", "traffic", "props", "assets", "input"):
+                system[x], conf[x] = f[1], "high"
+
 # a name with a system (V or I) wins over the graph tag
 nsys = {}
 for p in sorted(glob.glob("census/names_*.tsv")):
