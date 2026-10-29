@@ -6350,7 +6350,7 @@ undefined4 * FUN_004c8b70(undefined4 *param_1,undefined4 param_2)
           pcVar1 = pcVar9 + 1;
           pcVar9 = pcVar9 + 1;
         } while (*pcVar1 != '\0');
-        FUN_004e93b0();
+        GetEventHashForMagazineThumb();
         FUN_004c8fd0(local_1c);
         iVar11 = DAT_00735e58;
       }
@@ -7818,10 +7818,10 @@ void __thiscall FUN_004ca500(int param_1,int param_2)
   bVar3 = DAT_006fad58 != 2;
   *(undefined1 *)(param_1 + 0x48) = 0;
   if (bVar3) {
-    FUN_004ec4d0(3,0x12312311,0xceffd44);
+    FEKeyboard__ShowModal(3,0x12312311,0xceffd44);
     return;
   }
-  FUN_004ec4d0(3,0xffffffff,0xceffd44);
+  FEKeyboard__ShowModal(3,0xffffffff,0xceffd44);
   return;
 }
 
@@ -7921,7 +7921,7 @@ void __thiscall FUN_004ca670(int param_1,int param_2)
       puVar1[3] = 0;
     }
     *(undefined4 **)(param_1 + 0xac) = puVar1;
-    FUN_004eb420(0x12312300,puVar1);
+    MemcardInterface__LoadProfileNameArray(0x12312300,puVar1);
     return;
   }
   return;
@@ -8386,7 +8386,8 @@ void __thiscall FUN_004cadc0(int param_1,int param_2)
     Ugd__PackBlock(pvVar1,0xf660);
     Career___Career((int)pvVar1 + 0x6634);
     _free(pvVar1);
-    FUN_004eb560(0x12312300,&DAT_00777b74,*(undefined4 *)(param_1 + 0xb0),0xf660);
+    MemcardInterface__SaveCurrentProfile
+              (0x12312300,&DAT_00777b74,*(undefined4 *)(param_1 + 0xb0),0xf660);
   }
   ExceptionList = pvStack_c;
   return;
@@ -8669,10 +8670,12 @@ void __thiscall FUN_004cb480(int param_1,int param_2)
     *(undefined4 *)(param_1 + 0xb0) = uVar1;
     Ugd__PackBlock(&DAT_007588c4,0xf660);
     if (*(char *)(param_1 + 0xb5) != '\0') {
-      FUN_004eb4b0(0x12312300,&DAT_00777b74,*(undefined4 *)(param_1 + 0xb0));
+      MemcardInterface__AutosaveCurrentProfile
+                (0x12312300,&DAT_00777b74,*(undefined4 *)(param_1 + 0xb0));
       return;
     }
-    FUN_004eb560(0x12312300,&DAT_00777b74,*(undefined4 *)(param_1 + 0xb0),0xf660);
+    MemcardInterface__SaveCurrentProfile
+              (0x12312300,&DAT_00777b74,*(undefined4 *)(param_1 + 0xb0),0xf660);
     return;
   }
   if (param_2 != 0x12312300) {
@@ -8920,7 +8923,7 @@ void __thiscall FUN_004cb920(int param_1,int param_2)
       return;
     }
     *(undefined1 *)(param_1 + 0x48) = 0;
-    FUN_004eb3f0();
+    MemcardInterface__WaitUntilDone();
     if (DAT_00735dbd != '\0') {
       *(code **)(param_1 + 0x40) = FUN_004cb6b0;
       *(undefined1 *)(param_1 + 0x48) = 1;
@@ -8928,7 +8931,7 @@ void __thiscall FUN_004cb920(int param_1,int param_2)
     }
     uVar1 = FUN_00565b60(0xf660,0,0,0);
     *(undefined4 *)(param_1 + 0xb0) = uVar1;
-    FUN_004eb610(0x12312300,param_1 + 0x69,uVar1,0xf660);
+    MemcardInterface__LoadProfile(0x12312300,param_1 + 0x69,uVar1,0xf660);
     return;
   }
   if (param_2 != 0x12312300) {
@@ -9121,9 +9124,9 @@ void __thiscall FUN_004cbc50(int param_1,int param_2)
   }
   else if (param_2 == -0x367ca946) {
     *(undefined1 *)(param_1 + 0x48) = 0;
-    FUN_004eb3f0();
+    MemcardInterface__WaitUntilDone();
     if (DAT_00735dbd == '\0') {
-      FUN_004eb6c0(0x12312300,param_1 + 0x69);
+      MemcardInterface__CreateProfileOnCard(0x12312300,param_1 + 0x69);
       return;
     }
     *(code **)(param_1 + 0x40) = FUN_004cba40;
@@ -9928,7 +9931,7 @@ void __thiscall FUN_004ccab0(int param_1,int param_2)
     *(undefined1 *)(param_1 + 0x48) = 0;
     uVar1 = FUN_00565b60(0xf660,0,0,0);
     *(undefined4 *)(param_1 + 0xb0) = uVar1;
-    FUN_004eb610(0x12312300,param_1 + 0x69,uVar1,0xf660);
+    MemcardInterface__LoadProfile(0x12312300,param_1 + 0x69,uVar1,0xf660);
     ExceptionList = pvStack_c;
     return;
   }

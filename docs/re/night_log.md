@@ -103,3 +103,4 @@ Open: see each doc's Open list (traffic: writer of [ebx+0x59d4], Free Run x1.5, 
 15:34 canon wave round 8 by GC file (canon-sonnet-c1): CollisionBody 60, RaceParameters(Race) 60, FEPkg_MU_Options 60; named 2,691 -> 2,871; anchors 1,032
 15:45 canon wave round 9 by GC file (canon-sonnet-c1): InfoDialog 60, saems 60, FEPkg_Hud 60; see scoreboard
 15:49 corrections after round 9: 8 rows (collision vtable slots, Race, cFEng/FEngine)
+15:59 canon wave round 10 (canon-sonnet-c1, 1 worker, quota 90%): PresetBrowser batch 60 (54 hud, 6 misc); named 3111. Batches 2 (AIPlan) and 3 (MU_PauseOptions) pending

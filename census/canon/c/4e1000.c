@@ -5188,13 +5188,13 @@ undefined4 * GaragePresetsScreen__GaragePresetsScreen(undefined4 *param_1,undefi
       pcVar2 = pcVar5 + 1;
       pcVar5 = pcVar5 + 1;
     } while (*pcVar2 != '\0');
-    FUN_004e7be0();
+    GaragePresetsScreen__AddThumb();
     iVar6 = iVar6 + 1;
   } while (iVar6 < 10);
   param_1[0x21] = *puVar1;
   FUN_004f8960();
   GaragePresetsScreen__Redraw();
-  FUN_004e7cf0();
+  GaragePresetsScreen__ShowCurrentPreset();
   *(undefined1 *)(param_1 + 8) = 1;
   if (param_1[3] == 0) {
 LAB_004e7b9e:
@@ -5228,9 +5228,11 @@ LAB_004e7bba:
 }
 
 
-// ==== 0x4e7be0 FUN_004e7be0
+// ==== 0x4e7be0 GaragePresetsScreen::AddThumb
 
-void FUN_004e7be0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void GaragePresetsScreen__AddThumb(void)
 
 {
   undefined4 *puVar1;
@@ -5303,11 +5305,12 @@ void GaragePresetsScreen__Redraw(void)
 }
 
 
-// ==== 0x4e7cf0 FUN_004e7cf0
+// ==== 0x4e7cf0 GaragePresetsScreen::ShowCurrentPreset
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_004e7cf0(void)
+void GaragePresetsScreen__ShowCurrentPreset(void)
 
 {
   int in_EAX;
@@ -5337,9 +5340,11 @@ void FUN_004e7cf0(void)
 }
 
 
-// ==== 0x4e7d70 FUN_004e7d70
+// ==== 0x4e7d70 GaragePresetsScreen::ScrollPreset
 
-void __fastcall FUN_004e7d70(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall GaragePresetsScreen__ScrollPreset(int param_1)
 
 {
   undefined4 *puVar1;
@@ -5361,7 +5366,7 @@ LAB_004e7da0:
   if (puVar1 != *(undefined4 **)(unaff_EDI + 0x84)) {
     FUN_004f8340(*(undefined4 *)(unaff_EDI + 0xc));
     FUN_004f8910();
-    FUN_004e7cf0();
+    GaragePresetsScreen__ShowCurrentPreset();
     GaragePresetsScreen__Redraw();
     return;
   }
@@ -5369,9 +5374,11 @@ LAB_004e7da0:
 }
 
 
-// ==== 0x4e7e00 FUN_004e7e00
+// ==== 0x4e7e00 GaragePresetsScreen::PresetAction
 
-void FUN_004e7e00(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void GaragePresetsScreen__PresetAction(void)
 
 {
   int in_EAX;
@@ -5407,17 +5414,18 @@ LAB_004e7e31:
       local_1c = 0x12345555;
       goto LAB_004e7e31;
     }
-    FUN_004e7eb0();
+    GaragePresetsScreen__SavePreset();
   }
   return;
 }
 
 
-// ==== 0x4e7eb0 FUN_004e7eb0
+// ==== 0x4e7eb0 GaragePresetsScreen::SavePreset
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_004e7eb0(void)
+void GaragePresetsScreen__SavePreset(void)
 
 {
   int iVar1;
@@ -5481,9 +5489,11 @@ void GaragePresetsScreen__LoadPreset(void)
 }
 
 
-// ==== 0x4e8020 FUN_004e8020
+// ==== 0x4e8020 GaragePresetsScreen::NotificationMessage
 
-void FUN_004e8020(uint param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void GaragePresetsScreen__NotificationMessage(uint param_1)
 
 {
   int iVar1;
@@ -5508,11 +5518,11 @@ void FUN_004e8020(uint param_1)
     }
     else {
       if (param_1 == 0xc407210) {
-        FUN_004e7e00();
+        GaragePresetsScreen__PresetAction();
         return;
       }
       if (param_1 == 0x12345555) {
-        FUN_004e7eb0();
+        GaragePresetsScreen__SavePreset();
         return;
       }
       if (param_1 == 0x12346666) {
@@ -5522,7 +5532,7 @@ void FUN_004e8020(uint param_1)
     }
   }
   else if ((param_1 == 0x9120409e) || (param_1 == 0xb5971bf1)) {
-    FUN_004e7d70();
+    GaragePresetsScreen__ScrollPreset();
   }
   else if (param_1 == 0xc98356ba) {
     FUN_004f89d0();
@@ -5583,7 +5593,7 @@ Screen_MU_UG_NewCareerFMV__Screen_MU_UG_NewCareerFMV(undefined4 *param_1,undefin
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c2d84;
+  *param_1 = &PTR_UndergroundNewCareerFMV__scalar_deleting_destructor_006c2d84;
   iVar1 = FEPackageList__FindByName(&DAT_00746104);
   iVar2 = DAT_0073578c;
   if ((((iVar1 != 0) && (*(int *)(iVar1 + 0x18) != 0)) && (DAT_0073578c != 0)) &&
@@ -5628,7 +5638,7 @@ Screen_MU_UG_NewCareerFMV__Screen_MU_UG_NewCareerFMV(undefined4 *param_1,undefin
   else {
     pcVar3 = "04_GUM_s";
   }
-  FUN_004e8420(pcVar3);
+  UndergroundNewCareerFMV__StartMovie(pcVar3);
 LAB_004e82f1:
   *(undefined1 *)(param_1 + 0x10) = 0;
   iVar1 = FEPackageList__FindByName(&DAT_00746104);
@@ -5646,12 +5656,14 @@ LAB_004e82f1:
 }
 
 
-// ==== 0x4e8360 FUN_004e8360
+// ==== 0x4e8360 UndergroundNewCareerFMV::scalar_deleting_destructor
 
-void * __thiscall FUN_004e8360(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall UndergroundNewCareerFMV__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004e8380();
+  UndergroundNewCareerFMV___UndergroundNewCareerFMV();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -5659,9 +5671,11 @@ void * __thiscall FUN_004e8360(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4e8380 FUN_004e8380
+// ==== 0x4e8380 UndergroundNewCareerFMV::_UndergroundNewCareerFMV
 
-void __fastcall FUN_004e8380(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall UndergroundNewCareerFMV___UndergroundNewCareerFMV(undefined4 *param_1)
 
 {
   int iVar1;
@@ -5673,7 +5687,7 @@ void __fastcall FUN_004e8380(undefined4 *param_1)
   pcStack_8 = FUN_006879f8;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c2d84;
+  *param_1 = &PTR_UndergroundNewCareerFMV__scalar_deleting_destructor_006c2d84;
   local_4 = 0;
   if ((*(char *)(param_1 + 0x10) != '\0') && (DAT_0073578c != 0)) {
     iVar1 = *(int *)(DAT_0073578c + 8);
@@ -5689,11 +5703,12 @@ void __fastcall FUN_004e8380(undefined4 *param_1)
 }
 
 
-// ==== 0x4e8420 FUN_004e8420
+// ==== 0x4e8420 UndergroundNewCareerFMV::StartMovie
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
 
-void FUN_004e8420(undefined4 param_1)
+void UndergroundNewCareerFMV__StartMovie(undefined4 param_1)
 
 {
   int iVar1;
@@ -5741,9 +5756,11 @@ void FUN_004e8420(undefined4 param_1)
 }
 
 
-// ==== 0x4e8580 FUN_004e8580
+// ==== 0x4e8580 UndergroundNewCareerFMV::NotificationMessage
 
-void __thiscall FUN_004e8580(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall UndergroundNewCareerFMV__NotificationMessage(int param_1,int param_2)
 
 {
   undefined4 uVar1;
@@ -5815,23 +5832,28 @@ undefined4 Screen_MU_UG_NewCareerFMV__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4e86a0 FUN_004e86a0
+// ==== 0x4e86a0 UndergroundNewCareerExtroFMV::_UndergroundNewCareerExtroFMV
 
-void __fastcall FUN_004e86a0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall UndergroundNewCareerExtroFMV___UndergroundNewCareerExtroFMV(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c2d64;
+  *param_1 = &PTR_UndergroundNewCareerExtroFMV__scalar_deleting_destructor_006c2d64;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4e86b0 FUN_004e86b0
+// ==== 0x4e86b0 UndergroundNewCareerExtroFMV::scalar_deleting_destructor
 
-void * __thiscall FUN_004e86b0(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall
+UndergroundNewCareerExtroFMV__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004e86a0();
+  UndergroundNewCareerExtroFMV___UndergroundNewCareerExtroFMV();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -5865,7 +5887,7 @@ Screen_MU_UG_NewCareerExtroFMV__Screen_MU_UG_NewCareerExtroFMV
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c2d64;
+  *param_1 = &PTR_UndergroundNewCareerExtroFMV__scalar_deleting_destructor_006c2d64;
   iVar2 = FEPackageList__FindByName(&DAT_00746104);
   iVar4 = DAT_0073578c;
   if ((((iVar2 != 0) && (*(int *)(iVar2 + 0x18) != 0)) && (DAT_0073578c != 0)) &&
@@ -5951,9 +5973,11 @@ LAB_004e8848:
 }
 
 
-// ==== 0x4e89b0 FUN_004e89b0
+// ==== 0x4e89b0 UndergroundNewCareerExtroFMV::NotificationMessage
 
-int __thiscall FUN_004e89b0(int param_1,int param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+int __thiscall UndergroundNewCareerExtroFMV__NotificationMessage(int param_1,int param_2)
 
 {
   int iVar1;
@@ -6037,9 +6061,11 @@ undefined4 Screen_MU_UG_NewCareerExtroFMV__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4e8b10 FUN_004e8b10
+// ==== 0x4e8b10 UndergroundMagazineScreen::SetCursorToCurrentThumb
 
-void FUN_004e8b10(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundMagazineScreen__SetCursorToCurrentThumb(void)
 
 {
   int iVar1;
@@ -6216,9 +6242,11 @@ LAB_004e8d7a:
 }
 
 
-// ==== 0x4e8d90 FUN_004e8d90
+// ==== 0x4e8d90 UndergroundMagazineScreen::RefreshThumbs
 
-void FUN_004e8d90(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundMagazineScreen__RefreshThumbs(void)
 
 {
   byte bVar1;
@@ -6313,7 +6341,7 @@ void FUN_004e8d90(void)
     }
   }
   FUN_00495f00(uVar4);
-  FUN_004e8b10();
+  UndergroundMagazineScreen__SetCursorToCurrentThumb();
   local_10[0] = *(int *)(unaff_EBX + 0x4c) + -7;
   if (((&DAT_007602a0)[*(int *)(unaff_EBX + 0x44) * 0x454] == '\0') && (DAT_00735dcc == '\0')) {
     FUN_00495f70();
@@ -6409,9 +6437,11 @@ LAB_004e9363:
 }
 
 
-// ==== 0x4e93b0 FUN_004e93b0
+// ==== 0x4e93b0 GetEventHashForMagazineThumb
 
-undefined4 FUN_004e93b0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 GetEventHashForMagazineThumb(void)
 
 {
   undefined4 in_EAX;
@@ -6505,9 +6535,12 @@ undefined4 FUN_004e93b0(void)
 }
 
 
-// ==== 0x4e9540 FUN_004e9540
+// ==== 0x4e9540 UndergroundMagazineScreen::UndergroundMagazineScreen
 
-undefined4 * FUN_004e9540(undefined4 *param_1,undefined4 param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 *
+UndergroundMagazineScreen__UndergroundMagazineScreen(undefined4 *param_1,undefined4 param_2)
 
 {
   int iVar1;
@@ -6522,7 +6555,7 @@ undefined4 * FUN_004e9540(undefined4 *param_1,undefined4 param_2)
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,param_2);
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c2d54;
+  *param_1 = &PTR_UndergroundMagazineScreen__scalar_deleting_destructor_006c2d54;
   FUN_0051bad0(&DAT_007449c8);
   if (param_1[3] == 0) {
 LAB_004e959f:
@@ -6588,12 +6621,14 @@ LAB_004e9649:
 }
 
 
-// ==== 0x4e96b0 FUN_004e96b0
+// ==== 0x4e96b0 UndergroundMagazineScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004e96b0(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall UndergroundMagazineScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004e96d0();
+  UndergroundMagazineScreen___UndergroundMagazineScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -6601,9 +6636,11 @@ void * __thiscall FUN_004e96b0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4e96d0 FUN_004e96d0
+// ==== 0x4e96d0 UndergroundMagazineScreen::_UndergroundMagazineScreen
 
-void __fastcall FUN_004e96d0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall UndergroundMagazineScreen___UndergroundMagazineScreen(undefined4 *param_1)
 
 {
   void *local_c;
@@ -6613,7 +6650,7 @@ void __fastcall FUN_004e96d0(undefined4 *param_1)
   pcStack_8 = FUN_006879f8;
   local_c = ExceptionList;
   ExceptionList = &local_c;
-  *param_1 = &PTR_FUN_006c2d54;
+  *param_1 = &PTR_UndergroundMagazineScreen__scalar_deleting_destructor_006c2d54;
   DAT_006fb038 = param_1[0x14];
   local_4 = 0;
   FUN_0051bb50();
@@ -6624,9 +6661,11 @@ void __fastcall FUN_004e96d0(undefined4 *param_1)
 }
 
 
-// ==== 0x4e9730 FUN_004e9730
+// ==== 0x4e9730 UndergroundMagazineScreen::NotificationMessage
 
-void __thiscall FUN_004e9730(int param_1,uint param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall UndergroundMagazineScreen__NotificationMessage(int param_1,uint param_2)
 
 {
   uint uVar1;
@@ -6644,7 +6683,7 @@ void __thiscall FUN_004e9730(int param_1,uint param_2)
           (*(uint *)(param_1 + 0x40) = *(uint *)(param_1 + 0x40) - 1, DAT_006f1dd8 != 0)) &&
          (*(int **)(DAT_007356a8 + 0xc0) != (int *)0x0)) {
         (**(code **)(**(int **)(DAT_007356a8 + 0xc0) + 0x14))(2);
-        FUN_004e8d90();
+        UndergroundMagazineScreen__RefreshThumbs();
         return;
       }
       goto LAB_004e9c0e;
@@ -6655,11 +6694,11 @@ void __thiscall FUN_004e9730(int param_1,uint param_2)
           (**(code **)(**(int **)(DAT_007356a8 + 0xc0) + 0x14))(5);
         }
         FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
-        FUN_004e8d90();
+        UndergroundMagazineScreen__RefreshThumbs();
         return;
       }
       if (param_2 == 0xc407210) {
-        DAT_00735770 = FUN_004e93b0();
+        DAT_00735770 = GetEventHashForMagazineThumb();
         if (DAT_00735770 == 0) {
           return;
         }
@@ -6669,12 +6708,12 @@ void __thiscall FUN_004e9730(int param_1,uint param_2)
             (**(code **)(**(int **)(DAT_007356a8 + 0xc0) + 0x14))(4);
           }
           FEngSwitchPackages(*(undefined4 *)(param_1 + 0xc));
-          FUN_004e8d90();
+          UndergroundMagazineScreen__RefreshThumbs();
           return;
         }
         if ((DAT_006f1dd8 != 0) && (*(int **)(DAT_007356a8 + 0xc0) != (int *)0x0)) {
           (**(code **)(**(int **)(DAT_007356a8 + 0xc0) + 0x14))(7);
-          FUN_004e8d90();
+          UndergroundMagazineScreen__RefreshThumbs();
           return;
         }
         goto LAB_004e9c0e;
@@ -6687,7 +6726,7 @@ void __thiscall FUN_004e9730(int param_1,uint param_2)
           *(uint *)(param_1 + 0x44) = *(uint *)(param_1 + 0x44) - 2;
           if ((bVar7) && (*(int **)(DAT_007356a8 + 0xc0) != (int *)0x0)) {
             (**(code **)(**(int **)(DAT_007356a8 + 0xc0) + 0x14))(0);
-            FUN_004e8d90();
+            UndergroundMagazineScreen__RefreshThumbs();
             return;
           }
           goto LAB_004e9c0e;
@@ -6705,7 +6744,7 @@ LAB_004e97c2:
       FUN_00414a60();
       if ((*(int *)(param_1 + 0x44) == 0) || (*(int *)(param_1 + 0x44) == 1)) {
         FUN_00414a10();
-        FUN_004e8d90();
+        UndergroundMagazineScreen__RefreshThumbs();
         return;
       }
       goto LAB_004e9c0e;
@@ -6719,12 +6758,12 @@ LAB_004e97c2:
       *(uint *)(param_1 + 0x44) = uVar2;
       if (uVar1 < uVar2) {
         *(uint *)(param_1 + 0x44) = uVar1;
-        FUN_004e8d90();
+        UndergroundMagazineScreen__RefreshThumbs();
         return;
       }
       if ((DAT_006f1dd8 != 0) && (*(int **)(DAT_007356a8 + 0xc0) != (int *)0x0)) {
         (**(code **)(**(int **)(DAT_007356a8 + 0xc0) + 0x14))(1);
-        FUN_004e8d90();
+        UndergroundMagazineScreen__RefreshThumbs();
         return;
       }
       goto LAB_004e9c0e;
@@ -6745,7 +6784,7 @@ LAB_004e99d7:
     FUN_00414a60();
     if ((*(uint *)(param_1 + 0x44) == uVar2) || (*(uint *)(param_1 + 0x44) == uVar1)) {
       FUN_00414a10();
-      FUN_004e8d90();
+      UndergroundMagazineScreen__RefreshThumbs();
       return;
     }
     goto LAB_004e9c0e;
@@ -6757,7 +6796,7 @@ LAB_004e99d7:
         if ((uVar2 == 6) && (*(int *)(param_1 + 0x44) == *(int *)(param_1 + 0x4c) + -7)) {
           if ((DAT_006f1dd8 != 0) && (*(int **)(DAT_007356a8 + 0xc0) != (int *)0x0)) {
             (**(code **)(**(int **)(DAT_007356a8 + 0xc0) + 0x14))(7);
-            FUN_004e8d90();
+            UndergroundMagazineScreen__RefreshThumbs();
             return;
           }
         }
@@ -6765,7 +6804,7 @@ LAB_004e99d7:
           *(uint *)(param_1 + 0x40) = uVar2 + 1;
           if ((DAT_006f1dd8 != 0) && (*(int **)(DAT_007356a8 + 0xc0) != (int *)0x0)) {
             (**(code **)(**(int **)(DAT_007356a8 + 0xc0) + 0x14))(3);
-            FUN_004e8d90();
+            UndergroundMagazineScreen__RefreshThumbs();
             return;
           }
         }
@@ -6774,8 +6813,8 @@ LAB_004e99d7:
     else if (((param_2 == 0xc98356ba) && (FUN_004f7d30(), *(int *)(param_1 + 0x40) == 7)) &&
             (0x13 < *(uint *)(param_1 + 0x44))) {
       *(undefined4 *)(param_1 + 0x40) = 6;
-      FUN_004e8d90();
-      FUN_004e8d90();
+      UndergroundMagazineScreen__RefreshThumbs();
+      UndergroundMagazineScreen__RefreshThumbs();
       return;
     }
     goto LAB_004e9c0e;
@@ -6874,16 +6913,18 @@ switchD_004e9b8b_caseD_9db42e00:
     }
   }
 switchD_004e9b8b_default:
-  FUN_004e8b10();
+  UndergroundMagazineScreen__SetCursorToCurrentThumb();
 LAB_004e9c0e:
-  FUN_004e8d90();
+  UndergroundMagazineScreen__RefreshThumbs();
   return;
 }
 
 
-// ==== 0x4e9c80 FUN_004e9c80
+// ==== 0x4e9c80 CreateUndergroundMagazineScreen
 
-undefined4 FUN_004e9c80(undefined4 param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 CreateUndergroundMagazineScreen(undefined4 param_1)
 
 {
   void *pvVar1;
@@ -6899,7 +6940,7 @@ undefined4 FUN_004e9c80(undefined4 param_1)
   pvVar1 = _malloc(0x54);
   local_4 = 0;
   if (pvVar1 != (void *)0x0) {
-    uVar2 = FUN_004e9540(pvVar1,param_1);
+    uVar2 = UndergroundMagazineScreen__UndergroundMagazineScreen(pvVar1,param_1);
     ExceptionList = local_c;
     return uVar2;
   }
@@ -6931,7 +6972,7 @@ Screen_MU_UG_RankScreen__Screen_MU_UG_RankScreen(undefined4 *param_1,undefined4 
   iVar2 = DAT_0073578c;
   bVar3 = DAT_0073578c != 0;
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c2da4;
+  *param_1 = &PTR_UndergroundRankScreen__scalar_deleting_destructor_006c2da4;
   if (bVar3) {
     iVar1 = FEPackageList__FindByName(&DAT_00746104);
     if ((iVar1 != 0) && (*(int *)(iVar1 + 0x18) != 0)) {
@@ -6993,12 +7034,14 @@ LAB_004e9dec:
 }
 
 
-// ==== 0x4e9e60 FUN_004e9e60
+// ==== 0x4e9e60 UndergroundRankScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004e9e60(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall UndergroundRankScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004e9e80();
+  UndergroundRankScreen___UndergroundRankScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -7006,12 +7049,14 @@ void * __thiscall FUN_004e9e60(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4e9e80 FUN_004e9e80
+// ==== 0x4e9e80 UndergroundRankScreen::_UndergroundRankScreen
 
-void __fastcall FUN_004e9e80(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall UndergroundRankScreen___UndergroundRankScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c2da4;
+  *param_1 = &PTR_UndergroundRankScreen__scalar_deleting_destructor_006c2da4;
   FUN_004f7b50();
   return;
 }
@@ -7095,9 +7140,11 @@ void UrlRankScreen__Show(char *param_1)
 }
 
 
-// ==== 0x4ea090 FUN_004ea090
+// ==== 0x4ea090 UndergroundRankScreen::ScrollRankCategory
 
-void FUN_004ea090(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundRankScreen__ScrollRankCategory(int param_1)
 
 {
   int iVar1;
@@ -7136,9 +7183,11 @@ void FUN_004ea090(int param_1)
 }
 
 
-// ==== 0x4ea150 FUN_004ea150
+// ==== 0x4ea150 UndergroundRankScreen::NotificationMessage
 
-void __thiscall FUN_004ea150(int param_1,uint param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall UndergroundRankScreen__NotificationMessage(int param_1,uint param_2)
 
 {
   if (0xb5971bf1 < param_2) {
@@ -7156,7 +7205,7 @@ void __thiscall FUN_004ea150(int param_1,uint param_2)
       return;
     }
   }
-  FUN_004ea090(param_2);
+  UndergroundRankScreen__ScrollRankCategory(param_2);
   return;
 }
 
@@ -7213,7 +7262,7 @@ Screen_MU_UG_StatsScreen__Screen_MU_UG_StatsScreen(undefined4 *param_1,undefined
   iVar2 = DAT_0073578c;
   bVar3 = DAT_0073578c != 0;
   local_4 = 0;
-  *param_1 = &PTR_FUN_006c2d74;
+  *param_1 = &PTR_UndergroundStatsScreen__scalar_deleting_destructor_006c2d74;
   if (bVar3) {
     iVar1 = FEPackageList__FindByName(&DAT_00746104);
     if ((iVar1 != 0) && (*(int *)(iVar1 + 0x18) != 0)) {
@@ -7222,7 +7271,7 @@ Screen_MU_UG_StatsScreen__Screen_MU_UG_StatsScreen(undefined4 *param_1,undefined
   }
   param_1[0x10] = 0;
   FUN_00414a10();
-  FUN_004ea510();
+  UndergroundStatsScreen__DrawCurrentStats();
   *(undefined1 *)(param_1 + 8) = 1;
   param_1[0x11] = 0;
   param_1[0x12] = 0;
@@ -7314,12 +7363,14 @@ LAB_004ea3a5:
 }
 
 
-// ==== 0x4ea430 FUN_004ea430
+// ==== 0x4ea430 UndergroundStatsScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004ea430(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall UndergroundStatsScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004ea450();
+  UndergroundStatsScreen___UndergroundStatsScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -7327,20 +7378,24 @@ void * __thiscall FUN_004ea430(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4ea450 FUN_004ea450
+// ==== 0x4ea450 UndergroundStatsScreen::_UndergroundStatsScreen
 
-void __fastcall FUN_004ea450(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall UndergroundStatsScreen___UndergroundStatsScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c2d74;
+  *param_1 = &PTR_UndergroundStatsScreen__scalar_deleting_destructor_006c2d74;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4ea460 FUN_004ea460
+// ==== 0x4ea460 UndergroundStatsScreen::ScrollStats
 
-void FUN_004ea460(int param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__ScrollStats(int param_1)
 
 {
   int iVar1;
@@ -7369,42 +7424,46 @@ void FUN_004ea460(int param_1)
   }
   if (iVar1 != *(int *)(unaff_ESI + 0x40)) {
     FUN_004f8340(*(undefined4 *)(unaff_ESI + 0xc));
-    FUN_004ea510();
+    UndergroundStatsScreen__DrawCurrentStats();
   }
   return;
 }
 
 
-// ==== 0x4ea510 FUN_004ea510
+// ==== 0x4ea510 UndergroundStatsScreen::DrawCurrentStats
 
-void FUN_004ea510(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__DrawCurrentStats(void)
 
 {
   int in_EAX;
   
   switch(*(undefined4 *)(in_EAX + 0x40)) {
   case 0:
-    FUN_004ea810();
+    UndergroundStatsScreen__DrawCircuitStats();
     return;
   case 1:
-    FUN_004ea6b0();
+    UndergroundStatsScreen__DrawSprintStats();
     return;
   case 2:
-    FUN_004ea720();
+    UndergroundStatsScreen__DrawDragStats();
     return;
   case 3:
-    FUN_004ea7a0();
+    UndergroundStatsScreen__DrawDriftStats();
     return;
   case 4:
-    FUN_004ea880();
+    UndergroundStatsScreen__DrawGlobalStats();
   }
   return;
 }
 
 
-// ==== 0x4ea560 FUN_004ea560
+// ==== 0x4ea560 UndergroundStatsScreen::ClearAllStatsLines
 
-void FUN_004ea560(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__ClearAllStatsLines(void)
 
 {
   int iVar1;
@@ -7424,9 +7483,11 @@ void FUN_004ea560(void)
 }
 
 
-// ==== 0x4ea5d0 FUN_004ea5d0
+// ==== 0x4ea5d0 UndergroundStatsScreen::AddStatsLine
 
-void FUN_004ea5d0(int param_1,undefined4 param_2,undefined4 param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__AddStatsLine(int param_1,undefined4 param_2,undefined4 param_3)
 
 {
   undefined1 local_20 [32];
@@ -7440,9 +7501,12 @@ void FUN_004ea5d0(int param_1,undefined4 param_2,undefined4 param_3)
 }
 
 
-// ==== 0x4ea650 FUN_004ea650
+// ==== 0x4ea650 UndergroundStatsScreen::AddStatsLine
 
-void __fastcall FUN_004ea650(undefined4 param_1,int param_2,undefined4 param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall
+UndergroundStatsScreen__AddStatsLine(undefined4 param_1,int param_2,undefined4 param_3)
 
 {
   FUN_004f42f0("STATSTYPE_DATA_%02d",param_2 + 1);
@@ -7453,74 +7517,84 @@ void __fastcall FUN_004ea650(undefined4 param_1,int param_2,undefined4 param_3)
 }
 
 
-// ==== 0x4ea6b0 FUN_004ea6b0
+// ==== 0x4ea6b0 UndergroundStatsScreen::DrawSprintStats
 
-void FUN_004ea6b0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__DrawSprintStats(void)
 
 {
   undefined4 unaff_ESI;
   
   FUN_00495f00(0x817e429a);
-  FUN_004ea560(unaff_ESI);
-  FUN_004ea650(DAT_007681c8);
-  FUN_004ea650(DAT_007681cc);
-  FUN_004ea650(DAT_007681d0);
+  UndergroundStatsScreen__ClearAllStatsLines(unaff_ESI);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681c8);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681cc);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681d0);
   return;
 }
 
 
-// ==== 0x4ea720 FUN_004ea720
+// ==== 0x4ea720 UndergroundStatsScreen::DrawDragStats
 
-void FUN_004ea720(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__DrawDragStats(void)
 
 {
   undefined4 unaff_ESI;
   
   FUN_00495f00(0x8d9a96d8);
-  FUN_004ea560(unaff_ESI);
-  FUN_004ea650(DAT_007681d4);
-  FUN_004ea650(DAT_007681d8);
-  FUN_004ea650(DAT_007681dc);
-  FUN_004ea650(DAT_00768204);
+  UndergroundStatsScreen__ClearAllStatsLines(unaff_ESI);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681d4);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681d8);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681dc);
+  UndergroundStatsScreen__AddStatsLine(DAT_00768204);
   return;
 }
 
 
-// ==== 0x4ea7a0 FUN_004ea7a0
+// ==== 0x4ea7a0 UndergroundStatsScreen::DrawDriftStats
 
-void FUN_004ea7a0(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__DrawDriftStats(void)
 
 {
   undefined4 unaff_ESI;
   
   FUN_00495f00(0x40ed9413);
-  FUN_004ea560(unaff_ESI);
-  FUN_004ea650(DAT_007681e0);
-  FUN_004ea650(DAT_007681e4);
-  FUN_004ea650(DAT_007681e8);
+  UndergroundStatsScreen__ClearAllStatsLines(unaff_ESI);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681e0);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681e4);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681e8);
   return;
 }
 
 
-// ==== 0x4ea810 FUN_004ea810
+// ==== 0x4ea810 UndergroundStatsScreen::DrawCircuitStats
 
-void FUN_004ea810(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__DrawCircuitStats(void)
 
 {
   undefined4 unaff_ESI;
   
   FUN_00495f00(0xd14b7fcd);
-  FUN_004ea560(unaff_ESI);
-  FUN_004ea650(DAT_007681ec);
-  FUN_004ea650(DAT_007681f0);
-  FUN_004ea650(DAT_007681f4);
+  UndergroundStatsScreen__ClearAllStatsLines(unaff_ESI);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681ec);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681f0);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681f4);
   return;
 }
 
 
-// ==== 0x4ea880 FUN_004ea880
+// ==== 0x4ea880 UndergroundStatsScreen::DrawGlobalStats
 
-void FUN_004ea880(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void UndergroundStatsScreen__DrawGlobalStats(void)
 
 {
   undefined4 uVar1;
@@ -7528,12 +7602,12 @@ void FUN_004ea880(void)
   float local_4;
   
   FUN_00495f00(0xdda5e29e);
-  FUN_004ea560(unaff_ESI);
-  FUN_004ea650(DAT_007681bc);
-  FUN_004ea650(DAT_007681c0);
-  FUN_004ea650(DAT_007681c4);
+  UndergroundStatsScreen__ClearAllStatsLines(unaff_ESI);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681bc);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681c0);
+  UndergroundStatsScreen__AddStatsLine(DAT_007681c4);
   uVar1 = _ftol_nocw();
-  FUN_004ea650(uVar1);
+  UndergroundStatsScreen__AddStatsLine(uVar1);
   local_4 = DAT_007681b8;
   if (DAT_007588f0 == 0) {
     local_4 = DAT_007681b8 * 0.001 * 0.6213;
@@ -7541,20 +7615,22 @@ void FUN_004ea880(void)
   else if (DAT_007588f0 == 1) {
     local_4 = DAT_007681b8 * 0.001;
   }
-  FUN_004ea5d0(4,0x78eff98f,local_4);
-  FUN_004ea650(DAT_00758ad4);
+  UndergroundStatsScreen__AddStatsLine(4,0x78eff98f,local_4);
+  UndergroundStatsScreen__AddStatsLine(DAT_00758ad4);
   return;
 }
 
 
-// ==== 0x4ea990 FUN_004ea990
+// ==== 0x4ea990 UndergroundStatsScreen::NotificationMessage
 
-void __thiscall FUN_004ea990(int param_1,uint param_2)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall UndergroundStatsScreen__NotificationMessage(int param_1,uint param_2)
 
 {
   if (0xb5971bf1 < param_2) {
     if (param_2 == 0xc98356ba) {
-      FUN_004eaa10();
+      UndergroundStatsScreen__HandleMouseClick();
     }
     return;
   }
@@ -7571,14 +7647,16 @@ void __thiscall FUN_004ea990(int param_1,uint param_2)
       return;
     }
   }
-  FUN_004ea460(param_2);
+  UndergroundStatsScreen__ScrollStats(param_2);
   return;
 }
 
 
-// ==== 0x4eaa10 FUN_004eaa10
+// ==== 0x4eaa10 UndergroundStatsScreen::HandleMouseClick
 
-void FUN_004eaa10(void)
+/* [canon] hud med (ghidra-canon) docs/re/canon.md */
+
+void UndergroundStatsScreen__HandleMouseClick(void)
 
 {
   char cVar1;
@@ -7696,7 +7774,7 @@ Screen_MU_UG_UndergroundMenu__Screen_MU_UG_UndergroundMenu(undefined4 *param_1,u
   ExceptionList = &local_1c;
   FEScreen__FEScreen(param_1,param_2);
   local_14 = 0;
-  *param_1 = &PTR_FUN_006c2d94;
+  *param_1 = &PTR_UndergroundMenuScreen__scalar_deleting_destructor_006c2d94;
   *(undefined1 *)(param_1 + 0x10) = 0;
   RideInfo__Init();
   FECarConfig__BuildRide(&DAT_0075eef8,0,local_810);
@@ -7802,12 +7880,14 @@ Screen_MU_UG_UndergroundMenu__Screen_MU_UG_UndergroundMenu(undefined4 *param_1,u
 }
 
 
-// ==== 0x4eafc0 FUN_004eafc0
+// ==== 0x4eafc0 UndergroundMenuScreen::scalar_deleting_destructor
 
-void * __thiscall FUN_004eafc0(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall UndergroundMenuScreen__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004eafe0();
+  UndergroundMenuScreen___UndergroundMenuScreen();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -7815,20 +7895,24 @@ void * __thiscall FUN_004eafc0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4eafe0 FUN_004eafe0
+// ==== 0x4eafe0 UndergroundMenuScreen::_UndergroundMenuScreen
 
-void __fastcall FUN_004eafe0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall UndergroundMenuScreen___UndergroundMenuScreen(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c2d94;
+  *param_1 = &PTR_UndergroundMenuScreen__scalar_deleting_destructor_006c2d94;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4eaff0 FUN_004eaff0
+// ==== 0x4eaff0 UndergroundMenuScreen::MakeChoice
 
-undefined4 __fastcall FUN_004eaff0(uint param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 __fastcall UndergroundMenuScreen__MakeChoice(uint param_1)
 
 {
   int iVar1;
@@ -7899,9 +7983,11 @@ undefined4 __fastcall FUN_004eaff0(uint param_1)
 }
 
 
-// ==== 0x4eb170 FUN_004eb170
+// ==== 0x4eb170 UndergroundMenuScreen::GetBlurbHashFromName
 
-undefined4 FUN_004eb170(void)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+undefined4 UndergroundMenuScreen__GetBlurbHashFromName(void)
 
 {
   uint in_EAX;
@@ -7932,9 +8018,11 @@ undefined4 FUN_004eb170(void)
 }
 
 
-// ==== 0x4eb1e0 FUN_004eb1e0
+// ==== 0x4eb1e0 UndergroundMenuScreen::NotificationMessage
 
-void __thiscall FUN_004eb1e0(int param_1,uint param_2,int param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall UndergroundMenuScreen__NotificationMessage(int param_1,uint param_2,int param_3)
 
 {
   char cVar1;
@@ -7967,7 +8055,7 @@ void __thiscall FUN_004eb1e0(int param_1,uint param_2,int param_3)
       }
       if (param_2 == 0xc407210) {
         DAT_006fa19c = *(undefined4 *)(param_3 + 0x10);
-        FUN_004eaff0();
+        UndergroundMenuScreen__MakeChoice();
         return;
       }
       if (param_2 == 0x12345678) {
@@ -7990,7 +8078,7 @@ void __thiscall FUN_004eb1e0(int param_1,uint param_2,int param_3)
       if ((cVar1 == '\0') &&
          (iVar2 = FEngGetCurrentButton(*(undefined4 *)(param_1 + 0xc)), param_3 == iVar2)) {
         FEObject__SetScript("HighLight",1);
-        uVar3 = FUN_004eb170(param_1);
+        uVar3 = UndergroundMenuScreen__GetBlurbHashFromName(param_1);
         FUN_00416bb0(uVar3);
         FEngSetScript("FadeIn",1);
       }
@@ -8033,9 +8121,11 @@ undefined4 Screen_MU_UG_UndergroundMenu__Create(undefined4 param_1)
 }
 
 
-// ==== 0x4eb3f0 FUN_004eb3f0
+// ==== 0x4eb3f0 MemcardInterface::WaitUntilDone
 
-void FUN_004eb3f0(void)
+/* [canon] canon med (ghidra-canon) docs/re/canon.md */
+
+void MemcardInterface__WaitUntilDone(void)
 
 {
   while (DAT_006fa0a8 == '\0') {
@@ -8045,11 +8135,13 @@ void FUN_004eb3f0(void)
 }
 
 
-// ==== 0x4eb420 FUN_004eb420
+// ==== 0x4eb420 MemcardInterface::LoadProfileNameArray
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void __thiscall FUN_004eb420(int param_1,undefined4 param_2,undefined4 param_3)
+void __thiscall
+MemcardInterface__LoadProfileNameArray(int param_1,undefined4 param_2,undefined4 param_3)
 
 {
   char cVar1;
@@ -8086,13 +8178,15 @@ void __thiscall FUN_004eb420(int param_1,undefined4 param_2,undefined4 param_3)
 }
 
 
-// ==== 0x4eb4b0 FUN_004eb4b0
+// ==== 0x4eb4b0 MemcardInterface::AutosaveCurrentProfile
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __fastcall
-FUN_004eb4b0(undefined4 param_1,int param_2,undefined4 param_3,int param_4,undefined4 param_5,
-            undefined4 param_6)
+MemcardInterface__AutosaveCurrentProfile
+          (undefined4 param_1,int param_2,undefined4 param_3,int param_4,undefined4 param_5,
+          undefined4 param_6)
 
 {
   char cVar1;
@@ -8139,13 +8233,15 @@ FUN_004eb4b0(undefined4 param_1,int param_2,undefined4 param_3,int param_4,undef
 }
 
 
-// ==== 0x4eb560 FUN_004eb560
+// ==== 0x4eb560 MemcardInterface::SaveCurrentProfile
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __fastcall
-FUN_004eb560(undefined4 param_1,int param_2,undefined4 param_3,int param_4,undefined4 param_5,
-            undefined4 param_6)
+MemcardInterface__SaveCurrentProfile
+          (undefined4 param_1,int param_2,undefined4 param_3,int param_4,undefined4 param_5,
+          undefined4 param_6)
 
 {
   char cVar1;
@@ -8192,13 +8288,15 @@ FUN_004eb560(undefined4 param_1,int param_2,undefined4 param_3,int param_4,undef
 }
 
 
-// ==== 0x4eb610 FUN_004eb610
+// ==== 0x4eb610 MemcardInterface::LoadProfile
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] canon high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __fastcall
-FUN_004eb610(undefined4 param_1,int param_2,undefined4 param_3,int param_4,undefined4 param_5,
-            undefined4 param_6)
+MemcardInterface__LoadProfile
+          (undefined4 param_1,int param_2,undefined4 param_3,int param_4,undefined4 param_5,
+          undefined4 param_6)
 
 {
   char cVar1;
@@ -8245,11 +8343,12 @@ FUN_004eb610(undefined4 param_1,int param_2,undefined4 param_3,int param_4,undef
 }
 
 
-// ==== 0x4eb6c0 FUN_004eb6c0
+// ==== 0x4eb6c0 MemcardInterface::CreateProfileOnCard
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] canon low (ghidra-canon) docs/re/canon.md */
 
-void __thiscall FUN_004eb6c0(int param_1,undefined4 param_2,int param_3)
+void __thiscall MemcardInterface__CreateProfileOnCard(int param_1,undefined4 param_2,int param_3)
 
 {
   char cVar1;
@@ -8342,7 +8441,7 @@ undefined4 * __thiscall FUN_004eb7c0(int param_1,undefined4 *param_2)
   FEMenuData__FEMenuData();
   local_4 = CONCAT31(local_4._1_3_,1);
   param_2[0x11] = *(undefined4 *)(param_1 + 4);
-  FUN_004ebf20(&DAT_00777c10);
+  OnlineDialogBox__PostInitialize(&DAT_00777c10);
   DAT_00735ba8 = 0;
   DAT_00735da4 = param_2;
   uVar1 = FEngFindPackage();
@@ -8375,7 +8474,7 @@ undefined4 * __thiscall FUN_004eb7c0(int param_1,undefined4 *param_2)
 void * __thiscall FUN_004eb8c0(void *param_1,byte param_2)
 
 {
-  FUN_004eb8e0(param_1);
+  OnlineDialogBox___OnlineDialogBox(param_1);
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -8383,9 +8482,11 @@ void * __thiscall FUN_004eb8c0(void *param_1,byte param_2)
 }
 
 
-// ==== 0x4eb8e0 FUN_004eb8e0
+// ==== 0x4eb8e0 OnlineDialogBox::_OnlineDialogBox
 
-void FUN_004eb8e0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OnlineDialogBox___OnlineDialogBox(undefined4 *param_1)
 
 {
   void *local_c;
@@ -8563,9 +8664,11 @@ void __fastcall FUN_004ebac0(char *param_1,int param_2,undefined4 param_3)
 }
 
 
-// ==== 0x4ebb80 FUN_004ebb80
+// ==== 0x4ebb80 OnlineDialogBox::ShowDialogObjects
 
-void FUN_004ebb80(void)
+/* [canon] hud low (ghidra-canon) docs/re/canon.md */
+
+void OnlineDialogBox__ShowDialogObjects(void)
 
 {
   int iVar1;
@@ -8756,10 +8859,13 @@ void FUN_004ebdf0(void)
 }
 
 
-// ==== 0x4ebe60 FUN_004ebe60
+// ==== 0x4ebe60 OnlineDialogBox::NotificationMessage
+
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
 void __thiscall
-FUN_004ebe60(int param_1,int param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5)
+OnlineDialogBox__NotificationMessage
+          (int param_1,int param_2,undefined4 param_3,undefined4 param_4,undefined4 param_5)
 
 {
   char cVar1;
@@ -8782,7 +8888,7 @@ FUN_004ebe60(int param_1,int param_2,undefined4 param_3,undefined4 param_4,undef
       if (DAT_00735d9d == '\0') {
         return;
       }
-      FUN_004ebb80();
+      OnlineDialogBox__ShowDialogObjects();
       DAT_00735d9d = 0;
       return;
     }
@@ -8800,9 +8906,11 @@ FUN_004ebe60(int param_1,int param_2,undefined4 param_3,undefined4 param_4,undef
 }
 
 
-// ==== 0x4ebf20 FUN_004ebf20
+// ==== 0x4ebf20 OnlineDialogBox::PostInitialize
 
-void FUN_004ebf20(int *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void OnlineDialogBox__PostInitialize(int *param_1)
 
 {
   char *pcVar1;
@@ -8972,23 +9080,27 @@ void FUN_004ec3c0(void)
 }
 
 
-// ==== 0x4ec3e0 FUN_004ec3e0
+// ==== 0x4ec3e0 FEKeyboard::_FEKeyboard
 
-void __fastcall FUN_004ec3e0(undefined4 *param_1)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall FEKeyboard___FEKeyboard(undefined4 *param_1)
 
 {
-  *param_1 = &PTR_FUN_006c2c8c;
+  *param_1 = &PTR_FEKeyboard__scalar_deleting_destructor_006c2c8c;
   FUN_004f7b50();
   return;
 }
 
 
-// ==== 0x4ec3f0 FUN_004ec3f0
+// ==== 0x4ec3f0 FEKeyboard::scalar_deleting_destructor
 
-void * __thiscall FUN_004ec3f0(void *param_1,byte param_2)
+/* [canon] hud high (ghidra-canon) docs/re/canon.md */
+
+void * __thiscall FEKeyboard__scalar_deleting_destructor(void *param_1,byte param_2)
 
 {
-  FUN_004ec3e0();
+  FEKeyboard___FEKeyboard();
   if ((param_2 & 1) != 0) {
     _free(param_1);
   }
@@ -9042,19 +9154,22 @@ undefined4 * Screen_Keyboard__Screen_Keyboard(undefined4 *param_1)
   local_c = ExceptionList;
   ExceptionList = &local_c;
   FEScreen__FEScreen(param_1,unaff_EDI);
-  *param_1 = &PTR_FUN_006c2c8c;
+  *param_1 = &PTR_FEKeyboard__scalar_deleting_destructor_006c2c8c;
   local_4 = 0;
   param_1[0x80] = *(undefined4 *)(unaff_EDI + 4);
-  FUN_004ec990(param_1);
+  FEKeyboard__Initialize(param_1);
   FUN_004ed930(param_1);
   ExceptionList = local_c;
   return param_1;
 }
 
 
-// ==== 0x4ec4d0 FUN_004ec4d0
+// ==== 0x4ec4d0 FEKeyboard::ShowModal
 
-void __fastcall FUN_004ec4d0(undefined4 param_1,int param_2,undefined4 param_3,undefined4 param_4)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __fastcall
+FEKeyboard__ShowModal(undefined4 param_1,int param_2,undefined4 param_3,undefined4 param_4)
 
 {
   int iVar1;
@@ -9085,11 +9200,12 @@ void __fastcall FUN_004ec4d0(undefined4 param_1,int param_2,undefined4 param_3,u
 }
 
 
-// ==== 0x4ec550 FUN_004ec550
+// ==== 0x4ec550 FEKeyboard::Dispose
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
-undefined4 __fastcall FUN_004ec550(undefined4 param_1,char param_2,int param_3)
+undefined4 __fastcall FEKeyboard__Dispose(undefined4 param_1,char param_2,int param_3)
 
 {
   undefined4 uVar1;
@@ -9122,9 +9238,11 @@ undefined4 __fastcall FUN_004ec550(undefined4 param_1,char param_2,int param_3)
 }
 
 
-// ==== 0x4ec5f0 FUN_004ec5f0
+// ==== 0x4ec5f0 FEKeyboard::NotificationMessage
 
-void __thiscall FUN_004ec5f0(int param_1,uint param_2,int param_3)
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
+
+void __thiscall FEKeyboard__NotificationMessage(int param_1,uint param_2,int param_3)
 
 {
   int iVar1;
@@ -9138,14 +9256,14 @@ void __thiscall FUN_004ec5f0(int param_1,uint param_2,int param_3)
           if (DAT_0073578c != 0) {
             *(undefined1 *)(*(int *)(DAT_0073578c + 8) + 1) = 1;
           }
-          FUN_004ec550(param_1);
+          FEKeyboard__Dispose(param_1);
         }
         iVar1 = FUN_004117b0();
         if (iVar1 < 0) {
           if (DAT_0073578c != 0) {
             *(undefined1 *)(*(int *)(DAT_0073578c + 8) + 1) = 1;
           }
-          FUN_004ec550(param_1);
+          FEKeyboard__Dispose(param_1);
         }
         FUN_004ed930(param_1);
         return;
@@ -9162,7 +9280,7 @@ void __thiscall FUN_004ec5f0(int param_1,uint param_2,int param_3)
           if (param_2 != 0xb5af2461) {
             return;
           }
-          FUN_004ec550(param_1);
+          FEKeyboard__Dispose(param_1);
           return;
         }
         if (DAT_006f1dd8 == 0) {
@@ -9194,7 +9312,7 @@ void __thiscall FUN_004ec5f0(int param_1,uint param_2,int param_3)
       if (*(int *)(param_1 + 0x208) == -1) {
         return;
       }
-      FUN_004ec550(param_1);
+      FEKeyboard__Dispose(param_1);
       return;
     }
     if (param_2 != 0x911c0a4b) {
@@ -9272,7 +9390,7 @@ LAB_004ec639:
       if ((DAT_006f1dd8 != 0) && (*(int **)(DAT_007356a8 + 0xbc) != (int *)0x0)) {
         (**(code **)(**(int **)(DAT_007356a8 + 0xbc) + 0x14))(0x18);
       }
-      FUN_004ec550(param_1);
+      FEKeyboard__Dispose(param_1);
       return;
     }
     break;
@@ -9298,11 +9416,12 @@ LAB_004ec76b:
 }
 
 
-// ==== 0x4ec990 FUN_004ec990
+// ==== 0x4ec990 FEKeyboard::Initialize
 
 /* WARNING: Globals starting with '_' overlap smaller symbols at the same address */
+/* [canon] hud high (ghidra-canon+nfsug) docs/re/canon.md */
 
-void FUN_004ec990(int param_1)
+void FEKeyboard__Initialize(int param_1)
 
 {
   byte *pbVar1;

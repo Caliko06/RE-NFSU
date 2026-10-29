@@ -639,13 +639,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e7940	canon	0	19	0	1	0	
 0x4e7980	canon	0	84	2	0	0	B FEOnl_WaitSync::NotificationMessage
 0x4e7a20	canon	0	30	2	1	0	
-0x4e93b0	canon	0	289	1	3	27	
-0x4eb170	canon	0	97	0	1	0	
-0x4eb420	canon	0	137	2	1	1	
-0x4eb4b0	canon	0	170	2	1	1	
-0x4eb560	canon	0	170	2	2	1	
-0x4eb610	canon	0	170	2	2	1	
-0x4eb6c0	canon	0	158	2	1	1	
 0x4eeb70	canon	0	32	2	10	0	
 0x4f0700	canon	0	202	1	34	0	B FEngine::QueueMessage
 0x4f0a50	canon	0	168	1	1	0	R FEngine::QueuePackageUserTransfer
@@ -1388,7 +1381,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x472cf0	input	0	253	2	1	0	
 0x472df0	input	0	68	2	1	0	B GJKPolytope::MemoryImageLoad
 0x472e40	input	0	92	0	3	0	B GJKPolytope::MoveCenterOfGravity
-0x4ec4d0	input	0	124	2	1	0	
 0x4edd90	input	0	25	0	1	0	
 0x4eddb0	input	0	25	0	1	0	
 0x4eddd0	input	0	247	0	2	1	
@@ -3586,7 +3578,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4cd0d0	unknown	0	161	0	1	0	C IsPackageADialogBox
 0x4d99c0	unknown	0	97	1	1	0	
 0x4ee6e0	unknown	0	31	1	1	0	
-0x4eef40	unknown	0	87	0	1	0	R FEngine::AddToIdleList
+0x4eef40	unknown	0	87	0	1	0	C FEngine::AddToIdleList
 0x4f07d0	unknown	0	32	2	1	0	
 0x4f08b0	unknown	0	30	2	1	0	
 0x4f16d0	unknown	0	311	0	2	0	B cFEngRender::MakeRenderMatrix
@@ -4389,10 +4381,12 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c96f0	canon	1	79	4	7	0	
 0x4c9830	canon	1	30	2	1	0	
 0x4c9bd0	canon	1	68	3	2	1	R CreateChooseUserProfile
+0x4ca500	canon	1	209	3	2	0	R UserProfileScreen::InitPlayer1List
 0x4ca5e0	canon	1	130	2	1	1	R UserProfileScreen::ClearPlayer1List
 0x4cab00	canon	1	52	1	1	0	B UserProfileScreen::PrintIODescription
 0x4caca0	canon	1	275	2	1	1	
 0x4cb740	canon	1	52	1	1	0	R ChooseUserProfile::NotifySoundMessage
+0x4cbc50	canon	1	195	4	1	0	B GetCommonSound
 0x4cbd20	canon	1	45	1	1	0	
 0x4cbed0	canon	1	251	2	1	1	R GetInstallationSnd_Visual
 0x4cd330	canon	1	30	2	1	0	
@@ -4463,25 +4457,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e7720	canon	1	152	2	2	0	B SideScrollScreen::~SideScrollScreen
 0x4e7930	canon	1	11	1	1	0	
 0x4e7960	canon	1	30	2	1	0	
-0x4e7be0	canon	1	159	4	1	0	A GaragePresetsScreen::AddThumb
-0x4e7cf0	canon	1	124	3	2	0	A GaragePresetsScreen::ShowCurrentPreset
-0x4e7eb0	canon	1	165	5	2	0	A GaragePresetsScreen::SavePreset
-0x4e8360	canon	1	30	2	1	0	
-0x4e8580	canon	1	190	4	1	3	
-0x4e86a0	canon	1	11	1	1	0	
-0x4e86b0	canon	1	30	2	1	0	
-0x4e89b0	canon	1	241	3	1	3	
-0x4e96b0	canon	1	30	2	1	0	
-0x4e9c80	canon	1	91	2	0	0	
-0x4e9e60	canon	1	30	2	1	0	
-0x4e9e80	canon	1	11	1	1	0	
-0x4ea430	canon	1	30	2	1	0	
-0x4ea450	canon	1	11	1	1	0	
-0x4ea560	canon	1	108	2	5	2	
-0x4eafc0	canon	1	30	2	1	0	
-0x4eafe0	canon	1	11	1	1	0	
-0x4eb3f0	canon	1	36	1	2	0	
-0x4eb8e0	canon	1	109	2	1	0	
 0x4f0eb0	canon	1	95	1	1	0	R FEngine::ProcessListBoxResponses
 0x4f1430	canon	1	473	3	1	0	B FEngine::ProcessPackageCommands
 0x4f3eb0	canon	1	99	1	1	0	B FEPackageManager::NotifySoundMessage
@@ -5075,9 +5050,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x41b5f0	input	1	57	2	2	0	B FEKeyboard::AppendLetter
 0x41b970	input	1	261	3	1	0	R FEKeyboard::AppendChar
 0x472cb0	input	1	51	1	1	0	R GJKPolytope::~GJKPolytope
-0x4ec3e0	input	1	11	1	1	0	
-0x4ec3f0	input	1	30	2	1	0	
-0x4ec550	input	1	159	3	1	0	
 0x4edb30	input	1	222	2	1	0	
 0x4edc10	input	1	225	2	1	0	
 0x4edd00	input	1	131	2	3	0	
@@ -5614,7 +5586,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x624bd0	render	1	30	1	1	0	
 0x624dd0	render	1	45	2	2	0	
 0x624e00	render	1	35	1	2	0	
-0x625ba0	render	1	104	2	1	0	C EAGL::DrawGouraud::End
+0x625ba0	render	1	104	2	1	0	
 0x625f60	render	1	99	2	2	0	C EAGLInternal::DefaultMalloc
 0x626040	render	1	99	2	2	0	R __static_initialization_and_destruction_0
 0x6260b0	render	1	99	2	2	0	A _GLOBAL_.I._25GeoPrim_SingleDrawGouraud.gNumVolatiles
@@ -6098,7 +6070,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x643230	runtime	1	21	1	1	0	
 0x64538b	runtime	1	39	1	1	0	
 0x64583f	runtime	1	33	1	1	0	
-0x645f60	runtime	1	52	1	1	0	C SYNCTASK_add
+0x645f60	runtime	1	52	1	1	0	
 0x645fc0	runtime	1	130	2	2	0	R SYNCTASK_run
 0x646050	runtime	1	30	1	1	0	
 0x646564	runtime	1	218	1	1	0	B REAL_abortmessage
@@ -6751,7 +6723,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c9650	canon	2	111	3	27	0	R ChooseUserProfile::DoPlayNow
 0x4ca2d0	canon	2	135	3	2	0	C CreateUserProfileScreen
 0x4ca430	canon	2	208	3	2	1	R UserProfileScreen::~UserProfileScreen
-0x4ca500	canon	2	209	3	2	0	R UserProfileScreen::InitPlayer1List
+0x4ca670	canon	2	279	6	6	0	R UserProfileScreen::LoadingPlayer1List
 0x4cb030	canon	2	221	3	1	1	
 0x4cb320	canon	2	342	3	1	1	
 0x4cb5f0	canon	2	184	3	2	1	
@@ -6774,14 +6746,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e0c50	canon	2	93	4	1	0	C MPCarSelectScreen::MPCarSelectScreen
 0x4e1a10	canon	2	53	2	1	0	B MPCarSelectScreen::ScrollCars
 0x4e3960	canon	2	247	3	1	0	B GarageNewVinylScreen::RefreshHeader
-0x4e7e00	canon	2	162	2	1	1	A GaragePresetsScreen::PresetAction
-0x4e8380	canon	2	145	3	1	1	
-0x4e8b10	canon	2	640	5	2	0	
-0x4e96d0	canon	2	92	2	1	0	
-0x4ea150	canon	2	81	3	1	1	
-0x4ea650	canon	2	85	3	5	2	
-0x4ea990	canon	2	116	3	1	2	B GaragePresetsScreen::~GaragePresetsScreen
-0x4eaff0	canon	2	373	5	1	8	
 0x4ee840	canon	2	195	2	1	0	B FEngine::~FEngine
 0x4ef050	canon	2	86	2	244	0	R FindObject__C7FEngineUlPCc
 0x4f0f10	canon	2	187	2	1	0	R FEngine::ProcessCodeListBoxResponses
@@ -7497,13 +7461,13 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c9850	canon	3	140	4	1	0	R ChooseUserProfile::GetBlurbHashFromName
 0x4c98e0	canon	3	738	6	1	2	R ChooseUserProfile::NotificationMessage
 0x4c9c20	canon	3	246	5	1	0	
-0x4ca670	canon	3	279	6	6	0	R UserProfileScreen::LoadingPlayer1List
 0x4ca790	canon	3	339	5	1	1	R UserProfileScreen::ShowPlayer1List
 0x4cab80	canon	3	286	6	2	1	
 0x4cb130	canon	3	481	7	3	1	
+0x4cb480	canon	3	367	8	4	0	
 0x4cb7f0	canon	3	300	6	1	1	
+0x4cb920	canon	3	278	7	1	0	
 0x4cbb20	canon	3	300	6	1	1	B GetSpecialCaseScreenSound
-0x4cbc50	canon	3	195	4	1	0	B GetCommonSound
 0x4cc400	canon	3	382	6	1	2	
 0x4cc5d0	canon	3	401	6	1	2	
 0x4cd490	canon	3	229	4	1	0	C PauseMenu::DrawResume
@@ -7520,15 +7484,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4e1a50	canon	3	206	3	1	0	B MPCarSelectData::ScrollCars
 0x4e1b90	canon	3	198	5	3	0	B MPCarSelectScreen::~MPCarSelectScreen
 0x4e6ac0	canon	3	525	5	6	1	B GarageVinylPrompt::NotificationMessage
-0x4e7d70	canon	3	132	4	1	0	A GaragePresetsScreen::ScrollPreset
-0x4ea090	canon	3	177	4	1	2	
-0x4ea5d0	canon	3	124	4	1	3	
-0x4ea6b0	canon	3	98	3	1	0	
-0x4ea720	canon	3	121	3	1	0	
-0x4ea7a0	canon	3	98	3	1	0	
-0x4ea810	canon	3	98	3	1	0	
-0x4ebb80	canon	3	302	5	1	0	
-0x4ebe60	canon	3	179	4	1	0	
 0x4eff20	canon	3	1128	4	1	0	R FEngine::ProcessMouseForPackage
 0x4f0b00	canon	3	934	3	3	0	R FEngine::ProcessMessageQueue
 0x4f0fd0	canon	3	101	3	1	0	R FEngine::ProcessObjectMessage
@@ -7616,7 +7571,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x5600c0	hud	3	646	6	2	6	
 0x4067d0	input	3	823	3	1	0	
 0x41b150	input	3	181	4	3	0	
-0x4ec990	input	3	3957	7	1	6	
 0x4eded0	input	3	218	3	1	0	
 0x4edfb0	input	3	170	3	1	0	
 0x420380	props	3	1285	9	1	0	R World::DoTimestepCollisions
@@ -7932,6 +7886,8 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x6833a0	assets	4	192	5	1	3	
 0x411f40	audio	4	213	6	1	0	P AutoCalibrateWheel
 0x412020	audio	4	314	6	3	0	
+0x4cadc0	audio	4	528	15	1	0	B UserProfileScreen::NotificationMessage
+0x4ccab0	audio	4	391	11	1	0	
 0x537a60	audio	4	575	6	2	0	R EAXS_StreamManager::AddStream
 0x64635f	audio	4	95	5	1	0	R PRINT_string
 0x64f0e0	audio	4	289	5	2	0	R SNDAEMSI_streamsystemtask
@@ -7984,9 +7940,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4db8a0	canon	4	423	7	2	1	
 0x4e6cd0	canon	4	505	5	1	0	
 0x4e7600	canon	4	273	5	1	4	B __static_initialization_and_destruction_0
-0x4e9540	canon	4	364	8	1	1	
-0x4ea460	canon	4	162	4	1	2	
-0x4ea880	canon	4	268	5	1	0	
 0x4ef330	canon	4	3002	4	1	0	R FEngine::ProcessPadsForPackage
 0x514280	canon	4	96	4	1	1	B CreateMagazineScreen
 0x5146d0	canon	4	1206	7	3	0	B MagazineScreen::NotificationMessage
@@ -8094,7 +8047,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4aeee0	runtime	4	98	4	1	0	B CarOrbiter::SetLookatPart
 0x4beec0	runtime	4	262	4	1	0	R PauseOptionsMenu::ToggleHandling
 0x4c4560	runtime	4	211	6	1	0	B UndergroundStatsScreen::DrawDragStats
-0x4e8420	runtime	4	350	10	1	0	
 0x54d6b0	runtime	4	502	6	1	2	B MakeMapping
 0x54de70	runtime	4	139	6	2	0	
 0x563f70	runtime	4	401	7	1	1	
@@ -8186,8 +8138,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x63dec0	assets	5	407	5	1	0	B Realmc::GCInterface::GCMCThread
 0x66f830	assets	5	300	5	8	0	
 0x412160	audio	5	873	7	4	0	P ActualReadJoystickData
-0x4cadc0	audio	5	528	15	1	0	B UserProfileScreen::NotificationMessage
-0x4ccab0	audio	5	391	11	1	0	
 0x521b90	audio	5	228	6	1	0	
 0x532d40	audio	5	632	7	2	5	B CreateSoundObject
 0x646100	audio	5	246	7	1	4	B PRINT_movechannel
@@ -8208,11 +8158,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4c2440	canon	5	122	5	1	0	B UndergroundTradeConfirmScreen::ExecuteTrade
 0x4c3390	canon	5	225	7	1	0	R ChooseCareerCarScreen::MakeRideFromCarType
 0x4c9d20	canon	5	1449	11	1	2	
-0x4cb480	canon	5	367	8	4	0	
-0x4cb920	canon	5	278	7	1	0	
 0x4d5970	canon	5	865	10	1	6	R ControllerMenu::DrawButtons
-0x4ea510	canon	5	53	5	2	0	
-0x4eaa10	canon	5	292	6	1	0	
 0x51b720	canon	5	429	8	1	2	
 0x54fd50	canon	5	845	13	1	2	
 0x5a4a50	canon	5	199	6	2	0	R MovieStart
@@ -8360,9 +8306,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4dbf90	canon	6	637	11	3	0	C ColorPicker::RepositionCursor
 0x4e6f00	canon	6	1048	9	1	3	
 0x4e7320	canon	6	726	9	1	3	
-0x4e8d90	canon	6	1562	7	1	0	
-0x4eb1e0	canon	6	431	12	1	5	
-0x4ebf20	canon	6	1177	12	1	2	
 0x4f89d0	canon	6	422	8	27	0	
 0x4ffeb0	canon	6	738	6	3	0	R FEPackage::UpdateObject
 0x54ae10	canon	6	293	6	3	3	
@@ -8452,8 +8395,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x4d67b0	canon	7	190	8	1	2	R HUDMenu::DrawSplitTime
 0x4dbc70	canon	7	776	12	2	0	C ColorPicker::SetupColorTable
 0x4e67e0	canon	7	736	9	1	1	
-0x4e8020	canon	7	247	11	1	0	A GaragePresetsScreen::NotificationMessage
-0x4e9730	canon	7	1260	9	1	4	
 0x4ef0b0	canon	7	627	7	2	0	R FEngine::Update
 0x4fc100	canon	7	1154	8	3	0	
 0x513780	canon	7	757	19	1	3	
@@ -8545,6 +8486,7 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x417290	canon	9	454	11	1	2	R startnextrequest
 0x4bb2b0	canon	9	781	16	1	7	R QRTrackSelectScreen::HandleMultiTrackMsg
 0x4bd0f0	canon	9	537	16	2	5	B QRCarSelectScreen::ScrollCars
+0x4c8b70	canon	9	1102	14	1	6	
 0x4c9240	canon	9	458	12	1	1	
 0x64a28a	canon	9	868	9	1	0	
 0x579750	render	9	946	15	1	1	B AnimationMover::AnimationMover
@@ -8566,7 +8508,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x43ac10	unknown	9	391	14	2	0	
 0x546e60	assets	10	390	13	1	0	R eStreamPackLoader::CreateStreamingPack
 0x482230	camera	10	1203	13	1	0	A DragCameraManager::JoyHandler
-0x4c8b70	canon	10	1102	14	1	6	
 0x4e3320	canon	10	1529	16	1	6	
 0x4f1040	canon	10	957	13	2	0	B FEngine::ProcessResponses
 0x4783c0	car	10	422	10	2	0	B PhysicsMover::IterateForces
@@ -8637,7 +8578,6 @@ addr	system	open_callees	size	callees	callers	strings	prior
 0x513c90	canon	14	1192	24	1	8	
 0x5a4750	canon	14	478	15	2	1	R RCMP_Manager::UpdateFunction
 0x429620	input	14	1117	17	1	0	B Car::CalcForceParameters
-0x4ec5f0	input	14	907	15	1	0	
 0x5bd234	render	14	4782	20	1	3	
 0x5c238d	render	14	1227	15	2	6	
 0x60c503	render	14	823	14	1	2	

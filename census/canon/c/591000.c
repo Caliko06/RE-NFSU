@@ -13869,7 +13869,7 @@ LAB_005a0e91:
   do {
     if (((*pcVar4 == '\0') && (pcVar4[1] != '\0')) &&
        (*(char *)(iVar2 + 0x8884 + unaff_EDI) == '\0')) {
-      uVar5 = FUN_004e93b0(pcVar4);
+      uVar5 = GetEventHashForMagazineThumb(pcVar4);
       Career__AnnounceReward(uVar5);
     }
     iVar2 = iVar2 + 1;
