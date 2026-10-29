@@ -22,7 +22,7 @@ usage: citygraph.py --stats [--radius R]      (default R = 3 m; prints directed 
        citygraph.py --write [--radius R]      (undirected, default R = 10 m: build/openworld_city/TRACKB1010.lzc; the TrackPath is the tour's)
 --noflags counts the flagless section margins as road (the first measurement); the default drops them (node+0x84 drive flags).
 """
-import collections, itertools, json, math, os, struct, sys, time
+import collections, itertools, json, math, os, random, struct, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import tour as T  # noqa: E402  (read_net; also puts tools/hopper and ref/tools on the path)
@@ -365,6 +365,245 @@ def fmt(name, r):
               '%.1f' % r['off_tour_km'] if r['off_tour_km'] is not None else '?', fit))
 
 
+# ---- v2 planner: one-way walker (docs/openworld/re_citygraph.md "v2") -----------------------------------------------------
+# A driver walks every section in ONE direction (d=0 entries forward, d=1 = the transposed graph backward), so the graph the
+# walker sees is directed: node p -> p+1 of every section plus the links a -> b. Its strongly connected part is what a
+# racer can drive for ever. v1 joined only straight continuations (SCC 446 of 3816). v2 (a) offers a link at any angle wherever
+# two runs come within JUNCTION_D metres (cands), (b) orients every run (flip = write its nodes in reverse) and picks the
+# links under the entry budget (<= MAX_ENT // 2 links) by simulated annealing on the size of the biggest strongly connected part.
+JUNCTION_D = 30.0
+LINK_BUDGET = MAX_ENT // 2
+SA_FLIPS_S, SA_LINKS_S = 25.0, 90.0          # seconds of annealing (flips with every link on; flips + link swaps under the budget)
+
+
+def junction_pairs(runs_xy, D):
+    """[(r, p, r2, p2, d)]: per pair of runs, mutually close node pairs (<= D m), one per cluster (3 nodes on both runs)"""
+    grid = collections.defaultdict(list)
+    for r, xs in enumerate(runs_xy):
+        for p, (x, y) in enumerate(xs):
+            grid[(int(x // 25), int(y // 25))].append((r, p))
+    cell = max(1, int(math.ceil(D / 25.0)))
+    found = {}
+    for r, xs in enumerate(runs_xy):
+        for p, (x, y) in enumerate(xs):
+            cx, cy = int(x // 25), int(y // 25)
+            for dx in range(-cell, cell + 1):
+                for dy in range(-cell, cell + 1):
+                    for r2, p2 in grid.get((cx + dx, cy + dy), ()):
+                        if r2 > r:
+                            d = math.hypot(x - runs_xy[r2][p2][0], y - runs_xy[r2][p2][1])
+                            if d <= D:
+                                found.setdefault((r, r2), []).append((d, p, p2))
+    out = []
+    for (r, r2), lst in sorted(found.items()):
+        taken = []
+        for d, p, p2 in sorted(lst):
+            if not any(abs(p - a) <= 3 and abs(p2 - b) <= 3 for a, b in taken):
+                taken.append((p, p2))
+                out.append((r, p, r2, p2, d))
+    return out
+
+
+def cond_scc(L, flip, links):
+    """biggest strongly connected part of the walker's graph, counted in nodes. The graph is condensed to the link ends of each
+    run (the nodes between two ends join the part when both ends do). links: [((r, p), (r2, p2))] in the runs' original order;
+    flip[r] = run r is written reversed. Returns (nodes, component id of the biggest, component of every end, ends)"""
+    pts = collections.defaultdict(set)
+    ol = []
+    for a, b in links:
+        qa = (a[0], L[a[0]] - 1 - a[1] if flip[a[0]] else a[1])
+        qb = (b[0], L[b[0]] - 1 - b[1] if flip[b[0]] else b[1])
+        ol.append((qa, qb))
+        pts[qa[0]].add(qa[1])
+        pts[qb[0]].add(qb[1])
+    idx, vs, adj, gap = {}, [], [], {}
+    for r, ps in pts.items():
+        prev = None
+        for q in sorted(ps):
+            i = len(vs)
+            idx[(r, q)] = i
+            vs.append((r, q))
+            adj.append([])
+            if prev is not None:
+                adj[i - 1].append(i)
+                gap[(i - 1, i)] = q - vs[i - 1][1] - 1
+            prev = q
+    for qa, qb in ol:
+        adj[idx[qa]].append(idx[qb])
+    n = len(vs)
+    index, low, on, stack, comp, ncomp, t = [-1] * n, [0] * n, [False] * n, [], [-1] * n, 0, 0
+    for s0 in range(n):                                   # Tarjan, iterative
+        if index[s0] >= 0:
+            continue
+        work = [(s0, 0)]
+        index[s0] = low[s0] = t
+        t += 1
+        stack.append(s0)
+        on[s0] = True
+        while work:
+            v, i = work.pop()
+            if i < len(adj[v]):
+                work.append((v, i + 1))
+                w = adj[v][i]
+                if index[w] < 0:
+                    index[w] = low[w] = t
+                    t += 1
+                    stack.append(w)
+                    on[w] = True
+                    work.append((w, 0))
+                elif on[w]:
+                    low[v] = min(low[v], index[w])
+            else:
+                if low[v] == index[v]:
+                    while True:
+                        w = stack.pop()
+                        on[w] = False
+                        comp[w] = ncomp
+                        if w == v:
+                            break
+                    ncomp += 1
+                if work:
+                    u = work[-1][0]
+                    low[u] = min(low[u], low[v])
+    wt = [0] * ncomp
+    for i in range(n):
+        wt[comp[i]] += 1
+    for (i, j), g_ in gap.items():
+        if comp[i] == comp[j]:
+            wt[comp[i]] += g_
+    best = max(range(ncomp), key=lambda c: wt[c]) if ncomp else -1
+    return (wt[best] if best >= 0 else 0), best, comp, vs
+
+
+def plan_net(runs_xy, D=JUNCTION_D, budget=LINK_BUDGET, flips_s=SA_FLIPS_S, links_s=SA_LINKS_S, seed=3):
+    """(flip per run, [((r, p), (r2, p2))] directed links in original positions, nodes of the biggest SCC). Phase 1 anneals the
+    orientation with every candidate link (both ways) on; the links that add nothing are dropped, the least useful ones one by one
+    down to the budget; phase 2 anneals flips and link swaps together."""
+    L = [len(x) for x in runs_xy]
+    DL = []
+    for r, p, r2, p2, d in junction_pairs(runs_xy, D):
+        DL.append(((r, p), (r2, p2)))
+        DL.append(((r2, p2), (r, p)))
+    rng = random.Random(seed)
+    flip = [False] * len(L)
+    keep = set(range(len(DL)))
+    W = lambda: cond_scc(L, flip, [DL[i] for i in sorted(keep)])[0]
+    cur = best = W()
+    bf, t0 = flip[:], time.time()
+    while time.time() - t0 < flips_s:
+        temp = 60 * (1 - (time.time() - t0) / flips_s) + 1
+        r = rng.randrange(len(L))
+        flip[r] = not flip[r]
+        s = W()
+        if s >= cur or rng.random() < math.exp((s - cur) / temp):
+            cur = s
+        else:
+            flip[r] = not flip[r]
+        if cur > best:
+            best, bf = cur, flip[:]
+    flip = bf[:]
+    cur = W()
+    for i in rng.sample(sorted(keep), len(keep)):         # links that add nothing
+        keep.discard(i)
+        if W() < cur:
+            keep.add(i)
+    while len(keep) > budget:                             # the least useful one at a time
+        bm = None
+        for i in sorted(keep):
+            keep.discard(i)
+            w = W()
+            keep.add(i)
+            if bm is None or w > bm[0]:
+                bm = (w, i)
+        keep.discard(bm[1])
+    cur = W()
+    out, kl = [i for i in range(len(DL)) if i not in keep], sorted(keep)
+    best, bst, t0 = cur, (flip[:], set(keep)), time.time()
+    while time.time() - t0 < links_s:
+        temp = 25 * (1 - (time.time() - t0) / links_s) + 0.5
+        if rng.random() < 0.3:
+            r = rng.randrange(len(L))
+            flip[r] = not flip[r]
+            s = W()
+            if s >= cur or rng.random() < math.exp((s - cur) / temp):
+                cur = s
+            else:
+                flip[r] = not flip[r]
+        else:
+            ai, bi = rng.randrange(len(kl)), rng.randrange(len(out))
+            a, b = kl[ai], out[bi]
+            keep.discard(a)
+            keep.add(b)
+            s = W()
+            if s >= cur or rng.random() < math.exp((s - cur) / temp):
+                cur, kl[ai], out[bi] = s, b, a
+            else:
+                keep.discard(b)
+                keep.add(a)
+        if cur > best:
+            best, bst = cur, (flip[:], set(keep))
+    flip, keep = bst[0], bst[1]
+    links = [DL[i] for i in sorted(keep)]
+    w, bc, comp, vs = cond_scc(L, flip, links)
+    ends = {v for v, c in zip(vs, comp) if c == bc}     # (run, oriented position) of the link ends inside the SCC
+    inside = lambda a: (a[0], L[a[0]] - 1 - a[1] if flip[a[0]] else a[1]) in ends
+    links = [l for l in links if inside(l[0]) and inside(l[1])]    # a link that leaves the SCC only leads into a dead tail
+    return flip, links, cond_scc(L, flip, links)[0]
+
+
+def scc_of_file(secs, ent):
+    """exact check on the written chunks: nodes of the biggest strongly connected part of 'next node + d=0 links'
+    (the transposed walk of the d=1 entries has the same parts). secs = parse_net's nodes, ent = entries"""
+    off = [0]
+    for ns in secs:
+        off.append(off[-1] + len(ns))
+    N = off[-1]
+    adj = [[] for _ in range(N)]
+    radj = [[] for _ in range(N)]
+    for s, ns in enumerate(secs):
+        for i, nd in enumerate(ns):
+            u = off[s] + i
+            outs = [off[s] + i + 1] if i + 1 < len(ns) else []
+            for k in (0x81, 0x82):
+                if nd[k] != 0xff and ent[nd[k]][0xd] == 0 and ent[nd[k]][0xb] != 3:
+                    e = ent[nd[k]]
+                    outs.append(off[e[9]] + struct.unpack_from('<H', e, 4)[0])
+            for v in outs:
+                adj[u].append(v)
+                radj[v].append(u)
+    seen, order = [False] * N, []
+    for s0 in range(N):
+        if seen[s0]:
+            continue
+        seen[s0] = True
+        st = [(s0, 0)]
+        while st:
+            v, i = st.pop()
+            if i < len(adj[v]):
+                st.append((v, i + 1))
+                w = adj[v][i]
+                if not seen[w]:
+                    seen[w] = True
+                    st.append((w, 0))
+            else:
+                order.append(v)
+    comp, best = [-1] * N, 0
+    for s0 in reversed(order):
+        if comp[s0] >= 0:
+            continue
+        comp[s0] = s0
+        todo, cnt = [s0], 1
+        while todo:
+            for w in radj[todo.pop()]:
+                if comp[w] < 0:
+                    comp[w] = s0
+                    cnt += 1
+                    todo.append(w)
+        best = max(best, cnt)
+    return best, N
+
+
+
 # ---- the writer: TRACKB1010 with the whole-city road net (build/openworld_city) ------------------------------------------
 OUT_DIR = os.path.join(T.B.REPO, 'build', 'openworld_city')
 
@@ -427,17 +666,25 @@ def city_chunks(g):
     """(0x34121 payload, 0x34122 payload, stats): one section per run, one pair of entries per placed link"""
     global PXY
     runs, info = g['runs'], g['info']
+    rev0 = g.get('rev') or [False] * len(runs)
     nets_ = nets()
     st = min(range(len(runs)), key=lambda r: min(math.hypot(info[(n[0], n[1])][0][n[2]][0] - T.START_XY[0],
                                                            info[(n[0], n[1])][0][n[2]][1] - T.START_XY[1]) for n in runs[r]))
     order = [st] + [r for r in range(len(runs)) if r != st]
     runs = [runs[r] for r in order]
+    rev = [rev0[r] for r in order]
     remap = {old: new for new, old in enumerate(order)}
     links = [((remap[a[0]], a[1]), (remap[b[0]], b[1]), ty, lane) for a, b, ty, lane in g['link_list']]
     assert len(runs) <= MAX_SEC, '%d sections > %d' % (len(runs), MAX_SEC)
     xy = lambda n: info[(n[0], n[1])][0][n[2]]
     PXY = {(r, p): xy(n) for r, run in enumerate(runs) for p, n in enumerate(run)}
     placed, dropped = assign_slots(runs, links)
+    if g.get('typed'):                                 # v2: the last way out of each run is forced (type 2: racers always take it,
+        last = {}                                      # sub_462840), so no racer drives on into a dead tail; the others are forks
+        for k, ((ra, pa), _, _, _) in enumerate(placed):    # that a racer may take (type 0, lane 7: the tracks' own 45 forks)
+            if ra not in last or pa > placed[last[ra]][0][1]:
+                last[ra] = k
+        placed = [(a, b, 2, 2) if last[a[0]] == k else (a, b, 0, 7) for k, (a, b, _, _) in enumerate(placed)]
     seglen = [[math.hypot(*[a - b for a, b in zip(xy(run[p + 1]), xy(run[p]))]) for p in range(len(run) - 1)] for run in runs]
     off, cum = route_offsets(runs, placed, seglen)
     secs = []
@@ -452,16 +699,20 @@ def city_chunks(g):
         nodes = []
         for p, (t, sid, i) in enumerate(run):
             nd = bytearray(nets_[t]['secs'][sid]['nodes'][i])
+            if rev[r]:                                  # written against the section's own order: swap what is "next" and "back"
+                for a_, b_, w_ in ((0xc, 0x14, 8), (0x1c, 0x20, 4), (0x24, 0x28, 4), (0x30, 0x34, 4)):
+                    nd[a_:a_ + w_], nd[b_:b_ + w_] = nd[b_:b_ + w_], nd[a_:a_ + w_]
             nd[0x81] = nd[0x82] = 0xff
             nd[0x83] = r
             struct.pack_into('<I', nd, 0x84, struct.unpack_from('<I', nd, 0x84)[0] | (0x1f << 20))
             struct.pack_into('<f', nd, 0x38, off[r] + cum[r][p])
-            if p + 1 < len(run) and run[p + 1] != (t, sid, i + 1):          # a join: new heading and segment lengths
+            d_ = -1 if rev[r] else 1
+            if p + 1 < len(run) and run[p + 1] != (t, sid, i + d_):         # a join: new heading and segment lengths
                 hx, hy = pts[p + 1][0] - pts[p][0], pts[p + 1][1] - pts[p][1]
                 l = math.hypot(hx, hy) or 1.0
                 struct.pack_into('<4f', nd, 0xc, hx / l, hy / l, -hx / l, -hy / l)
                 struct.pack_into('<f', nd, 0x1c, l)
-            if p > 0 and run[p - 1] != (t, sid, i - 1):
+            if p > 0 and run[p - 1] != (t, sid, i - d_):
                 struct.pack_into('<f', nd, 0x20, seglen[r][p - 1])
             nodes.append(nd)
         secs.append((hdr, nodes))
@@ -482,6 +733,24 @@ def city_chunks(g):
     p21 = b''.join(bytes(h) + b''.join(bytes(n) for n in ns) for h, ns in secs)
     return p21, b''.join(ent), dict(sections=len(runs), entries=len(ent), links=len(placed), dropped_links=dropped, kinds=dict(kinds),
                                     nodes=sum(len(r) for r in runs), route_max=round(max(off[r] + cum[r][-1] for r in range(len(runs)))))
+
+
+def orient_net(g):
+    """v2: orient the runs and choose the links (plan_net); keep only the runs the biggest strongly connected part touches (a run
+    with no link is a trap: a walker that enters it stops at its end). Returns g with runs written in walk order, rev flags, typed links"""
+    runs, info = g['runs'], g['info']
+    xy = [[info[(t, sid)][0][i] for t, sid, i in run] for run in runs]
+    flip, links, scc = plan_net(xy)
+    print('plan: SCC %d of %d nodes in %d runs, %d links before the drop of unlinked runs' % (scc, sum(map(len, runs)), len(runs), len(links)), flush=True)
+    used = sorted({a[0] for a, b in links} | {b[0] for a, b in links})
+    new = {r: k for k, r in enumerate(used)}
+    pos = lambda r, p: len(runs[r]) - 1 - p if flip[r] else p
+    g2 = dict(g)
+    g2['runs'] = [runs[r][::-1] if flip[r] else runs[r] for r in used]
+    g2['rev'] = [flip[r] for r in used]
+    g2['link_list'] = [((new[a[0]], pos(*a)), (new[b[0]], pos(*b)), 2, 2) for a, b in links]
+    g2['typed'] = True
+    return g2
 
 
 def parse_net(d):
@@ -537,6 +806,7 @@ def walk_stats(secs, ent, dist=250.0):
 def write(radius=10.0):
     t0 = time.time()
     g = build(radius, True)
+    g = orient_net(g)
     p21, p22, st = city_chunks(g)
     print('city road net:', st, '(%.0fs)' % (time.time() - t0), flush=True)
     tp = T.load(os.path.join(T.B.OUT, 'TRACKB1010.lzc'))          # the TrackPath stays the tour's polyline
@@ -546,6 +816,9 @@ def write(radius=10.0):
     base2 = T.make_base(base, p21, p22, head, body)
     secs, ent = parse_net(base2)
     assert len(secs) == st['sections'] and len(ent) == st['entries']
+    scc, nn = scc_of_file(secs, ent)
+    print('SCC: biggest strongly connected part %d of %d nodes (%.1f%%)' % (scc, nn, 100.0 * scc / nn), flush=True)
+    assert scc >= 0.9 * nn, 'SCC %d < 90%% of %d nodes' % (scc, nn)
     print('walk 250 m from drivable nodes:', walk_stats(secs, ent), flush=True)
     B = T.B
     fences = json.load(open(B.FENCES))
