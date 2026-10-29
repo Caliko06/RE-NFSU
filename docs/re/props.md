@@ -18,7 +18,7 @@ Prior notes in Spanish: docs/openworld/re_props.md (this doc re-checks them and 
 - Reset: `0x595bf0` frees and rebuilds both pools at track load; `0x595d80` makes the Virgins; saved/restored per
   slot by `0x595f70`/`0x596f50` (index 0xffff = none). V (H+G for `0x595bf0`, `0x595f70`, `0x596f50`; G+C for `0x595d80`).
 
-## Data (chunks in TRACKB<id>.lzc, loader 3 `0x5952a0` -> array `0x734470`, count `0x734474`)
+## Data (chunks in TRACKB<id>.lzc, loader index 29 of the table at `0x7007e0` = `0x5952a0` (an earlier draft said "loader 3", wrong; index 3 is `0x442040`; external audit 2026-10-29) -> array `0x734470`, count `0x734474`)
 Instance `0x34027` (0x70): +0 class key, +4 s16 section id, +6 s16 placement index in the section, +8 model hash,
 +0xc runtime Virgin pointer, +0x10/+0x20 AABB min/max, +0x30 4x4 world matrix, +0x60 translation (= placement
 position, error < 0.01 over 4,580). V F.

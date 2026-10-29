@@ -356,7 +356,8 @@ KNOWN = {
 out = {"functions": len(entries), "cases": dict(res), "compared_stop_kinds": dict(stops),
        "functions_compared": len(compared), "functions_all_match": len(compared - failed),
        "all_match_by_seed": dict(collections.Counter(seed.get(e, "?") for e in compared - failed)),
-       "functions_with_mismatch": len(failed), "mismatch_funcs": sorted(hex(e) for e in failed), "mismatches": bad}
+       "functions_with_mismatch": len(failed), "mismatch_funcs": sorted(hex(e) for e in failed), "mismatches": bad,
+       "compared_funcs": sorted(hex(e) for e in compared)}   # per-function list: tools/census/scoreboard.py diff-tested column
 out["known_reference_deviations"] = {hex(k): v for k, v in KNOWN.items() if k in failed}
 out["gate"] = "pass" if failed <= set(KNOWN) else "FAIL"
 if not ONLY:

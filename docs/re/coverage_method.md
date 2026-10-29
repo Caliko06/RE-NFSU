@@ -38,3 +38,5 @@ Not run: career events past the career0 prologue, other tracks, pause/replay, th
 ## Limits
 Entry of a function, not instructions inside it. ABK modules (`M_` functions, build/gen/abk.c) are not counted. Threads
 write the map without a lock (byte stores). A run killed by the OS writes nothing.
+
+Copies of the 12 raw bitmaps (3,444 B each: header, `entered`, `seen by rn_call`) are kept in census/cov/bitmaps/ so the union can be rebuilt after build/ is cleaned (external audit 2026-10-29: census/cov/<s>.json keep only counts).

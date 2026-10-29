@@ -1,1040 +1,1040 @@
-addr	name	system	confidence	tool	doc	from
-0x4010e0	SetSpecialCameraFlag	blur	I	C	docs/re/blur.md	blur
-0x402820	Particle_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x4028f0	Particle_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x402b40	ParticleEmitter_Bind	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x402bd0	ParticleEmitter_Queue	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x407db0	Texture::CreateD3D	assets	V	Ghidra FUN_00407db0 + capstone	docs/re/assets.md	assets
-0x408010	Texture::ReleaseD3D	assets	V	Ghidra FUN_00408010	docs/re/assets.md	assets
-0x409580	RenderFrameMain	blur	V	G+H+C	docs/re/blur.md	blur
-0x409b70	LightStreakPath	blur	U	C	docs/re/blur.md	blur
-0x40a7f0	SetBlurCameraObject	blur	V	C	docs/re/blur.md	blur
-0x40a880	NullUpdate_ret	camera	V	C	docs/re/camera.md	camera
-0x40a890	SceneRTCreate	blur	V	G+C	docs/re/blur.md	blur
-0x40abd0	SceneRTSelect	blur	V	C	docs/re/blur.md	blur
-0x40b3f0	RenderSetupBlurFlags	blur	V	G+C	docs/re/blur.md	blur
-0x40b4e0	ReleaseSceneRTs	blur	I	C	docs/re/blur.md	blur
-0x40c690	Mesh_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x40c840	Mesh_Free	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x40cb80	BlurCreateRTs	blur	V	G+C	docs/re/blur.md	blur
-0x40cce0	BlurReleaseRTs	blur	I	C	docs/re/blur.md	blur
-0x40cd40	SpeedBlurPass	blur	V	G+H+C	docs/re/blur.md	blur
-0x40d090	BlurStreakPass4Tap	blur	V	G+H+C	docs/re/blur.md	blur
-0x40d370	BlurDownsample4Tap	blur	V	G+C	docs/re/blur.md	blur
-0x40d6e0	BlurComposite	blur	V	G+C	docs/re/blur.md	blur
-0x40dd00	BuildProjection	camera	I	C	docs/re/camera.md	camera
-0x4175c0	LinearTable::Init	rivals	I	capstone	docs/re/rivals.md	rivals
-0x417600	RideInfo::Init	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x41c420	Config::OpenCfgFile	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41c680	Settings::Load	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41c7a0	Settings::Save	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41cf40	Profile::CreateNew	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41d030	Profile::Load	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41d0d0	SaveSlot::Exists	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41d140	ProfileList::Load	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41d2a0	ProfileList::Touch	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41d650	ProBlob::Write	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41d770	ProBlob::Read	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41d8a0	Ugd::Write	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41da40	Ugd::Read	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41db70	Ugd::ReadHeader	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41dc10	Save::BuildPath	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41dd10	Adler32	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41dd60	Profile::Delete	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41e200	Opt::Write	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x41e330	Opt::Read	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x420050	SlowMoStart	camera	I	C	docs/re/camera.md	camera
-0x421a30	SpecialCamCooldown	camera	I	C	docs/re/camera.md	camera
-0x422410	Grid::BuildRacerCar	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x422580	Grid::GetStartPositions	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
-0x422a70	Grid::PlaceAllRacers	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x426110	Car_SetMode	traffic	U	H+G	docs/re/traffic.md	traffic
-0x426930	JumpCamTrigger	camera	V	G+C	docs/re/camera.md	camera
-0x429b10	Racer::UpdateTwoHumanCatchUp	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x429cf0	JumpCamPredict	camera	I	C	docs/re/camera.md	camera
-0x42ab50	IsCar1099InMode4	other	U	ghidra+hopper	docs/re/tuning.md	tuning
-0x42ae10	TrackRow_Current	traffic	V	H+G	docs/re/traffic.md	traffic
-0x42ae20	SpawnRecord_Get	traffic	V	H+G	docs/re/traffic.md	traffic
-0x42ae30	SpawnRecord_Count	traffic	V	H+G	docs/re/traffic.md	traffic
-0x42c3c0	Player::CreateRearViewMirror_call	camera	V	C	docs/re/camera.md	camera
-0x42c4b0	JumpCamBuildSpline	camera	I	C	docs/re/camera.md	camera
-0x42c670	Player::DefaultDriveCamera	camera	V	G+C	docs/re/camera.md	camera
-0x42c6d0	Player::ChangeCameraMover	camera	V	G+C	docs/re/camera.md	camera
-0x42d2f4	ChangeCameraMover_JumpTable	camera	V	G+C	docs/re/camera.md	camera
-0x42d330	ChangeCameraMover_IndexTable	camera	V	C	docs/re/camera.md	camera
-0x42d520	Player::SetInputMode	camera	I	C	docs/re/camera.md	camera
-0x42da40	Player::StartSpecialCamera	camera	V	G+C	docs/re/camera.md	camera
-0x42ddc0	Player::EndSpecialCamera	camera	V	G+C	docs/re/camera.md	camera
-0x42df30	DebugCameraCycler	camera	I	C	docs/re/camera.md	camera
-0x42e020	Player::CyclePOV	camera	V	G+C	docs/re/camera.md	camera
-0x42e450	Player::LookBackToggle	camera	I	C	docs/re/camera.md	camera
-0x430730	Player::StartRaceCameras	camera	I	C	docs/re/camera.md	camera
-0x431960	SpecialCamCaller_431960	camera	I	C	docs/re/camera.md	camera
-0x431a2e	JoyEvent_CAMERA_POV_CHANGE_case	camera	V	C+D	docs/re/camera.md	camera
-0x4322a0	RaceStatus::AddEntrant	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals
-0x432360	DriverInfo::operator=	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4323f0	RideInfo::operator=	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x435fe0	ModeFlags_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x436000	ModeFlags_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x436020	ModeFlags_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x43db70	Zone_FindTrafficDensity	traffic	I	G+H	docs/re/traffic.md	traffic
-0x43eb00	RaceManager::UpdateAIScores	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x43feb0	TrackMarker_Count	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x43fef0	TrackMarker_Get	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x441380	TrackCollision_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x441480	TrackCollision_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x441ed0	TrackPositionMarker_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x441f40	TrackPositionMarker_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x441fe0	TrackRow_FindById	traffic	V	G+C	docs/re/traffic.md	traffic
-0x442010	TrackInfo_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x442040	TrackInfoTable_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x442080	TrackInfoTable_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x442100	RoadIntersection_Get	traffic	V	H+G	docs/re/traffic.md	traffic
-0x442150	RoadEntries_FillDistances	traffic	I	H	docs/re/traffic.md	traffic
-0x4424d0	Node_IsDriveFwd	traffic	I	G	docs/re/traffic.md	traffic
-0x442520	Node_IsDriveBack	traffic	I	G	docs/re/traffic.md	traffic
-0x442950	Section_HasLane	traffic	V	G+H	docs/re/traffic.md	traffic
-0x442b70	RoadSections_Parse	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x442bd0	RoadSections_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x442dd0	RoadNetwork_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x442e60	RoadNetwork_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x442ed0	RoadEntries_Sort	traffic	I	H	docs/re/traffic.md	traffic
-0x4430b0	RoadNetwork_PostLoad	traffic	I	H	docs/re/traffic.md	traffic
-0x4432a0	TrackPath::BuildSplines	assets	V	Hopper sub_4432a0	docs/re/assets.md	assets
-0x4433f0	TrackPath::FreeSplines	assets	V	Hopper sub_4433f0	docs/re/assets.md	assets
-0x443450	TrackPath::Init	assets	V	Hopper sub_443450 + capstone	docs/re/assets.md	assets
-0x4434d0	TrackPath::Parse	assets	V	Hopper sub_4434d0 + Ghidra FUN_004434d0: H+G agree	docs/re/assets.md	assets
-0x4436d0	Zone_Find	traffic	I	G	docs/re/traffic.md	traffic
-0x4441f0	TrackPath::Loader	assets	V	Hopper sub_4441f0 + Ghidra make FUN_004441f0: H+G agree	docs/re/assets.md	assets
-0x444200	TrackPath::Unloader	assets	V	Hopper sub_444200 + Ghidra make FUN_00444200: H+G agree	docs/re/assets.md	assets
-0x4442a0	StreamSections::Loader	assets	V	Hopper sub_4442a0 + Ghidra make FUN_004442a0: H+G agree	docs/re/assets.md	assets
-0x4442f0	StreamSections::Unloader	assets	V	Hopper sub_4442f0 + Ghidra make FUN_004442f0: H+G agree	docs/re/assets.md	assets
-0x445350	StreamSections::Shutdown	assets	V	Ghidra make FUN_00445350	docs/re/assets.md	assets
-0x4457c0	StreamSection_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x445b00	Section::SyncSmackableVisibility	props	I	capstone	docs/re/props.md	props
-0x445b60	StreamSection_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x446aa0	StreamBoundaries_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x446ab0	StreamBoundaries_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x446db0	StreamBoundaries_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x447160	InitZDirArchive	assets	V	hopper	docs/re/assets.md	assets
-0x447ab0	PaddingChunk::Loader	assets	V	capstone	docs/re/assets.md	assets
-0x447ac0	bChunkLoader::LoadChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x447b10	bChunkLoader::UnloadChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x447c00	PlaceChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x447d90	LoadResourceChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x447f40	InitResourceFileSlotPool	assets	V	hopper	docs/re/assets.md	assets
-0x447f90	ResourceFile::ResourceFile	assets	V	hopper	docs/re/assets.md	assets
-0x448110	ResourceFile::BeginLoading	assets	V	hopper	docs/re/assets.md	assets
-0x4481d0	ResourceFile::UnloadChunks	assets	V	hopper	docs/re/assets.md	assets
-0x448220	ResourceFile::FinishLoading	assets	V	hopper	docs/re/assets.md	assets
-0x4482e0	ResourceFile::OnReadDone	assets	V	hopper	docs/re/assets.md	assets
-0x4482f0	CreateResourceFile	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x448370	UnloadResourceFile	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x4483c0	ServiceResourceLoading	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x448440	FindResourceFile	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x448600	GameFlow::LoadGlobalA	assets	V	hopper	docs/re/assets.md	assets
-0x448650	GameFlow::LoadGlobalB	assets	V	hopper	docs/re/assets.md	assets
-0x448b10	GameFlow::LoadingFrontEndPart1	assets	V	hopper	docs/re/assets.md	assets
-0x448f70	GameFlow_CreateRides	traffic	I	H	docs/re/traffic.md	traffic
-0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	V	hopper	docs/re/assets.md	assets
-0x449765	GameFlow::LoadingTrackSpecificPart1	assets	V	hopper	docs/re/assets.md	assets
-0x44aa10	AIGoal::Create	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals
-0x44bd10	RacerAI::UpdateRubberBand	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x44c010	RacerAI::GetCatchUpTerms	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
-0x44c2e0	TrafficCar_HonkAtPlayer	traffic	I	H	docs/re/traffic.md	traffic
-0x44c550	RacerAI::UpdateDesiredSpeed	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x44ca10	Racer::GetSkillLevel	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals
-0x44d570	Node_GetIntersection	traffic	V	H+G+file	docs/re/traffic.md	traffic
-0x44d8b0	RaceGoal::SelectAction	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
-0x44dd30	DragGoal::SelectAction	rivals	I	Ghidra+capstone	docs/re/rivals.md	rivals
-0x44e020	TrafficGoal_Select_BeTraffic	traffic	V	H+C	docs/re/traffic.md	traffic
-0x44e140	TrafficGoal_Select_BeAmbient	traffic	V	H+C	docs/re/traffic.md	traffic
-0x44efd0	TrafficCar_IsIntersectionObstacle	traffic	I	G	docs/re/traffic.md	traffic
-0x453920	Finder_AvoidAsTraffic	traffic	I	H	docs/re/traffic.md	traffic
-0x453c60	Action_AvoidAvoidableAsTraffic::Update	traffic	I	H	docs/re/traffic.md	traffic
-0x4543d0	Finder_ObeyIntersections	traffic	V	G	docs/re/traffic.md	traffic
-0x454490	Action_ObeyTrafficIntersections::Update	traffic	I	G	docs/re/traffic.md	traffic
-0x4563d0	RoadGraph_Walk	traffic	I	H+C	docs/re/traffic.md	traffic
-0x458bd0	RoadPath_LinkAccepted	traffic	I	H	docs/re/traffic.md	traffic
-0x45d640	Racer::GetDirection	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals
-0x462070	RacerAITuning::Loader	assets	V	Hopper sub_462070 + Ghidra make FUN_00462070: H+G agree	docs/re/assets.md	assets
-0x4620a0	RacerAITuning::Unloader	assets	V	Ghidra make FUN_004620a0 (Hopper export lacks it)	docs/re/assets.md	assets
-0x4623d0	Racer::ChooseGoal	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals
-0x462740	Racer::PersonalityDraw	rivals	V	capstone	docs/re/rivals.md	rivals
-0x462840	Racer::ShouldTakeFork	rivals	I	capstone	docs/re/rivals.md	rivals
-0x462aa0	Racer::GetUnstuckReady	rivals	I	capstone	docs/re/rivals.md	rivals
-0x465d00	SpecialCamCaller_465d00	camera	I	G+C	docs/re/camera.md	camera
-0x466840	Virtual::ReturnOne (float constant getter)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x468800	CarBody_DisableCountInc	traffic	U	H+G	docs/re/traffic.md	traffic
-0x469580	WorldObjects::Broadphase	props	V	hopper+ghidra	docs/re/props.md	props
-0x469670	WorldObjects::TestObject	props	I	ghidra+capstone	docs/re/props.md	props
-0x46d390	DriveTrain::DriveTrain	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4727c0	GJKWitness::Initialize	car.physics	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x472b00	CarShape_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x472b30	CollisionShapes::LoadChunk	props	I	hopper	docs/re/props.md	props
-0x472c00	CarShape_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x472c60	CarShape_Find	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x473cf0	CollisionShapes::DefaultBox	props	I	hopper+ghidra	docs/re/props.md	props
-0x473fc0	SelectDriveClassTuningRow (not GetUpgradeLevel)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4740d0	MellowMover::MellowMover	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x475070	Mellovator::Mellovator	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x476840	PhysicsMover::PhysicsMover	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x47af20	AnimBank_DynamicLoad	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47b7b0	PostRaceScene_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x47b7f0	PostRaceScene_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x47b890	NisScene_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47b8d0	NisScene_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47ce50	AnimBank_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47ced0	AnimBank_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47d070	Camera::SetCameraMatrix	blur	V	C+M	docs/re/blur.md	blur
-0x47d680	FindCameraRow	camera	V	G+H+C	docs/re/camera.md	camera
-0x47dcd0	CameraTables_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47de30	CameraTables_LoadChildren	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x47df00	CameraTables_Unload_Impl	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47e230	CameraTables_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47e250	CameraTables_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x47edb0	CountdownCameraCoordinator::ctor	camera	I	M+C	docs/re/camera.md	camera
-0x47ef00	IntroNisCoordinator	camera	I	M+C	docs/re/camera.md	camera
-0x482f00	DragCameras::Parse	assets	V	Ghidra make FUN_00482f00	docs/re/assets.md	assets
-0x483080	DragCameras::Loader	assets	V	Ghidra make FUN_00483080 (Hopper export lacks it)	docs/re/assets.md	assets
-0x4830b0	DragCameras::Unloader	assets	V	Hopper sub_4830b0 + Ghidra make: H+G agree	docs/re/assets.md	assets
-0x4834e0	CameraMover::ctor	camera	I	M	docs/re/camera.md	camera
-0x483640	Camera::ApplyNoise	camera	I	M+C	docs/re/camera.md	camera
-0x483860	CameraMover::ComputeBankedUpVector	camera	I	M	docs/re/camera.md	camera
-0x4838e0	CameraMover::EnforceMinGapToWalls	camera	V	G+C	docs/re/camera.md	camera
-0x4840c0	OrbitCarCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera
-0x4852a0	RearViewMirrorCameraMover::ctor	camera	V	C+D+M	docs/re/camera.md	camera
-0x4852e0	CameraMover::TrivialDtor	camera	I	D	docs/re/camera.md	camera
-0x485300	RearViewMirrorCameraMover::Update	camera	V	C+M	docs/re/camera.md	camera
-0x4854e0	TrackCarCameraMover::ctor	camera	I	G+M	docs/re/camera.md	camera
-0x485c00	TrackCarCameraMover::Update	camera	I	G+M	docs/re/camera.md	camera
-0x486c80	SelectCarCameraMover::ctor	camera	I	M	docs/re/camera.md	camera
-0x488420	DebugWorldCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera
-0x4892c0	NullCameraMover::ctor	camera	V	C+D	docs/re/camera.md	camera
-0x489360	DriveCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera
-0x489600	DriveCameraMover::OutsidePOV	camera	I	C	docs/re/camera.md	camera
-0x489650	DriveCameraMover::IsWallFlag	camera	I	C	docs/re/camera.md	camera
-0x489690	DriveCameraMover::Update	camera	V	G+H+C	docs/re/camera.md	camera
-0x48afd0	CubicCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera
-0x48c1f0	CameraMover_Type12::ctor	camera	I	G+C	docs/re/camera.md	camera
-0x48c280	DragRaceCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera
-0x48c990	DragRaceLeaderCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera
-0x48d6e0	DragRaceAheadCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera
-0x48e210	AnimationControllerCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera
-0x48f090	ZoneFreezeCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera
-0x490ea0	ZonePreviewCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera
-0x49fe10	HudElement::RegisterImage	fe	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4a5a30	EngineTempGauge::BuildTempBarImageList	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4aa4d0	Player::Init	canon	I	capstone	docs/re/canon.md	canon
-0x4aaad0	Opt::Serialize	canon	V	capstone	docs/re/canon.md	canon
-0x4aac70	Opt::Deserialize	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x4ab120	Ugd::PackBlock	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x4ab200	Ugd::UnpackBlock	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x4ab510	RaceOptions_Get	traffic	U	C+H	docs/re/traffic.md	traffic
-0x4ac0f0	cFrontendDatabase::BuildRideForCarHandle	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4ac460	CustomizationDB::Init	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x4ac5a0	FECarConfig::BuildRide	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4ac750	FECarConfig::FillFromRide	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4acce0	FECarConfig::GetCarType	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4ae650	DrawEmitters	blur	I	C	docs/re/blur.md	blur
-0x4af0e0	GarageCarLoader::LoadRideInfo	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4af140	GarageCarLoader::Update	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4af420	GetGarageCarLoader	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4af620	GarageMainScreen::GarageMainScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4afe20	GarageMainScreen::~GarageMainScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4aff90	GarageMainScreen::UpdateCarStatisticsBars	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4b0e50	GarageMainScreen::SetRideInfo	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4b0fd0	GarageMainScreen::DisplayReputation	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4b1530	GarageMainScreen::SetCarType	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4b1590	GarageMainScreen::CarLoadingHasStarted	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4b25b0	PresetRide::Loader	assets	V	Hopper sub_4b25b0 + Ghidra make FUN_004b25b0: H+G agree	docs/re/assets.md	assets
-0x4b2600	PresetRide::Unloader	assets	V	Ghidra make FUN_004b2600 (Hopper export lacks it)	docs/re/assets.md	assets
-0x4b2640	PresetRide::FindByKeyHash	rivals	I	capstone	docs/re/rivals.md	rivals
-0x4b2660	PresetRide::FindByHash	assets	V	Hopper sub_4b2660	docs/re/assets.md	assets
-0x4b26f0	PresetRide::ApplyToRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x4b3a20	Race::PickOpponentNames	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals
-0x4b3ac0	Race::SpawnTraffic	traffic	V	H+G+C+file	docs/re/traffic.md	traffic
-0x4b3c60	Race::BuildRandomOpponentRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x4b4040	Race::SpawnOpponents	canon	V	ghidra	docs/re/canon.md	canon
-0x4b4380	Race::MatchOpponentRatings	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals
-0x4b4590	Race::RollOpponentSkill	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals
-0x4b4610	Race::ShuffleGrid	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals
-0x4b47a0	ApplyOptionsToPlayerSettings	camera	V	G+C	docs/re/camera.md	camera
-0x4b49e0	RaceSetup_Circuit	traffic	I	H	docs/re/traffic.md	traffic
-0x4b5df0	Career::StartRaceFromEvent	canon	V	ghidra+capstone	docs/re/canon.md	canon
-0x4b6300	Race::SetPlayerGridSlot	canon	V	ghidra	docs/re/canon.md	canon
-0x4bbd70	CarPart::GetNameAttribute	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4be6c0	OptionsCameraUI	camera	I	C	docs/re/camera.md	camera
-0x4c2a50	GetCarModelNameHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4c2b00	GetSecondaryLogoHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4c40a0	(unknown garage screen)::NotificationMessage	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4c4920	EventMap::SetModeIcon	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x4c49f0	EventMap::GetModeLabelHash	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x4c4c60	EventMap::ShowEventSummary	canon	V	ghidra	docs/re/canon.md	canon
-0x4c55f0	Briefing::GetHostName	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x4c5680	Briefing::Build	canon	V	ghidra	docs/re/canon.md	canon
-0x4c5ce0	Briefing::ShowDescription	canon	V	ghidra	docs/re/canon.md	canon
-0x4c5f20	Briefing::HasRequiredRideRating	canon	V	capstone+ghidra+hopper	docs/re/canon.md	canon
-0x4c6970	GetCarManufacturerNameHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4c6bc0	UndergroundJunkmanGiveth::vslot3 (swallow-input filter)	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4c6c00	GetJunkmanRewardSpeech	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4c6cb0	UndergroundJunkmanGiveth::UndergroundJunkmanGiveth	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4c7150	UndergroundJunkmanGiveth::ApplyJunkmanPartToEditingRide	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4c7670	CreateUndergroundJunkmanGiveth	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4d77a0	GetPartColor	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4d7980	ColorElement::SetPart	fe	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4d7eb0	IsPaintLocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4d8180	IsPaintOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4d8270	IsLevel2PaintsOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4d82f0	IsLevel3PaintsOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4d8440	ColorPicker::GetHighestUpgradeLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4d9fa0	GetDefaultVinylColors	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4deaa0	BootMovieScreen::BootMovieScreen	canon	V	hopper	docs/re/canon.md	canon
-0x4e1c60	MPChooseGarageScreen::~MPChooseGarageScreen	fe	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e1c90	CreateMPChooseGarageScreen	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e1cf0	MPChooseGarageScreen::MPChooseGarageScreen	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e2030	MPChooseGarageScreen::NotificationMessage	fe	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e24a0	ComputeVinylIconHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e2680	IsHiddenUnique	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e27e0	IsSamanthaUnique	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e28d0	FilterVinylPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e45b0	GarageVinylTypeScreen::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e4610	GarageVinylTypeScreen::OptionChosen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e4840	GarageVinylTypeScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e4ae0	CreateVinylTypeScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e4c40	GarageVinylGroupScreen::GarageVinylGroupScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e5590	GarageVinylGroupScreen::OptionChosen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e55b0	GarageVinylGroupScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e5700	GarageVinylBrowserScreen::GarageVinylBrowserScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e5df0	GarageVinylBrowserScreen::~GarageVinylBrowserScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e6030	GarageVinylBrowserScreen::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e61f0	GarageVinylBrowserScreen::OptionChosen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e62b0	IsVinylUnlocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e6390	GarageVinylBrowserScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e6600	CreateGarageVinylBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e79e0	GaragePresetsScreen::~GaragePresetsScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e7a40	GaragePresetsScreen::GaragePresetsScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e7c80	GaragePresetsScreen::Redraw	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e7f60	GaragePresetsScreen::LoadPreset	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e8120	CreateGaragePresetsScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4e9e90	UrlRankScreen::Show	canon	V	ghidra	docs/re/canon.md	canon
-0x4f3a00	FEPackage::FEPackage	assets	V	Ghidra make FUN_004f3a00	docs/re/assets.md	assets
-0x4f4120	FEngLibrary::AddPackage	assets	V	Hopper sub_4f4120 + Ghidra make: H+G agree	docs/re/assets.md	assets
-0x4f4190	FEngLibrary::RemovePackage	assets	V	Ghidra make FUN_004f4190	docs/re/assets.md	assets
-0x4f4290	FEngPackage::Loader	assets	V	Ghidra make FUN_004f4290 (Hopper export lacks it; capstone agrees)	docs/re/assets.md	assets
-0x4f42c0	FEngPackage::Unloader	assets	V	Hopper sub_4f42c0 + Ghidra export FUN_004f42c0: H+G agree	docs/re/assets.md	assets
-0x4f4420	FEngFont_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x4f4470	FEngFont_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x4f44c0	FEngFont_Init	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x4f46c0	FEngFont_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x4f57a0	MoviePlayer::BuildPath	canon	V	hopper	docs/re/canon.md	canon
-0x4f62f0	FEngPushGarageMainPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x4f7840	MovieNameToId	canon	V	hopper+capstone	docs/re/canon.md	canon
-0x504260	GarageManager::GetMsgForNumScreensInList	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5042d0	GarageManager::GetMsgForUpgradeLevel	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x504320	GarageManager::PushScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x504390	GarageManager::PopScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x504450	GarageManager::PreviewPart	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5044b0	GarageManager::InstallPart	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x504550	GetBrakeForPerfUpgrade	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x504630	FindPartWithLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5046d0	GarageManager::PreviewPhysicsUpgrade	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5047d0	GarageManager::InstallPhysicsUpgrade	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x504890	GarageManager::SyncActualToEditing	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5048e0	ShowHideNewlyUnlockedMarker(int)	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x504be0	GarageScreen::GarageScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x505330	GarageScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5055c0	GarageChooseVisualCategoryScreen::~GarageChooseVisualCategoryScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x505660	CreateGarageVisualCategoryScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x506090	GarageCategoryVisual::~GarageCategoryVisual	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x506100	CreateGarageCategoryVisual	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x506210	GarageCategoryVisual::GarageCategoryVisual	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x506ca0	GarageCategoryVisual::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x506db0	GarageCategoryVisual::RefreshGrayedThumbsForWidebodyConflict	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x506e10	GarageCategoryVisual::ScrollPickables	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x506eb0	GarageCategoryVisual::GetNumPartsAvailable	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x507340	IsMagicSpoilerSpecialCase	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5074d0	IsMagicSpoilerToHide	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x507e10	GaragePartsBrowser::IsPartLocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x507ec0	GaragePartsBrowser::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x508510	GaragePartsBrowser::CanPlayerPurchasePart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x508560	GaragePartsBrowser::IsInstallingPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x508620	GaragePartsBrowser::IsBuyingPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5089b0	GaragePartsBrowser::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x509570	PerfStatsScreen::SetupUpgrades	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x509d10	CreateGaragePerfCategory	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x509d70	IsPerformanceUpgradeLocked	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50a070	ChooseGaragePerfPath::AddCategory	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50a1a0	ChooseGaragePerfPath::RedrawHeading	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50a3c0	ChooseGaragePerfPath::NotificationMessage	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50a570	CreateGaragePerfTuner	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50a5d0	GaragePerfTuner::GaragePerfTuner	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50a9a0	GaragePerfTuner::~GaragePerfTuner	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50aa90	GaragePerfTuner::IsUpgradeLocked	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50ada0	GaragePerfTuner::RedrawHeading	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50b610	GaragePerfBrandPackage::~GaragePerfBrandPackage	car.tuning	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50b680	CreateGaragePerfBrand	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50b6e0	GaragePerfBrandPackage::GaragePerfBrandPackage	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50b9e0	GaragePerfBrandPackage::RedrawHeading	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50bc10	GaragePerfBrandPackage::NotificationMessage	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c020	GaragePaintModScreen::~GaragePaintModScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c090	CreateGaragePaintModScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c0f0	GaragePaintModScreen::GaragePaintModScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c3c0	GaragePaintModScreen::AddCategory	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c430	GaragePaintModScreen::ScrollPickables	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c4d0	GaragePaintModScreen::RedrawHeading	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c530	GaragePaintModScreen::MoveBackPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c590	GaragePaintModScreen::MoveForwardPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c5f0	GaragePaintModScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50ce30	GarageRimsBrandBrowser::AddPickable	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50cf90	GarageRimsBrandBrowser::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50d010	GarageRimsBrandBrowser::NotificationMessage	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50d0a0	CreateGarageRimsBrandScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50d2b0	GarageRimsBrowser::ScrollPickables	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50d420	GarageRimsStyleBrowser::GarageRimsStyleBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50dc60	GarageRimsStyleBrowser::NotificationMessage	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50df60	GarageRimsStyleBrowser::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50e6f0	CreateGarageRimsStyleScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50e750	GarageRimsBrowser::~GarageRimsBrowser	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50e7c0	GarageRimsBrowser::GarageRimsBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50e890	GarageRimsBrowser::BuildPickablesList	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50f200	GarageRimsBrowser::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50f780	GarageRimsBrowser::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50f990	CreateGarageRimsBrowserScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50faa0	CreateDecalZoneChooseScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50fb00	GarageDecalsZone::GarageDecalsZone	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50fe70	GarageDecalsZone::AddPickable	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x50fee0	GarageDecalsZone::ScrollPickables	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x50ff80	GarageDecalsZone::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x510600	GarageDecalLayout::~GarageDecalLayout	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x510670	CreateDecalSizeChooseScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5106d0	GarageDecalLayout::GarageDecalLayout	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x510860	GarageDecalLayout::ScrollPickables	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x510900	GarageDecalLayout::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x510980	GarageDecalLayout::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x510d60	CreateDecalSlotChooseScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x510f50	GarageDecalsSlot::GarageDecalsSlot	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x511aa0	CreateDecalBrandChooseScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x511b00	IsBlackDecal	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x511b70	IsWhiteDecal	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x511bf0	BuildDecalList	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x511ff0	GarageDecalsBrand::GarageDecalsBrand	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x512690	GarageDecalsBrand::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x512c40	GarageChooseAccessoryCategoryScreen::~GarageChooseAccessoryCategoryScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x512cb0	CreateGarageAccessoryCategoryScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x512d10	GarageChooseAccessoryCategoryScreen::GarageChooseAccessoryCategoryScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x513210	GarageChooseAccessoryCategoryScreen::AddCategory	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x513310	GarageChooseAccessoryCategoryScreen::RedrawHeader	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x51ad30	Career::AnnounceReward	canon	I	ghidra+capstone	docs/re/canon.md	canon
-0x51bd70	CarDecalSlots::Loader	assets	V	Hopper sub_51bd70 + Ghidra make FUN_0051bd70: H+G agree	docs/re/assets.md	assets
-0x51bdc0	CarDecalSlots::Unloader	assets	V	Hopper sub_51bdc0 + Ghidra make FUN_0051bdc0: H+G agree	docs/re/assets.md	assets
-0x51be80	GarageRimsBrandBrowser::~GarageRimsBrandBrowser	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x51c180	MagazineTables::Loader	assets	V	Hopper sub_51c180 + Ghidra make FUN_0051c180: H+G agree	docs/re/assets.md	assets
-0x51c340	MagazineTables::Unloader	assets	V	Hopper sub_51c340 + Ghidra make FUN_0051c340: H+G agree	docs/re/assets.md	assets
-0x51c5f0	EAXSound::ReloadLanguageSpeechBank (called by ChangeLanguage 0x59fa20)	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x51c830	EAXSound::PlaySpeechStream	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x51cd60	EAXSound::InitializeDriver	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x51ce40	EAXSound::InitializeInGame	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x51cf40	EAXSound::InitializeFrontEnd	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x51d240	EAXSound::Update	audio.engine	V	ghidra+hopper	docs/re/sound.md	sound
-0x51da90	EAXSound::LoadFrontEndSoundBanks	audio.bank	V	ghidra+hopper	docs/re/sound.md	sound
-0x51dd70	EAXSound::UnloadFrontEndSoundBanks	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x51dec0	EAXSound::LoadInGameSoundBanks	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x51ec40	EAXSound::UnLoadInGameSoundBanks	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x51ee20	EAXSound::EnterPauseMenu	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x520b90	EAXSound::UpdateLoopedMusic (FE looped music Csis class FEDriveOn)	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x520e90	EAXSound::InitEATraxMasks	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x5212e0	EAXAemsManager::Initialize	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x521c80	EAXAemsManager::SetCurrentBankPath (bank name resolver)	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x522020	EAXAemsManager::LoadAemsBank	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x522440	EAXMod::Pause (guard only: SND enter/leave critical)	audio.sfx	I	ghidra	docs/re/sound.md	sound
-0x5225c0	EAXS_3DMixer::UpdateMasterVolume (virtual, base)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x522e50	EAXFrontEnd::PlayDriveOnSnd	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5234a0	EAXAITunerCar::Destroy	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x5234c0	EAXAITunerCar::Initialize	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x523540	EAXAITunerCar::HasFX	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x523560	EAXAITunerCar::RotationUpdate	audio.engine	I	ghidra	docs/re/sound.md	sound
-0x5235a0	EAXAITunerCar::UpdateEngineVol	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x5236c0	EAXAITunerCar::SFXMessage (thunk to EAXTunerCar::SFXMessage 0x526af0)	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x523910	EAXAITunerCar::UpdateTireSounds (not EAXTires)	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x523990	EAXAITunerCar::BeginUpShift	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x523a70	EAXAITunerCar::BeginDownShift	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x523b30	EAXAITunerCar::UpdateTorque	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x523e30	EAXAITunerCar::UpdateGearShiftState (map names are swapped with 0x529530)	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x524130	EAXAITunerCar::UpdateTurboFX	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x524240	EAXAITunerCar::UpdateNIS	audio.nis	I	ghidra	docs/re/sound.md	sound
-0x524620	EAXAITunerCar::Update	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x524930	EAXTrafficCar::SFXMessage (default stub, returns 0)	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x524bb0	EAXTrafficCar::IsPlayerCarInRange	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5251d0	EAXTrafficCar::IsHonking	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5251e0	EAXTrafficCar::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x525410	EAXTrafficCar::GetPlayerSpeedRelativeToUs	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x525480	EAXTrafficCar::UpdateDriveBy	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x526320	EAXTunerCar::ProcessSoundSphere	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x526420	EAXTunerCar::Initialize	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x526880	EAXTunerCar::Destroy	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x526a30	EAXTunerCar::Start	audio.engine	I	ghidra	docs/re/sound.md	sound
-0x526a40	EAXTunerCar::HasFX	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x526af0	EAXTunerCar::SFXMessage	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x526b50	EAXTunerCar::LandJumpPlay	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x526c70	EAXTunerCar::BottomOutPlay	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x526db0	EAXTunerCar::BottomOutUpdate	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x527080	EAXTunerCar::UpdateTorque	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x527180	EAXTunerCar::UpdateRPM	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x527480	CameraMover::VelocityNoise	camera	I	M+C	docs/re/camera.md	camera
-0x527740	EAXNitrous::Play	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5277f0	EAXNitrous::Stop	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x527810	EAXNitrous::Destroy	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x527850	EAXNitrous::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5278e0	EAXTunerCar::UpdateNitrous	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5279d0	EAXSkids::EAXSkids	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528300	EAXTurbo::~EAXTurbo	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x5283f0	EAXTurbo::AdjustVolume	audio.engine	I	ghidra	docs/re/sound.md	sound
-0x528470	EAXTurbo::PlayBlowoff	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528610	EAXTurbo::IsBlowOffDone	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528650	EAXTurbo::UpdateBlowOff	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x5286b0	EAXTurbo::StopBlowOff	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528700	EAXTurbo::PlaySpl (spool loop)	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528830	EAXTurbo::UpdateSpool	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528b60	EAXTunerCar::UpdateTurboFX	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528c70	EAXShifting::`scalar deleting destructor`	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528c90	EAXShifting::~EAXShifting	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528d70	EAXShifting::PlayDisengageSnd	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528f00	EAXShifting::Update	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x528f80	EAXShifting::PlayEngageSnd	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x5292b0	EAXTunerCar::BeginUpShift	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x529530	EAXTunerCar::UpdateGearShiftState (map names swapped with 0x523e30)	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x5298e0	EAXTunerCar::BeginDownShift	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x529a00	EAXTunerCar::CleanUpShiftFX	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x529b20	EAXTunerCar::IsEngineFinishedLoading	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x529b60	EAXTunerCar::InitializeEngine	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x529f50	EAXTunerCar::ShouldUpShiftDynLd	audio.engine	I	ghidra	docs/re/sound.md	sound
-0x52a310	EAXTunerCar::BreakingEffectUpdate	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x52a580	EAXTunerCar::ShouldDoBreakingEffect	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x52a890	EAXRoadNoise::Update	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52adf0	EAXRoadNoise::PlayTransition	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52b040	EAXRoadNoise::SendEnvelopeToMixer	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52b0e0	EAXRoadNoise::Play	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52b2d0	EAXTunerCar::Refl_Update	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52b500	EAXTunerCar::Create_Reflection	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52b690	EAXTunerCar::DestroyReflection	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52b700	EAXTunerCar::InitializeReflection	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52ba50	EAXTunerCar::UpdateTunnelWoosh	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52bb40	EAXTunerCar::DestroyTunnelWoosh	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52bb90	EAXTunerCar::ShouldPlayTunnelWoosh	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52c1d0	EAXTunerCar::MixUpdate	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52c3a0	EAXTunerCar::UpdateCarPhysics	audio.engine	I	ghidra	docs/re/sound.md	sound
-0x52c560	EAXTunerCar::UpdateMasterVolume	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52c620	EAXTunerCar::Update	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52c930	EAXCar::UpdateSoundSphere	audio.sfx	I	ghidra	docs/re/sound.md	sound
-0x52ccd0	EAXTires::CreateTires	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52d010	EAXTires::GenerateSkidNoise	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52d8b0	EAXTires::GenerateRoadNoise	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x52de60	EAXS_SoundShape::GetDistanceRolloff	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52e060	EAXS_SoundShape::GetCurveOutput	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52e380	EAXS_SoundShape::GetAzimShapeOutput	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52e3f0	EAXS_3DMixer::EAXS_3DMixer	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52e460	EAXS_3DMixer::~EAXS_3DMixer	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52e470	EAXS_3DMixer::Init3DMix	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52e4a0	EAXS_3DMixer::Setup3DMix	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52ea00	EAXS_3DMixer::Update3DMix	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52ebe0	EAXS_3DMixer::IsInsideMinDistance	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52ec20	EAXS_3DMixer::GetDistanceToRefObj	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x52f940	EAXCollision::EAXCollision	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x52f9b0	EAXCollision::~EAXCollision	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x530740	stSoundCollision::AdjustVolume	audio.sfx	I	ghidra	docs/re/sound.md	sound
-0x530a50	stSoundCollision::UpdateQueue	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x530e80	stSoundCollision::UpdateScrapeParams	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x530f20	stSoundCollision::CalcCollisionPositionData	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x531080	stSoundCollision::BeginScrape	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5311d0	stSoundCollision::BeginMixerEnvelope	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x531350	stSoundCollision::BeginImpact	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5314d0	EAXS_3DMixer::IsThisObjectIntheLead (default returns 0)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x532840	EAX linear ramp evaluate (not SetCsisName)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x532960	EA::Allocator::DefaultIAllocatorImpl::Allocate	other	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x532a20	EAXSND8Wrapper::Initialize	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x532ad7	(not a function: mid-instruction inside EAXSND8Wrapper::Initialize 0x532a20)	other	V	ghidra	docs/re/sound.md	sound
-0x5336c0	SoundObject::SoundObject(WorldObject*)	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5337f0	SoundObject::SoundObject(bVector3 const&)	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x5338c0	SoundObject::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x534a90	EAXS_3DMixer-derived deleting destructor (map: EAXS_SoundShape::~)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x534be0	EAXS_WindNoise::UpdateChannels (map: EAXS_VerticalCylinder::Update)	audio.sfx	I	ghidra	docs/re/sound.md	sound
-0x535710	EAXS_WindNoise::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x535c90	EAXS_WindNoise::UpdateCSISParams	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x535e90	EAXS_WindNoise::SetupSoundSphere	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x536250	EAXChannel::ReceiveEnvelopeEvent	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x5362a0	EAXChannel::GenerateEnvelope	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x5364e0	EAXMixMgr::EAXMixMgr	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x5368b0	EAXMixMgr::SetMixType	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x536a70	EAXMixMgr::EndMixType	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x536c80	EAXMixMgr::ReceiveTrigger	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x537460	EAXMod::SetOwner (this+0x10 = arg; map: Initialize(void))	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x538770	EAXS_StreamManager::SetupWorldDataTransitionData	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x5387c0	EAXS_StreamManager::GetCurrentAmbientZone	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x538ed0	EAXS_StreamControl::SetMasterVolume	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x538f10	EAXS_StreamControl::DelayStartBy	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x538f60	EAXS_StreamControl::SetStreamStage	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x538f80	EAXS_StreamControl::UpdateStreams	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x539210	EAXS_Streams::InitializeStream	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x539ac0	EAXS_Streams::Update3DParams	audio.stream	I	ghidra	docs/re/sound.md	sound
-0x539b70	EAXS_Streams::SetupStartParameters	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x53ac30	EAXS_AmbStereoStream::UpdateStreams	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x53b220	EAXS_AmbStereoStream::EnterRaceCountDown	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x53ba10	EAXS_AmbStereoStream::UpdateFadeTransition	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x53bfc0	EAXS_MusicStream::InitializeEATRAX	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x53d640	EAXS_TCMStream::PlayStream	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x53e400	BinarySearch_Hash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x53f6e0	Solid_ResolvePending	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x53f9b0	Solid_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x53fef0	SolidList_LoadContainer	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x53ffd0	Solid_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x540270	SolidList_Unload_Impl	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x5402f0	SolidList_Release	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x540420	SolidList_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x540440	SolidList_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x540460	SolidPack_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x5404e0	SolidPack_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x540630	Solid_FindByHash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x540680	Solid_FindInAllLists	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x540f10	LightPack_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x5410b0	LightPack_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x5413e0	LightTree_Query	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x544f30	LampFlares_Draw	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x5453d0	TexturePack_LoadIndex	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x545520	TexturePack_Remove	assets	I	Hopper export has no block (inside another sub_); Ghidra export block; capstone only	docs/re/assets.md	assets
-0x545580	TexturePack_BindPixels	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x5455c0	TexturePack_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x545770	TexturePack_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x5457f0	TexturePack_Register	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x545900	TexturePack_FixEntries	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x5459f0	TexturePack_AttachPixels	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x545af0	TexturePackHandle::UnmapData	assets	V	Hopper sub_545af0 + Ghidra FUN_00545af0: H+G agree	docs/re/assets.md	assets
-0x545c10	TexturePackHandle::FindRecordByHash	assets	V	Ghidra FUN_00545c10 + Hopper sub_545c10	docs/re/assets.md	assets
-0x545c60	TexAnim_Register	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x545cc0	TexAnim::Unregister	assets	V	Ghidra FUN_00545cc0	docs/re/assets.md	assets
-0x545d50	TexAnim::ResolveFrames	assets	V	Ghidra FUN_00545d50	docs/re/assets.md	assets
-0x545ea0	TexAnim::Update	assets	V	Ghidra FUN_00545ea0 (called from 0x40a752)	docs/re/assets.md	assets
-0x545fb0	TexturePack::SectionMap	assets	I	capstone asm (no decompile in either export)	docs/re/assets.md	assets
-0x546010	TexturePack::SectionUnmap	assets	I	capstone asm	docs/re/assets.md	assets
-0x5460e0	TexturePack::SectionHeader	assets	I	capstone asm	docs/re/assets.md	assets
-0x5461c0	Texture_FindByHash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x5462d0	TrackSkyInfo_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x546310	TrackSkyInfo_Select	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x546570	TrackSkyInfo_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x549130	EAXMod::Stop (ret 4 stub)	audio.sfx	V	ghidra	docs/re/sound.md	sound
-0x567450	Vec3Normalize	blur	I	C	docs/re/blur.md	blur
-0x569460	CarPartCuller::CullParts	other	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x569990	Car::InitRenderInfo	other	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x569c50	FrontEndRenderingCar::FrontEndRenderingCar	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x56a040	FrontEndRenderingCar::ReInit	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x56a130	CarRenderInfo::CarRenderInfo	other	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x56c3d0	CarRenderInfo::UpdateDecalTextures	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x56dc30	CarRenderInfo::Render	other	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x570950	DrawShowcaseCarList	blur	I	C	docs/re/blur.md	blur
-0x571050	DrawRaceCarList	blur	V	G+C	docs/re/blur.md	blur
-0x573150	Chunk39100::Loader	assets	V	Hopper sub_573150 + Ghidra make FUN_00573150: H+G agree	docs/re/assets.md	assets
-0x573160	Chunk39100::Unloader	assets	V	Hopper sub_573160 + Ghidra make FUN_00573160: H+G agree	docs/re/assets.md	assets
-0x575040	ApplyCameraShake	camera	I	G+C+M	docs/re/camera.md	camera
-0x575200	MaybeCameraShake	camera	I	M+C	docs/re/camera.md	camera
-0x575940	NullChunk::Loader	assets	V	capstone	docs/re/assets.md	assets
-0x575960	CompleatCarPhysicsInfo::BuildCarPhysicsInfo	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x576250	CompleatCarPhysicsInfo::BuildBodyInfo	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5787e0	WorldObjectCohort::Loader	assets	V	Ghidra make FUN_005787e0 (Hopper export lacks it)	docs/re/assets.md	assets
-0x578800	WorldObjectCohort::Unloader	assets	V	Ghidra make FUN_00578800	docs/re/assets.md	assets
-0x578880	WorldObjectCohort::Launch	assets	V	Ghidra make FUN_00578880	docs/re/assets.md	assets
-0x57c8b0	CarData_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x57cb70	CarData_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x57ce10	CarPartDatabase::GetCarPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x57cf70	GetCarTypeInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x57cfa0	CarTypeInfo_NextOfUsage	traffic	V	H+G	docs/re/traffic.md	traffic
-0x57d000	TrafficCar_PickType	traffic	V	H+G+C+file	docs/re/traffic.md	traffic
-0x57d160	Ride_Init	traffic	I	G	docs/re/traffic.md	traffic
-0x57d860	RideInfo::SyncPartsToPhysicsForAI	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x57ea80	RideInfo::UpdatePartsEnabled	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x57f170	GetStockPerformanceMeasure	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x57f260	RideInfo::GetPerformanceMeasure	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x57f2b0	RideInfo::RebuildPhysicsInfo	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x57f700	RideInfo::MatchPerformance(RideInfo *other, ...)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x57f970	RideInfo::MatchPerformance(float target, ...)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5801b0	RideInfo::GetTopSpeedRating	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x580240	RideInfo::GetTheoreticalTopSpeed	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5802c0	RideInfo::GetAccelRating	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x580400	RideInfo::GetHandlingRating	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x580590	RideInfo::ComputeMiscStats	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5809c0	DriverInfo::DriverInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x580b00	GetUsedCarTextureInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x581b30	MakeAccelerationTable	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x582f90	TrafficAI::ctor	traffic	I	C+H	docs/re/traffic.md	traffic
-0x5832a0	TrafficCar_Park	traffic	V	G+C	docs/re/traffic.md	traffic
-0x583350	TrafficAI::Update	traffic	V	H+G	docs/re/traffic.md	traffic
-0x583700	TrafficAI::Reset	traffic	I	H	docs/re/traffic.md	traffic
-0x583f20	LinearTable::Lookup11	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals
-0x584b10	RigidBody::SetMassInertia	props	V	hopper+ghidra	docs/re/props.md	props
-0x588d10	TriggerVolume::Loader	assets	V	Hopper sub_588d10 + Ghidra make FUN_00588d10: H+G agree	docs/re/assets.md	assets
-0x588d70	TriggerVolume::Unloader	assets	V	Hopper sub_588d70 + Ghidra make FUN_00588d70: H+G agree	docs/re/assets.md	assets
-0x58ae80	LoadedSkin::LoadedSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x58af10	LoadedWheel::LoadedWheel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x58b050	LoadedCar::LoadedCar	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x58b750	CarLoader::AllocateWheel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x58bb50	CarLoader::AllocateSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x58c3b0	CarLoader::AllocateRideInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x58c5a0	CarLoader::UnloadRideInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x58c760	CarLoader::DeleteUnusedRideInfos	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x58d140	Chunk37010::Accept	assets	V	Ghidra make FUN_0058d140 (H export lacks it; capstone agrees)	docs/re/assets.md	assets
-0x58d2c0	DecompressCOMP	assets	I	hopper	docs/re/assets.md	assets
-0x58d3c0	IsCompressedBuffer	assets	V	hopper+ghidra	docs/re/assets.md	assets
-0x58d3f0	DecompressBuffer	assets	V	hopper+data	docs/re/assets.md	assets
-0x58d4c0	Unused34030_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x58d500	Unused34030_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x58dca0	WorldZone_NodeWalk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x58dde0	WorldZone_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x58de10	WorldZone_Unload_Impl	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x58deb0	WorldZone_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x58dff0	WorldZone_CreateObject	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x58e2e0	WorldZone_Query	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets
-0x592100	RenderWorldModels	blur	V	G+C	docs/re/blur.md	blur
-0x592230	SurfaceTable::Init	props	I	hopper+ghidra	docs/re/props.md	props
-0x5927d0	WorldObject::CanCollide	props	I	capstone	docs/re/props.md	props
-0x592a50	Table34300::Loader	assets	V	Hopper sub_592a50 + Ghidra make FUN_00592a50: H+G agree	docs/re/assets.md	assets
-0x592ab0	Table34300::Unloader	assets	V	Hopper sub_592ab0 + Ghidra make: H+G agree	docs/re/assets.md	assets
-0x594c60	bOpenFile	assets	I	ghidra	docs/re/assets.md	assets
-0x595230	Smackables::Factory	props	V	hopper+ghidra	docs/re/props.md	props
-0x5952a0	Smackable::Loader	assets	V	Hopper sub_5952a0 + Ghidra export FUN_005952a0: H+G agree	docs/re/assets.md	assets
-0x5954c0	Smackable::Unloader	assets	V	Ghidra make FUN_005954c0 (Hopper export lacks it)	docs/re/assets.md	assets
-0x595670	Smackables::CleanupPool	props	V	hopper+ghidra	docs/re/props.md	props
-0x595750	Smackables::ForceCleanup	props	V	hopper+ghidra	docs/re/props.md	props
-0x595b70	Smackables::IsExcluded	props	V	hopper+ghidra	docs/re/props.md	props
-0x595bf0	Smackables::Init	props	V	hopper+ghidra	docs/re/props.md	props
-0x595d80	Smackables::CreateVirgins	props	I	ghidra+capstone	docs/re/props.md	props
-0x595f70	Smackables::SaveState	props	V	hopper+ghidra	docs/re/props.md	props
-0x5962e0	VirginSmokeable::VirginSmokeable	props	V	hopper+ghidra	docs/re/props.md	props
-0x5964c0	VirginSmokeable::~VirginSmokeable	props	V	hopper+ghidra	docs/re/props.md	props
-0x596570	VirginSmokeable::Wake	props	V	hopper+ghidra	docs/re/props.md	props
-0x5966d0	Smokeable::Smokeable	props	V	hopper+ghidra	docs/re/props.md	props
-0x596f50	Smackables::RestoreState	props	V	hopper+ghidra	docs/re/props.md	props
-0x597420	Smokeable::Update	props	V	hopper+ghidra	docs/re/props.md	props
-0x5977f0	Smokeable::RespawnOrExpire	props	V	hopper+ghidra	docs/re/props.md	props
-0x597980	Smokeable::OnHit	props	V	hopper+ghidra	docs/re/props.md	props
-0x597c90	Smokeable::Release	props	I	ghidra	docs/re/props.md	props
-0x597d10	Smokeable::BuildChildren	props	I	hopper+ghidra	docs/re/props.md	props
-0x597e10	Smokeable::BuildChildPart	props	I	hopper+ghidra	docs/re/props.md	props
-0x5983d0	SpawnRecord_Allowed	traffic	V	G+H	docs/re/traffic.md	traffic
-0x598510	Teleporter_RestoreState	traffic	I	H	docs/re/traffic.md	traffic
-0x598600	TrafficTeleporter::DoTimestep	traffic	V	H+G	docs/re/traffic.md	traffic
-0x5988c0	Teleporter_NeedsMove	traffic	V	H+G	docs/re/traffic.md	traffic
-0x598a50	Teleporter_IsPassed	traffic	V	H+G	docs/re/traffic.md	traffic
-0x598b60	TrafficTeleporter::IsPrimaryTeleportationSpotAllowed	traffic	V	G+file	docs/re/traffic.md	traffic
-0x598bf0	TrafficTeleporter::PlaceCar	traffic	V	H+G	docs/re/traffic.md	traffic
-0x598c80	PlaceCar_SpawnRecord	traffic	I	G	docs/re/traffic.md	traffic
-0x598fb0	PlaceCar_RandomNode	traffic	I	H+G	docs/re/traffic.md	traffic
-0x5991a0	PlaceCar_Route	traffic	I	G	docs/re/traffic.md	traffic
-0x5992f0	TrafficCar_Place	traffic	I	G	docs/re/traffic.md	traffic
-0x5995e0	PickLaneEitherSide	traffic	I	G	docs/re/traffic.md	traffic
-0x599660	PickLane	traffic	I	G	docs/re/traffic.md	traffic
-0x599830	Teleporter_MoveCar	traffic	V	H+G	docs/re/traffic.md	traffic
-0x5999c0	Teleporter_MoveRoute	traffic	I	G	docs/re/traffic.md	traffic
-0x599b20	FindNodeAtRoute	traffic	I	G	docs/re/traffic.md	traffic
-0x599c80	Teleporter_MoveToSpawnRecord	traffic	V	H+G	docs/re/traffic.md	traffic
-0x599fc0	SpawnRecord_Find	traffic	V	H+G	docs/re/traffic.md	traffic
-0x59a2c0	Teleporter_MoveFreeRun	traffic	V	G+C+H	docs/re/traffic.md	traffic
-0x59a7c0	TrafficCar_Move	traffic	I	G	docs/re/traffic.md	traffic
-0x59aa60	Spot_IsClear	traffic	V	H+G+file	docs/re/traffic.md	traffic
-0x59ac20	Teleporter_NearPlayerRoute	traffic	I	H+G	docs/re/traffic.md	traffic
-0x59ac80	Teleporter_CarInRange	traffic	I	G	docs/re/traffic.md	traffic
-0x59ad90	Spot_NearPlayerRoute	traffic	V	H+G	docs/re/traffic.md	traffic
-0x59ae60	Teleporter_ReloadTimer	traffic	V	H+G	docs/re/traffic.md	traffic
-0x59aea0	PickTravelSide	traffic	I	G	docs/re/traffic.md	traffic
-0x59b1e0	Spot_NearOtherCar	traffic	V	H+G	docs/re/traffic.md	traffic
-0x59b2c0	PickRandomSection	traffic	I	G	docs/re/traffic.md	traffic
-0x59b370	Teleporter_PickPlayer	traffic	I	G	docs/re/traffic.md	traffic
-0x59b3e0	Teleporter_Spacing	traffic	V	H+G+file	docs/re/traffic.md	traffic
-0x59b490	NearestPlayer	traffic	I	G	docs/re/traffic.md	traffic
-0x59b590	TrafficCar_PickPaint	traffic	I	G	docs/re/traffic.md	traffic
-0x59b620	TrafficDriverMode_Map	traffic	I	G	docs/re/traffic.md	traffic
-0x59b670	Zone_SpacingMin	traffic	V	C+G	docs/re/traffic.md	traffic
-0x59b6a0	Zone_SpacingMax	traffic	V	C+G	docs/re/traffic.md	traffic
-0x59b6d0	Intersections_UpdateAll	traffic	V	H+G	docs/re/traffic.md	traffic
-0x59b710	Teleporter_Disable	traffic	I	G	docs/re/traffic.md	traffic
-0x59b790	Teleporter_Enable	traffic	I	G	docs/re/traffic.md	traffic
-0x59b8d0	Teleporter_SlowCarNear	traffic	I	G	docs/re/traffic.md	traffic
-0x59c850	Spline::InitBasis	assets	V	Ghidra make FUN_0059c850	docs/re/assets.md	assets
-0x59db60	Spline::Finalize	assets	I	Ghidra make FUN_0059db60	docs/re/assets.md	assets
-0x59dd90	SplineSet::Loader	assets	V	Hopper sub_59dd90 + Ghidra export FUN_0059dd90: H+G agree	docs/re/assets.md	assets
-0x59de20	SplineSet::Unloader	assets	V	Hopper sub_59de20 + Ghidra export FUN_0059de20: H+G agree	docs/re/assets.md	assets
-0x59e5c0	EasterEggs::IsPartUnlocked	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x59e620	Table3A000::Loader	assets	V	Hopper sub_59e620 + Ghidra make FUN_0059e620: H+G agree	docs/re/assets.md	assets
-0x59e660	Table3A000::Unloader	assets	V	Ghidra make FUN_0059e660 (Hopper export lacks it)	docs/re/assets.md	assets
-0x59fa20	EAXSound::ChangeLanguage	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x59fb80	LanguageStrings::FindByHash	assets	V	Hopper sub_59fb80	docs/re/assets.md	assets
-0x59fce0	LanguageStrings::Loader	assets	V	Hopper sub_59fce0 + Ghidra make FUN_0059fce0: H+G agree	docs/re/assets.md	assets
-0x59fd40	LanguageStrings::Unloader	assets	V	Ghidra make FUN_0059fd40 (Hopper export lacks it)	docs/re/assets.md	assets
-0x59fd70	GetLocalizedLogoMovie	canon	I	hopper	docs/re/canon.md	canon
-0x5a0060	CareerEvents::IndexEventDesc	assets	V	Hopper sub_5a0060	docs/re/assets.md	assets
-0x5a00a0	CareerEvents::Loader	assets	V	Hopper sub_5a00a0 + Ghidra make FUN_005a00a0: H+G agree	docs/re/assets.md	assets
-0x5a0130	CareerEvents::Unloader	assets	V	Hopper sub_5a0130 + Ghidra make FUN_005a0130: H+G agree	docs/re/assets.md	assets
-0x5a01d0	Table34A08::Loader	assets	V	Hopper sub_5a01d0 + Ghidra make FUN_005a01d0: H+G agree	docs/re/assets.md	assets
-0x5a0200	Table34A08::Unloader	assets	V	Hopper sub_5a0200 + Ghidra make: H+G agree	docs/re/assets.md	assets
-0x5a0220	Table34A0A::Find	assets	V	Ghidra make FUN_005a0220	docs/re/assets.md	assets
-0x5a0270	Table34A09::Loader	assets	V	Hopper sub_5a0270 + Ghidra make FUN_005a0270: H+G agree	docs/re/assets.md	assets
-0x5a0290	Table34A09::Unloader	assets	V	Hopper sub_5a0290 + Ghidra make FUN_005a0290: H+G agree	docs/re/assets.md	assets
-0x5a02c0	Table34A0A::Loader	assets	V	Ghidra make FUN_005a02c0 (Hopper export lacks it)	docs/re/assets.md	assets
-0x5a02f0	Table34A0A::Unloader	assets	V	Hopper sub_5a02f0 + Ghidra make: H+G agree	docs/re/assets.md	assets
-0x5a0320	Career::EventGivesLevel4Part	canon	V	ghidra	docs/re/canon.md	canon
-0x5a03d0	MapCarPartIDToCareerUpgrade	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a05b0	CalculateRideReputationPoints	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a08f0	GetCarPartCost	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a0a00	Career::Reset	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x5a0ce0	Career::StartEvent	canon	V	hopper+ghidra	docs/re/canon.md	canon
-0x5a0dc0	Career::WinEvent	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x5a0f60	Career::QuitEvent	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x5a0fc0	Career::ArePrerequisitesDone	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x5a1100	Career::OpenAvailableEvents	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x5a1340	Career::GetUrlRank	canon	V	ghidra+hopper	docs/re/canon.md	canon
-0x5a1520	Career::GetCash	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x5a1550	Career::IsUpgradeUnlocked	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x5a1630	Career::IsCarUnlocked	canon	V	ghidra	docs/re/canon.md	canon
-0x5a16f0	Career::IsTrackUnlocked	canon	V	ghidra	docs/re/canon.md	canon
-0x5a1850	Career::OpenNextCashEvent	canon	V	ghidra	docs/re/canon.md	canon
-0x5a1b10	Career::ScaleCashEvent	canon	V	ghidra	docs/re/canon.md	canon
-0x5a1da0	Career::CountFinishedEvents	canon	V	ghidra	docs/re/canon.md	canon
-0x5a1fa0	FECareerManager::AreAllUnlockedPhysicsUpgradesPurchased	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a2040	Career::IsPlayerStuck	canon	V	ghidra	docs/re/canon.md	canon
-0x5a2270	Career::RefreshOpenEvents	canon	V	ghidra	docs/re/canon.md	canon
-0x5a2350	Career::CreateRaceObject	canon	V	ghidra	docs/re/canon.md	canon
-0x5a2690	Career::GetLastWonEventTextRow	canon	V	ghidra	docs/re/canon.md	canon
-0x5a2f10	Race::DidPlayerWin	canon	V	ghidra	docs/re/canon.md	canon
-0x5a3570	PartStore::HasPart	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x5a3630	PartStore::Has	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon
-0x5a36a0	CharacterRoster::Loader	assets	V	Hopper sub_5a36a0 + Ghidra make FUN_005a36a0: H+G agree	docs/re/assets.md	assets
-0x5a36d0	CharacterRoster::Unloader	assets	V	Hopper sub_5a36d0 + Ghidra make FUN_005a36d0: H+G agree	docs/re/assets.md	assets
-0x5a3750	UnlockTeller::GetVinylUnlockBits	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a3780	UnlockTeller::SetSingleVinylNewlyStyleUnlocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a3850	UnlockTeller::SetVinylGroupNewlyStyleUnlocked	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a3f00	Career::BuildRewardSummary	canon	V	ghidra	docs/re/canon.md	canon
-0x5a4420	UnlockTeller::GetNewlyUnlockedPartLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a4de0	AnimSkeleton_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x5a4e90	AnimSkeleton_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets
-0x5a53c0	RoadPath_Step	traffic	V	G+file	docs/re/traffic.md	traffic
-0x5a96b0	GetDoorLineHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a97f0	GetDoorLineMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a9930	GetHoodSpoilerHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a99e0	GetHoodSpoilerMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a9a90	GetWheelTextureHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a9af0	GetWheelTextureMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a9b50	GetVinylLayerHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a9c10	GetVinylLayerMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5a9ce0	CompositeSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5aa2d0	GetTempCarSkinTextures	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x5aa800	CompositeWheel	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x5aa970	TrafficIntersection_SavePtr	traffic	I	H	docs/re/traffic.md	traffic
-0x5aa9f0	TrafficIntersection_Save	traffic	V	H+C	docs/re/traffic.md	traffic
-0x5aaa90	IncomingTrafficCar_Save	traffic	V	H+C	docs/re/traffic.md	traffic
-0x5aaf10	Intersection_Update	traffic	I	G	docs/re/traffic.md	traffic
-0x5ab210	SpawnRecord_GetNode	traffic	V	G+H	docs/re/traffic.md	traffic
-0x5ab550	MovieSubtitles::FindByName	assets	V	Hopper sub_5ab550	docs/re/assets.md	assets
-0x5ab5a0	MovieSubtitles::Update	assets	V	Hopper sub_5ab5a0	docs/re/assets.md	assets
-0x5ab640	MovieSubtitles::Loader	assets	V	Ghidra make FUN_005ab640 (Hopper export lacks it)	docs/re/assets.md	assets
-0x5ab700	MovieSubtitles::Unloader	assets	V	Hopper sub_5ab700 + Ghidra make FUN_005ab700: H+G agree	docs/re/assets.md	assets
-0x5ac449	Vec4TransformInPlace	blur	I	C	docs/re/blur.md	blur
-0x61e790	GetFirstAnimBank	other	I	ghidra+hopper	docs/re/tuning.md	tuning
-0x64b510	Csis::System::GetAllocator	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x64b7d0	Csis::Class::GetRefCount	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x64b810	Csis::Class::SetMemberDataFast	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x64bb20	Csis::Class::CreateInstanceFast	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x64c000	Csis::ClassHandle::Set	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x64c1a0	Csis::Class::CreateInstance	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x64c380	Csis::ClassHandle::SetFast	audio.engine	V	ghidra	docs/re/sound.md	sound
-0x64dd70	SNDAEMS_removemodulebank	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x64dee0	SNDAEMSI_createmodulebankhandle	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x64e160	SNDAEMS_addmodulebank	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x64e330	SNDSYSI_100hzserver (map name SNDvol is wrong)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x64e540	SNDSYS_leavecritical	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x64f320	SNDAEMS_streaminit	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x64f580	SNDSYSI_init	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x64f820	SNDSYS_shutdown (map: SNDSYS_restore)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x64fba0	SNDSTRM_overhead	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x64fbd0	SNDplaysetdef	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x64fdc0	SNDSTRMI_startstream	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x6501a0	SNDSTRMI_parseheader	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x6503a0	SNDSTRMI_queue	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x650730	SNDSTRMI_parsechunk	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x650880	SNDSTRMI_service	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x650950	SNDSTRMI_service_all (map: numcreated)	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x650980	SNDSTRMI_create	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x6511b0	iSNDrandom	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x651260	SNDPLATFORM_setpitch	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x6512f0	Snd::Hal::SetVol (SNDPLATFORM_setvol)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x651450	SNDPLATFORM_setfxlevel (map: SNDstop)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x651490	SNDI_calcfxlevel	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x652030	SNDI_stophandle (loops patch voices of a handle, 0x651f30 kill; map: SNDSYS_entercritical)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x6520a0	SNDpitchmult	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x652150	SNDvol (map: SNDSYSI_100hzserver)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x6525f0	SNDVOICEI_free	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x652720	SNDVOICEI_get (validate handle -> voice index)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x652800	SNDbankremove	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x652a30	SNDBANKI_userdatacallback	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x652aa0	SNDbankadd	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x652b60	iSNDcalcvol	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x652ca0	iSNDcalcpitch	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x654e20	SNDCTRLI_getfxbus	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x655120	SNDPKTPLAY_start	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x655b80	SNDI_patchtohdr	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x656040	SNDMEMI_usage_percent (map: SNDMEMI_restore)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x6563a0	SNDMIXI_volramp	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x657d70	SNDBANKI_findfreekey	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x657dd0	SNDBANKI_playtimbre	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x658230	SNDBANKI_playpatch	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x6584e0	iSNDpatchkey	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x6586b0	SNDI_parsetimbre	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x659130	SNDI_sin	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x6599e0	SNDPLATFORM_packetplay	audio.stream	V	ghidra	docs/re/sound.md	sound
-0x659c80	SNDI_gettag	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x659d80	SNDI_patchtohdrgen	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x65bfa0	SNDPLATFORM_playtimbre	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x65c060	SNDI_pantoazimuth	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x65c0b0	SNDover (is sound finished)	audio.mixer	V	ghidra	docs/re/sound.md	sound
-0x65fce0	SNDI_getb	audio.bank	V	ghidra	docs/re/sound.md	sound
-0x674898	_ftol	blur	V	C	docs/re/blur.md	blur
-0x684aa8	EAX_CarFX::~EAX_CarFX	audio.engine	I	ghidra	docs/re/sound.md	sound
-0x6860d3	EAXSND8Wrapper::EAXSND8Wrapper (SEH unwind funclet, not the ctor)	other	V	ghidra	docs/re/sound.md	sound
-0x688888	(not a function: SEH frame handler thunk)	other	V	ghidra+hopper	docs/re/tuning.md	tuning
-0x6b5a30	TeleportInterval_Free	traffic	V	G+file	docs/re/traffic.md	traffic
-0x6b5a34	TeleportInterval_Route	traffic	V	G+file	docs/re/traffic.md	traffic
-0x6b5a38	TeleportFirstStep	traffic	V	G+file	docs/re/traffic.md	traffic
-0x6b5a3c	TeleportRouteLimit	traffic	V	G+file	docs/re/traffic.md	traffic
-0x6b5a50	TeleportSlowPlayerSpeed	traffic	V	G+file	docs/re/traffic.md	traffic
-0x6b5a5c	TeleportSpawnObjSpeed	traffic	V	G+file	docs/re/traffic.md	traffic
-0x6b5a68	SpawnRecordWindow	traffic	V	G+file	docs/re/traffic.md	traffic
-0x6b6c5c	CamBlend_Dist_A	camera	I	D	docs/re/camera.md	camera
-0x6b6c60	CamBlend_Height_A	camera	I	D	docs/re/camera.md	camera
-0x6b6c64	CamBlend_Dist_B	camera	I	D	docs/re/camera.md	camera
-0x6b6c68	CamBlend_Height_B	camera	I	D	docs/re/camera.md	camera
-0x6b6c78	CamAirborneRampStep	camera	I	D	docs/re/camera.md	camera
-0x6b6c80	CamSweepTrim	camera	I	D	docs/re/camera.md	camera
-0x6b6c98	CamWallPushOut	camera	I	D	docs/re/camera.md	camera
-0x6b6cbc	RearView_Param_0_75	camera	V	C+D	docs/re/camera.md	camera
-0x6b6cc0	RearView_Param_192	camera	V	C+D	docs/re/camera.md	camera
-0x6b7a7c	SlowMoArg1	camera	I	D	docs/re/camera.md	camera
-0x6b7aac	JumpCam_EdgeOffset	camera	V	C+D	docs/re/camera.md	camera
-0x6b9690	TrafficAI_ClassNames	traffic	U	C+file	docs/re/traffic.md	traffic
-0x6b96b0	TrafficAI_vtable	traffic	I	C+file	docs/re/traffic.md	traffic
-0x6c7fc8	vtable_DriveCameraMover	camera	V	G+D	docs/re/camera.md	camera
-0x6c8060	Str_SpeedCam	camera	V	D	docs/re/camera.md	camera
-0x6c806c	Str_DragCameras_bin	camera	V	D	docs/re/camera.md	camera
-0x6c80f4	Str_CAMERA_SETTINGS	camera	V	D	docs/re/camera.md	camera
-0x6ca8dc	Str_CountdownCameraCoordinator	camera	V	D	docs/re/camera.md	camera
-0x6cc7bc	K_ONE	blur	V	C+D	docs/re/blur.md	blur
-0x6cc7dc	K_HALF	blur	V	C+D	docs/re/blur.md	blur
-0x6cc970	K_BLUR_MIN_T	blur	V	C+D	docs/re/blur.md	blur
-0x6cc988	TeleportSpeedFlip	traffic	V	G+file	docs/re/traffic.md	traffic
-0x6cc9d8	K_BLUR_PASS2_MUL	blur	V	C+D	docs/re/blur.md	blur
-0x6ccb7c	K_EPS_SPEED	blur	V	C+D	docs/re/blur.md	blur
-0x6ccc0c	K_BLUR_W_MUL	blur	V	C+D	docs/re/blur.md	blur
-0x6ccc64	K_BLUR_S_MUL	blur	V	C+D	docs/re/blur.md	blur
-0x6cccf8	K_N_WEIGHT	blur	V	C+D	docs/re/blur.md	blur
-0x6ccd00	K_1_OVER_255_a	blur	V	C+D	docs/re/blur.md	blur
-0x6cf210	ChangeCameraMover_EHFuncInfo	camera	V	G+C	docs/re/camera.md	camera
-0x6f1850	JoyEventNameTable_0x75	camera	V	D	docs/re/camera.md	camera
-0x6fbde8	CamTweakDefault_Dist	camera	I	C	docs/re/camera.md	camera
-0x6fbdec	CamTweakDefault_Height	camera	I	D	docs/re/camera.md	camera
-0x6fbdf0	CamTweakDefault_Max	camera	I	D	docs/re/camera.md	camera
-0x6fbdf4	CameraFOVTable	camera	V	D+C	docs/re/camera.md	camera
-0x6fbec0	DriveCam_Scale	camera	V	C+D	docs/re/camera.md	camera
-0x6fbec4	DriveCam_K_0_03	camera	U	D	docs/re/camera.md	camera
-0x6fbec8	DriveCam_K_0_012	camera	U	D	docs/re/camera.md	camera
-0x6fbecc	DriveCam_K_2	camera	U	D	docs/re/camera.md	camera
-0x6fbed0	DriveCam_K_25	camera	U	D	docs/re/camera.md	camera
-0x6fbed4	DriveCam_K_0_05	camera	U	D	docs/re/camera.md	camera
-0x6fbed8	DriveCam_K_0_02	camera	U	D	docs/re/camera.md	camera
-0x6fbedc	DriveCam_K_6	camera	U	D	docs/re/camera.md	camera
-0x6fbee0	DriveCam_PitchLimitLo	camera	I	C+D	docs/re/camera.md	camera
-0x6fbee4	DriveCam_K_0_045	camera	I	C+D	docs/re/camera.md	camera
-0x6fbee8	DriveCam_PitchLimitHi	camera	I	C+D	docs/re/camera.md	camera
-0x6fbeec	DriveCam_NegThreshold	camera	I	C+D	docs/re/camera.md	camera
-0x6fbef0	DriveCam_K_1a	camera	U	D	docs/re/camera.md	camera
-0x6fbef4	DriveCam_K_1b	camera	U	D	docs/re/camera.md	camera
-0x6fbef8	DriveCam_K_500	camera	U	D	docs/re/camera.md	camera
-0x6fbefc	DriveCam_K_0_2	camera	U	D	docs/re/camera.md	camera
-0x6fbf00	DriveCam_K_6b	camera	U	D	docs/re/camera.md	camera
-0x6fbf04	DriveCam_K_m1	camera	U	D	docs/re/camera.md	camera
-0x6fbf08	DriveCam_K_0_4	camera	U	D	docs/re/camera.md	camera
-0x6fbf0c	DriveCam_K_3	camera	U	D	docs/re/camera.md	camera
-0x6fbf10	DriveCam_K_250	camera	U	D	docs/re/camera.md	camera
-0x6fbf14	DriveCam_DebugPOVOverrideFlag	camera	I	C	docs/re/camera.md	camera
-0x6fbf18	DriveCam_DebugPOVId	camera	I	C	docs/re/camera.md	camera
-0x6fbf1c	DriveCam_POV3Param	camera	I	C+D	docs/re/camera.md	camera
-0x700aa4	OPT_CubicCamera	camera	I	C	docs/re/camera.md	camera
-0x700b1c	SpecialCamNameTable	camera	V	D	docs/re/camera.md	camera
-0x700b3c	SpecialCamTable3	camera	I	D	docs/re/camera.md	camera
-0x700b44	SpecialCamEnableTable	camera	V	D	docs/re/camera.md	camera
-0x700e98	OPT_MOTIONBLUR	blur	V	G+C	docs/re/blur.md	blur
-0x700e9c	OPT_LIGHTSTREAKS	blur	V	C	docs/re/blur.md	blur
-0x701034	gBackbufW	blur	V	C+D	docs/re/blur.md	blur
-0x701038	gBackbufH	blur	V	C+D	docs/re/blur.md	blur
-0x7024b8	BlurDownsampleTaps	blur	V	C+D	docs/re/blur.md	blur
-0x7024e8	BlurTapTable2	blur	I	D	docs/re/blur.md	blur
-0x702a28	gBlurRTFormat	blur	V	C+D	docs/re/blur.md	blur
-0x702a2c	gBlurRTW	blur	V	C	docs/re/blur.md	blur
-0x702a30	gBlurRTH	blur	V	C	docs/re/blur.md	blur
-0x702a34	gStreakRTFormat	blur	V	C+D	docs/re/blur.md	blur
-0x702a38	BLUR_SPEED_LO	blur	V	G+C+D	docs/re/blur.md	blur
-0x702a3c	BLUR_SPEED_HI	blur	V	G+C+D	docs/re/blur.md	blur
-0x702a40	BLUR_T_CAP	blur	V	G+C+D	docs/re/blur.md	blur
-0x702a44	BLUR_STREAK_SCALE	blur	V	C+D	docs/re/blur.md	blur
-0x702a48	BLUR_N_UP	blur	V	C+D	docs/re/blur.md	blur
-0x702a4c	BLUR_N_DOWN	blur	V	C+D	docs/re/blur.md	blur
-0x702a80	gSceneRTFormat	blur	I	C	docs/re/blur.md	blur
-0x705b20	CamSpeedCurve	camera	I	D	docs/re/camera.md	camera
-0x705b34	RearView_Offset_x	camera	I	C+D	docs/re/camera.md	camera
-0x705b38	RearView_Offset_y	camera	I	C+D	docs/re/camera.md	camera
-0x7062cc	JumpCam_HeightCurve	camera	V	G+C	docs/re/camera.md	camera
-0x7062e4	JumpCam_DistCurve	camera	V	G+C	docs/re/camera.md	camera
-0x7062fc	JumpCam_SpeedCurve	camera	V	G+C	docs/re/camera.md	camera
-0x71ab9c	gBlurTexA	blur	V	C	docs/re/blur.md	blur
-0x71aba0	gBlurTexB	blur	V	C	docs/re/blur.md	blur
-0x71aba4	gStreakTex	blur	V	C	docs/re/blur.md	blur
-0x71aba8	gBlurSurfA	blur	V	C	docs/re/blur.md	blur
-0x71abac	gBlurSurfB	blur	V	C	docs/re/blur.md	blur
-0x71abb0	gStreakSurf	blur	V	C	docs/re/blur.md	blur
-0x73457c	FrameDt	camera	I	C	docs/re/camera.md	camera
-0x734588	CarTypeInfoTable	traffic	V	H+G+file	docs/re/traffic.md	traffic
-0x735ee8	CamTweakerEnable	camera	I	C	docs/re/camera.md	camera
-0x735f5c	gCamFlag735f5c	camera	I	G+C	docs/re/camera.md	camera
-0x736150	RoadEntries_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic
-0x736154	RoadEntries_Count	traffic	V	H+C	docs/re/traffic.md	traffic
-0x736158	RoadIntersections_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic
-0x73615c	RoadIntersections_Count	traffic	V	H+C	docs/re/traffic.md	traffic
-0x736160	SpawnRecords_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic
-0x736164	SpawnRecords_Count	traffic	V	H+C	docs/re/traffic.md	traffic
-0x736168	TrackRows_Ptr	traffic	V	H+G+file	docs/re/traffic.md	traffic
-0x736174	TrackRow_CurrentPtr	traffic	V	H+G	docs/re/traffic.md	traffic
-0x7361a4	CamGateFlagB	camera	I	C	docs/re/camera.md	camera
-0x7361f0	gGameModePtr	camera	I	C	docs/re/camera.md	camera
-0x7361f8	WorldCarList	traffic	I	H+G	docs/re/traffic.md	traffic
-0x736384	gBlurOrStreaksActive	blur	V	C	docs/re/blur.md	blur
-0x73641c	gBlurSpecialN	blur	V	G+C	docs/re/blur.md	blur
-0x73645c	gSceneRTMode	blur	V	C	docs/re/blur.md	blur
-0x736460	gSceneTex	blur	V	C	docs/re/blur.md	blur
-0x736464	gSceneSurf	blur	V	C	docs/re/blur.md	blur
-0x7364a0	gViewCountKind	camera	I	G+C	docs/re/camera.md	camera
-0x73654c	gSpecialCameraActive	blur	V	G+C	docs/re/blur.md	blur
-0x740500	gBlurCameraObj	blur	V	C	docs/re/blur.md	blur
-0x758938	POVSaveTable	camera	I	C	docs/re/camera.md	camera
-0x758948	POVIndexPerPlayer	camera	I	C	docs/re/camera.md	camera
-0x77af20	RoadSectionManager	traffic	V	H+C+file	docs/re/traffic.md	traffic
-0x77af30	RoadSectionTable	traffic	V	H+C	docs/re/traffic.md	traffic
-0x78a2f0	TrackId	traffic	V	H+G	docs/re/traffic.md	traffic
-0x78a2fc	TrackDirection	traffic	V	H+G	docs/re/traffic.md	traffic
-0x78a300	TrafficLevel	traffic	V	H+G	docs/re/traffic.md	traffic
-0x78a304	TrafficSameSideProb	traffic	I	H+G	docs/re/traffic.md	traffic
-0x78a345	CamGateFlagA	camera	I	C	docs/re/camera.md	camera
-0x78a347	TrafficOffFlag	traffic	V	H+G	docs/re/traffic.md	traffic
-0x78a3fa	OPT_JumpCamEnabled	camera	I	C	docs/re/camera.md	camera
-0x78a3fb	OPT_SpecialSlowmoEnabled	camera	I	C	docs/re/camera.md	camera
-0x78a3fc	TrafficDriverMode	traffic	I	G	docs/re/traffic.md	traffic
-0x78a418	Entrants_Ptr	traffic	V	H+G	docs/re/traffic.md	traffic
-0x78d270	gCameraObj	blur	V	C	docs/re/blur.md	blur
+addr	name	system	confidence	tool	doc	from	aliases	kind
+0x4010e0	SetSpecialCameraFlag	blur	I	C	docs/re/blur.md	blur		func
+0x402820	Particle_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x4028f0	Particle_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x402b40	ParticleEmitter_Bind	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x402bd0	ParticleEmitter_Queue	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x407db0	Texture::CreateD3D	assets	V	Ghidra FUN_00407db0 + capstone	docs/re/assets.md	assets		func
+0x408010	Texture::ReleaseD3D	assets	V	Ghidra FUN_00408010	docs/re/assets.md	assets		func
+0x409580	RenderFrameMain	blur	V	G+H+C	docs/re/blur.md	blur		func
+0x409b70	LightStreakPath	blur	U	C	docs/re/blur.md	blur		func
+0x40a7f0	SetBlurCameraObject	blur	V	C	docs/re/blur.md	blur		func
+0x40a880	NullUpdate_ret	camera	V	C	docs/re/camera.md	camera	nullsub (shared empty ret, 510 refs)@sound	func
+0x40a890	SceneRTCreate	blur	V	G+C	docs/re/blur.md	blur		func
+0x40abd0	SceneRTSelect	blur	V	C	docs/re/blur.md	blur		func
+0x40b3f0	RenderSetupBlurFlags	blur	V	G+C	docs/re/blur.md	blur		data
+0x40b4e0	ReleaseSceneRTs	blur	I	C	docs/re/blur.md	blur		func
+0x40c690	Mesh_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x40c840	Mesh_Free	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x40cb80	BlurCreateRTs	blur	V	G+C	docs/re/blur.md	blur		data
+0x40cce0	BlurReleaseRTs	blur	I	C	docs/re/blur.md	blur		func
+0x40cd40	SpeedBlurPass	blur	V	G+H+C	docs/re/blur.md	blur		func
+0x40d090	BlurStreakPass4Tap	blur	V	G+H+C	docs/re/blur.md	blur		func
+0x40d370	BlurDownsample4Tap	blur	V	G+C	docs/re/blur.md	blur		func
+0x40d6e0	BlurComposite	blur	V	G+C	docs/re/blur.md	blur		func
+0x40dd00	BuildProjection	camera	I	C	docs/re/camera.md	camera		func
+0x4175c0	LinearTable::Init	rivals	I	capstone	docs/re/rivals.md	rivals		func
+0x417600	RideInfo::Init	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x41c420	Config::OpenCfgFile	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41c680	Settings::Load	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41c7a0	Settings::Save	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41cf40	Profile::CreateNew	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41d030	Profile::Load	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41d0d0	SaveSlot::Exists	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41d140	ProfileList::Load	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41d2a0	ProfileList::Touch	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41d650	ProBlob::Write	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41d770	ProBlob::Read	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41d8a0	Ugd::Write	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41da40	Ugd::Read	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41db70	Ugd::ReadHeader	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41dc10	Save::BuildPath	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41dd10	Adler32	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41dd60	Profile::Delete	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41e200	Opt::Write	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x41e330	Opt::Read	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x420050	SlowMoStart	camera	I	C	docs/re/camera.md	camera		func
+0x421a30	SpecialCamCooldown	camera	I	C	docs/re/camera.md	camera		func
+0x422410	Grid::BuildRacerCar	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x422580	Grid::GetStartPositions	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
+0x422a70	Grid::PlaceAllRacers	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x426110	Car_SetMode	traffic	U	H+G	docs/re/traffic.md	traffic		func
+0x426930	JumpCamTrigger	camera	V	G+C	docs/re/camera.md	camera		func
+0x429b10	Racer::UpdateTwoHumanCatchUp	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x429cf0	JumpCamPredict	camera	I	C	docs/re/camera.md	camera		func
+0x42ab50	IsCar1099InMode4	other	U	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x42ae10	TrackRow_Current	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x42ae20	SpawnRecord_Get	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x42ae30	SpawnRecord_Count	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x42c3c0	Player::CreateRearViewMirror_call	camera	V	C	docs/re/camera.md	camera		data
+0x42c4b0	JumpCamBuildSpline	camera	I	C	docs/re/camera.md	camera		func
+0x42c670	Player::DefaultDriveCamera	camera	V	G+C	docs/re/camera.md	camera		func
+0x42c6d0	Player::ChangeCameraMover	camera	V	G+C	docs/re/camera.md	camera		func
+0x42d2f4	ChangeCameraMover_JumpTable	camera	V	G+C	docs/re/camera.md	camera		data
+0x42d330	ChangeCameraMover_IndexTable	camera	V	C	docs/re/camera.md	camera		data
+0x42d520	Player::SetInputMode	camera	I	C	docs/re/camera.md	camera		func
+0x42da40	Player::StartSpecialCamera	camera	V	G+C	docs/re/camera.md	camera		func
+0x42ddc0	Player::EndSpecialCamera	camera	V	G+C	docs/re/camera.md	camera		func
+0x42df30	DebugCameraCycler	camera	I	C	docs/re/camera.md	camera		func
+0x42e020	Player::CyclePOV	camera	V	G+C	docs/re/camera.md	camera		data
+0x42e450	Player::LookBackToggle	camera	I	C	docs/re/camera.md	camera		func
+0x430730	Player::StartRaceCameras	camera	I	C	docs/re/camera.md	camera		func
+0x431960	SpecialCamCaller_431960	camera	I	C	docs/re/camera.md	camera		func
+0x431a2e	JoyEvent_CAMERA_POV_CHANGE_case	camera	V	C+D	docs/re/camera.md	camera		data
+0x4322a0	RaceStatus::AddEntrant	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals		func
+0x432360	DriverInfo::operator=	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4323f0	RideInfo::operator=	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x435fe0	ModeFlags_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x436000	ModeFlags_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x436020	ModeFlags_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x43db70	Zone_FindTrafficDensity	traffic	I	G+H	docs/re/traffic.md	traffic		func
+0x43eb00	RaceManager::UpdateAIScores	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x43feb0	TrackMarker_Count	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x43fef0	TrackMarker_Get	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x441380	TrackCollision_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x441480	TrackCollision_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x441ed0	TrackPositionMarker_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x441f40	TrackPositionMarker_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x441fe0	TrackRow_FindById	traffic	V	G+C	docs/re/traffic.md	traffic		func
+0x442010	TrackInfo_GetRow	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x442040	TrackInfoTable_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x442080	TrackInfoTable_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x442100	RoadIntersection_Get	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x442150	RoadEntries_FillDistances	traffic	I	H	docs/re/traffic.md	traffic		func
+0x4424d0	Node_IsDriveFwd	traffic	I	G	docs/re/traffic.md	traffic		func
+0x442520	Node_IsDriveBack	traffic	I	G	docs/re/traffic.md	traffic		func
+0x442950	Section_HasLane	traffic	V	G+H	docs/re/traffic.md	traffic		func
+0x442b70	RoadSections_Parse	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x442bd0	RoadSections_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x442dd0	RoadNetwork_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x442e60	RoadNetwork_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x442ed0	RoadEntries_Sort	traffic	I	H	docs/re/traffic.md	traffic		func
+0x4430b0	RoadNetwork_PostLoad	traffic	I	H	docs/re/traffic.md	traffic		func
+0x4432a0	TrackPath::BuildSplines	assets	V	Hopper sub_4432a0	docs/re/assets.md	assets		func
+0x4433f0	TrackPath::FreeSplines	assets	V	Hopper sub_4433f0	docs/re/assets.md	assets		func
+0x443450	TrackPath::Init	assets	V	Hopper sub_443450 + capstone	docs/re/assets.md	assets		func
+0x4434d0	TrackPath::Parse	assets	V	Hopper sub_4434d0 + Ghidra FUN_004434d0: H+G agree	docs/re/assets.md	assets		func
+0x4436d0	Zone_Find	traffic	I	G	docs/re/traffic.md	traffic		func
+0x4441f0	TrackPath::Loader	assets	V	Hopper sub_4441f0 + Ghidra make FUN_004441f0: H+G agree	docs/re/assets.md	assets		func
+0x444200	TrackPath::Unloader	assets	V	Hopper sub_444200 + Ghidra make FUN_00444200: H+G agree	docs/re/assets.md	assets		func
+0x4442a0	StreamSections::Loader	assets	V	Hopper sub_4442a0 + Ghidra make FUN_004442a0: H+G agree	docs/re/assets.md	assets		func
+0x4442f0	StreamSections::Unloader	assets	V	Hopper sub_4442f0 + Ghidra make FUN_004442f0: H+G agree	docs/re/assets.md	assets		func
+0x445350	StreamSections::Shutdown	assets	V	Ghidra make FUN_00445350	docs/re/assets.md	assets		func
+0x4457c0	StreamSection_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x445b00	Section::SyncSmackableVisibility	props	I	capstone	docs/re/props.md	props		func
+0x445b60	StreamSection_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x446aa0	StreamBoundaries_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x446ab0	StreamBoundaries_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x446db0	StreamBoundaries_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x447160	InitZDirArchive	assets	V	hopper	docs/re/assets.md	assets		func
+0x447ab0	PaddingChunk::Loader	assets	V	capstone	docs/re/assets.md	assets		func
+0x447ac0	bChunkLoader::LoadChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x447b10	bChunkLoader::UnloadChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x447c00	PlaceChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x447d90	LoadResourceChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x447f40	InitResourceFileSlotPool	assets	V	hopper	docs/re/assets.md	assets		func
+0x447f90	ResourceFile::ResourceFile	assets	V	hopper	docs/re/assets.md	assets		func
+0x448110	ResourceFile::BeginLoading	assets	V	hopper	docs/re/assets.md	assets		func
+0x4481d0	ResourceFile::UnloadChunks	assets	V	hopper	docs/re/assets.md	assets		func
+0x448220	ResourceFile::FinishLoading	assets	V	hopper	docs/re/assets.md	assets		func
+0x4482e0	ResourceFile::OnReadDone	assets	V	hopper	docs/re/assets.md	assets		func
+0x4482f0	CreateResourceFile	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x448370	UnloadResourceFile	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x4483c0	ServiceResourceLoading	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x448440	FindResourceFile	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x448600	GameFlow::LoadGlobalA	assets	V	hopper	docs/re/assets.md	assets		func
+0x448650	GameFlow::LoadGlobalB	assets	V	hopper	docs/re/assets.md	assets		func
+0x448b10	GameFlow::LoadingFrontEndPart1	assets	V	hopper	docs/re/assets.md	assets		func
+0x448f70	GameFlow_CreateRides	traffic	I	H	docs/re/traffic.md	traffic		func
+0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	V	hopper	docs/re/assets.md	assets		func
+0x449765	GameFlow::LoadingTrackSpecificPart1	assets	V	hopper	docs/re/assets.md	assets		func
+0x44aa10	AIGoal::Create	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals		func
+0x44bd10	RacerAI::UpdateRubberBand	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x44c010	RacerAI::GetCatchUpTerms	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
+0x44c2e0	TrafficCar_HonkAtPlayer	traffic	I	H	docs/re/traffic.md	traffic		func
+0x44c550	RacerAI::UpdateDesiredSpeed	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x44ca10	Racer::GetSkillLevel	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals		func
+0x44d570	Node_GetIntersection	traffic	V	H+G+file	docs/re/traffic.md	traffic		func
+0x44d8b0	RaceGoal::SelectAction	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		data
+0x44dd30	DragGoal::SelectAction	rivals	I	Ghidra+capstone	docs/re/rivals.md	rivals		func
+0x44e020	TrafficGoal_Select_BeTraffic	traffic	V	H+C	docs/re/traffic.md	traffic		func
+0x44e140	TrafficGoal_Select_BeAmbient	traffic	V	H+C	docs/re/traffic.md	traffic		func
+0x44efd0	TrafficCar_IsIntersectionObstacle	traffic	I	G	docs/re/traffic.md	traffic		func
+0x453920	Finder_AvoidAsTraffic	traffic	I	H	docs/re/traffic.md	traffic		func
+0x453c60	Action_AvoidAvoidableAsTraffic::Update	traffic	I	H	docs/re/traffic.md	traffic		func
+0x4543d0	Finder_ObeyIntersections	traffic	V	G	docs/re/traffic.md	traffic		func
+0x454490	Action_ObeyTrafficIntersections::Update	traffic	I	G	docs/re/traffic.md	traffic		func
+0x4563d0	RoadGraph_Walk	traffic	I	H+C	docs/re/traffic.md	traffic		func
+0x458bd0	RoadPath_LinkAccepted	traffic	I	H	docs/re/traffic.md	traffic		func
+0x45d640	Racer::GetDirection	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals		func
+0x462070	RacerAITuning::Loader	assets	V	Hopper sub_462070 + Ghidra make FUN_00462070: H+G agree	docs/re/assets.md	assets		func
+0x4620a0	RacerAITuning::Unloader	assets	V	Ghidra make FUN_004620a0 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x4623d0	Racer::ChooseGoal	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals		func
+0x462740	Racer::PersonalityDraw	rivals	V	capstone	docs/re/rivals.md	rivals		data
+0x462840	Racer::ShouldTakeFork	rivals	I	capstone	docs/re/rivals.md	rivals		data
+0x462aa0	Racer::GetUnstuckReady	rivals	I	capstone	docs/re/rivals.md	rivals		data
+0x465d00	SpecialCamCaller_465d00	camera	I	G+C	docs/re/camera.md	camera		func
+0x466840	Virtual::ReturnOne (float constant getter)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x468800	CarBody_DisableCountInc	traffic	U	H+G	docs/re/traffic.md	traffic		func
+0x469580	WorldObjects::Broadphase	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x469670	WorldObjects::TestObject	props	I	ghidra+capstone	docs/re/props.md	props		func
+0x46d390	DriveTrain::DriveTrain	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4727c0	GJKWitness::Initialize	car.physics	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x472b00	CarShape_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x472b30	CollisionShapes::LoadChunk	props	I	hopper	docs/re/props.md	props		func
+0x472c00	CarShape_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x472c60	CarShape_Find	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets	CollisionShapes::FindByKey@props	func
+0x473cf0	CollisionShapes::DefaultBox	props	I	hopper+ghidra	docs/re/props.md	props		func
+0x473fc0	SelectDriveClassTuningRow (not GetUpgradeLevel)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4740d0	MellowMover::MellowMover	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x475070	Mellovator::Mellovator	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x476840	PhysicsMover::PhysicsMover	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x47af20	AnimBank_DynamicLoad	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets	CAnimBank::Initialize@tuning	func
+0x47b7b0	PostRaceScene_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x47b7f0	PostRaceScene_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x47b890	NisScene_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x47b8d0	NisScene_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x47ce50	AnimBank_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x47ced0	AnimBank_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x47d070	Camera::SetCameraMatrix	blur	V	C+M	docs/re/blur.md	blur		func
+0x47d680	FindCameraRow	camera	V	G+H+C	docs/re/camera.md	camera		func
+0x47dcd0	CameraTables_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x47de30	CameraTables_LoadChildren	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x47df00	CameraTables_Unload_Impl	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x47e230	CameraTables_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x47e250	CameraTables_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x47edb0	CountdownCameraCoordinator::ctor	camera	I	M+C	docs/re/camera.md	camera		func
+0x47ef00	IntroNisCoordinator	camera	I	M+C	docs/re/camera.md	camera		func
+0x482f00	DragCameras::Parse	assets	V	Ghidra make FUN_00482f00	docs/re/assets.md	assets		data
+0x483080	DragCameras::Loader	assets	V	Ghidra make FUN_00483080 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x4830b0	DragCameras::Unloader	assets	V	Hopper sub_4830b0 + Ghidra make: H+G agree	docs/re/assets.md	assets		func
+0x4834e0	CameraMover::ctor	camera	I	M	docs/re/camera.md	camera		func
+0x483640	Camera::ApplyNoise	camera	I	M+C	docs/re/camera.md	camera		func
+0x483860	CameraMover::ComputeBankedUpVector	camera	I	M	docs/re/camera.md	camera		func
+0x4838e0	CameraMover::EnforceMinGapToWalls	camera	V	G+C	docs/re/camera.md	camera		func
+0x4840c0	OrbitCarCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
+0x4852a0	RearViewMirrorCameraMover::ctor	camera	V	C+D+M	docs/re/camera.md	camera		func
+0x4852e0	CameraMover::TrivialDtor	camera	I	D	docs/re/camera.md	camera		data
+0x485300	RearViewMirrorCameraMover::Update	camera	V	C+M	docs/re/camera.md	camera		func
+0x4854e0	TrackCarCameraMover::ctor	camera	I	G+M	docs/re/camera.md	camera		func
+0x485c00	TrackCarCameraMover::Update	camera	I	G+M	docs/re/camera.md	camera		func
+0x486c80	SelectCarCameraMover::ctor	camera	I	M	docs/re/camera.md	camera		func
+0x488420	DebugWorldCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
+0x4892c0	NullCameraMover::ctor	camera	V	C+D	docs/re/camera.md	camera		func
+0x489360	DriveCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
+0x489600	DriveCameraMover::OutsidePOV	camera	I	C	docs/re/camera.md	camera		data
+0x489650	DriveCameraMover::IsWallFlag	camera	I	C	docs/re/camera.md	camera		func
+0x489690	DriveCameraMover::Update	camera	V	G+H+C	docs/re/camera.md	camera		func
+0x48afd0	CubicCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
+0x48c1f0	CameraMover_Type12::ctor	camera	I	G+C	docs/re/camera.md	camera		func
+0x48c280	DragRaceCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera		func
+0x48c990	DragRaceLeaderCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera		func
+0x48d6e0	DragRaceAheadCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera		func
+0x48e210	AnimationControllerCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera		func
+0x48f090	ZoneFreezeCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
+0x490ea0	ZonePreviewCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
+0x49fe10	HudElement::RegisterImage	fe	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4a5a30	EngineTempGauge::BuildTempBarImageList	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4aa4d0	Player::Init	canon	I	capstone	docs/re/canon.md	canon		func
+0x4aaad0	Opt::Serialize	canon	V	capstone	docs/re/canon.md	canon		func
+0x4aac70	Opt::Deserialize	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x4ab120	Ugd::PackBlock	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x4ab200	Ugd::UnpackBlock	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x4ab510	RaceOptions_Get	traffic	U	C+H	docs/re/traffic.md	traffic		func
+0x4ac0f0	cFrontendDatabase::BuildRideForCarHandle	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4ac460	CustomizationDB::Init	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x4ac5a0	FECarConfig::BuildRide	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4ac750	FECarConfig::FillFromRide	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4acce0	FECarConfig::GetCarType	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4ae650	DrawEmitters	blur	I	C	docs/re/blur.md	blur		func
+0x4af0e0	GarageCarLoader::LoadRideInfo	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4af140	GarageCarLoader::Update	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4af420	GetGarageCarLoader	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4af620	GarageMainScreen::GarageMainScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4afe20	GarageMainScreen::~GarageMainScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4aff90	GarageMainScreen::UpdateCarStatisticsBars	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4b0e50	GarageMainScreen::SetRideInfo	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4b0fd0	GarageMainScreen::DisplayReputation	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4b1530	GarageMainScreen::SetCarType	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4b1590	GarageMainScreen::CarLoadingHasStarted	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4b25b0	PresetRide::Loader	assets	V	Hopper sub_4b25b0 + Ghidra make FUN_004b25b0: H+G agree	docs/re/assets.md	assets		func
+0x4b2600	PresetRide::Unloader	assets	V	Ghidra make FUN_004b2600 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x4b2640	PresetRide::FindByKeyHash	rivals	I	capstone	docs/re/rivals.md	rivals		func
+0x4b2660	PresetRide::FindByHash	assets	V	Hopper sub_4b2660	docs/re/assets.md	assets		func
+0x4b26f0	PresetRide::ApplyToRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x4b3a20	Race::PickOpponentNames	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals		func
+0x4b3ac0	Race::SpawnTraffic	traffic	V	H+G+C+file	docs/re/traffic.md	traffic		func
+0x4b3c60	Race::BuildRandomOpponentRide	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x4b4040	Race::SpawnOpponents	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4b4380	Race::MatchOpponentRatings	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x4b4590	Race::RollOpponentSkill	rivals	V	capstone+Ghidra	docs/re/rivals.md	rivals		func
+0x4b4610	Race::ShuffleGrid	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals		func
+0x4b47a0	ApplyOptionsToPlayerSettings	camera	V	G+C	docs/re/camera.md	camera		func
+0x4b49e0	RaceSetup_Circuit	traffic	I	H	docs/re/traffic.md	traffic		func
+0x4b5df0	Career::StartRaceFromEvent	canon	V	ghidra+capstone	docs/re/canon.md	canon		func
+0x4b6300	Race::SetPlayerGridSlot	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4bbd70	CarPart::GetNameAttribute	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4be6c0	OptionsCameraUI	camera	I	C	docs/re/camera.md	camera		func
+0x4c2a50	GetCarModelNameHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c2b00	GetSecondaryLogoHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c40a0	(unknown garage screen)::NotificationMessage	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		data
+0x4c4920	EventMap::SetModeIcon	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
+0x4c49f0	EventMap::GetModeLabelHash	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
+0x4c4c60	EventMap::ShowEventSummary	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4c55f0	Briefing::GetHostName	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
+0x4c5680	Briefing::Build	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4c5ce0	Briefing::ShowDescription	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4c5f20	Briefing::HasRequiredRideRating	canon	V	capstone+ghidra+hopper	docs/re/canon.md	canon		func
+0x4c6970	GetCarManufacturerNameHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c6bc0	UndergroundJunkmanGiveth::vslot3 (swallow-input filter)	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c6c00	GetJunkmanRewardSpeech	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c6cb0	UndergroundJunkmanGiveth::UndergroundJunkmanGiveth	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c7150	UndergroundJunkmanGiveth::ApplyJunkmanPartToEditingRide	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c7670	CreateUndergroundJunkmanGiveth	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d77a0	GetPartColor	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d7980	ColorElement::SetPart	fe	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d7eb0	IsPaintLocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d8180	IsPaintOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d8270	IsLevel2PaintsOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d82f0	IsLevel3PaintsOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d8440	ColorPicker::GetHighestUpgradeLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d9fa0	GetDefaultVinylColors	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4deaa0	BootMovieScreen::BootMovieScreen	canon	V	hopper	docs/re/canon.md	canon		func
+0x4e1c60	MPChooseGarageScreen::~MPChooseGarageScreen	fe	I	ghidra+hopper	docs/re/tuning.md	tuning		data
+0x4e1c90	CreateMPChooseGarageScreen	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e1cf0	MPChooseGarageScreen::MPChooseGarageScreen	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e2030	MPChooseGarageScreen::NotificationMessage	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e24a0	ComputeVinylIconHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e2680	IsHiddenUnique	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e27e0	IsSamanthaUnique	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e28d0	FilterVinylPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e45b0	GarageVinylTypeScreen::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e4610	GarageVinylTypeScreen::OptionChosen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e4840	GarageVinylTypeScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e4ae0	CreateVinylTypeScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e4c40	GarageVinylGroupScreen::GarageVinylGroupScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e5590	GarageVinylGroupScreen::OptionChosen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e55b0	GarageVinylGroupScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e5700	GarageVinylBrowserScreen::GarageVinylBrowserScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e5df0	GarageVinylBrowserScreen::~GarageVinylBrowserScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e6030	GarageVinylBrowserScreen::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e61f0	GarageVinylBrowserScreen::OptionChosen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e62b0	IsVinylUnlocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e6390	GarageVinylBrowserScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e6600	CreateGarageVinylBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		data
+0x4e79e0	GaragePresetsScreen::~GaragePresetsScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e7a40	GaragePresetsScreen::GaragePresetsScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e7c80	GaragePresetsScreen::Redraw	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e7f60	GaragePresetsScreen::LoadPreset	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e8120	CreateGaragePresetsScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4e9e90	UrlRankScreen::Show	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4f3a00	FEPackage::FEPackage	assets	V	Ghidra make FUN_004f3a00	docs/re/assets.md	assets		func
+0x4f4120	FEngLibrary::AddPackage	assets	V	Hopper sub_4f4120 + Ghidra make: H+G agree	docs/re/assets.md	assets		func
+0x4f4190	FEngLibrary::RemovePackage	assets	V	Ghidra make FUN_004f4190	docs/re/assets.md	assets		func
+0x4f4290	FEngPackage::Loader	assets	V	Ghidra make FUN_004f4290 (Hopper export lacks it; capstone agrees)	docs/re/assets.md	assets		data
+0x4f42c0	FEngPackage::Unloader	assets	V	Hopper sub_4f42c0 + Ghidra export FUN_004f42c0: H+G agree	docs/re/assets.md	assets		func
+0x4f4420	FEngFont_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x4f4470	FEngFont_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x4f44c0	FEngFont_Init	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x4f46c0	FEngFont_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x4f57a0	MoviePlayer::BuildPath	canon	V	hopper	docs/re/canon.md	canon		func
+0x4f62f0	FEngPushGarageMainPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4f7840	MovieNameToId	canon	V	hopper+capstone	docs/re/canon.md	canon		func
+0x504260	GarageManager::GetMsgForNumScreensInList	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5042d0	GarageManager::GetMsgForUpgradeLevel	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x504320	GarageManager::PushScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x504390	GarageManager::PopScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x504450	GarageManager::PreviewPart	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5044b0	GarageManager::InstallPart	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x504550	GetBrakeForPerfUpgrade	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x504630	FindPartWithLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5046d0	GarageManager::PreviewPhysicsUpgrade	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5047d0	GarageManager::InstallPhysicsUpgrade	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x504890	GarageManager::SyncActualToEditing	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5048e0	ShowHideNewlyUnlockedMarker(int)	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x504be0	GarageScreen::GarageScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x505330	GarageScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5055c0	GarageChooseVisualCategoryScreen::~GarageChooseVisualCategoryScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x505660	CreateGarageVisualCategoryScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x506090	GarageCategoryVisual::~GarageCategoryVisual	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x506100	CreateGarageCategoryVisual	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x506210	GarageCategoryVisual::GarageCategoryVisual	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x506ca0	GarageCategoryVisual::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x506db0	GarageCategoryVisual::RefreshGrayedThumbsForWidebodyConflict	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x506e10	GarageCategoryVisual::ScrollPickables	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x506eb0	GarageCategoryVisual::GetNumPartsAvailable	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x507340	IsMagicSpoilerSpecialCase	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5074d0	IsMagicSpoilerToHide	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x507e10	GaragePartsBrowser::IsPartLocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x507ec0	GaragePartsBrowser::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x508510	GaragePartsBrowser::CanPlayerPurchasePart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x508560	GaragePartsBrowser::IsInstallingPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x508620	GaragePartsBrowser::IsBuyingPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5089b0	GaragePartsBrowser::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x509570	PerfStatsScreen::SetupUpgrades	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x509d10	CreateGaragePerfCategory	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x509d70	IsPerformanceUpgradeLocked	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50a070	ChooseGaragePerfPath::AddCategory	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50a1a0	ChooseGaragePerfPath::RedrawHeading	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50a3c0	ChooseGaragePerfPath::NotificationMessage	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50a570	CreateGaragePerfTuner	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50a5d0	GaragePerfTuner::GaragePerfTuner	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50a9a0	GaragePerfTuner::~GaragePerfTuner	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50aa90	GaragePerfTuner::IsUpgradeLocked	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50ada0	GaragePerfTuner::RedrawHeading	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50b610	GaragePerfBrandPackage::~GaragePerfBrandPackage	car.tuning	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50b680	CreateGaragePerfBrand	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50b6e0	GaragePerfBrandPackage::GaragePerfBrandPackage	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50b9e0	GaragePerfBrandPackage::RedrawHeading	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50bc10	GaragePerfBrandPackage::NotificationMessage	car.tuning	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c020	GaragePaintModScreen::~GaragePaintModScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c090	CreateGaragePaintModScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c0f0	GaragePaintModScreen::GaragePaintModScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c3c0	GaragePaintModScreen::AddCategory	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c430	GaragePaintModScreen::ScrollPickables	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c4d0	GaragePaintModScreen::RedrawHeading	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c530	GaragePaintModScreen::MoveBackPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c590	GaragePaintModScreen::MoveForwardPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c5f0	GaragePaintModScreen::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50ce30	GarageRimsBrandBrowser::AddPickable	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50cf90	GarageRimsBrandBrowser::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50d010	GarageRimsBrandBrowser::NotificationMessage	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50d0a0	CreateGarageRimsBrandScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50d2b0	GarageRimsBrowser::ScrollPickables	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50d420	GarageRimsStyleBrowser::GarageRimsStyleBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50dc60	GarageRimsStyleBrowser::NotificationMessage	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50df60	GarageRimsStyleBrowser::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50e6f0	CreateGarageRimsStyleScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50e750	GarageRimsBrowser::~GarageRimsBrowser	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50e7c0	GarageRimsBrowser::GarageRimsBrowser	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50e890	GarageRimsBrowser::BuildPickablesList	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50f200	GarageRimsBrowser::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50f780	GarageRimsBrowser::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50f990	CreateGarageRimsBrowserScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50faa0	CreateDecalZoneChooseScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50fb00	GarageDecalsZone::GarageDecalsZone	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50fe70	GarageDecalsZone::AddPickable	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50fee0	GarageDecalsZone::ScrollPickables	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x50ff80	GarageDecalsZone::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x510600	GarageDecalLayout::~GarageDecalLayout	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x510670	CreateDecalSizeChooseScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5106d0	GarageDecalLayout::GarageDecalLayout	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x510860	GarageDecalLayout::ScrollPickables	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x510900	GarageDecalLayout::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x510980	GarageDecalLayout::NotificationMessage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x510d60	CreateDecalSlotChooseScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x510f50	GarageDecalsSlot::GarageDecalsSlot	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x511aa0	CreateDecalBrandChooseScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x511b00	IsBlackDecal	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x511b70	IsWhiteDecal	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x511bf0	BuildDecalList	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x511ff0	GarageDecalsBrand::GarageDecalsBrand	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x512690	GarageDecalsBrand::RedrawHeading	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x512c40	GarageChooseAccessoryCategoryScreen::~GarageChooseAccessoryCategoryScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		data
+0x512cb0	CreateGarageAccessoryCategoryScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x512d10	GarageChooseAccessoryCategoryScreen::GarageChooseAccessoryCategoryScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x513210	GarageChooseAccessoryCategoryScreen::AddCategory	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x513310	GarageChooseAccessoryCategoryScreen::RedrawHeader	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x51ad30	Career::AnnounceReward	canon	I	ghidra+capstone	docs/re/canon.md	canon		func
+0x51bd70	CarDecalSlots::Loader	assets	V	Hopper sub_51bd70 + Ghidra make FUN_0051bd70: H+G agree	docs/re/assets.md	assets		func
+0x51bdc0	CarDecalSlots::Unloader	assets	V	Hopper sub_51bdc0 + Ghidra make FUN_0051bdc0: H+G agree	docs/re/assets.md	assets		func
+0x51be80	GarageRimsBrandBrowser::~GarageRimsBrandBrowser	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x51c180	MagazineTables::Loader	assets	V	Hopper sub_51c180 + Ghidra make FUN_0051c180: H+G agree	docs/re/assets.md	assets		func
+0x51c340	MagazineTables::Unloader	assets	V	Hopper sub_51c340 + Ghidra make FUN_0051c340: H+G agree	docs/re/assets.md	assets		func
+0x51c5f0	EAXSound::ReloadLanguageSpeechBank (called by ChangeLanguage 0x59fa20)	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x51c830	EAXSound::PlaySpeechStream	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x51cd60	EAXSound::InitializeDriver	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x51ce40	EAXSound::InitializeInGame	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x51cf40	EAXSound::InitializeFrontEnd	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x51d240	EAXSound::Update	audio.engine	V	ghidra+hopper	docs/re/sound.md	sound		func
+0x51da90	EAXSound::LoadFrontEndSoundBanks	audio.bank	V	ghidra+hopper	docs/re/sound.md	sound		func
+0x51dd70	EAXSound::UnloadFrontEndSoundBanks	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x51dec0	EAXSound::LoadInGameSoundBanks	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x51ec40	EAXSound::UnLoadInGameSoundBanks	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x51ee20	EAXSound::EnterPauseMenu	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x520b90	EAXSound::UpdateLoopedMusic (FE looped music Csis class FEDriveOn)	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x520e90	EAXSound::InitEATraxMasks	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x5212e0	EAXAemsManager::Initialize	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x521c80	EAXAemsManager::SetCurrentBankPath (bank name resolver)	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x522020	EAXAemsManager::LoadAemsBank	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x522440	EAXMod::Pause (guard only: SND enter/leave critical)	audio.sfx	I	ghidra	docs/re/sound.md	sound		data
+0x5225c0	EAXS_3DMixer::UpdateMasterVolume (virtual, base)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x522e50	EAXFrontEnd::PlayDriveOnSnd	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5234a0	EAXAITunerCar::Destroy	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x5234c0	EAXAITunerCar::Initialize	audio.engine	V	ghidra	docs/re/sound.md	sound		data
+0x523540	EAXAITunerCar::HasFX	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x523560	EAXAITunerCar::RotationUpdate	audio.engine	I	ghidra	docs/re/sound.md	sound		func
+0x5235a0	EAXAITunerCar::UpdateEngineVol	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x5236c0	EAXAITunerCar::SFXMessage (thunk to EAXTunerCar::SFXMessage 0x526af0)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x523910	EAXAITunerCar::UpdateTireSounds (not EAXTires)	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x523990	EAXAITunerCar::BeginUpShift	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x523a70	EAXAITunerCar::BeginDownShift	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x523b30	EAXAITunerCar::UpdateTorque	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x523e30	EAXAITunerCar::UpdateGearShiftState (map names are swapped with 0x529530)	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x524130	EAXAITunerCar::UpdateTurboFX	audio.engine	V	ghidra	docs/re/sound.md	sound		data
+0x524240	EAXAITunerCar::UpdateNIS	audio.nis	I	ghidra	docs/re/sound.md	sound		func
+0x524620	EAXAITunerCar::Update	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x524930	EAXTrafficCar::SFXMessage (default stub, returns 0)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x524bb0	EAXTrafficCar::IsPlayerCarInRange	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5251d0	EAXTrafficCar::IsHonking	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5251e0	EAXTrafficCar::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x525410	EAXTrafficCar::GetPlayerSpeedRelativeToUs	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x525480	EAXTrafficCar::UpdateDriveBy	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x526320	EAXTunerCar::ProcessSoundSphere	audio.sfx	V	ghidra	docs/re/sound.md	sound		data
+0x526420	EAXTunerCar::Initialize	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x526880	EAXTunerCar::Destroy	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x526a30	EAXTunerCar::Start	audio.engine	I	ghidra	docs/re/sound.md	sound		func
+0x526a40	EAXTunerCar::HasFX	audio.engine	V	ghidra	docs/re/sound.md	sound		data
+0x526af0	EAXTunerCar::SFXMessage	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x526b50	EAXTunerCar::LandJumpPlay	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x526c70	EAXTunerCar::BottomOutPlay	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x526db0	EAXTunerCar::BottomOutUpdate	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x527080	EAXTunerCar::UpdateTorque	audio.engine	V	ghidra	docs/re/sound.md	sound		data
+0x527180	EAXTunerCar::UpdateRPM	audio.engine	V	ghidra	docs/re/sound.md	sound		data
+0x527480	CameraMover::VelocityNoise	camera	I	M+C	docs/re/camera.md	camera		func
+0x527740	EAXNitrous::Play	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5277f0	EAXNitrous::Stop	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x527810	EAXNitrous::Destroy	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x527850	EAXNitrous::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5278e0	EAXTunerCar::UpdateNitrous	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5279d0	EAXSkids::EAXSkids	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528300	EAXTurbo::~EAXTurbo	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x5283f0	EAXTurbo::AdjustVolume	audio.engine	I	ghidra	docs/re/sound.md	sound		func
+0x528470	EAXTurbo::PlayBlowoff	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528610	EAXTurbo::IsBlowOffDone	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528650	EAXTurbo::UpdateBlowOff	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x5286b0	EAXTurbo::StopBlowOff	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528700	EAXTurbo::PlaySpl (spool loop)	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528830	EAXTurbo::UpdateSpool	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528b60	EAXTunerCar::UpdateTurboFX	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528c70	EAXShifting::`scalar deleting destructor`	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528c90	EAXShifting::~EAXShifting	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528d70	EAXShifting::PlayDisengageSnd	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528f00	EAXShifting::Update	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x528f80	EAXShifting::PlayEngageSnd	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x5292b0	EAXTunerCar::BeginUpShift	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x529530	EAXTunerCar::UpdateGearShiftState (map names swapped with 0x523e30)	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x5298e0	EAXTunerCar::BeginDownShift	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x529a00	EAXTunerCar::CleanUpShiftFX	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x529b20	EAXTunerCar::IsEngineFinishedLoading	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x529b60	EAXTunerCar::InitializeEngine	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x529f50	EAXTunerCar::ShouldUpShiftDynLd	audio.engine	I	ghidra	docs/re/sound.md	sound		func
+0x52a310	EAXTunerCar::BreakingEffectUpdate	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x52a580	EAXTunerCar::ShouldDoBreakingEffect	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x52a890	EAXRoadNoise::Update	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52adf0	EAXRoadNoise::PlayTransition	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52b040	EAXRoadNoise::SendEnvelopeToMixer	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52b0e0	EAXRoadNoise::Play	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52b2d0	EAXTunerCar::Refl_Update	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52b500	EAXTunerCar::Create_Reflection	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52b690	EAXTunerCar::DestroyReflection	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52b700	EAXTunerCar::InitializeReflection	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52ba50	EAXTunerCar::UpdateTunnelWoosh	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52bb40	EAXTunerCar::DestroyTunnelWoosh	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52bb90	EAXTunerCar::ShouldPlayTunnelWoosh	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52c1d0	EAXTunerCar::MixUpdate	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52c3a0	EAXTunerCar::UpdateCarPhysics	audio.engine	I	ghidra	docs/re/sound.md	sound		data
+0x52c560	EAXTunerCar::UpdateMasterVolume	audio.engine	V	ghidra	docs/re/sound.md	sound		data
+0x52c620	EAXTunerCar::Update	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52c930	EAXCar::UpdateSoundSphere	audio.sfx	I	ghidra	docs/re/sound.md	sound		func
+0x52ccd0	EAXTires::CreateTires	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52d010	EAXTires::GenerateSkidNoise	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52d8b0	EAXTires::GenerateRoadNoise	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x52de60	EAXS_SoundShape::GetDistanceRolloff	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52e060	EAXS_SoundShape::GetCurveOutput	audio.mixer	V	ghidra	docs/re/sound.md	sound		data
+0x52e380	EAXS_SoundShape::GetAzimShapeOutput	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52e3f0	EAXS_3DMixer::EAXS_3DMixer	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52e460	EAXS_3DMixer::~EAXS_3DMixer	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52e470	EAXS_3DMixer::Init3DMix	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52e4a0	EAXS_3DMixer::Setup3DMix	audio.mixer	V	ghidra	docs/re/sound.md	sound		data
+0x52ea00	EAXS_3DMixer::Update3DMix	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52ebe0	EAXS_3DMixer::IsInsideMinDistance	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52ec20	EAXS_3DMixer::GetDistanceToRefObj	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x52f940	EAXCollision::EAXCollision	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x52f9b0	EAXCollision::~EAXCollision	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x530740	stSoundCollision::AdjustVolume	audio.sfx	I	ghidra	docs/re/sound.md	sound		func
+0x530a50	stSoundCollision::UpdateQueue	audio.sfx	V	ghidra	docs/re/sound.md	sound		data
+0x530e80	stSoundCollision::UpdateScrapeParams	audio.sfx	V	ghidra	docs/re/sound.md	sound		data
+0x530f20	stSoundCollision::CalcCollisionPositionData	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x531080	stSoundCollision::BeginScrape	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5311d0	stSoundCollision::BeginMixerEnvelope	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x531350	stSoundCollision::BeginImpact	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5314d0	EAXS_3DMixer::IsThisObjectIntheLead (default returns 0)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x532840	EAX linear ramp evaluate (not SetCsisName)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x532960	EA::Allocator::DefaultIAllocatorImpl::Allocate	other	V	ghidra+hopper	docs/re/tuning.md	tuning		data
+0x532a20	EAXSND8Wrapper::Initialize	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x532ad7	(not a function: mid-instruction inside EAXSND8Wrapper::Initialize 0x532a20)	other	V	ghidra	docs/re/sound.md	sound		data
+0x5336c0	SoundObject::SoundObject(WorldObject*)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5337f0	SoundObject::SoundObject(bVector3 const&)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x5338c0	SoundObject::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x534a90	EAXS_3DMixer-derived deleting destructor (map: EAXS_SoundShape::~)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x534be0	EAXS_WindNoise::UpdateChannels (map: EAXS_VerticalCylinder::Update)	audio.sfx	I	ghidra	docs/re/sound.md	sound		func
+0x535710	EAXS_WindNoise::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x535c90	EAXS_WindNoise::UpdateCSISParams	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x535e90	EAXS_WindNoise::SetupSoundSphere	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x536250	EAXChannel::ReceiveEnvelopeEvent	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x5362a0	EAXChannel::GenerateEnvelope	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x5364e0	EAXMixMgr::EAXMixMgr	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x5368b0	EAXMixMgr::SetMixType	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x536a70	EAXMixMgr::EndMixType	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x536c80	EAXMixMgr::ReceiveTrigger	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x537460	EAXMod::SetOwner (this+0x10 = arg; map: Initialize(void))	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x538770	EAXS_StreamManager::SetupWorldDataTransitionData	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x5387c0	EAXS_StreamManager::GetCurrentAmbientZone	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x538ed0	EAXS_StreamControl::SetMasterVolume	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x538f10	EAXS_StreamControl::DelayStartBy	audio.stream	V	ghidra	docs/re/sound.md	sound		data
+0x538f60	EAXS_StreamControl::SetStreamStage	audio.stream	V	ghidra	docs/re/sound.md	sound		data
+0x538f80	EAXS_StreamControl::UpdateStreams	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x539210	EAXS_Streams::InitializeStream	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x539ac0	EAXS_Streams::Update3DParams	audio.stream	I	ghidra	docs/re/sound.md	sound		func
+0x539b70	EAXS_Streams::SetupStartParameters	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x53ac30	EAXS_AmbStereoStream::UpdateStreams	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x53b220	EAXS_AmbStereoStream::EnterRaceCountDown	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x53ba10	EAXS_AmbStereoStream::UpdateFadeTransition	audio.stream	V	ghidra	docs/re/sound.md	sound		data
+0x53bfc0	EAXS_MusicStream::InitializeEATRAX	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x53d640	EAXS_TCMStream::PlayStream	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x53e400	BinarySearch_Hash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x53f6e0	Solid_ResolvePending	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x53f9b0	Solid_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x53fef0	SolidList_LoadContainer	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x53ffd0	Solid_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x540270	SolidList_Unload_Impl	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x5402f0	SolidList_Release	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x540420	SolidList_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x540440	SolidList_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x540460	SolidPack_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x5404e0	SolidPack_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x540630	Solid_FindByHash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x540680	Solid_FindInAllLists	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x540f10	LightPack_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x5410b0	LightPack_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x5413e0	LightTree_Query	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x544f30	LampFlares_Draw	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x5453d0	TexturePack_LoadIndex	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x545520	TexturePack_Remove	assets	I	Hopper export has no block (inside another sub_); Ghidra export block; capstone only	docs/re/assets.md	assets		data
+0x545580	TexturePack_BindPixels	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x5455c0	TexturePack_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x545770	TexturePack_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x5457f0	TexturePack_Register	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x545900	TexturePack_FixEntries	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x5459f0	TexturePack_AttachPixels	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x545af0	TexturePackHandle::UnmapData	assets	V	Hopper sub_545af0 + Ghidra FUN_00545af0: H+G agree	docs/re/assets.md	assets		func
+0x545c10	TexturePackHandle::FindRecordByHash	assets	V	Ghidra FUN_00545c10 + Hopper sub_545c10	docs/re/assets.md	assets		func
+0x545c60	TexAnim_Register	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x545cc0	TexAnim::Unregister	assets	V	Ghidra FUN_00545cc0	docs/re/assets.md	assets		func
+0x545d50	TexAnim::ResolveFrames	assets	V	Ghidra FUN_00545d50	docs/re/assets.md	assets		func
+0x545ea0	TexAnim::Update	assets	V	Ghidra FUN_00545ea0 (called from 0x40a752)	docs/re/assets.md	assets		func
+0x545fb0	TexturePack::SectionMap	assets	I	capstone asm (no decompile in either export)	docs/re/assets.md	assets		func
+0x546010	TexturePack::SectionUnmap	assets	I	capstone asm	docs/re/assets.md	assets		func
+0x5460e0	TexturePack::SectionHeader	assets	I	capstone asm	docs/re/assets.md	assets		data
+0x5461c0	Texture_FindByHash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x5462d0	TrackSkyInfo_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x546310	TrackSkyInfo_Select	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x546570	TrackSkyInfo_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x549130	EAXMod::Stop (ret 4 stub)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x567450	Vec3Normalize	blur	I	C	docs/re/blur.md	blur		func
+0x569460	CarPartCuller::CullParts	other	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x569990	Car::InitRenderInfo	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x569c50	FrontEndRenderingCar::FrontEndRenderingCar	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x56a040	FrontEndRenderingCar::ReInit	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x56a130	CarRenderInfo::CarRenderInfo	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x56c3d0	CarRenderInfo::UpdateDecalTextures	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x56dc30	CarRenderInfo::Render	other	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x570950	DrawShowcaseCarList	blur	I	C	docs/re/blur.md	blur		func
+0x571050	DrawRaceCarList	blur	V	G+C	docs/re/blur.md	blur		func
+0x573150	Chunk39100::Loader	assets	V	Hopper sub_573150 + Ghidra make FUN_00573150: H+G agree	docs/re/assets.md	assets		func
+0x573160	Chunk39100::Unloader	assets	V	Hopper sub_573160 + Ghidra make FUN_00573160: H+G agree	docs/re/assets.md	assets		func
+0x575040	ApplyCameraShake	camera	I	G+C+M	docs/re/camera.md	camera		func
+0x575200	MaybeCameraShake	camera	I	M+C	docs/re/camera.md	camera		func
+0x575940	NullChunk::Loader	assets	V	capstone	docs/re/assets.md	assets		func
+0x575960	CompleatCarPhysicsInfo::BuildCarPhysicsInfo	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x576250	CompleatCarPhysicsInfo::BuildBodyInfo	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5787e0	WorldObjectCohort::Loader	assets	V	Ghidra make FUN_005787e0 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x578800	WorldObjectCohort::Unloader	assets	V	Ghidra make FUN_00578800	docs/re/assets.md	assets		data
+0x578880	WorldObjectCohort::Launch	assets	V	Ghidra make FUN_00578880	docs/re/assets.md	assets		func
+0x57c8b0	CarData_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x57cb70	CarData_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x57ce10	CarPartDatabase::GetCarPart	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x57cf70	GetCarTypeInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x57cfa0	CarTypeInfo_NextOfUsage	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x57d000	TrafficCar_PickType	traffic	V	H+G+C+file	docs/re/traffic.md	traffic		func
+0x57d160	Ride_Init	traffic	I	G	docs/re/traffic.md	traffic		func
+0x57d860	RideInfo::SyncPartsToPhysicsForAI	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x57ea80	RideInfo::UpdatePartsEnabled	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x57f170	GetStockPerformanceMeasure	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x57f260	RideInfo::GetPerformanceMeasure	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x57f2b0	RideInfo::RebuildPhysicsInfo	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x57f700	RideInfo::MatchPerformance(RideInfo *other, ...)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x57f970	RideInfo::MatchPerformance(float target, ...)	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5801b0	RideInfo::GetTopSpeedRating	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x580240	RideInfo::GetTheoreticalTopSpeed	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5802c0	RideInfo::GetAccelRating	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x580400	RideInfo::GetHandlingRating	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x580590	RideInfo::ComputeMiscStats	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		data
+0x5809c0	DriverInfo::DriverInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x580b00	GetUsedCarTextureInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x581b30	MakeAccelerationTable	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x582f90	TrafficAI::ctor	traffic	I	C+H	docs/re/traffic.md	traffic		func
+0x5832a0	TrafficCar_Park	traffic	V	G+C	docs/re/traffic.md	traffic		func
+0x583350	TrafficAI::Update	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x583700	TrafficAI::Reset	traffic	I	H	docs/re/traffic.md	traffic		func
+0x583f20	LinearTable::Lookup11	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
+0x584b10	RigidBody::SetMassInertia	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x588d10	TriggerVolume::Loader	assets	V	Hopper sub_588d10 + Ghidra make FUN_00588d10: H+G agree	docs/re/assets.md	assets		func
+0x588d70	TriggerVolume::Unloader	assets	V	Hopper sub_588d70 + Ghidra make FUN_00588d70: H+G agree	docs/re/assets.md	assets		func
+0x58ae80	LoadedSkin::LoadedSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58af10	LoadedWheel::LoadedWheel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58b050	LoadedCar::LoadedCar	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58b750	CarLoader::AllocateWheel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58bb50	CarLoader::AllocateSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58c3b0	CarLoader::AllocateRideInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58c5a0	CarLoader::UnloadRideInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58c760	CarLoader::DeleteUnusedRideInfos	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x58d140	Chunk37010::Accept	assets	V	Ghidra make FUN_0058d140 (H export lacks it; capstone agrees)	docs/re/assets.md	assets		data
+0x58d2c0	DecompressCOMP	assets	I	hopper	docs/re/assets.md	assets		func
+0x58d3c0	IsCompressedBuffer	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
+0x58d3f0	DecompressBuffer	assets	V	hopper+data	docs/re/assets.md	assets		func
+0x58d4c0	Unused34030_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x58d500	Unused34030_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x58dca0	WorldZone_NodeWalk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x58dde0	WorldZone_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x58de10	WorldZone_Unload_Impl	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x58deb0	WorldZone_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x58dff0	WorldZone_CreateObject	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x58e2e0	WorldZone_Query	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x592100	RenderWorldModels	blur	V	G+C	docs/re/blur.md	blur		func
+0x592230	SurfaceTable::Init	props	I	hopper+ghidra	docs/re/props.md	props		func
+0x5927d0	WorldObject::CanCollide	props	I	capstone	docs/re/props.md	props		func
+0x592a50	Table34300::Loader	assets	V	Hopper sub_592a50 + Ghidra make FUN_00592a50: H+G agree	docs/re/assets.md	assets		func
+0x592ab0	Table34300::Unloader	assets	V	Hopper sub_592ab0 + Ghidra make: H+G agree	docs/re/assets.md	assets		func
+0x594c60	bOpenFile	assets	I	ghidra	docs/re/assets.md	assets		func
+0x595230	Smackables::Factory	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x5952a0	Smackable::Loader	assets	V	Hopper sub_5952a0 + Ghidra export FUN_005952a0: H+G agree	docs/re/assets.md	assets	SmackableChunks::Loader@props	func
+0x5954c0	Smackable::Unloader	assets	V	Ghidra make FUN_005954c0 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x595670	Smackables::CleanupPool	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x595750	Smackables::ForceCleanup	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x595b70	Smackables::IsExcluded	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x595bf0	Smackables::Init	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x595d80	Smackables::CreateVirgins	props	I	ghidra+capstone	docs/re/props.md	props		func
+0x595f70	Smackables::SaveState	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x5962e0	VirginSmokeable::VirginSmokeable	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x5964c0	VirginSmokeable::~VirginSmokeable	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x596570	VirginSmokeable::Wake	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x5966d0	Smokeable::Smokeable	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x596f50	Smackables::RestoreState	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x597420	Smokeable::Update	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x5977f0	Smokeable::RespawnOrExpire	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x597980	Smokeable::OnHit	props	V	hopper+ghidra	docs/re/props.md	props		func
+0x597c90	Smokeable::Release	props	I	ghidra	docs/re/props.md	props		func
+0x597d10	Smokeable::BuildChildren	props	I	hopper+ghidra	docs/re/props.md	props		func
+0x597e10	Smokeable::BuildChildPart	props	I	hopper+ghidra	docs/re/props.md	props		func
+0x5983d0	SpawnRecord_Allowed	traffic	V	G+H	docs/re/traffic.md	traffic		func
+0x598510	Teleporter_RestoreState	traffic	I	H	docs/re/traffic.md	traffic		func
+0x598600	TrafficTeleporter::DoTimestep	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x5988c0	Teleporter_NeedsMove	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x598a50	Teleporter_IsPassed	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x598b60	TrafficTeleporter::IsPrimaryTeleportationSpotAllowed	traffic	V	G+file	docs/re/traffic.md	traffic		func
+0x598bf0	TrafficTeleporter::PlaceCar	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x598c80	PlaceCar_SpawnRecord	traffic	I	G	docs/re/traffic.md	traffic		func
+0x598fb0	PlaceCar_RandomNode	traffic	I	H+G	docs/re/traffic.md	traffic		func
+0x5991a0	PlaceCar_Route	traffic	I	G	docs/re/traffic.md	traffic		func
+0x5992f0	TrafficCar_Place	traffic	I	G	docs/re/traffic.md	traffic		func
+0x5995e0	PickLaneEitherSide	traffic	I	G	docs/re/traffic.md	traffic		func
+0x599660	PickLane	traffic	I	G	docs/re/traffic.md	traffic		func
+0x599830	Teleporter_MoveCar	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x5999c0	Teleporter_MoveRoute	traffic	I	G	docs/re/traffic.md	traffic		func
+0x599b20	FindNodeAtRoute	traffic	I	G	docs/re/traffic.md	traffic		func
+0x599c80	Teleporter_MoveToSpawnRecord	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x599fc0	SpawnRecord_Find	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x59a2c0	Teleporter_MoveFreeRun	traffic	V	G+C+H	docs/re/traffic.md	traffic		func
+0x59a7c0	TrafficCar_Move	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59aa60	Spot_IsClear	traffic	V	H+G+file	docs/re/traffic.md	traffic		func
+0x59ac20	Teleporter_NearPlayerRoute	traffic	I	H+G	docs/re/traffic.md	traffic		func
+0x59ac80	Teleporter_CarInRange	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59ad90	Spot_NearPlayerRoute	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x59ae60	Teleporter_ReloadTimer	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x59aea0	PickTravelSide	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59b1e0	Spot_NearOtherCar	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x59b2c0	PickRandomSection	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59b370	Teleporter_PickPlayer	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59b3e0	Teleporter_Spacing	traffic	V	H+G+file	docs/re/traffic.md	traffic		func
+0x59b490	NearestPlayer	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59b590	TrafficCar_PickPaint	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59b620	TrafficDriverMode_Map	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59b670	Zone_SpacingMin	traffic	V	C+G	docs/re/traffic.md	traffic		func
+0x59b6a0	Zone_SpacingMax	traffic	V	C+G	docs/re/traffic.md	traffic		func
+0x59b6d0	Intersections_UpdateAll	traffic	V	H+G	docs/re/traffic.md	traffic		func
+0x59b710	Teleporter_Disable	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59b790	Teleporter_Enable	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59b8d0	Teleporter_SlowCarNear	traffic	I	G	docs/re/traffic.md	traffic		func
+0x59c850	Spline::InitBasis	assets	V	Ghidra make FUN_0059c850	docs/re/assets.md	assets		func
+0x59db60	Spline::Finalize	assets	I	Ghidra make FUN_0059db60	docs/re/assets.md	assets		func
+0x59dd90	SplineSet::Loader	assets	V	Hopper sub_59dd90 + Ghidra export FUN_0059dd90: H+G agree	docs/re/assets.md	assets		func
+0x59de20	SplineSet::Unloader	assets	V	Hopper sub_59de20 + Ghidra export FUN_0059de20: H+G agree	docs/re/assets.md	assets		func
+0x59e5c0	EasterEggs::IsPartUnlocked	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x59e620	Table3A000::Loader	assets	V	Hopper sub_59e620 + Ghidra make FUN_0059e620: H+G agree	docs/re/assets.md	assets		func
+0x59e660	Table3A000::Unloader	assets	V	Ghidra make FUN_0059e660 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x59fa20	EAXSound::ChangeLanguage	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x59fb80	LanguageStrings::FindByHash	assets	V	Hopper sub_59fb80	docs/re/assets.md	assets	GetLocalizedStringByHash@canon	func
+0x59fce0	LanguageStrings::Loader	assets	V	Hopper sub_59fce0 + Ghidra make FUN_0059fce0: H+G agree	docs/re/assets.md	assets	LanguagePack::Loader@canon	func
+0x59fd40	LanguageStrings::Unloader	assets	V	Ghidra make FUN_0059fd40 (Hopper export lacks it)	docs/re/assets.md	assets	LanguagePack::Unloader@canon	data
+0x59fd70	GetLocalizedLogoMovie	canon	I	hopper	docs/re/canon.md	canon		func
+0x5a0060	CareerEvents::IndexEventDesc	assets	V	Hopper sub_5a0060	docs/re/assets.md	assets	EventDescPack::IndexEvents@canon	func
+0x5a00a0	CareerEvents::Loader	assets	V	Hopper sub_5a00a0 + Ghidra make FUN_005a00a0: H+G agree	docs/re/assets.md	assets	EventDescPack::Loader@canon	func
+0x5a0130	CareerEvents::Unloader	assets	V	Hopper sub_5a0130 + Ghidra make FUN_005a0130: H+G agree	docs/re/assets.md	assets	EventDescPack::Unloader@canon	func
+0x5a01d0	Table34A08::Loader	assets	V	Hopper sub_5a01d0 + Ghidra make FUN_005a01d0: H+G agree	docs/re/assets.md	assets		func
+0x5a0200	Table34A08::Unloader	assets	V	Hopper sub_5a0200 + Ghidra make: H+G agree	docs/re/assets.md	assets		func
+0x5a0220	Table34A0A::Find	assets	V	Ghidra make FUN_005a0220	docs/re/assets.md	assets		func
+0x5a0270	Table34A09::Loader	assets	V	Hopper sub_5a0270 + Ghidra make FUN_005a0270: H+G agree	docs/re/assets.md	assets		func
+0x5a0290	Table34A09::Unloader	assets	V	Hopper sub_5a0290 + Ghidra make FUN_005a0290: H+G agree	docs/re/assets.md	assets		func
+0x5a02c0	Table34A0A::Loader	assets	V	Ghidra make FUN_005a02c0 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x5a02f0	Table34A0A::Unloader	assets	V	Hopper sub_5a02f0 + Ghidra make: H+G agree	docs/re/assets.md	assets		func
+0x5a0320	Career::EventGivesLevel4Part	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a03d0	MapCarPartIDToCareerUpgrade	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a05b0	CalculateRideReputationPoints	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a08f0	GetCarPartCost	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a0a00	Career::Reset	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x5a0ce0	Career::StartEvent	canon	V	hopper+ghidra	docs/re/canon.md	canon		func
+0x5a0dc0	Career::WinEvent	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
+0x5a0f60	Career::QuitEvent	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
+0x5a0fc0	Career::ArePrerequisitesDone	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
+0x5a1100	Career::OpenAvailableEvents	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
+0x5a1340	Career::GetUrlRank	canon	V	ghidra+hopper	docs/re/canon.md	canon		func
+0x5a1520	Career::GetCash	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x5a1550	Career::IsUpgradeUnlocked	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon	FECareerManager::IsUpgradeUnlocked@tuning	func
+0x5a1630	Career::IsCarUnlocked	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a16f0	Career::IsTrackUnlocked	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a1850	Career::OpenNextCashEvent	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a1b10	Career::ScaleCashEvent	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a1da0	Career::CountFinishedEvents	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a1fa0	FECareerManager::AreAllUnlockedPhysicsUpgradesPurchased	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a2040	Career::IsPlayerStuck	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a2270	Career::RefreshOpenEvents	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a2350	Career::CreateRaceObject	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a2690	Career::GetLastWonEventTextRow	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a2f10	Race::DidPlayerWin	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a3570	PartStore::HasPart	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon	FECareerPurchasedParts::HasBoughtPart@tuning	func
+0x5a3630	PartStore::Has	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
+0x5a36a0	CharacterRoster::Loader	assets	V	Hopper sub_5a36a0 + Ghidra make FUN_005a36a0: H+G agree	docs/re/assets.md	assets		func
+0x5a36d0	CharacterRoster::Unloader	assets	V	Hopper sub_5a36d0 + Ghidra make FUN_005a36d0: H+G agree	docs/re/assets.md	assets		func
+0x5a3750	UnlockTeller::GetVinylUnlockBits	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a3780	UnlockTeller::SetSingleVinylNewlyStyleUnlocked	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a3850	UnlockTeller::SetVinylGroupNewlyStyleUnlocked	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a3f00	Career::BuildRewardSummary	canon	V	ghidra	docs/re/canon.md	canon		func
+0x5a4420	UnlockTeller::GetNewlyUnlockedPartLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a4de0	AnimSkeleton_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x5a4e90	AnimSkeleton_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
+0x5a53c0	RoadPath_Step	traffic	V	G+file	docs/re/traffic.md	traffic		func
+0x5a96b0	GetDoorLineHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a97f0	GetDoorLineMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a9930	GetHoodSpoilerHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a99e0	GetHoodSpoilerMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a9a90	GetWheelTextureHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a9af0	GetWheelTextureMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a9b50	GetVinylLayerHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a9c10	GetVinylLayerMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5a9ce0	CompositeSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5aa2d0	GetTempCarSkinTextures	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5aa800	CompositeWheel	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5aa970	TrafficIntersection_SavePtr	traffic	I	H	docs/re/traffic.md	traffic		func
+0x5aa9f0	TrafficIntersection_Save	traffic	V	H+C	docs/re/traffic.md	traffic		func
+0x5aaa90	IncomingTrafficCar_Save	traffic	V	H+C	docs/re/traffic.md	traffic		func
+0x5aaf10	Intersection_Update	traffic	I	G	docs/re/traffic.md	traffic		func
+0x5ab210	SpawnRecord_GetNode	traffic	V	G+H	docs/re/traffic.md	traffic		func
+0x5ab550	MovieSubtitles::FindByName	assets	V	Hopper sub_5ab550	docs/re/assets.md	assets		func
+0x5ab5a0	MovieSubtitles::Update	assets	V	Hopper sub_5ab5a0	docs/re/assets.md	assets		func
+0x5ab640	MovieSubtitles::Loader	assets	V	Ghidra make FUN_005ab640 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x5ab700	MovieSubtitles::Unloader	assets	V	Hopper sub_5ab700 + Ghidra make FUN_005ab700: H+G agree	docs/re/assets.md	assets		func
+0x5ac449	Vec4TransformInPlace	blur	I	C	docs/re/blur.md	blur		func
+0x61e790	GetFirstAnimBank	other	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x64b510	Csis::System::GetAllocator	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x64b7d0	Csis::Class::GetRefCount	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x64b810	Csis::Class::SetMemberDataFast	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x64bb20	Csis::Class::CreateInstanceFast	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x64c000	Csis::ClassHandle::Set	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x64c1a0	Csis::Class::CreateInstance	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x64c380	Csis::ClassHandle::SetFast	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x64dd70	SNDAEMS_removemodulebank	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x64dee0	SNDAEMSI_createmodulebankhandle	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x64e160	SNDAEMS_addmodulebank	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x64e330	SNDSYSI_100hzserver (map name SNDvol is wrong)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x64e540	SNDSYS_leavecritical	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x64f320	SNDAEMS_streaminit	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x64f580	SNDSYSI_init	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x64f820	SNDSYS_shutdown (map: SNDSYS_restore)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x64fba0	SNDSTRM_overhead	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x64fbd0	SNDplaysetdef	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x64fdc0	SNDSTRMI_startstream	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x6501a0	SNDSTRMI_parseheader	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x6503a0	SNDSTRMI_queue	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x650730	SNDSTRMI_parsechunk	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x650880	SNDSTRMI_service	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x650950	SNDSTRMI_service_all (map: numcreated)	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x650980	SNDSTRMI_create	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x6511b0	iSNDrandom	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x651260	SNDPLATFORM_setpitch	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x6512f0	Snd::Hal::SetVol (SNDPLATFORM_setvol)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x651450	SNDPLATFORM_setfxlevel (map: SNDstop)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x651490	SNDI_calcfxlevel	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x652030	SNDI_stophandle (loops patch voices of a handle, 0x651f30 kill; map: SNDSYS_entercritical)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x6520a0	SNDpitchmult	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x652150	SNDvol (map: SNDSYSI_100hzserver)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x6525f0	SNDVOICEI_free	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x652720	SNDVOICEI_get (validate handle -> voice index)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x652800	SNDbankremove	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x652a30	SNDBANKI_userdatacallback	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x652aa0	SNDbankadd	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x652b60	iSNDcalcvol	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x652ca0	iSNDcalcpitch	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x654e20	SNDCTRLI_getfxbus	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x655120	SNDPKTPLAY_start	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x655b80	SNDI_patchtohdr	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x656040	SNDMEMI_usage_percent (map: SNDMEMI_restore)	audio.mixer	V	ghidra	docs/re/sound.md	sound		data
+0x6563a0	SNDMIXI_volramp	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x657d70	SNDBANKI_findfreekey	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x657dd0	SNDBANKI_playtimbre	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x658230	SNDBANKI_playpatch	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x6584e0	iSNDpatchkey	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x6586b0	SNDI_parsetimbre	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x659130	SNDI_sin	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x6599e0	SNDPLATFORM_packetplay	audio.stream	V	ghidra	docs/re/sound.md	sound		func
+0x659c80	SNDI_gettag	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x659d80	SNDI_patchtohdrgen	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x65bfa0	SNDPLATFORM_playtimbre	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x65c060	SNDI_pantoazimuth	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x65c0b0	SNDover (is sound finished)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
+0x65fce0	SNDI_getb	audio.bank	V	ghidra	docs/re/sound.md	sound		func
+0x674898	_ftol	blur	V	C	docs/re/blur.md	blur		func
+0x684aa8	EAX_CarFX::~EAX_CarFX	audio.engine	I	ghidra	docs/re/sound.md	sound		data
+0x6860d3	EAXSND8Wrapper::EAXSND8Wrapper (SEH unwind funclet, not the ctor)	other	V	ghidra	docs/re/sound.md	sound		data
+0x688888	(not a function: SEH frame handler thunk)	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x6b5a30	TeleportInterval_Free	traffic	V	G+file	docs/re/traffic.md	traffic		data
+0x6b5a34	TeleportInterval_Route	traffic	V	G+file	docs/re/traffic.md	traffic		data
+0x6b5a38	TeleportFirstStep	traffic	V	G+file	docs/re/traffic.md	traffic		data
+0x6b5a3c	TeleportRouteLimit	traffic	V	G+file	docs/re/traffic.md	traffic		data
+0x6b5a50	TeleportSlowPlayerSpeed	traffic	V	G+file	docs/re/traffic.md	traffic		data
+0x6b5a5c	TeleportSpawnObjSpeed	traffic	V	G+file	docs/re/traffic.md	traffic		data
+0x6b5a68	SpawnRecordWindow	traffic	V	G+file	docs/re/traffic.md	traffic		data
+0x6b6c5c	CamBlend_Dist_A	camera	I	D	docs/re/camera.md	camera		data
+0x6b6c60	CamBlend_Height_A	camera	I	D	docs/re/camera.md	camera		data
+0x6b6c64	CamBlend_Dist_B	camera	I	D	docs/re/camera.md	camera		data
+0x6b6c68	CamBlend_Height_B	camera	I	D	docs/re/camera.md	camera		data
+0x6b6c78	CamAirborneRampStep	camera	I	D	docs/re/camera.md	camera		data
+0x6b6c80	CamSweepTrim	camera	I	D	docs/re/camera.md	camera		data
+0x6b6c98	CamWallPushOut	camera	I	D	docs/re/camera.md	camera		data
+0x6b6cbc	RearView_Param_0_75	camera	V	C+D	docs/re/camera.md	camera		data
+0x6b6cc0	RearView_Param_192	camera	V	C+D	docs/re/camera.md	camera		data
+0x6b7a7c	SlowMoArg1	camera	I	D	docs/re/camera.md	camera		data
+0x6b7aac	JumpCam_EdgeOffset	camera	V	C+D	docs/re/camera.md	camera		data
+0x6b9690	TrafficAI_ClassNames	traffic	U	C+file	docs/re/traffic.md	traffic		data
+0x6b96b0	TrafficAI_vtable	traffic	I	C+file	docs/re/traffic.md	traffic		data
+0x6c7fc8	vtable_DriveCameraMover	camera	V	G+D	docs/re/camera.md	camera		data
+0x6c8060	Str_SpeedCam	camera	V	D	docs/re/camera.md	camera		data
+0x6c806c	Str_DragCameras_bin	camera	V	D	docs/re/camera.md	camera		data
+0x6c80f4	Str_CAMERA_SETTINGS	camera	V	D	docs/re/camera.md	camera		data
+0x6ca8dc	Str_CountdownCameraCoordinator	camera	V	D	docs/re/camera.md	camera		data
+0x6cc7bc	K_ONE	blur	V	C+D	docs/re/blur.md	blur		data
+0x6cc7dc	K_HALF	blur	V	C+D	docs/re/blur.md	blur		data
+0x6cc970	K_BLUR_MIN_T	blur	V	C+D	docs/re/blur.md	blur		data
+0x6cc988	TeleportSpeedFlip	traffic	V	G+file	docs/re/traffic.md	traffic		data
+0x6cc9d8	K_BLUR_PASS2_MUL	blur	V	C+D	docs/re/blur.md	blur		data
+0x6ccb7c	K_EPS_SPEED	blur	V	C+D	docs/re/blur.md	blur		data
+0x6ccc0c	K_BLUR_W_MUL	blur	V	C+D	docs/re/blur.md	blur		data
+0x6ccc64	K_BLUR_S_MUL	blur	V	C+D	docs/re/blur.md	blur		data
+0x6cccf8	K_N_WEIGHT	blur	V	C+D	docs/re/blur.md	blur		data
+0x6ccd00	K_1_OVER_255_a	blur	V	C+D	docs/re/blur.md	blur		data
+0x6cf210	ChangeCameraMover_EHFuncInfo	camera	V	G+C	docs/re/camera.md	camera		data
+0x6f1850	JoyEventNameTable_0x75	camera	V	D	docs/re/camera.md	camera		data
+0x6fbde8	CamTweakDefault_Dist	camera	I	C	docs/re/camera.md	camera		data
+0x6fbdec	CamTweakDefault_Height	camera	I	D	docs/re/camera.md	camera		data
+0x6fbdf0	CamTweakDefault_Max	camera	I	D	docs/re/camera.md	camera		data
+0x6fbdf4	CameraFOVTable	camera	V	D+C	docs/re/camera.md	camera		data
+0x6fbec0	DriveCam_Scale	camera	V	C+D	docs/re/camera.md	camera		data
+0x6fbec4	DriveCam_K_0_03	camera	U	D	docs/re/camera.md	camera		data
+0x6fbec8	DriveCam_K_0_012	camera	U	D	docs/re/camera.md	camera		data
+0x6fbecc	DriveCam_K_2	camera	U	D	docs/re/camera.md	camera		data
+0x6fbed0	DriveCam_K_25	camera	U	D	docs/re/camera.md	camera		data
+0x6fbed4	DriveCam_K_0_05	camera	U	D	docs/re/camera.md	camera		data
+0x6fbed8	DriveCam_K_0_02	camera	U	D	docs/re/camera.md	camera		data
+0x6fbedc	DriveCam_K_6	camera	U	D	docs/re/camera.md	camera		data
+0x6fbee0	DriveCam_PitchLimitLo	camera	I	C+D	docs/re/camera.md	camera		data
+0x6fbee4	DriveCam_K_0_045	camera	I	C+D	docs/re/camera.md	camera		data
+0x6fbee8	DriveCam_PitchLimitHi	camera	I	C+D	docs/re/camera.md	camera		data
+0x6fbeec	DriveCam_NegThreshold	camera	I	C+D	docs/re/camera.md	camera		data
+0x6fbef0	DriveCam_K_1a	camera	U	D	docs/re/camera.md	camera		data
+0x6fbef4	DriveCam_K_1b	camera	U	D	docs/re/camera.md	camera		data
+0x6fbef8	DriveCam_K_500	camera	U	D	docs/re/camera.md	camera		data
+0x6fbefc	DriveCam_K_0_2	camera	U	D	docs/re/camera.md	camera		data
+0x6fbf00	DriveCam_K_6b	camera	U	D	docs/re/camera.md	camera		data
+0x6fbf04	DriveCam_K_m1	camera	U	D	docs/re/camera.md	camera		data
+0x6fbf08	DriveCam_K_0_4	camera	U	D	docs/re/camera.md	camera		data
+0x6fbf0c	DriveCam_K_3	camera	U	D	docs/re/camera.md	camera		data
+0x6fbf10	DriveCam_K_250	camera	U	D	docs/re/camera.md	camera		data
+0x6fbf14	DriveCam_DebugPOVOverrideFlag	camera	I	C	docs/re/camera.md	camera		data
+0x6fbf18	DriveCam_DebugPOVId	camera	I	C	docs/re/camera.md	camera		data
+0x6fbf1c	DriveCam_POV3Param	camera	I	C+D	docs/re/camera.md	camera		data
+0x700aa4	OPT_CubicCamera	camera	I	C	docs/re/camera.md	camera		data
+0x700b1c	SpecialCamNameTable	camera	V	D	docs/re/camera.md	camera		data
+0x700b3c	SpecialCamTable3	camera	I	D	docs/re/camera.md	camera		data
+0x700b44	SpecialCamEnableTable	camera	V	D	docs/re/camera.md	camera		data
+0x700e98	OPT_MOTIONBLUR	blur	V	G+C	docs/re/blur.md	blur		data
+0x700e9c	OPT_LIGHTSTREAKS	blur	V	C	docs/re/blur.md	blur		data
+0x701034	gBackbufW	blur	V	C+D	docs/re/blur.md	blur		data
+0x701038	gBackbufH	blur	V	C+D	docs/re/blur.md	blur		data
+0x7024b8	BlurDownsampleTaps	blur	V	C+D	docs/re/blur.md	blur		data
+0x7024e8	BlurTapTable2	blur	I	D	docs/re/blur.md	blur		data
+0x702a28	gBlurRTFormat	blur	V	C+D	docs/re/blur.md	blur		data
+0x702a2c	gBlurRTW	blur	V	C	docs/re/blur.md	blur		data
+0x702a30	gBlurRTH	blur	V	C	docs/re/blur.md	blur		data
+0x702a34	gStreakRTFormat	blur	V	C+D	docs/re/blur.md	blur		data
+0x702a38	BLUR_SPEED_LO	blur	V	G+C+D	docs/re/blur.md	blur		data
+0x702a3c	BLUR_SPEED_HI	blur	V	G+C+D	docs/re/blur.md	blur		data
+0x702a40	BLUR_T_CAP	blur	V	G+C+D	docs/re/blur.md	blur		data
+0x702a44	BLUR_STREAK_SCALE	blur	V	C+D	docs/re/blur.md	blur		data
+0x702a48	BLUR_N_UP	blur	V	C+D	docs/re/blur.md	blur		data
+0x702a4c	BLUR_N_DOWN	blur	V	C+D	docs/re/blur.md	blur		data
+0x702a80	gSceneRTFormat	blur	I	C	docs/re/blur.md	blur		data
+0x705b20	CamSpeedCurve	camera	I	D	docs/re/camera.md	camera		data
+0x705b34	RearView_Offset_x	camera	I	C+D	docs/re/camera.md	camera		data
+0x705b38	RearView_Offset_y	camera	I	C+D	docs/re/camera.md	camera		data
+0x7062cc	JumpCam_HeightCurve	camera	V	G+C	docs/re/camera.md	camera		data
+0x7062e4	JumpCam_DistCurve	camera	V	G+C	docs/re/camera.md	camera		data
+0x7062fc	JumpCam_SpeedCurve	camera	V	G+C	docs/re/camera.md	camera		data
+0x71ab9c	gBlurTexA	blur	V	C	docs/re/blur.md	blur		data
+0x71aba0	gBlurTexB	blur	V	C	docs/re/blur.md	blur		data
+0x71aba4	gStreakTex	blur	V	C	docs/re/blur.md	blur		data
+0x71aba8	gBlurSurfA	blur	V	C	docs/re/blur.md	blur		data
+0x71abac	gBlurSurfB	blur	V	C	docs/re/blur.md	blur		data
+0x71abb0	gStreakSurf	blur	V	C	docs/re/blur.md	blur		data
+0x73457c	FrameDt	camera	I	C	docs/re/camera.md	camera		data
+0x734588	CarTypeInfoTable	traffic	V	H+G+file	docs/re/traffic.md	traffic		data
+0x735ee8	CamTweakerEnable	camera	I	C	docs/re/camera.md	camera		data
+0x735f5c	gCamFlag735f5c	camera	I	G+C	docs/re/camera.md	camera		data
+0x736150	RoadEntries_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic		data
+0x736154	RoadEntries_Count	traffic	V	H+C	docs/re/traffic.md	traffic		data
+0x736158	RoadIntersections_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic		data
+0x73615c	RoadIntersections_Count	traffic	V	H+C	docs/re/traffic.md	traffic		data
+0x736160	SpawnRecords_Ptr	traffic	V	H+C+file	docs/re/traffic.md	traffic		data
+0x736164	SpawnRecords_Count	traffic	V	H+C	docs/re/traffic.md	traffic		data
+0x736168	TrackRows_Ptr	traffic	V	H+G+file	docs/re/traffic.md	traffic		data
+0x736174	TrackRow_CurrentPtr	traffic	V	H+G	docs/re/traffic.md	traffic		data
+0x7361a4	CamGateFlagB	camera	I	C	docs/re/camera.md	camera		data
+0x7361f0	gGameModePtr	camera	I	C	docs/re/camera.md	camera		data
+0x7361f8	WorldCarList	traffic	I	H+G	docs/re/traffic.md	traffic		data
+0x736384	gBlurOrStreaksActive	blur	V	C	docs/re/blur.md	blur		data
+0x73641c	gBlurSpecialN	blur	V	G+C	docs/re/blur.md	blur		data
+0x73645c	gSceneRTMode	blur	V	C	docs/re/blur.md	blur		data
+0x736460	gSceneTex	blur	V	C	docs/re/blur.md	blur		data
+0x736464	gSceneSurf	blur	V	C	docs/re/blur.md	blur		data
+0x7364a0	gViewCountKind	camera	I	G+C	docs/re/camera.md	camera		data
+0x73654c	gSpecialCameraActive	blur	V	G+C	docs/re/blur.md	blur		data
+0x740500	gBlurCameraObj	blur	V	C	docs/re/blur.md	blur		data
+0x758938	POVSaveTable	camera	I	C	docs/re/camera.md	camera		data
+0x758948	POVIndexPerPlayer	camera	I	C	docs/re/camera.md	camera		data
+0x77af20	RoadSectionManager	traffic	V	H+C+file	docs/re/traffic.md	traffic		data
+0x77af30	RoadSectionTable	traffic	V	H+C	docs/re/traffic.md	traffic		data
+0x78a2f0	TrackId	traffic	V	H+G	docs/re/traffic.md	traffic		data
+0x78a2fc	TrackDirection	traffic	V	H+G	docs/re/traffic.md	traffic		data
+0x78a300	TrafficLevel	traffic	V	H+G	docs/re/traffic.md	traffic		data
+0x78a304	TrafficSameSideProb	traffic	I	H+G	docs/re/traffic.md	traffic		data
+0x78a345	CamGateFlagA	camera	I	C	docs/re/camera.md	camera		data
+0x78a347	TrafficOffFlag	traffic	V	H+G	docs/re/traffic.md	traffic		data
+0x78a3fa	OPT_JumpCamEnabled	camera	I	C	docs/re/camera.md	camera		data
+0x78a3fb	OPT_SpecialSlowmoEnabled	camera	I	C	docs/re/camera.md	camera		data
+0x78a3fc	TrafficDriverMode	traffic	I	G	docs/re/traffic.md	traffic		data
+0x78a418	Entrants_Ptr	traffic	V	H+G	docs/re/traffic.md	traffic		data
+0x78d270	gCameraObj	blur	V	C	docs/re/blur.md	blur		data

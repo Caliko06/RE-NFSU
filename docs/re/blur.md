@@ -56,8 +56,8 @@ Constants (static `.data`, no code writer; D from the unpatched exe, G xref show
 
 | Addr | Value | Role |
 |---|---|---|
-| `0x702a38` | 25.0 | speed where the blur starts (m/s, 90 km/h) |
-| `0x702a3c` | 125.0 | speed where the speed term is 1 (450 km/h) |
+| `0x702a38` | 25.0 | speed where the blur starts (units I: the exe gives only the number 25; m/s, 90 km/h is an assumption until the unit of the speed passed in is read) |
+| `0x702a3c` | 125.0 | speed where the speed term is 1 (units I, see above) |
 | `0x702a40` | 0.65 | cap on t |
 | `0x702a44` | 0.00625 | streak length per tap per unit t (UV) |
 | `0x702a48` / `0x702a4c` | 0.2 / 0.1 | n ramp up / down per frame |

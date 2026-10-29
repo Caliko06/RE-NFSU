@@ -34,6 +34,10 @@ unverifiable = stub or thunk, tag only matches neighbours; wrong; unknown = tagg
   mover ctor, Loaded*SlotPool = assets, CRT file I/O = runtime), so it is not held out.
 - Seed 4242, n=24, held out, same rules: agree 9, plausible 5, unverifiable 5, wrong 2, unknown 3 (19/24 lenient).
 - Wrong tags are about 8-12% in both; the gap is unverifiable tiny functions and 11% unknown.
+- External audit 2026-10-29: of the 886 named functions, 419 (47%) had a different system in systems.tsv than in names.tsv
+  (normalised sound->audio, tuning/garage->car, blur->render). The strict agreement of 19/50 (38%) is the better estimate
+  of the graph's accuracy, not "8-12% wrong". Rule now: a name with a system (V or I) overrides the graph tag
+  (tools/census/scoreboard.py); `tagged` counts only med/high confidence or named functions.
 - Tuning samples: seeds 7, 101, 202; earlier reads: 1029 (n=50), 2026 (n=30).
 
 ## Rerun

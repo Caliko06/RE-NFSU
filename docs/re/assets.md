@@ -7,7 +7,7 @@ G = Ghidra export/headless, C = capstone (tools/recomp/asm.py), F = the game fil
 - Every BUN/BIN/LZC game file is a flat list of chunks `{u32 id, u32 size, payload}`; bit 31 of the id = container
   of more chunks, id 0 = padding. 235 files tile exactly, 116 ids, 58 at top level (`tools/re/chunks.py check`, V F).
 - Top-level chunks go to 47 loaders in the table `0x7007e0` (unloaders `0x7008a0`), tried round-robin by
-  `0x447ac0`; every top-level id in game/ has a loader (V F+H+G). Chunk meanings: table below (137 ids).
+  `0x447ac0`; every top-level id in game/ has a loader (V F+H+G). Chunk meanings: table below (137 ids = 115 seen in game files + 22 known only from code or nested children, 18 of them U; the 116th id seen in files is 0, padding; reconciled 2026-10-29).
 - Files are read async by ResourceFile objects (`0x447f90`..`0x448440`), decompressed by `0x58d3f0`
   (JDLZ or COMP), placed by `0x447c00` and handed to the dispatcher by `0x447d90` (V H+G).
 - Textures live in TPK packs (`0xb3300000`, loader `0x5455c0`); `tools/re/tpk.py` lists them and writes .dds (V F).

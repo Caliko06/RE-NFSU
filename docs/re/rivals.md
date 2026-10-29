@@ -29,7 +29,8 @@ Nothing was run. The REA MCP was not used.
 - **Rubber band** = `0x44bd10`, once per racer per 0.3 s. Scale = `1 + curve(distance, skill) + S x gain(position, skill)`,
   then x `max((f-1) x v(skill, rank) + 1, floor(skill))`; stored in `veh+0x404` as `max(scale, 1.0)` and in `ctx+0x4b8`
   raw. It is neutral for the first 3..19 s (by skill). S = `EventDesc +0x12c` (0.8..1.2). V formula, I directions
-- **All times in the AI are 4000 ticks per second** (`0x6cca38` = 0.00025). Older notes used milliseconds. V (C, D)
+- **The AI reads time as 4000 ticks per second** (`0x6cca38` = 0.00025). Older notes used milliseconds. V (C, D). `0x6cca38` has 260 references across the whole binary: it is a global clock constant, not something of the AI (external audit 2026-10-29).
+- **Skill at entrant +0x735 and aggression at +0x736 is I**: the constructor only copies arg5/arg6; which is which follows the caller's values. The rubber band reads skill. To make it V, read what each field is used for.
 
 ## 1. Where the data lives
 

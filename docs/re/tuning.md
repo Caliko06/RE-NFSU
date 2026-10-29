@@ -28,7 +28,7 @@ until a row in `census/names_tuning.tsv` says V.
 - **Two old labels were wrong.** `0x583ea0` is not a speed cap. It is the generic lookup in a uniformly sampled
   float table `{n, xmin, xmax, 1/step, data*}` with linear interpolation and clamping, V (G). The "tuning block"
   `0x705f48..0x705f84` is four of those tables for **steering**: maximum wheel angle vs speed (45° at 0 down to
-  2.9°/7° at 160), a 6-point factor and a 0..1 return scale. They are read by the steering limiter
+  2.9°/7° at the axis end 160; the unit of that axis, km/h?, is I: the exe gives only the number), a 6-point factor and a 0..1 return scale. They are read by the steering limiter
   `0x460a80`/`0x460de0`, not by the garage. V (G, D)
 
 ## Corrections to older notes (for the orchestrator to apply)

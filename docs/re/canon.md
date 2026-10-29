@@ -18,7 +18,7 @@ Readers (each has a `check` that passes on the real files):
   prerequisite ids with an all/any rule, 3 movie slots, 3 named rivals with a car preset hash, up to 5 rewards. V (D),
   field readers in `tools/census/career.py`, sampled with G below.
 - **Progress is one byte per event.** `career + 0x34c + id` (career object `0x75eef8`): 0 locked, 1 open, 2 won,
-  3 racing, 5 quit. `0x5a1100` opens every event that is not won and whose prerequisites are done (`0x5a0fc0`:
+  3 racing, 5 quit. `0x5a1100` (I: the external audit found two passes, the first sets every open event back to 0, the second calls `0x5a0fc0` and sets 1, and it also reads a second event source `[mgr+0x88b0]+0x58a0` that is not documented here; the "not won" condition is unchecked) opens every event that is not won and whose prerequisites are done (`0x5a0fc0`:
   skip status 2 / 4 and kind 8; rule `+0xa8` 0 = all, 1 = any over `+0x9c[+0xaa]`). V (H, G)
 - **Winning** (`0x5a0dc0`): cash `career+0x1374` and lifetime cash `+0x1378` grow by the cash for the difficulty,
   status = 2, each type-1 reward hands out a magazine cover (27 unlock slots of 0x454 bytes at `career+0x13a8`, byte 1 = unlocked,
@@ -190,4 +190,4 @@ H and G show the same entry, compares and callees for `0x59fb80`, `0x5a1100`, `0
   (an item no event rewards counts as unlocked; G).
 - I: `0x34a01` = 25 rows by part category: +4/+8/+0xc price of levels 1..3, +0x10..+0x1c ride-rating points of
   levels 1..4 (readers 0x5a08f0, 0x5a08b0, 0x5a25a0, 0x5a2620, 0x5a05b0, 0x5a2040). Earlier note: rows (25 x 0x20, values like 300/600/900): `0x5a08f0` reads `[0x733f78 + type*4]` as a price table
-  (night-opus-a lead) while the career cash is real; reconcile with docs/re/tuning.md "No prices".
+  (night-opus-a lead) while the career cash is real; (tuning.md "No prices" is already corrected).

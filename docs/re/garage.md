@@ -7,10 +7,10 @@ D = data (save/*.ugd, FrontB.lzc, exe bytes). The PS2 names are hints only.
 
 ## Answer
 
-- **Prices exist.** docs/re/tuning.md says "No prices": wrong. Cash is career+0x1374 = [0x76026c], spent is +0x137c = [0x760274]. V (C 0x5a1520, 0x5a2620)
+- **Prices exist.** (docs/re/tuning.md said "No prices"; it is corrected now.) Cash is career+0x1374 = [0x76026c], spent is +0x137c = [0x760274]. V (C 0x5a1520, 0x5a2620)
 - **Price table** = FrontB chunk 0x34a01, 25 records in [0x733f78+4*type]. Types 0..15 are visual, 16..24 are the 9 perf paths. V (D, G 0x5a08f0)
 - **Visual part price** = record[0x5a03d0(part.type)].cost[part.level-1]. Level 0 and level 4 cost 0. V (C 0x5a08f0)
-- **Perf price** = record[0x5a0350(path)].cost[level-1]; path 0..8 maps to types 0x10..0x18. V (G 0x5a0350, 0x5a25a0, D)
+- **Perf price** = record[0x5a0350(path)].cost[level-1]; path 0..8 maps to types 0x10..0x18. V (G 0x5a0350, 0x5a25a0, D). The function has 11 cases (`cmp eax,0xa`): paths 9 and 10 map to the visual types 8 and 5; this matches `level[11]` in tuning.md. The chooser shows 9 paths, the data model has 11 (external audit 2026-10-29, capstone).
 - **Screens** are made by a name -> factory registry at 0x6f94d8.. (name ptr, factory ptr, flag; stride 0x14). V (C, D)
 - **Hub:** `MU_Garage.fng` (GarageScreen, mode 1 from the career menu 0x4eaff0) lists Visual / Performance / Presets / Trade-in. V (G 0x504be0)
 - **Garage state** is one global object at 0x744ff0: [+8] = FECarConfig*, [+0x10] ride A (preview), [+0x730] ride B (committed). V (C 0x504450, 0x5044b0)
