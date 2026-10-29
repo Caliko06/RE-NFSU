@@ -22,7 +22,7 @@ walls. Simplest bridges and patches over the game's own AI; RE first; one check 
       the tour's road graph forward (docs/openworld_e_re.md B1), so a rival faces and races the tour direction; with the
       player stopped or driving against the tour they leave again in 8..20 s. Judge it in the OWNER's play.
    b. JDM racers cruising in traffic = 1d (skins), Sonnet session.
-   c. Phase 2: 6..8 real rivals (docs/openworld/re_racer_cap.md step 0 first) -> verify: 6 named rivals in a WORLD log.
+   c. Phase 2: DONE 2026-10-28 (858ba03): 6 real rivals by default (RN_FREERIV, max 9), Chrome WORLD 400 s: 6 named, mean 28.5 m/5 s.
 3. Walls: log the player position when speed drops to 0 with no visible wall; fix stub/fence there -> verify: the
    OWNER's spots pass.
 4. Whole-city road graph (exe limits 128 sections / 255 entries) if 1-2 need streets off the tour.
@@ -33,7 +33,9 @@ nearest < 150 m in 124/130 lines, rivals < 400 m in 374/390 samples, so the gaps
 5. WORLD picture on SELECT LOCATION -> verify: FE shot of the WORLD page shows the city; 1001's page unchanged.
 6. DONE: no WRONG WAY and no gap HUD in free mode (PATCH 0x430dbd, free_hud) -> verified: FREE hud mask 0x144589 cleared, WORLD shot.
 7. Handling in WORLD = 1001 -> verify: RN_BODYLOG A/B (z jitter, heading) on both tracks within noise.
-8. City road graph (docs/openworld/re_citygraph.md), then 6..8 rivals with personalities (docs/openworld/re_rivals_personality.md).
+8. City road graph: DONE 2026-10-28 (v2 f9cad5c, default in build/openworld; the tour net kept as TRACKB1010.tour.lzc). Open: lane
+   bytes of flipped sections and type 0 fork rates (re_answers_0b.md from re-nfsu-8b); traffic near < 150 m fell 181/182 -> 120/181
+   (19 cars over the whole city: raise traffic within the 30 entrants?). Then rival personalities (docs/openworld/re_rivals_personality.md).
 
 ## Earlier (OWNER 2026-10-27 late): regressions before the open world
 The OWNER plays and sees: speed blur too strong, traffic glitches (flicker as a car loads, some still invisible, too
