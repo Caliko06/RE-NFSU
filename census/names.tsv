@@ -49,7 +49,9 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x422580	Grid::GetStartPositions	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
 0x422a70	Grid::PlaceAllRacers	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x426110	Car_SetMode	traffic	U	H+G	docs/re/traffic.md	traffic		func
+0x4264d0	Car::ServiceResetRequest	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
 0x426930	JumpCamTrigger	camera	V	G+C	docs/re/camera.md	camera		func
+0x427ed0	Car::ApplyResetZone	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x429b10	Racer::UpdateTwoHumanCatchUp	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x429cf0	JumpCamPredict	camera	I	C	docs/re/camera.md	camera		func
 0x42ab50	IsCar1099InMode4	other	U	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -69,6 +71,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x42e020	Player::CyclePOV	camera	V	G+C	docs/re/camera.md	camera		data
 0x42e450	Player::LookBackToggle	camera	I	C	docs/re/camera.md	camera		func
 0x430730	Player::StartRaceCameras	camera	I	C	docs/re/camera.md	camera		func
+0x430e00	Player::WrongWayAndZoneTest	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x4314a0	Player::ResetToRoute	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x431960	SpecialCamCaller_431960	camera	I	C	docs/re/camera.md	camera		func
 0x431a2e	JoyEvent_CAMERA_POV_CHANGE_case	camera	V	C+D	docs/re/camera.md	camera		data
 0x4322a0	RaceStatus::AddEntrant	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals		func
@@ -79,10 +83,27 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x436020	ModeFlags_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x43db70	Zone_FindTrafficDensity	traffic	I	G+H	docs/re/traffic.md	traffic		func
 0x43eb00	RaceManager::UpdateAIScores	rivals	I	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x43fb50	Commentator::ShortcutZoneEntered	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x43fd20	TrackPolyRow::UnpackVertices	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x43fe70	TrackPolyBody::FromSlotIndex	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x43feb0	TrackMarker_Count	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x43fef0	TrackMarker_Get	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x43ff30	TrackPolyBody::Build	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x4400d0	TrackPolyBody::DetachRow	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x4400e0	TrackPolyBody::EdgeDistanceMax	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x4407b0	GroundQuery::RefillCache	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x440a40	GroundQuery::FindSurfaceBelow	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x440ce0	GroundQuery::HasGroundAt	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x440e00	GroundQuery::SweepSegment	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x4412b0	TrackPolygonSlotPool::Init	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x441380	TrackCollision_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x441480	TrackCollision_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x441500	CollisionGrid::Floor32	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x441530	CollisionQuadtree::FindCell	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x441660	CollisionCell::CollectPolys	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x441b20	TrackPolyBody::ReleaseUnused	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x441b90	TrackPoly::AcquireBody	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x441c10	TrackCollision::QueryBox	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x441ed0	TrackPositionMarker_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x441f40	TrackPositionMarker_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x441fe0	TrackRow_FindById	traffic	V	G+C	docs/re/traffic.md	traffic		func
@@ -104,18 +125,50 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4433f0	TrackPath::FreeSplines	assets	V	Hopper sub_4433f0	docs/re/assets.md	assets		func
 0x443450	TrackPath::Init	assets	V	Hopper sub_443450 + capstone	docs/re/assets.md	assets		func
 0x4434d0	TrackPath::Parse	assets	V	Hopper sub_4434d0 + Ghidra FUN_004434d0: H+G agree	docs/re/assets.md	assets		func
+0x4435e0	TrackPath::SetReverse	track	I	ghidra	docs/re/track.md	track		data
+0x443630	TrackPath::FindNearestNode	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x4436d0	Zone_Find	traffic	I	G	docs/re/traffic.md	traffic		func
+0x443790	ZoneManager::FindFromTypeMask	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x443920	TrackPath::NeighbourNodes	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x443a10	TrackPath::UpdateCursor	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x443d60	TrackPath::WrapDistance	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x4441f0	TrackPath::Loader	assets	V	Hopper sub_4441f0 + Ghidra make FUN_004441f0: H+G agree	docs/re/assets.md	assets		func
 0x444200	TrackPath::Unloader	assets	V	Hopper sub_444200 + Ghidra make FUN_00444200: H+G agree	docs/re/assets.md	assets		func
 0x4442a0	StreamSections::Loader	assets	V	Hopper sub_4442a0 + Ghidra make FUN_004442a0: H+G agree	docs/re/assets.md	assets		func
 0x4442f0	StreamSections::Unloader	assets	V	Hopper sub_4442f0 + Ghidra make FUN_004442f0: H+G agree	docs/re/assets.md	assets		func
+0x4443e0	StreamSections::ResetRound	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x444480	StreamSections::Init	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x4445c0	StreamSections::SetTrack	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x4446e0	StreamSections::IssueRead	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x444740	StreamSections::OnReadDone	track	V	hopper+capstone	docs/re/track.md	track		func
+0x444780	StreamSections::EvictOldest	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x444840	StreamSections::SeedViewer	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x444870	StreamSections::PredictBoundary	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x444af0	StreamSections::ComputePoolSize	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x444b50	StreamSections::BuildWantedSet	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x444d80	StreamSections::AllocateRow	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x444e90	StreamSections::FreeUnreadBuffers	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x444ee0	StreamSections::AllocateRequested	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x444fb0	StreamSections::UpdateViewerBoundaries	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x445050	StreamSections::Update	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x445100	StreamSections::WaitUntilIdle	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x445180	StreamSections::Round	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
 0x445350	StreamSections::Shutdown	assets	V	Ghidra make FUN_00445350	docs/re/assets.md	assets		func
+0x445520	Placement::UnpackAabb	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x445580	Placement::UnpackMatrix	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x4457c0	StreamSection_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x445b00	Section::SyncSmackableVisibility	props	I	capstone	docs/re/props.md	props		func
 0x445b60	StreamSection_Unload	assets	V	Hopper export has no block (inside another sub_); Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
+0x445ca0	Sections::FindSectionBySolid	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x445d00	StreamBoundaries::DebugDump	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x445ec0	Section::DrawPlacement	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x446140	Section::WalkBvh	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x446400	StreamBoundaries::BuildDrawList	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
+0x4465b0	StreamSections::DrawVisible	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x446aa0	StreamBoundaries_Load	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x446ab0	StreamBoundaries_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x446db0	StreamBoundaries_LoadChunk	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x446fd0	StreamBoundaries::FindContaining	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x447160	InitZDirArchive	assets	V	hopper	docs/re/assets.md	assets		func
 0x447ab0	PaddingChunk::Loader	assets	V	capstone	docs/re/assets.md	assets		func
 0x447ac0	bChunkLoader::LoadChunks	assets	V	hopper+ghidra	docs/re/assets.md	assets		func
@@ -137,7 +190,9 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x448b10	GameFlow::LoadingFrontEndPart1	assets	V	hopper	docs/re/assets.md	assets		func
 0x448f70	GameFlow_CreateRides	traffic	I	H	docs/re/traffic.md	traffic		func
 0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	V	hopper	docs/re/assets.md	assets		func
+0x4496a0	GameFlow::SetStreamPaths	track	I	hopper	docs/re/track.md	track		func
 0x449765	GameFlow::LoadingTrackSpecificPart1	assets	V	hopper	docs/re/assets.md	assets		func
+0x449870	GameFlow::TrackWorldInit	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x44aa10	AIGoal::Create	rivals	V	Ghidra+Hopper	docs/re/rivals.md	rivals		func
 0x44bd10	RacerAI::UpdateRubberBand	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x44c010	RacerAI::GetCatchUpTerms	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
@@ -168,6 +223,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x468800	CarBody_DisableCountInc	traffic	U	H+G	docs/re/traffic.md	traffic		func
 0x469580	WorldObjects::Broadphase	props	V	hopper+ghidra	docs/re/props.md	props		func
 0x469670	WorldObjects::TestObject	props	I	ghidra+capstone	docs/re/props.md	props		func
+0x46a6e0	AllTrackPolygonCollisionBodies::Serialize	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x46d390	DriveTrain::DriveTrain	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4727c0	GJKWitness::Initialize	car.physics	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x472b00	CarShape_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
@@ -221,6 +277,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x48c990	DragRaceLeaderCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera		func
 0x48d6e0	DragRaceAheadCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera		func
 0x48e210	AnimationControllerCameraMover::ctor	camera	I	M+C	docs/re/camera.md	camera		func
+0x48e8b0	Players::UpdateStreamViewers	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x48f090	ZoneFreezeCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
 0x490ea0	ZonePreviewCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
 0x49fe10	HudElement::RegisterImage	fe	I	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -626,7 +683,11 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x546310	TrackSkyInfo_Select	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x546570	TrackSkyInfo_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x549130	EAXMod::Stop (ret 4 stub)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x564db0	Atan2ToAngle16	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x566ed0	SlotPool::IndexOfSlot	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x567450	Vec3Normalize	blur	I	C	docs/re/blur.md	blur		func
+0x567600	Aabb2D::GrowByCircle	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x5679b0	PointInPolygon2D	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x569460	CarPartCuller::CullParts	other	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x569990	Car::InitRenderInfo	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x569c50	FrontEndRenderingCar::FrontEndRenderingCar	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -676,6 +737,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x584b10	RigidBody::SetMassInertia	props	V	hopper+ghidra	docs/re/props.md	props		func
 0x588d10	TriggerVolume::Loader	assets	V	Hopper sub_588d10 + Ghidra make FUN_00588d10: H+G agree	docs/re/assets.md	assets		func
 0x588d70	TriggerVolume::Unloader	assets	V	Hopper sub_588d70 + Ghidra make FUN_00588d70: H+G agree	docs/re/assets.md	assets		func
+0x58a850	AsyncReadQueue::Pump	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x58ae80	LoadedSkin::LoadedSkin	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x58af10	LoadedWheel::LoadedWheel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x58b050	LoadedCar::LoadedCar	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
