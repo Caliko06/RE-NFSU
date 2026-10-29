@@ -735,10 +735,32 @@ static uint32_t free_nopath(Ctx *c) {
 // clump. PATCH 0x59a5cf, 0x59a669 (cave 0x439a94: jmp [SCREEN_ADDR+0x88]): in free mode every node passes; the lane
 // (0x5995e0), the 31 m spacing and the out-of-sight rules of 0x59aa60 still decide. RN_FREE=0 or a race: the node's bit.
 static uint32_t rm_records(Ctx *c), grid_fix(Ctx *c);
+
+// The Free Run move 0x59a2c0 hunts a spot from the player's node: a 250 m walk (0x59a4b8 call 0x4563d0: ecx section, eax node,
+// &pair in/out, 1, metres, side, 0), then a loop (0x59a4fa..0x59a7af) that tries the spot and, when it is refused, walks on
+// (0x59a763). It gives up only past 500 m of race route ([0x6b5a3c], 0x443d60 on 0x7372b0 at 0x59a598) or at a dead end. On a
+// race track the route distance grows with every step forward; in the WORLD the net is strongly connected (citygraph v2c) and
+// streets off the route project near it, so the walk circled a block within 500 m of the player for good and the game froze
+// ~10 s into WORLD (OWNER 2026-10-28; RN_PROF stacks: 0x598600 > 0x599830 (0x59a2c0 inlined) > 0x4563d0 at 0x59a763).
+// PATCH 0x59a4b8, 0x59a763 (cave 0x439a94, told by their returns): in free mode the metres walked in one move count as its
+// route distance, so a walk that would take the move past 500 m is undone (the pair stays, the loop ends on its own test, the
+// move fails as at a dead end: the car is parked and moved later). RN_FREE=0 or a race: the original walks.
+static uint32_t free_walk(Ctx *c, int first) {
+    uint32_t a[5] = {ARG(0), ARG(1), ARG(2), ARG(3), ARG(4)};
+    static float walked;
+    static unsigned stopped;
+    float m = *(float *)&a[2];
+    walked = first ? m : walked + m;
+    if (!live || first || walked <= ldf(c, 0x6b5a3c)) return call_guest_cdecl(c, 0x4563d0, 5, a);
+    if (getenv("RN_FREELOG") && !(stopped++ & 63)) rn_log("FREE walk stopped %u times (%.0f m)", stopped, walked);
+    return 0;
+}
+
 static uint32_t free_tnode(Ctx *c) {
     uint32_t ret = ld(c, c->r[ESP], 4);
     if (ret == 0x4345ae) return rm_records(c);   // PATCH 0x4345a9: the RaceManager's records, same cave
     if (ret == 0x422a8b) return grid_fix(c);     // PATCH 0x422a86: the start positions
+    if (ret == 0x59a4bd || ret == 0x59a768) return free_walk(c, ret == 0x59a4bd);   // PATCH 0x59a4b8, 0x59a763: the move's walks
     uint32_t bit = ld(c, c->r[EAX] + 0x84, 4) >> ((c->r[ECX] & 0xff) ? 25 : 26) & 1;
     if (live && ld(c, c->r[ESP], 4) == 0x59a66e) bit ? n_onbit++ : n_offbit++;   // the second call: the node the car is placed on
     return live ? 1 : bit;

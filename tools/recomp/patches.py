@@ -253,6 +253,12 @@ PATCHES.append(dict(addr=0x6729f6, old="cc" * 6, new="ff2584300100", entry=True,
 PATCHES.append(dict(addr=0x59a5cf, old="e8dc7aeaff", new="e8" + _rel(0x59a5cf, 0x439a94), when=lambda: True))
 PATCHES.append(dict(addr=0x59a669, old="e8427aeaff", new="e8" + _rel(0x59a669, 0x439a94), when=lambda: True))
 PATCHES.append(dict(addr=0x439a94, old="cc" * 6, new="ff2588300100", entry=True, when=lambda: True))
+# PATCH: 0x59a4b8, 0x59a763 (cave 0x439a94 above, told by their returns 0x59a4bd, 0x59a768): the Free Run move 0x59a2c0 walks the
+# road (0x4563d0) from the player until a spot is accepted, 500 m of race route or a dead end; on the strongly connected WORLD net it
+# circled a block within 500 m for good (froze the game ~10 s into WORLD, OWNER 2026-10-28). Now host/free.c free_walk: in free
+# mode the metres walked in one move stand for its route distance, and a walk past [0x6b5a3c] is undone; otherwise the original.
+PATCHES.append(dict(addr=0x59a4b8, old="e813bfebff", new="e8" + _rel(0x59a4b8, 0x439a94), when=lambda: True))
+PATCHES.append(dict(addr=0x59a763, old="e868bcebff", new="e8" + _rel(0x59a763, 0x439a94), when=lambda: True))
 # PATCH: 0x5987f6 (+ cave 0x439a9a, the CC padding right after the one above): TrafficTeleporter 0x598600 asks 0x5988c0 whether a car
 # needs a move; its rules are all along the race route, so in free roam a car that drove into another street was never moved and
 # drove on 1..2.5 km away (17 of 19 cars on the WORLD). Now host/free.c free_recycle: the game's answer, or in free mode also yes
