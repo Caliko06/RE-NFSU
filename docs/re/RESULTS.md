@@ -6,7 +6,7 @@ Check everything below with one command (4 s quick, 3.5 min full; read-only):
 
 It does two things. Part 1 runs the 9 readers we wrote (`tools/re/*.py check`) on the files in `game/`: each one parses a
 format and re-packs it byte for byte, so a pass means the format is understood exactly. Part 2 reads the unpatched
-`pc/Speed.exe` (md5 b6b9232c...) with capstone and raw bytes and asserts 33 claims from the docs (addresses, constants,
+`pc/Speed.exe` (md5 b6b9232c...) with capstone and raw bytes and asserts 35 claims from the docs (addresses, constants,
 table sizes). A FAIL means a doc is wrong. The 2026-10-29 run: ALL PASS. An independent Opus auditor (no access to our
 conclusions) sampled 24 other claims: 21 confirmed, 2 refuted and fixed, 1 open (`docs/re/audit/external_opus.md`).
 
@@ -34,11 +34,13 @@ Marks: V = read in the binary and a second tool agrees; I = inferred; U = unknow
 - **Props.** Smackables: pool of 32 x 0x4d0 (`0x595bf0`), Virgin `0x5962e0` -> Smokeable `0x596570`, respawn `0x5977f0` after 2.0 s at rest; surface rows are 0x94 bytes at `0x6ef2d0`.
 - **Traffic.** No spawner: cars are moved by the teleporter `0x598600` (0.3 s on a route, 1.0 s in Free Run, 250 m ahead, 500 m cap; constants `0x6b5a30..3c`); 49 intersections (chunk 0x34123), 94 spawn points (0x34124); incoming cap 30 (`0x4322a0`).
 - **Track.** Collision pool `0x4412b0` (TrackPolygonSlotPool, slot 0x80), the section streamer around `0x444480`, zone queries `0x4436d0`; of the 16 TRACKB files, 1001..1008 are closed routes and 1102..1109 open, 2.9..8.2 km. 62 names (48 V) in `docs/re/track.md`. The graph tag `track` is wrong for several functions (e.g. `0x4655f0` is body collision).
+- **HUD and input.** One `HudManager` (`0x4a8e40`) per player owns 17 FEng widgets; a 64-bit visibility mask from `0x42e620` is applied by `0x4a9540`, widgets are updated by `0x4a9440`; the minimap is drawn in the same pass (`0x409cd0 -> 0x58e810`). Keyboard uses DirectInput8 action maps (40 game and 36 menu actions); wheels and force feedback go through an embedded "EZ Wheel Wrapper v4.26". 108 names (73 V) in `docs/re/hud_input.md`.
+- **Runtime.** The C library is MSVC VS2003 static, `0x670c6c..0x6849d0` (about 540 functions); the engine base library (`bMalloc` pools, `SlotPool`, lists, hash) is `0x564000..0x568800`. Only 608 of the 3,765 functions tagged "runtime" are CRT; 1,228 are SEH unwind funclets and 235 the network stack. Ghidra's signature names are wrong for `0x67147f` (`_printf`) and `0x674839` (`_vfprintf`). 126 names (90 V) in `docs/re/runtime.md`.
 - **Rivals.** Rating match `0x57f700/0x57f970` (303 of 313 rivals match the player), spawn `0x4b5df0 -> 0x4b4040 -> 0x4b26f0`, AI table of 523 floats copied to `0x779c78` (chunk 0x34b00), rubber band `0x44bd10` every 0.3 s with strength from EventDesc +0x12c. Skill vs aggression bytes (+0x735/+0x736) are I.
 
 ## Numbers (python3 tools/census/scoreboard.py; tables in docs/re_scoreboard.md §5)
-13,739 functions lifted; 6,038 (43.9%) ran in 12 scenarios (a floor); 948 carry a name, 776 of them V; 5,406 are tagged by a med/high graph tag or a name.
-Names: `census/names.tsv` (1,039 addresses, aliases and func/data kind). The graph's system tags are unreliable (38% strict agreement); a name's system overrides them.
+13,739 functions lifted; 6,038 (43.9%) ran in 12 scenarios (a floor); 1,180 carry a name, 938 of them V; 5,502 are tagged by a med/high graph tag or a name.
+Names: `census/names.tsv` (1,335 addresses, aliases and func/data kind). The graph's system tags are unreliable (38% strict agreement); a name's system overrides them.
 
 ## One finding that touches the game (OWNER's call, nothing applied)
 Our patch `0x735ec1=1` ("everything available") also makes `0x5a1520` return 1e9 cash, so garage purchases drive the balance negative (asas0.ugd: -9,875). Proposal `?cash=real` in `docs/re/proposals.md`.

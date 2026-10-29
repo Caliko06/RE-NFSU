@@ -1,13 +1,35 @@
 addr	name	system	confidence	tool	doc	from	aliases	kind
+0x401010	ScratchAlloc16	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x4010a0	CallNTimes	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x4010e0	SetSpecialCameraFlag	blur	I	C	docs/re/blur.md	blur		func
 0x402820	Particle_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x4028f0	Particle_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x402b40	ParticleEmitter_Bind	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x402bd0	ParticleEmitter_Queue	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x405570	InputDevice::IsKeyboardType	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x405630	Input::EnumDevicesBySemanticsCallback	input	I	capstone	docs/re/hud_input.md	input		func
+0x405660	Input::Init	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x4057c0	Input::SelectActionMapForGameState	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x405860	Input::DropUnpluggedWheels	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x4058d0	Input::AssignNewWheels	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x405980	Input::GetState	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x405c60	InputKeyboard::InitDevice	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x405fa0	InputDevice::GetInstanceGuid	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x4063a0	Input::AssignWheelToSlot	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x406580	InputDevice::ReadState	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x406b10	InputKeyboard::PollRebindCapture	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x406f00	InputKeyboard::ApplyRebind	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x4070a0	InputDevice::ReadButtonsAndAxes	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x4075e0	Input::InitActionFormats	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x407760	InputDevice::SetActionMap	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x407800	InputWheel::GetBindingName	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x4079f0	InputKeyboard::GetBindingName	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x407ca0	InputKeyboard::CopyDefaultActionTables	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
 0x407db0	Texture::CreateD3D	assets	V	Ghidra FUN_00407db0 + capstone	docs/re/assets.md	assets		func
 0x408010	Texture::ReleaseD3D	assets	V	Ghidra FUN_00408010	docs/re/assets.md	assets		func
 0x409580	RenderFrameMain	blur	V	G+H+C	docs/re/blur.md	blur		func
 0x409b70	LightStreakPath	blur	U	C	docs/re/blur.md	blur		func
+0x409cd0	Hud::RenderPass	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
 0x40a7f0	SetBlurCameraObject	blur	V	C	docs/re/blur.md	blur		func
 0x40a880	NullUpdate_ret	camera	V	C	docs/re/camera.md	camera	nullsub (shared empty ret, 510 refs)@sound	func
 0x40a890	SceneRTCreate	blur	V	G+C	docs/re/blur.md	blur		func
@@ -23,8 +45,32 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x40d370	BlurDownsample4Tap	blur	V	G+C	docs/re/blur.md	blur		func
 0x40d6e0	BlurComposite	blur	V	G+C	docs/re/blur.md	blur		func
 0x40dd00	BuildProjection	camera	I	C	docs/re/camera.md	camera		func
+0x413000	Input::CreateDirectInput8	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x414830	ControlsScreen::SetBindingLabel	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
 0x4175c0	LinearTable::Init	rivals	I	capstone	docs/re/rivals.md	rivals		func
 0x417600	RideInfo::Init	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x418d10	EZWheel::ReleaseChannel	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x418d70	EZWheel::ClearChannels	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x418e10	EZWheel::CreateDInputAndEnumerate	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x418e70	EZWheel::EnumDevicesCallback	input	I	capstone	docs/re/hud_input.md	input		data
+0x418ee0	EZWheel::OpenChannel	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x419220	EZWheel::ReadChannel	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x419900	EZWheel::CreatePeriodicEffect	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x419ab0	EZWheel::UpdatePeriodicForce	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x419c20	EZWheel::DebugLog	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x419c60	EZWheel::Create	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x419d60	EZWheel::ResetState	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x419e40	EZWheel::BuildSineTable	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x419ea0	EZWheel::Poll	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x41bab0	EZWheel::StartEffect	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x41bb30	EZWheel::StopEffect	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x41bbb0	EZWheel::UnloadEffect	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x41bc60	EZWheel::SetOverallGain	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x41bcf0	EZWheel::GetOverallGain	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x41bda0	EZWheel::CreateConstantEffect	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x41bf20	EZWheel::UpdateConstantForce	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x41c070	EZWheel::CreateConditionEffect	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x41c240	EZWheel::UpdateConditionForce	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
 0x41c420	Config::OpenCfgFile	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
 0x41c680	Settings::Load	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
 0x41c7a0	Settings::Save	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
@@ -70,8 +116,13 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x42df30	DebugCameraCycler	camera	I	C	docs/re/camera.md	camera		func
 0x42e020	Player::CyclePOV	camera	V	G+C	docs/re/camera.md	camera		data
 0x42e450	Player::LookBackToggle	camera	I	C	docs/re/camera.md	camera		func
+0x42e4f0	TrackMap::SelectMode	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x42e620	Player::ComputeHudFlags	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x42ed40	Player::SetHudFlags	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x430730	Player::StartRaceCameras	camera	I	C	docs/re/camera.md	camera		func
+0x430b90	Player::UpdateFrame	hud	I	ghidra	docs/re/hud_input.md	hud		data
 0x430e00	Player::WrongWayAndZoneTest	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x4311c0	Players::UpdateAll	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
 0x4314a0	Player::ResetToRoute	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x431960	SpecialCamCaller_431960	camera	I	C	docs/re/camera.md	camera		func
 0x431a2e	JoyEvent_CAMERA_POV_CHANGE_case	camera	V	C+D	docs/re/camera.md	camera		data
@@ -280,8 +331,46 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x48e8b0	Players::UpdateStreamViewers	track	I	hopper+ghidra	docs/re/track.md	track		func
 0x48f090	ZoneFreezeCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
 0x490ea0	ZonePreviewCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
+0x49fdb0	HudWidget::RegisterString	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x49fe10	HudElement::RegisterImage	fe	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x49fe70	HudWidget::RegisterObjectByHash	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x49fec0	HudWidget::SetVisible	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a00c0	HudPosition::HudPosition	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a01a0	HudPosition::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a03d0	HudTach::HudTach	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a0f50	HudTach::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a1290	HudTurbo::HudTurbo	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a13a0	HudTurbo::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a1580	HudLapCounter::HudLapCounter	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a1820	HudLapCounter::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a1b50	HudSplitTime::HudSplitTime	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a1bf0	HudSplitTime::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a1f40	HudLeaderboard::HudLeaderboard	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a2b10	HudLeaderboard::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a3ba0	HudWrongWay::HudWrongWay	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a3c60	HudWrongWay::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a3f00	HudTachDrag::HudTachDrag	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a4a50	HudTachDrag::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a5860	HudEngineHeat::HudEngineHeat	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x4a5a30	EngineTempGauge::BuildTempBarImageList	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4a5b60	HudEngineHeat::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a5ca0	HudNos::HudNos	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a67a0	HudNos::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a68a0	HudSmokeApplause::HudSmokeApplause	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a6a10	HudSmokeApplause::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a6f10	HudSpeedTrapDrift::HudSpeedTrapDrift	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a7660	HudSpeedTrapDrift::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a7c90	HudRaceOver::HudRaceOver	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a7d60	HudRaceOver::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a8140	HudTrackMap::HudTrackMap	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a8200	HudStylePoints::HudStylePoints	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a83c0	HudStylePoints::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a8b80	HudOnline::HudOnline	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a8cb0	HudOnline::Update	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4a8e40	HudManager::HudManager	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x4a9440	HudManager::Update	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x4a9540	HudManager::SetFlags	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x4a9900	HudWidget::RegisterObject	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x4aa4d0	Player::Init	canon	I	capstone	docs/re/canon.md	canon		func
 0x4aaad0	Opt::Serialize	canon	V	capstone	docs/re/canon.md	canon		func
 0x4aac70	Opt::Deserialize	canon	V	hopper+ghidra+capstone	docs/re/canon.md	canon		func
@@ -376,6 +465,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4e7f60	GaragePresetsScreen::LoadPreset	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e8120	CreateGaragePresetsScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4e9e90	UrlRankScreen::Show	canon	V	ghidra	docs/re/canon.md	canon		func
+0x4f3030	FEng::RenderPackages	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
 0x4f3a00	FEPackage::FEPackage	assets	V	Ghidra make FUN_004f3a00	docs/re/assets.md	assets		func
 0x4f4120	FEngLibrary::AddPackage	assets	V	Hopper sub_4f4120 + Ghidra make: H+G agree	docs/re/assets.md	assets		func
 0x4f4190	FEngLibrary::RemovePackage	assets	V	Ghidra make FUN_004f4190	docs/re/assets.md	assets		func
@@ -387,7 +477,13 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4f46c0	FEngFont_ResolveTextures	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x4f57a0	MoviePlayer::BuildPath	canon	V	hopper	docs/re/canon.md	canon		func
 0x4f62f0	FEngPushGarageMainPackage	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4f68a0	FEObject::SetFormattedText	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4f68c0	bSPrintf_regdst	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x4f6910	FEObject::SetInvisible	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4f6970	FEObject::SetVisible	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x4f6b70	FEObject::SetScript	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x4f7840	MovieNameToId	canon	V	hopper+capstone	docs/re/canon.md	canon		func
+0x4fd230	FEng::HashName	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
 0x504260	GarageManager::GetMsgForNumScreensInList	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x5042d0	GarageManager::GetMsgForUpgradeLevel	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x504320	GarageManager::PushScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -683,11 +779,30 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x546310	TrackSkyInfo_Select	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x546570	TrackSkyInfo_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x549130	EAXMod::Stop (ret 4 stub)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
+0x564990	bList::Sort	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x564db0	Atan2ToAngle16	track	I	hopper+ghidra	docs/re/track.md	track		func
+0x565230	bMatrixCopy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x565310	bInitMemoryPool	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x5657d0	bMemoryPool_TotalAllocated	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x565850	bMemoryPool_Validate	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x565d70	bLargestFreeBlock	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x565df0	bVPrintf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x566e20	SlotPool::BuildFreeList	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x566ed0	SlotPool::IndexOfSlot	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x567220	SlotPool::Destroy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x567270	bList::AddTail	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x567280	bDistance3	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x5672b0	bNormalize2	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x567310	bScaleToLength2	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x567370	bNormalize3	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x567450	Vec3Normalize	blur	I	C	docs/re/blur.md	blur		func
 0x567600	Aabb2D::GrowByCircle	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x5679b0	PointInPolygon2D	track	V	hopper+ghidra	docs/re/track.md	track		func
+0x567cc0	bStrLen	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x567ce0	bStrCpy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x567d30	bStrCmp	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x567da0	bStrICmp	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x567de0	bStrCat2	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x569460	CarPartCuller::CullParts	other	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x569990	Car::InitRenderInfo	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x569c50	FrontEndRenderingCar::FrontEndRenderingCar	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -699,6 +814,13 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x571050	DrawRaceCarList	blur	V	G+C	docs/re/blur.md	blur		func
 0x573150	Chunk39100::Loader	assets	V	Hopper sub_573150 + Ghidra make FUN_00573150: H+G agree	docs/re/assets.md	assets		func
 0x573160	Chunk39100::Unloader	assets	V	Hopper sub_573160 + Ghidra make FUN_00573160: H+G agree	docs/re/assets.md	assets		func
+0x573ab0	InputEvents::MatchBindings	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x573c30	InputEvents::PostEvent	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x573cb0	InputEvents::Update	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x574020	InputEvents::AddSource	input	V	ghidra+hopper	docs/re/hud_input.md	input		func
+0x5741c0	InputEvents::Init	input	V	ghidra+hopper+capstone	docs/re/hud_input.md	input		func
+0x5742b0	Profile::SerializeJoystickSection	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
+0x574a00	InputEvents::FindProfileForDevice	input	I	ghidra+hopper	docs/re/hud_input.md	input		func
 0x575040	ApplyCameraShake	camera	I	G+C+M	docs/re/camera.md	camera		func
 0x575200	MaybeCameraShake	camera	I	M+C	docs/re/camera.md	camera		func
 0x575940	NullChunk::Loader	assets	V	capstone	docs/re/assets.md	assets		func
@@ -758,6 +880,14 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x58deb0	WorldZone_Unload	assets	V	Hopper export block; Ghidra export has no block; live Ghidra decompile + capstone	docs/re/assets.md	assets		func
 0x58dff0	WorldZone_CreateObject	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x58e2e0	WorldZone_Query	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x58e540	TrackMap::TrackMap	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x58e810	TrackMap::Draw	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x58f090	TrackMap::DrawMapQuad	hud	V	ghidra+hopper+capstone	docs/re/hud_input.md	hud		func
+0x58f640	TrackMap::DrawIcon	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x58fa50	TrackMap::DrawBackdrop	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x58fb10	Poly2D::ClipToRect	hud	V	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x590ad0	TrackMap::WorldToMap	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
+0x5912b0	TrackMap::InitModeTable	hud	I	ghidra+hopper	docs/re/hud_input.md	hud		func
 0x592100	RenderWorldModels	blur	V	G+C	docs/re/blur.md	blur		func
 0x592230	SurfaceTable::Init	props	I	hopper+ghidra	docs/re/props.md	props		func
 0x5927d0	WorldObject::CanCollide	props	I	capstone	docs/re/props.md	props		func
@@ -903,7 +1033,14 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5ab700	MovieSubtitles::Unloader	assets	V	Hopper sub_5ab700 + Ghidra make FUN_005ab700: H+G agree	docs/re/assets.md	assets		func
 0x5ac449	Vec4TransformInPlace	blur	I	C	docs/re/blur.md	blur		func
 0x61e790	GetFirstAnimBank	other	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x63f150	CriticalSection::Init	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x63f190	CriticalSection::Enter	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x63f1a0	CriticalSection::Leave	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x642450	Log_Printf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6424a0	Error_Printf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		data
 0x64b510	Csis::System::GetAllocator	audio.engine	V	ghidra	docs/re/sound.md	sound		func
+0x64b580	Mutex::Lock	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x64b5a0	Mutex::Unlock	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x64b7d0	Csis::Class::GetRefCount	audio.engine	V	ghidra	docs/re/sound.md	sound		func
 0x64b810	Csis::Class::SetMemberDataFast	audio.engine	V	ghidra	docs/re/sound.md	sound		func
 0x64bb20	Csis::Class::CreateInstanceFast	audio.engine	V	ghidra	docs/re/sound.md	sound		func
@@ -960,9 +1097,106 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x65c060	SNDI_pantoazimuth	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
 0x65c0b0	SNDover (is sound finished)	audio.mixer	V	ghidra	docs/re/sound.md	sound		func
 0x65fce0	SNDI_getb	audio.bank	V	ghidra	docs/re/sound.md	sound		func
-0x674898	_ftol	blur	V	C	docs/re/blur.md	blur		func
+0x670c6c	__amsg_exit	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x670cb5	WinMainCRTStartup	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x670e72	_atol	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		data
+0x670efa	_atoi	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x670f00	_strrchr	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x670fd5	__onexit	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67100d	_atexit	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67101f	_sprintf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671077	_vsprintf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671102	_free	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671173	__heap_alloc	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6711ee	__nh_malloc	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67121a	_malloc	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67145d	_tolower	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67147f	_printf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671541	_fopen	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67163d	_fread	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671689	_isalpha	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6716c8	_isdigit	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671741	_isspace	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6718b6	__lock_file	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671908	__unlock_file	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671a61	_fwrite	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671e94	_getenv	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x671f1f	_fclose	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x672017	__cexit_doexit	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6720fb	__exit	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x672188	eh_vector_destructor_iterator	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6721e8	eh_vector_constructor_iterator	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67224a	__abstract_cw	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6723c0	_strncpy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x672630	_memmove	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x672a10	_strchr	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x672ad0	shortsort	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x672b40	_qsort	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x672eeb	_finite	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x672f00	__isnan	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x673078	___CxxFrameHandler	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x673463	_atof	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6734a0	__chkstk	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6734dd	_vsnprintf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x673533	_snprintf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x673c3b	__stricmp	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x673ca4	__strdup	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x674800	_strncmp	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x674839	_vfprintf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x674898	_ftol_nocw	blur	V	C	docs/re/blur.md	blur		func
+0x67490d	_bsearch	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x674b00	__aulldiv	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x674c30	_strlen	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x674e7a	_strtol	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x674ec2	__security_check_cookie	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x674f09	__NMSG_WRITE	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675080	__FF_MSGBANNER	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6758cb	__getptd	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675b30	__heap_init	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675b84	__SEH_prolog	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675bbf	__SEH_epilog	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675bd0	_isctype	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675c50	__allmul	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675c84	_realloc	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675ea7	__flsbuf	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x675fc0	write_char	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67733f	__unlock	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x677354	__mtinitlocknum	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6773d3	__lock	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x677f27	__callnewh	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x677f42	__errno	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x677f4b	___doserrno	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x677f54	__dosmaperr	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x678d30	_memcpy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67906d	_calloc	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x679519	_inconsistency	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x679f00	__aullrem	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67a054	__shift	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67a071	__cftoe2	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67a11f	__cftoe	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67a22f	__cftof	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67a297	__cftog	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67a8fb	__raise_exc	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67b827	___InternalCxxFrameHandler	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67c200	__fdiv_x87_ld	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67e180	___ascii_stricmp	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67e1d0	_strcpy	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67e1e0	_strcat	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67ef30	_strcspn	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67ef80	_memset	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67efe0	_strcmp	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67f980	_memcmp	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x67fc00	_strpbrk	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6800a5	___crtInitCritSecAndSpinCount	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x680230	__aulldvrm	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x681795	__fptostr	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6818c6	__fltout2	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x682073	__strnicmp	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6849a0	__allshr	runtime	V	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6849d0	__allshl	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x684aa8	EAX_CarFX::~EAX_CarFX	audio.engine	I	ghidra	docs/re/sound.md	sound		data
 0x6860d3	EAXSND8Wrapper::EAXSND8Wrapper (SEH unwind funclet, not the ctor)	other	V	ghidra	docs/re/sound.md	sound		data
+0x688528	__CxxFrameHandler_wrapper	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
 0x688888	(not a function: SEH frame handler thunk)	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x6b5a30	TeleportInterval_Free	traffic	V	G+file	docs/re/traffic.md	traffic		data
 0x6b5a34	TeleportInterval_Route	traffic	V	G+file	docs/re/traffic.md	traffic		data

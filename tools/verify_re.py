@@ -90,6 +90,8 @@ CLAIMS = [
     ("traffic", "teleporter timers and distances: 1.0 s, 0.3 s, 250 m, 500 m at 0x6b5a30..3c; 250 m is read by code", lambda: [f32(0x6b5a30 + 4 * k) for k in range(4)] == [1.0, approx_f(0.3), 250.0, 500.0] and refs(0x6b5a38) > 0),
     ("track", "zone query 0x4436d0 is asked for type 9 (SHORTCUT) by the commentator hook 0x43fb50", lambda: has(0x43fb50, "mov edx, 9", "call 0x4436d0", n=30)),
     ("track", "pool name string TrackPolygonSlotPool is created by 0x4412b0 (slot 0x80)", lambda: has(0x4412b0, "0x80", n=40) and any(cstr(int(m, 16)) == "TrackPolygonSlotPool" for m in __import__("re").findall(r"0x[67][0-9a-f]{5}", asm(0x4412b0, 40)))),
+    ("input", "an embedded EZ Wheel Wrapper (DirectInput wheel and force feedback) ships inside the exe", lambda: b"EZ Wheel Wrapper v4" in data),
+    ("runtime", "0x672fc8 is the real _ftol (saves, sets and restores the FPU control word); 0x674898 is the variant that does not", lambda: has(0x672fc8, "fnstcw", "fldcw", "fistp", n=30) and not has(0x674898, "fldcw", n=30)),
     ("sound", "speech event counts table 0x6f6bc8: 95 non-zero entries summing to 277", lambda: (lambda t: len(t) == 95 and all(t) and sum(t) == 277)([u32(0x6f6bc8 + 4 * i) for i in range(95)])),
     ("sound", "engine sound: loader 0x51dec0 reads family table 0x6f8100, crossfade 0x529cd0 reads 0x6f7220", lambda: has(0x51dec0, "0x6f8100") and has(0x529cd0, "0x6f7220")),
     ("tuning", "steering-vs-speed table at 0x705f48: 10 points, x 0..160, step 0.05625 (generic lookup 0x583ea0)", lambda: u32(0x705f48) == 10 and f32(0x705f50) == 160.0 and approx(f32(0x705f54), 0.05625)),
