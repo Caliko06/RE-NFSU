@@ -47,3 +47,8 @@ source file is reliable enough to set the system of unknown functions.
 Take ready rows (open_callees = 0) of one system from queue.tsv, read the named pseudocode, confirm or reject the
 prior hint, write rows to census/names_<system>.tsv (V when read, with the GC name when it fits), then
 `canon.py apply && canon.py export && canon.py queue`: callers now read with the new names, and more rows turn ready.
+
+## Systems from source files (tools/canon/tu_systems.py, 2026-10-29)
+143 of 910 unknown functions get a system from their GameCube source file (file vote >= 4 and >= 70 %, else directory
+vote; GameCube-only files skipped: an earlier pass that kept dolphinsdk gave 111 weak "render" rows). Written to
+census/canon/systems_tu.tsv, read by the scoreboard as med. 767 stay unknown (357 > 64 bytes): they need reading.

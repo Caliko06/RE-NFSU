@@ -65,6 +65,13 @@ if os.path.exists("census/systems_override.tsv"):
             if f[1] in ("render", "canon", "runtime", "audio", "rivals", "car", "track", "online", "hud", "camera", "traffic", "props", "assets", "input"):
                 system[x], conf[x] = f[1], "high"
 
+# unknown functions placed by their GameCube source file (tools/canon/tu_systems.py): inferred, so med
+if os.path.exists("census/canon/systems_tu.tsv"):
+    for r in csv.DictReader(open("census/canon/systems_tu.tsv"), delimiter="\t"):
+        x = a(r["addr"])
+        if system.get(x, "unknown") == "unknown":
+            system[x], conf[x] = r["system"], "med"
+
 # a name with a system (V or I) wins over the graph tag
 nsys = {}
 for p in sorted(glob.glob("census/names_*.tsv")):
