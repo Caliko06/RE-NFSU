@@ -1,0 +1,27 @@
+addr	name	system	confidence	evidence	tool	doc
+0x447ac0	bChunkLoader::LoadChunks	assets	high	V: walks chunks [p,p+size), calls table[i](chunk) round-robin from the last hit; a hit advances to the next chunk; no taker after n+1 tries -> int3; called with (0x7007e0, 47); H+G agree	hopper+ghidra	docs/re/assets.md
+0x447b10	bChunkLoader::UnloadChunks	assets	high	V: same walk over the unloader table 0x7008a0 (47), last chunk first; called by 0x4481d0; H+G agree	hopper+ghidra	docs/re/assets.md
+0x447c00	PlaceChunks	assets	high	V: recursive walk; measures or copies chunks into two pools; 0xb3320000 (texture data) and its children go to the second pool; inserts id-0 padding chunks filled with 0x11 to keep 128-byte alignment; H+G agree	hopper+ghidra	docs/re/assets.md
+0x447d90	LoadResourceChunks	assets	high	V: PlaceChunks dry run for sizes; if a texture-data part exists, allocates both pools (0x565b60, second with flag 0x2000), copies, frees the file buffer, then LoadChunks on each part; H+G agree	hopper+ghidra	docs/re/assets.md
+0x447ab0	PaddingChunk::Loader	assets	high	V: returns 1 when chunk id == 0 (sete); table index 0	capstone	docs/re/assets.md
+0x575940	NullChunk::Loader	assets	high	V: xor eax,eax; ret: never takes a chunk; table index 1 (load and unload)	capstone	docs/re/assets.md
+0x447f40	InitResourceFileSlotPool	assets	high	V: creates the "ResourceFileSlotPool" (0xb4-byte slots) at 0x7360f8; H	hopper	docs/re/assets.md
+0x447f90	ResourceFile::ResourceFile	assets	med	V: stores type/flags/args at +8..+0x14, name at +0x18, clears state +0x8c..+0xb0, opens the file (0x594c60) for its size; H	hopper	docs/re/assets.md
+0x4482f0	CreateResourceFile	assets	high	V: takes a slot from the pool (0x567160), constructs it (0x447f90), appends to the list 0x77a924/0x77a928; callers name GLOBALA/GLOBALB/FRONTB/TRACKB/car files; H+G agree	hopper+ghidra	docs/re/assets.md
+0x448110	ResourceFile::BeginLoading	assets	high	V: allocates the buffer (size +0xa0, pool flags +0x88 \| 8 when flags&2), queues the async read 0x58aba0 with callback 0x4482e0; counts pending files at 0x7360e8; H	hopper	docs/re/assets.md
+0x4482e0	ResourceFile::OnReadDone	assets	high	V: decrements the pending-read count +0x8c; H	hopper	docs/re/assets.md
+0x448220	ResourceFile::FinishLoading	assets	high	V: once reads are done: if flags&8 and the buffer is COMP/JDLZ (0x58d3c0), allocates the unpacked size and decompresses (0x58d3f0), then LoadResourceChunks; flag 4 frees the buffer; sets loaded +0x90; H	hopper	docs/re/assets.md
+0x4483c0	ServiceResourceLoading	assets	high	V: services the async file queue (0x58a850), then FinishLoading on each listed file, calls its done-callback +0x94(+0x98); H+G agree	hopper+ghidra	docs/re/assets.md
+0x448370	UnloadResourceFile	assets	high	V: waits until loaded (+0x90), unlinks from the list, UnloadChunks (0x4481d0), returns the slot to the pool; H+G agree	hopper+ghidra	docs/re/assets.md
+0x4481d0	ResourceFile::UnloadChunks	assets	high	V: UnloadChunks(buffer, 0x7008a0, 47) then frees the buffer; H	hopper	docs/re/assets.md
+0x448440	FindResourceFile	assets	high	V: strcmp of the name against +0x18 of each file in the list 0x77a924; H+G agree	hopper+ghidra	docs/re/assets.md
+0x58d3c0	IsCompressedBuffer	assets	high	V: "COMP" with byte +4 == 1, or "JDLZ" with byte +4 == 2; H+G agree	hopper+ghidra	docs/re/assets.md
+0x58d3f0	DecompressBuffer	assets	high	V: COMP -> 0x58d2c0; JDLZ inline: flags bytes +0x10/+0x11, unpacked size +8, short match len (b0&0xf0)<<4\|b1 +3 dist (b0&0xf)+1, long len (b0&0x1f)+3 dist (b0&0xe0)<<3\|b1 +0x11; matches tools/census/jdlz.py which re-creates GLOBALB.BUN and INGAMEB.BUN byte for byte; H	hopper+data	docs/re/assets.md
+0x58d2c0	DecompressCOMP	assets	med	I: the COMP (version 1) path of 0x58d3f0; no shipped file uses COMP	hopper	docs/re/assets.md
+0x447160	InitZDirArchive	assets	high	V: opens NFSUNDER\ZDIR.BIN; if present mounts NFSUNDER\ZZDATA (0x594970), else [0x736108]=0; neither file ships; H	hopper	docs/re/assets.md
+0x448600	GameFlow::LoadGlobalA	assets	high	V: CreateResourceFile GLOBAL\GLOBALA.BUN, waits; then LANGUAGES\LANGUAGETEXTURES.BIN into "LanguageMemoryPool"; H	hopper	docs/re/assets.md
+0x448650	GameFlow::LoadGlobalB	assets	high	V: reads GLOBAL\GLOBALB.LZC with flags 9 and renames the slot GLOBAL\GLOBALB.BUN; then the 5 car-part files at 0x700794..0x7007a4 (exhaust, brakes, plates); shows PC_Loading.fng / Chyron.fng; H	hopper	docs/re/assets.md
+0x448b10	GameFlow::LoadingFrontEndPart1	assets	med	V: names "GameFlowLoadingFrontEndPart1", slot named FRONTEND\FRONTB.BUN (read from FRONTB.LZC, I); H	hopper	docs/re/assets.md
+0x449765	GameFlow::LoadingTrackSpecificPart1	assets	high	V: sprintf TRACKS\TRACKB%d.LZC then TRACKB%d.BUN; H	hopper	docs/re/assets.md
+0x44952b	GameFlow::LoadingTrackSpecificPart6	assets	high	V: sprintf TRACKS\TEX%dTRACK.BIN; H	hopper	docs/re/assets.md
+0x594c60	bOpenFile	assets	low	I: (name<200 chars, mode, flags) -> file object with size at +4; G	ghidra	docs/re/assets.md

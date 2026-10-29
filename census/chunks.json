@@ -1,0 +1,1631 @@
+{
+ "0x00000000": {
+  "n": 18257,
+  "files": 224,
+  "depths": [
+   1,
+   0,
+   2
+  ],
+  "parents": [
+   "0x80134000",
+   "top",
+   "0xb3300000",
+   "0xb3320000"
+  ],
+  "min": 0,
+  "max": 326296,
+  "loader": 0,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00030201": {
+  "n": 67,
+  "files": 12,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 880,
+  "max": 12656,
+  "loader": 5,
+  "example": "Global/GLOBALA.BUN"
+ },
+ "0x00030203": {
+  "n": 22,
+  "files": 5,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 1672,
+  "max": 44144,
+  "loader": 33,
+  "example": "Global/GLOBALA.BUN"
+ },
+ "0x00030210": {
+  "n": 201,
+  "files": 5,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 532,
+  "max": 22316,
+  "loader": 33,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00030220": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 189888,
+  "max": 189888,
+  "loader": 39,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00030230": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 23024,
+  "max": 23024,
+  "loader": 40,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00030240": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 564,
+  "max": 564,
+  "loader": 41,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00034026": {
+  "n": 33,
+  "files": 33,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 256,
+  "max": 19968,
+  "loader": 29,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x00034027": {
+  "n": 24,
+  "files": 24,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 120,
+  "max": 49848,
+  "loader": 29,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034035": {
+  "n": 175,
+  "files": 5,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 136,
+  "max": 164,
+  "loader": 16,
+  "example": "Tracks/STREAML1RA.BUN"
+ },
+ "0x00034036": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 272,
+  "max": 272,
+  "loader": 17,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x00034101": {
+  "n": 593,
+  "files": 5,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034100"
+  ],
+  "min": 60,
+  "max": 68,
+  "loader": 12,
+  "example": "Tracks/STREAML1RA.BUN"
+ },
+ "0x00034102": {
+  "n": 593,
+  "files": 5,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034100"
+  ],
+  "min": 72,
+  "max": 11664,
+  "loader": 12,
+  "example": "Tracks/STREAML1RA.BUN"
+ },
+ "0x00034103": {
+  "n": 593,
+  "files": 5,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034100"
+  ],
+  "min": 60,
+  "max": 36588,
+  "loader": 12,
+  "example": "Tracks/STREAML1RA.BUN"
+ },
+ "0x00034104": {
+  "n": 593,
+  "files": 5,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034100"
+  ],
+  "min": 24,
+  "max": 4584,
+  "loader": 12,
+  "example": "Tracks/STREAML1RA.BUN"
+ },
+ "0x00034107": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 2408,
+  "max": 22456,
+  "loader": 35,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034108": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 12,
+  "max": 12,
+  "loader": 35,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034121": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 0,
+  "max": 464724,
+  "loader": 23,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034122": {
+  "n": 30,
+  "files": 30,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 128,
+  "max": 4608,
+  "loader": 23,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034123": {
+  "n": 14,
+  "files": 14,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 368,
+  "max": 2576,
+  "loader": 23,
+  "example": "Tracks/TRACKB1002.lzc"
+ },
+ "0x00034124": {
+  "n": 20,
+  "files": 20,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 264,
+  "max": 2112,
+  "loader": 23,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034130": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 152,
+  "max": 5044,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034131": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 344,
+  "max": 16296,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034132": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 18624,
+  "max": 772640,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034133": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 1564,
+  "max": 68612,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034134": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 32,
+  "max": 44,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034146": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 440,
+  "max": 1064,
+  "loader": 2,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034148": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034147"
+  ],
+  "min": 40,
+  "max": 40,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034149": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034147"
+  ],
+  "min": 200,
+  "max": 2000,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x0003414a": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034147"
+  ],
+  "min": 0,
+  "max": 10800,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034151": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034150"
+  ],
+  "min": 560,
+  "max": 14140,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034152": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034150"
+  ],
+  "min": 592,
+  "max": 14948,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034153": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034150"
+  ],
+  "min": 0,
+  "max": 272,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034154": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034150"
+  ],
+  "min": 0,
+  "max": 32,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034201": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 7812,
+  "max": 7812,
+  "loader": 3,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034202": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 1100,
+  "max": 1100,
+  "loader": 19,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034250": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 24,
+  "max": 21136,
+  "loader": 30,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00034492": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 5048,
+  "max": 5048,
+  "loader": null,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x00034600": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 112568,
+  "max": 112568,
+  "loader": 20,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034601": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 6080,
+  "max": 6080,
+  "loader": 20,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034603": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034602"
+  ],
+  "min": 32,
+  "max": 32,
+  "loader": null,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034604": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034602"
+  ],
+  "min": 217776,
+  "max": 217776,
+  "loader": null,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034605": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034602"
+  ],
+  "min": 64904,
+  "max": 64904,
+  "loader": null,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034606": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034602"
+  ],
+  "min": 21248,
+  "max": 21248,
+  "loader": null,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034a01": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034a00"
+  ],
+  "min": 800,
+  "max": 800,
+  "loader": null,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00034a02": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034a00"
+  ],
+  "min": 38512,
+  "max": 38512,
+  "loader": null,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00034a03": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 6400,
+  "max": 6400,
+  "loader": 43,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00034a07": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 1000,
+  "max": 1000,
+  "loader": 21,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034a08": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 3656,
+  "max": 3656,
+  "loader": 42,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00034a09": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 144,
+  "max": 144,
+  "loader": 44,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00034a0a": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 1384,
+  "max": 1384,
+  "loader": 45,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00034b00": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 2092,
+  "max": 2092,
+  "loader": 27,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00035020": {
+  "n": 33,
+  "files": 33,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 24,
+  "max": 39960,
+  "loader": 9,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00035021": {
+  "n": 33,
+  "files": 33,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 24,
+  "max": 48984,
+  "loader": 9,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00036001": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80036000"
+  ],
+  "min": 24,
+  "max": 24,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00036002": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80036000"
+  ],
+  "min": 64,
+  "max": 53440,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00036003": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80036000"
+  ],
+  "min": 8,
+  "max": 28680,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00039000": {
+  "n": 22,
+  "files": 22,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 40828,
+  "max": 192492,
+  "loader": 28,
+  "example": "Languages/Chinese.bin"
+ },
+ "0x00039010": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 864,
+  "max": 864,
+  "loader": 46,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x00039200": {
+  "n": 2506,
+  "files": 68,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034020"
+  ],
+  "min": 88,
+  "max": 100,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00039201": {
+  "n": 2506,
+  "files": 68,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034020"
+  ],
+  "min": 288,
+  "max": 2928,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00039202": {
+  "n": 2506,
+  "files": 68,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80034020"
+  ],
+  "min": 56,
+  "max": 692,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x0003a000": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 16388,
+  "max": 16388,
+  "loader": 32,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x0003b200": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 0,
+  "max": 692,
+  "loader": 36,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x0003b300": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 114568,
+  "max": 117288,
+  "loader": 38,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00134002": {
+  "n": 1276,
+  "files": 50,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134001"
+  ],
+  "min": 128,
+  "max": 128,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134003": {
+  "n": 1276,
+  "files": 50,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134001"
+  ],
+  "min": 8,
+  "max": 11808,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134004": {
+  "n": 40,
+  "files": 40,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134001"
+  ],
+  "min": 20,
+  "max": 29520,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134011": {
+  "n": 19989,
+  "files": 50,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134010"
+  ],
+  "min": 176,
+  "max": 188,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134012": {
+  "n": 19989,
+  "files": 50,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134010"
+  ],
+  "min": 0,
+  "max": 272,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134013": {
+  "n": 11828,
+  "files": 45,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134010"
+  ],
+  "min": 8,
+  "max": 72,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134017": {
+  "n": 4968,
+  "files": 23,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134010"
+  ],
+  "min": 12,
+  "max": 12,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134018": {
+  "n": 4968,
+  "files": 23,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134010"
+  ],
+  "min": 32,
+  "max": 16888,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134019": {
+  "n": 4968,
+  "files": 23,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134010"
+  ],
+  "min": 48,
+  "max": 29928,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x0013401a": {
+  "n": 3197,
+  "files": 37,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134010"
+  ],
+  "min": 80,
+  "max": 1448,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134900": {
+  "n": 19989,
+  "files": 50,
+  "depths": [
+   3
+  ],
+  "parents": [
+   "0x80134100"
+  ],
+  "min": 64,
+  "max": 72,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134b01": {
+  "n": 19989,
+  "files": 50,
+  "depths": [
+   3
+  ],
+  "parents": [
+   "0x80134100"
+  ],
+  "min": 8,
+  "max": 1081448,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134b02": {
+  "n": 19989,
+  "files": 50,
+  "depths": [
+   3
+  ],
+  "parents": [
+   "0x80134100"
+  ],
+  "min": 8,
+  "max": 2040,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00134b03": {
+  "n": 19989,
+  "files": 50,
+  "depths": [
+   3
+  ],
+  "parents": [
+   "0x80134100"
+  ],
+  "min": 8,
+  "max": 136372,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x00135001": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80135000"
+  ],
+  "min": 28,
+  "max": 28,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00135002": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80135000"
+  ],
+  "min": 76,
+  "max": 54460,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00135003": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80135000"
+  ],
+  "min": 8,
+  "max": 86024,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00135101": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80135100"
+  ],
+  "min": 64,
+  "max": 64,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00135102": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80135100"
+  ],
+  "min": 8,
+  "max": 63368,
+  "loader": null,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x00135200": {
+  "n": 278,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 160,
+  "max": 160,
+  "loader": 8,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x00e34009": {
+  "n": 16,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 840,
+  "max": 6584,
+  "loader": 15,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x00e34010": {
+  "n": 712,
+  "files": 7,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 728,
+  "max": 113912,
+  "loader": 14,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x30300101": {
+  "n": 35,
+  "files": 21,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0xb0300100"
+  ],
+  "min": 16,
+  "max": 16,
+  "loader": null,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x30300102": {
+  "n": 35,
+  "files": 21,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0xb0300100"
+  ],
+  "min": 52,
+  "max": 520,
+  "loader": null,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x30300103": {
+  "n": 35,
+  "files": 21,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0xb0300100"
+  ],
+  "min": 32,
+  "max": 608,
+  "loader": null,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0x33310001": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0xb3310000"
+  ],
+  "min": 124,
+  "max": 124,
+  "loader": null,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0x33310002": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0xb3310000"
+  ],
+  "min": 0,
+  "max": 7504,
+  "loader": null,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0x33310003": {
+  "n": 84,
+  "files": 84,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0xb3310000"
+  ],
+  "min": 0,
+  "max": 18760,
+  "loader": null,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0x33310004": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0xb3310000"
+  ],
+  "min": 0,
+  "max": 116312,
+  "loader": null,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0x33310005": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0xb3310000"
+  ],
+  "min": 0,
+  "max": 30016,
+  "loader": null,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0x33320001": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0xb3320000"
+  ],
+  "min": 24,
+  "max": 24,
+  "loader": null,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0x33320002": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0xb3320000"
+  ],
+  "min": 120,
+  "max": 19412120,
+  "loader": null,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0x80034020": {
+  "n": 68,
+  "files": 68,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 576,
+  "max": 60260,
+  "loader": 11,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x80034100": {
+  "n": 593,
+  "files": 5,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 248,
+  "max": 49336,
+  "loader": 12,
+  "example": "Tracks/STREAML1RA.BUN"
+ },
+ "0x80034147": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 604,
+  "max": 12484,
+  "loader": 24,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x80034150": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 1216,
+  "max": 29424,
+  "loader": 13,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x80034602": {
+  "n": 2,
+  "files": 2,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 303992,
+  "max": 303992,
+  "loader": 20,
+  "example": "Global/GLOBALB.BUN"
+ },
+ "0x80034a00": {
+  "n": 1,
+  "files": 1,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 39328,
+  "max": 39328,
+  "loader": 37,
+  "example": "FrontEnd/FrontB.lzc"
+ },
+ "0x80036000": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 120,
+  "max": 82168,
+  "loader": 10,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x8003b000": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 0,
+  "max": 0,
+  "loader": 34,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x80134000": {
+  "n": 1276,
+  "files": 50,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 588,
+  "max": 20865932,
+  "loader": 7,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x80134001": {
+  "n": 1276,
+  "files": 50,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80134000"
+  ],
+  "min": 160,
+  "max": 41488,
+  "loader": 6,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x80134008": {
+  "n": 1276,
+  "files": 50,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134001"
+  ],
+  "min": 0,
+  "max": 0,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x80134010": {
+  "n": 19989,
+  "files": 50,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0x80134000"
+  ],
+  "min": 328,
+  "max": 1219520,
+  "loader": 7,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x80134100": {
+  "n": 19989,
+  "files": 50,
+  "depths": [
+   2
+  ],
+  "parents": [
+   "0x80134010"
+  ],
+  "min": 128,
+  "max": 1219304,
+  "loader": null,
+  "example": "Cars/240SX/GEOMETRY.BIN"
+ },
+ "0x80135000": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 136,
+  "max": 140536,
+  "loader": 8,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0x80135100": {
+  "n": 31,
+  "files": 31,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 88,
+  "max": 63448,
+  "loader": 8,
+  "example": "Tracks/TRACKB1001.lzc"
+ },
+ "0xb0300100": {
+  "n": 35,
+  "files": 21,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 124,
+  "max": 1168,
+  "loader": null,
+  "example": "Global/INGAMEB.BUN"
+ },
+ "0xb3300000": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   0
+  ],
+  "parents": [
+   "top"
+  ],
+  "min": 504,
+  "max": 19560856,
+  "loader": 4,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0xb3310000": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0xb3300000"
+  ],
+  "min": 164,
+  "max": 172756,
+  "loader": 4,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ },
+ "0xb3320000": {
+  "n": 347,
+  "files": 142,
+  "depths": [
+   1
+  ],
+  "parents": [
+   "0xb3300000"
+  ],
+  "min": 248,
+  "max": 19412248,
+  "loader": 4,
+  "example": "Cars/240SX/TEXTURES.BIN"
+ }
+}

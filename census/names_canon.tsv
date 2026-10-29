@@ -1,0 +1,47 @@
+addr	name	system	confidence	evidence	tool	doc
+0x5a00a0	EventDescPack::Loader	canon	high	V: cmp [chunk],0x80034a00; child 0x34a01 -> 0x20-byte rows (size>>5) into 0x733f78; child 0x34a02 -> 0x5a0060(payload,size); loader #37 of table 0x7007e0	capstone+hopper (Ghidra made no function here: reached only through the table)	docs/re/canon.md
+0x5a0130	EventDescPack::Unloader	canon	med	V: unloader #37 of table 0x7008a0, same container id 0x80034a00	capstone	docs/re/canon.md
+0x5a0060	EventDescPack::IndexEvents	canon	high	V: clears 256 slots at 0x733ff8, walks 0x14c records, slot[id]=record; H+G agree	ghidra+hopper	docs/re/canon.md
+0x5a0fc0	Career::ArePrerequisitesDone	canon	high	V: status byte career+0x34c+id; skip 2/4 and kind 8; rule +0xa8 (0 all,1 any) over i16 ids +0x9c[+0xaa]; H (career.py) + G agree	ghidra+hopper	docs/re/canon.md
+0x5a1100	Career::OpenAvailableEvents	canon	high	V: loops the 256 slots of 0x733ff8, status at career+0x34c+id, opens events whose prerequisites pass (0x5a0fc0); H+G agree	ghidra+hopper	docs/re/canon.md
+0x5a0dc0	Career::WinEvent	canon	high	V: cash +0x1374 and +0x1378 += cash[difficulty]; status=2; type-1 rewards -> 0x51ad30 magazine; id 0x71 sets 0x7677ac; G read, H matches career.py	ghidra+hopper	docs/re/canon.md
+0x5a0f60	Career::QuitEvent	canon	high	V: status byte = 5, then releases the custom event at career+0x88b0; G	ghidra+hopper	docs/re/canon.md
+0x5a0ce0	Career::StartEvent	canon	high	V: status[id]=3, charges the entry fee (+0x10) from cash and adds it to spent +0x137c; H+G agree (save agent)	hopper+ghidra	docs/re/canon.md
+0x5a3f00	Career::BuildRewardSummary	canon	high	V: walks rewards +0x38[+0x74]; type 0 values 0..0x18 set one bit each (0x20<<value) plus group bits 1/2/8/0x10; G	ghidra	docs/re/canon.md
+0x51ad30	Career::AnnounceReward	canon	low	I: called by WinEvent per type-1 reward with the slot career+0x13a8+i*0x454; copies 0xce dwords of the current car record into a message (save agent, C); not a plain magazine give	ghidra+capstone	docs/re/canon.md
+0x59fce0	LanguagePack::Loader	canon	high	V: chunk 0x39000; stores charset 0x734438, count 0x73442c, table 0x734434, strings 0x734430; rebases offsets; loader #28; H+G agree	hopper+ghidra	docs/re/canon.md
+0x59fd40	LanguagePack::Unloader	canon	med	V: unloader #28 of table 0x7008a0, same id 0x39000	capstone	docs/re/canon.md
+0x59fb80	GetLocalizedStringByHash	canon	high	V: binary search of the sorted {hash,offset} table [0x734434] over [0x73442c] entries, returns the string pointer; H+G agree	ghidra+hopper	docs/re/canon.md
+0x4f7840	MovieNameToId	canon	high	V: strcmp over 42 {name,id} pairs at 0x6f90d8, returns id or -1; H+capstone	hopper+capstone	docs/re/canon.md
+0x4f57a0	MoviePlayer::BuildPath	canon	med	V: sprintf "%sMOVIES\%s%s" (0x6c1cdc) with ".mad", fopen check, retries with an alternate root (byte 0x70108f); H	hopper	docs/re/canon.md
+0x4deaa0	BootMovieScreen::BootMovieScreen	canon	med	V: language [0x734998] 0 or 5 -> "na_boot", else 0x59fd70 (localised logo); vtable 0x6c3758; H	hopper	docs/re/canon.md
+0x59fd70	GetLocalizedLogoMovie	canon	low	I: returns the logo_<lang> name for the boot movie; only read through 0x4deaa0	hopper	docs/re/canon.md
+0x41c420	Config::OpenCfgFile	canon	high	V: FindFirstFile on <name>.cfg under CSIDL 0x8023 + "\NFS Underground\", builds 0x44-byte parser at [0x736228]	hopper+ghidra+capstone	docs/re/canon.md
+0x41c680	Settings::Load	canon	high	V: calls 0x41e330 (.opt) then walks table 0x700ec0 with 0x4051f0 key lookup, int/float/string by type	hopper+ghidra+capstone	docs/re/canon.md
+0x41c7a0	Settings::Save	canon	high	V: calls 0x41e200 (.opt) then fwrite "KEY: value\n" for each row of 0x700ec0	hopper+ghidra+capstone	docs/re/canon.md
+0x41cf40	Profile::CreateNew	canon	med	V: autosaves old ([0x7588d1]), 4aa4d0 init, 0x4ac460/0x4ac220 databases, 0x5a0a00 career reset, clears P+0x214 and 0x7677b8, 41d2a0 MRU, 41d8a0 autosave	hopper+ghidra+capstone	docs/re/canon.md
+0x41d030	Profile::Load	canon	med	V: autosaves old, 4aa4d0(name), 41d2a0 MRU, 41da40(-1) loads autosave, 41c420, 41c680	hopper+ghidra+capstone	docs/re/canon.md
+0x41d0d0	SaveSlot::Exists	canon	high	V: 0x41dc10 path with ext .ugd then FindFirstFile != -1	hopper+ghidra+capstone	docs/re/canon.md
+0x41d140	ProfileList::Load	canon	high	V: reads Profiles.usr: count then count x 0x20 into heap array {0x20, cap, n, ptr}	hopper+ghidra+capstone	docs/re/canon.md
+0x41d2a0	ProfileList::Touch	canon	high	V: loads list, case-insensitive match, moves/inserts name at 0, rewrites Profiles.usr (count + 0x20 each)	hopper+ghidra+capstone	docs/re/canon.md
+0x41d650	ProBlob::Write	canon	med	V: "<name>0.pro": u32 1, blob, adler32 (0x41d72d)	hopper+ghidra+capstone	docs/re/canon.md
+0x41d770	ProBlob::Read	canon	med	V: same file, version==1 and adler32 compare (0x41d865)	hopper+ghidra+capstone	docs/re/canon.md
+0x41d8a0	Ugd::Write	canon	high	V: fwrite 0x13, 0x12, 0x19, 0xf660 (via 0x4ab120), adler32 (0x41dd10)	hopper+ghidra+capstone	docs/re/canon.md
+0x41da40	Ugd::Read	canon	high	V: reads same layout, rejects version != 0x13 or adler mismatch, then 0x4ab200 unpack	hopper+ghidra+capstone	docs/re/canon.md
+0x41db70	Ugd::ReadHeader	canon	high	V: version check then fread 0x12 and 0x19 into out buffers (load-menu captions)	hopper+ghidra+capstone	docs/re/canon.md
+0x41dc10	Save::BuildPath	canon	high	V: SHGetFolderPath(0x23)+"\NFS Underground\"+CreateDirectory, "%s%s%s%s" with "_autosave" when slot == -1, "%s%s%d%s" otherwise	hopper+ghidra+capstone	docs/re/canon.md
+0x41dd10	Adler32	canon	high	V: a=1,b=0, mod 0xfff1, (b<<16)+a; equals zlib on all files	hopper+ghidra+capstone	docs/re/canon.md
+0x41dd60	Profile::Delete	canon	med	V: scans Profiles.usr and removes the name; touches .opt/.usr/.ugd/.cfg path strings	hopper+ghidra+capstone	docs/re/canon.md
+0x41e200	Opt::Write	canon	high	V: fwrite 0x13, 0x2e5 payload from 0x4aaad0, adler32	hopper+ghidra+capstone	docs/re/canon.md
+0x41e330	Opt::Read	canon	high	V: reads same, version/adler check, 0x4aac70 deserialize (call 0x41e463)	hopper+ghidra+capstone	docs/re/canon.md
+0x4aaad0	Opt::Serialize	canon	high	V: 15 copies from P (0x0,0x10,0x38,0x74,0x90,0xac,0xb4,0x294,0xbc,0xdc,0xfc,0x11c,0x140,0x1c4,0x1f0) + P+0xeec	capstone	docs/re/canon.md
+0x4aac70	Opt::Deserialize	canon	high	V: mirror of 0x4aaad0 into ebx = P	hopper+ghidra+capstone	docs/re/canon.md
+0x4ab120	Ugd::PackBlock	canon	high	V: five memcpy pieces, constants 0x62d0, 0x88b4, 0xa50, 0x80	hopper+ghidra+capstone	docs/re/canon.md
+0x4ab200	Ugd::UnpackBlock	canon	high	V: mirror, skips first dword	hopper+ghidra+capstone	docs/re/canon.md
+0x4ac460	CustomizationDB::Init	canon	med	V: 10 records of 0xce dwords, rec+4 = hash("%s%d" fmt 0x6c6470, i); 20 car records, count at +0x61d8	hopper+ghidra+capstone	docs/re/canon.md
+0x4aa4d0	Player::Init	canon	low	I: sets name, calls 0x4ac460/0x4ac220/0x5a0a00 (0x4aa63b..0x4aa64b)	capstone	docs/re/canon.md
+0x5a0a00	Career::Reset	canon	high	V: zeroes status 0x34c(0x100), 0x450(0xe10), 0x1260, cash/earned/spent, 27 x 0x454 slots, 0x8884	hopper+ghidra+capstone	docs/re/canon.md
+0x5a1520	Career::GetCash	canon	high	V: returns [career+0x1374], or 1e9 under cheat flags	hopper+ghidra+capstone	docs/re/canon.md
+0x5a1550	Career::IsUpgradeUnlocked	canon	high	V: scans reward triples for status 2 (docs/re/tuning.md)	hopper+ghidra+capstone	docs/re/canon.md
+0x5a3630	PartStore::Has	canon	high	V: row = path*0x90, 0x24 keys, compare edx	hopper+ghidra+capstone	docs/re/canon.md
+0x5a3570	PartStore::HasPart	canon	med	V: maps part type to row through 0x5a03d0, forwards to 0x5a3630	hopper+ghidra+capstone	docs/re/canon.md
