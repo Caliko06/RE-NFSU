@@ -1,0 +1,131 @@
+addr	name	system	confidence	evidence	tool	doc
+0x42c6d0	Player::ChangeCameraMover	camera	V	jump table 0x42d2f4 byte index 0x42d330, 23 types 0..0x16	G+C	docs/re/camera.md
+0x42c670	Player::DefaultDriveCamera	camera	V	type = ([0x700aa4]!=0 ? 0x11 : 1)	G+C	docs/re/camera.md
+0x42e020	Player::CyclePOV	camera	V	cycles 4 POV codes in ctrl+0x2c..0x2f; looks up car rows; calls mover vtable+0x20; stores (&0x758948)[player]	G+C	docs/re/camera.md
+0x431a2e	JoyEvent_CAMERA_POV_CHANGE_case	camera	V	event id 0x75 in table 0x6f1850 -> call 0x42e020 at 0x431a32	C+D	docs/re/camera.md
+0x6f1850	JoyEventNameTable_0x75	camera	V	pairs (id, name ptr): 0x75 CAMERA_POV_CHANGE 0x6bad40, 0x76 CAMERA_LOOKBACK 0x6bad24	D	docs/re/camera.md
+0x42e450	Player::LookBackToggle	camera	I	called with 1 from the path next to POV case; matches event 0x76	C	docs/re/camera.md
+0x42da40	Player::StartSpecialCamera	camera	V	modes 1..7, sets [0x73654c]=1, ctrl+0x60=mode, ctrl+0x270=1	G+C	docs/re/camera.md
+0x42ddc0	Player::EndSpecialCamera	camera	V	clears [0x73654c]	G+C	docs/re/camera.md
+0x426930	JumpCamTrigger	camera	V	every 8 frames; curves 0x7062fc 0x7062cc 0x7062e4	G+C	docs/re/camera.md
+0x42c4b0	JumpCamBuildSpline	camera	I	builds spline from route	C	docs/re/camera.md
+0x429cf0	JumpCamPredict	camera	I	jump prediction	C	docs/re/camera.md
+0x465d00	SpecialCamCaller_465d00	camera	I	calls 0x42da40 at 0x4662f3 (Ghidra callers); crash role from earlier notes only	G+C	docs/re/camera.md
+0x431960	SpecialCamCaller_431960	camera	I	calls 0x42da40	C	docs/re/camera.md
+0x420050	SlowMoStart	camera	I	slow motion used by mode 5	C	docs/re/camera.md
+0x421a30	SpecialCamCooldown	camera	I	ctrl+0x70+mode*4 cooldown	C	docs/re/camera.md
+0x489360	DriveCameraMover::ctor	camera	V	type 1, size 0x3a0, vtable 0x6c7fc8	G+C	docs/re/camera.md
+0x489690	DriveCameraMover::Update	camera	V	chase/bumper/hood update; reads rows via 0x47d680, FOV table 0x6fbdf4, tuning block 0x6fbec0	G+H+C	docs/re/camera.md
+0x489650	DriveCameraMover::IsWallFlag	camera	I	vtable slot 0xb	C	docs/re/camera.md
+0x489600	DriveCameraMover::OutsidePOV	camera	I	vtable slot 9, true for POV 0,1,4	C	docs/re/camera.md
+0x47d680	FindCameraRow	camera	V	table=info+0xb50; count at +0, rows 16 B from +0x10 (or +4 count/+0x60 rows when [0x7364a0]==3); match s16 id	G+H+C	docs/re/camera.md
+0x488420	DebugWorldCameraMover::ctor	camera	V	type 2 size 0x4c vtable 0x6c7d80 update 0x488ae0; EH name	G+C	docs/re/camera.md
+0x4892c0	NullCameraMover::ctor	camera	V	type 3; base ctor 0x4834e0 with kind 3; vtable 0x6c7c50 slot0 0x4852e0 slot1 0x40a880 (a bare ret) so the mover does nothing	C+D	docs/re/camera.md
+0x4840c0	OrbitCarCameraMover::ctor	camera	V	types 4..12 size 0xd0 vtable 0x6c8018 update 0x4843e0; EH name	G+C	docs/re/camera.md
+0x48f090	ZoneFreezeCameraMover::ctor	camera	V	type 0xd size 0x368 vtable 0x6c7b98 update 0x4901e0; EH name	G+C	docs/re/camera.md
+0x490ea0	ZonePreviewCameraMover::ctor	camera	V	type 0xe size 0x450 vtable 0x6c7b50 update 0x492700; EH name	G+C	docs/re/camera.md
+0x4854e0	TrackCarCameraMover::ctor	camera	I	types 0xf,0x10 size 0x470 vtable 0x6c7d28 update 0x485c00; JUMPVIEW; name from PS2 map	G+M	docs/re/camera.md
+0x485c00	TrackCarCameraMover::Update	camera	I	jump view update (vtable slot 1 of type 0xf/0x10 vtable 0x6c7d28); body not read	G+M	docs/re/camera.md
+0x48afd0	CubicCameraMover::ctor	camera	V	type 0x11 size 0x54 vtable 0x6c7e58 update 0x48bcb0; EH name	G+C	docs/re/camera.md
+0x48c1f0	CameraMover_Type12::ctor	camera	I	type 0x12, vtable 0x6c7f80 update 0x48c220; ctor only zeroes camera+0x280 when [0x735f5c]==0 (Ghidra); AutoPilot role comes from the call site 0x42d881; class name U	G+C	docs/re/camera.md
+0x48c280	DragRaceCameraMover::ctor	camera	I	type 0x13 size 0x38 vtable 0x6c7ea8 update 0x48c820; PS2 map	M+C	docs/re/camera.md
+0x48c990	DragRaceLeaderCameraMover::ctor	camera	I	type 0x14 size 0x58 vtable 0x6c7dc8 update 0x48d3b0; PS2 map	M+C	docs/re/camera.md
+0x48d6e0	DragRaceAheadCameraMover::ctor	camera	I	type 0x15 size 0xa0 vtable 0x6c7ce0 update 0x48df00; PS2 map	M+C	docs/re/camera.md
+0x48e210	AnimationControllerCameraMover::ctor	camera	I	type 0x16 size 0x310 vtable 0x6c7c08 update 0x48e490; PS2 map	M+C	docs/re/camera.md
+0x42d520	Player::SetInputMode	camera	I	creates type 0x12 after AutoPilotOn 0x42e230	C	docs/re/camera.md
+0x42df30	DebugCameraCycler	camera	I	cycles types ebx,4,2,3	C	docs/re/camera.md
+0x430730	Player::StartRaceCameras	camera	I	calls 0x42c6d0 with 0xd, +1, 0x11, 1	C	docs/re/camera.md
+0x47ef00	IntroNisCoordinator	camera	I	type 0x16 NIS; PS2 map	M+C	docs/re/camera.md
+0x47edb0	CountdownCameraCoordinator::ctor	camera	I	string 0x6ca8dc; Update 0x47ee50; Begin 0x42c3e0	M+C	docs/re/camera.md
+0x486c80	SelectCarCameraMover::ctor	camera	I	garage/front end; Update 0x4870c0; PS2 map, not read	M	docs/re/camera.md
+0x4834e0	CameraMover::ctor	camera	I	base class; Enable 0x4835a0 Disable 0x483550; PS2 map	M	docs/re/camera.md
+0x4838e0	CameraMover::EnforceMinGapToWalls	camera	V	sweep 0x441030 then up to 3 push-out passes	G+C	docs/re/camera.md
+0x483860	CameraMover::ComputeBankedUpVector	camera	I	PS2 map	M	docs/re/camera.md
+0x483640	Camera::ApplyNoise	camera	I	called from 0x48c1b0 with param tables 0x6b6f08/0x6b6eb8; PS2 map	M+C	docs/re/camera.md
+0x575040	ApplyCameraShake	camera	I	effect-id switch, table 0x73b220 stride 0x20, rotation scales 0x704508/14/18; caller V: RearViewMirror Update 0x485300 (call at 0x4854b1); other callers not listed	G+C+M	docs/re/camera.md
+0x575200	MaybeCameraShake	camera	I	called from 0x420fd2; PS2 map	M+C	docs/re/camera.md
+0x527480	CameraMover::VelocityNoise	camera	I	called from 0x52c7ce; PS2 map	M+C	docs/re/camera.md
+0x40dd00	BuildProjection	camera	I	patches.py comment: FOV u16 gives 0x32dc	C	docs/re/camera.md
+0x4b47a0	ApplyOptionsToPlayerSettings	camera	V	copies option bytes to player settings: [0x78a3fa]=[0x758951]; [0x78a388]=(&0x758938)[[0x758948]*4] (index 3 reset to 0 unless [0x78a345]/[0x7361a4]); player 1 uses 0x78a3c0 and index 0x75894c	G+C	docs/re/camera.md
+0x4be6c0	OptionsCameraUI	camera	I	options screen touching POV arrays	C	docs/re/camera.md
+0x700b1c	SpecialCamNameTable	camera	V	names of special modes	D	docs/re/camera.md
+0x700b44	SpecialCamEnableTable	camera	V	bytes [0,0,0,1,1,1,1,1]	D	docs/re/camera.md
+0x700b3c	SpecialCamTable3	camera	I	third special-mode table	D	docs/re/camera.md
+0x6c7fc8	vtable_DriveCameraMover	camera	V	slot0 0x489490 slot1 0x489690; xrefs: ctor 0x489360 and 0x4894b0	G+D	docs/re/camera.md
+0x42d2f4	ChangeCameraMover_JumpTable	camera	V	switch in 0x42c6d0	G+C	docs/re/camera.md
+0x42d330	ChangeCameraMover_IndexTable	camera	V	byte index 0..0x16	C	docs/re/camera.md
+0x700aa4	OPT_CubicCamera	camera	I	selects type 0x11 instead of 1 in 0x42c670	C	docs/re/camera.md
+0x7364a0	gViewCountKind	camera	I	values 0..3 set by 0x408370/0x408410 from the view list [0x740504]; read by 0x42e020 0x47d680 0x489690 0x592100 0x56dc30 0x570950; ==3 selects the second camera row set and alternate blend values	G+C	docs/re/camera.md
+0x7361f0	gGameModePtr	camera	I	[[0x7361f0]] in {5,6,10} blocks types 0x12,0x13,0x15	C	docs/re/camera.md
+0x6fbdf4	CameraFOVTable	camera	V	s16 per POV code, 65536=360 deg: 0x32dc(71.5 deg) POV 0,1,4; 0x4000(90 deg) POV 2,3	D+C	docs/re/camera.md
+0x6fbde8	CamTweakDefault_Dist	camera	I	default of tweaker value [0x735ee8..0x735ef0]	C	docs/re/camera.md
+0x6fbdec	CamTweakDefault_Height	camera	I	2.3125	D	docs/re/camera.md
+0x6fbdf0	CamTweakDefault_Max	camera	I	10000	D	docs/re/camera.md
+0x735ee8	CamTweakerEnable	camera	I	if nonzero, debug values replace car rows in 0x489690	C	docs/re/camera.md
+0x6fbec0	DriveCam_Scale	camera	V	written 1.0 by 0x489690 each frame and multiplies tuning constants	C+D	docs/re/camera.md
+0x6fbec4	DriveCam_K_0_03	camera	U	0.03; use not derived	D	docs/re/camera.md
+0x6fbec8	DriveCam_K_0_012	camera	U	0.012; use not derived	D	docs/re/camera.md
+0x6fbecc	DriveCam_K_2	camera	U	2.0; use not derived	D	docs/re/camera.md
+0x6fbed0	DriveCam_K_25	camera	U	25; use not derived	D	docs/re/camera.md
+0x6fbed4	DriveCam_K_0_05	camera	U	0.05; use not derived	D	docs/re/camera.md
+0x6fbed8	DriveCam_K_0_02	camera	U	0.02; use not derived	D	docs/re/camera.md
+0x6fbedc	DriveCam_K_6	camera	U	6.0; use not derived	D	docs/re/camera.md
+0x6fbee0	DriveCam_PitchLimitLo	camera	I	0.6*scale*[esp+..] threshold used with 0x6fbee8	C+D	docs/re/camera.md
+0x6fbee4	DriveCam_K_0_045	camera	I	0.045*scale*x, compared with 0x6fbeec (-0.3)	C+D	docs/re/camera.md
+0x6fbee8	DriveCam_PitchLimitHi	camera	I	0.7	C+D	docs/re/camera.md
+0x6fbeec	DriveCam_NegThreshold	camera	I	-0.3	C+D	docs/re/camera.md
+0x6fbef0	DriveCam_K_1a	camera	U	1.0	D	docs/re/camera.md
+0x6fbef4	DriveCam_K_1b	camera	U	1.0	D	docs/re/camera.md
+0x6fbef8	DriveCam_K_500	camera	U	500	D	docs/re/camera.md
+0x6fbefc	DriveCam_K_0_2	camera	U	0.2	D	docs/re/camera.md
+0x6fbf00	DriveCam_K_6b	camera	U	6.0	D	docs/re/camera.md
+0x6fbf04	DriveCam_K_m1	camera	U	-1	D	docs/re/camera.md
+0x6fbf08	DriveCam_K_0_4	camera	U	0.4	D	docs/re/camera.md
+0x6fbf0c	DriveCam_K_3	camera	U	3.0	D	docs/re/camera.md
+0x6fbf10	DriveCam_K_250	camera	U	250	D	docs/re/camera.md
+0x6fbf14	DriveCam_DebugPOVOverrideFlag	camera	I	if nonzero uses mover field instead of searching player list	C	docs/re/camera.md
+0x6fbf18	DriveCam_DebugPOVId	camera	I	debug POV id searched in player list	C	docs/re/camera.md
+0x6fbf1c	DriveCam_POV3Param	camera	I	0.4; stored at +0xbc for POV 3	C+D	docs/re/camera.md
+0x6b6c5c	CamBlend_Dist_A	camera	I	18.0 distance used in flow 3	D	docs/re/camera.md
+0x6b6c60	CamBlend_Height_A	camera	I	-3.0	D	docs/re/camera.md
+0x6b6c64	CamBlend_Dist_B	camera	I	16.0	D	docs/re/camera.md
+0x6b6c68	CamBlend_Height_B	camera	I	-1.0	D	docs/re/camera.md
+0x6b6c78	CamAirborneRampStep	camera	I	0.24316	D	docs/re/camera.md
+0x6b6c80	CamSweepTrim	camera	I	0.01	D	docs/re/camera.md
+0x6b6c98	CamWallPushOut	camera	I	0.7	D	docs/re/camera.md
+0x705b20	CamSpeedCurve	camera	I	speed to factor via 0x583f20	D	docs/re/camera.md
+0x73457c	FrameDt	camera	I	multiplied in the smoothing steps of 0x489690	C	docs/re/camera.md
+0x758948	POVIndexPerPlayer	camera	I	(&0x758948)[player]=cycle index	C	docs/re/camera.md
+0x758938	POVSaveTable	camera	I	(&0x78a388)[player*0x38]=(&0x758938)[idx*4]	C	docs/re/camera.md
+0x78a345	CamGateFlagA	camera	I	gate for 4th POV slot and special modes	C	docs/re/camera.md
+0x7361a4	CamGateFlagB	camera	I	gate for 4th POV slot	C	docs/re/camera.md
+0x78a3fa	OPT_JumpCamEnabled	camera	I	modes 6/7 need it; set from [0x758951] by 0x4b47a0	C	docs/re/camera.md
+0x78a3fb	OPT_SpecialSlowmoEnabled	camera	I	modes 1..5 need it	C	docs/re/camera.md
+0x6b7a7c	SlowMoArg1	camera	I	slow-mo parameter	D	docs/re/camera.md
+0x7062fc	JumpCam_SpeedCurve	camera	V	speed curve	G+C	docs/re/camera.md
+0x7062cc	JumpCam_HeightCurve	camera	V	height curve	G+C	docs/re/camera.md
+0x7062e4	JumpCam_DistCurve	camera	V	distance curve	G+C	docs/re/camera.md
+0x6b7aac	JumpCam_EdgeOffset	camera	V	2.0 m from route-node edge	C+D	docs/re/camera.md
+0x6cf210	ChangeCameraMover_EHFuncInfo	camera	V	unwind map 0x6cf1e8 names mover classes	G+C	docs/re/camera.md
+0x6ca8dc	Str_CountdownCameraCoordinator	camera	V	RTTI-like string	D	docs/re/camera.md
+0x6c8060	Str_SpeedCam	camera	V	xref in 0x48e8b0	D	docs/re/camera.md
+0x6c806c	Str_DragCameras_bin	camera	V	0x482fc0 = DragCameraManager::SaveData	D	docs/re/camera.md
+0x6c80f4	Str_CAMERA_SETTINGS	camera	V	table at 0x6fc59c	D	docs/re/camera.md
+chunk:0x34600	CarTypeInfo chunk id (GLOBALB.BUN)	camera	V	file 0x199e00 payload +8 size 0x1b7b8, 35 records of 0xc90	D	docs/re/camera.md
+0x485300	RearViewMirrorCameraMover::Update	camera	V	looks backward (0x4000 rotations), sets FOV u16 0x4e20 (109.9 deg) at ctrl+0xc4 when [0x735f5c]==0, +0xbc=0.75 [0x6b6cbc], +0xc0=192.0 [0x6b6cc0], ApplyCameraShake, SetCameraMatrix 0x47d070	C+M	docs/re/camera.md
+0x4852a0	RearViewMirrorCameraMover::ctor	camera	V	base ctor kind 6; vtable 0x6c7e10 slot1 = 0x485300 (file bytes 0x2c7e14); created at 0x42c3c0 into Player+0x288, not through 0x42c6d0	C+D+M	docs/re/camera.md
+0x6b6cbc	RearView_Param_0_75	camera	V	0.75 written to ctrl+0xbc	C+D	docs/re/camera.md
+0x6b6cc0	RearView_Param_192	camera	V	192.0 written to ctrl+0xc0	C+D	docs/re/camera.md
+0x705b34	RearView_Offset_x	camera	I	0.5 added to eye offset	C+D	docs/re/camera.md
+0x705b38	RearView_Offset_y	camera	I	0.0 added to eye offset	C+D	docs/re/camera.md
+0x47d070	Camera::SetCameraMatrix	camera	V	applies matrix to camera object, computes eye velocity (pos-prev)/dt, dt at +0x274	C+M	docs/re/camera.md
+info+0xb50	CarCamRowTable	camera	V	per car record (0xc90): count u32 at +0xb50 (5), count2 at +0xb54 (5); rows 16 B at +0xb60 (flow!=3) and +0xbb0 (flow==3); read by FindCameraRow 0x47d680	D+C	docs/re/camera.md
+row+0x0	CamRow_POVId	camera	V	s16 POV id 0..4	D+C	docs/re/camera.md
+row+0x2	CamRow_AuxAngle	camera	I	s16 stored in mover field 0x3c; 500 (hood), 3040 (high chase); likely pitch (65536=360 deg)	D+C	docs/re/camera.md
+row+0x4	CamRow_Distance	camera	V	f32, 0x489690 uses -row (so -5.8 = 5.8 m behind); POV 0,1,4 also add (1-x)*blend term	D+C	docs/re/camera.md
+row+0x8	CamRow_Height	camera	V	f32 eye height 1.7 or 1.9 chase, 3.45 high, 0.79 hood, 0.81 bumper	D+C	docs/re/camera.md
+row+0xc	CamRow_Lateral	camera	I	f32 stored in mover field 0x40; -0.44 only for POV 3	D+C	docs/re/camera.md
+0x4852e0	CameraMover::TrivialDtor	camera	I	slot0 of vtables 0x6c7c50 and 0x6c7f80	D	docs/re/camera.md
+0x40a880	NullUpdate_ret	camera	V	single ret	C	docs/re/camera.md
+0x42c3c0	Player::CreateRearViewMirror_call	camera	V	calls 0x4852a0 and stores result in Player+0x288	C	docs/re/camera.md
+0x735f5c	gCamFlag735f5c	camera	I	read by 0x485300 (FOV forced to 0x4e20 when 0) and ctors 0x4852a0 0x48c1f0 (zero camera+0x280 when 0); meaning U	G+C	docs/re/camera.md

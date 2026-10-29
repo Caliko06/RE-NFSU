@@ -1,0 +1,63 @@
+addr	name	system	confidence	evidence	tool	doc
+0x409580	RenderFrameMain	blur	V	per-view render; order: world 0x592100, blur 0x40cd40, state reset 0x408b20, race cars 0x571050, showcase cars 0x570950, emitters 0x4ae650	G+H+C	docs/re/blur.md
+0x40b3f0	RenderSetupBlurFlags	blur	V	sets [0x73645c]/[0x736384]=(MOTIONBLUR||LIGHTSTREAKS), then creates scene RT	G+C	docs/re/blur.md
+0x40a890	SceneRTCreate	blur	V	CreateTexture [0x701034]x[0x701038] fmt [0x702a80] -> [0x736460], surface [0x736464]	G+C	docs/re/blur.md
+0x40abd0	SceneRTSelect	blur	V	SetRenderTarget(scene RT surface) when flag set	C	docs/re/blur.md
+0x40cb80	BlurCreateRTs	blur	V	creates two W/2 x H/2 A8R8G8B8 textures [0x71ab9c],[0x71aba0]; light-streak RT [0x71aba4]	G+C	docs/re/blur.md
+0x40cce0	BlurReleaseRTs	blur	I	releases blur RTs (pairs with 0x40cb80)	C	docs/re/blur.md
+0x40b4e0	ReleaseSceneRTs	blur	I	releases scene RT and others	C	docs/re/blur.md
+0x40cd40	SpeedBlurPass	blur	V	strength t from camera speed, 3 sub-passes, composite with BLENDFACTOR	G+H+C	docs/re/blur.md
+0x40d370	BlurDownsample4Tap	blur	V	scene RT -> half RT, 4 taps weight 0.25 via table 0x7024b8	G+C	docs/re/blur.md
+0x40d090	BlurStreakPass4Tap	blur	V	4 taps with UV corner shifts k*v, weight 0.25, CLAMP linear; called twice (v and 4v)	G+H+C	docs/re/blur.md
+0x40d6e0	BlurComposite	blur	V	draws RT over scene with src BLENDFACTOR(0xe) dest INVBLENDFACTOR(0xf)	G+C	docs/re/blur.md
+0x40a7f0	SetBlurCameraObject	blur	V	stores camera object 0x78d270 in [0x740500]	C	docs/re/blur.md
+0x47d070	Camera::SetCameraMatrix	blur	V	writes camobj+0x1e0..0x1e8 = (pos-prevpos)/dt; dt at +0x274	C+M	docs/re/blur.md
+0x4010e0	SetSpecialCameraFlag	blur	I	[0x73654c]=arg&0xff if view[arg2].enable==1; no direct callers	C	docs/re/blur.md
+0x592100	RenderWorldModels	blur	V	track/world draw, runs before the blur	G+C	docs/re/blur.md
+0x571050	DrawRaceCarList	blur	V	calls car draw 0x56dc30 for up to 99 cars; after the blur	G+C	docs/re/blur.md
+0x570950	DrawShowcaseCarList	blur	I	list at 0x73d6d8; after the blur	C	docs/re/blur.md
+0x4ae650	DrawEmitters	blur	I	particles/emitters, after the blur	C	docs/re/blur.md
+0x409b70	LightStreakPath	blur	U	uses RT 0x71aba4 and flare buffer 0x71abb0; not analysed	C	docs/re/blur.md
+0x5ac449	Vec4TransformInPlace	blur	I	thunk 0x5ac443 -> [0x6d4ac8]; velocity transform	C	docs/re/blur.md
+0x567450	Vec3Normalize	blur	I	normalises blur direction	C	docs/re/blur.md
+0x674898	_ftol	blur	V	CRT float to int; used for blend factor w*255	C	docs/re/blur.md
+0x700e98	OPT_MOTIONBLUR	blur	V	readers 0x409580 0x40b3f0 0x40cb80 0x4160b0; writers 0x410a00 0x410ce0 0x410ed0 0x416a40	G+C	docs/re/blur.md
+0x700e9c	OPT_LIGHTSTREAKS	blur	V	creates RT 0x71aba4 in 0x40cb80	C	docs/re/blur.md
+0x736384	gBlurOrStreaksActive	blur	V	gate in 0x409580 together with 0x73645c	C	docs/re/blur.md
+0x73645c	gSceneRTMode	blur	V	==1 enables scene RT and blur	C	docs/re/blur.md
+0x736460	gSceneTex	blur	V	scene render-target texture	C	docs/re/blur.md
+0x736464	gSceneSurf	blur	V	scene render-target surface	C	docs/re/blur.md
+0x701034	gBackbufW	blur	V	default 800	C+D	docs/re/blur.md
+0x701038	gBackbufH	blur	V	default 600	C+D	docs/re/blur.md
+0x702a80	gSceneRTFormat	blur	I	format passed to CreateTexture in 0x40a890	C	docs/re/blur.md
+0x702a2c	gBlurRTW	blur	V	=W/2 set in 0x40cb80	C	docs/re/blur.md
+0x702a30	gBlurRTH	blur	V	=H/2 set in 0x40cb80	C	docs/re/blur.md
+0x702a28	gBlurRTFormat	blur	V	=21 A8R8G8B8	C+D	docs/re/blur.md
+0x702a34	gStreakRTFormat	blur	V	=21	C+D	docs/re/blur.md
+0x71ab9c	gBlurTexA	blur	V	half-res texture A	C	docs/re/blur.md
+0x71aba0	gBlurTexB	blur	V	half-res texture B	C	docs/re/blur.md
+0x71aba4	gStreakTex	blur	V	light-streak RT texture	C	docs/re/blur.md
+0x71aba8	gBlurSurfA	blur	V	surface of A	C	docs/re/blur.md
+0x71abac	gBlurSurfB	blur	V	surface of B	C	docs/re/blur.md
+0x71abb0	gStreakSurf	blur	V	surface of streak RT	C	docs/re/blur.md
+0x702a38	BLUR_SPEED_LO	blur	V	25.0 m/s; read only by 0x40cd40; static .data, no code writer	G+C+D	docs/re/blur.md
+0x702a3c	BLUR_SPEED_HI	blur	V	125.0 m/s (range 100); read only by 0x40cd40	G+C+D	docs/re/blur.md
+0x702a40	BLUR_T_CAP	blur	V	0.65 cap on t	G+C+D	docs/re/blur.md
+0x702a44	BLUR_STREAK_SCALE	blur	V	0.00625 UV per tap per unit t	C+D	docs/re/blur.md
+0x702a48	BLUR_N_UP	blur	V	0.2 per frame ramp up of n	C+D	docs/re/blur.md
+0x702a4c	BLUR_N_DOWN	blur	V	0.1 per frame ramp down of n	C+D	docs/re/blur.md
+0x73641c	gBlurSpecialN	blur	V	ramps toward [0x73654c] by +0.2/-0.1 per frame	G+C	docs/re/blur.md
+0x73654c	gSpecialCameraActive	blur	V	1 in special camera modes (not nitrous); writers 0x42da40 0x426930 0x430a3b 0x492949 0x431c65 set, 0x42ddc0 0x431107 0x427dfe 0x460f86 0x4900fd 0x4922f2 0x492966 0x492a3b clear	G+C	docs/re/blur.md
+0x740500	gBlurCameraObj	blur	V	pointer to camera object 0x78d270	C	docs/re/blur.md
+0x78d270	gCameraObj	blur	V	matrix at +0, velocity at +0x1e0..0x1e8, dt at +0x274	C	docs/re/blur.md
+0x6ccd00	K_1_OVER_255_a	blur	V	1/255 threshold for n ramp	C+D	docs/re/blur.md
+0x6cc970	K_BLUR_MIN_T	blur	V	1/255; blur skipped if t below	C+D	docs/re/blur.md
+0x6ccb7c	K_EPS_SPEED	blur	V	1e-5; normalise only if speed above	C+D	docs/re/blur.md
+0x6cccf8	K_N_WEIGHT	blur	V	double 1.1; t = base + 1.1*n	C+D	docs/re/blur.md
+0x6ccc64	K_BLUR_S_MUL	blur	V	1.2 multiplier in s	C+D	docs/re/blur.md
+0x6cc7dc	K_HALF	blur	V	0.5 in s=(1+0.5n)	C+D	docs/re/blur.md
+0x6cc7bc	K_ONE	blur	V	1.0	C+D	docs/re/blur.md
+0x6cc9d8	K_BLUR_PASS2_MUL	blur	V	double 4.0; second pass vector multiplier	C+D	docs/re/blur.md
+0x6ccc0c	K_BLUR_W_MUL	blur	V	1.5; blend weight w=min(1.5t,1)	C+D	docs/re/blur.md
+0x7024b8	BlurDownsampleTaps	blur	V	4 x (0.25, +-0.5, +-0.5) tap table	C+D	docs/re/blur.md
+0x7024e8	BlurTapTable2	blur	I	(0.25,0,0) entries for other callers	D	docs/re/blur.md
