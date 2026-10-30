@@ -831,7 +831,7 @@ static void census_dump(void) {
 // TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
 // at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
 // seq; Present copies them into the game's .data when seq changed.
-static uint32_t tune[8];      // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch
+static uint32_t tune[9];      // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch, the nitro-camera switch
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -880,10 +880,15 @@ static void fov_frame(Ctx *c) {
 // the switch is off or the player's car changes. The mover smooths the target itself, so the change glides.
 #define CHASE_BACK 0.12f   // distance x (1 + this * t)
 #define CHASE_LOW  0.10f   // height   x (1 - this * t)
+// Nitro camera (?nitrocam=, word 8 of tune[]): while the player's nitrous burns (car+0x3bc, the start stamp 0x4654f0 writes and 0x465530
+// clears when 0x465430 sees the shot end; 0 or 0x7fffffff = off) the same rows go NITRO_BACK farther and NITRO_LOW lower, ~0.5 s low pass.
+#define NITRO_BACK 0.10f
+#define NITRO_LOW  0.05f
 static void chase_frame(Ctx *c) {
     static uint32_t info, rows[2][3];
-    static float orig[2][3][2], sm;
-    uint32_t on = __atomic_load_n(&tune[7], __ATOMIC_RELAXED), car = 0;
+    static float orig[2][3][2], sm, nsm;
+    static int nlast;
+    uint32_t on = __atomic_load_n(&tune[7], __ATOMIC_RELAXED), non = __atomic_load_n(&tune[8], __ATOMIC_RELAXED), car = 0;
     uint32_t h = ld(c, 0x7361f8, 4);
     if (h && h < GUEST_MEM - 0x1000)
         for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && r < GUEST_MEM - 0x1000 && k < 200; r = ld(c, r, 4), k++) {
@@ -896,9 +901,9 @@ static void chase_frame(Ctx *c) {
         for (int s = 0; s < 2; s++) for (int k = 0; k < 3; k++) if (rows[s][k]) {
             stf(c, rows[s][k] + 4, orig[s][k][0]); stf(c, rows[s][k] + 8, orig[s][k][1]);
         }
-        info = 0; sm = 0;
+        info = 0; sm = nsm = 0;
     }
-    if (!on && !info) return;
+    if (!on && !non && !info) return;
     if (!ni) return;
     if (!info) {
         static const int ids[3] = {0, 1, 4};
@@ -919,12 +924,18 @@ static void chase_frame(Ctx *c) {
         float v[3] = {ldf(c, cam + 0x1e0), ldf(c, cam + 0x1e4), ldf(c, cam + 0x1e8)};
         t = (sqrtf(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) - 25) / 50; t = t < 0 ? 0 : t > 1 ? 1 : t; t = t * t * (3 - 2 * t);
     }
+    uint32_t ns = ld(c, car + 0x3bc, 4);
+    int burn = non && ns != 0 && ns != 0x7fffffff;
+    if (burn != nlast) { nlast = burn; rn_log("CHASE nitro %s (car+0x3bc %08x)", burn ? "on" : "off", ns); }
     sm += ((on ? t : 0) - sm) * (1.0f / 60);
+    nsm += ((burn ? 1.0f : 0) - nsm) * (1.0f / 30);
     if (!on && sm < 0.001f) sm = 0;
+    if (!burn && nsm < 0.001f) nsm = 0;
+    float kb = 1 + CHASE_BACK * sm + NITRO_BACK * nsm, kl = 1 - CHASE_LOW * sm - NITRO_LOW * nsm;
     for (int s = 0; s < 2; s++) for (int k = 0; k < 3; k++) if (rows[s][k]) {
-        stf(c, rows[s][k] + 4, orig[s][k][0] * (1 + CHASE_BACK * sm)); stf(c, rows[s][k] + 8, orig[s][k][1] * (1 - CHASE_LOW * sm));
+        stf(c, rows[s][k] + 4, orig[s][k][0] * kb); stf(c, rows[s][k] + 8, orig[s][k][1] * kl);
     }
-    if (!on && sm == 0) info = 0;
+    if (!on && !non && sm == 0 && nsm == 0) info = 0;
 }
 // PS2-style depth speed blur (web/gpu.js psblur): out[0..2] = the view-1 camera's velocity [0x740500]+0x1e0 (camera 0x78d270; what the game's own blur 0x40cd40
 // reads) in camera space, normalised, out[3] = its length (m/s); float bits, 0 when there is no camera. out[4] = nitrous on ([0x73654c],
