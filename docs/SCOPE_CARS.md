@@ -15,6 +15,14 @@ it in the garage (CarCustomize: Skyline, Tiburon, stock and kits) and in WORLD a
 paint luminance: default 0.144, no carvol/cardetail 0.152, carlook=2003 0.164, original 0.165. Biggest darkener = carlook=3
 (host/sm1.c car_ps_live: cs*cs mid-tone squaring, x(1+4*lum^3) on highlights), then cardetail grime and carvol, bloom widens the red lamps.
 
+## Acceptance matrix (OWNER 2026-10-30 night: not one car, not one scene)
+Every look change is judged on all of these, ?carpack=0 vs 1 (split where useful), by someone LOOKING at the shots (w2 or a Haiku given a
+list of what to look at: paint not dark, lamps not blown, kit parts readable, no new shine, no seams/flicker):
+- Cars: Skyline, Tiburon, one dark-paint and one light-paint car, one stock and one with a kit; traffic and rivals count as cars too.
+- Scenes: garage (CarCustomize, front/side/rear), race start by day, a night track, WORLD at night with traffic.
+- Tool: build/carpack/matrix.sh (one Chrome run at a time, <= 4 min each). The shots + a one-line verdict per cell go to build/carpack/matrix.md.
+A step is done when no cell is worse than carpack=0 and the cells it targets are visibly better. A gate on one scene alone is not acceptance.
+
 ## Gates (all measured on the same scene, each with ?carpack=0 identical to today)
 - paint luminance >= 0.160 and <= 1.10 x original (0.165); pixels > 0.9 and saturated-red pixels not above today's.
 - reflection path unchanged: only the diffuse term and lamp handling change.
