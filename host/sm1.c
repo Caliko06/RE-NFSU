@@ -449,11 +449,13 @@ static const char *const car_ps_vol_off = "  let volk = vec3f(1.0);\n";
 static const char *const car_ps_vol =
     "  let vrg = max(u.c[19].x, max(u.c[19].y, u.c[19].z));\n"
     "  let vmx = max(u.c[18].x + u.c[19].x, max(u.c[18].y + u.c[19].y, u.c[18].z + u.c[19].z));\n"
-    "  let vs = %.2f * mix(0.55, 1.0, 1.0 - smoothstep(0.1, 0.5, vrg)) * smoothstep(0.1, 0.4, vmx);\n"
+    "  let vs = %.2f * mix(mix(0.55, 0.85, pkw), 1.0, 1.0 - smoothstep(0.1, 0.5, vrg)) * smoothstep(0.1, 0.4, vmx);\n"
     "  let dNx = dpdx(N);\n  let dNy = dpdy(N);\n  let dPx = -dpdx(Vr);\n  let dPy = -dpdy(Vr);\n"
     "  let hc = (dot(dNx, dPx) + dot(dNy, dPy)) / max(dot(dPx, dPx) + dot(dPy, dPy), 1e-6);\n"
     "  let vf = (1.0 + 0.35 * vs * (d - 0.55)) * (1.0 - 0.25 * vs * smoothstep(2.0, 10.0, -hc)) * (1.0 + 0.08 * vs * smoothstep(4.0, 14.0, hc));\n"
     "  let volk0 = vec3f(mix(1.0, clamp(vf, 0.3, 1.6), %s));\n"
+    // carpack: kits are painted with the body paint (garage RN_CARLOG: 52 % of the prims have range 0.41, 12 % range 0), so a paint's
+    // volume terms (vs above) run at 0.85 instead of 0.55; the facing slope pivots at N.V 0.55 and the reflection is untouched.
     // carpack: a surface with no range of its own (kit plastics, DiffuseRange 0) gets the facing slope of CARBONFIBER (K = 0.8, raised to 1.2 after the matrix: kits read flat),
     // pivot at N.V 0.55 so nothing that faces the eye gets darker than car.efx draws it (docs/re/car_kits.md).
     "  let km = (1.0 - smoothstep(0.02, 0.12, vrg)) * smoothstep(0.1, 0.4, vmx) * pkw;\n"
