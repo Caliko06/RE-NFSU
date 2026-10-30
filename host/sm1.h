@@ -51,7 +51,6 @@ enum { SM1_PLAIN, SM1_CAR_VS, SM1_CAR_PS, SM1_HL_VS, SM1_HL_PS };
 // OR-ed into mode for the two road reflection pixel shaders (worldreflect ps 0x92e7bdab, worldheadlightreflect ps 0x9bb3f7c7):
 // their weight w = texture alpha x vertex alpha goes through sm1_roadrefl()'s curve.
 #define SM1_REFL 0x100
-#define SM1_WALL 0x200
 // RN_ROADREFL / ?roadrefl=: 0 game (unset), 1 sq (w^2), 2 cube (w^3), 3 off (the game's own level 1, PATCH 0x410c1b: no mirrored draw).
 int sm1_roadrefl(void);
 #define SM1_HL_N 4
