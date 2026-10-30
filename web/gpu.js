@@ -231,10 +231,13 @@ async function startGpu(M, canvas, report, onFrame) {
   // linear 0.5 rolls it off instead of clipping, back to gamma. Below the shoulder it is the identity: an ACES curve took the median luma from
   // 0.155 to 0.099 and the road from 0.136 to 0.080 (build/ab/tone), a night scene has no shadows to spare. ?tonemap=0 turns it off.
   const TONE_ON = RN_Q.get('tonemap') !== '0';
+  // BRIDGE: remaster vignette: corners 14 % darker, in the same pass (the HUD comes after). ?vignette=0 turns it off.
+  const VIG_ON = RN_Q.get('vignette') !== '0';
   const fxaaMod = device.createShaderModule({ code: `
 const DBG = ${FXAA_MODE === '2' ? 1 : 0};
 const GRADE = ${GRADE_ON ? 1 : 0};
 const TONE = ${TONE_ON ? 1 : 0};
+const VIG = ${VIG_ON ? 1 : 0};
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
 @vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
@@ -256,6 +259,10 @@ fn post(c: vec4f, pos: vec4f) -> vec4f {
     s += 0.6 * s * (1.0 - s) * (s - 0.25);
     let vivid = max(s.r, max(s.g, s.b)) - min(s.r, min(s.g, s.b));
     s = clamp(mix(vec3f(lum(s)), s, 1.0 + 0.18 * (1.0 - vivid)), vec3f(0.0), vec3f(1.0));
+  }
+  if (VIG == 1) {
+    let d = (pos.xy / vec2f(textureDimensions(src)) - 0.5) * 2.0;
+    s *= 1.0 - 0.14 * smoothstep(0.5, 1.4, length(d));
   }
   return vec4f(s, c.a);
 }
@@ -935,7 +942,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     // Bloom, FXAA, grade: on the finished scene colour, before the HUD (see GPU_FXAA below).
     function postFx(rt) {
       if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
-      if ((FXAA_ON || GRADE_ON || TONE_ON) && rt && !rt.depth && !rt.msView) {
+      if ((FXAA_ON || GRADE_ON || TONE_ON || VIG_ON) && rt && !rt.depth && !rt.msView) {
         if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
           doom(fxaaTmp);
           fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
