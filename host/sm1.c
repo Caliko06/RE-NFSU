@@ -453,13 +453,31 @@ static const char *const car_ps_vol =
     "  let dNx = dpdx(N);\n  let dNy = dpdy(N);\n  let dPx = -dpdx(Vr);\n  let dPy = -dpdy(Vr);\n"
     "  let hc = (dot(dNx, dPx) + dot(dNy, dPy)) / max(dot(dPx, dPx) + dot(dPy, dPy), 1e-6);\n"
     "  let vf = (1.0 + 0.35 * vs * (d - 0.55)) * (1.0 - 0.25 * vs * smoothstep(2.0, 10.0, -hc)) * (1.0 + 0.08 * vs * smoothstep(4.0, 14.0, hc));\n"
-    "  let volk = vec3f(mix(1.0, clamp(vf, 0.3, 1.6), %s));\n";
+    "  let volk0 = vec3f(mix(1.0, clamp(vf, 0.3, 1.6), %s));\n"
+    // carpack: a surface with no range of its own (kit plastics, DiffuseRange 0) gets the facing slope of CARBONFIBER (K = 0.8),
+    // pivot at N.V 0.55 so nothing that faces the eye gets darker than car.efx draws it (docs/re/car_kits.md).
+    "  let km = (1.0 - smoothstep(0.02, 0.12, vrg)) * smoothstep(0.1, 0.4, vmx) * pkw;\n"
+    "  let volk = volk0 * mix(1.0, (1.0 + 0.8 * d) / (1.0 + 0.8 * 0.55), km);\n";
 static const char *const car_ps_flat = "  let dk0 = vec3f(1.0);\n  let rk0 = 1.0;\n";
 static const char *const car_ps_detail =
     "  let pz = u.c[17].z - i.t3.z;\n"
     "  let up = smoothstep(-0.7, 0.5, N.z);\n"
     "  let low = 1.0 - smoothstep(0.25, 0.6, pz);\n"
     "  let dk0 = mix(0.55, 1.0, up) * mix(vec3f(1.0), vec3f(0.62, 0.56, 0.48), low);\n"
+    "  let rk0 = mix(0.35, 1.0, up) * (1.0 - 0.7 * low);\n";
+// BRIDGE: car pack, OWNER 2026-10-30 ("the cars look very dark", docs/SCOPE_CARS.md; ?carpack=1 / RN_CARPACK, 0 = the lines above to the bit).
+// Measured on the Skyline rear (build/carbright): paint luminance 0.144 here against 0.165 in the original. Diffuse path only, the cube,
+// Env and Specular are not touched. Causes, from the largest: (1) carlook 3 reads the cube as c*c and rolls it through a shoulder, which
+// takes the grey-sky glow the original adds over the paint (-0.012); (2) car_ps_detail halves the sky on faces that look sideways and
+// browns everything under 0.6 m (-0.008). Here the occlusion floor is 0.8 not 0.55 and the grime is a light tint, and the glow the
+// squaring removed is put back as a plain diffuse gain (no pattern, so no veil) that fades out where the pixel is already bright, so the
+// lamps (diffuse near 1) keep their level.
+#define CARPACK_GAIN 0.20
+static const char *const car_ps_detail_pack =
+    "  let pz = u.c[17].z - i.t3.z;\n"
+    "  let up = smoothstep(-0.7, 0.5, N.z);\n"
+    "  let low = 1.0 - smoothstep(0.25, 0.6, pz);\n"
+    "  let dk0 = mix(mix(0.55, 0.8, pkw), 1.0, up) * mix(vec3f(1.0), mix(vec3f(0.62, 0.56, 0.48), vec3f(0.82, 0.78, 0.72), pkw), low);\n"
     "  let rk0 = mix(0.35, 1.0, up) * (1.0 - 0.7 * low);\n";
 static const char *const car_ps_tail =
     "  let b = clamp(4.0 * (t0.xyz * a) * rk, vec3f(-8.0), vec3f(8.0));\n"
@@ -475,6 +493,15 @@ static const char *const car_ps_tail_soft =
     "  let e = clamp(b + d1c.xyz * rk, vec3f(-8.0), vec3f(8.0));\n"
     "  let f = clamp(2.0 * (t1 * d0c), vec4f(-8.0), vec4f(8.0));\n"
     "  let pb = clamp(f.xyz * dk, vec3f(0.0), vec3f(1.0));\n"
+    "  let rf = 1.0 - exp(-max(e * f.w, vec3f(0.0)));\n"
+    "  r0 = vec4f(pb + rf * (1.0 - pb), f.w);\n";
+// carpack: the same, with the diffuse gain. pb0 * (1 + G * (1 - pb0)^2): 1 + G on dark paint, 1 at pb0 = 1 (lamps, white).
+static const char *const car_ps_tail_pack =
+    "  let b = clamp(4.0 * (t0.xyz * a) * rk, vec3f(-8.0), vec3f(8.0));\n"
+    "  let e = clamp(b + d1c.xyz * rk, vec3f(-8.0), vec3f(8.0));\n"
+    "  let f = clamp(2.0 * (t1 * d0c), vec4f(-8.0), vec4f(8.0));\n"
+    "  let pb0 = clamp(f.xyz * dk, vec3f(0.0), vec3f(1.0));\n"
+    "  let pb = clamp(pb0 * (vec3f(1.0) + pkw * %.2f * (vec3f(1.0) - pb0) * (vec3f(1.0) - pb0)), vec3f(0.0), vec3f(1.0));\n"
     "  let rf = 1.0 - exp(-max(e * f.w, vec3f(0.0)));\n"
     "  r0 = vec4f(pb + rf * (1.0 - pb), f.w);\n";
 
@@ -521,8 +548,12 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
         if (detail < 0) { const char *e = getenv("RN_CARDETAIL"); detail = !e ? 1 : e[0] == '0' ? 0 : !strcmp(e, "split") ? 2 : 1; }
         static int vol = -1;   // RN_CARVOL=0 off, 1 (default) the volume terms above, 2 stronger, split / split2: strength 1 / 2 on the right half only (A/B in one frame)
         if (vol < 0) { const char *e = getenv("RN_CARVOL"); vol = !e ? 1 : e[0] == '0' ? 0 : !strcmp(e, "split") ? 3 : !strcmp(e, "split2") ? 4 : atoi(e) >= 2 ? 2 : 1; }
+        static int pack = -1;   // RN_CARPACK=1: the car pack above (on the carlook 3 path only), split: right half of the screen only (A/B in one frame); 0 (default) off
+        if (pack < 0) { const char *e = getenv("RN_CARPACK"); pack = !e || look != 3 ? 0 : !strcmp(e, "split") ? 2 : e[0] != '0'; }
+        if (pack == 2) emit(&b, "  let pkw = step(%d.0, i.pos.x);\n", rn_screen_w / 2);
+        else emit(&b, "  let pkw = %s;\n", pack ? "1.0" : "0.0");
         emit(&b, "%s%s%s", car_ps_body, look == 1 ? car_ps_clearcoat : look == 2 ? car_ps_sharp : look == 3 ? car_ps_live : car_ps_env,
-             detail ? car_ps_detail : car_ps_flat);
+             detail ? (pack ? car_ps_detail_pack : car_ps_detail) : car_ps_flat);
         if (vol) {
             char w[48] = "1.0";
             if (vol >= 3) snprintf(w, sizeof w, "step(%d.0, i.pos.x)", rn_screen_w / 2);
@@ -531,7 +562,8 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
         else emit(&b, "%s", car_ps_vol_off);
         if (detail == 2) emit(&b, "  let sh = step(%d.0, i.pos.x);\n  let dk = mix(vec3f(1.0), dk0, sh) * volk;\n  let rk = mix(1.0, rk0, sh);\n", rn_screen_w / 2);
         else emit(&b, "  let dk = dk0 * volk;\n  let rk = rk0;\n");
-        emit(&b, "%s", look == 3 ? car_ps_tail_soft : car_ps_tail);
+        if (pack) emit(&b, car_ps_tail_pack, CARPACK_GAIN);
+        else emit(&b, "%s", look == 3 ? car_ps_tail_soft : car_ps_tail);
     }
     const Ins *pend = NULL;
     char pend_val[64] = "";

@@ -128,6 +128,9 @@ function line(s, cls) {
       // ?carvol=0|1|2: the diffuse volume and panel-edge terms (host/sm1.c car_ps_vol); 1 default, 2 stronger, 0 off
       const cv = RN_Q.get('carvol');
       if (cv !== null) m.ENV.RN_CARVOL = cv;
+      // ?carpack=1: the car look pack (host/sm1.c car_ps_tail_pack: paint as bright as the original, lamps held); 0 (default) = today
+      const cpk = RN_Q.get('carpack');
+      if (cpk !== null) m.ENV.RN_CARPACK = cpk;
       const look = RN_Q.get('carlook');
       if (look !== null) m.ENV.RN_CARLOOK = look;
     }],
