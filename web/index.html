@@ -128,12 +128,12 @@ function line(s, cls) {
       // ?carvol=0|1|2: the diffuse volume and panel-edge terms (host/sm1.c car_ps_vol); 1 default, 2 stronger, 0 off
       const cv = RN_Q.get('carvol');
       if (cv !== null) m.ENV.RN_CARVOL = cv;
-      // ?carpack=1: the car look pack (host/sm1.c car_ps_tail_pack: paint as bright as the original, lamps held); 0 (default) = today
+      // ?carpack=0|1|split: the car look pack (host/sm1.c car_ps_tail_pack: paint as bright as the original, lamps held); on in Remaster (OWNER 2026-10-30), 0 = before
       // ?car=<name|index>: the player's car in every race is a career rival's car (RN_CAR, host/free.c player_car; ?car=list logs the choices)
       const car = RN_Q.get('car');
       if (car) m.ENV.RN_CAR = car;
       const cpk = RN_Q.get('carpack');
-      if (cpk !== null) m.ENV.RN_CARPACK = cpk;
+      m.ENV.RN_CARPACK = cpk ?? '1';
       const look = RN_Q.get('carlook');
       if (look !== null) m.ENV.RN_CARLOOK = look;
     }],

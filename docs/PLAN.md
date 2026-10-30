@@ -2,12 +2,16 @@
 For the OWNER alone: Chrome on this Mac, tools/serve.py on 127.0.0.1:5180, saves in save/. Deploy is the OWNER's call.
 One session on main. Each milestone has one gate: the run that proves it.
 
-## Now (OWNER 2026-10-29): reverse engineer to 100 %, not publish
-Every system accounted for: canon, free tracks, traffic, rivals, tuning, sound, assets, blur, cameras, props. Method and
-checks: docs/re_scoreboard.md §4 (honest coverage, systems.tsv, names.tsv, scoreboard). The open world block below keeps
-going as the free-tracks/traffic/rivals thread. Branch `publish` is parked.
-OWNER 2026-10-29 (later): touching the Remaster is authorized, and the Remaster is the only focus; the original mode
-matters little (it stays as the A/B reference). RE proposals become Remaster work behind switches (docs/re/proposals.md).
+## Now (OWNER 2026-10-30): improve the Remaster in deliveries of 30-60 min
+Replaces "RE to 100 %" (parked: census, naming, scoreboard stay as they are). Scope: what the OWNER sees and feels in
+the Remaster on :5180: cars and garage, blur, camera, composition, traffic, rivals, AI. RE only when one improvement needs it.
+Each delivery: one improvement, before/after shot, web build served on :5180, `webcheck --route` PASS, one commit, and a
+message with the URL and 3-5 lines of what to look at. The change ships ON by default (?x=0 turns it off to compare); if the
+OWNER does not like it, it is reverted and its code deleted. Original mode stays untouched as the A/B reference. Branch
+`publish` is parked. Lanes by file: look (web/gpu.js), camera (patches.py, data tables), AI (host/rivals.c, free.c; shares
+the open world thread below with nfsu-c4).
+Order: 1 Car Look Pack on by default, 2 blur A/B strip, 3 camera (speed FOV, chase height/distance), 4 composition (post
+colour), 5 rival personality by skill tables (0x779ff8 + 0x54*level, catch-up 0x779c78), alongside the open world block.
 
 ## Now, block 1 (OWNER 2026-10-30): Open World in WORLD
 Traffic off the tour + rivals with personality + WORLD handling = 1001, without changing today's Remaster look.

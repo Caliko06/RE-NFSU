@@ -746,9 +746,9 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   const skinLin = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   const skinNear = device.createSampler({ magFilter: 'nearest', minFilter: 'nearest' });
   const skinTmp = new Map();     // size -> [ping, pong]
-  // ?carpack=1|split: the composite of a car's paint and kit layers is built from the layers' HD views (the game's own 512 layers
+  // ?carpack=1|split (default on in Remaster, =0 off): the composite of a car's paint and kit layers is built from the layers' HD views (the game's own 512 layers
   // stay in l.own); a skin remembers its op so it is composed again when an HD layer arrives (docs/re/car_tex_hd.md).
-  const PACK_SKIN = ['1', 'split'].includes(RN_Q.get('carpack')), skinOps = new Map();
+  const PACK_SKIN = RN_Q.get('carpack') !== '0', skinOps = new Map();
   const argb = c => [(c >>> 16) & 255, (c >>> 8) & 255, c & 255, c >>> 24];
   function skin(w, a) {
     const id = w[a], t = res.get(id);     // id read now: w is the frame list, reused by the time a check reports
