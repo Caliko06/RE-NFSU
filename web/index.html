@@ -127,8 +127,8 @@ function line(s, cls) {
       if (cd !== null) m.ENV.RN_CARDETAIL = cd;
       // ?roadrefl=game|sq|cube|off: how strongly the road reflects. sq / cube: the reflection weight (vertex alpha x texture alpha) squared /
       // cubed (host/sm1.c); off: the game's own ROADREFLECTION level 1, no mirrored world (PATCH 0x410c1b, host/win32.c). Read at boot.
-      const rr = RN_Q.get('roadrefl');
-      if (rr !== null) m.ENV.RN_ROADREFL = rr;
+      // Remaster default is off, a dry road (OWNER 2026-10-30: too much reflection); Original mode sets game (web/mode.js).
+      m.ENV.RN_ROADREFL = RN_Q.get('roadrefl') ?? 'off';
       // ?carvol=0|1|2: the diffuse volume and panel-edge terms (host/sm1.c car_ps_vol); 1 default, 2 stronger, 0 off
       const cv = RN_Q.get('carvol');
       if (cv !== null) m.ENV.RN_CARVOL = cv;
