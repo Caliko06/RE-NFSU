@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NFSU · progreso</title>
+<style>
+:root{--bg:#0b0c0d;--pn:#121416;--ln:#23272b;--tx:#d9d6cf;--dim:#7d8389;--ok:#5fcf80;--wa:#e0b34a;--ac:#e8e4d8;--mono:ui-monospace,"IBM Plex Mono",Menlo,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:12px/1.45 var(--mono)}
+header{position:sticky;top:0;z-index:5;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:#0b0c0dee;border-bottom:1px solid var(--ln)}
+header b{letter-spacing:.14em;margin-right:8px}
+button{font:inherit;color:var(--dim);background:none;border:1px solid var(--ln);padding:3px 9px;cursor:pointer}
+button.on{color:var(--bg);background:var(--ac);border-color:var(--ac)}
+#stamp{margin-left:auto;color:var(--dim)}
+main{display:grid;gap:10px;padding:10px 12px;grid-template-columns:repeat(auto-fit,minmax(min(520px,100%),1fr))}
+main.one{grid-template-columns:1fr}
+section{background:var(--pn);border:1px solid var(--ln);min-width:0}
+section.hide{display:none}
+h2{margin:0;padding:6px 10px;font-size:11px;letter-spacing:.16em;border-bottom:1px solid var(--ln);color:var(--ac);display:flex;justify-content:space-between}
+.body{padding:8px 10px;max-height:62vh;overflow:auto}main.one .body{max-height:none}
+.foot{padding:5px 10px;border-top:1px solid var(--ln);color:var(--dim);font-size:11px}
+table{border-collapse:collapse;width:100%}td,th{padding:3px 6px;text-align:left;border-bottom:1px solid var(--ln);vertical-align:top}th{color:var(--dim);font-weight:400}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--dim);margin-right:6px}.live .dot{background:var(--ok)}
+.sess{padding:6px 0;border-bottom:1px solid var(--ln)}.sess .t{color:var(--dim)}.nm{color:var(--ac);font-weight:700}
+.k{display:inline-block;padding:0 6px;border:1px solid var(--ln);margin-right:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.grid img{width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--ln);cursor:pointer}.grid img.a{outline:2px solid var(--ok)}.grid img.b{outline:2px solid var(--wa)}
+.cmp{position:relative;margin-bottom:8px;user-select:none}.cmp img{width:100%;display:block}
+.cmp .top{position:absolute;inset:0;overflow:hidden}.cmp .top img{width:var(--w);max-width:none}
+.cmp input{width:100%}
+.mut{color:var(--dim)}
+</style></head><body>
+<header><b>NFSU · PROGRESO</b><span id="tg"></span><button id="all" class="on">Todas</button><span id="stamp"></span></header>
+<main id="m"></main>
+<script>
+const W=[
+ {id:"ses",s:"Sesiones",t:"SESIONES DE CLAUDE",f:"Cada fila es una ventana de Claude. 'subs' = subagentes que le ayudan; el punto verde = escribió en los últimos 5 min. El texto es su último mensaje."},
+ {id:"ow",s:"Open World",t:"OPEN WORLD · MANEJO 1001 vs WORLD",f:"RN_BODYLOG: mismo auto en el tour (1001) y en la ciudad (1010). z_jitter = cuánto rebota la altura por cuadro (menor = más suave). Si WORLD ≈ 1001, el manejo es igual."},
+ {id:"shots",s:"A/B",t:"CAPTURAS A/B",f:"Clic en una miniatura = A (verde), segundo clic = B (naranja). El deslizador revela B sobre A en la misma posición."},
+ {id:"re",s:"Llamadas RE",t:"LLAMADAS RE",f:"Herramientas de ingeniería inversa que usaron las sesiones: REA (MCP), Hopper (hpar.sh), Ghidra. Se lee de los transcripts, no mide el resultado."},
+ {id:"git",s:"Commits",t:"COMMITS Y ESTADO",f:null}
+];
+let last={},S=null,sel=new Set(W.map(w=>w.id)),A=null,B=null,wipe=50;
+const $=(s,r=document)=>r.querySelector(s),ago=s=>s<90?s+"s":s<5400?Math.round(s/60)+"m":Math.round(s/3600)+"h";
+const esc=s=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const view={
+ ses:s=>s.sessions.map(r=>`<div class="sess ${r.age<300||r.subs_live?"live":""}"><span class="dot"></span><span class="nm">${esc(r.name||r.id)}</span> <span class="mut">${r.id} · hace ${ago(r.age)} · ${r.tools} tools · ${r.subs} subs${r.subs_live?" (activos)":""}</span><div class="t">${esc(r.title)}</div><div>${esc(r.text)}</div><div class="mut">▸ ${esc(r.tool)}</div></div>`).join("")||"<span class=mut>sin sesiones en 12 h</span>",
+ ow:s=>`<table><tr><th>corrida</th><th>cuadros</th><th>distancia</th><th>z_jitter p50</th><th>p95</th><th>hace</th></tr>${s.handling.map(r=>`<tr><td>${r.run}</td><td>${r.frames}</td><td>${r.dist}</td><td>${r.z_jitter_p50}</td><td>${r.z_jitter_p95}</td><td>${ago(s.now-r.mtime)}</td></tr>`).join("")}</table>
+  <p class="mut">webcheck: ${s.webcheck.map(w=>esc(w.tail)+` (hace ${ago(w.age)})`).join("")||"—"}</p>${s.logs.map(l=>`<div class="mut">${esc(l.file)} · hace ${ago(l.age)}</div>`).join("")}`,
+ shots:s=>{const sh=s.shots,h=n=>`/thumb?w=${n}&p=`;
+  const cmp=A&&B?`<div class="cmp" id="cmp"><img src="${h(1100)+encodeURIComponent(A)}"><div class="top" style="width:${wipe}%"><img style="--w:${100/wipe*100}%" src="${h(1100)+encodeURIComponent(B)}"></div></div><input type="range" min="0" max="100" value="${wipe}" oninput="setWipe(this.value)"><div class="mut">A ${esc(A)}<br>B ${esc(B)}</div>`:"<div class=mut>elige A y B</div>";
+  return cmp+`<div class="grid">${sh.map(x=>`<img loading="lazy" title="${esc(x.p)} · hace ${ago(x.age)}" class="${x.p==A?"a":x.p==B?"b":""}" data-p="${esc(x.p)}" src="${h(260)+encodeURIComponent(x.p)}">`).join("")}</div>`},
+ re:s=>`<div>${Object.entries(s.re.counts).map(([k,v])=>`<span class="k">${k} ${v}</span>`).join("")}</div><table>${s.re.rows.map(r=>`<tr><td class="mut">${(r.ts||"").slice(11,19)}</td><td>${r.kind}</td><td>${esc(r.arg)}</td></tr>`).join("")}</table>`,
+ git:s=>`<div class="mut">${s.git.dirty} archivos sucios (de todas las sesiones)</div><table>${s.git.commits.map(c=>`<tr><td>${c.h}</td><td class="mut">${esc(c.t)}</td><td>${esc(c.s)}</td></tr>`).join("")}</table>`
+};
+function build(){
+ $("#tg").innerHTML=W.map(w=>`<button data-w="${w.id}" class="${sel.has(w.id)?"on":""}">${w.s}</button>`).join("");
+ $("#m").innerHTML=W.map(w=>`<section id="w_${w.id}"><h2>${w.t}<span class="mut" id="n_${w.id}"></span></h2><div class="body"></div>${w.f?`<div class="foot">${w.f}</div>`:""}</section>`).join("");
+ draw()}
+function draw(){
+ if(!S)return;const one=sel.size===1;$("#m").className=one?"one":"";$("#all").className=sel.size===W.length?"on":"";
+ W.forEach(w=>{const sec=$("#w_"+w.id);sec.className=sel.has(w.id)?"":"hide";if(!sel.has(w.id))return;
+  const b=$(".body",sec),y=b.scrollTop,h=view[w.id](S);if(last[w.id]!==h){last[w.id]=h;b.innerHTML=h;b.scrollTop=y}});
+ $("#stamp").textContent="actualizado "+new Date(S.now*1000).toLocaleTimeString()}
+document.addEventListener("click",e=>{
+ const w=e.target.closest("[data-w]");if(w){const id=w.dataset.w;
+  if(e.shiftKey){sel.has(id)?sel.delete(id):sel.add(id);if(!sel.size)sel=new Set(W.map(x=>x.id))}else sel=new Set([id]);
+  $("#tg").querySelectorAll("button").forEach(b=>b.className=sel.has(b.dataset.w)?"on":"");return draw()}
+ if(e.target.id==="all"){sel=new Set(W.map(x=>x.id));$("#tg").querySelectorAll("button").forEach(b=>b.className="");return draw()}
+ const im=e.target.closest(".grid img");if(im){const p=im.dataset.p;if(!A||(A&&B))A=p,B=null;else B=p;last.shots="";draw()}});
+function setWipe(v){wipe=+v;const t=$("#cmp .top");if(t){t.style.width=wipe+"%";t.firstChild.style.setProperty("--w",100/wipe*100+"%")}}
+async function tick(){try{S=await (await fetch("/api/state")).json();draw()}catch(e){$("#stamp").textContent="sin conexión"}}
+build();tick();setInterval(tick,4000);
+</script></body></html>
