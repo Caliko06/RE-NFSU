@@ -385,6 +385,37 @@ static uint32_t rival_ride(Ctx *c) {
     return call_guest(c, 0x5809c0, 7, a);
 }
 
+// RN_CAR=<CAR>[:tier[:n]] (?car= on the web): the player's car in every race is the n-th (default 0) persona of that car model
+// (CARS above) built at tier 1..3 (default 2; 3 = kits, wings, vinyls), by the same build/apply as a rival, on the player's ride
+// (entrant table [0x78a418], 0x750 each, +4 kind 1, +0x10 RideInfo) before the race start builds the cars. The look matrix
+// (build/carpack/matrix.sh) needs other cars than the profile's. Called from host/free.c grid_fix (0x422a86, every race).
+void rn_player_car(Ctx *c) {
+    static int done;
+    const char *e = getenv("RN_CAR");
+    if (!e || done) return;
+    char nm[16] = {0}; int tier = 2, n = 0;
+    sscanf(e, "%15[^:]:%d:%d", nm, &tier, &n);
+    int car = -1;
+    for (int k = 0; k < 20; k++) if (!strcmp(nm, CARS[k])) car = k;
+    if (car < 0 || tier < 1 || tier > 3) { rn_log("RN_CAR: \"%s\" is not CAR[:tier 1..3[:n]]", e); done = 1; return; }
+    uint32_t cnt = ld(c, 0x78a41c, 4), t = ld(c, 0x78a418, 4);
+    for (uint32_t i = 0; i < cnt; i++) {
+        if (ld(c, t + 0x750 * i + 4, 4) != 1) continue;
+        if (!ready) catalog(c);
+        const Persona *pe = NULL;
+        for (int j = 0, q = 0; j < POOL && !pe; j++) if (pool[j].car == car && q++ == n) pe = &pool[j];
+        if (!pe) { rn_log("RN_CAR: %s has no persona %d", nm, n); done = 1; return; }
+        uint32_t ride = t + 0x750 * i + 0x10, tmp = guest_alloc(RIDE_SIZE);
+        memcpy(G(tmp), G(ride), RIDE_SIZE);
+        float r0;
+        apply(c, ride, tmp, syn[0], "RN_PLAYER", pe, tier, &r0);
+        guest_free(tmp);
+        rn_log("RN_CAR: player is %s tier %d, persona %s (%s)", nm, tier, pe->name, ARCH[pe->arch].name);
+        done = 1;
+        return;
+    }
+}
+
 // BRIDGE: every racer at the player's car detail (OWNER 2026-10-27: the rivals as well made as the Supra). 0x56dc30 draws
 // a car with model BODY_A..D by its size on screen, s = 3 * [view+0xc] / (distance - 3) (0x545180): s >= 120 = A,
 // >= 45 = B, >= 20 = C, else D (table 0x6b5dec, from the minimum LOD args 10 / 11 up), and ORs flag 0x800 into the draw

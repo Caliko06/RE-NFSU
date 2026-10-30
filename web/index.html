@@ -129,6 +129,9 @@ function line(s, cls) {
       const cv = RN_Q.get('carvol');
       if (cv !== null) m.ENV.RN_CARVOL = cv;
       // ?carpack=1: the car look pack (host/sm1.c car_ps_tail_pack: paint as bright as the original, lamps held); 0 (default) = today
+      // ?car=<name|index>: the player's car in every race is a career rival's car (RN_CAR, host/free.c player_car; ?car=list logs the choices)
+      const car = RN_Q.get('car');
+      if (car) m.ENV.RN_CAR = car;
       const cpk = RN_Q.get('carpack');
       if (cpk !== null) m.ENV.RN_CARPACK = cpk;
       const look = RN_Q.get('carlook');
