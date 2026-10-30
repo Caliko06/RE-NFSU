@@ -62,3 +62,31 @@ Fits the existing path: `host/d3d9.c` turns every draw into a command, `web/gpu.
   instanced vertices; (e) interaction with the planar road reflection (`roadrefl`).
 - Needs from the visual lane: the A/B bank in `tools/` (same scene, shadows 0 and 1), as the orchestrator asked.
 - Next step when the game runs: log, from `host/d3d9.c`, the draw that carries SHADOWIG (render states, vertex count) and `[0x735518]` per track; then build step 2.
+
+## 4. Runtime results and what was built (2026-10-30, pod 4090, `tools/abbench.py`, Quick Race 1003 grid, frame 300)
+
+Measured with `RN_DRAWLOG=40` (new, test-only: every draw of each 40th frame) and `RN_POKE` of `[0x700e7c]` to 0, diff of the draw lists:
+
+- **Decal draws (answers U (a)):** only with the option on: triangle strips (type 5), stride 24 (position, colour, UV), alpha blend SRCALPHA / INVSRCALPHA,
+  depth test on, depth write off, cull on, one texture (SHADOWIG). Per car about 20 two-triangle strips plus 3 fans of 28 to 38 vertices; 6 cars on the grid.
+- **Sun record exists per track (answers U (b)):** `[0x735518]` is set in Quick Race 1003: position (-3900, 650, 1300), not the (-16384, 0, 7000) default. From the
+  grid car it is 18 degrees up, below the 37.35 degree floor, so the elevation is 37.35 and the light direction is D = (0.793, -0.054, -0.607). Other tracks
+  were not logged (`RN_SHADOWLOG=1` logs it each 120 frames).
+- 0x56d700 runs only inside the decal gate, so with the decal off `0x73c670..` stay 0: `host/d3d9.c shadow_data` repeats its maths (`atan2(-z, horizontal)`,
+  floor `0x1a90`; `0x564db0(x, y)` is atan2 with y second, checked in the decompile).
+
+Built (touches host/d3d9.c, tools/recomp/patches.py, web/gpu.js, web/tune.js, web/mode.js):
+
+- `PATCH 0x56e493`: the SHADOW compare of `0x56dc30` reads `SCREEN_ADDR+0x98`; the host writes the option there, or 0 while `?shadows=1`. The other option readers
+  (flares) keep `[0x700e7c]`.
+- `host/d3d9.c shadow_data` sends View, Projection (camera block `[0x7404c0]`), D and the player's car in the GPU_FXAA words 8..47. The car vertex shader is marked
+  (bit 1 of the shader kind).
+- `web/gpu.js shadows()`: keeps the scene's car body draws, redraws them depth-only into a `depth32float` map (orthographic, 64 m wide, texel-snapped) with
+  the clip matrix columns c10..c13 multiplied by (View Proj)^-1 * LightViewProj, then a full-screen pass rebuilds light-space positions from the scene depth, 3x3 PCF,
+  alpha 0.5 black. `?shadows=0` = the game's decal (the old path, untouched), `?shadowres=1024|2048|4096`, `?shadowk=` strength, `?shadowbias=`.
+- GPU cost on the 4090 (abbench p50 per pass, 1080p, 6 cars, change against ?shadows=0): shadow map 0.04 / 0.05 / 0.13 ms at 1024 / 2048 / 4096, apply 0.05 ms; the
+  decal's own draws leave (draw 1080p -0.12 ms), so the net is about zero. The Mac M-series is not measured.
+- Seen: shadows fall to the right of the grid cars on the road and on the next car's side; no shimmer test yet (grid frame only).
+
+Open: moving shadows while driving (texel snapping untested), props and walls do not cast, headlight/night look (the light is the game's sun), cars far
+from the player are outside the 64 m box, and the apply pass also darkens the casting car itself a little (bias 0.0012).

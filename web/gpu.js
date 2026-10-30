@@ -15,6 +15,7 @@ const U_SIZE = 4320, U_STEP = 4352;     // sm1.h SM1_U_SIZE, rounded to the 256-
 
 // PS2 depth speed blur (psblur below): web/tune.js sets .on from the blur preset ('PS2 depth') and ?psblur.
 const RN_PS = { on: false };
+const RN_SH = { on: false, res: 2048 };   // web/tune.js: ?shadows, ?shadowres
 const CMP = [null, 'never', 'less', 'equal', 'less-equal', 'greater', 'not-equal', 'greater-equal', 'always'];
 const BLEND = [null, 'zero', 'one', 'src', 'one-minus-src', 'src-alpha', 'one-minus-src-alpha', 'dst-alpha',
   'one-minus-dst-alpha', 'dst', 'one-minus-dst', 'src-alpha-saturated', null, null, 'constant', 'one-minus-constant'];
@@ -547,6 +548,152 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       p.end();
     }
   }
+  // BRIDGE: real car shadows, not in the PC game (docs/re/shadows.md). The game draws one flat decal per car (0x56dc30); with ?shadows=1 (default
+  // in Remaster) that decal is off (PATCH 0x56e493) and the cars cast a shadow map instead. The car body draws of the scene (the car vertex
+  // shader, host/d3d9.c marks it with bit 1 of the shader kind) are kept during the frame and drawn again, depth only, from the light: the
+  // same vertices and constants, with the clip-space matrix (c10..c13, D3D row vectors: clip = v * WVP) multiplied by T = (View Proj)^-1 * LightViewProj, so
+  // the vertex shader's own object-to-clip chain ends in light space and no world matrix is needed. The light is orthographic, E metres
+  // around the player's car, the direction the game itself uses (host/d3d9.c shadow_data). A full-screen pass then rebuilds each pixel's light-space position
+  // from the scene depth (same T), compares it with the map (3x3 PCF) and darkens the colour. The road stays dry: it only gets darker.
+  const SH_E = 32, SH_Z = 140, SH_LEAD = 60;     // half size, depth range and eye distance behind the car centre (m)
+  const SH_K = Number(RN_Q.get('shadowk') || 0.5), SH_BIAS = Number(RN_Q.get('shadowbias') || 0.0012);
+  const shMod = device.createShaderModule({ code: `
+struct U { t: mat4x4f, a: vec4f, b: vec4f };
+@group(0) @binding(0) var dep: texture_depth_2d;
+@group(0) @binding(1) var smap: texture_depth_2d;
+@group(0) @binding(2) var cmp: sampler_comparison;
+@group(0) @binding(3) var<uniform> u: U;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
+}
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  let zn = textureLoad(dep, vec2i(pos.xy), 0);
+  if (zn >= 0.99999) { discard; }
+  let ndc = vec4f(pos.x / u.a.x * 2.0 - 1.0, 1.0 - pos.y / u.a.y * 2.0, zn, 1.0);
+  let lc = ndc * u.t;
+  let p = lc.xyz / lc.w;
+  let uv = vec2f(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5);
+  if (any(uv < vec2f(0.0)) || any(uv > vec2f(1.0)) || p.z < 0.0 || p.z > 1.0) { discard; }
+  let d = u.a.z;
+  var lit = 0.0;
+  for (var y = -1; y <= 1; y++) { for (var x = -1; x <= 1; x++) {
+    lit += textureSampleCompareLevel(smap, cmp, uv + vec2f(f32(x), f32(y)) * d, p.z - u.a.w);
+  } }
+  let edge = clamp(min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y)) * 12.0, 0.0, 1.0);   // fade at the map border
+  return vec4f(0.0, 0.0, 0.0, u.b.x * (1.0 - lit / 9.0) * edge);
+}` });
+  const shPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: shMod, entryPoint: 'vs' },
+    fragment: { module: shMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm', blend: {
+      color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha', operation: 'add' },
+      alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } }] }, primitive: { topology: 'triangle-list' } });
+  const shCmp = device.createSampler({ compare: 'less-equal', magFilter: 'linear', minFilter: 'linear' });
+  const shResU = device.createBuffer({ size: 96, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+  let shMap = null, shRes = 0, shU = null, shUcap = 0, shLog = 0;
+  const shPipes = new Map();
+  const mm = (A, B) => { const C = new Float64Array(16); for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { let s = 0; for (let k = 0; k < 4; k++) s += A[4 * i + k] * B[4 * k + j]; C[4 * i + j] = s; } return C; };
+  const inv4 = m => {   // Gauss-Jordan; null when singular
+    const a = Array.from({ length: 4 }, (_, i) => [...Array.from(m.slice(4 * i, 4 * i + 4)), ...[0, 1, 2, 3].map(j => +(i === j))]);
+    for (let c = 0; c < 4; c++) {
+      let p = c; for (let r = c + 1; r < 4; r++) if (Math.abs(a[r][c]) > Math.abs(a[p][c])) p = r;
+      if (Math.abs(a[p][c]) < 1e-12) return null;
+      [a[c], a[p]] = [a[p], a[c]];
+      const d = a[c][c]; for (let j = 0; j < 8; j++) a[c][j] /= d;
+      for (let r = 0; r < 4; r++) if (r !== c) { const f = a[r][c]; for (let j = 0; j < 8; j++) a[r][j] -= f * a[c][j]; }
+    }
+    return Float64Array.from(a.flatMap(r => r.slice(4)));
+  };
+  const vsAttrs = (vs, decl) => {
+    const attributes = [];
+    for (let k = 0; k < 16; k++) {
+      const inp = vs.inputs[k]; if (!inp) continue;
+      const e = decl.find(e => e.stream === 0 && e.usage === ((inp >>> 8) & 255) && e.index === (inp & 255));
+      if (!e || !VFMT[e.type]) return null;
+      attributes.push({ shaderLocation: k, offset: e.offset, format: VFMT[e.type] });
+    }
+    return attributes;
+  };
+  function shadows(enc, rt, ds, recs, p, vbuf, ibuf) {
+    // p: View (16), Proj (16), light direction (3), car (3), valid
+    if (!p[38] || !recs.length || !ds || !ds.depth || ds.sc !== 1 || ds.w !== rt.w || ds.h !== rt.h) return;
+    const VP = mm(p.subarray(0, 16), p.subarray(16, 32)), iVP = inv4(VP);
+    if (!iVP) return;
+    const D = [p[32], p[33], p[34]], dl = Math.hypot(...D); if (dl < 1e-6) return;
+    const f = D.map(x => x / dl);
+    let up = [0, 0, 1]; if (Math.abs(f[2]) > 0.98) up = [1, 0, 0];
+    const cr = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const nz = a => { const l = Math.hypot(...a); return a.map(x => x / l); };
+    const r = nz(cr(up, f)), u = cr(f, r);
+    const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const R = RN_SH.res, tx = 2 * SH_E / R;
+    let C = [p[35], p[36], p[37]];
+    const cx = dot(C, r), cy = dot(C, u), sx = Math.round(cx / tx) * tx - cx, sy = Math.round(cy / tx) * tx - cy;   // texel snapping: no shimmer
+    C = C.map((x, i) => x + r[i] * sx + u[i] * sy);
+    const eye = C.map((x, i) => x - f[i] * SH_LEAD);
+    const LV = Float64Array.of(r[0], u[0], f[0], 0, r[1], u[1], f[1], 0, r[2], u[2], f[2], 0, -dot(eye, r), -dot(eye, u), -dot(eye, f), 1);
+    const LVP = mm(LV, Float64Array.of(1 / SH_E, 0, 0, 0, 0, 1 / SH_E, 0, 0, 0, 0, 1 / SH_Z, 0, 0, 0, 0, 1));
+    const T = mm(iVP, LVP);
+    if (!shMap || shRes !== R) {
+      doom(shMap); shRes = R;
+      shMap = device.createTexture({ size: [R, R], format: 'depth32float', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING });
+    }
+    // constants of every caster: c10..c13 hold the columns of the object-to-clip matrix (m4x4 oPos, v0, c10)
+    const n = recs.length, need = n * U_STEP;
+    if (!shU || shUcap < need) { doom(shU); shUcap = Math.max(need, 64 * U_STEP); shU = device.createBuffer({ size: shUcap, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST }); }
+    const ud = new Float32Array(n * U_STEP / 4);
+    recs.forEach((rc, i) => {
+      const o = i * U_STEP / 4; ud.set(rc.c, o);
+      const W = new Float64Array(16);
+      for (let j = 0; j < 4; j++) for (let k = 0; k < 4; k++) W[4 * k + j] = ud[o + 4 * (10 + j) + k];
+      const W2 = mm(W, T);
+      for (let j = 0; j < 4; j++) for (let k = 0; k < 4; k++) ud[o + 4 * (10 + j) + k] = W2[4 * k + j];
+      ud[o + 1056] = 1 / R; ud[o + 1057] = 1 / R;
+    });
+    device.queue.writeBuffer(shU, 0, ud);
+    const bg0 = device.createBindGroup({ layout: drawBgl, entries: [{ binding: 0, resource: { buffer: shU, size: U_SIZE } }] });
+    const bg1 = device.createBindGroup({ layout: texBgl(0), entries: [] });
+    const pass = enc.beginRenderPass({ timestampWrites: tsw('shadow map'), colorAttachments: [],
+      depthStencilAttachment: { view: shMap.createView(), depthClearValue: 1, depthLoadOp: 'clear', depthStoreOp: 'store' } });
+    recs.forEach((rc, i) => {
+      const vs = shaders.get(rc.vs), decl = decls.get(rc.decl);
+      if (!vs || !decl) return;
+      const key = `${rc.vs},${rc.decl},${rc.stride},${rc.topo},${rc.fmt}`;
+      let pipe = shPipes.get(key);
+      if (!pipe) {
+        const attributes = vsAttrs(vs, decl); if (!attributes) return;
+        pipe = device.createRenderPipeline({ layout: drawLayout(0),
+          vertex: { module: vs.module, entryPoint: 'main', buffers: [{ arrayStride: rc.stride, attributes }] },
+          primitive: { topology: rc.topo === 5 ? 'triangle-strip' : 'triangle-list', cullMode: 'none', stripIndexFormat: rc.topo === 5 && rc.ni ? rc.fmt : undefined },
+          depthStencil: { format: 'depth32float', depthWriteEnabled: true, depthCompare: 'less', depthBias: 2, depthBiasSlopeScale: 2 } });
+        shPipes.set(key, pipe);
+      }
+      pass.setPipeline(pipe);
+      pass.setBindGroup(0, bg0, [i * U_STEP]);
+      pass.setBindGroup(1, bg1);
+      if (rc.rvb) {
+        pass.setVertexBuffer(0, gbufs.get(rc.rvb), rc.rvoff);
+        if (rc.rib) { pass.setIndexBuffer(gbufs.get(rc.rib), rc.fmt); pass.drawIndexed(rc.ni, 1, rc.rfirst, rc.rbasev); }
+        else pass.draw(rc.nv, 1, rc.rfirst);
+      } else {
+        pass.setVertexBuffer(0, vbuf, rc.voff, rc.vbytes);
+        if (rc.ni) { pass.setIndexBuffer(ibuf, 'uint32', rc.ioff, 4 * rc.ni); pass.drawIndexed(rc.ni); }
+        else pass.draw(rc.nv);
+      }
+    });
+    pass.end();
+    const tf = new Float32Array(24);
+    for (let j = 0; j < 4; j++) for (let k = 0; k < 4; k++) tf[4 * j + k] = T[4 * k + j];
+    tf.set([rt.w, rt.h, 1 / R, SH_BIAS, SH_K, 0, 0, 0], 16);
+    device.queue.writeBuffer(shResU, 0, tf);
+    const rp = enc.beginRenderPass({ timestampWrites: tsw('shadow apply'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
+    rp.setPipeline(shPipe);
+    rp.setBindGroup(0, device.createBindGroup({ layout: shPipe.getBindGroupLayout(0), entries: [
+      { binding: 0, resource: ds.tex.createView({ aspect: 'depth-only' }) }, { binding: 1, resource: shMap.createView() },
+      { binding: 2, resource: shCmp }, { binding: 3, resource: { buffer: shResU } }] }));
+    rp.draw(3);
+    rp.end();
+    if (RN_Q.get('shadowlog') === '1' && ++shLog % 120 === 1) report(`gpu.js: shadows ${n} caster draws, map ${R}, light ${f.map(x => x.toFixed(3))}, car ${C.map(x => x.toFixed(1))}`);
+  }
   const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
@@ -908,6 +1055,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     }
     let voff = 0, ioff = 0, uoff = 0;
     let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
+    const shRec = [];     // the car body draws of the scene this frame (shadows)
     if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
     // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
@@ -922,7 +1070,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
-        else if (op === GPU_FXAA) { if (asp && RN_PS.on && res.get(id)?.w >= 1000) return true; }   // psblur reads the scene depth
+        else if (op === GPU_FXAA) { if (asp && (RN_PS.on || RN_SH.on) && res.get(id)?.w >= 1000) return true; }   // psblur reads the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
       return true;     // the next frame may read it
@@ -1010,7 +1158,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         module.getCompilationInfo().then(info => {
           for (const m of info.messages) if (m.type === 'error') report(`gpu.js: shader ${id}: ${m.message} (line ${m.lineNum})`);
         });
-        shaders.set(id, { kind, module, inputs: Array.from(w.subarray(a + 4, a + 20)), texMask: w[a + 20] });
+        shaders.set(id, { kind, car: (kind & 2) !== 0, module, inputs: Array.from(w.subarray(a + 4, a + 20)), texMask: w[a + 20] });
         stats.shaders++;
       } else if (op === GPU_DECL) {
         const els = [];
@@ -1115,6 +1263,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
             else pass.draw(nv);
           }
         }
+        if (RN_SH.on && shaders.get(g(D_VS))?.car && ds && g(D_ZEN) && ds.w >= 1000 && rt.w === ds.w && (g(D_TOPO) === 4 || g(D_TOPO) === 5)) {
+          shRec.push({ vs: g(D_VS), decl: g(D_DECL), stride, topo: g(D_TOPO), nv, ni, rvb, rvoff: g(D_RVOFF), rib: g(D_RIB), rfirst: g(D_RFIRST), rbasev: w[a + D_RBASEV] | 0,
+            fmt: rvb ? ifmt(w, a) : 'uint32', voff, vbytes, ioff, c: f32.slice(src, src + 4 * nvc) });
+        }
         if (!rvb) { voff += (vbytes + 3) & ~3; ioff += 4 * ni; }
         uoff += U_STEP;
         stats.draws++;
@@ -1132,6 +1284,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(w[a]);
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
+        if (RN_SH.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) shadows(enc, st, res.get(sceneDs), shRec, f32.subarray(a + 8, a + 48), vbuf, ibuf); }
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
         if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
         if ((FXAA_ON || GRADE_ON) && rt && !rt.depth && !rt.msView) {
