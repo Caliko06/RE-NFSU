@@ -235,6 +235,21 @@ def batchfile(n, k="1", skip_files=""):
           f"{sum(map(len, files.values()))} functions with a file")
 
 
+def batchrange(lo, hi, n, k="r1"):
+    """Next batch inside an address range, for code with no GameCube file (tools/canon/libs.py regions, e.g. the PC
+    renderer 0x5a0000-0x640000): unnamed, non-online queue rows in address order, ready rows (open_callees = 0) first."""
+    lo, hi = a(lo), a(hi)
+    q = [r for r in csv.DictReader(open(OUT + "/queue.tsv"), delimiter="\t")
+         if lo <= a(r["addr"]) < hi and r["system"] != "online"]
+    q.sort(key=lambda r: (r["open_callees"] != "0", a(r["addr"])))
+    pick = [r["addr"] for r in q[: int(n)]]
+    path = f"build/canon/batch_range_{k}.txt"
+    os.makedirs("build/canon", exist_ok=True)
+    with open(path, "w") as o:
+        o.write(f"# range {lo:#x}-{hi:#x}\n" + "\n".join(pick) + "\n")
+    print(f"batchrange {k}: {len(pick)} of {len(q)} open in {lo:#x}-{hi:#x} -> {path}")
+
+
 def show(args):
     want = []
     for x in args:
@@ -302,6 +317,8 @@ if __name__ == "__main__":
         batch(*sys.argv[2:5])
     elif cmd == "batchfile":
         batchfile(*sys.argv[2:5])
+    elif cmd == "batchrange":
+        batchrange(*sys.argv[2:6])
     elif cmd == "show":
         show(sys.argv[2:])
     else:

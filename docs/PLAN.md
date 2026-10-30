@@ -6,6 +6,8 @@ One session on main. Each milestone has one gate: the run that proves it.
 Every system accounted for: canon, free tracks, traffic, rivals, tuning, sound, assets, blur, cameras, props. Method and
 checks: docs/re_scoreboard.md §4 (honest coverage, systems.tsv, names.tsv, scoreboard). The open world block below keeps
 going as the free-tracks/traffic/rivals thread. Branch `publish` is parked.
+OWNER 2026-10-29 (later): touching the Remaster is authorized, and the Remaster is the only focus; the original mode
+matters little (it stays as the A/B reference). RE proposals become Remaster work behind switches (docs/re/proposals.md).
 
 ## Open world with life (OWNER 2026-10-28)
 The OWNER played WORLD (remaster): invisible walls, no traffic seen, no rivals, "flat, lifeless". Wanted: rivals with
