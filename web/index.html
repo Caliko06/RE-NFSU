@@ -112,6 +112,11 @@ function line(s, cls) {
       if (RN_Q.get('jumpcam') === '0') m.ENV.RN_JUMPCAM = '0';
       // ?handling=0: the shipped rear grip assist (host/rivals.c)
       if (RN_Q.get('handling') === '0') m.ENV.RN_HANDLING = '0';
+      // Traffic, off until measured on the Mac (host/rivals.c): ?trafmodels=1 bus, ambulance, fire truck too; ?trafrefill=1 traffic_refill in place of free_tmove;
+      // ?traffic=<n> free mode's traffic count, x1.5 = cars, 23 at most with 6 rivals (0x4322a0)
+      if (RN_Q.get('trafmodels') === '1') m.ENV.RN_TRAFMODELS = '1';
+      if (RN_Q.get('trafrefill') === '1') { m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
+      if (RN_Q.has('traffic')) m.ENV.RN_FREETRAFFIC = RN_Q.get('traffic');
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;

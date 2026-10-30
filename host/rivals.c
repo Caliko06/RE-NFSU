@@ -347,6 +347,31 @@ static const uint8_t PERSONA[10] = {NORMAL, AGGRESSIVE, CLUMSY, AGGRESSIVE, NORM
 static int rivalai(void) { const char *e = getenv("RN_RIVALAI"); return !(e && e[0] == '0'); }
 static int rival_style(uint32_t skill, uint32_t style) { return rivalai() && skill <= 9 && PERSONA[skill] == AGGRESSIVE ? 2 : (int)style; }
 
+// Every traffic model (RN_TRAFMODELS=1 / ?trafmodels=1: on, off until measured on the Mac). The cave 0x63b270 weighs a usage 2 row 1.0 if any district weight +0xc60..+0xc70 is set: AMBULANCE, FIRETRUCK and BUS
+// have none, so they never come out of 0x57d000. A weight here brings them in, once, before AddTrafficCars 0x4b3ac0 (it runs after 0x4b4040, this hook's caller).
+static int free_race;                  // this race is free mode (rival_ride's rn_free_now)
+static void traffic_types(Ctx *c) {
+    static const uint8_t ROWS[3] = {22, 26, 30};
+    const char *e = getenv("RN_TRAFMODELS");
+    uint32_t tab = ld(c, 0x734588, 4);
+    if (!e || e[0] != '1' || !tab) return;
+    for (int k = 0; k < 3; k++) stf(c, tab + 0xc90 * ROWS[k] + 0xc60, 1.0f);
+}
+
+// The spacing of the placer (0x59aa60, trackinfo +0xd4/+0xd8, one per direction, 31 m on 520 nodes: 19..21 cars fit, docs/traffic_placement.md) is 20 m in free mode, RN_FREETRAFFIC's
+// 22 cars fit. Trackinfo row: 0x441fe0(esi = track), as free_setup. Back to the game's value in any other race (the table outlives the race).
+static void traffic_spacing(Ctx *c) {
+    static float keep[2];
+    static uint32_t row;
+    uint32_t esi = c->r[ESI];
+    if (row) stf(c, row + 0xd4, keep[0]), stf(c, row + 0xd8, keep[1]), row = 0;
+    if (!free_race || !getenv("RN_FREETRAFFIC")) return;
+    c->r[ESI] = ld(c, 0x78a2f0, 4);
+    row = call_guest(c, 0x441fe0, 0, NULL), c->r[ESI] = esi;
+    keep[0] = ldf(c, row + 0xd4), keep[1] = ldf(c, row + 0xd8);
+    stf(c, row + 0xd4, 20.0f), stf(c, row + 0xd8, 20.0f);
+}
+
 // Records 0x779ff8 + 0x54 * level (0x462070 copies them from GLOBALB): shipped, then the personas of this race.
 static void rival_tables(Ctx *c, int personas) {
     static uint8_t shipped[10 * 0x54];
@@ -371,7 +396,7 @@ static void rival_tables(Ctx *c, int personas) {
 static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
-    if (a[6] <= 1) rn_player_car(c), rival_tables(c, rivalai() && (rn_free_now || !c->mem[0x78a33c]));
+    if (a[6] <= 1) free_race = rn_free_now != 0, rn_player_car(c), rival_tables(c, rivalai() && (rn_free_now || !c->mem[0x78a33c])), traffic_types(c), traffic_spacing(c);
     if (rn_free_now) {                                           // host/free.c: free mode's career rivals
         uint32_t e = free_rival(c, a);                           // 0x5809c0 returns the entrant; free_rival picks the level at +0x735
         c->mem[e + 0x736] = (uint8_t)rival_style(c->mem[e + 0x735], c->mem[e + 0x736]);
@@ -423,6 +448,8 @@ static uint32_t rival_ride(Ctx *c) {
     return call_guest(c, 0x5809c0, 7, a);
 }
 
+static int n_refill, n_refail;
+static int n_react[3];                 // traffic_tick: yields, dodges, glued honks
 // RN_AILOG=1: test-only race log (tools/ailog.py sums it up). Every 60 frames, each racer: name, kind, route metres car+0x814, speed car+0x3d0,
 // rank (record +0xa), mean |slip angle| in degrees; at once, each change of a racer's action type [[drv+0x3f8]+0x1f8] and each nitro start (CarState car+0x40, +0x3bc, 0x4654f0).
 static void ai_log(Ctx *c) {
@@ -456,6 +483,24 @@ static void ai_log(Ctx *c) {
         i++;
     }
     if (n) rn_log("AILOG %u draft %u%s", rn_telem.presents, draft, b);
+    if (rn_telem.presents % 300 == 0) {            // traffic: how many, how near, how many models near (entrant ride +0: car type, row name in [0x734588])
+        uint32_t tab = ld(c, 0x734588, 4), me = 0, seen[36] = {0};
+        int total = 0, parked = 0, near = 0, close = 0, kinds = 0, all = 0;
+        for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200 && !me; r = ld(c, r, 4), k++) if (ld(c, ld(c, r + 0x14, 4) + 4, 4) == 1) me = r;
+        char names[512];
+        int m = 0;
+        for (uint32_t r = ld(c, h, 4), k = 0; me && r != h && k < 200; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
+            if (!e || ld(c, e + 4, 4) != 3) continue;
+            float d = hypotf(ldf(c, r + 0x50) - ldf(c, me + 0x50), ldf(c, r + 0x54) - ldf(c, me + 0x54));
+            uint32_t type = ld(c, e + 0x10, 4);
+            total++, parked += v && c->mem[v + 0x4d1], near += d < 250, close += d < 100;
+            if (type < 36 && !(seen[type] & 1)) { seen[type] |= 1, all++; if (m < 480) m += snprintf(names + m, sizeof names - m, " %s", G(tab + 0xc90 * type)); }
+            if (type < 36 && d < 250 && !(seen[type] & 2)) seen[type] |= 2, kinds++;
+        }
+        rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d%s", rn_telem.presents, total, parked, near, close, all, kinds,
+               n_refill, n_refail, n_react[0], n_react[1], n_react[2], rn_telem.presents % 3000 == 0 ? names : "");
+    }
 }
 
 // Handling (RN_HANDLING=0 / ?handling=0: as shipped; docs/re/physics.md). The OWNER's "rigid": outside drift events 0x4774a0 gives the rear wheels extra grip as the
@@ -471,15 +516,85 @@ static void handling_data(Ctx *c) {
     memcpy(G(0x6ffdd4), &rear, 4);
 }
 
-// Traffic that reacts (RN_TRAFYIELD=0 / ?trafyield=0: as shipped; docs/openworld/re_traffic_rivals.md). Traffic only ever looks ahead: its
-// finder 0x453920 takes the nearest car ahead in its lane, so a player closing from behind is never seen and hits the car square on.
-// Now a traffic car with the player in its neighbour list (0x57a910), same lane, 0.6..2.5 s from impact, takes a free neighbour lane
-// the way its own avoid update does (0x453c60: 0x453ba0 says if the lane is clear, then lane ctx+0x394, route state ctx+0x398 = 1) and
-// sounds its horn (0x429100, thiscall on the car). Outside the career, as the personas; each car once in YIELD_WAIT frames.
+// Traffic near the player in free mode (RN_TRAFREFILL=1 / ?trafrefill=1: on, and the page turns host/free.c free_tmove off with RN_FREETMOVE=0; off until measured on the Mac). 0x598600 parks a car
+// each time a move fails, and free_tmove tries one spot a second: a node with no lane (0x5995e0 = -1) or next to another car and it gives up, so 17 of 19 cars stood parked with
+// none within 250 m (autopilot on 1001, frames 3900..4800). Here, every 12 frames while fewer than REFILL_NEAR cars are within 250 m, the car that is parked, past 450 m, or
+// behind and past 160 m tries up to 8 nodes 150..650 m + 1 s of speed ahead on the road (0x4563d0), at least 150 m from the player, 18 m from every car that drives; then the
+// Free Run move's own tail, as free_tmove: lane 0x5995e0, speed 0x42adf0, 0x59a7c0 on the teleporter [[0x7361f8]+0x2f0] (ecx at 0x420c77).
+#define REFILL_NEAR 14
+static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
+    static int off = -1;
+    static uint32_t pair, seed = 0x2f11e0d5;
+    if (off < 0) { const char *e = getenv("RN_TRAFREFILL"); off = !e || e[0] != '1'; }
+    uint32_t tele = ld(c, h + 0x2f0, 4);
+    if (off || !free_race || rn_telem.presents % 12 || !tele) return;
+    float px = ldf(c, me + 0x50), py = ldf(c, me + 0x54), vx = ldf(c, me + 0x70), vy = ldf(c, me + 0x74), sp = hypotf(vx, vy);
+    uint32_t pick = 0;
+    int prio = 0, near = 0;
+    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
+        if (!e || ld(c, e + 4, 4) != 3 || !v) continue;
+        float dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py, d = hypotf(dx, dy);
+        int parked = c->mem[v + 0x4d1];
+        near += d < 250 && !parked;
+        int p = parked ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
+        if (p > prio) prio = p, pick = r;
+    }
+    if (near >= REFILL_NEAR || !pick) return;
+    if (!pair) pair = guest_alloc(8);
+    uint32_t zero = 0, ft = c->ftop;
+    c->r[EAX] = me; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
+    c->r[EAX] = me; uint32_t node = call_guest(c, 0x428160, 1, &zero);
+    st(c, pair, sec, 4), st(c, pair + 4, node, 4);
+    c->r[EAX] = pair;
+    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_refail++; return; }
+    int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0;
+    for (int t = 0; t < 8; t++) {              // farther each try (a stretch can lack lanes for 1 km); the last two behind the player
+        float m = 150.0f + 80.0f * (t % 6) + (float)(rnd(&seed) % 100) + (t < 6 ? sp : 0);
+        uint32_t a[5] = {pair, 1, 0, (uint32_t)(t < 6 ? along : !along), 0};
+        memcpy(&a[2], &m, 4);
+        st(c, pair, sec, 4), st(c, pair + 4, node, 4);
+        c->r[ECX] = sec, c->r[EAX] = node;
+        call_guest_cdecl(c, 0x4563d0, 5, a);
+        uint32_t n2 = ld(c, pair + 4, 4);
+        c->r[EAX] = pair;
+        if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) continue;
+        float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
+        int ok = hypotf(nx - px, ny - py) >= 150;
+        for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++) {
+            uint32_t v = ld(c, o + 0x2c, 4);
+            ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || hypotf(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= 18;
+        }
+        if (!ok) continue;
+        c->r[ECX] = tele;
+        uint32_t side = call_guest(c, 0x59aea0, 0, NULL) & 0xff, la[2] = {n2, side};
+        c->r[ECX] = tele;
+        int lane = (int)call_guest(c, 0x5995e0, 2, la);
+        if (lane == -1) continue;
+        c->r[EAX] = n2, c->r[ECX] = (uint32_t)lane;
+        call_guest(c, 0x42adf0, 0, NULL);
+        float v = (float)c->st[c->ftop];
+        fpop(c);                               // a pop, not ftop = ft: see free_tmove
+        uint32_t p[7] = {pick, n2, 0, (uint32_t)lane, 0x41c4b127, 0, 0};
+        memcpy(&p[5], &v, 4);
+        c->r[ECX] = tele;
+        call_guest(c, 0x59a7c0, 7, p);
+        c->ftop = ft, n_refill++;
+        return;
+    }
+    c->ftop = ft, n_refail++;
+}
+
+// Traffic that reacts (RN_TRAFYIELD=0 / ?trafyield=0: as shipped; docs/re/traffic_limits.md). Traffic only ever looks ahead: its finder 0x453920 takes the nearest car ahead in
+// its lane within 5 m, so a player closing from behind is never seen and a head-on is seen at the last moment. Its neighbour list (0x57a910) is empty between AI updates, so this
+// reads positions and velocities: a traffic car with the player on its line (under 2 m aside), closing from behind 0.6..2.5 s from impact, or head-on 0.6..3 s from impact at 10 m/s
+// or more, takes a neighbour lane with no car beside it, as its own avoid update does (0x453c60: lane test 0x5a7700, ctx+0x394, route state ctx+0x398 = 1); glued behind it (under
+// 12 m, closing under 5 m/s, above 8 m/s) it stays. All three sound the horn with the light flag (0x429100, thiscall on the car; the head flare ignores it, 0x5693b0 says on for every
+// traffic car). Outside the career, as the personas; each car once in YIELD_WAIT frames.
 #define YIELD_WAIT 240
 void traffic_tick(Ctx *c) {
-    static int off = -1, n_yield;
-    static uint32_t act, seed = 0x51ed2701;
+    static int off = -1;
+    static uint32_t seed = 0x51ed2701;
     static struct { uint32_t car, frame; } seen[32];
     ai_log(c);
     handling_data(c);
@@ -491,42 +606,47 @@ void traffic_tick(Ctx *c) {
         if (e && ld(c, e + 4, 4) == 1) me = r;
     }
     if (!me) return;
-    if (!act) {                                // the action 0x453ba0 reads: +0x204 the gap that counts as taken, +0x208 the scan range
-        float taken = ldf(c, 0x6b76d8), range = ldf(c, 0x6b76e0);
-        act = guest_alloc(0x210), memcpy(G(act + 0x204), &taken, 4), memcpy(G(act + 0x208), &range, 4);
-    }
+    traffic_refill(c, h, me);
+    float mx = ldf(c, me + 0x50), my = ldf(c, me + 0x54), mvx = ldf(c, me + 0x70), mvy = ldf(c, me + 0x74);
+    if (mvx * mvx + mvy * mvy < 64) return;
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
         if (!e || ld(c, e + 4, 4) != 3 || !v || c->mem[v + 0x4d1]) continue;
-        uint32_t ctx = v + 0x2c, a = ld(c, v + 0x3f8, 4), n = ld(c, ctx + 4, 4), lane = ld(c, ctx + 0x394, 4);
-        int own = (int8_t)c->mem[ctx + 0x388];
+        float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54), vx = ldf(c, r + 0x70), vy = ldf(c, r + 0x74), sp = sqrtf(vx * vx + vy * vy);
+        if (sp < 2 || fabsf(mx - x) > 90 || fabsf(my - y) > 90) continue;
+        uint32_t ctx = v + 0x2c, a = ld(c, v + 0x3f8, 4), lane = ld(c, ctx + 0x394, 4);
         if (!a || ld(c, a + 0x1f8, 4) == 3 || ld(c, a + 0x1f8, 4) == 0x12) continue;   // already avoiding, or at a junction
-        if (n > 16 || own < 0 || (uint32_t)own >= n || lane < 11 || lane > 16) continue;
-        uint32_t o = ctx + 8 + 0x38 * own, p = 0;
-        for (uint32_t i = 0; i < n && !p; i++) if (ld(c, ctx + 8 + 0x38 * i + 0x34, 4) == me) p = ctx + 8 + 0x38 * i;
-        if (!p) continue;
-        // Entry (0x44f470, 0x453c60): +4 speed relative to this car, +8/+0xc half width/length, +0x10 along the path, +0x18.. offset from each lane.
-        float gap = ldf(c, o + 0x10) - ldf(c, p + 0x10) - ldf(c, o + 0xc) - ldf(c, p + 0xc), closing = ldf(c, p + 4);
-        float side = ldf(c, p + 0x18 + 4 * (lane - 11)) - ldf(c, o + 0x18 + 4 * (lane - 11));
-        if (gap <= 0 || closing < 5 || gap / closing < 0.6f || gap / closing > 2.5f) continue;
-        if (fabsf(side) > 0.5f + ldf(c, o + 8) + ldf(c, p + 8)) continue;
+        if (lane < 11 || lane > 16) continue;
+        float along = ((mx - x) * vx + (my - y) * vy) / sp, off = ((mx - x) * vy - (my - y) * vx) / sp, mine = (mvx * vx + mvy * vy) / sp;
+        float gap = fabsf(along) - 5, rel = along < 0 ? mine - sp : sp - mine;  // rel > 0 closes the gap
+        if (gap <= 0 || fabsf(off) > 2) continue;
+        int yield = along < 0 && rel >= 5 && gap / rel >= 0.6f && gap / rel <= 2.5f;
+        int dodge = along > 0 && mine < 0 && rel >= 10 && gap / rel >= 0.6f && gap / rel <= 3.0f;
+        int glued = along < 0 && gap < 12 && fabsf(rel) < 5;
+        if (!yield && !dodge && !glued) continue;
         int s = 0;
         while (s < 31 && seen[s].car && seen[s].car != r) s++;
         if (seen[s].car == r && rn_telem.presents < seen[s].frame + YIELD_WAIT) continue;
         seen[s].car = r, seen[s].frame = rn_telem.presents;
-        uint32_t esi = c->r[ESI], to = 0, dir = rnd(&seed) & 2;   // a coin for the first side
-        for (int t = 0; t < 2 && !to; t++, dir ^= 2) {
-            uint32_t want = lane + dir - 1, one = act;
-            c->r[EAX] = lane, c->r[ECX] = want, c->r[ESI] = ctx;
-            if (call_guest(c, 0x453ba0, 1, &one) & 0xff) to = want;
+        int beside = 0;                        // any car next to it (0x453ba0's scan reads the neighbour list, empty here)
+        for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200; o = ld(c, o, 4), j++) {
+            float ox = ldf(c, o + 0x50) - x, oy = ldf(c, o + 0x54) - y, oa = (ox * vx + oy * vy) / sp, os = fabsf(ox * vy - oy * vx) / sp;
+            beside |= o != r && oa > -10 && oa < 25 && os > 1.5f && os < 6;
         }
-        c->r[ESI] = esi;
-        if (!to) continue;
-        st(c, ctx + 0x394, to, 4), st(c, ctx + 0x398, 1, 4), st(c, ctx + 0x39c, 0, 4), st(c, ctx + 0x3a0, 0, 4), c->mem[ctx + 0x3a4] = 0;
-        uint32_t honk[6] = {0x3e800000, 0x3e000000, 0x3e800000, 0, 1, 0};              // 0.25, 0.125, 0.25 s, horn +0x83f
+        // 0x5a7700 is 0x453ba0's lane test: eax = lane, ecx = a path element (as 0x44efd0: [path + 8 + 4 * [path + 0xb8]], the first when that index is -1), stack: current lane, car.
+        uint32_t path = ld(c, ctx + 0x3a8, 4), at = path ? ld(c, path + 0xb8, 4) : 0, elem = path && ld(c, path + 4, 4) ? ld(c, path + 8 + 4 * (at < ld(c, path + 4, 4) ? at : 0), 4) : 0, to = 0, dir = rnd(&seed) & 2;
+        for (int t = 0; t < 2 && !to && !glued && !beside && elem; t++, dir ^= 2) {
+            uint32_t want = lane + dir - 1, one[2] = {lane, r};
+            c->r[EAX] = want, c->r[ECX] = elem;
+            if (call_guest(c, 0x5a7700, 2, one) & 0xff) to = want;
+        }
+        if (to) st(c, ctx + 0x394, to, 4), st(c, ctx + 0x398, 1, 4), st(c, ctx + 0x39c, 0, 4), st(c, ctx + 0x3a0, 0, 4), c->mem[ctx + 0x3a4] = 0;
+        if (!to && !glued && !dodge) continue;
+        uint32_t honk[6] = {0x3e99999a, 0x3e19999a, 0x3e99999a, 1, 1, 1};              // 0.3, 0.15, 0.3 s; lights, horn, gap
         c->r[ECX] = r, call_guest(c, 0x429100, 6, honk);
+        n_react[yield ? 0 : dodge ? 1 : 2]++;
         if (getenv("RN_FREELOG") || getenv("RN_RIVALLOG"))
-            rn_log("trafyield #%d: lane %u -> %u, gap %.1f m, closing %.1f m/s, frame %u", ++n_yield, lane, to, gap, closing, rn_telem.presents);
+            rn_log("trafreact %s %08x: lane %u -> %u, gap %.1f m, rel %.1f m/s, off %.1f m, frame %u", yield ? "yield" : dodge ? "dodge" : "glued", r, lane, to, gap, rel, off, rn_telem.presents);
     }
 }
 
