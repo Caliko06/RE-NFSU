@@ -4,14 +4,15 @@
 # from the first race HUD), ?hold=N stops at race frame N (web/gpu.js). Measured noise of two identical runs: --frame 300 (the
 # default: the grid before GO) is the same frame, only the crowd moves (7 % of pixels, mean delta 1.5/255). --frame 900 (racing) is the same
 # road and speed but not the same pixels: race clock 7.02 vs 7.28 s, the rivals elsewhere. Compare looks at 300; at 900 only coarse things.
-# Times: ?gpuprof=1, race frames 120..N, p50 noise about 0.3 ms on the pod's 4090 (timestamp-query, start of the first pass to end of the last).
+# Times: ?gpuprof=1, race frames 120..N. Trust "by pass" and "sum" (ms per pass kind, stable to about 0.05 ms per post pass; the draws move more,
+# the crowd is in them). p50/p90 are first pass start to last pass end and jump between identical runs on the pod's 4090 (0.5 vs 1.9 ms).
 # usage: tools/abbench.py NAME [--frame 300] [--jump 0:1003] [--view 1920x1080@1] [--repeat] [--crop X,Y,W,H] label=query ...
 #   e.g. tools/abbench.py grade off=grade=0 on=
 #        tools/abbench.py cam base= far='chasecam=2&grade=0'
 # --repeat runs the first variant twice: the pixels that change are the noise floor of "same frame".
 # Output: build/ab/NAME/<label>.png, strip.jpg, results.json. Needs save/ (the "asas" profile; `cp -r /root/src/save save` on the pod).
 # Pod: DISPLAY=:91 RN_X11=1 RN_CHROME=/usr/bin/google-chrome; the Mac needs neither. Uses its own server on this worktree's files.
-import argparse, fcntl, json, os, re, socket, subprocess, sys
+import argparse, fcntl, json, os, re, signal, socket, subprocess, sys
 from completion import _PROFILE
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -30,17 +31,23 @@ if any(len(v) != 2 for v in variants): sys.exit('each variant is label=query')
 if a.repeat: variants.insert(1, [variants[0][0] + '_again', variants[0][1]])
 
 # One bench at a time on this machine: another run's GPU work would count in these times.
-lock = open(os.path.join(os.environ.get('TMPDIR', '/tmp'), 'abbench.lock'), 'w')
-fcntl.flock(lock, fcntl.LOCK_EX)
-with socket.socket() as s:
-    s.bind(('127.0.0.1', 0)); port = s.getsockname()[1]
+lock = open('/tmp/abbench.lock', 'w')
+try: fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+except OSError:
+    print('another bench is running, waiting for it', flush=True)
+    fcntl.flock(lock, fcntl.LOCK_EX)
+signal.signal(signal.SIGTERM, lambda *_: sys.exit('terminated'))   # a timeout still runs the finally below: no server left behind
+def free_port():
+    with socket.socket() as s:
+        s.bind(('127.0.0.1', 0)); return s.getsockname()[1]
+port = free_port()
 serve = subprocess.Popen([sys.executable, 'tools/serve.py', str(port)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 nav = ','.join(['20000:RETURN'] + _PROFILE[1:] + ['1500@=MU_Main_PC:RETURN'])
 
 def run(label, query):
     url = (f'http://127.0.0.1:{port}/?env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FIXEDCLOCK=1&jump={a.jump}&keys={nav}&hold={a.frame}&gpuprof=1'
            + (f'&{query}' if query else ''))
-    env = dict(os.environ, RN_VIEW=a.view, RN_UNTIL=r'held at race frame.*gpu ts@1', RN_CDP_PORT=os.environ.get('RN_CDP_PORT', '9481'))
+    env = dict(os.environ, RN_VIEW=a.view, RN_UNTIL=r'held at race frame.*gpu ts@1', RN_CDP_PORT=str(free_port()))
     png = f'{out}/{label}.png'
     subprocess.run(['node', 'tools/webcheck.mjs', url, str(a.secs), png], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     log = open('build/webcheck.log', errors='replace').read()
@@ -62,6 +69,9 @@ for r, im in zip(res, imgs):
     d = np.abs(np.asarray(im).astype(int) - base).max(2) if im.size == imgs[0].size else None
     r['changed_pct'] = None if d is None else round(100 * float((d > 2).mean()), 2)
     r['mean_delta'] = None if d is None else round(float(d.mean()), 2)
+    x, y, w, h = map(int, a.crop.split(',')) if a.crop else (0, 0, *im.size)   # sharpness of the crop: variance of the Laplacian of the luma
+    l = np.asarray(im.crop((x, y, x + w, y + h)).convert('L')).astype(float)
+    r['lap'] = round(float((l[1:-1, :-2] + l[1:-1, 2:] + l[:-2, 1:-1] + l[2:, 1:-1] - 4 * l[1:-1, 1:-1]).var()), 1)
 json.dump(res, open(f'{out}/results.json', 'w'), indent=1)
 
 if a.crop:
@@ -77,9 +87,9 @@ for i, (r, im) in enumerate(zip(res, imgs)):
     draw.text((W * i + 8, 5), f"{r['label']}  gpu p50 {r['p50']} p90 {r['p90']} ms", fill=(255, 212, 121), font=font)
 strip.save(f'{out}/strip.jpg', quality=92)
 
-print(f'{"variant":16} {"frame":>5} {"p50":>6} {"p90":>6} {"max":>6} {"dp50":>6} {"px>2 %":>7} {"mean":>6}  query')
+print(f'{"variant":16} {"frame":>5} {"p50":>6} {"p90":>6} {"max":>6} {"sum":>6} {"px>2 %":>7} {"mean":>6} {"lap":>8}  query')
 for r in res:
-    print(f'{r["label"]:16} {r["frame"]:5} {r["p50"]:6.1f} {r["p90"]:6.1f} {r["max"]:6.1f} {r["p50"] - res[0]["p50"]:+6.1f} {r["changed_pct"]!s:>7} {r["mean_delta"]!s:>6}  {r["query"]}')
+    print(f'{r["label"]:16} {r["frame"]:5} {r["p50"]:6.1f} {r["p90"]:6.1f} {r["max"]:6.1f} {sum(r["passes"].values()):6.2f} {r["changed_pct"]!s:>7} {r["mean_delta"]!s:>6} {r["lap"]:8.1f}  {r["query"]}')
 for r in res[1:]:
     keys = sorted(set(r['passes']) | set(res[0]['passes']), key=lambda k: -abs(r['passes'].get(k, 0) - res[0]['passes'].get(k, 0)))[:5]
     print(f'{r["label"]} vs {res[0]["label"]}, ms per frame by pass: ' + ', '.join(f'{k} {r["passes"].get(k, 0) - res[0]["passes"].get(k, 0):+.2f}' for k in keys))

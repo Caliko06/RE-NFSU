@@ -183,11 +183,6 @@ async function startGpu(M, canvas, report, onFrame) {
       const t = performance.now();
       hd.set(name, v); packed++;
       for (const x of res.values()) if (x.key && pack.get(x.key) === name) x.view = v.view;
-      if (PACK_SKIN) for (const op of skinOps.values()) {
-        if (!res.get(op[0])?.skin) continue;   // the id was freed or reused
-        const n = op[2], hit = i => { const x = res.get(i); return x?.key && pack.get(x.key) === name; };
-        for (let i = 0; i < n; i++) if (hit(op[3 + 7 * i]) || hit(op[4 + 7 * i])) { skin(op, 0); break; }
-      }
       hdMs += performance.now() - t;
     }, e => report(`gpu.js: remaster ${name}: ${e.message}`));
   }
@@ -221,14 +216,8 @@ async function startGpu(M, canvas, report, onFrame) {
   // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
   const FXAA_MODE = RN_Q.get('fxaa');   // '0' off, '2' debug: edges in red
   const FXAA_ON = FXAA_MODE !== '0';
-  // BRIDGE: remaster colour grade, not in the original (the game has no tonemap or grade; SetGammaRamp is kept, never applied,
-  // host/d3d9.c). It shares the FXAA pass (no extra pass), after bloom and before the HUD, so the HUD keeps its colours. Gamma-space
-  // S curve around 0.25: black and white stay fixed and the curve itself clips nothing, the road's dry mid-greys barely move; then
-  // saturation, less on what is already vivid so neon clips little. ?grade=0 turns it off. With ?msaa=4 no pass runs, like FXAA.
-  const GRADE_ON = RN_Q.get('grade') !== '0';
   const fxaaMod = device.createShaderModule({ code: `
 const DBG = ${FXAA_MODE === '2' ? 1 : 0};
-const GRADE = ${GRADE_ON ? 1 : 0};
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
 @vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
@@ -236,19 +225,9 @@ const GRADE = ${GRADE_ON ? 1 : 0};
   return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
 }
 fn lum(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
-fn grade(c: vec4f) -> vec4f {
-  if (GRADE == 0) { return c; }
-  let s = c.rgb + 0.6 * c.rgb * (1.0 - c.rgb) * (c.rgb - 0.25);
-  let vivid = max(s.r, max(s.g, s.b)) - min(s.r, min(s.g, s.b));
-  return vec4f(clamp(mix(vec3f(lum(s)), s, 1.0 + 0.18 * (1.0 - vivid)), vec3f(0.0), vec3f(1.0)), c.a);
-}
-@fragment fn gradeOnly(@builtin(position) pos: vec4f) -> @location(0) vec4f {
-  return grade(textureSampleLevel(src, smp, pos.xy / vec2f(textureDimensions(src)), 0.0));
-}
-@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f { return grade(fxaa(pos)); }
 fn L(uv: vec2f) -> f32 { return lum(textureSampleLevel(src, smp, uv, 0.0).rgb); }
 const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
-fn fxaa(pos: vec4f) -> vec4f {
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f {
   let rcp = 1.0 / vec2f(textureDimensions(src));
   let uv0 = pos.xy * rcp;
   let m4 = textureSampleLevel(src, smp, uv0, 0.0);
@@ -315,7 +294,7 @@ fn fxaa(pos: vec4f) -> vec4f {
   return vec4f(textureSampleLevel(src, smp, uv, 0.0).rgb, m4.a);
 }` });
   const fxaaPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: fxaaMod, entryPoint: 'vs' },
-    fragment: { module: fxaaMod, entryPoint: FXAA_ON ? 'fs' : 'gradeOnly', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+    fragment: { module: fxaaMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
   const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   let fxaaTmp = null;
   // BRIDGE: remaster, the last step of a frame. The back buffer is at most 2560 wide (web/index.html), so on the OWNER's
@@ -762,9 +741,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   const skinLin = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   const skinNear = device.createSampler({ magFilter: 'nearest', minFilter: 'nearest' });
   const skinTmp = new Map();     // size -> [ping, pong]
-  // ?carpack=1|split (default on in Remaster, =0 off): the composite of a car's paint and kit layers is built from the layers' HD views (the game's own 512 layers
-  // stay in l.own); a skin remembers its op so it is composed again when an HD layer arrives (docs/re/car_tex_hd.md).
-  const PACK_SKIN = RN_Q.get('carpack') !== '0', skinOps = new Map();
   const argb = c => [(c >>> 16) & 255, (c >>> 8) & 255, c & 255, c >>> 24];
   function skin(w, a) {
     const id = w[a], t = res.get(id);     // id read now: w is the frame list, reused by the time a check reports
@@ -788,7 +764,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       device.queue.writeBuffer(g, 0, b); return g;
     };
     const bind = (src, l, m, buf) => device.createBindGroup({ layout: skinPipe.getBindGroupLayout(0), entries: [
-      { binding: 0, resource: src.createView() }, { binding: 1, resource: check || !PACK_SKIN ? l.own : l.view }, { binding: 2, resource: check || !PACK_SKIN ? m.own : m.view },
+      { binding: 0, resource: src.createView() }, { binding: 1, resource: l.own }, { binding: 2, resource: m.own },
       { binding: 3, resource: check ? skinNear : skinLin }, { binding: 4, resource: { buffer: buf } }] });
     e.beginRenderPass({ colorAttachments: [{ view: A.createView(), loadOp: 'clear', storeOp: 'store',
       clearValue: { r: fill[0] / 255, g: fill[1] / 255, b: fill[2] / 255, a: fill[3] / 255 } }] }).end();
@@ -800,7 +776,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       [src, dst] = [dst, src];
     }
     const nm = w[o + 4];
-    if (PACK_SKIN) skinOps.set(id, w.slice(a, o + 5 + 2 * nm));
     step(dst, bind(src, t, t, uni(1, 0, [w[o], w[o + 1], w[o + 2], w[o + 3]], Array.from(w.subarray(o + 5, o + 5 + 2 * nm)))));
     if (check) {
       const bufs = [dst, t.tex].map(x => { const b = device.createBuffer({ size: S * S * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
@@ -836,7 +811,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   }
 
   const gpuDone = [], TS_MAX = 256;
-  let raceFrames = 0;   // the frames with a GPU_FXAA: 3D scene + HUD (?hold)
   const tsq = TS ? { set: device.createQuerySet({ type: 'timestamp', count: TS_MAX }),
     res: device.createBuffer({ size: 8 * TS_MAX, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC }), free: [] } : null;
   let tsN = 0;
@@ -1119,7 +1093,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         uoff += U_STEP;
         stats.draws++;
       } else if (op === GPU_FXAA) {
-        raceFrames++;
         if (PROF) {   // the draws on this target after the scene, and how many of them test or write depth
           let n = 0, z = 0;
           for (let k = ci; k < cl.length; k++) {
@@ -1134,7 +1107,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
         if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
-        if ((FXAA_ON || GRADE_ON) && rt && !rt.depth && !rt.msView) {
+        if (FXAA_ON && rt && !rt.depth && !rt.msView) {
           if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
             doom(fxaaTmp);
             fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
@@ -1222,10 +1195,9 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     return stats;
   }
 
-  // ?hold=N (tools/abbench.py): stop at the Present of race frame N, so a capture shows that frame (the game then waits), and log the
-  // GPU time of race frames HOLD_SKIP..N in one line (the first ones compile pipelines and load textures).
-  const hold = Number(RN_Q.get('hold')) || 0, HOLD_SKIP = 120;
-  let frames = 0, presents = 0, held = false;
+  // ?hold=N (debug): stop after the N-th Present, so a capture shows that frame (the game then waits).
+  const hold = Number(RN_Q.get('hold')) || 0;
+  let frames = 0, presents = 0;
   const steerLog = /RN_STEERLOG/.test(location.search);   // host/input.c RN_STEERLOG: GPU completion per present
   // The page runs a frame as soon as the game submits it (host/gpu.c wakes seq), not at the next animation frame: with one
   // frame in flight, waiting for requestAnimationFrame made Present wait up to a refresh more (OWNER session 2026-10-23:
@@ -1237,7 +1209,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   async function pump() {
     for (;;) {
       if (!tick()) return;
-      if (held) { await new Promise(f => setTimeout(f, 100)); continue; }
+      if (hold && presents >= hold) { await new Promise(f => setTimeout(f, 100)); continue; }
       const h = M.HEAP32, seq = Atomics.load(h, box);
       const r = Atomics.load(h, box + 1) < seq ? { async: false } : Atomics.waitAsync(h, box, seq);
       if (r.async) await r.value; else await yieldTask();
@@ -1246,22 +1218,17 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   function tick() {
     const h = H();
     try {
-      while (Atomics.load(h, box + 1) < Atomics.load(h, box) && !held) {
+      while (Atomics.load(h, box + 1) < Atomics.load(h, box) && !(hold && presents >= hold)) {
         const k = Atomics.load(h, box + 1) + 1;
         const t = performance.now();
         const s = run(h[box + 2 + (k & 1)], h[box + 4 + (k & 1)]);
         onFrame?.(s, t, performance.now() - t);
         frames++;
         if (s.present) presents++;
-        if (hold && s.present && raceFrames === HOLD_SKIP) { gpuDone.length = 0; profSum.clear(); profFrames = 0; encMs.length = 0; }
-        if (hold && s.present && raceFrames >= hold) {
-          held = true;
-          device.queue.onSubmittedWorkDone().then(() => setTimeout(() => report(`gpu.js: held at race frame ${raceFrames}, present ${s.present}${gpuReport()}`), 200));
-        }
         if (s.present && steerLog) { const p = presents; device.queue.onSubmittedWorkDone().then(() =>
           report(`page present ${p} start ${t.toFixed(1)} done ${performance.now().toFixed(1)}`)); }
         if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +
-          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + (hold ? '' : gpuReport()));
+          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + gpuReport());
         if (frames % 300 === 0) hdMs = 0;
         Atomics.store(h, box + 1, k);
         Atomics.notify(M.HEAP32, box + 1);

@@ -87,7 +87,7 @@ function line(s, cls) {
     preRun: [m => {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
       // The game draws at the pixels of this window (PATCH 0x408760), at most 2560x1440 to keep the GPU load sane.
-      const dpr = window.devicePixelRatio || 1, k = Math.min(1, 2560 / (innerWidth * dpr), 1440 / (innerHeight * dpr));
+      const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || 2560), k = Math.min(1, BB / (innerWidth * dpr), BB * 9 / 16 / (innerHeight * dpr));
       // Even sizes: the layer keeps width and height even (host/win32.c). At k = 1 the canvas gets exactly
       // back buffer / dpr CSS pixels, centred, so one back-buffer pixel is one device pixel; k < 1: Chrome scales it up.
       const bw = 2 * Math.floor(innerWidth * dpr * k / 2), bh = 2 * Math.floor(innerHeight * dpr * k / 2);
@@ -108,6 +108,8 @@ function line(s, cls) {
       if (RN_Q.get('rivalai') === '0') m.ENV.RN_RIVALAI = '0';
       // ?trafyield=0: traffic does not move aside for the player closing from behind (host/rivals.c traffic_tick)
       if (RN_Q.get('trafyield') === '0') m.ENV.RN_TRAFYIELD = '0';
+      // ?jumpcam=0: Free Run / WORLD keep the chase camera on jumps (host/free.c free_jumpcam); default: the game's jump shots as in a race
+      if (RN_Q.get('jumpcam') === '0') m.ENV.RN_JUMPCAM = '0';
       // ?handling=0: the shipped rear grip assist (host/rivals.c)
       if (RN_Q.get('handling') === '0') m.ENV.RN_HANDLING = '0';
       // Traffic, off until measured on the Mac (host/rivals.c): ?trafmodels=1 bus, ambulance, fire truck too; ?trafrefill=1 traffic_refill in place of free_tmove;
@@ -134,17 +136,11 @@ function line(s, cls) {
       if (cd !== null) m.ENV.RN_CARDETAIL = cd;
       // ?roadrefl=game|sq|cube|off: how strongly the road reflects. sq / cube: the reflection weight (vertex alpha x texture alpha) squared /
       // cubed (host/sm1.c); off: the game's own ROADREFLECTION level 1, no mirrored world (PATCH 0x410c1b, host/win32.c). Read at boot.
-      const rr = RN_Q.get('roadrefl');
-      if (rr !== null) m.ENV.RN_ROADREFL = rr;
-      // ?carvol=0|1|2: the diffuse volume and panel-edge terms (host/sm1.c car_ps_vol); 1 default, 2 stronger, 0 off
-      const cv = RN_Q.get('carvol');
-      if (cv !== null) m.ENV.RN_CARVOL = cv;
-      // ?carpack=0|1|split: the car look pack (host/sm1.c car_ps_tail_pack: paint as bright as the original, lamps held); on in Remaster (OWNER 2026-10-30), 0 = before
+      // Remaster default is off, a dry road (OWNER 2026-10-30: too much reflection); Original mode sets game (web/mode.js).
+      m.ENV.RN_ROADREFL = RN_Q.get('roadrefl') ?? 'off';
       // ?car=<name|index>: the player's car in every race is a career rival's car (RN_CAR, host/free.c player_car; ?car=list logs the choices)
       const car = RN_Q.get('car');
       if (car) m.ENV.RN_CAR = car;
-      const cpk = RN_Q.get('carpack');
-      m.ENV.RN_CARPACK = cpk ?? '1';
       const look = RN_Q.get('carlook');
       if (look !== null) m.ENV.RN_CARLOOK = look;
     }],
