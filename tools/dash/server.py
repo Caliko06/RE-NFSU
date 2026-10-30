@@ -51,7 +51,7 @@ def parse_file(path):
                 inp = b.get("input") or {}
                 arg = inp.get("command") or inp.get("description") or inp.get("file_path") or json.dumps(inp)
                 st["last_tool"], st["last_ts"] = f'{b["name"]}  {short(arg, 110)}', ts
-                cmd = inp.get("command", "") if b["name"] == "Bash" else ""
+                cmd = inp.get("command", "").split("\n")[0] if b["name"] == "Bash" else ""   # first line: a heredoc that only mentions a tool is not a call
                 if b["name"].startswith("mcp__rea__") or any(k in cmd for k in RE_CMDS):
                     st["re"].append({"ts": ts, "tool": b["name"], "arg": short(arg, 150)})
                     del st["re"][:-300]
