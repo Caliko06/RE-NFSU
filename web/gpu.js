@@ -226,9 +226,15 @@ async function startGpu(M, canvas, report, onFrame) {
   // S curve around 0.25: black and white stay fixed and the curve itself clips nothing, the road's dry mid-greys barely move; then
   // saturation, less on what is already vivid so neon clips little. ?grade=0 turns it off. With ?msaa=4 no pass runs, like FXAA.
   const GRADE_ON = RN_Q.get('grade') !== '0';
+  // BRIDGE: remaster tonemap, not in the original. The game's image is 8 bits and gamma space, with no light above 1, so this is not
+  // HDR rendering: to linear light, the top of the range expanded back (near-white lamps up to 3x, x^2 from luma 0.6), a shoulder from
+  // linear 0.5 rolls it off instead of clipping, back to gamma. Below the shoulder it is the identity: an ACES curve took the median luma from
+  // 0.155 to 0.099 and the road from 0.136 to 0.080 (build/ab/tone), a night scene has no shadows to spare. ?tonemap=0 turns it off.
+  const TONE_ON = RN_Q.get('tonemap') !== '0';
   const fxaaMod = device.createShaderModule({ code: `
 const DBG = ${FXAA_MODE === '2' ? 1 : 0};
 const GRADE = ${GRADE_ON ? 1 : 0};
+const TONE = ${TONE_ON ? 1 : 0};
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
 @vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
@@ -236,16 +242,27 @@ const GRADE = ${GRADE_ON ? 1 : 0};
   return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
 }
 fn lum(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
-fn grade(c: vec4f) -> vec4f {
-  if (GRADE == 0) { return c; }
-  let s = c.rgb + 0.6 * c.rgb * (1.0 - c.rgb) * (c.rgb - 0.25);
-  let vivid = max(s.r, max(s.g, s.b)) - min(s.r, min(s.g, s.b));
-  return vec4f(clamp(mix(vec3f(lum(s)), s, 1.0 + 0.18 * (1.0 - vivid)), vec3f(0.0), vec3f(1.0)), c.a);
+fn tonemap(c: vec3f) -> vec3f {
+  let lin = pow(c, vec3f(2.2));
+  let t = clamp((lum(c) - 0.6) / 0.4, 0.0, 1.0);
+  let x = lin * (1.0 + 2.0 * t * t);
+  let over = 1.0 - exp((0.5 - x) * 2.0);
+  return pow(select(x, 0.5 + 0.5 * over, x > vec3f(0.5)), vec3f(1.0 / 2.2));
 }
-@fragment fn gradeOnly(@builtin(position) pos: vec4f) -> @location(0) vec4f {
-  return grade(textureSampleLevel(src, smp, pos.xy / vec2f(textureDimensions(src)), 0.0));
+fn post(c: vec4f, pos: vec4f) -> vec4f {
+  var s = c.rgb;
+  if (TONE == 1) { s = tonemap(s); }
+  if (GRADE == 1) {
+    s += 0.6 * s * (1.0 - s) * (s - 0.25);
+    let vivid = max(s.r, max(s.g, s.b)) - min(s.r, min(s.g, s.b));
+    s = clamp(mix(vec3f(lum(s)), s, 1.0 + 0.18 * (1.0 - vivid)), vec3f(0.0), vec3f(1.0));
+  }
+  return vec4f(s, c.a);
 }
-@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f { return grade(fxaa(pos)); }
+@fragment fn postOnly(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  return post(textureSampleLevel(src, smp, pos.xy / vec2f(textureDimensions(src)), 0.0), pos);
+}
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f { return post(fxaa(pos), pos); }
 fn L(uv: vec2f) -> f32 { return lum(textureSampleLevel(src, smp, uv, 0.0).rgb); }
 const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
 fn fxaa(pos: vec4f) -> vec4f {
@@ -315,7 +332,7 @@ fn fxaa(pos: vec4f) -> vec4f {
   return vec4f(textureSampleLevel(src, smp, uv, 0.0).rgb, m4.a);
 }` });
   const fxaaPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: fxaaMod, entryPoint: 'vs' },
-    fragment: { module: fxaaMod, entryPoint: FXAA_ON ? 'fs' : 'gradeOnly', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+    fragment: { module: fxaaMod, entryPoint: FXAA_ON ? 'fs' : 'postOnly', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
   const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   let fxaaTmp = null;
   // BRIDGE: remaster, the last step of a frame. The back buffer is at most 2560 wide (web/index.html), so on the OWNER's
@@ -918,7 +935,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     // Bloom, FXAA, grade: on the finished scene colour, before the HUD (see GPU_FXAA below).
     function postFx(rt) {
       if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
-      if ((FXAA_ON || GRADE_ON) && rt && !rt.depth && !rt.msView) {
+      if ((FXAA_ON || GRADE_ON || TONE_ON) && rt && !rt.depth && !rt.msView) {
         if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
           doom(fxaaTmp);
           fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
