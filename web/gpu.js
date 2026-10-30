@@ -948,6 +948,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     t.view = t.skin.createView();
   }
 
+  const texLog = RN_Q.get('texlog') === '1' ? new Map() : null;   // ?texlog=1 with ?hold: what race frame N draws in the scene, in the pack or not
   const gpuDone = [], TS_MAX = 256;
   let raceFrames = 0;   // the frames with a GPU_FXAA: 3D scene + HUD (?hold)
   const tsq = TS ? { set: device.createQuerySet({ type: 'timestamp', count: TS_MAX }),
@@ -1222,6 +1223,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           for (let k = 0; k < 8; k++) if (ps.texMask >> k & 1) {
             const t = w.subarray(a + D_TEX + D_TEXN * k, a + D_TEX + D_TEXN * (k + 1));
             const img = t[T_ID] ? res.get(t[T_ID]) : null, cube = (t[T_TT] & T_CUBE) !== 0;
+            if (texLog && k === 0 && img && g(D_ZEN) && rt?.w >= 1000) { const e = texLog.get(img) || { n: 0 }; e.n += ni || nv; texLog.set(img, e); }
             const smp = sampler(t), v2 = !cube && img?.view || dummyView, vc = cube && img?.cube || dummyCubeView;
             bkey += `,${oid(smp)},${oid(v2)},${oid(vc)}`;
             entries.push({ binding: 2 * k, resource: smp }, { binding: 2 * k + 1, resource: v2 }, { binding: 16 + k, resource: vc });
@@ -1376,9 +1378,16 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         onFrame?.(s, t, performance.now() - t);
         frames++;
         if (s.present) presents++;
+        if (hold && s.present && raceFrames === hold - 1) texLog?.clear();
         if (hold && s.present && raceFrames === HOLD_SKIP) { gpuDone.length = 0; profSum.clear(); profFrames = 0; encMs.length = 0; }
         if (hold && s.present && raceFrames >= hold) {
           held = true;
+          if (texLog) {
+            const v = [...texLog].map(([t, e]) => ({ w: t.w, h: t.h, key: t.key || '-', name: pack.get(t.key) || '', hd: t.view !== t.own, n: e.n }));
+            const all = v.reduce((x, e) => x + e.n, 0) || 1, hit = v.filter(e => e.name), share = l => (100 * l.reduce((x, e) => x + e.n, 0) / all).toFixed(1);
+            report(`TEXLOG textures ${v.length}, verts in pack ${share(hit)} %, loaded ${share(v.filter(e => e.hd))} %`);
+            for (const e of v.sort((x, y) => y.n - x.n).slice(0, 400)) report(`TEXLOG ${e.key} ${e.w}x${e.h} n ${e.n} hd ${e.hd ? 1 : 0} ${e.name}`);
+          }
           device.queue.onSubmittedWorkDone().then(() => setTimeout(() => report(`gpu.js: held at race frame ${raceFrames}, present ${s.present}${gpuReport()}`), 200));
         }
         if (s.present && steerLog) { const p = presents; device.queue.onSubmittedWorkDone().then(() =>

@@ -69,6 +69,9 @@ for r, im in zip(res, imgs):
     d = np.abs(np.asarray(im).astype(int) - base).max(2) if im.size == imgs[0].size else None
     r['changed_pct'] = None if d is None else round(100 * float((d > 2).mean()), 2)
     r['mean_delta'] = None if d is None else round(float(d.mean()), 2)
+    x, y, w, h = map(int, a.crop.split(',')) if a.crop else (0, 0, *im.size)   # sharpness of the crop: variance of the Laplacian of the luma
+    l = np.asarray(im.crop((x, y, x + w, y + h)).convert('L')).astype(float)
+    r['lap'] = round(float((l[1:-1, :-2] + l[1:-1, 2:] + l[:-2, 1:-1] + l[2:, 1:-1] - 4 * l[1:-1, 1:-1]).var()), 1)
 json.dump(res, open(f'{out}/results.json', 'w'), indent=1)
 
 if a.crop:
@@ -84,9 +87,9 @@ for i, (r, im) in enumerate(zip(res, imgs)):
     draw.text((W * i + 8, 5), f"{r['label']}  gpu p50 {r['p50']} p90 {r['p90']} ms", fill=(255, 212, 121), font=font)
 strip.save(f'{out}/strip.jpg', quality=92)
 
-print(f'{"variant":16} {"frame":>5} {"p50":>6} {"p90":>6} {"max":>6} {"sum":>6} {"px>2 %":>7} {"mean":>6}  query')
+print(f'{"variant":16} {"frame":>5} {"p50":>6} {"p90":>6} {"max":>6} {"sum":>6} {"px>2 %":>7} {"mean":>6} {"lap":>8}  query')
 for r in res:
-    print(f'{r["label"]:16} {r["frame"]:5} {r["p50"]:6.1f} {r["p90"]:6.1f} {r["max"]:6.1f} {sum(r["passes"].values()):6.2f} {r["changed_pct"]!s:>7} {r["mean_delta"]!s:>6}  {r["query"]}')
+    print(f'{r["label"]:16} {r["frame"]:5} {r["p50"]:6.1f} {r["p90"]:6.1f} {r["max"]:6.1f} {sum(r["passes"].values()):6.2f} {r["changed_pct"]!s:>7} {r["mean_delta"]!s:>6} {r["lap"]:8.1f}  {r["query"]}')
 for r in res[1:]:
     keys = sorted(set(r['passes']) | set(res[0]['passes']), key=lambda k: -abs(r['passes'].get(k, 0) - res[0]['passes'].get(k, 0)))[:5]
     print(f'{r["label"]} vs {res[0]["label"]}, ms per frame by pass: ' + ', '.join(f'{k} {r["passes"].get(k, 0) - res[0]["passes"].get(k, 0):+.2f}' for k in keys))
