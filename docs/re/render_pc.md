@@ -79,6 +79,19 @@ Other flags: 0x700ea0 and 0x700ea4 set to 1 on every call (flares).
    - player view (index 1): `0x4090a0`, `SceneRTSelect`, headlight callback pass if `[0x700e80]`, then world (`0x446730`, `0x58a240`, `RenderWorldModels 0x592100`), **speed blur `0x40cd40`**, `0x408b20`, cars `0x571050`/`0x570950`, emitters `0x4ae650`, particle systems `0x404110` x2, flares or light streaks; then rear-view mirror `0x409180` x2.
 3. Queue: `FUN_0040c910` (this file: `Solid_QueueGroups`) puts each mesh group into per-slot buckets (`RenderQueue_GetBucketAlt 0x40f1e0`); `0x40ed50` flushes (`RenderQueue_Flush 0x40ed70`).
 
+## Correction and additions (game-side pass, W2 second stretch)
+- `[0x700e70]` is the **resolution index**, not a quality bit: `Resolution_ApplyIndex 0x408760` maps 0->640, 1->800, 2->1024, 3->1280, 4->1280 wide
+  (V). `GraphicsQuality_Set` writes 0 for level 0 and 1 for levels 1..3, so level 0 is 640 wide and others 800. `GraphicsQuality_AutoDetect 0x410a00` picks
+  the level from `MachinePerformanceScore` stored in `[0x701088]`: <0.3 level 0, <0.6 level 1, <0.9 level 2, else 3 (V).
+- **Fog data exists but is dead.** Every frame `0x4090a0` (called from `0x409580` at 0x40989d) turns the per-view "zone" blend of `FogZones_BlendAtView 0x588f40`
+  into 1/range, 250/range, alpha*1.5/255, x*1.35 and RGB/255 at `0x71a05c`. Nothing reads `0x71a05c` (byte search of the whole exe finds only the `mov esi, 0x71a05c` at 0x409897).
+  The zone records (in the global block at 0x737bf0: records from +0x44, 0x50 bytes each, count at +0x3078 = 0x73ac68; fields include position x/z and two radii) are a ready-made per-section atmosphere dataset the Remaster could
+  use for a real fog instead of a guess (I that they are fog; V that the blend is distance-weighted and the effect params FogOffset/FogScale/FogFalloffY/FogColor exist).
+- `RenderQueue_BindMaterial 0x40f3d0` (V): translucent material (mesh+0x56) => alpha blend on, ZWRITE off (non-car slots); car slot 5 uses cull 2 when translucent, 1 otherwise;
+  UV scroll from mesh+0x52 (mode 3 = static offsets, else flare-phase animation of the time `[0x73ad34] * 0.00025`).
+- **Car lighting is spherical harmonics**, computed on the CPU (`SH_AddDirectionalLight 0x5416e0`, constants 0.282095/0.488603/1.092548/0.315392/0.546274, 10 coefficients x 4)
+  and uploaded as `HarmonicCoeff[10]` of car.efx. Car shadows: `CarShadow_SunVector 0x56d700` uses the sun position `[0x735518]` (default -16384, 0, 7000).
+
 ## Render states the game sets directly (V, C: 66 SetRenderState call sites, immediates only)
 ZENABLE(7) 12, ZWRITE(14) 22, ALPHABLEND(27) 9, ALPHATEST(15) 4, CULL(22) 3, ALPHAREF(24) 3, COLORWRITEENABLE(168) 2, BLENDFACTOR(193) 2 (speed blur),
 ZFUNC(23), ALPHAFUNC(25), SPECULAR(29), LIGHTING(137), FOGENABLE(28)=0, SRCBLEND(19), DESTBLEND(20), TEXTUREFACTOR(60) 1 each. Everything else comes from the .efx passes.

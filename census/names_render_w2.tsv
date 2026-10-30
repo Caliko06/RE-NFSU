@@ -204,3 +204,24 @@ addr	name	system	confidence	evidence	tool	doc
 0x61ef60	EAGL_Malloc	assets	V	V: wrapper, calls _malloc(size) only	ghidra	docs/re/render_pc.md
 0x61ef70	EAGL_Free	assets	V	V: wrapper, calls _free only	ghidra	docs/re/render_pc.md
 0x61f020	EAGL_SetAllocHook	assets	V	V: stores its argument in PTR_FUN_006dfa9c; called from Render_InitSubsystem 0x53e020	ghidra	docs/re/render_pc.md
+0x40f3d0	RenderQueue_BindMaterial	render	V	V: per material: texture (mesh+0x18), alpha test, blend if mesh+0x56 (translucent) else off, ZWRITE 0 for translucent non-car slots, cull 2 vs 1 for car slot 5, UV scroll from mesh+0x52 mode (3 = static shorts +0x5e/+0x60, else FlareAnim phase of time*0.00025)	ghidra+capstone	docs/re/render_pc.md
+0x4090a0	View_ComputeFogParams	render	I	V body: from blended zone record (0x588f40) writes 1/range, 250/range, alpha*1.5/255, x*1.35, RGB/255 into 0x71a05c; I: that this is fog (matches effect params FogScale/FogOffset/FogFalloffY/FogColor); output block is never read	ghidra+capstone	docs/re/render_pc.md
+0x588f40	FogZones_BlendAtView	render	I	V body: zone list (count +0x3078, 0x50-byte records) weighted by distance from the view camera x/z, nearest full-weight zone wins, writes 5 blended floats + packed color at 0x737bf0; I: fog meaning	ghidra	docs/re/render_pc.md
+0x408760	Resolution_ApplyIndex	render	V	V: switch on [0x700e70]: 0->640, 1->800, 2->1024, 3->1280, 4->1280 wide via 0x4086b0 then Device_HandleLost	ghidra	docs/re/render_pc.md
+0x408f00	RenderFrame_PrepareViewCulling	render	V	V: for each active main view, reflection view ([0x700e74]), planar view ([0x700e90]) and headlight view ([0x700e80]) fills a 0xd0-byte cull record (count at +0x820) then GrandSceneryCullInfo__DoCulling	ghidra	docs/re/render_pc.md
+0x40b6a0	Matrix_FromAxisAngle	render	V	V: Rodrigues rotation matrix from axis (3 floats) and angle (sin/cos via 0x564b10), 4x4 row-major	ghidra	docs/re/render_pc.md
+0x40ed10	RenderQueue_FreeAll	render	V	V: only calls bList__FreeAllToSlotPool	ghidra	docs/re/render_pc.md
+0x4109f0	Render_NoOp	render	V	V: body is ret	capstone	docs/re/render_pc.md
+0x410a00	GraphicsQuality_AutoDetect	render	V	V: score = MachinePerformanceScore stored in [0x701088]; <0.3 level 0, <0.6 level 1 variant, <0.9 level 2, else 3; also sets [0x7363b5] on a slow-memory/old-OS probe (0x411b00)	ghidra	docs/re/render_pc.md
+0x411910	Drive_HasRacerBin	render	V	V: builds "<drive>:\tracks\racer.bin", opens it with bOpenFile, returns 1 if present (disc check)	ghidra	docs/re/render_pc.md
+0x4119d0	Const_0x2e	render	V	V: returns constant 0x2e	capstone	docs/re/render_pc.md
+0x5416e0	SH_AddDirectionalLight	render	V	V: spherical-harmonics basis constants 0.282095/0.488603/1.092548/0.315392/0.546274 times RGB(A) of light, accumulated into 10 coefficients x 4 floats (the HarmonicCoeff[10] of car.efx)	ghidra	docs/re/render_pc.md
+0x541bf0	SH_AddDirectionalLightPair	render	V	V: calls 0x5416e0 twice with weight 1.0 and direction (x,y,z) then (-x,-y,-z)	ghidra	docs/re/render_pc.md
+0x541c90	SH_RotateByMatrix	render	I	V body: quadratic forms of 3x3 matrix rows applied to 4 channels of SH coefficients; I: rotation of the 2nd-order band	ghidra	docs/re/render_pc.md
+0x542400	CarSH_ComputeCoefficients	render	I	V body: zeroes 10 vec4, transposes the car matrix, accumulates lights; callers CarRender_LitBodyPathA/B; I: exact light set	ghidra	docs/re/render_pc.md
+0x56d700	CarShadow_SunVector	render	I	V body: vector from sun position (DAT_00735518 +0x2c/+0x30/+0x34, default -16384,0,7000) to the car, angle via Atan2ToAngle16 clamped below 0x1a90, stores 0x73c670..; I: shadow use	ghidra	docs/re/render_pc.md
+0x56cf10	CarShadow_BuildOutline	render	I	V body: gathers 4 corner points (stride 0x10), ground height by GroundQuery::FindSurfaceBelow, builds quad at 0x73c680; I: car blob shadow	ghidra	docs/re/render_pc.md
+0x56c310	CarRenderInfo_RefreshTextureInfo	render	V	V: calls GetUsedCarTextureInfo(this+0x40) and, when a texture hash field (+0x458/+0x45c/+0x460/+0x464) changes, copies it and sets its cache id to -1	ghidra	docs/re/render_pc.md
+0x5409c0	Vec3_NormalizeKeepW	render	V	V: out.xyz = in.xyz / sqrt(x2+y2+z2), w copied	ghidra	docs/re/render_pc.md
+0x540be0	Vec4_NegateZ	render	V	V: out = (x, y, -z, w)	ghidra	docs/re/render_pc.md
+0x540ae0	Vec3_Transform4	render	V	V: D3DXVec3Transform then stores 4 floats (x,y,z,w) to the result	ghidra	docs/re/render_pc.md
