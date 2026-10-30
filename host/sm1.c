@@ -434,7 +434,27 @@ static const char *const car_ps_live =
 // under the bumpers, wheel arches) get less sky and less reflection. Grime from the height: below ~0.6 m the paint darkens
 // toward road dirt and loses most of its reflection. dk/rk scale the diffuse and the reflection; at 1 (switch off) the
 // result is car.efx's to the bit.
-static const char *const car_ps_flat = "  let dk = vec3f(1.0);\n  let rk = 1.0;\n";
+// BRIDGE: car volume, OWNER 2026-10-29 ("more volume and texture detail on the cars and kits, no new reflections"; ?carvol=0|1|2 /
+// RN_CARVOL, 0 = the lines above to the bit). Diffuse path only: it multiplies the diffuse term (f.xyz * dk in the tails) and never
+// touches t0 / a / d1c (the cube, Env and Specular), so no reflection is added. Why the kits look flat: GLOBALB 0x135200 gives the
+// kit materials (DULLPLASTIC, MATTEPLASTIC, BOTTOM, MOLDINGS, SHINYPLASTIC, GRILL, ...) DiffuseRange 0 and DiffuseMin ~1 (read with
+// the 0x40fae0 formulas, build/carlook/carvol/materials.txt), so car.efx's DiffuseMin + (N.V)*DiffuseRange is one number there; the
+// paints have 0.1..1.4. c18/c19 are those constants, so a near-zero range marks a kit surface and takes the full effect, a paint
+// half of it; a zero DiffuseMax (CHROME, mirrors, reflectors) takes none. Two terms: (1) the range the material lacks, a
+// facing-lit ramp on N.V (bright where the surface faces the eye, darker toward the silhouette); (2) panel edges from the mean
+// curvature of the normal field, H = dN.dP / |dP|^2 over the screen derivatives of the normal (t2) and of the car-space position
+// (t3 = eye - position): a concave crease (H < 0, panel gaps, the lip of a vent) darkens, a convex edge catches a little light.
+// Per pixel and per meter, so it does not depend on the camera distance or the screen size.
+static const char *const car_ps_vol_off = "  let volk = vec3f(1.0);\n";
+static const char *const car_ps_vol =
+    "  let vrg = max(u.c[19].x, max(u.c[19].y, u.c[19].z));\n"
+    "  let vmx = max(u.c[18].x + u.c[19].x, max(u.c[18].y + u.c[19].y, u.c[18].z + u.c[19].z));\n"
+    "  let vs = %.2f * mix(0.55, 1.0, 1.0 - smoothstep(0.1, 0.5, vrg)) * smoothstep(0.1, 0.4, vmx);\n"
+    "  let dNx = dpdx(N);\n  let dNy = dpdy(N);\n  let dPx = -dpdx(Vr);\n  let dPy = -dpdy(Vr);\n"
+    "  let hc = (dot(dNx, dPx) + dot(dNy, dPy)) / max(dot(dPx, dPx) + dot(dPy, dPy), 1e-6);\n"
+    "  let vf = (1.0 + 0.35 * vs * (d - 0.55)) * (1.0 - 0.25 * vs * smoothstep(2.0, 10.0, -hc)) * (1.0 + 0.08 * vs * smoothstep(4.0, 14.0, hc));\n"
+    "  let volk = vec3f(mix(1.0, clamp(vf, 0.3, 1.6), %s));\n";
+static const char *const car_ps_flat = "  let dk0 = vec3f(1.0);\n  let rk0 = 1.0;\n";
 static const char *const car_ps_detail =
     "  let pz = u.c[17].z - i.t3.z;\n"
     "  let up = smoothstep(-0.7, 0.5, N.z);\n"
@@ -499,10 +519,18 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
         if (look < 0) { const char *e = getenv("RN_CARLOOK"); look = e ? atoi(e) : 3; }   // 0 and 2003: car.efx, 1: clearcoat, 2: sharp, 3: live
         static int detail = -1;   // RN_CARDETAIL=split: only on the right half of the screen (A/B in one frame)
         if (detail < 0) { const char *e = getenv("RN_CARDETAIL"); detail = !e ? 1 : e[0] == '0' ? 0 : !strcmp(e, "split") ? 2 : 1; }
+        static int vol = -1;   // RN_CARVOL=0 off, 1 (default) the volume terms above, 2 stronger, split / split2: strength 1 / 2 on the right half only (A/B in one frame)
+        if (vol < 0) { const char *e = getenv("RN_CARVOL"); vol = !e ? 1 : e[0] == '0' ? 0 : !strcmp(e, "split") ? 3 : !strcmp(e, "split2") ? 4 : atoi(e) >= 2 ? 2 : 1; }
         emit(&b, "%s%s%s", car_ps_body, look == 1 ? car_ps_clearcoat : look == 2 ? car_ps_sharp : look == 3 ? car_ps_live : car_ps_env,
              detail ? car_ps_detail : car_ps_flat);
-        if (detail == 2) emit(&b, "  let sh = step(%d.0, i.pos.x);\n  let dk = mix(vec3f(1.0), dk0, sh);\n  let rk = mix(1.0, rk0, sh);\n", rn_screen_w / 2);
-        else if (detail) emit(&b, "  let dk = dk0;\n  let rk = rk0;\n");
+        if (vol) {
+            char w[48] = "1.0";
+            if (vol >= 3) snprintf(w, sizeof w, "step(%d.0, i.pos.x)", rn_screen_w / 2);
+            emit(&b, car_ps_vol, vol == 2 || vol == 4 ? 1.7 : 1.0, w);
+        }
+        else emit(&b, "%s", car_ps_vol_off);
+        if (detail == 2) emit(&b, "  let sh = step(%d.0, i.pos.x);\n  let dk = mix(vec3f(1.0), dk0, sh) * volk;\n  let rk = mix(1.0, rk0, sh);\n", rn_screen_w / 2);
+        else emit(&b, "  let dk = dk0 * volk;\n  let rk = rk0;\n");
         emit(&b, "%s", look == 3 ? car_ps_tail_soft : car_ps_tail);
     }
     const Ins *pend = NULL;

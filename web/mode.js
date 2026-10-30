@@ -8,6 +8,7 @@ const RN_ORIGINAL = {
   bloom: '0', fxaa: '0', sharp: 'off', aniso: '1',
   carlook: '2003',    // host/sm1.c: car.efx at the shipped strength
   cardetail: '0',     // host/sm1.c: no AO/grime terms
+  carvol: '0',        // host/sm1.c: no volume / panel-edge terms on the diffuse
   roadrefl: 'game',   // host/sm1.c: the road reflection as worldreflect.efx weights it
 };   // blur: web/tune.js starts the original mode at 'PC original' (shipped blur and flare colour)
 // Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places, night lights, free mode).

@@ -125,6 +125,9 @@ function line(s, cls) {
       // cubed (host/sm1.c); off: the game's own ROADREFLECTION level 1, no mirrored world (PATCH 0x410c1b, host/win32.c). Read at boot.
       const rr = RN_Q.get('roadrefl');
       if (rr !== null) m.ENV.RN_ROADREFL = rr;
+      // ?carvol=0|1|2: the diffuse volume and panel-edge terms (host/sm1.c car_ps_vol); 1 default, 2 stronger, 0 off
+      const cv = RN_Q.get('carvol');
+      if (cv !== null) m.ENV.RN_CARVOL = cv;
       const look = RN_Q.get('carlook');
       if (look !== null) m.ENV.RN_CARLOOK = look;
     }],

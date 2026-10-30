@@ -126,3 +126,9 @@ TYPE V, VORTEX, CRANK, STORM, FRENZY, BLAST, RAGE); 4 headlight and 4 brakelight
    SKIN1 atlas plus static kit textures (CARBOTTOM, INTERCOOLER, GRILL_02, CARBONFIBRE, BADGING, STYLE lights). A baked AO or normal-lit
    overlay can be added there. Constraint: ps_1_1 uses the texture alpha as the reflectivity mask, so any replaced texture must keep its
    alpha, or it adds reflections.
+
+**Applied (2026-10-29): ?carvol=0|1|2 (RN_CARVOL, host/sm1.c car_ps_vol).** Hook 1 turned out to be the diffuse path itself: the kit materials
+(DULLPLASTIC, MATTEPLASTIC, BOTTOM, MOLDINGS, SHINYPLASTIC, GRILL) have DiffuseRange 0 and DiffuseMin ~1 (build/carlook/carvol/materials.txt, GLOBALB
+0x135200 read with the 0x40fae0 formulas), so c18/c19 in the shader mark them. The effect multiplies only the diffuse term (an N.V ramp plus
+crease darkening from dN.dP/|dP|^2); the cube, Env and Specular terms are untouched. Default 1 (subtle, paint luminance within ~3 %), 2 = 1.7x,
+split / split2 = right half only, for an A/B in one frame.
