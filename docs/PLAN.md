@@ -9,6 +9,13 @@ going as the free-tracks/traffic/rivals thread. Branch `publish` is parked.
 OWNER 2026-10-29 (later): touching the Remaster is authorized, and the Remaster is the only focus; the original mode
 matters little (it stays as the A/B reference). RE proposals become Remaster work behind switches (docs/re/proposals.md).
 
+## Now, block 1 (OWNER 2026-10-30): Open World in WORLD
+Traffic off the tour + rivals with personality + WORLD handling = 1001, without changing today's Remaster look.
+Road: raise the exe's road-graph limits (128 sections / 255 entries; loader 0x442dd0/0x442b70) so the game's own AI uses
+the whole-city graph; no host driver. Delete what the new path replaces (no backward compat; Original untouched).
+Closes with numbers (traffic < 150 m, spawn spread p25..p75 > 100 m, RN_BODYLOG A/B, gate60 in WORLD, webcheck --route)
+and the OWNER playing :5180. Later: invisible walls, SELECT LOCATION page. Driver: nfsu-c4.
+
 ## Open world with life (OWNER 2026-10-28)
 The OWNER played WORLD (remaster): invisible walls, no traffic seen, no rivals, "flat, lifeless". Wanted: rivals with
 personality (they bump you, pass close, you can chase them, they crash too), traffic around the player, no invisible
@@ -42,7 +49,7 @@ nearest < 150 m in 124/130 lines, rivals < 400 m in 374/390 samples, so the gaps
 7. Handling in WORLD = 1001 -> verify: RN_BODYLOG A/B (z jitter, heading) on both tracks within noise.
 8. City road graph: DONE 2026-10-28 (v2 f9cad5c, default in build/openworld; the tour net kept as TRACKB1010.tour.lzc). Open: lane
    bytes of flipped sections and type 0 fork rates (re_answers_0b.md from re-nfsu-8b); traffic near < 150 m fell 181/182 -> 120/181
-   (19 cars over the whole city: raise traffic within the 30 entrants?). Then rival personalities (docs/openworld/re_rivals_personality.md).
+   (19 cars over the whole city: raise traffic within the 30 entrants?). Then rival personalities (docs/openworld/re_rival_personality.md).
 
 ## Earlier (OWNER 2026-10-27 late): regressions before the open world
 The OWNER plays and sees: speed blur too strong, traffic glitches (flicker as a car loads, some still invisible, too
