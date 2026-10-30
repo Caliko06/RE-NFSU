@@ -183,6 +183,11 @@ async function startGpu(M, canvas, report, onFrame) {
       const t = performance.now();
       hd.set(name, v); packed++;
       for (const x of res.values()) if (x.key && pack.get(x.key) === name) x.view = v.view;
+      if (PACK_SKIN) for (const op of skinOps.values()) {
+        if (!res.get(op[0])?.skin) continue;   // the id was freed or reused
+        const n = op[2], hit = i => { const x = res.get(i); return x?.key && pack.get(x.key) === name; };
+        for (let i = 0; i < n; i++) if (hit(op[3 + 7 * i]) || hit(op[4 + 7 * i])) { skin(op, 0); break; }
+      }
       hdMs += performance.now() - t;
     }, e => report(`gpu.js: remaster ${name}: ${e.message}`));
   }
@@ -741,6 +746,9 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   const skinLin = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   const skinNear = device.createSampler({ magFilter: 'nearest', minFilter: 'nearest' });
   const skinTmp = new Map();     // size -> [ping, pong]
+  // ?carpack=1|split: the composite of a car's paint and kit layers is built from the layers' HD views (the game's own 512 layers
+  // stay in l.own); a skin remembers its op so it is composed again when an HD layer arrives (docs/re/car_tex_hd.md).
+  const PACK_SKIN = ['1', 'split'].includes(RN_Q.get('carpack')), skinOps = new Map();
   const argb = c => [(c >>> 16) & 255, (c >>> 8) & 255, c & 255, c >>> 24];
   function skin(w, a) {
     const id = w[a], t = res.get(id);     // id read now: w is the frame list, reused by the time a check reports
@@ -764,7 +772,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       device.queue.writeBuffer(g, 0, b); return g;
     };
     const bind = (src, l, m, buf) => device.createBindGroup({ layout: skinPipe.getBindGroupLayout(0), entries: [
-      { binding: 0, resource: src.createView() }, { binding: 1, resource: l.own }, { binding: 2, resource: m.own },
+      { binding: 0, resource: src.createView() }, { binding: 1, resource: check || !PACK_SKIN ? l.own : l.view }, { binding: 2, resource: check || !PACK_SKIN ? m.own : m.view },
       { binding: 3, resource: check ? skinNear : skinLin }, { binding: 4, resource: { buffer: buf } }] });
     e.beginRenderPass({ colorAttachments: [{ view: A.createView(), loadOp: 'clear', storeOp: 'store',
       clearValue: { r: fill[0] / 255, g: fill[1] / 255, b: fill[2] / 255, a: fill[3] / 255 } }] }).end();
@@ -776,6 +784,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       [src, dst] = [dst, src];
     }
     const nm = w[o + 4];
+    if (PACK_SKIN) skinOps.set(id, w.slice(a, o + 5 + 2 * nm));
     step(dst, bind(src, t, t, uni(1, 0, [w[o], w[o + 1], w[o + 2], w[o + 3]], Array.from(w.subarray(o + 5, o + 5 + 2 * nm)))));
     if (check) {
       const bufs = [dst, t.tex].map(x => { const b = device.createBuffer({ size: S * S * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
