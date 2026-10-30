@@ -340,6 +340,7 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
 static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
+    if (a[6] <= 1) rn_player_car(c);
     if (rn_free_now) return free_rival(c, a);                    // host/free.c: free mode's career rivals
     if (!on) { const char *e = getenv("RN_RIVALS"); on = e && e[0] == '0' ? -1 : 1; }
     if (on > 0 && !c->mem[0x78a33c]) {
@@ -388,16 +389,17 @@ static uint32_t rival_ride(Ctx *c) {
 // RN_CAR=<CAR>[:tier[:n]] (?car= on the web): the player's car in every race is the n-th (default 0) persona of that car model
 // (CARS above) built at tier 1..3 (default 2; 3 = kits, wings, vinyls), by the same build/apply as a rival, on the player's ride
 // (entrant table [0x78a418], 0x750 each, +4 kind 1, +0x10 RideInfo) before the race start builds the cars. The look matrix
-// (build/carpack/matrix.sh) needs other cars than the profile's. Called from host/free.c grid_fix (0x422a86, every race).
+// (build/carpack/matrix.sh) needs other cars than the profile's. Called by rival_ride for each race's first opponent (0x4b4321, inside
+// 0x4b4040): the player is registered by then and the skin composite 0x5a8a50 of the cars has not run (a call at the race start, 0x422a86,
+// was too late: the player's body drew black in 6 of 9 cells).
 void rn_player_car(Ctx *c) {
-    static int done;
     const char *e = getenv("RN_CAR");
-    if (!e || done) return;
+    if (!e) return;
     char nm[16] = {0}; int tier = 2, n = 0;
     sscanf(e, "%15[^:]:%d:%d", nm, &tier, &n);
     int car = -1;
     for (int k = 0; k < 20; k++) if (!strcmp(nm, CARS[k])) car = k;
-    if (car < 0 || tier < 1 || tier > 3) { rn_log("RN_CAR: \"%s\" is not CAR[:tier 1..3[:n]]", e); done = 1; return; }
+    if (car < 0 || tier < 1 || tier > 3) { rn_log("RN_CAR: \"%s\" is not CAR[:tier 1..3[:n]]", e); return; }
     uint32_t cnt = ld(c, 0x78a41c, 4), t = ld(c, 0x78a418, 4);
     for (uint32_t i = 0; i < cnt; i++) {
         if (ld(c, t + 0x750 * i + 4, 4) != 1) continue;
@@ -421,14 +423,13 @@ void rn_player_car(Ctx *c) {
         }
         const Persona *pe = NULL;
         for (int j = 0, q = 0; j < POOL && !pe; j++) if (pool[j].car == car && q++ == n) pe = &pool[j];
-        if (!pe) { rn_log("RN_CAR: %s has no persona %d", nm, n); done = 1; return; }
+        if (!pe) { rn_log("RN_CAR: %s has no persona %d", nm, n); return; }
         uint32_t ride = t + 0x750 * i + 0x10, tmp = guest_alloc(RIDE_SIZE);
         memcpy(G(tmp), G(ride), RIDE_SIZE);
         float r0;
         apply(c, ride, tmp, syn[0], "RN_PLAYER", pe, tier, &r0);
         guest_free(tmp);
         rn_log("RN_CAR: player is %s tier %d, persona %s (%s)", nm, tier, pe->name, ARCH[pe->arch].name);
-        done = 1;
         return;
     }
 }

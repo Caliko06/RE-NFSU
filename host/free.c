@@ -807,7 +807,6 @@ static uint32_t grid_fix(Ctx *c) {
     uint32_t a[2] = {(live && nriv > 3) ? ARG(0) : 4, ARG(1)};
     call_guest_cdecl(c, 0x422580, 2, a);
     if (getenv("RN_FREELOG") && !(live && nriv > 3)) {
-    rn_player_car(c);   // RN_CAR (host/rivals.c): before the race start builds the cars
         char b[200]; int o = snprintf(b, sizeof b, "FREE start slots: original %u (live %d)", a[0], live);
         for (uint32_t k = 0; k < a[0] && k < 4; k++) o += snprintf(b + o, sizeof b - o, " %.1f,%.1f", ldf(c, a[1] + 0x20 * k), ldf(c, a[1] + 0x20 * k + 4));
         rn_log("%s", b);

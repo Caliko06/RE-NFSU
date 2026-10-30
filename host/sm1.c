@@ -454,10 +454,10 @@ static const char *const car_ps_vol =
     "  let hc = (dot(dNx, dPx) + dot(dNy, dPy)) / max(dot(dPx, dPx) + dot(dPy, dPy), 1e-6);\n"
     "  let vf = (1.0 + 0.35 * vs * (d - 0.55)) * (1.0 - 0.25 * vs * smoothstep(2.0, 10.0, -hc)) * (1.0 + 0.08 * vs * smoothstep(4.0, 14.0, hc));\n"
     "  let volk0 = vec3f(mix(1.0, clamp(vf, 0.3, 1.6), %s));\n"
-    // carpack: a surface with no range of its own (kit plastics, DiffuseRange 0) gets the facing slope of CARBONFIBER (K = 0.8),
+    // carpack: a surface with no range of its own (kit plastics, DiffuseRange 0) gets the facing slope of CARBONFIBER (K = 0.8, raised to 1.2 after the matrix: kits read flat),
     // pivot at N.V 0.55 so nothing that faces the eye gets darker than car.efx draws it (docs/re/car_kits.md).
     "  let km = (1.0 - smoothstep(0.02, 0.12, vrg)) * smoothstep(0.1, 0.4, vmx) * pkw;\n"
-    "  let volk = volk0 * mix(1.0, (1.0 + 0.8 * d) / (1.0 + 0.8 * 0.55), km);\n";
+    "  let volk = volk0 * mix(1.0, (1.0 + 1.2 * d) / (1.0 + 1.2 * 0.55), km);\n";
 static const char *const car_ps_flat = "  let dk0 = vec3f(1.0);\n  let rk0 = 1.0;\n";
 static const char *const car_ps_detail =
     "  let pz = u.c[17].z - i.t3.z;\n"
@@ -472,7 +472,7 @@ static const char *const car_ps_detail =
 // browns everything under 0.6 m (-0.008). Here the occlusion floor is 0.8 not 0.55 and the grime is a light tint, and the glow the
 // squaring removed is put back as a plain diffuse gain (no pattern, so no veil) that fades out where the pixel is already bright, so the
 // lamps (diffuse near 1) keep their level.
-#define CARPACK_GAIN 0.20
+#define CARPACK_GAIN 0.28
 static const char *const car_ps_detail_pack =
     "  let pz = u.c[17].z - i.t3.z;\n"
     "  let up = smoothstep(-0.7, 0.5, N.z);\n"
