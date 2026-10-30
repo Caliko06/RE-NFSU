@@ -475,6 +475,10 @@ static const char *const car_ps_detail =
 // squaring removed is put back as a plain diffuse gain (no pattern, so no veil) that fades out where the pixel is already bright, so the
 // lamps (diffuse near 1) keep their level.
 #define CARPACK_GAIN 0.28
+// toe lift: a multiplicative gain adds nothing to a dark paint (0.05 * 1.25 = +0.01, matrix 4: black/navy cars identical cp0/cp1), so below a diffuse
+// luminance of 0.2 the paint also rises by up to CARPACK_TOE (hue kept: the colour is scaled by 1 + toe / max(lum, 0.03)); 0 at 0.2, so the
+// blue scene (lum ~0.18) and the lamps do not move.
+#define CARPACK_TOE 0.07
 static const char *const car_ps_detail_pack =
     "  let pz = u.c[17].z - i.t3.z;\n"
     "  let up = smoothstep(-0.7, 0.5, N.z);\n"
@@ -503,7 +507,9 @@ static const char *const car_ps_tail_pack =
     "  let e = clamp(b + d1c.xyz * rk, vec3f(-8.0), vec3f(8.0));\n"
     "  let f = clamp(2.0 * (t1 * d0c), vec4f(-8.0), vec4f(8.0));\n"
     "  let pb0 = clamp(f.xyz * dk, vec3f(0.0), vec3f(1.0));\n"
-    "  let pb = clamp(pb0 * (vec3f(1.0) + pkw * %.2f * (vec3f(1.0) - pb0) * (vec3f(1.0) - pb0)), vec3f(0.0), vec3f(1.0));\n"
+    "  let pl = dot(pb0, vec3f(0.3, 0.59, 0.11));\n"
+    "  let tw = max(1.0 - pl / 0.2, 0.0);\n"
+    "  let pb = clamp(pb0 * (vec3f(1.0) + pkw * %.2f * (vec3f(1.0) - pb0) * (vec3f(1.0) - pb0)) * (1.0 + pkw * %.2f * tw * tw / max(pl, 0.03)), vec3f(0.0), vec3f(1.0));\n"
     "  let rf = 1.0 - exp(-max(e * f.w, vec3f(0.0)));\n"
     "  r0 = vec4f(pb + rf * (1.0 - pb), f.w);\n";
 
@@ -564,7 +570,7 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
         else emit(&b, "%s", car_ps_vol_off);
         if (detail == 2) emit(&b, "  let sh = step(%d.0, i.pos.x);\n  let dk = mix(vec3f(1.0), dk0, sh) * volk;\n  let rk = mix(1.0, rk0, sh);\n", rn_screen_w / 2);
         else emit(&b, "  let dk = dk0 * volk;\n  let rk = rk0;\n");
-        if (pack) emit(&b, car_ps_tail_pack, CARPACK_GAIN);
+        if (pack) emit(&b, car_ps_tail_pack, CARPACK_GAIN, CARPACK_TOE);
         else emit(&b, "%s", look == 3 ? car_ps_tail_soft : car_ps_tail);
     }
     const Ins *pend = NULL;
