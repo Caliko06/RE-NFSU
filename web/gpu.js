@@ -221,8 +221,14 @@ async function startGpu(M, canvas, report, onFrame) {
   // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
   const FXAA_MODE = RN_Q.get('fxaa');   // '0' off, '2' debug: edges in red
   const FXAA_ON = FXAA_MODE !== '0';
+  // BRIDGE: remaster colour grade, not in the original (the game has no tonemap or grade; SetGammaRamp is kept, never applied,
+  // host/d3d9.c). It shares the FXAA pass (no extra pass), after bloom and before the HUD, so the HUD keeps its colours. Gamma-space
+  // S curve around 0.25: black and white stay fixed and the curve itself clips nothing, the road's dry mid-greys barely move; then
+  // saturation, less on what is already vivid so neon clips little. ?grade=0 turns it off. With ?msaa=4 no pass runs, like FXAA.
+  const GRADE_ON = RN_Q.get('grade') !== '0';
   const fxaaMod = device.createShaderModule({ code: `
 const DBG = ${FXAA_MODE === '2' ? 1 : 0};
+const GRADE = ${GRADE_ON ? 1 : 0};
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
 @vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
@@ -230,9 +236,19 @@ const DBG = ${FXAA_MODE === '2' ? 1 : 0};
   return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
 }
 fn lum(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
+fn grade(c: vec4f) -> vec4f {
+  if (GRADE == 0) { return c; }
+  let s = c.rgb + 0.6 * c.rgb * (1.0 - c.rgb) * (c.rgb - 0.25);
+  let vivid = max(s.r, max(s.g, s.b)) - min(s.r, min(s.g, s.b));
+  return vec4f(clamp(mix(vec3f(lum(s)), s, 1.0 + 0.18 * (1.0 - vivid)), vec3f(0.0), vec3f(1.0)), c.a);
+}
+@fragment fn gradeOnly(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  return grade(textureSampleLevel(src, smp, pos.xy / vec2f(textureDimensions(src)), 0.0));
+}
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f { return grade(fxaa(pos)); }
 fn L(uv: vec2f) -> f32 { return lum(textureSampleLevel(src, smp, uv, 0.0).rgb); }
 const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
-@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+fn fxaa(pos: vec4f) -> vec4f {
   let rcp = 1.0 / vec2f(textureDimensions(src));
   let uv0 = pos.xy * rcp;
   let m4 = textureSampleLevel(src, smp, uv0, 0.0);
@@ -299,7 +315,7 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
   return vec4f(textureSampleLevel(src, smp, uv, 0.0).rgb, m4.a);
 }` });
   const fxaaPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: fxaaMod, entryPoint: 'vs' },
-    fragment: { module: fxaaMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+    fragment: { module: fxaaMod, entryPoint: FXAA_ON ? 'fs' : 'gradeOnly', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
   const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   let fxaaTmp = null;
   // BRIDGE: remaster, the last step of a frame. The back buffer is at most 2560 wide (web/index.html), so on the OWNER's
@@ -1116,7 +1132,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
         if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
-        if (FXAA_ON && rt && !rt.depth && !rt.msView) {
+        if ((FXAA_ON || GRADE_ON) && rt && !rt.depth && !rt.msView) {
           if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
             doom(fxaaTmp);
             fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
