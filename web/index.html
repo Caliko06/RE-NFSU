@@ -108,6 +108,8 @@ function line(s, cls) {
       if (RN_Q.get('rivalai') === '0') m.ENV.RN_RIVALAI = '0';
       // ?trafyield=0: traffic does not move aside for the player closing from behind (host/rivals.c traffic_tick)
       if (RN_Q.get('trafyield') === '0') m.ENV.RN_TRAFYIELD = '0';
+      // ?jumpcam=0: Free Run / WORLD keep the chase camera on jumps (host/free.c free_jumpcam); default: the game's jump shots as in a race
+      if (RN_Q.get('jumpcam') === '0') m.ENV.RN_JUMPCAM = '0';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;
