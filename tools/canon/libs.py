@@ -42,9 +42,17 @@ def code_callers_(x):
     return [c for c in F.get(x, {}).get("callers", []) if not c.startswith("d")]
 
 
+# methods of one vtable are one class, so one system; the constructors that write it are the class's own code too
+VT = {}
+for v in map(json.loads, (l for l in open("census/canon/data.jsonl") if '"vtable"' in l)):
+    mates = [canon.a(s) for s in v["slots"].split(",")] + [canon.a(u) for u in v.get("users", [])]
+    for s in mates:
+        VT.setdefault(s, set()).update(mates)
+
+
 def nbrs(x):
     j = F.get(x, {})
-    out = [canon.a(c) for c in j.get("callers", []) + j.get("callees", []) if not c.startswith("d")]
+    out = [canon.a(c) for c in j.get("callers", []) + j.get("callees", []) if not c.startswith("d")] + list(VT.get(x, ()))
     return [y for y in out if region(y) == region(x) and y != x]
 
 
@@ -97,11 +105,19 @@ if "--check" in sys.argv:
     sys.exit()
 
 tag = closure(seed)
+# what the graph cannot reach (no code callers: pointers in data) takes the system of both address neighbours when
+# they agree, since one object file links its functions together (on known functions 1360/1391); one pass, no chaining
+xs = sorted(x for x in L if region(x))
+adj = {x for p, x, n in zip(xs, xs[1:], xs[2:]) if x not in tag and region(p) == region(x) == region(n)
+       and p in tag and tag[p] == tag.get(n)}
+for x in adj:
+    tag[x] = tag[xs[xs.index(x) - 1]]
 new = {x: s for x, s in tag.items() if not solid(x)}
 with open("census/canon/systems_lib.tsv", "w") as o:
     o.write("addr\tsystem\tevidence\n")
     for x in sorted(new):
-        why = "seed: DirtySock string or WS2/TAPI import" if x in seed else "region closure over call-graph neighbours"
+        why = ("seed: DirtySock string or WS2/TAPI import" if x in seed else "both address neighbours agree" if x in adj
+               else "region closure over call-graph and vtable neighbours")
         o.write(f"{x:#x}\t{new[x]}\tI: {region(x)[2]}; {why}\n")
 fid = []
 for x in sorted(L):
