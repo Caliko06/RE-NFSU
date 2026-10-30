@@ -423,6 +423,54 @@ static uint32_t rival_ride(Ctx *c) {
     return call_guest(c, 0x5809c0, 7, a);
 }
 
+// RN_AILOG=1: test-only race log (tools/ailog.py sums it up). Every 60 frames, each racer: name, kind, route metres car+0x814, speed car+0x3d0,
+// rank (record +0xa), mean |slip angle| in degrees; at once, each change of a racer's action type [[drv+0x3f8]+0x1f8] and each nitro start (CarState car+0x40, +0x3bc, 0x4654f0).
+static void ai_log(Ctx *c) {
+    static int on = -1;
+    static struct { uint32_t car, act, nos, n; float slip; } st_[16];
+    if (on < 0) on = getenv("RN_AILOG") != NULL;
+    if (!on || ld(c, 0x77a920, 4) != 6) return;
+    static uint32_t draft;                // racer-seconds in the game's slipstream: car+0x47c (0x426450) above 0.1
+    uint32_t h = ld(c, 0x7361f8, 4), sec = rn_telem.presents % 60 == 0;
+    char b[640];
+    int n = 0, i = 0;
+    for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && i < 16; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4), kind = e ? ld(c, e + 4, 4) : 0, v = ld(c, r + 0x2c, 4), rec = ld(c, r + 0x1c, 4);
+        if (kind != 1 && kind != 2) continue;
+        uint32_t a = v ? ld(c, v + 0x3f8, 4) : 0, type = a ? ld(c, a + 0x1f8, 4) : 99, nos = ld(c, r + 0x3fc, 4);
+        if (st_[i].car == r && st_[i].act != type) rn_log("AIEV %u %s act %u", rn_telem.presents, G(e + 0x73c), type);
+        if (st_[i].car == r && st_[i].nos != nos && nos && nos != 0x7fffffff) rn_log("AIEV %u %s nos", rn_telem.presents, G(e + 0x73c));
+        st_[i].car = r, st_[i].act = type, st_[i].nos = nos;
+        draft += sec && ldf(c, r + 0x47c) > 0.1f;
+        if (rn_telem.presents % 6 == 0 && ldf(c, r + 0x3d0) > 10) {   // slip angle: 0x464ed0 (esi = CarState, radians on the FPU), as 0x479350 reads it
+            uint32_t esi = c->r[ESI], ft = c->ftop;
+            c->r[ESI] = r + 0x40, call_guest(c, 0x464ed0, 0, NULL), c->r[ESI] = esi;
+            double a2 = c->st[c->ftop];
+            fpop(c), c->ftop = ft;
+            st_[i].slip += (float)fabs(a2) * 57.296f, st_[i].n++;
+        }
+        if (sec && n < 560) {
+            n += snprintf(b + n, sizeof b - n, " %s:%u:%.0f:%.1f:%d:%.1f", kind == 1 ? "ME" : G(e + 0x73c), kind, ldf(c, r + 0x814), ldf(c, r + 0x3d0), rec ? c->mem[rec + 0xa] : -1, st_[i].n ? st_[i].slip / st_[i].n : 0);
+            st_[i].slip = 0, st_[i].n = 0;
+        }
+        i++;
+    }
+    if (n) rn_log("AILOG %u draft %u%s", rn_telem.presents, draft, b);
+}
+
+// Handling (RN_HANDLING=0 / ?handling=0: as shipped; docs/re/physics.md). The OWNER's "rigid": outside drift events 0x4774a0 gives the rear wheels extra grip as the
+// slip angle grows (0x4773f0: min(0.35, 2.5 * v/30 * slip), V from all 35 cars' physics +0x284), so at 30 m/s the cap holds from 4 degrees on and the tail will not step out.
+// Cap 0x6ffdd4 (.data, its only reader 0x477473..) goes to HANDLING_REAR, for every car. Yaw damping 0x479350 runs in drift events only: not touched.
+#define HANDLING_REAR 0.18f
+static void handling_data(Ctx *c) {
+    static int done;
+    if (done++) return;
+    const char *e = getenv("RN_HANDLING");
+    if (e && e[0] == '0') return;
+    float rear = HANDLING_REAR;
+    memcpy(G(0x6ffdd4), &rear, 4);
+}
+
 // Traffic that reacts (RN_TRAFYIELD=0 / ?trafyield=0: as shipped; docs/openworld/re_traffic_rivals.md). Traffic only ever looks ahead: its
 // finder 0x453920 takes the nearest car ahead in its lane, so a player closing from behind is never seen and hits the car square on.
 // Now a traffic car with the player in its neighbour list (0x57a910), same lane, 0.6..2.5 s from impact, takes a free neighbour lane
@@ -433,6 +481,8 @@ void traffic_tick(Ctx *c) {
     static int off = -1, n_yield;
     static uint32_t act, seed = 0x51ed2701;
     static struct { uint32_t car, frame; } seen[32];
+    ai_log(c);
+    handling_data(c);
     if (off < 0) { const char *e = getenv("RN_TRAFYIELD"); off = e && e[0] == '0'; }
     if (off || rn_telem.presents % 6 || ld(c, 0x77a920, 4) != 6 || c->mem[0x78a33c]) return;
     uint32_t h = ld(c, 0x7361f8, 4), me = 0;

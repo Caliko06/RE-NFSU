@@ -110,6 +110,8 @@ function line(s, cls) {
       if (RN_Q.get('trafyield') === '0') m.ENV.RN_TRAFYIELD = '0';
       // ?jumpcam=0: Free Run / WORLD keep the chase camera on jumps (host/free.c free_jumpcam); default: the game's jump shots as in a race
       if (RN_Q.get('jumpcam') === '0') m.ENV.RN_JUMPCAM = '0';
+      // ?handling=0: the shipped rear grip assist (host/rivals.c)
+      if (RN_Q.get('handling') === '0') m.ENV.RN_HANDLING = '0';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;

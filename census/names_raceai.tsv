@@ -1,0 +1,55 @@
+addr	name	system	confidence	evidence	tool	doc
+0x44d8b0	RaceGoal::SelectAction	raceai	V	V: goal-1 selector cascade GetUnstuck 500, 0x13 600, IJustGotHit 400, AvoidCross 400, Avoid 300, Accident 500, Block table 0x77a340[8*aggr], Pass 200, else goal vt[6] JustDrive; read in named decomp	Ghidra	docs/re/race_ai.md
+0x4624d0	Racer::MakeAction (vt 0x6c89f0 slot 0x84)	raceai	V	V: switch on type: 0x14 asks goal selector, 4 builds Draft (ctor 0x450400 prio 100), 7 JustDrive, 9 0x451400, 10 GetUnstuck, 0xe Accident, 0x11 0x453730, default 0x451400	Ghidra	docs/re/race_ai.md
+0x44bbd0	Racer::RunAction (vt slot 0x88)	raceai	V	V: calls action vt[2] update; if byte [action+0x1e0]==0 deletes the action and calls vt[0x84](type 4) at 0x44bc11 = the ONLY caller that asks for Draft (scan of all call [reg+0x84])	capstone+Ghidra	docs/re/race_ai.md
+0x44bc30	Racer::PollSelector	raceai	I	I: asks vt[0x84] type 0x14; keeps the new action only if its priority [+0x1f4] is strictly above the current one (asm 0x44bc6a cmp/jg)	capstone	docs/re/race_ai.md
+0x44a0e0	Action::IsExpired	raceai	V	V: true when action state [+0x10] is 1, 2 or 3 with timer flag [+4]; duration -1 never expires	Ghidra	docs/re/race_ai.md
+0x450400	AIActionDraft::ctor	raceai	V	V: 0x44e2b0(type 4, prio, dur), vtable 0x6c9144; only build site 0x4625a3 with ecx=0x64 (prio 100), dur -1.0	Ghidra+capstone	docs/re/race_ai.md
+0x450480	AIActionDraft::Update	raceai	V	V: lane state 1 + 0x45ae10; looks at slot own-1 (nearest car ahead); if driver kind 1 or 2, lateral overlap, gap<6 (0x6b7628): speed target = lead speed - (20 - gap) (0x6b7620), only if below [+0x1e4]; sets +0x1f0=0 then. A brake, never a gain	Ghidra	docs/re/race_ai.md
+0x450660	AIActionPass::ctor	raceai	V	V: type 0, vtable 0x6c9234, target at +0x200 (ctor arg3), start time +0x208; selector passes prio 200, dur 5.0 (0x6b75ac)	Ghidra	docs/re/race_ai.md
+0x450730	AIActionPass::Finder	raceai	V	V: race clock [[0x73619c]+4] older than 5.0 s (0x6cc954); loops slots 0..own-1 (ahead, farthest first), gap>0, |lat|<2*gap, reach test 0x4569b0, plan 0x45bae0, eligible 0x450b40; first hit returns 200	Ghidra	docs/re/race_ai.md
+0x450bb0	AIActionPass::Update	raceai	V	V: target found: if target not ahead (gap<=0) state 1; else 0x45bae0 path to pass, and if |rel speed|<=5 calls 0x44f6c0 (nitro flag). Target missing from list: lane drive and [+0x1e0]=0 (store at 0x450c33) so Draft follows	Ghidra	docs/re/race_ai.md
+0x450b40	Pass::TargetEligible	raceai	V	V: traffic target ok; target speed >= 20 m/s (0x700674) needs route state 1 or planner flag	Ghidra	docs/re/race_ai.md
+0x4569b0	AI::CanReachTarget	raceai	I	I: gap < 3.0*(1.5*S + relspeed) with S from own velocity and 0x57a5f0; uses 0x456830 when relspeed<0	Ghidra	docs/re/race_ai.md
+0x456830	AI::PredictSpeedGain	raceai	V	V: divides speed by car+0x404 and uses (1-car+0x47c)*drag term; reader of car+0x404 and 0x47c	Ghidra	docs/re/race_ai.md
+0x45bae0	Path::PlanPassSide	raceai	V	V: tries states current, 1, then side states 2/3 in the order given by 0x45c0d0, each checked by 0x45b050 over 2.0 s (0x7006ec) and 0x45b9f0; fallback state 1	Ghidra	docs/re/race_ai.md
+0x45c0d0	Path::PickPassSide	raceai	I	I: returns 1,2,3 from lateral values of target and self, road edge 0x20/0x3c and widths; Pass takes the other side with state 2 or 3	Ghidra	docs/re/race_ai.md
+0x44f6c0	Action::SetNitroFlag	raceai	V	V: [action+0x1f3]=0; if driver kind==2 and racer vt[0x78]=0x462b30 true then 1; callers 0x450caf (Pass update), 0x45295f (0x452800), 0x452ffb (AvoidCross update 0x452d20); JustDrive 0x4501a0 sets the same byte	Ghidra+capstone	docs/re/race_ai.md
+0x450e20	AIActionBlock::ctor	raceai	V	V: type 5, vtable 0x6c9284, target = driver object at +0x200	Ghidra	docs/re/race_ai.md
+0x450ec0	AIActionBlock::Finder	raceai	V	V: not in start window 0x435ca0; scans slots after own (behind); first car kind 6 with driver flag +0x1c!=0 and speed>=10 (0x6b7648) decides; bumper gap<0, >-50 (0x6b7644), rel speed>-5 (0x6b7640); non-human needs |gap/rel|<=2.0 s (0x6b7638); human within 35 m (0x6b763c) needs no closing; returns 0x77a340[8*aggr]	Ghidra	docs/re/race_ai.md
+0x451230	AIActionBlock::Update	raceai	V	V: aim line at the follower lateral (slot lane value by route state) via 0x45c370, blend from LinearTable 0x7061f4 of gap/rel speed when follower is >=10 m ahead (0x6b764c) else 1.0; speed target = goal cruise vt[0x5c]	Ghidra	docs/re/race_ai.md
+0x45c370	Path::ExtendLine	raceai	V	V: appends future points to the racer line toward lateral target param5 with blend param6 and step 0x45c640 clamped to road edges	Ghidra	docs/re/race_ai.md
+0x44f750	AIActionAvoid::ctor	raceai	I	I: selector call 0x44db68 passes prio from finder (300) and the side, TTC, flag; body not read	Ghidra	docs/re/race_ai.md
+0x44f8a0	AIActionAvoid::Finder	raceai	V	V: 0x457590 nearest car by time to collision < 2.0 s (0x7006ec) returns 300; or keeps the same car while route state 2..3 and TTC < 2+0x6b760c	Ghidra	docs/re/race_ai.md
+0x44fb30	AIActionAvoid::Update	raceai	V	V: picks route state 2 or 3 (0x45b9f0), plans 0x45b150 over 2.0 s; not clear and speed<=20 (0x6b7610) falls back to state 1 lane; vs a human uses race-start rule 0x435ca0	Ghidra	docs/re/race_ai.md
+0x4521c0	AIActionIJustGotHit::ctor	raceai	V	V: type 0xc, vtable 0x6c90cc, culprit slot car at +0x200; selector prio 400 (asm 0x44da19)	Ghidra+capstone	docs/re/race_ai.md
+0x44ed70	IJustGotHit::Finder	raceai	V	V: walks car contact records [car+0x3c], record+0x60>=param, other car must be a racer (driver flag +0x1c) when param3; prefers a human culprit	Ghidra	docs/re/race_ai.md
+0x4522a0	AIActionIJustGotHit::Update	raceai	V	V: backs off: speed target from culprit speed via 0x44e850 (-6 or -0.1) or 0x44e950 (coast, 0.2); hits by a human when I am ahead of him by more than 2.8 m (0x6b76a8); min speed 20 (0x6b76ac) if 1f0==0. No revenge code	Ghidra	docs/re/race_ai.md
+0x44e850	Action::FollowSpeedMinus	raceai	V	V: [+0x1e4]=culprit speed - param, floor 0; [+0x1e8] = gap/rel speed	Ghidra	docs/re/race_ai.md
+0x44e950	Action::CoastSpeed	raceai	V	V: [+0x1e4] = own speed - drag/power term * param	Ghidra	docs/re/race_ai.md
+0x44e9c0	AI::PathClearTest	raceai	I	I: returns 1 when own predicted box is clear of the path edges, 2 behind, 0 blocked	Ghidra	docs/re/race_ai.md
+0x452570	AIActionAccidentRecovery::ctor	raceai	I	I: type 0xe vtable 0x6c934c, stores now at +0x200; selector 0x44dbae, request case 0xe	capstone	docs/re/race_ai.md
+0x452630	AccidentRecovery::Finder	raceai	V	V: car state [+0x3cc]<2 and a speed/upright term <= 0x6b76b0 returns 500	Ghidra	docs/re/race_ai.md
+0x452710	AIActionAccidentRecovery::Update	raceai	V	V: state 1, speed 0, flag +0x1f1=0; after 0x6b76b4 s sets car+0x87c=1 once	Ghidra	docs/re/race_ai.md
+0x4519f0	AIActionGetUnstuck::ctor	raceai	V	V: type 0xa vtable 0x6c916c; selector duration from racer vt[0x70]=0x462ae0, cooldown stamp [racer+0x408]	Ghidra	docs/re/race_ai.md
+0x451b00	GetUnstuck::Finder	raceai	V	V: not in start window; ctx[0xe3]!=0; stuck by path-side test or by contact timer (0x6b7680) and speed < 0x6b7684; returns 500	Ghidra	docs/re/race_ai.md
+0x452070	AIActionGetUnstuck::Update	raceai	V	V: state 1, speed target 0x6b7674/0x6b7678 (-15/-6, reverse), if ctx[0xe3]==0 sets [+0x1e0]=0 (store 0x452181) so Draft follows	Ghidra	docs/re/race_ai.md
+0x462aa0	Racer::GetUnstuckReady (vt 0x6c)	raceai	V	V: now - [racer+0x408] > 6.0 s (0x6b7358)	Ghidra	docs/re/race_ai.md
+0x462740	Racer::PassAvoidDraw (vt 0x74)	raceai	V	V: 1.0 s lock per target (0x6b734c); rand01 < level record +0xc (0x77a004) allows; all records hold 1.0 per docs/re/rivals.md	Ghidra	docs/re/race_ai.md
+0x462b30	Racer::NitroRule (vt 0x78)	raceai	V	V: not in drag: cooldown since last shot > rec+0x34 (35 s skill0 to 17) or rec+0x38 on last lap, 0 in final stretch; burst cap rec+0x40; fires if speed < 0.8*route speed (0x6b7368) or 0x456fe0; ends with 0x44cac0	Ghidra	docs/re/race_ai.md
+0x44cac0	Racer::HasNitro	raceai	V	V: car state [+0x3cc]==4, not in contact, nitro count [car+0x3d8] >= [0x700784]=2 (street) or rec byte 0x77a049+1 (drag), and 0x44cb90 false	Ghidra	docs/re/race_ai.md
+0x44c550	RacerAI::UpdateDesiredSpeed	raceai	V	V: speed = route byte * rec+0x14 (0x77a00c) * racer+0x4b8 (asm 0x44c731) only when action +0x1f0 !=0, else action [+0x1e4]; capped by goal vt[0x10]; nitro flag +0x1f3 starts boost	Ghidra+capstone	docs/re/race_ai.md
+0x44bd10	RacerAI::UpdateRubberBand	raceai	V	V: every [0x77a49c] s; car+0x404 = max(scale,1.0) at 0x44bff5, racer+0x4b8 = raw scale at 0x44bffe; early returns write nothing	Ghidra+capstone	docs/re/race_ai.md
+0x44c010	RacerAI::GetCatchUpTerms	raceai	V	V: out1 and out2 from curves 0x779c78/0x779dd8 and 0x779f38/0x779f78 by skill; needs [0x78a400]!=0	Ghidra	docs/re/race_ai.md
+0x45ae10	Path::FollowRoute	raceai	I	I: lane/route driver filling action line at act+0x20, called by Draft, Pass, GetUnstuck, JustDrive with route state	Ghidra	docs/re/race_ai.md
+0x458f10	Path::ClearLine	raceai	I	I: called with (0,0) at start of ctor and updates; resets the action line	Ghidra	docs/re/race_ai.md
+0x45b150	Path::PlanAvoid	raceai	I	I: plans a side-step path for Avoid over 2.0 s, sets clear flag at act+0x218	Ghidra	docs/re/race_ai.md
+0x45c760	Path::BlockOrYield	raceai	I	I: builds lateral target from other car lane values plus width; used for forced line near a car	Ghidra	docs/re/race_ai.md
+0x57a910	AI::BuildNeighbourList	raceai	V	V: up to 16 cars, 0x38-byte slots, key=(along diff)^2+(lat diff)^2, behind cars key*-1, bubble sort descending: index 0 farthest ahead, own-1 nearest ahead, own+1 nearest behind; own index byte ctx+0x388	Ghidra	docs/re/race_ai.md
+0x44b1b0	Racer::Update	raceai	V	V: runs goal selector poll 0x44bc30, RunAction slot 0x88, UpdateDesiredSpeed; nitro stop/start via vt[0x78], 0x44cac0	Ghidra	docs/re/race_ai.md
+0x426450	Car::SlipstreamFactor	raceai	V	V: sum of 0x426300(other,self) over the world car list [0x7361f8], capped 0.9 (0x6b7b54); written to car+0x47c by 0x420b40 each step	Ghidra+capstone	docs/re/race_ai.md
+0x426300	Car::SlipstreamPair	raceai	V	V: other speed >= 1 (0x706288), distance <= 60 (0x70629c), cos to heading >= 0.95 (0x6b7b50), reach from speed table 0x7062b4, factor from table 0x700d3c (1,.9,.75,.55,.3,0)	Ghidra+capstone	docs/re/race_ai.md
+0x420b40	World::Step	raceai	V	V: three loops write car+0x47c = 0x426450() for every car then call car vt[3] step	Ghidra	docs/re/race_ai.md
+0x479160	Physics::SetCarScale	raceai	V	V: car+0x404 into physics +0x1e8, [ph+0x50]+8; (1-car+0x47c) into [ph+0x50]+0xc; 0x474d40 does the same on the other path	Ghidra	docs/re/race_ai.md
+0x429b10	Racer::UpdateTwoHumanCatchUp	raceai	V	V: writes car+0x404 for the human behind in a two-human race (0x429b8b)	Ghidra	docs/re/race_ai.md
+0x4338c0	Racer::UpdateStats	raceai	I	I: reads car+0x404 (clamped >=1) to divide the top speed stat of AI racers	Ghidra	docs/re/race_ai.md
