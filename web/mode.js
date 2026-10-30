@@ -11,6 +11,7 @@ const RN_ORIGINAL = {
   carvol: '0',        // host/sm1.c: no volume / panel-edge terms on the diffuse
   carpack: '0',       // host/sm1.c, host/lights.c, web/gpu.js: no car look pack (paint gain, HD layer skins, held lamps)
   speedfov: '0',      // web/tune.js, host/d3d9.c: the chase camera's FOV stays at the shipped 71.5 deg
+  chasecam: '0',      // web/tune.js, host/d3d9.c: the chase camera keeps the car's shipped distance and height rows
   roadrefl: 'game',   // host/sm1.c: the road reflection as worldreflect.efx weights it
 };   // blur: web/tune.js starts the original mode at 'PC original' (shipped blur and flare colour)
 // Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places, night lights, free mode).
