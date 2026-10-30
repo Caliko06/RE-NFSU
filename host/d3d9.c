@@ -831,7 +831,7 @@ static void census_dump(void) {
 // TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
 // at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
 // seq; Present copies them into the game's .data when seq changed.
-static uint32_t tune[9];      // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch, the nitro-camera switch
+static uint32_t tune[10];      // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch, the nitro-camera switch, the shadow-map size (0 = off)
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -936,6 +936,47 @@ static void chase_frame(Ctx *c) {
         stf(c, rows[s][k] + 4, orig[s][k][0] * kb); stf(c, rows[s][k] + 8, orig[s][k][1] * kl);
     }
     if (!on && !non && sm == 0 && nsm == 0) info = 0;
+}
+// Real shadows (web/gpu.js shadows, ?shadows=; docs/re/shadows.md). Sent with GPU_FXAA after the psblur and AO words (words 10..49): out[0..15] = the player's view matrix,
+// out[16..31] = its projection (the camera block [0x7404c0], D3D row vectors: clip = v * View * Proj), out[32..34] = the direction the light travels
+// (the game's own light, worked out here as 0x56d700 does; the vector it writes to 0x73c670.. is this one scaled: a point h metres above the ground lands at p + D * (-h / D.z)),
+// out[35..37] = the player's car, out[38] = 1 when all of it is valid. The decal the game draws itself (0x56e493 gate, SCREEN_ADDR+0x98 as the
+// SHADOW level) is switched off while the page shadows are on; RN_SHADOWLOG=1 logs the vector and the sun record.
+static void shadow_gate(Ctx *c) { st(c, SCREEN_ADDR + 0x98, __atomic_load_n(&tune[9], __ATOMIC_RELAXED) ? 0 : ld(c, 0x700e7c, 4), 4); }
+static void shadow_data(Ctx *c, uint32_t *out) {
+    static int lg = -1, last = -1;
+    if (lg < 0) lg = getenv("RN_SHADOWLOG") != NULL;
+    memset(out, 0, 40 * 4);
+    uint32_t res = __atomic_load_n(&tune[9], __ATOMIC_RELAXED);
+    if ((int)res != last) { last = (int)res; rn_log("SHADOW map %u (0 = the game's decal)", res); }
+    if (!res) return;
+    uint32_t blk = ld(c, 0x7404c0, 4), h = ld(c, 0x7361f8, 4), pn = 0;
+    if (!blk || blk >= GUEST_MEM - 0x80 || !h || h >= GUEST_MEM - 0x1000) return;
+    for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && r < GUEST_MEM - 0x1000 && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (e && e < GUEST_MEM - 16 && ld(c, e + 4, 4) == 1) { pn = r; break; }
+    }
+    // The game's own light (0x56d700, run only while its decal is on): sun record [0x735518] position +0x2c.. (default -16384, 0, 7000), the vector from the
+    // sun to the car, elevation atan2(-z, horizontal) never below 0x1a90 (37.35 degrees, 65536 = 360); D = (cos el * horizontal unit, -sin el).
+    uint32_t sun = ld(c, 0x735518, 4);
+    float sp[3] = {-16384, 0, 7000}, d[3] = {0, 0, 0};
+    if (sun && sun < GUEST_MEM - 0x40) for (int k = 0; k < 3; k++) sp[k] = ldf(c, sun + 0x2c + 4 * k);
+    if (pn) {
+        float v[3];
+        for (int k = 0; k < 3; k++) v[k] = ldf(c, pn + 0x60 + 4 * k) - sp[k];
+        float hz = hypotf(v[0], v[1]), el = atan2f(-v[2], hz), lo = 0x1a90 * 6.2831853f / 65536;
+        if (el < lo) el = lo;
+        if (hz > 1e-3f) { d[0] = v[0] / hz * cosf(el); d[1] = v[1] / hz * cosf(el); d[2] = -sinf(el); }
+    }
+    if (lg && dev.frames % 120 == 0)
+        rn_log("SHADOW f%u D %.4f %.4f %.4f car %08x sun %08x (%.0f %.0f %.0f)", (unsigned)dev.frames, d[0], d[1], d[2], pn, sun, sp[0], sp[1], sp[2]);
+    if (!pn || (d[0] == 0 && d[1] == 0 && d[2] == 0)) return;
+    float m[32];
+    for (int k = 0; k < 32; k++) m[k] = ldf(c, blk + 4 * k);
+    memcpy(out, m, sizeof m);
+    memcpy(out + 32, d, sizeof d);
+    for (int k = 0; k < 3; k++) { float v = ldf(c, pn + 0x60 + 4 * k); memcpy(out + 35 + k, &v, 4); }
+    float one = 1; memcpy(out + 38, &one, 4);
 }
 // PS2-style depth speed blur (web/gpu.js psblur): out[0..2] = the view-1 camera's velocity [0x740500]+0x1e0 (camera 0x78d270; what the game's own blur 0x40cd40
 // reads) in camera space, normalised, out[3] = its length (m/s); float bits, 0 when there is no camera. out[4] = nitrous on ([0x73654c],
@@ -1095,6 +1136,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     tune_apply(c);
     fov_frame(c);
     chase_frame(c);
+    shadow_gate(c);
     rng_log(c, dev.frames);
     flow_log(c);
     free_tick(c);
@@ -1788,7 +1830,7 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     char *wgsl = sm1_wgsl(sm, mode);
     uint32_t m = (uint32_t)strlen(wgsl), nw = 21 + n + (m + 4) / 4;
     uint32_t *w = calloc(nw, 4);
-    w[0] = idx(o) + 1; w[1] = iface == I_PS; w[2] = n; w[3] = m;
+    w[0] = idx(o) + 1; w[1] = (iface == I_PS) | (mode == SM1_CAR_VS ? 2 : 0); w[2] = n; w[3] = m;
     for (int k = 0; k < 16; k++) if (sm->inputs >> k & 1) w[4 + k] = 1u << 31 | (uint32_t)sm->in_usage[k] << 8 | sm->in_index[k];
     w[20] = sm->tex_used;
     memcpy(w + 21, o->blob, 4u * n);
@@ -2050,6 +2092,11 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     TR("draw %u x%u vs %u ps %u decl %u tex %u %u %u %u blend %u %u/%u atest %u z %u/%u cull %u fog %u", type, count,
        dev.vs, dev.ps, dev.decl, dev.tex[0], dev.tex[1], dev.tex[2], dev.tex[3], dev.rs[27], dev.rs[19], dev.rs[20],
        dev.rs[15], dev.rs[7], dev.rs[14], dev.rs[22], dev.rs[28]);
+    static int dlog = -1;   // RN_DRAWLOG=<n>: every draw of each n-th frame (state summary), to find a draw family (the car shadow decal, docs/re/shadows.md)
+    if (dlog < 0) { const char *e = getenv("RN_DRAWLOG"); dlog = e ? atoi(e) : 0; }
+    if (dlog > 0 && dev.frames % dlog == 0)
+        rn_log("DRAW f%u type %u n %u nv %u stride %u vs %u ps %u tex %u %u blend %u %u/%u z %u/%u cull %u rt %u", (unsigned)dev.frames, type, count,
+               nvert, stride, dev.vs, dev.ps, dev.tex[0], dev.tex[1], dev.rs[27], dev.rs[19], dev.rs[20], dev.rs[7], dev.rs[14], dev.rs[22], dev.rt[0]);
     Obj *vs = obj_k(dev.vs), *ps = obj_k(dev.ps);
     if (!draw_supported(c, ps ? ps->sm : NULL)) return;
     roadrefl_note(ps);
@@ -2598,7 +2645,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     int hud = race && (fen ? fen->hud : !menu), screen = race && fen && !fen->hud;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); rn_fixedclock_start(c); }
-    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[10] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 10, w1); }
+    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[50] = {rt->gpu}; psblur_vel(c, w1 + 1); shadow_data(c, w1 + 10); gpu_cmd(GPU_FXAA, 50, w1); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
     static int hud_mode = -1, fe_stretch = -1;

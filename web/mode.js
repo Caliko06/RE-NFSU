@@ -15,6 +15,7 @@ const RN_ORIGINAL = {
   speedfov: '0',      // web/tune.js, host/d3d9.c: the chase camera's FOV stays at the shipped 71.5 deg
   chasecam: '0',      // web/tune.js, host/d3d9.c: the chase camera keeps the car's shipped distance and height rows
   nitrocam: '0',      // web/tune.js, host/d3d9.c: no extra pull-back while the nitrous burns
+  shadows: '0',       // web/tune.js, host/d3d9.c, web/gpu.js: the game's own flat car decal, no shadow map
   roadrefl: 'game',   // host/sm1.c: the road reflection as worldreflect.efx weights it
 };   // blur: web/tune.js starts the original mode at 'PC original' (shipped blur and flare colour)
 // Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places, night lights, free mode).

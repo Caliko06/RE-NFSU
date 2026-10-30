@@ -419,3 +419,9 @@ def c_table():
     return (f"const uint32_t rn_patch_count = {len(ps)};\n"
             "const uint32_t rn_patch_addr[] = {" + "".join(f"0x{p['addr']:x}," for p in ps) + "0};\n"
             "const char *const rn_patch_hex[] = {" + "".join(f'"{p["new"]}",' for p in ps) + "0};\n")
+
+# PATCH: 0x56e493 (the SHADOW level compare in the car draw 0x56dc30), real shadows (docs/re/shadows.md): the game's projected decal
+# is drawn only if [0x700e7c] > 1 (the SHADOW option, default 2). The other readers of the option (flares 0x410xxx, 0x416131) keep it.
+# This compare reads SCREEN_ADDR+0x98 instead: host/d3d9.c shadow_data writes the option there each frame, or 0 while the page's
+# shadow map is on (?shadows=1), so the decal and the shadow map never add up.
+PATCHES.append(dict(addr=0x56e493, old="833d7c0e700001", new="833d9830010001", when=lambda: True))
