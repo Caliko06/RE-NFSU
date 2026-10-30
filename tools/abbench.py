@@ -12,7 +12,7 @@
 # --repeat runs the first variant twice: the pixels that change are the noise floor of "same frame".
 # Output: build/ab/NAME/<label>.png, strip.jpg, results.json. Needs save/ (the "asas" profile; `cp -r /root/src/save save` on the pod).
 # Pod: DISPLAY=:91 RN_X11=1 RN_CHROME=/usr/bin/google-chrome; the Mac needs neither. Uses its own server on this worktree's files.
-import argparse, fcntl, json, os, re, socket, subprocess, sys
+import argparse, fcntl, json, os, re, signal, socket, subprocess, sys
 from completion import _PROFILE
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -31,17 +31,23 @@ if any(len(v) != 2 for v in variants): sys.exit('each variant is label=query')
 if a.repeat: variants.insert(1, [variants[0][0] + '_again', variants[0][1]])
 
 # One bench at a time on this machine: another run's GPU work would count in these times.
-lock = open(os.path.join(os.environ.get('TMPDIR', '/tmp'), 'abbench.lock'), 'w')
-fcntl.flock(lock, fcntl.LOCK_EX)
-with socket.socket() as s:
-    s.bind(('127.0.0.1', 0)); port = s.getsockname()[1]
+lock = open('/tmp/abbench.lock', 'w')
+try: fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+except OSError:
+    print('another bench is running, waiting for it', flush=True)
+    fcntl.flock(lock, fcntl.LOCK_EX)
+signal.signal(signal.SIGTERM, lambda *_: sys.exit('terminated'))   # a timeout still runs the finally below: no server left behind
+def free_port():
+    with socket.socket() as s:
+        s.bind(('127.0.0.1', 0)); return s.getsockname()[1]
+port = free_port()
 serve = subprocess.Popen([sys.executable, 'tools/serve.py', str(port)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 nav = ','.join(['20000:RETURN'] + _PROFILE[1:] + ['1500@=MU_Main_PC:RETURN'])
 
 def run(label, query):
     url = (f'http://127.0.0.1:{port}/?env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FIXEDCLOCK=1&jump={a.jump}&keys={nav}&hold={a.frame}&gpuprof=1'
            + (f'&{query}' if query else ''))
-    env = dict(os.environ, RN_VIEW=a.view, RN_UNTIL=r'held at race frame.*gpu ts@1', RN_CDP_PORT=os.environ.get('RN_CDP_PORT', '9481'))
+    env = dict(os.environ, RN_VIEW=a.view, RN_UNTIL=r'held at race frame.*gpu ts@1', RN_CDP_PORT=str(free_port()))
     png = f'{out}/{label}.png'
     subprocess.run(['node', 'tools/webcheck.mjs', url, str(a.secs), png], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     log = open('build/webcheck.log', errors='replace').read()
