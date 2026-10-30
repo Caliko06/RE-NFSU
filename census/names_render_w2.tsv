@@ -1,0 +1,206 @@
+addr	name	system	confidence	evidence	tool	doc
+0x5af9e5	D3DXCreateEffectPool	render	V	V: out-pointer null -> 0x8876086c, malloc(0x14) pool object, called once from Effects_CreateAll	ghidra	docs/re/render_pc.md
+0x5afb2f	D3DXCreateEffect	render	V	V: args device,src,size,defines,include,flags,pool,ppEffect,ppErrors; leading dword -1 = compiled effect; called from Effects_CreateAll with the XOR 0xAA decoded .efx text	ghidra	docs/re/render_pc.md
+0x40c910	Solid_QueueGroups	render	V	V: picks substitution table 0x706898/0x706818/0x706798 by view flag 0x200 and options 0x700e80/0x700e90, then RenderQueue_GetBucketAlt per mesh group	ghidra	docs/re/render_pc.md
+0x5b0506	D3DX_Cpu_DisableMMX	render	V	V: function references string 'DisableMMX'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b05b6	D3DX_Cpu_Genuineintel_5b05b6	render	V	V: function references string 'GenuineIntel'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b1f01	D3DX_HlslLex_ErrorXU_5b1f01	render	V	V: function references string 'error X%u:'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b1fca	D3DX_HlslLex_Msg_5b1fca	render	V	V: function references string '(%u):'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	render	V	V: function references string 'syntax error : unexpected %s'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b226e	D3DX_HlslLex_CommentContinuesPastEndOfFile_5b226e	render	V	V: function references string 'comment continues past end of file'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b239e	D3DX_HlslLex_HexValueTruncatedTo32Bits_5b239e	render	V	V: function references string 'hex value truncated to 32bits'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b2443	D3DX_HlslLex_OctalValueTruncatedTo32Bits_5b2443	render	V	V: function references string 'octal value truncated to 32bits'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b24bf	D3DX_HlslLex_DecimalValueTruncatedTo32Bits_5b24bf	render	V	V: function references string 'decimal value truncated to 32bits'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b2560	D3DX_HlslLex_CharacterContinuesPastEndOfFil_5b2560	render	V	V: function references string 'character continues past end of file'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b2838	D3DX_HlslLex_StringContinuesPastEndOfLine_5b2838	render	V	V: function references string 'string continues past end of line'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b2d7a	D3DX_EffectCompiler_UnexpectedComponentType_5b2d7a	render	V	V: function references string 'ID3DXEffectCompiler: Unexpected component type'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b3675	D3DX_EffectCompiler_ArraysMustBeEitherNumericStruc_5b3675	render	V	V: function references string 'ID3DXEffectCompiler: Arrays must be either numeric, structur'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	render	V	V: function references string 'FILLMODE'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b4ef1	D3DX_EffectCompiler_CompileeffectThereWasAnErrorCo_5b4ef1	render	V	V: function references string 'ID3DXEffectCompiler::CompileEffect: There was an error compi'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	render	V	V: function references string 'ID3DXEffectCompiler::CompileEffect: Could not compile expres'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b710e	D3DX_EffectCompiler_ErrorInitializingAnnotationTyp_5b710e	render	V	V: function references string 'ID3DXEffectCompiler: Error initializing annotation type'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b90e9	D3DX_EffectCompiler_ThereWasAProblemGettingVariabl_5b90e9	render	V	V: function references string 'ID3DXEffectCompiler: There was a problem getting variable ty'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b9598	D3DX_EffectCompiler_ThereWasAProblemGettingAnnotat_5b9598	render	V	V: function references string 'ID3DXEffectCompiler: There was a problem getting annotations'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b98ff	D3DX_EffectCompiler_ThereWasAProblemGettingAnnotat_5b98ff	render	V	V: function references string 'ID3DXEffectCompiler: There was a problem getting annotations'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5b9b78	D3DX_EffectCompiler_ThereWasAnErrorInitializingThe_5b9b78	render	V	V: function references string 'ID3DXEffectCompiler: There was an error initializing the com'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	render	V	V: function references string 'token'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba2ce	D3DX_HlslSema_InternalErrorProductionFailed_5ba2ce	render	V	V: function references string 'internal error: production failed!'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba2ff	D3DX_HlslSema_InternalErrorOutOfMemory_5ba2ff	render	V	V: function references string 'internal error: out of memory'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba35f	D3DX_HlslSema_InternalErrorScopeUnderflow_5ba35f	render	V	V: function references string 'internal error: scope underflow'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba3df	D3DX_HlslSema_RedefinitionOfFormalParameterS_5ba3df	render	V	V: function references string 'redefinition of formal parameter '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba5ee	D3DX_HlslSema_InternalErrorUnknownNode_5ba5ee	render	V	V: function references string 'internal error: unknown node'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba681	D3DX_HlslSema_SyntaxError_5ba681	render	V	V: function references string 'syntax error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba70c	D3DX_HlslSema_InternalErrorUnknownNode_5ba70c	render	V	V: function references string 'internal error: unknown node'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba799	D3DX_HlslSema_InternalErrorUnknownNode_5ba799	render	V	V: function references string 'internal error: unknown node'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba80b	D3DX_HlslSema_InternalErrorUnknownNode_5ba80b	render	V	V: function references string 'internal error: unknown node'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	render	V	V: function references string '%sstruct{%u}'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bac05	D3DX_HlslSema_InternalErrorUnknownNode_5bac05	render	V	V: function references string 'internal error: unknown node'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bae82	D3DX_HlslSema_ObjectLiteralsAreNotAllowedIns_5bae82	render	V	V: function references string 'object literals are not allowed inside functions'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bb22e	D3DX_HlslSema_Stmts_5bb22e	render	V	V: function references string 'Stmts'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bb295	D3DX_HlslSema_Stmts_5bb295	render	V	V: function references string 'Stmts'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bb534	D3DX_HlslSema_Values_5bb534	render	V	V: function references string 'Values'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bbdd0	D3DX_HlslSema_NonMatrixTypesCannotBeDeclared_5bbdd0	render	V	V: function references string 'non-matrix types cannot be declared 'row_major' or 'column_m'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bc1ad	D3DX_HlslSema_SCannotSconvertFromSToS_5bc1ad	render	V	V: function references string ''%s': cannot %sconvert from '%s' to '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bc356	D3DX_HlslSema_Value_5bc356	render	V	V: function references string 'Value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bc4f9	D3DX_HlslSema_Value_5bc4f9	render	V	V: function references string 'Value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bc645	D3DX_HlslSema_Types_5bc645	render	V	V: function references string 'Types'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bc73c	D3DX_HlslSema_Swizzle_5bc73c	render	V	V: function references string 'Swizzle'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bcbdd	D3DX_HlslSema_Value_5bcbdd	render	V	V: function references string 'Value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bcd15	D3DX_HlslSema_Value_5bcd15	render	V	V: function references string 'Value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bd234	D3DX_HlslSema_InfiniteIndefiniteLog_5bd234	render	V	V: function references string 'infinite/indefinite log'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	render	V	V: function references string 'vertexshader'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bedc7	D3DX_HlslSema_Value_5bedc7	render	V	V: function references string 'Value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5beee7	D3DX_HlslSema_IncorrectNumberOfArgumentsToNu_5beee7	render	V	V: function references string 'incorrect number of arguments to numeric-type constructor'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bf135	D3DX_HlslSema_Value_5bf135	render	V	V: function references string 'Value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bf509	D3DX_HlslSema_DivisionByZero_5bf509	render	V	V: function references string 'division by zero'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bfd33	D3DX_HlslSema_Stmts_5bfd33	render	V	V: function references string 'Stmts'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5bfe5c	D3DX_HlslSema_Vertexfragment_5bfe5c	render	V	V: function references string 'vertexfragment'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c094c	D3DX_HlslSema_RedefinitionOfS_5c094c	render	V	V: function references string 'redefinition of '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c0cfc	D3DX_HlslSema_Value_5c0cfc	render	V	V: function references string 'Value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c0e94	D3DX_HlslSema_Stmts_5c0e94	render	V	V: function references string 'Stmts'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c10a3	D3DX_HlslSema_VectorDimensionMustBeBetween1A_5c10a3	render	V	V: function references string 'vector dimension must be between 1 and %u'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c1128	D3DX_HlslSema_MatrixDimensionsMustBeLiteralS_5c1128	render	V	V: function references string 'matrix dimensions must be literal scalar expressions'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c11d0	D3DX_HlslSema_ArrayDimensionsMustBeLiteralSc_5c11d0	render	V	V: function references string 'array dimensions must be literal scalar expressions'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c1248	D3DX_HlslSema_ArrayIndexOutOfBounds_5c1248	render	V	V: function references string 'array index out of bounds'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c1473	D3DX_HlslSema_LValueSpecifiesConstObject_5c1473	render	V	V: function references string 'l-value specifies const object'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c18f9	D3DX_HlslSema_Stmts_5c18f9	render	V	V: function references string 'Stmts'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	render	V	V: function references string 'Stmts'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c238d	D3DX_HlslSema_UndeclaredIdentifierS_5c238d	render	V	V: function references string 'undeclared identifier '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c2858	D3DX_HlslSema_Value_5c2858	render	V	V: function references string 'Value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	render	V	V: function references string 'internal error: out of memory'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c3e7d	D3DX_HlslParse_SyntaxError_5c3e7d	render	V	V: function references string 'syntax error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c52f4	D3DX_Preproc_FailedToOpenSourceFileS_5c52f4	render	V	V: function references string 'failed to open source file: '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c56ef	D3DX_Preproc_Error_5c56ef	render	V	V: function references string 'error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c5a21	D3DX_Preproc_SyntaxError_5c5a21	render	V	V: function references string 'syntax error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c5af6	D3DX_Preproc_SyntaxError_5c5af6	render	V	V: function references string 'syntax error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c5cbe	D3DX_Preproc_ErrorS_5c5cbe	render	V	V: function references string 'error: %s'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c5dec	D3DX_Preproc_UnexpectedElifFollowingElse_5c5dec	render	V	V: function references string 'unexpected #elif following #else'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c5e5f	D3DX_Preproc_UnexpectedElseFollowingElse_5c5e5f	render	V	V: function references string 'unexpected #else following #else'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c5ec1	D3DX_Preproc_UnexpectedEndif_5c5ec1	render	V	V: function references string 'unexpected #endif'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c5f11	D3DX_Preproc_RowMajor_5c5f11	render	V	V: function references string 'row_major'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c602e	D3DX_Preproc_Error_5c602e	render	V	V: function references string 'error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c652b	D3DX_Preproc_InternalErrorProductionFailed_5c652b	render	V	V: function references string 'internal error: production failed'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c655e	D3DX_Preproc_DuplicateMacroParameterS_5c655e	render	V	V: function references string 'duplicate macro parameter '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c683a	D3DX_Preproc_Warning_5c683a	render	V	V: function references string 'warning'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c68b4	D3DX_Preproc_FunctionalDefinesInPreprocesso_5c68b4	render	V	V: function references string 'functional defines in preprocessor expressions not yet imple'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c691a	D3DX_Preproc_NotEnoughActualParametersForMa_5c691a	render	V	V: function references string 'not enough actual parameters for macro '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c6feb	D3DX_Preproc_D3DxVersion_5c6feb	render	V	V: function references string 'D3DX_VERSION'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c7212	D3DX_Preproc_InternalErrorOutOfMemory_5c7212	render	V	V: function references string 'internal error: out of memory'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c765d	D3DX_Preproc_SyntaxError_5c765d	render	V	V: function references string 'syntax error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5c7bd2	D3DX_HlslGen_UnexpectedEndOfFile_5c7bd2	render	V	V: function references string 'unexpected end of file'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5ca8f4	D3DX_EffectCompiler_Banner	render	V	V: function references string 'D3DX9 Effect Compiler'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5d6900	D3DX_HlslGen_Authenticamd_5d6900	render	V	V: function references string 'AuthenticAMD'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5d7700	D3DX_HlslGen_S30_5d7700	render	V	V: function references string 's.3.0'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5d779c	D3DX_HlslGen_Vs30_5d779c	render	V	V: function references string 'vs_3_0'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5d9fa1	D3DX_HlslGen_InternalErrorResultRegisterInv_5d9fa1	render	V	V: function references string 'internal error: result register invalid'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5da405	D3DX_HlslGen_InternalErrorUnknownNode_5da405	render	V	V: function references string 'internal error: unknown node'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5da560	D3DX_HlslGen_InternalErrorUnknownNode_5da560	render	V	V: function references string 'internal error: unknown node'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5da768	D3DX_HlslGen_InternalErrorUnknownNode_5da768	render	V	V: function references string 'internal error: unknown node'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5dc760	D3DX_HlslGen_InternalErrorUnrecognizedState_5dc760	render	V	V: function references string 'internal error: unrecognized statement'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5dca6a	D3DX_HlslGen_IntrinsicFunctionSIsNotYetImpl_5dca6a	render	V	V: function references string 'intrinsic function '%s' is not yet implemented'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e1f75	D3DX_HlslGen_SFunctionMustReturnAValue_5e1f75	render	V	V: function references string ''%s': function must return a value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e2a38	D3DX_HlslGen_InternalErrorOutOfMemory_5e2a38	render	V	V: function references string 'internal error: out of memory'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e49cf	D3DX_HlslGen_InternalErrorUnrecognizedValue_5e49cf	render	V	V: function references string 'internal error: unrecognized value'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e4ca2	D3DX_Asm_OverloadedFunctionNotFound_5e4ca2	render	V	V: function references string 'overloaded function not found'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e505d	D3DX_Asm_NonTrivialObjectExpressionsNot_5e505d	render	V	V: function references string 'non-trivial object expressions not yet implemented'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e5221	D3DX_Asm_Psize_5e5221	render	V	V: function references string 'PSIZE'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e556b	D3DX_Asm_SyntaxError_5e556b	render	V	V: function references string 'syntax error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e5695	D3DX_Asm_InternalErrorProductionFailed_5e5695	render	V	V: function references string 'internal error: production failed'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	render	V	V: function references string 'texcoord'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e605e	D3DX_Asm_InvalidMaskS_5e605e	render	V	V: function references string 'invalid mask '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e6111	D3DX_Asm_InvalidSwizzleS_5e6111	render	V	V: function references string 'invalid swizzle '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	render	V	V: function references string 'internal error: instruction size mismatch'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e6ae3	D3DX_Asm_D3Dx9ShaderAssembler_5e6ae3	render	V	V: function references string 'D3DX9 Shader Assembler'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e6d03	D3DX_Asm_D3Dx9ShaderAssembler_5e6d03	render	V	V: function references string 'D3DX9 Shader Assembler'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e7154	D3DX_Asm_ConstantRegisterAddressOutOfBo_5e7154	render	V	V: function references string 'constant register address out of bounds on constant '%s', si'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e739b	D3DX_Asm_Entrypoint_5e739b	render	V	V: function references string 'entrypoint'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e7477	D3DX_Asm_InvalidRegisterS_5e7477	render	V	V: function references string 'invalid register '%s''; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	render	V	V: function references string 'internal error: out of memory'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e8013	D3DX_Asm_SyntaxError_5e8013	render	V	V: function references string 'syntax error'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e85e1	D3DX_Asm_Ps10IsNoLongerSupportedUsingPs_5e85e1	render	V	V: function references string 'ps_1_0 is no longer supported; using ps_1_1'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e8b19	D3DX_Asm_IntegerConstantRegisterSMustBe_5e8b19	render	V	V: function references string 'integer constant register '%s' must be defined as a variable'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e8cd0	D3DX_Asm_ConstantVariableSBoundToRegist_5e8cd0	render	V	V: function references string 'Constant variable '%s' bound to register greater than 8191 ('; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5e8fb1	D3DX_LoadD3D9Dll	render	V	V: function references string 'd3d9.dll'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5fc0d0	D3DX_Asm_InternalErrorArgumentWasNeverU_5fc0d0	render	V	V: function references string 'internal error: argument was never used (A%u)'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5fe888	D3DX_Opt_ArrayIndexOutOfBounds_5fe888	render	V	V: function references string 'array index out of bounds'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x5fefac	D3DX_Opt_DivisionByZero_5fefac	render	V	V: function references string 'division by zero'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60254c	D3DX_Opt_ExpressionTooComplex_60254c	render	V	V: function references string 'expression too complex'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x604024	D3DX_Ps1Back_InternalWarningOptimizationDid_604024	render	V	V: function references string 'internal warning: optimization did not converge'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x6043ad	D3DX_Ps1Back_TexcoordInputsUsedDirectlyThat_6043ad	render	V	V: function references string 'texcoord inputs used directly (that is, other than sampling '; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x604486	D3DX_Ps1Back_InternalErrorMalformedClipFoun_604486	render	V	V: function references string 'internal error: malformed clip found'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x605d41	D3DX_Ps1Back_Tex3D_605d41	render	V	V: function references string 'tex3D'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60691c	D3DX_Ps1Back_CannotPerformDoubleDependentTe_60691c	render	V	V: function references string 'cannot perform double dependent texture read in ps_1_x'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x606ae1	D3DX_Ps1Back_CannotReadFromATexcoordWhichWa_606ae1	render	V	V: function references string 'cannot read from a texcoord which was used as input in a sam'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60728d	D3DX_Ps1Back_CannotPerformDependentTextureR_60728d	render	V	V: function references string 'cannot perform dependent texture read which in any way is ba'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60783e	D3DX_Ps1Back_InternalErrorArgumentsNotVecto_60783e	render	V	V: function references string 'internal error: arguments not vectorized'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x607bc1	D3DX_Ps1Back_ProgramTooComplexExceededAvail_607bc1	render	V	V: function references string 'program too complex: exceeded available constant registers.'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60807f	D3DX_Ps1Back_InternalErrorTexldAliasFound_60807f	render	V	V: function references string 'internal error: texld alias found'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x6081f6	D3DX_Ps1Back_ProgramTooComplexOutOfTemporar_6081f6	render	V	V: function references string 'program too complex: out of temporary registers'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x608320	D3DX_Ps1Back_InternalErrorUppropagationFail_608320	render	V	V: function references string 'internal error: uppropagation failed'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x608771	D3DX_Ps1Back_ProgramTooComplexOutOfTemporar_608771	render	V	V: function references string 'program too complex: out of temporary registers'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x609c31	D3DX_Ps1Back_CannotMatchToTexreg2ArOrTexreg_609c31	render	V	V: function references string 'cannot match to texreg2ar or texreg2gb instruction because c'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60a0f3	D3DX_Ps1Back_CannotBindSamplerToSamplerArra_60a0f3	render	V	V: function references string 'cannot bind sampler to sampler array, sampler must be bound '; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60a702	D3DX_Ps1Back_AccessingTextureCoordinateWCom_60a702	render	V	V: function references string 'accessing texture coordinate w-component not yet implemented'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60a8f2	D3DX_Ps1Back_InternalErrorUnexpectedOutputR_60a8f2	render	V	V: function references string 'internal error: unexpected output register'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	render	V	V: function references string 'texcoord'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60b913	D3DX_Ps1Back_CannotMapSwizzleToPs14_60b913	render	V	V: function references string 'cannot map swizzle to ps_1_4'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60bafa	D3DX_Ps1Back_InternalErrorIllformedWriteFie_60bafa	render	V	V: function references string 'internal error: illformed write field'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60c25d	D3DX_Ps1Back_ShaderCannotCompileToAPs1IShad_60c25d	render	V	V: function references string 'shader cannot compile to a ps_1_%i shader because this model'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60c503	D3DX_Ps1Back_CannotMapExpressionToPixelShad_60c503	render	V	V: function references string 'cannot map expression to pixel shader instruction set'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60cdf7	D3DX_Ps1Back_InternalErrorOverlappingOutput_60cdf7	render	V	V: function references string 'internal error: overlapping output writes'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60cf25	D3DX_Ps1Back_PixelShaderMustMinimallyWriteA_60cf25	render	V	V: function references string 'pixel shader must minimally write all four components of COL'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60d526	D3DX_Ps1Back_InternalErrorUnexpectedAliasOn_60d526	render	V	V: function references string 'internal error: unexpected Alias on texture declaration'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60d5c4	D3DX_Ps1Back_SamplerMismatchSamplerUsedInco_60d5c4	render	V	V: function references string 'sampler mismatch: sampler used inconsistently'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	render	V	V: function references string 'texcoord'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60e0d8	D3DX_Ps1Back_InternalErrorCompilerEmittimgM_60e0d8	render	V	V: function references string 'internal error: compiler emittimg multiple movs to output re'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60eafe	D3DX_Ps1Back_InternalErrorInvalidSwizzleFou_60eafe	render	V	V: function references string 'internal error: invalid swizzle found'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60f23a	D3DX_Ps1Back_CannotMapExpressionToPixelShad_60f23a	render	V	V: function references string 'cannot map expression to pixel shader instruction set'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x60fcaa	D3DX_VsBack_VertexShaderMustMinimallyWrite_60fcaa	render	V	V: function references string 'vertex shader must minimally write all four components of PO'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	render	V	V: function references string 'texcoord'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x6110da	D3DX_VsBack_VSD_6110da	render	V	V: function references string 'v_%s%d'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61193a	D3DX_VsBack_RelativeAddressingNotSupported_61193a	render	V	V: function references string 'relative addressing not supported in vs_1_0 instruction set'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x611acc	D3DX_VsBack_CZzD_611acc	render	V	V: function references string 'c_$zz%d'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x611b44	D3DX_VsBack_RIntD_611b44	render	V	V: function references string 'r_$Int%d'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x611cfc	D3DX_VsBack_ConstantVariableSBoundToRegist_611cfc	render	V	V: function references string 'Constant variable '%s' bound to register greater than 8191 ('; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x611eae	D3DX_VsBack_InternalErrorMultipleWriteToSa_611eae	render	V	V: function references string 'internal error: multiple write to same output'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61269b	D3DX_VsBack_CannotMapExpressionToVertexSha_61269b	render	V	V: function references string 'cannot map expression to vertex shader instruction set'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x612a70	D3DX_VsBack_Color_612a70	render	V	V: function references string 'color'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x612c59	D3DX_VsBack_TooManyOutputsToTargetTx_612c59	render	V	V: function references string 'too many outputs to target TX'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x613d78	D3DX_VsBack_MaximumConstantRegisterIndexEx_613d78	render	V	V: function references string 'maximum constant register index exceeded'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x614682	D3DX_VsBack_InternalErrorMultipleWriteToSa_614682	render	V	V: function references string 'internal error: multiple write to same output'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x6151a7	D3DX_VsBack_CannotMatchLerpBecauseLerpFact_6151a7	render	V	V: function references string 'cannot match lerp because lerp factor is not _sat'd'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x615ec7	D3DX_VsBack_InternalErrorUnexpectedOutputR_615ec7	render	V	V: function references string 'internal error: unexpected output register type'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x615fb8	D3DX_VsBack_InternalErrorOverlappingOutput_615fb8	render	V	V: function references string 'internal error: overlapping output writes'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x616118	D3DX_VsBack_MaximumInputRegisterIndexExcee_616118	render	V	V: function references string 'maximum input register index exceeded'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61615c	D3DX_VsBack_MaximumConstantRegisterIndexEx_61615c	render	V	V: function references string 'maximum constant register index exceeded'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x617c5c	D3DX_VsBack_BiasOpportunityMissedBecauseSo_617c5c	render	V	V: function references string '_bias opportunity missed because source was not clamped 0 to'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61808b	D3DX_Ps2Back_ComplementOpportunityMissedBec_61808b	render	V	V: function references string 'complement opportunity missed because input result was not c'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x618709	D3DX_Ps2Back_CannotMatchLerpBecauseLerpFact_618709	render	V	V: function references string 'cannot match lerp because lerp factor is not _sat'd'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x618c64	D3DX_Ps2Back_D3Dx9ShaderCompiler_618c64	render	V	V: function references string 'D3DX9 Shader Compiler'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x619309	D3DX_Ps2Back_DebugInfoExceedsMaximumComment_619309	render	V	V: function references string 'debug info exceeds maximum comment size; no debug info emitt'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x619954	D3DX_Ps2Back_Direct3Dshadervalidatorcreate9_619954	render	V	V: function references string 'Direct3DShaderValidatorCreate9'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61a7fa	D3DX_Ps2Back_InternalErrorUnexpectedInputRe_61a7fa	render	V	V: function references string 'internal error: unexpected input register type'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61af1a	D3DX_Ps2Back_InternalErrorSizeMismatchInSca_61af1a	render	V	V: function references string 'internal error: size mismatch in scalar instruction'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61e5f0	EAGL_DynamicLoader_Dlsym	assets	V	V: function references string 'dlsym: Internal error. Bad j value %d (chain size %d)!'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61f2e0	EAGL_SymbolPool_Entry	assets	V	V: function references string 'EAGL::SymbolEntry'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x632a40	EAsys_FacingGG_632a40	runtime	V	V: function references string 'Facing: %g %g'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x632af0	EAsys_FacingGG_632af0	runtime	V	V: function references string 'Facing: %g %g'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x632df0	EAsys_TurnAlignDQGGGG_632df0	runtime	V	V: function references string 'turn align[%d] Q: %g %g %g %g'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x633063	EAsys_BeforeOffsetT0GT1G_633063	runtime	V	V: function references string 'before offset t0: %g  t1: %g'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x6385a0	EAsys_D3D8AdapterInfo	runtime	V	V: function references string 'IDirect3D8_GetAdapterIdentifier failed: err = 0x%x'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x6392f0	EAFile_DeviceThread	runtime	V	V: function references string 'FILE_devicethread - UNKNOWN TYPE OF OPERATION %d.'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x639c00	EAFile_CompleteOp	runtime	V	V: function references string 'FILESYS_completeop - OPERATION NOT FOUND IN COMPLETED LIST.'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x639f20	EAFile_CallbackOp	runtime	V	V: function references string 'FILESYS_callbackop - UNKNOWN FILEOP.'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x63a150	EAFile_GetDirectory	runtime	V	V: function references string 'getdirectory - FAILED TO FETCH, OR WAS TOO LONG (%D CHAR).'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x63a1e0	EAFile_StartDevice	runtime	V	V: function references string 'FILE_startdevice - FAILED TO START THREAD FOR FILE SYSTEM DE'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x63a310	EAFile_AllocateOp	runtime	V	V: function references string 'FILE_allocateop - NO FREE OPS LEFT TO ALLOCATE.'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x63aad0	EAFile_Atomic	runtime	V	V: function references string 'FILESYS_atomic - CALLED WITH ILLEGAL FILE DEVICE (%d).'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x63ec20	EAsys_TimerInit	runtime	V	V: function references string 'TIMER_init - FAILED TO INITIALIZE WINDOWS MULTIMEDIA TIMER, '; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x63eea0	EAsys_SyncTaskAdd	runtime	V	V: function references string 'SYNCTASK_add - LIST FULL'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x63f2a0	EAsys_CpuRegistryInfo	runtime	V	V: function references string 'HARDWARE\DESCRIPTION\System\CentralProcessor\0'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x63f7c0	EAsys_CpuVendorDetect	runtime	V	V: function references string 'GenuineIntel'; band by neighbouring strings	ghidra+strings	docs/re/render_pc.md
+0x61eee0	EAGL_DynamicLoader_Ctor	assets	V	V: stores 4 fields, calls EAGL::DynamicLoader::LoadSymbols and DumpRuntimeAllocs; called by AnimSkeleton_Load 0x5a4de0	ghidra	docs/re/render_pc.md
+0x61ef30	EAGL_DynamicLoader_Dtor	assets	V	V: frees buffer through hook 0x6dfaa0 using size field; called by AnimSkeleton_Unload 0x5a4e90	ghidra	docs/re/render_pc.md
+0x61ef60	EAGL_Malloc	assets	V	V: wrapper, calls _malloc(size) only	ghidra	docs/re/render_pc.md
+0x61ef70	EAGL_Free	assets	V	V: wrapper, calls _free only	ghidra	docs/re/render_pc.md
+0x61f020	EAGL_SetAllocHook	assets	V	V: stores its argument in PTR_FUN_006dfa9c; called from Render_InitSubsystem 0x53e020	ghidra	docs/re/render_pc.md

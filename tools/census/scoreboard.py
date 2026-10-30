@@ -77,11 +77,13 @@ if os.path.exists("census/canon/systems_lib.tsv"):
         x = a(r["addr"])
         if conf.get(x) not in ("med", "high"):
             system[x], conf[x] = r["system"], "med"
-
-# a name with a system (V or I) wins over the graph tag
-nsys = {}
-for p in sorted(glob.glob("census/names_*.tsv")):
-    if p.endswith("names_seed.tsv"):
+# library bands read by their strings and callers (docs/re/render_pc.md: D3DX9 render, EAGL anim runtime assets): they
+# replace a graph or region tag, since the region closure took 'render' for the whole 0x5a-0x64 range
+if os.path.exists("census/canon/systems_band.tsv"):
+    for r in csv.DictReader(open("census/canon/systems_band.tsv"), delimiter="\t"):
+        x = a(r["addr"])
+        if conf.get(x) != "high":
+            system[x], conf[x] = r["system"], "med"
 # both address neighbours agree (tools/canon/adjacent.py): inferred, so med
 if os.path.exists("census/canon/systems_adj.tsv"):
     for r in csv.DictReader(open("census/canon/systems_adj.tsv"), delimiter="\t"):
