@@ -77,3 +77,16 @@ census/canon/systems_tu.tsv, read by the scoreboard as med. 767 stay unknown (35
   normalizing notes "(...)", destructor forms (~X, scalar deleting) and keeping descriptive placeholders (NopArg1,
   ResetField1D4) out of the vote. Wired: queue.tsv prior "vt <name>" (40 rows: 19 new, 9 equal GC, 12 replace GC),
   shown for every size. The 9 disagreements (sibling classes naming one slot differently) are in census/canon/vt_check.txt.
+
+## Trivial functions (tools/canon/trivial.py, 2026-10-29)
+Unnamed lifted functions of <= 48 bytes with an exact MSVC shape, read in bytes with capstone, go to
+census/names_trivial.tsv with evidence `V: trivial: ...` (or I when the system comes only from callers). Shapes: jmp
+thunk, scalar deleting destructor, vtable-setting destructor, EH stub (`mov eax,FuncInfo; jmp ___CxxFrameHandler`),
+EH unwind funclet, static initializer, getter/setter, bare ret. EH parents come from FuncInfo (magic 0x19930520)
+unwind maps and the stub's pusher; all 309 stub parents were checked in bytes (`push -1; push stub` or
+`mov eax,stub; call __EH_prolog`). The system comes from structure (target, parent, destructor, readers of the global);
+no solid system means no row. First run: 701 rows (651 V); 3,257 small functions had no shape (wrappers, more forms)
+and 504 had a shape but no solid system.
+
+tu_systems.py also writes low graph tags that the source-file vote confirms (878 on 2026-10-29); the scoreboard reads
+them as med. Holdout of the file vote on known functions: 2,513 of 2,851 agree (88 %).

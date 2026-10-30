@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""System of unknown functions from their GameCube source file (docs/re/canon_db.md).
+"""System of unknown functions from their GameCube source file, and low graph tags it confirms (docs/re/canon_db.md).
 
 Source file of a PC function: its census/canon/prior_gc.tsv row, or, when it sits between two aligned functions of
 the same file, that file (link order). System of a file: majority of our med/high/named functions in it
@@ -48,8 +48,10 @@ for x, t in tu.items():
         dvotes[d(t)][s] += 1
 
 out, left = [], 0
+agree = 0
 for x in sorted(L):
-    if sysof(x)[0] != "unknown":
+    g, c = sysof(x)
+    if g != "unknown" and c != "low":
         continue
     t = tu.get(x)
     for key, V, lvl in ((t, votes, "file"), (t and d(t), dvotes, "dir")):
@@ -58,12 +60,16 @@ for x in sorted(L):
         if n >= 4:
             top, k = v.most_common(1)[0]
             if k / n >= 0.7:
-                out.append((x, top, f"I: GC {lvl} {key} votes {top} {k}/{n}; {how[x]} (nfsug align)"))
+                if g == "unknown":
+                    out.append((x, top, f"I: GC {lvl} {key} votes {top} {k}/{n}; {how[x]} (nfsug align)"))
+                elif g == top:   # a low graph tag that the source file confirms (two independent signals)
+                    out.append((x, top, f"I: graph tag and GC {lvl} {key} agree ({k}/{n}); {how[x]} (nfsug align)"))
+                    agree += 1
                 break
     else:
-        left += 1
+        left += g == "unknown"
 with open("census/canon/systems_tu.tsv", "w") as o:
     o.write("addr\tsystem\tevidence\n")
     for x, s, e in out:
         o.write(f"{x:#x}\t{s}\t{e}\n")
-print(f"tu_systems: {len(out)} unknown functions get a system {dict(Counter(s for _, s, _ in out))}; {left} stay unknown")
+print(f"tu_systems: {agree} low graph tags confirmed by the source file; {len(out) - agree} unknown functions get a system {dict(Counter(s for _, s, _ in out))}; {left} stay unknown")
