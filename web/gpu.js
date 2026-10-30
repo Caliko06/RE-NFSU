@@ -433,21 +433,55 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
 }
 @fragment fn blurH(v: V) -> @location(0) vec4f { return blur(v.uv, vec2f(1.0 / f32(textureDimensions(src).x), 0.0)); }
 @fragment fn blurV(v: V) -> @location(0) vec4f { return blur(v.uv, vec2f(0.0, 1.0 / f32(textureDimensions(src).y))); }
+@group(0) @binding(2) var src2: texture_2d<f32>;
+@group(0) @binding(3) var src3: texture_2d<f32>;
+@group(0) @binding(4) var dep: texture_depth_2d;
+@group(0) @binding(5) var<uniform> hu: vec4f;   // _33, _43, _22
+@fragment fn haloBright(v: V) -> @location(0) vec4f {
+  let t = 1.0 / vec2f(textureDimensions(src));
+  let c = 0.25 * (textureSampleLevel(src, smp, v.uv + vec2f(-t.x, -t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, -t.y), 0.0).rgb
+    + textureSampleLevel(src, smp, v.uv + vec2f(-t.x, t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, t.y), 0.0).rgb);
+  // Only what is above the eye (the chase camera is about as high as a car roof): lamps, neon, windows, the sky. Not the road or the cars.
+  let d = vec2f(textureDimensions(dep));
+  let zn = textureLoad(dep, vec2i(clamp(v.uv * d, vec2f(0.0), d - 1.0)), 0);
+  let z = hu.y / (zn - hu.x);
+  let high = select(smoothstep(-0.3, 0.3, (1.0 - 2.0 * v.uv.y) * z / abs(hu.z)), 1.0, zn >= 0.99999);
+  return vec4f(c * high * smoothstep(0.88, 1.0, max(c.r, max(c.g, c.b))), 1.0);
+}
+@fragment fn haloDown(v: V) -> @location(0) vec4f {
+  let t = 0.5 / vec2f(textureDimensions(src));
+  let c = 0.25 * (textureSampleLevel(src, smp, v.uv + vec2f(-t.x, -t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, -t.y), 0.0).rgb
+    + textureSampleLevel(src, smp, v.uv + vec2f(-t.x, t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, t.y), 0.0).rgb);
+  return vec4f(c, 1.0);
+}
+@fragment fn haloAdd(v: V) -> @location(0) vec4f {
+  let c = 1.1 * textureSampleLevel(src, smp, v.uv, 0.0).rgb + 1.0 * textureSampleLevel(src2, smp, v.uv, 0.0).rgb + 0.9 * textureSampleLevel(src3, smp, v.uv, 0.0).rgb;
+  let n = fract(52.9829189 * fract(dot(v.p.xy, vec2f(0.06711056, 0.00583715)))) / 255.0;   // the 8-bit target would band these wide gradients over the night sky
+  return vec4f(c + n * step(0.002, dot(c, vec3f(1.0))), 0.0);
+}
 @fragment fn add(v: V) -> @location(0) vec4f {
   let k = select(${BLOOM_W}, ${BLOOM_W} * step(0.5, v.uv.x), ${BLOOM_MODE?.endsWith('split') ? 'true' : 'false'});
   return vec4f(textureSampleLevel(src, smp, v.uv, 0.0).rgb * k, 0.0);
 }` });
-  const bloomPipe = (fs, sc) => device.createRenderPipeline({ layout: 'auto', vertex: { module: bloomMod, entryPoint: 'vs' },
-    fragment: { module: bloomMod, entryPoint: fs, targets: [{ format: 'rgba8unorm', ...(fs === 'add' ? { blend: {
-      color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } } : {}) }] },
+  const ADD_BLEND = { color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } };
+  const bloomPipe = (fs, sc, format = 'rgba8unorm') => device.createRenderPipeline({ layout: 'auto', vertex: { module: bloomMod, entryPoint: 'vs' },
+    fragment: { module: bloomMod, entryPoint: fs, targets: [{ format, ...(fs === 'add' || fs === 'haloAdd' ? { blend: ADD_BLEND } : {}) }] },
     primitive: { topology: 'triangle-list' }, multisample: { count: sc } });
-  const bloomPipes = BLOOM_ON ? { bright: bloomPipe('bright', 1), blurH: bloomPipe('blurH', 1), blurV: bloomPipe('blurV', 1), add: new Map() } : null;
+  // BRIDGE: remaster halo, the light in the night air around lamps, neon and windows; not in the original. Its own bright pass keeps only what is near
+  // clipping and above the road (bloom's 0.72, and even 0.88 without the height test, lit the zebra crossings and washed the road), then 1/8, 1/16, 1/32 of the screen, float, blurred at each, added back together: about 2 %, 4 % and 8 % of the width. It is a glow
+  // in screen space, no ray march: the game has no light positions here and the road stays dry, it only takes the haze a lamp above it spreads. ?halo=0 turns it off.
+  const HALO_ON = RN_Q.get('halo') !== '0';
+  const bloomPipes = BLOOM_ON || HALO_ON ? { bright: bloomPipe('bright', 1), blurH: bloomPipe('blurH', 1), blurV: bloomPipe('blurV', 1), add: new Map() } : null;
+  const haloPipes = HALO_ON ? { bright: bloomPipe('haloBright', 1, 'rgba16float'), down: bloomPipe('haloDown', 1, 'rgba16float'), blurH: bloomPipe('blurH', 1, 'rgba16float'), blurV: bloomPipe('blurV', 1, 'rgba16float') } : null;
   // A resource replaced while the frame is being encoded is destroyed after the frame's submit: the game reuses a
   // buffer or texture id mid-frame (GPU_BUFFER on a live id), and destroying it at once made WebGPU reject the whole
   // frame's command buffer ("used in submit while destroyed": 2 frames lost per race, build/bench/f_default_bc7).
   const doomed = [], doom = x => { if (x) doomed.push(x); };
   let bloomA = null, bloomB = null;
-  function bloom(enc, rt) {
+  const halo = [];
+  let haloSrc = null;
+  const haloU = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+  function bloom(enc, rt, ds, v) {
     const bw = Math.max(1, rt.w >> 2), bh = Math.max(1, rt.h >> 2);
     if (!bloomA || bloomA.width !== bw || bloomA.height !== bh) {
       doom(bloomA); doom(bloomB);
@@ -467,8 +501,45 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
     step(bloomPipes.blurH, bloomA, to(bloomB), 'bloom blur');
     step(bloomPipes.blurV, bloomB, to(bloomA), 'bloom blur');
     const sc = rt.msView ? rt.sc : 1;
-    if (!bloomPipes.add.has(sc)) bloomPipes.add.set(sc, bloomPipe('add', sc));
-    step(bloomPipes.add.get(sc), bloomA, colorAtt(rt), 'bloom add');
+    const addPipe = fs => {
+      const k = fs + sc;
+      if (!bloomPipes.add.has(k)) bloomPipes.add.set(k, bloomPipe(fs, sc));
+      return bloomPipes.add.get(k);
+    };
+    if (BLOOM_ON) step(addPipe('add'), bloomA, colorAtt(rt), 'bloom add');
+    if (!HALO_ON || !ds?.depth || ds.sc !== 1 || rt.msView || !v?.[8]) return;
+    if (!halo.length || halo[0][0].width !== rt.w >> 3 || halo[0][0].height !== rt.h >> 3) {
+      for (const l of halo) l.forEach(doom);
+      halo.length = 0;
+      for (const d of [3, 4, 5]) halo.push([0, 1].map(() => device.createTexture({ size: [Math.max(1, rt.w >> d), Math.max(1, rt.h >> d)], format: 'rgba16float',
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING })));
+    }
+    if (!haloSrc || haloSrc.width !== bloomA.width || haloSrc.height !== bloomA.height) {
+      doom(haloSrc);
+      haloSrc = device.createTexture({ size: [bloomA.width, bloomA.height], format: 'rgba16float', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING });
+    }
+    device.queue.writeBuffer(haloU, 0, new Float32Array([v[5], v[6], v[8], 0]));
+    {
+      const p = enc.beginRenderPass({ timestampWrites: tsw('halo'), colorAttachments: [to(haloSrc)] });
+      p.setPipeline(haloPipes.bright);
+      p.setBindGroup(0, device.createBindGroup({ layout: haloPipes.bright.getBindGroupLayout(0), entries: [{ binding: 0, resource: rt.tex.createView() }, { binding: 1, resource: fxaaSamp },
+        { binding: 4, resource: ds.tex.createView({ aspect: 'depth-only' }) }, { binding: 5, resource: { buffer: haloU } }] }));
+      p.draw(3);
+      p.end();
+    }
+    let from = haloSrc;
+    for (const [a, b] of halo) {
+      step(haloPipes.down, from, to(a), 'halo');
+      step(haloPipes.blurH, a, to(b), 'halo');
+      step(haloPipes.blurV, b, to(a), 'halo');
+      from = a;
+    }
+    const pipe = addPipe('haloAdd'), p = enc.beginRenderPass({ timestampWrites: tsw('halo add'), colorAttachments: [colorAtt(rt)] });
+    p.setPipeline(pipe);
+    p.setBindGroup(0, device.createBindGroup({ layout: pipe.getBindGroupLayout(0), entries: [{ binding: 0, resource: halo[0][0].createView() }, { binding: 1, resource: fxaaSamp },
+      { binding: 2, resource: halo[1][0].createView() }, { binding: 3, resource: halo[2][0].createView() }] }));
+    p.draw(3);
+    p.end();
   }
 
   // BRIDGE: PS2 speed blur with the scene's real depth, not in the PC game. Source: SLUS_208.11 0x113fc8 (read in the corpus C and the
@@ -1020,7 +1091,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       uBindBuf = ubuf;
     }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0, postRt = 0, postFrom = 0;
+    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0, postRt = 0, postFrom = 0, postV = null;
     if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
     // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
@@ -1030,7 +1101,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     };
     // Bloom, FXAA, grade: on the finished scene colour, before the HUD (see GPU_FXAA below).
     function postFx(rt) {
-      if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
+      if ((BLOOM_ON || HALO_ON) && rt && !rt.depth) bloom(enc, rt, res.get(sceneDs), postV);
       if ((FXAA_ON || GRADE_ON || TONE_ON || VIG_ON) && rt && !rt.depth && !rt.msView) {
         if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
           doom(fxaaTmp);
@@ -1263,6 +1334,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(w[a]);
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
+        postV = f32.subarray(a + 1, a + 10);
         if (AO_ON && sceneRt) aoPass(enc, res.get(sceneRt), res.get(sceneDs), f32.subarray(a + 1, a + 10));
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
         // With the game's scene RT ([0x73645c] = 1, 0x40a580) the target at GPU_FXAA only holds the light trails and flares: its next

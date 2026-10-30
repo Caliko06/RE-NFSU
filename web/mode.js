@@ -5,7 +5,7 @@
 const RN_ORIGINAL = {
   remaster: '0',      // texture pack (world and cars), web/gpu.js
   skinhd: '0',        // HD car skin composite, web/gpu.js
-  bloom: '0', fxaa: '0', grade: '0', tonemap: '0', vignette: '0', ao: '0', sharp: 'off', aniso: '1',
+  bloom: '0', fxaa: '0', grade: '0', tonemap: '0', vignette: '0', ao: '0', halo: '0', sharp: 'off', aniso: '1',
   carlook: '2003',    // host/sm1.c: car.efx at the shipped strength
   cardetail: '0',     // host/sm1.c: no AO/grime terms
   carvol: '0',        // host/sm1.c: no volume / panel-edge terms on the diffuse
