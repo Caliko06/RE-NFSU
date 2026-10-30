@@ -218,7 +218,7 @@ async function startGpu(M, canvas, report, onFrame) {
   // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
   const MSAA = RN_Q.get('msaa') === '4' ? 4 : 1;
   // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first screen quad of a race
-  // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
+  // frame. It only runs where the scene depth jumps: on the scene colour, FXAA's luma test also took the texture detail (facade crop, Laplacian variance 46.8 with it, 62.7 without, 55.6 with this gate). ?fxaa=0 turns it off.
   const FXAA_MODE = RN_Q.get('fxaa');   // '0' off, '2' debug: edges in red
   const FXAA_ON = FXAA_MODE !== '0';
   // BRIDGE: remaster colour grade, not in the original (the game has no tonemap or grade; SetGammaRamp is kept, never applied,
@@ -240,6 +240,7 @@ const TONE = ${TONE_ON ? 1 : 0};
 const VIG = ${VIG_ON ? 1 : 0};
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
+@group(0) @binding(2) var dep: texture_depth_2d;
 @vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
   let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
   return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
@@ -283,6 +284,15 @@ fn fxaa(pos: vec4f) -> vec4f {
   let rangeMin = min(min(lumaN, lumaW0), min(lumaE0, min(lumaS, lumaM)));
   let range = rangeMax - rangeMin;
   if (range < max(0.0625, rangeMax * 0.125)) { return m4; }
+  // Only where the depth jumps: a silhouette, not the detail inside a texture. 1 - z_ndc goes as 1 / distance, so the ratio is the relative step in metres.
+  let q = vec2i(pos.xy);
+  let dm = textureDimensions(dep) - vec2u(1u);
+  let dA = textureLoad(dep, vec2u(q), 0);
+  let dN = textureLoad(dep, vec2u(max(q - vec2i(0, 1), vec2i(0))), 0); let dS = textureLoad(dep, min(vec2u(q + vec2i(0, 1)), dm), 0);
+  let dW = textureLoad(dep, vec2u(max(q - vec2i(1, 0), vec2i(0))), 0); let dE = textureLoad(dep, min(vec2u(q + vec2i(1, 0)), dm), 0);
+  let dHi = max(1.0 - min(dA, min(min(dN, dS), min(dW, dE))), 1e-6);
+  let dLo = max(1.0 - max(dA, max(max(dN, dS), max(dW, dE))), 1e-6);
+  if (dHi / dLo < 1.03) { return m4; }
   if (DBG == 1) { return vec4f(1.0, 0.0, 0.0, m4.a); }
   let lumaNW = L(uv0 + vec2f(-rcp.x, -rcp.y)); let lumaNE = L(uv0 + vec2f(rcp.x, -rcp.y));
   let lumaSW = L(uv0 + vec2f(-rcp.x, rcp.y)); let lumaSE = L(uv0 + vec2f(rcp.x, rcp.y));
@@ -338,8 +348,9 @@ fn fxaa(pos: vec4f) -> vec4f {
   if (!horzSpan) { uv.x = uv.x + pixelOffsetSubpix * lengthSign; } else { uv.y = uv.y + pixelOffsetSubpix * lengthSign; }
   return vec4f(textureSampleLevel(src, smp, uv, 0.0).rgb, m4.a);
 }` });
-  const fxaaPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: fxaaMod, entryPoint: 'vs' },
-    fragment: { module: fxaaMod, entryPoint: FXAA_ON ? 'fs' : 'postOnly', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const fxaaPipe = fs => device.createRenderPipeline({ layout: 'auto', vertex: { module: fxaaMod, entryPoint: 'vs' },
+    fragment: { module: fxaaMod, entryPoint: fs, targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const fxaaPipes = { fs: FXAA_ON ? fxaaPipe('fs') : null, post: fxaaPipe('postOnly') };
   const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   let fxaaTmp = null;
   // BRIDGE: remaster, the last step of a frame. The back buffer is at most 2560 wide (web/index.html), so on the OWNER's
@@ -1039,9 +1050,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         }
         enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
         const p = enc.beginRenderPass({ timestampWrites: tsw('fxaa'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
-        p.setPipeline(fxaaPipe);
-        p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
-          entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
+        const ds = res.get(sceneDs), aa = FXAA_ON && ds?.depth && ds.sc === 1 && ds.w === rt.w && ds.h === rt.h, pipe = aa ? fxaaPipes.fs : fxaaPipes.post;
+        p.setPipeline(pipe);
+        p.setBindGroup(0, device.createBindGroup({ layout: pipe.getBindGroupLayout(0), entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp },
+          ...(aa ? [{ binding: 2, resource: ds.tex.createView({ aspect: 'depth-only' }) }] : [])] }));
         p.draw(3);
         p.end();
       }
@@ -1053,7 +1065,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
-        else if (op === GPU_FXAA) { if (asp && (RN_PS.on || AO_ON) && res.get(id)?.w >= 1000) return true; }   // psblur and AO read the scene depth
+        else if (op === GPU_FXAA) { if (asp && (RN_PS.on || AO_ON || FXAA_ON) && res.get(id)?.w >= 1000) return true; }   // psblur, AO and FXAA read the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
       return true;     // the next frame may read it
