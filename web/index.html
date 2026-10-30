@@ -104,6 +104,8 @@ function line(s, cls) {
       }
       // ?world=1: the open world (docs/OPENWORLD.md): the 16 street tracks load one merged collision, no fences (host/openworld.c)
       if (RN_Q.get('world') === '1') m.ENV.RN_WORLD = '1';
+      // ?rivalai=0: the rivals drive the shipped skill records, no clumsy or aggressive levels (host/rivals.c). Read at each race.
+      if (RN_Q.get('rivalai') === '0') m.ENV.RN_RIVALAI = '0';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;
