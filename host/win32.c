@@ -534,8 +534,22 @@ static uint32_t GetSystemInfo_(Ctx *c) {
 }
 // Same CPU as rn_cpuid: CX8 and RDTSC, no MMX/SSE/3DNow.
 static uint32_t IsProcessorFeaturePresent_(Ctx *c) { uint32_t f = ARG(0); return f == 2 || f == 8; }
-static uint32_t GetTickCount_(Ctx *c) { (void)c; rn_telem.clock_calls++; gil_clock(); return (uint32_t)(now_us() / 1000); }
-static uint32_t QueryPerformanceCounter_(Ctx *c) { rn_telem.clock_calls++; gil_clock(); st64(c, ARG(0), now_us()); return 1; }
+// RN_FIXEDCLOCK=1 (tests, tools/abbench.py): from the first race HUD on (host/d3d9.c), the game thread's clock reads count frames, not real
+// time: 1/60 s per Present and 1 us per read (a loop that polls the clock still ends). The frame time the game derives from QPC
+// (limiter 0x585b40) and the RNG are then the same in every run, so race frame N is the same moment. Other threads keep the real clock.
+static uint64_t fixed_base;
+static uint32_t fixed_presents;
+void rn_fixedclock_start(Ctx *c) {
+    if (!getenv("RN_FIXEDCLOCK")) return;
+    fixed_base = now_us(), fixed_presents = rn_telem.presents;
+    st(c, 0x6f227c, 0x12345678, 4);   // the game RNG (PATCH 0x4470f0): the frames before this one differ between runs
+}
+static uint64_t game_now_us(void) {
+    static uint64_t reads;
+    return fixed_base && rn_is_main_thread() ? fixed_base + (uint64_t)(rn_telem.presents - fixed_presents) * 16667 + ++reads : now_us();
+}
+static uint32_t GetTickCount_(Ctx *c) { (void)c; rn_telem.clock_calls++; gil_clock(); return (uint32_t)(game_now_us() / 1000); }
+static uint32_t QueryPerformanceCounter_(Ctx *c) { rn_telem.clock_calls++; gil_clock(); st64(c, ARG(0), game_now_us()); return 1; }
 static uint32_t QueryPerformanceFrequency_(Ctx *c) { st64(c, ARG(0), 1000000); return 1; }
 // The PC's clock runs on UTC: time zone "Greenwich Standard Time" (bias 0, no daylight saving),
 // so local time = system time. GetTimeZoneInformation then answers TIME_ZONE_ID_UNKNOWN.
@@ -812,7 +826,7 @@ static uint32_t GetThreadPriority_(Ctx *c) { (void)c; return 0; }
 static uint32_t SetThreadPriority_(Ctx *c) { (void)c; return 1; }
 
 // =================================== winmm =====================================================
-static uint32_t timeGetTime_(Ctx *c) { (void)c; rn_telem.clock_calls++; gil_clock(); return (uint32_t)(now_us() / 1000); }
+static uint32_t timeGetTime_(Ctx *c) { (void)c; rn_telem.clock_calls++; gil_clock(); return (uint32_t)(game_now_us() / 1000); }
 static uint32_t timeBeginPeriod_(Ctx *c) { (void)c; return 0; }
 static uint32_t timeEndPeriod_(Ctx *c) { (void)c; return 0; }
 static uint32_t timeGetDevCaps_(Ctx *c) { st(c, ARG(0), 1, 4); st(c, ARG(0) + 4, 1000000, 4); return 0; }

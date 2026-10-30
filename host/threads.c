@@ -174,6 +174,8 @@ static void teb_init(Ctx *c, uint32_t teb, uint32_t lo, uint32_t hi, uint32_t id
     st(c, teb + 0x30, PEB_ADDR, 4);
 }
 
+int rn_is_main_thread(void) { return is_main; }
+
 void threads_init(Ctx *c) {
     teb_init(c, TEB_ADDR, STACK_LO, STACK_HI, 0xc);
     is_main = 1;
