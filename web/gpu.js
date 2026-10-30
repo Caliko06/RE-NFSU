@@ -217,7 +217,7 @@ async function startGpu(M, canvas, report, onFrame) {
   // single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
   // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
   const MSAA = RN_Q.get('msaa') === '4' ? 4 : 1;
-  // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first HUD quad of a race
+  // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first screen quad of a race
   // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
   const FXAA_MODE = RN_Q.get('fxaa');   // '0' off, '2' debug: edges in red
   const FXAA_ON = FXAA_MODE !== '0';
@@ -907,7 +907,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       uBindBuf = ubuf;
     }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
+    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0, postRt = 0, postFrom = 0;
     if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
     // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
@@ -915,6 +915,23 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       if (pass) { pass.end(); pass = null; passKey = ''; }
       if (pend && !keepClear) { enc.beginRenderPass(passDesc(null, pend.mask & 1 ? pend.rt : 0, pend.mask & 6 ? pend.ds : 0, pend.k, pend)).end(); pend = null; }
     };
+    // Bloom, FXAA, grade: on the finished scene colour, before the HUD (see GPU_FXAA below).
+    function postFx(rt) {
+      if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
+      if ((FXAA_ON || GRADE_ON) && rt && !rt.depth && !rt.msView) {
+        if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
+          doom(fxaaTmp);
+          fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
+        }
+        enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
+        const p = enc.beginRenderPass({ timestampWrites: tsw('fxaa'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
+        p.setPipeline(fxaaPipe);
+        p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
+          entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
+        p.draw(3);
+        p.end();
+      }
+    }
     // What a later command does to target id's colour (asp 0, the MSAA twin), depth (1) or stencil (2):
     // true = it reads it (draw or partial clear: loadOp 'load'), false = it overwrites it first (full clear, new target).
     const needed = (k, id, asp) => {
@@ -1048,6 +1065,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         stats.texKb += tw * th >> 8;
       } else if (op === GPU_DRAW) {
         const g = k => w[a + k];
+        if (postRt && g(D_RT) !== postRt && g(D_RT) !== postFrom) { endPass(); postFx(res.get(postRt)); postRt = 0; }
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
         const key = `${g(D_RT)}/${g(D_DS)}`;
         if (ds && g(D_ZEN) && ds.w >= 1000 && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
@@ -1133,20 +1151,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
-        if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
-        if ((FXAA_ON || GRADE_ON) && rt && !rt.depth && !rt.msView) {
-          if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
-            doom(fxaaTmp);
-            fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
-          }
-          enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
-          const p = enc.beginRenderPass({ timestampWrites: tsw('fxaa'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
-          p.setPipeline(fxaaPipe);
-          p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
-            entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
-          p.draw(3);
-          p.end();
-        }
+        // With the game's scene RT ([0x73645c] = 1, 0x40a580) the target at GPU_FXAA only holds the light trails and flares: its next
+        // draws are added onto the scene colour (636 here), and only then the scene is copied to the back buffer under the HUD. So
+        // the post waits for the first draw on a third target. Without a scene RT the two are one target and it runs now.
+        if (sceneRt && sceneRt !== w[a]) { postRt = sceneRt; postFrom = w[a]; } else postFx(rt);
       } else if (op === GPU_BUFFER) {
         doom(gbufs.get(w[a]));
         gbufs.set(w[a], device.createBuffer({ size: Math.max(4, w[a + 1]), usage: GPUBufferUsage.VERTEX | GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST }));
@@ -1156,6 +1164,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         skin(w, a);
       } else if (op === GPU_PRESENT) {
         endPass();
+        if (postRt) { postFx(res.get(postRt)); postRt = 0; }
         const t = res.get(w[a]), size = `${w[a + 1]}x${w[a + 2]}`;
         // The game's cursor moves in back-buffer pixels (web/input.js), whatever the canvas size.
         canvas.gameW = w[a + 1]; canvas.gameH = w[a + 2];

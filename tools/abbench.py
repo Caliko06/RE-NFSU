@@ -4,7 +4,8 @@
 # from the first race HUD), ?hold=N stops at race frame N (web/gpu.js). Measured noise of two identical runs: --frame 300 (the
 # default: the grid before GO) is the same frame, only the crowd moves (7 % of pixels, mean delta 1.5/255). --frame 900 (racing) is the same
 # road and speed but not the same pixels: race clock 7.02 vs 7.28 s, the rivals elsewhere. Compare looks at 300; at 900 only coarse things.
-# Times: ?gpuprof=1, race frames 120..N, p50 noise about 0.3 ms on the pod's 4090 (timestamp-query, start of the first pass to end of the last).
+# Times: ?gpuprof=1, race frames 120..N. Trust "by pass" and "sum" (ms per pass kind, stable to about 0.05 ms per post pass; the draws move more,
+# the crowd is in them). p50/p90 are first pass start to last pass end and jump between identical runs on the pod's 4090 (0.5 vs 1.9 ms).
 # usage: tools/abbench.py NAME [--frame 300] [--jump 0:1003] [--view 1920x1080@1] [--repeat] [--crop X,Y,W,H] label=query ...
 #   e.g. tools/abbench.py grade off=grade=0 on=
 #        tools/abbench.py cam base= far='chasecam=2&grade=0'
@@ -77,9 +78,9 @@ for i, (r, im) in enumerate(zip(res, imgs)):
     draw.text((W * i + 8, 5), f"{r['label']}  gpu p50 {r['p50']} p90 {r['p90']} ms", fill=(255, 212, 121), font=font)
 strip.save(f'{out}/strip.jpg', quality=92)
 
-print(f'{"variant":16} {"frame":>5} {"p50":>6} {"p90":>6} {"max":>6} {"dp50":>6} {"px>2 %":>7} {"mean":>6}  query')
+print(f'{"variant":16} {"frame":>5} {"p50":>6} {"p90":>6} {"max":>6} {"sum":>6} {"px>2 %":>7} {"mean":>6}  query')
 for r in res:
-    print(f'{r["label"]:16} {r["frame"]:5} {r["p50"]:6.1f} {r["p90"]:6.1f} {r["max"]:6.1f} {r["p50"] - res[0]["p50"]:+6.1f} {r["changed_pct"]!s:>7} {r["mean_delta"]!s:>6}  {r["query"]}')
+    print(f'{r["label"]:16} {r["frame"]:5} {r["p50"]:6.1f} {r["p90"]:6.1f} {r["max"]:6.1f} {sum(r["passes"].values()):6.2f} {r["changed_pct"]!s:>7} {r["mean_delta"]!s:>6}  {r["query"]}')
 for r in res[1:]:
     keys = sorted(set(r['passes']) | set(res[0]['passes']), key=lambda k: -abs(r['passes'].get(k, 0) - res[0]['passes'].get(k, 0)))[:5]
     print(f'{r["label"]} vs {res[0]["label"]}, ms per frame by pass: ' + ', '.join(f'{k} {r["passes"].get(k, 0) - res[0]["passes"].get(k, 0):+.2f}' for k in keys))
