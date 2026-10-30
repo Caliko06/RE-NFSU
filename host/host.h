@@ -90,6 +90,8 @@ void win32_init(Ctx *c, uint32_t image_size);
 uint32_t guest_alloc(uint32_t size);                           // zeroed, for host-owned guest data
 void guest_free(uint32_t p);       // host/win32.c: back to the guest heap
 uint64_t now_us(void);
+int rn_is_main_thread(void);
+void rn_fixedclock_start(Ctx *c);
 uint32_t virtual_reserve(Ctx *c, uint32_t size);
 void gil_acquire(void);
 void gil_release(void);

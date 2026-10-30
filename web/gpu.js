@@ -836,6 +836,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   }
 
   const gpuDone = [], TS_MAX = 256;
+  let raceFrames = 0;   // the frames with a GPU_FXAA: 3D scene + HUD (?hold)
   const tsq = TS ? { set: device.createQuerySet({ type: 'timestamp', count: TS_MAX }),
     res: device.createBuffer({ size: 8 * TS_MAX, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC }), free: [] } : null;
   let tsN = 0;
@@ -1118,6 +1119,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         uoff += U_STEP;
         stats.draws++;
       } else if (op === GPU_FXAA) {
+        raceFrames++;
         if (PROF) {   // the draws on this target after the scene, and how many of them test or write depth
           let n = 0, z = 0;
           for (let k = ci; k < cl.length; k++) {
@@ -1220,9 +1222,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     return stats;
   }
 
-  // ?hold=N (debug): stop after the N-th Present, so a capture shows that frame (the game then waits).
-  const hold = Number(RN_Q.get('hold')) || 0;
-  let frames = 0, presents = 0;
+  // ?hold=N (tools/abbench.py): stop at the Present of race frame N, so a capture shows that frame (the game then waits), and log the
+  // GPU time of race frames HOLD_SKIP..N in one line (the first ones compile pipelines and load textures).
+  const hold = Number(RN_Q.get('hold')) || 0, HOLD_SKIP = 120;
+  let frames = 0, presents = 0, held = false;
   const steerLog = /RN_STEERLOG/.test(location.search);   // host/input.c RN_STEERLOG: GPU completion per present
   // The page runs a frame as soon as the game submits it (host/gpu.c wakes seq), not at the next animation frame: with one
   // frame in flight, waiting for requestAnimationFrame made Present wait up to a refresh more (OWNER session 2026-10-23:
@@ -1234,7 +1237,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   async function pump() {
     for (;;) {
       if (!tick()) return;
-      if (hold && presents >= hold) { await new Promise(f => setTimeout(f, 100)); continue; }
+      if (held) { await new Promise(f => setTimeout(f, 100)); continue; }
       const h = M.HEAP32, seq = Atomics.load(h, box);
       const r = Atomics.load(h, box + 1) < seq ? { async: false } : Atomics.waitAsync(h, box, seq);
       if (r.async) await r.value; else await yieldTask();
@@ -1243,17 +1246,22 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   function tick() {
     const h = H();
     try {
-      while (Atomics.load(h, box + 1) < Atomics.load(h, box) && !(hold && presents >= hold)) {
+      while (Atomics.load(h, box + 1) < Atomics.load(h, box) && !held) {
         const k = Atomics.load(h, box + 1) + 1;
         const t = performance.now();
         const s = run(h[box + 2 + (k & 1)], h[box + 4 + (k & 1)]);
         onFrame?.(s, t, performance.now() - t);
         frames++;
         if (s.present) presents++;
+        if (hold && s.present && raceFrames === HOLD_SKIP) { gpuDone.length = 0; profSum.clear(); profFrames = 0; encMs.length = 0; }
+        if (hold && s.present && raceFrames >= hold) {
+          held = true;
+          device.queue.onSubmittedWorkDone().then(() => setTimeout(() => report(`gpu.js: held at race frame ${raceFrames}, present ${s.present}${gpuReport()}`), 200));
+        }
         if (s.present && steerLog) { const p = presents; device.queue.onSubmittedWorkDone().then(() =>
           report(`page present ${p} start ${t.toFixed(1)} done ${performance.now().toFixed(1)}`)); }
         if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +
-          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + gpuReport());
+          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + (hold ? '' : gpuReport()));
         if (frames % 300 === 0) hdMs = 0;
         Atomics.store(h, box + 1, k);
         Atomics.notify(M.HEAP32, box + 1);
