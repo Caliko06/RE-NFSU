@@ -402,6 +402,23 @@ void rn_player_car(Ctx *c) {
     for (uint32_t i = 0; i < cnt; i++) {
         if (ld(c, t + 0x750 * i + 4, 4) != 1) continue;
         if (!ready) catalog(c);
+        if (getenv("RN_CARLIST")) {   // which persona n of a model is dark or light: the paint's own RGB of the first 6 personas of every model
+            uint32_t ride = t + 0x750 * i + 0x10, scratch = guest_alloc(RIDE_SIZE), tmp = guest_alloc(RIDE_SIZE);
+            for (int k = 0; k < 20; k++) for (int j = 0, q = 0; j < POOL && q < 6; j++) {
+                if (pool[j].car != k) continue;
+                memcpy(G(scratch), G(ride), RIDE_SIZE); memcpy(G(tmp), G(ride), RIDE_SIZE);
+                float r0; apply(c, scratch, tmp, syn[0], "RN_PLAYER", &pool[j], 3, &r0);
+                for (int sl = 0; sl < 0x78; sl++) {
+                    uint32_t key = ld(c, syn[0] + 0x4c + 8 * sl, 4);
+                    for (int u = 0; key && u < nparts; u++)
+                        if (parts[u].key == key && parts[u].slot == sl && parts[u].kind >= K_GLOSS && parts[u].kind <= K_CUSTOM)
+                            rn_log("RN_CARLIST %s n=%d %s rgb %u,%u,%u lum %.2f", CARS[k], q, G(parts[u].name), parts[u].rgb[0], parts[u].rgb[1], parts[u].rgb[2],
+                                   (0.2126 * parts[u].rgb[0] + 0.7152 * parts[u].rgb[1] + 0.0722 * parts[u].rgb[2]) / 255);
+                }
+                q++;
+            }
+            guest_free(scratch); guest_free(tmp);
+        }
         const Persona *pe = NULL;
         for (int j = 0, q = 0; j < POOL && !pe; j++) if (pool[j].car == car && q++ == n) pe = &pool[j];
         if (!pe) { rn_log("RN_CAR: %s has no persona %d", nm, n); done = 1; return; }
