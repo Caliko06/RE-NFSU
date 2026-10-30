@@ -87,7 +87,7 @@ function line(s, cls) {
     preRun: [m => {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
       // The game draws at the pixels of this window (PATCH 0x408760), at most 2560x1440 to keep the GPU load sane.
-      const dpr = window.devicePixelRatio || 1, k = Math.min(1, 2560 / (innerWidth * dpr), 1440 / (innerHeight * dpr));
+      const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || 2560), k = Math.min(1, BB / (innerWidth * dpr), BB * 9 / 16 / (innerHeight * dpr));
       // Even sizes: the layer keeps width and height even (host/win32.c). At k = 1 the canvas gets exactly
       // back buffer / dpr CSS pixels, centred, so one back-buffer pixel is one device pixel; k < 1: Chrome scales it up.
       const bw = 2 * Math.floor(innerWidth * dpr * k / 2), bh = 2 * Math.floor(innerHeight * dpr * k / 2);
