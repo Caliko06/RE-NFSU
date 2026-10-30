@@ -831,7 +831,7 @@ static void census_dump(void) {
 // TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
 // at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
 // seq; Present copies them into the game's .data when seq changed.
-static uint32_t tune[6];      // seq, then the 4 floats as bits, then the trail colour
+static uint32_t tune[7];      // seq, then the 4 floats as bits, then the trail colour, then the speed-FOV gain (degrees, float bits)
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -846,6 +846,31 @@ static void tune_apply(Ctx *c) {
     float f[4];
     memcpy(f, &tune[1], sizeof f);
     rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f, trails %08x", f[0], f[1], f[2], f[3], tune[5]);
+}
+// Speed FOV (web/tune.js ?speedfov=, word 6 of tune[]): the chase camera mover (type 0x11, update 0x48bcb0) reads the s16 FOV table
+// 0x6fbdf4 every frame (0x48bbed; POV 0, 1, 4 at +0, +2, +8, 0x32dc = 71.5 deg, 65536 = 360 deg), smooths it into camera+0xc4 (measured:
+// under 1 s behind) and the projection builder 0x40dd00 reads that, so frustum and focal stay one. Hood, bumper and special cameras do not read these entries. Present writes the three entries from the camera's speed
+// ([0x740500]+0x1e0, m/s): 0 at 25 m/s (90 km/h), the full gain at 75 m/s, smoothstep, then a ~1 s low pass (it also absorbs a
+// camera teleport). Gain 0 is the native default: nothing is touched, and a gain back to 0 restores 0x32dc once. RN_FOVLOG=1 logs.
+static void fov_frame(Ctx *c) {
+    static int lg = -1, wrote;
+    static float deg;
+    if (lg < 0) lg = getenv("RN_FOVLOG") != NULL;
+    float gain; uint32_t gb = __atomic_load_n(&tune[6], __ATOMIC_RELAXED);
+    memcpy(&gain, &gb, 4);
+    if (gain == 0 && !wrote) return;
+    uint32_t cam = ld(c, 0x740500, 4);
+    if (!cam || cam >= GUEST_MEM - 0x200) return;
+    float v[3] = {ldf(c, cam + 0x1e0), ldf(c, cam + 0x1e4), ldf(c, cam + 0x1e8)};
+    float sp = sqrtf(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    float t = (sp - 25) / 50; t = t < 0 ? 0 : t > 1 ? 1 : t; t = t * t * (3 - 2 * t);
+    deg += (gain * t - deg) * (1.0f / 60);
+    if (gain == 0 && fabsf(deg) < 0.01f) deg = 0, wrote = 0;
+    else wrote = 1;
+    uint32_t e = 0x32dc + (int)lroundf(deg * 65536 / 360);
+    for (int k = 0; k < 3; k++) st(c, 0x6fbdf4 + (k == 2 ? 8 : 2 * k), e, 2);
+    if (lg && dev.frames % 60 == 0)
+        rn_log("FOV f%u speed %.1f gain %.1f deg %.2f table %04x cam+c4 %04x", (unsigned)dev.frames, sp, gain, deg, e, ld(c, cam + 0xc4, 2));
 }
 // PS2-style depth speed blur (web/gpu.js psblur): out[0..2] = the view-1 camera's velocity [0x740500]+0x1e0 (camera 0x78d270; what the game's own blur 0x40cd40
 // reads) in camera space, normalised, out[3] = its length (m/s); float bits, 0 when there is no camera. out[4] = nitrous on ([0x73654c],
@@ -1003,6 +1028,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     jumpcam_log(c);
     tune_apply(c);
+    fov_frame(c);
     rng_log(c, dev.frames);
     flow_log(c);
     free_tick(c);

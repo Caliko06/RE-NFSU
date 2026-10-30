@@ -172,6 +172,10 @@ PATCHES.append(dict(addr=0x42d4b0, old="8a90ae040000", new="8a1514300100", when=
 # drove itself (runs 2026-10-24: drag 6/4, no finish). `mov ecx,3; jmp 0x42d4c1` now goes through the cave:
 # mov ecx,[0x13018]; jmp 0x42d4c1. The layer writes SCREEN_ADDR+0x18 = 4 with RN_AUTOPILOT, else 3 (the original).
 PATCHES.append(dict(addr=0x42d4a9, old="b903000000eb11", new="e9356221009090", when=lambda: True))
+# PATCH: 0x42d87e, TEST-ONLY autopilot keeps the chase camera: SetInputMode 0x42d520 asks the factory 0x42c6d0 for camera 0x12 in
+# PLAYER_MODE_AUTO_PILOT (update 0x48c220, a view that swings around the car); now 0x11, the mover the OWNER drives with (0x42c670), so
+# autopilot shots show what the OWNER sees, and the FOV path through 0x48bcb0 runs (with 0x12 camera+0xc4 stayed at 0x32dc, 2026-10-30).
+PATCHES.append(dict(addr=0x42d87e, old="6a12", new="6a11", when=lambda: True))
 # PATCH: 0x4609e3/0x460a80/0x460b4f/0x460c02, OWNER choice 2026-10-26 (?steer=pad, "the car responds late, I can't hold the angle"):
 # the steering model 0x460a80 reads [0x736514], 0 = keyboard (0x4070a0 clears it on the steer actions 3/4), 1 = gamepad
 # (0x40664a, with a joystick axis; the layer has no joystick, so it is always 0 here). With 0 the angle cap grows with the

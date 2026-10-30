@@ -26,6 +26,9 @@ const DECAY = [0x82, 0x96, 0xb4];   // BLENDFACTOR 0x008296b4 at 0x409bca, R G B
 const trailColor = s => s === 'raw' ? 0x1fffffff :
   (0x1f000000 | DECAY.reduce((c, k) => c << 8 | Math.min(255, Math.round(s * (255 - k))), 0)) >>> 0;
 const STREAK = 0.00625;     // 0x702a44 as shipped
+// ?speedfov=<deg>: the chase camera's FOV grows by up to this many degrees from 90 to 270 km/h (host/d3d9.c fov_frame: it rewrites
+// the game's FOV table 0x6fbdf4 from the camera's speed, the camera and projection follow). 0 = off, as shipped; Original mode sets 0.
+const SPEEDFOV = 10;
 
 function startTune(M) {
   const base = M._rn_tune_addr() >> 2;
@@ -36,6 +39,8 @@ function startTune(M) {
   try { const s = localStorage.getItem(KEY); if (s !== null && BLUR[+s]) level = +s; } catch {}
   const q = RN_Q.get('blur');
   if (q !== null && BLUR[+q]) level = +q;
+  const sf = parseFloat(RN_Q.get('speedfov') ?? SPEEDFOV);
+  const speedfov = isFinite(sf) ? sf : 0;
   const psOff = RN_Q.get('psblur') === '0';
   if (psOff && BLUR[level].ps) level = 3;    // ?psblur=0: the pass off, the game's own PS2 blur instead
 
@@ -50,6 +55,7 @@ function startTune(M) {
     const p = BLUR[level], h = M.HEAPU32;
     RN_PS.on = !!p.ps && !psOff;
     h[base + 1] = bits(p.ramp[0]); h[base + 2] = bits(p.ramp[1]); h[base + 3] = bits(p.cap); h[base + 4] = bits(STREAK); h[base + 5] = trailColor(p.trails);
+    h[base + 6] = bits(speedfov);
     Atomics.add(h, base, 1);
     try { localStorage.setItem(KEY, String(level)); } catch {}
     if (!show) return;
