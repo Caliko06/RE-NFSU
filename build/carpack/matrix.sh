@@ -18,10 +18,11 @@ CELLS=(
   "race_tiburon|&car=TIBURON:3|race|150"
   "race_dark|&car=INTEGRA:3:2|race|150"
   "race_light|&car=RSX:3:2|race|150"
-  "world_night|&world=1&jump=3:1001|race|150"
+  "world_night|&world=1&jump=3:1001|world|300"
   "garage_stock|$OPEN&keys=$PROFILE|fe|110"
   "garage_kit|$OPEN&keys=$KIT|fe|170"
 )
+# world: the Free Run shows an EA Trax banner first, so the shot is 14 s after the HUD, with the longer 330 s alarm
 run(){ n=$1; q=$2; kind=$3; secs=$4; cp=$5
   while [ "$(uptime | sed 's/.*averages: //;s/\..*//')" -ge 6 ]; do sleep 10; done
   ~/.claude/hooks/macgate.sh
@@ -29,6 +30,10 @@ run(){ n=$1; q=$2; kind=$3; secs=$4; cp=$5
   if [[ $kind == fe ]]; then
     mkdir -p $out.fe
     RN_SHOT_FE=$out.fe RN_SHOT_FE_AT=3,8,13 RN_VIEW=1920x1080@1 perl -e 'alarm 240; exec @ARGV' node tools/webcheck.mjs "$B$q&carpack=$cp" $secs $out.png "" > $out.out 2>&1
+    # keep the Car Customize / garage views only, at 1280 px (each cell was 42 MB, the disk is nearly full)
+    for f in $out.fe/*.png; do [[ $f == *Customize* || $f == *Garage* ]] && sips -Z 1280 $f >/dev/null || rm -f $f; done
+  elif [[ $kind == world ]]; then
+    RN_VIEW=1920x1080@1 RN_AFTER_HUD=14 perl -e 'alarm 330; exec @ARGV' node tools/webcheck.mjs "$B$q&carpack=$cp" $secs $out.png "$RACEKEYS" > $out.out 2>&1
   else
     RN_VIEW=1920x1080@1 RN_AFTER_HUD=3 perl -e 'alarm 240; exec @ARGV' node tools/webcheck.mjs "$B$q&carpack=$cp" $secs $out.png "$RACEKEYS" > $out.out 2>&1
   fi
