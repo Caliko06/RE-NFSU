@@ -12,8 +12,9 @@ const BLUR = [
   { name: 'PS2',          ramp: [0.1, 25], cap: 0.26, trails: 1.5 },
   { name: 'strong',       ramp: [0.1, 25], cap: 0.45, trails: 2.0 },
   { name: 'PC original',  ramp: [25, 125], cap: 0.65, trails: 'raw' },
-  // PC blur: the game's own half-res zoom blur at its shipped ramp (nothing under 90 km/h; cars drawn after it, so they stay sharp), with the 'PS2' trails.
-  { name: 'PC blur',      ramp: [25, 125], cap: 0.65, trails: 1.5 },
+  // PC blur: the game's own half-res zoom blur (cars drawn after it, so they stay sharp) with the ramp of 'PC original' (OWNER 2026-10-27: PS2's is
+  // "agresivo desde el arranque") and the cap of 'PS2' (OWNER 2026-10-26: 0.18 is hard to see; 0.65 smears the city from the chase camera at 240 km/h).
+  { name: 'PC blur',      ramp: [25, 125], cap: 0.26, trails: 1.5 },
   // PS2 depth: the PS2's 4-copy zoom blur weighted by the scene's depth (web/gpu.js psblur; car sharp, far city stretched; nitrous adds
   // the PS2's 2 extra passes). The game's own blur is off (cap 0) so the two do not stack; trails as 'PS2'. ?psblur=0 falls back to 3.
   { name: 'PS2 depth',    ramp: [0.1, 25], cap: 0,    trails: 1.5, ps: true },
