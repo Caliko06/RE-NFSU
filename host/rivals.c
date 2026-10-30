@@ -414,7 +414,7 @@ void rn_player_car(Ctx *c) {
                     uint32_t key = ld(c, syn[0] + 0x4c + 8 * sl, 4);
                     for (int u = 0; key && u < nparts; u++)
                         if (parts[u].key == key && parts[u].slot == sl && parts[u].kind >= K_GLOSS && parts[u].kind <= K_CUSTOM)
-                            rn_log("RN_CARLIST %s n=%d %s rgb %u,%u,%u lum %.2f", CARS[k], q, G(parts[u].name), parts[u].rgb[0], parts[u].rgb[1], parts[u].rgb[2],
+                            rn_log("RN_CARLIST %s n=%d %s %s rgb %u,%u,%u lum %.2f", CARS[k], q, ARCH[pool[j].arch].name, G(parts[u].name), parts[u].rgb[0], parts[u].rgb[1], parts[u].rgb[2],
                                    (0.2126 * parts[u].rgb[0] + 0.7152 * parts[u].rgb[1] + 0.0722 * parts[u].rgb[2]) / 255);
                 }
                 q++;
