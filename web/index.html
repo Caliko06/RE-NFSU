@@ -126,6 +126,8 @@ function line(s, cls) {
       const rr = RN_Q.get('roadrefl');
       if (rr !== null) m.ENV.RN_ROADREFL = rr;
       // ?carvol=0|1|2: the diffuse volume and panel-edge terms (host/sm1.c car_ps_vol); 1 default, 2 stronger, 0 off
+      // ?facade=0: walls without the facade detail (host/sm1.c)
+      if (RN_Q.get('facade') === '0') m.ENV.RN_FACADE = '0';
       const cv = RN_Q.get('carvol');
       if (cv !== null) m.ENV.RN_CARVOL = cv;
       // ?carpack=0|1|split: the car look pack (host/sm1.c car_ps_tail_pack: paint as bright as the original, lamps held); on in Remaster (OWNER 2026-10-30), 0 = before

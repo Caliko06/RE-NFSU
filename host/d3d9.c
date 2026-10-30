@@ -1708,7 +1708,7 @@ static uint32_t new_shader(Ctx *c, int iface, uint32_t p, uint32_t out) {
     int mode = !perpixel ? SM1_PLAIN : iface == I_VS && h == 0x4728b668u ? SM1_CAR_VS : iface == I_PS && h == 0xc27f3669u ? SM1_CAR_PS : SM1_PLAIN;
     // The headlight world pairs (worldheadlight, worldheadlightreflect): other cars' headlights, host/lights.c.
     if (iface == I_VS && (h == 0x67da8f41u || h == 0x102e066du)) mode = SM1_HL_VS;
-    if (iface == I_PS && (h == 0x91d5deecu || h == 0x9bb3f7c7u)) mode = SM1_HL_PS;
+    if (iface == I_PS && (h == 0x91d5deecu || h == 0x9bb3f7c7u)) mode = SM1_HL_PS | (h == 0x91d5deecu ? SM1_WALL : 0);
     o->hl = mode == SM1_HL_VS;
     // The road reflection weight (sm1.c sm1_roadrefl, ?roadrefl=): worldreflect.efx ps 0x92e7bdab, worldheadlightreflect.efx ps 0x9bb3f7c7.
     if (iface == I_PS && (h == 0x92e7bdabu || h == 0x9bb3f7c7u)) {

@@ -523,8 +523,8 @@ int sm1_roadrefl(void) {
 }
 
 char *sm1_wgsl(const Sm1 *s, int mode) {
-    int refl = mode & SM1_REFL;
-    mode &= ~SM1_REFL;
+    int refl = mode & SM1_REFL, wall = mode & SM1_WALL;
+    mode &= ~(SM1_REFL | SM1_WALL);
     Buf b = {malloc(4096), 0, 4096};
     b.p[0] = 0;
     emit(&b, "struct U { c: array<vec4f, 256>, pc: array<vec4f, 8>, hp: vec4f, fogc: vec4f, af: vec4u, ar: vec4f,"
@@ -639,6 +639,17 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
                          "    dark = dark * (1.0 - select(vec3f(0.0), %.2f * h, ok)); }\n", 4 + k, 0.005 * SM1_HL_REACH, SM1_HL_GAIN);
             emit(&b, "  let lp = clamp(t1.xyz * t2.xyz, vec3f(0.0), vec3f(1.0));\n"
                      "  r0 = vec4f(r0.xyz + 2.0 * t0.xyz * (1.0 - dark) * (1.0 - lp) * u.pc[0].xyz, r0.w);\n");
+        }
+        // BRIDGE: facade detail (?facade=0 / RN_FACADE=0 off; census/names_world.tsv): world meshes have no normal and one UV set and the night is baked in the vertex colour
+        // (0x40e180 vertex declarations, chunk 0x134b01), so a wall is a day photo times a soft gradient. Each texel against its neighbourhood (4 mips up): recesses, frames and
+        // ledges darker, stone lighter, power 0.6. Only worldheadlight ps 0x91d5deec, what buildings draw with: the road and sidewalk go through worldheadlightreflect, the dry road stays as it is.
+        // A slope-lit emboss from the same luma was tried: no visible gain for one more texture read (build/ab/fac).
+        if (wall) {
+            static int on = -1;
+            if (on < 0) { const char *e = getenv("RN_FACADE"); on = !e || e[0] != '0'; }
+            if (on) emit(&b, "  let fw = vec3f(0.3, 0.59, 0.11);\n"
+                             "  let fm = dot(textureSampleBias(x0, s0, tc(i.t0, u.tt[0][0]), 4.0).xyz, fw);\n"
+                             "  r0 = vec4f(r0.xyz * pow(clamp((dot(t0.xyz, fw) + 0.03) / (fm + 0.03), 0.5, 1.6), 0.6), r0.w);\n");
         }
         emit(&b, "  var c = r0;\n  if (u.af.y != 0u) { c = vec4f(mix(u.fogc.xyz, c.xyz, i.fog), c.w); }\n"
                  "  if (u.af.x != 0u && !d3d_cmp(u.af.x, clamp(c.w, 0.0, 1.0), u.ar.x)) { discard; }\n  return c;\n}\n");
