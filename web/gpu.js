@@ -571,6 +571,95 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       p.end();
     }
   }
+  // BRIDGE: remaster screen-space ambient occlusion from the game's own depth, not in the original. Half size: 8 samples per pixel, each the
+  // sine of its elevation over the surface minus an angle bias (Alchemy's 1 / |v| weight dirtied the near car's curved panels), in a 2 m radius (0.7 m barely showed at race distance, build/ab/ao2), on view-space positions (z = _43 / (z_ndc - _33), x and y by _11, _22; host/d3d9.c psblur_vel), turned by
+  // interleaved noise; two depth-aware 5-tap blurs; multiplied onto the scene colour at GPU_FXAA, so the light trails and flares added after it
+  // stay bright and the HUD is untouched. It only darkens: under cars, kerbs, wall corners. The sky and what is past 150 m take none.
+  // ?ao=0 turns it off, ?ao=show draws the term alone. With ?msaa=4 no pass runs (the depth is multisampled).
+  const AO_MODE = RN_Q.get('ao'), AO_ON = AO_MODE !== '0', AO_R = 2;
+  const aoMod = device.createShaderModule({ code: `
+struct U { zz: vec4f, size: vec2f, dir: vec2f };
+@group(0) @binding(0) var dep: texture_depth_2d;
+@group(0) @binding(1) var<uniform> u: U;
+@group(0) @binding(2) var ao: texture_2d<f32>;
+@group(0) @binding(3) var smp: sampler;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
+}
+fn zAt(p: vec2i) -> f32 { return u.zz.y / (textureLoad(dep, clamp(p, vec2i(0), vec2i(u.size) - 1), 0) - u.zz.x); }
+fn viewAt(p: vec2i) -> vec3f {
+  let z = zAt(p);
+  let n = (vec2f(p) + 0.5) / u.size * 2.0 - 1.0;
+  return vec3f(n.x * z / u.zz.z, -n.y * z / u.zz.w, z);
+}
+@fragment fn occl(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  let q = vec2i(pos.xy) * 2;
+  if (textureLoad(dep, q, 0) >= 0.99999) { return vec4f(1.0); }
+  let P = viewAt(q);
+  if (P.z > 150.0 || P.z <= 0.0) { return vec4f(1.0); }
+  // The normal from the nearer neighbour on each axis, so an edge does not bend it.
+  let l = viewAt(q - vec2i(2, 0)) - P; let r = viewAt(q + vec2i(2, 0)) - P;
+  let d = viewAt(q - vec2i(0, 2)) - P; let t = viewAt(q + vec2i(0, 2)) - P;
+  let dx = select(l * -1.0, r, dot(r, r) < dot(l, l));
+  let dy = select(d * -1.0, t, dot(t, t) < dot(d, d));
+  var n = normalize(cross(dx, dy));
+  if (dot(n, P) > 0.0) { n = -n; }
+  let rpx = clamp(${AO_R} * u.zz.z * u.size.x * 0.5 / P.z, 4.0, u.size.x / 12.0);
+  let phi = 6.2831853 * fract(52.9829189 * fract(dot(pos.xy, vec2f(0.06711056, 0.00583715))));
+  var sum = 0.0;
+  for (var i = 0; i < 8; i++) {
+    let a = phi + f32(i) * 2.3999632;
+    let s = sqrt((f32(i) + 0.5) / 8.0) * rpx;
+    let v = viewAt(q + vec2i(vec2f(cos(a), sin(a)) * s)) - P;
+    let vv = dot(v, v);
+    if (vv < ${AO_R * AO_R}) { sum += max(0.0, dot(v, n) / sqrt(vv + 1e-4) - 0.22) * (1.0 - vv / ${AO_R * AO_R}); }
+  }
+  return vec4f(vec3f(max(0.25, 1.0 - 0.8 * sum)), 1.0);
+}
+@fragment fn blur(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  let p = vec2i(pos.xy);
+  let z0 = zAt(p * 2);
+  var w = array<f32, 3>(0.4, 0.24, 0.06);
+  var c = 0.0; var tot = 0.0;
+  for (var i = -2; i <= 2; i++) {
+    let o = p + i * vec2i(u.dir);
+    let k = w[abs(i)] * max(0.0, 1.0 - abs(zAt(o * 2) - z0) / (0.02 * z0 + 0.1));
+    c += textureLoad(ao, clamp(o, vec2i(0), vec2i(textureDimensions(ao)) - 1), 0).r * k; tot += k;
+  }
+  return vec4f(vec3f(c / max(tot, 1e-4)), 1.0);
+}
+@fragment fn compose(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  return vec4f(vec3f(textureSampleLevel(ao, smp, pos.xy / u.size, 0.0).r), 1.0);
+}` });
+  const aoPipe = (fs, format, blend, msaa) => device.createRenderPipeline({ layout: 'auto', vertex: { module: aoMod, entryPoint: 'vs' },
+    fragment: { module: aoMod, entryPoint: fs, targets: [{ format, ...(blend ? { blend } : {}) }] }, primitive: { topology: 'triangle-list' } });
+  const aoPipes = AO_ON ? { occl: aoPipe('occl', 'r8unorm'), blur: aoPipe('blur', 'r8unorm'),
+    compose: aoPipe('compose', 'rgba8unorm', AO_MODE === 'show' ? null : { color: { srcFactor: 'zero', dstFactor: 'src', operation: 'add' },
+      alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } }) } : null;
+  const aoU = [0, 1, 2].map(() => device.createBuffer({ size: 32, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST }));
+  let aoA = null, aoB = null;
+  function aoPass(enc, rt, ds, v) {
+    if (!ds?.depth || ds.sc !== 1 || rt.msView || ds.w !== rt.w || ds.h !== rt.h || !v[7] || !v[8]) return;
+    const hw = rt.w >> 1, hh = rt.h >> 1;
+    if (!aoA || aoA.width !== hw || aoA.height !== hh) {
+      doom(aoA); doom(aoB);
+      const mk = () => device.createTexture({ size: [hw, hh], format: 'r8unorm', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING });
+      aoA = mk(); aoB = mk();
+    }
+    const depV = ds.tex.createView({ aspect: 'depth-only' });
+    const step = (lab, pipe, att, entries) => {
+      const p = enc.beginRenderPass({ timestampWrites: tsw(lab), colorAttachments: [att] });
+      p.setPipeline(pipe); p.setBindGroup(0, device.createBindGroup({ layout: pipe.getBindGroupLayout(0), entries })); p.draw(3); p.end();
+    };
+    const to = t => ({ view: t.createView(), loadOp: 'clear', clearValue: [1, 1, 1, 1], storeOp: 'store' });
+    [[1, 0], [0, 1], [0, 0]].forEach((dir, i) => device.queue.writeBuffer(aoU[i], 0, new Float32Array([v[5], v[6], v[7], v[8], rt.w, rt.h, ...dir])));
+    const buf = i => ({ binding: 1, resource: { buffer: aoU[i] } });
+    step('ao', aoPipes.occl, to(aoA), [{ binding: 0, resource: depV }, buf(0)]);
+    step('ao blur', aoPipes.blur, to(aoB), [{ binding: 0, resource: depV }, buf(0), { binding: 2, resource: aoA.createView() }]);
+    step('ao blur', aoPipes.blur, to(aoA), [{ binding: 0, resource: depV }, buf(1), { binding: 2, resource: aoB.createView() }]);
+    step('ao add', aoPipes.compose, { view: rt.view, loadOp: 'load', storeOp: 'store' }, [buf(2), { binding: 2, resource: aoA.createView() }, { binding: 3, resource: fxaaSamp }]);
+  }
   const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
@@ -963,7 +1052,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
-        else if (op === GPU_FXAA) { if (asp && RN_PS.on && res.get(id)?.w >= 1000) return true; }   // psblur reads the scene depth
+        else if (op === GPU_FXAA) { if (asp && (RN_PS.on || AO_ON) && res.get(id)?.w >= 1000) return true; }   // psblur and AO read the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
       return true;     // the next frame may read it
@@ -1174,6 +1263,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(w[a]);
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
+        if (AO_ON && sceneRt) aoPass(enc, res.get(sceneRt), res.get(sceneDs), f32.subarray(a + 1, a + 10));
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
         // With the game's scene RT ([0x73645c] = 1, 0x40a580) the target at GPU_FXAA only holds the light trails and flares: its next
         // draws are added onto the scene colour (636 here), and only then the scene is copied to the back buffer under the HUD. So
