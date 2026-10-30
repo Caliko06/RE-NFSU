@@ -18,10 +18,21 @@ static int lights_on(void) {
 //    alpha * clamp(z / focal, 0.01, 0.015) * 1.5 world units across; close to the camera (front end, post race, z < 15 m at
 //    2560 wide) that is a fixed 1.9 m star on a 4.4 m car. The PS2 (0x29ad30, same tables) has no 1.5, so its stars are 2/3
 //    as big: [0x6b633c] = 1.0 (one reader, 0x5444a9; the reflection view, mode 2, already skips it).
+//    carpack (RN_CARPACK=1, docs/SCOPE_CARS.md "lamps contained"): the head star is still 1.28 m across at the garage camera
+//    (z < 0.01 * focal: fixed in world, alpha_end * 0.01 half-size). RN_FLARE (default 0.55 under carpack) scales the end alpha of the
+//    two head layers, 0x6f3efc (64) and 0x6f3f38 (28), so the star and its glow shrink while the lamp keeps its colour and place.
 void lights_init(Ctx *c) {
     if (!lights_on()) return;
     stf(c, 0x6b5da0, 0.35f);
     stf(c, 0x6b633c, 1.0f);
+    const char *cp = getenv("RN_CARPACK"), *fe = getenv("RN_FLARE");
+    float k = fe ? (float)atof(fe) : cp && !strcmp(cp, "1") ? 0.55f : 1.0f;
+    if (k != 1.0f) {
+        float a0 = ldf(c, 0x6f3efc), a1 = ldf(c, 0x6f3f38);
+        stf(c, 0x6f3efc, a0 * k);
+        stf(c, 0x6f3f38, a1 * k);
+        rn_log("lights: head flare x%.2f (end alpha %.1f %.1f -> %.1f %.1f)", k, a0, a1, a0 * k, a1 * k);
+    }
 }
 
 // 3. Other cars' headlights (web only: the SM1 interpreter of the native CPU raster leaves them out). 0x4100a0 lights the
