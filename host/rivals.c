@@ -13,6 +13,7 @@
 // original in Quick Race too.
 #include "host.h"
 #include <string.h>
+#include <math.h>
 
 #define POOL 300
 #define NSYN 8                  // synthetic preset records: one per opponent slot of a race
@@ -336,12 +337,47 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
     return r1 > *r0 ? r1 - *r0 : *r0 - r1;
 }
 
-// 0x5809c0(id, 2, ride, record, skill, ?, index) with esi = the ride slot: stdcall, 7 arguments.
+// Personalities (RN_RIVALAI=0: as shipped; docs/openworld/re_rival_personality.md). The game picks each opponent's skill level by
+// difficulty (0x4b4590: easy 0..2, medium 3..5, hard 6..8), so each band gets a clumsy and an aggressive level and its strength stays.
+// Level 0 stays as shipped: an AI without a level reads record 0. The career keeps every shipped value.
+// Clumsy: accepts 35 % of Pass/Avoid targets (+0x0c, 0x4627ac), reads the route speed 6 % lower (+0x14, 0x44c72b) and twice as far off
+// its spot (+0x50, 0x44c667). Aggressive: route speed 4 % higher, and Block ceiling 400 (style 2, 0x44dbd0): it beats Avoid and Pass.
+enum { NORMAL, CLUMSY, AGGRESSIVE };
+static const uint8_t PERSONA[10] = {NORMAL, AGGRESSIVE, CLUMSY, AGGRESSIVE, NORMAL, CLUMSY, AGGRESSIVE, NORMAL, CLUMSY, AGGRESSIVE};
+static int rivalai(void) { const char *e = getenv("RN_RIVALAI"); return !(e && e[0] == '0'); }
+static int rival_style(uint32_t skill, uint32_t style) { return rivalai() && skill <= 9 && PERSONA[skill] == AGGRESSIVE ? 2 : (int)style; }
+
+// Records 0x779ff8 + 0x54 * level (0x462070 copies them from GLOBALB): shipped, then the personas of this race.
+static void rival_tables(Ctx *c, int personas) {
+    static uint8_t shipped[10 * 0x54];
+    static int saved;
+    if (!saved++) memcpy(shipped, G(0x779ff8), sizeof shipped);
+    memcpy(G(0x779ff8), shipped, sizeof shipped);
+    if (!personas) return;
+    char b[256];
+    int n = 0;
+    for (int lv = 1; lv <= 9; lv++) {
+        uint32_t r = 0x779ff8 + 0x54 * lv;
+        float accept = ldf(c, r + 0x0c), speed = ldf(c, r + 0x14);
+        if (PERSONA[lv] == CLUMSY) accept = 0.35f, speed *= 0.94f, c->mem[r + 0x50] *= 2;
+        if (PERSONA[lv] == AGGRESSIVE) speed *= 1.04f;
+        memcpy(G(r + 0x0c), &accept, 4), memcpy(G(r + 0x14), &speed, 4);
+        n += snprintf(b + n, sizeof b - n, " L%d %.2f %.3f %u", lv, ldf(c, r + 0x0c), ldf(c, r + 0x14), c->mem[r + 0x50]);
+    }
+    if (getenv("RN_RIVALLOG") || getenv("RN_FREELOG")) rn_log("rivalai accept speed look:%s", b);
+}
+
+// 0x5809c0(id, 2, ride, record, skill, style, index) with esi = the ride slot: stdcall, 7 arguments.
 static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
-    if (a[6] <= 1) rn_player_car(c);
-    if (rn_free_now) return free_rival(c, a);                    // host/free.c: free mode's career rivals
+    if (a[6] <= 1) rn_player_car(c), rival_tables(c, rivalai() && (rn_free_now || !c->mem[0x78a33c]));
+    if (rn_free_now) {                                           // host/free.c: free mode's career rivals
+        uint32_t e = free_rival(c, a);                           // 0x5809c0 returns the entrant; free_rival picks the level at +0x735
+        c->mem[e + 0x736] = (uint8_t)rival_style(c->mem[e + 0x735], c->mem[e + 0x736]);
+        if (getenv("RN_FREELOG")) rn_log("rivalai %s level %d style %d", G(e + 0x73c), (int8_t)c->mem[e + 0x735], (int8_t)c->mem[e + 0x736]);
+        return e;
+    }
     if (!on) { const char *e = getenv("RN_RIVALS"); on = e && e[0] == '0' ? -1 : 1; }
     if (on > 0 && !c->mem[0x78a33c]) {
         if (!ready) catalog(c);
@@ -382,8 +418,66 @@ static uint32_t rival_ride(Ctx *c) {
             }
         }
         guest_free(tmp);
+        a[5] = rival_style(a[4], a[5]);
     }
     return call_guest(c, 0x5809c0, 7, a);
+}
+
+// Traffic that reacts (RN_TRAFYIELD=0 / ?trafyield=0: as shipped; docs/openworld/re_traffic_rivals.md). Traffic only ever looks ahead: its
+// finder 0x453920 takes the nearest car ahead in its lane, so a player closing from behind is never seen and hits the car square on.
+// Now a traffic car with the player in its neighbour list (0x57a910), same lane, 0.6..2.5 s from impact, takes a free neighbour lane
+// the way its own avoid update does (0x453c60: 0x453ba0 says if the lane is clear, then lane ctx+0x394, route state ctx+0x398 = 1) and
+// sounds its horn (0x429100, thiscall on the car). Outside the career, as the personas; each car once in YIELD_WAIT frames.
+#define YIELD_WAIT 240
+void traffic_tick(Ctx *c) {
+    static int off = -1, n_yield;
+    static uint32_t act, seed = 0x51ed2701;
+    static struct { uint32_t car, frame; } seen[32];
+    if (off < 0) { const char *e = getenv("RN_TRAFYIELD"); off = e && e[0] == '0'; }
+    if (off || rn_telem.presents % 6 || ld(c, 0x77a920, 4) != 6 || c->mem[0x78a33c]) return;
+    uint32_t h = ld(c, 0x7361f8, 4), me = 0;
+    for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !me; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (e && ld(c, e + 4, 4) == 1) me = r;
+    }
+    if (!me) return;
+    if (!act) {                                // the action 0x453ba0 reads: +0x204 the gap that counts as taken, +0x208 the scan range
+        float taken = ldf(c, 0x6b76d8), range = ldf(c, 0x6b76e0);
+        act = guest_alloc(0x210), memcpy(G(act + 0x204), &taken, 4), memcpy(G(act + 0x208), &range, 4);
+    }
+    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
+        if (!e || ld(c, e + 4, 4) != 3 || !v || c->mem[v + 0x4d1]) continue;
+        uint32_t ctx = v + 0x2c, a = ld(c, v + 0x3f8, 4), n = ld(c, ctx + 4, 4), lane = ld(c, ctx + 0x394, 4);
+        int own = (int8_t)c->mem[ctx + 0x388];
+        if (!a || ld(c, a + 0x1f8, 4) == 3 || ld(c, a + 0x1f8, 4) == 0x12) continue;   // already avoiding, or at a junction
+        if (n > 16 || own < 0 || (uint32_t)own >= n || lane < 11 || lane > 16) continue;
+        uint32_t o = ctx + 8 + 0x38 * own, p = 0;
+        for (uint32_t i = 0; i < n && !p; i++) if (ld(c, ctx + 8 + 0x38 * i + 0x34, 4) == me) p = ctx + 8 + 0x38 * i;
+        if (!p) continue;
+        // Entry (0x44f470, 0x453c60): +4 speed relative to this car, +8/+0xc half width/length, +0x10 along the path, +0x18.. offset from each lane.
+        float gap = ldf(c, o + 0x10) - ldf(c, p + 0x10) - ldf(c, o + 0xc) - ldf(c, p + 0xc), closing = ldf(c, p + 4);
+        float side = ldf(c, p + 0x18 + 4 * (lane - 11)) - ldf(c, o + 0x18 + 4 * (lane - 11));
+        if (gap <= 0 || closing < 5 || gap / closing < 0.6f || gap / closing > 2.5f) continue;
+        if (fabsf(side) > 0.5f + ldf(c, o + 8) + ldf(c, p + 8)) continue;
+        int s = 0;
+        while (s < 31 && seen[s].car && seen[s].car != r) s++;
+        if (seen[s].car == r && rn_telem.presents < seen[s].frame + YIELD_WAIT) continue;
+        seen[s].car = r, seen[s].frame = rn_telem.presents;
+        uint32_t esi = c->r[ESI], to = 0, dir = rnd(&seed) & 2;   // a coin for the first side
+        for (int t = 0; t < 2 && !to; t++, dir ^= 2) {
+            uint32_t want = lane + dir - 1, one = act;
+            c->r[EAX] = lane, c->r[ECX] = want, c->r[ESI] = ctx;
+            if (call_guest(c, 0x453ba0, 1, &one) & 0xff) to = want;
+        }
+        c->r[ESI] = esi;
+        if (!to) continue;
+        st(c, ctx + 0x394, to, 4), st(c, ctx + 0x398, 1, 4), st(c, ctx + 0x39c, 0, 4), st(c, ctx + 0x3a0, 0, 4), c->mem[ctx + 0x3a4] = 0;
+        uint32_t honk[6] = {0x3e800000, 0x3e000000, 0x3e800000, 0, 1, 0};              // 0.25, 0.125, 0.25 s, horn +0x83f
+        c->r[ECX] = r, call_guest(c, 0x429100, 6, honk);
+        if (getenv("RN_FREELOG") || getenv("RN_RIVALLOG"))
+            rn_log("trafyield #%d: lane %u -> %u, gap %.1f m, closing %.1f m/s, frame %u", ++n_yield, lane, to, gap, closing, rn_telem.presents);
+    }
 }
 
 // RN_CAR=<CAR>[:tier[:n]] (?car= on the web): the player's car in every race is the n-th (default 0) persona of that car model

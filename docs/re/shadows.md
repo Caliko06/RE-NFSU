@@ -90,3 +90,6 @@ Built (touches host/d3d9.c, tools/recomp/patches.py, web/gpu.js, web/tune.js, we
 
 Open: moving shadows while driving (texel snapping untested), props and walls do not cast, headlight/night look (the light is the game's sun), cars far
 from the player are outside the 64 m box, and the apply pass also darkens the casting car itself a little (bias 0.0012).
+
+After the merge with the visual post (AO, grade, bloom, FXAA; 2026-10-30): the shadow pass runs first at GPU_FXAA (words 10..49 of the command, after the psblur and AO words), so AO, bloom and the grade work on the
+shadowed colour. The PCF is 5x5 with 2 texels between taps at 2048 (an edge about 25 cm soft, not a hard filter); apply pass +0.11 ms, map +0.05 ms at 2048 on the 4090.

@@ -359,14 +359,14 @@ entry	name	signature	calling	params	locals	bytes
 0061df40	DirectInput8Create	undefined DirectInput8Create()	unknown			6
 0061df50	FUN_0061df50	undefined FUN_0061df50()	unknown		undefined local_4;	59
 0061df90	FUN_0061df90	undefined FUN_0061df90()	unknown			113
-0061e010	FUN_0061e010	undefined FUN_0061e010()	unknown		undefined4 local_90;	1146
+0061e010	EAGL__DynamicLoader__LoadSymbols	undefined EAGL__DynamicLoader__LoadSymbols()	unknown		undefined4 local_90;	1146
 0061e4d0	FUN_0061e4d0	undefined FUN_0061e4d0()	unknown		undefined4 local_4;undefined4 local_c;	287
 0061e5f0	FUN_0061e5f0	undefined FUN_0061e5f0()	unknown			213
 0061e6d0	FUN_0061e6d0	undefined FUN_0061e6d0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined local_20;	178
-0061e790	FUN_0061e790	undefined FUN_0061e790()	unknown		undefined4 local_8;undefined local_10;	61
+0061e790	GetFirstAnimBank	undefined GetFirstAnimBank()	unknown		undefined4 local_8;undefined local_10;	61
 0061e7d0	FUN_0061e7d0	undefined FUN_0061e7d0()	unknown			118
-0061e850	FUN_0061e850	undefined FUN_0061e850()	unknown		undefined1 local_4;undefined4 local_c;undefined local_10;undefined4 local_14;undefined local_28;	422
-0061ea00	FUN_0061ea00	undefined FUN_0061ea00()	unknown		undefined4 local_88;undefined4 local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined local_ba;undefined1 local_bc;	1173
+0061e850	EAGL__DynamicLoader__RunDestructors	undefined EAGL__DynamicLoader__RunDestructors()	unknown		undefined1 local_4;undefined4 local_c;undefined local_10;undefined4 local_14;undefined local_28;	422
+0061ea00	EAGL__DynamicLoader__DumpRuntimeAllocs	undefined EAGL__DynamicLoader__DumpRuntimeAllocs()	unknown		undefined4 local_88;undefined4 local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined local_ba;undefined1 local_bc;	1173
 0061eee0	FUN_0061eee0	undefined FUN_0061eee0()	unknown			70
 0061ef30	FUN_0061ef30	undefined FUN_0061ef30()	unknown			45
 0061ef60	FUN_0061ef60	undefined FUN_0061ef60()	unknown			14
@@ -378,13 +378,13 @@ entry	name	signature	calling	params	locals	bytes
 0061f020	FUN_0061f020	undefined FUN_0061f020()	unknown			10
 0061f030	FUN_0061f030	undefined FUN_0061f030()	unknown			10
 0061f040	FUN_0061f040	undefined FUN_0061f040()	unknown			6
-0061f050	FUN_0061f050	undefined FUN_0061f050()	unknown			62
+0061f050	EAGL__RenderContext__New	undefined EAGL__RenderContext__New()	unknown			62
 0061f090	FUN_0061f090	undefined FUN_0061f090()	unknown			59
 0061f0d0	FUN_0061f0d0	undefined FUN_0061f0d0()	unknown			7
 0061f0e0	FUN_0061f0e0	undefined FUN_0061f0e0()	unknown			115
 0061f160	FUN_0061f160	undefined FUN_0061f160()	unknown			22
 0061f180	FUN_0061f180	undefined FUN_0061f180()	unknown			48
-0061f1b0	FUN_0061f1b0	undefined FUN_0061f1b0()	unknown			279
+0061f1b0	EAGL__SymbolPool__Lookup	undefined EAGL__SymbolPool__Lookup()	unknown			279
 0061f2e0	FUN_0061f2e0	undefined FUN_0061f2e0()	unknown			92
 0061f340	FUN_0061f340	undefined FUN_0061f340()	unknown		undefined4 local_4;undefined4 local_8;undefined local_18;	252
 0061f440	FUN_0061f440	undefined FUN_0061f440()	unknown			133
@@ -402,7 +402,7 @@ entry	name	signature	calling	params	locals	bytes
 0061f7e0	FUN_0061f7e0	undefined FUN_0061f7e0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	1402
 0061fd80	FUN_0061fd80	undefined FUN_0061fd80()	unknown			110
 0061fdf0	FUN_0061fdf0	undefined FUN_0061fdf0()	unknown			40
-0061fe20	FUN_0061fe20	undefined FUN_0061fe20()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	114
+0061fe20	EAGL__PC__CreateCapsWindow	undefined EAGL__PC__CreateCapsWindow()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	114
 0061fea0	FUN_0061fea0	undefined FUN_0061fea0()	unknown			906
 00620230	FUN_00620230	undefined FUN_00620230()	unknown			6
 00620240	FUN_00620240	undefined FUN_00620240()	unknown			6
@@ -418,13 +418,13 @@ entry	name	signature	calling	params	locals	bytes
 006204e0	FUN_006204e0	undefined FUN_006204e0()	unknown			204
 006205b0	FUN_006205b0	undefined FUN_006205b0()	unknown			935
 00620970	FUN_00620970	undefined FUN_00620970()	unknown			535
-00620bc0	FUN_00620bc0	undefined FUN_00620bc0()	unknown			410
+00620bc0	EAGL__RenderContext__Ctor	undefined EAGL__RenderContext__Ctor()	unknown			410
 00620d60	FUN_00620d60	undefined FUN_00620d60()	unknown			36
 00620d90	FUN_00620d90	undefined FUN_00620d90()	unknown			297
-00620ed0	FUN_00620ed0	undefined FUN_00620ed0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;	321
-00621020	FUN_00621020	undefined FUN_00621020()	unknown		undefined local_18c;	300
+00620ed0	EAGL__PC__InitCaps	undefined EAGL__PC__InitCaps()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;	321
+00621020	EAGL__PC__GetDirectDraw	undefined EAGL__PC__GetDirectDraw()	unknown		undefined local_18c;	300
 00621160	FUN_00621160	undefined FUN_00621160()	unknown			210
-00621290	thunk_FUN_0040a880	undefined thunk_FUN_0040a880()	unknown			5
+00621290	NullUpdate_ret	undefined NullUpdate_ret()	unknown			5
 006212a0	FUN_006212a0	undefined FUN_006212a0()	unknown			226
 00621390	FUN_00621390	undefined FUN_00621390()	unknown		undefined local_8;	116
 00621410	FUN_00621410	undefined FUN_00621410()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;	602
@@ -467,7 +467,7 @@ entry	name	signature	calling	params	locals	bytes
 00622b50	FUN_00622b50	undefined FUN_00622b50()	unknown			25
 00622c10	FUN_00622c10	undefined FUN_00622c10()	unknown			79
 00622c60	FUN_00622c60	undefined FUN_00622c60()	unknown			106
-00622cd0	FUN_00622cd0	undefined FUN_00622cd0()	unknown			109
+00622cd0	EAGL__VertexBuffer__New	undefined EAGL__VertexBuffer__New()	unknown			109
 00622d40	FUN_00622d40	undefined FUN_00622d40()	unknown			94
 00622da0	FUN_00622da0	undefined FUN_00622da0()	unknown			31
 00622dc0	FUN_00622dc0	undefined FUN_00622dc0()	unknown			9
@@ -482,7 +482,7 @@ entry	name	signature	calling	params	locals	bytes
 006230e0	FUN_006230e0	undefined FUN_006230e0()	unknown		undefined local_4;undefined4 local_8;	380
 00623260	FUN_00623260	undefined FUN_00623260()	unknown			61
 006232a0	FUN_006232a0	undefined FUN_006232a0()	unknown			66
-006232f0	FUN_006232f0	undefined FUN_006232f0()	unknown			89
+006232f0	EAGL__IndexBuffer__New	undefined EAGL__IndexBuffer__New()	unknown			89
 00623350	FUN_00623350	undefined FUN_00623350()	unknown			400
 006234f0	thunk_FUN_00623350	undefined thunk_FUN_00623350()	unknown			5
 00623500	FUN_00623500	undefined FUN_00623500()	unknown			134
@@ -534,7 +534,7 @@ entry	name	signature	calling	params	locals	bytes
 006271c0	FUN_006271c0	undefined FUN_006271c0()	unknown			33
 006271f0	FUN_006271f0	undefined FUN_006271f0()	unknown			32
 00627230	FUN_00627230	undefined FUN_00627230()	unknown			39
-00627360	FUN_00627360	undefined FUN_00627360()	unknown			52
+00627360	EAGLAnim__MemoryPool_Create	undefined EAGLAnim__MemoryPool_Create()	unknown			52
 006274d0	FUN_006274d0	undefined FUN_006274d0()	unknown			49
 00627530	FUN_00627530	undefined FUN_00627530()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	206
 00627600	FUN_00627600	undefined FUN_00627600()	unknown			63
@@ -543,7 +543,7 @@ entry	name	signature	calling	params	locals	bytes
 006276e0	FUN_006276e0	undefined FUN_006276e0()	unknown			43
 00627750	FUN_00627750	undefined FUN_00627750()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	251
 006278f0	FUN_006278f0	undefined FUN_006278f0()	unknown			33
-00627b90	FUN_00627b90	undefined FUN_00627b90()	unknown			93
+00627b90	EAGLAnim__FnAnimFactory__New	undefined EAGLAnim__FnAnimFactory__New()	unknown			93
 00627bf0	FUN_00627bf0	undefined FUN_00627bf0()	unknown			11
 00627c50	FUN_00627c50	undefined FUN_00627c50()	unknown		undefined4 local_4;	116
 00627cd0	FUN_00627cd0	undefined FUN_00627cd0()	unknown			143
@@ -686,7 +686,7 @@ entry	name	signature	calling	params	locals	bytes
 006388a0	FUN_006388a0	undefined FUN_006388a0()	unknown		undefined4 local_4;	236
 00638990	FUN_00638990	undefined FUN_00638990()	unknown			180
 00638a50	FUN_00638a50	undefined FUN_00638a50()	unknown		undefined local_10;	469
-00638c30	FUN_00638c30	undefined FUN_00638c30()	unknown		undefined local_10;	156
+00638c30	SHP_FormatName	undefined SHP_FormatName()	unknown		undefined local_10;	156
 00638cd0	FUN_00638cd0	undefined FUN_00638cd0()	unknown		undefined4 local_10;	249
 00638dd0	FUN_00638dd0	undefined FUN_00638dd0()	unknown			219
 00638ee0	FUN_00638ee0	undefined FUN_00638ee0()	unknown			30
@@ -705,7 +705,7 @@ entry	name	signature	calling	params	locals	bytes
 0063a190	FUN_0063a190	undefined FUN_0063a190()	unknown			35
 0063a1e0	FUN_0063a1e0	undefined FUN_0063a1e0()	unknown			298
 0063a310	FUN_0063a310	undefined FUN_0063a310()	unknown			218
-0063a3f0	FUN_0063a3f0	undefined FUN_0063a3f0()	unknown			81
+0063a3f0	FileSystem_Create	undefined FileSystem_Create()	unknown			81
 0063a5d0	FUN_0063a5d0	undefined FUN_0063a5d0()	unknown			190
 0063a690	FUN_0063a690	undefined FUN_0063a690()	unknown			100
 0063a700	FUN_0063a700	undefined FUN_0063a700()	unknown			121
@@ -758,10 +758,10 @@ entry	name	signature	calling	params	locals	bytes
 0063eea0	FUN_0063eea0	undefined FUN_0063eea0()	unknown			382
 0063f020	FUN_0063f020	undefined FUN_0063f020()	unknown			124
 0063f0a0	FUN_0063f0a0	undefined FUN_0063f0a0()	unknown			108
-0063f150	FUN_0063f150	undefined FUN_0063f150()	unknown			17
+0063f150	CriticalSection__Init	undefined CriticalSection__Init()	unknown			17
 0063f170	FUN_0063f170	undefined FUN_0063f170()	unknown			23
-0063f190	FUN_0063f190	undefined FUN_0063f190()	unknown			15
-0063f1a0	FUN_0063f1a0	undefined FUN_0063f1a0()	unknown			15
+0063f190	CriticalSection__Enter	undefined CriticalSection__Enter()	unknown			15
+0063f1a0	CriticalSection__Leave	undefined CriticalSection__Leave()	unknown			15
 0063f1b0	FUN_0063f1b0	undefined FUN_0063f1b0()	unknown			89
 0063f210	FUN_0063f210	undefined FUN_0063f210()	unknown			115
 0063f2a0	FUN_0063f2a0	undefined FUN_0063f2a0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	104
@@ -797,8 +797,8 @@ entry	name	signature	calling	params	locals	bytes
 00642330	FUN_00642330	undefined FUN_00642330()	unknown			47
 00642360	FUN_00642360	undefined FUN_00642360()	unknown			19
 00642380	FUN_00642380	undefined FUN_00642380()	unknown			15
-00642450	FUN_00642450	undefined FUN_00642450()	unknown		undefined local_200;	66
-006424a0	FUN_006424a0	undefined FUN_006424a0()	unknown		undefined local_200;	106
+00642450	Log_Printf	undefined Log_Printf()	unknown		undefined local_200;	66
+006424a0	Error_Printf	undefined Error_Printf()	unknown		undefined local_200;	106
 00642540	FUN_00642540	undefined FUN_00642540()	unknown			48
 00642570	FUN_00642570	undefined FUN_00642570()	unknown		undefined local_res0;	58
 006427d0	FUN_006427d0	undefined FUN_006427d0()	unknown			87
@@ -1029,15 +1029,15 @@ entry	name	signature	calling	params	locals	bytes
 0064b380	FUN_0064b380	undefined FUN_0064b380()	unknown			37
 0064b4c0	FUN_0064b4c0	undefined FUN_0064b4c0()	unknown			38
 0064b500	FUN_0064b500	undefined FUN_0064b500()	unknown			12
-0064b510	FUN_0064b510	undefined FUN_0064b510()	unknown			25
+0064b510	Csis__System__GetAllocator	undefined Csis__System__GetAllocator()	unknown			25
 0064b530	FUN_0064b530	undefined FUN_0064b530()	unknown			37
 0064b560	FUN_0064b560	undefined FUN_0064b560()	unknown			22
-0064b580	FUN_0064b580	undefined FUN_0064b580()	unknown			17
-0064b5a0	FUN_0064b5a0	undefined FUN_0064b5a0()	unknown			15
+0064b580	Mutex__Lock	undefined Mutex__Lock()	unknown			17
+0064b5a0	Mutex__Unlock	undefined Mutex__Unlock()	unknown			15
 0064b5c0	FUN_0064b5c0	undefined FUN_0064b5c0()	unknown		undefined local_c;	270
 0064b6e0	FUN_0064b6e0	undefined FUN_0064b6e0()	unknown		undefined local_res0;	136
-0064b7d0	FUN_0064b7d0	undefined FUN_0064b7d0()	unknown			14
-0064b810	FUN_0064b810	undefined FUN_0064b810()	unknown			40
+0064b7d0	Csis__Class__GetRefCount	undefined Csis__Class__GetRefCount()	unknown			14
+0064b810	Csis__Class__SetMemberDataFast	undefined Csis__Class__SetMemberDataFast()	unknown			40
 0064b840	FUN_0064b840	undefined FUN_0064b840()	unknown			34
 0064b870	FUN_0064b870	undefined FUN_0064b870()	unknown			61
 0064b8b0	FUN_0064b8b0	undefined FUN_0064b8b0()	unknown			34
@@ -1048,7 +1048,7 @@ entry	name	signature	calling	params	locals	bytes
 0064ba10	FUN_0064ba10	undefined FUN_0064ba10()	unknown			94
 0064ba70	FUN_0064ba70	undefined FUN_0064ba70()	unknown			77
 0064bac0	FUN_0064bac0	undefined FUN_0064bac0()	unknown			83
-0064bb20	FUN_0064bb20	undefined FUN_0064bb20()	unknown			166
+0064bb20	Csis__Class__CreateInstanceFast	undefined Csis__Class__CreateInstanceFast()	unknown			166
 0064bbd0	FUN_0064bbd0	undefined FUN_0064bbd0()	unknown		undefined local_8;	85
 0064bc30	FUN_0064bc30	undefined FUN_0064bc30()	unknown			69
 0064bc80	FUN_0064bc80	undefined FUN_0064bc80()	unknown			77
@@ -1056,9 +1056,9 @@ entry	name	signature	calling	params	locals	bytes
 0064be90	FUN_0064be90	undefined FUN_0064be90()	unknown			99
 0064bf00	FUN_0064bf00	undefined FUN_0064bf00()	unknown			91
 0064bf60	FUN_0064bf60	undefined FUN_0064bf60()	unknown			83
-0064c000	FUN_0064c000	undefined FUN_0064c000()	unknown			58
-0064c1a0	FUN_0064c1a0	undefined FUN_0064c1a0()	unknown			57
-0064c380	FUN_0064c380	undefined FUN_0064c380()	unknown		undefined4 local_4;undefined2 local_8;undefined2 local_c;undefined1 local_d;undefined local_20;	260
+0064c000	Csis__ClassHandle__Set	undefined Csis__ClassHandle__Set()	unknown			58
+0064c1a0	Csis__Class__CreateInstance	undefined Csis__Class__CreateInstance()	unknown			57
+0064c380	Csis__ClassHandle__SetFast	undefined Csis__ClassHandle__SetFast()	unknown		undefined4 local_4;undefined2 local_8;undefined2 local_c;undefined1 local_d;undefined local_20;	260
 0064c490	FUN_0064c490	undefined FUN_0064c490()	unknown		undefined4 local_4;undefined2 local_8;undefined2 local_c;undefined1 local_d;undefined local_20;	260
 0064c5a0	FUN_0064c5a0	undefined FUN_0064c5a0()	unknown			25
 0064c5c0	FUN_0064c5c0	undefined FUN_0064c5c0()	unknown			81
@@ -1077,16 +1077,16 @@ entry	name	signature	calling	params	locals	bytes
 0064d700	FUN_0064d700	undefined FUN_0064d700()	unknown			42
 0064da70	FUN_0064da70	undefined FUN_0064da70()	unknown		undefined4 local_4;	163
 0064db20	FUN_0064db20	undefined FUN_0064db20()	unknown			39
-0064dd70	FUN_0064dd70	undefined FUN_0064dd70()	unknown			359
-0064dee0	FUN_0064dee0	undefined FUN_0064dee0()	unknown			25
+0064dd70	SNDAEMS_removemodulebank	undefined SNDAEMS_removemodulebank()	unknown			359
+0064dee0	SNDAEMSI_createmodulebankhandle	undefined SNDAEMSI_createmodulebankhandle()	unknown			25
 0064df30	FUN_0064df30	undefined FUN_0064df30()	unknown		undefined2 local_2;undefined2 local_4;undefined4 local_8;undefined1 local_9;undefined local_1c;	541
-0064e160	FUN_0064e160	undefined FUN_0064e160()	unknown		undefined4 local_8;undefined4 local_c;	394
+0064e160	SNDAEMS_addmodulebank	undefined SNDAEMS_addmodulebank()	unknown		undefined4 local_8;undefined4 local_c;	394
 0064e2f0	FUN_0064e2f0	undefined FUN_0064e2f0()	unknown		undefined local_4;	52
-0064e330	FUN_0064e330	undefined FUN_0064e330()	unknown		undefined4 local_4;	449
+0064e330	SNDSYSI_100hzserver__map_name_SNDvol_is_wrong_	undefined SNDSYSI_100hzserver__map_name_SNDvol_is_wrong_()	unknown		undefined4 local_4;	449
 0064e500	thunk_FUN_00652d80	undefined thunk_FUN_00652d80()	unknown			5
 0064e510	thunk_FUN_00652d90	undefined thunk_FUN_00652d90()	unknown			5
 0064e520	FUN_0064e520	undefined FUN_0064e520()	unknown			19
-0064e540	FUN_0064e540	undefined FUN_0064e540()	unknown			18
+0064e540	SNDSYS_leavecritical	undefined SNDSYS_leavecritical()	unknown			18
 0064e560	FUN_0064e560	undefined FUN_0064e560()	unknown			81
 0064e5f0	FUN_0064e5f0	undefined FUN_0064e5f0()	unknown		undefined2 local_ac;undefined local_d4;	48
 0064e620	FUN_0064e620	undefined FUN_0064e620()	unknown		undefined4 local_a0;undefined local_d4;	83
@@ -1108,33 +1108,33 @@ entry	name	signature	calling	params	locals	bytes
 0064eba0	FUN_0064eba0	undefined FUN_0064eba0()	unknown			65
 0064ee30	FUN_0064ee30	undefined FUN_0064ee30()	unknown		undefined4 local_c;	189
 0064f210	FUN_0064f210	undefined FUN_0064f210()	unknown			120
-0064f320	FUN_0064f320	undefined FUN_0064f320()	unknown		undefined1 local_13;undefined local_18;undefined4 local_1c;	382
+0064f320	SNDAEMS_streaminit	undefined SNDAEMS_streaminit()	unknown		undefined1 local_13;undefined local_18;undefined4 local_1c;	382
 0064f4b0	FUN_0064f4b0	undefined FUN_0064f4b0()	unknown			122
 0064f530	FUN_0064f530	undefined FUN_0064f530()	unknown			66
-0064f580	FUN_0064f580	undefined FUN_0064f580()	unknown			643
+0064f580	SNDSYSI_init	undefined SNDSYSI_init()	unknown			643
 0064f810	FUN_0064f810	undefined FUN_0064f810()	unknown			8
-0064f820	FUN_0064f820	undefined FUN_0064f820()	unknown			179
+0064f820	SNDSYS_shutdown__map__SNDSYS_restore_	undefined SNDSYS_shutdown__map__SNDSYS_restore_()	unknown			179
 0064f8e0	FUN_0064f8e0	undefined FUN_0064f8e0()	unknown			17
 0064f900	FUN_0064f900	undefined FUN_0064f900()	unknown		undefined4 local_4;undefined4 local_8;	340
 0064fa60	FUN_0064fa60	undefined FUN_0064fa60()	unknown			198
 0064fb30	FUN_0064fb30	undefined FUN_0064fb30()	unknown			28
 0064fb50	FUN_0064fb50	undefined FUN_0064fb50()	unknown			41
 0064fb80	FUN_0064fb80	undefined FUN_0064fb80()	unknown			28
-0064fba0	FUN_0064fba0	undefined FUN_0064fba0()	unknown			45
-0064fbd0	FUN_0064fbd0	undefined FUN_0064fbd0()	unknown			69
+0064fba0	SNDSTRM_overhead	undefined SNDSTRM_overhead()	unknown			45
+0064fbd0	SNDplaysetdef	undefined SNDplaysetdef()	unknown			69
 0064fc20	FUN_0064fc20	undefined FUN_0064fc20()	unknown			403
-0064fdc0	FUN_0064fdc0	undefined FUN_0064fdc0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	455
+0064fdc0	SNDSTRMI_startstream	undefined SNDSTRMI_startstream()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	455
 0064ff90	FUN_0064ff90	undefined FUN_0064ff90()	unknown			129
 00650020	FUN_00650020	undefined FUN_00650020()	unknown			30
 00650040	FUN_00650040	undefined FUN_00650040()	unknown			81
-006501a0	FUN_006501a0	undefined FUN_006501a0()	unknown		undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	350
+006501a0	SNDSTRMI_parseheader	undefined SNDSTRMI_parseheader()	unknown		undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	350
 00650310	FUN_00650310	undefined FUN_00650310()	unknown			132
-006503a0	FUN_006503a0	undefined FUN_006503a0()	unknown			264
+006503a0	SNDSTRMI_queue	undefined SNDSTRMI_queue()	unknown			264
 006504b0	FUN_006504b0	undefined FUN_006504b0()	unknown			46
 006504e0	FUN_006504e0	undefined FUN_006504e0()	unknown			270
 006505f0	FUN_006505f0	undefined FUN_006505f0()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_20;undefined local_24;undefined4 local_28;undefined4 local_2c;	316
-00650880	FUN_00650880	undefined FUN_00650880()	unknown			194
-00650980	FUN_00650980	undefined FUN_00650980()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	750
+00650880	SNDSTRMI_service	undefined SNDSTRMI_service()	unknown			194
+00650980	SNDSTRMI_create	undefined SNDSTRMI_create()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	750
 00650c80	FUN_00650c80	undefined FUN_00650c80()	unknown			38
 00650cb0	FUN_00650cb0	undefined FUN_00650cb0()	unknown			78
 00650d00	FUN_00650d00	undefined FUN_00650d00()	unknown			63
@@ -1142,17 +1142,17 @@ entry	name	signature	calling	params	locals	bytes
 00650d90	FUN_00650d90	undefined FUN_00650d90()	unknown		undefined4 local_4;	423
 00650f40	FUN_00650f40	undefined FUN_00650f40()	unknown		undefined4 local_4;	30
 00650f60	FUN_00650f60	undefined FUN_00650f60()	unknown			86
-00650fc0	thunk_FUN_00656040	undefined thunk_FUN_00656040()	unknown			5
+00650fc0	SNDMEMI_usage_percent__map__SNDMEMI_restore_	undefined SNDMEMI_usage_percent__map__SNDMEMI_restore_()	unknown			5
 00650fd0	FUN_00650fd0	undefined FUN_00650fd0()	unknown		undefined local_10;	249
 006510d0	FUN_006510d0	undefined FUN_006510d0()	unknown		undefined local_8;	109
 00651150	FUN_00651150	undefined FUN_00651150()	unknown			89
-006511b0	FUN_006511b0	undefined FUN_006511b0()	unknown			165
-00651260	FUN_00651260	undefined FUN_00651260()	unknown			82
+006511b0	iSNDrandom	undefined iSNDrandom()	unknown			165
+00651260	SNDPLATFORM_setpitch	undefined SNDPLATFORM_setpitch()	unknown			82
 006512c0	FUN_006512c0	undefined FUN_006512c0()	unknown			48
-006512f0	FUN_006512f0	undefined FUN_006512f0()	unknown		undefined4 local_4;undefined4 local_14;	177
+006512f0	Snd__Hal__SetVol__SNDPLATFORM_setvol_	undefined Snd__Hal__SetVol__SNDPLATFORM_setvol_()	unknown		undefined4 local_4;undefined4 local_14;	177
 006513b0	FUN_006513b0	undefined FUN_006513b0()	unknown			147
-00651450	FUN_00651450	undefined FUN_00651450()	unknown			58
-00651490	FUN_00651490	undefined FUN_00651490()	unknown			68
+00651450	SNDPLATFORM_setfxlevel__map__SNDstop_	undefined SNDPLATFORM_setfxlevel__map__SNDstop_()	unknown			58
+00651490	SNDI_calcfxlevel	undefined SNDI_calcfxlevel()	unknown			68
 006514e0	FUN_006514e0	undefined FUN_006514e0()	unknown			41
 00651510	FUN_00651510	undefined FUN_00651510()	unknown			41
 00651540	FUN_00651540	undefined FUN_00651540()	unknown		undefined4 local_20;undefined4 local_38;undefined local_3c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;	1215
@@ -1164,21 +1164,21 @@ entry	name	signature	calling	params	locals	bytes
 00651c60	FUN_00651c60	undefined FUN_00651c60()	unknown			701
 00651f30	FUN_00651f30	undefined FUN_00651f30()	unknown			109
 00651fa0	FUN_00651fa0	undefined FUN_00651fa0()	unknown			35
-00652030	FUN_00652030	undefined FUN_00652030()	unknown		undefined4 local_4;	97
-006520a0	FUN_006520a0	undefined FUN_006520a0()	unknown		undefined4 local_4;	156
+00652030	SNDI_stophandle__loops_patch_voices_of_a_handle__0x651f30_kill__map__SNDSYS_entercritical_	undefined SNDI_stophandle__loops_patch_voices_of_a_handle__0x651f30_kill__map__SNDSYS_entercritical_()	unknown		undefined4 local_4;	97
+006520a0	SNDpitchmult	undefined SNDpitchmult()	unknown		undefined4 local_4;	156
 00652270	FUN_00652270	undefined FUN_00652270()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	866
-006525f0	FUN_006525f0	undefined FUN_006525f0()	unknown		undefined4 local_4;	304
-00652720	FUN_00652720	undefined FUN_00652720()	unknown			70
+006525f0	SNDVOICEI_free	undefined SNDVOICEI_free()	unknown		undefined4 local_4;	304
+00652720	SNDVOICEI_get__validate_handle____voice_index_	undefined SNDVOICEI_get__validate_handle____voice_index_()	unknown			70
 006527a0	FUN_006527a0	undefined FUN_006527a0()	unknown			82
-00652800	FUN_00652800	undefined FUN_00652800()	unknown		undefined local_cc;undefined4 local_d0;undefined local_e0;	337
+00652800	SNDbankremove	undefined SNDbankremove()	unknown		undefined local_cc;undefined4 local_d0;undefined local_e0;	337
 00652960	FUN_00652960	undefined FUN_00652960()	unknown			52
 006529a0	FUN_006529a0	undefined FUN_006529a0()	unknown			81
 00652a00	FUN_00652a00	undefined FUN_00652a00()	unknown			35
-00652a30	FUN_00652a30	undefined FUN_00652a30()	unknown		undefined4 local_c;undefined4 local_10;undefined4 local_14;	106
-00652aa0	FUN_00652aa0	undefined FUN_00652aa0()	unknown		undefined local_cc;undefined4 local_d0;	188
-00652b60	FUN_00652b60	undefined FUN_00652b60()	unknown		undefined4 local_4;	156
+00652a30	SNDBANKI_userdatacallback	undefined SNDBANKI_userdatacallback()	unknown		undefined4 local_c;undefined4 local_10;undefined4 local_14;	106
+00652aa0	SNDbankadd	undefined SNDbankadd()	unknown		undefined local_cc;undefined4 local_d0;	188
+00652b60	iSNDcalcvol	undefined iSNDcalcvol()	unknown		undefined4 local_4;	156
 00652c00	FUN_00652c00	undefined FUN_00652c00()	unknown			153
-00652ca0	FUN_00652ca0	undefined FUN_00652ca0()	unknown			163
+00652ca0	iSNDcalcpitch	undefined iSNDcalcpitch()	unknown			163
 00652d50	FUN_00652d50	undefined FUN_00652d50()	unknown			18
 00652d70	FUN_00652d70	undefined FUN_00652d70()	unknown			13
 00652d80	FUN_00652d80	undefined FUN_00652d80()	unknown			15
@@ -1216,14 +1216,14 @@ entry	name	signature	calling	params	locals	bytes
 00654b50	FUN_00654b50	undefined FUN_00654b50()	unknown			374
 00654cd0	FUN_00654cd0	undefined FUN_00654cd0()	unknown		undefined8 local_18;	195
 00654de0	FUN_00654de0	undefined FUN_00654de0()	unknown			62
-00654e20	FUN_00654e20	undefined FUN_00654e20()	unknown			52
+00654e20	SNDCTRLI_getfxbus	undefined SNDCTRLI_getfxbus()	unknown			52
 00654e60	FUN_00654e60	undefined FUN_00654e60()	unknown			152
 00654f00	FUN_00654f00	undefined FUN_00654f00()	unknown			213
 00654fe0	FUN_00654fe0	undefined FUN_00654fe0()	unknown			22
 00655000	FUN_00655000	undefined FUN_00655000()	unknown			58
 00655040	FUN_00655040	undefined FUN_00655040()	unknown			20
 00655060	FUN_00655060	undefined FUN_00655060()	unknown			178
-00655120	FUN_00655120	undefined FUN_00655120()	unknown		undefined2 local_b4;undefined1 local_c9;undefined local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined local_108;	969
+00655120	SNDPKTPLAY_start	undefined SNDPKTPLAY_start()	unknown		undefined2 local_b4;undefined1 local_c9;undefined local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined local_108;	969
 00655500	FUN_00655500	undefined FUN_00655500()	unknown			258
 00655610	FUN_00655610	undefined FUN_00655610()	unknown		undefined local_8;	74
 00655660	FUN_00655660	undefined FUN_00655660()	unknown			35
@@ -1240,13 +1240,13 @@ entry	name	signature	calling	params	locals	bytes
 00655ae0	FUN_00655ae0	undefined FUN_00655ae0()	unknown			45
 00655b10	FUN_00655b10	undefined FUN_00655b10()	unknown			36
 00655b40	FUN_00655b40	undefined FUN_00655b40()	unknown			60
-00655b80	FUN_00655b80	undefined FUN_00655b80()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;	1144
+00655b80	SNDI_patchtohdr	undefined SNDI_patchtohdr()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;	1144
 00656000	FUN_00656000	undefined FUN_00656000()	unknown			57
-00656040	FUN_00656040	undefined FUN_00656040()	unknown			40
+00656040	SNDMEMI_usage_percent__map__SNDMEMI_restore_	undefined SNDMEMI_usage_percent__map__SNDMEMI_restore_()	unknown			40
 00656070	FUN_00656070	undefined FUN_00656070()	unknown			237
 00656160	FUN_00656160	undefined FUN_00656160()	unknown			344
 006562c0	FUN_006562c0	undefined FUN_006562c0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;	224
-006563a0	FUN_006563a0	undefined FUN_006563a0()	unknown			324
+006563a0	SNDMIXI_volramp	undefined SNDMIXI_volramp()	unknown			324
 00656510	FUN_00656510	undefined FUN_00656510()	unknown			164
 006565c0	FUN_006565c0	undefined FUN_006565c0()	unknown			10
 006565d0	FUN_006565d0	undefined FUN_006565d0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;	440
@@ -1281,10 +1281,10 @@ entry	name	signature	calling	params	locals	bytes
 00658440	FUN_00658440	undefined FUN_00658440()	unknown			36
 00658470	FUN_00658470	undefined FUN_00658470()	unknown			34
 006584a0	FUN_006584a0	undefined FUN_006584a0()	unknown			49
-006584e0	FUN_006584e0	undefined FUN_006584e0()	unknown			130
+006584e0	iSNDpatchkey	undefined iSNDpatchkey()	unknown			130
 00658570	FUN_00658570	undefined FUN_00658570()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_2c;undefined4 local_30;	226
 00658660	FUN_00658660	undefined FUN_00658660()	unknown			68
-006586b0	FUN_006586b0	undefined FUN_006586b0()	unknown		undefined4 local_90;undefined local_b8;undefined4 local_e4;undefined4 local_f0;undefined4 local_100;undefined4 local_108;undefined4 local_11c;undefined local_164;undefined4 local_180;undefined4 local_184;undefined4 local_190;undefined4 local_194;undefined4 local_19c;undefined4 local_1a0;undefined4 local_1a4;undefined4 local_1a8;undefined4 local_1ac;undefined4 local_1c8;undefined4 local_1cc;undefined4 local_1ec;undefined4 local_1f8;undefined4 local_1fc;undefined4 local_200;undefined4 local_204;undefined4 local_208;undefined4 local_20c;undefined4 local_214;undefined4 local_21c;undefined4 local_220;undefined4 local_224;undefined4 local_228;undefined4 local_22c;undefined4 local_230;undefined4 local_234;undefined4 local_238;undefined4 local_23c;undefined4 local_240;undefined4 local_244;undefined4 local_248;undefined4 local_24c;undefined4 local_250;undefined4 local_254;undefined4 local_258;undefined4 local_260;undefined4 local_264;undefined4 local_26c;undefined4 local_27c;undefined4 local_280;undefined4 local_284;undefined4 local_288;undefined4 local_28c;undefined4 local_290;undefined4 local_294;undefined4 local_298;undefined4 local_2a0;undefined4 local_2a4;undefined4 local_2a8;undefined4 local_2ac;undefined4 local_2b0;undefined4 local_2b8;undefined4 local_2bc;undefined4 local_2c0;undefined4 local_2c4;undefined4 local_2cc;undefined4 local_2d0;undefined4 local_2d4;undefined4 local_2d8;undefined4 local_2dc;undefined4 local_2e0;undefined4 local_2e4;undefined4 local_2e8;undefined4 local_2ec;undefined4 local_2f0;undefined4 local_2f4;undefined local_304;	1580
+006586b0	SNDI_parsetimbre	undefined SNDI_parsetimbre()	unknown		undefined4 local_90;undefined local_b8;undefined4 local_e4;undefined4 local_f0;undefined4 local_100;undefined4 local_108;undefined4 local_11c;undefined local_164;undefined4 local_180;undefined4 local_184;undefined4 local_190;undefined4 local_194;undefined4 local_19c;undefined4 local_1a0;undefined4 local_1a4;undefined4 local_1a8;undefined4 local_1ac;undefined4 local_1c8;undefined4 local_1cc;undefined4 local_1ec;undefined4 local_1f8;undefined4 local_1fc;undefined4 local_200;undefined4 local_204;undefined4 local_208;undefined4 local_20c;undefined4 local_214;undefined4 local_21c;undefined4 local_220;undefined4 local_224;undefined4 local_228;undefined4 local_22c;undefined4 local_230;undefined4 local_234;undefined4 local_238;undefined4 local_23c;undefined4 local_240;undefined4 local_244;undefined4 local_248;undefined4 local_24c;undefined4 local_250;undefined4 local_254;undefined4 local_258;undefined4 local_260;undefined4 local_264;undefined4 local_26c;undefined4 local_27c;undefined4 local_280;undefined4 local_284;undefined4 local_288;undefined4 local_28c;undefined4 local_290;undefined4 local_294;undefined4 local_298;undefined4 local_2a0;undefined4 local_2a4;undefined4 local_2a8;undefined4 local_2ac;undefined4 local_2b0;undefined4 local_2b8;undefined4 local_2bc;undefined4 local_2c0;undefined4 local_2c4;undefined4 local_2cc;undefined4 local_2d0;undefined4 local_2d4;undefined4 local_2d8;undefined4 local_2dc;undefined4 local_2e0;undefined4 local_2e4;undefined4 local_2e8;undefined4 local_2ec;undefined4 local_2f0;undefined4 local_2f4;undefined local_304;	1580
 00658cf0	FUN_00658cf0	undefined FUN_00658cf0()	unknown		undefined4 local_4;	125
 00658d80	FUN_00658d80	undefined FUN_00658d80()	unknown		undefined4 local_4;undefined local_10;	213
 00658e60	FUN_00658e60	undefined FUN_00658e60()	unknown		undefined4 local_4;undefined local_10;	148
@@ -1292,7 +1292,7 @@ entry	name	signature	calling	params	locals	bytes
 00658f70	FUN_00658f70	undefined FUN_00658f70()	unknown		undefined4 local_4;	103
 00658fe0	FUN_00658fe0	undefined FUN_00658fe0()	unknown		undefined4 local_4;undefined4 local_8;	191
 006590b0	FUN_006590b0	undefined FUN_006590b0()	unknown			125
-00659130	FUN_00659130	undefined FUN_00659130()	unknown			133
+00659130	SNDI_sin	undefined SNDI_sin()	unknown			133
 00659250	FUN_00659250	undefined FUN_00659250()	unknown			187
 006593b0	FUN_006593b0	undefined FUN_006593b0()	unknown			173
 006594e0	FUN_006594e0	undefined FUN_006594e0()	unknown			106
@@ -1302,13 +1302,13 @@ entry	name	signature	calling	params	locals	bytes
 00659950	FUN_00659950	undefined FUN_00659950()	unknown			16
 00659960	FUN_00659960	undefined FUN_00659960()	unknown			34
 00659990	FUN_00659990	undefined FUN_00659990()	unknown			70
-006599e0	FUN_006599e0	undefined FUN_006599e0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	142
+006599e0	SNDPLATFORM_packetplay	undefined SNDPLATFORM_packetplay()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	142
 00659a70	FUN_00659a70	undefined FUN_00659a70()	unknown			196
 00659b40	FUN_00659b40	undefined FUN_00659b40()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_20;	213
 00659c20	FUN_00659c20	undefined FUN_00659c20()	unknown			88
-00659c80	FUN_00659c80	undefined FUN_00659c80()	unknown		undefined local_4;	149
+00659c80	SNDI_gettag	undefined SNDI_gettag()	unknown		undefined local_4;	149
 00659d20	FUN_00659d20	undefined FUN_00659d20()	unknown			88
-00659d80	FUN_00659d80	undefined FUN_00659d80()	unknown		undefined4 local_19c;undefined4 local_208;undefined4 local_20c;undefined4 local_214;undefined4 local_220;undefined4 local_224;undefined4 local_228;undefined4 local_22c;undefined4 local_230;undefined local_23c;	347
+00659d80	SNDI_patchtohdrgen	undefined SNDI_patchtohdrgen()	unknown		undefined4 local_19c;undefined4 local_208;undefined4 local_20c;undefined4 local_214;undefined4 local_220;undefined4 local_224;undefined4 local_228;undefined4 local_22c;undefined4 local_230;undefined local_23c;	347
 00659f30	FUN_00659f30	undefined FUN_00659f30()	unknown			36
 00659f60	FUN_00659f60	undefined FUN_00659f60()	unknown			62
 0065a130	FUN_0065a130	undefined FUN_0065a130()	unknown			251
@@ -1372,7 +1372,7 @@ entry	name	signature	calling	params	locals	bytes
 0065fbd0	FUN_0065fbd0	undefined FUN_0065fbd0()	unknown			48
 0065fc00	FUN_0065fc00	undefined FUN_0065fc00()	unknown			115
 0065fc80	FUN_0065fc80	undefined FUN_0065fc80()	unknown			88
-0065fce0	FUN_0065fce0	undefined FUN_0065fce0()	unknown			86
+0065fce0	SNDI_getb	undefined SNDI_getb()	unknown			86
 0065fd40	FUN_0065fd40	undefined FUN_0065fd40()	unknown			57
 0065fdb0	FUN_0065fdb0	undefined FUN_0065fdb0()	unknown			25
 0065fdd0	FUN_0065fdd0	undefined FUN_0065fdd0()	unknown			27
@@ -1693,17 +1693,17 @@ entry	name	signature	calling	params	locals	bytes
 00670c66	Ordinal_8	undefined Ordinal_8()	unknown			6
 00670c6c	__amsg_exit	void __amsg_exit(int param_1)	__cdecl	int param_1;		34
 00670c91	fast_error_exit	undefined fast_error_exit()	__cdecl			36
-00670cb5	entry	undefined entry()	unknown		undefined4 local_8;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined local_38;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;	402
+00670cb5	WinMainCRTStartup	undefined WinMainCRTStartup()	unknown		undefined4 local_8;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined local_38;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;	402
 00670e72	_atol	long _atol(char * _Str)	__cdecl	char * _Str;		136
-00670efa	_atol	long _atol(char * _Str)	__cdecl	char * _Str;		5
+00670efa	_atoi	long _atoi(char * _Str)	__cdecl	char * _Str;		5
 00670f00	_strrchr	char * _strrchr(char * _Str, int _Ch)	__cdecl	char * _Str;int _Ch;		45
 00670f2d	__onexit_lk	undefined __onexit_lk()	unknown			128
 00670fad	___onexitinit	undefined ___onexitinit()	unknown			40
 00670fd5	__onexit	_onexit_t __onexit(_onexit_t _Func)	__cdecl	_onexit_t _Func;	undefined4 local_8;undefined4 local_20;	50
 00671007	FUN_00671007	undefined FUN_00671007()	unknown			6
 0067100d	_atexit	int _atexit(_func_4879 * param_1)	__cdecl	_func_4879 * param_1;		18
-0067101f	FUN_0067101f	undefined FUN_0067101f()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	88
-00671077	FUN_00671077	undefined FUN_00671077()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	87
+0067101f	_sprintf	undefined _sprintf()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	88
+00671077	_vsprintf	undefined _vsprintf()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	87
 006710ce	_sscanf	int _sscanf(char * _Src, char * _Format, ...)	__cdecl	char * _Src;char * _Format;	undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	52
 00671102	_free	void _free(void * _Memory)	__cdecl	void * _Memory;	undefined4 local_8;undefined4 local_20;	104
 00671155	FUN_00671155	undefined FUN_00671155()	unknown			9
@@ -1723,7 +1723,7 @@ entry	name	signature	calling	params	locals	bytes
 006714da	FUN_006714da	undefined FUN_006714da()	unknown			11
 006714e5	__fsopen	FILE * __fsopen(char * _Filename, char * _Mode, int _ShFlag)	__cdecl	char * _Filename;char * _Mode;int _ShFlag;	undefined4 local_8;undefined4 local_20;undefined4 local_24;	82
 00671537	FUN_00671537	undefined FUN_00671537()	unknown			10
-00671541	FUN_00671541	undefined FUN_00671541()	unknown			19
+00671541	_fopen	undefined _fopen()	unknown			19
 00671554	__fread_lk	undefined __fread_lk()	unknown		undefined4 local_8;undefined4 local_c;	233
 0067163d	_fread	size_t _fread(void * _DstBuf, size_t _ElementSize, size_t _Count, FILE * _File)	__cdecl	void * _DstBuf;size_t _ElementSize;size_t _Count;FILE * _File;	undefined4 local_8;undefined4 local_20;	66
 0067167f	FUN_0067167f	undefined FUN_0067167f()	unknown			10
@@ -1759,14 +1759,14 @@ entry	name	signature	calling	params	locals	bytes
 00671fa0	FUN_00671fa0	undefined FUN_00671fa0()	unknown			9
 00671fa9	FUN_00671fa9	undefined FUN_00671fa9()	unknown			9
 00671fb2	FUN_00671fb2	undefined FUN_00671fb2()	unknown			101
-00672017	FUN_00672017	undefined FUN_00672017()	unknown			211
+00672017	__cexit_doexit	undefined __cexit_doexit()	unknown			211
 006720ea	FUN_006720ea	undefined FUN_006720ea()	unknown			17
 006720fb	__exit	void __exit(int _Code)	__cdecl	int _Code;		17
 0067210c	FUN_0067210c	undefined FUN_0067210c()	unknown			15
 0067212a	__ArrayUnwind	void __ArrayUnwind(void * param_1, uint param_2, int param_3, _func_void_void_ptr * param_4)	__stdcall	void * param_1;uint param_2;int param_3;_func_void_void_ptr * param_4;	undefined4 local_8;	47
-00672188	`eh_vector_destructor_iterator'	void `eh_vector_destructor_iterator'(void * param_1, uint param_2, int param_3, _func_void_void_ptr * param_4)	__stdcall	void * param_1;uint param_2;int param_3;_func_void_void_ptr * param_4;	undefined4 local_8;undefined4 local_20;	72
+00672188	eh_vector_destructor_iterator	void eh_vector_destructor_iterator(void * param_1, uint param_2, int param_3, _func_void_void_ptr * param_4)	__stdcall	void * param_1;uint param_2;int param_3;_func_void_void_ptr * param_4;	undefined4 local_8;undefined4 local_20;	72
 006721d0	FUN_006721d0	undefined FUN_006721d0()	unknown			24
-006721e8	`eh_vector_constructor_iterator'	void `eh_vector_constructor_iterator'(void * param_1, uint param_2, int param_3, _func_void_void_ptr * param_4, _func_void_void_ptr * param_5)	__stdcall	void * param_1;uint param_2;int param_3;_func_void_void_ptr * param_4;_func_void_void_ptr * param_5;	undefined4 local_8;undefined4 local_20;undefined4 local_24;	74
+006721e8	eh_vector_constructor_iterator	void eh_vector_constructor_iterator(void * param_1, uint param_2, int param_3, _func_void_void_ptr * param_4, _func_void_void_ptr * param_5)	__stdcall	void * param_1;uint param_2;int param_3;_func_void_void_ptr * param_4;_func_void_void_ptr * param_5;	undefined4 local_8;undefined4 local_20;undefined4 local_24;	74
 00672232	FUN_00672232	undefined FUN_00672232()	unknown			24
 0067224a	__abstract_cw	undefined __abstract_cw()	unknown			146
 006722dc	__hw_cw	undefined __hw_cw()	unknown			142
@@ -1779,14 +1779,14 @@ entry	name	signature	calling	params	locals	bytes
 00672621	thunk_FUN_006725f7	undefined thunk_FUN_006725f7()	unknown			5
 00672630	_memmove	void * _memmove(void * _Dst, void * _Src, size_t _Size)	__cdecl	void * _Dst;void * _Src;size_t _Size;		672
 00672970	FUN_00672970	undefined FUN_00672970()	unknown			139
-00672a10	FUN_00672a10	undefined FUN_00672a10()	unknown			190
+00672a10	_strchr	undefined _strchr()	unknown			190
 00672ad0	shortsort	undefined shortsort()	__cdecl			106
-00672b40	FUN_00672b40	undefined FUN_00672b40()	unknown		undefined4 local_f8;undefined4 local_fc;undefined4 local_100;	643
+00672b40	_qsort	undefined _qsort()	unknown		undefined4 local_f8;undefined4 local_fc;undefined4 local_100;	643
 00672dd0	FUN_00672dd0	undefined FUN_00672dd0()	unknown			56
 00672e08	FUN_00672e08	undefined FUN_00672e08()	unknown			23
 00672e20	FUN_00672e20	undefined FUN_00672e20()	unknown		undefined8 local_c;	20
 00672e3d	FUN_00672e3d	undefined FUN_00672e3d()	unknown		undefined2 local_4;	174
-00672eeb	FUN_00672eeb	undefined FUN_00672eeb()	unknown			21
+00672eeb	_finite	undefined _finite()	unknown			21
 00672f00	__isnan	int __isnan(double _X)	__cdecl	double _X;		46
 00672f2e	FUN_00672f2e	undefined FUN_00672f2e()	unknown		undefined8 local_c;	154
 00672fc8	__ftol	undefined __ftol()	unknown		undefined2 local_6;undefined2 local_8;undefined8 local_10;	39
@@ -1809,8 +1809,8 @@ entry	name	signature	calling	params	locals	bytes
 00673444	FUN_00673444	undefined FUN_00673444()	unknown		undefined4 local_res0;	31
 00673463	_atof	double _atof(char * _String)	__cdecl	char * _String;	undefined local_1c;	56
 006734a0	__chkstk	undefined __chkstk()	unknown		undefined4 local_res0;undefined4 local_4;undefined4 local_ffc;	61
-006734dd	FUN_006734dd	undefined FUN_006734dd()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	86
-00673533	FUN_00673533	undefined FUN_00673533()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	87
+006734dd	_vsnprintf	undefined _vsnprintf()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	86
+00673533	_snprintf	undefined _snprintf()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	87
 00673590	FUN_00673590	undefined FUN_00673590()	unknown		undefined local_res0;undefined4 local_4;undefined8 local_c;undefined4 local_10;undefined8 local_1c;undefined8 local_28;	498
 006736c0	FUN_006736c0	undefined FUN_006736c0()	unknown		undefined local_res0;undefined4 local_4;undefined8 local_c;undefined4 local_10;undefined8 local_1c;undefined8 local_28;	494
 006737f8	FUN_006737f8	undefined FUN_006737f8()	unknown			10
@@ -1842,7 +1842,7 @@ entry	name	signature	calling	params	locals	bytes
 00674800	_strncmp	int _strncmp(char * _Str1, char * _Str2, size_t _MaxCount)	__cdecl	char * _Str1;char * _Str2;size_t _MaxCount;		57
 00674839	FID_conflict:_vfwprintf	int FID_conflict:_vfwprintf(FILE * _File, wchar_t * _Format, va_list _ArgList)	__cdecl	FILE * _File;wchar_t * _Format;va_list _ArgList;	undefined4 local_8;undefined4 local_20;undefined4 local_24;undefined4 local_28;	83
 0067488c	FUN_0067488c	undefined FUN_0067488c()	unknown			10
-00674898	FUN_00674898	undefined FUN_00674898()	unknown		undefined4 local_18;undefined8 local_20;undefined4 local_30;	117
+00674898	_ftol_nocw	undefined _ftol_nocw()	unknown		undefined4 local_18;undefined8 local_20;undefined4 local_30;	117
 0067490d	_bsearch	void * _bsearch(void * _Key, void * _Base, size_t _NumOfElements, size_t _SizeOfElements, _PtFuncCompare * _PtFuncCompare)	__cdecl	void * _Key;void * _Base;size_t _NumOfElements;size_t _SizeOfElements;_PtFuncCompare * _PtFuncCompare;		140
 00674999	FUN_00674999	undefined FUN_00674999()	unknown			48
 006749ca	FUN_006749ca	undefined FUN_006749ca()	unknown		undefined4 local_8;	132
@@ -1855,7 +1855,7 @@ entry	name	signature	calling	params	locals	bytes
 00674e91	report_failure	undefined report_failure()	__cdecl		undefined4 local_8;	41
 00674ec2	__security_check_cookie	void __security_check_cookie(uintptr_t _StackCookie)	__fastcall	uintptr_t _StackCookie;		14
 00674ed0	FID_conflict:__time32	__time32_t FID_conflict:__time32(__time32_t * _Time)	__cdecl	__time32_t * _Time;	undefined4 local_8;undefined4 local_c;	57
-00674f09	FUN_00674f09	undefined FUN_00674f09()	unknown		undefined4 local_res0;undefined4 local_8;undefined1 local_c;undefined local_110;undefined local_11c;	375
+00674f09	__NMSG_WRITE	undefined __NMSG_WRITE()	unknown		undefined4 local_res0;undefined4 local_8;undefined1 local_c;undefined local_110;undefined local_11c;	375
 00675080	__FF_MSGBANNER	void __FF_MSGBANNER(void)	__cdecl			57
 006750b9	__XcptFilter	int __XcptFilter(ulong _ExceptionNum, _EXCEPTION_POINTERS * _ExceptionPtr)	__cdecl	ulong _ExceptionNum;_EXCEPTION_POINTERS * _ExceptionPtr;	undefined4 local_8;	356
 0067521d	__setenvp	int __setenvp(void)	__cdecl			199
@@ -1875,7 +1875,7 @@ entry	name	signature	calling	params	locals	bytes
 00675b30	__heap_init	int __heap_init(void)	__cdecl			81
 00675b84	__SEH_prolog	undefined __SEH_prolog()	unknown		undefined4 local_res0;undefined local_8;undefined4 local_10;	59
 00675bbf	__SEH_epilog	undefined __SEH_epilog()	unknown			17
-00675bd0	FUN_00675bd0	undefined FUN_00675bd0()	unknown		undefined1 local_6;undefined1 local_7;undefined1 local_8;	119
+00675bd0	_isctype	undefined _isctype()	unknown		undefined1 local_6;undefined1 local_7;undefined1 local_8;	119
 00675c50	__allmul	undefined __allmul()	unknown			52
 00675c84	_realloc	void * _realloc(void * _Memory, size_t _NewSize)	__cdecl	void * _Memory;size_t _NewSize;	undefined4 local_8;undefined4 local_20;undefined4 local_24;undefined4 local_28;	412
 00675dec	FUN_00675dec	undefined FUN_00675dec()	unknown			9
@@ -1890,8 +1890,8 @@ entry	name	signature	calling	params	locals	bytes
 006767f9	FUN_006767f9	undefined FUN_006767f9()	unknown		undefined4 local_res0;undefined4 local_8;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined1 local_2d;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined1 local_3d;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined1 local_4d;undefined1 local_4e;undefined1 local_4f;undefined1 local_50;undefined1 local_51;undefined1 local_52;undefined1 local_53;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined1 local_1c8;undefined1 local_1c9;undefined1 local_1ca;undefined local_1cb;undefined local_1cc;undefined4 local_1d0;undefined4 local_1d4;undefined1 local_1d7;undefined1 local_1d8;undefined2 local_1dc;undefined local_1e8;undefined1 local_1fd;	2672
 006772a1	__mtinitlocks	int __mtinitlocks(void)	__cdecl			73
 006772ea	__mtdeletelocks	void __mtdeletelocks(void)	__cdecl			85
-0067733f	FUN_0067733f	undefined FUN_0067733f()	unknown			21
-00677354	FUN_00677354	undefined FUN_00677354()	unknown			127
+0067733f	__unlock	undefined __unlock()	unknown			21
+00677354	__mtinitlocknum	undefined __mtinitlocknum()	unknown			127
 006773d3	__lock	void __lock(int _File)	__cdecl	int _File;		49
 00677404	___sbh_heap_init	undefined ___sbh_heap_init()	unknown			72
 0067744c	___sbh_find_block	undefined ___sbh_find_block()	unknown			43
@@ -1901,8 +1901,8 @@ entry	name	signature	calling	params	locals	bytes
 0067794c	___sbh_resize_block	undefined ___sbh_resize_block()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;	735
 00677c2b	___sbh_alloc_block	undefined ___sbh_alloc_block()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;	764
 00677f27	__callnewh	int __callnewh(size_t _Size)	__cdecl	size_t _Size;		27
-00677f42	FUN_00677f42	undefined FUN_00677f42()	unknown			9
-00677f4b	FUN_00677f4b	undefined FUN_00677f4b()	unknown			9
+00677f42	__errno	undefined __errno()	unknown			9
+00677f4b	___doserrno	undefined ___doserrno()	unknown			9
 00677f54	__dosmaperr	void __dosmaperr(ulong param_1)	__cdecl	ulong param_1;		115
 00677fc7	FUN_00677fc7	undefined FUN_00677fc7()	unknown		undefined4 local_res0;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined1 local_423;undefined local_424;	421
 0067816c	__write	int __write(int _FileHandle, void * _Buf, uint _MaxCharCount)	__cdecl	int _FileHandle;void * _Buf;uint _MaxCharCount;	undefined4 local_8;undefined4 local_20;	160
@@ -1955,10 +1955,10 @@ entry	name	signature	calling	params	locals	bytes
 0067a016	__fassign	void __fassign(int flag, char * argument, char * number)	__cdecl	int flag;char * argument;char * number;	undefined4 local_8;undefined4 local_c;	62
 0067a054	__shift	undefined __shift()	unknown			29
 0067a071	__cftoe2	undefined __cftoe2()	unknown			174
-0067a11f	FUN_0067a11f	undefined FUN_0067a11f()	unknown		undefined4 local_res0;undefined4 local_8;undefined4 local_18;undefined local_30;	116
+0067a11f	__cftoe	undefined __cftoe()	unknown		undefined4 local_res0;undefined4 local_8;undefined4 local_18;undefined local_30;	116
 0067a193	FUN_0067a193	undefined FUN_0067a193()	unknown			156
-0067a22f	FUN_0067a22f	undefined FUN_0067a22f()	unknown		undefined4 local_res0;undefined4 local_8;undefined4 local_14;undefined4 local_18;undefined local_30;	104
-0067a297	FUN_0067a297	undefined FUN_0067a297()	unknown		undefined4 local_res0;undefined4 local_8;undefined4 local_14;undefined4 local_18;undefined local_30;	160
+0067a22f	__cftof	undefined __cftof()	unknown		undefined4 local_res0;undefined4 local_8;undefined4 local_14;undefined4 local_18;undefined local_30;	104
+0067a297	__cftog	undefined __cftog()	unknown		undefined4 local_res0;undefined4 local_8;undefined4 local_14;undefined4 local_18;undefined local_30;	160
 0067a337	__cfltcvt	errno_t __cfltcvt(double * arg, char * buffer, size_t sizeInBytes, int format, int precision, int caps)	__cdecl	double * arg;char * buffer;size_t sizeInBytes;int format;int precision;int caps;		81
 0067a388	__ms_p5_test_fdiv	undefined __ms_p5_test_fdiv()	unknown		undefined8 local_c;undefined8 local_14;undefined8 local_1c;	64
 0067a3c8	__ms_p5_mp_test_fdiv	undefined __ms_p5_mp_test_fdiv()	unknown			41
@@ -2021,8 +2021,8 @@ entry	name	signature	calling	params	locals	bytes
 0067dec0	FUN_0067dec0	undefined FUN_0067dec0()	unknown		undefined8 local_10;	24
 0067dede	FUN_0067dede	undefined FUN_0067dede()	unknown		undefined2 local_2;undefined1[18] local_14;undefined4 local_18;undefined4 local_1c;	639
 0067e180	___ascii_stricmp	int ___ascii_stricmp(char * _Str1, char * _Str2)	__cdecl	char * _Str1;char * _Str2;		78
-0067e1d0	FUN_0067e1d0	undefined FUN_0067e1d0()	unknown			7
-0067e1e0	FUN_0067e1e0	undefined FUN_0067e1e0()	unknown			232
+0067e1d0	_strcpy	undefined _strcpy()	unknown			7
+0067e1e0	_strcat	undefined _strcat()	unknown			232
 0067e2c8	__get_lc_time	undefined __get_lc_time()	unknown		undefined4 local_8;undefined4 local_c;	871
 0067e62f	___free_lc_time	undefined ___free_lc_time()	unknown			400
 0067e81e	___free_lconv_num	undefined ___free_lconv_num()	unknown			95
@@ -2097,9 +2097,9 @@ entry	name	signature	calling	params	locals	bytes
 006816f9	FID_conflict:__ld12tod	INTRNCVT_STATUS FID_conflict:__ld12tod(_LDBL12 * _Ifp, _CRT_DOUBLE * _D)	__cdecl	_LDBL12 * _Ifp;_CRT_DOUBLE * _D;		22
 0068170f	FUN_0068170f	undefined FUN_0068170f()	unknown		undefined4 local_res0;undefined4 local_8;undefined local_c;undefined local_18;	67
 00681752	FUN_00681752	undefined FUN_00681752()	unknown		undefined4 local_res0;undefined4 local_8;undefined local_c;undefined local_18;	67
-00681795	FUN_00681795	undefined FUN_00681795()	unknown			119
+00681795	__fptostr	undefined __fptostr()	unknown			119
 0068180c	___dtold	undefined ___dtold()	unknown		undefined4 local_8;	186
-006818c6	FUN_006818c6	undefined FUN_006818c6()	unknown		undefined4 local_res0;undefined4 local_8;undefined local_14;undefined local_2c;undefined1 local_2e;undefined2 local_30;	114
+006818c6	__fltout2	undefined __fltout2()	unknown		undefined4 local_res0;undefined4 local_8;undefined local_14;undefined local_2c;undefined1 local_2e;undefined2 local_30;	114
 00681938	FUN_00681938	undefined FUN_00681938()	unknown			9
 00681941	FUN_00681941	undefined FUN_00681941()	unknown		undefined4 local_res0;undefined4 local_14;undefined4 local_50;undefined8 local_60;undefined local_90;undefined4 local_94;	254
 00681a3f	FUN_00681a3f	undefined FUN_00681a3f()	unknown			70
@@ -3081,7 +3081,7 @@ entry	name	signature	calling	params	locals	bytes
 00689de0	FUN_00689de0	undefined FUN_00689de0()	unknown			28
 00689e00	FUN_00689e00	undefined FUN_00689e00()	unknown			23
 00689e20	FUN_00689e20	undefined FUN_00689e20()	unknown			42
-00693420	FUN_00693420	undefined FUN_00693420()	unknown			22
+00693420	StaticInit_SplineSet_G73769c_693420	undefined StaticInit_SplineSet_G73769c_693420()	unknown			22
 006961d0	`dynamic_initializer_for_'afxGlobalUtils''	void `dynamic_initializer_for_'afxGlobalUtils''(void)	__cdecl			28
 006962d0	FUN_006962d0	undefined FUN_006962d0()	unknown			15
 006962e0	FUN_006962e0	undefined FUN_006962e0()	unknown			24

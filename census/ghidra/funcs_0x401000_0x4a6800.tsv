@@ -1,13 +1,13 @@
 entry	name	signature	calling	params	locals	bytes
 00401000	FUN_00401000	undefined FUN_00401000()	unknown			15
-00401010	FUN_00401010	undefined FUN_00401010()	unknown			63
-00401050	FUN_00401050	undefined FUN_00401050()	unknown			66
-004010a0	FUN_004010a0	undefined FUN_004010a0()	unknown			48
-004010e0	FUN_004010e0	undefined FUN_004010e0()	unknown			37
+00401010	ScratchAlloc16	undefined ScratchAlloc16()	unknown			63
+00401050	ScratchAlloc64xN	undefined ScratchAlloc64xN()	unknown			66
+004010a0	CallNTimes	undefined CallNTimes()	unknown			48
+004010e0	SetSpecialCameraFlag	undefined SetSpecialCameraFlag()	unknown			37
 00401110	FUN_00401110	undefined FUN_00401110()	unknown			78
 00401190	FUN_00401190	undefined FUN_00401190()	unknown		undefined1 local_10f;undefined local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined local_130;	659
 00401430	FUN_00401430	undefined FUN_00401430()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined local_30;	229
-00401520	FUN_00401520	undefined FUN_00401520()	unknown		undefined1 local_1;	434
+00401520	DiscCheck_ModalFrameLoop	undefined DiscCheck_ModalFrameLoop()	unknown		undefined1 local_1;	434
 004016e0	FUN_004016e0	undefined FUN_004016e0()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;	658
 00401980	FUN_00401980	undefined FUN_00401980()	unknown			133
 00401a10	FUN_00401a10	undefined FUN_00401a10()	unknown		undefined local_228;undefined4 local_22c;	274
@@ -22,30 +22,30 @@ entry	name	signature	calling	params	locals	bytes
 00401cb0	FUN_00401cb0	undefined FUN_00401cb0()	unknown		undefined4 local_4;	31
 00401cd0	FUN_00401cd0	undefined FUN_00401cd0()	unknown		undefined4 local_4;	133
 00401d60	FUN_00401d60	undefined FUN_00401d60()	unknown			10
-00401d70	FUN_00401d70	undefined FUN_00401d70()	unknown			12
+00401d70	GameFlow__IsInFrontEnd	undefined GameFlow__IsInFrontEnd()	unknown			12
 00401d80	FUN_00401d80	undefined FUN_00401d80()	unknown			5
 00401db0	FUN_00401db0	undefined FUN_00401db0()	unknown			7
 00401dc0	FUN_00401dc0	undefined FUN_00401dc0()	unknown			72
 00401e10	FUN_00401e10	undefined FUN_00401e10()	unknown			19
-00401e50	FUN_00401e50	undefined FUN_00401e50()	unknown		undefined local_10;	217
+00401e50	QuadBuffers_Create	undefined QuadBuffers_Create()	unknown		undefined local_10;	217
 00401f30	FUN_00401f30	undefined FUN_00401f30()	unknown		undefined4 local_4;	61
 00401f70	FUN_00401f70	undefined FUN_00401f70()	unknown			309
-004020b0	FUN_004020b0	undefined FUN_004020b0()	unknown			1099
+004020b0	Matrix4_Invert	undefined Matrix4_Invert()	unknown			1099
 00402500	FUN_00402500	undefined FUN_00402500()	unknown		undefined local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_124;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_134;undefined4 local_138;undefined4 local_13c;undefined4 local_140;undefined4 local_144;undefined4 local_148;undefined4 local_14c;undefined4 local_150;	542
 00402720	FUN_00402720	undefined FUN_00402720()	unknown			244
-00402820	FUN_00402820	undefined FUN_00402820()	unknown			201
-004028f0	FUN_004028f0	undefined FUN_004028f0()	unknown		undefined local_8;	172
+00402820	Particle_Load	undefined Particle_Load()	unknown			201
+004028f0	Particle_Unload	undefined Particle_Unload()	unknown		undefined local_8;	172
 004029a0	FUN_004029a0	undefined FUN_004029a0()	unknown		undefined4 local_4;	194
 00402a70	FUN_00402a70	undefined FUN_00402a70()	unknown			84
 00402ad0	FUN_00402ad0	undefined FUN_00402ad0()	unknown			98
-00402b40	FUN_00402b40	undefined FUN_00402b40()	unknown		undefined local_4;	65
+00402b40	ParticleEmitter_Bind	undefined ParticleEmitter_Bind()	unknown		undefined local_4;	65
 00402b90	FUN_00402b90	undefined FUN_00402b90()	unknown			52
-00402bd0	FUN_00402bd0	undefined FUN_00402bd0()	unknown		undefined4 local_4;undefined4 local_8;	275
+00402bd0	ParticleEmitter_Queue	undefined ParticleEmitter_Queue()	unknown		undefined4 local_4;undefined4 local_8;	275
 00402cf0	FUN_00402cf0	undefined FUN_00402cf0()	unknown			63
 00402d30	FUN_00402d30	undefined FUN_00402d30()	unknown		undefined local_90;undefined local_d0;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined local_150;undefined4 local_168;undefined4 local_16c;undefined4 local_174;undefined4 local_17c;undefined4 local_180;undefined4 local_184;undefined4 local_188;undefined4 local_18c;undefined4 local_190;undefined4 local_194;undefined4 local_198;undefined4 local_1b8;undefined4 local_1bc;undefined4 local_1c0;undefined4 local_1c4;undefined4 local_1c8;undefined4 local_1cc;undefined4 local_1d0;undefined4 local_1d4;undefined4 local_1d8;undefined4 local_1dc;undefined4 local_1e0;undefined4 local_1e4;undefined4 local_204;undefined4 local_20c;undefined4 local_218;undefined4 local_21c;undefined4 local_220;undefined4 local_228;undefined4 local_234;undefined4 local_238;undefined4 local_23c;	3261
 00403a00	FUN_00403a00	undefined FUN_00403a00()	unknown			91
-00403a60	FUN_00403a60	undefined FUN_00403a60()	unknown		undefined4 local_1c;undefined4 local_20;undefined4 local_2c;undefined4 local_30;undefined4 local_3c;undefined4 local_40;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;	1689
-00404110	FUN_00404110	undefined FUN_00404110()	unknown		undefined4 local_bc;undefined4 local_c0;undefined4 local_cc;undefined4 local_d0;undefined4 local_dc;undefined4 local_e0;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_144;undefined4 local_164;undefined4 local_194;undefined4 local_198;	2228
+00403a60	Particles_UpdateSystem	undefined Particles_UpdateSystem()	unknown		undefined4 local_1c;undefined4 local_20;undefined4 local_2c;undefined4 local_30;undefined4 local_3c;undefined4 local_40;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;	1689
+00404110	Particles_DrawSystem	undefined Particles_DrawSystem()	unknown		undefined4 local_bc;undefined4 local_c0;undefined4 local_cc;undefined4 local_d0;undefined4 local_dc;undefined4 local_e0;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_144;undefined4 local_164;undefined4 local_194;undefined4 local_198;	2228
 004049f0	FUN_004049f0	undefined FUN_004049f0()	unknown			51
 00404a30	FUN_00404a30	undefined FUN_00404a30()	unknown			57
 00404a70	FUN_00404a70	undefined FUN_00404a70()	unknown			49
@@ -68,81 +68,81 @@ entry	name	signature	calling	params	locals	bytes
 004054f0	FUN_004054f0	undefined FUN_004054f0()	unknown			79
 00405550	FUN_00405550	undefined FUN_00405550()	unknown			9
 00405560	FUN_00405560	undefined FUN_00405560()	unknown			5
-00405570	FUN_00405570	undefined FUN_00405570()	unknown			82
-004055e0	FUN_004055e0	undefined FUN_004055e0()	unknown			11
+00405570	InputDevice__IsKeyboardType	undefined InputDevice__IsKeyboardType()	unknown			82
+004055e0	DegToRad	undefined DegToRad()	unknown			11
 004055f0	FUN_004055f0	undefined FUN_004055f0()	unknown			7
 00405600	FUN_00405600	undefined FUN_00405600()	unknown			7
 00405610	FUN_00405610	undefined FUN_00405610()	unknown			26
-00405660	FUN_00405660	undefined FUN_00405660()	unknown			247
+00405660	Input__Init	undefined Input__Init()	unknown			247
 00405760	FUN_00405760	undefined FUN_00405760()	unknown			90
-004057c0	FUN_004057c0	undefined FUN_004057c0()	unknown			153
-00405860	FUN_00405860	undefined FUN_00405860()	unknown			104
-004058d0	FUN_004058d0	undefined FUN_004058d0()	unknown		undefined local_10;	145
-00405980	FUN_00405980	undefined FUN_00405980()	unknown			594
-00405c60	FUN_00405c60	undefined FUN_00405c60()	unknown			209
+004057c0	Input__SelectActionMapForGameState	undefined Input__SelectActionMapForGameState()	unknown			153
+00405860	Input__DropUnpluggedWheels	undefined Input__DropUnpluggedWheels()	unknown			104
+004058d0	Input__AssignNewWheels	undefined Input__AssignNewWheels()	unknown		undefined local_10;	145
+00405980	Input__GetState	undefined Input__GetState()	unknown			594
+00405c60	InputKeyboard__InitDevice	undefined InputKeyboard__InitDevice()	unknown			209
 00405d40	FUN_00405d40	undefined FUN_00405d40()	unknown		undefined local_10;	207
 00405e10	FUN_00405e10	undefined FUN_00405e10()	unknown			398
-00405fa0	FUN_00405fa0	undefined FUN_00405fa0()	unknown		undefined4 local_234;undefined4 local_238;undefined4 local_23c;undefined4 local_240;undefined4 local_244;	127
+00405fa0	InputDevice__GetInstanceGuid	undefined InputDevice__GetInstanceGuid()	unknown		undefined4 local_234;undefined4 local_238;undefined4 local_23c;undefined4 local_240;undefined4 local_244;	127
 00406020	FUN_00406020	undefined FUN_00406020()	unknown		undefined4 local_4;	123
 004060a0	FUN_004060a0	undefined FUN_004060a0()	unknown		undefined4 local_244;	764
-004063a0	FUN_004063a0	undefined FUN_004063a0()	unknown		undefined local_10;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;	294
+004063a0	Input__AssignWheelToSlot	undefined Input__AssignWheelToSlot()	unknown		undefined local_10;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;	294
 004064d0	FUN_004064d0	undefined FUN_004064d0()	unknown		undefined local_10;undefined local_14;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;	174
-00406580	FUN_00406580	undefined FUN_00406580()	unknown			254
+00406580	InputDevice__ReadState	undefined InputDevice__ReadState()	unknown			254
 00406680	FUN_00406680	undefined FUN_00406680()	unknown			305
 004067d0	FUN_004067d0	undefined FUN_004067d0()	unknown			823
-00406b10	FUN_00406b10	undefined FUN_00406b10()	unknown		undefined4 local_28c;	289
+00406b10	InputKeyboard__PollRebindCapture	undefined InputKeyboard__PollRebindCapture()	unknown		undefined4 local_28c;	289
 00406c40	FUN_00406c40	undefined FUN_00406c40()	unknown			265
 00406d50	FUN_00406d50	undefined FUN_00406d50()	unknown		undefined4 local_4;undefined4 local_8;	184
 00406e10	FUN_00406e10	undefined FUN_00406e10()	unknown		undefined local_8;	239
-00406f00	FUN_00406f00	undefined FUN_00406f00()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	410
-004070a0	FUN_004070a0	undefined FUN_004070a0()	unknown		undefined4 local_144;undefined4 local_148;undefined4 local_14c;	1331
-004075e0	FUN_004075e0	undefined FUN_004075e0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_14;undefined4 local_18;undefined4 local_1c;	381
-00407760	FUN_00407760	undefined FUN_00407760()	unknown			148
-00407800	FUN_00407800	undefined FUN_00407800()	unknown		undefined1 local_1;	488
-004079f0	FUN_004079f0	undefined FUN_004079f0()	unknown			176
+00406f00	InputKeyboard__ApplyRebind	undefined InputKeyboard__ApplyRebind()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	410
+004070a0	InputDevice__ReadButtonsAndAxes	undefined InputDevice__ReadButtonsAndAxes()	unknown		undefined4 local_144;undefined4 local_148;undefined4 local_14c;	1331
+004075e0	Input__InitActionFormats	undefined Input__InitActionFormats()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_14;undefined4 local_18;undefined4 local_1c;	381
+00407760	InputDevice__SetActionMap	undefined InputDevice__SetActionMap()	unknown			148
+00407800	InputWheel__GetBindingName	undefined InputWheel__GetBindingName()	unknown		undefined1 local_1;	488
+004079f0	InputKeyboard__GetBindingName	undefined InputKeyboard__GetBindingName()	unknown			176
 00407ab0	FUN_00407ab0	undefined FUN_00407ab0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;	134
 00407b40	FUN_00407b40	undefined FUN_00407b40()	unknown			348
-00407ca0	FUN_00407ca0	undefined FUN_00407ca0()	unknown			249
+00407ca0	InputKeyboard__CopyDefaultActionTables	undefined InputKeyboard__CopyDefaultActionTables()	unknown			249
 00407da0	FUN_00407da0	undefined FUN_00407da0()	unknown			13
-00407db0	FUN_00407db0	undefined FUN_00407db0()	unknown		undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	605
-00408010	FUN_00408010	undefined FUN_00408010()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	229
+00407db0	Texture__CreateD3D	undefined Texture__CreateD3D()	unknown		undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	605
+00408010	Texture__ReleaseD3D	undefined Texture__ReleaseD3D()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	229
 00408100	FUN_00408100	undefined FUN_00408100()	unknown			92
-00408160	FUN_00408160	undefined FUN_00408160()	unknown			31
+00408160	Vec3_Scale	undefined Vec3_Scale()	unknown			31
 00408180	FUN_00408180	undefined FUN_00408180()	unknown		undefined4 local_18;	50
 004081c0	FUN_004081c0	undefined FUN_004081c0()	unknown			28
 004081e0	FUN_004081e0	undefined FUN_004081e0()	unknown			4
 004081f0	FUN_004081f0	undefined FUN_004081f0()	unknown			6
 00408200	FUN_00408200	undefined FUN_00408200()	unknown			6
-00408210	FUN_00408210	undefined FUN_00408210()	unknown			8
-00408220	FUN_00408220	undefined FUN_00408220()	unknown		undefined1 local_1;undefined1 local_2;undefined1 local_3;undefined1 local_4;undefined2 local_6;undefined2 local_8;undefined1 local_9;undefined1 local_a;undefined1 local_b;undefined1 local_c;undefined2 local_e;undefined2 local_10;undefined1 local_11;undefined1 local_12;undefined1 local_13;undefined1 local_14;undefined2 local_16;undefined2 local_18;undefined1 local_19;undefined1 local_1a;undefined1 local_1b;undefined1 local_1c;undefined2 local_1e;undefined2 local_20;undefined1 local_21;undefined1 local_22;undefined1 local_23;undefined1 local_24;undefined2 local_26;undefined2 local_28;	322
+00408210	GetPlayerObject	undefined GetPlayerObject()	unknown			8
+00408220	VertexDecls_CreateDefault	undefined VertexDecls_CreateDefault()	unknown		undefined1 local_1;undefined1 local_2;undefined1 local_3;undefined1 local_4;undefined2 local_6;undefined2 local_8;undefined1 local_9;undefined1 local_a;undefined1 local_b;undefined1 local_c;undefined2 local_e;undefined2 local_10;undefined1 local_11;undefined1 local_12;undefined1 local_13;undefined1 local_14;undefined2 local_16;undefined2 local_18;undefined1 local_19;undefined1 local_1a;undefined1 local_1b;undefined1 local_1c;undefined2 local_1e;undefined2 local_20;undefined1 local_21;undefined1 local_22;undefined1 local_23;undefined1 local_24;undefined2 local_26;undefined2 local_28;	322
 00408370	FUN_00408370	undefined FUN_00408370()	unknown			156
 00408410	FUN_00408410	undefined FUN_00408410()	unknown			512
-00408610	FUN_00408610	undefined FUN_00408610()	unknown		undefined local_res0;	147
+00408610	RVM_LookupTextures	undefined RVM_LookupTextures()	unknown		undefined local_res0;	147
 004086b0	FUN_004086b0	undefined FUN_004086b0()	unknown			172
 00408760	FUN_00408760	undefined FUN_00408760()	unknown			179
 00408830	FUN_00408830	undefined FUN_00408830()	unknown			742
-00408b20	FUN_00408b20	undefined FUN_00408b20()	unknown			769
+00408b20	RenderState_ResetDefaults	undefined RenderState_ResetDefaults()	unknown			769
 00408e30	FUN_00408e30	undefined FUN_00408e30()	unknown		undefined local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;	203
 00408f00	FUN_00408f00	undefined FUN_00408f00()	unknown			394
 004090a0	FUN_004090a0	undefined FUN_004090a0()	unknown		undefined4 local_8;	221
-00409180	FUN_00409180	undefined FUN_00409180()	unknown		undefined local_50;undefined local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_124;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_134;undefined4 local_138;	1015
-00409580	FUN_00409580	undefined FUN_00409580()	unknown		undefined4 local_20;undefined local_840;	1517
-00409b70	FUN_00409b70	undefined FUN_00409b70()	unknown			338
-00409cd0	FUN_00409cd0	undefined FUN_00409cd0()	unknown		undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;	1121
+00409180	DrawScreenQuadTextured	undefined DrawScreenQuadTextured()	unknown		undefined local_50;undefined local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_124;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_134;undefined4 local_138;	1015
+00409580	RenderFrameMain	undefined RenderFrameMain()	unknown		undefined4 local_20;undefined local_840;	1517
+00409b70	LightStreakPath	undefined LightStreakPath()	unknown			338
+00409cd0	Hud__RenderPass	undefined Hud__RenderPass()	unknown		undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;	1121
 0040a140	FUN_0040a140	undefined FUN_0040a140()	unknown		undefined local_50;undefined4 local_60;undefined4 local_68;undefined4 local_78;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;	924
-0040a4e0	FUN_0040a4e0	undefined FUN_0040a4e0()	unknown			157
-0040a580	FUN_0040a580	undefined FUN_0040a580()	unknown		undefined local_1c;	607
-0040a7f0	FUN_0040a7f0	undefined FUN_0040a7f0()	unknown			135
-0040a880	FUN_0040a880	undefined FUN_0040a880()	unknown			1
-0040a890	FUN_0040a890	undefined FUN_0040a890()	unknown			400
-0040aa20	FUN_0040aa20	undefined FUN_0040aa20()	unknown			387
-0040abd0	FUN_0040abd0	undefined FUN_0040abd0()	unknown			171
-0040ac80	FUN_0040ac80	undefined FUN_0040ac80()	unknown			213
-0040ad60	FUN_0040ad60	undefined FUN_0040ad60()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_34;undefined4 local_44;undefined local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_74;undefined4 local_84;undefined local_90;undefined local_d0;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;	1477
-0040b340	FUN_0040b340	undefined FUN_0040b340()	unknown			172
-0040b3f0	FUN_0040b3f0	undefined FUN_0040b3f0()	unknown			230
-0040b4e0	FUN_0040b4e0	undefined FUN_0040b4e0()	unknown		undefined local_8;	255
-0040b5e0	FUN_0040b5e0	undefined FUN_0040b5e0()	unknown			177
+0040a4e0	Device_HandleLost	undefined Device_HandleLost()	unknown			157
+0040a580	RenderFrame	undefined RenderFrame()	unknown		undefined local_1c;	607
+0040a7f0	SetBlurCameraObject	undefined SetBlurCameraObject()	unknown			135
+0040a880	NullUpdate_ret	undefined NullUpdate_ret()	unknown			1
+0040a890	SceneRTCreate	undefined SceneRTCreate()	unknown			400
+0040aa20	RenderTargetTable_Init	undefined RenderTargetTable_Init()	unknown			387
+0040abd0	SceneRTSelect	undefined SceneRTSelect()	unknown			171
+0040ac80	RenderViews_InitLists	undefined RenderViews_InitLists()	unknown			213
+0040ad60	View_BuildMatrices	undefined View_BuildMatrices()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_34;undefined4 local_44;undefined local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_74;undefined4 local_84;undefined local_90;undefined local_d0;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;	1477
+0040b340	ReflectionCube_Create	undefined ReflectionCube_Create()	unknown			172
+0040b3f0	RenderSetupBlurFlags	undefined RenderSetupBlurFlags()	unknown			230
+0040b4e0	ReleaseSceneRTs	undefined ReleaseSceneRTs()	unknown		undefined local_8;	255
+0040b5e0	ViewMatrix_InitIdentity	undefined ViewMatrix_InitIdentity()	unknown			177
 0040b6a0	FUN_0040b6a0	undefined FUN_0040b6a0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;	224
 0040b780	FUN_0040b780	undefined FUN_0040b780()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_78;undefined4 local_7c;undefined4 local_80;	417
 0040b930	FUN_0040b930	undefined FUN_0040b930()	unknown		undefined4 local_4;	89
@@ -157,31 +157,31 @@ entry	name	signature	calling	params	locals	bytes
 0040be70	FUN_0040be70	undefined FUN_0040be70()	unknown			122
 0040bef0	FUN_0040bef0	undefined FUN_0040bef0()	unknown		undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;	1028
 0040c300	FUN_0040c300	undefined FUN_0040c300()	unknown		undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined4 local_80;	431
-0040c4b0	FUN_0040c4b0	undefined FUN_0040c4b0()	unknown			328
-0040c600	FUN_0040c600	undefined FUN_0040c600()	unknown			74
+0040c4b0	LightPack_ChunkDispatch	undefined LightPack_ChunkDispatch()	unknown			328
+0040c600	eLightMaterialPlatInfo_PoolCreate	undefined eLightMaterialPlatInfo_PoolCreate()	unknown			74
 0040c650	FUN_0040c650	undefined FUN_0040c650()	unknown		undefined4 local_4;	51
-0040c690	FUN_0040c690	undefined FUN_0040c690()	unknown		undefined4 local_4;	418
-0040c840	FUN_0040c840	undefined FUN_0040c840()	unknown			68
+0040c690	Mesh_Load	undefined Mesh_Load()	unknown		undefined4 local_4;	418
+0040c840	Mesh_Free	undefined Mesh_Free()	unknown			68
 0040c890	FUN_0040c890	undefined FUN_0040c890()	unknown			123
 0040c910	FUN_0040c910	undefined FUN_0040c910()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	385
 0040caa0	FUN_0040caa0	undefined FUN_0040caa0()	unknown			69
 0040caf0	FUN_0040caf0	undefined FUN_0040caf0()	unknown			114
 0040cb70	FUN_0040cb70	undefined FUN_0040cb70()	unknown			11
-0040cb80	FUN_0040cb80	undefined FUN_0040cb80()	unknown			347
-0040cce0	FUN_0040cce0	undefined FUN_0040cce0()	unknown			91
-0040cd40	FUN_0040cd40	undefined FUN_0040cd40()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_4c;	833
-0040d090	FUN_0040d090	undefined FUN_0040d090()	unknown		undefined local_20;	731
-0040d370	FUN_0040d370	undefined FUN_0040d370()	unknown		undefined local_20;	878
-0040d6e0	FUN_0040d6e0	undefined FUN_0040d6e0()	unknown		undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;	835
+0040cb80	BlurCreateRTs	undefined BlurCreateRTs()	unknown			347
+0040cce0	BlurReleaseRTs	undefined BlurReleaseRTs()	unknown			91
+0040cd40	SpeedBlurPass	undefined SpeedBlurPass()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_4c;	833
+0040d090	BlurStreakPass4Tap	undefined BlurStreakPass4Tap()	unknown		undefined local_20;	731
+0040d370	BlurDownsample4Tap	undefined BlurDownsample4Tap()	unknown		undefined local_20;	878
+0040d6e0	BlurComposite	undefined BlurComposite()	unknown		undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;	835
 0040da30	FUN_0040da30	undefined FUN_0040da30()	unknown		undefined4 local_8;undefined4 local_c;	234
 0040db20	FUN_0040db20	undefined FUN_0040db20()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;	313
 0040dc60	FUN_0040dc60	undefined FUN_0040dc60()	unknown			74
 0040dcb0	FUN_0040dcb0	undefined FUN_0040dcb0()	unknown		undefined4 local_4;	70
-0040dd00	FUN_0040dd00	undefined FUN_0040dd00()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	1116
-0040e180	FUN_0040e180	undefined FUN_0040e180()	unknown			989
-0040e560	FUN_0040e560	undefined FUN_0040e560()	unknown			358
-0040e6d0	FUN_0040e6d0	undefined FUN_0040e6d0()	unknown			111
-0040e7b0	FUN_0040e7b0	undefined FUN_0040e7b0()	unknown			325
+0040dd00	BuildProjection	undefined BuildProjection()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	1116
+0040e180	Effects_CreateAll	undefined Effects_CreateAll()	unknown			989
+0040e560	RampTexture_Create	undefined RampTexture_Create()	unknown			358
+0040e6d0	Effect_Select	undefined Effect_Select()	unknown			111
+0040e7b0	Effect_BindSceneParams	undefined Effect_BindSceneParams()	unknown			325
 0040e900	FUN_0040e900	undefined FUN_0040e900()	unknown			553
 0040ebc0	FUN_0040ebc0	undefined FUN_0040ebc0()	unknown		undefined local_10;	85
 0040ec20	FUN_0040ec20	undefined FUN_0040ec20()	unknown		undefined4 local_4;	106
@@ -189,15 +189,15 @@ entry	name	signature	calling	params	locals	bytes
 0040ed00	FUN_0040ed00	undefined FUN_0040ed00()	unknown			9
 0040ed10	FUN_0040ed10	undefined FUN_0040ed10()	unknown			13
 0040ed50	FUN_0040ed50	undefined FUN_0040ed50()	unknown		undefined4 local_8;undefined4 local_c;	915
-0040f0f0	FUN_0040f0f0	undefined FUN_0040f0f0()	unknown			233
-0040f1e0	FUN_0040f1e0	undefined FUN_0040f1e0()	unknown			253
-0040f2e0	FUN_0040f2e0	undefined FUN_0040f2e0()	unknown			231
+0040f0f0	RenderQueue_GetBucket	undefined RenderQueue_GetBucket()	unknown			233
+0040f1e0	RenderQueue_GetBucketAlt	undefined RenderQueue_GetBucketAlt()	unknown			253
+0040f2e0	RenderQueue_PoolsCreate	undefined RenderQueue_PoolsCreate()	unknown			231
 0040f3d0	FUN_0040f3d0	undefined FUN_0040f3d0()	unknown			779
 0040f6e0	FUN_0040f6e0	undefined FUN_0040f6e0()	unknown			215
-0040f7c0	FUN_0040f7c0	undefined FUN_0040f7c0()	unknown		undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;	800
+0040f7c0	RenderQueue_ApplyLights	undefined RenderQueue_ApplyLights()	unknown		undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;	800
 0040fae0	FUN_0040fae0	undefined FUN_0040fae0()	unknown		undefined4 local_18;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;	1457
-004100a0	FUN_004100a0	undefined FUN_004100a0()	unknown		undefined local_90;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;	589
-004102f0	FUN_004102f0	undefined FUN_004102f0()	unknown		undefined local_250;undefined local_290;undefined local_2d0;undefined local_310;undefined local_350;undefined local_390;undefined local_3d0;undefined local_410;undefined4 local_414;	258
+004100a0	Effect_SetObjectParams	undefined Effect_SetObjectParams()	unknown		undefined local_90;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;	589
+004102f0	BonePalette_Load	undefined BonePalette_Load()	unknown		undefined local_250;undefined local_290;undefined local_2d0;undefined local_310;undefined local_350;undefined local_390;undefined local_3d0;undefined local_410;undefined4 local_414;	258
 00410400	FUN_00410400	undefined FUN_00410400()	unknown		undefined local_90;undefined4 local_94;	333
 00410550	FUN_00410550	undefined FUN_00410550()	unknown			242
 00410650	FUN_00410650	undefined FUN_00410650()	unknown			170
@@ -212,10 +212,10 @@ entry	name	signature	calling	params	locals	bytes
 004109f0	FUN_004109f0	undefined FUN_004109f0()	unknown			7
 00410a00	FUN_00410a00	undefined FUN_00410a00()	unknown			363
 00410b70	FUN_00410b70	undefined FUN_00410b70()	unknown			220
-00410c50	FUN_00410c50	undefined FUN_00410c50()	unknown			139
+00410c50	Display_ProbeResolutions	undefined Display_ProbeResolutions()	unknown			139
 00410ce0	FUN_00410ce0	undefined FUN_00410ce0()	unknown			348
-00410e50	FUN_00410e50	undefined FUN_00410e50()	unknown			119
-00410ed0	FUN_00410ed0	undefined FUN_00410ed0()	unknown			347
+00410e50	DeviceCaps_Init	undefined DeviceCaps_Init()	unknown			119
+00410ed0	GraphicsQuality_Set	undefined GraphicsQuality_Set()	unknown			347
 00411030	FUN_00411030	undefined FUN_00411030()	unknown		undefined4 local_14;undefined4 local_18;undefined local_1c;	146
 00411340	FUN_00411340	undefined FUN_00411340()	unknown		undefined local_10;	648
 004115f0	FUN_004115f0	undefined FUN_004115f0()	unknown		undefined1 local_2;undefined1 local_3;undefined1 local_4;undefined1 local_5;undefined1 local_6;undefined1 local_7;undefined1 local_8;undefined1 local_9;undefined1 local_a;undefined1 local_b;undefined1 local_c;undefined1 local_d;undefined1 local_e;undefined1 local_f;undefined1 local_10;undefined1 local_11;undefined1 local_12;undefined1 local_13;undefined1 local_14;undefined1 local_15;undefined1 local_16;undefined1 local_17;undefined1 local_18;undefined1 local_19;undefined1 local_1a;undefined1 local_1b;undefined1 local_1c;undefined1 local_1d;undefined1 local_1e;undefined1 local_1f;undefined1 local_20;undefined1 local_21;undefined1 local_22;undefined1 local_23;undefined1 local_24;undefined1 local_25;undefined1 local_26;undefined1 local_27;undefined1 local_28;undefined1 local_29;undefined1 local_2a;undefined1 local_2b;undefined1 local_2c;undefined1 local_2d;undefined1 local_2e;undefined1 local_2f;undefined1 local_30;undefined1 local_31;undefined1 local_32;undefined1 local_33;undefined1 local_34;undefined1 local_35;undefined1 local_36;undefined1 local_37;undefined1 local_38;	304
@@ -228,8 +228,8 @@ entry	name	signature	calling	params	locals	bytes
 00411ab0	FUN_00411ab0	undefined FUN_00411ab0()	unknown			71
 00411b00	FUN_00411b00	undefined FUN_00411b00()	unknown		undefined4 local_98;undefined4 local_a8;	98
 00411b70	FUN_00411b70	undefined FUN_00411b70()	unknown			100
-00411be0	FUN_00411be0	undefined FUN_00411be0()	unknown			104
-00411c50	FUN_00411c50	undefined FUN_00411c50()	unknown			80
+00411be0	SNDSTRM_AllocRequest	undefined SNDSTRM_AllocRequest()	unknown			104
+00411c50	SNDSTRM_PushRequest	undefined SNDSTRM_PushRequest()	unknown			80
 00411ca0	FUN_00411ca0	undefined FUN_00411ca0()	unknown			87
 00411d00	FUN_00411d00	undefined FUN_00411d00()	unknown		undefined4 local_4;undefined4 local_8;undefined local_18;	445
 00411ec0	FUN_00411ec0	undefined FUN_00411ec0()	unknown			45
@@ -237,12 +237,12 @@ entry	name	signature	calling	params	locals	bytes
 00411f40	FUN_00411f40	undefined FUN_00411f40()	unknown			213
 00412020	FUN_00412020	undefined FUN_00412020()	unknown			314
 00412160	FUN_00412160	undefined FUN_00412160()	unknown			873
-004124d0	FUN_004124d0	undefined FUN_004124d0()	unknown			31
+004124d0	SNDSTRM_OverheadBytes	undefined SNDSTRM_OverheadBytes()	unknown			31
 004124f0	FUN_004124f0	undefined FUN_004124f0()	unknown		undefined4 local_4;	682
 004127a0	FUN_004127a0	undefined FUN_004127a0()	unknown			106
 00412810	FUN_00412810	undefined FUN_00412810()	unknown			119
 00412890	FUN_00412890	undefined FUN_00412890()	unknown			102
-00412900	FUN_00412900	undefined FUN_00412900()	unknown			46
+00412900	SNDSTRM_GetEntry	undefined SNDSTRM_GetEntry()	unknown			46
 00412930	FUN_00412930	undefined FUN_00412930()	unknown			192
 004129f0	FUN_004129f0	undefined FUN_004129f0()	unknown			167
 00412aa0	FUN_00412aa0	undefined FUN_00412aa0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined local_2c;	551
@@ -253,7 +253,7 @@ entry	name	signature	calling	params	locals	bytes
 00412f90	FUN_00412f90	undefined FUN_00412f90()	unknown			25
 00412fb0	FUN_00412fb0	undefined FUN_00412fb0()	unknown			44
 00412fe0	FUN_00412fe0	undefined FUN_00412fe0()	unknown			28
-00413000	FUN_00413000	undefined FUN_00413000()	unknown			71
+00413000	Input__CreateDirectInput8	undefined Input__CreateDirectInput8()	unknown			71
 00413050	FUN_00413050	undefined FUN_00413050()	unknown			126
 004130d0	FUN_004130d0	undefined FUN_004130d0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;	199
 004131a0	FUN_004131a0	undefined FUN_004131a0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	73
@@ -263,10 +263,10 @@ entry	name	signature	calling	params	locals	bytes
 00413310	FUN_00413310	undefined FUN_00413310()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	391
 004134a0	FUN_004134a0	undefined FUN_004134a0()	unknown			10
 004134c0	FUN_004134c0	undefined FUN_004134c0()	unknown			4
-004134d0	FUN_004134d0	undefined FUN_004134d0()	unknown			70
+004134d0	FEng_FindObjectByHash	undefined FEng_FindObjectByHash()	unknown			70
 00413520	FUN_00413520	undefined FUN_00413520()	unknown			34
-00413550	FUN_00413550	undefined FUN_00413550()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
-004135b0	FUN_004135b0	undefined FUN_004135b0()	unknown		undefined4 local_4;undefined4 local_c;	1150
+00413550	Screen_PC_Controller_Config__Create	undefined Screen_PC_Controller_Config__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
+004135b0	Screen_PC_Controller_Config__Screen_PC_Controller_Config	undefined Screen_PC_Controller_Config__Screen_PC_Controller_Config()	unknown		undefined4 local_4;undefined4 local_c;	1150
 00413a30	FUN_00413a30	undefined FUN_00413a30()	unknown			30
 00413a50	FUN_00413a50	undefined FUN_00413a50()	unknown			22
 00413a70	FUN_00413a70	undefined FUN_00413a70()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	1373
@@ -276,10 +276,10 @@ entry	name	signature	calling	params	locals	bytes
 004145c0	FUN_004145c0	undefined FUN_004145c0()	unknown			83
 00414620	FUN_00414620	undefined FUN_00414620()	unknown			82
 00414680	FUN_00414680	undefined FUN_00414680()	unknown			417
-00414830	FUN_00414830	undefined FUN_00414830()	unknown		undefined local_30;	256
+00414830	ControlsScreen__SetBindingLabel	undefined ControlsScreen__SetBindingLabel()	unknown		undefined local_30;	256
 00414930	FUN_00414930	undefined FUN_00414930()	unknown			90
 00414990	FUN_00414990	undefined FUN_00414990()	unknown			54
-004149d0	FUN_004149d0	undefined FUN_004149d0()	unknown			62
+004149d0	FEng_FindObjectByHash2	undefined FEng_FindObjectByHash2()	unknown			62
 00414a10	FUN_00414a10	undefined FUN_00414a10()	unknown			80
 00414a60	FUN_00414a60	undefined FUN_00414a60()	unknown			80
 00414ab0	FUN_00414ab0	undefined FUN_00414ab0()	unknown			7
@@ -289,14 +289,14 @@ entry	name	signature	calling	params	locals	bytes
 00414b80	FUN_00414b80	undefined FUN_00414b80()	unknown			30
 00414ba0	FUN_00414ba0	undefined FUN_00414ba0()	unknown			21
 00414bc0	FUN_00414bc0	undefined FUN_00414bc0()	unknown			30
-00414be0	FUN_00414be0	undefined FUN_00414be0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
-00414c40	FUN_00414c40	undefined FUN_00414c40()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	696
+00414be0	Screen_PC_Graphics__Create	undefined Screen_PC_Graphics__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
+00414c40	Screen_PC_Graphics__Screen_PC_Graphics	undefined Screen_PC_Graphics__Screen_PC_Graphics()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	696
 00414f00	FUN_00414f00	undefined FUN_00414f00()	unknown		undefined4 local_4;	81
 00415120	FUN_00415120	undefined FUN_00415120()	unknown		undefined local_8;	148
 004151c0	FUN_004151c0	undefined FUN_004151c0()	unknown		undefined1 local_1f;undefined local_20;	309
 00415300	FUN_00415300	undefined FUN_00415300()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_1c;undefined4 local_20;	514
 00415510	FUN_00415510	undefined FUN_00415510()	unknown			64
-004155b0	FUN_004155b0	undefined FUN_004155b0()	unknown		undefined4 local_4;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	855
+004155b0	Screen_PC_Customize_Graphics__Screen_PC_Customize_Graphics	undefined Screen_PC_Customize_Graphics__Screen_PC_Customize_Graphics()	unknown		undefined4 local_4;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	855
 00415910	FUN_00415910	undefined FUN_00415910()	unknown			30
 00415930	FUN_00415930	undefined FUN_00415930()	unknown			56
 00415aa0	FUN_00415aa0	undefined FUN_00415aa0()	unknown			117
@@ -314,8 +314,8 @@ entry	name	signature	calling	params	locals	bytes
 00416a40	FUN_00416a40	undefined FUN_00416a40()	unknown			356
 00416bb0	FUN_00416bb0	undefined FUN_00416bb0()	unknown			122
 00416c30	FUN_00416c30	undefined FUN_00416c30()	unknown		undefined4 local_4;undefined4 local_c;	91
-00416cb0	FUN_00416cb0	undefined FUN_00416cb0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
-00416d10	FUN_00416d10	undefined FUN_00416d10()	unknown		undefined4 local_4;undefined4 local_c;	456
+00416cb0	Screen_PC_LoadSave__Create	undefined Screen_PC_LoadSave__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
+00416d10	Screen_PC_LoadSave__Screen_PC_LoadSave	undefined Screen_PC_LoadSave__Screen_PC_LoadSave()	unknown		undefined4 local_4;undefined4 local_c;	456
 00416f00	FUN_00416f00	undefined FUN_00416f00()	unknown			57
 00416f40	FUN_00416f40	undefined FUN_00416f40()	unknown			125
 00416fc0	FUN_00416fc0	undefined FUN_00416fc0()	unknown		undefined1 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined1 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;	160
@@ -333,10 +333,10 @@ entry	name	signature	calling	params	locals	bytes
 00417580	FUN_00417580	undefined FUN_00417580()	unknown			27
 004175a0	FUN_004175a0	undefined FUN_004175a0()	unknown			4
 004175b0	FUN_004175b0	undefined FUN_004175b0()	unknown			5
-004175c0	FUN_004175c0	undefined FUN_004175c0()	unknown		undefined4 local_4;	50
-00417600	FUN_00417600	undefined FUN_00417600()	unknown			145
-004176a0	FUN_004176a0	undefined FUN_004176a0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
-00417700	FUN_00417700	undefined FUN_00417700()	unknown		undefined4 local_14;undefined4 local_1c;undefined4 local_2f8;undefined4 local_2fc;undefined local_740;undefined1 local_75f;undefined local_760;undefined4 local_764;undefined4 local_768;undefined4 local_76c;undefined4 local_770;undefined local_780;	1281
+004175c0	LinearTable__Init	undefined LinearTable__Init()	unknown		undefined4 local_4;	50
+00417600	RideInfo__Init	undefined RideInfo__Init()	unknown			145
+004176a0	Screen_MU_UG_NewOrLoad_PC2__Create	undefined Screen_MU_UG_NewOrLoad_PC2__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
+00417700	Screen_MU_UG_NewOrLoad_PC2__Screen_MU_UG_NewOrLoad_PC2	undefined Screen_MU_UG_NewOrLoad_PC2__Screen_MU_UG_NewOrLoad_PC2()	unknown		undefined4 local_14;undefined4 local_1c;undefined4 local_2f8;undefined4 local_2fc;undefined local_740;undefined1 local_75f;undefined local_760;undefined4 local_764;undefined4 local_768;undefined4 local_76c;undefined4 local_770;undefined local_780;	1281
 00417c10	FUN_00417c10	undefined FUN_00417c10()	unknown			30
 00417c30	FUN_00417c30	undefined FUN_00417c30()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	153
 00417cf0	FUN_00417cf0	undefined FUN_00417cf0()	unknown		undefined1 local_1f;undefined local_20;	383
@@ -351,21 +351,21 @@ entry	name	signature	calling	params	locals	bytes
 00418c00	FUN_00418c00	undefined FUN_00418c00()	unknown		undefined local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_124;	190
 00418cc0	FUN_00418cc0	undefined FUN_00418cc0()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;	50
 00418d00	FUN_00418d00	undefined FUN_00418d00()	unknown			7
-00418d10	FUN_00418d10	undefined FUN_00418d10()	unknown			96
-00418d70	FUN_00418d70	undefined FUN_00418d70()	unknown		undefined local_10;	154
-00418e10	FUN_00418e10	undefined FUN_00418e10()	unknown			91
+00418d10	EZWheel__ReleaseChannel	undefined EZWheel__ReleaseChannel()	unknown			96
+00418d70	EZWheel__ClearChannels	undefined EZWheel__ClearChannels()	unknown		undefined local_10;	154
+00418e10	EZWheel__CreateDInputAndEnumerate	undefined EZWheel__CreateDInputAndEnumerate()	unknown			91
 00418e90	FUN_00418e90	undefined FUN_00418e90()	unknown			76
-00418ee0	FUN_00418ee0	undefined FUN_00418ee0()	unknown		undefined4 local_244;undefined4 local_248;undefined4 local_24c;undefined4 local_250;undefined4 local_254;undefined4 local_258;	668
-00419220	FUN_00419220	undefined FUN_00419220()	unknown			1665
+00418ee0	EZWheel__OpenChannel	undefined EZWheel__OpenChannel()	unknown		undefined4 local_244;undefined4 local_248;undefined4 local_24c;undefined4 local_250;undefined4 local_254;undefined4 local_258;	668
+00419220	EZWheel__ReadChannel	undefined EZWheel__ReadChannel()	unknown			1665
 004198b0	FUN_004198b0	undefined FUN_004198b0()	unknown			76
-00419900	FUN_00419900	undefined FUN_00419900()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;	429
-00419ab0	FUN_00419ab0	undefined FUN_00419ab0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;	363
-00419c20	FUN_00419c20	undefined FUN_00419c20()	unknown		undefined local_100;	59
-00419c60	FUN_00419c60	undefined FUN_00419c60()	unknown			93
+00419900	EZWheel__CreatePeriodicEffect	undefined EZWheel__CreatePeriodicEffect()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;	429
+00419ab0	EZWheel__UpdatePeriodicForce	undefined EZWheel__UpdatePeriodicForce()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;	363
+00419c20	EZWheel__DebugLog	undefined EZWheel__DebugLog()	unknown		undefined local_100;	59
+00419c60	EZWheel__Create	undefined EZWheel__Create()	unknown			93
 00419cc0	FUN_00419cc0	undefined FUN_00419cc0()	unknown		undefined4 local_4;undefined4 local_c;	158
-00419d60	FUN_00419d60	undefined FUN_00419d60()	unknown		undefined2 local_8;undefined4 local_c;undefined local_1c;	213
-00419e40	FUN_00419e40	undefined FUN_00419e40()	unknown		undefined4 local_4;	70
-00419ea0	FUN_00419ea0	undefined FUN_00419ea0()	unknown			173
+00419d60	EZWheel__ResetState	undefined EZWheel__ResetState()	unknown		undefined2 local_8;undefined4 local_c;undefined local_1c;	213
+00419e40	EZWheel__BuildSineTable	undefined EZWheel__BuildSineTable()	unknown		undefined4 local_4;	70
+00419ea0	EZWheel__Poll	undefined EZWheel__Poll()	unknown			173
 00419f50	FUN_00419f50	undefined FUN_00419f50()	unknown			723
 0041a250	FUN_0041a250	undefined FUN_0041a250()	unknown			512
 0041a450	FUN_0041a450	undefined FUN_0041a450()	unknown			26
@@ -390,42 +390,42 @@ entry	name	signature	calling	params	locals	bytes
 0041b830	FUN_0041b830	undefined FUN_0041b830()	unknown			309
 0041b970	FUN_0041b970	undefined FUN_0041b970()	unknown		undefined local_10;	261
 0041ba80	FUN_0041ba80	undefined FUN_0041ba80()	unknown		undefined local_4;	45
-0041bab0	FUN_0041bab0	undefined FUN_0041bab0()	unknown			115
-0041bb30	FUN_0041bb30	undefined FUN_0041bb30()	unknown			115
-0041bbb0	FUN_0041bbb0	undefined FUN_0041bbb0()	unknown			108
+0041bab0	EZWheel__StartEffect	undefined EZWheel__StartEffect()	unknown			115
+0041bb30	EZWheel__StopEffect	undefined EZWheel__StopEffect()	unknown			115
+0041bbb0	EZWheel__UnloadEffect	undefined EZWheel__UnloadEffect()	unknown			108
 0041bc20	FUN_0041bc20	undefined FUN_0041bc20()	unknown			58
-0041bc60	FUN_0041bc60	undefined FUN_0041bc60()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;	133
-0041bcf0	FUN_0041bcf0	undefined FUN_0041bcf0()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;	110
+0041bc60	EZWheel__SetOverallGain	undefined EZWheel__SetOverallGain()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;	133
+0041bcf0	EZWheel__GetOverallGain	undefined EZWheel__GetOverallGain()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;	110
 0041bd60	FUN_0041bd60	undefined FUN_0041bd60()	unknown			52
-0041bda0	FUN_0041bda0	undefined FUN_0041bda0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;	381
-0041bf20	FUN_0041bf20	undefined FUN_0041bf20()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;	318
+0041bda0	EZWheel__CreateConstantEffect	undefined EZWheel__CreateConstantEffect()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;	381
+0041bf20	EZWheel__UpdateConstantForce	undefined EZWheel__UpdateConstantForce()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;	318
 0041c060	FUN_0041c060	undefined FUN_0041c060()	unknown			5
-0041c070	FUN_0041c070	undefined FUN_0041c070()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;	455
-0041c240	FUN_0041c240	undefined FUN_0041c240()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;	381
+0041c070	EZWheel__CreateConditionEffect	undefined EZWheel__CreateConditionEffect()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;	455
+0041c240	EZWheel__UpdateConditionForce	undefined EZWheel__UpdateConditionForce()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;	381
 0041c3c0	FUN_0041c3c0	undefined FUN_0041c3c0()	unknown			16
 0041c3d0	FUN_0041c3d0	undefined FUN_0041c3d0()	unknown			76
-0041c420	FUN_0041c420	undefined FUN_0041c420()	unknown		undefined4 local_c;	354
+0041c420	Config__OpenCfgFile	undefined Config__OpenCfgFile()	unknown		undefined4 local_c;	354
 0041c590	FUN_0041c590	undefined FUN_0041c590()	unknown		undefined local_c;	225
-0041c680	FUN_0041c680	undefined FUN_0041c680()	unknown		undefined2 local_100;	281
-0041c7a0	FUN_0041c7a0	undefined FUN_0041c7a0()	unknown		undefined1 local_106;undefined2 local_108;undefined local_118;undefined8 local_120;	569
+0041c680	Settings__Load	undefined Settings__Load()	unknown		undefined2 local_100;	281
+0041c7a0	Settings__Save	undefined Settings__Save()	unknown		undefined1 local_106;undefined2 local_108;undefined local_118;undefined8 local_120;	569
 0041c9e0	FUN_0041c9e0	undefined FUN_0041c9e0()	unknown		undefined1 local_42;undefined2 local_44;undefined local_54;undefined4 local_58;undefined local_68;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;	953
 0041cda0	FUN_0041cda0	undefined FUN_0041cda0()	unknown		undefined2 local_44;undefined local_54;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;	412
-0041cf40	FUN_0041cf40	undefined FUN_0041cf40()	unknown			233
-0041d030	FUN_0041d030	undefined FUN_0041d030()	unknown			126
+0041cf40	Profile__CreateNew	undefined Profile__CreateNew()	unknown			233
+0041d030	Profile__Load	undefined Profile__Load()	unknown			126
 0041d0b0	FUN_0041d0b0	undefined FUN_0041d0b0()	unknown			31
-0041d0d0	FUN_0041d0d0	undefined FUN_0041d0d0()	unknown		undefined local_140;undefined local_244;	103
-0041d140	FUN_0041d140	undefined FUN_0041d140()	unknown		undefined local_208;	345
-0041d2a0	FUN_0041d2a0	undefined FUN_0041d2a0()	unknown		undefined local_204;undefined local_308;undefined local_408;undefined4 local_42c;undefined4 local_430;undefined1 local_431;undefined local_444;	940
-0041d650	FUN_0041d650	undefined FUN_0041d650()	unknown		undefined local_208;	284
-0041d770	FUN_0041d770	undefined FUN_0041d770()	unknown		undefined local_208;	298
-0041d8a0	FUN_0041d8a0	undefined FUN_0041d8a0()	unknown		undefined local_104;undefined1 local_10f;undefined local_110;undefined2 local_12c;undefined4 local_130;undefined4 local_134;undefined local_144;	411
-0041da40	FUN_0041da40	undefined FUN_0041da40()	unknown		undefined local_104;undefined local_120;undefined local_134;undefined4 local_138;undefined4 local_13c;	294
-0041db70	FUN_0041db70	undefined FUN_0041db70()	unknown		undefined local_104;undefined4 local_108;	155
-0041dc10	FUN_0041dc10	undefined FUN_0041dc10()	unknown		undefined local_104;	248
-0041dd10	FUN_0041dd10	undefined FUN_0041dd10()	unknown			67
-0041dd60	FUN_0041dd60	undefined FUN_0041dd60()	unknown		undefined local_44c;undefined4 local_470;undefined4 local_474;	1166
-0041e200	FUN_0041e200	undefined FUN_0041e200()	unknown		undefined local_208;	301
-0041e330	FUN_0041e330	undefined FUN_0041e330()	unknown		undefined local_208;	359
+0041d0d0	SaveSlot__Exists	undefined SaveSlot__Exists()	unknown		undefined local_140;undefined local_244;	103
+0041d140	ProfileList__Load	undefined ProfileList__Load()	unknown		undefined local_208;	345
+0041d2a0	ProfileList__Touch	undefined ProfileList__Touch()	unknown		undefined local_204;undefined local_308;undefined local_408;undefined4 local_42c;undefined4 local_430;undefined1 local_431;undefined local_444;	940
+0041d650	ProBlob__Write	undefined ProBlob__Write()	unknown		undefined local_208;	284
+0041d770	ProBlob__Read	undefined ProBlob__Read()	unknown		undefined local_208;	298
+0041d8a0	Ugd__Write	undefined Ugd__Write()	unknown		undefined local_104;undefined1 local_10f;undefined local_110;undefined2 local_12c;undefined4 local_130;undefined4 local_134;undefined local_144;	411
+0041da40	Ugd__Read	undefined Ugd__Read()	unknown		undefined local_104;undefined local_120;undefined local_134;undefined4 local_138;undefined4 local_13c;	294
+0041db70	Ugd__ReadHeader	undefined Ugd__ReadHeader()	unknown		undefined local_104;undefined4 local_108;	155
+0041dc10	Save__BuildPath	undefined Save__BuildPath()	unknown		undefined local_104;	248
+0041dd10	Adler32	undefined Adler32()	unknown			67
+0041dd60	Profile__Delete	undefined Profile__Delete()	unknown		undefined local_44c;undefined4 local_470;undefined4 local_474;	1166
+0041e200	Opt__Write	undefined Opt__Write()	unknown		undefined local_208;	301
+0041e330	Opt__Read	undefined Opt__Read()	unknown		undefined local_208;	359
 0041e4a0	FUN_0041e4a0	undefined FUN_0041e4a0()	unknown			4
 0041e4b0	FUN_0041e4b0	undefined FUN_0041e4b0()	unknown			4
 0041e4c0	FUN_0041e4c0	undefined FUN_0041e4c0()	unknown			4
@@ -434,7 +434,7 @@ entry	name	signature	calling	params	locals	bytes
 0041e600	FUN_0041e600	undefined FUN_0041e600()	unknown		undefined4 local_c;undefined4 local_10;	69
 0041e650	FUN_0041e650	undefined FUN_0041e650()	unknown			19
 0041e670	FUN_0041e670	undefined FUN_0041e670()	unknown		undefined1 local_5;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined local_11c;undefined4 local_120;undefined4 local_124;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_134;	495
-0041e860	FUN_0041e860	undefined FUN_0041e860()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	309
+0041e860	CpuDetect	undefined CpuDetect()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	309
 0041e9b0	FUN_0041e9b0	undefined FUN_0041e9b0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	143
 0041ea60	FUN_0041ea60	undefined FUN_0041ea60()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	127
 0041eae0	FUN_0041eae0	undefined FUN_0041eae0()	unknown		undefined8 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined local_30;undefined4 local_34;	509
@@ -471,7 +471,7 @@ entry	name	signature	calling	params	locals	bytes
 0041ff50	FUN_0041ff50	undefined FUN_0041ff50()	unknown			39
 0041ff80	FUN_0041ff80	undefined FUN_0041ff80()	unknown		undefined4 local_4;	85
 0041ffe0	FUN_0041ffe0	undefined FUN_0041ffe0()	unknown			42
-00420050	FUN_00420050	undefined FUN_00420050()	unknown			43
+00420050	SlowMoStart	undefined SlowMoStart()	unknown			43
 00420080	FUN_00420080	undefined FUN_00420080()	unknown			13
 00420090	FUN_00420090	undefined FUN_00420090()	unknown			13
 004200a0	FUN_004200a0	undefined FUN_004200a0()	unknown			103
@@ -495,7 +495,7 @@ entry	name	signature	calling	params	locals	bytes
 00421980	FUN_00421980	undefined FUN_00421980()	unknown			40
 004219b0	FUN_004219b0	undefined FUN_004219b0()	unknown			63
 004219f0	FUN_004219f0	undefined FUN_004219f0()	unknown			49
-00421a30	FUN_00421a30	undefined FUN_00421a30()	unknown			22
+00421a30	SpecialCamCooldown	undefined SpecialCamCooldown()	unknown			22
 00421a50	FUN_00421a50	undefined FUN_00421a50()	unknown			25
 00421a70	FUN_00421a70	undefined FUN_00421a70()	unknown			4
 00421a80	FUN_00421a80	undefined FUN_00421a80()	unknown			12
@@ -513,9 +513,9 @@ entry	name	signature	calling	params	locals	bytes
 00421f00	FUN_00421f00	undefined FUN_00421f00()	unknown		undefined4 local_4;undefined4 local_c;	556
 00422130	FUN_00422130	undefined FUN_00422130()	unknown		undefined4 local_8;	349
 004222a0	FUN_004222a0	undefined FUN_004222a0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;	358
-00422410	FUN_00422410	undefined FUN_00422410()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;	365
-00422580	FUN_00422580	undefined FUN_00422580()	unknown		undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_2bc;undefined local_2e0;undefined4 local_2e4;undefined4 local_2e8;undefined4 local_2ec;undefined4 local_2f0;undefined4 local_2f4;undefined4 local_2f8;undefined4 local_2fc;undefined4 local_300;undefined4 local_304;undefined4 local_308;undefined4 local_314;undefined4 local_318;undefined4 local_31c;undefined4 local_320;undefined4 local_324;undefined4 local_328;undefined4 local_32c;undefined local_340;	1257
-00422a70	FUN_00422a70	undefined FUN_00422a70()	unknown		undefined local_90;	240
+00422410	Grid__BuildRacerCar	undefined Grid__BuildRacerCar()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;	365
+00422580	Grid__GetStartPositions	undefined Grid__GetStartPositions()	unknown		undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_2bc;undefined local_2e0;undefined4 local_2e4;undefined4 local_2e8;undefined4 local_2ec;undefined4 local_2f0;undefined4 local_2f4;undefined4 local_2f8;undefined4 local_2fc;undefined4 local_300;undefined4 local_304;undefined4 local_308;undefined4 local_314;undefined4 local_318;undefined4 local_31c;undefined4 local_320;undefined4 local_324;undefined4 local_328;undefined4 local_32c;undefined local_340;	1257
+00422a70	Grid__PlaceAllRacers	undefined Grid__PlaceAllRacers()	unknown		undefined local_90;	240
 00422b70	FUN_00422b70	undefined FUN_00422b70()	unknown		undefined local_4;	56
 00422c40	FUN_00422c40	undefined FUN_00422c40()	unknown			51
 00422eb0	FUN_00422eb0	undefined FUN_00422eb0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	401
@@ -527,7 +527,7 @@ entry	name	signature	calling	params	locals	bytes
 00423b50	FUN_00423b50	undefined FUN_00423b50()	unknown		undefined4 local_254;undefined4 local_258;	734
 00423e23	FUN_00423e23	undefined FUN_00423e23()	unknown			192
 00423f20	FUN_00423f20	undefined FUN_00423f20()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	571
-00424160	FUN_00424160	undefined FUN_00424160()	unknown		undefined4 local_8;undefined4 local_10;undefined local_1c;	783
+00424160	CameraMover_CreateByType	undefined CameraMover_CreateByType()	unknown		undefined4 local_8;undefined4 local_10;undefined local_1c;	783
 004244b0	FUN_004244b0	undefined FUN_004244b0()	unknown			145
 00424550	FUN_00424550	undefined FUN_00424550()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;	299
 00424680	FUN_00424680	undefined FUN_00424680()	unknown		undefined4 local_218;undefined local_240;undefined4 local_244;undefined4 local_248;undefined4 local_24c;undefined4 local_250;undefined4 local_254;undefined4 local_258;undefined4 local_25c;undefined4 local_260;undefined4 local_264;undefined4 local_268;undefined4 local_278;undefined4 local_27c;undefined4 local_280;undefined4 local_284;undefined4 local_288;undefined4 local_28c;undefined4 local_290;undefined4 local_294;undefined4 local_298;undefined4 local_29c;undefined4 local_2a0;undefined4 local_2a4;undefined4 local_2a8;undefined4 local_2ac;undefined4 local_2b0;undefined4 local_2b4;undefined4 local_2b8;undefined4 local_2bc;undefined4 local_2c0;undefined4 local_2c4;undefined4 local_2c8;undefined4 local_2cc;undefined4 local_2d0;undefined4 local_2d4;undefined4 local_2d8;undefined4 local_2dc;undefined local_2f0;	1154
@@ -537,7 +537,7 @@ entry	name	signature	calling	params	locals	bytes
 00424ba0	FUN_00424ba0	undefined FUN_00424ba0()	unknown		undefined4 local_4;	129
 00424c30	FUN_00424c30	undefined FUN_00424c30()	unknown			3
 00424c40	FUN_00424c40	undefined FUN_00424c40()	unknown			5
-00424c50	FUN_00424c50	undefined FUN_00424c50()	unknown			15
+00424c50	TrafficCar_AtIndex	undefined TrafficCar_AtIndex()	unknown			15
 00424c60	FUN_00424c60	undefined FUN_00424c60()	unknown			4
 00424c70	FUN_00424c70	undefined FUN_00424c70()	unknown			12
 00424c80	FUN_00424c80	undefined FUN_00424c80()	unknown			12
@@ -589,22 +589,22 @@ entry	name	signature	calling	params	locals	bytes
 00425330	FUN_00425330	undefined FUN_00425330()	unknown			31
 00425350	FUN_00425350	undefined FUN_00425350()	unknown		undefined4 local_14;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;	1594
 00425990	FUN_00425990	undefined FUN_00425990()	unknown		undefined4 local_8;undefined4 local_10;	339
-00425af0	FUN_00425af0	undefined FUN_00425af0()	unknown		undefined local_c;undefined4 local_10;	1256
+00425af0	Car_SerializeFields	undefined Car_SerializeFields()	unknown		undefined local_c;undefined4 local_10;	1256
 00425fe0	FUN_00425fe0	undefined FUN_00425fe0()	unknown			278
-00426110	FUN_00426110	undefined FUN_00426110()	unknown		undefined4 local_c;	406
+00426110	Car_SetMode	undefined Car_SetMode()	unknown		undefined4 local_c;	406
 004262c0	FUN_004262c0	undefined FUN_004262c0()	unknown			57
 00426300	FUN_00426300	undefined FUN_00426300()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_44;undefined4 local_4c;	331
 00426450	FUN_00426450	undefined FUN_00426450()	unknown		undefined4 local_4;	123
-004264d0	FUN_004264d0	undefined FUN_004264d0()	unknown			717
+004264d0	Car__ServiceResetRequest	undefined Car__ServiceResetRequest()	unknown			717
 004267a0	FUN_004267a0	undefined FUN_004267a0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined local_21;undefined4 local_38;	399
-00426930	FUN_00426930	undefined FUN_00426930()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined local_50;undefined4 local_58;	2707
+00426930	JumpCamTrigger	undefined JumpCamTrigger()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined local_50;undefined4 local_58;	2707
 004273d0	FUN_004273d0	undefined FUN_004273d0()	unknown		undefined local_50;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;	1273
 004278d0	FUN_004278d0	undefined FUN_004278d0()	unknown		undefined4 local_18;	84
 00427930	FUN_00427930	undefined FUN_00427930()	unknown		undefined4 local_4;	245
 00427a30	FUN_00427a30	undefined FUN_00427a30()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;	530
 00427c50	FUN_00427c50	undefined FUN_00427c50()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_34;	523
 00427e60	FUN_00427e60	undefined FUN_00427e60()	unknown			106
-00427ed0	FUN_00427ed0	undefined FUN_00427ed0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	147
+00427ed0	Car__ApplyResetZone	undefined Car__ApplyResetZone()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	147
 00427f70	FUN_00427f70	undefined FUN_00427f70()	unknown		undefined4 local_18;undefined local_20;undefined4 local_24;undefined4 local_34;undefined4 local_38;	270
 00428080	FUN_00428080	undefined FUN_00428080()	unknown			30
 004280a0	FUN_004280a0	undefined FUN_004280a0()	unknown		undefined4 local_4;	67
@@ -620,11 +620,11 @@ entry	name	signature	calling	params	locals	bytes
 00429270	FUN_00429270	undefined FUN_00429270()	unknown		undefined4 local_4;undefined1 local_5;	937
 00429620	FUN_00429620	undefined FUN_00429620()	unknown		undefined4 local_1c;undefined local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_44;	1117
 00429ac0	FUN_00429ac0	undefined FUN_00429ac0()	unknown			73
-00429b10	FUN_00429b10	undefined FUN_00429b10()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	133
+00429b10	Racer__UpdateTwoHumanCatchUp	undefined Racer__UpdateTwoHumanCatchUp()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	133
 00429ba0	FUN_00429ba0	undefined FUN_00429ba0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	172
 00429c50	FUN_00429c50	undefined FUN_00429c50()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	98
 00429cc0	FUN_00429cc0	undefined FUN_00429cc0()	unknown			41
-00429cf0	FUN_00429cf0	undefined FUN_00429cf0()	unknown		undefined local_50;undefined4 local_88;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_cc;	970
+00429cf0	JumpCamPredict	undefined JumpCamPredict()	unknown		undefined local_50;undefined4 local_88;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_cc;	970
 0042a0c0	FUN_0042a0c0	undefined FUN_0042a0c0()	unknown		undefined4 local_4;	85
 0042a120	FUN_0042a120	undefined FUN_0042a120()	unknown			937
 0042a4d0	FUN_0042a4d0	undefined FUN_0042a4d0()	unknown		undefined local_1;	86
@@ -642,7 +642,7 @@ entry	name	signature	calling	params	locals	bytes
 0042ab10	FUN_0042ab10	undefined FUN_0042ab10()	unknown			14
 0042ab20	FUN_0042ab20	undefined FUN_0042ab20()	unknown			15
 0042ab30	FUN_0042ab30	undefined FUN_0042ab30()	unknown			25
-0042ab50	FUN_0042ab50	undefined FUN_0042ab50()	unknown			35
+0042ab50	IsCar1099InMode4	undefined IsCar1099InMode4()	unknown			35
 0042ab80	FUN_0042ab80	undefined FUN_0042ab80()	unknown			37
 0042abf0	FUN_0042abf0	undefined FUN_0042abf0()	unknown			24
 0042ac10	FUN_0042ac10	undefined FUN_0042ac10()	unknown			21
@@ -652,13 +652,13 @@ entry	name	signature	calling	params	locals	bytes
 0042ac80	FUN_0042ac80	undefined FUN_0042ac80()	unknown			39
 0042acb0	FUN_0042acb0	undefined FUN_0042acb0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	55
 0042acf0	FUN_0042acf0	undefined FUN_0042acf0()	unknown			29
-0042ad10	FUN_0042ad10	undefined FUN_0042ad10()	unknown			120
+0042ad10	CameraMoverBase_InitFields	undefined CameraMoverBase_InitFields()	unknown			120
 0042ad90	FUN_0042ad90	undefined FUN_0042ad90()	unknown			53
 0042add0	FUN_0042add0	undefined FUN_0042add0()	unknown			22
 0042adf0	FUN_0042adf0	undefined FUN_0042adf0()	unknown		undefined4 local_4;	25
-0042ae10	FUN_0042ae10	undefined FUN_0042ae10()	unknown			6
-0042ae20	FUN_0042ae20	undefined FUN_0042ae20()	unknown			15
-0042ae30	FUN_0042ae30	undefined FUN_0042ae30()	unknown			6
+0042ae10	TrackRow_Current	undefined TrackRow_Current()	unknown			6
+0042ae20	SpawnRecord_Get	undefined SpawnRecord_Get()	unknown			15
+0042ae30	SpawnRecord_Count	undefined SpawnRecord_Count()	unknown			6
 0042ae40	FUN_0042ae40	undefined FUN_0042ae40()	unknown			4
 0042ae50	FUN_0042ae50	undefined FUN_0042ae50()	unknown		undefined4 local_8;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_2ac;undefined local_2d0;	481
 0042b040	FUN_0042b040	undefined FUN_0042b040()	unknown		undefined4 local_4;undefined4 local_c;	133
@@ -670,29 +670,29 @@ entry	name	signature	calling	params	locals	bytes
 0042c340	FUN_0042c340	undefined FUN_0042c340()	unknown			156
 0042c3e0	FUN_0042c3e0	undefined FUN_0042c3e0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	104
 0042c450	FUN_0042c450	undefined FUN_0042c450()	unknown			92
-0042c4b0	FUN_0042c4b0	undefined FUN_0042c4b0()	unknown			390
+0042c4b0	Player__IsJumpCamAvailable	undefined Player__IsJumpCamAvailable()	unknown			390
 0042c640	FUN_0042c640	undefined FUN_0042c640()	unknown			42
-0042c670	FUN_0042c670	undefined FUN_0042c670()	unknown			89
-0042c6d0	FUN_0042c6d0	undefined FUN_0042c6d0()	unknown			3094
+0042c670	Player__DefaultDriveCamera	undefined Player__DefaultDriveCamera()	unknown			89
+0042c6d0	Player__ChangeCameraMover	undefined Player__ChangeCameraMover()	unknown			3094
 0042d350	FUN_0042d350	undefined FUN_0042d350()	unknown			130
 0042d3e0	FUN_0042d3e0	undefined FUN_0042d3e0()	unknown			130
 0042d470	FUN_0042d470	undefined FUN_0042d470()	unknown			128
-0042d520	FUN_0042d520	undefined FUN_0042d520()	unknown			1086
-0042da40	FUN_0042da40	undefined FUN_0042da40()	unknown		undefined local_10;	857
-0042ddc0	FUN_0042ddc0	undefined FUN_0042ddc0()	unknown			210
+0042d520	Player__SetInputMode	undefined Player__SetInputMode()	unknown			1086
+0042da40	Player__StartSpecialCamera	undefined Player__StartSpecialCamera()	unknown		undefined local_10;	857
+0042ddc0	Player__EndSpecialCamera	undefined Player__EndSpecialCamera()	unknown			210
 0042deb0	FUN_0042deb0	undefined FUN_0042deb0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	356
-0042e020	FUN_0042e020	undefined FUN_0042e020()	unknown		undefined4 local_4;	297
+0042e020	Player__CyclePOV	undefined Player__CyclePOV()	unknown		undefined4 local_4;	297
 0042e150	FUN_0042e150	undefined FUN_0042e150()	unknown			49
 0042e190	FUN_0042e190	undefined FUN_0042e190()	unknown			71
 0042e1e0	FUN_0042e1e0	undefined FUN_0042e1e0()	unknown			67
 0042e230	FUN_0042e230	undefined FUN_0042e230()	unknown		undefined local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;	455
 0042e400	FUN_0042e400	undefined FUN_0042e400()	unknown			79
-0042e450	FUN_0042e450	undefined FUN_0042e450()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;	153
-0042e4f0	FUN_0042e4f0	undefined FUN_0042e4f0()	unknown			299
-0042e620	FUN_0042e620	undefined FUN_0042e620()	unknown			1399
+0042e450	Player__LookBackToggle	undefined Player__LookBackToggle()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;	153
+0042e4f0	TrackMap__SelectMode	undefined TrackMap__SelectMode()	unknown			299
+0042e620	Player__ComputeHudFlags	undefined Player__ComputeHudFlags()	unknown			1399
 0042ebb0	FUN_0042ebb0	undefined FUN_0042ebb0()	unknown			91
 0042ec10	FUN_0042ec10	undefined FUN_0042ec10()	unknown		undefined4 local_4;undefined4 local_c;	300
-0042ed40	FUN_0042ed40	undefined FUN_0042ed40()	unknown			83
+0042ed40	Player__SetHudFlags	undefined Player__SetHudFlags()	unknown			83
 0042eda0	FUN_0042eda0	undefined FUN_0042eda0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	148
 0042ee40	FUN_0042ee40	undefined FUN_0042ee40()	unknown		undefined4 local_4;	160
 0042eee0	FUN_0042eee0	undefined FUN_0042eee0()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;	310
@@ -709,23 +709,23 @@ entry	name	signature	calling	params	locals	bytes
 004300f0	FUN_004300f0	undefined FUN_004300f0()	unknown		undefined local_50;undefined local_60;undefined local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_94;undefined4 local_98;	1376
 00430650	FUN_00430650	undefined FUN_00430650()	unknown		undefined4 local_4;	98
 004306c0	FUN_004306c0	undefined FUN_004306c0()	unknown		undefined4 local_4;	103
-00430730	FUN_00430730	undefined FUN_00430730()	unknown			1108
-00430b90	FUN_00430b90	undefined FUN_00430b90()	unknown		undefined4 local_4;	610
-00430e00	FUN_00430e00	undefined FUN_00430e00()	unknown		undefined4 local_4;	543
+00430730	Player__StartRaceCameras	undefined Player__StartRaceCameras()	unknown			1108
+00430b90	Player__UpdateFrame	undefined Player__UpdateFrame()	unknown		undefined4 local_4;	610
+00430e00	Player__WrongWayAndZoneTest	undefined Player__WrongWayAndZoneTest()	unknown		undefined4 local_4;	543
 00431020	FUN_00431020	undefined FUN_00431020()	unknown			209
 00431100	FUN_00431100	undefined FUN_00431100()	unknown			131
 00431190	FUN_00431190	undefined FUN_00431190()	unknown			43
-004311c0	FUN_004311c0	undefined FUN_004311c0()	unknown			89
+004311c0	Players__UpdateAll	undefined Players__UpdateAll()	unknown			89
 00431230	FUN_00431230	undefined FUN_00431230()	unknown			102
 004312a0	FUN_004312a0	undefined FUN_004312a0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	506
-004314a0	FUN_004314a0	undefined FUN_004314a0()	unknown		undefined4 local_2f0;undefined4 local_2fc;	872
+004314a0	Player__ResetToRoute	undefined Player__ResetToRoute()	unknown		undefined4 local_2f0;undefined4 local_2fc;	872
 00431810	FUN_00431810	undefined FUN_00431810()	unknown			146
 004318b0	FUN_004318b0	undefined FUN_004318b0()	unknown			22
 004318d0	FUN_004318d0	undefined FUN_004318d0()	unknown			35
 00431900	FUN_00431900	undefined FUN_00431900()	unknown			32
 00431920	FUN_00431920	undefined FUN_00431920()	unknown			31
 00431940	FUN_00431940	undefined FUN_00431940()	unknown			31
-00431960	FUN_00431960	undefined FUN_00431960()	unknown			546
+00431960	SpecialCamCaller_431960	undefined SpecialCamCaller_431960()	unknown			546
 004319b4	caseD_75	undefined caseD_75()	unknown			141
 00431c0f	caseD_9b	undefined caseD_9b()	unknown			174
 00431d30	FUN_00431d30	undefined FUN_00431d30()	unknown			35
@@ -733,9 +733,9 @@ entry	name	signature	calling	params	locals	bytes
 00431dd0	FUN_00431dd0	undefined FUN_00431dd0()	unknown			25
 00431df0	FUN_00431df0	undefined FUN_00431df0()	unknown			333
 00431f40	FUN_00431f40	undefined FUN_00431f40()	unknown		undefined4 local_4;	855
-004322a0	FUN_004322a0	undefined FUN_004322a0()	unknown			189
-00432360	FUN_00432360	undefined FUN_00432360()	unknown			130
-004323f0	FUN_004323f0	undefined FUN_004323f0()	unknown			334
+004322a0	RaceStatus__AddEntrant	undefined RaceStatus__AddEntrant()	unknown			189
+00432360	DriverInfo__operator_	undefined DriverInfo__operator_()	unknown			130
+004323f0	RideInfo__operator_	undefined RideInfo__operator_()	unknown			334
 00432540	FUN_00432540	undefined FUN_00432540()	unknown			450
 00432710	FUN_00432710	undefined FUN_00432710()	unknown		undefined4 local_4;	163
 004327c0	FUN_004327c0	undefined FUN_004327c0()	unknown			15
@@ -802,7 +802,7 @@ entry	name	signature	calling	params	locals	bytes
 00435d30	FUN_00435d30	undefined FUN_00435d30()	unknown		undefined4 local_4;undefined4 local_8;undefined local_18;	548
 00435f70	FUN_00435f70	undefined FUN_00435f70()	unknown			10
 00435f80	FUN_00435f80	undefined FUN_00435f80()	unknown		undefined4 local_4;	95
-00435fe0	FUN_00435fe0	undefined FUN_00435fe0()	unknown			15
+00435fe0	ModeFlags_GetRow	undefined ModeFlags_GetRow()	unknown			15
 00435ff0	FUN_00435ff0	undefined FUN_00435ff0()	unknown			7
 00436070	FUN_00436070	undefined FUN_00436070()	unknown		undefined4 local_4;	317
 004361b0	FUN_004361b0	undefined FUN_004361b0()	unknown		undefined4 local_4;	124
@@ -905,7 +905,7 @@ entry	name	signature	calling	params	locals	bytes
 0043ab70	FUN_0043ab70	undefined FUN_0043ab70()	unknown		undefined4 local_8;	40
 0043aba0	FUN_0043aba0	undefined FUN_0043aba0()	unknown		undefined4 local_8;	101
 0043ac10	FUN_0043ac10	undefined FUN_0043ac10()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;	391
-0043ada0	FUN_0043ada0	undefined FUN_0043ada0()	unknown		undefined4 local_8;	156
+0043ada0	Race__RequestStartOrRestart	undefined Race__RequestStartOrRestart()	unknown		undefined4 local_8;	156
 0043ae40	FUN_0043ae40	undefined FUN_0043ae40()	unknown		undefined4 local_8;	142
 0043aed0	FUN_0043aed0	undefined FUN_0043aed0()	unknown		undefined4 local_8;	117
 0043af50	FUN_0043af50	undefined FUN_0043af50()	unknown		undefined4 local_8;	40
@@ -953,7 +953,7 @@ entry	name	signature	calling	params	locals	bytes
 0043db40	FUN_0043db40	undefined FUN_0043db40()	unknown			4
 0043db50	FUN_0043db50	undefined FUN_0043db50()	unknown			12
 0043db60	FUN_0043db60	undefined FUN_0043db60()	unknown			5
-0043db70	FUN_0043db70	undefined FUN_0043db70()	unknown			9
+0043db70	Zone_FindTrafficDensity	undefined Zone_FindTrafficDensity()	unknown			9
 0043dbb0	FUN_0043dbb0	undefined FUN_0043dbb0()	unknown			54
 0043dbf0	FUN_0043dbf0	undefined FUN_0043dbf0()	unknown			26
 0043dc10	FUN_0043dc10	undefined FUN_0043dc10()	unknown			6
@@ -969,7 +969,7 @@ entry	name	signature	calling	params	locals	bytes
 0043e9d0	FUN_0043e9d0	undefined FUN_0043e9d0()	unknown		undefined4 local_8;undefined4 local_c;	123
 0043ea50	FUN_0043ea50	undefined FUN_0043ea50()	unknown		undefined4 local_8;	69
 0043eaa0	FUN_0043eaa0	undefined FUN_0043eaa0()	unknown		undefined4 local_8;undefined4 local_c;	87
-0043eb00	FUN_0043eb00	undefined FUN_0043eb00()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;	725
+0043eb00	DriftManager__UpdateLeaderBoard	undefined DriftManager__UpdateLeaderBoard()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;	725
 0043ede0	FUN_0043ede0	undefined FUN_0043ede0()	unknown		undefined1 local_5;undefined4 local_c;undefined4 local_10;undefined local_14;undefined4 local_18;undefined4 local_1c;	281
 0043ef00	FUN_0043ef00	undefined FUN_0043ef00()	unknown		undefined4 local_8;	45
 0043ef30	FUN_0043ef30	undefined FUN_0043ef30()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;	428
@@ -989,87 +989,87 @@ entry	name	signature	calling	params	locals	bytes
 0043f980	FUN_0043f980	undefined FUN_0043f980()	unknown			40
 0043f9b0	FUN_0043f9b0	undefined FUN_0043f9b0()	unknown		undefined4 local_4;undefined4 local_8;	213
 0043fa90	FUN_0043fa90	undefined FUN_0043fa90()	unknown			187
-0043fb50	FUN_0043fb50	undefined FUN_0043fb50()	unknown			96
+0043fb50	Commentator__ShortcutZoneEntered	undefined Commentator__ShortcutZoneEntered()	unknown			96
 0043fbb0	FUN_0043fbb0	undefined FUN_0043fbb0()	unknown		undefined4 local_4;	356
-0043fd20	FUN_0043fd20	undefined FUN_0043fd20()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	332
-0043fe70	FUN_0043fe70	undefined FUN_0043fe70()	unknown			57
-0043feb0	FUN_0043feb0	undefined FUN_0043feb0()	unknown			50
-0043fef0	FUN_0043fef0	undefined FUN_0043fef0()	unknown			64
-0043ff30	FUN_0043ff30	undefined FUN_0043ff30()	unknown		undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;	415
-004400d0	FUN_004400d0	undefined FUN_004400d0()	unknown			14
-004400e0	FUN_004400e0	undefined FUN_004400e0()	unknown		undefined4 local_4;	278
+0043fd20	TrackPolyRow__UnpackVertices	undefined TrackPolyRow__UnpackVertices()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	332
+0043fe70	TrackPolyBody__FromSlotIndex	undefined TrackPolyBody__FromSlotIndex()	unknown			57
+0043feb0	TrackMarker_Count	undefined TrackMarker_Count()	unknown			50
+0043fef0	TrackMarker_Get	undefined TrackMarker_Get()	unknown			64
+0043ff30	TrackPolyBody__Build	undefined TrackPolyBody__Build()	unknown		undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;	415
+004400d0	TrackPolyBody__DetachRow	undefined TrackPolyBody__DetachRow()	unknown			14
+004400e0	TrackPolyBody__EdgeDistanceMax	undefined TrackPolyBody__EdgeDistanceMax()	unknown		undefined4 local_4;	278
 00440200	FUN_00440200	undefined FUN_00440200()	unknown		undefined4 local_18;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;	572
 00440450	FUN_00440450	undefined FUN_00440450()	unknown		undefined4 local_18;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;	260
 00440560	FUN_00440560	undefined FUN_00440560()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined local_40;	359
 004406d0	FUN_004406d0	undefined FUN_004406d0()	unknown			49
 00440710	FUN_00440710	undefined FUN_00440710()	unknown			34
 00440740	FUN_00440740	undefined FUN_00440740()	unknown			103
-004407b0	FUN_004407b0	undefined FUN_004407b0()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_28c;undefined local_290;undefined local_298;undefined4 local_29c;	632
-00440a40	FUN_00440a40	undefined FUN_00440a40()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined local_1c;	667
-00440ce0	FUN_00440ce0	undefined FUN_00440ce0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined local_21;	66
+004407b0	GroundQuery__RefillCache	undefined GroundQuery__RefillCache()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_28c;undefined local_290;undefined local_298;undefined4 local_29c;	632
+00440a40	GroundQuery__FindSurfaceBelow	undefined GroundQuery__FindSurfaceBelow()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined local_1c;	667
+00440ce0	GroundQuery__HasGroundAt	undefined GroundQuery__HasGroundAt()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined local_21;	66
 00440d30	FUN_00440d30	undefined FUN_00440d30()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;	196
-00440e00	FUN_00440e00	undefined FUN_00440e00()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_84;undefined4 local_88;	547
+00440e00	GroundQuery__SweepSegment	undefined GroundQuery__SweepSegment()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_84;undefined4 local_88;	547
 00441030	FUN_00441030	undefined FUN_00441030()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_54;	547
 00441270	FUN_00441270	undefined FUN_00441270()	unknown			55
-004412b0	FUN_004412b0	undefined FUN_004412b0()	unknown			107
+004412b0	TopologyTree__InitTree	undefined TopologyTree__InitTree()	unknown			107
 00441320	FUN_00441320	undefined FUN_00441320()	unknown			85
-00441380	FUN_00441380	undefined FUN_00441380()	unknown			248
-00441480	FUN_00441480	undefined FUN_00441480()	unknown			126
-00441500	FUN_00441500	undefined FUN_00441500()	unknown			37
-00441530	FUN_00441530	undefined FUN_00441530()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	292
-00441660	FUN_00441660	undefined FUN_00441660()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;	1196
-00441b20	FUN_00441b20	undefined FUN_00441b20()	unknown		undefined local_c;	103
-00441b90	FUN_00441b90	undefined FUN_00441b90()	unknown			124
-00441c10	FUN_00441c10	undefined FUN_00441c10()	unknown		undefined local_280;undefined4 local_284;undefined4 local_288;undefined local_298;	356
+00441380	TrackCollision_LoadChunk	undefined TrackCollision_LoadChunk()	unknown			248
+00441480	TrackCollision_Unload	undefined TrackCollision_Unload()	unknown			126
+00441500	CollisionGrid__Floor32	undefined CollisionGrid__Floor32()	unknown			37
+00441530	CollisionQuadtree__FindCell	undefined CollisionQuadtree__FindCell()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	292
+00441660	CollisionCell__CollectPolys	undefined CollisionCell__CollectPolys()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;	1196
+00441b20	TrackPolyBody__ReleaseUnused	undefined TrackPolyBody__ReleaseUnused()	unknown		undefined local_c;	103
+00441b90	TrackPoly__AcquireBody	undefined TrackPoly__AcquireBody()	unknown			124
+00441c10	TrackCollision__QueryBox	undefined TrackCollision__QueryBox()	unknown		undefined local_280;undefined4 local_284;undefined4 local_288;undefined local_298;	356
 00441d80	FUN_00441d80	undefined FUN_00441d80()	unknown		undefined4 local_4;undefined4 local_8;	332
-00441ed0	FUN_00441ed0	undefined FUN_00441ed0()	unknown			105
+00441ed0	TrackPositionMarker_Load	undefined TrackPositionMarker_Load()	unknown			105
 00441fa0	FUN_00441fa0	undefined FUN_00441fa0()	unknown			56
-00441fe0	FUN_00441fe0	undefined FUN_00441fe0()	unknown			40
-00442010	FUN_00442010	undefined FUN_00442010()	unknown			34
+00441fe0	TrackRow_FindById	undefined TrackRow_FindById()	unknown			40
+00442010	TrackInfo_GetRow	undefined TrackInfo_GetRow()	unknown			34
 004420a0	FUN_004420a0	undefined FUN_004420a0()	unknown			13
 004420b0	FUN_004420b0	undefined FUN_004420b0()	unknown			24
 004420d0	FUN_004420d0	undefined FUN_004420d0()	unknown			13
 004420e0	FUN_004420e0	undefined FUN_004420e0()	unknown			29
-00442100	FUN_00442100	undefined FUN_00442100()	unknown			15
+00442100	RoadIntersection_Get	undefined RoadIntersection_Get()	unknown			15
 00442110	FUN_00442110	undefined FUN_00442110()	unknown			53
-00442150	FUN_00442150	undefined FUN_00442150()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;	160
+00442150	RoadEntries_FillDistances	undefined RoadEntries_FillDistances()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;	160
 00442200	FUN_00442200	undefined FUN_00442200()	unknown			166
 004422b0	FUN_004422b0	undefined FUN_004422b0()	unknown		undefined4 local_18;undefined4 local_28;undefined4 local_2c;undefined4 local_38;undefined4 local_3c;	125
 00442330	FUN_00442330	undefined FUN_00442330()	unknown		undefined4 local_18;undefined4 local_28;undefined4 local_2c;undefined4 local_38;undefined4 local_3c;	127
 004423b0	FUN_004423b0	undefined FUN_004423b0()	unknown		undefined4 local_4;	166
 00442460	FUN_00442460	undefined FUN_00442460()	unknown			108
-004424d0	FUN_004424d0	undefined FUN_004424d0()	unknown			75
-00442520	FUN_00442520	undefined FUN_00442520()	unknown			75
+004424d0	Node_IsDriveFwd	undefined Node_IsDriveFwd()	unknown			75
+00442520	Node_IsDriveBack	undefined Node_IsDriveBack()	unknown			75
 00442570	FUN_00442570	undefined FUN_00442570()	unknown			20
 00442590	FUN_00442590	undefined FUN_00442590()	unknown		undefined4 local_4;undefined4 local_8;	152
 00442630	FUN_00442630	undefined FUN_00442630()	unknown			88
 00442690	FUN_00442690	undefined FUN_00442690()	unknown		undefined4 local_4;	381
 00442820	FUN_00442820	undefined FUN_00442820()	unknown		undefined4 local_4;undefined4 local_8;	297
-00442950	FUN_00442950	undefined FUN_00442950()	unknown			40
+00442950	Section_HasLane	undefined Section_HasLane()	unknown			40
 00442980	FUN_00442980	undefined FUN_00442980()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined1 local_45;undefined local_54;	379
 00442b00	FUN_00442b00	undefined FUN_00442b00()	unknown			30
 00442b20	FUN_00442b20	undefined FUN_00442b20()	unknown			78
-00442b70	FUN_00442b70	undefined FUN_00442b70()	unknown			90
-00442bd0	FUN_00442bd0	undefined FUN_00442bd0()	unknown		undefined local_8;	65
+00442b70	RoadSections_Parse	undefined RoadSections_Parse()	unknown			90
+00442bd0	RoadSections_Unload	undefined RoadSections_Unload()	unknown		undefined local_8;	65
 00442c20	FUN_00442c20	undefined FUN_00442c20()	unknown		undefined4 local_4;	86
 00442c80	FUN_00442c80	undefined FUN_00442c80()	unknown		undefined4 local_4;	136
 00442d10	FUN_00442d10	undefined FUN_00442d10()	unknown		undefined4 local_4;	180
-00442ed0	FUN_00442ed0	undefined FUN_00442ed0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;	437
-004430b0	FUN_004430b0	undefined FUN_004430b0()	unknown		undefined4 local_104;undefined local_114;	472
-004432a0	FUN_004432a0	undefined FUN_004432a0()	unknown		undefined4 local_8;undefined4 local_c;undefined local_18;	326
-004433f0	FUN_004433f0	undefined FUN_004433f0()	unknown		undefined4 local_4;	89
-00443450	FUN_00443450	undefined FUN_00443450()	unknown		undefined local_c;	113
-004434d0	FUN_004434d0	undefined FUN_004434d0()	unknown		undefined4 local_4;undefined4 local_8;	135
+00442ed0	RoadEntries_Sort	undefined RoadEntries_Sort()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;	437
+004430b0	RoadNetwork_PostLoad	undefined RoadNetwork_PostLoad()	unknown		undefined4 local_104;undefined local_114;	472
+004432a0	TrackPath__BuildSplines	undefined TrackPath__BuildSplines()	unknown		undefined4 local_8;undefined4 local_c;undefined local_18;	326
+004433f0	TrackPath__FreeSplines	undefined TrackPath__FreeSplines()	unknown		undefined4 local_4;	89
+00443450	TrackPath__Init	undefined TrackPath__Init()	unknown		undefined local_c;	113
+004434d0	TrackPath__Parse	undefined TrackPath__Parse()	unknown		undefined4 local_4;undefined4 local_8;	135
 00443560	FUN_00443560	undefined FUN_00443560()	unknown		undefined4 local_4;	114
-004435e0	FUN_004435e0	undefined FUN_004435e0()	unknown			65
-00443630	FUN_00443630	undefined FUN_00443630()	unknown		undefined4 local_4;undefined4 local_8;	154
-004436d0	FUN_004436d0	undefined FUN_004436d0()	unknown			179
-00443790	FUN_00443790	undefined FUN_00443790()	unknown			76
+004435e0	TrackPath__SetReverse	undefined TrackPath__SetReverse()	unknown			65
+00443630	TrackPath__FindNearestNode	undefined TrackPath__FindNearestNode()	unknown		undefined4 local_4;undefined4 local_8;	154
+004436d0	Zone_Find	undefined Zone_Find()	unknown			179
+00443790	ZoneManager__FindFromTypeMask	undefined ZoneManager__FindFromTypeMask()	unknown			76
 004437e0	FUN_004437e0	undefined FUN_004437e0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined local_20;	308
-00443920	FUN_00443920	undefined FUN_00443920()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;	237
-00443a10	FUN_00443a10	undefined FUN_00443a10()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	632
+00443920	TrackPath__NeighbourNodes	undefined TrackPath__NeighbourNodes()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;	237
+00443a10	TrackPath__UpdateCursor	undefined TrackPath__UpdateCursor()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	632
 00443c90	FUN_00443c90	undefined FUN_00443c90()	unknown		undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;	198
-00443d60	FUN_00443d60	undefined FUN_00443d60()	unknown			73
+00443d60	TrackPath__WrapDistance	undefined TrackPath__WrapDistance()	unknown			73
 00443db0	FUN_00443db0	undefined FUN_00443db0()	unknown			69
 00443e00	FUN_00443e00	undefined FUN_00443e00()	unknown		undefined4 local_8;undefined4 local_10;undefined4 local_14;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;	699
 004440c0	FUN_004440c0	undefined FUN_004440c0()	unknown			59
@@ -1077,47 +1077,47 @@ entry	name	signature	calling	params	locals	bytes
 004441b0	FUN_004441b0	undefined FUN_004441b0()	unknown			60
 00444260	FUN_00444260	undefined FUN_00444260()	unknown			5
 00444340	FUN_00444340	undefined FUN_00444340()	unknown			146
-004443e0	FUN_004443e0	undefined FUN_004443e0()	unknown		undefined local_8;	156
-00444480	FUN_00444480	undefined FUN_00444480()	unknown			99
+004443e0	StreamSections__ResetRound	undefined StreamSections__ResetRound()	unknown		undefined local_8;	156
+00444480	StreamSections__Init	undefined StreamSections__Init()	unknown			99
 004444f0	FUN_004444f0	undefined FUN_004444f0()	unknown			83
 00444550	FUN_00444550	undefined FUN_00444550()	unknown			54
 00444590	FUN_00444590	undefined FUN_00444590()	unknown			48
-004445c0	FUN_004445c0	undefined FUN_004445c0()	unknown			275
-004446e0	FUN_004446e0	undefined FUN_004446e0()	unknown			92
-00444780	FUN_00444780	undefined FUN_00444780()	unknown			168
+004445c0	StreamSections__SetTrack	undefined StreamSections__SetTrack()	unknown			275
+004446e0	StreamSections__IssueRead	undefined StreamSections__IssueRead()	unknown			92
+00444780	StreamSections__EvictOldest	undefined StreamSections__EvictOldest()	unknown			168
 00444830	FUN_00444830	undefined FUN_00444830()	unknown			5
-00444840	FUN_00444840	undefined FUN_00444840()	unknown			48
-00444870	FUN_00444870	undefined FUN_00444870()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined2 local_26;undefined4 local_2c;undefined4 local_30;	564
+00444840	StreamSections__SeedViewer	undefined StreamSections__SeedViewer()	unknown			48
+00444870	StreamSections__PredictBoundary	undefined StreamSections__PredictBoundary()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined2 local_26;undefined4 local_2c;undefined4 local_30;	564
 00444ab0	FUN_00444ab0	undefined FUN_00444ab0()	unknown			63
-00444af0	FUN_00444af0	undefined FUN_00444af0()	unknown			95
-00444b50	FUN_00444b50	undefined FUN_00444b50()	unknown		undefined local_2fc;undefined local_300;undefined2 local_302;undefined2 local_304;undefined2 local_306;undefined2 local_308;undefined4 local_30c;undefined4 local_310;undefined4 local_314;undefined local_320;	552
-00444d80	FUN_00444d80	undefined FUN_00444d80()	unknown		undefined4 local_4;undefined4 local_8;	260
-00444e90	FUN_00444e90	undefined FUN_00444e90()	unknown			66
-00444ee0	FUN_00444ee0	undefined FUN_00444ee0()	unknown		undefined local_c;	193
-00444fb0	FUN_00444fb0	undefined FUN_00444fb0()	unknown		undefined local_10;	149
-00445050	FUN_00445050	undefined FUN_00445050()	unknown		undefined1 local_5;undefined local_10;	165
-00445100	FUN_00445100	undefined FUN_00445100()	unknown			126
-00445180	FUN_00445180	undefined FUN_00445180()	unknown		undefined2 local_2;undefined local_4;undefined1 local_5;	457
-00445350	FUN_00445350	undefined FUN_00445350()	unknown		undefined4 local_4;undefined4 local_8;undefined local_14;	243
+00444af0	StreamSections__ComputePoolSize	undefined StreamSections__ComputePoolSize()	unknown			95
+00444b50	StreamSections__BuildWantedSet	undefined StreamSections__BuildWantedSet()	unknown		undefined local_2fc;undefined local_300;undefined2 local_302;undefined2 local_304;undefined2 local_306;undefined2 local_308;undefined4 local_30c;undefined4 local_310;undefined4 local_314;undefined local_320;	552
+00444d80	StreamSections__AllocateRow	undefined StreamSections__AllocateRow()	unknown		undefined4 local_4;undefined4 local_8;	260
+00444e90	StreamSections__FreeUnreadBuffers	undefined StreamSections__FreeUnreadBuffers()	unknown			66
+00444ee0	StreamSections__AllocateRequested	undefined StreamSections__AllocateRequested()	unknown		undefined local_c;	193
+00444fb0	StreamSections__UpdateViewerBoundaries	undefined StreamSections__UpdateViewerBoundaries()	unknown		undefined local_10;	149
+00445050	StreamSections__Update	undefined StreamSections__Update()	unknown		undefined1 local_5;undefined local_10;	165
+00445100	StreamSections__WaitUntilIdle	undefined StreamSections__WaitUntilIdle()	unknown			126
+00445180	StreamSections__Round	undefined StreamSections__Round()	unknown		undefined2 local_2;undefined local_4;undefined1 local_5;	457
+00445350	StreamSections__Shutdown	undefined StreamSections__Shutdown()	unknown		undefined4 local_4;undefined4 local_8;undefined local_14;	243
 00445450	FUN_00445450	undefined FUN_00445450()	unknown		undefined local_4;	113
 004454d0	FUN_004454d0	undefined FUN_004454d0()	unknown			68
-00445520	FUN_00445520	undefined FUN_00445520()	unknown		undefined4 local_4;	92
-00445580	FUN_00445580	undefined FUN_00445580()	unknown		undefined4 local_4;	210
+00445520	Placement__UnpackAabb	undefined Placement__UnpackAabb()	unknown		undefined4 local_4;	92
+00445580	Placement__UnpackMatrix	undefined Placement__UnpackMatrix()	unknown		undefined4 local_4;	210
 00445660	FUN_00445660	undefined FUN_00445660()	unknown			180
 00445720	FUN_00445720	undefined FUN_00445720()	unknown			10
 00445730	FUN_00445730	undefined FUN_00445730()	unknown			54
 00445770	FUN_00445770	undefined FUN_00445770()	unknown			79
 00445c60	FUN_00445c60	undefined FUN_00445c60()	unknown			59
-00445ca0	FUN_00445ca0	undefined FUN_00445ca0()	unknown		undefined4 local_4;	86
-00445d00	FUN_00445d00	undefined FUN_00445d00()	unknown		undefined1 local_3f;undefined local_40;undefined4 local_44;	258
+00445ca0	Sections__FindSectionBySolid	undefined Sections__FindSectionBySolid()	unknown		undefined4 local_4;	86
+00445d00	StreamBoundaries__DebugDump	undefined StreamBoundaries__DebugDump()	unknown		undefined1 local_3f;undefined local_40;undefined4 local_44;	258
 00445e10	FUN_00445e10	undefined FUN_00445e10()	unknown		undefined4 local_14;	164
-00445ec0	FUN_00445ec0	undefined FUN_00445ec0()	unknown		undefined local_20;undefined local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined local_50;undefined4 local_54;	636
-00446140	FUN_00446140	undefined FUN_00446140()	unknown		undefined local_10c;undefined4 local_110;undefined local_14f;undefined1 local_150;undefined4 local_158;undefined4 local_15c;undefined4 local_160;undefined4 local_168;undefined4 local_16c;undefined4 local_170;undefined4 local_174;undefined4 local_178;undefined4 local_17c;undefined local_190;	336
+00445ec0	Section__DrawPlacement	undefined Section__DrawPlacement()	unknown		undefined local_20;undefined local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined local_50;undefined4 local_54;	636
+00446140	Section__WalkBvh	undefined Section__WalkBvh()	unknown		undefined local_10c;undefined4 local_110;undefined local_14f;undefined1 local_150;undefined4 local_158;undefined4 local_15c;undefined4 local_160;undefined4 local_168;undefined4 local_16c;undefined4 local_170;undefined4 local_174;undefined4 local_178;undefined4 local_17c;undefined local_190;	336
 004462a0	FUN_004462a0	undefined FUN_004462a0()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_94;	349
-00446400	FUN_00446400	undefined FUN_00446400()	unknown		undefined4 local_4;	421
-004465b0	FUN_004465b0	undefined FUN_004465b0()	unknown		undefined2 local_fe;undefined local_100;undefined local_10c;	99
+00446400	StreamBoundaries__BuildDrawList	undefined StreamBoundaries__BuildDrawList()	unknown		undefined4 local_4;	421
+004465b0	StreamSections__DrawVisible	undefined StreamSections__DrawVisible()	unknown		undefined2 local_fe;undefined local_100;undefined local_10c;	99
 00446620	FUN_00446620	undefined FUN_00446620()	unknown			254
-00446730	FUN_00446730	undefined FUN_00446730()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined local_20;	356
+00446730	WorldSections_QueueForView	undefined WorldSections_QueueForView()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined local_20;	356
 004468a0	FUN_004468a0	undefined FUN_004468a0()	unknown		undefined local_c;	89
 00446900	FUN_00446900	undefined FUN_00446900()	unknown			70
 00446950	FUN_00446950	undefined FUN_00446950()	unknown		undefined local_4;	330
@@ -1125,45 +1125,45 @@ entry	name	signature	calling	params	locals	bytes
 00446b70	FUN_00446b70	undefined FUN_00446b70()	unknown			57
 00446bb0	FUN_00446bb0	undefined FUN_00446bb0()	unknown		undefined4 local_4;undefined local_14;	217
 00446c90	FUN_00446c90	undefined FUN_00446c90()	unknown		undefined4 local_4;undefined1 local_5;	286
-00446db0	FUN_00446db0	undefined FUN_00446db0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined local_1c;	525
-00446fd0	FUN_00446fd0	undefined FUN_00446fd0()	unknown			89
+00446db0	StreamBoundaries_LoadChunk	undefined StreamBoundaries_LoadChunk()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined local_1c;	525
+00446fd0	StreamBoundaries__FindContaining	undefined StreamBoundaries__FindContaining()	unknown			89
 00447030	FUN_00447030	undefined FUN_00447030()	unknown			9
 00447040	FUN_00447040	undefined FUN_00447040()	unknown			143
 004470d0	FUN_004470d0	undefined FUN_004470d0()	unknown		undefined4 local_4;undefined4 local_8;	130
-00447160	FUN_00447160	undefined FUN_00447160()	unknown			72
-004471b0	FUN_004471b0	undefined FUN_004471b0()	unknown			300
-004472e0	FUN_004472e0	undefined FUN_004472e0()	unknown			113
+00447160	InitZDirArchive	undefined InitZDirArchive()	unknown			72
+004471b0	GameFlow__InitSubsystems	undefined GameFlow__InitSubsystems()	unknown			300
+004472e0	GameFlow__Run	undefined GameFlow__Run()	unknown			113
 00447360	FUN_00447360	undefined FUN_00447360()	unknown		undefined4 local_4;undefined4 local_8;	313
 004474a0	FUN_004474a0	undefined FUN_004474a0()	unknown		undefined4 local_4;undefined4 local_8;	352
-00447600	FUN_00447600	undefined FUN_00447600()	unknown		undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;	1145
+00447600	GameFlow__MainLoop	undefined GameFlow__MainLoop()	unknown		undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;	1145
 00447a90	FUN_00447a90	undefined FUN_00447a90()	unknown			23
-00447ac0	FUN_00447ac0	undefined FUN_00447ac0()	unknown			71
-00447b10	FUN_00447b10	undefined FUN_00447b10()	unknown		undefined local_18;undefined4 local_1c;	148
+00447ac0	bChunkLoader__LoadChunks	undefined bChunkLoader__LoadChunks()	unknown			71
+00447b10	bChunkLoader__UnloadChunks	undefined bChunkLoader__UnloadChunks()	unknown		undefined local_18;undefined4 local_1c;	148
 00447bb0	FUN_00447bb0	undefined FUN_00447bb0()	unknown			72
-00447c00	FUN_00447c00	undefined FUN_00447c00()	unknown		undefined4 local_4;undefined4 local_8;	399
-00447d90	FUN_00447d90	undefined FUN_00447d90()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	329
+00447c00	PlaceChunks	undefined PlaceChunks()	unknown		undefined4 local_4;undefined4 local_8;	399
+00447d90	LoadResourceChunks	undefined LoadResourceChunks()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	329
 00447ee0	FUN_00447ee0	undefined FUN_00447ee0()	unknown		undefined local_8;	92
-00447f40	FUN_00447f40	undefined FUN_00447f40()	unknown			74
-00447f90	FUN_00447f90	undefined FUN_00447f90()	unknown			220
+00447f40	InitResourceFileSlotPool	undefined InitResourceFileSlotPool()	unknown			74
+00447f90	ResourceFile__ResourceFile	undefined ResourceFile__ResourceFile()	unknown			220
 00448070	FUN_00448070	undefined FUN_00448070()	unknown			55
 004480b0	FUN_004480b0	undefined FUN_004480b0()	unknown			59
 004480f0	FUN_004480f0	undefined FUN_004480f0()	unknown			26
-00448110	FUN_00448110	undefined FUN_00448110()	unknown			190
-004481d0	FUN_004481d0	undefined FUN_004481d0()	unknown			71
-00448220	FUN_00448220	undefined FUN_00448220()	unknown			185
-004482f0	FUN_004482f0	undefined FUN_004482f0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	114
-00448370	FUN_00448370	undefined FUN_00448370()	unknown			68
-004483c0	FUN_004483c0	undefined FUN_004483c0()	unknown			114
-00448440	FUN_00448440	undefined FUN_00448440()	unknown		undefined local_10;	97
+00448110	ResourceFile__BeginLoading	undefined ResourceFile__BeginLoading()	unknown			190
+004481d0	ResourceFile__UnloadChunks	undefined ResourceFile__UnloadChunks()	unknown			71
+00448220	ResourceFile__FinishLoading	undefined ResourceFile__FinishLoading()	unknown			185
+004482f0	CreateResourceFile	undefined CreateResourceFile()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	114
+00448370	UnloadResourceFile	undefined UnloadResourceFile()	unknown			68
+004483c0	ServiceResourceLoading	undefined ServiceResourceLoading()	unknown			114
+00448440	FindResourceFile	undefined FindResourceFile()	unknown		undefined local_10;	97
 004484b0	FUN_004484b0	undefined FUN_004484b0()	unknown			50
 004484f0	FUN_004484f0	undefined FUN_004484f0()	unknown			55
-00448530	FUN_00448530	undefined FUN_00448530()	unknown			36
-00448560	FUN_00448560	undefined FUN_00448560()	unknown			36
+00448530	GameFlow__SetNextUnloadingFrontEnd	undefined GameFlow__SetNextUnloadingFrontEnd()	unknown			36
+00448560	GameFlow__SetNextLoadingTrackCommon	undefined GameFlow__SetNextLoadingTrackCommon()	unknown			36
 00448590	FUN_00448590	undefined FUN_00448590()	unknown		undefined local_1c;	100
-00448600	FUN_00448600	undefined FUN_00448600()	unknown		undefined local_res0;	67
-00448650	FUN_00448650	undefined FUN_00448650()	unknown		undefined4 local_4;	948
-004491a0	FUN_004491a0	undefined FUN_004491a0()	unknown		undefined local_8;	161
-00449870	FUN_00449870	undefined FUN_00449870()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	401
+00448600	GameFlow__LoadGlobalA	undefined GameFlow__LoadGlobalA()	unknown		undefined local_res0;	67
+00448650	GameFlow__LoadGlobalB	undefined GameFlow__LoadGlobalB()	unknown		undefined4 local_4;	948
+004491a0	GameFlow__QueueRaceCars	undefined GameFlow__QueueRaceCars()	unknown		undefined local_8;	161
+00449870	GameFlow__TrackWorldInit	undefined GameFlow__TrackWorldInit()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	401
 00449d80	FUN_00449d80	undefined FUN_00449d80()	unknown			97
 00449e20	FUN_00449e20	undefined FUN_00449e20()	unknown			103
 00449ec0	FUN_00449ec0	undefined FUN_00449ec0()	unknown		undefined local_63;undefined1 local_64;	82
@@ -1190,7 +1190,7 @@ entry	name	signature	calling	params	locals	bytes
 0044a640	FUN_0044a640	undefined FUN_0044a640()	unknown			30
 0044a660	FUN_0044a660	undefined FUN_0044a660()	unknown		undefined4 local_4;undefined4 local_10;	143
 0044a6f0	FUN_0044a6f0	undefined FUN_0044a6f0()	unknown		undefined4 local_4;	795
-0044aa10	FUN_0044aa10	undefined FUN_0044aa10()	unknown			289
+0044aa10	AIGoal__Create	undefined AIGoal__Create()	unknown			289
 0044ab50	FUN_0044ab50	undefined FUN_0044ab50()	unknown			106
 0044ad00	FUN_0044ad00	undefined FUN_0044ad00()	unknown		undefined4 local_14;	188
 0044adc0	FUN_0044adc0	undefined FUN_0044adc0()	unknown		undefined4 local_24;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_3c;	672
@@ -1200,10 +1200,10 @@ entry	name	signature	calling	params	locals	bytes
 0044baf0	FUN_0044baf0	undefined FUN_0044baf0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;	224
 0044bc30	FUN_0044bc30	undefined FUN_0044bc30()	unknown		undefined4 local_4;	118
 0044bcb0	FUN_0044bcb0	undefined FUN_0044bcb0()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;	94
-0044bd10	FUN_0044bd10	undefined FUN_0044bd10()	unknown		undefined4 local_2c;undefined1 local_2d;	763
-0044c010	FUN_0044c010	undefined FUN_0044c010()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	564
-0044c2e0	FUN_0044c2e0	undefined FUN_0044c2e0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_24;	615
-0044c550	FUN_0044c550	undefined FUN_0044c550()	unknown			782
+0044bd10	RacerAI__UpdateRubberBand	undefined RacerAI__UpdateRubberBand()	unknown		undefined4 local_2c;undefined1 local_2d;	763
+0044c010	RacerAI__GetCatchUpTerms	undefined RacerAI__GetCatchUpTerms()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	564
+0044c2e0	TrafficCar_HonkAtPlayer	undefined TrafficCar_HonkAtPlayer()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_24;	615
+0044c550	RacerAI__UpdateDesiredSpeed	undefined RacerAI__UpdateDesiredSpeed()	unknown			782
 0044c860	FUN_0044c860	undefined FUN_0044c860()	unknown			137
 0044c940	FUN_0044c940	undefined FUN_0044c940()	unknown			113
 0044c9c0	FUN_0044c9c0	undefined FUN_0044c9c0()	unknown			75
@@ -1222,7 +1222,7 @@ entry	name	signature	calling	params	locals	bytes
 0044d410	FUN_0044d410	undefined FUN_0044d410()	unknown			7
 0044d4d0	FUN_0044d4d0	undefined FUN_0044d4d0()	unknown			43
 0044d530	FUN_0044d530	undefined FUN_0044d530()	unknown			14
-0044d570	FUN_0044d570	undefined FUN_0044d570()	unknown			81
+0044d570	Node_GetIntersection	undefined Node_GetIntersection()	unknown			81
 0044d5d0	FUN_0044d5d0	undefined FUN_0044d5d0()	unknown			32
 0044d5f0	FUN_0044d5f0	undefined FUN_0044d5f0()	unknown			71
 0044d640	FUN_0044d640	undefined FUN_0044d640()	unknown			7
@@ -1231,8 +1231,8 @@ entry	name	signature	calling	params	locals	bytes
 0044d670	FUN_0044d670	undefined FUN_0044d670()	unknown			142
 0044d700	FUN_0044d700	undefined FUN_0044d700()	unknown			86
 0044d760	FUN_0044d760	undefined FUN_0044d760()	unknown		undefined4 local_4;undefined local_5;	303
-0044d8b0	FUN_0044d8b0	undefined FUN_0044d8b0()	unknown		undefined1 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined1 local_28;undefined4 local_2c;undefined4 local_34;undefined4 local_38;	1058
-0044dd30	FUN_0044dd30	undefined FUN_0044dd30()	unknown		undefined4 local_10;undefined4 local_14;	570
+0044d8b0	RaceGoal__SelectAction	undefined RaceGoal__SelectAction()	unknown		undefined1 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined1 local_28;undefined4 local_2c;undefined4 local_34;undefined4 local_38;	1058
+0044dd30	DragGoal__SelectAction	undefined DragGoal__SelectAction()	unknown		undefined4 local_10;undefined4 local_14;	570
 0044e2b0	FUN_0044e2b0	undefined FUN_0044e2b0()	unknown			133
 0044e370	FUN_0044e370	undefined FUN_0044e370()	unknown			264
 0044e480	FUN_0044e480	undefined FUN_0044e480()	unknown		undefined4 local_4;undefined4 local_10;undefined4 local_14;	894
@@ -1241,7 +1241,7 @@ entry	name	signature	calling	params	locals	bytes
 0044e9c0	FUN_0044e9c0	undefined FUN_0044e9c0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;	779
 0044ecd0	FUN_0044ecd0	undefined FUN_0044ecd0()	unknown		undefined4 local_1c;undefined4 local_2c;undefined4 local_34;undefined4 local_38;	159
 0044ed70	FUN_0044ed70	undefined FUN_0044ed70()	unknown		undefined local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined local_20;	595
-0044efd0	FUN_0044efd0	undefined FUN_0044efd0()	unknown			156
+0044efd0	TrafficCar_IsIntersectionObstacle	undefined TrafficCar_IsIntersectionObstacle()	unknown			156
 0044f070	FUN_0044f070	undefined FUN_0044f070()	unknown			83
 0044f0d0	FUN_0044f0d0	undefined FUN_0044f0d0()	unknown		undefined4 local_28;undefined4 local_2c;undefined local_1d0;undefined4 local_1d4;	211
 0044f1b0	FUN_0044f1b0	undefined FUN_0044f1b0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;	700
@@ -1295,13 +1295,13 @@ entry	name	signature	calling	params	locals	bytes
 00453730	FUN_00453730	undefined FUN_00453730()	unknown			36
 00453760	FUN_00453760	undefined FUN_00453760()	unknown			105
 00453860	FUN_00453860	undefined FUN_00453860()	unknown			58
-00453920	FUN_00453920	undefined FUN_00453920()	unknown		undefined4 local_4;undefined4 local_8;	310
+00453920	Finder_AvoidAsTraffic	undefined Finder_AvoidAsTraffic()	unknown		undefined4 local_4;undefined4 local_8;	310
 00453ba0	FUN_00453ba0	undefined FUN_00453ba0()	unknown		undefined local_4;undefined4 local_8;	187
 00454170	FUN_00454170	undefined FUN_00454170()	unknown			53
 00454240	FUN_00454240	undefined FUN_00454240()	unknown		undefined4 local_20;undefined4 local_24;	232
 00454330	FUN_00454330	undefined FUN_00454330()	unknown		undefined4 local_4;undefined4 local_8;	156
-004543d0	FUN_004543d0	undefined FUN_004543d0()	unknown			66
-00454490	FUN_00454490	undefined FUN_00454490()	unknown		undefined4 local_14;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	1113
+004543d0	Finder_ObeyIntersections	undefined Finder_ObeyIntersections()	unknown			66
+00454490	Action_ObeyTrafficIntersections__Update	undefined Action_ObeyTrafficIntersections__Update()	unknown		undefined4 local_14;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	1113
 00454930	FUN_00454930	undefined FUN_00454930()	unknown			33
 00454960	FUN_00454960	undefined FUN_00454960()	unknown			105
 00454a20	FUN_00454a20	undefined FUN_00454a20()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_24;undefined4 local_28;	419
@@ -1328,7 +1328,7 @@ entry	name	signature	calling	params	locals	bytes
 00455d60	FUN_00455d60	undefined FUN_00455d60()	unknown		undefined4 local_14;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_2bc;undefined local_2e0;undefined4 local_2e8;undefined local_2f0;undefined4 local_2f8;undefined local_300;undefined4 local_308;undefined local_310;undefined4 local_314;undefined4 local_318;undefined4 local_31c;undefined4 local_320;undefined4 local_324;undefined4 local_32c;undefined4 local_330;	1082
 004561a0	FUN_004561a0	undefined FUN_004561a0()	unknown			37
 004561d0	FUN_004561d0	undefined FUN_004561d0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined1 local_11;	511
-004563d0	FUN_004563d0	undefined FUN_004563d0()	unknown		undefined1 local_4;undefined4 local_8;undefined4 local_c;undefined local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_124;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined1 local_131;undefined1 local_132;	942
+004563d0	RoadGraph_Walk	undefined RoadGraph_Walk()	unknown		undefined1 local_4;undefined4 local_8;undefined4 local_c;undefined local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_124;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined1 local_131;undefined1 local_132;	942
 00456780	FUN_00456780	undefined FUN_00456780()	unknown			163
 00456830	FUN_00456830	undefined FUN_00456830()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;	304
 00456960	FUN_00456960	undefined FUN_00456960()	unknown			72
@@ -1365,7 +1365,7 @@ entry	name	signature	calling	params	locals	bytes
 00458750	FUN_00458750	undefined FUN_00458750()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_3c;undefined4 local_40;undefined4 local_44;	762
 00458a50	FUN_00458a50	undefined FUN_00458a50()	unknown			107
 00458b90	FUN_00458b90	undefined FUN_00458b90()	unknown		undefined4 local_4;undefined4 local_8;	55
-00458bd0	FUN_00458bd0	undefined FUN_00458bd0()	unknown			235
+00458bd0	RoadPath_LinkAccepted	undefined RoadPath_LinkAccepted()	unknown			235
 00458cc0	FUN_00458cc0	undefined FUN_00458cc0()	unknown			193
 00458d90	FUN_00458d90	undefined FUN_00458d90()	unknown			39
 00458dc0	FUN_00458dc0	undefined FUN_00458dc0()	unknown		undefined4 local_4;undefined4 local_8;	322
@@ -1506,7 +1506,7 @@ entry	name	signature	calling	params	locals	bytes
 00465700	FUN_00465700	undefined FUN_00465700()	unknown			100
 00465770	FUN_00465770	undefined FUN_00465770()	unknown			181
 00465830	FUN_00465830	undefined FUN_00465830()	unknown		undefined4 local_24;undefined4 local_28;undefined4 local_34;undefined4 local_38;	1227
-00465d00	FUN_00465d00	undefined FUN_00465d00()	unknown		undefined4 local_e4;undefined4 local_e8;undefined4 local_f0;undefined4 local_114;	1604
+00465d00	SpecialCamCaller_465d00	undefined SpecialCamCaller_465d00()	unknown		undefined4 local_e4;undefined4 local_e8;undefined4 local_f0;undefined4 local_114;	1604
 00466350	FUN_00466350	undefined FUN_00466350()	unknown			74
 004663a0	FUN_004663a0	undefined FUN_004663a0()	unknown			38
 004663d0	FUN_004663d0	undefined FUN_004663d0()	unknown			62
@@ -1548,7 +1548,7 @@ entry	name	signature	calling	params	locals	bytes
 004684f0	FUN_004684f0	undefined FUN_004684f0()	unknown			172
 004685a0	FUN_004685a0	undefined FUN_004685a0()	unknown		undefined4 local_4;	210
 00468680	FUN_00468680	undefined FUN_00468680()	unknown		undefined4 local_10;	379
-00468800	FUN_00468800	undefined FUN_00468800()	unknown			4
+00468800	CarBody_DisableCountInc	undefined CarBody_DisableCountInc()	unknown			4
 00468810	FUN_00468810	undefined FUN_00468810()	unknown			13
 00468820	FUN_00468820	undefined FUN_00468820()	unknown			125
 004688a0	FUN_004688a0	undefined FUN_004688a0()	unknown			30
@@ -1563,7 +1563,7 @@ entry	name	signature	calling	params	locals	bytes
 00469390	FUN_00469390	undefined FUN_00469390()	unknown		undefined local_50;undefined local_60;	197
 00469470	FUN_00469470	undefined FUN_00469470()	unknown			157
 00469510	FUN_00469510	undefined FUN_00469510()	unknown			101
-00469580	FUN_00469580	undefined FUN_00469580()	unknown			487
+00469580	WorldObjects__Broadphase	undefined WorldObjects__Broadphase()	unknown			487
 00469770	FUN_00469770	undefined FUN_00469770()	unknown			150
 00469810	FUN_00469810	undefined FUN_00469810()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_c4;undefined4 local_c8;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;	489
 00469a00	FUN_00469a00	undefined FUN_00469a00()	unknown		undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;	204
@@ -1578,7 +1578,7 @@ entry	name	signature	calling	params	locals	bytes
 0046a440	FUN_0046a440	undefined FUN_0046a440()	unknown		undefined4 local_res0;undefined4 local_4;undefined4 local_c;undefined4 local_14;undefined4 local_1c;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined local_48;	317
 0046a580	FUN_0046a580	undefined FUN_0046a580()	unknown			42
 0046a5b0	FUN_0046a5b0	undefined FUN_0046a5b0()	unknown		undefined4 local_8;undefined4 local_10;	138
-0046a6e0	FUN_0046a6e0	undefined FUN_0046a6e0()	unknown		undefined4 local_8;undefined4 local_10;undefined2 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined local_2c;	525
+0046a6e0	AllTrackPolygonCollisionBodies__Serialize	undefined AllTrackPolygonCollisionBodies__Serialize()	unknown		undefined4 local_8;undefined4 local_10;undefined2 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined local_2c;	525
 0046a930	FUN_0046a930	undefined FUN_0046a930()	unknown			39
 0046a960	FUN_0046a960	undefined FUN_0046a960()	unknown			30
 0046a980	FUN_0046a980	undefined FUN_0046a980()	unknown			7
@@ -1610,7 +1610,7 @@ entry	name	signature	calling	params	locals	bytes
 0046cfc0	FUN_0046cfc0	undefined FUN_0046cfc0()	unknown			36
 0046cff0	FUN_0046cff0	undefined FUN_0046cff0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_10;undefined4 local_14;	449
 0046d1c0	FUN_0046d1c0	undefined FUN_0046d1c0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_48;	456
-0046d390	FUN_0046d390	undefined FUN_0046d390()	unknown		undefined4 local_4;undefined4 local_c;undefined local_18;	321
+0046d390	DriveTrain__DriveTrain	undefined DriveTrain__DriveTrain()	unknown		undefined4 local_4;undefined4 local_c;undefined local_18;	321
 0046d4e0	FUN_0046d4e0	undefined FUN_0046d4e0()	unknown			43
 0046d510	FUN_0046d510	undefined FUN_0046d510()	unknown			361
 0046d680	FUN_0046d680	undefined FUN_0046d680()	unknown			117
@@ -1635,13 +1635,13 @@ entry	name	signature	calling	params	locals	bytes
 004723a0	FUN_004723a0	undefined FUN_004723a0()	unknown			261
 004724b0	FUN_004724b0	undefined FUN_004724b0()	unknown			327
 00472600	FUN_00472600	undefined FUN_00472600()	unknown		undefined4 local_4;	440
-004727c0	FUN_004727c0	undefined FUN_004727c0()	unknown			107
+004727c0	GJKWitness__Initialize	undefined GJKWitness__Initialize()	unknown			107
 00472830	FUN_00472830	undefined FUN_00472830()	unknown			282
 00472950	FUN_00472950	undefined FUN_00472950()	unknown			307
 00472a90	FUN_00472a90	undefined FUN_00472a90()	unknown			15
 00472aa0	FUN_00472aa0	undefined FUN_00472aa0()	unknown		undefined4 local_18;	87
-00472b00	FUN_00472b00	undefined FUN_00472b00()	unknown		undefined4 local_4;	242
-00472c60	FUN_00472c60	undefined FUN_00472c60()	unknown			73
+00472b00	CarShape_Load	undefined CarShape_Load()	unknown		undefined4 local_4;	242
+00472c60	CarShape_Find	undefined CarShape_Find()	unknown			73
 00472cb0	FUN_00472cb0	undefined FUN_00472cb0()	unknown			51
 00472cf0	FUN_00472cf0	undefined FUN_00472cf0()	unknown		undefined4 local_4;undefined4 local_c;	253
 00472df0	FUN_00472df0	undefined FUN_00472df0()	unknown			68
@@ -1654,14 +1654,14 @@ entry	name	signature	calling	params	locals	bytes
 00473480	FUN_00473480	undefined FUN_00473480()	unknown		undefined4 local_18;undefined4 local_30;undefined4 local_38;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;	1457
 00473a90	FUN_00473a90	undefined FUN_00473a90()	unknown		undefined4 local_14;undefined4 local_18;	520
 00473ca0	FUN_00473ca0	undefined FUN_00473ca0()	unknown			75
-00473cf0	FUN_00473cf0	undefined FUN_00473cf0()	unknown			112
+00473cf0	CollisionShapes__DefaultBox	undefined CollisionShapes__DefaultBox()	unknown			112
 00473ea0	FUN_00473ea0	undefined FUN_00473ea0()	unknown			74
 00473f20	FUN_00473f20	undefined FUN_00473f20()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	97
 00473f90	FUN_00473f90	undefined FUN_00473f90()	unknown			38
-00473fc0	FUN_00473fc0	undefined FUN_00473fc0()	unknown			70
+00473fc0	SelectDriveClassTuningRow__not_GetUpgradeLevel_	undefined SelectDriveClassTuningRow__not_GetUpgradeLevel_()	unknown			70
 00474060	FUN_00474060	undefined FUN_00474060()	unknown			23
 00474080	FUN_00474080	undefined FUN_00474080()	unknown			43
-004740d0	FUN_004740d0	undefined FUN_004740d0()	unknown		undefined4 local_4;	812
+004740d0	MellowMover__MellowMover	undefined MellowMover__MellowMover()	unknown		undefined4 local_4;	812
 00474400	FUN_00474400	undefined FUN_00474400()	unknown			42
 00474430	FUN_00474430	undefined FUN_00474430()	unknown			5
 00474440	FUN_00474440	undefined FUN_00474440()	unknown			30
@@ -1675,7 +1675,7 @@ entry	name	signature	calling	params	locals	bytes
 00474d10	FUN_00474d10	undefined FUN_00474d10()	unknown			43
 00474d40	FUN_00474d40	undefined FUN_00474d40()	unknown			136
 00474dd0	FUN_00474dd0	undefined FUN_00474dd0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_54;	661
-00475070	FUN_00475070	undefined FUN_00475070()	unknown		undefined4 local_4;undefined4 local_c;	463
+00475070	Mellovator__Mellovator	undefined Mellovator__Mellovator()	unknown		undefined4 local_4;undefined4 local_c;	463
 00475240	FUN_00475240	undefined FUN_00475240()	unknown		undefined4 local_4;undefined4 local_8;	533
 00475460	FUN_00475460	undefined FUN_00475460()	unknown			122
 004754e0	FUN_004754e0	undefined FUN_004754e0()	unknown			57
@@ -1688,7 +1688,7 @@ entry	name	signature	calling	params	locals	bytes
 004764b0	FUN_004764b0	undefined FUN_004764b0()	unknown			43
 004764e0	FUN_004764e0	undefined FUN_004764e0()	unknown			638
 00476760	FUN_00476760	undefined FUN_00476760()	unknown			213
-00476840	FUN_00476840	undefined FUN_00476840()	unknown		undefined4 local_4;	1849
+00476840	PhysicsMover__PhysicsMover	undefined PhysicsMover__PhysicsMover()	unknown		undefined4 local_4;	1849
 00476fa0	FUN_00476fa0	undefined FUN_00476fa0()	unknown		undefined4 local_18;	340
 00477100	FUN_00477100	undefined FUN_00477100()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	324
 00477250	FUN_00477250	undefined FUN_00477250()	unknown		undefined4 local_4;	143
@@ -1711,7 +1711,7 @@ entry	name	signature	calling	params	locals	bytes
 0047a090	FUN_0047a090	undefined FUN_0047a090()	unknown		undefined1 local_5;undefined4 local_c;undefined4 local_10;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;	2471
 0047aa40	FUN_0047aa40	undefined FUN_0047aa40()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;	442
 0047ac00	FUN_0047ac00	undefined FUN_0047ac00()	unknown		undefined4 local_18;undefined4 local_24;	622
-0047af20	FUN_0047af20	undefined FUN_0047af20()	unknown			149
+0047af20	AnimBank_DynamicLoad	undefined AnimBank_DynamicLoad()	unknown			149
 0047afc0	FUN_0047afc0	undefined FUN_0047afc0()	unknown			89
 0047b020	FUN_0047b020	undefined FUN_0047b020()	unknown			17
 0047b040	FUN_0047b040	undefined FUN_0047b040()	unknown			101
@@ -1727,8 +1727,8 @@ entry	name	signature	calling	params	locals	bytes
 0047b6d0	FUN_0047b6d0	undefined FUN_0047b6d0()	unknown		undefined4 local_8;undefined4 local_10;undefined4 local_14;	94
 0047b730	FUN_0047b730	undefined FUN_0047b730()	unknown			117
 0047b810	FUN_0047b810	undefined FUN_0047b810()	unknown			114
-0047b890	FUN_0047b890	undefined FUN_0047b890()	unknown			55
-0047b8d0	FUN_0047b8d0	undefined FUN_0047b8d0()	unknown			35
+0047b890	NisScene_Load	undefined NisScene_Load()	unknown			55
+0047b8d0	NisScene_Unload	undefined NisScene_Unload()	unknown			35
 0047b900	FUN_0047b900	undefined FUN_0047b900()	unknown			257
 0047ba30	FUN_0047ba30	undefined FUN_0047ba30()	unknown			172
 0047bae0	FUN_0047bae0	undefined FUN_0047bae0()	unknown			46
@@ -1746,12 +1746,12 @@ entry	name	signature	calling	params	locals	bytes
 0047cb50	FUN_0047cb50	undefined FUN_0047cb50()	unknown		undefined4 local_1c;undefined local_2e0;undefined4 local_354;undefined4 local_358;undefined4 local_368;undefined4 local_36c;undefined4 local_370;undefined4 local_37c;	538
 0047cd70	FUN_0047cd70	undefined FUN_0047cd70()	unknown			40
 0047cda0	FUN_0047cda0	undefined FUN_0047cda0()	unknown		undefined4 local_4;undefined4 local_8;	164
-0047ce50	FUN_0047ce50	undefined FUN_0047ce50()	unknown			127
-0047ced0	FUN_0047ced0	undefined FUN_0047ced0()	unknown			91
+0047ce50	AnimBank_Load	undefined AnimBank_Load()	unknown			127
+0047ced0	AnimBank_Unload	undefined AnimBank_Unload()	unknown			91
 0047cf30	FUN_0047cf30	undefined FUN_0047cf30()	unknown		undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;	313
-0047d070	FUN_0047d070	undefined FUN_0047d070()	unknown		undefined local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined local_90;	1469
+0047d070	Camera__SetCameraMatrix	undefined Camera__SetCameraMatrix()	unknown		undefined local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined local_90;	1469
 0047d630	FUN_0047d630	undefined FUN_0047d630()	unknown		undefined local_50;undefined1 local_67;undefined local_68;undefined4 local_ac;undefined4 local_b0;	79
-0047d680	FUN_0047d680	undefined FUN_0047d680()	unknown			60
+0047d680	FindCameraRow	undefined FindCameraRow()	unknown			60
 0047d6c0	FUN_0047d6c0	undefined FUN_0047d6c0()	unknown		undefined4 local_4;	185
 0047d780	FUN_0047d780	undefined FUN_0047d780()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_14;	101
 0047d7f0	FUN_0047d7f0	undefined FUN_0047d7f0()	unknown		undefined4 local_4;undefined4 local_8;	72
@@ -1760,12 +1760,12 @@ entry	name	signature	calling	params	locals	bytes
 0047dc10	FUN_0047dc10	undefined FUN_0047dc10()	unknown			35
 0047dc40	FUN_0047dc40	undefined FUN_0047dc40()	unknown			76
 0047dc90	FUN_0047dc90	undefined FUN_0047dc90()	unknown			59
-0047dcd0	FUN_0047dcd0	undefined FUN_0047dcd0()	unknown			545
-0047df00	FUN_0047df00	undefined FUN_0047df00()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	375
+0047dcd0	CameraTables_LoadChunk	undefined CameraTables_LoadChunk()	unknown			545
+0047df00	CameraTables_Unload_Impl	undefined CameraTables_Unload_Impl()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	375
 0047e080	FUN_0047e080	undefined FUN_0047e080()	unknown		undefined local_c;	170
 0047e130	FUN_0047e130	undefined FUN_0047e130()	unknown		undefined4 local_a0;undefined local_a4;undefined4 local_a8;	250
-0047e230	FUN_0047e230	undefined FUN_0047e230()	unknown			20
-0047e250	FUN_0047e250	undefined FUN_0047e250()	unknown			19
+0047e230	CameraTables_Load	undefined CameraTables_Load()	unknown			20
+0047e250	CameraTables_Unload	undefined CameraTables_Unload()	unknown			19
 0047e270	FUN_0047e270	undefined FUN_0047e270()	unknown			89
 0047e2d0	FUN_0047e2d0	undefined FUN_0047e2d0()	unknown			35
 0047e300	FUN_0047e300	undefined FUN_0047e300()	unknown		undefined4 local_1c;undefined local_2f8;undefined4 local_2fc;undefined4 local_300;undefined4 local_304;undefined4 local_308;undefined4 local_30c;undefined4 local_310;undefined4 local_314;undefined4 local_318;undefined4 local_31c;undefined4 local_320;undefined4 local_324;undefined4 local_328;undefined4 local_32c;undefined4 local_330;undefined4 local_334;undefined local_340;undefined4 local_348;	1234
@@ -1774,10 +1774,10 @@ entry	name	signature	calling	params	locals	bytes
 0047e8c0	FUN_0047e8c0	undefined FUN_0047e8c0()	unknown		undefined4 local_8;undefined4 local_74;undefined local_ac;	264
 0047e9d0	FUN_0047e9d0	undefined FUN_0047e9d0()	unknown			74
 0047eae0	FUN_0047eae0	undefined FUN_0047eae0()	unknown			437
-0047edb0	FUN_0047edb0	undefined FUN_0047edb0()	unknown		undefined4 local_4;undefined4 local_c;	127
+0047edb0	CountdownCameraCoordinator__ctor	undefined CountdownCameraCoordinator__ctor()	unknown		undefined4 local_4;undefined4 local_c;	127
 0047ee30	FUN_0047ee30	undefined FUN_0047ee30()	unknown			32
 0047ee50	FUN_0047ee50	undefined FUN_0047ee50()	unknown		undefined local_c4;	176
-0047ef00	FUN_0047ef00	undefined FUN_0047ef00()	unknown		undefined4 local_8;undefined4 local_10;undefined4 local_14;undefined local_1c;	546
+0047ef00	IntroNisCoordinator	undefined IntroNisCoordinator()	unknown		undefined4 local_8;undefined4 local_10;undefined4 local_14;undefined local_1c;	546
 0047f130	FUN_0047f130	undefined FUN_0047f130()	unknown			31
 0047f150	FUN_0047f150	undefined FUN_0047f150()	unknown		undefined4 local_8;undefined4 local_10;undefined local_18;	435
 0047f310	FUN_0047f310	undefined FUN_0047f310()	unknown		undefined4 local_8;undefined4 local_c;	422
@@ -1826,7 +1826,7 @@ entry	name	signature	calling	params	locals	bytes
 00482870	FUN_00482870	undefined FUN_00482870()	unknown		undefined4 local_4;undefined4 local_8;	47
 004828a0	FUN_004828a0	undefined FUN_004828a0()	unknown		undefined4 local_4;	254
 004829a0	FUN_004829a0	undefined FUN_004829a0()	unknown		undefined local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_84;undefined4 local_88;undefined4 local_8c;	1339
-00482f00	FUN_00482f00	undefined FUN_00482f00()	unknown			6
+00482f00	DragCameras__Parse	undefined DragCameras__Parse()	unknown			6
 00482f06	FUN_00482f06	undefined FUN_00482f06()	unknown			132
 00482fc0	FUN_00482fc0	undefined FUN_00482fc0()	unknown		undefined local_80;	178
 004830f0	FUN_004830f0	undefined FUN_004830f0()	unknown			110
@@ -1836,18 +1836,18 @@ entry	name	signature	calling	params	locals	bytes
 004833a0	FUN_004833a0	undefined FUN_004833a0()	unknown			27
 004833c0	FUN_004833c0	undefined FUN_004833c0()	unknown		undefined4 local_4;undefined4 local_14;	99
 00483430	FUN_00483430	undefined FUN_00483430()	unknown		undefined4 local_4;undefined4 local_8;	169
-004834e0	FUN_004834e0	undefined FUN_004834e0()	unknown			104
+004834e0	CameraMover__ctor	undefined CameraMover__ctor()	unknown			104
 00483550	FUN_00483550	undefined FUN_00483550()	unknown			58
 004835a0	FUN_004835a0	undefined FUN_004835a0()	unknown			91
-00483640	FUN_00483640	undefined FUN_00483640()	unknown		undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined local_70;undefined4 local_74;undefined4 local_78;undefined4 local_94;	534
-00483860	FUN_00483860	undefined FUN_00483860()	unknown		undefined local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;	112
-004838e0	FUN_004838e0	undefined FUN_004838e0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;	485
+00483640	Camera__ApplyNoise	undefined Camera__ApplyNoise()	unknown		undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined local_70;undefined4 local_74;undefined4 local_78;undefined4 local_94;	534
+00483860	CameraMover__ComputeBankedUpVector	undefined CameraMover__ComputeBankedUpVector()	unknown		undefined local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;	112
+004838e0	CameraMover__EnforceMinGapToWalls	undefined CameraMover__EnforceMinGapToWalls()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;	485
 00483ad0	FUN_00483ad0	undefined FUN_00483ad0()	unknown		undefined local_50;undefined local_90;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined local_c0;	180
-00483b90	FUN_00483b90	undefined FUN_00483b90()	unknown		undefined4 local_14;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined local_2e0;undefined local_2f0;undefined4 local_2f8;undefined4 local_2fc;undefined4 local_300;undefined local_330;undefined4 local_348;undefined4 local_34c;undefined4 local_350;undefined4 local_358;	667
+00483b90	CameraMover_ClipAgainstWorld	undefined CameraMover_ClipAgainstWorld()	unknown		undefined4 local_14;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined local_2e0;undefined local_2f0;undefined4 local_2f8;undefined4 local_2fc;undefined4 local_300;undefined local_330;undefined4 local_348;undefined4 local_34c;undefined4 local_350;undefined4 local_358;	667
 00483e30	FUN_00483e30	undefined FUN_00483e30()	unknown		undefined4 local_4;	101
 00483ea0	FUN_00483ea0	undefined FUN_00483ea0()	unknown		undefined4 local_28;undefined4 local_2c;undefined4 local_30;	267
 00483fb0	FUN_00483fb0	undefined FUN_00483fb0()	unknown		undefined4 local_28;undefined4 local_2c;undefined4 local_30;	267
-004840c0	FUN_004840c0	undefined FUN_004840c0()	unknown		undefined4 local_4;undefined4 local_c;	252
+004840c0	OrbitCarCameraMover__ctor	undefined OrbitCarCameraMover__ctor()	unknown		undefined4 local_4;undefined4 local_c;	252
 004841c0	FUN_004841c0	undefined FUN_004841c0()	unknown			30
 004841e0	FUN_004841e0	undefined FUN_004841e0()	unknown			98
 00484270	FUN_00484270	undefined FUN_00484270()	unknown			206
@@ -1857,23 +1857,23 @@ entry	name	signature	calling	params	locals	bytes
 00484b80	FUN_00484b80	undefined FUN_00484b80()	unknown			30
 00484ba0	FUN_00484ba0	undefined FUN_00484ba0()	unknown			293
 00484d50	FUN_00484d50	undefined FUN_00484d50()	unknown		undefined local_90;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_124;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_134;undefined4 local_138;undefined4 local_13c;undefined4 local_140;undefined4 local_17c;undefined4 local_180;	1358
-004852a0	FUN_004852a0	undefined FUN_004852a0()	unknown			57
-00485300	FUN_00485300	undefined FUN_00485300()	unknown		undefined local_90;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;	469
-004854e0	FUN_004854e0	undefined FUN_004854e0()	unknown			1250
+004852a0	RearViewMirrorCameraMover__ctor	undefined RearViewMirrorCameraMover__ctor()	unknown			57
+00485300	RearViewMirrorCameraMover__Update	undefined RearViewMirrorCameraMover__Update()	unknown		undefined local_90;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;	469
+004854e0	TrackCarCameraMover__ctor	undefined TrackCarCameraMover__ctor()	unknown			1250
 004859d0	FUN_004859d0	undefined FUN_004859d0()	unknown			30
 004859f0	FUN_004859f0	undefined FUN_004859f0()	unknown		undefined local_8;	96
 00485a50	FUN_00485a50	undefined FUN_00485a50()	unknown			278
 00485b90	FUN_00485b90	undefined FUN_00485b90()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_28;undefined4 local_2c;undefined4 local_30;	103
-00485c00	FUN_00485c00	undefined FUN_00485c00()	unknown		undefined4 local_70;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_104;	2268
+00485c00	TrackCarCameraMover__Update	undefined TrackCarCameraMover__Update()	unknown		undefined4 local_70;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e4;undefined4 local_e8;undefined4 local_104;	2268
 004864e0	FUN_004864e0	undefined FUN_004864e0()	unknown			561
 00486720	FUN_00486720	undefined FUN_00486720()	unknown			30
 00486740	FUN_00486740	undefined FUN_00486740()	unknown			278
 00486880	FUN_00486880	undefined FUN_00486880()	unknown		undefined local_50;undefined4 local_60;undefined local_70;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_b4;	885
-00486c80	FUN_00486c80	undefined FUN_00486c80()	unknown			1003
+00486c80	SelectCarCameraMover__ctor	undefined SelectCarCameraMover__ctor()	unknown			1003
 00487070	FUN_00487070	undefined FUN_00487070()	unknown			69
 004870c0	FUN_004870c0	undefined FUN_004870c0()	unknown		undefined local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;	1232
 00487590	FUN_00487590	undefined FUN_00487590()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;	234
-00487680	FUN_00487680	undefined FUN_00487680()	unknown		undefined local_50;	327
+00487680	CameraMover_BuildBankedFrame	undefined CameraMover_BuildBankedFrame()	unknown		undefined local_50;	327
 004877d0	FUN_004877d0	undefined FUN_004877d0()	unknown			32
 004877f0	FUN_004877f0	undefined FUN_004877f0()	unknown			32
 00487810	FUN_00487810	undefined FUN_00487810()	unknown			32
@@ -1894,54 +1894,54 @@ entry	name	signature	calling	params	locals	bytes
 00488220	FUN_00488220	undefined FUN_00488220()	unknown			82
 00488280	FUN_00488280	undefined FUN_00488280()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	255
 00488380	FUN_00488380	undefined FUN_00488380()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	159
-00488420	FUN_00488420	undefined FUN_00488420()	unknown		undefined4 local_8;undefined4 local_10;	188
+00488420	DebugWorldCameraMover__ctor	undefined DebugWorldCameraMover__ctor()	unknown		undefined4 local_8;undefined4 local_10;	188
 004884e0	FUN_004884e0	undefined FUN_004884e0()	unknown			30
 00488500	FUN_00488500	undefined FUN_00488500()	unknown			74
 00488550	FUN_00488550	undefined FUN_00488550()	unknown			355
 004886c0	FUN_004886c0	undefined FUN_004886c0()	unknown			229
 004887b0	FUN_004887b0	undefined FUN_004887b0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_44;	725
 00488ae0	FUN_00488ae0	undefined FUN_00488ae0()	unknown		undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_2bc;undefined local_2e0;undefined local_320;undefined local_330;undefined4 local_338;undefined4 local_33c;undefined4 local_340;undefined4 local_344;undefined4 local_348;	2007
-004892c0	FUN_004892c0	undefined FUN_004892c0()	unknown			25
+004892c0	NullCameraMover__ctor	undefined NullCameraMover__ctor()	unknown			25
 00489300	FUN_00489300	undefined FUN_00489300()	unknown		undefined4 local_4;undefined4 local_c;	90
-00489360	FUN_00489360	undefined FUN_00489360()	unknown			294
+00489360	DriveCameraMover__ctor	undefined DriveCameraMover__ctor()	unknown			294
 00489490	FUN_00489490	undefined FUN_00489490()	unknown			30
 004894b0	FUN_004894b0	undefined FUN_004894b0()	unknown			136
-00489690	FUN_00489690	undefined FUN_00489690()	unknown		undefined local_50;undefined4 local_1f8;undefined4 local_1fc;undefined4 local_200;undefined4 local_2cc;undefined4 local_2ec;undefined1 local_2f1;	5886
+00489690	DriveCameraMover__Update	undefined DriveCameraMover__Update()	unknown		undefined local_50;undefined4 local_1f8;undefined4 local_1fc;undefined4 local_200;undefined4 local_2cc;undefined4 local_2ec;undefined1 local_2f1;	5886
 0048ad90	FUN_0048ad90	undefined FUN_0048ad90()	unknown		undefined4 local_18;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;	561
-0048afd0	FUN_0048afd0	undefined FUN_0048afd0()	unknown		undefined4 local_res0;undefined4 local_4;undefined4 local_c;undefined4 local_14;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_3c;undefined4 local_40;undefined4 local_4c;undefined4 local_50;undefined4 local_5c;undefined4 local_60;undefined4 local_6c;undefined4 local_70;undefined local_80;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined local_f0;undefined local_130;	798
+0048afd0	CubicCameraMover__ctor	undefined CubicCameraMover__ctor()	unknown		undefined4 local_res0;undefined4 local_4;undefined4 local_c;undefined4 local_14;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_3c;undefined4 local_40;undefined4 local_4c;undefined4 local_50;undefined4 local_5c;undefined4 local_60;undefined4 local_6c;undefined4 local_70;undefined local_80;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined local_f0;undefined local_130;	798
 0048b2f0	FUN_0048b2f0	undefined FUN_0048b2f0()	unknown			30
 0048b310	FUN_0048b310	undefined FUN_0048b310()	unknown		undefined4 local_4;undefined4 local_10;	168
 0048b530	FUN_0048b530	undefined FUN_0048b530()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	616
 0048b7a0	FUN_0048b7a0	undefined FUN_0048b7a0()	unknown			278
 0048b8c0	FUN_0048b8c0	undefined FUN_0048b8c0()	unknown		undefined local_50;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined local_84;	1000
 0048bcb0	FUN_0048bcb0	undefined FUN_0048bcb0()	unknown		undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined local_110;	1344
-0048c1f0	FUN_0048c1f0	undefined FUN_0048c1f0()	unknown			45
+0048c1f0	CameraMover_Type12__ctor	undefined CameraMover_Type12__ctor()	unknown			45
 0048c220	FUN_0048c220	undefined FUN_0048c220()	unknown			94
-0048c280	FUN_0048c280	undefined FUN_0048c280()	unknown			240
+0048c280	DragRaceCameraMover__ctor	undefined DragRaceCameraMover__ctor()	unknown			240
 0048c370	FUN_0048c370	undefined FUN_0048c370()	unknown			30
 0048c390	FUN_0048c390	undefined FUN_0048c390()	unknown			99
 0048c400	FUN_0048c400	undefined FUN_0048c400()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;	1047
 0048c820	FUN_0048c820	undefined FUN_0048c820()	unknown		undefined local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;	366
-0048c990	FUN_0048c990	undefined FUN_0048c990()	unknown			335
+0048c990	DragRaceLeaderCameraMover__ctor	undefined DragRaceLeaderCameraMover__ctor()	unknown			335
 0048cae0	FUN_0048cae0	undefined FUN_0048cae0()	unknown			30
 0048cb00	FUN_0048cb00	undefined FUN_0048cb00()	unknown		undefined4 local_4;undefined4 local_10;	199
 0048cbd0	FUN_0048cbd0	undefined FUN_0048cbd0()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_34;	358
 0048cd40	FUN_0048cd40	undefined FUN_0048cd40()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	234
 0048ce30	FUN_0048ce30	undefined FUN_0048ce30()	unknown		undefined4 local_3c;undefined4 local_40;undefined4 local_6c;undefined4 local_70;undefined4 local_9c;undefined4 local_a0;undefined4 local_cc;undefined4 local_d0;undefined4 local_fc;undefined4 local_100;undefined4 local_12c;undefined4 local_130;undefined4 local_158;undefined4 local_15c;undefined4 local_160;undefined4 local_168;undefined4 local_16c;undefined4 local_170;undefined2 local_182;undefined2 local_184;undefined4 local_188;undefined4 local_18c;undefined4 local_198;undefined4 local_19c;undefined4 local_1a0;undefined4 local_1a4;undefined4 local_1a8;undefined4 local_1ac;undefined4 local_1b0;undefined4 local_1b4;undefined4 local_1b8;undefined4 local_1bc;undefined4 local_1c0;undefined1 local_1c1;undefined4 local_1c8;	1397
 0048d3b0	FUN_0048d3b0	undefined FUN_0048d3b0()	unknown		undefined local_50;undefined4 local_98;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;	815
-0048d6e0	FUN_0048d6e0	undefined FUN_0048d6e0()	unknown		undefined local_20;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined local_90;undefined local_d0;undefined local_110;undefined4 local_114;	668
+0048d6e0	DragRaceAheadCameraMover__ctor	undefined DragRaceAheadCameraMover__ctor()	unknown		undefined local_20;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined local_90;undefined local_d0;undefined local_110;undefined4 local_114;	668
 0048d980	FUN_0048d980	undefined FUN_0048d980()	unknown			30
 0048d9a0	FUN_0048d9a0	undefined FUN_0048d9a0()	unknown			120
 0048da20	FUN_0048da20	undefined FUN_0048da20()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_34;	492
 0048dc10	FUN_0048dc10	undefined FUN_0048dc10()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;	237
 0048dd00	FUN_0048dd00	undefined FUN_0048dd00()	unknown		undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;	507
-0048e210	FUN_0048e210	undefined FUN_0048e210()	unknown			324
+0048e210	AnimationControllerCameraMover__ctor	undefined AnimationControllerCameraMover__ctor()	unknown			324
 0048e360	FUN_0048e360	undefined FUN_0048e360()	unknown			30
 0048e380	FUN_0048e380	undefined FUN_0048e380()	unknown		undefined4 local_4;undefined4 local_10;undefined local_1c;	235
 0048e490	FUN_0048e490	undefined FUN_0048e490()	unknown		undefined4 local_98;undefined local_d0;undefined4 local_10c;undefined4 local_110;	712
 0048e760	FUN_0048e760	undefined FUN_0048e760()	unknown			70
 0048e7b0	FUN_0048e7b0	undefined FUN_0048e7b0()	unknown		undefined4 local_4;	235
-0048e8b0	FUN_0048e8b0	undefined FUN_0048e8b0()	unknown			342
+0048e8b0	Players__UpdateStreamViewers	undefined Players__UpdateStreamViewers()	unknown			342
 0048ea30	FUN_0048ea30	undefined FUN_0048ea30()	unknown			37
 0048ea60	FUN_0048ea60	undefined FUN_0048ea60()	unknown			30
 0048ea80	FUN_0048ea80	undefined FUN_0048ea80()	unknown			7
@@ -1954,7 +1954,7 @@ entry	name	signature	calling	params	locals	bytes
 0048edf0	FUN_0048edf0	undefined FUN_0048edf0()	unknown			43
 0048ee20	FUN_0048ee20	undefined FUN_0048ee20()	unknown		undefined4 local_4;	170
 0048eed0	FUN_0048eed0	undefined FUN_0048eed0()	unknown		undefined4 local_18;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;	439
-0048f090	FUN_0048f090	undefined FUN_0048f090()	unknown		undefined4 local_res0;undefined4 local_4;undefined4 local_c;undefined4 local_14;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_108;undefined local_110;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_134;undefined4 local_138;undefined4 local_13c;undefined4 local_140;undefined local_150;undefined4 local_158;undefined local_1a0;	4143
+0048f090	ZoneFreezeCameraMover__ctor	undefined ZoneFreezeCameraMover__ctor()	unknown		undefined4 local_res0;undefined4 local_4;undefined4 local_c;undefined4 local_14;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;undefined4 local_b0;undefined4 local_b4;undefined4 local_b8;undefined4 local_bc;undefined4 local_c0;undefined4 local_c4;undefined4 local_c8;undefined4 local_cc;undefined4 local_d0;undefined4 local_d4;undefined4 local_d8;undefined4 local_dc;undefined4 local_e0;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_108;undefined local_110;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_134;undefined4 local_138;undefined4 local_13c;undefined4 local_140;undefined local_150;undefined4 local_158;undefined local_1a0;	4143
 004900d0	FUN_004900d0	undefined FUN_004900d0()	unknown			30
 004900f0	FUN_004900f0	undefined FUN_004900f0()	unknown			231
 004901e0	FUN_004901e0	undefined FUN_004901e0()	unknown		undefined local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_94;undefined4 local_a4;	783
@@ -1964,7 +1964,7 @@ entry	name	signature	calling	params	locals	bytes
 004906d0	FUN_004906d0	undefined FUN_004906d0()	unknown		undefined4 local_8;	87
 00490730	FUN_00490730	undefined FUN_00490730()	unknown			63
 00490770	FUN_00490770	undefined FUN_00490770()	unknown		undefined local_b0;undefined4 local_e4;undefined4 local_e8;undefined4 local_ec;undefined4 local_f0;undefined4 local_f4;undefined4 local_f8;undefined4 local_fc;undefined4 local_100;undefined4 local_104;undefined4 local_108;undefined4 local_10c;undefined4 local_110;undefined4 local_114;undefined4 local_118;undefined4 local_11c;undefined4 local_120;undefined4 local_128;undefined4 local_12c;undefined4 local_130;undefined4 local_138;undefined4 local_13c;undefined4 local_140;undefined4 local_144;undefined4 local_148;undefined4 local_158;undefined4 local_15c;undefined4 local_160;undefined4 local_164;undefined4 local_168;undefined4 local_16c;undefined4 local_170;undefined4 local_174;undefined4 local_188;undefined4 local_18c;undefined4 local_190;undefined4 local_1a8;undefined4 local_1ac;undefined4 local_1b0;undefined4 local_1b4;undefined4 local_1b8;	1825
-00490ea0	FUN_00490ea0	undefined FUN_00490ea0()	unknown		undefined4 local_res0;undefined4 local_4;undefined4 local_c;undefined4 local_14;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_b4;	5108
+00490ea0	ZonePreviewCameraMover__ctor	undefined ZonePreviewCameraMover__ctor()	unknown		undefined4 local_res0;undefined4 local_4;undefined4 local_c;undefined4 local_14;undefined4 local_1c;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_b4;	5108
 004922a0	FUN_004922a0	undefined FUN_004922a0()	unknown			30
 004922c0	FUN_004922c0	undefined FUN_004922c0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	429
 00492470	FUN_00492470	undefined FUN_00492470()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_18;	162
@@ -1988,16 +1988,16 @@ entry	name	signature	calling	params	locals	bytes
 00494890	FUN_00494890	undefined FUN_00494890()	unknown			41
 004948c0	FUN_004948c0	undefined FUN_004948c0()	unknown			47
 004948f0	FUN_004948f0	undefined FUN_004948f0()	unknown			30
-00494910	FUN_00494910	undefined FUN_00494910()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	91
-00494970	FUN_00494970	undefined FUN_00494970()	unknown		undefined4 local_4;undefined4 local_c;	377
+00494910	Screen_Options__Create	undefined Screen_Options__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	91
+00494970	Screen_Options__Screen_Options	undefined Screen_Options__Screen_Options()	unknown		undefined4 local_4;undefined4 local_c;	377
 00494af0	FUN_00494af0	undefined FUN_00494af0()	unknown			31
 00494b10	FUN_00494b10	undefined FUN_00494b10()	unknown		undefined4 local_4;undefined4 local_c;	81
 00494b90	FUN_00494b90	undefined FUN_00494b90()	unknown		undefined local_c;	285
 00494cb0	FUN_00494cb0	undefined FUN_00494cb0()	unknown			70
 00494d00	FUN_00494d00	undefined FUN_00494d00()	unknown		undefined4 local_4;undefined4 local_c;	91
 00494d60	FUN_00494d60	undefined FUN_00494d60()	unknown		undefined4 local_4;undefined4 local_c;	119
-00494de0	FUN_00494de0	undefined FUN_00494de0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
-00494e40	FUN_00494e40	undefined FUN_00494e40()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined1 local_97;undefined local_98;undefined4 local_9c;undefined4 local_a0;undefined local_b0;	2814
+00494de0	Screen_PreRaceStats__Create	undefined Screen_PreRaceStats__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
+00494e40	Screen_PreRaceStats__Screen_PreRaceStats	undefined Screen_PreRaceStats__Screen_PreRaceStats()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined1 local_97;undefined local_98;undefined4 local_9c;undefined4 local_a0;undefined local_b0;	2814
 00495940	FUN_00495940	undefined FUN_00495940()	unknown			30
 00495960	FUN_00495960	undefined FUN_00495960()	unknown			11
 004959d0	FUN_004959d0	undefined FUN_004959d0()	unknown		undefined local_c;undefined local_10;	783
@@ -2012,8 +2012,8 @@ entry	name	signature	calling	params	locals	bytes
 00496040	FUN_00496040	undefined FUN_00496040()	unknown		undefined local_4;undefined4 local_8;	87
 004960a0	FUN_004960a0	undefined FUN_004960a0()	unknown		undefined4 local_4;	60
 004960e0	FUN_004960e0	undefined FUN_004960e0()	unknown			43
-00496140	FUN_00496140	undefined FUN_00496140()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
-004961a0	FUN_004961a0	undefined FUN_004961a0()	unknown		undefined4 local_4;undefined4 local_c;	102
+00496140	Screen_PostRaceMenu__Create	undefined Screen_PostRaceMenu__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
+004961a0	Screen_PostRaceMenu__Screen_PostRaceMenu	undefined Screen_PostRaceMenu__Screen_PostRaceMenu()	unknown		undefined4 local_4;undefined4 local_c;	102
 00496210	FUN_00496210	undefined FUN_00496210()	unknown			30
 00496230	FUN_00496230	undefined FUN_00496230()	unknown			11
 00496240	FUN_00496240	undefined FUN_00496240()	unknown		undefined1 local_1f;undefined local_20;undefined4 local_24;undefined4 local_28;undefined4 local_3c;undefined4 local_40;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined4 local_80;undefined4 local_84;undefined4 local_88;undefined4 local_8c;undefined4 local_90;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined local_b8;	1912
@@ -2025,8 +2025,8 @@ entry	name	signature	calling	params	locals	bytes
 00497410	FUN_00497410	undefined FUN_00497410()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	369
 00497590	FUN_00497590	undefined FUN_00497590()	unknown			47
 00497a00	FUN_00497a00	undefined FUN_00497a00()	unknown			407
-00497bf0	FUN_00497bf0	undefined FUN_00497bf0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	91
-00497c50	FUN_00497c50	undefined FUN_00497c50()	unknown		undefined4 local_4;undefined4 local_c;	452
+00497bf0	Screen_PostRaceResults__Create	undefined Screen_PostRaceResults__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	91
+00497c50	Screen_PostRaceResults__Screen_PostRaceResults	undefined Screen_PostRaceResults__Screen_PostRaceResults()	unknown		undefined4 local_4;undefined4 local_c;	452
 00497e20	FUN_00497e20	undefined FUN_00497e20()	unknown			31
 00497e40	FUN_00497e40	undefined FUN_00497e40()	unknown		undefined4 local_4;	105
 00497eb0	FUN_00497eb0	undefined FUN_00497eb0()	unknown		undefined local_20;undefined1 local_3f;undefined local_40;undefined local_50;undefined1 local_6f;undefined local_70;undefined4 local_74;undefined4 local_78;undefined4 local_7c;undefined1 local_9b;undefined local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined local_b8;	3801
@@ -2037,8 +2037,8 @@ entry	name	signature	calling	params	locals	bytes
 0049af90	FUN_0049af90	undefined FUN_0049af90()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined4 local_68;undefined4 local_6c;undefined4 local_70;undefined4 local_74;undefined4 local_78;undefined4 local_94;undefined4 local_98;undefined4 local_9c;undefined4 local_a0;undefined4 local_a4;undefined4 local_a8;undefined4 local_ac;	2664
 0049be50	FUN_0049be50	undefined FUN_0049be50()	unknown			11
 0049be60	FUN_0049be60	undefined FUN_0049be60()	unknown			30
-0049be80	FUN_0049be80	undefined FUN_0049be80()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
-0049bee0	FUN_0049bee0	undefined FUN_0049bee0()	unknown		undefined4 local_4;undefined4 local_c;	359
+0049be80	Screen_PostRaceStats__Create	undefined Screen_PostRaceStats__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	94
+0049bee0	Screen_PostRaceStats__Screen_PostRaceStats	undefined Screen_PostRaceStats__Screen_PostRaceStats()	unknown		undefined4 local_4;undefined4 local_c;	359
 0049c050	FUN_0049c050	undefined FUN_0049c050()	unknown			130
 0049c0e0	FUN_0049c0e0	undefined FUN_0049c0e0()	unknown		undefined1 local_1f;undefined local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;	1845
 0049c820	FUN_0049c820	undefined FUN_0049c820()	unknown		undefined local_10;	927
@@ -2080,8 +2080,8 @@ entry	name	signature	calling	params	locals	bytes
 0049eee0	FUN_0049eee0	undefined FUN_0049eee0()	unknown			58
 0049ef20	FUN_0049ef20	undefined FUN_0049ef20()	unknown			11
 0049ef30	FUN_0049ef30	undefined FUN_0049ef30()	unknown			30
-0049ef50	FUN_0049ef50	undefined FUN_0049ef50()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	91
-0049efb0	FUN_0049efb0	undefined FUN_0049efb0()	unknown		undefined4 local_4;undefined4 local_c;	77
+0049ef50	Screen_RewardPopup__Create	undefined Screen_RewardPopup__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	91
+0049efb0	Screen_RewardPopup__Screen_RewardPopup	undefined Screen_RewardPopup__Screen_RewardPopup()	unknown		undefined4 local_4;undefined4 local_c;	77
 0049f000	FUN_0049f000	undefined FUN_0049f000()	unknown			191
 0049f120	FUN_0049f120	undefined FUN_0049f120()	unknown			143
 0049f1b0	FUN_0049f1b0	undefined FUN_0049f1b0()	unknown		undefined4 local_4;	243
@@ -2091,38 +2091,38 @@ entry	name	signature	calling	params	locals	bytes
 0049f7a0	FUN_0049f7a0	undefined FUN_0049f7a0()	unknown			265
 0049f8b0	FUN_0049f8b0	undefined FUN_0049f8b0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;	425
 0049fa60	FUN_0049fa60	undefined FUN_0049fa60()	unknown			49
-0049fac0	FUN_0049fac0	undefined FUN_0049fac0()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	91
-0049fb20	FUN_0049fb20	undefined FUN_0049fb20()	unknown		undefined4 local_4;undefined4 local_c;	146
+0049fac0	Screen_StyleAnimator__Create	undefined Screen_StyleAnimator__Create()	unknown		undefined4 local_4;undefined4 local_c;undefined4 local_10;	91
+0049fb20	Screen_StyleAnimator__Screen_StyleAnimator	undefined Screen_StyleAnimator__Screen_StyleAnimator()	unknown		undefined4 local_4;undefined4 local_c;	146
 0049fc50	FUN_0049fc50	undefined FUN_0049fc50()	unknown		undefined4 local_4;	53
 0049fc90	FUN_0049fc90	undefined FUN_0049fc90()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;	81
 0049fcf0	FUN_0049fcf0	undefined FUN_0049fcf0()	unknown			42
 0049fd20	FUN_0049fd20	undefined FUN_0049fd20()	unknown			103
-0049fdb0	FUN_0049fdb0	undefined FUN_0049fdb0()	unknown			88
-0049fe10	FUN_0049fe10	undefined FUN_0049fe10()	unknown			88
-0049fe70	FUN_0049fe70	undefined FUN_0049fe70()	unknown			76
-0049fec0	FUN_0049fec0	undefined FUN_0049fec0()	unknown			135
+0049fdb0	HudWidget__RegisterString	undefined HudWidget__RegisterString()	unknown			88
+0049fe10	HudElement__RegisterImage	undefined HudElement__RegisterImage()	unknown			88
+0049fe70	HudWidget__RegisterObjectByHash	undefined HudWidget__RegisterObjectByHash()	unknown			76
+0049fec0	HudWidget__SetVisible	undefined HudWidget__SetVisible()	unknown			135
 0049ff50	FUN_0049ff50	undefined FUN_0049ff50()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_28;undefined4 local_2c;	302
 004a0080	FUN_004a0080	undefined FUN_004a0080()	unknown			51
-004a00c0	FUN_004a00c0	undefined FUN_004a00c0()	unknown		undefined4 local_4;undefined4 local_c;	219
-004a01a0	FUN_004a01a0	undefined FUN_004a01a0()	unknown		undefined local_20;undefined local_2c;	554
-004a03d0	FUN_004a03d0	undefined FUN_004a03d0()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;	2760
+004a00c0	HudPosition__HudPosition	undefined HudPosition__HudPosition()	unknown		undefined4 local_4;undefined4 local_c;	219
+004a01a0	HudPosition__Update	undefined HudPosition__Update()	unknown		undefined local_20;undefined local_2c;	554
+004a03d0	HudTach__HudTach	undefined HudTach__HudTach()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;	2760
 004a0ea0	FUN_004a0ea0	undefined FUN_004a0ea0()	unknown			174
-004a0f50	FUN_004a0f50	undefined FUN_004a0f50()	unknown		undefined local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_24;undefined4 local_28;	823
-004a1290	FUN_004a1290	undefined FUN_004a1290()	unknown		undefined4 local_4;undefined4 local_c;	260
-004a13a0	FUN_004a13a0	undefined FUN_004a13a0()	unknown		undefined4 local_4;undefined1 local_5;	187
+004a0f50	HudTach__Update	undefined HudTach__Update()	unknown		undefined local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_24;undefined4 local_28;	823
+004a1290	HudTurbo__HudTurbo	undefined HudTurbo__HudTurbo()	unknown		undefined4 local_4;undefined4 local_c;	260
+004a13a0	HudTurbo__Update	undefined HudTurbo__Update()	unknown		undefined4 local_4;undefined1 local_5;	187
 004a1460	FUN_004a1460	undefined FUN_004a1460()	unknown			106
 004a14d0	FUN_004a14d0	undefined FUN_004a14d0()	unknown			170
-004a1580	FUN_004a1580	undefined FUN_004a1580()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined local_48;	671
-004a1820	FUN_004a1820	undefined FUN_004a1820()	unknown		undefined local_20;undefined local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_40;	804
-004a1b50	FUN_004a1b50	undefined FUN_004a1b50()	unknown		undefined4 local_4;undefined4 local_c;	157
-004a1bf0	FUN_004a1bf0	undefined FUN_004a1bf0()	unknown			249
+004a1580	HudLapCounter__HudLapCounter	undefined HudLapCounter__HudLapCounter()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined local_48;	671
+004a1820	HudLapCounter__Update	undefined HudLapCounter__Update()	unknown		undefined local_20;undefined local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_40;	804
+004a1b50	HudSplitTime__HudSplitTime	undefined HudSplitTime__HudSplitTime()	unknown		undefined4 local_4;undefined4 local_c;	157
+004a1bf0	HudSplitTime__Update	undefined HudSplitTime__Update()	unknown			249
 004a1d00	FUN_004a1d00	undefined FUN_004a1d00()	unknown		undefined local_20;	140
 004a1d90	FUN_004a1d90	undefined FUN_004a1d90()	unknown		undefined local_20;undefined4 local_24;	133
 004a1e20	FUN_004a1e20	undefined FUN_004a1e20()	unknown		undefined local_20;	83
 004a1e80	FUN_004a1e80	undefined FUN_004a1e80()	unknown		undefined local_20;	93
 004a1ee0	FUN_004a1ee0	undefined FUN_004a1ee0()	unknown			81
-004a1f40	FUN_004a1f40	undefined FUN_004a1f40()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined local_74;	3020
-004a2b10	FUN_004a2b10	undefined FUN_004a2b10()	unknown		undefined local_20;undefined4 local_24;	989
+004a1f40	HudLeaderboard__HudLeaderboard	undefined HudLeaderboard__HudLeaderboard()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;undefined4 local_4c;undefined4 local_50;undefined4 local_54;undefined4 local_58;undefined4 local_5c;undefined4 local_60;undefined4 local_64;undefined local_74;	3020
+004a2b10	HudLeaderboard__Update	undefined HudLeaderboard__Update()	unknown		undefined local_20;undefined4 local_24;	989
 004a2ef0	FUN_004a2ef0	undefined FUN_004a2ef0()	unknown		undefined4 local_4;	304
 004a3020	FUN_004a3020	undefined FUN_004a3020()	unknown		undefined4 local_4;undefined4 local_8;	427
 004a31e0	FUN_004a31e0	undefined FUN_004a31e0()	unknown		undefined local_20;undefined4 local_24;	533
@@ -2133,16 +2133,16 @@ entry	name	signature	calling	params	locals	bytes
 004a37d0	FUN_004a37d0	undefined FUN_004a37d0()	unknown		undefined4 local_4;undefined4 local_8;	339
 004a3930	FUN_004a3930	undefined FUN_004a3930()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;	361
 004a3aa0	FUN_004a3aa0	undefined FUN_004a3aa0()	unknown		undefined local_1c;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;	250
-004a3ba0	FUN_004a3ba0	undefined FUN_004a3ba0()	unknown		undefined4 local_4;undefined4 local_c;	178
-004a3c60	FUN_004a3c60	undefined FUN_004a3c60()	unknown		undefined8 local_18;	671
-004a3f00	FUN_004a3f00	undefined FUN_004a3f00()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;	2550
+004a3ba0	HudWrongWay__HudWrongWay	undefined HudWrongWay__HudWrongWay()	unknown		undefined4 local_4;undefined4 local_c;	178
+004a3c60	HudWrongWay__Update	undefined HudWrongWay__Update()	unknown		undefined8 local_18;	671
+004a3f00	HudTachDrag__HudTachDrag	undefined HudTachDrag__HudTachDrag()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined4 local_48;	2550
 004a4900	FUN_004a4900	undefined FUN_004a4900()	unknown			333
-004a4a50	FUN_004a4a50	undefined FUN_004a4a50()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_48;undefined4 local_4c;	3451
+004a4a50	HudTachDrag__Update	undefined HudTachDrag__Update()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined4 local_1c;undefined4 local_20;undefined4 local_24;undefined4 local_28;undefined4 local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_48;undefined4 local_4c;	3451
 004a57d0	FUN_004a57d0	undefined FUN_004a57d0()	unknown			144
-004a5860	FUN_004a5860	undefined FUN_004a5860()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;	457
-004a5a30	FUN_004a5a30	undefined FUN_004a5a30()	unknown		undefined1 local_7;undefined local_8;undefined4 local_c;undefined4 local_10;	291
-004a5b60	FUN_004a5b60	undefined FUN_004a5b60()	unknown		undefined4 local_4;undefined8 local_1c;	311
-004a5ca0	FUN_004a5ca0	undefined FUN_004a5ca0()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined local_54;	1724
+004a5860	HudEngineHeat__HudEngineHeat	undefined HudEngineHeat__HudEngineHeat()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;	457
+004a5a30	EngineTempGauge__BuildTempBarImageList	undefined EngineTempGauge__BuildTempBarImageList()	unknown		undefined1 local_7;undefined local_8;undefined4 local_c;undefined4 local_10;	291
+004a5b60	HudEngineHeat__Update	undefined HudEngineHeat__Update()	unknown		undefined4 local_4;undefined8 local_1c;	311
+004a5ca0	HudNos__HudNos	undefined HudNos__HudNos()	unknown		undefined4 local_4;undefined4 local_c;undefined1 local_2b;undefined local_2c;undefined4 local_30;undefined4 local_34;undefined4 local_38;undefined4 local_3c;undefined4 local_40;undefined4 local_44;undefined local_54;	1724
 004a6360	FUN_004a6360	undefined FUN_004a6360()	unknown		undefined1 local_1f;undefined local_20;undefined local_2c;	334
 004a64b0	FUN_004a64b0	undefined FUN_004a64b0()	unknown		undefined4 local_4;undefined4 local_8;undefined4 local_c;undefined4 local_10;undefined4 local_14;undefined4 local_18;undefined1 local_19;	738
-004a67a0	FUN_004a67a0	undefined FUN_004a67a0()	unknown			248
+004a67a0	HudNos__Update	undefined HudNos__Update()	unknown			248

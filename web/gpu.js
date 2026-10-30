@@ -218,7 +218,7 @@ async function startGpu(M, canvas, report, onFrame) {
   // single-sample texture (what the game samples and presents) and a multisampled twin that the passes draw into and
   // resolve from; depth targets are multisampled themselves. Size decides, so a pass's colour and depth always agree.
   const MSAA = RN_Q.get('msaa') === '4' ? 4 : 1;
-  // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first HUD quad of a race
+  // BRIDGE: FXAA over the 3D scene (FXAA 3.11 quality, T. Lottes, public domain), not in the original. The host sends GPU_FXAA at the first screen quad of a race
   // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
   const FXAA_MODE = RN_Q.get('fxaa');   // '0' off, '2' debug: edges in red
   const FXAA_ON = FXAA_MODE !== '0';
@@ -227,9 +227,18 @@ async function startGpu(M, canvas, report, onFrame) {
   // S curve around 0.25: black and white stay fixed and the curve itself clips nothing, the road's dry mid-greys barely move; then
   // saturation, less on what is already vivid so neon clips little. ?grade=0 turns it off. With ?msaa=4 no pass runs, like FXAA.
   const GRADE_ON = RN_Q.get('grade') !== '0';
+  // BRIDGE: remaster tonemap, not in the original. The game's image is 8 bits and gamma space, with no light above 1, so this is not
+  // HDR rendering: to linear light, the top of the range expanded back (near-white lamps up to 3x, x^2 from luma 0.6), a shoulder from
+  // linear 0.5 rolls it off instead of clipping, back to gamma. Below the shoulder it is the identity: an ACES curve took the median luma from
+  // 0.155 to 0.099 and the road from 0.136 to 0.080 (build/ab/tone), a night scene has no shadows to spare. ?tonemap=0 turns it off.
+  const TONE_ON = RN_Q.get('tonemap') !== '0';
+  // BRIDGE: remaster vignette: corners 14 % darker, in the same pass (the HUD comes after). ?vignette=0 turns it off.
+  const VIG_ON = RN_Q.get('vignette') !== '0';
   const fxaaMod = device.createShaderModule({ code: `
 const DBG = ${FXAA_MODE === '2' ? 1 : 0};
 const GRADE = ${GRADE_ON ? 1 : 0};
+const TONE = ${TONE_ON ? 1 : 0};
+const VIG = ${VIG_ON ? 1 : 0};
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
 @vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
@@ -237,16 +246,31 @@ const GRADE = ${GRADE_ON ? 1 : 0};
   return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
 }
 fn lum(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
-fn grade(c: vec4f) -> vec4f {
-  if (GRADE == 0) { return c; }
-  let s = c.rgb + 0.6 * c.rgb * (1.0 - c.rgb) * (c.rgb - 0.25);
-  let vivid = max(s.r, max(s.g, s.b)) - min(s.r, min(s.g, s.b));
-  return vec4f(clamp(mix(vec3f(lum(s)), s, 1.0 + 0.18 * (1.0 - vivid)), vec3f(0.0), vec3f(1.0)), c.a);
+fn tonemap(c: vec3f) -> vec3f {
+  let lin = pow(c, vec3f(2.2));
+  let t = clamp((lum(c) - 0.6) / 0.4, 0.0, 1.0);
+  let x = lin * (1.0 + 2.0 * t * t);
+  let over = 1.0 - exp((0.5 - x) * 2.0);
+  return pow(select(x, 0.5 + 0.5 * over, x > vec3f(0.5)), vec3f(1.0 / 2.2));
 }
-@fragment fn gradeOnly(@builtin(position) pos: vec4f) -> @location(0) vec4f {
-  return grade(textureSampleLevel(src, smp, pos.xy / vec2f(textureDimensions(src)), 0.0));
+fn post(c: vec4f, pos: vec4f) -> vec4f {
+  var s = c.rgb;
+  if (TONE == 1) { s = tonemap(s); }
+  if (GRADE == 1) {
+    s += 0.6 * s * (1.0 - s) * (s - 0.25);
+    let vivid = max(s.r, max(s.g, s.b)) - min(s.r, min(s.g, s.b));
+    s = clamp(mix(vec3f(lum(s)), s, 1.0 + 0.18 * (1.0 - vivid)), vec3f(0.0), vec3f(1.0));
+  }
+  if (VIG == 1) {
+    let d = (pos.xy / vec2f(textureDimensions(src)) - 0.5) * 2.0;
+    s *= 1.0 - 0.14 * smoothstep(0.5, 1.4, length(d));
+  }
+  return vec4f(s, c.a);
 }
-@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f { return grade(fxaa(pos)); }
+@fragment fn postOnly(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  return post(textureSampleLevel(src, smp, pos.xy / vec2f(textureDimensions(src)), 0.0), pos);
+}
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f { return post(fxaa(pos), pos); }
 fn L(uv: vec2f) -> f32 { return lum(textureSampleLevel(src, smp, uv, 0.0).rgb); }
 const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 8.0);
 fn fxaa(pos: vec4f) -> vec4f {
@@ -316,7 +340,7 @@ fn fxaa(pos: vec4f) -> vec4f {
   return vec4f(textureSampleLevel(src, smp, uv, 0.0).rgb, m4.a);
 }` });
   const fxaaPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: fxaaMod, entryPoint: 'vs' },
-    fragment: { module: fxaaMod, entryPoint: FXAA_ON ? 'fs' : 'gradeOnly', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+    fragment: { module: fxaaMod, entryPoint: FXAA_ON ? 'fs' : 'postOnly', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
   const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   let fxaaTmp = null;
   // BRIDGE: remaster, the last step of a frame. The back buffer is at most 2560 wide (web/index.html), so on the OWNER's
@@ -548,13 +572,102 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       p.end();
     }
   }
+  // BRIDGE: remaster screen-space ambient occlusion from the game's own depth, not in the original. Half size: 8 samples per pixel, each the
+  // sine of its elevation over the surface minus an angle bias (Alchemy's 1 / |v| weight dirtied the near car's curved panels), in a 2 m radius (0.7 m barely showed at race distance, build/ab/ao2), on view-space positions (z = _43 / (z_ndc - _33), x and y by _11, _22; host/d3d9.c psblur_vel), turned by
+  // interleaved noise; two depth-aware 5-tap blurs; multiplied onto the scene colour at GPU_FXAA, so the light trails and flares added after it
+  // stay bright and the HUD is untouched. It only darkens: under cars, kerbs, wall corners. The sky and what is past 150 m take none.
+  // ?ao=0 turns it off, ?ao=show draws the term alone. With ?msaa=4 no pass runs (the depth is multisampled).
+  const AO_MODE = RN_Q.get('ao'), AO_ON = AO_MODE !== '0', AO_R = 2;
+  const aoMod = device.createShaderModule({ code: `
+struct U { zz: vec4f, size: vec2f, dir: vec2f };
+@group(0) @binding(0) var dep: texture_depth_2d;
+@group(0) @binding(1) var<uniform> u: U;
+@group(0) @binding(2) var ao: texture_2d<f32>;
+@group(0) @binding(3) var smp: sampler;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
+}
+fn zAt(p: vec2i) -> f32 { return u.zz.y / (textureLoad(dep, clamp(p, vec2i(0), vec2i(u.size) - 1), 0) - u.zz.x); }
+fn viewAt(p: vec2i) -> vec3f {
+  let z = zAt(p);
+  let n = (vec2f(p) + 0.5) / u.size * 2.0 - 1.0;
+  return vec3f(n.x * z / u.zz.z, -n.y * z / u.zz.w, z);
+}
+@fragment fn occl(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  let q = vec2i(pos.xy) * 2;
+  if (textureLoad(dep, q, 0) >= 0.99999) { return vec4f(1.0); }
+  let P = viewAt(q);
+  if (P.z > 150.0 || P.z <= 0.0) { return vec4f(1.0); }
+  // The normal from the nearer neighbour on each axis, so an edge does not bend it.
+  let l = viewAt(q - vec2i(2, 0)) - P; let r = viewAt(q + vec2i(2, 0)) - P;
+  let d = viewAt(q - vec2i(0, 2)) - P; let t = viewAt(q + vec2i(0, 2)) - P;
+  let dx = select(l * -1.0, r, dot(r, r) < dot(l, l));
+  let dy = select(d * -1.0, t, dot(t, t) < dot(d, d));
+  var n = normalize(cross(dx, dy));
+  if (dot(n, P) > 0.0) { n = -n; }
+  let rpx = clamp(${AO_R} * u.zz.z * u.size.x * 0.5 / P.z, 4.0, u.size.x / 12.0);
+  let phi = 6.2831853 * fract(52.9829189 * fract(dot(pos.xy, vec2f(0.06711056, 0.00583715))));
+  var sum = 0.0;
+  for (var i = 0; i < 8; i++) {
+    let a = phi + f32(i) * 2.3999632;
+    let s = sqrt((f32(i) + 0.5) / 8.0) * rpx;
+    let v = viewAt(q + vec2i(vec2f(cos(a), sin(a)) * s)) - P;
+    let vv = dot(v, v);
+    if (vv < ${AO_R * AO_R}) { sum += max(0.0, dot(v, n) / sqrt(vv + 1e-4) - 0.22) * (1.0 - vv / ${AO_R * AO_R}); }
+  }
+  return vec4f(vec3f(max(0.25, 1.0 - 0.8 * sum)), 1.0);
+}
+@fragment fn blur(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  let p = vec2i(pos.xy);
+  let z0 = zAt(p * 2);
+  var w = array<f32, 3>(0.4, 0.24, 0.06);
+  var c = 0.0; var tot = 0.0;
+  for (var i = -2; i <= 2; i++) {
+    let o = p + i * vec2i(u.dir);
+    let k = w[abs(i)] * max(0.0, 1.0 - abs(zAt(o * 2) - z0) / (0.02 * z0 + 0.1));
+    c += textureLoad(ao, clamp(o, vec2i(0), vec2i(textureDimensions(ao)) - 1), 0).r * k; tot += k;
+  }
+  return vec4f(vec3f(c / max(tot, 1e-4)), 1.0);
+}
+@fragment fn compose(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  return vec4f(vec3f(textureSampleLevel(ao, smp, pos.xy / u.size, 0.0).r), 1.0);
+}` });
+  const aoPipe = (fs, format, blend, msaa) => device.createRenderPipeline({ layout: 'auto', vertex: { module: aoMod, entryPoint: 'vs' },
+    fragment: { module: aoMod, entryPoint: fs, targets: [{ format, ...(blend ? { blend } : {}) }] }, primitive: { topology: 'triangle-list' } });
+  const aoPipes = AO_ON ? { occl: aoPipe('occl', 'r8unorm'), blur: aoPipe('blur', 'r8unorm'),
+    compose: aoPipe('compose', 'rgba8unorm', AO_MODE === 'show' ? null : { color: { srcFactor: 'zero', dstFactor: 'src', operation: 'add' },
+      alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } }) } : null;
+  const aoU = [0, 1, 2].map(() => device.createBuffer({ size: 32, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST }));
+  let aoA = null, aoB = null;
+  function aoPass(enc, rt, ds, v) {
+    if (!ds?.depth || ds.sc !== 1 || rt.msView || ds.w !== rt.w || ds.h !== rt.h || !v[7] || !v[8]) return;
+    const hw = rt.w >> 1, hh = rt.h >> 1;
+    if (!aoA || aoA.width !== hw || aoA.height !== hh) {
+      doom(aoA); doom(aoB);
+      const mk = () => device.createTexture({ size: [hw, hh], format: 'r8unorm', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING });
+      aoA = mk(); aoB = mk();
+    }
+    const depV = ds.tex.createView({ aspect: 'depth-only' });
+    const step = (lab, pipe, att, entries) => {
+      const p = enc.beginRenderPass({ timestampWrites: tsw(lab), colorAttachments: [att] });
+      p.setPipeline(pipe); p.setBindGroup(0, device.createBindGroup({ layout: pipe.getBindGroupLayout(0), entries })); p.draw(3); p.end();
+    };
+    const to = t => ({ view: t.createView(), loadOp: 'clear', clearValue: [1, 1, 1, 1], storeOp: 'store' });
+    [[1, 0], [0, 1], [0, 0]].forEach((dir, i) => device.queue.writeBuffer(aoU[i], 0, new Float32Array([v[5], v[6], v[7], v[8], rt.w, rt.h, ...dir])));
+    const buf = i => ({ binding: 1, resource: { buffer: aoU[i] } });
+    step('ao', aoPipes.occl, to(aoA), [{ binding: 0, resource: depV }, buf(0)]);
+    step('ao blur', aoPipes.blur, to(aoB), [{ binding: 0, resource: depV }, buf(0), { binding: 2, resource: aoA.createView() }]);
+    step('ao blur', aoPipes.blur, to(aoA), [{ binding: 0, resource: depV }, buf(1), { binding: 2, resource: aoB.createView() }]);
+    step('ao add', aoPipes.compose, { view: rt.view, loadOp: 'load', storeOp: 'store' }, [buf(2), { binding: 2, resource: aoA.createView() }, { binding: 3, resource: fxaaSamp }]);
+  }
   // BRIDGE: real car shadows, not in the PC game (docs/re/shadows.md). The game draws one flat decal per car (0x56dc30); with ?shadows=1 (default
   // in Remaster) that decal is off (PATCH 0x56e493) and the cars cast a shadow map instead. The car body draws of the scene (the car vertex
   // shader, host/d3d9.c marks it with bit 1 of the shader kind) are kept during the frame and drawn again, depth only, from the light: the
   // same vertices and constants, with the clip-space matrix (c10..c13, D3D row vectors: clip = v * WVP) multiplied by T = (View Proj)^-1 * LightViewProj, so
   // the vertex shader's own object-to-clip chain ends in light space and no world matrix is needed. The light is orthographic, E metres
   // around the player's car, the direction the game itself uses (host/d3d9.c shadow_data). A full-screen pass then rebuilds each pixel's light-space position
-  // from the scene depth (same T), compares it with the map (3x3 PCF) and darkens the colour. The road stays dry: it only gets darker.
+  // from the scene depth (same T), compares it with the map (5x5 PCF, soft edge) and darkens the colour. The road stays dry: it only gets darker.
   const SH_E = 32, SH_Z = 140, SH_LEAD = 60;     // half size, depth range and eye distance behind the car centre (m)
   const SH_K = Number(RN_Q.get('shadowk') || 0.5), SH_BIAS = Number(RN_Q.get('shadowbias') || 0.0012);
   const shMod = device.createShaderModule({ code: `
@@ -577,11 +690,11 @@ struct U { t: mat4x4f, a: vec4f, b: vec4f };
   if (any(uv < vec2f(0.0)) || any(uv > vec2f(1.0)) || p.z < 0.0 || p.z > 1.0) { discard; }
   let d = u.a.z;
   var lit = 0.0;
-  for (var y = -1; y <= 1; y++) { for (var x = -1; x <= 1; x++) {
-    lit += textureSampleCompareLevel(smap, cmp, uv + vec2f(f32(x), f32(y)) * d, p.z - u.a.w);
+  for (var y = -2; y <= 2; y++) { for (var x = -2; x <= 2; x++) {
+    lit += textureSampleCompareLevel(smap, cmp, uv + vec2f(f32(x), f32(y)) * d * u.b.y, p.z - u.a.w);
   } }
   let edge = clamp(min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y)) * 12.0, 0.0, 1.0);   // fade at the map border
-  return vec4f(0.0, 0.0, 0.0, u.b.x * (1.0 - lit / 9.0) * edge);
+  return vec4f(0.0, 0.0, 0.0, u.b.x * (1.0 - lit / 25.0) * edge);
 }` });
   const shPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: shMod, entryPoint: 'vs' },
     fragment: { module: shMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm', blend: {
@@ -683,7 +796,7 @@ struct U { t: mat4x4f, a: vec4f, b: vec4f };
     pass.end();
     const tf = new Float32Array(24);
     for (let j = 0; j < 4; j++) for (let k = 0; k < 4; k++) tf[4 * j + k] = T[4 * k + j];
-    tf.set([rt.w, rt.h, 1 / R, SH_BIAS, SH_K, 0, 0, 0], 16);
+    tf.set([rt.w, rt.h, 1 / R, SH_BIAS, SH_K, 2 * R / 2048, 0, 0], 16);   // 5x5 PCF, 2 texels at 2048 apart: an edge about 25 cm soft
     device.queue.writeBuffer(shResU, 0, tf);
     const rp = enc.beginRenderPass({ timestampWrites: tsw('shadow apply'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
     rp.setPipeline(shPipe);
@@ -1054,7 +1167,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       uBindBuf = ubuf;
     }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
+    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0, postRt = 0, postFrom = 0;
     const shRec = [];     // the car body draws of the scene this frame (shadows)
     if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
@@ -1063,6 +1176,23 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       if (pass) { pass.end(); pass = null; passKey = ''; }
       if (pend && !keepClear) { enc.beginRenderPass(passDesc(null, pend.mask & 1 ? pend.rt : 0, pend.mask & 6 ? pend.ds : 0, pend.k, pend)).end(); pend = null; }
     };
+    // Bloom, FXAA, grade: on the finished scene colour, before the HUD (see GPU_FXAA below).
+    function postFx(rt) {
+      if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
+      if ((FXAA_ON || GRADE_ON || TONE_ON || VIG_ON) && rt && !rt.depth && !rt.msView) {
+        if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
+          doom(fxaaTmp);
+          fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
+        }
+        enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
+        const p = enc.beginRenderPass({ timestampWrites: tsw('fxaa'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
+        p.setPipeline(fxaaPipe);
+        p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
+          entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
+        p.draw(3);
+        p.end();
+      }
+    }
     // What a later command does to target id's colour (asp 0, the MSAA twin), depth (1) or stencil (2):
     // true = it reads it (draw or partial clear: loadOp 'load'), false = it overwrites it first (full clear, new target).
     const needed = (k, id, asp) => {
@@ -1070,7 +1200,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
-        else if (op === GPU_FXAA) { if (asp && (RN_PS.on || RN_SH.on) && res.get(id)?.w >= 1000) return true; }   // psblur reads the scene depth
+        else if (op === GPU_FXAA) { if (asp && (RN_PS.on || AO_ON || RN_SH.on) && res.get(id)?.w >= 1000) return true; }   // psblur, AO and the shadow pass read the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
       return true;     // the next frame may read it
@@ -1196,6 +1326,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         stats.texKb += tw * th >> 8;
       } else if (op === GPU_DRAW) {
         const g = k => w[a + k];
+        if (postRt && g(D_RT) !== postRt && g(D_RT) !== postFrom) { endPass(); postFx(res.get(postRt)); postRt = 0; }
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
         const key = `${g(D_RT)}/${g(D_DS)}`;
         if (ds && g(D_ZEN) && ds.w >= 1000 && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
@@ -1284,22 +1415,14 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(w[a]);
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
-        if (RN_SH.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) shadows(enc, st, res.get(sceneDs), shRec, f32.subarray(a + 8, a + 48), vbuf, ibuf); }
+        // Shadows first: they darken the scene colour, then AO, bloom and the grade work on that.
+        if (RN_SH.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) shadows(enc, st, res.get(sceneDs), shRec, f32.subarray(a + 10, a + 50), vbuf, ibuf); }
+        if (AO_ON && sceneRt) aoPass(enc, res.get(sceneRt), res.get(sceneDs), f32.subarray(a + 1, a + 10));
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
-        if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
-        if ((FXAA_ON || GRADE_ON) && rt && !rt.depth && !rt.msView) {
-          if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
-            doom(fxaaTmp);
-            fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
-          }
-          enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
-          const p = enc.beginRenderPass({ timestampWrites: tsw('fxaa'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
-          p.setPipeline(fxaaPipe);
-          p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
-            entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
-          p.draw(3);
-          p.end();
-        }
+        // With the game's scene RT ([0x73645c] = 1, 0x40a580) the target at GPU_FXAA only holds the light trails and flares: its next
+        // draws are added onto the scene colour (636 here), and only then the scene is copied to the back buffer under the HUD. So
+        // the post waits for the first draw on a third target. Without a scene RT the two are one target and it runs now.
+        if (sceneRt && sceneRt !== w[a]) { postRt = sceneRt; postFrom = w[a]; } else postFx(rt);
       } else if (op === GPU_BUFFER) {
         doom(gbufs.get(w[a]));
         gbufs.set(w[a], device.createBuffer({ size: Math.max(4, w[a + 1]), usage: GPUBufferUsage.VERTEX | GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST }));
@@ -1309,6 +1432,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         skin(w, a);
       } else if (op === GPU_PRESENT) {
         endPass();
+        if (postRt) { postFx(res.get(postRt)); postRt = 0; }
         const t = res.get(w[a]), size = `${w[a + 1]}x${w[a + 2]}`;
         // The game's cursor moves in back-buffer pixels (web/input.js), whatever the canvas size.
         canvas.gameW = w[a + 1]; canvas.gameH = w[a + 2];

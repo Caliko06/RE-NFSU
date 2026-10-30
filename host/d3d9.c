@@ -937,7 +937,7 @@ static void chase_frame(Ctx *c) {
     }
     if (!on && !non && sm == 0 && nsm == 0) info = 0;
 }
-// Real shadows (web/gpu.js shadows, ?shadows=; docs/re/shadows.md). Sent with GPU_FXAA after the psblur words: out[0..15] = the player's view matrix,
+// Real shadows (web/gpu.js shadows, ?shadows=; docs/re/shadows.md). Sent with GPU_FXAA after the psblur and AO words (words 10..49): out[0..15] = the player's view matrix,
 // out[16..31] = its projection (the camera block [0x7404c0], D3D row vectors: clip = v * View * Proj), out[32..34] = the direction the light travels
 // (the game's own light, worked out here as 0x56d700 does; the vector it writes to 0x73c670.. is this one scaled: a point h metres above the ground lands at p + D * (-h / D.z)),
 // out[35..37] = the player's car, out[38] = 1 when all of it is valid. The decal the game draws itself (0x56e493 gate, SCREEN_ADDR+0x98 as the
@@ -981,19 +981,19 @@ static void shadow_data(Ctx *c, uint32_t *out) {
 // PS2-style depth speed blur (web/gpu.js psblur): out[0..2] = the view-1 camera's velocity [0x740500]+0x1e0 (camera 0x78d270; what the game's own blur 0x40cd40
 // reads) in camera space, normalised, out[3] = its length (m/s); float bits, 0 when there is no camera. out[4] = nitrous on ([0x73654c],
 // written by 0x4010e0 for the player's view), out[5..6] = the projection's _33 and _43 (block +0x40; z_ndc = _33 + _43 / z_view, so the
-// page can turn the depth buffer into metres). Sent with GPU_FXAA.
+// page can turn the depth buffer into metres), out[7..8] = _11 and _22 (web/gpu.js AO: view-space positions). Sent with GPU_FXAA.
 // The camera block of the player's view (table 0x740460 + 0x60, +0 pointer; block +0 = View, rows 0..2 = the axes)
 // maps world to camera: v_cam = v * R (D3D row vectors). RN_PSLOG=1 logs it each 60 frames.
 static void psblur_vel(Ctx *c, uint32_t *out) {
     static int lg = -1;
     if (lg < 0) lg = getenv("RN_PSLOG") != NULL;
-    out[0] = out[1] = out[2] = out[3] = out[4] = out[5] = out[6] = 0;
+    memset(out, 0, 9 * sizeof *out);
     uint32_t car = ld(c, 0x740500, 4), blk = ld(c, 0x7404c0, 4), blk0 = ld(c, 0x740460, 4);
     if (!car || !blk || car >= GUEST_MEM - 0x200 || blk >= GUEST_MEM - 0x80) return;
     float v[3] = {ldf(c, car + 0x1e0), ldf(c, car + 0x1e4), ldf(c, car + 0x1e8)}, m[32];
     for (int k = 0; k < 32; k++) m[k] = ldf(c, blk + 4 * k);
     out[4] = ld(c, 0x73654c, 4) != 0;
-    memcpy(&out[5], &m[26], 4); memcpy(&out[6], &m[30], 4);
+    memcpy(&out[5], &m[26], 4); memcpy(&out[6], &m[30], 4); memcpy(&out[7], &m[16], 4); memcpy(&out[8], &m[21], 4);
     float s = sqrtf(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]), r[3];
     for (int j = 0; j < 3; j++) r[j] = v[0] * m[j] + v[1] * m[4 + j] + v[2] * m[8 + j];
     if (lg && dev.frames % 60 == 0) {
@@ -1140,6 +1140,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     rng_log(c, dev.frames);
     flow_log(c);
     free_tick(c);
+    traffic_tick(c);
     if (rn_steerlog) steer_frame(c);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
@@ -2644,7 +2645,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     int hud = race && (fen ? fen->hud : !menu), screen = race && fen && !fen->hud;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); rn_fixedclock_start(c); }
-    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[48] = {rt->gpu}; psblur_vel(c, w1 + 1); shadow_data(c, w1 + 8); gpu_cmd(GPU_FXAA, 48, w1); }
+    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[50] = {rt->gpu}; psblur_vel(c, w1 + 1); shadow_data(c, w1 + 10); gpu_cmd(GPU_FXAA, 50, w1); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
     static int hud_mode = -1, fe_stretch = -1;
