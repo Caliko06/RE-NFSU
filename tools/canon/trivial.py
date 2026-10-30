@@ -40,6 +40,16 @@ md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
 md.detail = True
 
 
+IMP = {}   # IAT slot -> (dll, function)
+pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_IMPORT"]])
+for e in pe.DIRECTORY_ENTRY_IMPORT:
+    for i in e.imports:
+        IMP[i.address] = (e.dll.decode().lower(), (i.name or b"ord%d" % i.ordinal).decode())
+DLLSYS = {"d3d9.dll": "render", "ddraw.dll": "render", "gdi32.dll": "render", "dsound.dll": "audio", "winmm.dll": "audio",
+          "dinput8.dll": "input", "dinput.dll": "input", "ws2_32.dll": "online", "tapi32.dll": "online", "netapi32.dll": "online"}
+ATEXIT = 0x67100d
+
+
 def dis(x, n):
     return [(i.mnemonic, i.op_str, i) for i in md.disasm(img[x - BASE:x - BASE + n], x)]
 
@@ -116,6 +126,40 @@ def classify(x, size):
             return int(o[i], 16)
         except ValueError:
             return None
+    calls = [int(b, 16) for a, b in zip(m, o) if a == "call" and re.fullmatch(r"0x[0-9a-f]+", b)]
+    if x in action_fi and not code_callers(x) and m[-1] in ("jmp", "ret"):   # listed in a FuncInfo unwind map
+        p = parent_of_funclet(x)
+        d = target(len(m) - 1) if m[-1] == "jmp" else (calls[-1] if calls else None)
+        s = (p and solid(p)) or (d and solid(d))
+        how = f"parent {p:#x}" if p and solid(p) else f"callee {d:#x}" if s else ""
+        return (s or False) and (f"Unwind_{nm(p) if p else 'x'}_{x:x}", s, f"EH unwind action of FuncInfo {action_fi[x]:#x} ({' ; '.join(m)}); system of the {how}")
+    if m == ["jmp"] and o[0].startswith("dword ptr [0x"):
+        slot = int(o[0][11:-1], 16)
+        if slot in IMP:
+            dll, fn = IMP[slot]
+            return (f"imp_{fn}", DLLSYS.get(dll, "runtime"), f"jmp [IAT {slot:#x}] = {dll}!{fn}")
+    if m[0] in ("mov", "push") and re.fullmatch(r"(ecx|esi|edi|eax), 0x[0-9a-f]+|0x[0-9a-f]+", o[0]) and not code_callers(x) \
+            and (calls or m[-1] == "jmp") and "test" not in m:   # static constructor / atexit registration of a global object
+        ctor = target(len(m) - 1) if m[-1] == "jmp" else calls[0]
+        ae = ATEXIT in calls
+        obj = int(o[0].split(", ")[-1], 16)
+        if calls == [ATEXIT]:   # push dtor; call _atexit: the subject is the pushed destructor
+            ctor = obj
+        s = ctor and solid(ctor)
+        if s and (ae or m[-1] == "jmp" or len(calls) == 1):
+            kind = "AtExit" if calls == [ATEXIT] else "DynInit"
+            return (f"{kind}_{nm(ctor)}" if kind == "AtExit" else f"{kind}_{nm(ctor)}_{obj:x}", s,
+                    f"static init: {' ; '.join(f'{a} {b}' for a, b in zip(m, o))[:160]}; system of {ctor:#x}")
+        return False
+    if (any("byte ptr [esp + 8], 1" in b or "byte ptr [esp + 4], 1" in b for b in o) and FREE in calls
+            and m[-1] == "ret" and o[-1] == "4" and len(calls) <= 2):   # scalar deleting destructor, every MSVC form
+        d = next((c for c in calls if c != FREE), None)
+        vt = next((int(b.split(", ")[1], 16) for a, b in zip(m, o) if a == "mov" and re.fullmatch(r"dword ptr \[esi\], 0x[0-9a-f]+", b)), None)
+        s = (d and solid(d)) or None
+        if not s:
+            s, how = callers_vote(x)
+        cls = nm(d).rsplit("::", 1)[0] if d and "::" in nm(d) else f"Dtor{d:x}" if d else f"vt{vt:x}" if vt else f"{x:x}"
+        return (s or False) and (f"{cls}::ScalarDeletingDtor", s, f"_free {FREE:#x} when arg & 1, dtor {d and hex(d)}, vtable {vt and hex(vt)}")
     if m == ["jmp"] and target(0):
         t = target(0)
         s = solid(t)
@@ -148,11 +192,15 @@ def classify(x, size):
     if m and m[-1] == "ret" and "call" not in m and not code_callers(x) and any(i.startswith(("fstp", "mov")) for i in m):
         dst = [int(g, 16) for a, b in zip(m, o) if a.startswith(("fstp", "mov")) for g in re.findall(r"^\w+ ptr \[(0x[0-9a-f]+)\]", b)]
         if dst and len(dst) == sum(1 for a, b in zip(m, o) if a.startswith(("fstp", "mov")) and b.startswith(("dword ptr [", "qword ptr [", "byte ptr [", "word ptr ["))):
-            v = Counter(s for g in dst for s in map(solid, (canon.a(r) for r in G.get(g, {}).get("readers", []))) if s)
+            rd = [canon.a(r) for g in dst for r in G.get(g, {}).get("readers", [])]
+            v = Counter(s for s in map(solid, rd) if s) or Counter(s for s in (system.get(r, ("unknown",))[0] for r in rd) if s not in ("unknown", "none"))
             if v:
                 s, k = v.most_common(1)[0]
                 if k * 10 >= 7 * sum(v.values()):
                     return (f"DynInit_{dst[0]:x}", s, f"static initializer: writes {', '.join(f'{g:#x}' for g in dst)}, no code callers; readers {k}/{sum(v.values())} {s}")
+            if not rd and all(c.startswith("d0x6d") for c in F[x]["callers"]):   # only the CRT initializer table calls it
+                return (f"DynInit_{dst[0]:x}", "runtime", f"static initializer of a global no code reads ({', '.join(f'{g:#x}' for g in dst)}); "
+                        f"called only from the CRT init table {F[x]['callers'][0][1:]}; system by callers: the CRT, so runtime")
         return None
     if m == ["mov", "ret"] and re.fullmatch(r"(eax|al|ax), (dword|byte|word) ptr \[ecx( \+ 0x[0-9a-f]+)?\]", o[0]) and o[1] == "":
         s, how = callers_vote(x)
@@ -162,6 +210,21 @@ def classify(x, size):
         s, how = callers_vote(x)
         off = (re.findall(r"0x[0-9a-f]+", o[1]) or ["0x0"])[0]
         return (s or False) and (f"Set_{off[2:]}", s, f"[ecx+{off}] = arg; ret {o[2]}; system by {how}")
+    leaf = {"mov eax, ret": "Get", "add eax, ret": "AddrOf", "xor eax, ret": "Ret0", "fld ret": "GetF"}
+    if len(m) <= 3 and m[-1] == "ret" and not calls and m[0] in ("mov", "xor", "add", "fld", "movzx", "lea", "or") \
+            and not any("[0x" in b and a != "fld" and b.startswith(("dword ptr [0x", "byte ptr [0x")) for a, b in zip(m, o)):
+        s, how = callers_vote(x)
+        kind = "SetVtbl" if o[0].startswith("dword ptr [ecx], 0x") else "Leaf"
+        return (s or False) and (f"{kind}_{x:x}", s, f"{' ; '.join(f'{a} {b}' for a, b in zip(m, o))}; system by {how}")
+    if m == ["mov", "ret"] and re.fullmatch(r"dword ptr \[0x[0-9a-f]+\], 0x[0-9a-f]+", o[0]) and not code_callers(x):
+        g = int(o[0][11:].split("]")[0], 16)
+        v = Counter(s for s in map(solid, (canon.a(r) for r in G.get(g, {}).get("readers", []))) if s)
+        if v:
+            s, k = v.most_common(1)[0]
+            return (f"DynInit_{g:x}", s, f"static initializer: {o[0]}; readers {k}/{sum(v.values())}")
+        return False
+    if m == ["int3"] or not m:
+        return ("Pad_int3", "runtime", "int3 padding")
     if m == ["ret"]:
         s, how = callers_vote(x)
         return (s or False) and (f"Nop_ret{o[0]}", s, f"ret {o[0]}; system by {how}")

@@ -85,8 +85,11 @@ thunk, scalar deleting destructor, vtable-setting destructor, EH stub (`mov eax,
 EH unwind funclet, static initializer, getter/setter, bare ret. EH parents come from FuncInfo (magic 0x19930520)
 unwind maps and the stub's pusher; all 309 stub parents were checked in bytes (`push -1; push stub` or
 `mov eax,stub; call __EH_prolog`). The system comes from structure (target, parent, destructor, readers of the global);
-no solid system means no row. First run: 701 rows (651 V); 3,257 small functions had no shape (wrappers, more forms)
-and 504 had a shape but no solid system.
+no solid system means no row. Second pass adds: any function listed as an unwind action in a FuncInfo, import thunks
+(`jmp [IAT]`, system by DLL), static constructors and `push dtor; call _atexit 0x67100d`, initializers of globals no code
+reads (called only from the CRT table at 0x6d49xx; system runtime, I), every MSVC scalar-deleting-destructor form,
+<= 3-instruction leaves (system by callers, I), int3 padding. 2026-10-29: 1,742 rows (1,255 V); 1,975 small functions
+still have no shape and 745 have a shape but no solid system.
 
 tu_systems.py also writes low graph tags that the source-file vote confirms (878 on 2026-10-29); the scoreboard reads
 them as med. Holdout of the file vote on known functions: 2,513 of 2,851 agree (88 %).
