@@ -873,9 +873,13 @@ static uint32_t free_hud(Ctx *c) {
 
 // The jump and crash cameras (PATCH 0x426dd7, 0x4662e0, cave 0x5567e3: jmp [SCREEN_ADDR+0x94]) ask 0x42c4b0 (esi = camera ctrl) for the
 // JUMPVIEW spline, built from TrackPath route nodes with no collision after placement: in the city it sits inside buildings. In free
-// mode the answer is 0 (no spline: the chase camera, which sweeps the world collision, stays); RN_FREE=0 or a race: the original call.
+// mode the answer was 0 (the chase camera stays, no jump shot at all; the OWNER 2026-10-30: "there is no jump cam"). Now RN_JUMPCAM (page
+// ?jumpcam=, default 1) lets the original call run in free mode too, so 0x426930 -> 0x42da40(6) -> mover 0xf shows the jump shot as in a race
+// (docs/re/camera_jump.md); RN_JUMPCAM=0 keeps the old answer 0. RN_FREE=0 or a race: always the original call.
 static uint32_t free_jumpcam(Ctx *c) {
-    return live ? 0 : call_guest(c, 0x42c4b0, 0, NULL);
+    static int off = -1;
+    if (off < 0) { const char *e = getenv("RN_JUMPCAM"); off = e && e[0] == '0'; }
+    return live && off ? 0 : call_guest(c, 0x42c4b0, 0, NULL);
 }
 
 uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
