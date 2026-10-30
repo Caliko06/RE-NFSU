@@ -10,6 +10,7 @@ const RN_ORIGINAL = {
   cardetail: '0',     // host/sm1.c: no AO/grime terms
   carvol: '0',        // host/sm1.c: no volume / panel-edge terms on the diffuse
   carpack: '0',       // host/sm1.c, host/lights.c, web/gpu.js: no car look pack (paint gain, HD layer skins, held lamps)
+  rivalai: '0',       // host/rivals.c: rival personalities off, the shipped skill records
   speedfov: '0',      // web/tune.js, host/d3d9.c: the chase camera's FOV stays at the shipped 71.5 deg
   chasecam: '0',      // web/tune.js, host/d3d9.c: the chase camera keeps the car's shipped distance and height rows
   roadrefl: 'game',   // host/sm1.c: the road reflection as worldreflect.efx weights it

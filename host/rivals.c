@@ -336,12 +336,47 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
     return r1 > *r0 ? r1 - *r0 : *r0 - r1;
 }
 
-// 0x5809c0(id, 2, ride, record, skill, ?, index) with esi = the ride slot: stdcall, 7 arguments.
+// Personalities (RN_RIVALAI=0: as shipped; docs/openworld/re_rival_personality.md). The game picks each opponent's skill level by
+// difficulty (0x4b4590: easy 0..2, medium 3..5, hard 6..8), so each band gets a clumsy and an aggressive level and its strength stays.
+// Level 0 stays as shipped: an AI without a level reads record 0. The career keeps every shipped value.
+// Clumsy: accepts 35 % of Pass/Avoid targets (+0x0c, 0x4627ac), reads the route speed 6 % lower (+0x14, 0x44c72b) and twice as far off
+// its spot (+0x50, 0x44c667). Aggressive: route speed 4 % higher, and Block ceiling 400 (style 2, 0x44dbd0): it beats Avoid and Pass.
+enum { NORMAL, CLUMSY, AGGRESSIVE };
+static const uint8_t PERSONA[10] = {NORMAL, AGGRESSIVE, CLUMSY, AGGRESSIVE, NORMAL, CLUMSY, AGGRESSIVE, NORMAL, CLUMSY, AGGRESSIVE};
+static int rivalai(void) { const char *e = getenv("RN_RIVALAI"); return !(e && e[0] == '0'); }
+static int rival_style(uint32_t skill, uint32_t style) { return rivalai() && skill <= 9 && PERSONA[skill] == AGGRESSIVE ? 2 : (int)style; }
+
+// Records 0x779ff8 + 0x54 * level (0x462070 copies them from GLOBALB): shipped, then the personas of this race.
+static void rival_tables(Ctx *c, int personas) {
+    static uint8_t shipped[10 * 0x54];
+    static int saved;
+    if (!saved++) memcpy(shipped, G(0x779ff8), sizeof shipped);
+    memcpy(G(0x779ff8), shipped, sizeof shipped);
+    if (!personas) return;
+    char b[256];
+    int n = 0;
+    for (int lv = 1; lv <= 9; lv++) {
+        uint32_t r = 0x779ff8 + 0x54 * lv;
+        float accept = ldf(c, r + 0x0c), speed = ldf(c, r + 0x14);
+        if (PERSONA[lv] == CLUMSY) accept = 0.35f, speed *= 0.94f, c->mem[r + 0x50] *= 2;
+        if (PERSONA[lv] == AGGRESSIVE) speed *= 1.04f;
+        memcpy(G(r + 0x0c), &accept, 4), memcpy(G(r + 0x14), &speed, 4);
+        n += snprintf(b + n, sizeof b - n, " L%d %.2f %.3f %u", lv, ldf(c, r + 0x0c), ldf(c, r + 0x14), c->mem[r + 0x50]);
+    }
+    if (getenv("RN_RIVALLOG") || getenv("RN_FREELOG")) rn_log("rivalai accept speed look:%s", b);
+}
+
+// 0x5809c0(id, 2, ride, record, skill, style, index) with esi = the ride slot: stdcall, 7 arguments.
 static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
-    if (a[6] <= 1) rn_player_car(c);
-    if (rn_free_now) return free_rival(c, a);                    // host/free.c: free mode's career rivals
+    if (a[6] <= 1) rn_player_car(c), rival_tables(c, rivalai() && (rn_free_now || !c->mem[0x78a33c]));
+    if (rn_free_now) {                                           // host/free.c: free mode's career rivals
+        uint32_t e = free_rival(c, a);                           // 0x5809c0 returns the entrant; free_rival picks the level at +0x735
+        c->mem[e + 0x736] = (uint8_t)rival_style(c->mem[e + 0x735], c->mem[e + 0x736]);
+        if (getenv("RN_FREELOG")) rn_log("rivalai %s level %d style %d", G(e + 0x73c), (int8_t)c->mem[e + 0x735], (int8_t)c->mem[e + 0x736]);
+        return e;
+    }
     if (!on) { const char *e = getenv("RN_RIVALS"); on = e && e[0] == '0' ? -1 : 1; }
     if (on > 0 && !c->mem[0x78a33c]) {
         if (!ready) catalog(c);
@@ -382,6 +417,7 @@ static uint32_t rival_ride(Ctx *c) {
             }
         }
         guest_free(tmp);
+        a[5] = rival_style(a[4], a[5]);
     }
     return call_guest(c, 0x5809c0, 7, a);
 }
