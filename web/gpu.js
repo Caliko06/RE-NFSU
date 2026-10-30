@@ -357,8 +357,8 @@ fn fxaa(pos: vec4f) -> vec4f {
   // window (1920x871 css, dpr 2) Chrome stretched 2560x1160 to 3840x1742 with a bilinear filter: a soft image. The present
   // now draws it into a canvas at the window's device pixels through AMD FidelityFX CAS (MIT; its upscaling path: the four
   // nearest texels each sharpened by their contrast, then blended), so the 1.5x upscale keeps edges and text crisp.
-  // ?sharp=0..1 is CAS's sharpness (default 0.5); ?sharp=off = the old copy at the back buffer size.
-  const SHARP_Q = RN_Q.get('sharp'), SHARP = SHARP_Q === 'off' ? -1 : Number(SHARP_Q ?? 0.5);
+  // ?sharp=0..1 is CAS's sharpness (default 0.8, no visible ringing on facades or neon); ?sharp=off = the old copy at the back buffer size.
+  const SHARP_Q = RN_Q.get('sharp'), SHARP = SHARP_Q === 'off' ? -1 : Number(SHARP_Q ?? 0.8);
   const casMod = device.createShaderModule({ code: `
 struct U { scale: vec2f, peak: f32, pad: f32, inMax: vec2i };
 @group(0) @binding(0) var src: texture_2d<f32>;
