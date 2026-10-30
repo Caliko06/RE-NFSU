@@ -1,0 +1,11 @@
+# Question C: texture coverage of car packs (tpk.py + index.py logic, FNV64 of level 0 vs web/remaster/index_v2.tsv + index.tsv)
+- Kit parts have NO texture of their own. Every KIT/STYLE solid (bumper, skirt, spoiler, hood, roof, trunk, exhaust) points to the same body slot <CAR>_SKIN1 (hash in the solid texture table, 2308 of 4774 LOD-A refs) plus a few shared detail textures. Body and kit share one skin, so kit detail can only come from that skin.
+- <CAR>_SKIN1 of the 17 player cars is in NO pack (runtime composite: paint + doorline + vinyl + decals), so it has no hash and no HD entry. Only the traffic SKIN1 are packed: 128x128 DXT, all HD at 512x512. Runtime composite size: NOT VERIFIED.
+- The shared detail textures on kit surfaces are all HD (x4): CARBOTTOM 256x64 (skirts, bumpers, rear), GRILL_01/02 128x64, INTERCOOLER 128x128, CARBONFIBRE 128x128 (hoods, spoilers). Without HD: WINDOW*/WINDOW_TRAFFIC (P8, 16 refs) only.
+- Packed car textures (TEXTURES.BIN of each car + Cars/TEXTURES.BIN + WHEELS): 2173 non-vinyl, 1995 HD (1527 x4, 123 x2, 345 shared x4), 160 MISSING, 10 P8 not indexed, 8 DUMMY_ skipped by design.
+- The 160 MISSING are all headlight/brakelight pieces, tiny: 16x16 DXT1/A8R8G8B8, a few 32x16 (GOLF 32, RX7 27, PEUGOT 26, SENTRA 26, MIATA 24, INTEGRA 10, FOCUS 4, NEON 4, 350Z/CIVIC/SUPRA 2, 240SX 1). No bumper/skirt/spoiler/hood/roof texture is missing.
+- P8 (palette) not indexed: CIVIC DOORLINE x6 (512x512), CELICA and GOLF STYLE01/02_ENGINE (256x256). Doorline/engine other cars are HD (doorline 512x512 -> x2/x4).
+- VINYLS.BIN: 17522 textures, all P8 512x512 (874 per car), none in the HD index (index.py skips P8). They are composited into SKIN1, so they only matter through the skin.
+- Resolution: SKIN1 128x128 (traffic) and 512x512 vinyl/doorline masks vs 128x64..256x64 detail maps; the body skin is the lowest-res piece per surface, kit has no more detail than body.
+- Conclusion: more kit/body texture detail needs work on the composited SKIN1 (hook its render target, or upscale layers: doorline, vinyl, decals), not a missing kit-part TPK entry.
+- Files: build/carao/texcover.tsv (every texture, status, game and HD size), texcover_bycar.tsv (counts), kit_textures.tsv (per LOD-A solid: texture refs, source, status).
