@@ -30,6 +30,6 @@ Out of this scope: AO bake into COLOR0 (paused: it darkens), Open World work (nf
 ## Effort and roles
 50 % reverse engineering (name the address before a change), 10 % orchestration, 40 % implementation.
 nfsu-w2 (this window) orchestrates: max 3 subagents (1 Sonnet or Opus + 2 Haiku only when worth it), reconciles, checks the scope.
-nfsu-c4 (Opus 5.5): implements in host/sm1.c, web/mode.js, web/index.html; may run 1 or 2 subagents. Only one Chrome run at a time,
+nfsu-c4 (Opus 5.5): implements in host/sm1.c, web/mode.js, web/index.html (+ web/gpu.js for step 3 only, behind ?carpack); may run 1 or 2 subagents. Only one Chrome run at a time,
 <= 4 min, load < 6. No ceremonial tests: a test must be able to fail on a real break. If two attempts at a step fail: evidence to
 HANDOFF.md and the next step, no third attempt. Overnight: decide the simple option and log it in HANDOFF.md; do not wait for the OWNER.
