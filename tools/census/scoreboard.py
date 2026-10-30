@@ -69,7 +69,13 @@ if os.path.exists("census/systems_override.tsv"):
 if os.path.exists("census/canon/systems_tu.tsv"):
     for r in csv.DictReader(open("census/canon/systems_tu.tsv"), delimiter="\t"):
         x = a(r["addr"])
-        if system.get(x, "unknown") == "unknown":
+        if system.get(x, "unknown") == "unknown" or (system[x] == r["system"] and conf.get(x) == "low"):   # or a low tag it confirms
+            system[x], conf[x] = r["system"], "med"
+# library regions with no GC source file, closed over the call graph (tools/canon/libs.py): inferred, so med
+if os.path.exists("census/canon/systems_lib.tsv"):
+    for r in csv.DictReader(open("census/canon/systems_lib.tsv"), delimiter="\t"):
+        x = a(r["addr"])
+        if conf.get(x) not in ("med", "high"):
             system[x], conf[x] = r["system"], "med"
 
 # a name with a system (V or I) wins over the graph tag

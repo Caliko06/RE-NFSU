@@ -93,3 +93,12 @@ still have no shape and 745 have a shape but no solid system.
 
 tu_systems.py also writes low graph tags that the source-file vote confirms (878 on 2026-10-29); the scoreboard reads
 them as med. Holdout of the file vote on known functions: 2,513 of 2,851 agree (88 %).
+
+## Code with no GameCube file (tools/canon/libs.py, 2026-10-29)
+Four regions have no GC source file: PC d3d9 renderer 0x5a0000-0x640000, EA sound library 0x640000-0x662800,
+DirtySock/ProtoSSL 0x662800-0x670800 (online), MSVC CRT 0x670800-0x684000. Region membership alone is not a system
+(each region mixes runtime with its own system), so an untagged function takes the system of its call-graph neighbours
+inside the same region (>= 70 % and >= 2, or all of them), repeated; DirtySock seeds are functions that reference its
+strings or call WS2_32/TAPI32 imports. One-step leave-one-out on known functions: 394/415 (95 %). Output
+census/canon/systems_lib.tsv (1,538 rows, read by the scoreboard as med) and census/names_lib.tsv (153 Ghidra FID
+names in the CRT region, I). 749 region functions stay untagged (most have no code callers: vtable or callback entries).
