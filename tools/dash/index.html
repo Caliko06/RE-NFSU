@@ -34,7 +34,7 @@ const W=[
  {id:"ses",s:"Sesiones",t:"SESIONES DE CLAUDE",f:"Cada fila es una ventana de Claude. 'subs' = subagentes que le ayudan; el punto verde = escribió en los últimos 5 min. El texto es su último mensaje."},
  {id:"ow",s:"Open World",t:"OPEN WORLD · MANEJO 1001 vs WORLD",f:"RN_BODYLOG: mismo auto en el tour (1001) y en la ciudad (1010). z_jitter = cuánto rebota la altura por cuadro (menor = más suave). Si WORLD ≈ 1001, el manejo es igual."},
  {id:"shots",s:"A/B",t:"CAPTURAS A/B",f:"Clic en una miniatura = A (verde), segundo clic = B (naranja). El deslizador revela B sobre A en la misma posición."},
- {id:"re",s:"Llamadas RE",t:"LLAMADAS RE",f:"Herramientas de ingeniería inversa que usaron las sesiones: REA (MCP), Hopper (hpar.sh), Ghidra. Se lee de los transcripts, no mide el resultado."},
+ {id:"re",s:"Llamadas RE",t:"LLAMADAS RE",f:"Herramientas de ingeniería inversa que usaron las sesiones: REA (MCP), Hopper (hpar.sh), Ghidra. Se lee de los transcripts, no mide el resultado. Es una heurística: busca hpar.sh, Ghidra, difftest, mkq y las llamadas mcp__rea__."},
  {id:"git",s:"Commits",t:"COMMITS Y ESTADO",f:null}
 ];
 let last={},S=null,sel=new Set(W.map(w=>w.id)),A=null,B=null,wipe=50;

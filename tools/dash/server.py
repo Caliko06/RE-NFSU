@@ -2,7 +2,7 @@
 """Progress dashboard for the NFSU Open World + cars block. Read-only, 127.0.0.1 only.
 usage: python3 tools/dash/server.py [port]   (default 8780)
 Windows: sessions (Claude transcripts), openworld (handling A/B + traffic lines), shots (A/B captures), re (REA/Hopper/Ghidra calls), git."""
-import glob, hashlib, json, math, os, subprocess, sys, threading, time
+import glob, hashlib, json, math, os, re, subprocess, sys, threading, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
@@ -12,6 +12,7 @@ PROJ = os.path.expanduser("~/.claude/projects/-Users-angeldamian-RE-NFSU")
 SESS = glob.glob(os.path.expanduser("~/.claude-profiles/*/sessions/*.json"))
 CACHE = f"{ROOT}/build/dash_cache"
 WINDOW = 12 * 3600
+READ_ONLY = {"grep", "ls", "du", "head", "tail", "sed", "cat", "ps", "wc", "rg", "echo", "cd", "find", "git"}
 RE_CMDS = ("hpar.sh", "ghidra", "DecompAt", "XrefsAt", "ExportRange", "mkq.py", "difftest.py", "export.sh")
 
 _files, _lock = {}, threading.Lock()   # path -> incremental parse state
@@ -52,10 +53,21 @@ def parse_file(path):
                 arg = inp.get("command") or inp.get("description") or inp.get("file_path") or json.dumps(inp)
                 st["last_tool"], st["last_ts"] = f'{b["name"]}  {short(arg, 110)}', ts
                 cmd = inp.get("command", "").split("\n")[0] if b["name"] == "Bash" else ""   # first line: a heredoc that only mentions a tool is not a call
-                if b["name"].startswith("mcp__rea__") or any(k in cmd for k in RE_CMDS):
+                if b["name"].startswith("mcp__rea__") or runs_re(cmd):
                     st["re"].append({"ts": ts, "tool": b["name"], "arg": short(arg, 150)})
                     del st["re"][:-300]
     return st
+
+
+def runs_re(cmd):
+    """True when a shell segment of the command runs an RE tool (not a grep/ls/sed that only mentions its name)."""
+    cmd = re.sub(r"'[^']*'|\"[^\"]*\"", "''", cmd)
+    for seg in re.split(r"&&|\|\||[;|]", cmd):
+        w = seg.split()
+        w = [x for x in w if "=" not in x or x.startswith("-")]      # drop VAR=value prefixes
+        if w and w[0] not in READ_ONLY and any(k in seg for k in RE_CMDS):
+            return True
+    return False
 
 
 def names():
