@@ -1,71 +1,140 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NFSU · progreso</title>
+<title>fsociety · NFSU</title>
 <style>
-:root{--bg:#0b0c0d;--pn:#121416;--ln:#23272b;--tx:#d9d6cf;--dim:#7d8389;--ok:#5fcf80;--wa:#e0b34a;--ac:#e8e4d8;--mono:ui-monospace,"IBM Plex Mono",Menlo,monospace}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:12px/1.45 var(--mono)}
-header{position:sticky;top:0;z-index:5;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:#0b0c0dee;border-bottom:1px solid var(--ln)}
-header b{letter-spacing:.14em;margin-right:8px}
-button{font:inherit;color:var(--dim);background:none;border:1px solid var(--ln);padding:3px 9px;cursor:pointer}
-button.on{color:var(--bg);background:var(--ac);border-color:var(--ac)}
-#stamp{margin-left:auto;color:var(--dim)}
-main{display:grid;gap:10px;padding:10px 12px;grid-template-columns:repeat(auto-fit,minmax(min(520px,100%),1fr))}
-main.one{grid-template-columns:1fr}
-section{background:var(--pn);border:1px solid var(--ln);min-width:0}
-section.hide{display:none}
-h2{margin:0;padding:6px 10px;font-size:11px;letter-spacing:.16em;border-bottom:1px solid var(--ln);color:var(--ac);display:flex;justify-content:space-between}
-.body{padding:8px 10px;max-height:62vh;overflow:auto}main.one .body{max-height:none}
-.foot{padding:5px 10px;border-top:1px solid var(--ln);color:var(--dim);font-size:11px}
-table{border-collapse:collapse;width:100%}td,th{padding:3px 6px;text-align:left;border-bottom:1px solid var(--ln);vertical-align:top}th{color:var(--dim);font-weight:400}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--dim);margin-right:6px}.live .dot{background:var(--ok)}
-.sess{padding:6px 0;border-bottom:1px solid var(--ln)}.sess .t{color:var(--dim)}.nm{color:var(--ac);font-weight:700}
-.k{display:inline-block;padding:0 6px;border:1px solid var(--ln);margin-right:4px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
-.grid img{width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--ln);cursor:pointer}.grid img.a{outline:2px solid var(--ok)}.grid img.b{outline:2px solid var(--wa)}
-.cmp{position:relative;margin-bottom:8px;user-select:none}.cmp img{width:100%;display:block}
-.cmp .top{position:absolute;inset:0;overflow:hidden}.cmp .top img{width:var(--w);max-width:none}
-.cmp input{width:100%}
-.mut{color:var(--dim)}
+:root{--bg:#030403;--pn:#070907;--ln:#1b211d;--tx:#cfd3cc;--dim:#6b736d;--g:#3dff86;--r:#ff2b3a;--c:#35e6ff;--mono:ui-monospace,"SF Mono","IBM Plex Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}html{background:var(--bg)}
+body{margin:0;color:var(--tx);font:12px/1.5 var(--mono);min-height:100vh;overflow-x:hidden;background:radial-gradient(1200px 700px at 50% -10%,#0b130d 0,transparent 70%),var(--bg)}
+/* CRT */
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,#0000 0 2px,#0000000d 2px 3px);mix-blend-mode:multiply}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:51;background:radial-gradient(ellipse at center,#0000 55%,#000000b0 100%);animation:flick 6s infinite}
+@keyframes flick{0%,100%{opacity:1}47%{opacity:.96}48%{opacity:.88}49%{opacity:1}}
+#addr{position:fixed;inset:0;z-index:0;overflow:hidden;color:#1a3a25;opacity:.55;font-size:11px;line-height:1.2;white-space:pre;padding:56px 10px;pointer-events:none;mask-image:linear-gradient(90deg,#000,#0000 38%,#0000 62%,#000)}
+header{position:sticky;top:0;z-index:20;background:#030403ee;border-bottom:1px solid var(--ln);backdrop-filter:blur(4px)}
+.top{display:flex;align-items:center;gap:14px;padding:10px 16px}
+.logo{font-weight:800;letter-spacing:.3em;font-size:14px;color:#fff;position:relative}
+.logo i{color:var(--r);font-style:normal}
+.glitch{position:relative;display:inline-block}
+.glitch:before,.glitch:after{content:attr(data-t);position:absolute;inset:0;overflow:hidden}
+.glitch:before{color:var(--r);transform:translateX(-1.5px);animation:gl 3.2s infinite steps(1);clip-path:inset(0 0 60% 0)}
+.glitch:after{color:var(--c);transform:translateX(1.5px);animation:gl 2.7s infinite steps(1) reverse;clip-path:inset(55% 0 0 0)}
+@keyframes gl{0%,92%{opacity:0}93%{opacity:.9;clip-path:inset(10% 0 70% 0)}95%{opacity:.9;clip-path:inset(60% 0 10% 0)}97%{opacity:0}}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav button{font:inherit;color:var(--dim);background:none;border:1px solid var(--ln);padding:4px 10px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;font-size:11px}
+.nav button:hover{color:#fff;border-color:#3b463f}
+.nav button.on{color:#000;background:var(--g);border-color:var(--g);box-shadow:0 0 14px #3dff8666}
+.nav button kbd{opacity:.5;margin-right:5px;font:inherit}
+.clock{margin-left:auto;color:var(--dim);text-align:right;font-size:11px}.clock b{color:var(--g);font-weight:400}
+.tick{border-top:1px solid var(--ln);overflow:hidden;white-space:nowrap;color:var(--dim);font-size:11px;padding:3px 0}
+.tick div{display:inline-block;padding-left:100%;animation:mq 90s linear infinite}.tick b{color:var(--g);font-weight:400}.tick em{color:var(--r);font-style:normal}
+@keyframes mq{to{transform:translateX(-100%)}}
+main{position:relative;z-index:2;display:grid;grid-template-columns:repeat(12,1fr);gap:12px;padding:14px 16px 60px}
+.w{grid-column:span 6;background:#070907e6;border:1px solid var(--ln);min-width:0;position:relative;box-shadow:0 0 0 1px #000,0 10px 40px #000a}
+.w.s12{grid-column:span 12}.w.s8{grid-column:span 8}.w.s4{grid-column:span 4}
+.w.hide{display:none}
+main.solo .w{grid-column:span 12}
+.w:before{content:"";position:absolute;left:-1px;top:-1px;width:14px;height:14px;border-left:2px solid var(--g);border-top:2px solid var(--g)}
+.w:after{content:"";position:absolute;right:-1px;bottom:-1px;width:14px;height:14px;border-right:2px solid var(--g);border-bottom:2px solid var(--g)}
+.tb{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--ln);background:linear-gradient(#0c110d,#070907);user-select:none}
+.tb .dots{display:flex;gap:5px}.tb .dots span{width:9px;height:9px;border-radius:50%;background:#2a302c;cursor:pointer}.tb .dots span:hover{background:var(--r)}.tb .dots span:nth-child(2):hover{background:var(--g)}
+.tb .ti{letter-spacing:.2em;text-transform:uppercase;color:#fff;font-size:11px}.tb .ti:before{content:"root@nfsu:~# ";color:var(--g);letter-spacing:0;text-transform:none}
+.tb .st{margin-left:auto;color:var(--dim);font-size:11px}
+.bd{padding:10px 12px;max-height:58vh;overflow:auto;scrollbar-width:thin;scrollbar-color:#27402f #000}
+main.solo .bd{max-height:none}
+.ft{padding:5px 12px;border-top:1px dashed var(--ln);color:var(--dim);font-size:11px}.ft:before{content:"// ";color:var(--g)}
+.mut{color:var(--dim)}.g{color:var(--g)}.r{color:var(--r)}.c{color:var(--c)}.hi{color:#fff}
+.ps{padding:7px 0;border-bottom:1px solid #12170f}.ps:last-child{border:0}
+.ps .h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.ps.old{opacity:.42}.ps.old:hover{opacity:1}
+.led{width:7px;height:7px;border-radius:50%;background:#333;display:inline-block}.live .led{background:var(--g);box-shadow:0 0 8px var(--g);animation:pl 1.4s infinite}
+@keyframes pl{50%{opacity:.35}}
+.ps .nm{color:#fff;font-weight:700;letter-spacing:.12em}.ps .q{color:var(--dim);margin-left:15px}
+.ps .say{margin-left:15px;color:#aeb5ad}.ps .cmd{margin-left:15px;color:var(--c)}.ps .cmd:before{content:"$ ";color:var(--g)}
+.chip{border:1px solid var(--ln);padding:0 6px;color:var(--dim)}
+.row{display:grid;grid-template-columns:64px 1fr 90px;gap:8px;align-items:center;margin:3px 0}
+.bar{height:10px;background:#0d130f;position:relative;border:1px solid #16201a}.bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#1d6e3c,var(--g));box-shadow:0 0 10px #3dff8655}
+.bar.o i{background:linear-gradient(90deg,#8a2330,var(--r));box-shadow:0 0 10px #ff2b3a55}
+.grp{margin:10px 0 2px;color:#fff;letter-spacing:.18em;font-size:11px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:10px}
+.kpi div{border:1px solid var(--ln);padding:6px 8px}.kpi b{display:block;font-size:20px;color:#fff;font-weight:700;text-shadow:0 0 12px #3dff8655}.kpi span{color:var(--dim);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:5px}
+.grid img{width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--ln);cursor:crosshair;filter:grayscale(.6) contrast(1.1);transition:.15s}
+.grid img:hover{filter:none;border-color:#fff}.grid img.a{outline:2px solid var(--g);filter:none}.grid img.b{outline:2px solid var(--r);filter:none}
+.cmp{position:relative;margin-bottom:8px;user-select:none;border:1px solid var(--ln)}.cmp>img{width:100%;display:block}
+.cmp .top{position:absolute;inset:0 auto 0 0;overflow:hidden;border-right:2px solid var(--g);box-shadow:6px 0 20px #3dff8644}.cmp .top img{height:100%;max-width:none;display:block}
+.cmp .tag{position:absolute;top:6px;padding:1px 6px;background:#000c;font-size:10px;letter-spacing:.2em}.cmp .tag.l{left:6px;color:var(--r)}.cmp .tag.rr{right:6px;color:var(--g)}
+input[type=range]{width:100%;accent-color:var(--g);margin:6px 0}
+table{border-collapse:collapse;width:100%}td,th{padding:2px 8px 2px 0;text-align:left;vertical-align:top;border-bottom:1px solid #0f150f}th{color:var(--dim);font-weight:400}
+.k{display:inline-block;padding:0 7px;border:1px solid var(--ln);margin:0 5px 6px 0}.k b{color:var(--g)}
+.gl .hs{color:var(--r)}
+pre.md{white-space:pre-wrap;margin:0;color:#aeb5ad}
+#boot{position:fixed;inset:0;z-index:100;background:#000;color:var(--g);padding:8vh 8vw;font-size:14px;white-space:pre-wrap;cursor:pointer}
+#boot .big{color:#fff;font-size:34px;letter-spacing:.4em;font-weight:800;margin:20px 0}
+.cur{display:inline-block;width:8px;height:14px;background:var(--g);vertical-align:-2px;animation:bk 1s steps(1) infinite}@keyframes bk{50%{opacity:0}}
+@media(max-width:900px){.w,.w.s8,.w.s4{grid-column:span 12}.clock{display:none}}
+@media(prefers-reduced-motion:reduce){*,:before,:after{animation:none!important}}
 </style></head><body>
-<header><b>NFSU · PROGRESO</b><span id="tg"></span><button id="all" class="on">Todas</button><span id="stamp"></span></header>
+<div id="addr"></div>
+<div id="boot"></div>
+<header>
+ <div class="top"><div class="logo"><span class="glitch" data-t="fsociety">fsociety</span><i>.</i></div><nav class="nav" id="nav"></nav>
+  <div class="clock"><b id="clk">--:--:--</b><br><span id="stamp">sync…</span></div></div>
+ <div class="tick"><div id="tick"></div></div>
+</header>
 <main id="m"></main>
 <script>
 const W=[
- {id:"ses",s:"Sesiones",t:"SESIONES DE CLAUDE",f:"Cada fila es una ventana de Claude. 'subs' = subagentes que le ayudan; el punto verde = escribió en los últimos 5 min. El texto es su último mensaje."},
- {id:"ow",s:"Open World",t:"OPEN WORLD · MANEJO 1001 vs WORLD",f:"RN_BODYLOG: mismo auto en el tour (1001) y en la ciudad (1010). z_jitter = cuánto rebota la altura por cuadro (menor = más suave). Si WORLD ≈ 1001, el manejo es igual."},
- {id:"shots",s:"A/B",t:"CAPTURAS A/B",f:"Clic en una miniatura = A (verde), segundo clic = B (naranja). El deslizador revela B sobre A en la misma posición."},
- {id:"re",s:"Llamadas RE",t:"LLAMADAS RE",f:"Herramientas de ingeniería inversa que usaron las sesiones: REA (MCP), Hopper (hpar.sh), Ghidra. Se lee de los transcripts, no mide el resultado. Es una heurística: busca hpar.sh, Ghidra, difftest, mkq y las llamadas mcp__rea__."},
- {id:"git",s:"Commits",t:"COMMITS Y ESTADO",f:null}
+ {id:"ses",k:"1",s:"Procesos",t:"Sesiones de Claude",c:"s8",f:"Cada fila es una ventana de Claude (nfsu-w2 y nfsu-c4 son las dos en curso). 'subs' = subagentes trabajando para ella; el LED verde = escribió en los últimos 5 min."},
+ {id:"mis",k:"2",s:"Misión",t:"Handoff · misión",c:"s4",f:"Lo que hay en HANDOFF.md ahora mismo: las decisiones del bloque y lo que falta. Si cambia el archivo, cambia aquí."},
+ {id:"ow",k:"3",s:"Open World",t:"Manejo 1001 vs WORLD",c:"s6",f:"RN_BODYLOG: el mismo auto en el tour (1001) y en la ciudad (1010). z_jitter = cuánto rebota la altura por cuadro; barras similares entre 1001 y 1010 = el manejo ya es igual."},
+ {id:"shots",k:"4",s:"A/B",t:"Capturas A/B",c:"s6",f:"Clic en una miniatura = A, otro clic = B. El deslizador revela B (izquierda, rojo) sobre A (derecha, verde) en el mismo pixel."},
+ {id:"re",k:"5",s:"RE",t:"Llamadas de reverse engineering",c:"s8",f:"REA (MCP), Hopper (hpar.sh), Ghidra y difftest que lanzaron las sesiones, leído de sus transcripts; es heurístico y no mide el resultado. Los 0x… del fondo salen de aquí."},
+ {id:"git",k:"6",s:"Git",t:"Commits",c:"s4",f:null}
 ];
 let last={},S=null,sel=new Set(W.map(w=>w.id)),A=null,B=null,wipe=50;
-const $=(s,r=document)=>r.querySelector(s),ago=s=>s<90?s+"s":s<5400?Math.round(s/60)+"m":Math.round(s/3600)+"h";
+const $=(q,r=document)=>r.querySelector(q),ago=s=>s<90?s+"s":s<5400?Math.round(s/60)+"m":Math.round(s/3600)+"h";
 const esc=s=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const view={
- ses:s=>s.sessions.map(r=>`<div class="sess ${r.age<300||r.subs_live?"live":""}"><span class="dot"></span><span class="nm">${esc(r.name||r.id)}</span> <span class="mut">${r.id} · hace ${ago(r.age)} · ${r.tools} tools · ${r.subs} subs${r.subs_live?" (activos)":""}</span><div class="t">${esc(r.title)}</div><div>${esc(r.text)}</div><div class="mut">▸ ${esc(r.tool)}</div></div>`).join("")||"<span class=mut>sin sesiones en 12 h</span>",
- ow:s=>`<table><tr><th>corrida</th><th>cuadros</th><th>distancia</th><th>z_jitter p50</th><th>p95</th><th>hace</th></tr>${s.handling.map(r=>`<tr><td>${r.run}</td><td>${r.frames}</td><td>${r.dist}</td><td>${r.z_jitter_p50}</td><td>${r.z_jitter_p95}</td><td>${ago(s.now-r.mtime)}</td></tr>`).join("")}</table>
-  <p class="mut">webcheck: ${s.webcheck.map(w=>esc(w.tail)+` (hace ${ago(w.age)})`).join("")||"—"}</p>${s.logs.map(l=>`<div class="mut">${esc(l.file)} · hace ${ago(l.age)}</div>`).join("")}`,
- shots:s=>{const sh=s.shots,h=n=>`/thumb?w=${n}&p=`;
-  const cmp=A&&B?`<div class="cmp" id="cmp"><img src="${h(1100)+encodeURIComponent(A)}"><div class="top" style="width:${wipe}%"><img style="--w:${100/wipe*100}%" src="${h(1100)+encodeURIComponent(B)}"></div></div><input type="range" min="0" max="100" value="${wipe}" oninput="setWipe(this.value)"><div class="mut">A ${esc(A)}<br>B ${esc(B)}</div>`:"<div class=mut>elige A y B</div>";
-  return cmp+`<div class="grid">${sh.map(x=>`<img loading="lazy" title="${esc(x.p)} · hace ${ago(x.age)}" class="${x.p==A?"a":x.p==B?"b":""}" data-p="${esc(x.p)}" src="${h(260)+encodeURIComponent(x.p)}">`).join("")}</div>`},
- re:s=>`<div>${Object.entries(s.re.counts).map(([k,v])=>`<span class="k">${k} ${v}</span>`).join("")}</div><table>${s.re.rows.map(r=>`<tr><td class="mut">${(r.ts||"").slice(11,19)}</td><td>${r.kind}</td><td>${esc(r.arg)}</td></tr>`).join("")}</table>`,
- git:s=>`<div class="mut">${s.git.dirty} archivos sucios (de todas las sesiones)</div><table>${s.git.commits.map(c=>`<tr><td>${c.h}</td><td class="mut">${esc(c.t)}</td><td>${esc(c.s)}</td></tr>`).join("")}</table>`
+ ses:s=>s.sessions.map((r,i,a)=>`<div class="ps ${r.age<300||r.subs_live?"live":""} ${r.age>3600&&!r.subs_live?"old":""}"><div class="h"><span class="mut">${i==a.length-1?"└─":"├─"}</span><span class="led"></span><span class="nm">${esc(r.name||r.id)}</span><span class="mut">[${r.id}]</span><span class="chip">${r.tools} tools</span><span class="chip">${r.subs} subs${r.subs_live?" ▲":""}</span><span class="mut">hace ${ago(r.age)}</span></div><div class="q">${esc(r.title)}</div>${r.text?`<div class="say">${esc(r.text)}</div>`:""}${r.tool?`<div class="cmd">${esc(r.tool)}</div>`:""}</div>`).join("")||"<span class=mut>sin procesos</span>",
+ mis:s=>`<pre class="md">${esc(s.handoff).replace(/^(#.*)$/gm,'<b class="g">$1</b>').replace(/(0x[0-9a-fA-F]+)/g,'<span class="c">$1</span>')}</pre>`,
+ ow:s=>{const R=s.handling;if(!R.length)return"<span class=mut>sin corridas</span>";
+  const mx=k=>Math.max(...R.map(r=>r[k]))||1;const bars=(k,l)=>`<div class="grp">${l}</div>`+R.map(r=>`<div class="row"><span class="${r.run.startsWith("1010")?"r":"g"}">${r.run}</span><div class="bar ${r.run.startsWith("1010")?"o":""}"><i style="width:${(r[k]/mx(k)*100).toFixed(1)}%"></i></div><span class="mut">${r[k]}</span></div>`).join("");
+  const tot=R.reduce((a,r)=>a+r.frames,0);
+  return`<div class="kpi"><div><b>${R.length}</b><span>corridas</span></div><div><b>${tot}</b><span>cuadros</span></div><div><b>${ago(s.now-Math.max(...R.map(r=>r.mtime)))}</b><span>última</span></div></div>`+bars("z_jitter_p50","z_jitter p50")+bars("z_jitter_p95","z_jitter p95")+bars("dist","distancia")+`<div class="grp">webcheck</div><div class="mut">${s.webcheck.map(w=>esc(w.tail)).join("")||"—"}</div>`},
+ shots:s=>{const h=n=>`/thumb?w=${n}&p=`;
+  const cmp=A&&B?`<div class="cmp" id="cmp"><img src="${h(1200)+encodeURIComponent(A)}"><div class="top" style="width:${wipe}%"><img style="width:${100/wipe*100}%" src="${h(1200)+encodeURIComponent(B)}"></div><span class="tag l">B</span><span class="tag rr">A</span></div><input type="range" min="0" max="100" value="${wipe}" oninput="setWipe(this.value)"><div class="mut">A ${esc(A)}<br>B ${esc(B)}</div>`:'<div class="mut">// elige A y B (dos clics)</div>';
+  return cmp+`<div class="grid">${s.shots.map(x=>`<img loading="lazy" title="${esc(x.p)} · hace ${ago(x.age)}" class="${x.p==A?"a":x.p==B?"b":""}" data-p="${esc(x.p)}" src="${h(260)+encodeURIComponent(x.p)}">`).join("")}</div>`},
+ re:s=>`<div>${Object.entries(s.re.counts).map(([k,v])=>`<span class="k">${k} <b>${v}</b></span>`).join("")||'<span class="mut">sin llamadas en 12 h</span>'}</div><table>${s.re.rows.map(r=>`<tr><td class="mut">${(r.ts||"").slice(11,19)}</td><td class="${r.kind=="REA"?"g":"c"}">${r.kind}</td><td>${esc(r.arg).replace(/(0x[0-9a-fA-F]{5,6})/g,'<span class="r">$1</span>')}</td></tr>`).join("")}</table>`,
+ git:s=>`<div class="mut">${s.git.dirty} archivos sucios · todas las sesiones</div><table class="gl">${s.git.commits.map(c=>`<tr><td class="hs">${c.h}</td><td class="mut">${esc(c.t)}</td></tr><tr><td></td><td>${esc(c.s)}</td></tr>`).join("")}</table>`
 };
 function build(){
- $("#tg").innerHTML=W.map(w=>`<button data-w="${w.id}" class="${sel.has(w.id)?"on":""}">${w.s}</button>`).join("");
- $("#m").innerHTML=W.map(w=>`<section id="w_${w.id}"><h2>${w.t}<span class="mut" id="n_${w.id}"></span></h2><div class="body"></div>${w.f?`<div class="foot">${w.f}</div>`:""}</section>`).join("");
- draw()}
+ $("#nav").innerHTML=W.map(w=>`<button data-w="${w.id}"><kbd>${w.k}</kbd>${w.s}</button>`).join("")+`<button data-all="1"><kbd>0</kbd>Todas</button>`;
+ $("#m").innerHTML=W.map(w=>`<section class="w ${w.c}" id="w_${w.id}"><div class="tb"><div class="dots"><span title="ocultar" data-hide="${w.id}"></span><span title="solo esta" data-w="${w.id}"></span></div><span class="ti">${w.t}</span></div><div class="bd"></div>${w.f?`<div class="ft">${w.f}</div>`:""}</section>`).join("");draw()}
 function draw(){
- if(!S)return;const one=sel.size===1;$("#m").className=one?"one":"";$("#all").className=sel.size===W.length?"on":"";
- W.forEach(w=>{const sec=$("#w_"+w.id);sec.className=sel.has(w.id)?"":"hide";if(!sel.has(w.id))return;
-  const b=$(".body",sec),y=b.scrollTop,h=view[w.id](S);if(last[w.id]!==h){last[w.id]=h;b.innerHTML=h;b.scrollTop=y}});
- $("#stamp").textContent="actualizado "+new Date(S.now*1000).toLocaleTimeString()}
+ const all=sel.size===W.length;$("#m").className=sel.size===1?"solo":"";
+ $("#nav").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.all?all:sel.has(b.dataset.w)&&!all));
+ if(!S)return;
+ W.forEach(w=>{const sec=$("#w_"+w.id);sec.classList.toggle("hide",!sel.has(w.id));if(!sel.has(w.id))return;
+  const b=$(".bd",sec),y=b.scrollTop,h=view[w.id](S);if(last[w.id]!==h){last[w.id]=h;b.innerHTML=h;b.scrollTop=y}});
+ $("#stamp").textContent="sync "+new Date(S.now*1000).toLocaleTimeString();
+ const live=S.sessions.filter(r=>r.age<300||r.subs_live).length;
+ $("#tick").innerHTML=`<b>${live}</b> procesos vivos &nbsp;//&nbsp; <b>${S.git.dirty}</b> archivos sucios &nbsp;//&nbsp; último commit <b>${esc(S.git.commits[0]?.s||"")}</b> &nbsp;//&nbsp; <em>hello, friend.</em> &nbsp;//&nbsp; ${Object.entries(S.re.counts).map(([k,v])=>`${k} <b>${v}</b>`).join(" · ")} &nbsp;//&nbsp; `.repeat(3);
+ const ad=[...JSON.stringify(S.re.rows).matchAll(/0x[0-9a-f]{5,6}/gi)].map(m=>m[0]);const A_=ad.length?ad:["0x442dd0","0x442b70","0x599c80"];let t="";
+ for(let i=0;i<46;i++){t+=Array.from({length:7},(_,j)=>A_[(i*7+j*3)%A_.length]+" "+((i*2654435761+j*40503)>>>0).toString(16).padStart(8,"0")).join("   ")+"\n"}
+ $("#addr").textContent=t}
+function setWipe(v){wipe=+v;const t=$("#cmp .top");if(t){t.style.width=wipe+"%";t.firstChild.style.width=100/wipe*100+"%"}}
+function pick(id,add){if(add){sel.has(id)?sel.delete(id):sel.add(id);if(!sel.size)sel=new Set(W.map(x=>x.id))}else sel=new Set([id]);draw()}
 document.addEventListener("click",e=>{
- const w=e.target.closest("[data-w]");if(w){const id=w.dataset.w;
-  if(e.shiftKey){sel.has(id)?sel.delete(id):sel.add(id);if(!sel.size)sel=new Set(W.map(x=>x.id))}else sel=new Set([id]);
-  $("#tg").querySelectorAll("button").forEach(b=>b.className=sel.has(b.dataset.w)?"on":"");return draw()}
- if(e.target.id==="all"){sel=new Set(W.map(x=>x.id));$("#tg").querySelectorAll("button").forEach(b=>b.className="");return draw()}
+ const hd=e.target.closest("[data-hide]");if(hd){sel.delete(hd.dataset.hide);if(!sel.size)sel=new Set(W.map(x=>x.id));return draw()}
+ const w=e.target.closest("[data-w]");if(w)return pick(w.dataset.w,e.shiftKey);
+ if(e.target.closest("[data-all]")){sel=new Set(W.map(x=>x.id));return draw()}
  const im=e.target.closest(".grid img");if(im){const p=im.dataset.p;if(!A||(A&&B))A=p,B=null;else B=p;last.shots="";draw()}});
-function setWipe(v){wipe=+v;const t=$("#cmp .top");if(t){t.style.width=wipe+"%";t.firstChild.style.setProperty("--w",100/wipe*100+"%")}}
-async function tick(){try{S=await (await fetch("/api/state")).json();draw()}catch(e){$("#stamp").textContent="sin conexión"}}
+document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT")return;if(e.key==="0")sel=new Set(W.map(x=>x.id));const w=W.find(x=>x.k===e.key);if(w)sel=new Set([w.id]);draw()});
+setInterval(()=>$("#clk").textContent=new Date().toLocaleTimeString("es-MX",{hour12:false}),1000);
+async function tick(){try{S=await(await fetch("/api/state")).json();draw()}catch(e){$("#stamp").textContent="sin enlace"}}
+(function(){const b=$("#boot");if(sessionStorage.getItem("booted")){b.remove();return}
+ const L=["> iniciando enlace con Speed.exe …","> montando /build, /docs, /tools … ok","> leyendo transcripts (solo lectura) … ok","> 0x442dd0  0x442b70  0x599c80  cargados en el mapa","","> acceso concedido"];let i=0,done=false;
+ const end=()=>{if(done)return;done=true;sessionStorage.setItem("booted","1");b.style.transition="opacity .5s";b.style.opacity=0;setTimeout(()=>b.remove(),500)};
+ b.onclick=end;(function step(){if(done)return;if(i<L.length){b.innerHTML=L.slice(0,++i).join("\n")+'<span class="cur"></span>';setTimeout(step,260)}else{b.innerHTML=L.join("\n")+'\n<div class="big">hello, friend.</div>';setTimeout(end,900)}})()})();
 build();tick();setInterval(tick,4000);
 </script></body></html>

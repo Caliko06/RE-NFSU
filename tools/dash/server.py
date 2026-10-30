@@ -176,7 +176,7 @@ def git():
 def state():
     with _lock:
         return {"now": int(time.time()), "sessions": sessions(), "re": re_calls(), "handling": handling(), "git": git(), "shots": shots(),
-                "webcheck": tails("build/webcheck.log", 1), "logs": tails("build/openworld/*.md", 4)}
+                "webcheck": tails("build/webcheck.log", 1), "handoff": open(f"{ROOT}/HANDOFF.md", errors="ignore").read()[:2600], "logs": tails("build/openworld/*.md", 4)}
 
 
 def thumb(rel, w):
