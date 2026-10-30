@@ -82,6 +82,12 @@ if os.path.exists("census/canon/systems_lib.tsv"):
 nsys = {}
 for p in sorted(glob.glob("census/names_*.tsv")):
     if p.endswith("names_seed.tsv"):
+# both address neighbours agree (tools/canon/adjacent.py): inferred, so med
+if os.path.exists("census/canon/systems_adj.tsv"):
+    for r in csv.DictReader(open("census/canon/systems_adj.tsv"), delimiter="\t"):
+        x = a(r["addr"])
+        if conf.get(x) not in ("med", "high"):
+            system[x], conf[x] = r["system"], "med"
         continue
     for r in csv.DictReader((l for l in open(p) if not l.startswith("#")), delimiter="\t"):
         try:
