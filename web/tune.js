@@ -31,6 +31,8 @@ const STREAK = 0.00625;     // 0x702a44 as shipped
 const SPEEDFOV = 10;
 // ?chasecam=1|0: the chase camera sits up to 12% farther and 10% lower with speed (host/d3d9.c chase_frame rewrites the car's camera rows).
 const CHASECAM = 1;
+// ?nitrocam=1|0: while the nitrous burns the chase camera goes 10% farther and 5% lower (host/d3d9.c chase_frame, same rows).
+const NITROCAM = 1;
 
 function startTune(M) {
   const base = M._rn_tune_addr() >> 2;
@@ -44,6 +46,7 @@ function startTune(M) {
   const sf = parseFloat(RN_Q.get('speedfov') ?? SPEEDFOV);
   const speedfov = isFinite(sf) ? sf : 0;
   const chasecam = RN_Q.get('chasecam') === null ? CHASECAM : +RN_Q.get('chasecam') ? 1 : 0;
+  const nitrocam = RN_Q.get('nitrocam') === null ? NITROCAM : +RN_Q.get('nitrocam') ? 1 : 0;
   const psOff = RN_Q.get('psblur') === '0';
   if (psOff && BLUR[level].ps) level = 3;    // ?psblur=0: the pass off, the game's own PS2 blur instead
 
@@ -60,6 +63,7 @@ function startTune(M) {
     h[base + 1] = bits(p.ramp[0]); h[base + 2] = bits(p.ramp[1]); h[base + 3] = bits(p.cap); h[base + 4] = bits(STREAK); h[base + 5] = trailColor(p.trails);
     h[base + 6] = bits(speedfov);
     h[base + 7] = chasecam;
+    h[base + 8] = nitrocam;
     Atomics.add(h, base, 1);
     try { localStorage.setItem(KEY, String(level)); } catch {}
     if (!show) return;
