@@ -450,6 +450,7 @@ static uint32_t rival_ride(Ctx *c) {
 
 static int n_refill, n_refail;
 static int n_react[3];                 // traffic_tick: yields, dodges, glued honks
+static uint32_t n_tr[4];               // ai_log, car-frames within 60 m: game avoid action, braking, horn; and contacts under 2.6 m
 // RN_AILOG=1: test-only race log (tools/ailog.py sums it up). Every 60 frames, each racer: name, kind, route metres car+0x814, speed car+0x3d0,
 // rank (record +0xa), mean |slip angle| in degrees; at once, each change of a racer's action type [[drv+0x3f8]+0x1f8] and each nitro start (CarState car+0x40, +0x3bc, 0x4654f0).
 static void ai_log(Ctx *c) {
@@ -483,6 +484,24 @@ static void ai_log(Ctx *c) {
         i++;
     }
     if (n) rn_log("AILOG %u draft %u%s", rn_telem.presents, draft, b);
+    {   // traffic reaction, per frame, cars within 60 m of the player: in the game's avoid action (type 3), braking (driver [car+0x30]+0x1e4, written by 0x45e970), horn flag +0x83f; hits = first frame under 2.6 m of the player
+        static uint32_t hitcar[32];
+        uint32_t me = 0;
+        for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200 && !me; r = ld(c, r, 4), k++) if (ld(c, ld(c, r + 0x14, 4) + 4, 4) == 1) me = r;
+        for (uint32_t r = ld(c, h, 4), k = 0; me && r != h && k < 200; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4), d = ld(c, r + 0x30, 4);
+            if (!e || ld(c, e + 4, 4) != 3 || !v || c->mem[v + 0x4d1]) continue;
+            float dist = hypotf(ldf(c, r + 0x50) - ldf(c, me + 0x50), ldf(c, r + 0x54) - ldf(c, me + 0x54));
+            uint32_t a = ld(c, v + 0x3f8, 4);
+            if (dist < 60) {
+                n_tr[0] += a && ld(c, a + 0x1f8, 4) == 3, n_tr[1] += d && ldf(c, d + 0x1e4) > 0.3f, n_tr[2] += c->mem[r + 0x83f] != 0;
+            }
+            int s = 0;
+            while (s < 31 && hitcar[s] && hitcar[s] != r) s++;
+            if (dist < 2.6f && hitcar[s] != r) hitcar[s] = r, n_tr[3]++;
+            else if (dist > 8 && hitcar[s] == r) hitcar[s] = 0;
+        }
+    }
     if (rn_telem.presents % 300 == 0) {            // traffic: how many, how near, how many models near (entrant ride +0: car type, row name in [0x734588])
         uint32_t tab = ld(c, 0x734588, 4), me = 0, seen[36] = {0};
         int total = 0, parked = 0, near = 0, close = 0, kinds = 0, all = 0;
@@ -499,8 +518,8 @@ static void ai_log(Ctx *c) {
             if (type < 36 && d < 250 && !(seen[type] & 2)) seen[type] |= 2, kinds++;
         }
         uint32_t bodies = ld(c, 0x736184, 4);       // TrackPolygonSlotPool 0x4412b0: slots in use, high-water mark, cap (docs/openworld/re_coll_pool.md)
-        rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d polys %u polymax %u polycap %u%s", rn_telem.presents, total, parked, near, close, all, kinds,
-               n_refill, n_refail, n_react[0], n_react[1], n_react[2], bodies ? ld(c, bodies + 0x18, 4) : 0, bodies ? ld(c, bodies + 0x1c, 4) : 0, bodies ? ld(c, bodies + 0x2c, 4) : 0, rn_telem.presents % 3000 == 0 ? names : "");
+        rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d polys %u polymax %u polycap %u avoidf %u brakef %u honkf %u hits %u%s", rn_telem.presents, total, parked, near, close, all, kinds,
+               n_refill, n_refail, n_react[0], n_react[1], n_react[2], bodies ? ld(c, bodies + 0x18, 4) : 0, bodies ? ld(c, bodies + 0x1c, 4) : 0, bodies ? ld(c, bodies + 0x2c, 4) : 0, n_tr[0], n_tr[1], n_tr[2], n_tr[3], rn_telem.presents % 3000 == 0 ? names : "");
     }
 }
 

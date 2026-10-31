@@ -427,3 +427,7 @@ def c_table():
 # the slot index is a s16 at row +6 (0x4400c1), so it must stay <= 0x7fff; save 0x46a6e0 writes row indices. Cost 1 MB of guest heap instead of 128 KB.
 # docs/openworld/re_coll_pool.md, census/names_collision.tsv.
 PATCHES.append(dict(addr=0x4412bd, old="bf00040000", new="bf00200000", when=lambda: True))
+# Traffic goal-5 finder 0x453920 dropped any obstacle that is a racer (race record [car+0x1c] != 0) going > 20 m/s, which is the
+# player too, so spawn-record traffic never braked, swerved or honked for him. Now only rivals (driver kind 2, [[rec+0x14]+4]) keep the
+# exemption: mov ecx,[ecx+0x14]; cmp [ecx+4],2; jne 0x4539ff (not exempt); nop*3 (docs/re/traffic_react.md item b)
+PATCHES.append(dict(addr=0x4539db, old="8b511c85d20f95c084c07418", new="8b49148379040275" + "1b" + "909090", when=lambda: True))
