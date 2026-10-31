@@ -1,0 +1,239 @@
+addr	name	system	confidence	evidence	tool	doc
+0x5737f0	ReplayManager::RegisterSnapshotChannels	runtime	I	I: calls the snapshot-channel registrar once per name: DEMO_MODE_SNAPSHOT, REPLAY_MANAGER_STATE, CHECKSUM0..3 (strings in body); caller 0x5734a0	Ghidra dossier	
+0x5734a0	ReplayManager::RefreshDemoSnapshot	runtime	I	I: if flags set and no REPLAY_MANAGER_STATE obj, creates DEMO_MODE_SNAPSHOT obj (0x572f20) at this+0xc; moves old snapshot node to ReplayManager free list when clock 12000 behind; calls 0x5737f0	Ghidra dossier	
+0x54ae10	Online::RequestListPage	online	I	I: builds param string INDEX/START/RANGE(100) and sends request tag 0x736e6170 with callback 0x54c1f0; index must be 1..0x23	Ghidra dossier	
+0x54c1f0	Online::OnListPageReply	online	I	I: callback for tag 0x736e6170: reads INDEX/START/RANGE from reply, compares with requested index DAT_0073d8bc, computes remaining count, invokes user callback DAT_0073d8ac	Ghidra dossier	
+0x549ca0	Online::FindNthEntryByFirstTwoChars	online	I	I: loops list entries (text at +0x1c), matches first 2 chars with param_1, returns the param_2-th match else empty string	Ghidra dossier	
+0x549fc0	Online::GetEntryCarModelHash	online	I	I: if 0x54b700 and 0x549e50 succeed returns GetCarModelNameHash()	Ghidra dossier	
+0x5712a0	CarRenderInfo::InitCarLightsList	car	I	I: copies string "Car Lights" into render info +0x19b4, builds linked list of 0x68-byte nodes (DAT_006f1d40 count) from 0x4081f0/0x41f5e0; caller Car::InitRenderInfo	Ghidra dossier	
+0x58d800	CarRenderInfo::ResolvePartSlotIndices	car	I	I: walks model part list, matches part hash against table DAT_006f0404 (stride 0x24), stores result of 0x58d420 into byte array at +0xe8; caller CarRenderInfo::CarRenderInfo	Ghidra dossier	
+0x643a60	EAsys::CpuModelName	runtime	V	V: returns/sets model string pointer (Pentium, PentiumPro, Pentium2/3/4, Athlon, AthlonXP, AthlonMP, Cyrix, WinChip) from cpuid feature globals DAT_0070fdd8..fdf8; caller EAsys_CpuVendorDetect	Ghidra dossier	
+0x59e060	CheatCodeTable::CheatCodeTable	runtime	I	I: constructor: hashes preset names (NISMO_PRESET, PETEY_PABLO, ROBZOMBIE_PRESET, MYSTIKAL_PRESET, LOSTPRO_PRESET) with 0x21 string hash and pairs them with code strings gotcharobzombie, havyamystikal, needmylostprophets, 119focus	Ghidra dossier	
+0x671357	CRT::flsall_unlock_stdio	runtime	I	I: 10-byte stub, callee __unlock_file2, caller _flsall	Ghidra dossier	
+0x671383	CRT::flsall_unlock_lock	runtime	I	I: 9-byte stub, callee __unlock, caller _flsall	Ghidra dossier	
+0x6714da	CRT::printf_unlock_file	runtime	I	I: 11 bytes, caller _printf, callee __unlock_file2 (finally block)	Ghidra dossier	
+0x671537	CRT::fsopen_unlock_file	runtime	I	I: 10 bytes, caller __fsopen, callee __unlock_file (finally block)	Ghidra dossier	
+0x67167f	CRT::fread_unlock_file	runtime	I	I: 10 bytes, caller _fread, callee __unlock_file (finally block)	Ghidra dossier	
+0x671aa3	CRT::fwrite_unlock_file	runtime	I	I: 10 bytes, caller _fwrite, callee __unlock_file (finally block)	Ghidra dossier	
+0x671d31	CRT::ftell_unlock_file	runtime	I	I: 10 bytes, caller _ftell, callee __unlock_file (finally block)	Ghidra dossier	
+0x671e09	CRT::fseek_unlock_file	runtime	I	I: 10 bytes, caller _fseek, callee __unlock_file (finally block)	Ghidra dossier	
+0x671eca	CRT::getenv_unlock	runtime	I	I: 9 bytes, caller _getenv, callee __unlock (finally block)	Ghidra dossier	
+0x671f68	CRT::fclose_unlock_file	runtime	I	I: 8 bytes, caller _fclose, callee __unlock_file (finally block)	Ghidra dossier	
+0x671fa0	CRT::onexit_lock	runtime	I	I: 9 bytes, caller __onexit, callee __lock	Ghidra dossier	
+0x671fa9	CRT::onexit_unlock	runtime	I	I: 9 bytes, caller 0x671007 (__onexit finally), callee __unlock	Ghidra dossier	
+0x671007	CRT::onexit_finally	runtime	I	I: 6 bytes, caller __onexit, calls 0x671fa9 (unlock)	Ghidra dossier	
+0x671395	CRT::_tolower_lk	runtime	I	I: callers _tolower, __stricmp, __strnicmp; callees _isctype and ___crtLCMapStringA (locale lower-casing)	Ghidra dossier	
+0x671aad	CRT::_toupper_lk	runtime	I	I: same shape as _tolower_lk (isctype + LCMapStringA); caller 0x671b76 which does __updatetlocinfo+__getptd	Ghidra dossier	
+0x671b76	CRT::_toupper	runtime	I	I: 34 bytes, calls __updatetlocinfo, __getptd then 0x671aad (toupper_lk)	Ghidra dossier	
+0x6720ea	CRT::_exit	runtime	I	I: 17 bytes: calls __cexit_doexit; callers bFatalError, 0x642540, WinMainCRTStartup	Ghidra dossier	
+0x67210c	CRT::exit	runtime	I	I: 15 bytes: calls __cexit_doexit; caller WinMainCRTStartup	Ghidra dossier	
+0x6721d0	CRT::ehvec_dtor_unwind	runtime	I	I: 24 bytes: calls __ArrayUnwind; caller eh_vector_destructor_iterator (SEH unwind funclet)	Ghidra dossier	
+0x672232	CRT::ehvec_ctor_unwind	runtime	I	I: 24 bytes: calls __ArrayUnwind; caller eh_vector_constructor_iterator (SEH unwind funclet)	Ghidra dossier	
+0x673ccf	CRT::free_lc_categories	runtime	I	I: frees via ___free_lc_time, ___free_lconv_num, ___free_lconv_mon; callers _setlocale	Ghidra dossier	
+0x673d99	CRT::__freetlocinfo	runtime	I	I: calls 0x673ccf (free lc categories) and __getptd; callers ___updatetlocinfo, _setlocale	Ghidra dossier	
+0x673e7f	CRT::__lc_strtolc	runtime	I	I: parses locale string with _strcspn on '_.,' separators into language/country/codepage; caller 0x674099	Ghidra dossier	
+0x674999	CRT::_callthreadstartex	runtime	I	I: 48 bytes: __getptd, __amsg_exit; caller 0x6749ca (_threadstartex)	Ghidra dossier	
+0x6749ca	CRT::_threadstartex	runtime	I	I: 132 bytes, SEH prolog, __amsg_exit, _free; caller __beginthreadex	Ghidra dossier	
+0x679958	CRT::__setmbcp_nolock	runtime	I	I: caller __setmbcp; calls setSBCS and CRT::setSBUpLow and cookie check	Ghidra dossier	
+0x681af5	CRT::__strgtold12	runtime	I	I: 1034 bytes, _isdigit plus ___add_12/___shl_12 helpers (via 0x682382); callers are the _atof/_fassign float parsers	Ghidra dossier	
+0x682382	CRT::__multtenpow12	runtime	I	I: 228 bytes using ___add_12/___shl_12; caller __strgtold12	Ghidra dossier	
+0x682466	CRT::$I10_OUTPUT	runtime	V	V: strings "1#INF","1#QNAN" in body, add_12/shl_12/shr_12 helpers, caller __fltout2	Ghidra dossier	
+0x680741	CRT::__alloc_osfhnd	runtime	I	I: _malloc, __lock, __mtinitlocknum, ___crtInitCritSecAndSpinCount, CRT::__lock_fhandle; caller 0x680aa6 (open helper)	Ghidra dossier	
+0x680aa6	CRT::_sopen_helper	runtime	I	I: caller __sopen; calls __read_lk, __lseek_lk, __close_lk, __dosmaperr, __alloc_osfhnd	Ghidra dossier	
+0x68088e	CRT::__ansicp	runtime	I	I: 73 bytes: _atol + cookie check on a GetLocaleInfoA result; used by locale-string funcs	Ghidra dossier	
+0x423280	Race::PreRaceAnimStage	gameflow	I	I: switch on stage arg; case 1 frees two objects, creates IntroNisCoordinator via malloc(0x30), then FindResourceFile("GLOBAL\PRERACEANIM.LZC"), on failure Race::SetRaceStage path via 0x434b50/0x421ae0/0x495e20	Ghidra dossier	
+0x495e20	PreRaceScreenManager::Create	hud	I	I: 105 bytes: malloc + tPreRaceScreenManager::tPreRaceScreenManager; callers 0x423280 and CameraMover_CreateByType	Ghidra dossier	
+0x429620	EZWheel::UpdateRaceForces	input	I	I: inside World::Step; only when mode global *DAT_007361f0==4 (racing) and wheel enabled (DAT_00736500); calls EZWheel condition/periodic force setters 0x41a680/0x41b5f0/0x41a8a0	Ghidra dossier	
+0x479e20	PhysicsMover::ApplyNitrousToWheelScales	car.physics	I	I: caller PhysicsMover::StepAndSetWheelScales; callees CarState::GetNitrousStoredSeconds, CarState::IsNitrousOn, CarState::StopNitrous, _ftol_nocw	Ghidra dossier	
+0x4620c0	Racer::CreateAIDriver	raceai	I	I: 360 bytes: calls AI::AI and RealDriver::ctor with malloc, _ftol_nocw	Ghidra dossier	
+0x401980	GameFlow::InitFileSystem	runtime	I	I: 133 bytes: Registry::ReadInstallSettings then FileSystem_Create; caller GameFlow::InitMainPoolAndTimer	Ghidra dossier	
+0x418c00	FEDialog::ShowGenericDialog	hud	I	I: string "GenericDialog.fng" passed to FEng_PushScreenWithFactory_B after bSPrintf_regdst	Ghidra dossier	
+0x5944f0	DiscCheck::PromptForDisc	runtime	I	I: caller bOpenFile; calls DiscCheck_ModalFrameLoop and bStrCat2 (builds path)	Ghidra dossier	
+0x431020	Player::InitDriftAndDirectionMarker	raceai	I	I: string MARKER_DIRECTION_AID; calls DriftManager::Init, RealDriver::SetManualTransmission, Solid_FindInAllLists	Ghidra dossier	
+0x562b50	CarSelect::SetBrandLogo	hud	I	I: string BRAND_NAME_%s with GetSecondaryLogoHash then FEng_SetImageTextureByName	Ghidra dossier	
+0x51b720	cFrontendDatabase::UpdateMagazineTasks	hud	I	I: string MAGAZINE_TASK_%d via bStringHashPrintf; called by cFrontendDatabase::NotifyTheRaceIsOver; uses 0x5a0b40	Ghidra dossier	
+0x5a0b40	Magazine::GetTaskBaseOffset	hud	V	V: hashes "MAGAZINE_TASK_1" (x33 hash), looks it up in 27-entry table at 0x744ab0, returns table value*0x454+param base	Ghidra dossier	
+0x43d8c0	Race::ComputeRepWonLoss	gameflow	I	I: caller PostRaceStatsScreen::SetupRepWonLoss; calls Career_ComputeCashAfterRace and Race::GetPlayer	Ghidra dossier	
+0x43b210	Online::WriteRaceOptions	online	I	I: calls RaceOptions_Get with BitStream::WriteBitsThunk and NetBitStream_WriteBits; caller 0x5472f0	Ghidra dossier	
+0x4c42d0	Screen_MU_UG_ChooseCareerCar::FillManufacturerList	hud	I	I: strings HONDA and CARSELECT_MANUFACTURER_%s via bStringHashPrintf, FEListBox::AddItem and SelectItemByData; caller is that screen's ctor	Ghidra dossier	
+0x4c66d0	CarSelectScreen::FillManufacturerList	hud	I	I: same strings and listbox calls as 0x4c42d0, different screen (caller 0x4c6530)	Ghidra dossier	
+0x4c4a60	Screen_MU_UG_MapScreen::BuildMapList	hud	I	I: strings master_thumb/thumb; FEListBox ctor + AddItem + SelectItemByData; caller is MapScreen ctor	Ghidra dossier	
+0x4e3d80	GarageVinylBrowserScreen::FillVinylEntries	car.garage	I	I: calls UserProfile::IsStyleRewardUnlocked, bStringHash, bStrCpy, bStrCat2; caller GarageVinylBrowserScreen ctor	Ghidra dossier	
+0x4e0380	Screen_MU_MultiplayerCarSelect::FindControls	hud	I	I: strings P%d_Transmission_select and button_%d_p%d via FEng_FindObjectInPackage; caller is the ctor	Ghidra dossier	
+0x4b9500	Screen_MU_MultiTrack::RefreshTrackSlot	hud	I	I: string MultiTrack_%d found with FEng_FindObjectInPackage and FEng_VisitChildren	Ghidra dossier	
+0x4b9750	Screen_MU_MultiTrack::RefreshTrackSlotB	hud	I	I: same MultiTrack_%d pattern as 0x4b9500; caller 0x4b94c0	Ghidra dossier	
+0x55ce20	Online::FillPlayerRow	online	I	I: strings PLAYERNAME%.2d and REPDATA%.2d via FEng_FindObjectInPackage, malloc	Ghidra dossier	
+0x55c550	Online::FillPlayerDataRow	online	I	I: string PLAYER_DATA_%.2d via FEngPrintf; caller 0x55bfc0	Ghidra dossier	
+0x5600c0	Online::FillRankingRow	online	I	I: strings Rank_DATA_%02d and PlayersName_DATA_%02d via FEng_FindObjectInPackage	Ghidra dossier	
+0x5a4750	RCMP::DECODER::DumpCapture	runtime	I	I: string d:\decodercapture%04d.fss formatted with bSPrintf and written; RCMP decoder file	Ghidra dossier	
+0x5a44e0	RCMP::operator_new_impl	runtime	I	I: 34 bytes; the operator_new of RCMP::DECODER, AUDIO_PLAYER, AV_MS_TIMER, AV_SUBTITLE call it	Ghidra dossier	
+0x412020	SNDSTRM::OpenQueuedFile	audio.stream	I	I: 314 bytes; callers SNDSTRM_QueueFileRequest and SNDSTRM_QueueMemoryRequest; callees EAFile_QueueOpen, EAFile_QueueClose, EAFile_CallbackOp	Ghidra dossier	
+0x572b50	ReplayManager::FindSnapshotByName	runtime	I	I: 88 bytes, no callees; callers ReplayManager::QueueDummySnapshot/UpdateHighlights/ThinLapSnapshots pass names like REPLAY_MANAGER_STATE	Ghidra dossier	
+0x572f20	ReplayManager::AllocSnapshot	runtime	I	I: 233 bytes: _malloc plus ReplayManager::DoSnapshotDispatch; callers QueueDummySnapshot, UpdateHighlights, ThinLapSnapshots and 0x5734a0 (string DEMO_MODE_SNAPSHOT)	Ghidra dossier	
+0x57bdd0	TrainEngine::TrainEngine	track	I	I: constructor: sets vtable 0x6ba438, hashes "XO_Train_EngineA_1b_3001", registers with TrackPath::UpdateCursor	Ghidra dossier	
+0x57bf90	TrainCar::TrainCar	track	I	I: constructor: sets vtable 0x6ba40c, hashes "TrainCar", looks up class via 0x577d10	Ghidra dossier	
+0x667fa0	DirtySock::ParseDelimitedField	online	I	I: skips optional quote char, loops counting delimiter param_6 for field param_5; uses hex-digit table string; network text parser called from 0x54dc70	Ghidra dossier	
+0x668270	DirtySock::ParseHexAfterDollar	online	I	I: checks leading '$' then parses hex digits with table; callers 0x665660	Ghidra dossier	
+0x41c9e0	Settings::WriteAll	runtime	I	I: 953 bytes: _fwrite and __itoa; caller Settings::Save; calls bFatalError and 0x41c590 (strings NULL file handle passed to FWriteSafe)	Ghidra dossier	
+0x4c98e0	Screen_MU_PlayerLogin::FindControls	hud	I	I: strings Player_DATA_0%d and HighLight0%d with FEng_FindObjectInPackage; caller Screen_MU_PlayerLogin ctor	Ghidra dossier	
+0x4c9d20	Screen_MU_PlayerLogin::UpdateHighlight	hud	I	I: same strings Player_DATA_0%d/HighLight0%d with FEObject::FireUnHighlight	Ghidra dossier	
+0x417e70	Screen_MU_UG_NewOrLoad_PC2::FindControls	hud	I	I: strings Player_DATA_0%d and menubar%d; caller is the ctor	Ghidra dossier	
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	hud	I	I: strings OptionData_%d and OptionName_%d; caller is the ctor	Ghidra dossier	
+0x4b8750	Screen_MU_QuickRaceOptions_PC::BuildOptionList	hud	I	I: strings Option%dText and Option%dData; caller is the ctor	Ghidra dossier	
+0x4d5970	Screen_EA_TRAX_Jukebox::BuildTrackList	audio	I	I: string trax_backing_0%d with StringList::AddEntry; caller is the ctor	Ghidra dossier	
+0x5500b0	Online::FillRepRow	online	I	I: strings Rep_DATA_0%d and PlayersName_DATA_0%d via FEng_FindObjectInPackage	Ghidra dossier	
+0x5037e0	FEngine::RegisterObjectTypes	hud	I	I: strings Simple Image and String compared with __stricmp; caller FEngine::FEngine	Ghidra dossier	
+0x4e0d90	Screen_MU_MultiplayerCarSelect::UpdateCarStats	hud	I	I: calls GetStockPerformanceMeasure; callers the ctor and 0x4e0d10	Ghidra dossier	
+0x463260	Car::CreateWheels	car	I	I: calls Wheel::Wheel, SlotPool::AddBlock, Angle16_Sin and _malloc; callers Car_SetMode, Racer::Update	Ghidra dossier	
+0x586090	FormatRaceTime::BuildTimeString	hud	I	I: bStrCpy/bStrLen and tick strings --\'--\ ; caller FormatRaceTime	Ghidra dossier	
+0x54fd50	Online::FormatRaceResultsLine	online	I	I: format strings '%d) %s' and '%d) %s (%s)'; calls Race::FindRacerById, Race::GetPlayer, 0x43d8c0	Ghidra dossier	
+0x419f50	EZWheel::UpdateConditionForces	input	I	I: calls EZWheel::PlayCondition, PlayConditionForce, PlayConditionForceB, PlayPeriodicForceB/C	Ghidra dossier	
+0x5b2ae3	Dtor5b2ab5::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b2ab5 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b70ac	Dtor5b5fe7::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b5fe7 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b907a	Dtor5b70c8::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b70c8 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b9812	Dtor5b97bb::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b97bb then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5c5234	Dtor5c521c::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5c521c then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5e737f	Dtor5e7139::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5e7139 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5f716a	Dtor5d7865::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7865 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d8fb6	Dtor5d7803::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7803 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d8fd8	Dtor5d7803::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7803 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d9086	Dtor5d7803::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7803 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x60ec76	Dtor613825::ScalarDeletingDtor	render	V	V: decompile read: calls 0x613825 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x612c37	Dtor613825::ScalarDeletingDtor	render	V	V: decompile read: calls 0x613825 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4eeb70	Dtor500560::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x500560 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4f07d0	Dtor4f07f0::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4f07f0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5753a0	Dtor575390::ScalarDeletingDtor	traffic	V	V: decompile read: calls 0x575390 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x45e060	Dtor45e080::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x45e080 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x460350	Dtor460370::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x460370 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x460f30	Dtor460f50::ScalarDeletingDtor	physics	V	V: decompile read: calls 0x460f50 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x47f130	Dtor47f150::ScalarDeletingDtor	camera	V	V: decompile read: calls 0x47f150 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x47f810	Dtor47f830::ScalarDeletingDtor	camera	V	V: decompile read: calls 0x47f830 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4fbc80	Dtor4fbca0::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4fbca0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4fd0d0	Dtor4fcff0::ScalarDeletingDtor	ui	V	V: decompile read: calls 0x4fcff0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4fe940	Dtor4fe860::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4fe860 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4ff830	Dtor4ff850::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4ff850 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5030b0	Dtor502fd0::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x502fd0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x503150	Dtor503170::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x503170 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x503660	Dtor503680::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x503680 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5339e0	Dtor533a00::ScalarDeletingDtor	audio.sfx	V	V: decompile read: calls 0x533a00 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x534140	Dtor534160::ScalarDeletingDtor	audio	V	V: decompile read: calls 0x534160 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5344b0	Dtor534500::ScalarDeletingDtor	audio	V	V: decompile read: calls 0x534500 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x55d370	Dtor55d390::ScalarDeletingDtor	online	V	V: decompile read: calls 0x55d390 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x579b10	Dtor579b30::ScalarDeletingDtor	runtime	V	V: decompile read: calls 0x579b30 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x413a30	Dtor413a50::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x413a50 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x46a3f0	Dtor46a410::ScalarDeletingDtor	car	V	V: decompile read: calls 0x46a410 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x495940	Dtor495960::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x495960 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x49ef30	Dtor49ef20::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x49ef20 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4b1f70	Dtor4b1f90::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4b1f90 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4b2200	Dtor4b2280::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4b2280 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4b37b0	Dtor4b37a0::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4b37a0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4b8020	Dtor4b8040::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4b8040 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4bc0a0	Dtor4bc0c0::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4bc0c0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4bd460	Dtor4bd480::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4bd480 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4c25b0	Dtor4c25a0::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4c25a0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4c3700	Dtor4c3720::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4c3720 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4c3fd0	Dtor4c3ff0::ScalarDeletingDtor	car.garage	V	V: decompile read: calls 0x4c3ff0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4c7060	Dtor4c70b0::ScalarDeletingDtor	util	V	V: decompile read: calls 0x4c70b0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4c8490	Dtor4c84b0::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4c84b0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4cd330	Dtor4cd350::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4cd350 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4cd590	Dtor4cd580::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4cd580 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4d5f90	Dtor4d5f80::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4d5f80 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4d61f0	Dtor4d61e0::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4d61e0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4d7360	Dtor4d7330::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4d7330 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4e0010	Dtor4e0000::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4e0000 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4e01d0	Dtor4e01c0::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4e01c0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4e29e0	Dtor4e29d0::ScalarDeletingDtor	car.parts	V	V: decompile read: calls 0x4e29d0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4e66c0	Dtor4e66b0::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4e66b0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4e7960	Dtor4e7930::ScalarDeletingDtor	car.garage	V	V: decompile read: calls 0x4e7930 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4ee6c0	Dtor4ee650::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4ee650 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4f3b10	Dtor4f3b30::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4f3b30 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4f3d40	Dtor4f3d00::ScalarDeletingDtor	fe	V	V: decompile read: calls 0x4f3d00 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4f84b0	Dtor4f84d0::ScalarDeletingDtor	ui	V	V: decompile read: calls 0x4f84d0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4f93a0	Dtor4f9390::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4f9390 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4f9fd0	Dtor4f9fc0::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x4f9fc0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4fa550	Dtor4fa870::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4fa870 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4fd340	Dtor4fd360::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4fd360 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x4fec10	Dtor4fef10::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x4fef10 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x500a10	Dtor500970::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x500970 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x500ad0	Dtor500a50::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x500a50 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x500cb0	Dtor500b10::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x500b10 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x514250	Dtor514270::ScalarDeletingDtor	runtime	V	V: decompile read: calls 0x514270 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x51a830	Dtor51a850::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x51a850 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x51c160	Dtor51c020::ScalarDeletingDtor	assets	V	V: decompile read: calls 0x51c020 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x51ca10	Dtor51ca30::ScalarDeletingDtor	audio.engine	V	V: decompile read: calls 0x51ca30 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x52c8f0	Dtor52c910::ScalarDeletingDtor	audio.sfx	V	V: decompile read: calls 0x52c910 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x52cbb0	Dtor52cbd0::ScalarDeletingDtor	audio.engine	V	V: decompile read: calls 0x52cbd0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x532390	Dtor5323b0::ScalarDeletingDtor	audio	V	V: decompile read: calls 0x5323b0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x534a70	Dtor534ab0::ScalarDeletingDtor	audio.mixer	V	V: decompile read: calls 0x534ab0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x534d80	Dtor534da0::ScalarDeletingDtor	audio.sfx	V	V: decompile read: calls 0x534da0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x535130	Dtor535150::ScalarDeletingDtor	audio.sfx	V	V: decompile read: calls 0x535150 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x535500	Dtor535530::ScalarDeletingDtor	audio.sfx	V	V: decompile read: calls 0x535530 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x537560	Dtor537500::ScalarDeletingDtor	audio	V	V: decompile read: calls 0x537500 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5378f0	Dtor537890::ScalarDeletingDtor	audio	V	V: decompile read: calls 0x537890 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x54e8a0	Dtor54e880::ScalarDeletingDtor	online	V	V: decompile read: calls 0x54e880 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x54f930	Dtor54f920::ScalarDeletingDtor	online	V	V: decompile read: calls 0x54f920 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x556960	Dtor556950::ScalarDeletingDtor	runtime	V	V: decompile read: calls 0x556950 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x556df0	Dtor556de0::ScalarDeletingDtor	runtime	V	V: decompile read: calls 0x556de0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x557480	Dtor557460::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x557460 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x557510	Dtor557500::ScalarDeletingDtor	canon	V	V: decompile read: calls 0x557500 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x55ef30	Dtor55ef50::ScalarDeletingDtor	online	V	V: decompile read: calls 0x55ef50 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x560690	Dtor560680::ScalarDeletingDtor	online	V	V: decompile read: calls 0x560680 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5634a0	Dtor5634c0::ScalarDeletingDtor	hud	V	V: decompile read: calls 0x5634c0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x563c20	Dtor563c40::ScalarDeletingDtor	runtime	V	V: decompile read: calls 0x563c40 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x567e40	Dtor567e20::ScalarDeletingDtor	runtime	V	V: decompile read: calls 0x567e20 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x568650	Dtor568640::ScalarDeletingDtor	runtime	V	V: decompile read: calls 0x568640 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x577270	Dtor577290::ScalarDeletingDtor	track	V	V: decompile read: calls 0x577290 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5779a0	Dtor5779c0::ScalarDeletingDtor	track	V	V: decompile read: calls 0x5779c0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x578290	Dtor578370::ScalarDeletingDtor	raceai	V	V: decompile read: calls 0x578370 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x578c50	Dtor578c70::ScalarDeletingDtor	assets	V	V: decompile read: calls 0x578c70 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57a220	Dtor57a1a0::ScalarDeletingDtor	raceai	V	V: decompile read: calls 0x57a1a0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57a250	Dtor57a240::ScalarDeletingDtor	raceai	V	V: decompile read: calls 0x57a240 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57b640	Dtor57b5c0::ScalarDeletingDtor	raceai	V	V: decompile read: calls 0x57b5c0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57b9d0	Dtor57b950::ScalarDeletingDtor	props	V	V: decompile read: calls 0x57b950 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57bae0	Dtor57bb00::ScalarDeletingDtor	props	V	V: decompile read: calls 0x57bb00 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57bcc0	Dtor57bce0::ScalarDeletingDtor	track	V	V: decompile read: calls 0x57bce0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57bd70	Dtor57bd90::ScalarDeletingDtor	track	V	V: decompile read: calls 0x57bd90 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57bda0	Dtor57bdc0::ScalarDeletingDtor	track	V	V: decompile read: calls 0x57bdc0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57c0e0	Dtor57c100::ScalarDeletingDtor	track	V	V: decompile read: calls 0x57c100 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x57c2e0	Dtor57c300::ScalarDeletingDtor	track	V	V: decompile read: calls 0x57c300 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5841d0	Dtor5841f0::ScalarDeletingDtor	util	V	V: decompile read: calls 0x5841f0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5843d0	Dtor5843f0::ScalarDeletingDtor	car	V	V: decompile read: calls 0x5843f0 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b0757	Dtor5b07b2::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b07b2 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b09ec	Dtor5b0773::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b0773 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b0a37	Dtor5b0a08::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b0a08 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b2a99	Dtor5b5e96::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b5e96 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b5fa7	Dtor5b5f73::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b5f73 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5b98e3	Dtor5b982e::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5b982e then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5c54ec	Dtor5c54d4::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5c54d4 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5c8f26	Dtor5cd1d4::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5cd1d4 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5c8f42	Dtor5cd25f::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5cd25f then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5cb122	Dtor5c8eec::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5c8eec then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d0387	Dtor5d031f::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d031f then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d1d24	Dtor5d1c1b::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d1c1b then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d6535	Dtor5d64ca::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d64ca then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d8f9a	Dtor5d7803::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7803 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d8ffa	Dtor5d7b97::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7b97 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d9016	Dtor5d7ca4::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7ca4 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d9032	Dtor5d7df3::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7df3 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d904e	Dtor5d7f77::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d7f77 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d906a	Dtor5d808a::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d808a then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d90a8	Dtor5d824f::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d824f then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d90c4	Dtor5d8486::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d8486 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d90e0	Dtor5d869a::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d869a then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d90fc	Dtor5d8882::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d8882 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d9118	Dtor5d8b5a::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d8b5a then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d9134	Dtor5d8caa::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d8caa then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d9150	Dtor5d8df2::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d8df2 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5d916c	Dtor5d8edb::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5d8edb then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5e6fe8	Dtor5e7978::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5e7978 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5f5722	Dtor5f56eb::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5f56eb then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5f76ed	Dtor5f7658::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5f7658 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x5fbf9d	Dtor5f7f76::ScalarDeletingDtor	render	V	V: decompile read: calls 0x5f7f76 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x60c89d	Dtor60ba7c::ScalarDeletingDtor	render	V	V: decompile read: calls 0x60ba7c then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x61267f	Dtor611e87::ScalarDeletingDtor	render	V	V: decompile read: calls 0x611e87 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x613660	Dtor613455::ScalarDeletingDtor	render	V	V: decompile read: calls 0x613455 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x61367c	Dtor6135d9::ScalarDeletingDtor	render	V	V: decompile read: calls 0x6135d9 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x616730	Dtor613825::ScalarDeletingDtor	render	V	V: decompile read: calls 0x613825 then _free(this) if flag&1 (30-byte scalar deleting destructor)	Ghidra dossier	
+0x66e8c0	DirtySock::CryptArc4_Init	online	I	I: 256-byte state init (state[i]=i) then key-schedule mixing with CRC32 table at 0x6ab998; string "hello world" used as one-time seed on first call; callers 0x66ea80	Ghidra dossier	
+0x66e9c0	DirtySock::CryptArc4_Apply	online	I	I: RC4-style PRGA over state at param_1 (+0x100 index, +0x104 CRC accumulator) XORing the buffer in place; caller 0x66ea80	Ghidra dossier	
+0x66ea80	DirtySock::ScrambleString	online	I	I: seeds two Arc4 states with "ru paranoid?", then maps each input/random byte into printable range 0x20..0x7e with a keystream byte; caller 0x664e00 (request sender)	Ghidra dossier	
