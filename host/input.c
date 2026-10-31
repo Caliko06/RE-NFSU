@@ -575,10 +575,38 @@ void steer_frame(Ctx *c) {
            eb, down[0x2a] | down[0x36], ld(c, s + 4, 1), car ? ld(c, car + 0x3b4, 2) : 0);
     // the slip angle 0x464ed0 (ESI = car+0x40): heading word car+0x3b4 minus the angle 0x564db0 of the velocity car+0x70/74   // ebrake 0x461e10 -> P+0x2ac; S+4 the slide flag of 0x460a80
 }
+// Media keys -> the game's own song change. The music stream (vtable 0x6be080) is [[[0x7356a8]+0x104]+0x14]
+// (stream factory 0x537a60, type 0). Its slot +0xb4 is the picker 0x53c3a0: it stops the song and starts the
+// playlist entry at player+0xf8 (player = stream+4), then moves that position on. The game reaches it through
+// 0x539030 when a song ends. The picker plays only songs whose bit is set in its mask (0x758930 when [0x77a920]==3
+// or player mode 8, else 0x758934; bit = order[pos]+1, order array 0x758b58, stride 8), and a song's bit clears
+// once it plays. Previous: step the position back past the song now playing and set that song's bit again.
+static int music_skip;
+void music_frame(Ctx *c) {
+    int dir = music_skip;
+    if (!dir) return;
+    music_skip = 0;
+    uint32_t snd = ld(c, 0x7356a8, 4), mgr = snd ? ld(c, snd + 0x104, 4) : 0, m = mgr ? ld(c, mgr + 0x14, 4) : 0;
+    if (!m || ld(c, m, 4) != 0x6be080) { rn_log("music: no music stream"); return; }
+    uint32_t pl = ld(c, m + 4, 4);
+    if (ld(c, pl + 0xf0, 4) == 99) return;                 // jukebox preview of one song
+    if (dir == 2) {                                         // the position before the song now playing
+        uint32_t ma = (ld(c, 0x77a920, 4) == 3 || ld(c, pl, 4) == 8) ? 0x758930 : 0x758934;
+        uint32_t k = (ld(c, pl + 0xf8, 4) + 24) % 26;
+        st(c, ma, ld(c, ma, 4) | 1u << ((ld(c, 0x758b58 + 8u * k, 4) + 1) & 31), 4);
+        st(c, pl + 0xf8, k, 4);
+    }
+    uint32_t ecx = c->r[ECX];
+    c->r[ECX] = m;
+    call_guest(c, 0x53c3a0, 0, NULL);
+    c->r[ECX] = ecx;
+    rn_log("music: %s, now song %u", dir == 1 ? "next" : "previous", ld(c, pl + 0xfc, 4));
+}
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 // u32 words: [0] head (page), [1] tail (game), [2..4] mouse dx, dy, wheel (page adds, game takes), [5] exclusive mouse,
-// [8..8+RING) events: bit 31 = mouse button (else key), bit 8 = down, low byte = DIK or button.
+// [8..8+RING) events: bit 31 = mouse button, bit 30 = media key (1 next, 2 previous), else key; bit 8 = down, low byte = DIK or button.
 #define RING 1024
 static uint32_t ring[8 + RING];
 EMSCRIPTEN_KEEPALIVE uint32_t rn_input_ring(void) { return (uint32_t)(uintptr_t)ring; }
@@ -588,6 +616,7 @@ void input_poll(void) {
     for (; tail != head; tail++) {
         uint32_t e = ring[8 + tail % RING];
         if (e & 0x80000000u) button_event(e & 0xff, (e >> 8) & 1);
+        else if (e & 0x40000000u) music_skip = (int)(e & 3);   // media key: 1 next, 2 previous (web/audio.js)
         else key_event(e & 0xff, (e >> 8) & 1);
     }
     __atomic_store_n(&ring[1], tail, __ATOMIC_RELEASE);

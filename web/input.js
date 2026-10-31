@@ -19,7 +19,7 @@ const DIK = {
 };
 
 // Ring (u32 words): [0] head (here), [1] tail (game), [2..4] mouse dx, dy, wheel, [5] exclusive mouse (game), [8..8+1024) events:
-// bit 31 = mouse button, bit 8 = down, low byte = DIK or button. The game thread reads it at its input calls.
+// bit 31 = mouse button, bit 30 = media key (1 next, 2 previous), bit 8 = down, low byte = DIK or button. The game thread reads it at its input calls.
 function startInput(M, canvas, steerLog) {
   const base = M._rn_input_ring() >> 2, RING = 1024;
   const H = () => M.HEAP32;
@@ -30,7 +30,9 @@ function startInput(M, canvas, steerLog) {
     Atomics.store(h, base, head + 1);
   }
   const held = new Set();
+  const MEDIA = { MediaTrackNext: 0x40000001, MediaTrackPrevious: 0x40000002 };
   function key(ev, down) {
+    if (MEDIA[ev.code]) { ev.preventDefault(); if (down && !ev.repeat) push(MEDIA[ev.code]); return; }
     const d = DIK[ev.code];
     if (d === undefined) return;
     ev.preventDefault();
@@ -78,4 +80,10 @@ function startInput(M, canvas, steerLog) {
   canvas.addEventListener('wheel', e => { Atomics.add(H(), base + 4, e.deltaY < 0 ? 120 : -120); e.preventDefault(); }, { passive: false });
   canvas.addEventListener('contextmenu', e => e.preventDefault());
   canvas.focus();
+  // Media keys (play/pause row of a keyboard, headset buttons): Chrome hands them to the page's media session
+  // (web/audio.js plays through an <audio> element so the page has one); the game changes the song (host/input.c).
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.setActionHandler('nexttrack', () => push(0x40000001));
+    navigator.mediaSession.setActionHandler('previoustrack', () => push(0x40000002));
+  }
 }

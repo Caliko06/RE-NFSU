@@ -86,6 +86,7 @@ void input_career(Ctx *c);      // RN_CAREER (host/input.c), same place
 extern int rn_steerlog;         // RN_STEERLOG (host/input.c): the player's steering, per event and per Present
 void steer_event(Ctx *c);       // from rn_call at the steer handler 0x461840
 void steer_frame(Ctx *c);       // from Present
+void music_frame(Ctx *c);       // from Present: media keys next/previous song
 int rn_trace(void);
 void win32_init(Ctx *c, uint32_t image_size);
 uint32_t guest_alloc(uint32_t size);                           // zeroed, for host-owned guest data
