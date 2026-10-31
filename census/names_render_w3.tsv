@@ -1,0 +1,22 @@
+addr	name	system	confidence	evidence	tool	doc
+0x408830	Render_CreateWindowAndDevice	render	V	V: Direct3DCreate9(0x1f), registers class and CreateWindowExA 'GameFrame'/'NFS Underground', IDirect3D9 vtbl+0x40 CreateDevice, creates g_textureHeaderPool/g_vertexBufferHeaderPool, then VertexDecls/Effects/DeviceCaps/RT/Blur/QuadBuffers create; sole caller Render_InitSubsystem	ghidra+capstone	docs/re/render_pc.md
+0x4016e0	Render_PresentFrameAndPumpFE	render	V	V: device vtbl BeginScene(0xa4), FE DrawForeground/RenderPackages, EndScene(0xa8), Present(0x44), TestCooperativeLevel(0xc) with 0x88760868/9 then Device_HandleLost, then FEManager::Update and input polling; labelled as caller Texture::ReleaseD3D is suspect	ghidra	docs/re/render_pc.md
+0x411830	Render_Shutdown	render	V	V: DestroyWindow(g_hwnd), ReleaseSceneRTs, BlurReleaseRTs, releases quad buffers loop (0x1e entries) and calls device Release (vtbl+8) then IDirect3D9 Release; caller GameFlow::Run	ghidra	docs/re/render_pc.md
+0x5447c0	LampFlare_ProjectAndFade	render	I	I: called by LampFlares_Draw and Emitters_DrawFlares; ground query via GroundQuery__FindSurfaceBelow, frustum tests, view-space transform, distance fade between 4 float pairs by flare type (param_5 1/2), then submits through 0x5443f0	ghidra	docs/re/render_pc.md
+0x542c20	CarRender_SetEyeVectorsObjectSpace	render	I	I: transposes car matrix, eye pos minus car translation transformed to object space, length clamped to [DAT_006b6348,DAT_006b634c], normalized and stored at obj+0xc0, matrix product at +0xe0; callers CarRender_LitBodyPathA and CarRenderInfo_Render	ghidra	docs/re/render_pc.md
+0x542360	Vec3_FromAngles16Polar	render	I	I: two _ftol_nocw to Angle16 then Angle16SinCos twice; out = (r*c1*k, r*s1*k, h*k) polar to cartesian; callers CarRender_LitBodyPathA/B	ghidra	docs/re/render_pc.md
+0x5fbec8	D3DX_Back_ErrorFormat	render	V	V: _vsnprintf into 256-byte buffer, picks name string from node (+0x10 for type 2, +0x30 for type 12), passes fmt 0x6cc568 to D3DX_HlslLex_ErrorXU; 49 shader-backend/optimizer callers	capstone	docs/re/render_pc.md
+0x5fbf37	D3DX_Back_WarningFormat	render	V	V: same shape as D3DX_Back_ErrorFormat but ends in D3DX_HlslLex_Msg (0x5b1fca) and returns 0 without setting an error flag	capstone	docs/re/render_pc.md
+0x5d9de1	D3DX_HlslGen_ErrorFormat	render	V	V: _vsnprintf into 256-byte buffer, node name from +0x14+0x10 (type 5) or +0x30 (type 12), calls D3DX_HlslLex_ErrorXU, sets this[0x34]=1	capstone	docs/re/render_pc.md
+0x5ba1d9	D3DX_HlslSema_ErrorFormat	render	V	V: _vsnprintf then D3DX_HlslLex_ErrorXU(ctx+4,...), sets this[0x40]=1 (error flag)	capstone	docs/re/render_pc.md
+0x5ba278	D3DX_HlslSema_FatalErrorFormat	render	V	V: as D3DX_HlslSema_ErrorFormat but sets this[0x40] and this[0x44] both to 1; called from InternalError* handlers	capstone	docs/re/render_pc.md
+0x5d78db	D3DX_HlslNode_InitKind1	render	I	I: sets node vtable 0x6a0bf4, kind field [+4]=1, stores 3 args at +8,+0xc,+0x10	capstone	docs/re/render_pc.md
+0x5d814c	D3DX_HlslNode_InitKind8	render	I	I: sets vtable 0x6a0c64, kind [+4]=8, stores 5 args at +0x10..+0x20	capstone	docs/re/render_pc.md
+0x5d8831	D3DX_HlslNode_InitKind12	render	I	I: sets vtable 0x6a0ca4, kind [+4]=0xc, stores args, copies 8 dwords into +0x30 (rep movsd)	capstone	docs/re/render_pc.md
+0x5d7885	D3DX_HlslNode_ReleaseOrVirtual8	render	I	I: null-safe call of virtual method at vtable+8 of the node argument	capstone	docs/re/render_pc.md
+0x5f7186	D3DX_Back_Container_DeletingDtor	render	I	I: calls 0x5f7738 (frees four arrays at +8,+0x10,+0x18,+0x20) then frees this if flag bit 0 set	capstone	docs/re/render_pc.md
+0x5f7709	D3DX_Back_Container_Reset	render	I	I: zeroes fields +0..+0x28,+0x30,+0x34 and sets +0x2c=-1	capstone	docs/re/render_pc.md
+0x5f762c	D3DX_Back_Container_GetItemA	render	I	I: bounds check against count [+8] then returns array[+0x14][i], else 0	capstone	docs/re/render_pc.md
+0x5f7a42	D3DX_Back_Container_CopyField34	render	I	I: returns E_FAIL (0x80004005) if src null else this[0x34]=src[0x34]	capstone	docs/re/render_pc.md
+0x5b2aff	D3DX_EffectCompiler_ListNode_Init	render	I	I: zeroes 7 fields, +0x10 points to itself; ctor used by 5b2b74/5b2c79 after 0x1c-byte alloc	capstone	docs/re/render_pc.md
+0x5b2b58	D3DX_EffectCompiler_ListNode_DeletingDtor	render	I	I: calls 0x5b2b18 (recursively frees +4 and next-chain at +8) then frees this if flag bit 0 set	capstone	docs/re/render_pc.md
