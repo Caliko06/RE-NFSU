@@ -1,0 +1,3679 @@
+addr	name	literal	count
+0x401110	GameFlow::InitMainPoolAndTimer	Main Pool	1
+0x401190	Registry::ReadInstallSettings	Software\EA Games\Need For Speed Underground	1
+0x401190	Registry::ReadInstallSettings	Software\EA Games\NFS Underground	1
+0x401190	Registry::ReadInstallSettings	Install Dir	1
+0x401190	Registry::ReadInstallSettings	CD Drive	1
+0x401190	Registry::ReadInstallSettings	CacheSize	1
+0x401190	Registry::ReadInstallSettings	SwapSize	1
+0x401190	Registry::ReadInstallSettings	Language	1
+0x401190	Registry::ReadInstallSettings	StreamingInstall	1
+0x401520	DiscCheck_ModalFrameLoop	DiscErrorPC.fng	1
+0x401b30	GetSkuString	SKU_TAIWAN	1
+0x401b30	GetSkuString	EMW-4139	1
+0x401b30	GetSkuString	SKU_KOREA	1
+0x401b30	GetSkuString	EAI08004144	1
+0x401b30	GetSkuString	EAS08004144	1
+0x401b30	GetSkuString	EAH08004144	1
+0x401b30	GetSkuString	EAN08004144	1
+0x401b30	GetSkuString	EAD08004144	1
+0x401b30	GetSkuString	EAF08004144	1
+0x401b30	GetSkuString	EAE08004144	1
+0x401b30	GetSkuString	14705	1
+0x402720	Acid::InitSlotPools	AcidParticleSlotPool	1
+0x402720	Acid::InitSlotPools	AcidActiveGroupSlotPool	1
+0x402720	Acid::InitSlotPools	AcidEmitterSlotPool	1
+0x404110	Particles_DrawSystem	XETT_RoadSDr_SprayA	1
+0x404bd0	Config::ReadFileAndParse	Could not open [%s] with params [%s]	1
+0x404db0	Config::ParseScript	Unterminated quotes %s\n	1
+0x404db0	Config::ParseScript	INCLUDESCRIPT:	1
+0x404db0	Config::ParseScript	Expected 1 argument to INCLUDESCRIPT:  at line %d in %s\n	1
+0x404db0	Config::ParseScript	Could not find 'INCLUDESCRIPT:' file '%s' at line %d in %s\n	1
+0x404db0	Config::ParseScript	No command %s\n	17
+0x4051a0	Config::DescribeLocation	line %d in %s	1
+0x405260	Config::ParseIntArg	Not enough arguments %s\n	1
+0x405260	Config::ParseIntArg	Expected a number but found %s %s\n	2
+0x405300	Config::ParseFloatArg	Not enough arguments %s\n	1
+0x4075e0	Input::InitActionFormats	NFS Underground Game	1
+0x4075e0	Input::InitActionFormats	NFS Underground Menu	1
+0x408610	RVM_LookupTextures	RVM_MASK	1
+0x408610	RVM_LookupTextures	WHITE16X16_NOALPHA	1
+0x408830	Render_CreateWindowAndDevice	g_textureHeaderPool	1
+0x408830	Render_CreateWindowAndDevice	g_vertexBufferHeaderPool	1
+0x408830	Render_CreateWindowAndDevice	GameFrame	1
+0x408830	Render_CreateWindowAndDevice	NFS Underground	1
+0x409b70	LightStreakPath	WHITE16X16_NOALPHA	1
+0x40a510	Device_ResetAndRecreate	WorldViewProj	1
+0x40c600	eLightMaterialPlatInfo_PoolCreate	eLightMaterialPlatInfoSlotPool	1
+0x40e180	Effects_CreateAll	WorldViewProj	44
+0x40e740	Effect_BindHeadlightTextures	HEADLIGHTS	1
+0x40e900	Effect_BindHeadlightParams	HEADLIGHTS	2
+0x40f2e0	RenderQueue_PoolsCreate	eAnimTextureSlotPool	1
+0x40f2e0	RenderQueue_PoolsCreate	eTextureBucketSlotPool	1
+0x40f2e0	RenderQueue_PoolsCreate	eMeshRender	1
+0x410780	eStrip::InitSlotPool	eStripSlotPool	1
+0x411910	Drive_HasRacerBin	tracks\racer.bin	1
+0x411910	Drive_HasRacerBin	ks\racer.bin	1
+0x411910	Drive_HasRacerBin	acer.bin	1
+0x411910	Drive_HasRacerBin	.bin	1
+0x413310	Render_InitMovieTexture	MovieTexture	3
+0x413a70	Screen_PC_Controller_Config::InitKeyboardConfig	keyboard_config_title	1
+0x413a70	Screen_PC_Controller_Config::InitKeyboardConfig	disabled	2
+0x414350		FadeIn	3
+0x414350		GenericDialog.fng	1
+0x414f64		GenericDialog.fng	3
+0x4151c0	Screen_PC_Graphics::UpdateResolutionList	Res_%02d	1
+0x4155b0	Screen_PC_Customize_Graphics::Screen_PC_Customize_Graphics	CarenvmapSliderBase_1	1
+0x4155b0	Screen_PC_Customize_Graphics::Screen_PC_Customize_Graphics	CarenvmapSliderBase	1
+0x4155b0	Screen_PC_Customize_Graphics::Screen_PC_Customize_Graphics	CarenvmapSlider_1_	1
+0x4168f0	Screen_PC_Graphics::ToggleGraphicsOption	on_option_%02d	1
+0x4168f0	Screen_PC_Graphics::ToggleGraphicsOption	off_option_%02d	1
+0x416950	Screen_PC_Graphics::ToggleOption	on_option_%02d	1
+0x416950	Screen_PC_Graphics::ToggleOption	off_option_%02d	1
+0x416fc0	Log_PrintOrDashes	------------	1
+0x4170a0		GenericDialog.fng	1
+0x417100		GenericDialog.fng	1
+0x4171a0		GenericDialog.fng	1
+0x417210		GenericDialog.fng	1
+0x417700	Screen_MU_UG_NewOrLoad_PC2::Screen_MU_UG_NewOrLoad_PC2	DUMMY_SKIN%d	1
+0x417700	Screen_MU_UG_NewOrLoad_PC2::Screen_MU_UG_NewOrLoad_PC2	DUMMY_WHEEL%d	1
+0x417700	Screen_MU_UG_NewOrLoad_PC2::Screen_MU_UG_NewOrLoad_PC2	FE_SKYLINE	1
+0x417700	Screen_MU_UG_NewOrLoad_PC2::Screen_MU_UG_NewOrLoad_PC2	Description	1
+0x417cf0	Screen_MU_UG_NewOrLoad_PC2::UpdateMenubarItems	menubar%d	4
+0x417e70	Screen_MU_UG_NewOrLoad_PC2::FindControls	Player_DATA_0%d	1
+0x417e70	Screen_MU_UG_NewOrLoad_PC2::FindControls	menubar%d	1
+0x4181e0	Screen::SetPlayerDataSlotLabels	Player_DATA_0%d	1
+0x4183b4		PC_Menubar.fng	1
+0x4183b4		HighLight	3
+0x4183b4		UnHighLight	3
+0x4183b4		FadeIn	2
+0x4183b4		GenericOKDialog.fng	3
+0x418c00	FEDialog::ShowGenericDialog	GenericDialog.fng	1
+0x418cc0		GenericOKDialog.fng	1
+0x418e10	EZWheel::CreateDInputAndEnumerate	ERROR: failed to create a DInput object\n	1
+0x418e10	EZWheel::CreateDInputAndEnumerate	ERROR: could not enumerate devices\n	1
+0x419180		ERROR: SetProperty failed\n	1
+0x419220	EZWheel::ReadChannel	ERROR: trying to read a wheel on channel %d that doesn't have a handle\n	1
+0x419220	EZWheel::ReadChannel	ERROR: ReadChannel %d: failed to set actuators to ON\n	2
+0x419220	EZWheel::ReadChannel	ERROR: ReadChannel %d: failed to acquire device, error DIERR_OTHERAPPHASPRIO.\n	1
+0x419220	EZWheel::ReadChannel	ERROR: ReadChannel %d: failed to acquire device, error DIERR_NOTINITIALIZED.\n	1
+0x419220	EZWheel::ReadChannel	ERROR: ReadChannel %d: failed to acquire device, error DIERR_INVALIDPARAM.\n	1
+0x419220	EZWheel::ReadChannel	ERROR: ReadChannel %d: failed to acquire device, error unknown.\n	1
+0x419220	EZWheel::ReadChannel	ERROR: could not retrieve positional information for wheel on channel %d\n	3
+0x419220	EZWheel::ReadChannel	Wheel got unplugged on channel %d!\n	3
+0x419220	EZWheel::ReadChannel	\nInput changed on channel %d.	6
+0x419220	EZWheel::ReadChannel	New lX:\t%d	6
+0x419220	EZWheel::ReadChannel	New lY:\t%d	6
+0x419220	EZWheel::ReadChannel	New lZ:\t%d	6
+0x419220	EZWheel::ReadChannel	New lRx:\t%d	6
+0x419220	EZWheel::ReadChannel	New lRy:\t%d	6
+0x419220	EZWheel::ReadChannel	New lRz:\t%d	6
+0x419220	EZWheel::ReadChannel	New lVX:\t%d	6
+0x419220	EZWheel::ReadChannel	New lVY:\t%d	6
+0x419220	EZWheel::ReadChannel	New lVZ:\t%d	6
+0x419220	EZWheel::ReadChannel	New lVRx:\t%d	6
+0x419220	EZWheel::ReadChannel	New lVRy:\t%d	6
+0x419220	EZWheel::ReadChannel	New lVRz:\t%d	6
+0x419220	EZWheel::ReadChannel	New lAX:\t%d	6
+0x419220	EZWheel::ReadChannel	New lAY:\t%d	6
+0x419220	EZWheel::ReadChannel	New lAZ:\t%d	6
+0x419220	EZWheel::ReadChannel	New lARx:\t%d	6
+0x419220	EZWheel::ReadChannel	New lARy:\t%d	6
+0x419220	EZWheel::ReadChannel	New lARz:\t%d	6
+0x419220	EZWheel::ReadChannel	New lFX:\t%d	6
+0x419220	EZWheel::ReadChannel	New lFY:\t%d	6
+0x419220	EZWheel::ReadChannel	New lFZ:\t%d	6
+0x419220	EZWheel::ReadChannel	New lFRx:\t%d	6
+0x419220	EZWheel::ReadChannel	New lFRy:\t%d	6
+0x419220	EZWheel::ReadChannel	New lFRz:\t%d	6
+0x419220	EZWheel::ReadChannel	New rglVSlider[%d]:\t%d	3
+0x419220	EZWheel::ReadChannel	New rglASlider[%d]:\t%d	3
+0x419220	EZWheel::ReadChannel	New rglFSlider[%d]:\t%d	3
+0x419220	EZWheel::ReadChannel	New rglSlider[%d]:\t%d	3
+0x419220	EZWheel::ReadChannel	New rgdwPOV[%d]:\t%d	3
+0x419220	EZWheel::ReadChannel	New rgbButtons[%d]:\t%d	3
+0x419900	EZWheel::CreatePeriodicEffect	ERROR: Failed to create periodic effect on channel %d\n	1
+0x419ab0	EZWheel::UpdatePeriodicForce	ERROR: Failed to update periodic force on channel %d\n	1
+0x419df0		EZ Wheel Wrapper v4.26\n	1
+0x419ea0	EZWheel::Poll	ERROR: could not enumerate devices\n	1
+0x41a250	EZWheel::PlayCondition	ERROR: trying to play a force on channel %d but no	1
+0x41a250	EZWheel::PlayCondition	wheel/joystick opened.\n	1
+0x41a4b0	EZWheel::PlayConstantForce	ERROR: trying to play a force on channel %d but no	1
+0x41a4b0	EZWheel::PlayConstantForce	wheel/joystick opened.\n	1
+0x41a6c0	EZWheel::PlayConditionForce	ERROR: trying to play a force on channel %d but no	1
+0x41a6c0	EZWheel::PlayConditionForce	wheel/joystick opened.\n	1
+0x41a8c0	EZWheel::PlayPeriodicForceA	ERROR: trying to play a force on channel %d but no	1
+0x41a8c0	EZWheel::PlayPeriodicForceA	wheel/joystick opened.\n	1
+0x41ab00	EZWheel::PlayPeriodicForceB	ERROR: trying to play a force on channel %d but no	1
+0x41ab00	EZWheel::PlayPeriodicForceB	wheel/joystick opened.\n	1
+0x41ad20	EZWheel::PlayPeriodicForceC	ERROR: trying to play a force on channel %d but no	1
+0x41ad20	EZWheel::PlayPeriodicForceC	wheel/joystick opened.\n	1
+0x41af40	EZWheel::PlayConditionForceB	ERROR: trying to play a force on channel %d but no	1
+0x41af40	EZWheel::PlayConditionForceB	wheel/joystick opened.\n	1
+0x41b210	EZWheel::PlayPeriodicForceMulti	ERROR: trying to play a force on channel %d but no	1
+0x41b210	EZWheel::PlayPeriodicForceMulti	wheel/joystick opened.\n	1
+0x41b670	EZWheel::StopChannelForces	ERROR: trying to play a force on channel %d but no	1
+0x41b670	EZWheel::StopChannelForces	wheel/joystick opened.\n	1
+0x41bab0	EZWheel::StartEffect	ERROR: Failed to start force effect on channel %d\n	1
+0x41bab0	EZWheel::StartEffect	ERROR: Trying to start force effect on channel %d but we have an invalid effectid\n	1
+0x41bb30	EZWheel::StopEffect	ERROR: Failed to stop force effect on channel %d\n	1
+0x41bb30	EZWheel::StopEffect	ERROR: Trying to stop force effect on channel %d but we have an invalid effectid\n	1
+0x41bbb0	EZWheel::UnloadEffect	ERROR: Failed to unload force effect on channel %d\n	1
+0x41bbb0	EZWheel::UnloadEffect	ERROR: Trying to unload force effect on channel %d but we have an invalid effectid\n	1
+0x41bc60	EZWheel::SetOverallGain	Setting gain to %d\n	1
+0x41bc60	EZWheel::SetOverallGain	ERROR: Failed to set overall force gain\n	1
+0x41bcf0	EZWheel::GetOverallGain	ERROR: Failed to get overall force gain\n	1
+0x41bda0	EZWheel::CreateConstantEffect	ERROR: Failed to create constant effect on channel %d\n	1
+0x41bf20	EZWheel::UpdateConstantForce	ERROR: Failed to update constant force on channel %d\n	1
+0x41c070	EZWheel::CreateConditionEffect	ERROR: Failed to create condition effect on channel %d\n	1
+0x41c240	EZWheel::UpdateConditionForce	ERROR: Failed to update condition force on channel %d\n	1
+0x41c420	Config::OpenCfgFile	.cfg	1
+0x41c680	Settings::Load	Not enough arguments %s\n	2
+0x41c7a0	Settings::Save	FWriteSafe failed.  Only wrote %d of %d bytes	2
+0x41c930		FWriteSafe failed.  Only wrote %d of %d bytes	2
+0x41c9e0	Settings::WriteAll	NULL file handle passed to FWriteSafe	2
+0x41c9e0	Settings::WriteAll	FWriteSafe failed.  Only wrote %d of %d bytes	2
+0x41cb40		NULL file handle passed to FWriteSafe	5
+0x41cb40		FWriteSafe failed.  Only wrote %d of %d bytes	5
+0x41d140	ProfileList::Load	%s%s%s	1
+0x41d2a0	ProfileList::Touch	%s%s%s	1
+0x41d680		%s%s%d%s	1
+0x41d7a0		%s%s%d%s	1
+0x41dc10	Save::BuildPath	%s%s%s%s	2
+0x41dc10	Save::BuildPath	%s%s%d%s	2
+0x41dd60	Profile::Delete	%s%s%s	31
+0x41e200	Opt::Write	%s%s%s	1
+0x41e330	Opt::Read	%s%s%s	1
+0x41e4d0	PCHelp::Init	PC_ContextHelp.fng	1
+0x41e670	PCHelp::UpdateMouseTooltip	PCHELP_%s	1
+0x41fc00	World::DoSnapshot	World	1
+0x41fc00	World::DoSnapshot	AllCollisionBodies	1
+0x421c70	RCQueuedMessage::InitSlotPool	RCQueuedMessageSlotPool	1
+0x421e80	RaceCoordinator::DoSnapshot	RaceCoordinator	1
+0x422580	Grid::GetStartPositions	ForwardStartingPosition	1
+0x422580	Grid::GetStartPositions	BackwardStartingPosition	1
+0x423280	Race::PreRaceAnimStage	GLOBAL\PRERACEANIM.LZC	3
+0x423b50	Rivals::HandlePresent	THE_PRESENT	1
+0x4251a0	CarDriver::DoSnapshot	CarDriver	1
+0x425350	Car::Car	CarWorldObject	1
+0x425af0	Car_SerializeFields	Car%d	1
+0x4281e0	World::ProcessZoneTriggers	WorldObject	1
+0x4281e0	World::ProcessZoneTriggers	XO_PlaneA_1b_01	1
+0x42b0d0	Player::Player	Player%d	1
+0x42bd60	Player::DoSnapshot	Player	1
+0x431020	Player::InitDriftAndDirectionMarker	MARKER_DIRECTION_AID	1
+0x431f40	RaceParameters::DoSnapshot	RaceParameters	1
+0x432890	RaceParameters::InitDriverSlot	PLAYER	1
+0x432910	cPlayerSettings::DoSnapshot	cPlayerSettings	1
+0x432a30	HudTach_PickFaceHashes	3RDPERSON_	3
+0x432a30	HudTach_PickFaceHashes	10500LINES	3
+0x432a30	HudTach_PickFaceHashes	8500RED	3
+0x432a30	HudTach_PickFaceHashes	9500LINES	3
+0x432a30	HudTach_PickFaceHashes	7500RED	3
+0x432a30	HudTach_PickFaceHashes	8500LINES	3
+0x432a30	HudTach_PickFaceHashes	7500LINES	3
+0x4334a0	RacingCar::DoSnapshot	RacingCar	1
+0x4343f0	Race::DoSnapshot	Race	1
+0x43b930	Net::SetupRemoteRacerRide	DUMMY_SKIN%d	1
+0x43b930	Net::SetupRemoteRacerRide	DUMMY_WHEEL%d	1
+0x43ccf0	Ride_ReadFromBitStream	DUMMY_SKIN%d	1
+0x43ccf0	Ride_ReadFromBitStream	DUMMY_WHEEL%d	1
+0x444100	TrackPathCoordinate::DoSnapshot	TrackPathCoordinate	1
+0x444480	StreamSections::Init	Track Streaming	1
+0x445180	StreamSections::Round	%s - %s	2
+0x445d00	StreamBoundaries::DebugDump	MARKER_BOUNDARY	1
+0x445d00	StreamBoundaries::DebugDump	Seeulator	4
+0x445d00	StreamBoundaries::DebugDump	%s\Gonkulator.hoo	1
+0x447160	InitZDirArchive	NFSUNDER\ZDIR.BIN	1
+0x447160	InitZDirArchive	NFSUNDER\ZZDATA	1
+0x4472e0	GameFlow::Run	LoadingFrontEnd	1
+0x447f40	InitResourceFileSlotPool	ResourceFileSlotPool	1
+0x448530	GameFlow::SetNextUnloadingFrontEnd	UnloadingFrontEnd	1
+0x448560	GameFlow::SetNextLoadingTrackCommon	LoadingTrackCommon	1
+0x448600	GameFlow::LoadGlobalA	GLOBAL\GLOBALA.BUN	1
+0x448600	GameFlow::LoadGlobalA	LanguageMemoryPool	1
+0x448600	GameFlow::LoadGlobalA	LANGUAGES\LANGUAGETEXTURES.BIN	3
+0x448650	GameFlow::LoadGlobalB	GLOBAL\GLOBALB.LZC	1
+0x448650	GameFlow::LoadGlobalB	GLOBAL\GLOBALB.BUN	1
+0x448650	GameFlow::LoadGlobalB	PC_Loading.fng	2
+0x448650	GameFlow::LoadGlobalB	Chyron.fng	4
+0x448a10	GameFlow::EndLoadingFrontEnd	EndGameFlowLoadingFrontEnd	1
+0x448a40	GameFlow::LoadingFrontEndPart3	GameFlowLoadingFrontEndPart3	1
+0x448a40	GameFlow::LoadingFrontEndPart3	EndGameFlowLoadingFrontEnd	1
+0x448b10	GameFlow::LoadingFrontEndPart1	Load	1
+0x448b10	GameFlow::LoadingFrontEndPart1	GameFlowLoadingFrontEndPart1	1
+0x448b10	GameFlow::LoadingFrontEndPart1	FRONTEND\FRONTB.BUN	1
+0x448d10	GameFlow::UnloadingFrontEnd	LoadingTrackCommon	4
+0x448ee0	GameFlow::BeginLoadingTrackSpecific	BeginGameFlowLoadingTrackSpecific	1
+0x448f70	GameFlow_CreateRides	Cars 	1
+0x448f70	GameFlow_CreateRides	GameFlowLoadingTrackCommonPart2	1
+0x4493a0	GameFlow::UnloadingTrackCommon	LoadingTrackCommon	6
+0x4493a0	GameFlow::UnloadingTrackCommon	LoadingFrontEnd	6
+0x4494f0	GameFlow::EndLoadingTrackSpecific	EndGameFlowLoadingTrackSpecific	1
+0x44952b	GameFlow::LoadingTrackSpecificPart6	GameFlowLoadingTrackSpecificPart6	1
+0x44952b	GameFlow::LoadingTrackSpecificPart6	TRACKS\TEX%dTRACK.BIN	1
+0x4495c0	GameFlow::LoadingTrackSpecificPart3	GameFlowLoadingTrackSpecificPart3	1
+0x449600	GameFlow::LoadingTrackSpecificPart2	Sound	1
+0x449600	GameFlow::LoadingTrackSpecificPart2	GameFlowLoadingTrackSpecificPart2	1
+0x449600	GameFlow::LoadingTrackSpecificPart2	GameFlowLoadingTrackSpecificPart3	1
+0x449765	GameFlow::LoadingTrackSpecificPart1	GameFlowLoadingTrackSpecificPart1	1
+0x449765	GameFlow::LoadingTrackSpecificPart1	TRACKS\TRACKB%d.LZC	1
+0x449765	GameFlow::LoadingTrackSpecificPart1	TRACKS\TRACKB%d.BUN	1
+0x449870	GameFlow::TrackWorldInit	Track	1
+0x449870	GameFlow::TrackWorldInit	GameFlowBeginRacing	1
+0x449a10	GameFlow::UnloadingTrackSpecific	BeginGameFlowUnloadingTrackCommon	1
+0x449ec0		%d.%d	1
+0x449f20	Version_FormatString	%d.%d.%d	1
+0x44a180		Win road race	1
+0x44a1b0		Win drag race	1
+0x44a1e0		Steer player in drag race	1
+0x44a220		Be traffic car	1
+0x44a250		Be ambient traffic car	1
+0x44a6f0	AICarController::DoSnapshot	AICarController	1
+0x44ceb0	DrivingInformation::DoSnapshot	DrivingInformation	1
+0x44d420		Avoid Avoidable	1
+0x44d430		Pass	1
+0x44d440		Just Drive	1
+0x44d450		Pull over	1
+0x44d460		Get Unstuck	1
+0x44d470		I just got hit!	1
+0x44d480		Accident recovery	1
+0x44d490		Block	1
+0x44d4a0		Drive Traffic Lane	1
+0x44d4b0		Avoid cross traffic	1
+0x44d4c0		Avoid Cars as a traffic car	1
+0x44d670	AIPlan::DoSnapshot	AIPlan	1
+0x44d760	AIGoal::DoSnapshot	AIGoalPtr	1
+0x44e370	AIAction::DoSnapshot	AIAction	1
+0x44e480	AIAction::DoSnapshot	AIActionPtr	1
+0x4514c0	AIActionPullOver::DoSnapshot	AIActionPullOver	1
+0x455810	HUD_UpdateMarkers	MARKER_GREEN	3
+0x455810	HUD_UpdateMarkers	MARKER_GREENARROW	1
+0x458dc0	DriveTarget::DoSnapshot	DriveTarget	1
+0x45a930	DebugCube::Build	DEBUG_CUBE	1
+0x45ac60	DrivingChoice::DoSnapshot	DrivingChoice	1
+0x45dbb0	RealDriver::ctor	MARKER_GREENARROW	1
+0x45e1b0	PsychoDriver::DoSnapshot	PsychoDriver	1
+0x460450	DragDriver::DoSnapshot	DragDriver	1
+0x462ee0	AnimationToAvoidInfo::DoSnapshot	AnimationToAvoidInfo	1
+0x4648c0	CarState::DoSnapshot	CarState	1
+0x465770	Collision::DoSnapshot	Collision	1
+0x466f70	CollisionBodyWitness::DoSnapshot	CollisionBodyWitness	1
+0x467010	CollisionBodyWitness::SnapshotEverything	AllCollisionBodyWitnesses	1
+0x4688e0	DynamicCollisionBody::DoSnapshot	DynamicCollisionBody	1
+0x469b00	CarCollisionBody::CarCollisionBody	Car%d	1
+0x46a440	TrackPolygonBody::ctor	TrackPolygon%d	1
+0x46a6e0	AllTrackPolygonCollisionBodies::Serialize	AllTrackPolygonCollisionBodies	1
+0x46c950	Engine::DoSnapshot	Engine	1
+0x46d390	DriveTrain::DriveTrain	Drvtrn	1
+0x46d510	DriveTrain::DoSnapshot	DriveTrain	1
+0x472600	GJKWitness::DoSnapshot	GJKWitness	1
+0x4740d0	MellowMover::MellowMover	MeloMvr	1
+0x474500	MellowMover::DoSnapshot	MellowMover	1
+0x475070	Mellovator::Mellovator	Melov8r	1
+0x475240	Mellovator::DoSnapshot	Mellovator	1
+0x476840	PhysicsMover::PhysicsMover	PhysMov	1
+0x476fa0	PhysicsMover::DoSnapshot	PhysicsMover	1
+0x47b600	Render_InitGlobalPoseBuffer	EAGL::Transform GlobalPoseBuffer CAnimPart	1
+0x47b6d0	Render_LoadSkeleton	Skeleton	1
+0x47cac0	NisSceneManager::FindNisSceneOriginPosition	ForwardStartLine	1
+0x47cac0	NisSceneManager::FindNisSceneOriginPosition	ForwardFinishLine	1
+0x47cac0	NisSceneManager::FindNisSceneOriginPosition	BackwardStartLine	1
+0x47cac0	NisSceneManager::FindNisSceneOriginPosition	BackwardFinishLine	1
+0x47ee50	Countdown_RefreshForNumber	COUNTDOWN_%d	1
+0x47f310	NISFlagGirl	NISFlagGirl	1
+0x47f680	Camera::SetStartingPosition	ForwardStartingPosition	1
+0x47f680	Camera::SetStartingPosition	BackwardStartingPosition	1
+0x48e8b0	Players::UpdateStreamViewers	JR2Server	2
+0x494970	Screen_Options::Screen_Options	Option 1 a	1
+0x494970	Screen_Options::Screen_Options	Option 1 b	1
+0x494970	Screen_Options::Screen_Options	Option 1 c	1
+0x494970	Screen_Options::Screen_Options	Option 1 d	1
+0x494970	Screen_Options::Screen_Options	Option 1 e	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	CarModel_%d	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	Driver_%d	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	Taunt_%d	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	Bet_%d	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	Position_%d	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	RacerColor_%d	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	BottomBacking_%d	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	Coner_%d	1
+0x494e40	Screen_PreRaceStats::Screen_PreRaceStats	CarColor_%d	1
+0x495d00		GREEN	1
+0x495d00		BLUE	1
+0x4969e0	PostRaceMenuScreen::Setup	Init0%d	1
+0x4969e0	PostRaceMenuScreen::Setup	TopBacking	1
+0x4969e0	PostRaceMenuScreen::Setup	Button%d	2
+0x4969e0	PostRaceMenuScreen::Setup	Button_%d	1
+0x496e00	PostRaceMenuScreen::Quit	MU_PostRaceConfirm.fng	1
+0x497115		MU_PostRaceConfirm.fng	1
+0x497185		MU_PostRaceConfirm.fng	1
+0x4971f5		MU_PostRaceConfirm.fng	1
+0x4975c0	PostRaceMenuScreen::NotificationMessage	DemoDisc_Marketing.fng	1
+0x4975c0	PostRaceMenuScreen::NotificationMessage	FadeOut	24
+0x4975c0	PostRaceMenuScreen::NotificationMessage	Button%d	2
+0x498d90	PostRaceResultsScreen::SetupRacers	Whhyl	1
+0x498f10		Name%d	1
+0x498f10		RacerColor_%d	1
+0x498f10		CarColor_%d	1
+0x498f10		Pos%d	1
+0x498f10		Position_%d	1
+0x498f10		CarModel_%d	1
+0x498f10		Rep_%d	2
+0x498f10		Lead%d	1
+0x498f10		Back_%d	1
+0x498f10		Corner_%d	1
+0x498f10		PointEarned_%d	1
+0x498f10		TotalPoints_%d	1
+0x499aa0	PostRaceResultsScreen::SetupRaceTimes	PointEarned_%d	2
+0x499aa0	PostRaceResultsScreen::SetupRaceTimes	TotalPoints_%d	2
+0x499aa0	PostRaceResultsScreen::SetupRaceTimes	Lead%d	23
+0x499aa0	PostRaceResultsScreen::SetupRaceTimes	Time%d	24
+0x499aa0	PostRaceResultsScreen::SetupRaceTimes	BestLap_%d	66
+0x49a3e0	PostRaceResultsScreen::SetupRaceTimes	PointEarned_%d	2
+0x49a3e0	PostRaceResultsScreen::SetupRaceTimes	TotalPoints_%d	2
+0x49a3e0	PostRaceResultsScreen::SetupRaceTimes	BestLap_%d	1
+0x49a3e0	PostRaceResultsScreen::SetupRaceTimes	Lead%d	151
+0x49a3e0	PostRaceResultsScreen::SetupRaceTimes	Time%d	225
+0x49ab64		Lead%d	1
+0x49ab64		Time%d	1
+0x49ab64		BestLap_%d	2
+0x49ab64		PointEarned_%d	1
+0x49ab64		%s %d	3
+0x49ab64		TotalPoints_%d	1
+0x49c0e0	PostRaceStatsScreen::Init	LapNumber_%d	1
+0x49c0e0	PostRaceStatsScreen::Init	AllLapTimes_%d	1
+0x49c0e0	PostRaceStatsScreen::Init	PositionAfterEachLap_%d	1
+0x49c0e0	PostRaceStatsScreen::Init	DataName_%d	1
+0x49c0e0	PostRaceStatsScreen::Init	Data_%d	1
+0x49c0e0	PostRaceStatsScreen::Init	TextBack_%d	1
+0x49c820	PostRaceStatsScreen::Setup	mouse_over_L	1
+0x49c91e		mouse_over_R	20
+0x49c91e		mouse_over_L	10
+0x49d3e0	PostRaceStatsScreen::DrawRacerName	%s - %s	3
+0x49db30	PostRaceStatsScreen::DrawMaxSpeed	%s %s	1
+0x49dc20	PostRaceStatsScreen::DrawAverageSpeed	%s %s	1
+0x49dd10	PostRaceStatsScreen::DrawOdometer	%s %s	1
+0x49de80	PostRaceStatsScreen::DrawPercentage	%s%%	1
+0x49df30	PostRaceStatsScreen::DrawLongestDrift	%s %s	1
+0x49e420	PostRaceRewardList::AddRewardItem	EVENT_REWARD_%s_LEVEL_%d	1
+0x49e420	PostRaceRewardList::AddRewardItem	_BACKWARD	1
+0x49e420	PostRaceRewardList::AddRewardItem	_FORWARD	1
+0x49e420	PostRaceRewardList::AddRewardItem	EVENT_REWARD_TRACK_%d%s	1
+0x49e420	PostRaceRewardList::AddRewardItem	HYUNDAI	5
+0x49e420	PostRaceRewardList::AddRewardItem	_USA	2
+0x49e420	PostRaceRewardList::AddRewardItem	_KOREA	1
+0x49e420	PostRaceRewardList::AddRewardItem	_EUROPE	7
+0x49e7e0	PostRaceRewardList::AddUniqueEventReward	EVENT_REWARD_EVENT_%d_UNIQUE	1
+0x49f2e3		Flashy	8
+0x4a03d0	HudTach::HudTach	RPM_%d	1
+0x4a03d0	HudTach::HudTach	RPM_bar	1
+0x4a03d0	HudTach::HudTach	RPM45Corner_Left	1
+0x4a03d0	HudTach::HudTach	RPM45Corner_Right	1
+0x4a03d0	HudTach::HudTach	Shift_light_back	1
+0x4a1580	HudLapCounter::HudLapCounter	LapCounterBacking_%d	1
+0x4a1820	HudLapCounter::Update	--:--:--	1
+0x4a1ee0	HudSplitTime::Show	ZoominRed	1
+0x4a1ee0	HudSplitTime::Show	ZoominGreen	1
+0x4a1f40	HudLeaderboard::HudLeaderboard	LBData_%d	1
+0x4a1f40	HudLeaderboard::HudLeaderboard	LBTextBacking_%d	1
+0x4a1f40	HudLeaderboard::HudLeaderboard	LeaderText_%d	1
+0x4a1f40	HudLeaderboard::HudLeaderboard	LBBacking_%d	1
+0x4a1f40	HudLeaderboard::HudLeaderboard	LeaderBoardFill	1
+0x4a1f40	HudLeaderboard::HudLeaderboard	LeaderBoardLine	1
+0x4a34c0	LeaderBoard::DrawDriftScores	SetPlayerColor	1
+0x4a34c0	LeaderBoard::DrawDriftScores	Init	1
+0x4a3690	LeaderBoard::DrawDriftPlayerNames	SetPlayerColor	1
+0x4a3690	LeaderBoard::DrawDriftPlayerNames	Init	1
+0x4a37d0	LeaderBoard::DrawDriftCarNames	SetPlayerColor	1
+0x4a37d0	LeaderBoard::DrawDriftCarNames	Init	1
+0x4a3c60	HudWrongWay::Update	%1.1f	1
+0x4a3c60	HudWrongWay::Update	FadeIn	18
+0x4a3c60	HudWrongWay::Update	Blink	12
+0x4a3c60	HudWrongWay::Update	FadeOut	24
+0x4a3f00	HudTachDrag::HudTachDrag	RPM_%d	1
+0x4a3f00	HudTachDrag::HudTachDrag	RPM_bar	1
+0x4a3f00	HudTachDrag::HudTachDrag	RPM45Corner_Left	1
+0x4a3f00	HudTachDrag::HudTachDrag	RPM45Corner_Right	1
+0x4a4a50	HudTachDrag::Update	Blink	1
+0x4a4a50	HudTachDrag::Update	Init	4
+0x4a4a50	HudTachDrag::Update	ZoomIn	33
+0x4a4a50	HudTachDrag::Update	PulseRed	6
+0x4a4a50	HudTachDrag::Update	PulseGreen	4
+0x4a4a50	HudTachDrag::Update	PulseBlue	2
+0x4a5860	HudEngineHeat::HudEngineHeat	back_heat_%d	1
+0x4a5a30	EngineTempGauge::BuildTempBarImageList	heat_%d	1
+0x4a5b60	HudEngineHeat::Update	Blink	1
+0x4a5ca0	HudNos::HudNos	NOS_bar_6_%d	1
+0x4a5ca0	HudNos::HudNos	NOS_bar_4_%d	1
+0x4a5ca0	HudNos::HudNos	bPNode SlotPool	30
+0x4a5ca0	HudNos::HudNos	NOS_bar_2_%d	1
+0x4a6360	NitrousGauge::SetStageVisibility	NOS_bar_%d_%d	1
+0x4a6a10	HudSmokeApplause::Update	%2d:%02d	1
+0x4a6a10	HudSmokeApplause::Update	 0:%02d	1
+0x4a6a10	HudSmokeApplause::Update	%2d%%	1
+0x4a6f10	HudSpeedTrapDrift::HudSpeedTrapDrift	CurrentSpeed_Trap_Backing_0%d	1
+0x4a6f10	HudSpeedTrapDrift::HudSpeedTrapDrift	NextSpeeed_Trap_Indicator	1
+0x4a7660	HudSpeedTrapDrift::Update	Highlight	4
+0x4a7a10	DriftGauge::UpdateCountdown	%1.1f	1
+0x4a7b80	DriftGauge::SetTextAngleColor	LosingMult	6
+0x4a7b80	DriftGauge::SetTextAngleColor	TooSlowToGain	6
+0x4a7d60	HudRaceOver::Update	Animate	10
+0x4a7d60	HudRaceOver::Update	%s\n%s%s  	2
+0x4a83c0	HudStylePoints::Update	Highlight	2
+0x4a87b0	CunningStuntSpread::DrawStunt	%dx%d	6
+0x4a87b0	CunningStuntSpread::DrawStunt	%+dx%d	3
+0x4a8cb0	HudOnline::Update	%1.1f	1
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_Main_PC.fng	1
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_UG_MapScreen.fng	1
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_Garage.fng	2
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_UG_JunkmanGiveth.fng	1
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_UG_SamanthaGiveth.fng	2
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_UG_UndergroundMenu.fng	26
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_UG_NewCareerExtroFMV.fng	16
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_UG_MagazineGiveth.fng	16
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_QuickRaceModeSelect.fng	1
+0x4ab670	cFrontendDatabase::CalculateFirstFrontendScreenToSeeAfterQuitRace	MU_OnlineMenu.fng	1
+0x4ac0f0	cFrontendDatabase::BuildRideForCarHandle	DUMMY_SKIN%d	1
+0x4ac0f0	cFrontendDatabase::BuildRideForCarHandle	DUMMY_WHEEL%d	1
+0x4ac220		ONLINE_RX7	1
+0x4ac220		ONLINE_1	1
+0x4ac220		ONLINE_NEON	1
+0x4ac220		ONLINE_2	1
+0x4ac220		ONLINE_CELICA	1
+0x4ac220		ONLINE_3	1
+0x4ac220		STYLE_SPONSOR_CAR_%d	1
+0x4ac460	CustomizationDB::Init	PRESET_SLOT_%d	1
+0x4ac460	CustomizationDB::Init	CUSTOMIZABLE_%s	1
+0x4ac5a0	FECarConfig::BuildRide	DUMMY_SKIN%d	1
+0x4ac5a0	FECarConfig::BuildRide	DUMMY_WHEEL%d	1
+0x4ac820		GREEN	2
+0x4ac820		BLUE	2
+0x4acb90	CustomizationDB::InitDummyRide	DUMMY_SKIN%d	1
+0x4acb90	CustomizationDB::InitDummyRide	DUMMY_WHEEL%d	1
+0x4ad2d0	bPNode::InitSlotPool	bPNode SlotPool	1
+0x4ad6d0	GetTrackNameHash	TRACK_NAME_%d	1
+0x4ad6d0	GetTrackNameHash	REVERSE_TRACK_NAME_%d	1
+0x4ada60	Render_InitMiniWorld	MiniWorld_DynamicLights	1
+0x4ada60	Render_InitMiniWorld	TRFE_ROAD02	1
+0x4ada60	Render_InitMiniWorld	TRFE_ROAD02_%02d	1
+0x4ada60	Render_InitMiniWorld	_FLARE	1
+0x4ada60	Render_InitMiniWorld	MARKER_GOLDRING	1
+0x4af140	GarageCarLoader::Update	DUMMY_SKIN%d	2
+0x4af140	GarageCarLoader::Update	DUMMY_WHEEL%d	2
+0x4af620	GarageMainScreen::GarageMainScreen	%s %d	2
+0x4af620	GarageMainScreen::GarageMainScreen	PLATFORM	1
+0x4af620	GarageMainScreen::GarageMainScreen	CAR_NAME_%s	1
+0x4aff90	GarageMainScreen::UpdateCarStatisticsBars	%s %d	1
+0x4b0e50	GarageMainScreen::SetRideInfo	CAR_NAME_%s	1
+0x4b0e50	GarageMainScreen::SetRideInfo	Cash: %d	1
+0x4b1530	GarageMainScreen::SetCarType	SECONDARY_LOGO_	1
+0x4b1590	GarageMainScreen::CarLoadingHasStarted	Loading...	2
+0x4b1590	GarageMainScreen::CarLoadingHasStarted	BLUEPRINT_%s	1
+0x4b2c33		DUMMY_SKIN%d	1
+0x4b2c33		DUMMY_WHEEL%d	1
+0x4b2c33		FE_SKYLINE	1
+0x4b3240		GenericDialog.fng	2
+0x4b3240		Idle	6
+0x4b3240		Highlight	1
+0x4b3240		FadeIn	1
+0x4b3c60	Race::BuildRandomOpponentRide	DUMMY_SKIN%d	16
+0x4b3c60	Race::BuildRandomOpponentRide	DUMMY_WHEEL%d	16
+0x4b40a0		DUMMY_SKIN%d	1
+0x4b40a0		DUMMY_WHEEL%d	1
+0x4b5090	RaceStarter::SetupFreeRun	DUMMY_SKIN1	1
+0x4b5090	RaceStarter::SetupFreeRun	DUMMY_WHEEL1	1
+0x4b5c00	QuickRace::StartRaceByMode	UnloadingFrontEnd	1
+0x4b5df0	Career::StartRaceFromEvent	DUMMY_SKIN1	1
+0x4b5df0	Career::StartRaceFromEvent	DUMMY_WHEEL1	1
+0x4b5df0	Career::StartRaceFromEvent	UnloadingFrontEnd	3
+0x4b6390	QuickRace::LaunchFromSetupGlobals	UnloadingFrontEnd	1
+0x4b6390	QuickRace::LaunchFromSetupGlobals	LoadingTrackCommon	1
+0x4b6390	QuickRace::LaunchFromSetupGlobals	SkipFE	1
+0x4b6895		split_screen_%d	4
+0x4b6895		GarageMain.fng	8
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	Mode_%d	7
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	MODE_CIRCUIT	1
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	QR_circuit	1
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	MODE_SPRINT	1
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	QR_sprint	1
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	MODE_RACE_DRAG	1
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	QR_drag	1
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	GENERICPLACEHOLDER	3
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	QR_drift	1
+0x4b7a94		Mode_%d	1
+0x4b7a94		Idle	1
+0x4b7a94		Highlight	1
+0x4b7a94		MU_QuickRaceOptions_PC.fng	1
+0x4b7a94		FadeIn	1
+0x4b81f0	QuickRaceOptions_UpdateRowOpt10	Option%1dTextString	1
+0x4b81f0	QuickRaceOptions_UpdateRowOpt10	Option%1dData	1
+0x4b8280	QuickRaceOptions_UpdateRowOpt20	Option%1dTextString	1
+0x4b8280	QuickRaceOptions_UpdateRowOpt20	Option%1dData	1
+0x4b8310	QuickRaceOptions_UpdateRowOpt18	Option%1dTextString	1
+0x4b8310	QuickRaceOptions_UpdateRowOpt18	Option%1dData	1
+0x4b83c0	QuickRaceOptions_UpdateRowOpt18Switch	Option%1dTextString	1
+0x4b83c0	QuickRaceOptions_UpdateRowOpt18Switch	Option%1dData	1
+0x4b84a0	QuickRaceOptions_UpdateRowOpt14	Option%1dTextString	1
+0x4b84a0	QuickRaceOptions_UpdateRowOpt14	Option%1dData	1
+0x4b8750	Screen_MU_QuickRaceOptions_PC::BuildOptionList	Option%dText	1
+0x4b8750	Screen_MU_QuickRaceOptions_PC::BuildOptionList	Option%dData	1
+0x4b8750	Screen_MU_QuickRaceOptions_PC::BuildOptionList	option%d_arrow_L_button	1
+0x4b8750	Screen_MU_QuickRaceOptions_PC::BuildOptionList	option%d_arrow_R_button	1
+0x4b8d50	Screen_PC_Options::BindOptionRow	Option%dText	1
+0x4b8d50	Screen_PC_Options::BindOptionRow	Option%dData	1
+0x4b8d50	Screen_PC_Options::BindOptionRow	Option%dTextString	1
+0x4b8d50	Screen_PC_Options::BindOptionRow	Option%d_Arrow_L	1
+0x4b8d50	Screen_PC_Options::BindOptionRow	Option%d_arrow_r	1
+0x4b8d50	Screen_PC_Options::BindOptionRow	Option%d_Arrow_L_Button	1
+0x4b8d50	Screen_PC_Options::BindOptionRow	Option%d_Arrow_R_Button	1
+0x4b92a0	TrackSelect::GetTrackBackgroundString	TRACK_%d	2
+0x4b92a0	TrackSelect::GetTrackBackgroundString	DRIFT_TRACKS_BACK	1
+0x4b92a0	TrackSelect::GetTrackBackgroundString	DRIFT_TRACKS_BACK2	1
+0x4b92a0	TrackSelect::GetTrackBackgroundString	SPRINT_TRACKS_BACK	1
+0x4b92a0	TrackSelect::GetTrackBackgroundString	SPRINT_TRACKS_BACK2	1
+0x4b9500	Screen_MU_MultiTrack::RefreshTrackSlot	MultiTrack_%d	6
+0x4b9750	Screen_MU_MultiTrack::RefreshTrackSlotB	MultiTrack_%d	2
+0x4b99c0		MULTITRACK_%d	6
+0x4b99c0		<empty>	2
+0x4b9b40	Screen_MU_QuickRaceTrackSelect::Screen_MU_QuickRaceTrackSelect	track_thumb_master	1
+0x4b9b40	Screen_MU_QuickRaceTrackSelect::Screen_MU_QuickRaceTrackSelect	track_thumb	1
+0x4b9b40	Screen_MU_QuickRaceTrackSelect::Screen_MU_QuickRaceTrackSelect	MU_TrackMapScroller.fng	4
+0x4ba280		GENERICPLACEHOLDER	1
+0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	Sprint_BG_%d	3
+0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	TrackLength	2
+0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	%3.1f	1
+0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	%s %s %s	1
+0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	TRACK_IMAGE_%d	1
+0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	REVERSE_TRACK_IMAGE_%d	1
+0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	Track_Reverse	1
+0x4baba0		%s %s	1
+0x4baba0		%s %d (%d %s)	2
+0x4bb2b0		GenericDialog.fng	1
+0x4bb980		PULSE	2
+0x4bbc90	Track_LoadSpline	TRACK_%d_SPLINE	1
+0x4bbe00	Screen_MU_QuickRaceCarSelect::Screen_MU_QuickRaceCarSelect	car_thumb3	1
+0x4bbe00	Screen_MU_QuickRaceCarSelect::Screen_MU_QuickRaceCarSelect	car_thumb	1
+0x4bbe00	Screen_MU_QuickRaceCarSelect::Screen_MU_QuickRaceCarSelect	MU_HorizontalBrowserBack.fng	4
+0x4bc170	Screen_MU_QuickRaceCarSelect::BuildCarList	HONDA	1
+0x4bc170	Screen_MU_QuickRaceCarSelect::BuildCarList	CARSELECT_MANUFACTURER_%s	1
+0x4bcb44		GenericDialog.fng	1
+0x4bd000		GenericDialog.fng	1
+0x4bd0f0	Screen_MU_QuickRaceCarSelect::ChangeSelectedCar	DUMMY_SKIN1	1
+0x4bd0f0	Screen_MU_QuickRaceCarSelect::ChangeSelectedCar	DUMMY_WHEEL1	1
+0x4bd915		SliderBase_3	1
+0x4bd915		Slider_3	1
+0x4bdf40		%s%1d	1
+0x4bdfb0		%s%1d	1
+0x4be020		%s%1d	1
+0x4be510	Render_QueueOptions	%s%1d	1
+0x4be510	Render_QueueOptions	OptionData_%1d	1
+0x4be510	Render_QueueOptions	NOT DRAWING ANYTHING	3
+0x4be660		%s%1d	1
+0x4be9a0		%s%1d	1
+0x4be9a0		OptionData_%1d	1
+0x4bead0		%s%1d	1
+0x4bead0		OptionData_%1d	1
+0x4beb80		%s%1d	1
+0x4beb80		OptionData_%1d	1
+0x4befd0		%s%1d	1
+0x4befd0		OptionData_%1d	1
+0x4bf180		%s%1d	1
+0x4bf180		OptionData_%1d	1
+0x4bf270		%s%1d	1
+0x4bf2d0		%s%1d	1
+0x4bf2d0		OptionData_%1d	1
+0x4bf380		%s%1d	1
+0x4bf380		OptionData_%1d	1
+0x4bf380		<DEBUG> FULLSCREEN	1
+0x4bf7d0		%s%1d	1
+0x4bf7d0		OptionData_%1d	1
+0x4bf9b0		%s%1d	1
+0x4bf9b0		OptionData_%1d	1
+0x4bfaa0		%s%1d	1
+0x4bfaa0		OptionData_%1d	1
+0x4bfbc0		%s%1d	1
+0x4bfbc0		OptionData_%1d	1
+0x4c0180	Car::DisplayNOSLevel	%s%1d	1
+0x4c0180	Car::DisplayNOSLevel	NOS Level (requires race restart):	1
+0x4c0180	Car::DisplayNOSLevel	OptionData_%1d	1
+0x4c0270	HUD_UpdateTrackMapOptions	%s%1d	1
+0x4c0270	HUD_UpdateTrackMapOptions	Fullscreen TrackMap	1
+0x4c0270	HUD_UpdateTrackMapOptions	OptionData_%1d	1
+0x4c0300	RaceCoordinator::HandleRaceStart	%s%1d	2
+0x4c0300	RaceCoordinator::HandleRaceStart	Force Race Finish	1
+0x4c0300	RaceCoordinator::HandleRaceStart	Please Wait for Race Start!	1
+0x4c0300	RaceCoordinator::HandleRaceStart	OptionData_%1d	1
+0x4c03b0	FillDebugInfoOptionLabel	%s%1d	1
+0x4c03b0	FillDebugInfoOptionLabel	Display Debug Info	1
+0x4c03b0	FillDebugInfoOptionLabel	OptionData_%1d	1
+0x4c0420	Camera::LogDebugInfo	%s%1d	1
+0x4c0420	Camera::LogDebugInfo	Debug Cameras	1
+0x4c0420	Camera::LogDebugInfo	OptionData_%1d	1
+0x4c0490	FillSuperEasyAIOptionLabel	%s%1d	1
+0x4c0490	FillSuperEasyAIOptionLabel	Super Easy AI	1
+0x4c0490	FillSuperEasyAIOptionLabel	OptionData_%1d	1
+0x4c0500	Camera::UpdateLapOption	%s%1d	1
+0x4c0500	Camera::UpdateLapOption	Set Lap	1
+0x4c0500	Camera::UpdateLapOption	OptionData_%1d	1
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	OptionData_%d	1
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	OptionName_%d	1
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	LeftArrow_%d	1
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	RightArrow_%d	1
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	OptionNametext_%d	1
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	option_buttonR_%02d	1
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	option_buttonL_%02d	2
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	minus_%02d	1
+0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	plus_%02d	2
+0x4c13b0	Screen_PC_Graphics::BindOptionRow	OptionNameText_%d	1
+0x4c13b0	Screen_PC_Graphics::BindOptionRow	OptionName_%d	1
+0x4c13b0	Screen_PC_Graphics::BindOptionRow	OptionText_%d	1
+0x4c13b0	Screen_PC_Graphics::BindOptionRow	OptionData_%d	1
+0x4c1470	HUD_DrawPauseMenuOptions	LeftArrow_%d	1
+0x4c1470	HUD_DrawPauseMenuOptions	RightArrow_%d	1
+0x4c1470	HUD_DrawPauseMenuOptions	option_buttonL_0%d	1
+0x4c1470	HUD_DrawPauseMenuOptions	option_buttonR_0%d	1
+0x4c2230		%s%1d	1
+0x4c2230		OptionData_%1d	1
+0x4c2a50	GetCarModelNameHash	CAR_MODEL_NAME_%s%s	7
+0x4c2b00	GetSecondaryLogoHash	SECONDARY_LOGO_%s%s	8
+0x4c2b00	GetSecondaryLogoHash	TUSCANI	1
+0x4c2b00	GetSecondaryLogoHash	COUPE	3
+0x4c2d20		DUMMY_SKIN%d	1
+0x4c2d20		DUMMY_WHEEL%d	1
+0x4c2ed0	Car::Init	master_thumb	1
+0x4c2ed0	Car::Init	thumb	1
+0x4c3120	CarSelect_UpdateBrandBanner	BRAND_NAME_%s	1
+0x4c32e0		HONDA	1
+0x4c32e0		CARSELECT_MANUFACTURER_%s	1
+0x4c3480		GenericOKDialog.fng	1
+0x4c3a40	Screen_MU_UG_MovieTheaterViewer::Screen_MU_UG_MovieTheaterViewer	DRIFT	1
+0x4c3a40	Screen_MU_UG_MovieTheaterViewer::Screen_MU_UG_MovieTheaterViewer	ENG_DRAG	1
+0x4c3db0	Screen_MU_UG_ChooseCareerCar::Screen_MU_UG_ChooseCareerCar	master_thumb	1
+0x4c3db0	Screen_MU_UG_ChooseCareerCar::Screen_MU_UG_ChooseCareerCar	thumb	1
+0x4c4230	Car::InitDummyComponents	DUMMY_SKIN1	1
+0x4c4230	Car::InitDummyComponents	DUMMY_WHEEL1	1
+0x4c42d0	Screen_MU_UG_ChooseCareerCar::FillManufacturerList	HONDA	1
+0x4c42d0	Screen_MU_UG_ChooseCareerCar::FillManufacturerList	CARSELECT_MANUFACTURER_%s	1
+0x4c44c0	Log_VersionInfo	%s %d	1
+0x4c46a0	Screen_MU_UG_MapScreen::Screen_MU_UG_MapScreen	MU_TrackMapScroller.fng	8
+0x4c4920	EventMap::SetModeIcon	_TOURNAMENT	1
+0x4c4920	EventMap::SetModeIcon	MODE_ICON_%s%s	7
+0x4c4920	EventMap::SetModeIcon	CIRCUIT	1
+0x4c4920	EventMap::SetModeIcon	DRAG	1
+0x4c4920	EventMap::SetModeIcon	SPRINT	1
+0x4c4920	EventMap::SetModeIcon	DRIFT	1
+0x4c4920	EventMap::SetModeIcon	TIME_TRIAL	1
+0x4c4920	EventMap::SetModeIcon	LAP_KNOCKOUT	1
+0x4c4a60	Screen_MU_UG_MapScreen::BuildMapList	master_thumb	1
+0x4c4a60	Screen_MU_UG_MapScreen::BuildMapList	thumb	1
+0x4c4c60	EventMap::ShowEventSummary	Cash: %d	1
+0x4c4c60	EventMap::ShowEventSummary	Entry Fee: %d	1
+0x4c4c60	EventMap::ShowEventSummary	EVENT_%d_TITLE	1
+0x4c6530		car_thumb3	1
+0x4c6530		car_thumb	1
+0x4c66d0	CarSelectScreen::FillManufacturerList	HONDA	1
+0x4c66d0	CarSelectScreen::FillManufacturerList	CARSELECT_MANUFACTURER_%s	1
+0x4c6970	GetCarManufacturerNameHash	HONDA	1
+0x4c6970	GetCarManufacturerNameHash	BRAND_NAME_%s	1
+0x4c6cb0	UndergroundJunkmanGiveth::UndergroundJunkmanGiveth	master_thumb	1
+0x4c6cb0	UndergroundJunkmanGiveth::UndergroundJunkmanGiveth	car_thumb	1
+0x4c6cb0	UndergroundJunkmanGiveth::UndergroundJunkmanGiveth	MU_HorizontalBrowserBack.fng	4
+0x4c6cb0	UndergroundJunkmanGiveth::UndergroundJunkmanGiveth	GarageMain.fng	4
+0x4c72d0		MU_UG_MagazineGiveth.fng	1
+0x4c72d0		MU_UG_UndergroundMenu.fng	1
+0x4c72d0		MU_UG_NewCareerExtroFMV.fng	1
+0x4c74d4		GenericDialog.fng	4
+0x4c7790	UndergroundRewardPartScreen::UndergroundRewardPartScreen	master_thumb	1
+0x4c7790	UndergroundRewardPartScreen::UndergroundRewardPartScreen	car_thumb	1
+0x4c7790	UndergroundRewardPartScreen::UndergroundRewardPartScreen	WHEELS	1
+0x4c7790	UndergroundRewardPartScreen::UndergroundRewardPartScreen	MU_HorizontalBrowserBack.fng	4
+0x4c7790	UndergroundRewardPartScreen::UndergroundRewardPartScreen	GarageMain.fng	8
+0x4c7790	UndergroundRewardPartScreen::UndergroundRewardPartScreen	CAR_THUMB	1
+0x4c8720	Car::ApplyStyleModifications	NOHATCHBACK	1
+0x4c8720	Car::ApplyStyleModifications	_STYLE03_SPOILER	1
+0x4c8904		GenericDialog.fng	4
+0x4c8b70	UndergroundMagazineGiveth::UndergroundMagazineGiveth	master_thumb	2
+0x4c8b70	UndergroundMagazineGiveth::UndergroundMagazineGiveth	car_thumb	1
+0x4c8b70	UndergroundMagazineGiveth::UndergroundMagazineGiveth	STATUS_MAGAZINES_ICON	2
+0x4c8b70	UndergroundMagazineGiveth::UndergroundMagazineGiveth	MU_HorizontalBrowserBack.fng	4
+0x4c8b70	UndergroundMagazineGiveth::UndergroundMagazineGiveth	GarageMain.fng	4
+0x4c98e0	Screen_MU_PlayerLogin::FindControls	Player_DATA_0%d	1
+0x4c98e0	Screen_MU_PlayerLogin::FindControls	HighLight0%d	1
+0x4c9bd0	Screen_MU_PlayerLogin::SetPlayerDataSlotLabels	Player_DATA_0%d	1
+0x4c9d24		Show	1
+0x4c9d24		Hide	1
+0x4c9d24		Player_DATA_0%d	1
+0x4c9d24		HighLight0%d	3
+0x4ca430		GenericDialog.fng	1
+0x4ca5e0		GenericOKDialog.fng	1
+0x4ca790		GenericDialog.fng	1
+0x4caca0		GenericDialog.fng	1
+0x4cb030		GenericDialog.fng	1
+0x4cb320		GenericDialog.fng	2
+0x4cb5f0		GenericOKDialog.fng	2
+0x4cb6b0		GenericOKDialog.fng	1
+0x4cba40		GenericOKDialog.fng	1
+0x4cbd50		GenericDialog.fng	1
+0x4cbed0		GenericDialog.fng	1
+0x4cbfd0		GenericDialog.fng	3
+0x4cc1c0		GenericDialog.fng	1
+0x4cc300		GenericDialog.fng	1
+0x4cd180	FEScreenSound::PlayForScreenEvent	HELP_Generic.fng	1
+0x4cda80		OptionName_%1d	1
+0x4cdb60	Screen_MU_Pause_PC::SetupOptionButton	OptionName_%1d	1
+0x4cdcf6		MU_PauseConfirm.fng	2
+0x4cddb0		MU_PauseConfirm.fng	1
+0x4ce120	Screen_MU_Pause_PC::BuildOptionButtons	OptionName_%1d	2
+0x4ce370	Screen_MU_Pause_PC::InitOptionButtons	OptionName_%1d	2
+0x4ce760	Screen_MU_Options_PC::Screen_MU_Options_PC	OptionNametext_	1
+0x4ce760	Screen_MU_Options_PC::Screen_MU_Options_PC	OptionName_%d	1
+0x4cf570	OptionsMenu::DrawMasterVol	%s%1d	1
+0x4cf5e0	OptionsMenu::DrawSpeechVol	%s%1d	1
+0x4cf650	OptionsMenu::DrawMusicVol	%s%1d	1
+0x4cf6c0	OptionsMenu::DrawSoundEffectsVol	%s%1d	1
+0x4cf730	OptionsMenu::DrawEngineVol	%s%1d	1
+0x4cf7a0	OptionsMenu::DrawTireVol	%s%1d	1
+0x4cfd00	OptionsMenu::DrawDriveCamera	%s%1d	1
+0x4cfd00	OptionsMenu::DrawDriveCamera	OptionData_%1d	1
+0x4cfdb0	OptionsMenu::DrawJumpCamera	%s%1d	1
+0x4cff80	OptionsMenu::DrawTransmission	%s%1d	1
+0x4cff80	OptionsMenu::DrawTransmission	OptionData_%1d	1
+0x4d0030	OptionsMenu::DrawDamage	%s%1d	1
+0x4d0030	OptionsMenu::DrawDamage	OptionData_%1d	1
+0x4d0210	OptionsMenu::DrawHandling	%s%1d	1
+0x4d0210	OptionsMenu::DrawHandling	OptionData_%1d	1
+0x4d0400	OptionsMenu::DrawUnits	%s%1d	1
+0x4d0400	OptionsMenu::DrawUnits	OptionData_%1d	1
+0x4d04b0	OptionsMenu::DrawTrackMap	%s%1d	1
+0x4d04b0	OptionsMenu::DrawTrackMap	OptionData_%1d	1
+0x4d0570	OptionsMenu::DrawHudFlag	%s%1d	1
+0x4d0570	OptionsMenu::DrawHudFlag	OptionData_%1d	1
+0x4d0620	OptionsMenu::DrawHUDP1	%s%1d	1
+0x4d0680	OptionsMenu::DrawHUDP2	%s%1d	1
+0x4d0900	OptionsMenu::DrawSaveOption	%s%1d	1
+0x4d0940	OptionsMenu::DrawLoadOption	%s%1d	1
+0x4d0980	OptionsMenu::DrawAutoSave	%s%1d	1
+0x4d0980	OptionsMenu::DrawAutoSave	OptionData_%1d	1
+0x4d0ab0	OptionsMenu::DrawMovie1	%s%1d	1
+0x4d0b70	OptionsMenu::Setup	OptionData_%d	1
+0x4d0b70	OptionsMenu::Setup	OptionName_%d	1
+0x4d0b70	OptionsMenu::Setup	SelectButton_%d	1
+0x4d0b70	OptionsMenu::Setup	LeftArrow_%d	1
+0x4d0b70	OptionsMenu::Setup	RightArrow_%d	1
+0x4d0b70	OptionsMenu::Setup	OptionNametext_%d	1
+0x4d0b70	OptionsMenu::Setup	option_buttonR_%02d	1
+0x4d0b70	OptionsMenu::Setup	option_buttonL_%02d	1
+0x4d0b70	OptionsMenu::Setup	minus_%02d	1
+0x4d0b70	OptionsMenu::Setup	plus_%02d	2
+0x4d1600	OptionsMenu::ShowOptionRow	OptionName_%d	1
+0x4d1600	OptionsMenu::ShowOptionRow	OptionNametext_%d	1
+0x4d1600	OptionsMenu::ShowOptionRow	OptionData_%d	1
+0x4d1600	OptionsMenu::ShowOptionRow	SelectButton_%d	1
+0x4d16d0	OptionsMenu::ShowOptionArrows	option_buttonR_%02d	1
+0x4d16d0	OptionsMenu::ShowOptionArrows	option_buttonL_%02d	1
+0x4d16d0	OptionsMenu::ShowOptionArrows	minus_%02d	2
+0x4d16d0	OptionsMenu::ShowOptionArrows	LeftArrow_%d	2
+0x4d1f30	OptionsMenu::SetupAudio	OptionName_%d	2
+0x4d1f30	OptionsMenu::SetupAudio	OptionNametext_%d	1
+0x4d1f30	OptionsMenu::SetupAudio	option_buttonR_%02d	1
+0x4d1f30	OptionsMenu::SetupAudio	option_buttonL_%02d	1
+0x4d1f30	OptionsMenu::SetupAudio	minus_%02d	1
+0x4d1f30	OptionsMenu::SetupAudio	plus_%02d	1
+0x4d2700	OptionsMenu::SetupCamera	OptionName_%d	1
+0x4d2700	OptionsMenu::SetupCamera	OptionNametext_%d	1
+0x4d2820	OptionsMenu::SetupCar	OptionName_%d	2
+0x4d2820	OptionsMenu::SetupCar	OptionNametext_%d	9
+0x4d2820	OptionsMenu::SetupCar	OptionData_%d	18
+0x4d2820	OptionsMenu::SetupCar	option_buttonR_%02d	9
+0x4d2820	OptionsMenu::SetupCar	option_buttonL_%02d	9
+0x4d2820	OptionsMenu::SetupCar	LeftArrow_%d	9
+0x4d2820	OptionsMenu::SetupCar	RightArrow_%d	9
+0x4d2f60	OptionsMenu::SetupController	OptionName_%d	1
+0x4d2f60	OptionsMenu::SetupController	OptionNametext_%d	1
+0x4d2f60	OptionsMenu::SetupController	%s%1d	1
+0x4d2f60	OptionsMenu::SetupController	OptionName_2	1
+0x4d2f60	OptionsMenu::SetupController	OptionNametext_2	1
+0x4d2f60	OptionsMenu::SetupController	OptionData_2	1
+0x4d3200		RightArrow_2	1
+0x4d32e0	OptionsMenu::SetupDisplay	OptionName_%d	12
+0x4d32e0	OptionsMenu::SetupDisplay	OptionNametext_%d	11
+0x4d32e0	OptionsMenu::SetupDisplay	OptionData_%d	18
+0x4d32e0	OptionsMenu::SetupDisplay	option_buttonR_%02d	9
+0x4d32e0	OptionsMenu::SetupDisplay	option_buttonL_%02d	9
+0x4d32e0	OptionsMenu::SetupDisplay	LeftArrow_%d	9
+0x4d32e0	OptionsMenu::SetupDisplay	RightArrow_%d	9
+0x4d3b60	OptionsMenu::SetupSaveLoad	OptionName_%d	2
+0x4d3b60	OptionsMenu::SetupSaveLoad	OptionNametext_%d	7
+0x4d3b60	OptionsMenu::SetupSaveLoad	SelectButton_%d	7
+0x4d3f30	OptionsMenu::SetupTrailers	OptionName_%d	2
+0x4d3f30	OptionsMenu::SetupTrailers	OptionNametext_%d	8
+0x4d3f30	OptionsMenu::SetupTrailers	SelectButton_%d	8
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	Controller	1
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	Display	1
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	EATrax	1
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	SavingOptions	1
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	Credits	1
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	GameTrailers	1
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	Camera	1
+0x4d4900	OptionsSelectorScreen::ResetItemScripts	Audio	1
+0x4d5790		Grabbed	7
+0x4d59b0		trax_backing_0%d	1
+0x4d5cf0	Screen_EA_TRAX_Jukebox::PushRowObject	%s%d	1
+0x4d5df0		Release	1
+0x4d6285		arrow_l_button_option%d	1
+0x4d6285		arrow_r_button_option%d	1
+0x4d6bb0		CONDUITMDITC_TT21I	2
+0x4d6bb0		HEADERBIG$	2
+0x4d6bb0		HEADERSMALL$	2
+0x4d6f40	Credits_DisplayLines	CREDITS_LINE_%05d	2
+0x4d7580		Show	3
+0x4d76a0	HUD_ChangeChyron	Chyron.fng	1
+0x4d76a0	HUD_ChangeChyron	Chyron_audiobahn.fng	1
+0x4d76a0	HUD_ChangeChyron	Chyron_kenwood.fng	1
+0x4d76a0	HUD_ChangeChyron	Chyron_alpine.fng	1
+0x4d8600	ColorPicker::UpdateLockedIcons	locked_icon_%d	1
+0x4d8600	ColorPicker::UpdateLockedIcons	LOCKED_ICON_%d	9
+0x4d8600	ColorPicker::UpdateLockedIcons	COLORELEMENT_%d	11
+0x4d8600	ColorPicker::UpdateLockedIcons	%d	2
+0x4d9a40	ColorPicker_BindElements	COLORELEMENT_%d	3
+0x4d9fa0	GetDefaultVinylColors	VINYL_L1_COLOR02	1
+0x4d9fa0	GetDefaultVinylColors	VINYL_L1_COLOR01	1
+0x4d9fa0	GetDefaultVinylColors	VINYL_L1_COLOR03	1
+0x4d9fa0	GetDefaultVinylColors	VINYL_L1_COLOR04	1
+0x4da1a0	Screen_PC_ColorPicker::InitControls	MU_HorizontalBrowserBack.fng	1
+0x4da1a0	Screen_PC_ColorPicker::InitControls	NUMREMAPCOLOURS	1
+0x4da1a0	Screen_PC_ColorPicker::InitControls	%s %i	1
+0x4dafa0	Screen_PC_ColorPicker::NotificationMessage	GenericDialog.fng	2
+0x4db8a0		GREEN	1
+0x4db8a0		BLUE	1
+0x4dd710		CButton_%d	1
+0x4dd8e0	LoadingScreen::ShowControllerConfig	CButton_%d	2
+0x4ddbb0	LoadingScreen::HideControllerConfig	CButton_%d	1
+0x4de1e0	ScreenSequence::ScreenSequence	h;hh	1
+0x4deaa0	BootMovieScreen::BootMovieScreen	na_boot	1
+0x4df560	Screen_DiscErrorPC::Screen_DiscErrorPC	DEMO_DISC_MARKETING_BLURB	1
+0x4e0380	Screen_MU_MultiplayerCarSelect::FindControls	P%d_Transmission_select	1
+0x4e0380	Screen_MU_MultiplayerCarSelect::FindControls	button_%d_p%d	1
+0x4e08c0		GarageMain_2P.fng	4
+0x4e08c0		MU_MPBackground.fng	4
+0x4e1290	Screen_MU_MultiplayerCarSelect::NotificationMessage	GarageMain_2p.fng	35
+0x4e1290	Screen_MU_MultiplayerCarSelect::NotificationMessage	Highlight	2
+0x4e1d70	MPChooseGarageScreen::FindSlotObjects	%s%i	1
+0x4e21e0		master_thumb	1
+0x4e21e0		thumb	1
+0x4e2250	GarageVinylScreenBase::AddVinylItem	GENERICPLACEHOLDER	1
+0x4e24a0	ComputeVinylIconHash	CAR_THUMB	1
+0x4e2520	Car::CheckModel	_BODY_1	1
+0x4e2520	Car::CheckModel	_BODY_2	1
+0x4e2520	Car::CheckModel	_BODY_3	1
+0x4e25f0		_BODY_5	1
+0x4e2680	IsHiddenUnique	SAMANTHA	1
+0x4e2680	IsHiddenUnique	EDDIE	1
+0x4e2680	IsHiddenUnique	JUNKMAN	1
+0x4e27e0	IsSamanthaUnique	CUSTOM1	3
+0x4e27e0	IsSamanthaUnique	CUSTOM3	3
+0x4e27e0	IsSamanthaUnique	CUSTOM4	1
+0x4e2940	Car::LoadVinylAssets	MU_GarageVinylType.fng	1
+0x4e2940	Car::LoadVinylAssets	MU_GarageVinylGroup.fng	1
+0x4e2940	Car::LoadVinylAssets	MU_GarageVinylBrowser.fng	1
+0x4e2940	Car::LoadVinylAssets	MU_GarageVinylLayerV2.fng	1
+0x4e2940	Car::LoadVinylAssets	ColorPicker.fng	2
+0x4e2a00	GarageVinylLayerScreen::GarageVinylLayerScreen	VINYL_THUMB_%d	1
+0x4e31c0	Car::UpdateThumbnail	CAR_THUMB	4
+0x4e3320	GarageVinylLayerScreen::NotificationMessage	GenericDialog.fng	1
+0x4e3320	GarageVinylLayerScreen::NotificationMessage	MU_HorizontalBrowserBack.fng	1
+0x4e3320	GarageVinylLayerScreen::NotificationMessage	LayerHighlight	1
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	MU_HorizontalBrowserBack.fng	1
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	VINYL_GROUP_MANUFACTURAR_NAME	1
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	MU_GarageVinylGroup.fng	8
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	VINYL_GROUP_MANUFACTURAR_HOOD_LOGO	7
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	VINYL_GROUP_MANUFACTURAR_LOGO	2
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	MU_GarageVinylBrowser.fng	4
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	VINYL_GROUP_BODY_VINYL	2
+0x4e40d0	GarageVinylTypeScreen::GarageVinylTypeScreen	VINYL_GROUP_UNIQUES	3
+0x4e43d0		MU_GarageVinylGroup.fng	1
+0x4e4610	GarageVinylTypeScreen::OptionChosen	GenericDialog.fng	15
+0x4e4843		MU_GarageVinylGroup.fng	5
+0x4e4843		MU_GarageVinylLayerV2.fng	10
+0x4e4843		MU_GarageVinylBrowser.fng	5
+0x4e4843		STOCK	4
+0x4e4c40	GarageVinylGroupScreen::GarageVinylGroupScreen	MU_HorizontalBrowserBack.fng	1
+0x4e4c40	GarageVinylGroupScreen::GarageVinylGroupScreen	MU_GarageVinylBrowser.fng	25
+0x4e4c40	GarageVinylGroupScreen::GarageVinylGroupScreen	PVhh)l	1
+0x4e5700	GarageVinylBrowserScreen::GarageVinylBrowserScreen	MU_HorizontalBrowserBack.fng	1
+0x4e6030	GarageVinylBrowserScreen::RedrawHeading	 (%s)	1
+0x4e6030	GarageVinylBrowserScreen::RedrawHeading	%s%s	1
+0x4e61f6		GenericOKDialog.fng	2
+0x4e61f6		GenericDialog.fng	2
+0x4e6f00		GenericDialog.fng	4
+0x4e7320		GenericDialog.fng	2
+0x4e7a40	GaragePresetsScreen::GaragePresetsScreen	master_thumb	1
+0x4e7a40	GaragePresetsScreen::GaragePresetsScreen	car_thumb	1
+0x4e7a40	GaragePresetsScreen::GaragePresetsScreen	GENERIC_STOCK	3
+0x4e7e00	GaragePresetsScreen::PresetAction	GenericDialog.fng	2
+0x4e9e90	UrlRankScreen::Show	RANK_DATA_%02d	1
+0x4e9e90	UrlRankScreen::Show	PLAYERNAME_DATA_%02d	1
+0x4e9e90	UrlRankScreen::Show	CARNAME_DATA_%02d	1
+0x4ea5d0	UndergroundStatsScreen::AddStatsLine	STATSTYPE_DATA_%02d	1
+0x4ea5d0	UndergroundStatsScreen::AddStatsLine	STATS_DATA_%02d	1
+0x4ea650	UndergroundStatsScreen::AddStatsLine	STATSTYPE_DATA_%02d	1
+0x4ea650	UndergroundStatsScreen::AddStatsLine	STATS_DATA_%02d	1
+0x4eabc0	Screen_MU_UG_UndergroundMenu::Screen_MU_UG_UndergroundMenu	GenericOKDialogMedium.fng	1
+0x4eaff0	UndergroundMenuScreen::MakeChoice	MU_Garage.fng	1
+0x4eb1e0	UndergroundMenuScreen::NotificationMessage	GenericDialog.fng	1
+0x4eb1e0	UndergroundMenuScreen::NotificationMessage	Init	1
+0x4eb1e0	UndergroundMenuScreen::NotificationMessage	HighLight	1
+0x4eb1e0	UndergroundMenuScreen::NotificationMessage	FadeIn	1
+0x4ec990	FEKeyboard::Initialize	KB_SYMBOL_%.2d	1
+0x4ec990	FEKeyboard::Initialize	KB_SYMBOL_BUTTON_%.2d	1
+0x4ec990	FEKeyboard::Initialize	KB_LETTER_%.2d	1
+0x4ec990	FEKeyboard::Initialize	KB_LETTER_BUTTON_%.2d	1
+0x4ec990	FEKeyboard::Initialize	KB_CONTROL_%.2d	1
+0x4ec990	FEKeyboard::Initialize	KB_CONTROL_BUTTON_%.2d	1
+0x4f37e0	FEScreenRegistry::CreateScreen	MU_HorizontalBrowserBack.fng	2
+0x4f4360	FEngMemoryPool::Init	FEngMemoryPool	1
+0x4f44c0	FEngFont_Init	UNKNOWN	2
+0x4f57a0	MoviePlayer::BuildPath	%sMOVIES\%s%s	1
+0x4f62f0	FEngPushGarageMainPackage	GarageMain.fng	2
+0x4f8dd0	FEObject::FireHighlight	Highlight	2
+0x4f8ec0	FEObject::FireUnHighlight	UnHighlight	2
+0x4f9435		Crumb_0%d	1
+0x4f9a60	Car::ProcessCrumbData	Crumb_0%d	1
+0x5036e0	Render_SetUpperLeft	Upper Left	1
+0x5037e0	FEngine::RegisterObjectTypes	Simple Image	1
+0x5037e0	FEngine::RegisterObjectTypes	String	1
+0x5037e0	FEngine::RegisterObjectTypes	Model	1
+0x5037e0	FEngine::RegisterObjectTypes	Movie	1
+0x5037e0	FEngine::RegisterObjectTypes	Effect	1
+0x5037e0	FEngine::RegisterObjectTypes	Group	1
+0x5037e0	FEngine::RegisterObjectTypes	Code List	1
+0x504550	GetBrakeForPerfUpgrade	BRAKES	2
+0x5047d0	GarageManager::InstallPhysicsUpgrade	MAGAZINE_TASK_1	2
+0x504be0	GarageScreen::GarageScreen	master_thumb	1
+0x504be0	GarageScreen::GarageScreen	thumb	1
+0x504be0	GarageScreen::GarageScreen	MU_HorizontalBrowserBack.fng	4
+0x504be0	GarageScreen::GarageScreen	BROWSER_VISUAL	1
+0x504be0	GarageScreen::GarageScreen	MU_GaragePartsChooseVisual.fng	1
+0x504be0	GarageScreen::GarageScreen	BROWSER_PERFORMANCE	1
+0x504be0	GarageScreen::GarageScreen	MU_GaragePerformanceCategory.fng	1
+0x504be0	GarageScreen::GarageScreen	BROWSER_PRESETS	2
+0x504be0	GarageScreen::GarageScreen	MU_GaragePresets.fng	2
+0x504be0	GarageScreen::GarageScreen	BROWSER_TRADE_IN	2
+0x504be0	GarageScreen::GarageScreen	MU_UG_TradeCareerCar.fng	2
+0x505330	GarageScreen::NotificationMessage	GenericDialog.fng	1
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	master_thumb	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	thumb	1
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	MU_HorizontalBrowserBack.fng	8
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	VISUAL_PART_BODY	1
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	MU_GaragePartsCategoryVisual.fng	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	VISUAL_PART_RIMS	1
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	MU_GarageRimsBrandBrowser.fng	1
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	VISUAL_PART_ACCESSORIES	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	MU_GarageAccessoriesCategory.fng	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	VISUAL_PART_PAINT	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	MU_GaragePaintMod.fng	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	VISUAL_PART_DECALS	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	MU_GarageDecals_Zone.fng	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	VISUAL_PART_VINYL	2
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	MU_GarageVinylLayerV2.fng	4
+0x505780	GarageChooseVisualCategoryScreen::GarageChooseVisualCategoryScreen	MU_GaragePartsChooseVisual.fng	2
+0x505ae0		MU_GarageRimsBrandBrowser.fng	1
+0x506160	GarageCategoryVisual::IsWidebodyInstalled	VAPOR	1
+0x506160	GarageCategoryVisual::IsWidebodyInstalled	MANTIS	1
+0x506210	GarageCategoryVisual::GarageCategoryVisual	master_thumb	1
+0x506210	GarageCategoryVisual::GarageCategoryVisual	thumb	1
+0x506210	GarageCategoryVisual::GarageCategoryVisual	MU_GaragePartsBrowser.fng	591
+0x507340	IsMagicSpoilerSpecialCase	_STYLE03_SPOILER	1
+0x507340	IsMagicSpoilerSpecialCase	NOHATCHBACK	1
+0x5074d0	IsMagicSpoilerToHide	_STYLE03_SPOILER	1
+0x507540	GaragePartsBrowser::GaragePartsBrowser	master_thumb	1
+0x507540	GaragePartsBrowser::GaragePartsBrowser	thumb	1
+0x507540	GaragePartsBrowser::GaragePartsBrowser	MU_HorizontalBrowserBack.fng	1
+0x507670		NOHATCHBACK	1
+0x507ec0	GaragePartsBrowser::RedrawHeading	 (%s)	3
+0x507ec0	GaragePartsBrowser::RedrawHeading	%s%s	3
+0x508560	GaragePartsBrowser::IsInstallingPart	GenericOKDialog.fng	1
+0x508620	GaragePartsBrowser::IsBuyingPart	GenericOKDialog.fng	1
+0x5089b0	GaragePartsBrowser::NotificationMessage	GenericDialog.fng	57
+0x5089b0	GaragePartsBrowser::NotificationMessage	%s_DECAL_LEFT_QUARTER_RECT_MEDIUM	1
+0x5089b0	GaragePartsBrowser::NotificationMessage	%s_DECAL_RIGHT_QUARTER_RECT_MEDIUM	1
+0x509060	PerfStatsScreen::PerfStatsScreen	Bar3_Bottom_b	1
+0x509060	PerfStatsScreen::PerfStatsScreen	Bar3_Top_b	1
+0x509570	PerfStatsScreen::SetupUpgrades	Upgrade_%d_%d	1
+0x509570	PerfStatsScreen::SetupUpgrades	Upgrade_Level_Unique_E	1
+0x509570	PerfStatsScreen::SetupUpgrades	Upgrade_Level_Stock_F	1
+0x509af0	PerfStatsScreen::SetupStats	%s %d @ %d RPM	1
+0x509af0	PerfStatsScreen::SetupStats	%s %2.1f	2
+0x509af0	PerfStatsScreen::SetupStats	%s %2.1f @ 3.1f	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	master_thumb	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	thumb	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_ENGINE	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	MU_GaragePerformanceTuner.fng	9
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_TRANSMISSION	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_TIRES	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_ECU	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_TURBO	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_BRAKES	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_WEIGHT_REDUCTION	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_SUSPENSION	1
+0x509dd0	ChooseGaragePerfPath::ChooseGaragePerfPath	PERFORMANCE_NITROUS	1
+0x50a5d0	GaragePerfTuner::GaragePerfTuner	master_thumb	1
+0x50a5d0	GaragePerfTuner::GaragePerfTuner	thumb	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_TURBO_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_NITROUS_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_ECU_FUEL_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_TRANS_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_TIRES_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_BRAKE_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_ENG_EXHAUST_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_SUSP_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_WEIGHT_%d	1
+0x50ada0	GaragePerfTuner::RedrawHeading	MOD_DESC_STOCK	1
+0x50ada0	GaragePerfTuner::RedrawHeading	 (%s)	1
+0x50ada0	GaragePerfTuner::RedrawHeading	%s%s	1
+0x50b2d0	GaragePerfTuner::NotificationMessage	GenericDialog.fng	1
+0x50b2d0	GaragePerfTuner::NotificationMessage	GenericOKDialog.fng	24
+0x50b6e0	GaragePerfBrandPackage::GaragePerfBrandPackage	master_thumb	1
+0x50b6e0	GaragePerfBrandPackage::GaragePerfBrandPackage	thumb	1
+0x50b6e0	GaragePerfBrandPackage::GaragePerfBrandPackage	GENERIC_LEVEL%d	1
+0x50b9e0	GaragePerfBrandPackage::RedrawHeading	%s %d	1
+0x50b9e0	GaragePerfBrandPackage::RedrawHeading	BRAND_%d	1
+0x50bc10	GaragePerfBrandPackage::NotificationMessage	GenericDialog.fng	2
+0x50c0f0	GaragePaintModScreen::GaragePaintModScreen	MU_HorizontalBrowserBack.fng	2
+0x50c1f0		PAINT_MOD_PART_RIMS	1
+0x50c1f0		PAINT_MOD_PART_SPOILER	1
+0x50c1f0		PAINT_MOD_PART_ENGINE_ACCENT	1
+0x50c1f0		PAINT_MOD_PART_BRAKE_CALIPERS	1
+0x50c1f0		PAINT_MOD_PART_MUFFLER_TIP	1
+0x50c5f0	GaragePaintModScreen::NotificationMessage	GenericOKDialog.fng	14
+0x50c870	HackHackHack_GetRimsBrandHash	AUTOSTRADA	1
+0x50c870	HackHackHack_GetRimsBrandHash	PIAA	1
+0x50c870	HackHackHack_GetRimsBrandHash	SPARCO	1
+0x50c930	IsNFSUBrand	AUTOSTRADA	1
+0x50c930	IsNFSUBrand	PIAA	1
+0x50c930	IsNFSUBrand	SPARCO	1
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	master_thumb	1
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	thumb	1
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	MU_GarageRimsBrowser.fng	1
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	MU_GarageRimsStyleBrowser.fng	2
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	MU_GarageRimsBrandBrowser.fng	1
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	WHEEL_MANUFACTURERS	1
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	VISUAL_RIMS_BRAND_	4
+0x50c9e0	GarageRimsBrandBrowser::GarageRimsBrandBrowser	NFSU	2
+0x50ce30	GarageRimsBrandBrowser::AddPickable	VISUAL_PART_RIMS	1
+0x50cf90	GarageRimsBrandBrowser::RedrawHeading	_BRAND_NAME	1
+0x50d420	GarageRimsStyleBrowser::GarageRimsStyleBrowser	master_thumb	1
+0x50d420	GarageRimsStyleBrowser::GarageRimsStyleBrowser	thumb	1
+0x50d420	GarageRimsStyleBrowser::GarageRimsStyleBrowser	WHEELS	1
+0x50dd40	GarageRimsStyleBrowser::AddPickable	VISUAL_PART_RIMS	1
+0x50df60	GarageRimsStyleBrowser::RedrawHeading	 (%s)	4
+0x50df60	GarageRimsStyleBrowser::RedrawHeading	_NAME	12
+0x50df60	GarageRimsStyleBrowser::RedrawHeading	%s%s	1
+0x50e340	GarageRimsStyleBrowser::NotificationMessage	GenericDialog.fng	2
+0x50e600	GarageRimsStyleBrowser::IsInstallingPart	GenericOKDialog.fng	2
+0x50e680	GarageRimsStyleBrowser::IsBuyingPart	GenericOKDialog.fng	1
+0x50e7c0	GarageRimsBrowser::GarageRimsBrowser	master_thumb	1
+0x50e7c0	GarageRimsBrowser::GarageRimsBrowser	thumb	1
+0x50e890	GarageRimsBrowser::BuildPickablesList	WHEELS	1
+0x50ed90	GarageRimsBrowser::IsInstallingPart	GenericOKDialog.fng	1
+0x50ee10	GarageRimsBrowser::IsBuyingPart	GenericOKDialog.fng	1
+0x50f0e0	GarageRimsBrowser::AddPickable	VISUAL_PART_RIMS	1
+0x50f780	GarageRimsBrowser::NotificationMessage	GenericDialog.fng	2
+0x50fb00	GarageDecalsZone::GarageDecalsZone	master_thumb	1
+0x50fb00	GarageDecalsZone::GarageDecalsZone	thumb	1
+0x50fb00	GarageDecalsZone::GarageDecalsZone	DECAL_ZONE_WINDSHIELD	1
+0x50fb00	GarageDecalsZone::GarageDecalsZone	DECAL_ZONE_REARWINDOW	1
+0x50fb00	GarageDecalsZone::GarageDecalsZone	DECAL_ZONE_LEFTDOOR	1
+0x50fb00	GarageDecalsZone::GarageDecalsZone	DECAL_ZONE_RIGHTDOOR	1
+0x50fb00	GarageDecalsZone::GarageDecalsZone	DECAL_ZONE_LEFTPANEL	1
+0x50fb00	GarageDecalsZone::GarageDecalsZone	DECAL_ZONE_RIGHTPANEL	1
+0x50fb00	GarageDecalsZone::GarageDecalsZone	DECAL_ZONE_HOOD	1
+0x5101f0	GarageDecalsZone::NotificationMessage	STOCK	2
+0x510980	GarageDecalLayout::NotificationMessage	GenericDialog.fng	3
+0x510f50	GarageDecalsSlot::GarageDecalsSlot	master_thumb	1
+0x510f50	GarageDecalsSlot::GarageDecalsSlot	thumb	1
+0x511b00	IsBlackDecal	EXTREMEDIMENSION	1
+0x511b00	IsBlackDecal	EXTRDIMENSION_BLACK_DECAL	1
+0x511b00	IsBlackDecal	_BLACK_DECAL	1
+0x511b70	IsWhiteDecal	EXTREMEDIMENSION	1
+0x511b70	IsWhiteDecal	EXTRDIMENSION_WHITE_DECAL	1
+0x511b70	IsWhiteDecal	Name	1
+0x511b70	IsWhiteDecal	_WHITE_DECAL	1
+0x511ff0	GarageDecalsBrand::GarageDecalsBrand	master_thumb	1
+0x511ff0	GarageDecalsBrand::GarageDecalsBrand	thumb	1
+0x511ff0	GarageDecalsBrand::GarageDecalsBrand	GENERIC_REMOVE	1
+0x511ff0	GarageDecalsBrand::GarageDecalsBrand	NONE	1
+0x512690	GarageDecalsBrand::RedrawHeading	 (%s)	1
+0x512690	GarageDecalsBrand::RedrawHeading	%s%s	1
+0x512900	GarageDecalsBrand::NotificationMessage	GenericDialog.fng	2
+0x512900	GarageDecalsBrand::NotificationMessage	GenericOKDialog.fng	1
+0x512d10	GarageChooseAccessoryCategoryScreen::GarageChooseAccessoryCategoryScreen	master_thumb	1
+0x512d10	GarageChooseAccessoryCategoryScreen::GarageChooseAccessoryCategoryScreen	thumb	1
+0x512d10	GarageChooseAccessoryCategoryScreen::GarageChooseAccessoryCategoryScreen	MU_GaragePartsBrowser.fng	47
+0x512d10	GarageChooseAccessoryCategoryScreen::GarageChooseAccessoryCategoryScreen	VISUAL_PART_MUFFLERTIP	16
+0x513780	Screen_DummyMagazine::Screen_DummyMagazine	DummyMagazineBack.fng	6
+0x513c90		ERROR	1
+0x514480	FERender::InitSlotPools	FERenderObjectSlotPool	1
+0x514480	FERender::InitSlotPools	FEEPolySlotPool	1
+0x51acb0	CheckMagazineTask	MAGAZINE_TASK_16	1
+0x51acb0	CheckMagazineTask	MAGAZINE_TASK_15	1
+0x51acb0	CheckMagazineTask	MAGAZINE_TASK_14	1
+0x51b060		MAGAZINE_TASK_1	9
+0x51b720	cFrontendDatabase::UpdateMagazineTasks	MAGAZINE_TASK_1	1
+0x51b720	cFrontendDatabase::UpdateMagazineTasks	MAGAZINE_TASK_%d	1
+0x51b810		MAGAZINE_TASK_%d	1
+0x51b8d0	Canon::SetMagazineTask1	MAGAZINE_TASK_1	3
+0x51ba00	Magazine_Task_1	MAGAZINE_TASK_1	1
+0x51beb0	Render_CheckAudioSystem	ALPINE	3
+0x51beb0	Render_CheckAudioSystem	AUDIOBAHN	3
+0x51beb0	Render_CheckAudioSystem	KENWOOD	3
+0x51c8e0	EAXSound::EAXSound	SOUND	1
+0x5212e0	EAXAemsManager::Initialize	Evt_Sys\Global_.csi	1
+0x5212e0	EAXAemsManager::Initialize	Evt_Sys\NFSU_Streams.csi	1
+0x5212e0	EAXAemsManager::Initialize	Evt_Sys\ENGINE_EVTSYS.csi	1
+0x5212e0	EAXAemsManager::Initialize	Evt_Sys\COLLISION_EVTS.csi	1
+0x5212e0	EAXAemsManager::Initialize	Evt_Sys\EVTSYS_FE.csi	1
+0x5212e0	EAXAemsManager::Initialize	Evt_Sys\EVTSYS_TURBO.csi	1
+0x5212e0	EAXAemsManager::Initialize	Evt_Sys\EVTSYS_ENVIRO.csi	1
+0x5218c0	EAXAemsManager::ResetLoadQueue	NONE	2
+0x5218c0	EAXAemsManager::ResetLoadQueue	ONE	1
+0x521c80	EAXAemsManager::SetCurrentBankPath (bank name resolver)	NONE	3
+0x521c80	EAXAemsManager::SetCurrentBankPath (bank name resolver)	ONE	1
+0x522885		SND: FE_FrontEnd	1
+0x522b40		SND: FE_FrontEnd	1
+0x522e50	EAXFrontEnd::PlayDriveOnSnd	SND: FE_DriveIdle	1
+0x522e50	EAXFrontEnd::PlayDriveOnSnd	SND: FE_DriveON	1
+0x522e50	EAXFrontEnd::PlayDriveOnSnd	SND: FE_DriveOff	1
+0x52313a		SND: FE_Common	1
+0x5232b0		SND: FE_Common	1
+0x526b50	EAXTunerCar::LandJumpPlay	Jump Landing	1
+0x526c70	EAXTunerCar::BottomOutPlay	Bottom Out	1
+0x5272f0	EAXTunerCar::PlaySparkChatter	SparkChatter	1
+0x527740	EAXNitrous::Play	SND: Nitrous	1
+0x527af0	EAXSound::SetSkidSound	SND: Skid	1
+0x528470	EAXTurbo::PlayBlowoff	SND: Turbo	1
+0x528700	EAXTurbo::PlaySpl (spool loop)	SND:Turbo Spool	1
+0x528d70	EAXShifting::PlayDisengageSnd	SND ShiftDisEngage	1
+0x528f80	EAXShifting::PlayEngageSnd	SND ShiftDisengage	1
+0x529100	EAXShifting::PlayUpShiftSnd	SND: Shift	1
+0x52a310	EAXTunerCar::BreakingEffectUpdate	SND: Breaking Effect	1
+0x52adf0	EAXRoadNoise::PlayTransition	Left Road Noise Transition	1
+0x52adf0	EAXRoadNoise::PlayTransition	Right Road Noise Transition	1
+0x52b0e0	EAXRoadNoise::Play	Left Road Noise	1
+0x52b0e0	EAXRoadNoise::Play	Right Road Noise	1
+0x52b500	EAXTunerCar::Create_Reflection	TUNNEL Reflections	1
+0x531080	stSoundCollision::BeginScrape	SND_SmokeableScrape	1
+0x531080	stSoundCollision::BeginScrape	SND_WORLDScrape	1
+0x531350	stSoundCollision::BeginImpact	SND_SmokeableImpact	1
+0x531350	stSoundCollision::BeginImpact	SND_WORLDImpact	1
+0x532a20	EAXSND8Wrapper::Initialize	Csis SlotPools	1
+0x532d40	Audio::CreateSoundObject	TrolleySoundObject	1
+0x532d40	Audio::CreateSoundObject	BridgeWarningSoundObject	1
+0x533140	Car::CreateObjects	WorldObject	1
+0x533140	Car::CreateObjects	XO_PlaneA_1b_01	1
+0x533140	Car::CreateObjects	PlaneSOB	1
+0x533280		FountainObj	9
+0x53e020	Render_InitSubsystem	DynamicFrameMemorySlotPool	1
+0x53e020	Render_InitSubsystem	ePointSprite3DSlotPool	1
+0x53e020	Render_InitSubsystem	eLightFlareSlotPool	1
+0x53e020	Render_InitSubsystem	ePolySlotPool	1
+0x53e830	StreamEntry_Process	StrmEntry%c: 0x%08x	1
+0x53f070		<filename too long>	1
+0x53f690	eModel::InitSlotPool	eModelSlotPool	1
+0x5457f0	TexturePack_Register	<null>	2
+0x5457f0	TexturePack_Register	TexturePack,%s	1
+0x546600		0.0.0.0	1
+0x548e30	Online::GetMessageTypeName	Unknown	1
+0x549340	Op_CreateKeyedString	%s:%u:%u	1
+0x5498f0	Online::ConnectToServer	ps2nfs04.ea.com	1
+0x54a2e0	Online::SendPersonaSelect	PERS=%s	1
+0x54a370		%04d_%s	1
+0x54a370		TRACK=%d DIR=%d LAPS=%d MYIP=%d	1
+0x54a370		NAME=%s ROOM=%s MAXSIZE=%d MINSIZE=2 SYSFLAGS=%d PARAMS=%s	1
+0x54a4e0		NAME=%s	1
+0x54a5e0	Online::SendRoomName	NAME=%s	1
+0x54a660	Online::SendGameStatName	NAME=%s	1
+0x54a700		NAME=%s	1
+0x54aa70		TEXT=%s	1
+0x54ac80	Online::SendGameMessage	GAME=%d PARAMS=%s	1
+0x54ac80	Online::SendGameMessage	PRIV=%s ATTR=%f TEXT=%s	1
+0x54ae10	Online::RequestListPage	INDEX	1
+0x54ae10	Online::RequestListPage	CHAN	1
+0x54ae10	Online::RequestListPage	START	1
+0x54ae10	Online::RequestListPage	RANGE	1
+0x54af80		NAME=%d	1
+0x54b0e0		ATTR	1
+0x54b1c0		MU_Online	1
+0x54b1c0		HELP_Generic.fng	3
+0x54b4e0		WHEN	1
+0x54b4e0		NAME%d	1
+0x54b810		Server	2
+0x54b8e0	Online::SendTextMessage	PRIV=%s ATTR=%f TEXT=%s	1
+0x54be20	Online::HandleChatMessage	%s: *broadcast* %s	1
+0x54be20	Online::HandleChatMessage	 (host)	1
+0x54be20	Online::HandleChatMessage	 (admin)	1
+0x54be20	Online::HandleChatMessage	 (mod)	1
+0x54be20	Online::HandleChatMessage	%s %s	1
+0x54be20	Online::HandleChatMessage	%s%s: %s	2
+0x54be20	Online::HandleChatMessage	GAME	1
+0x54be20	Online::HandleChatMessage	PARAMS	1
+0x54be20	Online::HandleChatMessage	NAME=%s	1
+0x54c7b0		0.0.0.0	6
+0x54cfe0		tsmiInvalid master account name	3
+0x54d0b0		 (host)	1
+0x54d0b0		st)	1
+0x54d0b0		 (vice)	1
+0x54d0b0		ce)	1
+0x54d0b0		 (admin)	1
+0x54d0b0		min)	1
+0x54d0b0		 (mod)	1
+0x54d0b0		d)	1
+0x54d0b0		 (me)	1
+0x54d0b0		 (online)	1
+0x54d0b0		line)	1
+0x54d0b0		 (gaming)	1
+0x54d0b0		ming)	1
+0x54d0b0		 (0)	1
+0x54d0b0		 (1)	1
+0x54d0b0		 (2)	1
+0x54d0b0		 (3)	1
+0x54d4a0	Online::FourCCToString	%c%c%c%c	1
+0x54d4e0	Online::OpenSocket	ps2nfs04.ea.com	1
+0x54d6b0		%04d%02d%02d	1
+0x54d6b0		%c%c	1
+0x54df00		%s-%s-%s	1
+0x54df00		%s/%s-%s	1
+0x54e1e0		%s:%u:%u	1
+0x54ee64		%s%s	1
+0x54f200	OnlineRoomListScreen::FillRoomRows	RoomName_DATA	6
+0x54f200	OnlineRoomListScreen::FillRoomRows	%s0%d	7
+0x54f200	OnlineRoomListScreen::FillRoomRows	%s%d	7
+0x54f200	OnlineRoomListScreen::FillRoomRows	PlayersRoom_DATA	1
+0x54f540		RoomName_DATA	1
+0x54f540		%s0%d	2
+0x54f540		%s%d	2
+0x54f540		PlayersRoom_DATA	1
+0x54f540		%d/%d	1
+0x54f9b0	Online_LoadWaitingScreen	MU_ONLINE_WAITING.fng	1
+0x54fd50	Online::FormatRaceResultsLine	%d) %s	1
+0x54fd50	Online::FormatRaceResultsLine	%d) %s (%s)	1
+0x5500b0	Online::FillRepRow	Rep_DATA_0%d	1
+0x5500b0	Online::FillRepRow	PlayersName_DATA_0%d	1
+0x5500b0	Online::FillRepRow	CarName_DATA_0%d	1
+0x5500b0	Online::FillRepRow	Generic_DATA_0%d	1
+0x5500b0	Online::FillRepRow	Ping_Group_0%d	1
+0x5500b0	Online::FillRepRow	NumberOfPlayers_DATA_0%d	1
+0x5500b0	Online::FillRepRow	Disc_DATA_0%d	1
+0x5500b0	Online::FillRepRow	HighLight_0%d	1
+0x552610		%d%%	4
+0x552bb0		%d%%	2
+0x5530e0	Log_InitAndFormat	%s - %s	1
+0x553a90		/tell %s 	1
+0x553b30		UnHighlite	1
+0x553b30		Highlite	2
+0x553de0		/tell 	1
+0x553de0		%s: %s	9
+0x5540b0	Logging::LogError	%s: %s	1
+0x554730	Screen_MU_OnlineGameRoom::UpdatePlayerSlots	%d%%%%	8
+0x5558d0	OnlineGameOptionsScreen::UpdateLapsRow	LapsData	1
+0x556a64		PlayersName_DATA	1
+0x556a64		FOO-BAR	1
+0x5570a0	OnlineScreen_5570a0::NotificationMessage	Grayout	3
+0x5570a0	OnlineScreen_5570a0::NotificationMessage	GenericDialog.fng	3
+0x5570a0	OnlineScreen_5570a0::NotificationMessage	FadeIn	36
+0x557a40	OnlineScreen_557a40::NotificationMessage	open	1
+0x557a40	OnlineScreen_557a40::NotificationMessage	GenericDialog.fng	1
+0x557a40	OnlineScreen_557a40::NotificationMessage	FadeIn	3
+0x557a40	OnlineScreen_557a40::NotificationMessage	%s %s	1
+0x55ab00		FadeIn	10
+0x55bfc0	OnlineLobbyScreen::OnlineLobbyScreen	Player_DATA_%.2d	1
+0x55bfc0	OnlineLobbyScreen::OnlineLobbyScreen	TEXT_ENTRY%d	1
+0x55c550	Online::FillPlayerDataRow	PLAYER_DATA_%.2d	1
+0x55c790		GenericDialog.fng	1
+0x55ce20	Online::FillPlayerRow	PLAYERNAME%.2d	1
+0x55ce20	Online::FillPlayerRow	REPDATA%.2d	1
+0x55ce20	Online::FillPlayerRow	REPTITLE%.2d	1
+0x55ce20	Online::FillPlayerRow	PLAYERCARNAME%.2d	1
+0x55ce20	Online::FillPlayerRow	CARTITLE%.2d	1
+0x55ce20	Online::FillPlayerRow	PING_GROUP_%.2d	1
+0x55ce20	Online::FillPlayerRow	PINGTITLE%.2d	1
+0x55e3b0	OnlineRaceSetupScreen::UpdateLapsRow	LapsData	1
+0x55e3b0	OnlineRaceSetupScreen::UpdateLapsRow	GreyOut	36
+0x55e770		%c%c%c%c	1
+0x55f380		%d%%%%	8
+0x55fe30	HUD_UpdatePlayerStats	Rank_DATA_%02d	1
+0x55fe30	HUD_UpdatePlayerStats	PlayersName_DATA_%02d	1
+0x55fe30	HUD_UpdatePlayerStats	Rep_DATA_%02d	1
+0x55fe30	HUD_UpdatePlayerStats	Win_DATA_%02d	1
+0x55fe30	HUD_UpdatePlayerStats	Losses_DATA_%02d	1
+0x55fe30	HUD_UpdatePlayerStats	NumberOfPlayers_DATA_%02d	1
+0x5600c0	Online::FillRankingRow	Rank_DATA_%02d	1
+0x5600c0	Online::FillRankingRow	PlayersName_DATA_%02d	1
+0x5600c0	Online::FillRankingRow	Rep_DATA_%02d	1
+0x5600c0	Online::FillRankingRow	Win_DATA_%02d	1
+0x5600c0	Online::FillRankingRow	Losses_DATA_%02d	1
+0x5600c0	Online::FillRankingRow	NumberOfPlayers_DATA_%02d	1
+0x5605f0		STAT	1
+0x562390		%s%02d	1
+0x5627e0		TRACK_NAME_%d	1
+0x562b50	CarSelect::SetBrandLogo	BRAND_NAME_%s	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.fre	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.ger	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.ita	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.spa	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.dut	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.swe	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.kor	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.chi	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.eng	1
+0x563550	Language_LoadAgreementFile	LANGUAGES\agree.usa	1
+0x563f70		%d%%%%	2
+0x564110		%d%%%%	4
+0x564550		%s %s.	6
+0x564550		MU_Online_NetworkLogin.fng	6
+0x5649f0	bPNodeSlotPool::EnsureCreated	bPNode SlotPool	1
+0x565b60	bMalloc	Main Pool	1
+0x5665fb		[%*.*f,%*.*f,%*.*f]	1
+0x5666be		[%*.*f,%*.*f]	1
+0x5697b0	CarEmitterPosition::InitSlotPool	CarEmitterPositionSlotPool	1
+0x56a130	CarRenderInfo::CarRenderInfo	BLURTEST	1
+0x56a130	CarRenderInfo::CarRenderInfo	%s_SHADOWFE	1
+0x56a130	CarRenderInfo::CarRenderInfo	%s_SHADOWIG	1
+0x56a130	CarRenderInfo::CarRenderInfo	%s_NEON	1
+0x56a130	CarRenderInfo::CarRenderInfo	GREEN	1
+0x56aed0		ALPHA2	1
+0x56c3d0	CarRenderInfo::UpdateDecalTextures	DEFAULTALPHA	1
+0x56c410		DUMMY_DECAL1	1
+0x56c410		DUMMY_DECAL2	1
+0x56c410		DUMMY_DECAL3	1
+0x56c410		DUMMY_DECAL4	1
+0x56c410		DUMMY_DECAL5	1
+0x56c410		DUMMY_DECAL6	1
+0x56c410		DUMMY_DECAL7	1
+0x56c410		DUMMY_DECAL8	1
+0x56c720		SHAPE	1
+0x56c720		SMALL	1
+0x56c720		MEDIUM	2
+0x56c720		LARGE	1
+0x56c720		SQUARE	4
+0x56c720		RECT	1
+0x56c720		WIDE	2
+0x56c720		NAME	1
+0x56c9d0		RECT	1
+0x5712a0	CarRenderInfo::InitCarLightsList	Car Lights	1
+0x5718d0	Str_PadToWidthWithSpaces	                                                                                              	3
+0x5718d0	Str_PadToWidthWithSpaces	                                                                                             	2
+0x571920	Render_UpdateLoop	bRepeat	1
+0x5722d0	ReplayManager::QueueDummySnapshot	DUMMY_SNAPSHOT	8
+0x572380	ReplayManager::UpdateHighlights	INSTANT_REPLAY	9
+0x572380	ReplayManager::UpdateHighlights	HIGHLIGHT_SNAPSHOT	3
+0x572540		CHECKSUM%d	1
+0x572690	ReplayManager::ThinLapSnapshots	LAP_SNAPSHOT	4
+0x572970	Camera::AdvanceInstantReplayTimer	INSTANT_REPLAY	2
+0x5729d0	Render_SnapshotHighlightOrLap	HIGHLIGHT_SNAPSHOT	2
+0x5729d0	Render_SnapshotHighlightOrLap	LAP_SNAPSHOT	1
+0x572d90	ReplayManager::DoSnapshotDispatch	REPLAY_MANAGER_STATE	2
+0x572e20	ReplayManager::DoSnapshot	ReplayManager	1
+0x573170	ReplayManager::GetReplayFilePath	REPLAY\%s	1
+0x5734a0	ReplayManager::RefreshDemoSnapshot	REPLAY_MANAGER_STATE	1
+0x5734a0	ReplayManager::RefreshDemoSnapshot	DEMO_MODE_SNAPSHOT	2
+0x5735a0	ReplayManager::ReleaseDemoSnapshots	DEMO_MODE_SNAPSHOT	1
+0x5735a0	ReplayManager::ReleaseDemoSnapshots	REPLAY_MANAGER_STATE	1
+0x573620		REPLAY\%s	1
+0x5737f0	ReplayManager::RegisterSnapshotChannels	DEMO_MODE_SNAPSHOT	2
+0x5737f0	ReplayManager::RegisterSnapshotChannels	REPLAY_MANAGER_STATE	2
+0x5737f0	ReplayManager::RegisterSnapshotChannels	CHECKSUM0	1
+0x5737f0	ReplayManager::RegisterSnapshotChannels	CHECKSUM1	1
+0x5737f0	ReplayManager::RegisterSnapshotChannels	CHECKSUM2	1
+0x5737f0	ReplayManager::RegisterSnapshotChannels	CHECKSUM3	1
+0x5741c0	InputEvents::Init	EventNodeSlotPool	1
+0x5742b0	Profile::SerializeJoystickSection	Joystick	1
+0x576f80	Mobile::InitSlotPools	MobileTopologySlotPool	1
+0x576f80	Mobile::InitSlotPools	MobileTrackPolygonSlotPool	1
+0x577880		WorldEntity	1
+0x577b00	Track::CreateWorldEntity	WorldEntity	1
+0x578010		WorldObject	1
+0x578820	Track_CheckDrawBridgeAndJump	DrawBridge	1
+0x578820	Track_CheckDrawBridgeAndJump	TRSABC_Track_Jump	1
+0x578910		WorldObject	1
+0x578b10	Track::HandleWorldObject	WorldObject	1
+0x579430	SpaceNode::InitSlotPool	SpaceNodeSlotPool	1
+0x579750	WorldObject::WorldObject	DEBUG_CUBE	1
+0x57b9f0	Barrel::Barrel	SMOKEBOMB	1
+0x57bdd3		XO_Train_EngineA_1b_3001	1
+0x57bf90	TrainCar::TrainCar	TrainCar	1
+0x57c110	Track::HandleTrainCar	TrainCar	1
+0x57d200	RideInfo::DoSnapshot	RideInfo	1
+0x57d340	RideInfo::FillDefaultParts	BRAKES	4
+0x57d860	RideInfo::SyncPartsToPhysicsForAI	_BODY_%d	2
+0x57dd30		_STYLE%02d_%2d_%2d	1
+0x57eab0		CALIPER	3
+0x57eab0		%s_WIDE%d_	1
+0x57eab0		DECAL_LEFT_DOOR_RECT_MEDIUM	1
+0x57eab0		DECAL_RIGHT_DOOR_RECT_MEDIUM	1
+0x57eab0		DECAL_LEFT_QUARTER_RECT_MEDIUM	1
+0x57eab0		DECAL_RIGHT_QUARTER_RECT_MEDIUM	1
+0x580a40	DriverInfo::DoSnapshot	DriverInfo	1
+0x580b00	GetUsedCarTextureInfo	%s_SKIN1	1
+0x580b00	GetUsedCarTextureInfo	%s_SKIN1B	1
+0x580b00	GetUsedCarTextureInfo	GLOBAL_SKIN1	1
+0x580b00	GetUsedCarTextureInfo	_WHEEL	1
+0x580b00	GetUsedCarTextureInfo	%s_HEADLIGHT	1
+0x580b00	GetUsedCarTextureInfo	%s_BRAKELIGHT	1
+0x580b00	GetUsedCarTextureInfo	_LEFT	2
+0x580b00	GetUsedCarTextureInfo	_RIGHT	2
+0x580b00	GetUsedCarTextureInfo	_GLASS_LEFT	2
+0x580b00	GetUsedCarTextureInfo	_GLASS_RIGHT	2
+0x580b00	GetUsedCarTextureInfo	_CENTRE	1
+0x580b00	GetUsedCarTextureInfo	_GLASS_CENTRE	1
+0x580b00	GetUsedCarTextureInfo	_DAMAGE0	2
+0x580b00	GetUsedCarTextureInfo	_GLASS_OFF	2
+0x580b00	GetUsedCarTextureInfo	_GLASS_ON	2
+0x580b00	GetUsedCarTextureInfo	_GLASS_DAMAGE0	2
+0x580b00	GetUsedCarTextureInfo	%s_INTERIOR	1
+0x580b00	GetUsedCarTextureInfo	%s_BADGING	1
+0x580b00	GetUsedCarTextureInfo	%s_BADGING_EU	1
+0x580b00	GetUsedCarTextureInfo	%s_LICENSE_PLATE	1
+0x580b00	GetUsedCarTextureInfo	%s_SIDELIGHT	2
+0x580b00	GetUsedCarTextureInfo	%s_DOOR_HANDLE	2
+0x580b00	GetUsedCarTextureInfo	%s_LOGO	2
+0x580b00	GetUsedCarTextureInfo	%s_SHADOW%s	2
+0x580b00	GetUsedCarTextureInfo	%s_NEON	2
+0x580b00	GetUsedCarTextureInfo	%s_TIRE	2
+0x581830		SHAPE	1
+0x581830		SMALL	1
+0x581830		MEDIUM	2
+0x581830		LARGE	1
+0x581830		SQUARE	3
+0x581830		RECT	1
+0x581830		WIDE	1
+0x581830		NAME	1
+0x581830		_SQUARE	1
+0x581830		_RECT	1
+0x581830		_WIDE	1
+0x5840c0	Average::DoSnapshot	Average	1
+0x5846a0	PidError::DoSnapshot	PidError	1
+0x584800	RigidBody::RigidBody	Rigid	1
+0x584960	RigidBody::DoSnapshot	RigidBody	1
+0x585ec0	WorldTime::DoSnapshot	WorldTime	1
+0x586090	FormatRaceTime::BuildTimeString	00'00\"00	1
+0x586090	FormatRaceTime::BuildTimeString	--'--\"--	1
+0x586090	FormatRaceTime::BuildTimeString	00:00:00	1
+0x586090	FormatRaceTime::BuildTimeString	--:--:--	1
+0x586090	FormatRaceTime::BuildTimeString	00:00.00	2
+0x586090	FormatRaceTime::BuildTimeString	--:--.--	2
+0x586090	FormatRaceTime::BuildTimeString	00h:00:00	2
+0x586090	FormatRaceTime::BuildTimeString	--h:--:--	2
+0x586090	FormatRaceTime::BuildTimeString	00h:00'00\"	1
+0x586090	FormatRaceTime::BuildTimeString	--h:--'--\"	1
+0x5868e0	Wheel::Wheel	Wheel	1
+0x5869c0	Wheel::DoSnapshot	Wheel	1
+0x5883e0	Suspension::Suspension	Suspnsn	1
+0x588470	Suspension::DoSnapshot	Suspension	1
+0x589ba0	Skid::InitSlotPool	SkidSetSlotPool	1
+0x589ba0	Skid::InitSlotPool	XEM_TIREFIRE	1
+0x58a000	Clan::InitSlotPool	ClanSlotPool	1
+0x58ab50	QueuedFile::InitSlotPool	QueuedFileSlotPool	1
+0x58af10	LoadedWheel::LoadedWheel	WHEELS	1
+0x58af10	LoadedWheel::LoadedWheel	_WHEEL	1
+0x58b110	Loaded::InitSlotPools	LoadedTexturePackSlotPool	1
+0x58b110	Loaded::InitSlotPools	LoadedSolidPackSlotPool	1
+0x58b110	Loaded::InitSlotPools	LoadedSkinLayerSlotPool	1
+0x58b110	Loaded::InitSlotPools	LoadedWheelSlotPool	1
+0x58b110	Loaded::InitSlotPools	LoadedCarSlotPool	1
+0x58b110	Loaded::InitSlotPools	LoadedRideInfoSlotPool	1
+0x58bb50	CarLoader::AllocateSkin	CARS\%s\TEXTURES.BIN	1
+0x58bb50	CarLoader::AllocateSkin	CARS\%s\VINYLS.BIN	1
+0x58d560	BodyDamage::DoSnapshot	BodyDamage	1
+0x58d8a0	CarDamage::DoSnapshot	CarDamage	1
+0x58dd50	Event::InitSlotPools	EventSlotPool	1
+0x58dd50	Event::InitSlotPools	EventHandlerSlotPool	1
+0x58e540	TrackMap::TrackMap	TRACK%d_MAP	1
+0x592280	WorldObject_ctor	World Object	1
+0x592470	WorldObjectCollisionBody::WorldObjectCollisionBody	World Object	1
+0x592670	WorldObjectCollisionBody::DoSnapshot	WorldObjectCollisionBody	1
+0x593880	GameFlow::InitFernShakerSlotPool	FernShakerSlotPool	1
+0x594970	Track_LoadResources	%s%d.BIN	1
+0x594b70	FileSystem::InitSlotPool	bFile System	1
+0x595b70	Smackables::IsExcluded	XO_CONSTRUCSIGNA_1B_00	1
+0x595bf0	Smackables::Init	VirginSmokeableSlotPool	1
+0x595bf0	Smackables::Init	SmokeableSlotPool	1
+0x595f70	Smackables::SaveState	AllSmokeables	1
+0x5962e0	VirginSmokeable::VirginSmokeable	VirginSmokeable%s	1
+0x596850		Smokeable%s	1
+0x597d10	Smokeable::BuildChildren	_CHILDx	1
+0x597d10	Smokeable::BuildChildren	LDx	1
+0x599c80	Teleporter_MoveToSpawnRecord	backwards	1
+0x599c80	Teleporter_MoveToSpawnRecord	forwards	1
+0x59a2c0	Teleporter_MoveFreeRun	forwards	27
+0x59a2c0	Teleporter_MoveFreeRun	backwards	27
+0x59ba20	DrivingLocation::DoSnapshot	DrivingLocation	1
+0x59ca70	QuickSpline::DoSnapshot	QuickSpline	1
+0x59e0a0		NISMO_PRESET	1
+0x59e0a0		PETEY_PABLO	2
+0x59e0a0		gimmeppablo	1
+0x59e0a0		eppablo	1
+0x59e0a0		blo	1
+0x59e0a0		ROBZOMBIE_PRESET	2
+0x59e0a0		gotcharobzombie	1
+0x59e0a0		harobzombie	1
+0x59e0a0		bzombie	1
+0x59e0a0		bie	1
+0x59e0a0		havyamystikal	1
+0x59e0a0		MYSTIKAL_PRESET	2
+0x59e0a0		amystikal	1
+0x59e0a0		tikal	1
+0x59e0a0		needmylostprophets	1
+0x59e0a0		mylostprophets	1
+0x59e0a0		LOSTPRO_PRESET	2
+0x59e0a0		stprophets	1
+0x59e0a0		ophets	1
+0x59e0a0		ts	1
+0x59e850	FEWidget::InitFromDescriptor_59e850	h(uh	1
+0x59e865		%s%d	1
+0x59eac0	FEWidget::InitFromDescriptor_59eac0	%s%d	2
+0x59f7c0	Language_LoadTextureBin	LANGUAGES\LANGUAGETEXTURES.BIN	2
+0x5a0a00	Career::Reset	CAREER_CAR	1
+0x5a0b40	Magazine::GetTaskBaseOffset	MAGAZINE_TASK_1	1
+0x5a0b40	Magazine::GetTaskBaseOffset	MAGAZINE_TASK_%d	4
+0x5a2540	Career::BuyCar	CAREER_CAR	1
+0x5a3850	UnlockTeller::SetVinylGroupNewlyStyleUnlocked	TEAR1	1
+0x5a3850	UnlockTeller::SetVinylGroupNewlyStyleUnlocked	TEAR2	1
+0x5a3850	UnlockTeller::SetVinylGroupNewlyStyleUnlocked	TEAR3	1
+0x5a3c00	Car::LookupCarType	_BODY_1	1
+0x5a3c00	Car::LookupCarType	_BODY_2	1
+0x5a3c00	Car::LookupCarType	_BODY_3	1
+0x5a3c00	Car::LookupCarType	_BODY_4	1
+0x5a3c00	Car::LookupCarType	_BODY_5	1
+0x5a3d50	Car::CheckBodyType	ALLCARS_BODY_1	1
+0x5a4750	RCMP::DECODER::DumpCapture	d:\decodercapture%04d.fss	2
+0x5a4f90	FuturePointsPtr::DoSnapshot	FuturePointsPtr	1
+0x5a50c0	FuturePoints::DoSnapshot	FuturePoints	1
+0x5a70f0	FuturePoint::DoSnapshot	FuturePoint	1
+0x5a96b0	GetDoorLineHash	_DOORLINE_WIDEBODY	1
+0x5a9740		_DOORLINE_KIT	1
+0x5a9740		_DOORLINE	1
+0x5a97f0	GetDoorLineMaskHash	_DOORLINE_WIDEBODY_MASK	1
+0x5a9880		_DOORLINE_KIT_MASK	1
+0x5a9880		_DOORLINE_MASK	1
+0x5a9930	GetHoodSpoilerHash	_HOOD_SPOILER	1
+0x5a9930	GetHoodSpoilerHash	_HOOD	1
+0x5a9930	GetHoodSpoilerHash	_SPOILER	1
+0x5a99e0	GetHoodSpoilerMaskHash	_HOOD_SPOILER_MASK	1
+0x5a99e0	GetHoodSpoilerMaskHash	_HOOD_MASK	1
+0x5a99e0	GetHoodSpoilerMaskHash	_SPOILER_MASK	1
+0x5a9a90	GetWheelTextureHash	_WHEEL	1
+0x5a9af0	GetWheelTextureMaskHash	_WHEEL_INNER_MASK	1
+0x5a9b50	GetVinylLayerHash	TEXTURE	1
+0x5a9c10	GetVinylLayerMaskHash	TEXTURE	1
+0x5a9c10	GetVinylLayerMaskHash	_MASK	1
+0x5a9ce0	CompositeSkin	GREEN	1
+0x5a9ce0	CompositeSkin	BLUE	1
+0x5a9ce0	CompositeSkin	GLOSS	3
+0x5a9ce0	CompositeSkin	NUMCOLOURS	1
+0x5a9ce0	CompositeSkin	_MASK	4
+0x5aa9f0	TrafficIntersection_Save	TrafficIntersection	1
+0x5aaa90	IncomingTrafficCar_Save	IncomingTrafficCar	1
+0x5b0506	D3DX_Cpu_DisableMMX	DisableMMX	1
+0x5b05b6	D3DX_Cpu_Genuineintel_5b05b6	GenuineIntel	3
+0x5b065b	D3DXPSGP_Init	DisablePSGP	1
+0x5b065b	D3DXPSGP_Init	DisableD3DXPSGP	1
+0x5b1f01	D3DX_HlslLex_ErrorXU_5b1f01	(%u): 	1
+0x5b1f01	D3DX_HlslLex_ErrorXU_5b1f01	error X%u: 	1
+0x5b1fca	D3DX_HlslLex_Msg_5b1fca	error	1
+0x5b1fca	D3DX_HlslLex_Msg_5b1fca	(%u): 	3
+0x5b1fca	D3DX_HlslLex_Msg_5b1fca	%s X%u: 	3
+0x5b1fca	D3DX_HlslLex_Msg_5b1fca	warning	1
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	syntax error : unexpected %s	11
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	token '%s'	2
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	integer '%u'	1
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	integer '%dl'	1
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	integer '%uul'	1
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	float '%g'	1
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	float '%gh'	1
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	float '%gf'	1
+0x5b212b	D3DX_HlslLex_SyntaxErrorUnexpectedS_5b212b	float '%gl'	1
+0x5b226e	D3DX_HlslLex_CommentContinuesPastEndOfFile_5b226e	comment continues past end of file	12
+0x5b239e	D3DX_HlslLex_HexValueTruncatedTo32Bits_5b239e	hex value truncated to 32bits	1
+0x5b2443	D3DX_HlslLex_OctalValueTruncatedTo32Bits_5b2443	octal value truncated to 32bits	1
+0x5b24bf	D3DX_HlslLex_DecimalValueTruncatedTo32Bits_5b24bf	decimal value truncated to 32bits	1
+0x5b2560	D3DX_HlslLex_CharacterContinuesPastEndOfFil_5b2560	character continues past end of file	1
+0x5b2d7a	D3DX_EffectCompiler_UnexpectedComponentType_5b2d7a	ID3DXEffectCompiler: Unexpected node encountered when trying to determine type	1
+0x5b2d7a	D3DX_EffectCompiler_UnexpectedComponentType_5b2d7a	ID3DXEffectCompiler: Unexpected template type	1
+0x5b2d7a	D3DX_EffectCompiler_UnexpectedComponentType_5b2d7a	ID3DXEffectCompiler: Unexpected component type	4
+0x5b3675	D3DX_EffectCompiler_ArraysMustBeEitherNumericStruc_5b3675	ID3DXEffectCompiler: Arrays must be either numeric, structure, string or shader	1
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: Max index for effect state '%s' is %d	1
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: Unexpected value type of state '%s' (internal error)	2
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: State '%s' was assigned an unsupported value	3
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: Unexpected error	3
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: Error in type checking	3
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: State '%s' was assigned an expression of incompatible type	3
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: State '%s' must be assigned a numeric scalar or a 4-float vector	2
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: State '%s' must be assigned a numeric value	2
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: State '%s' must be assigned a scalar	2
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: Error initializing assignment type	12
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: State '%s' must be assigned a 3-vector or a 4-vector or a uint scalar	2
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: Internal error	32
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: State '%s' does not accept '%s' as a value	9
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: Dword expressions for state '%s' must be evaluate to NULL	6
+0x5b3b78	D3DX_EffectCompiler_Fillmode_5b3b78	ID3DXEffectCompiler: FVFs must not evaluate to NULL	4
+0x5b4ef1	D3DX_EffectCompiler_CompileeffectThereWasAnErrorCo_5b4ef1	ID3DXEffectCompiler::CompileEffect: Unrecognized value type	1
+0x5b4ef1	D3DX_EffectCompiler_CompileeffectThereWasAnErrorCo_5b4ef1	ID3DXEffectCompiler::CompileEffect: There was an error compiling HLL shader parameter	1
+0x5b710e	D3DX_EffectCompiler_ErrorInitializingAnnotationTyp_5b710e	ID3DXEffectCompiler: There was a problem getting variable type	1
+0x5b710e	D3DX_EffectCompiler_ErrorInitializingAnnotationTyp_5b710e	ID3DXEffectCompiler: Error initializing annotation type	5
+0x5b710e	D3DX_EffectCompiler_ErrorInitializingAnnotationTyp_5b710e	ID3DXEffectCompiler: Only numeric types and strings are allowed as annotations	1
+0x5b90e9	D3DX_EffectCompiler_ThereWasAProblemGettingVariabl_5b90e9	ID3DXEffectCompiler: There was a problem getting variable type	2
+0x5b90e9	D3DX_EffectCompiler_ThereWasAProblemGettingVariabl_5b90e9	ID3DXEffectCompiler: Error initializing variable type	2
+0x5b90e9	D3DX_EffectCompiler_ThereWasAProblemGettingVariabl_5b90e9	ID3DXEffectCompiler: There was a problem getting annotations	16
+0x5b9598	D3DX_EffectCompiler_ThereWasAProblemGettingAnnotat_5b9598	ID3DXEffectCompiler: There was a problem getting annotations	4
+0x5b98ff	D3DX_EffectCompiler_ThereWasAProblemGettingAnnotat_5b98ff	ID3DXEffectCompiler: Only pass allowed within a technique	2
+0x5b9b78	D3DX_EffectCompiler_ThereWasAnErrorInitializingThe_5b9b78	ID3DXEffectCompiler: There was an error initializing technique annotation handles	2
+0x5b9b78	D3DX_EffectCompiler_ThereWasAnErrorInitializingThe_5b9b78	ID3DXEffectCompiler: There was an error initializing parameter annotation handles	2
+0x5b9b78	D3DX_EffectCompiler_ThereWasAnErrorInitializingThe_5b9b78	ID3DXEffectCompiler: There was an error initializing parameter handles	2
+0x5b9b78	D3DX_EffectCompiler_ThereWasAnErrorInitializingThe_5b9b78	ID3DXEffectCompiler: There was an error initializing the compiler	70
+0x5b9b78	D3DX_EffectCompiler_ThereWasAnErrorInitializingThe_5b9b78	ID3DXEffectCompiler: There was an unexpected error in the parse tree	2
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	syntax error	1
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	float constant	1
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	token	3
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	integer constant	1
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	token '%s'	2
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	syntax error: unexpected %s	4
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	version token	1
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	end of file	1
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	end of line	1
+0x5ba0ab	D3DX_HlslSema_Token_5ba0ab	string constant	1
+0x5ba2ce	D3DX_HlslSema_InternalErrorProductionFailed_5ba2ce	internal error: production failed!	1
+0x5ba2ff	D3DX_HlslSema_InternalErrorOutOfMemory_5ba2ff	internal error: out of memory	1
+0x5ba35f	D3DX_HlslSema_InternalErrorScopeUnderflow_5ba35f	internal error: scope underflow	1
+0x5ba3df	D3DX_HlslSema_RedefinitionOfFormalParameterS_5ba3df	internal error: scope missing	1
+0x5ba3df	D3DX_HlslSema_RedefinitionOfFormalParameterS_5ba3df	redefinition of formal parameter '%s'	1
+0x5ba3df	D3DX_HlslSema_RedefinitionOfFormalParameterS_5ba3df	Stmts	4
+0x5ba3df	D3DX_HlslSema_RedefinitionOfFormalParameterS_5ba3df	redefinition of '%s'	1
+0x5ba5ee	D3DX_HlslSema_InternalErrorUnknownNode_5ba5ee	internal error: unknown node	1
+0x5ba681	D3DX_HlslSema_SyntaxError_5ba681	duplicate usages specified	1
+0x5ba681	D3DX_HlslSema_SyntaxError_5ba681	syntax error	1
+0x5ba70c	D3DX_HlslSema_InternalErrorUnknownNode_5ba70c	internal error: unknown node	1
+0x5ba799	D3DX_HlslSema_InternalErrorUnknownNode_5ba799	internal error: unknown node	1
+0x5ba80b	D3DX_HlslSema_InternalErrorUnknownNode_5ba80b	internal error: unknown node	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	void	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	unknown	2
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	const 	2
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	bool	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	float	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	half	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	double	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	NULL	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	string	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	texture	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	texture1D	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	texture2D	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	texture3D	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	textureCUBE	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	sampler	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	sampler1D	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	sampler2D	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	sampler3D	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	samplerCUBE	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	pixelshader	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	vertexshader	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	pixelfragment	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	vertexfragment	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	%s%s%ux%u	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	%s%s%u	1
+0x5ba942	D3DX_HlslSema_SstructU_5ba942	[%u]	1
+0x5bac05	D3DX_HlslSema_InternalErrorUnknownNode_5bac05	internal error: unknown node	1
+0x5bae82	D3DX_HlslSema_ObjectLiteralsAreNotAllowedIns_5bae82	object literals are not allowed inside functions	2
+0x5bb22e	D3DX_HlslSema_Stmts_5bb22e	Stmts	2
+0x5bb295	D3DX_HlslSema_Stmts_5bb295	Stmts	16
+0x5bb534	D3DX_HlslSema_Values_5bb534	Values	1
+0x5bb534	D3DX_HlslSema_Values_5bb534	Decls	1
+0x5bbdd0	D3DX_HlslSema_NonMatrixTypesCannotBeDeclared_5bbdd0	non-matrix types cannot be declared 'row_major' or 'column_major'	3
+0x5bc1ad	D3DX_HlslSema_SCannotSconvertFromSToS_5bc1ad	implicitly 	1
+0x5bc1ad	D3DX_HlslSema_SCannotSconvertFromSToS_5bc1ad	cannot %sconvert from '%s' to '%s'	1
+0x5bc1ad	D3DX_HlslSema_SCannotSconvertFromSToS_5bc1ad	'%s': cannot %sconvert from '%s' to '%s'	1
+0x5bc356	D3DX_HlslSema_Value_5bc356	Value	1
+0x5bc4f9	D3DX_HlslSema_Value_5bc4f9	Value	1
+0x5bc645	D3DX_HlslSema_Types_5bc645	Types	4
+0x5bc73c	D3DX_HlslSema_Swizzle_5bc73c	invalid subscript '%s'	66
+0x5bc73c	D3DX_HlslSema_Swizzle_5bc73c	Swizzle	66
+0x5bcbdd	D3DX_HlslSema_Value_5bcbdd	Value	4
+0x5bcd15	D3DX_HlslSema_Value_5bcd15	Value	2
+0x5bd234	D3DX_HlslSema_InfiniteIndefiniteLog_5bd234	division by zero	4
+0x5bd234	D3DX_HlslSema_InfiniteIndefiniteLog_5bd234	infinite/indefinite log	6
+0x5bd234	D3DX_HlslSema_InfiniteIndefiniteLog_5bd234	indefinite acos	4
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	undeclared identifier '%s'	147
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	NULL	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	dword	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	'%s': identifier represents a %s, not a %s	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	float	5
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	vector	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	'%s': ambiguous function call	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	matrix	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	string	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	texture	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	Values	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	pixelshader	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	vertexshader	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	bool	1
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	half	2
+0x5be628	D3DX_HlslSema_Vertexshader_5be628	double	8
+0x5bedc7	D3DX_HlslSema_Value_5bedc7	Value	4
+0x5beee7	D3DX_HlslSema_IncorrectNumberOfArgumentsToNu_5beee7	constructors only defined for numeric base types	1
+0x5beee7	D3DX_HlslSema_IncorrectNumberOfArgumentsToNu_5beee7	cannot convert from 'object type' to 'numeric type'	12
+0x5beee7	D3DX_HlslSema_IncorrectNumberOfArgumentsToNu_5beee7	incorrect number of arguments to numeric-type constructor	24
+0x5bf135	D3DX_HlslSema_Value_5bf135	conditional must be numeric	1
+0x5bf135	D3DX_HlslSema_Value_5bf135	type mismatch between conditional values	1
+0x5bf135	D3DX_HlslSema_Value_5bf135	Types	10
+0x5bf135	D3DX_HlslSema_Value_5bf135	Value	20
+0x5bf509	D3DX_HlslSema_DivisionByZero_5bf509	array index out of bounds	2
+0x5bf509	D3DX_HlslSema_DivisionByZero_5bf509	division by zero	51
+0x5bfd33	D3DX_HlslSema_Stmts_5bfd33	Stmts	12
+0x5c0010		bool	1
+0x5c0010		break	1
+0x5c0110		compile_fragment	1
+0x5c0110		const	1
+0x5c0110		const_cast	1
+0x5c0470		return	1
+0x5c0510		shared	1
+0x5c0510		short	1
+0x5c0510		signed	1
+0x5c0510		sizeof	1
+0x5c0510		static	1
+0x5c0510		static_cast	1
+0x5c0510		string	1
+0x5c0510		struct	1
+0x5c0510		switch	1
+0x5c0510		sampler	1
+0x5c0740		union	1
+0x5c0740		unsigned	1
+0x5c094c	D3DX_HlslSema_RedefinitionOfS_5c094c	'%s': functions cannot be declared 'uniform'	1
+0x5c094c	D3DX_HlslSema_RedefinitionOfS_5c094c	'%s': functions cannot be declared 'extern'	1
+0x5c094c	D3DX_HlslSema_RedefinitionOfS_5c094c	'%s': function return value must be numeric	1
+0x5c094c	D3DX_HlslSema_RedefinitionOfS_5c094c	'%s': missing default value for parameter '%s'	2
+0x5c094c	D3DX_HlslSema_RedefinitionOfS_5c094c	Stmts	1
+0x5c094c	D3DX_HlslSema_RedefinitionOfS_5c094c	'%s': void function cannot have a semantic	2
+0x5c0cfc	D3DX_HlslSema_Value_5c0cfc	Value	2
+0x5c0e94	D3DX_HlslSema_Stmts_5c0e94	Stmts	1
+0x5c10a3	D3DX_HlslSema_VectorDimensionMustBeBetween1A_5c10a3	vector dimension must be a literal scalar expression	1
+0x5c10a3	D3DX_HlslSema_VectorDimensionMustBeBetween1A_5c10a3	vector dimension must be between 1 and %u	2
+0x5c1128	D3DX_HlslSema_MatrixDimensionsMustBeLiteralS_5c1128	matrix dimensions must be between 1 and %u	4
+0x5c1128	D3DX_HlslSema_MatrixDimensionsMustBeLiteralS_5c1128	matrix dimensions must be literal scalar expressions	2
+0x5c11d0	D3DX_HlslSema_ArrayDimensionsMustBeLiteralSc_5c11d0	array dimensions must be literal scalar expressions	1
+0x5c1248	D3DX_HlslSema_ArrayIndexOutOfBounds_5c1248	array index out of bounds	4
+0x5c1473	D3DX_HlslSema_LValueSpecifiesConstObject_5c1473	l-value specifies const object	1
+0x5c1473	D3DX_HlslSema_LValueSpecifiesConstObject_5c1473	object assignments are not allowed inside functions	1
+0x5c1473	D3DX_HlslSema_LValueSpecifiesConstObject_5c1473	type mismatch	2
+0x5c18f9	D3DX_HlslSema_Stmts_5c18f9	'%s': void functions cannot return a value	1
+0x5c18f9	D3DX_HlslSema_Stmts_5c18f9	'%s': function must return a value	1
+0x5c18f9	D3DX_HlslSema_Stmts_5c18f9	Stmts	1
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	local variables	1
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	loop control variables	1
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	annotation members	1
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	Stmts	1
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': array dimensions of %s must be explicit	1
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': secondary array dimensions must be explicit	1
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': array dimensions must be literal scalar expressions	1
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': implicit array missing %s	4
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be target specific	10
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be declared 'inline'	10
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': implicit array type does not match %s	2
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s must be numeric	20
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': extern %s cannot be declared 'static'	10
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': uniform %s cannot be declared 'static'	10
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be declared 'static'	20
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be declared 'uniform'	20
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be declared 'uniform out'	20
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be declared 'extern'	20
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be declared 'volatile'	20
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be declared 'shared'	20
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot be declared 'const'	10
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': output paramaters cannot be declared 'const'	10
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': missing %s	55
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot have annotations	45
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s cannot have semantics	35
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': output only %s cannot have %ss	10
+0x5c19bf	D3DX_HlslSema_Stmts_5c19bf	'%s': %s must be a literal expression	20
+0x5c238d	D3DX_HlslSema_UndeclaredIdentifierS_5c238d	undeclared identifier '%s'	4
+0x5c238d	D3DX_HlslSema_UndeclaredIdentifierS_5c238d	Inputs	16
+0x5c238d	D3DX_HlslSema_UndeclaredIdentifierS_5c238d	Outputs	16
+0x5c238d	D3DX_HlslSema_UndeclaredIdentifierS_5c238d	Parameters	14
+0x5c238d	D3DX_HlslSema_UndeclaredIdentifierS_5c238d	'%s': function does not take %u parameter%s	14
+0x5c238d	D3DX_HlslSema_UndeclaredIdentifierS_5c238d	'%s': intrinsic function does not take %u parameter%s	14
+0x5c2858	D3DX_HlslSema_Value_5c2858	unsupported compiler target '%s'	1
+0x5c2858	D3DX_HlslSema_Value_5c2858	Value	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	internal error: stack underflow	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	internal error: unhandled production	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	Stack	96
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	internal error: out of memory	96
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	TypeDefs	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	invalid use of '%s'	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	VariableDim	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	'%s' already has a body	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	Stmts	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	Passes	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	States	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	DwordExpr	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	Arguments	1
+0x5c2a3c	D3DX_HlslSema_InternalErrorOutOfMemory_5c2a3c	comma expression used where an initializer list may have been intended	1
+0x5c3e7d	D3DX_HlslParse_SyntaxError_5c3e7d	syntax error	16
+0x5c3e7d	D3DX_HlslParse_SyntaxError_5c3e7d	yacc stack overflow	1
+0x5c52f4	D3DX_Preproc_FailedToOpenSourceFileS_5c52f4	failed to open source file: '%s'	2
+0x5c56ef	D3DX_Preproc_Error_5c56ef	define	2
+0x5c56ef	D3DX_Preproc_Error_5c56ef	undef	2
+0x5c56ef	D3DX_Preproc_Error_5c56ef	include	2
+0x5c56ef	D3DX_Preproc_Error_5c56ef	error	2
+0x5c56ef	D3DX_Preproc_Error_5c56ef	ifdef	4
+0x5c56ef	D3DX_Preproc_Error_5c56ef	ifndef	4
+0x5c56ef	D3DX_Preproc_Error_5c56ef	else	4
+0x5c56ef	D3DX_Preproc_Error_5c56ef	endif	4
+0x5c56ef	D3DX_Preproc_Error_5c56ef	pragma	2
+0x5c56ef	D3DX_Preproc_Error_5c56ef	defined	2
+0x5c5a21	D3DX_Preproc_SyntaxError_5c5a21	syntax error	1
+0x5c5a21	D3DX_Preproc_SyntaxError_5c5a21	invalid preprocessor command '%s'	1
+0x5c5af6	D3DX_Preproc_SyntaxError_5c5af6	syntax error	1
+0x5c5af6	D3DX_Preproc_SyntaxError_5c5af6	include interface required to support #include from resource or memory	2
+0x5c5af6	D3DX_Preproc_SyntaxError_5c5af6	too many nested #includes	4
+0x5c5af6	D3DX_Preproc_SyntaxError_5c5af6	%s%s	8
+0x5c5cbe	D3DX_Preproc_ErrorS_5c5cbe	error: %s	1
+0x5c5dec	D3DX_Preproc_UnexpectedElifFollowingElse_5c5dec	unexpected #elif	1
+0x5c5dec	D3DX_Preproc_UnexpectedElifFollowingElse_5c5dec	unexpected #elif following #else	1
+0x5c5e5f	D3DX_Preproc_UnexpectedElseFollowingElse_5c5e5f	unexpected #else	1
+0x5c5e5f	D3DX_Preproc_UnexpectedElseFollowingElse_5c5e5f	unexpected #else following #else	1
+0x5c5ec1	D3DX_Preproc_UnexpectedEndif_5c5ec1	unexpected #endif	1
+0x5c602e	D3DX_Preproc_Error_5c602e	error	2
+0x5c602e	D3DX_Preproc_Error_5c602e	disable	2
+0x5c602e	D3DX_Preproc_Error_5c602e	default	2
+0x5c652b	D3DX_Preproc_InternalErrorProductionFailed_5c652b	internal error: production failed	1
+0x5c655e	D3DX_Preproc_DuplicateMacroParameterS_5c655e	duplicate macro parameter '%s'	1
+0x5c683a	D3DX_Preproc_Warning_5c683a	pack_matrix	1
+0x5c683a	D3DX_Preproc_Warning_5c683a	row_major	4
+0x5c683a	D3DX_Preproc_Warning_5c683a	column_major	4
+0x5c683a	D3DX_Preproc_Warning_5c683a	warning	1
+0x5c68b4	D3DX_Preproc_FunctionalDefinesInPreprocesso_5c68b4	functional defines in preprocessor expressions not yet implemented	1
+0x5c691a	D3DX_Preproc_NotEnoughActualParametersForMa_5c691a	unexpected end of file in macro expansion	2
+0x5c691a	D3DX_Preproc_NotEnoughActualParametersForMa_5c691a	not enough actual parameters for macro '%s'	1
+0x5c6feb	D3DX_Preproc_D3DxVersion_5c6feb	DIRECT3D	1
+0x5c6feb	D3DX_Preproc_D3DxVersion_5c6feb	DIRECT3D_VERSION	1
+0x5c6feb	D3DX_Preproc_D3DxVersion_5c6feb	D3DX_VERSION	1
+0x5c7212	D3DX_Preproc_InternalErrorOutOfMemory_5c7212	internal error: stack underflow	1
+0x5c7212	D3DX_Preproc_InternalErrorOutOfMemory_5c7212	division by zero in preprocessor expression	2
+0x5c7212	D3DX_Preproc_InternalErrorOutOfMemory_5c7212	Stack	2
+0x5c7212	D3DX_Preproc_InternalErrorOutOfMemory_5c7212	internal error: out of memory	2
+0x5c765d	D3DX_Preproc_SyntaxError_5c765d	syntax error	16
+0x5c765d	D3DX_Preproc_SyntaxError_5c765d	yacc stack overflow	1
+0x5c7bd2	D3DX_HlslGen_UnexpectedEndOfFile_5c7bd2	unexpected end of file	12
+0x5c7bd2	D3DX_HlslGen_UnexpectedEndOfFile_5c7bd2	unexpected tokens following preprocessor directive	4
+0x5c7bd2	D3DX_HlslGen_UnexpectedEndOfFile_5c7bd2	__FILE__	36
+0x5c7bd2	D3DX_HlslGen_UnexpectedEndOfFile_5c7bd2	__LINE__	36
+0x5d6900	D3DX_HlslGen_Authenticamd_5d6900	UnknownVendr	3
+0x5d6900	D3DX_HlslGen_Authenticamd_5d6900	AuthenticAMD	3
+0x5d779c	D3DX_HlslGen_Vs30_5d779c	vs_3_0	1
+0x5d9fa1	D3DX_HlslGen_InternalErrorResultRegisterInv_5d9fa1	internal error: argument missing context (A%u)	12
+0x5d9fa1	D3DX_HlslGen_InternalErrorResultRegisterInv_5d9fa1	internal error: result register invalid	4
+0x5da405	D3DX_HlslGen_InternalErrorUnknownNode_5da405	internal error: unknown node	1
+0x5da560	D3DX_HlslGen_InternalErrorUnknownNode_5da560	internal error: unknown node	1
+0x5da768	D3DX_HlslGen_InternalErrorUnknownNode_5da768	internal error: unknown node	1
+0x5dc760	D3DX_HlslGen_InternalErrorUnrecognizedState_5dc760	general for/do/while statements are not yet implemented	1
+0x5dc760	D3DX_HlslGen_InternalErrorUnrecognizedState_5dc760	internal error: unrecognized statement	1
+0x5dca6a	D3DX_HlslGen_IntrinsicFunctionSIsNotYetImpl_5dca6a	intrinsic function '%s' is not yet implemented	1
+0x5dca6a	D3DX_HlslGen_IntrinsicFunctionSIsNotYetImpl_5dca6a	tex1D will considered dependent since texcoord was not declared as at least float2	1
+0x5e1f75	D3DX_HlslGen_SFunctionMustReturnAValue_5e1f75	'%s': recursive functions not yet implemented	1
+0x5e1f75	D3DX_HlslGen_SFunctionMustReturnAValue_5e1f75	'%s': input parameter '%s' missing semantics	8
+0x5e1f75	D3DX_HlslGen_SFunctionMustReturnAValue_5e1f75	'%s': function must return a value	1
+0x5e1f75	D3DX_HlslGen_SFunctionMustReturnAValue_5e1f75	'%s': function return value missing semantics	2
+0x5e1f75	D3DX_HlslGen_SFunctionMustReturnAValue_5e1f75	'%s': output parameter '%s' never assigned a value	6
+0x5e1f75	D3DX_HlslGen_SFunctionMustReturnAValue_5e1f75	'%s': output parameter '%s' missing semantics	12
+0x5e2a38	D3DX_HlslGen_InternalErrorOutOfMemory_5e2a38	internal error: out of memory	24
+0x5e2a38	D3DX_HlslGen_InternalErrorOutOfMemory_5e2a38	function '%s' missing implementation	2
+0x5e2a38	D3DX_HlslGen_InternalErrorOutOfMemory_5e2a38	non-linear array references not yet implemented	2
+0x5e2a38	D3DX_HlslGen_InternalErrorOutOfMemory_5e2a38	array references of intermediate arguments not yet implemented	2
+0x5e49cf	D3DX_HlslGen_InternalErrorUnrecognizedValue_5e49cf	internal error: unrecognized value	4
+0x5e4ca2	D3DX_Asm_OverloadedFunctionNotFound_5e4ca2	vs_1_0 is no longer supported; using vs_1_1	4
+0x5e4ca2	D3DX_Asm_OverloadedFunctionNotFound_5e4ca2	ps_1_0 is no longer supported; using ps_1_1	4
+0x5e4ca2	D3DX_Asm_OverloadedFunctionNotFound_5e4ca2	'%s': entrypoint not found	4
+0x5e4ca2	D3DX_Asm_OverloadedFunctionNotFound_5e4ca2	overloaded function not found	4
+0x5e4ca2	D3DX_Asm_OverloadedFunctionNotFound_5e4ca2	unrecognized compiler target '%s'	1
+0x5e505d	D3DX_Asm_NonTrivialObjectExpressionsNot_5e505d	expressions returning objects in an array or struct not yet implemented	1
+0x5e505d	D3DX_Asm_NonTrivialObjectExpressionsNot_5e505d	internal error: expression expected	2
+0x5e505d	D3DX_Asm_NonTrivialObjectExpressionsNot_5e505d	non-trivial object expressions not yet implemented	4
+0x5e5221	D3DX_Asm_Psize_5e5221	POSITION	2
+0x5e5221	D3DX_Asm_Psize_5e5221	BLENDWEIGHT	2
+0x5e5221	D3DX_Asm_Psize_5e5221	BLENDINDICES	2
+0x5e5221	D3DX_Asm_Psize_5e5221	NORMAL	2
+0x5e5221	D3DX_Asm_Psize_5e5221	PSIZE	2
+0x5e5221	D3DX_Asm_Psize_5e5221	TEXCOORD	2
+0x5e5221	D3DX_Asm_Psize_5e5221	TANGENT	2
+0x5e5221	D3DX_Asm_Psize_5e5221	BINORMAL	2
+0x5e5221	D3DX_Asm_Psize_5e5221	TESSFACTOR	2
+0x5e5221	D3DX_Asm_Psize_5e5221	POSITIONT 	2
+0x5e5221	D3DX_Asm_Psize_5e5221	COLOR	2
+0x5e5221	D3DX_Asm_Psize_5e5221	DEPTH	2
+0x5e5221	D3DX_Asm_Psize_5e5221	SAMPLE	2
+0x5e5221	D3DX_Asm_Psize_5e5221	DIFFUSE	2
+0x5e5221	D3DX_Asm_Psize_5e5221	SPECULAR	2
+0x5e556b	D3DX_Asm_SyntaxError_5e556b	syntax error	1
+0x5e556b	D3DX_Asm_SyntaxError_5e556b	'%s' is not a valid instruction in this shader version	1
+0x5e556b	D3DX_Asm_SyntaxError_5e556b	invalid instruction modifiers '%s'	1
+0x5e5695	D3DX_Asm_InternalErrorProductionFailed_5e5695	internal error: production failed	1
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	centroid	1
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	volume	1
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	position	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	blendweight	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	blendindices	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	normal	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	psize	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	texcoord	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	tangent	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	binormal	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	tessfactor	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	positiont	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	color	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	depth	12
+0x5e56ca	D3DX_Asm_Texcoord_5e56ca	sample	12
+0x5e605e	D3DX_Asm_InvalidMaskS_5e605e	invalid mask '%s'	1
+0x5e6111	D3DX_Asm_InvalidSwizzleS_5e6111	invalid swizzle '%s'	2
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	source modifiers are not allowed on destination parameters	9
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	only one address register reference is allowed in a relative address expression	18
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	relative addressing of destination parameters is not supported in this shader version	9
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	predicates are not supported in this shader version	26
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	source modifiers are not allowed on predicates	9
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	relative addressing of predicates is not supported in this shader version	9
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	call, callnz, label, and ret instructions are not allowed in assembly fragments	1
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	source modifiers incompatible with SUB instruction	81
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	Matrices cannot be specified in temp registers with the fragment linker	4
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	internal error: instruction size mismatch	18
+0x5e62bd	D3DX_Asm_InternalErrorInstructionSizeMi_5e62bd	only a0.x is allowed as a relative address register in vs_1_1	72
+0x5e6ae3	D3DX_Asm_D3Dx9ShaderAssembler_5e6ae3	fragment info exceeds maximum comment size	2
+0x5e6d03	D3DX_Asm_D3Dx9ShaderAssembler_5e6d03	debug info exceeds maximum comment size; no debug info emitted	20
+0x5e7154	D3DX_Asm_ConstantRegisterAddressOutOfBo_5e7154	invalid register, input, or constant name '%s'	1
+0x5e7154	D3DX_Asm_ConstantRegisterAddressOutOfBo_5e7154	constant register address out of bounds on constant '%s', size %d, offset %d	6
+0x5e7154	D3DX_Asm_ConstantRegisterAddressOutOfBo_5e7154	constant register '%s' must be defined as a variable '%s'	6
+0x5e739b	D3DX_Asm_Entrypoint_5e739b	entrypoint	1
+0x5e739b	D3DX_Asm_Entrypoint_5e739b	true	1
+0x5e739b	D3DX_Asm_Entrypoint_5e739b	false	1
+0x5e7477	D3DX_Asm_InvalidRegisterS_5e7477	temporary and constant registers are not allowed in assembly fragments	1
+0x5e7477	D3DX_Asm_InvalidRegisterS_5e7477	bias	2
+0x5e7477	D3DX_Asm_InvalidRegisterS_5e7477	invalid register '%s[%u]'	1
+0x5e7477	D3DX_Asm_InvalidRegisterS_5e7477	invalid register '%s[...]'	1
+0x5e7477	D3DX_Asm_InvalidRegisterS_5e7477	invalid register '%s'	1
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	internal error: stack underflow	1
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	instruction coissue is not supported in this shader version	4
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	instruction predication is not supported in this shader version	8
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	scalar registers cannot be masked	2
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	not cannot be used with other modifiers	2
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	negate and divide modifiers cannot be combined	4
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	invalid complement expression	2
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	complement cannot be used with other modifiers	2
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	complement is not supported in this shader version	4
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	scalar registers cannot be swizzled	2
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	only one address register reference allowed in a relative address expression	2
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	Stack	2
+0x5e79cd	D3DX_Asm_InternalErrorOutOfMemory_5e79cd	internal error: out of memory	2
+0x5e8013	D3DX_Asm_SyntaxError_5e8013	syntax error	16
+0x5e8013	D3DX_Asm_SyntaxError_5e8013	yacc stack overflow	1
+0x5e85e1	D3DX_Asm_Ps10IsNoLongerSupportedUsingPs_5e85e1	vs_1_0 is no longer supported; using vs_1_1	1
+0x5e85e1	D3DX_Asm_Ps10IsNoLongerSupportedUsingPs_5e85e1	ps_1_0 is no longer supported; using ps_1_1	1
+0x5e85e1	D3DX_Asm_Ps10IsNoLongerSupportedUsingPs_5e85e1	shader version expected	1
+0x5e85e1	D3DX_Asm_Ps10IsNoLongerSupportedUsingPs_5e85e1	only vs_1_1, vs_2_0, vs_2_x, and vs_2_sw are supported for assembly fragments	2
+0x5e85e1	D3DX_Asm_Ps10IsNoLongerSupportedUsingPs_5e85e1	d3d9.dll	4
+0x5e85e1	D3DX_Asm_Ps10IsNoLongerSupportedUsingPs_5e85e1	Direct3DShaderValidatorCreate9	2
+0x5e85e1	D3DX_Asm_Ps10IsNoLongerSupportedUsingPs_5e85e1	unrecognized shader version	2
+0x5e8cd0	D3DX_Asm_ConstantVariableSBoundToRegist_5e8cd0	Constant variable '%s' bound to register greater than 8191 (%d requested)	3
+0x5e8fb1	D3DX_LoadD3D9Dll	d3d9.dll	2
+0x5e8fb1	D3DX_LoadD3D9Dll	DebugSetMute	2
+0x5e8fb1	D3DX_LoadD3D9Dll	d3d9d.dll	2
+0x5e8fb1	D3DX_LoadD3D9Dll	D3DXDoNotMute	1
+0x5fc0d0	D3DX_Asm_InternalErrorArgumentWasNeverU_5fc0d0	variable '%s' used without having been completely initialized	1
+0x5fc0d0	D3DX_Asm_InternalErrorArgumentWasNeverU_5fc0d0	internal error: argument used without having been initialized (A%u)	4
+0x5fc0d0	D3DX_Asm_InternalErrorArgumentWasNeverU_5fc0d0	internal error: output argument was never initialized (A%u)	3
+0x5fc0d0	D3DX_Asm_InternalErrorArgumentWasNeverU_5fc0d0	internal error: cannot write to argument pool (A%u)	6
+0x5fc0d0	D3DX_Asm_InternalErrorArgumentWasNeverU_5fc0d0	internal error: cannot read from argument pool (A%u)	12
+0x5fc0d0	D3DX_Asm_InternalErrorArgumentWasNeverU_5fc0d0	internal error: argument was never used (A%u)	48
+0x5fe888	D3DX_Opt_ArrayIndexOutOfBounds_5fe888	array index out of bounds	1
+0x5fefac	D3DX_Opt_DivisionByZero_5fefac	indefinite logarithm	2
+0x60254c	D3DX_Opt_ExpressionTooComplex_60254c	expression too complex	2
+0x604024	D3DX_Ps1Back_InternalWarningOptimizationDid_604024	internal warning: optimization did not converge	1
+0x604486	D3DX_Ps1Back_InternalErrorMalformedClipFoun_604486	internal error: malformed clip found	2
+0x604486	D3DX_Ps1Back_InternalErrorMalformedClipFoun_604486	Clip must be from a 3 vector in ps_1_%i	4
+0x605d41	D3DX_Ps1Back_Tex3D_605d41	%s%s is not supported on ps_1_%i	3
+0x605d41	D3DX_Ps1Back_Tex3D_605d41	cannot access w component from texcoord in general expression	2
+0x60691c	D3DX_Ps1Back_CannotPerformDoubleDependentTe_60691c	cannot perform dependent texture read which in any way is based on color inputs	1
+0x60691c	D3DX_Ps1Back_CannotPerformDoubleDependentTe_60691c	cannot perform double dependent texture read in ps_1_x	7
+0x606ae1	D3DX_Ps1Back_CannotReadFromATexcoordWhichWa_606ae1	cannot read from a texcoord which was used as input in a sampler	8
+0x606ae1	D3DX_Ps1Back_CannotReadFromATexcoordWhichWa_606ae1	too many texture loads and reads from texcoords	1
+0x60728d	D3DX_Ps1Back_CannotPerformDependentTextureR_60728d	program too big	3
+0x60728d	D3DX_Ps1Back_CannotPerformDependentTextureR_60728d	can read from texcoord and use it for texlookup only in ps_1_4 and higher	21
+0x60728d	D3DX_Ps1Back_CannotPerformDependentTextureR_60728d	cannot perform dependent texture read which in any way is based on color inputs	21
+0x60728d	D3DX_Ps1Back_CannotPerformDependentTextureR_60728d	texture loads or clips cannot be from inputs not marked TEXCOORD	7
+0x60783e	D3DX_Ps1Back_InternalErrorArgumentsNotVecto_60783e	internal error: arguments not vectorized	2
+0x60807f	D3DX_Ps1Back_InternalErrorTexldAliasFound_60807f	internal error: texld alias found	15
+0x6081f6	D3DX_Ps1Back_ProgramTooComplexOutOfTemporar_6081f6	program too complex: out of temporary registers	3
+0x608320	D3DX_Ps1Back_InternalErrorUppropagationFail_608320	internal error: uppropagation failed	2
+0x609c31	D3DX_Ps1Back_CannotMatchToTexreg2ArOrTexreg_609c31	cannot match to texreg2rgb instruction because can only have input modifier _bx2	4
+0x609c31	D3DX_Ps1Back_CannotMatchToTexreg2ArOrTexreg_609c31	expression can only be map to texreg2rgb, but this instruction is not supported on 1_%i	4
+0x609c31	D3DX_Ps1Back_CannotMatchToTexreg2ArOrTexreg_609c31	cannot match to texreg2ar or texreg2gb instruction because cannot have input modifiers	2
+0x60a0f3	D3DX_Ps1Back_CannotBindSamplerToSamplerArra_60a0f3	unable to match texm because computed texcoord is used in shader	2
+0x60a0f3	D3DX_Ps1Back_CannotBindSamplerToSamplerArra_60a0f3	cannot match to texm* because texm* can only have bx2 modifier on input texload	8
+0x60a0f3	D3DX_Ps1Back_CannotBindSamplerToSamplerArra_60a0f3	cannot match to texm* because texm* cannot have source modifiers on input texcoord	8
+0x60a702	D3DX_Ps1Back_AccessingTextureCoordinateWCom_60a702	pixel shader must minimally write all four components of COLOR0	1
+0x60a702	D3DX_Ps1Back_AccessingTextureCoordinateWCom_60a702	cannot access texture coordinate w-component in ps_1_%d	1
+0x60a702	D3DX_Ps1Back_AccessingTextureCoordinateWCom_60a702	accessing texture coordinate w-component not yet implemented in ps_1_4	1
+0x60a702	D3DX_Ps1Back_AccessingTextureCoordinateWCom_60a702	relative addressing not supported in ps_1_x	1
+0x60a702	D3DX_Ps1Back_AccessingTextureCoordinateWCom_60a702	DEPTH must be a scalar	1
+0x60a8f2	D3DX_Ps1Back_InternalErrorUnexpectedOutputR_60a8f2	internal error: unexpected output register	1
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	invalid reference to input semantic '%s%d'	3
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	spec	7
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	'texcoord' reference exceeds valid range for this shader model (max: %i)	28
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	color	3
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	texcoord	1
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	position	1
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	psize	1
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	diffuse	1
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	specular	1
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	invalid input semantic '%s%d'	4
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	input semantic '%s' has been deprecated; use '%s%d' instead	4
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	invalid output semantic '%s%d'	6
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	depth	2
+0x60ae08	D3DX_Ps1Back_Texcoord_60ae08	output semantic '%s%d' not yet implemented in ps_1_x	2
+0x60b913	D3DX_Ps1Back_CannotMapSwizzleToPs14_60b913	cannot map swizzle to ps_1_4	1
+0x60bfa0		internal error: illformed write field	2
+0x60bfa0		unable to emmulate write masks for ps_1_%i shader model	2
+0x60c25d	D3DX_Ps1Back_ShaderCannotCompileToAPs1IShad_60c25d	cannot map this dependent texture read to ps_1_%i	4
+0x60c503	D3DX_Ps1Back_CannotMapExpressionToPixelShad_60c503	cannot map expression to pixel shader instruction set	3
+0x60c503	D3DX_Ps1Back_CannotMapExpressionToPixelShad_60c503	relative addressing not allowed for pixel shaders	1
+0x60cdf7	D3DX_Ps1Back_InternalErrorOverlappingOutput_60cdf7	internal error: overlapping output writes	4
+0x60cf25	D3DX_Ps1Back_PixelShaderMustMinimallyWriteA_60cf25	DEPTH must be a scalar	1
+0x60cf25	D3DX_Ps1Back_PixelShaderMustMinimallyWriteA_60cf25	pixel shader must minimally write all four components of COLOR0	1
+0x60cf25	D3DX_Ps1Back_PixelShaderMustMinimallyWriteA_60cf25	COLOR%d must be a four-component vector	1
+0x60cf25	D3DX_Ps1Back_PixelShaderMustMinimallyWriteA_60cf25	COLOR outputs must be contiguous from COLOR0 to COLORn	1
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	invalid reference to input semantic '%s%d'	1
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	color	4
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	texcoord	2
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	position	2
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	psize	2
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	diffuse	2
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	specular	2
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	input semantic '%s' has been deprecated; use '%s%d' instead	4
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	depth	2
+0x60d89b	D3DX_Ps1Back_Texcoord_60d89b	invalid output semantic '%s%d'	4
+0x60e0d8	D3DX_Ps1Back_InternalErrorCompilerEmittimgM_60e0d8	internal error: write to output with instruction other than mov	2
+0x60e0d8	D3DX_Ps1Back_InternalErrorCompilerEmittimgM_60e0d8	internal error: compiler emittimg multiple movs to output registers	1
+0x60eafe	D3DX_Ps1Back_InternalErrorInvalidSwizzleFou_60eafe	internal error: invalid swizzle found	1
+0x60f23a	D3DX_Ps1Back_CannotMapExpressionToPixelShad_60f23a	relative addressing not allowed for pixel shaders	1
+0x60f23a	D3DX_Ps1Back_CannotMapExpressionToPixelShad_60f23a	cannot map expression to pixel shader instruction set	1
+0x60fcaa	D3DX_VsBack_VertexShaderMustMinimallyWrite_60fcaa	PSIZE must be a scalar	1
+0x60fcaa	D3DX_VsBack_VertexShaderMustMinimallyWrite_60fcaa	FOG must be a scalar	1
+0x60fcaa	D3DX_VsBack_VertexShaderMustMinimallyWrite_60fcaa	vertex shader must minimally write all four components of POSITION	1
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	position	9
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	blendweight	3
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	blendindices	3
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	normal	3
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	psize	9
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	texcoord	9
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	tangent	3
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	binormal	3
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	positiont	3
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	color	9
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	depth	3
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	sample	3
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	diffuse	9
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	specular	9
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	invalid input semantic '%s%d'	6
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	invalid output semantic '%s%d'	12
+0x610bd8	D3DX_VsBack_Texcoord_610bd8	multi-register semantics are not allowed in fragments '%s'	1
+0x6110da	D3DX_VsBack_VSD_6110da	v_%s%d	1
+0x6110da	D3DX_VsBack_VSD_6110da	n_%s	1
+0x61193a	D3DX_VsBack_RelativeAddressingNotSupported_61193a	relative addressing not supported in vs_1_0 instruction set	1
+0x611acc	D3DX_VsBack_CZzD_611acc	c_$zz%d	1
+0x611b44	D3DX_VsBack_RIntD_611b44	r_$Int%d	1
+0x611cfc	D3DX_VsBack_ConstantVariableSBoundToRegist_611cfc	Constant variable '%s' bound to register greater than 8191 (%d requested)	5
+0x611eae	D3DX_VsBack_InternalErrorMultipleWriteToSa_611eae	internal error: multiple write to same output	4
+0x611eae	D3DX_VsBack_InternalErrorMultipleWriteToSa_611eae	internal error: DST test failure	3
+0x612a70	D3DX_VsBack_Color_612a70	position	1
+0x612a70	D3DX_VsBack_Color_612a70	psize	1
+0x612a70	D3DX_VsBack_Color_612a70	color	2
+0x613d78	D3DX_VsBack_MaximumConstantRegisterIndexEx_613d78	invalid register semantic '%s'	2
+0x613d78	D3DX_VsBack_MaximumConstantRegisterIndexEx_613d78	overlapping register semantics not yet implemented '%c%u'	1
+0x614682	D3DX_VsBack_InternalErrorMultipleWriteToSa_614682	internal error: multiple write to same output	16
+0x6151a7	D3DX_VsBack_CannotMatchLerpBecauseLerpFact_6151a7	cannot match lerp because lerp factor is not _sat'd	2
+0x615ec7	D3DX_VsBack_InternalErrorUnexpectedOutputR_615ec7	internal error: unexpected output register type	1
+0x615fb8	D3DX_VsBack_InternalErrorOverlappingOutput_615fb8	internal error: overlapping output writes	2
+0x617c5c	D3DX_VsBack_BiasOpportunityMissedBecauseSo_617c5c	_bias opportunity missed because source was not clamped 0 to 1	4
+0x61808b	D3DX_Ps2Back_ComplementOpportunityMissedBec_61808b	complement opportunity missed because input result was not clamped from 0 to 1	4
+0x618709	D3DX_Ps2Back_CannotMatchLerpBecauseLerpFact_618709	cannot match lerp because lerp factor is not _sat'd	1
+0x618c64	D3DX_Ps2Back_D3Dx9ShaderCompiler_618c64	c_%s	1
+0x618c64	D3DX_Ps2Back_D3Dx9ShaderCompiler_618c64	constant table info exceeds maximum comment size	3
+0x619309	D3DX_Ps2Back_DebugInfoExceedsMaximumComment_619309	debug info exceeds maximum comment size; no debug info emitted	24
+0x619954	D3DX_Ps2Back_Direct3Dshadervalidatorcreate9_619954	d3d9.dll	2
+0x619954	D3DX_Ps2Back_Direct3Dshadervalidatorcreate9_619954	Direct3DShaderValidatorCreate9	1
+0x619954	D3DX_Ps2Back_Direct3Dshadervalidatorcreate9_619954	maximum number of samplers exceeded. %s target can have a maximum of %i samplers	1
+0x619954	D3DX_Ps2Back_Direct3Dshadervalidatorcreate9_619954	%s target does not support texture lookups	1
+0x619954	D3DX_Ps2Back_Direct3Dshadervalidatorcreate9_619954	maximum number of inputs exceeded	12
+0x619954	D3DX_Ps2Back_Direct3Dshadervalidatorcreate9_619954	overlapping output semantics	12
+0x61a7fa	D3DX_Ps2Back_InternalErrorUnexpectedInputRe_61a7fa	cannot clip from a swizzled vector	1
+0x61a7fa	D3DX_Ps2Back_InternalErrorUnexpectedInputRe_61a7fa	clip must be performed from a float3 vector for ps_1_x models	2
+0x61a7fa	D3DX_Ps2Back_InternalErrorUnexpectedInputRe_61a7fa	internal error: unexpected input register type	4
+0x61a7fa	D3DX_Ps2Back_InternalErrorUnexpectedInputRe_61a7fa	clip cannot be performed from a constant or literal	4
+0x61a7fa	D3DX_Ps2Back_InternalErrorUnexpectedInputRe_61a7fa	clip must be performed from a float4 vector for ps_2_0 models	2
+0x61af1a	D3DX_Ps2Back_InternalErrorSizeMismatchInSca_61af1a	internal error: size mismatch in scalar instruction	3
+0x61e5f0	EAGL_DynamicLoader_Dlsym	dlsym: Internal error. Bad j value %d (chain size %d)!\n	1
+0x61e850	EAGL::DynamicLoader::RunDestructors	EAGL::dynamic destructor list	1
+0x61e850	EAGL::DynamicLoader::RunDestructors	RenderMethod	2
+0x61ea00	EAGL::DynamicLoader::DumpRuntimeAllocs	RUNTIME_ALLOC::	16
+0x61f050	EAGL::RenderContext::New	RenderContext new	1
+0x61f2e0	EAGL_SymbolPool_Entry	EAGL::SymbolEntry	1
+0x61fe20	EAGL::PC::CreateCapsWindow	EAGL PC Caps Retrieval	2
+0x620bc0	EAGL::RenderContext::Ctor	Window Name	1
+0x620bc0	EAGL::RenderContext::Ctor	EAGL PC	1
+0x620bc0	EAGL::RenderContext::Ctor	 PC	1
+0x620ed0	EAGL::PC::InitCaps	EAGL PC Caps Retrieval	1
+0x6232f0	EAGL::IndexBuffer::New	EAGL::IndexBuffer new	1
+0x627b90	EAGLAnim::FnAnimFactory::New	EAGLAnim::FnAnimFactory new	1
+0x627b90	EAGLAnim::FnAnimFactory::New	AnimationBank	1
+0x6385a0	EAsys_D3D8AdapterInfo	pDevice is NULL\n	1
+0x6385a0	EAsys_D3D8AdapterInfo	IDirect3DDevice8_GetDirect3D failed: err = 0x%x\n	1
+0x6385a0	EAsys_D3D8AdapterInfo	IDirect3DDevice8_GetCreationParameters failed: err = 0x%x\n	1
+0x6385a0	EAsys_D3D8AdapterInfo	IDirect3D8_GetAdapterIdentifier failed: err = 0x%x\n	1
+0x638c30	SHP_FormatName	SHP%dx%dx%d	1
+0x6392f6		FILE_devicethread - UNKNOWN TYPE OF OPERATION %d.\n	1
+0x639c00	EAFile_CompleteOp	FILESYS_completeop - OPERATION NOT FOUND IN COMPLETED LIST.\n	2
+0x639f20	EAFile_CallbackOp	FILESYS_callbackop - can not specify a NULL callback.\n	1
+0x639f20	EAFile_CallbackOp	FILESYS_callbackop - UNKNOWN FILEOP.\n	2
+0x63a150	EAFile_GetDirectory	getdirectory - FAILED TO FETCH, OR WAS TOO LONG (%D CHAR).\n	2
+0x63a1e0	EAFile_StartDevice	FILE_startdevice - FAILED TO START THREAD FOR FILE SYSTEM DEVICE.\n	1
+0x63a310	EAFile_AllocateOp	FILE_allocateop - NO FREE OPS LEFT TO ALLOCATE.\n	1
+0x63a3f0	FileSystem_Create	File System	1
+0x63aad0	EAFile_Atomic	FILESYS_atomic - FILE SYSTEM NOT INITIALIZED, CALL FILESYS_init().\n	1
+0x63aad0	EAFile_Atomic	FILESYS_atomic - CALLED AT PRIORITY (%d) LOWER THAN CURRENT DEVICE PRIORITY (%d).\n	1
+0x63aad0	EAFile_Atomic	FILESYS_atomic - CALLED WITH ILLEGAL FILE DEVICE (%d).\n	1
+0x63b050		FCache Info	1
+0x63b6e0		FCACHE_cachefilestream - first open attempt failed on file %s.\n	8
+0x63bc20		Caching file %s... 	1
+0x63bc20		Already cached.\n	1
+0x63bc20		CacheDataFile - first open attempt failed on file %s.\n	4
+0x63bc20		CacheDataFile - Writing file %s to disk cache.\n	8
+0x63c740		FILE_load - unable to reserve memory for file %s\n	1
+0x63c740		FILE_load - unable to open file %s\n	1
+0x63e440		kernel32.dll	1
+0x63ec20	EAsys_TimerInit	TIMER_init - BAD TIMER FREQUENCY SPECIFIED %d\n	2
+0x63ec20	EAsys_TimerInit	TIMER_init - FAILED TO INITIALIZE WINDOWS MULTIMEDIA TIMER, TRY RE-RUNNING.\n	1
+0x63ec20	EAsys_TimerInit	TIMER_init - FAILED TO INITIALIZE MULTIMEDIA TIMER : 0x%x.\n	1
+0x63ec20	EAsys_TimerInit	TIMER_init - FAILED TO CREATE TIMER THREAD.\n	2
+0x63ec20	EAsys_TimerInit	TIMER_init - MULTIMEDIA TIMER CANNOT SUPPORT THIS FREQUENCY.\n	2
+0x63ec20	EAsys_TimerInit	TIMER_init - MULTIMEDIA TIMER NOT FOUND.\n	2
+0x63eea0	EAsys_SyncTaskAdd	SYNCTASK_add - LIST FULL\n	1
+0x63f2a0	EAsys_CpuRegistryInfo	HARDWARE\DESCRIPTION\System\CentralProcessor\0	1
+0x63f520		GenuineIntel	1
+0x63f520		AuthenticAMD	1
+0x63f520		CyrixInstead	1
+0x63f520		CentaurHauls	1
+0x63f7c0	EAsys_CpuVendorDetect	GenuineIntel	1
+0x63f7c0	EAsys_CpuVendorDetect	AuthenticAMD	1
+0x63f7c0	EAsys_CpuVendorDetect	CyrixInstead	1
+0x63f7c0	EAsys_CpuVendorDetect	CentaurHauls	1
+0x641720		REAL application	1
+0x641720		openmainwindow - FAILED WINDOWS CALL REGISTERCLASS (%d)	1
+0x643a60	EAsys::CpuModelName	Pentium	1
+0x643a60	EAsys::CpuModelName	PentiumPro	1
+0x643a60	EAsys::CpuModelName	Pentium2	1
+0x643a60	EAsys::CpuModelName	Pentium3	1
+0x643a60	EAsys::CpuModelName	Pentium4	1
+0x643a60	EAsys::CpuModelName	Athlon	1
+0x643a60	EAsys::CpuModelName	AthlonXP	1
+0x643a60	EAsys::CpuModelName	AthlonMP	1
+0x643a60	EAsys::CpuModelName	Cyrix	1
+0x643a60	EAsys::CpuModelName	WinChip	1
+0x644b88	RCMP::AV_PLAYER::Init	you must fill in the RCMP::rcmp_sys struct first!!!	2
+0x644b88	RCMP::AV_PLAYER::Init	RCMP_ASSERT in %s at %d \n %s\n	11
+0x644b88	RCMP::AV_PLAYER::Init	src/av/cmn/avplayer.cpp	11
+0x644b88	RCMP::AV_PLAYER::Init	AV::VideoStreamBuffer	2
+0x644b88	RCMP::AV_PLAYER::Init	AV::AudioStreamBuffer	1
+0x644b88	RCMP::AV_PLAYER::Init	bad LoadMode	4
+0x6453b2	RCMP::AV_PLAYER::CreateDecoders	Please Wait for video data to finish loading...\n	1
+0x6453b2	RCMP::AV_PLAYER::CreateDecoders	RCMP_ASSERT in %s at %d \n %s\n	33
+0x6453b2	RCMP::AV_PLAYER::CreateDecoders	src/av/cmn/avplayer.cpp	33
+0x6453b2	RCMP::AV_PLAYER::CreateDecoders	Done\n	3
+0x6453b2	RCMP::AV_PLAYER::CreateDecoders	Please Wait for audio data to finish loading...\n	2
+0x645860	RCMP::AV_PLAYER::SetSpeed	SetSpeed can not be called before AV_PLAYER::GetFirstFrame	1
+0x645860	RCMP::AV_PLAYER::SetSpeed	RCMP_ASSERT in %s at %d \n %s\n	1
+0x645860	RCMP::AV_PLAYER::SetSpeed	src/av/cmn/avplayer.cpp	1
+0x645910	RCMP::AV_PLAYER::SetVolume	You can set Volume if you are not using sound	1
+0x645910	RCMP::AV_PLAYER::SetVolume	RCMP_ASSERT in %s at %d \n %s\n	1
+0x645910	RCMP::AV_PLAYER::SetVolume	src/av/cmn/avplayer.cpp	1
+0x645a77	STREAM_Release	done\n	2
+0x645a77	STREAM_Release	Bad STREAM_release %s\n	1
+0x645a77	STREAM_Release	This file is not a MAD file	2
+0x645a77	STREAM_Release	RCMP_ASSERT in %s at %d \n %s\n	1
+0x645a77	STREAM_Release	src/av/cmn/avplayer.cpp	1
+0x645ed0	RCMP::DECODER::operator_new	RCMP::DECODER	1
+0x645f00	RCMP::AUDIO_PLAYER::operator_new	RCMP::AUDIO_PLAYER	1
+0x645f30	RCMP::AV_MS_TIMER::operator_new	RCMP::AV_MS_TIMER	1
+0x646100		RCMP_ASSERT in %s at %d \n %s\n	1
+0x646100		src/av/cmn/audioplayer.cpp	1
+0x646100		AV::audiobuff	1
+0x64623d		RCMP_ASSERT in %s at %d \n %s\n	1
+0x64623d		src/av/cmn/audioplayer.cpp	1
+0x64629f	AudioPlayer::Initialize	RCMP_ASSERT in %s at %d \n %s\n	1
+0x64629f	AudioPlayer::Initialize	src/av/cmn/audioplayer.cpp	1
+0x6462fd		RCMP_ASSERT in %s at %d \n %s\n	1
+0x6462fd		src/av/cmn/audioplayer.cpp	1
+0x64664f		FRAME	1
+0x64664f		parser error	2
+0x64664f		RCMP_ASSERT in %s at %d \n %s\n	1
+0x64664f		src/av/cmn/avsubtitle.cpp	1
+0x647b20	RCMP::AV_SUBTITLE::operator_new	RCMP::AV_SUBTITLE	1
+0x648a58	Codec_Selection_Prompt	Please choose a codec during the first data call back\n	1
+0x648a8e		Please choose a codec during the first data call back\n	1
+0x648ac8	Codec_EnsureSelected	Please choose a codec during the first data call back\n	1
+0x648b3a	RCMP::RCMPBASE::CallCodec	RCMP_ASSERT in %s at %d \n %s\n	1
+0x648b3a	RCMP::RCMPBASE::CallCodec	src/decoder/cmn/rcmpbase.cpp	1
+0x648d20	RCMP::MAD_FRAME::MAD_FRAME	MAD_FRAME::m_Shape	1
+0x648dd5	RCMP::MAD_FRAME::~MAD_FRAME	 RCMP:: Warning: in ~MAD_FRAME() m_ReferenceCount >= 1 \n	1
+0x649028		RCMP_ASSERT in %s at %d \n %s\n	1
+0x649028		src/decoder/cmn/rcmp_mad_codec.cpp	1
+0x649628		MAD_CODEC_INTERNAL::CreateIorP() out of frames did you call CODEC::ReleaseFrame( FRAME *Frame )\n	1
+0x649697		MAD_CODEC_INTERNAL::CreateB() out of frames did you call CODEC::ReleaseFrame( FRAME *Frame )\n	1
+0x649706	RCMP::MAD_FRAME::Release	RCMP_ASSERT in %s at %d \n %s\n	1
+0x649706	RCMP::MAD_FRAME::Release	src/decoder/cmn/rcmp_mad_codec.cpp	1
+0x6499a0	RCMP::MAD_FRAME::operator_new	RCMP::MAD_FRAME	1
+0x6499d0	RCMP::MAD_CODEC_INTERNAL::operator_new	RCMP::MAD_CODEC_INTERNAL	1
+0x64f580	SNDSYSI_init	SNDAUTHOR:  Adamchan, Thursday 04:40PM Sep 11, 2003, V8.04.07	1
+0x6635d0	OnlineManager::Initialize	GmUtil	1
+0x6635d0	OnlineManager::Initialize	TCP:~1:1024\tUDP:~1:1024	1
+0x6637b0		GmUtil	1
+0x6637b0		%d.%d.%d.%d%s	1
+0x664800	GameLoop	ADDR	1
+0x664800	GameLoop	PING	1
+0x664e00	Online::SendTaggedRequest	PASS	12
+0x664e00	Online::SendTaggedRequest	MASK	12
+0x664e00	Online::SendTaggedRequest	CHAN	16
+0x6652b0		@server	1
+0x6652f0	Config::ParseConfigArgs	IDENT	1
+0x6652f0	Config::ParseConfigArgs	NAME	1
+0x6652f0	Config::ParseConfigArgs	HOST	1
+0x6652f0	Config::ParseConfigArgs	ROOM	1
+0x6652f0	Config::ParseConfigArgs	PARAMS	1
+0x6652f0	Config::ParseConfigArgs	USERFLAGS	1
+0x6652f0	Config::ParseConfigArgs	SYSFLAGS	1
+0x6652f0	Config::ParseConfigArgs	COUNT	1
+0x6652f0	Config::ParseConfigArgs	WHEN	1
+0x6652f0	Config::ParseConfigArgs	MINSIZE	1
+0x6652f0	Config::ParseConfigArgs	MAXSIZE	1
+0x6652f0	Config::ParseConfigArgs	SELF	1
+0x6652f0	Config::ParseConfigArgs	AUTH	1
+0x6652f0	Config::ParseConfigArgs	SEED	1
+0x6652f0	Config::ParseConfigArgs	OPPO%d	1
+0x6652f0	Config::ParseConfigArgs	ADDR%d	1
+0x6652f0	Config::ParseConfigArgs	OPID%d	1
+0x665660	OnlineManager::ConnectToServer	TIME	1
+0x665660	OnlineManager::ConnectToServer	DIRECT	1
+0x665660	OnlineManager::ConnectToServer	ADDR	4
+0x665660	OnlineManager::ConnectToServer	PORT	2
+0x665660	OnlineManager::ConnectToServer	SESS	1
+0x665660	OnlineManager::ConnectToServer	MASK	1
+0x665660	OnlineManager::ConnectToServer	SKEY	3
+0x665660	OnlineManager::ConnectToServer	Public Key	1
+0x665660	OnlineManager::ConnectToServer	connecting to %08x:%d\n	1
+0x665660	OnlineManager::ConnectToServer	DOWN	1
+0x665660	OnlineManager::ConnectToServer	NAME	150
+0x665660	OnlineManager::ConnectToServer	CHAN	2
+0x665660	OnlineManager::ConnectToServer	MORE	2
+0x665660	OnlineManager::ConnectToServer	SLOTS	2
+0x665660	OnlineManager::ConnectToServer	PERS	2
+0x665660	OnlineManager::ConnectToServer	~%dms	2
+0x665660	OnlineManager::ConnectToServer	LIDENT	130
+0x665660	OnlineManager::ConnectToServer	LCOUNT	130
+0x665660	OnlineManager::ConnectToServer	IDENT	82
+0x665660	OnlineManager::ConnectToServer	COUNT	65
+0x665660	OnlineManager::ConnectToServer	FLAGS	65
+0x667750	Str_BuildFlagAlphabet	@ABCDEFGHIJKLMNOPQRSTUVWXYZ0123	1
+0x667c40		%d.%d.%d %d:%02d:%02d	1
+0x6688b0		ADDR	1
+0x6699e0		comm/datamodem	1
+0x669b20		TAPI%d:	12
+0x66a000		localhost	1
+0x66a000		%d%c	1
+0x66a9d0		internet	1
+0x66a9d0		localhost	1
+0x66b820		localhost	1
+0x66d020		localhost	1
+0x66d1e0		h<yq	2
+0x66d390		h<yq	1
+0x66ea80	DirtySock::ScrambleString	ru paranoid?	1
+0x670190		COM1	2
+0x670190		COM2	1
+0x670190		COM3	1
+0x670190		COM4	1
+0x670190		localhost	1
+0x670190		%s%c	1
+0x6702d0	SerialPort_Init	+RTS	8
+0x6702d0	SerialPort_Init	-RTS	8
+0x6702d0	SerialPort_Init	+CTS	8
+0x6702d0	SerialPort_Init	-CTS	8
+0x670a10	Runtime_InitSystem	SERIAL	1
+0x670a10	Runtime_InitSystem	AL	1
+0x671f70	___crtExitProcess	mscoree.dll	1
+0x671f70	___crtExitProcess	CorExitProcess	1
+0x674f09	__NMSG_WRITE	<program name unknown>	2
+0x674f09	__NMSG_WRITE	Runtime Error!\n\nProgram: 	4
+0x674f09	__NMSG_WRITE	Microsoft Visual C++ Runtime Library	2
+0x67a071	__cftoe2	e+000	1
+0x67f17c	Config::GetStringByLocale	1252	1
+0x67f17c	Config::GetStringByLocale	040a	1
+0x67f7c5	___get_qualified_locale	Norwegian-Nynorsk	5
+0x67fc58	___crtMessageBoxA	user32.dll	1
+0x67fc58	___crtMessageBoxA	MessageBoxA	1
+0x67fc58	___crtMessageBoxA	GetActiveWindow	1
+0x67fc58	___crtMessageBoxA	GetLastActivePopup	1
+0x67fc58	___crtMessageBoxA	GetUserObjectInformationA	1
+0x67fc58	___crtMessageBoxA	GetProcessWindowStation	1
+0x67ff4b	CRT::__report_gsfailure	Unknown security failure detected!	1
+0x67ff4b	CRT::__report_gsfailure	Buffer overrun detected!	1
+0x67ff4b	CRT::__report_gsfailure	<program name unknown>	1
+0x67ff4b	CRT::__report_gsfailure	Microsoft Visual C++ Runtime Library	1
+0x6800a5	___crtInitCritSecAndSpinCount	kernel32.dll	1
+0x6800a5	___crtInitCritSecAndSpinCount	InitializeCriticalSectionAndSpinCount	1
+0x682466	CRT::$I10_OUTPUT	1#SNAN	6
+0x682466	CRT::$I10_OUTPUT	1#IND	9
+0x682466	CRT::$I10_OUTPUT	1#QNAN	45
+0x682466	CRT::$I10_OUTPUT	1#INF	18
+0x6836a0	AsyncFile::Load	ASYNCFILE_load - out of async request blocks\n	1
+0x6836a0	AsyncFile::Load	ASYNCFILE_load - unable to initiate file open\n	1
+0x683a60	AsyncFile::Release	ASYNCFILE_release - release called more than once for this request\n	1
+0x684943		CONIN$	1
+0x689aca		DEFAULTALPHA	1
+0x689b00	DynInit_78aa30	CarSkin GlossMap	1
+0x689ec6		h@ci	1
+0x68a310	DynInit_779a60	Bip01	1
+0x68a370	DynInit_779a88	Bip03	1
+0x68a3d0	DynInit_779a64	Bip05	1
+0x68a430	DynInit_779a80	Bip07	1
+0x68a83a		ZPM_Car1	3
+0x68a83a		ZPM_Car2	2
+0x68a83a		ZPM_Car3	2
+0x68a83a		ZPM_Car4	3
+0x68a8e7		ZPM_Car1_t	3
+0x68a8e7		ZPM_Car2_t	2
+0x68a8e7		ZPM_Car3_t	2
+0x68a8e7		ZPM_Car4_t	3
+0x68a997		ZPM_Car1_q	1
+0x68a997		ZPM_Car2_q	2
+0x68a997		ZPM_Car3_q	2
+0x68a997		ZPM_Car4_q	3
+0x68aa50		ZPM_Car1_s	3
+0x68aa50		ZPM_Car2_s	2
+0x68aa50		ZPM_Car3_s	2
+0x68aa50		ZPM_Car4_s	3
+0x68ab90	DynInit_7797c4	ROOT	1
+0x68aeda		Keyboard.fng	3
+0x68aeda		EA_TRAX_Jukebox.fng	2
+0x68aeda		EA_TRAX_Jukebox_Alpine.fng	2
+0x68aeda		EA_TRAX_Jukebox_Kenwood.fng	2
+0x68aeda		EA_TRAX_Jukebox_Audiobahn.fng	2
+0x68aeda		LS_Splash.fng	2
+0x68b0f0		ColorPicker.fng	3
+0x68b0f0		Credits.fng	2
+0x68b0f0		EA_TRAX_Jukebox.fng	2
+0x68b0f0		EA_TRAX_Jukebox_Alpine.fng	2
+0x68b0f0		EA_TRAX_Jukebox_Audiobahn.fng	2
+0x68b0f0		EA_TRAX_Jukebox_Kenwood.fng	2
+0x68b0f0		GenericDialog.fng	1
+0x68b0f0		LS_DemoLegal.fng	1
+0x68b0f0		LS_Disclaimer.fng	2
+0x68b0f0		LS_EAlogo.fng	2
+0x68b0f0		LS_IntroFMV.fng	1
+0x68b0f0		LS_LangSelect.fng	1
+0x68b0f0		LS_License.fng	2
+0x68b0f0		LS_Splash.fng	2
+0x68b0f0		LS_THXMovie.fng	2
+0x68b0f0		MU_DebugPresetEditor.fng	2
+0x68b0f0		MU_DemoCustomBlurb.fng	2
+0x68b0f0		MU_GarageAudioCategory.fng	2
+0x68b0f0		MU_GaragePresets.fng	2
+0x68b0f0		MU_GarageVinylPrompt.fng	2
+0x68b0f0		MU_HorizontalBrowserBack.fng	1
+0x68b0f0		MU_Main.fng	1
+0x68b0f0		MU_Main_PC.fng	1
+0x68b0f0		MU_MPLogin.fng	1
+0x68b0f0		MU_MultiTrackConfirm.fng	2
+0x68b0f0		MU_Online_AnotherAccount.fng	2
+0x68b0f0		MU_Online_AuthenticateDNAS.fng	2
+0x68b0f0		MU_Online_BestLapTimes.fng	2
+0x68b0f0		MU_Online_CreateAccount.fng	2
+0x68b0f0		MU_Online_CreateAccount_StepOne_PC.fng	2
+0x68b0f0		MU_Online_CreateAccount_StepTwo.fng	2
+0x68b0f0		MU_OnlineDialogBox.fng	2
+0x68b0f0		MU_Online_ISPConnect.fng	2
+0x68b0f0		MU_Online_NetworkLogin.fng	1
+0x68b0f0		MU_Online_NetworkSelect.fng	3
+0x68b0f0		MU_Online_News.fng	2
+0x68b0f0		MU_Online_ParentalEmailRequired_PC.fng	2
+0x68b0f0		MU_Online_PlayerLogin.fng	2
+0x68b0f0		MU_Online_RankingsBoard.fng	2
+0x68b0f0		MU_Online_RankingSelect.fng	2
+0x68b0f0		MU_Online_TooYoung.fng	2
+0x68b0f0		MU_Online_WarningDialog.fng	2
+0x68b0f0		MU_Online4PlayerGameDialogueBox.fng	2
+0x68b0f0		MU_OnlineGameModeSelect.fng	2
+0x68b0f0		MU_OnlineGameRoom.fng	2
+0x68b0f0		MU_OnlineGameRoomChallenge.fng	2
+0x68b0f0		MU_OnlineGameRoomCreateGame.fng	2
+0x68b0f0		MU_OnlineGamesRoomDialog.fng	2
+0x68b0f0		MU_OnlineGenericDialogueBox.fng	2
+0x68b0f0		MU_OnlineMenu.fng	1
+0x68b0f0		MU_OnlineWaiting.fng	3
+0x68b0f0		MU_OnlineNews.fng	2
+0x68b0f0		MU_OnlinePlayerDetails.fng	2
+0x68b0f0		MU_OnlineMembership.fng	2
+0x68b0f0		MU_OnlineRankedGameSelect.fng	2
+0x68b0f0		MU_Options.fng	2
+0x68b0f0		MU_Options_PC.fng	1
+0x68b0f0		MU_OptionsController.fng	1
+0x68b0f0		MU_OptionsHUD.fng	2
+0x68b0f0		MU_OptionsSelector_PC.fng	1
+0x68b0f0		MU_Pause.fng	3
+0x68b0f0		MU_PauseOptions.fng	2
+0x68b0f0		MU_PauseOptionsSelector.fng	1
+0x68b0f0		MU_PlayerLogin.fng	1
+0x68b0f0		MU_QRTransmissionSelect.fng	1
+0x68b0f0		MU_QuickRaceLapPopup.fng	2
+0x68b0f0		MU_QuickRaceModeSelect.fng	1
+0x68b0f0		MU_QuickRaceOptions.fng	1
+0x68b0f0		MU_QuickRaceOptions_PC.fng	1
+0x68b0f0		MU_QuickRaceTrackSelect.fng	1
+0x68b0f0		MU_ScreenPos.fng	3
+0x68b0f0		MU_Tutorial.fng	2
+0x68b0f0		MU_UG_EventBriefing.fng	1
+0x68b0f0		MU_UG_MagazineScreen.fng	1
+0x68b0f0		MU_UG_MapScreen.fng	1
+0x68b0f0		MU_UG_NewOrLoad.fng	1
+0x68b0f0		MU_UG_RankScreen.fng	2
+0x68b0f0		MU_UG_StatsScreen.fng	1
+0x68b0f0		MU_UG_StatusMenu.fng	1
+0x68b0f0		MU_UG_TheatreScreen.fng	3
+0x68b0f0		MU_UG_UndergroundMenu.fng	1
+0x68b0f0		PC_customize_graphics.fng	1
+0x68b0f0		PC_graphics.fng	3
+0x68b0f0		PC_Joypad_Config.fng	2
+0x68b0f0		PC_Keyboard_Config.fng	2
+0x68b0f0		PC_LoadSave.fng	2
+0x68b0f0		PC_Wheel_Config.fng	2
+0x68b0f0		PostRaceMenu.fng	1
+0x68be68		GarageMain.fng	1
+0x68be68		GarageMain_2P.fng	1
+0x68be68		MU_Garage.fng	1
+0x68be68		MU_GarageAccessoriesCategory.fng	3
+0x68be68		MU_GarageDecals.fng	2
+0x68be68		MU_GarageDecals_Brand.fng	2
+0x68be68		MU_GarageDecals_ChooseDecal.fng	2
+0x68be68		MU_GarageDecals_Size.fng	2
+0x68be68		MU_GarageDecals_Slot.fng	2
+0x68be68		MU_GarageDecals_Zone.fng	2
+0x68be68		MU_GarageMenu.fng	2
+0x68be68		MU_GaragePaintMod.fng	2
+0x68be68		MU_GaragePartsBrowser.fng	2
+0x68be68		MU_GaragePartsCategory.fng	2
+0x68be68		MU_GaragePartsCategoryVisual.fng	4
+0x68be68		MU_GaragePartsChooseVisual.fng	2
+0x68be68		MU_GaragePerformanceBrand.fng	2
+0x68be68		MU_GaragePerformanceTuner.fng	2
+0x68be68		MU_GaragePerformanceV2.fng	2
+0x68be68		MU_GarageRimsBrandBrowser.fng	2
+0x68be68		MU_GarageRimsBrowser.fng	3
+0x68be68		MU_GarageRimsStyleBrowser.fng	6
+0x68be68		MU_GarageVinylBrand.fng	2
+0x68be68		MU_GarageVinylBrowser.fng	2
+0x68be68		MU_GarageVinylGroup.fng	2
+0x68be68		MU_GarageVinylLayerV2.fng	2
+0x68be68		MU_MainMenuCarCustomize.fng	2
+0x68be68		MU_MultiplayerCarSelect.fng	1
+0x68be68		MU_QuickRaceCarSelect.fng	3
+0x68be68		MU_QuickRaceLapPopup_PC.fng	2
+0x68be68		MU_GarageAudioCategory.fng	2
+0x68c3a0		MU_GaragePaintMod.fng	2
+0x68c3a0		MU_GarageVinylBrand.fng	2
+0x68c3a0		MU_GarageVinylGroup.fng	2
+0x68c3a0		MU_GarageVinylType.fng	2
+0x68c3a0		MU_GarageVinylBrowser.fng	2
+0x68c3a0		MU_GarageDecals.fng	2
+0x68c3a0		MU_GaragePartsCategory.fng	2
+0x68c3a0		MU_GaragePartsChooseVisual.fng	2
+0x68c3a0		MU_GarageVinylLayerV2.fng	2
+0x68c3a0		MU_GarageDecals_Zone.fng	2
+0x68c3a0		MU_GarageDecals_Size.fng	2
+0x68c3a0		MU_GarageDecals_Slot.fng	2
+0x68c3a0		MU_GarageDecals_Brand.fng	2
+0x68c3a0		MU_GarageDecals_ChooseDecal.fng	2
+0x68c3a0		MU_GarageAccessoriesCategory.fng	2
+0x68c3a0		GarageMain.fng	1
+0x68c3a0		GarageMain_2P.fng	1
+0x68c3a0		MU_Garage.fng	1
+0x68c3a0		MU_GarageMenu.fng	3
+0x68c3a0		MU_GaragePartsBrowser.fng	2
+0x68c3a0		MU_GarageRimsBrandBrowser.fng	2
+0x68c3a0		MU_GaragePerformanceTuner.fng	2
+0x68c3a0		MU_GaragePerformanceBrand.fng	2
+0x68c3a0		MU_GaragePerformanceV2.fng	2
+0x68c3a0		MU_QRTransmissionSelect.fng	2
+0x68c3a0		MU_GaragePerformanceCategory.fng	3
+0x68c810		MU_GaragePerformanceCategory.fng	3
+0x68c810		MU_GaragePartsChooseVisual.fng	3
+0x68c990		MU_GaragePerformanceTuner.fng	3
+0x68c990		MU_UG_ChooseCareerCar.fng	3
+0x68c9f0		MU_GarageAccessoriesCategory.fng	3
+0x68c9f0		MU_GarageRimsBrandBrowser.fng	2
+0x68c9f0		MU_GaragePartsCategoryVisual.fng	2
+0x68c9f0		MU_GaragePaintMod.fng	2
+0x68c9f0		MU_GarageVinylLayerV2.fng	2
+0x68c9f0		MU_GarageDecals_Zone.fng	2
+0x68c9f0		MU_GaragePerformanceTuner.fng	14
+0x68c9f0		MU_Garage.fng	1
+0x68c9f0		MU_UG_MagazineScreen.fng	2
+0x68c9f0		MU_UG_MapScreen.fng	1
+0x68c9f0		MU_GaragePerformanceCategory.fng	2
+0x68c9f0		MU_UG_RankScreen.fng	2
+0x68c9f0		MU_UG_StatsScreen.fng	1
+0x68c9f0		MU_UG_ChooseCareerCar.fng	5
+0x68c9f0		MU_GaragePartsChooseVisual.fng	2
+0x68c9f0		MU_UG_TradeCareerCar.fng	2
+0x68ceb6		2CarImportDialogBot.fng	1
+0x68ceb6		2CarImportDialogTop.fng	2
+0x68ceb6		GenericDialog.fng	1
+0x68ceb6		MU_Online_WarningDialog.fng	1
+0x68cf50		MU_Online4PlayerGameDialogueBox.fng	2
+0x68cf50		MU_OnlineChallengSettingsDialogueBox.fng	2
+0x68cf50		MU_OnlineGamesRoomDialog.fng	2
+0x68cf50		MU_OnlineGenericDialogueBox.fng	2
+0x68cf50		MU_UG_TradeCarConfirm.fng	3
+0x68d02f		GLOSS	3
+0x68d02f		METAL	2
+0x68d02f		PEARL	2
+0x68d02f		CALIPER	2
+0x68d02f		MUFFLER	2
+0x68d02f		VINYL	2
+0x68d1cc		VINYL_GROUP_TEAR	3
+0x68d1cc		VINYL_GROUP_TEAR_HOOD	2
+0x68d1cc		VINYL_GROUP_STRIPES	2
+0x68d1cc		VINYL_GROUP_STRIPES_HOOD	2
+0x68d1cc		VINYL_GROUP_SPLASH	2
+0x68d1cc		VINYL_GROUP_MODERN	2
+0x68d1cc		VINYL_GROUP_MODERN_HOOD	2
+0x68d1cc		VINYL_GROUP_FLAMES	2
+0x68d1cc		VINYL_GROUP_FLAMES_HOOD	2
+0x68d1cc		VINYL_GROUP_LIGHTNING	2
+0x68d1cc		VINYL_GROUP_LIGHTNING_HOOD	2
+0x68d1cc		VINYL_GROUP_FLAGS	2
+0x68d1cc		VINYL_GROUP_TRIBAL	2
+0x68d1cc		VINYL_GROUP_TRIBAL_HOOD	2
+0x68d1cc		VINYL_GROUP_WILD	2
+0x68d1cc		VINYL_GROUP_UNIQUES	2
+0x68d1cc		VINYL_GROUP_AEM	2
+0x68d1cc		VINYL_GROUP_BODY_VINYL	2
+0x68d1cc		VINYL_GROUP_MANUFACTURAR_LOGO	3
+0x68d670		WINDSHIELD_TINT_L1_BLACK	3
+0x68d670		WINDSHIELD_TINT_L1_GREEN	2
+0x68d670		WINDSHIELD_TINT_L2_BLACK	2
+0x68d670		WINDSHIELD_TINT_L2_GREEN	2
+0x68d670		WINDSHIELD_TINT_L2_BLUE	2
+0x68d670		WINDSHIELD_TINT_L2_RED	2
+0x68d670		WINDSHIELD_TINT_L3_BLACK	2
+0x68d670		WINDSHIELD_TINT_L3_GREEN	2
+0x68d670		WINDSHIELD_TINT_L3_BLUE	2
+0x68d670		WINDSHIELD_TINT_L3_RED	2
+0x68d670		WINDSHIELD_TINT_L3_YELLOW	2
+0x68d670		WINDSHIELD_TINT_L3_AQUA	2
+0x68d670		WINDSHIELD_TINT_L3_GRAPE	2
+0x68d670		WINDSHIELD_TINT_L3_ORANGE	2
+0x68d670		WINDSHIELD_TINT_L3_PINK	2
+0x68d670		WINDSHIELD_TINT_L3_LIME	2
+0x68d670		WINDSHIELD_TINT_L3_LAVENDER	2
+0x68d670		WINDSHIELD_TINT_L3_GOLD	2
+0x68da80		WINDOW_TINT_STOCK	3
+0x68da80		WINDSHIELD_TINT_L1_BLACK	2
+0x68da80		WINDSHIELD_TINT_L1_GREEN	2
+0x68da80		WINDSHIELD_TINT_L2_BLACK	2
+0x68da80		WINDSHIELD_TINT_L2_GREEN	2
+0x68da80		WINDSHIELD_TINT_L2_BLUE	2
+0x68da80		WINDSHIELD_TINT_L2_RED	2
+0x68da80		WINDSHIELD_TINT_L3_BLACK	2
+0x68da80		WINDSHIELD_TINT_L3_GREEN	2
+0x68da80		WINDSHIELD_TINT_L3_BLUE	2
+0x68da80		WINDSHIELD_TINT_L3_RED	2
+0x68da80		WINDSHIELD_TINT_L3_YELLOW	2
+0x68da80		WINDSHIELD_TINT_L3_AQUA	2
+0x68da80		WINDSHIELD_TINT_L3_GRAPE	2
+0x68da80		WINDSHIELD_TINT_L3_ORANGE	2
+0x68da80		WINDSHIELD_TINT_L3_PINK	2
+0x68da80		WINDSHIELD_TINT_L3_LIME	2
+0x68da80		WINDSHIELD_TINT_L3_LAVENDER	2
+0x68da80		WINDSHIELD_TINT_L3_GOLD	2
+0x68e330		DECAL_LEFTDOOR_SLOT1_WIDEBODY	3
+0x68e330		DECAL_LEFTDOOR_SLOT2_WIDEBODY	2
+0x68e330		DECAL_LEFTDOOR_SLOT3_WIDEBODY	2
+0x68e330		DECAL_LEFTDOOR_SLOT4_WIDEBODY	2
+0x68e330		DECAL_LEFTDOOR_SLOT5_WIDEBODY	2
+0x68e330		DECAL_LEFTDOOR_SLOT6_WIDEBODY	3
+0x68e427		DECAL_RIGHTDOOR_SLOT1_WIDEBODY	3
+0x68e427		DECAL_RIGHTDOOR_SLOT2_WIDEBODY	2
+0x68e427		DECAL_RIGHTDOOR_SLOT3_WIDEBODY	2
+0x68e427		DECAL_RIGHTDOOR_SLOT4_WIDEBODY	2
+0x68e427		DECAL_RIGHTDOOR_SLOT5_WIDEBODY	2
+0x68e427		DECAL_RIGHTDOOR_SLOT6_WIDEBODY	3
+0x68e530	DynInit_744b88	NONE	1
+0x68e78c		MAGAZINE_RACE_1	1
+0x68e78c		MAGAZINE_RACE_2	1
+0x68e78c		MAGAZINE_RACE_3	1
+0x68e78c		MAGAZINE_RACE_4	1
+0x68e78c		MAGAZINE_RACE_5	1
+0x68e78c		MAGAZINE_RACE_6	1
+0x68e78c		MAGAZINE_RACE_7	1
+0x68e78c		MAGAZINE_RACE_8	1
+0x68e78c		MAGAZINE_RACE_9	1
+0x68e78c		MAGAZINE_RACE_10	1
+0x68e78c		MAGAZINE_RACE_11	1
+0x68e78c		MAGAZINE_TASK_1	1
+0x68e78c		MAGAZINE_TASK_2	1
+0x68e78c		MAGAZINE_TASK_3	1
+0x68e78c		MAGAZINE_TASK_4	1
+0x68e78c		MAGAZINE_TASK_5	1
+0x68e78c		MAGAZINE_TASK_6	1
+0x68e78c		MAGAZINE_TASK_7	1
+0x68e78c		MAGAZINE_TASK_8	1
+0x68e78c		MAGAZINE_TASK_9	1
+0x68e78c		MAGAZINE_TASK_10	1
+0x68e78c		MAGAZINE_TASK_11	1
+0x68e78c		MAGAZINE_TASK_12	1
+0x68e78c		MAGAZINE_TASK_13	1
+0x68e78c		MAGAZINE_TASK_14	1
+0x68e78c		MAGAZINE_TASK_15	1
+0x68e78c		MAGAZINE_TASK_16	1
+0x68f1ec		5ZIGEN	4
+0x68f1ec		5Zigen	1
+0x68f1ec		5zigen	2
+0x68f1ec		DECAL_ICON_5ZIGEN	2
+0x68f1ec		ABS_DYNAMICS	3
+0x68f1ec		ABSDYNAMICS	2
+0x68f1ec		DECAL_ICON_ABS	2
+0x68f1ec		ABS DYNAMICS	1
+0x68f1ec		ADVANCEDCLUTCH	2
+0x68f1ec		DECAL_ICON_ACT	2
+0x68f1ec		DECAL_ICON_AEM	2
+0x68f1ec		ALPINE	3
+0x68f1ec		DECAL_ICON_ALPINE	2
+0x68f1ec		APEX	3
+0x68f1ec		DECAL_ICON_APEX	2
+0x68f1ec		APEXI	3
+0x68f1ec		DECAL_ICON_APEXI	2
+0x68f1ec		AROSPEED	3
+0x68f1ec		DECAL_ICON_AROSPEED	2
+0x68f1ec		AUDIOBAHN	3
+0x68f1ec		DECAL_ICON_AUDIOBAHN	2
+0x68f1ec		DECAL_ICON_BBS	2
+0x68f1ec		BILSTEIN	3
+0x68f1ec		DECAL_ICON_BILSTEIN	2
+0x68f1ec		BORLA	3
+0x68f1ec		DECAL_ICON_BORLA	2
+0x68f1ec		BREMBO	3
+0x68f1ec		DECAL_ICON_BREMBO	2
+0x68f1ec		CLUTCHMASTERS	3
+0x68f1ec		DECAL_ICON_CLUTCHMASTERS	2
+0x68f1ec		RACINGHART	3
+0x68f1ec		RACING_HART	2
+0x68f1ec		RacingHart	2
+0x68f1ec		DECAL_ICON_RACINGHART	2
+0x68f1ec		DC_SPORTS	2
+0x68f1ec		DCSPORTS	3
+0x68f1ec		DECAL_ICON_DC	2
+0x68f1ec		EIBACH	3
+0x68f1ec		EIBACHSPRINGS	2
+0x68f1ec		DECAL_ICON_EIBACH	2
+0x68f1ec		ENKEI	3
+0x68f1ec		DECAL_ICON_ENKEI	2
+0x68f1ec		EXTREMEDIMENSIONS	3
+0x68f1ec		EXTRDIMENSION	2
+0x68f1ec		EXTREMEDIMENSION	1
+0x68f1ec		DECAL_ICON_EXTREMEDIMENSIONS	1
+0x68f1ec		GENERA	2
+0x68f1ec		DECAL_ICON_TYC	2
+0x68f1ec		GREDDY	3
+0x68f1ec		GENERA (TYC)	1
+0x68f1ec		DECAL_ICON_GREDDY	2
+0x68f1ec		HENSHIN	2
+0x68f1ec		HENSHINAUTO	2
+0x68f1ec		DECAL_ICON_HENSHIN	2
+0x68f1ec		HENSHIN_AUTO	1
+0x68f1ec		DECAL_ICON_HKS	2
+0x68f1ec		HOLLEY	3
+0x68f1ec		DECAL_ICON_NOS	2
+0x68f1ec		HPRACING	2
+0x68f1ec		HP_RACING	2
+0x68f1ec		DECAL_ICON_HPRACING	2
+0x68f1ec		DECAL_ICON_HANDR	2
+0x68f1ec		INJEN	3
+0x68f1ec		DECAL_ICON_INJEN	2
+0x68f1ec		JACKSONRACING	3
+0x68f1ec		JACKSON_RACING	2
+0x68f1ec		JACKSON	2
+0x68f1ec		DECAL_ICON_JACKSON	2
+0x68f1ec		JSPAMERICA	2
+0x68f1ec		DECAL_ICON_JSP	2
+0x68f1ec		KENWOOD	3
+0x68f1ec		DECAL_ICON_KENWOOD	2
+0x68f1ec		KEYSTONE	3
+0x68f1ec		KONI	3
+0x68f1ec		DECAL_ICON_KONI	2
+0x68f1ec		KONIG	3
+0x68f1ec		DECAL_ICON_KONIG	2
+0x68f1ec		KUMHO	3
+0x68f1ec		KUMO	2
+0x68f1ec		KVRPERFORMANCE	2
+0x68f1ec		DECAL_ICON_KVR	2
+0x68f1ec		DECAL_ICON_KYB	2
+0x68f1ec		MOMO	3
+0x68f1ec		DECAL_ICON_MOMO	2
+0x68f1ec		NEUSPEED	3
+0x68f1ec		DECAL_ICON_NEUSPEED	2
+0x68f1ec		NITROUS_EXPRESS	3
+0x68f1ec		NITROUSEXPRESS	2
+0x68f1ec		DECAL_ICON_NX	2
+0x68f1ec		DECAL_ICON_OZ	2
+0x68f1ec		PIAA	2
+0x68f1ec		DECAL_ICON_PIAA	2
+0x68f1ec		PLASMAGLOW	3
+0x68f1ec		PLASMA_GLOW	2
+0x68f1ec		DECAL_ICON_PLASMAGLOW	2
+0x68f1ec		SCORPION	3
+0x68f1ec		DECAL_ICON_SCORPION	2
+0x68f1ec		SKUNK2	3
+0x68f1ec		DECAL_ICON_SKUNK2	2
+0x68f1ec		SPARCO	2
+0x68f1ec		DECAL_ICON_SPARCO	2
+0x68f1ec		STILLEN	3
+0x68f1ec		DECAL_ICON_STILLEN	2
+0x68f1ec		STREET_GLOW	2
+0x68f1ec		STREETGLOW	3
+0x68f1ec		DECAL_ICON_STREETGLOW	2
+0x68f1ec		TOUCAN	3
+0x68f1ec		TOYOTIRES	2
+0x68f1ec		TOYO_TIRES	2
+0x68f1ec		TOYO	3
+0x68f1ec		DECAL_ICON_TOYO	2
+0x68f1ec		TURBONETICS	3
+0x68f1ec		DECAL_ICON_TURBONETICS	2
+0x68f1ec		VENOM	3
+0x68f1ec		VINYL_ICON_VENOM	2
+0x68f1ec		WILWOOD	3
+0x68f1ec		WILLWOOD	2
+0x68f1ec		DECAL_ICON_WILWOOD	2
+0x68f1ec		WOLFRACE	3
+0x68f1ec		WOLFRACEWHEELS	2
+0x68f1ec		YOKOHAMA	3
+0x68f1ec		DECAL_ICON_YOKOHAMA	2
+0x68f1ec		ACURA	3
+0x68f1ec		CARSELECT_MANUFACTURER_ACURA	2
+0x68f1ec		DODGE	3
+0x68f1ec		CARSELECT_MANUFACTURER_DODGE	2
+0x68f1ec		FORD	3
+0x68f1ec		CARSELECT_MANUFACTURER_FORD	2
+0x68f1ec		HONDA	2
+0x68f1ec		CARSELECT_MANUFACTURER_HONDA	2
+0x68f1ec		HYUNDAI	2
+0x68f1ec		CARSELECT_MANUFACTURER_HYUNDAI	2
+0x68f1ec		MITSUBISHI	3
+0x68f1ec		CARSELECT_MANUFACTURER_MITSUBISHI	2
+0x68f1ec		MAZDA	3
+0x68f1ec		CARSELECT_MANUFACTURER_MAZDA	2
+0x68f1ec		NISSAN	3
+0x68f1ec		CARSELECT_MANUFACTURER_NISSAN	2
+0x68f1ec		PEUGEOT	3
+0x68f1ec		CARSELECT_MANUFACTURER_PEUGEOT	2
+0x68f1ec		SUBARU	3
+0x68f1ec		CARSELECT_MANUFACTURER_SUBARU	2
+0x68f1ec		VOLKSWAGEN	3
+0x68f1ec		CARSELECT_MANUFACTURER_VOLKSWAGEN	2
+0x68f1ec		TOYOTA	3
+0x68f1ec		CARSELECT_MANUFACTURER_TOYOTA	2
+0x68f1ec		EUROLITE	3
+0x68f1ec		DECAL_ICON_EUROLITE	2
+0x6912c6		AUTOPRESS	3
+0x6912c6		MAG_ICONS_AUTOPRESS	2
+0x6912c6		CHROM_AND_FLAMMEN	2
+0x6912c6		MAG_ICONS_CHROM	2
+0x6912c6		MAG_ICONS_DUB	2
+0x6912c6		HOT4S	2
+0x6912c6		MAG_ICONS_HOT	2
+0x6912c6		IMPORT_RACER	2
+0x6912c6		MAG_ICONS_IMPORTRACER	2
+0x6912c6		IMPORT_TUNER	2
+0x6912c6		MAG_ICONS_IMPORTTUNER	2
+0x6912c6		MAXI_TUNING	2
+0x6912c6		MAG_ICONS_MAXI	2
+0x6912c6		MODIFIED_MAG	2
+0x6912c6		MAG_ICONS_MODIFIEDMAG	2
+0x6912c6		OPTION	2
+0x6912c6		MAG_ICONS_OPTION	2
+0x6912c6		SPORT_COMPACT_CAR	2
+0x6912c6		MAG_ICONS_SPORTCOMPACTCAR	2
+0x6912c6		STUFF	2
+0x6912c6		MAG_ICONS_STUFF	2
+0x6912c6		SUPER_STREET	2
+0x6912c6		MAG_ICONS_SUPERSTREET	2
+0x6912c6		TURBO	2
+0x6912c6		MAG_ICONS_TURBOHIGHTECH	2
+0x6912c6		ELABORARE	2
+0x6912c6		MAG_ICONS_ELABORARE	3
+0x6923aa		h@hi	1
+0x69253a		BOTTOM_DECAL	3
+0x69253a		EXHAUST_TIP_DECAL	2
+0x69253a		FRONT_BUMPER_DECAL	2
+0x69253a		FRONT_DECAL	2
+0x69253a		GTWING_DECAL	2
+0x69253a		HOOD_DECAL	2
+0x69253a		LEFT_BRAKELIGHT_DECAL	2
+0x69253a		LEFT_DOOR_DECAL	2
+0x69253a		LEFT_FENDER_DECAL	2
+0x69253a		LEFT_QUARTER_DECAL	2
+0x69253a		LEFT_SIDE_MIRROR_DECAL	2
+0x69253a		LEFT_SKIRT_DECAL	2
+0x69253a		REAR_BUMPER_DECAL	2
+0x69253a		REAR_DECAL	2
+0x69253a		RIGHT_BRAKELIGHT_DECAL	2
+0x69253a		RIGHT_DOOR_DECAL	2
+0x69253a		RIGHT_FENDER_DECAL	2
+0x69253a		RIGHT_QUARTER_DECAL	2
+0x69253a		RIGHT_SIDE_MIRROR_DECAL	2
+0x69253a		RIGHT_SKIRT_DECAL	2
+0x69253a		TOP_DECAL	2
+0x69253a		FRONT_WINDOW_DECAL	2
+0x69253a		REAR_WINDOW_DECAL	2
+0x69253a		LEFT_FRONT_WINDOW_DECAL	2
+0x69253a		LEFT_REAR_WINDOW_DECAL	2
+0x69253a		RIGHT_FRONT_WINDOW_DECAL	2
+0x69253a		RIGHT_REAR_WINDOW_DECAL	3
+0x692a57		h`ii	1
+0x692b1c		h ji	1
+0x692cb0	StaticInit_Hash_Rotate_360_t	Rotate_360_t	1
+0x692d10	DynInit_73b0d8	Move_UnD_t	1
+0x6934ec		ALLCARS_BODY_1	1
+0x6934ec		ALLCARS_BODY_2	1
+0x6934ec		ALLCARS_BODY_3	1
+0x6934ec		ALLCARS_BODY_4	1
+0x6934ec		ALLCARS_BODY_5	1
+0x6934ec		5ZIGEN	2
+0x6934ec		ADVANCEDCLUTCH	1
+0x6934ec		ALPINE	2
+0x6934ec		APEX	2
+0x6934ec		APEXI	2
+0x6934ec		AROSPEED	2
+0x6934ec		AUDIOBAHN	2
+0x6934ec		BILSTEIN	2
+0x6934ec		BORLA	2
+0x6934ec		BREMBO	2
+0x6934ec		DCSPORTS	2
+0x6934ec		EIBACHSPRINGS	2
+0x6934ec		ENKEI	2
+0x6934ec		GREDDY	2
+0x6934ec		HPRACING	2
+0x6934ec		INJEN	2
+0x6934ec		JACKSONRACING	2
+0x6934ec		KNENGINEERING	2
+0x6934ec		KENWOOD	2
+0x6934ec		KEYSTONE	2
+0x6934ec		KONI	2
+0x6934ec		KONIG	2
+0x6934ec		KVRPERFORMANCE	2
+0x6934ec		MOMO	2
+0x6934ec		NEUSPEED	2
+0x6934ec		NITROUSEXPRESS	2
+0x6934ec		PIAA	1
+0x6934ec		PLASMAGLOW	2
+0x6934ec		RACINGHART	2
+0x6934ec		SCORPION	2
+0x6934ec		SKUNK2	2
+0x6934ec		SPARCO	1
+0x6934ec		STILLEN	2
+0x6934ec		STREETGLOW	2
+0x6934ec		EUROLITE	2
+0x6934ec		TOYOTIRES	2
+0x6934ec		TURBONETICS	2
+0x6934ec		VENOM	2
+0x6934ec		WILLWOOD	2
+0x6934ec		WOLFRACEWHEELS	2
+0x6934ec		YOKOHAMA	2
+0x6934ec		ABSDYNAMICS	2
+0x6934ec		CLUTCHMASTERS	2
+0x6934ec		HENSHINAUTO	2
+0x6934ec		JSPAMERICA	2
+0x6934ec		EXTREMEDIMENSIONS	2
+0x6934ec		KUMOTIRES	2
+0x6934ec		STUFF_VINYL	2
+0x6934ec		AUTOZONE_VINYL	2
+0x6934ec		HEIRO_VINYL	2
+0x6934ec		CUSTOM6	2
+0x6934ec		CUSTOM5	2
+0x6934ec		CUSTOM10	2
+0x6934ec		CUSTOM14	2
+0x6934ec		CUSTOM9	2
+0x6934ec		CUSTOM7	2
+0x6934ec		CUSTOM17	2
+0x6934ec		CUSTOM20	2
+0x6934ec		CUSTOM21	2
+0x6934ec		CUSTOM22	2
+0x6934ec		CUSTOM2	2
+0x6934ec		CUSTOM1	2
+0x6934ec		CUSTOM3	2
+0x6934ec		CUSTOM4	2
+0x6934ec		CUSTOM8	2
+0x6934ec		CUSTOM12	2
+0x6934ec		CUSTOM13	2
+0x6934ec		CUSTOM15	2
+0x6934ec		CUSTOM16	2
+0x6934ec		CUSTOM18	2
+0x6934ec		CUSTOM19	2
+0x6934ec		CUSTOM23	2
+0x6967cd		hPQT	1
+0x696c5d		hX{s	1
+0x414441		FadeIn	1
+0x414f60		GenericDialog.fng	1
+0x4239c0	Rivals::Update	THE_PRESENT	1
+0x460fc0	Car::UpdateDriver	RealDriver	1
+0x46a640	Car::TrackPolygonCollisionBody	TrackPolygonCollisionBody	1
+0x4bcb40		GenericDialog.fng	1
+0x4c4154	Settings_AutoApply	auto	1
+0x4c8900		GenericDialog.fng	1
+0x4cb130		GenericDialog.fng	2
+0x4cc400		%s^%s	1
+0x4cc400		GenericDialog.fng	1
+0x4e494d	GarageManager_InstallStockParts	STOCK	1
+0x54d020		%3s %3s %-12s %12s	1
+0x54d020		%2s# %3s %-12s %12s	1
+0x5881c0	Car::TwoWheelAckermanSteering	TwoWheelAckermanSteering	1
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	ID3DXEffectCompiler: There were no techniques	1
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	%s[%s]	1
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	ID3DXEffectCompiler::CompileEffect: Shader arrays index was not float or int	1
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	ID3DXEffectCompiler::CompileEffect: Could not compile expression containing shader array	1
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	ID3DXEffectCompiler::CompileEffect: Shader arrays must be a previously defined parameter	1
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	ID3DXEffectCompiler::CompileEffect: Only 1-d shader arrays allowed	1
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	ID3DXEffectCompiler::CompileEffect: There was an error compiling expression	1
+0x5b51a7	D3DX_EffectCompiler_CompileeffectCouldNotCompileEx_5b51a7	ID3DXEffectCompiler: Compilation failed	1
+0x60d526	D3DX_Ps1Back_InternalErrorUnexpectedAliasOn_60d526	internal error: unexpected Alias on texture declaration	1
+0x60d5c4	D3DX_Ps1Back_SamplerMismatchSamplerUsedInco_60d5c4	sampler mismatch: sampler used inconsistently	1
+0x616118	D3DX_VsBack_MaximumInputRegisterIndexExcee_616118	maximum input register index exceeded	1
+0x633063	EAsys_BeforeOffsetT0GT1G_633063	currTime: %g  offset: %g   cycle: %g\n	1
+0x633063	EAsys_BeforeOffsetT0GT1G_633063	offset0: %g  offset1: %g\n	1
+0x633063	EAsys_BeforeOffsetT0GT1G_633063	cycle0: %g  cycle1: %g\n	1
+0x633063	EAsys_BeforeOffsetT0GT1G_633063	before offset t0: %g  t1: %g\n	1
+0x63b280		queued file	1
+0x63b280		Already in cache, updating database.\n	1
+0x63b28a	Rivals::UpdateCache	queued file	1
+0x63b28a	Rivals::UpdateCache	Already in cache, updating database.\n	1
+0x665240	OnlineManager::HandleICMPTimeout	server ICMP timeout\n	1
+0x68005e		Microsoft Visual C++ Runtime Library	1
+0x68006b	Runtime_ErrorHandler	Microsoft Visual C++ Runtime Library	1
+0x689ad0	DynInit_78a4e0	DEFAULTALPHA	1
+0x68aee0	Audio_LoadFNGFiles	Keyboard.fng	1
+0x68aee0	Audio_LoadFNGFiles	EA_TRAX_Jukebox.fng	1
+0x68aee0	Audio_LoadFNGFiles	EA_TRAX_Jukebox_Alpine.fng	1
+0x68aee0	Audio_LoadFNGFiles	EA_TRAX_Jukebox_Kenwood.fng	1
+0x68aee0	Audio_LoadFNGFiles	EA_TRAX_Jukebox_Audiobahn.fng	1
+0x68aee0	Audio_LoadFNGFiles	LS_Splash.fng	1
+0x68be70	Garage_LoadFNGFiles	GarageMain.fng	2
+0x68be70	Garage_LoadFNGFiles	GarageMain_2P.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_Garage.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageAccessoriesCategory.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageDecals.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageDecals_Brand.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageDecals_ChooseDecal.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageDecals_Size.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageDecals_Slot.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageDecals_Zone.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageMenu.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GaragePaintMod.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GaragePartsBrowser.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GaragePartsCategory.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GaragePartsCategoryVisual.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GaragePartsChooseVisual.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GaragePerformanceBrand.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GaragePerformanceTuner.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GaragePerformanceV2.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageRimsBrandBrowser.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageRimsBrowser.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageRimsStyleBrowser.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageVinylBrand.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageVinylBrowser.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageVinylGroup.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_GarageVinylLayerV2.fng	2
+0x68be70	Garage_LoadFNGFiles	MU_MainMenuCarCustomize.fng	1
+0x68be70	Garage_LoadFNGFiles	MU_MultiplayerCarSelect.fng	1
+0x68be70	Garage_LoadFNGFiles	MU_QuickRaceCarSelect.fng	1
+0x68be70	Garage_LoadFNGFiles	MU_QuickRaceLapPopup_PC.fng	1
+0x68be70	Garage_LoadFNGFiles	MU_GarageAudioCategory.fng	1
+0x68be70	Garage_LoadFNGFiles	MU_GarageVinylType.fng	1
+0x68be70	Garage_LoadFNGFiles	MU_QRTransmissionSelect.fng	1
+0x68be70	Garage_LoadFNGFiles	MU_GaragePerformanceCategory.fng	1
+0x68c7c0	DynInit_7469bc	GenericDialog.fng	1
+0x68c870		ColorPicker.fng	1
+0x68c8a0		MU_UG_ChooseCareerCar.fng	2
+0x68c8a0		MU_MainMenuCarCustomize.fng	1
+0x68c8a0		MU_QuickRaceCarSelect.fng	1
+0x68c8a0		MU_QuickRaceLapPopup_PC.fng	1
+0x68c8a0		MU_MultiplayerCarSelect.fng	1
+0x68c900	FEng_LoadMenuFiles	MU_QuickRaceCarSelect.fng	1
+0x68c900	FEng_LoadMenuFiles	MU_QuickRaceLapPopup_PC.fng	1
+0x68c900	FEng_LoadMenuFiles	MU_MultiplayerCarSelect.fng	1
+0x68c900	FEng_LoadMenuFiles	MU_UG_ChooseCareerCar.fng	1
+0x68cec0	FEng_LoadDialogFiles	2CarImportDialogBot.fng	1
+0x68cec0	FEng_LoadDialogFiles	2CarImportDialogTop.fng	1
+0x68cec0	FEng_LoadDialogFiles	GenericDialog.fng	1
+0x68cec0	FEng_LoadDialogFiles	MU_Online_WarningDialog.fng	1
+0x68cec0	FEng_LoadDialogFiles	MU_Online4PlayerGameDialogueBox.fng	1
+0x68cec0	FEng_LoadDialogFiles	MU_OnlineChallengSettingsDialogueBox.fng	1
+0x68cec0	FEng_LoadDialogFiles	MU_OnlineGamesRoomDialog.fng	1
+0x68cec0	FEng_LoadDialogFiles	MU_OnlineGenericDialogueBox.fng	1
+0x68cec0	FEng_LoadDialogFiles	MU_UG_TradeCarConfirm.fng	1
+0x68d030	Car::InitPartTable	GLOSS	1
+0x68d030	Car::InitPartTable	METAL	1
+0x68d030	Car::InitPartTable	PEARL	1
+0x68d030	Car::InitPartTable	CALIPER	1
+0x68d030	Car::InitPartTable	MUFFLER	1
+0x68d1d0		VINYL_GROUP_TEAR	1
+0x68d1d0		VINYL_GROUP_TEAR_HOOD	1
+0x68d1d0		VINYL_GROUP_STRIPES	1
+0x68d1d0		VINYL_GROUP_STRIPES_HOOD	1
+0x68d1d0		VINYL_GROUP_SPLASH	1
+0x68d1d0		VINYL_GROUP_MODERN	1
+0x68d1d0		VINYL_GROUP_MODERN_HOOD	1
+0x68d1d0		VINYL_GROUP_FLAMES	1
+0x68d1d0		VINYL_GROUP_FLAMES_HOOD	1
+0x68d1d0		VINYL_GROUP_LIGHTNING	1
+0x68d1d0		VINYL_GROUP_LIGHTNING_HOOD	1
+0x68d1d0		VINYL_GROUP_FLAGS	1
+0x68d1d0		VINYL_GROUP_TRIBAL	1
+0x68d1d0		VINYL_GROUP_TRIBAL_HOOD	1
+0x68d1d0		VINYL_GROUP_WILD	1
+0x68d1d0		VINYL_GROUP_UNIQUES	1
+0x68d1d0		VINYL_GROUP_AEM	1
+0x68d1d0		VINYL_GROUP_BODY_VINYL	1
+0x68d1d0		VINYL_GROUP_MANUFACTURAR_LOGO	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_FLAMES_HOOD	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_LIGHTNING	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_LIGHTNING_HOOD	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_FLAGS	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_TRIBAL	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_TRIBAL_HOOD	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_WILD	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_UNIQUES	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_AEM	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_BODY_VINYL	1
+0x68d300	Car::InitVinylGroups	VINYL_GROUP_MANUFACTURAR_LOGO	1
+0x68d5e0	Car::InitVisualParts	VISUAL_PART_MUFFLERTIP	1
+0x68d5e0	Car::InitVisualParts	_KIT%02d_EXHAUST	1
+0x68d5e0	Car::InitVisualParts	_KIT%02d_WIDE_BODY	1
+0x68de40	Car::InitNeonColors	NEON_NONE	1
+0x68de40	Car::InitNeonColors	NEON_RED	1
+0x68de40	Car::InitNeonColors	NEON_GREEN	1
+0x68de40	Car::InitNeonColors	NEON_BLUE	1
+0x68de40	Car::InitNeonColors	NEON_ORANGE	1
+0x68de40	Car::InitNeonColors	NEON_YELLOW	1
+0x68de40	Car::InitNeonColors	NEON_AQUA	1
+0x68de40	Car::InitNeonColors	NEON_WHITE	1
+0x68de40	Car::InitNeonColors	NEON_GRAPE	1
+0x68de40	Car::InitNeonColors	NEON_PINK	1
+0x68de40	Car::InitNeonColors	NEON_LIME	1
+0x68de40	Car::InitNeonColors	NEON_LAVENDER	1
+0x68de40	Car::InitNeonColors	NEON_GOLD	1
+0x68de40	Car::InitNeonColors	NEON_RED_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_GREEN_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_BLUE_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_ORANGE_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_YELLOW_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_AQUA_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_WHITE_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_GRAPE_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_PINK_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_LIME_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_LAVENDER_PULSE	1
+0x68de40	Car::InitNeonColors	NEON_GOLD_PULSE	1
+0x68e430	Car_Decal_InitWideBodySlots	DECAL_RIGHTDOOR_SLOT1_WIDEBODY	1
+0x68e430	Car_Decal_InitWideBodySlots	DECAL_RIGHTDOOR_SLOT2_WIDEBODY	1
+0x68e430	Car_Decal_InitWideBodySlots	DECAL_RIGHTDOOR_SLOT3_WIDEBODY	1
+0x68e430	Car_Decal_InitWideBodySlots	DECAL_RIGHTDOOR_SLOT4_WIDEBODY	1
+0x68e430	Car_Decal_InitWideBodySlots	DECAL_RIGHTDOOR_SLOT5_WIDEBODY	1
+0x68e430	Car_Decal_InitWideBodySlots	DECAL_RIGHTDOOR_SLOT6_WIDEBODY	1
+0x68e790		MAGAZINE_RACE_1	1
+0x68e790		MAGAZINE_RACE_2	1
+0x68e790		MAGAZINE_RACE_3	1
+0x68e790		MAGAZINE_RACE_4	1
+0x68e790		MAGAZINE_RACE_5	1
+0x68e790		MAGAZINE_RACE_6	1
+0x68e790		MAGAZINE_RACE_7	1
+0x68e790		MAGAZINE_RACE_8	1
+0x68e790		MAGAZINE_RACE_9	1
+0x68e790		MAGAZINE_RACE_10	1
+0x68e790		MAGAZINE_RACE_11	1
+0x68e790		MAGAZINE_TASK_1	1
+0x68e790		MAGAZINE_TASK_2	1
+0x68e790		MAGAZINE_TASK_3	1
+0x68e790		MAGAZINE_TASK_4	1
+0x68e790		MAGAZINE_TASK_5	1
+0x68e790		MAGAZINE_TASK_6	1
+0x68e790		MAGAZINE_TASK_7	1
+0x68e790		MAGAZINE_TASK_8	1
+0x68e790		MAGAZINE_TASK_9	1
+0x68e790		MAGAZINE_TASK_10	1
+0x68e790		MAGAZINE_TASK_11	1
+0x68e790		MAGAZINE_TASK_12	1
+0x68e790		MAGAZINE_TASK_13	1
+0x68e790		MAGAZINE_TASK_14	1
+0x68e790		MAGAZINE_TASK_15	1
+0x68e790		MAGAZINE_TASK_16	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_1	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_2	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_3	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_4	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_5	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_6	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_7	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_8	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_9	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_10	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_RACE_11	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_1	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_2	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_3	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_4	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_5	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_6	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_7	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_8	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_9	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_10	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_11	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_12	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_13	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_14	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_15	1
+0x68eca0	Canon::InitializeMagazineRaces	MAGAZINE_TASK_16	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_5ZIGEN	1
+0x68f1f0	Car::InitializeConfigurations	ABS_DYNAMICS	1
+0x68f1f0	Car::InitializeConfigurations	ABSDYNAMICS	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_ABS	1
+0x68f1f0	Car::InitializeConfigurations	ABS DYNAMICS	1
+0x68f1f0	Car::InitializeConfigurations	ADVANCEDCLUTCH	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_ACT	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_AEM	1
+0x68f1f0	Car::InitializeConfigurations	ALPINE	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_ALPINE	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_APEX	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_APEXI	1
+0x68f1f0	Car::InitializeConfigurations	AROSPEED	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_AROSPEED	1
+0x68f1f0	Car::InitializeConfigurations	AUDIOBAHN	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_AUDIOBAHN	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_BBS	1
+0x68f1f0	Car::InitializeConfigurations	BILSTEIN	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_BILSTEIN	1
+0x68f1f0	Car::InitializeConfigurations	BORLA	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_BORLA	1
+0x68f1f0	Car::InitializeConfigurations	BREMBO	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_BREMBO	1
+0x68f1f0	Car::InitializeConfigurations	CLUTCHMASTERS	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_CLUTCHMASTERS	1
+0x68f1f0	Car::InitializeConfigurations	RACINGHART	2
+0x68f1f0	Car::InitializeConfigurations	RACING_HART	1
+0x68f1f0	Car::InitializeConfigurations	RacingHart	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_RACINGHART	1
+0x68f1f0	Car::InitializeConfigurations	DC_SPORTS	1
+0x68f1f0	Car::InitializeConfigurations	DCSPORTS	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_DC	1
+0x68f1f0	Car::InitializeConfigurations	EIBACH	2
+0x68f1f0	Car::InitializeConfigurations	EIBACHSPRINGS	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_EIBACH	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_ENKEI	1
+0x68f1f0	Car::InitializeConfigurations	EXTREMEDIMENSIONS	2
+0x68f1f0	Car::InitializeConfigurations	EXTRDIMENSION	1
+0x68f1f0	Car::InitializeConfigurations	EXTREMEDIMENSION	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_EXTREMEDIMENSIONS	1
+0x68f1f0	Car::InitializeConfigurations	GENERA	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_TYC	1
+0x68f1f0	Car::InitializeConfigurations	GENERA (TYC)	1
+0x68f1f0	Car::InitializeConfigurations	GREDDY	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_GREDDY	1
+0x68f1f0	Car::InitializeConfigurations	HENSHIN	1
+0x68f1f0	Car::InitializeConfigurations	HENSHINAUTO	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_HENSHIN	1
+0x68f1f0	Car::InitializeConfigurations	HENSHIN_AUTO	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_HKS	1
+0x68f1f0	Car::InitializeConfigurations	HOLLEY	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_NOS	1
+0x68f1f0	Car::InitializeConfigurations	HPRACING	1
+0x68f1f0	Car::InitializeConfigurations	HP_RACING	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_HPRACING	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_HANDR	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_INJEN	1
+0x68f1f0	Car::InitializeConfigurations	JACKSONRACING	2
+0x68f1f0	Car::InitializeConfigurations	JACKSON_RACING	1
+0x68f1f0	Car::InitializeConfigurations	JACKSON	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_JACKSON	1
+0x68f1f0	Car::InitializeConfigurations	JSPAMERICA	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_JSP	1
+0x68f1f0	Car::InitializeConfigurations	KENWOOD	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_KENWOOD	1
+0x68f1f0	Car::InitializeConfigurations	KEYSTONE	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_KONI	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_KONIG	1
+0x68f1f0	Car::InitializeConfigurations	KVRPERFORMANCE	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_KVR	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_KYB	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_MOMO	1
+0x68f1f0	Car::InitializeConfigurations	NEUSPEED	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_NEUSPEED	1
+0x68f1f0	Car::InitializeConfigurations	NITROUS_EXPRESS	2
+0x68f1f0	Car::InitializeConfigurations	NITROUSEXPRESS	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_NX	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_OZ	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_PIAA	1
+0x68f1f0	Car::InitializeConfigurations	PLASMAGLOW	2
+0x68f1f0	Car::InitializeConfigurations	PLASMA_GLOW	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_PLASMAGLOW	1
+0x68f1f0	Car::InitializeConfigurations	SCORPION	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_SCORPION	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_SKUNK2	1
+0x68f1f0	Car::InitializeConfigurations	SPARCO	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_SPARCO	1
+0x68f1f0	Car::InitializeConfigurations	STILLEN	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_STILLEN	1
+0x68f1f0	Car::InitializeConfigurations	STREET_GLOW	1
+0x68f1f0	Car::InitializeConfigurations	STREETGLOW	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_STREETGLOW	1
+0x68f1f0	Car::InitializeConfigurations	TOUCAN	2
+0x68f1f0	Car::InitializeConfigurations	TOYOTIRES	1
+0x68f1f0	Car::InitializeConfigurations	TOYO_TIRES	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_TOYO	1
+0x68f1f0	Car::InitializeConfigurations	TURBONETICS	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_TURBONETICS	1
+0x68f1f0	Car::InitializeConfigurations	VENOM	2
+0x68f1f0	Car::InitializeConfigurations	VINYL_ICON_VENOM	1
+0x68f1f0	Car::InitializeConfigurations	WILWOOD	2
+0x68f1f0	Car::InitializeConfigurations	WILLWOOD	1
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_WILWOOD	1
+0x68f1f0	Car::InitializeConfigurations	WOLFRACE	2
+0x68f1f0	Car::InitializeConfigurations	WOLFRACEWHEELS	1
+0x68f1f0	Car::InitializeConfigurations	YOKOHAMA	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_YOKOHAMA	1
+0x68f1f0	Car::InitializeConfigurations	ACURA	2
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_ACURA	1
+0x68f1f0	Car::InitializeConfigurations	DODGE	2
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_DODGE	1
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_FORD	1
+0x68f1f0	Car::InitializeConfigurations	HONDA	2
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_HONDA	1
+0x68f1f0	Car::InitializeConfigurations	HYUNDAI	2
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_HYUNDAI	1
+0x68f1f0	Car::InitializeConfigurations	MITSUBISHI	2
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_MITSUBISHI	1
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_MAZDA	1
+0x68f1f0	Car::InitializeConfigurations	NISSAN	2
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_NISSAN	1
+0x68f1f0	Car::InitializeConfigurations	PEUGEOT	2
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_PEUGEOT	1
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_SUBARU	1
+0x68f1f0	Car::InitializeConfigurations	VOLKSWAGEN	2
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_VOLKSWAGEN	1
+0x68f1f0	Car::InitializeConfigurations	CARSELECT_MANUFACTURER_TOYOTA	1
+0x68f1f0	Car::InitializeConfigurations	EUROLITE	2
+0x68f1f0	Car::InitializeConfigurations	DECAL_ICON_EUROLITE	1
+0x690000	Car::InitDecalHashes	JACKSON_RACING	1
+0x690000	Car::InitDecalHashes	JACKSON	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_JACKSON	1
+0x690000	Car::InitDecalHashes	JACKSONRACING	1
+0x690000	Car::InitDecalHashes	JSPAMERICA	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_JSP	1
+0x690000	Car::InitDecalHashes	KENWOOD	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_KENWOOD	1
+0x690000	Car::InitDecalHashes	KEYSTONE	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_KONI	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_KONIG	1
+0x690000	Car::InitDecalHashes	KVRPERFORMANCE	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_KVR	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_KYB	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_MOMO	1
+0x690000	Car::InitDecalHashes	NEUSPEED	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_NEUSPEED	1
+0x690000	Car::InitDecalHashes	NITROUS_EXPRESS	2
+0x690000	Car::InitDecalHashes	NITROUSEXPRESS	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_NX	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_OZ	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_PIAA	1
+0x690000	Car::InitDecalHashes	PLASMAGLOW	2
+0x690000	Car::InitDecalHashes	PLASMA_GLOW	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_PLASMAGLOW	1
+0x690000	Car::InitDecalHashes	SCORPION	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_SCORPION	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_SKUNK2	1
+0x690000	Car::InitDecalHashes	SPARCO	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_SPARCO	1
+0x690000	Car::InitDecalHashes	STILLEN	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_STILLEN	1
+0x690000	Car::InitDecalHashes	STREET_GLOW	1
+0x690000	Car::InitDecalHashes	STREETGLOW	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_STREETGLOW	1
+0x690000	Car::InitDecalHashes	TOUCAN	2
+0x690000	Car::InitDecalHashes	TOYOTIRES	1
+0x690000	Car::InitDecalHashes	TOYO_TIRES	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_TOYO	1
+0x690000	Car::InitDecalHashes	TURBONETICS	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_TURBONETICS	1
+0x690000	Car::InitDecalHashes	VENOM	2
+0x690000	Car::InitDecalHashes	VINYL_ICON_VENOM	1
+0x690000	Car::InitDecalHashes	WILWOOD	2
+0x690000	Car::InitDecalHashes	WILLWOOD	1
+0x690000	Car::InitDecalHashes	DECAL_ICON_WILWOOD	1
+0x690000	Car::InitDecalHashes	WOLFRACE	2
+0x690000	Car::InitDecalHashes	WOLFRACEWHEELS	1
+0x690000	Car::InitDecalHashes	YOKOHAMA	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_YOKOHAMA	1
+0x690000	Car::InitDecalHashes	ACURA	2
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_ACURA	1
+0x690000	Car::InitDecalHashes	DODGE	2
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_DODGE	1
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_FORD	1
+0x690000	Car::InitDecalHashes	HONDA	2
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_HONDA	1
+0x690000	Car::InitDecalHashes	HYUNDAI	2
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_HYUNDAI	1
+0x690000	Car::InitDecalHashes	MITSUBISHI	2
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_MITSUBISHI	1
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_MAZDA	1
+0x690000	Car::InitDecalHashes	NISSAN	2
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_NISSAN	1
+0x690000	Car::InitDecalHashes	PEUGEOT	2
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_PEUGEOT	1
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_SUBARU	1
+0x690000	Car::InitDecalHashes	VOLKSWAGEN	2
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_VOLKSWAGEN	1
+0x690000	Car::InitDecalHashes	CARSELECT_MANUFACTURER_TOYOTA	1
+0x690000	Car::InitDecalHashes	EUROLITE	2
+0x690000	Car::InitDecalHashes	DECAL_ICON_EUROLITE	1
+0x690068	Car_Decal_Init	DECAL_ICON_JACKSON	1
+0x690068	Car_Decal_Init	JACKSONRACING	1
+0x690068	Car_Decal_Init	JSPAMERICA	1
+0x690068	Car_Decal_Init	DECAL_ICON_JSP	1
+0x690068	Car_Decal_Init	KENWOOD	2
+0x690068	Car_Decal_Init	DECAL_ICON_KENWOOD	1
+0x690068	Car_Decal_Init	KEYSTONE	2
+0x690068	Car_Decal_Init	DECAL_ICON_KONI	1
+0x690068	Car_Decal_Init	DECAL_ICON_KONIG	1
+0x690068	Car_Decal_Init	KVRPERFORMANCE	1
+0x690068	Car_Decal_Init	DECAL_ICON_KVR	1
+0x690068	Car_Decal_Init	DECAL_ICON_KYB	1
+0x690068	Car_Decal_Init	DECAL_ICON_MOMO	1
+0x690068	Car_Decal_Init	NEUSPEED	2
+0x690068	Car_Decal_Init	DECAL_ICON_NEUSPEED	1
+0x690068	Car_Decal_Init	NITROUS_EXPRESS	2
+0x690068	Car_Decal_Init	NITROUSEXPRESS	1
+0x690068	Car_Decal_Init	DECAL_ICON_NX	1
+0x690068	Car_Decal_Init	DECAL_ICON_OZ	1
+0x690068	Car_Decal_Init	DECAL_ICON_PIAA	1
+0x690068	Car_Decal_Init	PLASMAGLOW	2
+0x690068	Car_Decal_Init	PLASMA_GLOW	1
+0x690068	Car_Decal_Init	DECAL_ICON_PLASMAGLOW	1
+0x690068	Car_Decal_Init	SCORPION	2
+0x690068	Car_Decal_Init	DECAL_ICON_SCORPION	1
+0x690068	Car_Decal_Init	DECAL_ICON_SKUNK2	1
+0x690068	Car_Decal_Init	SPARCO	2
+0x690068	Car_Decal_Init	DECAL_ICON_SPARCO	1
+0x690068	Car_Decal_Init	STILLEN	2
+0x690068	Car_Decal_Init	DECAL_ICON_STILLEN	1
+0x690068	Car_Decal_Init	STREET_GLOW	1
+0x690068	Car_Decal_Init	STREETGLOW	2
+0x690068	Car_Decal_Init	DECAL_ICON_STREETGLOW	1
+0x690068	Car_Decal_Init	TOUCAN	2
+0x690068	Car_Decal_Init	TOYOTIRES	1
+0x690068	Car_Decal_Init	TOYO_TIRES	1
+0x690068	Car_Decal_Init	DECAL_ICON_TOYO	1
+0x690068	Car_Decal_Init	TURBONETICS	2
+0x690068	Car_Decal_Init	DECAL_ICON_TURBONETICS	1
+0x690068	Car_Decal_Init	VENOM	2
+0x690068	Car_Decal_Init	VINYL_ICON_VENOM	1
+0x690068	Car_Decal_Init	WILWOOD	2
+0x690068	Car_Decal_Init	WILLWOOD	1
+0x690068	Car_Decal_Init	DECAL_ICON_WILWOOD	1
+0x690068	Car_Decal_Init	WOLFRACE	2
+0x690068	Car_Decal_Init	WOLFRACEWHEELS	1
+0x690068	Car_Decal_Init	YOKOHAMA	2
+0x690068	Car_Decal_Init	DECAL_ICON_YOKOHAMA	1
+0x690068	Car_Decal_Init	ACURA	2
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_ACURA	1
+0x690068	Car_Decal_Init	DODGE	2
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_DODGE	1
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_FORD	1
+0x690068	Car_Decal_Init	HONDA	2
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_HONDA	1
+0x690068	Car_Decal_Init	HYUNDAI	2
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_HYUNDAI	1
+0x690068	Car_Decal_Init	MITSUBISHI	2
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_MITSUBISHI	1
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_MAZDA	1
+0x690068	Car_Decal_Init	NISSAN	2
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_NISSAN	1
+0x690068	Car_Decal_Init	PEUGEOT	2
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_PEUGEOT	1
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_SUBARU	1
+0x690068	Car_Decal_Init	VOLKSWAGEN	2
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_VOLKSWAGEN	1
+0x690068	Car_Decal_Init	CARSELECT_MANUFACTURER_TOYOTA	1
+0x690068	Car_Decal_Init	EUROLITE	2
+0x690068	Car_Decal_Init	DECAL_ICON_EUROLITE	1
+0x690200	Car::InitDecalIcons	KEYSTONE	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_KONI	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_KONIG	1
+0x690200	Car::InitDecalIcons	KVRPERFORMANCE	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_KVR	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_KYB	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_MOMO	1
+0x690200	Car::InitDecalIcons	NEUSPEED	2
+0x690200	Car::InitDecalIcons	DECAL_ICON_NEUSPEED	1
+0x690200	Car::InitDecalIcons	NITROUS_EXPRESS	2
+0x690200	Car::InitDecalIcons	NITROUSEXPRESS	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_NX	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_OZ	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_PIAA	1
+0x690200	Car::InitDecalIcons	PLASMAGLOW	2
+0x690200	Car::InitDecalIcons	PLASMA_GLOW	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_PLASMAGLOW	1
+0x690200	Car::InitDecalIcons	SCORPION	2
+0x690200	Car::InitDecalIcons	DECAL_ICON_SCORPION	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_SKUNK2	1
+0x690200	Car::InitDecalIcons	SPARCO	2
+0x690200	Car::InitDecalIcons	DECAL_ICON_SPARCO	1
+0x690200	Car::InitDecalIcons	STILLEN	2
+0x690200	Car::InitDecalIcons	DECAL_ICON_STILLEN	1
+0x690200	Car::InitDecalIcons	STREET_GLOW	1
+0x690200	Car::InitDecalIcons	STREETGLOW	2
+0x690200	Car::InitDecalIcons	DECAL_ICON_STREETGLOW	1
+0x690200	Car::InitDecalIcons	TOUCAN	2
+0x690200	Car::InitDecalIcons	TOYOTIRES	1
+0x690200	Car::InitDecalIcons	TOYO_TIRES	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_TOYO	1
+0x690200	Car::InitDecalIcons	TURBONETICS	2
+0x690200	Car::InitDecalIcons	DECAL_ICON_TURBONETICS	1
+0x690200	Car::InitDecalIcons	VENOM	2
+0x690200	Car::InitDecalIcons	VINYL_ICON_VENOM	1
+0x690200	Car::InitDecalIcons	WILWOOD	2
+0x690200	Car::InitDecalIcons	WILLWOOD	1
+0x690200	Car::InitDecalIcons	DECAL_ICON_WILWOOD	1
+0x690200	Car::InitDecalIcons	WOLFRACE	2
+0x690200	Car::InitDecalIcons	WOLFRACEWHEELS	1
+0x690200	Car::InitDecalIcons	YOKOHAMA	2
+0x690200	Car::InitDecalIcons	DECAL_ICON_YOKOHAMA	1
+0x690200	Car::InitDecalIcons	ACURA	2
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_ACURA	1
+0x690200	Car::InitDecalIcons	DODGE	2
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_DODGE	1
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_FORD	1
+0x690200	Car::InitDecalIcons	HONDA	2
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_HONDA	1
+0x690200	Car::InitDecalIcons	HYUNDAI	2
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_HYUNDAI	1
+0x690200	Car::InitDecalIcons	MITSUBISHI	2
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_MITSUBISHI	1
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_MAZDA	1
+0x690200	Car::InitDecalIcons	NISSAN	2
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_NISSAN	1
+0x690200	Car::InitDecalIcons	PEUGEOT	2
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_PEUGEOT	1
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_SUBARU	1
+0x690200	Car::InitDecalIcons	VOLKSWAGEN	2
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_VOLKSWAGEN	1
+0x690200	Car::InitDecalIcons	CARSELECT_MANUFACTURER_TOYOTA	1
+0x690200	Car::InitDecalIcons	EUROLITE	2
+0x690200	Car::InitDecalIcons	DECAL_ICON_EUROLITE	1
+0x6912d0		AUTOPRESS	1
+0x6912d0		MAG_ICONS_AUTOPRESS	1
+0x6912d0		CHROM_AND_FLAMMEN	1
+0x6912d0		MAG_ICONS_CHROM	1
+0x6912d0		MAG_ICONS_DUB	1
+0x6912d0		MAG_ICONS_HOT	1
+0x6912d0		IMPORT_RACER	1
+0x6912d0		MAG_ICONS_IMPORTRACER	1
+0x6912d0		IMPORT_TUNER	1
+0x6912d0		MAG_ICONS_IMPORTTUNER	1
+0x6912d0		MAXI_TUNING	1
+0x6912d0		MAG_ICONS_MAXI	1
+0x6912d0		MODIFIED_MAG	1
+0x6912d0		MAG_ICONS_MODIFIEDMAG	1
+0x6912d0		OPTION	1
+0x6912d0		MAG_ICONS_OPTION	1
+0x6912d0		SPORT_COMPACT_CAR	1
+0x6912d0		MAG_ICONS_SPORTCOMPACTCAR	1
+0x6912d0		STUFF	1
+0x6912d0		MAG_ICONS_STUFF	1
+0x6912d0		SUPER_STREET	1
+0x6912d0		MAG_ICONS_SUPERSTREET	1
+0x6912d0		MAG_ICONS_TURBOHIGHTECH	1
+0x6912d0		ELABORARE	1
+0x6912d0		MAG_ICONS_ELABORARE	1
+0x691600		STUFF	1
+0x691600		MAG_ICONS_STUFF	1
+0x691600		SUPER_STREET	1
+0x691600		MAG_ICONS_SUPERSTREET	1
+0x691600		MAG_ICONS_TURBOHIGHTECH	1
+0x691600		ELABORARE	1
+0x691600		MAG_ICONS_ELABORARE	1
+0x691740		MAG_ICONS_MODIFIEDMAG	1
+0x691740		MAG_ICONS_SPORTCOMPACTCAR	3
+0x691740		MAG_ICONS_CHROM	1
+0x691740		MAG_ICONS_TURBOHIGHTECH	2
+0x691740		MAG_ICONS_IMPORTTUNER	5
+0x691740		MAG_ICONS_IMPORTRACER	2
+0x691740		MAG_ICONS_SUPERSTREET	2
+0x691740		MAG_ICONS_HOT	3
+0x691740		MAG_ICONS_STUFF	1
+0x691740		MAG_ICONS_AUTOPRESS	1
+0x691740		MAG_ICONS_MAXI	2
+0x691740		MAG_ICONS_OPTION	1
+0x691740		MAG_ICONS_ELABORARE	2
+0x691740		MAG_ICONS_DUB	1
+0x692540	Car_DecalHashes_Init	BOTTOM_DECAL	1
+0x692540	Car_DecalHashes_Init	EXHAUST_TIP_DECAL	1
+0x692540	Car_DecalHashes_Init	FRONT_BUMPER_DECAL	1
+0x692540	Car_DecalHashes_Init	FRONT_DECAL	1
+0x692540	Car_DecalHashes_Init	GTWING_DECAL	1
+0x692540	Car_DecalHashes_Init	HOOD_DECAL	1
+0x692540	Car_DecalHashes_Init	LEFT_BRAKELIGHT_DECAL	1
+0x692540	Car_DecalHashes_Init	LEFT_DOOR_DECAL	1
+0x692540	Car_DecalHashes_Init	LEFT_FENDER_DECAL	1
+0x692540	Car_DecalHashes_Init	LEFT_QUARTER_DECAL	1
+0x692540	Car_DecalHashes_Init	LEFT_SIDE_MIRROR_DECAL	1
+0x692540	Car_DecalHashes_Init	LEFT_SKIRT_DECAL	1
+0x692540	Car_DecalHashes_Init	REAR_BUMPER_DECAL	1
+0x692540	Car_DecalHashes_Init	REAR_DECAL	1
+0x692540	Car_DecalHashes_Init	RIGHT_BRAKELIGHT_DECAL	1
+0x692540	Car_DecalHashes_Init	RIGHT_DOOR_DECAL	1
+0x692540	Car_DecalHashes_Init	RIGHT_FENDER_DECAL	1
+0x692540	Car_DecalHashes_Init	RIGHT_QUARTER_DECAL	1
+0x692540	Car_DecalHashes_Init	RIGHT_SIDE_MIRROR_DECAL	1
+0x692540	Car_DecalHashes_Init	RIGHT_SKIRT_DECAL	1
+0x692540	Car_DecalHashes_Init	TOP_DECAL	1
+0x692540	Car_DecalHashes_Init	FRONT_WINDOW_DECAL	1
+0x692540	Car_DecalHashes_Init	REAR_WINDOW_DECAL	1
+0x692540	Car_DecalHashes_Init	LEFT_FRONT_WINDOW_DECAL	1
+0x692540	Car_DecalHashes_Init	LEFT_REAR_WINDOW_DECAL	1
+0x692540	Car_DecalHashes_Init	RIGHT_FRONT_WINDOW_DECAL	1
+0x692540	Car_DecalHashes_Init	RIGHT_REAR_WINDOW_DECAL	1
+0x692d40		WorldObject	1
+0x692d90		WorldObject	1
+0x692df0		WorldObject	1
+0x692e20		WorldObject	1
+0x692e50	WorldObject_Init	WorldObject	1
+0x692e80		WorldObject	1
+0x692eb0		WorldObject	1
+0x692ee0		WorldObject	1
+0x692f10		WorldObject	1
+0x692f40		WorldObject	1
+0x6934f0	Car::InitializeParts	ALLCARS_BODY_1	1
+0x6934f0	Car::InitializeParts	ALLCARS_BODY_2	1
+0x6934f0	Car::InitializeParts	ALLCARS_BODY_3	1
+0x6934f0	Car::InitializeParts	ALLCARS_BODY_4	1
+0x6934f0	Car::InitializeParts	ALLCARS_BODY_5	1
+0x6934f0	Car::InitializeParts	ADVANCEDCLUTCH	1
+0x6934f0	Car::InitializeParts	ALPINE	1
+0x6934f0	Car::InitializeParts	AROSPEED	1
+0x6934f0	Car::InitializeParts	AUDIOBAHN	1
+0x6934f0	Car::InitializeParts	BILSTEIN	1
+0x6934f0	Car::InitializeParts	BORLA	1
+0x6934f0	Car::InitializeParts	BREMBO	1
+0x6934f0	Car::InitializeParts	DCSPORTS	1
+0x6934f0	Car::InitializeParts	EIBACHSPRINGS	1
+0x6934f0	Car::InitializeParts	GREDDY	1
+0x6934f0	Car::InitializeParts	HPRACING	1
+0x6934f0	Car::InitializeParts	JACKSONRACING	1
+0x6934f0	Car::InitializeParts	KNENGINEERING	1
+0x6934f0	Car::InitializeParts	KENWOOD	1
+0x6934f0	Car::InitializeParts	KEYSTONE	1
+0x6934f0	Car::InitializeParts	KVRPERFORMANCE	1
+0x6934f0	Car::InitializeParts	NEUSPEED	1
+0x6934f0	Car::InitializeParts	NITROUSEXPRESS	1
+0x6934f0	Car::InitializeParts	PLASMAGLOW	1
+0x6934f0	Car::InitializeParts	RACINGHART	1
+0x6934f0	Car::InitializeParts	SCORPION	1
+0x6934f0	Car::InitializeParts	SPARCO	1
+0x6934f0	Car::InitializeParts	STILLEN	1
+0x6934f0	Car::InitializeParts	STREETGLOW	1
+0x6934f0	Car::InitializeParts	EUROLITE	1
+0x6934f0	Car::InitializeParts	TOYOTIRES	1
+0x6934f0	Car::InitializeParts	TURBONETICS	1
+0x6934f0	Car::InitializeParts	VENOM	1
+0x6934f0	Car::InitializeParts	WILLWOOD	1
+0x6934f0	Car::InitializeParts	WOLFRACEWHEELS	1
+0x6934f0	Car::InitializeParts	YOKOHAMA	1
+0x6934f0	Car::InitializeParts	ABSDYNAMICS	1
+0x6934f0	Car::InitializeParts	CLUTCHMASTERS	1
+0x6934f0	Car::InitializeParts	HENSHINAUTO	1
+0x6934f0	Car::InitializeParts	JSPAMERICA	1
+0x6934f0	Car::InitializeParts	EXTREMEDIMENSIONS	1
+0x6934f0	Car::InitializeParts	KUMOTIRES	1
+0x6934f0	Car::InitializeParts	STUFF_VINYL	1
+0x6934f0	Car::InitializeParts	AUTOZONE_VINYL	1
+0x6934f0	Car::InitializeParts	HEIRO_VINYL	1
+0x6934f0	Car::InitializeParts	CUSTOM10	1
+0x6934f0	Car::InitializeParts	CUSTOM14	1
+0x6934f0	Car::InitializeParts	CUSTOM17	1
+0x6934f0	Car::InitializeParts	CUSTOM20	1
+0x6934f0	Car::InitializeParts	CUSTOM21	1
+0x6934f0	Car::InitializeParts	CUSTOM22	1
+0x6934f0	Car::InitializeParts	CUSTOM2	1
+0x6934f0	Car::InitializeParts	CUSTOM1	1
+0x6934f0	Car::InitializeParts	CUSTOM3	1
+0x6934f0	Car::InitializeParts	CUSTOM4	1
+0x6934f0	Car::InitializeParts	CUSTOM8	1
+0x6934f0	Car::InitializeParts	CUSTOM12	1
+0x6934f0	Car::InitializeParts	CUSTOM13	1
+0x6934f0	Car::InitializeParts	CUSTOM15	1
+0x6934f0	Car::InitializeParts	CUSTOM16	1
+0x6934f0	Car::InitializeParts	CUSTOM18	1
+0x6934f0	Car::InitializeParts	CUSTOM19	1
+0x6934f0	Car::InitializeParts	CUSTOM23	1
+0x696140	Texture_Init	Texture	1
