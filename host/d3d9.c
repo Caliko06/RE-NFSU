@@ -1075,9 +1075,12 @@ static void flow_log(Ctx *c) {
 // [0x7361bc] (the player array), car [ctrl+4], driver [car+0x2c]; 0x42c4b0 takes the route from driver vtable slot 0x20
 // (AI driver 0x44a310 = [driver+0x3e4], human driver 0x59bfb0 = [driver+0x44]): +4 node count, +8 node pointers, node+0x58
 // its route distance. One line a second, and one per airborne sample (car+0x3cc wheels on the ground == 0) or camera mode
-// change (ctrl+0x60). span = the node indices 0x42c4b0 chose (ctrl+0x5c8/0x5cc; -1 when its last call failed: no 5 nodes
-// over 75 m ahead). Without RN_JCLOG only the camera mode changes are logged (always on, so the OWNER's own play shows
-// in build/web.log each jump camera they got).
+// change (ctrl+0x60). cam/span = the route clone and node indices 0x42c4b0 chose (ctrl+0x5c4, 0x5c8/0x5cc). During modes 6 and 7
+// they read 0 and -1: 0x42dd11 calls 0x42c640, which frees them right after the mover copied what it needs, so that is normal and
+// not a failed call. eye = ctrl+0x560..0x568, the fixed eye of the shot; fov = the word at [[ctrl+0x27c]+0x1c]+0xc4 (ctrl+0x27c
+// is the active mover, 0x42c6bd; mover+0x1c its camera view; 0x485ff1 writes it, 16 bits); rp = car+0x810, which 0x42cb34
+// copies into the mover: these tell whether the view degenerated. Without RN_JCLOG only the camera mode changes are logged
+// (always on, so the OWNER's own play shows in build/web.log each jump camera they got).
 static void jumpcam_log(Ctx *c) {
     static int on = -1; static uint32_t last, mode = ~0u, air;
     if (on < 0) on = getenv("RN_JCLOG") != NULL ? 2 : 1;
@@ -1086,19 +1089,38 @@ static void jumpcam_log(Ctx *c) {
     if (!drv) return;
     uint32_t slot = ld(c, ld(c, drv, 4) + 0x20, 4), route = ld(c, drv + (slot == 0x59bfb0 ? 0x44 : 0x3e4), 4), n = route ? ld(c, route + 4, 4) : 0;
     uint32_t m = ld(c, ctrl + 0x60, 4), wheels = ld(c, car + 0x3cc, 4), now = rn_telem.presents;
+    uint32_t mover = ld(c, ctrl + 0x27c, 4), view = mover ? ld(c, mover + 0x1c, 4) : 0;
     int airborne = on == 2 && wheels == 0 && now >= air + 8;
     if ((on < 2 || now < last + 60) && m == mode && !airborne) return;
     if (airborne) air = now;
     last = now, mode = m;
     rn_log("JC f%u mode %u wheels %u speed %.1f pos %.0f,%.0f,%.0f yaw %d drv %08x vt %08x slot20 %08x route %08x nodes %u last %.0f m "
-           "cam %08x span %d..%d 7361e8 %u 78a3fa %u", now, m, wheels, ldf(c, car + 0x3d4), ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), (int16_t)ld(c, car + 0x3b4, 2), drv,
+           "cam %08x span %d..%d 7361e8 %u 78a3fa %u eye %.0f,%.0f,%.0f fov %d rp %.2f", now, m, wheels, ldf(c, car + 0x3d4), ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), (int16_t)ld(c, car + 0x3b4, 2), drv,
            ld(c, drv, 4), slot, route, n, n && n < 4096 ? ldf(c, ld(c, route + 8 + (n - 1) * 4, 4) + 0x58) : 0.0f,
-           ld(c, ctrl + 0x5c4, 4), (int)ld(c, ctrl + 0x5c8, 4), (int)ld(c, ctrl + 0x5cc, 4), ld(c, 0x7361e8, 4), ld(c, 0x78a3fa, 1));
+           ld(c, ctrl + 0x5c4, 4), (int)ld(c, ctrl + 0x5c8, 4), (int)ld(c, ctrl + 0x5cc, 4), ld(c, 0x7361e8, 4), ld(c, 0x78a3fa, 1),
+           ldf(c, ctrl + 0x560), ldf(c, ctrl + 0x564), ldf(c, ctrl + 0x568), view ? (int)ld(c, view + 0xc4, 2) : -1, ldf(c, car + 0x810));
+}
+// Probe for walls crossed at speed (exit: delete when that bug is decided). Silent caps can drop a wall: the car's polygon cache 0x4407b0 holds
+// 0xa0 (car+0x7e0 total, +0x7e4 ground, +0x7e8 walls, +0x7ec rest; 0x441660 drops by cell order, not distance) and the shared pools
+// [0x72cbf4] polygon bodies (0xa0) and [0x72cc00] witnesses (0x100) (+0x18 used, +0x1c peak, +0x2c size). One line when one of them
+// is full, at most every 30 frames, at 40 m/s or more; a crossing with no WALLCAP line near it clears the caps.
+static void wallcap_log(Ctx *c) {
+    static uint32_t last;
+    uint32_t ctrl = ld(c, 0x77a920, 4) == 6 ? ld(c, 0x7361bc, 4) : 0, car = ctrl ? ld(c, ctrl + 4, 4) : 0, now = rn_telem.presents;
+    uint32_t pb = ld(c, 0x72cbf4, 4), pw = ld(c, 0x72cc00, 4);
+    if (!car || !pb || !pw || now < last + 30 || ldf(c, car + 0x3d4) < 40.0f) return;
+    uint32_t n = ld(c, car + 0x7e0, 4), bu = ld(c, pb + 0x18, 4), wu = ld(c, pw + 0x18, 4);
+    if (n < 0xa0 && bu < ld(c, pb + 0x2c, 4) && wu < ld(c, pw + 0x2c, 4)) return;
+    last = now;
+    rn_log("WALLCAP f%u speed %.1f pos %.0f,%.0f,%.0f vz %.1f cache %u ground %u walls %u rest %u bodies %u peak %u witness %u peak %u", now, ldf(c, car + 0x3d4),
+           ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), ldf(c, car + 0x78), n, ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4),
+           bu, ld(c, pb + 0x1c, 4), wu, ld(c, pw + 0x1c, 4));
 }
 static void roadrefl_frame(void);
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     jumpcam_log(c);
+    wallcap_log(c);
     tune_apply(c);
     fov_frame(c);
     hfov_frame(c);

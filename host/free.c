@@ -872,14 +872,81 @@ static uint32_t free_hud(Ctx *c) {
 }
 
 // The jump and crash cameras (PATCH 0x426dd7, 0x4662e0, cave 0x5567e3: jmp [SCREEN_ADDR+0x94]) ask 0x42c4b0 (esi = camera ctrl) for the
-// JUMPVIEW spline, built from TrackPath route nodes with no collision after placement: in the city it sits inside buildings. In free
-// mode the answer was 0 (the chase camera stays, no jump shot at all; the OWNER 2026-10-30: "there is no jump cam"). Now RN_JUMPCAM (page
-// ?jumpcam=, default 1) lets the original call run in free mode too, so 0x426930 -> 0x42da40(6) -> mover 0xf shows the jump shot as in a race
-// (docs/re/camera_jump.md); RN_JUMPCAM=0 keeps the old answer 0. RN_FREE=0 or a race: always the original call.
+// JUMPVIEW route: a clone of the driver's TrackPath nodes (ctrl+0x5c4: +4 count, +8 node pointers), the node nearest the car k (ctrl+0x5c8)
+// and the first node 75 m or more past it (ctrl+0x5cc). The shot 0x42da40(6) -> 0x42c6d0(ctrl, 0xf, 1) then puts the eye, fixed for the
+// whole shot, on one road edge of node e = [5cc] - 2 (e = [5cc] when [5cc] - k < 5, case 0x42ca9b) and looks at the car with no wall
+// check. The game has a portal test for that (0x457300: the car -> eye segment must cross the cross-section [node+0x20, node+0x3c] of
+// every node k..e-1), tries the other road edge when it fails and then uses that edge unchecked. In a city, 80 to 100 m along a road that
+// bends, the view is buildings. docs/re/camera_jump.md.
+// Free mode (live; a race or RN_FREE=0 is the exact original call): after the original call, walk e from the game's eye node back toward
+// k and keep the first e whose eye (the edge the game would use, 0x42cd24..0x42cf6e) passes that portal test and is 30 m or more from the
+// car; [5cc] is set so the game takes it. None: the clone is freed (0x42c640) and the answer is 0, so the chase camera stays.
+#define JUMP_MIN_M 30.0f
+static uint32_t jump_scr;   // 3 x 16 bytes of guest memory: the eye's left end, right end and the candidate the portal test reads
+
+// A guest method that returns a float in st(0) (thiscall, one stack argument): read and pop the x87 result.
+static float guest_float(Ctx *c, uint32_t fn, uint32_t self, uint32_t arg) {
+    uint32_t ecx = c->r[ECX];
+    c->r[ECX] = self;
+    call_guest(c, fn, 1, &arg);
+    c->r[ECX] = ecx;
+    float v = (float)*fr(c, 0);
+    fpop(c);
+    return v;
+}
+
+// 0x5a7270 (esi = node): the world point at lateral offset lat from the node's route position, three floats to out.
+static void node_point(Ctx *c, uint32_t node, float lat, uint32_t lane, uint32_t out) {
+    uint32_t esi = c->r[ESI], a[4] = {out, ld(c, node + 0x58, 4), 0, lane};
+    memcpy(&a[2], &lat, 4);
+    c->r[ESI] = node;
+    call_guest(c, 0x5a7270, 4, a);
+    c->r[ESI] = esi;
+}
+
+// Does the game's own portal test 0x457300 (eax = first node, ecx = route; the car and eye points, last node) pass for the eye
+// placed at the edge the game takes first (the one less far ahead along car+0x70..0x78, 0x42cdb1..0x42ce3c) or, when that fails,
+// at the other edge (0x42cf12)? Returns the used edge's distance to the car in metres, or -1 when both fail.
+static float eye_check(Ctx *c, uint32_t route, int k, int e, uint32_t car, uint32_t lane) {
+    uint32_t node = ld(c, route + 8 + 4 * e, 4), vt = ld(c, node, 4), ends[2] = {jump_scr, jump_scr + 16}, eye = jump_scr + 32;
+    float off = ldf(c, 0x6b7aac), dot[2];
+    node_point(c, node, guest_float(c, ld(c, vt + 0xc, 4), node, lane) - off, lane, ends[0]);    // left end: vt[+0xc] - 2.0
+    node_point(c, node, guest_float(c, ld(c, vt + 8, 4), node, lane) + off, lane, ends[1]);      // right end: vt[+8] + 2.0
+    for (int s = 0; s < 2; s++) {
+        dot[s] = 0;
+        for (int a = 0; a < 3; a++) dot[s] += (ldf(c, ends[s] + 4 * a) - ldf(c, car + 0x60 + 4 * a)) * ldf(c, car + 0x70 + 4 * a);
+    }
+    int first = dot[0] <= dot[1] ? 0 : 1;
+    for (int t = 0; t < 2; t++) {
+        uint32_t end = ends[first ^ t], args[3] = {car + 0x60, eye, (uint32_t)(e - 1)}, eax = c->r[EAX], ecx = c->r[ECX];
+        memcpy(c->mem + eye, c->mem + end, 12);
+        c->r[EAX] = (uint32_t)k, c->r[ECX] = route;
+        uint32_t ok = call_guest_cdecl(c, 0x457300, 3, args) & 0xff;
+        c->r[EAX] = eax, c->r[ECX] = ecx;
+        if (ok) return hypotf(ldf(c, end) - ldf(c, car + 0x60), ldf(c, end + 4) - ldf(c, car + 0x64));
+    }
+    return -1;
+}
+
 static uint32_t free_jumpcam(Ctx *c) {
-    static int off = -1;
-    if (off < 0) { const char *e = getenv("RN_JUMPCAM"); off = e && e[0] == '0'; }
-    return live && off ? 0 : call_guest(c, 0x42c4b0, 0, NULL);
+    uint32_t ret = call_guest(c, 0x42c4b0, 0, NULL), ctrl = c->r[ESI];
+    if (!live || !(ret & 0xff)) return ret;
+    if (!jump_scr) jump_scr = guest_alloc(64);
+    uint32_t route = ld(c, ctrl + 0x5c4, 4), car = ld(c, ctrl + 4, 4), drv = ld(c, car + 0x2c, 4), zero = 0;
+    int k = (int)ld(c, ctrl + 0x5c8, 4), end = (int)ld(c, ctrl + 0x5cc, 4), e0 = end - k >= 5 ? end - 2 : end, e = e0;
+    uint32_t ecx = c->r[ECX];
+    c->r[ECX] = drv;                                                                     // the lane the game puts the eye on: 0x42cae9, driver vt[+0x1c](0), at least 0
+    int lane = (int)call_guest(c, ld(c, ld(c, drv, 4) + 0x1c, 4), 1, &zero);
+    c->r[ECX] = ecx;
+    float dist = 0;
+    for (; e > k; e--)
+        if ((dist = eye_check(c, route, k, e, car, lane > 0 ? (uint32_t)lane : 0)) >= JUMP_MIN_M) break;
+    if (e > k && e != e0) st(c, ctrl + 0x5cc, e - k <= 4 ? (uint32_t)e : (uint32_t)e + 2, 4);   // [5cc] - k < 5 gives e; otherwise [5cc] = e + 2 gives e (0x42ca9b)
+    rn_log("JCPICK f%u k %d end %d eye %d of orig %d dist %.0f m %s", rn_telem.presents, k, (int)ld(c, ctrl + 0x5cc, 4), e > k ? e : -1, e0,
+           e > k ? dist : 0.0f, e > k ? "clear" : "refused");
+    if (e > k) return ret;
+    call_guest(c, 0x42c640, 0, NULL);                                                    // frees the clone, [5c4] = 0, [5c8] = [5cc] = -1 (reads esi only)
+    return 0;
 }
 
 uint32_t world_rows(Ctx *c), world_lang(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
