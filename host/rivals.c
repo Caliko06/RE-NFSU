@@ -498,8 +498,9 @@ static void ai_log(Ctx *c) {
             if (type < 36 && !(seen[type] & 1)) { seen[type] |= 1, all++; if (m < 480) m += snprintf(names + m, sizeof names - m, " %s", G(tab + 0xc90 * type)); }
             if (type < 36 && d < 250 && !(seen[type] & 2)) seen[type] |= 2, kinds++;
         }
-        rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d%s", rn_telem.presents, total, parked, near, close, all, kinds,
-               n_refill, n_refail, n_react[0], n_react[1], n_react[2], rn_telem.presents % 3000 == 0 ? names : "");
+        uint32_t bodies = ld(c, 0x736184, 4);       // TrackPolygonSlotPool 0x4412b0: slots in use, high-water mark, cap (docs/openworld/re_coll_pool.md)
+        rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d polys %u polymax %u polycap %u%s", rn_telem.presents, total, parked, near, close, all, kinds,
+               n_refill, n_refail, n_react[0], n_react[1], n_react[2], bodies ? ld(c, bodies + 0x18, 4) : 0, bodies ? ld(c, bodies + 0x1c, 4) : 0, bodies ? ld(c, bodies + 0x2c, 4) : 0, rn_telem.presents % 3000 == 0 ? names : "");
     }
 }
 
@@ -589,16 +590,25 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
 // its lane within 5 m, so a player closing from behind is never seen and a head-on is seen at the last moment. Its neighbour list (0x57a910) is empty between AI updates, so this
 // reads positions and velocities: a traffic car with the player on its line (under 2 m aside), closing from behind 0.6..2.5 s from impact, or head-on 0.6..3 s from impact at 10 m/s
 // or more, takes a neighbour lane with no car beside it, as its own avoid update does (0x453c60: lane test 0x5a7700, ctx+0x394, route state ctx+0x398 = 1); glued behind it (under
-// 12 m, closing under 5 m/s, above 8 m/s) it stays. All three sound the horn with the light flag (0x429100, thiscall on the car; the head flare ignores it, 0x5693b0 says on for every
-// traffic car). Outside the career, as the personas; each car once in YIELD_WAIT frames.
+// 12 m, closing under 5 m/s, above 8 m/s) it stays. All three sound the horn with the light flag (0x429100, thiscall on the car). Outside the career, as the personas; each car once in YIELD_WAIT frames.
 #define YIELD_WAIT 240
 void traffic_tick(Ctx *c) {
     static int off = -1;
     static uint32_t seed = 0x51ed2701;
-    static struct { uint32_t car, frame; } seen[32];
+    static struct { uint32_t car, frame; int flash; } seen[32];
     ai_log(c);
     handling_data(c);
     if (off < 0) { const char *e = getenv("RN_TRAFYIELD"); off = e && e[0] == '0'; }
+    // The head flare follows +0x855 only if 0x5693b0 stops saying "on" for traffic (byte 0x5693b7 75 -> eb, not patched yet: docs/re/traffic_limits.md). +0x855 = the flash phase of
+    // 0x429190, else the base +0x854, which nothing in the game writes: on for traffic, and off for a car in its flash, or the flash would have no dark phase.
+    if (rn_telem.presents % 6 == 0 && ld(c, 0x77a920, 4) == 6)
+        for (uint32_t h0 = ld(c, 0x7361f8, 4), r = h0 ? ld(c, h0, 4) : 0, k = 0; r && r != h0 && k < 200; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4);
+            if (!e || ld(c, e + 4, 4) != 3) continue;
+            int on = 1;
+            for (int s = 0; s < 32 && seen[s].car; s++) on &= !(seen[s].car == r && seen[s].flash && rn_telem.presents < seen[s].frame + 48);
+            c->mem[r + 0x854] = (uint8_t)on;
+        }
     if (off || rn_telem.presents % 6 || ld(c, 0x77a920, 4) != 6 || c->mem[0x78a33c]) return;
     uint32_t h = ld(c, 0x7361f8, 4), me = 0;
     for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !me; r = ld(c, r, 4), k++) {
@@ -627,7 +637,7 @@ void traffic_tick(Ctx *c) {
         int s = 0;
         while (s < 31 && seen[s].car && seen[s].car != r) s++;
         if (seen[s].car == r && rn_telem.presents < seen[s].frame + YIELD_WAIT) continue;
-        seen[s].car = r, seen[s].frame = rn_telem.presents;
+        seen[s].car = r, seen[s].frame = rn_telem.presents, seen[s].flash = 0;
         int beside = 0;                        // any car next to it (0x453ba0's scan reads the neighbour list, empty here)
         for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200; o = ld(c, o, 4), j++) {
             float ox = ldf(c, o + 0x50) - x, oy = ldf(c, o + 0x54) - y, oa = (ox * vx + oy * vy) / sp, os = fabsf(ox * vy - oy * vx) / sp;
@@ -644,6 +654,7 @@ void traffic_tick(Ctx *c) {
         if (!to && !glued && !dodge) continue;
         uint32_t honk[6] = {0x3e99999a, 0x3e19999a, 0x3e99999a, 1, 1, 1};              // 0.3, 0.15, 0.3 s; lights, horn, gap
         c->r[ECX] = r, call_guest(c, 0x429100, 6, honk);
+        seen[s].flash = 1;
         n_react[yield ? 0 : dodge ? 1 : 2]++;
         if (getenv("RN_FREELOG") || getenv("RN_RIVALLOG"))
             rn_log("trafreact %s %08x: lane %u -> %u, gap %.1f m, rel %.1f m/s, off %.1f m, frame %u", yield ? "yield" : dodge ? "dodge" : "glued", r, lane, to, gap, rel, off, rn_telem.presents);

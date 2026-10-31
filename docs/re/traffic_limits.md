@@ -105,3 +105,8 @@ and it is in the traffic car's slot list. The older "within 50 m" is not what th
 
 To flash and honk from the host: `0x429100` with ecx = traffic car, A = 0.3, B = 0.15, C = 0.3, lights = 1, horn = 1, gap = 1
 (chosen values, not game values). It is silently ignored if the last arm is too recent.
+
+## Flash visible: one byte (not applied, tools/recomp/patches.py is the orchestrator's)
+0x5693b0 (C): `cmp [ecx+4],3 / jne +3 / mov al,1 / ret / mov al,[eax+0x855]`: a traffic car's head flare is always on (caller 0x56da42 in 0x56d8d0), so 0x429100's lights flag cannot show.
+Byte 0x5693b7 `75` -> `eb` makes every car read +0x855. host/rivals.c traffic_tick already keeps the base +0x854 at 1 for traffic and at 0 for 48 frames during a flash, so the lights blink.
+Without the byte nothing changes on screen; the horn works either way.
