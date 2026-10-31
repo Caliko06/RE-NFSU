@@ -1002,9 +1002,20 @@ static void chase_rows(Ctx *c) {
         stf(c, a + 4, ldf(c, a + 4) * CHASE_KD); stf(c, a + 8, ldf(c, a + 8) + CHASE_DH); st(c, a + 2, CHASE_PITCH, 2);
     }
 }
+static uint32_t up_bytes, up_max, up_size, up_caller, up_flags, up_n, lock_caller, lock_flags;
+static void upload_log(void) {
+    static uint32_t last;
+    if (up_bytes > (4u << 20) && rn_telem.presents > last + 120) {
+        last = rn_telem.presents;
+        rn_log("BIGUPLOAD f%u %u KB in %u uploads; biggest %u KB of a %s of %u KB, Lock from %08x flags %x", rn_telem.presents, up_bytes >> 10, up_n,
+               up_max >> 10, up_flags >> 31 ? "IB" : "VB", up_size >> 10, up_caller, up_flags & 0xffff);
+    }
+    up_bytes = up_max = up_n = 0;
+}
 static void roadrefl_frame(void);
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
+    upload_log();
     jumpcam_log(c);
     chase_rows(c);
     wallcap_log(c);
@@ -1474,10 +1485,14 @@ static int resident_on(void) {
 #endif
 }
 static int resident(const Obj *o) { return o && resident_on() && !(o->usage & U_DYNAMIC); }
+// Probe for the WORLD lag spans (OWNER session 20-02: 10x the command words per second, half the main thread's guest time; exit:
+// delete when that lag is decided): bytes re-sent by buffer_upload this frame, and the biggest one with the guest caller of its Lock.
 static void buffer_upload(Ctx *c, Obj *o) {
     uint32_t lo = o->dlo & ~3u, hi = (o->dhi + 3) & ~3u, n = hi - lo;
     o->dlo = o->dhi = 0;
     if (!n) return;
+    up_bytes += n; up_n++;
+    if (n > up_max) up_max = n, up_size = o->size, up_caller = lock_caller, up_flags = lock_flags | (o->type == 7 ? 0x80000000u : 0);
     uint32_t *w = calloc(3 + n / 4, 4);
     w[0] = idx(o) + 1; w[1] = lo; w[2] = n;
     memcpy(w + 3, G(lock_mem(o) + lo), hi <= o->size ? n : o->size - lo);
@@ -1515,6 +1530,7 @@ static uint32_t buffer_lock(Ctx *c, Obj *o) {
     uint32_t off = ARG(1), size = ARG(2), out = ARG(3);
     if (!out || off > o->size || (size && off + size > o->size)) return D3DERR_INVALIDCALL;
     o->locked++;
+    lock_caller = ld(c, c->r[ESP], 4), lock_flags = ARG(4);
     st(c, out, lock_mem(o) + off, 4);
     static uint32_t ver_clock;   // one clock for every buffer: a reused slot at a reused address never repeats a smooth key
     if (!(ARG(4) & 0x10)) o->ver = ++ver_clock;
