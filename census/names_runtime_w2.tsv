@@ -1,0 +1,60 @@
+addr	name	system	confidence	evidence	tool	doc
+0x43a360	OnlineManager::Update	runtime	V	V: string "OnlineManager::Update" passed to scope-op at entry; switch on state *this (1,5,6,7) driving racer finish/timers; caller GameFlow::MainLoop	Ghidra dossier	
+0x67604e	CRT::_output	runtime	V	V: printf core: state table DAT_006ac5c8 indexed by char class DAT_006ac5a8, cases parse flags (' ','#','+','-','0'), width '*', precision, 'I64' size prefix, then write_char	Ghidra dossier	
+0x6767f9	CRT::_input	runtime	V	V: scanf core; sole caller _sscanf; uses isdigit/isxdigit/isspace/mbtowc, __inc, 64-bit multiply for number conversion	Ghidra dossier	
+0x679c5c	CRT::__tzset	runtime	V	V: __lock(7), getenv "TZ" (DAT_006ac77c), GetTimeZoneInformation, sets timezone globals, frees old tz string	Ghidra dossier	
+0x6808d7	CRT::__convertcp	runtime	V	V: sig (fromCP,toCP,str,&len,out,flag); calls GetCPInfo, calloc, memset; callers ___crtLCMapStringA and ___crtGetStringTypeA	Ghidra dossier	
+0x681f42	CRT::__getlocaleinfo	runtime	V	V: param 0/1 selects int vs string result of ___crtGetLocaleInfoW/A into out buffer; callers __init_numeric/__init_monetary/__get_lc_time	Ghidra dossier	
+0x6743e3	CRT::_expandlocale	runtime	I	I: sole caller _setlocale; parses locale string with strpbrk/strcspn/strncmp/strncpy	Ghidra dossier	
+0x67b645	CRT::FindHandler	runtime	I	I: sole caller ___InternalCxxFrameHandler; uses GetRangeOfTrysToCheck, TypeMatch, CatchIt, DestructExceptionObject	Ghidra dossier	
+0x67ff4b	CRT::__report_gsfailure	runtime	V	V: strings "A buffer overrun has been detected..." / "A security error of unknown cause..." plus title "Microsoft Visual C++ Runtime Library"; shows crtMessageBoxA then _exit	Ghidra dossier	
+0x6806ac	CRT::__lock_fhandle	runtime	V	V: lazily InitCritSecAndSpinCount(4000) on ioinfo entry under __lock(10), then EnterCriticalSection on (&DAT_00793240)[fh>>5]; callers _write/_read/_lseek/_close/_commit	Ghidra dossier	
+0x67fc40	CRT::abort	runtime	V	V: __NMSG_WRITE(10); raise(0x16 SIGABRT); _exit(3); caller terminate	Ghidra dossier	
+0x680dfe	CRT::__crtCompareStringA	runtime	I	I: sole caller __mbsnbicoll; uses strncnt, malloc/free	Ghidra dossier	
+0x681236	CRT::__crtsetenv	runtime	I	I: calls findenv, copy_environ, realloc, strcpy, __mbschr (putenv core)	Ghidra dossier	
+0x677fc7	CRT::__write_lk	runtime	I	I: sole caller __write; lseeki64_lk, dosmaperr	Ghidra dossier	
+0x678aac	CRT::__read_lk	runtime	I	I: sole caller __read; lseek_lk, dosmaperr	Ghidra dossier	
+0x67939b	CRT::__close_lk	runtime	I	I: sole caller __close; get_osfhandle, free_osfhnd, dosmaperr	Ghidra dossier	
+0x67f3c2	CRT::LangCountryEnumProc	runtime	I	I: sole caller _GetLcidFromLangCountry; stricmp/strnicmp, LcidFromHexString	Ghidra dossier	
+0x67f5e2	CRT::LanguageEnumProc	runtime	I	I: sole caller _GetLcidFromLanguage; stricmp, LcidFromHexString	Ghidra dossier	
+0x67f2b1	CRT::CountryEnumProc	runtime	I	I: sole caller _GetLcidFromCountry; stricmp, LcidFromHexString	Ghidra dossier	
+0x681941	CRT::__except1	runtime	I	I: sole caller __startOneArgErrorHandling; raise_exc, ctrlfp	Ghidra dossier	
+0x679757	CRT::setSBUpLow	runtime	I	I: calls ___crtLCMapStringA and ___crtGetStringTypeA to fill single-byte upper/lower tables; part of mbcp setup	Ghidra dossier	
+0x675614	CRT::__ioinit	runtime	I	I: caller WinMainCRTStartup; malloc + InitCritSecAndSpinCount for ioinfo arrays	Ghidra dossier	
+0x675aa7	CRT::__mtinit	runtime	I	I: caller WinMainCRTStartup; __mtinitlocks + calloc	Ghidra dossier	
+0x671155	CRT::free_unlock_finally	runtime	V	V: body is __unlock(4); only callers _free and thunk__free (heap lock release)	Ghidra dossier	
+0x6711e5	CRT::heap_alloc_unlock_finally	runtime	V	V: body is __unlock(4); only caller __heap_alloc	Ghidra dossier	
+0x689e20	RacerRecord::StaticInitArray77b1a0	runtime	V	V: eh_vector_constructor_iterator(&DAT_0077b1a0, 0x28, 4, ctor 0x43db80, dtor RacerRecord::~RacerRecord) then atexit; static initializer for 4 RacerRecords	Ghidra dossier	
+0x6832d0	AsyncFile::LoadAtChunkCallback	runtime	I	I: strings "ASYNCFILE_load[at] - unable to initiate file read/close"; chunked 0x2000 read, re-registers itself as callback	Ghidra dossier	
+0x6833a0	AsyncFile::LoadChunkCallback	runtime	I	I: strings "ASYNCFILE_load - unable to initiate file read/close", "ASYNCFILEBUF" allocation	Ghidra dossier	
+0x683460	AsyncFile::LoadAtOpenCallback	runtime	I	I: strings "ASYNCFILE_load - unable to initiate file size get", "ASYNCFILE_loadat - unable to initiate file read"; step after open	Ghidra dossier	
+0x404bd0	Config::ReadFileAndParse	runtime	V	V: fopen/fseek/ftell/malloc/fread whole file into buffer plus 4 zero bytes, passes it to parser 0x404db0, frees; error "Could not open [%s] with params [%s]"	Ghidra dossier	
+0x405260	Config::ParseIntArg	runtime	V	V: pops next arg; "0x" prefix uses sscanf "%X", else atoi after isdigit/'-' check; errors "Not enough arguments %s" / "Expected a number but found %s %s"	Ghidra dossier	
+0x405300	Config::ParseFloatArg	runtime	V	V: pops next arg, sscanf "%f"; error "Not enough arguments %s"; sibling of 0x405260	Ghidra dossier	
+0x4051a0	Config::DescribeLocation	runtime	V	V: sprintf "line %d in %s" into DAT_0078ee40 for error messages	Ghidra dossier	
+0x404db0	Config::ParseScript	runtime	I	I: strings "Unterminated quotes %s", "No command %s", "INCLUDESCRIPT:"; called by 0x404bd0 with file buffer	Ghidra dossier	
+0x401190	Registry::ReadInstallSettings	runtime	V	V: RegOpenKeyEx HKLM "Software\EA Games\Need For Speed Underground" then queries "Install Dir", "CD Drive", "CacheSize", "SwapSize", "Language", "StreamingInstall"	Ghidra dossier	
+0x401110	GameFlow::InitMainPoolAndTimer	runtime	V	V: bInitMemoryPool(0,"Main Pool") once (flag DAT_007349b0), EAsys_TimerInit(100); sole caller GameFlow::InitSubsystems	Ghidra dossier	
+0x63a5d0	EAFile_QueueOpen	runtime	V	V: AllocateOp type 0, copies path, strchr '|' check, queues on device slot (*0xac + DAT_0070f36c) with log "FILE_queueop - ATTEMPT TO QUEUE FILEOP ON NON-EXISTANT DEVICE"	Ghidra dossier	
+0x63a690	EAFile_QueueClose	runtime	V	V: AllocateOp type 1 with handle; AsyncFile callback 0x6832d0 logs "unable to initiate file close" when this returns 0	Ghidra dossier	
+0x63a700	EAFile_QueueRead	runtime	V	V: AllocateOp type 2 with handle, buffer, size, offset; callback 0x6832d0 logs "unable to initiate file read" when it returns 0	Ghidra dossier	
+0x63a800	EAFile_QueueGetSize	runtime	I	I: AllocateOp type 4 with handle; caller 0x683460 logs "unable to initiate file size get"	Ghidra dossier	
+0x6836a0	AsyncFile::Load	runtime	V	V: takes a request block from free list under CriticalSection (DAT_00717f18), logs 'ASYNCFILE_load - out of async request blocks' / 'unable to initiate file open', queues EAFile open 0x63a5d0 with callback 0x683460	Ghidra dossier	
+0x683a60	AsyncFile::Release	runtime	V	V: validates request id (&0xff index, 0x30 stride), logs 'ASYNCFILE_release - release called more than once for this request', returns size/status and frees block	Ghidra dossier	
+0x6832b0	AsyncFile::CompleteOpCallback	runtime	I	I: calls EAFile_CompleteOp on request's op then 0x683260; used as continuation by AsyncFile callbacks 0x6832d0/0x6833a0/0x683460	Ghidra dossier	
+0x673fd1	CRT::updatetlocinfo_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller ___updatetlocinfo (SEH finally block of that function)	Ghidra dossier	
+0x67470b	CRT::setlocale_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller _setlocale (SEH finally block of that function)	Ghidra dossier	
+0x67488c	CRT::vfprintf_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller _vfprintf (SEH finally block of that function)	Ghidra dossier	
+0x675dec	CRT::realloc_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller _realloc (SEH finally block of that function)	Ghidra dossier	
+0x675e9e	CRT::msize_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __msize (SEH finally block of that function)	Ghidra dossier	
+0x6781f3	CRT::write_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __write (SEH finally block of that function)	Ghidra dossier	
+0x6782b7	CRT::commit_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __commit (SEH finally block of that function)	Ghidra dossier	
+0x6789c2	CRT::getstream_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __getstream (SEH finally block of that function)	Ghidra dossier	
+0x678d00	CRT::read_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __read (SEH finally block of that function)	Ghidra dossier	
+0x679117	CRT::calloc_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller _calloc (SEH finally block of that function)	Ghidra dossier	
+0x6792be	CRT::lseek_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __lseek (SEH finally block of that function)	Ghidra dossier	
+0x679495	CRT::close_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __close (SEH finally block of that function)	Ghidra dossier	
+0x6796c1	CRT::raise_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller _raise (SEH finally block of that function)	Ghidra dossier	
+0x67994f	CRT::updatetmbcinfo_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller ___updatetmbcinfo (SEH finally block of that function)	Ghidra dossier	
+0x679c35	CRT::setmbcp_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __setmbcp (SEH finally block of that function)	Ghidra dossier	
+0x680dd2	CRT::sopen_unlock_finally	runtime	V	V: 8-10 byte stub that only calls __unlock/__unlock_file/__unlock_fhandle; sole caller __sopen (SEH finally block of that function)	Ghidra dossier	
