@@ -21,6 +21,7 @@
 // PATCH 0x410c1b: the ROADREFLECTION cap word at +0x70 (host/win32.c, RN_ROADREFL=off makes it 1)
 // PATCH 0x4b528d: host/free.c free_setup (free mode's rivals in Free Run) at +0x68; PATCH 0x4b3c2f: free_traffic at +0x6c
 // PATCH 0x422b36: host/free.c free_place (the traffic placer 0x598bf0, step by step) at +0x7c
+// PATCH 0x45399f: host/rivals.c traffic_behind (a traffic car sees the player closing from behind) at +0x98
 #define HEAP_LO     0x00800000u
 #define HOST_BASE   0xe0000000u     // fake code addresses of host functions: HOST_BASE + 16*index
 
