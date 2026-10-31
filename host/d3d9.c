@@ -831,7 +831,7 @@ static void census_dump(void) {
 // TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
 // at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
 // seq; Present copies them into the game's .data when seq changed.
-static uint32_t tune[8];      // seq, then the 4 floats as bits, then the trail colour, then the race projection scale k (float bits, 0 = the patch's), then the chase framing switch
+static uint32_t tune[9];      // seq, then the 4 floats as bits, then the trail colour, then the race projection scale k (float bits, 0 = the patch's), then the chase framing switch, then light streaks off
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -854,6 +854,14 @@ static void tune_apply(Ctx *c) {
 static void hfov_frame(Ctx *c) {
     uint32_t k = __atomic_load_n(&tune[6], __ATOMIC_RELAXED);
     st(c, 0x707fc0, k && ld(c, 0x77a920, 4) == 6 ? k : 0x3f924925, 4);
+}
+// Light streaks off (word 8, Remaster; OWNER 2026-10-31 "astigmatism"): the flare buffer 0x409b70 draws the lamps a second time into RT
+// [0x71aba4] with view 0x7404c0 and adds it back, which shows as a reddish copy ~22 px above every lamp, still or moving
+// (docs/re/feel_2026-10-31.md 3). LIGHTSTREAKS [0x700e9c] = 0 skips that path (0x409580); the lamps keep their own flare. The menu
+// quality preset (0x410ed0) rewrites the option, so it is held every Present. The motion blur is not touched: its streak
+// direction measured (0, 0, 1) driving straight, a pure zoom as designed (0x40cd40).
+static void streaks_frame(Ctx *c) {
+    if (__atomic_load_n(&tune[8], __ATOMIC_RELAXED)) st(c, 0x700e9c, 0, 4);
 }
 // RN_RNGLOG: how many steps the game RNG [0x6f227c] took since the last Present (step inlined ~60 times, e.g. 0x41f81d:
 // u = x ^ 0x1d872b41, v = u ^ u >> 5, x' = v ^ v << 27 ^ u). A frame with steps makes key timing matter in frames.
@@ -1021,6 +1029,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     wallcap_log(c);
     tune_apply(c);
     hfov_frame(c);
+    streaks_frame(c);
     rng_log(c, dev.frames);
     flow_log(c);
     free_tick(c);

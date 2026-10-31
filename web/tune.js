@@ -22,5 +22,6 @@ function startTune(M) {
   h[base + 5] = orig ? 0x1fffffff : trailColor(1.5);
   h[base + 6] = orig ? 0 : bits(4 / 3);
   h[base + 7] = 0;   // off: OWNER 2026-10-31 found the closer, pitched chase worse
+  h[base + 8] = orig ? 0 : 1;   // Remaster: light streaks off (the reddish copy above every lamp, host/d3d9.c streaks_frame)
   Atomics.add(h, base, 1);
 }
