@@ -831,7 +831,7 @@ static void census_dump(void) {
 // TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
 // at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
 // seq; Present copies them into the game's .data when seq changed.
-static uint32_t tune[9];      // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch, the nitro-camera switch
+static uint32_t tune[10];     // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch, the nitro-camera switch, the widescreen scale k (float bits, 0 = shipped)
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -884,6 +884,13 @@ static void fov_frame(Ctx *c) {
 // clears when 0x465430 sees the shot end; 0 or 0x7fffffff = off) the same rows go NITRO_BACK farther and NITRO_LOW lower, ~0.5 s low pass.
 #define NITRO_BACK 0.10f
 #define NITRO_LOW  0.05f
+// Horizontal FOV (web/tune.js ?hfov=, word 9 of tune[]): k at 0x707fc0 is the widescreen caves' scale (P[0] = k / tan(F/2) * H'/W, PATCH 0x40debb); the web
+// page turns the wanted horizontal degrees at 16:9 into k. Written in races only ([0x77a920] == 6, the same test as the caves' 16:9 cap), so the garage keeps
+// the shipped k = 512/448. Word 0: the shipped k.
+static void hfov_frame(Ctx *c) {
+    uint32_t k = __atomic_load_n(&tune[9], __ATOMIC_RELAXED);
+    st(c, 0x707fc0, k && ld(c, 0x77a920, 4) == 6 ? k : 0x3f924925, 4);
+}
 static void chase_frame(Ctx *c) {
     static uint32_t info, rows[2][3];
     static float orig[2][3][2], sm, nsm;
@@ -1094,6 +1101,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     jumpcam_log(c);
     tune_apply(c);
     fov_frame(c);
+    hfov_frame(c);
     chase_frame(c);
     rng_log(c, dev.frames);
     flow_log(c);

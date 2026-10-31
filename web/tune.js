@@ -30,6 +30,8 @@ const SPEEDFOV = 10;
 const CHASECAM = 1;
 // ?nitrocam=1|0: while the nitrous burns the chase camera goes 10% farther and 5% lower (host/d3d9.c chase_frame, same rows).
 const NITROCAM = 1;
+// ?hfov=<deg>: the horizontal view at 16:9 or wider in races, in degrees (host/d3d9.c hfov_frame, k of the widescreen caves). Absent = the shipped 96.5 (the PS2's
+// vertical view, PATCH 0x40debb); 4:3 PC was 71.5 horizontal. k = tan(71.5/2) * 16/9 / tan(hfov/2).
 
 function startTune(M) {
   const base = M._rn_tune_addr() >> 2;
@@ -44,6 +46,8 @@ function startTune(M) {
   const speedfov = isFinite(sf) ? sf : 0;
   const chasecam = RN_Q.get('chasecam') === null ? CHASECAM : +RN_Q.get('chasecam') ? 1 : 0;
   const nitrocam = RN_Q.get('nitrocam') === null ? NITROCAM : +RN_Q.get('nitrocam') ? 1 : 0;
+  const hf = parseFloat(RN_Q.get('hfov'));
+  const hfovK = hf > 40 && hf < 120 ? Math.tan(35.75 * Math.PI / 180) * 16 / 9 / Math.tan(hf * Math.PI / 360) : 0;
   const psOff = RN_Q.get('psblur') === '0';
   if (psOff && BLUR[level].ps) level = 3;    // ?psblur=0: the pass off, the game's own PS2 blur instead
 
@@ -61,6 +65,7 @@ function startTune(M) {
     h[base + 6] = bits(speedfov);
     h[base + 7] = chasecam;
     h[base + 8] = nitrocam;
+    h[base + 9] = hfovK ? bits(hfovK) : 0;
     Atomics.add(h, base, 1);
     try { localStorage.setItem(KEY, String(level)); } catch {}
     if (!show) return;
