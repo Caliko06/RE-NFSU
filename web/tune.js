@@ -21,6 +21,6 @@ function startTune(M) {
   h[base + 1] = bits(BLUR_RAMP[0]); h[base + 2] = bits(BLUR_RAMP[1]); h[base + 3] = bits(orig ? BLUR_CAP : BLUR_CAP_REMASTER); h[base + 4] = bits(STREAK);
   h[base + 5] = orig ? 0x1fffffff : trailColor(1.5);
   h[base + 6] = orig ? 0 : bits(4 / 3);
-  h[base + 7] = orig ? 0 : 1;
+  h[base + 7] = 0;   // off: OWNER 2026-10-31 found the closer, pitched chase worse
   Atomics.add(h, base, 1);
 }
