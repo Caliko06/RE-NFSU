@@ -36,6 +36,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x402b40	ParticleEmitter_Bind	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x402b90	ParticleLists_Init	render	I	ghidra-canon	docs/re/car.md	car		func
 0x402bd0	ParticleEmitter_Queue	assets	I	Hopper export + Ghidra export	docs/re/assets.md	assets		func
+0x402d30	Particles_UpdateEmitter	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x403a60	Particles_UpdateSystem	render	I	hopper	docs/re/render.md	render		func
 0x404110	Particles_DrawSystem	render	I	ghidra+capstone	docs/re/render.md	render		func
 0x4049f0	List_DeleteAllNodes	runtime	V	ghidra-canon	docs/re/car.md	car		data
@@ -215,6 +216,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x413550	Screen_PC_Controller_Config::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4135b0	Screen_PC_Controller_Config::Screen_PC_Controller_Config	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x413a30	Dtor413a50::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		func
+0x413a70	Screen_PC_Controller_Config::InitKeyboardConfig	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x41444e	sub_414350::part_41444e	canon	I	capstone	docs/re/canon.md	canon		data
 0x41445a	sub_414350::part_41445a	canon	I	capstone	docs/re/canon.md	canon		data
 0x414544	sub_414350::part_414544	canon	I	capstone	docs/re/canon.md	canon		data
@@ -226,6 +228,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4149d0	FEng_FindObjectByHash2	canon	I	hopper+capstone	docs/re/misc.md	misc		func
 0x414a10	FEng_SetObjectInvisibleByName	ui	V	Ghidra dossier		hudcar_w2		func
 0x414a60	FEng_SetObjectVisibleByName	ui	V	Ghidra dossier		hudcar_w2		func
+0x414ab0	Dtor414ab0::DtorBody	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x414ac0	Slider::StepUp	canon	V	ghidra-canon	docs/re/canon.md	canon		func
 0x414af0	Slider::StepDown	canon	V	ghidra-canon	docs/re/canon.md	canon		func
 0x414b20	Slider::scalar_deleting_destructor	canon	I	ghidra-canon	docs/re/canon.md	canon		func
@@ -247,6 +250,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x415bf0	Screen_PC_Customize_Graphics::AdjustSlider1	canon	V	ghidra-canon	docs/re/canon.md	canon		func
 0x415f00	sub_415c70::part_415f00	canon	I	capstone	docs/re/canon.md	canon		data
 0x415f45	sub_415c70::part_415f45	canon	I	capstone	docs/re/canon.md	canon		data
+0x415f90	Screen_PC_Customize_Graphics::BindOptionRow	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x416000	sub_415f90::part_416000	canon	I	capstone	docs/re/canon.md	canon		data
 0x416563	sub_4164e0::part_416563	canon	I	capstone	docs/re/canon.md	canon		data
 0x41656e	sub_4164e0::part_41656e	canon	I	capstone	docs/re/canon.md	canon		data
@@ -274,6 +278,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4176a0	Screen_MU_UG_NewOrLoad_PC2::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x417700	Screen_MU_UG_NewOrLoad_PC2::Screen_MU_UG_NewOrLoad_PC2	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x417c10	Dtor417c30::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
+0x417c30	Screen_MU_UG_NewOrLoad_PC2::~Screen_MU_UG_NewOrLoad_PC2	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x417cd0	Screen_MU_UG_NewOrLoad_PC2::MaskButtonFlags	canon	I	ghidra-canon	docs/re/canon.md	canon		data
 0x417cf0	Screen_MU_UG_NewOrLoad_PC2::UpdateMenubarItems	canon	V	ghidra-canon	docs/re/canon.md	canon		func
 0x417e70	Screen_MU_UG_NewOrLoad_PC2::FindControls	hud	I	Ghidra dossier		core_w3		func
@@ -351,6 +356,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x41eff0	MachinePerformanceScore	render	V	ghidra-canon	docs/re/render.md	render		func
 0x41f0b0	int_Sub	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
 0x41f0c0	FEMenuData::FEMenuData	canon	I	ghidra-canon+hopper	docs/re/canon.md	canon		func
+0x41f140	FEMenuData::~FEMenuData	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x41f240	FEMenuData::HandleCursorBlink	hud	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x41f5d0	Leaf_41f5d0	traffic	I	capstone	docs/re/canon_db.md	trivial		func
 0x41f5f0	Leaf_41f5f0	traffic	I	capstone	docs/re/canon_db.md	trivial		func
@@ -358,6 +364,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x41f680	WorldCarList_TrafficCount	traffic	V	capstone	docs/re/traffic_limits.md	trafficpool	Leaf_41f680@trivial	func
 0x41f690	WorldCarList_TrafficAt	traffic	V	capstone	docs/re/traffic_limits.md	trafficpool		func
 0x41f6a0	GameMode::BlocksSpecialCameras	canon	I	ghidra-canon+hopper	docs/re/canon.md	canon		func
+0x41f6e0	World::World	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x41f9b0	World::~World	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x41fc00	World::DoSnapshot	physics	V	Ghidra+dossier	docs/re/physics.md	game_w3		func
 0x41fe50	RaceManager::SortRacersByKind	rivals	V	ghidra-canon	docs/re/rivals.md	rivals	WorldCarList_Rebuild@trafficpool	func
 0x41ff50	RaceManager::FindRacerByIdIn	rivals	V	ghidra-canon	docs/re/rivals.md	rivals		func
@@ -371,20 +379,25 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x421550	Track::WrapDistance	traffic	I	Ghidra+dossier	docs/re/traffic.md	game_w1		func
 0x4216b0	Rng::NextMod	traffic	V	Ghidra+dossier	docs/re/traffic.md	game_w1		func
 0x4216f0	Random_NextFloat	runtime	V	ghidra-canon	docs/re/traffic.md	render		func
+0x421900	SlotList::ReleaseAllNodes	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x421a30	SpecialCamCooldown	camera	I	C	docs/re/camera.md	camera		func
 0x421a70	Leaf_421a70	runtime	I	capstone	docs/re/canon_db.md	trivial		func
 0x421a80	DriverInfo::IsRemote	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		func
 0x421a90	Leaf_421a90	traffic	I	capstone	docs/re/canon_db.md	trivial		func
 0x421aa0	FloatPair_LessEqual	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
 0x421b10	Race::PumpFlowMessages	runtime	V	ghidra-canon	docs/re/runtime.md	runtime		func
+0x421c00	RaceCoordinator::QueueMessage	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x421c70	RCQueuedMessage::InitSlotPool	runtime	V	Ghidra+dossier	docs/re/gameflow.md	game_w1		func
 0x421e80	RaceCoordinator::DoSnapshot	rivals	V	Ghidra+dossier	docs/re/rivals.md	game_w1		func
+0x421f00	RaceCoordinator::BeginRace	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x422410	Grid::BuildRacerCar	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x422580	Grid::GetStartPositions	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
 0x422a70	Grid::PlaceAllRacers	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
 0x422bb0	Race::OnFlowMessage	canon	I	capstone	docs/re/gameflow.md	gameflow		func
+0x422eb0	Race::HandleFlowStep	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x423280	Race::PreRaceAnimStage	gameflow	I	Ghidra dossier		core_w3		func
 0x423530	Race::IntroNisStage::OnMessage	camera	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x423f20	RaceCoordinator::FinishRaceFlow	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x424160	CameraMover_CreateByType	camera	I	hopper+capstone	docs/re/misc.md	misc		func
 0x424200	InFunc_00424160_L424200	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		data
 0x424b10	FlowMessageList::FreeAll	runtime	V	ghidra-canon	docs/re/canon.md	rivals		data
@@ -402,6 +415,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x424d50	RacerNode::IsPlayerKind	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		func
 0x424d60	RacerNode::IsLocalHuman	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		func
 0x424d80	RacerNode::IsRemote	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		func
+0x424db0	RacerNode::GetField18	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x424dc0	Leaf_424dc0	traffic	I	capstone	docs/re/canon_db.md	trivial		func
 0x424dd0	Leaf_424dd0	track	I	capstone	docs/re/canon_db.md	trivial		func
 0x424de0	Leaf_424de0	track	I	capstone	docs/re/canon_db.md	trivial		func
@@ -417,6 +431,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x425060	PsychoDriver::scalar_deleting_dtor	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		data
 0x425080	Leaf_425080	rivals	I	capstone	docs/re/canon_db.md	trivial		func
 0x4250a0	PsychoDriver::scalar_deleting_dtor_b	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		func
+0x4250c0	Dtor4250c0::DtorBody	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		data
 0x4250d0	PsychoDriverDerived::scalar_deleting_dtor	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		func
 0x4250f0	PsychoDriverDerived::scalar_deleting_dtor_pooled	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		func
 0x425150	RacerNode::GetControlMode	rivals	V	ghidra-canon	docs/re/rivals.md	rivals		func
@@ -434,11 +449,14 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4264d0	Car::ServiceResetRequest	track	V	hopper+ghidra+capstone	docs/re/track.md	track		func
 0x4267a0	Car::RefillGroundCache	track	V	ghidra	docs/openworld/re_coll_pool.md	collision		func
 0x426930	JumpCamTrigger	camera	V	G+C	docs/re/camera.md	camera		func
+0x427c50	Car::InitKinematicState	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x427ed0	Car::ApplyResetZone	track	V	hopper+ghidra	docs/re/track.md	track		func
 0x427f70	Car::PlaceAtRoutePoint	track	I	Ghidra+dossier	docs/re/track.md	game_w1		func
 0x4280a0	Car::IsResetGraceActive	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
 0x4280f0	Leaf_4280f0	traffic	I	capstone	docs/re/canon_db.md	trivial		func
 0x428100	Car_GetLaneSpeedCapFraction	traffic	I	ghidra-canon+hopper	docs/re/traffic.md	render		func
+0x4281e0	World::ProcessZoneTriggers	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x4286a0	Car::UpdateTireSurfaceEffects	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x429100	Car::HonkAndOrBlinkHeadlights	car	V	ghidra-canon+nfsug	docs/re/canon.md	rivals	Car::ArmHornFlash@trafficpool	func
 0x429190	Car::UpdateHeadlightsAndHorn	car	V	ghidra-canon+nfsug	docs/re/canon.md	rivals	Car::UpdateHornFlash@trafficpool	func
 0x429620	EZWheel::UpdateRaceForces	input	I	Ghidra dossier		core_w3		func
@@ -457,6 +475,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x42a710	Car::CalculateWheelPosition	car	V	ghidra-canon+nfsug	docs/re/canon.md	rivals		func
 0x42a790	World::RefreshCarPhysics	rivals	I	Ghidra+dossier	docs/re/physics.md	game_w1		func
 0x42a810	Car::SetArtificialColour	car	V	ghidra-canon+nfsug	docs/re/canon.md	rivals		func
+0x42a860	PhysicsMover::ApplySteerAssistForce	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x42aa10	Car::WheelFlagsAllowSteer	car	I	ghidra-canon	docs/re/canon.md	rivals		func
 0x42ab00	int_Greater	runtime	I	ghidra-canon	docs/re/canon.md	rivals		func
 0x42ab10	int_Less	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
@@ -477,6 +496,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x42ae40	Leaf_42ae40	runtime	I	capstone	docs/re/canon_db.md	trivial		func
 0x42ae50	PreviewComet::PreviewComet	camera	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x42b040	PreviewComet::~PreviewComet	camera	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x42b0d0	Player::Player	runtime	V	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x42bac0	Struct0x38::Copy	canon	I	ghidra-canon+hopper	docs/re/canon.md	canon		func
 0x42bb60	Player::DestroyReleaseCache	track	V	ghidra	docs/openworld/re_coll_pool.md	collision		func
 0x42bd60	Player::DoSnapshot	car	V	Ghidra+dossier	docs/re/car.md	unknown_w1		func
@@ -514,9 +534,11 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x42fdf0	Player::ResetMatrix140	camera	I	ghidra-canon+hopper	docs/re/camera.md	render		func
 0x42fe60	Player::InitAimTuning	camera	I	ghidra-canon+hopper	docs/re/camera.md	render		func
 0x42fec5	Player_42fe60.part_42fec5	camera	I	ghidra-canon+capstone	docs/re/camera.md	render		data
+0x42fee0	Player::SetPreviewComet	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x42ff00	Player_42fee0.part_42ff00	camera	I	ghidra-canon+capstone	docs/re/camera.md	render		data
 0x42ffff	Player_42fee0.part_42ffff	camera	I	ghidra-canon+capstone	docs/re/camera.md	render		data
 0x430060	RacerState::GetLapProgress	runtime	V	ghidra-canon	docs/re/runtime.md	runtime		func
+0x4300f0	Player::UpdatePreviewComet	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x430650	Player::GetTimeUntilOnFire	hud	V	ghidra-canon+nfsug	docs/re/canon.md	hud		func
 0x4306c0	Player::IsOnFire	runtime	V	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
 0x430730	Player::StartRaceCameras	camera	I	C	docs/re/camera.md	camera		func
@@ -663,15 +685,19 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x439130	Race::FindRacerById	rivals	I	ghidra-canon	docs/re/canon.md	rivals		func
 0x439170	NetPlayer::SendFinishMessage	online	I	ghidra-canon	docs/re/canon.md	online		func
 0x4392a0	NetPacket_Begin	online	I	Ghidra	docs/re/misc_w2.md	misc_w2	BitStream::BitStream@online	func
+0x4394f0	OnlineManager::UpdateFinishTimeouts	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x439a80	Race::GetClockSeconds	rivals	I	ghidra-canon	docs/re/rivals.md	rivals		func
 0x439a94	Pad_int3	runtime	V	capstone	docs/re/canon_db.md	trivial		data
 0x439a9a	Pad_int3	runtime	V	capstone	docs/re/canon_db.md	trivial		data
 0x43a001	Pad_int3	runtime	V	capstone	docs/re/canon_db.md	trivial		data
 0x43a1a0	Online_AllocBuffer	online	V	Ghidra	docs/re/misc_w2.md	misc_w2		func
+0x43a2e0	OnlineManager::IsActive	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x43a340	IsFlag7346c8Set	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
 0x43a360	OnlineManager::Update	runtime	V	Ghidra dossier		runtime_w2		func
 0x43a7e4	Pad_int3	runtime	V	capstone	docs/re/canon_db.md	trivial		data
 0x43a7ea	Pad_int3	runtime	V	capstone	docs/re/canon_db.md	trivial		data
+0x43a8a0	OnlineManager::UpdateFrameTime	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x43ac10	OnlineManager::TickRaceSync	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x43ada0	Race::RequestStartOrRestart	canon	I	capstone	docs/re/gameflow.md	gameflow		func
 0x43af80	OnlineManager::BeginRaceStart	online	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x43b090	Net_ReadRaceOptionsFromPacket	online	I	Ghidra	docs/re/misc_w2.md	misc_w2		func
@@ -679,9 +705,15 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x43b400	Race::AddDriverEntrant	rivals	I	Ghidra+dossier	docs/re/rivals.md	game_w1		func
 0x43b850	Race::GetPlayer	runtime	V	ghidra-canon	docs/re/runtime.md	runtime		func
 0x43b930	Net::SetupRemoteRacerRide	online	I	Ghidra+dossier	docs/re/rivals.md	game_w3		func
+0x43be30	OnlineManager::OnRacerFinished	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x43bfe0	OnlineManager::RankRacers	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x43c300	OnlineManager::SendRacerStatePacket	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x43cb60	Net_WriteRideSetupBits	online	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x43ccf0	Ride_ReadFromBitStream	car	I	Ghidra dossier		hudcar_w2		func
+0x43cef0	OnlineManager::SendCheckpointListPacket	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x43d030	OnlineManager::SendFinishTimePacket	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x43d220	Race::ApplyPendingSlotNames	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
+0x43d2d0	OnlineManager::OnRacerTimeout	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x43d3d0	OnlineManager::HandlePeerUpdate	online	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x43d4f0	OnlineManager::CheckPeerTimeout	online	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x43d8c0	Race::ComputeRepWonLoss	gameflow	I	Ghidra dossier		core_w3		func
@@ -697,17 +729,20 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x43dd10	DriftManager::~DriftManager	runtime	V	ghidra-canon+nfsug	docs/re/canon.md	track		func
 0x43dd40	DriftManager::Init	rivals	I	Ghidra+dossier	docs/re/rivals.md	game_w1		func
 0x43de90	DriftManager::BuildLeaderBoard	runtime	V	ghidra-canon+nfsug	docs/re/runtime.md	runtime		func
+0x43e310	DriftManager::Update	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x43e540	DriftManager::CalcDriftIntensity	rivals	I	Ghidra+dossier	docs/re/canon.md	game_w3		func
 0x43e6e0	DriftManager::CalcBonusZoneMult	runtime	V	ghidra-canon+nfsug	docs/re/canon.md	track		func
 0x43e790	DriftManager::CalcDriftMultiplier	runtime	V	ghidra-canon+nfsug	docs/re/canon.md	track		func
 0x43e9d0	DriftManager::GetCollisionIntensity	runtime	V	ghidra-canon+nfsug	docs/re/canon.md	track		func
 0x43eaa0	RaceManager::GetRacerRank	runtime	V	ghidra-canon	docs/re/runtime.md	runtime		func
 0x43eb00	DriftManager::UpdateLeaderBoard	rivals	V	Ghidra+Hopper+capstone	docs/re/rivals.md	rivals		func
+0x43ef30	DriftManager::UpdateSpeedGate	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x43f0e0	DriftManager::GetCurrentDriftSpeedGate	runtime	V	ghidra-canon+nfsug	docs/re/canon.md	track		func
 0x43f130	SortScoreList	runtime	V	ghidra-canon+nfsug	docs/re/canon.md	track		func
 0x43f160	_GLOBAL_.D.__12DriftManager	runtime	V	ghidra-canon+nfsug	docs/re/canon.md	track		func
 0x43f1d0	bTList::EndOfList	runtime	I	ghidra-canon	docs/re/canon.md	track		func
 0x43f210	MiscStyleManager::IsAirTimeActive	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	sound		func
+0x43f240	RacingCar::UpdateStyleItems	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x43f3f0	MiscStyleManager::GetTimeSinceLastCollision	runtime	V	ghidra-canon+nfsug	docs/re/runtime.md	sound		func
 0x43f420	MiscStyleManager::ClearFlags	runtime	I	ghidra-canon	docs/re/runtime.md	sound		func
 0x43f630	StyleItem::UpdateNearMiss	car	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
@@ -905,6 +940,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x44a130	AIObject::FreeToPool	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w1		data
 0x44a150	AIGoal::AIGoal	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w1		func
 0x44a170	SetVtbl_44a170	rivals	I	capstone	docs/re/canon_db.md	trivial		func
+0x44a200	AIGoalBeTraffic::AIGoalBeTraffic	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
+0x44a230	AIGoalBeAmbientTraffic::AIGoalBeAmbientTraffic	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x44a300	Leaf_44a300	rivals	I	capstone	docs/re/canon_db.md	trivial		func
 0x44a320	Leaf_44a320	traffic	I	capstone	docs/re/canon_db.md	trivial		func
 0x44a330	AI::AI	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w1		func
@@ -915,15 +952,20 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x44bad0	Msg_ReadOnOffByType	misc	I	ghidra-canon+hopper	docs/re/car.md	car		func
 0x44bbd0	Racer::RunAction (vt slot 0x88)	raceai	V	capstone+Ghidra	docs/re/race_ai.md	raceai		func
 0x44bc30	Racer::PollSelector	raceai	I	capstone	docs/re/race_ai.md	raceai		func
+0x44bcb0	AICarController::HoldPosition	traffic	I	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x44bd10	RacerAI::UpdateRubberBand	raceai	V	Ghidra+capstone	docs/re/race_ai.md	raceai		func
 0x44c010	RacerAI::GetCatchUpTerms	raceai	V	Ghidra	docs/re/race_ai.md	raceai		func
 0x44c2e0	TrafficCar_HonkAtPlayer	traffic	V	Ghidra+capstone	docs/re/traffic_limits.md	trafficpool		func
 0x44c550	RacerAI::UpdateDesiredSpeed	raceai	V	Ghidra+capstone	docs/re/race_ai.md	raceai		func
+0x44c940	AICarController::EndUpdate	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x44ca10	Racer::GetSkillLevel	rivals	V	capstone+Hopper	docs/re/rivals.md	rivals		func
+0x44ca70	Unk_traffic_44ca70	traffic	U	ghidra	docs/re/traffic_react.md	traffic_w4		data
 0x44cac0	Racer::HasNitro	raceai	V	Ghidra	docs/re/race_ai.md	raceai		func
 0x44ce00	AI::DestroyDriverState	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w3		func
 0x44ceb0	DrivingInformation::DoSnapshot	rivals	V	Ghidra+dossier	docs/re/rivals.md	unknown_w1		func
+0x44cf30	AICarController::UpdateRoute	raceai	V	ghidra+capstone	docs/re/traffic_react.md	traffic_w4		func
 0x44d410	Leaf_44d410	rivals	I	capstone	docs/re/canon_db.md	trivial		func
+0x44d4d0	AIGoal::ScalarDeletingDtor	traffic	I	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x44d570	Node_GetIntersection	traffic	V	H+G+file	docs/re/traffic.md	traffic		func
 0x44d5d0	AI::GetTargetWorldPos	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w1		func
 0x44d5f0	AI::GetTargetSpeed	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w1		func
@@ -947,7 +989,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x44e9c0	AIAction::GetHeadingClassification	rivals	V	ghidra-canon+nfsug	docs/re/canon.md	rivals	AI::PathClearTest@raceai	func
 0x44ecd0	AIAction::GetCollisionClassification	rivals	V	ghidra-canon+nfsug	docs/re/canon.md	rivals		func
 0x44ed70	IJustGotHit::Finder	raceai	V	Ghidra	docs/re/race_ai.md	raceai	AIAction::GetMostImportantNearbyCollidingAvoidable@rivals	func
-0x44efd0	TrafficCar_IsIntersectionObstacle	traffic	I	G	docs/re/traffic.md	traffic		func
+0x44efd0	TrafficAvoid_IsObstacleCounted	traffic	V	capstone	docs/re/traffic_react.md	traffic_w4	TrafficCar_IsIntersectionObstacle@traffic	func
 0x44f070	AIAction::GetNewBestLine	rivals	V	ghidra-canon+nfsug	docs/re/canon.md	rivals		func
 0x44f0d0	AIAction::GetNewTrafficLane	rivals	V	ghidra-canon+nfsug	docs/re/canon.md	rivals		func
 0x44f1b0	AIAction::GetWorldSpaceDistanceAndTimeToAvoidable	rivals	V	ghidra-canon+nfsug	docs/re/canon.md	rivals		func
@@ -1033,7 +1075,10 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x453830	AIActionEndOfRace::CleanUp	rivals	V	ghidra-canon+nfsug	docs/re/canon.md	rivals		func
 0x453860	AIActionAvoidAvoidableAsTraffic::AIActionAvoidAvoidableAsTraffic	rivals	V	ghidra-canon+nfsug	docs/re/canon.md	rivals		func
 0x453920	Finder_AvoidAsTraffic	traffic	I	H	docs/re/traffic.md	traffic		func
+0x453ba0	AIActionAvoidAsTraffic::IsLaneClear	traffic	V	ghidra+capstone	docs/re/traffic_react.md	traffic_w4		func
 0x453c60	Action_AvoidAvoidableAsTraffic::Update	traffic	I	H	docs/re/traffic.md	traffic		func
+0x454170	AIActionObeyTrafficIntersections::AIActionObeyTrafficIntersections	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
+0x454330	TrafficIntersection_PickTurn	traffic	I	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x4543d0	Finder_ObeyIntersections	traffic	V	G	docs/re/traffic.md	traffic		func
 0x454490	Action_ObeyTrafficIntersections::Update	traffic	I	G	docs/re/traffic.md	traffic		func
 0x454960	AIActionPickRouteToAvoidAnimation::DoSnapshot	raceai	V	Ghidra+dossier	docs/re/race_ai.md	game_w1		data
@@ -1056,7 +1101,9 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4573f0	Vec3Ring20::PushBack	traffic	I	ghidra-canon	docs/re/canon.md	track		func
 0x457450	Vec3Ring20::PushFront	traffic	I	ghidra-canon	docs/re/canon.md	track		func
 0x457590	AI::FindClosestAvoidable	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w3		func
+0x4576b0	AI::PredictClosestApproachTime	raceai	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x458bd0	RoadPath_LinkAccepted	traffic	I	H	docs/re/traffic.md	traffic		func
+0x458cc0	Path::PruneDecisionCache	raceai	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x458d90	Path::Reset	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w1		func
 0x458dc0	DriveTarget::DoSnapshot	raceai	V	Ghidra+dossier	docs/re/race_ai.md	game_w3		func
 0x458f10	Path::ClearLine	raceai	I	Ghidra	docs/re/race_ai.md	raceai		func
@@ -1086,6 +1133,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x45e100	PsychoDriver::~PsychoDriver::part_45e100	canon	I	capstone	docs/re/canon.md	canon		data
 0x45e180	PsychoDriver::SetDesiredSpeed	canon	V	ghidra-canon+nfsug	docs/re/canon.md	canon		data
 0x45e1b0	PsychoDriver::DoSnapshot	rivals	V	Ghidra+dossier	docs/re/rivals.md	unknown_w1		func
+0x45e370	PsychoDriver::GetSteerAngles	raceai	I	ghidra	docs/re/traffic_react.md	traffic_w4		func
+0x45e970	PsychoDriver::Update	raceai	I	ghidra+capstone	docs/re/traffic_react.md	traffic_w4	PsychoDriver::UpdateControls@w4a	func
 0x460090	PsychoDriver::StartHonkHorn	canon	V	ghidra-canon	docs/re/canon.md	canon		func
 0x4600b0	PsychoDriver::StopHonkHorn	canon	V	ghidra-canon	docs/re/canon.md	canon		data
 0x4600d0	PsychoDriver::IsHonking	canon	V	ghidra-canon	docs/re/canon.md	canon		func
@@ -1139,16 +1188,19 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x463260	Car::CreateWheels	car	I	Ghidra dossier		core_w3		func
 0x463610	Dtor463630::ScalarDeletingDtor	rivals	V	capstone	docs/re/canon_db.md	trivial		func
 0x4636f0	BeltMover::DoSnapshot	car	V	Ghidra+dossier	docs/re/car.md	unknown_w1		func
+0x463f20	SteerController::Update	raceai	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4647c0	Float9_Max_Off10	car.tuning	V	ghidra-canon	docs/re/car.md	car		func
 0x4648c0	CarState::DoSnapshot	car	V	Ghidra+dossier	docs/re/physics.md	game_w3		func
 0x464ed0	CarState::GetYaw	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	car	CarState::GetSlipAngle@physics	func
 0x4650d0	AI::WorldToLocalXY	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w1		func
+0x465150	Car::BuildWheelMatrix	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4653e0	Vec3_TransformSub	runtime	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
 0x465430	CarState::IsNitrousOn	runtime	V	ghidra-canon+nfsug	docs/re/runtime.md	runtime		func
 0x465530	CarState::StopNitrous	runtime	I	ghidra-canon	docs/re/runtime.md	runtime		func
 0x4655e0	Leaf_4655e0	traffic	I	capstone	docs/re/canon_db.md	trivial		func
 0x4655f0	Collision::InitSlotPool	physics	V	Ghidra+dossier	docs/re/physics.md	game_w1		func
 0x465770	Collision::DoSnapshot	physics	V	Ghidra+dossier	docs/re/physics.md	game_w3		func
+0x465830	Collision::AddContactImpulse	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x465d00	SpecialCamCaller_465d00	camera	I	G+C	docs/re/camera.md	camera		func
 0x466350	Collision::GetTerrainType	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	camera		func
 0x4663a0	Collision::IsTwoCarCollision	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	camera		func
@@ -1257,6 +1309,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x46c950	Engine::DoSnapshot	car	V	Ghidra+dossier	docs/re/car.md	unknown_w1		func
 0x46cfc0	Engine::GetEffectiveThrottle	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	car		func
 0x46cff0	Engine::ComputeTorque	physics	V	Ghidra+capstone	docs/re/physics.md	physics		func
+0x46d1c0	DriveTrain::BuildGearSpeedTable	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x46d390	DriveTrain::DriveTrain	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x46d4e0	DriveTrain::scalar deleting destructor	car.physics	I	ghidra-canon	docs/re/car.md	car		data
 0x46d510	DriveTrain::DoSnapshot	car	V	Ghidra+dossier	docs/re/car.md	unknown_w1		func
@@ -1269,10 +1322,12 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x46e580	DriveTrain::ClutchMatched	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	car		data
 0x46ea30	DriveTrain::SetState	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	car		func
 0x46ea50	SCEA_GJKsimplexPair::DistanceSqr	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	car		func
+0x471de0	GJKWitness::ComputeDistance	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4723a0	SCEA_GJKsimplexPair::SCEA_GJKsimplexPair(copy)	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	car		func
 0x4724b0	SCEA_GJKsimplexPair::operator=	car.physics	V	ghidra-canon+nfsug	docs/re/car.md	car		func
 0x472600	GJKWitness::DoSnapshot	physics	V	Ghidra+dossier	docs/re/physics.md	game_w3		func
 0x4727c0	GJKWitness::Initialize	car.physics	I	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x472830	GJKWitness::SetBodyTransforms	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x472950	CollisionBodyWitness::RefreshSeparation	car	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x472b00	CarShape_Load	assets	V	Hopper export has no block (inside another sub_); Ghidra export block; live Ghidra decompile + capstone	docs/re/assets.md	assets		data
 0x472b30	CollisionShapes::LoadChunk	props	I	hopper	docs/re/props.md	props		func
@@ -1309,6 +1364,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x479510	DriftMode::YawDampingB	physics	V	Ghidra+capstone	docs/re/physics.md	physics		func
 0x479640	Wheel::LaunchPulseAndShiftGrip	physics	I	Ghidra+capstone	docs/re/physics.md	physics		func
 0x479e20	PhysicsMover::ApplyNitrousToWheelScales	car.physics	I	Ghidra dossier		core_w3		func
+0x47a090	PhysicsMover::UpdateStartAssist	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x47ae90	CAnimBank::GetAnimByIndex	assets	I	ghidra-canon+nfsug	docs/re/assets.md	render		func
 0x47aea0	CAnimBank::GetAnimByIndex_Table2	assets	I	ghidra-canon+hopper	docs/re/assets.md	render		func
 0x47af00	CAnimBank_Loader::scalar_deleting_destructor	assets	I	ghidra-canon+nfsug	docs/re/assets.md	render		data
@@ -1323,7 +1379,9 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x47b8d0	NisScene_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x47ba30	CameraMover::SetStreamedSection	track	I	Ghidra+dossier	docs/re/track.md	game_w1		func
 0x47c310	IntroNisCoordinator::CreateAnimControllers	assets	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x47c580	NisScene::UpdateCarAnimations	track	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x47cac0	NisSceneManager::FindNisSceneOriginPosition	camera	V	ghidra-canon+nfsug	docs/re/canon.md	hud		func
+0x47cb50	NisScene::BuildWorldMatrix	track	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x47ce50	AnimBank_Load	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x47ced0	AnimBank_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x47d070	Camera::SetCameraMatrix	blur	V	C+M	docs/re/blur.md	blur		func
@@ -1342,6 +1400,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x47e250	CameraTables_Unload	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x47e270	DemoCameraCoordinator::DemoCameraCoordinator	camera	V	ghidra-canon+nfsug	docs/re/camera.md	camera		func
 0x47e2d0	DemoCameraCoordinator::~DemoCameraCoordinator	camera	V	ghidra-canon+nfsug	docs/re/camera.md	camera		func
+0x47e300	DemoCameraCoordinator::CreateMover	camera	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x47e820	DemoCameraCoordinator::WillLookGood	camera	V	ghidra-canon+nfsug	docs/re/camera.md	camera		func
 0x47e9d0	FlyByCameraCoordinator::FlyByCameraCoordinator	camera	I	ghidra-canon+nfsug	docs/re/camera.md	camera		func
 0x47edb0	CountdownCameraCoordinator::ctor	camera	I	M+C	docs/re/camera.md	camera		func
@@ -1530,11 +1589,13 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x490560	PreviewComet::Init	camera	V	ghidra-canon+nfsug	docs/re/camera.md	camera		func
 0x4906d0	PreviewComet::EnableEmitters	camera	V	ghidra-canon+nfsug	docs/re/camera.md	camera		func
 0x490730	PreviewComet::DisableEmitters	camera	V	ghidra-canon+nfsug	docs/re/camera.md	camera		func
+0x490770	PreviewComet::UpdateTrail	camera	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x490ea0	ZonePreviewCameraMover::ctor	camera	V	G+C	docs/re/camera.md	camera		func
 0x4922a0	Dtor4922c0::ScalarDeletingDtor	camera	V	capstone	docs/re/canon_db.md	trivial		data
 0x4922c0	ZonePreviewCameraMover::~ZonePreviewCameraMover	camera	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x492700	ZonePreviewCameraMover::Update	camera	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x4936e0	ZonePreviewCameraMover::EvalSplinePath	camera	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x493c70	ZonePreviewCameraMover::BuildPathSpline	camera	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x494890	LinkedList_FreeAll	canon	I	Ghidra	docs/re/misc_w2.md	misc_w2		func
 0x4948c0	Screen_Options::ItemList::~ItemList	canon	I	ghidra-canon	docs/re/canon.md	canon		data
 0x4948f0	Screen_Options::ItemList::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
@@ -1547,6 +1608,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x495940	Dtor495960::ScalarDeletingDtor	hud	V	Ghidra dossier		core_w3		func
 0x495e20	PreRaceScreenManager::Create	hud	I	Ghidra dossier		core_w3		func
 0x495ec0	tPreRaceScreenManager::RequestStatsScreen	canon	I	ghidra-canon+hopper	docs/re/canon.md	canon		func
+0x495f00	FEngSetLabelHashByName	hud	V	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x495f70	FEng_SetObjectInvisibleByHash	hud	V	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x495fc0	FEng_SetObjectVisible	ui	V	Ghidra dossier		hudcar_w2		func
 0x4960e0	PostRaceRewardList::~PostRaceRewardList	canon	I	ghidra-canon	docs/re/canon.md	canon		func
 0x496110	PostRaceRewardList::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
@@ -1630,6 +1693,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x49efb0	Screen_RewardPopup::Screen_RewardPopup	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x49f000	Screen_RewardPopup::ShowReward	hud	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x49f2b0	Screen_RewardPopup::HasDisplayTimeElapsed	canon	I	ghidra-canon+hopper	docs/re/canon.md	canon		func
+0x49f2e0	Screen_RewardPopup::UpdateState	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x49faa0	Dtor49fa60::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
 0x49fac0	Screen_StyleAnimator::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x49fb20	Screen_StyleAnimator::Screen_StyleAnimator	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
@@ -1797,18 +1861,24 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4af0e0	GarageCarLoader::LoadRideInfo	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4af140	GarageCarLoader::Update	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4af420	GetGarageCarLoader	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4af5d0	GarageMain_EndCarPreview	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4af620	GarageMainScreen::GarageMainScreen	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4afe20	GarageMainScreen::~GarageMainScreen	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4aff90	GarageMainScreen::UpdateCarStatisticsBars	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4b0150	Unk_garage_4b0150	car.garage	U	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x4b0340	GarageMainScreen::UpdateCarCamera	camera	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4b0e50	GarageMainScreen::SetRideInfo	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4b0fd0	GarageMainScreen::DisplayReputation	car.garage	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4b1530	GarageMainScreen::SetCarType	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4b1590	GarageMainScreen::CarLoadingHasStarted	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4b1760	GarageMainScreen::UpdateShowCarWheels	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x4b1b70	GarageMainScreen::QueueBackdropSolid	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4b1c50	GarageMainScreen::HideObject_3b7f8ae	ui	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x4b1f10	Screen_background::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4b1f70	Dtor4b1f90::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		func
 0x4b2200	Dtor4b2280::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		data
+0x4b2330	GarageMain_GetScreenObject	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x4b2480	GarageMain_SetDramaticCamera	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4b25b0	PresetRide::Loader	assets	V	Hopper sub_4b25b0 + Ghidra make FUN_004b25b0: H+G agree	docs/re/assets.md	assets		func
 0x4b2600	PresetRide::Unloader	assets	V	Ghidra make FUN_004b2600 (Hopper export lacks it)	docs/re/assets.md	assets		data
 0x4b2640	PresetRide::FindByKeyHash	rivals	I	capstone	docs/re/rivals.md	rivals		func
@@ -1849,6 +1919,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4b6820	Screen_MU_QuickRaceModeSelect::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4b6880	Screen_MU_QuickRaceModeSelect::Screen_MU_QuickRaceModeSelect	canon	I	capstone	docs/re/gameflow.md	gameflow		func
 0x4b70a0	Screen_MU_QuickRaceModeSelect::FindRaceMode_ByObject	canon	I	ghidra-canon	docs/re/canon.md	canon		func
+0x4b70c0	Screen_MU_QuickRaceModeSelect::SetupModeButtons	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4b7a30	Screen_MU_QuickRaceModeSelect::DrawRaceMode	canon	V	ghidra-canon+nfsug	docs/re/canon.md	canon		func
 0x4b7e80	Screen_MU_QuickRaceModeSelect::NotifySoundMessage	canon	I	ghidra-canon	docs/re/canon.md	canon		func
 0x4b7ee0	Screen_MU_QuickRaceOptions_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
@@ -1862,6 +1933,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4b84a0	QuickRaceOptions_UpdateRowOpt14	hud	V	ghidra dossier decomp	docs/re/hud_input.md	view_w3		func
 0x4b8750	Screen_MU_QuickRaceOptions_PC::BuildOptionList	hud	I	Ghidra dossier		core_w3		func
 0x4b8e60	Screen_MU_QuickRaceOptions_PC::SetupOptionRows	hud	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x4b9070	Screen_MU_QuickRaceOptions_PC::InitOptionRows	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4b9240	GenericDialogData::GenericDialogData	canon	I	ghidra-canon+hopper	docs/re/canon.md	canon		func
 0x4b9270	SetVtbl_4b9270	canon	I	capstone	docs/re/canon_db.md	trivial		data
 0x4b9280	SelectableTrack::scalar_deleting_destructor	canon	I	ghidra-canon	docs/re/canon.md	canon		data
@@ -1878,6 +1950,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4b9e60	Dtor4b9e80::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		data
 0x4b9f40	Screen_MU_QuickRaceTrackSelect::AddTrack	canon	I	ghidra-canon	docs/re/canon.md	canon		func
 0x4b9fd0	Screen_MU_QuickRaceTrackSelect::SortTracks	canon	I	ghidra-canon	docs/re/canon.md	canon		func
+0x4ba100	Screen_MU_QuickRaceTrackSelect::BuildTrackList	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	ui	I	Ghidra dossier		hudcar_w2		func
 0x4bb1c0	Screen_MU_MultiTrack::NotificationMessage	hud	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x4bb5d0	Screen_MU_TrackMapScroller::Screen_MU_TrackMapScroller	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
@@ -1888,9 +1961,11 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4bbda0	Screen_MU_QuickRaceCarSelect::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4bbe00	Screen_MU_QuickRaceCarSelect::Screen_MU_QuickRaceCarSelect	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4bc0a0	Dtor4bc0c0::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		func
+0x4bc170	Screen_MU_QuickRaceCarSelect::BuildCarList	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4bca40	Ride_BuildFromPartDatabase	car	I	hopper+capstone	docs/re/misc.md	misc		func
 0x4bcb00	Screen_MU_QuickRaceCarSelect::MaskButtonFlags	canon	I	ghidra-canon	docs/re/canon.md	canon		func
 0x4bcfd0	Screen_MU_QuickRaceCarSelect::IsSelectedCarInGarage	canon	I	ghidra-canon+hopper	docs/re/canon.md	canon		func
+0x4bd0f0	Screen_MU_QuickRaceCarSelect::ChangeSelectedCar	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4bd310	Screen_MU_QuickRaceLapPopup_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4bd370	Screen_MU_QuickRaceLapPopup_PC::Screen_MU_QuickRaceLapPopup_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4bd460	Dtor4bd480::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		func
@@ -1903,6 +1978,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4bdf20	Screen_MU_PauseOptions_PC::NotifySoundMessage	canon	I	ghidra-canon	docs/re/canon.md	canon		data
 0x4be6c0	OptionsCameraUI	camera	I	C	docs/re/camera.md	camera		func
 0x4c0b60	Screen_MU_PauseOptions_PC::BuildOptionList	hud	I	Ghidra dossier		core_w3		func
+0x4c1ca0	Screen_MU_PauseOptions_PC::InitOptionRows	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4c25b0	Dtor4c25a0::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		func
 0x4c25d0	Screen_MU_PauseOptionsSelector::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4c2630	Screen_MU_PauseOptionsSelector::Screen_MU_PauseOptionsSelector	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
@@ -1910,6 +1986,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4c2b00	GetSecondaryLogoHash	fe	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4c3120	CarSelect_UpdateBrandBanner	ui	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x4c3700	Dtor4c3720::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		data
+0x4c39d0	FEng_CopyTextToObject	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4c3a40	Screen_MU_UG_MovieTheaterViewer::Screen_MU_UG_MovieTheaterViewer	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4c3c40	Dtor4c3c60::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		data
 0x4c3cd0	Screen_MU_UG_MovieTheaterViewer::NotificationMessage	canon	I	ghidra-canon	docs/re/canon.md	canon		func
@@ -1928,6 +2005,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4c4e90	Screen_MU_UG_MapScreen::SummonEventBriefing	canon	I	ghidra-canon	docs/re/canon.md	canon		func
 0x4c4ee0	Screen_MU_UG_MapScreen::EventHasFMV	canon	I	ghidra-canon	docs/re/canon.md	canon		data
 0x4c4f00	Screen_MU_UG_MapScreen::SummonNewCareerFMV	canon	I	ghidra-canon	docs/re/canon.md	canon		data
+0x4c4f50	Screen_MU_UG_MapScreen::NotificationMessage	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4c5100	Screen_MU_UG_MapScreen::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4c51e0	Dtor4c5160::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
 0x4c53c0	Screen_MU_UG_EventBriefing::Screen_MU_UG_EventBriefing	canon	I	capstone	docs/re/gameflow.md	gameflow		data
@@ -1947,9 +2025,12 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4c7080	bList::FreeAllNodes	util	V	Ghidra dossier		hudcar_w2		func
 0x4c7150	UndergroundJunkmanGiveth::ApplyJunkmanPartToEditingRide	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4c7670	CreateUndergroundJunkmanGiveth	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4c7790	UndergroundRewardPartScreen::UndergroundRewardPartScreen	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4c8490	Dtor4c84b0::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		func
 0x4c8b50	Dtor4c8b10::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
+0x4c8b70	UndergroundMagazineGiveth::UndergroundMagazineGiveth	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4c95f0	Screen_MU_PlayerLogin::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4c96c0	FEng_SendBaseMessage	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4c9740	Screen_MU_PlayerLogin::Screen_MU_PlayerLogin	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4c9830	Dtor4c9850::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
 0x4c9850	Screen_MU_PlayerLogin::~Screen_MU_PlayerLogin	ui	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
@@ -1961,12 +2042,15 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4ccc90	FEScreenSound_MapEventFromRow	hud	V	ghidra-canon	docs/re/hud_input.md	sound		func
 0x4ccd20	FEScreenSound_MapEventDefault	hud	V	ghidra-canon	docs/re/hud_input.md	sound		func
 0x4cce10	PostRaceSpeech_MapRewardType2	hud	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
+0x4cd180	FEScreenSound::PlayForScreenEvent	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4cd2a0	FEScreenBase::FEScreenBase	hud	I	ghidra	docs/re/gameflow.md	gameflow		func
 0x4cd330	Dtor4cd350::ScalarDeletingDtor	hud	V	Ghidra dossier		core_w3		func
 0x4cd590	Dtor4cd580::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		func
 0x4cd5b0	Screen_MU_Pause_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4cd660	Screen_MU_Pause_PC::Screen_MU_Pause_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
+0x4cdb60	Screen_MU_Pause_PC::SetupOptionButton	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4cdea0	Screen_MU_Pause_PC::BuildMenuForMode	ui	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x4ce120	Screen_MU_Pause_PC::BuildOptionButtons	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4ce370	Screen_MU_Pause_PC::InitOptionButtons	ui	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x4ce700	Screen_MU_Options_PC::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4ce760	Screen_MU_Options_PC::Screen_MU_Options_PC	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
@@ -2061,12 +2145,15 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4d8270	IsLevel2PaintsOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4d82f0	IsLevel3PaintsOwned	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x4d8440	ColorPicker::GetHighestUpgradeLevel	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4d8600	ColorPicker::UpdateLockedIcons	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4d9960	Screen_PC_ColorPicker::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4d9a40	ColorPicker_BindElements	car	I	hopper+capstone	docs/re/misc.md	misc		func
 0x4d9fa0	GetDefaultVinylColors	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x4da1a0	Screen_PC_ColorPicker::InitControls	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4dab10	Screen_PC_ColorPicker::Screen_PC_ColorPicker	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4dae20	Screen_PC_ColorPicker::~Screen_PC_ColorPicker	ui	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x4dafa0	Screen_PC_ColorPicker::NotificationMessage	ui	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
+0x4dbf90	ColorPicker::ShowPartPrice	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4dc5e0	Dtor4dc600::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
 0x4dc6e0	FEng_PushScreenWithFactory_B	ui	I	Ghidra dossier		hudcar_w2		func
 0x4dcaa0	Dtor4dcac0::ScalarDeletingDtor	canon	V	capstone	docs/re/canon_db.md	trivial		func
@@ -2301,6 +2388,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4f0660	FEObjectSorter::AddObject	hud	I	ghidra-canon	docs/re/runtime.md	runtime		func
 0x4f0700	cFEng::QueueMessageNode	hud	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x4f07d0	Dtor4f07f0::ScalarDeletingDtor	hud	V	Ghidra dossier		core_w3		func
+0x4f0800	FEManager::QueueSwitchPackage	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4f08b0	FENode::ScalarDeletingDtor	hud	V	capstone	docs/re/canon_db.md	trivial		func
 0x4f08d0	FENode::DtorBody	hud	I	ghidra-canon	docs/re/hud.md	render		func
 0x4f08f0	UIListNode_Alloc	canon	I	hopper+capstone	docs/re/misc.md	misc		func
@@ -2419,12 +2507,16 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4f7350	FEObject::GetSize	ui	I	Ghidra dossier		hudcar_w2		func
 0x4f7430	FEImage_SetWidthScaled	hud	I	Ghidra	docs/re/misc_w2.md	misc_w2		func
 0x4f74f0	FEImage_SetHeightScaled	hud	I	Ghidra	docs/re/misc_w2.md	misc_w2		func
+0x4f75b0	FEObject::SetColor	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4f7840	MovieNameToId	canon	V	hopper+capstone	docs/re/canon.md	canon		func
 0x4f78b0	SetVtbl_4f78b0	canon	I	capstone	docs/re/canon_db.md	trivial		func
 0x4f78e0	FEScreen::FEScreen	hud	V	ghidra+capstone+hopper	docs/re/gameflow.md	gameflow		func
 0x4f7b30	FEScreen::ScalarDeletingDtor	hud	I	capstone	docs/re/gameflow.md	gameflow		func
 0x4f7b50	FEScreen::~FEScreen	ui	V	Ghidra dossier		hudcar_w2		func
+0x4f7c00	FEScreen::HandleBaseMessage	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x4f7d30	FEScreen::HandleArrowMouseClicks	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4f8000	FEScreen::BuildObjectPresenceMask	ui	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
+0x4f8340	FEScreenSound::PlayScreenSoundByName	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4f8370	FEListBox::FEListBox	ui	I	Ghidra dossier		hudcar_w2		func
 0x4f84b0	Dtor4f84d0::ScalarDeletingDtor	ui	V	Ghidra dossier		core_w3		func
 0x4f84d0	FEListBox::Destroy	ui	I	Ghidra dossier		hudcar_w2		func
@@ -2432,9 +2524,11 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4f87f0	FEListBox::UpdateScrollArrows	ui	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x4f8910	FEListBox::SelectItemByData2	ui	I	Ghidra dossier		hudcar_w2		func
 0x4f8960	FEListBox::SelectItemByData	ui	I	Ghidra dossier		hudcar_w2		func
+0x4f89d0	FEListBox::UpdateCursorPulse	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4f8dd0	FEObject::FireHighlight	hud	I	Ghidra+dossier	docs/re/hud.md	unknown_w1		func
 0x4f8ec0	FEObject::FireUnHighlight	hud	I	Ghidra+dossier	docs/re/hud.md	unknown_w1		func
 0x4f93a0	Dtor4f9390::ScalarDeletingDtor	hud	V	Ghidra dossier		core_w3		func
+0x4f9420	FEBreadcrumbScreen::FEBreadcrumbScreen	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4f9b70	Screen_MU_HorizontalBrowserBack::SetPageState	ui	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x4f9fd0	Dtor4f9fc0::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		data
 0x4f9ff0	Screen_DiscError::Create	canon	V	capstone+hopper	docs/re/gameflow.md	gameflow		func
@@ -2485,7 +2579,9 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4fec10	Dtor4fef10::ScalarDeletingDtor	hud	V	Ghidra dossier		core_w3		func
 0x4fefb0	FEObject::SetName	hud	V	ghidra-canon	docs/re/hud.md	render		func
 0x4ff010	FEObject::FindScript	hud	V	ghidra-canon	docs/re/hud.md	render		func
+0x4ff030	FEObject::RebaseTrackOffsets	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4ff1d0	FEObject::FindResponse	hud	V	ghidra-canon	docs/re/hud.md	render		func
+0x4ff2f0	FEObject::WriteKeyTrackValue	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x4ff560	FEObject::GetDataOffset	hud	V	ghidra-canon	docs/re/hud.md	render		func
 0x4ff690	FEListBox::SetCurrentColumn	hud	V	ghidra-canon	docs/re/hud.md	render		func
 0x4ff6c0	FEListBox::SetCurrentRow	hud	V	ghidra-canon	docs/re/hud.md	render		func
@@ -2497,6 +2593,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x4ffb70	FEng_VisitChildrenSEH	ui	I	Ghidra dossier		hudcar_w2		func
 0x4ffbc0	FEFindByGUID::Callback	hud	V	ghidra-canon+mw	docs/re/hud.md	render		func
 0x500410	ResourceConnector::ConnectListBoxResources	hud	V	ghidra-canon	docs/re/hud.md	render		func
+0x500560	Dtor500560::DtorBody	hud	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x5006a0	FETypeNode::GetFieldAt	hud	I	ghidra-canon+hopper	docs/re/hud.md	render		func
 0x5006f0	FEKeyTrack::FEKeyTrack	hud	V	ghidra-canon	docs/re/hud.md	render		func
 0x500760	FEScript::FEScript	hud	V	ghidra-canon+mw	docs/re/hud.md	render		func
@@ -3027,6 +3124,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5337f0	SoundObject::SoundObject(bVector3 const&)	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
 0x5338c0	SoundObject::Update	audio.sfx	V	ghidra	docs/re/sound.md	sound		func
 0x5339e0	Dtor533a00::ScalarDeletingDtor	audio.sfx	V	Ghidra dossier		core_w3		func
+0x533a50	EnvStaticSoundObject::Update	audio	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x533f70	Audio::CreateEnvStaticInstance	audio	I	Ghidra+dossier	docs/re/audio.md	unknown_w1		func
 0x534140	Dtor534160::ScalarDeletingDtor	audio	V	Ghidra dossier		core_w3		func
 0x534490	EAX_DeletingDtor_534490	audio.sfx	V	ghidra dossier decomp	docs/re/sound.md	view_w3		func
@@ -3096,8 +3194,10 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x53e400	BinarySearch_Hash	assets	V	Hopper export + Ghidra export	docs/re/assets.md	assets		func
 0x53e4f0	StringList_Find	runtime	I	hopper+capstone	docs/re/misc.md	misc		func
 0x53e560	SolidListSet_FindListByHash	assets	I	ghidra-canon	docs/re/runtime.md	runtime		func
+0x53e9e0	Resource_QueueLoadByHashArray	assets	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x53ec90	Resource_ReleaseByHashArray	assets	V	Ghidra	docs/re/misc_w2.md	misc_w2		func
 0x53ed70	ResourceFileList_IsLoadedByName	assets	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
+0x53eed0	ResourceFileList_OpenOrAddRef	assets	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x53f220	StrmHdrRes::Create	assets	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x53f3e0	ResourceFileList_Remove	assets	I	hopper+capstone	docs/re/misc.md	misc		func
 0x53f540	Solid_BindTextureRefs	assets	I	ghidra-canon+hopper	docs/re/runtime.md	runtime		func
@@ -3204,6 +3304,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x54dc70	Online::OnPersonaListReply	online	V	Ghidra+dossier	docs/re/online.md	unknown_w1		func
 0x54dd30	Online::BuildClientInfoString	online	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x54e8a0	Dtor54e880::ScalarDeletingDtor	online	V	Ghidra dossier		core_w3		data
+0x54f200	OnlineRoomListScreen::FillRoomRows	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x54f930	Dtor54f920::ScalarDeletingDtor	online	V	Ghidra dossier		core_w3		func
 0x54fd50	Online::FormatRaceResultsLine	online	I	Ghidra dossier		core_w3		func
 0x5500b0	Online::FillRepRow	online	I	Ghidra dossier		core_w3		func
@@ -3220,16 +3321,22 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x554400	Leaf_554400	online	I	capstone	docs/re/canon_db.md	trivial		func
 0x554410	Leaf_554410	online	I	capstone	docs/re/canon_db.md	trivial		func
 0x554495	Pad_int3	runtime	V	capstone	docs/re/canon_db.md	trivial		data
+0x5544a0	OnlineGameOptionsScreen::OnlineGameOptionsScreen	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x554730	Screen_MU_OnlineGameRoom::UpdatePlayerSlots	online	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x554f60	OnlineGameOptionsScreen::NotificationMessage	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x5558d0	OnlineGameOptionsScreen::UpdateLapsRow	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x555dd0	OnlineGameOptionsScreen::SelectFirstAvailableTrack	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x556460	Screen_MU_OnlineGameRoom::HandleReply	online	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x5567e3	Pad_int3	runtime	V	capstone	docs/re/canon_db.md	trivial		data
 0x556960	Dtor556950::ScalarDeletingDtor	runtime	V	Ghidra dossier		core_w3		func
 0x556df0	Dtor556de0::ScalarDeletingDtor	runtime	V	Ghidra dossier		core_w3		func
 0x556e70	Screen_MU_OnlineMenu::Screen_MU_OnlineMenu	online	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
+0x5570a0	OnlineScreen_5570a0::NotificationMessage	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x557470	Nop_ret0x10	canon	I	capstone	docs/re/canon_db.md	trivial		data
 0x557480	Dtor557460::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		data
 0x557510	Dtor557500::ScalarDeletingDtor	canon	V	Ghidra dossier		core_w3		data
 0x557a00	Dtor557a20::ScalarDeletingDtor	online	V	capstone	docs/re/canon_db.md	trivial		data
+0x557a40	OnlineScreen_557a40::NotificationMessage	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x5583f0	Screen_MU_Online_CreateAccount_StepOne::Screen_MU_Online_CreateAccount_StepOne	online	V	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x558b60	Dtor558b80::ScalarDeletingDtor	online	V	capstone	docs/re/canon_db.md	trivial		func
 0x55a610	Screen_MU_Online_AnotherAccount::Screen_MU_Online_AnotherAccount	online	V	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
@@ -3238,10 +3345,12 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x55b6d0	Screen_MU_Online_ParentalEmailRequired_PC::Screen_MU_Online_ParentalEmailRequired_PC	online	V	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x55b920	Dtor55b940::ScalarDeletingDtor	online	V	capstone	docs/re/canon_db.md	trivial		func
 0x55bec0	Dtor55bee0::ScalarDeletingDtor	online	V	capstone	docs/re/canon_db.md	trivial		func
+0x55bfc0	OnlineLobbyScreen::OnlineLobbyScreen	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x55c550	Online::FillPlayerDataRow	online	I	Ghidra dossier		core_w3		func
 0x55ce20	Online::FillPlayerRow	online	I	Ghidra dossier		core_w3		func
 0x55d370	Dtor55d390::ScalarDeletingDtor	online	V	Ghidra dossier		core_w3		func
 0x55da00	Screen_MU_Online4PlayerGameDialogueBox::OnReplyCancel	online	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x55e3b0	OnlineRaceSetupScreen::UpdateLapsRow	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x55ec30	Screen_MU_Online_RankingsBoard::Screen_MU_Online_RankingsBoard	online	V	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x55ef30	Dtor55ef50::ScalarDeletingDtor	online	V	Ghidra dossier		core_w3		func
 0x5600c0	Online::FillRankingRow	online	I	Ghidra dossier		core_w3		func
@@ -3303,11 +3412,13 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x569c50	FrontEndRenderingCar::FrontEndRenderingCar	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x56a040	FrontEndRenderingCar::ReInit	car.garage	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x56a130	CarRenderInfo::CarRenderInfo	other	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x56c140	CarRenderInfo::~CarRenderInfo	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x56c250	CarRenderInfo::CacheWheelAxes	render	I	Ghidra+dossier	docs/re/render.md	unknown_w1		func
 0x56c310	CarRenderInfo_RefreshTextureInfo	render	V	ghidra	docs/re/render_pc.md	render_w2		func
 0x56c3d0	CarRenderInfo::UpdateDecalTextures	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x56cf10	CarShadow_BuildOutline	render	I	ghidra	docs/re/render_pc.md	render_w2		func
 0x56d700	CarShadow_SunVector	render	I	ghidra	docs/re/render_pc.md	render_w2		func
+0x56d8d0	CarRenderInfo::DrawLampFlares	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x56dc30	CarRenderInfo_Render	carfx	I	ghidra	docs/re/car_assets.md	carfx	CarRenderInfo::Render@tuning	func
 0x5707b0	Views_UpdatePerFrame	render	I	hopper+ghidra	docs/re/render.md	render		func
 0x570950	DrawShowcaseCarList	blur	I	C	docs/re/blur.md	blur		func
@@ -3356,6 +3467,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x576f80	Mobile::InitSlotPools	track	V	Ghidra+dossier	docs/re/track.md	game_w1		func
 0x577270	Dtor577290::ScalarDeletingDtor	track	V	Ghidra dossier		core_w3		func
 0x5779a0	Dtor5779c0::ScalarDeletingDtor	track	V	Ghidra dossier		core_w3		func
+0x577fd0	Stub::ReturnTrue	traffic	V	capstone	docs/re/traffic_react.md	traffic_w4		func
 0x578290	Dtor578370::ScalarDeletingDtor	raceai	V	Ghidra dossier		core_w3		func
 0x578730	AI::CacheCarFrame	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w3		func
 0x5787e0	WorldObjectCohort::Loader	assets	V	Ghidra make FUN_005787e0 (Hopper export lacks it)	docs/re/assets.md	assets		data
@@ -3366,11 +3478,13 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5791c0	SpaceNode::UpdateWorldMatrix	track	I	Ghidra+dossier	docs/re/track.md	game_w1		func
 0x579430	SpaceNode::InitSlotPool	track	V	Ghidra+dossier	docs/re/track.md	game_w1		func
 0x579590	IList_InitEmpty_Thunk	runtime	V	hopper+capstone	docs/re/misc.md	misc		func
+0x579750	WorldObject::WorldObject	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x579b10	Dtor579b30::ScalarDeletingDtor	runtime	V	Ghidra dossier		core_w3		func
 0x579c00	AnimController::UpdateSpaceNode	track	I	Ghidra dossier decomp + Speed.exe data scan	docs/re/names_w4b.md	w4b		func
 0x57a220	Dtor57a1a0::ScalarDeletingDtor	raceai	V	Ghidra dossier		core_w3		data
 0x57a250	Dtor57a240::ScalarDeletingDtor	raceai	V	Ghidra dossier		core_w3		func
 0x57a420	TrackPath::TrackPath	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w3		func
+0x57a6b0	AINeighbour::IsHumanDriven	raceai	V	ghidra+capstone	docs/re/traffic_react.md	traffic_w4		func
 0x57a910	AI::BuildNeighbourList	raceai	V	Ghidra	docs/re/race_ai.md	raceai		func
 0x57b520	AI::FindNeighbour	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w1		func
 0x57b640	Dtor57b5c0::ScalarDeletingDtor	raceai	V	Ghidra dossier		core_w3		data
@@ -3395,6 +3509,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x57d120	CarTypeInfo_SkinId	traffic	V	capstone	docs/re/traffic_limits.md	trafficpool		func
 0x57d160	Ride_Init	traffic	I	G	docs/re/traffic.md	traffic		func
 0x57d200	RideInfo::DoSnapshot	car	V	Ghidra+dossier	docs/re/car.md	unknown_w1		func
+0x57d340	RideInfo::FillDefaultParts	car	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x57d860	RideInfo::SyncPartsToPhysicsForAI	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x57e9a0	Ride::SetBodyColourSpec	traffic	I	Ghidra	docs/re/traffic_limits.md	trafficpool		func
 0x57ea80	RideInfo::UpdatePartsEnabled	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -3417,17 +3532,23 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x580af0	Leaf_580af0	runtime	I	capstone	docs/re/canon_db.md	trivial		func
 0x580b00	GetUsedCarTextureInfo	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x581b30	MakeAccelerationTable	car.physics	V	ghidra+hopper	docs/re/tuning.md	tuning		func
+0x5825c0	CameraPath_FreeBuffers	camera	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		data
 0x5829e0	Spline_CatmullRomEval	camera	V	Ghidra	docs/re/misc_w2.md	misc_w2		func
+0x582f50	TrafficAI::GetDirection	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x582f90	TrafficAI::ctor	traffic	I	C+H	docs/re/traffic.md	traffic		func
 0x5830b0	Dtor5830d0::ScalarDeletingDtor	rivals	V	capstone	docs/re/canon_db.md	trivial		func
 0x583140	TrafficController::DoSnapshot	traffic	V	Ghidra+dossier	docs/re/traffic.md	unknown_w1		data
+0x583230	TrafficAI::CreateDefaultGoal	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		data
 0x583250	TrafficAI::SetDirection	traffic	V	Ghidra+dossier	docs/re/traffic.md	game_w1		func
 0x583270	TrafficAI::SetTrackedCar	traffic	I	Ghidra+dossier	docs/re/traffic.md	game_w1		func
 0x5832a0	TrafficCar_Park	traffic	V	G+C	docs/re/traffic.md	traffic		func
 0x583350	TrafficAI::Update	traffic	V	H+G	docs/re/traffic.md	traffic		func
 0x583700	TrafficAI::Reset	traffic	I	H	docs/re/traffic.md	traffic		func
+0x583850	TrafficAI::ApplyAction	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
+0x583910	TrafficAI::CalcSpeedTarget	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x583c80	TrafficAI::CalcTimeToIntersection	traffic	I	Ghidra+dossier	docs/re/traffic.md	game_w1		func
 0x583d70	Leaf_583d70	traffic	I	capstone	docs/re/canon_db.md	trivial		func
+0x583da0	Unk_traffic_583da0	traffic	U	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x583ea0	UniformTable::Lookup	physics	V	Ghidra+capstone	docs/re/physics.md	physics		func
 0x583f20	LinearTable::Lookup11	rivals	V	Ghidra+capstone	docs/re/rivals.md	rivals		func
 0x5840c0	Average::DoSnapshot	car	V	Ghidra+dossier	docs/re/car.md	unknown_w1		func
@@ -3527,6 +3648,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5944f0	DiscCheck::PromptForDisc	runtime	I	Ghidra dossier		core_w3		func
 0x594b70	FileSystem::InitSlotPool	runtime	V	Ghidra+dossier	docs/re/gameflow.md	game_w1		func
 0x594c60	bOpenFile	assets	I	ghidra	docs/re/assets.md	assets		func
+0x594d40	bCloseFile	assets	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x594d90	bFileGetSize	assets	I	Ghidra	docs/re/misc_w2.md	misc_w2		func
 0x594ef0	bFileWriteMemory	assets	V	Ghidra	docs/re/misc_w2.md	misc_w2		func
 0x594fc0	thunk__malloc	runtime	V	capstone	docs/re/canon_db.md	trivial		func
@@ -3614,6 +3736,9 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x59e5c0	EasterEggs::IsPartUnlocked	car.parts	I	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x59e620	Table3A000::Loader	assets	V	Hopper sub_59e620 + Ghidra make FUN_0059e620: H+G agree	docs/re/assets.md	assets		func
 0x59e660	Table3A000::Unloader	assets	V	Ghidra make FUN_0059e660 (Hopper export lacks it)	docs/re/assets.md	assets		data
+0x59e850	FEWidget::InitFromDescriptor_59e850	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x59eac0	FEWidget::InitFromDescriptor_59eac0	ui	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x59f7c0	Language_LoadTextureBin	assets	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x59fa20	EAXSound::ChangeLanguage	audio.bank	V	ghidra	docs/re/sound.md	sound		func
 0x59fb80	LanguageStrings::FindByHash	assets	V	Hopper sub_59fb80	docs/re/assets.md	assets	GetLocalizedStringByHash@canon	func
 0x59fc90	PostRaceStats_FormatDecimalLocale	hud	V	ghidra dossier decomp	docs/re/hud_input.md	view_w3		func
@@ -3677,6 +3802,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5a6e10	Node::DistanceToIntersection	traffic	I	Ghidra+dossier	docs/re/traffic.md	game_w1		func
 0x5a70f0	FuturePoint::DoSnapshot	rivals	V	Ghidra+dossier	docs/re/rivals.md	unknown_w1		func
 0x5a7390	AI::GetLateralOffsetToLane	raceai	I	Ghidra+dossier	docs/re/race_ai.md	game_w3		func
+0x5a7700	RoadLane_CanChangeTo	traffic	V	ghidra	docs/re/traffic_react.md	traffic_w4		func
 0x5a96b0	GetDoorLineHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x5a97f0	GetDoorLineMaskHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
 0x5a9930	GetHoodSpoilerHash	car.parts	V	ghidra+hopper	docs/re/tuning.md	tuning		func
@@ -3768,10 +3894,12 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5ba942	D3DX_HlslSema_SstructU_5ba942	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5bac05	D3DX_HlslSema_InternalErrorUnknownNode_5bac05	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5bae82	D3DX_HlslSema_ObjectLiteralsAreNotAllowedIns_5bae82	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
+0x5bb1eb	D3DX_HlslSema_ResolveConstDims	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x5bb22e	D3DX_HlslSema_Stmts_5bb22e	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5bb295	D3DX_HlslSema_Stmts_5bb295	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5bb534	D3DX_HlslSema_Values_5bb534	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5bbdd0	D3DX_HlslSema_NonMatrixTypesCannotBeDeclared_5bbdd0	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
+0x5bbe7f	D3DX_HlslSema_TypesEqual	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x5bc1ad	D3DX_HlslSema_SCannotSconvertFromSToS_5bc1ad	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5bc356	D3DX_HlslSema_Value_5bc356	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5bc4f9	D3DX_HlslSema_Value_5bc4f9	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
@@ -3790,6 +3918,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5bfe5c	D3DX_HlslSema_Vertexfragment_5bfe5c	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5c094c	D3DX_HlslSema_RedefinitionOfS_5c094c	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5c0cfc	D3DX_HlslSema_Value_5c0cfc	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
+0x5c0e2d	D3DX_HlslSema_EvalLiteralDimension	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x5c0e94	D3DX_HlslSema_Stmts_5c0e94	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5c1052	D3DX_HlslSema_NewKind1Node	render	I	ghidra dossier decomp	docs/re/render_pc.md	view_w3		func
 0x5c10a3	D3DX_HlslSema_VectorDimensionMustBeBetween1A_5c10a3	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
@@ -3879,11 +4008,13 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5db2b5	D3DX_HlslGen_EmitIntrinsic_5db2b5	render	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x5dbae8	D3DX_HlslGen_EmitVectorOp_5dbae8	render	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x5dbe7e	D3DX_HlslGen_ApplyNodeFlags	render	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x5dc02b	D3DX_HlslGen_EmitIfStatement	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x5dc760	D3DX_HlslGen_InternalErrorUnrecognizedState_5dc760	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5dca6a	D3DX_HlslGen_IntrinsicFunctionSIsNotYetImpl_5dca6a	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5e1f75	D3DX_HlslGen_SFunctionMustReturnAValue_5e1f75	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5e2a38	D3DX_HlslGen_InternalErrorOutOfMemory_5e2a38	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5e49cf	D3DX_HlslGen_InternalErrorUnrecognizedValue_5e49cf	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
+0x5e4bb7	D3DX_HlslGen_AllocNodeRegisterArray	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x5e4ca2	D3DX_Asm_OverloadedFunctionNotFound_5e4ca2	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5e505d	D3DX_Asm_NonTrivialObjectExpressionsNot_5e505d	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5e5221	D3DX_Asm_Psize_5e5221	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
@@ -3917,6 +4048,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5f762c	D3DX_Back_Container_GetItemA	render	I	capstone	docs/re/render_pc.md	render_w3		func
 0x5f76ed	Dtor5f7658::ScalarDeletingDtor	render	V	Ghidra dossier		core_w3		data
 0x5f7709	D3DX_Back_Container_Reset	render	I	capstone	docs/re/render_pc.md	render_w3		func
+0x5f7760	D3DX_Back_Container_Init	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x5f7a42	D3DX_Back_Container_CopyField34	render	I	capstone	docs/re/render_pc.md	render_w3		func
 0x5f7a96	D3DX_Ir_IsTypeClass0	render	V	ghidra dossier decomp	docs/re/render_pc.md	view_w3		func
 0x5f7aa3	D3DX_Ir_IsTypeClass1	render	V	ghidra dossier decomp	docs/re/render_pc.md	view_w3		func
@@ -3930,6 +4062,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x5fe888	D3DX_Opt_ArrayIndexOutOfBounds_5fe888	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5fefac	D3DX_Opt_DivisionByZero_5fefac	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x5ff66c	D3DX_Back_Pass_5ff66c	render	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x5ffbd5	D3DX_Back_LowerNodes	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		data
+0x600fa7	D3DX_Back_AllocRegisterFile	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		data
 0x60254c	D3DX_Opt_ExpressionTooComplex_60254c	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x602b94	D3DX_Ps1Back_Pass_602b94	render	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
 0x604024	D3DX_Ps1Back_InternalWarningOptimizationDid_604024	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
@@ -3957,6 +4091,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x60c25d	D3DX_Ps1Back_ShaderCannotCompileToAPs1IShad_60c25d	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x60c503	D3DX_Ps1Back_CannotMapExpressionToPixelShad_60c503	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x60c89d	Dtor60ba7c::ScalarDeletingDtor	render	V	Ghidra dossier		core_w3		data
+0x60c8b9	D3DX_Ps1Back_Compile	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		data
 0x60cdf7	D3DX_Ps1Back_InternalErrorOverlappingOutput_60cdf7	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x60cf25	D3DX_Ps1Back_PixelShaderMustMinimallyWriteA_60cf25	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x60d526	D3DX_Ps1Back_InternalErrorUnexpectedAliasOn_60d526	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		data
@@ -3981,6 +4116,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x612c37	Dtor613825::ScalarDeletingDtor	render	V	Ghidra dossier		core_w3		data
 0x612c59	D3DX_VsBack_TooManyOutputsToTargetTx_612c59	render	V	ghidra+strings	docs/re/render_pc.md	render_w2		func
 0x613165	D3DX_BlockList_FreeAll	render	I	Ghidra	docs/re/misc_w2.md	misc_w2		func
+0x61319b	D3DX_String_Create	render	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x6132d2	D3DX_Buffer_DwordCount	render	I	Ghidra	docs/re/misc_w2.md	misc_w2		func
 0x613660	Dtor613455::ScalarDeletingDtor	render	V	Ghidra dossier		core_w3		func
 0x61367c	Dtor6135d9::ScalarDeletingDtor	render	V	Ghidra dossier		core_w3		data
@@ -4243,6 +4379,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x65f420	Set_d64	audio	I	capstone	docs/re/canon_db.md	trivial		func
 0x65fce0	SNDI_getb	audio.bank	V	ghidra	docs/re/sound.md	sound		func
 0x663300	Leaf_663300	runtime	I	capstone	docs/re/canon_db.md	trivial		func
+0x664e00	Online::SendTaggedRequest	online	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x665140	Online::LogReceivedPacket	online	V	Ghidra+dossier	docs/re/online.md	unknown_w1		func
 0x6670c0	Leaf_6670c0	runtime	I	capstone	docs/re/canon_db.md	trivial		func
 0x667fa0	DirtySock::ParseDelimitedField	online	I	Ghidra dossier		core_w3		func
@@ -4397,6 +4534,8 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x673f9f	___updatetlocinfo	runtime	I	ghidra-fid	docs/re/canon_db.md	lib		func
 0x673fd1	CRT::updatetlocinfo_unlock_finally	runtime	V	Ghidra dossier		runtime_w2		func
 0x673fda	CRT::setlocale_get_all	runtime	I	Ghidra dossier decomp	docs/re/names_w4b.md	w4b		func
+0x674099	CRT::_expandlocale_core	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
+0x6741c5	CRT::_setlocale_set_cat	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x6743e3	CRT::_expandlocale	runtime	I	Ghidra dossier		runtime_w2		func
 0x6745c2	_setlocale	runtime	I	ghidra-fid	docs/re/canon_db.md	lib		func
 0x67470b	CRT::setlocale_unlock_finally	runtime	V	Ghidra dossier		runtime_w2		func
@@ -4600,6 +4739,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind
 0x681af5	CRT::__strgtold12	runtime	I	Ghidra dossier		core_w3		func
 0x681f42	CRT::__getlocaleinfo	runtime	V	Ghidra dossier		runtime_w2		func
 0x682073	__strnicmp	runtime	I	ghidra+hopper	docs/re/runtime.md	runtime		func
+0x6820f2	CRT::_chsize_lk	runtime	I	Ghidra headless decomp (tools/ghidra/gpar.sh) + dossier	docs/re/names_w4a.md	w4a		func
 0x68222d	__mbschr	runtime	I	ghidra-fid	docs/re/canon_db.md	lib		func
 0x6822a8	___addl	runtime	I	ghidra-fid	docs/re/canon_db.md	lib		func
 0x6822c9	___add_12	runtime	I	ghidra-fid	docs/re/canon_db.md	lib		func
