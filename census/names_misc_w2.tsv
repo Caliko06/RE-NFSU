@@ -1,0 +1,60 @@
+addr	name	system	confidence	evidence	tool	doc
+0x564b10	Angle16_Sin	math	V	V: x87 polynomial sine (odd terms x,x^3,x^5..), arg = AX*scale, quadrant fold by compares with consts, sign multiplier; callers are Matrix_FromAxisAngle, BuildProjection, camera movers and Angle16 matrix builders	Ghidra	docs/re/misc_w2.md
+0x40b930	Matrix_RotationZ_Angle16	camera	V	V: calls 0x564b10 twice (sin,cos), writes [0]=[5]=c,[1]=s,[4]=-s,[10]=[15]=1, rest 0 into 4x4 out	Ghidra	docs/re/misc_w2.md
+0x40ba40	Matrix_MultiplyRotationY_Angle16	camera	V	V: builds Y rotation (c at 0,10; -s at 2; s at 8; [5]=[15]=1) from 0x564b10 then D3DXMatrixMultiply(out,in,rot)	Ghidra	docs/re/misc_w2.md
+0x40b990	Matrix_MultiplyRotationX_Angle16	camera	V	V: builds X rotation ([0]=[15]=1; c at 5,10; s at 6; -s at 9) from 0x564b10 then D3DXMatrixMultiply(out,in,rot)	Ghidra	docs/re/misc_w2.md
+0x5829e0	Spline_CatmullRomEval	camera	V	V: splits t into index+frac (0x4387e0 floor), weights ((2t^2-t^3-t)/2, ...,(t^3-t^2)/2) with 0.5 const 0x6cc7dc = Catmull-Rom basis, passes to 0x5828e0	Ghidra	docs/re/misc_w2.md
+0x564cd0	Angle16_AtanTable	math	V	V: |x|>=1 returns 0x4000 (+0x8000 if neg); else bisects to a segment and interpolates table 0x6f2280, returns signed 16-bit angle: arctan to Angle16	Ghidra	docs/re/misc_w2.md
+0x5673e0	Vec3_ScaleToLength	math	V	V: out = v * (len_target/|v|) computed as 1/(|v|/s); zero vector returns (s,0,0)	Ghidra	docs/re/misc_w2.md
+0x441d80	Noise2D_Value	math	V	V: floor of x*scale and y*scale (0x4387e0), bilinear blend of four hashed lattice values from table 0x7009d8 indexed by (i*j*-5+..)&15	Ghidra	docs/re/misc_w2.md
+0x47ee50	Countdown_RefreshForNumber	hud	I	I: when 0x434d10 value differs from +0x20, deletes old element and formats string COUNTDOWN_%d, finds the FE/NIS object and constructs new 0x45c object	Ghidra	docs/re/misc_w2.md
+0x494890	LinkedList_FreeAll	canon	I	I: loops circular list head, unlinks node, calls 0x48edf0 on it and _free; used by 0x417560 twice	Ghidra	docs/re/misc_w2.md
+0x594fe0	operator_delete	canon	V	V: only body is _free(EAX); 238 callers incl. 219 named	Ghidra	docs/re/misc_w2.md
+0x4f42f0	bStringHashPrintf	canon	V	V: bVPrintf into 256 byte stack buffer then hash h=-1; h=h*33+c over the result	Ghidra	docs/re/misc_w2.md
+0x404ab0	bFatalError	canon	V	V: _vsprintf to 1KB, prints 'FATAL ERROR: ' + message (or calls handler DAT_0073651c) then int3/exit(1)	Ghidra	docs/re/misc_w2.md
+0x449f20	Version_FormatString	canon	V	V: zeroes buffer, bSPrintf-style FUN_00565da0('%d.%d.%d',1,4,DAT_00734994) (major.minor.build)	Ghidra	docs/re/misc_w2.md
+0x565ce0	bFree	canon	V	V: validates pool when set, checks header magic 0x2222 at ptr-0xe (int3 if bad), clears it and links block back into pool free list	Ghidra	docs/re/misc_w2.md
+0x565b60	bMalloc	canon	I	I: lazily inits 'Main Pool' via bInitMemoryPool, picks pool by param_4&7 and allocates; counterpart of 0x565ce0 (used together at 0x447040)	Ghidra	docs/re/misc_w2.md
+0x546060	Resource_ReleaseByHash	assets	I	I: finds section for hash in list 0x740420, BinarySearch_Hash entry, decrements refcount at +0xe, at zero frees via 0x53ebc0 or flags +0xd|=0x20	Ghidra	docs/re/misc_w2.md
+0x53ec90	Resource_ReleaseByHashArray	assets	V	V: loops count entries of hash array, same refcount decrement/free as 0x546060 per entry	Ghidra	docs/re/misc_w2.md
+0x51bad0	Frontend_LoadMagazineTextures	assets	V	V: if StringList_Find(0x740420,'FRONTEND_MAGAZINE_TEXTURES_BIN') missing, queues load 0x53eed0 and spins ServiceResourceLoading until loaded	Ghidra	docs/re/misc_w2.md
+0x546590	Sky_LookupTextures	assets	V	V: TrackSkyInfo_Select then Texture_FindByHash for five fixed hashes stored in globals 0x730138..48	Ghidra	docs/re/misc_w2.md
+0x4f7430	FEImage_SetWidthScaled	hud	I	I: for image types 1,7,9 multiplies param by texture short +0x44 (width) and stores at obj+0x2c ->+0x38; type 2 stores raw	Ghidra	docs/re/misc_w2.md
+0x4f74f0	FEImage_SetHeightScaled	hud	I	I: same as 0x4f7430 using texture short +0x46 (height) into +0x3c	Ghidra	docs/re/misc_w2.md
+0x548820	NetBitStream_Reset	online	V	V: zero first byte, write bit pos +0x400=0, read bit pos +0x404=0, flag +0x408=1	Ghidra	docs/re/misc_w2.md
+0x548840	NetBitStream_WriteBits	online	V	V: appends EAX bits of param MSB-first at bit pos +0x400, merging into partial byte and filling whole bytes	Ghidra	docs/re/misc_w2.md
+0x5488d0	NetBitStream_ReadBits	online	V	V: reads param bits from bit pos +0x404 into *ESI, advances, right-aligns result	Ghidra	docs/re/misc_w2.md
+0x4392a0	NetPacket_Begin	online	I	I: thin wrapper over NetBitStream_Reset	Ghidra	docs/re/misc_w2.md
+0x4389b0	NetPacket_WriteByte	online	I	I: thin wrapper over NetBitStream_WriteBits	Ghidra	docs/re/misc_w2.md
+0x436d90	NetPacket_ReadBits	online	I	I: thin wrapper over NetBitStream_ReadBits, returns 0	Ghidra	docs/re/misc_w2.md
+0x547910	Net_SendToAllPeers	online	I	I: loops peer table 0x73ddc0 (stride 0x20, to 0x73de20), for each connected slot calls send 0x54e480 then 0x548d70(type)	Ghidra	docs/re/misc_w2.md
+0x547620	Net_BroadcastString_Type07	online	I	I: Begin, write byte 7, copy string bytes, 0x547910(7,..,1)	Ghidra	docs/re/misc_w2.md
+0x547690	Net_BroadcastString_Type05	online	I	I: same as 0x547620 with type 5, flag 0	Ghidra	docs/re/misc_w2.md
+0x547700	Net_BroadcastString_Type0E	online	I	I: same pattern with type 0xe, flag 1	Ghidra	docs/re/misc_w2.md
+0x5d7ac2	D3DX_HlslNode_InitKind2	render	I	I: ctor sets vtable 0x6a0c04, kind field [1]=2, copies 8 dwords; same node family as D3DX_HlslNode_InitKind*	Ghidra	docs/re/misc_w2.md
+0x5d8a65	D3DX_HlslNode_InitKind13	render	I	I: ctor vtable 0x6a0cb4, kind [1]=0xd, two params and 8 copied dwords	Ghidra	docs/re/misc_w2.md
+0x5d7db0	D3DX_HlslNode_InitKind5	render	I	I: ctor vtable 0x6a0c34, kind [1]=5, stores four params	Ghidra	docs/re/misc_w2.md
+0x5b1775	D3DX_Pool_AllocChained	render	I	I: malloc(n+4), chains block into list head *param_1 and returns ptr+4 (arena that frees all later)	Ghidra	docs/re/misc_w2.md
+0x5b1a6c	D3DX_Preproc_AtLineEnd	render	I	I: scans text for '\n', skipping backslash-newline and backslash-CRLF continuations; compiler front-end text scanner	Ghidra	docs/re/misc_w2.md
+0x43a1a0	Online_AllocBuffer	online	V	V: allocates named buffer 'Online Buffer' via 0x401000(name,0), stores at +0x58, then if online flag DAT_007346c4 calls 0x5492c0	Ghidra	docs/re/misc_w2.md
+0x5479a0	Net_BroadcastMsgType	online	V	V: Begin packet, write byte param_1, 0x547910(param_1,..,1) to all peers (no payload)	Ghidra	docs/re/misc_w2.md
+0x547390	Net_BroadcastMsg0A	online	I	I: Begin, byte 0xa, writes DAT_00735504 bits, 0x547910 to all peers	Ghidra	docs/re/misc_w2.md
+0x547560	Net_SetState3AndBroadcast	online	V	V: DAT_00735500=3, Begin, byte 0xd, writes DAT_00735500, broadcast	Ghidra	docs/re/misc_w2.md
+0x5475c0	Net_SetState4AndBroadcast	online	V	V: DAT_00735500=4, Begin, byte 0xd, writes DAT_00735500, broadcast	Ghidra	docs/re/misc_w2.md
+0x43b090	Net_ReadRaceOptionsFromPacket	online	I	I: series of NetBitStream_ReadBits (8,16,8,8,32,32 bits) stored into RaceOptions_Get() fields +8,+0xc,+0x1f	Ghidra	docs/re/misc_w2.md
+0x594d90	bFileGetSize	assets	I	I: bOpenFile handle, calls 0x594d40 (close), returns size field +4 or -1 if negative/missing	Ghidra	docs/re/misc_w2.md
+0x594ef0	bFileWriteMemory	assets	V	V: memcpy of n bytes into file buffer at pos +8 (0x63c290), advances pos, grows size +4 to max, then 0x594d40	Ghidra	docs/re/misc_w2.md
+0x4480b0	ResourceBuffer_Alloc	assets	I	I: if size +0xa0 set, allocs via 0x565b60 (bMalloc) with flags from +0x88 (|8 if +0xc&2 or param), stores at +0x9c	Ghidra	docs/re/misc_w2.md
+0x4480f0	ResourceBuffer_Free	assets	V	V: if +0x9c set, 0x565ce0 (bFree) and null it	Ghidra	docs/re/misc_w2.md
+0x597920	ParticleEmitterList_QueueAll	render	V	V: walks circular list at +0x4b0 calling ParticleEmitter_Queue each, sets flag +0x4c0=1	Ghidra	docs/re/misc_w2.md
+0x544390	CarRender_DrawBodyDispatch	render	I	I: if DAT_0073554c calls CarRender_LitBodyPathA else 0x542400+0x542c20 (Path B steps)	Ghidra	docs/re/misc_w2.md
+0x5d844d	D3DX_HlslNode_InitKind10	render	I	I: ctor vtable 0x6a0c84, kind [1]=10, zeroes 11 fields	Ghidra	docs/re/misc_w2.md
+0x5d8670	D3DX_HlslNode_InitKind11	render	I	I: ctor vtable 0x6a0c94, kind [1]=0xb, zeroes fields 4..9	Ghidra	docs/re/misc_w2.md
+0x5ba22d	D3DX_Hlsl_ReportFormatted	render	I	I: _vsnprintf into 256 byte buffer then forwards to message sink 0x5b1fca with the compiler context	Ghidra	docs/re/misc_w2.md
+0x5d9e57	D3DX_Hlsl_ReportFormattedAtNode	render	I	I: same as 0x5ba22d, passes node+0x30 when node kind==0xc as location	Ghidra	docs/re/misc_w2.md
+0x5bd1b1	D3DX_Hlsl_AddUsageTypeAnnotation	render	I	I: constructs annotation node through 0x5d78db with literal 'UsageType'	Ghidra	docs/re/misc_w2.md
+0x613165	D3DX_BlockList_FreeAll	render	I	I: pops singly linked list at +8, frees payload unless flag bit pattern says external, frees node	Ghidra	docs/re/misc_w2.md
+0x6132d2	D3DX_Buffer_DwordCount	render	I	I: returns ((size+3)>>2)+2 for size field +4	Ghidra	docs/re/misc_w2.md
+0x455250	FreeListPush_Pool00733f64	canon	V	V: pushes node onto free list at pool DAT_00733f64+0x10 and decrements used count +0x18	Ghidra	docs/re/misc_w2.md
+0x447a90	FreeListPush_Pool007360f8	canon	V	V: same free-list push into pool DAT_007360f8	Ghidra	docs/re/misc_w2.md
+0x455510	FreeListPush_Pool007344c8	canon	V	V: same free-list push into pool DAT_007344c8	Ghidra	docs/re/misc_w2.md

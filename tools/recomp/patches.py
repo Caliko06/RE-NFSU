@@ -419,3 +419,11 @@ def c_table():
     return (f"const uint32_t rn_patch_count = {len(ps)};\n"
             "const uint32_t rn_patch_addr[] = {" + "".join(f"0x{p['addr']:x}," for p in ps) + "0};\n"
             "const char *const rn_patch_hex[] = {" + "".join(f'"{p["new"]}",' for p in ps) + "0};\n")
+
+# PATCH: 0x4412be, OWNER 2026-10-30 (WORLD stops at 85 s of Free Run: int3 0x441b82 in TrackPolyBody::ReleaseUnused 0x441b20). The track polygon
+# collision body pool 0x4412b0 (0x566dc0, 0x80 B slots, flags 0xb & ~3: it never grows) holds 0x400 bodies; each car's ground cache pins up to 160
+# (0x4407b0 passes 0xa0) and 0x441b20 frees only bodies of count 0, so 1 + 6 rivals + 19 traffic (26 x 160) outrun it; shipped 1001 already peaks at
+# 1,024 in use (RN_AILOG TRAFLOG polymax). mov edi,0x400 -> 0x2000. The cap is read back from the pool ([+0x2c] at 0x441baa, [+0x24] at 0x43fe84);
+# the slot index is a s16 at row +6 (0x4400c1), so it must stay <= 0x7fff; save 0x46a6e0 writes row indices. Cost 1 MB of guest heap instead of 128 KB.
+# docs/openworld/re_coll_pool.md, census/names_collision.tsv.
+PATCHES.append(dict(addr=0x4412bd, old="bf00040000", new="bf00200000", when=lambda: True))

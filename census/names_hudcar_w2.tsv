@@ -1,0 +1,61 @@
+addr	name	system	confidence	evidence	tool	doc
+0x4fd0f0	StrCmpNoCase	ui	V	V: loops upcasing a-z of both strings, returns difference of first mismatch; called from 0x4fd1e0 name lookup	Ghidra dossier	
+0x4fd1e0	FEng_FindNodeByName	ui	I	I: hashes name (FEng__HashName), walks list via next at +4, compares hash at +0x10 then StrCmpNoCase; returns node	Ghidra dossier	
+0x4ffb00	FEngGroup_VisitChildren	ui	V	V: walks child list at +0x40, calls visitor vfunc[1] on each, recurses when child type==5 (group), returns 0 if a visitor returns 0	Ghidra dossier	
+0x4ffb70	FEng_VisitChildrenSEH	ui	I	I: SEH frame wrapper that only calls 0x4ffb00 and returns 0	Ghidra dossier	
+0x4f7b50	FEScreen::~FEScreen	ui	V	V: sets vtable PTR_FEScreen__ScalarDeletingDtor_006c1874, pops the FE package via cFEng__PopPackage if still loaded; called by every screen dtor	Ghidra dossier	
+0x414a10	FEng_SetObjectInvisibleByName	ui	V	V: FEng__HashName(name), finds object in package (0x4ffb70 or 0x4ef050 fallback), calls FEObject__SetInvisible	Ghidra dossier	
+0x414a60	FEng_SetObjectVisibleByName	ui	V	V: same as 0x414a10 but calls FEObject__SetVisible	Ghidra dossier	
+0x495fc0	FEng_SetObjectVisible	ui	V	V: given hash, looks up object in package and calls FEObject__SetVisible	Ghidra dossier	
+0x416bb0	FEng_SetStringByName	ui	I	I: hashes name, finds object; if type==2 (string) stores param at +0x5c, calls global callback DAT_00735710, marks dirty 0x400000	Ghidra dossier	
+0x4ad7b0	FEng_SetImageTextureByName	ui	I	I: finds object; if type==1 (image) and field +0x24 differs, stores param and sets dirty flag 0x400000	Ghidra dossier	
+0x4ef050	FEng_FindObjectInPackage	ui	I	I: if hash==0 loops list at +0xe4 else 0x4fd1e0 on +0xdc; each hit checked with 0x4ffb70	Ghidra dossier	
+0x566e60	SlotPool::AddBlock	mem	V	V: calls SlotPool::Create with pool fields, appends new block at end of chain (+8), threads freelist	Ghidra dossier	
+0x5649f0	bPNodeSlotPool::EnsureCreated	mem	V	V: lazily creates SlotPool named "bPNode SlotPool" (item size 0xc) into DAT_007349b4	Ghidra dossier	
+0x565da0	bSPrintf	util	I	I: bVPrintf(0,fmt,args) then writes terminator via DAT_00730508 when buffer given	Ghidra dossier	
+0x4f84d0	FEListBox::Destroy	ui	I	I: resets vtable PTR_FUN_006c1870, unlinks and frees (_free) every node of circular list at +4	Ghidra dossier	
+0x4f8370	FEListBox::FEListBox	ui	I	I: sets vtable PTR_FUN_006c1870, inits circular list at +4, mallocs 0x30 state block with scale 1.0; same vtable as 0x4f84d0	Ghidra dossier	
+0x4f8730	FEListBox::AddItem	ui	I	I: mallocs 0x24 node (value, owner, color via GetHudObjectColor), appends to circular list at +4, advances +0x1c total	Ghidra dossier	
+0x4f8960	FEListBox::SelectItemByData	ui	I	I: scans list for node with [+8]==key, sets current (+0xc), scroll target from [+0x10] node	Ghidra dossier	
+0x4f8910	FEListBox::SelectItemByData2	ui	I	I: same scan as 0x4f8960 on list passed in param, no scan restart fallback	Ghidra dossier	
+0x586580	FormatRaceTime	ui	I	I: splits time int (0/0x7fffffff special) via 0x5864f0 into min/sec/frac, formats via 0x586090; callers DrawFinishTime/DrawLapTimes/DrawBestLapTime	Ghidra dossier	
+0x5326f0	EAXRamp::Update	audio	V	V: t+=dt; for current segment interpolates start[+7+i]->end[+0xd+i] over duration[+1+i] with curve type [+0x15+i] (1 step,2 quadratic,3 sine-like,else linear), advances segment, sets done flag; called from EAXTunerCar::UpdateTorque/UpdateRPM	Ghidra dossier	
+0x532640	EAXRamp::Reset	audio	V	V: zeroes time, segment count/index/value and the 6 segment slots	Ghidra dossier	
+0x532670	EAXRamp::AddSegment	audio	V	V: stores duration (param*const, min 0.01f), start, end, curve into slot[count], count++, returns -1 if 5 full	Ghidra dossier	
+0x584310	MovingAverage::Fill	util	V	V: sets all N (byte+5) ring samples to value, sum=N*value, avg=value	Ghidra dossier	
+0x584270	MovingAverage::AddSample	util	V	V: ring buffer: sum += new - oldest, writes sample, advances index, avg=sum/count	Ghidra dossier	
+0x64bc30	CallbackList::Invoke	audio	I	I: under mutex DAT_00713c50 walks list at +8 calling cb[2](arg,cb[3])	Ghidra dossier	
+0x64bbd0	CallbackList::ReleaseRef	audio	I	I: under mutex runs list at +0xc callbacks, decrements refcount +4, at 0 calls vfunc[1] of DAT_00713c54 (free)	Ghidra dossier	
+0x5256f0	Csis_AllocLocked	audio	I	I: Csis__System__GetAllocator, Mutex lock, allocator vfunc0(size,4,-1), unlock	Ghidra dossier	
+0x4c7080	bList::FreeAllNodes	util	V	V: walks circular list at +4, unlinks each node and _free()s it until empty	Ghidra dossier	
+0x5041a0	StatBarSlider::~StatBarSlider	ui	I	I: sets vtable PTR_FUN_006c01fc, frees circular list at +0x3c, calls ListSlider::~ListSlider; caller is StatBarSlider::scalar_deleting_destructor	Ghidra dossier	
+0x4e2170	GarageVinylScreenBase::~GarageVinylScreenBase	ui	I	I: calls FEListBox::Destroy (0x4f84d0), frees list at +0x44, then FEScreen::~FEScreen; called by garage vinyl browser dtors	Ghidra dossier	
+0x5a0350	PerfUpgradeTypeToPartCategory	car	I	I: switch 0..10 -> 0x10,0x15,0x12,0x16,0x18,0x17,0x13,0x14,0x11,8,5 else -1; callers IsPerformanceUpgradeLocked, GaragePerfTuner::CanPlayerPurchaseUpgradeLevel, PerfStatsScreen::SetupUpgrades	Ghidra dossier	
+0x521850	EAXAemsManager::OnBanksLoaded	audio	V	V: when AreAllBanksLoaded fires pending callback DAT_0073568c once, then binds Stream/FX/Car/Collision/Ambient class handles and sets FX_TURBO_01 class handle	Ghidra dossier	
+0x51cc10	EAXSound::ApplyMasterVolumes	audio	I	I: if audio enabled, re-applies volumes to car sounds, EAXCollision::UpdateMasterVolume and vfunc[9] of ~8 sound objects; callers Opt::Deserialize and Options screen	Ghidra dossier	
+0x41c060	ReleaseSlots16	util	I	I: two loops of 8 pointer slots at +0x10, calls vfunc[2] (release) and nulls each	Ghidra dossier	
+0x4dcbe0	FEng_PushScreenWithFactory_A	ui	I	I: FEScreenRegistry__SetFactory(id,0x4dcb50), cFEng__PushPackage if package not already in list +0xdc; sibling of 0x4dc6e0	Ghidra dossier	
+0x4dc6e0	FEng_PushScreenWithFactory_B	ui	I	I: FEScreenRegistry__SetFactory(id,0x4dc690), cFEng__PushPackage if package not in list +0xdc	Ghidra dossier	
+0x41e670	PCHelp::UpdateMouseTooltip	ui	V	V: per frame (RenderFrame); finds FE string object under mouse with flag 0x10, after a 1 s hover delay (bTickerToSeconds) builds "PCHELP_%s", hashes it, shows via 0x41e600, else Hud_HideObject	Ghidra dossier	
+0x4ba530	QuickRaceTrackSelect::UpdateTrackInfo	ui	I	I: formats strings "Sprint_BG_%d", "TrackLength", "%3.1f", "TRACK_IMAGE_%d", "REVERSE_TRACK_IMAGE_%d", "Track_Reverse" onto FE objects; uses FormatRaceTime	Ghidra dossier	
+0x43ccf0	Ride_ReadFromBitStream	car	I	I: reads bits with BitStream::ReadQuantizedInt, Ride_Init, names "DUMMY_SKIN%d"/"DUMMY_WHEEL%d", loops 11 parts, RideInfo__RebuildPhysicsInfo, then reads up to 0x78 part slots	Ghidra dossier	
+0x501ea0	FEObject::LoadScripts	ui	I	I: FETypeLib::FindType/GetFieldAt, FEScript::SetName/SetTrackCount/FindTrack, FEListEntryArray::SetCount; builds FE scripts from package data	Ghidra dossier	
+0x5013a0	FEPackage::LoadObjects	ui	I	I: malloc objects, FEPackage::AddObject, FEGroup::AddChild, FEListBox::RecalculateCummulative, calls LoadScripts 0x501ea0	Ghidra dossier	
+0x501b80	FEListBox::LoadCells	ui	I	I: switch on cell type tags calling FEListBox::SetCellType/SetCellString/SetCellResource/SetCellImageUV/SetCurrentRow/Column	Ghidra dossier	
+0x564a80	bRandomFloat	util	V	V: xorshift step on seed DAT_006f227c (^0x1d872b41, >>5, <<27), returns (seed%0x7fffffff)*const*param; callers EAXTrafficCar::Update, DriftManager::BuildLeaderBoard, PhysicsMover	Ghidra dossier	
+0x63f0a0	SNDSYS_RunTimedCallbacks	audio	V	V: loops 16-byte slots at 0x70f538: if fn set, due time <= now (DAT_0070fe28) and not busy, marks busy, calls fn(arg,elapsed), ORs results, reschedules now+interval	Ghidra dossier	
+0x654cd0	SND_MemZero	audio	V	V: aligns pointer to 8 with 1/2/4 byte zero stores then clears 0x20-byte blocks (memset 0 of sound lib)	Ghidra dossier	
+0x412930	SNDSTRM_QueueFileRequest	audio	I	I: checks stream magic 0x4d525453 'STRM', SNDSTRM_AllocRequest, strncpy path (0x103) into request type 0, SNDSTRM_PushRequest, wakes stream thread; sibling of 0x4129f0	Ghidra dossier	
+0x4129f0	SNDSTRM_QueueMemoryRequest	audio	I	I: same 'STRM' check and request alloc, request type 1, computes size by walking chunk chain until id==param_4	Ghidra dossier	
+0x53d910	Csis_FreeLocked	audio	V	V: Csis__System__GetAllocator, Mutex__Lock, allocator vfunc[1](ptr) (free), Mutex__Unlock; pair of Csis_AllocLocked 0x5256f0	Ghidra dossier	
+0x522220	EAXAemsManager::UnloadBank	audio	I	I: if audio on, drops per-bank refcount at +0x200+idx*4; at <2 sets 0 and SNDAEMS_removemodulebank; called from ReloadLanguageSpeechBank	Ghidra dossier	
+0x5259e0	EAXSoundParams::SetClamped	audio	I	I: clamps fields to 0..0x7fff, 0..9000, 0..0xffff before storing; callers LandJumpPlay, BottomOutPlay, CSISBeginImpact	Ghidra dossier	
+0x520460	EAXSound::Create	audio	I	I: mallocs 0x570 object, stores in DAT_007356a8, calls EAXSound__InitializeDriver; called from GameFlow::InitSubsystems	Ghidra dossier	
+0x5841f0	SmallBuffer::~SmallBuffer	util	I	I: resets vtable, frees heap buffer at +0x10 unless it points to inline storage +0x14	Ghidra dossier	
+0x41e4d0	PCHelp::Init	ui	V	V: pushes FE package "PC_ContextHelp.fng", finds help object into DAT_00736220 and hides it; the object used by PCHelp::UpdateMouseTooltip 0x41e670	Ghidra dossier	
+0x4f6c30	FEng_SetScriptByName	ui	V	V: looks up FE object (package find or 0x4ef050) then FEObject__SetScript(param1,param2); caller HudManager::SetFlags	Ghidra dossier	
+0x4f7260	FEObject::GetPosition	ui	I	I: switch on object type (+0x18); default reads +0x1c/+0x20 of data block, string type scales by font metrics; sibling 0x4f7350 reads +0x38/+0x3c	Ghidra dossier	
+0x4f7350	FEObject::GetSize	ui	I	I: switch on object type; types 1,7,9 read +0x38/+0x3c of data block, string type computes from font metrics; used by HUD Update fns	Ghidra dossier	
+0x4181e0	Screen::SetPlayerDataSlotLabels	ui	I	I: loops 1..5 formatting "Player_DATA_0%d" and FEngPrintf; twin at 0x4c9bd0 (Screen_MU_PlayerLogin)	Ghidra dossier	
+0x4c9bd0	Screen_MU_PlayerLogin::SetPlayerDataSlotLabels	ui	I	I: same loop of "Player_DATA_0%d" as 0x4181e0; called from Screen_MU_PlayerLogin ctor	Ghidra dossier	
+0x4e2250	GarageVinylScreenBase::AddVinylItem	ui	I	I: mallocs 0x18 node (hash, ids, flags) appended to list at +0x44, FEListBox::AddItem (0x4f8730), Texture_FindByHash for the icon; called from vinyl type/group/browser screen ctors	Ghidra dossier	
