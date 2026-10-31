@@ -431,3 +431,26 @@ PATCHES.append(dict(addr=0x4412bd, old="bf00040000", new="bf00200000", when=lamb
 # player too, so spawn-record traffic never braked, swerved or honked for him. Now only rivals (driver kind 2, [[rec+0x14]+4]) keep the
 # exemption: mov ecx,[ecx+0x14]; cmp [ecx+4],2; jne 0x4539ff (not exempt); nop*3 (docs/re/traffic_react.md item b)
 PATCHES.append(dict(addr=0x4539db, old="8b511c85d20f95c084c07418", new="8b49148379040275" + "1b" + "909090", when=lambda: True))
+# PATCH: 0x45399f (+ cave 0x44dd21, NOP padding after a ret, no reference: asm.py free), a traffic car sees the player closing from behind. The
+# finder 0x453920 asks 0x44f470 for the nearest car AHEAD in its lane (slots own-1 down to 0 of the neighbour list); nothing reads the slots
+# own+1.. behind it, and the Avoid action cannot take a car behind (its vt[7] 0x453a60 ends it at once, its brake branch 0x45406c would stop the car).
+# The call now goes to the cave, jmp [SCREEN_ADDR+0x98] = host/rivals.c traffic_behind: the original call first (same ecx and args, the caller
+# still pops 0x14); if it found nothing and the car is traffic in a lane 11..16, the rows behind are scanned while the list is valid and a car
+# that sees the player closing in takes a clear neighbour lane itself (ctx+0x394 / +0x398 as 0x453e21..0x453e4b) and honks. It returns 0 for
+# every behind case. RN_TRAFYIELD=0 (original mode): the original call only. Replaces traffic_tick's host-side "yield" case.
+PATCHES.append(dict(addr=0x45399f, old="e8ccbaffff", new="e8" + _rel(0x45399f, 0x44dd21), when=lambda: True))
+PATCHES.append(dict(addr=0x44dd21, old="90" * 6, new="ff2598300100", entry=True, when=lambda: True))
+# PATCH: 0x5693b7 (jne +3 -> jmp +3 in Car::LightsOnForDraw 0x5693b0, only caller 0x56da42 = the head flare of DrawLampFlares 0x56d8d0): a traffic
+# car (driver kind 3) no longer answers "lights on" at once, it reads car+0x855 like every car, so the flash of 0x429190 can be seen.
+PATCHES.append(dict(addr=0x5693b7, old="75", new="eb", when=lambda: True))
+# PATCH: 0x425853 (Car::Car 0x425350, 28 bytes: the +0x854, +0x83e, +0x83f, +0x840 byte stores): the base "lights on" byte +0x854 is 1 for a traffic car
+# (entrant kind [[car+0x14]+4] == 3; car+0x14 is stored at 0x425582) and 0 for the others as before, so with 0x5693b7 above its head flare stays lit.
+# The kind is final when the ctor runs: the only store of an entrant's kind is 0x5809e6 (0x5809c0, called at the race setup 0x4b3c2f traffic, 0x4b4321..0x4b6681
+# racers; host/free.c free_traffic and free_rival pass its arguments through), cars are built after. mov eax,[ebx+0x14]; cmp [eax+4],3; sete [ebx+0x854];
+# mov [ebx+0x83e],si (esi = 0 since 0x42580a); mov byte [ebx+0x840],0 (eax is dead until 0x425896). Replaces the host +0x854 loop of traffic_tick.
+PATCHES.append(dict(addr=0x425853, old="c6835408000000c6833e08000000c6833f08000000c6834008000000",
+                    new="8b4314" "83780403" "0f9483540800" "00" "6689b33e080000" "c6834008000000", when=lambda: True))
+# PATCH: 0x4291ec (Car::UpdateHornFlash 0x429190, `xor cl,cl; jmp 0x42920f` -> `jmp 0x429219; nop nop`): the dark half of a flash (the gap flag +0x840 set by
+# 0x429100, from HonkAtPlayer 0x44c539 or the host) used to fall back to the base byte +0x854, which is 1 for traffic now, so the flash had no dark phase.
+# Now it stores +0x855 = 0 there (0x429219: xor eax,eax; cl is already 0 since 0x4291b4).
+PATCHES.append(dict(addr=0x4291ec, old="32c9eb1f", new="eb2b9090", when=lambda: True))
