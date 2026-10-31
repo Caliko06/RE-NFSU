@@ -455,3 +455,8 @@ PATCHES.append(dict(addr=0x425853, old="c6835408000000c6833e08000000c6833f080000
 # 0x429100, from HonkAtPlayer 0x44c539 or the host) used to fall back to the base byte +0x854, which is 1 for traffic now, so the flash had no dark phase.
 # Now it stores +0x855 = 0 there (0x429219: xor eax,eax; cl is already 0 since 0x4291b4).
 PATCHES.append(dict(addr=0x4291ec, old="32c9eb1f", new="eb2b9090", when=lambda: True))
+# PATCH: 0x4669fe, OWNER 2026-10-31 (WORLD: the car passes walls, and after the reset it passes them always). Each car's DynamicCollisionBody builds up to
+# 0x30 wall/ground bodies a step (0x469810) from TrackPolygonCollisionBodySlotPool [0x72cbf4] (0x466970, 0x270 B slots, 0xa0 of them); when used == cap
+# (0x469810: [+0x18] == [+0x2c]) it returns with none, so that car has no walls. The OWNER's WORLD session 18-25 logs the pool at 160/160 for the whole
+# drive (WALLCAP). 26 cars x 48 outrun 160. mov edi,0xa0 -> 0x800; the cap is only read back from the pool header. Cost 1.3 MB instead of 100 KB.
+PATCHES.append(dict(addr=0x4669fe, old="bfa0000000", new="bf00080000", when=lambda: True))

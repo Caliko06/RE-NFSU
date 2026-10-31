@@ -831,7 +831,7 @@ static void census_dump(void) {
 // TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
 // at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
 // seq; Present copies them into the game's .data when seq changed.
-static uint32_t tune[7];      // seq, then the 4 floats as bits, then the trail colour, then the race projection scale k (float bits, 0 = the patch's)
+static uint32_t tune[8];      // seq, then the 4 floats as bits, then the trail colour, then the race projection scale k (float bits, 0 = the patch's), then the chase framing switch
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -982,10 +982,31 @@ static void wallcap_log(Ctx *c) {
            ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), ldf(c, car + 0x78), n, ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4),
            bu, ld(c, pb + 0x1c, 4), wu, ld(c, pw + 0x1c, 4));
 }
+// Remaster chase framing (OWNER 2026-10-31: "it looks like I chase my car instead of driving it"; word 7 of tune[], 1 = on). Measured
+// shipped (autopilot, Olympic Square): the eye sits 6.1-7.3 m behind the car, 1.5 m above it, and looks level (pitch 0). The default
+// mover (SetDesired 0x48b8c0) reads the car's camera rows [[car+0xc]+0xb50] (+0x10 normal set, +0x60 the [0x7364a0] == 3 set, 16 B:
+// s16 id, s16 pitch (65536 = 360 deg), f32 distance, f32 height). Far (id 0) and close (id 1) chase of the player's car become distance
+// x CHASE_KD, height + CHASE_DH, pitch CHASE_PITCH: measured 5.3-5.6 m behind, 2.0 m up, 8 deg down. Relative to each car's own row,
+// so per-car data (and any car, stock or modified) keeps its own framing; Original (word 7 = 0) leaves the file values.
+#define CHASE_KD 0.85f
+#define CHASE_DH 0.45f
+#define CHASE_PITCH 1500
+static void chase_rows(Ctx *c) {
+    if (!__atomic_load_n(&tune[7], __ATOMIC_RELAXED)) return;
+    uint32_t ctrl = ld(c, 0x77a920, 4) == 6 ? ld(c, 0x7361bc, 4) : 0, car = ctrl ? ld(c, ctrl + 4, 4) : 0, ni = car ? ld(c, car + 0xc, 4) : 0;
+    if (!ni || ni >= GUEST_MEM - 0xc00) return;
+    for (int s = 0; s < 2; s++) for (int i = 0; i < 5; i++) {
+        uint32_t a = ni + 0xb50 + (s ? 0x60 : 0x10) + 16 * i;
+        int16_t id = (int16_t)ld(c, a, 2);
+        if ((id != 0 && id != 1) || ld(c, a + 2, 2) == CHASE_PITCH) continue;   // done already (the pitch marks it): each frame is cheap and a reloaded CarTypeInfo gets it again
+        stf(c, a + 4, ldf(c, a + 4) * CHASE_KD); stf(c, a + 8, ldf(c, a + 8) + CHASE_DH); st(c, a + 2, CHASE_PITCH, 2);
+    }
+}
 static void roadrefl_frame(void);
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     jumpcam_log(c);
+    chase_rows(c);
     wallcap_log(c);
     tune_apply(c);
     hfov_frame(c);
