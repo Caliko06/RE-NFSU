@@ -1093,10 +1093,27 @@ static void jumpcam_log(Ctx *c) {
            ld(c, ctrl + 0x5c4, 4), (int)ld(c, ctrl + 0x5c8, 4), (int)ld(c, ctrl + 0x5cc, 4), ld(c, 0x7361e8, 4), ld(c, 0x78a3fa, 1),
            ldf(c, ctrl + 0x560), ldf(c, ctrl + 0x564), ldf(c, ctrl + 0x568), view ? (int)ld(c, view + 0xc4, 2) : -1, ldf(c, car + 0x810));
 }
+// Probe for walls crossed at speed (exit: delete when that bug is decided). Silent caps can drop a wall: the car's polygon cache 0x4407b0 holds
+// 0xa0 (car+0x7e0 total, +0x7e4 ground, +0x7e8 walls, +0x7ec rest; 0x441660 drops by cell order, not distance) and the shared pools
+// [0x72cbf4] polygon bodies (0xa0) and [0x72cc00] witnesses (0x100) (+0x18 used, +0x1c peak, +0x2c size). One line when one of them
+// is full, at most every 30 frames, at 40 m/s or more; a crossing with no WALLCAP line near it clears the caps.
+static void wallcap_log(Ctx *c) {
+    static uint32_t last;
+    uint32_t ctrl = ld(c, 0x77a920, 4) == 6 ? ld(c, 0x7361bc, 4) : 0, car = ctrl ? ld(c, ctrl + 4, 4) : 0, now = rn_telem.presents;
+    uint32_t pb = ld(c, 0x72cbf4, 4), pw = ld(c, 0x72cc00, 4);
+    if (!car || !pb || !pw || now < last + 30 || ldf(c, car + 0x3d4) < 40.0f) return;
+    uint32_t n = ld(c, car + 0x7e0, 4), bu = ld(c, pb + 0x18, 4), wu = ld(c, pw + 0x18, 4);
+    if (n < 0xa0 && bu < ld(c, pb + 0x2c, 4) && wu < ld(c, pw + 0x2c, 4)) return;
+    last = now;
+    rn_log("WALLCAP f%u speed %.1f pos %.0f,%.0f,%.0f vz %.1f cache %u ground %u walls %u rest %u bodies %u peak %u witness %u peak %u", now, ldf(c, car + 0x3d4),
+           ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), ldf(c, car + 0x78), n, ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4),
+           bu, ld(c, pb + 0x1c, 4), wu, ld(c, pw + 0x1c, 4));
+}
 static void roadrefl_frame(void);
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     jumpcam_log(c);
+    wallcap_log(c);
     tune_apply(c);
     fov_frame(c);
     chase_frame(c);
