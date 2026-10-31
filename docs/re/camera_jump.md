@@ -35,9 +35,44 @@ H = our host code read. Earlier work: `docs/openworld/re_jumpcam.md` (same chain
   (it sets its own FOV at `+0xc4`).
 - The same cave also feeds the crash camera (`0x465d00`, call `0x4662e0`): it came back too.
 
-## The fix and its exit
+## The fix and its exit (updated 2026-10-31)
 
-`free_jumpcam` now runs the original call in free mode too. `?jumpcam=0` (env `RN_JUMPCAM=0`) restores the 2026-10-28 answer. Exit: if the OWNER
-likes the jump shots, delete the switch; if the shots go through buildings in WORLD, the next step is a wall sweep on the eye of `0x485c00`
-(the push-out `0x4838e0` takes a car collision cache, so it only works near the car) or a route check in `free_jumpcam`.
-Known risk (from 2026-10-28, not re-measured): in the city the eye can sit in a building or behind a pillar for about 2 s.
+`free_jumpcam` runs the original call in free mode too (the switch `?jumpcam` / `RN_JUMPCAM` is deleted: the OWNER wants the jump cam, 2026-10-30)
+and then the route check below. A race and `RN_FREE=0` stay the exact original call.
+
+## Correction: `cam 0 span -1` in mode 6 is normal (V, capstone on pc/Speed.exe)
+
+- The old `JC` comment said `span -1` means the last `0x42c4b0` call failed. Wrong during modes 6 and 7. `0x42c4b0` sets `ctrl+0x5c4` = route clone
+  (+4 count, +8 node pointers), `ctrl+0x5c8` = k (the node nearest the car), `ctrl+0x5cc` = first node 75 m or more past k. `0x42da40` mode 6 runs
+  `0x42c6d0(ctrl, 0xf, 1)`; then `0x42dd11` always calls `0x42c640`, which frees the clone and sets `5c4 = 0`, `5c8 = 5cc = -1`. So the log
+  line sees `cam 0 span -1` for the whole shot. Only a refusal at the time of the call shows as a missing jump cam.
+- `host/d3d9.c jumpcam_log` now also prints `eye` (`ctrl+0x560..0x568`), `fov` (the word at `[[ctrl+0x27c]+0x1c]+0xc4`: `ctrl+0x27c` is the active
+  mover, `0x42c6bd`; `mover+0x1c` is its camera view, written by `TrackCarCameraMover__Update` at `0x485fee..0x485ff1`) and `rp` (`car+0x810`,
+  copied at `0x42cb34`).
+
+## The eye is fixed, and the city blocks it (V, capstone)
+
+- Case `0xf` of `0x42c6d0` (`0x42ca9b..0x42d0a0`) takes the eye node e = `[5cc] - 2` if `[5cc] - k >= 5`, else `[5cc]`. The eye is one point at a road
+  edge of node e: `0x5a7270(out, node+0x58, vt[+0xc](lane) - 2.0, lane)` (left, `0x42cd24`) or `0x5a7270(out, node+0x58, vt[+8](lane) + 2.0, lane)`
+  (right, `0x42cd4d`), `2.0` is `[0x6b7aac]`, lane = driver `vt[+0x1c](0)` clamped at 0 (`0x42cae9`). Node vtable `0x6c8f5c`: `+8 = 0x5a7ac0`,
+  `+0xc = 0x5a7a10`, both return a float in st(0). The edge first tried is the one less far ahead along `car+0x70..0x78` (`0x42cdb1..0x42ce3c`).
+  The eye is then raised to the ground + 1 (`GroundQuery__FindSurfaceBelow`) and stays there for the whole shot (about 3 s). FOV is constant, no wall check.
+- The game has a portal test: `0x457300` (eax = first node, ecx = route; stack: car position pointer, eye pointer, last node; the caller pops) checks that
+  the car -> eye segment crosses the cross-section `[node+0x20, node+0x3c]` (`0x5a7270` at lateral `node+0x20` and `node+0x3c`, lane 0) of every node
+  from k to e-1, with the 2D segment test `0x457180` on x and y. If it fails, the game switches to the other road edge (`0x42cf12`) and uses it
+  **without testing it**. In a city, 80 to 100 m along a road that bends, both edges are behind buildings. That is the bug.
+
+## The route check (H, `host/free.c free_jumpcam`)
+
+- After the original call, in free mode: for e from the game's eye node down to k+1, `eye_check` places the eye exactly as above, runs `0x457300` on the
+  edge the game takes first and, if it fails, on the other edge; e is accepted when one passes and the edge used is 30 m or more from the car (2D).
+- Taking e: `[5cc] = e` if e - k <= 4 (then `[5cc] - k < 5` gives e), else `[5cc] = e + 2`. This never goes past the original `[5cc]`. Lower limit: e >= k+1
+  (the portal range k..e-1 is empty below that and `0x457300` answers 0). Node k+2, which the case reads for the second point (`0x42cdc6`), stays valid
+  because the original call guaranteed `[5cc] - k >= 4`.
+- Nothing qualifies: `0x42c640` (reads esi only) frees the clone and the answer is 0, so the chase camera stays.
+- One line per query in free mode, in build/web.log: `JCPICK f<frame> k <k> end <5cc now> eye <e or -1> of orig <e0> dist <m> clear|refused`.
+  `eye == orig` and `clear`: the game's own eye was fine. `eye` lower than `orig`: the eye was moved closer. `refused`: no clear eye, chase camera stays.
+  Read it together with `JC ... eye .. fov .. rp ..` of the same jump.
+- Not run in the pod (no game files): the Mac must confirm with jumps in WORLD. Exit: if the OWNER is happy with the shots, nothing more to delete; if
+  `refused` is frequent, the next step is a wall sweep on the eye of `0x485c00` (the push-out `0x4838e0` takes a car collision cache, so it only
+  works near the car).

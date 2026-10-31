@@ -396,7 +396,8 @@ PATCHES.append(dict(addr=0x6d3440, old="00" * 36, when=lambda: True,
 # jumps in WORLD): the jump trigger 0x426930 and the crash camera 0x465d00 both ask 0x42c4b0 (esi = camera ctrl, returns al) to build
 # the JUMPVIEW spline from the player's route nodes (mode 6, mover 0x485c00: a point 2 m off the road edge, no collision after
 # placement), which in the city lands inside buildings. Both calls now go to the cave, jmp [SCREEN_ADDR+0x94] = host/free.c
-# free_jumpcam: the original call; 0 in free mode only with RN_JUMPCAM=0 (page ?jumpcam=0, the chase camera stays). docs/openworld/re_answers_0b.md "Chase / jump camera".
+# free_jumpcam: the original call; in free mode it also moves the eye node to one with a clear view along the road, or answers 0 (the chase
+# camera stays). docs/re/camera_jump.md.
 PATCHES.append(dict(addr=0x426dd7, old="e8d4560000", new="e8" + _rel(0x426dd7, 0x5567e3), when=lambda: True))
 PATCHES.append(dict(addr=0x4662e0, old="e8cb61fcff", new="e8" + _rel(0x4662e0, 0x5567e3), when=lambda: True))
 PATCHES.append(dict(addr=0x5567e3, old="cc" * 6, new="ff2594300100", entry=True, when=lambda: True))

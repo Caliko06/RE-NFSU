@@ -1109,7 +1109,7 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 0x88, host_addr_of("rn", "free_tnode"), 4);   // PATCH 0x59a5cf, 0x59a669: free mode traffic on every node
     st(c, SCREEN_ADDR + 0x8c, host_addr_of("rn", "free_recycle"), 4); // PATCH 0x5987f6: free mode moves cars that drove far away
     st(c, SCREEN_ADDR + 0x90, host_addr_of("rn", "free_hud"), 4);     // PATCH 0x430dbd: free mode HUD without WRONG WAY and the gap
-    st(c, SCREEN_ADDR + 0x94, host_addr_of("rn", "free_jumpcam"), 4); // PATCH 0x426dd7, 0x4662e0: free mode keeps the chase camera on jumps
+    st(c, SCREEN_ADDR + 0x94, host_addr_of("rn", "free_jumpcam"), 4); // PATCH 0x426dd7, 0x4662e0: free mode picks a jump-camera eye with a clear view, or keeps the chase camera
     st(c, SCREEN_ADDR + 0x98, host_addr_of("rn", "traffic_behind"), 4); // PATCH 0x45399f: a traffic car sees the player closing from behind (RN_TRAFYIELD=0 = original)
     lights_init(c);                            // host/lights.c: live brake lights (RN_LIGHTS=0 = original)
     const char *steer = getenv("RN_STEER");    // PATCH 0x460a80: 1 = the keys steer through the game's gamepad model

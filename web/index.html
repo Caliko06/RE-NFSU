@@ -108,8 +108,6 @@ function line(s, cls) {
       if (RN_Q.get('rivalai') === '0') m.ENV.RN_RIVALAI = '0';
       // ?trafyield=0: traffic does not move aside for the player closing from behind (host/rivals.c traffic_tick)
       if (RN_Q.get('trafyield') === '0') m.ENV.RN_TRAFYIELD = '0';
-      // ?jumpcam=0: Free Run / WORLD keep the chase camera on jumps (host/free.c free_jumpcam); default: the game's jump shots as in a race
-      if (RN_Q.get('jumpcam') === '0') m.ENV.RN_JUMPCAM = '0';
       // RN_JCLOG: one log line a second plus one per airborne sample (host/d3d9.c jumpcam_log): why a jump did or did not get the jump camera, in build/web.log
       m.ENV.RN_JCLOG = '1';
       // ?handling=0: the shipped rear grip assist (host/rivals.c)
