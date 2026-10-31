@@ -1,0 +1,213 @@
+addr	name	system	confidence	evidence	tool	doc
+0x401a10	ProcessMonitor_CheckRunningProcesses	runtime	I	model-V: CreateToolhelp32Snapshot, Process32First, Process32Next, and Sleep calls indicate monitoring running processes	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x411030	Runtime_PumpMessages	runtime	I	model-V: PeekMessageA and GetMessageA on HWND 0x0, TranslateMessage, and DispatchMessageA	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x411f40	EAXSound::UpdateBuffer	audio	I	model-I: Calls to FUN_00411d00, FUN_00412020, FUN_00412160, FUN_0063f190, and FUN_0063f1a0 suggest buffer management and sound processing typical of an audio system.	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x413310	Render_InitMovieTexture	render	I	model-V: "MovieTexture"	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x4168f0	Screen_PC_Graphics::ToggleGraphicsOption	canon	I	model-V: String literals "on_option_%02d" and "off_option_%02d"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x416950	Screen_PC_Graphics::ToggleOption	canon	I	model-V: String literals "on_option_%02d" and "off_option_%02d"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x41eae0	Runtime_InitPerformanceSettings	runtime	I	model-V: Calls to QueryPerformanceFrequency, SetPriorityClass, SetThreadPriority, and various CPUID functions	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x4237a0	FEManager::HandlePackage	canon	I	model-I: Calls FEManager__ShowPackage and other FEManager-related functions based on param_2	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x423870	FEManager_HandlePackage	canon	I	model-I: switch-case structure handling different package-related actions	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x4239c0	Rivals::Update	rivals	I	model-V: The presence of the string literal "THE_PRESENT"	local qwen2.5-coder-14b-awq@4090	docs/re/rivals.md
+0x423b50	Rivals::HandlePresent	rivals	I	model-V: FUN_00572f20("THE_PRESENT")	local qwen2.5-coder-14b-awq@4090	docs/re/rivals.md
+0x42deb0	Camera::HandleInput	camera	I	model-I: Function handles different input cases and calls other camera-related functions like FUN_0042c6d0 and FUN_00422c40.	local qwen2.5-coder-14b-awq@4090	docs/re/camera.md
+0x43ba60	Camera::UpdateSettings	camera	I	model-I: Calls to FUN_0043b850, FUN_004390d0, FUN_00432710, FUN_004a8d90, and FUN_00439470 suggest camera settings updates.	local qwen2.5-coder-14b-awq@4090	docs/re/camera.md
+0x4470d0	Runtime_InitPerformanceCounter	runtime	I	model-V: QueryPerformanceCounter(&local_8)	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x455810	HUD_UpdateMarkers	hud	I	model-V: string literals "MARKER_GREEN" and "MARKER_GREENARROW"	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x455c50	Rivals::UpdateRivalCars	rivals	I	model-I: Loop iterating over 0x28 elements, updating rival cars' states based on input parameters.	local qwen2.5-coder-14b-awq@4090	docs/re/rivals.md
+0x460fc0	Car::UpdateDriver	car	I	model-V: FUN_00571ea0(0,"RealDriver")	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x461a60	Car::ApplyEBrake	car	I	model-V: Calls FUN_00572970 with the string "EBrake"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x46a370	Track::Update	track	I	model-I: Calls to functions like FUN_00565230, thunk_FUN_005abda2, and FUN_0058d930 suggest track-related updates.	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x46a640	Car::TrackPolygonCollisionBody	car	I	model-V: TrackPolygonCollisionBody	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x47b600	Render_InitGlobalPoseBuffer	render	I	model-V: malloc and free calls with "EAGL::Transform GlobalPoseBuffer CAnimPart" string	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x47b6d0	Render_LoadSkeleton	render	I	model-V: Calls FUN_0061e6d0 with the string literal "Skeleton"	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x47f310	NISFlagGirl	canon	I	model-V: "NISFlagGirl"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x47f680	Camera::SetStartingPosition	camera	I	model-V: string literals "ForwardStartingPosition" and "BackwardStartingPosition"	local qwen2.5-coder-14b-awq@4090	docs/re/camera.md
+0x482fc0	DragCameraManager::LoadDragCameras	camera	I	model-V: FUN_00565da0("..\\..\\World\\Location1\\Track_%04d\\DragCameras.bin",DAT_0078a2f0)	local qwen2.5-coder-14b-awq@4090	docs/re/camera.md
+0x4ada60	Render_InitMiniWorld	render	I	model-V: string literal "MiniWorld_DynamicLights"	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x4af5a0	Car::ResetSuspension	car	I	model-I: Calls FUN_004f3f90 and sets a field at offset 0x9c	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4afe40	Car::Cleanup	car	I	model-I: Calls to _free on fields at offsets 0x10 and 0x11, and cleanup operations on other fields	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4b2070	Car::InitializeComponents	car	I	model-I: Calls to FUN_004af620 with parameters related to car components	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4b2220	Car::EnableWheels	car	I	model-I: Calls to FUN_004ae9a0 followed by setting fields at offsets 0x84 of two wheel-related pointers	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4b8d50	Screen_PC_Options::BindOptionRow	canon	I	model-V: Calls to FUN_004f68c0 with string literals like "Option%dText", "Option%dData", etc.	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x4bbc90	Track_LoadSpline	track	I	model-V: Calls FUN_004f42f0 with the string literal "TRACK_%d_SPLINE"	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x4be510	Render_QueueOptions	render	I	model-I: Calls to FUN_004f68c0 with string literals "%s%1d" and "OptionData_%1d", and conditional logic involving rendering states	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x4c0180	Car::DisplayNOSLevel	car	I	model-V: Displays NOS Level with messages like 'NOS Level (requires race restart):' and formats strings with '%s%1d' and 'OptionData_%1d'	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4c0270	HUD_UpdateTrackMapOptions	hud	I	model-V: String literals "%s%1d", "Fullscreen TrackMap", and "OptionData_%1d"	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x4c0300	RaceCoordinator::HandleRaceStart	rivals	I	model-V: String literals "Please Wait for Race Start!" and "Force Race Finish"	local qwen2.5-coder-14b-awq@4090	docs/re/rivals.md
+0x4c0420	Camera::LogDebugInfo	camera	I	model-V: String literals "%s%1d" and "OptionData_%1d"	local qwen2.5-coder-14b-awq@4090	docs/re/camera.md
+0x4c0500	Camera::UpdateLapOption	camera	I	model-V: String literals "%s%1d" and "Set Lap"	local qwen2.5-coder-14b-awq@4090	docs/re/camera.md
+0x4c0aa0	PauseMenu::HandlePauseOption	canon	I	model-V: switch-case selecting from string literals like "MU_PAUSE_AUDIO"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x4c13b0	Screen_PC_Graphics::BindOptionRow	canon	I	model-V: Calls to FUN_004f68c0 with string literals like "OptionNameText_%d", "OptionName_%d", "OptionText_%d", and "OptionData_%d"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x4c1470	HUD_DrawPauseMenuOptions	hud	I	model-V: Calls to FUN_004f68c0 with string literals like "LeftArrow_%d", "RightArrow_%d", "option_buttonL_0%d", and "option_buttonR_0%d"	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x4c1dc0	HUD_Init	hud	I	model-I: Calls to FUN_004c13b0 and FUN_004c1470, setting up HUD elements at specific offsets	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x4c2ed0	Car::Init	car	I	model-V: FUN_004f8370(param_1 + 0x13,"master_thumb","thumb")	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4c3240	Car::UpdateManufacturerSelection	car	I	model-V: String literals "HONDA" and "CARSELECT_MANUFACTURER_%s"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4c4154	Settings_AutoApply	canon	I	model-V: Ugd__Write(&DAT_0078a478,"auto")	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x4c4230	Car::InitDummyComponents	car	I	model-V: String literals "DUMMY_SKIN1" and "DUMMY_WHEEL1"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4c44c0	Log_VersionInfo	runtime	I	model-V: FUN_004f6850("%s %d", local_20, *(undefined4 *)(*(int *)(*(int *)(unaff_EBX + 0x48) + 0x730) + 0xc7c))	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x4c4560	GameFlow::HandleStateChange	runtime	I	model-I: Handles state changes based on the input parameter, calling various other functions like FUN_004b2330, FUN_004323f0, and FUN_004f8910.	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x4c6ab0	Car::LoadGarage	car	I	model-V: Calls FUN_004ac060("MU_Garage.fng",0)	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4c8720	Car::ApplyStyleModifications	car	I	model-V: Checks for "NOHATCHBACK" and applies modifications based on "_STYLE03_SPOILER"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4d6f40	Credits_DisplayLines	canon	I	model-V: Calls FUN_004f42f0 with the string literal "CREDITS_LINE_%05d"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x4d76a0	HUD_ChangeChyron	hud	I	model-V: String literals "Chyron_alpine.fng", "Chyron_kenwood.fng", "Chyron_audiobahn.fng", and "Chyron.fng"	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x4dc840	Highlight	canon	I	model-V: FUN_004f6b70("Highlight",1)	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x4e2520	Car::CheckModel	car	I	model-I: Function compares param_1 + 8 with several global addresses (DAT_006c3454, DAT_006c344c, DAT_006c3444, DAT_006c343c, DAT_006c3434) and returns a value based on the comparison.	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4e2940	Car::LoadVinylAssets	car	I	model-V: Loads multiple vinyl-related asset files using FUN_005043f0	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4e31c0	Car::UpdateThumbnail	car	I	model-V: String literal "CAR_THUMB"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4e494d	GarageManager_InstallStockParts	car	I	model-V: string literal "STOCK"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x4f2cb0	HUD_UpdateElement	hud	I	model-I: Switch-case structure handling different cases (1, 2, 7, 9) and calls to other functions based on the value of *(int *)(in_EAX + 0x18)	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x4f9a60	Car::ProcessCrumbData	car	I	model-V: String literal "Crumb_0%d"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x500d80	Render_Init	render	I	model-I: Calls multiple initialization functions like FUN_00500eb0, FUN_00500e50, etc., followed by setting up various fields in unaff_EDI	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x501610	Render_AllocateAndInitialize	render	I	model-I: Switch-case structure allocating memory and initializing different types of render objects based on param_1	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5017d0	Render_ProcessCommands	render	I	model-I: Processing commands based on the values of uVar2 and handling different cases like 0x504f, 0x4150, 0x4153, 0x6e4f, and 0x744f.	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x501da0	Render_HandleCommand	render	I	model-I: Handles different commands based on the value of *param_2	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5036e0	Render_SetUpperLeft	render	I	model-V: __stricmp with "Upper Left"	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5135a0	Car::HandleEvent	car	I	model-I: Handles different events based on param_2, calling other functions like FUN_005133d0, FUN_00513530, FUN_00513270	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x51acb0	CheckMagazineTask	canon	I	model-V: Checks for string literals "MAGAZINE_TASK_16", "MAGAZINE_TASK_15", and "MAGAZINE_TASK_14"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x51b8d0	Canon::SetMagazineTask1	canon	I	model-V: string literal "MAGAZINE_TASK_1"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x51ba00	Magazine_Task_1	canon	I	model-V: string literal "MAGAZINE_TASK_1"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x51beb0	Render_CheckAudioSystem	render	I	model-V: Checks for "ALPINE", "AUDIOBAHN", and "KENWOOD" strings	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x520ae0	EAXSound::Play	audio	I	model-I: Calls to FUN_0064bbd0, FUN_0064b510, FUN_0064b580, and FUN_0064b5a0 suggest sound playback operations.	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x522870	EAXSound::PlayFrontEndSample	audio	I	model-I: Calls to FUN_0064c1a0 and FUN_0064c000 with references to front-end samples	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x527af0	EAXSound::SetSkidSound	audio	I	model-V: Sets skid sound parameters using 's_SND__Skid_006bf0b4' and 'PTR_s_CSISSOUND_006f8714'	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x529ea0	EAXSound::ProcessState	audio	I	model-I: Calls to various state processing functions like FUN_00529f50, FUN_00529fb0, and FUN_0052a000 based on the value of *(int *)(param_1 + 0x18e8)	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x532d40	Audio::CreateSoundObject	audio	I	model-V: string literals "TrolleySoundObject" and "BridgeWarningSoundObject"	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x533140	Car::CreateObjects	car	I	model-V: String literals 'WorldObject', 'XO_PlaneA_1b_01', 'PlaneSOB', and 'FountainObj'	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x5348e0	EAXSound::Initialize	audio	I	model-I: Calls to FUN_005338c0, FUN_0052ebe0, FUN_005336c0, FUN_00578710, and FUN_00520430 suggest initialization steps for audio handling.	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x53d220	EAXS_StreamControl__UpdateStreams	audio	I	model-V: Direct call to EAXS_StreamControl__UpdateStreams	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x53dd40	EAXSound::Release	audio	I	model-I: Calls to FUN_0064b510, FUN_0064b580, and FUN_0064b5a0, which are likely part of the sound release process.	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x53e830	StreamEntry_Process	canon	I	model-V: String literal "StrmEntry%c: 0x%08x"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x548000	Car::UpdateSuspension	car	I	model-I: Calls to FUN_00438980, FUN_0043b850, and FUN_0043d2d0 suggest suspension-related operations	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x54c9e0	Track::HandleFlowStep	track	I	model-V: Calls FUN_00667530 with "LIDENT"	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x54f9b0	Online_LoadWaitingScreen	canon	I	model-V: param_1[0x10] = "MU_ONLINE_WAITING.fng"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x5530e0	Log_InitAndFormat	runtime	I	model-V: Calls FUN_004f6850 with the format string "%s - %s"	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x5540b0	Logging::LogError	runtime	I	model-V: FUN_004f68c0(0x40,"%s: %s",&DAT_00734718,param_1)	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x55f2a0	HUD_InitElements	hud	I	model-I: Repeated calls to FUN_00562390 suggest initializing multiple HUD elements	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x55fe30	HUD_UpdatePlayerStats	hud	I	model-V: String literals like "Rank_DATA_%02d", "PlayersName_DATA_%02d", etc.	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x562420	Time_FormatAndDisplay	runtime	I	model-V: Uses the format string "%02d:%02d:%02d" to display time	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x563550	Language_LoadAgreementFile	canon	I	model-V: switch-case selecting language-specific file paths like "LANGUAGES\agree.fre"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x571920	Render_UpdateLoop	render	I	model-V: FUN_00571ea0(0,"bRepeat")	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5729d0	Render_SnapshotHighlightOrLap	render	I	model-V: Calls FUN_00572b50 with "HIGHLIGHT_SNAPSHOT" and "LAP_SNAPSHOT"	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5731c0	ReplayManager::StartReplay	rivals	I	model-V: FUN_00565da0("REPLAY\\%s",(&PTR_s_REPLAY0_BIN_006f1a04)[iVar1]);	local qwen2.5-coder-14b-awq@4090	docs/re/rivals.md
+0x5754b0	TrafficController::UpdatePosition	traffic	I	model-I: Updates position and velocity fields in the object pointed by param_1	local qwen2.5-coder-14b-awq@4090	docs/re/traffic.md
+0x577b00	Track::CreateWorldEntity	track	I	model-V: string literal "WorldEntity"	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x578820	Track_CheckDrawBridgeAndJump	track	I	model-V: String literals "DrawBridge" and "TRSABC_Track_Jump"	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x578b10	Track::HandleWorldObject	track	I	model-V: "WorldObject"	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x57a270	Car::Create	car	I	model-V: FUN_005782b0(param_2,"CarWorldObject")	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x57c110	Track::HandleTrainCar	track	I	model-V: string literal "TrainCar"	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x585b40	GameFlow::UpdateFrameTime	runtime	I	model-V: QueryPerformanceCounter and frame time calculations involving DAT_00734574 and _DAT_006f0890	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x587e90	Car::ApplyCollisionForce	car	I	model-V: Calls to FUN_00567370, FUN_00587e40, FUN_005673e0, and FUN_00589a30 with calculations involving car positions and velocities	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x5881c0	Car::TwoWheelAckermanSteering	car	I	model-V: FUN_00571ea0(0,"TwoWheelAckermanSteering")	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x593880	GameFlow::InitFernShakerSlotPool	runtime	I	model-V: Function initializes a slot pool named 'FernShakerSlotPool'	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x594970	Track_LoadResources	track	I	model-V: FUN_00565da0("%s%d.BIN",param_1,iVar2)	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x59d350	Track::UpdatePath	track	I	model-I: Calls to FUN_0059cb90, FUN_0059ce10, FUN_004387e0, FUN_00674898, FUN_004010a0, FUN_0059cea0, and FUN_0059cdb0 suggest path-related operations.	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x5a3c00	Car::LookupCarType	car	I	model-V: Multiple comparisons against constants derived from global data addresses like DAT_006c3454, DAT_006c344c, etc., suggesting a lookup table for car types.	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x5a3d50	Car::CheckBodyType	car	I	model-V: string literal "ALLCARS_BODY_1"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x5b4df5	Render_SetupAndPresentFrame	render	I	model-I: Calls to FUN_005b4cdc, FUN_005e4fdd, FUN_005b19e6, and FUN_005d7665, which are likely related to rendering setup and frame presentation.	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5bc254	Render_SetupViewport	render	I	model-I: Calls to FUN_005ba80b, FUN_005bbe7f, FUN_005baccd, and FUN_005ba5ee suggest viewport setup operations.	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5c5283	Render_DestroyResources	render	I	model-I: Calls to FUN_005c5234, _free, and multiple other functions related to resource management	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5c7f41	Assets::LoadFile	assets	I	model-V: CreateFileA/CreateFileW followed by CreateFileMappingA, GetFileSize, and MapViewOfFile	local qwen2.5-coder-14b-awq@4090	docs/re/assets.md
+0x5d14b1	Render_CleanupResources	render	I	model-I: Calls to free resources and reset pointers at offsets 0x28, 0x30, 0x38, 0x80, 0x84, 0x88, 0x8c	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5dbee8	Render_SetupAndDraw	render	I	model-I: Calls to FUN_005da560 with parameters related to rendering	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5dc68d	Render_QueueTextures	render	I	model-I: Calls to FUN_005f762c and FUN_005f74cf suggest texture processing	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x5fc5a6	Render_SwapBuffers	render	I	model-I: Calls to FUN_005f7e20 and FUN_005fbe30, which are likely related to rendering and buffer swapping.	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x6203e0	GameFlow::Shutdown	runtime	I	model-I: Calls to DestroyWindow, UnregisterClassA, and other shutdown-related functions	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6205b0	GameFlow::InitMain	runtime	I	model-I: Calls to multiple initialization functions like FUN_00622e90, FUN_00621ea0, FUN_00623590, etc.	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x621410	Render_ReleaseResources	render	I	model-I: Calls to FUN_00622c60 and FUN_00622c10, which likely release resources, and setting pointers to 0xffffffff	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x621b00	RenderQueue_Process	render	I	model-I: Calls to FUN_00621670 and FUN_00621410 based on the value of iVar3, and calls to FUN_00626b60 and a function pointer at PTR_FUN_006dfaa0	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x624c80	RenderFrame_RenderObjects	render	I	model-I: Calls to FUN_006269d0, FUN_00622020, FUN_00622780, and FUN_00622860 suggest rendering objects	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x625260	RenderFrame_UpdateAndDraw	render	I	model-I: Calls to FUN_006269a0, FUN_006269d0, FUN_00622020, and FUN_00622840 suggest updating and drawing frames.	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x625340	RenderFrame_UpdateAndPresent	render	I	model-I: Calls to FUN_00622770, FUN_00622020, FUN_00622780, and FUN_00622860 suggest frame update and presentation operations.	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x625440	Render_Update	render	I	model-I: Calls to FUN_006269a0, FUN_006269d0, FUN_00622020, and FUN_00622840 suggest rendering operations.	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x625640	Render_UpdateCameraSettings	render	I	model-I: Calls to FUN_006202b0, FUN_006202d0, and updates to camera-related globals like DAT_006e2b88 and DAT_006e2b8c	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x62a520	RenderFrame_DrawObjects	render	I	model-I: Calls to FUN_00627d80 and FUN_00629140, which likely handle drawing objects and rendering	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x62aa30	Render_InterpolateAndDraw	render	I	model-I: Calls to rendering functions like FUN_00628c90, FUN_00629140, and FUN_00627d80, and interpolation logic involving float parameters.	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x62b950	Render_SetupFrame	render	I	model-I: Calls to FUN_00636b20, FUN_00636b40, FUN_006353d0, FUN_006353f0, and a function pointer at offset 0x3c	local qwen2.5-coder-14b-awq@4090	docs/re/render.md
+0x63b28a	Rivals::UpdateCache	rivals	I	model-V: CreateFileA with "queued file" and "Already in cache, updating database."	local qwen2.5-coder-14b-awq@4090	docs/re/rivals.md
+0x63d1c0	Asset_LoadFile	assets	I	model-V: CreateFileA and GetFileSize calls to load and size a file	local qwen2.5-coder-14b-awq@4090	docs/re/assets.md
+0x63d4d0	Asset::LoadData	assets	I	model-V: ReadFile and buffer handling operations	local qwen2.5-coder-14b-awq@4090	docs/re/assets.md
+0x63d670	Asset_WriteData	assets	I	model-V: WriteFile and WriteFile-like operations on a handle	local qwen2.5-coder-14b-awq@4090	docs/re/assets.md
+0x63e850	Runtime_InitThreadHandle	runtime	I	model-V: DuplicateHandle on GetCurrentThread and GetCurrentProcess	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x63e8b0	Runtime_StartThread	runtime	I	model-I: Calls __beginthreadex to start a new thread and manages its lifecycle	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x63e950	ThreadManager::CreateAndResumeThread	runtime	I	model-V: __beginthreadex and ResumeThread calls	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x63eaa0	GameLoop::Update	runtime	I	model-V: timeSetEvent and GetTickCount calls for timing and scheduling updates	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x63eb90	Runtime_Shutdown	runtime	I	model-V: Calls to timeKillEvent, timeEndPeriod, and FUN_00641a90, which are typical shutdown operations	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x642cb0	Runtime_InitDebugFlags	runtime	I	model-V: _getenv("PRINT_CHANNEL") and _getenv("PRINT_DEVICE")	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x645a77	STREAM_Release	runtime	I	model-V: FUN_00642e80("Bad STREAM_release %s\n", &local_1c)	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x64629f	AudioPlayer::Initialize	audio	I	model-V: RCMP_ASSERT in %s at %d %s	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x648a58	Codec_Selection_Prompt	canon	I	model-V: String literal "Please choose a codec during the first data call back"	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x648ac8	Codec_SelectionPrompt	runtime	I	model-V: string literal "Please choose a codec during the first data call back"	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x64f0e0	EAXSound::ProcessQueuedSounds	audio	I	model-I: Iterates over queued sound entries, processes them, and calls SNDSYS_leavecritical()	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x64fa60	EAXSound::GetStreamInfo	audio	I	model-V: Calls to FUN_00650020, FUN_00655660, and FUN_00655000, which are likely related to sound stream processing	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x650d90	EAXSound::SetEffectParameter	audio	I	model-V: FUN_00650d40(param_3); and *(float *)(iVar5 + 0x38) = param_3;	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x654340	Audio_Init	audio	I	model-I: Calls to GetForegroundWindow, GetDesktopWindow, and multiple audio-related functions like FUN_00654cd0 and FUN_006538b0	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x656510	Audio::Cleanup	audio	I	model-I: Calls to FUN_006510d0 on various global pointers followed by setting them to zero	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x658e60	EAXSound::SetChannelVolume	audio	I	model-I: Calls to FUN_00651490 and FUN_00651450, which likely set volume properties	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x65bc70	EAXSound::SetVolume	audio	I	model-V: Calls to FUN_0065bde0 and FUN_00657820 with volume-related parameters	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x662b20	GameLoop_UpdateTimers	runtime	I	model-V: Calls GetTickCount and updates timer fields in a loop	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6635d0	OnlineManager::Initialize	runtime	I	model-V: Calls to FUN_0066d8f0, FUN_0066bf40, FUN_0066b000, FUN_0066a3e0, and FUN_00669430 with specific parameters, and string literals "GmUtil", "TCP:~1:1024 UDP:~1:1024"	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x664600	GameFlow::UpdatePlayerSettings	runtime	I	model-I: Function updates player settings based on input parameters and modifies structures at specific offsets.	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x664800	GameLoop	runtime	I	model-I: Contains a loop that repeatedly calls FUN_00664460 and executes a callback function	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x665240	OnlineManager::HandleICMPTimeout	runtime	I	model-V: FUN_00664310("server ICMP timeout\n")	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6652f0	Config::ParseConfigArgs	runtime	I	model-V: Parsing multiple configuration parameters including "IDENT", "PARAMS", "USERFLAGS", "SYSFLAGS", "COUNT", "MINSIZE", "MAXSIZE", and dynamically generated strings like "OPPO%d", "ADDR%d", and "OPID%d"	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x665660	OnlineManager::ConnectToServer	runtime	I	model-V: string literal "connecting to %08x:%d\n"	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x668d60	Thread_SafeIncrementCounter	runtime	I	model-V: InterlockedExchange on local_4 + 2, followed by GetCurrentThreadId and incrementing local_4[1]	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x668f40	Runtime_InitThread	runtime	I	model-V: CreateThread with LAB_00668f00 as the thread start routine	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x66a3e0	Runtime_InitThreadAndExecute	runtime	I	model-V: HeapAlloc for 0x18c bytes, CreateThread with &LAB_00669e60 as the start routine, and setting lpParameter[0x20] based on thread execution status	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x66a910	GameFlow::Update	runtime	I	model-I: Calls to FUN_00668d10, FUN_0066a580, and FUN_00668df0 suggest a main loop update function	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x66d410	Queue_InitOrAdd	runtime	I	model-V: Checks queue size and adds elements based on param_3, using GetTickCount for timing	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x66f830	AsyncFile::WriteData	assets	I	model-V: Calls to WriteFile and WaitForSingleObject with file handle operations	local qwen2.5-coder-14b-awq@4090	docs/re/assets.md
+0x66fd80	GameLoop_Update	runtime	I	model-I: Contains multiple state checks and updates, including calls to WaitForSingleObject, Sleep, and various game-specific functions like FUN_0066f830 and FUN_0066f960.	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6700c0	Runtime_CleanupHandles	runtime	I	model-V: Calls to CloseHandle on multiple handles and HeapFree on multiple heap allocations	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6702d0	SerialPort_Init	runtime	I	model-V: CreateFileA, SetCommTimeouts, SetCommMask, and handling of serial port settings like RTS, CTS, and baud rate	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6706c0	SerialPort_Close	runtime	I	model-V: CloseHandle on a HANDLE at offset 0x6c	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x670800	Queue_AddMessage	runtime	I	model-V: Calls to GetTickCount, EnterCriticalSection, and LeaveCriticalSection, along with queue management logic	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x670a10	Runtime_InitSystem	runtime	I	model-V: HeapAlloc calls, InitializeCriticalSection, CreateEventA, CreateThread, and SetThreadPriority	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6724fa	GameFlow::UpdateSystemTime	runtime	I	model-V: Calls to GetSystemTimeAsFileTime, GetTimeZoneInformation, and updates to global variables related to time and daylight saving	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x672e3d	Math_CalculateAngle	runtime	I	model-V: Uses fpatan and SQRT functions to calculate an angle	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x673590	Math_RoundDoubleToFloat	runtime	I	model-V: Handling of double precision floating point numbers and rounding logic	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x676cd2	Memory_AllocateAndInitialize	runtime	I	model-V: _malloc and _memset calls	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6783cd	String_ConvertAndAllocate	runtime	I	model-V: Calls to MultiByteToWideChar, LCMapStringW, and WideCharToMultiByte for string conversion and memory allocation	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x67849b	String_ConvertWideToMultiByte	runtime	I	model-V: Calls WideCharToMultiByte to convert a wide character string to a multi-byte string	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x67af08	Math_ErrorHandler	runtime	I	model-V: __raise_exc() and __umatherr(iVar1,param_2,param_3,0,param_4,param_5)	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x67e7bf	Runtime_InitLocale	runtime	I	model-V: __get_lc_time and ___free_lc_time calls	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x67ed62	Config::InitializeCharacterEncoding	runtime	I	model-V: Calls to GetCPInfo, ___crtGetStringTypeA, and initializes character encoding tables	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x67f17c	Config::GetStringByLocale	runtime	I	model-V: Binary search on UNK_006b0cb0 for param_1, then conditional string copies based on param_2	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x67fb15	String_ConvertAndCheck	runtime	I	model-V: MultiByteToWideChar and GetStringTypeW calls	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x68006b	Runtime_ErrorHandler	runtime	I	model-V: ___crtMessageBoxA with the title "Microsoft Visual C++ Runtime Library"	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x68041c	Memory_ProtectRegion	runtime	I	model-V: Calls to VirtualQuery, VirtualProtect, and VirtualAlloc	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x680fad	String_CompareIgnoreCase	runtime	I	model-V: MultiByteToWideChar followed by CompareStringW with LCID and flags indicating case-insensitive comparison	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x681047	String_CompareWithAlloc	runtime	I	model-V: MultiByteToWideChar followed by CompareStringW, with memory allocation and deallocation	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x682a7a	LocaleInfo_GetAndConvert	runtime	I	model-V: Calls GetLocaleInfoA and MultiByteToWideChar to retrieve and convert locale information	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x682ba1	Locale_GetString	runtime	I	model-V: Calls to GetLocaleInfoW and WideCharToMultiByte for locale-specific string conversion	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x68461d	Input_ReadConsoleKey	input	I	model-V: ReadConsoleInputA and __getextendedkeycode calls	local qwen2.5-coder-14b-awq@4090	docs/re/input.md
+0x684763	Input_PollConsoleInput	input	I	model-V: PeekConsoleInputA call	local qwen2.5-coder-14b-awq@4090	docs/re/input.md
+0x6848a1	File_CloseAllLockedFiles	runtime	I	model-V: __fclose_lk(iVar1) inside a loop iterating over locked files	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x685000	Unwind_00685000	canon	I	model-I: FUN_00594fe0("StyleMoment",0)	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x685100	Unwind_SpaceCadetMoverListArray	runtime	I	model-V: FUN_00594fe0("SpaceCadet::mpMoverListArray",0)	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x686200	Unwind_TerrainEffectEmitters	props	I	model-V: FUN_00594fe0("TerrainEffectEmitters",0)	local qwen2.5-coder-14b-awq@4090	docs/re/props.md
+0x6863d0	HUD_VisibleDrivingLine	hud	I	model-V: FUN_00594fe0("VisibleDrivingLine",0)	local qwen2.5-coder-14b-awq@4090	docs/re/hud.md
+0x686410	AnimationMover	runtime	I	model-V: FUN_00594fe0("AnimationMover",0)	local qwen2.5-coder-14b-awq@4090	docs/re/runtime.md
+0x6866e8	PsychoDriver	canon	I	model-V: FUN_00594fe0("PsychoDriver",0)	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x6874e0	CustomizeGraphicsConfig	canon	I	model-V: FUN_00594fe0("CustomizeGraphicsConfig",0)	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x68a840	Car::CalculateChecksums	car	I	model-V: Repeated pattern of checksum calculation using a constant multiplier of 0x21 and accumulating values from global arrays	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x68a8f0	Car::CalculateChecksum	car	I	model-V: Repeatedly calculates checksums using a base of 0x21 and global addresses like DAT_006c8210	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x68aee0	Audio_LoadFNGFiles	audio	I	model-V: Loads multiple .fng files including 'Keyboard.fng', 'EA_TRAX_Jukebox.fng', and 'LS_Splash.fng'	local qwen2.5-coder-14b-awq@4090	docs/re/audio.md
+0x68be70	Garage_LoadFNGFiles	car	I	model-V: Repeatedly loads FNG files like "GarageMain.fng" and "MU_Garage.fng" into global variables	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x68c900	FEng_LoadMenuFiles	canon	I	model-V: Loads menu files like "MU_QuickRaceCarSelect.fng", "MU_QuickRaceLapPopup_PC.fng", etc.	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x68cec0	FEng_LoadDialogFiles	canon	I	model-V: Loading dialog files like "2CarImportDialogBot.fng", "2CarImportDialogTop.fng", etc.	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x68d030	Car::InitPartTable	car	I	model-V: String literals "GLOSS", "METAL", "PEARL", "CALIPER", "MUFFLER"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x68d300	Car::InitVinylGroups	car	I	model-V: Processing string literals like "VINYL_GROUP_FLAMES_HOOD" and calculating hash values for each	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x68d5e0	Car::InitVisualParts	car	I	model-V: String literals "VISUAL_PART_MUFFLERTIP", "_KIT%02d_EXHAUST", and "_KIT%02d_WIDE_BODY"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x68de40	Car::InitNeonColors	car	I	model-V: String literals like "NEON_NONE", "NEON_RED", etc., are processed to initialize neon color values.	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x68e430	Car_Decal_InitWideBodySlots	car	I	model-V: String literals like "DECAL_RIGHTDOOR_SLOT1_WIDEBODY"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x68eca0	Canon::InitializeMagazineRaces	canon	I	model-V: Processing string literals like "MAGAZINE_RACE_1" and assigning values to global variables	local qwen2.5-coder-14b-awq@4090	docs/re/canon.md
+0x68f1f0	Car::InitializeConfigurations	car	I	model-V: Processing string literals like "DECAL_ICON_5ZIGEN", "ABS_DYNAMICS", and others related to car configurations.	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x690000	Car::InitDecalHashes	car	I	model-V: String literals like "JACKSON_RACING", "JACKSON", "DECAL_ICON_JACKSON", etc.	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x690068	Car_Decal_Init	car	I	model-V: String literals like "DECAL_ICON_JACKSON", "JACKSONRACING", etc., indicate initialization of car decals.	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x690200	Car::InitDecalIcons	car	I	model-V: Handles initialization of decal icons like "DECAL_ICON_KONI", "DECAL_ICON_KONIG", etc.	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x692540	Car_DecalHashes_Init	car	I	model-V: String literals like "BOTTOM_DECAL", "EXHAUST_TIP_DECAL", etc., being processed into hash values stored in global variables.	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x692e50	WorldObject_Init	track	I	model-I: Calls FUN_00577b00 with "WorldObject"	local qwen2.5-coder-14b-awq@4090	docs/re/track.md
+0x6934f0	Car::InitializeParts	car	I	model-V: Processing string literals like "ALLCARS_BODY_1", "ADVANCEDCLUTCH", and "ALPINE"	local qwen2.5-coder-14b-awq@4090	docs/re/car.md
+0x696140	Texture_Init	render	I	model-V: Passes "Texture" to FUN_006218b0	local qwen2.5-coder-14b-awq@4090	docs/re/render.md

@@ -1,0 +1,50 @@
+addr	name	system	confidence	evidence	tool	doc
+0x51ccf0	EAXSound::SetMasterVolume	audio	I	I: callee EAXSound::ApplyMasterVolumes 0x51cc10, then recomputes the master-volume globals 0x6f8718 (value) and 0x6f871c (scaled); 6 front-end option callers	hopper	docs/re/sound.md
+0x522280	EAXAemsManager::FreeStreamSlot	audio	I	I: clears the slot at [idx*4+0x72cfd8] and [idx*4+0x72d190] for [0x735684] and frees through 0x565ce0; called by UnloadBank 0x522220 and both bank-load paths	hopper	docs/re/sound.md
+0x522460	EAXMod::Unpause	audio	I	I: same audio-on guard as EAXMod::Pause 0x522440 ([0x6f1dd8] non-null and arg non-null, then 0x64e520/0x64e540 critical section) and no other effect	hopper	docs/re/sound.md
+0x5233f0	thunk_EAXFrontEnd::ScalarDeletingDtor	audio	V	V: whole body forwards to EAXFrontEnd::ScalarDeletingDtor 0x522730	hopper	docs/re/sound.md
+0x523400	thunk_EAXCommon::ScalarDeletingDtor	audio	V	V: whole body forwards to EAXCommon::ScalarDeletingDtor 0x523090	hopper	docs/re/sound.md
+0x524780	thunk_Dtor523480::ScalarDeletingDtor	audio	V	V: whole body forwards to Dtor523480::ScalarDeletingDtor 0x523460	hopper	docs/re/sound.md
+0x5256e0	thunk_Dtor524a70::ScalarDeletingDtor	audio	V	V: whole body forwards to Dtor524a70::ScalarDeletingDtor 0x524a50	hopper	docs/re/sound.md
+0x525bf0	Dtor525bf0::ScalarDeletingDtor	audio	V	V: sets vptr 0x6bee78 then calls operator delete 0x671102 when arg&1; EAXSoundParams block (neighbours 0x525b80..0x525c10)	hopper	docs/re/sound.md
+0x52c8b0	thunk_Dtor527a60::ScalarDeletingDtor	audio	V	V: whole body forwards to loc_527a40 (Dtor527a60 body)	hopper	docs/re/sound.md
+0x52cf80	EAXTires::ResetSkidLevels	audio	I	I: for the 4 tire slots copies 1.4f*level into +0x9c.. clamped to 2.5f (0x40200000) and averages pairs into this+0xbc/+0xc0/+0xc4; callers EAXTunerCar::Update 0x52c620 and the AI/traffic updates	hopper	docs/re/sound.md
+0x532610	EAXRamp::Begin	audio	I	I: calls EAXRamp::Reset 0x532640 then EAXRamp::AddSegment 0x532670(arg,arg,arg,0) and stores the ramp at this+0x74	hopper	docs/re/sound.md
+0x536c20	EAXMixMgr::ScaleChannelVolume	audio	V	V: indexes the mix table by group*0xb+channel (4 groups x 11 channels, records 0x130 bytes at this+8), scales by zone volume >>0xf, forces 0 when mgr+0x84 (pause) or [0x7361f0] state is 1/7	hopper	docs/re/sound.md
+0x5379a0	Dtor5379a0::ScalarDeletingDtor	audio	V	V: sets vptr 0x6bde0c then calls operator delete 0x671102 when arg&1	hopper	docs/re/sound.md
+0x538e80	Dtor538e80::ScalarDeletingDtor	audio	V	V: sets vptr 0x6bdd40 then calls operator delete 0x671102 when arg&1; its funclet is 0x684d00	hopper	docs/re/sound.md
+0x53d010	EAXS_StreamManager::GetZone	audio	V	V: returns this + index*0x2e0, the ambient-zone record stride used by the zone volume setters 0x53a860/0x53cb70	hopper	docs/re/sound.md
+0x64b380	Csis::Class::RemoveMemberNode	audio	I	I: unlinks arg_0 from the doubly linked list at this+0 (head at *this), count at this+4; single caller 0x64eef6; Csis::Class area next to SetMemberDataFast 0x64b810	hopper	docs/re/sound.md
+0x64c5a0	SNDAEMSI_registerclasshandle	audio	I	I: appends arg_0 to global array 0x713f08 at index byte_713ee7 and increments it; that array is freed wholesale at shutdown (decomp 1497073); callers 0x64f320, 0x650980	hopper	docs/re/sound.md
+0x64db50	SNDAEMSI_updatecopy	audio	V	V: returns in0/in1/in2 unchanged (copy node); docs/re/sound.md section 5 lists 0x64db50 as the 3-value copy node used 10x in the ENG patches	hopper	docs/re/sound.md
+0x64df00	SNDAEMSI_freemodulebanks	audio	V	V: inside 0x64e520/0x64e540 it drains the list 0x713c74 through SNDAEMS_removemodulebank 0x64dd70 until the list is empty	hopper	docs/re/sound.md
+0x64e2f0	SNDSYS_RunChangeCallbacks	audio	I	I: when 0x713ca4 differs from 0x713cac it walks the list 0x713ca8 calling entry[2](entry[3]) per node, then stores the new value	hopper	docs/re/sound.md
+0x64e560	SNDSYS_MapResult	audio	I	I: maps (arg+0x13) through the byte table 0x64e5dc to the SNDSYS error codes -1..-11; callers are the SNDSYS status wrappers 0x64e680/0x64e800	hopper	docs/re/sound.md
+0x64e8e0	SNDSYS_Reset	audio	I	I: calls SNDSYS_shutdown 0x64f820 then clears 0x713cc0; callers 0x51d080 and EAXSound_InitMixerBanks 0x532bb0	hopper	docs/re/sound.md
+0x64e900	SNDSYS_SetDeviceCallbacks	audio	I	I: stores arg_4 in 0x713cc0 and arg_8 in 0x713cb0, returns -5 when arg_0 != 0; callers EAXSND8Wrapper::Initialize 0x532a20 and 0x532bb0	hopper	docs/re/sound.md
+0x64f4b0	SNDSYS_SetDefaultSettings	audio	V	V: writes the SNDSYS defaults word_713d98=0x10, byte_713dbb=0x5a, byte_713dac=1, byte_713da8=0, dword_713da4=-1.0f, then 0x713e44=0x713d90 and arms 0x713ce4	hopper	docs/re/sound.md
+0x64f530	SNDSYS_ApplyConfig	audio	I	I: copies cfg+0x8 to 0x713d90 and cfg+0x30 to 0x713e30, calls 0x651c60, then 0x713e44=0x713d90; called by the SNDSYS config setters 0x64e5f0..0x64f580	hopper	docs/re/sound.md
+0x650020	SNDCTRLI_gethandle	audio	I	I: returns table[0x713cf0][id] only when 0 <= id < byte_713db6, else 0; 16 callers, the whole SNDSYS handle API	hopper	docs/re/sound.md
+0x650cb0	SNDCTRLI_setvolume	audio	V	V: clamps arg_4 to 0x4000, stores it at handle+0x8e, calls 0x6520a0(handle[1], vol), returns 0; -10 when the init flag byte_713ee4 is 0	hopper	docs/re/sound.md
+0x651f30	SNDI_killvoice	audio	V	V: indexes voice*0x8c in 0x713f48 and instance*0x110 in 0x71400c, calls vtable +0x3a, clears +0x43, frees +0x74, calls SNDVOICEI_free 0x6525f0 when flag 0x10; the ledger already calls 0x651f30 "kill" in SNDI_stophandle 0x652030	hopper	docs/re/sound.md
+0x651fa0	SNDI_reapplygain	audio	I	I: when voice+0x24 flag 0x4 is set it calls SNDPLATFORM_setvol 0x6512f0 for that voice index	hopper	docs/re/sound.md
+0x652960	SNDSYS_RunDeferredCallbacks	audio	I	I: walks the list 0x713c70 calling entry[2]() per node; when byte_713c7a is set it only bumps byte_713c79 (deferral)	hopper	docs/re/sound.md
+0x652e40	SNDCTRLI_setstreamrange	audio	I	I: stores arg_4/arg_8 at handle+0x230/+0x234, sets handle+0x48 and +0x4c, then calls 0x658d80(handle[1], arg_4, arg_8)	hopper	docs/re/sound.md
+0x655830	SNDPLATFORM_queuerelease	audio	V	V: when voice[0x42] == arg_4 it subtracts arg_8 from voice+0x4c and pushes {0, voice id, arg_8} at 0x7160dc + [0x7160d8]*8	hopper	docs/re/sound.md
+0x655880	SNDPLATFORM_flushreleases	audio	V	V: drains the 0x7160e0 array (count 0x7160d8) calling voice vtable +0x54 when the flag word is set and +0x58 otherwise, then zeroes the count	hopper	docs/re/sound.md
+0x6558f0	SNDSTRMI_freeslot	audio	I	I: takes slot [idx*4+0x7163dc], calls SNDI_stophandle 0x652030 and flushreleases 0x655880, frees the 0x64 pointer array, sets the slot id to -1	hopper	docs/re/sound.md
+0x655aa0	SNDSTRMI_listinit	audio	V	V: zeroes head/tail/count of the 3-dword list that 0x655ab0 pushes and 0x655b10 pops	hopper	docs/re/sound.md
+0x655ab0	SNDSTRMI_listpushfront	audio	V	V: head insert (node->next = old head, old head->prev = node, tail set when the list was empty) and count at +8 incremented	hopper	docs/re/sound.md
+0x655b10	SNDSTRMI_listpophead	audio	V	V: pops the head of that list, fixes the tail when it empties and decrements the count at +8	hopper	docs/re/sound.md
+0x656000	SNDCTRLI_attachstream	audio	I	I: handle lookup 0x650020 then 0x412890(*handle, arg_4); *handle is the SNDSTRM stream object attached to the sound	hopper	docs/re/sound.md
+0x656870	SNDPLATFORM_storevoiceparam	audio	I	I: stores float arg_8 at this+arg_4*4+0x1c and sets the dirty byte at arg_0*0x60+[0x71666c]+1; callers SNDPLATFORM_setvol 0x6512f0 and 0x659b40	hopper	docs/re/sound.md
+0x6568a0	SNDPLATFORM_storevoiceparam2	audio	I	I: same store and dirty-byte marking as 0x656870 but into field +0x38; caller 0x6574d0	hopper	docs/re/sound.md
+0x6577e0	SNDBANKI_ListInsert	audio	V	V: sorted insert by key node+0x30 into the list at *arg_0, walking next (+8) while key < new key, then links prev (+0x10) and moves the head	hopper	docs/re/sound.md
+0x657820	SNDBANKI_ListRemove	audio	V	V: unlinks arg_4 from that same key-ordered list (head at *arg_0), repairing next (+8) and prev (+0x10)	hopper	docs/re/sound.md
+0x658440	SNDBANKI_findfreeslot	audio	V	V: scans the 0x713f4c records (count word_713d98 = 0x10 written by SNDSYS_SetDefaultSettings) for a null one and returns -9 when the table is full	hopper	docs/re/sound.md
+0x658470	SNDBANKI_getkey	audio	V	V: returns the self-relative record from the array at this+0x14 when index < count(this+0xc & 0xffff), else 0	hopper	docs/re/sound.md
+0x6590b0	SNDI_cos	audio	V	V: cosine Taylor series 1 - x^2/2 + x^4/24 - x^6/720 (1/24 = 0x3D2AAAAB, 1/720 = 0x3AB60B61) after the same 2*pi reduction loop as SNDI_sin 0x659130	hopper	docs/re/sound.md
+0x659960	SNDCTRLI_getpage	audio	I	I: returns the sign-extended int16 at voice*0x8c + 0x713f48 + 0x28, keeping -1 when the field is 0xffff	hopper	docs/re/sound.md
+0x65fc00	SNDI_expandbytes	audio	V	V: converts arg_0 bytes read backwards from arg_4 into floats through table 0x717300 at arg_8, 4 bytes per iteration under pushal	hopper	docs/re/sound.md
+0x660820	SNDCTRLI_findhandle	audio	V	V: loops 0..byte_713db6 over the voice table 0x7163dc comparing SNDVOICEI_get 0x652720(entry) with arg, returns the index or -1	hopper	docs/re/sound.md
+0x691b90	StaticInit_EAXFrontEnd_G744234_691b90	audio	I	I: stores -3 in 0x744234, the global immediately after the EAXFrontEnd ClassHandle 0x7441f8 that the following function 0x691ba0 initialises	hopper	docs/re/sound.md

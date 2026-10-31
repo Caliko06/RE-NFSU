@@ -1,0 +1,52 @@
+addr	name	system	confidence	evidence	tool	doc
+0x5d77e9	D3DX_HlslNode_CtorKind0	render	V	V: sets vtable 0x6a0be4 (base of the per-kind table 0x6a0be4+0x10*kind), stores arg at +4, clears +8/+0xc	hopper	docs/re/render_pc.md
+0x5d78c0	D3DX_HlslNode_CtorKind1	render	V	V: vtable 0x6a0bf4, kind field +4 = 1, zeroes +8..+0x10	hopper	docs/re/render_pc.md
+0x5d8044	D3DX_HlslNode_CtorKind7	render	V	V: vtable 0x6a0c54, kind field +4 = 7, zeroes +8/+0x10/+0x14	hopper	docs/re/render_pc.md
+0x5d8121	D3DX_HlslNode_CtorKind8	render	V	V: vtable 0x6a0c64, kind field +4 = 8, constant 9 at +0x14, zeroes +8..+0x20	hopper	docs/re/render_pc.md
+0x5d8213	D3DX_HlslNode_CtorKind9	render	V	V: vtable 0x6a0c74, kind field +4 = 9, zeroes +8..+0x3c	hopper	docs/re/render_pc.md
+0x5d7f77	D3DX_HlslNode_DtorKind6	render	V	V: sets vtable 0x6a0c44 (kind 6) then base 0x6a0be4, releases +0x14/+0x18/+8 and walks the +0xc chain calling the dtor slot	hopper	docs/re/render_pc.md
+0x5d8486	D3DX_HlslNode_DtorKind10	render	V	V: vtable 0x6a0c84 (kind 10), releases +0x20..+0x30, frees this and calls base dtor 0x5d7803	hopper	docs/re/render_pc.md
+0x5d81d3	D3DX_HlslNode_CloneKind8	render	V	V: allocates 0x24, calls 0x5d8121 (kind 8 ctor), copies +0x10..+0x20 from the source node	hopper	docs/re/render_pc.md
+0x5d87f4	D3DX_HlslNode_CtorKind12	render	V	V: vtable 0x6a0ca4, kind field +4 = 0xc, zeroes +8..+0x24, sets +0x28 = 1	hopper	docs/re/render_pc.md
+0x5d89c9	D3DX_HlslNode_CtorKind13	render	V	V: vtable 0x6a0cb4, kind field +4 = 0xd, zeroes +8/+0xc and +0x10..+0x3c, sets *(this+0x10) = 3	hopper	docs/re/render_pc.md
+0x5f7616	D3DX_Back_Container_GetItemB	render	V	V: bounds check arg_0 against count [+4] then returns dword table [+0x10][i], else 0 (same shape as Container_GetItemA 0x5f762c, whose count is at +8)	hopper	docs/re/render_pc.md
+0x5f7a5c	D3DX_DataTable_GetRowPointer	render	V	V: element count = *(this) & 0xffffff, bounds check index*arg_0 + count vs this[4], returns this[8] + index*arg_0*4, else 0 and writes 0 to *arg_4	hopper	docs/re/render_pc.md
+0x5f7d7e	D3DX_NodeTable_CompareKeys	render	V	V: comparator over table arg_8[5]: compares entries arg_0 and arg_4 on +0, then +8, then +4, then +0xc, returns -1/0/1 (qsort-style callback)	hopper	docs/re/render_pc.md
+0x5b5e6c	D3DX_Array_DestroyElements	render	V	V: (table, stride arg_4, count arg_8, dtor arg_c): loop from the end, ptr -= stride each step, calls the dtor per element	hopper	docs/re/render_pc.md
+0x5b4dd4	D3DX_Object_UnwrapType1	render	V	V: high-bit tagged pointer arg: if *ptr == 1 returns ptr[1], else 0; an untagged arg falls through to 0 in this variant	hopper	docs/re/render_pc.md
+0x5b4cdc	D3DX_Object_UnwrapType2OrFindByName124	render	V	V: tagged pointer: if *ptr == 2 returns ptr[1]; else walks the list at this[0x49] (+0x124) comparing C strings two chars at a time, advancing by +0xa	hopper	docs/re/render_pc.md
+0x5b4c4b	D3DX_Object_UnwrapType3OrFindByName120	render	V	V: tagged pointer: if *ptr == 3 with ptr[6]==0 and ptr[4]==-1 returns ptr[1][0x44]; else walks the list at this[0x48] (+0x120) comparing C strings, advancing by +0xd	hopper	docs/re/render_pc.md
+0x5b4d58	D3DX_Object_FindByNameList11c	render	V	V: untagged arg walks the list at this[0x47] (+0x11c) comparing the C string at node+0x20 two chars per step, advancing by +0xd; returns the node or 0	hopper	docs/re/render_pc.md
+0x5b2b18	D3DX_EffectCompiler_ListNode_Dtor	render	V	V: frees +4, then pops the +8 chain calling itself and freeing each node (the body that DeletingDtor 0x5b2b58 was named for)	hopper	docs/re/render_pc.md
+0x5b2ab5	D3DX_EffectCompiler_ListNode_DeleteChildChain14	render	V	V: pops the chain at +0x14 ([5]) one node at a time, recursing on each, then frees it	hopper	docs/re/render_pc.md
+0x5fbe17	D3DX_Ir_AssignIdentitySlots	render	V	V: for each of this[2] entries writes its own index into entry+0x1c	hopper	docs/re/render_pc.md
+0x5fbe30	D3DX_Ir_RemapReferencesThroughSlot	render	I	I: first rewrites entry+4 to table[entry+4][0x1c]; then remaps every index in the this[3] groups' +0x10/+8 arrays through table[index][0x1c]	hopper	docs/re/render_pc.md
+0x5f7ab5	D3DX_Ir_IsTypeClass0x11	render	V	V: returns (*desc & 0xff000000) == 0x11000000	hopper	docs/re/render_pc.md
+0x5f7ac7	D3DX_Ir_IsTypeClass0x30	render	V	V: returns (*desc & 0xff000000) == 0x30000000	hopper	docs/re/render_pc.md
+0x5f7ad9	D3DX_Ir_IsTypeClass0x31	render	V	V: returns (*desc & 0xff000000) == 0x31000000	hopper	docs/re/render_pc.md
+0x5f7aeb	D3DX_Ir_IsTypeClass0x32	render	V	V: returns (*desc & 0xff000000) == 0x32000000	hopper	docs/re/render_pc.md
+0x5f7b0f	D3DX_Ir_IsRegType1	render	V	V: returns (*desc & 0xf0000000) == 0x10000000 (register-file nibble)	hopper	docs/re/render_pc.md
+0x5f7b21	D3DX_Ir_IsRegType2	render	V	V: returns (*desc & 0xf0000000) == 0x20000000	hopper	docs/re/render_pc.md
+0x5f7b33	D3DX_Ir_IsRegType5	render	V	V: returns (*desc & 0xf0000000) == 0x50000000	hopper	docs/re/render_pc.md
+0x5f7b45	D3DX_Ir_IsRegType4	render	V	V: returns (*desc & 0xf0000000) == 0x40000000	hopper	docs/re/render_pc.md
+0x5f7b67	D3DX_Ir_IsNumericType	render	I	I: switch on *desc & 0xff000000 returns 1 for 0x20000000, 0x21000000, 0x24000000, 0x25000000 and 0x30000000, else 0; callers are Asm/Opt/HlslGen	hopper	docs/re/render_pc.md
+0x5f7f90	D3DX_String_AssignCopy	render	V	V: strlen(arg)+1, alloc, rep movsb copy, frees the previous block; returns 0x8007000e on alloc failure	hopper	docs/re/render_pc.md
+0x5b1927	D3DX_StringList_Prepend	render	I	I: len = strlen(arg)+1, alloc len+4, node[0] = old head, node[4..] = string via rep movsb, head+4 counter grows by len-1	hopper	docs/re/render_pc.md
+0x5c63c3	D3DX_String_Length	render	V	V: walks arg to the NUL byte (Hopper reports return 0, the real return is the length register)	hopper	docs/re/render_pc.md
+0x5c63d8	D3DX_NameTable_InsertOrFind	render	V	V: bucket = this + strlen(name)*4 + 0x4c; walks the +0xc chain, unlinks on exact match, else links arg_8 in and returns 0; C string compare two chars per step	hopper	docs/re/render_pc.md
+0x5c6455	D3DX_NameTable_Find	render	V	V: bucket = this + strlen(name)*4 + 0x4c, walks the +0xc chain comparing C strings, writes node+4 and node+8 to arg_1c/arg_20	hopper	docs/re/render_pc.md
+0x5e54bc	String_HashTimes19Mod7	render	V	V: h = h*0x13 + chartype(c) over the C string, returns h % 7	hopper	docs/re/render_pc.md
+0x627c50	StringTable_BinarySearch	render	V	V: lo/hi binary search over the pointer array at this+0x10 comparing the arg C string, returns the index or -1	hopper	docs/re/render_pc.md
+0x61fd80	D3DX_DeviceCaps_SetGpuWorkaroundFlag	render	V	V: when the caps dword at +0x240 has bits 0x80000|0x10000|0x100000, compares the device id at caps+0x204 with 0x10024c57, 0x10de0171 and 0x104a0010 and writes byte 0x709d8c = 0 for those three, 1 otherwise	hopper	docs/re/render_pc.md
+0x614972	D3DX_Shader_MergeRegisterRanges	render	I	I: per entry of this[2] follows the alias at +0x24 (0xffffffff = none), copies that entry's +0x2c/+0x30/+0x34, keeps the min of +0x38, the max of +0x3c and adds +0x40	hopper	docs/re/render_pc.md
+0x5caf72	D3DX_ConstantTable_GetValueAddress	render	I	I: constant = this[0x23][arg+4]; base = constant+0x38 flag ? this[0xb] : this[0xc][8]; passes constant+0x24 + arg+8 + base to 0x5c8303; siblings 0x5cafde and 0x5cce58 differ only by the tail callee	hopper	docs/re/render_pc.md
+0x615aff	D3DX_TypeTree_ComputeSize	render	I	I: node kind at +4: 1 = sum of the two children, 2 = result(child+0x10)*child[5], 3 = child[6]*child[7], 6/8 recurse on +0x10/+0x20, other kinds give 0	hopper	docs/re/render_pc.md
+0x604ee2	D3DX_Ps1Back_MatchMaskedTemplate	render	I	I: for each of arg_8 rows compares 4 dwords of the arg_0 row with the fixed 4-dword templates at 0x6df548 through the wildcard mask row in arg_4; returns 1 when a row matches	hopper	docs/re/render_pc.md
+0x5f573e	Texture_ComputeByteSize	render	V	V: recursive: when the child count at +0x14 is set it sums child size * word at child+8; else width*height with a block path (element type 3 swaps w/h then ((max+3)>>2)*other)	hopper	docs/re/render.md
+0x4fca20	FEng_NodeList_DeleteAll	render	V	V: walks the list at this+8, calls the node's virtual dtor (**node)(1), unlinks it (fixing head/tail at +0xc) and poisons next/prev with 0xabadcafe	hopper	docs/re/render.md
+0x570c70	Cars_DrawLampFlaresForView	render	V	V: walks the car list at 0x73d6d8 up to the 0x40a880 sentinel, keeps entries with +0x265!=0 and +0x267==0 whose +0x1cc matches arg[1], then calls CarRenderInfo::DrawLampFlares 0x56d8d0; callers 0x409580 RenderFrameMain and 0x409b70	hopper	docs/re/render.md
+0x638780	BinarySearch_S16Key	render	V	V: (key, base arg_4, count arg_8, stride arg_c): mid = count/2, compare key - int16[base+mid*stride], keep the upper half when positive, halve count; returns 1 on a hit else 0	hopper	docs/re/render.md
+0x56a0d0	CarRenderInfoOwner_Destroy	render	V	V: frees the CarRenderInfo at this+8 through CarRenderInfo::~CarRenderInfo 0x56c140, releases the +0x264 node with ListRef_Release 0x42ac80 and relinks it into the list at 0x73557c, then unlinks this from its own ring	hopper	docs/re/render.md
+0x40caa0	TexturePacks_RefreshAll	render	I	I: walks the list at 0x743c58 (node = list-4) up to the 0x40cb70 base-adjust sentinel and calls 0x53f9f0 per node; callers TexturePack_AttachPixels 0x5459f0 and TexturePackHandle::UnmapData 0x545af0	hopper	docs/re/render.md
+0x5ae4a0	Vec2_Transform4x4	render	V	V: out[i] = m[i]*in.x + m[0x10+i]*in.y + m[0x30+i] for i=0..3 (row-vector 4x4, translation row at +0x30), stored as 4 dwords	hopper	docs/re/render.md
+0x5e98ef	Quat_MultiplySSE	render	I	I: loads two 16-byte vectors via movlps/movhps, broadcasts lane 3 (shufps 0xff) and accumulates 4 sign-flipped shuffled products (masks 0x1b/0xb1/0xaa, xorps with sign mask), stores 16 bytes: quaternion-product shape, not a plain cross product	hopper	docs/re/render.md

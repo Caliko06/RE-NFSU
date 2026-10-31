@@ -1,0 +1,195 @@
+addr	name	system	confidence	evidence	tool	doc
+0x411030	Win32_PumpMessages	runtime	V	PeekMessageA/GetMessageA loop; WM_QUIT 0x12 sets dword_736124 and ShowCursor(1), then TranslateMessage/DispatchMessageA	hopper	docs/re/runtime.md
+0x416fc0	Log_PrintOrDashes	runtime	I	reads a string via 0x41db70, substitutes the literal "------------" when empty, then 0x4f68a0(0x6cc568)	hopper	docs/re/runtime.md
+0x421ae0	Flow_QueueThreeMessages	runtime	I	three calls to 0x421bc0 with ids 2, 1, 3	hopper	docs/re/runtime.md
+0x421bc0	FlowMessage_Enqueue	runtime	V	allocates a node via 0x567160, stores id at [2] and payload at [3], links into the circular list at this+8 and bumps the count	hopper	docs/re/runtime.md
+0x4399a0	ThresholdTable_MarkCode	runtime	I	sets bitfield [0x62] |= arg_0 and increments the counter at this + sub_439930(arg_0)*4 + 0x18c	hopper	docs/re/runtime.md
+0x43a7f0	Net_FlushIfActiveA	runtime	I	OnlineManager::IsActive (0x43a2e0) gates a call to 0x546710	hopper	docs/re/runtime.md
+0x43a810	Net_FlushIfActiveB	runtime	I	OnlineManager::IsActive (0x43a2e0) gates a call to 0x546750	hopper	docs/re/runtime.md
+0x447ee0	Frame_EndPerfSample	runtime	I	QueryPerformanceCounter then flushes the timing globals 0x735564/0x735568/0x735570	hopper	docs/re/runtime.md
+0x548d70	Counter_Accumulate	runtime	I	increments 0x73fe74/0x73fe78 and the per-index counters at 0x73de40 + (index & 0xff)*0x204 ([0x7d], [0x7e])	hopper	docs/re/runtime.md
+0x549340	Op_CreateKeyedString	runtime	I	_vsprintf "%s:%u:%u" (0x67101f) into a stack buffer, then 0x663540 alloc + 0x6635d0 with type 0x101/0x102	hopper	docs/re/runtime.md
+0x549460	Alloc_DefaultBlock	runtime	I	single tail call bMalloc(size, 0, 0, 0); 23 callers all allocate plain blocks	hopper	docs/re/runtime.md
+0x54e2f0	GlobalSlotTable_Reset	runtime	V	walks 0x73d830..0x73d86c stride 0x14, frees via 0x6640b0 and 0x663960, writes 0xffffffff	hopper	docs/re/runtime.md
+0x54e5b0	Perf_QueryAndDispatch	runtime	I	QueryPerformanceCounter + 0x6849a0 then tail-calls 0x54e5e0 with the counter	hopper	docs/re/runtime.md
+0x5647d0	Crc32_Update	runtime	V	table at 0x6b5e80 indexed by (crc>>24 ^ byte), crc = (crc<<8) ^ table[i]	hopper	docs/re/runtime.md
+0x5648c0	Perf_QueryCounter	runtime	V	QueryPerformanceCounter(&var_8) then 0x6849a0, 64-bit result in edx:eax	hopper	docs/re/runtime.md
+0x564930	List_IsEmpty	runtime	V	returns this[6] == 0	hopper	docs/re/runtime.md
+0x564940	List_InsertByPredicate	runtime	V	walks the circular head list calling the predicate arg_4, links the node before the first match	hopper	docs/re/runtime.md
+0x5718d0	Str_PadToWidthWithSpaces	runtime	V	writes 0x20 into the 94-space literal buffer up to min(length-1, arg_0)	hopper	docs/re/runtime.md
+0x577d10	List_ContainsPredicate	runtime	I	walks the intrusive list at this+0x20 recursing with arg_0 until the sentinel node is reached	hopper	docs/re/runtime.md
+0x579010	Child_RelinkParent	runtime	V	detaches child [0x38] (count [0x36]--, returns to pool 0x73b0e0) then attaches the new parent	hopper	docs/re/runtime.md
+0x579090	Child_DetachLastChild	runtime	V	clears [0x38], decrements [0x36], returns the child to pool 0x73b0e0 when the count hits zero	hopper	docs/re/runtime.md
+0x579380	Child_CreateNew	runtime	I	0x567160 alloc + 0x578e80 init then increments the parent count [0x36]	hopper	docs/re/runtime.md
+0x5793e0	Child_FreeAllToPool	runtime	V	unlinks every node reachable from 0x73b0dc through 0x578f80 and returns it to pool 0x7345bc	hopper	docs/re/runtime.md
+0x579480	Child_FreeAllToPoolB	runtime	V	same unlink/return loop starting at this->[0], free-list 0x7345bc	hopper	docs/re/runtime.md
+0x57a020	Progress_Normalize	runtime	I	(arg_4 - arg_0)/[0x5c]/global only when both args >= [0x60], otherwise returns the 1.0 literal	hopper	docs/re/runtime.md
+0x57cc70	PairTable_LookupOrDefault	runtime	V	scans count [0xe] entries of stride 8 from [5] for the key, returns entry[1] or the default arg_0	hopper	docs/re/runtime.md
+0x5864f0	Time_TicksToClockParts	runtime	V	magic-divide by 0x3e8/0x3c then *0x1f4 and *0x38 fill hours, minutes, seconds and fraction	hopper	docs/re/runtime.md
+0x58a050	List_FreeAllToPool	runtime	V	walks the sentinel list at dword_737bc4, unlinks, calls 0x58a2e0, returns the node to pool 0x734510	hopper	docs/re/runtime.md
+0x58dc10	Bitset256_Clear	runtime	V	zeroes 32 bytes while subtracting each byte from the counter at [0x14], then resets the counter	hopper	docs/re/runtime.md
+0x593850	Child_DetachAndFree	runtime	V	clears bit 0xef of [4]->[0xe], detaches [5] and returns it to pool 0x7344c8	hopper	docs/re/runtime.md
+0x593960	List_InitSentinel	runtime	V	sets [2] and [3] to this+8, i.e. an empty circular list	hopper	docs/re/runtime.md
+0x593970	Thunk_List_DeleteAllNodes	runtime	V	single call to 0x4049f0 List_DeleteAllNodes	hopper	docs/re/runtime.md
+0x593980	List_FreeAllToPoolB	runtime	V	same free loop over the byte_7377d8 sentinel using 0x593850 and pool 0x7344b0	hopper	docs/re/runtime.md
+0x5b00b6	Vec3_ReflectAroundNormal	runtime	I	computes a-b, dots it with d, subtracts d*dot, scales by the scalar then adds b back	hopper	docs/re/runtime.md
+0x5b0484	Registry_ReadValueTypeMatch	runtime	V	RegOpenKeyA(HKEY_LOCAL_MACHINE 0x80000002, 0x699494) + RegQueryValueExA, compares the type to arg_0	hopper	docs/re/runtime.md
+0x5f3fb8	Vec3_TransformAffineMMX	runtime	V	femms + punpck/pfmul on packed pairs against edx[0..5], 4th column not applied	hopper	docs/re/runtime.md
+0x5f4d50	Vec2_TransformMMX	runtime	V	femms + punpckldq/punpckhdq/pfmul/pfadd of two packed floats against edx[0..2]	hopper	docs/re/runtime.md
+0x5f4d89	Vec2_TransformDivideMMX	runtime	V	femms + pfmul plus the pfrcp/pfrcpit1/pfrcpit2 reciprocal chain	hopper	docs/re/runtime.md
+0x61f5f0	Win32_Sleep	runtime	V	single call Sleep(ms)	hopper	docs/re/runtime.md
+0x61f600	Win32_PostMessage	runtime	V	single call PostMessageA(hwnd, msg, w, l)	hopper	docs/re/runtime.md
+0x620250	Size_ByCode	runtime	I	jump table on arg_0-0x14 returning 0x18/0x20/0x10/0x8	hopper	docs/re/runtime.md
+0x622dd0	Obj_UnlinkRefB	runtime	V	count [4]--, doubly-linked unlink via [5]/[6], global 0x70a4a4, calls global vtable slot 0x138	hopper	docs/re/runtime.md
+0x622e30	Obj_UnlinkRefA	runtime	V	count [2]--, doubly-linked unlink via [3]/[4], global 0x70a4a8, calls global vtable slot 0x168	hopper	docs/re/runtime.md
+0x63aba0	Str_CopyZeroPadded	runtime	V	calls EAsys_MemZero when the stored length exceeds 0x28, then copies from the default dword_6e75e8	hopper	docs/re/runtime.md
+0x63c200	EAFile_OpenAndWait	runtime	I	EAFile_QueueOpen (0x63a5d0) then 0x6398f0 size query, returns EAFile_CompleteOp into *arg_c	hopper	docs/re/runtime.md
+0x63c2c0	EAFile_CloseAndCheck	runtime	I	EAFile_QueueClose (0x63a690), wait via 0x639d70, returns EAFile_CompleteOp != 0	hopper	docs/re/runtime.md
+0x63db00	HandleTable_Lookup	runtime	V	stride 0xc table dword_70f48c with count dword_70f488, byte-flag test, SetLastError(6) on miss	hopper	docs/re/runtime.md
+0x63e4d0	Callback_InvokeOrDefault	runtime	V	calls [1] when non-null, else [2]([3], arg, saved)	hopper	docs/re/runtime.md
+0x63e5c0	EAsys_SleepAlertable	runtime	V	SleepEx(ms, 1)	hopper	docs/re/runtime.md
+0x63e600	Thread_IsCurrentOwner	runtime	V	GetCurrentThreadId compared with *dword_70f4ec (arg 0) or obj[2]; arg -1 returns 1	hopper	docs/re/runtime.md
+0x63e850	EAsys_ThreadInit	runtime	V	GetCurrentThreadId stored to dword_70f4ec, DuplicateHandle on the current thread, registers 0x63e510 as exit handler	hopper	docs/re/runtime.md
+0x63e8b0	Thread_BeginEx	runtime	V	__beginthreadex(0x63e4d0) + ResumeThread then a SleepEx(1, 1) drain loop	hopper	docs/re/runtime.md
+0x63f170	CriticalSection_Destroy	runtime	V	DeleteCriticalSection(this+4) then stores magic 0x6d757446 ('Futm')	hopper	docs/re/runtime.md
+0x63f1b0	EAsys_MemCpy	runtime	V	dispatches on dword_70fddc/70fde0/70fdd8 to 0x643550/0x643440/0x643350, else inline unaligned head + 32-byte block copy	hopper	docs/re/runtime.md
+0x63f210	EAsys_MemZero	runtime	V	same three-flag dispatch to 0x643910/0x643860/0x6437b0 with a literal 0 fill value, callers pass (dst, len)	hopper	docs/re/runtime.md
+0x641a10	EAsys_MemSet	runtime	V	same dispatch, forwards (dst, val, len) to 0x643860/0x643910/0x6437b0/0x6436f0	hopper	docs/re/runtime.md
+0x641a70	EAsysEvent_Create	runtime	V	CreateEventA(0, 0, 0, 0) stored at this+4	hopper	docs/re/runtime.md
+0x641ac0	EAsysEvent_Wait	runtime	V	WaitForSingleObject(this[1], 0xffffffff INFINITE)	hopper	docs/re/runtime.md
+0x641b10	EAsysEvent_Close	runtime	V	CloseHandle(this[1])	hopper	docs/re/runtime.md
+0x641b50	List_UnlinkNode	runtime	V	doubly-linked unlink with head [2] and tail [3] cases, count-- at [0], dirties flag [1]	hopper	docs/re/runtime.md
+0x641bf0	WaitQueue_Init	runtime	V	CriticalSection::Init at +0x18, count 0, state 2, default callback 0x641b20	hopper	docs/re/runtime.md
+0x641cb0	List_InsertHead	runtime	V	locks +0x18, links the node before [2], count++ at [0], fixes tail [3]	hopper	docs/re/runtime.md
+0x641d40	List_PopHead	runtime	V	locks +0x18, removes [2], count-- at [0]	hopper	docs/re/runtime.md
+0x641e00	List_InsertSorted	runtime	V	compare callback at [4], walks the [2] chain, links the node, count++ at [0], lock at +0x18	hopper	docs/re/runtime.md
+0x641e90	List_UnlinkLocked	runtime	V	locks +0x18 then List_UnlinkNode (0x641b50)	hopper	docs/re/runtime.md
+0x641fb0	List_FindFirst	runtime	V	locks +0x18, walks the [2] chain calling the predicate arg_4, returns the first match	hopper	docs/re/runtime.md
+0x6420d0	List_FindAndUnlinkLocked	runtime	V	locks, predicate walk, unlink via 0x641b50, unlock	hopper	docs/re/runtime.md
+0x642360	WaitQueue_Lock	runtime	V	tail call CriticalSection::Enter (0x63f190) on this+0x18	hopper	docs/re/runtime.md
+0x642380	WaitQueue_Unlock	runtime	V	tail call CriticalSection::Leave (0x63f1a0) on this+0x18	hopper	docs/re/runtime.md
+0x642540	EAsys_RunExitHandlers	runtime	V	calls every non-null pointer in 0x70fe38..0x70ff34, zeroes the slot, then CRT::_exit (0x6720ea)	hopper	docs/re/runtime.md
+0x642570	EAsys_RegisterExitHandler	runtime	V	linear scan of 0x70fe38 bounded by dword_70ff38 and 0x40 slots, stores the handler	hopper	docs/re/runtime.md
+0x6427d0	StrICmp_CountMatch	runtime	V	folds bytes 0x41..0x5a to +0x20 and counts matching characters until NUL	hopper	docs/re/runtime.md
+0x642830	Str_CopyLowerTruncate	runtime	V	copy loop folding A-Z to +0x20 into a destination of length arg_0, NUL terminated	hopper	docs/re/runtime.md
+0x642de0	EAsys_PrintfCore	runtime	V	__chkstk + _vsprintf into a stack buffer then dispatches to handler table 0x6e80d4 stride 0xc up to 0x6e8134	hopper	docs/re/runtime.md
+0x642e60	EAsys_PrintfVariant	runtime	I	second thin wrapper over 0x642de0 (two callers)	hopper	docs/re/runtime.md
+0x642e80	EAsys_Printf	runtime	I	17 callers, single tail call to 0x642de0; 0x648ac8 passes it an ASCII message	hopper	docs/re/runtime.md
+0x643230	Timer_QueryGlobal	runtime	I	checks *dword_70ff90 then calls 0x641a90(0x70ff3c)	hopper	docs/re/runtime.md
+0x643c20	Printf_Thunk	runtime	V	single call to 0x67147f (_printf)	hopper	docs/re/runtime.md
+0x643e50	Mat4_TransformPoint3x4	runtime	V	nine fmul over [ecx+0..0x28] then adds the translation at +0x30/+0x34/+0x38	hopper	docs/re/runtime.md
+0x645da0	Obj_SetField00_645da0	runtime	V	writes arg_0 to *this and returns this	hopper	docs/re/runtime.md
+0x645e00	VCall_Offset4	runtime	V	calls (*(this+4))(arg_0..arg_10, this)	hopper	docs/re/runtime.md
+0x645fc0	Time_AccumulateTicks	runtime	V	timeGetTime, divisor 0x1000, 64-bit accumulate using __aulldiv 0x674b00	hopper	docs/re/runtime.md
+0x646070	Obj_SetField04_646070	runtime	V	writes arg_0 to this[1]	hopper	docs/re/runtime.md
+0x646090	Obj_SetField08_646090	runtime	V	writes arg_0 to this[2]	hopper	docs/re/runtime.md
+0x6460d0	Obj_GetField30_6460d0	runtime	V	returns this[0xc]	hopper	docs/re/runtime.md
+0x6460f0	Obj_GetField00_6460f0	runtime	V	returns *this	hopper	docs/re/runtime.md
+0x647984	Obj_SetField00_647984	runtime	V	writes arg_0 to this[0]	hopper	docs/re/runtime.md
+0x647999	Obj_SetField04_647999	runtime	V	writes arg_0 to this[1]	hopper	docs/re/runtime.md
+0x6479af	Obj_SetField08_6479af	runtime	V	writes arg_0 to this[2]	hopper	docs/re/runtime.md
+0x6479c5	Obj_SetField0C_6479c5	runtime	V	writes arg_0 to this[3]	hopper	docs/re/runtime.md
+0x6479db	Obj_SetField10_6479db	runtime	V	writes arg_0 to this[4]	hopper	docs/re/runtime.md
+0x6479f1	Obj_SetField14_6479f1	runtime	V	writes arg_0 to this[5]	hopper	docs/re/runtime.md
+0x647c10	Obj_GetField98_647c10	runtime	V	returns this[0x26]	hopper	docs/re/runtime.md
+0x647c30	Obj_GetField9C_647c30	runtime	V	returns this[0x27]	hopper	docs/re/runtime.md
+0x647c90	Obj_GetField20_647c90	runtime	V	returns this[0x8]	hopper	docs/re/runtime.md
+0x648ac8	Codec_EnsureSelected	runtime	V	ASCII "Please choose a codec during the first data call back" then dispatch through [6]->[8]	hopper	docs/re/runtime.md
+0x652d50	GlobalMutex_Create	runtime	V	CreateMutexA(0, 0, 0) stored to dword_71402c	hopper	docs/re/runtime.md
+0x657cd0	OS_DetectVersionClass	runtime	V	GetVersionExA on a 0x94-byte OSVERSIONINFOA then version and platform-id checks	hopper	docs/re/runtime.md
+0x65f930	Envelope_DecodeDelimited	runtime	I	0xee lead byte, then 2-byte entries fild'd from their high bytes, 0x1c values	hopper	docs/re/runtime.md
+0x6623c0	PacketHeader_Compare	runtime	V	compares the first int16 then 0xe bytes (6 when type == 2) through 0x668c60	hopper	docs/re/runtime.md
+0x6625d0	Dword_SetHighByte	runtime	V	sets HIBYTE of the dword argument to arg_0	hopper	docs/re/runtime.md
+0x663540	Alloc_0xac_Zeroed	runtime	V	bMalloc(0xac) then rep stosd zero fill	hopper	docs/re/runtime.md
+0x663960	Obj_FreeWithHandler	runtime	V	calls 0x663570 then frees this through 0x447030	hopper	docs/re/runtime.md
+0x663d90	Guard_ReentrantCall	runtime	I	flag at [0x71] set around the call to 0x663ae0, returns 0 when already set	hopper	docs/re/runtime.md
+0x6640b0	Obj_ReleaseVtableAndLock	runtime	V	vtable slot [8] with 0, slot [1], frees [0x61], destroys the lock at +0x190	hopper	docs/re/runtime.md
+0x664310	Printf_ToCallback	runtime	V	__chkstk + _vsprintf then an indirect call through [0x1c0]	hopper	docs/re/runtime.md
+0x664380	MessageQueue_Insert	runtime	V	alloc 0x44, walks the list at [0x6f4] for tag 0x70696e67 and links the new node at [0x10]	hopper	docs/re/runtime.md
+0x664400	MessageQueue_PopHead	runtime	V	compares the literal 0x44515545, unlinks the node, frees it, decrements [0x1be]	hopper	docs/re/runtime.md
+0x664460	MessageQueue_RemoveByKey	runtime	V	walks the [0x6f4] chain matching tag 0x70696e67 then key [2] or priority [0x10], frees the node	hopper	docs/re/runtime.md
+0x664920	Ring_ResetHeadTail	runtime	V	writes [6]=0, [7]=0xffffffff, [8]=0	hopper	docs/re/runtime.md
+0x664aa0	Slot_SetPairFields	runtime	V	writes arg_8/arg_c at this + index*8 + 0x6cc and +0x6d0	hopper	docs/re/runtime.md
+0x664c00	HashTable_InitSlot	runtime	I	index < 10, sets 0x12a/0x12b and creates two objects via 0x66ddd0(0x3e8, 0x7d0) and 0x666d60(0x64, 0x64, 0)	hopper	docs/re/runtime.md
+0x664c70	HashTable_ClearSlot	runtime	V	frees each entry via 0x447030, zeroes slot fields 0x128..0x12b, index bounded by 10	hopper	docs/re/runtime.md
+0x664d40	HashTable_FindInSlot	runtime	V	index < 10, table at this+0x4a0 stride 0x14, delegates to 0x66dd40	hopper	docs/re/runtime.md
+0x664d80	Profile_FindSectionByTag	runtime	I	4CC tags 0x75736572/0x61636374/0x70657273/0x726f6f6d/0x706c6179/0x646f776e map to +0x134/+0x174/+0x1c0/+0x200/+0x570	hopper	docs/re/runtime.md
+0x665120	Bit_PopLowestSet	runtime	V	x & (x-1) trick, returns the isolated lowest set bit and clears it in place	hopper	docs/re/runtime.md
+0x6655c0	PacketHandler_Create	runtime	I	alloc 0x708 with zero fill, strchr '=' (0x3d), 0x66de50 hash + 0x6687e0(0x40) buffer, callbacks at 0x1bf/0x1c0	hopper	docs/re/runtime.md
+0x666da0	List_FreeChainAndSelf	runtime	V	frees the chain at [0xf], then [0x10], then this through 0x447030	hopper	docs/re/runtime.md
+0x666e50	Cursor_AdvanceWithCompare	runtime	I	uses the callbacks at [8]/[9] to compare and advance, bumps the counter at [2]	hopper	docs/re/runtime.md
+0x666ea0	Ptr_DerefOrNull	runtime	V	returns *arg_4 or 0	hopper	docs/re/runtime.md
+0x666eb0	ValueTable_Remove	runtime	V	linear scan of the table at [0x10] for the value, shifts the tail down, decrements [6]	hopper	docs/re/runtime.md
+0x666f30	ValueTable_AtChecked	runtime	V	bounds check i < [6], returns **(this[0x10] + i*4)	hopper	docs/re/runtime.md
+0x6672e0	Str_CopyThenAppendEquals	runtime	V	copies bytes until NUL then writes 0x3d '='	hopper	docs/re/runtime.md
+0x667650	Str_CopyTruncate	runtime	V	copies until NUL or count-1, NUL terminates, returns the written count	hopper	docs/re/runtime.md
+0x667750	Str_BuildFlagAlphabet	runtime	V	selects characters by the bits of arg_c from "@ABCDEFGHIJKLMNOPQRSTUVWXYZ0123" then calls 0x667300	hopper	docs/re/runtime.md
+0x667ec0	Str_ParseInt	runtime	V	handles '+' 0x2b and '-' 0x2d then accumulates decimal digits *10	hopper	docs/re/runtime.md
+0x667f50	Str_ParseDottedQuad	runtime	V	'.' 0x2e shifts the accumulator left 8 bits, digits pack one byte per field	hopper	docs/re/runtime.md
+0x668720	SlotTable_FindIndex	runtime	V	scans count [1] entries of stride 0x10 from this+0x18 for the key, returns -1	hopper	docs/re/runtime.md
+0x6687e0	GlobalBuffer_Create	runtime	V	reference count dword_7177c4/c8, alloc (n-1)*0x10+0x28, zero fill, GetTickCount	hopper	docs/re/runtime.md
+0x668870	GlobalBuffer_Release	runtime	V	decrements dword_7177c8 and frees the buffer, clearing dword_7177c4/c8	hopper	docs/re/runtime.md
+0x668b40	Slot_FindOrAppend	runtime	V	0x668720 lookup, 0x10-stride entry at this+0x18, sets the 0x8000 flag	hopper	docs/re/runtime.md
+0x668bc0	Slot_FindAndMark	runtime	V	0x668720 lookup then sets [0x1c]=0x8000 and the length bytes at +0x1e/+0x1f	hopper	docs/re/runtime.md
+0x668c50	AsyncOp_WaitAndRelease	runtime	V	Sleep(0xa) loop on vtable [2], returns [1] then calls vtable [3]	hopper	docs/re/runtime.md
+0x668c60	StrCompare_Len	runtime	V	byte-difference loop, negative length means a NUL-terminated compare	hopper	docs/re/runtime.md
+0x668cc0	LockObject_Init	runtime	V	zeroes [0..2], InitializeCriticalSection(+0xc), NULL selects the 0x7177d0 singleton	hopper	docs/re/runtime.md
+0x668cf0	LockObject_Destroy	runtime	V	DeleteCriticalSection(+0xc), NULL selects the 0x7177d0 singleton	hopper	docs/re/runtime.md
+0x668d10	LockObject_Lock	runtime	V	GetCurrentThreadId owner test, InterlockedExchange(+8), EnterCriticalSection(+0xc), count++ at [1]	hopper	docs/re/runtime.md
+0x668d60	LockObject_LockSpin	runtime	I	retries EnterCriticalSection + InterlockedExchange until 0x668d10 succeeds	hopper	docs/re/runtime.md
+0x668df0	LockObject_Unlock	runtime	V	decrements [1]; at zero clears owner and count, LeaveCriticalSection(+0xc)	hopper	docs/re/runtime.md
+0x66a520	Stream_ResetTimersA	runtime	I	zeroes [0x22..0x30] and backdates [0x30] by 0x1388 ms from GetTickCount	hopper	docs/re/runtime.md
+0x66a910	Stream_LockedUpdate	runtime	I	locks this+0x1d8 with 0x668d10 then calls 0x66a580	hopper	docs/re/runtime.md
+0x66ad40	Ring_ReadA	runtime	I	reads the entry at [0x25]/[0x26]/[0x27], rep movsb, refresh via 0x66a910	hopper	docs/re/runtime.md
+0x66b110	Stream_ResetTimersB	runtime	I	zeroes [0x25..0x32] and backdates [0x2d] by 0x1388 ms from GetTickCount	hopper	docs/re/runtime.md
+0x66b150	Stream_SendFromRing	runtime	I	calls 0x662e80 then accumulates [0x16] += n and [0x18]++, GetTickCount into [0x2d]	hopper	docs/re/runtime.md
+0x66b1a0	Stream_SendChecked	runtime	I	0x66b150 followed by __security_check_cookie (0x674ec2)	hopper	docs/re/runtime.md
+0x66b710	Stream_LockedUpdateB	runtime	I	locks this+0x1dc with 0x668d10 then calls 0x66b690	hopper	docs/re/runtime.md
+0x66bb50	Ring_ReadB	runtime	I	reads the entry at [0x25]/[0x26]/[0x27], clamps to the requested size, rep movsb	hopper	docs/re/runtime.md
+0x66c060	Stream_ResetCounters	runtime	V	resets [0x24..0x32], thresholds 0x65 (101), backdates both timers by 0x1388	hopper	docs/re/runtime.md
+0x66c0c0	Stream_RecvIntoRing	runtime	I	calls 0x662e80, stamps GetTickCount into [0x31] and advances [0x16]/[0x18] on a full read	hopper	docs/re/runtime.md
+0x66c120	Stream_AdvanceState	runtime	V	when state [0x20]==4 calls 0x66c0c0 then sets state 5 and clears [0x21]	hopper	docs/re/runtime.md
+0x66c8d0	Ring_ComputeSlotAverage	runtime	V	(([0x2c] - [0x2d]) + [0x2b]) % [0x2b] / [0x2a]	hopper	docs/re/runtime.md
+0x66da20	SlotRing_Destroy	runtime	V	frees the chain at [6], then [5], then this through 0x447030	hopper	docs/re/runtime.md
+0x66da60	SlotRing_Reserve	runtime	V	alloc (n+1)*12 via 0x549460 and threads the slots through [7]	hopper	docs/re/runtime.md
+0x66dac0	SlotRing_Pop	runtime	V	head index modulo [4] over table [5], returns the slot to free list [7], count-- at [0]	hopper	docs/re/runtime.md
+0x66dc20	HashTable_FindWithCompare	runtime	V	bucket from 0x66db20, compare callback at [8]	hopper	docs/re/runtime.md
+0x66f9e0	Session_StateTransition	runtime	I	[2]==1 promotes to 2; ==2 promotes [0x2f] 2->4; ==3 promotes 4->7	hopper	docs/re/runtime.md
+0x670660	Session_CommitFlushA	runtime	I	EnterCriticalSection(+0x1910), 0x6702d0, then state 5 -> 3	hopper	docs/re/runtime.md
+0x670740	Session_CommitFlushB	runtime	I	EnterCriticalSection(+0x1910), 0x6702d0, then state 5 -> 2	hopper	docs/re/runtime.md
+0x6707b0	ModeCode_Normalize	runtime	V	maps 2|3 -> 2, 1|7 -> 1, 4|5 -> 3, otherwise 4	hopper	docs/re/runtime.md
+0x6709c0	Ring_AdvanceIndex	runtime	V	([0x31] + [0x34]) % [0x32] stored back to [0x34]	hopper	docs/re/runtime.md
+0x672e20	CRT::pow	runtime	I	inf/NaN precheck via 0x67a6b8 then 0x672e3d, which saves the x87 cw and compares with the 1.0 exponent 0x3ff00000	hopper	docs/re/runtime.md
+0x67342a	CRT::__NLG_Notify	runtime	V	writes the three notify globals 0x6eb47c/0x6eb480/0x6eb484, sibling of __NLG_Notify1 at 0x673421	hopper	docs/re/runtime.md
+0x673890	CRT::powSpecial	runtime	I	stmxcsr exception-mask test 0x1f80 then 0x67cf90 or 0x6738ed	hopper	docs/re/runtime.md
+0x673b70	CRT::powAlt	runtime	I	same inf/NaN precheck then 0x673b8d, which saves the x87 cw and checks 0x27f	hopper	docs/re/runtime.md
+0x679330	WideEnv_Set	runtime	V	WideCharToMultiByte + _malloc (0x67121a) + CRT::__crtsetenv (0x681236) per wide string	hopper	docs/re/runtime.md
+0x67a193	CRT::FloatFormat_PadFraction	runtime	I	'-' sign 0x2d, decimal point from byte_6ec184, '0' padding via _memset with length arg_4	hopper	docs/re/runtime.md
+0x67a5d0	CRT::FloatErrorExit	runtime	V	calls 0x681941 __except1, tests status 0x27f, restores the control word	hopper	docs/re/runtime.md
+0x67a630	CRT::_pow2x	runtime	V	frndint + f2xm1 + fld1/faddp + fscale sequence	hopper	docs/re/runtime.md
+0x67a645	CRT::RestoreControlWord	runtime	V	fldcw from the caller-supplied control word at arg+2	hopper	docs/re/runtime.md
+0x67a6b8	Double_IsInfOrNaN	runtime	V	(arg_4 & 0x7ff00000) == 0x7ff00000 exponent-mask test	hopper	docs/re/runtime.md
+0x67adc2	CRT::SetMathErrno	runtime	V	writes 0x21 (EDOM) or 0x22 (ERANGE) through __errno 0x677f42	hopper	docs/re/runtime.md
+0x67afc6	CRT::_fwait	runtime	V	wait + fnstsw to read the x87 status word	hopper	docs/re/runtime.md
+0x67afd3	CRT::_clearfp	runtime	V	fnclex after fnstsw, returns the previous status word	hopper	docs/re/runtime.md
+0x67f15e	CRT::LcidTable_Find	runtime	I	linear scan of a 10-dword table, returns 1 when the id is absent	hopper	docs/re/runtime.md
+0x6816e3	CRT::__ld12cvt_entry	runtime	V	calls 0x68158b __ld12cvt with the table at 0x6ec200	hopper	docs/re/runtime.md
+0x681aa5	CRT::IsValidReadPtr	runtime	V	IsBadReadPtr(arg_0, len) inverted	hopper	docs/re/runtime.md
+0x681f2f	CRT::_frnd	runtime	V	frndint on the double argument, result kept as double	hopper	docs/re/runtime.md
+0x682932	CRT::IntToDecimalDigits	runtime	I	tables 0x6ec1e0/0x6ec340 stride 0x54, three bits consumed per digit step, ends in __security_check_cookie	hopper	docs/re/runtime.md
+0x684f60	VtableInit_0x6c6434	runtime	V	writes 0x6c6434 to this+0x44c	hopper	docs/re/runtime.md
+0x6850d0	EHStub_CxxHandler_6850d0	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x6854b0	VtableInit_0x6c8584	runtime	V	writes 0x6c8584 to *this	hopper	docs/re/runtime.md
+0x685f90	EHStub_CxxHandler_685f90	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x6861c0	Free_PairOfPointers	runtime	V	frees [4] and [0xb] through _free 0x671102	hopper	docs/re/runtime.md
+0x686240	List_FreeCircularToPool	runtime	V	walks the circular list at this+0x1c, unlinks, returns each node to pool 0x7344f0	hopper	docs/re/runtime.md
+0x686718	EHStub_CxxHandler_686718	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x686c18	EHStub_CxxHandler_686c18	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x686c30	SentinelList_Destroy	runtime	V	sets vtable 0x6ba6b8 then unlinks the [1]/[2] pair	hopper	docs/re/runtime.md
+0x686c4d	EHStub_CxxHandler_686c4d	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x686c88	EHStub_CxxHandler_686c88	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x687528	EHStub_CxxHandler_687528	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x687938	EHStub_CxxHandler_687938	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x688b57	EHStub_CxxHandler_688b57	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x688bfb	EHStub_CxxHandler_688bfb	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
+0x6896cb	EHStub_CxxHandler_6896cb	runtime	V	single call to 0x673078 ___CxxFrameHandler	hopper	docs/re/runtime.md
