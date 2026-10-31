@@ -1,87 +1,22 @@
-// Blur bank: presets for the game's own motion blur (0x40cd40). host/d3d9.c tune_apply copies the 4 floats into its .data
-// (ramp start/end m/s 0x702a38/0x702a3c, cap of t 0x702a40, streak length 0x702a44) at the next Present.
-// ?blur=0..6 picks one; F6 / F7 step down / up in game (the game maps neither key). The choice is kept in this browser.
-// Composite alpha at full speed = min(1.5 cap, 1). PC original: 25 -> 125 m/s, cap 0.65; PS2 ramp 0.1 -> 25 m/s
-// (SLUS_208.11 0x4ff95c/0x4ff960), strongest PS2 copy alpha 50/128 (0x4485f0) = cap 0.26.
-// trails = light-trail strength s (PATCH 0x409bdb, [0x707fcc]): a still lamp is s times its flare, a moving one keeps the
-// game's trail length (= the PS2 one in time); 'raw' is the shipped colour 0x1fffffff (still lamps 2-3.4x, blue-white).
-const BLUR = [
-  { name: 'off',          ramp: [0.1, 25], cap: 0,    trails: 1.0 },
-  { name: 'light',        ramp: [0.1, 25], cap: 0.10, trails: 1.0 },
-  { name: 'medium',       ramp: [0.1, 25], cap: 0.18, trails: 1.25 },
-  { name: 'PS2',          ramp: [0.1, 25], cap: 0.26, trails: 1.5 },
-  { name: 'strong',       ramp: [0.1, 25], cap: 0.45, trails: 2.0 },
-  { name: 'PC original',  ramp: [25, 125], cap: 0.65, trails: 'raw' },
-  // PS2 depth: the PS2's 4-copy zoom blur weighted by the scene's depth (web/gpu.js psblur; car sharp, far city stretched; nitrous adds
-  // the PS2's 2 extra passes). The game's own blur is off (cap 0) so the two do not stack; trails as 'PS2'. ?psblur=0 falls back to 3.
-  { name: 'PS2 depth',    ramp: [0.1, 25], cap: 0,    trails: 1.5, ps: true },
-];
-const BLUR_ORIGINAL = 5;    // 'PC original': Original mode starts there, as shipped
-const BLUR_DEFAULT = 6;     // PS2 depth (before it: 3 = PS2, OWNER 2026-10-26: medium made the blur and the light aura hard to see)
+// Motion blur and race projection. host/d3d9.c tune_apply copies the 4 blur floats into the game's .data at the next Present:
+// ramp start/end m/s 0x702a38/0x702a3c, cap of t 0x702a40, streak length 0x702a44 (all read by the blur 0x40cd40).
+// Both modes use the PC values as shipped: ramp 25 -> 125 m/s, cap 0.65, so there is no blur under 56 mph
+// (docs/re/feel_2026-10-31.md 2). The PS2 ramp (0.1 -> 25 m/s) blurred city speeds.
+// Light-trail strength (PATCH 0x409bdb, [0x707fcc]): a still lamp is s times its flare. Shipped 0x1fffffff makes still lamps
+// 2.0/2.4/3.4x (blue-white): Original keeps it, Remaster uses s = 1.5 on every channel.
+// Race projection k (word 6, host/d3d9.c hfov_frame): Remaster = 4/3, the PC's 4:3 view widened to 16:9; Original = 0, the patch's k.
+const BLUR_RAMP = [25, 125], BLUR_CAP = 0.65, STREAK = 0.00625;   // 0x702a38..0x702a44 as shipped
 const DECAY = [0x82, 0x96, 0xb4];   // BLENDFACTOR 0x008296b4 at 0x409bca, R G B
 // D3DCOLOR 0x1fRRGGBB with channel = s (1 - k): the add weight that makes a still light s times its flare.
-const trailColor = s => s === 'raw' ? 0x1fffffff :
-  (0x1f000000 | DECAY.reduce((c, k) => c << 8 | Math.min(255, Math.round(s * (255 - k))), 0)) >>> 0;
-const STREAK = 0.00625;     // 0x702a44 as shipped
-// ?speedfov=<deg>: the chase camera's FOV grows by up to this many degrees from 90 to 270 km/h (host/d3d9.c fov_frame: it rewrites
-// the game's FOV table 0x6fbdf4 from the camera's speed, the camera and projection follow). 0 = off, as shipped; Original mode sets 0.
-const SPEEDFOV = 10;
-// ?chasecam=1|0: the chase camera sits up to 12% farther and 10% lower with speed (host/d3d9.c chase_frame rewrites the car's camera rows).
-const CHASECAM = 1;
-// ?nitrocam=1|0: while the nitrous burns the chase camera goes 10% farther and 5% lower (host/d3d9.c chase_frame, same rows).
-const NITROCAM = 1;
-// ?hfov=<deg>: the horizontal view at 16:9 or wider in races, in degrees (host/d3d9.c hfov_frame, k of the widescreen caves). Absent = the shipped 96.5 (the PS2's
-// vertical view, PATCH 0x40debb); 4:3 PC was 71.5 horizontal. k = tan(71.5/2) * 16/9 / tan(hfov/2).
+const trailColor = s => (0x1f000000 | DECAY.reduce((c, k) => c << 8 | Math.min(255, Math.round(s * (255 - k))), 0)) >>> 0;
 
 function startTune(M) {
-  const base = M._rn_tune_addr() >> 2;
+  const base = M._rn_tune_addr() >> 2, h = M.HEAPU32;
   const f = new Float32Array(1), u = new Uint32Array(f.buffer);
   const bits = x => (f[0] = x, u[0]);
-  let level = RN_MODE === 'original' ? BLUR_ORIGINAL : BLUR_DEFAULT;
-  const KEY = RN_MODE === 'original' ? 'rn_blur2_orig' : 'rn_blur3';   // web/mode.js: each mode keeps its own F6/F7 choice
-  try { const s = localStorage.getItem(KEY); if (s !== null && BLUR[+s]) level = +s; } catch {}
-  const q = RN_Q.get('blur');
-  if (q !== null && BLUR[+q]) level = +q;
-  const sf = parseFloat(RN_Q.get('speedfov') ?? SPEEDFOV);
-  const speedfov = isFinite(sf) ? sf : 0;
-  const chasecam = RN_Q.get('chasecam') === null ? CHASECAM : +RN_Q.get('chasecam') ? 1 : 0;
-  const nitrocam = RN_Q.get('nitrocam') === null ? NITROCAM : +RN_Q.get('nitrocam') ? 1 : 0;
-  const hf = parseFloat(RN_Q.get('hfov'));
-  const hfovK = hf > 40 && hf < 120 ? Math.tan(35.75 * Math.PI / 180) * 16 / 9 / Math.tan(hf * Math.PI / 360) : 0;
-  const psOff = RN_Q.get('psblur') === '0';
-  if (psOff && BLUR[level].ps) level = 3;    // ?psblur=0: the pass off, the game's own PS2 blur instead
-
-  const toast = document.createElement('div');
-  Object.assign(toast.style, { position: 'fixed', left: '50%', top: '12px', transform: 'translateX(-50%)', padding: '6px 14px',
-    background: 'rgba(0,0,0,0.75)', color: '#9fe3ff', font: '14px system-ui, sans-serif', borderRadius: '6px',
-    pointerEvents: 'none', display: 'none', zIndex: 10 });
-  document.body.appendChild(toast);
-  let hide = 0;
-
-  function apply(show) {
-    const p = BLUR[level], h = M.HEAPU32;
-    RN_PS.on = !!p.ps && !psOff;
-    h[base + 1] = bits(p.ramp[0]); h[base + 2] = bits(p.ramp[1]); h[base + 3] = bits(p.cap); h[base + 4] = bits(STREAK); h[base + 5] = trailColor(p.trails);
-    h[base + 6] = bits(speedfov);
-    h[base + 7] = chasecam;
-    h[base + 8] = nitrocam;
-    h[base + 9] = hfovK ? bits(hfovK) : 0;
-    Atomics.add(h, base, 1);
-    try { localStorage.setItem(KEY, String(level)); } catch {}
-    if (!show) return;
-    toast.textContent = `Blur ${level}/${BLUR.length - 1}: ${p.name}   (F6 / F7)`;
-    toast.style.display = 'block';
-    clearTimeout(hide); hide = setTimeout(() => toast.style.display = 'none', 1500);
-  }
-  // Capture phase on window: the canvas (web/input.js) never sees F6/F7, so the game does not get them.
-  window.addEventListener('keydown', e => {
-    if (e.code !== 'F6' && e.code !== 'F7') return;
-    e.preventDefault(); e.stopPropagation();
-    if (e.repeat) return;
-    level = Math.max(0, Math.min(BLUR.length - 1, level + (e.code === 'F7' ? 1 : -1)));
-    if (psOff && BLUR[level].ps) level = BLUR.length - 2;
-    apply(true);
-  }, true);
-  window.addEventListener('keyup', e => { if (e.code === 'F6' || e.code === 'F7') { e.preventDefault(); e.stopPropagation(); } }, true);
-  apply(false);
+  const orig = RN_MODE === 'original';
+  h[base + 1] = bits(BLUR_RAMP[0]); h[base + 2] = bits(BLUR_RAMP[1]); h[base + 3] = bits(BLUR_CAP); h[base + 4] = bits(STREAK);
+  h[base + 5] = orig ? 0x1fffffff : trailColor(1.5);
+  h[base + 6] = orig ? 0 : bits(4 / 3);
+  Atomics.add(h, base, 1);
 }

@@ -13,8 +13,6 @@ const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_D
 const T_ID = 0, T_AU = 1, T_AV = 2, T_MAG = 3, T_MIN = 4, T_MIP = 5, T_TT = 6, T_ANISO = 7, T_CUBE = 0x10000;
 const U_SIZE = 4320, U_STEP = 4352;     // sm1.h SM1_U_SIZE, rounded to the 256-byte offset alignment
 
-// PS2 depth speed blur (psblur below): web/tune.js sets .on from the blur preset ('PS2 depth') and ?psblur.
-const RN_PS = { on: false };
 const CMP = [null, 'never', 'less', 'equal', 'less-equal', 'greater', 'not-equal', 'greater-equal', 'always'];
 const BLEND = [null, 'zero', 'one', 'src', 'one-minus-src', 'src-alpha', 'one-minus-src-alpha', 'dst-alpha',
   'one-minus-dst-alpha', 'dst', 'one-minus-dst', 'src-alpha-saturated', null, null, 'constant', 'one-minus-constant'];
@@ -354,178 +352,10 @@ fn amp(a: vec3f, b: vec3f, c: vec3f, d: vec3f, e: vec3f, mn: ptr<function, f32>,
     const b = e.devicePixelContentBoxSize?.[0];
     disp = b ? [b.inlineSize, b.blockSize] : [Math.round(e.contentRect.width * devicePixelRatio), Math.round(e.contentRect.height * devicePixelRatio)];
   }).observe(canvas);
-  // BRIDGE: bloom over the 3D scene, not in the original (docs/PLAN.md block 5). PC NFSU1 has its own light glow and
-  // streaks (0x409b70, PATCH 0x409bdb), and it is the sharpest of the four versions, so this one only lifts what is
-  // already near white: a quarter-size bright pass (luma over 0.72), a separable 9-tap Gaussian, added back with weight
-  // 0.2. It runs at GPU_FXAA (the first HUD quad: the scene is done, the HUD comes after) and adds into the multisampled
-  // twin too, so the HUD pass's resolve keeps it. ?bloom=0 turns it off; ?bloom=split = only the right half (A/B in one frame).
-  // ?bloom=lights (OWNER 2026-10-27, "the lights and how they look"): street lamps, neon and headlights glow wider: the
-  // bright pass starts at luma 0.55 and adds back at 0.35 (the default lifts only near-white, 0.72 at 0.2).
-  const BLOOM_MODE = RN_Q.get('bloom'), BLOOM_ON = BLOOM_MODE !== '0';
-  const [BLOOM_T, BLOOM_W] = BLOOM_MODE?.startsWith('lights') ? ['0.55', '0.35'] : ['0.72', '0.2'];   // lights-split: A/B
-  const bloomMod = device.createShaderModule({ code: `
-@group(0) @binding(0) var src: texture_2d<f32>;
-@group(0) @binding(1) var smp: sampler;
-struct V { @builtin(position) p: vec4f, @location(0) uv: vec2f };
-@vertex fn vs(@builtin(vertex_index) i: u32) -> V {
-  let xy = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
-  return V(vec4f(xy * 2.0 - 1.0, 0.0, 1.0), vec2f(xy.x, 1.0 - xy.y));
-}
-@fragment fn bright(v: V) -> @location(0) vec4f {
-  let t = 1.0 / vec2f(textureDimensions(src));
-  let c = 0.25 * (textureSampleLevel(src, smp, v.uv + vec2f(-t.x, -t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, -t.y), 0.0).rgb
-    + textureSampleLevel(src, smp, v.uv + vec2f(-t.x, t.y), 0.0).rgb + textureSampleLevel(src, smp, v.uv + vec2f(t.x, t.y), 0.0).rgb);
-  let l = dot(c, vec3f(0.299, 0.587, 0.114));
-  return vec4f(c * smoothstep(${BLOOM_T}, 1.0, l), 1.0);
-}
-fn blur(uv: vec2f, d: vec2f) -> vec4f {
-  let w = array<f32, 5>(0.2270270, 0.1945946, 0.1216216, 0.0540540, 0.0162162);
-  var c = textureSampleLevel(src, smp, uv, 0.0).rgb * w[0];
-  for (var k = 1; k < 5; k++) {
-    c += (textureSampleLevel(src, smp, uv + d * f32(k), 0.0).rgb + textureSampleLevel(src, smp, uv - d * f32(k), 0.0).rgb) * w[k];
-  }
-  return vec4f(c, 1.0);
-}
-@fragment fn blurH(v: V) -> @location(0) vec4f { return blur(v.uv, vec2f(1.0 / f32(textureDimensions(src).x), 0.0)); }
-@fragment fn blurV(v: V) -> @location(0) vec4f { return blur(v.uv, vec2f(0.0, 1.0 / f32(textureDimensions(src).y))); }
-@fragment fn add(v: V) -> @location(0) vec4f {
-  let k = select(${BLOOM_W}, ${BLOOM_W} * step(0.5, v.uv.x), ${BLOOM_MODE?.endsWith('split') ? 'true' : 'false'});
-  return vec4f(textureSampleLevel(src, smp, v.uv, 0.0).rgb * k, 0.0);
-}` });
-  const bloomPipe = (fs, sc) => device.createRenderPipeline({ layout: 'auto', vertex: { module: bloomMod, entryPoint: 'vs' },
-    fragment: { module: bloomMod, entryPoint: fs, targets: [{ format: 'rgba8unorm', ...(fs === 'add' ? { blend: {
-      color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } } : {}) }] },
-    primitive: { topology: 'triangle-list' }, multisample: { count: sc } });
-  const bloomPipes = BLOOM_ON ? { bright: bloomPipe('bright', 1), blurH: bloomPipe('blurH', 1), blurV: bloomPipe('blurV', 1), add: new Map() } : null;
   // A resource replaced while the frame is being encoded is destroyed after the frame's submit: the game reuses a
   // buffer or texture id mid-frame (GPU_BUFFER on a live id), and destroying it at once made WebGPU reject the whole
   // frame's command buffer ("used in submit while destroyed": 2 frames lost per race, build/bench/f_default_bc7).
   const doomed = [], doom = x => { if (x) doomed.push(x); };
-  let bloomA = null, bloomB = null;
-  function bloom(enc, rt) {
-    const bw = Math.max(1, rt.w >> 2), bh = Math.max(1, rt.h >> 2);
-    if (!bloomA || bloomA.width !== bw || bloomA.height !== bh) {
-      doom(bloomA); doom(bloomB);
-      const mk = () => device.createTexture({ size: [bw, bh], format: 'rgba8unorm', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING });
-      bloomA = mk(); bloomB = mk();
-    }
-    const step = (pipe, from, att, lab) => {
-      const p = enc.beginRenderPass({ timestampWrites: tsw(lab), colorAttachments: [att] });
-      p.setPipeline(pipe);
-      p.setBindGroup(0, device.createBindGroup({ layout: pipe.getBindGroupLayout(0),
-        entries: [{ binding: 0, resource: from.createView() }, { binding: 1, resource: fxaaSamp }] }));
-      p.draw(3);
-      p.end();
-    };
-    const to = t => ({ view: t.createView(), loadOp: 'clear', clearValue: [0, 0, 0, 1], storeOp: 'store' });
-    step(bloomPipes.bright, rt.tex, to(bloomA), 'bloom bright');
-    step(bloomPipes.blurH, bloomA, to(bloomB), 'bloom blur');
-    step(bloomPipes.blurV, bloomB, to(bloomA), 'bloom blur');
-    const sc = rt.msView ? rt.sc : 1;
-    if (!bloomPipes.add.has(sc)) bloomPipes.add.set(sc, bloomPipe('add', sc));
-    step(bloomPipes.add.get(sc), bloomA, colorAtt(rt), 'bloom add');
-  }
-
-  // BRIDGE: PS2 speed blur with the scene's real depth, not in the PC game. Source: SLUS_208.11 0x113fc8 (read in the corpus C and the
-  // ELF data 2026-10-27; ref/docs/re/postfx-elf.md section 4). The PS2 copies the frame into a texture whose alpha is
-  // min(depth_byte * k, 255) (k = 2), then draws it back over the frame, one pass per offset (2.3 6.4 8.8 11.4 px at 512 x 448), each
-  // copy stretched along the car's velocity in camera space (x, y, z, normalised; y down, as here): rect X0 = -(x+z) o, X1 = W + (z-x) o,
-  // Y0 = -(y+z) o, Y1 = H + (z-y) o, o = offset_i * c, c = 2. Vertex alpha 50 35 28 17 (/128), times t, the speed ramp
-  // below (speed in m/s, |[0x740500]+0x1e0|). The GS modulates the texture alpha by the vertex alpha (As = At * Af / 128) and blends
-  // Cs * As + Cd * (1 - As), 128 = 1.
-  // Nitrous (the game's [0x73654c], the PS2's view +0x50): a counter climbs 2 a frame to 15 and falls 1 a frame; k = 2 + 13 r and
-  // c = 2 + 2 r (r = counter / 15); passes 5-6 (22 and 40 px, alpha 8 r and 4 r) join, and while it is active every copy is tinted
-  // (130 + 10 i, 130 + 10 i, 130 + 28 i) / 128 for pass i (the PS2's table 0x44a680; plain 130 / 128 otherwise).
-  // The depth byte (scratchpad RE 2026-10-27, SLUS FUN_00112ba8 + FUN_00113fc8, projection FUN_0010a7f8): Z24 bits 15:8, Z24 linear in
-  // 1/z, so byte = z <= 128 N ? 254 : 32768 N / z (N = camera near, lens default 0.5 m, FUN_001b1200), and the sky (no Z) 0: the near
-  // road and walls take the full copy, the far city little, the sky none. Here the depth buffer is turned into metres (z_ndc = _33 +
-  // _43 / z). ?psweight=ps2 takes that weight (?psnear=N); it also streaks the player's car, which the PS2 keeps sharp (its draw order
-  // against FUN_00113fc8 is still unread), so the default stays the reverse weight: 255 * metres / ?psfar, far = strong.
-  // Offsets scale with the resolution per axis (W / 512, H / 448). It runs on the scene colour (not the FXAA target: that one holds
-  // the light trails and the HUD), after the game's own blur, which must be off (web/tune.js 'PS2 depth' sets its cap to 0), before the
-  // HUD. ?psblur=0 off, ?psblur=depth shows the weight (debug), ?psblur=split = the right half only (A/B in one frame),
-  // ?psspeed=57 a still scene as if driving straight at 57 m/s.
-  const PS_DBG = RN_Q.get('psblur') === 'depth', PS_SPLIT = RN_Q.get('psblur') === 'split';   // split: the pass on the right half only (A/B in one frame)
-  // The speed ramp. Both games read the same input, the view-1 camera's velocity |[0x740500] + 0x1e0| ([0x740500] = camera 0x78d270,
-  // set by 0x40a7f0; PC 0x40cd40, PS2 0x113fc8 via view +0x40); measured 2026-10-27 within ~1 % of the car's own speed (+0x3d4, the
-  // HUD's), 0 -> 27 m/s in 3 s from a launch. They ramp it differently: Speed.exe 0x702a38 / 0x702a3c / 0x702a40 = 25 -> 125 m/s, cap 0.65 (no blur under 90 km/h);
-  // SLUS 0x4ff95c / 0x4ff960 / 0x4ff954 = 0.1 -> 25 m/s, cap 1 (full blur ~3 s after a launch here). OWNER 2026-10-27: "agresivo desde el
-  // arranque", so the PC exe's ramp is the default; ?psramp=ps2 the PS2's.
-  const PS_RAMP = RN_Q.get('psramp') === 'ps2' ? [0.1, 25, 1] : [25, 125, 0.65];
-  const PS_FORCE = Number(RN_Q.get('psspeed') || 0);   // debug: a still scene as if driving straight at this many m/s (?psspeed=57)
-  const PS_OFF = [2.3, 6.4, 8.8, 11.4, 22, 40], PS_ALPHA = [50, 35, 28, 17];
-  const PS_FAR = Number(RN_Q.get('psfar') || 200);   // metres where the depth byte reaches 255 (not with ?psweight=ps2)
-  const PS_W2 = RN_Q.get('psweight') === 'ps2', PS_NEAR = Number(RN_Q.get('psnear') || 0.5);
-  const psMod = device.createShaderModule({ code: `
-struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
-@group(0) @binding(0) var src: texture_2d<f32>;
-@group(0) @binding(1) var dep: texture_depth_2d;
-@group(0) @binding(2) var smp: sampler;
-@group(0) @binding(3) var<uniform> u: U;
-@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
-  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
-  return vec4f(p * 2.0 - 1.0, 0.0, 1.0);
-}
-@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f {
-  let uv = (pos.xy - u.rect.xy) / (u.rect.zw - u.rect.xy);
-  if (any(uv < vec2f(0.0)) || any(uv > vec2f(1.0)) || pos.x < u.par.z) { discard; }
-  let col = textureSampleLevel(src, smp, uv, 0.0).rgb;
-  let dsz = vec2f(textureDimensions(dep));
-  let zn = textureLoad(dep, vec2i(clamp(uv * dsz, vec2f(0.0), dsz - 1.0)), 0);
-  // metres from the camera: z_ndc = _33 + _43 / z. The far clear (1.0) is the sky.
-  let zv = select(u.zz.z, u.zz.y / (zn - u.zz.x), zn < 0.99999);
-  let far = 255.0 * clamp(zv / u.zz.z, 0.0, 1.0);
-  let ps2 = select(0.0, select(min(floor(32768.0 * u.zz.z / zv), 254.0), 254.0, zv <= 128.0 * u.zz.z), zn < 0.99999);
-  let byte = select(far, ps2, u.zz.w > 0.5);
-  let at = min(byte * u.par.y, 255.0);                  // CLUT alpha
-  let a = min(at * u.par.x / 128.0, 255.0) / 128.0;     // x vertex alpha (par.x = Af * t), GS modulate then blend weight
-  if (${PS_DBG ? 'true' : 'false'}) { return vec4f(vec3f(at / 255.0), 1.0); }
-  return vec4f(min(col * u.tint.rgb, vec3f(1.0)), a);
-}` });
-  const psPipes = new Map();
-  const psPipe = () => {
-    if (!psPipes.has(0)) psPipes.set(0, device.createRenderPipeline({ layout: 'auto', vertex: { module: psMod, entryPoint: 'vs' },
-      fragment: { module: psMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm', blend: {
-        color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha', operation: 'add' },
-        alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } }] }, primitive: { topology: 'triangle-list' } }));
-    return psPipes.get(0);
-  };
-  const psU = Array.from({ length: 6 }, () => device.createBuffer({ size: 64, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST }));
-  const PS_LOG = RN_Q.get('pslog') === '1';
-  let psN = 0, psTmp = null, psCount = 0;
-  const psBase = (v) => { const z = Math.hypot(v[0], v[1], v[2]); return z > 0.5; };
-  function psblur(enc, rt, ds, v, nitro) {
-    // v: x y z (unit velocity in camera space), speed (m/s), (nitro bits), _33, _43
-    if (PS_LOG && ++psN % 120 === 1) report(`gpu.js: psblur ds ${ds ? `${ds.w}x${ds.h} sc ${ds.sc} depth ${ds.depth}` : 'none'} rt ${rt.w}x${rt.h} v ${Array.from(v).map(x => x.toFixed(3)).join(' ')} nitro ${nitro}`);
-    if (PS_FORCE) v = Float32Array.of(0, 0, 1, PS_FORCE, 0, v[5], v[6]);
-    if (!ds || !ds.depth || ds.sc !== 1 || ds.w !== rt.w || ds.h !== rt.h || !psBase(v)) return;
-    const t = Math.min(PS_RAMP[2], Math.max(0, Math.min(1, (v[3] - PS_RAMP[0]) / (PS_RAMP[1] - PS_RAMP[0]))));
-    psCount = nitro ? Math.min(15, psCount + 2) : Math.max(0, psCount - 1);   // one step per race frame
-    const r = psCount / 15, active = nitro || psCount > 0, k = 2 + 13 * r, c = 2 + 2 * r;
-    if (t <= 0) return;
-    if (!psTmp || psTmp.width !== rt.w || psTmp.height !== rt.h) {
-      doom(psTmp);
-      psTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
-    }
-    enc.copyTextureToTexture({ texture: rt.tex }, { texture: psTmp }, [rt.w, rt.h]);
-    const pipe = psPipe(), W = rt.w, Hh = rt.h, sx = W / 512, sy = Hh / 448;
-    const srcV = psTmp.createView(), depV = ds.tex.createView({ aspect: 'depth-only' });
-    const n = active ? 6 : 4;
-    for (let i = 0; i < n; i++) {
-      const ox = PS_OFF[i] * c * sx, oy = PS_OFF[i] * c * sy, x = v[0], y = v[1], z = v[2];
-      device.queue.writeBuffer(psU[i], 0, new Float32Array([
-        -(x + z) * ox, -(y + z) * oy, W + (z - x) * ox, Hh + (z - y) * oy,
-        Math.floor((i === 4 ? 8 * r : i === 5 ? 4 * r : PS_ALPHA[i]) * t), k, PS_SPLIT ? W / 2 : 0, 0,
-        v[5], v[6], PS_W2 ? PS_NEAR : PS_FAR, PS_W2 ? 1 : 0,
-        ...(active ? [(130 + 10 * i) / 128, (130 + 10 * i) / 128, (130 + 28 * i) / 128, 0] : [130 / 128, 130 / 128, 130 / 128, 0])]));
-      const p = enc.beginRenderPass({ timestampWrites: tsw('psblur'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
-      p.setPipeline(pipe);
-      p.setBindGroup(0, device.createBindGroup({ layout: pipe.getBindGroupLayout(0), entries: [
-        { binding: 0, resource: srcV }, { binding: 1, resource: depV }, { binding: 2, resource: fxaaSamp }, { binding: 3, resource: { buffer: psU[i] } }] }));
-      p.draw(3);
-      p.end();
-    }
-  }
   const msFor = (w, h) => MSAA > 1 && w >= 1000 && h >= 500 ? MSAA : 1;
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
@@ -881,7 +711,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       uBindBuf = ubuf;
     }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
+    let pass = null, passKey = '', pend = null, ci = 0;
     if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
     // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
@@ -896,7 +726,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
-        else if (op === GPU_FXAA) { if (asp && RN_PS.on && res.get(id)?.w >= 1000) return true; }   // psblur reads the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
       return true;     // the next frame may read it
@@ -1024,7 +853,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const g = k => w[a + k];
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
         const key = `${g(D_RT)}/${g(D_DS)}`;
-        if (ds && g(D_ZEN) && ds.w >= 1000 && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
         if (key !== passKey) {
           const fold = pend && (!(pend.mask & 1) || pend.rt === g(D_RT)) && (!(pend.mask & 6) || pend.ds === g(D_DS));
           endPass(fold);
@@ -1103,10 +931,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         }
         endPass();
         const rt = res.get(w[a]);
-        // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
-        // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
-        if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }
-        if (BLOOM_ON && rt && !rt.depth) bloom(enc, rt);
         if (FXAA_ON && rt && !rt.depth && !rt.msView) {
           if (!fxaaTmp || fxaaTmp.width !== rt.w || fxaaTmp.height !== rt.h) {
             doom(fxaaTmp);

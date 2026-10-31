@@ -5,19 +5,15 @@
 const RN_ORIGINAL = {
   remaster: '0',      // texture pack (world and cars), web/gpu.js
   skinhd: '0',        // HD car skin composite, web/gpu.js
-  bloom: '0', fxaa: '0', sharp: 'off', aniso: '1',
-  carlook: '2003',    // host/sm1.c: car.efx at the shipped strength
+  fxaa: '0', sharp: 'off', aniso: '1',
   cardetail: '0',     // host/sm1.c: no AO/grime terms
   handling: '0',      // host/rivals.c: the shipped rear grip assist
   trafyield: '0',     // host/rivals.c: traffic never sees a car closing from behind
   rivalai: '0',       // host/rivals.c: rival personalities off, the shipped skill records
-  speedfov: '0',      // web/tune.js, host/d3d9.c: the chase camera's FOV stays at the shipped 71.5 deg
-  chasecam: '0',      // web/tune.js, host/d3d9.c: the chase camera keeps the car's shipped distance and height rows
-  nitrocam: '0',      // web/tune.js, host/d3d9.c: no extra pull-back while the nitrous burns
   roadrefl: 'game',   // host/sm1.c: the road reflection as worldreflect.efx weights it
-};   // blur: web/tune.js starts the original mode at 'PC original' (shipped blur and flare colour)
-// Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places, night lights, free mode).
-const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43', RN_LIGHTS: '0', RN_CARLOD: '0', RN_FREE: '0' };
+};   // blur: web/tune.js gives the original mode the shipped flare colour
+// Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places, night lights, free mode, car cube at 0.5).
+const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43', RN_LIGHTS: '0', RN_CARLOD: '0', RN_FREE: '0', RN_CARLOOK: '2003' };
 
 // ?mode=original|remaster: one run in that mode without touching the stored choice (tools/webcheck.mjs).
 const RN_MODE = (() => {
