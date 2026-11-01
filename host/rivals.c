@@ -453,6 +453,9 @@ static int n_react[3];                 // traffic_behind: yields; traffic_tick: 
 static uint32_t n_tr[5];               // ai_log, car-frames within 60 m: game avoid action, braking, horn; contacts under 2.6 m; flash dark phase (+0x83e set, +0x855 clear)
 // RN_AILOG=1: test-only race log (tools/ailog.py sums it up). Every 60 frames, each racer: name, kind, route metres car+0x814, speed car+0x3d0,
 // rank (record +0xa), mean |slip angle| in degrees; at once, each change of a racer's action type [[drv+0x3f8]+0x1f8] and each nitro start (CarState car+0x40, +0x3bc, 0x4654f0).
+// Guest pointers ai_log follows: a racer list read at the race load can hold stale or half-built links (native SIGSEGV in
+// ai_log at the first race frame, ghost run cjump_7 2026-10-31), so every one is checked before it is read.
+#define AP(x) ((x) && (x) < GUEST_MEM - 0x1000)
 static void ai_log(Ctx *c) {
     static int on = -1;
     static struct { uint32_t car, act, nos, n; float slip; } st_[16];
@@ -460,12 +463,13 @@ static void ai_log(Ctx *c) {
     if (!on || ld(c, 0x77a920, 4) != 6) return;
     static uint32_t draft;                // racer-seconds in the game's slipstream: car+0x47c (0x426450) above 0.1
     uint32_t h = ld(c, 0x7361f8, 4), sec = rn_telem.presents % 60 == 0;
+    if (!AP(h)) return;
     char b[640];
     int n = 0, i = 0;
-    for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && i < 16; r = ld(c, r, 4), k++) {
-        uint32_t e = ld(c, r + 0x14, 4), kind = e ? ld(c, e + 4, 4) : 0, v = ld(c, r + 0x2c, 4), rec = ld(c, r + 0x1c, 4);
+    for (uint32_t r = ld(c, h, 4), k = 0; AP(r) && r != h && k < 200 && i < 16; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4), kind = AP(e) ? ld(c, e + 4, 4) : 0, v = ld(c, r + 0x2c, 4), rec = ld(c, r + 0x1c, 4);
         if (kind != 1 && kind != 2) continue;
-        uint32_t a = v ? ld(c, v + 0x3f8, 4) : 0, type = a ? ld(c, a + 0x1f8, 4) : 99, nos = ld(c, r + 0x3fc, 4);
+        uint32_t a = AP(v) ? ld(c, v + 0x3f8, 4) : 0, type = AP(a) ? ld(c, a + 0x1f8, 4) : 99, nos = ld(c, r + 0x3fc, 4);
         if (st_[i].car == r && st_[i].act != type) rn_log("AIEV %u %s act %u", rn_telem.presents, G(e + 0x73c), type);
         if (st_[i].car == r && st_[i].nos != nos && nos && nos != 0x7fffffff) rn_log("AIEV %u %s nos", rn_telem.presents, G(e + 0x73c));
         st_[i].car = r, st_[i].act = type, st_[i].nos = nos;
@@ -478,7 +482,7 @@ static void ai_log(Ctx *c) {
             st_[i].slip += (float)fabs(a2) * 57.296f, st_[i].n++;
         }
         if (sec && n < 560) {
-            n += snprintf(b + n, sizeof b - n, " %s:%u:%.0f:%.1f:%d:%.1f", kind == 1 ? "ME" : G(e + 0x73c), kind, ldf(c, r + 0x814), ldf(c, r + 0x3d0), rec ? c->mem[rec + 0xa] : -1, st_[i].n ? st_[i].slip / st_[i].n : 0);
+            n += snprintf(b + n, sizeof b - n, " %s:%u:%.0f:%.1f:%d:%.1f", kind == 1 ? "ME" : G(e + 0x73c), kind, ldf(c, r + 0x814), ldf(c, r + 0x3d0), AP(rec) ? c->mem[rec + 0xa] : -1, st_[i].n ? st_[i].slip / st_[i].n : 0);
             st_[i].slip = 0, st_[i].n = 0;
         }
         i++;
@@ -487,14 +491,14 @@ static void ai_log(Ctx *c) {
     {   // traffic reaction, per frame, cars within 60 m of the player: in the game's avoid action (type 3), braking (driver [car+0x30]+0x1e4, written by 0x45e970), horn flag +0x83f; hits = first frame under 2.6 m of the player
         static uint32_t hitcar[32];
         uint32_t me = 0;
-        for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200 && !me; r = ld(c, r, 4), k++) if (ld(c, ld(c, r + 0x14, 4) + 4, 4) == 1) me = r;
-        for (uint32_t r = ld(c, h, 4), k = 0; me && r != h && k < 200; r = ld(c, r, 4), k++) {
+        for (uint32_t r = ld(c, h, 4), k = 0; AP(r) && r != h && k < 200 && !me; r = ld(c, r, 4), k++) { uint32_t e = ld(c, r + 0x14, 4); if (AP(e) && ld(c, e + 4, 4) == 1) me = r; }
+        for (uint32_t r = ld(c, h, 4), k = 0; me && AP(r) && r != h && k < 200; r = ld(c, r, 4), k++) {
             uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4), d = ld(c, r + 0x30, 4);
-            if (!e || ld(c, e + 4, 4) != 3 || !v || c->mem[v + 0x4d1]) continue;
+            if (!AP(e) || ld(c, e + 4, 4) != 3 || !AP(v) || c->mem[v + 0x4d1]) continue;
             float dist = hypotf(ldf(c, r + 0x50) - ldf(c, me + 0x50), ldf(c, r + 0x54) - ldf(c, me + 0x54));
             uint32_t a = ld(c, v + 0x3f8, 4);
             if (dist < 60) {
-                n_tr[0] += a && ld(c, a + 0x1f8, 4) == 3, n_tr[1] += d && ldf(c, d + 0x1e4) > 0.3f, n_tr[2] += c->mem[r + 0x83f] != 0, n_tr[4] += c->mem[r + 0x83e] != 0 && c->mem[r + 0x855] == 0;
+                n_tr[0] += AP(a) && ld(c, a + 0x1f8, 4) == 3, n_tr[1] += AP(d) && ldf(c, d + 0x1e4) > 0.3f, n_tr[2] += c->mem[r + 0x83f] != 0, n_tr[4] += c->mem[r + 0x83e] != 0 && c->mem[r + 0x855] == 0;
             }
             int s = 0;
             while (s < 31 && hitcar[s] && hitcar[s] != r) s++;
@@ -505,23 +509,24 @@ static void ai_log(Ctx *c) {
     if (rn_telem.presents % 300 == 0) {            // traffic: how many, how near, how many models near (entrant ride +0: car type, row name in [0x734588])
         uint32_t tab = ld(c, 0x734588, 4), me = 0, seen[36] = {0};
         int total = 0, parked = 0, near = 0, close = 0, kinds = 0, all = 0;
-        for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200 && !me; r = ld(c, r, 4), k++) if (ld(c, ld(c, r + 0x14, 4) + 4, 4) == 1) me = r;
+        for (uint32_t r = ld(c, h, 4), k = 0; AP(r) && r != h && k < 200 && !me; r = ld(c, r, 4), k++) { uint32_t e = ld(c, r + 0x14, 4); if (AP(e) && ld(c, e + 4, 4) == 1) me = r; }
         char names[512];
         int m = 0;
-        for (uint32_t r = ld(c, h, 4), k = 0; me && r != h && k < 200; r = ld(c, r, 4), k++) {
+        for (uint32_t r = ld(c, h, 4), k = 0; me && AP(r) && r != h && k < 200; r = ld(c, r, 4), k++) {
             uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
-            if (!e || ld(c, e + 4, 4) != 3) continue;
+            if (!AP(e) || ld(c, e + 4, 4) != 3) continue;
             float d = hypotf(ldf(c, r + 0x50) - ldf(c, me + 0x50), ldf(c, r + 0x54) - ldf(c, me + 0x54));
             uint32_t type = ld(c, e + 0x10, 4);
-            total++, parked += v && c->mem[v + 0x4d1], near += d < 250, close += d < 100;
+            total++, parked += AP(v) && c->mem[v + 0x4d1], near += d < 250, close += d < 100;
             if (type < 36 && !(seen[type] & 1)) { seen[type] |= 1, all++; if (m < 480) m += snprintf(names + m, sizeof names - m, " %s", G(tab + 0xc90 * type)); }
             if (type < 36 && d < 250 && !(seen[type] & 2)) seen[type] |= 2, kinds++;
         }
         uint32_t bodies = ld(c, 0x736184, 4);       // TrackPolygonSlotPool 0x4412b0: slots in use, high-water mark, cap (docs/openworld/re_coll_pool.md)
         rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d polys %u polymax %u polycap %u avoidf %u brakef %u honkf %u hits %u flashf %u%s", rn_telem.presents, total, parked, near, close, all, kinds,
-               n_refill, n_refail, n_react[0], n_react[1], n_react[2], bodies ? ld(c, bodies + 0x18, 4) : 0, bodies ? ld(c, bodies + 0x1c, 4) : 0, bodies ? ld(c, bodies + 0x2c, 4) : 0, n_tr[0], n_tr[1], n_tr[2], n_tr[3], n_tr[4], rn_telem.presents % 3000 == 0 ? names : "");
+               n_refill, n_refail, n_react[0], n_react[1], n_react[2], AP(bodies) ? ld(c, bodies + 0x18, 4) : 0, AP(bodies) ? ld(c, bodies + 0x1c, 4) : 0, AP(bodies) ? ld(c, bodies + 0x2c, 4) : 0, n_tr[0], n_tr[1], n_tr[2], n_tr[3], n_tr[4], rn_telem.presents % 3000 == 0 ? names : "");
     }
 }
+#undef AP
 
 // Handling (RN_HANDLING=0 / ?handling=0: as shipped; docs/re/physics.md). The OWNER's "rigid": outside drift events 0x4774a0 gives the rear wheels extra grip as the
 // slip angle grows (0x4773f0: min(0.35, 2.5 * v/30 * slip), V from all 35 cars' physics +0x284), so at 30 m/s the cap holds from 4 degrees on and the tail will not step out.
