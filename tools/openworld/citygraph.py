@@ -20,6 +20,7 @@ sections (24,909 nodes). The same street shows up in many tracks, so:
 Reuses tour.py's readers (read_net) and its hop rule (14 m, cos > 0.92, not behind). Nothing is written.
 usage: citygraph.py --stats [--radius R]      (default R = 3 m; prints directed and undirected, then a radius sweep)
        citygraph.py --write [--radius R]      (undirected, default R = 10 m: build/openworld_city/TRACKB1010.lzc; the TrackPath is the tour's)
+       citygraph.py --slow <TRACKB.lzc>      (only the junction speed caps of --write, in place on a written file)
 --noflags counts the flagless section margins as road (the first measurement); the default drops them (node+0x84 drive flags).
 """
 import collections, itertools, json, math, os, random, struct, sys, time
@@ -927,6 +928,60 @@ def write(radius=10.0):
     print('SCC: biggest strongly connected part %d of %d nodes (%.1f%%)' % (scc, nn, 100.0 * scc / nn), flush=True)
     assert scc >= 0.9 * nn, 'SCC %d < 90%% of %d nodes' % (scc, nn)
     print('walk 250 m from drivable nodes:', walk_stats(secs, ent), flush=True)
+def slow_junctions(d):
+    """Caps the racer lane speeds before every sharp link, in place on a decoded TRACKB. Why (OWNER 2026-10-31, "the AI is dumb";
+    rivals hit walls at ~44 m/s in JustDrive): a racer's route speed is the speed byte [+0x6a + lane] of the node at its own node
+    index + [racer+0x404] (0x44c550; 0x404 is a random -(k+1)..k+1, clamped to the section), so it has no look ahead and the bytes
+    must already hold the braking. Lanes 0..4 drive along the node order, 5..9 against it (0x59bb80). The original tracks have
+    no link that turns more than 45 deg; this net has many (forced type 2 near U-turns at run ends, 90 deg junctions) whose
+    source nodes ask ~60 m/s. Cap = sqrt(v_turn^2 + 2 * BRAKE * metres to the link node), on the nodes that lead to it in the
+    walker's direction (d=0: lanes 0..4 up to the node, d=1: lanes 5..9 down to it); v_turn 34 m/s at 30 deg, 16 at 90, 10 at
+    180. Returns the number of bytes lowered."""
+    BRAKE, MIN_TURN = 9.0, 30.0
+    secs, ent = parse_net(d)
+    (b, s), = T.find(d, 0x34121)
+    base, p = [], b
+    for ns in secs:
+        base.append(p + 0x27c)
+        p += 0x27c + len(ns) * 0x88
+    xy = lambda s_, i: struct.unpack_from('<2f', secs[s_][i], 0)
+    def head(s_, i, fwd):                      # travel heading at node i of section s_ for a walker along (fwd) or against the order
+        n, st = len(secs[s_]), 1 if fwd else -1
+        a, c = (i, i + st) if 0 <= i + st < n else (i - st, i)
+        (x0, y0), (x1, y1) = xy(s_, a), xy(s_, c)
+        return math.atan2(y1 - y0, x1 - x0)
+    cap = {}                                   # (section, node, lanes along) -> m/s
+    def mark(s_, i, v, fwd):
+        j, dist, back = i, 0.0, -1 if fwd else 1
+        while 0 <= j < len(secs[s_]):
+            c = math.sqrt(v * v + 2 * BRAKE * dist)
+            if c >= 80:
+                break
+            cap[(s_, j, fwd)] = min(cap.get((s_, j, fwd), 255.0), c)
+            if not 0 <= j + back < len(secs[s_]):
+                break
+            dist += math.dist(xy(s_, j), xy(s_, j + back))
+            j += back
+    for e in ent:
+        if e[0xb] == 3:
+            continue
+        dst, src = struct.unpack_from('<HH', e, 4)
+        ds, ss, fwd = e[9], e[0xa], e[0xd] == 0
+        if ss >= len(secs) or ds >= len(secs) or src >= len(secs[ss]) or dst >= len(secs[ds]):
+            continue
+        turn = math.degrees(abs((head(ds, dst, fwd) - head(ss, src, fwd) + math.pi) % (2 * math.pi) - math.pi))
+        if turn >= MIN_TURN:
+            mark(ss, src, max(10.0, 16.0 * (90.0 / turn) ** 0.7), fwd)
+    low = 0
+    for (s_, i, fwd), c in cap.items():
+        o = base[s_] + i * 0x88 + (0x6a if fwd else 0x6f)
+        for k in range(5):
+            if d[o + k] > c:
+                d[o + k] = max(1, int(c))
+                low += 1
+    return low
+
+
     B = T.B
     fences = json.load(open(B.FENCES))
     fence_keys = {f['key'] for f in fences['fences']}
@@ -936,8 +991,9 @@ def write(radius=10.0):
     cls, props = B.union_props(bases)
     gg = T.gen.derive(rows)
     print('collision derived (%.0fs)' % (time.time() - t0), flush=True)
-    new = B.build_file(base2, gg, rows, props)
-    blob = T.lzc.encode(new)
+    new = bytearray(B.build_file(base2, gg, rows, props))
+    print('junction speed caps: %d lane bytes lowered' % slow_junctions(new), flush=True)
+    blob = T.lzc.encode(bytes(new))
     os.makedirs(OUT_DIR, exist_ok=True)
     path = os.path.join(OUT_DIR, 'TRACKB%d.lzc' % T.OUT_ID)
     if os.path.lexists(path):
@@ -969,4 +1025,13 @@ def main():
 
 
 if __name__ == '__main__':
+    if '--slow' in sys.argv:                  # the caps of slow_junctions on an already written file, in place (no rebuild)
+        path = sys.argv[sys.argv.index('--slow') + 1]
+        d = bytearray(T.load(path))
+        print(path, 'junction speed caps: %d lane bytes lowered' % slow_junctions(d))
+        blob = T.lzc.encode(bytes(d))
+        assert T.lzc.exe_decode(blob) == d, 'lzc round trip'
+        os.remove(path)
+        open(path, 'wb').write(blob)
+        return
     main()
