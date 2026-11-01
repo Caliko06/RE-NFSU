@@ -483,3 +483,12 @@ PATCHES.append(dict(addr=0x4555f8, old="bf80020000", new="bf00050000", when=lamb
 # now goes to the cave, jmp [SCREEN_ADDR+0xb0] = host/rivals.c persona_step: the original call first, then per personality (WORLD only, ?ai=0 off).
 PATCHES.append(dict(addr=0x44c573, old="e898f7ffff", new="e8" + _rel(0x44c573, 0x43b556), when=lambda: True))
 PATCHES.append(dict(addr=0x43b556, old="cc" * 6, new="ff25b0300100", entry=True, when=lambda: True))
+# PATCH: 0x45c8c2 (+ cave 0x43db2a, CC padding after the ret of 0x43dxxx, no reference: asm.py free), OWNER order 2026-11-01 (clean WORLD rivals
+# pass wide): the side-line builder 0x45c760 calls the clearance 0x45cea0 (ecx = ctx, edx = row, 2 args, st0). The call now goes to the cave,
+# jmp [SCREEN_ADDR+0xb4] = host/rivals.c persona_clear: the original call, then + 1.5 m for a clean rival (WORLD only, ?ai=0 off).
+PATCHES.append(dict(addr=0x45c8c2, old="e8d9050000", new="e8" + _rel(0x45c8c2, 0x43db2a), when=lambda: True))
+PATCHES.append(dict(addr=0x43db2a, old="cc" * 6, new="ff25b4300100", entry=True, when=lambda: True))
+# PATCH: 0x583a37, 0x583a5b (on top of the traffic speed patches above) + cave 0x63b366 (10 free bytes of the dead CRT routine between the traffic caves and 0x63b370): the traffic driver's two lane-speed calls go to jmp [SCREEN_ADDR+0xa0] = host/free.c traffic_speed, which calls the same speed cave 0x63b331 first, then in the WORLD scales by car type (bus/vans slow, taxis fast; elsewhere and with ?ai=0 the result is unchanged).
+PATCHES.append(dict(addr=0x63b366, old="6a00ff15ec75", new="ff25a0300100", entry=True, when=lambda: True))
+PATCHES.append(dict(addr=0x583a37, old="e8f5780b00", new="e8" + _rel(0x583a37, 0x63b366), when=lambda: True))
+PATCHES.append(dict(addr=0x583a5b, old="e8d1780b00", new="e8" + _rel(0x583a5b, 0x63b366), when=lambda: True))

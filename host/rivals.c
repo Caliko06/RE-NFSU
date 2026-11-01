@@ -344,7 +344,7 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
 // Nervous: accepts 35 % of Pass/Avoid targets (+0x0c, 0x4627ac), route speed 6 % lower (+0x14, 0x44c72b), its speed lookup wanders twice
 //   as far (+0x50, 0x44c667), reads it 2 nodes further on (brakes early), nitro cooldown x0.7 (+0x34/+0x38, 0x462ca8) and lifts 12 % while
 //   its nitro burns (panic).
-// Clean: shipped records; in Draft (type 4) it holds the lead car's speed and stays in the tow (car+0x47c) instead of the shipped
+// Clean: shipped records; passes wide (side line + 1.5 m, persona_clear); in Draft (type 4) it holds the lead car's speed and stays in the tow (car+0x47c) instead of the shipped
 //   "lead - (20 - gap)" back-off (0x450480), so the Pass finder slings it out after.
 // Aggressive: route speed 4 % higher, Block ceiling 400 (style 2, 0x44dbd0: it beats Avoid and Pass), nitro cooldown x0.5, reads the
 //   route speed 2 nodes earlier (brakes late), and IJustGotHit (type 0xc, 0x4522a0, a back-off to culprit - 6 m/s) becomes revenge:
@@ -878,7 +878,10 @@ static uint32_t persona_step(Ctx *c) {
     if (p == NORMAL) return r;
     int k = 0;
     while (k < 15 && s[k].v && s[k].v != v) k++;
-    if (s[k].v != v) s[k].v = v, s[k].stamp = s[k].shot = s[k].said = 0;
+    if (s[k].v != v) {
+        s[k].v = v, s[k].stamp = s[k].shot = s[k].said = 0;
+        if (getenv("RN_RIVALLOG") || getenv("RN_FREELOG")) rn_log("persona %s L%d %s: on", G(ent + 0x73c), lv, PNAME[p]);
+    }
     uint32_t type = ld(c, act + 0x1f8, 4), now = ld(c, 0x73ad34, 4), route = c->mem[act + 0x1f0];
     int own = (int8_t)c->mem[ctx + 0x388], n = (int)ld(c, ctx + 4, 4);
     float vx = ldf(c, car + 0x70), vy = ldf(c, car + 0x74), sp = sqrtf(vx * vx + vy * vy);
@@ -917,6 +920,18 @@ static uint32_t persona_step(Ctx *c) {
     return r;
 }
 
+// PATCH 0x45c8c2 (cave 0x43db2a: jmp [SCREEN_ADDR+0xb4]): the side-line builder 0x45c760 (Pass, Avoid and IJustGotHit in route state 2/3)
+// puts the line at the other car's lateral +- (own half width + its half width + 0x45cea0's clearance, st0; ecx = ctx, edx = the other's row,
+// 2 stack args, ret 8), then clamps it to the road edges. A clean rival passes wide: its clearance + 1.5 m.
+static uint32_t persona_clear(Ctx *c) {
+    uint32_t a[2] = {ARG(0), ARG(1)}, ctx = c->r[ECX];
+    call_guest(c, 0x45cea0, 2, a);
+    uint32_t car = persona_on ? ld(c, ctx, 4) : 0, ent = car ? ld(c, car + 0x14, 4) : 0;
+    int lv = ent && ld(c, ent + 4, 4) == 2 ? (int8_t)c->mem[ent + 0x735] : -1;
+    if (lv >= 0 && lv <= 9 && PERSONA[lv] == TIDY) c->st[c->ftop] += 1.5;
+    return 0;
+}
+
 const Api rivals_apis[] = {{"rn", "rival_ride", 7, rival_ride}, {"rn", "car_draw", 12, car_draw}, {"rn", "traffic_behind", 0, traffic_behind},
-                           {"rn", "persona_step", 0, persona_step}};
-const int rivals_api_count = 4;
+                           {"rn", "persona_step", 0, persona_step}, {"rn", "persona_clear", 2, persona_clear}};
+const int rivals_api_count = 5;
