@@ -8,7 +8,7 @@
 # the crowd is in them). p50/p90 are first pass start to last pass end and jump between identical runs on the pod's 4090 (0.5 vs 1.9 ms).
 # usage: tools/abbench.py NAME [--frame 300] [--jump 0:1003] [--view 1920x1080@1] [--repeat] [--crop X,Y,W,H] label=query ...
 #   e.g. tools/abbench.py grade off=grade=0 on=
-#        tools/abbench.py fxaa base= off='fxaa=0'
+#        tools/abbench.py cam base= far='chasecam=2&grade=0'
 # --repeat runs the first variant twice: the pixels that change are the noise floor of "same frame".
 # Output: build/ab/NAME/<label>.png, strip.jpg, results.json. Needs save/ (the "asas" profile; `cp -r /root/src/save save` on the pod).
 # Pod: DISPLAY=:91 RN_X11=1 RN_CHROME=/usr/bin/google-chrome; the Mac needs neither. Uses its own server on this worktree's files.

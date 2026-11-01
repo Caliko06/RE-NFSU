@@ -61,12 +61,8 @@ async function startAudio(M, log) {
   const node = new AudioWorkletNode(ctx, 'rn-ring', { numberOfInputs: 0, outputChannelCount: [2] });
   node.port.onmessage = e => log(e.data.level ? `audio level ${e.data.level} dBFS` : e.data.started ? 'audio started' : `audio resync ${e.data.resync}: ${e.data.behind} frames behind, 64-frame fade`);
   node.port.postMessage({ buffer: M.HEAPU8.buffer, hdr: M._rn_audio_ring(), level: RN_Q.get('audiolog') === '1' });
-  // Out through an <audio> element, not ctx.destination: Chrome gives the media keys (next/previous track) only
-  // to a page that plays a media element (handlers in web/input.js).
-  const out = ctx.createMediaStreamDestination(), el = new Audio();
-  node.connect(out);
-  el.srcObject = out.stream;
-  const resume = () => { if (ctx.state !== 'running') ctx.resume(); if (el.paused) el.play().catch(() => {}); };
+  node.connect(ctx.destination);
+  const resume = () => { if (ctx.state !== 'running') ctx.resume(); };
   addEventListener('keydown', resume, true);
   addEventListener('mousedown', resume, true);
   return ctx;

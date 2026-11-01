@@ -831,7 +831,7 @@ static void census_dump(void) {
 // TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
 // at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
 // seq; Present copies them into the game's .data when seq changed.
-static uint32_t tune[9];      // seq, then the 4 floats as bits, then the trail colour, then the race projection scale k (float bits, 0 = the patch's), then the chase framing switch, then light streaks off
+static uint32_t tune[10];     // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch, the nitro-camera switch, the widescreen scale k (float bits, 0 = shipped)
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -847,21 +847,147 @@ static void tune_apply(Ctx *c) {
     memcpy(f, &tune[1], sizeof f);
     rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f, trails %08x", f[0], f[1], f[2], f[3], tune[5]);
 }
-// Race projection (word 6 of tune[]): k at 0x707fc0 is the widescreen caves' scale (P[0] = k / tan(F/2) * H'/W, PATCH 0x40debb). Remaster writes
-// k = 4/3 in races ([0x77a920] == 6, the caves' 16:9 cap test): the PC's own 4:3 view (71.5 deg horizontal = 56.7 deg vertical, 0x484b53) widened
-// to 16:9 (87.6 deg horizontal), so the car keeps the size it has in the PC game (docs/re/feel_2026-10-31.md 1). The patch's 512/448 (PS2
-// vertical 64.4 deg) made it 0.86x. Word 0 (Original mode, the garage and menus): the patch's k = 512/448.
+// Speed FOV (web/tune.js ?speedfov=, word 6 of tune[]): the chase camera mover (type 0x11, update 0x48bcb0) reads the s16 FOV table
+// 0x6fbdf4 every frame (0x48bbed; POV 0, 1, 4 at +0, +2, +8, 0x32dc = 71.5 deg, 65536 = 360 deg), smooths it into camera+0xc4 (measured:
+// under 1 s behind) and the projection builder 0x40dd00 reads that, so frustum and focal stay one. Hood, bumper and special cameras do not read these entries. Present writes the three entries from the camera's speed
+// ([0x740500]+0x1e0, m/s): 0 at 25 m/s (90 km/h), the full gain at 75 m/s, smoothstep, then a ~1 s low pass (it also absorbs a
+// camera teleport). Gain 0 is the native default: nothing is touched, and a gain back to 0 restores 0x32dc once. RN_FOVLOG=1 logs.
+static void fov_frame(Ctx *c) {
+    static int lg = -1, wrote;
+    static float deg;
+    if (lg < 0) lg = getenv("RN_FOVLOG") != NULL;
+    float gain; uint32_t gb = __atomic_load_n(&tune[6], __ATOMIC_RELAXED);
+    memcpy(&gain, &gb, 4);
+    if (gain == 0 && !wrote) return;
+    uint32_t cam = ld(c, 0x740500, 4);
+    if (!cam || cam >= GUEST_MEM - 0x200) return;
+    float v[3] = {ldf(c, cam + 0x1e0), ldf(c, cam + 0x1e4), ldf(c, cam + 0x1e8)};
+    float sp = sqrtf(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    float t = (sp - 25) / 50; t = t < 0 ? 0 : t > 1 ? 1 : t; t = t * t * (3 - 2 * t);
+    deg += (gain * t - deg) * (1.0f / 60);
+    if (gain == 0 && fabsf(deg) < 0.01f) deg = 0, wrote = 0;
+    else wrote = 1;
+    uint32_t e = 0x32dc + (int)lroundf(deg * 65536 / 360);
+    for (int k = 0; k < 3; k++) st(c, 0x6fbdf4 + (k == 2 ? 8 : 2 * k), e, 2);
+    if (lg && dev.frames % 60 == 0)
+        rn_log("FOV f%u speed %.1f gain %.1f deg %.2f table %04x cam+c4 %04x", (unsigned)dev.frames, sp, gain, deg, e, ld(c, cam + 0xc4, 2));
+}
+// Chase framing (web/tune.js ?chasecam=, word 7 of tune[], 1 = on): the default race camera (type 0x11) reads distance +4, height +8
+// and lateral +0xc of the car's camera row (SetDesired 0x48b8c0 at 0x48ba2a; rows id 0, 1, 4 = far, close and high chase) from
+// CarTypeInfo [[car+0xc]+0xb50]: +0x10 + 16 k (normal set) and +0x60 + 16 k (the [0x7364a0] == 3 set, 0x47d680). Present rewrites those
+// rows of the player's car from its speed (same 25..75 m/s smoothstep and ~1 s low pass as the FOV): the camera sits up to CHASE_BACK
+// farther and CHASE_LOW lower, relative to the row of that car (per-car data stays per car). Rows go back to the file values when
+// the switch is off or the player's car changes. The mover smooths the target itself, so the change glides.
+#define CHASE_BACK 0.12f   // distance x (1 + this * t)
+#define CHASE_LOW  0.10f   // height   x (1 - this * t)
+// Nitro camera (?nitrocam=, word 8 of tune[]): while the player's nitrous burns (car+0x3bc, the start stamp 0x4654f0 writes and 0x465530
+// clears when 0x465430 sees the shot end; 0 or 0x7fffffff = off) the same rows go NITRO_BACK farther and NITRO_LOW lower, ~0.5 s low pass.
+#define NITRO_BACK 0.10f
+#define NITRO_LOW  0.05f
+// Horizontal FOV (web/tune.js ?hfov=, word 9 of tune[]): k at 0x707fc0 is the widescreen caves' scale (P[0] = k / tan(F/2) * H'/W, PATCH 0x40debb); the web
+// page turns the wanted horizontal degrees at 16:9 into k. Written in races only ([0x77a920] == 6, the same test as the caves' 16:9 cap), so the garage keeps
+// the shipped k = 512/448. Word 0: the shipped k.
 static void hfov_frame(Ctx *c) {
-    uint32_t k = __atomic_load_n(&tune[6], __ATOMIC_RELAXED);
+    uint32_t k = __atomic_load_n(&tune[9], __ATOMIC_RELAXED);
     st(c, 0x707fc0, k && ld(c, 0x77a920, 4) == 6 ? k : 0x3f924925, 4);
 }
-// Light streaks off (word 8, Remaster; OWNER 2026-10-31 "astigmatism"): the flare buffer 0x409b70 draws the lamps a second time into RT
-// [0x71aba4] with view 0x7404c0 and adds it back, which shows as a reddish copy ~22 px above every lamp, still or moving
-// (docs/re/feel_2026-10-31.md 3). LIGHTSTREAKS [0x700e9c] = 0 skips that path (0x409580); the lamps keep their own flare. The menu
-// quality preset (0x410ed0) rewrites the option, so it is held every Present. The motion blur is not touched: its streak
-// direction measured (0, 0, 1) driving straight, a pure zoom as designed (0x40cd40).
-static void streaks_frame(Ctx *c) {
-    if (__atomic_load_n(&tune[8], __ATOMIC_RELAXED)) st(c, 0x700e9c, 0, 4);
+static void chase_frame(Ctx *c) {
+    static uint32_t info, rows[2][3];
+    static float orig[2][3][2], sm, nsm;
+    static int nlast;
+    uint32_t on = __atomic_load_n(&tune[7], __ATOMIC_RELAXED), non = __atomic_load_n(&tune[8], __ATOMIC_RELAXED), car = 0;
+    uint32_t h = ld(c, 0x7361f8, 4);
+    if (h && h < GUEST_MEM - 0x1000)
+        for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && r < GUEST_MEM - 0x1000 && k < 200; r = ld(c, r, 4), k++) {
+            uint32_t e = ld(c, r + 0x14, 4);
+            if (e && e < GUEST_MEM - 16 && ld(c, e + 4, 4) == 1) { car = r; break; }
+        }
+    uint32_t ni = car ? ld(c, car + 0xc, 4) : 0;
+    if (ni >= GUEST_MEM - 0xc00) ni = 0;
+    if (info && ni != info) {   // another car (garage, next race): put the old rows back
+        for (int s = 0; s < 2; s++) for (int k = 0; k < 3; k++) if (rows[s][k]) {
+            stf(c, rows[s][k] + 4, orig[s][k][0]); stf(c, rows[s][k] + 8, orig[s][k][1]);
+        }
+        info = 0; sm = nsm = 0;
+    }
+    if (!on && !non && !info) return;
+    if (!ni) return;
+    if (!info) {
+        static const int ids[3] = {0, 1, 4};
+        for (int s = 0; s < 2; s++) for (int k = 0; k < 3; k++) {
+            rows[s][k] = 0;
+            for (int i = 0; i < 5; i++) {
+                uint32_t a = ni + 0xb50 + (s ? 0x60 : 0x10) + 16 * i;
+                if ((int16_t)ld(c, a, 2) == ids[k]) { rows[s][k] = a; orig[s][k][0] = ldf(c, a + 4); orig[s][k][1] = ldf(c, a + 8); break; }
+            }
+        }
+        info = ni;
+        rn_log("CHASE car %08x info %08x rows %08x %08x %08x: dist %.2f %.2f %.2f height %.2f %.2f %.2f", car, ni, rows[0][0], rows[0][1], rows[0][2],
+               orig[0][0][0], orig[0][1][0], orig[0][2][0], orig[0][0][1], orig[0][1][1], orig[0][2][1]);
+    }
+    uint32_t cam = ld(c, 0x740500, 4);
+    float t = 0;
+    if (cam && cam < GUEST_MEM - 0x200) {
+        float v[3] = {ldf(c, cam + 0x1e0), ldf(c, cam + 0x1e4), ldf(c, cam + 0x1e8)};
+        t = (sqrtf(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) - 25) / 50; t = t < 0 ? 0 : t > 1 ? 1 : t; t = t * t * (3 - 2 * t);
+    }
+    uint32_t ns = ld(c, car + 0x3bc, 4);
+    int burn = non && ns != 0 && ns != 0x7fffffff;
+    if (burn != nlast) { nlast = burn; rn_log("CHASE nitro %s (car+0x3bc %08x)", burn ? "on" : "off", ns); }
+    sm += ((on ? t : 0) - sm) * (1.0f / 60);
+    nsm += ((burn ? 1.0f : 0) - nsm) * (1.0f / 30);
+    if (!on && sm < 0.001f) sm = 0;
+    if (!burn && nsm < 0.001f) nsm = 0;
+    float kb = 1 + CHASE_BACK * sm + NITRO_BACK * nsm, kl = 1 - CHASE_LOW * sm - NITRO_LOW * nsm;
+    for (int s = 0; s < 2; s++) for (int k = 0; k < 3; k++) if (rows[s][k]) {
+        stf(c, rows[s][k] + 4, orig[s][k][0] * kb); stf(c, rows[s][k] + 8, orig[s][k][1] * kl);
+    }
+    if (!on && !non && sm == 0 && nsm == 0) info = 0;
+}
+// PS2-style depth speed blur (web/gpu.js psblur): out[0..2] = the view-1 camera's velocity [0x740500]+0x1e0 (camera 0x78d270; what the game's own blur 0x40cd40
+// reads) in camera space, normalised, out[3] = its length (m/s); float bits, 0 when there is no camera. out[4] = nitrous on ([0x73654c],
+// written by 0x4010e0 for the player's view), out[5..6] = the projection's _33 and _43 (block +0x40; z_ndc = _33 + _43 / z_view, so the
+// page can turn the depth buffer into metres). Sent with GPU_FXAA.
+// The camera block of the player's view (table 0x740460 + 0x60, +0 pointer; block +0 = View, rows 0..2 = the axes)
+// maps world to camera: v_cam = v * R (D3D row vectors). RN_PSLOG=1 logs it each 60 frames.
+static void psblur_vel(Ctx *c, uint32_t *out) {
+    static int lg = -1;
+    if (lg < 0) lg = getenv("RN_PSLOG") != NULL;
+    out[0] = out[1] = out[2] = out[3] = out[4] = out[5] = out[6] = 0;
+    uint32_t car = ld(c, 0x740500, 4), blk = ld(c, 0x7404c0, 4), blk0 = ld(c, 0x740460, 4);
+    if (!car || !blk || car >= GUEST_MEM - 0x200 || blk >= GUEST_MEM - 0x80) return;
+    float v[3] = {ldf(c, car + 0x1e0), ldf(c, car + 0x1e4), ldf(c, car + 0x1e8)}, m[32];
+    for (int k = 0; k < 32; k++) m[k] = ldf(c, blk + 4 * k);
+    out[4] = ld(c, 0x73654c, 4) != 0;
+    memcpy(&out[5], &m[26], 4); memcpy(&out[6], &m[30], 4);
+    float s = sqrtf(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]), r[3];
+    for (int j = 0; j < 3; j++) r[j] = v[0] * m[j] + v[1] * m[4 + j] + v[2] * m[8 + j];
+    if (lg && dev.frames % 60 == 0) {
+        float n[16] = {0};
+        if (blk0 && blk0 < GUEST_MEM - 0x40) for (int k = 0; k < 16; k++) n[k] = ldf(c, blk0 + 4 * k);
+        float q[3];
+        for (int j = 0; j < 3; j++) q[j] = v[0] * n[j] + v[1] * n[4 + j] + v[2] * n[8 + j];
+        float t[3];   // the transposed reading (R * v)
+        for (int j = 0; j < 3; j++) t[j] = m[4 * j] * v[0] + m[4 * j + 1] * v[1] + m[4 * j + 2] * v[2];
+        // The car's own speed, the HUD's (+0x3d4 x 2.237 = mph, 0x6cc9f0; read so by 0x4286a0, 0x52b760): the player's node in the race
+        // list [0x7361f8] (host/openworld.c player_node), next to the camera's (above).
+        // Also the cars in the list by entrant kind (+0x14 -> +4: 1 player, 3 traffic; PATCH 0x598c4b).
+        uint32_t h = ld(c, 0x7361f8, 4), pn = 0, kinds[5] = {0};
+        if (h && h < GUEST_MEM - 0x1000)
+            for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && r < GUEST_MEM - 0x1000 && k < 200; r = ld(c, r, 4), k++) {
+                uint32_t e = ld(c, r + 0x14, 4), kd = e && e < GUEST_MEM - 16 ? ld(c, e + 4, 4) : 4;
+                kinds[kd < 4 ? kd : 4]++;
+                if (kd == 1 && !pn) pn = r;
+            }
+        if (pn) rn_log("PSBLUR frame %u car %08x +0x3d4 %.2f m/s (%.1f mph) | list kinds 0:%u 1:%u 2:%u 3:%u other:%u", dev.frames, pn,
+                       ldf(c, pn + 0x3d4), ldf(c, pn + 0x3d4) * 2.237f, kinds[0], kinds[1], kinds[2], kinds[3], kinds[4]);
+        rn_log("PSBLUR frame %u speed %.2f v %.2f %.2f %.2f | view1 v*R %.2f %.2f %.2f R*v %.2f %.2f %.2f | view0 v*R %.2f %.2f %.2f | nitro %u P %.4f %.4f %.4f %.4f P33 %.5f P43 %.5f",
+               dev.frames, s, v[0], v[1], v[2], r[0], r[1], r[2], t[0], t[1], t[2], q[0], q[1], q[2],
+               out[4], m[16], m[21], m[26], m[27], m[26], m[30]);
+    }
+    if (s < 1e-3f) return;
+    for (int j = 0; j < 3; j++) { r[j] /= s; memcpy(&out[j], &r[j], 4); }
+    memcpy(&out[3], &s, 4);
 }
 // RN_RNGLOG: how many steps the game RNG [0x6f227c] took since the last Present (step inlined ~60 times, e.g. 0x41f81d:
 // u = x ^ 0x1d872b41, v = u ^ u >> 5, x' = v ^ v << 27 ^ u). A frame with steps makes key timing matter in frames.
@@ -990,52 +1116,20 @@ static void wallcap_log(Ctx *c) {
            ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), ldf(c, car + 0x78), n, ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4),
            bu, ld(c, pb + 0x1c, 4), wu, ld(c, pw + 0x1c, 4));
 }
-// Remaster chase framing (OWNER 2026-10-31: "it looks like I chase my car instead of driving it"; word 7 of tune[], 1 = on). Measured
-// shipped (autopilot, Olympic Square): the eye sits 6.1-7.3 m behind the car, 1.5 m above it, and looks level (pitch 0). The default
-// mover (SetDesired 0x48b8c0) reads the car's camera rows [[car+0xc]+0xb50] (+0x10 normal set, +0x60 the [0x7364a0] == 3 set, 16 B:
-// s16 id, s16 pitch (65536 = 360 deg), f32 distance, f32 height). Far (id 0) and close (id 1) chase of the player's car become distance
-// x CHASE_KD, height + CHASE_DH, pitch CHASE_PITCH: measured 5.3-5.6 m behind, 2.0 m up, 8 deg down. Relative to each car's own row,
-// so per-car data (and any car, stock or modified) keeps its own framing; Original (word 7 = 0) leaves the file values.
-#define CHASE_KD 0.85f
-#define CHASE_DH 0.45f
-#define CHASE_PITCH 1500
-static void chase_rows(Ctx *c) {
-    if (!__atomic_load_n(&tune[7], __ATOMIC_RELAXED)) return;
-    uint32_t ctrl = ld(c, 0x77a920, 4) == 6 ? ld(c, 0x7361bc, 4) : 0, car = ctrl ? ld(c, ctrl + 4, 4) : 0, ni = car ? ld(c, car + 0xc, 4) : 0;
-    if (!ni || ni >= GUEST_MEM - 0xc00) return;
-    for (int s = 0; s < 2; s++) for (int i = 0; i < 5; i++) {
-        uint32_t a = ni + 0xb50 + (s ? 0x60 : 0x10) + 16 * i;
-        int16_t id = (int16_t)ld(c, a, 2);
-        if ((id != 0 && id != 1) || ld(c, a + 2, 2) == CHASE_PITCH) continue;   // done already (the pitch marks it): each frame is cheap and a reloaded CarTypeInfo gets it again
-        stf(c, a + 4, ldf(c, a + 4) * CHASE_KD); stf(c, a + 8, ldf(c, a + 8) + CHASE_DH); st(c, a + 2, CHASE_PITCH, 2);
-    }
-}
-static uint32_t up_bytes, up_max, up_size, up_caller, up_flags, up_n, lock_caller, lock_flags;
-static void upload_log(void) {
-    static uint32_t last;
-    if (up_bytes > (4u << 20) && rn_telem.presents > last + 120) {
-        last = rn_telem.presents;
-        rn_log("BIGUPLOAD f%u %u KB in %u uploads; biggest %u KB of a %s of %u KB, Lock from %08x flags %x", rn_telem.presents, up_bytes >> 10, up_n,
-               up_max >> 10, up_flags >> 31 ? "IB" : "VB", up_size >> 10, up_caller, up_flags & 0xffff);
-    }
-    up_bytes = up_max = up_n = 0;
-}
 static void roadrefl_frame(void);
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
-    upload_log();
     jumpcam_log(c);
-    chase_rows(c);
     wallcap_log(c);
     tune_apply(c);
+    fov_frame(c);
     hfov_frame(c);
-    streaks_frame(c);
+    chase_frame(c);
     rng_log(c, dev.frames);
     flow_log(c);
     free_tick(c);
     traffic_tick(c);
     if (rn_steerlog) steer_frame(c);
-    music_frame(c);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
         return D3DERR_INVALIDCALL;
@@ -1494,14 +1588,10 @@ static int resident_on(void) {
 #endif
 }
 static int resident(const Obj *o) { return o && resident_on() && !(o->usage & U_DYNAMIC); }
-// Probe for the WORLD lag spans (OWNER session 20-02: 10x the command words per second, half the main thread's guest time; exit:
-// delete when that lag is decided): bytes re-sent by buffer_upload this frame, and the biggest one with the guest caller of its Lock.
 static void buffer_upload(Ctx *c, Obj *o) {
     uint32_t lo = o->dlo & ~3u, hi = (o->dhi + 3) & ~3u, n = hi - lo;
     o->dlo = o->dhi = 0;
     if (!n) return;
-    up_bytes += n; up_n++;
-    if (n > up_max) up_max = n, up_size = o->size, up_caller = lock_caller, up_flags = lock_flags | (o->type == 7 ? 0x80000000u : 0);
     uint32_t *w = calloc(3 + n / 4, 4);
     w[0] = idx(o) + 1; w[1] = lo; w[2] = n;
     memcpy(w + 3, G(lock_mem(o) + lo), hi <= o->size ? n : o->size - lo);
@@ -1539,7 +1629,6 @@ static uint32_t buffer_lock(Ctx *c, Obj *o) {
     uint32_t off = ARG(1), size = ARG(2), out = ARG(3);
     if (!out || off > o->size || (size && off + size > o->size)) return D3DERR_INVALIDCALL;
     o->locked++;
-    lock_caller = ld(c, c->r[ESP], 4), lock_flags = ARG(4);
     st(c, out, lock_mem(o) + off, 4);
     static uint32_t ver_clock;   // one clock for every buffer: a reused slot at a reused address never repeats a smooth key
     if (!(ARG(4) & 0x10)) o->ver = ++ver_clock;
@@ -2539,7 +2628,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     int hud = race && (fen ? fen->hud : !menu), screen = race && fen && !fen->hud;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); rn_fixedclock_start(c); }
-    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[1] = {rt->gpu}; gpu_cmd(GPU_FXAA, 1, w1); }
+    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 8, w1); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
     static int hud_mode = -1, fe_stretch = -1;
