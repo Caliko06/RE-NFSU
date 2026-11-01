@@ -810,6 +810,32 @@ static void pace_plan(Ctx *c) { (void)c; }
 static void pace_sleep(void) {}
 #endif
 
+// Spike probe for the OWNER's F10 (OWNER log 2026-11-01 03:37: 47 race frames > 22 ms, no pipeline or texture work in them).
+// A race frame longer than 25 ms (Present to Present) logs its clock reads by call site (host/win32.c clk_site) and its file
+// reads: a long busy wait names its loop, a frame with few clock reads is the game's own work.
+extern uint32_t rn_clk_site[8], rn_clk_n[8];
+static void spike_log(Ctx *c) {
+    static uint64_t t0;
+    static uint32_t clk0, reads0, kb0;
+    static double ms0;
+    uint64_t t = now_us();
+    uint32_t rs = ld(c, 0x7361f0, 4);
+    if (t0 && t - t0 > 25000 && ld(c, 0x77a920, 4) == 6 && rs && ld(c, rs, 4) != 1) {
+        char top[160] = "";
+        for (int n = 0, k; n < 3; n++) {
+            int b = -1;
+            for (k = 0; k < 8; k++) if (rn_clk_n[k] && (b < 0 || rn_clk_n[k] > rn_clk_n[b])) b = k;
+            if (b < 0) break;
+            snprintf(top + strlen(top), sizeof top - strlen(top), " 0x%x x%u", rn_clk_site[b], rn_clk_n[b]);
+            rn_clk_n[b] = 0;
+        }
+        rn_log("spike: frame %u %.1f ms, clock %u:%s, reads %u (%u KB, %.1f ms)", rn_telem.presents, (t - t0) / 1000.0,
+               rn_telem.clock_calls - clk0, top, rn_telem.reads - reads0, rn_telem.read_kb - kb0, rn_telem.read_ms - ms0);
+    }
+    memset(rn_clk_n, 0, sizeof rn_clk_n);
+    t0 = t, clk0 = rn_telem.clock_calls, reads0 = rn_telem.reads, kb0 = rn_telem.read_kb, ms0 = rn_telem.read_ms;
+}
+
 // The list goes to the renderer in parts of at most 16 MB: a load can upload hundreds of MB of
 // texels in one frame, more than the web build's heap holds at once. Commands keep their order.
 // The list is handed off under the GIL; the wait for the page is without it.
@@ -1194,6 +1220,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     dev.frames++;
     rn_telem.presents++;
     if (dev.frames == 1) rn_log("d3d9 first Present: %ux%u", b->w, b->h);
+    spike_log(c);
     pace_plan(c);
     hand_off();             // may wait for the display
     return D3D_OK;

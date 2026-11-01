@@ -32,6 +32,10 @@ FPU_CONST = {0xe8: "1.0", 0xe9: "3.321928094887362347870319429489390175864831393
              0xee: "0.0"}
 
 PROLOGUE = '#include "rt.h"\n'
+# Functions with a native body in host/native.h (nat_<addr>): the same operations in the same order, proven bit for bit
+# by RN_ONLY=<addr> tools/recomp/difftest.py. The lifted body stays as f_<addr>_lift for inputs outside the fast case.
+# 0x5d6f5d D3DXMatrixMultiply (x87): 5.8 % self of the race game thread (build/bench/spk2, 2026-11-01).
+NATIVE = {0x5d6f5d}
 
 
 class Unsupported(Exception):
@@ -1023,10 +1027,14 @@ class Lifter:
         # c->mem, c->memsz, c->ftop and c->st[] (with -fno-strict-aliasing any byte store could alias them).
         if self.uses_fs:
             flags += " uint32_t ft0=0; double " + ",".join(f"fq{k}=0" for k in range(16)) + ";"
-        return (f"void f_{entry:x}(Ctx *restrict c) {{\n{regs} {flags}\n"
+        nat = entry in NATIVE and not self.trace
+        src = (f"{f'static void f_{entry:x}_lift' if nat else f'void f_{entry:x}'}(Ctx *restrict c) {{\n{regs} {flags}\n"
                 "uint32_t ea=0,t1=0,t2=0,res=0,n=0,k=0; uint64_t u=0; int64_t w=0;\n"
                 "(void)ea;(void)t1;(void)t2;(void)res;(void)n;(void)k;(void)u;(void)w;\n"
                 # RN_COV build (build.py sets `cov`): one byte store per function ENTRY, direct calls and tail jumps included.
                 + (f"RN_COV(RNI_{entry:x});\n" if getattr(self, "cov", False) else "") +
                 f"goto L{entry:x};\n" + "\n".join(self.out) +
                 f"\ndone: {self.save()} return;\ntrap: c->halt=1; {self.save()} return;\n}}\n")
+        if nat:     # NATIVE: the native body first, the lifted one outside its fast case
+            src += f'#include "native.h"\nvoid f_{entry:x}(Ctx *restrict c) {{ if (!nat_{entry:x}(c)) f_{entry:x}_lift(c); }}\n'
+        return src

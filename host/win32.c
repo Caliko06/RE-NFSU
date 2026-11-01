@@ -548,8 +548,17 @@ static uint64_t game_now_us(void) {
     static uint64_t reads;
     return fixed_base && rn_is_main_thread() ? fixed_base + (uint64_t)(rn_telem.presents - fixed_presents) * 16667 + ++reads : now_us();
 }
-static uint32_t GetTickCount_(Ctx *c) { (void)c; rn_telem.clock_calls++; gil_clock(); return (uint32_t)(game_now_us() / 1000); }
-static uint32_t QueryPerformanceCounter_(Ctx *c) { rn_telem.clock_calls++; gil_clock(); st64(c, ARG(0), game_now_us()); return 1; }
+// Spike probe (host/d3d9.c spike_log, race frames > 25 ms -> page log -> F10): the main thread's clock reads by call site
+// (the return address), to name a busy wait that is not the limiter 0x585b40.
+uint32_t rn_clk_site[8], rn_clk_n[8];
+static void clk_site(Ctx *c) {
+    if (!rn_is_main_thread()) return;
+    uint32_t a = ld(c, c->r[ESP], 4);
+    for (int k = 0; k < 8; k++)
+        if (rn_clk_site[k] == a || !rn_clk_n[k]) { rn_clk_site[k] = a; rn_clk_n[k]++; return; }
+}
+static uint32_t GetTickCount_(Ctx *c) { rn_telem.clock_calls++; clk_site(c); gil_clock(); return (uint32_t)(game_now_us() / 1000); }
+static uint32_t QueryPerformanceCounter_(Ctx *c) { rn_telem.clock_calls++; clk_site(c); gil_clock(); st64(c, ARG(0), game_now_us()); return 1; }
 static uint32_t QueryPerformanceFrequency_(Ctx *c) { st64(c, ARG(0), 1000000); return 1; }
 // The PC's clock runs on UTC: time zone "Greenwich Standard Time" (bias 0, no daylight saving),
 // so local time = system time. GetTimeZoneInformation then answers TIME_ZONE_ID_UNKNOWN.
@@ -826,7 +835,7 @@ static uint32_t GetThreadPriority_(Ctx *c) { (void)c; return 0; }
 static uint32_t SetThreadPriority_(Ctx *c) { (void)c; return 1; }
 
 // =================================== winmm =====================================================
-static uint32_t timeGetTime_(Ctx *c) { (void)c; rn_telem.clock_calls++; gil_clock(); return (uint32_t)(game_now_us() / 1000); }
+static uint32_t timeGetTime_(Ctx *c) { rn_telem.clock_calls++; clk_site(c); gil_clock(); return (uint32_t)(game_now_us() / 1000); }
 static uint32_t timeBeginPeriod_(Ctx *c) { (void)c; return 0; }
 static uint32_t timeEndPeriod_(Ctx *c) { (void)c; return 0; }
 static uint32_t timeGetDevCaps_(Ctx *c) { st(c, ARG(0), 1, 4); st(c, ARG(0) + 4, 1000000, 4); return 0; }
