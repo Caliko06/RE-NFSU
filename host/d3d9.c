@@ -893,6 +893,7 @@ static void hfov_frame(Ctx *c) {
     uint32_t k = __atomic_load_n(&tune[9], __ATOMIC_RELAXED);
     st(c, 0x707fc0, k && ld(c, 0x77a920, 4) == 6 ? k : 0x3f924925, 4);
 }
+void ai_tel(Ctx *c);
 static void chase_frame(Ctx *c) {
     static uint32_t info, rows[2][3];
     static float orig[2][3][2], sm, nsm;
@@ -1136,6 +1137,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     flow_log(c);
     free_tick(c);
     traffic_tick(c);
+    ai_tel(c);           // host/aitel.c: AI telemetry lines for the F10 (RN_AILOG)
     if (rn_steerlog) steer_frame(c);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
