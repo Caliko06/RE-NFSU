@@ -831,7 +831,7 @@ static void census_dump(void) {
 // TEXTUREFACTOR alpha = min(1.5 t, 1)), streak length per t at 0x702a44 (40cf2c). A 5th word is the light-trail colour
 // at 0x707fcc (PATCH 0x409bdb: the add weight of the flare buffer, D3DCOLOR). The page writes the 5 words, then bumps
 // seq; Present copies them into the game's .data when seq changed.
-static uint32_t tune[10];     // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch, the nitro-camera switch, the widescreen scale k (float bits, 0 = shipped)
+static uint32_t tune[11];     // seq, then the 4 floats as bits, then the trail colour, the speed-FOV gain (degrees, float bits), the chase-camera switch, the nitro-camera switch, the widescreen scale k (float bits, 0 = shipped), the light-trail decay BLENDFACTOR (0 = shipped 0x008296b4)
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_tune_addr(void) { return (uint32_t)(uintptr_t)tune; }
@@ -845,7 +845,7 @@ static void tune_apply(Ctx *c) {
     if (tune[5]) st(c, 0x707fcc, tune[5], 4);
     float f[4];
     memcpy(f, &tune[1], sizeof f);
-    rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f, trails %08x", f[0], f[1], f[2], f[3], tune[5]);
+    rn_log("d3d9 blur bank: ramp %.2f-%.2f m/s, cap %.3f, streak %.5f, trails %08x decay %06x", f[0], f[1], f[2], f[3], tune[5], tune[10]);
 }
 // Speed FOV (web/tune.js ?speedfov=, word 6 of tune[]): the chase camera mover (type 0x11, update 0x48bcb0) reads the s16 FOV table
 // 0x6fbdf4 every frame (0x48bbed; POV 0, 1, 4 at +0, +2, +8, 0x32dc = 71.5 deg, 65536 = 360 deg), smooths it into camera+0xc4 (measured:
@@ -1165,6 +1165,7 @@ static uint32_t IDirect3DDevice9_SetRenderState(Ctx *c) {
     uint32_t s = ARG(1), v = ARG(2);
     if (s >= 256) return D3DERR_INVALIDCALL;
     TR("SetRenderState(%u, %08x)", s, v);
+    if (s == 193 && v == 0x008296b4 && tune[10]) v = tune[10];   // light-trail decay (0x409bca), word 10 of tune[]
     dev.rs[s] = v;
     return D3D_OK;
 }

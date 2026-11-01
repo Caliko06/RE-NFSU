@@ -18,10 +18,14 @@ const BLUR = [
 ];
 const BLUR_ORIGINAL = 5;    // 'PC original': Original mode starts there, as shipped
 const BLUR_DEFAULT = 6;     // PS2 depth (before it: 3 = PS2, OWNER 2026-10-26: medium made the blur and the light aura hard to see)
-const DECAY = [0x82, 0x96, 0xb4];   // BLENDFACTOR 0x008296b4 at 0x409bca, R G B
+// Trail decay k per frame, R G B: shipped BLENDFACTOR 0x008296b4 at 0x409bca (trail 4.4 / 5.6 / 8.6 frames to 5%: the blue tail).
+// Remaster: one k = 0x60 for all three (3.1 frames, white, no blue smear; host/d3d9.c SetRenderState swaps the value), and 'raw'
+// becomes s = 1 (a still lamp = its flare, not 2-3.4x). OWNER 2026-10-31: the trail looked like astigmatism, too aggressive.
+const DECAY = RN_MODE === 'original' ? [0x82, 0x96, 0xb4] : [0x60, 0x60, 0x60];
+const DECAY_RS = RN_MODE === 'original' ? 0 : DECAY.reduce((c, k) => c << 8 | k, 0);
 // D3DCOLOR 0x1fRRGGBB with channel = s (1 - k): the add weight that makes a still light s times its flare.
-const trailColor = s => s === 'raw' ? 0x1fffffff :
-  (0x1f000000 | DECAY.reduce((c, k) => c << 8 | Math.min(255, Math.round(s * (255 - k))), 0)) >>> 0;
+const trailColor = s => s === 'raw' && RN_MODE === 'original' ? 0x1fffffff :
+  (0x1f000000 | DECAY.reduce((c, k) => c << 8 | Math.min(255, Math.round((s === 'raw' ? 1 : s) * (255 - k))), 0)) >>> 0;
 const STREAK = 0.00625;     // 0x702a44 as shipped
 // ?speedfov=<deg>: the chase camera's FOV grows by up to this many degrees from 90 to 270 km/h (host/d3d9.c fov_frame: it rewrites
 // the game's FOV table 0x6fbdf4 from the camera's speed, the camera and projection follow). 0 = off, as shipped; Original mode sets 0.
@@ -66,6 +70,7 @@ function startTune(M) {
     h[base + 7] = chasecam;
     h[base + 8] = nitrocam;
     h[base + 9] = hfovK ? bits(hfovK) : 0;
+    h[base + 10] = DECAY_RS;
     Atomics.add(h, base, 1);
     try { localStorage.setItem(KEY, String(level)); } catch {}
     if (!show) return;
