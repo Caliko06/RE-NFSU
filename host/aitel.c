@@ -84,8 +84,8 @@ void ai_tel(Ctx *c) {
                    a ? ldf(c, a + 0x1e4) : 0.0f, v ? ldf(c, v + 0x4b8) : 0.0f, ldf(c, r + 0x404), rec && rec < GUEST_MEM - 0x20 ? ldf(c, rec + 0x14) : 0.0f,
                    tr[i].stuck / 60.0f, tr[i].unst, tr[i].wall, tr[i].car);
         } else if (kind == 3 && d < 80) {
-            rn_log("AIT f%u car %08x d %+.0f lat %+.1f sp %.1f act %d parked %u hits wall %d car %d", f, r, along >= 0 ? d : -d, lat, sp, at,
-                   v ? c->mem[v + 0x4d1] : 0, tr[i].wall, tr[i].car);
+            rn_log("AIT f%u car %08x d %+.0f lat %+.1f sp %.1f act %d parked %u hits wall %d car %d draw %u blink %u view %x", f, r, along >= 0 ? d : -d, lat, sp, at,   // probe (exit: delete when "horns with no cars" is decided): the tests of DrawRaceCarList 0x571050
+                   v ? c->mem[v + 0x4d1] : 0, tr[i].wall, tr[i].car, c->mem[r + 0x4d0], c->mem[r + 0x8a8], ld(c, r + 0x534, 4));
         }
     }
 }

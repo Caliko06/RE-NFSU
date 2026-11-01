@@ -521,6 +521,26 @@ static void ai_log(Ctx *c) {
             if (type < 36 && !(seen[type] & 1)) { seen[type] |= 1, all++; if (m < 480) m += snprintf(names + m, sizeof names - m, " %s", G(tab + 0xc90 * type)); }
             if (type < 36 && d < 250 && !(seen[type] & 2)) seen[type] |= 2, kinds++;
         }
+        // Probe (exit: delete when the reset/walls bug is decided): wall body pool [0x72cbf4] and witness pool [0x72cc00] (+0x18 used, +0x1c peak), next body id [[0x736070]+8] (id space 0x840,
+        // PATCH 0x466b01), bodies of type 3 with no witness (+0x1a == 0: they free only with their last witness, so each is a leak), the first one's id, |normal z| and distance from the
+        // player, and the player's CarCollisionBody [car+0x3c]: +0x1d awake, +0x1b disable count, +0x1a witnesses, car+0x28 mode, cache count car+0x7e0.
+        if (me) {
+            uint32_t pw = ld(c, 0x72cbf4, 4), pv = ld(c, 0x72cc00, 4), al = ld(c, 0x736070, 4), b = ld(c, me + 0x3c, 4), oid = 0;
+            int orph = 0, oflat = 0, n = 0; float onz = 0, od = 0;
+            for (uint32_t o = ld(c, 0x779c70, 4); AP(o) && o != 0x779c70 && n < 8192; o = ld(c, o, 4), n++) {
+                uint32_t q = o - 4;
+                if (c->mem[q + 0x15] != 3 || c->mem[q + 0x1a]) continue;
+                uint32_t pl = ld(c, q + 0x60, 4);
+                float nz = AP(pl) ? fabsf(ldf(c, pl + 0x78)) : -1;
+                if (!orph++) {          // od: metres from the first orphan's box corner to the nearest car (racers and traffic); near 0 = a car still on it, far = left behind
+                    oid = ld(c, q + 0x18, 2), onz = nz, od = 1e9f;
+                    for (uint32_t r = ld(c, h, 4), k = 0; AP(r) && r != h && k < 200; r = ld(c, r, 4), k++) { float e = hypotf(ldf(c, q + 0x24) - ldf(c, r + 0x50), ldf(c, q + 0x28) - ldf(c, r + 0x54)); if (e < od) od = e; }
+                }
+                oflat += nz >= 0.7f;
+            }
+            rn_log("COLLOG %u walls %u peak %u witness %u peak %u nextid %u bodies %d orphans %d flat %d first id %u nz %.2f d %.0f | me awake %u off %u wit %u mode %u cache %u pos %.0f,%.0f,%.0f sp %.1f reset %u", rn_telem.presents, AP(pw) ? ld(c, pw + 0x18, 4) : 0, AP(pw) ? ld(c, pw + 0x1c, 4) : 0,
+                   AP(pv) ? ld(c, pv + 0x18, 4) : 0, AP(pv) ? ld(c, pv + 0x1c, 4) : 0, AP(al) ? ld(c, al + 8, 4) : 0, n, orph, oflat, oid, onz, od, AP(b) ? c->mem[b + 0x1d] : 0, AP(b) ? c->mem[b + 0x1b] : 0, AP(b) ? c->mem[b + 0x1a] : 0, ld(c, me + 0x28, 4), ld(c, me + 0x7e0, 4), ldf(c, me + 0x60), ldf(c, me + 0x64), ldf(c, me + 0x68), ldf(c, me + 0x3d4), ld(c, me + 0x884, 4));
+        }
         uint32_t bodies = ld(c, 0x736184, 4);       // TrackPolygonSlotPool 0x4412b0: slots in use, high-water mark, cap (docs/openworld/re_coll_pool.md)
         rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d polys %u polymax %u polycap %u avoidf %u brakef %u honkf %u hits %u flashf %u%s", rn_telem.presents, total, parked, near, close, all, kinds,
                n_refill, n_refail, n_react[0], n_react[1], n_react[2], AP(bodies) ? ld(c, bodies + 0x18, 4) : 0, AP(bodies) ? ld(c, bodies + 0x1c, 4) : 0, AP(bodies) ? ld(c, bodies + 0x2c, 4) : 0, n_tr[0], n_tr[1], n_tr[2], n_tr[3], n_tr[4], rn_telem.presents % 3000 == 0 ? names : "");

@@ -460,3 +460,16 @@ PATCHES.append(dict(addr=0x4291ec, old="32c9eb1f", new="eb2b9090", when=lambda: 
 # (0x469810: [+0x18] == [+0x2c]) it returns with none, so that car has no walls. The OWNER's WORLD session 18-25 logs the pool at 160/160 for the whole
 # drive (WALLCAP). 26 cars x 48 outrun 160. mov edi,0xa0 -> 0x800; the cap is only read back from the pool header. Cost 1.3 MB instead of 100 KB.
 PATCHES.append(dict(addr=0x4669fe, old="bfa0000000", new="bf00080000", when=lambda: True))
+# PATCH: 0x466b01 + 9 more, collision body ids. 0xde (222) = the sum of the shipped pools (0x20 world objects, 0x1e cars, 0xa0 polygons); the id allocator [0x736070], the id table [0x736050] (malloc 0x378) and the
+# witness bitmap [0x72cbfc] (a * 0xde + b, malloc 0x1810) are sized for it and nothing checks: with PATCH 0x4669fe (2048 polygons) a live id >= 222 writes past all three and aliases bits, so "witness exists" is false-true and that wall is skipped.
+# Id space 0x840 = 0x20 + 0x1e + 0x800. Costs 557 KB of bitmap. The first one rewrites the same 22 bytes: push 0x10c; xor eax,eax; mov [esi+4],eax; mov [esi+8],eax; mov [esi],0x840; nops. The call at 0x466b17 stays.
+PATCHES.append(dict(addr=0x466b01, old="6a1b" "c7460400000000" "c7460800000000" "c706de000000", new="680c010000" "33c0" "894604" "894608" "c70640080000" "909090", when=lambda: True))
+PATCHES.append(dict(addr=0x466b26, old="b906000000", new="b942000000", when=lambda: True))  # clears the allocator bitmap: 0x42 dwords + the stosw + stosb (0x10b B)
+PATCHES.append(dict(addr=0x466b3b, old="6878030000", new="6800210000", when=lambda: True))  # id table: 0x840 x 4 B
+PATCHES.append(dict(addr=0x466b55, old="b9de000000", new="b940080000", when=lambda: True))  # its clear loop
+PATCHES.append(dict(addr=0x466b66, old="6810180000", new="6800820800", when=lambda: True))  # witness bitmap: 0x840 x 0x840 bits
+PATCHES.append(dict(addr=0x466be1, old="b904060000", new="b980200200", when=lambda: True))  # its clear loop
+for a in (0x466d7b, 0x466daa, 0x466e95, 0x466ece, 0x468317, 0x4696e1):  # imul r,r,0xde: witness ctor, dtor, DoesWitnessExist, WorldObjects::Broadphase (all six sites of the stride)
+    PATCHES.append(dict(addr=a, old="de000000", new="40080000", when=lambda: True))
+# PATCH: 0x466a3e, witness pool [0x72cc00] 0x100 -> 0x800 (0x280 B slots, 1.3 MB): 0x469770 and Broadphase 0x4695xx skip the witness when the pool is empty, so that wall is not tested and its polygon body, which frees only with its last witness (0x466e20), leaks. The bound follows PATCH 0x4669fe.
+PATCHES.append(dict(addr=0x466a3e, old="bf00010000", new="bf00080000", when=lambda: True))
