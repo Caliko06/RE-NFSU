@@ -139,6 +139,8 @@ static uint32_t free_setup(Ctx *c) {
         npicked = 0, rn_free_now = 1;
         memset(rdir, 0, sizeof rdir);
         st(c, 0x6c89f0 + 0x40, host_addr_of("rn", "free_dir"), 4);   // racer vtable slot +0x40: each rival's own route direction
+        st(c, 0x6b8968 + 0x2c, host_addr_of("rn", "free_hseed"), 4); // player driver vtable: route seed by place, not by tour progress
+        st(c, 0x6b8968 + 0x40, host_addr_of("rn", "free_hdir"), 4);  // and route direction from the seed node (free_hseed)
         uint32_t args[2] = {(uint32_t)nriv, 0};
         call_guest_cdecl(c, 0x4b4040, 2, args);
         rn_free_now = 0;
@@ -906,6 +908,42 @@ static void node_point(Ctx *c, uint32_t node, float lat, uint32_t lane, uint32_t
     memcpy(&a[2], &lat, 4);
     c->r[ESI] = node;
     call_guest(c, 0x5a7270, 4, a);
+// The player's route in free mode (docs/re/camera_jump_route.md). The player driver class (vtable 0x6b8968) seeds its route each frame
+// with slot +0x2c = 0x59bd90 (ecx = driver, 1 arg: a flag byte): keep [drv+0x2c] if 0x442690 still finds it near the TrackPath cursor
+// car+0x814, else 0x4561d0 (ecx = car+0x60, eax = 0, cdecl &out, flags, car+0x814) with flags (0x24|0x64)|0x8c0, then without 0x8c0.
+// Flag 0x20 ranks nodes by |node+0x38 - car+0x814|: in WORLD the cursor runs on the old tour polyline and node+0x38 is the new net's,
+// so the seed lands 300..400 m away on another road and the route (jump cam eye, 0x42c4b0) is behind the car or far (OWNER 21:06 log:
+// 13 of 14 refused). free_hseed: the game's call, then, if the seed is missing or more than SEED_M from the car, the same two
+// 0x4561d0 calls without flag 0x20 (rank by XY distance). Free mode only; a race keeps the game's seed.
+#define SEED_M 64.0f
+static uint32_t seed_out;
+static uint32_t free_hseed(Ctx *c) {
+    uint32_t drv = c->r[ECX], flag = ARG(0), ret = call_guest(c, 0x59bd90, 1, &flag);
+    if (!live) return ret;
+    uint32_t node = ld(c, drv + 0x2c, 4), car = ld(c, drv + 4, 4);
+    if (node && hypotf(ldf(c, node) - ldf(c, car + 0x60), ldf(c, node + 4) - ldf(c, car + 0x64)) <= SEED_M) return ret;
+    if (!seed_out) seed_out = guest_alloc(16);
+    uint32_t f = ((flag & 0xff) ? 0x24 : 0x64) & ~0x20u, ecx = c->r[ECX], eax = c->r[EAX];
+    uint32_t a[3] = {seed_out, f | 0x8c0, ld(c, car + 0x814, 4)};
+    c->r[ECX] = car + 0x60, c->r[EAX] = 0;
+    uint32_t ok = call_guest_cdecl(c, 0x4561d0, 3, a) & 0xff;
+    if (!ok) { a[1] = f; c->r[ECX] = car + 0x60, c->r[EAX] = 0; ok = call_guest_cdecl(c, 0x4561d0, 3, a) & 0xff; }
+    c->r[ECX] = ecx, c->r[EAX] = eax;
+    if (ok) st(c, drv + 0x2c, ld(c, seed_out + 4, 4), 4);
+    return ret;
+}
+// Slot +0x40 = 0x59c7b0 gives the route direction from the TrackPath tangent car+0x818/0x81c (same polyline, so on WORLD roads that run
+// against it the route walks behind the car). free_hdir: the seed node's own direction (node+0xc/+0x10) against the car's velocity
+// (car+0x70/0x74, or its heading car+0x90/0x94 when car+0x3d4 * [0x6cc9f0] <= [0x6cca94], as 0x59c7b0 picks): 0 = along the nodes
+// (free_dir's convention), 1 = against. No seed or a race: the game's answer.
+static uint32_t free_hdir(Ctx *c) {
+    uint32_t drv = c->r[ECX], node = ld(c, drv + 0x2c, 4), car = ld(c, drv + 4, 4);
+    if (!live || !node) return call_guest(c, 0x59c7b0, 0, NULL);
+    int fast = ldf(c, car + 0x3d4) * ldf(c, 0x6cc9f0) > ldf(c, 0x6cca94);
+    uint32_t v = car + (fast ? 0x70 : 0x90);
+    return ldf(c, v) * ldf(c, node + 0xc) + ldf(c, v + 4) * ldf(c, node + 0x10) > 0 ? 0 : 1;
+}
+
     c->r[ESI] = esi;
 }
 
@@ -977,5 +1015,16 @@ const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traff
                          {"rn", "free_nopath", 0, free_nopath},
                          {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle},
                          {"rn", "free_hud", 1, free_hud}, {"rn", "free_dir", 0, free_dir},
-                         {"rn", "free_jumpcam", 0, free_jumpcam}};
-const int free_api_count = 12;
+                         {"rn", "free_jumpcam", 0, free_jumpcam}, {"rn", "free_hseed", 1, free_hseed},
+                         {"rn", "free_hdir", 0, free_hdir}};
+const int free_api_count = 14;
+    if (k >= 0 && k < n) {   // a route far from the car (seed on another road) gives a far eye: keep the chase camera
+        uint32_t nd = ld(c, route + 8 + 4 * k, 4), ctr = jump_scr + 48;
+        node_point(c, nd, 0.5f * (ldf(c, nd + 0x20) + ldf(c, nd + 0x3c)), 0, ctr);
+        float dk = hypotf(ldf(c, ctr) - ldf(c, car + 0x60), ldf(c, ctr + 4) - ldf(c, car + 0x64));
+        if (dk > SEED_M) {
+            rn_log("JCPICK f%u k %d n %d route far %.0f m refused", rn_telem.presents, k, n, dk);
+            call_guest(c, 0x42c640, 0, NULL);
+            return 0;
+        }
+    }
