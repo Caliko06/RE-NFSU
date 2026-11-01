@@ -208,7 +208,12 @@ static uint32_t free_traffic(Ctx *c) {
             int k = cand[rnd(&s) % n];
             c->r[EAX] = CANON[k].preset;
             call_guest_cdecl(c, 0x4b26f0, 1, &one);
-            for (int sl = 0x13; sl <= 0x72; sl++)
+            // WORLD (world_ai, judge order 2): a racer that gets an overlay skin below keeps the preset's vinyls, decals and rim paint; they bake into
+            // its own DUMMY_SKIN13..20 like a rival's. Body kit (slots < 0x13), paint 0x1e, part paint 0x23..0x28, tint 0x73 and neon 0x74 are kept everywhere.
+            static int slot;
+            if (a[0] == 0x32) slot = 0;
+            int keep_vinyl = rn_tex_overlay && slot < 8 && world_ai(c);
+            for (int sl = 0x13; sl <= 0x72 && !keep_vinyl; sl++)
                 if (sl <= 0x1d || (sl >= 0x1f && sl <= 0x22) || sl == 0x29 || sl >= 0x2a) {
                     st(c, ride + 0x44c + 4 * sl, 0, 4);
                     c->mem[ride + 0x62c + sl]++;
@@ -217,15 +222,13 @@ static uint32_t free_traffic(Ctx *c) {
             // The body is drawn with the texture at ride +0x444 (DUMMY_SKIN<n>) and the rims with +0x448 (DUMMY_WHEEL<n>), which the loader
             // 0x58cbb0 -> 0x58be50 -> 0x5a9ce0 bakes the paint into (docs/openworld/re_traffic_racers.md). 0x57d160 zeroed them; the slots 1..4
             // are the player's and the first rivals', 5..20 are the overlay's (rivals 4+: 5..10, traffic racers 13..20) (Cars/TEXTURES.BIN, tools/remaster/world_overlays.py): one per racer.
-            static int slot;
-            if (a[0] == 0x32) slot = 0;
             if (rn_tex_overlay && slot < 8) {
                 char nm[24];     // 13..20: the rivals take DUMMY_SKIN2..N+1 by name (0x4b4040), up to 10
                 snprintf(nm, sizeof nm, "DUMMY_SKIN%d", 13 + slot); st(c, ride + 0x444, nhash(nm), 4);
                 snprintf(nm, sizeof nm, "DUMMY_WHEEL%d", 13 + slot); st(c, ride + 0x448, nhash(nm), 4);
                 slot++;
             }
-            if (getenv("RN_FREELOG")) rn_log("FREE traffic %u: type %u wears %s's preset %08x skin %08x", a[0], type, CANON[k].name, CANON[k].preset, ld(c, ride + 0x444, 4));
+            if (getenv("RN_FREELOG")) rn_log("FREE traffic %u: type %u wears %s's preset %08x skin %08x%s", a[0], type, CANON[k].name, CANON[k].preset, ld(c, ride + 0x444, 4), keep_vinyl ? " vinyls kept" : "");
         }
     }
     return call_guest(c, 0x5809c0, 7, a);
@@ -438,6 +441,25 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
                hypot(ldf(c, pick + 0x50) - px, ldf(c, pick + 0x54) - py), m, lane, v, near, rn_telem.presents);
 }
 
+// Traffic types (judge order 2, WORLD only, ?ai=0 off). PATCH 0x583a37, 0x583a5b (cave 0x63b366: jmp [SCREEN_ADDR+0xa0]) send the traffic driver
+// 0x583910's two lane-speed asks here: first the speed cave 0x63b331 they called before (0x5a6b00, eax/ebx as the caller set them, 1 stack arg,
+// stdcall, the speed on the FPU, x0.85..1.15 per car), then x the factor of the car's type. esi = the traffic AI, [esi+4] = its car (0x58393a reads
+// its speed +0x3d4), car+0x14 = entrant, entrant+0x10 = the ride (0x5809c0 -> 0x4323f0), ride+0 = the CarTypeInfo row (tools/re/carinfo.py cars).
+// Slow: BUS 30 x0.75, PANELVAN 24 / PARCELVAN 27 x0.85, PICKUP 28 / FIRETRUCK 26 x0.9: the cars behind catch them and pass with the game's own
+// Avoid lane change (0x453c60). Fast: TAXI 20 / TAXI02 23 x1.2, AMBULANCE 22 x1.25: they close on the car ahead and change lanes to pass it (the
+// same Avoid action), and honk when the player blocks them (0x44c2e0). Other types and other tracks: the cave's speed unchanged.
+static int tspeed_on;   // free_tick: free mode live in the WORLD
+static uint32_t traffic_speed(Ctx *c) {
+    uint32_t a = ARG(0), ai = c->r[ESI];
+    uint32_t r = call_guest(c, 0x63b331, 1, &a);
+    uint32_t car = tspeed_on && ai ? ld(c, ai + 4, 4) : 0, e = car ? ld(c, car + 0x14, 4) : 0;
+    if (!e || ld(c, e + 4, 4) != 3) return r;
+    uint32_t type = ld(c, e + 0x10, 4);
+    double k = type == 30 ? 0.75 : type == 24 || type == 27 ? 0.85 : type == 28 || type == 26 ? 0.9 : type == 20 || type == 23 ? 1.2 : type == 22 ? 1.25 : 1.0;
+    c->st[c->ftop] *= k;
+    return r;
+}
+
 void free_tick(Ctx *c) {
     static int raced;
     static uint32_t start;           // the first race frame: respawns wait 10 s (the grid)
@@ -445,7 +467,7 @@ void free_tick(Ctx *c) {
     // The setup runs in the front end (state 3, runs/jump_3_1001): the race is over once state 6 went back to 3.
     if (ld(c, 0x77a920, 4) != 6) {
         if (raced && ld(c, 0x77a920, 4) == 3) {
-            live = raced = 0, start = 0, tele = 0, opened = drove = 0, open_from = 0;
+            live = raced = 0, start = 0, tele = 0, opened = drove = 0, open_from = 0, tspeed_on = 0;
             memset(rdir, 0, sizeof rdir);
             if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
             if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
@@ -453,6 +475,7 @@ void free_tick(Ctx *c) {
         return;
     }
     raced = 1;
+    tspeed_on = world_ai(c);
     // The RaceManager's frame 0x435570 calls the record update 0x4338c0 (edi = record: route progress +0x14/+0x1c/+0x20, checkpoint
     // +4/+6/+8) for each record of its own, so the extra records get the same call (RN_FREEXREC=0: not).
     static int xr = -1;
