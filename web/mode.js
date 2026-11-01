@@ -10,7 +10,7 @@ const RN_ORIGINAL = {
   cardetail: '0',     // host/sm1.c: no AO/grime terms
   handling: '0',      // host/rivals.c: the shipped rear grip assist
   trafyield: '0',     // host/rivals.c: traffic never sees a car closing from behind
-  rivalai: '0',       // host/rivals.c: rival personalities off, the shipped skill records
+  ai: '0',            // host/rivals.c: rival personalities off, the shipped skill records
   speedfov: '0',      // web/tune.js, host/d3d9.c: the chase camera's FOV stays at the shipped 71.5 deg
   chasecam: '0',      // web/tune.js, host/d3d9.c: the chase camera keeps the car's shipped distance and height rows
   nitrocam: '0',      // web/tune.js, host/d3d9.c: no extra pull-back while the nitrous burns

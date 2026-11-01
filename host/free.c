@@ -40,6 +40,14 @@ static const struct { const char *name; uint32_t preset; } CANON[] = {
 
 int rn_free_now;                 // 1 while 0x4b4040 builds free mode's rivals (host/rivals.c rival_ride asks free_rival), 2 in its traffic
 static int on, live, picked[NRIV_MAX], npicked;
+// AI in WORLD (judge order 2026-11-01): the WORLD (track id [0x78a2f0] == 1010, 0x441fe0's key) gets 8 rivals, 21 traffic cars (1 + 8 + 21 = the
+// entrant table's 30, 0x4322a0) and free_tmove keeps 16 of them within 250 m, checked every 15 frames. Other tracks: as before.
+// ?ai=0 (RN_AI=0): off. RN_AIFORCE=1, test only: the same on any Free Run track (the WORLD is not reachable headless).
+static int world_ai(Ctx *c) {
+    const char *e = getenv("RN_AI");
+    if (e && e[0] == '0') return 0;
+    return ld(c, 0x78a2f0, 4) == 1010 || getenv("RN_AIFORCE") != NULL;
+}
 static uint32_t zone_at, zone_was;     // the clear zone free_place changed (free mode, the whole race) and its value
 // The rubber band 0x44bd10 needs a gap from 0x44c010, which is 0 while [0x78a400] (the race options' Catch Up byte +0x1f, set by
 // the mode setups 0x4b4a56..0x4b5f47) is 0, as shipped in Free Run. RN_FREECU=1 sets it to 1 for the race (rivals ahead wait, rivals
@@ -131,7 +139,7 @@ static uint32_t free_setup(Ctx *c) {
     if (on > 0 && ld(c, 0x777cc8, 4) == 3 && !c->mem[0x78a347]) {
         if (!names) names = guest_alloc(16 * NRIV_MAX);
         const char *fr = getenv("RN_FREERIV");
-        nriv = fr ? atoi(fr) : 6;
+        nriv = fr ? atoi(fr) : world_ai(c) ? 8 : 6;
         nriv = nriv < 0 ? 0 : nriv > NRIV_MAX ? NRIV_MAX : nriv;
         uint32_t tab = ld(c, 0x78a418, 4), n = ld(c, 0x78a41c, 4);
         for (uint32_t i = 0; i < n; i++)                          // the player leads the grid (0x422a70 slot 1 = the front)
@@ -157,7 +165,7 @@ static uint32_t free_setup(Ctx *c) {
     c->r[ESI] = ld(c, 0x78a2f0, 4);                               // 0x441fe0 reads its argument in esi
     uint32_t ti = call_guest(c, 0x441fe0, 0, NULL), cnt = ti + ld(c, 0x78a2fc, 4) + ld(c, 0x78a300, 4) * 2 + 0xc0;
     int8_t keep = (int8_t)c->mem[cnt];
-    int base = getenv("RN_FREETRAFFIC") ? atoi(getenv("RN_FREETRAFFIC")) : FREE_TRAFFIC;
+    int base = getenv("RN_FREETRAFFIC") ? atoi(getenv("RN_FREETRAFFIC")) : world_ai(c) ? 14 : FREE_TRAFFIC;   // WORLD: 14 x1.5 = 21
     if (live && base > 0) c->mem[cnt] = (int8_t)base;
     if (getenv("RN_FREELOG")) rn_log("FREE traffic asked: trackinfo count %d -> %d (x1.5, at most 26)", keep, (int8_t)c->mem[cnt]);
     uint32_t r = call_guest(c, 0x4b3ac0, 0, NULL);
@@ -258,57 +266,74 @@ static void rival_flip(Ctx *c, uint32_t drv, uint32_t dir) {
     if (path) c->r[ESI] = path, call_guest(c, 0x5a5340, 0, NULL), c->r[ESI] = esi;
     for (int k = 0; k < 8; k++) st(c, drv + 0xc + 4 * k, ld(c, drv + 0xc + 4 * k, 4) & ~1u, 4);
 }
-static uint32_t respawn_pair;
-static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
+static uint32_t respawn_pair, open_from;
+static int opened, drove;               // the opening pass of free_respawn is done for this race
+// open: the opening pass (OWNER 2026-10-31: rivals vanished right after the start, others were not there until it): once, in the first second the
+// player moves, every rival goes to its own spot 90..340 m of road from the player, alternating ahead and behind, already rolling, so some
+// are on the street from the first second and none sits stacked on the grid (the grid pile was then 'stuck' and teleported away).
+// RN_RIVALOPEN=0: off. Returns 1 when the pass is complete.
+static int free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy, int open) {
     static int off = -1, rev; static float far; static uint32_t seed = 0x5eed1234, done[16], when[16];
     if (off < 0) rev = getenv("RN_RESPAWNREV") != NULL;   // test-only: every respawn drives the way opposite to the player's (the flipped racer AI on its own)
     if (off < 0) off = getenv("RN_RESPAWN") && !atoi(getenv("RN_RESPAWN")), far = getenv("RN_RIVALFAR") ? (float)atof(getenv("RN_RIVALFAR")) : 400.0f;
-    if (off || !pc) return;
+    if (off || !pc) return 0;
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
     // Stuck (OWNER 2026-10-28, MW's AIPursuit/AITrafficManager rule): a rival under 2 m/s for 5 s in a row (this runs once a
     // second, after the grid) is respawned like a far one, whatever its distance.
     static struct { uint32_t r; float x, y; int slow; } st5[16];
+    int nr = -1;
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4);
         if (!e || ld(c, e + 4, 4) != 2) continue;
+        nr++;
         int s = 0;
         while (s < 15 && st5[s].r && st5[s].r != r) s++;
         float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
         st5[s].slow = st5[s].r == r && hypot(x - st5[s].x, y - st5[s].y) < 2.0 ? st5[s].slow + 1 : 0;
         st5[s].r = r, st5[s].x = x, st5[s].y = y;
         int stuck = st5[s].slow >= 5;
-        if (!stuck && hypot(x - px, y - py) < far) continue;
+        if (!open && !stuck && hypot(x - px, y - py) < far) continue;
         int i = 0;
         while (i < 16 && done[i] && done[i] != r) i++;
-        if (i == 16 || (done[i] == r && rn_telem.presents < when[i] + 480)) continue;
+        if (open && i < 16 && done[i] == r && when[i] >= open_from) continue;   // already placed by this pass
+        if (i == 16 || (!open && done[i] == r && rn_telem.presents < when[i] + 480)) continue;
         if (!respawn_pair) respawn_pair = guest_alloc(8);
         uint32_t zero = 0, ft = c->ftop;
         c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
         c->r[EAX] = pc; uint32_t node = call_guest(c, 0x428160, 1, &zero);
         st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
         c->r[EAX] = respawn_pair;
-        if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; return; }
+        if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; return 0; }
         // along the player's node (dot of its direction and the player's motion) = ahead; the coin picks ahead or behind
-        int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, ahead = rnd(&seed) & 1;
-        float m = 220.0f + (float)(rnd(&seed) % 160);
-        uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)(along == ahead), 0};
-        memcpy(&a[2], &m, 4);
-        c->r[ECX] = sec, c->r[EAX] = node;
-        uint32_t w = call_guest_cdecl(c, 0x4563d0, 5, a);
-        uint32_t s2 = ld(c, respawn_pair, 4), n2 = ld(c, respawn_pair + 4, 4);
-        c->r[EAX] = respawn_pair;
-        if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; return; }
-        float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
-        int clear = 1;
-        for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
-            clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
-        if (!clear) { c->ftop = ft; return; }
+        int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, ahead = open ? !(nr & 1) : rnd(&seed) & 1;
+        float m0 = open ? 90.0f + 35.0f * (float)nr : 220.0f + (float)(rnd(&seed) % 160), m = m0;
+        uint32_t w = 0, s2 = 0, n2 = 0;
+        int clear = 0;
+        // open: up to 4 tries, each 60 m farther and the other way round, when the walk stalls or the spot is within 31 m of a car (the far rivals sit on
+        // those spots at the start)
+        for (int t = 0; t < (open ? 4 : 1) && !clear; t++) {
+            m = m0 + 60.0f * (float)t;
+            st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
+            uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)(along == (ahead ^ (t & 1))), 0};
+            memcpy(&a[2], &m, 4);
+            c->r[ECX] = sec, c->r[EAX] = node;
+            w = call_guest_cdecl(c, 0x4563d0, 5, a);
+            s2 = ld(c, respawn_pair, 4), n2 = ld(c, respawn_pair + 4, 4);
+            c->r[EAX] = respawn_pair;
+            if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) continue;
+            float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
+            clear = 1;
+            for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
+                clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
+        }
+        if (!clear) { if (open && getenv("RN_FREELOG")) rn_log("FREE open fail: rival %d", nr); c->ftop = ft; return 0; }
         // dir: the player's way along the road (`along`, at the player's own node; the node 300 m on may bend past 90 degrees from the
         // player's heading, its direction vector says nothing about the way); a stopped player: the rival keeps its own. The racer's
         // route flag is 0 along the node direction, 1 against (forward flag = dir == 0, 0x44ae02).
         uint32_t drv = ld(c, r + 0x2c, 4), had = drv ? ld(c, drv, 4) : 0, flag = !along ^ rev;
         if (sp < 2.0) { c->r[ECX] = drv; flag = free_dir(c) != 0; }
         float dir = flag ? -1.0f : 1.0f, lo = ldf(c, 0x700d58), v = sp > lo ? (float)sp : lo;   // 0x426617: 8 m/s at least
+        if (open && v < 14.0f) v = 14.0f;   // rolling from the first second
         if (drv && on > 0) rival_flip(c, drv, flag);
         double was = hypot(ldf(c, r + 0x50) - px, ldf(c, r + 0x54) - py);
         uint32_t p[9] = {r, s2, n2, 0, 1, 0, 0, 0, 0};
@@ -320,8 +345,9 @@ static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) 
         if (getenv("RN_FREELOG"))
             rn_log("FREE respawn %s%s: %.0f m -> %.0f m %s (walk %s %.0f m, ret %u, node %08x dir %+.0f flag %u vt %08x, %.0f m/s) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), stuck ? " (stuck)" : "", was,
                    hypot(dx, dy), dx * vx + dy * vy >= 0 ? "ahead" : "behind", ahead ? "ahead" : "behind", m, w, n2, dir, flag, had, v, rn_telem.presents);
-        return;                                                   // one rival a second
+        if (!open) return 0;                                      // one rival a second
     }
+    return open;
 }
 
 // Traffic (OWNER 2026-10-28: "traffic like MW"): the TrafficTeleporter keeps cars only along the race route, so in the open
@@ -335,7 +361,7 @@ static void free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) 
 // against the node direction, then 0x427f70 places the car and its AI). RN_FREETMOVE=0: off.
 #define TMOVE_NEAR 10
 #define TMOVE_AHEAD 200.0f
-static int n_tmove, n_tfail;
+static int n_tmove, n_tfail, n_twhy[4];
 static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
     static int off = -1; static uint32_t seed = 0x7a11c0de;
     static struct { uint32_t car, since; } bh[64];
@@ -343,6 +369,7 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
     if (off || !tele || !pc) return;
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
     uint32_t pick = 0; int prio = 0, near = 0;
+    double far = world_ai(c) ? 300 : 400;   // WORLD: a car past 300 m is free to move (placements land 150..300 m out)
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
         if (!e || ld(c, e + 4, 4) != 3 || !v) continue;
@@ -354,35 +381,43 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
         int behind = sp > 2 && dx * vx + dy * vy < 0 && d > 130;
         if (!behind) bh[b].since = 0;
         else if (!bh[b].since) bh[b].since = rn_telem.presents;
-        int p = c->mem[v + 0x4d1] ? 3 : d > 400 ? 2 : behind && rn_telem.presents >= bh[b].since + 240 ? 1 : 0;
+        int p = c->mem[v + 0x4d1] ? 3 : d > far ? 2 : behind && rn_telem.presents >= bh[b].since + 240 ? 1 : 0;
         if (p > prio) prio = p, pick = r;
     }
-    if (near >= TMOVE_NEAR || !pick) return;
+    if (near >= (world_ai(c) ? 16 : TMOVE_NEAR) || !pick) return;
     if (!respawn_pair) respawn_pair = guest_alloc(8);
     uint32_t zero = 0, ft = c->ftop;
     c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
     c->r[EAX] = pc; uint32_t node = call_guest(c, 0x428160, 1, &zero);
     st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
     c->r[EAX] = respawn_pair;
-    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_tfail++; return; }
-    int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0;
-    float m = TMOVE_AHEAD - 50.0f + (float)(rnd(&seed) % 101) + (float)sp;
-    uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)along, 0};
-    memcpy(&a[2], &m, 4);
-    c->r[ECX] = sec, c->r[EAX] = node;
-    call_guest_cdecl(c, 0x4563d0, 5, a);
-    uint32_t n2 = ld(c, respawn_pair + 4, 4);
-    c->r[EAX] = respawn_pair;
-    if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_tfail++; return; }
-    float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
-    int ok = hypot(nx - px, ny - py) >= 150;
-    for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++)
-        ok = o == pick || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= 20;
-    if (!ok) { c->ftop = ft; n_tfail++; return; }
-    c->r[ECX] = tele;
-    uint32_t side = call_guest(c, 0x59aea0, 0, NULL) & 0xff, la[2] = {n2, side};
-    c->r[ECX] = tele;
-    int lane = (int)call_guest(c, 0x5995e0, 2, la);
+    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_tfail++, n_twhy[3]++; return; }
+    int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, lane = -1;
+    uint32_t n2 = 0;
+    float m = 0;
+    // WORLD: up to 3 spots per check, each a new random distance (the run with RN_AIFORCE on 1001 failed 6 checks of 7 with one try);
+    // n_twhy counts the refusals: [3] no player node, walk stalled / within 150 m of the player or 20 m of a car / no free lane.
+    for (int t = 0, tries = world_ai(c) ? 3 : 1; t < tries && lane == -1; t++) {
+        m = TMOVE_AHEAD - 50.0f + (float)(rnd(&seed) % 101) + (float)sp;
+        st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
+        uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)along, 0};
+        memcpy(&a[2], &m, 4);
+        c->r[ECX] = sec, c->r[EAX] = node;
+        call_guest_cdecl(c, 0x4563d0, 5, a);
+        n2 = ld(c, respawn_pair + 4, 4);
+        c->r[EAX] = respawn_pair;
+        if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { n_twhy[0]++; continue; }
+        float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
+        int ok = hypot(nx - px, ny - py) >= 150;
+        for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++)
+            ok = o == pick || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= 20;
+        if (!ok) { n_twhy[1]++; continue; }
+        c->r[ECX] = tele;
+        uint32_t side = call_guest(c, 0x59aea0, 0, NULL) & 0xff, la[2] = {n2, side};
+        c->r[ECX] = tele;
+        lane = (int)call_guest(c, 0x5995e0, 2, la);
+        if (lane == -1) n_twhy[2]++;
+    }
     if (lane == -1) { c->ftop = ft; n_tfail++; return; }
     c->r[EAX] = n2, c->r[ECX] = (uint32_t)lane;
     call_guest(c, 0x42adf0, 0, NULL);
@@ -410,7 +445,7 @@ void free_tick(Ctx *c) {
     // The setup runs in the front end (state 3, runs/jump_3_1001): the race is over once state 6 went back to 3.
     if (ld(c, 0x77a920, 4) != 6) {
         if (raced && ld(c, 0x77a920, 4) == 3) {
-            live = raced = 0, start = 0, tele = 0;
+            live = raced = 0, start = 0, tele = 0, opened = drove = 0, open_from = 0;
             memset(rdir, 0, sizeof rdir);
             if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
             if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
@@ -453,14 +488,15 @@ void free_tick(Ctx *c) {
                                                ldf(c, r + 0x50), ldf(c, r + 0x54), ldf(c, r + 0x58), ld(c, r + 0x1c, 4));
         }
     }
-    if (rn_telem.presents % 30 == 0 && rn_telem.presents > start + 300) {   // traffic, after the grid
+    int per = world_ai(c) ? 15 : 30;                                       // WORLD: the traffic check twice as often
+    if (rn_telem.presents % per == 0 && rn_telem.presents > start + 300) {  // traffic, after the grid
         static double tw[2];
         uint32_t rh = ld(c, 0x7361f8, 4), me = 0;
         for (uint32_t r = rh ? ld(c, rh, 4) : 0, k = 0; r && r != rh && k < 200 && !me; r = ld(c, r, 4), k++) {
             uint32_t e = ld(c, r + 0x14, 4);
             if (e && ld(c, e + 4, 4) == 1) me = r;
         }
-        if (me && (tw[0] || tw[1])) free_tmove(c, rh, me, (ldf(c, me + 0x50) - tw[0]) * 2, (ldf(c, me + 0x54) - tw[1]) * 2);
+        if (me && (tw[0] || tw[1])) free_tmove(c, rh, me, (ldf(c, me + 0x50) - tw[0]) * (60.0 / per), (ldf(c, me + 0x54) - tw[1]) * (60.0 / per));
         if (me) tw[0] = ldf(c, me + 0x50), tw[1] = ldf(c, me + 0x54);
     }
     if (rn_telem.presents % 60 == 0) {
@@ -476,7 +512,14 @@ void free_tick(Ctx *c) {
             uint32_t pd = ld(c, me + 0x2c, 4), pv = pd ? ld(c, pd, 4) : 0;
             rn_log("FREE vtable 0x6c89f0+0x40 = %08x; player driver %08x vt %08x slot40 %08x", ld(c, 0x6c89f0 + 0x40, 4), pd, pv, pv ? ld(c, pv + 0x40, 4) : 0), shown = 1;
         }
-        if (me && rn_telem.presents > start + 600) free_respawn(c, rh, me, x - was[0], y - was[1]);
+        static int ropen = -1;
+        if (ropen < 0) ropen = !getenv("RN_RIVALOPEN") || atoi(getenv("RN_RIVALOPEN"));
+        drove = (was[0] || was[1]) && hypot(x - was[0], y - was[1]) > 10.0 ? drove + 1 : 0;   // the parked car drifts 4-7 m/s, a grid teleport is one jump; driving is 10+ m/s, seconds in a row
+        if (me && ropen && !opened && drove >= 2) {   // the player drives 2 s = the go (the game re-grids at the pre-race screen, after `start`)
+            if (!open_from) open_from = rn_telem.presents;
+            opened = free_respawn(c, rh, me, x - was[0], y - was[1], 1);
+        }
+        if (me && rn_telem.presents > start + 600) free_respawn(c, rh, me, x - was[0], y - was[1], 0);
         was[0] = x, was[1] = y;
     }
     // RN_BODYLOG: the player's position every frame (WORLD vs 1001 handling A/B: z jitter = bumps, xy = speed and turns).
@@ -619,7 +662,7 @@ void free_tick(Ctx *c) {
         double d = sqrt(dx * dx + dy * dy);
         for (int j = 0; j < 3; j++) if (d < near[j]) { double t = near[j]; near[j] = d; d = t; }
     }
-    o += snprintf(line + o, sizeof line - o, " | traffic near %.0f %.0f %.0f m | tmove %d fail %d", near[0], near[1], near[2], n_tmove, n_tfail);
+    o += snprintf(line + o, sizeof line - o, " | traffic near %.0f %.0f %.0f m | tmove %d fail %d (player node %d, walk %d, close %d, lane %d)", near[0], near[1], near[2], n_tmove, n_tfail, n_twhy[3], n_twhy[0], n_twhy[1], n_twhy[2]);
     rn_log("%s", line);
     // Every 10 s, each traffic car as TrafficTeleporter 0x598600 sees it: the cars [L+0x28 + 4 i], i from L[9] to L[6]
     // (L = [0x7361f8], 0x41f680/0x41f690), driver V = car+0x2c (0x41f5d0). Flags of V: +0x4d1 parked (0x583350, the
@@ -754,6 +797,11 @@ static uint32_t free_walk(Ctx *c, int first) {
     uint32_t a[5] = {ARG(0), ARG(1), ARG(2), ARG(3), ARG(4)};
     static float walked;
     static unsigned stopped;
+    static uint32_t seed = 0x3c1a0b17;
+    if (live && first) {   // the first walk is 250 m ([0x6b5a38], also the reject radius: not editable), so every car landed ~230 m ahead, 31 m apart; U(250, 480) spreads them
+        float m0 = 250.0f + (float)(rnd(&seed) % 231);
+        memcpy(&a[2], &m0, 4);
+    }
     float m = *(float *)&a[2];
     walked = first ? m : walked + m;
     if (!live || first || walked <= ldf(c, 0x6b5a3c)) return call_guest_cdecl(c, 0x4563d0, 5, a);

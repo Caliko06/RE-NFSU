@@ -104,22 +104,26 @@ function line(s, cls) {
       }
       // ?world=1: the open world (docs/OPENWORLD.md): the 16 street tracks load one merged collision, no fences (host/openworld.c)
       if (RN_Q.get('world') === '1') m.ENV.RN_WORLD = '1';
-      // ?rivalai=0: the rivals drive the shipped skill records, no clumsy or aggressive levels (host/rivals.c). Read at each race.
-      if (RN_Q.get('rivalai') === '0') m.ENV.RN_RIVALAI = '0';
+      // ?ai=0: WORLD rivals drive the shipped skill records, no nervous, clean or aggressive personalities (host/rivals.c). Read at each race.
+      if (RN_Q.get('ai') === '0') m.ENV.RN_AI = '0';
       // ?trafyield=0: traffic does not move aside for the player closing from behind (host/rivals.c traffic_tick)
       if (RN_Q.get('trafyield') === '0') m.ENV.RN_TRAFYIELD = '0';
+      // ?rivalopen=0: Free Run rivals stay on the start grid until the 10 s respawn rules move them (host/free.c free_respawn)
+      if (RN_Q.get('rivalopen') === '0') m.ENV.RN_RIVALOPEN = '0';
       // RN_JCLOG: one log line a second plus one per airborne sample (host/d3d9.c jumpcam_log): why a jump did or did not get the jump camera, in build/web.log
       m.ENV.RN_JCLOG = '1';
-      // Shipped rear grip assist by default (OWNER 2026-10-31: the feel must be the original's); ?handling=1: the 0.18 cap (host/rivals.c)
-      if (RN_Q.get('handling') !== '1') m.ENV.RN_HANDLING = '0';
       // AI evidence in every F10 (OWNER 2026-10-31, "the AI is still bad"): rivals' speed, skill, actions, distance (host/free.c RN_FREELOG),
       // traffic near the player, reactions, hits (host/rivals.c RN_AILOG). Log lines only, no behaviour change.
       m.ENV.RN_FREELOG = '1'; m.ENV.RN_AILOG = '1';
+      // Shipped rear grip assist by default (OWNER 2026-10-31: the feel must be the original's); ?handling=1: the 0.18 cap (host/rivals.c)
+      if (RN_Q.get('handling') !== '1') m.ENV.RN_HANDLING = '0';
       // Traffic, off until measured on the Mac (host/rivals.c): ?trafmodels=1 bus, ambulance, fire truck too; ?trafrefill=1 traffic_refill in place of free_tmove;
       // ?traffic=<n> free mode's traffic count, x1.5 = cars, 23 at most with 6 rivals (0x4322a0)
       if (RN_Q.get('trafmodels') === '1') m.ENV.RN_TRAFMODELS = '1';
       if (RN_Q.get('trafrefill') === '1') { m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
       if (RN_Q.has('traffic')) m.ENV.RN_FREETRAFFIC = RN_Q.get('traffic');
+      // ?ai=0: the WORLD keeps the plain free mode AI (6 rivals, 19 traffic cars, host/free.c world_ai)
+      if (RN_Q.get('ai') === '0') m.ENV.RN_AI = '0';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;

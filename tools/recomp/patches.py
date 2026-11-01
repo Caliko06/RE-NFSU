@@ -473,3 +473,13 @@ for a in (0x466d7b, 0x466daa, 0x466e95, 0x466ece, 0x468317, 0x4696e1):  # imul r
     PATCHES.append(dict(addr=a, old="de000000", new="40080000", when=lambda: True))
 # PATCH: 0x466a3e, witness pool [0x72cc00] 0x100 -> 0x800 (0x280 B slots, 1.3 MB): 0x469770 and Broadphase 0x4695xx skip the witness when the pool is empty, so that wall is not tested and its polygon body, which frees only with its last witness (0x466e20), leaks. The bound follows PATCH 0x4669fe.
 PATCHES.append(dict(addr=0x466a3e, old="bf00010000", new="bf00080000", when=lambda: True))
+# PATCH: 0x45553b/0x45557b/0x4555bb/0x4555f8, AI slot pools (ctor 0x455530) 26/27/27/640 -> 48/49/49/1280: each AI car (racer or traffic) takes 1 goal, 1 action, 1 FuturePoints and ~24 future points, so the shipped pools cap AI cars at 26; WORLD runs 8 rivals + 21 traffic (host/free.c world_ai). Capacity only: a race with fewer cars allocates the same slots as before.
+PATCHES.append(dict(addr=0x45553b, old="bf1a000000", new="bf30000000", when=lambda: True))  # AIGoalSlotPool 26 -> 48
+PATCHES.append(dict(addr=0x45557b, old="bf1b000000", new="bf31000000", when=lambda: True))  # AIActionSlotPool 27 -> 49
+PATCHES.append(dict(addr=0x4555bb, old="bf1b000000", new="bf31000000", when=lambda: True))  # FuturePointsSlotPool 27 -> 49
+PATCHES.append(dict(addr=0x4555f8, old="bf80020000", new="bf00050000", when=lambda: True))  # FuturePointSlotPool 640 -> 1280
+# PATCH: 0x44c573 (+ cave 0x43b556, CC padding after the ret 8 of 0x43b4xx, no reference: asm.py free), OWNER order 2026-11-01 (rival personalities
+# in WORLD): the racer's desired-speed step 0x44c550 calls the catch-up 0x44bd10 (eax = AIVehicle) right before it reads the speed inputs. The call
+# now goes to the cave, jmp [SCREEN_ADDR+0xb0] = host/rivals.c persona_step: the original call first, then per personality (WORLD only, ?ai=0 off).
+PATCHES.append(dict(addr=0x44c573, old="e898f7ffff", new="e8" + _rel(0x44c573, 0x43b556), when=lambda: True))
+PATCHES.append(dict(addr=0x43b556, old="cc" * 6, new="ff25b0300100", entry=True, when=lambda: True))

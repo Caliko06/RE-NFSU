@@ -337,19 +337,31 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
     return r1 > *r0 ? r1 - *r0 : *r0 - r1;
 }
 
-// Personalities (RN_RIVALAI=0: as shipped; docs/openworld/re_rival_personality.md). The game picks each opponent's skill level by
-// difficulty (0x4b4590: easy 0..2, medium 3..5, hard 6..8), so each band gets a clumsy and an aggressive level and its strength stays.
-// Level 0 stays as shipped: an AI without a level reads record 0. The career keeps every shipped value.
-// Clumsy: accepts 35 % of Pass/Avoid targets (+0x0c, 0x4627ac), reads the route speed 6 % lower (+0x14, 0x44c72b) and twice as far off
-// its spot (+0x50, 0x44c667). Aggressive: route speed 4 % higher, and Block ceiling 400 (style 2, 0x44dbd0): it beats Avoid and Pass.
-enum { NORMAL, CLUMSY, AGGRESSIVE };
-static const uint8_t PERSONA[10] = {NORMAL, AGGRESSIVE, CLUMSY, AGGRESSIVE, NORMAL, CLUMSY, AGGRESSIVE, NORMAL, CLUMSY, AGGRESSIVE};
-static int rivalai(void) { const char *e = getenv("RN_RIVALAI"); return !(e && e[0] == '0'); }
-static int rival_style(uint32_t skill, uint32_t style) { return rivalai() && skill <= 9 && PERSONA[skill] == AGGRESSIVE ? 2 : (int)style; }
+// Personalities, WORLD only (RN_WORLD=1 free mode; ?ai=0 / RN_AI=0 off; RN_AI=2 forces them in any non-career race, for tests).
+// docs/openworld/re_rival_personality.md, docs/re/race_ai.md. Free mode gives each rival its own skill level (host/free.c RN_FREESKILL
+// 2,5,9,4,7,3,...), so a per-level style is a per-rival style: 2,4,1 nervous, 5,3,6 clean, 9,7,8 aggressive; level 0 as shipped.
+// Records 0x779ff8 + 0x54 * level (rival_tables), and per step persona_step below.
+// Nervous: accepts 35 % of Pass/Avoid targets (+0x0c, 0x4627ac), route speed 6 % lower (+0x14, 0x44c72b), its speed lookup wanders twice
+//   as far (+0x50, 0x44c667), reads it 2 nodes further on (brakes early), nitro cooldown x0.7 (+0x34/+0x38, 0x462ca8) and lifts 12 % while
+//   its nitro burns (panic).
+// Clean: shipped records; in Draft (type 4) it holds the lead car's speed and stays in the tow (car+0x47c) instead of the shipped
+//   "lead - (20 - gap)" back-off (0x450480), so the Pass finder slings it out after.
+// Aggressive: route speed 4 % higher, Block ceiling 400 (style 2, 0x44dbd0: it beats Avoid and Pass), nitro cooldown x0.5, reads the
+//   route speed 2 nodes earlier (brakes late), and IJustGotHit (type 0xc, 0x4522a0, a back-off to culprit - 6 m/s) becomes revenge:
+//   culprit + 4 m/s.
+enum { NORMAL, NERVOUS, TIDY, AGGRESSIVE };   // TIDY = clean (CLEAN is an archetype above)
+static const uint8_t PERSONA[10] = {NORMAL, NERVOUS, NERVOUS, TIDY, NERVOUS, TIDY, TIDY, AGGRESSIVE, AGGRESSIVE, AGGRESSIVE};
+static const char *PNAME[4] = {"normal", "nervous", "clean", "aggressive"};
+static int free_race;                  // this race is free mode (rival_ride's rn_free_now)
+static int persona_on;                 // this race's rivals have personalities (set at its first opponent)
+static int rivalai(void) {             // 0 off, 1 WORLD only, 2 forced
+    const char *e = getenv("RN_AI");
+    return e && e[0] == '0' ? 0 : e && e[0] == '2' ? 2 : 1;
+}
+static int rival_style(uint32_t skill, uint32_t style) { return persona_on && skill <= 9 && PERSONA[skill] == AGGRESSIVE ? 2 : (int)style; }
 
 // Every traffic model (RN_TRAFMODELS=1 / ?trafmodels=1: on, off until measured on the Mac). The cave 0x63b270 weighs a usage 2 row 1.0 if any district weight +0xc60..+0xc70 is set: AMBULANCE, FIRETRUCK and BUS
 // have none, so they never come out of 0x57d000. A weight here brings them in, once, before AddTrafficCars 0x4b3ac0 (it runs after 0x4b4040, this hook's caller).
-static int free_race;                  // this race is free mode (rival_ride's rn_free_now)
 static void traffic_types(Ctx *c) {
     static const uint8_t ROWS[3] = {22, 26, 30};
     const char *e = getenv("RN_TRAFMODELS");
@@ -379,24 +391,29 @@ static void rival_tables(Ctx *c, int personas) {
     if (!saved++) memcpy(shipped, G(0x779ff8), sizeof shipped);
     memcpy(G(0x779ff8), shipped, sizeof shipped);
     if (!personas) return;
-    char b[256];
+    char b[512];
     int n = 0;
     for (int lv = 1; lv <= 9; lv++) {
         uint32_t r = 0x779ff8 + 0x54 * lv;
-        float accept = ldf(c, r + 0x0c), speed = ldf(c, r + 0x14);
-        if (PERSONA[lv] == CLUMSY) accept = 0.35f, speed *= 0.94f, c->mem[r + 0x50] *= 2;
-        if (PERSONA[lv] == AGGRESSIVE) speed *= 1.04f;
-        memcpy(G(r + 0x0c), &accept, 4), memcpy(G(r + 0x14), &speed, 4);
-        n += snprintf(b + n, sizeof b - n, " L%d %.2f %.3f %u", lv, ldf(c, r + 0x0c), ldf(c, r + 0x14), c->mem[r + 0x50]);
+        float accept = ldf(c, r + 0x0c), speed = ldf(c, r + 0x14), nitro = 1;
+        if (PERSONA[lv] == NERVOUS) accept = 0.35f, speed *= 0.94f, c->mem[r + 0x50] = c->mem[r + 0x50] > 63 ? 127 : c->mem[r + 0x50] * 2, nitro = 0.7f;
+        if (PERSONA[lv] == AGGRESSIVE) speed *= 1.04f, nitro = 0.5f;
+        stf(c, r + 0x0c, accept), stf(c, r + 0x14, speed), stf(c, r + 0x34, ldf(c, r + 0x34) * nitro), stf(c, r + 0x38, ldf(c, r + 0x38) * nitro);
+        n += snprintf(b + n, sizeof b - n, " L%d %c %.2f %.3f %u %.0fs", lv, PNAME[PERSONA[lv]][0], ldf(c, r + 0x0c), ldf(c, r + 0x14), c->mem[r + 0x50], ldf(c, r + 0x34));
     }
-    if (getenv("RN_RIVALLOG") || getenv("RN_FREELOG")) rn_log("rivalai accept speed look:%s", b);
+    if (getenv("RN_RIVALLOG") || getenv("RN_FREELOG")) rn_log("rivalai accept speed look nitro:%s", b);
 }
 
 // 0x5809c0(id, 2, ride, record, skill, style, index) with esi = the ride slot: stdcall, 7 arguments.
 static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
-    if (a[6] <= 1) free_race = rn_free_now != 0, rn_player_car(c), rival_tables(c, rivalai() && (rn_free_now || !c->mem[0x78a33c])), traffic_types(c), traffic_spacing(c);
+    if (a[6] <= 1) {
+        const char *w = getenv("RN_WORLD");
+        free_race = rn_free_now != 0;
+        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && free_race && w && w[0] == '1'));
+        rn_player_car(c), rival_tables(c, persona_on), traffic_types(c), traffic_spacing(c);
+    }
     if (rn_free_now) {                                           // host/free.c: free mode's career rivals
         uint32_t e = free_rival(c, a);                           // 0x5809c0 returns the entrant; free_rival picks the level at +0x735
         c->mem[e + 0x736] = (uint8_t)rival_style(c->mem[e + 0x735], c->mem[e + 0x736]);
@@ -844,5 +861,62 @@ static uint32_t car_draw(Ctx *c) {
     return r;
 }
 
-const Api rivals_apis[] = {{"rn", "rival_ride", 7, rival_ride}, {"rn", "car_draw", 12, car_draw}, {"rn", "traffic_behind", 0, traffic_behind}};
-const int rivals_api_count = 3;
+// PATCH 0x44c573 (cave 0x43b556: jmp [SCREEN_ADDR+0xb0]): the racer's desired-speed step 0x44c550 (ebx = the AIVehicle v, once per racer and
+// step) calls the catch-up 0x44bd10 (eax = v) right before it reads the speed: the route node's byte at index node + [v+0x404] (offset drawn
+// every 5 s, stamp [v+0x400]) x record+0x14 x [v+0x4b8] when the action's +0x1f0 is set, else the action's own target [act+0x1e4] (m/s).
+// Here the original call runs first, then each personality adjusts those inputs (see Personalities above). v+0x2c = ctx: [ctx] = car,
+// [car+0x14] = entrant (+4 kind 2 = rival, +0x735 level), neighbour rows ctx + 8 + i * 0x38 (+4 speed of the other minus own, +0xc half
+// length, +0x10 route position, +0x34 body node), own row index (int8) ctx+0x388. Nitro burns while [car+0x3fc] (start tick of the
+// clock [0x73ad34]) is set and younger than [car+0x3f8] ticks (0x465430 on car+0x40). Returns 0x44bd10's eax.
+static uint32_t persona_step(Ctx *c) {
+    static struct { uint32_t v, stamp, shot, said; } s[16];
+    uint32_t v = c->r[EAX], r = call_guest(c, 0x44bd10, 0, NULL);
+    if (!persona_on || !v) return r;
+    uint32_t ctx = v + 0x2c, car = ld(c, ctx, 4), ent = car ? ld(c, car + 0x14, 4) : 0, act = ld(c, v + 0x3f8, 4);
+    if (!ent || ld(c, ent + 4, 4) != 2 || !act) return r;
+    int lv = (int8_t)c->mem[ent + 0x735], p = lv >= 0 && lv <= 9 ? PERSONA[lv] : NORMAL;
+    if (p == NORMAL) return r;
+    int k = 0;
+    while (k < 15 && s[k].v && s[k].v != v) k++;
+    if (s[k].v != v) s[k].v = v, s[k].stamp = s[k].shot = s[k].said = 0;
+    uint32_t type = ld(c, act + 0x1f8, 4), now = ld(c, 0x73ad34, 4), route = c->mem[act + 0x1f0];
+    int own = (int8_t)c->mem[ctx + 0x388], n = (int)ld(c, ctx + 4, 4);
+    float vx = ldf(c, car + 0x70), vy = ldf(c, car + 0x74), sp = sqrtf(vx * vx + vy * vy);
+    const char *ev = NULL;
+    float tgt = 0;
+    if (ld(c, v + 0x400, 4) != s[k].stamp) {                      // a new speed lookup offset: brake early or late
+        s[k].stamp = ld(c, v + 0x400, 4);
+        if (p != TIDY) st(c, v + 0x404, ld(c, v + 0x404, 4) + (p == NERVOUS ? 2 : -2), 4);
+    }
+    if (p == AGGRESSIVE && type == 0xc && !route && own >= 0 && n <= 16) {   // IJustGotHit: revenge on the culprit [act+0x1fc]
+        uint32_t who = ld(c, act + 0x1fc, 4);
+        for (int i = 0; i < n && who; i++) {
+            uint32_t row = ctx + 8 + i * 0x38;
+            if (i == own || ld(c, row + 0x34, 4) != who) continue;
+            tgt = sp + ldf(c, row + 4) + 4;
+            if (tgt > ldf(c, act + 0x1e4)) stf(c, act + 0x1e4, tgt), ev = "revenge";
+            break;
+        }
+    }
+    if (p == TIDY && type == 4 && !route && own > 0 && n <= 16) {      // Draft near a car: hold the lead's speed, stay in the tow
+        uint32_t orow = ctx + 8 + own * 0x38, row = orow - 0x38;
+        float gap = ldf(c, row + 0x10) - ldf(c, row + 0xc) - ldf(c, orow + 0x10) - ldf(c, orow + 0xc);
+        tgt = sp + ldf(c, row + 4) + (gap > 3 ? 1.0f : 0.0f);
+        if (gap > 0 && gap < 12 && tgt > ldf(c, act + 0x1e4)) stf(c, act + 0x1e4, tgt), ev = "draft";
+    }
+    uint32_t t0 = ld(c, car + 0x3fc, 4);
+    if (p == NERVOUS && t0 && t0 != 0x7fffffffu && now - t0 < ld(c, car + 0x3f8, 4)) {   // its nitro burns: it lifts
+        if (route) stf(c, v + 0x4b8, ldf(c, v + 0x4b8) * 0.88f);
+        else stf(c, act + 0x1e4, ldf(c, act + 0x1e4) * 0.88f);
+        if (s[k].shot != t0) s[k].shot = t0, ev = "panic";
+    }
+    if (ev && (getenv("RN_RIVALLOG") || getenv("RN_FREELOG")) && now - s[k].said > 8000) {
+        s[k].said = now;
+        rn_log("persona %s L%d %s: %s speed %.1f target %.1f frame %u", G(ent + 0x73c), lv, PNAME[p], ev, sp, tgt, rn_telem.presents);
+    }
+    return r;
+}
+
+const Api rivals_apis[] = {{"rn", "rival_ride", 7, rival_ride}, {"rn", "car_draw", 12, car_draw}, {"rn", "traffic_behind", 0, traffic_behind},
+                           {"rn", "persona_step", 0, persona_step}};
+const int rivals_api_count = 4;
