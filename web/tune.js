@@ -27,7 +27,7 @@ const STREAK = 0.00625;     // 0x702a44 as shipped
 // the game's FOV table 0x6fbdf4 from the camera's speed, the camera and projection follow). 0 = off, as shipped; Original mode sets 0.
 const SPEEDFOV = 0;   // was 10: the wider view at speed made the acceleration feel stronger than the shipped game (OWNER 2026-10-31)
 // ?chasecam=1|0: the far and close chase cameras look 8 degrees steeper at the same distance (host/d3d9.c chase_frame rewrites the car's camera rows).
-const CHASECAM = 1;
+const CHASECAM = 0;   // OWNER 2026-10-31: the steeper eye hid the car's rear; the shipped rows (1:1)
 // ?nitrocam=1|0: while the nitrous burns the chase camera goes 10% farther and 5% lower (host/d3d9.c chase_frame, same rows).
 const NITROCAM = 0;   // was 1: the pull-back with nitrous, off (OWNER 2026-10-31: camera not farther)
 // ?hfov=<deg>: the horizontal view at 16:9 or wider in races, in degrees (host/d3d9.c hfov_frame, k of the widescreen caves). Absent = the shipped 96.5 (the PS2's
