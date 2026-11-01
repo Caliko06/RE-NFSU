@@ -42,8 +42,10 @@ int rn_free_now;                 // 1 while 0x4b4040 builds free mode's rivals (
 static int on, live, picked[NRIV_MAX], npicked;
 static uint32_t zone_at, zone_was;     // the clear zone free_place changed (free mode, the whole race) and its value
 // The rubber band 0x44bd10 needs a gap from 0x44c010, which is 0 while [0x78a400] (the race options' Catch Up byte +0x1f, set by
-// the mode setups 0x4b4a56..0x4b5f47) is 0: free mode sets it to 1 for the race (RN_FREECU=0: the game's value), so rivals ahead
-// wait and rivals behind are boosted ([veh+0x404]) as in a Quick Race with Catch Up on. Put back at race end (free_tick).
+// the mode setups 0x4b4a56..0x4b5f47) is 0, as shipped in Free Run. RN_FREECU=1 sets it to 1 for the race (rivals ahead wait, rivals
+// behind boosted, as in a Quick Race with Catch Up on); off by default (OWNER 2026-10-31, "the AI is dumb"): the gap is route progress
+// car+0x814, which means nothing when each rival walks its own direction, so rivals sat at racer+0x4b8 0.47-0.57 for minutes, ahead or
+// behind (F10 AIR lines). Respawn (RN_RIVALFAR) keeps them near instead. Put back at race end (free_tick).
 static int cu_was = -1;
 // 0x44c010 reads the gap through the curves 0x779c78/0x779dd8 (8 rows of 11 (x m, y) points, loaded at run time): a
 // leader is slowed only 3 % at 120 m and 30 % at 320 m, so in Free Run rivals settle 250 m ahead. Free mode scales the
@@ -436,7 +438,7 @@ void free_tick(Ctx *c) {
         }
         c->r[EBX] = keep[0], c->r[ESI] = keep[1], c->r[EDI] = keep[2], c->r[EBP] = keep[3];
     }
-    if (cu_was < 0 && (!getenv("RN_FREECU") || atoi(getenv("RN_FREECU")))) {
+    if (cu_was < 0 && getenv("RN_FREECU") && atoi(getenv("RN_FREECU"))) {
         cu_was = (int)ld(c, 0x78a400, 4);
         st(c, 0x78a400, 1, 4);
         free_curves(c, 1);

@@ -8,7 +8,7 @@
 //   AIT  once a second, each traffic car (kind 3) within 80 m: distance (signed as above), lateral offset from the player's line,
 //        speed, action type (3 = Avoid), parked (AI obj +0x4d1).
 //   AIHIT at once, any car of the race list whose speed drops 4 m/s or more in one frame: who, speed before -> after, the nearest
-//        other car and its distance; "wall" when no car is within 6 m.
+//        other car and its distance; "wall" when no car is within 6 m; its position (where the walls are).
 // Offsets: race list [0x7361f8] (next +0, entrant +0x14, kind entrant+4, AI obj +0x2c, position +0x50, velocity +0x70, heading +0x90,
 // speed +0x3d4, wheels +0x3cc), docs/re/race_ai.md, docs/re/traffic_react.md, host/rivals.c TRAFLOG.
 #include <math.h>
@@ -72,8 +72,8 @@ void ai_tel(Ctx *c) {
             uint32_t ne = nr ? ld(c, nr + 0x14, 4) : 0;
             int car = nd < 6.0f;
             if (car) tr[i].car++; else tr[i].wall++;
-            rn_log("AIHIT f%u kind %u car %08x sp %.1f -> %.1f act %d %s (nearest kind %u at %.1f m) d %.0f", f, kind, r, tr[i].sp, sp, at,
-                   car ? "car" : "wall", ne && ne < GUEST_MEM - 8 ? ld(c, ne + 4, 4) : 0, nd, d);
+            rn_log("AIHIT f%u kind %u car %08x sp %.1f -> %.1f act %d %s (nearest kind %u at %.1f m) d %.0f at %.0f,%.0f,%.0f", f, kind, r, tr[i].sp, sp, at,
+                   car ? "car" : "wall", ne && ne < GUEST_MEM - 8 ? ld(c, ne + 4, 4) : 0, nd, d, x, y, ldf(c, r + 0x58));
         }
         tr[i].sp = sp;
         if (!sec) continue;
