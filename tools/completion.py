@@ -4,8 +4,10 @@
 # usage: completion.py launch ROW[.SEED] ...     start rows in the background (nohup), runs/<row>.<seed>/
 #        completion.py queue N ROW[.SEED] ...    the same, at most N at a time through macgate.sh, blocking (run it under nohup)
 #        completion.py collect                   runs/*/log.txt -> census/completion.json (one row per run dir), shots -> WebP
+#        completion.py table                     runs/cjump_*/log.txt -> census/ghost_career.tsv
 import json, os, re, shutil, subprocess, sys, time
 R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BIN = os.environ.get('RN_BIN', f'{R}/build/speed')   # a frozen copy under build/, so a rebuild does not change a batch halfway
 SECS, GAP = 1300, 3000   # 6/8 comes near 840 s with 4 rows on 10 cores; leaving takes ~30 s more
 SEEDS = ['0x1234', '0x5678', '0x9abc']
 
@@ -52,6 +54,13 @@ ROWS = {'explore_career': ','.join(f'{20000 + 4000 * i}:RETURN' for i in range(1
 # career_trace (docs/PLAN.md 6.1): career0's new profile and prologue, won by RN_FINISH (no 6/8: the prologue has no
 # results), RETURNs through MU_UG_NewCareerExtroFMV to MU_UG_ChooseCareerCar; then RN_CAREER (host/input.c) plays the
 # career from the game's own open list with the unlock patches off (RN_UNLOCK=0). Parse: tools/census/career_trace.py.
+# prologue: what a new career shows with no key on a movie: boot movies, 01_DAY, the race won by RN_FINISH, 02_FAN_S, the car, 02_FAN_E,
+# the map, Back (the menu bar's BACK key; ESCAPE does nothing there, Chrome 2026-11-01) to the hub, then the first garage visit = 04_GUM_s.
+ROWS['prologue'] = ','.join(['3000@=LS_Splash_PC:RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + ['1500@=MU_UG_NewOrLoad_PC2:UP'] * 2
+                            + ['1500@=MU_UG_NewOrLoad_PC2:RETURN', '3000@!NONE:Z', '1000@!NONE:Z', '1500@!NONE:RETURN'] + ['4000@!MU_Main_PC:RETURN'] * 4
+                            + ['1500@=MU_Main_PC:UP', '1500@=MU_Main_PC:RETURN', '1500@=MU_UG_Explained:LEFT', '1500@=MU_UG_Explained:RETURN']
+                            + ['3000@6:RETURN'] * 2 + ['1500@=MU_UG_ChooseCareerCar:RETURN'] * 3
+                            + ['1500@=MU_UG_MapScreen:BACK', '1500@=MU_UG_UndergroundMenu:DOWN', '1500@=MU_UG_UndergroundMenu:RETURN'])
 ROWS['career_trace'] = ','.join(ROWS['career0'].split(',')[:ROWS['career0'].split(',').index('3000@6:RETURN')]
                                 + ['3000@6:RETURN'] * 2 + ['3000@3:RETURN'] + ['4000@!MU_UG_ChooseCareerCar:RETURN'] * 3
                                 + ['1500@=MU_UG_ChooseCareerCar:RETURN'] * 3)
@@ -166,11 +175,12 @@ def launch(run):
     if row in OPEN: env.update(RN_OPEN=OPEN[row], RN_SECS='45', RN_KEEP='500')
     if row in CALL: env.update(RN_CALL=CALL[row])
     if row == 'career_trace': env.update(RN_CAREER='1', RN_FINISH='1', RN_UNLOCK='0', RN_SECS='12000')
+    if row == 'prologue': env.update(RN_FINISH='1', RN_SECS='600')
     env.setdefault('RN_WORLD_DIR', f'{R}/build/openworld')   # the WORLD row's merged TRACKB and minimap (host/openworld.c); runs start in runs/<row>/
     if jmp: env.update(RN_JUMP=jmp[1], RN_SECS=str(jmp[2]), **({'RN_NEXT': jmp[3]} if len(jmp) > 3 else {}))
     if os.environ.get('RN_KEEP'): env['RN_KEEP'] = os.environ['RN_KEEP']   # a kept frame every N (look inside a long race)
     with open(f'{d}/log.txt', 'w') as log:
-        return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
+        return subprocess.Popen(['nice', '-n', '5', BIN, f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
 
 def reload(run):
@@ -182,7 +192,7 @@ def reload(run):
     env = dict(os.environ, RN_TURBO='4', RN_SECS='150', RN_SCREEN='640x480', RN_RASTER='1000000', RN_FLOWLOG='1', RN_KEYS=','.join(seq))
     if run.startswith('reload_options'): env.update(RN_KEYS=','.join(_OPTS), RN_OPEN=OPEN['options'], RN_SECS='30', RN_KEEP='500')
     with open(f'{d}/log.txt', 'w') as log:
-        return subprocess.Popen(['nice', '-n', '5', f'{R}/build/speed', f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
+        return subprocess.Popen(['nice', '-n', '5', BIN, f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
 
 def careers(d):   # the "flow career N status H" of a run, in order (host/d3d9.c flow_log: H hashes the event status bytes)
@@ -305,7 +315,13 @@ elif CMD == 'queue':
     n, todo, kids = int(sys.argv[2]), sys.argv[3:], {}
     while todo or kids:
         for k, w in list(kids.items()):
-            if k.poll() is not None: del kids[k]; continue
+            if k.poll() is not None:
+                if os.environ.get('RN_SLIM'):   # a batch over the whole canon on a small disk: only the log stays
+                    d = os.path.dirname(w[0])
+                    shutil.rmtree(f'{d}/game', ignore_errors=True)
+                    for f in os.listdir(d):
+                        if f.endswith('.png'): os.remove(f'{d}/{f}')
+                del kids[k]; continue
             flows = open(w[0], 'rb').read().count(b'flow state')
             if flows != w[1]: kids[k] = [w[0], flows, time.time()]
             elif time.time() - w[2] > STALL:
@@ -318,6 +334,33 @@ elif CMD == 'queue':
             kids[launch(row)] = [f'{R}/runs/{row if "." in row else row + "." + SEEDS[0]}/log.txt', 0, time.time()]
         elif todo and free < 5: print(f'{time.strftime("%T")} {free} GB free: {todo[0]} waits', flush=True)
         time.sleep(10)
+elif CMD == 'table':   # runs/cjump_<n>.0x1234/log.txt (a RN_AILOG=1 batch) -> census/ghost_career.tsv: one row per career event (docs/PLAN.md "Ghost player")
+    cols = 'ev kind mode stages results state rivals me_rank rival_wall me_wall polymax movies stop'.split()
+    out = []
+    for row in json.load(open(f'{R}/census/rows.json'))['rows']:
+        p = f"{R}/runs/cjump_{row['id'].split('.')[1]}.0x1234/log.txt"
+        if row['group'] != 'career' or not os.path.exists(p): continue
+        t = open(p, errors='replace').read()
+        st = [(int(a), int(b)) for a, b in re.findall(r'^flow state (\d+)/(-?\d+) ', t, re.M)]
+        res = sum(b == (6, 8) and a != (6, 8) for a, b in zip(st, st[1:]))
+        seen = [s for s, _ in st]
+        stop = re.search(r'^.*(?:\bSTOP\b|unimplemented|SIGSEGV|panic|Assertion).*$', t, re.M)
+        # A row the queue killed (no flow change for STALL s) or RN_SECS ended has no results and no way back: NO_RESULTS; the log's tail says which.
+        state = 'CRASH' if stop else 'NO_RESULTS' if res < len(row['stages']) else 'OK' if 7 in seen and 3 in seen[seen.index(7):] else 'NO_RETURN'
+        recs = [r.rsplit(':', 5) for b in re.findall(r'^AILOG \d+ draft \d+ (.*)$', t, re.M) for r in b.split()]
+        recs = [r for r in recs if len(r) == 6]
+        me = [r[4] for r in recs if r[1] == '1']
+        out.append(dict(ev=row['id'].split('.')[1], kind=row['kind'], mode=row['type'], stages=len(row['stages']), results=res, state=state,
+                        rivals=len({r[0] for r in recs if r[1] != '1'}), me_rank=me[-1] if me else '', rival_wall=len(re.findall(r'^AIHIT .*kind 2 .* wall', t, re.M)),
+                        me_wall=len(re.findall(r'^AIHIT .*kind 1 .* wall', t, re.M)), polymax=max(map(int, re.findall(r'polymax (\d+)', t)), default=0),
+                        movies='+'.join(sorted({m.upper() for m in re.findall(r'MOVIES\\(\w+)\.mad', t)} - {'E3_TITLE'})), stop=stop[0][:100] if stop else ''))
+    if not out: sys.exit('table: no runs/cjump_* logs, census/ghost_career.tsv left as it is')
+    with open(f'{R}/census/ghost_career.tsv', 'w') as f:
+        f.write('\t'.join(cols) + '\n')
+        for o in out: f.write('\t'.join(str(o[c]) for c in cols) + '\n')
+    for o in out:
+        if o['state'] != 'OK': print(o['ev'], o['mode'], o['state'], o['results'], '/', o['stages'], o['stop'])
+    print(len(out), 'rows', {s: sum(o['state'] == s for o in out) for s in {o['state'] for o in out}}, 'movies', sorted({m for o in out for m in o['movies'].split('+') if m}))
 elif CMD == 'collect':
     runs = [r for r in sorted(os.listdir(f'{R}/runs')) if any(os.path.exists(f'{R}/runs/{r}/{f}') for f in ('log.txt', 'flow.txt'))]
     for r in runs: webp(f'{R}/runs/{r}')

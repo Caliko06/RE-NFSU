@@ -476,8 +476,20 @@ static uint32_t IDirectSoundBuffer_Lock(Ctx *c) {
     if (n > a && !p2) return DSERR_INVALIDPARAM;
     return DS_OK;
 }
+// The song now playing goes to the log (and so to F10): the stream manager's index [[0x7356a8]+0x104]+0x2ac into the song table
+// 0x6f4d08 (26 x {title, artist, album, "IG"|"FE"}), read the way 0x51c7b0 does. Nothing is written to the game.
+static void song_log(Ctx *c) {
+    static int last = -1;
+    uint32_t snd = ld(c, 0x7356a8, 4), m = snd && snd < GUEST_MEM - 0x200 ? ld(c, snd + 0x104, 4) : 0;
+    int s = m && m < GUEST_MEM - 0x400 ? (int)ld(c, m + 0x2ac, 4) : -1;
+    if (s == last || s < 0 || s >= 26) return;
+    last = s;
+    uint32_t r = 0x6f4d08 + 16u * s;
+    rn_log("music song %d %s: %s - %s (frame %u)", s, G(ld(c, r + 12, 4)), G(ld(c, r + 4, 4)), G(ld(c, r, 4)), rn_telem.presents);
+}
 static uint32_t IDirectSoundBuffer_Unlock(Ctx *c) {
     SELF(I_BUF);
+    song_log(c);
     pthread_mutex_lock(&mx); o->since_unlock = 0; o->unlocks++; pthread_mutex_unlock(&mx);
     return DS_OK;
 }
