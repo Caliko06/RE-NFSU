@@ -65,7 +65,8 @@ static void free_curves(Ctx *c, int on) {
 }
 static struct { uint32_t drv, dir; } rdir[16];   // free_dir's table, see free_respawn
 static int n_game, n_free;             // free_spacing: moves with the game's spacing, moves given the track's spacing
-static int n_far, n_offbit, n_onbit;   // free_recycle: far cars sent to a move; free_tnode: cars placed on a node without / with the bit
+#define KEEP_M 200.0f   // free_recycle: a car this close and ahead of the player is never moved
+static int n_far, n_kept, n_offbit, n_onbit;   // free_recycle: far cars sent to a move; free_tnode: cars placed on a node without / with the bit
 static uint32_t xrec[12], nxrec;       // the extra racers' records (rm_records, outside the RaceManager) and how many there are
 static uint32_t tele;            // the TrafficTeleporter, cached by free_recycle (ecx of its call) for free_tmove
 static uint32_t names;           // NRIV_MAX guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
@@ -638,7 +639,7 @@ void free_tick(Ctx *c) {
         for (int ty = 0; ty < 0x16; ty++) if (acts[j][ty]) a += snprintf(al + a, sizeof al - a, " %x:%u", ty, acts[j][ty]);
         rn_log("%s", al);
     }
-    t += snprintf(tl + t, sizeof tl - t, " | spacing %d game, %d free | far %d | placed on node bit %d, off %d", n_game, n_free, n_far, n_onbit, n_offbit);
+    t += snprintf(tl + t, sizeof tl - t, " | spacing %d game, %d free | far %d kept %d | placed on node bit %d, off %d", n_game, n_free, n_far, n_kept, n_onbit, n_offbit);
     // The catch-up's gates (re_rivals_ai.md 4): 0x78a344 (byte), 0x7361a8, 0x78a320 > 0, 0x7360ac, [0x7361f0] != 9, players 0x7361c4,
     // player 0x7361bc, strength [0x78a404 + 4 slot], difficulty 0x78a40c.
     uint32_t pt = ld(c, 0x7361f0, 4);
@@ -838,8 +839,8 @@ static uint32_t grid_fix(Ctx *c) {
 // player drives) but not free roam: a car that drove off into another street is never "passed" and drives on, 1..2.5 km
 // away, for good (WORLD 1010, RN_FREELOG: 17 of 19 cars at 600..2450 m for the whole run, 3 moves in 75 s). PATCH 0x5987f6
 // (cave 0x439a9a: jmp [SCREEN_ADDR+0x8c]): in free mode a car farther than the move's own route limit ([0x6b5a3c], 500 m)
-// in a straight line also needs a move, so the cars stay in the band the teleporter keeps around the player. RN_FREE=0 or
-// a race: the game's answer.
+// in a straight line also needs a move, so the cars stay in the band the teleporter keeps around the player; a car within
+// KEEP_M ahead of the player never moves (it would vanish in sight). RN_FREE=0 or a race: the game's answer.
 static uint32_t free_recycle(Ctx *c) {
     tele = c->r[ECX];
     uint32_t car = ARG(0), r = call_guest(c, 0x5988c0, 1, &car) & 0xff, h = ld(c, 0x7361f8, 4);
@@ -847,7 +848,11 @@ static uint32_t free_recycle(Ctx *c) {
     for (uint32_t p = ld(c, h, 4), k = 0; p && p != h && k < 200; p = ld(c, p, 4), k++) {
         uint32_t e = ld(c, p + 0x14, 4);
         if (!e || ld(c, e + 4, 4) != 1) continue;
-        if (hypot(ldf(c, car + 0x50) - ldf(c, p + 0x50), ldf(c, car + 0x54) - ldf(c, p + 0x54)) > ldf(c, 0x6b5a3c)) r = 1, n_far++;
+        float dx = ldf(c, car + 0x50) - ldf(c, p + 0x50), dy = ldf(c, car + 0x54) - ldf(c, p + 0x54), d = hypotf(dx, dy);
+        if (d > ldf(c, 0x6b5a3c)) { r = 1, n_far++; break; }
+        // In view: within KEEP_M ahead of the player (forward car+0x90..0x94, cone of +-70 deg), a move would make it vanish
+        // on screen (OWNER 2026-10-31). The route rules above are not geometric in the city, so they fire on cars in sight.
+        if (r && d < KEEP_M && dx * ldf(c, p + 0x90) + dy * ldf(c, p + 0x94) > 0.34f * d) r = 0, n_kept++;
         break;
     }
     return r;
@@ -881,7 +886,7 @@ static uint32_t free_hud(Ctx *c) {
 // Free mode (live; a race or RN_FREE=0 is the exact original call): after the original call, walk e from the game's eye node back toward
 // k and keep the first e whose eye (the edge the game would use, 0x42cd24..0x42cf6e) passes that portal test and is 30 m or more from the
 // car; [5cc] is set so the game takes it. None: the clone is freed (0x42c640) and the answer is 0, so the chase camera stays.
-#define JUMP_MIN_M 30.0f
+#define JUMP_MIN_M 40.0f
 static uint32_t jump_scr;   // 3 x 16 bytes of guest memory: the eye's left end, right end and the candidate the portal test reads
 
 // A guest method that returns a float in st(0) (thiscall, one stack argument): read and pop the x87 result.
@@ -918,11 +923,13 @@ static float eye_check(Ctx *c, uint32_t route, int k, int e, uint32_t car, uint3
     }
     int first = dot[0] <= dot[1] ? 0 : 1;
     for (int t = 0; t < 2; t++) {
-        uint32_t end = ends[first ^ t], args[3] = {car + 0x60, eye, (uint32_t)(e - 1)}, eax = c->r[EAX], ecx = c->r[ECX];
+        uint32_t end = ends[first ^ t], args[3] = {car + 0x60, eye, (uint32_t)(e - 1)}, eax = c->r[EAX], ecx = c->r[ECX], ok = 1;
         memcpy(c->mem + eye, c->mem + end, 12);
-        c->r[EAX] = (uint32_t)k, c->r[ECX] = route;
-        uint32_t ok = call_guest_cdecl(c, 0x457300, 3, args) & 0xff;
-        c->r[EAX] = eax, c->r[ECX] = ecx;
+        if (k <= e - 1) {   // no node between the car and the eye: nothing to cross
+            c->r[EAX] = (uint32_t)k, c->r[ECX] = route;
+            ok = call_guest_cdecl(c, 0x457300, 3, args) & 0xff;
+            c->r[EAX] = eax, c->r[ECX] = ecx;
+        }
         if (ok) return hypotf(ldf(c, end) - ldf(c, car + 0x60), ldf(c, end + 4) - ldf(c, car + 0x64));
     }
     return -1;
@@ -931,19 +938,33 @@ static float eye_check(Ctx *c, uint32_t route, int k, int e, uint32_t car, uint3
 static uint32_t free_jumpcam(Ctx *c) {
     uint32_t ret = call_guest(c, 0x42c4b0, 0, NULL), ctrl = c->r[ESI];
     if (!live || !(ret & 0xff)) return ret;
-    if (!jump_scr) jump_scr = guest_alloc(64);
+    if (!jump_scr) jump_scr = guest_alloc(64);   // +48: a node centre
     uint32_t route = ld(c, ctrl + 0x5c4, 4), car = ld(c, ctrl + 4, 4), drv = ld(c, car + 0x2c, 4), zero = 0;
     int k = (int)ld(c, ctrl + 0x5c8, 4), end = (int)ld(c, ctrl + 0x5cc, 4), e0 = end - k >= 5 ? end - 2 : end, e = e0;
     uint32_t ecx = c->r[ECX];
     c->r[ECX] = drv;                                                                     // the lane the game puts the eye on: 0x42cae9, driver vt[+0x1c](0), at least 0
     int lane = (int)call_guest(c, ld(c, ld(c, drv, 4) + 0x1c, 4), 1, &zero);
     c->r[ECX] = ecx;
-    float dist = 0;
-    for (; e > k; e--)
-        if ((dist = eye_check(c, route, k, e, car, lane > 0 ? (uint32_t)lane : 0)) >= JUMP_MIN_M) break;
+    // The portal starts at the first node ahead of the car, f: the route cursor k lags up to ~55 m behind a fast car (updated every
+    // 60 frames, 0x426b63), and a car past node k never crosses its section, so the test failed on both edges at speed
+    // (OWNER 19:00 log: 8 of 9 refused). The eye is searched upward from f + 1 (docs/re/camera_crash.md).
+    int n = (int)ld(c, route + 4, 4), f = k;
+    for (; f < n; f++) {
+        uint32_t nd = ld(c, route + 8 + 4 * f, 4), ctr = jump_scr + 48;
+        node_point(c, nd, 0.5f * (ldf(c, nd + 0x20) + ldf(c, nd + 0x3c)), 0, ctr);
+        float dp = 0;
+        for (int a = 0; a < 3; a++) dp += (ldf(c, ctr + 4 * a) - ldf(c, car + 0x60 + 4 * a)) * ldf(c, car + 0x70 + 4 * a);
+        if (dp > 0) break;
+    }
+    float dist = 0, best = 0;
+    for (e = f + 1; e < n; e++) {
+        if ((dist = eye_check(c, route, f, e, car, lane > 0 ? (uint32_t)lane : 0)) >= JUMP_MIN_M) break;
+        if (dist > best) best = dist;
+    }
+    if (e >= n) e = k, dist = best;   // none
     if (e > k && e != e0) st(c, ctrl + 0x5cc, e - k <= 4 ? (uint32_t)e : (uint32_t)e + 2, 4);   // [5cc] - k < 5 gives e; otherwise [5cc] = e + 2 gives e (0x42ca9b)
-    rn_log("JCPICK f%u k %d end %d eye %d of orig %d dist %.0f m %s", rn_telem.presents, k, (int)ld(c, ctrl + 0x5cc, 4), e > k ? e : -1, e0,
-           e > k ? dist : 0.0f, e > k ? "clear" : "refused");
+    rn_log("JCPICK f%u k %d f %d n %d end %d eye %d of orig %d dist %.0f m %s 4ac %u", rn_telem.presents, k, f, n, (int)ld(c, ctrl + 0x5cc, 4),
+           e > k ? e : -1, e0, dist, e > k ? "clear" : "refused", ld(c, ctrl + 0x4ac, 1));
     if (e > k) return ret;
     call_guest(c, 0x42c640, 0, NULL);                                                    // frees the clone, [5c4] = 0, [5c8] = [5cc] = -1 (reads esi only)
     return 0;

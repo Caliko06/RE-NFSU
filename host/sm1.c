@@ -414,7 +414,8 @@ static const char *const car_ps_sharp =
 // the reflection 5-10x on most of the body (Schlick at N.V 0.5 is 3 %), which is the flat look. Here car.efx's own
 // curve (EnvmapMin/Max on (N.V)^c23, the line above's a) on the cube read linear (c * c: the grey mid-tones that made the
 // 2003 veil fall to a quarter) with its bright texels lifted up to 5x, so the lamps and the sky draw the body's lines
-// (car_ps_tail_soft keeps them from clipping). A key light from the SH linear terms c7..c9 was tried: no visible change.
+// (car_ps_tail_soft keeps them from clipping). OWNER 2026-10-31 (reflections a bit less bright): 0.85 x, lift up to 3.5x (was 5x).
+// A key light from the SH linear terms c7..c9 was tried: no visible change.
 static const char *const car_ps_live =
     "  let Rc = normalize(cc);\n"
     "  let ax = select(vec3f(0.0, 1.0, 0.0), vec3f(1.0, 0.0, 0.0), abs(Rc.y) > 0.9);\n"
@@ -425,7 +426,7 @@ static const char *const car_ps_live =
     "  let cs = 0.4 * textureSample(y0, s0, Rc) + 0.15 * (textureSample(y0, s0, Rc + rad * ta) + textureSample(y0, s0, Rc - rad * ta)"
     " + textureSample(y0, s0, Rc + rad * tb) + textureSample(y0, s0, Rc - rad * tb));\n"
     "  let lum = dot(cs.xyz, vec3f(0.3, 0.59, 0.11));\n"
-    "  let hdr = vec4f(cs.xyz * cs.xyz * (1.0 + 4.0 * lum * lum * lum), cs.w);\n"
+    "  let hdr = vec4f(0.85 * cs.xyz * cs.xyz * (1.0 + 2.5 * lum * lum * lum), cs.w);\n"
     "  t0 = select(textureSample(x0, s0, tc(vec4f(cc, 1.0), u.tt[0][0])), hdr, (u.tt[0][0] & 65536u) != 0u);\n"
     "  let a = clamp(d1c.w * u.pc[1].xyz + u.pc[0].xyz, vec3f(-8.0), vec3f(8.0));\n";
 // BRIDGE: car detail, OWNER 2026-10-27 ("detail: AO, grime, wear, not gloss"; ?cardetail=0 / RN_CARDETAIL=0 = car.efx as is).

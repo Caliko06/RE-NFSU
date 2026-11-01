@@ -879,7 +879,8 @@ static void fov_frame(Ctx *c) {
 // farther and CHASE_LOW lower, relative to the row of that car (per-car data stays per car). Rows go back to the file values when
 // the switch is off or the player's car changes. The mover smooths the target itself, so the change glides.
 #define CHASE_BACK 0.12f   // distance x (1 + this * t)
-#define CHASE_LOW  0.10f   // height   x (1 - this * t)
+#define CHASE_LOW  0.0f    // height   x (1 - this * t); was 0.10, OWNER 2026-10-31: lower at speed felt like chasing the car
+#define CHASE_UP   1.35f   // height x this on rows 0 and 1 (far, close chase) while on: 1.70 m -> 2.30 m, OWNER 2026-10-31 (camera higher)
 // Nitro camera (?nitrocam=, word 8 of tune[]): while the player's nitrous burns (car+0x3bc, the start stamp 0x4654f0 writes and 0x465530
 // clears when 0x465430 sees the shot end; 0 or 0x7fffffff = off) the same rows go NITRO_BACK farther and NITRO_LOW lower, ~0.5 s low pass.
 #define NITRO_BACK 0.10f
@@ -940,7 +941,7 @@ static void chase_frame(Ctx *c) {
     if (!burn && nsm < 0.001f) nsm = 0;
     float kb = 1 + CHASE_BACK * sm + NITRO_BACK * nsm, kl = 1 - CHASE_LOW * sm - NITRO_LOW * nsm;
     for (int s = 0; s < 2; s++) for (int k = 0; k < 3; k++) if (rows[s][k]) {
-        stf(c, rows[s][k] + 4, orig[s][k][0] * kb); stf(c, rows[s][k] + 8, orig[s][k][1] * kl);
+        stf(c, rows[s][k] + 4, orig[s][k][0] * kb); stf(c, rows[s][k] + 8, orig[s][k][1] * kl * (on && k < 2 ? CHASE_UP : 1));
     }
     if (!on && !non && sm == 0 && nsm == 0) info = 0;
 }

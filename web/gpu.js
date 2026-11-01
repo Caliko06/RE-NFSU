@@ -101,6 +101,8 @@ async function startGpu(M, canvas, report, onFrame) {
       const r = await fetch(u);
       if (r.ok) for (const l of (await r.text()).split('\n')) { const f = l.split('\t'); if (f[1]) pack.set(f[0], f[1]); }
     } catch {}
+    // keep_original.tsv: dirt and grass ground stays the game's own texture (the deblock + upscale made it too smooth, OWNER 2026-10-31).
+    try { const r = await fetch('remaster/keep_original.tsv'); if (r.ok) for (const l of (await r.text()).split('\n')) if (l[0] !== '#') pack.delete(l.split('\t')[0]); } catch {}
     if (pack.size) report(`gpu.js: remaster pack ${pack.size} textures`);
   }
   const HD_MAX = Number(RN_Q.get('hdmax') || 1024);
