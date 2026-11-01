@@ -110,8 +110,8 @@ function line(s, cls) {
       if (RN_Q.get('trafyield') === '0') m.ENV.RN_TRAFYIELD = '0';
       // RN_JCLOG: one log line a second plus one per airborne sample (host/d3d9.c jumpcam_log): why a jump did or did not get the jump camera, in build/web.log
       m.ENV.RN_JCLOG = '1';
-      // ?handling=0: the shipped rear grip assist (host/rivals.c)
-      if (RN_Q.get('handling') === '0') m.ENV.RN_HANDLING = '0';
+      // Shipped rear grip assist by default (OWNER 2026-10-31: the feel must be the original's); ?handling=1: the 0.18 cap (host/rivals.c)
+      if (RN_Q.get('handling') !== '1') m.ENV.RN_HANDLING = '0';
       // Traffic, off until measured on the Mac (host/rivals.c): ?trafmodels=1 bus, ambulance, fire truck too; ?trafrefill=1 traffic_refill in place of free_tmove;
       // ?traffic=<n> free mode's traffic count, x1.5 = cars, 23 at most with 6 rivals (0x4322a0)
       if (RN_Q.get('trafmodels') === '1') m.ENV.RN_TRAFMODELS = '1';
