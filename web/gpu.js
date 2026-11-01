@@ -62,8 +62,20 @@ async function startGpu(M, canvas, report, onFrame) {
       usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST }) };
   };
   const recycle = q => { if (`${q.w}x${q.h}` === qSize) freeQ.push(q); else q.tex.destroy(); };
-  function showQueued() {
+  // ?pace=vsync (OFF by default; th0mk/nfsu2-web framerate.c): each animation frame writes the refresh time (ms,
+  // timeOrigin based like the worker's emscripten_get_now) and the measured refresh period into host/d3d9.c pace_box,
+  // whose address comes with each Present. In a race the game thread then sleeps after Present to the next display slot.
+  const PACE = RN_Q.get('pace') === 'vsync';
+  let paceBox = 0, paceT = 0, paceP = 0;
+  function showQueued(ts) {
     requestAnimationFrame(showQueued);
+    if (PACE && paceBox) {
+      const d = ts - paceT;
+      if (paceT && d > 4 && d < 50) paceP = !paceP || d < paceP * 0.75 ? d : d < paceP * 1.5 ? paceP + (d - paceP) * 0.05 : paceP;
+      paceT = ts;
+      M.HEAPF64[paceBox >> 3] = performance.timeOrigin + ts;
+      M.HEAPF64[(paceBox >> 3) + 1] = paceP;
+    }
     const q = shownQ.shift();
     if (!q) return;
     const tex = ctx.getCurrentTexture();
@@ -621,7 +633,49 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
   // Index size of a draw: resident index buffers keep the game's 16 or 32 bits; payload indices are 32 bits.
   const ifmt = (w, hdr) => w[hdr + D_RIB] && w[hdr + D_RIFMT] === 2 ? 'uint16' : 'uint32';
   const gbufs = new Map();   // resident vertex / index buffers (GPU_BUFFER): id -> GPUBuffer
-  function pipeline(w, hdr, stride, sc) {
+  // ?warm=1 (OFF by default; th0mk/nfsu2-web encoder.ts loadWarm/warmUp): each new pipeline is remembered in localStorage
+  // by its shader texts' hashes, its declaration and the draw state it reads; the next session builds them with
+  // createRenderPipelineAsync as soon as those shaders and that declaration exist, so a first draw finds its pipeline made
+  // (shader ids change between sessions, the texts do not). Same pipelines, same pixels. A draw that comes first still
+  // creates it at once. Kept: the last WARM_MAX.
+  const WARM = RN_Q.get('warm') === '1', WARM_KEY = 'rn-warm-pipes', WARM_MAX = 4000;
+  const WARM_F = [D_TOPO, D_NIDX, D_DS, D_ZEN, D_ZWRITE, D_ZFUNC, D_CULL, D_BLEND, D_SRCB, D_DSTB, D_BOP, D_SEPA, D_SRCBA,
+    D_DSTBA, D_BOPA, D_CWRITE, D_RIB, D_RIFMT];
+  const hash53 = s => { let a = 0xdeadbeef, b = 0x41c6ce57;
+    for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); a = Math.imul(a ^ c, 2654435761); b = Math.imul(b ^ c, 1597334677); }
+    a = Math.imul(a ^ a >>> 16, 2246822507) ^ Math.imul(b ^ b >>> 13, 3266489909);
+    b = Math.imul(b ^ b >>> 16, 2246822507) ^ Math.imul(a ^ a >>> 13, 3266489909);
+    return (b >>> 0).toString(36) + '.' + (a >>> 0).toString(36); };
+  const warmShader = new Map(), warmDecl = new Map();   // this session: text hash -> shader id, declaration words -> id
+  let warmList = [];
+  try { if (WARM) warmList = JSON.parse(localStorage.getItem(WARM_KEY) || '[]'); } catch {}
+  const warmSeen = new Set(warmList.map(r => r.k));
+  let warmTodo = warmList.slice(), warmSave = 0, warmMade = 0;
+  function warmTry() {     // after a shader or declaration arrives: build every remembered pipeline it completes
+    if (!warmTodo.length) return;
+    warmTodo = warmTodo.filter(r => {
+      const vs = warmShader.get(r.vs), ps = warmShader.get(r.ps), dc = warmDecl.get(r.decl);
+      if (vs === undefined || ps === undefined || dc === undefined) return true;
+      if (shaders.get(vs)?.h !== r.vs || shaders.get(ps)?.h !== r.ps || decls.get(dc)?.sig !== r.decl) return true;
+      const h = new Uint32Array(D_HDR);
+      WARM_F.forEach((f, i) => { h[f] = r.st[i]; });
+      h[D_VS] = vs; h[D_PS] = ps; h[D_DECL] = dc;
+      try { pipeline(h, 0, r.stride, r.sc, true); warmMade++; } catch {}
+      return false;
+    });
+  }
+  function warmRemember(w, hdr, stride, sc, key) {
+    const vs = shaders.get(w[hdr + D_VS]), ps = shaders.get(w[hdr + D_PS]), dc = decls.get(w[hdr + D_DECL]);
+    const k = hash53(`${vs.h} ${ps.h} ${dc.sig} ${key.slice(key.indexOf(',', key.indexOf(',', key.indexOf(',') + 1) + 1))}`);
+    if (warmSeen.has(k)) return;
+    warmSeen.add(k);
+    warmList.push({ k, vs: vs.h, ps: ps.h, decl: dc.sig, stride, sc, st: WARM_F.map(f => w[hdr + f]) });
+    if (!warmSave) warmSave = setTimeout(() => {
+      warmSave = 0;
+      try { localStorage.setItem(WARM_KEY, JSON.stringify(warmList.slice(-WARM_MAX))); } catch {}
+    }, 5000);
+  }
+  function pipeline(w, hdr, stride, sc, warm) {
     const vs = shaders.get(w[hdr + D_VS]), ps = shaders.get(w[hdr + D_PS]), decl = decls.get(w[hdr + D_DECL]);
     if (!vs || !ps || !decl) fail('draw with an unknown shader or declaration');
     const g = i => w[hdr + i];
@@ -629,6 +683,7 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
     const key = [g(D_VS), g(D_PS), g(D_DECL), stride, g(D_TOPO), ds, g(D_ZEN), g(D_ZWRITE), g(D_ZFUNC), g(D_CULL), g(D_BLEND),
       g(D_SRCB), g(D_DSTB), g(D_BOP), g(D_SEPA), g(D_SRCBA), g(D_DSTBA), g(D_BOPA), g(D_CWRITE), sc, ifmt(w, hdr)].join(',');
     if (pipes.has(key)) return pipes.get(key);
+    if (WARM && !warm) warmRemember(w, hdr, stride, sc, key);
     const attributes = [];
     for (let k = 0; k < 16; k++) {
       const inp = vs.inputs[k];
@@ -642,7 +697,7 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
     const topo = g(D_TOPO) === 4 ? 'triangle-list' : g(D_TOPO) === 5 ? 'triangle-strip' : fail(`topology ${g(D_TOPO)}`);
     const cull = g(D_CULL) === 3 ? 'back' : g(D_CULL) === 2 ? 'front' : 'none';
     const st = { compare: 'always' };
-    const p = device.createRenderPipeline({ layout: drawLayout(ps.texMask),
+    const desc = { layout: drawLayout(ps.texMask),
       vertex: { module: vs.module, entryPoint: 'main', buffers: [{ arrayStride: stride, attributes }] },
       fragment: { module: ps.module, entryPoint: 'main',
         targets: [{ format: 'rgba8unorm', blend: blendState(w.subarray(hdr)), writeMask: g(D_CWRITE) & 15 }] },
@@ -651,7 +706,12 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       primitive: { topology: topo, frontFace: 'cw', cullMode: cull,
         stripIndexFormat: topo === 'triangle-strip' && g(D_NIDX) ? ifmt(w, hdr) : undefined },
       depthStencil: ds ? { format: 'depth24plus-stencil8', depthWriteEnabled: !!(g(D_ZEN) && g(D_ZWRITE)),
-        depthCompare: g(D_ZEN) ? CMP[g(D_ZFUNC)] : 'always', stencilFront: st, stencilBack: st } : undefined });
+        depthCompare: g(D_ZEN) ? CMP[g(D_ZFUNC)] : 'always', stencilFront: st, stencilBack: st } : undefined };
+    if (warm) {
+      device.createRenderPipelineAsync(desc).then(p => { if (!pipes.has(key)) pipes.set(key, p); }, () => {});
+      return null;
+    }
+    const p = device.createRenderPipeline(desc);
     pipes.set(key, p);
     newPipes++;
     return p;
@@ -992,8 +1052,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         module.getCompilationInfo().then(info => {
           for (const m of info.messages) if (m.type === 'error') report(`gpu.js: shader ${id}: ${m.message} (line ${m.lineNum})`);
         });
-        shaders.set(id, { kind, module, inputs: Array.from(w.subarray(a + 4, a + 20)), texMask: w[a + 20] });
+        const sh = { kind, module, inputs: Array.from(w.subarray(a + 4, a + 20)), texMask: w[a + 20] };
+        shaders.set(id, sh);
         stats.shaders++;
+        if (WARM) { sh.h = hash53(text); warmShader.set(sh.h, id); warmTry(); }
       } else if (op === GPU_DECL) {
         const els = [];
         for (let k = 0; k < w[a + 1]; k++) {
@@ -1001,6 +1063,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           els.push({ stream: x & 0xffff, offset: x >>> 16, type: y & 255, usage: (y >>> 16) & 255, index: y >>> 24 });
         }
         decls.set(w[a], els);
+        if (WARM) { els.sig = Array.from(w.subarray(a + 1, a + 2 + 2 * w[a + 1])).join(','); warmDecl.set(els.sig, w[a]); warmTry(); }
       } else if (op === GPU_TEXTURE) {
         doom(res.get(w[a])?.tex);
         const tex = device.createTexture({ size: [w[a + 1], w[a + 2]], mipLevelCount: w[a + 3], format: 'rgba8unorm',
@@ -1137,6 +1200,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         skin(w, a);
       } else if (op === GPU_PRESENT) {
         endPass();
+        if (n > 3) paceBox = w[a + 3];
         const t = res.get(w[a]), size = `${w[a + 1]}x${w[a + 2]}`;
         // The game's cursor moves in back-buffer pixels (web/input.js), whatever the canvas size.
         canvas.gameW = w[a + 1]; canvas.gameH = w[a + 2];
@@ -1236,7 +1300,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         if (s.present && steerLog) { const p = presents; device.queue.onSubmittedWorkDone().then(() =>
           report(`page present ${p} start ${t.toFixed(1)} done ${performance.now().toFixed(1)}`)); }
         if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +
-          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + gpuReport());
+          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + (WARM ? `, warm ${warmMade}/${warmList.length}` : '') + gpuReport());
         if (frames % 300 === 0) hdMs = 0;
         Atomics.store(h, box + 1, k);
         Atomics.notify(M.HEAP32, box + 1);

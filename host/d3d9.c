@@ -772,6 +772,44 @@ static uint32_t IDirect3DDevice9_Clear(Ctx *c) {
     return D3D_OK;
 }
 
+// ?pace=vsync (web/gpu.js, OFF by default; th0mk/nfsu2-web framerate.c grid()/pace()): in a race the game makes one frame
+// per display slot instead of spinning on QPC. The page writes pace_box at each animation frame: [0] the refresh time (ms,
+// timeOrigin based = emscripten_get_now), [1] the measured refresh period (ms; 0 = pacing off). Present plans the end of
+// this frame's slot: k refreshes per frame (1 at 60 Hz, 2 at 120 Hz; no pacing when k refreshes are not ~1/60 s, e.g.
+// 144 Hz), boundaries half a refresh after a vsync, a frame longer than its slot takes the next boundary (nfsu2 "missed").
+// hand_off then sleeps to it without the GIL. The limiter 0x585b40 skips its race wait (bit 6 of the PATCH 0x585b94 load
+// mask [0x707fc8]); its QPC dt stays the real elapsed time, so physics steps the same 1/60 s. Menus and loads unchanged.
+static double pace_box[2], pace_next, pace_due;
+#ifdef __EMSCRIPTEN__
+#include <math.h>
+#include <emscripten.h>
+#include <emscripten/threading.h>
+static void pace_plan(Ctx *c) {
+    pace_due = 0;
+    double per = pace_box[1];
+    if (per < 4 || per > 50) return;
+    int k = (int)(1000.0 / 60 / per + 0.5);
+    if (k < 1) k = 1;
+    int on = fabs(k * per - 1000.0 / 60) <= 1.5;            // else the limiter keeps its race wait
+    uint32_t m = ld(c, 0x707fc8, 4), rs = ld(c, 0x7361f0, 4);
+    if (!!(m & 0x40) != on) st(c, 0x707fc8, on ? m | 0x40 : m & ~0x40u, 4);
+    if (!on || ld(c, 0x77a920, 4) != 6 || !rs || ld(c, rs, 4) == 1) { pace_next = 0; return; }
+    double now = emscripten_get_now(), b = pace_box[0] + per / 2;
+    double next = pace_next ? pace_next + k * per : now;
+    if (next < now) next = now;                             // missed its slot: the next boundary
+    pace_next = pace_due = b + ceil((next - b) / per - 0.25) * per;   // onto the refresh grid
+}
+static void pace_sleep(void) {
+    static uint32_t z;
+    double ms;
+    while (pace_due && (ms = pace_due - emscripten_get_now()) > 0.05) emscripten_futex_wait(&z, 0, ms);
+    pace_due = 0;
+}
+#else
+static void pace_plan(Ctx *c) { (void)c; }
+static void pace_sleep(void) {}
+#endif
+
 // The list goes to the renderer in parts of at most 16 MB: a load can upload hundreds of MB of
 // texels in one frame, more than the web build's heap holds at once. Commands keep their order.
 // The list is handed off under the GIL; the wait for the page is without it.
@@ -780,6 +818,7 @@ static void hand_off(void) {
     uint64_t t0 = now_us();
     gpu_wait();
     rn_telem.gpu_wait_ms += (double)(now_us() - t0) / 1000;   // written before the GIL is back: only this thread presents
+    pace_sleep();
     gil_acquire();
 }
 static void flush_big(void) { if (gpu_pending() > (4u << 20)) hand_off(); }
@@ -1145,8 +1184,8 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     }
     if (dev.in_scene) TR("Present inside BeginScene/EndScene");
     Obj *b = obj_k(dev.backbuf);
-    uint32_t w[3] = {b->gpu, b->w, b->h};
-    gpu_cmd(GPU_PRESENT, 3, w);
+    uint32_t w[4] = {b->gpu, b->w, b->h, (uint32_t)(uintptr_t)pace_box};   // word 3: ?pace=vsync (pace_plan)
+    gpu_cmd(GPU_PRESENT, 4, w);
     if (cen_on < 0) { const char *e = getenv("RN_DRAWS"); cen_on = e != NULL; cen_frame = e ? (uint32_t)atoi(e) : 0; }
     if (cen_on > 0 && dev.frames >= cen_frame && cen_total >= 300) { census_dump(); cen_on = 0; }
     ncen = 0; cen_total = 0;
@@ -1155,6 +1194,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     dev.frames++;
     rn_telem.presents++;
     if (dev.frames == 1) rn_log("d3d9 first Present: %ux%u", b->w, b->h);
+    pace_plan(c);
     hand_off();             // may wait for the display
     return D3D_OK;
 }
