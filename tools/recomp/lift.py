@@ -36,7 +36,8 @@ PROLOGUE = '#include "rt.h"\n'
 # by RN_ONLY=<addr> tools/recomp/difftest.py. The lifted body stays as f_<addr>_lift for inputs outside the fast case.
 # 0x5d6f5d D3DXMatrixMultiply (x87): 5.8 % self of the race game thread (build/bench/spk2, 2026-11-01).
 # 0x5c97cb D3DX effect state apply: 11.4 % of the race game thread, ~0.5 % of it device work (spk2, 2026-11-02).
-NATIVE = {0x5d6f5d, 0x5c97cb}
+# 0x5c85c1 D3DX parameter -> shader constants copy (float type): 2.4 % of the race game thread (spk2, 2026-11-02).
+NATIVE = {0x5d6f5d, 0x5c97cb, 0x5c85c1}
 
 
 class Unsupported(Exception):

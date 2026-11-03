@@ -199,3 +199,69 @@ static inline int nat_5c97cb(Ctx *c) {
     c->cf = 0; c->zf = 1; c->sf = 0; c->of = 0; c->pf = 1; c->af = 0;   // test eax, eax with [ebp-0x1c] = 0
     return 1;
 }
+
+// 0x5c85c1 D3DX effect: copy one parameter's data into shader-constant registers (stdcall (pdesc, psrc, pdst, pleft),
+// ret 0x10; the four are pointers to cursors that it advances). Reached from the parameter-change walk 0x5cf304 via
+// 0x5cafde: 2.4 % of the race game thread (spk2). Native: the float type ([desc] == 3, class 0..3), a transposed copy
+// through fld/fstp (a signaling NaN comes out quiet with IE set). Integer/bool types, structs (class 5, recursive) and
+// the error path run the lifted body. The cursors and data are read and written in the original order, element by
+// element, so overlapping buffers behave the same; a buffer inside this function's own frame is not modelled.
+static inline int nat_5c85c1(Ctx *c) {
+    uint32_t sp = c->r[4], fr = sp - 0x30;                      // frame: ebp = sp-4, locals to ebp-0x20, 3 saves
+    if (c->df || !NAT_OK(fr, 0x44) || (c->ftag & (1u << ((c->ftop - 1) & 7)))) return 0;
+    uint32_t p1 = ld(c, sp + 4, 4), p2 = ld(c, sp + 8, 4), p3 = ld(c, sp + 12, 4), p4 = ld(c, sp + 16, 4);
+    if (!NAT_NS(p1, 4) || !NAT_NS(p2, 4) || !NAT_NS(p3, 4) || !NAT_NS(p4, 4)) return 0;
+    uint32_t D = ld(c, p1, 4);
+    if (!NAT_NS(D, 0x1c)) return 0;
+    uint32_t cls = ld(c, D + 4, 4), ty = ld(c, D, 4);
+    if (cls > 3 || ty != 3) return 0;
+    uint32_t n = ld(c, D + 0x10, 4), cols = ld(c, D + 0x14, 4), rows = ld(c, D + 0x18, 4);
+    uint32_t ebp = sp - 4, c4 = (cols >> 2) + ((cols & 3) != 0);
+    st(c, sp - 4, c->r[5], 4);                                  // push ebp; sub esp, 0x20; push ebx, esi, edi
+    st(c, ebp - 0x24, c->r[3], 4); st(c, ebp - 0x28, c->r[6], 4); st(c, ebp - 0x2c, c->r[7], 4);
+    st(c, ebp - 0x10, 0, 4); st(c, ebp - 8, n ? n : 1, 4);
+    st(c, ebp - 0x1c, cols, 4); st(c, ebp - 0x20, rows, 4); st(c, ebp - 4, cols, 4);
+    st(c, ebp - 0x18, c4, 4); st(c, ebp - 0xc, c4, 4);
+    uint32_t ecx = 0, edx = cols >> 2, nn = n ? n : 1, fl = 0, at = 0;
+    st(c, ebp - 0x14, 0, 4);
+    for (uint32_t i = 0; i < nn; i++) {                         // 0x5c86b9
+        if (!ld(c, p4, 4)) break;
+        st(c, ebp + 0x10, 0, 4);
+        for (uint32_t j = 0; j < rows; j++) {                   // 0x5c86ca
+            uint32_t left = ld(c, p4, 4);
+            ecx = left;
+            if (!left) break;
+            if (ld(c, ebp - 0x18, 4) > left) { edx = left << 2; st(c, ebp - 4, edx, 4); st(c, ebp - 0xc, left, 4); }
+            edx = 0;
+            uint32_t cnt = ld(c, ebp - 4, 4);
+            for (uint32_t k = 0, so = j << 2; k < cnt; k++, so += rows << 2) {   // 0x5c86ed
+                uint32_t s = so + ld(c, p2, 4), d = ld(c, p3, 4) + k * 4;
+                if (!NAT_OK(s, 4)) { at = 0x5c86ef; goto fault; }
+                uint32_t b = ld(c, s, 4);
+                if ((b & 0x7f800000u) == 0x7f800000u && (b & 0x7fffffu) && !(b & 0x400000u)) { b |= 0x400000u; c->fsw |= FIE; }
+                if (!NAT_OK(d, 4)) { at = 0x5c86f4; goto fault; }
+                st(c, d, b, 4);
+                fl = 1; edx = k + 1;
+            }
+            ecx = ld(c, ebp - 0xc, 4); edx = ecx << 4;          // 0x5c870a
+            st(c, p3, ld(c, p3, 4) + edx, 4);
+            st(c, p4, ld(c, p4, 4) - ecx, 4);
+            st(c, ebp + 0x10, j + 1, 4);
+        }
+        st(c, p2, ld(c, p2, 4) + ((rows * cols) << 2), 4);      // 0x5c871e
+        st(c, ebp - 0x14, i + 1, 4);
+        ecx = nn;
+    }
+    if (fl) c->st[(c->ftop - 1) & 7] = findef();               // the fld/fstp slot, popped
+    {   uint32_t a = ld(c, p1, 4), res = a + 0x1c;              // 0x5c8864: add dword [eax], 0x1c
+        st(c, p1, res, 4);
+        c->cf = res < a; c->of = ((~(a ^ 0x1cu)) & (a ^ res) & 0x80000000u) != 0; c->af = ((a ^ 0x1cu ^ res) >> 4) & 1;
+        c->zf = res == 0; c->sf = res >> 31; c->pf = par(res); }
+    c->r[0] = 0; c->r[1] = ecx; c->r[2] = edx;                  // eax = [ebp-0x10] = 0
+    c->r[3] = ld(c, ebp - 0x24, 4); c->r[6] = ld(c, ebp - 0x28, 4); c->r[7] = ld(c, ebp - 0x2c, 4);
+    c->r[5] = ld(c, ebp, 4); c->ret = ld(c, sp, 4); c->r[4] = sp + 0x14;   // leave; ret 0x10
+    return 1;
+fault:
+    c->halt = 1; c->halt_at = at; c->why = "memory fault";
+    return 1;
+}
