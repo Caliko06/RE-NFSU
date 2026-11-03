@@ -46,7 +46,9 @@ const log = document.getElementById('log'), status = document.getElementById('st
 const t0 = performance.now();
 // Everything shown here also goes to tools/serve.py (build/web.log), so a session can be read afterwards.
 let pending = [], allLog = [];       // allLog: the whole session, for the F10 download (telemetry.js)
-const keep = s => { pending.push(s); allLog.push(s); };
+const duelBox = Object.assign(document.createElement('div'), { style: 'position:fixed;left:50%;top:14%;transform:translateX(-50%);padding:6px 16px;background:rgba(0,0,0,.72);color:#ffc24a;font:bold 20px system-ui;border-radius:6px;pointer-events:none;display:none;z-index:9' });
+const duelSay = s => { const m = /DUEL (\S+) (start|won|lost)/.exec(s); if (!m) return; if (!duelBox.isConnected) document.body.appendChild(duelBox); duelBox.textContent = { start: `Duelo con ${m[1]}`, won: `${m[1]} te ganó`, lost: `Le ganaste a ${m[1]}` }[m[2]]; duelBox.style.display = ''; clearTimeout(duelSay.t); duelSay.t = setTimeout(() => duelBox.style.display = 'none', 3500); };
+const keep = s => { pending.push(s); allLog.push(s); if (s.includes('DUEL ')) duelSay(s); };
 function flush() {
   if (!pending.length) return;
   const body = pending.join('\n') + '\n';
@@ -138,6 +140,11 @@ function line(s, cls) {
       // 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift), the next one when a race comes back to the menu
       const jump = RN_Q.get('jump');
       if (jump) m.ENV.RN_JUMP = jump;
+      // ?pool=1 opens WORLD directly (the menu path of tools/completion.py jump 3:1010); ?keys= or ?jump= take over
+      if (RN_Q.get('pool') === '1' && !keys && !jump) {
+        m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_FLOWLOG = '1';
+        m.ENV.RN_KEYS = '20000:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_Main_PC:RETURN,3000@6:RETURN,3000@6:RETURN';
+      }
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
       // 1: the clearcoat (OWNER: flat), 2: the sharp clearcoat candidate, 3 (default): live, the 2003 strength with contrast
       // ?steer=pad: the keyboard steers through the game's gamepad model (PATCH 0x460a80, host/win32.c RN_STEER)

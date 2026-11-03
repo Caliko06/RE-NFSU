@@ -462,6 +462,24 @@ static uint32_t rival_ride(Ctx *c) {
         uint32_t e = free_rival(c, a);                           // 0x5809c0 returns the entrant; free_rival picks the level at +0x735
         c->mem[e + 0x736] = (uint8_t)rival_style(c->mem[e + 0x735], c->mem[e + 0x736]);
         if (getenv("RN_FREELOG")) rn_log("rivalai %s level %d style %d", G(e + 0x73c), (int8_t)c->mem[e + 0x735], (int8_t)c->mem[e + 0x736]);
+        if (rn_pool() && ld(c, 0x78a2f0, 4) == 1010 && ld(c, a[2], 4) < 20) {
+            // WORLD: the car of the preset, a pool build that shows how it drives: one game vinyl, kit and rims of an archetype of its style.
+            static const uint8_t BY[4][3] = {[TIDY] = {CLEAN, TRACK, VIP}, [NERVOUS] = {STREET, SHOW, STREET}, [AGGRESSIVE] = {DRIFT, BOSO, DRIFT}};
+            if (!ready) catalog(c);
+            int lvl = (int8_t)c->mem[e + 0x735], sty = lvl >= 0 && lvl <= 9 ? PERSONA[lvl] : TIDY;
+            uint32_t ride = a[2], k = a[6] % NSYN, tmp = guest_alloc(RIDE_SIZE), skin0 = ld(c, ride + 0x444, 4);
+            memcpy(G(tmp), G(ride), RIDE_SIZE);
+            Persona pe = {.car = (uint8_t)ld(c, ride, 4), .seed = hash(G(e + 0x73c)) * 0x9e3779b1u};
+            pe.arch = BY[sty][pe.seed % 3];
+            char nm[32]; snprintf(nm, sizeof nm, "RN_RIVAL_%u", k);
+            float r0 = 0;
+            apply(c, ride, tmp, syn[k], nm, &pe, lvl >= 7 ? 3 : 2, &r0);
+            guest_free(tmp);
+            personality(c, ride, &pe);
+            uint32_t skin = ld(c, ride + 0x444, 4) ? ld(c, ride + 0x444, 4) : skin0;
+            neon_ride[k] = pe.arch == SHOW || pe.arch == BOSO ? skin : 0;
+            rn_log("POOLRIDE %s car %s %s tier %d skin %08x", G(e + 0x73c), CARS[pe.car], ARCH[pe.arch].name, lvl >= 7 ? 3 : 2, skin);
+        }
         return e;
     }
     if (!on) { const char *e = getenv("RN_RIVALS"); on = e && e[0] == '0' ? -1 : 1; }
@@ -925,6 +943,48 @@ static uint32_t car_draw(Ctx *c) {
 // [car+0x14] = entrant (+4 kind 2 = rival, +0x735 level), neighbour rows ctx + 8 + i * 0x38 (+4 speed of the other minus own, +0xc half
 // length, +0x10 route position, +0x34 body node), own row index (int8) ctx+0x388. Nitro burns while [car+0x3fc] (start tick of the
 // clock [0x73ad34]) is set and younger than [car+0x3f8] ticks (0x465430 on car+0x40). Returns 0x44bd10's eax.
+// ?pool=1 in WORLD, gangs (OWNER 2026-11-03): a rival cruises like tuned traffic (route speed x0.5, action target at most 17 m/s, no nitro) until the player
+// stays within 40 m going its way for 1.5 s, or a duel: full AI for 60 s or until 280 m apart, at most 2 at once; 30 s of cooldown after. DUEL lines reach the page's toast (web/index.html).
+#define CLK_S 4000u
+static int gang_step(Ctx *c, uint32_t v, uint32_t car, uint32_t ent, uint32_t act) {
+    static struct { uint32_t v, near, until, cool; } g[16];
+    static int duels;
+    static uint32_t me, me_at;
+    if (ld(c, 0x78a2f0, 4) != 1010) return 1;
+    int k = 0;
+    while (k < 15 && g[k].v && g[k].v != v) k++;
+    if (g[k].v != v) { if (!k) duels = 0; g[k].v = v, g[k].near = g[k].until = 0, g[k].cool = 0; }
+    uint32_t now = ld(c, 0x73ad34, 4), h = ld(c, 0x7361f8, 4);
+    if (me_at != rn_telem.presents) {
+        me_at = rn_telem.presents, me = 0;
+        for (uint32_t r = h ? ld(c, h, 4) : 0, j = 0; r && r != h && j < 200 && !me; r = ld(c, r, 4), j++) { uint32_t e = ld(c, r + 0x14, 4); if (e && ld(c, e + 4, 4) == 1) me = r; }
+    }
+    if (!me) return 1;
+    float dx = ldf(c, car + 0x50) - ldf(c, me + 0x50), dy = ldf(c, car + 0x54) - ldf(c, me + 0x54), d = hypotf(dx, dy);
+    float vx = ldf(c, car + 0x70), vy = ldf(c, car + 0x74), px = ldf(c, me + 0x70), py = ldf(c, me + 0x74);
+    if (g[k].until) {
+        if (now < g[k].until && d < 280) return 1;
+        int ahead = dx * vx + dy * vy > 0;
+        rn_log("DUEL %s %s", G(ent + 0x73c), ahead ? "won" : "lost");
+        g[k].until = 0, g[k].near = 0, g[k].cool = now + 30 * CLK_S;
+        if (duels > 0) duels--;
+    } else if (d < 40 && px * vx + py * vy > 0 && hypotf(px, py) > 12 && now >= g[k].cool && duels < 2) {
+        if (!g[k].near) g[k].near = now;
+        if (now - g[k].near > 3 * CLK_S / 2) {
+            g[k].until = now + 60 * CLK_S; duels++;
+            rn_log("DUEL %s start", G(ent + 0x73c));
+            return 1;
+        }
+    } else g[k].near = 0;
+    uint32_t veh = ld(c, v + 4, 4);
+    stf(c, v + 0x4b8, 0.5f);
+    if (veh) stf(c, veh + 0x404, 1.0f);
+    if (ldf(c, act + 0x1e4) > 17.0f) stf(c, act + 0x1e4, 17.0f);
+    uint32_t t0 = ld(c, car + 0x3fc, 4);
+    if (t0 && t0 != 0x7fffffffu) st(c, car + 0x3fc, 0, 4);
+    return 0;
+}
+
 static uint32_t persona_step(Ctx *c) {
     static struct { uint32_t v, stamp, shot, said; } s[16];
     uint32_t v = c->r[EAX], r = call_guest(c, 0x44bd10, 0, NULL);
@@ -945,6 +1005,8 @@ static uint32_t persona_step(Ctx *c) {
     }
     uint32_t ctx = v + 0x2c, car = ld(c, ctx, 4), ent = car ? ld(c, car + 0x14, 4) : 0, act = ld(c, v + 0x3f8, 4);
     if (!ent || ld(c, ent + 4, 4) != 2 || !act) return r;
+    int duel = !rn_pool() || gang_step(c, v, car, ent, act);
+    if (!duel) return r;
     int lv = (int8_t)c->mem[ent + 0x735], p = lv >= 0 && lv <= 9 ? PERSONA[lv] : NORMAL;
     if (p == NORMAL) return r;
     int k = 0;
@@ -961,6 +1023,8 @@ static uint32_t persona_step(Ctx *c) {
     if (ld(c, v + 0x400, 4) != s[k].stamp) {                      // a new speed lookup offset: brake early or late
         s[k].stamp = ld(c, v + 0x400, 4);
         if (p != TIDY) st(c, v + 0x404, ld(c, v + 0x404, 4) + (p == NERVOUS ? 2 : -2), 4);
+        uint32_t e = (s[k].stamp ^ v) * 0x9e3779b1u >> 24;       // ?pool=1: a mistake now and then, it reads the curve late and overshoots
+        if (rn_pool() && e < (p == NERVOUS ? 77u : p == AGGRESSIVE ? 38u : 13u)) st(c, v + 0x404, ld(c, v + 0x404, 4) - 6, 4);
     }
     if (p == AGGRESSIVE && type == 0xc && !route && own >= 0 && n <= 16) {   // IJustGotHit: revenge on the culprit [act+0x1fc]
         uint32_t who = ld(c, act + 0x1fc, 4);

@@ -28,6 +28,8 @@ Telem rn_telem;
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 EMSCRIPTEN_KEEPALIVE uint32_t rn_telem_addr(void) { return (uint32_t)(uintptr_t)&rn_telem; }
+#else
+#define EMSCRIPTEN_KEEPALIVE
 #endif
 
 static struct timespec t0;
