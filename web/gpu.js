@@ -36,6 +36,15 @@ async function startGpu(M, canvas, report, onFrame) {
   const BC = adapter.features.has('texture-compression-bc');
   const device = await adapter.requestDevice({ requiredFeatures: [...(TS ? ['timestamp-query'] : []), ...(BC ? ['texture-compression-bc'] : [])] });
   device.addEventListener('uncapturederror', e => report('webgpu: ' + e.error.message));
+  // ?apicount=1 (debug): WebGPU calls per frame list, reported with the frame log (wraps the prototypes).
+  const apiN = {};
+  if (RN_Q.get('apicount') === '1') {
+    const wrap = (proto, names) => { for (const m of names) { const f = proto[m]; proto[m] = function (...x) { apiN[m] = (apiN[m] || 0) + 1; return f.apply(this, x); }; } };
+    wrap(GPURenderPassEncoder.prototype, ['setPipeline', 'setBindGroup', 'setVertexBuffer', 'setIndexBuffer', 'setViewport', 'setScissorRect', 'setBlendConstant', 'setStencilReference', 'draw', 'drawIndexed']);
+    wrap(GPUDevice.prototype, ['createBindGroup', 'createRenderPipeline']);
+    wrap(GPUQueue.prototype, ['writeBuffer', 'writeTexture']);
+    wrap(GPUCommandEncoder.prototype, ['beginRenderPass']);
+  }
   // A lost device (GPU reset, iOS reclaiming a background tab) stops drawing for good: say so instead of a frozen frame.
   device.lost.then(i => { if (i.reason !== 'destroyed') report(`STOP webgpu: se perdió la GPU (${i.reason || '?'}: ${i.message}). Recarga la página.`); });
   const ctx = canvas.getContext('webgpu');
@@ -932,7 +941,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       if (IN_CL[op]) cl.push(i);
       i += 1 + n;
       if (op === GPU_DRAW && !w[a + D_RVB]) {
-        vneed += (w[a + D_NVERT] * w[a + D_STRIDE] + 3) & ~3;
+        vneed += ((w[a + D_NVERT] * w[a + D_STRIDE] + 3) & ~3) + w[a + D_STRIDE];   // + start on a whole vertex
         ineed += 4 * w[a + D_NIDX];
       }
       if (op === GPU_DRAW) uneed += U_STEP;
@@ -952,6 +961,9 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     }
     let voff = 0, ioff = 0, uoff = 0;
     let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
+    // What the current draw pass already holds (WebGPU keeps state for the whole pass): a draw sets only what changes,
+    // and payload draws keep one binding of the frame's vertex/index buffers, addressed by first vertex/index.
+    let stPass = null, stPipe, stBg1, stVp = '', stSc = '', stBf = -1, stVb, stVo = -1, stIb, stIf = '';
     if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
     // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
@@ -1125,13 +1137,16 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         for (let k = 0; k < 8; k++) udw[ub + 1072 + k] = g(D_TEX + D_TEXN * k + T_TT);
         // vertices and indices: in the payload, or in resident buffers (GPU_BUFFER)
         const rvb = g(D_RVB), vsrc = 4 * (src + 4 * nvc + 4 * npc), vbytes = rvb ? 0 : nv * stride;
+        if (!rvb && stride) voff = Math.ceil(voff / stride) * stride;
         if (!rvb) {
           vdata.set(u8.subarray(vsrc, vsrc + vbytes), voff);
           if (ni) idata.set(w.subarray(src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2), src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2) + ni), ioff / 4);
         }
         const sc = [g(D_SC), g(D_SC + 1), Math.min(g(D_SC + 2), rt.w), Math.min(g(D_SC + 3), rt.h)];
         if (sc[2] > sc[0] && sc[3] > sc[1]) {
-          pass.setPipeline(pipeline(w, a, stride, rt.sc || 1));
+          if (pass !== stPass) { stPass = pass; stPipe = stBg1 = stVb = stIb = undefined; stVp = stSc = stIf = ''; stBf = stVo = -1; }
+          const pl = pipeline(w, a, stride, rt.sc || 1);
+          if (pl !== stPipe) { pass.setPipeline(pl); stPipe = pl; }
           pass.setBindGroup(0, uBind, [uoff]);
           const entries = [];
           let bkey = ps.texMask;
@@ -1147,18 +1162,31 @@ fn mulfloor(c: f32, w: f32) -> f32 {
             if (texBinds.size >= 8192) texBinds.clear();     // keys of destroyed textures are never asked again
             texBinds.set(bkey, bg = device.createBindGroup({ layout: texBgl(ps.texMask), entries }));
           }
-          pass.setBindGroup(1, bg);
-          pass.setViewport(g(D_VP), g(D_VP + 1), g(D_VP + 2), g(D_VP + 3), f32[a + D_VP + 4], f32[a + D_VP + 5]);
-          pass.setScissorRect(sc[0], sc[1], sc[2] - sc[0], sc[3] - sc[1]);
+          if (bg !== stBg1) { pass.setBindGroup(1, bg); stBg1 = bg; }
+          const vp = `${g(D_VP)},${g(D_VP + 1)},${g(D_VP + 2)},${g(D_VP + 3)},${w[a + D_VP + 4]},${w[a + D_VP + 5]}`;
+          if (vp !== stVp) { pass.setViewport(g(D_VP), g(D_VP + 1), g(D_VP + 2), g(D_VP + 3), f32[a + D_VP + 4], f32[a + D_VP + 5]); stVp = vp; }
+          const scs = `${sc[0]},${sc[1]},${sc[2]},${sc[3]}`;
+          if (scs !== stSc) { pass.setScissorRect(sc[0], sc[1], sc[2] - sc[0], sc[3] - sc[1]); stSc = scs; }
           const bf = g(D_BFACTOR);
-          if (g(D_BLEND)) pass.setBlendConstant([((bf >>> 16) & 255) / 255, ((bf >>> 8) & 255) / 255, (bf & 255) / 255, (bf >>> 24) / 255]);
+          if (g(D_BLEND) && (bf !== stBf)) { pass.setBlendConstant([((bf >>> 16) & 255) / 255, ((bf >>> 8) & 255) / 255, (bf & 255) / 255, (bf >>> 24) / 255]); stBf = bf; }
           if (rvb) {
-            pass.setVertexBuffer(0, gbufs.get(rvb), g(D_RVOFF));
-            if (g(D_RIB)) { pass.setIndexBuffer(gbufs.get(g(D_RIB)), ifmt(w, a)); pass.drawIndexed(ni, 1, g(D_RFIRST), w[a + D_RBASEV] | 0); }
+            const vb = gbufs.get(rvb);
+            if (vb !== stVb || g(D_RVOFF) !== stVo) { pass.setVertexBuffer(0, vb, g(D_RVOFF)); stVb = vb; stVo = g(D_RVOFF); }
+            if (g(D_RIB)) {
+              const ib = gbufs.get(g(D_RIB)), f = ifmt(w, a);
+              if (ib !== stIb || f !== stIf) { pass.setIndexBuffer(ib, f); stIb = ib; stIf = f; }
+              pass.drawIndexed(ni, 1, g(D_RFIRST), w[a + D_RBASEV] | 0);
+            }
             else pass.draw(nv, 1, g(D_RFIRST));
+          } else if (stride) {   // one binding of the frame's vertex/index buffers, addressed per draw
+            if (vbuf !== stVb || stVo !== 0) { pass.setVertexBuffer(0, vbuf); stVb = vbuf; stVo = 0; }
+            if (ni) {
+              if (ibuf !== stIb || stIf !== 'uint32') { pass.setIndexBuffer(ibuf, 'uint32'); stIb = ibuf; stIf = 'uint32'; }
+              pass.drawIndexed(ni, 1, ioff / 4, voff / stride);
+            } else pass.draw(nv, 1, voff / stride);
           } else {
-            pass.setVertexBuffer(0, vbuf, voff, vbytes);
-            if (ni) { pass.setIndexBuffer(ibuf, 'uint32', ioff, 4 * ni); pass.drawIndexed(ni); }
+            pass.setVertexBuffer(0, vbuf, voff, vbytes); stVb = undefined;
+            if (ni) { pass.setIndexBuffer(ibuf, 'uint32', ioff, 4 * ni); stIb = undefined; pass.drawIndexed(ni); }
             else pass.draw(nv);
           }
         }
@@ -1269,6 +1297,13 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     return stats;
   }
 
+  // ?apicount=1: calls per frame list since the last report
+  let apiFrames = 0;
+  const apiReport = () => {
+    const n = frames - apiFrames; if (!n || !Object.keys(apiN).length) return '';
+    const r = '; api/frame ' + Object.entries(apiN).sort().map(([k, v]) => `${k} ${(v / n).toFixed(1)}`).join(' ');
+    for (const k in apiN) apiN[k] = 0; apiFrames = frames; return r;
+  };
   // ?hold=N (debug): stop after the N-th Present, so a capture shows that frame (the game then waits).
   const hold = Number(RN_Q.get('hold')) || 0;
   let frames = 0, presents = 0;
@@ -1302,7 +1337,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         if (s.present && steerLog) { const p = presents; device.queue.onSubmittedWorkDone().then(() =>
           report(`page present ${p} start ${t.toFixed(1)} done ${performance.now().toFixed(1)}`)); }
         if (frames <= 3 || frames % 300 === 0) report(`gpu.js: frame ${frames}: ${s.clears} clears, ${s.draws} draws, present ${s.present}` +
-          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + (WARM ? `, warm ${warmMade}/${warmList.length}` : '') + gpuReport());
+          (pack.size ? `, remaster ${packed} (${hdMs.toFixed(0)} ms)` : '') + (WARM ? `, warm ${warmMade}/${warmList.length}` : '') + gpuReport() + apiReport());
         if (frames % 300 === 0) hdMs = 0;
         Atomics.store(h, box + 1, k);
         Atomics.notify(M.HEAP32, box + 1);
