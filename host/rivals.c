@@ -277,7 +277,16 @@ static void build(Ctx *c, uint32_t rec, const Persona *pe, int t) {
     if (rim) set(c, rec, 0x29, paint(&s, a->rimcol[rnd(&s) % 3], 1u << K_RIMS));
     // Vinyls: up to the archetype's layers (1 at tier 1); colours from the accent and a neutral against the body.
     int layers = 0;
-    if (a->vinyl && roll(&s, P(a->vinyl) + 10)) layers = 1 + (int)(rnd(&s) % (a->layers < t ? a->layers : t));
+    if (rn_pool()) {
+        // ?pool=1: one design per car, the game's own vinyl in colours that read on the body (two unrelated layers looked like a collage, OWNER "wonky").
+        static const uint8_t VINP[NARCH] = {[CLEAN] = 40, [SHOW] = 100, [DRIFT] = 85, [STREET] = 90, [BOSO] = 90, [VIP] = 15, [TRACK] = 70};
+        layers = a->vinyl && roll(&s, VINP[pe->arch]);
+        for (int k = 0; k < np; k++) {
+            int dr = (int)(accent >> 16 & 255) - (int)(body >> 16 & 255), dg = (int)(accent >> 8 & 255) - (int)(body >> 8 & 255), db = (int)(accent & 255) - (int)(body & 255);
+            if (accent != body && 2 * dr * dr + 4 * dg * dg + 3 * db * db > 40000) break;
+            accent = a->paint[k];
+        }
+    } else if (a->vinyl && roll(&s, P(a->vinyl) + 10)) layers = 1 + (int)(rnd(&s) % (a->layers < t ? a->layers : t));
     for (int l = 0; l < layers; l++) {
         const Part *v = pick(&s, car, 0x1f, l ? 3 : lv, a->vinyls, 0);
         if (!v) continue;
@@ -342,7 +351,7 @@ static void personality(Ctx *c, uint32_t ride, const Persona *pe) {
 
 // Builds persona pe into preset record rec, lets the game apply it to the ride (0x4b26f0 keeps DUMMY_SKIN/WHEEL) and
 // matches the rating of tmp (the ride the game made, *r0 once 0x57f700 computed it) within 5.0; returns how far it stayed.
-// 12 liveries per car: 0..3 clean stripes, 4..7 loud show graphics, 8..11 street slashes and stickers.
+// 12 sticker sets per car (tools/art/compose.py): 0..3 clean, 4..7 show, 8..11 street.
 static int livery_of(int arch, uint32_t *s) {
     int base = arch == CLEAN || arch == TRACK || arch == VIP ? 0 : arch == SHOW || arch == BOSO ? 4 : 8;
     return base + (int)(rnd(s) % 4);

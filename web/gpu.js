@@ -900,14 +900,15 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     const t = res.get(id), url = `remaster/liv/${LIV_CARS[car]}/${n}.webp`;
     if (!t || !t.skin) return;
     const skinTex = t.skin;
-    if (!livCache.has(url)) livCache.set(url, fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.blob(); })
-      .then(b => createImageBitmap(b, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })).then(img => {
+    if (!livCache.has(url)) livCache.set(url, fetch(url).then(r => r.ok ? r.blob() : null)
+      .then(b => b && createImageBitmap(b, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })).then(img => {
+        if (!img) return null;                // no sticker art for this car yet
         const a = device.createTexture({ size: [img.width, img.height], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
         device.queue.copyExternalImageToTexture({ source: img }, { texture: a }, [img.width, img.height]);
         return a;
       }));
     livCache.get(url).then(a => {
-      if (t.skin !== skinTex) return;
+      if (!a || t.skin !== skinTex) return;
       livPipe ??= device.createRenderPipeline({ layout: 'auto', vertex: { module: mipMod, entryPoint: 'vs' }, fragment: { module: device.createShaderModule({ code: `
 @group(0) @binding(0) var art: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
