@@ -583,7 +583,7 @@ static void limiter_sleep(Ctx *c) {
 }
 // RN_FPS=30 (web ?fps=30, accepted degradation, OFF by default): the limiter's frame target [0x6f0890] (1/60, read
 // only at 0x585b83) becomes 1/30. The limiter then adds the waited time to the frame dt (param_1 + wait = 1/30) and the
-// game turns dt into 1/60 s simulation ticks with a carried remainder ([0x734570], cap [0x6f0894] = 3 or 6): two ticks a
+// game turns dt into 1/60 s simulation ticks with a carried remainder ([0x73456c]; dt is clamped by [0x6f0894] = 3): two ticks a
 // frame, as on a PC that runs at 30 fps, so the game's speed and physics step stay the same. Set at the first clock read.
 static void fps_init(Ctx *c) {
     static int done;

@@ -24,7 +24,13 @@ typedef struct Ctx {
 
 // Guest pages below 64 KB are never mapped: a null pointer read is a loud fault.
 #define LOW 0x10000u
+// RN_NOCHK (web opt-in, tools/recomp/build.py): no guest bounds check; game thread work -16 % on the Pod A/B
+// (2026-11-03), but a bad guest pointer then corrupts wasm memory instead of a clean "memory fault" halt.
+#ifdef RN_NOCHK
+#define CHK(a, n, at) do { } while (0)
+#else
 #define CHK(a, n, at) do { if ((uint32_t)((a) - LOW) > c->memsz - LOW - (n)) { c->halt_at = (at); c->why = "memory fault"; goto trap; } } while (0)
+#endif
 #define TRAP(at, msg) do { c->halt_at = (at); c->why = (msg); goto trap; } while (0)
 
 static inline uint32_t ld(Ctx *c, uint32_t a, int n) { uint32_t v = 0; memcpy(&v, c->mem + a, n); return v; }

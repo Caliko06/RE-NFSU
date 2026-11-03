@@ -32,8 +32,9 @@ FPU_CONST = {0xe8: "1.0", 0xe9: "3.321928094887362347870319429489390175864831393
              0xee: "0.0"}
 
 PROLOGUE = '#include "rt.h"\n'
-# Functions with a native body in host/native.h (nat_<addr>): the same operations in the same order, proven bit for bit
-# by RN_ONLY=<addr> tools/recomp/difftest.py. The lifted body stays as f_<addr>_lift for inputs outside the fast case.
+# Functions with a native body in host/native.h (nat_<addr>): the same operations in the same order. Native vs lifted on
+# random inputs: tools/recomp/natproof/run.sh (0x5c97cb, 0x5c85c1). RN_ONLY=<addr> difftest checks the lifted body only.
+# The lifted body stays as f_<addr>_lift for inputs outside the fast case.
 # 0x5d6f5d D3DXMatrixMultiply (x87): 5.8 % self of the race game thread (build/bench/spk2, 2026-11-01).
 # 0x5c97cb D3DX effect state apply: 11.4 % of the race game thread, ~0.5 % of it device work (spk2, 2026-11-02).
 # 0x5c85c1 D3DX parameter -> shader constants copy (float type): 2.4 % of the race game thread (spk2, 2026-11-02).

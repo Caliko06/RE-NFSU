@@ -122,15 +122,18 @@ def compile_native():
 
 def compile_web():
     srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c", f"{GEN}/abk.c"]
-    os.makedirs("build/wobj", exist_ok=True)
-    flags = ["-O2", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing", "-pthread"]
+    # RN_NOCHK=1: guest bounds checks off (host/rt.h), objects in their own folder. Off by default.
+    nochk = os.environ.get("RN_NOCHK") == "1"
+    wobj = "build/wobj-nochk/" if nochk else "build/wobj/"
+    os.makedirs(wobj, exist_ok=True)
+    flags = ["-O2", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing", "-pthread", *(["-DRN_NOCHK"] if nochk else [])]
     jobs = []
     for s in srcs:
-        o = "build/wobj/" + os.path.basename(s)[:-2] + ".o"
+        o = wobj + os.path.basename(s)[:-2] + ".o"
         if not os.path.exists(o) or os.path.getmtime(o) < max(os.path.getmtime(s), os.path.getmtime("host/rt.h")):
             jobs.append(["emcc", *flags, "-c", s, "-o", o])
     run_jobs(jobs)
-    objs = ["build/wobj/" + os.path.basename(s)[:-2] + ".o" for s in srcs]
+    objs = [wobj + os.path.basename(s)[:-2] + ".o" for s in srcs]
     os.makedirs("web/out", exist_ok=True)
     # main() runs in a worker (PROXY_TO_PTHREAD) so guest threads and waits may block.
     subprocess.run(["emcc", "-O2", "-pthread", "-Ihost", f"-I{GEN}", *HOST, *objs, "-o", "web/out/speed.js",
