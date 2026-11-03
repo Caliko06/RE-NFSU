@@ -87,7 +87,8 @@ function line(s, cls) {
     preRun: [m => {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
       // The game draws at the pixels of this window (PATCH 0x408760), at most 2560x1440 to keep the GPU load sane.
-      const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || 2560), k = Math.min(1, BB / (innerWidth * dpr), BB * 9 / 16 / (innerHeight * dpr));
+      const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || (matchMedia('(pointer: coarse)').matches ? 1280 : 2560)), k = Math.min(1, BB / (innerWidth * dpr), BB * 9 / 16 / (innerHeight * dpr));
+      // Phones and tablets (coarse pointer): 1280 wide; an iPhone tab at 2560 was killed by iOS after 20-40 s (memory, likely).
       // Even sizes: the layer keeps width and height even (host/win32.c). At k = 1 the canvas gets exactly
       // back buffer / dpr CSS pixels, centred, so one back-buffer pixel is one device pixel; k < 1: Chrome scales it up.
       const bw = 2 * Math.floor(innerWidth * dpr * k / 2), bh = 2 * Math.floor(innerHeight * dpr * k / 2);
@@ -159,6 +160,12 @@ function line(s, cls) {
   startTune(M);
   startAudio(M, s => line(s)).catch(e => line('audio.js: ' + e.message, 'stop'));
   window.RN_M = M;                          // for checks from the console or tools/webcheck.mjs
+  // Memory line when it moves by 16 MB or more (host/win32.c rn_mem_mb): what an iPhone tab (~1.5 GB, then iOS kills it) holds.
+  let memLast = '';
+  setInterval(() => {
+    const v = [0, 1, 2].map(k => M._rn_mem_mb(k)), key = v.map(x => x >> 4).join();
+    if (key !== memLast) { memLast = key; line(`mem: wasm break ${v[0]} MB (guest 1024 untouched until used), guest heap ${v[1]} MB, guest virtual ${v[2]} MB`); }
+  }, 2000);
 })();
 </script>
 </body>

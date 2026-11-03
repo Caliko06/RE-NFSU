@@ -134,7 +134,15 @@ int main(int argc, char **argv) {
     static Ctx ctx;
     Ctx *c = g_ctx = &ctx;
     c->memsz = GUEST_MEM;
+#ifdef __EMSCRIPTEN__
+    // Web: fresh memory past the break is zero (wasm memory starts zeroed; emscripten's dlmalloc never trims), so take it
+    // as is. calloc would memset the whole 1 GB (dlmalloc without mmap clears every calloc) and make it all resident:
+    // on an iPhone that alone is most of the ~1.5 GB a Safari tab gets before iOS kills it.
+    c->mem = sbrk(GUEST_MEM);
+    if (c->mem == (void *)-1) c->mem = NULL;
+#else
     c->mem = calloc(1, GUEST_MEM);
+#endif
     if (!c->mem) { fprintf(stderr, "cannot allocate guest memory\n"); return 2; }
 
     const uint8_t *nt = pe + rd32(pe + 0x3c);

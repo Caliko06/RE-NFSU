@@ -10,12 +10,21 @@ POST /log appends the page's log to build/web.log (POST /log?new starts it again
 build/web.prev.log), so a Chrome session can be read after it stops. Headless Chrome (tools/webcheck.mjs) writes
 build/webcheck.log instead, so a test never replaces the OWNER's session.
 POST /telemetry does the same for web/telemetry.js: build/telemetry.ndjson (build/webcheck.telemetry.ndjson).
-Usage: .venv/bin/python tools/serve.py [port]
+--lan also serves HTTPS on 0.0.0.0:5443 for a phone or tablet on the same Wi-Fi (SAB and WebGPU need a secure
+context; only localhost is exempt). The certificate comes from a local CA in build/lan-cert/ (made once with openssl;
+the Mac keychain is not touched). The phone trusts it once: open https://<mac>.local:5443/lan-ca.crt, install the
+profile, then Settings > General > About > Certificate Trust Settings > full trust (iOS); Android: Settings > Security
+> Install a certificate > CA. The leaf certificate is remade when the Mac's LAN address changes.
+Usage: .venv/bin/python tools/serve.py [port] [--lan]
 """
-import http.server, json, os, shutil, sys, urllib.parse
+import email.utils, gzip, http.server, json, os, shutil, socket, ssl, subprocess, sys, threading, urllib.parse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5180
+ARGS = [a for a in sys.argv[1:] if a != "--lan"]
+LAN = "--lan" in sys.argv
+PORT = int(ARGS[0]) if ARGS else 5180
+LAN_PORT = 5443
+CERT = os.path.join(ROOT, "build", "lan-cert")
 WORLD_DIR = os.path.join(ROOT, os.environ.get("RN_WORLD_DIR") or "build/openworld")
 
 
@@ -106,6 +115,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
+        if route == "/out/speed.wasm" and self.wasm_packed():
+            return
         rng = self.headers.get("Range")
         path = self.translate_path(self.path)
         if rng and rng.startswith("bytes=") and os.path.isfile(path):    # the game thread reads byte ranges
@@ -129,8 +140,45 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return
         super().do_GET()
 
+    def wasm_packed(self):
+        """speed.wasm compressed once per build (70 MB -> 12 MB br over HTTPS, 16 MB gzip), revalidated by ETag so a
+        reload downloads nothing until the next build. True when it answered."""
+        src = os.path.join(ROOT, "web", "out", "speed.wasm")
+        acc = self.headers.get("Accept-Encoding", "")
+        enc = "br" if "br" in acc and isinstance(self.connection, ssl.SSLSocket) and shutil.which("brotli") else "gzip" if "gzip" in acc else None
+        if not enc or not os.path.isfile(src):
+            return False
+        st = os.stat(src)
+        tag = f'"{st.st_mtime_ns:x}-{st.st_size:x}-{enc}"'
+        if self.headers.get("If-None-Match") == tag:
+            self.send_response(304)
+            self.send_header("ETag", tag)
+            self.end_headers()
+            return True
+        out = src + (".br" if enc == "br" else ".gz")
+        with PACK_LOCK:
+            if not os.path.exists(out) or os.path.getmtime(out) < st.st_mtime:
+                if enc == "br":
+                    subprocess.run(["brotli", "-q", "9", "-f", "-o", out + ".tmp", src], check=True)
+                else:
+                    with open(src, "rb") as f, gzip.open(out + ".tmp", "wb", 6) as g:
+                        shutil.copyfileobj(f, g, 1 << 20)
+                os.replace(out + ".tmp", out)
+        self.send_response(200)
+        self.send_header("Content-Type", "application/wasm")
+        self.send_header("Content-Encoding", enc)
+        self.send_header("Content-Length", str(os.path.getsize(out)))
+        self.send_header("ETag", tag)
+        self.send_header("Vary", "Accept-Encoding")
+        self.end_headers()
+        with open(out, "rb") as f:
+            shutil.copyfileobj(f, self.wfile, 1 << 20)
+        return True
+
     def translate_path(self, path):
         path = path.split("?", 1)[0].split("#", 1)[0]
+        if path == "/lan-ca.crt":
+            return os.path.join(CERT, "ca.crt")
         if path == "/pc/Speed.exe":
             return os.path.join(ROOT, "pc", "Speed.exe")
         if path.startswith("/game/"):
@@ -145,12 +193,50 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
-        self.send_header("Cache-Control", "no-store")
+        # Saves and logs change within a second (Last-Modified's grain): never stored. The rest revalidates on each load (304 = no download).
+        self.send_header("Cache-Control", "no-store" if self.path.startswith(("/save", "/log", "/telemetry")) else "no-cache")
         super().end_headers()
 
     def log_message(self, *a):
         pass
 
 
-Handler.extensions_map = {**Handler.extensions_map, ".wasm": "application/wasm", ".js": "text/javascript"}
+def lan_names():
+    """(LAN IPv4 or None, mDNS host name such as Angels-Mac-mini.local)."""
+    ip = subprocess.run(["ipconfig", "getifaddr", "en0"], capture_output=True, text=True).stdout.strip() or \
+        subprocess.run(["ipconfig", "getifaddr", "en1"], capture_output=True, text=True).stdout.strip() or None
+    host = subprocess.run(["scutil", "--get", "LocalHostName"], capture_output=True, text=True).stdout.strip() or socket.gethostname()
+    return ip, host.removesuffix(".local") + ".local"
+
+
+def lan_cert(ip, host):
+    """build/lan-cert/{ca.crt,ca.key,leaf.crt,leaf.key}; the leaf names host, the IP and localhost."""
+    os.makedirs(CERT, exist_ok=True)
+    f = lambda n: os.path.join(CERT, n)
+    ossl = lambda *a: subprocess.run(["openssl", *a], check=True, capture_output=True)
+    if not os.path.exists(f("ca.crt")):
+        ossl("req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "3650", "-keyout", f("ca.key"), "-out", f("ca.crt"),
+             "-subj", "/CN=NFSU local CA", "-addext", "basicConstraints=critical,CA:TRUE", "-addext", "keyUsage=critical,keyCertSign,cRLSign")
+    san = f"DNS:{host},DNS:localhost" + (f",IP:{ip}" if ip else "") + ",IP:127.0.0.1"
+    old = open(f("leaf.san")).read() if os.path.exists(f("leaf.san")) else None
+    if old != san:
+        ossl("req", "-newkey", "rsa:2048", "-nodes", "-keyout", f("leaf.key"), "-out", f("leaf.csr"), "-subj", f"/CN={host}")
+        with open(f("leaf.ext"), "w") as e:     # iOS wants serverAuth, a SAN and at most 825 days
+            e.write(f"subjectAltName={san}\nextendedKeyUsage=serverAuth\nbasicConstraints=CA:FALSE\nkeyUsage=digitalSignature,keyEncipherment\n")
+        ossl("x509", "-req", "-in", f("leaf.csr"), "-CA", f("ca.crt"), "-CAkey", f("ca.key"), "-CAcreateserial", "-days", "800",
+             "-sha256", "-extfile", f("leaf.ext"), "-out", f("leaf.crt"))
+        open(f("leaf.san"), "w").write(san)
+    return f("leaf.crt"), f("leaf.key")
+
+
+PACK_LOCK = threading.Lock()
+Handler.extensions_map = {**Handler.extensions_map, ".wasm": "application/wasm", ".js": "text/javascript", ".crt": "application/x-x509-ca-cert"}
+if LAN:
+    ip, host = lan_names()
+    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ctx.load_cert_chain(*lan_cert(ip, host))
+    lan = http.server.ThreadingHTTPServer(("0.0.0.0", LAN_PORT), Handler)
+    lan.socket = ctx.wrap_socket(lan.socket, server_side=True, do_handshake_on_connect=False)   # handshake in each request thread
+    threading.Thread(target=lan.serve_forever, daemon=True).start()
+    print(f"LAN: https://{host}:{LAN_PORT}/  (https://{ip}:{LAN_PORT}/)  CA for the phone: https://{host}:{LAN_PORT}/lan-ca.crt", flush=True)
 http.server.ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()

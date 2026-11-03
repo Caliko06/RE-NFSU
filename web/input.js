@@ -70,7 +70,7 @@ function startInput(M, canvas, steerLog) {
   });
   canvas.addEventListener('mousedown', e => {
     canvas.focus();
-    if (exclusive() && document.pointerLockElement !== canvas) canvas.requestPointerLock()?.catch?.(() => {});
+    if (exclusive() && document.pointerLockElement !== canvas) canvas.requestPointerLock?.()?.catch?.(() => {});   // iOS Safari has no pointer lock
     push(0x80000100 | btn[e.button]);
     e.preventDefault();
   });
