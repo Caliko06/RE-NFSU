@@ -540,7 +540,7 @@ static uint32_t rival_ride(Ctx *c) {
     return call_guest(c, 0x5809c0, 7, a);
 }
 
-static int n_refill, n_refail;
+static int n_refill, n_refail, n_rf[5];
 static int n_react[3];                 // traffic_behind: yields; traffic_tick: dodges, glued honks
 static uint32_t n_tr[5];               // ai_log, car-frames within 60 m: game avoid action, braking, horn; contacts under 2.6 m; flash dark phase (+0x83e set, +0x855 clear)
 // RN_AILOG=1: test-only race log (tools/ailog.py sums it up). Every 60 frames, each racer: name, kind, route metres car+0x814, speed car+0x3d0,
@@ -634,6 +634,7 @@ static void ai_log(Ctx *c) {
                    AP(pv) ? ld(c, pv + 0x18, 4) : 0, AP(pv) ? ld(c, pv + 0x1c, 4) : 0, AP(al) ? ld(c, al + 8, 4) : 0, n, orph, oflat, oid, onz, od, AP(b) ? c->mem[b + 0x1d] : 0, AP(b) ? c->mem[b + 0x1b] : 0, AP(b) ? c->mem[b + 0x1a] : 0, ld(c, me + 0x28, 4), ld(c, me + 0x7e0, 4), ldf(c, me + 0x60), ldf(c, me + 0x64), ldf(c, me + 0x68), ldf(c, me + 0x3d4), ld(c, me + 0x884, 4));
         }
         uint32_t bodies = ld(c, 0x736184, 4);       // TrackPolygonSlotPool 0x4412b0: slots in use, high-water mark, cap (docs/openworld/re_coll_pool.md)
+        rn_log("REFILLWHY early %d walk %d spacing %d lane %d", n_rf[0], n_rf[1], n_rf[2], n_rf[3]);
         rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d polys %u polymax %u polycap %u avoidf %u brakef %u honkf %u hits %u flashf %u%s", rn_telem.presents, total, parked, near, close, all, kinds,
                n_refill, n_refail, n_react[0], n_react[1], n_react[2], AP(bodies) ? ld(c, bodies + 0x18, 4) : 0, AP(bodies) ? ld(c, bodies + 0x1c, 4) : 0, AP(bodies) ? ld(c, bodies + 0x2c, 4) : 0, n_tr[0], n_tr[1], n_tr[2], n_tr[3], n_tr[4], rn_telem.presents % 3000 == 0 ? names : "");
     }
@@ -659,6 +660,7 @@ static void handling_data(Ctx *c) {
 // behind and past 160 m tries up to 8 nodes 150..650 m + 1 s of speed ahead on the road (0x4563d0), at least 150 m from the player, 18 m from every car that drives; then the
 // Free Run move's own tail, as free_tmove: lane 0x5995e0, speed 0x42adf0, 0x59a7c0 on the teleporter [[0x7361f8]+0x2f0] (ecx at 0x420c77).
 #define REFILL_NEAR 14
+#define REFILL_POOL 18   // ?pool=1: of WORLD's 21 cars (OWNER: a live city; lower it if it lags)
 static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     static int off = -1;
     static uint32_t pair, seed = 0x2f11e0d5;
@@ -677,14 +679,14 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         int p = parked ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
         if (p > prio) prio = p, pick = r;
     }
-    if (near >= REFILL_NEAR || !pick) return;
+    if (!pick || (near >= (rn_pool() ? REFILL_POOL : REFILL_NEAR) && prio < 3)) return;   // a parked car always goes back on the road
     if (!pair) pair = guest_alloc(8);
     uint32_t zero = 0, ft = c->ftop;
     c->r[EAX] = me; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
     c->r[EAX] = me; uint32_t node = call_guest(c, 0x428160, 1, &zero);
     st(c, pair, sec, 4), st(c, pair + 4, node, 4);
     c->r[EAX] = pair;
-    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_refail++; return; }
+    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_refail++; n_rf[0]++; return; }
     int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0;
     for (int t = 0; t < 8; t++) {              // farther each try (a stretch can lack lanes for 1 km); the last two behind the player
         float m = 150.0f + 80.0f * (t % 6) + (float)(rnd(&seed) % 100) + (t < 6 ? sp : 0);
@@ -695,19 +697,19 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         call_guest_cdecl(c, 0x4563d0, 5, a);
         uint32_t n2 = ld(c, pair + 4, 4);
         c->r[EAX] = pair;
-        if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) continue;
+        if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { n_rf[1]++; continue; }
         float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
         int ok = hypotf(nx - px, ny - py) >= 150;
         for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++) {
             uint32_t v = ld(c, o + 0x2c, 4);
             ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || hypotf(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= 18;
         }
-        if (!ok) continue;
+        if (!ok) { n_rf[2]++; continue; }
         c->r[ECX] = tele;
         uint32_t side = call_guest(c, 0x59aea0, 0, NULL) & 0xff, la[2] = {n2, side};
         c->r[ECX] = tele;
         int lane = (int)call_guest(c, 0x5995e0, 2, la);
-        if (lane == -1) continue;
+        if (lane == -1) { n_rf[3]++; continue; }
         c->r[EAX] = n2, c->r[ECX] = (uint32_t)lane;
         call_guest(c, 0x42adf0, 0, NULL);
         float v = (float)c->st[c->ftop];

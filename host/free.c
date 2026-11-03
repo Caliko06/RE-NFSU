@@ -184,6 +184,7 @@ static uint32_t free_setup(Ctx *c) {
 // way 0x57e9a0 clears the vinyls of stock traffic, and 0x57ea80 (stdcall, the ride) recomputes the ride's derived state.
 static int8_t ctype[NCANON];      // the car type of each career preset (-1 = not in the game's list), filled once
 void rn_pool_traffic(Ctx *c, uint32_t ride, uint32_t seed);   // host/rivals.c
+int rn_pool(void);
 static uint32_t free_traffic(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
@@ -923,6 +924,8 @@ static uint32_t grid_fix(Ctx *c) {
 static uint32_t free_recycle(Ctx *c) {
     tele = c->r[ECX];
     uint32_t car = ARG(0), r = call_guest(c, 0x5988c0, 1, &car) & 0xff, h = ld(c, 0x7361f8, 4);
+    // ?pool=1 in WORLD: a failed move parks the car (0x598837: not drawn, no collision), even a car driving in sight of the player. Only parked cars go through the teleporter; traffic_refill (host/rivals.c) moves the driving ones, out of sight and never parking them.
+    if (live && rn_pool() && world_ai(c)) { uint32_t v = ld(c, car + 0x2c, 4); return v && c->mem[v + 0x4d1] ? r : 0; }
     if (!live || r || !h) return r;
     for (uint32_t p = ld(c, h, 4), k = 0; p && p != h && k < 200; p = ld(c, p, 4), k++) {
         uint32_t e = ld(c, p + 0x14, 4);
