@@ -580,7 +580,18 @@ static void limiter_sleep(Ctx *c) {
     if (left_us < 800) return;
     gil_sleep_us((uint64_t)(left_us - 300));
 }
-static uint32_t QueryPerformanceCounter_(Ctx *c) { rn_telem.clock_calls++; clk_site(c); limiter_sleep(c); gil_clock(); st64(c, ARG(0), game_now_us()); return 1; }
+// RN_FPS=30 (web ?fps=30, accepted degradation, OFF by default): the limiter's frame target [0x6f0890] (1/60, read
+// only at 0x585b83) becomes 1/30. The limiter then adds the waited time to the frame dt (param_1 + wait = 1/30) and the
+// game turns dt into 1/60 s simulation ticks with a carried remainder ([0x734570], cap [0x6f0894] = 3 or 6): two ticks a
+// frame, as on a PC that runs at 30 fps, so the game's speed and physics step stay the same. Set at the first clock read.
+static void fps_init(Ctx *c) {
+    static int done;
+    if (done) return;
+    done = 1;
+    const char *e = getenv("RN_FPS");
+    if (e && atoi(e) == 30) { st(c, 0x6f0890, 0x3d088889, 4); rn_log("RN_FPS=30: frame target [0x6f0890] = 1/30 s"); }
+}
+static uint32_t QueryPerformanceCounter_(Ctx *c) { rn_telem.clock_calls++; clk_site(c); fps_init(c); limiter_sleep(c); gil_clock(); st64(c, ARG(0), game_now_us()); return 1; }
 static uint32_t QueryPerformanceFrequency_(Ctx *c) { st64(c, ARG(0), 1000000); return 1; }
 // The PC's clock runs on UTC: time zone "Greenwich Standard Time" (bias 0, no daylight saving),
 // so local time = system time. GetTimeZoneInformation then answers TIME_ZONE_ID_UNKNOWN.
