@@ -788,9 +788,12 @@ static void pace_plan(Ctx *c) {
     pace_due = 0;
     double per = pace_box[1];
     if (per < 4 || per > 50) return;
-    int k = (int)(1000.0 / 60 / per + 0.5);
+    // The game's frame target [0x6f0890] (1/60 s; 1/30 with RN_FPS=30, host/win32.c): k refreshes per game frame.
+    double tgt = 1000.0 * ldf(c, 0x6f0890);
+    if (tgt < 10 || tgt > 50) tgt = 1000.0 / 60;
+    int k = (int)(tgt / per + 0.5);
     if (k < 1) k = 1;
-    int on = fabs(k * per - 1000.0 / 60) <= 1.5;            // else the limiter keeps its race wait
+    int on = fabs(k * per - tgt) <= 1.5;                    // else the limiter keeps its race wait
     uint32_t m = ld(c, 0x707fc8, 4), rs = ld(c, 0x7361f0, 4);
     if (!!(m & 0x40) != on) st(c, 0x707fc8, on ? m | 0x40 : m & ~0x40u, 4);
     if (!on || ld(c, 0x77a920, 4) != 6 || !rs || ld(c, rs, 4) == 1) { pace_next = 0; return; }

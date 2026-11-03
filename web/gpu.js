@@ -25,7 +25,7 @@ const VFMT = ['float32', 'float32x2', 'float32x3', 'float32x4', 'unorm8x4-bgra',
   'snorm16x2', 'snorm16x4', 'unorm16x2', 'unorm16x4', null, null, 'float16x2', 'float16x4'];
 
 async function startGpu(M, canvas, report, onFrame) {
-  if (!navigator.gpu) throw new Error('WebGPU no disponible');
+  if (!navigator.gpu) throw new Error('WebGPU no disponible en este navegador (hace falta Chrome/Edge 113+, Safari 26+ o Firefox 145+ en Mac Apple Silicon)');
   const adapter = await navigator.gpu.requestAdapter();
   if (!adapter) throw new Error('WebGPU: sin adaptador');
   // Which GPU drew (the Pod's Chrome must get the NVIDIA, not SwiftShader).
@@ -36,6 +36,8 @@ async function startGpu(M, canvas, report, onFrame) {
   const BC = adapter.features.has('texture-compression-bc');
   const device = await adapter.requestDevice({ requiredFeatures: [...(TS ? ['timestamp-query'] : []), ...(BC ? ['texture-compression-bc'] : [])] });
   device.addEventListener('uncapturederror', e => report('webgpu: ' + e.error.message));
+  // A lost device (GPU reset, iOS reclaiming a background tab) stops drawing for good: say so instead of a frozen frame.
+  device.lost.then(i => { if (i.reason !== 'destroyed') report(`STOP webgpu: se perdió la GPU (${i.reason || '?'}: ${i.message}). Recarga la página.`); });
   const ctx = canvas.getContext('webgpu');
   const box = M._rn_gpu_mailbox() >> 2;     // u32 index: seq, done, ptr[2], len[2]
   const H = () => M.HEAPU32;                // the view of the shared wasm memory

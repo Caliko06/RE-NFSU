@@ -73,7 +73,8 @@ function line(s, cls) {
   else if (/^  \S+!/.test(s)) d.className = 'api';
   d.textContent = s;
   log.appendChild(d);
-  if (/^STOP/.test(s)) { document.body.classList.add('dbg'); status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; }
+  // A 'stop' line (missing WebGPU, COOP/COEP, a lost GPU) opens the panel: otherwise the page is a black screen.
+  if (cls === 'stop' || /^STOP/.test(s)) { document.body.classList.add('dbg'); status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; }
 }
 (async () => {
   if (!crossOriginIsolated) { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
