@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <time.h>
+#include <unistd.h>
 #include "host.h"
 
 #define PROCESS_ID 0x8
@@ -105,6 +106,15 @@ void gil_clock(void) {
     if (is_main && now_us() - slice_start < main_clock_us) return;
     __atomic_add_fetch(&spinners, 1, __ATOMIC_RELAXED);
     gil_release();
+    gil_acquire();
+    __atomic_sub_fetch(&spinners, 1, __ATOMIC_RELAXED);
+}
+// A sleep without the GIL that counts as a spinner (as gil_clock): a thread that takes the turn meanwhile gets the
+// short quantum, so the sleeper is back on time (the limiter sleep, host/win32.c limiter_sleep).
+void gil_sleep_us(uint64_t us) {
+    __atomic_add_fetch(&spinners, 1, __ATOMIC_RELAXED);
+    gil_release();
+    usleep((useconds_t)us);
     gil_acquire();
     __atomic_sub_fetch(&spinners, 1, __ATOMIC_RELAXED);
 }

@@ -96,6 +96,7 @@ void rn_fixedclock_start(Ctx *c);
 uint32_t virtual_reserve(Ctx *c, uint32_t size);
 void gil_acquire(void);
 void gil_release(void);
+void gil_sleep_us(uint64_t us);
 void gil_slice(void);                                          // preempt at an API call after a quantum
 void gil_clock(void);                                          // a clock read: let a waiting thread run
 // Telemetry: running totals that web/telemetry.js reads at every frame (layout mirrored there). Each field has
