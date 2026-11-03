@@ -566,10 +566,11 @@ static uint32_t GetTickCount_(Ctx *c) { rn_telem.clock_calls++; clk_site(c); gil
 // * [0x7301d0] >= the wait at [esp+0x1c] of its frame (esp = this call's esp + 8). The spin is ~25 % of the game thread's
 // CPU in a race (profile spk2) and holds a core that a phone needs. Here the host sleeps without the GIL until 0.3 ms
 // before that exit point and then lets the loop spin as before: the loop still exits at its first read past the
-// deadline, so the frame times are the same. RN_LIMSLEEP=0 spins all the way (the A/B); off under RN_FIXEDCLOCK.
+// deadline, so the frame times are the same. OFF by default (RN_LIMSLEEP=1 on): bench spk5 (Mac under load) gave p99
+// 33.4 ms, 35 frames > 33 ms vs spk3 19.6 / 3; not yet separated from the load. Off under RN_FIXEDCLOCK.
 static int lim_sleep = -1;
 static void limiter_sleep(Ctx *c) {
-    if (lim_sleep < 0) { const char *e = getenv("RN_LIMSLEEP"); lim_sleep = !(e && *e == '0'); }
+    if (lim_sleep < 0) { const char *e = getenv("RN_LIMSLEEP"); lim_sleep = e && *e == '1'; }
     if (!lim_sleep || fixed_base || ld(c, c->r[ESP], 4) != 0x585bf7 || !rn_is_main_thread()) return;
     uint32_t sh = ld(c, 0x7349c8, 4) & 31, w = ld(c, c->r[ESP] + 8 + 0x1c, 4), p = ld(c, 0x7301d0, 4);
     float wait, per;
