@@ -98,6 +98,9 @@ function line(s, cls) {
       // web/mode.js: the original mode turns the native bridges off too (?env= still wins)
       if (RN_MODE === 'original') Object.assign(m.ENV, RN_ORIGINAL_ENV);
       line(`mode: ${RN_MODE} (F4 switches)`);
+      // ?fps=30: the host frame pacer targets 30 fps (web/mode.js degradation switches; ?fx=0 is read there)
+      if (RN_Q.get('fps') === '30') m.ENV.RN_FPS = '30';
+      if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
       for (const kv of (RN_Q.get('env') || '').split(',').filter(Boolean)) {
         const k = kv.indexOf('=');
