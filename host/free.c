@@ -183,6 +183,7 @@ static uint32_t free_setup(Ctx *c) {
 // +0x448, which 0x4b4040 sets for the four racers only), so the vinyl, decal and rim paint slots are cleared again, the
 // way 0x57e9a0 clears the vinyls of stock traffic, and 0x57ea80 (stdcall, the ride) recomputes the ride's derived state.
 static int8_t ctype[NCANON];      // the car type of each career preset (-1 = not in the game's list), filled once
+void rn_pool_traffic(Ctx *c, uint32_t ride, uint32_t seed);   // host/rivals.c
 static uint32_t free_traffic(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
@@ -228,6 +229,7 @@ static uint32_t free_traffic(Ctx *c) {
                 snprintf(nm, sizeof nm, "DUMMY_WHEEL%d", 13 + slot); st(c, ride + 0x448, nhash(nm), 4);
                 slot++;
             }
+            rn_pool_traffic(c, ride, a[0]);
             if (getenv("RN_FREELOG")) rn_log("FREE traffic %u: type %u wears %s's preset %08x skin %08x%s", a[0], type, CANON[k].name, CANON[k].preset, ld(c, ride + 0x444, 4), keep_vinyl ? " vinyls kept" : "");
         }
     }

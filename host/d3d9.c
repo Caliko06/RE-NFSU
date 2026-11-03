@@ -1547,6 +1547,7 @@ static uint32_t tex_of_bits(uint32_t bits) {
         if (objs[k].iface == I_SURFACE && objs[k].mem == bits && objs[k].container) return objs[k].container;
     return 0;
 }
+int rn_pool_livery(uint32_t skin, int *car, int *n);   // host/rivals.c
 static void skin_bridge(Ctx *c, Obj *s) {
     if (ld(c, c->r[ESP], 4) != 0x5a8e7d) return;
     uint32_t p = ld(c, c->r[ESP] + 0x44, 4) - 8, n = ld(c, p + 0x1b8, 4), fill = ld(c, p + 4, 4);
@@ -1572,6 +1573,8 @@ static void skin_bridge(Ctx *c, Obj *s) {
     for (uint32_t j = 0; j < 4; j++)
         for (uint32_t i = 0, cnt = ld(c, 0x733f50 + 4 * j, 4); i < cnt && i < 16; i++) { w[k++] = ld(c, 0x733e28 + 4 * (16 * j + i), 4); w[k++] = j; w[nm]++; }
     gpu_cmd(GPU_SKIN, (int)k, w);
+    int lcar, ln;   // spec +0 = the skin's texture record (0x5a8a50 reads its pixel code at +0x4a), its hash at +0x24 (docs/re/assets.md)
+    if (rn_pool_livery(ld(c, ld(c, p, 4) + 0x24, 4), &lcar, &ln)) { uint32_t lw[3] = {s->container, (uint32_t)lcar, (uint32_t)ln}; gpu_cmd(GPU_LIVERY, 3, lw); }
 }
 static uint32_t unlock_rect(Ctx *c, Obj *s) {
     if (!s->locked) return D3DERR_INVALIDCALL;

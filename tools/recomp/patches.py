@@ -488,6 +488,9 @@ PATCHES.append(dict(addr=0x43b556, old="cc" * 6, new="ff25b0300100", entry=True,
 # jmp [SCREEN_ADDR+0xb4] = host/rivals.c persona_clear: the original call, then + 1.5 m for a clean rival (WORLD only, ?ai=0 off).
 PATCHES.append(dict(addr=0x45c8c2, old="e8d9050000", new="e8" + _rel(0x45c8c2, 0x43db2a), when=lambda: True))
 PATCHES.append(dict(addr=0x43db2a, old="cc" * 6, new="ff25b4300100", entry=True, when=lambda: True))
+# PATCH: 0x56f21e (+ cave 0x67358a, CC padding after a ret), OWNER 2026-11-03 (more neon on tuned cars): the neon pass setup of DrawLampFlares 0x56d8d0 calls host/rivals.c neon_pass, jmp [SCREEN_ADDR+0xb8]: same eax and [esp+0x20], but with RN_POOL (?pool=1) a wider, stronger glow on the others' cars.
+PATCHES.append(dict(addr=0x56f21e, old="8b45088b4c241c8b80bc040000894c2420", new="e8" + _rel(0x56f21e, 0x67358a) + "90" * 12, when=lambda: True))
+PATCHES.append(dict(addr=0x67358a, old="cc" * 6, new="ff25b8300100", entry=True, when=lambda: True))
 # PATCH: 0x583a37, 0x583a5b (on top of the traffic speed patches above) + cave 0x63b366 (10 free bytes of the dead CRT routine between the traffic caves and 0x63b370): the traffic driver's two lane-speed calls go to jmp [SCREEN_ADDR+0xa0] = host/free.c traffic_speed, which calls the same speed cave 0x63b331 first, then in the WORLD scales by car type (bus/vans slow, taxis fast; elsewhere and with ?ai=0 the result is unchanged).
 PATCHES.append(dict(addr=0x63b366, old="6a00ff15ec75", new="ff25a0300100", entry=True, when=lambda: True))
 PATCHES.append(dict(addr=0x583a37, old="e8f5780b00", new="e8" + _rel(0x583a37, 0x63b366), when=lambda: True))

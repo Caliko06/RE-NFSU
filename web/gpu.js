@@ -4,7 +4,7 @@
 'use strict';
 const GPU_TARGET = 1, GPU_CLEAR = 2, GPU_PRESENT = 3, GPU_DRAW = 4, GPU_SHADER = 5, GPU_DECL = 6, GPU_TEXTURE = 7,
   GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10, GPU_FXAA = 11, GPU_SKIN = 12,
-  GPU_BUFFER = 13, GPU_BUFDATA = 14;
+  GPU_BUFFER = 13, GPU_BUFDATA = 14, GPU_LIVERY = 15;
 const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_DECL = 6, D_RT = 7, D_DS = 8, D_VP = 9,
   D_SC = 15, D_ZEN = 19, D_ZWRITE = 20, D_ZFUNC = 21, D_CULL = 22, D_BLEND = 23, D_SRCB = 24, D_DSTB = 25, D_BOP = 26,
   D_SEPA = 27, D_SRCBA = 28, D_DSTBA = 29, D_BOPA = 30, D_BFACTOR = 31, D_CWRITE = 32, D_AFUNC = 33, D_AREF = 34,
@@ -878,15 +878,51 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST });
     }
     e.copyTextureToTexture({ texture: dst }, { texture: t.skin }, [S, S]);
-    for (let l = 1; l <= Math.log2(S); l++) {
-      const p = e.beginRenderPass({ colorAttachments: [{ view: t.skin.createView({ baseMipLevel: l, mipLevelCount: 1 }), loadOp: 'clear', storeOp: 'store' }] });
-      p.setPipeline(mipPipe);
-      p.setBindGroup(0, device.createBindGroup({ layout: mipPipe.getBindGroupLayout(0), entries: [
-        { binding: 0, resource: t.skin.createView({ baseMipLevel: l - 1, mipLevelCount: 1 }) }, { binding: 1, resource: skinLin }] }));
-      p.draw(3); p.end();
-    }
+    skinMips(e, t.skin);
     device.queue.submit([e.finish()]);
     t.view = t.skin.createView();
+  }
+  function skinMips(e, tex) {
+    for (let l = 1; l < tex.mipLevelCount; l++) {
+      const p = e.beginRenderPass({ colorAttachments: [{ view: tex.createView({ baseMipLevel: l, mipLevelCount: 1 }), loadOp: 'clear', storeOp: 'store' }] });
+      p.setPipeline(mipPipe);
+      p.setBindGroup(0, device.createBindGroup({ layout: mipPipe.getBindGroupLayout(0), entries: [
+        { binding: 0, resource: tex.createView({ baseMipLevel: l - 1, mipLevelCount: 1 }) }, { binding: 1, resource: skinLin }] }));
+      p.draw(3); p.end();
+    }
+  }
+  // ?pool=1 (OWNER 2026-11-03): host/d3d9.c skin_bridge names a livery right after GPU_SKIN. The art (tools/art/compose.py, RGBA, skin UV) loads
+  // once and is alpha-blended over mip 0 of the HD skin. The skin's alpha (reflectivity) stays. A car drawn before it loads just pops in.
+  const LIV_CARS = ['GOLF', 'FOCUS', 'MIATA', 'NEON', 'CIVIC', 'PEUGOT', 'CELICA', 'ECLIPSE', 'RX7', 'SUPRA', 'S2000', 'RSX', 'IMPREZA', 'LANCER', 'INTEGRA', 'TIBURON', '350Z', 'SENTRA', '240SX', 'SKYLINE'];
+  const livCache = new Map();
+  let livPipe = null;
+  function livery(id, car, n) {
+    const t = res.get(id), url = `remaster/liv/${LIV_CARS[car]}/${n}.webp`;
+    if (!t || !t.skin) return;
+    const skinTex = t.skin;
+    if (!livCache.has(url)) livCache.set(url, fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.blob(); })
+      .then(b => createImageBitmap(b, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })).then(img => {
+        const a = device.createTexture({ size: [img.width, img.height], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
+        device.queue.copyExternalImageToTexture({ source: img }, { texture: a }, [img.width, img.height]);
+        return a;
+      }));
+    livCache.get(url).then(a => {
+      if (t.skin !== skinTex) return;
+      livPipe ??= device.createRenderPipeline({ layout: 'auto', vertex: { module: mipMod, entryPoint: 'vs' }, fragment: { module: device.createShaderModule({ code: `
+@group(0) @binding(0) var art: texture_2d<f32>;
+@group(0) @binding(1) var smp: sampler;
+@fragment fn fs(@builtin(position) p: vec4f) -> @location(0) vec4f {
+  return textureSampleLevel(art, smp, p.xy / vec2f(${skinTex.width}.0), 0.0);
+}` }), entryPoint: 'fs', targets: [{ format: 'rgba8unorm', writeMask: GPUColorWrite.RED | GPUColorWrite.GREEN | GPUColorWrite.BLUE,
+        blend: { color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha' }, alpha: { srcFactor: 'zero', dstFactor: 'one' } } }] }, primitive: { topology: 'triangle-list' } });
+      const e = device.createCommandEncoder();
+      const p = e.beginRenderPass({ colorAttachments: [{ view: skinTex.createView({ baseMipLevel: 0, mipLevelCount: 1 }), loadOp: 'load', storeOp: 'store' }] });
+      p.setPipeline(livPipe);
+      p.setBindGroup(0, device.createBindGroup({ layout: livPipe.getBindGroupLayout(0), entries: [{ binding: 0, resource: a.createView() }, { binding: 1, resource: skinLin }] }));
+      p.draw(3); p.end();
+      skinMips(e, skinTex);
+      device.queue.submit([e.finish()]);
+    }).catch(err => report('gpu.js: livery ' + err.message));
   }
 
   const gpuDone = [], TS_MAX = 256;
@@ -1228,6 +1264,8 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         device.queue.writeBuffer(gbufs.get(w[a]), w[a + 1], u8, 4 * (a + 3), w[a + 2]);
       } else if (op === GPU_SKIN) {
         skin(w, a);
+      } else if (op === GPU_LIVERY) {
+        livery(w[a], w[a + 1], w[a + 2]);
       } else if (op === GPU_PRESENT) {
         endPass();
         if (n > 3) paceBox = w[a + 3];

@@ -1157,6 +1157,7 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 0xa0, host_addr_of("rn", "traffic_speed"), 4);  // PATCH 0x583a37, 0x583a5b: traffic speed by car type in WORLD (host/free.c, RN_AI=0 = off)
     st(c, SCREEN_ADDR + 0xb0, host_addr_of("rn", "persona_step"), 4);  // PATCH 0x44c573: rival personalities in WORLD (RN_AI=0 = original)
     st(c, SCREEN_ADDR + 0xb4, host_addr_of("rn", "persona_clear"), 4); // PATCH 0x45c8c2: clean WORLD rivals pass wide
+    st(c, SCREEN_ADDR + 0xb8, host_addr_of("rn", "neon_pass"), 4);     // PATCH 0x56f21e: neon puddle (?pool=1)
     lights_init(c);                            // host/lights.c: live brake lights (RN_LIGHTS=0 = original)
     const char *steer = getenv("RN_STEER");    // PATCH 0x460a80: 1 = the keys steer through the game's gamepad model
     st(c, SCREEN_ADDR + 32, steer && !strcmp(steer, "pad"), 4);

@@ -458,6 +458,9 @@ static const char *const car_ps_tail_soft =
     "  let pb = clamp(f.xyz * dk, vec3f(0.0), vec3f(1.0));\n"
     "  let rf = 1.0 - exp(-max(e * f.w, vec3f(0.0)));\n"
     "  r0 = vec4f(pb + rf * (1.0 - pb), f.w);\n";
+// ?pool=1 (OWNER 2026-11-03, warmth): sodium street light on the cars, a warm gain and a low warm fill so shadows on the body are not grey-blue.
+static const char *const car_ps_warm =
+    "  r0 = vec4f(clamp(r0.xyz * vec3f(1.07, 1.0, 0.88) + vec3f(0.018, 0.008, 0.0), vec3f(0.0), vec3f(1.0)), r0.w);\n";
 
 int sm1_roadrefl(void) {
     static int v = -1;
@@ -505,6 +508,7 @@ char *sm1_wgsl(const Sm1 *s, int mode) {
         if (detail == 2) emit(&b, "  let sh = step(%d.0, i.pos.x);\n  let dk = mix(vec3f(1.0), dk0, sh);\n  let rk = mix(1.0, rk0, sh);\n", rn_screen_w / 2);
         else if (detail) emit(&b, "  let dk = dk0;\n  let rk = rk0;\n");
         emit(&b, "%s", look == 3 ? car_ps_tail_soft : car_ps_tail);
+        if (getenv("RN_POOL")) emit(&b, "%s", car_ps_warm);
     }
     const Ins *pend = NULL;
     char pend_val[64] = "";

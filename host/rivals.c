@@ -14,12 +14,26 @@
 #include "host.h"
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
 #define POOL 300
 #define NSYN 8                  // synthetic preset records: one per opponent slot of a race
 #define RIDE_SIZE 0x720         // RideInfo: 0x57d160 clears up to +0x71c
 enum { CLEAN, SHOW, DRIFT, SLEEPER, STREET, BOSO, VIP, TRACK, NARCH };
 
+int rn_pool(void) { static int on = -1; if (on < 0) on = getenv("RN_POOL") != NULL; return on; }   // ?pool=1, OWNER 2026-11-03: the car pool, off until approved
+// Liveries of the pool: skin hash (ride +0x444) -> car and art number, web/remaster/liv/<CAR>/<n>.webp (tools/art/compose.py). host/d3d9.c skin_bridge asks here.
+static struct { uint32_t skin; uint8_t car, n; } liv[32];
+static void livery_set(uint32_t skin, int car, int n) {
+    int k = 0;
+    while (k < 31 && liv[k].skin && liv[k].skin != skin) k++;
+    liv[k].skin = n >= 0 ? skin : 0; liv[k].car = (uint8_t)car; liv[k].n = (uint8_t)n;
+}
+int rn_pool_livery(uint32_t skin, int *car, int *n) {
+    for (int k = 0; k < 32; k++) if (skin && liv[k].skin == skin) { *car = liv[k].car; *n = liv[k].n; return 1; }
+    return 0;
+}
+static uint32_t neon_ride[NSYN];       // skin hash (ride +0x444) of the SHOW and BOSO rivals: neon_pass animates them
 static const char *CARS[20] = {"GOLF", "FOCUS", "MIATA", "NEON", "CIVIC", "PEUGOT", "CELICA", "ECLIPSE", "RX7", "SUPRA",
     "S2000", "RSX", "IMPREZA", "LANCER", "INTEGRA", "TIBURON", "350Z", "SENTRA", "240SX", "SKYLINE"};
 
@@ -291,7 +305,9 @@ static void build(Ctx *c, uint32_t rec, const Persona *pe, int t) {
     // Glass and underglow.
     const char *tints[3] = {"LIGHT TINT BLACK", "MEDIUM TINT BLACK", "DARK TINT BLACK"};
     if (pe->arch != STREET || roll(&s, 70)) set(c, rec, 0x73, pick(&s, car, 0x73, 4, tints[a->tint < t ? a->tint : t - 1], 0));
-    if (t > 1 && roll(&s, a->neon)) {
+    int neonp = a->neon;
+    if (rn_pool() && (pe->arch == CLEAN || pe->arch == DRIFT || pe->arch == STREET || pe->arch == BOSO || pe->arch == SHOW)) neonp = neonp > 80 ? neonp : 80;
+    if ((t > 1 || rn_pool()) && roll(&s, neonp)) {
         const Part *best = NULL; int bd = 1 << 30;
         int ar = accent >> 16 & 255, ag = accent >> 8 & 255, ab = accent & 255;
         for (int k = 0; k < nparts; k++) {
@@ -326,6 +342,25 @@ static void personality(Ctx *c, uint32_t ride, const Persona *pe) {
 
 // Builds persona pe into preset record rec, lets the game apply it to the ride (0x4b26f0 keeps DUMMY_SKIN/WHEEL) and
 // matches the rating of tmp (the ride the game made, *r0 once 0x57f700 computed it) within 5.0; returns how far it stayed.
+// 12 liveries per car: 0..3 clean stripes, 4..7 loud show graphics, 8..11 street slashes and stickers.
+static int livery_of(int arch, uint32_t *s) {
+    int base = arch == CLEAN || arch == TRACK || arch == VIP ? 0 : arch == SHOW || arch == BOSO ? 4 : 8;
+    return base + (int)(rnd(s) % 4);
+}
+// Free mode: a tuned traffic car (host/free.c free_traffic): half wear a neon, most a livery.
+void rn_pool_traffic(Ctx *c, uint32_t ride, uint32_t seed) {
+    if (!rn_pool() || c->mem[0x78a33c]) return;
+    if (!ready) catalog(c);
+    uint32_t s = seed * 0x9e3779b1u + ride;
+    if (!ld(c, ride + 0x61c, 4) && roll(&s, 50)) {
+        int cand[64], n = 0;
+        for (int k = 0; k < nparts && n < 64; k++) if (parts[k].slot == 0x74 && parts[k].lvl) cand[n++] = k;
+        if (n) { st(c, ride + 0x61c, parts[cand[rnd(&s) % n]].rec, 4); c->mem[ride + 0x62c + 0x74]++; }
+    }
+    int car = (int)ld(c, ride, 4), arch = (int)(rnd(&s) % NARCH);
+    if (car < 20 && ld(c, ride + 0x444, 4)) livery_set(ld(c, ride + 0x444, 4), car, roll(&s, 70) ? livery_of(arch, &s) : -1);
+}
+
 static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char *nm, const Persona *pe, int tier, float *r0) {
     build(c, rec, pe, tier);
     link(c, rec, nm);
@@ -411,7 +446,7 @@ static uint32_t rival_ride(Ctx *c) {
     if (a[6] <= 1) {
         const char *w = getenv("RN_WORLD");
         free_race = rn_free_now != 0;
-        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && free_race && w && w[0] == '1'));
+        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && ((free_race && w && w[0] == '1') || rn_pool())));
         rn_player_car(c), rival_tables(c, persona_on), traffic_types(c), traffic_spacing(c);
     }
     if (rn_free_now) {                                           // host/free.c: free mode's career rivals
@@ -425,11 +460,12 @@ static uint32_t rival_ride(Ctx *c) {
         if (!ready) catalog(c);
         uint32_t ride = a[2], k = a[6] % NSYN, rec = syn[k];
         if (a[6] <= 1) nused = 0;                                  // the first opponent of a race
-        uint32_t tmp = guest_alloc(RIDE_SIZE);
+        uint32_t tmp = guest_alloc(RIDE_SIZE), skin0 = ld(c, ride + 0x444, 4);
         memcpy(G(tmp), G(ride), RIDE_SIZE);
         // A persona from the game's random stream; its tier from the tuning the game gave this rival.
         int lv = 0; for (int i = 0; i < 9; i++) lv += ld(c, ride + 8 + 4 * i, 4);
         int tier = lv >= 18 ? 3 : lv >= 7 ? 2 : 1;
+        if (rn_pool() && tier < 2) tier = 2;                       // ?pool=1: the early rivals are visibly tuned too
         uint32_t s = ld(c, 0x6f227c, 4) ^ (a[6] * 0x85ebca6bu);
         Persona *pick_p = fresh(rnd(&s) % POOL);
         // The persona's car must reach the rating the game chose (0x57f700 can only move levels 0..3): up to 12 personas,
@@ -445,6 +481,18 @@ static uint32_t rival_ride(Ctx *c) {
         }
         if (best != pick_p) { apply(c, ride, tmp, rec, nm, pick_p = best, tier, &r0); used[(nused - 1) % NSYN] = (uint32_t)(best - pool); }
         personality(c, ride, pick_p);
+        uint32_t skin = ld(c, ride + 0x444, 4) ? ld(c, ride + 0x444, 4) : skin0;
+        neon_ride[k] = pick_p->arch == SHOW || pick_p->arch == BOSO ? skin : 0;
+        if (rn_pool()) {
+            // The driving follows the build: PERSONA is per skill level, so each archetype takes the nearest level of its style (Quick Race gives all rivals one level).
+            static const uint8_t STYLE[NARCH] = {[CLEAN] = TIDY, [SHOW] = NERVOUS, [DRIFT] = AGGRESSIVE, [SLEEPER] = TIDY, [STREET] = NERVOUS, [BOSO] = AGGRESSIVE, [VIP] = TIDY, [TRACK] = TIDY};
+            int best_lv = (int)a[4], bdl = 99;
+            if (a[4] <= 9) for (int l = 1; l <= 9; l++) { int dl = abs(l - (int)a[4]); if (PERSONA[l] == STYLE[pick_p->arch] && dl < bdl) bdl = dl, best_lv = l; }
+            a[4] = (uint32_t)best_lv;
+            static const uint8_t LIVP[NARCH] = {[CLEAN] = 40, [SHOW] = 100, [DRIFT] = 85, [SLEEPER] = 0, [STREET] = 90, [BOSO] = 90, [VIP] = 15, [TRACK] = 70};
+            uint32_t ls = pick_p->seed ^ 0x51ed270bu;
+            livery_set(skin, pick_p->car, roll(&ls, LIVP[pick_p->arch]) ? livery_of(pick_p->arch, &ls) : -1);
+        }
         if (getenv("RN_RIVALLOG")) {
             float r1; memcpy(&r1, G(ride + 0x428), 4);
             rn_log("rival %u: %s %s %s tier %d rating %.1f -> %.1f", a[6], pick_p->name, CARS[pick_p->car], ARCH[pick_p->arch].name,
@@ -872,6 +920,20 @@ static uint32_t persona_step(Ctx *c) {
     static struct { uint32_t v, stamp, shot, said; } s[16];
     uint32_t v = c->r[EAX], r = call_guest(c, 0x44bd10, 0, NULL);
     if (!persona_on || !v) return r;
+    if (rn_pool()) {
+        // Less rubber band: 0x44bd10 writes its scale at [v+0x4b8] (raw) and [[v+4]+0x404] (max(raw, 1)) once per 0.3 s (0x44bfe9..0x44bffe). A new value keeps 35 % of its distance to 1.
+        static struct { uint32_t v; float last; } rb[16];
+        int q = 0;
+        while (q < 15 && rb[q].v && rb[q].v != v) q++;
+        float raw = ldf(c, v + 0x4b8);
+        if (rb[q].v != v || raw != rb[q].last) {
+            uint32_t veh = ld(c, v + 4, 4);
+            float d = 1.f + (raw - 1.f) * 0.35f;
+            stf(c, v + 0x4b8, d);
+            if (veh) stf(c, veh + 0x404, d > 1.f ? d : 1.f);
+            rb[q].v = v; rb[q].last = d;
+        }
+    }
     uint32_t ctx = v + 0x2c, car = ld(c, ctx, 4), ent = car ? ld(c, car + 0x14, 4) : 0, act = ld(c, v + 0x3f8, 4);
     if (!ent || ld(c, ent + 4, 4) != 2 || !act) return r;
     int lv = (int8_t)c->mem[ent + 0x735], p = lv >= 0 && lv <= 9 ? PERSONA[lv] : NORMAL;
@@ -932,6 +994,33 @@ static uint32_t persona_clear(Ctx *c) {
     return 0;
 }
 
+// BRIDGE: neon puddle, OWNER 2026-11-03 (?pool=1, Remaster only, off by default). DrawLampFlares 0x56d8d0 draws the car's shadow and then its
+// neon (+0x4bc, texture <CAR>_NEON, pass 1 of the loop at 0x56f200) over one 4x4 grid on the road (16 points of 16 bytes at [esp+0x5b0]), colour [esp+0x1c].
+// PATCH 0x56f21e sends the neon pass's setup here. Every car but the player's (skin DUMMY_SKIN1) outside the career gets a wider, stronger glow; SHOW and BOSO
+// rivals pulse or sweep hue. The neon pass is the last user of the grid, so it is scaled in place. Clock [0x73ad34] = 4000 Hz (0x6cca38 = 0.00025).
+static uint32_t neon_pass(Ctx *c) {
+    uint32_t esp = c->r[ESP] + 4, info = ld(c, c->r[EBP] + 8, 4), tex = ld(c, info + 0x4bc, 4), col = ld(c, esp + 0x1c, 4), ride = ld(c, info + 4, 4);
+    if (rn_pool() && tex && (col >> 24) && !c->mem[0x78a33c] && ride && ld(c, ride + 0x444, 4) != 0x530b82b0) {
+        float t = ld(c, 0x73ad34, 4) * 0.00025f, q[3], k = 1.3f;
+        for (int i = 0; i < 3; i++) q[i] = (col >> (8 * i) & 255);
+        uint32_t skin = ld(c, ride + 0x444, 4);
+        for (int i = 0; i < NSYN; i++) if (skin && neon_ride[i] == skin) {
+            if (skin & 1) k *= 0.8f + 0.2f * sinf(t * 2.5f);          // pulse
+            else {                                                          // slow sweep into the rotated colour
+                float m = 0.5f + 0.5f * sinf(t * 0.75f), r[3] = {q[1], q[2], q[0]};
+                for (int j = 0; j < 3; j++) q[j] += (r[j] - q[j]) * m;
+            }
+        }
+        col = 0xfe000000u;
+        for (int i = 0; i < 3; i++) { float v = q[i] * k; col |= (uint32_t)(v > 254.f ? 254.f : v) << (8 * i); }
+        float g[16][3], m[3] = {0, 0, 0};
+        for (int i = 0; i < 16; i++) for (int j = 0; j < 3; j++) { memcpy(&g[i][j], G(esp + 0x5b0 + 16 * i + 4 * j), 4); m[j] += g[i][j] / 16.f; }
+        for (int i = 0; i < 16; i++) for (int j = 0; j < 3; j++) { float v = m[j] + (g[i][j] - m[j]) * 1.18f; memcpy(G(esp + 0x5b0 + 16 * i + 4 * j), &v, 4); }
+    }
+    st(c, esp + 0x20, col, 4);
+    return tex;
+}
+
 const Api rivals_apis[] = {{"rn", "rival_ride", 7, rival_ride}, {"rn", "car_draw", 12, car_draw}, {"rn", "traffic_behind", 0, traffic_behind},
-                           {"rn", "persona_step", 0, persona_step}, {"rn", "persona_clear", 2, persona_clear}};
-const int rivals_api_count = 5;
+                           {"rn", "persona_step", 0, persona_step}, {"rn", "persona_clear", 2, persona_clear}, {"rn", "neon_pass", 0, neon_pass}};
+const int rivals_api_count = 6;
