@@ -35,7 +35,8 @@ PROLOGUE = '#include "rt.h"\n'
 # Functions with a native body in host/native.h (nat_<addr>): the same operations in the same order, proven bit for bit
 # by RN_ONLY=<addr> tools/recomp/difftest.py. The lifted body stays as f_<addr>_lift for inputs outside the fast case.
 # 0x5d6f5d D3DXMatrixMultiply (x87): 5.8 % self of the race game thread (build/bench/spk2, 2026-11-01).
-NATIVE = {0x5d6f5d}
+# 0x5c97cb D3DX effect state apply: 11.4 % of the race game thread, ~0.5 % of it device work (spk2, 2026-11-02).
+NATIVE = {0x5d6f5d, 0x5c97cb}
 
 
 class Unsupported(Exception):

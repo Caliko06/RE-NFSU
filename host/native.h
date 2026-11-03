@@ -66,3 +66,136 @@ static inline int nat_5d6f5d(Ctx *c) {
     c->cf = cf; c->zf = 1; c->sf = 0; c->of = 0; c->pf = 1; c->af = 1;   // inc edi -> 0
     return 1;
 }
+
+// 0x5c97cb D3DX effect: apply one state record to the device (thiscall ecx = effect, (rec, index), ret 8). Called per
+// state by Pass 0x5d01ec and by the parameter-change walk 0x5cf304. 11.4 % of the race game thread, of which ~0.5 % is
+// the device work: the rest is the lifted body and the call bridge (build/bench/spk2.2715D8F0 profile, 2026-11-02).
+// Native here: the cases that make one device call (render, texture stage and sampler states, light enable, texture,
+// transform, shader constants, vertex shader constant state). The others (vertex/pixel shader objects, lights,
+// materials, the record-list recursion, NPatchMode, the caps check when [this+0x84] == 2) run the lifted body.
+// The device call itself goes through rn_call with the same stack, registers and return address as the lifted code.
+#define NAT_NS(a, n) (NAT_OK(a, n) && ((uint32_t)(a) + (n) <= fr || (uint32_t)(a) >= sp + 12))   // in range, off the frame
+static inline int nat_call(Ctx *c, uint32_t esp, uint32_t target, uint32_t ra) {
+    esp -= 4; st(c, esp, ra, 4); c->r[4] = esp;
+    rn_call(c, target);
+    if (c->halt) return 0;
+    if (c->ret != ra) { c->halt = 1; c->halt_at = ra - 6; c->why = "return address changed"; return 0; }
+    return 1;
+}
+static inline int nat_5c97cb(Ctx *c) {
+    uint32_t sp = c->r[4], th = c->r[1], fr = sp - 0x460;     // frame: ebp = sp-4, locals to ebp-0x438, 3 saves, 5 pushes
+    if (!NAT_OK(fr, 0x46c) || !NAT_NS(th, 0x90)) return 0;
+    uint32_t ebp = sp - 4, rec = ld(c, sp + 4, 4), idx = ld(c, sp + 8, 4);
+    if (!NAT_NS(rec, 0x6c)) return 0;
+    uint32_t edi = idx == 0xffffffffu ? ld(c, rec + 4, 4) : idx, arg2 = edi, r = rec;   // arg2: [ebp+0xc] after 0x5c9806
+    if (ld(c, rec, 4) == 0xffffffffu) { r = ld(c, rec + 0x64, 4); if (!NAT_NS(r, 0xac)) return 0; }
+    else if (!NAT_NS(r, 0xac)) return 0;
+    uint32_t ta = ld(c, r, 4) * 0x1c + 0x6dc274;
+    if (!NAT_NS(ta, 4)) return 0;
+    uint32_t s = ld(c, ta, 4), ty = s >> 24, x84 = ld(c, th + 0x84, 4);
+    uint32_t dev = ld(c, th + 8, 4);
+    if (!NAT_NS(dev, 4)) return 0;
+    uint32_t vt = ld(c, dev, 4);
+    // the call: registers at it, the arguments (first = lowest address), the vtable slot, the return address, epilogue
+    uint32_t a[5], na, off, ra, eax = dev, ecx = vt, edx = 0, ebx = r, esi = th, epi_b = 0;
+    a[0] = dev;
+    switch (ty) {
+    case 1: case 2: case 8:     // SetRenderState / SetTextureStageState / SetSamplerState
+        ecx = s & 0xffffff; edx = vt;
+        if (ty == 1) { a[1] = ecx; a[2] = ld(c, r + 0x68, 4); na = 3; off = 0xe4; ra = 0x5c984a; }
+        else { a[1] = edi; a[2] = ecx; a[3] = ld(c, r + 0x68, 4); na = 4;
+               off = ty == 2 ? 0x10c : 0x114; ra = ty == 2 ? 0x5c9866 : 0x5ca078; }
+        break;
+    case 3:                     // LightEnable only
+        if (s != 0x300000d) return 0;
+        a[1] = edi; a[2] = ld(c, r + 0x68, 4); na = 3; off = 0xd4; ra = 0x5c99d0;
+        break;
+    case 5: {                   // SetTexture (0x5c9ac9)
+        if (x84 == 2) return 0;
+        uint32_t pt = ld(c, th + 0x8c, 4) + ld(c, r + 0xc, 4) * 4;
+        if (!NAT_NS(pt, 4)) return 0;
+        uint32_t P = ld(c, pt, 4);
+        if (!NAT_NS(P, 0x3c)) return 0;
+        uint32_t p38 = ld(c, P + 0x38, 4), q = ld(c, P + 0x28, 4) + ld(c, r + 0x14, 4), v;
+        if (!p38) {
+            uint32_t b = ld(c, th + 0x2c, 4);
+            if (!NAT_NS(q + b, 4)) return 0;
+            v = ld(c, q + b, 4);
+        } else {
+            uint32_t e = ld(c, th + 0xc, 4);
+            if (!NAT_NS(e + 8, 4) || !NAT_NS(p38 + 8, 4)) return 0;
+            uint32_t b = ld(c, e + 8, 4);
+            if (!NAT_NS(q + b, 4)) return 0;
+            uint32_t k = ld(c, q + b, 4), tb = ld(c, p38 + 8, 4);
+            if (!NAT_NS(tb + k * 4, 4)) return 0;
+            v = ld(c, tb + k * 4, 4);
+        }
+        ebx = ld(c, th + 0x24, 4); eax = v * 0x1c;
+        if (!NAT_NS(eax + ebx + 4, 4)) return 0;
+        a[1] = edi; a[2] = ld(c, eax + ebx + 4, 4); na = 3;
+        ecx = dev; edx = vt; off = 0x104; ra = 0x5c9b10;
+        break;
+    }
+    case 6:                     // vertex shader constant state 0x6000008, shader constants
+        if (s == 0x6000008) {
+            ebx = x84 == 1 ? 2 : ld(c, r + 0x68, 4);
+            a[1] = ebx; na = 2; off = 0x164; ra = 0x5c9b39;
+            break;
+        }
+        if (x84 == 1) return 0;
+        edx = 0x6000102; ecx = s;
+        if (s > 0x6000102) {
+            switch (s) {
+            case 0x6000105: off = 0x1b4; break;
+            case 0x6000202: off = 0x178; ecx = 0xfd; break;
+            case 0x6000205: case 0x6000305: case 0x6000405: off = 0x1b4; ecx = 0xfd; edx = 3; break;
+            case 0x6000302: case 0x6000402: off = 0x178; ecx = 0xfd; edx = 3; break;
+            default: return 0;
+            }
+        } else if (s == 0x6000102) off = 0x178;
+        else {
+            static const uint16_t offs[8] = {0, 0, 0x178, 0x180, 0x188, 0x1b4, 0x1bc, 0x1c4};
+            ecx = s - 0x6000000;
+            if (ecx > 7 || !offs[ecx]) return 0;
+            off = offs[ecx];
+        }
+        switch (off) {
+        case 0x178: ra = 0x5ca00c; break;  case 0x180: ra = 0x5c9f61; break;  case 0x188: ra = 0x5c9f7c; break;
+        case 0x1b4: ra = 0x5c9ff4; break;  case 0x1bc: ra = 0x5c9f97; break;  default: ra = 0x5c9faf; break;
+        }
+        a[1] = edi; a[2] = ld(c, r + 0x4c, 4); a[3] = ld(c, r + 0xa8, 4); na = 4;
+        eax = vt; esi = dev; epi_b = 1;
+        break;
+    case 7: {                   // SetTransform (0x5ca01b)
+        uint32_t k = s - 0x7000000;
+        if (k > 3) return 0;
+        if (k == 2) edi += 0x100; else if (k == 3) edi += 0x10;
+        ebx = r + 0x68;
+        a[1] = k == 0 ? 3 : k == 1 ? 2 : edi; a[2] = ebx; na = 3; off = 0xb0; ra = 0x5ca05f;
+        break;
+    }
+    default: return 0;
+    }
+    if (!NAT_NS(vt + off, 4)) return 0;
+    uint32_t target = ld(c, vt + off, 4);
+    // prologue (0x5c97cb): push ebp; sub esp, 0x438; push ebx; [ebp-7..-5] = 0; push esi; push edi; locals
+    st(c, sp - 4, c->r[5], 4);
+    st(c, ebp - 0x43c, c->r[3], 4); st(c, ebp - 0x440, c->r[6], 4); st(c, ebp - 0x444, c->r[7], 4);
+    st(c, ebp - 4, th, 4); st(c, ebp - 0x1c, 0, 4); st(c, ebp - 0xc, 0xff, 4); st(c, ebp - 8, 0x11, 4);
+    if (idx == 0xffffffffu) st(c, ebp + 0xc, arg2, 4);
+    uint32_t esp = ebp - 0x444 - 4 * na;
+    for (uint32_t k = 0; k < na; k++) st(c, esp + 4 * k, a[k], 4);
+    c->r[0] = eax; c->r[1] = ecx; c->r[2] = edx; c->r[3] = ebx; c->r[5] = ebp; c->r[6] = esi; c->r[7] = edi;
+    if (!nat_call(c, esp, target, ra)) return 1;
+    uint32_t v = c->r[0], e;
+    if (epi_b) e = (int32_t)v < 0 ? v : 0;                          // 0x5ca00c
+    else e = (int32_t)v >= 0 || ld(c, c->r[6] + 0x84, 4) == 1 ? 0 : v;   // 0x5ca0d2
+    uint32_t sp2 = c->r[4], bp = c->r[5];                            // 0x5ca0e3: [ebp-0x1c] is still 0, no Release
+    c->r[7] = ld(c, sp2, 4); c->r[6] = ld(c, sp2 + 4, 4); c->r[3] = ld(c, sp2 + 8, 4);
+    c->r[5] = ld(c, bp, 4);
+    c->ret = ld(c, bp + 4, 4);
+    c->r[4] = bp + 16;                                              // leave; ret 8
+    c->r[0] = e;
+    c->cf = 0; c->zf = 1; c->sf = 0; c->of = 0; c->pf = 1; c->af = 0;   // test eax, eax with [ebp-0x1c] = 0
+    return 1;
+}
