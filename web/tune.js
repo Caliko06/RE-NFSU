@@ -1,6 +1,6 @@
 // Blur bank: presets for the game's own motion blur (0x40cd40). host/d3d9.c tune_apply copies the 4 floats into its .data
 // (ramp start/end m/s 0x702a38/0x702a3c, cap of t 0x702a40, streak length 0x702a44) at the next Present.
-// ?blur=0..6 picks one; F6 / F7 step down / up in game (the game maps neither key). The choice is kept in this browser.
+// ?blur=0..7 picks one; F6 / F7 step down / up in game (the game maps neither key). The choice is kept in this browser.
 // Composite alpha at full speed = min(1.5 cap, 1). PC original: 25 -> 125 m/s, cap 0.65; PS2 ramp 0.1 -> 25 m/s
 // (SLUS_208.11 0x4ff95c/0x4ff960), strongest PS2 copy alpha 50/128 (0x4485f0) = cap 0.26.
 // trails = light-trail strength s (PATCH 0x409bdb, [0x707fcc]): a still lamp is s times its flare, a moving one keeps the
@@ -15,6 +15,8 @@ const BLUR = [
   // PS2 depth: the PS2's 4-copy zoom blur weighted by the scene's depth (web/gpu.js psblur; car sharp, far city stretched; nitrous adds
   // the PS2's 2 extra passes). The game's own blur is off (cap 0) so the two do not stack; trails as 'PS2'. ?psblur=0 falls back to 3.
   { name: 'PS2 depth',    ramp: [0.1, 25], cap: 0,    trails: 1.5, ps: true },
+  // Soft (?pool=1): the PC ramp at a third of its cap. PC cap 0.65 lays a half-resolution zoomed copy of the world over it at up to 97.5 % while the car stays sharp: the OWNER's myopia.
+  { name: 'Soft',         ramp: [25, 125], cap: 0.22, trails: 'raw' },
 ];
 const BLUR_ORIGINAL = 5;    // 'PC original': Original mode starts there, as shipped
 const BLUR_DEFAULT = 6;     // PS2 depth (before it: 3 = PS2, OWNER 2026-10-26: medium made the blur and the light aura hard to see)
@@ -42,7 +44,9 @@ function startTune(M) {
   const f = new Float32Array(1), u = new Uint32Array(f.buffer);
   const bits = x => (f[0] = x, u[0]);
   let level = RN_MODE === 'original' ? BLUR_ORIGINAL : BLUR_DEFAULT;
-  const KEY = RN_MODE === 'original' ? 'rn_blur2_orig' : 'rn_blur3';   // web/mode.js: each mode keeps its own F6/F7 choice
+  const POOL = RN_MODE !== 'original' && RN_Q.get('pool') === '1';
+  if (POOL) level = 7;
+  const KEY = RN_MODE === 'original' ? 'rn_blur2_orig' : POOL ? 'rn_blur_pool' : 'rn_blur3';   // web/mode.js: each mode keeps its own F6/F7 choice
   try { const s = localStorage.getItem(KEY); if (s !== null && BLUR[+s]) level = +s; } catch {}
   const q = RN_Q.get('blur');
   if (q !== null && BLUR[+q]) level = +q;

@@ -116,7 +116,7 @@ function line(s, cls) {
       // ?rivalopen=0: Free Run rivals stay on the start grid until the 10 s respawn rules move them (host/free.c free_respawn)
       if (RN_Q.get('rivalopen') === '0') m.ENV.RN_RIVALOPEN = '0';
       // ?pool=1 (OWNER 2026-11-03): the car pool: neon puddle, liveries, personas, warm car light (host/rivals.c, web/gpu.js livery). Off until approved.
-      if (RN_Q.get('pool') === '1') { m.ENV.RN_POOL = '1'; m.ENV.RN_TRAFMODELS = '1'; }
+      if (RN_Q.get('pool') === '1') { m.ENV.RN_POOL = '1'; m.ENV.RN_TRAFMODELS = '1'; m.ENV.RN_TRAFREFILL = '1'; }
       // RN_JCLOG: one log line a second plus one per airborne sample (host/d3d9.c jumpcam_log): why a jump did or did not get the jump camera, in build/web.log
       m.ENV.RN_JCLOG = '1';
       // AI evidence in every F10 (OWNER 2026-10-31, "the AI is still bad"): rivals' speed, skill, actions, distance (host/free.c RN_FREELOG),

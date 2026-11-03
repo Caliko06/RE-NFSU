@@ -1005,27 +1005,21 @@ static uint32_t persona_clear(Ctx *c) {
 
 // BRIDGE: neon puddle, OWNER 2026-11-03 (?pool=1, Remaster only, off by default). DrawLampFlares 0x56d8d0 draws the car's shadow and then its
 // neon (+0x4bc, texture <CAR>_NEON, pass 1 of the loop at 0x56f200) over one 4x4 grid on the road (16 points of 16 bytes at [esp+0x5b0]), colour [esp+0x1c].
-// PATCH 0x56f21e sends the neon pass's setup here. Every car but the player's (skin DUMMY_SKIN1) outside the career gets a wider, stronger glow; SHOW and BOSO
-// rivals pulse or sweep hue. The neon pass is the last user of the grid, so it is scaled in place. Clock [0x73ad34] = 4000 Hz (0x6cca38 = 0.00025).
+// PATCH 0x56f21e sends the neon pass's setup here. The puddle keeps the game's size, alpha and light (OWNER: x1.18 area and x1.3 light were too marked);
+// outside the career SHOW and BOSO rivals only pulse or sweep hue. Clock [0x73ad34] = 4000 Hz (0x6cca38 = 0.00025).
 static uint32_t neon_pass(Ctx *c) {
     uint32_t esp = c->r[ESP] + 4, info = ld(c, c->r[EBP] + 8, 4), tex = ld(c, info + 0x4bc, 4), col = ld(c, esp + 0x1c, 4), ride = ld(c, info + 4, 4);
-    if (rn_pool() && tex && (col >> 24) && !c->mem[0x78a33c] && ride && ld(c, ride + 0x444, 4) != 0x530b82b0) {
-        float t = ld(c, 0x73ad34, 4) * 0.00025f, q[3], k = 1.3f;
-        for (int i = 0; i < 3; i++) q[i] = (col >> (8 * i) & 255);
-        uint32_t skin = ld(c, ride + 0x444, 4);
-        for (int i = 0; i < NSYN; i++) if (skin && neon_ride[i] == skin) {
-            if (skin & 1) k *= 0.8f + 0.2f * sinf(t * 2.5f);          // pulse
-            else {                                                          // slow sweep into the rotated colour
-                float m = 0.5f + 0.5f * sinf(t * 0.75f), r[3] = {q[1], q[2], q[0]};
-                for (int j = 0; j < 3; j++) q[j] += (r[j] - q[j]) * m;
-            }
+    uint32_t skin = ride ? ld(c, ride + 0x444, 4) : 0;
+    if (rn_pool() && tex && (col >> 24) && !c->mem[0x78a33c] && skin && skin != 0x530b82b0)
+        for (int i = 0; i < NSYN; i++) if (neon_ride[i] == skin) {
+            float t = ld(c, 0x73ad34, 4) * 0.00025f, q[3], k = skin & 1 ? 0.8f + 0.2f * sinf(t * 2.5f) : 1.0f, m = skin & 1 ? 0.0f : 0.5f + 0.5f * sinf(t * 0.75f);
+            for (int j = 0; j < 3; j++) q[j] = (col >> (8 * j) & 255);
+            float r[3] = {q[1], q[2], q[0]};
+            uint32_t out = col & 0xff000000u;
+            for (int j = 0; j < 3; j++) out |= (uint32_t)((q[j] + (r[j] - q[j]) * m) * k) << (8 * j);
+            col = out;
+            break;
         }
-        col = 0xfe000000u;
-        for (int i = 0; i < 3; i++) { float v = q[i] * k; col |= (uint32_t)(v > 254.f ? 254.f : v) << (8 * i); }
-        float g[16][3], m[3] = {0, 0, 0};
-        for (int i = 0; i < 16; i++) for (int j = 0; j < 3; j++) { memcpy(&g[i][j], G(esp + 0x5b0 + 16 * i + 4 * j), 4); m[j] += g[i][j] / 16.f; }
-        for (int i = 0; i < 16; i++) for (int j = 0; j < 3; j++) { float v = m[j] + (g[i][j] - m[j]) * 1.18f; memcpy(G(esp + 0x5b0 + 16 * i + 4 * j), &v, 4); }
-    }
     st(c, esp + 0x20, col, 4);
     return tex;
 }

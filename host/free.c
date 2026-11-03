@@ -204,6 +204,7 @@ static uint32_t free_traffic(Ctx *c) {
         }
         int cand[NCANON], n = 0;
         for (int k = 0; k < NCANON; k++) if (ctype[k] == (int)type) cand[n++] = k;
+        if (!n) rn_log("NOSKIN traffic %u: racer type %u has no career preset", a[0], type);
         if (n) {
             uint32_t s = ld(c, 0x6f227c, 4) ^ a[0] * 0x9e3779b9u, one = ride;
             int k = cand[rnd(&s) % n];
@@ -230,6 +231,7 @@ static uint32_t free_traffic(Ctx *c) {
                 slot++;
             }
             rn_pool_traffic(c, ride, a[0]);
+            if (!ld(c, ride + 0x444, 4)) rn_log("NOSKIN traffic %u: racer type %u has no body texture (slot %d)", a[0], type, slot);
             if (getenv("RN_FREELOG")) rn_log("FREE traffic %u: type %u wears %s's preset %08x skin %08x%s", a[0], type, CANON[k].name, CANON[k].preset, ld(c, ride + 0x444, 4), keep_vinyl ? " vinyls kept" : "");
         }
     }
