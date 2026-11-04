@@ -31,11 +31,12 @@ typedef uint32_t (*HostFn)(Ctx *c);
 typedef struct { const char *dll, *name; int nargs; HostFn fn; } Api;   // nargs < 0: cdecl
 
 extern Ctx *g_ctx;
-extern const Api win32_apis[], user32_apis[], thread_apis[], net_apis[], d3d9_apis[], dinput8_apis[], dsound_apis[], rivals_apis[], free_apis[];
-extern const int win32_api_count, user32_api_count, thread_api_count, net_api_count, d3d9_api_count, dinput8_api_count, dsound_api_count, rivals_api_count, free_api_count;
+extern const Api win32_apis[], user32_apis[], thread_apis[], net_apis[], d3d9_apis[], dinput8_apis[], dsound_apis[], rivals_apis[], free_apis[], horn_apis[];
+extern const int win32_api_count, user32_api_count, thread_api_count, net_api_count, d3d9_api_count, dinput8_api_count, dsound_api_count, rivals_api_count, free_api_count, horn_api_count;
 extern int rn_free_now;
 uint32_t free_rival(Ctx *c, uint32_t *a);
 void traffic_tick(Ctx *c);
+void horn_tick(Ctx *c);          // host/horn.c, at each Present next to free_tick
 void rn_player_car(Ctx *c);   // RN_CAR: the player's car in a race (host/rivals.c)
 void free_tick(Ctx *c);          // host/free.c, at each Present
 void lights_init(Ctx *c);   // host/lights.c
