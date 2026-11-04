@@ -383,7 +383,7 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
 
 // Personalities, WORLD only (RN_WORLD=1 free mode; ?ai=0 / RN_AI=0 off; RN_AI=2 forces them in any non-career race, for tests).
 // docs/openworld/re_rival_personality.md, docs/re/race_ai.md. Free mode gives each rival its own skill level (host/free.c RN_FREESKILL
-// 2,5,9,4,7,3,...), so a per-level style is a per-rival style: 2,4,1 nervous, 5,3,6 clean, 9,7,8 aggressive; level 0 as shipped.
+// 2,5,9,4,7,3,...), so a per-level style is a per-rival style: 2,1 nervous, 5,3 clean, 4,6 blocker, 9,7,8 aggressive; level 0 as shipped.
 // Records 0x779ff8 + 0x54 * level (rival_tables), and per step persona_step below.
 // Nervous: accepts 35 % of Pass/Avoid targets (+0x0c, 0x4627ac), route speed 6 % lower (+0x14, 0x44c72b), its speed lookup wanders twice
 //   as far (+0x50, 0x44c667), reads it 2 nodes further on (brakes early), nitro cooldown x0.7 (+0x34/+0x38, 0x462ca8) and lifts 12 % while
@@ -393,16 +393,16 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
 // Aggressive: route speed 4 % higher, Block ceiling 400 (style 2, 0x44dbd0: it beats Avoid and Pass), nitro cooldown x0.5, reads the
 //   route speed 2 nodes earlier (brakes late), and IJustGotHit (type 0xc, 0x4522a0, a back-off to culprit - 6 m/s) becomes revenge:
 //   culprit + 4 m/s.
-enum { NORMAL, NERVOUS, TIDY, AGGRESSIVE };   // TIDY = clean (CLEAN is an archetype above)
-static const uint8_t PERSONA[10] = {NORMAL, NERVOUS, NERVOUS, TIDY, NERVOUS, TIDY, TIDY, AGGRESSIVE, AGGRESSIVE, AGGRESSIVE};
-static const char *PNAME[4] = {"normal", "nervous", "clean", "aggressive"};
+enum { NORMAL, NERVOUS, TIDY, AGGRESSIVE, BLOCKER };   // TIDY = clean (CLEAN is an archetype above)
+static const uint8_t PERSONA[10] = {NORMAL, NERVOUS, NERVOUS, TIDY, BLOCKER, TIDY, BLOCKER, AGGRESSIVE, AGGRESSIVE, AGGRESSIVE};
+static const char *PNAME[5] = {"normal", "nervous", "clean", "aggressive", "blocker"};
 static int free_race;                  // this race is free mode (rival_ride's rn_free_now)
 static int persona_on;                 // this race's rivals have personalities (set at its first opponent)
 static int rivalai(void) {             // 0 off, 1 WORLD only, 2 forced
     const char *e = getenv("RN_AI");
     return e && e[0] == '0' ? 0 : e && e[0] == '2' ? 2 : 1;
 }
-static int rival_style(uint32_t skill, uint32_t style) { return persona_on && skill <= 9 && PERSONA[skill] == AGGRESSIVE ? 2 : (int)style; }
+static int rival_style(uint32_t skill, uint32_t style) { return persona_on && skill <= 9 && (PERSONA[skill] == AGGRESSIVE || PERSONA[skill] == BLOCKER) ? 2 : (int)style; }
 
 // Every traffic model, default in WORLD (track 1010, OWNER 2026-11-04; RN_TRAFMODELS=0 off, =1 any track). The cave 0x63b270 weighs a usage 2 row 1.0 if any district weight +0xc60..+0xc70 is set: AMBULANCE, FIRETRUCK and BUS
 // have none, so they never come out of 0x57d000. A weight here brings them in, once, before AddTrafficCars 0x4b3ac0 (it runs after 0x4b4040, this hook's caller).
@@ -442,6 +442,7 @@ static void rival_tables(Ctx *c, int personas) {
         float accept = ldf(c, r + 0x0c), speed = ldf(c, r + 0x14), nitro = 1;
         if (PERSONA[lv] == NERVOUS) accept = 0.35f, speed *= 0.94f, c->mem[r + 0x50] = c->mem[r + 0x50] > 63 ? 127 : c->mem[r + 0x50] * 2, nitro = 0.7f;
         if (PERSONA[lv] == AGGRESSIVE) speed *= 1.04f, nitro = 0.5f;
+        if (PERSONA[lv] == BLOCKER) accept = 1.0f, speed *= 0.98f, c->mem[r + 0x50] /= 2;   // Block ceiling 400 via style 2 (0x44dbd0), a steadier speed lookup, a little slower: it stays in front
         stf(c, r + 0x0c, accept), stf(c, r + 0x14, speed), stf(c, r + 0x34, ldf(c, r + 0x34) * nitro), stf(c, r + 0x38, ldf(c, r + 0x38) * nitro);
         n += snprintf(b + n, sizeof b - n, " L%d %c %.2f %.3f %u %.0fs", lv, PNAME[PERSONA[lv]][0], ldf(c, r + 0x0c), ldf(c, r + 0x14), c->mem[r + 0x50], ldf(c, r + 0x34));
     }
@@ -455,7 +456,7 @@ static uint32_t rival_ride(Ctx *c) {
     if (a[6] <= 1) {
         const char *w = getenv("RN_WORLD");
         free_race = rn_free_now != 0;
-        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && ((free_race && w && w[0] == '1') || rn_pool())));
+        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && ((free_race && w && w[0] == '1') || rn_pool() || ld(c, 0x78a2f0, 4) == 1010)));
         rn_player_car(c), rival_tables(c, persona_on), traffic_types(c), traffic_spacing(c);
     }
     if (rn_free_now) {                                           // host/free.c: free mode's career rivals
@@ -464,7 +465,7 @@ static uint32_t rival_ride(Ctx *c) {
         if (getenv("RN_FREELOG")) rn_log("rivalai %s level %d style %d", G(e + 0x73c), (int8_t)c->mem[e + 0x735], (int8_t)c->mem[e + 0x736]);
         if (rn_pool() && ld(c, 0x78a2f0, 4) == 1010 && ld(c, a[2], 4) < 20) {
             // WORLD: the car of the preset, a pool build that shows how it drives: one game vinyl, kit and rims of an archetype of its style.
-            static const uint8_t BY[4][3] = {[TIDY] = {CLEAN, TRACK, VIP}, [NERVOUS] = {STREET, SHOW, STREET}, [AGGRESSIVE] = {DRIFT, BOSO, DRIFT}};
+            static const uint8_t BY[5][3] = {[TIDY] = {CLEAN, TRACK, VIP}, [NERVOUS] = {STREET, SHOW, STREET}, [AGGRESSIVE] = {DRIFT, BOSO, DRIFT}, [BLOCKER] = {TRACK, BOSO, VIP}};
             if (!ready) catalog(c);
             int lvl = (int8_t)c->mem[e + 0x735], sty = lvl >= 0 && lvl <= 9 ? PERSONA[lvl] : TIDY;
             uint32_t ride = a[2], k = a[6] % NSYN, tmp = guest_alloc(RIDE_SIZE), skin0 = ld(c, ride + 0x444, 4);
@@ -1065,7 +1066,7 @@ static uint32_t persona_step(Ctx *c) {
     float tgt = 0;
     if (ld(c, v + 0x400, 4) != s[k].stamp) {                      // a new speed lookup offset: brake early or late
         s[k].stamp = ld(c, v + 0x400, 4);
-        if (p != TIDY) st(c, v + 0x404, ld(c, v + 0x404, 4) + (p == NERVOUS ? 2 : -2), 4);
+        if (p == NERVOUS || p == AGGRESSIVE) st(c, v + 0x404, ld(c, v + 0x404, 4) + (p == NERVOUS ? 2 : -2), 4);
         uint32_t e = (s[k].stamp ^ v) * 0x9e3779b1u >> 24;       // ?pool=1: a mistake now and then, it reads the curve late and overshoots
         if (rn_pool() && e < (p == NERVOUS ? 77u : p == AGGRESSIVE ? 38u : 13u)) st(c, v + 0x404, ld(c, v + 0x404, 4) - 6, 4);
     }
