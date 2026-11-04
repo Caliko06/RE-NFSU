@@ -404,13 +404,13 @@ static int rivalai(void) {             // 0 off, 1 WORLD only, 2 forced
 }
 static int rival_style(uint32_t skill, uint32_t style) { return persona_on && skill <= 9 && PERSONA[skill] == AGGRESSIVE ? 2 : (int)style; }
 
-// Every traffic model (RN_TRAFMODELS=1 / ?trafmodels=1: on, off until measured on the Mac). The cave 0x63b270 weighs a usage 2 row 1.0 if any district weight +0xc60..+0xc70 is set: AMBULANCE, FIRETRUCK and BUS
+// Every traffic model, default in WORLD (track 1010, OWNER 2026-11-04; RN_TRAFMODELS=0 off, =1 any track). The cave 0x63b270 weighs a usage 2 row 1.0 if any district weight +0xc60..+0xc70 is set: AMBULANCE, FIRETRUCK and BUS
 // have none, so they never come out of 0x57d000. A weight here brings them in, once, before AddTrafficCars 0x4b3ac0 (it runs after 0x4b4040, this hook's caller).
 static void traffic_types(Ctx *c) {
     static const uint8_t ROWS[3] = {22, 26, 30};
     const char *e = getenv("RN_TRAFMODELS");
     uint32_t tab = ld(c, 0x734588, 4);
-    if (!e || e[0] != '1' || !tab) return;
+    if (!tab || (e ? e[0] != '1' : ld(c, 0x78a2f0, 4) != 1010)) return;
     for (int k = 0; k < 3; k++) stf(c, tab + 0xc90 * ROWS[k] + 0xc60, 1.0f);
 }
 
