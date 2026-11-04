@@ -651,3 +651,13 @@ FEEL_CANDIDATES = [
 PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[0:5]]
 # C3 camera: FOV of POV 0/1/4 71.5 -> 65.9 deg (0x2ee0): the car reads 1.11x bigger. The exe has no speed term for eye distance/height/FOV (docs/re/camera_speed.md), so this is at every speed.
 PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[7:10]]
+
+# ---- AI stuck (lalo 2026-11-04, docs/re/ai_stuck.md): the finder 0x451b00 marks a rival stuck after 0.4 s under 5.0 m/s
+# and the recovery reverses at -15.0/-6.0 m/s for 1.3/1.6 s (prio 500). Measured: 27-38 % of the GetUnstuck entries happen at
+# speed >= 5 m/s. Two data floats, read only by the three stuck finders (0x451c2e/0x451eaf/0x451ffb timer,
+# 0x451c48/0x451ec5/0x45201b speed): 0.4 s -> 1.5 s and 5.0 -> 3.0 m/s. Opt-in, original mode untouched.
+_AI_STUCK = (lambda: __import__("os").environ.get("RN_AI_STUCK") == "1")
+PATCHES += [
+    dict(addr=0x6b7680, old="cdcccc3e", new="0000c03f", when=_AI_STUCK),   # stuck time 0.4 -> 1.5 s
+    dict(addr=0x6b7684, old="0000a040", new="00004040", when=_AI_STUCK),   # stuck speed 5.0 -> 3.0 m/s
+]
