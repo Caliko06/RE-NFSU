@@ -65,6 +65,17 @@ void ai_tel(Ctx *c) {
             tr[i].jump = sp - tr[i].sp > 40.0f ? 4 : tr[i].jump - 1;
             rn_log("AIJUMP f%u kind %u car %08x sp %.1f -> %.1f v %.1f %.1f %.1f pos %.1f %.1f %.1f moved %.1f act %d scale %.2f wheels %u mode %u spin %.0f %.0f nos %u/%.0f crash %u", f, kind, r, tr[i].sp, sp, ldf(c, r + 0x70), ldf(c, r + 0x74), ldf(c, r + 0x78),
                    x, y, ldf(c, r + 0x58), hypotf(x - tr[i].x, y - tr[i].y), at, ldf(c, r + 0x404), ld(c, r + 0x3cc, 4), ld(c, r + 0x28, 4), ldf(c, r + 0x2f0), ldf(c, r + 0x2f8), ld(c, r + 0x3fc, 4), ldf(c, r + 0x3f8), ld(c, r + 0x38, 4));
+            // Mode 4 = BeltMover (ctor 0x463260, update 0x463f20): position = spline(s) + lateral, velocity = position difference / dt. s = (a t / 2 + b) t + s0.
+            uint32_t m = ld(c, r + 0x34, 4), cp = ld(c, r + 0x30, 4);
+            if (ld(c, r + 0x28, 4) == 4 && m && cp && m < GUEST_MEM - 0x48 && cp < GUEST_MEM - 0x1c0) {
+                uint32_t lat = ld(c, m + 0x18, 4), sp14 = ld(c, m + 0x14, 4);
+                char b[256];
+                int n = c->mem[cp + 0x10], o = 0;
+                for (int k = 0; k < n && k < 6 && o < 200; k++) o += snprintf(b + o, sizeof b - o, " %.0f,%.0f,%.0f", ldf(c, cp + 0x20 + 16 * k), ldf(c, cp + 0x24 + 16 * k), ldf(c, cp + 0x28 + 16 * k));
+                if (!o) b[0] = 0;
+                rn_log("AIBELT f%u car %08x t %.3f rate %.4f s0 %.3f b %.3f a %.3f lat %.2f keys %u n %d L %.1f pts%s", f, r, ldf(c, m + 0xc), ldf(c, m + 0x10), ldf(c, m + 0x1c), ldf(c, m + 0x20), ldf(c, m + 0x24),
+                       lat && lat < GUEST_MEM - 4 ? ldf(c, lat) : 0, sp14 && sp14 < GUEST_MEM - 0x20 ? ld(c, sp14 + 0x1e, 2) : 0, n, ldf(c, cp + 0x1bc), b);
+            }
         }
         tr[i].x = x, tr[i].y = y;
         if (tr[i].sp - sp >= 4.0f && tr[i].sp > 5.0f) {   // an impact: who was nearest
