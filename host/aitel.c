@@ -5,6 +5,11 @@
 //        current action type/priority (AI obj +0x3f8: +0x1f8 / +0x1f4; 7 JustDrive, 0 Pass, 5 Block, 0xa GetUnstuck, 1 Avoid),
 //        +0x1f0 (1 = speed from the route nodes, 0 = the action's own speed +0x1e4), speed scales racer+0x4b8 and car+0x404,
 //        skill record +0x14 (record = car+0x1c), seconds stuck (< 2 m/s), GetUnstuck count, wall and car hits so far.
+//   AIDS once a second, each rival, only with RN_AIDS (off by default): the target-speed chain that AIR cannot show.
+//        route node index (record+0x8), jitter b (record+0x50), the live jitter (ctx+0x404), the effective node,
+//        the route speed byte (node+0x6a), record+0x14, ctx+0x4b8, car+0x404, the product want = byte x rec14 x 4b8
+//        recomputed here (0x44c550 stores no such value: it passes it to the vehicle update, argument 1), and the
+//        action's own speed pair +0x1e4 / +0x1e8 with the +0x1f0 flag that decides whether they are used.
 //   AIT  once a second, each traffic car (kind 3) within 80 m: distance (signed as above), lateral offset from the player's line,
 //        speed, action type (3 = Avoid), parked (AI obj +0x4d1).
 //   AIDR once a second, the game's own slipstream value car+0x47c (0x426450) of the player (kind 1) and each rival (kind 2).
@@ -27,10 +32,43 @@ static int slot(uint32_t r) {
     return i;
 }
 
+// AIDS (RN_AIDS, off by default; RN_AILOG must be on too): the target-speed chain of one rival, 1/s, host/aitel.c header.
+// The desired speed itself is not stored anywhere: 0x44c550 keeps it in a float and passes it to the vehicle update
+// (*(*ctx[0x2]+0x38))(speed, ...), and it returns sub_458f10(0,0). So this line logs the four inputs of the product and
+// the product recomputed here: want = rb x rec+0x14 x ctx+0x4b8 (I, recomputed, not read from the game).
+static void aids_log(Ctx *c, uint32_t f, const char *nm, uint32_t r, uint32_t v, uint32_t rec, uint32_t a, float sp) {
+    int node = -1, b = -1, jit = 0, eff = -1, rb = -1;
+    float rec14 = 0, s4b8 = 0, s404 = 0, want = 0, a1 = 0, a2 = 0;
+    int flag = -1;
+    if (rec && rec < GUEST_MEM - 0x60) {
+        node = (int8_t)c->mem[rec + 8];
+        b = (int8_t)c->mem[rec + 0x50];
+        rec14 = ldf(c, rec + 0x14);
+    }
+    if (a && a < GUEST_MEM - 0x200) flag = c->mem[a + 0x1f0], a1 = ldf(c, a + 0x1e4), a2 = ldf(c, a + 0x1e8);
+    if (!v) return;
+    s4b8 = ldf(c, v + 0x4b8), s404 = ldf(c, r + 0x404);
+    jit = (int32_t)ld(c, v + 0x404, 4);   // jitter of the route node, re-rolled every 0x77a498 s from record+0x50 (0x44c550)
+    // route speed byte: route node idx*0x88 + 0x6a, nodes via the AI driver's route clone (driver +0x3e4, nodes at +8, host/d3d9.c:1154)
+    uint32_t drv = ld(c, r + 0x2c, 4), route = drv && drv < GUEST_MEM - 0x400 ? ld(c, drv + 0x3e4, 4) : 0;
+    uint32_t n = route && route < GUEST_MEM - 0x100 ? ld(c, route + 4, 4) : 0;
+    if (node >= 0 && n && n < 4096) {
+        eff = node + jit;
+        if (eff < 0) eff = 0;
+        if ((uint32_t)eff >= n) eff = n - 1;
+        uint32_t np = ld(c, route + 8 + 4 * (uint32_t)eff, 4);
+        if (np && np < GUEST_MEM - 0x80) rb = c->mem[np + 0x6a];
+    }
+    if (rb > 0) want = (float)rb * rec14 * s4b8;
+    rn_log("AIDS f%u %s sp %.1f node %d b %d jit %d eff %d rb %d rec14 %.2f s4b8 %.2f s404 %.2f want %.1f a1 %.1f a2 %.1f flag %d nodes %u",
+           f, nm, sp, node, b, jit, eff, rb, rec14, s4b8, s404, want, a1, a2, flag, n);
+}
+
 void ai_tel(Ctx *c) {
-    static int on = -1;
+    static int on = -1, aids = -1;
     static uint32_t race;
     if (on < 0) on = getenv("RN_AILOG") != NULL;
+    if (aids < 0) aids = getenv("RN_AIDS") != NULL;
     if (!on) return;
     uint32_t h = ld(c, 0x7361f8, 4);
     if (ld(c, 0x77a920, 4) != 6 || !h || h >= GUEST_MEM - 0x1000) { race = 0; return; }
@@ -105,6 +143,7 @@ void ai_tel(Ctx *c) {
                    along >= 0 ? d : -d, lat);
         if (kind == 2) {
             uint32_t rec = ld(c, r + 0x1c, 4);
+            if (aids) aids_log(c, f, G(e + 0x73c), r, v, rec, a, sp);
             rn_log("AIR f%u %s d %+.0f lat %+.0f sp %.1f act %d/%d route %d own %.1f s4b8 %.2f s404 %.2f rec14 %.2f stuck %.1f s unst %d hits wall %d car %d",
                    f, G(e + 0x73c), along >= 0 ? d : -d, lat, sp, at, a ? (int)ld(c, a + 0x1f4, 4) : -1, a ? c->mem[a + 0x1f0] : -1,
                    a ? ldf(c, a + 0x1e4) : 0.0f, v ? ldf(c, v + 0x4b8) : 0.0f, ldf(c, r + 0x404), rec && rec < GUEST_MEM - 0x20 ? ldf(c, rec + 0x14) : 0.0f,
