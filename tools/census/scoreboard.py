@@ -4,12 +4,17 @@
   tagged  functions with a system tag of confidence med/high in census/systems.tsv, or with a name in names_*.tsv
           (the name's system overrides the graph tag: the external audit found 47% of named functions disagreed)
   ran     functions that were entered in the RN_COV scenarios (census/cov/union.json)
-  named   functions with a row in census/names_*.tsv (V = verified with a second tool)
+  named   functions with a row in census/names_*.tsv (named V = evidence state V, tools/census/evstate.py: an explicit
+          V/I/U in confidence or the evidence prefix, never the word `high`; legacy `high` with no state is listed on stderr)
+  fragments  lifted starts that are not Ghidra functions but lie inside a parent function (census/canon/fragments.tsv);
+          they stay in `lifted` and `named` once; "frag/parent named" = unnamed fragments whose parent has a name
   difftested  census/difftest.json `compared_funcs` (written by tools/recomp/difftest.py since 2026-10-29). Older runs stored only the total (5,813), shown as U until difftest is re-run
 
 Run: python3 tools/census/scoreboard.py [--md]   (--md prints the table for docs/re_scoreboard.md)
 """
 import csv, glob, json, re, sys
+sys.path.insert(0, __file__.rsplit('/', 1)[0])
+from evstate import state
 from collections import Counter, defaultdict
 
 def a(s):
@@ -34,7 +39,7 @@ for line in open("census/systems.tsv"):
 
 ran = {a(x) for x in json.load(open("census/cov/union.json"))["addrs"]}
 
-named, named_v = set(), set()
+named, named_v, legacy_v, explicit_v = set(), set(), set(), set()
 for p in glob.glob("census/names_*.tsv"):
     if p.endswith(("names_seed.tsv",)):
         continue
@@ -47,10 +52,10 @@ for p in glob.glob("census/names_*.tsv"):
         except ValueError:
             continue
         named.add(x)
-        c = (r.get("confidence") or "").strip()
-        e = (r.get("evidence") or "").strip()
-        if c in ("V", "high") or e.startswith("V"):
+        st, leg = state(r)
+        if st == "V":
             named_v.add(x)
+            (legacy_v if leg else explicit_v).add(x)
 
 # hand-read reassignments (census/systems_override.tsv: addr, system, evidence) win over the graph; a name still wins over both
 import os
@@ -77,7 +82,6 @@ if os.path.exists("census/canon/systems_lib.tsv"):
         x = a(r["addr"])
         if conf.get(x) not in ("med", "high"):
             system[x], conf[x] = r["system"], "med"
-
 # library bands read by their strings and callers (docs/re/render_pc.md: D3DX9 render, EAGL anim runtime assets): they
 # replace a graph or region tag, since the region closure took 'render' for the whole 0x5a-0x64 range
 if os.path.exists("census/canon/systems_band.tsv"):
@@ -112,10 +116,19 @@ for x, t in nsys.items():
         system[x], conf[x] = t, "high"
 print(f"# {len(nsys)} named addresses with a system; {changed} replaced a different graph tag", file=sys.stderr)
 
+print(f"# {len(named_v)} named V; {len(legacy_v - explicit_v)} of them only by legacy `high` (review candidates, not proven false)", file=sys.stderr)
+
+frag = {}   # lifter-only start -> parent function start; '?' parents are not fragments
+if os.path.exists("census/canon/fragments.tsv"):
+    for line in list(open("census/canon/fragments.tsv"))[1:]:
+        f = line.rstrip("\n").split("\t")
+        if len(f) >= 2 and f[1] != "?":
+            frag[a(f[0])] = a(f[1])
+
 dt = json.load(open("census/difftest.json"))
 dtest = {a(x) for x in dt["compared_funcs"]} - {a(x) for x in dt.get("mismatch_funcs", [])} if "compared_funcs" in dt else None
 
-tot, tag, rn, nm, nv, dc = Counter(), Counter(), Counter(), Counter(), Counter(), Counter()
+tot, tag, rn, nm, nv, dc, fr, fp = Counter(), Counter(), Counter(), Counter(), Counter(), Counter(), Counter(), Counter()
 for f in lifted:
     s = system.get(f, "none")
     tot[s] += 1
@@ -126,12 +139,15 @@ for f in lifted:
     nv[s] += f in named_v
     if dtest is not None:
         dc[s] += f in dtest
+    if f in frag:
+        fr[s] += 1
+        fp[s] += f not in named and frag[f] in named
 
 order = sorted(tot, key=lambda s: -tot[s])
 md = "--md" in sys.argv
-hdr = ["system", "lifted", "tagged", "ran", "named", "named V", "diff-tested"]
-rows = [[s, tot[s], tag[s], rn[s], nm[s], nv[s], dc[s] if dtest is not None else "U"] for s in order]
-rows.append(["TOTAL", sum(tot.values()), sum(tag.values()), sum(rn.values()), sum(nm.values()), sum(nv.values()), sum(dc.values()) if dtest is not None else "5813 (no split)"])
+hdr = ["system", "lifted", "tagged", "ran", "named", "named V", "diff-tested", "fragments", "frag/parent named"]
+rows = [[s, tot[s], tag[s], rn[s], nm[s], nv[s], dc[s] if dtest is not None else "U", fr[s], fp[s]] for s in order]
+rows.append(["TOTAL", sum(tot.values()), sum(tag.values()), sum(rn.values()), sum(nm.values()), sum(nv.values()), sum(dc.values()) if dtest is not None else "5813 (no split)", sum(fr.values()), sum(fp.values())])
 if md:
     print("| " + " | ".join(hdr) + " |\n|" + "---|" * len(hdr))
     for r in rows:
