@@ -833,11 +833,21 @@ static uint32_t traffic_behind(Ctx *c) {
     return 0;
 }
 
+// Rival stuck test (docs/re/ai_stuck.md, lalo): the finders 0x451b00.. call a rival stuck after [0x6b7680] = 0.4 s under [0x6b7684] = 5.0 m/s and then
+// reverse at prio 500; 27-38 % of the entries happen above 5 m/s. Data floats read only by the stuck finders (3 timer reads, 5 speed reads in the exe).
+// RN_AI_STUCK=1 (web ?aistuck=1, off by default): 1.5 s and 3.0 m/s, written every present (the page may reload the data).
+static void ai_tune(Ctx *c) {
+    static int stuck = -1;
+    if (stuck < 0) stuck = getenv("RN_AI_STUCK") != NULL;
+    if (stuck) st(c, 0x6b7680, 0x3fc00000, 4), st(c, 0x6b7684, 0x40400000, 4);
+}
+
 void traffic_tick(Ctx *c) {
     static uint32_t seed = 0x51ed2701;
     static struct { uint32_t car, frame; } seen[32];
     ai_log(c);
     handling_data(c);
+    ai_tune(c);
     // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
     // Every present, before the traffic guards (RN_TRAFYIELD=0, pause or a non-race mode must not turn it back on); outside WORLD it writes the factory value 1.
     st(c, 0x700740, ld(c, 0x78a2f0, 4) != 1010, 4);

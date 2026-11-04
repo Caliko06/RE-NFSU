@@ -128,6 +128,8 @@ function line(s, cls) {
       m.ENV.RN_RESETLOG = '1'; m.ENV.RN_HORNLOG = '1'; m.ENV.RN_FEELLOG = '1';
       // ?hornfix=1: no traffic honk from a parked, undrawn or just-recycled car (host/horn.c)
       if (RN_Q.get('hornfix') === '1') m.ENV.RN_HORNFIX = '1';
+      // ?aistuck=1: rivals count as stuck after 1.5 s under 3 m/s, not 0.4 s under 5 m/s (host/rivals.c ai_tune)
+      if (RN_Q.get('aistuck') === '1') m.ENV.RN_AI_STUCK = '1';
       // Shipped rear grip assist by default (OWNER 2026-10-31: the feel must be the original's); ?handling=1: the 0.18 cap (host/rivals.c)
       if (RN_Q.get('handling') !== '1') m.ENV.RN_HANDLING = '0';
       // Traffic, off until measured on the Mac (host/rivals.c): ?trafmodels=1 bus, ambulance, fire truck too; ?trafrefill=1 traffic_refill in place of free_tmove;
