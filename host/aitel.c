@@ -108,16 +108,23 @@ void ai_tel(Ctx *c) {
 }
 
 // Reset probe (RN_RESETLOG=1, off by default; OWNER: why a car passes walls or falls after a reset, docs/re/reset_causes.md).
-// The reset 0x427c50 (and its entry 0x427f70, host/free.c free_tmove) writes position +0x60, heading +0x3b4, velocity
-// +0x70/74/78 and speed +0x3d0, and clears the collision cache car+0x540 with 0x440740. This probe reads that state
-// only. reset_call runs from rn_call before the body (host/dispatch.c), reset_tel once per Present (host/d3d9.c).
-// Recipe (docs/re/reset_causes.md): RN_RESETLOG=1 RN_FREELOG=1 RN_FREETMOVE=1 with traffic on (?traffic=15&trafrefill=1),
-// or a ghost: tools/openworld/ghost.sh <tag> 240 RN_RESETLOG=1 RN_FREETMOVE=1 RN_TRAFREFILL=1.
+// Every path of the game's reset only raises car+0x87c: 0x428080 (request), 0x426930 (no ground every 32 frames via 0x440ce0,
+// or > 5000 m from the route point), 0x427ed0 (RESET zone). Car::ServiceResetRequest 0x4264d0 (from the car update) consumes it:
+// for driver kind 1 with driver+0x734 == 0 it does `eax = car+0x18; call 0x4314a0` (0x42653b). Player::ResetToRoute 0x4314a0
+// then re-places the car with 0x427f70(car, section, node, speed, 1, dir, 0, 0, lat) when the car has a route path, or with
+// 0x427c50(&pos, 0, heading) on the nearest route node that has ground (0x440a40) when it has none.
+// reset_call runs from rn_call before the body (host/dispatch.c) for 0x427f70/0x427c50, reset_tel once per Present
+// (host/d3d9.c). RN_RESETEVERY=<s> (default off) calls the player's own reset 0x4314a0 on the kind-1 car every N s.
+// Recipe (docs/re/reset_causes.md): RN_RESETLOG=1 RN_RESETEVERY=3 in a Free Run ghost (tools/openworld/ghost.sh <tag> 240),
+// or RN_RESETLOG=1 RN_FREELOG=1 RN_FREETMOVE=1 with traffic (?traffic=15&trafrefill=1) for traffic resets.
 int rn_resetlog = -1;
+static int rn_resetevery = -1;      // RN_RESETEVERY=<seconds>; <= 0 off
+static uint32_t rq_next;            // next presents to fire it
 #define RST_MAX 4
 #define RST_WATCH 120
-static struct { uint32_t car, f0; int idx, k, armed, after, prev; float x, y, z, sp, lx, ly, lz, lsp; } rq[RST_MAX];
+static struct { uint32_t car, f0; int idx, armed, after; float x, y, z, sp, lx, ly, lz, lsp; } rq[RST_MAX];
 static int rq_n;
+static uint32_t gq_pt, gq_flag;
 
 static int rst_index(Ctx *c, uint32_t car) {
     uint32_t h = ld(c, 0x7361f8, 4);
@@ -128,51 +135,111 @@ static int rst_index(Ctx *c, uint32_t car) {
     return -1;
 }
 
+// The game's own ground query 0x440a40 on the car's cache object (as host/openworld.c ground_at): return 1 with the height.
+// It can rebuild that cache, so callers read the cache counters BEFORE this. The FPU stack is saved and put back.
+static int rst_ground(Ctx *c, uint32_t car, float *h) {
+    if (!gq_pt) gq_pt = guest_alloc(16), gq_flag = guest_alloc(16);
+    if (!gq_pt || !gq_flag) return 0;
+    float x = ldf(c, car + 0x60), y = ldf(c, car + 0x64);
+    memcpy(c->mem + gq_pt, &x, 4), memcpy(c->mem + gq_pt + 4, &y, 4);
+    st(c, gq_flag, 0, 4);
+    uint32_t a[5] = {car + 0x540, gq_pt, 0, 0, gq_flag};
+    uint32_t fcw = c->fcw, fsw = c->fsw, ftop = c->ftop, ftag = c->ftag;
+    double st8[8];
+    memcpy(st8, c->st, sizeof st8);
+    call_guest(c, 0x440a40, 5, a);
+    *h = (float)*fr(c, 0);
+    fpop(c);
+    memcpy(c->st, st8, sizeof st8);
+    c->fcw = fcw, c->fsw = fsw, c->ftop = ftop, c->ftag = ftag;
+    return ld(c, gq_flag, 1) != 0;
+}
+
+// One watch slot per car; logs the state the reset had when it was called.
+static int rst_arm(Ctx *c, uint32_t car, const char *why, uint32_t target) {
+    uint32_t f = rn_telem.presents;
+    int i = 0;
+    while (i < RST_MAX && rq[i].car && rq[i].car != car) i++;
+    if (i == RST_MAX) return -1;
+    if (!rq[i].car) rq[i].car = car, rq[i].armed = 0;
+    if (rq[i].armed && rq[i].f0 == f) return i;   // 0x427f70 then 0x427c50 in the same frame: one reset
+    rq[i].idx = rst_index(c, car);
+    rq[i].x = ldf(c, car + 0x60), rq[i].y = ldf(c, car + 0x64), rq[i].z = ldf(c, car + 0x68);
+    rq[i].sp = ldf(c, car + 0x3d0);
+    rq[i].f0 = f, rq[i].armed = 1, rq[i].after = 0;
+    if (i + 1 > rq_n) rq_n = i + 1;
+    rn_log("RST f%u %s call %08x car %08x idx %d pos %.2f,%.2f,%.2f sp %.1f head %d dt %.4f cache %u/%u/%u/%u",
+           f, why, target, car, rq[i].idx, rq[i].x, rq[i].y, rq[i].z, rq[i].sp, (int16_t)ld(c, car + 0x3b4, 2), ldf(c, 0x73ad38),
+           ld(c, car + 0x7e0, 4), ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4));
+    return i;
+}
+
 // target 0x427f70: arg0 = car. target 0x427c50: car = EDI (the entry's this), arg0 = position pointer.
 void reset_call(Ctx *c, uint32_t target) {
     if (rn_resetlog < 0) rn_resetlog = getenv("RN_RESETLOG") != NULL;
     if (!rn_resetlog) return;
     uint32_t car = target == 0x427c50 ? c->r[EDI] : ld(c, c->r[ESP] + 4, 4);
     if (!car || car >= GUEST_MEM - 0x900) return;
+    rst_arm(c, car, "call", target);
+}
+
+// RN_RESETEVERY: the player's own reset, exactly the call 0x4264d0 makes (0x42653b: eax = car+0x18; call 0x4314a0).
+static void reset_every(Ctx *c) {
+    if (rn_resetevery < 0) {
+        const char *e = getenv("RN_RESETEVERY");
+        rn_resetevery = e ? atoi(e) : 0;
+        if (rn_resetevery > 0) rn_resetlog = 1;   // forcing the reset implies logging it
+    }
+    if (rn_resetevery <= 0) return;
     uint32_t f = rn_telem.presents;
-    int i = 0;
-    while (i < RST_MAX && rq[i].car && rq[i].car != car) i++;
-    if (i == RST_MAX) return;
-    if (!rq[i].car) rq[i].car = car, rq[i].armed = 0;
-    if (rq[i].armed && rq[i].f0 == f) return;   // 0x427f70 then 0x427c50 in the same frame: one reset
-    rq[i].idx = rst_index(c, car);
-    rq[i].x = ldf(c, car + 0x60), rq[i].y = ldf(c, car + 0x64), rq[i].z = ldf(c, car + 0x68);
-    rq[i].sp = ldf(c, car + 0x3d0);
-    rq[i].f0 = f, rq[i].k = 0, rq[i].armed = 1, rq[i].after = 0, rq[i].prev = 0;
-    if (i + 1 > rq_n) rq_n = i + 1;
-    rn_log("RST f%u call %08x car %08x idx %d pos %.2f,%.2f,%.2f sp %.1f head %d dt %.4f cache %u/%u/%u/%u",
-           f, target, car, rq[i].idx, rq[i].x, rq[i].y, rq[i].z, rq[i].sp, (int16_t)ld(c, car + 0x3b4, 2), ldf(c, 0x73ad38),
-           ld(c, car + 0x7e0, 4), ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4));
+    if (f < rq_next || ld(c, 0x77a920, 4) != 6) return;
+    uint32_t h = ld(c, 0x7361f8, 4), car = 0;
+    if (!h || h >= GUEST_MEM - 0x1000) return;
+    for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (e && e < GUEST_MEM - 16 && ld(c, e + 4, 4) == 1) { car = r; break; }
+    }
+    if (!car) return;
+    uint32_t ctrl = ld(c, car + 0x18, 4);
+    if (!ctrl || ctrl >= GUEST_MEM - 0x900) return;
+    rq_next = f + (uint32_t)rn_resetevery * 60;
+    c->r[EAX] = ctrl;
+    call_guest(c, 0x4314a0, 0, NULL);
+    if (!c->halt) st(c, car + 0x87c, 0, 4);   // 0x4264d0 clears the request after the service
+    if (rn_resetlog > 0) rst_arm(c, car, "every", 0x4314a0);
 }
 
 void reset_tel(Ctx *c) {
+    reset_every(c);
     if (rn_resetlog <= 0) return;
     uint32_t f = rn_telem.presents;
     for (int i = 0; i < rq_n; i++) {
         if (!rq[i].car || !rq[i].armed) continue;
         uint32_t car = rq[i].car;
         float x = ldf(c, car + 0x60), y = ldf(c, car + 0x64), z = ldf(c, car + 0x68), sp = ldf(c, car + 0x3d4);
-        if (!rq[i].after) {   // first frame after the call: the state the reset left
-            rq[i].after = 1, rq[i].lx = x, rq[i].ly = y, rq[i].lz = z, rq[i].lsp = sp, rq[i].prev = 1;
-            rn_log("RSTA f%u car %08x idx %d pos %.2f,%.2f,%.2f dz %+.2f moved %.2f sp %.1f cache %u/%u/%u/%u",
+        uint32_t cb = ld(c, car + 0x7e0, 4), cg = ld(c, car + 0x7e4, 4), cw = ld(c, car + 0x7e8, 4), cr = ld(c, car + 0x7ec, 4);
+        if (!rq[i].after) {   // first frame after the call: the state the reset left (counters read before the ground query)
+            float zh = 0;
+            int ok = rst_ground(c, car, &zh);
+            char zr[32];
+            snprintf(zr, sizeof zr, ok ? "%.2f" : "none", zh);
+            rq[i].after = 1, rq[i].lx = x, rq[i].ly = y, rq[i].lz = z, rq[i].lsp = sp;
+            rn_log("RSTA f%u car %08x idx %d pos %.2f,%.2f,%.2f dz %+.2f moved %.2f sp %.1f zroad %s dzroad %+.2f ground %d cache %u/%u/%u/%u",
                    f, car, rq[i].idx, x, y, z, z - rq[i].z, hypotf(x - rq[i].x, y - rq[i].y), sp,
-                   ld(c, car + 0x7e0, 4), ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4));
-            rq[i].k = 0;
+                   zr, ok ? z - zh : 0.0f, ok, cb, cg, cw, cr);
             continue;
         }
         uint32_t d = f - rq[i].f0;
         if (d > RST_WATCH) { rq[i].armed = 0, rq[i].car = 0; continue; }   // slot free after 2 s
         if (d % 10) continue;
+        float zh = 0;
+        int ok = rst_ground(c, car, &zh);
+        char zr[32];
+        snprintf(zr, sizeof zr, ok ? "%.2f" : "none", zh);
         float mv = hypotf(x - rq[i].lx, y - rq[i].ly);
         int moved = mv > 3.0f && sp < 1.0f && rq[i].lsp < 1.0f;   // embedded or fallen: it slid while stopped
-        rn_log("RSTW f%u +%u car %08x idx %d pos %.2f,%.2f,%.2f dz %+.2f moved %.2f sp %.1f cache %u/%u/%u/%u%s",
-               f, d, car, rq[i].idx, x, y, z, z - rq[i].z, mv, sp,
-               ld(c, car + 0x7e0, 4), ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4),
+        rn_log("RSTW f%u +%u car %08x idx %d pos %.2f,%.2f,%.2f dz %+.2f moved %.2f sp %.1f zroad %s dzroad %+.2f ground %d cache %u/%u/%u/%u%s",
+               f, d, car, rq[i].idx, x, y, z, z - rq[i].z, mv, sp, zr, ok ? z - zh : 0.0f, ok, cb, cg, cw, cr,
                moved ? " MOVED-WHILE-SLOW" : "");
         rq[i].lx = x, rq[i].ly = y, rq[i].lz = z, rq[i].lsp = sp;
     }
