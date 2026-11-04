@@ -840,6 +840,7 @@ static void ai_tune(Ctx *c) {
     static int stuck = -1;
     if (stuck < 0) stuck = getenv("RN_AI_STUCK") != NULL;
     if (stuck) st(c, 0x6b7680, 0x3fc00000, 4), st(c, 0x6b7684, 0x40400000, 4);
+}
 
 // RN_AI_TRAFGO=1 (?trafgo=1, off by default): ends a long traffic standstill with nothing ahead (docs/re/ai_traffic_stop.md). A car in the
 // Avoid action (type 3) keeps act+0x1f0 = 0 and act+0x1e4 = 0 in 0x453c60's brake branch; 0x583910 then hands 0 m/s to 0x45e180 (SetDesiredSpeed)
