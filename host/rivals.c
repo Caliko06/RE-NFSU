@@ -660,7 +660,8 @@ static void handling_data(Ctx *c) {
 // behind and past 160 m tries up to 8 nodes 150..650 m + 1 s of speed ahead on the road (0x4563d0), at least 150 m from the player, 18 m from every car that drives; then the
 // Free Run move's own tail, as free_tmove: lane 0x5995e0, speed 0x42adf0, 0x59a7c0 on the teleporter [[0x7361f8]+0x2f0] (ecx at 0x420c77).
 #define REFILL_NEAR 14
-#define REFILL_POOL 18   // of WORLD's 21 cars (OWNER: a live city; lower it if it lags)
+#define REFILL_POOL 18   // of WORLD's 21 cars (OWNER: a live city; lower it if it lags). Tried 21 + spots from 110 m (d_a/d_b, 2026-11-04): near100 median 10 -> 11, refills x2, no gain: the cap is the 21 cars
+#define REFILL_MIN 150   // m from the player for a refill spot
 // Frozen traffic (w_h, 240 s: 21% of traffic samples did not move, a queue of 10 cars for up to 176 s, 57 cars braking to 6.1 m/s at one spot): the refill below only picks
 // parked, far (>450 m) or behind-the-player cars, and counts a frozen car as "near", so it was never recycled. Speed [car+0x3d4] stays 6.1 on a blocked car (w_i), so it is the
 // position that counts: a car that stays within 3 m of where it was seen for STUCK_PRESENTS presents (about 10 s, this runs every 12) and is 200 m or more from the player (as free.c KEEP_M: never vanish on screen) is
@@ -685,8 +686,6 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     static int off = -1;
     static uint32_t pair, seed = 0x2f11e0d5;
     int world = ld(c, 0x78a2f0, 4) == 1010;   // WORLD: always on (OWNER 2026-11-03); RN_TRAFREFILL=0 turns it off
-    static uint32_t still_h;   // the traffic list is rebuilt on a new race: nodes reused at the same address must not inherit a timer
-    if (h != still_h) memset(still_r, 0, sizeof still_r), still_h = h;
     if (off < 0) { const char *e = getenv("RN_TRAFREFILL"); off = e ? e[0] != '1' : -2; }
     if (off == -2 && !world) return;
     uint32_t tele = ld(c, h + 0x2f0, 4);
@@ -715,7 +714,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_refail++; n_rf[0]++; frozen_clear(pick); return; }
     int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0;
     for (int t = 0; t < 8; t++) {              // farther each try (a stretch can lack lanes for 1 km); the last two behind the player
-        float m = 150.0f + 80.0f * (t % 6) + (float)(rnd(&seed) % 100) + (t < 6 ? sp : 0);
+        float m = REFILL_MIN + 80.0f * (t % 6) + (float)(rnd(&seed) % 100) + (t < 6 ? sp : 0);
         uint32_t a[5] = {pair, 1, 0, (uint32_t)(t < 6 ? along : !along), 0};
         memcpy(&a[2], &m, 4);
         st(c, pair, sec, 4), st(c, pair + 4, node, 4);
@@ -725,7 +724,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         c->r[EAX] = pair;
         if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { n_rf[1]++; continue; }
         float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
-        int ok = hypotf(nx - px, ny - py) >= 150;
+        int ok = hypotf(nx - px, ny - py) >= REFILL_MIN;
         for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++) {
             uint32_t v = ld(c, o + 0x2c, 4);
             ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || hypotf(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= 18;
@@ -842,6 +841,7 @@ void traffic_tick(Ctx *c) {
     // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
     // Every present, before the traffic guards (RN_TRAFYIELD=0, pause or a non-race mode must not turn it back on); outside WORLD it writes the factory value 1.
     st(c, 0x700740, ld(c, 0x78a2f0, 4) != 1010, 4);
+    if (ld(c, 0x77a920, 4) != 6) memset(still_r, 0, sizeof still_r);   // out of a race: frozen-car timers die with it (a rebuilt list can reuse node addresses; presents never restarts)
     if (trafyield_off() || rn_telem.presents % 6 || ld(c, 0x77a920, 4) != 6 || c->mem[0x78a33c]) return;
     uint32_t h = ld(c, 0x7361f8, 4), me = 0;
     for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !me; r = ld(c, r, 4), k++) {
