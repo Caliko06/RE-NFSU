@@ -1064,6 +1064,42 @@ void rn_player_car(Ctx *c) {
 // Hopper build/hopper/viewscale.txt). PATCH 0x57119a sends the race list's draw (0x571050, list [0x7361f8]) here (cave
 // 0x43a7e4: jmp [SCREEN_ADDR+0x64]); a car that is not traffic is drawn with both at 0, then they go back to -1.
 // Traffic keeps the game's LOD. RN_CARLOD=0: the original.
+// Traffic body motion (OWNER 2026-11-04, "rigid"): 0x571050 passes the car's own matrix, record+0x90 (rows forward, right, up, 0x10 apart), to the draw (arg 3). The body leans on a damped spring from the car's
+// acceleration: nose dips under braking, rolls out in a turn. Drawn only: physics and collisions keep record+0x90. Wheels share the matrix; the angle stays under 3 deg. RN_TRAFLEAN=0: the game's matrix.
+static uint32_t traffic_lean(Ctx *c, uint32_t mat) {
+    static int off = -1;
+    static uint32_t tmp;
+    static struct { uint32_t rec, at; float vx, vy, p, r, dp, dr; } s[64];
+    if (off < 0) { const char *e = getenv("RN_TRAFLEAN"); off = e && e[0] == '0'; }
+    if (off || mat < 0x90 || mat >= GUEST_MEM - 0x100) return mat;
+    uint32_t rec = mat - 0x90, slot = 0;
+    for (uint32_t i = 0; i < 64; i++) {
+        if (s[i].rec == rec) { slot = i; break; }
+        if (s[i].at < s[slot].at) slot = i;
+    }
+    float fx = ldf(c, mat), fy = ldf(c, mat + 4), vx = ldf(c, rec + 0x70), vy = ldf(c, rec + 0x74);
+    if (s[slot].rec != rec) memset(&s[slot], 0, sizeof s[slot]), s[slot].rec = rec, s[slot].vx = vx, s[slot].vy = vy;
+    else if (s[slot].at != rn_telem.presents) {                 // once per present: a car draws again in reflections
+        const float dt = 1.0f / 60, w = 7.0f, z = 0.45f;        // about 1.1 Hz, some overshoot, as a soft street car
+        float ax = (vx - s[slot].vx) / dt, ay = (vy - s[slot].vy) / dt, al = ax * fx + ay * fy, as = ax * fy - ay * fx;
+        s[slot].vx = vx, s[slot].vy = vy;
+        if (fabsf(al) > 15 || fabsf(as) > 15) al = as = 0;      // a hit or a recycle jump, not driving
+        float tp = fmaxf(-0.05f, fminf(0.05f, 0.0065f * al)), tr = fmaxf(-0.05f, fminf(0.05f, 0.0065f * as));
+        s[slot].dp += (w * w * (tp - s[slot].p) - 2 * z * w * s[slot].dp) * dt, s[slot].p += s[slot].dp * dt;
+        s[slot].dr += (w * w * (tr - s[slot].r) - 2 * z * w * s[slot].dr) * dt, s[slot].r += s[slot].dr * dt;
+    }
+    s[slot].at = rn_telem.presents;
+    if (!tmp) tmp = guest_alloc(64 * 2);
+    uint32_t out = tmp + (rn_telem.presents & 1) * 64;
+    float m[16], p = s[slot].p, ro = s[slot].r;
+    for (int i = 0; i < 16; i++) m[i] = ldf(c, mat + i * 4);
+    for (int i = 0; i < 3; i++) {                               // small angles: forward tips along up, right along up, up the other way
+        float f = m[i], rg = m[4 + i], u = m[8 + i];
+        stf(c, out + i * 4, f + p * u), stf(c, out + 0x10 + i * 4, rg + ro * u), stf(c, out + 0x20 + i * 4, u - p * f - ro * rg);
+    }
+    for (int i = 3; i < 16; i += (i == 3 || i == 7 ? 4 : 1)) stf(c, out + i * 4, m[i]);
+    return out;
+}
 static uint32_t car_draw(Ctx *c) {
     static int lod = -1;
     if (lod < 0) { const char *e = getenv("RN_CARLOD"); lod = !(e && e[0] == '0'); }
@@ -1079,6 +1115,7 @@ static uint32_t car_draw(Ctx *c) {
                                                     t && tab ? ld(c, tab + 0xc90 * ld(c, t, 4) + 0xc54, 4) : 0, racer);
     }
     if (racer) { st(c, 0x6f1b30, 0, 4); st(c, 0x6f1b34, 0, 4); }
+    if (lod && t && tab && !racer) a[3] = traffic_lean(c, a[3]);
     uint32_t r = call_guest(c, 0x56dc30, 12, a);
     if (racer) { st(c, 0x6f1b30, 0xffffffffu, 4); st(c, 0x6f1b34, 0xffffffffu, 4); }
     return r;
