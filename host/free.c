@@ -453,7 +453,17 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
 // Slow: BUS 30 x0.75, PANELVAN 24 / PARCELVAN 27 x0.85, PICKUP 28 / FIRETRUCK 26 x0.9: the cars behind catch them and pass with the game's own
 // Avoid lane change (0x453c60). Fast: TAXI 20 / TAXI02 23 x1.2, AMBULANCE 22 x1.25: they close on the car ahead and change lanes to pass it (the
 // same Avoid action), and honk when the player blocks them (0x44c2e0). Other types and other tracks: the cave's speed unchanged.
+double rn_lane_sum; int rn_lane_n;   // RN_AILOG: the lane speed asks of traffic, before the factors
 static int tspeed_on;   // free_tick: free mode live in the WORLD
+#define TRAFFIC_TOP 0x696ea8   // PATCH 0x696ea8: the route speed limit of 0x582f70, 24.58 unless WORLD runs
+// 0 slow 20%, 1 normal 45%, 2 fast 25%, 3 very fast 10%; RN_TRAFPROF=0: -1, none.
+int traffic_profile(uint32_t ai) {
+    static int off = -1;
+    if (off < 0) { const char *e = getenv("RN_TRAFPROF"); off = e && e[0] == '0'; }
+    if (off) return -1;
+    uint32_t b = (ai >> 4) * 0x9e3779b1u >> 24;   // AI objects are aligned; a different mix from the cave's x0.85..1.15
+    return b < 51 ? 0 : b < 166 ? 1 : b < 230 ? 2 : 3;
+}
 static uint32_t traffic_speed(Ctx *c) {
     uint32_t a = ARG(0), ai = c->r[ESI];
     uint32_t r = call_guest(c, 0x63b331, 1, &a);
@@ -461,6 +471,17 @@ static uint32_t traffic_speed(Ctx *c) {
     if (!e || ld(c, e + 4, 4) != 3) return r;
     uint32_t type = ld(c, e + 0x10, 4);
     double k = type == 30 ? 0.75 : type == 24 || type == 27 ? 0.85 : type == 28 || type == 26 ? 0.9 : type == 20 || type == 23 ? 1.2 : type == 22 ? 1.25 : 1.0;
+    // Driver profile (OWNER 2026-11-04): fixed per car. A faster car closes on the car ahead and the game's own Avoid (0x453c60) changes lane when 0x453ba0 sees a gap, so the
+    // cause stays believable. Route cap 0x582f70 = min([ai+0x4dc], 24.58 m/s) would cut the fast ones, so WORLD raises both: PATCH 0x582f76/85 reads the limit from TRAFFIC_TOP.
+    static const float PK[4] = {0.72f, 1.0f, 1.28f, 1.5f}, PTOP[4] = {18.0f, 24.58f, 31.0f, 36.0f};
+    rn_lane_sum += c->st[c->ftop], rn_lane_n++;
+    int p = traffic_profile(ai);
+    if (p >= 0) {
+        float pk = PK[p];
+        if (k < 1 && pk > 1) pk = 1;           // a bus or a van is never a fast driver
+        k *= pk;
+        stf(c, ai + 0x4dc, PTOP[p]), stf(c, TRAFFIC_TOP, 36.0f);
+    }
     c->st[c->ftop] *= k;
     return r;
 }
@@ -474,6 +495,7 @@ void free_tick(Ctx *c) {
     if (ld(c, 0x77a920, 4) != 6) {
         if (raced && ld(c, 0x77a920, 4) == 3) {
             live = raced = 0, start = 0, tele = 0, opened = drove = 0, open_from = 0, tspeed_on = 0;
+            st(c, TRAFFIC_TOP, 0x41c4b127, 4);
             memset(rdir, 0, sizeof rdir);
             if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
             if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);

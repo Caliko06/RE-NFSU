@@ -844,6 +844,38 @@ static void ai_tune(Ctx *c) {
     if (stuck) st(c, 0x6b7680, 0x3fc00000, 4), st(c, 0x6b7684, 0x40400000, 4);
 }
 
+// RN_AILOG: per driver profile, cars and mean speed of those moving; lane changes per 600 presents, all and in front of the player within 40 m.
+int traffic_profile(uint32_t ai);   // host/free.c
+extern double rn_lane_sum; extern int rn_lane_n;
+static void traffic_prof_log(Ctx *c, uint32_t h, uint32_t me) {
+    static int on = -1, lc, cuts;
+    static uint32_t car[64], was[64], t;
+    if (on < 0) on = getenv("RN_AILOG") != NULL;
+    if (!on) return;
+    static int hist[6], act3, seen_cars;
+    int n[5] = {0}; float sum[5] = {0}, mx = ldf(c, me + 0x50), my = ldf(c, me + 0x54), mvx = ldf(c, me + 0x70), mvy = ldf(c, me + 0x74), ms = hypotf(mvx, mvy);
+    int i = 0;
+    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200 && i < 64; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
+        if (!e || ld(c, e + 4, 4) != 3 || !v || c->mem[v + 0x4d1]) continue;
+        uint32_t lane = ld(c, v + 0x2c + 0x394, 4);
+        float dx = ldf(c, r + 0x50) - mx, dy = ldf(c, r + 0x54) - my, along = ms > 1 ? (dx * mvx + dy * mvy) / ms : -1;
+        if (car[i] == r && was[i] != lane) lc++, cuts += along > 0 && hypotf(dx, dy) < 40;
+        car[i] = r, was[i] = lane, i++;
+        int p = traffic_profile(v) + 1;
+        float sp = hypotf(ldf(c, r + 0x70), ldf(c, r + 0x74));
+        n[p]++, sum[p] += sp;
+        hist[sp < 2 ? 0 : sp < 6.5f ? 1 : sp < 12 ? 2 : sp < 20 ? 3 : sp < 27 ? 4 : 5]++, seen_cars++;
+        uint32_t a = ld(c, v + 0x3f8, 4);
+        act3 += a && ld(c, a + 0x1f8, 4) == 3;
+    }
+    if ((t += 6) < 600) return;
+    t = 0;
+    rn_log("TRAFSPEED <2 %d <6.5 %d <12 %d <20 %d <27 %d more %d avoid %d of %d lane mean %.1f", hist[0], hist[1], hist[2], hist[3], hist[4], hist[5], act3, seen_cars, rn_lane_n ? rn_lane_sum / rn_lane_n : 0.0);
+    memset(hist, 0, sizeof hist), act3 = seen_cars = 0, rn_lane_sum = 0, rn_lane_n = 0;
+    rn_log("TRAFPROF lc %d cuts %d n %d %d %d %d %d sp %.1f %.1f %.1f %.1f %.1f", lc, cuts, n[0], n[1], n[2], n[3], n[4], n[0] ? sum[0] / n[0] : 0, n[1] ? sum[1] / n[1] : 0, n[2] ? sum[2] / n[2] : 0, n[3] ? sum[3] / n[3] : 0, n[4] ? sum[4] / n[4] : 0);
+    lc = cuts = 0;
+}
 void traffic_tick(Ctx *c) {
     static uint32_t seed = 0x51ed2701;
     static struct { uint32_t car, frame; } seen[32];
@@ -862,6 +894,7 @@ void traffic_tick(Ctx *c) {
     }
     if (!me) return;
     traffic_refill(c, h, me);
+    traffic_prof_log(c, h, me);
     float mx = ldf(c, me + 0x50), my = ldf(c, me + 0x54), mvx = ldf(c, me + 0x70), mvy = ldf(c, me + 0x74);
     if (mvx * mvx + mvy * mvy < 64) return;
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {

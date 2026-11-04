@@ -536,6 +536,10 @@ PATCHES.append(dict(addr=0x4412bd, old="bf00040000", new="bf00400000", when=lamb
 # player too, so spawn-record traffic never braked, swerved or honked for him. Now only rivals (driver kind 2, [[rec+0x14]+4]) keep the
 # exemption: mov ecx,[ecx+0x14]; cmp [ecx+4],2; jne 0x4539ff (not exempt); nop*3 (docs/re/traffic_react.md item b)
 PATCHES.append(dict(addr=0x4539db, old="8b511c85d20f95c084c07418", new="8b49148379040275" + "1b" + "909090", when=lambda: True))
+# Route speed limit of traffic 0x582f70 = min([ai+0x4dc], 24.58 at 0x6cc988); 0x6cc988 has 4 other readers, so this one reads its own copy at 0x696ea8 (zero padding after .text code): 24.58 as shipped, host/free.c raises it in WORLD for the driver profiles.
+PATCHES.append(dict(addr=0x582f76, old="d81588c96c00", new="d815a86e6900", when=lambda: True))
+PATCHES.append(dict(addr=0x582f85, old="d90588c96c00", new="d905a86e6900", when=lambda: True))
+PATCHES.append(dict(addr=0x696ea8, old="00000000", new="27b1c441", when=lambda: True))
 # PATCH: 0x45399f (+ cave 0x44dd21, NOP padding after a ret, no reference: asm.py free), a traffic car sees the player closing from behind. The
 # finder 0x453920 asks 0x44f470 for the nearest car AHEAD in its lane (slots own-1 down to 0 of the neighbour list); nothing reads the slots
 # own+1.. behind it, and the Avoid action cannot take a car behind (its vt[7] 0x453a60 ends it at once, its brake branch 0x45406c would stop the car).
