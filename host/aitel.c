@@ -7,6 +7,7 @@
 //        skill record +0x14 (record = car+0x1c), seconds stuck (< 2 m/s), GetUnstuck count, wall and car hits so far.
 //   AIT  once a second, each traffic car (kind 3) within 80 m: distance (signed as above), lateral offset from the player's line,
 //        speed, action type (3 = Avoid), parked (AI obj +0x4d1).
+//   AIDR once a second, the game's own slipstream value car+0x47c (0x426450) of the player (kind 1) and each rival (kind 2).
 //   AIHIT at once, any car of the race list whose speed drops 4 m/s or more in one frame: who, speed before -> after, the nearest
 //        other car and its distance; "wall" when no car is within 6 m; its position (where the walls are).
 // Offsets: race list [0x7361f8] (next +0, entrant +0x14, kind entrant+4, AI obj +0x2c, position +0x50, velocity +0x70, heading +0x90,
@@ -94,6 +95,11 @@ void ai_tel(Ctx *c) {
         }
         tr[i].sp = sp, tr[i].seen = 1;
         if (!sec) continue;
+        // AIDR: the game's own slipstream value car+0x47c (0x426450, sum of the 0x426300 pair terms, cap 0.9) once a second,
+        // for the player (kind 1) and each rival (kind 2). Log only; docs/re/ai_draft.md. Read it with d = the gap to the car ahead.
+        if (kind == 1 || kind == 2)
+            rn_log("AIDR f%u kind %u car %08x draft %.3f sp %.1f d %+.0f lat %+.0f", f, kind, r, ldf(c, r + 0x47c), sp,
+                   along >= 0 ? d : -d, lat);
         if (kind == 2) {
             uint32_t rec = ld(c, r + 0x1c, 4);
             rn_log("AIR f%u %s d %+.0f lat %+.0f sp %.1f act %d/%d route %d own %.1f s4b8 %.2f s404 %.2f rec14 %.2f stuck %.1f s unst %d hits wall %d car %d",
