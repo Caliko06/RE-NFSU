@@ -2,6 +2,7 @@
 For the OWNER alone: Chrome on this Mac, :5180, saves in save/. Older plans live in git history (before 2026-10-31).
 
 ## Now
+0. WORLD AI quality (rivals, traffic, NPCs), OWNER 2026-11-04: scope, rules, agents and RE ladder in docs/openworld/AI_SCOPE.md. Items 1-3 below are older (2026-10-31).
 1. Car falls through / passes walls after a reset; handling feels worse (OWNER 2026-10-31).
 2. Feel: blur, light halos, camera angle at speed, acceleration (docs/re/feel_2026-10-31.md has the addresses found).
 3. Traffic almost absent in WORLD; horns heard with no cars; hitches.
