@@ -1,0 +1,10 @@
+1405432c02	used	Base del commit de todos los modelos (BUS, AMBULANCE, FIRETRUCK)
+1405432b3c	rejected	Rines con textura sin verificar; usé filas de corredores con presets de carrera
+1405438860	used	Lectura de 0x583910 y Avoid: guio perfiles y el arreglo de colas
+140544a394	used	Plan del tope a 64; confirmé cada dirección antes de parchar
+1405445942	used	Campos de rivales y perfil blocker (commit 898cb79)
+14054442cc	partial	Identificó INNER, OUTER y GLOW; resolví con texturas en vez de su parche
+140544f14c	partial	Contexto de otros proyectos; ningún cambio sale directo de aquí
+142641b58c	used	H1 reparto 29% corregido a 1 de 4; H3 refill corregido; H2 ya estaba resuelto
+1426413150	partial	Tomé 4 perfiles por hash; descarté sus sitios 3-5 y la cueva (0x6b76e8 al revés, pila FPU, fuera de .text)
+142641bac6	pending	Línea base lista; falta compararla con rivales nuevos

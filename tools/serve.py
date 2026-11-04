@@ -106,6 +106,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         route = self.path.split("?", 1)[0]
+        if route == "/becarios":             # the OWNER's Becario monitor (tools/becmon.py)
+            import becmon
+            body = becmon.page()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+            return
         if route in ("/game-files.json", "/save-files.json"):
             top = os.path.join(ROOT, "game") if route == "/game-files.json" else save_root(self.headers)
             body = listing(top) if os.path.isdir(top) else b"[]"
