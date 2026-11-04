@@ -88,6 +88,9 @@ extern int rn_steerlog;         // RN_STEERLOG (host/input.c): the player's stee
 void steer_event(Ctx *c);       // from rn_call at the steer handler 0x461840
 void steer_frame(Ctx *c);       // from Present
 int rn_trace(void);
+extern int rn_resetlog;     // RN_RESETLOG (host/aitel.c): the game's reset 0x427c50/0x427f70, per call and 120 frames after
+void reset_call(Ctx *c, uint32_t target);   // from rn_call before the body
+void reset_tel(Ctx *c);     // from Present
 void win32_init(Ctx *c, uint32_t image_size);
 uint32_t guest_alloc(uint32_t size);                           // zeroed, for host-owned guest data
 void guest_free(uint32_t p);       // host/win32.c: back to the guest heap

@@ -106,3 +106,74 @@ void ai_tel(Ctx *c) {
         }
     }
 }
+
+// Reset probe (RN_RESETLOG=1, off by default; OWNER: why a car passes walls or falls after a reset, docs/re/reset_causes.md).
+// The reset 0x427c50 (and its entry 0x427f70, host/free.c free_tmove) writes position +0x60, heading +0x3b4, velocity
+// +0x70/74/78 and speed +0x3d0, and clears the collision cache car+0x540 with 0x440740. This probe reads that state
+// only. reset_call runs from rn_call before the body (host/dispatch.c), reset_tel once per Present (host/d3d9.c).
+// Recipe (docs/re/reset_causes.md): RN_RESETLOG=1 RN_FREELOG=1 RN_FREETMOVE=1 with traffic on (?traffic=15&trafrefill=1),
+// or a ghost: tools/openworld/ghost.sh <tag> 240 RN_RESETLOG=1 RN_FREETMOVE=1 RN_TRAFREFILL=1.
+int rn_resetlog = -1;
+#define RST_MAX 4
+#define RST_WATCH 120
+static struct { uint32_t car, f0; int idx, k, armed, after, prev; float x, y, z, sp, lx, ly, lz, lsp; } rq[RST_MAX];
+static int rq_n;
+
+static int rst_index(Ctx *c, uint32_t car) {
+    uint32_t h = ld(c, 0x7361f8, 4);
+    if (!h || h >= GUEST_MEM - 0x1000) return -1;
+    int k = 0;
+    for (uint32_t r = ld(c, h, 4); r && r != h && k < 200; r = ld(c, r, 4), k++)
+        if (r == car) return k;
+    return -1;
+}
+
+// target 0x427f70: arg0 = car. target 0x427c50: car = EDI (the entry's this), arg0 = position pointer.
+void reset_call(Ctx *c, uint32_t target) {
+    if (rn_resetlog < 0) rn_resetlog = getenv("RN_RESETLOG") != NULL;
+    if (!rn_resetlog) return;
+    uint32_t car = target == 0x427c50 ? c->r[EDI] : ld(c, c->r[ESP] + 4, 4);
+    if (!car || car >= GUEST_MEM - 0x900) return;
+    uint32_t f = rn_telem.presents;
+    int i = 0;
+    while (i < RST_MAX && rq[i].car && rq[i].car != car) i++;
+    if (i == RST_MAX) return;
+    if (!rq[i].car) rq[i].car = car, rq[i].armed = 0;
+    if (rq[i].armed && rq[i].f0 == f) return;   // 0x427f70 then 0x427c50 in the same frame: one reset
+    rq[i].idx = rst_index(c, car);
+    rq[i].x = ldf(c, car + 0x60), rq[i].y = ldf(c, car + 0x64), rq[i].z = ldf(c, car + 0x68);
+    rq[i].sp = ldf(c, car + 0x3d0);
+    rq[i].f0 = f, rq[i].k = 0, rq[i].armed = 1, rq[i].after = 0, rq[i].prev = 0;
+    if (i + 1 > rq_n) rq_n = i + 1;
+    rn_log("RST f%u call %08x car %08x idx %d pos %.2f,%.2f,%.2f sp %.1f head %d dt %.4f cache %u/%u/%u/%u",
+           f, target, car, rq[i].idx, rq[i].x, rq[i].y, rq[i].z, rq[i].sp, (int16_t)ld(c, car + 0x3b4, 2), ldf(c, 0x73ad38),
+           ld(c, car + 0x7e0, 4), ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4));
+}
+
+void reset_tel(Ctx *c) {
+    if (rn_resetlog <= 0) return;
+    uint32_t f = rn_telem.presents;
+    for (int i = 0; i < rq_n; i++) {
+        if (!rq[i].car || !rq[i].armed) continue;
+        uint32_t car = rq[i].car;
+        float x = ldf(c, car + 0x60), y = ldf(c, car + 0x64), z = ldf(c, car + 0x68), sp = ldf(c, car + 0x3d4);
+        if (!rq[i].after) {   // first frame after the call: the state the reset left
+            rq[i].after = 1, rq[i].lx = x, rq[i].ly = y, rq[i].lz = z, rq[i].lsp = sp, rq[i].prev = 1;
+            rn_log("RSTA f%u car %08x idx %d pos %.2f,%.2f,%.2f dz %+.2f moved %.2f sp %.1f cache %u/%u/%u/%u",
+                   f, car, rq[i].idx, x, y, z, z - rq[i].z, hypotf(x - rq[i].x, y - rq[i].y), sp,
+                   ld(c, car + 0x7e0, 4), ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4));
+            rq[i].k = 0;
+            continue;
+        }
+        uint32_t d = f - rq[i].f0;
+        if (d > RST_WATCH) { rq[i].armed = 0, rq[i].car = 0; continue; }   // slot free after 2 s
+        if (d % 10) continue;
+        float mv = hypotf(x - rq[i].lx, y - rq[i].ly);
+        int moved = mv > 3.0f && sp < 1.0f && rq[i].lsp < 1.0f;   // embedded or fallen: it slid while stopped
+        rn_log("RSTW f%u +%u car %08x idx %d pos %.2f,%.2f,%.2f dz %+.2f moved %.2f sp %.1f cache %u/%u/%u/%u%s",
+               f, d, car, rq[i].idx, x, y, z, z - rq[i].z, mv, sp,
+               ld(c, car + 0x7e0, 4), ld(c, car + 0x7e4, 4), ld(c, car + 0x7e8, 4), ld(c, car + 0x7ec, 4),
+               moved ? " MOVED-WHILE-SLOW" : "");
+        rq[i].lx = x, rq[i].ly = y, rq[i].lz = z, rq[i].lsp = sp;
+    }
+}

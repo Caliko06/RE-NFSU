@@ -1208,6 +1208,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     traffic_tick(c);
     ai_tel(c);           // host/aitel.c: AI telemetry lines for the F10 (RN_AILOG)
     horn_tick(c);        // host/horn.c: recycle stamps for the horn hook (RN_HORNLOG / RN_HORNFIX)
+    reset_tel(c);        // host/aitel.c: the game's reset 0x427c50 + 120 frames after (RN_RESETLOG)
     if (rn_steerlog) steer_frame(c);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
