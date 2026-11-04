@@ -884,6 +884,8 @@ static void trafgo(Ctx *c) {
         c->mem[a + 0x1f0] = 1;
         st(c, a + 0x200, 0, 4);
         rn_log("RNTGO f%u car %08x act 3 at %.0f,%.0f sp %.1f: route speed on, obstacle cleared", rn_telem.presents, r, x, y, ldf(c, r + 0x3d4));
+    }
+}
 
 // RN_DRAFT_K=<k> (default off, OWNER 2026-11-04: make the rebufo real). docs/re/ai_draft.md: (1 - car+0x47c) only scales the aero
 // drag of 0x585410, whose coefficient body+0x1e4 = phys+0x290 is 0.0 in the 35 stock cars, so the game's tow adds no speed by itself.
