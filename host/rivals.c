@@ -685,8 +685,8 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     static int off = -1;
     static uint32_t pair, seed = 0x2f11e0d5;
     int world = ld(c, 0x78a2f0, 4) == 1010;   // WORLD: always on (OWNER 2026-11-03); RN_TRAFREFILL=0 turns it off
-    // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
-    st(c, 0x700740, !world, 4);
+    static uint32_t still_h;   // the traffic list is rebuilt on a new race: nodes reused at the same address must not inherit a timer
+    if (h != still_h) memset(still_r, 0, sizeof still_r), still_h = h;
     if (off < 0) { const char *e = getenv("RN_TRAFREFILL"); off = e ? e[0] != '1' : -2; }
     if (off == -2 && !world) return;
     uint32_t tele = ld(c, h + 0x2f0, 4);
@@ -699,6 +699,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         if (!e || ld(c, e + 4, 4) != 3 || !v) continue;
         float dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py, d = hypotf(dx, dy);
         int parked = c->mem[v + 0x4d1];
+        if (parked) frozen_clear(r);   // parked time is not standing-still time (a car un-parked later would be recycled at once)
         int frozen = !parked && frozen_car(r, ldf(c, r + 0x50), ldf(c, r + 0x54)) && d >= 200;
         near += d < 250 && !parked && !frozen;
         int p = parked || frozen ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
@@ -838,6 +839,9 @@ void traffic_tick(Ctx *c) {
     static struct { uint32_t car, frame; } seen[32];
     ai_log(c);
     handling_data(c);
+    // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
+    // Every present, before the traffic guards (RN_TRAFYIELD=0, pause or a non-race mode must not turn it back on); outside WORLD it writes the factory value 1.
+    st(c, 0x700740, ld(c, 0x78a2f0, 4) != 1010, 4);
     if (trafyield_off() || rn_telem.presents % 6 || ld(c, 0x77a920, 4) != 6 || c->mem[0x78a33c]) return;
     uint32_t h = ld(c, 0x7361f8, 4), me = 0;
     for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !me; r = ld(c, r, 4), k++) {
