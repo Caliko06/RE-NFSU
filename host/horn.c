@@ -81,5 +81,5 @@ uint32_t horn_start(Ctx *c) {
     return call_guest(c, 0x524f30, 1, &a);
 }
 
-const Api horn_apis[] = {{"rn", "horn_start", 0, horn_start}};
+const Api horn_apis[] = {{"rn", "horn_start", 1, horn_start}};
 const int horn_api_count = 1;
