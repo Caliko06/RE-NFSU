@@ -421,7 +421,7 @@ static void traffic_spacing(Ctx *c) {
     static uint32_t row;
     uint32_t esi = c->r[ESI];
     if (row) stf(c, row + 0xd4, keep[0]), stf(c, row + 0xd8, keep[1]), row = 0;
-    if (!free_race || !getenv("RN_FREETRAFFIC")) return;
+    if (!free_race || (!getenv("RN_FREETRAFFIC") && ld(c, 0x78a2f0, 4) != 1010)) return;   // 31 m fits 14 cars on 1010, 20 m fits 26 (docs/traffic_placement.md); refill spreads the rest
     c->r[ESI] = ld(c, 0x78a2f0, 4);
     row = call_guest(c, 0x441fe0, 0, NULL), c->r[ESI] = esi;
     keep[0] = ldf(c, row + 0xd4), keep[1] = ldf(c, row + 0xd8);
@@ -661,7 +661,7 @@ static void handling_data(Ctx *c) {
 // behind and past 160 m tries up to 8 nodes 150..650 m + 1 s of speed ahead on the road (0x4563d0), at least 150 m from the player, 18 m from every car that drives; then the
 // Free Run move's own tail, as free_tmove: lane 0x5995e0, speed 0x42adf0, 0x59a7c0 on the teleporter [[0x7361f8]+0x2f0] (ecx at 0x420c77).
 #define REFILL_NEAR 14
-#define REFILL_POOL 18   // of WORLD's 21 cars (OWNER: a live city; lower it if it lags). Tried 21 + spots from 110 m (d_a/d_b, 2026-11-04): near100 median 10 -> 11, refills x2, no gain: the cap is the 21 cars
+// WORLD: 3/4 of the traffic within 250 m (ghosts, 40 cars: all but 3 near = 50-85% stopped, a jam), 25 m from every car for a refill spot.
 #define REFILL_MIN 150   // m from the player for a refill spot
 // Frozen traffic (w_h, 240 s: 21% of traffic samples did not move, a queue of 10 cars for up to 176 s, 57 cars braking to 6.1 m/s at one spot): the refill below only picks
 // parked, far (>450 m) or behind-the-player cars, and counts a frozen car as "near", so it was never recycled. Speed [car+0x3d4] stays 6.1 on a blocked car (w_i), so it is the
@@ -693,10 +693,11 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     if (off > 0 || !free_race || rn_telem.presents % 12 || !tele) return;
     float px = ldf(c, me + 0x50), py = ldf(c, me + 0x54), vx = ldf(c, me + 0x70), vy = ldf(c, me + 0x74), sp = hypotf(vx, vy);
     uint32_t pick = 0;
-    int prio = 0, near = 0;
+    int prio = 0, near = 0, cars = 0;
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
         if (!e || ld(c, e + 4, 4) != 3 || !v) continue;
+        cars++;
         float dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py, d = hypotf(dx, dy);
         int parked = c->mem[v + 0x4d1];
         if (parked) frozen_clear(r);   // parked time is not standing-still time (a car un-parked later would be recycled at once)
@@ -705,7 +706,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         int p = parked || frozen ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
         if (p > prio) prio = p, pick = r;
     }
-    if (!pick || (near >= (world ? REFILL_POOL : REFILL_NEAR) && prio < 3)) return;   // a parked car always goes back on the road
+    if (!pick || (near >= (world ? cars * 3 / 4 : REFILL_NEAR) && prio < 3)) return;   // a parked car always goes back on the road
     if (!pair) pair = guest_alloc(8);
     uint32_t zero = 0, ft = c->ftop;
     c->r[EAX] = me; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
@@ -728,7 +729,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         int ok = hypotf(nx - px, ny - py) >= REFILL_MIN;
         for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++) {
             uint32_t v = ld(c, o + 0x2c, 4);
-            ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || hypotf(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= 18;
+            ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || hypotf(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= (world ? 25 : 18);
         }
         if (!ok) { n_rf[2]++; continue; }
         c->r[ECX] = tele;

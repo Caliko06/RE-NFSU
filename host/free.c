@@ -161,13 +161,13 @@ static uint32_t free_setup(Ctx *c) {
         live = 1, rn_free_now = 2;                                // AddTrafficCars: free_traffic dresses the racer rows
     }
     // The traffic count of AddTrafficCars (0x4b3b01 reads i8 [0x441fe0() + [0x78a2fc] + [0x78a300] * 2 + 0xc0], 6 on 1003 and 12 on 1001
-    // and 1010, then PATCH 0x57d060's x1.5, at most 26): set to FREE_TRAFFIC, then put back (the track table outlives the race).
+    // and 1010, then PATCH 0x57d060's x1.5, at most 55): set to FREE_TRAFFIC, then put back (the track table outlives the race).
     c->r[ESI] = ld(c, 0x78a2f0, 4);                               // 0x441fe0 reads its argument in esi
     uint32_t ti = call_guest(c, 0x441fe0, 0, NULL), cnt = ti + ld(c, 0x78a2fc, 4) + ld(c, 0x78a300, 4) * 2 + 0xc0;
     int8_t keep = (int8_t)c->mem[cnt];
-    int base = getenv("RN_FREETRAFFIC") ? atoi(getenv("RN_FREETRAFFIC")) : world_ai(c) ? 14 : FREE_TRAFFIC;   // WORLD: 14 x1.5 = 21
+    int base = getenv("RN_FREETRAFFIC") ? atoi(getenv("RN_FREETRAFFIC")) : world_ai(c) ? 27 : FREE_TRAFFIC;   // WORLD: 27 x1.5 = 40 (ghosts 300 s: near100 median 8 -> 16; 48 and 54 stable but more spikes)
     if (live && base > 0) c->mem[cnt] = (int8_t)base;
-    if (getenv("RN_FREELOG")) rn_log("FREE traffic asked: trackinfo count %d -> %d (x1.5, at most 26)", keep, (int8_t)c->mem[cnt]);
+    if (getenv("RN_FREELOG")) rn_log("FREE traffic asked: trackinfo count %d -> %d (x1.5, at most 55)", keep, (int8_t)c->mem[cnt]);
     uint32_t r = call_guest(c, 0x4b3ac0, 0, NULL);
     c->mem[cnt] = (uint8_t)keep;
     rn_free_now = 0;
@@ -212,10 +212,10 @@ static uint32_t free_traffic(Ctx *c) {
             c->r[EAX] = CANON[k].preset;
             call_guest_cdecl(c, 0x4b26f0, 1, &one);
             // WORLD (world_ai, judge order 2): a racer that gets an overlay skin below keeps the preset's vinyls, decals and rim paint; they bake into
-            // its own DUMMY_SKIN13..20 like a rival's. Body kit (slots < 0x13), paint 0x1e, part paint 0x23..0x28, tint 0x73 and neon 0x74 are kept everywhere.
+            // its own DUMMY_SKIN13..28 like a rival's. Body kit (slots < 0x13), paint 0x1e, part paint 0x23..0x28, tint 0x73 and neon 0x74 are kept everywhere.
             static int slot;
             if (a[0] == 0x32) slot = 0;
-            int keep_vinyl = rn_tex_overlay && slot < 8 && world_ai(c);
+            int keep_vinyl = rn_tex_overlay && slot < 16 && world_ai(c);
             for (int sl = 0x13; sl <= 0x72 && !keep_vinyl; sl++)
                 if (sl <= 0x1d || (sl >= 0x1f && sl <= 0x22) || sl == 0x29 || sl >= 0x2a) {
                     st(c, ride + 0x44c + 4 * sl, 0, 4);
@@ -224,8 +224,8 @@ static uint32_t free_traffic(Ctx *c) {
             call_guest(c, 0x57ea80, 1, &one);
             // The body is drawn with the texture at ride +0x444 (DUMMY_SKIN<n>) and the rims with +0x448 (DUMMY_WHEEL<n>), which the loader
             // 0x58cbb0 -> 0x58be50 -> 0x5a9ce0 bakes the paint into (docs/openworld/re_traffic_racers.md). 0x57d160 zeroed them; the slots 1..4
-            // are the player's and the first rivals', 5..20 are the overlay's (rivals 4+: 5..10, traffic racers 13..20) (Cars/TEXTURES.BIN, tools/remaster/world_overlays.py): one per racer.
-            if (rn_tex_overlay && slot < 8) {
+            // are the player's and the first rivals', 5..20 are the overlay's (rivals 4+: 5..10, traffic racers 13..28) (Cars/TEXTURES.BIN, tools/remaster/world_overlays.py): one per racer.
+            if (rn_tex_overlay && slot < 16) {
                 char nm[24];     // 13..20: the rivals take DUMMY_SKIN2..N+1 by name (0x4b4040), up to 10
                 snprintf(nm, sizeof nm, "DUMMY_SKIN%d", 13 + slot); st(c, ride + 0x444, nhash(nm), 4);
                 snprintf(nm, sizeof nm, "DUMMY_WHEEL%d", 13 + slot); st(c, ride + 0x448, nhash(nm), 4);
@@ -1109,4 +1109,4 @@ const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traff
                          {"rn", "free_hud", 1, free_hud}, {"rn", "free_dir", 0, free_dir},
                          {"rn", "free_jumpcam", 0, free_jumpcam}, {"rn", "free_hseed", 1, free_hseed},
                          {"rn", "free_hdir", 0, free_hdir}, {"rn", "traffic_speed", 1, traffic_speed}};
-const int free_api_count = 15;
+const int free_api_count = sizeof free_apis / sizeof *free_apis;

@@ -98,7 +98,11 @@ static uint32_t heap_alloc(Ctx *c, uint32_t n) {
             return b + HDR;
         }
     }
-    if (brk_ptr + need >= vtop) { guest_mem_log("full"); return 0; }
+    if (brk_ptr + need >= vtop) {
+        rn_log("guest heap: request of %u bytes from %08x line %u", need, ld(c, 0x7349a8, 4), ld(c, 0x7349ac, 4));
+        guest_mem_log("full");
+        return 0;
+    }
     uint32_t b = brk_ptr;
     st(c, b, need | 1, 4);
     st(c, b + 4, heap_top, 4);           // size of the previous block

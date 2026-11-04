@@ -3,9 +3,9 @@
 # [0x1301c] = SCREEN_ADDR+28, written by win32_init: 1 = this traffic, 0 = the original (RN_TRAFFIC=0).
 
 # Data first, at fixed addresses 0x63b270..0x63b27f (the code reads them by absolute address).
-# GOLF FOCUS NEON CIVIC PEUGOT CELICA INTEGRA SENTRA (type ids 0 1 3 4 5 6 14 17): 8 x 0.375 = 3 of 15 total weight.
-stock:  .long 0x0002407b
-wstock: .float 0.375
+# Every tuner row but LANCER (no paints): 19 x 5/19 = 5 of 20 total weight, so 1 traffic car in 4 is a tuned racer in a career preset (host/free.c free_traffic), OWNER 2026-11-04.
+stock:  .long 0x000fdfff
+wstock: .float 0.21052632
 kmin:   .float 0.85
 kspan:  .float 0.0011764706
 
@@ -65,17 +65,17 @@ iter:
 4:  JMPA 0x57cfd1
 5:  JMPA 0x57cfed
 
-# Count, was movsx edx, byte [ecx+edi*2+0xc0] at 0x4b3b01 (trackinfo traffic count, 12 on most tracks): x1.5, at most 26
-# (rides cap 30 at 0x4322a0, 4 racers).
+# Count, was movsx edx, byte [ecx+edi*2+0xc0] at 0x4b3b01 (trackinfo traffic count, 12 on most tracks): x1.5, at most 55
+# (rides cap 64 at 0x4322a0, 1 player + 8 rivals).
 count:
     movsx edx, byte ptr [ecx + edi*2 + 0xc0]
     cmp dword ptr [0x1301c], 0
     je 6f
     lea edx, [edx + edx*2]
     sar edx, 1
-    cmp edx, 26
+    cmp edx, 55
     jle 6f
-    mov edx, 26
+    mov edx, 55
 6:  ret
 
 # Desired speed of a traffic car, at the two calls of 0x5a6b00 (speed of the lane path at a distance: node byte +0x6a via

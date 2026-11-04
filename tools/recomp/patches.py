@@ -362,7 +362,7 @@ PATCHES.append(dict(addr=0x63b3ad, old="68f4700001e8d9660000" + "81c40c010000c39
 # (node +0x6a via 0x5a7690) twice a frame; each car now drives at x0.85..1.15 of it, from a hash of its AI object (esi), so
 # a car keeps its pace (a spawn speed alone would not last). [0x1301c] (SCREEN_ADDR+28) = 0 (RN_TRAFFIC=0) = original.
 PATCHES.append(dict(addr=0x63b270, entries=(0x63b280, 0x63b28a, 0x63b310, 0x63b331), old="8b44240881ec0801000085c00f8424010000538b9c24100100005556578944241053e8b91e000083c40484c00f85eb000000a1f4756e008d5424142bd08d49008a08880c024084c975f68bc38bf38bff8a084084c975f98d7c24142bc64f8bff8a4f014784c975f88bc8c1e9026a00f3a568800000006a036a006a008bc868000000808d44242c83e10350f3a4ff15c07169008bf883ffff745268fc8c6a006a07e84a7b000053e834fdffff8be883c40c85ed750f8b0d18766e0051e81f71000083c4048b3590f470006a005783c610ff15b871690001068356040057c6850401000001ff1528716900eb316a00681001000068f08c",
-                    new="7b4002000000c03e9a99593fce339a3a5089c8e80200000058c3833d1c300100007508d984b0600c0000c3528b90540c000085d274248b90600c00000b90640c00000b90680c00000b906c0c00000b90700c00007420d9e85ac38b90500c000083fa1f77110fa31570b263007308d90574b263005ac3d9ee5ac38b88540c000039f17412833d1c30010000740e85c9750a83fe027505e9c61cf4ffe9dd1cf4ff0fbe9479c0000000833d1c30010000740f8d1452d1fa83fa1a7e05ba1a000000c3ff742404e8c6b7f6ff833d1c3001000074205089f069c0b179379ec1e81850db042458d80d7cb26300d80578b26300dec958c20400", when=lambda: True))
+                    new="ffdf0f003694573e9a99593fce339a3a5089c8e80200000058c3833d1c300100007508d984b0600c0000c3528b90540c000085d274248b90600c00000b90640c00000b90680c00000b906c0c00000b90700c00007420d9e85ac38b90500c000083fa1f77110fa31570b263007308d90574b263005ac3d9ee5ac38b88540c000039f17412833d1c30010000740e85c9750a83fe027505e9c61cf4ffe9dd1cf4ff0fbe9479c0000000833d1c30010000740f8d1452d1fa83fa377e05ba37000000c3ff742404e8c6b7f6ff833d1c3001000074205089f069c0b179379ec1e81850db042458d80d7cb26300d80578b26300dec958c20400", when=lambda: True))
 PATCHES.append(dict(addr=0x57d060, old="d984b0600c0000", new="e825e20b009090", when=lambda: True))
 PATCHES.append(dict(addr=0x57d0c1, old="d984b1600c0000", new="e8bae10b009090", when=lambda: True))
 # 0x57cfc7 (cave iter: the traffic pick also took racer rows, usage 0) is on again (2026-10-28, with the overlay below): a racer model
@@ -529,9 +529,9 @@ def c_table():
 # collision body pool 0x4412b0 (0x566dc0, 0x80 B slots, flags 0xb & ~3: it never grows) holds 0x400 bodies; each car's ground cache pins up to 160
 # (0x4407b0 passes 0xa0) and 0x441b20 frees only bodies of count 0, so 1 + 6 rivals + 19 traffic (26 x 160) outrun it; shipped 1001 already peaks at
 # 1,024 in use (RN_AILOG TRAFLOG polymax). mov edi,0x400 -> 0x2000. The cap is read back from the pool ([+0x2c] at 0x441baa, [+0x24] at 0x43fe84);
-# the slot index is a s16 at row +6 (0x4400c1), so it must stay <= 0x7fff; save 0x46a6e0 writes row indices. Cost 1 MB of guest heap instead of 128 KB.
+# the slot index is a s16 at row +6 (0x4400c1), so it must stay <= 0x7fff; save 0x46a6e0 writes row indices. 0x4000 = 2 MB: 64 entrants x 160 + camera (2026-11-04).
 # docs/openworld/re_coll_pool.md, census/names_collision.tsv.
-PATCHES.append(dict(addr=0x4412bd, old="bf00040000", new="bf00200000", when=lambda: True))
+PATCHES.append(dict(addr=0x4412bd, old="bf00040000", new="bf00400000", when=lambda: True))
 # Traffic goal-5 finder 0x453920 dropped any obstacle that is a racer (race record [car+0x1c] != 0) going > 20 m/s, which is the
 # player too, so spawn-record traffic never braked, swerved or honked for him. Now only rivals (driver kind 2, [[rec+0x14]+4]) keep the
 # exemption: mov ecx,[ecx+0x14]; cmp [ecx+4],2; jne 0x4539ff (not exempt); nop*3 (docs/re/traffic_react.md item b)
@@ -578,10 +578,19 @@ for a in (0x466d7b, 0x466daa, 0x466e95, 0x466ece, 0x468317, 0x4696e1):  # imul r
 # PATCH: 0x466a3e, witness pool [0x72cc00] 0x100 -> 0x800 (0x280 B slots, 1.3 MB): 0x469770 and Broadphase 0x4695xx skip the witness when the pool is empty, so that wall is not tested and its polygon body, which frees only with its last witness (0x466e20), leaks. The bound follows PATCH 0x4669fe.
 PATCHES.append(dict(addr=0x466a3e, old="bf00010000", new="bf00080000", when=lambda: True))
 # PATCH: 0x45553b/0x45557b/0x4555bb/0x4555f8, AI slot pools (ctor 0x455530) 26/27/27/640 -> 48/49/49/1280: each AI car (racer or traffic) takes 1 goal, 1 action, 1 FuturePoints and ~24 future points, so the shipped pools cap AI cars at 26; WORLD runs 8 rivals + 21 traffic (host/free.c world_ai). Capacity only: a race with fewer cars allocates the same slots as before.
-PATCHES.append(dict(addr=0x45553b, old="bf1a000000", new="bf30000000", when=lambda: True))  # AIGoalSlotPool 26 -> 48
-PATCHES.append(dict(addr=0x45557b, old="bf1b000000", new="bf31000000", when=lambda: True))  # AIActionSlotPool 27 -> 49
-PATCHES.append(dict(addr=0x4555bb, old="bf1b000000", new="bf31000000", when=lambda: True))  # FuturePointsSlotPool 27 -> 49
-PATCHES.append(dict(addr=0x4555f8, old="bf80020000", new="bf00050000", when=lambda: True))  # FuturePointSlotPool 640 -> 1280
+PATCHES.append(dict(addr=0x45553b, old="bf1a000000", new="bf40000000", when=lambda: True))  # AIGoalSlotPool 26 -> 64
+PATCHES.append(dict(addr=0x45557b, old="bf1b000000", new="bf40000000", when=lambda: True))  # AIActionSlotPool 27 -> 64
+PATCHES.append(dict(addr=0x4555bb, old="bf1b000000", new="bf40000000", when=lambda: True))  # FuturePointsSlotPool 27 -> 64
+PATCHES.append(dict(addr=0x4555f8, old="bf80020000", new="bf00060000", when=lambda: True))  # FuturePointSlotPool 640 -> 1536
+
+# PATCH: traffic cap 30 -> 64 entrants (OWNER 2026-11-04; docs/re/traffic_cap_plan.md, each site read in Speed.exe). Entrant table 30 x 0x750 ends at RaceStatus 0x78a2f0; only three sites hold its base.
+ENTRANT_ADDR, CHECK_ADDR = 0x7c0000, 0x7e0000  # RAM past SizeOfImage 0x794368, below HEAP_LO: 64 x 0x750 = 0x1d400, then the 0x400 of checksum records
+PATCHES.append(dict(addr=0x431e9d, old="b9d8360000" "bf90c77700", new="b900750000" "bf0000" "7c00", when=lambda: True))  # ctor memset: 64 entrants at the new base
+PATCHES.append(dict(addr=0x431ec4, old="c7862801000090c77700", new="c786280100000000" "7c00", when=lambda: True))  # RaceStatus+0x128 = [0x78a418], every reader's pointer
+PATCHES.append(dict(addr=0x689d22, old="bec4ce7700" "bf1e000000", new="be34077c00" "bf40000000", when=lambda: True))  # static init of each entrant's sub-object, 64 of them
+PATCHES.append(dict(addr=0x4322e0, old="83bd2c0100001e", new="83bd2c01000040", when=lambda: True))  # AddEntrant cap 0x1e -> 0x40
+PATCHES.append(dict(addr=0x421191, old="81c7a8000000", new="bf00007e0090", when=lambda: True))  # checksum 0x421170 wrote records at L+0xa8 over sorted[32..], so car 33 read a float as a pointer (STOP 0042119a): records go to CHECK_ADDR
+PATCHES.append(dict(addr=0x4669be, old="bf1e000000", new="bf40000000", when=lambda: True))  # CarCollisionBodySlotPool 30 -> 64
 # PATCH: 0x44c573 (+ cave 0x43b556, CC padding after the ret 8 of 0x43b4xx, no reference: asm.py free), OWNER order 2026-11-01 (rival personalities
 # in WORLD): the racer's desired-speed step 0x44c550 calls the catch-up 0x44bd10 (eax = AIVehicle) right before it reads the speed inputs. The call
 # now goes to the cave, jmp [SCREEN_ADDR+0xb0] = host/rivals.c persona_step: the original call first, then per personality (WORLD only, ?ai=0 off).
