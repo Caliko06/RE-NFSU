@@ -653,13 +653,3 @@ PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[0:5]]
 PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[7:10]]
 
 
-# ---- AI (Becarios 2026-11-04, build-time opt-in: docs/re/ai_corner.md, ai_traffic.md; nacho docs/re/ai_review2.md verified both byte for byte)
-# RN_AI_LOOK=1: RacerAI::UpdateDesiredSpeed 0x44c550 picks the road node for its speed as cur + NextMod(2*(b+1)) - (b+1): half the draws point BEHIND the car
-# (the cap of a corner already passed). `sub eax,esi` at 0x44c678 -> two NOPs: the window is [0, 2b+1] nodes ahead. eax is stored at 0x44c67a, esi is dead.
-# RN_AI_TRAFP=1: Avoid finder 0x453920 skips the obstacle for a goal-5 car when the leader's flag is set and its speed > 20 m/s (0x4539db): the player
-# was invisible to fast traffic. `mov edx,[ecx+0x1c]; test; setne; test; je` -> `mov ecx,[ecx+0x14]; cmp [ecx+4],2; jne` + 3 NOPs: only a rival (kind 2) keeps the pass-through.
-_AI_ENV = lambda n: (lambda: __import__("os").environ.get(n) == "1")
-PATCHES += [
-    dict(addr=0x44c678, old="2bc6", new="9090", when=_AI_ENV("RN_AI_LOOK")),
-    dict(addr=0x4539db, old="8b511c85d20f95c084c07418", new="8b491483790402751b909090", when=_AI_ENV("RN_AI_TRAFP")),
-]

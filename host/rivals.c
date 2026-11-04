@@ -842,107 +842,15 @@ static void ai_tune(Ctx *c) {
     if (stuck) st(c, 0x6b7680, 0x3fc00000, 4), st(c, 0x6b7684, 0x40400000, 4);
 }
 
-// RN_AI_TRAFGO=1 (?trafgo=1, off by default): ends a long traffic standstill with nothing ahead (docs/re/ai_traffic_stop.md). A car in the
-// Avoid action (type 3) keeps act+0x1f0 = 0 and act+0x1e4 = 0 in 0x453c60's brake branch; 0x583910 then hands 0 m/s to 0x45e180 (SetDesiredSpeed)
-// and nothing in the action ever expires. The action is only replaced when the selector 0x44e020 gets no obstacle from 0x453920, which needs
-// the neighbour list to hold no same-lane car ahead: a queue tail whose leader left the list stays dead, and the parked flag never covers it.
-// Rule: speed < 0.5 m/s in act 3 for 4 s and no car of the race list ahead within 12 m of its heading -> act+0x1f0 = 1 (route speed wins at
-// 0x583910) and act+0x200 = 0 (the next think re-acquires a real obstacle). Logs RNTGO. AIT shows sp leaving 0.0 and act 3 -> 8 within ~2 s.
-#define TGO_WAIT 8              // this runs every 30 presents: 8 x 0.5 s = 4 s
-static struct { uint32_t car; int n; } tgo[32];
-static int trafgo_on(void) {
-    static int on = -1;
-    if (on < 0) on = getenv("RN_AI_TRAFGO") != NULL;
-    return on;
-}
-static void trafgo(Ctx *c) {
-    if (!trafgo_on() || rn_telem.presents % 30 || ld(c, 0x77a920, 4) != 6) return;
-    uint32_t h = ld(c, 0x7361f8, 4);
-    if (!h || h >= GUEST_MEM - 0x1000) return;
-    for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
-        uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
-        if (!e || e >= GUEST_MEM - 0x800 || ld(c, e + 4, 4) != 3 || !v || v >= GUEST_MEM - 0x900) continue;
-        uint32_t a = ld(c, v + 0x3f8, 4);
-        int slot = -1, i;
-        for (i = 0; i < 32; i++) if (tgo[i].car == r) slot = i;
-        if (!a || a >= GUEST_MEM - 0x200 || ld(c, a + 0x1f8, 4) != 3 || ldf(c, r + 0x3d4) >= 0.5f) { if (slot >= 0) tgo[slot].car = 0; continue; }
-        float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54), fx = ldf(c, r + 0x90), fy = ldf(c, r + 0x94), fl = hypotf(fx, fy);
-        if (fl < 0.01f) { if (slot >= 0) tgo[slot].car = 0; continue; }
-        fx /= fl, fy /= fl;
-        int blocked = 0;
-        for (uint32_t o = ld(c, h, 4), j = 0; o && o != h && j < 200 && !blocked; o = ld(c, o, 4), j++) {
-            if (o == r || o >= GUEST_MEM - 0x200) continue;
-            float dx = ldf(c, o + 0x50) - x, dy = ldf(c, o + 0x54) - y;
-            blocked = dx * fx + dy * fy > 0.0f && dx * fx + dy * fy < 12.0f && fabsf(dx * fy - dy * fx) < 2.5f;
-        }
-        if (blocked) { if (slot >= 0) tgo[slot].car = 0; continue; }
-        if (slot < 0)
-            for (i = 0; i < 32 && slot < 0; i++) if (!tgo[i].car) slot = i, tgo[i].car = r, tgo[i].n = 0;
-        if (slot < 0) continue;
-        if (++tgo[slot].n < TGO_WAIT) continue;
-        tgo[slot].car = 0;
-        c->mem[a + 0x1f0] = 1;
-        st(c, a + 0x200, 0, 4);
-        rn_log("RNTGO f%u car %08x act 3 at %.0f,%.0f sp %.1f: route speed on, obstacle cleared", rn_telem.presents, r, x, y, ldf(c, r + 0x3d4));
-    }
-}
-
-// RN_DRAFT_K=<k> (default off, OWNER 2026-11-04: make the rebufo real). docs/re/ai_draft.md: (1 - car+0x47c) only scales the aero
-// drag of 0x585410, whose coefficient body+0x1e4 = phys+0x290 is 0.0 in the 35 stock cars, so the game's tow adds no speed by itself.
-// Rule: every present, after the game has written car+0x404 (rivals: rubber band 0x44bd10 at 0x44bff5, every 0.3 s; player: init 1.0
-// and the 2-human catch-up 0x429b8b), scale it by (1 + k*car+0x47c) for every car of the race list with draft > 0.2. The value the game
-// left is the BASE: when it differs from what we wrote, that is the new base, so the factor never compounds. Kind 1 (player) and 2
-// (rivals); traffic has no force mover, so it is skipped. Arithmetic, constant power with the aero path dead: v_term satisfies
-// F(v) = R, F scales by (1+k*d) -> dv/v = k*d (F ~ 1/v at fixed power), so k = 0.05/0.9 = 0.055 gives 0.9 draft = +4.95 % at any speed
-// (60 -> 62.97 m/s). Side effect: 0x404 also feeds grip (wheel+0x17c) and the dead drag scale (body+0x1e8), so +5 % grip in the tow.
-// At the rev limiter in top gear the extra torque adds no speed; then the honest lever is gearing, not 0x404. Logs DRAFTK 1/s.
-static int draftk_on = -1;
-static float draftk;
-static struct { uint32_t car; float base, wrote; } dk[24];
-
-void draft_step(Ctx *c) {
-    if (draftk_on < 0) {
-        const char *e = getenv("RN_DRAFT_K");
-        draftk = e ? (float)atof(e) : 0.0f;
-        draftk_on = draftk > 0.0f;
-        if (draftk_on) rn_log("DRAFTK on k %.4f: car+0x404 = base*(1+k*car+0x47c) when draft > 0.2", draftk);
-    }
-    if (!draftk_on || ld(c, 0x77a920, 4) != 6) return;
-    static uint32_t race;
-    uint32_t h = ld(c, 0x7361f8, 4);
-    if (!h || h >= GUEST_MEM - 0x1000) { race = 0; return; }
-    if (h != race) memset(dk, 0, sizeof dk), race = h;      // a new race list: no stale car pointers keep a base
-    int sec = rn_telem.presents % 60 == 0;
-    for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
-        uint32_t e = ld(c, r + 0x14, 4);
-        if (!e || e >= GUEST_MEM - 0x800 || r >= GUEST_MEM - 0x900) continue;
-        uint32_t kind = ld(c, e + 4, 4);
-        if (kind != 1 && kind != 2) continue;
-        int i = 0;
-        while (i < 24 && dk[i].car && dk[i].car != r) i++;
-        if (i == 24) continue;
-        if (!dk[i].car) dk[i].car = r, dk[i].base = dk[i].wrote = ldf(c, r + 0x404);
-        float cur = ldf(c, r + 0x404), d = ldf(c, r + 0x47c);
-        if (cur != dk[i].wrote) dk[i].base = cur;                 // the game wrote a new base
-        float f = d > 0.2f ? 1.0f + draftk * d : 1.0f;
-        float want = dk[i].base * f;
-        if (want != cur) stf(c, r + 0x404, want);
-        dk[i].wrote = want;
-        if (sec) rn_log("DRAFTK f%u kind %u car %08x draft %.3f base %.3f x %.3f -> %.3f", rn_telem.presents, kind, r, d, dk[i].base, f, want);
-    }
-}
-
 void traffic_tick(Ctx *c) {
     static uint32_t seed = 0x51ed2701;
     static struct { uint32_t car, frame; } seen[32];
-    draft_step(c);
     ai_log(c);
     handling_data(c);
     ai_tune(c);
     // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
     // Every present, before the traffic guards (RN_TRAFYIELD=0, pause or a non-race mode must not turn it back on); outside WORLD it writes the factory value 1.
     st(c, 0x700740, ld(c, 0x78a2f0, 4) != 1010, 4);
-    trafgo(c);   // RN_AI_TRAFGO: before the guards below, a parked player must not freeze the unlock too
     if (ld(c, 0x77a920, 4) != 6) memset(still_r, 0, sizeof still_r);   // out of a race: frozen-car timers die with it (a rebuilt list can reuse node addresses; presents never restarts)
     if (trafyield_off() || rn_telem.presents % 6 || ld(c, 0x77a920, 4) != 6 || c->mem[0x78a33c]) return;
     uint32_t h = ld(c, 0x7361f8, 4), me = 0;
