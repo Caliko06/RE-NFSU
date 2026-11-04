@@ -121,7 +121,8 @@ async function startGpu(M, canvas, report, onFrame) {
     const world = wq === '1';
     const worldBc = world && v2 && BC && q.get('worldbc') !== '0';
     const lists = ['remaster/index.tsv', ...(v2 ? ['remaster/index_v2.tsv', 'remaster/index_fe_v2.tsv'] : []),
-      ...(worldBc ? ['remaster/index_world_bc.tsv'] : world ? ['remaster/index_world.tsv', ...(v2 ? ['remaster/index_world_v2.tsv'] : [])] : [])];
+      ...(worldBc ? ['remaster/index_world_bc.tsv'] : world ? ['remaster/index_world.tsv', ...(v2 ? ['remaster/index_world_v2.tsv'] : [])] : []),
+      'remaster/index_glow.tsv'];   // last: tools/remaster/flare_glow.py, the clean round lamp glow wins over any upscale of the flares
     for (const u of lists) try {
       const r = await fetch(u);
       if (r.ok) for (const l of (await r.text()).split('\n')) { const f = l.split('\t'); if (f[1]) pack.set(f[0], f[1]); }
