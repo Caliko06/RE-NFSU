@@ -35,7 +35,7 @@ against its "done when", merges, commits, and keeps docs/re/night_log.md as the 
 
 ## Stop conditions (everything halts and waits for the OWNER)
 Scope drift (publishing, patches, features, a different project); a change in game behavior; main stops passing
-`node tools/webcheck.mjs --route`; a worker edits a frozen item; quota at 92 % (hand off and stop, relay to acct 3 only for the orchestrator).
+`node tools/webcheck.mjs --route`; a worker edits a frozen item. (Quota at 92 % is not a stop: AGENTS.md "Close" — commit, HANDOFF.md, `claude-acc relay check`, relay.)
 
 ## Tools (REA skill applied)
 REA MCP on pc/Speed.exe (open_binary, procedure_pseudo_code, xrefs, search_strings, resolve_containing_procedure,

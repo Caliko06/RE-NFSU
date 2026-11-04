@@ -83,10 +83,18 @@ Layout in `tools/re/lang.py` (docstring). Loader `0x59fce0` stores charset `[0x7
   this build: preopen, psa, fre/ger/spa/dut/ita/swe_drag, ssx, intssx, nfl, intnfl, nascar, logo_fre..logo_swe, nfsgb.
   V (C, H)
 - Localised variants `0x6ee844`: records of 0x60 bytes, `{name, lang, name}` pairs (FR/GR/IT/SP prefixes). V (C)
-- Movie theatre (`MU_UG_MovieTheaterViewer`) table `0x6fae30`: 16 rows `{hash, ICON_FMV_nn, movie}`; 12_BUD is not in
-  the theatre. Read by 0x4c9240 and 0x513c90. V (C), readers I
-- Boot movie `0x4deaa0`: language `[0x734998]` 0 or 5 -> `na_boot` (not shipped; the port patches around it at
-  `0x4f5891`), else the localised logo from `0x59fd70` (`logo_eng`). V (H)
+- Movie theatre table `0x6fae30`: 16 rows `{hash, ICON_FMV_nn, movie}`. Cut from this exe: no reference to the table
+  (raw scan), and `MU_UG_TheatreScreen` has only a static hash at `0x68bd10`, no factory. So `04_GUM_e`, which only this
+  table names, never plays. V (D). `0x4c9240` and `0x513c90` are the magazine screens.
+- `MU_UG_MovieTheaterViewer` plays the tutorials: the PC menu bar's T key (`0x4e6f00`) or a mouse click (`0x4b7de0`) sends
+  `0xc519bfc8`; on the Quick Race mode screen mode 5 / 6 sets `[0x6faefc]` (`0x4b7d43`, `0x4b7d67`), the viewer asks
+  `ENG_DRAG` / `DRIFT` (`0x4c3ad5`, `0x4c3ae1`). V (C)
+- Boot movie `0x4deaa0`: region `[0x734998]` 0 or 5 -> `na_boot` (not shipped; the port patches around it at
+  `0x4f5891`), else the localised logo from `0x59fd70` (`logo_eng`). The exe has 29 reads and no writer of the region, so
+  it is 0: the list is `0x6fa1a8` (EAlogo, PSA, IntroFMV, Splash). `logo_eng` and `THX_logo` (only in list `0x6fa1bc`, region
+  not 0) never play in the unpatched exe. V (C, D)
+- Who plays the rest: event slots (table in `tools/census/career.py`); `04_GUM_s` on the first garage visit (hub `0x4eaff0`,
+  `[0x76027f]` == 0, `0x4eb06e` sets `[0x735dc4]`, `0x4e82ab`). V (C)
 - Path `0x4f57a0`: `sprintf("%sMOVIES\%s%s", root, name, ".mad")`. V (H)
 
 ## Saves

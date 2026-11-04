@@ -20,8 +20,10 @@ Marks: V = I re-ran it or read the code this session, D = a doc or the ledger sa
 | Hopper query scripts | 131 `tools/hopper/q_*.py`, 85 frozen PS2/NFSU1 RE notes in `ref/docs/re` | `ls` |
 
 Reading: the port is a faithful machine translation (lifted + partly diff-tested). What we have *understood* is written in
-prose docs and patch comments, not in one registry. There is no file that says "address X is function Y of system Z,
-learned with tool T". That registry is the missing instrument, and it is what makes "100 %" measurable.
+prose docs and patch comments, and now also in a registry: `census/names_<system>.tsv` (merged by `tools/census/names_merge.py`
+into `census/names.tsv`) says "address X is function Y of system Z, learned with tool T", with evidence state V/I/U
+(`tools/census/evstate.py`). The name counts in the table above are from the morning of 2026-10-29; `tools/census/scoreboard.py`
+prints the current ones. Fragments (lifter starts inside a parent function) are shown in their own columns, not folded into `named`.
 
 ## 2. What the last OpenCode session got wrong (audit, 2026-10-29)
 
@@ -82,6 +84,8 @@ Evidence marks are about the docs named; none of these was re-run here.
 ## 5. Four numbers per system (tools/census/scoreboard.py, 2026-10-29 12:40, V; changed after the external audit and the unknown/render passes)
 
 Universe = the 13,739 lifted functions.
+
+What each gate proves: `difftest` (lifted function = Unicorn on the same inputs: equal only for the cases run); `census/rows.json` 167/167 (career rows still load: a regression guard, not progress); `webcheck --route` (main still boots and routes); gate60 (frame time on the machine and scene measured). None of them says the look or feel is right (OWNER A/B) or that a function's name is correct (evidence V/I/U).
 - tagged = a system tag of confidence med/high in census/systems.tsv, or a name in names_*.tsv. The name's system overrides the graph tag (the audit found 47% of named functions had a different system in the graph). Before this change `tagged` counted every non-unknown function (12,179) and told nothing.
 - ran = RN_COV union, a floor (prologue only), 22 scenarios (12 first, 10 more tracks and career rows later the same day added only 29 functions: 6,038 -> 6,067).
 - named = a row in census/names_*.tsv with a system (V or I); named V = a second tool agrees (an automatic recheck of the 328 one-tool V rows: 259 hold, 69 inconclusive, 0 contradicted (docs/re/audit/v_recheck.tsv)).
