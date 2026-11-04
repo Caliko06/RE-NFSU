@@ -645,3 +645,7 @@ FEEL_CANDIDATES = [
     # drag and grip disappears; the probe (RN_FEELLOG, host/feellog.c) says how many seconds of 0-60 that was worth.
     dict(addr=0x474d47, old="7508", new="9090", when=lambda: False),
 ]
+
+# ---- FEEL batch 1 (OWNER 2026-11-04: feel changes replace the default; one commit per change so it reverts) -------------------------
+# C1 blur: the second zoom pass no longer multiplies its taps by 4.0 (smear reach /4, directional instead of the whole frame going soupy).
+PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[0:5]]
