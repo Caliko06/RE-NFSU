@@ -649,3 +649,5 @@ FEEL_CANDIDATES = [
 # ---- FEEL batch 1 (OWNER 2026-11-04: feel changes replace the default; one commit per change so it reverts) -------------------------
 # C1 blur: the second zoom pass no longer multiplies its taps by 4.0 (smear reach /4, directional instead of the whole frame going soupy).
 PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[0:5]]
+# C3 camera: FOV of POV 0/1/4 71.5 -> 65.9 deg (0x2ee0): the car reads 1.11x bigger. The exe has no speed term for eye distance/height/FOV (docs/re/camera_speed.md), so this is at every speed.
+PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[7:10]]
