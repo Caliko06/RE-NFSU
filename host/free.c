@@ -374,7 +374,7 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
     static int off = -1; static uint32_t seed = 0x7a11c0de;
     static struct { uint32_t car, since; } bh[64];
     if (off < 0) off = getenv("RN_FREETMOVE") && !atoi(getenv("RN_FREETMOVE"));
-    if (off || !tele || !pc) return;
+    if (off || !tele || !pc || world_ai(c)) return;   // WORLD: traffic_refill (host/rivals.c)
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
     uint32_t pick = 0; int prio = 0, near = 0;
     double far = world_ai(c) ? 300 : 400;   // WORLD: a car past 300 m is free to move (placements land 150..300 m out)
@@ -924,8 +924,8 @@ static uint32_t grid_fix(Ctx *c) {
 static uint32_t free_recycle(Ctx *c) {
     tele = c->r[ECX];
     uint32_t car = ARG(0), r = call_guest(c, 0x5988c0, 1, &car) & 0xff, h = ld(c, 0x7361f8, 4);
-    // ?pool=1 in WORLD: a failed move parks the car (0x598837: not drawn, no collision), even a car driving in sight of the player. Only parked cars go through the teleporter; traffic_refill (host/rivals.c) moves the driving ones, out of sight and never parking them.
-    if (live && rn_pool() && world_ai(c)) { uint32_t v = ld(c, car + 0x2c, 4); return v && c->mem[v + 0x4d1] ? r : 0; }
+    // WORLD: a failed move parks the car (0x598837: not drawn, no collision), even a car driving in sight of the player. Only parked cars go through the teleporter; traffic_refill (host/rivals.c) moves the driving ones, out of sight and never parking them.
+    if (live && world_ai(c)) { uint32_t v = ld(c, car + 0x2c, 4); return v && c->mem[v + 0x4d1] ? r : 0; }
     if (!live || r || !h) return r;
     for (uint32_t p = ld(c, h, 4), k = 0; p && p != h && k < 200; p = ld(c, p, 4), k++) {
         uint32_t e = ld(c, p + 0x14, 4);

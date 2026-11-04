@@ -660,13 +660,15 @@ static void handling_data(Ctx *c) {
 // behind and past 160 m tries up to 8 nodes 150..650 m + 1 s of speed ahead on the road (0x4563d0), at least 150 m from the player, 18 m from every car that drives; then the
 // Free Run move's own tail, as free_tmove: lane 0x5995e0, speed 0x42adf0, 0x59a7c0 on the teleporter [[0x7361f8]+0x2f0] (ecx at 0x420c77).
 #define REFILL_NEAR 14
-#define REFILL_POOL 18   // ?pool=1: of WORLD's 21 cars (OWNER: a live city; lower it if it lags)
+#define REFILL_POOL 18   // of WORLD's 21 cars (OWNER: a live city; lower it if it lags)
 static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     static int off = -1;
     static uint32_t pair, seed = 0x2f11e0d5;
-    if (off < 0) { const char *e = getenv("RN_TRAFREFILL"); off = !e || e[0] != '1'; }
+    int world = ld(c, 0x78a2f0, 4) == 1010;   // WORLD: always on (OWNER 2026-11-03); RN_TRAFREFILL=0 turns it off
+    if (off < 0) { const char *e = getenv("RN_TRAFREFILL"); off = e ? e[0] != '1' : -2; }
+    if (off == -2 && !world) return;
     uint32_t tele = ld(c, h + 0x2f0, 4);
-    if (off || !free_race || rn_telem.presents % 12 || !tele) return;
+    if (off > 0 || !free_race || rn_telem.presents % 12 || !tele) return;
     float px = ldf(c, me + 0x50), py = ldf(c, me + 0x54), vx = ldf(c, me + 0x70), vy = ldf(c, me + 0x74), sp = hypotf(vx, vy);
     uint32_t pick = 0;
     int prio = 0, near = 0;
@@ -679,7 +681,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         int p = parked ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
         if (p > prio) prio = p, pick = r;
     }
-    if (!pick || (near >= (rn_pool() ? REFILL_POOL : REFILL_NEAR) && prio < 3)) return;   // a parked car always goes back on the road
+    if (!pick || (near >= (world ? REFILL_POOL : REFILL_NEAR) && prio < 3)) return;   // a parked car always goes back on the road
     if (!pair) pair = guest_alloc(8);
     uint32_t zero = 0, ft = c->ftop;
     c->r[EAX] = me; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
