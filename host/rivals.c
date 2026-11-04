@@ -701,7 +701,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         float dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py, d = hypotf(dx, dy);
         int parked = c->mem[v + 0x4d1];
         if (parked) frozen_clear(r);   // parked time is not standing-still time (a car un-parked later would be recycled at once)
-        int frozen = !parked && frozen_car(r, ldf(c, r + 0x50), ldf(c, r + 0x54)) && d >= 200;
+        int frozen = !parked && frozen_car(r, ldf(c, r + 0x50), ldf(c, r + 0x54)) && (d >= 200 || (world && d >= 40 && dx * ldf(c, me + 0x90) + dy * ldf(c, me + 0x94) < 0.34f * d));   // WORLD: also out of the +-70 deg cone (free.c KEEP_M test): a wedged car behind the player leaves
         near += d < 250 && !parked && !frozen;
         int p = parked || frozen ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
         if (p > prio) prio = p, pick = r;
@@ -727,9 +727,12 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { n_rf[1]++; continue; }
         float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
         int ok = hypotf(nx - px, ny - py) >= REFILL_MIN;
+        float room = 1e9f;   // nearest car to the spot: it arrives at a speed it can stop from (a queue's tail 25 m on took a 20 m/s spawn in the back)
         for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++) {
             uint32_t v = ld(c, o + 0x2c, 4);
-            ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || hypotf(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) >= (world ? 25 : 18);
+            float od = hypotf(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny);
+            ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || od >= (world ? 25 : 18);
+            if (o != pick && od < room) room = od;
         }
         if (!ok) { n_rf[2]++; continue; }
         c->r[ECX] = tele;
@@ -741,6 +744,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         call_guest(c, 0x42adf0, 0, NULL);
         float v = (float)c->st[c->ftop];
         fpop(c);                               // a pop, not ftop = ft: see free_tmove
+        if (world && room > 8 && v * v > 8 * (room - 8)) v = sqrtf(8 * (room - 8));
         uint32_t p[7] = {pick, n2, 0, (uint32_t)lane, 0x41c4b127, 0, 0};
         memcpy(&p[5], &v, 4);
         c->r[ECX] = tele;
@@ -847,6 +851,56 @@ static void ai_tune(Ctx *c) {
 // RN_AILOG: per driver profile, cars and mean speed of those moving; lane changes per 600 presents, all and in front of the player within 40 m.
 int traffic_profile(uint32_t ai);   // host/free.c
 extern double rn_lane_sum; extern int rn_lane_n;
+// RN_AILOG probe: every 600 presents, the cars that moved under 3 m since the last one: what holds each (nearest car in a 3 m wide corridor 20 m ahead of its nose), how far it sits from its road's line.
+static void traffic_jam_log(Ctx *c, uint32_t h, uint32_t me) {
+    static struct { uint32_t r; float x, y; } was[64];
+    int frozen = 0, heads = 0, fol = 0, mutual = 0, side = 0, byp = 0, byr = 0, wr = 0, shown = 0, wn = 0;
+    uint32_t cars[80], lead[80]; int isf[80]; float X[80], Y[80], FX[80], FY[80];
+    int n = 0;
+    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200 && n < 80; r = ld(c, r, 4), k++) {
+        if (!ld(c, r + 0x14, 4)) continue;
+        cars[n] = r, X[n] = ldf(c, r + 0x50), Y[n] = ldf(c, r + 0x54), FX[n] = ldf(c, r + 0x90), FY[n] = ldf(c, r + 0x94), lead[n] = 0, isf[n] = 0, n++;
+    }
+    for (int i = 0; i < n; i++) {
+        uint32_t r = cars[i], e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
+        if (ld(c, e + 4, 4) != 3 || !v || c->mem[v + 0x4d1]) continue;
+        int j = 0;
+        while (j < 64 && was[j].r != r) j++;
+        if (j < 64 && hypotf(X[i] - was[j].x, Y[i] - was[j].y) < 3) isf[i] = 1;
+        float best = 20;
+        for (int o = 0; o < n; o++) {
+            if (o == i) continue;
+            float dx = X[o] - X[i], dy = Y[o] - Y[i], al = dx * FX[i] + dy * FY[i], la = fabsf(dx * FY[i] - dy * FX[i]);
+            if (al > 0 && al < best && la < 3) best = al, lead[i] = cars[o];
+        }
+    }
+    for (int i = 0; i < n; i++) {
+        if (!isf[i]) continue;
+        frozen++;
+        uint32_t r = cars[i], v = ld(c, r + 0x2c, 4), a = ld(c, v + 0x3f8, 4), ft = c->ftop, zero = 0;
+        c->r[EAX] = r; uint32_t node = call_guest(c, 0x428160, 1, &zero);
+        c->ftop = ft;
+        float co = node ? fabsf(ldf(c, node + 0xc) * FX[i] + ldf(c, node + 0x10) * FY[i]) / fmaxf(1e-3f, hypotf(ldf(c, node + 0xc), ldf(c, node + 0x10))) : -1;
+        side += co >= 0 && co < 0.85f;
+        if (!lead[i]) {
+            heads++;
+            uint32_t ob = a && ld(c, a + 0x1f8, 4) == 3 ? ld(c, a + 0x200, 4) : 0, ob2 = ob && ob < GUEST_MEM - 0x200 ? ld(c, ob + 0x1d4, 4) : 0, orc = ob2 && ob2 < GUEST_MEM - 0x100 ? ld(c, ob2 + 0x90, 4) : 0;
+            int ok = orc && orc < GUEST_MEM - 0x400, live = 0;
+            for (int o = 0; ok && o < n; o++) live |= cars[o] == orc;
+            float odx = ok ? ldf(c, orc + 0x50) - X[i] : 0, ody = ok ? ldf(c, orc + 0x54) - Y[i] : 0;
+            uint32_t oe = ok ? ld(c, orc + 0x14, 4) : 0;
+            if (shown++ < 6) rn_log("TRAFHEAD %.0f %.0f cos %.2f act %u target %.1f gain %.1f owner %d me %.0f m obstacle %08x rec %08x live %d kind %d dist %.1f along %.1f aside %.1f facing %.2f speed %.1f", X[i], Y[i], co, a ? ld(c, a + 0x1f8, 4) : 0, a ? ldf(c, a + 0x1e4) : 0, a ? ldf(c, a + 0x1ec) : 0, a ? c->mem[a + 0x1f0] : -1, hypotf(X[i] - ldf(c, me + 0x50), Y[i] - ldf(c, me + 0x54)), ob, ok ? orc : 0, live, oe && oe < GUEST_MEM - 8 ? (int)ld(c, oe + 4, 4) : -1, hypotf(odx, ody), odx * FX[i] + ody * FY[i], odx * FY[i] - ody * FX[i], ok ? ldf(c, orc + 0x90) * FX[i] + ldf(c, orc + 0x94) * FY[i] : 0, ok ? ldf(c, orc + 0x3d4) : 0);
+            continue;
+        }
+        fol++;
+        uint32_t le = ld(c, lead[i] + 0x14, 4);
+        int kind = le ? ld(c, le + 4, 4) : 0;
+        byp += kind == 1, byr += kind == 2;
+        for (int o = 0; o < n; o++) if (cars[o] == lead[i]) mutual += lead[o] == r, wr += FX[o] * FX[i] + FY[o] * FY[i] < -0.5f;
+    }
+    for (int i = 0; i < n && wn < 64; i++) if (ld(c, ld(c, cars[i] + 0x14, 4) + 4, 4) == 3) was[wn].r = cars[i], was[wn].x = X[i], was[wn].y = Y[i], wn++;
+    rn_log("TRAFJAM frozen %d heads %d follow %d mutual %d facing %d off-line %d behind-player %d behind-rival %d", frozen, heads, fol, mutual, wr, side, byp, byr);
+}
 static void traffic_prof_log(Ctx *c, uint32_t h, uint32_t me) {
     static int on = -1, lc, cuts;
     static uint32_t car[64], was[64], t;
@@ -873,6 +927,7 @@ static void traffic_prof_log(Ctx *c, uint32_t h, uint32_t me) {
     t = 0;
     rn_log("TRAFSPEED <2 %d <6.5 %d <12 %d <20 %d <27 %d more %d avoid %d of %d lane mean %.1f", hist[0], hist[1], hist[2], hist[3], hist[4], hist[5], act3, seen_cars, rn_lane_n ? rn_lane_sum / rn_lane_n : 0.0);
     memset(hist, 0, sizeof hist), act3 = seen_cars = 0, rn_lane_sum = 0, rn_lane_n = 0;
+    traffic_jam_log(c, h, me);
     rn_log("TRAFPROF lc %d cuts %d n %d %d %d %d %d sp %.1f %.1f %.1f %.1f %.1f", lc, cuts, n[0], n[1], n[2], n[3], n[4], n[0] ? sum[0] / n[0] : 0, n[1] ? sum[1] / n[1] : 0, n[2] ? sum[2] / n[2] : 0, n[3] ? sum[3] / n[3] : 0, n[4] ? sum[4] / n[4] : 0);
     lc = cuts = 0;
 }

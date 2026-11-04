@@ -488,26 +488,41 @@ static uint32_t traffic_speed(Ctx *c) {
 
 // PATCH 0x45406c, Avoid 0x453c60, car ahead at 15..30 m and no free lane: ebx = the action, eax = the obstacle (0x454080 reads [eax+0x1d4]), [[eax+0x1d4]+0x90] = its race
 // record (0x4540a1), record+0x3d4 = its speed (0x58393a). The game wrote 6 m/s here, so a queue crawled at 6 behind a car doing 20. WORLD: that car's speed, at least 6.
-static uint32_t avoid_record(Ctx *c, uint32_t a) {
-    uint32_t b = tspeed_on ? ld(c, a + 0x1d4, 4) : 0, r = b && b < GUEST_MEM - 0x100 ? ld(c, b + 0x90, 4) : 0;
-    return r && r < GUEST_MEM - 0x400 ? r : 0;
+// Ghost w_jam2, queue heads: 0x44f470's lane test works on route positions and takes a stopped car in the next lane as the car ahead (3.1-5 m aside, up to 22 m; one with along -0.3), so two lanes
+// stop for each other and the queue never clears. WORLD: only a car on this car's own line counts, by position: under 2.4 m aside (half widths and a margin) plus 0.08 m per m ahead (a bend).
+// The finder stops at its first match, so the nearest such car is searched here. The target is the speed this car can still stop from behind it (4 m/s2, 5 m between centres + bumper): a 36 m/s driver brakes in time.
+#define AVOID_LOOK 60.0f
+#define AVOID_NONE 60.0f   // above every cruise: 0x583910 takes the route speed
+static float avoid_on_line(Ctx *c, uint32_t me, uint32_t r, float *along) {
+    float dx = ldf(c, r + 0x50) - ldf(c, me + 0x50), dy = ldf(c, r + 0x54) - ldf(c, me + 0x54), fx = ldf(c, me + 0x90), fy = ldf(c, me + 0x94);
+    *along = dx * fx + dy * fy;
+    return fabsf(dx * fy - dy * fx);
+}
+static float avoid_target(Ctx *c, uint32_t me) {
+    uint32_t h = ld(c, 0x7361f8, 4), lead = 0;
+    float best = AVOID_LOOK;
+    for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
+        float al, as;
+        if (r == me || !ld(c, r + 0x14, 4)) continue;
+        as = avoid_on_line(c, me, r, &al);
+        int facing = ldf(c, r + 0x90) * ldf(c, me + 0x90) + ldf(c, r + 0x94) * ldf(c, me + 0x94) < -0.5f;   // the other direction's lane: no bend margin
+        if (al > 0 && al < best && as < (facing ? 2.2f : 2.4f + 0.08f * al)) best = al, lead = r;
+    }
+    if (!lead) return AVOID_NONE;
+    float vl = ldf(c, lead + 0x3d4), gap = best - 5.0f;
+    if (gap <= 0) return vl > 3 ? 0.8f * vl : 0.0f;
+    return sqrtf(vl * vl + 8.0f * gap);
 }
 static uint32_t avoid_follow(Ctx *c) {
-    uint32_t a = c->r[EAX], r = avoid_record(c, a), me = c->r[EDI];   // edi = own record (0x453ecb)
-    float t = 6.0f;
-    if (r) {
-        float v = ldf(c, r + 0x3d4);
-        if (v > t) t = v;
-        if (hypotf(ldf(c, r + 0x50) - ldf(c, me + 0x50), ldf(c, r + 0x54) - ldf(c, me + 0x54)) > 45) t = 60.0f;   // the finder lost it (it keeps the old id): no limit, 0x583910 takes the cruise
-    }
-    stf(c, c->r[EBX] + 0x1e4, t);
+    uint32_t a = c->r[EAX];
+    stf(c, c->r[EBX] + 0x1e4, tspeed_on ? avoid_target(c, c->r[EDI]) : 6.0f);
     return a;
 }
-// PATCH 0x4540e9, same, the car ahead within 15 m: 0 m/s, gain 0, a dead stop even if it pulls away. WORLD: while it moves, 0.8 x its speed, gain 2.
+// PATCH 0x4540e9, same, the car ahead within 15 m: 0 m/s, gain 0, a dead stop even if it pulls away. WORLD: avoid_target; gain 0 only when it says stop.
 static uint32_t avoid_close(Ctx *c) {
-    uint32_t a = c->r[EAX], r = avoid_record(c, a), act = c->r[EBX];
-    float v = r ? ldf(c, r + 0x3d4) : 0;
-    stf(c, act + 0x1e4, v > 3 ? v * 0.8f : 0.0f), stf(c, act + 0x1ec, v > 3 ? 2.0f : 0.0f);
+    uint32_t a = c->r[EAX], act = c->r[EBX];
+    float t = tspeed_on ? avoid_target(c, c->r[EDI]) : 0.0f;
+    stf(c, act + 0x1e4, t), stf(c, act + 0x1ec, t > 0 ? 2.0f : 0.0f);
     return a;
 }
 
