@@ -931,12 +931,27 @@ static void traffic_prof_log(Ctx *c, uint32_t h, uint32_t me) {
     rn_log("TRAFPROF lc %d cuts %d n %d %d %d %d %d sp %.1f %.1f %.1f %.1f %.1f", lc, cuts, n[0], n[1], n[2], n[3], n[4], n[0] ? sum[0] / n[0] : 0, n[1] ? sum[1] / n[1] : 0, n[2] ? sum[2] / n[2] : 0, n[3] ? sum[3] / n[3] : 0, n[4] ? sum[4] / n[4] : 0);
     lc = cuts = 0;
 }
+// Traffic paint (OWNER 2026-11-04, "flat, lifeless"): every traffic body uses the light material TRAFFIC (GLOBALB 0x135200, hash 0x19e0ecbe): EnvmapMin 0.29, EnvmapMax 0, diffuse 0.68..1.0, while the METPAINT
+// records have Min ~1.0, Max ~0.15, diffuse 0.3..1.2. Here TRAFFIC takes a slightly duller METPAINT in place; 0x40fae0 reads the record at each draw. Records: list [0x743c18], next +0, hash +0xc. RN_TRAFPAINT=0: as shipped.
+static void traffic_paint(Ctx *c) {
+    static int off = -1;
+    if (off < 0) { const char *e = getenv("RN_TRAFPAINT"); off = e && e[0] == '0'; }
+    if (off || rn_telem.presents % 300) return;
+    uint32_t h = ld(c, 0x743c18, 4);
+    for (uint32_t m = h, k = 0; m && m != 0x743c18 && k < 300; m = ld(c, m, 4), k++) {
+        if (ld(c, m + 0xc, 4) != 0x19e0ecbe) continue;
+        stf(c, m + 0x30, 0.45f), stf(c, m + 0x40, 1.1f), stf(c, m + 0x5c, 0.8f), stf(c, m + 0x6c, 1.1f), stf(c, m + 0x58, 3.0f);
+        stf(c, m + 0x7c, 0.35f), stf(c, m + 0x80, 0.85f), stf(c, m + 0x90, 0.13f);
+        return;
+    }
+}
 void traffic_tick(Ctx *c) {
     static uint32_t seed = 0x51ed2701;
     static struct { uint32_t car, frame; } seen[32];
     ai_log(c);
     handling_data(c);
     ai_tune(c);
+    traffic_paint(c);
     // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
     // Every present, before the traffic guards (RN_TRAFYIELD=0, pause or a non-race mode must not turn it back on); outside WORLD it writes the factory value 1.
     st(c, 0x700740, ld(c, 0x78a2f0, 4) != 1010, 4);
