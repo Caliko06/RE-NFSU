@@ -661,6 +661,26 @@ static void handling_data(Ctx *c) {
 // Free Run move's own tail, as free_tmove: lane 0x5995e0, speed 0x42adf0, 0x59a7c0 on the teleporter [[0x7361f8]+0x2f0] (ecx at 0x420c77).
 #define REFILL_NEAR 14
 #define REFILL_POOL 18   // of WORLD's 21 cars (OWNER: a live city; lower it if it lags)
+// Frozen traffic (w_h, 240 s: 21% of traffic samples did not move, a queue of 10 cars for up to 176 s, 57 cars braking to 6.1 m/s at one spot): the refill below only picks
+// parked, far (>450 m) or behind-the-player cars, and counts a frozen car as "near", so it was never recycled. Speed [car+0x3d4] stays 6.1 on a blocked car (w_i), so it is the
+// position that counts: a car that stays within 3 m of where it was seen for STUCK_PRESENTS presents (about 10 s, this runs every 12) and is 200 m or more from the player (as free.c KEEP_M: never vanish on screen) is
+// picked like a parked one; a pick that cannot be placed starts its timer again (frozen_clear), so it cannot hold the refill.
+#define STUCK_PRESENTS 600
+static uint32_t still_r[64], still_t[64];
+static float still_x[64], still_y[64];
+static int frozen_car(uint32_t r, float x, float y) {
+    int free_i = -1;
+    for (int i = 0; i < 64; i++) {
+        if (still_r[i] == r) {
+            if (hypotf(x - still_x[i], y - still_y[i]) >= 3.0f) { still_x[i] = x, still_y[i] = y, still_t[i] = rn_telem.presents; return 0; }
+            return rn_telem.presents - still_t[i] >= STUCK_PRESENTS;
+        }
+        if (!still_r[i] && free_i < 0) free_i = i;
+    }
+    if (free_i >= 0) still_r[free_i] = r, still_x[free_i] = x, still_y[free_i] = y, still_t[free_i] = rn_telem.presents;
+    return 0;
+}
+static void frozen_clear(uint32_t r) { for (int i = 0; i < 64; i++) if (still_r[i] == r) still_r[i] = 0; }
 static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     static int off = -1;
     static uint32_t pair, seed = 0x2f11e0d5;
@@ -679,8 +699,9 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         if (!e || ld(c, e + 4, 4) != 3 || !v) continue;
         float dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py, d = hypotf(dx, dy);
         int parked = c->mem[v + 0x4d1];
-        near += d < 250 && !parked;
-        int p = parked ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
+        int frozen = !parked && frozen_car(r, ldf(c, r + 0x50), ldf(c, r + 0x54)) && d >= 200;
+        near += d < 250 && !parked && !frozen;
+        int p = parked || frozen ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
         if (p > prio) prio = p, pick = r;
     }
     if (!pick || (near >= (world ? REFILL_POOL : REFILL_NEAR) && prio < 3)) return;   // a parked car always goes back on the road
@@ -690,7 +711,7 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     c->r[EAX] = me; uint32_t node = call_guest(c, 0x428160, 1, &zero);
     st(c, pair, sec, 4), st(c, pair + 4, node, 4);
     c->r[EAX] = pair;
-    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_refail++; n_rf[0]++; return; }
+    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; n_refail++; n_rf[0]++; frozen_clear(pick); return; }
     int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0;
     for (int t = 0; t < 8; t++) {              // farther each try (a stretch can lack lanes for 1 km); the last two behind the player
         float m = 150.0f + 80.0f * (t % 6) + (float)(rnd(&seed) % 100) + (t < 6 ? sp : 0);
@@ -723,9 +744,11 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         c->r[ECX] = tele;
         call_guest(c, 0x59a7c0, 7, p);
         c->ftop = ft, n_refill++;
+        frozen_clear(pick);
         return;
     }
     c->ftop = ft, n_refail++;
+    frozen_clear(pick);
 }
 
 // Traffic that reacts (RN_TRAFYIELD=0 / ?trafyield=0: as shipped; docs/re/traffic_limits.md). Traffic only ever looks ahead: its finder 0x453920 takes the nearest car ahead in
