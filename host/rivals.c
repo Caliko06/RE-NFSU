@@ -665,6 +665,8 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     static int off = -1;
     static uint32_t pair, seed = 0x2f11e0d5;
     int world = ld(c, 0x78a2f0, 4) == 1010;   // WORLD: always on (OWNER 2026-11-03); RN_TRAFREFILL=0 turns it off
+    // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
+    st(c, 0x700740, !world, 4);
     if (off < 0) { const char *e = getenv("RN_TRAFREFILL"); off = e ? e[0] != '1' : -2; }
     if (off == -2 && !world) return;
     uint32_t tele = ld(c, h + 0x2f0, 4);
