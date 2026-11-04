@@ -42,39 +42,39 @@ Per pair: `other+0x3d4 >= 1.0` (`0x706288`), distance (3D, +0x60) clamped to **6
 against a heading >= cos_min, then `w = falloff(dist / reach)` and the cosine ramp, product.
 
 - falloff `0x700d3c`: **1, 0.9, 0.75, 0.55, 0.3, 0** over `dist/reach` in 6 equal steps.
-- reach table `0x7062b4`: curve descriptors {base 2.5, cap 255, slope 0.5} and a second {50, 255, 5} -> reach grows ~0.5 per m/s,
-  2.5 m at 0 and ~32 m at 60 m/s. I (the reader is `sub_583f20`, same shape as the other curve tables).
-- cosine: `(cos - c0) / (1 - c0)` with c0 near 0.95 (`0x6b7b50`, and `0x6b7b40-44` holds 0.65 / 0.95 / 0.9). I for the exact c0.
-- Consequence: full 1.0 needs `dist/reach < 1/6` (~5 m at 60 m/s) *and* cos = 1. One car well placed at 15 m / 60 m/s gives
-  ~0.58; 0.9 needs several cars stacked. I.
-- Which car's heading: the call `sub_567370` at `0x426300` has no visible argument in the decompile. U (race_ai.md says the same).
+- reach table `0x7062b4`: {base 2.5, cap 255, slope 0.5} -> reach ~0.5 per m/s, 2.5 m at 0 and ~32 m at 60 m/s. I (`sub_583f20`).
+- cosine: `(cos - c0) / (1 - c0)` with c0 near 0.95 (`0x6b7b50`; `0x6b7b40-44` holds 0.65 / 0.95 / 0.9). I for the exact c0.
+- Full 1.0 needs `dist/reach < 1/6` (~5 m at 60 m/s) and cos = 1; one car at 15 m / 60 m/s gives ~0.58, 0.9 needs several. I.
+- Which car's heading: `sub_567370` at `0x426300` has no visible argument. U (race_ai.md says the same).
 
-## m/s if aero drag were live (tuned / non-stock drag coefficient)
+## Wave 2: the rule that makes it real (RN_DRAFT_K, host/rivals.c)
 
-Take `D(v) = r0 + a*v²` resistance with `a*v0² = s*D` (s = aero share at top speed). Scaling aero by `1-d` moves the top speed by
-`dv = v0 * d * s / 2` (flat engine curve near v0), i.e. exactly `v0*(1/sqrt(1-d) - 1)` when the aero term is the *only* limit.
-At v0 = 60 m/s (216 km/h):
+Car+0x404 is the scale of engine torque (`engine+0xa0`), dead drag (`body+0x1e8`) and grip (`wheel+0x17c`), read per frame by
+`0x479160`. Writers: `0x44bd10` for rivals (rubber band, `0x44bff5`, `max(scale,1)` every 0.3 s) and **only** `0x429b10`
+(`UpdateTwoHumanCatchUp`, `0x429b8b`) for the player, i.e. only with two humans; a single player keeps 1.0 from the ctor. V.
+`0x485c00` also stores `+0x404` but it is `TrackCarCameraMover::Update`, a camera field. V.
 
-| d = car+0x47c | s = aero share | dv |
-|---|---|---|
-| 0.30 (one car, ~15 m) | 0.30 | +2.7 m/s |
-| 0.58 | 0.30 | +5.2 m/s |
-| 0.90 (cap) | 0.30 | +8.1 m/s |
-| 0.90 | 1.00 | +27 m/s (unphysical, would be 3.16x v0) |
+Rule (`RN_DRAFT_K=<k>`, off by default, logs `DRAFTK` 1/s): every present, kind 1 and 2, `car+0x404 = base * (1 + k*draft)` when
+`draft > 0.2`. `base` = the value the game left; if it differs from ours it is the new base, so rubber band and tow never compound.
+Traffic skipped (BeltMover, no force mover).
 
-I (formula, not a measurement). With the shipped coefficient s = 0 and dv = 0. The rival never gains speed, it only *predicts* more
-in `0x456830`, which loosens its Pass/avoid thresholds: the tow makes rivals **try** harder, not go faster. I.
+Arithmetic for k. With the aero path dead the terminal speed is where drive force meets the remaining resistance (rolling, drivetrain,
+rev limiter), `F(v) = R`. Near v0 in a fixed gear the engine is at constant power, `F ~ P/v`, so scaling the torque (and P) by
+`s = 1 + k*d` scales the terminal speed the same way:
 
-## Probe (log only, host/aitel.c, tag AIDR)
+  `s*F(v') = R, F(v) = F0*v0/v  ->  v' = s*v0  ->  dv/v0 = k*d`
 
-One line per second per player (kind 1) and rival (kind 2), inside the existing `if (sec)` block of `ai_tel`:
+| k | d = 0.9 (cap) | d = 0.58 (one car, 15 m) | at 60 m/s, full draft |
+|---|---|---|---|
+| 0.050 | +4.50 % | +2.90 % | 60 -> 62.7 m/s |
+| **0.055** | **+4.95 %** | **+3.19 %** | **60 -> 62.97 m/s** |
+| 0.060 | +5.40 % | +3.48 % | 60 -> 63.24 m/s |
 
-```c
-if (kind == 1 || kind == 2)
-    rn_log("AIDR f%u kind %u car %08x draft %.3f sp %.1f d %+.0f lat %+.0f",
-           f, kind, r, ldf(c, r + 0x47c), sp, along >= 0 ? d : -d, lat);
-```
+k = 0.055 lands inside the 4-6 % window at the 0.9 cap (I, model above, not a measurement). Caveat: on the rev limiter in top gear the
+extra torque adds no speed and 4-6 % would need gearing. Side effects: +4.95 % grip in the tow, no drag (coefficient 0), and `0x456830`
+divides by 0x404, so rivals also predict the player 5 % faster. I.
+## Probes (log only, host/aitel.c)
 
-Read: `draft` is the game's own value, `d`/`lat` are relative to the player. Run `RN_AILOG=1` in a normal race ghost (no flag
-needed, AILOG is on by default in the page) and `grep AIDR log.txt`. Expected if case 1 holds: `draft 0.000` in clear air and also
-at a rival 15 m behind at 60 m/s, i.e. the tow exists as a number and never becomes force.
+`AIDR` 1/s per player (kind 1) and rival (kind 2): `draft` = `car+0x47c`, `sp`, `d`/`lat` to the player. `AIP` adds the player's
+`draft` and `tow>0.2 N/M x%` (seconds in tow over seconds in the race). `RN_AILOG=1` in a race ghost, `grep -E "AIDR|AIP"`; with
+`RN_DRAFT_K=0.055` compare `grep DRAFTK` against the speeds.

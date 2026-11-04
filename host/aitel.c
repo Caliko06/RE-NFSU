@@ -45,8 +45,11 @@ void ai_tel(Ctx *c) {
     float fl = hypotf(fx, fy);
     if (fl > 0) fx /= fl, fy /= fl;
     int sec = f % 60 == 0;
-    if (sec) rn_log("AIP f%u sp %.1f pos %.0f,%.0f,%.0f wheels %u crash %u", f, ldf(c, me + 0x3d4), px, py, ldf(c, me + 0x58),
-                    ld(c, me + 0x3cc, 4), ld(c, me + 0x38, 4));
+    static uint32_t tow_n, sec_n;          // seconds with the player's draft (car+0x47c) > 0.2, out of seconds in a race
+    float pd = ldf(c, me + 0x47c);
+    if (sec) tow_n += pd > 0.2f, sec_n++;
+    if (sec) rn_log("AIP f%u sp %.1f pos %.0f,%.0f,%.0f wheels %u crash %u draft %.3f tow>0.2 %u/%u %.1f%%", f, ldf(c, me + 0x3d4), px, py, ldf(c, me + 0x58),
+                    ld(c, me + 0x3cc, 4), ld(c, me + 0x38, 4), pd, tow_n, sec_n, sec_n ? 100.0f * tow_n / sec_n : 0.0f);
     for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4);
         if (!e || e >= GUEST_MEM - 0x800) continue;

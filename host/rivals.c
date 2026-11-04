@@ -884,12 +884,56 @@ static void trafgo(Ctx *c) {
         c->mem[a + 0x1f0] = 1;
         st(c, a + 0x200, 0, 4);
         rn_log("RNTGO f%u car %08x act 3 at %.0f,%.0f sp %.1f: route speed on, obstacle cleared", rn_telem.presents, r, x, y, ldf(c, r + 0x3d4));
+
+// RN_DRAFT_K=<k> (default off, OWNER 2026-11-04: make the rebufo real). docs/re/ai_draft.md: (1 - car+0x47c) only scales the aero
+// drag of 0x585410, whose coefficient body+0x1e4 = phys+0x290 is 0.0 in the 35 stock cars, so the game's tow adds no speed by itself.
+// Rule: every present, after the game has written car+0x404 (rivals: rubber band 0x44bd10 at 0x44bff5, every 0.3 s; player: init 1.0
+// and the 2-human catch-up 0x429b8b), scale it by (1 + k*car+0x47c) for every car of the race list with draft > 0.2. The value the game
+// left is the BASE: when it differs from what we wrote, that is the new base, so the factor never compounds. Kind 1 (player) and 2
+// (rivals); traffic has no force mover, so it is skipped. Arithmetic, constant power with the aero path dead: v_term satisfies
+// F(v) = R, F scales by (1+k*d) -> dv/v = k*d (F ~ 1/v at fixed power), so k = 0.05/0.9 = 0.055 gives 0.9 draft = +4.95 % at any speed
+// (60 -> 62.97 m/s). Side effect: 0x404 also feeds grip (wheel+0x17c) and the dead drag scale (body+0x1e8), so +5 % grip in the tow.
+// At the rev limiter in top gear the extra torque adds no speed; then the honest lever is gearing, not 0x404. Logs DRAFTK 1/s.
+static int draftk_on = -1;
+static float draftk;
+static struct { uint32_t car; float base, wrote; } dk[24];
+
+void draft_step(Ctx *c) {
+    if (draftk_on < 0) {
+        const char *e = getenv("RN_DRAFT_K");
+        draftk = e ? (float)atof(e) : 0.0f;
+        draftk_on = draftk > 0.0f;
+        if (draftk_on) rn_log("DRAFTK on k %.4f: car+0x404 = base*(1+k*car+0x47c) when draft > 0.2", draftk);
+    }
+    if (!draftk_on || ld(c, 0x77a920, 4) != 6) return;
+    static uint32_t race;
+    uint32_t h = ld(c, 0x7361f8, 4);
+    if (!h || h >= GUEST_MEM - 0x1000) { race = 0; return; }
+    if (h != race) memset(dk, 0, sizeof dk), race = h;      // a new race list: no stale car pointers keep a base
+    int sec = rn_telem.presents % 60 == 0;
+    for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (!e || e >= GUEST_MEM - 0x800 || r >= GUEST_MEM - 0x900) continue;
+        uint32_t kind = ld(c, e + 4, 4);
+        if (kind != 1 && kind != 2) continue;
+        int i = 0;
+        while (i < 24 && dk[i].car && dk[i].car != r) i++;
+        if (i == 24) continue;
+        if (!dk[i].car) dk[i].car = r, dk[i].base = dk[i].wrote = ldf(c, r + 0x404);
+        float cur = ldf(c, r + 0x404), d = ldf(c, r + 0x47c);
+        if (cur != dk[i].wrote) dk[i].base = cur;                 // the game wrote a new base
+        float f = d > 0.2f ? 1.0f + draftk * d : 1.0f;
+        float want = dk[i].base * f;
+        if (want != cur) stf(c, r + 0x404, want);
+        dk[i].wrote = want;
+        if (sec) rn_log("DRAFTK f%u kind %u car %08x draft %.3f base %.3f x %.3f -> %.3f", rn_telem.presents, kind, r, d, dk[i].base, f, want);
     }
 }
 
 void traffic_tick(Ctx *c) {
     static uint32_t seed = 0x51ed2701;
     static struct { uint32_t car, frame; } seen[32];
+    draft_step(c);
     ai_log(c);
     handling_data(c);
     ai_tune(c);
