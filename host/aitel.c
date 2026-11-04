@@ -16,7 +16,7 @@
 #include "host.h"
 
 #define AIT_MAX 64
-static struct { uint32_t r; float sp; int wall, car, unst, stuck, lastact; } tr[AIT_MAX];
+static struct { uint32_t r; float sp, x, y; int wall, car, unst, stuck, lastact, jump; } tr[AIT_MAX];
 
 static int slot(uint32_t r) {
     int i = 0;
@@ -61,6 +61,12 @@ void ai_tel(Ctx *c) {
         if (at == 0xa && tr[i].lastact != 0xa) tr[i].unst++;
         tr[i].lastact = at;
         if (sp < 2.0f) tr[i].stuck++; else tr[i].stuck = 0;
+        if (sp - tr[i].sp > 40.0f || tr[i].jump) {        // a speed jump and the 3 frames after it: is the car moving that fast, and which way
+            tr[i].jump = sp - tr[i].sp > 40.0f ? 4 : tr[i].jump - 1;
+            rn_log("AIJUMP f%u kind %u car %08x sp %.1f -> %.1f v %.1f %.1f %.1f pos %.1f %.1f %.1f moved %.1f act %d scale %.2f wheels %u mode %u spin %.0f %.0f nos %u/%.0f crash %u", f, kind, r, tr[i].sp, sp, ldf(c, r + 0x70), ldf(c, r + 0x74), ldf(c, r + 0x78),
+                   x, y, ldf(c, r + 0x58), hypotf(x - tr[i].x, y - tr[i].y), at, ldf(c, r + 0x404), ld(c, r + 0x3cc, 4), ld(c, r + 0x28, 4), ldf(c, r + 0x2f0), ldf(c, r + 0x2f8), ld(c, r + 0x3fc, 4), ldf(c, r + 0x3f8), ld(c, r + 0x38, 4));
+        }
+        tr[i].x = x, tr[i].y = y;
         if (tr[i].sp - sp >= 4.0f && tr[i].sp > 5.0f) {   // an impact: who was nearest
             float nd = 1e9f;
             uint32_t nr = 0;
