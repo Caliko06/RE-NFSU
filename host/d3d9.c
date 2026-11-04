@@ -963,6 +963,7 @@ static void hfov_frame(Ctx *c) {
     st(c, 0x707fc0, k && ld(c, 0x77a920, 4) == 6 ? k : 0x3f924925, 4);
 }
 void ai_tel(Ctx *c);
+void feel_tel(Ctx *c);
 static void chase_frame(Ctx *c) {
     static uint32_t info, rows[2][3];
     static float orig[2][3][2], sm, nsm;
@@ -1209,6 +1210,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     ai_tel(c);           // host/aitel.c: AI telemetry lines for the F10 (RN_AILOG)
     horn_tick(c);        // host/horn.c: recycle stamps for the horn hook (RN_HORNLOG / RN_HORNFIX)
     reset_tel(c);        // host/aitel.c: the game's reset 0x427c50 + 120 frames after (RN_RESETLOG)
+    feel_tel(c);         // host/feellog.c: speed, chase row, FOV and 0-60 / 0-100 (RN_FEELLOG)
     if (rn_steerlog) steer_frame(c);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
