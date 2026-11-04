@@ -540,6 +540,10 @@ PATCHES.append(dict(addr=0x4539db, old="8b511c85d20f95c084c07418", new="8b491483
 PATCHES.append(dict(addr=0x582f76, old="d81588c96c00", new="d815a86e6900", when=lambda: True))
 PATCHES.append(dict(addr=0x582f85, old="d90588c96c00", new="d905a86e6900", when=lambda: True))
 PATCHES.append(dict(addr=0x696ea8, old="00000000", new="27b1c441", when=lambda: True))
+# Avoid 0x453c60 with a car ahead at 15..30 m and no free lane: target 6 m/s whatever that car does, so queues crawl (ghost f40: traffic mean 4 m/s). call [SCREEN_ADDR+0xbc] = host/free.c avoid_follow: WORLD follows that car's speed, at least 6; elsewhere 6 as shipped.
+PATCHES.append(dict(addr=0x45406c, old="c783e40100000000c040", new="ff15bc30010090909090", when=lambda: True))
+# Same, car ahead within 15 m: target 0, gain 0, a dead stop even if that car is pulling away. call [SCREEN_ADDR+0xc0] = host/free.c avoid_close: WORLD keeps 0.8 x its speed while it moves.
+PATCHES.append(dict(addr=0x4540e9, old="8993e40100008993ec010000", new="ff15c0300100909090909090", when=lambda: True))
 # PATCH: 0x45399f (+ cave 0x44dd21, NOP padding after a ret, no reference: asm.py free), a traffic car sees the player closing from behind. The
 # finder 0x453920 asks 0x44f470 for the nearest car AHEAD in its lane (slots own-1 down to 0 of the neighbour list); nothing reads the slots
 # own+1.. behind it, and the Avoid action cannot take a car behind (its vt[7] 0x453a60 ends it at once, its brake branch 0x45406c would stop the car).

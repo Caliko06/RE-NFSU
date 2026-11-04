@@ -486,6 +486,31 @@ static uint32_t traffic_speed(Ctx *c) {
     return r;
 }
 
+// PATCH 0x45406c, Avoid 0x453c60, car ahead at 15..30 m and no free lane: ebx = the action, eax = the obstacle (0x454080 reads [eax+0x1d4]), [[eax+0x1d4]+0x90] = its race
+// record (0x4540a1), record+0x3d4 = its speed (0x58393a). The game wrote 6 m/s here, so a queue crawled at 6 behind a car doing 20. WORLD: that car's speed, at least 6.
+static uint32_t avoid_record(Ctx *c, uint32_t a) {
+    uint32_t b = tspeed_on ? ld(c, a + 0x1d4, 4) : 0, r = b && b < GUEST_MEM - 0x100 ? ld(c, b + 0x90, 4) : 0;
+    return r && r < GUEST_MEM - 0x400 ? r : 0;
+}
+static uint32_t avoid_follow(Ctx *c) {
+    uint32_t a = c->r[EAX], r = avoid_record(c, a), me = c->r[EDI];   // edi = own record (0x453ecb)
+    float t = 6.0f;
+    if (r) {
+        float v = ldf(c, r + 0x3d4);
+        if (v > t) t = v;
+        if (hypotf(ldf(c, r + 0x50) - ldf(c, me + 0x50), ldf(c, r + 0x54) - ldf(c, me + 0x54)) > 45) t = 60.0f;   // the finder lost it (it keeps the old id): no limit, 0x583910 takes the cruise
+    }
+    stf(c, c->r[EBX] + 0x1e4, t);
+    return a;
+}
+// PATCH 0x4540e9, same, the car ahead within 15 m: 0 m/s, gain 0, a dead stop even if it pulls away. WORLD: while it moves, 0.8 x its speed, gain 2.
+static uint32_t avoid_close(Ctx *c) {
+    uint32_t a = c->r[EAX], r = avoid_record(c, a), act = c->r[EBX];
+    float v = r ? ldf(c, r + 0x3d4) : 0;
+    stf(c, act + 0x1e4, v > 3 ? v * 0.8f : 0.0f), stf(c, act + 0x1ec, v > 3 ? 2.0f : 0.0f);
+    return a;
+}
+
 void rockport_tick(Ctx *c);   // host/openworld.c
 void free_tick(Ctx *c) {
     static int raced;
@@ -1130,5 +1155,5 @@ const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traff
                          {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle},
                          {"rn", "free_hud", 1, free_hud}, {"rn", "free_dir", 0, free_dir},
                          {"rn", "free_jumpcam", 0, free_jumpcam}, {"rn", "free_hseed", 1, free_hseed},
-                         {"rn", "free_hdir", 0, free_hdir}, {"rn", "traffic_speed", 1, traffic_speed}};
+                         {"rn", "free_hdir", 0, free_hdir}, {"rn", "traffic_speed", 1, traffic_speed}, {"rn", "avoid_follow", 0, avoid_follow}, {"rn", "avoid_close", 0, avoid_close}};
 const int free_api_count = sizeof free_apis / sizeof *free_apis;
