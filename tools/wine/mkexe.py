@@ -32,7 +32,7 @@ if a.set == 'parity':
             n = n.replace(o, r)
         if p['addr'] == 0x42d4b0: n = bytes.fromhex('b20190909090' if a.autopilot else p['old'])
         return dict(p, new=n.hex())
-    ps = [imm(p) for p in patches.active() if p not in bss]
+    ps = [imm(p) for p in patches.active() if p not in bss and not p.get('widen')]   # widen: the road manager moved past the image (patches.py)
     ps = [p for p in ps if not screen(p) and p["addr"] != 0x4470f0]   # ours jumps to the cave 0x408814 there
     # The seed block replaces the 32 bytes 0x4470f0..0x44710f (QPC path; 0x4470d0 runs once, from the boot 0x4471b0):
     # mov byte [a],b for each .bss PATCH byte (the file cannot hold them), mov edi,K, jmp 0x447110.

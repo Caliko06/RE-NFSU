@@ -50,6 +50,7 @@ class Lifter:
         self.pe = pefile.PE(exe)
         self.base = self.pe.OPTIONAL_HEADER.ImageBase
         self.img = bytearray(self.pe.get_memory_mapped_image())
+        self.img += bytes(max(0, patches.CODE_AREA[1] - self.base - len(self.img)))   # zero RAM past the image holds the road-graph cave code
         patches.apply(self.img, self.base)
         t = next(s for s in self.pe.sections if s.Name.rstrip(b"\0") == b".text")
         self.t0, self.t1 = self.base + t.VirtualAddress, self.base + t.VirtualAddress + t.Misc_VirtualSize
@@ -99,7 +100,7 @@ class Lifter:
     def insn(self, a):
         if a in self._cache:
             return self._cache[a]
-        if not (self.t0 <= a < self.t1):
+        if not (self.t0 <= a < self.t1 or patches.CODE_AREA[0] <= a < patches.CODE_AREA[1]):
             return None
         o = a - self.base
         i = next(self.md.disasm(bytes(self.img[o:o + 16]), a), None)

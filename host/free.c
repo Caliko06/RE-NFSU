@@ -465,6 +465,7 @@ static uint32_t traffic_speed(Ctx *c) {
     return r;
 }
 
+void rockport_tick(Ctx *c);   // host/openworld.c
 void free_tick(Ctx *c) {
     static int raced;
     static uint32_t start;           // the first race frame: respawns wait 10 s (the grid)
@@ -480,6 +481,7 @@ void free_tick(Ctx *c) {
         return;
     }
     raced = 1;
+    rockport_tick(c);
     tspeed_on = world_ai(c);
     // The RaceManager's frame 0x435570 calls the record update 0x4338c0 (edi = record: route progress +0x14/+0x1c/+0x20, checkpoint
     // +4/+6/+8) for each record of its own, so the extra records get the same call (RN_FREEXREC=0: not).
@@ -958,36 +960,6 @@ static uint32_t free_hud(Ctx *c) {
     return (uint32_t)m;
 }
 
-// The jump and crash cameras (PATCH 0x426dd7, 0x4662e0, cave 0x5567e3: jmp [SCREEN_ADDR+0x94]) ask 0x42c4b0 (esi = camera ctrl) for the
-// JUMPVIEW route: a clone of the driver's TrackPath nodes (ctrl+0x5c4: +4 count, +8 node pointers), the node nearest the car k (ctrl+0x5c8)
-// and the first node 75 m or more past it (ctrl+0x5cc). The shot 0x42da40(6) -> 0x42c6d0(ctrl, 0xf, 1) then puts the eye, fixed for the
-// whole shot, on one road edge of node e = [5cc] - 2 (e = [5cc] when [5cc] - k < 5, case 0x42ca9b) and looks at the car with no wall
-// check. The game has a portal test for that (0x457300: the car -> eye segment must cross the cross-section [node+0x20, node+0x3c] of
-// every node k..e-1), tries the other road edge when it fails and then uses that edge unchecked. In a city, 80 to 100 m along a road that
-// bends, the view is buildings. docs/re/camera_jump.md.
-// Free mode (live; a race or RN_FREE=0 is the exact original call): after the original call, walk e from the game's eye node back toward
-// k and keep the first e whose eye (the edge the game would use, 0x42cd24..0x42cf6e) passes that portal test and is 30 m or more from the
-// car; [5cc] is set so the game takes it. None: the clone is freed (0x42c640) and the answer is 0, so the chase camera stays.
-#define JUMP_MIN_M 40.0f
-static uint32_t jump_scr;   // 3 x 16 bytes of guest memory: the eye's left end, right end and the candidate the portal test reads
-
-// A guest method that returns a float in st(0) (thiscall, one stack argument): read and pop the x87 result.
-static float guest_float(Ctx *c, uint32_t fn, uint32_t self, uint32_t arg) {
-    uint32_t ecx = c->r[ECX];
-    c->r[ECX] = self;
-    call_guest(c, fn, 1, &arg);
-    c->r[ECX] = ecx;
-    float v = (float)*fr(c, 0);
-    fpop(c);
-    return v;
-}
-
-// 0x5a7270 (esi = node): the world point at lateral offset lat from the node's route position, three floats to out.
-static void node_point(Ctx *c, uint32_t node, float lat, uint32_t lane, uint32_t out) {
-    uint32_t esi = c->r[ESI], a[4] = {out, ld(c, node + 0x58, 4), 0, lane};
-    memcpy(&a[2], &lat, 4);
-    c->r[ESI] = node;
-    call_guest(c, 0x5a7270, 4, a);
 // The player's route in free mode (docs/re/camera_jump_route.md). The player driver class (vtable 0x6b8968) seeds its route each frame
 // with slot +0x2c = 0x59bd90 (ecx = driver, 1 arg: a flag byte): keep [drv+0x2c] if 0x442690 still finds it near the TrackPath cursor
 // car+0x814, else 0x4561d0 (ecx = car+0x60, eax = 0, cdecl &out, flags, car+0x814) with flags (0x24|0x64)|0x8c0, then without 0x8c0.
@@ -1024,6 +996,36 @@ static uint32_t free_hdir(Ctx *c) {
     return ldf(c, v) * ldf(c, node + 0xc) + ldf(c, v + 4) * ldf(c, node + 0x10) > 0 ? 0 : 1;
 }
 
+// The jump and crash cameras (PATCH 0x426dd7, 0x4662e0, cave 0x5567e3: jmp [SCREEN_ADDR+0x94]) ask 0x42c4b0 (esi = camera ctrl) for the
+// JUMPVIEW route: a clone of the driver's TrackPath nodes (ctrl+0x5c4: +4 count, +8 node pointers), the node nearest the car k (ctrl+0x5c8)
+// and the first node 75 m or more past it (ctrl+0x5cc). The shot 0x42da40(6) -> 0x42c6d0(ctrl, 0xf, 1) then puts the eye, fixed for the
+// whole shot, on one road edge of node e = [5cc] - 2 (e = [5cc] when [5cc] - k < 5, case 0x42ca9b) and looks at the car with no wall
+// check. The game has a portal test for that (0x457300: the car -> eye segment must cross the cross-section [node+0x20, node+0x3c] of
+// every node k..e-1), tries the other road edge when it fails and then uses that edge unchecked. In a city, 80 to 100 m along a road that
+// bends, the view is buildings. docs/re/camera_jump.md.
+// Free mode (live; a race or RN_FREE=0 is the exact original call): after the original call, walk e from the game's eye node back toward
+// k and keep the first e whose eye (the edge the game would use, 0x42cd24..0x42cf6e) passes that portal test and is 30 m or more from the
+// car; [5cc] is set so the game takes it. None: the clone is freed (0x42c640) and the answer is 0, so the chase camera stays.
+#define JUMP_MIN_M 40.0f
+static uint32_t jump_scr;   // 3 x 16 bytes of guest memory: the eye's left end, right end and the candidate the portal test reads
+
+// A guest method that returns a float in st(0) (thiscall, one stack argument): read and pop the x87 result.
+static float guest_float(Ctx *c, uint32_t fn, uint32_t self, uint32_t arg) {
+    uint32_t ecx = c->r[ECX];
+    c->r[ECX] = self;
+    call_guest(c, fn, 1, &arg);
+    c->r[ECX] = ecx;
+    float v = (float)*fr(c, 0);
+    fpop(c);
+    return v;
+}
+
+// 0x5a7270 (esi = node): the world point at lateral offset lat from the node's route position, three floats to out.
+static void node_point(Ctx *c, uint32_t node, float lat, uint32_t lane, uint32_t out) {
+    uint32_t esi = c->r[ESI], a[4] = {out, ld(c, node + 0x58, 4), 0, lane};
+    memcpy(&a[2], &lat, 4);
+    c->r[ESI] = node;
+    call_guest(c, 0x5a7270, 4, a);
     c->r[ESI] = esi;
 }
 
@@ -1067,6 +1069,16 @@ static uint32_t free_jumpcam(Ctx *c) {
     // 60 frames, 0x426b63), and a car past node k never crosses its section, so the test failed on both edges at speed
     // (OWNER 19:00 log: 8 of 9 refused). The eye is searched upward from f + 1 (docs/re/camera_crash.md).
     int n = (int)ld(c, route + 4, 4), f = k;
+    if (k >= 0 && k < n) {   // a route far from the car (seed on another road) gives a far eye: keep the chase camera
+        uint32_t nd = ld(c, route + 8 + 4 * k, 4), ctr = jump_scr + 48;
+        node_point(c, nd, 0.5f * (ldf(c, nd + 0x20) + ldf(c, nd + 0x3c)), 0, ctr);
+        float dk = hypotf(ldf(c, ctr) - ldf(c, car + 0x60), ldf(c, ctr + 4) - ldf(c, car + 0x64));
+        if (dk > SEED_M) {
+            rn_log("JCPICK f%u k %d n %d route far %.0f m refused", rn_telem.presents, k, n, dk);
+            call_guest(c, 0x42c640, 0, NULL);
+            return 0;
+        }
+    }
     for (; f < n; f++) {
         uint32_t nd = ld(c, route + 8 + 4 * f, 4), ctr = jump_scr + 48;
         node_point(c, nd, 0.5f * (ldf(c, nd + 0x20) + ldf(c, nd + 0x3c)), 0, ctr);
@@ -1096,15 +1108,5 @@ const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traff
                          {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle},
                          {"rn", "free_hud", 1, free_hud}, {"rn", "free_dir", 0, free_dir},
                          {"rn", "free_jumpcam", 0, free_jumpcam}, {"rn", "free_hseed", 1, free_hseed},
-                         {"rn", "free_hdir", 0, free_hdir}};
-const int free_api_count = 14;
-    if (k >= 0 && k < n) {   // a route far from the car (seed on another road) gives a far eye: keep the chase camera
-        uint32_t nd = ld(c, route + 8 + 4 * k, 4), ctr = jump_scr + 48;
-        node_point(c, nd, 0.5f * (ldf(c, nd + 0x20) + ldf(c, nd + 0x3c)), 0, ctr);
-        float dk = hypotf(ldf(c, ctr) - ldf(c, car + 0x60), ldf(c, ctr + 4) - ldf(c, car + 0x64));
-        if (dk > SEED_M) {
-            rn_log("JCPICK f%u k %d n %d route far %.0f m refused", rn_telem.presents, k, n, dk);
-            call_guest(c, 0x42c640, 0, NULL);
-            return 0;
-        }
-    }
+                         {"rn", "free_hdir", 0, free_hdir}, {"rn", "traffic_speed", 1, traffic_speed}};
+const int free_api_count = 15;

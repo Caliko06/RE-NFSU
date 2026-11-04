@@ -29,7 +29,8 @@ sys.path.insert(0, HERE)
 import tour as T  # noqa: E402  (read_net; also puts tools/hopper and ref/tools on the path)
 
 HOP_R, HOP_COS, BEHIND = T.HOP_R, T.HOP_COS, -2.0
-MAX_SEC, MAX_ENT = 128, 255
+MAX_SEC, MAX_ENT = 254, 2047                     # patches.py "WIDEN the road graph": section ids are bytes (255 = none), entry indexes 11 bits
+RETAIL_ENT = 255                                 # up to here a node's slot byte is the global entry index (the exe sorts and remaps it)
 CELL = 20.0
 _NETS = {}
 
@@ -505,6 +506,16 @@ def ahead_source(runs_xy, a, b, flip):
     return None
 
 
+MAX_TURN = float(sys.argv[sys.argv.index('--maxturn') + 1]) if '--maxturn' in sys.argv else None   # degrees; off = the served net. On: plan_net refuses links this sharp in the walk direction (the tracks' own stay <= 45)
+
+
+def link_turn(runs_xy, a, b, fa, fb):
+    """degrees the walker turns on link a -> b, runs written reversed when fa / fb"""
+    hx, hy = heading(runs_xy[a[0]], a[1], fa)
+    kx, ky = heading(runs_xy[b[0]], b[1], fb)
+    return math.degrees(math.acos(max(-1.0, min(1.0, hx * kx + hy * ky))))
+
+
 def plan_net(runs_xy, D=JUNCTION_D, budget=LINK_BUDGET, flips_s=SA_FLIPS_S, links_s=SA_LINKS_S, seed=3):
     """(flip per run, [((r, p), (r2, p2))] directed links in original positions, nodes of the biggest SCC). Phase 1 anneals the
     orientation with every candidate link (both ways) on; the links that add nothing are dropped, the least useful ones one by one
@@ -518,7 +529,10 @@ def plan_net(runs_xy, D=JUNCTION_D, budget=LINK_BUDGET, flips_s=SA_FLIPS_S, link
     rng = random.Random(seed)
     flip = [False] * len(L)
     keep = set(range(len(DL)))
-    real = lambda ks: [((DL[i][0][0], SRC[i][flip[DL[i][0][0]]]), DL[i][1]) for i in sorted(ks) if SRC[i][flip[DL[i][0][0]]] is not None]
+    TURN = {(i, fa, fb): link_turn(runs_xy, (DL[i][0][0], SRC[i][fa]), DL[i][1], fa, fb) for i in range(len(DL)) for fa in (False, True) for fb in (False, True)
+            if MAX_TURN is not None and SRC[i][fa] is not None}
+    ok = lambda i: SRC[i][flip[DL[i][0][0]]] is not None and (MAX_TURN is None or TURN[i, flip[DL[i][0][0]], flip[DL[i][1][0]]] < MAX_TURN)
+    real = lambda ks: [((DL[i][0][0], SRC[i][flip[DL[i][0][0]]]), DL[i][1]) for i in sorted(ks) if ok(i)]
     W = lambda: cond_scc(L, flip, real(keep))[0]
     cur = best = W()
     bf, t0 = flip[:], time.time()
@@ -583,6 +597,14 @@ def plan_net(runs_xy, D=JUNCTION_D, budget=LINK_BUDGET, flips_s=SA_FLIPS_S, link
     return flip, links, cond_scc(L, flip, links)[0]
 
 
+def slot_entry(ent, nd, k):
+    """the entry that node nd's slot byte nd[k] (0x81/0x82) names, the way the exe reads it: the file index up to 255 entries, else the rank
+    inside the node's section (nd[0x83]) on top of the section's first entry"""
+    if len(ent) <= RETAIL_ENT:
+        return ent[nd[k]]
+    return ent[next(i for i, e in enumerate(ent) if e[0xa] == nd[0x83]) + nd[k]]
+
+
 def scc_of_file(secs, ent):
     """exact check on the written chunks: nodes of the biggest strongly connected part of 'next node + d=0 links'
     (the transposed walk of the d=1 entries has the same parts). secs = parse_net's nodes, ent = entries"""
@@ -597,8 +619,8 @@ def scc_of_file(secs, ent):
             u = off[s] + i
             outs = [off[s] + i + 1] if i + 1 < len(ns) else []
             for k in (0x81, 0x82):
-                if nd[k] != 0xff and ent[nd[k]][0xd] == 0 and ent[nd[k]][0xb] != 3:
-                    e = ent[nd[k]]
+                if nd[k] != 0xff and slot_entry(ent, nd, k)[0xd] == 0 and slot_entry(ent, nd, k)[0xb] != 3:
+                    e = slot_entry(ent, nd, k)
                     outs.append(off[e[9]] + struct.unpack_from('<H', e, 4)[0])
             for v in outs:
                 adj[u].append(v)
@@ -793,7 +815,7 @@ def city_chunks(g):
         fixed.append(((ra, q), (rb, pb), ty, lane))
     placed = fixed
 
-    ent, kinds, no_rev = [], collections.Counter(), 0
+    items, kinds, no_rev = [], collections.Counter(), 0
     for (ra, pa), (rb, pb), ty, lane in placed:
         kinds[(ty, lane)] += 1
         for (sr, sp), (dr, dp), d in (((ra, pa), (rb, pb), 0), ((rb, pb), (ra, pa), 1)):
@@ -804,12 +826,22 @@ def city_chunks(g):
             struct.pack_into('<fHH', e, 0, 0.0, dp, sp)
             e[8], e[9], e[0xa], e[0xb], e[0xc], e[0xd] = 0, dr, sr, ty, lane, d
             struct.pack_into('<IiII', e, 0x10, 0, -1, 0, 0)
-            node = secs[sr][1][sp]
-            slot = 0x81 if node[0x81] == 0xff else 0x82
-            assert node[slot] == 0xff
-            node[slot] = len(ent)
-            ent.append(bytes(e))
-    assert len(ent) <= MAX_ENT, '%d entries > %d' % (len(ent), MAX_ENT)
+            items.append((sr, sp, bytes(e)))
+    assert len(items) <= MAX_ENT, '%d entries > %d' % (len(items), MAX_ENT)
+    # Up to 255 entries a node's slot byte is the entry's index in the file. Above that the exe skips its sort and a slot byte is the
+    # rank inside the node's section (entry = first entry of the section + byte, patches.py EBASE), so the entries are grouped by source.
+    wide = len(items) > RETAIL_ENT
+    if wide:
+        items.sort(key=lambda it: (it[0], it[1]))
+    ent, rank = [], collections.Counter()
+    for sr, sp, e in items:
+        node = secs[sr][1][sp]
+        slot = 0x81 if node[0x81] == 0xff else 0x82
+        assert node[slot] == 0xff
+        node[slot] = rank[sr] if wide else len(ent)
+        rank[sr] += 1
+        assert node[slot] < 0xff
+        ent.append(e)
     p21 = b''.join(bytes(h) + b''.join(bytes(n) for n in ns) for h, ns in secs)
     return p21, b''.join(ent), dict(sections=len(runs), entries=len(ent), links=len(placed), dropped_links=dropped, src_moved=moved, src_cut=cut, no_reverse=no_rev, kinds=dict(kinds),
                                     nodes=sum(len(r) for r in runs), route_max=round(max(off[r] + cum[r][-1] for r in range(len(runs)))))
@@ -860,7 +892,7 @@ def behind_entries(secs, ent):
             for k in (0x81, 0x82):
                 if nd[k] == 0xff:
                     continue
-                e = ent[nd[k]]
+                e = slot_entry(ent, nd, k)
                 if e[0xb] == 3:
                     continue
                 x, y = struct.unpack_from('<2f', nd, 0)
@@ -890,7 +922,7 @@ def walk_stats(secs, ent, dist=250.0):
         nxt = []
         for k in (0x81, 0x82):
             if nd[k] != 0xff:
-                e = ent[nd[k]]
+                e = slot_entry(ent, nd, k)
                 if e[0xd] == (0 if fwd else 1) and e[0xb] != 3:
                     nxt.append((e[9], struct.unpack_from('<H', e, 4)[0]))
         j = i + 1 if fwd else i - 1
@@ -909,25 +941,6 @@ def walk_stats(secs, ent, dist=250.0):
     return {('fwd' if f else 'back'): '%.1f%% of %d' % (100.0 * a / max(b, 1), b) for f, (a, b) in res.items()}
 
 
-def write(radius=10.0):
-    t0 = time.time()
-    g = build(radius, True)
-    g = orient_net(g)
-    p21, p22, st = city_chunks(g)
-    print('city road net:', st, '(%.0fs)' % (time.time() - t0), flush=True)
-    tp = T.load(os.path.join(T.B.OUT, 'TRACKB1010.lzc'))          # the TrackPath stays the tour's polyline
-    (hb, hs), (nb, ns) = T.find(tp, 0x34148)[0], T.find(tp, 0x34149)[0]
-    head, body = bytes(tp[hb:hb + hs]), bytes(tp[nb:nb + ns])
-    base = T.load(T.trackb_path(T.PC, 1001))
-    base2 = T.make_base(base, p21, p22, head, body)
-    secs, ent = parse_net(base2)
-    assert len(secs) == st['sections'] and len(ent) == st['entries']
-    bad = behind_entries(secs, ent)
-    assert not bad, 'entries landing behind their source: %s' % bad[:8]
-    scc, nn = scc_of_file(secs, ent)
-    print('SCC: biggest strongly connected part %d of %d nodes (%.1f%%)' % (scc, nn, 100.0 * scc / nn), flush=True)
-    assert scc >= 0.9 * nn, 'SCC %d < 90%% of %d nodes' % (scc, nn)
-    print('walk 250 m from drivable nodes:', walk_stats(secs, ent), flush=True)
 def slow_junctions(d):
     """Caps the racer lane speeds before every sharp link, in place on a decoded TRACKB. Why (OWNER 2026-10-31, "the AI is dumb";
     rivals hit walls at ~44 m/s in JustDrive): a racer's route speed is the speed byte [+0x6a + lane] of the node at its own node
@@ -982,6 +995,25 @@ def slow_junctions(d):
     return low
 
 
+def write(radius=10.0):
+    t0 = time.time()
+    g = build(radius, True)
+    g = orient_net(g)
+    p21, p22, st = city_chunks(g)
+    print('city road net:', st, '(%.0fs)' % (time.time() - t0), flush=True)
+    tp = T.load(os.path.join(T.B.OUT, 'TRACKB1010.lzc'))          # the TrackPath stays the tour's polyline
+    (hb, hs), (nb, ns) = T.find(tp, 0x34148)[0], T.find(tp, 0x34149)[0]
+    head, body = bytes(tp[hb:hb + hs]), bytes(tp[nb:nb + ns])
+    base = T.load(T.trackb_path(T.PC, 1001))
+    base2 = T.make_base(base, p21, p22, head, body)
+    secs, ent = parse_net(base2)
+    assert len(secs) == st['sections'] and len(ent) == st['entries']
+    bad = behind_entries(secs, ent)
+    assert not bad, 'entries landing behind their source: %s' % bad[:8]
+    scc, nn = scc_of_file(secs, ent)
+    print('SCC: biggest strongly connected part %d of %d nodes (%.1f%%)' % (scc, nn, 100.0 * scc / nn), flush=True)
+    assert scc >= 0.9 * nn, 'SCC %d < 90%% of %d nodes' % (scc, nn)
+    print('walk 250 m from drivable nodes:', walk_stats(secs, ent), flush=True)
     B = T.B
     fences = json.load(open(B.FENCES))
     fence_keys = {f['key'] for f in fences['fences']}
@@ -1006,6 +1038,15 @@ def slow_junctions(d):
 
 
 def main():
+    if '--slow' in sys.argv:                  # the caps of slow_junctions on an already written file, in place (no rebuild)
+        path = sys.argv[sys.argv.index('--slow') + 1]
+        d = bytearray(T.load(path))
+        print(path, 'junction speed caps: %d lane bytes lowered' % slow_junctions(d))
+        blob = T.lzc.encode(bytes(d))
+        assert T.lzc.exe_decode(blob) == d, 'lzc round trip'
+        os.remove(path)
+        open(path, 'wb').write(blob)
+        return
     if '--write' in sys.argv:
         write(float(sys.argv[sys.argv.index('--radius') + 1]) if '--radius' in sys.argv else 10.0)
         return
@@ -1025,13 +1066,4 @@ def main():
 
 
 if __name__ == '__main__':
-    if '--slow' in sys.argv:                  # the caps of slow_junctions on an already written file, in place (no rebuild)
-        path = sys.argv[sys.argv.index('--slow') + 1]
-        d = bytearray(T.load(path))
-        print(path, 'junction speed caps: %d lane bytes lowered' % slow_junctions(d))
-        blob = T.lzc.encode(bytes(d))
-        assert T.lzc.exe_decode(blob) == d, 'lzc round trip'
-        os.remove(path)
-        open(path, 'wb').write(blob)
-        return
     main()

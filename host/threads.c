@@ -45,9 +45,20 @@ static __thread int is_main;
 static __thread uint32_t self_start;    // the guest thread's start address (telemetry hold_other_who)
 // Under gm: the next ticket's turn. Only its thread wakes (a broadcast woke every waiter to re-check its ticket).
 // Telemetry times the gap until that thread holds the GIL.
+// A woken thread can start 17-37 ms late on the web (telemetry gilGap, benches p1103/g60_1103 2026-10-29) and the main
+// thread, queued behind it, misses the frame; Windows would run main on its own core meanwhile. So main borrows a turn
+// still untaken after one of its 2 ms waits: it gives up its own ticket (pass_turn skips it), and the late thread runs
+// when main releases.
+static int borrowed;                    // under gm: main holds the GIL on the turn passed to a late thread
+static unsigned char cancelled[128];    // under gm: the ticket main gave up when it borrowed
 static void pass_turn(void) {
     unsigned long s = __atomic_add_fetch(&serving, 1, __ATOMIC_RELEASE);
+    while (s != next_ticket && cancelled[s & 127]) { cancelled[s & 127] = 0; s = __atomic_add_fetch(&serving, 1, __ATOMIC_RELEASE); }
     if (next_ticket != s) { free_since = now_us(); pthread_cond_signal(&turn_cv[s & 127]); }
+}
+static void release_turn(void) {        // under gm, by the holder
+    if (borrowed) { borrowed = 0; free_since = now_us(); pthread_cond_signal(&turn_cv[serving & 127]); return; }
+    pass_turn();
 }
 void gil_acquire(void) {
     uint64_t t0 = now_us();
@@ -59,15 +70,20 @@ void gil_acquire(void) {
             if (!(k & 63) && now_us() - t0 >= MAIN_SPIN_US) break;
         pthread_mutex_lock(&gm);
     }
-    while (t != serving) {
+    unsigned long late = ~0ul;      // main: the turn seen passed but untaken at its last wait
+    while (t != serving || (!is_main && borrowed)) {
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
         uint64_t ns = (uint64_t)ts.tv_nsec + PREEMPT_US * 1000ull;
         ts.tv_sec += ns / 1000000000ull;
         ts.tv_nsec = ns % 1000000000ull;
-        if (pthread_cond_timedwait(&turn_cv[t & 127], &gm, &ts) && t != serving) rn_preempt = 1;   // the holder ran a quantum
+        if (pthread_cond_timedwait(&turn_cv[t & 127], &gm, &ts) && t != serving) {
+            if (is_main && free_since && late == serving) { borrowed = 1; cancelled[t & 127] = 1; break; }
+            if (is_main) late = free_since ? serving : ~0ul;
+            rn_preempt = 1;   // the holder ran a quantum
+        }
     }
-    if (free_since) {       // the web's clock is per worker: a gap measured across two threads can come out < 0
+    if (free_since && !borrowed) {       // the web's clock is per worker: a gap measured across two threads can come out < 0
         uint64_t now = now_us();
         rn_telem.gil_handoffs++;
         if (now > free_since) rn_telem.gil_gap_us += (uint32_t)(now - free_since);
@@ -81,13 +97,14 @@ void gil_acquire(void) {
 // done by another thread relies on it. The GIL holder gives its turn away at the next API call
 // once it has run a quantum (since it got the GIL) while another thread waits for the GIL.
 // This runs at every API call (thousands per frame): with no waiter it reads no clock (a clock read
-// is a call out to JS on the web), and with one it reads the clock every 16th call.
+// is a call out to JS on the web), and with one it reads the clock every 256th call: at every 16th the reads were ~9% of
+// the main thread's race work (D3DX state calls 0x5c97cb, CPU profile prof1 2026-10-29).
 #define SPIN_QUANTUM_US 2000
 static int spinners;     // threads that gave the GIL away at a clock read (gil_clock) and wait to get it back
 void gil_slice(void) {
     static unsigned calls;
     if (__atomic_load_n(&next_ticket, __ATOMIC_RELAXED) == __atomic_load_n(&serving, __ATOMIC_RELAXED) + 1) return;
-    if (++calls & 15 || now_us() - slice_start < (__atomic_load_n(&spinners, __ATOMIC_RELAXED) ? SPIN_QUANTUM_US : QUANTUM_US) * rn_turbo) return;   // a real-time quantum
+    if (++calls & 255 || now_us() - slice_start < (__atomic_load_n(&spinners, __ATOMIC_RELAXED) ? SPIN_QUANTUM_US : QUANTUM_US) * rn_turbo) return;   // a real-time quantum
     gil_release();
     gil_acquire();
 }
@@ -138,7 +155,7 @@ static void count_hold(void) {
 void gil_release(void) {
     count_hold();
     pthread_mutex_lock(&gm);
-    pass_turn();
+    release_turn();
     pthread_mutex_unlock(&gm);
 }
 static void notify(void) {
@@ -153,7 +170,7 @@ static void wait_change(uint64_t deadline) {
     count_hold();
     pthread_mutex_lock(&gm);
     unsigned long g = gen;
-    pass_turn();
+    release_turn();
     while (gen == g) {
         uint64_t now = now_us();
         if (deadline && now >= deadline) break;
