@@ -11,6 +11,18 @@ const TELEM_COLS = ['t', 'run', 'present', 'draws', 'clears', 'kwords', 'texKb',
   'starves', 'starveBuf',
   'audioBehind', 'underrun', 'resyncs', 'clockCalls', 'handoffs', 'gilGap', 'heldMain', 'heldOther', 'holdWho'];
 
+// F10 keeps the whole session in memory: a fixed ring, newest kept, so a long capture cannot grow without bound.
+// It answers `length` and JSON (oldest first) like the array it replaces, for every existing reader and the exporter.
+function telemRing(cap) {
+  const a = new Array(cap);
+  let head = 0, n = 0;
+  return {
+    get length() { return n; },
+    push(v) { a[(head + n) % cap] = v; if (n < cap) n++; else head = (head + 1) % cap; return n; },
+    toJSON() { const out = new Array(n); for (let i = 0; i < n; i++) out[i] = a[(head + i) % cap]; return out; },
+  };
+}
+
 function startTelemetry(M, t0, log, logLines) {
   if (RN_Q.get('telemetry') === '0') return null;
   const base = M._rn_telem_addr(), audio = M._rn_audio_ring() >> 2;
@@ -24,7 +36,7 @@ function startTelemetry(M, t0, log, logLines) {
     return [f[d], f[d + 1], f[d + 2], f[d + 3], f[d + 4], f[d + 5], f[d + 6], u[W], u[W + 1], u[W + 2], u[W + 3], u[W + 4], u[W + 6], u[W + 7], u[W + 8], u[W + 9], u[W + 10], u[W + 11]];
   };
   let prev = host(), prevUnder = 0, prevResync = 0, rows = [], events = [];
-  const allRows = [], allEvents = [];                  // the whole session, for F10
+  const allRows = telemRing(36000), allEvents = telemRing(20000);   // the whole session, for F10 (36000 rows = 10 min at 60 fps)
   // Live view: the last N presented frames, each the sum of its rows (a load hands a frame over in parts).
   const N = 300, live = [];
   let acc = null, lastPresent = 0, starves = 0, underruns = 0;

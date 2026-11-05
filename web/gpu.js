@@ -897,11 +897,15 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   const LIV_CARS = ['GOLF', 'FOCUS', 'MIATA', 'NEON', 'CIVIC', 'PEUGOT', 'CELICA', 'ECLIPSE', 'RX7', 'SUPRA', 'S2000', 'RSX', 'IMPREZA', 'LANCER', 'INTEGRA', 'TIBURON', '350Z', 'SENTRA', '240SX', 'SKYLINE'];
   const livCache = new Map();
   let livPipe = null;
+  let livGate = null;                    // one probe for the whole session: web/remaster/liv is not shipped, so a 404 per URL is pointless
   function livery(id, car, n) {
     const t = res.get(id), url = `remaster/liv/${LIV_CARS[car]}/${n}.webp`;
     if (!t || !t.skin) return;
     const skinTex = t.skin;
-    if (!livCache.has(url)) livCache.set(url, fetch(url).then(r => r.ok ? r.blob() : null)
+    // The first livery decides whether the art dir exists at all; when it does not, later calls reuse the resolved gate and never fetch.
+    if (!livCache.has(url)) livCache.set(url, (livGate ??= fetch(url).then(r => r.ok, () => false))
+      .then(ok => ok ? fetch(url) : null)
+      .then(r => r && r.ok ? r.blob() : null)
       .then(b => b && createImageBitmap(b, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })).then(img => {
         if (!img) return null;                // no sticker art for this car yet
         const a = device.createTexture({ size: [img.width, img.height], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
