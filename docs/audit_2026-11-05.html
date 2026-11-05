@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auditoría NFSU</title>
+<style>
+:root{
+  --bg:#f6f5f1;--card:#fff;--ink:#1b1b1f;--ink2:#55555f;--ink3:#8a8a94;--line:#e4e2db;
+  --ok:#1f8a4c;--okbg:#e3f4ea;--part:#b7791f;--partbg:#fbf0dc;--no:#c2392b;--nobg:#fbe5e2;--unk:#6b6b78;--unkbg:#ececf0;
+  --hi:#c2392b;--med:#d08a12;--lo:#8a8a94;--accent:#3b5bdb;--accentbg:#e7ecfd;
+  --r:16px;--sh:0 1px 2px rgb(0 0 0/.04),0 4px 14px rgb(0 0 0/.05);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#121216;--card:#1c1c22;--ink:#ececf1;--ink2:#b0b0bc;--ink3:#7c7c88;--line:#2c2c35;
+  --ok:#4cc47f;--okbg:#173525;--part:#e5a743;--partbg:#3a2c12;--no:#f0705f;--nobg:#3d1c18;--unk:#a0a0ad;--unkbg:#2a2a32;
+  --accent:#8ea2ff;--accentbg:#222a4a;--sh:none;}}
+:root[data-theme=dark]{
+  --bg:#121216;--card:#1c1c22;--ink:#ececf1;--ink2:#b0b0bc;--ink3:#7c7c88;--line:#2c2c35;
+  --ok:#4cc47f;--okbg:#173525;--part:#e5a743;--partbg:#3a2c12;--no:#f0705f;--nobg:#3d1c18;--unk:#a0a0ad;--unkbg:#2a2a32;
+  --accent:#8ea2ff;--accentbg:#222a4a;--sh:none;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:1060px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:30px;letter-spacing:-.02em;margin:0 0 6px}
+h2{font-size:21px;letter-spacing:-.01em;margin:44px 0 14px;display:flex;align-items:center;gap:10px}
+h2 .n{font-size:13px;font-weight:600;color:var(--ink3);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:1px 9px}
+.sub{color:var(--ink2);margin:0 0 22px;font-size:17px;max-width:760px}
+code,.mono{font:13px/1.45 ui-monospace,"SF Mono",Menlo,monospace}
+.tldr{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh);font-size:17px}
+.tldr b{font-weight:650}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 0}
+.stat{border-radius:var(--r);padding:14px 16px;cursor:pointer;border:2px solid transparent;transition:transform .12s}
+.stat:hover{transform:translateY(-1px)}.stat.on{border-color:var(--ink)}
+.stat .v{font-size:34px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.stat .l{font-size:14px;font-weight:600;margin-top:6px}
+.s-CONFIRMED{background:var(--okbg);color:var(--ok)}.s-PARTIAL{background:var(--partbg);color:var(--part)}
+.s-REFUTED{background:var(--nobg);color:var(--no)}.s-UNVERIFIABLE{background:var(--unkbg);color:var(--unk)}
+.plan{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);display:flex;gap:14px}
+.step .num{flex:none;width:34px;height:34px;border-radius:10px;background:var(--accentbg);color:var(--accent);font-weight:750;display:grid;place-items:center;font-size:17px}
+.step h3{margin:0 0 3px;font-size:17px}
+.step p{margin:0 0 9px;color:var(--ink2);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{font:600 12.5px/1 ui-monospace,Menlo,monospace;padding:5px 8px;border-radius:8px;cursor:pointer;border:0}
+.eff{font-size:12.5px;font-weight:600;color:var(--ink3);margin-left:auto;white-space:nowrap}
+.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);padding:12px 0;margin:0 0 6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
+.bar input{flex:1 1 220px;min-width:0;font:inherit;font-size:15px;padding:9px 13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.f{font:600 13.5px/1 inherit;font-family:inherit;padding:8px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink2);cursor:pointer}
+.f.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.area{margin:22px 0 8px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3)}
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 0 8px;overflow:hidden}
+.item>button{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer}
+.item>button:hover{background:color-mix(in srgb,var(--ink) 3%,transparent)}
+.dot{flex:none;width:10px;height:10px;border-radius:50%}
+.d-high{background:var(--hi)}.d-medium{background:var(--med)}.d-low{background:var(--lo);opacity:.55}
+.item .t{flex:1;min-width:0;font-weight:560}
+.item .id{font:12px ui-monospace,Menlo,monospace;color:var(--ink3)}
+.badge{flex:none;font-size:12px;font-weight:700;padding:4px 9px;border-radius:8px;letter-spacing:.02em}
+.body{display:none;padding:0 16px 16px 38px;color:var(--ink2);font-size:15px}
+.item.open .body{display:block}
+.body .k{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin:10px 0 3px}
+.body .ev{background:color-mix(in srgb,var(--ink) 4%,transparent);border-radius:10px;padding:9px 11px;word-break:break-word}
+.body .fix{border-left:3px solid var(--part);padding:2px 0 2px 11px;color:var(--ink)}
+.good{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g{background:var(--okbg);border-radius:14px;padding:13px 15px}
+.g b{color:var(--ok);display:block;margin-bottom:3px}
+.g p{margin:0 0 6px;font-size:14px;color:var(--ink)}
+.g code{font-size:11.5px;color:var(--ink3)}
+.ask{background:var(--accentbg);border-radius:var(--r);padding:16px 20px}
+.ask ol{margin:6px 0 0;padding-left:22px}.ask li{margin:7px 0}
+.extra{background:var(--card);border:1px dashed var(--accent);border-radius:14px;padding:13px 16px;margin:0 0 8px}
+.extra b{color:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;color:var(--ink3);font-size:13.5px;margin:6px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.top{position:fixed;right:16px;bottom:16px;display:flex;gap:8px}
+.top button{font:600 13px inherit;font-family:inherit;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink2);cursor:pointer;box-shadow:var(--sh)}
+.empty{color:var(--ink3);padding:20px;text-align:center}
+@media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.plan,.good{grid-template-columns:1fr}h1{font-size:25px}.body{padding-left:16px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Auditoría NFSU</h1>
+  <p class="sub">12 becarios revisaron el repo, un Sonnet confirmó o refutó cada hallazgo contra el código y Main integró el resultado. <span id="date"></span></p>
+  <div class="tldr" id="tldr"></div>
+  <div class="stats" id="stats"></div>
+
+  <h2>Haz esto primero <span class="n" id="planN"></span></h2>
+  <div class="plan" id="plan"></div>
+
+  <h2>Decisiones tuyas</h2>
+  <div class="ask"><ol id="decide"></ol></div>
+
+  <h2 id="hall">Hallazgos <span class="n" id="hallN"></span></h2>
+  <div class="bar" id="bar">
+    <input id="q" type="search" placeholder="Buscar: archivo, flag, palabra…" aria-label="Buscar">
+  </div>
+  <div class="legend"><span><i class="dot d-high"></i>impacto alto</span><span><i class="dot d-medium"></i>medio</span><span><i class="dot d-low"></i>bajo</span><span>clic en un hallazgo = evidencia</span></div>
+  <div id="list"></div>
+
+  <div id="extraWrap" hidden>
+    <h2>Lo que nadie había visto <span class="n">Sonnet</span></h2>
+    <div id="extra"></div>
+  </div>
+
+  <h2>Bien hecho, se queda <span class="n" id="goodN"></span></h2>
+  <div class="good" id="good"></div>
+</main>
+<div class="top"><button id="all">Abrir todo</button><button id="theme">Tema</button></div>
+<script>
+const D = {"areas": {"orig": "Modo original", "perf": "Build servida y fps", "build": "Build y recomp", "render": "Render", "ai": "IA y WORLD", "web": "Shell web", "win": "Capa Windows", "tools": "Herramientas y RE", "disk": "Higiene y disco", "docs": "Docs"}, "claims": [{"id": "C01", "area": "orig", "title": "Los parches de feel C1/C3 también se aplican en el modo original", "verdict": "CONFIRMED", "evidence": "patches.py:668,670 when=lambda: True for FEEL_CANDIDATES[0:5],[7:10]; build-time byte patches. d3d9.c:924 fov_frame returns early at gain 0, so original keeps 65.9 though mode.js:17 says 71.5", "correction": "", "severity": "high", "effort": "hours"}, {"id": "C02", "area": "orig", "title": "En el modo original faltan RN_UNLOCK, RN_NPCSMOOTH y RN_POOL", "verdict": "CONFIRMED", "evidence": "mode.js:20 RN_ORIGINAL_ENV lacks RN_UNLOCK (win32.c:1176 default open), RN_NPCSMOOTH (d3d9.c:2407 default 3); RN_POOL (rivals.c:24) is off unless ?pool=1", "correction": "RN_POOL is moot (off by default); RN_UNLOCK open is an OWNER 2026-10-20 default but still differs from the 2003 game in original mode", "severity": "low", "effort": "min"}, {"id": "C03", "area": "orig", "title": "?pool=1 se activa aunque estés en el modo original", "verdict": "PARTIAL", "evidence": "index.html:121 sets RN_POOL from RN_Q 'pool' only; mode.js RN_Q does not inject pool; tune.js:47 already guards blur with RN_MODE !== 'original'", "correction": "Not stored: needs explicit ?pool=1 together with ?mode=original (URL key wins by design, mode.js:4); no localStorage for pool", "severity": "low", "effort": "min"}, {"id": "C04", "area": "perf", "title": "6 logs de depuración forzados en la build que juegas", "verdict": "PARTIAL", "evidence": "index.html:123-128 sets the six RN_*LOG on; dispatch.c:180-187 rn_log fflushes each line. Deliberate: comments cite OWNER 2026-10-31 and SCOPE_2026-11-04 (evidence in every F10)", "correction": "Forced on by OWNER decision, log lines only; cost per line is a fflush to the console pipe; fps effect not measured", "severity": "low", "effort": "min"}, {"id": "C05", "area": "perf", "title": "Barrido de 1 GB de memoria buscando AIVehicle", "verdict": "CONFIRMED", "evidence": "free.c:719-722 while(!ncand) scans 1 GB (w to GUEST_MEM/4) for 0x6c89f0; gated only by presents % 120 (free.c:699) and RN_FREELOG (page forces it on)", "correction": "Runs every 120 frames (2 s), not every log tick, and only while no AIVehicle found; a hitch of 100s of ms in wasm each time", "severity": "medium", "effort": "min"}, {"id": "C06", "area": "render", "title": "Present hace de tick: IA y cámara dependen de cuántos Present hay", "verdict": "PARTIAL", "evidence": "d3d9.c:1199-1213 Present calls free_tick, traffic_tick, chase_frame, fov_frame, ai_tel, feel_tel without a frame guard; Present is called once per game frame", "correction": "True as design (the game renders once per tick); the double-step is hypothetical, no second Present caller exists", "severity": "low", "effort": "hours"}, {"id": "C07", "area": "build", "title": "native.h no está en las dependencias del build", "verdict": "CONFIRMED", "evidence": "build.py:112,133 deps are [s, host/rt.h] only; build/gen/f095.c:10277 and f097.c:17295 include native.h; compile_web:133 checks rt.h only", "correction": "", "severity": "low", "effort": "min"}, {"id": "C08", "area": "build", "title": "Cada build re-levanta las 13,756 funciones", "verdict": "CONFIRMED", "evidence": "build.py:167 lift_all() runs before every target; pool.map over all FUNCS (build.py:53-54), no lift cache; only write_if_changed saves file writes", "correction": "", "severity": "low", "effort": "hours"}, {"id": "C09", "area": "build", "title": "El troceado reescribe casi todos los chunks", "verdict": "PARTIAL", "evidence": "build.py:76-79 per=ceil(N/160), chunk=out[k*per:(k+1)*per]; write_if_changed (45-48) skips identical chunks", "correction": "Inserting a function shifts only chunks after the insertion point (avg half) not most; each shifted chunk recompiles with clang/emcc", "severity": "low", "effort": "hours"}, {"id": "C10", "area": "web", "title": "?ai=0 está duplicado en index.html", "verdict": "CONFIRMED", "evidence": "index.html:115 and 141 both: if (RN_Q.get('ai') === '0') m.ENV.RN_AI = '0'", "correction": "", "severity": "low", "effort": "min"}, {"id": "C11", "area": "ai", "title": "world_ai() llama a getenv en cada llamada", "verdict": "PARTIAL", "evidence": "free.c:47 getenv('RN_AI') per call; callers 142,168,218,377-408,547,583,992; getenv is a short env scan", "correction": "Not ~2x per car per frame: free_tmove ~4 calls per frame plus one per free_recycle (992, per recycle ask); cost negligible", "severity": "low", "effort": "min"}, {"id": "C12", "area": "web", "title": "La telemetría F10 crece sin tope", "verdict": "CONFIRMED", "evidence": "telemetry.js:27 allRows/allEvents, :33 push, :49 allRows.push per frame; no cap or shift (only live[] is trimmed at :58); F10 stringifies all at :187", "correction": "", "severity": "low", "effort": "min"}, {"id": "C13", "area": "web", "title": "gpu.js pide remaster/liv/, que no existe", "verdict": "PARTIAL", "evidence": "gpu.js:901 url remaster/liv/<CAR>/<n>.webp; find web -maxdepth 3 -name 'liv*' finds nothing; gpu.js:903 livCache keyed by url, r.ok guarded", "correction": "One 404 per distinct livery url, not per car; only with ?pool=1 (off by default); failure is silent (null)", "severity": "low", "effort": "hours"}, {"id": "C14", "area": "ai", "title": "RN_AI, RN_WORLD y RN_CARLOOK con parsers distintos", "verdict": "PARTIAL", "evidence": "free.c:47 RN_AI off iff e[0]=='0'; rivals.c:402 maps 0/2/other; openworld.c:25 on iff nonempty and !='0' vs rivals.c:458 w[0]=='1'; main.c:198 vs sm1.c:503 CARLOOK", "correction": "Readers disagree only for non-standard values (RN_WORLD=2, RN_AI=2 in free.c); the page sets only 0/1 so no live bug", "severity": "low", "effort": "min"}, {"id": "C15", "area": "ai", "title": "car_draw identifica el tráfico por modelo: parte del tráfico sin lean ni LOD", "verdict": "CONFIRMED", "evidence": "rivals.c:1109 racer = usage(tab+0xc54) != 2; :1125 traffic_lean only if !racer; :1124 racer forces LOD 0 (0x6f1b30/34 = 0)", "correction": "", "severity": "low", "effort": "hours"}, {"id": "C16", "area": "build", "title": "Nunca se verifica el md5 de Speed.exe al cargar", "verdict": "CONFIRMED", "evidence": "main.c:143-150 checks only the PE image base path; no md5 in host/ or web; the md5 is checked only by tools/verify_re.py:135", "correction": "Patches check old bytes at build (patches.py), so a different exe fails the build, not at load", "severity": "low", "effort": "min"}, {"id": "C17", "area": "docs", "title": "El tope de tráfico en docs dice 30; el real es 0x40", "verdict": "PARTIAL", "evidence": "free.c:18 and :43 say entrant table's 30; patches.py:599 patches 0x4322e0 cap 0x1e -> 0x40 (entrants 64); traffic_placement.md:27 says rides cap 4+26", "correction": "Comments stale; patch address is 0x4322e0 (0x4322a0 is the function). docs/traffic_placement.md says 4+26 not 30", "severity": "low", "effort": "min"}, {"id": "C18", "area": "render", "title": "Uniforms: un slot de 4352 B por draw", "verdict": "CONFIRMED", "evidence": "gpu.js:14 U_STEP 4352; :985 uneed += U_STEP per GPU_DRAW; :1232 uoff += U_STEP; :1305 one writeBuffer(ubuf, 0, udata, 0, uoff) per list", "correction": "One write per frame list, not per draw; size = draws x 4352 B (CPU copy is versioned, GPU upload is whole span); cost not measured", "severity": "low", "effort": "hours"}, {"id": "C19", "area": "render", "title": "Un calloc/free por draw", "verdict": "CONFIRMED", "evidence": "d3d9.c:2197 w=calloc(total,4), :2237 free(w); ix malloc/free 2180-2238 per draw", "correction": "", "severity": "low", "effort": "hours"}, {"id": "C20", "area": "render", "title": "La lista de comandos se corta a 4 MB (el comentario dice 16)", "verdict": "CONFIRMED", "evidence": "d3d9.c:844 comment 'parts of at most 16 MB'; :854 flush_big() hands off when gpu_pending() > (4u << 20)", "correction": "Comment wrong or limit changed; 4 MB is the real cut", "severity": "low", "effort": "min"}, {"id": "C21", "area": "render", "title": "El hash de texturas corre aunque el remaster esté apagado", "verdict": "CONFIRMED", "evidence": "d3d9.c:1510-1515 FNV-1a 64 byte loop over every level-0 DXT/ARGB texture upload, no remaster test; the key also feeds GPU_TEXKEY and tex_key[] (skin/TRAFFIC hashes)", "correction": "Hash is also used by non-remaster paths (tex_key lookups), so it cannot simply be skipped; loading-time cost only", "severity": "low", "effort": "hours"}, {"id": "C22", "area": "disk", "title": "build/ está en el ignore pero tiene 30 archivos trackeados", "verdict": "CONFIRMED", "evidence": ".gitignore has build/; git ls-files build | wc -l = 30 (build/carao/*, force-added)", "correction": "", "severity": "low", "effort": "min"}, {"id": "C23", "area": "disk", "title": "Dumps regenerables de Ghidra y canon en git", "verdict": "CONFIRMED", "evidence": "git ls-files census/ghidra: 5 decomp_*.c + menu_*.c tracked; census/canon 12 + canon/c 42 tracked (38 MB with ghidra); .gitignore:14 census/hopper/decomp.c", "correction": "", "severity": "low", "effort": "min"}, {"id": "C24", "area": "disk", "title": "Basura en la raíz: --help, devcalls.json, 1/, a_a/, b_a/", "verdict": "CONFIRMED", "evidence": "git status: ?? --help (98341 B JSON), ?? devcalls.json (2 B); ls: dirs 1/, a_a/, b_a/ exist and are empty (git does not list empty dirs)", "correction": "", "severity": "low", "effort": "min"}, {"id": "C25", "area": "disk", "title": "docs/re/ai/ (2.7 MB) sin trackear", "verdict": "CONFIRMED", "evidence": "ls docs/re/ai = 45 files, du 2.7M, untracked; INDEX.md:3 says extracted verbatim from census/hopper/decomp.c", "correction": "Looks like pending Becario work, may be intended to be committed", "severity": "low", "effort": "min"}, {"id": "C26", "area": "tools", "title": "El parche de AO de tools/ao nunca se aplicó", "verdict": "CONFIRMED", "evidence": "grep -c 'CAO|carao' host/d3d9.c = 0; build/carao/NOTES.md says 'd3d9_carao.patch, unbuilt'; patch hunk adds BRIDGE baked car AO", "correction": "Deliberately unbuilt per its notes; the tools/ao + build/carao work is parked", "severity": "low", "effort": "min"}, {"id": "C27", "area": "tools", "title": "web/remaster/nr (77 MB): nadie lo lee", "verdict": "CONFIRMED", "evidence": "web/remaster/nr 77M dated Oct 24; no match for remaster/nr or /nr/ in web/*.js, web/*.html, host/*.c, tools py, nor in web/remaster/index*.tsv", "correction": "", "severity": "low", "effort": "min"}, {"id": "C28", "area": "tools", "title": "151 scripts tools/hopper/q_*.py hechos de plantilla", "verdict": "PARTIAL", "evidence": "tools/hopper has 151 q_*.py; q_template.py:6 says 'Copy as q_<topic>.py'; q_creward.py differs from the template by 30 lines", "correction": "Copy-the-template is the documented workflow; scripts differ in ADDRS/DATA and query body, not pure copies", "severity": "low", "effort": "min"}, {"id": "C29", "area": "tools", "title": "tools/re/ast.py tapa el ast del stdlib; jdlz vive en census", "verdict": "CONFIRMED", "evidence": "tools/re/ast.py exists; tpk.py:27 sys.path.insert(0, tools/re) so stdlib ast is shadowed; tpk.py:28-30 inserts tools/census and imports jdlz", "correction": "No 'import ast' found under tools/, so no current breakage; stdlib modules importing ast (inspect, dataclasses) would hit it", "severity": "low", "effort": "min"}, {"id": "C30", "area": "tools", "title": "decode_all.py hace exec() de un pedazo de index.py", "verdict": "CONFIRMED", "evidence": "decode_all.py:4-5 src=open('/Users/angeldamian/RE-NFSU/tools/remaster/index.py').read().split('game, pngs, out')[0]; exec(src, ns); absolute path", "correction": "", "severity": "low", "effort": "min"}, {"id": "C31", "area": "tools", "title": "4 copias de la ruta de menú en los harnesses", "verdict": "PARTIAL", "evidence": "bench.py:7 'from completion import _PROFILE'; abrun.py has no route text; only completion.py and webcheck.mjs hold a menu route", "correction": "Two copies (py + mjs), bench.py imports from completion.py, abrun.py has none", "severity": "low", "effort": "hours"}, {"id": "C32", "area": "tools", "title": "runcap.py lista lanzadores muertos y no cuenta bench.py", "verdict": "PARTIAL", "evidence": "runcap.py:14 LAUNCHERS has matrix.py, run1.sh, gate60.py: find tools -maxdepth 3 finds none; bench.py not listed", "correction": "bench.py runs via macgate.sh (also a LAUNCHER, per AGENTS) so it is counted that way; only a bare bench.py call is missed", "severity": "low", "effort": "min"}, {"id": "C33", "area": "tools", "title": "El harness del pod sigue aunque el pod está aparcado (1.9 GB)", "verdict": "CONFIRMED", "evidence": "PLAN.md:10-11 pod parked; tools/abrun.py, abmetrics.py, abframes.py, tools/wine/ exist; du build/pod = 1.9G", "correction": "Disk only, no runtime effect", "severity": "low", "effort": "min"}, {"id": "C34", "area": "docs", "title": "driving_patches.md dice que no hay parche de IA; sí lo hay", "verdict": "PARTIAL", "evidence": "driving_patches.md:4 'no patch changes ... the rivals' AI' (doc dated 2026-10-27); patches.py:544,546 0x45406c/0x4540e9 patch Avoid 0x453c60", "correction": "Those two change TRAFFIC avoidance, not rivals; but the doc is stale anyway: rival patch 0x44c573 (personalities) is when=True", "severity": "low", "effort": "min"}, {"id": "C35", "area": "docs", "title": "coverage.md: 13,739 funciones vs 13,756 reales", "verdict": "CONFIRMED", "evidence": "coverage.md:8,21,103,108 say 13,739 / 13739; census/lift_report.json functions = 13756", "correction": "", "severity": "low", "effort": "min"}, {"id": "C36", "area": "win", "title": "new_handle devuelve 0 y nadie lo revisa", "verdict": "CONFIRMED", "evidence": "win32.c:143-146 new_handle returns 0 at 512; create_file :668-670 get_handle(h)->gf with h=0 -> NULL deref; HeapCreate_:390 and FindFirstFile :762 return it unchecked", "correction": "Needs 511 live handles at once; CloseHandle exists, no leak seen", "severity": "low", "effort": "min"}, {"id": "C37", "area": "win", "title": "El mezclador de audio ignora el cursor del lector", "verdict": "PARTIAL", "evidence": "dsound.c:164-166 emit() writes ring from ring_hdr[0], never reads the page cursor [1]; but dsound.c:19,255-269 mixer is clock-paced (LEAD 2048 frames vs RING 16384)", "correction": "Overrun only if the page stalls > ~0.3 s; audio.js resyncs (ring_hdr[5]); by design, no live bug", "severity": "low", "effort": "hours"}, {"id": "C38", "area": "web", "title": "F2 abre el panel pero el juego sigue recibiendo la tecla", "verdict": "CONFIRMED", "evidence": "index.html:68 F2 handler: toggle + preventDefault only; input.js:12 maps F2 to DIK 0x3c and canvas keydown (input.js:43) still pushes it; mode.js F4 uses stopPropagation", "correction": "Whether NFSU reacts to F2 is not verified", "severity": "low", "effort": "min"}, {"id": "C39", "area": "web", "title": "serve.py confina rutas con lstrip; --lan permite PUT al save", "verdict": "PARTIAL", "evidence": "serve.py:195-201 normpath(...).lstrip('/.') ; :44-47 save_path rejects leading '..'; :248-252 LAN server uses same Handler on 0.0.0.0:5443", "correction": "lstrip removes leading dots so '../' cannot escape (and dotfiles are unreachable); no traversal found. --lan does allow PUT under /save/ (home Wi-Fi accepted)", "severity": "low", "effort": "min"}, {"id": "C40", "area": "ai", "title": "RN_TRAFPAINT y RN_TRAFLEAN encendidos sin haberse visto", "verdict": "CONFIRMED", "evidence": "rivals.c:938,1073 off only if env starts with '0'; mode.js:20 sets both 0 in original mode; HANDOFF.md: 'paint and lean never seen on traffic in a capture', 'Open: OWNER verdict'", "correction": "Default-on is deliberate (look replaces default in remaster) but unverified visually", "severity": "medium", "effort": "min"}, {"id": "X1", "area": "orig", "title": "Speed FOV anula el FOV 65.9° del parche C3", "verdict": "CONFIRMED", "evidence": "host/d3d9.c:939 fov_frame escribe 0x32dc (71.5°) + delta en 0x6fbdf4 cuando gain ≠ 0; el parche C3 deja 0x2ee0 (65.9°). Hoy speedfov=0 (web/tune.js:34), por eso no se nota.", "correction": "", "severity": "medium", "effort": "min"}], "good": [["Una sola tabla de parches", "Verifica los bytes originales antes de escribir y aborta el build si no cuadran. Lift, build y difftest usan la misma lista.", "tools/recomp/patches.py:509"], ["Un solo contrato C↔JS", "La lista de comandos de host/gpu.h es lo único que comparten d3d9.c y los dos backends; un op desconocido falla ruidoso.", "host/gpu.h:1-50"], ["Difftest con oráculo real", "Unicorn por función; 5,809 de 5,812 comparaciones explicadas.", "tools/recomp/difftest.py"], ["rt.h con fuentes", "x87/MMX modelado con la regla del SDM al lado; un null read es fallo ruidoso.", "host/rt.h:24-158"], ["Capa Windows honesta", "GIL de hilos medido, files.c encierra escrituras en save/, dsound.c es un mezclador real.", "host/threads.c, host/files.c, host/dsound.c"], ["Caché de estado WebGPU", "setPipeline y viewport cacheados por pase: −73 % de llamadas, medido.", "web/gpu.js:1199-1216"], ["Pesos fuera de git", "ref/, build/, game/ y web/remaster/ ignorados: 19 de 20 GB fuera del repo.", ".gitignore:1-14"], ["Commits con causa", "364 de 619 commits explican causa, número y alcance; el HANDOFF se reemplaza y no crece.", "git log"], ["openworld se autoverifica", "Cada archivo que escribe build.py se comprueba (roundtrip JDLZ, quadtree, query).", "tools/openworld/build.py:20-25"]], "plan": [["Modo original de verdad", "Feel C1/C3 solo en remaster/WORLD; completar RN_ORIGINAL_ENV. Hoy F4 → Original queda en 65.9° y con blur cambiado.", ["C01", "C02", "C40"], "horas"], ["Quitar el tirón de cada 2 s", "El barrido de 1 GB corre cada 120 frames mientras no encuentra AIVehicle. Medir los 6 logs y, si cuestan, moverlos detrás de ?debug=1.", ["C05", "C04"], "minutos"], ["Speed FOV contra el parche C3", "Si enciendes speedfov, fov_frame reescribe 71.5° y borra el 65.9° de C3. Partir de la base que dejó el parche.", ["X1"], "minutos"], ["F10 que no revienta", "Anillo de tamaño fijo en allRows: la sesión larga que quieres capturar es justo la que se queda sin memoria.", ["C12"], "10 líneas"], ["Build rápido y honesto", "native.h en las deps + sello de lift para saltarlo cuando exe, parches y lifter no cambian.", ["C07", "C08", "C09"], "~1 h"], ["Limpieza", "Raíz, build/ y census/ regenerables, lanes muertas (nr, ao), poda de corridas.", ["C22", "C23", "C24", "C26", "C27", "C33"], "minutos"], ["Una tabla de flags", "Un parser por flag; borrar el ?ai=0 duplicado.", ["C10", "C14", "C11"], "medio día"], ["Uniforms y heap por draw", "Medir primero con RN_DRAWSTAT; después constantes con versión y una arena por frame.", ["C18", "C19", "C20"], "~40 líneas"]], "decide": ["RN_UNLOCK: ¿el modo original arranca con la carrera abierta (tu decisión del 20-oct) o como venía de fábrica?", "¿Borro rockport, ao, canon y dash, o alguna sigue en tus planes?", "docs/re/ai/: ¿lo commiteo o lo borro?"], "extra": [{"id": "X1", "area": "orig", "title": "Speed FOV anula el FOV 65.9° del parche C3", "verdict": "CONFIRMED", "severity": "medium", "effort": "min", "evidence": "host/d3d9.c:939 fov_frame escribe 0x32dc (71.5°) + delta en 0x6fbdf4 cuando gain ≠ 0; el parche C3 deja 0x2ee0 (65.9°). Hoy speedfov=0 (web/tune.js:34), por eso no se nota.", "correction": "", "detail": "Lo encontró el Sonnet y Main lo comprobó en el código: si enciendes speedfov, la cámara vuelve a 71.5° más el extra por velocidad y el cambio de feel C3 desaparece."}]};
+const VL = { CONFIRMED: "Confirmado", PARTIAL: "Parcial", REFUTED: "Refutado", UNVERIFIABLE: "Sin verificar" };
+const SEV = { high: 0, medium: 1, low: 2 };
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const fmt = (s) => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/((?:[\w.\-]+\/)*[\w.\-]+\.(?:c|h|py|js|mjs|md|html|tsv|json|sh|s)(?::[\d,\-]+)?)/g, "<code>$1</code>");
+const byId = Object.fromEntries(D.claims.map((c) => [c.id, c]));
+const st = { v: new Set(), sev: new Set(), area: new Set(), q: "" };
+let openAll = false;
+const $ = (id) => document.getElementById(id);
+$("date").textContent = "5 de noviembre de 2026.";
+
+// counters
+const cnt = (v) => D.claims.filter((c) => c.verdict === v).length;
+const conf = cnt("CONFIRMED"), part = cnt("PARTIAL"), ref = cnt("REFUTED"), unk = cnt("UNVERIFIABLE");
+const highReal = D.claims.filter((c) => c.severity === "high" && (c.verdict === "CONFIRMED" || c.verdict === "PARTIAL")).length;
+const medReal = D.claims.filter((c) => c.severity === "medium" && c.verdict !== "REFUTED").length;
+$("tldr").innerHTML = `<b>La base es sólida; los problemas están alrededor.</b> De ${D.claims.length} hallazgos, <b>${conf + part} se sostienen</b> (${conf} completos, ${part} con matices), ${ref} se cayeron${unk ? ` y ${unk} no se pudieron verificar` : ""}. <b>${highReal} de impacto alto y ${medReal} medio</b>; el resto es deuda barata. Casi todo se arregla en minutos u horas, no en días.`;
+$("stats").innerHTML = ["CONFIRMED", "PARTIAL", "REFUTED", "UNVERIFIABLE"].map((v) => `<div class="stat s-${v}" data-v="${v}" role="button" tabindex="0"><div class="v">${cnt(v)}</div><div class="l">${VL[v]}</div></div>`).join("");
+document.querySelectorAll(".stat").forEach((e) => e.onclick = () => { toggle(st.v, e.dataset.v); $("hall").scrollIntoView({ behavior: "smooth" }); });
+
+// plan
+$("planN").textContent = D.plan.length + " pasos";
+$("plan").innerHTML = D.plan.map(([t, p, ids, eff], i) => `<div class="step"><div class="num">${i + 1}</div><div style="flex:1;min-width:0"><h3>${esc(t)}</h3><p>${esc(p)}</p><div class="chips">${ids.map((id) => { const c = byId[id]; return `<button class="chip s-${c.verdict}" data-go="${id}" title="${esc(c.title)} · ${VL[c.verdict]}">${id}</button>`; }).join("")}<span class="eff">${esc(eff)}</span></div></div></div>`).join("");
+$("decide").innerHTML = D.decide.map((d) => `<li>${esc(d)}</li>`).join("");
+document.addEventListener("click", (e) => { const g = e.target.closest("[data-go]"); if (!g) return; const el = document.querySelector(`[data-id="${g.dataset.go}"]`); if (!el) { st.v.clear(); st.sev.clear(); st.area.clear(); st.q = ""; $("q").value = ""; render(); } const t = document.querySelector(`[data-id="${g.dataset.go}"]`); t.classList.add("open"); t.scrollIntoView({ behavior: "smooth", block: "center" }); });
+
+// filters
+const bar = $("bar");
+const mk = (label, set, val) => { const b = document.createElement("button"); b.className = "f"; b.textContent = label; b.onclick = () => toggle(set, val); b.dataset.k = label; b._s = set; b._v = val; bar.appendChild(b); };
+mk("Impacto alto", st.sev, "high"); mk("Medio", st.sev, "medium");
+Object.entries(D.areas).forEach(([k, l]) => { if (D.claims.some((c) => c.area === k)) mk(l, st.area, k); });
+function toggle(set, v) { set.has(v) ? set.delete(v) : set.add(v); render(); }
+$("q").oninput = (e) => { st.q = e.target.value.toLowerCase(); render(); };
+
+function render() {
+  document.querySelectorAll(".f").forEach((b) => b.classList.toggle("on", b._s.has(b._v)));
+  document.querySelectorAll(".stat").forEach((e) => e.classList.toggle("on", st.v.has(e.dataset.v)));
+  const ok = (c) => (!st.v.size || st.v.has(c.verdict)) && (!st.sev.size || st.sev.has(c.severity)) && (!st.area.size || st.area.has(c.area)) &&
+    (!st.q || (c.id + c.title + c.evidence + c.correction).toLowerCase().includes(st.q));
+  const L = D.claims.filter(ok).sort((a, b) => SEV[a.severity] - SEV[b.severity] || (a.verdict === "REFUTED") - (b.verdict === "REFUTED") || a.id.localeCompare(b.id));
+  $("hallN").textContent = L.length === D.claims.length ? D.claims.length : `${L.length} de ${D.claims.length}`;
+  let h = "";
+  for (const [k, l] of Object.entries(D.areas)) {
+    const A = L.filter((c) => c.area === k); if (!A.length) continue;
+    h += `<div class="area">${esc(l)}</div>` + A.map((c) => `<div class="item${openAll ? " open" : ""}" data-id="${c.id}"><button aria-expanded="false"><i class="dot d-${c.severity}" title="impacto ${c.severity}"></i><span class="t">${esc(c.title)}</span><span class="id">${c.id}</span><span class="badge s-${c.verdict}">${VL[c.verdict]}</span></button><div class="body">${c.evidence ? `<div class="k">Evidencia</div><div class="ev">${fmt(c.evidence)}</div>` : ""}${c.correction ? `<div class="k">Lo que en realidad pasa</div><div class="fix">${fmt(c.correction)}</div>` : ""}<div class="k">Esfuerzo</div>${esc(c.effort || "—")}</div></div>`).join("");
+  }
+  $("list").innerHTML = h || `<div class="empty">Nada con esos filtros.</div>`;
+  document.querySelectorAll(".item>button").forEach((b) => b.onclick = () => { const it = b.parentElement; it.classList.toggle("open"); b.setAttribute("aria-expanded", it.classList.contains("open")); });
+}
+render();
+
+if (D.extra.length) { $("extraWrap").hidden = false; $("extra").innerHTML = D.extra.map((x) => `<div class="extra"><b>${esc(x.title)}</b><div>${fmt(x.detail)}</div></div>`).join(""); }
+$("goodN").textContent = D.good.length;
+$("good").innerHTML = D.good.map(([t, p, w]) => `<div class="g"><b>${esc(t)}</b><p>${esc(p)}</p><code>${esc(w)}</code></div>`).join("");
+$("all").onclick = () => { openAll = !openAll; $("all").textContent = openAll ? "Cerrar todo" : "Abrir todo"; render(); };
+$("theme").onclick = () => { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; };
+</script>
+</body>
+</html>
