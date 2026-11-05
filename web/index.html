@@ -65,7 +65,7 @@ addEventListener('keyup', e => keep(`${secs()} key up ${e.code}`), true);
 addEventListener('error', e => { line('JS error: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'stop'); flush(); });
 addEventListener('unhandledrejection', e => { line('JS rejection: ' + (e.reason && e.reason.stack || e.reason), 'stop'); flush(); });
 addEventListener('pagehide', flush);
-addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classList.toggle('dbg'); e.preventDefault(); } }, true);
+addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classList.toggle('dbg'); e.preventDefault(); e.stopPropagation(); } }, true);
 function line(s, cls) {
   keep(`${secs()} ${s}`);
   if (/^STOP|^JS |abort|Aborted|RuntimeError/.test(s)) setTimeout(flush, 0);
@@ -111,7 +111,8 @@ function line(s, cls) {
       }
       // ?world=1: the open world (docs/OPENWORLD.md): the 16 street tracks load one merged collision, no fences (host/openworld.c)
       if (RN_Q.get('world') === '1') m.ENV.RN_WORLD = '1';
-      // ?ai=0: WORLD rivals drive the shipped skill records, no nervous, clean or aggressive personalities (host/rivals.c). Read at each race.
+      // ?ai=0: WORLD rivals drive the shipped skill records, no nervous, clean or aggressive personalities (host/rivals.c), and the WORLD
+      // keeps the plain free mode AI: 6 rivals, 19 traffic cars (host/free.c world_ai). Read at each race.
       if (RN_Q.get('ai') === '0') m.ENV.RN_AI = '0';
       // ?trafyield=0: traffic does not move aside for the player closing from behind (host/rivals.c traffic_tick)
       if (RN_Q.get('trafyield') === '0') m.ENV.RN_TRAFYIELD = '0';
@@ -137,8 +138,6 @@ function line(s, cls) {
       if (RN_Q.has('trafmodels')) m.ENV.RN_TRAFMODELS = RN_Q.get('trafmodels');
       if (RN_Q.get('trafrefill') === '1') { m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
       if (RN_Q.has('traffic')) m.ENV.RN_FREETRAFFIC = RN_Q.get('traffic');
-      // ?ai=0: the WORLD keeps the plain free mode AI (6 rivals, 19 traffic cars, host/free.c world_ai)
-      if (RN_Q.get('ai') === '0') m.ENV.RN_AI = '0';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;
