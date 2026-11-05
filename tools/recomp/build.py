@@ -7,7 +7,7 @@ build/gen/table.c  sorted guest address -> function table for rn_call
 census/lift_report.json  counts: functions, traps by reason
 Usage: .venv/bin/python tools/recomp/build.py [native|web|lift]   (default: native)
 """
-import collections, json, multiprocessing as mp, os, re, struct, subprocess, sys
+import bisect, collections, json, multiprocessing as mp, os, re, struct, subprocess, sys
 import pefile
 sys.path.insert(0, os.path.dirname(__file__))
 from lift import Lifter, Unsupported
@@ -19,6 +19,10 @@ CHUNKS = 160
 COV = os.environ.get("RN_COV") == "1"
 GEN = "build/gen_cov" if COV else "build/gen"
 FUNCS = {int(l.split()[0], 16): l.split()[1] for l in open("census/speed_exe_functions.tsv")}
+# A function's chunk comes from its address: the census (the unpatched exe, it rarely changes) cuts the address space into
+# CHUNKS equal-count ranges, so a cave or a dropped seed only rewrites the chunk that holds it.
+_census = sorted(FUNCS)
+BOUNDS = [_census[k * len(_census) // CHUNKS] for k in range(1, CHUNKS)]
 # The census reads the unpatched exe: a PATCH cave reached by a call is a function entry of its own.
 FUNCS.update({p["addr"]: "call" for p in patches.active() if p.get("entry")})
 FUNCS.update({a: "call" for p in patches.active() for a in p.get("entries", ())})   # calls into a multi-entry cave
@@ -73,10 +77,11 @@ def lift_all():
         protos += ("extern uint8_t rn_cov_map[];\n#define RN_COV(k) (rn_cov_map[k] = 1)\nenum {"
                    + ",".join(f"RNI_{e:x}={k}" for k, (e, _) in enumerate(out)) + "};\n")
     write_if_changed(f"{GEN}/funcs.h", '#pragma once\n#include "rt.h"\n' + protos)
-    per = (len(out) + CHUNKS - 1) // CHUNKS
-    for k in range(CHUNKS):
-        part = out[k * per:(k + 1) * per]
-        write_if_changed(f"{GEN}/f{k:03d}.c", '#include "funcs.h"\n' + "\n".join(s for _, s in part))
+    parts = [[] for _ in range(CHUNKS)]
+    for e, s in out:
+        parts[bisect.bisect_right(BOUNDS, e)].append(s)
+    for k, part in enumerate(parts):
+        write_if_changed(f"{GEN}/f{k:03d}.c", '#include "funcs.h"\n' + "\n".join(part))
     write_if_changed(f"{GEN}/table.c", '#include "funcs.h"\n'
                      f"const uint32_t rn_fn_count = {len(out)};\n"
                      "const uint32_t rn_fn_addr[] = {" + ",".join(f"0x{e:x}" for e, _ in out) + "};\n"
