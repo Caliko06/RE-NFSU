@@ -1,7 +1,8 @@
-// Touch overlay (iPad / iPhone, any coarse pointer; ?touch=1 forces it, ?touch=0 hides it) -> the keyboard path of web/input.js:
-// every control presses DIK keys through startInput's setKey (same ring and held set as the keyboard and web/pad.js).
-// Keys are the game's default action table (exe 0x702c98): arrows steer / gas / brake, Shift handbrake, Space nitrous,
-// C camera, R respot, Esc pause; menus: arrows, Enter select, Esc back.
+// Touch overlay (iPad / iPhone: 'ontouchstart' in window; ?touch=1 forces it, ?touch=0 hides it) -> the keyboard path of
+// web/input.js: every control presses DIK keys through startInput's setKey (same ring and held set as the keyboard and web/pad.js).
+// Keys are the game's default action table (exe 0x702c98, docs/re/hud_input.md): arrows steer / gas / brake,
+// Left Shift handbrake, Space nitrous, C camera, R respot, Esc pause; menus: arrows, Enter select, Esc back.
+// It steps aside when a real keyboard key or a gamepad is used, and comes back on the next touch.
 // Two layouts. drive: steer zone (left), gas / brake / nitro / handbrake / camera / respot / pause (right). menu: d-pad, OK, BACK.
 // The page cannot read the race state, so the layout follows pad.js's heuristic (inputNextMode): drive after the gas is
 // touched, menu on pause / d-pad / BACK or after 10 s with nothing held; the MENU/DRIVE button switches by hand.
@@ -11,7 +12,7 @@ const TOUCH_IDLE_MS = 10000, TOUCH_MIN_HOLD_MS = 60, TOUCH_STEER_DEAD = 0.08;
 
 function startTouch(input) {
   const want = RN_Q.get('touch');
-  if (!input || want === '0' || !(want === '1' || matchMedia('(pointer: coarse)').matches)) return null;
+  if (!input || want === '0' || !(want === '1' || 'ontouchstart' in window)) return null;
   const D = TOUCH_DIK;
   const css = document.createElement('style');
   css.textContent = `
@@ -24,7 +25,8 @@ function startTouch(input) {
       background: rgba(20,24,30,.42); border: 2px solid rgba(255,255,255,.35); border-radius: 18px; text-shadow: 0 1px 2px #000; }
     #touch .b.on { background: rgba(255,194,74,.6); border-color: #ffc24a; }
     #touch .round { border-radius: 50%; }
-    #touch .steer { left: 3vmin; bottom: 3vmin; width: 42vw; height: 34vh; justify-content: space-between; padding: 0 5vmin; font-size: 8vmin; }
+    #touch .steer { left: 0; top: 0; bottom: 0; width: 50vw; justify-content: space-between; padding: 0 4vmin; font-size: 8vmin;
+      background: none; border: 0; border-radius: 0; }
     #touch .gas { right: 3vmin; bottom: 3vmin; width: 20vmin; height: 32vmin; background: rgba(63,185,80,.38); }
     #touch .brake { right: 26vmin; bottom: 3vmin; width: 18vmin; height: 18vmin; background: rgba(248,81,73,.38); }
     #touch .nitro { right: 26vmin; bottom: 24vmin; width: 18vmin; height: 18vmin; background: rgba(121,192,255,.38); }
@@ -114,10 +116,21 @@ function startTouch(input) {
   });
   for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) root.addEventListener(t, stop);
   const releaseAll = () => { for (const id of [...ptr.keys()]) stop({ pointerId: id }); };
+  // A keyboard key or a pad means a real controller is in hand: the overlay hides (releasing what it held) and returns on the next touch.
+  const hide = () => { if (root.style.display !== 'none') { releaseAll(); root.style.display = 'none'; } };
+  const show = () => { if (root.style.display === 'none') { root.style.display = ''; sync(); } };
+  const padUsed = () => {
+    if (!navigator.getGamepads) return false;
+    const p = [...navigator.getGamepads()].find(g => g && g.connected);
+    return !!p && (p.buttons.some(b => b && b.pressed) || Math.abs(p.axes[0] || 0) > 0.4 || Math.abs(p.axes[1] || 0) > 0.4);
+  };
+  addEventListener('keydown', hide, true);
+  addEventListener('pointerdown', e => { if (e.pointerType === 'touch') show(); }, true);
+  addEventListener('touchstart', show, { capture: true, passive: true });   // iOS: the first touch after the keyboard
   addEventListener('blur', releaseAll);
   document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAll(); });
   for (const t of ['gesturestart', 'gesturechange', 'dblclick', 'contextmenu']) document.addEventListener(t, e => e.preventDefault());   // Safari pinch / double-tap zoom, long-press menu
-  setInterval(() => { if (!ptr.size) sync(); }, 500);                 // idle: back to the menu layout
+  setInterval(() => { if (padUsed()) hide(); if (!ptr.size) sync(); }, 500);   // idle: back to the menu layout; a pad takes over
   layout('menu');
   return { layout };
 }
