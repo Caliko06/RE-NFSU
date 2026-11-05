@@ -1,8 +1,8 @@
 // Gamepad (standard mapping) -> the keyboard path of web/input.js: the pad presses the same DIK keys, through the same
 // ring and held set (startInput returns { key }), so the game sees a keyboard and its own action map applies.
-// Keys are the game's defaults: arrows steer / gas / brake, Space handbrake, Left Shift nitrous, Enter accept, Escape back / pause.
+// Keys are the game's defaults: arrows steer / gas / brake, Left Shift handbrake, Space nitrous (the table at 0x702c98: Handbrake RShift/LShift, Nitrous Space/N), Enter accept, Escape back / pause.
 //   menu : d-pad and left stick = arrows, A = Enter, B = Escape, Start = Escape
-//   drive: left stick X = left / right, RT = Up (gas), LT = Down (brake), A or X = nitrous, B = handbrake, Start = Escape
+//   drive: left stick X = left / right, RT = Up (gas), LT = Down (brake), A or X = nitrous (Space), B = handbrake (Shift), Start = Escape
 // The page cannot read the game's race state, so the pad is in menu mode until a trigger is pulled (a race needs the gas),
 // and back in menu mode on a d-pad press, Start, or 4 s with triggers and buttons released (the post-race screens).
 // Polled in requestAnimationFrame, only while a pad is connected; only changes reach the ring.
@@ -10,14 +10,20 @@
 const PAD_DIK = { esc: 0x01, enter: 0x1c, lshift: 0x2a, space: 0x39, up: 0xc8, left: 0xcb, right: 0xcd, down: 0xd0 };
 const PAD_STICK = 0.4, PAD_TRIGGER = 0.3, PAD_IDLE_MS = 4000;
 
+// The menu/drive layout heuristic, shared with web/touch.js. st = { mode, last }; sig = { drive: gas pulled, menu: navigation
+// asked (d-pad, Start), active: any control held }; drive after the gas, menu on navigation or after idleMs without activity.
+function inputNextMode(st, now, sig, idleMs = PAD_IDLE_MS) {
+  if (sig.drive) { st.mode = 'drive'; st.last = now; }
+  else if (sig.active) st.last = now;
+  if (sig.menu || (st.mode === 'drive' && now - (st.last ?? now) > idleMs)) st.mode = 'menu';
+  return st.mode;
+}
+
 // Which DIKs a pad state asks for. s = { ax, ay, lt, rt, b: buttons[], mode }; returns { keys: Set, mode }.
 function padKeys(s, now) {
   const D = PAD_DIK, k = new Set(), b = s.b;
   const dpad = b[12] || b[13] || b[14] || b[15], face = b[0] || b[1] || b[2] || b[3], trig = s.lt > PAD_TRIGGER || s.rt > PAD_TRIGGER;
-  let mode = s.mode;
-  if (trig) { mode = 'drive'; s.last = now; }
-  else if (face || b[9]) s.last = now;
-  if (dpad || b[9] || (mode === 'drive' && now - (s.last ?? now) > PAD_IDLE_MS)) mode = 'menu';
+  const mode = inputNextMode(s, now, { drive: trig, menu: dpad || b[9], active: face || b[9] });
   if (s.ax < -PAD_STICK || b[14]) k.add(D.left);
   if (s.ax > PAD_STICK || b[15]) k.add(D.right);
   if (b[12] || (mode === 'menu' && s.ay < -PAD_STICK)) k.add(D.up);
@@ -26,7 +32,7 @@ function padKeys(s, now) {
   if (s.lt > PAD_TRIGGER) k.add(D.down);
   if (b[9] || b[8]) k.add(D.esc);
   if (mode === 'menu') { if (b[0]) k.add(D.enter); if (b[1]) k.add(D.esc); }
-  else { if (b[0] || b[2]) k.add(D.lshift); if (b[1]) k.add(D.space); }
+  else { if (b[0] || b[2]) k.add(D.space); if (b[1]) k.add(D.lshift); }
   return { keys: k, mode };
 }
 
