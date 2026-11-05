@@ -192,6 +192,14 @@ function startTelemetry(M, t0, log, logLines) {
   }
   setInterval(flush, 2000);
   addEventListener('pagehide', flush);
+  // ?stopafter=N: after N s the page saves what it has and leaves for about:blank, so a headed bench tab stops the
+  // game by itself (nobody has to close it). 1.5 s covers the next log flush (web/boot.js, every 1 s).
+  const stopAfter = +RN_Q.get('stopafter');
+  if (stopAfter > 0) setTimeout(() => {
+    log(`telemetry: stopafter ${stopAfter} s reached, leaving for about:blank`);
+    event('stop', {}); flush();
+    setTimeout(() => location.replace('about:blank'), 1500);
+  }, stopAfter * 1000);
   // F10: the session as one file the browser saves (Downloads): head, cols, rows, events, log.
   addEventListener('keydown', e => {
     if (e.code !== 'F10') return;
