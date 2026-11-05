@@ -39,7 +39,7 @@ def start_time(log_path, warm):
 
 def telemetry(ndjson_path):
     # collect the column names, all rows and the vsync events from the JSON lines
-    cols, rows, vsync = None, [], []
+    cols, batches, vsync = None, [], []
     with open(ndjson_path, errors='replace') as f:
         for line in f:
             try:
@@ -52,9 +52,22 @@ def telemetry(ndjson_path):
                 cols = list(o.get('cols') or [])
             elif o.get('kind') == 'vsync':
                 vsync.append(o)
-            if 'rows' in o and cols:
-                rows += o['rows']
-    return cols, rows, vsync
+            if 'rows' in o and cols and o['rows']:
+                batches.append(o['rows'])
+    return cols, own(batches, cols.index('t') if 't' in cols else 0), vsync
+
+
+def own(batches, ti):
+    # A tab left open on the same port (an earlier run) keeps posting into the same file, its page clock far ahead.
+    # This session's rows are the chain that starts with the earliest batch, each next one within 10 s of the last.
+    if not batches:
+        return []
+    batches.sort(key=lambda b: b[0][ti])
+    rows = list(batches[0])
+    for b in batches[1:]:
+        if rows[-1][ti] <= b[0][ti] <= rows[-1][ti] + 10000:
+            rows += b
+    return rows
 
 
 def report(ndjson_path, log_path, warm, secs):
