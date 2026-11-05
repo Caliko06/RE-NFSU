@@ -47,6 +47,39 @@ async function startGpu(M, canvas, report, onFrame) {
   }
   // A lost device (GPU reset, iOS reclaiming a background tab) stops drawing for good: say so instead of a frozen frame.
   device.lost.then(i => { if (i.reason !== 'destroyed') report(`STOP webgpu: se perdió la GPU (${i.reason || '?'}: ${i.message}). Recarga la página.`); });
+  // ?watchdog=1 (probe, OFF by default; w1 2026-11-05): in Safari the page's main thread stopped 15 times in 24 min, for
+  // 20-113 s each (rAF, timers and the log all stopped, no visibilitychange; F10 nfsu-session-2026-11-05T20-46-57). A worker
+  // watches a heartbeat the main thread bumps every 100 ms and writes to build/web.log with its own fetch: how long the
+  // main thread stopped, its phase (1 pump runs a frame list, 2 rAF present, 3 telemetry flush, 4 pump in waitAsync,
+  // 5 pump yielding a task, 0 other) and the pump turns meanwhile (turns that go on while timers starve = a microtask loop).
+  const WD = RN_Q.get('watchdog') === '1' ? new Int32Array(new SharedArrayBuffer(16)) : null;   // heartbeat, phase, pump turns
+  globalThis.RN_WD = WD;
+  if (WD) {
+    setInterval(() => Atomics.add(WD, 0, 1), 100);
+    const src = `onmessage = ({ data: [wd, url, t0] }) => {
+      const pt = () => (performance.timeOrigin + performance.now() - t0) / 1000;   // seconds on the page's clock
+      const say = s => fetch(url, { method: 'POST', body: pt().toFixed(2) + ' watchdog: ' + s + '\\n' }).catch(() => {});
+      let hb = -1, since = 0, turns = 0, ph = 0, told = 0;
+      say('worker up');
+      setInterval(() => {
+        const h = Atomics.load(wd, 0), now = performance.now();
+        if (h !== hb) {
+          if (told) say('page main thread back after ' + ((now - since) / 1000).toFixed(1) + ' s; phase at the stop ' + ph +
+                        ', now ' + Atomics.load(wd, 1) + ', pump turns during it ' + (Atomics.load(wd, 2) - turns));
+          hb = h; since = now; turns = Atomics.load(wd, 2); ph = Atomics.load(wd, 1); told = 0;
+          return;
+        }
+        const s = (now - since) / 1000;
+        if (s >= 2 && s >= 2 * (told || 1)) {   // at 2, 4, 8, 16 ... s
+          told = s;
+          say('page main thread stopped ' + s.toFixed(1) + ' s; phase ' + Atomics.load(wd, 1) + ' (at the stop ' + ph +
+              '), pump turns ' + (Atomics.load(wd, 2) - turns));
+        }
+      }, 200);
+    };`;
+    new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' }))).postMessage([WD, location.origin + '/log', performance.timeOrigin]);
+    report('watchdog: on (?watchdog=1)');
+  }
   const ctx = canvas.getContext('webgpu');
   const box = M._rn_gpu_mailbox() >> 2;     // u32 index: seq, done, ptr[2], len[2]
   const H = () => M.HEAPU32;                // the view of the shared wasm memory
@@ -80,6 +113,11 @@ async function startGpu(M, canvas, report, onFrame) {
   let paceBox = 0, paceT = 0, paceP = 0;
   function showQueued(ts) {
     requestAnimationFrame(showQueued);
+    const wdWas = WD ? WD[1] : 0;
+    if (WD) WD[1] = 2;
+    try { showQueuedBody(ts); } finally { if (WD) WD[1] = wdWas; }
+  }
+  function showQueuedBody(ts) {
     if (PACE && paceBox) {
       const d = ts - paceT;
       if (paceT && d > 4 && d < 50) paceP = !paceP || d < paceP * 0.75 ? d : d < paceP * 1.5 ? paceP + (d - paceP) * 0.05 : paceP;
@@ -1361,14 +1399,17 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   const yieldTask = () => new Promise(f => { yields.push(f); ch.port2.postMessage(0); });
   async function pump() {
     for (;;) {
+      if (WD) WD[2]++;
       if (!tick()) return;
       if (hold && presents >= hold) { await new Promise(f => setTimeout(f, 100)); continue; }
       const h = M.HEAP32, seq = Atomics.load(h, box);
       const r = Atomics.load(h, box + 1) < seq ? { async: false } : Atomics.waitAsync(h, box, seq);
+      if (WD) WD[1] = r.async ? 4 : 5;
       if (r.async) await r.value; else await yieldTask();
     }
   }
   function tick() {
+    if (WD) WD[1] = 1;
     const h = H();
     try {
       while (Atomics.load(h, box + 1) < Atomics.load(h, box) && !(hold && presents >= hold)) {
