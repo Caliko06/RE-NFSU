@@ -399,8 +399,8 @@ static const char *PNAME[5] = {"normal", "nervous", "clean", "aggressive", "bloc
 static int free_race;                  // this race is free mode (rival_ride's rn_free_now)
 static int persona_on;                 // this race's rivals have personalities (set at its first opponent)
 static int rivalai(void) {             // 0 off, 1 WORLD only, 2 forced
-    const char *e = getenv("RN_AI");
-    return e && e[0] == '0' ? 0 : e && e[0] == '2' ? 2 : 1;
+    int ai = rn_env("RN_AI", 1);
+    return ai == 0 ? 0 : ai == 2 ? 2 : 1;
 }
 static int rival_style(uint32_t skill, uint32_t style) { return persona_on && skill <= 9 && (PERSONA[skill] == AGGRESSIVE || PERSONA[skill] == BLOCKER) ? 2 : (int)style; }
 
@@ -454,9 +454,9 @@ static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
     if (a[6] <= 1) {
-        const char *w = getenv("RN_WORLD");
+        int w = rn_env("RN_WORLD", 0);   // the same test as host/openworld.c world_on
         free_race = rn_free_now != 0;
-        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && ((free_race && w && w[0] == '1') || rn_pool() || ld(c, 0x78a2f0, 4) == 1010)));
+        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && ((free_race && w) || rn_pool() || ld(c, 0x78a2f0, 4) == 1010)));
         rn_player_car(c), rival_tables(c, persona_on), traffic_types(c), traffic_spacing(c);
     }
     if (rn_free_now) {                                           // host/free.c: free mode's career rivals

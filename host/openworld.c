@@ -22,7 +22,7 @@
 
 static int enabled(void) {
     static int on = -1;
-    if (on < 0) { const char *e = getenv("RN_WORLD"); on = e && *e && *e != '0'; }
+    if (on < 0) on = rn_env("RN_WORLD", 0) != 0;
     return on;
 }
 

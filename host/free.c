@@ -42,11 +42,10 @@ int rn_free_now;                 // 1 while 0x4b4040 builds free mode's rivals (
 static int on, live, picked[NRIV_MAX], npicked;
 // AI in WORLD (judge order 2026-11-01): the WORLD (track id [0x78a2f0] == 1010, 0x441fe0's key) gets 8 rivals, 21 traffic cars (1 + 8 + 21 = the
 // entrant table's 30, 0x4322a0) and free_tmove keeps 16 of them within 250 m, checked every 15 frames. Other tracks: as before.
-// ?ai=0 (RN_AI=0): off. RN_AIFORCE=1, test only: the same on any Free Run track (the WORLD is not reachable headless).
+// ?ai=0 (RN_AI=0): off. RN_AI=2 (as host/rivals.c rivalai) or RN_AIFORCE=1, test only: the same on any Free Run track (the WORLD is not reachable headless).
 static int world_ai(Ctx *c) {
-    const char *e = getenv("RN_AI");
-    if (e && e[0] == '0') return 0;
-    return ld(c, 0x78a2f0, 4) == 1010 || getenv("RN_AIFORCE") != NULL;
+    int ai = rn_env("RN_AI", 1);
+    return ai && (ai == 2 || ld(c, 0x78a2f0, 4) == 1010 || getenv("RN_AIFORCE") != NULL);
 }
 static uint32_t zone_at, zone_was;     // the clear zone free_place changed (free mode, the whole race) and its value
 // The rubber band 0x44bd10 needs a gap from 0x44c010, which is 0 while [0x78a400] (the race options' Catch Up byte +0x1f, set by
