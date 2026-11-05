@@ -10,16 +10,19 @@
 static uint32_t *list;
 static uint32_t nlist, cap;
 
-void gpu_cmd(int op, int n, const uint32_t *w) {
-    if (nlist + 1 + (uint32_t)n > cap) {
+uint32_t *gpu_put(int op, int n) {
+    while (nlist + 1 + (uint32_t)n > cap) {
         cap = cap ? cap * 2 : 1u << 16;
         list = realloc(list, 4u * cap);
         if (!list) { fprintf(stderr, "gpu: out of memory\n"); exit(1); }
     }
     list[nlist++] = (uint32_t)op | (uint32_t)n << 8;
-    memcpy(list + nlist, w, 4u * n);
+    uint32_t *w = list + nlist;
+    memset(w, 0, 4u * n);
     nlist += (uint32_t)n;
+    return w;
 }
+void gpu_cmd(int op, int n, const uint32_t *w) { memcpy(gpu_put(op, n), w, 4u * n); }
 
 uint32_t gpu_pending(void) { return nlist; }
 
@@ -39,9 +42,10 @@ void gpu_set_shot(const char *path) { (void)path; }
 void gpu_keep_frame(void) {}
 
 void gpu_submit(void) {
-    uint32_t k = (box.seq + 1) & 1;
-    if (bufcap[k] < nlist) { bufcap[k] = nlist; buf[k] = realloc(buf[k], 4u * nlist); }
-    memcpy(buf[k], list, 4u * nlist);
+    // The list itself becomes frame k (no copy); the next frame is written into the buffer of frame k-2, which the
+    // page has finished (gpu_wait: done >= seq - 1 before this submit).
+    uint32_t k = (box.seq + 1) & 1, *t = buf[k], tc = bufcap[k];
+    buf[k] = list, bufcap[k] = cap, list = t, cap = tc;
     box.ptr[k] = (uint32_t)(uintptr_t)buf[k];
     box.len[k] = nlist;
     nlist = 0;
