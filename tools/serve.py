@@ -15,15 +15,23 @@ context; only localhost is exempt). The certificate comes from a local CA in bui
 the Mac keychain is not touched). The phone trusts it once: open https://<mac>.local:5443/lan-ca.crt, install the
 profile, then Settings > General > About > Certificate Trust Settings > full trust (iOS); Android: Settings > Security
 > Install a certificate > CA. The leaf certificate is remade when the Mac's LAN address changes.
+HTTP/1.1 keep-alive on both ports: every response has a Content-Length (204 and 304 have no body), and a request whose body
+is not read closes its connection, so one connection carries the many Range reads of the game thread.
+--lan also opens a plain-HTTP setup port (5444) that serves only /setup, /setup.json, /lan-ca.crt and /nfsu.mobileconfig: a
+device that does not trust the CA yet cannot open the HTTPS page, so it starts here (scan the QR on /setup, install the
+profile; iOS: Settings > General > About > Certificate Trust Settings > full trust). /nfsu.mobileconfig = the CA as an iOS
+profile (payload com.apple.security.root), made here from build/lan-cert/ca.crt. RN_LAN_PORT / RN_SETUP_PORT change the two ports.
 Usage: .venv/bin/python tools/serve.py [port] [--lan]
 """
-import email.utils, gzip, http.server, json, os, shutil, socket, ssl, subprocess, sys, threading, urllib.parse
+import email.utils, gzip, hashlib, http.server, json, os, plistlib, shutil, socket, ssl, subprocess, sys, threading, urllib.parse, uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARGS = [a for a in sys.argv[1:] if a != "--lan"]
 LAN = "--lan" in sys.argv
 PORT = int(ARGS[0]) if ARGS else 5180
-LAN_PORT = 5443
+LAN_PORT = int(os.environ.get("RN_LAN_PORT") or 5443)
+SETUP_PORT = int(os.environ.get("RN_SETUP_PORT") or 5444)
+LAN_INFO = {}     # filled when --lan starts: host, ip, ports
 CERT = os.path.join(ROOT, "build", "lan-cert")
 WORLD_DIR = os.path.join(ROOT, os.environ.get("RN_WORLD_DIR") or "build/openworld")
 
@@ -57,11 +65,53 @@ def listing(top):
     return json.dumps(sorted(files)).encode()
 
 
+def mobileconfig():
+    """The local CA as an unsigned iOS configuration profile (a root certificate payload), or None before the CA exists."""
+    ca = os.path.join(CERT, "ca.crt")
+    if not os.path.exists(ca):
+        return None
+    der = ssl.PEM_cert_to_DER_cert(open(ca).read())
+    ns = uuid.uuid5(uuid.NAMESPACE_URL, "https://nfsu.local/lan-ca/" + hashlib.sha256(der).hexdigest())
+    cert = {"PayloadType": "com.apple.security.root", "PayloadVersion": 1, "PayloadIdentifier": "com.nfsu.lan.ca.cert",
+            "PayloadUUID": str(uuid.uuid5(ns, "cert")).upper(), "PayloadDisplayName": "NFSU local CA", "PayloadContent": der}
+    top = {"PayloadType": "Configuration", "PayloadVersion": 1, "PayloadIdentifier": "com.nfsu.lan.ca", "PayloadUUID": str(ns).upper(),
+           "PayloadDisplayName": "NFSU local CA", "PayloadDescription": "Lets this device open the NFSU page on your Mac over HTTPS.",
+           "PayloadOrganization": "NFSU (this Mac)", "PayloadContent": [cert]}
+    return plistlib.dumps(top)
+
+
+def setup_info():
+    host, ip = LAN_INFO.get("host"), LAN_INFO.get("ip")
+    return json.dumps({"lan": bool(LAN_INFO), "https": f"https://{host}:{LAN_PORT}/" if host else None,
+                       "https_ip": f"https://{ip}:{LAN_PORT}/" if ip else None,
+                       "setup": f"http://{host}:{SETUP_PORT}/setup" if host else None,
+                       "setup_ip": f"http://{ip}:{SETUP_PORT}/setup" if ip else None,
+                       "ca": "/lan-ca.crt", "profile": "/nfsu.mobileconfig"}).encode()
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"      # keep-alive: every answer below carries its Content-Length
+    timeout = 300                      # an idle connection frees its thread
+
+    def reply(self, code, ctype, body, extra=()):
+        self.send_response(code)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(body)))
+        for k, v in extra:
+            self.send_header(k, v)
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
+    def refuse(self, code):
+        """An error before the request body was read: close, or the body would be parsed as the next request."""
+        self.close_connection = True
+        self.send_error(code)
+
     def do_PUT(self):
         p = save_path(self.path, save_root(self.headers)) if self.path.startswith("/save/") else None
         if not p:
-            self.send_error(403)
+            self.refuse(403)
             return
         body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
         if self.path.endswith("/"):         # PUT /save/dir/ makes a directory (CreateDirectoryA)
@@ -79,7 +129,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         route = self.path.split("?", 1)[0]
         if route not in ("/log", "/telemetry"):
-            self.send_error(403)
+            self.refuse(403)
             return
         body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
         name = "webcheck" if "HeadlessChrome" in self.headers.get("User-Agent", "") else "web"
@@ -108,22 +158,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         route = self.path.split("?", 1)[0]
         if route == "/becarios":             # the OWNER's Becario monitor (tools/becmon.py)
             import becmon
-            body = becmon.page()
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.send_header("Cache-Control", "no-store")
-            self.end_headers()
-            self.wfile.write(body)
+            self.reply(200, "text/html; charset=utf-8", becmon.page(), [("Cache-Control", "no-store")])
+            return
+        if route == "/setup":                # LAN entry page (web/setup.html): QR, CA, iOS profile
+            self.path = "/setup.html"
+        elif route == "/setup.json":
+            self.reply(200, "application/json", setup_info(), [("Cache-Control", "no-store")])
+            return
+        elif route == "/nfsu.mobileconfig":
+            body = mobileconfig()
+            if body is None:
+                self.send_error(404, "no CA yet: start serve.py with --lan once")
+            else:
+                self.reply(200, "application/x-apple-aspen-config", body, [("Content-Disposition", 'attachment; filename="nfsu-ca.mobileconfig"')])
             return
         if route in ("/game-files.json", "/save-files.json"):
             top = os.path.join(ROOT, "game") if route == "/game-files.json" else save_root(self.headers)
-            body = listing(top) if os.path.isdir(top) else b"[]"
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+            self.reply(200, "application/json", listing(top) if os.path.isdir(top) else b"[]")
             return
         if route == "/out/speed.wasm" and self.wasm_packed():
             return
@@ -136,17 +187,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if a >= size or b < a:
                 self.send_response(416)
                 self.send_header("Content-Range", f"bytes */{size}")
+                self.send_header("Content-Length", "0")
                 self.end_headers()
                 return
             with open(path, "rb") as f:
                 f.seek(a)
                 body = f.read(b - a + 1)
-            self.send_response(206)
-            self.send_header("Content-Type", "application/octet-stream")
-            self.send_header("Content-Range", f"bytes {a}-{b}/{size}")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+            self.reply(206, "application/octet-stream", body, [("Content-Range", f"bytes {a}-{b}/{size}")])
             return
         super().do_GET()
 
@@ -187,6 +234,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def translate_path(self, path):
         path = path.split("?", 1)[0].split("#", 1)[0]
+        if path == "/setup.html":
+            return os.path.join(ROOT, "web", "setup.html")
         if path == "/lan-ca.crt":
             return os.path.join(CERT, "ca.crt")
         if path == "/pc/Speed.exe":
@@ -239,14 +288,30 @@ def lan_cert(ip, host):
     return f("leaf.crt"), f("leaf.key")
 
 
+class SetupHandler(Handler):
+    """The plain-HTTP LAN port: only the page that gets a new device to trust the CA, nothing of the game or the saves."""
+    def do_GET(self):
+        if self.path.split("?", 1)[0] in ("/setup", "/setup.json", "/lan-ca.crt", "/nfsu.mobileconfig"):
+            super().do_GET()
+        else:
+            self.send_error(404)
+
+    def do_PUT(self):
+        self.refuse(405)
+
+    do_POST = do_DELETE = do_HEAD = do_PUT
+
+
 PACK_LOCK = threading.Lock()
 Handler.extensions_map = {**Handler.extensions_map, ".wasm": "application/wasm", ".js": "text/javascript", ".crt": "application/x-x509-ca-cert"}
 if LAN:
     ip, host = lan_names()
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     ctx.load_cert_chain(*lan_cert(ip, host))
+    LAN_INFO.update(host=host, ip=ip)
     lan = http.server.ThreadingHTTPServer(("0.0.0.0", LAN_PORT), Handler)
     lan.socket = ctx.wrap_socket(lan.socket, server_side=True, do_handshake_on_connect=False)   # handshake in each request thread
     threading.Thread(target=lan.serve_forever, daemon=True).start()
-    print(f"LAN: https://{host}:{LAN_PORT}/  (https://{ip}:{LAN_PORT}/)  CA for the phone: https://{host}:{LAN_PORT}/lan-ca.crt", flush=True)
+    threading.Thread(target=http.server.ThreadingHTTPServer(("0.0.0.0", SETUP_PORT), SetupHandler).serve_forever, daemon=True).start()
+    print(f"LAN: https://{host}:{LAN_PORT}/  (https://{ip}:{LAN_PORT}/)  setup page + CA for a new device: http://{host}:{SETUP_PORT}/setup", flush=True)
 http.server.ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()

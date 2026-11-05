@@ -30,14 +30,18 @@ function startInput(M, canvas, steerLog) {
     Atomics.store(h, base, head + 1);
   }
   const held = new Set();
+  // One key change by DIK code; web/pad.js uses it too, so a pad and the keyboard share the ring and the held set.
+  function setKey(d, down, ts = performance.now()) {
+    if (down === held.has(d)) return;                  // auto-repeat: DirectInput reports changes only
+    down ? held.add(d) : held.delete(d);
+    steerLog?.(`page key ${d.toString(16)} ${down ? 'down' : 'up'} t ${ts.toFixed(1)}`);
+    push((down ? 0x100 : 0) | d);
+  }
   function key(ev, down) {
     const d = DIK[ev.code];
     if (d === undefined) return;
     ev.preventDefault();
-    if (down === held.has(d)) return;                  // auto-repeat: DirectInput reports changes only
-    down ? held.add(d) : held.delete(d);
-    steerLog?.(`page key ${d.toString(16)} ${down ? 'down' : 'up'} t ${ev.timeStamp.toFixed(1)}`);
-    push((down ? 0x100 : 0) | d);
+    setKey(d, down, ev.timeStamp);
   }
   canvas.tabIndex = 0;
   canvas.addEventListener('keydown', e => key(e, true));
@@ -78,4 +82,5 @@ function startInput(M, canvas, steerLog) {
   canvas.addEventListener('wheel', e => { Atomics.add(H(), base + 4, e.deltaY < 0 ? 120 : -120); e.preventDefault(); }, { passive: false });
   canvas.addEventListener('contextmenu', e => e.preventDefault());
   canvas.focus();
+  return { key: setKey };
 }

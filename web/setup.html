@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFSU - conectar un dispositivo</title>
+<style>
+  :root { --bg: #0b0d10; --fg: #c9d1d9; --dim: #8b949e; --ok: #3fb950; --api: #79c0ff; }
+  body { margin: 0; padding: 20px; background: var(--bg); color: var(--fg); font: 16px/1.5 -apple-system, system-ui, sans-serif; max-width: 640px; }
+  h1 { font-size: 20px; } h2 { font-size: 16px; margin: 28px 0 6px; }
+  a { color: var(--api); } code { font: 14px ui-monospace, Menlo, monospace; word-break: break-all; }
+  .dim { color: var(--dim); } .qr { background: #fff; display: inline-block; padding: 6px; border-radius: 6px; } .qr svg { display: block; }
+  .btn { display: inline-block; padding: 10px 16px; border: 1px solid #30363d; border-radius: 8px; margin: 4px 8px 4px 0; text-decoration: none; }
+</style>
+</head>
+<body>
+<h1>Need for Speed Underground en este Wi-Fi</h1>
+<p id="off" class="dim" hidden>El servidor no está en modo LAN. En el Mac: <code>.venv/bin/python tools/serve.py --lan</code> (o carga el LaunchAgent) y recarga esta página.</p>
+<div id="on" hidden>
+<h2>1. Confiar en el certificado (una vez por dispositivo)</h2>
+<p>Escanea este código con la cámara del iPad / iPhone / otro Mac, o abre <code id="setupUrl"></code>.</p>
+<div class="qr" id="qrSetup"></div>
+<p>
+  <a class="btn" id="profile" href="/nfsu.mobileconfig">Perfil para iOS / macOS (.mobileconfig)</a>
+  <a class="btn" id="ca" href="/lan-ca.crt">Certificado CA (.crt)</a>
+</p>
+<ul class="dim">
+  <li>iOS: abre el perfil, Ajustes &gt; Perfil descargado &gt; Instalar; luego Ajustes &gt; General &gt; Información &gt; Ajustes de confianza de certificados &gt; activa <b>NFSU local CA</b>.</li>
+  <li>Otro Mac: abre el .mobileconfig (Ajustes del Sistema &gt; Privacidad y seguridad &gt; Perfiles &gt; Instalar), luego Llavero &gt; NFSU local CA &gt; Confiar siempre. Chrome y Safari usan el llavero.</li>
+</ul>
+<h2>2. Abrir el juego</h2>
+<div class="qr" id="qrGame"></div>
+<p><a id="game" href="#"></a><br><span class="dim">Si el nombre .local no abre: <a id="gameIp" href="#"></a></span></p>
+<p class="dim">Pantalla completa y sonido empiezan con un toque o una tecla. Un control (gamepad): conéctalo y pulsa un botón.</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous"></script>
+<script>
+// The QR library is a pinned cdnjs file (SRI); without Internet the URLs above stay as text and links.
+(async () => {
+  const info = await (await fetch('/setup.json', { cache: 'no-store' })).json();
+  if (!info.lan) { document.getElementById('off').hidden = false; return; }
+  document.getElementById('on').hidden = false;
+  const set = (id, url) => { const a = document.getElementById(id); a.textContent = url; a.href = url; };
+  document.getElementById('setupUrl').textContent = info.setup;
+  set('game', info.https); if (info.https_ip) set('gameIp', info.https_ip);
+  const qr = (id, text) => {
+    if (typeof qrcode === 'undefined') return;
+    const q = qrcode(0, 'M'); q.addData(text); q.make();
+    document.getElementById(id).innerHTML = q.createSvgTag({ cellSize: 5, margin: 0, scalable: true });
+    document.querySelector('#' + id + ' svg').setAttribute('width', 220);
+  };
+  qr('qrSetup', info.setup); qr('qrGame', info.https);
+})().catch(e => { document.body.insertAdjacentHTML('beforeend', '<p class="dim">setup: ' + e.message + '</p>'); });
+</script>
+</body>
+</html>

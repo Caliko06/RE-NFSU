@@ -67,5 +67,8 @@ async function startAudio(M, log) {
   const resume = () => { if (ctx.state !== 'running') ctx.resume(); };
   addEventListener('keydown', resume, true);
   addEventListener('mousedown', resume, true);
+  addEventListener('touchend', resume, true);            // iOS only unlocks audio from touchend / click, not touchstart
+  addEventListener('click', resume, true);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') resume(); });   // iOS suspends it when the tab hides
   return ctx;
 }

@@ -131,7 +131,8 @@ function line(s, cls) {
   const telem = startTelemetry(M, t0, s => line(s), allLog);
   startGpu(M, document.getElementById('screen'), s => line(s, 'api'), telem?.frame).catch(e => line('gpu.js: ' + e.message, 'stop'));
   // RN_STEERLOG (host/input.c): also each key at the page and each present's GPU completion, on the page's clock
-  startInput(M, document.getElementById('screen'), /RN_STEERLOG/.test(location.search) ? s => line(s) : null);
+  const input = startInput(M, document.getElementById('screen'), /RN_STEERLOG/.test(location.search) ? s => line(s) : null);
+  startPad(input);                          // web/pad.js: a gamepad into the same ring
   startTune(M);
   startAudio(M, s => line(s)).catch(e => line('audio.js: ' + e.message, 'stop'));
   window.RN_M = M;                          // for checks from the console or tools/webcheck.mjs
