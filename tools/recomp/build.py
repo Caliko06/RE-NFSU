@@ -7,7 +7,7 @@ build/gen/table.c  sorted guest address -> function table for rn_call
 census/lift_report.json  counts: functions, traps by reason
 Usage: .venv/bin/python tools/recomp/build.py [native|web|lift]   (default: native)
 """
-import bisect, collections, json, multiprocessing as mp, os, re, struct, subprocess, sys
+import bisect, collections, glob, hashlib, json, multiprocessing as mp, os, re, struct, subprocess, sys
 import pefile
 sys.path.insert(0, os.path.dirname(__file__))
 from lift import Lifter, Unsupported
@@ -52,8 +52,27 @@ def write_if_changed(path, text):
     open(path, "w").write(text)
 
 
+def seal():
+    """Hash of everything the lift reads: the exe, the census, the lifter and patch sources, the ABK files (by size and time)."""
+    h = hashlib.sha256(f"cov={COV} x87run={os.environ.get('RN_X87RUN')}".encode())
+    for f in ["pc/Speed.exe", "census/speed_exe_functions.tsv",
+              *sorted(glob.glob("tools/recomp/**/*.py", recursive=True) + glob.glob("tools/recomp/caves/*.s"))]:
+        h.update(f.encode() + b"\0" + open(f, "rb").read())
+    for r, _, fs in sorted(os.walk("game")):
+        for f in sorted(fs):
+            if f.lower().endswith(".abk"):
+                st = os.stat(os.path.join(r, f))
+                h.update(f"{r}/{f} {st.st_size} {st.st_mtime_ns}".encode())
+    return h.hexdigest()
+
+
 def lift_all():
     os.makedirs(GEN, exist_ok=True)
+    sig, sealf = seal(), f"{GEN}/.seal"
+    if os.path.exists(sealf) and open(sealf).read() == sig and all(
+            os.path.exists(f"{GEN}/{n}") for n in ["funcs.h", "table.c", "abk.c"] + [f"f{k:03d}.c" for k in range(CHUNKS)]):
+        print(f"lift skipped: inputs unchanged (seal {sig[:12]}, delete {sealf} to force)")
+        return
     with mp.Pool(JOBS, initializer=init) as pool:
         res = pool.map(work, sorted(FUNCS), chunksize=64)
     # A data pointer that lands inside an instruction of real code is not a code start.
@@ -100,6 +119,7 @@ def lift_all():
           f"trap sites {sum(traps.values())}")
     print(f"ABK code modules: {mods}")
     print("top trap reasons:", dict(traps.most_common(15)))
+    open(sealf, "w").write(sig)
 
 
 def stale(o, src, gen=GEN):
