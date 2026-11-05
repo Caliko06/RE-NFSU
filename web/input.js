@@ -38,7 +38,7 @@ function startInput(M, canvas, steerLog) {
     push((down ? 0x100 : 0) | d);
   }
   function key(ev, down) {
-    const d = DIK[ev.code];
+    const d = dikFor(ev.code);                         // web/binds.js: the saved key bindings (default: the key's own DIK)
     if (d === undefined) return;
     ev.preventDefault();
     setKey(d, down, ev.timeStamp);
