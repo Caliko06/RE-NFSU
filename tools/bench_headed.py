@@ -1,8 +1,8 @@
 # Headed-race frame report: reads a finished bench run (webcheck log + telemetry NDJSON) and prints the
 # race frame stats and the gate. It never opens a browser, so a run made by hand can be read later.
 # usage: bench_headed.py report NDJSON LOG [--warm 10] [--secs 180]
-#        bench_headed.py url PORT        (race 1103, autopilot, same key profile as tools/bench.py)
-import json, sys
+#        bench_headed.py url PORT [--stop 300]   (race 1103, autopilot, same key profile as tools/bench.py)
+import json, re, sys
 from completion import _PROFILE
 
 HUD = 'd3d9 race HUD'
@@ -10,12 +10,12 @@ HUD = 'd3d9 race HUD'
 
 def args(argv):
     # small option reader: first two words are the command and its file arguments
-    opts = {'warm': 10.0, 'secs': 180.0}
+    opts = {'warm': 10.0, 'secs': 180.0, 'stop': 300.0}
     pos = []
     i = 0
     while i < len(argv):
         a = argv[i]
-        if a in ('--warm', '--secs'):
+        if a in ('--warm', '--secs', '--stop'):
             opts[a[2:]] = float(argv[i + 1])
             i += 2
         else:
@@ -104,13 +104,49 @@ def report(ndjson_path, log_path, warm, secs):
     drop = sum(v.get('drop', 0) for v in win)
     top = max((v.get('maxMs', 0) for v in win), default=0)
     print(f'vsync {len(win)} events: rep {rep}  drop {drop}  maxMs {top:.1f}')
+    causes(rows, c, start, end)
+    sites(log_path, start, end)
     return 0
 
 
-def url(port):
-    # race 1103 from the menu: the jump env and the key profile mirror tools/bench.py
+def causes(rows, c, start, end):
+    # each frame > 20 ms by the bucket that took most of it (telemetry rows between two presents): page = waiting for the
+    # page/GPU (gpuWait), gil = waiting for another guest thread, read = file reads, wait = the game's own busy wait (many
+    # clock reads), work = the game's code (few clock reads)
+    seg, last, n = [], None, {}
+    for r in rows:
+        seg.append(r)
+        if not r[c['present']]:
+            continue
+        t = r[c['t']]
+        if last is not None and start <= last / 1000 < end and 20 < t - last <= 1000:
+            dt = t - last
+            S = lambda k: sum(x[c[k]] for x in seg if x[c[k]] < 1e9) if k in c else 0
+            b = {'page': S('gpuWait'), 'gil': S('gilMain'), 'read': S('read')}
+            b['wait' if S('clockCalls') > 1000 else 'work'] = dt - sum(b.values())
+            k = max(b, key=b.get)
+            x = n.setdefault(k, [0, 0]); x[0] += 1; x[1] += dt > 33.4
+        last, seg = t, []
+    print('frames > 20 ms by cause (count, of them > 33.4 ms):', '  '.join(f'{k} {v[0]} ({v[1]})' for k, v in sorted(n.items(), key=lambda kv: -kv[1][0])))
+
+
+def sites(log_path, start, end):
+    # 'spike:' lines (host/d3d9.c, frames > 25 ms): the top clock-read call site names the loop the frame ran
+    n = {}
+    for line in open(log_path, errors='replace'):
+        m = re.match(r'([\d.]+) spike: frame \d+ ([\d.]+) ms, clock \d+: (0x[0-9a-f]+)?.*reads (\d+)', line)
+        if not m or not start <= float(m.group(1)) < end:
+            continue
+        k = 'reads' if int(m.group(4)) else (m.group(3) or 'none')
+        x = n.setdefault(k, [0, 0]); x[0] += 1; x[1] += float(m.group(2)) > 33.4
+    print('spike lines by top clock site (count, of them > 33.4 ms):', '  '.join(f'{k} {v[0]} ({v[1]})' for k, v in sorted(n.items(), key=lambda kv: -kv[1][0])[:8]))
+
+
+def url(port, stop=300):
+    # race 1103 from the menu: the jump env and the key profile mirror tools/bench.py. stopafter: the page leaves for
+    # about:blank after that many seconds (web/telemetry.js), so a headed tab does not keep the game running.
     nav = ','.join(['20000:RETURN'] + _PROFILE[1:] + ['1500@=MU_Main_PC:RETURN'])
-    print(f'http://127.0.0.1:{port}/?mute=1&env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1'
+    print(f'http://127.0.0.1:{port}/?mute=1&stopafter={stop:.0f}&env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1'
           f'&jump=0:1103&keys={nav}')
     return 0
 
@@ -123,6 +159,6 @@ if __name__ == '__main__':
     if pos[0] == 'report' and len(pos) >= 3:
         sys.exit(report(pos[1], pos[2], opts['warm'], opts['secs']))
     if pos[0] == 'url' and len(pos) >= 2:
-        sys.exit(url(pos[1]))
+        sys.exit(url(pos[1], opts['stop']))
     print('usage: bench_headed.py report NDJSON LOG [--warm 10] [--secs 180] | url PORT')
     sys.exit(2)
