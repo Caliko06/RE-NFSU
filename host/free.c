@@ -715,13 +715,18 @@ void free_tick(Ctx *c) {
                       ldf(c, r + 0x814) - ldf(c, player + 0x814));
         if (o > 200) break;
     }
-    // docs/openworld_e_re.md B: each rival's AI context: the racer's AIVehicle (vtable 0x6c89f0, ctor 0x4620c0 over the base 0x44a330, +4 = its vehicle, one guest memory scan) with the
+    // docs/openworld_e_re.md B: each rival's AI context: the racer's AIVehicle (vtable 0x6c89f0, ctor 0x4620c0 over the base 0x44a330, +4 = its vehicle) with the
     // context at +0x2c and its PATH list (ctx + 0x3a8 -> object: count +4, node objects at +8 + 4 i, section byte +0x5c, node short
     // +0x5e (short), current index +0xac).
-    if (!ncand) {
-        const uint32_t *m = (const uint32_t *)c->mem;
-        for (uint32_t w = 0x800000 / 4; w < GUEST_MEM / 4 - 1 && ncand < 64; w++) if (m[w] == 0x6c89f0) cand[ncand++] = w * 4;
-        for (int j = 0; j < ncand; j++) rn_log("FREE aivehicle %08x: +4 %08x +8 %08x", cand[j], ld(c, cand[j] + 4, 4), ld(c, cand[j] + 8, 4));
+    // The AI factory 0x425fe0 stores each car's AI object at car+0x2c (esi[0xb], kind esi[9]; case 3 = 0x4620c0), so the race list
+    // gives every AIVehicle; new ones are appended so acts[] keeps its index (audit 2026-11-05 C05: was a 1 GB scan every 120 frames).
+    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200 && ncand < 64; r = ld(c, r, 4), k++) {
+        uint32_t obj = ld(c, r + 0x2c, 4), j = 0;
+        if (!obj || obj > GUEST_MEM - 0x500 || ld(c, obj, 4) != 0x6c89f0) continue;
+        while (j < (uint32_t)ncand && cand[j] != obj) j++;
+        if (j < (uint32_t)ncand) continue;
+        cand[ncand++] = obj;
+        rn_log("FREE aivehicle %08x: +4 %08x +8 %08x", obj, ld(c, obj + 4, 4), ld(c, obj + 8, 4));
     }
     for (int j = 0; j < ncand; j++) {
         uint32_t obj = cand[j], veh = ld(c, obj + 4, 4);
