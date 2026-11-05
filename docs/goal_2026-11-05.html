@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFSU Día de Reestructura</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1f;--mute:#6b6b70;--line:#e2e0da;--acc:#c2410c;--ok:#15803d;--warn:#b45309;--bad:#b91c1c;--chip:#f1efe9;--code:#f3f2ee}
+@media (prefers-color-scheme:dark){:root{--bg:#111214;--card:#1a1b1e;--ink:#ececee;--mute:#9a9aa2;--line:#2c2d31;--acc:#fb923c;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--chip:#24252a;--code:#202126}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+main{max-width:1060px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:28px;margin:0 0 4px;letter-spacing:-.02em}
+h2{font-size:20px;margin:40px 0 12px;letter-spacing:-.01em}
+h3{font-size:16px;margin:0 0 8px}
+.sub{color:var(--mute);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.kpi{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.kpi small{font-size:13px;color:var(--mute);font-weight:500}
+.chip{display:inline-block;background:var(--chip);border-radius:999px;padding:1px 9px;font-size:12px;margin:2px 4px 2px 0;color:var(--mute)}
+.conf{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute)}
+.bar{flex:1;height:8px;background:var(--chip);border-radius:6px;overflow:hidden;max-width:220px}
+.bar i{display:block;height:100%;background:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.tw{overflow-x:auto}
+.k{font-weight:600}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+code,pre{font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--code);border-radius:6px}
+code{padding:1px 5px}
+pre{padding:12px 14px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;border:1px solid var(--line)}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:12px 0}
+details>summary{cursor:pointer;padding:14px 18px;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center}
+details>summary::-webkit-details-marker{display:none}
+details[open]>summary{border-bottom:1px solid var(--line)}
+details .in{padding:14px 18px}
+.bn{font-size:12px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.06em}
+.row{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:6px 0}
+@media(max-width:640px){.row{grid-template-columns:1fr}.row .k{margin-top:8px}}
+.tag{font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--chip)}
+.copy{float:right;font:12px -apple-system,sans-serif;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:3px 10px;cursor:pointer}
+ol,ul{padding-left:20px;margin:6px 0}
+li{margin:3px 0}
+.split{display:flex;height:22px;border-radius:6px;overflow:hidden;font-size:12px;color:#fff;font-weight:600}
+.split div{display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body><main>
+
+<h1>Día de reestructura NFSU</h1>
+<p class="sub">5 nov 2026 · Dos auditores Sonnet (A: producto, B: proceso) se refutaron entre sí; Main integró. Fuente: <code>docs/GOAL_2026-11-05.md</code> y <code>docs/goal_2026-11-05/</code>.</p>
+
+<div class="card">
+<h3>La respuesta corta</h3>
+<p style="margin:0">Lo que falta para jugar en cualquier navegador y equipo de tu casa <b>no es el motor</b>, sino la capa web. No hay nada táctil ni de gamepad. Safari nunca se ha medido. Nadie ha medido una carrera de 3 minutos con ventana visible. El servidor no está listo para la red. Además, las reglas cuestan caro: el 35 % de los commits son solo docs, 10 reverts vinieron de efectos hechos sin que los vieras y hay topes que te obligan a escribir "budget +N". El plan son <b>4 bloques en un día</b> con una orquestadora y 3 ventanas, cada una dueña de sus archivos todo el día.</p>
+</div>
+
+<div class="grid">
+<div class="card"><div class="kpi">4 <small>bloques · ~3 h c/u</small></div>Base+alcance → táctil → sin tirones → feel+WORLD</div>
+<div class="card"><div class="kpi">3+1 <small>ventanas</small></div>w1 gráficos/perf · w2 input/LAN · w3 juego · orquestadora</div>
+<div class="card"><div class="kpi">p99 ≤ 20 ms <small>y 0 &gt; 33 ms</small></div>carrera 1103, 3 min, ventana visible, Chrome y Safari, 2 de 3</div>
+<div class="card"><div class="kpi">~65 % <small>confianza global</small></div>alcance+táctil alto; el "0 picos" literal: 40 %</div>
+</div>
+
+<div class="card">
+<h3>Reparto del esfuerzo (lo pediste: 70 / 20 / 10)</h3>
+<div class="split"><div style="width:70%;background:#c2410c">70 % construir · ventanas</div><div style="width:20%;background:#7c3aed">20 % integrar</div><div style="width:10%;background:#0369a1">10 %</div></div>
+<p style="margin:8px 0 0;color:var(--mute);font-size:13px">Se cumple por la forma de trabajar, no por una regla escrita:</p>
+<ul style="margin:4px 0 0;color:var(--mute);font-size:13px">
+<li><b>10 % planear:</b> solo la primera hora del Bloque 1.</li>
+<li><b>20 % integrar:</b> la orquestadora no escribe código de más de 20 líneas; solo lee los DONE y mezcla al final de cada bloque.</li>
+<li><b>70 % construir:</b> todo lo demás lo hacen las 3 ventanas.</li>
+</ul>
+</div>
+
+<h2>Los 4 bloques</h2>
+
+<details open><summary><div><div class="bn">Bloque 1 · ~3.5 h</div><h3 style="margin:2px 0 0">Base limpia + alcance: Safari, red de casa, gamepad</h3></div><div class="conf">70 %<div class="bar"><i style="width:70%"></i></div></div></summary><div class="in">
+<div class="row"><div class="k">Por qué</div><div>Safari nunca se midió aquí. Un iPhone sí jugó WORLD, según un HANDOFF del 11-03, pero es la afirmación de un worker, no una medición. Si Safari necesita un arreglo grande, hay que saberlo a la hora 1, no a la 6. Además, el build del 11-05 está construido pero nunca se corrió.</div>
+<div class="k">Qué es</div><div>Primera hora, la orquestadora sola:
+<ul>
+<li>edita las reglas (ver abajo);</li>
+<li>borra rockport/ao/canon/dash/carao y hace commit de <code>docs/re/ai/</code>;</li>
+<li>enciende RN_UNLOCK en original y TRAFPAINT/LEAN en remaster;</li>
+<li>parte <code>patches.py</code> por tema y <code>index.html</code>→<code>boot.js</code>, y agrega <code>?mute=1</code>;</li>
+<li>crea 3 worktrees con build propio y corre <b>un</b> <code>webcheck --route</code>.</li>
+</ul>
+Después arrancan las ventanas.</div>
+<div class="k">Cómo se arregla</div><div><b>w1:</b> abre Safari ya (<code>open -a Safari</code>, silenciado) y lee <code>build/web.log</code> y la telemetría. Solo si falla, agrega un Worker de respaldo para <code>Atomics.waitAsync</code> (<code>web/gpu.js:1367</code>, el único motor de frames) y corrige el WGSL. Arma el bench con ventana visible.<br>
+<b>w2:</b> <code>serve.py</code> pasa a HTTP/1.1 keep-alive (hoy es 1.0: un apretón TLS por cada lectura). Suma un LaunchAgent, una página <code>/setup</code> con QR, certificado y perfil iOS, <code>pad.js</code> y el desbloqueo de audio en iOS.<br>
+<b>w3:</b> empieza el RE de reset/muros: 0x427c50 limpia car+0x540, el refill está en 0x4267a0/0x4407b0 y el pool es de 8192.</div>
+<div class="k">Qué cambia para ti</div><div>Una URL fija que abre sola, desde esta Mac, otra Mac o el iPad. El gamepad mueve el menú y el coche. Remaster con tráfico pintado e inclinado. RN_UNLOCK también en original.</div>
+<div class="k">Resultado esperado</div><div><code>webcheck --route</code> PASS; Safari corre la 1103 por 180 s sin errores; otra Mac e iPad llegan al menú por https; el pad maneja.</div>
+<div class="k">Riesgo real</div><div><span class="warn">Medio.</span> El compilador WGSL de Safari es más estricto que el de Chrome, y nadie sabe si acepta nuestros shaders generados (<code>host/sm1.c</code>). Además, cada equipo tiene que confiar una vez en el certificado: es un paso manual tuyo.</div>
+<div class="k">Test</div><div><b>Sí:</b> borrados, build y arranque (1 route), y Safari por tocar render. <b>No:</b> servidor ni pad: tú pruebas.</div></div>
+</div></details>
+
+<details><summary><div><div class="bn">Bloque 2 · ~3 h</div><h3 style="margin:2px 0 0">Táctil en iPad/iPhone + línea base de tirones</h3></div><div class="conf">65 %<div class="bar"><i style="width:65%"></i></div></div></summary><div class="in">
+<div class="row"><div class="k">Por qué</div><div><code>grep touch web/*.js</code> no encuentra nada: hoy solo hay teclado y ratón, y los menús son de teclado. Es el hueco de producto más grande. Para los tirones, toda la medición existente es Chrome headless de ~100 s (3-5 frames &gt; 33 ms por minuto), y headless no tiene vsync real.</div>
+<div class="k">Qué es</div><div>Un overlay táctil y una tabla de tirones <b>por causa</b>, medida con ventana visible en Chrome y Safari.</div>
+<div class="k">Cómo se arregla</div><div><b>w2:</b> <code>touch.js</code> mete eventos de tecla al mismo anillo de input que el teclado: dirección, gas, freno, nitro, freno de mano, cámara, pausa y d-pad/OK/atrás para menús, con <code>touch-action:none</code> y 30 fps automáticos en pantallas táctiles.<br>
+<b>w1:</b> mide en slots avisados. Las primeras curas: lectura anticipada en <code>host/files.c</code> y un arena por frame en lugar de un calloc por cada draw (<code>host/d3d9.c ~2197</code>).<br>
+<b>w3:</b> parche de reset/muros, con difftest y un fantasma de mismo seed con resets forzados.</div>
+<div class="k">Qué cambia para ti</div><div>Juegas una carrera completa en el iPad con el dedo. El coche ya no atraviesa muros tras un reset.</div>
+<div class="k">Resultado esperado</div><div>El iPad termina una carrera (tú la juegas); hay una tabla de picos por causa; 0 atravesadas tras resets forzados.</div>
+<div class="k">Riesgo real</div><div><span class="warn">Medio.</span> Con dirección digital, el táctil se sentirá igual de "tardío" que el teclado; la dirección analógica queda para después. El RE de reset puede gastar sus 4 intentos.</div>
+<div class="k">Test</div><div><b>Sí:</b> el parche de reset, porque la física es compartida con original, y <code>files.c</code> por estar en la ruta de arranque. <b>No:</b> el táctil.</div></div>
+</div></details>
+
+<details><summary><div><div class="bn">Bloque 3 · ~3 h</div><h3 style="margin:2px 0 0">Sin tirones: llegar al número</h3></div><div class="conf">75 % p99 · 40 % "0"<div class="bar"><i style="width:55%"></i></div></div></summary><div class="in">
+<div class="row"><div class="k">Por qué</div><div>Tu meta es p99 ≤ 20 ms y cero frames &gt; 33 ms. Hoy, en headless, el p99 está en 19.6-21 ms con 3-5 picos por minuto. Las causas candidatas: lecturas de archivo síncronas a media carrera, ~13 MB de uniforms por frame (<code>U_STEP</code> en <code>gpu.js</code>), subidas de texturas en el hilo de la página y picos de WORLD en (1846,-727).</div>
+<div class="k">Qué es</div><div>Se arreglan las <b>2 causas que más cuentan en la tabla</b> del Bloque 2, no las que uno adivine.</div>
+<div class="k">Cómo se arregla</div><div><b>w1:</b> empaca los uniforms (sube solo el tramo usado), saca las subidas de texturas del frame crítico y agrega prefetch de streams.<br>
+<b>w3:</b> los picos de spawn y stream de WORLD en <code>host/</code>.<br>
+<b>w2:</b> pulido de <code>/setup</code>, valores por tipo de equipo y revisión de la pantalla de controles del juego para remapear.<br>
+Original también recibe estas curas, porque no cambian el feel.</div>
+<div class="k">Qué cambia para ti</div><div>La carrera se siente lisa en Chrome y en Safari, también en modo original.</div>
+<div class="k">Resultado esperado</div><div>Carrera 1103, visible, 180 s: p99 ≤ 20 ms y 0 &gt; 33 ms en 2 de 3 corridas, en ambos navegadores. Si quedan 1-2 picos se te reporta y <b>tú decides</b>; no se da por hecho en silencio.</div>
+<div class="k">Riesgo real</div><div><span class="bad">Alto para el cero literal.</span> Es una métrica de cola: el GC, macOS, el calor y otras apps abiertas también la mueven. Por eso las otras ventanas no corren nada durante los slots de medición.</div>
+<div class="k">Test</div><div><b>Sí:</b> el número define el bloque, y los cambios en gpu.js/d3d9.c tocan todos los draws.</div></div>
+</div></details>
+
+<details><summary><div><div class="bn">Bloque 4 · ~3 h</div><h3 style="margin:2px 0 0">Feel + WORLD + cierre</h3></div><div class="conf">60 %<div class="bar"><i style="width:60%"></i></div></div></summary><div class="in">
+<div class="row"><div class="k">Por qué</div><div>Los candidatos de feel (hornfix, chasecam, aceleración) siguen apagados. La IA de WORLD del 11-04 no se ha corrido sobre el build final. Hay tres planes vivos (PLAN, SCOPE y AI_SCOPE) que se contradicen.</div>
+<div class="k">Qué es</div><div>Se encienden los defaults de feel en remaster, con un commit por cambio para que cada uno se pueda revertir. Corren 3 fantasmas de WORLD de 30 min con el mismo seed, se hace el gate final y queda un solo PLAN.md.</div>
+<div class="k">Cómo se arregla</div><div><b>w3:</b> los fantasmas de WORLD y los defaults.<br>
+<b>w1:</b> lo que haya sobrado de perf.<br>
+<b>w2:</b> pulido táctil, y dirección analógica si sobra tiempo.<br>
+<b>Orquestadora:</b>
+<ul>
+<li>corre macbench 3 veces en Chrome y en Safari;</li>
+<li>deja un solo <code>docs/PLAN.md</code> y borra SCOPE y AI_SCOPE después de rescatar su método;</li>
+<li>limpia los 12 worktrees viejos de Becarios.</li>
+</ul></div>
+<div class="k">Qué cambia para ti</div><div>Remaster con el feel nuevo por defecto. Un solo plan. Todo jugable en :5180 y en la red de casa.</div>
+<div class="k">Resultado esperado</div><div>Los números del gate quedan registrados; los fantasmas de WORLD no muestran regresiones; tú juegas y das el veredicto.</div>
+<div class="k">Riesgo real</div><div><span class="warn">Medio.</span> El feel es tu gusto: hubo 10 reverts por "feo" o "peor". Cada cambio va en su propio commit para revertirlo en un paso.</div>
+<div class="k">Test</div><div><b>Sí:</b> un route final y el bench final. <b>No:</b> los defaults de feel (los juegas tú).</div></div>
+</div></details>
+
+<h2>Reglas: qué se corta y por qué</h2>
+<p class="sub">Tú autorizaste editar todo. Los dos auditores coinciden en que los hooks no fueron el gasto grande: el gasto vino de olas de nombres y censo, de efectos hechos sin que tú los vieras y de auditorías de auditorías. Pero los topes sí cortan el avance a cada rato.</p>
+<div class="card tw"><table>
+<tr><th>Regla</th><th>Hoy</th><th>Pasa a</th><th>Por qué</th><th>Conf.</th></tr>
+<tr><td>Llamadas por sesión</td><td>400</td><td class="ok">3000</td><td>25 de 124 sesiones necesitaron que escribieras "budget +N"; un día de orquestadora usa ~1500-2000.</td><td>75 %</td></tr>
+<tr><td>Subagentes Claude</td><td>3</td><td class="ok">8</td><td>Ya se rodeaba el tope con ventanas y Becarios; la sesión que integra queda sin margen.</td><td>65 %</td></tr>
+<tr><td>Sin prompt tuyo → solo WORKLIST</td><td>60 min · bypass ≤ 12 h</td><td class="ok">240 min · bypass ≤ 24 h</td><td>Un worker que solo recibe mensajes de otra sesión cuenta como "desatendido" desde el minuto 0 (verificado: <code>spend-guard.py:71</code> solo cuenta <code>origin.kind=="human"</code>). Se queda la regla anti-noche-desperdiciada.</td><td>70 %</td></tr>
+<tr><td>Tope de 3 ventanas worker</td><td>cuenta <i>todas</i> las <code>-wt/</code> de la Mac</td><td class="ok">3 por repo</td><td>Hoy las ventanas de Max Payne bloquean los lanzamientos de NFSU. Lo encontró Main, no los auditores.</td><td>85 %</td></tr>
+<tr><td>runcap (corridas)</td><td>30 por mensaje</td><td class="ok">100</td><td>Los mensajes entre sesiones no lo reinician, así que en la práctica son 30 por ventana en todo el día. El freno real ya lo ponen macgate y RN_SECS.</td><td>60 %</td></tr>
+<tr><td>context-guard (relevo a 250k)</td><td>relee 4 MB por cada llamada</td><td class="bad">cortar el relevo</td><td>Contradice tu "todo en esta sesión"; se queda el ancla de scope.md.</td><td>85 %</td></tr>
+<tr><td>block-dangerous-cmds.sh</td><td>no está registrado</td><td class="ok">registrarlo en el repo</td><td>Hoy no protege nada. Va solo en este repo (A refutó a B): global bloquearía MW, MP y Dashboards.</td><td>65 %</td></tr>
+<tr><td>Puerta de 5 pasos por diff de Becario</td><td>leer + REA + nacho + fantasma</td><td class="ok">revisar rutas + build</td><td>Fantasma o difftest solo si el diff es peligroso. Rindió solo donde había un número.</td><td>70 %</td></tr>
+<tr><td>"Rebanadas, cada una con fantasma"</td><td>fantasma por rebanada</td><td class="ok">la regla de test única</td><td>Se prueba solo si toca arranque/menús, render/shaders, física compartida, el build o borra código.</td><td>85 %</td></tr>
+<tr><td>Memorias viejas</td><td>work-style "sin subagentes", mobile-scope, pod-quota, relay-account</td><td class="bad">reescribir / borrar</td><td>Contradicen el modelo nuevo y cada ventana obedece un subconjunto al azar.</td><td>85 %</td></tr>
+<tr><td>HANDOFF</td><td>30 líneas (global) vs 15 (repo)</td><td class="ok">15 en todo</td><td>Una sola cifra.</td><td>90 %</td></tr>
+<tr><td>Hooks muertos</td><td>mac-guard.py, kgrun.sh, .bak</td><td class="bad">borrar</td><td>No están registrados.</td><td>90 %</td></tr>
+<tr><td class="k">Se quedan</td><td colspan="4">macgate (Jetsam/pánicos), chrome-guard, esperas y salidas acotadas (14 GB, 8 h), md5, game/ref solo lectura, no matar procesos ajenos, bypass solo desde tu prompt, stop a los 4 intentos, pruebas silenciosas (+ <code>?mute=1</code> nuevo), owner-oracle-session.</td></tr>
+</table></div>
+
+<h2>Dónde se refutaron los auditores (y qué decidió Main)</h2>
+<div class="card tw"><table>
+<tr><th>Tema</th><th>A (producto)</th><th>B (proceso)</th><th>Decisión</th></tr>
+<tr><td>Safari</td><td>Es el mayor desconocido: 60 % de que arranque.</td><td>Un iPhone ya lo corrió; prueba de 5 min.</td><td>Smoke silenciado <b>en la hora 1</b> por w1; el Worker de respaldo solo si falla. Safari trae waitAsync desde 16.4 (inferencia).</td></tr>
+<tr><td>Bloques</td><td>Bloque 0 + 4</td><td>Bloque 0 + 4</td><td>Tú pediste 4 como máximo: el bloque 0 se fusiona en la primera hora del Bloque 1.</td></tr>
+<tr><td>Reset/muros</td><td>Al final</td><td>Desde el inicio, como carril largo</td><td>B: w3 empieza en el Bloque 1 (es tu punto #1 desde el 10-31).</td></tr>
+<tr><td>Bench</td><td>Slots exclusivos en el bloque de perf</td><td>macbench solo al final</td><td>Ambos: slots avisados para w1 y macbench al cierre.</td></tr>
+<tr><td>Build por ventana</td><td>Faltan symlinks de game/ref/remaster y clonar gen/wobj (320 MB c/u)</td><td>Build propio</td><td>A: build/ real clonado con <code>cp -c</code>; RN_JOBS=4 por ventana.</td></tr>
+<tr><td>Meta de perf</td><td>"≤ 1 pico por minuto primero"</td><td>Eso baja tu meta en silencio: hay que definirla estricta.</td><td>B: estricta y siempre reportada. 1-2 picos los decides tú.</td></tr>
+<tr><td>Sonido</td><td colspan="2">Ninguno lo vio de entrada: una corrida visible de Safari suena por tus bocinas.</td><td><code>?mute=1</code> obligatorio en toda corrida visible.</td></tr>
+</table></div>
+
+<h2>Cómo lanzar</h2>
+<div class="card">
+<ol>
+<li>Abre una ventana Claude en la <b>cuenta 1</b> (4 % de la semana usado), con Opus en esfuerzo medio, en <code>~/RE-NFSU</code>.</li>
+<li>Pega el prompt de la orquestadora (abajo).</li>
+<li>Cuando te lo pida, escribe <code>bypass 24h</code> y <code>budget +1000</code>. Solo tú puedes, y solo cuenta si lo tecleas tú.</li>
+<li>Ella abre w1 (cuenta 7, Opus), w2 (cuenta 6, Sonnet) y w3 (cuenta 3, Sonnet), sin prompt inicial; les manda el brief por socket con /sesiones.</li>
+<li>Tú recibes una tanda al final de cada bloque: qué cambió y qué apretar.</li>
+</ol>
+</div>
+
+<h3>Prompt · orquestadora <button class="copy" onclick="cp('p0')">copiar</button></h3>
+<pre id="p0">Eres nfsu-orq, la orquestadora del día de reestructura NFSU (OWNER 2026-11-05). Repo ~/RE-NFSU, main.
+Lee primero docs/GOAL_2026-11-05.md (manda sobre PLAN/SCOPE/AI_SCOPE) y docs/goal_2026-11-05/refute_*.md si dudas de una decisión.
+Usa /triage para cada brief y /sesiones para hablar con las ventanas. Nombre de esta sesión: nfsu-orq.
+Bloque 1, primera hora, tú sola, en este orden:
+1. Edita las reglas de la sección 5 del GOAL. El OWNER autorizó editar todo, incluidos spend-guard.py, settings.json y CLAUDE.md global. Después pídeme que teclee "bypass 24h" y "budget +1000".
+2. Borra rockport/ao/canon/dash y build/carao; commit de docs/re/ai/; RN_UNLOCK en original; RN_TRAFPAINT y RN_TRAFLEAN en remaster; parte patches.py en patches_&lt;tema&gt;.py y el boot de index.html en web/boot.js; agrega ?mute=1.
+3. Build y UN node tools/webcheck.mjs --route (vía macgate.sh &amp;&amp;). Si falla, arréglalo antes de seguir.
+4. Crea los worktrees w1..w3 según la sección 2 (build/ real clonado con cp -c, nunca symlink), escribe runs/day/w&lt;k&gt;_brief.md (≤ 12 líneas, formato /triage) y lanza nfsu-w1/w2/w3 con la receta de la sección 6. Luego PING/PONG.
+Después: 20 % integrar y 0 código de más de 20 líneas. Lees los DONE/BLOCKED/REQ y al cierre de cada bloque mezclas en orden w3, w1, w2, construyes, pruebas solo según la sección 3, haces commit, escribes HANDOFF (≤ 15 líneas) y me das la tanda en español: qué cambió, qué apretar. Luego mandas el brief del siguiente bloque.
+Becarios: bec "..." --de nfsu-orq, máximo 5, solo mecánico o investigación, en rutas disjuntas.
+Corridas visibles (Chrome o Safari) solo en slots avisados de unos 10 min, máximo 2 por hora y siempre ?mute=1; las demás ventanas no corren nada durante el slot.
+Stop: 4 intentos por causa. "pausa" = parar todo. Empieza cada respuesta con [nfsu].</pre>
+
+<h3>Brief · nfsu-w1 (gráficos + perf) <button class="copy" onclick="cp('p1')">copiar</button></h3>
+<pre id="p1">Objetivo: NFSU corre en Safari y Chrome en esta Mac; carrera 1103 visible, 180 s: p99 ≤ 20 ms y 0 frames &gt; 33 ms en 2 de 3 corridas.
+Contexto: docs/GOAL_2026-11-05.md s1-s4; docs/goal_2026-11-05/audit_A.md (perf y Safari); pump() en web/gpu.js:1362-1371; spike: en host/d3d9.c:836.
+Alcance: escribe solo web/gpu.js, web/telemetry.js, host/d3d9.c, host/files.c, host/sm1.c, tools/bench*.py; worktree ~/RE-NFSU-wt/w1, rama day/w1, puertos 5181/9382, RN_JOBS=4.
+B1: smoke de Safari ya (open -a Safari con ?mute=1, lee build/web.log + telemetry); Worker de respaldo para waitAsync solo si falla; arregla WGSL; bench visible.
+B2: tabla de picos por causa (Chrome y Safari); files.c read-ahead; arena por frame en d3d9.c. B3: top 2 causas de la tabla. B4: sobrantes.
+Hecho cuando: números del bench en tu DONE (por corrida, por navegador).
+Límites: corridas visibles solo en el slot que anuncias a nfsu-orq; 4 intentos por causa; sin push, sin tocar main ni archivos ajenos.
+Reporte: DONE/BLOCKED/REQ a nfsu-orq, 3-5 líneas + hash.</pre>
+
+<h3>Brief · nfsu-w2 (input + entrada + red) <button class="copy" onclick="cp('p2')">copiar</button></h3>
+<pre id="p2">Objetivo: una URL que abre y juega en esta Mac, otra Mac y el iPad/iPhone por Wi-Fi; gamepad y controles táctiles.
+Contexto: docs/GOAL_2026-11-05.md s1-s4; audit_A.md (LAN, touch, pad); serve.py --lan ya sirve HTTPS en :5443 con CA local; input.js solo tiene teclado y ratón.
+Alcance: escribe solo web/input.js, pad.js, touch.js, audio.js, boot.js, mode.js, setup.html, tools/serve.py y el LaunchAgent; worktree ~/RE-NFSU-wt/w2, rama day/w2, puertos 5182/9383.
+B1: serve.py en HTTP/1.1 keep-alive (revisa 206/PUT); LaunchAgent; /setup con QR, CA y .mobileconfig; input.js exporta pushKey/pushMouse; pad.js; desbloqueo de audio en touchend y visibilitychange.
+B2: touch.js (dirección, gas, freno, nitro, freno de mano, cámara, pausa y d-pad/OK/atrás de menú), touch-action:none, ?fps=30 en coarse pointer.
+B3: toggles de /setup, defaults por tipo de equipo, revisión del remap. B4: pulido táctil; dirección analógica si sobra tiempo.
+Hecho cuando: el OWNER llega al menú desde otra Mac y el iPad, y termina una carrera por táctil.
+Límites: no toques gpu.js ni host/; sin push; las corridas las decides tú (100 por día).
+Reporte: DONE/BLOCKED/REQ a nfsu-orq, 3-5 líneas + hash.</pre>
+
+<h3>Brief · nfsu-w3 (juego: reset/muros, WORLD, feel) <button class="copy" onclick="cp('p3')">copiar</button></h3>
+<pre id="p3">Objetivo: el coche no atraviesa muros ni cae tras un reset; WORLD sin picos y sin regresiones; defaults de feel encendidos en remaster.
+Contexto: docs/GOAL_2026-11-05.md; docs/re/coll_reset.md (reset 0x427c50 limpia car+0x540; refill 0x4267a0/0x4407b0); docs/openworld/re_coll_pool.md (pool 8192); docs/re/feel_2026-10-31.md.
+Alcance: escribe solo host/rivals.c, free.c, openworld.c, win32.c, archivos de colisión de host/, tools/recomp/patches_&lt;tema&gt;.py y docs/re/; worktree ~/RE-NFSU-wt/w3, rama day/w3, puertos 5183/9384, RN_JOBS=4.
+B1: RE de reset/muros con REA (procedure_pseudo_code y xrefs). B2: parche con difftest + fantasma de mismo seed con RN_RESETEVERY (cuenta atravesadas antes/después).
+B3: picos de WORLD en (1846,-727) y de spawn/stream (fantasmas fuera de los slots de w1). B4: 3 fantasmas WORLD de 1800 s, mismo seed; hornfix/chasecam/aceleración por defecto, un commit cada uno.
+Hecho cuando: 0 atravesadas tras resets forzados; números de WORLD antes/después en tu DONE.
+Límites: original solo recibe perf sin cambio de feel; 4 intentos por causa; fantasmas ≤ 3 a la vez, RN_SECS acotado; sin push.
+Reporte: DONE/BLOCKED/REQ a nfsu-orq, 3-5 líneas + hash.</pre>
+
+<h2>Qué no se sabe todavía</h2>
+<div class="card"><ul>
+<li><span class="tag">DESCONOCIDO</span> Si Safari acepta los shaders WGSL generados. Se sabe a la hora 1.</li>
+<li><span class="tag">DESCONOCIDO</span> Si un mensaje entre sesiones dispara UserPromptSubmit (y con eso reinicia runcap). Por eso el tope sube a 100.</li>
+<li><span class="tag">INFERENCIA</span> HTTP/1.0 con TLS por petición causa tirones en Wi-Fi; no está medido.</li>
+<li><span class="tag">INFERENCIA</span> La memoria del iPad alcanza (el iPhone corrió WORLD según el HANDOFF del 11-03).</li>
+<li><span class="tag">HECHO</span> No existe ni una línea de código táctil ni de gamepad.</li>
+</ul></div>
+
+</main>
+<script>function cp(id){try{navigator.clipboard.writeText(document.getElementById(id).innerText)}catch(e){}}</script>
+</body></html>
