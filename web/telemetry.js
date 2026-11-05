@@ -185,7 +185,10 @@ function startTelemetry(M, t0, log, logLines) {
     let body = rows.length ? JSON.stringify({ rows }) + '\n' : '';
     for (const e of events) body += JSON.stringify(e) + '\n';
     rows = []; events = [];
+    const wd = globalThis.RN_WD, was = wd ? wd[1] : 0;   // web/gpu.js ?watchdog=1: phase 3 while the flush call runs
+    if (wd) wd[1] = 3;
     fetch('/telemetry', { method: 'POST', body, keepalive: body.length < 60000 }).catch(() => {});
+    if (wd) wd[1] = was;
   }
   setInterval(flush, 2000);
   addEventListener('pagehide', flush);

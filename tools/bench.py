@@ -25,7 +25,7 @@ def run(mode, loc, secs, name):
     nav = ','.join(['20000:RETURN'] + _PROFILE[1:] + ['1500@=MU_Main_PC:RETURN']) if jump else ''
     url = os.environ.get('BENCH_URL', 'http://127.0.0.1:5180/') + '?env='   # BENCH_URL: another server, e.g. a worktree's on 5181
     url += 'RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1' + os.environ.get('BENCH_ENV', '') + (f'&jump={jump}&keys={nav}' if jump else '') + os.environ.get('BENCH_Q', '')   # BENCH_Q='&gpuprof=1'
-    env = dict(os.environ, RN_CDP_PORT='9341', RN_VIEW=VIEW)
+    env = dict(os.environ, RN_CDP_PORT=os.environ.get('RN_CDP_PORT', '9341'), RN_VIEW=VIEW)
     with open(f'{OUT}/{name}.out', 'w') as f:
         subprocess.run(['node', 'tools/webcheck.mjs', url, str(20 + GAP * (len(ks) or 6) + secs), f'{OUT}/{name}.png', ours],
                        env=env, stdout=f, stderr=subprocess.STDOUT)

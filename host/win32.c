@@ -40,8 +40,16 @@ unsigned rn_turbo = 1;
 #ifdef __EMSCRIPTEN__
 // The same clock clock_gettime(CLOCK_MONOTONIC) reads on the web (emscripten_get_now, timeOrigin-based in every worker),
 // without musl and the wasi i64 round trip: clock reads were ~10% of the game thread in a race (build/bench/b4_s10.prof.txt).
+// Safari: performance.timeOrigin drifts during a page's life (WebKit bug 258572) and is rounded to 1 ms per worker, so
+// timeOrigin + now() can step back a few ms within one thread; QPC and same-thread deltas (gpu_wait, GIL holds) then
+// wrapped to ~1.8e19. Each thread's clock never goes back, and a read before t0_ms is 0 (the cast was undefined).
 static double t0_ms;
-uint64_t now_us(void) { return (uint64_t)((emscripten_get_now() - t0_ms) * 1000.0) * rn_turbo; }
+uint64_t now_us(void) {
+    static _Thread_local uint64_t last;
+    double d = (emscripten_get_now() - t0_ms) * 1000.0;
+    uint64_t v = d > 0 ? (uint64_t)d * rn_turbo : 0;
+    return v > last ? (last = v) : last;
+}
 #else
 uint64_t now_us(void) {
     struct timespec ts;
