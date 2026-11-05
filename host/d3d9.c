@@ -920,11 +920,13 @@ static void tune_apply(Ctx *c) {
 // 0x6fbdf4 every frame (0x48bbed; POV 0, 1, 4 at +0, +2, +8, 0x32dc = 71.5 deg, 65536 = 360 deg), smooths it into camera+0xc4 (measured:
 // under 1 s behind) and the projection builder 0x40dd00 reads that, so frustum and focal stay one. Hood, bumper and special cameras do not read these entries. Present writes the three entries from the camera's speed
 // ([0x740500]+0x1e0, m/s): 0 at 25 m/s (90 km/h), the full gain at 75 m/s, smoothstep, then a ~1 s low pass (it also absorbs a
-// camera teleport). Gain 0 is the native default: nothing is touched, and a gain back to 0 restores 0x32dc once. RN_FOVLOG=1 logs.
+// camera teleport). The base is the table as boot left it (0x2ee0 with RN_FEEL, host/win32.c; 0x32dc in original mode). Gain 0 is the
+// native default: nothing is touched, and a gain back to 0 restores the base once. RN_FOVLOG=1 logs.
 static void fov_frame(Ctx *c) {
     static int lg = -1, wrote;
+    static uint32_t base;
     static float deg;
-    if (lg < 0) lg = getenv("RN_FOVLOG") != NULL;
+    if (lg < 0) lg = getenv("RN_FOVLOG") != NULL, base = ld(c, 0x6fbdf4, 2);
     float gain; uint32_t gb = __atomic_load_n(&tune[6], __ATOMIC_RELAXED);
     memcpy(&gain, &gb, 4);
     if (gain == 0 && !wrote) return;
@@ -936,7 +938,7 @@ static void fov_frame(Ctx *c) {
     deg += (gain * t - deg) * (1.0f / 60);
     if (gain == 0 && fabsf(deg) < 0.01f) deg = 0, wrote = 0;
     else wrote = 1;
-    uint32_t e = 0x32dc + (int)lroundf(deg * 65536 / 360);
+    uint32_t e = base + (int)lroundf(deg * 65536 / 360);
     for (int k = 0; k < 3; k++) st(c, 0x6fbdf4 + (k == 2 ? 8 : 2 * k), e, 2);
     if (lg && dev.frames % 60 == 0)
         rn_log("FOV f%u speed %.1f gain %.1f deg %.2f table %04x cam+c4 %04x", (unsigned)dev.frames, sp, gain, deg, e, ld(c, cam + 0xc4, 2));
