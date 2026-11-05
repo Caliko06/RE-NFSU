@@ -5,7 +5,7 @@ itself about its own state.
 
 | Question | Answer | Where it comes from |
 |---|---|---|
-| How much of Speed.exe is lifted to C? | 13,739 of 14,354 seeds (95.7 %) | `census/lift_report.json`, `tools/recomp/build.py` |
+| How much of Speed.exe is lifted to C? | 13,756 of 14,371 seeds (95.7 %) | `census/lift_report.json`, `tools/recomp/build.py` |
 | How much of it runs in a session? | not measured yet: the counter in §4 only sees indirect calls, so 1,006 / 1,627 are floors | `host/dispatch.c`, §4 |
 | How much of the career did a person actually play? | 167 of 167 rows, 30 tracks, 282 runs | `census/completion.json`, `tools/census/rows.py` |
 
@@ -18,12 +18,12 @@ Everything below is measured on `pc/Speed.exe` md5 `b6b9232c55376b3c38c56aac1f8a
 lifted (`failed 0`). Last build, printed by the build itself:
 
 ```
-lifted 13739 functions, dropped 615 false data seeds, failed 0, trap sites 7655
+lifted 13756 functions, dropped 615 false data seeds, failed 0, trap sites 7655
 ABK code modules: {'abk_files': 106, 'abk_modules': 79, 'abk_distinct_code': 23, 'abk_functions': 28}
 ```
 
 - 14,330 starts in `census/speed_exe_functions.tsv` (Hopper's function list, `census/hopper/funcs.tsv` has 14,333 rows),
-  plus 24 PATCH caves that are entered by a call: 14,354 seeds.
+  plus 41 PATCH cave entries that are entered by a call (22 `entry` patches and 19 entries of multi-entry caves): 14,371 seeds.
 - 615 seeds are dropped because the address lands **inside** an instruction of real code: a data pointer that Hopper or a
   vtable read as a function. The build proves it (it knows every instruction byte of every lifted body) instead of
   trusting the list.
@@ -100,12 +100,12 @@ real object graph: the skip reasons above are the exact list, not a shrug.
 calls and jumps reach `rn_call`. The numbers in this section are floors, and "88 % has not run" is not supported.
 Fix: count at function entry behind `RN_COV=1`.
 
-New on this branch. `host/dispatch.c` keeps one bit per entry of the dispatch table (`rn_fn_addr`, 13,739 entries) and
+New on this branch. `host/dispatch.c` keeps one bit per entry of the dispatch table (`rn_fn_addr`, 13,756 entries) and
 sets it the first time `rn_call` resolves an address to that function. The bitmap is 1.7 KB, the hit test is one load
 and one test, and the store happens once per function, so the cost on the hot path is a predictable branch. The count
 comes out three ways:
 
-- `dispatch_report()` prints `coverage: N of 13739 guest functions ran (P%)` at every halt and on `RN_SECS`.
+- `dispatch_report()` prints `coverage: N of 13756 guest functions ran (P%)` at every halt and on `RN_SECS`.
 - `rn_cov_hits()` / `rn_cov_total()` are exported to the page.
 - `web/telemetry.js` adds it to the session file (F10) as `summary.coverage`, and to the log on `pagehide`.
 
@@ -136,7 +136,7 @@ broken by a change, not that a human played it. The OWNER's own playthrough is t
 
 ## 6. Patches: the game's own numbers, moved on purpose
 
-122 active patches (`census/lift_report.json` → `patches`, table in `tools/recomp/patches.py`), each one line with why:
+365 active patches (`census/lift_report.json` → `patches`, table in `tools/recomp/patches.py`), each one line with why:
 widescreen and 1920x1080 device creation (`0x408a24`), the 60 fps limiter (`0x585b94`), the car's reflection at 0.5
 (`0x40fbb7` reads `0x707fc4`), the remaster switches. A patch is not a hole in the lift: it is a value the game reads,
 changed with its address written down.

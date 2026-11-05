@@ -24,5 +24,6 @@ spacing 26.
 - Last resort repeated up to 4 times (400 tries): the pool is near saturation, 100 tries lose about 1 in 10 cars.
 - Count: FREE_TRAFFIC 13 (RN_FREETRAFFIC) written to the track table byte for the AddTrafficCars call and put back: x1.5 = 19.
 Result (native, 5 runs: 1003, 1001, 1010 x3 seeds): 19 asked, 19 placed in every run. 21 asked: 1 lost in 4 runs; 22: 0 of 2.
-19 is the safe default; the rides cap (4 + 26) is not the limit, the network is. More density needs a bigger traffic
-network (OPENWORLD E) or a shorter spacing (+0xd4, 20 m gave 26 with zone 0).
+19 is the safe default; the rides cap (64 entrants since PATCH 0x4322e0, `cmp [race+0x12c], 0x40`, was 30) is not the
+limit, the network is. More density needs a bigger traffic network (OPENWORLD E) or a shorter spacing (+0xd4, 20 m gave
+26 with zone 0).
