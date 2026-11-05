@@ -337,6 +337,7 @@ static uint32_t CreateThread_(Ctx *c) {
     if (!t) return 0;
     t->start = entry; t->param = param;
     t->handle = new_handle(H_THREAD);
+    if (!t->handle) { set_error(c, 8); return 0; }   // table full (host/win32.c new_handle logs it): the thread never starts
     get_handle(t->handle)->thread = t;
     if (out) st(c, out, t->id, 4);
     rn_log("CreateThread %08x(%08x) -> thread %x%s", entry, param, t->id, (flags & 4) ? " suspended" : "");
@@ -395,6 +396,7 @@ static uint32_t DuplicateHandle_(Ctx *c) {
         return 0;
     }
     uint32_t h = new_handle(H_THREAD);
+    if (!h) { set_error(c, 8); return 0; }
     if (src == 0xfffffffeu)
         for (int k = 0; k < nthreads; k++)
             if (threads[k]->id == tid(c)) get_handle(h)->thread = threads[k];
@@ -464,6 +466,7 @@ static uint32_t SleepEx_(Ctx *c) { Sleep_(c); return 0; }
 static uint32_t CreateEventA_(Ctx *c) {
     if (ARG(3)) { rn_halt(c, "CreateEventA named %s", G(ARG(3))); return 0; }
     uint32_t h = new_handle(H_EVENT);
+    if (!h) { set_error(c, 8); return 0; }
     get_handle(h)->manual = ARG(1) != 0;
     get_handle(h)->signaled = ARG(2) != 0;
     set_error(c, 0);
@@ -490,6 +493,7 @@ static uint32_t CreateMutexA_(Ctx *c) {
         for (int k = 0; k < 16; k++)
             if (named[k].h && !strcmp(named[k].name, G(name))) { set_error(c, 183); return named[k].h; }
     uint32_t h = new_handle(H_MUTEX);
+    if (!h) { set_error(c, 8); return 0; }
     if (own) { get_handle(h)->owner = tid(c); get_handle(h)->count = 1; }
     if (name)
         for (int k = 0; k < 16; k++)

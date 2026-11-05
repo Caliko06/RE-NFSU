@@ -143,11 +143,13 @@ static Handle handles[512];
 uint32_t new_handle(int kind) {
     for (int k = 1; k < 512; k++)
         if (handles[k].kind == H_FREE) { memset(&handles[k], 0, sizeof handles[k]); handles[k].kind = kind; return 0x100 + 4 * k; }
+    static int warned;   // table full: callers fail the Windows way (CreateFile INVALID_HANDLE_VALUE, HeapCreate NULL...)
+    if (!warned) { warned = 1; rn_log("handle table full (511 in use): new_handle(kind %d) fails", kind); }
     return 0;
 }
 Handle *get_handle(uint32_t h) {
     uint32_t k = (h - 0x100) / 4;
-    if (h < 0x100 || (h & 3) || k >= 512 || handles[k].kind == H_FREE) return NULL;
+    if (!h || h < 0x100 || (h & 3) || k >= 512 || handles[k].kind == H_FREE) return NULL;
     return &handles[k];
 }
 
@@ -387,7 +389,11 @@ static uint32_t GetLocaleInfoW_(Ctx *c) {
 static uint32_t GetUserDefaultLCID_(Ctx *c) { (void)c; return 0x0409; }
 static uint32_t IsValidLocale_(Ctx *c) { return ARG(0) == 0x0409; }
 
-static uint32_t HeapCreate_(Ctx *c) { (void)c; return new_handle(H_HEAP); }
+static uint32_t HeapCreate_(Ctx *c) {
+    uint32_t h = new_handle(H_HEAP);
+    if (!h) set_error(c, ERROR_NOT_ENOUGH_MEMORY);       // NULL, as Windows
+    return h;
+}
 static uint32_t HeapDestroy_(Ctx *c) { (void)c; return 1; }
 static uint32_t HeapAlloc_(Ctx *c) {
     uint32_t flags = ARG(1), n = ARG(2);
@@ -666,6 +672,7 @@ static uint32_t create_file(Ctx *c, const char *name) {
         if (id == -2) { rn_halt(c, "CreateFileA outside the game and save folders: %s", name); return INVALID_HANDLE; }
         if (id < 0) { set_error(c, err[-id]); return INVALID_HANDLE; }
         uint32_t h = new_handle(H_FILE);
+        if (!h) { gf_close(id); set_error(c, ERROR_NOT_ENOUGH_MEMORY); return INVALID_HANDLE; }
         get_handle(h)->gf = id;
         snprintf(get_handle(h)->path, sizeof get_handle(h)->path, "%s", name);
         if (rn_trace()) rn_log("open for writing %s (disp %u) -> %x", name, disp, h);
@@ -680,6 +687,7 @@ static uint32_t create_file(Ctx *c, const char *name) {
         return INVALID_HANDLE;
     }
     uint32_t h = new_handle(H_FILE);
+    if (!h) { gf_close(id); set_error(c, ERROR_NOT_ENOUGH_MEMORY); return INVALID_HANDLE; }
     get_handle(h)->gf = id;
     snprintf(get_handle(h)->path, sizeof get_handle(h)->path, "%s", name);
     if (rn_trace()) rn_log("open %s -> %x", name, h);
@@ -755,11 +763,13 @@ static uint32_t FindFirstFileA_(Ctx *c) {
     if (r == -2) { rn_halt(c, "FindFirstFileA outside the game and save folders: %s", pat); return INVALID_HANDLE; }
     if (rn_trace()) rn_log("find %s -> %s", pat, r ? "none" : name);
     if (r) { set_error(c, ERROR_FILE_NOT_FOUND); return INVALID_HANDLE; }
+    uint32_t fh = new_handle(H_FIND);
+    if (!fh) { set_error(c, ERROR_NOT_ENOUGH_MEMORY); return INVALID_HANDLE; }
     memset(G(fd), 0, 320);
     st(c, fd, dir ? 0x10 : 0x20, 4);                                 // FILE_ATTRIBUTE_DIRECTORY / ARCHIVE
     st(c, fd + 32, (uint32_t)size, 4);
     memcpy(G(fd + 44), name, strlen(name) + 1);
-    return new_handle(H_FIND);
+    return fh;
 }
 static uint32_t FindClose_(Ctx *c) {
     Handle *h = get_handle(ARG(0));
@@ -774,6 +784,7 @@ static uint32_t CreateFileMappingA_(Ctx *c) {
     if (!f || f->kind != H_FILE) { rn_halt(c, "CreateFileMappingA without a file (%08x)", ARG(0)); return 0; }
     if (prot != 2) { rn_halt(c, "CreateFileMappingA protect %#x (only PAGE_READONLY)", prot); return 0; }
     uint32_t h = new_handle(H_MAPPING);
+    if (!h) { set_error(c, ERROR_NOT_ENOUGH_MEMORY); return 0; }
     get_handle(h)->gf = f->gf;
     return h;
 }
@@ -848,7 +859,9 @@ static uint32_t GetLongPathNameA_(Ctx *c) {
 // Toolhelp: the process list holds this process only.
 static uint32_t CreateToolhelp32Snapshot_(Ctx *c) {
     if (ARG(0) != 2) { rn_halt(c, "CreateToolhelp32Snapshot flags %08x", ARG(0)); return INVALID_HANDLE; }
-    return new_handle(H_SNAPSHOT);
+    uint32_t h = new_handle(H_SNAPSHOT);
+    if (!h) { set_error(c, ERROR_NOT_ENOUGH_MEMORY); return INVALID_HANDLE; }
+    return h;
 }
 static uint32_t process_entry(Ctx *c, int first) {
     Handle *h = get_handle(ARG(0));
