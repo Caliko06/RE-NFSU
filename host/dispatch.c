@@ -121,8 +121,91 @@ static void bucket_init(void) {         // under the GIL, like every rn_call
     }
 }
 
+// RN_FNTIME=1 (off by default; w1 2026-11-05: Safari race frames are guest main-thread compute, heldMain p99 82 ms vs
+// Chrome's 27.5, in the car physics 0x4774a0 / 0x474a90, which enter only through rn_call): the main thread's self and
+// inclusive time per indirect-call target (vtables, function pointers). Every 5 s the log gets the top 12 by self time
+// ("fntime"), plus the cost of one clock pair (Safari's performance.now from wasm may be dear; subtract calls * pair).
+#include <emscripten.h>
+static int fnt_on = -1, fnt_depth;
+static double *fnt_self, *fnt_incl, fnt_child[64], fnt_t0, fnt_pair;
+static uint32_t *fnt_n, fnt_hn[1024];
+static double fnt_hms[1024];   // host APIs (call_host from rn_call: D3D vtables, imports) on the main thread, inclusive
+static void fnt_report(double now) {
+    double s = (now - fnt_t0) / 1000, tot = 0;
+    int top[12] = {0}, nt = 0;
+    for (uint32_t k = 0; k < rn_fn_count; k++) {
+        tot += fnt_self[k];
+        if (!fnt_n[k]) continue;
+        int j;
+        if (nt < 12) j = nt++;
+        else if (fnt_self[k] > fnt_self[top[11]]) j = 11;
+        else continue;
+        for (; j > 0 && fnt_self[top[j - 1]] < fnt_self[k]; j--) top[j] = top[j - 1];
+        top[j] = (int)k;
+    }
+    char buf[1024];
+    int o = snprintf(buf, sizeof buf, "fntime %.1f s, self in calls %.0f ms/s, clock pair %.2f us; self ms/s (incl, calls/s):",
+                     s, tot / s, 1000 * fnt_pair);
+    for (int j = 0; j < nt && o < (int)sizeof buf - 64; j++) {
+        uint32_t k = (uint32_t)top[j];
+        o += snprintf(buf + o, sizeof buf - o, " %x %.1f (%.1f, %.0f)", rn_fn_addr[k], fnt_self[k] / s, fnt_incl[k] / s, fnt_n[k] / s);
+    }
+    rn_log("%s", buf);
+    int ht[8] = {0}, nh = 0;   // top 8 host APIs by time
+    double htot = 0;
+    for (int k = 0; k < nhosts; k++) {
+        htot += fnt_hms[k];
+        if (!fnt_hn[k]) continue;
+        int j;
+        if (nh < 8) j = nh++;
+        else if (fnt_hms[k] > fnt_hms[ht[7]]) j = 7;
+        else continue;
+        for (; j > 0 && fnt_hms[ht[j - 1]] < fnt_hms[k]; j--) ht[j] = ht[j - 1];
+        ht[j] = k;
+    }
+    o = snprintf(buf, sizeof buf, "fntime host APIs %.0f ms/s; ms/s (calls/s):", htot / s);
+    for (int j = 0; j < nh && o < (int)sizeof buf - 96; j++)
+        o += snprintf(buf + o, sizeof buf - o, " %s %.1f (%.0f)", hosts[ht[j]].name, fnt_hms[ht[j]] / s, fnt_hn[ht[j]] / s);
+    rn_log("%s", buf);
+    memset(fnt_hms, 0, sizeof fnt_hms), memset(fnt_hn, 0, sizeof fnt_hn);
+    memset(fnt_self, 0, 8u * rn_fn_count), memset(fnt_incl, 0, 8u * rn_fn_count), memset(fnt_n, 0, 4u * rn_fn_count);
+    fnt_t0 = now;
+}
+static int fnt_init(void) {
+    const char *e = getenv("RN_FNTIME");
+    if (!(e && *e == '1')) return 0;
+    fnt_self = calloc(rn_fn_count, 8), fnt_incl = calloc(rn_fn_count, 8), fnt_n = calloc(rn_fn_count, 4);
+    double t = emscripten_get_now();
+    for (int k = 0; k < 1000; k++) emscripten_get_now(), emscripten_get_now();
+    fnt_t0 = emscripten_get_now(), fnt_pair = (fnt_t0 - t) / 1000;
+    return 1;
+}
+static void fnt_call(Ctx *c, uint32_t k) {
+    int d = fnt_depth++;
+    if (d < 64) fnt_child[d] = 0;
+    double t = emscripten_get_now();
+    rn_fn_ptr[k](c);
+    double e = emscripten_get_now(), dt = e - t;
+    fnt_depth--;
+    if (d < 64) {
+        fnt_incl[k] += dt, fnt_self[k] += dt - fnt_child[d], fnt_n[k]++;
+        if (d > 0) fnt_child[d - 1] += dt;
+    }
+    if (e - fnt_t0 >= 5000) fnt_report(e);
+}
+
+static void fnt_host(Ctx *c, uint32_t target) {
+    double t = emscripten_get_now();
+    call_host(c, target);
+    double dt = emscripten_get_now() - t;
+    uint32_t k = (target - HOST_BASE) / 16;
+    if (k < 1024) fnt_hms[k] += dt, fnt_hn[k]++;
+    if (fnt_depth > 0 && fnt_depth <= 64) fnt_child[fnt_depth - 1] += dt;
+}
+
 void rn_call(Ctx *c, uint32_t target) {
-    if (target >= HOST_BASE) { call_host(c, target); return; }
+    if (fnt_on < 0) fnt_on = fnt_init();
+    if (target >= HOST_BASE) { if (fnt_on && rn_is_main_thread()) fnt_host(c, target); else call_host(c, target); return; }
     if (rn_steerlog && target == 0x461840) steer_event(c);
     if (target == 0x427f70 || target == 0x427c50) reset_call(c, target);   // RN_RESETLOG, host/aitel.c
     if (!bucket) bucket_init();
@@ -134,6 +217,7 @@ void rn_call(Ctx *c, uint32_t target) {
                 extern uint8_t rn_cov_viacall[];
                 rn_cov_viacall[k] = 1;
 #endif
+                if (fnt_on && rn_is_main_thread()) { fnt_call(c, k); return; }
                 rn_fn_ptr[k](c);
                 return;
             }
