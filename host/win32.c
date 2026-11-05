@@ -1177,6 +1177,13 @@ void win32_init(Ctx *c, uint32_t image_size) {
     int unlock = !(un && un[0] == '0');
     st(c, SCREEN_ADDR + 36, unlock, 4);
     st(c, 0x735ec1, unlock, 1);
+    // FEEL C1 + C3 (OWNER 2026-11-04: feel changes in remaster only; RN_FEEL=0 in original mode, web/mode.js): the second blur pass
+    // scale [0x707fd0] (PATCH 0x40cfb9.., shipped 4.0) becomes 1.0, and the chase FOV table 0x6fbdf4 POV 0/1/4 goes 0x32dc -> 0x2ee0.
+    const char *feel = getenv("RN_FEEL");
+    if (!(feel && feel[0] == '0')) {
+        st(c, 0x707fd0, 0, 4); st(c, 0x707fd4, 0x3ff00000, 4);
+        st(c, 0x6fbdf4, 0x2ee0, 2); st(c, 0x6fbdf6, 0x2ee0, 2); st(c, 0x6fbdfc, 0x2ee0, 2);
+    }
     // PATCH 0x410c1b (cave 0x63b3ad): the cap of ROADREFLECTION [0x70105c] is at most this word (2 = as shipped; 1 with
     // RN_ROADREFL=off / ?roadrefl=off: the game's own level 1, the mirrored world is not drawn). sq / cube: host/sm1.c.
     st(c, SCREEN_ADDR + 0x70, sm1_roadrefl() == 3 ? 1 : 2, 4);

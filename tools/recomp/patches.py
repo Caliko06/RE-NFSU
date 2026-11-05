@@ -664,9 +664,11 @@ FEEL_CANDIDATES = [
 ]
 
 # ---- FEEL batch 1 (OWNER 2026-11-04: feel changes replace the default; one commit per change so it reverts) -------------------------
-# C1 blur: the second zoom pass no longer multiplies its taps by 4.0 (smear reach /4, directional instead of the whole frame going soupy).
-PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[0:5]]
-# C3 camera: FOV of POV 0/1/4 71.5 -> 65.9 deg (0x2ee0): the car reads 1.11x bigger. The exe has no speed term for eye distance/height/FOV (docs/re/camera_speed.md), so this is at every speed.
-PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[7:10]]
+# C1 blur: the four operands always read [0x707fd0], which holds the shipped 4.0 here (the same value as 0x6cc9d8, so original mode
+# blurs as in 2003); host/win32.c writes 1.0 there at boot unless RN_FEEL=0 (web/mode.js original): smear reach /4, directional.
+PATCHES += [dict(p, when=lambda: True) for p in FEEL_CANDIDATES[1:5]]
+PATCHES.append(dict(addr=0x707fd0, old="0000000000000000", new="0000000000001040", when=lambda: True))
+# C3 camera: FOV of POV 0/1/4 71.5 -> 65.9 deg (0x2ee0, FEEL_CANDIDATES[7:10]) is written by host/win32.c at boot unless RN_FEEL=0,
+# so the table keeps the shipped 0x32dc in original mode. The car reads 1.11x bigger; no speed term in the exe (docs/re/camera_speed.md).
 
 
