@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Keeps `tools/serve.py --lan` running (http://127.0.0.1:5180, https://<mac>.local:5443, setup page http://<mac>.local:5444/setup).
+  Install (the OWNER; port 5180 must be free, so stop a hand-started serve.py first):
+    cp tools/launchagent/com.nfsu.serve.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.nfsu.serve.plist
+  Stop / remove:
+    launchctl bootout gui/$(id -u)/com.nfsu.serve
+  Log: build/serve.log. PATH has /opt/homebrew/bin for brotli (the compressed wasm over HTTPS); openssl, ipconfig, scutil are in /usr/bin.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.nfsu.serve</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/angeldamian/RE-NFSU/.venv/bin/python</string>
+    <string>/Users/angeldamian/RE-NFSU/tools/serve.py</string>
+    <string>--lan</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/angeldamian/RE-NFSU</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>PYTHONUNBUFFERED</key><string>1</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>10</integer>
+  <key>StandardOutPath</key><string>/Users/angeldamian/RE-NFSU/build/serve.log</string>
+  <key>StandardErrorPath</key><string>/Users/angeldamian/RE-NFSU/build/serve.log</string>
+</dict>
+</plist>
