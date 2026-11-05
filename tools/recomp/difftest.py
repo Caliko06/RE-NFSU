@@ -15,6 +15,7 @@ from unicorn.x86_const import (UC_X86_REG_FPCW, UC_X86_REG_FPSW, UC_X86_REG_FPTA
                                UC_X86_INS_CPUID)
 import pefile
 import patches
+from build import stale     # object older than its .c or any header it includes (host/native.h too)
 
 CASES = int(sys.argv[1]) if len(sys.argv) > 1 else 4
 UREG = [UC_X86_REG_EAX, UC_X86_REG_ECX, UC_X86_REG_EDX, UC_X86_REG_EBX,
@@ -33,7 +34,7 @@ for f in sorted(os.listdir("build/gen")):
         continue
     src, o = "build/gen/" + f, "build/dobj/" + f[:-2] + ".o"
     objs.append(o)
-    if not os.path.exists(o) or os.path.getmtime(o) < max(os.path.getmtime(src), os.path.getmtime("host/rt.h")):
+    if stale(o, src):
         jobs.append(["clang", "-O1", "-w", "-Ihost", "-Ibuild/gen", "-fno-strict-aliasing", "-DRN_REF_QEMU5", "-c", src, "-o", o])
 running = []
 for j in jobs:

@@ -7,7 +7,7 @@ build/gen/table.c  sorted guest address -> function table for rn_call
 census/lift_report.json  counts: functions, traps by reason
 Usage: .venv/bin/python tools/recomp/build.py [native|web|lift]   (default: native)
 """
-import collections, json, multiprocessing as mp, os, struct, subprocess, sys
+import collections, json, multiprocessing as mp, os, re, struct, subprocess, sys
 import pefile
 sys.path.insert(0, os.path.dirname(__file__))
 from lift import Lifter, Unsupported
@@ -97,6 +97,23 @@ def lift_all():
     print("top trap reasons:", dict(traps.most_common(15)))
 
 
+def stale(o, src, gen=GEN):
+    """True when object o is missing or older than src or any header src includes (host/ or gen/, followed recursively).
+    funcs.h only counts in a coverage build: elsewhere it holds prototypes of one shape, and every new function changes it."""
+    if not os.path.exists(o):
+        return True
+    seen, todo = {src}, [src]
+    while todo:
+        for m in re.findall(r'#include "([^"]+)"', open(todo.pop()).read()):
+            if m == "funcs.h" and not COV:
+                continue
+            p = next((f"{d}/{m}" for d in ("host", gen) if os.path.exists(f"{d}/{m}")), None)
+            if p and p not in seen:
+                seen.add(p)
+                todo.append(p)
+    return os.path.getmtime(o) < max(map(os.path.getmtime, seen))
+
+
 HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c",
         "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c", "host/abk.c", "host/bridge.c", "host/carsmooth.c", "host/rivals.c", "host/free.c", "host/aitel.c", "host/lights.c", "host/openworld.c", "host/cov.c", "host/horn.c", "host/feellog.c"]
 
@@ -109,8 +126,7 @@ def compile_native():
     jobs = []
     for s in srcs:
         o = obj + "/" + os.path.basename(s)[:-2] + ".o"
-        dep = [s, "host/rt.h"] + ([f"{GEN}/funcs.h"] if COV else [])     # funcs.h holds the RNI_ indexes of a coverage build
-        if not os.path.exists(o) or os.path.getmtime(o) < max(map(os.path.getmtime, dep)):
+        if stale(o, s):
             jobs.append(["clang", *flags, "-c", s, "-o", o])
     run_jobs(jobs)
     objs = [obj + "/" + os.path.basename(s)[:-2] + ".o" for s in srcs]
@@ -130,7 +146,7 @@ def compile_web():
     jobs = []
     for s in srcs:
         o = wobj + os.path.basename(s)[:-2] + ".o"
-        if not os.path.exists(o) or os.path.getmtime(o) < max(os.path.getmtime(s), os.path.getmtime("host/rt.h")):
+        if stale(o, s):
             jobs.append(["emcc", *flags, "-c", s, "-o", o])
     run_jobs(jobs)
     objs = [wobj + os.path.basename(s)[:-2] + ".o" for s in srcs]
