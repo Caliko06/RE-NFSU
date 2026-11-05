@@ -525,7 +525,6 @@ static uint32_t avoid_close(Ctx *c) {
     return a;
 }
 
-void rockport_tick(Ctx *c);   // host/openworld.c
 void free_tick(Ctx *c) {
     static int raced;
     static uint32_t start;           // the first race frame: respawns wait 10 s (the grid)
@@ -542,7 +541,6 @@ void free_tick(Ctx *c) {
         return;
     }
     raced = 1;
-    rockport_tick(c);
     tspeed_on = world_ai(c);
     // The RaceManager's frame 0x435570 calls the record update 0x4338c0 (edi = record: route progress +0x14/+0x1c/+0x20, checkpoint
     // +4/+6/+8) for each record of its own, so the extra records get the same call (RN_FREEXREC=0: not).

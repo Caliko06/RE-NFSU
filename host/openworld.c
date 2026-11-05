@@ -79,13 +79,6 @@ static int worldrow_on(void) {
     return on;
 }
 
-// ?rockport=1: the WORLD row loads build/openworld/rockport/ (tools/rockport/merge.py): a Rockport block north of Olympic City and the bridge to it.
-int rn_rockport_on(void) {
-    static int on = -1;
-    if (on < 0) { const char *e = getenv("RN_ROCKPORT"); on = e && *e && *e != '0'; }
-    return on;
-}
-
 static uint32_t rows_prev, lang_prev;   // the copies of the last load (the unloaders only zero the pointers): freed at the next one
 
 // Handler of chunk 0x34201: the original loader, then one more row.
@@ -151,7 +144,7 @@ static void world_install(void) {
 int rn_world_alias(const char *gpath, char *out, size_t n) {
     const char *b = gpath;
     for (const char *p = gpath; *p; p++) if (*p == '/' || *p == '\\') b = p + 1;
-    if (!worldrow_on() || rn_rockport_on() || !ci_eq(b, "STREAML1RA_1010.BUN", 20)) return 0;   // STREAML1RA_<id>.BUN: 0 bytes for every L1RA track, the base one too
+    if (!worldrow_on() || !ci_eq(b, "STREAML1RA_1010.BUN", 20)) return 0;   // STREAML1RA_<id>.BUN: 0 bytes for every L1RA track, the base one too
     snprintf(out, n, "%.*s%s", (int)(b - gpath), gpath, "STREAML1RA_1001.BUN");
     return 1;
 }
@@ -200,11 +193,6 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
             return 1;
         }
     }
-    if (worldrow_on() && rn_rockport_on() && ci_eq(b, "STREAML1RA_1010.BUN", 20)) {
-        if (!world_file("rockport/STREAML1RA_1010.BUN", real, n, size)) return 0;
-        rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size);
-        return 1;
-    }
     if (!ci_eq(b, "TRACKB", 6) || !isdigit((unsigned char)b[6])) return 0;
     const char *e = b + 6;
     unsigned id = 0;
@@ -214,7 +202,7 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
     if (id == WORLD_ID && worldrow_on()) {
         // the WORLD row: its own file (tools/openworld/tour.py: the merged city with a closed road tour for the rivals, docs/openworld/tour.md);
         // without it the merged city of the base track
-        if (world_file(rn_rockport_on() ? "rockport/TRACKB1010.lzc" : "TRACKB1010.lzc", real, n, size)) { rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size); return 1; }
+        if (world_file("TRACKB1010.lzc", real, n, size)) { rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size); return 1; }
         id = WORLD_BASE;
     } else if (!enabled()) return 0;
     snprintf(name, sizeof name, "TRACKB%u.lzc", id);             // web: tools/serve.py serves build/openworld at /world/; host/files.c web_read fetches "<real>" by range
@@ -223,43 +211,6 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
     return 1;
 }
 
-// ?rockport=1: Olympic City's walled north strip continues over a bridge into the Rockport block (tools/rockport/bridge.py, merge.py).
-// The first time the player passes 10 m/s the car is put at the bridge's city foot, facing it (the Free Run grid is ~1.3 km away; the
-// grid places the car and the game resets it at the start, so moved distance is no signal). From there it is driving only.
-// Spot printed by merge.py: x 1526 y 770 z 51.46 yaw16 11298. Probe for the F10: every 2 s north of the strip, rows 3020..3034 loaded.
-void rockport_tick(Ctx *c) {
-    static uint32_t seen, scratch, last;
-    static int done;
-    if (!rn_rockport_on()) return;
-    uint32_t h = ld(c, 0x7361f8, 4), car = 0;
-    for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !car; r = ld(c, r, 4), k++) {
-        uint32_t e = ld(c, r + 0x14, 4);
-        if (e && ld(c, e + 4, 4) == 1) car = r;      // the list node is the car object (RN_WORLD_AT)
-    }
-    if (!car) return;
-    if (car != seen) { seen = car; done = 0; }
-    if (done) {                                      // evidence for the F10: table SECT_ADDR holds a pointer per loaded id (0x445807)
-        if (ldf(c, car + 0x54) < 800 || rn_telem.presents - last < 120) return;
-        last = rn_telem.presents;
-        uint32_t n = 0;
-        for (int id = 3020; id <= 3034; id++) n += ld(c, 0x7a0000 + id * 4, 4) != 0;
-        rn_log("ROCKPORT: %u of 15 rows loaded (bridge %s), pos %.0f,%.0f,%.1f sp %.1f wheels %u", n, ld(c, 0x7a0000 + 3034 * 4, 4) ? "in" : "OUT",
-               ldf(c, car + 0x50), ldf(c, car + 0x54), ldf(c, car + 0x58), ldf(c, car + 0x3d4), ld(c, car + 0x3cc, 4));
-        return;
-    }
-    if (ldf(c, car + 0x3d4) < 10) return;
-    if (!scratch && !(scratch = guest_alloc(64))) return;
-    done = 1; last = rn_telem.presents;
-    stf(c, scratch, 1526.0f); stf(c, scratch + 4, 770.0f); stf(c, scratch + 8, 51.46f);
-    uint32_t keep[8], a[2] = {0, 0};
-    memcpy(keep, c->r, sizeof keep);
-    c->r[ECX] = car; c->r[EDX] = scratch; c->r[EAX] = 11298;
-    call_guest(c, 0x427e60, 2, a);
-    c->r[EAX] = 0; c->r[EDX] = 0x77a980; c->r[ECX] = car + 0x60;
-    call_guest(c, 0x444840, 0, NULL);
-    memcpy(c->r, keep, sizeof keep);
-    rn_log("ROCKPORT: at the bridge foot, car %08x at %.1f %.1f %.1f", car, ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68));
-}
 
 #ifndef __EMSCRIPTEN__
 // ---- the test teleport ------------------------------------------------------------------------------------------------

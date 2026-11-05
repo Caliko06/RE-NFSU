@@ -867,7 +867,6 @@ static void census_draw(Ctx *c, uint32_t prims) {
     cen[i].n++; cen[i].prims += prims; cen_total++;
 }
 static void disasm_line(const char *l);
-static void geo_present(void);
 static const Obj *car_vs_obj[8];   // the car body vertex shader objects (token hash 0x4728b668); dev.vs is an internal index, not the game's handle
 static int ncar_vs;
 static const Obj *bone_vs_obj[8];  // fx\worldbone.efx's vertex shader (token hash 0x95d99bf8): the skinned NIS people (flag girl, crowd)
@@ -1225,7 +1224,6 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     if (cen_on < 0) { const char *e = getenv("RN_DRAWS"); cen_on = e != NULL; cen_frame = e ? (uint32_t)atoi(e) : 0; }
     if (cen_on > 0 && dev.frames >= cen_frame && cen_total >= 300) { census_dump(); cen_on = 0; }
     ncen = 0; cen_total = 0;
-    geo_present();
     roadrefl_frame();
     dev.frames++;
     rn_telem.presents++;
@@ -2520,53 +2518,6 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
     xdraw.vb = NULL;
     return 1;
 }
-// RN_GEODUMP=<min draws>[:<every>[:<max>]]: up to <max> frames (default 64; <every> frames apart, default 300; each with
-// >= <min draws> indexed draws: a race frame has >= 300, the front-end garage fewer) of every DrawIndexedPrimitive to
-// save/geodump/f<frame>.bin, for the baked AO (tools/ao). Per draw: a header of 16 words (caller, vs hash, ps hash, stride,
-// nvert, nidx, type, tex0 key lo/hi, tex1 key lo/hi, decl elements, fvf, rt w, rt h, BaseVertexIndex), the
-// D3DVERTEXELEMENT9s, vs constants c0-c95, the world/view/projection transforms, the vertex bytes MinVertexIndex ..
-// +NumVertices, then the indices minus MinVertexIndex as u32.
-static struct { int on, done; uint32_t min, every, max, next; uint8_t *b; size_t n, cap; uint32_t draws; } geo = {-1};
-static void geo_put(const void *p, size_t n) {
-    if (geo.n + n > geo.cap) { geo.cap = (geo.n + n) * 2; geo.b = realloc(geo.b, geo.cap); }
-    memcpy(geo.b + geo.n, p, n); geo.n += n;
-}
-static void geo_draw(Ctx *c, uint32_t vbase, uint32_t stride, uint32_t vmin, uint32_t nvert, uint32_t ibase, int i32, uint32_t prims) {
-    if (geo.on < 0) {
-        const char *e = getenv("RN_GEODUMP");
-        geo.on = e != NULL;
-        if (e) { geo.every = 300; geo.max = 64; sscanf(e, "%u:%u:%u", &geo.min, &geo.every, &geo.max);
-                 gf_mkdir("C:/Documents and Settings/All Users/Application Data/NFS Underground/geodump"); }
-    }
-    if (!geo.on || geo.done >= (int)geo.max || dev.frames < geo.next || !vbase || !ibase) return;
-    uint32_t type = ARG(1), nidx = type == 4 ? 3 * prims : type == 5 ? prims + 2 : 0;
-    if (!nidx || stride == 0 || nvert > (1u << 20)) return;
-    Obj *d = obj_k(dev.decl), *t0 = obj_k(dev.tex[0]), *t1 = obj_k(dev.tex[1]), *rt = obj_k(dev.rt[0]), *v = obj_k(dev.vs), *p = obj_k(dev.ps);
-    uint64_t k0 = t0 ? tex_key[dev.tex[0] - 1] : 0, k1 = t1 ? tex_key[dev.tex[1] - 1] : 0;
-    uint32_t ne = d && !dev.fvf ? d->nblob / 2 : 0;
-    uint32_t h[16] = {ld(c, c->r[ESP], 4), v ? shader_hash(v) : 0, p ? shader_hash(p) : 0, stride, nvert, nidx, type,
-                      (uint32_t)k0, (uint32_t)(k0 >> 32), (uint32_t)k1, (uint32_t)(k1 >> 32), ne, dev.fvf, rt ? rt->w : 0, rt ? rt->h : 0,
-                      (uint32_t)ARG(2)};
-    geo_put(h, sizeof h);
-    if (ne) geo_put(d->blob, 8u * ne);
-    geo_put(dev.vsf, 96 * 16);
-    geo_put(dev.xf[256], 64); geo_put(dev.xf[2], 64); geo_put(dev.xf[3], 64);
-    geo_put(G(vbase + vmin * stride), (size_t)nvert * stride);
-    for (uint32_t k = 0; k < nidx; k++) { uint32_t x = ld(c, ibase + k * (i32 ? 4 : 2), i32 ? 4 : 2) - vmin; geo_put(&x, 4); }
-    geo.draws++;
-}
-// At Present: the frame's draws go to one file.
-static void geo_present(void) {
-    if (geo.on <= 0 || dev.frames < geo.next) return;
-    if (geo.draws >= geo.min && geo.draws) {
-        char name[64];
-        snprintf(name, sizeof name, "geodump/f%05u.bin", dev.frames);
-        if (layer_store(name, geo.b, (int)geo.n)) rn_log("d3d9: cannot write save/%s", name);
-        else rn_log("GEODUMP frame %u: %u draws, %zu bytes (flow %x)", dev.frames, geo.draws, geo.n, rn_flow);
-        geo.done++; geo.next = dev.frames + geo.every;
-    }
-    geo.n = 0; geo.draws = 0;
-}
 // DrawIndexedPrimitive(Type, BaseVertexIndex, MinVertexIndex, NumVertices, StartIndex, PrimitiveCount)
 static uint32_t dip_frame, dip_n;   // indexed draws so far in this frame (the race HUD bridge: is there a 3D scene under the quads?)
 static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
@@ -2582,7 +2533,6 @@ static uint32_t IDirect3DDevice9_DrawIndexedPrimitive(Ctx *c) {
     int i32 = ib->fmt == F_INDEX32;
     uint32_t base = stream0(c), stride = dev.stream[0].stride;
     int32_t bv = (int32_t)ARG(2);
-    geo_draw(c, base ? base + (uint32_t)bv * stride : 0, stride, ARG(3), ARG(4), lock_mem(ib) + ARG(5) * (i32 ? 4 : 2), i32, ARG(6));
     static int smlog = -1;
     if (smlog < 0) smlog = getenv("RN_SMOOTH_LOG") != NULL;
     if (base && smlog && is_car_vs(dev.vs)) { static int nl; if (nl++ < 6) rn_log("SMOOTH call type %u i32 %d prims %u", ARG(1), i32, ARG(6)); }
