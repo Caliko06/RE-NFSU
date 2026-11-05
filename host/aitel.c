@@ -173,6 +173,7 @@ static uint32_t rq_next;            // next presents to fire it
 static struct { uint32_t car, f0; int idx, armed, after; float x, y, z, sp, lx, ly, lz, lsp; } rq[RST_MAX];
 static int rq_n;
 static uint32_t gq_pt, gq_flag;
+static uint32_t wx_reset_car, wx_reset_f, wx_resets;   // last reset seen by rst_arm (RN_WALLX)
 
 static int rst_index(Ctx *c, uint32_t car) {
     uint32_t h = ld(c, 0x7361f8, 4);
@@ -211,6 +212,7 @@ static int rst_arm(Ctx *c, uint32_t car, const char *why, uint32_t target) {
     if (i == RST_MAX) return -1;
     if (!rq[i].car) rq[i].car = car, rq[i].armed = 0;
     if (rq[i].armed && rq[i].f0 == f) return i;   // 0x427f70 then 0x427c50 in the same frame: one reset
+    wx_reset_car = car, wx_reset_f = f, wx_resets++;   // RN_WALLX: the post-reset window starts here
     rq[i].idx = rst_index(c, car);
     rq[i].x = ldf(c, car + 0x60), rq[i].y = ldf(c, car + 0x64), rq[i].z = ldf(c, car + 0x68);
     rq[i].sp = ldf(c, car + 0x3d0);
@@ -224,7 +226,7 @@ static int rst_arm(Ctx *c, uint32_t car, const char *why, uint32_t target) {
 
 // target 0x427f70: arg0 = car. target 0x427c50: car = EDI (the entry's this), arg0 = position pointer.
 void reset_call(Ctx *c, uint32_t target) {
-    if (rn_resetlog < 0) rn_resetlog = getenv("RN_RESETLOG") != NULL;
+    if (rn_resetlog < 0) rn_resetlog = getenv("RN_RESETLOG") != NULL || getenv("RN_WALLX") != NULL;   // RN_WALLX needs the reset frame
     if (!rn_resetlog) return;
     uint32_t car = target == 0x427c50 ? c->r[EDI] : ld(c, c->r[ESP] + 4, 4);
     if (!car || car >= GUEST_MEM - 0x900) return;
@@ -257,8 +259,115 @@ static void reset_every(Ctx *c) {
     if (rn_resetlog > 0) rst_arm(c, car, "every", 0x4314a0);
 }
 
+// RN_WALLX=1 (off by default; GOAL 2026-11-05 Block 1, docs/re/reset_walls.md): count wall pass-throughs of the player.
+// Truth = the walls the game itself holds: manager 0x77b130 wsrc rows (+0x10 ptr, +0x14 count, 32 B each, flags byte +3 & 2 =
+// wall, layout in tools/openworld/polys.py). Every Present the player's xy step (prev -> now) is tested against the base
+// segment of each wall row (its two farthest vertices) and its z span (+-2 m; 0x16 walls are infinite). A car that is stopped
+// by a wall never has its centre cross the base segment, so each crossing is a pass-through. The step across a teleport
+// (> 15 m in one Present, or the reset frame itself) is skipped. "post" = within 180 Presents (3 s) after the player's reset.
+static struct { int on; uint32_t init, mm_all, mm_post, ns_all, ns_post, car, nall, npost, fall, fpost, jumps, last; float px, py, pz; int have; } wx;
+
+static uint32_t player_car(Ctx *c) {
+    uint32_t h = ld(c, 0x7361f8, 4);
+    if (!h || h >= GUEST_MEM - 0x1000) return 0;
+    for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (e && e < GUEST_MEM - 16 && ld(c, e + 4, 4) == 1) return r;
+    }
+    return 0;
+}
+
+static int seg_x(float ax, float ay, float bx, float by, float cx, float cy, float dx, float dy) {
+    float d1 = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax), d2 = (bx - ax) * (dy - ay) - (by - ay) * (dx - ax);
+    float d3 = (dx - cx) * (ay - cy) - (dy - cy) * (ax - cx), d4 = (dx - cx) * (by - cy) - (dy - cy) * (bx - cx);
+    return ((d1 > 0) != (d2 > 0) || d1 == 0 || d2 == 0) && ((d3 > 0) != (d4 > 0) || d3 == 0 || d4 == 0) && !(d1 == 0 && d2 == 0);
+}
+
+// Wall rows whose xy bbox overlaps the box pos +- r and whose z span holds z (+-3): what the car's wall cache (car+0x7e8) should hold.
+static uint32_t walls_near(Ctx *c, uint32_t base, uint32_t n, float x, float y, float z, float r) {
+    uint32_t k = 0;
+    for (uint32_t i = 0; i < n; i++) {
+        uint32_t row = base + i * 32, fl = ld(c, row + 3, 1);
+        if (!(fl & 2)) continue;
+        int nv = fl & 0x10 ? 4 : 3;
+        float mnx = 1e9f, mxx = -1e9f, mny = 1e9f, mxy = -1e9f, mnz = 1e9f, mxz = -1e9f, bz = (int16_t)ld(c, row + 4, 2), kz = fl & 4 ? 4.0f : 1.0f;
+        for (int j = 0; j < nv; j++) {
+            float vx = (int16_t)ld(c, row + 8 + 2 * j, 2) / 8.0f, vy = (int16_t)ld(c, row + 16 + 2 * j, 2) / 8.0f;
+            float vz = (bz + (int16_t)ld(c, row + 24 + 2 * j, 2) / 256.0f) * kz;
+            mnx = fminf(mnx, vx), mxx = fmaxf(mxx, vx), mny = fminf(mny, vy), mxy = fmaxf(mxy, vy), mnz = fminf(mnz, vz), mxz = fmaxf(mxz, vz);
+        }
+        k += !(mxx < x - r || mnx > x + r || mxy < y - r || mny > y + r || z < mnz - 3.0f || z > mxz + 3.0f);
+    }
+    return k;
+}
+
+static void wallx_tel(Ctx *c) {
+    if (!wx.on) wx.on = getenv("RN_WALLX") ? 1 : -1;
+    if (wx.on < 0 || ld(c, 0x77a920, 4) != 6) return;
+    uint32_t car = player_car(c), f = rn_telem.presents;
+    if (!car) return;
+    float x = ldf(c, car + 0x60), y = ldf(c, car + 0x64), z = ldf(c, car + 0x68);
+    uint32_t base = ld(c, 0x77b140, 4), n = ld(c, 0x77b144, 4);
+    if (!base || n > 1000000 || base >= GUEST_MEM - n * 32) return;
+    float dx = x - wx.px, dy = y - wx.py;
+    int skip = !wx.have || car != wx.car || hypotf(dx, dy) > 15.0f || (wx_reset_car == car && wx_reset_f == f);
+    uint32_t since = wx_reset_car == car ? f - wx_reset_f : 0xffffffffu;
+    int post = since <= 180;
+    if (!wx.init) {
+        wx.init = 1;
+        uint32_t nw = 0;
+        for (uint32_t i = 0; i < n; i++) nw += (ld(c, base + i * 32 + 3, 1) & 2) != 0;
+        rn_log("WALLXINIT rows %u walls %u", n, nw);
+    }
+    if (!skip) {
+        wx.fall++, wx.fpost += post;
+        float lox = fminf(x, wx.px) - 1, hix = fmaxf(x, wx.px) + 1, loy = fminf(y, wx.py) - 1, hiy = fmaxf(y, wx.py) + 1;
+        for (uint32_t i = 0; i < n; i++) {
+            uint32_t r = base + i * 32;
+            uint32_t fl = ld(c, r + 3, 1);
+            if (!(fl & 2)) continue;
+            int nv = fl & 0x10 ? 4 : 3;
+            float vx[4], vy[4], vz[4], bz = (int16_t)ld(c, r + 4, 2), k = fl & 4 ? 4.0f : 1.0f;
+            float mnx = 1e9f, mxx = -1e9f, mny = 1e9f, mxy = -1e9f, mnz = 1e9f, mxz = -1e9f;
+            for (int j = 0; j < nv; j++) {
+                vx[j] = (int16_t)ld(c, r + 8 + 2 * j, 2) / 8.0f, vy[j] = (int16_t)ld(c, r + 16 + 2 * j, 2) / 8.0f;
+                vz[j] = (bz + (int16_t)ld(c, r + 24 + 2 * j, 2) / 256.0f) * k;
+                mnx = fminf(mnx, vx[j]), mxx = fmaxf(mxx, vx[j]), mny = fminf(mny, vy[j]), mxy = fmaxf(mxy, vy[j]);
+                mnz = fminf(mnz, vz[j]), mxz = fmaxf(mxz, vz[j]);
+            }
+            if (mxx < lox || mnx > hix || mxy < loy || mny > hiy || z < mnz - 2.0f || z > mxz + 2.0f) continue;
+            int bi = 0, bj = 1;
+            float bd = -1;
+            for (int a = 0; a < nv; a++) for (int b = a + 1; b < nv; b++) {
+                float d = hypotf(vx[a] - vx[b], vy[a] - vy[b]);
+                if (d > bd) bd = d, bi = a, bj = b;
+            }
+            if (!seg_x(wx.px, wx.py, x, y, vx[bi], vy[bi], vx[bj], vy[bj])) continue;
+            wx.nall++, wx.npost += post;
+            rn_log("WALLX f%u row %u %s since %d pos %.2f,%.2f,%.2f step %.2f,%.2f wall %.1f,%.1f-%.1f,%.1f z %.1f..%.1f fl %02x sp %.1f",
+                   f, i, post ? "POST" : "other", post ? (int)since : -1, x, y, z, dx, dy, vx[bi], vy[bi], vx[bj], vy[bj], mnz, mxz, fl,
+                   ldf(c, car + 0x3d4));
+        }
+    } else if (wx.have && car == wx.car) wx.jumps++;
+    if (!skip && (f % 15 == 0)) {   // WNEAR: does the cache hold the walls that really are within 8 m? (the cache box is bigger, so it should hold at least that many)
+        uint32_t cw = ld(c, car + 0x7e8, 4), cn = ld(c, car + 0x7e0, 4), near = walls_near(c, base, n, x, y, z, 8.0f);
+        wx.ns_all++, wx.ns_post += post;
+        if (cw < near && cn < 0xa0) {
+            wx.mm_all++, wx.mm_post += post;
+            if (wx.mm_all <= 60) rn_log("WNEAR f%u %s since %d pos %.1f,%.1f,%.1f sp %.1f real8 %u cache %u/%u/%u/%u",
+                                       f, post ? "POST" : "other", post ? (int)since : -1, x, y, z, ldf(c, car + 0x3d4), near, cn, ld(c, car + 0x7e4, 4), cw, ld(c, car + 0x7ec, 4));
+        }
+    }
+    wx.car = car, wx.px = x, wx.py = y, wx.pz = z, wx.have = 1;
+    if (f - wx.last >= 600) {
+        wx.last = f ? f : 1;
+        rn_log("WALLXSUM f%u cross %u post %u frames %u postframes %u resets %u skipped %u wnear_samples %u/%u wnear_short %u/%u (all/post)", f, wx.nall, wx.npost, wx.fall, wx.fpost, wx_resets, wx.jumps, wx.ns_all, wx.ns_post, wx.mm_all, wx.mm_post);
+    }
+}
+
 void reset_tel(Ctx *c) {
     reset_every(c);
+    wallx_tel(c);
     if (rn_resetlog <= 0) return;
     uint32_t f = rn_telem.presents;
     for (int i = 0; i < rq_n; i++) {
