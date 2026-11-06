@@ -841,11 +841,20 @@ static uint32_t traffic_behind(Ctx *c) {
 
 // Rival stuck test (docs/re/ai_stuck.md, lalo): the finders 0x451b00.. call a rival stuck after [0x6b7680] = 0.4 s under [0x6b7684] = 5.0 m/s and then
 // reverse at prio 500; 27-38 % of the entries happen above 5 m/s. Data floats read only by the stuck finders (3 timer reads, 5 speed reads in the exe).
-// RN_AI_STUCK=1 (web ?aistuck=1, off by default): 1.5 s and 3.0 m/s, written every present (the page may reload the data).
+// WORLD (track 1010) default since 2026-11-05 (w5): 1.5 s and 3.0 m/s; RN_AI_STUCK=0 turns it off (web: only ?aistuck=1 exists, boot.js is w2's), =1 forces it on any track.
+// Written every present (the page may reload the data); outside WORLD the factory 0.4 s / 5.0 m/s go back, original mode = reference.
 static void ai_tune(Ctx *c) {
     static int stuck = -1;
-    if (stuck < 0) stuck = getenv("RN_AI_STUCK") != NULL;
-    if (stuck) st(c, 0x6b7680, 0x3fc00000, 4), st(c, 0x6b7684, 0x40400000, 4);
+    if (stuck < 0) stuck = getenv("RN_AI_STUCK") ? atoi(getenv("RN_AI_STUCK")) : 2;
+    int on = stuck == 1 || (stuck == 2 && rivalai() && ld(c, 0x78a2f0, 4) == 1010);
+    st(c, 0x6b7680, on ? 0x3fc00000 : 0x3ecccccd, 4), st(c, 0x6b7684, on ? 0x40400000 : 0x40a00000, 4);
+    // The AI look-ahead [0x7006ec] = 2.0 s (REA xrefs: 26 readers, among them the Avoid finder 0x44f8a0 "obstacle on my path within 2.0 s" and the planners
+    // 0x45b050/0x45b150 it calls): a rival at twice a traffic car's speed starts to dodge ~20 m before it. WORLD default 3.0 (the exe's next float 0x7006f0 is 3.0 too; REA read_bytes 0x7006ec = 00000040 0000 4040); RN_AI_HORIZON=<s> sets it, 0 = factory 2.0. NOT A/B tested (OWNER stopped the ghosts 2026-11-05): rival->traffic hits near the player were 10.8/min at 2.0 s.
+    static float hz = -1;
+    if (hz < 0) hz = getenv("RN_AI_HORIZON") ? (float)atof(getenv("RN_AI_HORIZON")) : 3.0f;
+    float h = hz > 0 && rivalai() && ld(c, 0x78a2f0, 4) == 1010 ? hz : 2.0f;
+    uint32_t hb; memcpy(&hb, &h, 4);
+    st(c, 0x7006ec, hb, 4);
 }
 
 // RN_AILOG: per driver profile, cars and mean speed of those moving; lane changes per 600 presents, all and in front of the player within 40 m.

@@ -303,22 +303,28 @@ static int free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy, i
         int i = 0;
         while (i < 16 && done[i] && done[i] != r) i++;
         if (open && i < 16 && done[i] == r && when[i] >= open_from) continue;   // already placed by this pass
-        if (i == 16 || (!open && done[i] == r && rn_telem.presents < when[i] + 480)) continue;
+        if (i == 16 || (!open && done[i] == r && rn_telem.presents < when[i] + 480)) {
+            if (stuck && getenv("RN_FREELOG")) rn_log("FREE stuck skip %s: %s frame %u", G(e + 0x73c), i == 16 ? "done table full" : "8 s since its last respawn", rn_telem.presents);
+            continue;
+        }
         if (!respawn_pair) respawn_pair = guest_alloc(8);
         uint32_t zero = 0, ft = c->ftop;
         c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
         c->r[EAX] = pc; uint32_t node = call_guest(c, 0x428160, 1, &zero);
         st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
         c->r[EAX] = respawn_pair;
-        if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { c->ftop = ft; return 0; }
+        if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) {
+            if (stuck && getenv("RN_FREELOG")) rn_log("FREE stuck skip %s: no player node (sec %08x node %08x) frame %u", G(e + 0x73c), sec, node, rn_telem.presents);
+            c->ftop = ft; return 0;
+        }
         // along the player's node (dot of its direction and the player's motion) = ahead; the coin picks ahead or behind
         int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, ahead = open ? !(nr & 1) : rnd(&seed) & 1;
         float m0 = open ? 90.0f + 35.0f * (float)nr : 220.0f + (float)(rnd(&seed) % 160), m = m0;
         uint32_t w = 0, s2 = 0, n2 = 0;
         int clear = 0;
-        // open: up to 4 tries, each 60 m farther and the other way round, when the walk stalls or the spot is within 31 m of a car (the far rivals sit on
+        // up to 4 tries (the opening pass and every later respawn), each 60 m farther and the other way round, when the walk stalls or the spot is within 31 m of a car (the far rivals sit on
         // those spots at the start)
-        for (int t = 0; t < (open ? 4 : 1) && !clear; t++) {
+        for (int t = 0; t < 4 && !clear; t++) {
             m = m0 + 60.0f * (float)t;
             st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
             uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)(along == (ahead ^ (t & 1))), 0};
@@ -333,7 +339,12 @@ static int free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy, i
             for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
                 clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
         }
-        if (!clear) { if (open && getenv("RN_FREELOG")) rn_log("FREE open fail: rival %d", nr); c->ftop = ft; return 0; }
+        if (!clear) {   // a stuck or far rival keeps its turn: the next rival is tried, this one again in a second (WORLD has ~40 traffic cars: one spot of four rarely stays 31 m clear)
+            if ((open || stuck) && getenv("RN_FREELOG")) rn_log("FREE %s fail: %s %d", open ? "open" : "stuck respawn spot", open ? "rival" : G(e + 0x73c), nr);
+            c->ftop = ft;
+            if (open) return 0;
+            continue;
+        }
         // dir: the player's way along the road (`along`, at the player's own node; the node 300 m on may bend past 90 degrees from the
         // player's heading, its direction vector says nothing about the way); a stopped player: the rival keeps its own. The racer's
         // route flag is 0 along the node direction, 1 against (forward flag = dir == 0, 0x44ae02).
