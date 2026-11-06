@@ -833,8 +833,19 @@ static void spike_log(Ctx *c) {
             snprintf(top + strlen(top), sizeof top - strlen(top), " 0x%x x%u", rn_clk_site[b], rn_clk_n[b]);
             rn_clk_n[b] = 0;
         }
-        rn_log("spike: frame %u %.1f ms, clock %u:%s, reads %u (%u KB, %.1f ms)", rn_telem.presents, (t - t0) / 1000.0,
-               rn_telem.clock_calls - clk0, top, rn_telem.reads - reads0, rn_telem.read_kb - kb0, rn_telem.read_ms - ms0);
+        static int sxy = -1;   // RN_SPIKEXY=1 (off by default; Block 3, spikes at (1846,-727)): the player's xy on each spike line
+        if (sxy < 0) sxy = getenv("RN_SPIKEXY") != NULL;
+        char pxy[48] = "";
+        if (sxy) {
+            uint32_t ct = ld(c, 0x7361bc, 4), car = ct && ct < GUEST_MEM - 0x900 ? ld(c, ct + 4, 4) : 0;
+            if (car && car < GUEST_MEM - 0x900) {
+                float x, y;
+                memcpy(&x, c->mem + car + 0x60, 4), memcpy(&y, c->mem + car + 0x64, 4);
+                snprintf(pxy, sizeof pxy, ", pxy %.0f,%.0f", x, y);
+            }
+        }
+        rn_log("spike: frame %u %.1f ms, clock %u:%s, reads %u (%u KB, %.1f ms)%s", rn_telem.presents, (t - t0) / 1000.0,
+               rn_telem.clock_calls - clk0, top, rn_telem.reads - reads0, rn_telem.read_kb - kb0, rn_telem.read_ms - ms0, pxy);
     }
     memset(rn_clk_n, 0, sizeof rn_clk_n);
     t0 = t, clk0 = rn_telem.clock_calls, reads0 = rn_telem.reads, kb0 = rn_telem.read_kb, ms0 = rn_telem.read_ms;

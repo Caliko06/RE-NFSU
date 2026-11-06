@@ -25,3 +25,12 @@ Status: cause NOT reproduced. No patch address yet; the ghost counts below say w
 
 ## Open (I, not tested)
 The autopilot is not a human at 40+ m/s with 26 cars. Remaining candidates: pool B at the WALLCAP condition under traffic load, a step of 3 frames (50 ms) at 60 m/s. Next patch needs the OWNER's F10 log of a pass-through (WALLCAP / WALLX lines); with it the address follows.
+
+## Block 2 (nfsu-w3, static RE + 2 ghosts, 2026-11-05)
+Evidence: Ghidra headless decomp (census/ghidra) + objdump of pc/Speed.exe; no REA session opened.
+- Probe fix: `reset_every` armed RST after the call (host/aitel.c), so Block 1's "pos before" was the pos after. Now RST = before, RSTA = after.
+- Player reset in WORLD (ghost r_fix, 117 forced resets, seed 1): the route-path branch (0x427f70) runs: car moves 1-3 m, dz +0.07, speed clamped 8.1.
+  Placement cannot put it past a wall. 0 strict crossings (r_base 105 resets, r_fix 117, ~10k post-reset frames each); the 4 lenient crossings are the same two decks as Block 1.
+- Found, not exercised: `0x4314a0` no-route branch (0x4317ac z = 0; node test at z = 100000 at 0x431724). `0x440a40` takes the highest surface below z+1, else the
+  highest of the column, so z = 0 lands on the top layer of the column. patches_reset.py starts both queries at the car's z. Same result on a one-layer column.
+- Still open: nothing in the code reached by the player's normal reset moves it into a wall. A pass-through needs the OWNER's F10 or a human-speed ghost.
