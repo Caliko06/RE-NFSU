@@ -2205,7 +2205,7 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     Obj *rt = obj_k(dev.rt[0]), *ds = obj_k(dev.ds);
     uint32_t nvc = vs->hl ? 16 + 4 * SM1_HL_N : (uint32_t)(vs->sm->max_const + 1), npc = 8, vbytes = rdraw.vb ? 0 : nvert * stride, ni = rdraw.vb ? 0 : nidx;
     uint32_t total = D_HDR + 4 * nvc + 4 * npc + (vbytes + 3) / 4 + ni;
-    uint32_t *w = calloc(total, 4);
+    uint32_t *w = gpu_put(GPU_DRAW, (int)total);   // straight into the frame list: no calloc, copy and free per draw
     w[D_TOPO] = type; w[D_NVERT] = nvert; w[D_NIDX] = nidx; w[D_STRIDE] = stride;
     w[D_VS] = dev.vs; w[D_PS] = dev.ps; w[D_DECL] = dev.decl;
     w[D_RT] = rt->gpu; w[D_DS] = ds && dev.rs[7] ? ds->gpu : 0;
@@ -2244,8 +2244,6 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     if (vbytes) memcpy(p, xdraw.vb ? xdraw.vb : G(vbase + vmin * stride), vbytes);
     p += (vbytes + 3) / 4;
     if (ni) memcpy(p, ix, 4u * ni);
-    gpu_cmd(GPU_DRAW, (int)total, w);
-    free(w);
     free(ix);
     // RN_DRAWSTAT=1: words per frame by kind of draw (resident, smoothed car, indexed copy, plain copy), every 300 frames.
     static int dstat = -1;
