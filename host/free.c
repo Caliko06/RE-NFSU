@@ -72,7 +72,7 @@ static void free_curves(Ctx *c, int on) {
         }
     saved = on;
 }
-static struct { uint32_t drv, dir; } rdir[16];   // free_dir's table, see free_respawn
+static struct { uint32_t drv, dir; } rdir[16];   // free_dir's table, see riv_place
 static int n_game, n_free;             // free_spacing: moves with the game's spacing, moves given the track's spacing
 #define KEEP_M 200.0f   // free_recycle: a car this close and ahead of the player is never moved
 static int n_far, n_kept, n_offbit, n_onbit;   // free_recycle: far cars sent to a move; free_tnode: cars placed on a node without / with the bit
@@ -273,108 +273,124 @@ static void rival_flip(Ctx *c, uint32_t drv, uint32_t dir) {
     if (path) c->r[ESI] = path, call_guest(c, 0x5a5340, 0, NULL), c->r[ESI] = esi;
     for (int k = 0; k < 8; k++) st(c, drv + 0xc + 4 * k, ld(c, drv + 0xc + 4 * k, 4) & ~1u, 4);
 }
-static uint32_t respawn_pair, open_from;
-static int opened, drove;               // the opening pass of free_respawn is done for this race
-// open: the opening pass (OWNER 2026-10-31: rivals vanished right after the start, others were not there until it): once, in the first second the
-// player moves, every rival goes to its own spot 90..340 m of road from the player, alternating ahead and behind, already rolling, so some
-// are on the street from the first second and none sits stacked on the grid (the grid pile was then 'stuck' and teleported away).
-// RN_RIVALOPEN=0: off. Returns 1 when the pass is complete.
-static int free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy, int open) {
-    static int off = -1, rev; static float far; static uint32_t seed = 0x5eed1234, done[16], when[16];
-    if (off < 0) rev = getenv("RN_RESPAWNREV") != NULL;   // test-only: every respawn drives the way opposite to the player's (the flipped racer AI on its own)
-    if (off < 0) off = getenv("RN_RESPAWN") && !atoi(getenv("RN_RESPAWN")), far = getenv("RN_RIVALFAR") ? (float)atof(getenv("RN_RIVALFAR")) : 400.0f;
-    if (off || !pc) return 0;
+static uint32_t respawn_pair, go_at;
+static int drove;                       // seconds in a row the player has been driving (10+ m/s)
+// Each rival's life in a free mode race (OWNER 2026-11-06: explicit states; host/phase.c starts every race with an empty table):
+//   R_GRID      on the grid. Once the player drives 2 s (the go; RN_RIVALOPEN=0: never) it gets its own opening spot, 90 + 35 i m of
+//               road from the player, ahead and behind in turn, already rolling (OWNER 2026-10-31: rivals vanished after the start,
+//               others were not there until later). A spot that is not clear is tried again next second; the other rivals go on.
+//   R_ROAD      driving. Under 2 m in a second for 5 s in a row (OWNER 2026-10-28, MW's AIPursuit/AITrafficManager rule) or farther
+//               than RN_RIVALFAR (400 m) from the player, 10 s after the race start: respawned 220..380 m out, one rival a second.
+//   R_COOLDOWN  8 s after its last placement nothing moves it, then R_ROAD.
+// A grid rival is also respawned when stuck or far (the player may never drive off).
+enum { R_GRID, R_ROAD, R_COOLDOWN };
+static const char *const RIV_ST[] = {"GRID", "ROAD", "COOLDOWN"};
+static struct { uint32_t r, since; int st, slow; float x, y; } riv[16];   // this race's rivals, by record (free_race_begin zeroes it)
+static void riv_go(Ctx *c, int k, int to, const char *why) {
+    if (getenv("RN_FREELOG")) rn_log("FREE %s %s -> %s (%s) frame %u", G(ld(c, riv[k].r + 0x14, 4) + 0x73c), RIV_ST[riv[k].st], RIV_ST[to], why, rn_telem.presents);
+    riv[k].st = to, riv[k].since = rn_telem.presents, riv[k].slow = 0;
+}
+// One placement of rival r on the road from the player: 1 placed, 0 no clear spot, -1 no player node (nothing can be placed now).
+static int riv_place(Ctx *c, uint32_t h, uint32_t pc, uint32_t r, double vx, double vy, int open, int nr, int stuck) {
+    static int rev = -1; static uint32_t seed = 0x5eed1234;
+    if (rev < 0) rev = getenv("RN_RESPAWNREV") != NULL;   // test-only: every respawn drives the way opposite to the player's (the flipped racer AI on its own)
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
-    // Stuck (OWNER 2026-10-28, MW's AIPursuit/AITrafficManager rule): a rival under 2 m/s for 5 s in a row (this runs once a
-    // second, after the grid) is respawned like a far one, whatever its distance.
-    static struct { uint32_t r; float x, y; int slow; } st5[16];
-    static uint32_t race;
-    if (rn_new_race(&race)) memset(done, 0, sizeof done), memset(when, 0, sizeof when), memset(st5, 0, sizeof st5);   // they filled up over races
-    int nr = -1;
-    for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
+    if (!respawn_pair) respawn_pair = guest_alloc(8);
+    uint32_t zero = 0, ft = c->ftop;
+    c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
+    c->r[EAX] = pc; uint32_t node = call_guest(c, 0x428160, 1, &zero);
+    st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
+    c->r[EAX] = respawn_pair;
+    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) {
+        if (getenv("RN_FREELOG")) rn_log("FREE place skip %s: no player node (sec %08x node %08x) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), sec, node, rn_telem.presents);
+        c->ftop = ft; return -1;
+    }
+    // along the player's node (dot of its direction and the player's motion) = ahead; the coin picks ahead or behind
+    int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, ahead = open ? !(nr & 1) : rnd(&seed) & 1;
+    float m0 = open ? 90.0f + 35.0f * (float)nr : 220.0f + (float)(rnd(&seed) % 160), m = m0;
+    uint32_t w = 0, s2 = 0, n2 = 0;
+    int clear = 0;
+    // up to 4 tries, each 60 m farther and the other way round, when the walk stalls or the spot is within 31 m of a car (WORLD has
+    // ~40 traffic cars: one spot of four rarely stays 31 m clear)
+    for (int t = 0; t < 4 && !clear; t++) {
+        m = m0 + 60.0f * (float)t;
+        st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
+        uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)(along == (ahead ^ (t & 1))), 0};
+        memcpy(&a[2], &m, 4);
+        c->r[ECX] = sec, c->r[EAX] = node;
+        w = call_guest_cdecl(c, 0x4563d0, 5, a);
+        s2 = ld(c, respawn_pair, 4), n2 = ld(c, respawn_pair + 4, 4);
+        c->r[EAX] = respawn_pair;
+        if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) continue;
+        float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
+        clear = 1;
+        for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
+            clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
+    }
+    if (!clear) {
+        if (getenv("RN_FREELOG")) rn_log("FREE %s fail: %s %d", open ? "open" : "respawn spot", G(ld(c, r + 0x14, 4) + 0x73c), nr);
+        c->ftop = ft; return 0;
+    }
+    // dir: the player's way along the road (`along`, at the player's own node; the node 300 m on may bend past 90 degrees from the
+    // player's heading, its direction vector says nothing about the way); a stopped player: the rival keeps its own. The racer's
+    // route flag is 0 along the node direction, 1 against (forward flag = dir == 0, 0x44ae02).
+    uint32_t drv = ld(c, r + 0x2c, 4), had = drv ? ld(c, drv, 4) : 0, flag = !along ^ rev;
+    if (sp < 2.0) { c->r[ECX] = drv; flag = free_dir(c) != 0; }
+    float dir = flag ? -1.0f : 1.0f, lo = ldf(c, 0x700d58), v = sp > lo ? (float)sp : lo;   // 0x426617: 8 m/s at least
+    if (open && v < 14.0f) v = 14.0f;   // rolling from the first second
+    if (drv && on > 0) rival_flip(c, drv, flag);
+    double was = hypot(ldf(c, r + 0x50) - px, ldf(c, r + 0x54) - py);
+    uint32_t p[9] = {r, s2, n2, 0, 1, 0, 0, 0, 0};
+    memcpy(&p[3], &v, 4), memcpy(&p[5], &dir, 4);
+    call_guest(c, 0x427f70, 9, p);
+    c->ftop = ft;
+    double dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py;
+    if (getenv("RN_FREELOG"))
+        rn_log("FREE respawn %s%s: %.0f m -> %.0f m %s (walk %s %.0f m, ret %u, node %08x dir %+.0f flag %u vt %08x, %.0f m/s) frame %u", G(ld(c, r + 0x14, 4) + 0x73c),
+               open ? " (open)" : stuck ? " (stuck)" : "", was, hypot(dx, dy), dx * vx + dy * vy >= 0 ? "ahead" : "behind", ahead ? "ahead" : "behind", m, w, n2, dir, flag, had, v, rn_telem.presents);
+    return 1;
+}
+// Once a second in a race: every rival's state (see R_GRID). go = the player has driven off; late = 10 s after the race start.
+static void free_rivals(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy, int go, int late) {
+    static int off = -1; static float far;
+    if (off < 0) off = getenv("RN_RESPAWN") && !atoi(getenv("RN_RESPAWN")), far = getenv("RN_RIVALFAR") ? (float)atof(getenv("RN_RIVALFAR")) : 400.0f;
+    if (off || !pc) return;
+    double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54);
+    int nr = -1, moved = 0, ngrid = 0;   // moved: one far or stuck respawn a second, as before
+    for (uint32_t r = ld(c, h, 4), n = 0; r != h && n < 200; r = ld(c, r, 4), n++) {
         uint32_t e = ld(c, r + 0x14, 4);
         if (!e || ld(c, e + 4, 4) != 2) continue;
         nr++;
-        int s = 0;
-        while (s < 15 && st5[s].r && st5[s].r != r) s++;
+        int k = 0;
+        while (k < 16 && riv[k].r && riv[k].r != r) k++;
+        if (k == 16) continue;   // more than 16 rivals in one race: not possible (NRIV_MAX 9)
         float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
-        st5[s].slow = st5[s].r == r && hypot(x - st5[s].x, y - st5[s].y) < 2.0 ? st5[s].slow + 1 : 0;
-        st5[s].r = r, st5[s].x = x, st5[s].y = y;
-        int stuck = st5[s].slow >= 5;
-        if (!open && !stuck && hypot(x - px, y - py) < far) continue;
-        int i = 0;
-        while (i < 16 && done[i] && done[i] != r) i++;
-        if (open && i < 16 && done[i] == r && when[i] >= open_from) continue;   // already placed by this pass
-        if (i == 16 || (!open && done[i] == r && rn_telem.presents < when[i] + 480)) {
-            if (stuck && getenv("RN_FREELOG")) rn_log("FREE stuck skip %s: %s frame %u", G(e + 0x73c), i == 16 ? "done table full" : "8 s since its last respawn", rn_telem.presents);
-            continue;
+        if (!riv[k].r) riv[k].r = r, riv[k].st = R_GRID, riv[k].since = rn_telem.presents;
+        else riv[k].slow = hypot(x - riv[k].x, y - riv[k].y) < 2.0 ? riv[k].slow + 1 : 0;
+        riv[k].x = x, riv[k].y = y;
+        if (riv[k].st == R_COOLDOWN && rn_telem.presents >= riv[k].since + 480) riv_go(c, k, R_ROAD, "8 s");
+        int stuck = riv[k].slow >= 5, gone = hypot(x - px, y - py) >= far;
+        if (riv[k].st == R_GRID && go) {
+            int got = riv_place(c, h, pc, r, vx, vy, 1, nr, 0);
+            if (got < 0) return;
+            if (got) { riv_go(c, k, R_COOLDOWN, "opening spot"); continue; }
         }
-        if (!respawn_pair) respawn_pair = guest_alloc(8);
-        uint32_t zero = 0, ft = c->ftop;
-        c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
-        c->r[EAX] = pc; uint32_t node = call_guest(c, 0x428160, 1, &zero);
-        st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
-        c->r[EAX] = respawn_pair;
-        if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) {
-            if (stuck && getenv("RN_FREELOG")) rn_log("FREE stuck skip %s: no player node (sec %08x node %08x) frame %u", G(e + 0x73c), sec, node, rn_telem.presents);
-            c->ftop = ft; return 0;
-        }
-        // along the player's node (dot of its direction and the player's motion) = ahead; the coin picks ahead or behind
-        int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, ahead = open ? !(nr & 1) : rnd(&seed) & 1;
-        float m0 = open ? 90.0f + 35.0f * (float)nr : 220.0f + (float)(rnd(&seed) % 160), m = m0;
-        uint32_t w = 0, s2 = 0, n2 = 0;
-        int clear = 0;
-        // up to 4 tries (the opening pass and every later respawn), each 60 m farther and the other way round, when the walk stalls or the spot is within 31 m of a car (the far rivals sit on
-        // those spots at the start)
-        for (int t = 0; t < 4 && !clear; t++) {
-            m = m0 + 60.0f * (float)t;
-            st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
-            uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)(along == (ahead ^ (t & 1))), 0};
-            memcpy(&a[2], &m, 4);
-            c->r[ECX] = sec, c->r[EAX] = node;
-            w = call_guest_cdecl(c, 0x4563d0, 5, a);
-            s2 = ld(c, respawn_pair, 4), n2 = ld(c, respawn_pair + 4, 4);
-            c->r[EAX] = respawn_pair;
-            if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) continue;
-            float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
-            clear = 1;
-            for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
-                clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
-        }
-        if (!clear) {   // a stuck or far rival keeps its turn: the next rival is tried, this one again in a second (WORLD has ~40 traffic cars: one spot of four rarely stays 31 m clear)
-            if ((open || stuck) && getenv("RN_FREELOG")) rn_log("FREE %s fail: %s %d", open ? "open" : "stuck respawn spot", open ? "rival" : G(e + 0x73c), nr);
-            c->ftop = ft;
-            if (open) return 0;
-            continue;
-        }
-        // dir: the player's way along the road (`along`, at the player's own node; the node 300 m on may bend past 90 degrees from the
-        // player's heading, its direction vector says nothing about the way); a stopped player: the rival keeps its own. The racer's
-        // route flag is 0 along the node direction, 1 against (forward flag = dir == 0, 0x44ae02).
-        uint32_t drv = ld(c, r + 0x2c, 4), had = drv ? ld(c, drv, 4) : 0, flag = !along ^ rev;
-        if (sp < 2.0) { c->r[ECX] = drv; flag = free_dir(c) != 0; }
-        float dir = flag ? -1.0f : 1.0f, lo = ldf(c, 0x700d58), v = sp > lo ? (float)sp : lo;   // 0x426617: 8 m/s at least
-        if (open && v < 14.0f) v = 14.0f;   // rolling from the first second
-        if (drv && on > 0) rival_flip(c, drv, flag);
-        double was = hypot(ldf(c, r + 0x50) - px, ldf(c, r + 0x54) - py);
-        uint32_t p[9] = {r, s2, n2, 0, 1, 0, 0, 0, 0};
-        memcpy(&p[3], &v, 4), memcpy(&p[5], &dir, 4);
-        call_guest(c, 0x427f70, 9, p);
-        c->ftop = ft;
-        done[i] = r, when[i] = rn_telem.presents, st5[s].slow = 0;
-        double dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py;
-        if (getenv("RN_FREELOG"))
-            rn_log("FREE respawn %s%s: %.0f m -> %.0f m %s (walk %s %.0f m, ret %u, node %08x dir %+.0f flag %u vt %08x, %.0f m/s) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), stuck ? " (stuck)" : "", was,
-                   hypot(dx, dy), dx * vx + dy * vy >= 0 ? "ahead" : "behind", ahead ? "ahead" : "behind", m, w, n2, dir, flag, had, v, rn_telem.presents);
-        if (!open) return 0;                                      // one rival a second
+        if (riv[k].st == R_COOLDOWN || !late || moved || !(stuck || gone)) { ngrid += riv[k].st == R_GRID; continue; }
+        int got = riv_place(c, h, pc, r, vx, vy, 0, nr, stuck);
+        if (got < 0) return;
+        if (got) { riv_go(c, k, R_COOLDOWN, stuck ? "stuck" : "far"); moved = 1; }
+        else ngrid += riv[k].st == R_GRID;
     }
-    return open;
+    static uint32_t told;   // the frame the opening ended (logged once a race)
+    if (go && !ngrid && nr >= 0 && told < go_at && getenv("RN_FREELOG"))
+        told = rn_telem.presents, rn_log("FREE opening done: %d rivals on the road %.1f s after the go, frame %u", nr + 1, (rn_telem.presents - go_at) / 60.0, rn_telem.presents);
 }
 
 // Traffic (OWNER 2026-10-28: "traffic like MW"): the TrafficTeleporter keeps cars only along the race route, so in the open
 // world the player outruns them and drives empty streets. MW's AITrafficManager rule, with this game's own placer: every
 // 30 frames, while fewer than TMOVE_NEAR cars are within 250 m, one car that is parked (driver +0x4d1), farther than 400 m,
 // or behind the player (dot with his motion < 0) and > 130 m away for 4 s, goes to a node TMOVE_AHEAD +-50 m + 1 s of speed
-// ahead on the road (0x4563d0 from the player's node, as free_respawn), at least 150 m away in a straight line (out of view
+// ahead on the road (0x4563d0 from the player's node, as riv_place), at least 150 m away in a straight line (out of view
 // distance) and 20 m from every car. The move is the Free Run move's own tail (0x59a2c0 at 0x59a5ac..0x59a6c6): lane =
 // 0x5995e0(ecx = teleporter; node, side = 0x59aea0's coin on [0x78a304]), -1 = none; speed = 0x42adf0 (eax node, ecx lane:
 // byte [node + lane + 0x6a]); 0x59a7c0(car, node, 0, lane, 0x41c4b127, speed, 0) (thiscall, ret 0x1c: a lane >= 6 drives
@@ -553,7 +569,7 @@ void free_frontend(Ctx *c) {
 void free_race_begin(Ctx *c) {
     (void)c;
     memset(rdir, 0, sizeof rdir);
-    tele = 0, opened = drove = 0, open_from = 0;
+    tele = 0, drove = 0, go_at = 0, memset(riv, 0, sizeof riv);
     n_game = n_free = n_far = n_kept = n_offbit = n_onbit = 0, n_tmove = n_tfail = 0, memset(n_twhy, 0, sizeof n_twhy);
 }
 
@@ -631,11 +647,8 @@ void free_tick(Ctx *c) {
         static int ropen = -1;
         if (ropen < 0) ropen = !getenv("RN_RIVALOPEN") || atoi(getenv("RN_RIVALOPEN"));
         drove = (was[0] || was[1]) && hypot(x - was[0], y - was[1]) > 10.0 ? drove + 1 : 0;   // the parked car drifts 4-7 m/s, a grid teleport is one jump; driving is 10+ m/s, seconds in a row
-        if (me && ropen && !opened && drove >= 2) {   // the player drives 2 s = the go (the game re-grids at the pre-race screen, after `start`)
-            if (!open_from) open_from = rn_telem.presents;
-            opened = free_respawn(c, rh, me, x - was[0], y - was[1], 1);
-        }
-        if (me && rn_telem.presents > start + 600) free_respawn(c, rh, me, x - was[0], y - was[1], 0);
+        if (me && ropen && drove >= 2 && !go_at) go_at = rn_telem.presents;   // the player drives 2 s = the go (the game re-grids at the pre-race screen, after `start`)
+        if (me) free_rivals(c, rh, me, x - was[0], y - was[1], go_at != 0, rn_telem.presents > start + 600);
         was[0] = x, was[1] = y;
     }
     // RN_BODYLOG: the player's position every frame (WORLD vs 1001 handling A/B: z jitter = bumps, xy = speed and turns).
