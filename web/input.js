@@ -38,7 +38,7 @@ function startInput(M, canvas, steerLog) {
     push((down ? 0x100 : 0) | d);
   }
   function key(ev, down) {
-    const d = DIK[ev.code];
+    const d = dikFor(ev.code);                         // web/binds.js: the saved key bindings (default: the key's own DIK)
     if (d === undefined) return;
     ev.preventDefault();
     setKey(d, down, ev.timeStamp);
@@ -62,11 +62,11 @@ function startInput(M, canvas, steerLog) {
     if (!ex && document.pointerLockElement === canvas) document.exitPointerLock();
   }
   setInterval(mouseMode, 250);
-  canvas.addEventListener('mousemove', e => {
+  canvas.addEventListener('mousemove', e => {   // iOS synthesizes mouse events from taps, without movementX
     const r = canvas.getBoundingClientRect();
     if (!r.width || !r.height) return;
-    remX += e.movementX * (canvas.gameW || canvas.width) / r.width;
-    remY += e.movementY * (canvas.gameH || canvas.height) / r.height;
+    remX += (e.movementX || 0) * (canvas.gameW || canvas.width) / r.width;
+    remY += (e.movementY || 0) * (canvas.gameH || canvas.height) / r.height;
     const ix = Math.trunc(remX), iy = Math.trunc(remY);
     remX -= ix; remY -= iy;
     if (ix) Atomics.add(H(), base + 2, ix);

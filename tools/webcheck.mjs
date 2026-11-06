@@ -4,8 +4,8 @@
 // keys: "20:Enter,23:ArrowDown" = at that second, a tap of that KeyboardEvent.code on the canvas;
 // "60:KeyW+6" holds it 6 seconds (released on the first check after that).
 // node tools/webcheck.mjs --route: the regression route; exit 0 = PASS. It grows with each milestone met.
-import { spawn } from 'node:child_process';
-import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { execSync, spawn } from 'node:child_process';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -18,7 +18,7 @@ const ROUTE = { keys: '20:Enter,23:Enter,26:ArrowRight,29:Enter,32:Enter,35:Ente
   shot: 'build/route.png' };
 const route = process.argv[2] === '--route';
 const arg = route ? [] : process.argv.slice(2);
-const url = arg[0] || 'http://127.0.0.1:5180/';
+const url = process.env.RN_URL || arg[0] || 'http://127.0.0.1:5180/';   // RN_URL: a window's own server (5181-5183), also for --route
 const secs = route ? ROUTE.secs : Number(arg[1] || 120);
 const shot = route ? ROUTE.shot : arg[2] || 'build/webcheck.png';
 const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, c]) => ({ t: +t, code: c.split('+')[0], hold: +(c.split('+')[1] || 0) }));
@@ -28,7 +28,7 @@ if (!process.env.RN_KEEP_SAVE) rmSync('build/save-headless', { recursive: true, 
 // RE-NFSU's own CDP port: ~/RE-NFSMW's webcheck holds 9333 (127.0.0.1) and once took this repo's run into its Chrome,
 // which died with its run (2026-10-25, the page stopped at 61 s).
 const port = Number(process.env.RN_CDP_PORT || 9381);
-const profileDir = mkdtempSync(join(tmpdir(), 'rn-'));
+const profileDir = process.env.RN_PROFILE_DIR || mkdtempSync(join(tmpdir(), 'rn-'));   // RN_PROFILE_DIR: a profile kept between runs (a warm HTTP and code cache)
 // RN_X11=1 (Pod, AGENTS.md): headless Chrome on Linux gets SwiftShader, so Chrome runs on an Xvfb DISPLAY with Vulkan,
 // which gives WebGPU the NVIDIA. The user agent still says HeadlessChrome: tools/serve.py tells test runs apart by it.
 const x11 = process.env.RN_X11 ? ['--ozone-platform=x11', '--enable-features=Vulkan', '--ignore-gpu-blocklist', '--no-sandbox',
@@ -37,7 +37,7 @@ const chrome = spawn(process.env.RN_CHROME || '/Users/angeldamian/.local/bin/chr
   ...x11, `--remote-debugging-port=${port}`, `--user-data-dir=${profileDir}`,
   '--no-first-run', '--enable-unsafe-webgpu', '--mute-audio', '--window-size=1280,1100', 'about:blank'], { stdio: 'ignore' });
 // Each profile is ~330 MB: 107 left behind filled 29 GB of the Mac. Removed on every exit.
-process.on('exit', () => { chrome.kill('SIGKILL'); try { rmSync(profileDir, { recursive: true, force: true }); } catch {} });
+process.on('exit', () => { chrome.kill('SIGKILL'); if (!process.env.RN_PROFILE_DIR) try { rmSync(profileDir, { recursive: true, force: true }); } catch {} });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let tabs;
 for (let i = 0; i < 50 && !tabs; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); } catch { await sleep(200); } }
@@ -143,6 +143,31 @@ const recAt = rec ? Number(process.env.RN_REC_AT || 0) : -1;
 let recOn = false;
 async function recStart() { recOn = true; await send('Page.startScreencast', { format: 'jpeg', quality: 90, everyNthFrame: 1 }); }
 if (recAt === 0) await recStart();
+// RN_MEASURE=file: what a run costs, as JSON: bytes over the wire by class (wasm, Speed.exe, game files, the rest), peak Chrome RSS (the whole
+// process tree, wasm memory included) and peak JS heap of the page, and the page seconds of the load markers in the log.
+const measure = process.env.RN_MEASURE, net = new Map(), peak = { rssMB: 0, jsHeapMB: 0 };
+if (measure) {
+  const onmsg = ws.onmessage;
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data), k = (m.sessionId || '') + (m.params?.requestId || '');
+    if (m.method === 'Target.attachedToTarget') send('Network.enable', {}, m.params.sessionId);
+    if (m.method === 'Network.requestWillBeSent') net.set(k, { path: decodeURIComponent(new URL(m.params.request.url).pathname), enc: 0 });
+    if (m.method === 'Network.loadingFinished' && net.has(k)) net.get(k).enc = m.params.encodedDataLength;
+    onmsg(e);
+  };
+  await send('Network.enable');
+  await send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true });
+  await send('Performance.enable');
+}
+async function sample() {
+  const ps = execSync('ps -axo rss=,command=', { maxBuffer: 1 << 26 }).toString().split('\n').filter(l => l.includes(profileDir));
+  const by = {};
+  for (const l of ps) { const t = l.match(/--type=([\w-]+)/)?.[1] || 'browser'; by[t] = (by[t] || 0) + Number(l.trim().split(/\s+/)[0]) / 1024; }
+  const tot = Object.values(by).reduce((a, b) => a + b, 0);
+  if (tot > peak.rssMB) { peak.rssMB = tot; peak.byType = Object.fromEntries(Object.entries(by).map(([k, v]) => [k, Math.round(v)])); }
+  const h = (await send('Performance.getMetrics'))?.metrics?.find(x => x.name === 'JSHeapUsedSize')?.value || 0;
+  peak.jsHeapMB = Math.max(peak.jsHeapMB, h / 1048576);
+}
 await send('Page.navigate', { url });
 const t0 = Date.now();
 let text = '', seen = 0;
@@ -166,6 +191,7 @@ while (Date.now() - t0 < secs * 1000) {
   }
   if (recAt > 0 && !recOn && Date.now() - t0 >= recAt * 1000) await recStart();
   if (prof) await profile();
+  if (measure) await sample();
   const r = await send('Runtime.evaluate', { expression: "document.getElementById('status')?.textContent + '\\n' + document.getElementById('log')?.innerText" });
   text = r?.result?.value || '';
   if (/STOP|Falta COOP/.test(text)) break;
@@ -215,6 +241,24 @@ if (png?.data) { writeFileSync(shot, Buffer.from(png.data, 'base64')); console.l
 console.log(`[${((Date.now() - t0) / 1000).toFixed(1)} s]`);
 console.log(text);
 if (errors.length) console.log('page errors:\n' + errors.join('\n'));
+if (measure) {
+  // Page seconds of the load markers come from the server's copy of the page log (build/webcheck.log, one block per page load).
+  const wl = existsSync('build/webcheck.log') ? readFileSync('build/webcheck.log', 'utf8') : '';
+  const at = re => { const m = wl.match(new RegExp('^([0-9.]+) ' + re, 'm')); return m ? Number(m[1]) : null; };
+  const res = (await send('Runtime.evaluate', { returnByValue: true, expression: `JSON.stringify(performance.getEntriesByType('resource').filter(e => /speed\\.(wasm|js)$|Speed\\.exe$/.test(e.name)).map(e => [e.name.split('/').pop(), +e.startTime.toFixed(0), +e.responseEnd.toFixed(0)]))` }))?.result?.value;
+  const cls = { wasm: 0, exe: 0, game: 0, gameFiles: new Set(), other: 0 };
+  for (const r of net.values()) {
+    if (r.path.endsWith('.wasm')) cls.wasm += r.enc; else if (r.path.endsWith('Speed.exe')) cls.exe += r.enc;
+    else if (r.path.startsWith('/game/')) { cls.game += r.enc; cls.gameFiles.add(r.path); } else cls.other += r.enc;
+  }
+  const mb = v => Math.round(v / 1048576 * 10) / 10;
+  writeFileSync(measure, JSON.stringify({ url, secs: (Date.now() - t0) / 1000, wire_MB: { wasm: mb(cls.wasm), exe: mb(cls.exe), game: mb(cls.game), other: mb(cls.other) },
+    gameFiles: cls.gameFiles.size, requests: net.size, peakRssMB: Math.round(peak.rssMB), rssByType: peak.byType, peakJsHeapMB: Math.round(peak.jsHeapMB),
+    resourceMs: res ? JSON.parse(res) : null,
+    top: Object.entries([...net.values()].reduce((o, r) => { const p = r.path.replace(/^(\/remaster\/.*\/).*/, '$1*'); (o[p] ||= [0, 0]); o[p][0] += r.enc; o[p][1]++; return o; }, {})).sort((a, b) => b[1][0] - a[1][0]).slice(0, 12).map(([p, [n, k]]) => `${(n / 1048576).toFixed(1)} MB x${k} ${p}`),
+    pageSec: { screenLine: at('screen:'), exeLoaded: at('Speed.exe loaded'), firstPresent: at('d3d9 first Present'), raceHud: at('d3d9 race HUD') } }, null, 1) + '\n');
+  console.log('measure: ' + measure);
+}
 chrome.kill('SIGKILL');   // headless Chrome can ignore SIGTERM and keep the game (and its sound) running
 if (route) {
   const why = /STOP/.test(text) ? 'a STOP' : errors.length ? 'a page error' : !seen ? `no ${ROUTE.marker} in ${secs} s`

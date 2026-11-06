@@ -158,7 +158,11 @@ async function startGpu(M, canvas, report, onFrame) {
     // by default; ?worldhd=1 brings the pack back.
     const world = wq === '1';
     const worldBc = world && v2 && BC && q.get('worldbc') !== '0';
+    // index_bc.tsv (tools/remaster/pack_bc7.py): the same three lists as BC7 .dds, a quarter of the GPU memory of rgba8
+    // (title screen: 528 MB -> ~132 MB for its 539 textures); it overrides the keys it has. ?packbc=0 = the webp/png as before.
+    const packBc = v2 && BC && q.get('packbc') !== '0';
     const lists = ['remaster/index.tsv', ...(v2 ? ['remaster/index_v2.tsv', 'remaster/index_fe_v2.tsv'] : []),
+      ...(packBc ? ['remaster/index_bc.tsv'] : []),
       ...(worldBc ? ['remaster/index_world_bc.tsv'] : world ? ['remaster/index_world.tsv', ...(v2 ? ['remaster/index_world_v2.tsv'] : [])] : []),
       'remaster/index_glow.tsv'];   // last: tools/remaster/flare_glow.py, the clean round lamp glow wins over any upscale of the flares
     for (const u of lists) try {

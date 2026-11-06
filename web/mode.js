@@ -33,6 +33,8 @@ const RN_Q = (() => {
   const q = new URLSearchParams(location.search);
   if (RN_MODE === 'original') for (const [k, v] of Object.entries(RN_ORIGINAL)) if (!q.has(k)) q.set(k, v);
   if (q.get('fx') === '0') for (const k of RN_FX_OFF) if (!q.has(k)) q.set(k, RN_ORIGINAL[k]);
+  // Coarse pointer (iPad, phone): 30 fps unless ?fps= says otherwise (host RN_FPS, web/boot.js)
+  if (!q.has('fps') && matchMedia('(pointer: coarse)').matches) q.set('fps', '30');
   return q;
 })();
 
