@@ -186,6 +186,16 @@ ids are >= 1000 (V F), so columns 1..4 are unused. Traffic rides get no tuner sk
 7. **Collisions.** Traffic cars use the common car body (`CarCollisionBodySlotPool`, 30 bodies; re_racer_cap.md). Parking increments a counter at
    `[[veh+0x3c]+0x1b]` (U what tests it). Racers avoid traffic through the shared neighbour list (re_ai_interact.md section 4, I).
 
+Placement rules in detail (V asm, 2026-11-06; scratchpad gap1):
+- `0x59b1e0` (Spot_NearOtherCar) walks the WHOLE car list `[0x7361f8]` (players, racers, traffic, parked or not). Metric = route position, not Euclid:
+  `d = 0x443d60(node+0x38, car+0x814)`, wrapped to +-L/2 on a loop. Skips self, any car with byte `[car+0x8a8] != 0` (meaning U) and, when flag == 0 (teleporter), cars with `[car+0x4d0] == 0`.
+  Traffic car (entrant kind 3): near if `|d| < spacing` (31 m). Racer or player: near only if `0 < d < spacing`, i.e. the spot is 0..31 m AHEAD of it; a racer 20 m ahead does not block.
+- `0x59aa60` has NO camera, frustum or line-of-sight test. "Out of sight" = route distance >= 250 m (`[0x6b5a38]`, rule b, state 4 only) from every player. It is a pure predicate
+  but rejects every spot within 250 m of the player route, so it is wrong for placing rivals. Straight-line variants 0x59acd0 / 0x59b130 are dead code.
+- `0x59a2c0` Free Run move is the only candidate walk: one chain from the player's node (`0x4563d0`, 250 m, then step doubles from max(spacing, node length): about 250, +s, +3s, +7s), give up past 500 m.
+  There is no stored candidate list and no reusable generator: every path tests spots inline and then moves a TRAFFIC car (driver mode, goal 4 / 5), so calling it on a racer would corrupt its AI.
+- Failure: `0x5832a0` parks the car; it is looked at again when the round-robin cursor returns (1 s in Free Run). The 49 intersections are not a placement input (no call to 0x44d570 / 0x442100 in 0x598600..0x59b700).
+
 ## Functions
 
 The 120 names with evidence are in `census/names_traffic.tsv`. Main ones:

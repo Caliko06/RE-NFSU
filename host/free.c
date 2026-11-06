@@ -289,47 +289,85 @@ static void riv_go(Ctx *c, int k, int to, const char *why) {
     if (getenv("RN_FREELOG")) rn_log("FREE %s %s -> %s (%s) frame %u", G(ld(c, riv[k].r + 0x14, 4) + 0x73c), RIV_ST[riv[k].st], RIV_ST[to], why, rn_telem.presents);
     riv[k].st = to, riv[k].since = rn_telem.presents, riv[k].slow = 0;
 }
-// One placement of rival r on the road from the player: 1 placed, 0 no clear spot, -1 no player node (nothing can be placed now).
-static int riv_place(Ctx *c, uint32_t h, uint32_t pc, uint32_t r, double vx, double vy, int open, int nr, int stuck) {
-    static int rev = -1; static uint32_t seed = 0x5eed1234;
-    if (rev < 0) rev = getenv("RN_RESPAWNREV") != NULL;   // test-only: every respawn drives the way opposite to the player's (the flipped racer AI on its own)
-    double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
+// Candidate spots (docs/re/traffic.md: the game keeps no list; 0x59a2c0 walks 250 m once and steps on ~31 m 4 times). Built once a
+// second, when a rival needs one: both ways from the player's node, 40..600 m of road in 25 m steps with 0x4563d0 (ecx section, eax
+// node, cdecl: &pair in/out, 1, metres, along the node direction 1 / against 0, 0), each distinct node 0x456c90 accepts and 60+ m
+// from the player in a straight line. -1 = no player node.
+#define RING 48
+static struct { uint32_t sec, node; float x, y, m; int ahead; } ring[RING];
+static int nring, ring_along, ring_stall;
+static uint32_t ring_at, ring_sec, ring_node;
+static int riv_ring(Ctx *c, uint32_t pc, double vx, double vy) {
+    if (ring_at == rn_telem.presents) return ring_node ? nring : -1;
+    ring_at = rn_telem.presents, nring = ring_stall = 0;
     if (!respawn_pair) respawn_pair = guest_alloc(8);
     uint32_t zero = 0, ft = c->ftop;
     c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
     c->r[EAX] = pc; uint32_t node = call_guest(c, 0x428160, 1, &zero);
     st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
     c->r[EAX] = respawn_pair;
-    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) {
-        if (getenv("RN_FREELOG")) rn_log("FREE place skip %s: no player node (sec %08x node %08x) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), sec, node, rn_telem.presents);
-        c->ftop = ft; return -1;
+    ring_sec = sec, ring_node = node;
+    if (!sec || !node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { ring_node = 0; c->ftop = ft; return -1; }
+    // along the player's node (dot of its direction and the player's motion) = ahead
+    ring_along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0;
+    double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54);
+    for (int side = 0; side < 2; side++)
+        for (float m = 40.0f; m <= 600.0f && nring < RING; m += 25.0f) {
+            st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
+            uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)(side ? !ring_along : ring_along), 0};
+            memcpy(&a[2], &m, 4);
+            c->r[ECX] = sec, c->r[EAX] = node;
+            call_guest_cdecl(c, 0x4563d0, 5, a);
+            uint32_t s2 = ld(c, respawn_pair, 4), n2 = ld(c, respawn_pair + 4, 4);
+            c->r[EAX] = respawn_pair;
+            if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { ring_stall++; break; }   // the walk ends here (dead end): farther walks give the same node
+            int dup = 0;
+            for (int k = 0; k < nring && !dup; k++) dup = ring[k].node == n2;
+            float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
+            if (dup || hypot(nx - px, ny - py) < 60) continue;
+            ring[nring].sec = s2, ring[nring].node = n2, ring[nring].x = nx, ring[nring].y = ny, ring[nring].m = m, ring[nring].ahead = !side, nring++;
+        }
+    c->ftop = ft;
+    return nring;
+}
+// A spot is taken as the game's 0x59b1e0 takes it (docs/re/traffic.md), in straight metres (route positions in the city net are
+// spanning-tree values and car+0x814 lags after a move): a traffic car within 31 m blocks it; the player or a racer blocks it only
+// when it lies 0..31 m ahead of that car (a racer just ahead of the spot does not).
+static int spot_clear(Ctx *c, uint32_t h, uint32_t r, float nx, float ny) {
+    for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200; o = ld(c, o, 4), j++) {
+        if (o == r) continue;
+        float dx = nx - ldf(c, o + 0x50), dy = ny - ldf(c, o + 0x54);
+        if (dx * dx + dy * dy >= 31.0f * 31.0f) continue;
+        uint32_t e = ld(c, o + 0x14, 4);
+        if (!e || ld(c, e + 4, 4) == 3 || dx * ldf(c, o + 0x90) + dy * ldf(c, o + 0x94) > 0) return 0;
     }
-    // along the player's node (dot of its direction and the player's motion) = ahead; the coin picks ahead or behind
-    int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, ahead = open ? !(nr & 1) : rnd(&seed) & 1;
-    float m0 = open ? 90.0f + 35.0f * (float)nr : 220.0f + (float)(rnd(&seed) % 160), m = m0;
-    uint32_t w = 0, s2 = 0, n2 = 0;
-    int clear = 0;
-    // up to 4 tries, each 60 m farther and the other way round, when the walk stalls or the spot is within 31 m of a car (WORLD has
-    // ~40 traffic cars: one spot of four rarely stays 31 m clear)
-    for (int t = 0; t < 4 && !clear; t++) {
-        m = m0 + 60.0f * (float)t;
-        st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
-        uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)(along == (ahead ^ (t & 1))), 0};
-        memcpy(&a[2], &m, 4);
-        c->r[ECX] = sec, c->r[EAX] = node;
-        w = call_guest_cdecl(c, 0x4563d0, 5, a);
-        s2 = ld(c, respawn_pair, 4), n2 = ld(c, respawn_pair + 4, 4);
-        c->r[EAX] = respawn_pair;
-        if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) continue;
-        float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
-        clear = 1;
-        for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && clear; o = ld(c, o, 4), j++)
-            clear = o == r || hypot(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny) > 31;   // 0x59b1e0's 31 m spacing
+    return 1;
+}
+// One placement of rival r on the road from the player: 1 placed, 0 no clear spot, -1 no player node (nothing can be placed now).
+// The spot: the ring's clear node nearest to m0 of road (opening 90 + 35 i m, ahead and behind in turn; respawn 220..380 m, a coin
+// for the side), the wanted side first.
+static int riv_place(Ctx *c, uint32_t h, uint32_t pc, uint32_t r, double vx, double vy, int open, int nr, int stuck) {
+    static int rev = -1; static uint32_t seed = 0x5eed1234;
+    if (rev < 0) rev = getenv("RN_RESPAWNREV") != NULL;   // test-only: every respawn drives the way opposite to the player's (the flipped racer AI on its own)
+    if (riv_ring(c, pc, vx, vy) < 0) {
+        if (getenv("RN_FREELOG")) rn_log("FREE place skip %s: no player node (sec %08x node %08x) frame %u", G(ld(c, r + 0x14, 4) + 0x73c), ring_sec, ring_node, rn_telem.presents);
+        return -1;
     }
-    if (!clear) {
-        if (getenv("RN_FREELOG")) rn_log("FREE %s fail: %s %d", open ? "open" : "respawn spot", G(ld(c, r + 0x14, 4) + 0x73c), nr);
-        c->ftop = ft; return 0;
+    double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
+    int along = ring_along, ahead = open ? !(nr & 1) : rnd(&seed) & 1, best = -1, blocked = 0;
+    float m0 = open ? 90.0f + 35.0f * (float)nr : 220.0f + (float)(rnd(&seed) % 160), cost = 1e9f;
+    for (int k = 0; k < nring; k++) {
+        float q = fabsf(ring[k].m - m0) + (ring[k].ahead == ahead ? 0.0f : 1000.0f);
+        if (q >= cost) continue;
+        if (!spot_clear(c, h, r, ring[k].x, ring[k].y)) { blocked++; continue; }
+        cost = q, best = k;
     }
+    if (best < 0) {
+        if (getenv("RN_FREELOG")) rn_log("FREE %s fail: %s %d (ring %d spots, %d blocked, %d walks stalled)", open ? "open" : "respawn spot", G(ld(c, r + 0x14, 4) + 0x73c), nr, nring, blocked, ring_stall);
+        return 0;
+    }
+    uint32_t s2 = ring[best].sec, n2 = ring[best].node, w = 0, ft = c->ftop;
+    float m = ring[best].m;
     // dir: the player's way along the road (`along`, at the player's own node; the node 300 m on may bend past 90 degrees from the
     // player's heading, its direction vector says nothing about the way); a stopped player: the rival keeps its own. The racer's
     // route flag is 0 along the node direction, 1 against (forward flag = dir == 0, 0x44ae02).
