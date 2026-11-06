@@ -797,7 +797,7 @@ static void pace_plan(Ctx *c) {
     int on = fabs(k * per - tgt) <= 1.5;                    // else the limiter keeps its race wait
     uint32_t m = ld(c, 0x707fc8, 4), rs = ld(c, 0x7361f0, 4);
     if (!!(m & 0x40) != on) st(c, 0x707fc8, on ? m | 0x40 : m & ~0x40u, 4);
-    if (!on || ld(c, 0x77a920, 4) != 6 || !rs || ld(c, rs, 4) == 1) { pace_next = 0; return; }
+    if (!on || !rn_racing() || !rs || ld(c, rs, 4) == 1) { pace_next = 0; return; }
     double now = emscripten_get_now(), b = pace_box[0] + per / 2;
     double next = pace_next ? pace_next + k * per : now;
     if (next < now) next = now;                             // missed its slot: the next boundary
@@ -824,7 +824,7 @@ static void spike_log(Ctx *c) {
     static double ms0;
     uint64_t t = now_us();
     uint32_t rs = ld(c, 0x7361f0, 4);
-    if (t0 && t - t0 > 25000 && ld(c, 0x77a920, 4) == 6 && rs && ld(c, rs, 4) != 1) {
+    if (t0 && t - t0 > 25000 && rn_racing() && rs && ld(c, rs, 4) != 1) {
         char top[160] = "";
         for (int n = 0, k; n < 3; n++) {
             int b = -1;
@@ -968,11 +968,11 @@ static void fov_frame(Ctx *c) {
 #define NITRO_BACK 0.10f
 #define NITRO_LOW  0.05f
 // Horizontal FOV (web/tune.js ?hfov=, word 9 of tune[]): k at 0x707fc0 is the widescreen caves' scale (P[0] = k / tan(F/2) * H'/W, PATCH 0x40debb); the web
-// page turns the wanted horizontal degrees at 16:9 into k. Written in races only ([0x77a920] == 6, the same test as the caves' 16:9 cap), so the garage keeps
+// page turns the wanted horizontal degrees at 16:9 into k. Written in races only (rn_racing(), the same test as the caves' 16:9 cap), so the garage keeps
 // the shipped k = 512/448. Word 0: the shipped k.
 static void hfov_frame(Ctx *c) {
     uint32_t k = __atomic_load_n(&tune[9], __ATOMIC_RELAXED);
-    st(c, 0x707fc0, k && ld(c, 0x77a920, 4) == 6 ? k : 0x3f924925, 4);
+    st(c, 0x707fc0, k && rn_racing() ? k : 0x3f924925, 4);
 }
 void ai_tel(Ctx *c);
 void feel_tel(Ctx *c);
@@ -1097,7 +1097,6 @@ static void rng_log(Ctx *c, uint32_t frame) {
 // RN_FLOWLOG: each new game-flow label [0x77a90c] (a string in .rdata, e.g. 0x6c9c3c "EndGameFlowLoadingTrackSpecific")
 // at the Present that first sees it: the bounds of the loads (tools/bench.py). Also each new game-flow state [0x77a920]
 // (written at 0x448b11 .. 0x449a15: 1 loading FE, 2 unloading FE, 3 FE, 4/5 loading track, 6 race, 7 unloading track).
-uint32_t rn_flow = ~0u;
 const char *rn_screen = "", *rn_fe = "";
 // The front end's active packages: FEngine = [[0x73578c]+8], list head [+0xe4], node next +4, .fng name +0xc
 // (cFEng::FindPackage 0x4f6600..0x4f661d walks it with 0x4fd1e0). The guest addresses of the names, at most 16.
@@ -1115,7 +1114,7 @@ static void flow_log(Ctx *c) {
     static uint32_t prev, prev_st;
     if (on < 0) on = getenv("RN_FLOWLOG") != NULL || getenv("RN_JUMP") != NULL || getenv("RN_CAREER") != NULL;   // RN_JUMP, RN_CAREER read rn_fe
     if (!on) return;
-    uint32_t lb = ld(c, 0x77a90c, 4), rs = ld(c, 0x7361f0, 4), st = ld(c, 0x77a920, 4) << 8 | (rs ? ld(c, rs, 4) & 0xff : 0xff);
+    uint32_t lb = ld(c, 0x77a90c, 4), st = rn_flow;   // host/phase.c read it at this Present
     if (lb != prev && lb >= 0x697000 && lb < 0x6d4000) rn_log("flow %.64s (frame %u)", G(lb), dev.frames);
     // [[0x7361f0]]: the race's own state; 0x447600 and the draws read state 6 with it == 1 as "not racing yet"
     if (st != prev_st) { rn_log("flow state %u/%d (frame %u)", st >> 8, st & 0xff, dev.frames); gpu_keep_frame(); }
@@ -1159,7 +1158,7 @@ static void flow_log(Ctx *c) {
     input_next(c);
     input_call(c);
     input_career(c);
-    prev = lb, prev_st = st, rn_flow = st, rn_screen = scr;
+    prev = lb, prev_st = st, rn_screen = scr;
 }
 // RN_JCLOG (test-only): what the jump camera (docs/openworld/re_jumpcam.md) reads for player 1, during a race. ctrl
 // [0x7361bc] (the player array), car [ctrl+4], driver [car+0x2c]; 0x42c4b0 takes the route from driver vtable slot 0x20
@@ -1172,9 +1171,10 @@ static void flow_log(Ctx *c) {
 // copies into the mover: these tell whether the view degenerated. Without RN_JCLOG only the camera mode changes are logged
 // (always on, so the OWNER's own play shows in build/web.log each jump camera they got).
 static void jumpcam_log(Ctx *c) {
-    static int on = -1; static uint32_t last, mode = ~0u, air;
+    static int on = -1; static uint32_t last, mode = ~0u, air, race;
     if (on < 0) on = getenv("RN_JCLOG") != NULL ? 2 : 1;
-    if (ld(c, 0x77a920, 4) != 6 || !ld(c, 0x7361bc, 4)) return;
+    if (!rn_racing() || !ld(c, 0x7361bc, 4)) return;
+    if (rn_new_race(&race)) last = 0, mode = ~0u, air = 0;   // the first camera mode of each race is logged
     uint32_t ctrl = ld(c, 0x7361bc, 4), car = ctrl ? ld(c, ctrl + 4, 4) : 0, drv = car ? ld(c, car + 0x2c, 4) : 0;
     if (!drv) return;
     uint32_t slot = ld(c, ld(c, drv, 4) + 0x20, 4), route = ld(c, drv + (slot == 0x59bfb0 ? 0x44 : 0x3e4), 4), n = route ? ld(c, route + 4, 4) : 0;
@@ -1196,7 +1196,7 @@ static void jumpcam_log(Ctx *c) {
 // is full, at most every 30 frames, at 40 m/s or more; a crossing with no WALLCAP line near it clears the caps.
 static void wallcap_log(Ctx *c) {
     static uint32_t last;
-    uint32_t ctrl = ld(c, 0x77a920, 4) == 6 ? ld(c, 0x7361bc, 4) : 0, car = ctrl ? ld(c, ctrl + 4, 4) : 0, now = rn_telem.presents;
+    uint32_t ctrl = rn_racing() ? ld(c, 0x7361bc, 4) : 0, car = ctrl ? ld(c, ctrl + 4, 4) : 0, now = rn_telem.presents;
     uint32_t pb = ld(c, 0x72cbf4, 4), pw = ld(c, 0x72cc00, 4);
     if (!car || !pb || !pw || now < last + 30 || ldf(c, car + 0x3d4) < 40.0f) return;
     uint32_t n = ld(c, car + 0x7e0, 4), bu = ld(c, pb + 0x18, 4), wu = ld(c, pw + 0x18, 4);
@@ -1209,6 +1209,7 @@ static void wallcap_log(Ctx *c) {
 static void roadrefl_frame(void);
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
+    rn_phase_tick(c);    // host/phase.c: rn_flow and the race edges, before anything reads them
     jumpcam_log(c);
     wallcap_log(c);
     tune_apply(c);

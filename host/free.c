@@ -288,6 +288,8 @@ static int free_respawn(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy, i
     // Stuck (OWNER 2026-10-28, MW's AIPursuit/AITrafficManager rule): a rival under 2 m/s for 5 s in a row (this runs once a
     // second, after the grid) is respawned like a far one, whatever its distance.
     static struct { uint32_t r; float x, y; int slow; } st5[16];
+    static uint32_t race;
+    if (rn_new_race(&race)) memset(done, 0, sizeof done), memset(when, 0, sizeof when), memset(st5, 0, sizeof st5);   // they filled up over races
     int nr = -1;
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4);
@@ -383,6 +385,8 @@ static int n_tmove, n_tfail, n_twhy[4];
 static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
     static int off = -1; static uint32_t seed = 0x7a11c0de;
     static struct { uint32_t car, since; } bh[64];
+    static uint32_t race;
+    if (rn_new_race(&race)) memset(bh, 0, sizeof bh);   // 64 slots per race (they filled up over races)
     if (off < 0) off = getenv("RN_FREETMOVE") && !atoi(getenv("RN_FREETMOVE"));
     if (off || !tele || !pc || world_ai(c)) return;   // WORLD: traffic_refill (host/rivals.c)
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
@@ -536,22 +540,36 @@ static uint32_t avoid_close(Ctx *c) {
     return a;
 }
 
-void free_tick(Ctx *c) {
-    static int raced;
-    static uint32_t start;           // the first race frame: respawns wait 10 s (the grid)
+// Back in the front end (host/phase.c): free mode's event is over; the game's values come back.
+void free_frontend(Ctx *c) {
     if (!live) return;
-    // The setup runs in the front end (state 3, runs/jump_3_1001): the race is over once state 6 went back to 3.
-    if (ld(c, 0x77a920, 4) != 6) {
-        if (raced && ld(c, 0x77a920, 4) == 3) {
-            live = raced = 0, start = 0, tele = 0, opened = drove = 0, open_from = 0, tspeed_on = 0;
-            st(c, TRAFFIC_TOP, 0x41c4b127, 4);
-            memset(rdir, 0, sizeof rdir);
-            if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
-            if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
-        }
-        return;
+    live = 0, tspeed_on = 0;
+    st(c, TRAFFIC_TOP, 0x41c4b127, 4);
+    if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
+    if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
+}
+// A race's grid is placed (host/phase.c; Restart and tournament stages too): what the guest callbacks fill per race starts empty.
+// The cars, drivers and the TrafficTeleporter are new objects; the old addresses may come back for other cars.
+void free_race_begin(Ctx *c) {
+    (void)c;
+    memset(rdir, 0, sizeof rdir);
+    tele = 0, opened = drove = 0, open_from = 0;
+    n_game = n_free = n_far = n_kept = n_offbit = n_onbit = 0, n_tmove = n_tfail = 0, memset(n_twhy, 0, sizeof n_twhy);
+}
+
+void free_tick(Ctx *c) {
+    static uint32_t start;           // the first race frame: respawns wait 10 s (the grid)
+    // RN_FREELOG probes and speeds: this race's (zeroed when host/phase.c begins a new race)
+    static uint32_t race, first, last_contact, cand[64], acts[64][0x16], last_type[64], tframe[200], tcar[200], ntcar;
+    static double tw[2], was[2], rp[8][2];
+    static float tpos[200][2], ppos[2], last[64][2];
+    static int ncand;
+    if (rn_new_race(&race)) {
+        start = first = last_contact = 0, ncand = 0, ntcar = 0;
+        memset(cand, 0, sizeof cand), memset(acts, 0, sizeof acts), memset(last_type, 0, sizeof last_type), memset(tframe, 0, sizeof tframe), memset(tcar, 0, sizeof tcar);
+        memset(tw, 0, sizeof tw), memset(was, 0, sizeof was), memset(rp, 0, sizeof rp), memset(tpos, 0, sizeof tpos), memset(ppos, 0, sizeof ppos), memset(last, 0, sizeof last);
     }
-    raced = 1;
+    if (!live || !rn_racing()) return;
     tspeed_on = world_ai(c);
     // The RaceManager's frame 0x435570 calls the record update 0x4338c0 (edi = record: route progress +0x14/+0x1c/+0x20, checkpoint
     // +4/+6/+8) for each record of its own, so the extra records get the same call (RN_FREEXREC=0: not).
@@ -590,7 +608,6 @@ void free_tick(Ctx *c) {
     }
     int per = world_ai(c) ? 15 : 30;                                       // WORLD: the traffic check twice as often
     if (rn_telem.presents % per == 0 && rn_telem.presents > start + 300) {  // traffic, after the grid
-        static double tw[2];
         uint32_t rh = ld(c, 0x7361f8, 4), me = 0;
         for (uint32_t r = rh ? ld(c, rh, 4) : 0, k = 0; r && r != rh && k < 200 && !me; r = ld(c, r, 4), k++) {
             uint32_t e = ld(c, r + 0x14, 4);
@@ -600,7 +617,6 @@ void free_tick(Ctx *c) {
         if (me) tw[0] = ldf(c, me + 0x50), tw[1] = ldf(c, me + 0x54);
     }
     if (rn_telem.presents % 60 == 0) {
-        static double was[2];
         uint32_t rh = ld(c, 0x7361f8, 4), me = 0;
         for (uint32_t r = rh ? ld(c, rh, 4) : 0, k = 0; r && r != rh && k < 200 && !me; r = ld(c, r, 4), k++) {
             uint32_t e = ld(c, r + 0x14, 4);
@@ -638,7 +654,6 @@ void free_tick(Ctx *c) {
     uint32_t h = ld(c, 0x7361f8, 4), player = 0;
     // Every 5 s: each rival's skill level (entrant+0x735) and speed over those 5 s (personality A/B).
     if (h && rn_telem.presents % 300 == 0) {
-        static double rp[8][2];
         char b[640];
         int n = 0, i = 0;
         for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
@@ -657,7 +672,6 @@ void free_tick(Ctx *c) {
         if (i) rn_log("FREE rivals%s m/s frame %u", b, rn_telem.presents);
     }
     // A contact: a rival's centre within 4 m of the player's (car to car), 10 s after the start (the grid), at most one line per second.
-    static uint32_t first, last_contact;
     if (!first) first = rn_telem.presents;
     if (h && rn_telem.presents > first + 600 && rn_telem.presents > last_contact + 60) {
         uint32_t pc = 0;
@@ -674,7 +688,6 @@ void free_tick(Ctx *c) {
     }
     // Each rival's current action (docs/openworld/re_rivals_ai.md 0: [obj+0x3f8], type +0x1f8: 0 Pass, 1 AvoidAvoidable, 5 Block,
     // 7 JustDrive, 0xa GetUnstuck, 0xc IJustGotHit, 0xe AccidentRecovery): every change counted, printed every 10 s.
-    static uint32_t cand[64], acts[64][0x16], last_type[64]; static int ncand;
     for (int j = 0; j < ncand; j++) {
         uint32_t act = ld(c, cand[j], 4) == 0x6c89f0 ? ld(c, cand[j] + 0x3f8, 4) : 0, ty = act ? ld(c, act + 0x1f8, 4) : 0x15;
         if (ty > 0x15) ty = 0x15;
@@ -683,7 +696,6 @@ void free_tick(Ctx *c) {
     // Each traffic car that jumped > 60 m in one frame was moved by the TrafficTeleporter (0x599830): where it landed, as the
     // straight and route distance ([car+0x814]) from the player, and whether it is in front of the player's nose (camera side).
     // Keyed by the car pointer: the game reorders this list, so a list index is not a car.
-    static float tpos[200][2], ppos[2]; static uint32_t tframe[200], tcar[200], ntcar;
     uint32_t pc = 0;
     for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !pc; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4);
@@ -773,7 +785,6 @@ void free_tick(Ctx *c) {
     // (L = [0x7361f8], 0x41f680/0x41f690), driver V = car+0x2c (0x41f5d0). Flags of V: +0x4d1 parked (0x583350, the
     // teleporter recycles it), +0x410 no path after a reset (0x583700: braked, never parked), +0x4d0. Moved = metres since the last line.
     if (rn_telem.presents % 600) return;
-    static float last[64][2];
     char tl[1600]; int t = snprintf(tl, sizeof tl, "FREE tcars:");
     uint32_t L = ld(c, 0x7361f8, 4);
     for (uint32_t i = ld(c, L + 0x24, 4), k = 0; i < ld(c, L + 0x18, 4) && k < 64 && t < 1100; i++, k++) {
@@ -960,6 +971,7 @@ static uint32_t rm_records(Ctx *c) {
 // the ones left over follow. Up to 3 rivals nothing moves (the slots the free mode always had).
 #define GRID_GAP 8.0
 static uint32_t grid_fix(Ctx *c) {
+    rn_phase_grid(c);   // every race places its grid here (Restart too): host/phase.c begins a new race
     // The patched builder asks for 10 slots (push 10, loop to 10); outside a Free Run with more than 3 rivals the original 4 are asked,
     // so career and Quick Race get the same start places as before (the loop's slots 5..10 find no car with that grid index).
     uint32_t a[2] = {(live && nriv > 3) ? ARG(0) : 4, ARG(1)};

@@ -9,7 +9,7 @@
 //        the car pointer under it changed every frame).
 //
 // What each field reads (all verified in Speed.exe, see the doc for the addresses):
-//   mover  [ctrl+0x27c], ctrl = [0x7361bc] while [0x77a920] == 6. The camera object 0x48bcb0 updates; mover+0x2c is the car
+//   mover  [ctrl+0x27c], ctrl = [0x7361bc] while rn_racing(). The camera object 0x48bcb0 updates; mover+0x2c is the car
 //          it drives (0x48bd19) and mover+0x1c is the view it writes.
 //   pov    (s16)[mover+0x40]. 0x48bf43 feeds it to FindCameraRow 0x47d680, which walks the car's rows matching this s16.
 //   row    FindCameraRow: base [[car+0xc]+0xb50], count at +4 and rows at +0x60 when [0x7364a0] == 3, else count at +0 and
@@ -47,7 +47,7 @@ void feel_tel(Ctx *c) {
     if (on < 0) on = getenv("RN_FEELLOG") != NULL;
     if (!on) return;
     uint32_t now = rn_telem.presents;
-    uint32_t ctrl = ld(c, 0x77a920, 4) == 6 ? ld(c, 0x7361bc, 4) : 0;
+    uint32_t ctrl = rn_racing() ? ld(c, 0x7361bc, 4) : 0;
     uint32_t mover = ctrl && ctrl < GUEST_MEM - 0x1000 ? ld(c, ctrl + 0x27c, 4) : 0;
     if (mover >= GUEST_MEM - 0x400) mover = 0;
     uint32_t car = mover ? ld(c, mover + 0x2c, 4) : 0;              // the car the camera drives (0x48bd19)

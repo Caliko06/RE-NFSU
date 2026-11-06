@@ -553,8 +553,10 @@ static void ai_log(Ctx *c) {
     static int on = -1;
     static struct { uint32_t car, act, nos, n; float slip; } st_[16];
     if (on < 0) on = getenv("RN_AILOG") != NULL;
-    if (!on || ld(c, 0x77a920, 4) != 6) return;
-    static uint32_t draft;                // racer-seconds in the game's slipstream: car+0x47c (0x426450) above 0.1
+    if (!on || !rn_racing()) return;
+    static uint32_t draft, race;          // racer-seconds in the game's slipstream this race: car+0x47c (0x426450) above 0.1
+    static uint32_t hitcar[32];           // traffic cars in contact with the player (n_tr[3] counts each once)
+    if (rn_new_race(&race)) memset(st_, 0, sizeof st_), memset(hitcar, 0, sizeof hitcar), draft = 0;
     uint32_t h = ld(c, 0x7361f8, 4), sec = rn_telem.presents % 60 == 0;
     if (!AP(h)) return;
     char b[640];
@@ -582,7 +584,6 @@ static void ai_log(Ctx *c) {
     }
     if (n) rn_log("AILOG %u draft %u%s", rn_telem.presents, draft, b);
     {   // traffic reaction, per frame, cars within 60 m of the player: in the game's avoid action (type 3), braking (driver [car+0x30]+0x1e4, written by 0x45e970), horn flag +0x83f; hits = first frame under 2.6 m of the player
-        static uint32_t hitcar[32];
         uint32_t me = 0;
         for (uint32_t r = ld(c, h, 4), k = 0; AP(r) && r != h && k < 200 && !me; r = ld(c, r, 4), k++) { uint32_t e = ld(c, r + 0x14, 4); if (AP(e) && ld(c, e + 4, 4) == 1) me = r; }
         for (uint32_t r = ld(c, h, 4), k = 0; me && AP(r) && r != h && k < 200; r = ld(c, r, 4), k++) {
@@ -640,7 +641,6 @@ static void ai_log(Ctx *c) {
                n_refill, n_refail, n_react[0], n_react[1], n_react[2], AP(bodies) ? ld(c, bodies + 0x18, 4) : 0, AP(bodies) ? ld(c, bodies + 0x1c, 4) : 0, AP(bodies) ? ld(c, bodies + 0x2c, 4) : 0, n_tr[0], n_tr[1], n_tr[2], n_tr[3], n_tr[4], rn_telem.presents % 3000 == 0 ? names : "");
     }
 }
-#undef AP
 
 // Handling (RN_HANDLING=0 / ?handling=0: as shipped; docs/re/physics.md). The OWNER's "rigid": outside drift events 0x4774a0 gives the rear wheels extra grip as the
 // slip angle grows (0x4773f0: min(0.35, 2.5 * v/30 * slip), V from all 35 cars' physics +0x284), so at 30 m/s the cap holds from 4 degrees on and the tail will not step out.
@@ -794,9 +794,11 @@ static uint32_t traffic_behind(Ctx *c) {
     uint32_t hit = call_guest_cdecl(c, 0x44f470, 5, a);
     c->ftop = ft;
     if (hit || trafyield_off()) return hit;
-    uint32_t car = ld(c, ctx, 4), drv = car ? ld(c, car + 0x14, 4) : 0;
+    // ld() does not bound its address: a race 4 ghost (2026-11-06, p1x6) died here on a car whose pointers were not guest memory.
+    uint32_t car = AP(ctx) ? ld(c, ctx, 4) : 0, drv = AP(car) ? ld(c, car + 0x14, 4) : 0;
+    if (!AP(drv)) return 0;
     int own = (int8_t)c->mem[ctx + 0x388], n = (int)ld(c, ctx + 4, 4), lane = (int)a[0];
-    if (!drv || ld(c, drv + 4, 4) != 3 || lane < 11 || lane > 16 || own < 0 || n > 16 || own + 1 >= n) return 0;
+    if ( ld(c, drv + 4, 4) != 3 || lane < 11 || lane > 16 || own < 0 || n > 16 || own + 1 >= n) return 0;
     uint32_t orow = ctx + 8 + own * 0x38;
     float lat;
     memcpy(&lat, &a[1], 4);
@@ -863,6 +865,8 @@ extern double rn_lane_sum; extern int rn_lane_n;
 // RN_AILOG probe: every 600 presents, the cars that moved under 3 m since the last one: what holds each (nearest car in a 3 m wide corridor 20 m ahead of its nose), how far it sits from its road's line.
 static void traffic_jam_log(Ctx *c, uint32_t h, uint32_t me) {
     static struct { uint32_t r; float x, y; } was[64];
+    static uint32_t race;
+    if (rn_new_race(&race)) memset(was, 0, sizeof was);
     int frozen = 0, heads = 0, fol = 0, mutual = 0, side = 0, byp = 0, byr = 0, wr = 0, shown = 0, wn = 0;
     uint32_t cars[80], lead[80]; int isf[80]; float X[80], Y[80], FX[80], FY[80];
     int n = 0;
@@ -916,6 +920,8 @@ static void traffic_prof_log(Ctx *c, uint32_t h, uint32_t me) {
     if (on < 0) on = getenv("RN_AILOG") != NULL;
     if (!on) return;
     static int hist[6], act3, seen_cars;
+    static uint32_t race;   // every count here is this race's
+    if (rn_new_race(&race)) lc = cuts = act3 = seen_cars = 0, t = 0, memset(car, 0, sizeof car), memset(was, 0, sizeof was), memset(hist, 0, sizeof hist);
     int n[5] = {0}; float sum[5] = {0}, mx = ldf(c, me + 0x50), my = ldf(c, me + 0x54), mvx = ldf(c, me + 0x70), mvy = ldf(c, me + 0x74), ms = hypotf(mvx, mvy);
     int i = 0;
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200 && i < 64; r = ld(c, r, 4), k++) {
@@ -957,6 +963,11 @@ static void traffic_paint(Ctx *c) {
 void traffic_tick(Ctx *c) {
     static uint32_t seed = 0x51ed2701;
     static struct { uint32_t car, frame; } seen[32];
+    static uint32_t race;   // this race's frozen-car timers, yield stamps and counters (a rebuilt list can reuse node addresses)
+    if (rn_new_race(&race)) {
+        memset(seen, 0, sizeof seen), memset(still_r, 0, sizeof still_r);
+        n_refill = n_refail = 0, memset(n_rf, 0, sizeof n_rf), memset(n_react, 0, sizeof n_react), memset(n_tr, 0, sizeof n_tr);
+    }
     ai_log(c);
     handling_data(c);
     ai_tune(c);
@@ -964,8 +975,7 @@ void traffic_tick(Ctx *c) {
     // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
     // Every present, before the traffic guards (RN_TRAFYIELD=0, pause or a non-race mode must not turn it back on); outside WORLD it writes the factory value 1.
     st(c, 0x700740, ld(c, 0x78a2f0, 4) != 1010, 4);
-    if (ld(c, 0x77a920, 4) != 6) memset(still_r, 0, sizeof still_r);   // out of a race: frozen-car timers die with it (a rebuilt list can reuse node addresses; presents never restarts)
-    if (trafyield_off() || rn_telem.presents % 6 || ld(c, 0x77a920, 4) != 6 || c->mem[0x78a33c]) return;
+    if (trafyield_off() || rn_telem.presents % 6 || !rn_racing() || c->mem[0x78a33c]) return;
     uint32_t h = ld(c, 0x7361f8, 4), me = 0;
     for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !me; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4);
@@ -1079,7 +1089,9 @@ static uint32_t traffic_lean(Ctx *c, uint32_t mat) {
     static int off = -1;
     static uint32_t tmp;
     static struct { uint32_t rec, at; float vx, vy, p, r, dp, dr; } s[64];
+    static uint32_t race;   // a new race's cars may reuse an old record address: no lean carried over
     if (off < 0) { const char *e = getenv("RN_TRAFLEAN"); off = e && e[0] == '0'; }
+    if (rn_new_race(&race)) memset(s, 0, sizeof s);
     if (off || mat < 0x90 || mat >= GUEST_MEM - 0x100) return mat;
     uint32_t rec = mat - 0x90, slot = 0;
     for (uint32_t i = 0; i < 64; i++) {
@@ -1143,8 +1155,9 @@ static uint32_t car_draw(Ctx *c) {
 static int gang_step(Ctx *c, uint32_t v, uint32_t car, uint32_t ent, uint32_t act) {
     static struct { uint32_t v, near, until, cool; } g[16];
     static int duels;
-    static uint32_t me, me_at;
+    static uint32_t me, me_at, race;
     if (ld(c, 0x78a2f0, 4) != 1010) return 1;
+    if (rn_new_race(&race)) memset(g, 0, sizeof g), duels = 0, me = me_at = 0;   // 16 slots, one per vehicle of this race (they filled up over races)
     int k = 0;
     while (k < 15 && g[k].v && g[k].v != v) k++;
     if (g[k].v != v) { if (!k) duels = 0; g[k].v = v, g[k].near = g[k].until = 0, g[k].cool = 0; }
@@ -1181,11 +1194,13 @@ static int gang_step(Ctx *c, uint32_t v, uint32_t car, uint32_t ent, uint32_t ac
 
 static uint32_t persona_step(Ctx *c) {
     static struct { uint32_t v, stamp, shot, said; } s[16];
+    static struct { uint32_t v; float last; } rb[16];
+    static uint32_t race;   // 16 slots, one per rival of this race (they filled up over races)
+    if (rn_new_race(&race)) memset(s, 0, sizeof s), memset(rb, 0, sizeof rb);
     uint32_t v = c->r[EAX], r = call_guest(c, 0x44bd10, 0, NULL);
     if (!persona_on || !v) return r;
     if (rn_pool()) {
         // Less rubber band: 0x44bd10 writes its scale at [v+0x4b8] (raw) and [[v+4]+0x404] (max(raw, 1)) once per 0.3 s (0x44bfe9..0x44bffe). A new value keeps 35 % of its distance to 1.
-        static struct { uint32_t v; float last; } rb[16];
         int q = 0;
         while (q < 15 && rb[q].v && rb[q].v != v) q++;
         float raw = ldf(c, v + 0x4b8);

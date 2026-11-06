@@ -309,7 +309,7 @@ static void *tp_thread(void *arg) {
         gil_acquire();
         Ctx *c = g_ctx;
         if (c && !c->halt) {
-            if (ld(c, 0x77a920, 4) != 6) { raced = 0; }
+            if (!rn_racing()) { raced = 0; }
             else {
                 if (flow_n && (rn_flow >> 8) != 6) raced = 0;
                 else if (flow_n && (rn_flow & 0xff) != (unsigned)flow_n) raced = 0;

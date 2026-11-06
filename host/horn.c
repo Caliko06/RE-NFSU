@@ -31,7 +31,7 @@ void horn_tick(Ctx *c) {
     if (hlog < 0) hlog = getenv("RN_HORNLOG") != NULL, hfix = getenv("RN_HORNFIX") != NULL;
     if (!hlog && !hfix) return;
     uint32_t h = ld(c, 0x7361f8, 4);
-    if (ld(c, 0x77a920, 4) != 6 || !h || h >= GUEST_MEM - 0x1000) { memset(hc, 0, sizeof hc); return; }
+    if (!rn_racing() || !h || h >= GUEST_MEM - 0x1000) { memset(hc, 0, sizeof hc); return; }
     float now = hclock(c);
     for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = inmem(c, r, 0x900) ? ld(c, r + 0x14, 4) : 0;

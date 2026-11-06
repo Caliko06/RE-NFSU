@@ -66,13 +66,14 @@ static void aids_log(Ctx *c, uint32_t f, const char *nm, uint32_t r, uint32_t v,
 
 void ai_tel(Ctx *c) {
     static int on = -1, aids = -1;
-    static uint32_t race;
+    static uint32_t race;   // rn_race of the state in tr[] and the draft counters
     if (on < 0) on = getenv("RN_AILOG") != NULL;
     if (aids < 0) aids = getenv("RN_AIDS") != NULL;
     if (!on) return;
     uint32_t h = ld(c, 0x7361f8, 4);
-    if (ld(c, 0x77a920, 4) != 6 || !h || h >= GUEST_MEM - 0x1000) { race = 0; return; }
-    if (h != race) memset(tr, 0, sizeof tr), race = h;
+    if (!rn_racing() || !h || h >= GUEST_MEM - 0x1000) return;
+    static uint32_t tow_n, sec_n;          // seconds with the player's draft (car+0x47c) > 0.2, out of seconds in this race
+    if (rn_new_race(&race)) memset(tr, 0, sizeof tr), tow_n = sec_n = 0;
     uint32_t f = rn_telem.presents, me = 0;
     for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4);
@@ -83,7 +84,6 @@ void ai_tel(Ctx *c) {
     float fl = hypotf(fx, fy);
     if (fl > 0) fx /= fl, fy /= fl;
     int sec = f % 60 == 0;
-    static uint32_t tow_n, sec_n;          // seconds with the player's draft (car+0x47c) > 0.2, out of seconds in a race
     float pd = ldf(c, me + 0x47c);
     if (sec) tow_n += pd > 0.2f, sec_n++;
     if (sec) rn_log("AIP f%u sp %.1f pos %.0f,%.0f,%.0f wheels %u crash %u draft %.3f tow>0.2 %u/%u %.1f%%", f, ldf(c, me + 0x3d4), px, py, ldf(c, me + 0x58),
@@ -242,7 +242,7 @@ static void reset_every(Ctx *c) {
     }
     if (rn_resetevery <= 0) return;
     uint32_t f = rn_telem.presents;
-    if (f < rq_next || ld(c, 0x77a920, 4) != 6) return;
+    if (f < rq_next || !rn_racing()) return;
     uint32_t h = ld(c, 0x7361f8, 4), car = 0;
     if (!h || h >= GUEST_MEM - 0x1000) return;
     for (uint32_t r = ld(c, h, 4), k = 0; r && r != h && k < 200; r = ld(c, r, 4), k++) {
@@ -303,7 +303,9 @@ static uint32_t walls_near(Ctx *c, uint32_t base, uint32_t n, float x, float y, 
 
 static void wallx_tel(Ctx *c) {
     if (!wx.on) wx.on = getenv("RN_WALLX") ? 1 : -1;
-    if (wx.on < 0 || ld(c, 0x77a920, 4) != 6) return;
+    if (wx.on < 0 || !rn_racing()) return;
+    static uint32_t race;
+    if (rn_new_race(&race)) wx.have = 0, wx.car = 0;   // the first frame of a race measures no jump from the last one
     uint32_t car = player_car(c), f = rn_telem.presents;
     if (!car) return;
     float x = ldf(c, car + 0x60), y = ldf(c, car + 0x64), z = ldf(c, car + 0x68);

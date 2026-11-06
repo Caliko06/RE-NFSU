@@ -72,7 +72,14 @@ uint64_t call_guest64(Ctx *c, uint32_t fn, int n, const uint32_t *args);   // st
 uint32_t call_guest_cdecl(Ctx *c, uint32_t fn, int n, const uint32_t *args);   // the caller pops the args
 uint32_t host_addr_of(const char *dll, const char *name);     // HOST_BASE address, registering if needed
 void rn_halt(Ctx *c, const char *fmt, ...);
-extern uint32_t rn_flow;   // RN_FLOWLOG: game-flow state << 8 | race state (RN_KEYS "ms@S/R:KEY")
+extern uint32_t rn_flow;   // host/phase.c, every Present: game-flow state [0x77a920] << 8 | race state [[0x7361f0]] (RN_KEYS "ms@S/R:KEY")
+extern uint32_t rn_race;   // host/phase.c: races begun this session; a module zeroes its race state when this changes
+static inline int rn_racing(void) { return rn_flow >> 8 == 6; }   // in a race (flow 6), grid and pause included
+static inline int rn_new_race(uint32_t *seen) { if (*seen == rn_race) return 0; *seen = rn_race; return 1; }
+void rn_phase_tick(Ctx *c);       // host/phase.c, first thing at each Present
+void rn_phase_grid(Ctx *c);       // host/phase.c, from host/free.c grid_fix: a race's grid is placed (every race, Restart too)
+void free_race_begin(Ctx *c);     // host/free.c: zero free mode's per-race state (from rn_phase)
+void free_frontend(Ctx *c);       // host/free.c: back in the front end, free mode's event is over (from rn_phase)
 extern const char *rn_screen;   // RN_FLOWLOG: the post-race screen shown (e.g. "PostRaceMenu.fng"), "" if none
 extern unsigned rn_turbo;       // RN_TURBO: the guest clocks run this many times faster (native tests; 1 = play)
 extern const char *rn_fe;       // RN_FLOWLOG: the front end's active packages, "A.fng,B.fng,..."
