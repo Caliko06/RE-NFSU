@@ -75,6 +75,8 @@ void rn_halt(Ctx *c, const char *fmt, ...);
 extern uint32_t rn_flow;   // host/phase.c, every Present: game-flow state [0x77a920] << 8 | race state [[0x7361f0]] (RN_KEYS "ms@S/R:KEY")
 extern uint32_t rn_race;   // host/phase.c: races begun this session; a module zeroes its race state when this changes
 static inline int rn_racing(void) { return rn_flow >> 8 == 6; }   // in a race (flow 6), grid and pause included
+extern uint32_t rn_finished;   // host/phase.c: rn_race once its finish runs (RaceCoordinator 0x423f20: state 8, or 1 with [coord+0x14] == 8)
+static inline int rn_race_over(void) { return rn_race && rn_finished == rn_race; }   // this race is finished (results), still flow 6
 static inline int rn_new_race(uint32_t *seen) { if (*seen == rn_race) return 0; *seen = rn_race; return 1; }
 void rn_phase_tick(Ctx *c);       // host/phase.c, first thing at each Present
 void rn_phase_grid(Ctx *c);       // host/phase.c, from host/free.c grid_fix: a race's grid is placed (every race, Restart too)

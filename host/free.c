@@ -354,7 +354,7 @@ static int riv_place(Ctx *c, uint32_t h, uint32_t pc, uint32_t r, double vx, dou
 static void free_rivals(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy, int go, int late) {
     static int off = -1; static float far;
     if (off < 0) off = getenv("RN_RESPAWN") && !atoi(getenv("RN_RESPAWN")), far = getenv("RN_RIVALFAR") ? (float)atof(getenv("RN_RIVALFAR")) : 400.0f;
-    if (off || !pc) return;
+    if (off || !pc || rn_race_over()) return;   // after the finish the game's AIActionEndOfRace stops every rival where it is
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54);
     int nr = -1, moved = 0, ngrid = 0;   // moved: one far or stuck respawn a second, as before
     for (uint32_t r = ld(c, h, 4), n = 0; r != h && n < 200; r = ld(c, r, 4), n++) {
@@ -364,6 +364,8 @@ static void free_rivals(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy, i
         int k = 0;
         while (k < 16 && riv[k].r && riv[k].r != r) k++;
         if (k == 16) continue;   // more than 16 rivals in one race: not possible (NRIV_MAX 9)
+        uint32_t rec = ld(c, r + 0x1c, 4);
+        if (rec && ld(c, rec + 0x10, 2)) continue;   // this rival finished (record +0x10 = finish reason, FinishCar 0x435315 also swapped its driver)
         float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
         if (!riv[k].r) riv[k].r = r, riv[k].st = R_GRID, riv[k].since = rn_telem.presents;
         else riv[k].slow = hypot(x - riv[k].x, y - riv[k].y) < 2.0 ? riv[k].slow + 1 : 0;
