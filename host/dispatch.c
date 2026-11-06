@@ -125,7 +125,12 @@ static void bucket_init(void) {         // under the GIL, like every rn_call
 // Chrome's 27.5, in the car physics 0x4774a0 / 0x474a90, which enter only through rn_call): the main thread's self and
 // inclusive time per indirect-call target (vtables, function pointers). Every 5 s the log gets the top 12 by self time
 // ("fntime"), plus the cost of one clock pair (Safari's performance.now from wasm may be dear; subtract calls * pair).
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#else   // native ghosts: same ms clock
+#include <time.h>
+static double emscripten_get_now(void) { struct timespec ts; clock_gettime(CLOCK_MONOTONIC, &ts); return ts.tv_sec * 1e3 + ts.tv_nsec / 1e6; }
+#endif
 static int fnt_on = -1, fnt_depth;
 static double *fnt_self, *fnt_incl, fnt_child[64], fnt_t0, fnt_pair;
 static uint32_t *fnt_n, fnt_hn[1024];
