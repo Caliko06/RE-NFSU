@@ -848,6 +848,13 @@ static void ai_tune(Ctx *c) {
     if (stuck < 0) stuck = getenv("RN_AI_STUCK") ? atoi(getenv("RN_AI_STUCK")) : 2;
     int on = stuck == 1 || (stuck == 2 && rivalai() && ld(c, 0x78a2f0, 4) == 1010);
     st(c, 0x6b7680, on ? 0x3fc00000 : 0x3ecccccd, 4), st(c, 0x6b7684, on ? 0x40400000 : 0x40a00000, 4);
+    // The AI look-ahead [0x7006ec] = 2.0 s (REA xrefs: 26 readers, among them the Avoid finder 0x44f8a0 "obstacle on my path within 2.0 s" and the planners
+    // 0x45b050/0x45b150 it calls): a rival at twice a traffic car's speed starts to dodge ~20 m before it. WORLD default 3.0 (the exe's next float 0x7006f0 is 3.0 too; REA read_bytes 0x7006ec = 00000040 0000 4040); RN_AI_HORIZON=<s> sets it, 0 = factory 2.0. NOT A/B tested (OWNER stopped the ghosts 2026-11-05): rival->traffic hits near the player were 10.8/min at 2.0 s.
+    static float hz = -1;
+    if (hz < 0) hz = getenv("RN_AI_HORIZON") ? (float)atof(getenv("RN_AI_HORIZON")) : 3.0f;
+    float h = hz > 0 && rivalai() && ld(c, 0x78a2f0, 4) == 1010 ? hz : 2.0f;
+    uint32_t hb; memcpy(&hb, &h, 4);
+    st(c, 0x7006ec, hb, 4);
 }
 
 // RN_AILOG: per driver profile, cars and mean speed of those moving; lane changes per 600 presents, all and in front of the player within 40 m.
