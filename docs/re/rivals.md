@@ -140,7 +140,7 @@ Called from `0x44c550` for each racer. It runs only if: AIVehicle `[ctx+0x46c]` 
 5. `veh+0x404 = max(scale, 1.0)` (a rival is never slowed below 1.0 by this field) and `ctx+0x4b8 = scale` (raw). V (C: 0x44bfe9, 0x44bffe)
 
 Who turns it on or off: quick race `[0x78a400]` = race options byte `+0x1f` (`0x4b4a56`, `0x43b199`); career sets 1 (`0x4b5f47`).
-`[0x78a404]` is written only in career (`0x4b5f53`, event +0x12c) and in `0x4b541c`, `0x4b65f2`; no store found for quick-race circuits (so S = 0 there: I).
+`[0x78a404]` (S, player 1) defaults to 1.0: reset `0x431e37` (RaceStatus reset `0x431df0`). Writers: `0x4b541c` (1.0, mode 4), `0x4b5f53` (career, event +0x12c), `0x4b65f2` (1.0, SkipFE); reader `0x44bed9`. No other store in the text, so quick-race circuits keep S = 1.0 (V). `[0x78a400]` (gate) is set by Reset (1), `0x4b4a56` circuit, `0x4b4caa`, `0x4b4edc`, `0x4b50f2` (free), `0x4b5365`/`0x4b5416` (mode 4), `0x4b5631`, `0x4b5a2a`, career `0x4b5f47` (1), LAN `0x43b199`; quick race = options byte +0x1f.
 Two humans: `0x429b10` (called from `0x4264e2`) sets `veh+0x404` for the player behind by `d` metres: 1.08 at -600, 1.03 at -250, 1.015 at -120, 1.0 at -50. V (G, H, C)
 
 ## 4. Speed, skill and difficulty elsewhere
@@ -238,6 +238,5 @@ Result: 10/10 agree. Not in both exports: `0x4623d0`, `0x462740`, `0x462aa0`, `0
 - What `[[target+0xa8]+0xc]` (factor f in the rubber band) is; whether car byte `+0xa` is a 1-based rank; sign of `out2` in a real race.
 - Reader of `0x77a358..0x77a3ff` (12 + 30 floats); records `+0x51`, `+0x52`; `+0x04..+0x08` of fork meaning in play.
 - Rival row `+0x08..+0x0b`, `+0x19..+0x1b`; Drift mode rivals (`0x43de90`, ids 100..102 placeholders).
-- Quick-race S = 0 is only "no store found"; confirm with `RN_TRACE` of `[0x78a404]` in a quick race.
 - Bodies of Pass / Block / GetUnstuck finders (re-read with both tools); path rebuild in `0x44cd30`; what the speed byte unit is (m/s?).
 - Whether AI rating match for 4+ rivals (`0x4b4380` default branch) is correct for the cap patches (older note says OK).

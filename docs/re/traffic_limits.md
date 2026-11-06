@@ -20,7 +20,7 @@ Names: `census/names_trafficpool.tsv`. Earlier notes (docs/re/traffic.md, docs/o
 
 | # | Limit | Address | Value | On overflow | Data or code |
 |---|---|---|---|---|---|
-| 1 | Entrants | 0x4322a0 (G, C) | 30 (0x1e), stride 0x750, count [race+0x12c] = 0x78a41c | the entrant is dropped without any message; later code uses a smaller list | code: the immediate 0x1e. The allocation of the array at [0x78a418] (race+0x128) was not found, so raising 0x1e alone is U |
+| 1 | Entrants | 0x4322a0 (G, C) | 30 (0x1e), stride 0x750, count [race+0x12c] = 0x78a41c | the entrant is dropped without any message; later code uses a smaller list | code: the immediate 0x1e. The array is a static pool 0x77c790..0x78a2f0 (30 x 0x750 = 0xdb60 bytes, ends at RaceStatus), cleared by `0x431df0` on return to the front end (sets [0x78a418] = 0x77c790, count 0); the cap 30 is structural, so raising 0x1e alone overruns into RaceStatus (V) |
 | 2 | Collision body ids | 0x466970 (C), id taken at 0x469b00 (C) | 0xde = 222 ids; table 0x736050 = 0xde dwords; bitmap 0x736070 = 0x1b bytes = 216 bits | no check: id 216..222 writes past the bitmap, id 222 past the table (heap corruption) | code (two malloc sizes and 0xde) |
 | 3 | Track polygon bodies | 0x466970, 0x469810 (G) | pool n = 0xa0 (160), stops adding when full | cars late in the update get no road polygons (I: may fall through) | code; they also take ids from 2 (U how long they live) |
 | 4 | Car body pool | 0x466970: CarCollisionBodySlotPool n=0x1e, slot 0x190 | 30, flags 0xb | grows by n/4+1 = 8 slots (V, G 0x567160) | none needed |
@@ -33,10 +33,10 @@ Names: `census/names_trafficpool.tsv`. Earlier notes (docs/re/traffic.md, docs/o
 
 Not a cap but what really limits the world: placement. Measured 19 placed of 21 asked in WORLD (docs/traffic_placement.md,
 31 m spacing +0xd4 and 520 nodes). That is data in the TrackInfo row (host can write it).
-Entrant array pointer, per-car sound/skid/shadow pools and model memory were not traced in the time given (U).
+Per-car sound/skid/shadow pools and model memory were not traced in the time given (U).
 
 Largest count with no patch: 23 traffic (30 - 1 - 6), if placement and the id table allow it. Fewest patches for more: the immediate
-0x1e plus (U) the array size; the id table then needs 0xde and the two mallocs raised together.
+0x1e plus (V) a larger array (the static pool ends at RaceStatus 0x78a2f0); the id table then needs 0xde and the two mallocs raised together.
 
 ## 2. VARIETY
 

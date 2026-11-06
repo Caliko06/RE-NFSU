@@ -406,25 +406,30 @@ static int rival_style(uint32_t skill, uint32_t style) { return persona_on && sk
 
 // Every traffic model, default in WORLD (track 1010, OWNER 2026-11-04; RN_TRAFMODELS=0 off, =1 any track). The cave 0x63b270 weighs a usage 2 row 1.0 if any district weight +0xc60..+0xc70 is set: AMBULANCE, FIRETRUCK and BUS
 // have none, so they never come out of 0x57d000. A weight here brings them in, once, before AddTrafficCars 0x4b3ac0 (it runs after 0x4b4040, this hook's caller).
+static const uint8_t TT_ROWS[3] = {22, 26, 30};
+static uint32_t tt_tab, tt_keep[3];    // the weights traffic_types changed (the car table outlives the race), put back by rivals_frontend
 static void traffic_types(Ctx *c) {
-    static const uint8_t ROWS[3] = {22, 26, 30};
     const char *e = getenv("RN_TRAFMODELS");
     uint32_t tab = ld(c, 0x734588, 4);
     if (!tab || (e ? e[0] != '1' : ld(c, 0x78a2f0, 4) != 1010)) return;
-    for (int k = 0; k < 3; k++) stf(c, tab + 0xc90 * ROWS[k] + 0xc60, 1.0f);
+    if (!tt_tab) for (int k = 0; k < 3; k++) tt_keep[k] = ld(c, tab + 0xc90 * TT_ROWS[k] + 0xc60, 4);
+    tt_tab = tab;
+    for (int k = 0; k < 3; k++) stf(c, tab + 0xc90 * TT_ROWS[k] + 0xc60, 1.0f);
 }
 
 // The spacing of the placer (0x59aa60, trackinfo +0xd4/+0xd8, one per direction, 31 m on 520 nodes: 19..21 cars fit, docs/traffic_placement.md) is 20 m in free mode, RN_FREETRAFFIC's
 // 22 cars fit. Trackinfo row: 0x441fe0(esi = track), as free_setup. Back to the game's value in any other race (the table outlives the race).
+static float ts_keep[2];
+static uint32_t ts_row;                // the trackinfo row traffic_spacing changed, put back at the next race's first opponent or by rivals_frontend
+static void traffic_spacing_back(Ctx *c) { if (ts_row) stf(c, ts_row + 0xd4, ts_keep[0]), stf(c, ts_row + 0xd8, ts_keep[1]), ts_row = 0; }
 static void traffic_spacing(Ctx *c) {
-    static float keep[2];
-    static uint32_t row;
     uint32_t esi = c->r[ESI];
-    if (row) stf(c, row + 0xd4, keep[0]), stf(c, row + 0xd8, keep[1]), row = 0;
+    traffic_spacing_back(c);
     if (!free_race || (!getenv("RN_FREETRAFFIC") && ld(c, 0x78a2f0, 4) != 1010)) return;   // 31 m fits 14 cars on 1010, 20 m fits 26 (docs/traffic_placement.md); refill spreads the rest
     c->r[ESI] = ld(c, 0x78a2f0, 4);
-    row = call_guest(c, 0x441fe0, 0, NULL), c->r[ESI] = esi;
-    keep[0] = ldf(c, row + 0xd4), keep[1] = ldf(c, row + 0xd8);
+    uint32_t row = call_guest(c, 0x441fe0, 0, NULL);
+    c->r[ESI] = esi, ts_row = row;
+    ts_keep[0] = ldf(c, row + 0xd4), ts_keep[1] = ldf(c, row + 0xd8);
     stf(c, row + 0xd4, 20.0f), stf(c, row + 0xd8, 20.0f);
 }
 
@@ -447,6 +452,16 @@ static void rival_tables(Ctx *c, int personas) {
         n += snprintf(b + n, sizeof b - n, " L%d %c %.2f %.3f %u %.0fs", lv, PNAME[PERSONA[lv]][0], ldf(c, r + 0x0c), ldf(c, r + 0x14), c->mem[r + 0x50], ldf(c, r + 0x34));
     }
     if (getenv("RN_RIVALLOG") || getenv("RN_FREELOG")) rn_log("rivalai accept speed look nitro:%s", b);
+}
+
+// Back in the front end (host/phase.c): the shared tables this file changed for the event get the game's values back. The game resets
+// only its race block 0x78a2f0..0x78a427 there (0x431df0); the car table [0x734588], the trackinfo rows and the records 0x779ff8 outlive
+// every race (docs/re/gameflow.md), so a race after a WORLD one had its traffic spacing, its BUS/AMBULANCE/FIRETRUCK weights and personas.
+void rivals_frontend(Ctx *c) {
+    traffic_spacing_back(c);
+    if (tt_tab && ld(c, 0x734588, 4) == tt_tab) for (int k = 0; k < 3; k++)   // the table is chunk 0x34600 (0x57c850 sets, 0x57cb7e clears it) st(c, tt_tab + 0xc90 * TT_ROWS[k] + 0xc60, tt_keep[k], 4);
+    tt_tab = 0;
+    rival_tables(c, 0);
 }
 
 // 0x5809c0(id, 2, ride, record, skill, style, index) with esi = the ride slot: stdcall, 7 arguments.

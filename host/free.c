@@ -602,7 +602,7 @@ void free_frontend(Ctx *c) {
     live = 0, tspeed_on = 0;
     st(c, TRAFFIC_TOP, 0x41c4b127, 4);
     if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
-    if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
+    if (cu_was >= 0) cu_was = -1, free_curves(c, 0);   // [0x78a400] itself: 0x431df0 reset it on the way here (flow 1)
 }
 // A race's grid is placed (host/phase.c; Restart and the career retry too): what the guest callbacks fill per race starts empty.
 // Lifetime (docs/re/gameflow.md): cars, drivers, the car list and its TrafficTeleporter are freed by the teardown 0x422130 and made

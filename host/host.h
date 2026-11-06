@@ -82,6 +82,7 @@ void rn_phase_tick(Ctx *c);       // host/phase.c, first thing at each Present
 void rn_phase_grid(Ctx *c);       // host/phase.c, from host/free.c grid_fix: a race's grid is placed (every race, Restart too)
 void free_race_begin(Ctx *c);     // host/free.c: zero free mode's per-race state (from rn_phase)
 void free_frontend(Ctx *c);       // host/free.c: back in the front end, free mode's event is over (from rn_phase)
+void rivals_frontend(Ctx *c);     // host/rivals.c: back in the front end, the shared tables it changed get the game's values (from rn_phase)
 extern const char *rn_screen;   // RN_FLOWLOG: the post-race screen shown (e.g. "PostRaceMenu.fng"), "" if none
 extern unsigned rn_turbo;       // RN_TURBO: the guest clocks run this many times faster (native tests; 1 = play)
 extern const char *rn_fe;       // RN_FLOWLOG: the front end's active packages, "A.fng,B.fng,..."

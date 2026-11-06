@@ -38,7 +38,7 @@ void rn_phase_tick(Ctx *c) {
         rn_finished = rn_race;
         rn_log("phase race %u finished (state %u, frame %u)", rn_race, s, rn_telem.presents);
     }
-    if (f == 3 && was != 3) free_frontend(c);   // back in the front end: the event (free mode's setup) is over
+    if (f == 3 && was != 3) free_frontend(c), rivals_frontend(c);   // back in the front end: the event (free mode's setup) is over
 }
 
 void rn_phase_grid(Ctx *c) {
