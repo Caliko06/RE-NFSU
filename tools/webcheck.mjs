@@ -168,6 +168,15 @@ async function sample() {
   const h = (await send('Performance.getMetrics'))?.metrics?.find(x => x.name === 'JSHeapUsedSize')?.value || 0;
   peak.jsHeapMB = Math.max(peak.jsHeapMB, h / 1048576);
 }
+// Physical footprint (macOS `footprint`, counts GPU and compressed memory, unlike RSS) of every process of the run by type, once.
+function foot() {
+  const by = {};
+  for (const l of execSync('ps -axo pid=,command=', { maxBuffer: 1 << 26 }).toString().split('\n').filter(l => l.includes(profileDir))) {
+    const t = l.match(/--type=([\w-]+)/)?.[1] || 'browser', pid = l.trim().split(/\s+/)[0];
+    try { const m = execSync(`footprint -p ${pid}`, { timeout: 20000 }).toString().match(/Footprint: ([\d.]+) (KB|MB|GB)/); if (m) by[t] = (by[t] || 0) + m[1] * ({ KB: 1 / 1024, MB: 1, GB: 1024 })[m[2]]; } catch {}
+  }
+  return Object.fromEntries(Object.entries(by).map(([k, v]) => [k, Math.round(v)]));
+}
 await send('Page.navigate', { url });
 const t0 = Date.now();
 let text = '', seen = 0;
@@ -209,6 +218,7 @@ while (Date.now() - t0 < secs * 1000) {
     }
   }
   if (route && !seen && ROUTE.marker.test(text)) seen = Date.now();
+  if (measure && seen && !peak.footMB && Date.now() - seen >= (ROUTE.hold - 8) * 1000) peak.footMB = foot();   // in the race, before the hold ends
   if (seen && Date.now() - seen >= ROUTE.hold * 1000) break;
   // RN_AFTER_HUD=s: the shot s seconds after the race HUD appears (the race starts at a different second each run, so a
   // shot at a fixed page time shows a different moment: camera-dependent effects then look like regressions).
@@ -253,7 +263,7 @@ if (measure) {
   }
   const mb = v => Math.round(v / 1048576 * 10) / 10;
   writeFileSync(measure, JSON.stringify({ url, secs: (Date.now() - t0) / 1000, wire_MB: { wasm: mb(cls.wasm), exe: mb(cls.exe), game: mb(cls.game), other: mb(cls.other) },
-    gameFiles: cls.gameFiles.size, requests: net.size, peakRssMB: Math.round(peak.rssMB), rssByType: peak.byType, peakJsHeapMB: Math.round(peak.jsHeapMB),
+    gameFiles: cls.gameFiles.size, requests: net.size, peakRssMB: Math.round(peak.rssMB), rssByType: peak.byType, peakJsHeapMB: Math.round(peak.jsHeapMB), footMB: peak.footMB,
     resourceMs: res ? JSON.parse(res) : null,
     top: Object.entries([...net.values()].reduce((o, r) => { const p = r.path.replace(/^(\/remaster\/.*\/).*/, '$1*'); (o[p] ||= [0, 0]); o[p][0] += r.enc; o[p][1]++; return o; }, {})).sort((a, b) => b[1][0] - a[1][0]).slice(0, 12).map(([p, [n, k]]) => `${(n / 1048576).toFixed(1)} MB x${k} ${p}`),
     pageSec: { screenLine: at('screen:'), exeLoaded: at('Speed.exe loaded'), firstPresent: at('d3d9 first Present'), raceHud: at('d3d9 race HUD') } }, null, 1) + '\n');

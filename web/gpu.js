@@ -221,27 +221,38 @@ async function startGpu(M, canvas, report, onFrame) {
     return { view: tex.createView() };
   }
   // A BC7 .dds with its mip chain (tools/remaster/world_bc7.sh, MW's bcdds.cpp), gzipped on disk next to it (<name>.gz):
-  // no decode on the page thread, a quarter of the VRAM of rgba8. Same reader as ~/RE-NFSMW web/gpu.js loadDds.
+  // no decode on the page thread, a quarter of the VRAM of rgba8.
   async function loadDds(url) {
     if (netN < HD_NET) netN++; else await new Promise(r => netQ.push(r));
-    let b;
+    let tex;
     try {
-      const r = await fetch(url + '.gz');
-      b = r.ok ? await new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer() : await (await fetch(url)).arrayBuffer();
+      let r = await fetch(url + '.gz'), gz = r.ok;
+      if (!gz) r = await fetch(url);
+      // Streamed: each mip goes to writeTexture as soon as its bytes have arrived, so only one level (<= 1 MB) is held
+      // at a time, not the whole gunzipped file (ArrayBuffers wait for a GC; the renderer's peak RSS was 1.6 GB at the title).
+      const rd = (gz ? r.body.pipeThrough(new DecompressionStream('gzip')) : r.body).getReader();
+      let chunk = new Uint8Array(0), pos = 0;
+      const take = async n => {
+        const out = new Uint8Array(n);
+        for (let got = 0; got < n;) {
+          if (pos === chunk.length) { const x = await rd.read(); if (x.done) throw new Error('short dds'); chunk = x.value; pos = 0; }
+          const k = Math.min(n - got, chunk.length - pos);
+          out.set(chunk.subarray(pos, pos + k), got); got += k; pos += k;
+        }
+        return out;
+      };
+      const h = await take(148), u = new Uint32Array(h.buffer, 0, 32);
+      if (u[0] !== 0x20534444 || u[21] !== 0x30315844 || new Uint32Array(h.buffer, 128, 1)[0] !== 98) throw new Error('not a BC7 dds');
+      const H = u[3], W = u[4], levels = u[7];
+      tex = device.createTexture({ size: [W, H], mipLevelCount: levels, format: 'bc7-rgba-unorm',
+        usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
+      for (let l = 0; l < levels; l++) {
+        const bw = Math.ceil(Math.max(1, W >> l) / 4), bh = Math.ceil(Math.max(1, H >> l) / 4), d = await take(bw * bh * 16), t = performance.now();
+        device.queue.writeTexture({ texture: tex, mipLevel: l }, d, { bytesPerRow: bw * 16, rowsPerImage: bh }, [bw * 4, bh * 4]);
+        hdMs += performance.now() - t;
+      }
+      rd.cancel().catch(() => {});
     } finally { const next = netQ.shift(); if (next) next(); else netN--; }
-    const u = new Uint32Array(b, 0, 32);
-    if (u[0] !== 0x20534444 || u[21] !== 0x30315844 || new Uint32Array(b, 128, 1)[0] !== 98) throw new Error('not a BC7 dds');
-    const H = u[3], W = u[4], levels = u[7], t = performance.now();
-    const tex = device.createTexture({ size: [W, H], mipLevelCount: levels, format: 'bc7-rgba-unorm',
-      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
-    let off = 148;
-    for (let l = 0; l < levels; l++) {
-      const bw = Math.ceil(Math.max(1, W >> l) / 4), bh = Math.ceil(Math.max(1, H >> l) / 4);
-      device.queue.writeTexture({ texture: tex, mipLevel: l }, new Uint8Array(b, off, bw * bh * 16),
-        { bytesPerRow: bw * 16, rowsPerImage: bh }, [bw * 4, bh * 4]);
-      off += bw * bh * 16;
-    }
-    hdMs += performance.now() - t;
     return { view: tex.createView() };
   }
   function useHd(t, key) {
