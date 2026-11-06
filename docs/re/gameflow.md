@@ -45,7 +45,7 @@ CRT start 0x670e19 -> GameFlow::Run 0x4472e0 -> InitSubsystems 0x4471b0 -> (disc
       -> next 0x448c40                                                                                 |
 [3] IN_FRONTEND        0x448c40 EnterFrontEnd  (FEng screens run; MainLoop calls FEManager::Update)     |
       leave by: 0x4b5c00 QuickRace::StartRaceByMode (QR menus 0x4b8050/0x4bb2b0/0x4bd710), 0x4b5df0      |
-      career event start (0x4b62b3), 0x4b6390 (0x4b6778), or 0x43ada0 -> 0x448530                        |
+      career event start (0x4b62b3), 0x4b6390 (0x4b6778), or the online lobby 0x43ada0 -> 0x448530      |
 [2] UNLOADING_FRONTEND 0x448d10  waits for the loader, frees FRONTB group, -> next 0x449250 <------------+
 [4] LOADING_TRACK_COMMON 0x449250  shows PC_Loading.fng; GLOBAL\INGAMEA.BUN (sync), INGAMEB.LZC -cb->
       0x448f70 CreateRides (installs job 0x448ee0 in [0x737b58]) -> 0x448ee0 BeginLoadingTrackSpecific -> next 0x449760
@@ -53,10 +53,11 @@ CRT start 0x670e19 -> GameFlow::Run 0x4472e0 -> InitSubsystems 0x4471b0 -> (disc
       -> 0x4491a0 QueueRaceCars (cb 0x449590 via 0x4495c0 Part3) -> 0x449520 Part6 TEX<id>TRACK.BIN -cb-> 0x4494f0 End
       -> next 0x449870 TrackWorldInit -> next 0x449840
 [6] RACING             0x449840  every frame: 0x43a2e0 test, 0x43ae40 race update
-      leave by: Race::OnFlowMessage 0x422bb0 (message 9 / 10) -> next 0x449a10 ; or 0x43ada0 restart -> 0x448560 -> 0x449250
+      leave by: Race::OnFlowMessage 0x422bb0 (message 9 / 10) -> next 0x449a10 ; or race message 8 (Restart) rebuilds in place, flow stays 6 (section "Race coordinator states"); 0x43ada0 is the online lobby, not Restart
 [7] UNLOADING_TRACK_SPECIFIC 0x449a10  PC_Loading.fng, tears down the world (0x445350 streamer, 0x441320, 0x4433f0, 0x466bf0) -> next 0x4493a0
 [8] UNLOADING_TRACK_COMMON   0x4493a0  frees INGAME group; if ([0x777b4c]==1 or [0x777b4c] in {2,4} with [0x777cc8]==4) and [0x778898] in {0,3}
       -> next 0x449250 (race again)  else -> next 0x448b10 (front end)
+      8 -> 4 is the career retry (I): [0x778898] = 3 / 0 is written by 0x4973df / 0x49753e, both after 0x4abc20
 ```
 All writes of `[0x77a904]` with an immediate were enumerated with capstone (list in the section "Evidence"): 0x422bfd, 0x44732c, 0x448a21,
 0x448a9d, 0x448e6c, 0x448f35, 0x44943e, 0x4494a7, 0x449501, 0x4499de, 0x449d1b, 0x4b5ceb, 0x4b62b3, 0x4b6778, 0x4b67a0 and the setters 0x448530 / 0x448560.
@@ -69,8 +70,8 @@ Triggers in detail (V unless marked):
   `0x5809c0(.., "SkipFE", ..)` and spawns opponents; from state 3 it requests UnloadingFrontEnd, from any other state it jumps straight to LoadingTrackCommon.
 - **Race end**: `Race::OnFlowMessage 0x422bb0` (vtable method; jump table 0x422c20, ids 1..10 -> cases 0,0,0,4,4,4,4,1,2,3) handles ids 9 and 10 by
   setting next = 0x449a10 with name "BeginGameFlowUnloadingTrackSpecific" (id 10 first calls 0x495e90). Who sends 9/10 is U.
-- **Restart / start from anywhere**: `Race::RequestStartOrRestart 0x43ada0` picks `SetNextUnloadingFrontEnd 0x448530` when `IsInFrontEnd`, else
-  `SetNextLoadingTrackCommon 0x448560` (I: callers 0x546b41, 0x548721 not read).
+- **Restart**: NOT `0x43ada0`. Restart is race message 8 (see "Race coordinator states and object lifetime"); flow stays 6. `Race::RequestStartOrRestart 0x43ada0`
+  (only callers 0x546b41, 0x548721 = Net_HostStartRaceWhenAllReady 0x546980) is the online lobby start: `SetNextUnloadingFrontEnd 0x448530` when `IsInFrontEnd`, else `SetNextLoadingTrackCommon 0x448560`. V (gap2)
 
 ## 3. How a step loads (the continuation pattern; V C/H)
 `file = CreateResourceFile(path, type, flags, ..)  (0x4482f0)`, then `BeginLoading(file, callback)  (0x448110)` with `eax` = callback; the step also writes
@@ -231,13 +232,68 @@ Rule: the name was read from one export, the same question asked of another tool
 | 0x4f78e0 | FEScreen::FEScreen | vtable 0x6c1874 and the hash constants 0xaa68bfce / 0xaa68bfd4 / 0xaa68bfc6 | G, H and C share all (script: 0x6c1874 = 7084148 in H and C) |
 11/11 agree. Factory rows were checked by Hopper too (`sub_<ctor>` in the callee list of the factory) for the ones tagged `capstone+hopper`; the rest stay capstone-only (I-level naming).
 
+## Race coordinator states and object lifetime (2026-11-06)
+V = code read, I = inferred, U = open. Sources: scratchpad gap2 and gap4 (REA, Ghidra, capstone).
+
+**What [0x7361f0] is.** The RaceCoordinator, built by 0x421f00 (`[0x7361f0] = this`), message driven. `[coord+0]` = state. Only the pump `0x421b10` writes it: message 1 sets
+`*coord = arg`, message 2 (leave) writes 0 after the handler. Handler = table `0x700db8[state]` (12 entries). The game loop 0x447600 queues message 3 (tick) every frame.
+`0x421ae0(N)` = transition helper: queue 2 (leave), 1 (enter N), 3 (tick). Fields: +4 enter stamp, +0x14 "next mode" (4 / 2 / 9 / 10 at start, 8 = results), +0x18 initial stage,
++0x20 state saved by pause, +0x24 paused byte. V
+
+| state | handler | meaning |
+|---|---|---|
+| 1 | 0x422eb0 | loading / streaming step (grid, seed, SetRaceStage), then `0x421ae0([coord+0x14])`. Also REUSED after the finish with `[coord+0x14] == 8` |
+| 2 | 0x423070 | pre-race wait (when [0x73465c] or [coord+0x44]); starts cars, then 3 |
+| 3 | 0x423280 | pre-race NIS / countdown, then 4 |
+| 4 | 0x423530 | RACING; tick runs the FINISH CHECK |
+| 5 | 0x4239c0 | instant replay / THE_PRESENT camera (pause menu choice 4) |
+| 6 | 0x423b50 | in-race replay, returns to 4 |
+| 7 | 0x423870 | PAUSE MENU (saves old state in +0x20); result 1 resume, 2 quit-to-results (msg 8), 3 unload (msg 10), 4 replay |
+| 8 | 0x424160 | RESULTS / post-race screens; msgs 9 / 10 queue the unload (flow 7). Flow stays 6 here |
+| 9 / 10 | 0x422c80 / 0x422d70 | alt. modes ([0x78a308] / [0x78a309]); 10 plays a replay. Role beyond that: I |
+| 0xb | 0x4237a0 | queued by 0x4211f0; FEng package; purpose U |
+
+**Finish edge (V).** `Race::Update 0x435570` -> `Race::FinishCar 0x4350d0` for the player (racer+0x10 short = finish reason, +0x110 time, +0xc rank, Race+0x28 count++).
+State 4 tick (0x423630, `0x435b30` AreAllPlayersFinished) or msg 4 (0x423686) -> `call 0x423f20` FinishRaceFlow (only these 2 callers, both in state 4): first `0x435a70`
+SimulateRaceFinish (call at 0x423f3e, ret 0x423f43) = FinishCar for EVERY unfinished racer; then offline `[coord+0x14] = 8`, enter 1, and 1 -> 8 after streaming.
+Online (0x43a2e0 true) queues msg 10 instead. 4 -> 1 with `[coord+0x14] == 8` -> 8; flow stays 6 the whole time.
+- Test `state == 8 || (state == 1 && [coord+0x14] == 8)`. Never use 7 (pause) or 5 / 6 (replay): they return to 4. A plain "state == 1" also fires on the grid. V
+- Racer finished flag: Race = [0x73619c], racers at `Race+0x520 + 4*i`, count `[Race+0x24]`; `short racer+0x10` = finish reason, 0 = still racing. Rivals may finish before the player. V
+- A finished rival (car+0x24 == 3): FinishCar sets `[ctrl+0x3f4] = 0x11` (0x43532c) -> AIActionEndOfRace ctor 0x453730 (priority 600), plan with zero speed: it brakes to a stop in place. V
+- Pause "quit to results" (state 7 arg 2) goes by msg 8 with no 0x423f20; whether racers get FinishCar there (0x495e20): U.
+
+**Restart and next race (V).** Restart = race message 8 (posters 0x42395e, 0x4243e3, 0x4973b1 DoRestartRace). `0x422bb0` case 8 (0x422bd4): `call 0x422130` (tear down) then
+`call 0x421f00` (build again); flow stays 6; `[0x7361f0]` keeps its address. Msg 9 (DoRestartEvent 0x4973d0, DoNextRaceInEvent 0x497410, handler 0x423530 case 9) -> state 0 handler
+0x422bed -> 0x449a10: flow 6 -> 7 -> 8 -> 4 (career retry, [0x778898] in {0,3}, gate in 0x4493a0) -> 5 -> 6. Msg 10 (quit): 7 -> 8 -> 1 -> 3.
+Build order in 0x421f00: PlaceAllRacers 0x422a70 (call at 0x421fc7) runs BEFORE the records 0x434590 (call at 0x422047). Car fields: car+0x14 = entrant, car+0x2c = driver.
+Free + build run inside one guest handler; during the 4/5/7/8 loading frames [0x7361f8] and [0x7361f0] are 0, so code gated on flow 6 never sees freed cars.
+
+**Race block reset (V, gap3).** RaceStatus 0x78a2f0..0x78a427 (+ entrant pool 0x77c790) is reset by `0x431df0`, not by track load. Callers: 0x448b3f (LoadingFrontEnd, flow 1), 0x4b5c15
+(StartRaceByMode), 0x4b5d33 (LAN start), 0x4b5e18 (Career::StartRaceFromEvent). Flow 4 / 5 / 6 never store into it. Restart and 8 -> 4 keep it; 8 -> 4 re-copies only track, laps,
+direction ([0x78a2f0], [0x78a318], [0x78a31c], [0x78a2fc]) through 0x4abc20.
+
+**Object lifetime** (cars are created only at 0x4224f2 / 0x599463, freed only in the sweep 0x422b70; nothing is created or freed mid-race):
+| object | created | freed | host edge |
+|---|---|---|---|
+| race coordinator [0x7361f0] (0xb0, ctor 0x421c70) | 0x449976 (TrackWorldInit 0x449870, flow 5) | 0x449a9f, zeroed 0x449ab1 (flow 7) | same pointer on Restart |
+| car list head [0x7361f8] (0x17a0, ctor 0x41f6e0) | 0x421fb9 in 0x421f00 (flow 5, or msg 8) | 0x4221ff in 0x422130; [0x7361f8] = 0 | rn_race change |
+| human + racer cars (0x8f0) | 0x422410 BuildRacerCar from PlaceAllRacers 0x422aec | sweep 0x422b70 (dtor 0x425990) | rn_race change; address may repeat for another car |
+| traffic cars (0x8f0) | 0x599463 via 0x5992f0 <- 0x598bf0 <- 0x422b36 (PlaceCar may return 0) | same sweep | RECYCLED IN PLACE by 0x599830 (same car, driver, entrant) |
+| driver car+0x2c | placeholder at 0x425665, real by Car::SetDriver 0x425fe0 | car dtor and every 0x425fe0 call | replaced in flow 6 for player and finishing cars (FinishCar 0x435315, World::Step 0x420c2a, 0x42e1a4..); traffic never |
+| RaceManager [0x73619c] (0x568, ctor 0x434270) + records | 0x421f8c; records by 0x434590 | 0x422130, zeroed | rn_race change |
+| teleporter L+0x2f0 (0x1a0) | with L (0x598440 in 0x41f6e0) | with L | read live as ld(L+0x2f0) |
+| players [0x7361bc+4i] | head of 0x421f00 (I) | tail of 0x422130 | re-read each time |
+| entrants car+0x14 (pool 0x77c790, stride 0x750) | front end / mode setup | never in 4..6 | same record across Restart |
+Msg 8 and next stage both free and re-malloc everything; only [0x7361f0] keeps its address on Restart.
+
 ## Evidence notes
 - Writers of `[0x77a920]` (capstone scan of .text): 0x448b11 (1), 0x448ce9 (3), 0x448d1f (2 via ebx), 0x449257 (4), 0x4493a8 (8), 0x44976a (5), 0x449845 (6), 0x449a15 (7); readers cmp 3 / 6 at 0x403bc5 0x4081c0 0x4085b8 0x408f24
   0x40a5d9 0x44776b 0x4b675f 0x4f308f 0x539847 0x53cc51 0x542eaa 0x543a8b 0x544f47 0x56dc63 0x5704a7 0x570db0 (cmp 3 = front-end-only code: FEng render, input; cmp 6 = race-only code).
 - Scratch scripts are not committed (scratchpad gf/).
 
 ## Open (U)
-- Who sends message ids 9 and 10 to `Race::OnFlowMessage 0x422bb0`, and which class owns it; callers of `Race::RequestStartOrRestart 0x43ada0` (0x546b41, 0x548721) and the meaning of its first branch `[0x6f1f64]`.
+- Who else sends message ids 9 and 10 (known: DoRestartEvent 0x4973d0, DoNextRaceInEvent 0x497410, state 4 case 9; quit 10), and the first branch `[0x6f1f64]` of the online lobby start `0x43ada0`.
+- Which trigger fires World::Step 0x420c2a and the 0x42e* SetDriver calls (player driver swap in flow 6); how a tournament advances a stage (probably via the front end, I); whether 0x495e20 finishes racers.
 - Where the results screens (PostRaceResults / PostRaceStats / PostRaceMenu, factories 0x497bf0 0x49be80 0x496140) are pushed and how they return to state 7: no GameFlow state covers them; the push site is probably in the race end code of
   `0x43ae40` or its callees (not traced).
 - What `[0x6f1dd8]==1` selects in steps 0x448a40 / 0x449600 / 0x448d10 / 0x449a10 (calls 0x51da90 / 0x51dec0 with callback 0x448a10 / 0x4495c0): looks like the online path (I), out of scope.

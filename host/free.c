@@ -77,7 +77,6 @@ static int n_game, n_free;             // free_spacing: moves with the game's sp
 #define KEEP_M 200.0f   // free_recycle: a car this close and ahead of the player is never moved
 static int n_far, n_kept, n_offbit, n_onbit;   // free_recycle: far cars sent to a move; free_tnode: cars placed on a node without / with the bit
 static uint32_t xrec[12], nxrec;       // the extra racers' records (rm_records, outside the RaceManager) and how many there are
-static uint32_t tele;            // the TrafficTeleporter, cached by free_recycle (ecx of its call) for free_tmove
 static uint32_t names;           // NRIV_MAX guest strings of 16 bytes: 0x5809c0 copies the entrant name from its 4th argument
 
 static uint32_t rnd(uint32_t *s) { uint32_t x = *s; x ^= x << 13; x ^= x >> 17; x ^= x << 5; return *s = x ? x : 0x9e3779b9u; }
@@ -257,7 +256,7 @@ static uint32_t free_traffic(Ctx *c) {
 // the new path) to empty it, bit 0 of the 8 decision slots driver+0xc..+0x28 cleared; the path is ctx+0x3a8, ctx = driver+0x2c.
 static uint32_t free_dir(Ctx *c) {
     uint32_t drv = c->r[ECX];
-    for (int i = 0; i < 16 && rdir[i].drv; i++)
+    for (int i = 0; i < 16 && rdir[i].drv && !rn_race_over(); i++)   // finished: new drivers (FinishCar), maybe at a freed one's address
         if (rdir[i].drv == drv) return rdir[i].dir;
     return ld(c, 0x78a2fc, 4);
 }
@@ -406,6 +405,7 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
     static uint32_t race;
     if (rn_new_race(&race)) memset(bh, 0, sizeof bh);   // 64 slots per race (they filled up over races)
     if (off < 0) off = getenv("RN_FREETMOVE") && !atoi(getenv("RN_FREETMOVE"));
+    uint32_t tele = ld(c, h + 0x2f0, 4);              // the TrafficTeleporter of this race's car list (ecx at 0x420c77), read live
     if (off || !tele || !pc || world_ai(c)) return;   // WORLD: traffic_refill (host/rivals.c)
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
     uint32_t pick = 0; int prio = 0, near = 0;
@@ -566,12 +566,14 @@ void free_frontend(Ctx *c) {
     if (zone_at) st(c, zone_at, zone_was, 4), zone_at = 0;   // free_place's clear zone back to the game's value
     if (cu_was >= 0) st(c, 0x78a400, (uint32_t)cu_was, 4), cu_was = -1, free_curves(c, 0);
 }
-// A race's grid is placed (host/phase.c; Restart and tournament stages too): what the guest callbacks fill per race starts empty.
-// The cars, drivers and the TrafficTeleporter are new objects; the old addresses may come back for other cars.
+// A race's grid is placed (host/phase.c; Restart and the career retry too): what the guest callbacks fill per race starts empty.
+// Lifetime (docs/re/gameflow.md): cars, drivers, the car list and its TrafficTeleporter are freed by the teardown 0x422130 and made
+// again by the build 0x421f00, which places the grid (0x422a70, here) before the records (0x434590 -> rm_records refills xrec).
+// No car is made or freed inside a race; a finished car gets a new driver (FinishCar 0x435315), so rdir is not used after the finish.
 void free_race_begin(Ctx *c) {
     (void)c;
-    memset(rdir, 0, sizeof rdir);
-    tele = 0, drove = 0, go_at = 0, memset(riv, 0, sizeof riv);
+    memset(rdir, 0, sizeof rdir), nxrec = 0;
+    drove = 0, go_at = 0, memset(riv, 0, sizeof riv);
     n_game = n_free = n_far = n_kept = n_offbit = n_onbit = 0, n_tmove = n_tfail = 0, memset(n_twhy, 0, sizeof n_twhy);
 }
 
@@ -603,7 +605,7 @@ void free_tick(Ctx *c) {
     }
     for (uint32_t k = 0; xr && k < nxrec; k++) {
         uint32_t keep[4] = {c->r[EBX], c->r[ESI], c->r[EDI], c->r[EBP]};
-        if (ld(c, ld(c, xrec[k], 4) + 0x1c, 4) == xrec[k] && ld(c, xrec[k] + 0x10, 2) == 0) {
+        if (ld(c, xrec[k] + 0x10, 2) == 0) {   // still racing (+0x10 = finish reason)
             c->r[EDI] = xrec[k], call_guest(c, 0x4338c0, 0, NULL);
             if (prec) c->mem[xrec[k] + 0xa] = c->mem[prec + 0xa];
         }
@@ -1026,7 +1028,6 @@ static uint32_t grid_fix(Ctx *c) {
 // in a straight line also needs a move, so the cars stay in the band the teleporter keeps around the player; a car within
 // KEEP_M ahead of the player never moves (it would vanish in sight). RN_FREE=0 or a race: the game's answer.
 static uint32_t free_recycle(Ctx *c) {
-    tele = c->r[ECX];
     uint32_t car = ARG(0), r = call_guest(c, 0x5988c0, 1, &car) & 0xff, h = ld(c, 0x7361f8, 4);
     // WORLD: a failed move parks the car (0x598837: not drawn, no collision), even a car driving in sight of the player. Only parked cars go through the teleporter; traffic_refill (host/rivals.c) moves the driving ones, out of sight and never parking them.
     if (live && world_ai(c)) { uint32_t v = ld(c, car + 0x2c, 4); return v && c->mem[v + 0x4d1] ? r : 0; }
