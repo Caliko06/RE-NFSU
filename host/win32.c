@@ -588,6 +588,9 @@ static uint32_t GetTickCount_(Ctx *c) { rn_telem.clock_calls++; clk_site(c); gil
 // before that exit point and then lets the loop spin as before: the loop still exits at its first read past the
 // deadline, so the frame times are the same. OFF by default (RN_LIMSLEEP=1 on): bench spk5 (Mac under load) gave p99
 // 33.4 ms, 35 frames > 33 ms vs spk3 19.6 / 3; not yet separated from the load. Off under RN_FIXEDCLOCK.
+// Wake margin: a sleep on the web comes back ~1.5-2.5 ms late (and the thread that took the turn meanwhile runs a 2 ms
+// spin quantum); at 0.3 ms the race ran at p50 17.9-19.0 ms, 53-57 fps (headed A/B ls_on1/2, w1 2026-11-05).
+#define LIM_WAKE_US 3000
 static int lim_sleep = -1;
 static void limiter_sleep(Ctx *c) {
     if (lim_sleep < 0) { const char *e = getenv("RN_LIMSLEEP"); lim_sleep = e && *e == '1'; }
@@ -598,8 +601,8 @@ static void limiter_sleep(Ctx *c) {
     if (!(per > 0) || !(wait > 0)) return;
     int32_t el = (int32_t)((uint32_t)(now_us() >> sh) - c->r[EBP]);
     double left_us = wait / per - (double)(el < 0 ? 0 : el) * (1u << sh);   // ticks = us (QPF 1 MHz)
-    if (left_us < 800) return;
-    gil_sleep_us((uint64_t)(left_us - 300));
+    if (left_us < LIM_WAKE_US + 500) return;
+    gil_sleep_us((uint64_t)(left_us - LIM_WAKE_US));
 }
 // RN_FPS=30 (web ?fps=30, accepted degradation, OFF by default): the limiter's frame target [0x6f0890] (1/60, read
 // only at 0x585b83) becomes 1/30. The limiter then adds the waited time to the frame dt (param_1 + wait = 1/30) and the
