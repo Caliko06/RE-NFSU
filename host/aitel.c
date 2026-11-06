@@ -253,10 +253,10 @@ static void reset_every(Ctx *c) {
     uint32_t ctrl = ld(c, car + 0x18, 4);
     if (!ctrl || ctrl >= GUEST_MEM - 0x900) return;
     rq_next = f + (uint32_t)rn_resetevery * 60;
+    if (rn_resetlog > 0) rst_arm(c, car, "every", 0x4314a0);   // before the call: RST logs the pos before, RSTA the pos after (Block 1 armed it after)
     c->r[EAX] = ctrl;
     call_guest(c, 0x4314a0, 0, NULL);
     if (!c->halt) st(c, car + 0x87c, 0, 4);   // 0x4264d0 clears the request after the service
-    if (rn_resetlog > 0) rst_arm(c, car, "every", 0x4314a0);
 }
 
 // RN_WALLX=1 (off by default; GOAL 2026-11-05 Block 1, docs/re/reset_walls.md): count wall pass-throughs of the player.
