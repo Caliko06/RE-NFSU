@@ -1,5 +1,5 @@
 {
- "functions": 13756,
+ "functions": 13757,
  "abk_files": 106,
  "abk_modules": 79,
  "abk_distinct_code": 23,
@@ -361,7 +361,11 @@
   "0x40cfda",
   "0x40cfed",
   "0x40cffb",
-  "0x707fd0"
+  "0x707fd0",
+  "0x431724",
+  "0x4317ac",
+  "0x797400",
+  "0x474be7"
  ],
  "data_seeds_inside_instructions": 615,
  "failed": {},
