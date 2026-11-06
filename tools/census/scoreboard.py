@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Per-system scoreboard: tagged / ran / named / diff-tested (docs/re/NIGHT_BRIEF.md).
+"""Per-system scoreboard: tagged / ran / named / diff-tested (docs/archive/NIGHT_BRIEF.md).
 
   tagged  functions with a system tag of confidence med/high in census/systems.tsv, or with a name in names_*.tsv
           (the name's system overrides the graph tag: the external audit found 47% of named functions disagreed)

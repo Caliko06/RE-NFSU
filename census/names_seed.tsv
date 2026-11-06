@@ -55,7 +55,7 @@ addr	in_funcs	func_start	source	line	snippet
 00409b70	yes	00409b70	docs/night_re.md	43	## Track lamps (0x544f30 from 0x409580 / 0x409b70)
 00409b70	yes	00409b70	tools/hopper/q_worldflare.py	1	4ada60), how lamp flares are placed, coloured, sized and faded by distance/angle, the LIGHTGLOW and LIGHTSTREAKS passes (0x409b70, flag 0x700e9c, buffer 0x71abb0), and MiniWorld_DynamicLights 0x6c641c
 00409b70	yes	00409b70	tools/recomp/patches.py	131	# buffer 0x71abb0 (0x409b70). Each frame that buffer is multiplied by BLENDFACTOR k = 0x008296b4 (ZERO / BLENDFACTOR quad,
-00409bdb	inside	00409b70	docs/PLAN.md	125	- Lights: RE how the game draws them (flares 0x409bdb, the light glow, headlights) before changing them.
+00409bdb	inside	00409b70	docs/archive/PLAN.md	125	- Lights: RE how the game draws them (flares 0x409bdb, the light glow, headlights) before changing them.
 00409bdb	inside	00409b70	docs/night_re.md	13	| LIGHTSTREAKS | 0x700e9c | 0x409580, 0x40b3f0, 0x40cb80 | flare buffer 0x71abb0 (PATCH 0x409bdb) |
 00409bdb	inside	00409b70	tools/recomp/patches.py	129	# PATCH: 0x409bdb (+ weight 0x707fcc), OWNER 2026-10-22 (light flares blind the view) and 2026-10-26 (now the trails are
 00409bdb	inside	00409b70	tools/recomp/patches.py	140	# The block 0x409bdb..0x409bfe is rewritten in place: same args to 0x40d6e0, same ecx / edx / eax as before the call.
@@ -175,7 +175,7 @@ addr	in_funcs	func_start	source	line	snippet
 00410c1b	inside	00410b70	tools/recomp/patches.py	339	PATCHES.append(dict(addr=0x410c1b, old="83e1fe03c8", new="e8" + _rel(0x410c1b, 0x63b3ad), when=lambda: True))
 00410c1b	inside	00410b70	tools/recomp/patches.py	339	PATCHES.append(dict(addr=0x410c1b, old="83e1fe03c8", new="e8" + _rel(0x410c1b, 0x63b3ad), when=lambda: True))
 00410ce0	no	00410c50	docs/night_re.md	17	0x410ce0 clamps each flag to the cap table 0x701040. Preset 1 sets HEADLIGHTS, MOTIONBLUR, LIGHTSTREAKS = 0.
-00411030	yes	00411030	docs/PLAN.md	142	- Known layer gaps: GetMessageA that would wait (0x411030, window inactive), SuspendThread of a running thread
+00411030	yes	00411030	docs/archive/PLAN.md	142	- Known layer gaps: GetMessageA that would wait (0x411030, window inactive), SuspendThread of a running thread
 00417600	yes	00417600	docs/openworld/re_racer_cap_probe.md	70	runs `param_1` times (test `iVar11-1 < param_1`): for each, `0x417600`, "DUMMY_SKIN%d"/"DUMMY_WHEEL%d" with iVar11, ride
 0041cf40	yes	0041cf40	tools/recomp/patches.py	311	# game's "career beaten" flag: 0x5a0dc0 sets it to 1 when the last event (0x71) is won, new profile 0x41cf40 clears it
 0041dd10	yes	0041dd10	docs/re_audio_default.md	58	(serializer `0x4aaad0`, checksum `0x41dd10`); reader `0x41e330` (deserializer `0x4aac70`, call at `0x41e463`
@@ -302,7 +302,7 @@ addr	in_funcs	func_start	source	line	snippet
 00425350	yes	00425350	docs/openworld/re_racer_cap.md	138	Gives full racer behaviour (Pass, Block, chase, rubber band) because racers are built by 0x425350 (object 0x8f0,
 004264d0	yes	004264d0	docs/openworld/re_zones.md	29	| consumer of `car+0x87c` = 0x4264d0 (Ghidra 29760; the same flag is also raised by 0x426930 when the car has no ground under it every 32 frames and when it is > 5000 (0x6b7bac) from its route point) 
 004264d0	yes	004264d0	docs/openworld/re_zones.md	156	Never run. Driver-kind to racer/traffic mapping in 0x44b1b0 and 0x4264d0; route position source for the human reset when
-00426617	inside	004264d0	docs/PLAN.md	26	Speed: [0x700d58] = 8.0 is the reset's MINIMUM (0x426617), so a rival lands at the player's speed. Racers follow
+00426617	inside	004264d0	docs/archive/PLAN.md	26	Speed: [0x700d58] = 8.0 is the reset's MINIMUM (0x426617), so a rival lands at the player's speed. Racers follow
 00426930	yes	00426930	docs/OPENWORLD.md	86	0x4436d0 ignores the +0x80 track list. Not walls (REA ev_6572fc.., ev_911679..): 0x426930 resets at > 5000.0 m 2D from the
 00426930	yes	00426930	docs/openworld/re_answers_0b.md	268	that start mode 6 are 0x426930 (jump trigger) and 0x465d00 (crash camera); BOTH call 0x42c4b0 first (0x426930 at
 00426930	yes	00426930	docs/openworld/re_answers_0b.md	268	that start mode 6 are 0x426930 (jump trigger) and 0x465d00 (crash camera); BOTH call 0x42c4b0 first (0x426930 at
@@ -342,7 +342,7 @@ addr	in_funcs	func_start	source	line	snippet
 00427ed0	yes	00427ed0	docs/openworld/re_zones.md	30	frame%8 and frame%22 time slicing by driver kind) inside a RESET or RESET_TO_POINT zone is reset by 0x427ed0 | each AI slice, after its 0.1 s timer; no mode test | 56492-56494 | owzone2.txt 653-662 | 
 00427ed0	yes	00427ed0	docs/openworld/re_zones.md	34	2b380 (via 0x443790, mask 0x20) | 5 TUNNEL | sound/reverb tunnel id (+0x7c), height gate +0x14 like 0x427ed0 | audio | 109951 and 100993 (block 4a6800) | owzone2.txt 6572 | CONFIRMED type; use UNREAD 
 00427ed0	yes	00427ed0	docs/openworld/re_zones.md	41	- RESET / RESET_TO_POINT on the player: 0x430730 -> 0x430e00 -> 0x427ed0, no game-mode or speed or time condition. Only
-00427f70	yes	00427f70	docs/PLAN.md	25	ahead or behind (a coin) with the game's reset 0x427f70. WORLD 300 s: 16 respawns, 94 % of rival samples < 400 m.
+00427f70	yes	00427f70	docs/archive/PLAN.md	25	ahead or behind (a coin) with the game's reset 0x427f70. WORLD 300 s: 16 respawns, 94 % of rival samples < 400 m.
 00427f70	yes	00427f70	docs/openworld/re_answers_0b.md	52	- Seen once, not explained (NV): webcheck line 1604, EDDIE respawned at (1647, 336) with `n 0` (usual 1-sample path rebuild after 0x427f70), 2 s later at (1683, -438)
 00427f70	yes	00427f70	docs/openworld/re_answers_0b.md	66	(0x427f70 onto a node 220..380 m of road away) without its 400 m "far" condition. Today the game's own reset puts the car back on the same node and the
 00427f70	yes	00427f70	docs/openworld/re_answers_0b.md	381	(speed byte) and 0x59a7c0 -> 0x442590 (offset) -> 0x427f70 reset.
@@ -443,7 +443,7 @@ addr	in_funcs	func_start	source	line	snippet
 00430730	yes	00430730	docs/openworld/re_zones.md	48	-> 0x4314a0) sits in 0x43e310, which 0x430730 runs only when `[0x78a345] || [0x7361a4]` (drift mode flags; 0x4b5090 does
 00430730	yes	00430730	tools/recomp/patches.py	268	# PATCH: 0x430dbd (+ cave 0x554495, CC padding after a ret, no reference): the player update 0x430730 asks 0x42e620
 0043074d	inside	00430730	docs/openworld/re_hud_free.md	10	0x430730 stores from 0x430e00 every frame (0x43074d).
-00430dbd	no	00430730	docs/PLAN.md	39	6. DONE: no WRONG WAY and no gap HUD in free mode (PATCH 0x430dbd, free_hud) -> verified: FREE hud mask 0x144589 cleared, WORLD shot.
+00430dbd	no	00430730	docs/archive/PLAN.md	39	6. DONE: no WRONG WAY and no gap HUD in free mode (PATCH 0x430dbd, free_hud) -> verified: FREE hud mask 0x144589 cleared, WORLD shot.
 00430dbd	no	00430730	docs/openworld/re_hud_free.md	13	returns eax = lo, edx = hi. Its only caller is 0x430dbd: if it differs from player+0x4b0/+0x4b4, 0x42ed40(lo, hi)
 00430dbd	no	00430730	docs/openworld/re_hud_free.md	17	At 0x430dbd (`call 0x42e620`, 5 bytes) call a host function instead (cave as usual): it calls 0x42e620 and, in free
 00430dbd	no	00430730	tools/recomp/patches.py	268	# PATCH: 0x430dbd (+ cave 0x554495, CC padding after a ret, no reference): the player update 0x430730 asks 0x42e620
@@ -1105,7 +1105,7 @@ addr	in_funcs	func_start	source	line	snippet
 004484f0	yes	004484f0	docs/openworld/re_trackmap.md	22	unload 0x442080; lookup by id 0x4484f0 sets `[0x736174]` = the current row). `this+0xa4` of the map object = that row.
 004485f0	inside	00448590	tools/recomp/patches.py	80	# (alpha 50/128, SLUS_208.11 0x4485f0). The streak length scales with t too. Only 0x40ced6/0x40cee2 read it.
 00448b11	inside	00448b10	tools/recomp/patches.py	191	# skips its wait while the game-flow state [0x77a920] (writes 0x448b11 .. 0x449a15) is a load: 1, 2, 4, 5, 7, 8 (bit mask
-00448d00	inside	00448c40	docs/PLAN.md	143	(0x448d00, 0x5a4a50). Fix one when a run stops on it.
+00448d00	inside	00448c40	docs/archive/PLAN.md	143	(0x448d00, 0x5a4a50). Fix one when a run stops on it.
 00448d10	yes	00448d10	tools/recomp/patches.py	190	# (UnloadingFrontEnd 0x448d10, the track load, 0x4493a0), so menu->race was ~400 limited frames (7.4 s). The limiter now
 00448f70	yes	00448f70	docs/openworld/re_racer_cap.md	31	- Readers of [0x78a418] (loop over entrants, they scale with the count): 0x448f70, 0x4a03d0, 0x4a3f00, 0x4b3ac0,
 00448f70	yes	00448f70	docs/openworld/re_racer_cap.md	176	0x448f70, 0x4a3f00, 0x51e030, 0x51e410, 0x5a2db0, 0x4b4610, 0x4b6300 (grid <= 4 assumptions); what bSlotPool does on
@@ -1524,7 +1524,7 @@ addr	in_funcs	func_start	source	line	snippet
 0045f99c	inside	0045e970	docs/openworld/re_rivals_ai.md	94	[0x7361a8]==0, else 1). Reader: the driver update 0x45f99c copies it into [driver+0x1dc] (the throttle ceiling) when
 00460100	yes	00460100	docs/openworld/re_answers_0b.md	146	| 0x460100 | `[esi+0x1c]` null-tested, then `word [rec+0x10]`. (scan) | no fault | **safe** |
 00460970	yes	00460970	tools/recomp/patches.py	178	# time the key is held (S+0x14, 0.55 s to full) and 0x460de0 (called by 0x460970 on the same byte, 0x4609e3) limits the rate; with 1
-004609e3	inside	00460970	docs/PLAN.md	112	x0.85..1.15, racer rows), ?steer=pad (0x4609e3..), frame limiter 0x585b94, the TEST-ONLY autopilot/seed patches.
+004609e3	inside	00460970	docs/archive/PLAN.md	112	x0.85..1.15, racer rows), ?steer=pad (0x4609e3..), frame limiter 0x585b94, the TEST-ONLY autopilot/seed patches.
 004609e3	inside	00460970	docs/driving_patches.md	12	| 0x4609e3, 0x460a80, 0x460b4f, 0x460c02 | steering input | keyboard model (angle cap grows over 0.55 s held, rate limit 0x460de0) -> gamepad model (angle = speed cap at once) | off (?steer=pad) | kee
 004609e3	inside	00460970	tools/recomp/patches.py	175	# PATCH: 0x4609e3/0x460a80/0x460b4f/0x460c02, OWNER choice 2026-10-26 (?steer=pad, "the car responds late, I can't hold the angle"):
 004609e3	inside	00460970	tools/recomp/patches.py	178	# time the key is held (S+0x14, 0.55 s to full) and 0x460de0 (called by 0x460970 on the same byte, 0x4609e3) limits the rate; with 1
@@ -1838,7 +1838,7 @@ addr	in_funcs	func_start	source	line	snippet
 004b3c60	yes	004b3c60	docs/openworld/re_racer_cap_probe.md	38	| 0x4b3c60 | Builds one opponent ride. Forced model overrides only for ids 100/101/102 ([0x6f1dbc..dc4]); others random with a widening rating window (always ends). Skin/wheel hash = "DUMMY_SKIN%d"/"D
 004b3c60	yes	004b3c60	docs/openworld/re_racer_cap_probe.md	71	by `0x4b3c60(ride, iVar11, ..)`, skill by `0x4b4590`, name `*local_ee0++` (= local_ed0[k]), then `0x5809c0(iVar11+0x62, 2, ride, name,
 004b3c60	yes	004b3c60	docs/openworld/re_racer_cap_probe.md	116	- Memory for 16 DUMMY_SKIN/WHEEL targets (guest heap and GPU) and 0x4b3c60's model uniqueness among 6 rivals (random pick;
-004b4040	yes	004b4040	docs/PLAN.md	105	DUMMY_SKIN<n> texture whose hash 0x4b4040 sets at ride +0x444 for slots 1..4; traffic rides get 0 (0x57d160), and
+004b4040	yes	004b4040	docs/archive/PLAN.md	105	DUMMY_SKIN<n> texture whose hash 0x4b4040 sets at ride +0x444 for slots 1..4; traffic rides get 0 (0x57d160), and
 004b4040	yes	004b4040	docs/openworld/re_racer_cap.md	14	- Softer caps: opponent builder 0x4b4040 (stack array of 4 names), HUD leaderboard (4 lines), AI pools (26/27),
 004b4040	yes	004b4040	docs/openworld/re_racer_cap.md	49	### 1.3 Opponent builder 0x4b4040(count, career-context)  [F, Ghidra]
 004b4040	yes	004b4040	docs/openworld/re_racer_cap.md	57	`0x4b4040(3, 0)` with [0x78a324] = 3.
@@ -2023,11 +2023,11 @@ addr	in_funcs	func_start	source	line	snippet
 004f42f0	yes	004f42f0	docs/openworld/re_freerun_menu.md	59	- Name: 0x4ad6d0 (esi = id, stack arg = reverse) finds the row, then `0x4f42f0(fmt, id)`: a sprintf that returns the **hash** of the
 004f42f0	yes	004f42f0	docs/openworld/re_select_picture.md	5	1. key = hash("TRACK_IMAGE_%d" or "REVERSE_TRACK_IMAGE_%d", id) (0x4f42f0, h = -1, h = h*33 + c), item =
 004f42f0	yes	004f42f0	docs/openworld/re_select_picture.md	45	The tool: python over the file, hash = h*33+c from -1 (as 0x4f42f0).
-004f57a0	yes	004f57a0	docs/PLAN.md	94	0x75eef8+0x34c), the movie message (0x4f5860 type 7, name from 0x4f57a0) and who posts each story movie, the reward
+004f57a0	yes	004f57a0	docs/archive/PLAN.md	94	0x75eef8+0x34c), the movie message (0x4f5860 type 7, name from 0x4f57a0) and who posts each story movie, the reward
 004f57a0	yes	004f57a0	tools/recomp/patches.py	10	# message handler (0x4f5860, msg type 7) builds MOVIES\<name>.mad (0x4f57a0), checks it (0x63c4a0) and starts the
-004f5860	inside	004f5840	docs/PLAN.md	94	0x75eef8+0x34c), the movie message (0x4f5860 type 7, name from 0x4f57a0) and who posts each story movie, the reward
+004f5860	inside	004f5840	docs/archive/PLAN.md	94	0x75eef8+0x34c), the movie message (0x4f5860 type 7, name from 0x4f57a0) and who posts each story movie, the reward
 004f5860	inside	004f5840	tools/recomp/patches.py	10	# message handler (0x4f5860, msg type 7) builds MOVIES\<name>.mad (0x4f57a0), checks it (0x63c4a0) and starts the
-004f5891	inside	004f5867	docs/PLAN.md	63	- M4 front end on screen: SM1 -> WGSL, textures, loading screen, title (PATCH 0x4f5891 while MOVIES\ is missing).
+004f5891	inside	004f5867	docs/archive/PLAN.md	63	- M4 front end on screen: SM1 -> WGSL, textures, loading screen, title (PATCH 0x4f5891 while MOVIES\ is missing).
 004f5891	inside	004f5867	docs/re_scoreboard.md	53	.json`; PS2 ledger rows `Q-laps`; 167 rows | OWNER's playthrough depth (U, `build/web.log`); event tables not in a registry; movies: `na_boot.mad` missing, patched around (`0x4f5891`); 23 VP6 movies |
 004f5891	inside	004f5867	tools/recomp/patches.py	9	# PATCH: 0x4f5891 (+ caves 0x43a001, 0x438eb1, 0x438b41: CC padding, no reference), a missing movie file: the movie
 004f5891	inside	004f5867	tools/recomp/patches.py	15	dict(addr=0x4f5891, old="e80a6c1400", new="e86b47f4ff", when=lambda: True),
@@ -2231,8 +2231,8 @@ addr	in_funcs	func_start	source	line	snippet
 0057ce10	yes	0057ce10	docs/openworld/re_racer_cap.md	130	- NV: geometry/texture memory per extra loaded type (resource lookup 0x504630 / 0x57ce10).
 0057cfa0	yes	0057cfa0	docs/openworld/re_racer_cap.md	159	- Picker 0x57d000 weights f32 `[row+0xc60+district*4]` of rows kept by iterator 0x57cfa0 (usage +0xc54 == 2, enable
 0057cfa0	yes	0057cfa0	tools/recomp/patches.py	347	# 0x57d000: weights f32 [row + 0xc60 + district*4] of the rows the iterator 0x57cfa0 keeps (usage +0xc54 == 2, enable
-0057cfc7	inside	0057cfa0	docs/PLAN.md	22	PATCH 0x57cfc7 can come back -> verify: no invisible car in a WORLD shot.
-0057cfc7	inside	0057cfa0	docs/PLAN.md	106	Cars/TEXTURES.BIN has baked <MODEL>_SKIN1..8 only for traffic models. PATCH 0x57cfc7 is off; tuned cars in traffic
+0057cfc7	inside	0057cfa0	docs/archive/PLAN.md	22	PATCH 0x57cfc7 can come back -> verify: no invisible car in a WORLD shot.
+0057cfc7	inside	0057cfa0	docs/archive/PLAN.md	106	Cars/TEXTURES.BIN has baked <MODEL>_SKIN1..8 only for traffic models. PATCH 0x57cfc7 is off; tuned cars in traffic
 0057cfc7	inside	0057cfa0	docs/driving_patches.md	9	traffic types | 6 of 12 types weighted in Quick Race district 0 -> 12 types at 1.0. The racer rows (0x57cfc7) are off since 2026-10-28: a racer body is DUMMY_SKIN<n>, set only for slots 1..4, so in tr
 0057cfc7	inside	0057cfa0	docs/openworld/re_traffic_racers.md	3	Why PATCH 0x57cfc7 is off (tools/recomp/patches.py): a racer model has no body texture of its own; its body is drawn
 0057cfc7	inside	0057cfa0	docs/openworld/re_traffic_racers.md	23	rival_ride builds for rivals (JDM tuned look). Free the slot when the car is recycled. Then turn PATCH 0x57cfc7 on.
@@ -2249,7 +2249,7 @@ addr	in_funcs	func_start	source	line	snippet
 0057d0c1	inside	0057d000	docs/driving_patches.md	9	| 0x57d060, 0x57d0c1 (cave 0x63b270) | traffic types | 6 of 12 types weighted in Quick Race district 0 -> 12 types at 1.0. The racer rows (0x57cfc7) are off since 2026-10-28: a racer body is DUMMY_SKI
 0057d0c1	inside	0057d000	tools/recomp/patches.py	344	# PATCH: 0x57d060, 0x57d0c1, (0x57cfc7 off), 0x4b3b01, 0x583a37, 0x583a5b (+ cave 0x63b270, a dead CRT routine: no call, jump or pointer
 0057d0c1	inside	0057d000	tools/recomp/patches.py	359	PATCHES.append(dict(addr=0x57d0c1, old="d984b1600c0000", new="e8bae10b009090", when=lambda: True))
-0057d160	yes	0057d160	docs/PLAN.md	105	DUMMY_SKIN<n> texture whose hash 0x4b4040 sets at ride +0x444 for slots 1..4; traffic rides get 0 (0x57d160), and
+0057d160	yes	0057d160	docs/archive/PLAN.md	105	DUMMY_SKIN<n> texture whose hash 0x4b4040 sets at ride +0x444 for slots 1..4; traffic rides get 0 (0x57d160), and
 0057d160	yes	0057d160	docs/openworld/re_racer_cap.md	69	c. traffic path: traffic rides have no DUMMY_SKIN (0x57d160 zeroes ride +0x444 / +0x448), the car uses the
 0057d160	yes	0057d160	docs/openworld/re_traffic_racers.md	4	with the texture whose hash sits at ride +0x444 (DUMMY_SKIN<n>), and traffic rides get 0 there (0x57d160).
 0057d160	yes	0057d160	docs/openworld/re_traffic_racers.md	21	2. Traffic racer rides: after 0x57d160 (it zeroes +0x444/+0x448) give each racer-row traffic car a free slot k:
@@ -2301,14 +2301,14 @@ addr	in_funcs	func_start	source	line	snippet
 00583a5b	inside	00583910	tools/recomp/patches.py	344	# PATCH: 0x57d060, 0x57d0c1, (0x57cfc7 off), 0x4b3b01, 0x583a37, 0x583a5b (+ cave 0x63b270, a dead CRT routine: no call, jump or pointer
 00583a5b	inside	00583910	tools/recomp/patches.py	370	PATCHES.append(dict(addr=0x583a5b, old="e8a0300200", new="e8d1780b00", when=lambda: True))
 00583c80	yes	00583c80	docs/openworld_e_re.md	79	0x583c80, 0x5a6e10 through sub_44d570 / 0x442100).
-00583ea0	yes	00583ea0	docs/PLAN.md	114	(RN_STEERLOG); speed caps 0x583ea0 on 0x705f48..0x705f84 (lead); bought upgrades really change the tuning values.
+00583ea0	yes	00583ea0	docs/archive/PLAN.md	114	(RN_STEERLOG); speed caps 0x583ea0 on 0x705f48..0x705f84 (lead); bought upgrades really change the tuning values.
 00583ea0	yes	00583ea0	docs/driving_patches.md	4	No patch changes car physics or the rivals' AI: the speed caps 0x583ea0, tuning 0x705f48..0x705f84 and the racer
 00583ea0	yes	00583ea0	docs/re_scoreboard.md	57	| Tuning (parts, garage, physics) | tuning block `0x705f48..0x705f84`, speed caps `0x583ea0`, driver `0x5a6ef0` "run as shipped" (`driving_patches.md`); PS2 physics rows | weakest on PC: 2 patch menti
 00584800	yes	00584800	docs/openworld/re_props.md	59	| 0x20 | bloque de parámetros RigidBody; +0x20 = masa | `lea eax,[edi+0x20]; call 0x584800` en `0x596872`; `0x584b10`: masa -> body+0x144, 1/masa -> +0x148; inercia diagonal en clase +0x30,+0x44,+0x58
 00584b10	yes	00584b10	docs/openworld/re_props.md	59	 bloque de parámetros RigidBody; +0x20 = masa | `lea eax,[edi+0x20]; call 0x584800` en `0x596872`; `0x584b10`: masa -> body+0x144, 1/masa -> +0x148; inercia diagonal en clase +0x30,+0x44,+0x58 -> body
-00585b40	yes	00585b40	docs/PLAN.md	78	2026-10-25: the game caps itself at 60 (0x585b40); the misses are CPU-bound frames of ~4450 draws. Telemetry at
+00585b40	yes	00585b40	docs/archive/PLAN.md	78	2026-10-25: the game caps itself at 60 (0x585b40); the misses are CPU-bound frames of ~4450 draws. Telemetry at
 00585b40	yes	00585b40	tools/recomp/patches.py	188	# PATCH: 0x585b94 (+ mask 0x707fc8), OWNER 2026-10-24 (faster loads): the frame limiter 0x585b40 (main loop 0x447600) spins on
-00585b94	inside	00585b40	docs/PLAN.md	112	x0.85..1.15, racer rows), ?steer=pad (0x4609e3..), frame limiter 0x585b94, the TEST-ONLY autopilot/seed patches.
+00585b94	inside	00585b40	docs/archive/PLAN.md	112	x0.85..1.15, racer rows), ?steer=pad (0x4609e3..), frame limiter 0x585b94, the TEST-ONLY autopilot/seed patches.
 00585b94	inside	00585b40	docs/coverage.md	140	widescreen and 1920x1080 device creation (`0x408a24`), the 60 fps limiter (`0x585b94`), the car's reflection at 0.5
 00585b94	inside	00585b40	docs/driving_patches.md	13	| 0x585b94 | frame pacing | 1/60 s limiter in load states too -> skipped while loading (states 1,2,4,5,7,8, race state 1); menu->race ~400 frames / 7.4 s -> load-bound | on | keep: race and front end 
 00585b94	inside	00585b40	tools/recomp/patches.py	188	# PATCH: 0x585b94 (+ mask 0x707fc8), OWNER 2026-10-24 (faster loads): the frame limiter 0x585b40 (main loop 0x447600) spins on
@@ -2544,7 +2544,7 @@ addr	in_funcs	func_start	source	line	snippet
 00598774	inside	00598600	tools/recomp/patches.py	237	# PATCH: 0x598774 (+ cave 0x673848, the CC padding right after the one above): TrafficTeleporter 0x598600 asks 0x59b3e0 for the
 00598774	inside	00598600	tools/recomp/patches.py	241	PATCHES.append(dict(addr=0x598774, old="e8672c0000", new="e8" + _rel(0x598774, 0x673848), when=lambda: True))
 00598774	inside	00598600	tools/recomp/patches.py	241	PATCHES.append(dict(addr=0x598774, old="e8672c0000", new="e8" + _rel(0x598774, 0x673848), when=lambda: True))
-005987f6	inside	00598600	docs/PLAN.md	14	1. Traffic recycling: DONE 2026-10-28 for gaps (free_recycle, PATCH 0x5987f6: cars > 500 m also move; WORLD 1010 nearest
+005987f6	inside	00598600	docs/archive/PLAN.md	14	1. Traffic recycling: DONE 2026-10-28 for gaps (free_recycle, PATCH 0x5987f6: cars > 500 m also move; WORLD 1010 nearest
 005987f6	inside	00598600	docs/openworld/re_traffic_teleport.md	103	- Fix: PATCH 0x5987f6 -> host/free.c free_recycle: in free mode a car > 500 m ([0x6b5a3c]) in a straight line also moves.
 005987f6	inside	00598600	tools/recomp/patches.py	262	# PATCH: 0x5987f6 (+ cave 0x439a9a, the CC padding right after the one above): TrafficTeleporter 0x598600 asks 0x5988c0 whether a car
 005987f6	inside	00598600	tools/recomp/patches.py	266	PATCHES.append(dict(addr=0x5987f6, old="e8c5000000", new="e8" + _rel(0x5987f6, 0x439a9a), when=lambda: True))
@@ -2601,11 +2601,11 @@ addr	in_funcs	func_start	source	line	snippet
 00599830	yes	00599830	docs/openworld/re_traffic_teleport.md	68	spacing was 31 m. Gates left on the move (REA/Ghidra): 0x599830 first tries 0x599c80 (spawn objects, 0x42ae30 > 0,
 00599830	yes	00599830	docs/openworld/re_traffic_teleport.md	106	- 0x599830 (REA): at player speed >= 20 m/s it first tries 0x599c80 (35 % of ticks below it): the designers' spawn objects
 00599830	yes	00599830	docs/openworld_e_re.md	129	- Spawner: sub_599c80 (caller 0x599830) and sub_598c80 pick a random world point near the camera (random =
-005999c0	yes	005999c0	docs/PLAN.md	20	c. Races (route mode 0x5999c0): same check of gaps and groups -> verify: one 1001-style race log.
+005999c0	yes	005999c0	docs/archive/PLAN.md	20	c. Races (route mode 0x5999c0): same check of gaps and groups -> verify: one 1001-style race log.
 005999c0	yes	005999c0	docs/openworld/re_lift_gaps.md	9	- Roots 0x59a2c0, 0x59a7c0, 0x599c80, 0x5999c0, 0x427f70, 0x44b1b0, 0x4338c0 (reach 181..605 functions) hit only:
 005999c0	yes	005999c0	docs/openworld/re_traffic_teleport.md	16	0x5999c0 in route mode or 0x59a2c0 in Free Run. On failure: car+0x4d1 = 1 and 0x5832a0 (car parked).
 005999c0	yes	005999c0	docs/openworld/re_traffic_teleport.md	108	+0xb0 x 0.447). 0x5999c0 (route mode) or 0x59a2c0 (free) are the fallback.
-00599c80	yes	00599c80	docs/PLAN.md	18	b. Groups: every move lands ~230 m ahead, one per tick; read how 0x599c80 spreads spawn objects (+0x70/+0x90) and use
+00599c80	yes	00599c80	docs/archive/PLAN.md	18	b. Groups: every move lands ~230 m ahead, one per tick; read how 0x599c80 spreads spawn objects (+0x70/+0x90) and use
 00599c80	yes	00599c80	docs/openworld/re_lift_gaps.md	9	- Roots 0x59a2c0, 0x59a7c0, 0x599c80, 0x5999c0, 0x427f70, 0x44b1b0, 0x4338c0 (reach 181..605 functions) hit only:
 00599c80	yes	00599c80	docs/openworld/re_traffic_teleport.md	15	- 0x599830 does the move: random gate (0x4216f0 vs 1.0, or 0.35 when speed 0x424e00 < 20), 0x599c80, then
 00599c80	yes	00599c80	docs/openworld/re_traffic_teleport.md	68	spacing was 31 m. Gates left on the move (REA/Ghidra): 0x599830 first tries 0x599c80 (spawn objects, 0x42ae30 > 0,
@@ -2744,7 +2744,7 @@ addr	in_funcs	func_start	source	line	snippet
 005a2db0	yes	005a2db0	docs/openworld/re_rival_personality.md	13	| 0x4b4610, 0x4b6300, 0x5a2db0 | loop / index x 0x750; 0x5a2db0 also x 0x15c (per-AI record, base esi) | OK; NOT VERIFIED size of the 0x15c array |
 005a2eb0	yes	005a2eb0	docs/openworld/re_racer_cap_probe.md	34	| 0x5a2db0 | Not a function: split of 0x5a2d70 (caller 0x5a2eb0), the online lobby "drop a player" step over a session list at +0x586c (stride 0xc, count +0x589c). Matches entrants by id. Online is ou
 005a3570	yes	005a3570	tools/recomp/patches.py	69	# upgrade unlocked and owned (0x507e10, 0x509d70, 0x50aa90, 0x5a1550, 0x5a3570), every Quick Race track won
-005a4a50	yes	005a4a50	docs/PLAN.md	143	(0x448d00, 0x5a4a50). Fix one when a run stops on it.
+005a4a50	yes	005a4a50	docs/archive/PLAN.md	143	(0x448d00, 0x5a4a50). Fix one when a run stops on it.
 005a4c31	inside	005a4ba0	tools/recomp/patches.py	14	# does at 0x5a4c31: push msg, edx = 0x746104, call 0x4f3dc0, ret 4) and return 0. Movies that exist play as before.
 005a4cf0	yes	005a4cf0	docs/re_audio_default.md	41	- Supporting evidence for `b1` = music: the audio message handler `0x5a4cf0` computes
 005a4d11	inside	005a4cf0	docs/re_audio_default.md	42	`table[id] * b0 * b1` (`0x5a4d11`, `0x5a4d17`; table `0x6b5948` is 127 for ids 0 to 41) and for id 1 calls

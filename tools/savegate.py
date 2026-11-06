@@ -1,4 +1,4 @@
-# Block 3 gate (docs/PLAN.md): in Chrome, the game saves, the page is opened again on that save, the career goes on.
+# Block 3 gate (docs/archive/PLAN.md): in Chrome, the game saves, the page is opened again on that save, the career goes on.
 # A: career event 3 (RN_JUMP e3, RN_FINISH 1) on a fresh copy of the OWNER's save; the race's autosave (0x4c96f0,
 #    <profile>_autosave.ugd) goes to build/save-headless through tools/serve.py.
 # B: a new page on A's save (RN_KEEP_SAVE): the profile load must bring back A's career status (host/d3d9.c "flow

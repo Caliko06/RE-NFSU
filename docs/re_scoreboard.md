@@ -2,7 +2,7 @@
 
 Scope: recompile, extract, reconstruct, patch, bridge, and reverse engineer the original game until every system is
 accounted for: canon (career, events, movies, text), free tracks, traffic, rivals, tuning, sound, assets, blur, cameras,
-props. Publishing is out of this scope (branch `publish` is parked, see HANDOFF.md).
+props. Publishing is out of this scope (branch `publish` is parked).
 
 Marks: V = I re-ran it or read the code this session, D = a doc or the ledger says it (not re-checked), U = unknown.
 

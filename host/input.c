@@ -432,7 +432,7 @@ void input_next(Ctx *c) {
 }
 #undef left
 
-// RN_CAREER=1: test-only trace of the Underground career as the game offers it (docs/PLAN.md 6.1 -> tools/census/
+// RN_CAREER=1: test-only trace of the Underground career as the game offers it (docs/archive/PLAN.md 6.1 -> tools/census/
 // career_trace.py). Once a career is on (the hub MU_UG_UndergroundMenu or MU_UG_MapScreen, after event 0), each time
 // the front end rests there: read the open list the game keeps (status byte 1 at career 0x75eef8 + 0x34c + id, written
 // by 0x5a1100), take the lowest id and start it the way the map does (0x4c5df0): difficulty [0x75f240] = 1 (the

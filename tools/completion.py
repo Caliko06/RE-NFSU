@@ -1,4 +1,4 @@
-# M8.6 completion matrix (docs/PLAN.md), Pod side. One native build/speed per row, each in its own run dir (AGENTS.md:
+# M8.6 completion matrix (docs/archive/PLAN.md), Pod side. One native build/speed per row, each in its own run dir (AGENTS.md:
 # game/ as a hard-link copy, its own save/), the game's autopilot drives (RN_AUTOPILOT, RN_SEED), RN_RASTER keeps the CPU
 # backend off the frames nobody looks at, RN_FLOWLOG logs the game-flow states and keeps a shot at each change.
 # usage: completion.py launch ROW[.SEED] ...     start rows in the background (nohup), runs/<row>.<seed>/
@@ -51,7 +51,7 @@ ROWS = {'explore_career': ','.join(f'{20000 + 4000 * i}:RETURN' for i in range(1
                             + ['3000@3:RETURN'] + ['4000@!MU_UG_ChooseCareerCar:RETURN'] * 3),
         'circuit': menu(0), 'sprint': menu(1), 'drag': menu(2), 'drift': menu(3), 'lapko': menu(4), 'freerun': menu(5)}
 
-# career_trace (docs/PLAN.md 6.1): career0's new profile and prologue, won by RN_FINISH (no 6/8: the prologue has no
+# career_trace (docs/archive/PLAN.md 6.1): career0's new profile and prologue, won by RN_FINISH (no 6/8: the prologue has no
 # results), RETURNs through MU_UG_NewCareerExtroFMV to MU_UG_ChooseCareerCar; then RN_CAREER (host/input.c) plays the
 # career from the game's own open list with the unlock patches off (RN_UNLOCK=0). Parse: tools/census/career_trace.py.
 # prologue: what a new career shows with no key on a movie: boot movies, 01_DAY, the race won by RN_FINISH, 02_FAN_S, the car, 02_FAN_E,
@@ -334,7 +334,7 @@ elif CMD == 'queue':
             kids[launch(row)] = [f'{R}/runs/{row if "." in row else row + "." + SEEDS[0]}/log.txt', 0, time.time()]
         elif todo and free < 5: print(f'{time.strftime("%T")} {free} GB free: {todo[0]} waits', flush=True)
         time.sleep(10)
-elif CMD == 'table':   # runs/cjump_<n>.0x1234/log.txt (a RN_AILOG=1 batch) -> census/ghost_career.tsv: one row per career event (docs/PLAN.md "Ghost player")
+elif CMD == 'table':   # runs/cjump_<n>.0x1234/log.txt (a RN_AILOG=1 batch) -> census/ghost_career.tsv: one row per career event (docs/archive/PLAN.md "Ghost player")
     cols = 'ev kind mode stages results state rivals me_rank rival_wall me_wall polymax movies stop'.split()
     out = []
     for row in json.load(open(f'{R}/census/rows.json'))['rows']:

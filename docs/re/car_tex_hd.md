@@ -81,7 +81,7 @@ Short list of what is missing and visible in the garage on those two cars: no st
 ## Current wiring (how a substitute is chosen)
 
 1. The game binds textures through the solid's table 0x134012 (hash, ptr), resolved by 0x53f9b0 -> 0x5461c0 (G; hash lookup in the loaded
-   TPKs). For the player's body it uses the DUMMY_SKINn hash that 0x4b4040 stores at ride +0x444 (docs/PLAN.md 6.2; 0x580b00 copies
+   TPKs). For the player's body it uses the DUMMY_SKINn hash that 0x4b4040 stores at ride +0x444 (docs/archive/PLAN.md 6.2; 0x580b00 copies
    it to [0x106]). The exact instruction that swaps the table's `<CAR>_SKIN1` entry for DUMMY_SKINn: NOT VERIFIED.
 2. The pack is keyed by **content, not by name**: host/d3d9.c:1302-1310, at UnlockRect of level 0, for DXT formats and non-dynamic
    A8R8G8B8/X8R8G8B8, computes FNV-1a 64 of the locked level-0 bytes and sends GPU_TEXKEY (container id, hash lo, hi).

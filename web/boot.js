@@ -82,7 +82,7 @@ function line(s, cls) {
       // AI evidence in every F10 (OWNER 2026-10-31, "the AI is still bad"): rivals' speed, skill, actions, distance (host/free.c RN_FREELOG),
       // traffic near the player, reactions, hits (host/rivals.c RN_AILOG). Log lines only, no behaviour change.
       m.ENV.RN_FREELOG = '1'; m.ENV.RN_AILOG = '1';
-      // Lanes 1-3 evidence in every F10 (OWNER 2026-11-04, docs/SCOPE_2026-11-04.md): log lines only. RST/RSTA/RSTW = each reset 0x427c50 + 120 frames (pos, ground height); HORNL = each traffic honk; FEEL = speed, camera, FOV.
+      // Lanes 1-3 evidence in every F10 (OWNER 2026-11-04, docs/archive/SCOPE_2026-11-04.md): log lines only. RST/RSTA/RSTW = each reset 0x427c50 + 120 frames (pos, ground height); HORNL = each traffic honk; FEEL = speed, camera, FOV.
       m.ENV.RN_RESETLOG = '1'; m.ENV.RN_HORNLOG = '1'; m.ENV.RN_FEELLOG = '1';
       // ?hornfix=1: no traffic honk from a parked, undrawn or just-recycled car (host/horn.c)
       if (RN_Q.get('hornfix') === '1') m.ENV.RN_HORNFIX = '1';

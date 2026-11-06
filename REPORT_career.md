@@ -13,7 +13,7 @@
 - Spread between rivals: 117-175 m in lap 1, 34-69 m in lap 2. Rival speed fell from 55-68 to 37-52 (car+0x3d0 units)
   while the player was far behind. This looks like the rubber band slowing the leaders (0x44bd10) (I).
   +0x404 read 1.00 the whole race. That fits "max(scale, 1.0)" for leaders that are never boosted (I: object offset not proven).
-- Which OWNER notes apply to a career race: **none.** PLAN.md:37 ("only 3 rivals, they vanish fast") and
+- Which OWNER notes apply to a career race: **none.** docs/archive/PLAN.md:37 ("only 3 rivals, they vanish fast") and
   re_rival_turnback.md:3-4 (a rival leaves in 8-20 s) are WORLD/Free Run. There, racers follow the tour direction
   (0x45d640) and free_respawn moves them. In a career race the count is the event's own data, and rivals stay on the track.
 

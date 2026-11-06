@@ -20,9 +20,9 @@ Minimal proposal, not implemented: give explicit evidence status precedence and 
 
 ### 2. FACT: active navigation includes stale instructions, not just old statistics
 
-Evidence: `AGENTS.md:9-10` -> `docs/PLAN.md:5-8` -> scoreboard. `docs/re_scoreboard.md:22-24` still says the registry is missing, while `docs/re/canon_db.md:3-6` describes its implementation. Scoreboard section 5 and `docs/re/RESULTS.md:41-43` retain the 1,464-name snapshot. The auditor found the merged `census/names.tsv` still at 1,649 addresses, while component ledgers and `HANDOFF.md:4` have later naming work.
+Evidence: `AGENTS.md:9-10` -> `docs/archive/PLAN.md:5-8` -> scoreboard. `docs/re_scoreboard.md:22-24` still says the registry is missing, while `docs/re/canon_db.md:3-6` describes its implementation. Scoreboard section 5 and `docs/re/RESULTS.md:41-43` retain the 1,464-name snapshot. The auditor found the merged `census/names.tsv` still at 1,649 addresses, while component ledgers and `HANDOFF.md:4` have later naming work.
 
-Stronger operational example independently checked by Hermes: `HANDOFF.md:4` says round 9 completed, but its title says three rounds, `:5` lists only early commits, and `:16-18` says next is round 4. `docs/re/NIGHT_BRIEF.md:36-38` retains the quota stop overridden in `docs/re/night_log.md:88,92`. `docs/OPENWORLD.md:103` retains a barricade phase closed by its own OWNER decision at `:150-151`.
+Stronger operational example independently checked by Hermes: `HANDOFF.md:4` says round 9 completed, but its title says three rounds, `:5` lists only early commits, and `:16-18` says next is round 4. `docs/archive/NIGHT_BRIEF.md:36-38` retains the quota stop overridden in `docs/re/night_log.md:88,92`. `docs/OPENWORLD.md:103` retains a barricade phase closed by its own OWNER decision at `:150-151`.
 
 Impact, INFERENCE: a fresh session can redo completed work, stop under obsolete guidance or revive a closed phase. Historical snapshots are useful; presenting them through active routing without a supersession marker is the problem.
 
@@ -44,11 +44,11 @@ Evidence: `docs/re/RESULTS.md:7-10` calls byte-identical repacking exact format 
 
 Impact, INFERENCE: technical PASS can be mistaken for semantic completeness or product approval. More sharpness can score differently without being a better remaster.
 
-Minimal proposal: label each gate by what it proves and retain OWNER same-scene A/B/play as the visual/feel decision. Preserve tests, binary evidence and timing measurements. Counterevidence worth retaining: `docs/PLAN.md:123-124` already requires inspecting actual output, and `docs/night_re.md:57-60` records an OWNER rejection despite steady timing. Do not add a new comprehensive test prerequisite merely because this audit exists.
+Minimal proposal: label each gate by what it proves and retain OWNER same-scene A/B/play as the visual/feel decision. Preserve tests, binary evidence and timing measurements. Counterevidence worth retaining: `docs/archive/PLAN.md:123-124` already requires inspecting actual output, and `docs/night_re.md:57-60` records an OWNER rejection despite steady timing. Do not add a new comprehensive test prerequisite merely because this audit exists.
 
 ### 5. FACT: authorized 100%-RE scope and Remaster delivery are different accounting questions
 
-Evidence: `docs/PLAN.md:5-8` and `docs/re/NIGHT_BRIEF.md:7-16` explicitly authorize RE toward 100%, with 13,739 lifted starts as denominator. `docs/re/canon_db.md:61-62` excludes 888 fragments from naming work through parent accounting. `tools/census/scoreboard.py:18-20,98-108` counts lifted address membership without consulting that parent ledger. `tools/census/names_merge.py:7,30` labels non-Hopper starts as data, which is not proof that every such address is data.
+Evidence: `docs/archive/PLAN.md:5-8` and `docs/archive/NIGHT_BRIEF.md:7-16` explicitly authorize RE toward 100%, with 13,739 lifted starts as denominator. `docs/re/canon_db.md:61-62` excludes 888 fragments from naming work through parent accounting. `tools/census/scoreboard.py:18-20,98-108` counts lifted address membership without consulting that parent ledger. `tools/census/names_merge.py:7,30` labels non-Hopper starts as data, which is not proof that every such address is data.
 
 Impact: named, parent-covered, translated, executed and independently checked populations are not interchangeable completion percentages. Source-file placement and inferred system names are also not verified ownership of every mechanism.
 
@@ -70,8 +70,8 @@ Ranges inclusive; full summaries mean the file was parsed for the stated aggrega
 |---|---|
 | `AGENTS.md` | 1-61 |
 | `HANDOFF.md` | 1-20 |
-| `docs/PLAN.md` | 1-147 |
-| `docs/re/NIGHT_BRIEF.md` | 1-47 |
+| `docs/archive/PLAN.md` | 1-147 |
+| `docs/archive/NIGHT_BRIEF.md` | 1-47 |
 | `docs/re_scoreboard.md` | 1-110 |
 | `docs/re/RESULTS.md` | 1-49 |
 | `docs/re/canon_db.md` | 1-69 |

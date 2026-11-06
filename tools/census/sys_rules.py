@@ -79,7 +79,7 @@ IMPORT_RULES = [(s, re.compile(rx)) for s, rx in IMPORT_RULES]
 DOC_SYSTEM = {
     'docs/re_audio_default.md': 'audio', 'docs/re_minimap.md': 'hud', 'docs/flare_re.md': 'render', 'docs/night_re.md': 'render',
     'docs/traffic_placement.md': 'traffic', 'docs/openworld_e_re.md': None, 'docs/driving_patches.md': None,
-    'docs/OPENWORLD.md': None, 'docs/PLAN.md': None, 'docs/coverage.md': None,
+    'docs/OPENWORLD.md': None, 'docs/archive/PLAN.md': None, 'docs/coverage.md': None,
     'docs/openworld/re_ai_interact.md': 'rivals', 'docs/openworld/re_rivals_ai.md': 'rivals', 'docs/openworld/re_racer_cap.md': 'rivals',
     'docs/openworld/re_racer_cap_probe.md': 'rivals', 'docs/openworld/re_rival_personality.md': 'rivals', 'docs/openworld/re_rival_turnback.md': 'rivals',
     'docs/openworld/re_citygraph.md': 'track', 'docs/openworld/re_coll.md': 'track', 'docs/openworld/re_mesh.md': 'track', 'docs/openworld/re_stream.md': 'track',

@@ -36,7 +36,7 @@ until a row in `census/names_tuning.tsv` says V.
 | Note | Says | This RE shows | Evidence |
 |---|---|---|---|
 | `docs/driving_patches.md:4` | "the speed caps 0x583ea0, tuning 0x705f48..0x705f84" | `0x583ea0` is the generic lookup in a sampled float table (with clamping and linear interpolation; no cap of its own). `0x705f48..0x705f98` are four of those table headers for **steering vs speed**, read by `0x460a80`/`0x460de0`. Car tuning lives in GLOBALB chunk 0x34600 | V (G, D) |
-| `docs/PLAN.md:114` | "speed caps 0x583ea0 on 0x705f48..0x705f84 (lead); bought upgrades really change the tuning values" | Same correction. Upgrades do change the physics, through `0x57f2b0` → `0x575960` with the table rows in §1. The 0x705f48 tables are the steering limit (relevant to the "rigid, late" handling item, not to upgrades) | V (G) |
+| `docs/archive/PLAN.md:114` | "speed caps 0x583ea0 on 0x705f48..0x705f84 (lead); bought upgrades really change the tuning values" | Same correction. Upgrades do change the physics, through `0x57f2b0` → `0x575960` with the table rows in §1. The 0x705f48 tables are the steering limit (relevant to the "rigid, late" handling item, not to upgrades) | V (G) |
 | `docs/re_scoreboard.md:57` | tuning block `0x705f48..`, speed caps `0x583ea0` | Point it to this doc and to chunk 0x34600 / `0x57f2b0` | V |
 | `ref/docs/re/out/x86-ps2-map.tsv` row 0x473fc0 | `PhysicsUpgradeSpecification::GetUpgradeLevel` (tier I) | `0x473fc0` picks a row of the drift/drag blend table `0x6f0fc0` by a float vs 0.2/0.8; not GetUpgradeLevel | V (G, H) |
 | `docs/openworld/re_rivals_ai.md:107` | position curve "through sub_4175c0 / sub_583ea0" | Consistent: 0x583ea0 is the table lookup that reads that curve. No change needed | V |
