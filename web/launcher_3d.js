@@ -4,6 +4,7 @@
 // Walls, floor and signs use textures from the game's own files (web/launcher/v3/tex, extracted from web/remaster/ and build/launcher_ref/picks).
 // The menu labels are drawn with the game's font atlas (launcher/v2/ui/game_font.*). If WebGL2 or an asset fails, start() rejects and the page shows the static plate.
 import * as THREE from 'three';
+import { createRain } from './launcher_rain.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -410,28 +411,8 @@ function buildWorld() {
   passing.position.set(-18, .9, 8.5); passing.target.position.set(0, 1.4, -7.8);
   addLight('passing', passing, 0, 0, { manual: true });
 
-  // rain streaks
-  const N = 3200, q = new THREE.PlaneGeometry(1, 1), geo = new THREE.InstancedBufferGeometry(); geo.index = q.index; geo.setAttribute('position', q.getAttribute('position')); geo.setAttribute('uv', q.getAttribute('uv'));
-  const seed = new Float32Array(N * 4); for (let i = 0; i < N; i++) { seed[i * 4] = Math.random(); seed[i * 4 + 1] = Math.random(); seed[i * 4 + 2] = Math.random(); seed[i * 4 + 3] = .8 + Math.random() * .5; }
-  geo.setAttribute('aSeed', new THREE.InstancedBufferAttribute(seed, 4)); geo.instanceCount = N;
-  rain = new THREE.Mesh(geo, new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
-    uniforms: { uTime: { value: 0 }, uSpeed: { value: 1 }, uLamp: { value: lampPos.clone() }, uCol: { value: new Color(.55, .68, .95) } },
-    vertexShader: `attribute vec4 aSeed; uniform float uTime, uSpeed; uniform vec3 uLamp; varying float vA;
-      void main(){
-        const vec3 SZ = vec3(34., 15., 30.); const vec3 C0 = vec3(2., 0., 0.);
-        float y = fract(aSeed.y - uTime * aSeed.w * 11. * uSpeed / SZ.y);
-        vec3 c = C0 + vec3((aSeed.x - .5) * SZ.x, y * SZ.y, (aSeed.z - .5) * SZ.z); c.x += (y - .5) * 1.1;
-        vec3 dir = normalize(vec3(.07, -1., .02)); vec3 toCam = normalize(cameraPosition - c); vec3 right = normalize(cross(dir, toCam));
-        float len = .75 + aSeed.w * .4; vec3 p = c + right * position.x * .012 + dir * position.y * len;
-        float d = length(cameraPosition - c);
-        float near = smoothstep(3., 7., d), far = 1. - smoothstep(14., 34., d);
-        float lampLit = exp(-length((c - uLamp) * vec3(.28, .14, .28)));
-        vA = (.05 + .24 * lampLit) * near * far * smoothstep(0., .5, c.y) * (.6 + .4 * aSeed.z);
-        gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.); }`,
-    fragmentShader: 'varying float vA; uniform vec3 uCol; void main(){ gl_FragColor = vec4(uCol * vA * 1.6, 1.); }',
-  }));
-  rain.frustumCulled = false; rain.renderOrder = 7; scene.add(rain);
+  // Rain owns its particles and injects lens refraction into the existing grading pass.
+  rain = createRain({ scene, lampPos, grading: FINAL });
 }
 
 function coneMaterial(col, k) {
@@ -691,7 +672,7 @@ function frame(now) {
   updateRig(dt); updateLights(dt);
   if ((frameNo++ & 7) === 0) renderer.shadowMap.needsUpdate = true;          // the lamp and the headlights light a still scene: 1 shadow pass in 8 frames is enough
   const t = tNow, u = reflector.userData.uTime; u.value = t;
-  rain.material.uniforms.uTime.value = t; rain.material.uniforms.uSpeed.value = motion ? 1 : .55;
+  rain.userData.update(t, motion, car, L, finalPass.uniforms);
   sky.material.uniforms.uT.value = t;
   FINAL.uniforms.uTime.value = t; finalPass.uniforms.uFocus.value = rig.focus; finalPass.uniforms.uFade.value = going && going.fade ? going.fade : 0;
   finalPass.uniforms.uFlash.value = going ? Math.max(0, 1 - Math.abs(going.u - .78) * 7) * .9 : 0;
