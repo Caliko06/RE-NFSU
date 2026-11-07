@@ -291,11 +291,26 @@ void input_jump(Ctx *c) {
 // RN_FINISH=<place>: test-only, finish each race at that place a second after [[0x73619c]] reaches 4, the way
 // the debug race menu's Force Race Finish does (Hopper dbgfin.txt; 0x4c09b0 accept at 0x4c0a52): eax = 0, edx = place,
 // stdcall 0x572a90([0x7345d0], player) -> 0x494b90 message 0 sets [[0x73619c]+0x534] = place, +0x538 = player.
+// F3 in the page (web/input.js, ring word 6): the same finish at place 1 for one race, the OWNER's skip. Armed from the menus, it also
+// passes the event briefing's "buy all upgrades" check (0x4c5fa0 -> 0x5a1fa0): the debug byte 0x735ec1 it reads, set only while the
+// briefing is open. Not on in the shops: 0x5a2620 would charge a price the byte let through, and cash goes negative. The byte does not
+// pass the min ride rating check 0x4c5f20 (0x5a05b0 against event +0x18), which comes first.
+static int cheat_take(void);
+static void cheat_briefing(Ctx *c, int armed) {
+    static int forced;
+    static uint32_t prev;
+    int on = armed && rn_fe && strstr(rn_fe, "MU_UG_EventBriefing.fng");
+    if (on && !forced) prev = ld(c, 0x735ec1, 1), st(c, 0x735ec1, 1, 1), forced = 1;
+    else if (!on && forced) st(c, 0x735ec1, prev, 1), forced = 0;
+}
 void input_finish(Ctx *c) {
     static const char *s;
     static uint32_t seen, done;
+    static int armed;
     if (!s) { s = getenv("RN_FINISH"); if (!s) s = ""; }
-    if (!*s) return;
+    if (cheat_take()) armed = 1, rn_log("CHEAT: F3, this race counts as won (flow %u/%d, frame %u)", rn_flow >> 8, (int)(rn_flow & 0xff), rn_telem.presents);
+    cheat_briefing(c, armed);
+    if (!*s && !armed) return;
     if (rn_flow >> 8 != 6) { seen = done = 0; return; }
     // The menu offers it only while [[0x73619c]] == 4 (0x4c09c0); runs/cjump_3 fired at 3 and the race went on.
     uint32_t rs = ld(c, 0x73619c, 4), v = rs ? ld(c, rs, 4) : ~0u;
@@ -311,11 +326,12 @@ void input_finish(Ctx *c) {
     // unpaused it gave 1 and no racer matched. The race update 0x435570 (esi = [0x73619c]) finds the racer whose
     // [[r]+0x18]+0x10 == +0x538 and calls 0x4350d0(place, 0, 1).
     uint32_t player = 0, a[2] = {ld(c, 0x7345d0, 4), player};
-    c->r[EAX] = 0, c->r[EDX] = (uint32_t)atoi(s);
+    uint32_t place = *s ? (uint32_t)atoi(s) : 1;
+    c->r[EAX] = 0, c->r[EDX] = place;
     call_guest(c, 0x572a90, 2, a);
     memcpy(c->r, r, sizeof r);
-    rn_log("RN_FINISH: place %s player %u at frame %u", s, player, rn_telem.presents);
-    done = 1;
+    rn_log("RN_FINISH: place %u player %u at frame %u", place, player, rn_telem.presents);
+    armed = 0, done = *s != 0, seen = 0;   // a cheat fires once, and this function stops running until the next F3
 }
 // RN_OPEN="MU_Main_PC>MU_MainMenuCarCustomize:20": test-only, once <from> is on, switch it to <to> the way the menus do
 // (0x4b3494: [0x777b4c] = 0x20, edi = "MU_MainMenuCarCustomize.fng", cdecl 0x4f6360("<from>.fng")). 0x4f6360 finds the
@@ -578,10 +594,11 @@ void steer_frame(Ctx *c) {
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 // u32 words: [0] head (page), [1] tail (game), [2..4] mouse dx, dy, wheel (page adds, game takes), [5] exclusive mouse,
-// [8..8+RING) events: bit 31 = mouse button (else key), bit 8 = down, low byte = DIK or button.
+// [6] F3 cheat (page sets, game takes), [8..8+RING) events: bit 31 = mouse button (else key), bit 8 = down, low byte = DIK or button.
 #define RING 1024
 static uint32_t ring[8 + RING];
 EMSCRIPTEN_KEEPALIVE uint32_t rn_input_ring(void) { return (uint32_t)(uintptr_t)ring; }
+static int cheat_take(void) { return (int)__atomic_exchange_n(&ring[6], 0, __ATOMIC_ACQ_REL); }
 void input_mouse_exclusive(int on) { __atomic_store_n(&ring[5], (uint32_t)on, __ATOMIC_RELEASE); }
 void input_poll(void) {
     uint32_t head = __atomic_load_n(&ring[0], __ATOMIC_ACQUIRE), tail = ring[1];
@@ -598,6 +615,7 @@ void input_poll(void) {
     script_poll();
 }
 #else
+static int cheat_take(void) { return 0; }
 void input_mouse_exclusive(int on) { (void)on; }
 void input_poll(void) { script_poll(); }
 #endif

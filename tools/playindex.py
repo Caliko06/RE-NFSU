@@ -24,7 +24,7 @@ def session(path):
     keys = [(float(m[1]), m[2], m[3]) for m in re.finditer(r"^([\d.]+) key (down|up) (\S+)", text, re.M)]
     return {
         "date": os.path.basename(path)[13:32],
-        "driver": "scripted" if SCRIPTED.search(url) or "RN_JUMP:" in text else "human",
+        "driver": "scripted" if SCRIPTED.search(url) or "RN_JUMP:" in text or "CHEAT:" in text else "human",
         "mode": mode[1] if mode else "unknown",
         "world": "OPENWORLD:" in text or "rockport" in url,
         "normal_career": "career=normal" in url,

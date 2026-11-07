@@ -18,7 +18,7 @@ const DIK = {
   PageDown: 0xd1, Insert: 0xd2, Delete: 0xd3, MetaLeft: 0xdb, MetaRight: 0xdc, ContextMenu: 0xdd,
 };
 
-// Ring (u32 words): [0] head (here), [1] tail (game), [2..4] mouse dx, dy, wheel, [5] exclusive mouse (game), [8..8+1024) events:
+// Ring (u32 words): [0] head (here), [1] tail (game), [2..4] mouse dx, dy, wheel, [5] exclusive mouse (game), [6] F3 cheat, [8..8+1024) events:
 // bit 31 = mouse button, bit 8 = down, low byte = DIK or button. The game thread reads it at its input calls.
 function startInput(M, canvas, steerLog) {
   const base = M._rn_input_ring() >> 2, RING = 1024;
@@ -29,6 +29,15 @@ function startInput(M, canvas, steerLog) {
     h[base + 8 + (head % RING)] = e;
     Atomics.store(h, base, head + 1);
   }
+  // F3: this race counts as won (host/input.c input_finish). Capture phase, so the game never gets the key.
+  addEventListener('keydown', e => {
+    if (e.code !== 'F3') return;
+    e.preventDefault(); e.stopPropagation();
+    if (e.repeat) return;
+    Atomics.store(H(), base + 6, 1);
+    window.rnToast?.('F3: esta carrera cuenta como ganada', 3000);
+  }, true);
+  addEventListener('keyup', e => { if (e.code === 'F3') { e.preventDefault(); e.stopPropagation(); } }, true);
   const held = new Set();
   // One key change by DIK code; web/pad.js uses it too, so a pad and the keyboard share the ring and the held set.
   function setKey(d, down, ts = performance.now()) {

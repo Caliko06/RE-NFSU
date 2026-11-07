@@ -45,6 +45,7 @@ const RN_Q = (() => {
     background: 'rgba(0,0,0,0.75)', color: '#ffd479', font: '14px system-ui, sans-serif', borderRadius: '6px',
     pointerEvents: 'none', display: 'none', zIndex: 10 });
   const show = (s, ms) => { toast.textContent = s; toast.style.display = 'block'; clearTimeout(show.t); show.t = setTimeout(() => toast.style.display = 'none', ms); };
+  window.rnToast = show;
   addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(toast);
     show(RN_MODE === 'original' ? 'Modo ORIGINAL (2003)   ·   F4 = Remaster' : 'Modo Remaster   ·   F4 = Original', 2500);
