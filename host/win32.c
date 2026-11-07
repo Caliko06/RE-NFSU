@@ -1208,6 +1208,9 @@ void win32_init(Ctx *c, uint32_t image_size) {
         st(c, 0x707fd0, 0, 4); st(c, 0x707fd4, 0x3ff00000, 4);
         st(c, 0x6fbdf4, 0x2ee0, 2); st(c, 0x6fbdf6, 0x2ee0, 2); st(c, 0x6fbdfc, 0x2ee0, 2);
     }
+    // REMASTER wall feel: 0x46bae0 uses [0x6b7254] only when 0x46c620 identifies a grazing wall contact; zero removes e=0.05 rebound.
+    const char *wallsoften = getenv("RN_WALLSOFTEN");
+    if (wallsoften && wallsoften[0] != '0') st(c, 0x6b7254, 0, 4);
     // PATCH 0x410c1b (cave 0x63b3ad): the cap of ROADREFLECTION [0x70105c] is at most this word (2 = as shipped; 1 with
     // RN_ROADREFL=off / ?roadrefl=off: the game's own level 1, the mirrored world is not drawn). sq / cube: host/sm1.c.
     st(c, SCREEN_ADDR + 0x70, sm1_roadrefl() == 3 ? 1 : 2, 4);
