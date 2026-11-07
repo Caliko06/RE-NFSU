@@ -1,0 +1,154 @@
+[
+ {
+  "file": "bg_sky.webp",
+  "w": 1920,
+  "h": 1080,
+  "alpha": false,
+  "layer": "sky",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "mid_city.webp",
+  "w": 1920,
+  "h": 1080,
+  "alpha": true,
+  "layer": "city",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "street.webp",
+  "w": 1920,
+  "h": 750,
+  "alpha": true,
+  "layer": "street",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim. Upper half transparent; bottom edge opaque."
+ },
+ {
+  "file": "car_hero.webp",
+  "w": 1400,
+  "h": 700,
+  "alpha": true,
+  "layer": "car",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "car_glow.webp",
+  "w": 1400,
+  "h": 700,
+  "alpha": true,
+  "layer": "glow",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "neon_1.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "neon",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "neon_2.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "neon",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "neon_3.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "neon",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "neon_4.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "neon",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "title.webp",
+  "w": 1400,
+  "h": 219,
+  "alpha": true,
+  "layer": "title",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "sticker_1.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "sticker",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "sticker_2.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "sticker",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "sticker_3.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "sticker",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "sticker_4.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "sticker",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "sticker_5.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "sticker",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "sticker_6.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": true,
+  "layer": "sticker",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "grunge.webp",
+  "w": 1024,
+  "h": 1024,
+  "alpha": false,
+  "layer": "texture",
+  "notes": "Opaque seamless tile; matched opposite edges. Grayscale scratches, dust and grain on mid-gray."
+ },
+ {
+  "file": "panel.webp",
+  "w": 1200,
+  "h": 750,
+  "alpha": true,
+  "layer": "ui",
+  "notes": "Original Y2K tuner art; orange upper-left key, cyan/magenta right rim."
+ },
+ {
+  "file": "carbon.webp",
+  "w": 512,
+  "h": 512,
+  "alpha": false,
+  "layer": "texture",
+  "notes": "Opaque seamless tile; matched opposite edges. Dark carbon-fiber weave."
+ }
+]

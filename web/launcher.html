@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Need for Speed Underground</title>
+<link rel="stylesheet" href="launcher.css">
+</head>
+<body data-screen="main">
+<div class="bg" aria-hidden="true">
+  <!-- Layered scene (images: web/launcher/img, made for this page). data-d = parallax depth; web/launcher_scene.js moves them. -->
+  <div class="layer sky" data-d=".12"><img src="launcher/img/bg_sky.webp" alt=""></div>
+  <div class="layer city" data-d=".3">
+    <img class="cityimg" src="launcher/img/mid_city.webp" alt="">
+    <img class="neon n1" src="launcher/img/neon_1.webp" alt="">
+    <img class="neon n2" src="launcher/img/neon_2.webp" alt="">
+    <img class="neon n3" src="launcher/img/neon_3.webp" alt="">
+    <img class="neon n4" src="launcher/img/neon_4.webp" alt="">
+  </div>
+  <div class="haze"></div>
+  <div class="layer street" data-d=".55"><img src="launcher/img/street.webp" alt=""></div>
+  <i class="trail t1"></i><i class="trail t2"></i><i class="trail t3"></i>
+  <div class="layer ride" data-d=".85">
+    <div class="carbox">
+      <img class="glow" src="launcher/img/car_glow.webp" alt="">
+      <img class="car" src="launcher/img/car_hero.webp" alt="">
+      <i class="flare f1"></i><i class="flare f2"></i>
+    </div>
+  </div>
+  <canvas id="rain"></canvas>
+  <div class="shade"></div>
+</div>
+
+<div class="stage">
+  <header class="brand">
+    <p class="eyebrow">Speed.exe en tu navegador</p>
+    <h1><span class="nfs">Need for Speed</span><img class="ug" src="launcher/img/title.webp" alt="Underground"></h1>
+    <div class="stickers" aria-hidden="true"><img class="stk s1" src="launcher/img/sticker_1.webp" alt=""><img class="stk s2" src="launcher/img/sticker_2.webp" alt=""><img class="stk s3" src="launcher/img/sticker_3.webp" alt=""><img class="stk s4" src="launcher/img/sticker_4.webp" alt=""></div>
+    <img class="refl" src="launcher/img/title.webp" alt="" aria-hidden="true">
+  </header>
+
+  <section class="screen" id="s-main" aria-label="Menú principal">
+    <nav class="menu" id="menu">
+      <button class="item nav" id="play" type="button"><span>Jugar</span></button>
+      <button class="item nav" data-go="presets" type="button"><span>Presets</span></button>
+      <button class="item nav" data-go="opts" type="button"><span>Opciones</span></button>
+      <button class="item nav" data-go="ctrl" type="button"><span>Controles</span></button>
+    </nav>
+    <dl class="status" aria-live="polite">
+      <div><dt>Perfil</dt><dd id="stPreset"></dd></div>
+      <div><dt>Modo</dt><dd id="stMode"></dd></div>
+    </dl>
+  </section>
+
+  <section class="screen" id="s-presets" aria-label="Presets" hidden>
+    <h2>Presets</h2>
+    <div class="menu small" id="presetList" role="radiogroup" aria-label="Perfil"></div>
+    <p class="info" id="presetDesc"></p>
+  </section>
+
+  <section class="screen" id="s-opts" aria-label="Opciones" hidden>
+    <h2>Opciones</h2>
+    <div class="tabs nav" id="tabs" tabindex="0" role="tablist" aria-label="Grupos de opciones"></div>
+    <div class="rows" id="optList"></div>
+    <p class="info" id="help"></p>
+  </section>
+
+  <section class="screen" id="s-ctrl" aria-label="Controles" hidden>
+    <h2>Controles</h2>
+    <div class="ctrl">
+      <div>
+        <h3>Teclado</h3>
+        <p><b>Flechas</b> dirección, acelerar y frenar</p>
+        <p><b>Espacio</b> nitro</p>
+        <p><b>Shift</b> freno de mano</p>
+        <p><b>C</b> cámara</p>
+        <p><b>R</b> reiniciar el coche</p>
+        <p><b>Esc</b> pausa y atrás</p>
+      </div>
+      <div>
+        <h3>Mando</h3>
+        <p><b>Palanca izq.</b> dirección</p>
+        <p><b>RT / LT</b> acelerar / frenar</p>
+        <p><b>A</b> nitro</p>
+        <p><b>B</b> freno de mano</p>
+        <p><b>Y</b> cámara</p>
+        <p><b>RB</b> reiniciar el coche</p>
+        <p><b>Start</b> pausa</p>
+      </div>
+      <div>
+        <h3>En el juego</h3>
+        <p><b>F4</b> Original / Remaster</p>
+        <p><b>K</b> o <b>Select</b> reasignar teclas y botones</p>
+        <p><b>F2</b> registro del juego</p>
+        <p><b>Pantalla táctil</b> controles en pantalla</p>
+      </div>
+    </div>
+    <div class="menu small"><button class="item nav" data-back="1" type="button"><span>Volver</span></button></div>
+  </section>
+
+  <footer class="bar">
+    <span class="keys" id="keys"></span>
+    <span class="foot">F4 en el juego cambia Original/Remaster</span>
+  </footer>
+</div>
+
+<div class="over" aria-hidden="true">
+  <div class="grunge"></div><div class="scan"></div><div class="vig"></div>
+  <img class="stk s5" src="launcher/img/sticker_5.webp" alt=""><img class="stk s6" src="launcher/img/sticker_6.webp" alt="">
+</div>
+
+<script src="launcher_opts.js"></script>
+<script src="launcher.js"></script>
+<script src="launcher_scene.js"></script>
+</body>
+</html>

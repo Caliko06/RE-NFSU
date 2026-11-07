@@ -160,7 +160,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             import becmon
             self.reply(200, "text/html; charset=utf-8", becmon.page(), [("Cache-Control", "no-store")])
             return
-        if route == "/setup":                # LAN entry page (web/setup.html): QR, CA, iOS profile
+        if self.path.split("#", 1)[0] in ("/", "/?"):    # bare address: the launcher (web/launcher.html); "Jugar" goes to /?play=1&...
+            self.path = "/launcher.html"
+        elif route == "/setup":              # LAN entry page (web/setup.html): QR, CA, iOS profile
             self.path = "/setup.html"
         elif route == "/setup.json":
             self.reply(200, "application/json", setup_info(), [("Cache-Control", "no-store")])
