@@ -68,7 +68,14 @@ vec3 ripples(vec2 p, float t){
   }
   return acc;
 }
-float wetAt(vec2 p){ float w = smoothstep(.34, .64, fbm(p * .2)); float near = 1. - smoothstep(2., 9.5, length(p - uHero)); return max(w, near * .95); }
+// Broad low spots collect water; fine aggregate breaks only the damp areas.
+float wetAt(vec2 p){
+  vec2 q = p * vec2(.24, .18);
+  float basin = fbm(q + vec2(vnoise(q * 1.7), vnoise(q * 1.7 + 19.)) * .65);
+  float gutter = exp(-abs(p.x + 4.85) * 3.) * .12;
+  return smoothstep(.43, .55, basin + gutter);
+}
+vec2 asphaltSlope(vec2 p){ return (vec2(vnoise(p * 38.), vnoise(p * 38. + 17.)) - .5) * .32; }
 `;
 
 // ---------------------------------------------------------------- loading
@@ -174,42 +181,58 @@ function buildWorld() {
   }
 
   // --- ground: road (lit, wet, ripples) + sidewalks + the reflection overlay
-  const uHero = { value: new THREE.Vector2(layoutPos.car.x, layoutPos.car.z) }, uTime = { value: 0 };
+  const uTime = { value: 0 };
   const roadMap = tex('asphalt2', 9, 9); roadMap.anisotropy = 16;
   const floorMat = new THREE.MeshStandardMaterial({ map: roadMap, color: 0x8c8c94, roughness: .6, metalness: 0 });
   floorMat.onBeforeCompile = sh => {
-    sh.uniforms.uTime = uTime; sh.uniforms.uHero = uHero;
+    sh.uniforms.uTime = uTime;
     sh.vertexShader = 'varying vec3 vWP;\n' + sh.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n vWP = (modelMatrix * vec4(transformed, 1.)).xyz;');
-    sh.fragmentShader = 'varying vec3 vWP; uniform float uTime; uniform vec2 uHero;\n' + GLSL_WET + sh.fragmentShader
-      .replace('#include <map_fragment>', '#include <map_fragment>\n float wetF = wetAt(vWP.xz); diffuseColor.rgb *= mix(1., .5, wetF);')
-      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n roughnessFactor = mix(.8, .07, wetF); vec3 rip = ripples(vWP.xz, uTime) * (.35 + .65 * wetF);')
-      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n normal = normalize(normal + (viewMatrix * vec4(rip.x, 0., rip.y, 0.)).xyz * .5);');
+    sh.fragmentShader = 'varying vec3 vWP; uniform float uTime;\n' + GLSL_WET + sh.fragmentShader
+      .replace('#include <map_fragment>', '#include <map_fragment>\n float wetF = wetAt(vWP.xz); diffuseColor.rgb *= mix(.78, .42, wetF);')
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n roughnessFactor = mix(.86, .045, wetF); vec3 rip = ripples(vWP.xz, uTime); vec2 slope = mix(asphaltSlope(vWP.xz), rip.xy * .045, wetF);')
+      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n normal = normalize(normal + (viewMatrix * vec4(slope.x, 0., slope.y, 0.)).xyz);');
   };
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(90, 70), floorMat); floor.rotation.x = -Math.PI / 2; floor.position.set(10, 0, 0); floor.receiveShadow = true; scene.add(floor);
   roadMap.repeat.set(24, 18);
 
   const rShader = {
     name: 'WetReflector',
-    uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, uTime, uHero, uStr: { value: 1 } },
+    uniforms: { color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null }, uTime, uStr: { value: 1 } },
     vertexShader: 'uniform mat4 textureMatrix; varying vec4 vUv; varying vec3 vWP; void main(){ vUv = textureMatrix * vec4(position, 1.); vec4 w = modelMatrix * vec4(position, 1.); vWP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
-    fragmentShader: `uniform vec3 color; uniform sampler2D tDiffuse; uniform float uTime, uStr; uniform vec2 uHero; varying vec4 vUv; varying vec3 vWP;
+    fragmentShader: `uniform vec3 color; uniform sampler2D tDiffuse; uniform float uTime, uStr; varying vec4 vUv; varying vec3 vWP;
       ${GLSL_WET}
       void main(){
-        float wet = wetAt(vWP.xz); vec3 rp = ripples(vWP.xz, uTime);
-        vec3 V = normalize(cameraPosition - vWP); float F = .05 + .95 * pow(1. - clamp(V.y, 0., 1.), 4.);
-        vec2 uv = vUv.xy / vUv.w + rp.xy * .012 * (.3 + wet);
-        float sm = mix(.016, .0035, wet);
-        vec3 acc = vec3(0.); float ws = 0.;
-        for (int i = -3; i <= 3; i++){ float f = float(i), w = 1. - abs(f) / 4.2; acc += texture2D(tDiffuse, uv + vec2(0., f * sm * .5)).rgb * w; ws += w; }
-        acc /= ws;
-        float k = mix(.2, 1., wet) * (.55 + .45 * smoothstep(.0, .5, wet));
-        gl_FragColor = vec4(acc * F * k * uStr * 1.15 + rp.z * wet * vec3(.015, .02, .03), 1.);
+        float wet = wetAt(vWP.xz), rough = 1. - wet; vec3 rp = ripples(vWP.xz, uTime);
+        vec3 V = normalize(cameraPosition - vWP);
+        vec2 slope = mix(asphaltSlope(vWP.xz), rp.xy * .045, wet);
+        vec3 N = normalize(vec3(slope.x, 1., slope.y));
+        // Water IOR 1.33: Schlick Fresnel, with stronger reflection at grazing angles.
+        float F = .02 + .98 * pow(1. - max(dot(N, V), 0.), 5.);
+        vec2 uv = vUv.xy / vUv.w + slope * mix(.014, .035, wet);
+        vec3 acc = texture2D(tDiffuse, clamp(uv, vec2(.002), vec2(.998))).rgb;
+        if (rough > .025){
+          acc *= 3.; float ws = 3.;
+          // Seven taps total: a narrow horizontal lobe and a long vertical wet-road streak.
+          float spread = mix(.00025, .027, rough * rough);
+          for (int i = -3; i <= 3; i++){
+            if (i == 0) continue;
+            float f = float(i), w = exp(-f * f * .22);
+            vec2 o = vec2(sin(f * 2.4) * spread * .12, f * spread);
+            acc += texture2D(tDiffuse, clamp(uv + o, vec2(.002), vec2(.998))).rgb * w; ws += w;
+          }
+          acc /= ws;
+        }
+        float k = mix(.19, .96, wet);
+        gl_FragColor = vec4(acc + rp.z * wet * vec3(.008, .012, .016), clamp(F * k * uStr, 0., .96));
       }`,
   };
   reflector = new Reflector(new THREE.PlaneGeometry(90, 70), { textureWidth: 640, textureHeight: 360, clipBias: .003, shader: rShader, multisample: 0 });
   reflector.rotation.x = -Math.PI / 2; reflector.position.set(10, .004, 0);
-  Object.assign(reflector.material, { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+  Object.assign(reflector.material, { transparent: true, blending: THREE.NormalBlending, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   scene.add(reflector);
+  // Prior art: https://github.com/mrdoob/three.js/blob/r170/examples/jsm/objects/Reflector.js (cloned uniforms).
+  // Share the live clock with the road material.
+  reflector.material.uniforms.uTime = uTime;
   reflector.userData.uTime = uTime;
 
   // road paint: yellow double line along the street, white stop bar and crosswalk (planes on the asphalt: they also make the vanishing lines)
@@ -303,19 +326,29 @@ function buildWorld() {
   decal('graf3', 7, 3.5, 24, 2.4, -8.97, 0); decal('graf4', 6, 3, 31, 3, -8.97, 0, .9); decal('graf1', 4.2, 4.2, 6.97, 2.6, -17, -Math.PI / 2, .9); decal('graf2', 3.8, 3.8, 5.58, 3, -14.5, Math.PI / 2, .8);
 
   // --- signs (additive neon on a black box)
-  const signs = [];
+  const neonGlow = softTex(.8);
   const neon = (name, w, h, x, y, z, ry, col, I, light, lightPos, key) => {
     const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; scene.add(g);
     const back = new THREE.Mesh(new THREE.BoxGeometry(w + .2, h + .2, .16), new THREE.MeshStandardMaterial({ color: 0x07080a, metalness: .6, roughness: .5 })); back.position.z = -.09; g.add(back);
     const m = new THREE.MeshBasicMaterial({ map: tex(name), color: col.clone().multiplyScalar(I), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
     const p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m); g.add(p); p.renderOrder = 4;
-    const n = { mat: m, base: I, col, seed: signs.length * 3.7 + 1, key, mult: 0 }; neons.push(n);
+    const n = { mat: m, base: I, col, seed: neons.length * 3.7 + 1, key, mult: 0 }; neons.push(n);
     if (light) { n.light = light; light.position.set(...lightPos); }
+    // Soft spill cards supplement the existing point lights without another lighting pass.
+    const tint = light ? light.color : new Color(key === 'lounge' ? 0xff54bb : 0xff4333);
+    const spillMat = new THREE.MeshBasicMaterial({ map: neonGlow, color: tint, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 });
+    const wallGlow = new THREE.Mesh(new THREE.PlaneGeometry(w + 3.8, h + 3.2), spillMat);
+    wallGlow.position.z = -.174; g.add(wallGlow);
+    if (key === 'pink') { wallGlow.position.set(-1.79, -.6, 2.55); wallGlow.rotation.y = Math.PI / 2; }
+    const roadMat = spillMat.clone();
+    const roadGlow = new THREE.Mesh(new THREE.PlaneGeometry(w + 3., 7.), roadMat);
+    roadGlow.rotation.x = -Math.PI / 2; roadGlow.position.set(x + (key === 'pink' ? 2. : 0), .009, z + 2.8); scene.add(roadGlow);
+    n.spills = [spillMat, roadMat];
     return g;
   };
-  const pk = new THREE.PointLight(0xff3fa4, 140, 16, 2); addLight('pink', pk, .55, 2); L.pink.mats = [];
-  const op = new THREE.PointLight(0xff2a50, 70, 12, 2); addLight('open', op, .9, 5);
-  const cy = new THREE.PointLight(0x3ef0e6, 70, 12, 2); addLight('cyan', cy, 1.25, 7);
+  const pk = new THREE.PointLight(0xff3fa4, 210, 16, 2); addLight('pink', pk, .55, 2); L.pink.mats = [];
+  const op = new THREE.PointLight(0xff2a50, 105, 12, 2); addLight('open', op, .9, 5);
+  const cy = new THREE.PointLight(0x3ef0e6, 110, 12, 2); addLight('cyan', cy, 1.25, 7);
   const lg = null; L.lounge = { t0: 1.0 };
   const blade = neon('neon_shanghai', 1.1, 4.4, -6.9, 7.1, -2.55, 0, new Color(1, 1, 1), 2.6, pk, [-6.2, 6.4, -1.2], 'pink');
   const bracket = new Merge(tin); bracket.box(1.4, .08, .08, -7.6, 9.4, -2.55).box(1.4, .08, .08, -7.6, 4.9, -2.55).box(.08, 4.7, .08, -6.35, 7.1, -2.58);
@@ -372,6 +405,10 @@ function buildWorld() {
   const cone = new THREE.Mesh(coneGeo, coneMaterial(new Color(1, .62, .28), .09)); cone.position.copy(lampPos); cone.position.y += -.05;
   const dirv = new V3().subVectors(lamp.target.position, lampPos).normalize(); cone.quaternion.setFromUnitVectors(new V3(0, -1, 0), dirv); cone.scale.set(1, 1.06, 1);
   cone.renderOrder = 6; scene.add(cone); cones.push({ mesh: cone, light: 'lamp', base: .09 });
+  // Passing traffic on the avenue: one wide, unshadowed beam catches the clearcoat.
+  const passing = new THREE.SpotLight(0xd9e8ff, 0, 44, .5, .85, 2);
+  passing.position.set(-18, .9, 8.5); passing.target.position.set(0, 1.4, -7.8);
+  addLight('passing', passing, 0, 0, { manual: true });
 
   // rain streaks
   const N = 3200, q = new THREE.PlaneGeometry(1, 1), geo = new THREE.InstancedBufferGeometry(); geo.index = q.index; geo.setAttribute('position', q.getAttribute('position')); geo.setAttribute('uv', q.getAttribute('uv'));
@@ -399,12 +436,20 @@ function buildWorld() {
 
 function coneMaterial(col, k) {
   return new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, forceSinglePass: true, fog: false,
     uniforms: { uCol: { value: col.clone() }, uK: { value: k }, uTime: { value: 0 } },
-    vertexShader: 'varying vec3 vN, vP; varying float vY; void main(){ vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vP = mv.xyz; vY = uv.y; gl_Position = projectionMatrix * mv; }',
-    fragmentShader: `varying vec3 vN, vP; varying float vY; uniform vec3 uCol; uniform float uK, uTime;
-      void main(){ float f = pow(abs(dot(normalize(vN), normalize(-vP))), 1.6); float a = f * (.2 + .8 * vY) * smoothstep(0., .1, vY) * uK;
-        a *= .9 + .1 * sin(uTime * 7. + vY * 9.); gl_FragColor = vec4(uCol * a, 1.); }`,
+    vertexShader: 'varying vec3 vN, vP; varying vec2 vU; void main(){ vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vP = mv.xyz; vU = uv; gl_Position = projectionMatrix * mv; }',
+    fragmentShader: `varying vec3 vN, vP; varying vec2 vU; uniform vec3 uCol; uniform float uK, uTime;
+      void main(){
+        float facing = pow(abs(dot(normalize(vN), normalize(-vP))), 1.8);
+        float taper = smoothstep(0., .22, vU.y) * (1. - smoothstep(.92, 1., vU.y));
+        float falloff = .18 + .82 * vU.y * vU.y;
+        // Sparse drifting density in the shaft, rather than a solid glowing cone.
+        float mist = .82 + .10 * sin(vU.y * 38. + sin(vU.x * 31.) - uTime * .7)
+                         + .08 * sin(vU.x * 57. + vU.y * 19. + uTime * .45);
+        float a = facing * taper * falloff * mist * uK;
+        gl_FragColor = vec4(uCol * a, 1.);
+      }`,
   });
 }
 
@@ -584,8 +629,22 @@ function updateLights(dt) {
     l.mult = m; if (!l.manual) l.light.intensity = l.base * m * (going && /head/.test(k) ? 2.5 : 1);
   }
   for (const n of neons) {
-    const owner = L[n.key]; const m = (owner ? strike(t - owner.t0) : strike(t - 1.6)) * flick(t, n.seed, calm); n.mult = m;
+    const owner = L[n.key];
+    // A tired tube briefly loses its ballast once per 23 seconds; spill follows the tube.
+    const phase = (t + n.seed * 1.7) % 23;
+    const dropout = motion && n.key === 'pink' ? 1. - .78 * sm(17., 17.07, phase) * (1. - sm(17.28, 17.65, phase)) : 1;
+    const m = (owner ? strike(t - owner.t0) : strike(t - 1.6)) * (motion ? flick(t, n.seed, 1) : 1) * dropout; n.mult = m;
     n.mat.color.copy(n.col).multiplyScalar(n.base * m); if (n.light) n.light.intensity = (L[n.key] ? L[n.key].base : 80) * m;
+    n.spills[0].opacity = .26 * m; n.spills[1].opacity = .17 * m;
+  }
+  if (L.passing) {
+    const phase = (t + 10) % 29, u = clamp(phase / 7., 0, 1);
+    const envelope = motion ? sm(0., 1.2, phase) * (1. - sm(5.2, 7., phase)) : 0;
+    const pass = L.passing.light;
+    pass.intensity = 640 * envelope;
+    pass.position.set(lerp(-17, 19, u), 1.05, 8.5);
+    pass.target.position.set(lerp(-4., 8., u), 1.25, -8.7);
+    L.passing.mult = envelope;
   }
   if (L.garageGlow) { const m = strike(t - 1.15); L.garageGlow.mat.uniforms.uI.value = m; L.spill.mat.opacity = .5 * m; }
   if (L.alleyLamp) L.alleyLamp.mat.color.setRGB(1, .2, .1).multiplyScalar(5 * strike(t - 1.4) * flick(t, 11, calm));
