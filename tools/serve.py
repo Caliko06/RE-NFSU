@@ -10,7 +10,7 @@ POST /log appends the page's log to build/web.log (POST /log?new starts it again
 build/web.prev.log), so a Chrome session can be read after it stops. Headless Chrome (tools/webcheck.mjs) writes
 build/webcheck.log instead, so a test never replaces the OWNER's session.
 POST /telemetry does the same for web/telemetry.js: build/telemetry.ndjson (build/webcheck.telemetry.ndjson).
-POST /plan/verdict {"asset", "ok", "note"} (web/plan/harness/) writes assets[i].owner = {ok, note, time} into web/plan/plan.json (tmp + replace).
+POST /plan/verdict {"detail", "ok", "note"} (web/plan/) writes details[i].owner = {ok, note, time} into web/plan/plan.json (tmp + replace).
 --lan also serves HTTPS on 0.0.0.0:5443 for a phone or tablet on the same Wi-Fi (SAB and WebGPU need a secure
 context; only localhost is exempt). The certificate comes from a local CA in build/lan-cert/ (made once with openssl;
 the Mac keychain is not touched). The phone trusts it once: open https://<mac>.local:5443/lan-ca.crt, install the
@@ -128,7 +128,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def plan_verdict(self):
-        """The OWNER's verdict from the harness page: assets[asset].owner in web/plan/plan.json. 204, or 400 for a bad body or unknown asset."""
+        """The OWNER's verdict: details[i].owner in web/plan/plan.json. 204, or 400 for a bad body or unknown detail."""
         n = int(self.headers.get("Content-Length", 0))
         if n > 4096:
             self.refuse(413)
@@ -136,18 +136,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         body = self.rfile.read(n)
         try:
             v = json.loads(body)
-            asset, ok, note = v["asset"], v["ok"], v.get("note", "")
-            assert isinstance(asset, str) and isinstance(ok, bool) and isinstance(note, str)
+            detail, ok, note = v["detail"], v["ok"], v.get("note", "")
+            assert isinstance(detail, str) and isinstance(ok, bool) and isinstance(note, str)
         except (ValueError, KeyError, AssertionError, AttributeError, TypeError):
-            self.send_error(400, "want {asset: str, ok: bool, note: str}")
+            self.send_error(400, "want {detail: str, ok: bool, note: str}")
             return
         path = os.path.join(ROOT, "web", "plan", "plan.json")
         with PLAN_LOCK:
             with open(path, encoding="utf-8") as f:
                 plan = json.load(f)
-            hit = [a for a in plan.get("assets", []) if a.get("name") == asset]
+            hit = [d for d in plan.get("details", []) if d.get("name") == detail]
             if not hit:
-                self.send_error(400, "unknown asset")
+                self.send_error(400, "unknown detail")
                 return
             hit[0]["owner"] = {"ok": ok, "note": note[:500], "time": time.strftime("%Y-%m-%d %H:%M")}
             with open(path + ".tmp", "w", encoding="utf-8") as f:
