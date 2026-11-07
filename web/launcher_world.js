@@ -17,8 +17,12 @@ let renderer, scene, camera, composer, spark, car, bloom, lensPass;
 let running = false, moving = !reduced.matches, elapsed = 0, weatherTime = 0, previous = 0;
 let introDone = false, introCallback, screenName = 'main';
 const pointer = new THREE.Vector2(), damped = new THREE.Vector2();
-const cameraHome = new THREE.Vector3(0, 1.15, .7);
-const targetHome = new THREE.Vector3(-.5, 1.35, -6);
+// Camera = Marble's capture camera: origin, looking straight ahead, inside the source plate's field of view
+// (plate_empty.png measured against pano.png: 64.7 x 39.2 deg, yaw 0.6, pitch -0.1). Outside that view Marble
+// invents geometry (smeared walls, garbage text), so the view never leaves it; 2 deg margin covers the parallax.
+const PLATE_HFOV = 62.5, PLATE_VFOV = 37.4;
+const cameraHome = new THREE.Vector3(0, 1.33, 0);
+const targetHome = new THREE.Vector3(0, 1.33, -10);
 const target = new THREE.Vector3();
 const flickering = [];
 const ray = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0);
@@ -281,7 +285,7 @@ function makeLights() {
 }
 function prepareCar(model, collider) {
   car = model; car.rotation.y = -.67;
-  car.position.set(1.65, 0, -5.3);
+  car.position.set(1.0, 0, -11);   // where the car stood in backdrop_main.png: ~5 deg right, front ~9.8 m from a 1.33 m eye
   car.updateMatrixWorld(true);
   const bounds = new THREE.Box3().setFromObject(car);
   const ground = groundAt(collider, car.position.x, car.position.z);
@@ -331,7 +335,10 @@ function resize() {
   const w = innerWidth, h = innerHeight;
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
   renderer.setSize(w,h,false); composer.setSize(w,h);
-  camera.aspect = w/h; camera.updateProjectionMatrix();
+  camera.aspect = w/h;
+  const hTan = Math.tan(THREE.MathUtils.degToRad(PLATE_HFOV/2));
+  camera.fov = Math.min(PLATE_VFOV, THREE.MathUtils.radToDeg(2*Math.atan(hTan/camera.aspect)));
+  camera.updateProjectionMatrix();
   lensPass.fullscreenMaterial.uniforms.aspect.value = w/h;
 }
 function frame(now) {
@@ -394,6 +401,7 @@ async function start(canvas) {
     const captureGround = groundAt(collider,0,0);
     if (captureGround === null) throw new Error('Collider ground unavailable at capture origin');
     world.position.y -= captureGround; collider.position.y -= captureGround;
+    cameraHome.y = targetHome.y = offset*scale - captureGround;   // eye height of the capture camera
     collider.updateMatrixWorld(true); collider.visible = false;
     scene.add(world); // Collider is only a load-time placement/raycast surface.
     pano.mapping = THREE.EquirectangularReflectionMapping; pano.colorSpace = THREE.SRGBColorSpace;
