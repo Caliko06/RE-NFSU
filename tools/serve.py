@@ -10,6 +10,7 @@ POST /log appends the page's log to build/web.log (POST /log?new starts it again
 build/web.prev.log), so a Chrome session can be read after it stops. Headless Chrome (tools/webcheck.mjs) writes
 build/webcheck.log instead, so a test never replaces the OWNER's session.
 POST /telemetry does the same for web/telemetry.js: build/telemetry.ndjson (build/webcheck.telemetry.ndjson).
+POST /plan/verdict {"asset", "ok", "note"} (web/plan/harness/) writes assets[i].owner = {ok, note, time} into web/plan/plan.json (tmp + replace).
 --lan also serves HTTPS on 0.0.0.0:5443 for a phone or tablet on the same Wi-Fi (SAB and WebGPU need a secure
 context; only localhost is exempt). The certificate comes from a local CA in build/lan-cert/ (made once with openssl;
 the Mac keychain is not touched). The phone trusts it once: open https://<mac>.local:5443/lan-ca.crt, install the
@@ -23,7 +24,7 @@ profile; iOS: Settings > General > About > Certificate Trust Settings > full tru
 profile (payload com.apple.security.root), made here from build/lan-cert/ca.crt. RN_LAN_PORT / RN_SETUP_PORT change the two ports.
 Usage: .venv/bin/python tools/serve.py [port] [--lan]
 """
-import email.utils, gzip, hashlib, http.server, json, os, plistlib, shutil, socket, ssl, subprocess, sys, threading, urllib.parse, uuid
+import email.utils, gzip, hashlib, http.server, json, os, plistlib, shutil, socket, ssl, subprocess, sys, threading, time, urllib.parse, uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARGS = [a for a in sys.argv[1:] if a != "--lan"]
@@ -126,8 +127,40 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_response(204)
         self.end_headers()
 
+    def plan_verdict(self):
+        """The OWNER's verdict from the harness page: assets[asset].owner in web/plan/plan.json. 204, or 400 for a bad body or unknown asset."""
+        n = int(self.headers.get("Content-Length", 0))
+        if n > 4096:
+            self.refuse(413)
+            return
+        body = self.rfile.read(n)
+        try:
+            v = json.loads(body)
+            asset, ok, note = v["asset"], v["ok"], v.get("note", "")
+            assert isinstance(asset, str) and isinstance(ok, bool) and isinstance(note, str)
+        except (ValueError, KeyError, AssertionError, AttributeError, TypeError):
+            self.send_error(400, "want {asset: str, ok: bool, note: str}")
+            return
+        path = os.path.join(ROOT, "web", "plan", "plan.json")
+        with PLAN_LOCK:
+            with open(path, encoding="utf-8") as f:
+                plan = json.load(f)
+            hit = [a for a in plan.get("assets", []) if a.get("name") == asset]
+            if not hit:
+                self.send_error(400, "unknown asset")
+                return
+            hit[0]["owner"] = {"ok": ok, "note": note[:500], "time": time.strftime("%Y-%m-%d %H:%M")}
+            with open(path + ".tmp", "w", encoding="utf-8") as f:
+                json.dump(plan, f, ensure_ascii=False, indent=1)
+            os.replace(path + ".tmp", path)
+        self.send_response(204)
+        self.end_headers()
+
     def do_POST(self):
         route = self.path.split("?", 1)[0]
+        if route == "/plan/verdict":
+            self.plan_verdict()
+            return
         if route not in ("/log", "/telemetry"):
             self.refuse(403)
             return
@@ -305,6 +338,7 @@ class SetupHandler(Handler):
 
 
 PACK_LOCK = threading.Lock()
+PLAN_LOCK = threading.Lock()
 Handler.extensions_map = {**Handler.extensions_map, ".wasm": "application/wasm", ".js": "text/javascript", ".crt": "application/x-x509-ca-cert"}
 if LAN:
     ip, host = lan_names()
