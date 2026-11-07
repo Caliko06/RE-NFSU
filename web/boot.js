@@ -95,6 +95,8 @@ function line(s, cls) {
       if (RN_Q.has('trafmodels')) m.ENV.RN_TRAFMODELS = RN_Q.get('trafmodels');
       if (RN_Q.get('trafrefill') === '1') { m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
       if (RN_Q.has('traffic')) m.ENV.RN_FREETRAFFIC = RN_Q.get('traffic');
+      // Always on: an F10 session then shows the menus and files of a normal play, so it can answer a gap row without a test (tools/playindex.py)
+      m.ENV.RN_FLOWLOG = '1';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;
@@ -104,7 +106,7 @@ function line(s, cls) {
       if (jump) m.ENV.RN_JUMP = jump;
       // ?pool=1 opens WORLD directly (the menu path of tools/completion.py jump 3:1010); ?keys= or ?jump= take over
       if (RN_Q.get('pool') === '1' && !keys && !jump) {
-        m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_FLOWLOG = '1';
+        m.ENV.RN_JUMP = '3:1010';
         m.ENV.RN_KEYS = '20000:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_Main_PC:RETURN,3000@6:RETURN,3000@6:RETURN';
       }
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
