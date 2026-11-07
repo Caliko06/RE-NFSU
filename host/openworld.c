@@ -184,7 +184,8 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
     {
         const char *par = b - 1;
         while (par > gpath && par[-1] != '/' && par[-1] != '\\') par--;
-        if (b > gpath && ci_eq(b, "TEXTURES.BIN", 13) && ci_eq(par, "CARS", 4) && (par[4] == '/' || par[4] == '\\')) {
+        const char *fe = getenv("RN_FREE");   // the overlay only feeds free mode; RN_FREE=0 (original mode) keeps the shipped file
+        if (!(fe && fe[0] == '0') && b > gpath && ci_eq(b, "TEXTURES.BIN", 13) && ci_eq(par, "CARS", 4) && (par[4] == '/' || par[4] == '\\')) {
             if (world_file("CARS_TEXTURES.BIN", real, n, size)) { rn_tex_overlay = 1; rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size); return 1; }
             return 0;
         }
