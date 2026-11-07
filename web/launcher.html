@@ -8,9 +8,10 @@
 <title>Need for Speed Underground</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="launcher.css">
+<script type="importmap">{"imports":{"three":"./launcher/vendor/three/build/three.module.min.js","three/addons/":"./launcher/vendor/three/examples/jsm/"}}</script>
 </head>
 <body data-screen="main" class="boot">
-<!-- Scene: web/launcher_gl.js draws into #scene. .plate is the still image shown if WebGL is missing or has not started. -->
+<!-- Scene: web/launcher_3d.js (three.js) draws a 3D street into #scene, the menu stands inside it. .plate is the still image shown if WebGL2 is missing or fails. -->
 <div class="plate" aria-hidden="true"></div>
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="shade" aria-hidden="true"></div>
@@ -77,7 +78,7 @@
 
 <script src="launcher_opts.js"></script>
 <script src="launcher_audio.js"></script>
-<script src="launcher_gl.js"></script>
-<script src="launcher.js"></script>
+<script type="module" src="launcher_3d.js"></script>
+<script type="module" src="launcher.js"></script>
 </body>
 </html>

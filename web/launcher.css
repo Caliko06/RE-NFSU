@@ -1,5 +1,5 @@
 /* Pre-game launcher v2: the game's own front-end language (translucent teal panels, chamfered corners, italic caps, red neon chevrons)
-   over the WebGL scene (#scene, web/launcher_gl.js). 1rem = 1 unit "u" = 1 % of the smaller of screen height / (9/16 width).
+   over the WebGL scene (#scene, web/launcher_3d.js). 1rem = 1 unit "u" = 1 % of the smaller of screen height / (9/16 width).
    Animation uses transform and opacity only. OS reduce-motion is ignored on purpose (OWNER): the in-page "Animación" switch is the control. */
 :root {
   --u: min(1vh, .5625vw);
@@ -243,3 +243,23 @@ body.touch .keys .nb { display: none; }
 .row.more .tag { justify-self: end; }
 .row.more { grid-template-columns: minmax(0, 1fr) auto; }
 @media (max-width: 640px), (max-aspect-ratio: 4/5) { .row.more { grid-template-columns: minmax(0, 1fr); justify-items: start; } .row.more .tag { justify-self: start; margin-top: .4rem; } }
+
+/* ---------- v3: the main menu is 3D (light-boxes in the scene, web/launcher_3d.js). html.w3d is set once the scene runs. ---------- */
+html.w3d .shade { background:
+    linear-gradient(0deg, rgba(3, 8, 14, .6) 0, rgba(3, 8, 14, 0) 16%),
+    radial-gradient(130% 100% at 50% 50%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, .5) 100%); }
+/* the HTML list stays in the DOM for keyboard, screen readers and the selection logic, but it is not drawn */
+html.w3d .menu-panel { pointer-events: none; top: auto; bottom: 9.4rem; width: min(64rem, 92vw); padding: 0; }
+html.w3d .menu-panel::before, html.w3d .menu-panel::after { display: none; }
+html.w3d .menu-panel .list { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; pointer-events: none; }
+html.w3d .menu-panel .desc { background: none; border: 0; padding: 0 0 0 5rem; min-height: 5rem; font-size: max(15px, 2.9rem); text-shadow: 0 .2rem 1.2rem #000, 0 0 .6rem #000; pointer-events: none; }
+/* sub-screens: panels stand in the room, turned toward the camera, with a cast shadow */
+html.w3d .stage { perspective: 170rem; perspective-origin: 28% 50%; }
+html.w3d .opts-panel, html.w3d .ctrl-panel { transform: rotateY(-9deg) translateZ(1rem); transform-origin: 0 50%; filter: drop-shadow(1.4rem 2.2rem 2.6rem rgba(0, 0, 0, .65)); }
+html.w3d .head, html.w3d .line .dl { filter: drop-shadow(.8rem 1.4rem 1.6rem rgba(0, 0, 0, .6)); }
+html.w3d .head { transform: rotateY(-9deg); transform-origin: 0 50%; }
+@media (max-width: 640px), (max-aspect-ratio: 4/5) {
+  html.w3d .menu-panel { left: 0; right: auto; bottom: 8.6rem; width: 100%; }
+  html.w3d .menu-panel .desc { padding: 0 0 0 3rem; text-align: left; }
+  html.w3d .opts-panel, html.w3d .ctrl-panel { transform: none; }
+}

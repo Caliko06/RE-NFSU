@@ -1,5 +1,5 @@
 // Pre-game launcher v2 (UI). Data comes from window.RN_LAUNCH (web/launcher_opts.js); "Jugar" goes to /?play=1&...
-// The scene behind is window.RN_SCENE (web/launcher_gl.js), sound is window.RN_SND (web/launcher_audio.js). Both are optional:
+// The scene behind is window.RN_SCENE (web/launcher_3d.js, a module that runs before this one), sound is window.RN_SND (web/launcher_audio.js). Both are optional:
 // every call is guarded, so the UI works over a still image and in silence.
 // Game font: launcher/v2/ui/game_font.png + game_font.json (BMFont-like: glyph rects + advance; see GF below). When present, labels
 // are drawn from it (mask sprites); otherwise the condensed italic system stack in launcher.css is used.
@@ -168,7 +168,7 @@
     }
     if (!o.quiet) { flicker(node); snd('move'); }
     if (sc.onSel) sc.onSel(node, o);
-    if (!o.noscene) scene('select', i, list.length);
+    if (!o.noscene) scene('select', i, list.length, cur);
   }
   function step(d) {
     const list = itemsOf(); if (!list.length) return;
@@ -628,6 +628,12 @@
   addEventListener('gamepadconnected', startPolling);
   if (navigator.getGamepads && [...navigator.getGamepads()].some(Boolean)) startPolling();
 
+  // the 3D light-boxes in the scene are the menu: they call back here (hover = move the selection, click = accept)
+  window.RN_UI = {
+    hover(i) { if (cur === 'main' && !going && revealed) { const n = itemsOf()[i]; if (n) choose(n); } },
+    click(i) { if (going) return; if (!revealed) { reveal(); return; } if (cur !== 'main') return; const n = itemsOf()[i]; if (!n) return; choose(n); n.click(); },
+  };
+
   // ---------- start: scene intro, then the UI comes in ----------
   const sweeper = document.querySelector('.sweep');
   function reveal() {
@@ -655,8 +661,8 @@
   choose($('play'), { snap: true, quiet: true, noscene: true });
   if (S && typeof S.start === 'function') {
     let p;
-    try { p = S.start($('scene'), { base: 'launcher/v2/' }); } catch (e) { console.warn('RN_SCENE.start', e); p = Promise.reject(e); }
-    Promise.resolve(p).then(() => { scene('motion', motion); if (typeof S.onIntroDone === 'function') S.onIntroDone(reveal); else setTimeout(reveal, 2500); },
+    try { p = S.start($('scene'), { base: 'launcher/v3/' }); } catch (e) { console.warn('RN_SCENE.start', e); p = Promise.reject(e); }
+    Promise.resolve(p).then(() => { root.classList.add('w3d'); scene('motion', motion); scene('screen', cur); if (typeof S.onIntroDone === 'function') S.onIntroDone(reveal); else setTimeout(reveal, 2500); },
       () => { staticMode(); setTimeout(reveal, 300); });
     setTimeout(reveal, 7000);                        // never leave the menu hidden
   } else { staticMode(); setTimeout(reveal, 350); }
