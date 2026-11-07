@@ -4,85 +4,49 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0a0e17">
+<meta name="theme-color" content="#151a21">
 <title>Need for Speed Underground</title>
 <link rel="icon" href="data:,">
+<link rel="stylesheet" href="launcher/vendor/fonts/barlow-condensed.css">
 <link rel="stylesheet" href="launcher.css">
-<script type="importmap">{"imports":{"three":"./launcher/vendor/three/build/three.module.min.js","three/addons/":"./launcher/vendor/three/examples/jsm/"}}</script>
+<script type="importmap">{"imports":{"three":"./launcher/vendor/three/build/three.module.js","three/addons/":"./launcher/vendor/three/examples/jsm/","@sparkjsdev/spark":"./launcher/vendor/spark/spark.module.min.js","postprocessing":"./launcher/vendor/postprocessing/postprocessing.js"}}</script>
 </head>
-<body data-screen="main" class="boot">
-<!-- Scene: web/launcher_3d.js (three.js) draws a 3D street into #scene, the menu is drawn in the DOM above it. .plate is the still image shown if WebGL2 is missing or fails. -->
+<body data-screen="main">
 <div class="plate" aria-hidden="true"></div>
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="shade" aria-hidden="true"></div>
-
 <div class="ui" id="ui">
-  <header class="brand" data-in>
-    <h1 class="logo"><img src="launcher/v2/ui/logo.webp" alt="Need for Speed Underground" width="688" height="125"></h1>
+  <header class="brand">
+    <p class="eyebrow">Tu noche empieza aquí</p>
+    <h1><span>Need for Speed</span><strong>Underground</strong></h1>
   </header>
-
-  <div class="tools" aria-label="Accesos rápidos" data-in>
-    <button class="tool" id="btnSnd" type="button" aria-pressed="true" aria-label="Sonido (M)" title="Sonido (M)">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path class="spk" d="M4 9.5v5h3.6L13 19V5L7.6 9.5z"/><path class="wv" d="M16 8.6c1.6 1.9 1.6 4.9 0 6.8M18.6 6c3 3.3 3 8.7 0 12"/><path class="xx" d="M16 9l6 6M22 9l-6 6"/></svg>
-    </button>
-    <button class="tool motion-tool" id="btnMot" type="button" aria-pressed="true" title="Animación" aria-label="Animación"><span aria-hidden="true">Ⅱ</span><span class="ml sr-only">Animación: sí</span></button>
-    <button class="tool" type="button" data-shortcut="presets" aria-label="Perfiles" title="Perfiles"><span aria-hidden="true">P</span></button>
-    <button class="tool" type="button" data-shortcut="opts" aria-label="Opciones" title="Opciones"><span aria-hidden="true">≡</span></button>
-  </div>
-
-  <main class="stage">
-    <section class="screen" id="s-main" aria-label="Menú principal">
-      <div class="panel menu-panel" data-in>
-        <h2 class="menu-title"><span class="t">Menú principal</span></h2>
-        <nav class="list" id="menu" aria-label="Menú">
-          <i class="light" aria-hidden="true"></i>
-          <button class="item" id="play" type="button" data-desc="play"><span class="t">Jugar</span></button>
-          <button class="item" type="button" data-go="presets" data-desc="Elige el perfil de conducción."><span class="t">Perfiles</span></button>
-          <button class="item" type="button" data-go="opts" data-desc="Imagen, cámara y audio."><span class="t">Opciones</span></button>
-          <button class="item" type="button" data-go="ctrl" data-desc="Teclado, mando y táctil."><span class="t">Controles</span></button>
-        </nav>
-        <p class="desc" aria-live="polite"><span class="dl"></span></p>
-      </div>
+  <p class="mode-label" id="modeLabel">Original 2003</p>
+  <main>
+    <nav class="menu" id="menu" aria-label="Menú principal">
+      <span id="underline" aria-hidden="true"></span>
+      <button id="play" type="button">Entrar a la calle <span aria-hidden="true">→</span></button>
+      <button id="profileMenu" type="button" data-panel="profiles">Perfil</button>
+      <button type="button" data-panel="options">Opciones</button>
+      <button type="button" data-panel="controls">Controles</button>
+    </nav>
+    <section class="utility" id="panel" aria-labelledby="panelTitle" hidden>
+      <header class="panel-head"><h2 id="panelTitle"></h2><button id="back" type="button">← Volver</button></header>
+      <div id="panelContent"></div>
     </section>
-
-    <section class="screen" id="s-presets" aria-label="Perfiles" hidden>
-      <h2 class="head" data-in><span class="t">Perfiles</span></h2>
-      <div class="covers" id="covers" role="radiogroup" aria-label="Perfil"></div>
-      <p class="line" id="presetLine" data-in aria-live="polite"><span class="dl"></span></p>
-    </section>
-
-    <section class="screen" id="s-opts" aria-label="Opciones" hidden>
-      <div class="panel opts-panel" data-in>
-        <div class="tabbar" data-in>
-          <button class="bump" type="button" data-tab="-1" aria-label="Grupo anterior"></button>
-          <div class="tabs" id="tabs" role="tablist" aria-label="Grupos de opciones"><i class="tabline" aria-hidden="true"></i></div>
-          <button class="bump" type="button" data-tab="1" aria-label="Grupo siguiente"></button>
-        </div>
-        <div class="rows" id="optList"><i class="light" aria-hidden="true"></i></div>
-        <p class="desc" aria-live="polite"><span class="dl"></span></p>
-      </div>
-    </section>
-
-    <section class="screen" id="s-ctrl" aria-label="Controles" hidden>
-      <div class="panel ctrl-panel" data-in>
-        <div class="ctrl" id="ctrlGrid"></div>
-        <nav class="list one" id="ctrlList" aria-label="Controles"><i class="light" aria-hidden="true"></i>
-          <button class="item" type="button" data-back="1" data-desc="Reasignables con K en el juego."><span class="t">Volver</span></button>
-        </nav>
-        <p class="desc" aria-live="polite"><span class="dl"></span></p>
-      </div>
-    </section>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
   </main>
-
-  <footer class="keys" id="keysBar" data-in><div class="keysin" id="keys"></div></footer>
+  <footer><span id="hints">↑ ↓ Elegir　↵ Entrar　Esc Volver</span><span class="edition">PC · 2003　 01 / After Hours</span></footer>
 </div>
-
 <div class="fade" id="fade" aria-hidden="true"></div>
-<div class="flash-pop" id="flashPop" aria-hidden="true"></div>
-
+<script src="launcher/vendor/gsap/gsap.min.js"></script>
+<script src="launcher/vendor/gsap/CustomEase.min.js"></script>
 <script src="launcher_opts.js"></script>
-<script src="launcher_audio.js"></script>
-<script type="module" src="launcher_3d.js"></script>
+<script src="input.js"></script>
+<!-- Register launcher capture before the game's bindings overlay listeners. -->
+<script src="launcher_ui.js"></script>
+<script src="binds.js"></script>
+<script src="pad.js"></script>
+<script type="module" src="launcher_world.js"></script>
 <script type="module" src="launcher.js"></script>
 </body>
 </html>

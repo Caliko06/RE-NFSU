@@ -12,3 +12,4 @@ web/remaster/
 /.mvenv
 /runs
 census/hopper/decomp.c
+web/launcher/world/
