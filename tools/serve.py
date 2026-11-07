@@ -160,7 +160,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             import becmon
             self.reply(200, "text/html; charset=utf-8", becmon.page(), [("Cache-Control", "no-store")])
             return
-        if self.path.split("#", 1)[0] in ("/", "/?"):    # bare address: the launcher (web/launcher.html); "Jugar" goes to /?play=1&...
+        if route == "/launcher":             # the pre-game launcher (lane w3, OWNER 2026-11-07); bare / opens the game directly
             self.path = "/launcher.html"
         elif route == "/setup":              # LAN entry page (web/setup.html): QR, CA, iOS profile
             self.path = "/setup.html"

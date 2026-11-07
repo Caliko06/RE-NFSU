@@ -19,7 +19,7 @@ const ROUTE = { keys: '20:Enter,23:Enter,26:ArrowRight,29:Enter,32:Enter,35:Ente
 const route = process.argv[2] === '--route';
 const arg = route ? [] : process.argv.slice(2);
 let url = process.env.RN_URL || arg[0] || 'http://127.0.0.1:5180/?play=1';   // RN_URL: a window's own server (5181-5183), also for --route
-if (!url.includes('?')) url += '?play=1';    // a bare address is the launcher page (web/launcher.html), not the game
+if (!url.includes('?')) url += '?play=1';    // a bare address is the game too; ?play=1 stays harmless
 const secs = route ? ROUTE.secs : Number(arg[1] || 120);
 const shot = route ? ROUTE.shot : arg[2] || 'build/webcheck.png';
 const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).map(k => k.split(':')).map(([t, c]) => ({ t: +t, code: c.split('+')[0], hold: +(c.split('+')[1] || 0) }));
