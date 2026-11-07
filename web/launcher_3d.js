@@ -1,11 +1,11 @@
-// Pre-game launcher v3: a real 3D street corner (three.js, vendored in web/launcher/vendor/three) with the menu standing inside it.
-// Defines window.RN_SCENE (same calls as v2, see launcher.js): start(canvas,{base}) -> Promise, onIntroDone(cb), select(i,n,screen), screen(name),
-// confirm() -> Promise, motion(on), pointer(x,y), screenPos(i) -> {x,y}; plus stats() when the URL has #perf.
+// Pre-game launcher v3: a real 3D street corner (three.js, vendored in web/launcher/vendor/three) behind the DOM Main Menu.
+// Defines window.RN_SCENE: start(canvas,{base}), onIntroDone(cb), screen(name),
+// confirm(), resume(), motion(on), pointer(x,y); plus stats() when the URL has #perf.
 // Walls, floor and signs use textures from the game's own files (web/launcher/v3/tex, extracted from web/remaster/ and build/launcher_ref/picks).
-// The menu labels are drawn with the game's font atlas (launcher/v2/ui/game_font.*). If WebGL2 or an asset fails, start() rejects and the page shows the static plate.
+// The DOM UI draws its labels with the game's font atlas (launcher/v2/ui/game_font.*). If WebGL2 or an asset fails, start() rejects and the page shows the static plate.
 import * as THREE from 'three';
 import { createRain } from './launcher_rain.js';
-import { createLampSparks } from './launcher_sparks.js';
+import { createLampSparks } from './launcher_sparks.js';   // the OWNER asked for the sparking lamp: keep it
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -21,7 +21,6 @@ const sm = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t
 const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
 const noise1 = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u); };
 const PERF = /perf/.test(location.hash);
-const ACC = [0xff2a3c, 0xff3fa4, 0x3e8ffb, 0x4ddc32];            // Jugar / Perfiles / Opciones / Controles: the game's neon palette
 
 // neon tube: steady with fast dips and the odd dropout (a = amount)
 const flick = (t, s, a = 1) => {
@@ -35,14 +34,13 @@ const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 // ---------------------------------------------------------------- state
 let renderer, scene, camera, composer, finalPass, bloomPass, reflector, base = 'launcher/v3/', canvas;
-let W = 1, H = 1, pr = 1, running = false, started = false, tNow = 0, lastT = 0, introDone = false, introCb = null;
-let motion = true, screenName = 'main', selIdx = 0, hover = -1, going = null, perfSamples = [], glTimer = null;
+let W = 1, H = 1, pr = 1, running = false, tNow = 0, lastT = 0, introDone = false, introCb = null;
+let motion = true, screenName = 'main', going = null, perfSamples = [], glTimer = null;
 const ptr = { x: 0, y: 0, sx: 0, sy: 0 };
 const L = {};                       // named lights: { light, base (intensity), t0 (strike time), seed, mats[] }
 const neons = [];                   // emissive things that flicker: { mat, base, light, seed }
-const panels = [];                  // menu light-boxes
-let car = null, totem = null, sky = null, rain = null, steam = [], cones = [], carLights = null, lampPos = new V3();
-const layoutPos = { car: new V3(1.2, 0, -.5), totem: new V3(-4.7, 0, 1.3) };
+let car = null, sky = null, rain = null, steam = [], cones = [], carLights = null, lampPos = new V3();
+const layoutPos = { car: new V3(1.2, 0, -.5) };
 const rig = { az: .3, el: .1, r: 9.2, tx: -.9, ty: 1.35, tz: 0, fov: 36, sx: 0, sy: 0, focus: 9 };
 const goal = { ...rig };
 const SHOTS = {
@@ -90,33 +88,7 @@ const tex = (name, rx = 1, ry = 1, srgb = true) => {
 };
 async function loadAssets() {
   await Promise.all(TEX.map(async n => { const t = await TL.loadAsync(base + 'tex/' + n + '.webp'); t.colorSpace = THREE.SRGBColorSpace; T[n] = t; }));
-}
-// the game's font -> a function that draws a string into a canvas (white glyphs, transparent)
-let FONT = null;
-async function loadFont() {
-  try {
-    const [j, img] = await Promise.all([fetch('launcher/v2/ui/game_font.json').then(r => r.json()), new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = 'launcher/v2/ui/game_font.png'; })]);
-    const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
-    const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0);
-    const d = x.getImageData(0, 0, c.width, c.height), px = d.data;
-    let alpha = false; for (let i = 3; i < px.length; i += 4) if (px[i] < 250) { alpha = true; break; }
-    if (!alpha) for (let i = 0; i < px.length; i += 4) { px[i + 3] = Math.max(px[i], px[i + 1], px[i + 2]); px[i] = px[i + 1] = px[i + 2] = 255; }
-    x.putImageData(d, 0, 0);
-    const g = j.chars || j.glyphs || {}, lh = +j.lineHeight || 124, bs = +j.base || lh * .75, cap = (g.H || g.E || { h: lh * .6 }).h, sp = (g[' '] && g[' '].adv) || cap * .4;
-    FONT = { g, atlas: c, lh, bs, cap, sp };
-  } catch { FONT = null; }
-}
-function labelCanvas(str, cw, ch, capFrac, left) {
-  const c = document.createElement('canvas'); c.width = cw; c.height = ch; const x = c.getContext('2d');
-  const s = String(str).toUpperCase();
-  if (!FONT) { x.fillStyle = '#fff'; x.font = `italic 700 ${ch * capFrac * 1.4}px sans-serif`; x.textBaseline = 'middle'; x.fillText(s, left, ch / 2); return c; }
-  const { g, atlas, lh, bs, cap, sp } = FONT, gl = k => g[k] || g[k.toLowerCase()];
-  let w = 0; for (const k of s) { const q = gl(k); w += q ? q.adv : sp; }
-  const t = document.createElement('canvas'); t.width = Math.ceil(w) + 4; t.height = Math.ceil(lh) + 4; const tx = t.getContext('2d'); let cx = 0;
-  for (const k of s) { const q = gl(k); if (q) { if (q.w > 0 && q.h > 0) tx.drawImage(atlas, q.x, q.y, q.w, q.h, Math.round(cx + q.xo), Math.round(q.yo), q.w, q.h); cx += q.adv; } else cx += sp; }
-  const k = ch * capFrac / cap, yc = bs - cap / 2;
-  x.drawImage(t, 0, 0, t.width, t.height, left, ch / 2 - yc * k, t.width * k, t.height * k);
-  return c;
+  T.glow = await TL.loadAsync('remaster/glow/glow.png');
 }
 const canvasTex = (c, srgb = true) => { const t = new THREE.CanvasTexture(c); t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace; t.anisotropy = 8; return t; };
 
@@ -146,12 +118,6 @@ function softTex(inner = 1, size = 128) {         // radial glow
   const g = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); g.addColorStop(0, `rgba(255,255,255,${inner})`); g.addColorStop(.4, `rgba(255,255,255,${inner * .35})`); g.addColorStop(1, 'rgba(255,255,255,0)');
   x.fillStyle = g; x.fillRect(0, 0, size, size); return canvasTex(c, false);
 }
-function windowTex() {                            // distant lit windows
-  const c = document.createElement('canvas'); c.width = 128; c.height = 256; const x = c.getContext('2d'); x.fillStyle = '#05070c'; x.fillRect(0, 0, 128, 256);
-  for (let j = 0; j < 32; j++) for (let i = 0; i < 12; i++) { const h = hash(i * 13.7 + j * 71.3); if (h > .42) { x.fillStyle = h > .9 ? '#ffd9a0' : h > .8 ? '#8fd2ff' : h > .7 ? '#ff9ad0' : '#c79b62'; x.globalAlpha = .45 + h * .5; x.fillRect(i * 10.6 + 2, j * 8 + 2, 6, 4); } }
-  const t = canvasTex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
-}
-
 // ---------------------------------------------------------------- the world
 function buildWorld() {
   scene.fog = new THREE.FogExp2(0x0b1224, .021);
@@ -166,11 +132,12 @@ function buildWorld() {
       gl_FragColor = vec4(c, 1.); }`,
   }));
   sky.renderOrder = -10; sky.frustumCulled = false; scene.add(sky);
-  const wt = windowTex(), sk = [];
+  // Reuse the full-resolution facade instead of the 128x256 window grid.
+  const wt = tex('brick'), sk = [];
   for (let i = 0; i < 64; i++) {
     const a = lerp(-1.35, 1.35, i / 63) + (hash(i) - .5) * .05, R = 62 + hash(i + 9) * 55, h = 24 + hash(i + 3) * 70, w = 9 + hash(i + 5) * 14;
-    const t = wt.clone(); t.needsUpdate = true; t.repeat.set(w / 14, h / 28); t.offset.set(hash(i), hash(i + 1));
-    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), new THREE.MeshBasicMaterial({ map: t, color: new Color(.55, .6, .8), fog: false }));
+    const t = wt.clone(); t.needsUpdate = true; t.repeat.set(w / 10, h / 15); t.offset.set(hash(i), hash(i + 1));
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), new THREE.MeshBasicMaterial({ map: t, color: new Color(.32, .34, .42), fog: true }));
     m.position.set(R * Math.sin(a), h / 2 - 2, -R * Math.cos(a) - 8); scene.add(m); sk.push(m);
   }
 
@@ -241,12 +208,12 @@ function buildWorld() {
   // --- walls
   const wallsG = new THREE.Group(); scene.add(wallsG);
   const emissiveBrick = (() => {                  // the brick tile's own lit windows -> an emissive map
-    const im = T.brick.image, c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0, 512, 512);
-    const d = x.getImageData(0, 0, 512, 512), p = d.data;
-    for (let i = 0; i < p.length; i += 4) { const r = p[i], g = p[i + 1], b = p[i + 2]; const on = r > 175 && g > 130 && b < 170 && r - b > 40; if (on) { p[i] = Math.min(255, r * 1.1); p[i + 1] = g; p[i + 2] = b * .8; } else { p[i] = p[i + 1] = p[i + 2] = 0; } }
+    const im = T.brick.image, c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+    for (let i = 0; i < p.length; i += 4) { const r = p[i], g = p[i + 1], b = p[i + 2]; const light = sm(145, 230, g) * sm(15, 65, r - b); p[i] = r * light; p[i + 1] = g * light; p[i + 2] = b * light; }
     x.putImageData(d, 0, 0); return canvasTex(c);
   })();
-  const brickMat = (rx, ry) => { const m = lam('brick', rx, ry); const e = emissiveBrick.clone(); e.needsUpdate = true; e.wrapS = e.wrapT = THREE.RepeatWrapping; e.repeat.set(rx, ry); m.emissiveMap = e; m.emissive = new Color(1, .8, .5); m.emissiveIntensity = 1.6; return m; };
+  const brickMat = (rx, ry) => { const m = lam('brick', rx, ry); const e = emissiveBrick.clone(); e.needsUpdate = true; e.wrapS = e.wrapT = THREE.RepeatWrapping; e.repeat.set(rx, ry); m.emissiveMap = e; m.emissive = new Color(1, .8, .5); m.emissiveIntensity = .8; return m; };
   const dark = new THREE.MeshLambertMaterial({ color: 0x14161a });
   const tin = new THREE.MeshStandardMaterial({ color: 0x3a3f46, metalness: .8, roughness: .4 });
   const wall = (x0, x1, y1, z0, z1, mat, y0 = 0) => boxMesh(wallsG, mat, x1 - x0, y1 - y0, z1 - z0, (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2, 0, false);
@@ -415,8 +382,8 @@ function buildWorld() {
   passing.position.set(-18, .9, 8.5); passing.target.position.set(0, 1.4, -7.8);
   addLight('passing', passing, 0, 0, { manual: true });
 
-  // Rain owns its particles and injects lens refraction into the existing grading pass.
-  rain = createRain({ scene, lampPos, grading: FINAL });
+  // Light-local streaks; no screen-space rain layer.
+  rain = createRain({ scene, lampPos });
   L.lampFault = createLampSparks({ scene, position: new V3(-2.02, 3.32, .05), rain, atlasURL: base + 'fx/lamp_sparks.png' });
 }
 
@@ -467,6 +434,12 @@ function placeCar(info) {
   car = info; const g = car.root; g.position.copy(layoutPos.car); g.rotation.y = -.5; scene.add(g);
   const sp = (name, p) => { const s = new THREE.SpotLight(0xfff0cc, 110, 26, .5, .55, 2); s.position.copy(p); s.target.position.copy(p).addScaledVector(car.dir, 6); g.add(s); g.add(s.target); L[name] = { light: s, base: 110, t0: 1.5, seed: 21, local: true }; return s; };
   sp('headL', car.headL); sp('headR', car.headR);
+  // Original engine glow texture keeps a soft halo around each headlight.
+  for (const name of ['headL', 'headR']) {
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: T.glow, color: new Color(1.6, 1.25, .72), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 }));
+    halo.position.copy(car[name]).add(new V3(0, 0, .045)); halo.scale.set(1.05, 1.05, 1);
+    g.add(halo); L[name].halo = halo;
+  }
   L.headL.light.castShadow = true; L.headL.light.shadow.mapSize.set(512, 512); L.headL.light.shadow.bias = -.0005; L.headL.light.shadow.camera.near = .5; L.headL.light.shadow.camera.far = 18;
   // headlight beams (faint volumetric cones along the car's forward)
   for (const [n, p] of [['headL', car.headL], ['headR', car.headR]]) {
@@ -474,74 +447,48 @@ function placeCar(info) {
     const m = new THREE.Mesh(geo, coneMaterial(new Color(1, .95, .8), .07)); m.position.copy(p); g.add(m); m.renderOrder = 6; cones.push({ mesh: m, light: n, base: .07 });
   }
   L.tailL = { t0: 1.6 };               // tail lamps are emissive only (no light: the reflection pass lights every fragment per light)
-  // underglow: a coloured light and an additive pool on the asphalt
+  // E3 purple underglow: low lights and a wide reflected pool on wet asphalt.
+  for (const x of [-.72, .72]) {
+    const light = new THREE.PointLight(0xbc22ff, 9, 3.5, 2);
+    light.position.set(x, .18, 0); g.add(light);
+    L[x < 0 ? 'underL' : 'underR'] = { light, base: 9, t0: 1.7, seed: 0, local: true };
+  }
   
-  const pool = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 6.2), new THREE.MeshBasicMaterial({ map: softTex(.7), color: new Color(.2, .45, 1), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: .55 }));
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 6.2), new THREE.MeshBasicMaterial({ map: softTex(.7), color: new Color(.85, .035, 1.35), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: .55 }));
   pool.rotation.x = -Math.PI / 2; pool.position.y = .012; g.add(pool); L.pool = { mat: pool.material };
   const blob = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 5.4), new THREE.MeshBasicMaterial({ map: softTex(1), color: 0x000000, transparent: true, opacity: .8, depthWrite: false, blending: THREE.NormalBlending }));
   blob.rotation.x = -Math.PI / 2; blob.position.y = .014; g.add(blob);
 }
 
-// ---------------------------------------------------------------- the menu light-boxes
-function buildTotem(labels) {
-  const g = new THREE.Group(); totem = { g, items: [], frames: [] }; scene.add(g);
-  const PW = 2.9, PH = .66, PD = .2, GAP = .84, Y0 = 1.15;
-  const metal = new THREE.MeshStandardMaterial({ color: 0x23272d, metalness: .85, roughness: .38 });
-  const post = new Merge(metal);
-  for (const sx of [-1, 1]) { post.box(.14, 4.5, .14, sx * 1.75, 2.25, -.2).box(.5, .08, .5, sx * 1.75, .04, -.2); post.box(.1, .1, .5, sx * 1.75, 3.7, -.05); }
-  post.box(3.9, .12, .12, 0, 4.5, -.2).box(3.6, .06, .06, 0, 1.0, -.3).box(.07, 3.9, .07, -.75, 2.5, -.32).box(.07, 3.9, .07, .75, 2.5, -.32);
-  post.mesh(g);
-  const hood = new THREE.Mesh(new THREE.BoxGeometry(3.4, .12, .55), metal); hood.position.set(0, 4.7, .05); g.add(hood);
-  // no plates: the label floats, a thin accent strip runs under it, the selected one gets a neon bar on its left edge
-  const stripTex = stripTexture();
-  const stripGeo = new THREE.PlaneGeometry(PW - .1, .034), barGeo = new THREE.PlaneGeometry(.07, PH - .08), pickGeo = new THREE.PlaneGeometry(PW + .1, PH + .14);
-  const glow = (map, o = {}) => new THREE.MeshBasicMaterial({ map, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false, ...o });
-  labels.forEach((txt, i) => {
-    const p = new THREE.Group(); p.position.set(0, Y0 + (labels.length - 1 - i) * GAP, 0); g.add(p);
-    const pick = new THREE.Mesh(pickGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false })); pick.userData.idx = i; p.add(pick); totem.frames.push(pick);
-    const label = new THREE.Mesh(new THREE.PlaneGeometry(PW, PW * 244 / 1024), glow(canvasTex(labelCanvas(txt, 1024, 244, .4, 120)), { color: new Color(1, 1, 1) }));
-    label.position.z = .02; p.add(label); label.renderOrder = 5;
-    const strip = new THREE.Mesh(stripGeo, glow(stripTex, { color: new Color(ACC[i % 4]).multiplyScalar(.2) }));
-    strip.position.set(0, -PH / 2 + .1, .02); p.add(strip); strip.renderOrder = 5;
-    const bar = new THREE.Mesh(barGeo, glow(null, { color: new Color(ACC[i % 4]), opacity: 0 }));
-    bar.position.set(-PW / 2 - .02, 0, .02); p.add(bar); bar.renderOrder = 5;
-    const chev = new THREE.Mesh(new THREE.PlaneGeometry(.3, .15), glow(tex('chev'), { opacity: 0, color: new Color(2, 2, 2) }));
-    chev.position.set(-PW / 2 + .22, 0, .03); p.add(chev); chev.renderOrder = 5;
-    totem.items.push({ p, label, chev, strip, bar, sel: 0, vel: 0, pr: 0, base: p.position.clone(), acc: new Color(ACC[i % 4]), lit: 0, t0: 1.9 + i * .16, seed: 40 + i });
-  });
-  const sel = new THREE.PointLight(0xff2a3c, 0, 9, 2); sel.position.set(0, 2.4, 1.6); g.add(sel); L.sel = { light: sel, base: 1, t0: 0, seed: 0, local: true, manual: true };
-  // road lamp on top of the totem
-  const lamp = new THREE.Mesh(new THREE.BoxGeometry(.5, .08, .3), new THREE.MeshBasicMaterial({ color: new Color(.7, .9, 1).multiplyScalar(3) })); lamp.position.set(0, 4.62, .1); g.add(lamp); totem.lamp = lamp;
-  placeTotem();
-}
-function stripTexture() {                                      // thin line, bright at the left, fading to the right
-  const c = document.createElement('canvas'); c.width = 256; c.height = 4; const x = c.getContext('2d');
-  const gr = x.createLinearGradient(0, 0, 256, 0); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.55, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
-  x.fillStyle = gr; x.fillRect(0, 0, 256, 4); return canvasTex(c);
-}
-function placeTotem() { totem.g.position.copy(layoutPos.totem); totem.g.rotation.y = .5; }
-
-// ---------------------------------------------------------------- post: bloom + one grading pass (DoF, aberration, grain, tone map)
+// ---------------------------------------------------------------- post: bloom + one grading pass (DoF, aberration, tone map)
 const FINAL = {
-  uniforms: { tDiffuse: { value: null }, tDepth: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uTime: { value: 0 }, uFocus: { value: 9 }, uAper: { value: .55 }, uNear: { value: .1 }, uFar: { value: 250 }, uFade: { value: 0 }, uExp: { value: .95 }, uGrain: { value: .03 }, uCA: { value: 0 }, uFlash: { value: 0 } },
+  uniforms: { tDiffuse: { value: null }, tDepth: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uTime: { value: 0 }, uFocus: { value: 9 }, uAper: { value: .55 }, uNear: { value: .1 }, uFar: { value: 250 }, uFade: { value: 0 }, uExp: { value: .95 }, uCA: { value: 0 }, uFlash: { value: 0 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }',
-  fragmentShader: `uniform sampler2D tDiffuse, tDepth; uniform vec2 uRes; uniform float uTime, uFocus, uAper, uNear, uFar, uFade, uExp, uGrain, uCA, uFlash; varying vec2 vUv;
+  fragmentShader: `uniform sampler2D tDiffuse, tDepth; uniform vec2 uRes; uniform float uTime, uFocus, uAper, uNear, uFar, uFade, uExp, uCA, uFlash; varying vec2 vUv;
     float linD(float d){ float z = d * 2. - 1.; return 2. * uNear * uFar / (uFar + uNear - z * (uFar - uNear)); }
     vec3 aces(vec3 x){ return clamp((x * (2.51 * x + .03)) / (x * (2.43 * x + .59) + .14), 0., 1.); }
-    float h(vec2 p){ p = fract(p * vec2(443.897, 441.423)); p += dot(p, p + 19.19); return fract(p.x * p.y); }
-    const vec2 D[10] = vec2[10](vec2(.00,.00), vec2(.70,.00), vec2(-.35,.61), vec2(-.35,-.61), vec2(1.35,.35), vec2(.55,1.25), vec2(-.9,1.0), vec2(-1.3,-.4), vec2(-.2,-1.3), vec2(.95,-.95));
     void main(){
       vec2 uv = vUv, c = uv - .5; float r2 = dot(c, c);
       float d = linD(texture2D(tDepth, uv).x);
-      float coc = clamp(abs(1. / d - 1. / uFocus) * uAper, 0., 1.) * .016;
+      float coc = clamp(abs(d - uFocus) / max(d, .1) * uAper, 0., 1.) * .012;
       vec2 asp = vec2(uRes.y / uRes.x, 1.), ca = c * r2 * uCA * 6.;
       vec3 col = vec3(0.);
       if (coc < .0006){ col = vec3(texture2D(tDiffuse, uv + ca).r, texture2D(tDiffuse, uv).g, texture2D(tDiffuse, uv - ca).b); }
-      else { for (int i = 0; i < 10; i++){ vec2 o = D[i] * coc * asp; col += vec3(texture2D(tDiffuse, uv + o + ca).r, texture2D(tDiffuse, uv + o).g, texture2D(tDiffuse, uv + o - ca).b); } col /= 10.; }
+      else {
+        // Uniform disk samples avoid the old ten-tap star around distant lights.
+        float weight = 0.;
+        for (int i = 0; i < 24; i++) {
+          float f = float(i), angle = f * 2.39996323;
+          vec2 o = vec2(cos(angle), sin(angle)) * sqrt((f + .5) / 24.) * coc * asp;
+          vec3 sampleCol = vec3(texture2D(tDiffuse, uv + o + ca).r, texture2D(tDiffuse, uv + o).g, texture2D(tDiffuse, uv + o - ca).b);
+          float highlight = 1. + min(max(sampleCol.r, max(sampleCol.g, sampleCol.b)), 3.) * .3;
+          col += sampleCol * highlight; weight += highlight;
+        }
+        col /= weight;
+      }
       col = col * uExp + uFlash * vec3(1., .85, .7);
       col = aces(col);
       col *= 1. - smoothstep(.25, .75, r2 * 1.6) * .55;                         // vignette
-      float g = h(uv * uRes + floor(uTime * 24.) * 17.17) - .5; col += g * uGrain * (.4 + col * .8);
       col = mix(col, vec3(dot(col, vec3(.3, .59, .11))), .06) * vec3(.99, 1., 1.03);
       col *= 1. - uFade;
       gl_FragColor = vec4(pow(col, vec3(1. / 2.2)), 1.);
@@ -555,14 +502,14 @@ function sizeAll() {
   W = Math.round(cw * pr); H = Math.round(ch * pr);
   composer.setSize(W, H); bloomPass.resolution.set(W / 2, H / 2); bloomPass.setSize(W, H);
   FINAL.uniforms.uRes.value.set(W, H);
-  const rt = reflector.getRenderTarget(); rt.setSize(Math.round(W * .5), Math.round(H * .5));
+  const rt = reflector.getRenderTarget(); rt.setSize(W, H);
   camera.aspect = cw / ch; layout(cw / ch); camera.updateProjectionMatrix();
 }
-// portrait screens: the totem and the car come closer to the middle and the lens opens up
+// Portrait screens: the car comes closer to the middle and the lens opens up.
 function layout(aspect) {
   const p = clamp((1.25 - aspect) / .65, 0, 1);
-  layoutPos.totem.set(lerp(-4.7, -.6, p), 0, lerp(1.3, 3.2, p)); layoutPos.car.set(lerp(1.2, .6, p), 0, lerp(-.5, -2.2, p));
-  if (totem) placeTotem(); if (car) car.root.position.copy(layoutPos.car);
+  layoutPos.car.set(lerp(1.2, .6, p), 0, lerp(-.5, -2.2, p));
+  if (car) car.root.position.copy(layoutPos.car);
   L.lamp && L.lamp.light.target.position.set(layoutPos.car.x + .3, 0, layoutPos.car.z + .4);
   layout.p = p;
 }
@@ -574,16 +521,10 @@ const shotFor = name => {
 };
 
 // ---------------------------------------------------------------- frame
-const tmpV = new V3(), tmpV2 = new V3(), tmpC = new Color();
-const rc = new THREE.Raycaster();
 function updateRig(dt) {
   const g = shotFor(screenName), k = 1 - Math.exp(-dt * (motion ? 2.6 : 8));
-  // the selected light-box pulls the camera a little toward it (main screen only)
-  let ax = 0, ay = 0, az = 0;
-  if (screenName === 'main' && panels.length) { const it = totem.items[selIdx]; const f = (selIdx - (totem.items.length - 1) / 2); az = f * -.02; ay = -f * .09; ax = it ? .0 : 0; }
-  for (const key of ['az', 'el', 'r', 'tx', 'ty', 'tz', 'fov', 'sx', 'sy']) rig[key] = lerp(rig[key], g[key] + (key === 'az' ? az : key === 'ty' ? ay : 0), k);
-  const it = totem && totem.items[selIdx];
-  let fd = 9.4; if (it && screenName === 'main') { it.p.getWorldPosition(tmpV); fd = lerp(9.6, tmpV.distanceTo(camera.position), .85); } else if (screenName !== 'main') fd = rig.r;
+  for (const key of ['az', 'el', 'r', 'tx', 'ty', 'tz', 'fov', 'sx', 'sy']) rig[key] = lerp(rig[key], g[key], k);
+  const fd = screenName === 'main' ? 9.4 : rig.r;
   rig.focus = lerp(rig.focus, fd, 1 - Math.exp(-dt * 4));
   const orb = motion ? Math.sin(tNow * .16) * .17 + Math.sin(tNow * .07 + 1) * .05 : 0, bob = motion ? Math.sin(tNow * .23) * .035 : 0;
   // intro dolly: starts low and far, settles in 2.6 s
@@ -605,7 +546,11 @@ function updateLights(dt) {
   for (const k in L) {
     const l = L[k]; if (!l.light) continue;
     const m = strike(t - l.t0) * (l.flicker ? lerp(1, flick(t, l.seed, 1), l.flicker * calm) : 1);
-    l.mult = m; if (!l.manual) l.light.intensity = l.base * m * (going && /head/.test(k) ? 2.5 : 1);
+    l.mult = m; if (l.halo) {
+      const facing = car.dir.clone().transformDirection(car.root.matrixWorld);
+      const view = camera.position.clone().sub(l.halo.getWorldPosition(new V3())).normalize();
+      l.halo.material.opacity = .32 * m * sm(.05, .85, facing.dot(view));
+    } if (!l.manual) l.light.intensity = l.base * m * (going && /head/.test(k) ? 2.5 : 1);
   }
   if (L.lampFault) {
     const fault = L.lampFault.update(dt, motion, introDone);
@@ -637,36 +582,12 @@ function updateLights(dt) {
   if (car) for (const m of car.lamps) { if (!m.userData.b) m.userData.b = m.color.clone(); m.color.copy(m.userData.b).multiplyScalar(m.map ? (L.headL.mult || 0) : (L.tailL.mult || 0) * (.8 + .2 * Math.sin(t * 2))); }
   if (L.pool) L.pool.mat.opacity = .5 * strike(t - 1.7) * (.85 + .15 * Math.sin(t * 1.3));
   for (const c of cones) { const m = L[c.light] ? L[c.light].mult || 0 : 1; c.mesh.material.uniforms.uK.value = c.base * m * (going && /head/.test(c.light) ? 2.2 : 1); c.mesh.material.uniforms.uTime.value = t; }
-  // menu light-boxes: spring to selected / hovered, light up one after the other
-  let nl = 0; const col = tmpC.set(0, 0, 0);
-  totem.hide = lerp(totem.hide || 0, screenName === 'main' ? 0 : 1, 1 - Math.exp(-dt * 6)); totem.g.position.x = layoutPos.totem.x - 3.6 * totem.hide; totem.g.rotation.y = .5 - .6 * totem.hide;
-  totem.items.forEach((it, i) => {
-    const on = strike(t - it.t0) * (1 - .85 * totem.hide), tgt = (i === selIdx && screenName === 'main') ? 1 : 0;
-    const K = motion ? 210 : 600, D = motion ? 15 : 50; it.vel += (K * (tgt - it.sel) - D * it.vel) * dt; it.sel += it.vel * dt;
-    const s = it.sel, sc = clamp(s, 0, 1.15); it.lit = on;
-    it.pr = lerp(it.pr, going && i === selIdx ? 1 : 0, 1 - Math.exp(-dt * 30));
-    it.p.position.z = it.base.z + .3 * s; it.p.position.x = it.base.x + .24 * s - .05 * it.pr; it.p.rotation.y = -.04 * s; it.p.scale.setScalar(1 + .035 * s - .03 * it.pr);
-    const hot = clamp(s, 0, 1.1), fl = i === selIdx ? flick(t, it.seed, .6 * (motion ? 1 : .2)) : 1;
-    it.label.material.color.setRGB(.62, .78, .9).lerp(tmpC.setRGB(1, 1, 1), hot).multiplyScalar((.45 + 1.1 * hot + .5 * it.pr) * on * fl);
-    it.bar.material.opacity = clamp(s, 0, 1) * on; it.bar.material.color.copy(it.acc).multiplyScalar((1.6 + 1.4 * it.pr) * fl);
-    it.chev.material.opacity = clamp(s, 0, 1) * on * (.5 + .5 * Math.abs(Math.sin(t * 5 - i)));
-    it.strip.scale.y = 1 + 1.2 * hot + 1.5 * it.pr; it.strip.material.color.setRGB(.55, .58, .62).lerp(it.acc, clamp(hot * 1.4, 0, 1)).multiplyScalar((.22 + 2.6 * hot + 1.5 * it.pr) * on * fl);   // accent color only on the active item (OWNER 2026-11-07)
-    if (s > .02 && tgt) { col.r += it.acc.r * s; col.g += it.acc.g * s; col.b += it.acc.b * s; nl = s; }
-  });
-  if (L.sel) { const sel = L.sel.light; sel.color.copy(L.sel.col || (L.sel.col = new Color(1, 1, 1))).setRGB(col.r, col.g, col.b); const it = totem.items[selIdx]; if (it) { it.p.getWorldPosition(tmpV); totem.g.worldToLocal(tmpV); sel.position.set(tmpV.x, tmpV.y, tmpV.z + 1.4); } sel.intensity = lerp(sel.intensity, 9 * nl * (L.sel.mult = 1), 1 - Math.exp(-dt * 14)); }
-  if (totem.lamp) totem.lamp.material.color.setRGB(.7, .9, 1).multiplyScalar(3 * strike(t - 1.9));
   // steam
   for (const s of steam) {
     const u = (t * .09 + s.userData.ph) % 1, sd = s.userData.sd;
     s.position.set(3.4 + (sd - .5) * .6 + u * .9, .15 + u * 3.2, -1.8 + (hash(sd * 9) - .5) * .5); const sz = .8 + u * 2.6; s.scale.set(sz, sz, 1); s.material.opacity = Math.sin(u * Math.PI) * .09 * (.4 + .6 * L.lamp.mult);
   }
 }
-function pickAt(x, y) {                                         // client px -> panel index or -1
-  if (!totem || screenName !== 'main' || going) return -1;
-  const r = canvas.getBoundingClientRect(); rc.setFromCamera(new THREE.Vector2(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1)), camera);
-  const hit = rc.intersectObjects(totem.frames, false)[0]; return hit ? hit.object.userData.idx : -1;
-}
-
 let glq = null, glExt = null, frameNo = 0;
 function frame(now) {
   if (!running) return;
@@ -703,12 +624,9 @@ const API = {
     renderer.toneMapping = THREE.NoToneMapping; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false; renderer.setClearColor(0x05080d, 1);
     canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); running = false; document.documentElement.classList.add('static'); document.documentElement.classList.remove('w3d'); });
     scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(36, 16 / 9, .1, 250);
-    await Promise.all([loadAssets(), loadFont()]);
-    const labels = [...document.querySelectorAll('#menu .item .t')].map(e => e._text || e.textContent);
+    await loadAssets();
     buildWorld();
     placeCar(await loadCar());
-    buildTotem(labels.length ? labels : ['Jugar', 'Perfiles', 'Opciones', 'Controles']);
-    panels.push(...totem.items);
     layout(innerWidth / innerHeight);
     // composer: scene in HDR with MSAA and a depth texture, bloom at half size, then the grading pass to the screen
     const depth = new THREE.DepthTexture(2, 2); depth.type = THREE.UnsignedIntType;
@@ -732,25 +650,13 @@ const API = {
     running = true; lastT = performance.now(); tNow = 0;
     updateRig(.016); updateLights(.016); composer.render(.016);
     requestAnimationFrame(frame);
-    started = true;
   },
   onIntroDone(cb) { if (introDone) cb(); else introCb = cb; },
-  select(i, n, scr) { if (scr && scr !== 'main') return; selIdx = clamp(i, 0, (totem ? totem.items.length : n || 1) - 1); },
   screen(name) { screenName = name; },
   motion(on) { motion = !!on; },
   pointer(x, y) { ptr.x = x; ptr.y = y; },
-  screenPos(i) {
-    if (!totem) return null; const it = totem.items[clamp(i | 0, 0, totem.items.length - 1)]; it.p.getWorldPosition(tmpV2); tmpV2.project(camera);
-    const r = canvas.getBoundingClientRect(); return { x: r.left + (tmpV2.x * .5 + .5) * r.width, y: r.top + (-tmpV2.y * .5 + .5) * r.height };
-  },
-  confirm() {
-    if (!totem || going) return Promise.resolve();
-    const it = totem.items[selIdx]; it.p.getWorldPosition(tmpV); const n = new V3(0, 0, 1).applyQuaternion(it.p.getWorldQuaternion(new THREE.Quaternion()));
-    going = { t0: performance.now(), u: 0, from: camera.position.clone(), to: tmpV.clone().addScaledVector(n, .75), at: tmpV.clone(), fade: 0 };
-    return new Promise(r => setTimeout(() => { if (going) going.fade = 0; r(); }, 880));
-  },
+  confirm() { return Promise.resolve(); },
   resume() { going = null; },
-  hit: pickAt,
   stats() {
     const q = a => { const s = [...a].sort((x, y) => x - y); return { n: s.length, p50: s[Math.floor(s.length * .5)], p95: s[Math.floor(s.length * .95)], max: s[s.length - 1] }; };
     return { gpu: glTimer && glTimer.length ? q(glTimer) : null, frame: perfSamples.length ? q(perfSamples.slice(60)) : null, timerExt: !!glExt, size: [W, H], pr, calls: renderer.info.render.calls, tris: renderer.info.render.triangles };
@@ -758,13 +664,4 @@ const API = {
 };
 window.RN_SCENE = API;
 
-// pointer on the 3D menu: hover selects, a tap or click accepts
-addEventListener('pointermove', e => {
-  if (!started || e.pointerType === 'touch' || e.target !== canvas || !window.RN_UI) return;
-  const i = pickAt(e.clientX, e.clientY); canvas.style.cursor = i >= 0 ? 'pointer' : ''; if (i >= 0 && i !== hover) { hover = i; window.RN_UI.hover(i); } if (i < 0) hover = -1;
-});
-addEventListener('pointerdown', e => {
-  if (!started || e.target !== canvas || !window.RN_UI) return;
-  const i = pickAt(e.clientX, e.clientY); if (i >= 0) { e.preventDefault(); window.RN_UI.click(i); }
-});
 addEventListener('pageshow', e => { if (e.persisted) going = null; });

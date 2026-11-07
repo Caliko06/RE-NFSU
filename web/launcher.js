@@ -26,11 +26,12 @@
   const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
   const wait = ms => new Promise(r => setTimeout(r, ms));
 
-  // ---------- motion switch (default ON, ignores the OS reduce-motion setting) ----------
+  // ---------- motion switch ----------
   let motion = store.get('rn_launch_motion', '1') !== '0';
-  const RM = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };   // only the new intro / accept effects follow the OS setting (see header note)
-  const A = (node, frames, opt) => {      // WAAPI; calm mode keeps only opacity and halves the time
-    if (!motion || (opt && opt.fx && RM.matches)) { frames = frames.map(f => { const g = { ...f }; delete g.transform; return g; }); opt = { ...opt, duration: Math.min(opt.duration || 150, 140), delay: Math.min(opt.delay || 0, 60) }; }
+  const RM = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  const A = (node, frames, opt) => {      // UI transitions stay within a short menu response.
+    opt = { ...opt, duration: Math.min(opt.duration || 140, 240), delay: Math.min(opt.delay || 0, 180) };
+    if (!motion || RM.matches) { frames = frames.map(f => { const g = { ...f }; delete g.transform; return g; }); opt = { ...opt, duration: Math.min(opt.duration || 150, 140), delay: Math.min(opt.delay || 0, 60) }; }
     try { return node.animate(frames, opt); } catch { return null; }
   };
 
@@ -72,7 +73,7 @@
       } catch { /* no game font: the system stack stays */ }
     })();
     g.draw = s => {
-      const text = (s._text || '').toUpperCase();
+      const text = s.dataset.case === 'preserve' ? (s._text || '') : (s._text || '').toUpperCase();
       const S = 1;                                   // atlas pixels are already large enough for a 1080p label
       let w = 0; const gl = ch => g.glyphs[ch] || g.glyphs[ch.toLowerCase()];
       for (const ch of text) { const q = gl(ch); w += q ? q.adv : g.space; }
@@ -95,7 +96,7 @@
 
   // ---------- the one sliding light (spring) ----------
   function Light(node, box) {
-    node.innerHTML = '<i class="bg"></i><i class="ln t"></i><i class="ln b"></i><span class="chevs"><i></i><i></i><i></i></span><i class="flash"></i>';
+    node.innerHTML = '<i class="bg"></i><i class="ln t"></i><i class="ln b"></i><i class="flash"></i>';
     let y = 0, h = 0, vy = 0, vh = 0, ty = 0, th = 0, raf = 0, last = 0, first = true, target = null, lastH = -1;
     const apply = () => {
       node.style.transform = `translate3d(0,${y.toFixed(2)}px,0) scaleY(${(1 + Math.min(Math.abs(vy) * 0.00004, .05)).toFixed(3)})`;
@@ -127,15 +128,6 @@
     return api;
   }
 
-  // tube warm-up: a few hard on/off steps, then steady
-  function flicker(item) {
-    const t = item.querySelector('.t, .lbl') || item;
-    if (!motion) { A(t, [{ opacity: .55 }, { opacity: 1 }], { duration: 120 }); return; }
-    const s = 'steps(1)';
-    t.animate([{ opacity: .12, easing: s }, { opacity: 1, offset: .1, easing: s }, { opacity: .28, offset: .2, easing: s }, { opacity: 1, offset: .33, easing: s },
-      { opacity: .6, offset: .46, easing: s }, { opacity: 1, offset: .6, easing: s }, { opacity: .86, offset: .78, easing: s }, { opacity: 1 }], { duration: 320 });
-  }
-
   // ---------- state ----------
   let cur = 'main', going = false, revealed = false, kind = (matchMedia('(hover: none)').matches && matchMedia('(pointer: coarse)').matches) ? 'touch' : 'key';
   const scr = {};                                      // name -> { root, items(), sel, light, onSel(el), onEnter() -> el }
@@ -147,6 +139,7 @@
     const old = box.querySelector('.dl:last-child');
     if (old && old._v === text) return;
     const nw = el('span', 'dl', text); nw._v = text;
+    if (box.closest('.menu-panel')) { nw.classList.add('t'); nw.dataset.case = 'preserve'; setT(nw, text); }
     box.append(nw);
     if (old) {
       A(old, [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(-.8rem)' }], { duration: 130, fill: 'forwards' });
@@ -169,7 +162,7 @@
       if (t < box.scrollTop + 8) box.scrollTo({ top: Math.max(0, t - 8), behavior: beh });
       else if (b > box.scrollTop + box.clientHeight - 8) box.scrollTo({ top: b - box.clientHeight + 8, behavior: beh });
     }
-    if (!o.quiet) { flicker(node); snd('move'); }
+    if (!o.quiet) snd('move');
     if (sc.onSel) sc.onSel(node, o);
     if (!o.noscene) scene('select', i, list.length, cur);
   }
@@ -192,7 +185,7 @@
     const ch = [...r.querySelectorAll('.item, .row:not([hidden]), .cover')].slice(0, 10);
     ch.forEach((n, i) => {
       const cover = n.classList.contains('cover');
-      A(n, cover ? [{ opacity: 0, transform: 'translateY(5rem) rotate(-3deg) scale(.9)' }, { opacity: 1, transform: n.classList.contains('sel') ? 'translateY(-2.6rem) scale(1.07)' : 'scale(.93)' }] : [{ opacity: 0, transform: x }, { opacity: 1, transform: n.classList.contains('sel') ? 'translateX(1.4rem)' : 'none' }],
+      A(n, cover ? [{ opacity: 0, transform: 'translateY(5rem) rotate(-3deg) scale(.9)' }, { opacity: 1, transform: n.classList.contains('sel') ? 'translateY(-2.6rem) scale(1.07)' : 'scale(.93)' }] : [{ opacity: 0, transform: x }, { opacity: 1, transform: 'none' }],
         { duration: 480, delay: base + 120 + i * 70, easing: e, fill: 'backwards' });
     });
     if (sc.light) A(sc.light.node, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: base + 120 + ch.length * 40, fill: 'backwards' });
@@ -225,6 +218,8 @@
   for (const b of $('menu').querySelectorAll('.item')) {
     b.addEventListener('click', () => { if (b.dataset.go) { snd('accept'); show(b.dataset.go); } else if (b.id === 'play') play(); });
   }
+
+  for (const b of document.querySelectorAll('[data-shortcut]')) b.addEventListener('click', () => { if (!going) { snd('accept'); show(b.dataset.shortcut); } });
 
   // controls
   scr.ctrl = { root: $('s-ctrl'), items: () => [...$('ctrlList').querySelectorAll('.item')], light: Light($('ctrlList').querySelector('.light'), $('ctrlList')) };
@@ -512,23 +507,24 @@
   const K = (c, t) => `<kbd class="${c || ''}">${t}</kbd>`;
   function hints() {
     const sub = cur !== 'main', pad = kind === 'pad', touch = kind === 'touch';
-    const h = (kbds, label, act) => act ? `<button type="button" class="hint" data-act="${act}">${kbds}<span>${label}</span></button>` : `<span class="hint nb">${kbds}<span>${label}</span></span>`;
+    const h = (kbds, label, act) => act ? `<button type="button" class="hint" data-act="${act}">${kbds}<span class="t" data-case="preserve">${label}</span></button>` : `<span class="hint nb">${kbds}<span class="t" data-case="preserve">${label}</span></span>`;
     const out = [];
     if (pad) {
       out.push(h(K('wide', '↕'), 'Elegir'));
       if (cur === 'opts') out.push(h(K('wide', '↔'), 'Cambiar'), h(K('wide', 'LB') + K('wide', 'RB'), 'Grupo'));
       if (cur === 'presets') out.push(h(K('wide', '↔'), 'Elegir'));
-      out.push(h(K('pad a', 'A'), 'Aceptar', 'ok'));
+      out.push(h(K('pad a', 'A'), 'Siguiente', 'ok'));
       if (sub) out.push(h(K('pad b', 'B'), 'Atrás', 'back'));
       out.push(h(K('wide', 'Start'), 'Jugar', 'play'));
     } else if (!touch) {
       out.push(h(K('wide', '↑↓'), cur === 'presets' ? 'Elegir' : 'Elegir'));
       if (cur === 'opts') out.push(h(K('wide', '←→'), 'Cambiar'), h(K('', 'Q') + K('', 'E'), 'Grupo'));
       if (cur === 'presets') out.push(h(K('wide', '←→'), 'Elegir'));
-      out.push(h(K('wide', '↵'), 'Aceptar', 'ok'));
+      out.push(h(K('wide', '↵'), 'Siguiente', 'ok'));
       if (sub) out.push(h(K('wide', 'Esc'), 'Atrás', 'back'));
-    } else if (sub) out.push(h(K('wide', '←'), 'Atrás', 'back'));
+    } else { if (sub) out.push(h(K('wide', '←'), 'Atrás', 'back')); out.push(h(K('', '↵'), 'Siguiente', 'ok')); }
     bar.innerHTML = out.join('');
+    for (const t of bar.querySelectorAll('span.t')) setT(t, t.textContent);
     for (const b of optsBumps) b.innerHTML = pad ? '<span>' + (b.dataset.tab < 0 ? 'LB' : 'RB') + '</span>' : touch ? '<span>' + (b.dataset.tab < 0 ? '‹' : '›') + '</span>' : '<span>' + (b.dataset.tab < 0 ? 'Q' : 'E') + '</span>';
   }
   const optsBumps = [...document.querySelectorAll('.bump')];
@@ -633,35 +629,17 @@
   addEventListener('gamepadconnected', startPolling);
   if (navigator.getGamepads && [...navigator.getGamepads()].some(Boolean)) startPolling();
 
-  // the 3D light-boxes in the scene are the menu: they call back here (hover = move the selection, click = accept)
-  window.RN_UI = {
-    hover(i) { if (cur === 'main' && !going && revealed) { const n = itemsOf()[i]; if (n) choose(n); } },
-    click(i) { if (going) return; if (!revealed) { reveal(); return; } if (cur !== 'main') return; const n = itemsOf()[i]; if (!n) return; choose(n); n.click(); },
-  };
-
-  // ---------- start: scene intro, then the UI comes in ----------
-  const sweeper = document.querySelector('.sweep');
+  // The menu belongs to the DOM; keyboard, pointer and gamepad share choose()/activate().
   function reveal() {
     if (revealed) return;
     revealed = true;
     body.classList.remove('boot');
-    // staged intro, ~800 ms: logo slides in and its shine runs, the tools drop in, the hint bar fades up last
-    const ez = 'cubic-bezier(.16,1,.3,1)';
-    A(document.querySelector('.brand'), [{ opacity: 0, transform: 'translateX(-9rem)' }, { opacity: 1, transform: 'none' }], { duration: 560, easing: ez, fill: 'backwards', fx: 1 });
-    A(document.querySelector('.tools'), [{ opacity: 0, transform: 'translateY(-2rem)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 220, easing: ez, fill: 'backwards', fx: 1 });
-    A(document.querySelector('.keys'), [{ opacity: 0, transform: 'translateY(2.4rem)' }, { opacity: 1, transform: 'none' }], { duration: 480, delay: 320, easing: ez, fill: 'backwards', fx: 1 });
-    enter(scr.main, 120);
-    setTimeout(() => { if (sweeper) { sweeper.classList.remove('go'); void sweeper.offsetWidth; if (motion) sweeper.classList.add('go'); } }, 420);
-    setInterval(() => { if (sweeper && motion && !going && revealed && !document.hidden) { sweeper.classList.remove('go'); void sweeper.offsetWidth; sweeper.classList.add('go'); } }, 11000);
-    // a tube that hums: now and then the selected label dips for a moment
-    (function hum() {
-      setTimeout(() => {
-        const s = scr[cur] && scr[cur].sel, t = s && s.querySelector('.t');
-        if (motion && t && !going && !document.hidden) t.animate([{ opacity: 1, easing: 'steps(1)' }, { opacity: .55, offset: .15, easing: 'steps(1)' }, { opacity: 1, offset: .3, easing: 'steps(1)' }, { opacity: .8, offset: .45, easing: 'steps(1)' }, { opacity: 1 }], { duration: 240 });
-        hum();
-      }, 4500 + Math.random() * 6500);
-    })();
+    for (const n of document.querySelectorAll('.brand, .tools, .keys, .menu-panel')) {
+      A(n, [{ opacity: 0 }, { opacity: 1 }], { duration: 180, fx: 1 });
+    }
+    scr.main.light.resnap();
   }
+  for (const t of document.querySelectorAll('span.t')) if (!t._text) setT(t, t.textContent);
   const staticMode = () => root.classList.add('static');
   const S = window.RN_SCENE;
   body.classList.toggle('touch', kind === 'touch');
