@@ -1,0 +1,495 @@
+{
+ "goal": "NFSU en muchos navegadores: Original 100 %, luego navegadores, Remaster y WORLD (docs/GOAL.md)",
+ "updated": "2026-11-07 00:44",
+ "blocks": [
+  {
+   "id": "B1",
+   "title": "Original",
+   "cap": 2500,
+   "conf": "70 %",
+   "done_when": "Checklist en verde en Chrome Mac y tu firma"
+  },
+  {
+   "id": "B2",
+   "title": "Navegadores",
+   "cap": 4000,
+   "conf": "55 % sin iPhone, 20 % con él",
+   "done_when": "Cada destino arranca, 180 s de carrera 1103, 0 errores, guarda y reabre, con su número de perf"
+  },
+  {
+   "id": "B3",
+   "title": "Remaster",
+   "cap": 1000,
+   "conf": "80 % si llega B2",
+   "done_when": "Defaults de feel encendidos en cada destino"
+  },
+  {
+   "id": "B4",
+   "title": "WORLD",
+   "cap": 7000,
+   "conf": "35 % si llega B3",
+   "done_when": "Ciudad abierta e IA en cada destino"
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D1",
+   "q": "¿La máquina prueba lo repetitivo?",
+   "state": "pendiente",
+   "rec": "Sí: trazo + autopilot, y tú juegas una muestra",
+   "why": "Solo humano son ~9.5 h tuyas (estimado); hoy AGENTS.md no lo permite"
+  },
+  {
+   "id": "D2",
+   "q": "¿Una corrida de 12,000 s?",
+   "state": "pendiente",
+   "rec": "Sí, solo el trazo nativo",
+   "why": "El límite es 1,800 s y ese trazo pide 12,000 s"
+  },
+  {
+   "id": "D3",
+   "q": "¿Launcher en la meta y un solo dueño de main?",
+   "state": "pendiente",
+   "rec": "Sí a ambos",
+   "why": "Otra sesión sube a main mientras planeamos"
+  }
+ ],
+ "phases": [
+  {
+   "id": "F0",
+   "block": "B1",
+   "title": "Plan por escrito",
+   "cap": 100,
+   "conf": "alta",
+   "done_when": "Tracker vivo y cada fila con criterio",
+   "steps": [
+    {
+     "id": "F0.1",
+     "title": "Plan y auditoría externa",
+     "status": "done",
+     "who": "opus + sonnet",
+     "proof": "-",
+     "done_when": "Veredicto del Sonnet reconciliado",
+     "evidence": "runs/plan_final_2026-11-06.html: aprobado con cambios",
+     "done_at": "2026-11-06 23:58"
+    },
+    {
+     "id": "F0.2",
+     "title": "Tracker y pestaña en Agencia, como Max Payne",
+     "status": "done",
+     "who": "opus",
+     "done_when": "La pestaña muestra este JSON",
+     "evidence": "out/goal/goal.html: pestañas Orquestador NFSU 2 (Red) y Goal NFSU, capturas revisadas",
+     "done_at": "2026-11-07 00:50",
+     "calls": 79,
+     "known": "79 llamadas medidas de toda F0 hasta ahora: 54 Opus y 25 del Sonnet. No incluye becarios."
+    },
+    {
+     "id": "F0.3",
+     "title": "Reconciliar preguntas abiertas contra el repo",
+     "status": "done",
+     "who": "19 trabajos de becario",
+     "done_when": "Cada respuesta citada y revisada entra en su paso",
+     "evidence": "out/goal/goal.json: cada hallazgo marcado Revisado o Sin revisar en su paso",
+     "done_at": "2026-11-07 01:00",
+     "known": "14 útiles. Fallaron los 2 de modo 4 y el del trazo en página, y 2 solo preguntaron; se relanzaron o quedaron como pasos. Una cita del oráculo no existe en runs/."
+    },
+    {
+     "id": "F0.4",
+     "title": "Tus 3 decisiones",
+     "status": "blocked",
+     "who": "OWNER",
+     "needs": "D1 D2 D3",
+     "done_when": "Contestas va o cambias alguna"
+    },
+    {
+     "id": "F0.5",
+     "title": "Corregir punteros viejos",
+     "status": "todo",
+     "who": "opus",
+     "needs": "D3",
+     "done_when": "Ninguno contradice GOAL",
+     "known": "Sin revisar: AGENTS.md:24 (Pod), .claude/hooks/runcap.py:2 y :40 (30 y 5 corridas), web/mode.js:1 (remaster default), AGENTS.md:41 y worktrees w4 y w5."
+    }
+   ]
+  },
+  {
+   "id": "H",
+   "block": "B1",
+   "title": "Ya arreglado",
+   "cap": 0,
+   "conf": "hecho",
+   "done_when": "Fila FIXED en GOAL.md con su commit",
+   "steps": [
+    {
+     "id": "H.1",
+     "title": "Lifter: tablas con índice negativo",
+     "status": "done",
+     "who": "opus",
+     "gap": 1,
+     "proof": "ruta",
+     "done_when": "Difftest RN_ONLY de 0x67a337, 0x672630 y 0x678d30 pasa",
+     "commit": "c23b7a4",
+     "evidence": "docs/GOAL.md: fila 1"
+    },
+    {
+     "id": "H.2",
+     "title": "Sin elección guardada abre Original",
+     "status": "done",
+     "who": "opus",
+     "gap": 2,
+     "proof": "ruta",
+     "done_when": "web/mode.js cae a original",
+     "commit": "c23b7a4",
+     "evidence": "docs/GOAL.md: fila 2"
+    },
+    {
+     "id": "H.3",
+     "title": "Original no carga contenido WORLD",
+     "status": "done",
+     "who": "opus",
+     "gap": 11,
+     "proof": "ruta",
+     "done_when": "Route con 0 líneas OPENWORLD",
+     "commit": "b18404b",
+     "evidence": "docs/GOAL.md: fila 11"
+    }
+   ]
+  },
+  {
+   "id": "A",
+   "block": "B1",
+   "title": "Evidencia, sin ventanas",
+   "cap": 500,
+   "conf": "media",
+   "done_when": "Lista real de fallas por fila",
+   "steps": [
+    {
+     "id": "A.1",
+     "title": "Repetir el trazo de carrera en nativo",
+     "status": "todo",
+     "who": "opus",
+     "gap": 3,
+     "needs": "D2",
+     "done_when": "career_trace sin diferencias en el build actual",
+     "known": "Revisado: census/career_trace.json tiene diff vacío (27 oct), pero el log de esa corrida ya no existe en runs/. Pide RN_SECS=12000."
+    },
+    {
+     "id": "A.2",
+     "title": "Mismo trazo en la página",
+     "status": "todo",
+     "who": "sonnet",
+     "gap": 3,
+     "needs": "D1",
+     "done_when": "Mismo resultado en wasm, tramos de 1,800 s o menos",
+     "known": "Revisado: la ruta ?env= existe (web/boot.js:65) y savegate ya la usa. Sin revisar: nunca se ha corrido RN_CAREER en la página, y falta confirmar que reanude por tramos. Dos becarios fallaron con esta pregunta."
+    },
+    {
+     "id": "A.3",
+     "title": "Dinero y rep en flow career",
+     "status": "todo",
+     "who": "sonnet",
+     "gap": 3,
+     "done_when": "Una sesión F10 muestra los cambios contra el oráculo",
+     "known": "Revisado: host/d3d9.c:1152 ya registra conteo y hash; falta el valor de dinero y rep. Sin revisar: dinero en [0x76026c]; rep no es un escalar, es un rating 0..5 de 0x5a05b0."
+    },
+    {
+     "id": "A.4",
+     "title": "Autopilot: repetir la muestra en el build actual",
+     "status": "todo",
+     "who": "haiku",
+     "gap": 4,
+     "needs": "D1",
+     "done_when": "cjump 1, 2, 4, 105 y 92, más jump_2_1002 (knockout), terminan sin RN_FINISH",
+     "known": "Revisado: las 24 corridas runs/cjump_* no tienen líneas RN_FINISH: el final ya es natural, en un build viejo. Sin revisar: 104 y 109 no acabaron porque el autopilot se atora, sin crash; knockout no tiene corrida viva."
+    },
+    {
+     "id": "A.5",
+     "title": "Tarjeta F10: URL fija y partida respaldada",
+     "status": "todo",
+     "who": "opus",
+     "needs": "D3",
+     "done_when": "Tarjeta con /?play=1&mode=original&career=normal; playindex la clasifica human / original / no-world",
+     "known": "Revisado: ?mode= gana sobre lo guardado (web/mode.js:23-28). El launcher trae \"Todo abierto\" por defecto, así que por ahí no sirve sin elegir Normal. La sesión más reciente (7 nov, 2 carreras) es remaster con WORLD: no cuenta."
+    },
+    {
+     "id": "A.6",
+     "title": "Sesión 1: arranque, películas, opciones, audio",
+     "status": "todo",
+     "who": "OWNER",
+     "gap": 9,
+     "done_when": "Log con flow open MOVIES + pantalla *FMV.fng y dos capturas distintas en esa ventana (tools/completion.py:202-216)",
+     "known": "Revisado: hay 23 películas en game/Movies. Sin revisar: solo 8 tienen log vivo y 12 nunca se abrieron."
+    },
+    {
+     "id": "A.7",
+     "title": "Persistencia de opciones y controles",
+     "status": "todo",
+     "who": "OWNER",
+     "gap": 7,
+     "done_when": "Copia de save/: cambiar audio y una tecla, guardar, cerrar, reabrir; difieren .opt, .cfg y DirectInput user maps.txt",
+     "known": "Sin revisar: .opt ya se probó (census/completion.json); .cfg y el remapeo no. No se sabe si Controls escribe el .txt."
+    },
+    {
+     "id": "A.8",
+     "title": "Audio sin huecos",
+     "status": "todo",
+     "who": "OWNER",
+     "gap": 8,
+     "done_when": "0 underrun y 0 starves en sesión válida, y tu oído firma",
+     "known": "Sin revisar: el log descarta mudez, no ruido ni mezcla. Ninguna sesión usó ?audiolog=1. Sin fixes de audio desde el 5 nov, y el tope de log son 20 líneas."
+    },
+    {
+     "id": "A.9",
+     "title": "Sesión 2: carrera y garage",
+     "status": "todo",
+     "who": "OWNER",
+     "gap": 5,
+     "done_when": "Comprar parte y nivel: cash y spent cuadran con el oráculo, la parte queda tras recargar",
+     "known": "Sin revisar: no hay hook de garage en el host; hoy ningún log prueba una compra."
+    },
+    {
+     "id": "A.10",
+     "title": "Sesión 3: guardar, cerrar, reabrir",
+     "status": "todo",
+     "who": "OWNER",
+     "gap": 6,
+     "done_when": "savegate pasa en el build actual y además cubre guardado manual, dinero y rep",
+     "known": "Sin revisar: savegate pasó por última vez el 25 oct; solo compara el hash de estado del autosave, con RN_JUMP y RN_FINISH. Corre sobre build/save-headless, no toca tu partida."
+    },
+    {
+     "id": "A.11",
+     "title": "Ampliar el oráculo: recompensas, fee, covers y dificultades 0 y 2",
+     "status": "todo",
+     "who": "sonnet",
+     "gap": 3,
+     "done_when": "career_trace compara esos campos también",
+     "known": "Revisado: career_trace.py:48-61 no compara recompensas ni fee. Sin revisar: el oráculo sale del mismo exe y datos, y fija dificultad 1: no es independiente."
+    },
+    {
+     "id": "A.12",
+     "title": "playindex excluye sesiones con CHEAT:",
+     "status": "todo",
+     "who": "sonnet",
+     "done_when": "Una sesión con F3 no cuenta como carrera terminada",
+     "known": "Revisado: F3 funciona en cualquier modo; playindex la marca scripted pero conserva su finished (tools/playindex.py:27). La regla solo está escrita en HANDOFF."
+    },
+    {
+     "id": "A.13",
+     "title": "Revisar 0x5264d2 y llamada a 0 en Original",
+     "status": "todo",
+     "who": "opus",
+     "done_when": "Cada una: alcanzable o no en Original, con dirección",
+     "known": "Revisado: 0x526420 es EAXTunerCar::Initialize. Sin revisar: corre al crear cualquier coche, así que podría pegar en Original; es inferencia."
+    },
+    {
+     "id": "A.14",
+     "title": "Oráculo y log de garage",
+     "status": "todo",
+     "who": "sonnet",
+     "gap": 5,
+     "done_when": "Tablas 0x34a01 y 0x6ee3d8 en un oráculo y compras en el log",
+     "known": "Sin revisar: career_oracle no trae precios ni puntos; docs/re/garage.md da las direcciones."
+    },
+    {
+     "id": "A.15",
+     "title": "¿Se llega al modo 4 de quick race?",
+     "status": "todo",
+     "who": "opus",
+     "gap": 4,
+     "done_when": "Dirección que lo prueba: alcanzable con su fila, o fila cerrada",
+     "known": "Revisado: tools/census/rows.py dice que el menú ofrece 0, 1, 2, 3, 5 y 6. GOAL pide tournament y no aparece en esa lista; que sean lo mismo es inferencia. Dos becarios fallaron con esta pregunta."
+    }
+   ]
+  },
+  {
+   "id": "FX",
+   "block": "B1",
+   "title": "Arreglar solo los FAIL",
+   "cap": 1700,
+   "conf": "se estima al cerrar A",
+   "done_when": "Cada FAIL parchado en :5180, máximo 4 intentos por causa",
+   "steps": []
+  },
+  {
+   "id": "C",
+   "block": "B1",
+   "title": "Cierre",
+   "cap": 200,
+   "conf": "perf es el riesgo",
+   "done_when": "Tu firma",
+   "steps": [
+    {
+     "id": "C.1",
+     "title": "Difftest completo",
+     "status": "todo",
+     "who": "haiku",
+     "done_when": "gate pass en corrida completa desde el lift actual: fallos dentro de las 3 desviaciones QEMU y cobertura declarada, nunca 100 %",
+     "known": "Sin revisar: tarda ~10-15 min (inferencia). Compara 5,798 de 13,823. El FAIL actual es 0x67a337, ya arreglado y sin re-correr."
+    },
+    {
+     "id": "C.2",
+     "title": "3 corridas de perf con ventana",
+     "status": "todo",
+     "who": "OWNER + opus",
+     "gap": 10,
+     "done_when": "p99 <= 20 ms y 0 frames > 33 ms en 2 de 3"
+    },
+    {
+     "id": "C.3",
+     "title": "Tu firma del Bloque 1",
+     "status": "todo",
+     "who": "OWNER",
+     "done_when": "Lo dices tú"
+    }
+   ]
+  },
+  {
+   "id": "N",
+   "block": "B2",
+   "title": "Navegadores",
+   "cap": 4000,
+   "conf": "ver bloque",
+   "done_when": "Reestimar al cerrar B1",
+   "steps": [
+    {
+     "id": "N.1",
+     "title": "Edge y Brave",
+     "status": "todo",
+     "who": "sonnet",
+     "done_when": "Criterio de B2",
+     "known": "Sin revisar: sin código propio ni corridas; se espera que hereden Chrome."
+    },
+    {
+     "id": "N.2",
+     "title": "Otra Mac por Wi-Fi",
+     "status": "todo",
+     "who": "sonnet + OWNER",
+     "done_when": "Criterio de B2",
+     "known": "Sin revisar: HTTPS y CA probados con curl, no con una segunda Mac real."
+    },
+    {
+     "id": "N.3",
+     "title": "Safari Mac",
+     "status": "todo",
+     "who": "opus",
+     "done_when": "Criterio de B2",
+     "known": "Sin revisar: Safari Mac nunca se corrió. web/gpu.js:1421 usa Atomics.waitAsync sin fallback."
+    },
+    {
+     "id": "N.4",
+     "title": "Safari iPad/iPhone",
+     "status": "todo",
+     "who": "opus + OWNER",
+     "done_when": "Criterio de B2",
+     "known": "Revisado: se piden 2 GB de memoria wasm (build.py:181) pero son virtuales: guest de 1 GB con sbrk, pico de 725-750 MB en Chrome headless. Sin revisar: no hay carrera jugada con touch."
+    },
+    {
+     "id": "N.5",
+     "title": "Firefox Mac",
+     "status": "todo",
+     "who": "sonnet",
+     "done_when": "Criterio de B2",
+     "known": "Sin revisar: la única corrida fue Firefox 159 en Linux: dibuja y el proceso padre muere a los 3-10 s. En Mac nunca se probó."
+    }
+   ]
+  },
+  {
+   "id": "R",
+   "block": "B3",
+   "title": "Remaster",
+   "cap": 1000,
+   "conf": "ver bloque",
+   "done_when": "Reestimar al cerrar B2",
+   "steps": [
+    {
+     "id": "R.1",
+     "title": "Blur PS2 depth",
+     "status": "todo",
+     "who": "sonnet",
+     "done_when": "Encendido por default y aprobado por ti en cada destino",
+     "known": "Sin revisar: nivel 6 en web/tune.js:21-22."
+    },
+    {
+     "id": "R.2",
+     "title": "Halos",
+     "status": "todo",
+     "who": "sonnet",
+     "done_when": "Encendido por default y aprobado por ti en cada destino",
+     "known": "Sin revisar: bloom y RN_LIGHTS encendidos."
+    },
+    {
+     "id": "R.3",
+     "title": "Cámara",
+     "status": "todo",
+     "who": "sonnet",
+     "done_when": "Encendido por default y aprobado por ti en cada destino",
+     "known": "Sin revisar: SPEEDFOV, CHASECAM y NITROCAM apagadas por tu decisión del 31 oct."
+    },
+    {
+     "id": "R.4",
+     "title": "Tráfico",
+     "status": "todo",
+     "who": "sonnet",
+     "done_when": "Encendido por default y aprobado por ti en cada destino",
+     "known": "Sin revisar: pool completo por RN_TRAFFIC."
+    },
+    {
+     "id": "R.5",
+     "title": "Accel",
+     "status": "todo",
+     "who": "opus",
+     "done_when": "Encendido por default y aprobado por ti en cada destino",
+     "known": "Sin revisar: no existe switch: GOAL lo pide y hay que definir qué significa."
+    },
+    {
+     "id": "R.6",
+     "title": "Reset y muros",
+     "status": "todo",
+     "who": "opus",
+     "done_when": "Encendido por default y aprobado por ti en cada destino",
+     "known": "Sin revisar: no es switch de remaster; la causa no se reprodujo (docs/re/reset_walls.md)."
+    }
+   ]
+  },
+  {
+   "id": "W",
+   "block": "B4",
+   "title": "WORLD",
+   "cap": 7000,
+   "conf": "ver bloque",
+   "done_when": "Reestimar al cerrar B3",
+   "steps": [
+    {
+     "id": "W.1",
+     "title": "Contar paradas en el build nuevo y cerrarlas",
+     "status": "todo",
+     "who": "opus",
+     "done_when": "Sesión tuya sin paradas",
+     "known": "Revisado: 0x462a06 y 0x441b82 tienen commit de arreglo. Sin revisar: 0x5447ff era de ?rockport, ruta ya borrada; 0x5264d2 y la llamada a 0 siguen abiertas."
+    },
+    {
+     "id": "W.2",
+     "title": "Ciudad abierta e IA",
+     "status": "todo",
+     "who": "opus + sonnet",
+     "done_when": "Tú la manejas",
+     "known": "Sin revisar: tour de 42 km, 6 rivales y 40 coches funcionan; la red de ciudad llega a 3402 de 3538 nodos y por eso el default volvió a tour."
+    },
+    {
+     "id": "W.3",
+     "title": "WORLD en cada destino",
+     "status": "todo",
+     "who": "sonnet",
+     "done_when": "Criterio de B2 con WORLD"
+    }
+   ]
+  }
+ ],
+ "notes": [],
+ "check": {
+  "at": "2026-11-07 00:44",
+  "head": "17c40db",
+  "problems": []
+ }
+}
