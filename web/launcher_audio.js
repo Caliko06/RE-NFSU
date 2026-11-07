@@ -1,8 +1,8 @@
 // Launcher sound (WebAudio). window.RN_SND = { play(name), rev(), toggle(), set(on), isOn(), fadeOut(ms), onChange(cb) }.
 // Files (same origin): launcher/v2/sfx/{move,accept,back,tab,idle,rain}.ogg. A missing file is never an error: the four UI
-// sounds fall back to a tiny synthesized tick, idle/rain stay silent. Master gain 0.06, never above 0.1.
+// sounds fall back to a tiny synthesized tick, idle/rain stay silent. 'press' (the button thunk) is always synthesized. Master gain 0.06, never above 0.1.
 // Browsers start audio only after a user gesture: the context is made on the first pointer/key/touch (or pad button) press.
-// State is remembered in localStorage 'rn_launch_snd' ('0' = off, anything else = on).
+// State is remembered in localStorage 'rn_launch_snd' ('0' = off, anything else = on). ?mute=1 in the URL starts muted (not stored).
 (() => {
   'use strict';
   const KEY = 'rn_launch_snd', MASTER = 0.06, CAP = 0.1, BASE = 'launcher/v2/sfx/';
@@ -11,7 +11,7 @@
     get() { try { return localStorage.getItem(KEY) !== '0'; } catch { return true; } },
     set(on) { try { localStorage.setItem(KEY, on ? '1' : '0'); } catch {} },
   };
-  let on = store.get(), ctx = null, master = null, loops = null, started = false;
+  let on = store.get() && !/[?&]mute=1(&|$)/.test(location.search), ctx = null, master = null, loops = null, started = false;
   const raw = {}, bufs = {}, subs = [];
   const gainValue = () => Math.min(CAP, on ? MASTER : 0);
 
@@ -72,6 +72,7 @@
     tab: [[900, 1100, 0.05, 'triangle', 0.5]],
     accept: [[620, 880, 0.07, 'triangle', 0.55], [880, 1320, 0.09, 'sine', 0.45, 0.06]],
     back: [[700, 420, 0.09, 'triangle', 0.5]],
+    press: [[170, 52, 0.085, 'sine', 0.8], [420, 150, 0.025, 'triangle', 0.22]],     // short low thunk, the quietest of the set
   };
   function synth(name) {
     const parts = SYN[name];

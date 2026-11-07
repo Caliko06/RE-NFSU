@@ -21,13 +21,16 @@
   const ok = !!(L && Array.isArray(L.opts) && Array.isArray(L.presets) && typeof L.query === 'function');
   const scene = (fn, ...a) => { try { const s = window.RN_SCENE; if (s && typeof s[fn] === 'function') return s[fn](...a); } catch (e) { console.warn('RN_SCENE.' + fn, e); } };
   const snd = n => { try { window.RN_SND && window.RN_SND.play(n); } catch {} };
+  // press: the .pr class drives the CSS pressed state (same as :active), plus the quiet thunk
+  const thunk = node => { if (node) { node.classList.add('pr'); setTimeout(() => node.classList.remove('pr'), 150); } snd('press'); };
   const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
   const wait = ms => new Promise(r => setTimeout(r, ms));
 
   // ---------- motion switch (default ON, ignores the OS reduce-motion setting) ----------
   let motion = store.get('rn_launch_motion', '1') !== '0';
+  const RM = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };   // only the new intro / accept effects follow the OS setting (see header note)
   const A = (node, frames, opt) => {      // WAAPI; calm mode keeps only opacity and halves the time
-    if (!motion) { frames = frames.map(f => { const g = { ...f }; delete g.transform; return g; }); opt = { ...opt, duration: Math.min(opt.duration || 150, 140), delay: Math.min(opt.delay || 0, 60) }; }
+    if (!motion || (opt && opt.fx && RM.matches)) { frames = frames.map(f => { const g = { ...f }; delete g.transform; return g; }); opt = { ...opt, duration: Math.min(opt.duration || 150, 140), delay: Math.min(opt.delay || 0, 60) }; }
     try { return node.animate(frames, opt); } catch { return null; }
   };
 
@@ -176,7 +179,7 @@
     choose(list[i < 0 ? 0 : (i + d + list.length) % list.length]);
   }
   const adj = d => { const s = scr[cur].sel; if (s && s._adj) s._adj(d); else if (cur === 'presets') step(d); };
-  const activate = () => { const s = scr[cur].sel; if (!s) { step(0); return; } const lg = scr[cur].light; if (lg) { lg.press(true); setTimeout(() => lg.press(false), 110); } if (s._ok) s._ok(); else if (s._adj) s._adj(1); else s.click(); };
+  const activate = () => { const s = scr[cur].sel; if (!s) { step(0); return; } thunk(s); const lg = scr[cur].light; if (lg) { lg.press(true); setTimeout(() => lg.press(false), 110); } if (s._ok) s._ok(); else if (s._adj) s._adj(1); else s.click(); };
   const tabStep = d => { if (cur === 'opts' && scr.opts.tabStep) { scr.opts.tabStep(d); snd('tab'); } };
 
   // ---------- screens ----------
@@ -488,17 +491,18 @@
     going = true;
     const q = launchHook.query();
     const s = scr.main.sel; if (s && scr.main.light) scr.main.light.node.classList.add('go');
+    if (motion && !RM.matches) { const fp = $('flashPop'); fp.classList.remove('go'); void fp.offsetWidth; fp.classList.add('go'); }      // white pop, then black
     for (const it of scr.main.items()) if (it !== s) it.classList.add('out');
     snd('accept'); try { window.RN_SND && window.RN_SND.rev(); window.RN_SND && window.RN_SND.fadeOut(900); } catch {}
     body.classList.add('leaving');
     const done = Promise.resolve(scene('confirm'));
     await Promise.race([done.catch(() => 0), wait(1800)]);
     $('fade').classList.add('on');
-    await wait(motion ? 220 : 120);
+    await wait(motion ? 300 : 140);
     location.href = '/?' + q;
   }
   addEventListener('pageshow', e => {
-    if (e.persisted) { going = false; body.classList.remove('leaving'); $('fade').classList.remove('on'); for (const it of scr.main.items()) it.classList.remove('out'); scr.main.light.node.classList.remove('go'); }
+    if (e.persisted) { going = false; body.classList.remove('leaving'); $('fade').classList.remove('on'); $('flashPop').classList.remove('go'); for (const it of scr.main.items()) it.classList.remove('out'); scr.main.light.node.classList.remove('go'); }
   });
   document.addEventListener('pointerdown', e => { const lg = scr[cur].light; if (lg && e.target.closest && e.target.closest('.item, .row')) lg.press(true); });
   addEventListener('pointerup', () => { for (const k of ['main', 'ctrl', 'opts']) if (scr[k].light) scr[k].light.press(false); });
@@ -573,6 +577,7 @@
     if (!revealed) { reveal(); return; }
     const n = e.target.closest && e.target.closest('.item, .row, .cover');
     if (n && itemsOf().includes(n) && n !== scr[cur].sel) choose(n);
+    if (e.button === 0 && e.target.closest && e.target.closest('.item, .row, .cover, .tool, .bump, .tabs button')) snd('press');
   });
   const KEYS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', Escape: 'back', Backspace: 'back', PageUp: 'tab-', PageDown: 'tab+', q: 'tab-', Q: 'tab-', e: 'tab+', E: 'tab+', Home: 'home', End: 'end' };
   addEventListener('keydown', e => {
@@ -640,9 +645,13 @@
     if (revealed) return;
     revealed = true;
     body.classList.remove('boot');
-    for (const n of document.querySelectorAll('.brand, .tools, .keys')) A(n, [{ opacity: 0, transform: n.classList.contains('keys') ? 'translateY(3rem)' : 'translateX(-4rem)' }, { opacity: 1, transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
+    // staged intro, ~800 ms: logo slides in and its shine runs, the tools drop in, the hint bar fades up last
+    const ez = 'cubic-bezier(.16,1,.3,1)';
+    A(document.querySelector('.brand'), [{ opacity: 0, transform: 'translateX(-9rem)' }, { opacity: 1, transform: 'none' }], { duration: 560, easing: ez, fill: 'backwards', fx: 1 });
+    A(document.querySelector('.tools'), [{ opacity: 0, transform: 'translateY(-2rem)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 220, easing: ez, fill: 'backwards', fx: 1 });
+    A(document.querySelector('.keys'), [{ opacity: 0, transform: 'translateY(2.4rem)' }, { opacity: 1, transform: 'none' }], { duration: 480, delay: 320, easing: ez, fill: 'backwards', fx: 1 });
     enter(scr.main, 120);
-    setTimeout(() => { if (sweeper) { sweeper.classList.remove('go'); void sweeper.offsetWidth; if (motion) sweeper.classList.add('go'); } }, 380);
+    setTimeout(() => { if (sweeper) { sweeper.classList.remove('go'); void sweeper.offsetWidth; if (motion) sweeper.classList.add('go'); } }, 420);
     setInterval(() => { if (sweeper && motion && !going && revealed && !document.hidden) { sweeper.classList.remove('go'); void sweeper.offsetWidth; sweeper.classList.add('go'); } }, 11000);
     // a tube that hums: now and then the selected label dips for a moment
     (function hum() {
