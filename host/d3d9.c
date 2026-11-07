@@ -1109,6 +1109,61 @@ static int fe_packages(Ctx *c, uint32_t np[16]) {
     }
     return n;
 }
+// REA/Hopper: 0x5a05b0 calculates the 0..5 car reputation from RideInfo B at 0x745720 using
+// the thresholds in 0x6ee3d8 and the part-point tables rooted at 0x733f78. Cash is career+0x1374
+// ([0x76026c], read by 0x5a1520). Keep this read-only mirror in sync with that shipped calculation.
+static int career_rating(Ctx *c, float *rating) {
+    const uint32_t rows = 0x6ee3d8, ride = 0x745720, data_ptrs = 0x733f78;
+    double a = 0, b = 0, d = 0, score = 0;
+    int ended = 0;
+    for (uint32_t i = 0; i < 32; i++) {
+        uint32_t row = rows + i * 12, type = ld(c, row, 4);
+        if (type == ~0u) { ended = 1; break; }
+        if (type >= 32) continue;
+        uint32_t table = ld(c, data_ptrs + type * 4, 4);
+        if (table < LOW || table > c->memsz - 0x20) return 0;
+        uint32_t flags = ld(c, row + 8, 4);
+        if (flags & 1) a += (int32_t)ld(c, table + 0x10, 4);
+        if (flags & 2) b += (int32_t)ld(c, table + 0x14, 4);
+        if (flags & 4) d += (int32_t)ld(c, table + 0x18, 4);
+    }
+    if (!ended || a <= 0 || b <= a || d <= b || ride > c->memsz - 0x700) return 0;
+    for (uint32_t i = 0; i < 32; i++) {
+        uint32_t row = rows + i * 12, type = ld(c, row, 4);
+        if (type == ~0u) break;
+        if (type >= 32) continue;
+        uint32_t table = ld(c, data_ptrs + type * 4, 4), level = 0;
+        if (table < LOW || table > c->memsz - 0x20) return 0;
+        if (type == 7) {
+            for (uint32_t j = 0; j < 4; j++) {
+                uint32_t part = ld(c, ride + 0x4c8 + j * 4, 4);
+                if (!part) continue;
+                if (part > c->memsz - 0x12) return 0;
+                uint32_t n = ld(c, part + 0x11, 1);
+                if (level < n) level = n;
+            }
+        } else if (type == 1) {
+            static const struct { uint32_t first, last, level; } groups[] = {{0x3b, 0x40, 3}, {0x53, 0x70, 2}, {0x43, 0x50, 1}};
+            for (uint32_t g = 0; g < sizeof groups / sizeof groups[0] && !level; g++)
+                for (uint32_t slot = groups[g].first; slot <= groups[g].last; slot++)
+                    if (ld(c, ride + 0x44c + slot * 4, 4)) { level = groups[g].level; break; }
+        } else {
+            uint32_t slot = ld(c, row + 4, 4);
+            if (slot >= 0x78) return 0;
+            uint32_t part = ld(c, ride + 0x44c + slot * 4, 4);
+            if (part) {
+                if (part > c->memsz - 0x12) return 0;
+                level = ld(c, part + 0x11, 1);
+            }
+        }
+        if (level >= 1 && level <= 4) score += (int32_t)ld(c, table + 0x0c + level * 4, 4);
+    }
+    double value = score < a ? 2.0 * score / a : score < b ? 2.0 + 2.0 * (score - a) / (b - a)
+                                                               : 4.0 + (score - b) / (d - b);
+    if (value > 5.0) value = 5.0;
+    *rating = (float)value;
+    return 1;
+}
 static void flow_log(Ctx *c) {
     static int on = -1;
     static uint32_t prev, prev_st;
@@ -1145,12 +1200,21 @@ static void flow_log(Ctx *c) {
     // Career progress: one status byte per event id at career 0x75eef8 + 0x34c (0x5a0ce0 writes 3 when the event's race
     // starts; Hopper evbrief.txt). The count after a profile load shows what the save brought back (game.save_reload).
     static int pcar = -1;
-    static uint32_t phash;
+    static uint32_t phash, pcash = ~0u, prating_bits = ~0u;
+    static int prating_valid = -1;
     int car = 0;
     uint32_t hash = 2166136261u;   // FNV-1a of the 256 status bytes: a reload must bring back the same ones
     for (uint32_t k = 0; k < 0x100; k++) { uint32_t b = ld(c, 0x75eef8 + 0x34c + k, 1); car += b != 0; hash = (hash ^ b) * 16777619u; }
-    if (car != pcar || hash != phash) rn_log("flow career %d status %08x (frame %u)", car, hash, dev.frames);
-    phash = hash;
+    uint32_t cash = ld(c, 0x76026c, 4), rating_bits = 0;
+    float rating = 0;
+    int rating_valid = career_rating(c, &rating);
+    memcpy(&rating_bits, &rating, sizeof rating_bits);
+    if (car != pcar || hash != phash || cash != pcash || rating_valid != prating_valid || (rating_valid && rating_bits != prating_bits)) {
+        if (rating_valid) rn_log("flow career %d status %08x cash %d rating %.2f (frame %u)", car, hash, (int32_t)cash, rating, dev.frames);
+        else rn_log("flow career %d status %08x cash %d rating n/a (frame %u)", car, hash, (int32_t)cash, dev.frames);
+    }
+    phash = hash, pcash = cash, prating_valid = rating_valid;
+    if (rating_valid) prating_bits = rating_bits;
     pm = m, pt = t, pe = e, pcar = car;
     input_jump(c);
     input_finish(c);
