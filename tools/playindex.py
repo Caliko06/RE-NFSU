@@ -18,19 +18,20 @@ def session(path):
     text = "\n".join(log)
     if "st Wanted" in text:     # another game's page saved under this name
         return None
+    cheat = "CHEAT:" in text
     cols, rows = o.get("cols", []), o.get("rows", [])
     col = lambda name: [r[cols.index(name)] for r in rows] if name in cols else []
     mode = re.search(r"mode: (\w+)", text)
     keys = [(float(m[1]), m[2], m[3]) for m in re.finditer(r"^([\d.]+) key (down|up) (\S+)", text, re.M)]
     return {
         "date": os.path.basename(path)[13:32],
-        "driver": "scripted" if SCRIPTED.search(url) or "RN_JUMP:" in text or "CHEAT:" in text else "human",
+        "driver": "scripted" if SCRIPTED.search(url) or "RN_JUMP:" in text or cheat else "human",
         "mode": mode[1] if mode else "unknown",
         "world": "OPENWORLD:" in text or "rockport" in url,
         "normal_career": "career=normal" in url,
         "min": round((rows[-1][0] - rows[0][0]) / 60000, 1) if len(rows) > 1 else 0,
         "races": max(len(re.findall(r"race HUD", text)), len(re.findall(r"phase race \d+ begins", text))),   # a lower bound: older builds log the HUD once
-        "finished": len(re.findall(r"phase race \d+ finished", text)),
+        "finished": 0 if cheat else len(re.findall(r"phase race \d+ finished", text)),  # a cheat-triggered finish is not Original evidence
         "flow": "flow fe " in text,
         "songs": len(re.findall(r"music song", text)),
         "stream_silent": len(re.findall(r"a whole lap with no Unlock", text)),
