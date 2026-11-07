@@ -28,10 +28,11 @@ h1 span { display: block; font-size: clamp(1.3rem, 2.7vw, 3rem); }
 h1 strong { display: block; font-size: clamp(2.2rem, 5.6vw, 6rem); }
 .mode-label { position: absolute; top: 4%; right: 6%; font-style: italic; color: var(--muted); }
 .menu { font-family: "Barlow Condensed", var(--font); font-weight: 500; position: absolute; left: 5%; top: 46%; width: min(30vw, 470px); display: flex; flex-direction: column; align-items: stretch; }
-.menu button { position: relative; width: fit-content; max-width: 100%; padding: .5rem .15rem .65rem; font-size: clamp(1.25rem, 2vw, 2.3rem); font-style: italic; color: var(--muted); line-height: 1.25; text-shadow: 0 3px 10px rgb(0 0 0 / .8); }
+.menu button { position: relative; width: fit-content; max-width: 100%; padding: .5rem .15rem .65rem; font-size: clamp(1.25rem, 2vw, 2.3rem); font-style: italic; color: rgb(250 248 244 / .75); line-height: 1.25; text-shadow: 0 3px 10px rgb(0 0 0 / .8); }
 .menu #play { font-size: clamp(1.7rem, 3.1vw, 3.7rem); margin-bottom: 1rem; white-space: nowrap; }
 #play span { font-size: .65em; }
-.menu button.active, .menu button:focus-visible { color: var(--ivory); }
+.menu button.active, .menu button:focus-visible { color: rgb(250 248 244); }
+.menu button:focus-visible { outline: none; }
 #underline { position: absolute; z-index: 1; left: 0; top: 0; height: 2px; pointer-events: none; background: linear-gradient(90deg, transparent, var(--crimson) 12%, var(--ivory) 55%, var(--crimson) 78%, transparent); box-shadow: 0 0 10px var(--crimson); transform-origin: left; }
 .utility { position: absolute; left: 39%; right: 6%; top: 28%; bottom: 16%; overflow: auto; padding: 1.5rem 2rem 2rem; background: linear-gradient(115deg, rgb(21 26 33 / .97), rgb(12 20 28 / .9) 70%, rgb(21 26 33 / .74)); border-left: 2px solid var(--crimson); box-shadow: 0 18px 60px rgb(0 0 0 / .45), inset 0 1px var(--hairline); scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
 .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--hairline); }

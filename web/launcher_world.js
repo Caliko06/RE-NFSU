@@ -102,42 +102,57 @@ function groundAt(collider, x, z) {
   return hit ? hit.point.y : null;
 }
 function makeSplashes(collider) {
-  const points = [], seeds = [];
+  const points = [], seeds = [], normals = [];
   for (let i = 0; i < 360; i++) {
     let x = (Math.random() - .5) * 19, z = -Math.random() * 23;
-    let y;
+    let hit;
     if (i < 90) {
       // Raycast the real car once, so hood and roof droplets follow its mesh.
       rayOrigin.set((Math.random() - .5) * 1.5, 4, (Math.random() - .5) * 3.8);
       car.localToWorld(rayOrigin); ray.set(rayOrigin, down);
-      const hit = ray.intersectObject(car, true)[0];
-      if (!hit) continue;
-      x = hit.point.x; y = hit.point.y; z = hit.point.z;
-    } else y = groundAt(collider, x, z);
-    if (y === null) continue;
-    points.push(x, y + .018, z); seeds.push(Math.random(), .5 + Math.random());
+      hit = ray.intersectObject(car, true)[0];
+    } else {
+      rayOrigin.set(x, 2.5, z); ray.set(rayOrigin, down);
+      hit = ray.intersectObject(collider, true)[0];
+    }
+    if (!hit?.face) continue;
+    const normal = hit.face.normal.clone().applyNormalMatrix(new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld));
+    if (normal.y < .35) continue;
+    const point = hit.point.clone().addScaledVector(normal, .003);
+    points.push(point.x, point.y, point.z); normals.push(normal.x, normal.y, normal.z);
+    seeds.push(Math.random(), .5 + Math.random());
   }
-  instanced(points, seeds, /* glsl */`
-    attribute vec3 origin; attribute vec2 seed; uniform float uTime;
-    varying vec2 vUv; varying float vLife; varying vec3 vLight;
+  const splashes = instanced(points, seeds, /* glsl */`
+    attribute vec3 origin, surfaceNormal; attribute vec2 seed; uniform float uTime;
+    varying vec2 vUv; varying float vLife, vSeed; varying vec3 vLight;
     ${illumination}
     void main(){
-      vLife=fract(seed.x+uTime*(.75+seed.y*.3)); vUv=uv;
-      float radius=(.025+vLife*.17)*seed.y;
-      vec3 p=origin+vec3(position.x*radius*2.,0.,position.y*radius*2.);
-      vLight=lit(p)*1.6;
+      vLife=fract(seed.x+uTime*(.75+seed.y*.3)); vUv=uv; vSeed=seed.x;
+      float age=clamp(vLife/.18,0.,1.);
+      float radius=(.012+age*.035)*seed.y;
+      vec3 tangent=normalize(cross(surfaceNormal,vec3(0.,0.,1.)));
+      vec3 bitangent=cross(surfaceNormal,tangent);
+      vec3 p=origin+(tangent*position.x+bitangent*position.y)*radius*2.;
+      vLight=lit(origin);
       gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);
     }
   `, /* glsl */`
-    varying vec2 vUv; varying float vLife; varying vec3 vLight;
+    varying vec2 vUv; varying float vLife, vSeed; varying vec3 vLight;
     void main(){
-      vec2 p=vUv*2.-1.; float r=length(p);
-      float ring=exp(-pow((r-.78)*22.,2.));
-      float crown=pow(max(0.,sin(atan(p.y,p.x)*9.)),8.)*exp(-pow((r-.52)*16.,2.));
-      float a=(ring+crown*(1.-vLife))*(1.-vLife)*(1.-vLife)*.44;
+      if(vLife>=.18) discard;
+      vec2 p=vUv*2.-1.; float age=vLife/.18, burst=0.;
+      // Separate tiny beads spread along the hit surface, with no annular base.
+      for(int i=0;i<5;i++){
+        float id=float(i), angle=id*1.256637+vSeed*6.28318;
+        float reach=(.22+age*.48)*(.7+.3*sin(id*13.+vSeed*41.));
+        vec2 bead=vec2(cos(angle),sin(angle))*reach;
+        burst+=1.-smoothstep(.025,.11,length(p-bead));
+      }
+      float a=min(burst,1.)*sin(age*3.14159)*(1.-age)*.24;
       gl_FragColor=vec4(vLight,a);
     }
   `);
+  splashes.geometry.setAttribute('surfaceNormal', new THREE.InstancedBufferAttribute(new Float32Array(normals), 3));
 }
 function makeMist() {
   instanced([0,.24,-8, 0,.48,-15], [.13,1, .73,1.5], /* glsl */`
@@ -165,7 +180,10 @@ function makeLens() {
   const context = canvas.getContext('2d');
   const pixels = context.createImageData(64, 64);
   for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) {
-    const radius = Math.hypot((x - 31.5) / 30, (y - 31.5) / 30);
+    const px = (x - 31.5) / 30, py = (y - 31.5) / 30;
+    const angle = Math.atan2(py, px);
+    const contour = .87 + .065 * Math.sin(angle * 3 + .8) + .045 * Math.sin(angle * 5 - .4);
+    const radius = Math.hypot(px + .09 * py * py, py) / contour;
     const height = Math.round(Math.sqrt(Math.max(0, 1 - radius * radius)) * 255);
     const i = (y * 64 + x) * 4;
     pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = height; pixels.data[i + 3] = 255;
@@ -180,24 +198,50 @@ function makeLens() {
     fragmentShader: /* glsl */`
       uniform sampler2D inputBuffer,heightMap; uniform float uTime,aspect,intro; varying vec2 vUv;
       void main(){
-        vec2 refractUV=vec2(0.); float rim=0.;
-        for(int i=0;i<9;i++){
+        vec2 refractUV=vec2(0.); float highlight=0.,innerEdge=0.,wet=0.;
+        for(int i=0;i<8;i++){
           float id=float(i), phase=uTime*.035+id*.618;
           float life=fract(phase), cycle=floor(phase);
           float hash=fract(sin(id*81.17+cycle*17.1)*43758.5453);
           vec2 center=vec2(.06+hash*.88,.94-life*life*1.15);
-          vec2 size=vec2(.012/aspect,.021)*(0.6+fract(id*.371));
+          vec2 size=vec2(.008/aspect,.013)*(.65+fract(id*.371));
           float growth=smoothstep(0.,.15,life)*(1.-smoothstep(.85,1.,life));
+          float slide=life*life*1.15;
+          float trailLength=min(slide,.045)*growth;
+          vec2 trailDelta=vUv-center;
+          float trailWidth=size.x*.12*growth;
+          float trail=(1.-smoothstep(trailWidth*.35,max(trailWidth,.000001),abs(trailDelta.x)))
+            *smoothstep(0.,size.y,trailDelta.y)*(1.-smoothstep(0.,max(trailLength,.000001),trailDelta.y));
+          refractUV.x+=trail*sin(trailDelta.x/max(trailWidth,.000001)*3.)*.0007;
+          wet=max(wet,trail*.2);
           vec2 q=(vUv-center)/size/max(growth,.001)*.5+.5;
+          float angle=id*2.4;
+          q=mat2(cos(angle),-sin(angle),sin(angle),cos(angle))*(q-.5)+.5;
           if(all(greaterThan(q,vec2(0.)))&&all(lessThan(q,vec2(1.)))){
             float h=texture2D(heightMap,q).r;
             float dx=texture2D(heightMap,q+vec2(.015625,0.)).r-texture2D(heightMap,q-vec2(.015625,0.)).r;
             float dy=texture2D(heightMap,q+vec2(0.,.015625)).r-texture2D(heightMap,q-vec2(0.,.015625)).r;
-            refractUV+=vec2(dx/aspect,dy)*.065*growth;
-            rim+=h*.018;
+            float mask=smoothstep(.015,.10,h);
+            vec2 slope=mat2(cos(angle),sin(angle),-sin(angle),cos(angle))*vec2(dx,dy);
+            refractUV+=vec2(slope.x/aspect,slope.y)*.026*growth*mask;
+            wet=max(wet,mask);
+            float edge=(1.-smoothstep(.16,.43,h))*mask;
+            float lightSide=dot(normalize(-slope+vec2(.00001)),normalize(vec2(-.6,.8)));
+            highlight+=edge*pow(max(lightSide,0.),5.)*.16;
+            innerEdge+=smoothstep(.08,.18,h)*(1.-smoothstep(.22,.48,h))*max(-lightSide,0.)*.2;
           }
         }
-        gl_FragColor=vec4((texture2D(inputBuffer,clamp(vUv+refractUV,.001,.999)).rgb+rim)*intro,1.);
+        vec2 sampleUV=clamp(vUv+refractUV,.001,.999);
+        vec3 color=texture2D(inputBuffer,sampleUV).rgb;
+        if(wet>0.){
+          vec2 blur=vec2(.00045/aspect,.00045);
+          vec3 soft=(texture2D(inputBuffer,clamp(sampleUV+vec2(blur.x,0.),.001,.999)).rgb
+            +texture2D(inputBuffer,clamp(sampleUV-vec2(blur.x,0.),.001,.999)).rgb
+            +texture2D(inputBuffer,clamp(sampleUV+vec2(0.,blur.y),.001,.999)).rgb
+            +texture2D(inputBuffer,clamp(sampleUV-vec2(0.,blur.y),.001,.999)).rgb)*.25;
+          color=mix(color,soft,wet*.3);
+        }
+        gl_FragColor=vec4((color*(1.-innerEdge)+highlight)*intro,1.);
         #include <colorspace_fragment>
       }
     `,

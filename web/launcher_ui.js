@@ -36,7 +36,8 @@
     const mark = b => {
       if (!menu.includes(b)) return;
       active = b; menu.forEach(n => n.classList.toggle('active', n === b));
-      tween($('underline'), { y: b.offsetTop + b.offsetHeight - 3, width: b.offsetWidth, duration: .16 });
+      tween($('underline'), { y: b.offsetTop + b.offsetHeight - 3, width: b.offsetWidth,
+        duration: b.matches(':focus-visible') ? 0 : .16 });
     };
     const refreshMode = () => { $('modeLabel').textContent = selection.mode === 'remaster' ? 'Remaster' : 'Original 2003'; };
     const saveOptions = () => { L.save(selection); refreshMode(); };
@@ -67,7 +68,9 @@
     $('back').addEventListener('click', closePanel);
     for (const b of menu) {
       b.addEventListener('focus', () => mark(b));
-      b.addEventListener('pointerenter', () => mark(b));
+      b.addEventListener('pointerenter', () => {
+        if (!menu.some(n => n.matches(':focus-visible'))) mark(b);
+      });
       if (b.dataset.panel) b.addEventListener('click', () => openPanel(b.dataset.panel));
     }
     $('play').addEventListener('click', () => {
