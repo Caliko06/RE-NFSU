@@ -1,0 +1,41 @@
+date	driver	mode	world	normal_career	min	races	finished	flow	songs	stream_silent	underrun	starves	stops	url
+2026-10-21T22-23-31	human	unknown	False	False	3.7	0	0	False	0	3	0	3	[]	http://127.0.0.1:5180/
+2026-10-23T01-05-40	human	unknown	False	False	0.3	0	0	False	0	1	0	1	[]	http://localhost:5180/
+2026-10-23T01-17-03	human	unknown	False	False	0.3	0	0	False	0	1	0	1	[]	http://127.0.0.1:5180/
+2026-10-23T21-59-15	human	unknown	False	False	0.6	0	0	False	0	2	0	2	[]	http://127.0.0.1:5180/?worldhd=1
+2026-10-23T23-09-11	human	unknown	False	False	0.7	0	0	False	0	2	0	2	[]	http://127.0.0.1:5180/?skinhd=check
+2026-10-24T04-08-42	human	unknown	False	False	3.6	1	0	False	0	3	0	3	[]	http://127.0.0.1:5180/
+2026-10-24T04-30-06	human	unknown	False	False	3.3	1	0	False	0	3	0	3	[]	http://localhost:5180/
+2026-10-25T22-41-40	human	unknown	False	False	3.3	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-27T20-54-16	human	remaster	False	False	7.5	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-28T06-56-05	human	remaster	False	False	1.1	1	0	False	0	0	0	0	[]	http://127.0.0.1:5181/
+2026-10-28T20-54-24	human	remaster	True	False	8.1	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-29T01-08-55	human	remaster	True	False	17.3	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-29T04-34-27	human	remaster	True	False	5.4	1	0	False	0	0	0	0	[('00462a06', 'memory fault')]	http://localhost:5180/
+2026-10-29T05-42-14	human	remaster	True	False	0.9	1	0	False	0	0	0	0	[]	http://127.0.0.1:5180/
+2026-10-29T06-30-39	human	remaster	True	False	8.6	1	0	False	0	0	0	0	[]	http://127.0.0.1:5180/
+2026-10-30T23-30-33	human	remaster	True	False	1.2	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-30T23-44-19	human	remaster	True	False	1.4	1	0	False	0	0	0	0	[('00441b82', 'not lifted: int3')]	http://localhost:5180/
+2026-10-31T02-00-14	human	remaster	True	False	6.4	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-31T02-47-49	human	remaster	True	False	1.5	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-31T14-56-05	human	remaster	True	False	3.6	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-31T15-18-03	human	original	True	False	0.6	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-31T18-20-40	human	original	True	False	4.8	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-31T18-25-51	human	remaster	True	False	3.1	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-10-31T20-02-47	human	remaster	True	False	2.6	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-11-01T00-14-55	human	remaster	True	False	1.4	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-11-01T00-21-37	human	remaster	True	False	1.2	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-11-01T00-54-07	human	remaster	True	False	6.8	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-11-01T03-10-36	human	remaster	True	False	6.4	1	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-11-01T03-37-33	human	remaster	True	False	4.4	1	0	False	0	1	0	1	[('00000000', 'no lifted function at 00000000 ')]	http://localhost:5180/
+2026-11-01T16-26-42	human	remaster	True	False	0.1	0	0	False	0	0	0	0	[]	http://localhost:5180/
+2026-11-02T04-32-59	human	remaster	True	False	8.2	1	0	False	5	1	0	1	[]	http://localhost:5180/?rockport=1
+2026-11-02T04-48-50	human	remaster	True	False	0.7	1	0	False	4	1	0	1	[('005447ff', 'memory fault')]	http://localhost:5180/?rockport=1
+2026-11-03T01-17-04	human	remaster	True	False	1.2	1	0	False	4	1	0	1	[]	http://localhost:5180/?rockport=1
+2026-11-03T02-06-26	human	remaster	True	False	1.5	1	0	False	3	1	0	1	[]	http://localhost:5180/?rockport=1
+2026-11-03T21-04-39	human	remaster	True	False	2.9	1	0	False	3	0	0	0	[]	http://localhost:5180/?pool=1
+2026-11-04T21-33-11	scripted	remaster	True	False	3.3	1	0	True	5	0	0	0	[]	http://localhost:5180/?pool=1
+2026-11-05T20-27-35	scripted	remaster	True	False	0.9	1	0	True	3	2	3196	2	[]	http://127.0.0.1:5181/?mute=1&env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1&jump=0:1103&keys=20000:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_Main_PC:RETURN
+2026-11-05T20-46-57	scripted	remaster	True	False	24.4	1	0	True	7	20	0	25	[]	http://127.0.0.1:5181/?mute=1&env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1,RN_FNTIME=1&jump=0:1103&keys=20000:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_Main_PC:RETURN
+2026-11-05T21-47-34	scripted	remaster	True	False	23.2	1	0	True	15	20	0	46	[]	http://127.0.0.1:5181/?mute=1&watchdog=1&env=RN_SEED=0x1234,RN_AUTOPILOT=1,RN_FLOWLOG=1,RN_FNTIME=1&jump=0:1103&keys=20000:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_Main_PC:RETURN
+2026-11-07T02-08-39	human	remaster	True	True	7.1	2	2	False	8	0	0	0	[]	http://localhost:5180/?career=normal
