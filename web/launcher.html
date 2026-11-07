@@ -4,114 +4,80 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0e17">
 <title>Need for Speed Underground</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="launcher.css">
 </head>
-<body data-screen="main">
-<div class="bg" aria-hidden="true">
-  <!-- Layered scene (images: web/launcher/img, made for this page). data-d = parallax depth; web/launcher_scene.js moves them. -->
-  <div class="layer sky" data-d=".12"><img src="launcher/img/bg_sky.webp" alt=""></div>
-  <div class="layer city" data-d=".3">
-    <img class="cityimg" src="launcher/img/mid_city.webp" alt="">
-    <img class="neon n1" src="launcher/img/neon_1.webp" alt="">
-    <img class="neon n2" src="launcher/img/neon_2.webp" alt="">
-    <img class="neon n3" src="launcher/img/neon_3.webp" alt="">
-    <img class="neon n4" src="launcher/img/neon_4.webp" alt="">
-  </div>
-  <div class="haze"></div>
-  <div class="layer street" data-d=".55"><img src="launcher/img/street.webp" alt=""></div>
-  <i class="trail t1"></i><i class="trail t2"></i><i class="trail t3"></i>
-  <div class="layer ride" data-d=".85">
-    <div class="carbox">
-      <img class="glow" src="launcher/img/car_glow.webp" alt="">
-      <img class="car" src="launcher/img/car_hero.webp" alt="">
-      <i class="flare f1"></i><i class="flare f2"></i>
-    </div>
-  </div>
-  <canvas id="rain"></canvas>
-  <div class="shade"></div>
-</div>
+<body data-screen="main" class="boot">
+<!-- Scene: web/launcher_gl.js draws into #scene. .plate is the still image shown if WebGL is missing or has not started. -->
+<div class="plate" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="shade" aria-hidden="true"></div>
 
-<div class="stage">
-  <header class="brand">
-    <p class="eyebrow">Speed.exe en tu navegador</p>
-    <h1><span class="nfs">Need for Speed</span><img class="ug" src="launcher/img/title.webp" alt="Underground"></h1>
-    <div class="stickers" aria-hidden="true"><img class="stk s1" src="launcher/img/sticker_1.webp" alt=""><img class="stk s2" src="launcher/img/sticker_2.webp" alt=""><img class="stk s3" src="launcher/img/sticker_3.webp" alt=""><img class="stk s4" src="launcher/img/sticker_4.webp" alt=""></div>
-    <img class="refl" src="launcher/img/title.webp" alt="" aria-hidden="true">
+<div class="ui" id="ui">
+  <header class="brand panel" data-in>
+    <h1 class="logo"><img src="launcher/v2/ui/logo.webp" alt="Need for Speed Underground" width="688" height="125"><span class="sm" aria-hidden="true"><i class="sweep"></i></span></h1>
   </header>
 
-  <section class="screen" id="s-main" aria-label="Menú principal">
-    <nav class="menu" id="menu">
-      <button class="item nav" id="play" type="button"><span>Jugar</span></button>
-      <button class="item nav" data-go="presets" type="button"><span>Presets</span></button>
-      <button class="item nav" data-go="opts" type="button"><span>Opciones</span></button>
-      <button class="item nav" data-go="ctrl" type="button"><span>Controles</span></button>
-    </nav>
-    <dl class="status" aria-live="polite">
-      <div><dt>Perfil</dt><dd id="stPreset"></dd></div>
-      <div><dt>Modo</dt><dd id="stMode"></dd></div>
-    </dl>
-  </section>
+  <div class="tools" data-in>
+    <button class="tool" id="btnSnd" type="button" aria-pressed="true" aria-label="Sonido (M)" title="Sonido (M)">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path class="spk" d="M4 9.5v5h3.6L13 19V5L7.6 9.5z"/><path class="wv" d="M16 8.6c1.6 1.9 1.6 4.9 0 6.8M18.6 6c3 3.3 3 8.7 0 12"/><path class="xx" d="M16 9l6 6M22 9l-6 6"/></svg>
+    </button>
+    <button class="tool pill" id="btnMot" type="button" aria-pressed="true" title="Animación"><i class="dot" aria-hidden="true"></i><span class="ml">Animación: sí</span></button>
+  </div>
 
-  <section class="screen" id="s-presets" aria-label="Presets" hidden>
-    <h2>Presets</h2>
-    <div class="menu small" id="presetList" role="radiogroup" aria-label="Perfil"></div>
-    <p class="info" id="presetDesc"></p>
-  </section>
-
-  <section class="screen" id="s-opts" aria-label="Opciones" hidden>
-    <h2>Opciones</h2>
-    <div class="tabs nav" id="tabs" tabindex="0" role="tablist" aria-label="Grupos de opciones"></div>
-    <div class="rows" id="optList"></div>
-    <p class="info" id="help"></p>
-  </section>
-
-  <section class="screen" id="s-ctrl" aria-label="Controles" hidden>
-    <h2>Controles</h2>
-    <div class="ctrl">
-      <div>
-        <h3>Teclado</h3>
-        <p><b>Flechas</b> dirección, acelerar y frenar</p>
-        <p><b>Espacio</b> nitro</p>
-        <p><b>Shift</b> freno de mano</p>
-        <p><b>C</b> cámara</p>
-        <p><b>R</b> reiniciar el coche</p>
-        <p><b>Esc</b> pausa y atrás</p>
+  <main class="stage">
+    <section class="screen" id="s-main" aria-label="Menú principal">
+      <div class="panel menu-panel" data-in>
+        <nav class="list" id="menu" aria-label="Menú">
+          <i class="light" aria-hidden="true"></i>
+          <button class="item" id="play" type="button" data-desc="play"><span class="t">Jugar</span></button>
+          <button class="item" type="button" data-go="presets" data-desc="Tres maneras de correr."><span class="t">Perfiles</span></button>
+          <button class="item" type="button" data-go="opts" data-desc="Imagen, cámara y audio."><span class="t">Opciones</span></button>
+          <button class="item" type="button" data-go="ctrl" data-desc="Teclado, mando y táctil."><span class="t">Controles</span></button>
+        </nav>
+        <p class="desc" aria-live="polite"><span class="dl"></span></p>
       </div>
-      <div>
-        <h3>Mando</h3>
-        <p><b>Palanca izq.</b> dirección</p>
-        <p><b>RT / LT</b> acelerar / frenar</p>
-        <p><b>A</b> nitro</p>
-        <p><b>B</b> freno de mano</p>
-        <p><b>Y</b> cámara</p>
-        <p><b>RB</b> reiniciar el coche</p>
-        <p><b>Start</b> pausa</p>
-      </div>
-      <div>
-        <h3>En el juego</h3>
-        <p><b>F4</b> Original / Remaster</p>
-        <p><b>K</b> o <b>Select</b> reasignar teclas y botones</p>
-        <p><b>F2</b> registro del juego</p>
-        <p><b>Pantalla táctil</b> controles en pantalla</p>
-      </div>
-    </div>
-    <div class="menu small"><button class="item nav" data-back="1" type="button"><span>Volver</span></button></div>
-  </section>
+    </section>
 
-  <footer class="bar">
-    <span class="keys" id="keys"></span>
-    <span class="foot">F4 en el juego cambia Original/Remaster</span>
-  </footer>
+    <section class="screen" id="s-presets" aria-label="Perfiles" hidden>
+      <h2 class="head" data-in><span class="t">Perfiles</span></h2>
+      <div class="covers" id="covers" role="radiogroup" aria-label="Perfil"></div>
+      <p class="line" id="presetLine" data-in aria-live="polite"><span class="dl"></span></p>
+    </section>
+
+    <section class="screen" id="s-opts" aria-label="Opciones" hidden>
+      <div class="panel opts-panel" data-in>
+        <div class="tabbar" data-in>
+          <button class="bump" type="button" data-tab="-1" aria-label="Grupo anterior"></button>
+          <div class="tabs" id="tabs" role="tablist" aria-label="Grupos de opciones"><i class="tabline" aria-hidden="true"></i></div>
+          <button class="bump" type="button" data-tab="1" aria-label="Grupo siguiente"></button>
+        </div>
+        <div class="rows" id="optList"><i class="light" aria-hidden="true"></i></div>
+        <p class="desc" aria-live="polite"><span class="dl"></span></p>
+      </div>
+    </section>
+
+    <section class="screen" id="s-ctrl" aria-label="Controles" hidden>
+      <div class="panel ctrl-panel" data-in>
+        <div class="ctrl" id="ctrlGrid"></div>
+        <nav class="list one" id="ctrlList" aria-label="Controles"><i class="light" aria-hidden="true"></i>
+          <button class="item" type="button" data-back="1" data-desc="Reasignables con K en el juego."><span class="t">Volver</span></button>
+        </nav>
+        <p class="desc" aria-live="polite"><span class="dl"></span></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="keys" id="keysBar" data-in><div class="keysin" id="keys"></div></footer>
 </div>
 
-<div class="over" aria-hidden="true">
-  <div class="grunge"></div><div class="scan"></div><div class="vig"></div>
-  <img class="stk s5" src="launcher/img/sticker_5.webp" alt=""><img class="stk s6" src="launcher/img/sticker_6.webp" alt="">
-</div>
+<div class="fade" id="fade" aria-hidden="true"></div>
 
 <script src="launcher_opts.js"></script>
+<script src="launcher_audio.js"></script>
+<script src="launcher_gl.js"></script>
 <script src="launcher.js"></script>
-<script src="launcher_scene.js"></script>
 </body>
 </html>
