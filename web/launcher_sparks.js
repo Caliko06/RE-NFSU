@@ -4,7 +4,7 @@ import * as THREE from 'three';
 // https://threejs.org/examples/webgl_buffergeometry_instancing_billboards.html
 // One small electrical fault, not a continuous particle emitter.
 export function createLampSparks({ scene, position, rain, atlasURL }) {
-  const count = 24, gravity = 9.81, road = .025;
+  const count = 14, gravity = 9.81, road = .025;
   const quad = new THREE.PlaneGeometry(1, 1), geo = new THREE.InstancedBufferGeometry();
   geo.index = quad.index;
   geo.setAttribute('position', quad.attributes.position);
@@ -13,7 +13,8 @@ export function createLampSparks({ scene, position, rain, atlasURL }) {
   geo.setAttribute('aCenter', new THREE.InstancedBufferAttribute(centers, 3));
   geo.setAttribute('aShape', new THREE.InstancedBufferAttribute(shapes, 4));
   geo.instanceCount = count;
-  const atlas = new THREE.TextureLoader().load(atlasURL);
+  let atlasReady = false;
+  const atlas = new THREE.TextureLoader().load(atlasURL, () => { atlasReady = true; });
   atlas.colorSpace = THREE.SRGBColorSpace;
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
@@ -37,7 +38,7 @@ export function createLampSparks({ scene, position, rain, atlasURL }) {
       varying float vAlpha;
       void main() {
         vec4 spark = texture2D(uAtlas, vUv);
-        gl_FragColor = vec4(spark.rgb * 2.4, spark.a * vAlpha);
+        gl_FragColor = vec4(spark.rgb * vec3(2.8, 1.65, .65), spark.a * vAlpha);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }`,
@@ -64,15 +65,16 @@ export function createLampSparks({ scene, position, rain, atlasURL }) {
     material.needsUpdate = true;
   });
 
-  let clock = 0, nextBurst = 4.8, burstStart = -100;
+  // This clock starts at intro completion, not asset loading or page boot.
+  let clock = 0, nextBurst = 1, burstStart = -100;
   const particles = Array.from({ length: count }, () => ({}));
   const random = (a, b) => a + Math.random() * (b - a);
   function burst() {
     burstStart = clock;
     nextBurst = clock + random(4, 9);
     for (const p of particles) {
-      p.vx = random(-.85, .85); p.vz = random(-.65, .65); p.vy = random(-2.4, .5);
-      p.delay = random(0, .12); p.size = random(.07, .14);
+      p.vx = random(-.3, .6); p.vz = random(-.3, .3); p.vy = random(-1.3, .35);
+      p.delay = random(0, .12); p.size = random(.11, .18);
       p.cell = Math.floor(random(0, 8));
       p.hit = (p.vy + Math.sqrt(p.vy * p.vy + 2 * gravity * (position.y - road))) / gravity;
       p.rebound = (gravity * p.hit - p.vy) * random(.13, .2);
@@ -81,8 +83,8 @@ export function createLampSparks({ scene, position, rain, atlasURL }) {
   }
 
   return {
-    update(dt, enabled) {
-      if (!enabled) {
+    update(dt, enabled, introSettled) {
+      if (!enabled || !introSettled || !atlasReady) {
         mesh.visible = false; flash.intensity = 0; sparkColor.value.setRGB(0, 0, 0);
         return 1;
       }

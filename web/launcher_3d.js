@@ -363,12 +363,21 @@ function buildWorld() {
   pole.mesh(scene);
   const post = new Merge(new THREE.MeshStandardMaterial({ color: 0x23272d, metalness: .8, roughness: .4 }));
   post.cyl(.11, 7.4, 4.3, 3.7, -7.1, 10).box(.5, .5, .5, 4.3, .4, -7.1).box(.12, .12, 1.9, 4.3, 7.35, -6.2, 0).box(.09, .09, 1.7, 4.3, 7.2, -6.4, 0, 0, 0);
-  // Bent mounting bracket: only the existing head droops; the street stays intact.
-  post.box(.45, .16, .7, 4.3, 7.38, -5.1, 0, .16, -.24).box(.3, .1, .45, 4.3, 7.5, -5.1, 0, .16, -.24);
+  post.box(.45, .16, .7, 4.3, 7.38, -5.1).box(.3, .1, .45, 4.3, 7.5, -5.1);
   post.mesh(scene);
   lampPos.set(4.3, 7.2, -5.15);
   const lampBulb = new THREE.Mesh(new THREE.BoxGeometry(.4, .06, .6), new THREE.MeshBasicMaterial({ color: new Color(1, .7, .35).multiplyScalar(5), toneMapped: false })); lampBulb.position.set(4.3, 7.3, -5.1); scene.add(lampBulb); L.lampBulb = { mat: lampBulb.material };
-  lampBulb.rotation.set(.16, 0, -.24);
+  // Low broken fixture in the visible gap between the menu and the car.
+  // Its own dim pool preserves the original overhead lamp's scene lighting.
+  const brokenPost = new Merge(new THREE.MeshStandardMaterial({ color: 0x23272d, metalness: .8, roughness: .4 }));
+  brokenPost.cyl(.065, 3.55, -2.9, 1.775, .05, 8).box(.26, .12, .26, -2.9, .06, .05);
+  brokenPost.box(.7, .075, .09, -2.58, 3.54, .05, 0, 0, -.12);
+  brokenPost.box(.52, .16, .33, -2.22, 3.45, .05, 0, .14, -.48);
+  brokenPost.mesh(scene);
+  const brokenBulb = new THREE.Mesh(new THREE.BoxGeometry(.41, .045, .25), new THREE.MeshBasicMaterial({ color: new Color(1, .48, .12).multiplyScalar(3), toneMapped: false }));
+  brokenBulb.position.set(-2.21, 3.37, .05); brokenBulb.rotation.set(.14, 0, -.48); scene.add(brokenBulb);
+  const brokenLight = new THREE.PointLight(0xffa34b, 7, 5, 2); brokenLight.position.set(-2.21, 3.32, .05); scene.add(brokenLight);
+  L.faultBulb = { mat: brokenBulb.material, light: brokenLight, base: 7, t0: .1, seed: 19 };
   const wires = [];
   const pt = (x, y, z) => new V3(x, y, z);
   for (const o of [-.12, 0, .12, .24]) {
@@ -408,7 +417,7 @@ function buildWorld() {
 
   // Rain owns its particles and injects lens refraction into the existing grading pass.
   rain = createRain({ scene, lampPos, grading: FINAL });
-  L.lampFault = createLampSparks({ scene, position: new V3(4.45, 7.22, -5.1), rain, atlasURL: base + 'fx/lamp_sparks.png' });
+  L.lampFault = createLampSparks({ scene, position: new V3(-2.02, 3.32, .05), rain, atlasURL: base + 'fx/lamp_sparks.png' });
 }
 
 function coneMaterial(col, k) {
@@ -514,7 +523,7 @@ function placeTotem() { totem.g.position.copy(layoutPos.totem); totem.g.rotation
 
 // ---------------------------------------------------------------- post: bloom + one grading pass (DoF, aberration, grain, tone map)
 const FINAL = {
-  uniforms: { tDiffuse: { value: null }, tDepth: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uTime: { value: 0 }, uFocus: { value: 9 }, uAper: { value: .55 }, uNear: { value: .1 }, uFar: { value: 250 }, uFade: { value: 0 }, uExp: { value: .95 }, uGrain: { value: .05 }, uCA: { value: 0 }, uFlash: { value: 0 } },
+  uniforms: { tDiffuse: { value: null }, tDepth: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uTime: { value: 0 }, uFocus: { value: 9 }, uAper: { value: .55 }, uNear: { value: .1 }, uFar: { value: 250 }, uFade: { value: 0 }, uExp: { value: .95 }, uGrain: { value: .03 }, uCA: { value: 0 }, uFlash: { value: 0 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }',
   fragmentShader: `uniform sampler2D tDiffuse, tDepth; uniform vec2 uRes; uniform float uTime, uFocus, uAper, uNear, uFar, uFade, uExp, uGrain, uCA, uFlash; varying vec2 vUv;
     float linD(float d){ float z = d * 2. - 1.; return 2. * uNear * uFar / (uFar + uNear - z * (uFar - uNear)); }
@@ -599,8 +608,9 @@ function updateLights(dt) {
     l.mult = m; if (!l.manual) l.light.intensity = l.base * m * (going && /head/.test(k) ? 2.5 : 1);
   }
   if (L.lampFault) {
-    L.lamp.mult *= L.lampFault.update(dt, motion);
-    L.lamp.light.intensity = L.lamp.base * L.lamp.mult;
+    const fault = L.lampFault.update(dt, motion, introDone);
+    L.faultBulb.light.intensity = L.faultBulb.base * fault;
+    L.faultBulb.mat.color.setRGB(1, .48, .12).multiplyScalar(3 * fault);
   }
   for (const n of neons) {
     const owner = L[n.key];
@@ -640,7 +650,7 @@ function updateLights(dt) {
     it.label.material.color.setRGB(.62, .78, .9).lerp(tmpC.setRGB(1, 1, 1), hot).multiplyScalar((.45 + 1.1 * hot + .5 * it.pr) * on * fl);
     it.bar.material.opacity = clamp(s, 0, 1) * on; it.bar.material.color.copy(it.acc).multiplyScalar((1.6 + 1.4 * it.pr) * fl);
     it.chev.material.opacity = clamp(s, 0, 1) * on * (.5 + .5 * Math.abs(Math.sin(t * 5 - i)));
-    it.strip.scale.y = 1 + 1.2 * hot + 1.5 * it.pr; it.strip.material.color.copy(it.acc).multiplyScalar((.3 + 2.6 * hot + 1.5 * it.pr) * on * fl);
+    it.strip.scale.y = 1 + 1.2 * hot + 1.5 * it.pr; it.strip.material.color.setRGB(.55, .58, .62).lerp(it.acc, clamp(hot * 1.4, 0, 1)).multiplyScalar((.22 + 2.6 * hot + 1.5 * it.pr) * on * fl);   // accent color only on the active item (OWNER 2026-11-07)
     if (s > .02 && tgt) { col.r += it.acc.r * s; col.g += it.acc.g * s; col.b += it.acc.b * s; nl = s; }
   });
   if (L.sel) { const sel = L.sel.light; sel.color.copy(L.sel.col || (L.sel.col = new Color(1, 1, 1))).setRGB(col.r, col.g, col.b); const it = totem.items[selIdx]; if (it) { it.p.getWorldPosition(tmpV); totem.g.worldToLocal(tmpV); sel.position.set(tmpV.x, tmpV.y, tmpV.z + 1.4); } sel.intensity = lerp(sel.intensity, 9 * nl * (L.sel.mult = 1), 1 - Math.exp(-dt * 14)); }
