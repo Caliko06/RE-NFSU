@@ -8,7 +8,7 @@ import {
   ToneMappingEffect, ToneMappingMode, SMAAEffect, VignetteEffect,
 } from 'postprocessing';
 
-const WORLD = new URL('./launcher/world/', import.meta.url);
+const WORLD = new URL('./launcher/world/' + (/^g\d+$/.test(new URLSearchParams(location.search).get('w') || '') ? new URLSearchParams(location.search).get('w') + '/' : ''), import.meta.url);   // ?w=g2 loads web/launcher/world/g2/
 const asset = name => new URL(name, WORLD).href;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const time = { value: 0 }, lampLevels = { value: new THREE.Vector3(1, 1, 1) };
