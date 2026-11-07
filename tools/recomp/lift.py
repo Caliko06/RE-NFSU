@@ -128,7 +128,7 @@ class Lifter:
         seen, todo, switches, bad = {}, [entry], {}, set()
         while todo:
             a = todo.pop()
-            last_cmp = {}
+            last_cmp, negs = {}, set()   # negs: registers last written by `neg` (a table read backward, CRT memmove)
             while a not in seen and a not in bad:
                 if len(seen) > limit:
                     raise Unsupported("function too big")
@@ -156,6 +156,9 @@ class Lifter:
                 elif op is not None and op.type == x86.X86_OP_REG and m not in ("cmp", "test", "push") and not m.startswith("j"):
                     r = i.reg_name(op.reg)
                     last_cmp.pop({**LO8, **HI8, **R16}.get(r, r), None)
+                if op is not None and op.type == x86.X86_OP_REG and m not in ("cmp", "test", "push") and not m.startswith("j"):
+                    r = i.reg_name(op.reg)
+                    (negs.add if m == "neg" else negs.discard)({**LO8, **HI8, **R16}.get(r, r))
                 if m in ("call", "mul", "div", "imul", "idiv", "cdq", "lodsb", "lodsd"):
                     last_cmp.clear()
                 if i.group(CS_GRP_RET) or m in ("hlt", "int3", "ud2", "iretd", "retf", "int", "int1", "into"):
@@ -176,6 +179,13 @@ class Lifter:
                         if mm and not mm.base and mm.index and mm.scale == 4:
                             n = last_cmp.get(i.reg_name(mm.index))
                             tg = self.table(mm.disp, None if n is None else n + 1)
+                            if i.reg_name(mm.index) in negs:
+                                # `neg idx; jmp [idx*4+disp]` (0x6727f6, 0x678ef6): entries sit below disp. Read down while
+                                # the dword points inside this function; the dword past the table (0x6728a8) does not.
+                                k = 1
+                                while self.in_image(mm.disp - 4 * k) and entry <= self.u32(mm.disp - 4 * k) < nxt:
+                                    tg.append(self.u32(mm.disp - 4 * k))
+                                    k += 1
                             switches[a] = tg
                             todo.extend(t for t in tg if not (t != entry and self.is_func(t)))
                         break

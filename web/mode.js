@@ -23,7 +23,8 @@ const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HU
 const RN_MODE = (() => {
   const q = new URLSearchParams(location.search).get('mode');
   if (q === 'original' || q === 'remaster') return q;
-  try { return localStorage.getItem('rn_mode') === 'original' ? 'original' : 'remaster'; } catch { return 'remaster'; }
+  // Default original (stage 1, docs/GOAL.md); the remaster only when the player picked it.
+  try { return localStorage.getItem('rn_mode') === 'remaster' ? 'remaster' : 'original'; } catch { return 'original'; }
 })();
 // Degradation switches for weaker devices (OWNER 2026-11-02: accepted, each a switch, off by default):
 // ?fx=0: the remaster's visual effects off (texture pack, HD skins, bloom, FXAA, sharpen, aniso, car and road shader

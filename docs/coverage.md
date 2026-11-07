@@ -7,7 +7,7 @@ itself about its own state.
 |---|---|---|
 | How much of Speed.exe is lifted to C? | 13,756 of 14,371 seeds (95.7 %) | `census/lift_report.json`, `tools/recomp/build.py` |
 | How much of it runs in a session? | not measured yet: the counter in §4 only sees indirect calls, so 1,006 / 1,627 are floors | `host/dispatch.c`, §4 |
-| How much of the career did a person actually play? | 167 of 167 rows, 30 tracks, 282 runs | `census/completion.json`, `tools/census/rows.py` |
+| Do all event rows still load and return to the menu? (RN_JUMP + injected finish, not played) | 167 of 167 rows (116 career, 46 quick race, 5 game), 30 tracks, 282 runs | `census/completion.json`, `tools/census/rows.py` |
 
 Everything below is measured on `pc/Speed.exe` md5 `b6b9232c55376b3c38c56aac1f8a121d` (base 0x400000), branch
 `publish`, 2026-10-29.
@@ -73,7 +73,7 @@ The gate field in `census/difftest.json` says **FAIL**, and it is not a lie: 4 f
 | `0x642774` | `F6 /1` is `TEST` on real CPUs (undocumented alias); QEMU 5 calls it invalid | documented reference deviation |
 | `0x673824` | `FPREM` with invalid operands: the SDM gives −NaN, QEMU 5 gives +NaN | documented reference deviation |
 | `0x67ca06` | `FPREM` on unsupported 80-bit encodings: the SDM gives −NaN, QEMU 5 gives +NaN | documented reference deviation |
-| `0x67a337` | the reference retires into `0x6728cc`; there is no lifted function there | **explained 2026-10-29: real lifter gap, not applied.** CRT memmove `0x672630` copies backward and jumps through a table that is indexed negatively (`neg ecx; jmp [ecx*4+0x6728c8]`, entries at `0x6728ac..0x6728c8`); `Lifter.table()` (lift.py:177) reads only forward, so those 7 labels are missing and the case falls to `rn_call`. Same pattern in the second CRT copy `0x678d30` (table `0x678fac`). Direct memmove probe: 224 of 312 overlapping backward copies of 4..34 bytes stop. Evidence: docs/re/audit/diag_67a337.md |
+| `0x67a337` | the reference retires into `0x6728cc`; there is no lifted function there | **fixed 2026-11-06** (lift.py body() reads `neg idx` tables downward; `RN_ONLY=0x67a337` case 8 now matches, census/difftest.json not re-run). Was: real lifter gap. CRT memmove `0x672630` copies backward and jumps through a table that is indexed negatively (`neg ecx; jmp [ecx*4+0x6728c8]`, entries at `0x6728ac..0x6728c8`); `Lifter.table()` (lift.py:177) reads only forward, so those 7 labels are missing and the case falls to `rn_call`. Same pattern in the second CRT copy `0x678d30` (table `0x678fac`). Direct memmove probe: 224 of 312 overlapping backward copies of 4..34 bytes stop. Evidence: docs/re/audit/diag_67a337.md |
 
 So the port's honest number is 5,809 of 5,812 explained comparisons, with one open item that has never shown up in a run
 (the game does not reach it in the career census or the route).
@@ -130,7 +130,7 @@ function) and an injected finish, and records what it saw. `census/completion.js
 | results | 215 / 282 | back to menu | 203 / 282 |
 | unload | 202 / 282 | second race | 12 / 282 |
 
-167 of 167 career rows, 30 distinct tracks, 18,315 screenshots. 167/167 is a **regression guard**: it proves no row was
+167 of 167 rows (116 career, 46 quick race, 5 game), 30 distinct tracks, 18,315 screenshots. 167/167 is a **regression guard**: it proves no row was
 broken by a change, not that a human played it. The OWNER's own playthrough is the other half, and it lives in
 `build/web.log`.
 
