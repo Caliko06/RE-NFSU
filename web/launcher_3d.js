@@ -5,6 +5,7 @@
 // The menu labels are drawn with the game's font atlas (launcher/v2/ui/game_font.*). If WebGL2 or an asset fails, start() rejects and the page shows the static plate.
 import * as THREE from 'three';
 import { createRain } from './launcher_rain.js';
+import { createLampSparks } from './launcher_sparks.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -136,14 +137,6 @@ const boxMesh = (parent, mat, w, h, d, x, y, z, ry = 0, cast = true) => { const 
 const LK = .085;                            // lights are in candela (three r170): the numbers below are written for a 2 m to 10 m street
 const addLight = (name, light, t0, seed = 0, o = {}) => { light.intensity *= LK; L[name] = { light, base: light.intensity, t0, seed, ...o }; scene.add(light); if (light.target) scene.add(light.target); return L[name]; };
 
-function chamfer(w, h, c) {
-  const s = new THREE.Shape(); s.moveTo(-w / 2 + c, h / 2); s.lineTo(w / 2, h / 2); s.lineTo(w / 2, -h / 2 + c); s.lineTo(w / 2 - c, -h / 2); s.lineTo(-w / 2, -h / 2); s.lineTo(-w / 2, h / 2 - c); s.closePath(); return s;
-}
-function shapeGeo(shape, w, h) {                 // ShapeGeometry with 0..1 uv
-  const g = new THREE.ShapeGeometry(shape), p = g.attributes.position, uv = g.attributes.uv;
-  for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / w + .5, p.getY(i) / h + .5);
-  return g;
-}
 function wire(a, b, sag, list, r = .024) {
   const mid = a.clone().lerp(b, .5); mid.y -= sag * 2;
   list.push(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(a, mid, b), 28, r, 4, false));
@@ -370,10 +363,12 @@ function buildWorld() {
   pole.mesh(scene);
   const post = new Merge(new THREE.MeshStandardMaterial({ color: 0x23272d, metalness: .8, roughness: .4 }));
   post.cyl(.11, 7.4, 4.3, 3.7, -7.1, 10).box(.5, .5, .5, 4.3, .4, -7.1).box(.12, .12, 1.9, 4.3, 7.35, -6.2, 0).box(.09, .09, 1.7, 4.3, 7.2, -6.4, 0, 0, 0);
-  post.box(.45, .16, .7, 4.3, 7.38, -5.1).box(.3, .1, .45, 4.3, 7.5, -5.1);
+  // Bent mounting bracket: only the existing head droops; the street stays intact.
+  post.box(.45, .16, .7, 4.3, 7.38, -5.1, 0, .16, -.24).box(.3, .1, .45, 4.3, 7.5, -5.1, 0, .16, -.24);
   post.mesh(scene);
   lampPos.set(4.3, 7.2, -5.15);
   const lampBulb = new THREE.Mesh(new THREE.BoxGeometry(.4, .06, .6), new THREE.MeshBasicMaterial({ color: new Color(1, .7, .35).multiplyScalar(5), toneMapped: false })); lampBulb.position.set(4.3, 7.3, -5.1); scene.add(lampBulb); L.lampBulb = { mat: lampBulb.material };
+  lampBulb.rotation.set(.16, 0, -.24);
   const wires = [];
   const pt = (x, y, z) => new V3(x, y, z);
   for (const o of [-.12, 0, .12, .24]) {
@@ -413,6 +408,7 @@ function buildWorld() {
 
   // Rain owns its particles and injects lens refraction into the existing grading pass.
   rain = createRain({ scene, lampPos, grading: FINAL });
+  L.lampFault = createLampSparks({ scene, position: new V3(4.45, 7.22, -5.1), rain, atlasURL: base + 'fx/lamp_sparks.png' });
 }
 
 function coneMaterial(col, k) {
@@ -487,45 +483,38 @@ function buildTotem(labels) {
   post.box(3.9, .12, .12, 0, 4.5, -.2).box(3.6, .06, .06, 0, 1.0, -.3).box(.07, 3.9, .07, -.75, 2.5, -.32).box(.07, 3.9, .07, .75, 2.5, -.32);
   post.mesh(g);
   const hood = new THREE.Mesh(new THREE.BoxGeometry(3.4, .12, .55), metal); hood.position.set(0, 4.7, .05); g.add(hood);
-  const outer = chamfer(PW, PH, .2), inner = chamfer(PW - .16, PH - .16, .15);
-  const frameGeo = new THREE.ExtrudeGeometry(outer, { depth: PD, bevelEnabled: true, bevelThickness: .035, bevelSize: .035, bevelSegments: 1, steps: 1 }); frameGeo.translate(0, 0, -PD / 2);
-  const faceGeo = shapeGeo(inner, PW - .16, PH - .16);
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x15181c, metalness: .9, roughness: .3 });
-  const tubeGeo = new THREE.BoxGeometry(PW - .5, .045, .05);
+  // no plates: the label floats, a thin accent strip runs under it, the selected one gets a neon bar on its left edge
+  const stripTex = stripTexture();
+  const stripGeo = new THREE.PlaneGeometry(PW - .1, .034), barGeo = new THREE.PlaneGeometry(.07, PH - .08), pickGeo = new THREE.PlaneGeometry(PW + .1, PH + .14);
+  const glow = (map, o = {}) => new THREE.MeshBasicMaterial({ map, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false, ...o });
   labels.forEach((txt, i) => {
     const p = new THREE.Group(); p.position.set(0, Y0 + (labels.length - 1 - i) * GAP, 0); g.add(p);
-    const face = new THREE.Mesh(faceGeo, new THREE.MeshPhysicalMaterial({ color: 0x0a1c26, emissive: new Color(.15, .45, .6), emissiveIntensity: .5, emissiveMap: faceTex(), roughness: .55, metalness: 0, clearcoat: .35, clearcoatRoughness: .4 }));
-    face.position.z = PD / 2 + .036; p.add(face);
-    const fr = new THREE.Mesh(frameGeo, frameMat); fr.castShadow = true; fr.userData.idx = i; p.add(fr); totem.frames.push(fr);
-    const label = new THREE.Mesh(new THREE.PlaneGeometry(PW - .16, (PW - .16) * 244 / 1024), new THREE.MeshBasicMaterial({ map: canvasTex(labelCanvas(txt, 1024, 244, .4, 235)), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false, color: new Color(1, 1, 1) }));
-    label.position.z = PD / 2 + .04; label.position.y = 0; p.add(label); label.renderOrder = 5;
-    const chev = new THREE.Mesh(new THREE.PlaneGeometry(.5, .25), new THREE.MeshBasicMaterial({ map: tex('chev'), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false, opacity: 0, color: new Color(2, 2, 2) }));
-    chev.position.set(-PW / 2 + .42, 0, PD / 2 + .045); p.add(chev); chev.renderOrder = 5;
-    const tube = new THREE.Mesh(tubeGeo, new THREE.MeshBasicMaterial({ color: new Color(ACC[i % 4]).multiplyScalar(.2), toneMapped: false })); tube.position.set(-.1, -PH / 2 + .035, PD / 2 + .05); p.add(tube);
-    const bolt = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .04, 6), metal); bolt.rotation.x = Math.PI / 2; bolt.position.set(PW / 2 - .15, PH / 2 - .1, PD / 2 + .05); p.add(bolt);
-    // arms that bolt the box to the posts
-    const arm = new THREE.Mesh(new THREE.BoxGeometry(PW + .1, .06, .06), metal); arm.position.set(0, 0, -PD / 2 - .05); p.add(arm);
-    totem.items.push({ p, face, label, chev, tube, sel: 0, vel: 0, base: p.position.clone(), acc: new Color(ACC[i % 4]), lit: 0, t0: 1.9 + i * .16, seed: 40 + i });
+    const pick = new THREE.Mesh(pickGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false })); pick.userData.idx = i; p.add(pick); totem.frames.push(pick);
+    const label = new THREE.Mesh(new THREE.PlaneGeometry(PW, PW * 244 / 1024), glow(canvasTex(labelCanvas(txt, 1024, 244, .4, 120)), { color: new Color(1, 1, 1) }));
+    label.position.z = .02; p.add(label); label.renderOrder = 5;
+    const strip = new THREE.Mesh(stripGeo, glow(stripTex, { color: new Color(ACC[i % 4]).multiplyScalar(.2) }));
+    strip.position.set(0, -PH / 2 + .1, .02); p.add(strip); strip.renderOrder = 5;
+    const bar = new THREE.Mesh(barGeo, glow(null, { color: new Color(ACC[i % 4]), opacity: 0 }));
+    bar.position.set(-PW / 2 - .02, 0, .02); p.add(bar); bar.renderOrder = 5;
+    const chev = new THREE.Mesh(new THREE.PlaneGeometry(.3, .15), glow(tex('chev'), { opacity: 0, color: new Color(2, 2, 2) }));
+    chev.position.set(-PW / 2 + .22, 0, .03); p.add(chev); chev.renderOrder = 5;
+    totem.items.push({ p, label, chev, strip, bar, sel: 0, vel: 0, pr: 0, base: p.position.clone(), acc: new Color(ACC[i % 4]), lit: 0, t0: 1.9 + i * .16, seed: 40 + i });
   });
   const sel = new THREE.PointLight(0xff2a3c, 0, 9, 2); sel.position.set(0, 2.4, 1.6); g.add(sel); L.sel = { light: sel, base: 1, t0: 0, seed: 0, local: true, manual: true };
   // road lamp on top of the totem
   const lamp = new THREE.Mesh(new THREE.BoxGeometry(.5, .08, .3), new THREE.MeshBasicMaterial({ color: new Color(.7, .9, 1).multiplyScalar(3) })); lamp.position.set(0, 4.62, .1); g.add(lamp); totem.lamp = lamp;
   placeTotem();
 }
-let _faceTex = null;
-function faceTex() {
-  if (_faceTex) return _faceTex;
-  const c = document.createElement('canvas'); c.width = 512; c.height = 128; const x = c.getContext('2d');
-  const gr = x.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, '#9fdcf2'); gr.addColorStop(.12, '#3f8aa8'); gr.addColorStop(.55, '#1d5470'); gr.addColorStop(1, '#0e3246'); x.fillStyle = gr; x.fillRect(0, 0, 512, 128);
-  const gh = x.createLinearGradient(0, 0, 512, 0); gh.addColorStop(0, 'rgba(255,255,255,.25)'); gh.addColorStop(.6, 'rgba(255,255,255,.05)'); gh.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = gh; x.fillRect(0, 0, 512, 128);
-  x.fillStyle = 'rgba(0,0,0,.16)'; for (let y = 0; y < 128; y += 3) x.fillRect(0, y, 512, 1);
-  return (_faceTex = canvasTex(c));
+function stripTexture() {                                      // thin line, bright at the left, fading to the right
+  const c = document.createElement('canvas'); c.width = 256; c.height = 4; const x = c.getContext('2d');
+  const gr = x.createLinearGradient(0, 0, 256, 0); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.55, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = gr; x.fillRect(0, 0, 256, 4); return canvasTex(c);
 }
 function placeTotem() { totem.g.position.copy(layoutPos.totem); totem.g.rotation.y = .5; }
 
 // ---------------------------------------------------------------- post: bloom + one grading pass (DoF, aberration, grain, tone map)
 const FINAL = {
-  uniforms: { tDiffuse: { value: null }, tDepth: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uTime: { value: 0 }, uFocus: { value: 9 }, uAper: { value: .55 }, uNear: { value: .1 }, uFar: { value: 250 }, uFade: { value: 0 }, uExp: { value: .95 }, uGrain: { value: .05 }, uCA: { value: .0035 }, uFlash: { value: 0 } },
+  uniforms: { tDiffuse: { value: null }, tDepth: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uTime: { value: 0 }, uFocus: { value: 9 }, uAper: { value: .55 }, uNear: { value: .1 }, uFar: { value: 250 }, uFade: { value: 0 }, uExp: { value: .95 }, uGrain: { value: .05 }, uCA: { value: 0 }, uFlash: { value: 0 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }',
   fragmentShader: `uniform sampler2D tDiffuse, tDepth; uniform vec2 uRes; uniform float uTime, uFocus, uAper, uNear, uFar, uFade, uExp, uGrain, uCA, uFlash; varying vec2 vUv;
     float linD(float d){ float z = d * 2. - 1.; return 2. * uNear * uFar / (uFar + uNear - z * (uFar - uNear)); }
@@ -609,6 +598,10 @@ function updateLights(dt) {
     const m = strike(t - l.t0) * (l.flicker ? lerp(1, flick(t, l.seed, 1), l.flicker * calm) : 1);
     l.mult = m; if (!l.manual) l.light.intensity = l.base * m * (going && /head/.test(k) ? 2.5 : 1);
   }
+  if (L.lampFault) {
+    L.lamp.mult *= L.lampFault.update(dt, motion);
+    L.lamp.light.intensity = L.lamp.base * L.lamp.mult;
+  }
   for (const n of neons) {
     const owner = L[n.key];
     // A tired tube briefly loses its ballast once per 23 seconds; spill follows the tube.
@@ -641,12 +634,13 @@ function updateLights(dt) {
     const on = strike(t - it.t0) * (1 - .85 * totem.hide), tgt = (i === selIdx && screenName === 'main') ? 1 : 0;
     const K = motion ? 210 : 600, D = motion ? 15 : 50; it.vel += (K * (tgt - it.sel) - D * it.vel) * dt; it.sel += it.vel * dt;
     const s = it.sel, sc = clamp(s, 0, 1.15); it.lit = on;
-    it.p.position.z = it.base.z + .66 * s; it.p.position.x = it.base.x - .05 * s; it.p.rotation.y = -.1 * s; it.p.scale.setScalar(1 + .07 * s);
+    it.pr = lerp(it.pr, going && i === selIdx ? 1 : 0, 1 - Math.exp(-dt * 30));
+    it.p.position.z = it.base.z + .3 * s; it.p.position.x = it.base.x + .24 * s - .05 * it.pr; it.p.rotation.y = -.04 * s; it.p.scale.setScalar(1 + .035 * s - .03 * it.pr);
     const hot = clamp(s, 0, 1.1), fl = i === selIdx ? flick(t, it.seed, .6 * (motion ? 1 : .2)) : 1;
-    const fm = it.face.material; fm.emissive.setRGB(.15, .45, .6).lerp(it.acc, clamp(s, 0, 1) * .72); fm.emissiveIntensity = (.38 + 1.5 * hot) * on * fl;
-    it.label.material.color.setRGB(.8, .93, 1).lerp(tmpC.setRGB(1, 1, 1), hot).multiplyScalar((.85 + .75 * hot) * on * fl);
+    it.label.material.color.setRGB(.62, .78, .9).lerp(tmpC.setRGB(1, 1, 1), hot).multiplyScalar((.45 + 1.1 * hot + .5 * it.pr) * on * fl);
+    it.bar.material.opacity = clamp(s, 0, 1) * on; it.bar.material.color.copy(it.acc).multiplyScalar((1.6 + 1.4 * it.pr) * fl);
     it.chev.material.opacity = clamp(s, 0, 1) * on * (.5 + .5 * Math.abs(Math.sin(t * 5 - i)));
-    it.tube.material.color.copy(it.acc).multiplyScalar((.25 + 3.5 * hot) * on * fl);
+    it.strip.scale.y = 1 + 1.2 * hot + 1.5 * it.pr; it.strip.material.color.copy(it.acc).multiplyScalar((.3 + 2.6 * hot + 1.5 * it.pr) * on * fl);
     if (s > .02 && tgt) { col.r += it.acc.r * s; col.g += it.acc.g * s; col.b += it.acc.b * s; nl = s; }
   });
   if (L.sel) { const sel = L.sel.light; sel.color.copy(L.sel.col || (L.sel.col = new Color(1, 1, 1))).setRGB(col.r, col.g, col.b); const it = totem.items[selIdx]; if (it) { it.p.getWorldPosition(tmpV); totem.g.worldToLocal(tmpV); sel.position.set(tmpV.x, tmpV.y, tmpV.z + 1.4); } sel.intensity = lerp(sel.intensity, 9 * nl * (L.sel.mult = 1), 1 - Math.exp(-dt * 14)); }

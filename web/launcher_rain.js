@@ -35,26 +35,26 @@ function lens(grading, clock) {
   grading.fragmentShader = grading.fragmentShader.replace('void main(){', `
     uniform float uRainTime;
     vec2 lensRain(vec2 uv) {
-      vec2 grid = vec2(uRes.x / uRes.y, 1.) * 7.;
+      vec2 grid = vec2(uRes.x / uRes.y, 1.) * 6.;
       vec2 st = uv * grid;
       vec2 id = floor(st), cell = fract(st) - .5;
       float seed = h(id + 73.1);
-      float cycle = uRainTime * (.06 + seed * .055) + seed * 13.;
+      float cycle = uRainTime * (.018 + seed * .014) + seed * 13.;
       float age = fract(cycle);
-      float alive = step(.73, h(id + floor(cycle) * 17.7));
+      float alive = step(.93, h(id + floor(cycle) * 17.7));
       float envelope = smoothstep(0., .12, age) * (1. - smoothstep(.8, 1., age));
       float x = (h(id + 9.2) - .5) * .65 + sin(age * 9. + seed * 30.) * .025;
       float y = .38 - .78 * age * age;
-      vec2 p = (cell - vec2(x, y)) / vec2(.09, .12);
+      vec2 p = (cell - vec2(x, y)) / vec2(.052, .072);
       float bead = exp(-dot(p, p) * 2.8);
       // A thin, broken trail above the moving bead; never a full-screen water sheet.
-      float trailX = (cell.x - x) / .018;
+      float trailX = (cell.x - x) / .009;
       float trail = exp(-trailX * trailX) *
-        smoothstep(y, y + .06, cell.y) * (1. - smoothstep(y + .08, y + .4, cell.y));
+        smoothstep(y, y + .06, cell.y) * (1. - smoothstep(y + .06, y + .24, cell.y));
       trail *= .45 + .55 * sin(cell.y * 110. + seed * 20.);
-      vec2 normal = p * bead * .045 + vec2((cell.x - x) * trail * .16, 0.);
+      vec2 normal = p * bead * .028 + vec2((cell.x - x) * trail * .09, 0.);
       float edge = smoothstep(.12, .35, length((uv - .5) * vec2(uRes.x / uRes.y, 1.)));
-      return normal / grid * alive * envelope * (.3 + .7 * edge);
+      return normal / grid * alive * envelope * (.3 + .7 * edge) * smoothstep(.25, .4, uv.x);
     }
     void main(){`);
   grading.fragmentShader = grading.fragmentShader.replace(
@@ -65,7 +65,16 @@ function lens(grading, clock) {
 export function createRain({ scene, lampPos, grading }) {
   const group = new THREE.Group();
   const clock = { value: 0 };
+  const loader = new THREE.TextureLoader();
+  const sheet = name => {
+    const texture = loader.load(new URL(`./launcher/v3/fx/${name}.png`, import.meta.url).href);
+    texture.colorSpace = THREE.NoColorSpace; // Atlas RGB is a coverage mask; scene lights supply color.
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    return { value: texture };
+  };
   const uniforms = {
+    uCrowns: sheet('rain_crowns'), uStreaks: sheet('rain_streaks'),
     uTime: clock, uWind: { value: new THREE.Vector2(.8, .18) },
     uCar: { value: new THREE.Matrix4() }, uHasCar: { value: 0 },
     uLightPos: { value: Array.from({ length: lightCount }, () => lampPos.clone()) },
@@ -74,15 +83,15 @@ export function createRain({ scene, lampPos, grading }) {
   lens(grading, clock);
   const material = (vertexShader, fragmentShader) => new THREE.ShaderMaterial({
     uniforms, vertexShader, fragmentShader, transparent: true, depthWrite: false,
-    blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+    blending: THREE.NormalBlending, side: THREE.DoubleSide, fog: false,
   });
-  const streaks = new THREE.Mesh(geometry(4200), material(`
+  const streaks = new THREE.Mesh(geometry(3200), material(`
     attribute vec4 aSeed;
     uniform float uTime;
     uniform vec2 uWind;
     varying vec2 vUv;
     varying vec3 vColor;
-    varying float vAlpha, vNear;
+    varying float vAlpha, vNear, vVariant;
     ${lighting}
     void main() {
       float speed = 10. + aSeed.w * 6.;
@@ -93,88 +102,85 @@ export function createRain({ scene, lampPos, grading }) {
       vNear = 1. - smoothstep(3., 15., distanceToEye);
       vec3 direction = normalize(vec3(uWind.x * .12, -1., uWind.y * .12));
       vec3 right = normalize(cross(direction, normalize(cameraPosition - p)));
-      float width = mix(.009, .055, vNear);
-      float exposure = mix(.32, .74, vNear) * (.75 + .5 * aSeed.w);
+      // The photographed core occupies only ~5% of its atlas cell width.
+      float width = mix(.12, .26, vNear);
+      float exposure = mix(.28, .60, vNear) * (.75 + .5 * aSeed.w);
       vec3 vertex = p + right * position.x * width + direction * position.y * exposure;
-      vColor = rainLight(p);
+      vColor = min(rainLight(p), vec3(.85));
+      vVariant = floor(aSeed.w * 3.999);
       vAlpha = smoothstep(.7, 2.5, distanceToEye) * (1. - smoothstep(22., 36., distanceToEye));
       vAlpha *= smoothstep(0., .3, p.y) * (.45 + aSeed.w * .55);
+      vec4 clip = projectionMatrix * viewMatrix * vec4(p, 1.);
+      float screenX = clip.x / max(clip.w, .001) * .5 + .5;
+      // Thin density, rather than just dimming a curtain across the menu.
+      float menu = 1. - smoothstep(.29, .40, screenX);
+      vAlpha *= 1. - menu * step(aSeed.x, .83) * mix(.65, 1., vNear);
       vUv = uv;
       gl_Position = projectionMatrix * viewMatrix * vec4(vertex, 1.);
     }`, `
     varying vec2 vUv;
     varying vec3 vColor;
-    varying float vAlpha, vNear;
+    varying float vAlpha, vNear, vVariant;
+    uniform sampler2D uStreaks;
     void main() {
-      float x = abs(vUv.x - .5) * 2.;
-      float core = exp(-x * x * mix(9., 3., vNear));
-      float ends = smoothstep(0., .17, vUv.y) * (1. - smoothstep(.65, 1., vUv.y));
-      float a = core * ends * vAlpha * mix(.65, .35, vNear);
-      gl_FragColor = vec4(vColor * 1.8, a);
+      vec2 tile = vec2(mod(vVariant, 2.), 1. - floor(vVariant / 2.));
+      vec4 sprite = texture2D(uStreaks, (tile + clamp(vUv, .006, .994)) / 2.);
+      float coverage = dot(sprite.rgb, vec3(.3333)) * sprite.a;
+      float a = coverage * vAlpha * mix(.5, .24, vNear);
+      gl_FragColor = vec4(vColor, a);
     }`));
   streaks.frustumCulled = false;
   streaks.renderOrder = 7;
   group.add(streaks);
 
-  // Three ballistic droplets per impact; shared seeds keep each crown in sync on the GPU.
-  const splashCount = 720, splashGeo = geometry(splashCount * 3);
+  // One photographed crown per impact, not three independent bright points.
+  const carSplashCount = 12, splashCount = 480, splashGeo = geometry(splashCount);
   const seeds = splashGeo.getAttribute('aSeed');
-  const hits = new Float32Array(splashCount * 9);
-  const lobes = new Float32Array(splashCount * 3);
-  for (let i = 0; i < splashCount; i++) {
-    for (let j = 0; j < 3; j++) {
-      const k = i * 3 + j;
-      if (j) seeds.array.copyWithin(k * 4, i * 12, i * 12 + 4);
-      lobes[k] = j;
-      // First 160 crowns land on the body; the rest on the street.
-      hits[k * 3 + 1] = i < 160 ? -100 : .025;
-    }
-  }
+  const hits = new Float32Array(splashCount * 3);
+  for (let i = 0; i < splashCount; i++) hits[i * 3 + 1] = i < carSplashCount ? -100 : .025;
   splashGeo.setAttribute('aHit', new THREE.InstancedBufferAttribute(hits, 3));
-  splashGeo.setAttribute('aLobe', new THREE.InstancedBufferAttribute(lobes, 1));
   const splashes = new THREE.Mesh(splashGeo, material(`
     attribute vec4 aSeed;
     attribute vec3 aHit;
-    attribute float aLobe;
     uniform float uTime, uHasCar;
     uniform mat4 uCar;
-    uniform vec2 uWind;
     varying vec2 vUv;
     varying vec3 vColor;
-    varying float vAlpha;
+    varying float vAlpha, vFrame;
     ${lighting}
     void main() {
       float onCar = step(.1, aHit.y);
       vec3 road = vec3((aSeed.x - .5) * 25. + 2., .025, (aSeed.z - .5) * 24.);
       vec3 impact = onCar > .5 ? (uCar * vec4(aHit, 1.)).xyz : road;
-      float age = fract(uTime * (1.8 + aSeed.w) + aSeed.y);
-      float life = .23 + .08 * aSeed.x;
-      float seconds = age * life;
-      float angle = aLobe * 2.0944 + aSeed.x * 31.;
-      vec2 spread = vec2(cos(angle), sin(angle)) * (.5 + aSeed.z * .6);
-      vec3 p = impact + vec3(spread.x * seconds, (1.15 + aSeed.z * .5) * seconds - 5. * seconds * seconds, spread.y * seconds);
-      p.xz += uWind * seconds * .12;
-      vec4 mv = viewMatrix * vec4(p, 1.);
-      float size = mix(.018, .009, age);
-      mv.xy += position.xy * vec2(size, size * (1.5 - age * .5));
-      vec3 carPos = uCar[3].xyz;
-      // No street impacts beneath the car's footprint (rotation about Y only).
-      vec3 rel = road - carPos;
+      float cycle = fract(uTime * (.38 + aSeed.w * .18) + aSeed.y);
+      // A .22-.28 second impact, followed by ~2 seconds without a sprite.
+      float age = min(cycle / ((.22 + .06 * aSeed.x) * (.38 + aSeed.w * .18)), 1.);
+      vFrame = min(floor(age * 16.), 15.);
+      float size = (.09 + aSeed.z * .055) * mix(1., .62, onCar);
+      vec4 mv = viewMatrix * vec4(impact, 1.);
+      // Low-angle photographic ellipse is already baked into the sheet.
+      mv.xy += (position.xy + vec2(0., .15)) * size;
+      vec3 rel = road - uCar[3].xyz;
       vec2 local = vec2(dot(rel, uCar[0].xyz), dot(rel, uCar[2].xyz));
       float underCar = (1. - step(1., abs(local.x))) * (1. - step(2.35, abs(local.y))) * uHasCar;
-      vAlpha = (1. - age) * smoothstep(0., .045, age) * (1. - step(p.y, impact.y - .005));
-      vAlpha *= onCar > .5 ? uHasCar : (1. - underCar) * step(-1., aHit.y);
-      vColor = rainLight(impact) * 2.8;
+      vAlpha = smoothstep(0., .06, age) * (1. - smoothstep(.55, 1., age));
+      // Unsampled car slots remain off; never emit phantom street impacts.
+      vAlpha *= onCar > .5 ? uHasCar * .16 : (1. - underCar) * step(-1., aHit.y) * .42;
+      vColor = min(rainLight(impact) * .7, vec3(.6));
       vUv = uv;
       gl_Position = projectionMatrix * mv;
     }`, `
+    uniform sampler2D uCrowns;
     varying vec2 vUv;
     varying vec3 vColor;
-    varying float vAlpha;
+    varying float vAlpha, vFrame;
     void main() {
-      vec2 p = vUv * 2. - 1.;
-      float a = exp(-dot(p, p) * 3.5) * vAlpha;
-      gl_FragColor = vec4(vColor, a);
+      vec2 tile = vec2(mod(vFrame, 4.), 3. - floor(vFrame / 4.));
+      vec4 sprite = texture2D(uCrowns, (tile + clamp(vUv, .008, .992)) / 4.);
+      // Keep water edges, suppress the broad gray fill in the photographed puddle.
+      float edge = smoothstep(.22, .72, dot(sprite.rgb, vec3(.3333)));
+      vec2 pad = smoothstep(vec2(0.), vec2(.10), vUv) * (1. - smoothstep(vec2(.9), vec2(1.), vUv));
+      gl_FragColor = vec4(vColor, sprite.a * edge * pad.x * pad.y * vAlpha);
     }`));
   splashes.frustumCulled = false;
   splashes.renderOrder = 7;
@@ -188,7 +194,7 @@ export function createRain({ scene, lampPos, grading }) {
   group.userData.update = (time, motion, car, lights, gradingUniforms) => {
     const dt = Math.max(0, Math.min(time - lastTime, .05));
     lastTime = time;
-    rainTime += dt * (motion ? 1 : .4);
+    rainTime += dt * (motion ? 1 : .12);
     clock.value = rainTime;
     gradingUniforms.uRainTime.value = rainTime;
     // Two slow gust scales prevent lockstep swaying and keep reduced motion gentle.
@@ -207,20 +213,18 @@ export function createRain({ scene, lampPos, grading }) {
     if (bodySampled) return;
     bodySampled = true;
     // Sample the shipped SKYLINE once, so roof/hood impacts follow its actual surface and layout.
-    for (let i = 0; i < 160; i++) {
-      const k = i * 12;
+    for (let i = 0; i < carSplashCount; i++) {
+      const k = i * 4;
       const x = (seeds.array[k] - .5) * 1.35;
-      const z = i < 85 ? -.72 + seeds.array[k + 2] * .95 : 1.05 + seeds.array[k + 2] * .8;
+      const z = i < 8 ? -.72 + seeds.array[k + 2] * .95 : 1.05 + seeds.array[k + 2] * .8;
       point.set(x, 3., z).applyMatrix4(car.root.matrixWorld);
       ray.set(point, down);
       const hit = ray.intersectObject(car.root, true).find(hit => hit.face && hit.face.normal.y > .55 && hit.object.isMesh);
       if (!hit) continue;
       point.copy(hit.point);
       car.root.worldToLocal(point);
-      for (let j = 0; j < 3; j++) {
-        const offset = (i * 3 + j) * 3;
-        hits[offset] = point.x; hits[offset + 1] = point.y + .012; hits[offset + 2] = point.z;
-      }
+      const offset = i * 3;
+      hits[offset] = point.x; hits[offset + 1] = point.y + .012; hits[offset + 2] = point.z;
     }
     splashGeo.getAttribute('aHit').needsUpdate = true;
   };
