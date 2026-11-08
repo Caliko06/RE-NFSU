@@ -26,7 +26,7 @@ const keys = ((route ? ROUTE.keys : arg[3]) || '').split(',').filter(Boolean).ma
 // Each run starts from a fresh copy of the OWNER's save (tools/serve.py gives headless Chrome build/save-headless).
 // RN_KEEP_SAVE=1 keeps the last run's: a second run is a page reload on what the first one saved (block 3 gate).
 if (!process.env.RN_KEEP_SAVE) rmSync('build/save-headless', { recursive: true, force: true });
-// RE-NFSU's own CDP port: ~/RE-NFSMW's webcheck holds 9333 (127.0.0.1) and once took this repo's run into its Chrome,
+// RE-NFSU's own CDP port: another repo's webcheck held 9333 (127.0.0.1) and once took this repo's run into its Chrome,
 // which died with its run (2026-10-25, the page stopped at 61 s).
 const port = Number(process.env.RN_CDP_PORT || 9381);
 const profileDir = process.env.RN_PROFILE_DIR || mkdtempSync(join(tmpdir(), 'rn-'));   // RN_PROFILE_DIR: a profile kept between runs (a warm HTTP and code cache)

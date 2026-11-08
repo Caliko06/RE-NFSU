@@ -77,4 +77,4 @@ No gain or limit is shown to be off; `0x7060c0` is not a clamp and the shipped 1
 
 Open: caller of `vt+0x40` for rivals (U); whether `0x4592f0` also clamps (I); the mid-road obstacle/step at the 10
 coordinates and why every rival meets it (U). Reproduce with
-`python3 -I tools/re/ai_walls.py ~/RE-NFSU/runs ~/NFSU1-RE/game/Tracks`.
+`python3 -I tools/re/ai_walls.py ~/RE-NFSU/runs ~/RE-NFSU/game/Tracks`.

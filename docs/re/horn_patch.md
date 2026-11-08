@@ -1,6 +1,6 @@
 # Horn patch draft: probe at StartHorn, and the three tests it skips on
 
-Base: `~/Dashboards/tokentok/becarios/tomas/work/horn_traffic.md` (V = read in the binary). Nothing here was built or run:
+Base: a becario's horn and traffic notes (not kept; V = read in the binary). Nothing here was built or run:
 the worktree is `RE-NFSU-wt/tomas` (branch `bec/tomas`) and the order was to draft, not to build. Everything below is a byte
 reading of `pc/Speed.exe` with objdump plus the host pattern of `host/rivals.c` / `host/free.c`.
 

@@ -2,7 +2,7 @@
 # Pod side of remaster pack v2 (OWNER 2026-10-24): every unique world texture (STREAML1R*.BUN) and the car pack
 # (web/remaster/index.tsv), 1x-BCGone-Smooth deblock then 4x-UltraSharpV2 in fp32; score.py FLOOR=28 sends a file under
 # 28 dB to the soft fallback (deblock + Lanczos x4). Ships WebP (ship_webp.py) and deletes the PNGs of each stage.
-# Models: /root/rm2/m (4x-UltraSharpV2.safetensors from RE-NFSMW, 1x-BCGone-Smooth.pth). venv: RE-NFSMW upvenv.
+# Models: /root/rm2/m (4x-UltraSharpV2.safetensors from the Most Wanted pod, 1x-BCGone-Smooth.pth). venv: PY below (pod-side).
 # Output /root/rm2/out/{world2,cars2}/<hash>.webp + index_world_v2.tsv, index_v2.tsv. usage: pack_v2.sh [SHARDS]
 # SETS=fe pack_v2.sh: the front end, HUD and global packs (FrontEnd/, Global/), into fe2/ + index_fe_v2.tsv.
 # SETS=extra pack_v2.sh: the world textures the first pass left out (TEX*TRACK.BIN, and sides of 1024), added to world2.

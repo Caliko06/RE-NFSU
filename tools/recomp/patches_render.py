@@ -37,10 +37,10 @@ PATCHES.append(dict(addr=0x408a24, old="6820030000be58020000c705802a700015000000
 PATCHES.append(dict(addr=0x4494c4, old="6820030000be58020000e8ddf1fbff83c404",
                     new="8b3504300100ff3500300100e8dbf1fbff59", when=lambda: True))
 
-# PATCH: 0x702a38, OWNER 2026-10-21 (blur visible, as in ~/NFSU1-RE): the PC motion blur 0x40cd40 weights its half-size
+# PATCH: 0x702a38, OWNER 2026-10-21 (blur visible, as on the PS2): the PC motion blur 0x40cd40 weights its half-size
 # copy by t = (|camera +0x1e0| - [0x702a38]) / ([0x702a3c] - [0x702a38]) + 1.1 * nitrous, at most 0.65 ([0x702a40]).
 # PC ramp 25 -> 125 m/s: no blur under 90 km/h, full at 450 km/h. Now the PS2 ramp 0.1 -> 25 m/s (SLUS_208.11 0x4ff95c,
-# 0x4ff960; ~/NFSU1-RE docs/re/postfx-elf.md). The PC algorithm and its 0.65 cap stay. Only 0x40ce70/0x40ce7a read them.
+# 0x4ff960; ref/docs/re/postfx-elf.md). The PC algorithm and its 0.65 cap stay. Only 0x40ce70/0x40ce7a read them.
 PATCHES.append(dict(addr=0x702a38, old="0000c8410000fa42", new="cdcccc3d0000c841", when=lambda: True))
 # PATCH: 0x702a40, OWNER 2026-10-21 (the blur was too strong): the composite weight is min(1.5 * t, 1), so the PC cap 0.65
 # put 97% of the blurred copy on screen from ~56 mph. The cap is now 0.26: weight 0.39, the strongest PS2 copy
@@ -61,7 +61,7 @@ PATCHES.append(dict(addr=0x40d2a2, old="7512", new="9090", when=lambda: True))
 PATCHES.append(dict(addr=0x702a84, old="80000000", new="00020000", when=lambda: True))
 
 # PATCH: 0x40debb, 0x40deec, 0x40dcdb (+ caves 0x408799, 0x5f4a04, constant 0x707fc0), OWNER 2026-10-22: the camera look of
-# ~/NFSU1-RE. RE (Speed.exe): 0x40dd00 builds a view's projection from the camera FOV u16 F (0x484b53: 0x32dc = 71.5 deg).
+# the PS2 build. RE (Speed.exe): 0x40dd00 builds a view's projection from the camera FOV u16 F (0x484b53: 0x32dc = 71.5 deg).
 # P[0] (view+0x40) = 1/tan(F/2): the horizontal view is fixed. P[5] (view+0x54) = -1/tan(A*F/2), A = viewport H/W (+0x18 / +0x14,
 # view+0x58 struct) times 1.21 for view types 1, 2, 4, 5: the angle (not the tangent) follows the aspect, so 16:9 gives a 48 deg
 # vertical view and pixels 12% too tall. 0x40dcb0 returns the focal length into view+0xc. The PS2 (SLUS_208.11 0x10a7f8) keeps the
@@ -100,7 +100,7 @@ PATCHES.append(dict(addr=0x56e0d2, old="7a1f", new="eb1f", when=lambda: True))
 # (both 0x40d6e0 calls point at that slot; the decay quad ignores it, source factor ZERO). A still light builds to
 # w/(1 - k): R 2.0x, G 2.4x, B 3.4x (the blinding, blue-white lamps); a moving one leaves a trail of 4.4 / 5.6 / 8.6 frames
 # at 60 fps (73 / 93 / 143 ms). That decay stays as shipped: it is the PS2 trail in time (SLUS_208.11 glow buffer loses
-# (90,79,53) per 30 fps frame: 94 / 107 / 160 ms; ~/NFSU1-RE docs/re/postfx-elf.md). The 2026-10-22 patch (k / 4, w 0.55)
+# (90,79,53) per 30 fps frame: 94 / 107 / 160 ms; ref/docs/re/postfx-elf.md). The 2026-10-22 patch (k / 4, w 0.55)
 # cut the trail to 1.7 frames and a still lamp to 0.65x, so the aura vanished. Now the colour comes from [0x707fcc] (free
 # .data, no reference in the exe), set per channel to s (1 - k): a still light is s times its own flare in R, G and B alike,
 # and the trail keeps the game's length. Default s = 1.5 (0x1fbc9e71); web/tune.js sets s per blur preset (F6/F7).

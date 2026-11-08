@@ -189,10 +189,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         route = self.path.split("?", 1)[0]
-        if route == "/becarios":             # the OWNER's Becario monitor (tools/becmon.py)
-            import becmon
-            self.reply(200, "text/html; charset=utf-8", becmon.page(), [("Cache-Control", "no-store")])
-            return
         if route == "/launcher":             # the pre-game launcher (lane w3, OWNER 2026-11-07); bare / opens the game directly
             self.path = "/launcher.html"
         elif route == "/setup":              # LAN entry page (web/setup.html): QR, CA, iOS profile

@@ -1,10 +1,10 @@
 """Remaster index: content hash of each TPK texture's level 0 -> its upscaled PNG.
 
 The layer (host/d3d9.c) hashes level 0 at UnlockRect the same way (FNV-1a 64 of the locked bytes) and asks
-web/gpu.js to show the PNG instead. TPK layout and JDLZ from ~/NFSU1-RE/tools (cartex.py, jdlz.py).
+web/gpu.js to show the PNG instead. TPK layout and JDLZ as in the PS2 build RE (its cartex/jdlz tools are not kept).
 CARS/TEXTURES.BIN is the shared pack (traffic skins, sponsor decals); DUMMY_* are the game's own composited skins and
 wheels, so they keep their original. Format 0x20 is 32-bit (w*h*4 bytes), hashed like DXT by the layer.
-Usage: index.py game web/remaster/png web/remaster/index.tsv  (png = cp -c -R ~/NFSU1-RE/remaster/out)
+Usage: index.py game web/remaster/png web/remaster/index.tsv  (png = a folder of <key>.png upscales; web/remaster/index.tsv now lists dump/ webp paths, so no png/ is needed)
 """
 import os, struct, sys
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The /goal tracker, from maxpayne-re: out/goal/goal.json is the truth (blocks -> phases -> steps -> evidence), out/goal/goal.html is rendered from it.
+"""The /goal tracker: out/goal/goal.json is the truth (blocks -> phases -> steps -> evidence), out/goal/goal.html is rendered from it.
 
   tools/goal.py                       render only
   tools/goal.py set F1.2 status=done evidence="out/goal/p0/native.log: ctl 1 at 212 s" commit=abc123 calls=8

@@ -2,7 +2,7 @@
 # The world pack (?worldhd=1) as BC7: web/remaster/world_bc/<hash>.dds.gz + index_world_bc.tsv, read by web/gpu.js loadDds.
 # Why: with the RGBA8 world pack a race costs 1.5-2 ms more GPU a frame (gate60 1/4, HANDOFF 2026-10-26); BC7 is a
 # quarter of the VRAM and bandwidth, and it uploads with no decode on the page thread. Same encoder as NFS Most Wanted's
-# pack (~/RE-NFSMW/tools/assets/bcdds.cpp, BC7 with the full mip chain, box-filtered and not premultiplied as mipPipe).
+# pack (bcdds.cpp from the Most Wanted repo, not kept; pack_bc7.py is the etcpak version, BC7 with the full mip chain, box-filtered and not premultiplied as mipPipe).
 # Each key takes world2/ (v2) when it has it, else world/ (v1), as gpu.js did with both indexes. All are <= 1024 a side.
 # Files keep their folder (world_bc/world2/, world/, dump/ <hash>): one hash can name a v1 and a v2 image.
 # Resumable: a file whose .dds.gz exists is skipped. Usage: tools/remaster/world_bc7.sh [jobs, default 6]

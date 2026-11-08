@@ -3,7 +3,7 @@
 #   us = 4x-UltraSharp after 1x-BCGone-Smooth deblock; db = deblock only.
 #   score.py gate FLOOR=28: a file under 28 dB takes the soft fallback (db + Lanczos x4), the GAN draws lines there.
 # Input /root/remaster/{world/, world.lst}, models in /root/remaster/m. Output /root/remaster/world_out.
-# Fresh pod (disposable; NFSU1-RE/tools/podsetup.sh first):
+# Fresh pod (disposable; the old pod setup script is not kept; install as below):
 #   python3 -m venv /root/remaster/venv && venv/bin/pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 #   venv/bin/pip install spandrel pillow numpy
 #   m/4x-UltraSharp.pth   https://huggingface.co/lokCX/4x-Ultrasharp/resolve/main/4x-UltraSharp.pth
