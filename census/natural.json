@@ -1,5 +1,5 @@
 {
- "ok": 154,
+ "ok": 162,
  "total": 167,
  "rule": "autopilot, no RN_FINISH; OK = every stage reached 6/8 (Free Run, prologue: raced and back to the menu)",
  "rows": {
@@ -105,7 +105,7 @@
    "results": 1,
    "stages": 1,
    "unstick": 0,
-   "last": "6/8"
+   "last": "3/255"
   },
   "career.13": {
    "state": "OK",
@@ -228,12 +228,12 @@
    "last": "3/255"
   },
   "career.28": {
-   "state": "NO_RESULTS",
+   "state": "OK",
    "run": "cjump_28.0x01234",
-   "results": 0,
+   "results": 1,
    "stages": 1,
-   "unstick": 2,
-   "last": "6/4"
+   "unstick": 11,
+   "last": "3/255"
   },
   "career.29": {
    "state": "OK",
@@ -268,12 +268,12 @@
    "last": "3/255"
   },
   "career.33": {
-   "state": "NO_RESULTS",
+   "state": "OK",
    "run": "cjump_33.0x01234",
-   "results": 0,
+   "results": 1,
    "stages": 1,
-   "unstick": 1,
-   "last": "6/4"
+   "unstick": 5,
+   "last": "3/255"
   },
   "career.34": {
    "state": "OK",
@@ -308,12 +308,12 @@
    "last": "3/255"
   },
   "career.38": {
-   "state": "NO_RESULTS",
-   "run": "cjump_38.0x1234",
-   "results": 0,
+   "state": "OK",
+   "run": "cjump_38.0x01234",
+   "results": 3,
    "stages": 3,
-   "unstick": 0,
-   "last": "6/4"
+   "unstick": 79,
+   "last": "3/255"
   },
   "career.39": {
    "state": "OK",
@@ -404,12 +404,12 @@
    "last": "3/255"
   },
   "career.50": {
-   "state": "NO_RESULTS",
-   "run": "cjump_50.0x1234",
-   "results": 0,
+   "state": "OK",
+   "run": "cjump_50.0x01234",
+   "results": 1,
    "stages": 1,
-   "unstick": 0,
-   "last": "6/4"
+   "unstick": 1,
+   "last": "3/255"
   },
   "career.51": {
    "state": "OK",
@@ -517,19 +517,19 @@
   },
   "career.64": {
    "state": "NO_RESULTS",
-   "run": "cjump_64.0x1234",
+   "run": "cjump_64.0x01234",
    "results": 0,
    "stages": 1,
-   "unstick": 0,
+   "unstick": 45,
    "last": "6/4"
   },
   "career.65": {
-   "state": "NO_RESULTS",
-   "run": "cjump_65.0x1234",
-   "results": 0,
+   "state": "OK",
+   "run": "cjump_65.0x01234",
+   "results": 1,
    "stages": 1,
-   "unstick": 0,
-   "last": "6/4"
+   "unstick": 1,
+   "last": "3/255"
   },
   "career.66": {
    "state": "NO_RESULTS",
@@ -588,12 +588,12 @@
    "last": "3/255"
   },
   "career.73": {
-   "state": "NO_RESULTS",
-   "run": "cjump_73.0x1234",
-   "results": 0,
+   "state": "OK",
+   "run": "cjump_73.0x01234",
+   "results": 1,
    "stages": 1,
-   "unstick": 0,
-   "last": "6/4"
+   "unstick": 37,
+   "last": "3/255"
   },
   "career.74": {
    "state": "OK",
@@ -1028,12 +1028,12 @@
    "last": "3/255"
   },
   "qr.sprint.1106": {
-   "state": "NO_RESULTS",
-   "run": "jump_1_1106.0x1234",
-   "results": 0,
+   "state": "OK",
+   "run": "jump_1_1106.0x01234",
+   "results": 1,
    "stages": 1,
    "unstick": 0,
-   "last": "6/4"
+   "last": "3/255"
   },
   "qr.sprint.1107": {
    "state": "OK",
@@ -1148,12 +1148,12 @@
    "last": "3/255"
   },
   "qr.drift.1306": {
-   "state": "NO_RESULTS",
-   "run": "jump_6_1306.0x1234",
-   "results": 0,
+   "state": "OK",
+   "run": "jump_6_1306.0x01234",
+   "results": 1,
    "stages": 1,
-   "unstick": 0,
-   "last": "6/4"
+   "unstick": 1,
+   "last": "3/255"
   },
   "qr.drift.1307": {
    "state": "OK",
@@ -1322,7 +1322,7 @@
   "game.movies": {
    "state": "OK",
    "run": "game_rows",
-   "why": "movie frames 3000..6500 between frames 2300 and 6856"
+   "why": "movie frames 2500..5000 between frames 2142 and 5367"
   }
  }
 }
