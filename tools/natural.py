@@ -30,7 +30,7 @@ for row in json.load(open(f'{R}/census/rows.json'))['rows']:
         back = 6 in seen and 7 in seen[seen.index(6):] and 3 in seen[seen.index(6):][seen[seen.index(6):].index(7):]
         free = rid.startswith('qr.freerun') or rid == 'career.0'
         ok = (6 in seen and back) if free else res >= len(row.get('stages', [1]))
-        stuck = len(re.findall(r'^RN_AUTOPILOT: stuck', log, re.M))
+        stuck = len(re.findall(r'^RN_AUTOPILOT: (?:stuck|no progress)', log, re.M))
         best = dict(state='OK' if ok else 'NO_RESULTS', run=f'{name}.{seed}', results=res, stages=len(row.get('stages', [1])),
                     unstick=stuck, last=next((f'{a}/{b}' for a, b in reversed(st)), ''))
         if ok or seed == '0x01234': break
