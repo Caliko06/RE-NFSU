@@ -1218,6 +1218,7 @@ static void flow_log(Ctx *c) {
     pm = m, pt = t, pe = e, pcar = car;
     input_jump(c);
     input_finish(c);
+    input_unstick(c);
     input_open(c);
     input_next(c);
     input_call(c);
