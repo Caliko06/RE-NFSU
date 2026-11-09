@@ -108,12 +108,12 @@ ROWS['freerun'] = ','.join(keys(menu(5, 3)).split(',') + FREE_LEAVE)
 
 # garage: RN_OPEN (host/input.c) switches MU_Main_PC to MU_MainMenuCarCustomize as the menu does (0x4b3494), then
 # Next, Visual, Body, Spoiler into the parts browser and four parts (runs/open_garage shot 5100: kit STRIKE on the car).
-_PROFILE = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 8   # 4 lost the splash on 2026-11-09 (runs/garage: tap 4 on LS_Splash_PC eaten, attract loop) + ['1500@=MU_UG_NewOrLoad_PC2:RETURN']
-ROWS['garage'] = ','.join(['0:RETURN'] + _PROFILE[1:] + [f'1500@={s}:RETURN' for s in ('MU_MainMenuCarCustomize', 'MU_Garage', 'MU_GaragePartsChooseVisual', 'MU_GaragePartsCategoryVisual')] + ['3000@!NONE:RIGHT'] * 4)
+_PROFILE = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + ['1500@=MU_UG_NewOrLoad_PC2:RETURN']   # as cjump: first tap at 20 s (intro movie up), the splash eats one tap (runs/cjump_1 taps 0-2)
+ROWS['garage'] = ','.join(['20000:RETURN'] + _PROFILE[1:] + [f'1500@={s}:RETURN' for s in ('MU_MainMenuCarCustomize', 'MU_Garage', 'MU_GaragePartsChooseVisual', 'MU_GaragePartsCategoryVisual')] + ['3000@!NONE:RIGHT'] * 4)
 # options: RN_OPEN opens MU_OptionsSelector_PC (0x4b3413), Audio, Volume LEFT x3, Back x2; leaving saves nothing
 # (0x4d4892), so RN_CALL runs the save 0x41c7a0 (.cfg/.opt, as autosave 0x4c9705) back on MU_Main_PC. reload_options.<seed>
 # opens Audio again on that save/ (runs/reload_opt 2026-10-25: Volume one notch, the .opt bytes 62, 65 and checksum moved).
-_OPTS = ['0:RETURN'] + _PROFILE[1:] + ['1500@=MU_OptionsSelector_PC:RETURN']
+_OPTS = ['20000:RETURN'] + _PROFILE[1:] + ['1500@=MU_OptionsSelector_PC:RETURN']
 ROWS['options'] = ','.join(_OPTS + ['2000@!NONE:LEFT'] * 3 + ['2000@!NONE:BACK'] * 2)
 OPEN = {'garage': 'MU_Main_PC>MU_MainMenuCarCustomize:20', 'options': 'MU_Main_PC>MU_OptionsSelector_PC:10'}
 CALL = {'options': 'MU_Main_PC#2:41c7a0'}
