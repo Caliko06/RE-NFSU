@@ -327,12 +327,13 @@ elif CMD == 'queue':
             elif time.time() - w[2] > STALL:
                 print(f'{time.strftime("%T")} {w[0]}: no flow change for {STALL} s, killed', flush=True)
                 k.kill()
-        free = shutil.disk_usage(R).free >> 30   # never launch under 5 GB free
+        free = shutil.disk_usage(R).free >> 30   # never launch under RN_MINFREE GB free (default 5; 4 with tools/shots_gc.py loop purging shots)
+        minfree = int(os.environ.get('RN_MINFREE', '5'))
         # N is a ceiling; the machine-wide gate (memory level, launches 30 s apart, every session) decides each launch.
-        if todo and live() < n and free >= 5 and subprocess.run([GATE, '--try']).returncode == 0:
+        if todo and live() < n and free >= minfree and subprocess.run([GATE, '--try']).returncode == 0:
             row = todo.pop(0)
             kids[launch(row)] = [f'{R}/runs/{row if "." in row else row + "." + SEEDS[0]}/log.txt', 0, time.time()]
-        elif todo and free < 5: print(f'{time.strftime("%T")} {free} GB free: {todo[0]} waits', flush=True)
+        elif todo and free < minfree: print(f'{time.strftime("%T")} {free} GB free: {todo[0]} waits', flush=True)
         time.sleep(10)
 elif CMD == 'table':   # runs/cjump_<n>.0x1234/log.txt (a RN_AILOG=1 batch) -> census/ghost_career.tsv: one row per career event (docs/archive/PLAN.md "Ghost player")
     cols = 'ev kind mode stages results state rivals me_rank rival_wall me_wall polymax movies stop'.split()
