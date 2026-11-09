@@ -56,5 +56,39 @@ if (bridgeTo !== null) window.rnBridge = q => { location.href = (bridgeTo && bri
 <script src="out/speed.js"></script>
 <script src="boot.js"></script>
 <script src="overlay.js"></script>
+<script>
+// ?fast=1 (the launcher, proposal A+B): scene B (web/launcher_b) covers the game while it boots (no intro movies or splash, PATCH 0x4de395; the game's own
+// Accept loads the profile, web/boot.js). Enter or a click lifts the cover with a 250 ms fade, only once the game reports its main menu (the "flow fe ...MU_Main_PC.fng" log line).
+if (RN_Q.get('fast') === '1') {
+  const css = document.createElement('style');
+  css.textContent = `#ab { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 12; background: #000; pointer-events: none; transition: opacity .25s ease; }
+    #ab-msg { position: fixed; left: 0; right: 0; bottom: 8vh; z-index: 13; text-align: center; font: 600 15px system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase;
+      color: #ffd9b0; text-shadow: 0 2px 12px #000; pointer-events: none; transition: opacity .25s ease; }
+    @media (prefers-reduced-motion: reduce) { #ab, #ab-msg { transition: none; } }`;
+  document.head.appendChild(css);
+  const ab = Object.assign(document.createElement('iframe'), { id: 'ab', src: '/launcher_b/', tabIndex: -1 }), msg = Object.assign(document.createElement('div'), { id: 'ab-msg', textContent: 'Enter para jugar' });
+  document.body.append(ab, msg);
+  let ready = false, want = false, gone = false;
+  const lift = () => {
+    if (gone) return; gone = true; ab.style.opacity = msg.style.opacity = '0';
+    setTimeout(() => { ab.remove(); msg.remove(); document.getElementById('screen').focus(); }, 260);
+  };
+  const press = () => { if (ready) lift(); else { want = true; msg.textContent = 'cargando\u2026'; } };
+  new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) {
+    const t = n.textContent || '';
+    if (/flow fe .*MU_Main_PC\.fng/.test(t)) { ready = true; if (want) lift(); }
+    else if (/^STOP|^JS |abort|Aborted/.test(t)) lift();       // an error must show, not hide behind the scene
+  } }).observe(document.getElementById('log'), { childList: true });
+  // while the cover is up the game gets no keys (Enter lifts it; F keys and K stay)
+  addEventListener('keydown', e => {
+    if (gone || /^F\d+$/.test(e.code) || e.code === 'KeyK') return;
+    e.preventDefault(); e.stopPropagation(); if (e.code === 'Enter' && !e.repeat) press();
+  }, true);
+  addEventListener('keyup', e => { if (!gone && !/^F\d+$/.test(e.code) && e.code !== 'KeyK') { e.preventDefault(); e.stopPropagation(); } }, true);
+  addEventListener('pointerdown', e => { if (!gone && !e.target.closest('#ov, #ov-btn')) { e.preventDefault(); e.stopPropagation(); press(); } }, true);
+  window.RN_AB = { get ready() { return ready; }, lift };
+}
+</script>
+
 </body>
 </html>

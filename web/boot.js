@@ -105,6 +105,12 @@ function line(s, cls) {
       // 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift), the next one when a race comes back to the menu
       const jump = RN_Q.get('jump');
       if (jump) m.ENV.RN_JUMP = jump;
+      // ?fast=1 (the launcher, web/index.html): no intro movies, no splash (PATCH 0x4de395, tools/recomp/patches_launcher.py); the profile screen takes the game's own
+      // Accept: Enter 1.5 s after it shows, then twice more 3 s apart unless the main menu is already up (the game loads the last profile; a tap is dropped once MU_Main_PC shows).
+      if (RN_Q.get('fast') === '1') {
+        m.ENV.RN_FAST = '1';
+        if (!keys && !RN_Q.get('jump')) m.ENV.RN_KEYS = '1500@=MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN';
+      }
       // ?pool=1 opens WORLD directly (the menu path of tools/completion.py jump 3:1010); ?keys= or ?jump= take over
       if (RN_Q.get('pool') === '1' && !keys && !jump) {
         m.ENV.RN_JUMP = '3:1010';

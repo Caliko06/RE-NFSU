@@ -1201,6 +1201,8 @@ void win32_init(Ctx *c, uint32_t image_size) {
     int unlock = !(un && un[0] == '0');
     st(c, SCREEN_ADDR + 36, unlock, 4);
     st(c, 0x735ec1, unlock, 1);
+    // PATCH 0x4de395 (patches_launcher.py): RN_FAST=1 (?fast=1) starts the boot screen sequence at the profile screen: no intro movies, no splash.
+    st(c, SCREEN_ADDR + 0xc4, getenv("RN_FAST") != NULL && getenv("RN_FAST")[0] == '1', 4);
     // FEEL C1 + C3 (OWNER 2026-11-04: feel changes in remaster only; RN_FEEL=0 in original mode, web/mode.js): the second blur pass
     // scale [0x707fd0] (PATCH 0x40cfb9.., shipped 4.0) becomes 1.0, and the chase FOV table 0x6fbdf4 POV 0/1/4 goes 0x32dc -> 0x2ee0.
     const char *feel = getenv("RN_FEEL");
