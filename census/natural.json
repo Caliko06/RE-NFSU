@@ -1,5 +1,5 @@
 {
- "ok": 164,
+ "ok": 166,
  "total": 167,
  "rule": "autopilot, no RN_FINISH; OK = every stage reached 6/8 (Free Run, prologue: raced and back to the menu)",
  "rows": {
@@ -517,10 +517,10 @@
   },
   "career.64": {
    "state": "NO_RESULTS",
-   "run": "cjump_64.0x01234",
+   "run": "cjump_64.0x5678",
    "results": 0,
    "stages": 1,
-   "unstick": 52,
+   "unstick": 63,
    "last": "6/4"
   },
   "career.65": {
@@ -1305,14 +1305,14 @@
    "why": "new profile [b'zz']"
   },
   "game.garage": {
-   "state": "NO_RUN",
+   "state": "OK",
    "run": "game_rows",
-   "why": ""
+   "why": "parts browser reached"
   },
   "game.options": {
-   "state": "NO_RUN",
+   "state": "OK",
    "run": "game_rows",
-   "why": ""
+   "why": "asas.opt changed by the save 0x41c7a0, reloaded into Options"
   },
   "game.save_reload": {
    "state": "OK",
@@ -1322,7 +1322,7 @@
   "game.movies": {
    "state": "OK",
    "run": "game_rows",
-   "why": "movie frames 2500..5000 between frames 2142 and 5367"
+   "why": "movie frames 4500..8500 between frames 4289 and 8775"
   }
  }
 }
