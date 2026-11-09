@@ -1082,277 +1082,461 @@
         "material": "PLAINNOTHING",
         "source_hash": "5799E60B",
         "texture": "DRIVER",
-        "resolved_hash": "5799E60B"
+        "resolved_hash": "5799E60B",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "DECAL",
         "source_hash": "29C86189",
         "texture": "SKYLINE_BADGING",
-        "resolved_hash": "29C86189"
+        "resolved_hash": "29C86189",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "INTERIOR",
         "source_hash": "3EDA2CA3",
         "texture": "SKYLINE_SKIN1",
-        "resolved_hash": "3EDA2CA3"
+        "resolved_hash": "3EDA2CA3",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "WINDSHIELD",
         "source_hash": "7B220DDF",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "WINDSHIELD",
         "source_hash": "E7E4EF49",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "WINDSHIELD",
         "source_hash": "4CDEBFCA",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "WINDOWMASK",
         "source_hash": "4CDEBFCA",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "WINDSHIELD",
         "source_hash": "1B0763A0",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "WINDOWMASK",
         "source_hash": "1B0763A0",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "WINDSHIELD",
         "source_hash": "60F8B13C",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "WINDSHIELD",
         "source_hash": "0AB88F5D",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "WINDOWMASK",
         "source_hash": "0AB88F5D",
         "texture": "WINDOW",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "CARSKIN",
         "source_hash": "3EDA2CA3",
         "texture": "SKYLINE_SKIN1",
-        "resolved_hash": "3EDA2CA3"
+        "resolved_hash": "3EDA2CA3",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "BOTTOM",
         "source_hash": "BD1F0E0A",
         "texture": "CARBOTTOM",
-        "resolved_hash": "BD1F0E0A"
+        "resolved_hash": "BD1F0E0A",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "MESH",
         "source_hash": "69C032BA",
         "texture": "GRILL_02",
-        "resolved_hash": "69C032BA"
+        "resolved_hash": "69C032BA",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "DULLPLASTIC",
         "source_hash": "3EDA2CA3",
         "texture": "SKYLINE_SKIN1",
-        "resolved_hash": "3EDA2CA3"
+        "resolved_hash": "3EDA2CA3",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "PLAINNOTHING",
         "source_hash": "3EDA2CA3",
         "texture": "SKYLINE_SKIN1",
-        "resolved_hash": "3EDA2CA3"
+        "resolved_hash": "3EDA2CA3",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "RAD",
         "source_hash": "3EDA2CA3",
         "texture": "SKYLINE_SKIN1",
-        "resolved_hash": "3EDA2CA3"
+        "resolved_hash": "3EDA2CA3",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "MOLDINGS",
         "source_hash": "3EDA2CA3",
         "texture": "SKYLINE_SKIN1",
-        "resolved_hash": "3EDA2CA3"
+        "resolved_hash": "3EDA2CA3",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "CARBONFIBER",
         "source_hash": "721AFF7C",
         "texture": "CARBONFIBRE",
-        "resolved_hash": "721AFF7C"
+        "resolved_hash": "721AFF7C",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "ALUMINUM",
         "source_hash": "3EDA2CA3",
         "texture": "SKYLINE_SKIN1",
-        "resolved_hash": "3EDA2CA3"
+        "resolved_hash": "3EDA2CA3",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "MOLDINGS",
         "source_hash": "B8453EE8",
         "texture": "SKYLINE_KIT00_HEADLIGHT",
-        "resolved_hash": "B8453EE8"
+        "resolved_hash": "B8453EE8",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "ALUMINUM",
         "source_hash": "B8453EE8",
         "texture": "SKYLINE_KIT00_HEADLIGHT",
-        "resolved_hash": "B8453EE8"
+        "resolved_hash": "B8453EE8",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "HEADLIGHTREFLECTOR",
         "source_hash": "B8453EE8",
         "texture": "SKYLINE_KIT00_HEADLIGHT",
-        "resolved_hash": "B8453EE8"
+        "resolved_hash": "B8453EE8",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "HEADLIGHTGLASS",
         "source_hash": "7B220DDF",
         "texture": "WINDOW_MATERIAL_ALPHA",
-        "resolved_hash": "834B8017"
+        "resolved_hash": "834B8017",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "BRAKELIGHT",
         "source_hash": "BAC0F21B",
         "texture": "SKYLINE_KIT00_BRAKELIGH",
-        "resolved_hash": "BAC0F21B"
+        "resolved_hash": "BAC0F21B",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "CARSKIN",
         "source_hash": "BAC0F21B",
         "texture": "SKYLINE_KIT00_BRAKELIGH",
-        "resolved_hash": "BAC0F21B"
+        "resolved_hash": "BAC0F21B",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "DECAL",
         "source_hash": "B8949CAF",
         "texture": "SPARCO_WHITE_WIDE",
-        "resolved_hash": "B8949CAF"
+        "resolved_hash": "B8949CAF",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "DECAL",
         "source_hash": "8A571203",
         "texture": "KENWOOD_WHITE_RECT",
-        "resolved_hash": "8A571203"
+        "resolved_hash": "8A571203",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "DECAL",
         "source_hash": "B015F6F2",
         "texture": "NX_WHITE_RECT",
-        "resolved_hash": "B015F6F2"
+        "resolved_hash": "B015F6F2",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "DECAL",
         "source_hash": "B891CDB4",
         "texture": "SPARCO_WHITE_RECT",
-        "resolved_hash": "B891CDB4"
+        "resolved_hash": "B891CDB4",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "DECAL",
         "source_hash": "0F4108B2",
         "texture": "HKS_WHITE_RECT",
-        "resolved_hash": "0F4108B2"
+        "resolved_hash": "0F4108B2",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "DECAL",
         "source_hash": "66994F4A",
         "texture": "DEFAULTALPHA",
-        "resolved_hash": "66994F4A"
+        "resolved_hash": "66994F4A",
+        "state": [
+          0,
+          2
+        ]
       },
       {
         "material": "PLAINNOTHING",
         "source_hash": "A5B28001",
         "texture": "EXHAUST",
-        "resolved_hash": "A5B28001"
+        "resolved_hash": "A5B28001",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "DULLENGINE",
         "source_hash": "A5B28001",
         "texture": "EXHAUST",
-        "resolved_hash": "A5B28001"
+        "resolved_hash": "A5B28001",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "EXHAUST_TIP",
         "source_hash": "A5B28001",
         "texture": "EXHAUST",
-        "resolved_hash": "A5B28001"
+        "resolved_hash": "A5B28001",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "EXHAUST_TIP",
         "source_hash": "DDA11455",
         "texture": "EXHAUST",
-        "resolved_hash": "A5B28001"
+        "resolved_hash": "A5B28001",
+        "state": [
+          0,
+          0
+        ]
       },
       {
         "material": "MAGGUNMETAL",
         "source_hash": "957078BE",
         "texture": "BBS_STYLE04_WHEEL",
-        "resolved_hash": "957078BE"
+        "resolved_hash": "957078BE",
+        "state": [
+          1,
+          0
+        ]
       },
       {
         "material": "PLAINNOTHING",
         "source_hash": "957078BE",
         "texture": "BBS_STYLE04_WHEEL",
-        "resolved_hash": "957078BE"
+        "resolved_hash": "957078BE",
+        "state": [
+          1,
+          0
+        ]
       },
       {
         "material": "MAGSILVER",
         "source_hash": "957078BE",
         "texture": "BBS_STYLE04_WHEEL",
-        "resolved_hash": "957078BE"
+        "resolved_hash": "957078BE",
+        "state": [
+          1,
+          0
+        ]
       },
       {
         "material": "MAGCHROME",
         "source_hash": "957078BE",
         "texture": "BBS_STYLE04_WHEEL",
-        "resolved_hash": "957078BE"
+        "resolved_hash": "957078BE",
+        "state": [
+          1,
+          0
+        ]
       },
       {
         "material": "RUBBER",
         "source_hash": "957078BE",
         "texture": "BBS_STYLE04_WHEEL",
-        "resolved_hash": "957078BE"
+        "resolved_hash": "957078BE",
+        "state": [
+          1,
+          0
+        ]
       },
       {
         "material": "CALIPERDECAL",
         "source_hash": "17F9F794",
         "texture": "BRAKE_GLOBAL",
-        "resolved_hash": "17F9F794"
+        "resolved_hash": "17F9F794",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "CALLIPER",
         "source_hash": "17F9F794",
         "texture": "BRAKE_GLOBAL",
-        "resolved_hash": "17F9F794"
+        "resolved_hash": "17F9F794",
+        "state": [
+          0,
+          1
+        ]
       },
       {
         "material": "GOLDROTOR",
         "source_hash": "C6578697",
         "texture": "BRAKE_STYLE03",
-        "resolved_hash": "C6578697"
+        "resolved_hash": "C6578697",
+        "state": [
+          1,
+          0
+        ]
       },
       {
         "material": "CALLIPER",
         "source_hash": "DDA11455",
         "texture": "BRAKE_STYLE03",
-        "resolved_hash": "C6578697"
+        "resolved_hash": "C6578697",
+        "state": [
+          1,
+          0
+        ]
       }
     ],
     "evidence": {
@@ -1924,6 +2108,88 @@
     "BRAKE_GLOBAL_17F9F794",
     "BRAKE_STYLE03_C6578697"
   ],
+  "textureStates": {
+    "DRIVER": [
+      0,
+      1
+    ],
+    "SKYLINE_BADGING": [
+      0,
+      1
+    ],
+    "SKYLINE_SKIN1": [
+      0,
+      0
+    ],
+    "WINDOW": [
+      0,
+      1
+    ],
+    "CARBOTTOM": [
+      0,
+      0
+    ],
+    "GRILL_02": [
+      0,
+      1
+    ],
+    "CARBONFIBRE": [
+      0,
+      0
+    ],
+    "SKYLINE_KIT00_HEADLIGHT": [
+      0,
+      0
+    ],
+    "WINDOW_MATERIAL_ALPHA": [
+      0,
+      1
+    ],
+    "SKYLINE_KIT00_BRAKELIGH": [
+      0,
+      0
+    ],
+    "SPARCO_WHITE_WIDE": [
+      0,
+      1
+    ],
+    "KENWOOD_WHITE_RECT": [
+      0,
+      1
+    ],
+    "NX_WHITE_RECT": [
+      0,
+      1
+    ],
+    "SPARCO_WHITE_RECT": [
+      0,
+      1
+    ],
+    "HKS_WHITE_RECT": [
+      0,
+      1
+    ],
+    "DEFAULTALPHA": [
+      0,
+      2
+    ],
+    "EXHAUST": [
+      0,
+      0
+    ],
+    "BBS_STYLE04_WHEEL": [
+      1,
+      0
+    ],
+    "BRAKE_GLOBAL": [
+      0,
+      1
+    ],
+    "BRAKE_STYLE03": [
+      1,
+      0
+    ]
+  },
   "texture_credit": "HDCube by Venomalia, CC-BY-4.0",
   "texture_upscale": {
     "upscaled": 19,
@@ -1934,7 +2200,7 @@
     "before_bytes": 593688,
     "after_bytes": 1125220,
     "device": "mps",
-    "seconds": 0.034,
+    "seconds": 0.025,
     "model_sha256": "67f296d868de757b4f3daca3e35f16b61ab1ae88703776727dab212004203e57"
   },
   "glb_bytes": 1125220

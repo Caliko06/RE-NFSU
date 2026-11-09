@@ -1,6 +1,6 @@
 {
   "source": "game/Tracks/STREAML1RA.BUN",
-  "texture_source": "game/Tracks/TEX1001TRACK.BIN",
+  "texture_source": "game/Tracks/TEX1002TRACK.BIN",
   "solid": "SKYDOME",
   "solid_hash": "be43edbb",
   "solid_chunk_payload_offset": 246336,
@@ -104,7 +104,7 @@
       "embedded": true
     }
   ],
-  "glb_bytes": 159776,
+  "glb_bytes": 183636,
   "render_state_notes": {
     "source_fact": "SKYDOME hash is excluded from ordinary world placement resolution at 0x4457c0; it uses a separate sky pass.",
     "launcher": "scene.js puts sky in the first layer, disables depth test/write and culling, and forces clip z to w*0.99999. Vertex colour and original UVs are preserved; its sky shader multiplies texture RGB by 2*vertex RGB.",

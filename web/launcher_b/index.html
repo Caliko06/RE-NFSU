@@ -12,5 +12,13 @@
 </style>
 <canvas id="scene" aria-label="Nissan Skyline parked on a rain-wet street at night"></canvas>
 <p id="status" role="status">LOADING SKYLINE</p>
-<script type="module" src="./scene.js"></script>
+<script type="module">
+  // Standalone page and iframe host. ?shot=<hero|low|side|rear|detail> jumps to a shot with no intro; ?curtain=1 = loading curtain
+  // (end pose of the launch move, frozen once the first frames are drawn). The status line is optional.
+  import './scene.js';
+  const status = () => document.querySelector('#status');
+  RN_SCENE.start(document.querySelector('#scene'), {}).then(
+    () => { const el = status(); if (el) el.hidden = true; },
+    error => { const el = status(); if (el) { el.hidden = false; el.textContent = `SCENE B · ${error.message}`; } });
+</script>
 </html>

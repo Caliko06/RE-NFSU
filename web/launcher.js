@@ -1,6 +1,6 @@
 // Pre-game launcher v2 (UI). Data comes from window.RN_LAUNCH (web/launcher_opts.js); "Jugar" goes to /?play=1&...
-// The scene behind is window.RN_SCENE (web/launcher_2d.js, a module that runs before this one), sound is window.RN_SND (web/launcher_audio.js). Both are optional:
-// every call is guarded, so the UI works over a still image and in silence.
+// The scene behind is window.RN_SCENE (web/launcher_b/scene.js, a module that runs before this one), sound is window.RN_SND (web/launcher_audio.js). Both are optional:
+// every call is guarded, so the UI works over a dark gradient and in silence.
 // Game font: launcher/v2/ui/game_font.png + game_font.json (BMFont-like: glyph rects + advance; see GF below). When present, labels
 // are drawn from it (mask sprites); otherwise the condensed italic system stack in launcher.css is used.
 (() => {
@@ -486,7 +486,9 @@
   async function launch() {
     if (going) return;
     going = true;
-    const q = launchHook.query();
+    // fast=1 + go=1: the game page boots under a loading curtain (web/index.html) and lifts it by itself at its main menu
+    const u = new URLSearchParams(launchHook.query()); u.set('fast', '1'); u.set('go', '1');
+    const q = u.toString();
     const s = scr.main.sel; if (s && scr.main.light) scr.main.light.node.classList.add('go');
     for (const it of scr.main.items()) if (it !== s) it.classList.add('out');
     snd('accept'); try { window.RN_SND && window.RN_SND.rev(); window.RN_SND && window.RN_SND.fadeOut(900); } catch {}
@@ -661,7 +663,7 @@
   choose($('play'), { snap: true, quiet: true, noscene: true });
   if (S && typeof S.start === 'function') {
     let p;
-    try { p = S.start($('scene'), { base: 'launcher/v4/' }); } catch (e) { console.warn('RN_SCENE.start', e); p = Promise.reject(e); }
+    try { p = S.start($('scene'), {}); } catch (e) { console.warn('RN_SCENE.start', e); p = Promise.reject(e); }
     Promise.resolve(p).then(() => { scene('motion', motion); scene('screen', cur); if (typeof S.onIntroDone === 'function') S.onIntroDone(reveal); else setTimeout(reveal, 2500); },
       () => { staticMode(); setTimeout(reveal, 300); });
     setTimeout(reveal, 7000);                        // never leave the menu hidden

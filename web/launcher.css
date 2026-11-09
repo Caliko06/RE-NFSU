@@ -1,5 +1,5 @@
 /* Pre-game launcher v2: the game's own front-end language (translucent teal panels, chamfered corners, italic caps, red neon chevrons)
-   over the WebGL scene (#scene, web/launcher_3d.js). 1rem = 1 unit "u" = 1 % of the smaller of screen height / (9/16 width).
+   over the WebGL scene (#scene, web/launcher_b/scene.js). 1rem = 1 unit "u" = 1 % of the smaller of screen height / (9/16 width).
    Animation uses transform and opacity only. OS reduce-motion is ignored on purpose (OWNER): the in-page "Animación" switch is the control. */
 :root {
   --u: min(1vh, .5625vw);
@@ -21,7 +21,7 @@ body { color: var(--ink); font-family: var(--f); font-style: italic; -webkit-fon
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: inherit; }
 
 /* ---------- scene layers ---------- */
-.plate { display: none; position: fixed; inset: 0; background: url(launcher/v4/bg_street.webp) 58% 50% / cover no-repeat, #0a0e17; filter: saturate(1.1) contrast(1.05); }
+.plate { display: none; position: fixed; inset: 0; background: radial-gradient(70% 80% at 72% 62%, rgba(90, 42, 154, .45), rgba(90, 42, 154, 0) 70%), radial-gradient(50% 40% at 30% 100%, rgba(25, 211, 230, .16), rgba(25, 211, 230, 0) 70%), linear-gradient(180deg, #080c18 0, #0a0e17 55%, #05070d 100%); }
 html.static .plate { display: block; }
 #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #05080d; }
 html.static #scene { display: none; }
@@ -241,12 +241,13 @@ body.touch .keys .nb { display: none; }
 .row.more { grid-template-columns: minmax(0, 1fr) auto; }
 @media (max-width: 640px), (max-aspect-ratio: 4/5) { .row.more { grid-template-columns: minmax(0, 1fr); justify-items: start; } .row.more .tag { justify-self: start; margin-top: .4rem; } }
 
-/* ---------- v4: painted 2D street (web/launcher_2d.js). The menu has no box: big slanted labels on the dark flank,
-   the selected one rides a magenta -> violet -> teal neon slash with depth; the canvas plays the streak glint behind it. ---------- */
+/* ---------- v4 menu over the 3D street (web/launcher_b/scene.js). The menu has no box: big slanted labels on the dark flank,
+   the selected one rides a magenta -> violet -> teal neon slash with depth; the scene is darker and bluer than the old painting and the camera moves, so .shade carries a scrim. ---------- */
 .shade { background:
-    linear-gradient(90deg, rgba(5, 4, 18, .78) 0, rgba(8, 6, 26, .42) 30%, rgba(8, 6, 26, 0) 52%),
-    linear-gradient(0deg, rgba(5, 4, 18, .72) 0, rgba(5, 4, 18, 0) 20%),
-    radial-gradient(120% 95% at 60% 45%, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, .55) 100%); }
+    linear-gradient(90deg, rgba(4, 4, 16, .86) 0, rgba(6, 5, 22, .62) 26%, rgba(8, 6, 26, .24) 46%, rgba(8, 6, 26, 0) 60%),
+    linear-gradient(0deg, rgba(4, 4, 16, .78) 0, rgba(4, 4, 16, 0) 22%),
+    linear-gradient(180deg, rgba(4, 4, 16, .5) 0, rgba(4, 4, 16, 0) 18%),
+    radial-gradient(120% 95% at 62% 48%, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, .55) 100%); }
 .menu-panel::before, .menu-panel::after { display: none; }
 .menu-panel { top: 27rem; width: 58rem; padding: 0; }
 .menu-panel .list { padding: 0; transform: skewX(-8deg); transform-origin: 0 100%; }
