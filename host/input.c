@@ -333,6 +333,31 @@ void input_finish(Ctx *c) {
     rn_log("RN_FINISH: place %u player %u at frame %u", place, player, rn_telem.presents);
     armed = 0, done = *s != 0, seen = 0;   // a cheat fires once, and this function stops running until the next F3
 }
+// RN_AUTOPILOT only: the game's AI does not always free the player's car (runs/cjump_104: wedged head-on in a wall for 7 minutes after the
+// rivals lapped it, GetUnstuck 0x451b00 never fired; cjump_109: Drift, a wall at -111,-1170 reversed into 30000 frames), so the race
+// never reaches the results. A human presses Reset there: it is car+0x87c = 1 on the player's car, consumed by Car::ServiceResetRequest 0x4264d0
+// -> Player::ResetToRoute 0x4314a0 (AccidentRecovery 0x452710 raises the same flag). Raised after 15 s inside a 40 m circle while racing
+// (flow state 6/4 in the log). Off without RN_AUTOPILOT, so a human's feel is untouched.
+void input_unstick(Ctx *c) {
+    static int on = -1;
+    static uint32_t since;
+    static float ax, ay;
+    if (on < 0) on = getenv("RN_AUTOPILOT") != NULL;
+    if (!on || rn_flow != 0x604) { since = 0; return; }
+    uint32_t h = ld(c, 0x7361f8, 4), car = 0;
+    if (!h || h >= GUEST_MEM - 0x1000) return;
+    for (uint32_t r = ld(c, h, 4), k = 0; r && r < GUEST_MEM - 0x1000 && r != h && k < 200 && !car; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (e && e < GUEST_MEM - 0x1000 && ld(c, e + 4, 4) == 1) car = r;
+    }
+    if (!car) return;
+    float x = ldf(c, car + 0x60), y = ldf(c, car + 0x64);
+    if (!since || (x - ax) * (x - ax) + (y - ay) * (y - ay) > 40.f * 40.f) { since = rn_telem.presents ? rn_telem.presents : 1, ax = x, ay = y; return; }
+    if (rn_telem.presents - since < 900) return;
+    st(c, car + 0x87c, 1, 4);
+    rn_log("RN_AUTOPILOT: stuck 15 s at %.0f,%.0f, reset requested at frame %u", x, y, rn_telem.presents);
+    since = 0;
+}
 // RN_OPEN="MU_Main_PC>MU_MainMenuCarCustomize:20": test-only, once <from> is on, switch it to <to> the way the menus do
 // (0x4b3494: [0x777b4c] = 0x20, edi = "MU_MainMenuCarCustomize.fng", cdecl 0x4f6360("<from>.fng")). 0x4f6360 finds the
 // open package by its name (0x4f3f90) and 0x4f0800 replaces it with edi's. ":<hex>" = the [0x777b4c] the menu sets
