@@ -1,0 +1,2904 @@
+{
+  "source": "game/Tracks/STREAML1RA.BUN",
+  "section_id": 601,
+  "included_sections": [
+    601,
+    611
+  ],
+  "road_section_id": 611,
+  "selection_reason": "Section 601 places dense shops, hotels and sushi/lounge/martini neon signs on Commercial Street; section 611 supplies the matching original road and terrain.",
+  "evidence_textures": [
+    "AR1_STORE01",
+    "ARC_MARKETSTORE",
+    "ARC_NEONLIGHTS",
+    "ARC_RJB_MONEY_SIGN_NEON",
+    "ARC_RJB_SHOPA_WINDOW",
+    "ARC_RJB_SHOPC_WINDOW",
+    "ARC_RJB_SHOPD",
+    "ARC_RJB_SHOPE",
+    "ARC_RJB_SHOPE_SIDEA",
+    "ARC_RJB_SHOPE_WINDOW",
+    "ARC_RJB_SHOPF",
+    "ARC_RJB_SHOPF_WINDOW",
+    "ARC_RJB_SHOPG_WINDOW",
+    "ARC_RJB_STOREFRONTA",
+    "ARC_SHOPPING_CENTER_01",
+    "ARC_SHOPPING_CENTER_PLA",
+    "ARC_WIND_STORELIT",
+    "SGN_NEON_OUTLINE",
+    "SGN_RJB_BLANCHARD_NEON",
+    "SGN_RJB_PARK_CROWN_NEON",
+    "SGN_RJB_PARK_KING_NEON",
+    "SGN_STAR_NEON",
+    "SGN_SUSHI_NEON",
+    "SGN_SUSHI_RYAN_NEON",
+    "SGN_THE_DIPLOMAT_NEON",
+    "SGN_THE_IMPERIAL_NEON"
+  ],
+  "chunk_ids": [
+    "0x00034035",
+    "0x00034101",
+    "0x00034102",
+    "0x00034103",
+    "0x00034104",
+    "0x00134002",
+    "0x00134003",
+    "0x00134011",
+    "0x00134012",
+    "0x00134013",
+    "0x00134900",
+    "0x00134b01",
+    "0x00134b02",
+    "0x00134b03",
+    "0x00e34010",
+    "0x30300101",
+    "0x30300102",
+    "0x30300103",
+    "0x33310001",
+    "0x33310002",
+    "0x33310004",
+    "0x33310005",
+    "0x33320001",
+    "0x33320002",
+    "0x80034100",
+    "0x80134000",
+    "0x80134001",
+    "0x80134008",
+    "0x80134010",
+    "0x80134100",
+    "0xb0300100",
+    "0xb3300000",
+    "0xb3310000",
+    "0xb3320000"
+  ],
+  "coordinate_system": "glTF Y-up, metres; game (x,y,z) -> (y,z,x)",
+  "game_origin": [
+    800.0,
+    -607.0,
+    19.6
+  ],
+  "bounds": {
+    "min": [
+      -111.231689453125,
+      -19.6,
+      -145.24749755859375
+    ],
+    "max": [
+      102.10000610351562,
+      73.60857238769532,
+      188.1201803330332
+    ]
+  },
+  "camera": {
+    "position": [
+      0.0,
+      1.1903903255686892,
+      3.7000000000000455
+    ],
+    "target": [
+      0.0,
+      3.0174180957361685,
+      65.0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
+    "height_above_road_m": 1.2,
+    "vertical_fov_degrees": 55,
+    "near": 0.1,
+    "far": 650
+  },
+  "vertices": 30948,
+  "triangles": 19990,
+  "unique_vertices": 14880,
+  "unique_triangles": 10253,
+  "meshes": 233,
+  "instances": 233,
+  "materials": 168,
+  "placement_chunk": "0x80034100 > 0x34103; 48-byte instances; definitions in 0x34102",
+  "source_instances": 244,
+  "skipped_instances": [
+    {
+      "section": 601,
+      "placement": 100,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 101,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 103,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 104,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 105,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 107,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 108,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 110,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 111,
+      "flags": 98,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 229,
+      "flags": 66,
+      "reason": "auxiliary_view"
+    },
+    {
+      "section": 601,
+      "placement": 230,
+      "flags": 66,
+      "reason": "auxiliary_view"
+    }
+  ],
+  "placement_evidence": "census/hopper/decomp.c: 0x4457c0 loads instances, 0x445580 builds local * R + t, 0x445ec0 filters view[0x210] & (flags ^ 0x60); exclude auxiliary-view bit 0x02.",
+  "shared_texture_sources": [
+    "game/GLOBAL/GLOBALB.BUN",
+    "game/GLOBAL/INGAMEB.BUN"
+  ],
+  "textures": [
+    {
+      "hash": "8c58916b",
+      "name": "GRAY_MID_A",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "483d7daf",
+      "name": "SGN_NOPARKING",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "ad0948d3",
+      "name": "SGN_BACKLARGESIGN",
+      "width": 512,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "6290ace1",
+      "name": "SGN_METALROUND",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "d8e4f459",
+      "name": "SGN_WARNSIDERD",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "15052cde",
+      "name": "ARC_RJB_BLKSHNYMETL",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4235eed5",
+      "name": "SGN_BUS_STOP",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "65335b5e",
+      "name": "SGN_LI_GATE03",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "ce03dd15",
+      "name": "OBJ_CARDBOARD_BOX2",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d5565d8",
+      "name": "ARC_LI_STWL15",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "c59c12d3",
+      "name": "OBJ_FENCE_CHNLINK01_TOP",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "8e3f81f3",
+      "name": "OBJ_TELEPOLE",
+      "width": 64,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "1c27d114",
+      "name": "OBJ_TELEPOLE01",
+      "width": 128,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "45b98e8e",
+      "name": "ARC_LI_PLBG01",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "cfe5a082",
+      "name": "OBJ_BARREL1",
+      "width": 128,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "df064019",
+      "name": "OBJ_POLE_001",
+      "width": 64,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4fd2467a",
+      "name": "OBJ_WOOD_PLANKS",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "7d56b986",
+      "name": "ARC_CONC_WALL",
+      "width": 256,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "87d75105",
+      "name": "ARC_MARKETSTORE",
+      "width": 512,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "3f541a20",
+      "name": "ARC_LI_MTSC01",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "a6e7dfba",
+      "name": "OBJ_SMALLROUND",
+      "width": 64,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "5d616350",
+      "name": "ORG_LEAVES6T",
+      "width": 128,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "71e2bb47",
+      "name": "ARC_CONCRETPAINTED_01",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "74658a5b",
+      "name": "ARC_WIND_STORELIT",
+      "width": 128,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "b81f130b",
+      "name": "ARC_A_CROSSBEAM_GR",
+      "width": 128,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "eff29a7a",
+      "name": "ARC_METAL3",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "1ff171df",
+      "name": "OBJ_TELEPOLE_LITE_BRIGH",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "5c6d5869",
+      "name": "SGN_COMMERCIALST",
+      "width": 256,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "ea1865cb",
+      "name": "SGN_COMMERCIALSTB",
+      "width": 256,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "598b8a66",
+      "name": "SGN_WALLACEST",
+      "width": 128,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "8afcd768",
+      "name": "SGN_WALLACESTB",
+      "width": 128,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "9c3eb0f7",
+      "name": "SGN_SIGNALAHEAD",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "282dea78",
+      "name": "ARC_CONC_WALL2",
+      "width": 128,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "45f7b2e4",
+      "name": "ARC_VENTS",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "d9cd6374",
+      "name": "ARC_LI_WDWN01_L",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4bb9239f",
+      "name": "ARC_CT6STORY_BANKB",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "ae0f7f90",
+      "name": "AR1_STORE01",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "27eb21b2",
+      "name": "ARC_CONC_TOPBOX",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d535637",
+      "name": "ARC_LI_STST01",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "23f03d06",
+      "name": "ARC_NOTRESPASS",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "405880d7",
+      "name": "ARC_OVERPASS_001",
+      "width": 512,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "34f94803",
+      "name": "ARC_RJB_SHOPA_WINDOW",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "008dafc2",
+      "name": "OBJ_NOPARKING",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "ffdba2df",
+      "name": "OBJ_SPOT",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "e666259c",
+      "name": "OBJ_VIOLATORS",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "1a4448d1",
+      "name": "SGN_TOW_AWAY",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "d0ace305",
+      "name": "WAL_YELLOWBARRIER",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "314032a7",
+      "name": "ARC_BLDING_B_C",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "31403b29",
+      "name": "ARC_BLDING_D_C",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "31403b2c",
+      "name": "ARC_BLDING_D_F",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "a9cf103b",
+      "name": "ARC_CT3TOWERAPARTMENT",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "98af887c",
+      "name": "ARC_SHOPPING_CENTER_01",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "59d41788",
+      "name": "ARC_CT3TOWERAPARTMENT_N",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "0b6b7e2d",
+      "name": "ARC_LI_STWN04_ILLU",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "5f246268",
+      "name": "SGN_THE_IMPERIAL_NEON",
+      "width": 256,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "78e3fc8d",
+      "name": "SGN_LI_OPEN01",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "005fa675",
+      "name": "SGN_NEON_OUTLINE",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "eb17ec81",
+      "name": "SGN_SUSHI_NEON",
+      "width": 256,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "c8ad795e",
+      "name": "ARC_A51_CONCWALL1",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d5565b9",
+      "name": "ARC_LI_STWL07",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d556e38",
+      "name": "ARC_LI_STWN04",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "fc1c4688",
+      "name": "ARC_RJB_STOREFRONTA",
+      "width": 1024,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "491fa5c0",
+      "name": "ARC_ST_BALC_BAR",
+      "width": 512,
+      "height": 128,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "76b8b2af",
+      "name": "ARC_ST_BUILD01_SIDE",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "fa5f0cf0",
+      "name": "ARC_ST_BUILD06",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "5c9e0ef0",
+      "name": "ARC_A_INSIDE",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "8929ce25",
+      "name": "ARC_CANOPYKAMTRAVEL",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "22d2cad8",
+      "name": "ARC_CT4STORY_APARTA",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "0d7cf1c5",
+      "name": "ARC_RJB_SHOPC_WINDOW",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "94f3293d",
+      "name": "SGN_ALL_DAY_BREAKFAST_N",
+      "width": 256,
+      "height": 32,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "17b16ee5",
+      "name": "ARC_CANOPYPOHINGJEWELRY",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d528e49",
+      "name": "ARC_LI_STRF02",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "580ca50f",
+      "name": "ARC_RJB_SHOPD",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "e6009b87",
+      "name": "ARC_RJB_SHOPE_WINDOW",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "c61439b2",
+      "name": "ARC_CANOPYMAHBAKERY",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "f564a6ff",
+      "name": "ARC_FENCEONBRIDGE",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "580ca510",
+      "name": "ARC_RJB_SHOPE",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "2d7968b5",
+      "name": "ARC_RJB_SHOPE_SIDEA",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "d2427068",
+      "name": "ARC_RJB_SHOPF_WINDOW",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "be844549",
+      "name": "ARC_RJB_SHOPG_WINDOW",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "65335b5c",
+      "name": "SGN_LI_GATE01",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "580ca511",
+      "name": "ARC_RJB_SHOPF",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "15291026",
+      "name": "ARC_LI_CLOTH04",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "15291048",
+      "name": "ARC_LI_CLOTH15",
+      "width": 512,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d5565ba",
+      "name": "ARC_LI_STWL08",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "4d556e3a",
+      "name": "ARC_LI_STWN06",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "fa533eb9",
+      "name": "ARC_BRIDGESIDES",
+      "width": 128,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "b9fa5260",
+      "name": "ARC_UNDERTHEBRIDGE",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "e65f74e5",
+      "name": "ARC_IBEAM3",
+      "width": 64,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "d458d821",
+      "name": "ARC_A_PILLERSIDE",
+      "width": 128,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "545847cb",
+      "name": "ARC_BARRIER_GREEN",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "d57c0d6f",
+      "name": "ARC_NEONLIGHTS",
+      "width": 64,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "2b779eb1",
+      "name": "SGN_RJB_BLANCHARD_NEON",
+      "width": 256,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "9d2f9027",
+      "name": "SGN_RJB_THEATRE_PURPLE",
+      "width": 512,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "2ba4b41a",
+      "name": "OBJ_GARBAGE_BIN",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "3f4b82db",
+      "name": "ARC_LI_MTCN01",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "50429592",
+      "name": "OBJ_GREEN_BOX",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "9feb83f1",
+      "name": "ARC_SHOPPING_CENTER_PLA",
+      "width": 64,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "eedfdfc2",
+      "name": "TRN_GRASS_001",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "5494786d",
+      "name": "SGN_ADV_AUTOZONE_SPARKP",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "17f2b2e7",
+      "name": "SGN_BACK_001",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "3170524e",
+      "name": "SGN_LIGHT_001",
+      "width": 128,
+      "height": 32,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "c253203f",
+      "name": "SGN_LIGHTBACK_001",
+      "width": 128,
+      "height": 32,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "2c48d59e",
+      "name": "SGN_ADV_ZOOYORKA",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "a38b6cee",
+      "name": "ARC_A51CONCRETE",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "ed4c55c0",
+      "name": "ARC_LADDER",
+      "width": 32,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "3394fe62",
+      "name": "HEADLIGHTGLOW",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x8",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "26361d52",
+      "name": "SGN_BILLBOARD_GRAFB",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "f91d2588",
+      "name": "ARC_SIDEWALK_A",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "9100facf",
+      "name": "SGN_THE_DIPLOMAT_NEON",
+      "width": 64,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "9dac57e2",
+      "name": "SGN_HOTEL",
+      "width": 256,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "b896ba48",
+      "name": "SGN_RJB_PARK_CROWN_NEON",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "04174c19",
+      "name": "SGN_RJB_PARK_KING",
+      "width": 64,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "b3bad128",
+      "name": "SGN_RJB_PARK_KING_NEON",
+      "width": 64,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "8cca863d",
+      "name": "SGN_RJB_LUNCH",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "381f059a",
+      "name": "SGN_SUSHI_RYAN_NEON",
+      "width": 32,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "00fd3d6d",
+      "name": "ARC_LI_STWL05_SD",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "c00fedba",
+      "name": "SGN_USED_FURNITURE",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "b02fc908",
+      "name": "ORG_GRASSSINGLE",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "a8fe7190",
+      "name": "ARC_DEADBRANCH",
+      "width": 128,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "ffd210f9",
+      "name": "OBJ_BARK",
+      "width": 64,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "ba2f3869",
+      "name": "ARC_OVERPASS_GRAFC",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "ba2f386b",
+      "name": "ARC_OVERPASS_GRAFE",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d5565da",
+      "name": "ARC_LI_STWL17",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "ba2f3867",
+      "name": "ARC_OVERPASS_GRAFA",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "70a13912",
+      "name": "XW_CHAIN_FENCEB",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "d8cb04d8",
+      "name": "ARC_CHAINA",
+      "width": 64,
+      "height": 32,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "3dc82952",
+      "name": "ARC_CONCRETE_BLOCKA",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "d366c94d",
+      "name": "ARC_POST_METALA",
+      "width": 64,
+      "height": 64,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "736fd118",
+      "name": "ARC_RJB_MONEY_SIGN_NEON",
+      "width": 128,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "885785ce",
+      "name": "ARC_RJB_BILLIARD_BALL",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "d1dfd14f",
+      "name": "SGN_STAR_NEON",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x24",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "c2975107",
+      "name": "ARC_BARRIERDIRTY",
+      "width": 512,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "bd126460",
+      "name": "ARC_BRICK01",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "9e163bea",
+      "name": "ARC_CONCFREEWAY",
+      "width": 256,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "3405a420",
+      "name": "OBJ_FENCE_CHNLINK",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "31403f6e",
+      "name": "ARC_BLDING_E_G",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "5813087c",
+      "name": "ARC_RJB_STC_B",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "8d73d271",
+      "name": "ARC_SHINY_METAL",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "81792362",
+      "name": "SFX_TRAFFICLIGHTYELLOW",
+      "width": 128,
+      "height": 128,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "f86a6420",
+      "name": "ARC_LI_STWN10_L",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d556e5b",
+      "name": "ARC_LI_STWN16",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "f869fe08",
+      "name": "ARC_LI_STWN09_L",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d556e7b",
+      "name": "ARC_LI_STWN25",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d556e78",
+      "name": "ARC_LI_STWN22",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "0e45781a",
+      "name": "ARC_FACTORYBRICK_04",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "a73d6925",
+      "name": "ARC_NORCHEMSIDE",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "6b1f7137",
+      "name": "ARC_WINDOW_GREY_CORRGTD",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "41646f10",
+      "name": "AR1_WALLBRKOLD",
+      "width": 128,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "ff70241e",
+      "name": "ARC_WAREHOUSE_ROOF02",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "4d5565d9",
+      "name": "ARC_LI_STWL16",
+      "width": 512,
+      "height": 256,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "f91d258a",
+      "name": "ARC_SIDEWALK_C",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "de762fdd",
+      "name": "RDP_INTERSECTMIDTILE",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "9a722bf7",
+      "name": "RDP_RD_INTERSECT_MA",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "85e557b0",
+      "name": "RDP_ROADSTRIP_AADIRT",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "1ada15ff",
+      "name": "RDP_ROADSTRIP_AC",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "1ada1600",
+      "name": "RDP_ROADSTRIP_AD",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "1ada1620",
+      "name": "RDP_ROADSTRIP_BC",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "1ada1624",
+      "name": "RDP_ROADSTRIP_BG",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "c555177e",
+      "name": "RDP_ROADSTRIP_COBBLESTO",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "1ada178b",
+      "name": "RDP_ROADSTRIP_MC",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "8974fd5b",
+      "name": "RDP_ROADSTRIP_RSHLDR1",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "8974fd5d",
+      "name": "RDP_ROADSTRIP_RSHLDR3",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "05dbf74c",
+      "name": "ARC_COURTGD_01",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "5671b2b5",
+      "name": "TRN_GRASSC",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "00fcb10c",
+      "name": "ARC_LI_STWL04_SD",
+      "width": 256,
+      "height": 512,
+      "source_format": "0x22",
+      "encoding": "image/jpeg",
+      "embedded": true
+    },
+    {
+      "hash": "f91d258d",
+      "name": "ARC_SIDEWALK_F",
+      "width": 128,
+      "height": 1024,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    },
+    {
+      "hash": "a39a8ff1",
+      "name": "RDP_ROAD_JUNKYARD",
+      "width": 512,
+      "height": 512,
+      "source_format": "0x24",
+      "encoding": "image/png",
+      "embedded": true
+    }
+  ],
+  "glb_bytes": 14718540,
+  "normals": "Area-weighted normals derived from original triangle winding; absent in 24-byte source vertices.",
+  "materials_note": "Unlit glTF materials preserve baked vertex colours and diffuse textures. Original shaders are not reproduced.",
+  "unknown": [
+    "Original wet-road reflection, animated/additive neon and exact shader blend behaviour.",
+    "Pixel parity with the game; no game run was performed."
+  ],
+  "unresolved_texture_hashes": [],
+  "objects": [
+    {
+      "section": 601,
+      "placement": 0,
+      "solid": "XO_SIGNNOPARKINGSIGNA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 1,
+      "solid": "XO_SIGNNOPARKINGSIGNA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 2,
+      "solid": "XO_SIGNNOPARKINGSIGNA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 3,
+      "solid": "XO_SIGNNOPARKINGSIGNA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 4,
+      "solid": "XO_SIGNNOPARKINGSIGNA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 5,
+      "solid": "XO_SIGNNOPARKINGSIGNA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 6,
+      "solid": "XO_SIGNNOPARKINGSIGNA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 7,
+      "solid": "XO_WARNSIDERDB_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 8,
+      "solid": "XO_BUSSIGNPOSTB_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 9,
+      "solid": "XO_BUSSIGNPOSTB_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 10,
+      "solid": "XO_CARDBOARDBOXA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 11,
+      "solid": "XO_ELECPOLEA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 12,
+      "solid": "XO_ELECPOLEA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 13,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 14,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 15,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 16,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 17,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 18,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 19,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 20,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 21,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 22,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 23,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 24,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 25,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 26,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 27,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 28,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 29,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 30,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 31,
+      "solid": "XO_GARBAGEBAGA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 32,
+      "solid": "XO_OILBARRELA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 33,
+      "solid": "XO_OILBARRELA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 34,
+      "solid": "XO_OILBARRELA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 35,
+      "solid": "XO_PARKBENCHD_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 36,
+      "solid": "XO_PARKBENCHD_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 37,
+      "solid": "XO_POWERPOLEA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 38,
+      "solid": "XO_POWERPOLEA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 39,
+      "solid": "XO_POWERPOLEA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 40,
+      "solid": "XO_POWERPOLEA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 41,
+      "solid": "XO_SHOPPING_CARTA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 42,
+      "solid": "XT_BUSHA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 43,
+      "solid": "XO_PARKLAMPA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 44,
+      "solid": "XO_PARKLAMPA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 45,
+      "solid": "XO_PARKLAMPA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 46,
+      "solid": "XO_PARKLAMPA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 47,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 48,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 49,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 50,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 51,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 52,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 53,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 54,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 55,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 56,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 57,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 58,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 59,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 60,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 61,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 62,
+      "solid": "XO_STREETLIGHTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 63,
+      "solid": "XO_STREETPOSTC_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 64,
+      "solid": "SGN_COMMERCIALST_05"
+    },
+    {
+      "section": 601,
+      "placement": 65,
+      "solid": "SGN_WALLACEST_03"
+    },
+    {
+      "section": 601,
+      "placement": 66,
+      "solid": "XO_SIGNALAHEADNP_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 67,
+      "solid": "FILLERPIECE"
+    },
+    {
+      "section": 601,
+      "placement": 68,
+      "solid": "HOTEL_FENCE"
+    },
+    {
+      "section": 601,
+      "placement": 69,
+      "solid": "XB_APARTMENTS_NARROW_WINDOW"
+    },
+    {
+      "section": 601,
+      "placement": 70,
+      "solid": "XB_CT_6STORY_BANKB_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 71,
+      "solid": "XB_GUARDSHACK_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 72,
+      "solid": "XB_HOTEL_A_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 73,
+      "solid": "XB_HOTEL_B_WINDOWS_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 74,
+      "solid": "XB_PINK_BUILDING_NEON_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 75,
+      "solid": "XB_RJB_APTA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 76,
+      "solid": "XB_RJB_APTA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 77,
+      "solid": "XB_RJB_LUNCH_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 78,
+      "solid": "XB_RJB_LUNCH_NEON_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 79,
+      "solid": "XB_RJB_SHOPD_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 80,
+      "solid": "XB_RJB_SHOPD_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 81,
+      "solid": "XB_RJB_SHOPE_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 82,
+      "solid": "XB_RJB_SHOPF_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 83,
+      "solid": "XB_RJB_SHOPF_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 84,
+      "solid": "XB_SHOPH_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 85,
+      "solid": "XB_SKYWALK_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 86,
+      "solid": "XB_SKYWALK_EDGES_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 87,
+      "solid": "XB_STAIRCASESOLID_1B_00_DEI"
+    },
+    {
+      "section": 601,
+      "placement": 88,
+      "solid": "XB_THEATRE_BLANCHARD_NEON_1"
+    },
+    {
+      "section": 601,
+      "placement": 89,
+      "solid": "XO_CARWRECKA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 90,
+      "solid": "XO_GARBAGEBINA_1B_00_DEINST"
+    },
+    {
+      "section": 601,
+      "placement": 91,
+      "solid": "XO_GARBAGEBINB_1B_00_DEINST"
+    },
+    {
+      "section": 601,
+      "placement": 92,
+      "solid": "XO_GREEN_BOX_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 93,
+      "solid": "XO_PLANTERC_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 94,
+      "solid": "XOU_OPEN_SIGN_1B_6000"
+    },
+    {
+      "section": 601,
+      "placement": 95,
+      "solid": "XS_BBAUTOZONE_SPARKPLUG_1B_"
+    },
+    {
+      "section": 601,
+      "placement": 96,
+      "solid": "XS_BBZOOYORK_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 97,
+      "solid": "XS_BILLBOARD_FRAME_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 98,
+      "solid": "XS_BILLBOARD_GRAFB_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 99,
+      "solid": "XS_DIPLOMAT_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 102,
+      "solid": "XS_HOTEL_ORANGE_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 106,
+      "solid": "XS_PARK_KING_SIGN_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 109,
+      "solid": "XS_RJB_LUNCH_NEON_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 112,
+      "solid": "XS_SUSHI_RYAN_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 113,
+      "solid": "XSU_RJB_LUNCH_1B_2001"
+    },
+    {
+      "section": 601,
+      "placement": 114,
+      "solid": "XSU_USED_FURNITURE_1B_6000"
+    },
+    {
+      "section": 601,
+      "placement": 115,
+      "solid": "XT_GRASSCLUMP_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 116,
+      "solid": "XT_STREET_TREEA_1B_00_DEINS"
+    },
+    {
+      "section": 601,
+      "placement": 117,
+      "solid": "XW_BACK_ALLEY_WALLH_1B_00_D"
+    },
+    {
+      "section": 601,
+      "placement": 118,
+      "solid": "XW_BACK_ALLEY_WALLJ_1B_00_D"
+    },
+    {
+      "section": 601,
+      "placement": 119,
+      "solid": "XW_CHAINFENCEPOSTA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 120,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 121,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 122,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 123,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 124,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 125,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 126,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 127,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 128,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 129,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 130,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 131,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 132,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 133,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 134,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 135,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 136,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 137,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 138,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 139,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 140,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 141,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 142,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 143,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 144,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 145,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 146,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 147,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 148,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 149,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 150,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 151,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 152,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 153,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 154,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 155,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 156,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 157,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 158,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 159,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 160,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 161,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 162,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 163,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 164,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 165,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 166,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 167,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 168,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 169,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 170,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 171,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 172,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 173,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 174,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 175,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 176,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 177,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 178,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 179,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 180,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 181,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 182,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 183,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 184,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 185,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 186,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 187,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 188,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 189,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 190,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 191,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 192,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 193,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 194,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 195,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 196,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 197,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 198,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 199,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 200,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 201,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 202,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 203,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 204,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 205,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 206,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 207,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 208,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 209,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 210,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 211,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 212,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 213,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 214,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 215,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 216,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 217,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 218,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 219,
+      "solid": "XW_CHAIN_FENCEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 220,
+      "solid": "XW_YELLOWBARRIERA_1B_00_DEI"
+    },
+    {
+      "section": 601,
+      "placement": 221,
+      "solid": "_WORKAROUND_FOR_REDUCED_TEX"
+    },
+    {
+      "section": 601,
+      "placement": 222,
+      "solid": "_WORKAROUND_FOR_REDUCED_TEX"
+    },
+    {
+      "section": 601,
+      "placement": 223,
+      "solid": "_WORKAROUND_FOR_STAR_SIGN"
+    },
+    {
+      "section": 601,
+      "placement": 224,
+      "solid": "XW_BARRIERR_1B_00_DEINSTANC"
+    },
+    {
+      "section": 601,
+      "placement": 225,
+      "solid": "OSBFG_LONGTRAFFICCABLE"
+    },
+    {
+      "section": 601,
+      "placement": 226,
+      "solid": "XO_CANOPYLIGHTA_1B_00_DEINS"
+    },
+    {
+      "section": 601,
+      "placement": 227,
+      "solid": "XO_TRAFFICLIGHTC_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 228,
+      "solid": "XO_TRAFFICLIGHTC_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 231,
+      "solid": "XO_TRAFFICLIGHTCABLEA_1A_00"
+    },
+    {
+      "section": 601,
+      "placement": 232,
+      "solid": "XB_BACK_ALLEY_BUILDC_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 233,
+      "solid": "XB_BACK_ALLEY_BUILDD_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 234,
+      "solid": "XB_BACK_ALLEY_BUILDE_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 235,
+      "solid": "XB_WHOUSEBOXB_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 236,
+      "solid": "XB_HIGHWAYBUILDA_1B_00"
+    },
+    {
+      "section": 601,
+      "placement": 237,
+      "solid": "XW_BACK_ALLEY_WALLD_1B_00_D"
+    },
+    {
+      "section": 601,
+      "placement": 238,
+      "solid": "XO_CATSEYEORANGE_1B_00_DEIN"
+    },
+    {
+      "section": 601,
+      "placement": 239,
+      "solid": "XO_CATSEYE_1B_00_DEINSTANCE"
+    },
+    {
+      "section": 611,
+      "placement": 0,
+      "solid": "TRSBFG_ROADA_CHOP1"
+    },
+    {
+      "section": 611,
+      "placement": 1,
+      "solid": "TRSBFG_TERRAINNDA_CHOP5"
+    },
+    {
+      "section": 611,
+      "placement": 2,
+      "solid": "TRSBFG_TERRAINNRND_CHOP1"
+    },
+    {
+      "section": 611,
+      "placement": 3,
+      "solid": "TRSCEFJ_ROADA_CHOP1"
+    }
+  ],
+  "prior_art": [
+    "tools/launcher/car_export.py",
+    "tools/openworld/mesh.py",
+    "tools/remaster/census_world.py",
+    "ref/_ext/PryHUB/crates/gizmo-nfs/src/geometry/vertex.rs",
+    "ref/_ext/PryHUB/crates/gizmo-nfs/src/geometry/material.rs"
+  ],
+  "texture_credit": "HDCube by Venomalia, CC-BY-4.0",
+  "texture_upscale": {
+    "upscaled": 142,
+    "skipped_large": 26,
+    "skipped_tiny": 0,
+    "cache_hits": 0,
+    "skipped": 26,
+    "before_bytes": 11519224,
+    "after_bytes": 14718540,
+    "device": "mps",
+    "seconds": 3.048,
+    "model_sha256": "67f296d868de757b4f3daca3e35f16b61ab1ae88703776727dab212004203e57"
+  }
+}

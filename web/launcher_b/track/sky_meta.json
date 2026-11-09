@@ -1,0 +1,125 @@
+{
+  "source": "game/Tracks/STREAML1RA.BUN",
+  "texture_source": "game/Tracks/TEX1001TRACK.BIN",
+  "solid": "SKYDOME",
+  "solid_hash": "be43edbb",
+  "solid_chunk_payload_offset": 246336,
+  "section_id": 2600,
+  "placement": 0,
+  "placement_flags": 0,
+  "placement_translation_game": [
+    -692.1016845703125,
+    2132.54736328125,
+    0.0
+  ],
+  "placement_rotation": [
+    [
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "header_matrix_game_not_applied": [
+    -1.0,
+    -3.8941436741879443e-07,
+    0.0,
+    0.0,
+    3.8941436741879443e-07,
+    -1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -692.1016845703125,
+    2132.54736328125,
+    0.0,
+    1.0
+  ],
+  "coordinate_system": "glTF Y-up, metres; game (x,y,z) -> (y,z,x)",
+  "game_origin": [
+    800.0,
+    -607.0,
+    19.6
+  ],
+  "radius": 6172.292983886771,
+  "radius_definition": "Maximum vertex distance from placed AABB center, metres; not an ideal sphere.",
+  "center_game": [
+    -647.5301513671875,
+    2061.582763671875,
+    39.5552978515625
+  ],
+  "center_offset": [
+    2668.582763671875,
+    19.9552978515625,
+    -1447.5301513671875
+  ],
+  "center_offset_game": [
+    -1447.5301513671875,
+    2668.582763671875,
+    19.9552978515625
+  ],
+  "center_definition": "Placed AABB center relative to street_meta.json game_origin; baked into GLB positions.",
+  "bounds": {
+    "min": [
+      -3454.7841796875,
+      -3515.66259765625,
+      -7570.8974609375
+    ],
+    "max": [
+      8791.94921875,
+      3555.572998046875,
+      4675.83740234375
+    ]
+  },
+  "vertices": 421,
+  "triangles": 720,
+  "materials": 2,
+  "textures": [
+    {
+      "hash": "8922567d",
+      "name": "SKY_OVERCASTA",
+      "width": 512,
+      "height": 128,
+      "source_format": "0x20",
+      "embedded": true
+    },
+    {
+      "hash": "67688ab0",
+      "name": "SKY_OVERCASTA_CAP",
+      "width": 256,
+      "height": 256,
+      "source_format": "0x20",
+      "embedded": true
+    }
+  ],
+  "glb_bytes": 159776,
+  "render_state_notes": {
+    "source_fact": "SKYDOME hash is excluded from ordinary world placement resolution at 0x4457c0; it uses a separate sky pass.",
+    "launcher": "scene.js puts sky in the first layer, disables depth test/write and culling, and forces clip z to w*0.99999. Vertex colour and original UVs are preserved; its sky shader multiplies texture RGB by 2*vertex RGB.",
+    "gltf": "Opaque, double-sided KHR_materials_unlit materials with embedded PNGs. Depth state is descriptive extras; glTF does not encode it.",
+    "placement": "Explicit section 2600 placement is baked once. No rescaling or camera-follow transform is invented."
+  },
+  "prior_art": [
+    "tools/launcher/track_export.py",
+    "tools/launcher/car_export.py",
+    "tools/openworld/mesh.py",
+    "ref/_ext/PryHUB/crates/gizmo-nfs/src/geometry/vertex.rs",
+    "ref/_ext/PryHUB/crates/gizmo-nfs/src/geometry/material.rs"
+  ],
+  "unknown": [
+    "Original runtime sky recentering and exact sky-pass shader/blend state.",
+    "Pixel parity and in-browser integration; no game runs performed."
+  ]
+}

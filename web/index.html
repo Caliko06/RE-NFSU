@@ -54,8 +54,6 @@ const bridgeTo = RN_Q.get('bridge');
 if (bridgeTo !== null) window.rnBridge = q => { location.href = (bridgeTo && bridgeTo !== '1' ? bridgeTo : `http://${location.hostname}:5190/`) + '?' + q; return 1; };
 </script>
 <script src="out/speed.js"></script>
-<script src="boot.js"></script>
-<script src="overlay.js"></script>
 <script>
 // ?fast=1 (the launcher, proposal A+B): scene B (web/launcher_b) covers the game while it boots (no intro movies or splash, PATCH 0x4de395; the game's own
 // Accept loads the profile, web/boot.js). Enter or a click lifts the cover with a 250 ms fade, only once the game reports its main menu (the "flow fe ...MU_Main_PC.fng" log line).
@@ -69,6 +67,9 @@ if (RN_Q.get('fast') === '1') {
   const ab = Object.assign(document.createElement('iframe'), { id: 'ab', src: '/launcher_b/', tabIndex: -1 }), msg = Object.assign(document.createElement('div'), { id: 'ab-msg', textContent: 'Enter para jugar' });
   document.body.append(ab, msg);
   let ready = false, want = false, gone = false;
+  // The WASM boot waits (web/boot.js awaits RN_HOLD) until scene B has drawn its first frame (RN_B.ready, same origin) or 1.5 s: the game's boot would starve it (GPU, main thread).
+  const t0b = performance.now();
+  window.RN_HOLD = new Promise(res => { const f = () => { if (ab.contentWindow?.RN_B?.ready || performance.now() - t0b > 1500) { window.RN_AB_MS = Math.round(performance.now() - t0b); res(); } else setTimeout(f, 40); }; f(); });
   const lift = () => {
     if (gone) return; gone = true; ab.style.opacity = msg.style.opacity = '0';
     setTimeout(() => { ab.remove(); msg.remove(); document.getElementById('screen').focus(); }, 260);
@@ -89,6 +90,8 @@ if (RN_Q.get('fast') === '1') {
   window.RN_AB = { get ready() { return ready; }, lift };
 }
 </script>
+<script src="boot.js"></script>
+<script src="overlay.js"></script>
 
 </body>
 </html>

@@ -1,0 +1,1941 @@
+{
+  "car": "SKYLINE",
+  "units": "metres",
+  "axes": "glTF: +x car-left, +y up, +z forward; ground at y=0",
+  "bbox": {
+    "min": [
+      -1.003,
+      0.0,
+      -2.354
+    ],
+    "max": [
+      1.003,
+      1.34,
+      2.397
+    ]
+  },
+  "wheel_radius": 0.3303283751010895,
+  "wheel_mounts_game": {
+    "FL": [
+      1.341439962387085,
+      0.9628300070762634,
+      0.14632000029087067
+    ],
+    "FR": [
+      1.341439962387085,
+      -0.9628300070762634,
+      0.14632000029087067
+    ],
+    "RR": [
+      -1.3200199604034424,
+      -0.9830999970436096,
+      0.1410599946975708
+    ],
+    "RL": [
+      -1.3200199604034424,
+      0.9830999970436096,
+      0.1410599946975708
+    ]
+  },
+  "wheel_placement_source": "GLOBALB CarTypeInfo +0x120, stride 0x30; render face +0x20 widebody / +0x1c stock; identity 0x134011 wheel matrix",
+  "wheel_centers": {
+    "FL": [
+      0.871,
+      0.336,
+      1.341
+    ],
+    "FR": [
+      -0.871,
+      0.336,
+      1.341
+    ],
+    "RR": [
+      -0.891,
+      0.33,
+      -1.32
+    ],
+    "RL": [
+      0.891,
+      0.33,
+      -1.32
+    ]
+  },
+  "wheel_nodes_note": "nodes wheel_FL/FR/RL/RR share one mesh; spin about local x; steer about local y",
+  "headlights": {
+    "L": [
+      0.6,
+      0.627,
+      2.013
+    ],
+    "R": [
+      -0.6,
+      0.627,
+      2.013
+    ]
+  },
+  "taillights": {
+    "L": [
+      0.656,
+      0.83,
+      -2.15
+    ],
+    "R": [
+      -0.656,
+      0.83,
+      -2.15
+    ]
+  },
+  "other_markers": {
+    "plate_rear": [
+      0.001,
+      0.528,
+      -2.263
+    ],
+    "mirror_R": [
+      -0.974,
+      0.966,
+      0.44
+    ],
+    "mirror_L": [
+      0.972,
+      0.971,
+      0.433
+    ]
+  },
+  "materials": [
+    "PLAINNOTHING+tex0",
+    "DECAL+tex1",
+    "INTERIOR+tex2",
+    "WINDSHIELD+tex3",
+    "WINDOWMASK+tex3",
+    "CARSKIN+tex2",
+    "BOTTOM+tex4",
+    "MESH+tex5",
+    "DULLPLASTIC+tex2",
+    "PLAINNOTHING+tex2",
+    "RAD+tex2",
+    "MOLDINGS+tex2",
+    "CARBONFIBER+tex6",
+    "ALUMINUM+tex2",
+    "MOLDINGS+tex7",
+    "ALUMINUM+tex7",
+    "HEADLIGHTREFLECTOR+tex7",
+    "HEADLIGHTGLASS+tex8",
+    "BRAKELIGHT+tex9",
+    "CARSKIN+tex9",
+    "DECAL+tex10",
+    "DECAL+tex11",
+    "DECAL+tex12",
+    "DECAL+tex13",
+    "DECAL+tex14",
+    "DECAL+tex15",
+    "PLAINNOTHING+tex16",
+    "DULLENGINE+tex16",
+    "EXHAUST_TIP+tex16",
+    "MAGGUNMETAL+tex17",
+    "PLAINNOTHING+tex17",
+    "MAGSILVER+tex17",
+    "MAGCHROME+tex17",
+    "RUBBER+tex17",
+    "CALIPERDECAL+tex18",
+    "CALLIPER+tex18",
+    "GOLDROTOR+tex19",
+    "CALLIPER+tex19"
+  ],
+  "gameMaterials": {
+    "ALUMINUM": {
+      "dmin": [
+        0.699999988079071,
+        0.699999988079071,
+        0.699999988079071,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "smin": [
+        0.6000000238418579,
+        0.6000000238418579,
+        0.6600000262260437
+      ],
+      "srange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emin": [
+        0.009999999776482582,
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "erange": [
+        0.10200000368058681,
+        0.10200000368058681,
+        0.10200000368058681
+      ],
+      "spower": 1.690000057220459,
+      "epower": 0.13199999928474426
+    },
+    "BOTTOM": {
+      "dmin": [
+        0.8330000042915344,
+        0.8330000042915344,
+        0.8330000042915344,
+        1.0
+      ],
+      "drange": [
+        0.006999969482421875,
+        0.006999969482421875,
+        0.006999969482421875,
+        0.0
+      ],
+      "smin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "srange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "erange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "spower": 3.888000011444092,
+      "epower": 2.0
+    },
+    "BRAKELIGHT": {
+      "dmin": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        -0.6629999876022339
+      ],
+      "smin": [
+        0.6050000190734863,
+        0.5,
+        0.5
+      ],
+      "srange": [
+        -0.10300004482269287,
+        0.0,
+        0.0
+      ],
+      "emin": [
+        0.0860000029206276,
+        0.0860000029206276,
+        0.0860000029206276
+      ],
+      "erange": [
+        0.11400000005960464,
+        0.11400000005960464,
+        0.11400000005960464
+      ],
+      "spower": 1.7599999904632568,
+      "epower": 1.6629999876022339
+    },
+    "CALIPERDECAL": {
+      "dmin": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "smin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "srange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "erange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "spower": 1.2649999856948853,
+      "epower": 2.0
+    },
+    "CALLIPER": {
+      "dmin": [
+        0.9959999918937683,
+        0.9959999918937683,
+        0.9959999918937683,
+        1.0
+      ],
+      "drange": [
+        0.007999956607818604,
+        0.007999956607818604,
+        0.007999956607818604,
+        0.0
+      ],
+      "smin": [
+        0.7940000295639038,
+        0.7940000295639038,
+        0.7940000295639038
+      ],
+      "srange": [
+        0.23041891732788145,
+        0.3436839075241096,
+        0.04499995708465576
+      ],
+      "emin": [
+        0.2619999945163727,
+        0.2619999945163727,
+        0.33169200155305845
+      ],
+      "erange": [
+        -0.14330100046002858,
+        -0.14330100046002858,
+        -0.22319200518894178
+      ],
+      "spower": 3.6549999713897705,
+      "epower": 0.4790000021457672
+    },
+    "CARBONFIBER": {
+      "dmin": [
+        0.5799999833106995,
+        0.5799999833106995,
+        0.5799999833106995,
+        1.0
+      ],
+      "drange": [
+        0.458190051493645,
+        0.42765503320217135,
+        0.3823450287866592,
+        -0.5559999942779541
+      ],
+      "smin": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "srange": [
+        -0.4309999942779541,
+        -0.4309999942779541,
+        -0.4309999942779541
+      ],
+      "emin": [
+        0.19300000369548798,
+        0.19300000369548798,
+        0.19300000369548798
+      ],
+      "erange": [
+        0.015000000596046448,
+        0.015000000596046448,
+        0.015000000596046448
+      ],
+      "spower": 2.7690000534057617,
+      "epower": 0.5230000019073486
+    },
+    "DECAL": {
+      "dmin": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "smin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "srange": [
+        0.19499999284744263,
+        0.19499999284744263,
+        0.19499999284744263
+      ],
+      "emin": [
+        0.16500000655651093,
+        0.16500000655651093,
+        0.16500000655651093
+      ],
+      "erange": [
+        -0.08250000327825546,
+        -0.08250000327825546,
+        -0.08250000327825546
+      ],
+      "spower": 1.2649999856948853,
+      "epower": 2.0
+    },
+    "DULLENGINE": {
+      "dmin": [
+        0.24699999392032623,
+        0.24699999392032623,
+        0.24699999392032623,
+        1.0
+      ],
+      "drange": [
+        0.24800001084804535,
+        0.24800001084804535,
+        0.24800001084804535,
+        0.0
+      ],
+      "smin": [
+        0.20600000023841858,
+        0.20600000023841858,
+        0.21629999042749404
+      ],
+      "srange": [
+        -0.20600000023841858,
+        -0.20600000023841858,
+        -0.21629999042749404
+      ],
+      "emin": [
+        0.24549999833106995,
+        0.24549999833106995,
+        0.24549999833106995
+      ],
+      "erange": [
+        -0.22749999910593033,
+        -0.22749999910593033,
+        -0.22749999910593033
+      ],
+      "spower": 5.834000110626221,
+      "epower": 0.07199999690055847
+    },
+    "DULLPLASTIC": {
+      "dmin": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        -0.8490000069141388
+      ],
+      "smin": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "srange": [
+        -0.5530000030994415,
+        -0.5530000030994415,
+        -0.5530000030994415
+      ],
+      "emin": [
+        0.1340000033378601,
+        0.1340000033378601,
+        0.1340000033378601
+      ],
+      "erange": [
+        -0.1340000033378601,
+        -0.1340000033378601,
+        -0.1340000033378601
+      ],
+      "spower": 3.0239999294281006,
+      "epower": 0.37299999594688416
+    },
+    "EXHAUST_TIP": {
+      "dmin": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "smin": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "srange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emin": [
+        0.949999988079071,
+        0.949999988079071,
+        0.949999988079071
+      ],
+      "erange": [
+        -0.050000011920928955,
+        -0.050000011920928955,
+        -0.050000011920928955
+      ],
+      "spower": 4.0,
+      "epower": 2.0
+    },
+    "GOLDROTOR": {
+      "dmin": [
+        0.40299999713897705,
+        0.34375899160242085,
+        0.11001899998760223,
+        1.0
+      ],
+      "drange": [
+        -0.013999998569488525,
+        -0.009218987267971102,
+        -0.014324997696280484,
+        0.0
+      ],
+      "smin": [
+        0.5799999833106995,
+        0.5799999833106995,
+        0.6177000154137602
+      ],
+      "srange": [
+        0.8063960401096324,
+        0.7909520269851669,
+        0.5702999483466158
+      ],
+      "emin": [
+        0.0989999994635582,
+        0.0989999994635582,
+        0.0989999994635582
+      ],
+      "erange": [
+        -0.06149999797344208,
+        -0.06149999797344208,
+        -0.06149999797344208
+      ],
+      "spower": 2.3369998931884766,
+      "epower": 0.4189999997615814
+    },
+    "HEADLIGHTGLASS": {
+      "dmin": [
+        0.9900000095367432,
+        0.9900000095367432,
+        0.9900000095367432,
+        1.3600000143051147
+      ],
+      "drange": [
+        0.009999990463256836,
+        0.009999990463256836,
+        0.009999990463256836,
+        -0.21599996089935303
+      ],
+      "smin": [
+        0.9716200033473967,
+        0.9620000123977661,
+        0.9812399942970274
+      ],
+      "srange": [
+        -0.12120000367164607,
+        -0.12000000476837158,
+        -0.12240000257492056
+      ],
+      "emin": [
+        0.6654999852180481,
+        0.7087575223374358,
+        0.6721549787235261
+      ],
+      "erange": [
+        -0.06099998950958252,
+        -0.10425752662897025,
+        -0.06765498301506057
+      ],
+      "spower": 4.921000003814697,
+      "epower": 3.246000051498413
+    },
+    "HEADLIGHTREFLECTOR": {
+      "dmin": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "smin": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "srange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emin": [
+        0.949999988079071,
+        0.949999988079071,
+        0.949999988079071
+      ],
+      "erange": [
+        -0.050000011920928955,
+        -0.050000011920928955,
+        -0.050000011920928955
+      ],
+      "spower": 4.0,
+      "epower": 2.0
+    },
+    "INTERIOR": {
+      "dmin": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "smin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "srange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "erange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "spower": 0.0,
+      "epower": 0.0
+    },
+    "MAGCHROME": {
+      "dmin": [
+        0.3149999976158142,
+        0.3149999976158142,
+        0.36823500652551644,
+        1.0
+      ],
+      "drange": [
+        -0.014999985694885254,
+        -0.014999985694885254,
+        -0.033434976341723655,
+        0.0
+      ],
+      "smin": [
+        0.9700000286102295,
+        1.0,
+        1.0700000524520874
+      ],
+      "srange": [
+        0.11252005789756936,
+        0.11600005626678467,
+        0.12412006628990468
+      ],
+      "emin": [
+        0.43050000071525574,
+        0.43050000071525574,
+        0.43050000071525574
+      ],
+      "erange": [
+        -0.19850000739097595,
+        -0.19850000739097595,
+        -0.19850000739097595
+      ],
+      "spower": 3.1480000019073486,
+      "epower": 2.0369999408721924
+    },
+    "MAGGUNMETAL": {
+      "dmin": [
+        1.093999981880188,
+        1.093999981880188,
+        1.093999981880188,
+        1.0
+      ],
+      "drange": [
+        -0.5076640205726619,
+        -0.5099999904632568,
+        -0.5099999904632568,
+        0.0
+      ],
+      "smin": [
+        0.9692200408267979,
+        0.9890000224113464,
+        0.9890000224113464
+      ],
+      "srange": [
+        0.0950599462413777,
+        0.09699994325637817,
+        0.09699994325637817
+      ],
+      "emin": [
+        0.19499999284744263,
+        0.19499999284744263,
+        0.19499999284744263
+      ],
+      "erange": [
+        -0.1574999913573265,
+        -0.1574999913573265,
+        -0.1574999913573265
+      ],
+      "spower": 4.34499979019165,
+      "epower": 0.8989999890327454
+    },
+    "MAGSILVER": {
+      "dmin": [
+        0.7509999871253967,
+        0.7509999871253967,
+        0.7509999871253967,
+        1.0
+      ],
+      "drange": [
+        -0.024104047389982952,
+        -0.027000010013580322,
+        -0.027000010013580322,
+        0.0
+      ],
+      "smin": [
+        1.0893399824237804,
+        1.0850000381469727,
+        1.1511850290918346
+      ],
+      "srange": [
+        0.12992603254222956,
+        0.12099993228912354,
+        0.04154896869754765
+      ],
+      "emin": [
+        0.18000000715255737,
+        0.18000000715255737,
+        0.20646000013589827
+      ],
+      "erange": [
+        -0.12200000882148743,
+        -0.12200000882148743,
+        -0.14155800443720779
+      ],
+      "spower": 0.7919999957084656,
+      "epower": 0.9390000104904175
+    },
+    "MESH": {
+      "dmin": [
+        0.2940000174045565,
+        0.2940000174045565,
+        0.2940000174045565,
+        1.0
+      ],
+      "drange": [
+        0.7059999825954435,
+        0.7059999825954435,
+        0.7059999825954435,
+        0.0
+      ],
+      "smin": [
+        0.42268999862432466,
+        0.42268999862432466,
+        0.42268999862432466
+      ],
+      "srange": [
+        -0.049239996860027446,
+        -0.056999983906745655,
+        -0.049239996860027446
+      ],
+      "emin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "erange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "spower": 4.0,
+      "epower": 0.0
+    },
+    "METPAINTGOLD": {
+      "dmin": [
+        0.19520000510215763,
+        0.1608000064015389,
+        0.16360000615715986,
+        1.0460000038146973
+      ],
+      "drange": [
+        0.8094520079116814,
+        0.7927679887480732,
+        0.6755019990842337,
+        -0.07700002193450928
+      ],
+      "smin": [
+        0.6867179534382828,
+        1.076732957760811,
+        0.5759099937939638
+      ],
+      "srange": [
+        0.3657620563750257,
+        0.19206205443191493,
+        0.33741999949693735
+      ],
+      "emin": [
+        0.524223000963449,
+        0.524223000963449,
+        0.5820990205774308
+      ],
+      "erange": [
+        -0.5172230007473821,
+        -0.5172230007473821,
+        -0.575099020361364
+      ],
+      "spower": 3.753999948501587,
+      "epower": 0.3440000116825104
+    },
+    "MOLDINGS": {
+      "dmin": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "drange": [
+        0.003999948501586914,
+        0.003999948501586914,
+        0.003999948501586914,
+        0.003999948501586914
+      ],
+      "smin": [
+        0.9819999933242798,
+        0.9819999933242798,
+        0.9819999933242798
+      ],
+      "srange": [
+        -0.8293920060591695,
+        -0.8299999982118607,
+        -0.8299999982118607
+      ],
+      "emin": [
+        0.2745000123977661,
+        0.2745000123977661,
+        0.2745000123977661
+      ],
+      "erange": [
+        -0.2745000123977661,
+        -0.2745000123977661,
+        -0.2745000123977661
+      ],
+      "spower": 1.1549999713897705,
+      "epower": 0.17299999296665192
+    },
+    "PLAINNOTHING": {
+      "dmin": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "smin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "srange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "erange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "spower": 0.0,
+      "epower": 0.0
+    },
+    "RAD": {
+      "dmin": [
+        0.30000001192092896,
+        0.30000001192092896,
+        0.30000001192092896,
+        1.0
+      ],
+      "drange": [
+        0.699999988079071,
+        0.699999988079071,
+        0.699999988079071,
+        0.0
+      ],
+      "smin": [
+        0.4300000071525574,
+        0.4300000071525574,
+        0.4300000071525574
+      ],
+      "srange": [
+        -0.04500001668930054,
+        -0.04500001668930054,
+        -0.04500001668930054
+      ],
+      "emin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "erange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "spower": 4.0,
+      "epower": 0.0
+    },
+    "RUBBER": {
+      "dmin": [
+        0.24699999392032623,
+        0.24699999392032623,
+        0.24699999392032623,
+        1.0
+      ],
+      "drange": [
+        0.3670000284910202,
+        0.3670000284910202,
+        0.3670000284910202,
+        0.0
+      ],
+      "smin": [
+        0.20600000023841858,
+        0.20600000023841858,
+        0.21629999042749404
+      ],
+      "srange": [
+        -0.003999993205070496,
+        -0.003999993205070496,
+        -0.014299983394145954
+      ],
+      "emin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "erange": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "spower": 5.834000110626221,
+      "epower": 0.07199999690055847
+    },
+    "WINDOWMASK": {
+      "dmin": [
+        0.10199999809265137,
+        0.10199999809265137,
+        0.10199999809265137,
+        1.0
+      ],
+      "drange": [
+        0.013999998569488525,
+        0.013999998569488525,
+        0.013999998569488525,
+        0.003999948501586914
+      ],
+      "smin": [
+        0.33399999141693115,
+        0.33399999141693115,
+        0.33399999141693115
+      ],
+      "srange": [
+        -0.18139200415182088,
+        -0.18199999630451202,
+        -0.18199999630451202
+      ],
+      "emin": [
+        0.6004999876022339,
+        0.6004999876022339,
+        0.6004999876022339
+      ],
+      "erange": [
+        -0.5354999899864197,
+        -0.5354999899864197,
+        -0.5354999899864197
+      ],
+      "spower": 5.570000171661377,
+      "epower": 0.35499998927116394
+    },
+    "WINDSHIELD_TINT_L3_ORANGE": {
+      "dmin": [
+        0.8799999952316284,
+        0.5899999737739563,
+        0.0,
+        1.0
+      ],
+      "drange": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "smin": [
+        1.2886670027928346,
+        1.2886670027928346,
+        0.8391319747262003
+      ],
+      "srange": [
+        -1.1002669890122405,
+        -1.1191069903903,
+        -0.6821319694809915
+      ],
+      "emin": [
+        0.22100000083446503,
+        0.24508899375951287,
+        0.2680730140794516
+      ],
+      "erange": [
+        -0.17599999904632568,
+        -0.20008899197137353,
+        -0.22307301229131227
+      ],
+      "spower": 6.4720001220703125,
+      "epower": 0.8840000033378601
+    }
+  },
+  "paint_materials": [
+    "CARSKIN+tex2",
+    "CARSKIN+tex9"
+  ],
+  "parts_used": [
+    "SKYLINE_BASE_A",
+    "SKYLINE_KIT00_LEFT_SIDE_MIR",
+    "SKYLINE_KIT00_RIGHT_SIDE_MI",
+    "SKYLINE_KITW02_BODY_A",
+    "SKYLINE_KIT00_ROOF_A",
+    "SKYLINE_KIT00_HOOD_A",
+    "SKYLINE_STYLE20_SPOILER_A",
+    "SKYLINE_KIT00_HEADLIGHT_A",
+    "SKYLINE_KIT00_BRAKELIGHT_A",
+    "SKYLINE_DECAL_REAR_WINDOW_W",
+    "SKYLINE_WIDE2_DECAL_LEFT_DO",
+    "SKYLINE_WIDE2_DECAL_RIGHT_D",
+    "EXHAUST_STYLE07_LEVEL1_A"
+  ],
+  "approximate": [
+    "Plain glTF cannot reproduce car.efx angle-dependent alpha. Windows use facing alpha 1.0; headlight glass uses grazing alpha 0.4. Native alpha is reflectivity, not opacity.",
+    "PBR lighting differs from original spherical harmonics and environment shader.",
+    "PBR uses GLOBALB facing diffuse endpoints; original angular diffuse, reflection and specular remain approximate"
+  ],
+  "appearance": {
+    "appearance": "original Eddie preset",
+    "paint_part": "METAL_L3_TEST04",
+    "paint_rgba": [
+      145,
+      63,
+      16,
+      128
+    ],
+    "bindings": [
+      {
+        "material": "PLAINNOTHING",
+        "source_hash": "5799E60B",
+        "texture": "DRIVER",
+        "resolved_hash": "5799E60B"
+      },
+      {
+        "material": "DECAL",
+        "source_hash": "29C86189",
+        "texture": "SKYLINE_BADGING",
+        "resolved_hash": "29C86189"
+      },
+      {
+        "material": "INTERIOR",
+        "source_hash": "3EDA2CA3",
+        "texture": "SKYLINE_SKIN1",
+        "resolved_hash": "3EDA2CA3"
+      },
+      {
+        "material": "WINDSHIELD",
+        "source_hash": "7B220DDF",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "WINDSHIELD",
+        "source_hash": "E7E4EF49",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "WINDSHIELD",
+        "source_hash": "4CDEBFCA",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "WINDOWMASK",
+        "source_hash": "4CDEBFCA",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "WINDSHIELD",
+        "source_hash": "1B0763A0",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "WINDOWMASK",
+        "source_hash": "1B0763A0",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "WINDSHIELD",
+        "source_hash": "60F8B13C",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "WINDSHIELD",
+        "source_hash": "0AB88F5D",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "WINDOWMASK",
+        "source_hash": "0AB88F5D",
+        "texture": "WINDOW",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "CARSKIN",
+        "source_hash": "3EDA2CA3",
+        "texture": "SKYLINE_SKIN1",
+        "resolved_hash": "3EDA2CA3"
+      },
+      {
+        "material": "BOTTOM",
+        "source_hash": "BD1F0E0A",
+        "texture": "CARBOTTOM",
+        "resolved_hash": "BD1F0E0A"
+      },
+      {
+        "material": "MESH",
+        "source_hash": "69C032BA",
+        "texture": "GRILL_02",
+        "resolved_hash": "69C032BA"
+      },
+      {
+        "material": "DULLPLASTIC",
+        "source_hash": "3EDA2CA3",
+        "texture": "SKYLINE_SKIN1",
+        "resolved_hash": "3EDA2CA3"
+      },
+      {
+        "material": "PLAINNOTHING",
+        "source_hash": "3EDA2CA3",
+        "texture": "SKYLINE_SKIN1",
+        "resolved_hash": "3EDA2CA3"
+      },
+      {
+        "material": "RAD",
+        "source_hash": "3EDA2CA3",
+        "texture": "SKYLINE_SKIN1",
+        "resolved_hash": "3EDA2CA3"
+      },
+      {
+        "material": "MOLDINGS",
+        "source_hash": "3EDA2CA3",
+        "texture": "SKYLINE_SKIN1",
+        "resolved_hash": "3EDA2CA3"
+      },
+      {
+        "material": "CARBONFIBER",
+        "source_hash": "721AFF7C",
+        "texture": "CARBONFIBRE",
+        "resolved_hash": "721AFF7C"
+      },
+      {
+        "material": "ALUMINUM",
+        "source_hash": "3EDA2CA3",
+        "texture": "SKYLINE_SKIN1",
+        "resolved_hash": "3EDA2CA3"
+      },
+      {
+        "material": "MOLDINGS",
+        "source_hash": "B8453EE8",
+        "texture": "SKYLINE_KIT00_HEADLIGHT",
+        "resolved_hash": "B8453EE8"
+      },
+      {
+        "material": "ALUMINUM",
+        "source_hash": "B8453EE8",
+        "texture": "SKYLINE_KIT00_HEADLIGHT",
+        "resolved_hash": "B8453EE8"
+      },
+      {
+        "material": "HEADLIGHTREFLECTOR",
+        "source_hash": "B8453EE8",
+        "texture": "SKYLINE_KIT00_HEADLIGHT",
+        "resolved_hash": "B8453EE8"
+      },
+      {
+        "material": "HEADLIGHTGLASS",
+        "source_hash": "7B220DDF",
+        "texture": "WINDOW_MATERIAL_ALPHA",
+        "resolved_hash": "834B8017"
+      },
+      {
+        "material": "BRAKELIGHT",
+        "source_hash": "BAC0F21B",
+        "texture": "SKYLINE_KIT00_BRAKELIGH",
+        "resolved_hash": "BAC0F21B"
+      },
+      {
+        "material": "CARSKIN",
+        "source_hash": "BAC0F21B",
+        "texture": "SKYLINE_KIT00_BRAKELIGH",
+        "resolved_hash": "BAC0F21B"
+      },
+      {
+        "material": "DECAL",
+        "source_hash": "B8949CAF",
+        "texture": "SPARCO_WHITE_WIDE",
+        "resolved_hash": "B8949CAF"
+      },
+      {
+        "material": "DECAL",
+        "source_hash": "8A571203",
+        "texture": "KENWOOD_WHITE_RECT",
+        "resolved_hash": "8A571203"
+      },
+      {
+        "material": "DECAL",
+        "source_hash": "B015F6F2",
+        "texture": "NX_WHITE_RECT",
+        "resolved_hash": "B015F6F2"
+      },
+      {
+        "material": "DECAL",
+        "source_hash": "B891CDB4",
+        "texture": "SPARCO_WHITE_RECT",
+        "resolved_hash": "B891CDB4"
+      },
+      {
+        "material": "DECAL",
+        "source_hash": "0F4108B2",
+        "texture": "HKS_WHITE_RECT",
+        "resolved_hash": "0F4108B2"
+      },
+      {
+        "material": "DECAL",
+        "source_hash": "66994F4A",
+        "texture": "DEFAULTALPHA",
+        "resolved_hash": "66994F4A"
+      },
+      {
+        "material": "PLAINNOTHING",
+        "source_hash": "A5B28001",
+        "texture": "EXHAUST",
+        "resolved_hash": "A5B28001"
+      },
+      {
+        "material": "DULLENGINE",
+        "source_hash": "A5B28001",
+        "texture": "EXHAUST",
+        "resolved_hash": "A5B28001"
+      },
+      {
+        "material": "EXHAUST_TIP",
+        "source_hash": "A5B28001",
+        "texture": "EXHAUST",
+        "resolved_hash": "A5B28001"
+      },
+      {
+        "material": "EXHAUST_TIP",
+        "source_hash": "DDA11455",
+        "texture": "EXHAUST",
+        "resolved_hash": "A5B28001"
+      },
+      {
+        "material": "MAGGUNMETAL",
+        "source_hash": "957078BE",
+        "texture": "BBS_STYLE04_WHEEL",
+        "resolved_hash": "957078BE"
+      },
+      {
+        "material": "PLAINNOTHING",
+        "source_hash": "957078BE",
+        "texture": "BBS_STYLE04_WHEEL",
+        "resolved_hash": "957078BE"
+      },
+      {
+        "material": "MAGSILVER",
+        "source_hash": "957078BE",
+        "texture": "BBS_STYLE04_WHEEL",
+        "resolved_hash": "957078BE"
+      },
+      {
+        "material": "MAGCHROME",
+        "source_hash": "957078BE",
+        "texture": "BBS_STYLE04_WHEEL",
+        "resolved_hash": "957078BE"
+      },
+      {
+        "material": "RUBBER",
+        "source_hash": "957078BE",
+        "texture": "BBS_STYLE04_WHEEL",
+        "resolved_hash": "957078BE"
+      },
+      {
+        "material": "CALIPERDECAL",
+        "source_hash": "17F9F794",
+        "texture": "BRAKE_GLOBAL",
+        "resolved_hash": "17F9F794"
+      },
+      {
+        "material": "CALLIPER",
+        "source_hash": "17F9F794",
+        "texture": "BRAKE_GLOBAL",
+        "resolved_hash": "17F9F794"
+      },
+      {
+        "material": "GOLDROTOR",
+        "source_hash": "C6578697",
+        "texture": "BRAKE_STYLE03",
+        "resolved_hash": "C6578697"
+      },
+      {
+        "material": "CALLIPER",
+        "source_hash": "DDA11455",
+        "texture": "BRAKE_STYLE03",
+        "resolved_hash": "C6578697"
+      }
+    ],
+    "evidence": {
+      "ranges": "0x40c910: +0xc count, +0x1c texture, +0x20 material, +0x34 first index",
+      "paint": "0x5a9ce0, 0x5a8a50: part swatch + masked doorline; vertex colour unused by car.efx",
+      "windows": "0x56ca60: intact WINDOW/WINDOW2; 0x40c4b0 and PE 0x702a54/64: alpha 0.30 grazing, 1.0 facing",
+      "preset": "0x4b2640/0x4b26f0",
+      "parts": "GLOBALB 0x80034602/0x34604, CarPart +0x20 LOD A",
+      "enabled": "0x57ea80: widebody disables slots 1,2,5,10",
+      "vinyl": "0x5a9b50/0x5a9c10/0x5a9ce0, 0x5a8640/0x5a8a50; P8 TPK 0x33310004/0x33320002"
+    },
+    "limitations": [
+      "Plain glTF cannot reproduce car.efx angle-dependent alpha. Windows use facing alpha 1.0; headlight glass uses grazing alpha 0.4. Native alpha is reflectivity, not opacity.",
+      "PBR lighting differs from original spherical harmonics and environment shader."
+    ],
+    "preset": {
+      "name": "EDDIE_SKYLINE",
+      "file": "game/FrontEnd/FrontB.lzc",
+      "chunk": "0x30220",
+      "chunk_offset_decompressed": "0xb3d680",
+      "record_offset_decompressed": "0xb5ce70"
+    },
+    "vinyl_layers": [
+      {
+        "slot": 34,
+        "part": "EDDIE",
+        "texture": "SKYLINE_EDDIE",
+        "num_colours": 64,
+        "colours_rgba": [
+          [
+            160,
+            15,
+            15,
+            100
+          ],
+          [
+            17,
+            56,
+            39,
+            100
+          ],
+          [
+            25,
+            51,
+            97,
+            100
+          ],
+          [
+            5,
+            5,
+            5,
+            100
+          ]
+        ],
+        "recoloured": true
+      }
+    ],
+    "doorline": "SKYLINE_DOORLINE_WIDEBODY",
+    "missing_geometry": [
+      {
+        "part": "TRUNK KIT00",
+        "lod_a_hash": "0xabe49618"
+      }
+    ],
+    "slots": {
+      "0": {
+        "hash": "0x1923ea78",
+        "part": "BASE KIT00"
+      },
+      "1": {
+        "hash": "0x69730117",
+        "part": "STOCK"
+      },
+      "2": {
+        "hash": "0xb37a3df8",
+        "part": "STOCK"
+      },
+      "3": {
+        "hash": "0x3134e18d",
+        "part": "LEFT SIDE MIRROR"
+      },
+      "4": {
+        "hash": "0x14a9b80",
+        "part": "RIGHT SIDE MIRROR"
+      },
+      "5": {
+        "hash": "0xd3099ff2",
+        "part": "STOCK BODY"
+      },
+      "6": {
+        "hash": "0xcb52ba4b",
+        "part": "MANTIS"
+      },
+      "7": {
+        "hash": "0xd312675a",
+        "part": "STOCK"
+      },
+      "8": {
+        "hash": "0xd30ceb8e",
+        "part": "STOCK"
+      },
+      "9": {
+        "hash": "0x35854398",
+        "part": "TRUNK KIT00"
+      },
+      "10": {
+        "hash": "0x356f21f1",
+        "part": "STOCK"
+      },
+      "11": {
+        "hash": "0x863726d",
+        "part": "SUPERNOVA"
+      },
+      "12": {
+        "hash": "0x0",
+        "part": null
+      },
+      "13": {
+        "hash": "0xa75b368e",
+        "part": "STOCK"
+      },
+      "14": {
+        "hash": "0x6f8f4841",
+        "part": "STOCK"
+      },
+      "15": {
+        "hash": "0x66c50cc0",
+        "part": "ROCKET"
+      },
+      "16": {
+        "hash": "0xc6578697",
+        "part": "BRAKE STYLE03"
+      },
+      "17": {
+        "hash": "0x92c63112",
+        "part": "BBS RX2 20"
+      },
+      "18": {
+        "hash": "0x53a38e68",
+        "part": "LICENSE PLATE STYLE01"
+      },
+      "19": {
+        "hash": "0x216c58cc",
+        "part": "HOOD RECT MEDIUM"
+      },
+      "20": {
+        "hash": "0x5d54f0bd",
+        "part": "FRONT WINDOW RECT MEDIUM"
+      },
+      "21": {
+        "hash": "0x7b7d88fe",
+        "part": "REAR WINDOW RECT MEDIUM"
+      },
+      "22": {
+        "hash": "0x2d3bf8e0",
+        "part": "L DOOR RECT MEDIUM"
+      },
+      "23": {
+        "hash": "0x306cd8d3",
+        "part": "R DOOR RECT MEDIUM"
+      },
+      "24": {
+        "hash": "0xd1693910",
+        "part": "L PANEL RECT MEDIUM"
+      },
+      "25": {
+        "hash": "0xc166f823",
+        "part": "R PANEL RECT MEDIUM"
+      },
+      "26": {
+        "hash": "0x69370bfa",
+        "part": "WIDE2_DECAL_LEFT_DOOR_RECT_MEDIUM"
+      },
+      "27": {
+        "hash": "0xebca4f2d",
+        "part": "WIDE2_DECAL_RIGHT_DOOR_RECT_MEDIUM"
+      },
+      "28": {
+        "hash": "0xd9fdadea",
+        "part": "WIDE2_DECAL_LEFT_QUARTER_RECT_MEDIUM"
+      },
+      "29": {
+        "hash": "0xdc8a083d",
+        "part": "WIDE2_DECAL_RIGHT_QUARTER_RECT_MEDIUM"
+      },
+      "30": {
+        "hash": "0x98ee4393",
+        "part": "METAL_L3_TEST04"
+      },
+      "31": {
+        "hash": "0x0",
+        "part": null
+      },
+      "32": {
+        "hash": "0x0",
+        "part": null
+      },
+      "33": {
+        "hash": "0x0",
+        "part": null
+      },
+      "34": {
+        "hash": "0x2b1e6da",
+        "part": "EDDIE"
+      },
+      "35": {
+        "hash": "0x0",
+        "part": null
+      },
+      "36": {
+        "hash": "0x0",
+        "part": null
+      },
+      "37": {
+        "hash": "0x0",
+        "part": null
+      },
+      "38": {
+        "hash": "0x0",
+        "part": null
+      },
+      "39": {
+        "hash": "0x926f45b0",
+        "part": null
+      },
+      "40": {
+        "hash": "0x0",
+        "part": null
+      },
+      "41": {
+        "hash": "0x96fb28da",
+        "part": null
+      },
+      "42": {
+        "hash": "0x0",
+        "part": null
+      },
+      "43": {
+        "hash": "0x0",
+        "part": null
+      },
+      "44": {
+        "hash": "0x0",
+        "part": null
+      },
+      "45": {
+        "hash": "0x0",
+        "part": null
+      },
+      "46": {
+        "hash": "0x0",
+        "part": null
+      },
+      "47": {
+        "hash": "0x0",
+        "part": null
+      },
+      "48": {
+        "hash": "0x0",
+        "part": null
+      },
+      "49": {
+        "hash": "0x0",
+        "part": null
+      },
+      "50": {
+        "hash": "0x0",
+        "part": null
+      },
+      "51": {
+        "hash": "0x0",
+        "part": null
+      },
+      "52": {
+        "hash": "0x0",
+        "part": null
+      },
+      "53": {
+        "hash": "0x0",
+        "part": null
+      },
+      "54": {
+        "hash": "0xd0561e8e",
+        "part": "VINYL_L1_COLOR03"
+      },
+      "55": {
+        "hash": "0xd0561e92",
+        "part": "VINYL_L1_COLOR07"
+      },
+      "56": {
+        "hash": "0xd0561eac",
+        "part": "VINYL_L1_COLOR10"
+      },
+      "57": {
+        "hash": "0xd0561e8c",
+        "part": "VINYL_L1_COLOR01"
+      },
+      "58": {
+        "hash": "0x0",
+        "part": null
+      },
+      "59": {
+        "hash": "0x0",
+        "part": null
+      },
+      "60": {
+        "hash": "0x0",
+        "part": null
+      },
+      "61": {
+        "hash": "0x0",
+        "part": null
+      },
+      "62": {
+        "hash": "0x0",
+        "part": null
+      },
+      "63": {
+        "hash": "0x0",
+        "part": null
+      },
+      "64": {
+        "hash": "0x0",
+        "part": null
+      },
+      "65": {
+        "hash": "0x0",
+        "part": null
+      },
+      "66": {
+        "hash": "0x0",
+        "part": null
+      },
+      "67": {
+        "hash": "0xd88eed23",
+        "part": null
+      },
+      "68": {
+        "hash": "0x0",
+        "part": null
+      },
+      "69": {
+        "hash": "0x0",
+        "part": null
+      },
+      "70": {
+        "hash": "0x0",
+        "part": null
+      },
+      "71": {
+        "hash": "0x0",
+        "part": null
+      },
+      "72": {
+        "hash": "0x0",
+        "part": null
+      },
+      "73": {
+        "hash": "0x0",
+        "part": null
+      },
+      "74": {
+        "hash": "0x0",
+        "part": null
+      },
+      "75": {
+        "hash": "0xc9ce2aff",
+        "part": "SPARCO"
+      },
+      "76": {
+        "hash": "0x0",
+        "part": null
+      },
+      "77": {
+        "hash": "0x0",
+        "part": null
+      },
+      "78": {
+        "hash": "0x0",
+        "part": null
+      },
+      "79": {
+        "hash": "0x0",
+        "part": null
+      },
+      "80": {
+        "hash": "0x0",
+        "part": null
+      },
+      "81": {
+        "hash": "0x0",
+        "part": null
+      },
+      "82": {
+        "hash": "0x0",
+        "part": null
+      },
+      "83": {
+        "hash": "0xd43bf92e",
+        "part": "KENWOOD"
+      },
+      "84": {
+        "hash": "0xb1d77bfd",
+        "part": "NITROUS EXPRESS"
+      },
+      "85": {
+        "hash": "0xc9ce2aff",
+        "part": "SPARCO"
+      },
+      "86": {
+        "hash": "0xf664c5bd",
+        "part": "HKS USA"
+      },
+      "87": {
+        "hash": "0x0",
+        "part": null
+      },
+      "88": {
+        "hash": "0x0",
+        "part": null
+      },
+      "89": {
+        "hash": "0x0",
+        "part": null
+      },
+      "90": {
+        "hash": "0x0",
+        "part": null
+      },
+      "91": {
+        "hash": "0xd43bf92e",
+        "part": "KENWOOD"
+      },
+      "92": {
+        "hash": "0xb1d77bfd",
+        "part": "NITROUS EXPRESS"
+      },
+      "93": {
+        "hash": "0xc9ce2aff",
+        "part": "SPARCO"
+      },
+      "94": {
+        "hash": "0xf664c5bd",
+        "part": "HKS USA"
+      },
+      "95": {
+        "hash": "0x0",
+        "part": null
+      },
+      "96": {
+        "hash": "0x0",
+        "part": null
+      },
+      "97": {
+        "hash": "0x0",
+        "part": null
+      },
+      "98": {
+        "hash": "0x0",
+        "part": null
+      },
+      "99": {
+        "hash": "0x0",
+        "part": null
+      },
+      "100": {
+        "hash": "0x0",
+        "part": null
+      },
+      "101": {
+        "hash": "0x0",
+        "part": null
+      },
+      "102": {
+        "hash": "0x0",
+        "part": null
+      },
+      "103": {
+        "hash": "0x0",
+        "part": null
+      },
+      "104": {
+        "hash": "0x0",
+        "part": null
+      },
+      "105": {
+        "hash": "0x0",
+        "part": null
+      },
+      "106": {
+        "hash": "0x0",
+        "part": null
+      },
+      "107": {
+        "hash": "0x0",
+        "part": null
+      },
+      "108": {
+        "hash": "0x0",
+        "part": null
+      },
+      "109": {
+        "hash": "0x0",
+        "part": null
+      },
+      "110": {
+        "hash": "0x0",
+        "part": null
+      },
+      "111": {
+        "hash": "0x0",
+        "part": null
+      },
+      "112": {
+        "hash": "0x0",
+        "part": null
+      },
+      "113": {
+        "hash": "0x0",
+        "part": null
+      },
+      "114": {
+        "hash": "0x0",
+        "part": null
+      },
+      "115": {
+        "hash": "0xb3645f81",
+        "part": "DARK TINT ORANGE"
+      },
+      "116": {
+        "hash": "0x0",
+        "part": null
+      },
+      "117": {
+        "hash": "0x0",
+        "part": null
+      },
+      "118": {
+        "hash": "0x0",
+        "part": null
+      },
+      "119": {
+        "hash": "0x97a5ffb6",
+        "part": "ColVol KIT00"
+      }
+    },
+    "rim": "BBS_STYLE04_20_26_A",
+    "brake": "BRAKE_STYLE03_A"
+  },
+  "textures": [
+    "DRIVER_5799E60B",
+    "SKYLINE_BADGING_29C86189",
+    "SKYLINE_SKIN1",
+    "WINDOW_834B8017",
+    "CARBOTTOM_BD1F0E0A",
+    "GRILL_02_69C032BA",
+    "CARBONFIBRE_721AFF7C",
+    "SKYLINE_KIT00_HEADLIGHT_B8453EE8",
+    "WINDOW_MATERIAL_ALPHA_834B8017",
+    "SKYLINE_KIT00_BRAKELIGH_BAC0F21B",
+    "SPARCO_WHITE_WIDE_B8949CAF",
+    "KENWOOD_WHITE_RECT_8A571203",
+    "NX_WHITE_RECT_B015F6F2",
+    "SPARCO_WHITE_RECT_B891CDB4",
+    "HKS_WHITE_RECT_0F4108B2",
+    "DEFAULTALPHA_66994F4A",
+    "EXHAUST_A5B28001",
+    "BBS_STYLE04_WHEEL_957078BE",
+    "BRAKE_GLOBAL_17F9F794",
+    "BRAKE_STYLE03_C6578697"
+  ],
+  "texture_credit": "HDCube by Venomalia, CC-BY-4.0",
+  "texture_upscale": {
+    "upscaled": 19,
+    "skipped_large": 1,
+    "skipped_tiny": 0,
+    "cache_hits": 19,
+    "skipped": 1,
+    "before_bytes": 593688,
+    "after_bytes": 1125220,
+    "device": "mps",
+    "seconds": 0.034,
+    "model_sha256": "67f296d868de757b4f3daca3e35f16b61ab1ae88703776727dab212004203e57"
+  },
+  "glb_bytes": 1125220
+}

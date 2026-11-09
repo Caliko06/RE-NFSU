@@ -36,6 +36,7 @@ function line(s, cls) {
   if (cls === 'stop' || /^STOP/.test(s)) { document.body.classList.add('dbg'); status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; }
 }
 (async () => {
+  if (window.RN_HOLD) await window.RN_HOLD;       // ?fast=1: scene B draws first (web/index.html)
   if (!crossOriginIsolated) { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
   const exe = new Uint8Array(await (await fetch('pc/Speed.exe')).arrayBuffer());
   // Game files are read on demand by the game thread (host/files.c), not loaded here.
