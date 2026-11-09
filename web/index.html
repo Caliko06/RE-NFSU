@@ -64,7 +64,7 @@ if (RN_Q.get('fast') === '1') {
       color: #ffd9b0; text-shadow: 0 2px 12px #000; pointer-events: none; transition: opacity .25s ease; }
     @media (prefers-reduced-motion: reduce) { #ab, #ab-msg { transition: none; } }`;
   document.head.appendChild(css);
-  const ab = Object.assign(document.createElement('iframe'), { id: 'ab', src: '/launcher_b/', tabIndex: -1 }), msg = Object.assign(document.createElement('div'), { id: 'ab-msg', textContent: 'Enter para jugar' });
+  const ab = Object.assign(document.createElement('iframe'), { id: 'ab', src: '/launcher_b/', tabIndex: -1 }), msg = Object.assign(document.createElement('div'), { id: 'ab-msg', textContent: 'Presiona cualquier tecla' });
   document.body.append(ab, msg);
   let ready = false, want = false, gone = false;
   // The WASM boot waits (web/boot.js awaits RN_HOLD) until scene B has drawn its first frame (RN_B.ready, same origin) or 1.5 s: the game's boot would starve it (GPU, main thread).
@@ -74,7 +74,14 @@ if (RN_Q.get('fast') === '1') {
     if (gone) return; gone = true; ab.style.opacity = msg.style.opacity = '0';
     setTimeout(() => { ab.remove(); msg.remove(); document.getElementById('screen').focus(); }, 260);
   };
-  const press = () => { if (ready) lift(); else { want = true; msg.textContent = 'cargando\u2026'; } };
+  // First key or click = the browser's audio unlock (web/audio.js keeps its context in RN_ACTX and resumes it itself if the key came before it existed;
+  // the game's own front-end song then plays, it is never restarted); the cover stays. Enter (or a click) after that lifts it.
+  let unlocked = false;
+  const press = e => {
+    if (!unlocked) { unlocked = true; window.RN_ACTX?.resume(); msg.textContent = 'Enter para jugar'; return; }
+    if (e && e.code && e.code !== 'Enter') return;
+    if (ready) lift(); else { want = true; msg.textContent = 'cargando\u2026'; }
+  };
   new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) {
     const t = n.textContent || '';
     if (/flow fe .*MU_Main_PC\.fng/.test(t)) { ready = true; if (want) lift(); }
@@ -83,11 +90,11 @@ if (RN_Q.get('fast') === '1') {
   // while the cover is up the game gets no keys (Enter lifts it; F keys and K stay)
   addEventListener('keydown', e => {
     if (gone || /^F\d+$/.test(e.code) || e.code === 'KeyK') return;
-    e.preventDefault(); e.stopPropagation(); if (e.code === 'Enter' && !e.repeat) press();
+    e.preventDefault(); e.stopPropagation(); if (!e.repeat) press(e);
   }, true);
   addEventListener('keyup', e => { if (!gone && !/^F\d+$/.test(e.code) && e.code !== 'KeyK') { e.preventDefault(); e.stopPropagation(); } }, true);
   addEventListener('pointerdown', e => { if (!gone && !e.target.closest('#ov, #ov-btn')) { e.preventDefault(); e.stopPropagation(); press(); } }, true);
-  window.RN_AB = { get ready() { return ready; }, lift };
+  window.RN_AB = { get ready() { return ready; }, get unlocked() { return unlocked; }, lift };
 }
 </script>
 <script src="boot.js"></script>

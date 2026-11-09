@@ -56,6 +56,8 @@ registerProcessor('rn-ring', Ring);`;
 // log gets one line per catch-up after the start (the resync counter).
 async function startAudio(M, log) {
   const ctx = new AudioContext({ sampleRate: 44100 });
+  window.RN_ACTX = ctx;
+  if (navigator.userActivation?.hasBeenActive) ctx.resume();   // a key before the game booted (the launcher cover, web/index.html ?fast=1)
   const url = URL.createObjectURL(new Blob([AUDIO_WORKLET], { type: 'text/javascript' }));
   await ctx.audioWorklet.addModule(url);
   const node = new AudioWorkletNode(ctx, 'rn-ring', { numberOfInputs: 0, outputChannelCount: [2] });
