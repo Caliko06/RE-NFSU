@@ -1,0 +1,1328 @@
+{
+ "ok": 154,
+ "total": 167,
+ "rule": "autopilot, no RN_FINISH; OK = every stage reached 6/8 (Free Run, prologue: raced and back to the menu)",
+ "rows": {
+  "career.0": {
+   "state": "OK",
+   "run": "cjump_0.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.1": {
+   "state": "OK",
+   "run": "cjump_1.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.2": {
+   "state": "OK",
+   "run": "cjump_2.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.3": {
+   "state": "OK",
+   "run": "cjump_3.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.4": {
+   "state": "OK",
+   "run": "cjump_4.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.5": {
+   "state": "OK",
+   "run": "cjump_5.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.6": {
+   "state": "OK",
+   "run": "cjump_6.0x1234",
+   "results": 3,
+   "stages": 3,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.7": {
+   "state": "OK",
+   "run": "cjump_7.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.8": {
+   "state": "OK",
+   "run": "cjump_8.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.9": {
+   "state": "OK",
+   "run": "cjump_9.0x1234",
+   "results": 3,
+   "stages": 3,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.10": {
+   "state": "OK",
+   "run": "cjump_10.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.11": {
+   "state": "OK",
+   "run": "cjump_11.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.12": {
+   "state": "OK",
+   "run": "cjump_12.0x01234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "6/8"
+  },
+  "career.13": {
+   "state": "OK",
+   "run": "cjump_13.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.14": {
+   "state": "OK",
+   "run": "cjump_14.0x1234",
+   "results": 3,
+   "stages": 3,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.15": {
+   "state": "OK",
+   "run": "cjump_15.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.16": {
+   "state": "OK",
+   "run": "cjump_16.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.17": {
+   "state": "OK",
+   "run": "cjump_17.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.18": {
+   "state": "OK",
+   "run": "cjump_18.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.19": {
+   "state": "OK",
+   "run": "cjump_19.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.20": {
+   "state": "OK",
+   "run": "cjump_20.0x1234",
+   "results": 4,
+   "stages": 4,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.21": {
+   "state": "OK",
+   "run": "cjump_21.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.22": {
+   "state": "OK",
+   "run": "cjump_22.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.23": {
+   "state": "OK",
+   "run": "cjump_23.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.24": {
+   "state": "OK",
+   "run": "cjump_24.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.25": {
+   "state": "OK",
+   "run": "cjump_25.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.26": {
+   "state": "OK",
+   "run": "cjump_26.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.27": {
+   "state": "OK",
+   "run": "cjump_27.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.28": {
+   "state": "NO_RESULTS",
+   "run": "cjump_28.0x01234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 2,
+   "last": "6/4"
+  },
+  "career.29": {
+   "state": "OK",
+   "run": "cjump_29.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.30": {
+   "state": "OK",
+   "run": "cjump_30.0x1234",
+   "results": 3,
+   "stages": 3,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.31": {
+   "state": "OK",
+   "run": "cjump_31.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.32": {
+   "state": "OK",
+   "run": "cjump_32.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.33": {
+   "state": "NO_RESULTS",
+   "run": "cjump_33.0x01234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 1,
+   "last": "6/4"
+  },
+  "career.34": {
+   "state": "OK",
+   "run": "cjump_34.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.35": {
+   "state": "OK",
+   "run": "cjump_35.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.36": {
+   "state": "OK",
+   "run": "cjump_36.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.37": {
+   "state": "OK",
+   "run": "cjump_37.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.38": {
+   "state": "NO_RESULTS",
+   "run": "cjump_38.0x1234",
+   "results": 0,
+   "stages": 3,
+   "unstick": 0,
+   "last": "6/4"
+  },
+  "career.39": {
+   "state": "OK",
+   "run": "cjump_39.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.40": {
+   "state": "OK",
+   "run": "cjump_40.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.41": {
+   "state": "OK",
+   "run": "cjump_41.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.42": {
+   "state": "OK",
+   "run": "cjump_42.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.43": {
+   "state": "OK",
+   "run": "cjump_43.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.44": {
+   "state": "OK",
+   "run": "cjump_44.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.45": {
+   "state": "OK",
+   "run": "cjump_45.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.46": {
+   "state": "OK",
+   "run": "cjump_46.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.47": {
+   "state": "OK",
+   "run": "cjump_47.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.48": {
+   "state": "OK",
+   "run": "cjump_48.0x1234",
+   "results": 3,
+   "stages": 3,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.49": {
+   "state": "OK",
+   "run": "cjump_49.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.50": {
+   "state": "NO_RESULTS",
+   "run": "cjump_50.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "6/4"
+  },
+  "career.51": {
+   "state": "OK",
+   "run": "cjump_51.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.52": {
+   "state": "OK",
+   "run": "cjump_52.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.53": {
+   "state": "OK",
+   "run": "cjump_53.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.54": {
+   "state": "OK",
+   "run": "cjump_54.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.55": {
+   "state": "OK",
+   "run": "cjump_55.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.56": {
+   "state": "OK",
+   "run": "cjump_56.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.57": {
+   "state": "OK",
+   "run": "cjump_57.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.58": {
+   "state": "OK",
+   "run": "cjump_58.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.59": {
+   "state": "OK",
+   "run": "cjump_59.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.60": {
+   "state": "OK",
+   "run": "cjump_60.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.61": {
+   "state": "OK",
+   "run": "cjump_61.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.62": {
+   "state": "OK",
+   "run": "cjump_62.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.63": {
+   "state": "OK",
+   "run": "cjump_63.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.64": {
+   "state": "NO_RESULTS",
+   "run": "cjump_64.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "6/4"
+  },
+  "career.65": {
+   "state": "NO_RESULTS",
+   "run": "cjump_65.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "6/4"
+  },
+  "career.66": {
+   "state": "NO_RESULTS",
+   "run": "cjump_66.0x1234",
+   "results": 1,
+   "stages": 3,
+   "unstick": 0,
+   "last": "6/4"
+  },
+  "career.67": {
+   "state": "OK",
+   "run": "cjump_67.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.68": {
+   "state": "OK",
+   "run": "cjump_68.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.69": {
+   "state": "OK",
+   "run": "cjump_69.0x1234",
+   "results": 3,
+   "stages": 3,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.70": {
+   "state": "OK",
+   "run": "cjump_70.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.71": {
+   "state": "OK",
+   "run": "cjump_71.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.72": {
+   "state": "OK",
+   "run": "cjump_72.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.73": {
+   "state": "NO_RESULTS",
+   "run": "cjump_73.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "6/4"
+  },
+  "career.74": {
+   "state": "OK",
+   "run": "cjump_74.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.75": {
+   "state": "OK",
+   "run": "cjump_75.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.76": {
+   "state": "OK",
+   "run": "cjump_76.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.77": {
+   "state": "OK",
+   "run": "cjump_77.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.78": {
+   "state": "OK",
+   "run": "cjump_78.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.79": {
+   "state": "OK",
+   "run": "cjump_79.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "6/8"
+  },
+  "career.80": {
+   "state": "OK",
+   "run": "cjump_80.0x1234",
+   "results": 4,
+   "stages": 4,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.81": {
+   "state": "OK",
+   "run": "cjump_81.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.82": {
+   "state": "OK",
+   "run": "cjump_82.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.83": {
+   "state": "OK",
+   "run": "cjump_83.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.84": {
+   "state": "OK",
+   "run": "cjump_84.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.86": {
+   "state": "OK",
+   "run": "cjump_86.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.87": {
+   "state": "OK",
+   "run": "cjump_87.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.88": {
+   "state": "OK",
+   "run": "cjump_88.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.89": {
+   "state": "OK",
+   "run": "cjump_89.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.90": {
+   "state": "OK",
+   "run": "cjump_90.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.91": {
+   "state": "OK",
+   "run": "cjump_91.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.92": {
+   "state": "OK",
+   "run": "cjump_92.0x1234",
+   "results": 3,
+   "stages": 3,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.93": {
+   "state": "OK",
+   "run": "cjump_93.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.94": {
+   "state": "OK",
+   "run": "cjump_94.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.95": {
+   "state": "OK",
+   "run": "cjump_95.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.96": {
+   "state": "OK",
+   "run": "cjump_96.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.97": {
+   "state": "OK",
+   "run": "cjump_97.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.98": {
+   "state": "OK",
+   "run": "cjump_98.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.99": {
+   "state": "OK",
+   "run": "cjump_99.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.100": {
+   "state": "OK",
+   "run": "cjump_100.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.101": {
+   "state": "OK",
+   "run": "cjump_101.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.102": {
+   "state": "OK",
+   "run": "cjump_102.0x1234",
+   "results": 3,
+   "stages": 3,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.103": {
+   "state": "OK",
+   "run": "cjump_103.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.104": {
+   "state": "OK",
+   "run": "cjump_104.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.105": {
+   "state": "OK",
+   "run": "cjump_105.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.106": {
+   "state": "OK",
+   "run": "cjump_106.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.107": {
+   "state": "OK",
+   "run": "cjump_107.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.108": {
+   "state": "OK",
+   "run": "cjump_108.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.109": {
+   "state": "OK",
+   "run": "cjump_109.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.110": {
+   "state": "OK",
+   "run": "cjump_110.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.111": {
+   "state": "OK",
+   "run": "cjump_111.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.112": {
+   "state": "OK",
+   "run": "cjump_112.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.113": {
+   "state": "OK",
+   "run": "cjump_113.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.120": {
+   "state": "OK",
+   "run": "cjump_120.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.121": {
+   "state": "OK",
+   "run": "cjump_121.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "career.122": {
+   "state": "OK",
+   "run": "cjump_122.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.circuit.1001": {
+   "state": "OK",
+   "run": "jump_0_1001.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.circuit.1002": {
+   "state": "OK",
+   "run": "jump_0_1002.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.circuit.1003": {
+   "state": "OK",
+   "run": "jump_0_1003.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.circuit.1004": {
+   "state": "OK",
+   "run": "jump_0_1004.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.circuit.1005": {
+   "state": "OK",
+   "run": "jump_0_1005.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.circuit.1006": {
+   "state": "OK",
+   "run": "jump_0_1006.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.circuit.1007": {
+   "state": "OK",
+   "run": "jump_0_1007.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.circuit.1008": {
+   "state": "OK",
+   "run": "jump_0_1008.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.sprint.1102": {
+   "state": "OK",
+   "run": "jump_1_1102.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.sprint.1103": {
+   "state": "OK",
+   "run": "jump_1_1103.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.sprint.1104": {
+   "state": "OK",
+   "run": "jump_1_1104.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.sprint.1105": {
+   "state": "OK",
+   "run": "jump_1_1105.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.sprint.1106": {
+   "state": "NO_RESULTS",
+   "run": "jump_1_1106.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "6/4"
+  },
+  "qr.sprint.1107": {
+   "state": "OK",
+   "run": "jump_1_1107.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.sprint.1108": {
+   "state": "OK",
+   "run": "jump_1_1108.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.sprint.1109": {
+   "state": "OK",
+   "run": "jump_1_1109.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drag.1201": {
+   "state": "OK",
+   "run": "jump_5_1201.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drag.1202": {
+   "state": "OK",
+   "run": "jump_5_1202.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drag.1206": {
+   "state": "OK",
+   "run": "jump_5_1206.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drag.1207": {
+   "state": "OK",
+   "run": "jump_5_1207.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drag.1210": {
+   "state": "OK",
+   "run": "jump_5_1210.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drag.1214": {
+   "state": "OK",
+   "run": "jump_5_1214.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drift.1301": {
+   "state": "OK",
+   "run": "jump_6_1301.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drift.1302": {
+   "state": "OK",
+   "run": "jump_6_1302.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drift.1303": {
+   "state": "OK",
+   "run": "jump_6_1303.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drift.1304": {
+   "state": "OK",
+   "run": "jump_6_1304.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drift.1305": {
+   "state": "OK",
+   "run": "jump_6_1305.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drift.1306": {
+   "state": "NO_RESULTS",
+   "run": "jump_6_1306.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "6/4"
+  },
+  "qr.drift.1307": {
+   "state": "OK",
+   "run": "jump_6_1307.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.drift.1308": {
+   "state": "OK",
+   "run": "jump_6_1308.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.lapko.1001": {
+   "state": "OK",
+   "run": "jump_2_1001.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.lapko.1002": {
+   "state": "OK",
+   "run": "jump_2_1002.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.lapko.1003": {
+   "state": "OK",
+   "run": "jump_2_1003.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.lapko.1004": {
+   "state": "OK",
+   "run": "jump_2_1004.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.lapko.1005": {
+   "state": "OK",
+   "run": "jump_2_1005.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.lapko.1006": {
+   "state": "OK",
+   "run": "jump_2_1006.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.lapko.1007": {
+   "state": "OK",
+   "run": "jump_2_1007.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.lapko.1008": {
+   "state": "OK",
+   "run": "jump_2_1008.0x1234",
+   "results": 1,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.freerun.1001": {
+   "state": "OK",
+   "run": "jump_3_1001.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.freerun.1002": {
+   "state": "OK",
+   "run": "jump_3_1002.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.freerun.1003": {
+   "state": "OK",
+   "run": "jump_3_1003.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.freerun.1004": {
+   "state": "OK",
+   "run": "jump_3_1004.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.freerun.1005": {
+   "state": "OK",
+   "run": "jump_3_1005.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.freerun.1006": {
+   "state": "OK",
+   "run": "jump_3_1006.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.freerun.1007": {
+   "state": "OK",
+   "run": "jump_3_1007.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "qr.freerun.1008": {
+   "state": "OK",
+   "run": "jump_3_1008.0x1234",
+   "results": 0,
+   "stages": 1,
+   "unstick": 0,
+   "last": "3/255"
+  },
+  "game.profile": {
+   "state": "OK",
+   "run": "game_rows",
+   "why": "new profile [b'zz']"
+  },
+  "game.garage": {
+   "state": "NO_RUN",
+   "run": "game_rows",
+   "why": ""
+  },
+  "game.options": {
+   "state": "NO_RUN",
+   "run": "game_rows",
+   "why": ""
+  },
+  "game.save_reload": {
+   "state": "NO_RUN",
+   "run": "game_rows",
+   "why": ""
+  },
+  "game.movies": {
+   "state": "OK",
+   "run": "game_rows",
+   "why": "movie frames 3000..6500 between frames 2300 and 6856"
+  }
+ }
+}
