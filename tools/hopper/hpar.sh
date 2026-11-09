@@ -1,6 +1,10 @@
 #!/bin/sh
 # Hopper in parallel, no click: HOP_DIR=<scratchpad> [HOP_WIN=n] hpar.sh <topic> ...
 # (tools/hopper/q_<topic>.py writes build/hopper/<topic>.txt ending in "DONE", then closes its document).
+# Any PE, not just Speed.exe (OWNER 2026-11-08: Mafia's game/Game.exe needs the same fan-out):
+#   HOP_EXE=<path to the .exe>   what every window opens (default pc/Speed.exe, relative to HOP_REPO)
+#   HOP_REPO=<repo root>         where build/hopper/ lives and where the script cds (default: this repo, ../../)
+#   HOP_QDIR=<dir>               where q_<topic>.py lives (default $HOP_REPO/tools/hopper)
 # FACT 2026-10-25 (Hopper 6.6.0-demo, PID 20369): an instance opened in the background (open -g -n, persistence off)
 # keeps its license panel (697x335, "Try the Demo") off screen and still runs the open event + script (DONE in ~45 s,
 # focus untouched). So nobody clicks; never bring a window to the front (the panel then blocks until a click).
@@ -14,17 +18,19 @@
 # - HOP_STALL=s: a window whose output file has not grown for s seconds is killed and the topic left without DONE
 #   (Hopper can hang inside one decompile); HOP_KEEP=1 keeps the old output so the script can resume after it.
 # - Each window opens through ~/.claude/hooks/macgate.sh (the machine-wide gate; a Hopper window is ~100 MB, so 3 s apart).
-dir=${HOP_DIR:?set HOP_DIR to the scratchpad}; ncpu=$(sysctl -n hw.ncpu); win=${HOP_WIN:-$(( $# < ncpu ? $# : ncpu ))}; B=$(cd "$(dirname "$0")/../.." && pwd); cd "$B" || exit 1
+dir=${HOP_DIR:?set HOP_DIR to the scratchpad}; ncpu=$(sysctl -n hw.ncpu); win=${HOP_WIN:-$(( $# < ncpu ? $# : ncpu ))}; B=${HOP_REPO:-$(cd "$(dirname "$0")/../.." && pwd)}; cd "$B" || exit 1
+S=$(cd "$(dirname "$0")" && pwd)    # send.js lives next to this script, not under $B (HOP_REPO may be another repo)
+exe=${HOP_EXE:-pc/Speed.exe}; qdir=${HOP_QDIR:-$B/tools/hopper}; name=$(basename "$exe"); name=${name%.*}
 APP="/Applications/Hopper Disassembler.app"; LIFE=1800; MINLEFT=480
 
 prep() {    # topic -> exe copy + wrapper script that checks the document
-  t=$1; q=$B/tools/hopper/q_$t.py; [ -f "$q" ] || { echo "hpar: no $q"; return 1; }
-  cp -c pc/Speed.exe "$dir/Speed_$t.exe"; [ -n "$HOP_KEEP" ] || rm -f "build/hopper/$t.txt"; rm -f "build/hopper/$t.wrong"
+  t=$1; q=$qdir/q_$t.py; [ -f "$q" ] || { echo "hpar: no $q"; return 1; }
+  cp -c "$exe" "$dir/${name}_$t.exe"; [ -n "$HOP_KEEP" ] || rm -f "build/hopper/$t.txt"; rm -f "build/hopper/$t.wrong"
   cat > "$dir/w_$t.py" <<EOF
 import os
 _p = Document.getCurrentDocument().getExecutableFilePath() or ''
-if os.path.basename(_p) != 'Speed_$t.exe':
-    open('$B/build/hopper/$t.wrong', 'w').write('WRONG DOC %s (wanted Speed_$t.exe)\n' % _p)
+if os.path.basename(_p) != '${name}_$t.exe':
+    open('$B/build/hopper/$t.wrong', 'w').write('WRONG DOC %s (wanted ${name}_$t.exe)\n' % _p)
 else:
     exec(compile(open('$q').read(), '$q', 'exec'))
 EOF
@@ -43,16 +49,20 @@ launch() {  # -> new PID in $pid, its start in $t0 (launches are serialized by t
   [ -n "$pid" ] && echo "$t0 $pid" >> build/hopper/launch.log
 }
 
+bye() {     # Hopper ignores a plain TERM at times and the window stays up (OWNER 2026-11-08): TERM, then KILL
+  kill "$1" 2>/dev/null; sleep 2; kill -9 "$1" 2>/dev/null
+}
+
 window() {  # topics of one window, run in sequence; a fresh window when the demo time runs short
   pid=""; t0=0
   for t in "$@"; do
     if [ -z "$pid" ] || [ $(( LIFE - ($(date +%s) - t0) )) -lt $MINLEFT ] || ! kill -0 "$pid" 2>/dev/null; then
-      [ -n "$pid" ] && kill "$pid" 2>/dev/null
+      [ -n "$pid" ] && bye "$pid"
       launch; [ -n "$pid" ] || { echo "hpar: no new Hopper process: $t not started"; continue; }
       echo "hpar: window PID $pid"
     fi
     prep "$t" || continue
-    echo "hpar: PID $pid: $t: $(osascript -l JavaScript tools/hopper/send.js "$pid" "$dir/Speed_$t.exe" "$dir/w_$t.py" 900)"
+    echo "hpar: PID $pid: $t: $(osascript -l JavaScript "$S/send.js" "$pid" "$dir/${name}_$t.exe" "$dir/w_$t.py" 900)"
     ts=$(date +%s)
     while ! grep -q '^DONE' "build/hopper/$t.txt" 2>/dev/null && [ ! -f "build/hopper/$t.wrong" ] \
           && [ $(( $(date +%s) - t0 )) -lt $LIFE ] && kill -0 "$pid" 2>/dev/null; do
@@ -63,7 +73,7 @@ window() {  # topics of one window, run in sequence; a fresh window when the dem
     echo "hpar: PID $pid: $t done: $(tail -1 "build/hopper/$t.txt" 2>/dev/null)$(cat "build/hopper/$t.wrong" 2>/dev/null)"
     sleep 3    # the script closes its document; give Hopper a moment before the next open
   done
-  [ -n "$pid" ] && kill "$pid" 2>/dev/null
+  [ -n "$pid" ] && bye "$pid"
 }
 
 rmdir "$dir/hpar.lock" 2>/dev/null

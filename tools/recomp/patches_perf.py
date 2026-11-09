@@ -1,4 +1,4 @@
-"""Patches: perf (Block 3, nfsu-w3)."""
+"""Patches: perf."""
 import struct
 from patches import PATCHES
 

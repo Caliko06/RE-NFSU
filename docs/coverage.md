@@ -5,12 +5,11 @@ itself about its own state.
 
 | Question | Answer | Where it comes from |
 |---|---|---|
-| How much of Speed.exe is lifted to C? | 13,756 of 14,371 seeds (95.7 %) | `census/lift_report.json`, `tools/recomp/build.py` |
+| How much of Speed.exe is lifted to C? | 13,757 functions, 0 failed; 615 seeds dropped as data, not code (quote no %) | `census/lift_report.json`, `tools/recomp/build.py` |
 | How much of it runs in a session? | not measured yet: the counter in §4 only sees indirect calls, so 1,006 / 1,627 are floors | `host/dispatch.c`, §4 |
 | Do all event rows still load and return to the menu? (RN_JUMP + injected finish, not played) | 167 of 167 rows (116 career, 46 quick race, 5 game), 30 tracks, 282 runs | `census/completion.json`, `tools/census/rows.py` |
 
-Everything below is measured on `pc/Speed.exe` md5 `b6b9232c55376b3c38c56aac1f8a121d` (base 0x400000), branch
-`publish`, 2026-10-29.
+Everything below is measured on `pc/Speed.exe` md5 `b6b9232c55376b3c38c56aac1f8a121d` (base 0x400000), numbers last checked 2026-11-09 against `census/lift_report.json` and `census/difftest.json`.
 
 ## 1. Static: the code that exists
 
@@ -18,7 +17,7 @@ Everything below is measured on `pc/Speed.exe` md5 `b6b9232c55376b3c38c56aac1f8a
 lifted (`failed 0`). Last build, printed by the build itself:
 
 ```
-lifted 13756 functions, dropped 615 false data seeds, failed 0, trap sites 7655
+lifted 13756 functions, dropped 615 false data seeds, failed 0, trap sites 7655   # 2026-10-29 print; lift_report.json now says 13,757
 ABK code modules: {'abk_files': 106, 'abk_modules': 79, 'abk_distinct_code': 23, 'abk_functions': 28}
 ```
 
@@ -60,25 +59,24 @@ under the CPU we advertise. If a later change advertises SSE, 7,655 stops appear
 
 | | |
 |---|---|
-| functions in the census | 13,800 |
-| functions compared | 5,813 |
-| all cases match | 5,809 |
-| cases compared | 32,215 |
-| cases skipped | 77,176 (`skip_unmapped` 76,752, `skip_pinned_cpu_path` 775, `skip_timeout` 474, `skip_not_a_function` 133, `skip_call_into_data` 16) |
+| functions in the census | 13,841 |
+| functions compared | 5,805 |
+| all cases match | 5,802 |
+| cases matching | 32,131 (18 mismatching cases, all in the 3 functions below) |
+| cases skipped | 78,579 (`skip_unmapped` 77,165, `skip_pinned_cpu_path` 775, `skip_timeout` 474, `skip_not_a_function` 133, `skip_call_into_data` 16, `skip_ret_imm16_sign` 16) |
 
-The gate field in `census/difftest.json` says **FAIL**, and it is not a lie: 4 functions disagree.
+The gate field in `census/difftest.json` says **pass** (regenerated 2026-11-07): 3 functions disagree, all documented reference deviations.
 
 | Function | What happens | Status |
 |---|---|---|
 | `0x642774` | `F6 /1` is `TEST` on real CPUs (undocumented alias); QEMU 5 calls it invalid | documented reference deviation |
 | `0x673824` | `FPREM` with invalid operands: the SDM gives −NaN, QEMU 5 gives +NaN | documented reference deviation |
 | `0x67ca06` | `FPREM` on unsupported 80-bit encodings: the SDM gives −NaN, QEMU 5 gives +NaN | documented reference deviation |
-| `0x67a337` | the reference retires into `0x6728cc`; there is no lifted function there | **fixed 2026-11-06** (lift.py body() reads `neg idx` tables downward; `RN_ONLY=0x67a337` case 8 now matches, census/difftest.json not re-run). Was: real lifter gap. CRT memmove `0x672630` copies backward and jumps through a table that is indexed negatively (`neg ecx; jmp [ecx*4+0x6728c8]`, entries at `0x6728ac..0x6728c8`); `Lifter.table()` (lift.py:177) reads only forward, so those 7 labels are missing and the case falls to `rn_call`. Same pattern in the second CRT copy `0x678d30` (table `0x678fac`). Direct memmove probe: 224 of 312 overlapping backward copies of 4..34 bytes stop. Evidence: docs/re/audit/diag_67a337.md |
+| `0x67a337` | the reference retires into `0x6728cc`; there is no lifted function there | **fixed 2026-11-06** (lift.py body() reads `neg idx` tables downward; matches in the regenerated census/difftest.json). Was: real lifter gap. CRT memmove `0x672630` copies backward and jumps through a table that is indexed negatively (`neg ecx; jmp [ecx*4+0x6728c8]`, entries at `0x6728ac..0x6728c8`); `Lifter.table()` (lift.py:177) reads only forward, so those 7 labels are missing and the case falls to `rn_call`. Same pattern in the second CRT copy `0x678d30` (table `0x678fac`). Direct memmove probe: 224 of 312 overlapping backward copies of 4..34 bytes stop. Evidence: docs/re/audit/diag_67a337.md |
 
-So the port's honest number is 5,809 of 5,812 explained comparisons, with one open item that has never shown up in a run
-(the game does not reach it in the career census or the route).
+So the port's honest number is 5,802 of 5,805 matching, and the other 3 are reference deviations, not lifter gaps.
 
-The comparison is only 5,813 of 13,800 functions because most functions cannot be called from a synthetic seed without a
+The comparison is only 5,805 of 13,841 functions because most functions cannot be called from a synthetic seed without a
 real object graph: the skip reasons above are the exact list, not a shrug.
 
 ## 3. Imports: what the game asks Windows for
@@ -100,7 +98,7 @@ real object graph: the skip reasons above are the exact list, not a shrug.
 calls and jumps reach `rn_call`. The numbers in this section are floors, and "88 % has not run" is not supported.
 Fix: count at function entry behind `RN_COV=1`.
 
-New on this branch. `host/dispatch.c` keeps one bit per entry of the dispatch table (`rn_fn_addr`, 13,756 entries) and
+`host/dispatch.c` keeps one bit per entry of the dispatch table (`rn_fn_addr`, 13,756 entries) and
 sets it the first time `rn_call` resolves an address to that function. The bitmap is 1.7 KB, the hit test is one load
 and one test, and the store happens once per function, so the cost on the hot path is a predictable branch. The count
 comes out three ways:
@@ -136,7 +134,7 @@ broken by a change, not that a human played it. The OWNER's own playthrough is t
 
 ## 6. Patches: the game's own numbers, moved on purpose
 
-365 active patches (`census/lift_report.json` → `patches`, table in `tools/recomp/patches.py`), each one line with why:
+361 active patches (`census/lift_report.json` → `patches`, table in `tools/recomp/patches.py`), each one line with why:
 widescreen and 1920x1080 device creation (`0x408a24`), the 60 fps limiter (`0x585b94`), the car's reflection at 0.5
 (`0x40fbb7` reads `0x707fc4`), the remaster switches. A patch is not a hole in the lift: it is a value the game reads,
 changed with its address written down.
@@ -156,6 +154,6 @@ node tools/webcheck.mjs --route                   # the route; the session file 
 - No number for "how much of the *game* runs" beyond one route and one career census; the counter now makes that
   measurable per session, and it needs sessions.
 - 4,780 indirect transfers are resolved at run time, not statically: a coverage number counts what ran, never what could.
-- The difftest cannot seed object-graph functions, so 7,987 functions have no comparison.
+- The difftest cannot seed object-graph functions, so about 8,000 functions have no comparison.
 - Online/LAN is not implemented (25 `ws2_32` imports) and is out of scope.
 - No WebGL2 renderer: the port needs WebGPU (~86 % of browsers).
