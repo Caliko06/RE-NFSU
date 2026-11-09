@@ -7,6 +7,7 @@
 // input_poll() hands new events to the key state, the DirectInput devices and the window messages.
 #include <strings.h>
 #include <unistd.h>
+#include <math.h>
 #include "host.h"
 
 // DirectInput key codes (scan codes; 0x80 = the 0xE0-prefixed extended keys), US layout.
@@ -341,10 +342,47 @@ void input_finish(Ctx *c) {
 // 0x443a10 stores it at 0x443c7f; UpdateLapCounts 0x4338c0 reads it *100 for the lap markers) has not passed its best value of this
 // race by 2 % (about 16 m) in 20 s of racing (flow state 6/4 in the log). A drop of more than a half lap is the lap wrap and counts
 // as progress. Off without RN_AUTOPILOT, so a human's feel is untouched.
+// Where the reset lands (runs/cjump_64: drift event 64 came back to -77,-1280 after each of 52+ resets, 15 m before the same wall):
+// 0x4314a0 puts the car on the AI driver's cursor [[car+0x2c]+0x3d8] = (+0 segment = [0x77af30 + 4 * id], +4 piece = segment + 0x27c + 0x88 * n,
+// the 0x44adc0 search of the nearest piece when the cursor is empty) through 0x427f70: centre of the piece, its direction, the car's own speed.
+// A second reset at the same progress moves that cursor along the driver's route first: [driver+0x3e4] (+4 nodes, +8 node pointers, node+0x58
+// metres from its start, node+0x5c segment id byte, node+0x5e piece index word: 0x5a6150 reads them the same way) to the node 40 m
+// per repeat past the nearest one (0x5a6150, as the jump camera 0x42c4b0 calls it), driver slot 4 0x44ab50 (seg, piece, -1) sets the cursor,
+// and 0x4314a0 runs here, the way 0x4264d0 calls it, because the driver's own update may rewrite the cursor before that car update.
+static int route_reset(Ctx *c, uint32_t car, float metres) {
+    uint32_t drv = ld(c, car + 0x2c, 4), vt = drv ? ld(c, drv, 4) : 0, ply = ld(c, car + 0x18, 4), kind = ld(c, car + 0x14, 4);
+    if (!vt || !ply || !kind || ld(c, vt + 0x20, 4) != 0x44a310 || ld(c, kind + 0x734, 1)) return 0;   // the AI driver only
+    uint32_t route = ld(c, drv + 0x3e4, 4), n = route ? ld(c, route + 4, 4) : 0;
+    if (n < 2 || n > 4096) return 0;
+    uint32_t r[8], a[3] = {route, car + 0x60, 1};
+    memcpy(r, c->r, sizeof r);
+    c->r[EAX] = 0;
+    int32_t k = (int32_t)call_guest(c, 0x5a6150, 3, a), j = k;
+    int ok = k >= 0 && (uint32_t)k + 1 < n;
+    if (ok) {
+        float base = ldf(c, ld(c, route + 8 + 4 * k, 4) + 0x58);
+        while ((uint32_t)j + 1 < n && ldf(c, ld(c, route + 8 + 4 * j, 4) + 0x58) - base < metres) j++;
+        uint32_t node = ld(c, route + 8 + 4 * j, 4);
+        int sid = (int8_t)ld(c, node + 0x5c, 1), pi = (int16_t)ld(c, node + 0x5e, 2);
+        uint32_t seg = sid >= 0 ? ld(c, 0x77af30 + 4 * sid, 4) : 0;
+        ok = seg && pi >= 0 && j > k;
+        if (ok) {
+            uint32_t b[3] = {seg, seg + 0x27c + 0x88 * pi, 0xffffffffu};
+            c->r[ECX] = drv;
+            call_guest(c, ld(c, vt + 0x10, 4), 3, b);
+            c->r[EAX] = ply;
+            call_guest(c, 0x4314a0, 0, NULL);
+            st(c, car + 0x87c, 0, 4);
+            rn_log("RN_AUTOPILOT: reset %.0f m on, route node %d -> %d of %u, segment %d piece %d, car now %.0f,%.0f", metres, k, j, n, sid, pi, ldf(c, car + 0x60), ldf(c, car + 0x64));
+        }
+    }
+    memcpy(c->r, r, sizeof r);
+    return ok;
+}
 void input_unstick(Ctx *c) {
-    static int on = -1;
+    static int on = -1, same;
     static uint32_t since;
-    static float best;
+    static float best, at = -1;
     if (on < 0) on = getenv("RN_AUTOPILOT") != NULL;
     if (!on || rn_flow != 0x604) { since = 0; return; }
     uint32_t h = ld(c, 0x7361f8, 4), car = 0;
@@ -357,8 +395,9 @@ void input_unstick(Ctx *c) {
     float p = ldf(c, car + 0x810);
     if (!since || p > best + 0.02f || p < best - 0.5f) { since = rn_telem.presents ? rn_telem.presents : 1, best = p; return; }
     if (rn_telem.presents - since < 1200) return;
-    st(c, car + 0x87c, 1, 4);
+    same = at >= 0 && fabsf(p - at) < 0.02f ? same + 1 : 0, at = p;   // consecutive resets that gained no progress
     rn_log("RN_AUTOPILOT: no progress %u s at %.0f,%.0f, reset requested at frame %u", (rn_telem.presents - since) / 60, ldf(c, car + 0x60), ldf(c, car + 0x64), rn_telem.presents);
+    if (!same || !route_reset(c, car, 40.0f * same)) st(c, car + 0x87c, 1, 4);
     since = rn_telem.presents;
 }
 // RN_OPEN="MU_Main_PC>MU_MainMenuCarCustomize:20": test-only, once <from> is on, switch it to <to> the way the menus do
