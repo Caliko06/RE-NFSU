@@ -172,7 +172,7 @@ def launch(run):
     env = dict(os.environ, RN_TURBO='4', RN_SECS=str(secs), RN_SCREEN='640x480', RN_RASTER='1000000', RN_FLOWLOG='1', RN_SEED=seed,
                RN_AUTOPILOT='1', RN_KEYS=seq if isinstance(seq, str) else keys(seq, LEAVE[SEEDS.index(seed) % 3] + NEXT))
     if row.startswith('explore'): env.update(RN_KEEP='120', RN_SECS='600')
-    if row in OPEN: env.update(RN_OPEN=OPEN[row], RN_SECS='45', RN_KEEP='500')
+    if row in OPEN: env.update(RN_OPEN=OPEN[row], RN_SECS='120', RN_KEEP='500')   # 45 s ended in LS_IntroFMV (runs/garage 2026-11-09, frame 8692)
     if row in CALL: env.update(RN_CALL=CALL[row])
     if row == 'career_trace': env.update(RN_CAREER='1', RN_FINISH='1', RN_UNLOCK='0', RN_SECS='12000')
     if row == 'prologue': env.update(RN_FINISH='1', RN_SECS='600')
@@ -190,7 +190,7 @@ def reload(run):
     subprocess.run(['cp', '-r', f'{src}/save', f'{d}/save'], check=True)
     seq = cjump('cjump_0')[0].split(',')[:-len(_LEAVE) - 4] + ['4000@=MU_UG_MapScreen:RIGHT']
     env = dict(os.environ, RN_TURBO='4', RN_SECS='150', RN_SCREEN='640x480', RN_RASTER='1000000', RN_FLOWLOG='1', RN_KEYS=','.join(seq))
-    if run.startswith('reload_options'): env.update(RN_KEYS=','.join(_OPTS), RN_OPEN=OPEN['options'], RN_SECS='30', RN_KEEP='500')
+    if run.startswith('reload_options'): env.update(RN_KEYS=','.join(_OPTS), RN_OPEN=OPEN['options'], RN_SECS='120', RN_KEEP='500')
     with open(f'{d}/log.txt', 'w') as log:
         return subprocess.Popen(['nice', '-n', '5', BIN, f'{R}/pc/Speed.exe', 'game', '--shot', 'shot.png'], cwd=d, env=env,
                          stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
