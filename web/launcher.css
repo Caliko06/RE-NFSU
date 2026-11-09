@@ -21,7 +21,7 @@ body { color: var(--ink); font-family: var(--f); font-style: italic; -webkit-fon
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: inherit; }
 
 /* ---------- scene layers ---------- */
-.plate { display: none; position: fixed; inset: 0; background: url(launcher/v2/plate.webp) 62% 50% / cover no-repeat, url(launcher/v2/ui/plate_fallback.webp) 62% 50% / cover no-repeat, #0a0e17; filter: saturate(1.1) contrast(1.05); }
+.plate { display: none; position: fixed; inset: 0; background: url(launcher/v4/bg_street.webp) 58% 50% / cover no-repeat, #0a0e17; filter: saturate(1.1) contrast(1.05); }
 html.static .plate { display: block; }
 #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #05080d; }
 html.static #scene { display: none; }
@@ -244,22 +244,31 @@ body.touch .keys .nb { display: none; }
 .row.more { grid-template-columns: minmax(0, 1fr) auto; }
 @media (max-width: 640px), (max-aspect-ratio: 4/5) { .row.more { grid-template-columns: minmax(0, 1fr); justify-items: start; } .row.more .tag { justify-self: start; margin-top: .4rem; } }
 
-/* ---------- v3: the main menu is 3D (light-boxes in the scene, web/launcher_3d.js). html.w3d is set once the scene runs. ---------- */
-html.w3d .shade { background:
-    linear-gradient(0deg, rgba(3, 8, 14, .6) 0, rgba(3, 8, 14, 0) 16%),
-    radial-gradient(130% 100% at 50% 50%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, .5) 100%); }
-/* the HTML list stays in the DOM for keyboard, screen readers and the selection logic, but it is not drawn */
-html.w3d .menu-panel { pointer-events: none; top: auto; bottom: 9.4rem; width: min(64rem, 92vw); padding: 0; }
-html.w3d .menu-panel::before, html.w3d .menu-panel::after { display: none; }
-html.w3d .menu-panel .list { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; pointer-events: none; }
-html.w3d .menu-panel .desc { background: none; border: 0; padding: 0 0 0 5rem; min-height: 5rem; font-size: max(15px, 2.9rem); text-shadow: 0 .2rem 1.2rem #000, 0 0 .6rem #000; pointer-events: none; }
-/* sub-screens: panels stand in the room, turned toward the camera, with a cast shadow */
-html.w3d .stage { perspective: 170rem; perspective-origin: 28% 50%; }
-html.w3d .opts-panel, html.w3d .ctrl-panel { transform: rotateY(-9deg) translateZ(1rem); transform-origin: 0 50%; filter: drop-shadow(1.4rem 2.2rem 2.6rem rgba(0, 0, 0, .65)); }
-html.w3d .head, html.w3d .line .dl { filter: drop-shadow(.8rem 1.4rem 1.6rem rgba(0, 0, 0, .6)); }
-html.w3d .head { transform: rotateY(-9deg); transform-origin: 0 50%; }
+/* ---------- v4: painted 2D street (web/launcher_2d.js). The menu has no box: big slanted labels on the dark flank,
+   the selected one rides a magenta -> violet -> teal neon slash with depth; the canvas plays the streak glint behind it. ---------- */
+.shade { background:
+    linear-gradient(90deg, rgba(5, 4, 18, .78) 0, rgba(8, 6, 26, .42) 30%, rgba(8, 6, 26, 0) 52%),
+    linear-gradient(0deg, rgba(5, 4, 18, .72) 0, rgba(5, 4, 18, 0) 20%),
+    radial-gradient(120% 95% at 60% 45%, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, .55) 100%); }
+.menu-panel::before, .menu-panel::after { display: none; }
+.menu-panel { top: 27rem; width: 58rem; padding: 0; }
+.menu-panel .list { padding: 0; transform: skewX(-8deg); transform-origin: 0 100%; }
+.menu-panel .item { height: 9.6rem; padding: 0 3rem 0 9rem; font-size: 6.6rem; --ink: rgba(214, 226, 255, .62); }
+.menu-panel .item.sel { --ink: #fff; transform: translateX(2.4rem); }
+.menu-panel .item .t { transform: skewX(8deg); letter-spacing: .02em; font-weight: 700; text-shadow: 0 .3rem 1.4rem rgba(0, 0, 0, .8); }
+.menu-panel .item.sel .t { text-shadow: 0 0 .9rem rgba(255, 120, 220, .65), 0 .3rem 1.2rem rgba(20, 0, 40, .9); }
+.menu-panel .light { height: var(--lh, 9.6rem); }
+.menu-panel .light .bg { inset: .9rem 0 .9rem 0;
+  background: linear-gradient(90deg, #ff2fa8 0, #b23cff 34%, rgba(64, 120, 255, .78) 64%, rgba(25, 211, 230, 0) 100%);
+  box-shadow: 0 1.8rem 3.6rem -1.2rem rgba(150, 40, 255, .7), 0 0 4.2rem rgba(255, 47, 168, .35);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 3rem) 100%, 0 100%); animation: none; }
+.menu-panel .light .bg::after { content: ""; position: absolute; inset: 0 0 auto; height: 38%; background: linear-gradient(180deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, 0)); }
+.menu-panel .light .ln { display: none; }
+.menu-panel .light .chevs { left: 2rem; filter: drop-shadow(0 0 .8rem rgba(255, 255, 255, .8)); }
+.menu-panel .desc { margin-top: 1.2rem; background: none; border: 0; clip-path: none; padding: 0 0 0 9rem; min-height: 5rem; font-size: max(15px, 2.8rem); color: #d9e4ff; text-shadow: 0 .2rem 1.2rem #000; }
+.brand::after { background: linear-gradient(90deg, rgba(14, 6, 34, .92), rgba(60, 14, 90, .55) 70%, rgba(255, 47, 168, .25)); }
+.brand::before { background: linear-gradient(90deg, rgba(255, 47, 168, .9), rgba(25, 211, 230, .6)); }
 @media (max-width: 640px), (max-aspect-ratio: 4/5) {
-  html.w3d .menu-panel { left: 0; right: auto; bottom: 8.6rem; width: 100%; }
-  html.w3d .menu-panel .desc { padding: 0 0 0 3rem; text-align: left; }
-  html.w3d .opts-panel, html.w3d .ctrl-panel { transform: none; }
+  .menu-panel { left: 0; top: auto; bottom: 10rem; width: 100%; }
+  .menu-panel .desc { padding-left: 4rem; }
 }
