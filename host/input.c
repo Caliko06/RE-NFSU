@@ -351,19 +351,26 @@ void input_finish(Ctx *c) {
 // and 0x4314a0 runs here, the way 0x4264d0 calls it, because the driver's own update may rewrite the cursor before that car update.
 static int route_reset(Ctx *c, uint32_t car, float metres) {
     uint32_t drv = ld(c, car + 0x2c, 4), vt = drv ? ld(c, drv, 4) : 0, ply = ld(c, car + 0x18, 4), kind = ld(c, car + 0x14, 4);
-    if (!vt || !ply || !kind || ld(c, vt + 0x20, 4) != 0x44a310 || ld(c, kind + 0x734, 1)) return 0;   // the AI driver only
+    if (!vt || !ply || !kind || ld(c, vt + 0x20, 4) != 0x44a310 || ld(c, kind + 0x734, 1)) {   // the AI driver only
+        rn_log("RN_AUTOPILOT: route reset skipped: driver %x vt %x [vt+0x20] %x player %x kind %x", drv, vt, vt ? ld(c, vt + 0x20, 4) : 0, ply, kind);
+        return 0;
+    }
     uint32_t route = ld(c, drv + 0x3e4, 4), n = route ? ld(c, route + 4, 4) : 0;
-    if (n < 2 || n > 4096) return 0;
+    if (n < 2 || n > 4096) { rn_log("RN_AUTOPILOT: route reset skipped: route %x nodes %u", route, n); return 0; }
     uint32_t r[8], a[3] = {route, car + 0x60, 1};
     memcpy(r, c->r, sizeof r);
     c->r[EAX] = 0;
     int32_t k = (int32_t)call_guest(c, 0x5a6150, 3, a), j = k;
-    int ok = k >= 0 && (uint32_t)k + 1 < n;
+    int ok = k >= 0 && (uint32_t)k + 1 < n, sid = -1, pi = -1;
     if (ok) {
         float base = ldf(c, ld(c, route + 8 + 4 * k, 4) + 0x58);
-        while ((uint32_t)j + 1 < n && ldf(c, ld(c, route + 8 + 4 * j, 4) + 0x58) - base < metres) j++;
-        uint32_t node = ld(c, route + 8 + 4 * j, 4);
-        int sid = (int8_t)ld(c, node + 0x5c, 1), pi = (int16_t)ld(c, node + 0x5e, 2);
+        // 0x5a6194/0x5a619c: a node with segment 0xff or piece -1 has no piece; skip it as 0x5a6150 does (cjump_64: nodes 22, 29).
+        uint32_t node = 0;
+        for (; (uint32_t)j < n; j++) {
+            node = ld(c, route + 8 + 4 * j, 4), sid = (int8_t)ld(c, node + 0x5c, 1), pi = (int16_t)ld(c, node + 0x5e, 2);
+            if (ldf(c, node + 0x58) - base >= metres && sid >= 0 && pi >= 0) break;
+        }
+        if ((uint32_t)j >= n) j = k, sid = pi = -1;
         uint32_t seg = sid >= 0 ? ld(c, 0x77af30 + 4 * sid, 4) : 0;
         ok = seg && pi >= 0 && j > k;
         if (ok) {
@@ -376,6 +383,7 @@ static int route_reset(Ctx *c, uint32_t car, float metres) {
             rn_log("RN_AUTOPILOT: reset %.0f m on, route node %d -> %d of %u, segment %d piece %d, car now %.0f,%.0f", metres, k, j, n, sid, pi, ldf(c, car + 0x60), ldf(c, car + 0x64));
         }
     }
+    if (!ok) rn_log("RN_AUTOPILOT: route reset skipped: nearest node %d -> %d of %u, segment %d piece %d", k, j, n, sid, pi);
     memcpy(c->r, r, sizeof r);
     return ok;
 }
@@ -396,7 +404,7 @@ void input_unstick(Ctx *c) {
     if (!since || p > best + 0.02f || p < best - 0.5f) { since = rn_telem.presents ? rn_telem.presents : 1, best = p; return; }
     if (rn_telem.presents - since < 1200) return;
     same = at >= 0 && fabsf(p - at) < 0.02f ? same + 1 : 0, at = p;   // consecutive resets that gained no progress
-    rn_log("RN_AUTOPILOT: no progress %u s at %.0f,%.0f, reset requested at frame %u", (rn_telem.presents - since) / 60, ldf(c, car + 0x60), ldf(c, car + 0x64), rn_telem.presents);
+    rn_log("RN_AUTOPILOT: no progress %u s at %.0f,%.0f (route %.3f, repeat %d), reset requested at frame %u", (rn_telem.presents - since) / 60, ldf(c, car + 0x60), ldf(c, car + 0x64), p, same, rn_telem.presents);
     if (!same || !route_reset(c, car, 40.0f * same)) st(c, car + 0x87c, 1, 4);
     since = rn_telem.presents;
 }
