@@ -108,7 +108,7 @@ ROWS['freerun'] = ','.join(keys(menu(5, 3)).split(',') + FREE_LEAVE)
 
 # garage: RN_OPEN (host/input.c) switches MU_Main_PC to MU_MainMenuCarCustomize as the menu does (0x4b3494), then
 # Next, Visual, Body, Spoiler into the parts browser and four parts (runs/open_garage shot 5100: kit STRIKE on the car).
-_PROFILE = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 4 + ['1500@=MU_UG_NewOrLoad_PC2:RETURN']
+_PROFILE = ['RETURN'] + ['3000@!MU_UG_NewOrLoad_PC2:RETURN'] * 8   # 4 lost the splash on 2026-11-09 (runs/garage: tap 4 on LS_Splash_PC eaten, attract loop) + ['1500@=MU_UG_NewOrLoad_PC2:RETURN']
 ROWS['garage'] = ','.join(['0:RETURN'] + _PROFILE[1:] + [f'1500@={s}:RETURN' for s in ('MU_MainMenuCarCustomize', 'MU_Garage', 'MU_GaragePartsChooseVisual', 'MU_GaragePartsCategoryVisual')] + ['3000@!NONE:RIGHT'] * 4)
 # options: RN_OPEN opens MU_OptionsSelector_PC (0x4b3413), Audio, Volume LEFT x3, Back x2; leaving saves nothing
 # (0x4d4892), so RN_CALL runs the save 0x41c7a0 (.cfg/.opt, as autosave 0x4c9705) back on MU_Main_PC. reload_options.<seed>
@@ -225,7 +225,8 @@ def game_rows():   # the whole-game rows (census/rows.json group game) a run pro
             # The source run's race changed the autosave (0x4c96f0 writes <profile>_autosave.ugd, which the profile
             # load reads back: runs/reload_cjump_7) and the reload's status bytes equal the source's last ones.
             a, b, sv = careers(f'{R}/runs/{r[7:]}'), careers(d), lambda x: open(f'{x}/save/asas_autosave.ugd', 'rb').read()
-            if a and b and a[-1][0] > 0 and b[-1] == a[-1] and sv(f'{R}/runs/{r[7:]}') != sv(R):
+            # The loaded career appears among the reload's status lines (the first is the empty profile 0, a later map key RIGHT rehashes it) (runs/reload_cjump_1 2026-11-09: 5df5d396 at load, dce81602 after tap 9).
+            if a and b and a[-1][0] > 0 and a[-1] in b and sv(f'{R}/runs/{r[7:]}') != sv(R):
                 out[f'{r}#game'] = ok('game.save_reload', f'career {a[-1]} -> reload {b[-1]}')
         src = f'{R}/runs/{r[7:]}'
         if r.startswith('reload_options') and os.path.isdir(src) and os.path.exists(f'{d}/log.txt'):

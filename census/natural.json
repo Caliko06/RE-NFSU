@@ -1,5 +1,5 @@
 {
- "ok": 162,
+ "ok": 164,
  "total": 167,
  "rule": "autopilot, no RN_FINISH; OK = every stage reached 6/8 (Free Run, prologue: raced and back to the menu)",
  "rows": {
@@ -520,7 +520,7 @@
    "run": "cjump_64.0x01234",
    "results": 0,
    "stages": 1,
-   "unstick": 45,
+   "unstick": 52,
    "last": "6/4"
   },
   "career.65": {
@@ -532,12 +532,12 @@
    "last": "3/255"
   },
   "career.66": {
-   "state": "NO_RESULTS",
-   "run": "cjump_66.0x1234",
-   "results": 1,
+   "state": "OK",
+   "run": "cjump_66.0x01234",
+   "results": 3,
    "stages": 3,
    "unstick": 0,
-   "last": "6/4"
+   "last": "3/255"
   },
   "career.67": {
    "state": "OK",
@@ -1315,9 +1315,9 @@
    "why": ""
   },
   "game.save_reload": {
-   "state": "NO_RUN",
+   "state": "OK",
    "run": "game_rows",
-   "why": ""
+   "why": "career (20, '5df5d396') -> reload (20, 'dce81602')"
   },
   "game.movies": {
    "state": "OK",

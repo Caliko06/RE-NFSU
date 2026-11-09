@@ -20,7 +20,7 @@ for row in json.load(open(f'{R}/census/rows.json'))['rows']:
         g = {v['row']: v for k, v in GAME.items() if fresh(k)}.get(rid)
         out[rid] = dict(state='OK' if g else 'NO_RUN', run='game_rows', why=(g or {}).get('why', '')); n += bool(g); continue
     best = None
-    for seed in ('0x01234', '0x1234'):   # the rerun wins when it exists and is newer
+    for seed in ('0x01234', '0x1234', '0x5678'):   # the rerun (same seed) wins; 0x5678 = a second seed, named in 'run'
         d = f'{R}/runs/{name}.{seed}'
         if not os.path.exists(f'{d}/log.txt') or os.path.getmtime(f'{d}/log.txt') < since: continue
         log = open(f'{d}/log.txt', errors='replace').read()
@@ -33,7 +33,7 @@ for row in json.load(open(f'{R}/census/rows.json'))['rows']:
         stuck = len(re.findall(r'^RN_AUTOPILOT: (?:stuck|no progress)', log, re.M))
         best = dict(state='OK' if ok else 'NO_RESULTS', run=f'{name}.{seed}', results=res, stages=len(row.get('stages', [1])),
                     unstick=stuck, last=next((f'{a}/{b}' for a, b in reversed(st)), ''))
-        if ok or seed == '0x01234': break
+        if ok: break
     out[rid] = best or dict(state='NO_RUN', run=name)
     n += out[rid]['state'] == 'OK'
 json.dump(dict(ok=n, total=len(out), rule='autopilot, no RN_FINISH; OK = every stage reached 6/8 (Free Run, prologue: raced and back to the menu)',
