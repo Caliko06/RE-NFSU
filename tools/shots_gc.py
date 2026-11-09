@@ -13,7 +13,8 @@ def gc():
     # Slice worktrees clone build/ (APFS copy-on-write), so their copies of runs/ hold the same blocks: purge those too.
     for d in glob.glob(f'{R}/runs/*/') + glob.glob(f'{R}-wt/*/build/pod/runs/*/'):
         pngs = sorted(glob.glob(d + 'shot.png*.png'), key=mt)
-        if not pngs or time.time() - mt(d + 'log.txt') < 1800: continue
+        # career0/prologue frames are the game.movies proof (completion.py movie() reads the kept FMV frames): never purged.
+        if not pngs or time.time() - mt(d + 'log.txt') < 1800 or os.path.basename(d.rstrip('/')).startswith(('career0', 'prologue')): continue
         dst = f"{R}/census/shots/{os.path.basename(d.rstrip('/'))}__last.webp"
         if mt(dst) < mt(pngs[-1]): Image.open(pngs[-1]).save(dst, quality=70); k += 1
         for p in pngs + [d + 'shot.png']:
