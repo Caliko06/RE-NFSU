@@ -435,7 +435,20 @@ function coneMaterial(col, k) {
 }
 
 // ---------------------------------------------------------------- the car: SKYLINE exported from the game (web/launcher/v3/car.glb + car_meta.json)
-const carPaint = () => new THREE.MeshPhysicalMaterial({ color: 0x0e3fa8, metalness: .38, roughness: .36, clearcoat: 1, clearcoatRoughness: .04, sheen: .25, sheenColor: new Color(.25, .4, 1), sheenRoughness: .5, envMapIntensity: .75 });
+const carPaint = () => {
+  const m = new THREE.MeshPhysicalMaterial({ color: 0x0e3fa8, metalness: .38, roughness: .36, clearcoat: 1, clearcoatRoughness: .04, sheen: .25, sheenColor: new Color(.25, .4, 1), sheenRoughness: .5, envMapIntensity: .75 });
+  // A grazing pink reflection from the Shanghai sign, restricted to the paint.
+  m.userData.rim = { value: 0 };
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uCarRim = m.userData.rim;
+    sh.fragmentShader = 'uniform float uCarRim;\n' + sh.fragmentShader.replace('#include <opaque_fragment>', `
+      vec3 neonDir = normalize((viewMatrix * vec4(-.8, .65, -.2, 0.)).xyz);
+      float edge = pow(1. - max(0., dot(normal, normalize(vViewPosition))), 4.);
+      outgoingLight += vec3(.16, .015, .06) * edge * smoothstep(-.15, .65, dot(normal, neonDir)) * uCarRim;
+      #include <opaque_fragment>`);
+  };
+  return m;
+};
 async function loadCar() {
   const [gltf, meta] = await Promise.all([new GLTFLoader().loadAsync(base + 'car.glb'), fetch(base + 'car_meta.json').then(r => r.json())]);
   const root = gltf.scene, paint = [], lamps = [];
@@ -456,17 +469,20 @@ async function loadCar() {
   });
   const v = a => new V3(a[0], a[1], a[2]);
   return { root: (() => { const g = new THREE.Group(); g.add(root); return g; })(), headL: v(meta.headlights.L).add(new V3(0, 0, .12)), headR: v(meta.headlights.R).add(new V3(0, 0, .12)), tailL: v(meta.taillights.L), tailR: v(meta.taillights.R),
-    dir: new V3(0, -.05, 1).normalize(), length: meta.bbox.max[2] - meta.bbox.min[2], width: meta.bbox.max[0] - meta.bbox.min[0], paint, lamps, wheels: [root.getObjectByName('wheel_FL'), root.getObjectByName('wheel_FR'), root.getObjectByName('wheel_RL'), root.getObjectByName('wheel_RR')].filter(Boolean) };
+    dir: new V3(0, -.12, 1).normalize(), length: meta.bbox.max[2] - meta.bbox.min[2], width: meta.bbox.max[0] - meta.bbox.min[0], paint, lamps, contacts: Object.values(meta.wheel_centers).map(v), wheels: [root.getObjectByName('wheel_FL'), root.getObjectByName('wheel_FR'), root.getObjectByName('wheel_RL'), root.getObjectByName('wheel_RR')].filter(Boolean) };
 }
 function placeCar(info) {
   car = info; const g = car.root; g.position.copy(layoutPos.car); g.rotation.y = -.5; scene.add(g);
-  const sp = (name, p) => { const s = new THREE.SpotLight(0xfff0cc, 110, 26, .5, .55, 2); s.position.copy(p); s.target.position.copy(p).addScaledVector(car.dir, 6); g.add(s); g.add(s.target); L[name] = { light: s, base: 110, t0: 1.5, seed: 21, local: true }; return s; };
+  const sp = (name, p) => { const s = new THREE.SpotLight(0xfff0cc, 110, 26, .36, .8, 2); s.position.copy(p); s.target.position.copy(p).addScaledVector(car.dir, 6); g.add(s); g.add(s.target); L[name] = { light: s, base: 110, t0: 1.5, seed: 21, local: true }; return s; };
   sp('headL', car.headL); sp('headR', car.headR);
   L.headL.light.castShadow = true; L.headL.light.shadow.mapSize.set(512, 512); L.headL.light.shadow.bias = -.0005; L.headL.light.shadow.camera.near = .5; L.headL.light.shadow.camera.far = 18;
   // headlight beams (faint volumetric cones along the car's forward)
   for (const [n, p] of [['headL', car.headL], ['headR', car.headR]]) {
-    const h = 6, geo = new THREE.ConeGeometry(1.5, h, 20, 1, true); geo.translate(0, -h / 2, 0); geo.rotateX(Math.PI / 2);   // apex at origin, axis +z
-    const m = new THREE.Mesh(geo, coneMaterial(new Color(1, .95, .8), .07)); m.position.copy(p); g.add(m); m.renderOrder = 6; cones.push({ mesh: m, light: n, base: .07 });
+    const h = 6, geo = new THREE.ConeGeometry(1.5, h, 20, 1, true); geo.translate(0, -h / 2, 0);   // apex at origin; aim the -y axis forward and down
+    const m = new THREE.Mesh(geo, coneMaterial(new Color(1, .95, .8), .022)); m.position.copy(p); m.quaternion.setFromUnitVectors(new V3(0, -1, 0), car.dir); g.add(m); m.renderOrder = 6; cones.push({ mesh: m, light: n, base: .022 });
+    // Soft wet-road spill shares the headlight strike and follows the car transform.
+    const pool = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 6), new THREE.MeshBasicMaterial({ map: softTex(.8), color: new Color(1, .91, .7), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 }));
+    pool.rotation.x = -Math.PI / 2; pool.position.set(p.x, .018, p.z + 3); pool.renderOrder = 3; g.add(pool); L[n].pool = pool.material;
   }
   L.tailL = { t0: 1.6 };               // tail lamps are emissive only (no light: the reflection pass lights every fragment per light)
   // underglow: a coloured light and an additive pool on the asphalt
@@ -474,7 +490,13 @@ function placeCar(info) {
   const pool = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 6.2), new THREE.MeshBasicMaterial({ map: softTex(.7), color: new Color(.2, .45, 1), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: .55 }));
   pool.rotation.x = -Math.PI / 2; pool.position.y = .012; g.add(pool); L.pool = { mat: pool.material };
   const blob = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 5.4), new THREE.MeshBasicMaterial({ map: softTex(1), color: 0x000000, transparent: true, opacity: .8, depthWrite: false, blending: THREE.NormalBlending }));
-  blob.rotation.x = -Math.PI / 2; blob.position.y = .014; g.add(blob);
+  blob.rotation.x = -Math.PI / 2; blob.position.y = .014; blob.renderOrder = 4; g.add(blob);
+  // Tight AO at the tyre patches, above both the wet reflection and underglow.
+  const contactMat = new THREE.MeshBasicMaterial({ map: softTex(1), color: 0x000000, transparent: true, opacity: .92, depthWrite: false });
+  for (const p of car.contacts) {
+    const patch = new THREE.Mesh(new THREE.PlaneGeometry(.72, 1.05), contactMat);
+    patch.rotation.x = -Math.PI / 2; patch.position.set(p.x, .02, p.z); patch.renderOrder = 5; g.add(patch);
+  }
 }
 
 // ---------------------------------------------------------------- the menu light-boxes
@@ -618,6 +640,8 @@ function updateLights(dt) {
   if (L.lampBulb) L.lampBulb.mat.color.setRGB(1, .7, .35).multiplyScalar(5 * L.lamp.mult * (1 - .07 * calm + .07 * calm * Math.sin(t * 1.7)));
   L.tailL.mult = strike(t - 1.6);
   if (car) for (const m of car.lamps) { if (!m.userData.b) m.userData.b = m.color.clone(); m.color.copy(m.userData.b).multiplyScalar(m.map ? (L.headL.mult || 0) : (L.tailL.mult || 0) * (.8 + .2 * Math.sin(t * 2))); }
+  if (car) for (const m of car.paint) m.userData.rim.value = L.pink.mult || 0;
+  for (const key of ['headL', 'headR']) if (L[key].pool) L[key].pool.opacity = .23 * L[key].mult * (going ? 1.5 : 1);
   if (L.pool) L.pool.mat.opacity = .5 * strike(t - 1.7) * (.85 + .15 * Math.sin(t * 1.3));
   for (const c of cones) { const m = L[c.light] ? L[c.light].mult || 0 : 1; c.mesh.material.uniforms.uK.value = c.base * m * (going && /head/.test(c.light) ? 2.2 : 1); c.mesh.material.uniforms.uTime.value = t; c.mesh.material.uniforms.uCalm.value = calm; }
   // menu light-boxes: spring to selected / hovered, light up one after the other
