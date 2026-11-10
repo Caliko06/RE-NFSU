@@ -1,6 +1,6 @@
 # Open world: all of Olympic City, no fences
 
-> Stage 4 reference (docs/GOAL.md). Parked: its "Next:" lines and plans are history, not work orders, until stage 4 starts.
+> WORLD lane reference (docs/GOAL.md). Parked: its "Next:" lines and plans are history, not work orders, until the Minecraft lane reaches WORLD.
 
 OWNER 2026-10-27: "connect the whole NFSU world, remove the fences, real Free Run, drive the whole map like GTA."
 Apart from Free Run (host/free.c, RN_FREE), which stays as it is.
