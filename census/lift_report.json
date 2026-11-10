@@ -1,5 +1,5 @@
 {
- "functions": 13759,
+ "functions": 13760,
  "abk_files": 106,
  "abk_modules": 79,
  "abk_distinct_code": 23,
@@ -368,7 +368,9 @@
   "0x797400",
   "0x474be7",
   "0x797540",
-  "0x4de395"
+  "0x4de395",
+  "0x4479be",
+  "0x797600"
  ],
  "data_seeds_inside_instructions": 615,
  "failed": {},

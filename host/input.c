@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <math.h>
 #include "host.h"
+#include "mc.h"
 
 // DirectInput key codes (scan codes; 0x80 = the 0xE0-prefixed extended keys), US layout.
 typedef struct { uint8_t dik, vk; char ch, shift_ch; const char *name; } Key;
@@ -110,6 +111,7 @@ void input_key_name(uint8_t dik, char *out, int n) {
 }
 
 static void key_event(uint8_t dik, int d) {
+    if (mc_key(dik, d)) return;   // host/mc.c: F and, on foot, the walking keys never reach the game
     if (down[dik] == d) return;
     const Key *k = key_of(dik);
     down[dik] = (uint8_t)d;
@@ -125,6 +127,8 @@ static void key_event(uint8_t dik, int d) {
     dinput8_key(dik, d);
     user32_key(dik, k ? k->vk : 0, d);
 }
+// host/mc.c, leaving the car: every key the game holds goes up (gas, steer), so the parked car gets no input.
+void input_release_game(void) { for (int k = 0; k < 256; k++) if (down[k]) key_event((uint8_t)k, 0); }
 static void button_event(int b, int d) {
     if (b < 0 || b > 7) return;
     static const uint8_t vk[] = {0x01, 0x02, 0x04, 0x05, 0x06, 0, 0, 0};    // VK_LBUTTON, RBUTTON, MBUTTON, X1, X2
@@ -686,7 +690,7 @@ void input_poll(void) {
     int32_t dx = (int32_t)__atomic_exchange_n(&ring[2], 0, __ATOMIC_ACQ_REL);
     int32_t dy = (int32_t)__atomic_exchange_n(&ring[3], 0, __ATOMIC_ACQ_REL);
     int32_t dz = (int32_t)__atomic_exchange_n(&ring[4], 0, __ATOMIC_ACQ_REL);
-    if (dx || dy || dz) dinput8_motion(dx, dy, dz);
+    if ((dx || dy || dz) && !mc_mouse(dx, dy)) dinput8_motion(dx, dy, dz);
     script_poll();
 }
 #else

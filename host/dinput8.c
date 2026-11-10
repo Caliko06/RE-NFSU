@@ -91,12 +91,12 @@ static Obj *any_obj(Ctx *c) {
     return NULL;
 }
 static uint32_t AddRef_(Ctx *c) { Obj *o = any_obj(c); return o ? ++o->refs : 0; }
-static void mouse_mode(void);
+void dinput8_mouse_mode(void);
 // The last Release of a device unacquires it.
 static uint32_t Release_(Ctx *c) {
     Obj *o = any_obj(c);
     if (!o || !o->refs) return 0;
-    if (!--o->refs && o->iface == I_DEV && o->acquired) { o->acquired = 0; mouse_mode(); }
+    if (!--o->refs && o->iface == I_DEV && o->acquired) { o->acquired = 0; dinput8_mouse_mode(); }
     return o->refs;
 }
 
@@ -181,7 +181,7 @@ static uint32_t IDirectInputDevice8A_SetCooperativeLevel(Ctx *c) {
 // An acquired DISCL_EXCLUSIVE | DISCL_FOREGROUND mouse: Windows hides its cursor and keeps it in the window, so
 // the only cursor is the one the game draws from the relative motion (Speed.exe 0x413050 asks for this, level 5).
 // The page does the same with the Pointer Lock API.
-static void mouse_mode(void) {
+void dinput8_mouse_mode(void) {
     int on = 0;
     for (int k = 0; k < nobjs; k++)
         on |= objs[k].iface == I_DEV && objs[k].kind == MOUSE && objs[k].acquired && (objs[k].coop & 5) == 5;
@@ -206,7 +206,7 @@ static uint32_t IDirectInputDevice8A_Acquire(Ctx *c) {
         for (int j = 0; j < o->nf; j++)
             if (o->f[j].what >= 0x200 && input_key_down((uint8_t)(o->f[j].what - 0x200)))
                 push(o, o->f[j].ofs, 0x80, o->f[j].app);
-    mouse_mode();
+    dinput8_mouse_mode();
     return DI_OK;
 }
 static uint32_t IDirectInputDevice8A_Unacquire(Ctx *c) {
@@ -214,7 +214,7 @@ static uint32_t IDirectInputDevice8A_Unacquire(Ctx *c) {
     if (!o->acquired) return 1;
     o->acquired = 0;
     if (dilog()) rn_log("di Unacquire dev %d", (int)(o - objs));
-    mouse_mode();
+    dinput8_mouse_mode();
     return DI_OK;
 }
 static uint32_t IDirectInputDevice8A_GetDeviceState(Ctx *c) {
