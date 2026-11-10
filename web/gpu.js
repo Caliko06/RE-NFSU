@@ -1073,7 +1073,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
-        else if (op === GPU_FXAA) { if (asp && RN_PS.on && res.get(id)?.w >= 1000) return true; }   // psblur reads the scene depth
+        else if (op === GPU_FXAA) { if (window.MaxChar?.enabled || (asp && RN_PS.on && res.get(id)?.w >= 1000)) return true; }   // psblur reads the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
       return true;     // the next frame may read it
@@ -1204,7 +1204,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const g = k => w[a + k];
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
         const key = `${g(D_RT)}/${g(D_DS)}`;
-        if (ds && g(D_ZEN) && ds.w >= 1000 && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
+        if (ds && g(D_ZEN) && (ds.w >= 1000 || window.MaxChar?.enabled) && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
         if (key !== passKey) {
           const fold = pend && (!(pend.mask & 1) || pend.rt === g(D_RT)) && (!(pend.mask & 6) || pend.ds === g(D_DS));
           endPass(fold);
@@ -1299,6 +1299,8 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         }
         endPass();
         const rt = res.get(w[a]);
+        // F-Max
+        window.MaxChar?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs));
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }

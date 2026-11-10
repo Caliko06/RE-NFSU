@@ -138,6 +138,9 @@ function line(s, cls) {
       if (look !== null) m.ENV.RN_CARLOOK = look;
     }],
   });
+  // F-Max
+  if (RN_MODE === 'remaster' && RN_Q.get('max') === '1')
+    import('./maxpayne/boot.js').then(m => m.start(M, s => line(s))).catch(e => line('[F-Max] STOP ' + e.message, 'stop'));
   const telem = startTelemetry(M, t0, s => line(s), allLog);
   startGpu(M, document.getElementById('screen'), s => line(s, 'api'), telem?.frame).catch(e => line('gpu.js: ' + e.message, 'stop'));
   // RN_STEERLOG (host/input.c): also each key at the page and each present's GPU completion, on the page's clock
