@@ -17,7 +17,7 @@ typedef struct {                    // 32 bytes
     int32_t cx, cy, cz;             // chunk coords: cells cx*16 .. cx*16+15
     uint32_t state;                 // 0 free, 1 live
     uint32_t version;               // +1 on any block or light change in this chunk (the page remeshes)
-    uint32_t pad[3];
+    uint32_t pad[3];               // pad[0]: edited by the player
 } VoxSlot;
 
 typedef struct {                    // 32 bytes

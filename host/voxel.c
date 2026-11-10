@@ -2,6 +2,9 @@
 #include "host.h"
 #include <math.h>
 #include <string.h>
+#ifndef __EMSCRIPTEN__
+#include <time.h>
+#endif
 #include "gpu.h"
 #include "voxel.h"
 
@@ -20,20 +23,55 @@ static int chunk_coord(int x) {
     return q - (x % VOX_CH < 0);
 }
 
+// Open addressing: entries are slot + 1; 0 is empty and UINT16_MAX is a tombstone.
+static uint16_t chunk_hash[2048];
+static uint32_t cell_hash(int x, int y) {
+    uint32_t h = (uint32_t)x * 0x8da6b343u ^ (uint32_t)y * 0xd8163841u;
+    h ^= h >> 16; h *= 0x7feb352du; h ^= h >> 15;
+    return h;
+}
+static unsigned chunk_bucket(int cx, int cy, int cz) {
+    return (cell_hash(cx, cy) ^ (uint32_t)cz * 0xcb1ab31fu) & 2047;
+}
+
 static int chunk_slot(int cx, int cy, int cz, int create) {
-    int free_slot = -1;
+    unsigned at = chunk_bucket(cx, cy, cz), insert = 2048;
+    for (unsigned n = 0; n < 2048; n++, at = (at + 1) & 2047) {
+        unsigned entry = chunk_hash[at];
+        if (!entry) { if (insert == 2048) insert = at; break; }
+        if (entry == UINT16_MAX) { if (insert == 2048) insert = at; continue; }
+        VoxSlot *s = &vox.slot[entry - 1];
+        if (s->cx == cx && s->cy == cy && s->cz == cz) return entry - 1;
+    }
+    if (!create || insert == 2048) return -1;
     for (int i = 0; i < VOX_SLOTS; i++) {
         VoxSlot *s = &vox.slot[i];
-        if (!s->state) { if (free_slot < 0) free_slot = i; }
-        else if (s->cx == cx && s->cy == cy && s->cz == cz) return i;
+        if (s->state) continue;
+        s->cx = cx; s->cy = cy; s->cz = cz;
+        memset(vox.block[i], B_AIR, VOX_CELLS);
+        memset(vox.light[i], light_cell_init(B_AIR), VOX_CELLS);
+        memset(s->pad, 0, sizeof s->pad);
+        s->version++; s->state = 1;
+        chunk_hash[insert] = i + 1;
+        return i;
     }
-    if (!create || free_slot < 0) return -1;
-    VoxSlot *s = &vox.slot[free_slot];
-    s->cx = cx; s->cy = cy; s->cz = cz;
-    memset(vox.block[free_slot], B_AIR, VOX_CELLS);
-    memset(vox.light[free_slot], light_cell_init(B_AIR), VOX_CELLS);
-    s->version = 1; s->state = 1;
-    return free_slot;
+    return -1;
+}
+
+static void chunk_free(int slot) {
+    VoxSlot *s = &vox.slot[slot];
+    unsigned at = chunk_bucket(s->cx, s->cy, s->cz);
+    for (unsigned n = 0; n < 2048; n++, at = (at + 1) & 2047) {
+        if (!chunk_hash[at]) break;
+        if (chunk_hash[at] == slot + 1) { chunk_hash[at] = UINT16_MAX; break; }
+    }
+    s->state = 0; s->version++;
+    for (int d = 0; d < 6; d++) {
+        int c[3] = {s->cx, s->cy, s->cz};
+        c[d / 2] += d & 1 ? 1 : -1;
+        int next = chunk_slot(c[0], c[1], c[2], 0);
+        if (next >= 0) vox.slot[next].version++;
+    }
 }
 
 static uint8_t get_cell(int x, int y, int z) {
@@ -159,6 +197,7 @@ static void set_cell(int x, int y, int z, uint8_t block) {
     if (vox.block[s][n] == block) return;
     uint8_t old_light = vox.light[s][n];
     vox.block[s][n] = block;
+    vox.slot[s].pad[0] = 1;
     vox.slot[s].version++;
     for (int a = 0; a < 3; a++) {
         if (p[a] != 0 && p[a] != VOX_CH - 1) continue;
@@ -255,6 +294,238 @@ static uint32_t player_node(Ctx *c) {
     return 0;
 }
 
+// 0x440a40: private ground cache, surface out, hit byte and ST0 height; preserve the guest x87 state.
+static int vox_ground(Ctx *c, float x, float y, float z, float *h, uint32_t *surface) {
+    static uint32_t cache, pt;
+    if (!cache) {
+        cache = guest_alloc(0x2c0); pt = guest_alloc(20);
+        uint32_t eax = c->r[EAX];
+        c->r[EAX] = cache; call_guest(c, 0x440740, 0, NULL); c->r[EAX] = eax;
+    }
+    stf(c, pt, x); stf(c, pt + 4, y); stf(c, pt + 8, z);
+    st(c, pt + 12, 0, 4);
+    uint32_t a[5] = {cache, pt, pt + 16, 0, pt + 12};
+    uint32_t fcw = c->fcw, fsw = c->fsw, ftop = c->ftop, ftag = c->ftag;
+    double st8[8];
+    memcpy(st8, c->st, sizeof st8);
+    call_guest(c, 0x440a40, 5, a);
+    *h = (float)*fr(c, 0); fpop(c);
+    memcpy(c->st, st8, sizeof st8);
+    c->fcw = fcw; c->fsw = fsw; c->ftop = ftop; c->ftag = ftag;
+    *surface = ld(c, pt + 16, 4);
+    return ld(c, pt + 12, 1) != 0;
+}
+
+static double vox_now(void) {
+#ifdef __EMSCRIPTEN__
+    return emscripten_get_now();
+#else
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return t.tv_sec * 1000.0 + t.tv_nsec * 1e-6;
+#endif
+}
+
+// Value noise: smooth interpolation of hashed lattice values, then two octaves; https://pablowilliams.github.io/Octave/index.html
+static float value_noise(float x, float y) {
+    int ix = (int)floorf(x), iy = (int)floorf(y);
+    float u = x - ix, v = y - iy;
+    u = u * u * (3 - 2 * u); v = v * v * (3 - 2 * v);
+    float a = (cell_hash(ix, iy) & 65535) / 32767.5f - 1;
+    float b = (cell_hash(ix + 1, iy) & 65535) / 32767.5f - 1;
+    float d = (cell_hash(ix, iy + 1) & 65535) / 32767.5f - 1;
+    float e = (cell_hash(ix + 1, iy + 1) & 65535) / 32767.5f - 1;
+    return (a + u * (b - a)) * (1 - v) + (d + u * (e - d)) * v;
+}
+static float terrain_noise(int x, int y) {
+    return (value_noise(x / 38.0f, y / 38.0f) + 0.5f * value_noise(x / 19.0f, y / 19.0f)) / 1.5f;
+}
+
+typedef struct {
+    int cx, cy, live;
+    float base;
+    uint32_t street[8];
+} VoxColumn;
+static VoxColumn columns[VOX_SLOTS];
+static uint32_t street_surfaces[8];
+static int street_count;
+
+static int is_street(uint32_t surface) {
+    for (int i = 0; i < street_count; i++) if (street_surfaces[i] == surface) return 1;
+    return 0;
+}
+static int column_find(int cx, int cy) {
+    for (int i = 0; i < VOX_SLOTS; i++)
+        if (columns[i].live && columns[i].cx == cx && columns[i].cy == cy) return i;
+    return -1;
+}
+static int near_street(int x, int y, int origin_x, int origin_y, const int nearby[9]) {
+    // Unknown adjacent columns keep their two-cell border clear until sampled.
+    for (int dy = -2; dy <= 2; dy++) for (int dx = -2; dx <= 2; dx++) {
+        int cx = chunk_coord(x + dx), cy = chunk_coord(y + dy);
+        int col = nearby[cx - origin_x + 1 + 3 * (cy - origin_y + 1)];
+        if (col < 0) return 1;
+        int n = x + dx - cx * VOX_CH + VOX_CH * (y + dy - cy * VOX_CH);
+        if ((columns[col].street[n / 32] >> (n % 32)) & 1) return 1;
+    }
+    return 0;
+}
+
+static void gen_cell(int x, int y, int z, uint8_t block) {
+    int cx = chunk_coord(x), cy = chunk_coord(y), cz = chunk_coord(z);
+    int s = chunk_slot(cx, cy, cz, 1);
+    if (s < 0 || vox.slot[s].pad[0]) return;
+    vox.block[s][x - cx * VOX_CH + VOX_CH * (y - cy * VOX_CH + VOX_CH * (z - cz * VOX_CH))] = block;
+}
+
+static void chunk_relight(int s) {
+    VoxSlot *slot = &vox.slot[s];
+    int above = chunk_slot(slot->cx, slot->cy, slot->cz + 1, 0);
+    for (int xy = 0; xy < VOX_CH * VOX_CH; xy++) {
+        int sky = above < 0 ? 15 : vox.light[above][xy] >> 4;
+        for (int z = VOX_CH - 1; z >= 0; z--) {
+            int n = xy + z * VOX_CH * VOX_CH;
+            uint8_t b = vox.block[s][n];
+            if (!light_open(b)) sky = 0;
+            vox.light[s][n] = (sky << 4) | light_emission(b);
+        }
+    }
+    slot->version++;
+}
+static void gen_light_seed(int cell) {
+    for (int sky = 0; sky < 2; sky++) {
+        int level = light_value(cell, sky);
+        if (!level) continue;
+        for (int d = 0; d < 6; d++) {
+            int next = light_neighbour(cell, d);
+            if (next < 0 || !light_open(vox.block[next / VOX_CELLS][next % VOX_CELLS])) continue;
+            if (light_value(next, sky) < level) { light_push(&light_add, cell, sky, level); break; }
+        }
+    }
+}
+static void column_relight(int cx, int cy) {
+    int slots[VOX_SLOTS], count = 0;
+    for (int s = 0; s < VOX_SLOTS; s++) if (vox.slot[s].state && vox.slot[s].cx == cx && vox.slot[s].cy == cy) {
+        int j = count++;
+        while (j > 0 && vox.slot[slots[j - 1]].cz < vox.slot[s].cz) { slots[j] = slots[j - 1]; j--; }
+        slots[j] = s;
+    }
+    light_add.head = light_add.tail = light_remove.head = light_remove.tail = 0;
+    light_stopped = 0;
+    for (int i = 0; i < count; i++) chunk_relight(slots[i]);
+    for (int i = 0; i < count; i++) {
+        int s = slots[i];
+        for (int n = 0; n < VOX_CELLS; n++) gen_light_seed(s * VOX_CELLS + n);
+        // Seed the four side borders and the bottom row of the chunk above.
+        for (int d = 0; d < 6; d++) {
+            int c[3] = {cx, cy, vox.slot[s].cz};
+            c[d / 2] += d & 1 ? 1 : -1;
+            int other = chunk_slot(c[0], c[1], c[2], 0);
+            if (other < 0) continue;
+            vox.slot[other].version++;
+            if (d == 4) continue;
+            for (int v = 0; v < VOX_CH; v++) for (int u = 0; u < VOX_CH; u++) {
+                int n = d < 2 ? (d == 0 ? 15 : 0) + 16 * (u + 16 * v) :
+                        d < 4 ? u + 16 * ((d == 2 ? 15 : 0) + 16 * v) : u + 16 * v;
+                gen_light_seed(other * VOX_CELLS + n);
+            }
+        }
+    }
+    light_drain_add();
+}
+
+static void generate_column(Ctx *c, int cx, int cy) {
+    static int timed;
+    float height[256], sum = 0;
+    uint8_t hit[256];
+    uint32_t surface[256];
+    int hits = 0, streets = 0, props = 0, col = -1;
+    for (int i = 0; i < VOX_SLOTS; i++) if (!columns[i].live) { col = i; break; }
+    if (col < 0) return;
+    double start = vox_now();
+    for (int n = 0; n < 256; n++) {
+        hit[n] = vox_ground(c, cx * 16 + n % 16 + 0.5f, cy * 16 + n / 16 + 0.5f,
+                            vox.eye[2] + 30, &height[n], &surface[n]);
+        if (hit[n]) { hits++; sum += height[n]; }
+    }
+    double queried = vox_now();
+    float base = vox.eye[2] - 2;
+    int nearest = -1, distance = 0;
+    if (hits) base = sum / hits;
+    else for (int i = 0; i < VOX_SLOTS; i++) if (columns[i].live) {
+        int dx = columns[i].cx - cx, dy = columns[i].cy - cy, d = dx * dx + dy * dy;
+        if (nearest < 0 || d < distance) { nearest = i; distance = d; base = columns[i].base; }
+    }
+    VoxColumn *column = &columns[col];
+    column->cx = cx; column->cy = cy; column->base = base; column->live = 1;
+    memset(column->street, 0, sizeof column->street);
+    for (int n = 0; n < 256; n++) if (hit[n] && is_street(surface[n])) {
+        column->street[n / 32] |= 1u << (n % 32); streets++;
+    }
+    int nearby[9];
+    for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++)
+        nearby[dx + 1 + 3 * (dy + 1)] = column_find(cx + dx, cy + dy);
+    for (int n = 0; n < 256; n++) {
+        int x = cx * 16 + n % 16, y = cy * 16 + n / 16;
+        if ((column->street[n / 32] >> (n % 32)) & 1) continue;
+        if (!hit[n]) {
+            int top = (int)floorf(base + 3 * terrain_noise(x, y));
+            for (int z = (int)floorf(base - 6); z <= top; z++)
+                gen_cell(x, y, z, z == top ? B_ASPHALT : z >= top - 2 ? B_GRIT : B_CONCRETE);
+            continue;
+        }
+        if (near_street(x, y, cx, cy, nearby)) continue;
+        int z = (int)ceilf(height[n] - 0.25f), count = 0;
+        uint32_t h = cell_hash(x, y), roll = h % 10000;
+        uint8_t b = B_AIR;
+        if (x % 24 == 0 && y % 24 == 0) {
+            for (int k = 0; k < 3; k++) gen_cell(x, y, z + k, B_CONCRETE);
+            gen_cell(x, y, z + 3, B_SODIUM); props++; continue;
+        }
+        if (roll < 120) { b = B_CRATE; count = 1 + (h / 10000) % 3; }
+        else if (roll < 200) { b = B_TYRES; count = 1 + (h / 10000) % 2; }
+        else if (roll < 250) { b = B_BARRIER; count = 1; }
+        else if (roll < 290) { b = B_SCRAP; count = 1; gen_cell(x, y, z + 1, B_GRIT); }
+        for (int k = 0; k < count; k++) gen_cell(x, y, z + k, b);
+        if (count) props++;
+    }
+    double filled = vox_now();
+    column_relight(cx, cy);
+    double relit = vox_now();
+    if (timed++ < 6) rn_log("voxel gen col %d %d ms %.3f q %.3f f %.3f r %.3f hits %d street %d props %d",
+                           cx, cy, relit - start, queried - start, filled - queried, relit - filled, hits, streets, props);
+}
+
+static void stream_columns(Ctx *c, uint32_t node) {
+    if (node) {
+        float h;
+        uint32_t surface;
+        if (vox_ground(c, ldf(c, node + 0x50), ldf(c, node + 0x54), ldf(c, node + 0x58) + 0.5f, &h, &surface)
+            && !is_street(surface) && street_count < 8) street_surfaces[street_count++] = surface;
+    }
+    int cx = chunk_coord((int)floorf(vox.eye[0])), cy = chunk_coord((int)floorf(vox.eye[1]));
+    if (vox.frame % 30 == 0) {
+        for (int s = 0; s < VOX_SLOTS; s++) if (vox.slot[s].state && !vox.slot[s].pad[0]) {
+            int dx = vox.slot[s].cx - cx, dy = vox.slot[s].cy - cy;
+            if (dx * dx + dy * dy > 16) chunk_free(s);
+        }
+        for (int i = 0; i < VOX_SLOTS; i++) if (columns[i].live) {
+            int dx = columns[i].cx - cx, dy = columns[i].cy - cy, keep = 0;
+            if (dx * dx + dy * dy <= 16) continue;
+            for (int s = 0; s < VOX_SLOTS; s++)
+                if (vox.slot[s].state && vox.slot[s].cx == columns[i].cx && vox.slot[s].cy == columns[i].cy) { keep = 1; break; }
+            if (!keep) columns[i].live = 0;
+        }
+    }
+    int bx = 0, by = 0, best = 10;
+    for (int dy = -3; dy <= 3; dy++) for (int dx = -3; dx <= 3; dx++) {
+        int distance = dx * dx + dy * dy;
+        if (distance > 9 || distance >= best || column_find(cx + dx, cy + dy) >= 0) continue;
+        bx = cx + dx; by = cy + dy; best = distance;
+    }
+    if (best < 10 && street_count) generate_column(c, bx, by);   // never before the street is known: props would land on the road
+}
+
 // J. Amanatides and A. Woo, "A Fast Voxel Traversal Algorithm for Ray Tracing", Eurographics 1987: https://www.cse.yorku.ca/~amana/research/grid.pdf
 static void target_ray(const float forward[3]) {
     int p[3], step[3];
@@ -306,9 +577,9 @@ void vox_frame(Ctx *c) {
     if (enabled < 0) {
         const char *e = getenv("RN_VOXEL"); enabled = !e || strcmp(e, "0");
         demo = rn_env("RN_VOXDEMO", 0) == 1;
-        probe = rn_env("RN_VOXPROBE", 0) == 1;
+        probe = demo && rn_env("RN_VOXPROBE", 0) == 1;
         const char *light_env = getenv("RN_VOXLIGHT");
-        light_test = light_env && !strcmp(light_env, "1");
+        light_test = demo && light_env && !strcmp(light_env, "1");
     }
     vox.on = 0;
     if (!enabled || ld(c, 0x777cc8, 4) != 3) return;
@@ -333,7 +604,7 @@ void vox_frame(Ctx *c) {
     float forward[3] = {m[2], m[6], m[10]};
     float len = sqrtf(forward[0] * forward[0] + forward[1] * forward[1] + forward[2] * forward[2]);
     if (len > 0) for (int a = 0; a < 3; a++) forward[a] /= len;
-    if (!built && vox.frame >= 90) {
+    if (demo && !built && vox.frame >= 90) {
         if (node) {
             float pos[3], heading[3];
             for (int a = 0; a < 3; a++) {
@@ -403,6 +674,7 @@ void vox_frame(Ctx *c) {
                    (unsigned)light_at(x, y, z + 6), (unsigned)(light_at(x, y, z + 6) & 15),
                    (unsigned)light_at(x, y, z + 4));
     }
+    stream_columns(c, node);
     uint32_t w[40] = {0};
     memcpy(w, m, sizeof m);
     memcpy(w + 32, vox.target, sizeof vox.target);
