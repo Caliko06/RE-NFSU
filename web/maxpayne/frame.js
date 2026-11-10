@@ -34,7 +34,7 @@ export function maxPlayer(M) {
   const pos = Array.from(f.subarray(b + 6, b + 9));
   if (Atomics.load(h, b + 1) !== seq) return null; // skip this packet's draws during a concurrent publication
   // View: not read from guest memory (the GM+0x1074 camera read gave no player in run 4); gpu.js takes it from the draws.
-  return { pos, vel: Array.from(f.subarray(b + 18, b + 21)), control: h[b + 351] };
+  return { pos, rot: Array.from(f.subarray(b + 9, b + 18)), vel: Array.from(f.subarray(b + 18, b + 21)), control: h[b + 351] };
 }
 
 export function pedFrame(M) {

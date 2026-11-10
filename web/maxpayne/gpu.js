@@ -213,7 +213,7 @@ export function createReader(M, device) {
       if (t) { t.refs = (t.refs || 0) + 1; textures.push(t); }
     }
     const indices = M.HEAPU8.slice(h[slot + 4] + hdr[D_IOFF], h[slot + 4] + hdr[D_IOFF] + hdr[D_NIDX] * 4);
-    pending.push({ hdr, uniform, vertices, indices, world, lo, hi, c, radius, dW, textures, binding: texBind(hdr, 0, mask) });
+    pending.push({ hdr, uniform, vertices, indices, world, lo, hi, c, radius, dW, player, textures, binding: texBind(hdr, 0, mask) });
     stats.kept++;
     if (pending.length === 1) {
       stats.view = 'dominant WV x' + stats.viewN;
@@ -228,8 +228,17 @@ export function createReader(M, device) {
     // (object space, Y up) moved to the origin: the feet stand on the placement point.
     const body = draws.reduce((m, d) => !m || d.dW < m.dW ? d : m, null);
     if (body) {
-      const inv = inverse(body.world);
-      const feet = identity(); feet[12] = -(body.lo[0] + body.hi[0]) / 2; feet[13] = -body.lo[1]; feet[14] = -(body.lo[2] + body.hi[2]) / 2;
+      // Into the player's own frame (gamestate rot rows + pos, Y up): Max's yaw and position in his level drop out and the
+      // body keeps its object-to-world tilt (run 1 of the join: W_body^-1 alone left him lying on the road). Feet = the body's lowest point there.
+      const r = body.player.rot, q = body.player.pos;
+      const inv = inverse([r[0], r[1], r[2], 0, r[3], r[4], r[5], 0, r[6], r[7], r[8], 0, q[0], q[1], q[2], 1]);
+      const rel = inv && mul(body.world, inv);
+      let low = Infinity;
+      if (rel) for (let k = 0; k < 8; k++) {
+        const v = [0, 1, 2].map(a => (k >> a & 1 ? body.hi : body.lo)[a]);
+        low = Math.min(low, v[0] * rel[1] + v[1] * rel[5] + v[2] * rel[9] + rel[13]);
+      }
+      const feet = identity(); feet[13] = -low;
       for (const d of draws) d.local = inv ? mul(mul(d.world, inv), feet) : null;
     }
     // Keep the body (draws on the body's W: one skinned object) and the weapon (a small object at hand height inside the
