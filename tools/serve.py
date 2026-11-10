@@ -189,6 +189,66 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         route = self.path.split("?", 1)[0]
+        # F-Max: runtime-only files from the OWNER's separate Max installation.
+        if route.startswith("/mp/"):
+            repo = os.path.expanduser(os.environ.get("RN_MAX_REPO", "~/maxpayne-re"))
+            game = os.path.expanduser(os.environ.get("RN_MAX_GAME", "~/Games/maxpayne"))
+            roots = {"out": os.path.join(repo, "web", "out"), "img": os.path.join(repo, "build", "img"), "game": game}
+            if route in ("/mp/img-files.json", "/mp/game-files.json", "/mp/files.json", "/mp/save-files.json"):
+                if route == "/mp/save-files.json":
+                    body = b"[]"
+                elif route == "/mp/files.json":
+                    rows = json.loads(listing(game))
+                    body = json.dumps({"game": [[f, n, "/mp/game/" + urllib.parse.quote(f, safe="/")] for f, n in rows], "save": []}).encode()
+                else:
+                    body = listing(roots["img" if route == "/mp/img-files.json" else "game"])
+                self.reply(200, "application/json", body, [("Cache-Control", "no-store")])
+                return
+            parts = route.split("/", 3)
+            if len(parts) != 4 or parts[2] not in roots:
+                self.send_error(404)
+                return
+            root = os.path.realpath(roots[parts[2]])
+            path = os.path.realpath(os.path.join(root, urllib.parse.unquote(parts[3])))
+            if not path.startswith(root + os.sep) or not os.path.isfile(path):
+                self.send_error(404)
+                return
+            st = os.stat(path)
+            rng = self.headers.get("Range")
+            if rng:
+                import re
+                m = re.fullmatch(r"bytes=(\d+)-(\d*)", rng)
+                a, b = (int(m[1]), min(int(m[2]) if m[2] else st.st_size - 1, st.st_size - 1)) if m else (st.st_size, -1)
+                if b < a or a >= st.st_size:
+                    self.reply(416, "application/octet-stream", b"", [("Content-Range", f"bytes */{st.st_size}")])
+                    return
+                with open(path, "rb") as f:
+                    f.seek(a)
+                    body = f.read(b - a + 1)
+                self.reply(206, self.guess_type(path), body, [("Content-Range", f"bytes {a}-{b}/{st.st_size}")])
+                return
+            # imported from maxpayne-re b28fb1a tools/serve.py: use a fresh prebuilt .br, never write into Max's tree.
+            br = path + ".br"
+            packed = parts[2] == "out" and "br" in self.headers.get("Accept-Encoding", "") and os.path.isfile(br) and os.path.getmtime(br) >= st.st_mtime
+            bodypath = br if packed else path
+            tag = f'"{st.st_mtime_ns:x}-{st.st_size:x}-{"br" if packed else "id"}"'
+            if self.headers.get("If-None-Match") == tag:
+                self.send_response(304)
+                self.send_header("ETag", tag)
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", self.guess_type(path))
+            self.send_header("Content-Length", str(os.path.getsize(bodypath)))
+            self.send_header("X-Raw-Length", str(st.st_size))
+            self.send_header("ETag", tag)
+            self.send_header("Vary", "Accept-Encoding")
+            if packed:
+                self.send_header("Content-Encoding", "br")
+            self.end_headers()
+            with open(bodypath, "rb") as f:
+                shutil.copyfileobj(f, self.wfile, 1 << 20)
+            return
         if route == "/launcher":             # the pre-game launcher (lane w3, OWNER 2026-11-07); bare / opens the game directly
             self.path = "/launcher.html"
         elif route == "/setup":              # LAN entry page (web/setup.html): QR, CA, iOS profile
