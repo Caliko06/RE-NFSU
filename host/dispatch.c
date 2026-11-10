@@ -26,8 +26,8 @@ uint32_t host_addr_of(const char *dll, const char *name) {
 }
 
 const Api *find_api(const char *dll, const char *name) {
-    static const Api *tables[] = {win32_apis, user32_apis, thread_apis, net_apis, d3d9_apis, dinput8_apis, dsound_apis, rivals_apis, free_apis, horn_apis};
-    const int *counts[] = {&win32_api_count, &user32_api_count, &thread_api_count, &net_api_count, &d3d9_api_count, &dinput8_api_count, &dsound_api_count, &rivals_api_count, &free_api_count, &horn_api_count};
+    static const Api *tables[] = {win32_apis, user32_apis, thread_apis, net_apis, d3d9_apis, dinput8_apis, dsound_apis, rivals_apis, free_apis, horn_apis, mc_apis};
+    const int *counts[] = {&win32_api_count, &user32_api_count, &thread_api_count, &net_api_count, &d3d9_api_count, &dinput8_api_count, &dsound_api_count, &rivals_api_count, &free_api_count, &horn_api_count, &mc_api_count};
     for (int t = 0; t < (int)(sizeof tables / sizeof *tables); t++)
         for (int k = 0; k < *counts[t]; k++)
             if (!strcasecmp(tables[t][k].dll, dll) && !strcmp(tables[t][k].name, name)) return &tables[t][k];

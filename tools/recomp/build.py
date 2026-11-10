@@ -140,7 +140,7 @@ def stale(o, src, gen=GEN):
 
 
 HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c",
-        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c", "host/abk.c", "host/bridge.c", "host/carsmooth.c", "host/rivals.c", "host/free.c", "host/aitel.c", "host/lights.c", "host/openworld.c", "host/cov.c", "host/horn.c", "host/feellog.c", "host/phase.c"]
+        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c", "host/abk.c", "host/bridge.c", "host/carsmooth.c", "host/rivals.c", "host/free.c", "host/aitel.c", "host/lights.c", "host/openworld.c", "host/cov.c", "host/horn.c", "host/feellog.c", "host/phase.c", "host/mc.c"]
 
 
 def compile_native():
