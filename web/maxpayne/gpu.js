@@ -30,7 +30,7 @@ export function createReader(M, device) {
   if (M.HEAPU32[box + B_ABI] !== GPU_ABI) fail('packet ABI mismatch');
   const res = new Map(), shaders = new Map(), decls = new Map();
   const pk = { present: 0, draws: 0, passes: 0, clears: 0, kb: 0, texKb: 0, pipes: 0, shaders: 0, targets: 0, reads: 0 };
-  const stats = { packets: 0, seen: 0, kept: 0, view: 'unselected', world: '-', player: '-', noPlayer: 0, noView: 0, notXyz: 0, far: 0, big: 0, nearest: Infinity, nearestW: Infinity, cam: '-' };
+  const stats = { packets: 0, seen: 0, kept: 0, view: 'unselected', world: '-', player: '-', noPlayer: 0, noView: 0, level: 0, notXyz: 0, far: 0, big: 0, nearest: Infinity, nearestW: Infinity, cam: '-' };
   const lut = device.createTexture({ size: [256, 1], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
   const lutData = new Uint8Array(1024);
   for (let i = 0; i < 256; i++) lutData.set([i, i, i, 255], 4 * i);
@@ -213,7 +213,7 @@ export function createReader(M, device) {
       if (t) { t.refs = (t.refs || 0) + 1; textures.push(t); }
     }
     const indices = M.HEAPU8.slice(h[slot + 4] + hdr[D_IOFF], h[slot + 4] + hdr[D_IOFF] + hdr[D_NIDX] * 4);
-    pending.push({ hdr, uniform, vertices, indices, world, lo, hi, radius, textures, binding: texBind(hdr, 0, mask) });
+    pending.push({ hdr, uniform, vertices, indices, world, lo, hi, c, radius, dW, textures, binding: texBind(hdr, 0, mask) });
     stats.kept++;
     if (pending.length === 1) {
       stats.view = 'dominant WV x' + stats.viewN;
@@ -223,15 +223,27 @@ export function createReader(M, device) {
   }
   function publish() {
     release(current);
-    const draws = pending; pending = [];
-    // Body = the largest kept draw. Each draw's local = W_i * W_body^-1, then the body's lowest point and its xz centre
+    let draws = pending; pending = [];
+    // Body = the draw whose W sits on the player (run 5: 0.12 m; a level piece's W is its own origin). Each draw's local = W_i * W_body^-1, then the body's lowest point and its xz centre
     // (object space, Y up) moved to the origin: the feet stand on the placement point.
-    const body = draws.reduce((m, d) => !m || d.radius > m.radius ? d : m, null);
+    const body = draws.reduce((m, d) => !m || d.dW < m.dW ? d : m, null);
     if (body) {
       const inv = inverse(body.world);
       const feet = identity(); feet[12] = -(body.lo[0] + body.hi[0]) / 2; feet[13] = -body.lo[1]; feet[14] = -(body.lo[2] + body.hi[2]) / 2;
       for (const d of draws) d.local = inv ? mul(mul(d.world, inv), feet) : null;
     }
+    // Keep the body (draws on the body's W: one skinned object) and the weapon (a small object at hand height inside the
+    // body's reach); every other kept draw is a piece of Max's level that happened to be near the player.
+    const same = d => d.world.every((x, k) => Math.abs(x - body.world[k]) < 1e-3);
+    const inHand = d => {
+      if (!d.local || d.radius > 0.6) return false;
+      const q = [0, 1, 2].map(k => d.c[0] * d.local[k] + d.c[1] * d.local[4 + k] + d.c[2] * d.local[8 + k] + d.local[12 + k]);
+      return q[1] > 0.5 && q[1] < 1.9 && Math.hypot(q[0], q[2]) < 0.9;
+    };
+    const keep = body ? draws.filter(d => same(d) || inHand(d)) : [];
+    for (const d of draws) if (!keep.includes(d)) for (const t of d.textures) if (--t.refs === 0 && t.retired) retire(t.tex);
+    stats.level += draws.length - keep.length;
+    draws = keep;
     let nv = 0, ni = 0;
     for (const d of draws) {
       d.voff = nv; d.ioff = ni;

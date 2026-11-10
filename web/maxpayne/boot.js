@@ -1,21 +1,17 @@
 // imported from maxpayne-re b28fb1a web/index.html, web/input.js, web/audio.js
 import { createReader } from './gpu.js';
-import { speedFrame } from './frame.js';
+import { pedFrame } from './frame.js';
 
 const api = window.MaxChar = {
   enabled: false,
   key() {},
   encode() {},
-  // F-Speed may supply its guest base and later replace placement with the pedestrian matrix.
-  guestBase: 0,
-  place: null,
   scene(device, speed, encoder, rt, ds) {
     if (!api.enabled || !rt || !ds) return;
     if (!api.reader && api.module) api.reader = createReader(api.module, device);
     if (!api.reader) { api.why = 'no reader (Max module not up)'; return; }
-    if (!api.guestBase) api.guestBase = speed._rn_mem_mb(3) >>> 0;   // host/win32.c rn_mem_mb(3) = wasm address of guest 0
-    const frame = speedFrame(speed, api.guestBase, api.place);
-    if (!frame) { api.why = 'no Speed frame (guest base ' + api.guestBase + ')'; return; }
+    const frame = pedFrame(speed);
+    if (!frame) { api.why = 'driving'; return; }
     api.why = 'drawing';
     api.reader.frame = { ...frame, width: rt.w, height: rt.h, resolveTarget: rt.msView ? rt.view : undefined };
     api.encode(encoder, rt.msView || rt.view, ds.view, rt.sc);
@@ -24,7 +20,6 @@ const api = window.MaxChar = {
 
 export async function start(speedM, log = console.log) {
   api.log = log;
-  if (RN_MODE !== 'remaster' || new URLSearchParams(location.search).get('max') !== '1') return;
   api.enabled = true;
   const report = s => log('[F-Max] ' + s);
   report('start: loading /mp/out/maxpayne.js');
@@ -47,7 +42,8 @@ export async function start(speedM, log = console.log) {
     preRun: [m => {
       Object.assign(m.ENV, { RN_FILES: '/mp/files.json', RN_SCREEN: '640x480', RN_GUEST_MB: '448',
         RN_TEXDETAIL: '0', RN_MAXTEX: '1024', RN_FILECACHE_MB: '32', RN_LOWMEM: '1', RN_NOCURSOR: '1',
-        RN_JUMP: 'maxpayne_gamemode->gm_init(startup_level);|x_modeswitch->s_modeswitch(game);' });
+        // part0_level1 (the prologue: no AI, free control after its comic). The last line waits for control (Max host/jump.c:121-123).
+        RN_JUMP: 'maxpayne_gamemode->gm_init(part0_level1);|x_modeswitch->s_modeswitch(game);|player->c_setinvulnerable(true);' });
       m.FS.mkdirTree('/build/img');
       for (const [f, bytes] of data) m.FS.writeFile('/build/img/' + f, bytes);
     }],
@@ -69,18 +65,24 @@ export async function start(speedM, log = console.log) {
   const audio = M._rn_audio_ring() >>> 2;
   setInterval(() => { const h = M.HEAP32; Atomics.store(h, audio + 1, Atomics.load(h, audio)); }, 20);
   api.encode = (...args) => api.reader?.encode(...args);
-  // Walk keys reach Max's ring while F-Speed's pedestrian is on foot, or always before its export exists (pre-merge).
+  // Max's walk/run follows the pedestrian (host/mc.c McPed): its velocity in the pedestrian's frame becomes W/S/A/D in Max's
+  // ring (Max runs about 4.4 m/s, 3.97 m in 0.9 s, ~/maxpayne-re/rea/map/player.md; the pedestrian walks 4.0, runs 7.0 and
+  // owns the position).
   let sent = 0;
-  const onFoot = () => !speedM._rn_mc_state || new DataView(speedM.HEAPU8.buffer).getInt32(speedM._rn_mc_state() >>> 0, true) !== 0;
-  for (const type of ['keydown', 'keyup']) addEventListener(type, e => {
-    if (e.repeat || !(e.code in keys) || (type === 'keydown' && !onFoot())) return;
-    api.key(e.code, type === 'keydown'); sent++;
-  }, true);
+  setInterval(() => {
+    const gs = M._rn_gamestate_addr() >>> 2;
+    if (M.HEAPU32[gs + 3] !== 3) return;   // comic or menu: Max's own RN_JUMP skips the comic (host/jump.c); an Esc from here opened his pause menu
+    const a = speedM._rn_mc_state() >>> 0, v = new DataView(speedM.HEAPU8.buffer), foot = v.getInt32(a, true) !== 0;
+    const h = v.getFloat32(a + 16, true), vx = v.getFloat32(a + 20, true), vy = v.getFloat32(a + 24, true);
+    const fwd = vx * Math.cos(h) + vy * Math.sin(h), left = -vx * Math.sin(h) + vy * Math.cos(h);
+    const want = { KeyW: foot && fwd > 0.5, KeyS: foot && fwd < -0.5, KeyA: foot && left > 0.5, KeyD: foot && left < -0.5 };
+    for (const [k, on] of Object.entries(want)) if (held.has(keys[k]) !== on) { api.key(k, on); sent++; }
+  }, 50);
   setInterval(() => {
     const b = M._rn_gamestate_addr() >>> 2, h = M.HEAPU32;
     const level = new TextDecoder().decode(M.HEAPU8.slice((b + 32) * 4, (b + 40) * 4)).split('\0')[0];
     const r = api.reader;
     const f = new Float32Array(h.buffer), p = [6, 7, 8].map(k => f[b + k].toFixed(2)).join(','), sp = Math.hypot(f[b + 18], f[b + 20]).toFixed(2);
-    report(`mode=${h[b + 3]} level=${level} maxpos=${p} maxspeed=${sp} control=${h[b + 351]} keys=${sent} packets=${r?.stats.packets || 0} draws=${r?.stats.seen || 0} kept=${r?.stats.kept || 0} rejected noPlayer/noView/notXyz/far/big=${r ? [r.stats.noPlayer, r.stats.noView, r.stats.notXyz, r.stats.far, r.stats.big].join('/') : '-'} nearest=${r ? r.stats.nearest.toFixed(2) : '-'} nearestW=${r ? r.stats.nearestW.toFixed(2) : '-'} cam=${r?.stats.cam || '-'} viewN=${r?.stats.viewN || 0} view=${r?.stats.view || 'unselected'} W=${r?.stats.world || '-'} player=${r?.stats.player || '-'} placement=${api.guestBase ? 'guest' : 'waiting-for-Speed-guest-base'} scene=${api.why || 'never called'}`);
+    report(`mode=${h[b + 3]} level=${level} maxpos=${p} maxspeed=${sp} control=${h[b + 351]} keys=${sent} packets=${r?.stats.packets || 0} draws=${r?.stats.seen || 0} kept=${r?.stats.kept || 0} dropped=${r?.stats.level || 0} ped=${(() => { const a = speedM._rn_mc_state() >>> 0, v = new DataView(speedM.HEAPU8.buffer); return [v.getInt32(a, true), ...[4, 8, 12, 16].map(o => v.getFloat32(a + o, true).toFixed(2)), Math.hypot(v.getFloat32(a + 20, true), v.getFloat32(a + 24, true)).toFixed(2)].join(','); })()} rejected noPlayer/noView/notXyz/far/big=${r ? [r.stats.noPlayer, r.stats.noView, r.stats.notXyz, r.stats.far, r.stats.big].join('/') : '-'} nearest=${r ? r.stats.nearest.toFixed(2) : '-'} nearestW=${r ? r.stats.nearestW.toFixed(2) : '-'} cam=${r?.stats.cam || '-'} viewN=${r?.stats.viewN || 0} view=${r?.stats.view || 'unselected'} W=${r?.stats.world || '-'} player=${r?.stats.player || '-'} scene=${api.why || 'never called'}`);
   }, 1000);
 }

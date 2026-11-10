@@ -40,6 +40,9 @@ function line(s, cls) {
   if (!crossOriginIsolated) { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
   const exe = new Uint8Array(await (await fetch('pc/Speed.exe')).arrayBuffer());
   // Game files are read on demand by the game thread (host/files.c), not loaded here.
+  // F-Max: in Remaster the pedestrian is Max Payne when the local Max build answers on /mp/ (tools/serve.py); ?max=0 keeps
+  // F-Speed's debug box. Original never loads it.
+  const maxChar = RN_MODE === 'remaster' && RN_Q.get('max') !== '0' && (await fetch('/mp/out/maxpayne.js').catch(() => null))?.ok === true;
   status.textContent = 'corriendo'; status.className = 'run';
   const M = await Speed({
     arguments: ['/pc/Speed.exe', '/game'],
@@ -47,6 +50,7 @@ function line(s, cls) {
     onAbort: what => line('STOP wasm abort: ' + what),
     preRun: [m => {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
+      if (maxChar) m.ENV.RN_MAXCHAR = '1';   // host/mc.c mc_draw_actor: no debug box, Max is drawn by web/maxpayne/
       // The game draws at the pixels of this window (PATCH 0x408760), at most 2560x1440 to keep the GPU load sane.
       const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || (matchMedia('(pointer: coarse)').matches ? 1280 : 2560)), k = Math.min(1, BB / (innerWidth * dpr), BB * 9 / 16 / (innerHeight * dpr));
       // Phones and tablets (coarse pointer): 1280 wide; an iPhone tab at 2560 was killed by iOS after 20-40 s (memory, likely).
@@ -139,7 +143,7 @@ function line(s, cls) {
     }],
   });
   // F-Max
-  if (RN_MODE === 'remaster' && RN_Q.get('max') === '1')
+  if (maxChar)
     import('./maxpayne/boot.js').then(m => m.start(M, s => line(s))).catch(e => line('[F-Max] STOP ' + e.message, 'stop'));
   const telem = startTelemetry(M, t0, s => line(s), allLog);
   startGpu(M, document.getElementById('screen'), s => line(s, 'api'), telem?.frame).catch(e => line('gpu.js: ' + e.message, 'stop'));

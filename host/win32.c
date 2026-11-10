@@ -454,9 +454,7 @@ static uint32_t vspace(Ctx *c, uint32_t sz) {   // first fit in the released ran
     return vtop -= sz;
 }
 // The page's memory line (web/index.html): 0 host heap end (sbrk), 1 guest heap, 2 guest VirtualAlloc'd, all in MB.
-// 3 (F-Max, web/maxpayne/frame.js): the wasm address of guest address 0, so the page can read guest memory.
 EMSCRIPTEN_KEEPALIVE uint32_t rn_mem_mb(int k) {
-    if (k == 3) return g_ctx ? (uint32_t)(uintptr_t)g_ctx->mem : 0;
     return k == 0 ? (uint32_t)((uintptr_t)sbrk(0) >> 20) : k == 1 ? (brk_ptr - HEAP_LO) >> 20 : (g_ctx ? (g_ctx->memsz - vtop) >> 20 : 0);
 }
 void guest_mem_log(const char *why) {

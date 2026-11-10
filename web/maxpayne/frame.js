@@ -27,15 +27,6 @@ export function transpose(m) { return m.map((_, i) => m[(i % 4) * 4 + (i >>> 2)]
 export function convert(v) { return [v[2], -v[0], v[1]]; }
 const conversion = () => [...convert([1, 0, 0]), 0, ...convert([0, 1, 0]), 0, ...convert([0, 0, 1]), 0, 0, 0, 0, 1];
 
-function guest(M, base, size) {
-  const v = new DataView(M.HEAPU8.buffer);
-  const valid = (a, n = 4) => base > 0 && a >= 0x10000 && a + n <= size && base + a + n <= v.byteLength;
-  return {
-    u: a => valid(a) ? v.getUint32(base + a, true) : 0,
-    f: a => valid(a) ? v.getFloat32(base + a, true) : NaN,
-    matrix: a => valid(a, 64) ? Array.from({ length: 16 }, (_, i) => v.getFloat32(base + a + 4 * i, true)) : null,
-  };
-}
 export function maxPlayer(M) {
   const h = M.HEAPU32, f = new Float32Array(h.buffer), b = M._rn_gamestate_addr() >>> 2;
   const seq = Atomics.load(h, b + 1);
@@ -47,39 +38,11 @@ export function maxPlayer(M) {
 }
 
 export function pedFrame(M) {
-  if (!M._rn_mc_state) return undefined;
   const a = M._rn_mc_state() >>> 0, v = new DataView(M.HEAPU8.buffer);
   if (!v.getInt32(a, true)) return null;               // driving: no pedestrian to draw
   const f = o => v.getFloat32(a + o, true), m = o => Array.from({ length: 16 }, (_, i) => f(o + 4 * i));
   const h = f(16), c = Math.cos(h), s = Math.sin(h);
   return { view: m(48), projection: m(112), place: [c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, f(4), f(8), f(12), 1], conversion: conversion() };
-}
-export function speedFrame(M, base, place) {
-  const ped = pedFrame(M);
-  if (ped !== undefined) return ped;
-  if (!base) return null;
-  const g = guest(M, base, 0x40000000), camera = g.u(0x7404c0);
-  if (!camera) return null;
-  const view = g.matrix(camera), projection = g.matrix(camera + 0x40);
-  if (!view || !projection || !view.every(Number.isFinite) || !projection.every(Number.isFinite)) return null;
-  if (place) return { view, projection, place, conversion: conversion() };
-  const projector = g.u(0x740760), pv = projector && g.matrix(projector), cam = pv && inverse(pv);
-  if (!cam) return null;
-  const head = g.u(0x7361f8);
-  let player = 0, best = 9, count = 0;
-  for (let r = head && g.u(head); r && r !== head && count++ < 200; r = g.u(r)) {
-    const d = [0, 1, 2].reduce((s, k) => s + (g.f(r + 0x50 + 4 * k) - cam[12 + k]) ** 2, 0);
-    if (d < best) { best = d; player = r; }
-  }
-  if (!player) return null;
-  const b = (g.u(player + 0x530) >>> 1) & 1;
-  const rot = player + (b ? 0x4e0 : 0x90), pos = player + (b ? 0x520 : 0x50);
-  // Speed car local X is forward (host/lights.c); keep its heading and world Z, offset along its right axis.
-  const heading = Math.atan2(g.f(rot + 4), g.f(rot)), c = Math.cos(heading), s = Math.sin(heading);
-  // Rows: body forward (converted Max +Z = Speed local +X) along the car heading, left, up.
-  const placement = [c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0,
-    g.f(pos) + 3 * s, g.f(pos + 4) - 3 * c, g.f(pos + 8), 1];
-  return placement.every(Number.isFinite) ? { view, projection, place: placement, conversion: conversion() } : null;
 }
 export function reproject(uniform, local, frame) {
   const w = mul(mul(local, frame.conversion), frame.place);

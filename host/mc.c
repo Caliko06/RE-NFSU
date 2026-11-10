@@ -217,6 +217,9 @@ const int mc_api_count = sizeof mc_apis / sizeof *mc_apis;
 
 // Debug marker until F-Max's mesh exists: a 0.5 x 0.5 x 1.8 m box at the feet with a nose toward the heading.
 void mc_draw_actor(Ctx *c, const McPed *p) {
+    static int maxchar = -1;   // RN_MAXCHAR (web/boot.js, local Max build present): Max Payne is the pedestrian (web/maxpayne/)
+    if (maxchar < 0) maxchar = getenv("RN_MAXCHAR") != NULL;
+    if (maxchar) return;
     float ch = cosf(p->heading) * 0.25f, sh = sinf(p->heading) * 0.25f, v[8][3];
     for (int k = 0; k < 8; k++) {
         float a = k & 1 ? 1 : -1, b = k & 2 ? 1 : -1;
