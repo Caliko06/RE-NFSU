@@ -6,6 +6,7 @@
 #include <strings.h>
 #include "host.h"
 #include "gpu.h"
+#include "voxel.h"
 #include "sm1.h"
 #include "carsmooth.h"
 #include <pthread.h>
@@ -2811,7 +2812,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     int hud = race && (fen ? fen->hud : !menu), screen = race && fen && !fen->hud;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); rn_fixedclock_start(c); }
-    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 8, w1); }
+    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); vox_frame(c); gpu_cmd(GPU_FXAA, 8, w1); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
     static int hud_mode = -1, fe_stretch = -1;

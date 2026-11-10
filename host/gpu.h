@@ -23,6 +23,7 @@ enum {
                         // +X -X +Y -Y +Z -Z, sent before as GPU_TARGET) become the layers of one cube texture
     GPU_BUFFER = 13,    // id, bytes: a vertex or index buffer that lives on the GPU (web only; static buffers)
     GPU_BUFDATA = 14,   // id, byte offset, byte count n, n bytes (zero padded): its contents from that Unlock on
+    GPU_VOXEL = 16,     // 40 words: View, Projection, target, time, face; payload in host/voxel.h
     GPU_LIVERY = 15,    // skin id, car, art number: the pool livery over the HD skin (web/gpu.js livery)
     GPU_SKIN = 12,      // skin id, fill ARGB, layer count n, n x (layer id, mask id, recolour, 4 ARGB colours), 4 marker ARGB,
                         // marker count m, m x (texel index, colour 0-3): the HD replay of the skin composite (d3d9.c skin_bridge)

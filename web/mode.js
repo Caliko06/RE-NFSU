@@ -17,7 +17,7 @@ const RN_ORIGINAL = {
   roadrefl: 'game',   // host/sm1.c: the road reflection as worldreflect.efx weights it
 };   // blur: web/tune.js starts the original mode at 'PC original' (shipped blur and flare colour)
 // Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places, night lights, free mode).
-const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43', RN_LIGHTS: '0', RN_CARLOD: '0', RN_FREE: '0', RN_WORLDROW: '0', RN_TRAFPAINT: '0', RN_TRAFLEAN: '0', RN_FEEL: '0', RN_WALLSOFTEN: '0', RN_NPCSMOOTH: '0' };
+const RN_ORIGINAL_ENV = { RN_VOXEL: '0', RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43', RN_LIGHTS: '0', RN_CARLOD: '0', RN_FREE: '0', RN_WORLDROW: '0', RN_TRAFPAINT: '0', RN_TRAFLEAN: '0', RN_FEEL: '0', RN_WALLSOFTEN: '0', RN_NPCSMOOTH: '0' };
 
 // ?mode=original|remaster: one run in that mode without touching the stored choice (tools/webcheck.mjs).
 const RN_MODE = (() => {
