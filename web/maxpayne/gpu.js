@@ -1,5 +1,5 @@
 // imported from maxpayne-re b28fb1a web/gpu.js
-import { maxPlayer, mul, transpose, reproject } from './frame.js';
+import { maxPlayer, mul, inverse, identity, transpose, reproject } from './frame.js';
 'use strict';
 const GPU_ABI = 3, GPU_SLOTS = 2, GPU_STAGES = 4, GPU_USTEP = 1536;
 const GPU_TARGET = 1, GPU_CLEAR = 2, GPU_PRESENT = 3, GPU_DRAW = 4, GPU_SHADER = 5, GPU_DECL = 6, GPU_TEXTURE = 7,
@@ -30,12 +30,12 @@ export function createReader(M, device) {
   if (M.HEAPU32[box + B_ABI] !== GPU_ABI) fail('packet ABI mismatch');
   const res = new Map(), shaders = new Map(), decls = new Map();
   const pk = { present: 0, draws: 0, passes: 0, clears: 0, kb: 0, texKb: 0, pipes: 0, shaders: 0, targets: 0, reads: 0 };
-  const stats = { packets: 0, seen: 0, kept: 0, view: 'unselected', world: '-', player: '-', noPlayer: 0, notXyz: 0, far: 0, big: 0, nearest: Infinity };
+  const stats = { packets: 0, seen: 0, kept: 0, view: 'unselected', world: '-', player: '-', noPlayer: 0, noView: 0, notXyz: 0, far: 0, big: 0, nearest: Infinity, nearestW: Infinity, cam: '-' };
   const lut = device.createTexture({ size: [256, 1], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST });
   const lutData = new Uint8Array(1024);
   for (let i = 0; i < 256; i++) lutData.set([i, i, i, 255], 4 * i);
   device.queue.writeTexture({ texture: lut }, lutData, { bytesPerRow: 1024 }, [256, 1]);
-  let sampleCount = 1, pending = [], current = null, unshown = 0;
+  let sampleCount = 1, pending = [], current = null, unshown = 0, view = null;
   // Match Max's Present cadence without creating a canvas or an audio clock.
   setInterval(() => {
     if (!unshown) return;
@@ -182,11 +182,13 @@ export function createReader(M, device) {
     const up = h[slot + 6] + h[a + D_UOFF], vp = h[slot + 2] + h[a + D_VOFF];
     const uniform = new Float32Array(M.HEAPU8.slice(up, up + GPU_USTEP).buffer);
     const wv = transpose(Array.from(uniform.subarray(16, 32)));
-    const candidates = [mul(wv, player.invView), mul(wv, player.view)];
-    const distance = w => Math.hypot(...w.slice(12, 15).map((x, k) => x - player.pos[k]));
-    const choice = distance(candidates[0]) <= distance(candidates[1]) ? 0 : 1, world = candidates[choice];
-    stats.nearest = Math.min(stats.nearest, distance(world));
-    if (!(distance(world) <= 1.5)) { stats.far++; return; }
+    if (!view) { stats.noView++; return; }
+    const near = q => Math.hypot(...[0, 1, 2].map(k => q[k] - player.pos[k]));
+    const distance = w => near(w.slice(12, 15));
+    const world = mul(wv, view.inv);
+    const dW = distance(world);
+    stats.nearestW = Math.min(stats.nearestW, dW);
+    if (!(dW <= 30)) { stats.far++; return; }   // cheap cut before reading vertices: a body's root is within a metre or two of its bounds
     const n = h[a + D_NVERT], stride = h[a + D_STRIDE];
     const vertices = M.HEAPU8.slice(vp, vp + n * stride), v = new DataView(vertices.buffer);
     const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
@@ -194,6 +196,13 @@ export function createReader(M, device) {
       const x = v.getFloat32(i * stride + pos.offset + k * 4, true);
       lo[k] = Math.min(lo[k], x); hi[k] = Math.max(hi[k], x);
     }
+    // Skinned vertices are in the root object's space and W is its object-to-world (0x57d510:276-345, setupPass 0x10415ef0:210-212),
+    // so the player test uses the bounds centre carried through W.
+    const c = [0, 1, 2].map(k => (lo[k] + hi[k]) / 2);
+    const cw = [0, 1, 2].map(k => c[0] * world[k] + c[1] * world[4 + k] + c[2] * world[8 + k] + world[12 + k]);
+    const dC = near(cw);
+    stats.nearest = Math.min(stats.nearest, dC);
+    if (!(dC <= 1.5)) { stats.far++; return; }
     const scale = Math.max(...[0, 4, 8].map(i => Math.hypot(...world.slice(i, i + 3))));
     const radius = Math.hypot(...hi.map((x, k) => (x - lo[k]) * 0.5)) * scale;
     if (!(radius < 2.5)) { stats.big++; return; }
@@ -204,10 +213,10 @@ export function createReader(M, device) {
       if (t) { t.refs = (t.refs || 0) + 1; textures.push(t); }
     }
     const indices = M.HEAPU8.slice(h[slot + 4] + hdr[D_IOFF], h[slot + 4] + hdr[D_IOFF] + hdr[D_NIDX] * 4);
-    pending.push({ hdr, uniform, vertices, indices, world, player, textures, binding: texBind(hdr, 0, mask) });
+    pending.push({ hdr, uniform, vertices, indices, world, lo, hi, radius, textures, binding: texBind(hdr, 0, mask) });
     stats.kept++;
     if (pending.length === 1) {
-      stats.view = choice ? 'inverse(camera+0x8c)' : 'camera+0x8c';
+      stats.view = 'dominant WV x' + stats.viewN;
       stats.world = world.slice(12, 15).map(x => x.toFixed(3)).join(',');
       stats.player = player.pos.map(x => x.toFixed(3)).join(',');
     }
@@ -215,6 +224,14 @@ export function createReader(M, device) {
   function publish() {
     release(current);
     const draws = pending; pending = [];
+    // Body = the largest kept draw. Each draw's local = W_i * W_body^-1, then the body's lowest point and its xz centre
+    // (object space, Y up) moved to the origin: the feet stand on the placement point.
+    const body = draws.reduce((m, d) => !m || d.radius > m.radius ? d : m, null);
+    if (body) {
+      const inv = inverse(body.world);
+      const feet = identity(); feet[12] = -(body.lo[0] + body.hi[0]) / 2; feet[13] = -body.lo[1]; feet[14] = -(body.lo[2] + body.hi[2]) / 2;
+      for (const d of draws) d.local = inv ? mul(mul(d.world, inv), feet) : null;
+    }
     let nv = 0, ni = 0;
     for (const d of draws) {
       d.voff = nv; d.ioff = ni;
@@ -236,7 +253,7 @@ export function createReader(M, device) {
     for (let i = 0; i < current.draws.length; i++) {
       const d = current.draws[i], u = new Float32Array(bytes.buffer, GPU_USTEP * i, GPU_USTEP / 4);
       u.set(d.uniform);
-      if (reproject(u, d.world, d.player, frame)) valid.push([d, i]);
+      if (d.local && reproject(u, d.local, frame)) valid.push([d, i]);
     }
     if (!valid.length) return;
     const uniform = device.createBuffer({ size: bytes.length, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
@@ -265,6 +282,23 @@ export function createReader(M, device) {
     const blob = h[s + 8], end = (h[s] >>> 2) + h[s + 1];
     const player = maxPlayer(M);
     stats.packets++;
+    // V = the WV most draws of this packet share: static level geometry has W = identity (or its room's transform, the frame of
+    // the gamestate position), so its WV is the view. Kept across packets; replaced when a packet has 16+ draws on one WV.
+    const count = new Map();
+    for (let i = h[s] >>> 2; i < end;) {
+      const op = h[i] & 255, a = i + 1;
+      i = a + (h[i] >>> 8);
+      if (op !== GPU_DRAW) continue;
+      const up = (h[s + 6] + h[a + D_UOFF]) >>> 2, key = Array.from(f32.subarray(up + 16, up + 32), x => x.toFixed(3)).join(',');
+      count.set(key, (count.get(key) || 0) + 1);
+    }
+    let best = null, bestN = 0;
+    for (const [k, n] of count) if (n > bestN) { best = k; bestN = n; }
+    if (bestN >= 16) {
+      const v = transpose(best.split(',').map(Number)), inv = inverse(v);
+      if (inv) { view = { v, inv }; stats.viewN = bestN; }
+    }
+    if (player && view) stats.cam = Math.hypot(...[0, 1, 2].map(k => view.inv[12 + k] - player.pos[k])).toFixed(1);
     for (let i = h[s] >>> 2; i < end;) {
       const op = h[i] & 255, a = i + 1;
       i = a + (h[i] >>> 8);

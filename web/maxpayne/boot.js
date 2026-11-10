@@ -69,10 +69,18 @@ export async function start(speedM, log = console.log) {
   const audio = M._rn_audio_ring() >>> 2;
   setInterval(() => { const h = M.HEAP32; Atomics.store(h, audio + 1, Atomics.load(h, audio)); }, 20);
   api.encode = (...args) => api.reader?.encode(...args);
+  // Walk keys reach Max's ring while F-Speed's pedestrian is on foot, or always before its export exists (pre-merge).
+  let sent = 0;
+  const onFoot = () => !speedM._rn_mc_state || new DataView(speedM.HEAPU8.buffer).getInt32(speedM._rn_mc_state() >>> 0, true) !== 0;
+  for (const type of ['keydown', 'keyup']) addEventListener(type, e => {
+    if (e.repeat || !(e.code in keys) || (type === 'keydown' && !onFoot())) return;
+    api.key(e.code, type === 'keydown'); sent++;
+  }, true);
   setInterval(() => {
     const b = M._rn_gamestate_addr() >>> 2, h = M.HEAPU32;
     const level = new TextDecoder().decode(M.HEAPU8.slice((b + 32) * 4, (b + 40) * 4)).split('\0')[0];
     const r = api.reader;
-    report(`mode=${h[b + 3]} level=${level} packets=${r?.stats.packets || 0} draws=${r?.stats.seen || 0} kept=${r?.stats.kept || 0} rejected noPlayer/notXyz/far/big=${r ? [r.stats.noPlayer, r.stats.notXyz, r.stats.far, r.stats.big].join('/') : '-'} nearest=${r ? r.stats.nearest.toFixed(2) : '-'} view=${r?.stats.view || 'unselected'} W=${r?.stats.world || '-'} player=${r?.stats.player || '-'} placement=${api.guestBase ? 'guest' : 'waiting-for-Speed-guest-base'} scene=${api.why || 'never called'}`);
+    const f = new Float32Array(h.buffer), p = [6, 7, 8].map(k => f[b + k].toFixed(2)).join(','), sp = Math.hypot(f[b + 18], f[b + 20]).toFixed(2);
+    report(`mode=${h[b + 3]} level=${level} maxpos=${p} maxspeed=${sp} control=${h[b + 351]} keys=${sent} packets=${r?.stats.packets || 0} draws=${r?.stats.seen || 0} kept=${r?.stats.kept || 0} rejected noPlayer/noView/notXyz/far/big=${r ? [r.stats.noPlayer, r.stats.noView, r.stats.notXyz, r.stats.far, r.stats.big].join('/') : '-'} nearest=${r ? r.stats.nearest.toFixed(2) : '-'} nearestW=${r ? r.stats.nearestW.toFixed(2) : '-'} cam=${r?.stats.cam || '-'} viewN=${r?.stats.viewN || 0} view=${r?.stats.view || 'unselected'} W=${r?.stats.world || '-'} player=${r?.stats.player || '-'} placement=${api.guestBase ? 'guest' : 'waiting-for-Speed-guest-base'} scene=${api.why || 'never called'}`);
   }, 1000);
 }

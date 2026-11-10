@@ -41,23 +41,22 @@ export function maxPlayer(M) {
   const seq = Atomics.load(h, b + 1);
   if ((seq & 1) || !(h[b + 4] & 2)) return null;
   const pos = Array.from(f.subarray(b + 6, b + 9));
-  const body = identity();
-  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) body[4 * i + j] = f[b + 9 + i * 3 + j];
-  body.splice(12, 3, ...pos);
   if (Atomics.load(h, b + 1) !== seq) return null; // skip this packet's draws during a concurrent publication
-  const base = h[(M._rn_telem_addr() + 120) >>> 2];
-  const g = guest(M, base, 448 * 1048576);
-  // 0x8a6338 is theApp itself, not a pointer (host/gamestate.c at b28fb1a).
-  const ms = g.u(0x8a6338 + 0xc8), gm = ms && g.u(ms + 0x80), camera = gm && g.u(gm + 0x1074);
-  if (!camera) return null;
-  const view = identity();
-  for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) view[4 * i + j] = g.f(camera + 0x8c + 4 * (i * 3 + j));
-  const invView = inverse(view), invBody = inverse(body);
-  return invView && invBody && view.every(Number.isFinite) ? { pos, invBody, view, invView } : null;
+  // View: not read from guest memory (the GM+0x1074 camera read gave no player in run 4); gpu.js takes it from the draws.
+  return { pos, vel: Array.from(f.subarray(b + 18, b + 21)), control: h[b + 351] };
 }
 
-// NFSU host/lights.c car_world and player selection, read directly on the page once F-Speed supplies the guest base.
+export function pedFrame(M) {
+  if (!M._rn_mc_state) return undefined;
+  const a = M._rn_mc_state() >>> 0, v = new DataView(M.HEAPU8.buffer);
+  if (!v.getInt32(a, true)) return null;               // driving: no pedestrian to draw
+  const f = o => v.getFloat32(a + o, true), m = o => Array.from({ length: 16 }, (_, i) => f(o + 4 * i));
+  const h = f(16), c = Math.cos(h), s = Math.sin(h);
+  return { view: m(48), projection: m(112), place: [c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, f(4), f(8), f(12), 1], conversion: conversion() };
+}
 export function speedFrame(M, base, place) {
+  const ped = pedFrame(M);
+  if (ped !== undefined) return ped;
   if (!base) return null;
   const g = guest(M, base, 0x40000000), camera = g.u(0x7404c0);
   if (!camera) return null;
@@ -82,8 +81,7 @@ export function speedFrame(M, base, place) {
     g.f(pos) + 3 * s, g.f(pos + 4) - 3 * c, g.f(pos + 8), 1];
   return placement.every(Number.isFinite) ? { view, projection, place: placement, conversion: conversion() } : null;
 }
-export function reproject(uniform, world, player, frame) {
-  const local = mul(world, player.invBody);
+export function reproject(uniform, local, frame) {
   const w = mul(mul(local, frame.conversion), frame.place);
   const wv = mul(w, frame.view), wvp = mul(wv, frame.projection), inv = inverse(wv);
   if (!inv) return false;

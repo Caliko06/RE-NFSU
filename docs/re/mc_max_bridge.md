@@ -40,3 +40,32 @@ not the player position; (b) camera+0x8c is not the view used for those draws; (
 The status line now prints rejected noPlayer/notXyz/far/big and the nearest distance, so the next run names the cause.
 Next patch: if `far` dominates, take the draws whose vertex bounds centre (through W) is within 1.5 m of the player, and use
 body-local = W * B^-1 unchanged; also enter a level with a free-roaming start (RN_JUMP c_teleport) instead of startup_level.
+
+## Contract with F-Speed (../mc-speed docs/re/mc_speed_exit.md "Interface", commit 319cdca), read 2026-11-09
+
+F-Max reads `McPed` (on_foot +0, pos +4, heading +16, view +48, proj +112) in web/maxpayne/frame.js pedFrame: the body stands on
+`pos` (feet, z from 0x440a40), faces `heading`, and is drawn with McPed view/proj; while driving nothing is drawn. Disagreements:
+1. Draw site. F-Speed: host C `mc_draw_actor(Ctx*, const McPed*)` records into NFSU's list at the GPU_FXAA line ("F-Max replaces
+   its body"). F-Max: Max's packets live in the page, so the draw is page-side, `MaxChar.scene` in web/gpu.js at the same
+   GPU_FXAA command (same boundary, depth still bound). At the merge `mc_draw_actor` must stop drawing its debug box when ?max=1
+   (or be emptied), otherwise box and character overlap.
+2. Export. `rn_mc_state()` is plain C in ../mc-speed host/mc.c:14, with no EMSCRIPTEN_KEEPALIVE and not in build.py
+   EXPORTED_FUNCTIONS, so the page cannot call it. The merge must add `_rn_mc_state` to that list; until then pedFrame sees no
+   export and the body stands 3 m right of the car.
+3. Keys. F-Speed sends all keys except F and Esc to the pedestrian (host side). F-Max forwards W/A/S/D/Shift/arrows from the page
+   to Max's ring while on_foot, so both see the same keys: the pedestrian moves the body, Max plays the matching walk/run.
+   Max's own root motion is not fed back into McPed (speeds may differ: Max run 4.2 m/s, F-Speed's walk speed is its own).
+
+## Block 2 (runs 4-5)
+
+- Skin space (FACT, Max code): 0x57d510:276-298 copies each bone's object-to-world (+0x5c), :300-345 multiplies by object 0's
+  4x3 at +0x8c (world-to-object), setupPass 0x10415ef0:210-212 sets WORLD = the object's +0x5c. So skinned vertices are in the
+  root object's space and W is its object-to-world; "world space with W = identity" was wrong.
+- Run 4: every draw rejected as noPlayer: the view read from guest memory (GM+0x1074 camera, +0x8c) never gave a player frame.
+  Replaced, not fixed: V = the WV most draws of a packet share (static level geometry). Run 5: viewN 45-128, W of the kept draws
+  within 0.05-0.4 m of Max's gamestate position, kept 73,540 draws; the body draws in Free Run (web/plan/shots/mc_max_run5.png).
+- Open: (1) pieces of Max's level near the player pass the filter (a tall panel and floor bits in run5.png). Next patch: keep
+  only draws whose W equals the body's W (one skinned object) plus the weapon's. (2) Walking not shown: keys reach Max's ring
+  (keys=4), but maxspeed stayed 0 and part0_level1 was in scripted parts (mode 2, control 1); Max's position changed once
+  (z -13.25 -> -0.92), cause unknown. Next: enter a level in free control (RN_JUMP c_teleport, or a later chapter).
+  (3) Placement still 3 m right of the car until `_rn_mc_state` is exported (contract item 2).
