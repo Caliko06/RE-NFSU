@@ -143,6 +143,7 @@ function line(s, cls) {
   // RN_STEERLOG (host/input.c): also each key at the page and each present's GPU completion, on the page's clock
   const input = startInput(M, document.getElementById('screen'), /RN_STEERLOG/.test(location.search) ? s => line(s) : null);
   startVoxelInput(M, document.getElementById('screen'));
+  startVoxelHud(M);
   startPad(input);                          // web/pad.js: a gamepad into the same ring
   startTouch(input);                        // web/touch.js: the touch overlay (coarse pointer or ?touch=1) into the same ring
   startTune(M);
