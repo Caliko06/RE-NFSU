@@ -132,12 +132,12 @@ async function main(canvas, opts, resolveReady) {
     const look = new URLSearchParams(location.search).get('look') !== '0';
     if (look) {
         Object.assign(frame.ssao,{type:pc.SSAOTYPE_COMBINE,intensity:.6,radius:1.2,samples:16,power:4,minAngle:10});
-        Object.assign(frame.colorEnhance,{enabled:true,dehaze:.25,shadows:-.15,vibrance:.25,highlights:.1});
-        Object.assign(frame.grading,{enabled:true,contrast:1.1,saturation:1.08,brightness:1,tint:new pc.Color(.93,.98,1.06)});
-        Object.assign(frame.vignette,{intensity:.45,inner:.45,outer:1.1,curvature:.6});
-        frame.fringing.intensity = 2;
-        frame.rendering.sharpness = .35;
-        frame.dof.enabled = true; Object.assign(frame.dof,{nearBlur:false,focusRange:5,blurRadius:4,blurRings:4,blurRingPoints:5,highQuality:true});
+        Object.assign(frame.colorEnhance,{enabled:true,dehaze:0,shadows:.1,vibrance:-.3,highlights:-.4});
+        // Metered against real game frames (census/shots, 2026-11-09): mean saturation .13 and luma p99 117; this scene had .43 and 186.
+        Object.assign(frame.grading,{enabled:true,contrast:.96,saturation:.5,brightness:1,tint:new pc.Color(.95,1.0,.97)});
+        Object.assign(frame.vignette,{intensity:.62,inner:.35,outer:1.05,curvature:.6});
+        frame.rendering.sharpness = .15;
+        frame.dof.enabled = true; Object.assign(frame.dof,{nearBlur:false,focusRange:5,blurRadius:2.5,blurRings:4,blurRingPoints:5,highQuality:true});
     }
     window.RN_B.look = look;
     frame.update();
@@ -159,10 +159,11 @@ async function main(canvas, opts, resolveReady) {
                 halo += source * smoothstep(1.15,1.5,peak) * exp(-float(ring*ring)*.35);
             }
         }
-        result = (min(result,vec3(1.0)) + halo*.018)*1.25;
-        // x1.25 exposure clipped bright walls to flat white: roll off the top 25 % instead, on the max channel so hue holds.
+        result = min(result,vec3(1.0)) + halo*.006;
+        // No exposure gain; highlights roll off from .5 to a .8 ceiling on the max channel so hue holds (the game never burns a sign to white).
         float peakOut = max(result.r,max(result.g,result.b));
-        if (peakOut > .75) result *= (.75 + .25*(1.0-exp(-(peakOut-.75)/.25)))/peakOut;
+        if (peakOut > .5) result *= (.5 + .3*(1.0-exp(-(peakOut-.5)/.3)))/peakOut;
+        result = max(result-.059,vec3(0.0))*1.063; // black point 15/255, as the period ReShade presets do
     `);
     function target(name,w,h) {
         return new pc.RenderTarget({ colorBuffer: new pc.Texture(device, { name,
@@ -344,7 +345,7 @@ async function main(canvas, opts, resolveReady) {
                     vec3 delta = lamps[i].xyz-world;
                     float height = max(delta.y,.1);
                     float pool = exp(-dot(delta.xz,delta.xz)/(height*height*.45));
-                    illumination += vec3(1.0,.78,.48)*pool*lamps[i].w;
+                    illumination += vec3(1.0,.62,.27)*pool*lamps[i].w; // sodium vapour, about 2200 K (#FF9F46)
                 }
                 // worldheadlight.efx: (headlight*clip*color + vertexColor)*texture*2.
                 // HEADLIGHTS contains the original paired low-beam footprint.
@@ -366,7 +367,7 @@ async function main(canvas, opts, resolveReady) {
                 base.rgb *= 1.0-max(contact*.72,ao); base.a = 1.0;
             }
             base.rgb = min(base.rgb,vec3(1.0));
-            if (glow > .5) { base.rgb *= 1.0+.75*smoothstep(.65,1.0,max(base.r,max(base.g,base.b))); base.rgb *= neon; }
+            if (glow > .5) base.rgb *= neon*.6; // signs sit under the street lamps, no glow gain
             gl_FragColor = base;
             writeSceneTextureDepth(viewDepth,1.0);
         }` });
@@ -986,7 +987,7 @@ async function main(canvas, opts, resolveReady) {
             Object.assign(window.RN_B,{ready:true,track:'street.glb',wet_road_meshes:roads.length,
                 ms_to_first_frame:Math.round(performance.now()-started),
                 render_size:[device.width,device.height],
-                polish:{antialiasing:'PlayCanvas TAA',exposure:1.25,bloom:'emissive-only, threshold 1.15',camera_height_m:1.0,
+                polish:{antialiasing:'PlayCanvas TAA',exposure:1,bloom:'emissive-only, threshold 1.15, x.006',camera_height_m:1.0,
                     anisotropy:device.maxAnisotropy,mipmaps:true},
                 fidelity_limits:['SH ambient from local baked lighting; directional terms from street cube, not live game coefficients']});
             resolveReady();

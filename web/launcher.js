@@ -92,7 +92,7 @@
 
   // ---------- the one sliding light (spring) ----------
   function Light(node, box) {
-    node.innerHTML = '<i class="bg"></i><i class="ln t"></i><i class="ln b"></i><span class="chevs"><i></i><i></i><i></i></span><i class="flash"></i>';
+    node.innerHTML = '<i class="bg"></i><span class="chevs"></span><i class="flash"></i>';
     let y = 0, h = 0, vy = 0, vh = 0, ty = 0, th = 0, raf = 0, last = 0, first = true, target = null, lastH = -1;
     const apply = () => {
       node.style.transform = `translate3d(0,${y.toFixed(2)}px,0) scaleY(${(1 + Math.min(Math.abs(vy) * 0.00004, .05)).toFixed(3)})`;
@@ -637,16 +637,13 @@
   };
 
   // ---------- start: scene intro, then the UI comes in ----------
-  const sweeper = document.querySelector('.sweep');
   function reveal() {
     if (revealed) return;
     revealed = true;
     body.classList.remove('boot');
     for (const n of document.querySelectorAll('.brand, .tools, .keys')) A(n, [{ opacity: 0, transform: n.classList.contains('keys') ? 'translateY(3rem)' : 'translateX(-4rem)' }, { opacity: 1, transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
     enter(scr.main, 120);
-    setTimeout(() => { if (sweeper) { sweeper.classList.remove('go'); void sweeper.offsetWidth; if (motion) sweeper.classList.add('go'); } }, 380);
-    setInterval(() => { if (sweeper && motion && !going && revealed && !document.hidden) { sweeper.classList.remove('go'); void sweeper.offsetWidth; sweeper.classList.add('go'); } }, 11000);
-    // a tube that hums: now and then the selected label dips for a moment
+    // a bad contact: now and then the selected label dips for a moment
     (function hum() {
       setTimeout(() => {
         const s = scr[cur] && scr[cur].sel, t = s && s.querySelector('.t');
