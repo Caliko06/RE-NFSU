@@ -106,6 +106,11 @@ struct Out {
   return u.projection * (u.view * vec4f(p,1));
 }
 @fragment fn lineFs() -> @location(0) vec4f { return vec4f(0.94,0.96,1.0,0.7); }
+struct MobOut { @builtin(position) pos: vec4f, @location(0) colour: vec4f };
+@vertex fn mobVs(@location(0) pos: vec3f, @location(1) colour: vec4f) -> MobOut {
+  var o: MobOut; o.pos = u.projection * (u.view * vec4f(pos,1)); o.colour = colour; return o;
+}
+@fragment fn mobFs(v: MobOut) -> @location(0) vec4f { return v.colour; }
 `;
   function createGpu(device) {
     const atlas = device.createTexture({ size: [16,16,16], format: 'rgba8unorm',
@@ -142,6 +147,14 @@ struct Out {
       multisample: { count }
     });
     const p = [make(false,false),make(true,false),make(true,true)];
+    p.push(device.createRenderPipeline({ layout: gpu.layout,
+      vertex: { module: gpu.module, entryPoint: 'mobVs', buffers: [{ arrayStride: 28, attributes: [
+        { shaderLocation: 0, offset: 0, format: 'float32x3' }, { shaderLocation: 1, offset: 12, format: 'float32x4' }
+      ] }] }, fragment: { module: gpu.module, entryPoint: 'mobFs', targets: [{ format: 'rgba8unorm' }] },
+      primitive: { topology: 'triangle-list', cullMode: 'none' },
+      depthStencil: { format: 'depth24plus-stencil8', depthCompare: 'less-equal', depthWriteEnabled: true },
+      multisample: { count }
+    }));
     gpu.pipelines.set(count,p); return p;
   }
   function drop(mesh) { mesh.vb?.destroy(); mesh.ib?.destroy(); }
@@ -179,6 +192,44 @@ struct Out {
       device.queue.writeBuffer(mesh[name],0,data);
     }
     mesh.opaque = opaque.length; mesh.clear = clear.length;
+  }
+  function mobVertices(base) {
+    const data = [], heap = M.HEAPU8.buffer;
+    const u = new Uint32Array(heap,base+33024,64*8), f = new Float32Array(heap,base+33024,64*8);
+    for (let i = 0; i < 64*8; i += 8) {
+      if (u[i] !== 1 && u[i] !== 2) continue;
+      const c = Math.cos(f[i+4]), s = Math.sin(f[i+4]), phase = Math.sin(f[i+5]*2*Math.PI);
+      // Axis rotation: https://en.wikipedia.org/wiki/Rotation_matrix#Basic_3D_rotations
+      const quad = (points, colour, glow = false) => {
+        const tint = glow ? 1 : .55, rgb = [colour>>16, (colour>>8)&255, colour&255].map(v => v/255*tint);
+        for (const j of [0,1,2,0,2,3]) {
+          const [x,y,z] = points[j];
+          data.push(f[i+1]+x*c-y*s,f[i+2]+x*s+y*c,f[i+3]+z,...rgb,1);
+        }
+      };
+      const box = (x,y,z,dx,dy,dz,colour,glow = false,turn = 0) => {
+        const ct = Math.cos(turn), st = Math.sin(turn);
+        for (const [,corners] of faces) quad(corners.map(([a,b,h]) => {
+          const px = a*dx, py = (b-.5)*dy;
+          return [x+px*ct-py*st,y+px*st+py*ct,z+h*dz];
+        }),colour,glow);
+      };
+      if (u[i] === 1) {
+        box(-.21,0,.04,.42,.18,.16,0x4a4038);
+        box(.21,0,.10,.14,.13,.12,0x5a4e44);
+        for (const side of [-1,1]) box(.33,side*.045,.18,.025,.025,.025,0xff3030,true);
+        box(-.21,0,.06,.30,.03,.03,0x8a6a64,false,Math.PI+.4*phase);
+        for (const front of [-1,1]) for (const side of [-1,1])
+          box(front*.14-.02,side*.065,.01*(1+front*side*phase),.04,.04,.05,0x4a4038);
+      } else {
+        box(-.03,0,0,.06,.035,.035,0xd8cfb8);
+        const flap = .9*phase;
+        for (const side of [-1,1]) quad([[-.06,side*.0175,.0175],[.06,side*.0175,.0175],
+          [.06,side*(.0175+.10*Math.cos(flap)),.0175+.10*Math.sin(flap)],
+          [-.06,side*(.0175+.10*Math.cos(flap)),.0175+.10*Math.sin(flap)]],0xffd58a,true);
+      }
+    }
+    return new Float32Array(data);
   }
   function draw(device, enc, rt, ds, f32, a, module) {
     init(module);
@@ -235,6 +286,16 @@ struct Out {
           pass.setVertexBuffer(0,mesh.vb); pass.setIndexBuffer(mesh.ib,'uint32');
           pass.drawIndexed(count,1,type ? mesh.opaque : 0);
         }
+      }
+      const mobs = mobVertices(base);
+      if (mobs.length) {
+        if (!gpu.mobBuffer || gpu.mobBuffer.size < mobs.byteLength) {
+          gpu.mobBuffer?.destroy();
+          gpu.mobBuffer = device.createBuffer({ size: Math.max(4096,2**Math.ceil(Math.log2(mobs.byteLength))),
+            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST });
+        }
+        device.queue.writeBuffer(gpu.mobBuffer,0,mobs);
+        pass.setPipeline(p[3]); pass.setVertexBuffer(0,gpu.mobBuffer); pass.draw(mobs.length/7);
       }
       const payload = new Int32Array(f32.buffer,f32.byteOffset,f32.length);
       if (payload[a+35]) { pass.setPipeline(p[2]); pass.draw(24); }

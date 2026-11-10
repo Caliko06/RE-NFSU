@@ -27,7 +27,8 @@ Original design for a night street-racing city. Not a copy of any other block ga
 - Blocks (id name: look, rule): 0 air; 1 asphalt: black, fine grit; 2 concrete: pale grey slab; 3 brick: soot red;
   4 tread plate: diamond steel; 5 scrap: rust mix; 6 tyre stack: black rings; 7 crate: pallet wood; 8 barrier: orange and
   white stripes; 9 sodium lamp: emits 14, warm orange; 10 neon: emits 11, magenta glow; 11 glass: see-through, passes light;
-  12 grit: falls when nothing is under it; 13 oil: flows down, spreads 3 cells on flat ground, see-through, dark sheen.
+  12 grit: falls when nothing is under it; 13 oil: falls, then runs off any edge beside it (no levels), see-through, dark sheen.
+  Random tick: scrap under the open sky slowly weathers into grit.
 - Creatures (box models, drawn in the voxel pass): gutter rat: walks on solid cells, wanders, runs from the player within 4 m
   and from light above 9; lamp moth: flies, circles the brightest emitter within 12 cells, rests on it when none moves.
 - Inventory and controls: counts per block type; hotbar of 9 slots. Left mouse breaks (+1 to its count), right mouse

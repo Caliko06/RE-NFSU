@@ -188,7 +188,33 @@ static uint8_t light_at(int x, int y, int z) {
     return 0xF0;
 }
 
+#define PHYS_QUEUE_SIZE 4096u
+typedef struct { int x, y, z; } TickCell;
+static TickCell phys_queue[PHYS_QUEUE_SIZE];
+static uint32_t phys_head, phys_tail;
+static TickCell demo_cells[4];
+static int demo_physics;
+
+static void schedule_cell(int x, int y, int z) {
+    for (uint32_t i = phys_head; i != phys_tail; i++) {
+        TickCell *p = &phys_queue[i & (PHYS_QUEUE_SIZE - 1)];
+        if (p->x == x && p->y == y && p->z == z) return;
+    }
+    if (phys_tail - phys_head == PHYS_QUEUE_SIZE) {
+        static int warned;
+        if (!warned) { rn_log("voxel physics queue full"); warned = 1; }
+        return;
+    }
+    phys_queue[phys_tail++ & (PHYS_QUEUE_SIZE - 1)] = (TickCell){x, y, z};
+}
+
 static void set_cell(int x, int y, int z, uint8_t block) {
+    schedule_cell(x, y, z);
+    for (int d = 0; d < 6; d++) {
+        int q[3] = {x, y, z};
+        q[d / 2] += d & 1 ? 1 : -1;
+        schedule_cell(q[0], q[1], q[2]);
+    }
     int c[3] = {chunk_coord(x), chunk_coord(y), chunk_coord(z)};
     int p[3] = {x - c[0] * VOX_CH, y - c[1] * VOX_CH, z - c[2] * VOX_CH};
     int s = chunk_slot(c[0], c[1], c[2], block != B_AIR);
@@ -232,6 +258,205 @@ static void set_cell(int x, int y, int z, uint8_t block) {
 int vox_solid(int x, int y, int z) {
     uint8_t b = get_cell(x, y, z);
     return b != B_AIR && b != B_OIL;
+}
+
+// G. Marsaglia, Xorshift RNGs (2003): https://www.jstatsoft.org/article/view/v008i14
+static uint32_t tick_random(void) {
+    static uint32_t state = 0x6d2b79f5u;
+    state ^= state << 13; state ^= state >> 17; state ^= state << 5;
+    return state;
+}
+static float tick_unit(void) { return (tick_random() >> 8) * (1.0f / 16777216.0f); }
+static const int side_x[4] = {1, 0, -1, 0}, side_y[4] = {0, 1, 0, -1};
+
+static void move_cell(TickCell p, int x, int y, int z, uint8_t b, uint8_t old) {
+    set_cell(x, y, z, b);
+    if (get_cell(x, y, z) != b) return;
+    set_cell(p.x, p.y, p.z, old);
+    if (demo_physics) for (int i = 0; i < 4; i++)
+        if (demo_cells[i].x == p.x && demo_cells[i].y == p.y && demo_cells[i].z == p.z)
+            demo_cells[i] = (TickCell){x, y, z};
+}
+
+static void block_step(uint32_t step) {
+    static TickCell pending[PHYS_QUEUE_SIZE];
+    static uint8_t before[PHYS_QUEUE_SIZE];
+    unsigned count = phys_tail - phys_head;
+    // Snapshot both work and contents: a destination cannot move again on an old air entry.
+    for (unsigned i = 0; i < count; i++) {
+        pending[i] = phys_queue[phys_head++ & (PHYS_QUEUE_SIZE - 1)];
+        TickCell p = pending[i];
+        before[i] = get_cell(p.x, p.y, p.z);
+    }
+    for (unsigned i = 0; i < count; i++) {
+        TickCell p = pending[i];
+        uint8_t b = before[i], below = get_cell(p.x, p.y, p.z - 1);
+        if (get_cell(p.x, p.y, p.z) != b) continue;
+        if (b == B_GRIT && (below == B_AIR || below == B_OIL))
+            move_cell(p, p.x, p.y, p.z - 1, b, below);
+        else if (b == B_OIL) {
+            if (below == B_AIR) move_cell(p, p.x, p.y, p.z - 1, b, B_AIR);
+            else if (vox_solid(p.x, p.y, p.z - 1)) for (int j = 0; j < 4; j++) {
+                int d = (step + j) & 3, x = p.x + side_x[d], y = p.y + side_y[d];
+                if (get_cell(x, y, p.z) == B_AIR && get_cell(x, y, p.z - 1) == B_AIR) {
+                    move_cell(p, x, y, p.z, b, B_AIR); break;
+                }
+            }
+        }
+    }
+    for (int s = 0; s < VOX_SLOTS; s++) if (vox.slot[s].state) for (int j = 0; j < 3; j++) {
+        unsigned n = tick_random() & (VOX_CELLS - 1);
+        int x = vox.slot[s].cx * VOX_CH + (n & 15);
+        int y = vox.slot[s].cy * VOX_CH + ((n >> 4) & 15);
+        int z = vox.slot[s].cz * VOX_CH + (n >> 8);
+        uint8_t b = vox.block[s][n];
+        if (b == B_SCRAP && (light_at(x, y, z + 1) >> 4) == 15 && tick_random() % 40 == 0)
+            set_cell(x, y, z, B_GRIT);
+        else if (b == B_GRIT && get_cell(x, y, z - 1) == B_AIR) schedule_cell(x, y, z);
+    }
+}
+
+typedef struct { TickCell p; float distance; } Emitter;
+static Emitter emitters[32];
+static int emitter_count;
+static float moth_angle[VOX_MOBS];
+
+static void find_emitters(void) {
+    emitter_count = 0;
+    for (int s = 0; s < VOX_SLOTS; s++) if (vox.slot[s].state) {
+        VoxSlot *slot = &vox.slot[s];
+        float distance = 0;
+        int c[3] = {slot->cx, slot->cy, slot->cz};
+        for (int a = 0; a < 3; a++) {
+            float low = c[a] * VOX_CH, high = low + VOX_CH;
+            float d = fmaxf(low - vox.eye[a], fmaxf(0, vox.eye[a] - high));
+            distance += d * d;
+        }
+        if (distance > 144) continue;
+        for (int n = 0; n < VOX_CELLS; n++) {
+            uint8_t b = vox.block[s][n];
+            if (b != B_SODIUM && b != B_NEON) continue;
+            TickCell p = {slot->cx * 16 + (n & 15), slot->cy * 16 + ((n >> 4) & 15), slot->cz * 16 + (n >> 8)};
+            float dx = p.x + 0.5f - vox.eye[0], dy = p.y + 0.5f - vox.eye[1], dz = p.z + 0.5f - vox.eye[2];
+            float d = dx * dx + dy * dy + dz * dz;
+            if (d > 144) continue;
+            int at = emitter_count;
+            while (at > 0 && emitters[at - 1].distance > d) at--;
+            if (at == 32) continue;
+            if (emitter_count < 32) emitter_count++;
+            for (int j = emitter_count - 1; j > at; j--) emitters[j] = emitters[j - 1];
+            emitters[at] = (Emitter){p, d};
+        }
+    }
+}
+
+static int nearest_emitter(const VoxMob *m) {
+    int best = -1;
+    float distance = 144.0f;
+    for (int i = 0; i < emitter_count; i++) {
+        TickCell p = emitters[i].p;
+        if (!light_emission(get_cell(p.x, p.y, p.z))) continue;
+        float dx = m->x - p.x - 0.5f, dy = m->y - p.y - 0.5f, dz = m->z - p.z - 0.5f;
+        float d = dx * dx + dy * dy + dz * dz;
+        if (d <= distance) { distance = d; best = i; }
+    }
+    return best;
+}
+
+static void mob_spawn(int slot, int kind, float x, float y, float z) {
+    static unsigned logged;
+    vox.mob[slot] = (VoxMob){.kind = kind, .x = x, .y = y, .z = z, .yaw = tick_unit() * 6.2831853f};
+    moth_angle[slot] = vox.mob[slot].yaw;
+    if (!(logged & (1u << kind))) {
+        rn_log("voxel mob spawn %d %.3f %.3f %.3f", kind, x, y, z);
+        logged |= 1u << kind;
+    }
+}
+
+static void creature_step(uint32_t step) {
+    const float dt = 0.05f;
+    int rats = 0, moths = 0, free_slot = -1;
+    if (step == 1 || step % 40 == 0) find_emitters();
+    for (int i = 0; i < VOX_MOBS; i++) {
+        VoxMob *m = &vox.mob[i];
+        if (!m->kind) continue;
+        float dx = m->x - vox.eye[0], dy = m->y - vox.eye[1], dz = m->z - vox.eye[2];
+        float distance = dx * dx + dy * dy;
+        if (distance + dz * dz > 1600) { m->kind = 0; continue; }
+        if (m->kind == 1) {
+            int x = (int)floorf(m->x), y = (int)floorf(m->y), z = (int)floorf(m->z);
+            if (!vox_solid(x, y, z - 1)) {
+                int drop;
+                for (drop = 1; drop <= 8; drop++)
+                    if (vox_solid(x, y, z - 1 - drop)) { m->z = z - drop; break; }
+                if (drop > 8) { m->kind = 0; continue; }
+                z = (int)floorf(m->z);
+            }
+            float speed = 1.2f;
+            m->yaw += tick_unit() * 0.8f - 0.4f;
+            if (distance < 16) { m->yaw = atan2f(dy, dx); speed = 3; }
+            if ((light_at(x, y, z) & 15) > 9) {
+                int best = -1, level = light_at(x, y, z) & 15;
+                for (int d = 0; d < 4; d++) {
+                    int v = light_at(x + side_x[d], y + side_y[d], z) & 15;
+                    if (v < level) { level = v; best = d; }
+                }
+                if (best >= 0) {
+                    float turn = atan2f((float)side_y[best], (float)side_x[best]) - m->yaw;
+                    turn = atan2f(sinf(turn), cosf(turn));
+                    m->yaw += fmaxf(-0.8f, fminf(0.8f, turn));
+                }
+            }
+            float nx = m->x + cosf(m->yaw) * speed * dt, ny = m->y + sinf(m->yaw) * speed * dt;
+            int ix = (int)floorf(nx), iy = (int)floorf(ny), nz = z;
+            int allowed = light_open(get_cell(ix, iy, z)) && vox_solid(ix, iy, z - 1);
+            if (!allowed && light_open(get_cell(ix, iy, z)) && light_open(get_cell(ix, iy, z - 1)) && vox_solid(ix, iy, z - 2)) {
+                allowed = 1; nz--;
+            }
+            if (allowed) { m->x = nx; m->y = ny; m->z = nz; }
+            else m->yaw += 1.6f;
+            m->anim = fmodf(m->anim + speed * dt * 2, 1);
+            dx = m->x - vox.eye[0]; dy = m->y - vox.eye[1]; dz = m->z - vox.eye[2];
+            if (dx * dx + dy * dy + dz * dz <= 576) rats++;
+        } else if (m->kind == 2) {
+            int target = nearest_emitter(m);
+            if (target >= 0) {
+                TickCell p = emitters[target].p;
+                moth_angle[i] += 2.2f * dt + (tick_unit() - 0.5f) * 0.08f;
+                float tx = p.x + 0.5f + 1.2f * cosf(moth_angle[i]);
+                float ty = p.y + 0.5f + 1.2f * sinf(moth_angle[i]);
+                float tz = p.z + 1.1f + 0.2f * sinf(step * dt * 3);
+                dx = tx - m->x; dy = ty - m->y; dz = tz - m->z;
+                float length = sqrtf(dx * dx + dy * dy + dz * dz);
+                float scale = length > 4 * dt ? 4 * dt / length : 1;
+                m->x += dx * scale; m->y += dy * scale; m->z += dz * scale;
+                if (dx != 0 || dy != 0) m->yaw = atan2f(dy, dx);
+            }
+            m->anim = fmodf(m->anim + dt * (target >= 0 ? 8 : 1), 1);
+            moths++;
+        }
+    }
+    for (int i = 0; i < VOX_MOBS; i++) if (!vox.mob[i].kind) { free_slot = i; break; }
+    if (free_slot >= 0 && step % 20 == 0 && rats < 8) {
+        float angle = tick_unit() * 6.2831853f, radius = 6 + tick_unit() * 14;
+        int x = (int)floorf(vox.eye[0] + cosf(angle) * radius), y = (int)floorf(vox.eye[1] + sinf(angle) * radius);
+        int top = (int)floorf(vox.eye[2]) + 4;
+        for (int z = top; z >= top - 12; z--)
+            if (vox_solid(x, y, z) && light_open(get_cell(x, y, z + 1)) && light_open(get_cell(x, y, z + 2)) &&
+                (light_at(x, y, z + 1) & 15) < 5 && (light_at(x, y, z + 2) & 15) < 5) {
+                float dx = x + 0.5f - vox.eye[0], dy = y + 0.5f - vox.eye[1], dz = z + 1 - vox.eye[2];
+                if (dx * dx + dy * dy + dz * dz <= 576) mob_spawn(free_slot, 1, x + 0.5f, y + 0.5f, z + 1);
+                break;
+            }
+    }
+    if (step % 40 == 0 && moths < 6 && emitter_count) {
+        for (int i = 0; i < VOX_MOBS; i++) if (!vox.mob[i].kind) {
+            TickCell p = emitters[0].p;
+            mob_spawn(i, 2, p.x + 0.5f + tick_unit() * 2 - 1, p.y + 0.5f + tick_unit() * 2 - 1,
+                      p.z + 0.5f + tick_unit() * 2 - 1);
+            break;
+        }
+    }
 }
 
 // Axis slabs: https://pbr-book.org/4ed/Shapes/Basic_Shape_Interface#RayBoundsIntersections ; sweep each box face against cell slabs.
@@ -573,6 +798,8 @@ static void collision_probe(int x, int y, int z) {
 void vox_frame(Ctx *c) {
     static int enabled = -1, built, initialized, demo, probe, light_test;
     static int light_anchor[3];
+    static double last_time, accumulator;
+    static uint32_t physics_step;
     static uint32_t last_break, last_place, built_frame;
     if (enabled < 0) {
         const char *e = getenv("RN_VOXEL"); enabled = !e || strcmp(e, "0");
@@ -582,12 +809,12 @@ void vox_frame(Ctx *c) {
         light_test = demo && light_env && !strcmp(light_env, "1");
     }
     vox.on = 0;
-    if (!enabled || ld(c, 0x777cc8, 4) != 3) return;
+    if (!enabled || ld(c, 0x777cc8, 4) != 3) { last_time = accumulator = 0; return; }
     uint32_t node = player_node(c);
     // The player's view [0x7404c0]: View +0, Projection +0x40. Checked by projecting the car through the 6 view-table entries
     // (0x740460 + 0x60 k): only k 1 and 4 hold a projection, and k 1 draws voxels in register with the street (build/voxel_s3.png).
     uint32_t blk = ld(c, 0x7404c0, 4);
-    if (!blk || blk >= GUEST_MEM - 0x80) return;
+    if (!blk || blk >= GUEST_MEM - 0x80) { last_time = accumulator = 0; return; }
     float m[32];
     for (int k = 0; k < 32; k++) m[k] = ldf(c, blk + 4 * k);
     vox.on = 1;
@@ -675,6 +902,35 @@ void vox_frame(Ctx *c) {
                    (unsigned)light_at(x, y, z + 4));
     }
     stream_columns(c, node);
+    if (demo && built && vox.frame - built_frame == 120) {
+        int x = light_anchor[0], y = light_anchor[1], z = light_anchor[2];
+        for (int i = 0; i < 3; i++) demo_cells[i] = (TickCell){x + 2, y - 1 + i, z + 4};
+        demo_cells[3] = (TickCell){x + 1, y, z + 5};
+        demo_physics = 1;
+        for (int i = 0; i < 4; i++) {
+            TickCell p = demo_cells[i];
+            set_cell(p.x, p.y, p.z, i == 3 ? B_OIL : B_GRIT);
+        }
+    }
+    // G. Fiedler, Fix Your Timestep: https://gafferongames.com/post/fix_your_timestep/ (bounded accumulator).
+    double now = vox_now();
+    if (last_time) accumulator += fmax(0, now - last_time);
+    last_time = now;
+    if (accumulator > 150) accumulator = 150;
+    for (int steps = 0; accumulator >= 50 && steps < 3; steps++) {
+        accumulator -= 50;
+        if (!physics_step) rn_log("voxel physics on");
+        physics_step++;
+        block_step(physics_step);
+        creature_step(physics_step);
+    }
+    if (demo && built && vox.frame - built_frame == 180) {
+        for (int i = 0; i < 4; i++) {
+            TickCell p = demo_cells[i];
+            rn_log("voxel physics final %d %d %d %d block %u", i, p.x, p.y, p.z, (unsigned)get_cell(p.x, p.y, p.z));
+        }
+        demo_physics = 0;
+    }
     uint32_t w[40] = {0};
     memcpy(w, m, sizeof m);
     memcpy(w + 32, vox.target, sizeof vox.target);
