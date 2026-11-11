@@ -32,7 +32,8 @@ class World:
             elif cid == 0x34132:
                 self.wsrc, self.n_wsrc = b, s >> 5
             elif cid == 0x34133:
-                self.widx, self.n_widx = b, s >> 1
+                self.wide = s >= 4 and d[b:b + 4] == b'\xff\xff\xff\xff'   # u32 entries (PATCH 0x441423)
+                self.widx, self.n_widx = (b + 4, (s - 4) >> 2) if self.wide else (b, s >> 1)
             elif cid == 0x34134:
                 a = ((base + hdr + 0x17) & ~0xf) - base
                 self.bbox = struct.unpack_from('<7f', d, a)
@@ -70,7 +71,7 @@ class World:
         """0x441660: row is a wcell row index"""
         cx, cy, off, cnt = struct.unpack_from('<2f2I', self.d, self.wcell + 16 * row)
         for k in range(off, off + cnt):
-            i = struct.unpack_from('<H', self.d, self.widx + 2 * k)[0]
+            i = struct.unpack_from('<I', self.d, self.widx + 4 * k)[0] if self.wide else struct.unpack_from('<H', self.d, self.widx + 2 * k)[0]
             if i in seen or self.d[self.wsrc + 32 * i] != 0:
                 continue
             mnx, mny, mxx, mxy = self.row_vals(i)

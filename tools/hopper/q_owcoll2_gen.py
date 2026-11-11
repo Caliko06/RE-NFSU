@@ -80,7 +80,7 @@ def cells_of(r):
     return out
 
 
-def derive(rows, order='yx', node_order='cell'):
+def derive(rows, order='yx', node_order='cell', wide=False):
     """rows: list of 32 B wsrc rows. returns dict of chunk payloads (unpadded) + helpers"""
     cell_polys = collections.OrderedDict()
     for pi, r in enumerate(rows):
@@ -88,10 +88,10 @@ def derive(rows, order='yx', node_order='cell'):
         cs.sort(key=(lambda c: (c[0], c[1])) if order == 'xy' else (lambda c: (c[1], c[0])))
         for c in cs:
             cell_polys.setdefault(c, []).append(pi)
-    return build(cell_polys, node_order)
+    return build(cell_polys, node_order, wide)
 
 
-def build(cell_polys, node_order='cell'):
+def build(cell_polys, node_order='cell', wide=False):
     """cell_polys: ordered {(i, j): [poly idx ascending]} -> wcell rows, widx, wmap rows"""
     wcell = [struct.pack('<2f2I', SENT, SENT, 0, 0)]
     widx = []
@@ -115,7 +115,7 @@ def build(cell_polys, node_order='cell'):
                     nodes[n][q] = len(nodes) - 1
                 n = nodes[n][q]
     return dict(wmap=b''.join(struct.pack('<4H', *n) for n in nodes), wcell=b''.join(wcell),
-                widx=struct.pack('<%dH' % len(widx), *widx), nodes=len(nodes), cells=len(cell_polys))
+                widx=struct.pack('<%d%s' % (len(widx), 'I' if wide else 'H'), *widx), nodes=len(nodes), cells=len(cell_polys))
 
 
 def chunks(d):
