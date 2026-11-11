@@ -103,12 +103,14 @@ EM_JS(double, world_head, (const char *path), {
 // pointer 0x7007ec points at a cave (PATCH, slot SCREEN_ADDR+0x74) that lands in world_rows, which runs 0x442040 and adds the row.
 // The name comes the same way: 0x700850 (language loader 0x59fce0) -> world_lang adds the pair (hash of "TRACK_NAME_1010", "WORLD")
 // to the sorted language table [0x734434] (count [0x73442c]). The minimap of the row reads its bounds at +0x8c/+0x90/+0x94
-// (0x590ad0: u = (x - X0) / S, v = (Y0 - y) / S): the picture of tools/openworld/worldmap.py, same three numbers.
+// (0x590ad0: u = (x - X0) / S, v = (Y0 - y) / S): the picture of tools/openworld/worldmap.py, same three numbers. They are one square
+// holding both cities: NFSU1 road nodes x -691..2393, y -1920..734 and the UG2 map picture (TRACKMAP4000, census/ug2/map.md) placed by
+// R270 + t, x -3633..2000, y -1395..4238. The worldmap.py assert checks that these three defines match its own.
 #define WORLD_ID   1010
 #define WORLD_BASE 1001            // its TRACKB is the merged city of base track 1001
-#define WORLD_X0   (-750.f)
-#define WORLD_Y0   1000.f
-#define WORLD_S    3200.f
+#define WORLD_X0   (-3650.f)
+#define WORLD_Y0   4260.f
+#define WORLD_S    6240.f
 #define WORLD_NAME_HASH 0x5461a075u   // "TRACK_NAME_1010" with the game's hash (0x4f42f0: h = -1, h = h * 33 + c)
 
 int rn_tex_overlay;   // 1 once Cars/TEXTURES.BIN was served from the overlay with the DUMMY_SKIN5..12 targets (host/free.c checks it)
