@@ -151,7 +151,8 @@ async function download(url, what) {
       // ?pool=1 opens WORLD directly (the menu path of tools/completion.py jump 3:1010); ?keys= or ?jump= take over
       if (RN_Q.get('pool') === '1' && !keys && !jump) {
         m.ENV.RN_JUMP = '3:1010';
-        m.ENV.RN_KEYS = '20000:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_Main_PC:RETURN,3000@6:RETURN,3000@6:RETURN';
+        m.ENV.RN_KEYS = '20000:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_UG_NewOrLoad_PC2:RETURN,1500@=MU_Main_PC:RETURN';
+        // no RETURN after flow 6: in a race RETURN changes the camera (taps at flow 6/3 and 6/4 cycled POV 1 -> 2 -> 0, FEEL log 2026-11-10)
       }
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
       // 1: the clearcoat (OWNER: flat), 2: the sharp clearcoat candidate, 3 (default): live, the 2003 strength with contrast
