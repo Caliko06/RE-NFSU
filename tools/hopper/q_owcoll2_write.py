@@ -50,15 +50,19 @@ def bbox_payload(rows):
     return struct.pack('<8f', min(xs), min(ys), -127.0, 0.0, max(xs), max(ys), 127.0, 0.0)
 
 
-def build_trackb(base, rows):
-    """base: decompressed TRACKB bytes; rows: list of 32 B wsrc rows -> new decompressed TRACKB bytes"""
-    assert len(rows) <= 0xfffe, 'more than 65534 polygons: u16 indices (widx, save/restore 0xffff terminator) overflow'
+WIDE = b'\xff\xff\xff\xff'   # first dword of a u32 widx chunk (PATCH 0x441423: the loader tells it from the shipped u16 files; no row index is 0xffff)
+
+
+def build_trackb(base, rows, wide=False):
+    """base: decompressed TRACKB bytes; rows: list of 32 B wsrc rows -> new decompressed TRACKB bytes.
+    wide: u32 widx entries behind WIDE (more than 65,534 rows; the exe needs the PATCHES of patches_collision.py)"""
+    assert wide or len(rows) <= 0xfffe, 'more than 65534 polygons: u16 indices (widx, save/restore 0xffff terminator) overflow'
     ch = top_chunks(base)
     ids = [c[0] for c in ch]
     i0 = ids.index(0x34130)
     assert ids[i0:i0 + 5] == list(COLL)
-    g = gen.derive(rows)
-    widx = g['widx'] + (b'\0\0' if (len(g['widx']) // 2) % 2 else b'')
+    g = gen.derive(rows, wide=wide)
+    widx = WIDE + g['widx'] if wide else g['widx'] + (b'\0\0' if (len(g['widx']) // 2) % 2 else b'')
     assert g['nodes'] <= 0xffff and g['cells'] <= 0xffff
     out = bytearray(base[:ch[i0][1]])
     for cid, payload, al in ((0x34130, g['wmap'], True), (0x34131, g['wcell'], True), (0x34132, b''.join(rows), False),

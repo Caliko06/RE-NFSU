@@ -27,3 +27,17 @@ for a in (0x466d7b, 0x466daa, 0x466e95, 0x466ece, 0x468317, 0x4696e1):  # imul r
     PATCHES.append(dict(addr=a, old="de000000", new="40080000", when=lambda: True))
 # PATCH: 0x466a3e, witness pool [0x72cc00] 0x100 -> 0x800 (0x280 B slots, 1.3 MB): 0x469770 and Broadphase 0x4695xx skip the witness when the pool is empty, so that wall is not tested and its polygon body, which frees only with its last witness (0x466e20), leaks. The bound follows PATCH 0x4669fe.
 PATCHES.append(dict(addr=0x466a3e, old="bf00010000", new="bf00080000", when=lambda: True))
+# PATCH: 0x4416c4 + 6 more, collision index entries u16 -> u32 (docs: census/ug2/coll_load.md; UG2 city + NFSU1 = 180k rows, the u16 widx stops at 65,534). The only reader of the widx entries is
+# CollectPolys 0x441660 (5 loads; 0x441c10 and 0x4407b0 hold row POINTERS): lea ebx,[ebx+2*esi+4] -> [ebx+4*esi+8]; the four unrolled loads (word [ebx-4],[ebx-2],[ebx],[ebx+2]) -> dword [ebx-8],[ebx-4],[ebx],[ebx+4]
+# (nop-padded to the same length); step add ebx,8 -> 0x10; the tail load word [ebx+2*esi] -> dword [ebx+4*esi]. The loader below keeps the 16 shipped u16 files working. widen: Wine runs the shipped u16 reader.
+PATCHES.append(dict(addr=0x4416c4, old="8d5c7304", new="8d5cb308", when=lambda: True, widen=True))
+PATCHES.append(dict(addr=0x4416c8, old="0fb74bfc", new="8b4bf890", when=lambda: True, widen=True))
+PATCHES.append(dict(addr=0x44179d, old="0fb74bfe", new="8b4bfc90", when=lambda: True, widen=True))
+PATCHES.append(dict(addr=0x441868, old="0fb70b", new="8b0b90", when=lambda: True, widen=True))
+PATCHES.append(dict(addr=0x441932, old="0fb74b02", new="8b4b0490", when=lambda: True, widen=True))
+PATCHES.append(dict(addr=0x441a09, old="83c308", new="83c310", when=lambda: True, widen=True))
+PATCHES.append(dict(addr=0x441a30, old="0fb70c73", new="8b0cb390", when=lambda: True, widen=True))
+# PATCH: 0x441423 (+ cave 0x797620 in CODE_AREA), the 0x34133 branch of the collision loader 0x441380 (lea edx,[ecx+8]; mov [eax+0x18],edx; mov ecx,[ecx+4]; shr ecx; mov [eax+0x1c],ecx): the host (host/openworld.c world_widx) sets mgr+0x18
+# to u32 entries: a chunk that starts with 0xffffffff is already u32 (the merged UG2 + NFSU1 file), any other is the shipped u16 and is widened into a guest copy. push ecx (chunk); push eax (mgr); call cave; add esp,8; 4 nops.
+PATCHES.append(dict(addr=0x441423, old="8d5108895018" "8b4904d1e989481c", new="51" "50" + "e8" + _rel(0x441425, 0x797620) + "83c408" "90909090", when=lambda: True, widen=True))
+PATCHES.append(dict(addr=0x797620, old="00" * 6, new="ff25cc300100", entry=True, when=lambda: True, widen=True))

@@ -129,6 +129,25 @@ uint32_t world_lang(Ctx *c) {
     return r;
 }
 
+// Collision index of a TRACKB (PATCH 0x441423, cave 0x797620: push chunk, push mgr; call [SCREEN_ADDR+0xcc]), the 0x34133 branch of the
+// loader 0x441380; CollectPolys 0x441660 now reads u32 entries. A chunk that starts with 0xffffffff is already u32 (the merged city,
+// tools/ug2_collfile.py: more than 65,534 rows): used in place. Any other is u16 (the 16 shipped files): widened into a guest copy.
+// Sets mgr+0x18 (entries) and +0x1c (count, read by nobody). The copy of the last load is freed at the next one.
+uint32_t world_widx(Ctx *c) {
+    static uint32_t prev;
+    uint32_t mgr = ARG(0), ch = ARG(1), size = ld(c, ch + 4, 4), data = ch + 8, ptr = data, n;
+    if (prev) { guest_free(prev); prev = 0; }
+    if (size >= 4 && ld(c, data, 4) == 0xffffffffu) { ptr = data + 4; n = (size - 4) / 4; }
+    else {
+        n = size / 2;
+        ptr = prev = guest_alloc(n * 4 + 4);
+        if (!ptr) { rn_log("OPENWORLD: no memory for %u widx entries", n); n = 0; ptr = data; }
+        for (uint32_t k = 0; k < n; k++) st(c, ptr + 4 * k, ld(c, data + 2 * k, 2), 4);
+    }
+    st(c, mgr + 0x18, ptr, 4); st(c, mgr + 0x1c, n, 4);
+    return 0;
+}
+
 // The caves of PATCH 0x7007ec / 0x700850 jump through these slots; filled on the first file open (before GLOBALB is read), so
 // host/win32.c is untouched.
 static void world_install(void) {
@@ -137,6 +156,7 @@ static void world_install(void) {
     done = 1;
     st(g_ctx, SCREEN_ADDR + 0x74, host_addr_of("rn", "world_rows"), 4);
     st(g_ctx, SCREEN_ADDR + 0x78, host_addr_of("rn", "world_lang"), 4);
+    st(g_ctx, SCREEN_ADDR + 0xcc, host_addr_of("rn", "world_widx"), 4);
 }
 // (world_rows and world_lang are in the api table at the end of host/free.c, the last table dispatch.c searches.)
 
