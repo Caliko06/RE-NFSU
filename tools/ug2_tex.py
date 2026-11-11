@@ -9,6 +9,8 @@ Writes (all generated, git-ignored):
                             nverts x (f32 u, f32 v), ntri x u16 texture index (into tex.json textures, 0xffff = none),
                             ntri x u16 material index (into tex.json materials, 0xffff = default material).
                             Vertex and triangle order are exactly city.bin's (verified against it when present).
+  web/ug2/tex/sky_*.png     SKY_SUNRISE_A, _CAP, SKY_NIGHT_A, _CAP from TRACKS/LOC4DYNTEX.BIN (JDLZ blocks); tex.json key "sky"
+  web/ug2/sky.json          SKYDOME mesh (101 verts, 144 tris, 2 groups -> texture hash)
 Proof for each layout: census/ug2/tex.md.
 """
 import glob, json, os, struct, sys
@@ -317,6 +319,103 @@ def walk(data, sol, secs, near, fixed):
             np.concatenate(MM).astype('<u2'), tlist, mlist)
 
 
+# ---------------------------------------------------------------- sky: TRACKS/LOC4DYNTEX.BIN textures + SKYDOME mesh (census/ug2/tex.md, light.md section 8)
+SKYDOME = 0xbe43edbb   # exe 0x5c59ec compares the solid hash
+SKY_TEX = [('SKY_SUNRISE_A', 'dome', 'sunrise'), ('SKY_SUNRISE_A_CAP', 'cap', 'sunrise'),
+           ('SKY_NIGHT_A', 'dome', 'night'), ('SKY_NIGHT_A_CAP', 'cap', 'night')]
+
+
+def name_hash(s):   # same hash as ug2_world / tools/probe/ug2_sky.py (h = h*33 + c, seed 0xffffffff)
+    x = 0xffffffff
+    for c in s.encode():
+        x = (x * 33 + c) & 0xffffffff
+    return x
+
+
+def jdlz(b):
+    """JDLZ block -> bytes. Header: 'JDLZ', u8 version 2 (exe 0x573718), u32 +8 = unpacked size, +0xc = packed size, stream from +0x10.
+    Exe decoder 0x573700..0x573838 (dispatch on the magic: 0x574670 / 0x574630): two flag bytes (control bit, length-form bit),
+    each refilled as byte|0x100 when it reaches 1; control 0 = literal; control 1 + form 1 = 2 bytes, len = ((b0&0xf0)<<4|b1)+3,
+    dist = (b0&0xf)+1 (0x573773..0x57379e); form 0 = len = (b0&0x1f)+3, dist = ((b0&0xe0)<<3|b1)+17 (0x5737a0..0x5737c9)."""
+    assert b[:4] == b'JDLZ' and b[4] == 2
+    usize, csize = struct.unpack_from('<II', b, 8)
+    out, f1, f2, ip = bytearray(), 1, 1, 16
+    while len(out) < usize:
+        if f1 == 1:
+            f1 = b[ip] | 0x100
+            ip += 1
+        if f2 == 1:
+            f2 = b[ip] | 0x100
+            ip += 1
+        if f1 & 1:
+            if f2 & 1:
+                n, d = ((b[ip] & 0xf0) << 4 | b[ip + 1]) + 3, (b[ip] & 15) + 1
+            else:
+                n, d = (b[ip] & 0x1f) + 3, ((b[ip] & 0xe0) << 3 | b[ip + 1]) + 17
+            ip += 2
+            for _ in range(n):
+                out.append(out[-d])
+            f2 >>= 1
+        else:
+            out.append(b[ip])
+            ip += 1
+        f1 >>= 1
+    assert len(out) == usize and ip <= csize
+    return bytes(out)
+
+
+def sky_textures(path):
+    """LOC4DYNTEX.BIN = pack 0xb3300000 > header 0xb3310000 {0x33310001, 0x33310002 hash list, 0x33310003 index} + data 0xb3320000.
+    Measured, no exe reader (0x494dd0 / 0x4943f0 only skip / store 0x33310003; the exe loads no texture from this pack): 0x33310003
+    = size/24 entries (u32 hash, u32 ABSOLUTE file offset of a JDLZ block, u32 packed size, u32 unpacked size, 0x100, 0).
+    Unpacked block = pixels | 0x7c texture record (same layout as 0x33310004, tex.md) | 0x20 GPU entry (D3DFORMAT @+0x14)."""
+    d = open(path, 'rb').read()
+    for o, i, s in kids(d, 0, len(d)):
+        if i != 0xb3300000:
+            continue
+        for o2, i2, s2 in kids(d, o + 8, o + 8 + s):
+            if i2 == 0xb3310000:
+                for o3, i3, s3 in kids(d, o2 + 8, o2 + 8 + s2):
+                    if i3 == 0x33310003:
+                        idx = {struct.unpack_from('<I', d, o3 + 8 + 24 * k)[0]: struct.unpack_from('<4I', d, o3 + 8 + 24 * k + 4)
+                               for k in range(s3 // 24)}
+                        out = []
+                        for name, role, tod in SKY_TEX:
+                            h = name_hash(name)
+                            off, cs, us, _ = idx[h]
+                            blk = jdlz(d[off:off + cs])
+                            assert len(blk) == us
+                            r = us - 0x7c - 0x20
+                            v = struct.unpack_from('<8I2h', blk, r + 0x24)
+                            assert v[0] == h and blk[r + 0xc:r + 0x24].split(b'\0')[0].decode() == name
+                            fmt = GPU_FMT[struct.unpack_from('<I', blk, r + 0x7c + 0x14)[0]]
+                            rec = dict(pix=0, pal=0, mip0=v[7], w=v[8], h=v[9])
+                            pk = {'blob': (0, len(blk))}
+                            img = decode(blk, pk, rec, fmt)
+                            assert v[5] == r and img.shape[:2] == (v[9], v[8])   # record npix (+0x38) = pixel bytes before the record
+                            fn = 'tex/%s.png' % name.lower()   # names start with SKY_, no clash with <hash8>.png
+                            Image.fromarray(np.ascontiguousarray(img), 'RGBA').save(os.path.join(OUT, fn))
+                            out.append({'name': name, 'hash': '%08x' % h, 'role': role, 'time': tod, 'file': fn, 'w': v[8], 'h': v[9],
+                                        'fmt': fmt, 'mips': blk[r + 0x4e], 'flag55': blk[r + 0x55], 'flag56': blk[r + 0x56],
+                                        'raw_alpha': bool((img[:, :, 3] < 255).any()), 'src': 'TRACKS/LOC4DYNTEX.BIN@0x%x' % off})
+                        return out
+
+
+def sky_mesh(d, s):
+    """SKYDOME solid (scan_solids dict) -> web/ug2/sky.json: verts [x,y,z,u,v] (24 B stride, mask 0, uv@16), tris (u16 index triples),
+    groups {first_tri, tris, texture hash of the 0x134012 slot}. Group layout as in the world solids (tex.md)."""
+    n, nt = s['nv'], s['ntri']
+    a = np.frombuffer(d, np.uint8, n * 24, s['v']).reshape(n, 24)
+    v = np.concatenate([a[:, :12].copy().view('<f4'), a[:, 16:24].copy().view('<f4')], 1)
+    ix = np.frombuffer(d, '<u2', nt * 3, s['i']).reshape(-1, 3)
+    assert ix.max() < n and s['mask'] == 0
+    grp = [{'first_tri': g[0] // 3, 'tris': g[1] // 3, 'slot': g[2], 'texture': '%08x' % s['tex'][g[2]]} for g in s['groups']]
+    json.dump({'verts': np.round(v.astype(np.float64), 4).tolist(), 'tris': ix.tolist(), 'groups': grp,
+               'layout': 'verts [x,y,z,u,v]; tris index triples into verts; groups: first_tri, tris, texture hash (SKY_*_A dome / _CAP cap)'},
+              open(os.path.join(OUT, 'sky.json'), 'w'), separators=(',', ':'))
+    return {'verts': n, 'tris': nt, 'groups': grp}
+
+
 def main():
     tracks = sys.argv[1] if len(sys.argv) > 1 else W.TRACKS
     # city = STREAML4RA only (ug2_world.main); the other streams are only a texture-hash source
@@ -405,7 +504,10 @@ def main():
     stats = {'referenced': len(tlist), 'decoded': len(tlist) - missing - undec, 'no_pack_record': missing,
              'undecoded_format': undec, 'formats': fmtcount, 'packs_scanned': npk, 'records_scanned': ntexrec,
              'positions_with_per_mask_stride': fixed_used}
-    json.dump({'textures': texes, 'materials': ['%08x' % h for h in mlist], 'stats': stats},
+    sky = {'textures': sky_textures(os.path.join(tracks, 'LOC4DYNTEX.BIN')), 'mesh': 'sky.json'}
+    ra = [f for f in range(len(files)) if os.path.basename(files[f]) == 'STREAML4RA.BUN'][0]
+    sky['dome'] = sky_mesh(data[ra], sol[SKYDOME])
+    json.dump({'textures': texes, 'materials': ['%08x' % h for h in mlist], 'stats': stats, 'sky': sky},
               open(os.path.join(OUT, 'tex.json'), 'w'), indent=0)
     with open(os.path.join(OUT, 'city_tex.bin'), 'wb') as f:
         f.write(b'UG2T' + struct.pack('<IIII', len(P), len(Tt), len(tlist), len(mlist)))
