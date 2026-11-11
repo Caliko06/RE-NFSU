@@ -43,7 +43,11 @@ OUT_ID = 1010
 
 # ---- reading a track's road net ------------------------------------------------------------------------------------
 def read_net(tid):
-    d = load(trackb_path(PC, tid))
+    return net_of(load(trackb_path(PC, tid)))
+
+
+def net_of(d):
+    """the road net of a decoded TRACKB: {secs: {id: hdr, lst, nodes}, ent, tp}"""
     secs = {}
     (b, s), = find(d, 0x34121)
     p = b

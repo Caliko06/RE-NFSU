@@ -185,3 +185,41 @@ Risks, in order:
 - Walker semantics for UG2 itself (0x5de240) were read only where they test the bits above.
 - Free Run gate patches on UG2 nodes, the host refill state in the shipped page, the loader buffer for a bigger net.
 - Stage numbers (15 sections / 40 entries / ~94 sections / ~240 entries) are counts from the data; no net was written.
+
+## 8. Stage 1 built (2026-11-11): `tools/ug2_traffic.py`, written by `tools/ug2_collfile.py` (same writer as the collision)
+Static only. `python3 tools/ug2_collfile.py` (12 s) rewrites `build/openworld/TRACKB1010.lzc`; its `check()` runs `ug2_traffic.check`. Only chunks 0x34121 / 0x34122 differ from the file before (collision and every other chunk byte-identical, 0x34130 header phase mod 128 kept by resizing the id-0 pad).
+| What | Result |
+|---|---|
+| Sections | 78 -> 94: id 78 = connector, 79..93 = UG2 229, 230, 231, 233, 313, 314, 315, 317, 318, 361, 362, 371, 372, 373, 374 (UG2 id order, nodes 1:1, 226 nodes) |
+| Entries | 196 -> 240 (22 links = 44 entries, d=0 + d=1 each); 20 UG2 pairs (the 40 inside entries) all written, 0 dropped, plus 2 connector links; <= 255, <= 128 sections: retail path, no EBASE |
+| NFSU1 part | sections 0..77 and entries 0..195 identical; ONE byte differs: 28:2 link slot +0x81 `ff` -> `ec` (entry 236). A link needs a source slot. |
+| Connector | section 78, 39 nodes, 301 m, gap <= 7.93 m. Starts ON NFSU1 node 28:3 (221.6, 401.5, z 43.0), the junction in front of the stub road (y 394..407.75), west, right turn (R 12), north over the bridge (x 121.6), left turn onto the UG2 road, last node (113.6, 600.6) heading west. The nearest real NFSU1 node by road is 28:3, not 12:97 (that one is on the other arm). |
+| Links to the nets | 28:2 -> connector 0 (d=0), connector 1 -> 28:3 (d=1); connector 38 -> section 80 node 24 (= UG2 230:24, hop 35.2 m), 80:24 -> connector 38 (d=1). All 2 / 2. |
+| z | connector: max |node z - collision ground| 0.057 over 340 samples (every metre); UG2 nodes: 224 of 226 sit on a ground row (any surface, 2 drivable ones do not), max dz 0.12 over those |
+| Walk 250 m (0x4563d0 model, `citygraph.walk_stats` rule) | from the new drivable nodes: forward 187 of 232, backward 200 of 232 |
+| `+0x38` | -28.2 .. 2,643.6 over the new nodes (continuous from 28:2 over the links, `citygraph.route_offsets` rule); the negative values are the start of UG2 229, far under L/2 = 20.9 km (0x443d60 only subtracts and wraps by L) |
+| `citygraph.behind_entries` | empty: every landing is > 0.1 m ahead of its source along the source heading for that direction (the grower 0x5a58d0 faults at 0x462a06 otherwise, `citygraph.py:881-904`) |
+
+Fields (same table as section 3, what was actually done):
+- Direct from UG2: x, y, z, tangent (+0xc/+0x10, back heading +0x14/+0x18 = negative), drive flags 11/18/25/26/27/28 -> 6/19/25/26/27/28, own id +0x83, bits 20..24 = 31, bbox, node counts, link pairs (+4/+6/+9/+0xa).
+- Regenerated: `+0x1c` / `+0x20` = distance to next / from previous node (`citygraph.py` writes them at joins; real nodes agree: 28:1 5.28 = its spacing), `+0x38` (above), entry d and landing by geometry: for a UG2 pair the orientation whose two entries pass the AHEAD test with the smallest shifts; a source that fails moves back up to 3 nodes (`citygraph.py:802-813`), hop <= 50 m (UG2's own max is 35 m; only the connector end needs 35.2).
+- Types: `citygraph.py:742-747`: the last way out of a section (largest source index) = type 2 / lane 2, the others 0 / 7 (the live net has exactly these: 2/2 x 119, 0/7 x 77). Per direction: 14 links 2/2 (12 UG2 + 2 connector), 8 links 0/7. The anchor link and the connector end are 2/2: at a bit-25 node a +0xc 2 link is taken at once (0x456553..0x456571), so southbound traffic on 28 always turns onto the bridge there (intended: that is how a car gets to UG2).
+- Templates (real NFSU1 bytes): header = live section 0 (98 nodes, all with traffic lanes, `hdr[0x265+k]` set for 11..13 and 17..19), changed only in id, list 0, counts, bbox, and `hdr[0x265+k]` = 1 only for k = 11, 17. Kept its name blocks (+0x34..0x23b) rather than zeroing: every live section but 10 has them, none of those 10 has traffic lanes, so zero blocks + lanes was never seen working. Node = live section 0 node 3 (widths `+0x75..+0x80` all 6 = UG2's default `06 x8`, lane 11 offset 464 = 1.8 m; of the section's 5 all-6-width nodes the one nearest the median of `+0x24/+0x28`). Lanes 12, 13, 18, 19 set to -1 and their speed bytes to 6 (the "unused" value, `re_answers_0b.md` Q1), so traffic drives 1.8 m right of the centre line (lane 11 along the node order, 17 against, 0x599660) and cannot be put 8.6 m out on a 6 m street.
+- Dropped: UG2 intersection records (bits 20..24 = 31 as `tour.py`), lane/width bytes, class names, race-only links, entries to sections outside the disc.
+
+### 8.1 UNKNOWN that the game reads (what may bite at run time)
+| What | Where the exe reads it | State |
+|---|---|---|
+| Node `+0x24 +0x28 +0x2c +0x30 +0x34` (template values 10..13 / 0) | not located in this pass; `citygraph.py` swaps them with the node order, so they are direction dependent | UNKNOWN; template from section 0 |
+| Lane offsets of ids 0..9 and speed bytes `+0x6a..+0x80` (racer lanes, traffic speed of lane 11 / 17) | 0x442590, 0x44c550 / 0x44c5f7 (racer cap), 0x42adf0 / 0x59a2c0 (traffic spawn speed), 0x5a7690 | template from one real node; a traffic car on UG2 gets the speed byte of section 0 |
+| Header name blocks `+0x34..+0x23b`, lane flags `+0x270..+0x27b` | 0x442950 (six bytes at +0x270 / +0x276); name blocks: no reader found | copied from section 0 |
+| Does the lane picker accept a 1-lane section | 0x599660 / 0x454ff0 (`hdr[0x265+k] != 0`, random id then in order, other base on failure) | model only; only ids 11 and 17 are on |
+| Link type semantics with bit 25 / 6 and the walker flag at `[esp+0x158]` | 0x456528..0x456571 (bit 25: +0xc 7 skipped, +0xc 2 taken; otherwise queue by +0xb), 0x4564e4..0x4564f6 (d) | read; 2/2 vs 0/7 effect on traffic density is a run-time question; racer decider 0x458bd0 |
+| The UG2 flags 0..7 / 13..17 of node +0x84 (template bits kept) | 0x4424d0, 0x442520, 0x4420b0 read only 6/19/25..28 | other bits not read by those |
+| Route distance `+0x38` below 0 and overlap with NFSU1 values (UG2 d 1,100..2,600 overlaps NFSU1 sections of the same range, so "near other car" 0x59b1e0 may refuse a spot) | 0x442570 -> 0x443d60, 0x59b1e0 | read; effect only on spawn spots |
+| Chunk 0x34121 grows 528,736 -> 574,952 B (+9 %), 94 sections, 240 entries | loader 0x442dd0 / 0x442b70, PostLoad sort 0x443123 (<= 255 entries) | buffer size UNKNOWN (the file itself is 4.8 MB and loads) |
+| Both-direction traffic: 22 pairs mean back drivers (vt +0x40) use d=1 entries on a section where the node order is the opposite of UG2's travel direction | UG2 order vs travel side is mixed (68 % of oncoming neighbours on the left of the node order) | UNKNOWN which way UG2 intends; both walks exist |
+| Collision under UG2 nodes of the sections' far ends (2 drivable nodes without ground; surfaces 11 / 16 under the side roads) | the car physics | surface 11 / 16 friction UNKNOWN |
+
+### 8.2 NOT VERIFIED
+Everything at run time: that the file loads, that PostLoad accepts the net, that a traffic car is placed on the connector or UG2 (`RN_FREELOG`), that the walker crosses the anchor link, the crash of `re_widen.md` Stage 4 near the stub (not expected: <= 255 entries, no widened path, but the net is new). The offline walk numbers (section above) are a model of the walker, not the walker.
