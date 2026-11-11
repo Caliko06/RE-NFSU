@@ -1,7 +1,7 @@
 # Camera at speed: distance, height, pitch, FOV (2026-11-03, becario rosa)
 
 Wish: "camera low/flat and car small at speed". Tools: capstone on the unpatched `pc/Speed.exe` (read-only, no build,
-no run), `census/hopper/decomp.c`, `docs/re/camera*.md`, `docs/re/feel_2026-10-31.md` §1, port code
+no run), `census/hopper/decomp.c`, `docs/re/camera*.md`, `docs/archive/remaster/feel_2026-10-31.md` §1, port code
 `host/d3d9.c` + `web/tune.js`. Marks: **F** = read in bytes/code, **I** = inferred from F, **NV** = not verified.
 
 ## Answer

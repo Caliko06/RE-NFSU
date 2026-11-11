@@ -1,7 +1,7 @@
 # Acceleration chain and the knobs that scale it (Lane 2, 2026-11-04)
 
 Question from the OWNER: "0-60 in ~2.7 s feels too fast". Sources read this session: `docs/re/physics.md`,
-`docs/re/feel_2026-10-31.md` §5, `build/re_accel_2026-10-31.md` (read-only symlink to Main's), `census/hopper/decomp.c`
+`docs/archive/remaster/feel_2026-10-31.md` §5, `build/re_accel_2026-10-31.md` (read-only symlink to Main's), `census/hopper/decomp.c`
 (0x46cff0, 0x4774a0, 0x46aa40, 0x585410), direct float reads of `pc/Speed.exe`.
 Marks: F = read in code/data this or a prior RE session (cited), I = inference/model output, NV = not verified (no build, no run).
 

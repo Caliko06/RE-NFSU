@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chunk</title>
+<style>
+  :root { --ink: #f4efe6; --dim: rgba(244, 239, 230, .55); --panel: rgba(12, 10, 18, .55); --pick: #ffb347; }
+  html, body { margin: 0; height: 100%; background: #0d0b14; overflow: hidden; font: 13px/1.4 ui-monospace, Menlo, monospace; color: var(--ink); }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  #cross { position: fixed; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; pointer-events: none; mix-blend-mode: difference; }
+  #cross::before, #cross::after { content: ""; position: absolute; background: #fff; }
+  #cross::before { left: 8px; top: 0; width: 2px; height: 18px; }
+  #cross::after { top: 8px; left: 0; height: 2px; width: 18px; }
+  #bar { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px; background: var(--panel); border-radius: 10px; backdrop-filter: blur(6px); }
+  #bar div { width: 40px; height: 40px; border-radius: 6px; border: 2px solid transparent; position: relative; }
+  #bar div.on { border-color: var(--pick); box-shadow: 0 0 12px rgba(255, 179, 71, .5); }
+  #bar span { position: absolute; left: 3px; top: 1px; font-size: 10px; color: var(--ink); text-shadow: 0 1px 2px #000; }
+  #help { position: fixed; left: 16px; top: 14px; color: var(--dim); max-width: calc(100vw - 32px); }
+  #help b { color: var(--ink); font-weight: 600; }
+  #msg { position: fixed; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--ink); background: rgba(13, 11, 20, .6); cursor: pointer; }
+  #msg[hidden] { display: none; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="cross"></div>
+<div id="help"><b>WASD</b> walk · <b>Space</b> jump · <b>mouse</b> look · <b>left</b> break · <b>right</b> place · <b>1-6</b> block</div>
+<div id="bar"></div>
+<div id="msg">Loading…</div>
+<script type="module" src="chunk.js"></script>
+</body>
+</html>

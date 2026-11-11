@@ -1,6 +1,6 @@
 # Open world: all of Olympic City, no fences
 
-> WORLD lane reference (docs/GOAL.md). Parked: its "Next:" lines and plans are history, not work orders, until the Minecraft lane reaches WORLD.
+> Open world / Free Run reference (docs/GOAL.md): this is where the UG2 bridge connects. Its "Next:" lines and plans are history, not work orders; the orders are in web/plan/plan.json.
 
 OWNER 2026-10-27: "connect the whole NFSU world, remove the fences, real Free Run, drive the whole map like GTA."
 Apart from Free Run (host/free.c, RN_FREE), which stays as it is.

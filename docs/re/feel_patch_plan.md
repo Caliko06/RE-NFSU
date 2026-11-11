@@ -1,6 +1,6 @@
 # Feel patch plan (2026-11-03, bec/pepa)
 
-Base: `becarios/pepa/work/feel_candidates.md`, `docs/re/feel_2026-10-31.md` (OWNER complaints), `camera.md`,
+Base: `becarios/pepa/work/feel_candidates.md`, `docs/archive/remaster/feel_2026-10-31.md` (OWNER complaints), `camera.md`,
 `camera_chase.md`, `blur.md`. Nothing in this plan was built or run: every byte below was read from `pc/Speed.exe` and checked
 with the same `old` test `patches.apply()` uses (script run, 11/11 match). The look and the numbers are expectations, not
 measurements; the probe is what turns them into numbers.
