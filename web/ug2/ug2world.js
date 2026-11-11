@@ -3,7 +3,7 @@
 // Same path as F-Max (web/maxpayne/boot.js): web/gpu.js calls Ug2.scene() at GPU_FXAA, when the scene colour and depth are bound and
 // the HUD has not started; host/d3d9.c mc_hook has just copied the player's View and Projection into rn_mc.view / rn_mc.proj
 // (host/mc.h, D3D row vectors, clip = v * V * P), which is what is read here. Remaster only (RN_MODE), like the MC lane.
-// Mesh: web/ug2/city.bin or city_lod.bin: 'UG2M', u32 nverts, u32 nidx, u32 0; nverts x (f32 xyz, u8 rgba); nidx x u32 triangle list.
+// Mesh: web/ug2/city.bin or city_lod.bin, plus web/ug2/bridge.bin: 'UG2M', u32 nverts, u32 nidx, u32 0; nverts x (f32 xyz, u8 rgba); nidx x u32 triangle list.
 (() => {
   // THE placement (one line to change): UG2 world units -> NFSU1 world (metres, z up, same units, no axis swap): p' = Rz(yaw) * p + (tx, ty, tz).
   // OWNER 2026-11-10, docs/re/ug2_bridge.md rank 1: rotate R270 (x,y)->(y,-x) = yaw -pi/2 (column0 (0,-1), column1 (1,0)), then t.
@@ -39,17 +39,25 @@ struct O { @builtin(position) pos: vec4f, @location(0) col: vec3f, @location(1) 
   const api = window.Ug2 = { on: RN_MODE === 'remaster' && RN_Q.get('ug2') !== '0', state: 'idle' };
   let device, mesh, pipes = new Map(), bind, uniform, module, loading = false;
 
+  // One UG2M file -> {nv, ni, vb, ib}, or null when it is missing or not a UG2M mesh.
+  async function read(name) {
+    const r = await fetch('/ug2/' + name).catch(() => null);
+    if (!r?.ok) return null;
+    const b = await r.arrayBuffer(), h = new Uint32Array(b, 0, 4);
+    if (new TextDecoder().decode(new Uint8Array(b, 0, 4)) !== 'UG2M' || b.byteLength !== 16 + 16 * h[1] + 4 * h[2]) { console.warn('ug2:', name, 'is not a UG2M mesh'); return null; }
+    say(`ug2: ${name} ${h[1]} verts ${h[2] / 3} tris`);
+    return { nv: h[1], ni: h[2], vb: new Uint8Array(b, 16, 16 * h[1]), ib: new Uint32Array(b, 16 + 16 * h[1], h[2]) };
+  }
+
+  // The city (city.bin, else city_lod.bin) plus the bridge deck (bridge.bin, tools/ug2_collfile.py): both raw UG2 units, one PLACE, one draw.
   async function load() {
-    for (const name of ['city.bin', 'city_lod.bin']) {
-      const r = await fetch('/ug2/' + name).catch(() => null);
-      if (!r?.ok) continue;
-      const b = await r.arrayBuffer(), h = new Uint32Array(b, 0, 4);
-      if (new TextDecoder().decode(new Uint8Array(b, 0, 4)) !== 'UG2M' || b.byteLength !== 16 + 16 * h[1] + 4 * h[2]) { console.warn('ug2:', name, 'is not a UG2M mesh'); return null; }
-      say(`ug2: ${name} ${h[1]} verts ${h[2] / 3} tris`);
-      return { nv: h[1], ni: h[2], vb: new Uint8Array(b, 16, 16 * h[1]), ib: new Uint32Array(b, 16 + 16 * h[1], h[2]) };
-    }
-    say('ug2: no web/ug2/city.bin or city_lod.bin, nothing drawn');
-    return null;
+    const city = await read('city.bin') || await read('city_lod.bin'), bridge = await read('bridge.bin');
+    if (!city) { say('ug2: no web/ug2/city.bin or city_lod.bin, nothing drawn'); return null; }
+    if (!bridge) return city;
+    const vb = new Uint8Array(city.vb.length + bridge.vb.length), ib = new Uint32Array(city.ni + bridge.ni);
+    vb.set(city.vb); vb.set(bridge.vb, city.vb.length);
+    ib.set(city.ib); for (let k = 0; k < bridge.ni; k++) ib[city.ni + k] = bridge.ib[k] + city.nv;
+    return { nv: city.nv + bridge.nv, ni: city.ni + bridge.ni, vb, ib };
   }
 
   function setup(dev, m) {
