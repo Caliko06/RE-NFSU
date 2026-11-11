@@ -247,7 +247,7 @@
     const opts = L.opts, presets = L.presets;
     const modeOpt = opts.find(o => o.id === 'mode' || o.key === 'mode');
     const modeId = modeOpt ? modeOpt.id : 'mode';
-    const storedMode = () => store.get('rn_mode', 'original') === 'remaster' ? 'remaster' : 'original';
+    const storedMode = () => store.get('rn_mode', 'remaster') === 'original' ? 'original' : 'remaster';
     const defaults = () => Object.fromEntries(opts.map(o => [o.id, o.def]));
     const valuesOf = o => (o.values && o.values.length) ? o.values : [{ v: '0', label: 'No' }, { v: '1', label: 'Sí' }];
     const valid = (o, v) => v !== undefined && v !== null && valuesOf(o).some(x => eq(x.v, v));

@@ -18,7 +18,7 @@
 
   const opts = [
     { id: 'mode', group: 'modo', label: 'Modo', help: 'Original = el juego como salió. Remaster = con texturas y efectos extra.',
-      key: 'mode', type: 'choice', values: [T('original', 'Original 2003'), T('remaster', 'Remaster')], def: 'original',
+      key: 'mode', type: 'choice', values: [T('original', 'Original 2003'), T('remaster', 'Remaster')], def: 'remaster',
       modes: BOTH, src: 'web/mode.js' },
 
     { id: 'career', group: 'carrera', label: 'Progreso de carrera', help: 'Normal: eventos se abren uno por uno. Todo abierto: sin candados.',
