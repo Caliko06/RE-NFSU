@@ -145,6 +145,9 @@ def connector(ground, anchor_xyz):
         a = 0.0 + (math.pi / 2) * k / n
         pts.append((xc - RAD + RAD * math.cos(a), y_arc + RAD * math.sin(a)))
     pts.append((xc - RAD, y_end))
+    # straight on west to one SPACING short of 80:24 = UG2 230:24 (74.4, 599.1): with the end at 109.6 the 35 m hop let eastbound cars aim from 80:24 straight at node 36
+    # and stop on the bridge's west wall end (114.6, 589); RN_SPAWN=116:555 run 2026-11-11, TRAFUG2 log: one car parked at 113,592 heading -35, a queue behind it
+    pts.append((74.4 + SPACING, y_end))
     cum = [0.0]
     for p, q in zip(pts, pts[1:]):
         cum.append(cum[-1] + math.dist(p, q))

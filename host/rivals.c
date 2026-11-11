@@ -619,14 +619,19 @@ static void ai_log(Ctx *c) {
         uint32_t tab = ld(c, 0x734588, 4), me = 0, seen[36] = {0};
         int total = 0, parked = 0, near = 0, close = 0, kinds = 0, all = 0;
         for (uint32_t r = ld(c, h, 4), k = 0; AP(r) && r != h && k < 200 && !me; r = ld(c, r, 4), k++) { uint32_t e = ld(c, r + 0x14, 4); if (AP(e) && ld(c, e + 4, 4) == 1) me = r; }
-        char names[512];
-        int m = 0;
+        char names[512], u2s[480] = "";
+        int m = 0, u2[3] = {0}, u2m = 0;
         for (uint32_t r = ld(c, h, 4), k = 0; me && AP(r) && r != h && k < 200; r = ld(c, r, 4), k++) {
             uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
             if (!AP(e) || ld(c, e + 4, 4) != 3) continue;
             float d = hypotf(ldf(c, r + 0x50) - ldf(c, me + 0x50), ldf(c, r + 0x54) - ldf(c, me + 0x54));
             uint32_t type = ld(c, e + 0x10, 4);
             total++, parked += AP(v) && c->mem[v + 0x4d1], near += d < 250, close += d < 100;
+            {   // UG2 side of the net (census/ug2/roads.md section 8): connector stub x 110..230 y 380..499, bridge x 110..135 y 499..589, UG2 = west of x 135 north of y 589
+                float x = ldf(c, r + 0x50), y = ldf(c, r + 0x54);
+                int k2 = x > 110 && x < 230 && y > 380 && y < 499 ? 0 : x > 110 && x < 135 && y >= 499 && y < 589 ? 1 : x < 135 && y >= 589 && y < 3000 ? 2 : -1;
+                if (k2 >= 0) { u2[k2]++; if (u2m < 440) u2m += snprintf(u2s + u2m, sizeof u2s - u2m, " %d:%.0f,%.0f h%.0f v%.1f", k2, x, y, atan2f(ldf(c, r + 0x94), ldf(c, r + 0x90)) * 57.3f, ldf(c, r + 0x3d4)); }
+            }
             if (type < 36 && !(seen[type] & 1)) { seen[type] |= 1, all++; if (m < 480) m += snprintf(names + m, sizeof names - m, " %s", G(tab + 0xc90 * type)); }
             if (type < 36 && d < 250 && !(seen[type] & 2)) seen[type] |= 2, kinds++;
         }
@@ -652,6 +657,7 @@ static void ai_log(Ctx *c) {
         }
         uint32_t bodies = ld(c, 0x736184, 4);       // TrackPolygonSlotPool 0x4412b0: slots in use, high-water mark, cap (docs/openworld/re_coll_pool.md)
         rn_log("REFILLWHY early %d walk %d spacing %d lane %d", n_rf[0], n_rf[1], n_rf[2], n_rf[3]);
+        rn_log("TRAFUG2 stub %d bridge %d ug2 %d |%s", u2[0], u2[1], u2[2], u2s);
         rn_log("TRAFLOG %u cars %d parked %d near250 %d near100 %d models %d models250 %d refill %d fail %d yield %d dodge %d glued %d polys %u polymax %u polycap %u avoidf %u brakef %u honkf %u hits %u flashf %u%s", rn_telem.presents, total, parked, near, close, all, kinds,
                n_refill, n_refail, n_react[0], n_react[1], n_react[2], AP(bodies) ? ld(c, bodies + 0x18, 4) : 0, AP(bodies) ? ld(c, bodies + 0x1c, 4) : 0, AP(bodies) ? ld(c, bodies + 0x2c, 4) : 0, n_tr[0], n_tr[1], n_tr[2], n_tr[3], n_tr[4], rn_telem.presents % 3000 == 0 ? names : "");
     }
