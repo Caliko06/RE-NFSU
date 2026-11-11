@@ -5,7 +5,7 @@
 // (host/mc.h, D3D row vectors, clip = v * V * P), which is what is read here. Remaster only (RN_MODE), like the MC lane.
 // Files (tools/ug2_world.py, tools/ug2_collfile.py, tools/ug2_tex.py; facts census/ug2/tex.md):
 //   city.bin, bridge.bin 'UG2M': u32 nverts, u32 nidx, u32 0; nverts x (f32 xyz, u8 rgba); nidx x u32 triangle list
-//   city_tex.bin 'UG2T': u32 nverts, ntri, ntex, nmat; nverts x (f32 u, v); ntri x u16 texture (0xffff none); ntri x u16 material
+//   city_tex.bin, bridge_tex.bin 'UG2T': u32 nverts, ntri, ntex, nmat; nverts x (f32 u, v); ntri x u16 texture (0xffff none); ntri x u16 material
 //   tex.json textures[i] = {file, w, h, alpha_test, blend}; tex/<hash>.png RGBA mip 0
 (() => {
   // THE placement (one line to change): UG2 world units -> NFSU1 world (metres, z up, same units, no axis swap): p' = Rz(yaw) * p + (tx, ty, tz).
@@ -71,11 +71,11 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
   }
 
   // city_tex.bin -> {uv Float32Array (2 per vertex), tri Uint16Array (texture per triangle)}, only when it matches city.bin.
-  async function readSide(city) {
-    const r = await fetch('/ug2/city_tex.bin').catch(() => null);
-    if (!r?.ok) { say('ug2: no city_tex.bin, untextured'); return null; }
+  async function readSide(city, name = 'city_tex.bin') {
+    const r = await fetch('/ug2/' + name).catch(() => null);
+    if (!r?.ok) { say(`ug2: no ${name}, untextured`); return null; }
     const b = await r.arrayBuffer(), h = new Uint32Array(b, 0, 5);
-    if (new TextDecoder().decode(new Uint8Array(b, 0, 4)) !== 'UG2T' || h[1] !== city.nv || h[2] !== city.ni / 3) { say(`ug2: city_tex.bin (${h[1]} verts, ${h[2]} tris) does not match city.bin, untextured`); return null; }
+    if (new TextDecoder().decode(new Uint8Array(b, 0, 4)) !== 'UG2T' || h[1] !== city.nv || h[2] !== city.ni / 3) { say(`ug2: ${name} (${h[1]} verts, ${h[2]} tris) does not match its mesh, untextured`); return null; }
     return { uv: new Float32Array(b, 20, 2 * h[1]), tri: new Uint16Array(b, 20 + 8 * h[1], h[2]) };
   }
 
@@ -87,10 +87,10 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     const t0 = performance.now();
     const city = await read('city.bin') || await read('city_lod.bin'), bridge = await read('bridge.bin');
     if (!city) { say('ug2: no web/ug2/city.bin or city_lod.bin, nothing drawn'); return null; }
-    const side = TEXTURED ? await readSide(city) : null;
+    const side = TEXTURED ? await readSide(city) : null, bside = side && bridge ? await readSide(bridge, 'bridge_tex.bin') : null;
     const info = side ? (await (await fetch('/ug2/tex.json')).json()).textures : [];
     const nv = city.nv + (bridge?.nv || 0), ntri = (city.ni + (bridge?.ni || 0)) / 3;
-    // Vertices, 24 B: f32 xyz, u8 rgba, f32 uv (bridge.bin and untextured city: uv 0).
+    // Vertices, 24 B: f32 xyz, u8 rgba, f32 uv (untextured: uv 0).
     const vb = new ArrayBuffer(24 * nv), vf = new Float32Array(vb), vu = new Uint32Array(vb);
     const put = (m, base) => {
       const f = new Float32Array(m.vb.buffer, m.vb.byteOffset, m.nv * 4), w = new Uint32Array(m.vb.buffer, m.vb.byteOffset, m.nv * 4);
@@ -98,6 +98,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     };
     put(city, 0); if (bridge) put(bridge, city.nv);
     if (side) for (let k = 0; k < city.nv; k++) { vf[6 * k + 4] = side.uv[2 * k]; vf[6 * k + 5] = side.uv[2 * k + 1]; }
+    if (bside) for (let k = 0, o = 6 * city.nv; k < bridge.nv; k++, o += 6) { vf[o + 4] = bside.uv[2 * k]; vf[o + 5] = bside.uv[2 * k + 1]; }
     // Textures: one 2D array per size (layer = instance index of its draws), plus a 1x1 white layer for "no texture".
     const buckets = new Map(), slot = new Int32Array(info.length + 1).fill(-1);   // texture -> bucket*65536 + layer
     const white = { w: 1, h: 1, list: [-1] }; buckets.set('1x1', white);
@@ -122,7 +123,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     order.forEach((o, r) => key[o.i] = r);
     const triKey = new Uint32Array(ntri);
     for (let k = 0; k < ntri; k++) {
-      const t = side && k < city.ni / 3 ? side.tri[k] : 0xffff;
+      const t = k < city.ni / 3 ? (side ? side.tri[k] : 0xffff) : (bside ? bside.tri[k - city.ni / 3] : 0xffff);
       triKey[k] = key[t < info.length && slot[t] >= 0 ? t : info.length];
     }
     const count = new Uint32Array(order.length + 1);

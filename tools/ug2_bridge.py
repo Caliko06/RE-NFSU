@@ -9,7 +9,8 @@ Every number is read from the real neighbouring rows (facts table in docs/re/ug2
                 the UG2 south wall rows inside the opening: one becomes the east side wall (same row number), two are clipped to the opening edge.
 Row indexes stay: nothing moves, 32 ground rows are appended. The mesh (deck + 1.2 m barriers) is returned in raw UG2 units (inverse of the placement),
 so web/ug2 draws it with the same model as city.bin."""
-import struct
+import json, os, struct
+import numpy as np
 
 S = 8          # x,y are s16/8
 NSEG = 8       # ground segments along the bridge (NFSU1 and UG2 rows are about 10 units long; 82 / 8 = 10)
@@ -49,6 +50,61 @@ def lerp_edge(poly, x):
             f = (x - x0) / (x1 - x0)
             return y0 + f * (y1 - y0), z0 + f * (z1 - z0)
     raise AssertionError(x)
+
+
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+MOUTH = (195, 240, 1380, 1440)        # raw UG2 box around the road side the bridge leaves from (x 223.5 east edge, y 1402..1416)
+DECK, WALL = 'RDP_LANEB_WD_AA_KT', 'XW_CONDO_WALLA_1A_00'   # the outer lane strip at the mouth; the wall solid lining that road edge
+
+
+def sources():
+    """measured from the UG2 data at the mouth: deck = texture index + median vertex colour of the DECK strip in city.bin/city_tex.bin;
+    wall = the WALL solid (xyz, colour, uv, triangles, texture per triangle), its local length, and the cross scale of its instances there"""
+    import ug2_world as W, ug2_tex as T
+    ug = os.path.join(REPO, 'web', 'ug2')
+    tex = json.load(open(os.path.join(ug, 'tex.json')))['textures']
+    tid = {t['hash']: i for i, t in enumerate(tex)}
+    b = open(os.path.join(ug, 'city.bin'), 'rb').read()
+    nv, ni = struct.unpack_from('<II', b, 4)
+    vb = np.frombuffer(b, np.uint8, 16 * nv, 16).reshape(-1, 16)
+    xyz = vb[:, :12].copy().view('<f4').reshape(-1, 3)
+    ix = np.frombuffer(b, '<u4', ni, 16 + 16 * nv).reshape(-1, 3)
+    t = open(os.path.join(ug, 'city_tex.bin'), 'rb').read()
+    assert t[:4] == b'UG2T' and struct.unpack_from('<II', t, 4) == (nv, ni // 3)
+    tt = np.frombuffer(t, '<u2', ni // 3, 20 + 8 * nv)
+    k = next(i for i, x in enumerate(tex) if x.get('name') == DECK)
+    c = xyz[ix].mean(1)
+    x0, x1, y0, y1 = MOUTH
+    v = np.unique(ix[(tt == k) & (c[:, 0] > x0) & (c[:, 0] < x1) & (c[:, 1] > y0) & (c[:, 1] < y1)])
+    assert len(v) > 20, len(v)
+    deck = dict(tex=k, col=tuple(int(round(q)) for q in np.median(vb[v, 12:16], 0)))
+    d, sol, secs = T.scan_solids(os.path.join(W.TRACKS, 'STREAML4RA.BUN'))
+    s = next(x for x in sol.values() if x['name'] == WALL)
+    st, co = W.STRIDE.get(s['mask'], (24, 12))
+    rw = np.frombuffer(d, np.uint8, s['nv'] * st, s['v']).reshape(-1, st)
+    wx = rw[:, :12].copy().view('<f4').reshape(-1, 3).astype(np.float64)
+    wc = rw[:, co:co + 4][:, [2, 1, 0, 3]]
+    wuv = rw[:, co + 4:co + 12].copy().view('<f4').reshape(-1, 2)
+    wi = np.frombuffer(d, '<u2', s['ntri'] * 3, s['i']).reshape(-1, 3).astype(np.int64)
+    wt = np.full(len(wi), 0xffff, np.int64)
+    for start, cnt, ts, _ in s['groups']:
+        if ts < len(s['tex']):
+            wt[start // 3:(start + cnt) // 3] = tid.get('%08x' % s['tex'][ts], 0xffff)
+    ok = (wi < s['nv']).all(1) & (wi[:, 0] != wi[:, 1]) & (wi[:, 1] != wi[:, 2]) & (wi[:, 0] != wi[:, 2])
+    assert (wt[ok] != 0xffff).all(), 'wall texture missing from tex.json'
+    wide = []
+    for defs, inst in secs:
+        for r in inst:
+            w = r.tobytes(); di, fl = struct.unpack_from('<HH', w, 24); bb = struct.unpack_from('<6f', w, 0)
+            hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
+            if hh == s['hash'] and not fl & 0x10 and x0 < bb[0] < x1 and y0 < bb[1] < y1:
+                R = np.array(struct.unpack_from('<9h', w, 44)).reshape(3, 3) / 8192
+                wide += [np.linalg.norm(R[1]), np.linalg.norm(R[2])]
+    assert len(wide) >= 4, wide
+    wall = dict(mesh=(wx, wc, wuv, wi[ok], wt[ok].tolist()), len=float(np.ptp(wx[:, 0])), wide=float(np.median(wide)))
+    print('bridge sources: deck tex %d %s colour %s; wall %s %d tris, local length %.2f, cross scale %.3f (from %d instances)'
+          % (k, DECK, deck['col'], WALL, ok.sum(), wall['len'], wall['wide'], len(wide) // 2))
+    return deck, wall
 
 
 def apply(nf, uz, tx8, ty8, tz):
@@ -116,14 +172,16 @@ def apply(nf, uz, tx8, ty8, tz):
     ground = [pack_ground(1, 0x10, [V[i][k + 1], V[i][k], V[i + 1][k], V[i + 1][k + 1]]) for k in range(NSEG) for i in range(4)]
     # --- mesh, raw UG2 units: x = ty - y', y = x' - tx, z = z' - tz (inverse of ug2_collfile.move)
     raw = lambda x8, y8, z: (ty8 / S - y8 / S, x8 / S - tx8 / S, z - tz)
-    GR, BA = (80, 80, 80, 255), (184, 184, 184, 255)      # city.bin grey verts on the UG2 road end (x 90..330, y 1360..1460, z 49.2 +- 0.6): median 87
-    P_, C_, T_ = [], [], []
-    def quad(q, col):
-        n = len(P_); P_.extend(q); C_.extend([col] * 4); T_.extend([n, n + 1, n + 2, n, n + 2, n + 3])
+    deck, wall = sources()
+    P_, C_, UV, T_, TX = [], [], [], [], []
+    def quad(q, cols, uvs, t):
+        n = len(P_); P_.extend(q); C_.extend(cols); UV.extend(uvs); T_.extend([n, n + 1, n + 2, n, n + 2, n + 3]); TX.extend([t, t])
+    # deck: the UG2 outer lane strip it leaves from (RDP_LANEB_WD_AA_KT): u 1 per 8 units across, v 0.025 per unit along, its vertex colour
     for k in range(NSEG):
         for i in range(4):
-            quad([raw(*V[j][m]) for j, m in ((i, k + 1), (i, k), (i + 1, k), (i + 1, k + 1))], GR)
-    H = 1.2
+            jm = ((i, k + 1), (i, k), (i + 1, k), (i + 1, k + 1))
+            uvs = [(1 + (V[j][m][0] - V[0][m][0]) / S / 8, (V[j][m][1] - ytop) / S * 0.025) for j, m in jm]
+            quad([raw(*V[j][m]) for j, m in jm], [deck['col']] * 4, uvs, deck['tex'])
     def zg(col, y):
         """ground z of a bridge edge column at y (1/8 units): piecewise linear over its vertices, 43.0 south of the dead end's north edge"""
         pts = [(v[1], v[2]) for v in V[col]]
@@ -132,13 +190,21 @@ def apply(nf, uz, tx8, ty8, tz):
         if y >= pts[-1][0]:
             return pts[-1][1]
         return next(z0 + (y - y0) * (z1 - z0) / (y1 - y0) for (y0, z0), (y1, z1) in zip(pts, pts[1:]) if y0 <= y <= y1)
+    # side barriers: the road-edge wall solid of the mouth (XW_CONDO_WALLA_1A_00), one copy per segment, scaled as its real instances
+    xyz, wc, wuv, wix, wtx = wall['mesh']
     for xw, col, y0, y1 in ((XW, 0, yW, ycap), (XE, 4, ycap, yE)):
         ya = [round(y0 + (y1 - y0) * k / NSEG) for k in range(NSEG + 1)]
         for k in range(NSEG):
-            z0, z1 = zg(col, ya[k]), zg(col, ya[k + 1])
-            quad([raw(xw, ya[k], z0), raw(xw, ya[k], z0 + H), raw(xw, ya[k + 1], z1 + H), raw(xw, ya[k + 1], z1)], BA)
+            p0, p1 = (np.array(raw(xw, ya[k + j], zg(col, ya[k + j]))) for j in (0, 1))
+            ax = p1 - p0
+            ax2 = ax[:2] / np.hypot(*ax[:2])
+            R = np.array([ax / wall['len'], [-ax2[1] * wall['wide'], ax2[0] * wall['wide'], 0], [0, 0, wall['wide']]])
+            wp = xyz @ R + p0
+            n = len(P_)
+            P_.extend(map(tuple, wp)); C_.extend(map(tuple, wc)); UV.extend(map(tuple, wuv)); T_.extend((wix + n).ravel().tolist()); TX.extend(wtx)
     mesh = b'UG2M' + struct.pack('<III', len(P_), len(T_), 0) + b''.join(struct.pack('<fffBBBB', *p, *c) for p, c in zip(P_, C_)) + struct.pack('<%dI' % len(T_), *T_)
-    return nf, uz, ground, mesh
+    side = b'UG2T' + struct.pack('<IIII', len(P_), len(TX), 0, 0) + struct.pack('<%df' % (2 * len(UV)), *(c for u in UV for c in u)) + struct.pack('<%dH' % len(TX), *TX)
+    return nf, uz, ground, mesh, side
 
 
 def check(rows):

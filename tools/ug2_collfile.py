@@ -23,7 +23,7 @@ import ug2_bridge  # noqa: E402
 OUT = os.path.join(REPO, 'build', 'openworld', 'TRACKB1010.lzc')
 PREV = os.path.join(REPO, 'build', 'openworld', 'TRACKB1010.prev.lzc')
 UG2 = os.path.join(REPO, 'build', 'ug2', 'coll_rows.bin')
-MESH = os.path.join(REPO, 'web', 'ug2', 'bridge.bin')   # bridge deck + barriers, raw UG2 units, same format and model as city.bin
+MESH = os.path.join(REPO, 'web', 'ug2', 'bridge.bin')   # bridge deck + barriers, raw UG2 units, same format and model as city.bin; bridge_tex.bin = its UG2T side file
 # t = (-1287.4, 812.2, -6.2) of the decision, rounded to what the rows hold: x,y to 1/8, z to 1/64 (flag 0x04 rows step 1/64)
 TX8, TY8, TZ = round(-1287.4 * 8), round(812.2 * 8), round(-6.2 * 64) / 64
 S16 = (-32768, 32767)
@@ -66,8 +66,9 @@ def build():
         shutil.copy(OUT, PREV)
     base = lzc.exe_decode(open(PREV, 'rb').read())
     nf = old_rows(base)
-    nf, uz, bridge, mesh = ug2_bridge.apply(nf, ug2_rows(), TX8, TY8, TZ)
+    nf, uz, bridge, mesh, side = ug2_bridge.apply(nf, ug2_rows(), TX8, TY8, TZ)
     open(MESH, 'wb').write(mesh)
+    open(MESH.replace('.bin', '_tex.bin'), 'wb').write(side)
     uz = uz + bridge
     new = w.build_trackb(base, nf + uz, wide=True)
     blob = lzc.encode(new)
