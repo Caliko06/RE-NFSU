@@ -66,11 +66,12 @@ async function startAudio(M, log) {
   let out = ctx.destination;   // ?mute=1: headed test runs stay silent; the ring still drains, so timing is unchanged (GOAL 2026-11-05)
   if (RN_Q.get('mute') === '1') { const g = ctx.createGain(); g.gain.value = 0; g.connect(out); out = g; }
   node.connect(out);
-  const resume = () => { if (ctx.state !== 'running') ctx.resume(); };
+  const resume = () => { if (RN_APP.state !== 'paused' && ctx.state !== 'running') ctx.resume(); };
   addEventListener('keydown', resume, true);
   addEventListener('mousedown', resume, true);
   addEventListener('touchend', resume, true);            // iOS only unlocks audio from touchend / click, not touchstart
   addEventListener('click', resume, true);
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') resume(); });   // iOS suspends it when the tab hides
+  // web/app.js: silent while paused (hidden page, phone upright); back on 'run' (iOS suspends it by itself when the tab hides)
+  RN_APP.on(s => { if (s === 'paused') ctx.suspend(); else if (s === 'run') resume(); });
   return ctx;
 }

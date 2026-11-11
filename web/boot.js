@@ -6,15 +6,17 @@ let pending = [], allLog = [];       // allLog: the whole session, for the F10 d
 const duelBox = Object.assign(document.createElement('div'), { style: 'position:fixed;left:50%;top:14%;transform:translateX(-50%);padding:6px 16px;background:rgba(0,0,0,.72);color:#ffc24a;font:bold 20px system-ui;border-radius:6px;pointer-events:none;display:none;z-index:9' });
 const duelSay = s => { const m = /DUEL (\S+) (start|won|lost)/.exec(s); if (!m) return; if (!duelBox.isConnected) document.body.appendChild(duelBox); duelBox.textContent = { start: `Duelo con ${m[1]}`, won: `${m[1]} te ganó`, lost: `Le ganaste a ${m[1]}` }[m[2]]; duelBox.style.display = ''; clearTimeout(duelSay.t); duelSay.t = setTimeout(() => duelBox.style.display = 'none', 3500); };
 const keep = s => { pending.push(s); allLog.push(s); if (s.includes('DUEL ')) duelSay(s); };
+let logUp = true;                    // tools/serve.py answers /log; a plain web host does not, and then nothing is sent
 function flush() {
   if (!pending.length) return;
+  if (!logUp) { pending = []; return; }
   const body = pending.join('\n') + '\n';
   pending = [];
   // keepalive (the batch still goes out if the page is closing) caps the body at 64 KB: a bigger batch was dropped whole,
   // silently (518 pack errors in one second took the race HUD line with them and the run looked hung, build/bench/g_cas).
   fetch('/log', { method: 'POST', body, keepalive: body.length < 60000 }).catch(() => {});
 }
-fetch('/log?new', { method: 'POST', body: `page ${location.href} ${new Date().toISOString()}\n` }).catch(() => {});
+fetch('/log?new', { method: 'POST', body: `page ${location.href} ${new Date().toISOString()}\n` }).then(r => { logUp = r.ok; }, () => { logUp = false; });
 setInterval(flush, 1000);
 const secs = () => ((performance.now() - t0) / 1000).toFixed(2);
 addEventListener('keydown', e => { if (!e.repeat) keep(`${secs()} key down ${e.code}`); }, true);
@@ -32,13 +34,34 @@ function line(s, cls) {
   else if (/^  \S+!/.test(s)) d.className = 'api';
   d.textContent = s;
   log.appendChild(d);
-  // A 'stop' line (missing WebGPU, COOP/COEP, a lost GPU) opens the panel: otherwise the page is a black screen.
-  if (cls === 'stop' || /^STOP/.test(s)) { document.body.classList.add('dbg'); status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; }
+  // A 'stop' line (missing WebGPU, COOP/COEP, a lost GPU) ends the session: the gate says why (web/app.js), F2 opens this log.
+  if (cls === 'stop' || /^STOP/.test(s)) { status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; RN_APP.set('stop', s); }
+  // ?fast=1: the game is up when its main menu shows (the launcher's curtain lifts then); otherwise at the first present (below).
+  else if (FAST && !up && /flow fe .*MU_Main_PC\.fng/.test(s)) { up = true; RN_APP.set('run'); }
+}
+const FAST = RN_Q.get('fast') === '1';
+let up = false;
+RN_APP.on((s, from) => keep(`${secs()} app: ${from} -> ${s}`));
+// A download whose bytes are counted on the gate. Compressed transfers have no usable total, so it shows megabytes.
+async function download(url, what) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`descarga de ${url}: HTTP ${r.status}`);
+  let n = 0, mb = -1;
+  const count = new TransformStream({ transform(c, ctl) {
+    n += c.byteLength;
+    if (n >> 20 !== mb) { mb = n >> 20; if (RN_APP.state === 'load') RN_APP.say(`${what} ${mb} MB`); }
+    ctl.enqueue(c);
+  } });
+  return new Response(r.body.pipeThrough(count), { headers: { 'Content-Type': r.headers.get('Content-Type') || 'application/octet-stream' } });
 }
 (async () => {
+  // check: what the game cannot run without, before any download (the wasm is 70 MB).
+  if (!crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
+  if (!navigator.gpu) { line('gpu.js: WebGPU no disponible en este navegador', 'stop'); return; }
+  if (!await navigator.gpu.requestAdapter().catch(() => null)) { line('gpu.js: WebGPU: sin adaptador', 'stop'); return; }
+  RN_APP.set('load');
   if (window.RN_HOLD) await window.RN_HOLD;       // ?fast=1: scene B draws first (web/index.html)
-  if (!crossOriginIsolated) { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
-  const exe = new Uint8Array(await (await fetch('pc/Speed.exe')).arrayBuffer());
+  const exe = new Uint8Array(await (await download('pc/Speed.exe', 'Descargando')).arrayBuffer());
   // Game files are read on demand by the game thread (host/files.c), not loaded here.
   // F-Max: in Remaster the pedestrian is Max Payne when the local Max build answers on /mp/ (tools/serve.py); ?max=0 keeps
   // F-Speed's debug box. Original never loads it.
@@ -48,17 +71,26 @@ function line(s, cls) {
     arguments: ['/pc/Speed.exe', '/game'],
     print: s => line(s), printErr: s => line(s, 'dim'),
     onAbort: what => line('STOP wasm abort: ' + what),
+    // The 70 MB module compiles while it downloads, as Emscripten's own loader does, with the bytes counted on the gate.
+    instantiateWasm: (imports, done) => {
+      download('out/speed.wasm', 'Descargando').then(r => WebAssembly.instantiateStreaming(r, imports))
+        .then(w => { RN_APP.say('Arrancando…'); done(w.instance, w.module); }, e => line('STOP wasm: ' + e.message));
+      return {};
+    },
     preRun: [m => {
       m.FS.mkdir('/pc'); m.FS.writeFile('/pc/Speed.exe', exe);
       if (maxChar) m.ENV.RN_MAXCHAR = '1';   // host/mc.c mc_draw_actor: no debug box, Max is drawn by web/maxpayne/
       // The game draws at the pixels of this window (PATCH 0x408760), at most 2560x1440 to keep the GPU load sane.
-      const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || (matchMedia('(pointer: coarse)').matches ? 1280 : 2560)), k = Math.min(1, BB / (innerWidth * dpr), BB * 9 / 16 / (innerHeight * dpr));
+      // A phone opened upright still gets a landscape back buffer (the game waits behind the upright gate, web/app.js): the
+      // size is fixed here for the whole session.
+      const turned = RN_APP.coarse && innerHeight > innerWidth, vw = turned ? innerHeight : innerWidth, vh = turned ? innerWidth : innerHeight;
+      const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || (RN_APP.coarse ? 1280 : 2560)), k = Math.min(1, BB / (vw * dpr), BB * 9 / 16 / (vh * dpr));
       // Phones and tablets (coarse pointer): 1280 wide; an iPhone tab at 2560 was killed by iOS after 20-40 s (memory, likely).
       // Even sizes: the layer keeps width and height even (host/win32.c). At k = 1 the canvas gets exactly
       // back buffer / dpr CSS pixels, centred, so one back-buffer pixel is one device pixel; k < 1: Chrome scales it up.
-      const bw = 2 * Math.floor(innerWidth * dpr * k / 2), bh = 2 * Math.floor(innerHeight * dpr * k / 2);
+      const bw = 2 * Math.floor(vw * dpr * k / 2), bh = 2 * Math.floor(vh * dpr * k / 2);
       m.ENV.RN_SCREEN = `${bw}x${bh}`;
-      if (k === 1) Object.assign(document.getElementById('screen').style, { width: `${bw / dpr}px`, height: `${bh / dpr}px`, margin: 'auto' });
+      if (k === 1 && !turned) Object.assign(document.getElementById('screen').style, { width: `${bw / dpr}px`, height: `${bh / dpr}px`, margin: 'auto' });
       line(`screen: window ${innerWidth}x${innerHeight} css, dpr ${dpr}, k ${k.toFixed(3)}, back buffer ${m.ENV.RN_SCREEN}`);
       // web/mode.js: the original mode turns the native bridges off too (?env= still wins)
       if (RN_MODE === 'original') Object.assign(m.ENV, RN_ORIGINAL_ENV);
@@ -146,11 +178,10 @@ function line(s, cls) {
   if (maxChar)
     import('./maxpayne/boot.js').then(m => m.start(M, s => line(s))).catch(e => line('[F-Max] STOP ' + e.message, 'stop'));
   const telem = startTelemetry(M, t0, s => line(s), allLog);
-  startGpu(M, document.getElementById('screen'), s => line(s, 'api'), telem?.frame).catch(e => line('gpu.js: ' + e.message, 'stop'));
+  const onFrame = (s, t, ms) => { if (s.present && !up && !FAST) { up = true; RN_APP.set('run'); } telem?.frame?.(s, t, ms); };
+  startGpu(M, document.getElementById('screen'), s => line(s, 'api'), onFrame).catch(e => line('gpu.js: ' + e.message, 'stop'));
   // RN_STEERLOG (host/input.c): also each key at the page and each present's GPU completion, on the page's clock
   const input = startInput(M, document.getElementById('screen'), /RN_STEERLOG/.test(location.search) ? s => line(s) : null);
-  startVoxelInput(M, document.getElementById('screen'));
-  startVoxelHud(M);
   startPad(input);                          // web/pad.js: a gamepad into the same ring
   startTouch(input);                        // web/touch.js: the touch overlay (coarse pointer or ?touch=1) into the same ring
   startTune(M);

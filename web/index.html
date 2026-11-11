@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>NFSU</title>
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<title>Need for Speed Underground</title>
+<link rel="icon" href="data:,">
 <style>
   :root { --bg: #0b0d10; --fg: #c9d1d9; --dim: #6e7681; --ok: #3fb950; --stop: #f85149; --api: #79c0ff; }
   html, body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.45 ui-monospace, Menlo, monospace; }
@@ -42,10 +45,8 @@
 if (!location.search) { const q = RN_LAUNCH.query(RN_LAUNCH.load()).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&'); if (q && localStorage.getItem('rn_launch')) location.replace('/?' + q); }
 </script>
 <script src="mode.js"></script>
+<script src="app.js"></script>
 <script src="gpu.js"></script>
-<script src="voxel/voxel.js"></script>
-<script src="voxel/input.js"></script>
-<script src="voxel/hud.js"></script>
 <script src="input.js"></script>
 <script src="binds.js"></script>
 <script src="pad.js"></script>
@@ -61,40 +62,23 @@ if (bridgeTo !== null) window.rnBridge = q => { location.href = (bridgeTo && bri
 <script src="out/speed.js"></script>
 <script>
 // ?fast=1&go=1 (the launcher's "Jugar"): the launcher's 3D scene (web/launcher_b/?curtain=1, frozen at the end of its push-in) covers the game while it boots
-// (no intro movies or splash, PATCH 0x4de395; the game's own Accept loads the profile, web/boot.js). It is only a loading curtain: it lifts by itself with a 250 ms fade
-// once the game reports its main menu (the "flow fe ...MU_Main_PC.fng" log line), and on a STOP or JS error. Opened without go=1 (set at the top of this page) it never gets here.
+// (no intro movies or splash, PATCH 0x4de395; the game's own Accept loads the profile, web/boot.js). It is only a loading curtain: it fades out in 250 ms
+// when RN_APP leaves 'load' (web/app.js: the main menu is up, or a stop that must show). Opened without go=1 (set at the top of this page) it never gets here.
 if (RN_Q.get('fast') === '1') {
   const css = document.createElement('style');
   css.textContent = `#ab { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 12; background: #05080d; pointer-events: none; transition: opacity .25s ease; }
-    #ab-msg { position: fixed; left: 0; right: 0; bottom: 7vh; z-index: 13; text-align: center; font: italic 700 clamp(14px, 1.5vw, 20px) "Avenir Next Condensed", "DIN Condensed", "Bahnschrift", "Roboto Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-      letter-spacing: .2em; text-transform: uppercase; color: #b9c3ec; text-shadow: 0 0 .9em rgba(255,47,168,.45), 0 2px 8px #000; pointer-events: none; transition: opacity .25s ease; }
-    @media (prefers-reduced-motion: reduce) { #ab, #ab-msg { transition: none; } }`;
+    @media (prefers-reduced-motion: reduce) { #ab { transition: none; } }`;
   document.head.appendChild(css);
-  const ab = Object.assign(document.createElement('iframe'), { id: 'ab', src: '/launcher_b/?curtain=1', tabIndex: -1 }), msg = Object.assign(document.createElement('div'), { id: 'ab-msg', textContent: 'Cargando\u2026' });
-  document.body.append(ab, msg);
-  let ready = false, gone = false;
+  const ab = Object.assign(document.createElement('iframe'), { id: 'ab', src: '/launcher_b/?curtain=1', tabIndex: -1 });
+  document.body.append(ab);
   // The WASM boot waits (web/boot.js awaits RN_HOLD) until the scene has drawn its first frame (RN_B.ready, same origin) or 1.5 s: the game's boot would starve it (GPU, main thread).
   const t0b = performance.now();
   window.RN_HOLD = new Promise(res => { const f = () => { if (ab.contentWindow?.RN_B?.ready || performance.now() - t0b > 1500) { window.RN_AB_MS = Math.round(performance.now() - t0b); res(); } else setTimeout(f, 40); }; f(); });
-  // The click on "Jugar" was on the previous same-origin page, so the browser usually carries the audio unlock over; resume() at the lift and on the first key or pointer covers the case it does not
-  // (web/audio.js keeps its context in RN_ACTX and resumes it itself if the key came before it existed).
-  const lift = () => {
-    if (gone) return; gone = true; window.RN_ACTX?.resume(); ab.style.opacity = msg.style.opacity = '0';
-    setTimeout(() => { ab.remove(); msg.remove(); document.getElementById('screen').focus(); }, 260);
-  };
-  new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) {
-    const t = n.textContent || '';
-    if (/flow fe .*MU_Main_PC\.fng/.test(t)) { ready = true; lift(); }
-    else if (/^STOP|^JS |abort|Aborted/.test(t)) lift();       // an error must show, not hide behind the scene
-  } }).observe(document.getElementById('log'), { childList: true });
-  // while the curtain is up the game gets no keys (F keys and K stay)
-  addEventListener('keydown', e => {
-    if (gone || /^F\d+$/.test(e.code) || e.code === 'KeyK') return;
-    e.preventDefault(); e.stopPropagation(); window.RN_ACTX?.resume();
-  }, true);
-  addEventListener('keyup', e => { if (!gone && !/^F\d+$/.test(e.code) && e.code !== 'KeyK') { e.preventDefault(); e.stopPropagation(); } }, true);
-  addEventListener('pointerdown', e => { if (!gone && !e.target.closest('#ov, #ov-btn')) { e.preventDefault(); e.stopPropagation(); window.RN_ACTX?.resume(); } }, true);
-  window.RN_AB = { get ready() { return ready; }, lift };
+  RN_APP.on(s => {
+    if (s === 'load' || !ab.isConnected || ab.style.opacity === '0') return;
+    ab.style.opacity = '0';
+    setTimeout(() => { ab.remove(); document.getElementById('screen').focus(); }, 260);
+  });
 }
 </script>
 <script src="boot.js"></script>

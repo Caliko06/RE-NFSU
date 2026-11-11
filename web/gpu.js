@@ -4,7 +4,7 @@
 'use strict';
 const GPU_TARGET = 1, GPU_CLEAR = 2, GPU_PRESENT = 3, GPU_DRAW = 4, GPU_SHADER = 5, GPU_DECL = 6, GPU_TEXTURE = 7,
   GPU_TEXDATA = 8, GPU_TEXKEY = 9, GPU_CUBE = 10, GPU_FXAA = 11, GPU_SKIN = 12,
-  GPU_BUFFER = 13, GPU_BUFDATA = 14, GPU_LIVERY = 15, GPU_VOXEL = 16;
+  GPU_BUFFER = 13, GPU_BUFDATA = 14, GPU_LIVERY = 15;
 const D_TOPO = 0, D_NVERT = 1, D_NIDX = 2, D_STRIDE = 3, D_VS = 4, D_PS = 5, D_DECL = 6, D_RT = 7, D_DS = 8, D_VP = 9,
   D_SC = 15, D_ZEN = 19, D_ZWRITE = 20, D_ZFUNC = 21, D_CULL = 22, D_BLEND = 23, D_SRCB = 24, D_DSTB = 25, D_BOP = 26,
   D_SEPA = 27, D_SRCBA = 28, D_DSTBA = 29, D_BOPA = 30, D_BFACTOR = 31, D_CWRITE = 32, D_AFUNC = 33, D_AREF = 34,
@@ -615,8 +615,7 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
   const colorAtt = rt => rt.msView ? { view: rt.msView, resolveTarget: rt.view, loadOp: 'load', storeOp: 'store' }
     : { view: rt.view, loadOp: 'load', storeOp: 'store' };
   const IN_CL = [];      // commands that open, close or clear passes
-  for (const op of [GPU_TARGET, GPU_CLEAR, GPU_DRAW, GPU_VOXEL, GPU_FXAA, GPU_PRESENT]) IN_CL[op] = true;
-  let voxelWarned = false;
+  for (const op of [GPU_TARGET, GPU_CLEAR, GPU_DRAW, GPU_FXAA, GPU_PRESENT]) IN_CL[op] = true;
   const cl = [];
   const clearPipes = new Map();
   function clearPipe(hasColor, hasDepth, flags, sc) {
@@ -1074,7 +1073,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
-        else if (op === GPU_VOXEL) { if ((asp === 0 && id === sceneRt) || (asp === 1 && id === sceneDs)) return true; }
         else if (op === GPU_FXAA) { if (window.MaxChar?.enabled || (asp && RN_PS.on && res.get(id)?.w >= 1000)) return true; }   // psblur reads the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
@@ -1290,12 +1288,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         if (!rvb) { voff += (vbytes + 3) & ~3; ioff += 4 * ni; }
         uoff += U_STEP;
         stats.draws++;
-      } else if (op === GPU_VOXEL) {
-        endPass();
-        if (window.rnVoxel && sceneRt && sceneDs) {
-          try { window.rnVoxel.draw(device, enc, res.get(sceneRt), res.get(sceneDs), f32, a, M); }
-          catch (e) { if (!voxelWarned) { voxelWarned = true; console.warn('voxel draw:', e); } }
-        }
       } else if (op === GPU_FXAA) {
         if (PROF) {   // the draws on this target after the scene, and how many of them test or write depth
           let n = 0, z = 0;
@@ -1422,8 +1414,13 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   const ch = new MessageChannel(), yields = [];
   ch.port1.onmessage = () => yields.shift()?.();
   const yieldTask = () => new Promise(f => { yields.push(f); ch.port2.postMessage(0); });
+  // RN_APP 'paused' (web/app.js: hidden page, phone upright): no frame runs, so the game thread waits in Present
+  // (host/gpu.c gpu_wait) until the page is back; the same wait ?hold=N uses.
+  let held = null, letGo = null;
+  RN_APP.on(s => { if (s === 'paused') held ||= new Promise(f => letGo = f); else if (held) { letGo(); held = null; } });
   async function pump() {
     for (;;) {
+      if (held) { await held; continue; }
       if (WD) WD[2]++;
       if (!tick()) return;
       if (hold && presents >= hold) { await new Promise(f => setTimeout(f, 100)); continue; }
