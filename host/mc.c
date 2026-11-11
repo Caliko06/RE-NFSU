@@ -3,7 +3,6 @@
 // One world frame: Speed.exe metres, z up; the pedestrian's height is the game's own ground query 0x440a40 on a private cache.
 #include "host.h"
 #include "mc.h"
-#include "voxel.h"
 #include <math.h>
 #include <string.h>
 
@@ -138,13 +137,7 @@ static void walk(Ctx *c, float dt) {
     if (hit && z - h < 0.3f && rn_mc.vel[2] <= 0) z = h, rn_mc.vel[2] = 0;          // on the ground (or a step down)
     else { rn_mc.vel[2] -= 9.8f * dt; z += rn_mc.vel[2] * dt; if (hit && z < h) z = h, rn_mc.vel[2] = 0; }
     rn_mc.on_ground = hit && z - h < 0.05f;
-    // Blocks (host/voxel.c): clip this step's move of a 0.6 x 0.6 x 1.8 m box; a block under the feet is ground.
-    float d[3] = {x - rn_mc.pos[0], y - rn_mc.pos[1], z - rn_mc.pos[2]};
-    float lo[3] = {rn_mc.pos[0] - 0.3f, rn_mc.pos[1] - 0.3f, rn_mc.pos[2] + 0.05f}, hi[3] = {lo[0] + 0.6f, lo[1] + 0.6f, rn_mc.pos[2] + 1.8f};
-    int falling = d[2] < 0, blocked = vox_sweep(lo, hi, d);
-    if (blocked & 3) rn_mc.vel[0] = d[0] / dt, rn_mc.vel[1] = d[1] / dt;
-    if (blocked & 4) { rn_mc.vel[2] = 0; if (falling) rn_mc.on_ground = 1; }
-    rn_mc.pos[0] += d[0], rn_mc.pos[1] += d[1], rn_mc.pos[2] += d[2];
+    rn_mc.pos[0] = x, rn_mc.pos[1] = y, rn_mc.pos[2] = z;
 }
 
 void mc_frame(Ctx *c) {
