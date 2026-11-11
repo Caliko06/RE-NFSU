@@ -137,7 +137,7 @@ static uint32_t free_setup(Ctx *c) {
     if (on > 0 && ld(c, 0x777cc8, 4) == 3 && !c->mem[0x78a347]) {
         if (!names) names = guest_alloc(16 * NRIV_MAX);
         const char *fr = getenv("RN_FREERIV");
-        nriv = fr ? atoi(fr) : world_ai(c) ? 8 : 6;
+        nriv = fr ? atoi(fr) : 6;                   // WORLD too (OWNER 2026-11-11: 8 rivals + 40 cars was too much)
         nriv = nriv < 0 ? 0 : nriv > NRIV_MAX ? NRIV_MAX : nriv;
         uint32_t tab = ld(c, 0x78a418, 4), n = ld(c, 0x78a41c, 4);
         for (uint32_t i = 0; i < n; i++)                          // the player leads the grid (0x422a70 slot 1 = the front)
@@ -163,7 +163,7 @@ static uint32_t free_setup(Ctx *c) {
     c->r[ESI] = ld(c, 0x78a2f0, 4);                               // 0x441fe0 reads its argument in esi
     uint32_t ti = call_guest(c, 0x441fe0, 0, NULL), cnt = ti + ld(c, 0x78a2fc, 4) + ld(c, 0x78a300, 4) * 2 + 0xc0;
     int8_t keep = (int8_t)c->mem[cnt];
-    int base = getenv("RN_FREETRAFFIC") ? atoi(getenv("RN_FREETRAFFIC")) : world_ai(c) ? 27 : FREE_TRAFFIC;   // WORLD: 27 x1.5 = 40 (ghosts 300 s: near100 median 8 -> 16; 48 and 54 stable but more spikes)
+    int base = getenv("RN_FREETRAFFIC") ? atoi(getenv("RN_FREETRAFFIC")) : FREE_TRAFFIC;   // WORLD too: 13 x1.5 = 19 cars (OWNER 2026-11-11; was 27 = 40)
     if (live && base > 0) c->mem[cnt] = (int8_t)base;
     if (getenv("RN_FREELOG")) rn_log("FREE traffic asked: trackinfo count %d -> %d (x1.5, at most 55)", keep, (int8_t)c->mem[cnt]);
     uint32_t r = call_guest(c, 0x4b3ac0, 0, NULL);
