@@ -8,7 +8,7 @@
   // THE placement (one line to change): UG2 world units -> NFSU1 world (metres, z up, same units, no axis swap): p' = Rz(yaw) * p + (tx, ty, tz).
   // OWNER 2026-11-10, docs/re/ug2_bridge.md rank 1: rotate R270 (x,y)->(y,-x) = yaw -pi/2 (column0 (0,-1), column1 (1,0)), then t.
   // Same constant as the collision writer (slice/ug2coll); keeps every vertex inside the +-4096 collision range (s16/8 rows).
-  const PLACE = { tx: -1287.4, ty: 812.2, tz: -6.2, yaw: -Math.PI / 2 };
+  const PLACE = { tx: -1287.375, ty: 812.25, tz: -6.203125, yaw: -Math.PI / 2 };   // quantized as in the collision file (tools/ug2_collfile.py)
   const FAR = 6000;            // this pass only: the game's far plane would clip a city this big (the depth test still matches: n << f)
   const FOG = [0.035, 0.045, 0.085], FOG_DENSITY = 1 / 900;   // night haze, exp2 fog
 
