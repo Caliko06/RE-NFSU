@@ -1,5 +1,7 @@
 # UG2 world shading: how SPEED2.EXE v1.2 combines colour, fog and material (facts for the browser pass)
 
+REFERENCE ONLY (OWNER 2026-11-10): UG2 sky, fog and look are rejected (plan.json `rejected`); the UG2 city is drawn under NFSU1's sky. The open items here are not tasks.
+
 Exe = pc/ug2/SPEED2.EXE (md5 59b7d600...), VA = file offset + 0x400000 in .text. Shaders are NOT compiled blobs hidden in code: they are 23 D3DX9 effect files (`0xFEFF0901`, compiler "D3DX9 5.04.00.2904", vs_1_1 / ps_1_1) stored as RCDATA resources named `IDI_*_FX` in .rsrc (file 0x41d000). Extracted with a throw-away PE resource walker and disassembled with a small vs/ps 1.x disassembler (not committed; every listing below is quoted). "Res file off" = byte offset inside SPEED2.EXE; resource VA = file + 0x49f000. Marks: FACT = read from exe bytes or code, INFERENCE = consistent reading, UNKNOWN = not found.
 
 ## 1. Which effect draws a scenery group

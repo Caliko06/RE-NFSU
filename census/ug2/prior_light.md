@@ -1,5 +1,7 @@
 # UG2 world lighting and sky: prior art (2026-11-10)
 
+REFERENCE ONLY (OWNER 2026-11-10): UG2 sky, fog and look are rejected (plan.json `rejected`); the UG2 city is drawn under NFSU1's sky. The open items here are not tasks.
+
 Sources: the real files in this repo, OpenUG2 (MIT, UG2 engine reimplementation), MWEncyclopedia (TsyVM, **Most Wanted 2005**, not UG2). Marks: [F] proven here, [O] OpenUG2 code, [M] MW chapter, [U] unverified.
 
 | Topic | Fact | Source |
