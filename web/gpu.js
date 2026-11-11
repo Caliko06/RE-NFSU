@@ -1055,7 +1055,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       uBindBuf = ubuf;
     }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
+    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0, ug2Done = false;
     // What the current draw pass already holds (WebGPU keeps state for the whole pass): a draw sets only what changes,
     // and payload draws keep one binding of the frame's vertex/index buffers, addressed by first vertex/index.
     let stPass = null, stPipe, stBg1, stVp = '', stSc = '', stBf = -1, stVb, stVo = -1, stIb, stIf = '';
@@ -1205,6 +1205,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
         const key = `${g(D_RT)}/${g(D_DS)}`;
         if (ds && g(D_ZEN) && (ds.w >= 1000 || window.MaxChar?.enabled) && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
+        // NFSU2 city at the end of the 3D scene: the first draw that leaves the scene target. GPU_FXAA comes at the first HUD quad, which
+        // with the bumper camera (POV 2) is after the game has already copied the scene to the back buffer (636 -> 3), so a pass there
+        // was never shown (the sky-only frames, ?gpuprof=1 pass list 2026-11-10).
+        else if (sceneRt && !ug2Done && g(D_RT) !== sceneRt) { ug2Done = true; endPass(); window.Ug2?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs), tsw); }
         if (key !== passKey) {
           const fold = pend && (!(pend.mask & 1) || pend.rt === g(D_RT)) && (!(pend.mask & 6) || pend.ds === g(D_DS));
           endPass(fold);
@@ -1301,7 +1305,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(w[a]);
         // F-Max
         window.MaxChar?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs));
-        window.Ug2?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs), tsw);   // NFSU2 city (web/ug2/ug2world.js)
+        if (!ug2Done) { ug2Done = true; window.Ug2?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs), tsw); }   // NFSU2 city (web/ug2/ug2world.js), if the scene was last
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }

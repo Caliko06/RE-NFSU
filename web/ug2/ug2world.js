@@ -17,8 +17,9 @@
 
   // UG2's world pixel shader, IDI_WORLD_FX in SPEED2.EXE (PE resource at file offset 0x420d70, ps_1_1 at +0x222c):
   //   tex t0; mul r0, t0, v0; add r0.xyz, r0, r0   = texture x vertex colour x 2 (alpha = texture a x vertex a), no lighting.
-  // Its vertex shader passes the colour as is (mov oD0, v1) and uv + TextureOffset (add oT0, v2, c7). Its linear fog (oFog from
-  // c8 = FogValue) has runtime values not read yet: no fog here (UNKNOWN).
+  // Its vertex shader passes the colour as is (mov oD0, v1) and uv + TextureOffset (add oT0, v2, c7). No fog and no UG2 sky here:
+  // the city sits in NFSU1's world look (OWNER 2026-11-10), and NFSU1 PC draws no fog (its only FOGENABLE write is 0 at 0x408bb0,
+  // docs/re/render_pc.md); the sky is NFSU1's own. UG2's fog tables are reference only (census/ug2/light.md).
   const shader = `
 struct U { view: mat4x4<f32>, proj: mat4x4<f32>, model: mat4x4<f32> };
 @group(0) @binding(0) var<uniform> u: U;
