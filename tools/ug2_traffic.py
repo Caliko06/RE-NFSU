@@ -17,7 +17,7 @@ Built (every field says what proves it; sources in census/ug2/roads.md sections 
              faults at 0x462a06 otherwise) ahead of the source along its heading for that direction (d=0 +0xc/+0x10, d=1 +0x14/+0x18). A source
              that fails is moved back up to 3 nodes (citygraph.py:802-813), hop <= 50 m. Pairs whose ends run against each other
              (the global walk direction cannot follow them) get no entry that passes the test and are dropped, counted in the report.
-  types    : citygraph.py:742-747: the last way out of a section is type 2 / lane 2 (always taken), the others 0 / 7. The anchor link is 2 / 2.
+  types    : citygraph.py:742-747: the last way out of a section is type 2 / lane 2 (always taken), the others 0 / 7. The connector's fork entries (28:2 -> connector, 230:24 -> connector) are 0 / 7, its ends 2 / 2.
   templates: header = live section 0 (the NFSU1 section whose nodes all carry traffic lanes), node = the live section 0 node with default
              widths nearest to that section's median; see TEMPLATE_* below. Lanes: only traffic lane 11 and 17 (offset 1.8 m right of the driver).
 usage: python3 tools/ug2_traffic.py [--check]   (--check: read build/openworld/TRACKB1010.lzc and run the static check)"""
@@ -47,6 +47,9 @@ MASK = sum(1 << b for _, b in MAP_BITS) | (0x1f << 20)
 TEMPLATE_SEC = 0              # live section: all 98 nodes carry the traffic lanes 11..13 / 17..19, hdr[0x265+k] set for them
 LANES = (11, 17)              # traffic lanes kept on the new nodes (offset 1.8 m, right of the driver)
 UNUSED_LANES = (12, 13, 18, 19)
+# lane speed in m/s = byte [node + 0x6a + lane] (0x5a7690 reads it at 0x5a76d2, docs/re/ai_traffic_speed.md), NOT a width. The template node's 11 / 17 bytes are 6:
+# a slow driver did 3.5 m/s and a convoy formed behind it (TRAFUG2 run 2026-11-11). 20 = the most common value of lanes 11 and 17 on the anchor section 28 (55 / 38 of 360 nodes)
+LANE_SPEED = 20
 
 
 def parse(d):
@@ -273,13 +276,18 @@ def apply(base, rows):
     # ---- entries and slots
     ent = list(ent0)
     slot = collections.defaultdict(list)       # node -> entry indexes
-    for u, v, ty, lane, s0, s1 in links:
+    # the connector's two mid-section sources are forks, not the last way out of their section (citygraph.py:742-747 rule): NFSU1 28:2 (28 runs on to
+    # 28:359) and UG2 230:24 (230 runs on east). Type 2 is always taken (0x462840) and at a bit-25 node at once (0x456553), so 2/2 there sent every
+    # car on 28 southbound onto the bridge (TRAFUG2 5 min run 2026-11-11: 0 cars on 28 south of the junction). The connector's own ends stay 2/2.
+    fork = {(len(links) - 2, 0), (len(links) - 1, 1)}
+    for k, (u, v, ty, lane, s0, s1) in enumerate(links):
         for src, dst, d in ((s0, v, 0), (s1, u, 1)):
             if src is None:
                 continue
             e = bytearray(32)
             struct.pack_into('<fHH', e, 0, 0.0, dst[1], src[1])
-            e[8], e[9], e[0xa], e[0xb], e[0xc], e[0xd] = 0, dst[0], src[0], ty, lane, d
+            t = (0, 7) if (k, d) in fork else (ty, lane)
+            e[8], e[9], e[0xa], e[0xb], e[0xc], e[0xd] = 0, dst[0], src[0], t[0], t[1], d
             struct.pack_into('<IiII', e, 0x10, 0, -1, 0, 0)
             slot[src].append(len(ent))
             ent.append(bytes(e))
@@ -327,6 +335,8 @@ def apply(base, rows):
         for kk in UNUSED_LANES:
             struct.pack_into('<h', nd, 0x3c + 2 * kk, -1)
             nd[0x6a + kk] = 6
+        for kk in LANES:
+            nd[0x6a + kk] = LANE_SPEED
         nd[0x81] = nd[0x82] = 0xff
         for j, ei in enumerate(slot.get(k, ())):
             nd[0x81 + j] = ei
