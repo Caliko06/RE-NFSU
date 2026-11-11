@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ug2_world.py: NFS Underground 2 city scenery -> one world-space triangle mesh (web/ug2/city.bin).
 
-usage: python3 -I tools/ug2_world.py [TRACKS_DIR]     (numpy; ~1-2 min; writes web/ug2/city.bin, city_lod.bin, prints stats)
+usage: python3 -I tools/ug2_world.py [TRACKS_DIR]  (reads STREAML4RA.BUN only)     (numpy; ~1-2 min; writes web/ug2/city.bin, city_lod.bin, prints stats)
 Layouts (docs in census/ug2/world.md; same engine as NFSU1, see docs/openworld/re_mesh.md and tools/openworld/mesh.py):
   chunk = u32 id, u32 size, payload; id bit 31 = container. Payload start = (chunk + 0x17) & ~0xf (file has 0x11 filler).
   0x80134010 solid > 0x134011 (u32 hash @0x10, bbox f32 @0x20/@0x30, name @0xa4) and 0x80134100 > 0x134900 (mesh header),
@@ -9,7 +9,7 @@ Layouts (docs in census/ug2/world.md; same engine as NFSU1, see docs/openworld/r
   0x80034100 section > 0x34102 defs (68 B: name[32], solid hash @32 = LOD0, @36 = LOD1), 0x34103 instances (64 B:
   f32 bbox min/max @0, u16 def @24, u16 flags @26, f32 pos @32, s16 3x3 @44 / 8192; world = local * R + pos, row vectors).
 Output web/ug2/city.bin: 'UG2M', u32 nverts, u32 nidx, u32 0, nverts x (f32 x,y,z, u8 r,g,b,a), nidx x u32. Raw UG2 world units."""
-import glob, os, struct, sys
+import os, struct, sys
 import numpy as np
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
@@ -18,6 +18,11 @@ OUT = os.path.join(REPO, 'web', 'ug2')
 SKIP = ('SKYDOME', 'PAN_', 'XO_VISTA')  # sky dome, far panorama backdrops (km away, z -900..), vista spotlights
 LOD_CENTER = None  # set below from the city bbox when None
 LOD_TRIS = 800_000
+# Keep only scenery near the drivable city: an instance whose bbox centre (UG2 units) lies within REACH of a UG2 collision row
+# (build/ug2/coll_rows.bin, tools/ug2_coll.py). FACT 2026-11-10: the full scenery spans x -3967..6750, y -5119..4989 against the
+# collision's -3093..1898, -2079..3149 (backdrop walls up to z 1100); placed at R270+t, 18,745 of its vertices land on NFSU1 ground.
+COLL = os.path.join(REPO, 'build', 'ug2', 'coll_rows.bin')
+REACH, CELL = 160, 16
 
 
 def tree(d):
@@ -95,7 +100,9 @@ def scan(path):
 
 def main():
     tracks = sys.argv[1] if len(sys.argv) > 1 else TRACKS
-    files = sorted(glob.glob(os.path.join(tracks, 'STREAML4R?.BUN')))
+    # RA only: each STREAML4R?.BUN carries its own collision (0x80034130 sections: RA 255, RB 15, RC 24, RD 255, RF 16, RG 26,
+    # RH 4, RR 4), so they are separate tracks drawn in their own frames (RH, RR centred on the origin); the city collision is RA's.
+    files = [os.path.join(tracks, 'STREAML4RA.BUN')]
     data, sol, secs = [], {}, []
     for f in files:
         d, s, c = scan(f)
@@ -106,6 +113,18 @@ def main():
         secs += [(fi, defs, inst) for defs, inst in c]
         print(os.path.basename(f), 'solids', len(s), 'sections', len(c), flush=True)
     print('distinct solids', len(sol), 'sections', len(secs))
+
+    rows = np.frombuffer(open(COLL, 'rb').read(), np.uint8).reshape(-1, 32)
+    cx = (rows[:, 8:16].copy().view('<i2')[:, :3] / 8).mean(1)
+    cy = (rows[:, 16:24].copy().view('<i2')[:, :3] / 8).mean(1)
+    foot = np.zeros((16384 // CELL, 16384 // CELL), bool)
+    foot[((cx + 8192) // CELL).astype(int), ((cy + 8192) // CELL).astype(int)] = True
+    for _ in range(REACH // CELL):  # grow by REACH (4-neighbour steps)
+        g = foot.copy(); g[1:] |= foot[:-1]; g[:-1] |= foot[1:]; g[:, 1:] |= foot[:, :-1]; g[:, :-1] |= foot[:, 1:]; foot = g
+
+    def near(bb):
+        i, j = int((bb[0] + bb[3]) / 2 + 8192) // CELL, int((bb[1] + bb[4]) / 2 + 8192) // CELL
+        return 0 <= i < foot.shape[0] and 0 <= j < foot.shape[1] and foot[i, j]
 
     cache = {}
 
@@ -126,7 +145,7 @@ def main():
         return r
 
     V, C, I, T0, FI = [], [], [], [], []  # per instance chunks
-    seen, nv_tot, bad, miss, mism, skipped = set(), 0, 0, 0, 0, 0
+    seen, nv_tot, bad, miss, mism, skipped, far = set(), 0, 0, 0, 0, 0, 0
     center = []
     for fi, defs, inst in secs:
         for r in inst:
@@ -138,6 +157,9 @@ def main():
             hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
             if hh in sol and sol[hh]['name'].upper().startswith(SKIP):
                 skipped += 1
+                continue
+            if not near(struct.unpack_from('<6f', w, 0)):
+                far += 1
                 continue
             key = (hh, w[32:62])  # same solid, position and matrix = the same object (RD repeats most of RA)
             if key in seen:
@@ -167,7 +189,7 @@ def main():
             T0.append(len(ix))
             FI.append(fi)
             center.append(wp[used].mean(0))
-    print('instances', len(V), 'bad def', bad, 'unresolved solid', miss, 'skipped sky/panorama', skipped, 'bbox mismatch >2 m', mism)
+    print('instances', len(V), 'bad def', bad, 'unresolved solid', miss, 'skipped sky/panorama', skipped, 'beyond REACH of collision', far, 'bbox mismatch >2 m', mism)
     for fi in sorted(set(FI)):
         q = np.concatenate([V[k] for k in range(len(V)) if FI[k] == fi])
         print(os.path.basename(files[fi]), 'instances', FI.count(fi), 'bbox', q.min(0).round(0), q.max(0).round(0))

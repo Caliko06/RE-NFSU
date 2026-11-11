@@ -31,6 +31,46 @@ static int ci_eq(const char *a, const char *b, size_t n) {
     return 1;
 }
 
+// RN_SPAWN="x:y:z:yaw16" (web: ?env=RN_SPAWN=117.6:601.3:44:32768): once per race, 2 s after GO (rn_flow 0x604: the start 0x422eb0 has reset
+// the grid), the player's car is put at that NFSU1 point by the game's own reset-to-point 0x427e60 (ecx = car, edx = &pos, eax = yaw16,
+// 2 stack args 0), then the streamer's viewer is seeded with 0x444840 (eax 0, edx 0x77a980, ecx = &car pos), as the native test teleport
+// below does (tp_thread). Runs on the game's own context at Present (host/d3d9.c, next to free_tick), so it works in the web build.
+void world_spawn(Ctx *c) {
+    static float at[4];
+    static int n = -1;
+    static uint32_t race, go, buf, car, after;
+    if (n < 0) { const char *e = getenv("RN_SPAWN"); n = e ? sscanf(e, "%f:%f:%f:%f", &at[0], &at[1], &at[2], &at[3]) : 0; if (e && n < 3) rn_log("SPAWN: cannot read RN_SPAWN \"%s\" (x:y:z[:yaw16])", e); }
+    if (n < 3) return;
+    if (rn_new_race(&race)) go = 0, after = 0;
+    if (rn_flow != 0x604) return;
+    if (after && rn_telem.presents == after) {   // one line 20 s later: where the car went and its speed (car+0x1e0/+0x1e4)
+        rn_log("SPAWN +20 s: car at %.1f %.1f %.1f speed %.1f m/s", ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), hypotf(ldf(c, car + 0x1e0), ldf(c, car + 0x1e4)));
+        after = 0;
+    }
+    if (!go) go = rn_telem.presents;
+    if (go == ~0u || rn_telem.presents < go + 120) return;
+    go = ~0u;
+    car = 0;
+    uint32_t h = ld(c, 0x7361f8, 4);   // the player's node of the race list = the car (player_node below)
+    for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !car; r = ld(c, r, 4), k++) {
+        uint32_t e = ld(c, r + 0x14, 4);
+        if (e && e < GUEST_MEM - 16 && ld(c, e + 4, 4) == 1) car = r;
+    }
+    if (!car) { rn_log("SPAWN: no player car in the race list"); return; }
+    if (!buf) buf = guest_alloc(16);
+    stf(c, buf, at[0]); stf(c, buf + 4, at[1]); stf(c, buf + 8, at[2]);
+    uint32_t keep[7] = {c->r[EAX], c->r[EBX], c->r[ECX], c->r[EDX], c->r[ESI], c->r[EDI], c->r[EBP]}, ft = c->ftop, a[2] = {0, 0};
+    float was[3] = {ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68)};
+    c->r[ECX] = car; c->r[EDX] = buf; c->r[EAX] = n > 3 ? (uint32_t)(int32_t)at[3] : ld(c, car + 0x3b4, 2);
+    call_guest(c, 0x427e60, 2, a);
+    c->r[EAX] = 0; c->r[EDX] = 0x77a980; c->r[ECX] = car + 0x60;
+    call_guest(c, 0x444840, 0, NULL);
+    c->r[EAX] = keep[0], c->r[EBX] = keep[1], c->r[ECX] = keep[2], c->r[EDX] = keep[3], c->r[ESI] = keep[4], c->r[EDI] = keep[5], c->r[EBP] = keep[6], c->ftop = ft;
+    rn_log("SPAWN: car %08x %.1f %.1f %.1f -> %.1f %.1f %.1f (asked %.1f %.1f %.1f yaw %d) frame %u", car, was[0], was[1], was[2],
+           ldf(c, car + 0x60), ldf(c, car + 0x64), ldf(c, car + 0x68), at[0], at[1], at[2], n > 3 ? (int)at[3] : -1, rn_telem.presents);
+    after = rn_telem.presents + 1200;
+}
+
 #ifdef __EMSCRIPTEN__
 static void tp_start(void) {}     // the test teleport is native only
 #else

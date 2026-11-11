@@ -42,6 +42,7 @@ void traffic_tick(Ctx *c);
 void horn_tick(Ctx *c);          // host/horn.c, at each Present next to free_tick
 void rn_player_car(Ctx *c);   // RN_CAR: the player's car in a race (host/rivals.c)
 void free_tick(Ctx *c);          // host/free.c, at each Present
+void world_spawn(Ctx *c);        // host/openworld.c, at each Present: RN_SPAWN
 void lights_init(Ctx *c);   // host/lights.c
 #define LIGHTS_N 4          // other cars' headlights on the world (sm1.h SM1_HL_N, the free texcoords t4..t7)
 const float *lights_hl(Ctx *c);   // their projectors this frame: VS c16..c31 of the headlight world shaders

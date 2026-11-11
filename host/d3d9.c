@@ -1285,6 +1285,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     rng_log(c, dev.frames);
     flow_log(c);
     free_tick(c);
+    world_spawn(c);      // host/openworld.c: RN_SPAWN puts the car at a point after GO
     traffic_tick(c);
     ai_tel(c);           // host/aitel.c: AI telemetry lines for the F10 (RN_AILOG)
     horn_tick(c);        // host/horn.c: recycle stamps for the horn hook (RN_HORNLOG / RN_HORNFIX)
