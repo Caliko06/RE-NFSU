@@ -289,8 +289,8 @@ def walk(data, sol, secs, near, fixed):
     for fi, defs, inst in secs:
         for row in inst:
             w = row.tobytes()
-            di = struct.unpack_from('<H', w, 24)[0]
-            if di >= len(defs):
+            di, fl = struct.unpack_from('<HH', w, 24)
+            if di >= len(defs) or fl & W.HIDDEN:   # hidden scenery-group instances, as ug2_world.main
                 continue
             hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
             if hh in sol and sol[hh]['name'].upper().startswith(W.SKIP):

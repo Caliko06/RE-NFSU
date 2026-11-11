@@ -27,6 +27,12 @@ REACH, CELL = 160, 16
 # 36 B (xyz, normal @12, BGRA @24, uv @28) for 0x4180. Measured on STREAML4RA.BUN: vertex-buffer bytes / nv = 24.0 and 36.0
 # exactly (census/ug2/tex.md, slice/ug2tex 3e17901); the exe picks the shader object from the mask at 0x5c58cf..0x5c591b.
 STRIDE = {0x4180: (36, 24)}
+# Instance flags u16 @26 (exe +0x1a): 0x10 = hidden. The scenery groups (chunk 0x34108 in L4RA.BUN, loader 0x5db2e0: BARRIERS_<race>,
+# PLAYER_BARRIERS_<race>, BARRIERS_CAREER<n>, FREE_ROAM*) list entries of the override table 0x34107 (0x5df8c9; entry = s16 section,
+# s16 instance, u16 flags), and enabling a group (0x5710a0) clears 0x10, disabling (0x5710e0) sets it; 0x5db0e0 copies the flags to the
+# instance at +0x1a. The shipped instances carry 0x10 on 5,999 of them (XO_TRACKBARRIER*, shop beams, door pieces): the state with no
+# group enabled, which is the open city the OWNER drives (no race barriers, no career locks).
+HIDDEN = 0x10
 
 
 def tree(d):
@@ -150,14 +156,17 @@ def main():
         return r
 
     V, C, I, T0, FI = [], [], [], [], []  # per instance chunks
-    seen, nv_tot, bad, miss, mism, skipped, far = set(), 0, 0, 0, 0, 0, 0
+    seen, nv_tot, bad, miss, mism, skipped, far, hidden = set(), 0, 0, 0, 0, 0, 0, 0
     center = []
     for fi, defs, inst in secs:
         for r in inst:
             w = r.tobytes()
-            di = struct.unpack_from('<H', w, 24)[0]
+            di, fl = struct.unpack_from('<HH', w, 24)
             if di >= len(defs):
                 bad += 1
+                continue
+            if fl & HIDDEN:
+                hidden += 1
                 continue
             hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
             if hh in sol and sol[hh]['name'].upper().startswith(SKIP):
@@ -194,7 +203,7 @@ def main():
             T0.append(len(ix))
             FI.append(fi)
             center.append(wp[used].mean(0))
-    print('instances', len(V), 'bad def', bad, 'unresolved solid', miss, 'skipped sky/panorama', skipped, 'beyond REACH of collision', far, 'bbox mismatch >2 m', mism)
+    print('instances', len(V), 'bad def', bad, 'unresolved solid', miss, 'skipped sky/panorama', skipped, 'beyond REACH of collision', far, 'hidden (flag 0x10)', hidden, 'bbox mismatch >2 m', mism)
     for fi in sorted(set(FI)):
         q = np.concatenate([V[k] for k in range(len(V)) if FI[k] == fi])
         print(os.path.basename(files[fi]), 'instances', FI.count(fi), 'bbox', q.min(0).round(0), q.max(0).round(0))

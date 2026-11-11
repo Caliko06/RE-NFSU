@@ -1301,7 +1301,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(w[a]);
         // F-Max
         window.MaxChar?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs));
-        window.Ug2?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs));   // NFSU2 city (web/ug2/ug2world.js)
+        window.Ug2?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs), tsw);   // NFSU2 city (web/ug2/ug2world.js)
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }

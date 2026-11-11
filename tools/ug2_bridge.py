@@ -88,7 +88,7 @@ def apply(nf, uz, tx8, ty8, tz):
     poly = [(x, y, z) for x, (y, z) in sorted(g.items())]
     assert len(poly) == 4 and [round(p[0] / S, 1) for p in poly] == [105.2, 115.1, 125.1, 135.1], poly
     uw = [i for i, r in enumerate(uz) if D(r)['surf'] == 20 and D(r)['fl'] == 0x16 and inbox(D(r), 105, 134.5, 588, 593)]
-    assert uw == [30238, 30239, 30240], uw
+    assert len(uw) == 3, uw   # rows 30238..30240 before the barrier-group rows left coll_rows.bin (tools/ug2_coll.py)
     a, b, c = (D(uz[i]) for i in uw)
     assert a['xs'][2] < XW < a['xs'][3] or a['xs'][3] > XW > a['xs'][0]
     # wall line y at the opening edges, 1/8 grid
@@ -107,7 +107,7 @@ def apply(nf, uz, tx8, ty8, tz):
     east = dict(b); east['xs'] = [XE] * 4; east['ys'] = [ycap, ycap, yE, yE]              # heading north, road on its left (west), like 42876
     assert cap['xs'] == [XE, XE, XW, XW] and wW['ys'][:2] == [ycap, ycap]
     nf[42877] = pk(west)
-    uz[30238], uz[30239], uz[30240] = pk(a2), pk(east), pk(c2)
+    uz[uw[0]], uz[uw[1]], uz[uw[2]] = pk(a2), pk(east), pk(c2)
     # --- ground: columns on the 5 north-edge points; edge vertices on the UG2 south polyline
     V = []
     for x, z0 in P:

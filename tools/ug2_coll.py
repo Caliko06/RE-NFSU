@@ -6,6 +6,10 @@ UG2 keeps collision in 255 section chunks 0x80034130, each holding:
   0x34134 32 B rows: the SAME layout as NFSU1 wsrc 0x34132 (tools/openworld/polys.py, Speed.exe 0x43ff30),
           absolute world coordinates (x, y = s16/8; z = s16 base + s16/256, x4 when flag 0x04).
   0x34136, 0x34137: per-section index tables (not needed: NFSU1 rebuilds its own wmap/wcell/widx).
+Row byte +0 = barrier group: index into L4RA.BUN chunk 0x3412f (32 B entries: u32 hash, u32, byte +8 on/off, name +9;
+  entry 0 "NONE", 1..125 PLAYER_BARRIERS_<race> / BARRIERS_<race>). The loader 0x5d8430 turns every entry off but 0;
+  the collision queries 0x5e75c9 and 0x5e1027 skip a row whose group is off; 0x5d80f0 (callers 0x5f54f0..) turns one on
+  for a race. Free Run enables none, so rows with byte +0 != 0 (12,049 rows, all finite surface-20 walls) are dropped here.
 Output, in raw UG2 world units (the transform to NFSU1 space is applied later, by whoever places the city):
   build/ug2/coll_rows.bin  unique rows, 32 B each, byte +0 = 0, s16 +6 = -1 (as the NFSU1 loader expects)
 usage: ug2_coll.py [STREAML4RA.BUN]   prints the counts written to census/ug2/coll.md
@@ -38,14 +42,16 @@ def verts(r):
 
 def main():
     d = open(sys.argv[1] if len(sys.argv) > 1 else BUN, 'rb').read()
-    seen, rows, nsec, total = set(), [], 0, 0
+    seen, rows, nsec, total, barrier = set(), [], 0, 0, 0
     flags = collections.Counter()
     for sec in sections(d):
         nsec += 1
         body = sec[0x34134]
         for o in range(0, len(body) - 31, 32):
             r = bytearray(body[o:o + 32])
-            r[0] = 0
+            if r[0]:                    # race barrier wall, off unless its group is on (0x5e75c9)
+                barrier += 1
+                continue
             r[6:8] = b'\xff\xff'
             total += 1
             if bytes(r) in seen:
@@ -58,7 +64,7 @@ def main():
     open(out, 'wb').write(b''.join(rows))
     vs = [v for r in rows for v in verts(r)]
     ground = sum(n for f, n in flags.items() if f & 0x0a == 0)
-    print('sections', nsec, 'rows', total, 'unique', len(rows), 'ground (flags & 0x0a == 0)', ground)
+    print('sections', nsec, 'rows', total, 'barrier rows dropped', barrier, 'unique', len(rows), 'ground (flags & 0x0a == 0)', ground)
     for a, name in ((0, 'x'), (1, 'y'), (2, 'z')):
         print(name, min(v[a] for v in vs), max(v[a] for v in vs))
     print('flags', ' '.join('%02x:%d' % kv for kv in flags.most_common()))

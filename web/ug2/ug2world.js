@@ -208,7 +208,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
   let frames = 0, since = 0, cpu = 0, reports = 0;
 
   // Called at GPU_FXAA with the scene targets (web/gpu.js res entries).
-  api.scene = (dev, speed, enc, rt, ds) => {
+  api.scene = (dev, speed, enc, rt, ds, tsw) => {
     if (!api.on || !rt || !ds || !speed._rn_mc_state) return;
     if (!loading) {
       loading = true; api.state = 'loading';
@@ -228,7 +228,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     const c = Math.cos(PLACE.yaw), s = Math.sin(PLACE.yaw);
     u.set([c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, PLACE.tx, PLACE.ty, PLACE.tz, 1], 32);   // model, as WGSL columns: column k = image of axis k
     device.queue.writeBuffer(gpu.uniform, 0, u);
-    const pass = enc.beginRenderPass({
+    const pass = enc.beginRenderPass({ timestampWrites: tsw?.('ug2 city'),   // GPU time of this pass in ?gpuprof=1 (gpu.js tsw)
       colorAttachments: [{ view: rt.msView || rt.view, ...(rt.msView ? { resolveTarget: rt.view } : {}), loadOp: 'load', storeOp: 'store' }],
       depthStencilAttachment: { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store', stencilLoadOp: 'load', stencilStoreOp: 'store' } });
     pass.setBindGroup(0, gpu.bind0); pass.setVertexBuffer(0, gpu.vbuf); pass.setIndexBuffer(gpu.ibuf, 'uint32');
