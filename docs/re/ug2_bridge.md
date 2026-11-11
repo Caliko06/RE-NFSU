@@ -40,3 +40,19 @@ Transform UG2 -> NFSU1 space: rotate with `R`, then add t. `R90: (x,y)->(-y,x)`,
 
 ## Decision (OWNER 2026-11-10)
 Rank 1 chosen: R270 `(x,y)->(y,-x)`, then t = (-1287.4, 812.2, -6.2). One constant for render (web/ug2/ug2world.js) and collision.
+
+## Bridge road built (rank 1, 2026-11-10): tools/ug2_bridge.py, called by tools/ug2_collfile.py
+Units below are NFSU1 space; x,y on the 1/8 grid (s16 value in brackets). Every number is read from the neighbouring rows at generation time (asserted), nothing typed in.
+| item | value | proof |
+|---|---|---|
+| NFSU1 end | 4 ground rows 38417-38420, surface 1, flags 0x10, north edge y 507.9, x 114.8 118.2 121.8 125.2 128.8, z 43.023 | wsrc rows of build/openworld/TRACKB1010.prev.lzc |
+| bridge ground | 32 quads (rows 179341..179372), copy of those flags/surface, 4 columns x 8 segments of ~10 units, x constant per column, z linear | same row format as its two ends |
+| UG2 end | south ground edge of the moved UG2 surface-1 rows: (105.2,588.8,43.3) (115.1,589.1,43.2) (125.1,589.4,43.2) (135.1,589.6,43.1); bridge vertices lie on that polyline | moved rows 29816, 29812, 29808 |
+| side walls NFSU1 | x 114.625 [917] and 128.625 [1029], surface 20, flags 0x16, z -508..508 (rows 42878, 42876, end y 506.25) | existing rows |
+| opened, NFSU1 | cap wall row 42877 (x 114.6..128.6 at y 506.25) is now the west side wall (114.625, y 506.25..589.125); row numbers unchanged | rewritten in place |
+| opened, UG2 | south wall rows (UG2 index 30238, 30239, 30240): 30239 (x 115.1..125.0) becomes the east side wall (128.625, y 506.25..590.875); 30238 clipped to x <= 114.625, 30240 clipped to x >= 128.625 (wall line interpolated, 1/8 grid) | rows 83841..83843 in the file |
+| winding | walls head south (west) / north (east), road on the left, as 42878 / 42876 | existing rows |
+| mesh | web/ug2/bridge.bin (generated, ignored like city.bin): 'UG2M', 192 verts, 288 idx, deck grey (80,80,80), 1.2 m barriers (184,184,184); RAW UG2 units | city.bin grey verts at the UG2 road end, median 87 |
+Render plug-in (for web/ug2/ug2world.js, not edited here): load /ug2/bridge.bin with the same loader as city.bin and draw it with the same PLACE model (it is stored in raw UG2 units, the inverse of the placement, so no extra transform).
+Static check (`python3 -I tools/ug2_collfile.py --check`, 5 lanes x 689 samples y 440..612 in 0.25 steps): 0 gaps, 0 interior overlaps (y 505..589), max z step 0.009 per 0.25 units, z 42.87..43.23, 0 wall crossings of any lane (the UG2 north wall at y 613.1 is the end). Row count 179,373 (53,603 + 125,770).
+NOT VERIFIED: no run in the game (collision feel, car wheels on 0.04 m seams: bridge edge vertices are rounded to 1/8 on the UG2 polyline); the render mesh was not drawn; UNKNOWN whether surface 1 = asphalt; z 43.0 -> 43.2 slope assumed fine; the UG2 north-side wall at 613 and anything on the UG2 road east/west of the mouth untouched.

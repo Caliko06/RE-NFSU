@@ -12,15 +12,18 @@ import os, random, shutil, struct, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
 os.environ.setdefault('NFSU1_MAIN', REPO)
+sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, 'hopper'))
 import q_owcoll2_gen as gen  # noqa: E402
 import q_owcoll2_lzc as lzc  # noqa: E402
 import q_owcoll2_sim as sim  # noqa: E402
 import q_owcoll2_write as w  # noqa: E402
+import ug2_bridge  # noqa: E402
 
 OUT = os.path.join(REPO, 'build', 'openworld', 'TRACKB1010.lzc')
 PREV = os.path.join(REPO, 'build', 'openworld', 'TRACKB1010.prev.lzc')
 UG2 = os.path.join(REPO, 'build', 'ug2', 'coll_rows.bin')
+MESH = os.path.join(REPO, 'web', 'ug2', 'bridge.bin')   # bridge deck + barriers, raw UG2 units, same format and model as city.bin
 # t = (-1287.4, 812.2, -6.2) of the decision, rounded to what the rows hold: x,y to 1/8, z to 1/64 (flag 0x04 rows step 1/64)
 TX8, TY8, TZ = round(-1287.4 * 8), round(812.2 * 8), round(-6.2 * 64) / 64
 S16 = (-32768, 32767)
@@ -63,7 +66,9 @@ def build():
         shutil.copy(OUT, PREV)
     base = lzc.exe_decode(open(PREV, 'rb').read())
     nf = old_rows(base)
-    uz = ug2_rows()
+    nf, uz, bridge, mesh = ug2_bridge.apply(nf, ug2_rows(), TX8, TY8, TZ)
+    open(MESH, 'wb').write(mesh)
+    uz = uz + bridge
     new = w.build_trackb(base, nf + uz, wide=True)
     blob = lzc.encode(new)
     open(OUT, 'wb').write(blob)
@@ -74,6 +79,10 @@ def rbox(v, rng, pad):
     return ((v[0] - rng.uniform(0, pad), v[1] - rng.uniform(0, pad)), (v[2] + rng.uniform(0, pad), v[3] + rng.uniform(0, pad)))
 
 
+def rows_at(d, wd, i):
+    return bytes(d[wd.wsrc + 32 * i:wd.wsrc + 32 * i + 32])
+
+
 def check():
     rng = random.Random(11)
     blob, prev = open(OUT, 'rb').read(), open(PREV, 'rb').read()
@@ -81,6 +90,7 @@ def check():
     new, old = lzc.exe_decode(blob), lzc.exe_decode(prev)
     wn, wo = sim.World(new), sim.World(old)
     nf = old_rows(old)
+    nf[42877] = rows_at(new, wn, 42877)   # the dead-end cap wall is the bridge's west side wall (tools/ug2_bridge.py)
     assert wn.wide and not wo.wide
     assert [c[0] for c in w.top_chunks(new) if c[0]] == [c[0] for c in w.top_chunks(old) if c[0]], 'chunk ids differ from the old file'
     assert not w.check_alignment(old, new), 'misaligned chunks'
@@ -130,9 +140,13 @@ def check():
     for _ in range(300):
         v = vals[rng.randrange(len(nf))]
         q = rbox(v, rng, 40)
-        a, b = set(wo.query(*q, cap=10 ** 6)), {i for i in wn.query(*q, cap=10 ** 6) if i < len(nf)}
+        a, b = set(wo.query(*q, cap=10 ** 6)) - {42877}, {i for i in wn.query(*q, cap=10 ** 6) if i < len(nf)} - {42877}
         d += a != b
     assert d == 0, d
+    out, cross = ug2_bridge.check(rows)
+    for x, o in out.items():
+        print('bridge lane x=%.1f: ground samples %d, gaps %d, interior overlaps y505..589 %d, max z step per 0.25 %.3f, z %.2f..%.2f, wall crossings y440..612: %d' % ((x,) + o + (cross[x],)))
+        assert o[1] == 0 and o[2] == 0 and o[3] < 0.1 and cross[x] == 0, (x, o, cross[x])
     print('check OK: bbox selectors, own-box 2000/2000, UG2 boxes 150/150 == brute force, NFSU1 boxes 300/300 == old file')
 
 
