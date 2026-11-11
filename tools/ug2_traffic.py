@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
-"""ug2_traffic.py: NFSU1 traffic on the UG2 streets near the bridge (census/ug2/roads.md section 5, stage 1).
+"""ug2_traffic.py: NFSU1 traffic on the UG2 city, as far as the road-section id limit allows (census/ug2/roads.md sections 2.1, 5, 8).
 
 Called by ug2_collfile.py (the one writer of build/openworld/TRACKB1010.lzc): apply(base, rows) -> base' with the road chunks 0x34121 / 0x34122
-extended, check(new, old, rows) -> static check numbers (asserts). Nothing else is rewritten; the NFSU1 part of the net stays byte for byte
-(sections 0..77, entries 0..195) except ONE link slot byte of the anchor node (a link needs a source slot).
+extended, check(new, old, rows) -> static check numbers (asserts). Nothing else is rewritten; the NFSU1 sections 0..77 keep every byte but the
+link slot bytes, and every NFSU1 node names the same entries as before (the anchor node 28:2 one more, to the connector).
 
-Built (every field says what proves it; sources in census/ug2/roads.md sections 1-3):
-  UG2 part : the L4RA sections of RoutesFreeRoam.bin with a node within 600 m of the bridge mouth (UG2 211, 1405): moved by the placement
+Limit that binds: the section id is a BYTE (node +0x83, entry +9/+0xa, NodeRef +0x5c: 0x44a2ae movsx al -> [0x77af30 + 4*id]); the widen
+patches (tools/recomp/patches_road.py, always on) make it unsigned with a 256-slot table at 0x796000, 255 = none, so <= 254 sections in all
+(citygraph.MAX_SEC). NFSU1 uses 78 + the connector: 175 ids are left for UG2's 855 sections (dedupe + chain merge still leaves ~410,
+citygraph.build on UG2 polylines). Entries (2047, 11 bits) and nodes per section (s16, 0x442bb2) are far from binding.
+  UG2 part : select(): the 600 m seed disc around the bridge mouth (UG2 211, 1405; the near-bridge set, always in), then Dijkstra by road
+             distance over UG2's own entries until the 175 ids are used, skipping a section whose nodes lie >= 80 % within DUP_R (3 m) of road
+             already taken (the same centre line twice). One connected piece of UG2's graph. Nodes moved by the placement
              R270 (x,y)->(y,-x) + t (tools/ug2_roads.to_nfsu1); node z = s16/8 + tz; tangent (tx,ty)->(ty,-tx), the back heading is its negative;
              drive flags bit 11/18/25/26/27/28 -> 6/19/25/26/27/28 (0x4424d0, 0x442520 vs 0x5dd550..); intersection bits 20..24 = 31 (as tour.py).
-             Sections renumbered 79.. in UG2 id order, one per UG2 section, nodes 1:1 (226).
+             Sections renumbered 79.. in UG2 id order, one per UG2 section, nodes 1:1.
+  entries  : > 255 in all, so the wide path: PostLoad hook 0x443123 (cave 0x797000) sets EBASE[s] = first entry whose source is s and skips
+             the sort; a slot byte is the rank inside its source section (readers 0x4564bd, 0x5a53f8, 0x5a56ce, 0x5a6da9 -> caves E1..E4). So
+             all entries, NFSU1 ones included, are written grouped by source section (citygraph.city_chunks does the same).
   connector: section 78, from the junction node 28:3 (221.6, 401.5, z 43.0) west along the stub road, north over the bridge, left onto the UG2
              road (ends at the road centre, heading west). Nodes every <= 8 m, z = the collision ground there.
-  links    : the UG2 entries inside the set are 20 twin pairs; a pair is written as citygraph.py writes a link: d=0 entry (source -> target) and its
+  links    : the UG2 entries inside the set are twin pairs; a pair is written as citygraph.py writes a link: d=0 entry (source -> target) and its
              d=1 twin (target side -> source side), both only if the landing is > AHEAD (0.1 m, [0x6cc7b8], citygraph.py:881; the grower at 0x5a58d0
              faults at 0x462a06 otherwise) ahead of the source along its heading for that direction (d=0 +0xc/+0x10, d=1 +0x14/+0x18). A source
              that fails is moved back up to 3 nodes (citygraph.py:802-813), hop <= 50 m. Pairs whose ends run against each other
@@ -21,7 +29,7 @@ Built (every field says what proves it; sources in census/ug2/roads.md sections 
   templates: header = live section 0 (the NFSU1 section whose nodes all carry traffic lanes), node = the live section 0 node with default
              widths nearest to that section's median; see TEMPLATE_* below. Lanes: only traffic lane 11 and 17 (offset 1.8 m right of the driver).
 usage: python3 tools/ug2_traffic.py [--check]   (--check: read build/openworld/TRACKB1010.lzc and run the static check)"""
-import collections, math, os, statistics, struct, sys
+import collections, heapq, math, os, statistics, struct, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
 os.environ.setdefault('NFSU1_MAIN', REPO)
@@ -35,7 +43,9 @@ import tour as T  # noqa: E402
 from lib import find  # noqa: E402
 
 MOUTH = (211.0, 1405.0)       # UG2 bridge mouth, raw UG2 units (roads.md section 4)
-RADIUS = 600.0
+RADIUS = 600.0                # seed disc: the near-bridge sections, always in (the connector lands on UG2 230:24)
+DUP_R = 3.0                   # a section this close to taken road (>= 80 % of its nodes) is the same centre line again: skipped
+MAX_SEC, MAX_ENT, RETAIL_ENT = 254, 2047, 255   # section ids are bytes (255 = none, widened table 0x796000), entries 11 bits (patches_road.py)
 ANCHOR = (28, 3)              # NFSU1 node of the junction in front of the stub road (x 221.6, y 401.5)
 AHEAD = 0.1                   # citygraph.py:881
 MAX_SHIFT, MAX_HOP = 3, 50.0
@@ -66,7 +76,7 @@ def parse(d):
 
 class Ground:
     """collision ground (rows without the wall flags 0x0a) as triangles in 16 m cells, from the final row list"""
-    def __init__(self, rows, box=(-700, 300, 600, 1750)):
+    def __init__(self, rows, box=(-3500, -1200, 1900, 4000)):     # the connector and the whole UG2 city in NFSU1 space (x -3360..1834, y -1079..3878)
         self.cell = collections.defaultdict(list)
         for r in rows:
             d = ub.unpack(r)
@@ -102,11 +112,71 @@ class Ground:
         return min(out, key=lambda q: abs(q - near)) if out else None
 
 
-def ug2_part():
+def _seg_d(p, a, b):
+    vx, vy = b[0] - a[0], b[1] - a[1]
+    l2 = vx * vx + vy * vy or 1e-9
+    u = max(0.0, min(1.0, ((p[0] - a[0]) * vx + (p[1] - a[1]) * vy) / l2))
+    return math.hypot(p[0] - a[0] - u * vx, p[1] - a[1] - u * vy)
+
+
+def select(g, budget):
+    """UG2 sections to carry traffic: the 600 m seed disc around the bridge mouth, then Dijkstra by road distance from it over UG2's own
+    entries, one section at a time, until `budget` section ids are used. A section whose nodes lie >= 80 % within DUP_R of the sections
+    already taken (either heading: the same centre line written twice) is skipped, it would spend an id on road that already has traffic.
+    Growing only through taken sections keeps the set one connected piece of UG2's own graph."""
+    S = {s['id']: s for s in g['sections']}
+    P = {k: [(n['x'], n['y']) for n in s['nodes']] for k, s in S.items()}
+    cum = {}
+    for k, p in P.items():
+        c = [0.0]
+        for i in range(1, len(p)):
+            c.append(c[-1] + math.dist(p[i], p[i - 1]))
+        cum[k] = c
+    out = collections.defaultdict(list)
+    for e in g['entries']:
+        out[e['ss']].append((e['sn'], e['ds'], e['dn']))
+    seeds = {k for k, s in S.items() if any(math.hypot(n['x'] - MOUTH[0], n['y'] - MOUTH[1]) <= RADIUS for n in s['nodes'])}
+    grid = collections.defaultdict(list)
+
+    def dup(k):
+        near = 0
+        for p in P[k]:
+            cx, cy = int(p[0] // 20), int(p[1] // 20)
+            near += any(_seg_d(p, a, b) < DUP_R for dx in (-1, 0, 1) for dy in (-1, 0, 1) for a, b in grid.get((cx + dx, cy + dy), ()))
+        return near >= 0.8 * len(P[k])
+    pq = [(0.0, k, 0) for k in sorted(seeds)]
+    heapq.heapify(pq)
+    taken, done, skipped = [], set(), 0
+    while pq and len(taken) < budget:
+        d, k, i = heapq.heappop(pq)
+        if k in done:
+            continue
+        done.add(k)
+        if k not in seeds and dup(k):
+            skipped += 1
+            continue
+        taken.append(k)
+        for a, b in zip(P[k], P[k][1:]):
+            for cx in range(int(min(a[0], b[0]) // 20), int(max(a[0], b[0]) // 20) + 1):
+                for cy in range(int(min(a[1], b[1]) // 20), int(max(a[1], b[1]) // 20) + 1):
+                    grid[(cx, cy)].append((a, b))
+        for sn, ds, dn in out[k]:
+            if ds not in done:
+                heapq.heappush(pq, (d + abs(cum[k][sn] - cum[k][i]) + math.dist(P[k][sn], P[ds][dn]), ds, dn))
+    assert seeds <= set(taken), 'the near-bridge sections must all be in'
+    return taken, skipped
+
+
+def ug2_part(budget):
     """selected UG2 sections (sorted by UG2 id) with nodes in NFSU1 space, and their entry pairs"""
     g = R.load('A')
-    sel = [s for s in g['sections'] if any(math.hypot(n['x'] - MOUTH[0], n['y'] - MOUTH[1]) <= RADIUS for n in s['nodes'])]
-    sel.sort(key=lambda s: s['id'])
+    keep, skipped = select(g, budget)
+    keep = set(keep)
+    sel = sorted((s for s in g['sections'] if s['id'] in keep), key=lambda s: s['id'])
+    print('UG2 sections: %d of %d taken (budget %d ids), %d skipped as duplicates (%.1f m), %.1f of %.1f km' % (
+        len(sel), len(g['sections']), budget, skipped, DUP_R,
+        sum(math.dist((a['x'], a['y']), (b['x'], b['y'])) for s in sel for a, b in zip(s['nodes'], s['nodes'][1:])) / 1000,
+        sum(math.dist((a['x'], a['y']), (b['x'], b['y'])) for s in g['sections'] for a, b in zip(s['nodes'], s['nodes'][1:])) / 1000))
     ids = {s['id'] for s in sel}
     secs = []
     for s in sel:
@@ -189,7 +259,7 @@ def apply(base, rows):
     tmpl = min(cand, key=lambda c: sum(abs(struct.unpack_from('<f', c, o)[0] - m) for o, m in zip((0x24, 0x28), med)))
     tidx = [node(TEMPLATE_SEC, i) for i in range(tn)].index(tmpl)
     # ---- the new geometry
-    ug, pairs = ug2_part()
+    ug, pairs = ug2_part(MAX_SEC - n0 - 1)
     ground = Ground(rows)
     ax, ay, az = struct.unpack_from('<3f', node(*ANCHOR), 0)
     con = connector(ground, (ax, ay, az))
@@ -274,8 +344,12 @@ def apply(base, rows):
     for k in last.values():
         links[k][2], links[k][3] = 2, 2
     # ---- entries and slots
-    ent = list(ent0)
-    slot = collections.defaultdict(list)       # node -> entry indexes
+    items = []                                 # (source node, entry bytes): the NFSU1 entries in node / slot order, then the new ones
+    for sid in range(n0):
+        for i in range(secs0[sid][2]):
+            nd = node(sid, i)
+            items += [((sid, i), ent0[nd[k]]) for k in (0x81, 0x82) if nd[k] != 0xff]
+    assert len(items) == e0
     # the connector's two mid-section sources are forks, not the last way out of their section (citygraph.py:742-747 rule): NFSU1 28:2 (28 runs on to
     # 28:359) and UG2 230:24 (230 runs on east). Type 2 is always taken (0x462840) and at a bit-25 node at once (0x456553), so 2/2 there sent every
     # car on 28 southbound onto the bridge (TRAFUG2 5 min run 2026-11-11: 0 cars on 28 south of the junction). The connector's own ends stay 2/2.
@@ -289,9 +363,20 @@ def apply(base, rows):
             t = (0, 7) if (k, d) in fork else (ty, lane)
             e[8], e[9], e[0xa], e[0xb], e[0xc], e[0xd] = 0, dst[0], src[0], t[0], t[1], d
             struct.pack_into('<IiII', e, 0x10, 0, -1, 0, 0)
-            slot[src].append(len(ent))
-            ent.append(bytes(e))
-    assert len(ent) <= 255, len(ent)
+            items.append((src, bytes(e)))
+    # Up to 255 entries a slot byte is the file index (the exe sorts and remaps at PostLoad). Above, PostLoad hook H (patches_road.py stage 3,
+    # 0x443123 -> cave 0x797000) skips the sort: EBASE[s] = first entry whose source is s and a slot byte is the rank inside that run
+    # (readers 0x4564bd, 0x5a53f8, 0x5a56ce, 0x5a6da9 -> caves E1..E4), so entries are grouped by source section (citygraph.city_chunks).
+    assert len(items) <= MAX_ENT, len(items)
+    wide = len(items) > RETAIL_ENT
+    if wide:
+        items.sort(key=lambda it: it[0])       # stable: a node keeps its slot order
+    ent, slot, rank = [], collections.defaultdict(list), collections.Counter()
+    for src, e in items:
+        slot[src].append(rank[src[0]] if wide else len(ent))
+        rank[src[0]] += 1
+        ent.append(e)
+    assert max(max(v) for v in slot.values()) < 0xff and all(len(v) <= 2 for v in slot.values())
     # ---- route distance +0x38: continuous along each new section, through the links from the anchor (citygraph.py route_offsets)
     cum = {}
     for sid, n in sizes.items():
@@ -357,12 +442,13 @@ def apply(base, rows):
         for kk in range(23):
             hdr[0x265 + kk] = int(kk in LANES)
         sections.append(bytes(hdr) + b''.join(make(sid, i) for i in range(n)))
-    # ---- patch the anchor source slot, assemble the chunks
+    # ---- the NFSU1 slot bytes (new indexes or ranks; the anchor source gets its link), assemble the chunks
     p21 = bytearray(base[b:b + s])
-    o = secs0[a0[0]][1] - b + 0x27c + a0[1] * 0x88
-    sl = 0x81 if p21[o + 0x81] == 0xff else 0x82
-    assert p21[o + sl] == 0xff
-    p21[o + sl] = slot[a0][0]
+    for sid in range(n0):
+        for i in range(secs0[sid][2]):
+            o = secs0[sid][1] - b + 0x27c + i * 0x88
+            v = slot.get((sid, i), [])
+            p21[o + 0x81], p21[o + 0x82] = (v + [0xff, 0xff])[:2]
     p21 += b''.join(sections)
     p22 = b''.join(ent)
     ch = w.top_chunks(base)
@@ -379,13 +465,24 @@ def apply(base, rows):
     out += struct.pack('<II', 0, need - 8) + b'\0' * (need - 8)
     out += base[old_pad_end:]
     print('template node: section %d node %d' % (TEMPLATE_SEC, tidx))
-    print('traffic net: %d sections (+%d), %d entries (+%d), %d links, dropped pairs %d, chunk 0x34121 %d -> %d B' % (
-        n0 + 1 + len(ug), 1 + len(ug), len(ent), len(ent) - e0, len(links), len(dropped), s, len(p21)))
+    print('traffic net: %d sections (+%d), %d entries (+%d, %s path), %d links, dropped pairs %d, chunk 0x34121 %d -> %d B' % (
+        n0 + 1 + len(ug), 1 + len(ug), len(ent), len(ent) - e0, 'wide' if wide else 'retail', len(links), len(dropped), s, len(p21)))
     return bytes(out)
+
+
+def slot_index(ent):
+    """node, slot offset -> entry index, read the way the exe does: the file index up to 255 entries, else EBASE[node +0x83] + byte
+    (EBASE[s] = the first entry whose source is s: PostLoad hook H, patches_road.py stage 3)"""
+    first = {}
+    for i, e in enumerate(ent):
+        first.setdefault(e[0xa], i)
+    wide = len(ent) > RETAIL_ENT
+    return lambda nd, k: first[nd[0x83]] + nd[k] if wide else nd[k]
 
 
 def walk(C, secs, ent, which, dist=250.0):
     """citygraph.walk_stats (the teleporter walk 0x4563d0, any path) started only from the drivable nodes of the sections in `which`"""
+    ix = slot_index(ent)
     drv = lambda nd: bool(struct.unpack_from('<I', nd, 0x84)[0] & (FWD_BITS | BACK_BITS))
     seg = lambda nd: struct.unpack_from('<f', nd, 0x1c)[0]
 
@@ -400,7 +497,7 @@ def walk(C, secs, ent, which, dist=250.0):
         nxt = []
         for k in (0x81, 0x82):
             if nd[k] != 0xff:
-                e = ent[nd[k]]
+                e = ent[ix(nd, k)]
                 if e[0xd] == (0 if fwd else 1) and e[0xb] != 3:
                     nxt.append((e[9], struct.unpack_from('<H', e, 4)[0]))
         j = i + 1 if fwd else i - 1
@@ -423,39 +520,46 @@ def check(new, old, rows):
     net, onet = T.net_of(new), T.net_of(old)
     n0, e0 = len(onet['secs']), len(onet['ent'])
     ns, es = net['secs'], net['ent']
-    assert sorted(ns) == list(range(len(ns))) and len(ns) <= 128 and len(es) <= 255, (len(ns), len(es))
-    # NFSU1 part byte-identical, except one slot byte of the anchor source
-    diff = []
+    assert sorted(ns) == list(range(len(ns))) and len(ns) <= MAX_SEC and len(es) <= MAX_ENT, (len(ns), len(es))
+    ix, oix = slot_index(es), slot_index(onet['ent'])
+    # NFSU1 part: byte-identical but for the slot bytes; every NFSU1 node names the same entries as before, the anchor source one more (-> connector)
+    added = []
     for sid in range(n0):
         a, b = onet['secs'][sid], ns[sid]
         assert a['hdr'] == b['hdr'] and a['lst'] == b['lst'] and len(a['nodes']) == len(b['nodes'])
         for i, (x, y) in enumerate(zip(a['nodes'], b['nodes'])):
-            if x != y:
-                diff += [(sid, i, k, x[k], y[k]) for k in range(0x88) if x[k] != y[k]]
-    assert len(diff) == 1 and diff[0][2] in (0x81, 0x82) and diff[0][3] == 0xff, diff
-    assert es[:e0] == onet['ent']
+            assert x[:0x81] == y[:0x81] and x[0x83:] == y[0x83:], (sid, i)
+            was = [onet['ent'][oix(x, k)] for k in (0x81, 0x82) if x[k] != 0xff]
+            now = [es[ix(y, k)] for k in (0x81, 0x82) if y[k] != 0xff]
+            if was != now:
+                assert now[:len(was)] == was and len(now) == len(was) + 1 and now[-1][9] == n0, (sid, i)
+                added.append((sid, i))
+    assert len(added) == 1, added
+    diff = added
     # every link resolves: slot -> entry -> source is this node, landing valid and drivable; twins both ways
-    byfrom = {}
     for sid in range(n0, len(ns)):
         for i, nd in enumerate(ns[sid]['nodes']):
             assert nd[0x83] == sid and (struct.unpack_from('<I', nd, 0x84)[0] >> 20) & 0x1f == 31
             for k in (0x81, 0x82):
                 if nd[k] != 0xff:
-                    e = es[nd[k]]
+                    e = es[ix(nd, k)]
                     assert (e[0xa], struct.unpack_from('<H', e, 6)[0]) == (sid, i), (sid, i)
-                    byfrom[(sid, i)] = byfrom.get((sid, i), 0) + 1
-    new_e = es[e0:]
+    new_e = [e for e in es if e[9] >= n0 or e[0xa] >= n0]
+    assert len(es) - len(new_e) == e0
     drv = lambda sid, i: struct.unpack_from('<I', ns[sid]['nodes'][i], 0x84)[0] & (FWD_BITS | BACK_BITS)
     owners = collections.Counter()
+    for sid in ns:
+        for nd in ns[sid]['nodes']:
+            for k in (0x81, 0x82):
+                if nd[k] != 0xff:
+                    owners[ix(nd, k)] += 1
     for k, e in enumerate(es):
         dn, sn = struct.unpack_from('<HH', e, 4)
         ds, ss = e[9], e[0xa]
         assert ds in ns and ss in ns and dn < len(ns[ds]['nodes']) and sn < len(ns[ss]['nodes'])
-        if k >= e0:
+        if ds >= n0 or ss >= n0:
             assert drv(ds, dn) and drv(ss, sn)
-        nd = ns[ss]['nodes'][sn]
-        owners[k] += (nd[0x81] == k) + (nd[0x82] == k)
-    assert all(owners[k] == 1 for k in range(len(es))), 'an entry is not named by exactly one slot'
+    assert all(owners[k] == 1 for k in range(len(es))) and len(owners) == len(es), 'an entry is not named by exactly one slot'
     pairs = collections.Counter()
     for e in new_e:
         dn, sn = struct.unpack_from('<HH', e, 4)
@@ -499,11 +603,12 @@ def check(new, old, rows):
                 dz.append(abs(g - z))
     secs_l = [[nd for nd in ns[i]['nodes']] for i in range(len(ns))]
     ws = walk(C, secs_l, es, range(n0, len(ns)))
+    scc = C.scc_of_file(secs_l, es)
     dr = [(sid, i) for sid in range(n0 + 1, len(ns)) for i, nd in enumerate(ns[sid]['nodes']) if struct.unpack_from('<I', nd, 0x84)[0] & (FWD_BITS | BACK_BITS)]
     noground = sum(ground.z(*struct.unpack_from('<3f', ns[a]['nodes'][b_], 0)[:2], struct.unpack_from('<f', ns[a]['nodes'][b_], 8)[0]) is None for a, b_ in dr)
     dd = [struct.unpack_from('<f', nd, 0x38)[0] for sid in range(n0, len(ns)) for nd in ns[sid]['nodes']]
     r = dict(sections=len(ns), entries=len(es), new_sections=len(ns) - n0, new_nodes=sum(len(ns[i]['nodes']) for i in range(n0, len(ns))), new_entries=len(new_e),
-             d0=d0, d1=d1, types=dict(pairs), diff_bytes=diff, connector_nodes=len(con), connector_len=round(sum(gaps)), connector_max_gap=round(max(gaps), 2),
+             d0=d0, d1=d1, types=dict(pairs), anchor_node=diff, scc_nodes='%d of %d' % scc, connector_nodes=len(con), connector_len=round(sum(gaps)), connector_max_gap=round(max(gaps), 2),
              last_hop=round(hop, 1), connector_z_max_dev=round(zmax, 3), z_samples=nsamp, ug2_nodes_with_ground=len(dz), ug2_dz_max=round(max(dz), 2),
              ug2_dz_within_2=round(sum(v < 2 for v in dz) / len(dz), 4), d_range=(round(min(dd), 1), round(max(dd), 1)), walk250_new_nodes=ws, ug2_drivable_nodes=len(dr), ug2_drivable_without_ground=noground)
     return r

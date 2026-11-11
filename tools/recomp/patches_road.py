@@ -68,6 +68,10 @@ PATCHES.append(dict(addr=0x4627ee, old="c70263000000", new=_j32(0x4627ee, 0x7970
 PATCHES.append(dict(addr=0x5836d5, old="c70064000000c70177000000", new=_j32(0x5836d5, 0x797120, "e8") + "90" * 7, when=lambda: True, widen=True))
 PATCHES.append(dict(addr=0x5836ed, old="c70163000000", new=_j32(0x5836ed, 0x797100, "e8") + "90", when=lambda: True, widen=True))
 PATCHES.append(dict(addr=0x435e79, old="83f8777f25", new="3cfe907725", when=lambda: True, widen=True))
+# 0x456ca8: the same 0..119 cap in the NodeRef check 0x456c90 ('movsx edx,[sec+0xa]; test; jl; cmp edx,0x77; jg' -> false), called by the traffic
+# placement 0x598fb0 (0x599012), the Free Run move 0x59a2c0 (0x59a333) and host/rivals.c traffic_refill: a node in section 120..254 was refused,
+# so no car was placed or moved there (WORLD + UG2 net, 254 sections, deep-city spawn: REFILLWHY 'early' 1,041 of 1,041). 'cmp dl,0xfe; ja', same length.
+PATCHES.append(dict(addr=0x456ca8, old="83fa777f26", new="80fafe7726", when=lambda: True, widen=True))
 PATCHES.append(dict(addr=0x41f8a2, old=_imm(0x1a0), new=_imm(0x410), when=lambda: True, widen=True))
 
 # Stage 3, more than 255 entries (11 bits = 2047). PostLoad hook (caves/road.s H): EBASE (0x796410, u32 per section, cleared at every load)

@@ -4,7 +4,7 @@
 Base = the live build/openworld/TRACKB1010.lzc (roads, routes, props, everything but the collision block stays; its old wsrc rows stay first,
 row numbers unchanged). UG2 rows = build/ug2/coll_rows.bin (tools/ug2_coll.py) moved into NFSU1 space: rotate R270 (x,y) -> (y,-x), then t.
 The result has more than 65,534 rows, so the 0x34133 chunk holds u32 entries behind 0xffffffff (PATCHES 0x441423 and 0x441660, patches_collision.py).
-The road net (0x34121 / 0x34122) goes through the same writer: tools/ug2_traffic.py appends the UG2 streets near the bridge and a connector (census/ug2/roads.md section 8).
+The road net (0x34121 / 0x34122) goes through the same writer: tools/ug2_traffic.py appends the UG2 streets (175 sections from the bridge outward) and a connector (census/ug2/roads.md section 8).
 Row fields (layout tools/openworld/polys.py): x,y s16/8 are moved in integers; z = s16 base + s16/256 moves by tz (a multiple of 1/64, so exact for
 flag 0x04 rows too) with a new base; byte +1 (bbox selectors, 0x441660) is recomputed from the new vertices; flag 0x04 rows are the infinite walls
 (z -508..508 in every UG2 row) and keep their z; nothing else is stored (the plane is built at run time, 0x43ff30).
@@ -72,7 +72,7 @@ def build():
     open(MESH, 'wb').write(mesh)
     open(MESH.replace('.bin', '_tex.bin'), 'wb').write(side)
     uz = uz + bridge
-    base = ug2_traffic.apply(base, nf + uz)       # road chunks 0x34121 / 0x34122: + the UG2 streets near the bridge and the connector
+    base = ug2_traffic.apply(base, nf + uz)       # road chunks 0x34121 / 0x34122: + the UG2 streets and the connector
     new = w.build_trackb(base, nf + uz, wide=True)
     blob = lzc.encode(new)
     open(OUT, 'wb').write(blob)
