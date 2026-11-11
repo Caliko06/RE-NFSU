@@ -63,9 +63,10 @@ async function download(url, what) {
   if (window.RN_HOLD) await window.RN_HOLD;       // ?fast=1: scene B draws first (web/index.html)
   const exe = new Uint8Array(await (await download('pc/Speed.exe', 'Descargando')).arrayBuffer());
   // Game files are read on demand by the game thread (host/files.c), not loaded here.
-  // F-Max: in Remaster the pedestrian is Max Payne when the local Max build answers on /mp/ (tools/serve.py); ?max=0 keeps
-  // F-Speed's debug box. Original never loads it.
-  const maxChar = RN_MODE === 'remaster' && RN_Q.get('max') !== '0' && (await fetch('/mp/out/maxpayne.js').catch(() => null))?.ok === true;
+  // F-Max (archived lane, off by default since 2026-11-11): ?max=1 in Remaster makes the pedestrian Max Payne when the local Max
+  // build answers on /mp/ (tools/serve.py). It boots a second game in the page; with the UG2 city loaded it ended in
+  // "[F-Max] gpu: out of memory (12582400 bytes)" at 46 s of the OWNER's WORLD session (build/web.log 2026-11-11 05:31Z).
+  const maxChar = RN_MODE === 'remaster' && RN_Q.get('max') === '1' && (await fetch('/mp/out/maxpayne.js').catch(() => null))?.ok === true;
   status.textContent = 'corriendo'; status.className = 'run';
   const M = await Speed({
     arguments: ['/pc/Speed.exe', '/game'],
