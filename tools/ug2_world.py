@@ -5,7 +5,7 @@ usage: python3 -I tools/ug2_world.py [TRACKS_DIR]  (reads STREAML4RA.BUN only)  
 Layouts (docs in census/ug2/world.md; same engine as NFSU1, see docs/openworld/re_mesh.md and tools/openworld/mesh.py):
   chunk = u32 id, u32 size, payload; id bit 31 = container. Payload start = (chunk + 0x17) & ~0xf (file has 0x11 filler).
   0x80134010 solid > 0x134011 (u32 hash @0x10, bbox f32 @0x20/@0x30, name @0xa4) and 0x80134100 > 0x134900 (mesh header),
-  0x134b01 vertices (24 B: f32 xyz, u32 BGRA colour, f32 uv), 0x134b03 u16 triangle list (h[9] triangles).
+  0x134b01 vertices (24 B: f32 xyz, u32 BGRA colour, f32 uv; 36 B for mesh mask 0x4180, see STRIDE), 0x134b03 u16 triangle list (h[9] triangles).
   0x80034100 section > 0x34102 defs (68 B: name[32], solid hash @32 = LOD0, @36 = LOD1), 0x34103 instances (64 B:
   f32 bbox min/max @0, u16 def @24, u16 flags @26, f32 pos @32, s16 3x3 @44 / 8192; world = local * R + pos, row vectors).
 Output web/ug2/city.bin: 'UG2M', u32 nverts, u32 nidx, u32 0, nverts x (f32 x,y,z, u8 r,g,b,a), nidx x u32. Raw UG2 world units."""
@@ -23,6 +23,10 @@ LOD_TRIS = 800_000
 # collision's -3093..1898, -2079..3149 (backdrop walls up to z 1100); placed at R270+t, 18,745 of its vertices land on NFSU1 ground.
 COLL = os.path.join(REPO, 'build', 'ug2', 'coll_rows.bin')
 REACH, CELL = 160, 16
+# Vertex stride and colour offset by the mesh mask (0x134900 +0xc): 24 B (xyz, BGRA @12, uv @16) for masks 0, 0x40, 0x1000;
+# 36 B (xyz, normal @12, BGRA @24, uv @28) for 0x4180. Measured on STREAML4RA.BUN: vertex-buffer bytes / nv = 24.0 and 36.0
+# exactly (census/ug2/tex.md, slice/ug2tex 3e17901); the exe picks the shader object from the mask at 0x5c58cf..0x5c591b.
+STRIDE = {0x4180: (36, 24)}
 
 
 def tree(d):
@@ -71,7 +75,7 @@ def scan(path):
                 elif j == 0x134900:
                     q, _ = pay(d, b2, s2)
                     h = struct.unpack_from('<16I', d, q)
-                    sol['nv'], sol['ntri'] = h[13], h[9]
+                    sol['nv'], sol['ntri'], sol['mask'] = h[13], h[9], h[3]
                 elif j == 0x134b01:
                     sol['v'] = pay(d, b2, s2, 128)[0]
                 elif j == 0x134b03:
@@ -135,9 +139,10 @@ def main():
         s, r = sol.get(h), None
         if s:
             d = data[s['f']]
-            raw = np.frombuffer(d, dtype=np.uint8, count=s['nv'] * 24, offset=s['v']).reshape(-1, 24)
+            st, co = STRIDE.get(s['mask'], (24, 12))
+            raw = np.frombuffer(d, dtype=np.uint8, count=s['nv'] * st, offset=s['v']).reshape(-1, st)
             xyz = raw[:, :12].copy().view('<f4').reshape(-1, 3)
-            col = raw[:, 12:16][:, [2, 1, 0, 3]].copy()
+            col = raw[:, co:co + 4][:, [2, 1, 0, 3]].copy()
             ix = np.frombuffer(d, dtype='<u2', count=s['ntri'] * 3, offset=s['i']).reshape(-1, 3).astype(np.int64)
             ok = (ix < s['nv']).all(1) & (ix[:, 0] != ix[:, 1]) & (ix[:, 1] != ix[:, 2]) & (ix[:, 0] != ix[:, 2])
             r = (xyz, col, ix[ok]) if ok.any() and np.isfinite(xyz).all() else None

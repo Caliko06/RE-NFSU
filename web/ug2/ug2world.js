@@ -1,43 +1,63 @@
 'use strict';
-// NFSU2 city geometry drawn inside the NFSU1 Free Run scene (world only: no collision, no textures, no traffic).
+// NFSU2 city geometry drawn inside the NFSU1 Free Run scene, textured as UG2 draws its world (no traffic; collision is TRACKB1010).
 // Same path as F-Max (web/maxpayne/boot.js): web/gpu.js calls Ug2.scene() at GPU_FXAA, when the scene colour and depth are bound and
 // the HUD has not started; host/d3d9.c mc_hook has just copied the player's View and Projection into rn_mc.view / rn_mc.proj
 // (host/mc.h, D3D row vectors, clip = v * V * P), which is what is read here. Remaster only (RN_MODE), like the MC lane.
-// Mesh: web/ug2/city.bin or city_lod.bin, plus web/ug2/bridge.bin: 'UG2M', u32 nverts, u32 nidx, u32 0; nverts x (f32 xyz, u8 rgba); nidx x u32 triangle list.
+// Files (tools/ug2_world.py, tools/ug2_collfile.py, tools/ug2_tex.py; facts census/ug2/tex.md):
+//   city.bin, bridge.bin 'UG2M': u32 nverts, u32 nidx, u32 0; nverts x (f32 xyz, u8 rgba); nidx x u32 triangle list
+//   city_tex.bin 'UG2T': u32 nverts, ntri, ntex, nmat; nverts x (f32 u, v); ntri x u16 texture (0xffff none); ntri x u16 material
+//   tex.json textures[i] = {file, w, h, alpha_test, blend}; tex/<hash>.png RGBA mip 0
 (() => {
   // THE placement (one line to change): UG2 world units -> NFSU1 world (metres, z up, same units, no axis swap): p' = Rz(yaw) * p + (tx, ty, tz).
   // OWNER 2026-11-10, docs/re/ug2_bridge.md rank 1: rotate R270 (x,y)->(y,-x) = yaw -pi/2 (column0 (0,-1), column1 (1,0)), then t.
   // Same constant as the collision writer (slice/ug2coll); keeps every vertex inside the +-4096 collision range (s16/8 rows).
   const PLACE = { tx: -1287.375, ty: 812.25, tz: -6.203125, yaw: -Math.PI / 2 };   // quantized as in the collision file (tools/ug2_collfile.py)
   const FAR = 6000;            // this pass only: the game's far plane would clip a city this big (the depth test still matches: n << f)
-  const FOG = [0.035, 0.045, 0.085], FOG_DENSITY = 1 / 900;   // night haze, exp2 fog
+  const ALPHA_REF = 0x5f / 255;   // texture record +0x55 == 1: alpha test, ALPHAREF 0x5f (state setter 0x5bcc30, census/ug2/tex.md)
 
+  // UG2's world pixel shader, IDI_WORLD_FX in SPEED2.EXE (PE resource at file offset 0x420d70, ps_1_1 at +0x222c):
+  //   tex t0; mul r0, t0, v0; add r0.xyz, r0, r0   = texture x vertex colour x 2 (alpha = texture a x vertex a), no lighting.
+  // Its vertex shader passes the colour as is (mov oD0, v1) and uv + TextureOffset (add oT0, v2, c7). Its linear fog (oFog from
+  // c8 = FogValue) has runtime values not read yet: no fog here (UNKNOWN).
   const shader = `
-struct U { view: mat4x4<f32>, proj: mat4x4<f32>, model: mat4x4<f32>, fog: vec4f };
+struct U { view: mat4x4<f32>, proj: mat4x4<f32>, model: mat4x4<f32> };
 @group(0) @binding(0) var<uniform> u: U;
-struct O { @builtin(position) pos: vec4f, @location(0) col: vec3f, @location(1) world: vec3f, @location(2) dist: f32 };
-@vertex fn vs(@location(0) p: vec3f, @location(1) c: vec4f) -> O {
+@group(1) @binding(0) var tex: texture_2d_array<f32>;
+@group(1) @binding(1) var samp: sampler;
+struct O { @builtin(position) pos: vec4f, @location(0) col: vec4f, @location(1) uv: vec2f, @location(2) @interpolate(flat) layer: u32 };
+@vertex fn vs(@location(0) p: vec3f, @location(1) c: vec4f, @location(2) uv: vec2f, @builtin(instance_index) layer: u32) -> O {
   var o: O;
-  let w = u.model * vec4f(p, 1);
-  let v = u.view * w;
-  o.pos = u.proj * v; o.col = c.rgb; o.world = w.xyz; o.dist = length(v.xyz);
+  o.pos = u.proj * (u.view * (u.model * vec4f(p, 1)));
+  o.col = c; o.uv = uv; o.layer = layer;
   return o;
 }
-@fragment fn fs(i: O) -> @location(0) vec4f {
-  // Flat face normal from screen derivatives, a cold moon from above-left, sodium-warm fill from below: night, no textures.
-  let n = normalize(cross(dpdx(i.world), dpdy(i.world)));
-  let moon = max(dot(n, normalize(vec3f(-0.4, 0.3, 0.85))), 0.0);
-  let street = max(-n.z, 0.0) * 0.1;
-  let lit = i.col * (vec3f(0.14, 0.16, 0.24) + vec3f(0.20, 0.24, 0.36) * moon + vec3f(0.30, 0.18, 0.08) * street);
-  let f = 1.0 - exp(-(i.dist * u.fog.w) * (i.dist * u.fog.w));
-  return vec4f(mix(lit, u.fog.xyz, f), 1.0);
+fn shade(i: O) -> vec4f {
+  let t = textureSample(tex, samp, i.uv, i.layer) * i.col;
+  return vec4f(t.rgb * 2.0, t.a);
+}
+@fragment fn fs(i: O) -> @location(0) vec4f { return shade(i); }
+@fragment fn fs_test(i: O) -> @location(0) vec4f {
+  let c = shade(i);
+  if (c.a < ${ALPHA_REF}) { discard; }
+  return c;
 }`;
+  // Mip maker: one full-screen triangle sampling the level above (linear).
+  const blit = `
+@group(0) @binding(0) var src: texture_2d<f32>;
+@group(0) @binding(1) var samp: sampler;
+struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
+@vertex fn vs(@builtin(vertex_index) i: u32) -> O {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u));
+  var o: O; o.pos = vec4f(p * 2.0 - 1.0, 0, 1); o.uv = vec2f(p.x, 1.0 - p.y); return o;
+}
+@fragment fn fs(i: O) -> @location(0) vec4f { return textureSample(src, samp, i.uv); }`;
 
-  // Remaster only; ?ug2=0 turns it off.
-  // One line to the console and to the page log (#log, which tools/webcheck.mjs prints).
-  const say = t => { console.log(t); const l = document.getElementById('log'); if (l) { const d = document.createElement('div'); d.textContent = t; l.appendChild(d); } };
+  // Remaster only; ?ug2=0 turns it off, ?ug2tex=0 draws vertex colour x 2 only (the untextured baseline).
+  // One line to the page log (web/boot.js line(): the page and build/webcheck.log through tools/serve.py).
+  const say = t => line(t);
   const api = window.Ug2 = { on: RN_MODE === 'remaster' && RN_Q.get('ug2') !== '0', state: 'idle' };
-  let device, mesh, pipes = new Map(), bind, uniform, module, loading = false;
+  const TEXTURED = RN_Q.get('ug2tex') !== '0';
+  let device, gpu, loading = false;
 
   // One UG2M file -> {nv, ni, vb, ib}, or null when it is missing or not a UG2M mesh.
   async function read(name) {
@@ -49,68 +69,183 @@ struct O { @builtin(position) pos: vec4f, @location(0) col: vec3f, @location(1) 
     return { nv: h[1], ni: h[2], vb: new Uint8Array(b, 16, 16 * h[1]), ib: new Uint32Array(b, 16 + 16 * h[1], h[2]) };
   }
 
-  // The city (city.bin, else city_lod.bin) plus the bridge deck (bridge.bin, tools/ug2_collfile.py): both raw UG2 units, one PLACE, one draw.
-  async function load() {
+  // city_tex.bin -> {uv Float32Array (2 per vertex), tri Uint16Array (texture per triangle)}, only when it matches city.bin.
+  async function readSide(city) {
+    const r = await fetch('/ug2/city_tex.bin').catch(() => null);
+    if (!r?.ok) { say('ug2: no city_tex.bin, untextured'); return null; }
+    const b = await r.arrayBuffer(), h = new Uint32Array(b, 0, 5);
+    if (new TextDecoder().decode(new Uint8Array(b, 0, 4)) !== 'UG2T' || h[1] !== city.nv || h[2] !== city.ni / 3) { say(`ug2: city_tex.bin (${h[1]} verts, ${h[2]} tris) does not match city.bin, untextured`); return null; }
+    return { uv: new Float32Array(b, 20, 2 * h[1]), tri: new Uint16Array(b, 20 + 8 * h[1], h[2]) };
+  }
+
+  // Draw classes, in draw order (0x5bcc30: +0x56 non-zero = blended and no depth write).
+  const OPAQUE = 0, TEST = 1, BLEND = 2, ADD = 3;
+  const klass = t => !t ? OPAQUE : t.blend === 'add' ? ADD : t.blend === 'alpha' ? BLEND : t.alpha_test ? TEST : OPAQUE;
+
+  async function load(dev) {
+    const t0 = performance.now();
     const city = await read('city.bin') || await read('city_lod.bin'), bridge = await read('bridge.bin');
     if (!city) { say('ug2: no web/ug2/city.bin or city_lod.bin, nothing drawn'); return null; }
-    if (!bridge) return city;
-    const vb = new Uint8Array(city.vb.length + bridge.vb.length), ib = new Uint32Array(city.ni + bridge.ni);
-    vb.set(city.vb); vb.set(bridge.vb, city.vb.length);
-    ib.set(city.ib); for (let k = 0; k < bridge.ni; k++) ib[city.ni + k] = bridge.ib[k] + city.nv;
-    return { nv: city.nv + bridge.nv, ni: city.ni + bridge.ni, vb, ib };
+    const side = TEXTURED ? await readSide(city) : null;
+    const info = side ? (await (await fetch('/ug2/tex.json')).json()).textures : [];
+    const nv = city.nv + (bridge?.nv || 0), ntri = (city.ni + (bridge?.ni || 0)) / 3;
+    // Vertices, 24 B: f32 xyz, u8 rgba, f32 uv (bridge.bin and untextured city: uv 0).
+    const vb = new ArrayBuffer(24 * nv), vf = new Float32Array(vb), vu = new Uint32Array(vb);
+    const put = (m, base) => {
+      const f = new Float32Array(m.vb.buffer, m.vb.byteOffset, m.nv * 4), w = new Uint32Array(m.vb.buffer, m.vb.byteOffset, m.nv * 4);
+      for (let k = 0, o = base * 6; k < m.nv; k++, o += 6) { vf[o] = f[4 * k]; vf[o + 1] = f[4 * k + 1]; vf[o + 2] = f[4 * k + 2]; vu[o + 3] = w[4 * k + 3]; }
+    };
+    put(city, 0); if (bridge) put(bridge, city.nv);
+    if (side) for (let k = 0; k < city.nv; k++) { vf[6 * k + 4] = side.uv[2 * k]; vf[6 * k + 5] = side.uv[2 * k + 1]; }
+    // Textures: one 2D array per size (layer = instance index of its draws), plus a 1x1 white layer for "no texture".
+    const buckets = new Map(), slot = new Int32Array(info.length + 1).fill(-1);   // texture -> bucket*65536 + layer
+    const white = { w: 1, h: 1, list: [-1] }; buckets.set('1x1', white);
+    const maxLayers = dev.limits.maxTextureArrayLayers;   // 256 by default: a size with more textures takes several arrays
+    info.forEach((t, i) => {
+      if (!t.file) return;
+      let n = 0, k;
+      while (buckets.get(k = `${t.w}x${t.h}#${n}`)?.list.length >= maxLayers) n++;
+      if (!buckets.has(k)) buckets.set(k, { w: t.w, h: t.h, list: [] });
+      buckets.get(k).list.push(i);
+    });
+    const blist = [...buckets.values()];
+    blist.forEach((b, bi) => b.list.forEach((ti, li) => { if (ti >= 0) slot[ti] = bi * 65536 + li; }));
+    // Triangles sorted by (class, bucket, layer): one draw per texture.
+    const NONE = 0, key = new Uint32Array(info.length + 1);   // index info.length = no texture (white, opaque)
+    const order = [];
+    for (let i = 0; i <= info.length; i++) {
+      const t = i < info.length && slot[i] >= 0 ? info[i] : null;
+      order.push({ i, cls: klass(t), s: t ? slot[i] : NONE });
+    }
+    order.sort((a, b) => a.cls - b.cls || a.s - b.s);
+    order.forEach((o, r) => key[o.i] = r);
+    const triKey = new Uint32Array(ntri);
+    for (let k = 0; k < ntri; k++) {
+      const t = side && k < city.ni / 3 ? side.tri[k] : 0xffff;
+      triKey[k] = key[t < info.length && slot[t] >= 0 ? t : info.length];
+    }
+    const count = new Uint32Array(order.length + 1);
+    for (let k = 0; k < ntri; k++) count[triKey[k] + 1]++;
+    for (let r = 0; r < order.length; r++) count[r + 1] += count[r];
+    const start = count.slice(), ib = new Uint32Array(3 * ntri), pos = count.slice(0, order.length);
+    for (let k = 0; k < ntri; k++) {
+      const d = 3 * pos[triKey[k]]++, cityTri = k < city.ni / 3;
+      const src = cityTri ? city.ib : bridge.ib, s = cityTri ? 3 * k : 3 * k - city.ni, add = cityTri ? 0 : city.nv;
+      ib[d] = src[s] + add; ib[d + 1] = src[s + 1] + add; ib[d + 2] = src[s + 2] + add;
+    }
+    const draws = [];
+    order.forEach((o, r) => { const n = start[r + 1] - start[r]; if (n) draws.push({ cls: o.cls, bucket: o.s >> 16, layer: o.s & 0xffff, first: 3 * start[r], count: 3 * n }); });
+    const tMesh = performance.now();
+    // Upload the pixels: each PNG into its layer, then the mips on the GPU.
+    const texs = blist.map(b => dev.createTexture({ size: [b.w, b.h, b.list.length], format: 'rgba8unorm', dimension: '2d',
+      mipLevelCount: Math.floor(Math.log2(Math.max(b.w, b.h))) + 1,
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT }));
+    dev.queue.writeTexture({ texture: texs[0] }, new Uint8Array([255, 255, 255, 255]), { bytesPerRow: 4 }, [1, 1, 1]);
+    const jobs = []; blist.forEach((b, bi) => b.list.forEach((ti, li) => { if (ti >= 0) jobs.push([bi, li, info[ti].file]); }));
+    let failed = 0;
+    const worker = async () => {
+      for (let j; (j = jobs.pop());) {
+        const [bi, li, file] = j;
+        try {
+          const img = await createImageBitmap(await (await fetch('/ug2/' + file)).blob(), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
+          dev.queue.copyExternalImageToTexture({ source: img }, { texture: texs[bi], origin: [0, 0, li] }, [img.width, img.height]);
+          img.close();
+        } catch { failed++; }
+      }
+    };
+    await Promise.all(Array.from({ length: 16 }, worker));
+    const mipPipe = dev.createRenderPipeline({ layout: 'auto', vertex: { module: dev.createShaderModule({ code: blit }), entryPoint: 'vs' },
+      fragment: { module: dev.createShaderModule({ code: blit }), entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] } });
+    const lin = dev.createSampler({ minFilter: 'linear', magFilter: 'linear' }), enc = dev.createCommandEncoder();
+    texs.forEach(tx => {
+      for (let l = 0; l < tx.depthOrArrayLayers; l++) for (let m = 1; m < tx.mipLevelCount; m++) {
+        const v = o => tx.createView({ dimension: '2d', baseArrayLayer: l, arrayLayerCount: 1, baseMipLevel: o, mipLevelCount: 1 });
+        const p = enc.beginRenderPass({ colorAttachments: [{ view: v(m), loadOp: 'clear', storeOp: 'store' }] });
+        p.setPipeline(mipPipe);
+        p.setBindGroup(0, dev.createBindGroup({ layout: mipPipe.getBindGroupLayout(0), entries: [{ binding: 0, resource: v(m - 1) }, { binding: 1, resource: lin }] }));
+        p.draw(3); p.end();
+      }
+    });
+    dev.queue.submit([enc.finish()]);
+    const mb = texs.reduce((a, t) => a + t.width * t.height * t.depthOrArrayLayers * 4 * 4 / 3, 0) / 1e6;
+    say(`ug2: ${side ? 'textured' : 'untextured'}: ${nv} verts ${ntri} tris, ${draws.length} draws, ${info.filter(t => t.file).length} textures in ${blist.length} arrays (${mb.toFixed(0)} MB with mips, ${failed} failed), mesh ${(tMesh - t0).toFixed(0)} ms, total load ${(performance.now() - t0).toFixed(0)} ms`);
+    return { vb: new Uint8Array(vb), ib, draws, texs };
   }
 
   function setup(dev, m) {
     device = dev;
-    const make = (data, usage) => { const buf = device.createBuffer({ size: (data.byteLength + 3) & ~3, usage: usage | GPUBufferUsage.COPY_DST }); device.queue.writeBuffer(buf, 0, data); return buf; };
-    mesh = { ...m, vbuf: make(m.vb, GPUBufferUsage.VERTEX), ibuf: make(m.ib, GPUBufferUsage.INDEX) };
-    uniform = device.createBuffer({ size: 64 * 3 + 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
-    const bgl = device.createBindGroupLayout({ entries: [{ binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' } }] });
-    bind = device.createBindGroup({ layout: bgl, entries: [{ binding: 0, resource: { buffer: uniform } }] });
-    module = device.createShaderModule({ code: shader });
-    mesh.layout = device.createPipelineLayout({ bindGroupLayouts: [bgl] });
+    const make = (data, usage) => { const buf = dev.createBuffer({ size: (data.byteLength + 3) & ~3, usage: usage | GPUBufferUsage.COPY_DST }); dev.queue.writeBuffer(buf, 0, data); return buf; };
+    const uniform = dev.createBuffer({ size: 64 * 3, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+    const bgl0 = dev.createBindGroupLayout({ entries: [{ binding: 0, visibility: GPUShaderStage.VERTEX, buffer: { type: 'uniform' } }] });
+    const bgl1 = dev.createBindGroupLayout({ entries: [
+      { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: { viewDimension: '2d-array' } },
+      { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} }] });
+    // D3D's default address mode is WRAP and the terrain uvs are world-planar (census/ug2/tex.md): repeat, trilinear.
+    const samp = dev.createSampler({ addressModeU: 'repeat', addressModeV: 'repeat', minFilter: 'linear', magFilter: 'linear', mipmapFilter: 'linear', maxAnisotropy: 8 });
+    gpu = { vbuf: make(m.vb, GPUBufferUsage.VERTEX), ibuf: make(m.ib, GPUBufferUsage.INDEX), draws: m.draws, uniform, pipes: new Map(),
+      module: dev.createShaderModule({ code: shader }), layout: dev.createPipelineLayout({ bindGroupLayouts: [bgl0, bgl1] }),
+      bind0: dev.createBindGroup({ layout: bgl0, entries: [{ binding: 0, resource: { buffer: uniform } }] }),
+      bind1: m.texs.map(t => dev.createBindGroup({ layout: bgl1, entries: [{ binding: 0, resource: t.createView({ dimension: '2d-array' }) }, { binding: 1, resource: samp }] })) };
   }
 
-  function pipeline(count) {
-    if (pipes.has(count)) return pipes.get(count);
-    const p = device.createRenderPipeline({ layout: mesh.layout,
-      vertex: { module, entryPoint: 'vs', buffers: [{ arrayStride: 16, attributes: [
-        { shaderLocation: 0, offset: 0, format: 'float32x3' }, { shaderLocation: 1, offset: 12, format: 'unorm8x4' }] }] },
-      fragment: { module, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] },
-      // No culling: the handedness of the NFSU2 mesh is not proven; closed shells under the depth test look right either way.
+  function pipeline(cls, count) {
+    const k = cls * 64 + count;
+    if (gpu.pipes.has(k)) return gpu.pipes.get(k);
+    const blend = cls === BLEND ? { color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha' }, alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' } }
+      : cls === ADD ? { color: { srcFactor: 'src-alpha', dstFactor: 'one' }, alpha: { srcFactor: 'zero', dstFactor: 'one' } } : undefined;
+    const p = device.createRenderPipeline({ layout: gpu.layout,
+      vertex: { module: gpu.module, entryPoint: 'vs', buffers: [{ arrayStride: 24, attributes: [
+        { shaderLocation: 0, offset: 0, format: 'float32x3' }, { shaderLocation: 1, offset: 12, format: 'unorm8x4' }, { shaderLocation: 2, offset: 16, format: 'float32x2' }] }] },
+      fragment: { module: gpu.module, entryPoint: cls === TEST ? 'fs_test' : 'fs', targets: [{ format: 'rgba8unorm', blend }] },
+      // No culling: UG2's cull state per mesh is not read (UNKNOWN); closed shells under the depth test look right either way.
       primitive: { topology: 'triangle-list', cullMode: 'none' },
-      depthStencil: { format: 'depth24plus-stencil8', depthCompare: 'less-equal', depthWriteEnabled: true },
+      depthStencil: { format: 'depth24plus-stencil8', depthCompare: 'less-equal', depthWriteEnabled: cls <= TEST },
       multisample: { count } });
-    pipes.set(count, p); return p;
+    gpu.pipes.set(k, p); return p;
   }
+
+  // Frame rate while the city is drawn: one line per 600 frames, six times (load and frame cost, OWNER rule: measure before/after).
+  let frames = 0, since = 0, cpu = 0, reports = 0;
 
   // Called at GPU_FXAA with the scene targets (web/gpu.js res entries).
   api.scene = (dev, speed, enc, rt, ds) => {
     if (!api.on || !rt || !ds || !speed._rn_mc_state) return;
     if (!loading) {
       loading = true; api.state = 'loading';
-      load().then(m => { if (m) { try { setup(dev, m); api.state = 'ready'; } catch (e) { api.state = 'failed'; console.warn('ug2 upload:', e.message); } } else api.state = 'nofile'; });
+      load(dev).then(m => { if (m) { try { setup(dev, m); api.state = 'ready'; } catch (e) { api.state = 'failed'; say('ug2 upload: ' + e.message); } } else api.state = 'nofile'; },
+        e => { api.state = 'failed'; say('ug2 load: ' + e.message); });
     }
     if (api.state !== 'ready') return;
+    const c0 = performance.now();
     // Re-take the heap view every frame: wasm memory can grow.
     const a = speed._rn_mc_state() >>> 0, f = new Float32Array(speed.HEAPU8.buffer, a + 48, 32);
     if (!f[11 + 16]) return;       // no projection yet (m[11] of a D3D perspective matrix is 1)
-    const u = new Float32Array(52);
+    const u = new Float32Array(48);
     u.set(f);                      // View, Projection: row-major D3D row vectors read as WGSL columns = the transpose, so P_w * (V_w * p) = v * V * P
     // Far plane for this pass only: z = f/(f-n) * (1 - n/w), so only f changes (n = -m14/m10 from the game's own projection).
-    const m10 = f[16 + 10], m14 = f[16 + 14], near = -m14 / m10, gameFar = m10 * near / (m10 - 1);
+    const m10 = f[16 + 10], m14 = f[16 + 14], near = -m14 / m10;
     u[16 + 10] = FAR / (FAR - near); u[16 + 14] = -near * FAR / (FAR - near);
     const c = Math.cos(PLACE.yaw), s = Math.sin(PLACE.yaw);
-    // model, as WGSL columns: column k holds the image of axis k
-    u.set([c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, PLACE.tx, PLACE.ty, PLACE.tz, 1], 32);
-    u.set([...FOG, FOG_DENSITY], 48);
-    if (!api.logged) { api.logged = true; say(`ug2: first frame, eye ${[0, 1, 2].map(j => (-(f[12] * f[4 * j] + f[13] * f[4 * j + 1] + f[14] * f[4 * j + 2])).toFixed(1))}, game near ${near.toFixed(3)} far ${gameFar.toFixed(0)} -> ${FAR}, target ${rt.w}x${rt.h} x${ds.tex.sampleCount}`); }
-    device.queue.writeBuffer(uniform, 0, u);
+    u.set([c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, PLACE.tx, PLACE.ty, PLACE.tz, 1], 32);   // model, as WGSL columns: column k = image of axis k
+    device.queue.writeBuffer(gpu.uniform, 0, u);
     const pass = enc.beginRenderPass({
       colorAttachments: [{ view: rt.msView || rt.view, ...(rt.msView ? { resolveTarget: rt.view } : {}), loadOp: 'load', storeOp: 'store' }],
       depthStencilAttachment: { view: ds.view, depthLoadOp: 'load', depthStoreOp: 'store', stencilLoadOp: 'load', stencilStoreOp: 'store' } });
-    pass.setPipeline(pipeline(ds.tex.sampleCount)); pass.setBindGroup(0, bind);
-    pass.setVertexBuffer(0, mesh.vbuf); pass.setIndexBuffer(mesh.ibuf, 'uint32'); pass.drawIndexed(mesh.ni);
+    pass.setBindGroup(0, gpu.bind0); pass.setVertexBuffer(0, gpu.vbuf); pass.setIndexBuffer(gpu.ibuf, 'uint32');
+    let cls = -1, bucket = -1;
+    for (const d of gpu.draws) {
+      if (d.cls !== cls) { cls = d.cls; pass.setPipeline(pipeline(cls, ds.tex.sampleCount)); }
+      if (d.bucket !== bucket) { bucket = d.bucket; pass.setBindGroup(1, gpu.bind1[bucket]); }
+      pass.drawIndexed(d.count, 1, d.first, 0, d.layer);
+    }
     pass.end();
+    const now = performance.now();
+    cpu += now - c0;
+    if (!since) since = now;
+    if (++frames === 600 && reports < 6) {
+      reports++;
+      say(`ug2: ${(600 * 1000 / (now - since)).toFixed(1)} fps over 600 frames, ug2 pass ${(cpu / 1200).toFixed(2)} ms cpu per frame (${TEXTURED ? 'textured' : 'ug2tex=0'}), eye ${[0, 1, 2].map(j => (-(f[12] * f[4 * j] + f[13] * f[4 * j + 1] + f[14] * f[4 * j + 2])).toFixed(1))}`);
+      frames = 0; since = now; cpu = 0;
+    }
   };
 })();
