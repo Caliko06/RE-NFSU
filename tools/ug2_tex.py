@@ -51,7 +51,7 @@ def packs(d):
                     v = struct.unpack_from('<8I2h', d, r + 0x24)
                     pk['recs'].append(dict(name=d[r + 0xc:r + 0x24].split(b'\0')[0].decode('latin1'), hash=v[0],
                                            pix=v[3], pal=v[4], npix=v[5], npal=v[6], mip0=v[7], w=v[8], h=v[9],
-                                           mips=d[r + 0x4e]))
+                                           mips=d[r + 0x4e], atest=d[r + 0x55], blend=d[r + 0x56]))
             elif i3 == 0x33310005:  # 0x494380: count = size >> 5; D3DFORMAT at +0x14
                 pk['gpu'] = [struct.unpack_from('<I', d, p + 0x20 * k + 0x14)[0] for k in range(s3 // 32)]
         return pk
@@ -148,9 +148,10 @@ def decode(d, pk, r, fmt):
     w, h = r['w'], r['h']
     if fmt.startswith('DXT'):
         return decode_dxt(d[base + r['pix']:base + r['pix'] + r['mip0']], w, h, fmt)
-    if fmt == 'P8':   # palette 256 x 4 bytes at record +0x34 (channel order checked by eye, census/ug2/tex.md)
+    if fmt == 'P8':   # palette 256 x u32 at record +0x34. Exe 0x5ce1e9..0x5ce23b copies palette[index] (a whole dword) into a
+        # D3DFMT_A8R8G8B8 (0x15) texture, so the file bytes are B,G,R,A like every A8R8G8B8 pixel.
         idx = np.frombuffer(d, np.uint8, count=w * h, offset=base + r['pix'])
-        pal = np.frombuffer(d, np.uint8, count=1024, offset=base + r['pal']).reshape(256, 4)
+        pal = np.frombuffer(d, np.uint8, count=1024, offset=base + r['pal']).reshape(256, 4)[:, [2, 1, 0, 3]]
         return pal[idx].reshape(h, w, 4)
     if fmt == 'A8R8G8B8':
         a = np.frombuffer(d, np.uint8, count=w * h * 4, offset=base + r['pix']).reshape(h, w, 4)
@@ -183,7 +184,7 @@ def scan_solids(path):
                 elif j == 0x134900:
                     q, _ = W.pay(d, b2, s2)
                     h = struct.unpack_from('<16I', d, q)
-                    sol['nv'], sol['ntri'], sol['ngrp'] = h[13], h[9], h[4]   # +0x10 group count (0x5c58a4)
+                    sol['nv'], sol['ntri'], sol['ngrp'], sol['mask'] = h[13], h[9], h[4], h[3]   # +0x10 group count (0x5c58a4), +0xc vertex mask
                 elif j == 0x134b01:
                     sol['v'] = W.pay(d, b2, s2, 128)[0]
                 elif j == 0x134b02:   # 0x5cc2dd: mesh+0x14 = payload aligned 16; groups 0x3c apart (0x5c58c7)
@@ -218,25 +219,123 @@ def scan_solids(path):
     return d, solids, sections
 
 
+BLEND = {0: 'none', 1: 'alpha', 2: 'add'}   # record +0x56; exe 0x5bcce0 table: 1 SRCALPHA/INVSRCALPHA, 2 SRCALPHA/ONE (3..6 never occur in UG2 data)
+
+
+def footprint():
+    """same collision footprint as ug2_world.main (near()): grid of REACH-grown cells around the collision rows"""
+    rows = np.frombuffer(open(W.COLL, 'rb').read(), np.uint8).reshape(-1, 32)
+    cx = (rows[:, 8:16].copy().view('<i2')[:, :3] / 8).mean(1)
+    cy = (rows[:, 16:24].copy().view('<i2')[:, :3] / 8).mean(1)
+    foot = np.zeros((16384 // W.CELL, 16384 // W.CELL), bool)
+    foot[((cx + 8192) // W.CELL).astype(int), ((cy + 8192) // W.CELL).astype(int)] = True
+    for _ in range(W.REACH // W.CELL):
+        g = foot.copy(); g[1:] |= foot[:-1]; g[:-1] |= foot[1:]; g[:, 1:] |= foot[:, :-1]; g[:, :-1] |= foot[:, 1:]; foot = g
+
+    def near(bb):
+        i, j = int((bb[0] + bb[3]) / 2 + 8192) // W.CELL, int((bb[1] + bb[4]) / 2 + 8192) // W.CELL
+        return 0 <= i < foot.shape[0] and 0 <= j < foot.shape[1] and foot[i, j]
+    return near
+
+
+STRIDE = {0x4180: (36, 28)}   # vertex mask -> (stride, uv offset); every other mask seen: (24, 16). Measured, census/ug2/tex.md
+
+
+def walk(data, sol, secs, near, fixed):
+    """the instance walk of ug2_world.main, collecting uv + per-triangle texture/material instead of colour.
+    fixed=False reproduces ug2_world's hardcoded 24-byte vertex for positions; fixed=True uses the per-mask stride."""
+    cache, tlist, tindex, mlist, mindex = {}, [], {}, [], {}
+
+    def tid(h):
+        if h not in tindex:
+            tindex[h] = len(tlist)
+            tlist.append(h)
+        return tindex[h]
+
+    def mid(h):
+        if h not in mindex:
+            mindex[h] = len(mlist)
+            mlist.append(h)
+        return mindex[h]
+
+    def local(h):
+        if h in cache:
+            return cache[h]
+        s, r = sol.get(h), None
+        if s:
+            d = data[s['f']]
+            stride, uvo = STRIDE.get(s['mask'], (24, 16))
+            ps = stride if fixed else 24
+            raw = np.frombuffer(d, np.uint8, count=s['nv'] * ps, offset=s['v']).reshape(-1, ps)
+            xyz = raw[:, :12].copy().view('<f4').reshape(-1, 3)
+            rw = np.frombuffer(d, np.uint8, count=s['nv'] * stride, offset=s['v']).reshape(-1, stride)
+            uv = rw[:, uvo:uvo + 8].copy().view('<f4').reshape(-1, 2)
+            ix = np.frombuffer(d, '<u2', count=s['ntri'] * 3, offset=s['i']).reshape(-1, 3).astype(np.int64)
+            ok = (ix < s['nv']).all(1) & (ix[:, 0] != ix[:, 1]) & (ix[:, 1] != ix[:, 2]) & (ix[:, 0] != ix[:, 2])
+            if ok.any() and np.isfinite(xyz).all():
+                tt = np.full(len(ix), 0xffff, np.int64)
+                mm = np.full(len(ix), 0xffff, np.int64)
+                for start, cnt, ts, ms in s['groups']:
+                    a, b = start // 3, (start + cnt) // 3
+                    if ts < len(s['tex']):
+                        tt[a:b] = tid(s['tex'][ts])
+                    if ms != 0xff and ms < len(s['mat']):
+                        mm[a:b] = mid(s['mat'][ms])
+                r = (xyz, uv, ix[ok], tt[ok], mm[ok])
+        cache[h] = r
+        return r
+
+    UV, TT, MM, XYZ, seen = [], [], [], [], set()
+    for fi, defs, inst in secs:
+        for row in inst:
+            w = row.tobytes()
+            di = struct.unpack_from('<H', w, 24)[0]
+            if di >= len(defs):
+                continue
+            hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
+            if hh in sol and sol[hh]['name'].upper().startswith(W.SKIP):
+                continue
+            if not near(struct.unpack_from('<6f', w, 0)):
+                continue
+            key = (hh, w[32:62])
+            if key in seen:
+                continue
+            seen.add(key)
+            m = local(hh)
+            if m is None:
+                continue
+            xyz, uv, ix, tt, mm = m
+            R = np.array(struct.unpack_from('<9h', w, 44), dtype=np.float64).reshape(3, 3) / 8192.0
+            pos = np.array(struct.unpack_from('<3f', w, 32), dtype=np.float64)
+            with np.errstate(all='ignore'):
+                wp = (xyz.astype(np.float64) @ R + pos).astype(np.float32)
+            if not np.isfinite(wp).all() or np.abs(wp).max() > 1e5:
+                continue
+            used = np.unique(ix)
+            XYZ.append(wp[used]); UV.append(uv[used]); TT.append(tt); MM.append(mm)
+    return (np.concatenate(XYZ), np.concatenate(UV).astype('<f4'), np.concatenate(TT).astype('<u2'),
+            np.concatenate(MM).astype('<u2'), tlist, mlist)
+
+
 def main():
     tracks = sys.argv[1] if len(sys.argv) > 1 else W.TRACKS
+    # city = STREAML4RA only (ug2_world.main); the other streams are only a texture-hash source
     files = sorted(glob.glob(os.path.join(tracks, 'STREAML4R?.BUN')))
-    data, sol, secs = [], {}, []
-    texsrc = {}   # texture hash -> (file index, pack, record, gpu format)
-    npk = ntexrec = 0
+    data, sol, secs, texsrc, npk, ntexrec = [], {}, [], {}, 0, 0
     for f in files:
-        d, s, c = scan_solids(f)
+        isra = os.path.basename(f) == 'STREAML4RA.BUN'
+        d, s, c = scan_solids(f) if isra else (open(f, 'rb').read(), {}, [])
         fi = len(data)
         data.append(d)
-        for h, v in s.items():
-            sol.setdefault(h, dict(v, f=fi))
-        secs += [(fi, defs, inst) for defs, inst in c]
+        if isra:
+            for h, v in s.items():
+                sol.setdefault(h, dict(v, f=fi))
+            secs += [(fi, defs, inst) for defs, inst in c]
         for pk in packs(d):
             npk += 1
             for r, g in zip(pk['recs'], pk['gpu']):
                 ntexrec += 1
                 texsrc.setdefault(r['hash'], (fi, pk, r, GPU_FMT.get(g, hex(g))))
-        print(os.path.basename(f), 'solids', len(s), 'packs so far', npk, flush=True)
     print('packs', npk, 'texture records', ntexrec, 'distinct hashes', len(texsrc))
     # game-wide texture packs (GLOBAL/, FRONTEND/FrontB.lzc) are searched for hashes the track packs lack
     root = os.path.dirname(tracks.rstrip('/'))
@@ -254,91 +353,26 @@ def main():
                     got += 1
         print(os.path.basename(f), 'new hashes', got)
 
-    # ---- walk the instances exactly as ug2_world.main (same filter, same dedup, same order) -> uv + per triangle link
-    cache, tlist, tindex, mlist, mindex = {}, [], {}, [], {}
-    def tid(h):
-        if h not in tindex:
-            tindex[h] = len(tlist)
-            tlist.append(h)
-        return tindex[h]
-    def mid(h):
-        if h not in mindex:
-            mindex[h] = len(mlist)
-            mlist.append(h)
-        return mindex[h]
-
-    def local(h):
-        if h in cache:
-            return cache[h]
-        s, r = sol.get(h), None
-        if s:
-            d = data[s['f']]
-            raw = np.frombuffer(d, np.uint8, count=s['nv'] * 24, offset=s['v']).reshape(-1, 24)
-            xyz = raw[:, :12].copy().view('<f4').reshape(-1, 3)
-            uv = raw[:, 16:24].copy().view('<f4').reshape(-1, 2)
-            ix = np.frombuffer(d, '<u2', count=s['ntri'] * 3, offset=s['i']).reshape(-1, 3).astype(np.int64)
-            ok = (ix < s['nv']).all(1) & (ix[:, 0] != ix[:, 1]) & (ix[:, 1] != ix[:, 2]) & (ix[:, 0] != ix[:, 2])
-            if ok.any() and np.isfinite(xyz).all():
-                tt = np.full(len(ix), 0xffff, np.int64)   # per triangle texture / material index
-                mm = np.full(len(ix), 0xffff, np.int64)
-                for start, cnt, ts, ms in s['groups']:
-                    a, b = start // 3, (start + cnt) // 3
-                    if ts < len(s['tex']):
-                        tt[a:b] = tid(s['tex'][ts])
-                    if ms != 0xff and ms < len(s['mat']):
-                        mm[a:b] = mid(s['mat'][ms])
-                r = (xyz, uv, ix[ok], tt[ok], mm[ok])
-        cache[h] = r
-        return r
-
-    UV, TT, MM, XYZ = [], [], [], []
-    seen = set()
-    for fi, defs, inst in secs:
-        for row in inst:
-            w = row.tobytes()
-            di = struct.unpack_from('<H', w, 24)[0]
-            if di >= len(defs):
-                continue
-            hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
-            if hh in sol and sol[hh]['name'].upper().startswith(W.SKIP):
-                continue
-            key = (hh, w[32:62])
-            if key in seen:
-                continue
-            seen.add(key)
-            m = local(hh)
-            if m is None:
-                continue
-            xyz, uv, ix, tt, mm = m
-            R = np.array(struct.unpack_from('<9h', w, 44), dtype=np.float64).reshape(3, 3) / 8192.0
-            pos = np.array(struct.unpack_from('<3f', w, 32), dtype=np.float64)
-            wp = (xyz.astype(np.float64) @ R + pos).astype(np.float32)
-            if not np.isfinite(wp).all() or np.abs(wp).max() > 1e5:
-                continue
-            used = np.unique(ix)
-            XYZ.append(wp[used])
-            UV.append(uv[used])
-            TT.append(tt)
-            MM.append(mm)
-    P = np.concatenate(XYZ)
-    UVa = np.concatenate(UV).astype('<f4')
-    Tt = np.concatenate(TT).astype('<u2')
-    Mm = np.concatenate(MM).astype('<u2')
-    print('verts', len(P), 'tris', len(Tt), 'distinct textures referenced', len(tlist), 'materials', len(mlist))
-
-    # ---- check against city.bin (same vertex order is what makes the side file bindable)
+    near = footprint()
     cb = os.path.join(OUT, 'city.bin')
+    nv = ni = None
     if os.path.exists(cb):
         with open(cb, 'rb') as f:
-            hd = f.read(16)
-            nv, ni = struct.unpack_from('<II', hd, 4)
+            nv, ni = struct.unpack_from('<II', f.read(16), 4)
+            f.seek(16)
             rec = np.frombuffer(f.read(nv * 16), dtype=[('p', '<f4', 3), ('c', 'u1', 4)])
-        same = nv == len(P) and ni == 3 * len(Tt) and np.array_equal(rec['p'], P)
-        print('city.bin match: verts', nv, 'vs', len(P), 'tris', ni // 3, 'vs', len(Tt), '->', 'IDENTICAL' if same else 'DIFFERENT')
-        if not same:
-            sys.exit('city.bin order differs: side file not written')
+    fixed_used = False
+    for fixed in (False, True):
+        P, UVa, Tt, Mm, tlist, mlist = walk(data, sol, secs, near, fixed)
+        same = nv is not None and nv == len(P) and ni == 3 * len(Tt) and np.array_equal(rec['p'], P)
+        print('stride per mask' if fixed else 'ug2_world 24-byte stride', ': verts', len(P), 'tris', len(Tt),
+              '| city.bin', (nv, ni // 3 if ni else None), '->', 'IDENTICAL' if same else 'DIFFERENT')
+        if same or nv is None:
+            fixed_used = fixed
+            break
     else:
-        print('city.bin absent: order NOT checked')
+        sys.exit('city.bin order differs: side file not written')
+    print('distinct textures referenced', len(tlist), 'materials', len(mlist))
 
     # ---- decode the referenced textures
     os.makedirs(os.path.join(OUT, 'tex'), exist_ok=True)
@@ -356,25 +390,33 @@ def main():
             undec += 1
             continue
         fn = 'tex/%08x.png' % h
+        used = r['atest'] != 0 or r['blend'] != 0   # exe 0x5bcca7/0x5bccbc: alpha only matters with record +0x55 / +0x56 set
+        raw_alpha = bool((img[:, :, 3] < 255).any())
+        if not used:   # alpha test and blending both off: the palette/DXT alpha is never used by the draw, so store opaque
+            img = img.copy()
+            img[:, :, 3] = 255
         Image.fromarray(np.ascontiguousarray(img), 'RGBA').save(os.path.join(OUT, fn))
-        alpha = bool((img[:, :, 3] < 255).any())
         fmtcount[fmt] = fmtcount.get(fmt, 0) + 1
-        texes.append({'hash': '%08x' % h, 'file': fn, 'w': r['w'], 'h': r['h'], 'fmt': fmt, 'alpha': alpha,
-                      'name': r['name'], 'pack': pk.get('name')})
+        texes.append({'hash': '%08x' % h, 'file': fn, 'w': r['w'], 'h': r['h'], 'fmt': fmt,
+                      'alpha': r['atest'] == 1 or r['blend'] != 0, 'raw_alpha': raw_alpha, 'name': r['name'], 'pack': pk.get('name'),
+                      'alpha_test': r['atest'] == 1,   # exe 0x5bcca7: record +0x55 == 1 -> ALPHATESTENABLE, ALPHAREF 0x5f
+                      'blend': BLEND.get(r['blend'], 'mode%d' % r['blend']),   # record +0x56, exe 0x5bccbc
+                      'flag55': r['atest'], 'flag56': r['blend']})
     stats = {'referenced': len(tlist), 'decoded': len(tlist) - missing - undec, 'no_pack_record': missing,
-             'undecoded_format': undec, 'formats': fmtcount, 'packs_scanned': npk, 'records_scanned': ntexrec}
+             'undecoded_format': undec, 'formats': fmtcount, 'packs_scanned': npk, 'records_scanned': ntexrec,
+             'positions_with_per_mask_stride': fixed_used}
     json.dump({'textures': texes, 'materials': ['%08x' % h for h in mlist], 'stats': stats},
               open(os.path.join(OUT, 'tex.json'), 'w'), indent=0)
     with open(os.path.join(OUT, 'city_tex.bin'), 'wb') as f:
         f.write(b'UG2T' + struct.pack('<IIII', len(P), len(Tt), len(tlist), len(mlist)))
-        f.write(UVa.tobytes())
-        f.write(Tt.tobytes())
-        f.write(Mm.tobytes())
-    ntri_tex = int((Tt != 0xffff).sum())
+        f.write(UVa.tobytes()); f.write(Tt.tobytes()); f.write(Mm.tobytes())
     dec_ok = np.array([t['file'] is not None for t in texes] + [False])
+    tri_dec = dec_ok[np.where(Tt == 0xffff, len(texes), Tt)]
+    bl = np.array([t.get('blend', 'none') for t in texes] + ['none'])[np.where(Tt == 0xffff, len(texes), Tt)]
+    at = np.array([t.get('alpha_test', False) for t in texes] + [False])[np.where(Tt == 0xffff, len(texes), Tt)]
     print('stats', json.dumps(stats))
-    print('triangles with a texture slot', ntri_tex, 'of', len(Tt), '; with a decoded texture',
-          int(dec_ok[np.where(Tt == 0xffff, len(texes), Tt)].sum()))
+    print('triangles', len(Tt), 'with texture slot', int((Tt != 0xffff).sum()), 'decoded', int(tri_dec.sum()),
+          '| alpha-test', int(at.sum()), 'blend alpha', int((bl == 'alpha').sum()), 'additive', int((bl == 'add').sum()))
 
 
 if __name__ == '__main__':
