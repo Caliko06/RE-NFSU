@@ -287,6 +287,11 @@ void input_jump(Ctx *c) {
     if (sscanf(s, "%u:%u%n", &m, &t, &used) != 2 || m > 6) { rn_log("RN_JUMP: cannot read \"%s\"", s); s = ""; return; }
     s += used;
     while (*s == ',' || *s == ' ' || *s == '+') s++;
+    // The setup looks the id up in the track-info table ([0x736168] rows x 0xfc, [0x73616c] count, s16 id @+0x6c, loop 0x4b5140)
+    // and reads [0+0x69] at 0x4b515b when it is missing: WORLD 1010 is absent in original mode (RN_WORLDROW=0, web/mode.js).
+    uint32_t rows = ld(c, 0x736168, 4), n = ld(c, 0x73616c, 4), k = 0;
+    while (k < n && (uint16_t)ld(c, rows + k * 0xfc + 0x6c, 2) != t) k++;
+    if (k == n) { rn_log("RN_JUMP: track %u is not in the track table (%u rows; WORLD 1010 needs RN_WORLDROW on, i.e. not ?mode=original)", t, n); s = ""; return; }
     st(c, 0x777cc8, m, 4);
     st(c, 0x748f70 + rec[m] + 8, t, 4);
     rn_log("RN_JUMP: mode %u track %u at frame %u", m, t, rn_telem.presents);
