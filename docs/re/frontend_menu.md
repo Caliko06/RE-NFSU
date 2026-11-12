@@ -27,3 +27,7 @@ MU_Main_PC (QuickRace) -> ModeSelect 0x4b7a94 (writes [0x777cc8] = mode) -> CarS
 
 ## What ?pool=1 / completion.py jump 3:1010 drives
 Keys: profile MU_UG_NewOrLoad_PC2 RETURN, MU_Main_PC RETURN (the cursor starts on QuickRace, observed, completion.py:30) -> [0x777b4c]=2 -> MU_QuickRaceModeSelect. host/input.c input_jump then (flow state 3, screen up 30 frames) stores [0x777cc8]=3, [0x7589e8]=1010 and calls 0x4b5c00. Nothing else: no car, track, options screen. It is a host hook, not game code.
+
+## WORLD button (row 8, built 2026-11-11)
+Online accept 0x4b342a -> cave 0x7977c0 -> host world_arm (host/input.c) -> QuickRace case 0x4b34e9 (ModeSelect builds, its ctor does the 0xf660 copy) -> world_go sets [0x777cc8]=3, 0x7589e0+8=1010, +0xc=0, calls 0x4b5c00 (6 frames after the screen is up). Label: world_lang repoints hash 0x36dbec3e at "WORLD".
+Track 1010 needs its row in the track-info table (setup 0x4b5090 looks it up by id, +0x69; TRACKB/TEX/STREAM names come from it), NOT the Free Run list: lists filter by mask bits (0x4ab470), so Original gets the row with mask 0x80 = in no list (RN_WORLDROW=2, web/mode.js). Run: shots web/plan/shots/world_menu*.png, world_launcher*.png.

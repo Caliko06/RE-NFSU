@@ -1218,6 +1218,7 @@ static void flow_log(Ctx *c) {
     if (rating_valid) prating_bits = rating_bits;
     pm = m, pt = t, pe = e, pcar = car;
     input_jump(c);
+    world_go(c);
     input_finish(c);
     input_unstick(c);
     input_open(c);
