@@ -4,6 +4,7 @@
 #include "host.h"
 #include "mc.h"
 #include <math.h>
+#include <stddef.h>
 #include <string.h>
 
 McPed rn_mc;
@@ -98,7 +99,7 @@ static void get_out(Ctx *c, uint32_t car) {
     if (n < 1e-3f) fx = 1, fy = 0, n = 1;
     fx /= n, fy /= n;
     float x = ldf(c, car + 0x60) - fy * DOOR, y = ldf(c, car + 0x64) + fx * DOOR, z = ldf(c, car + 0x68), h;   // left of forward, z up
-    memset(&rn_mc, 0, sizeof rn_mc - sizeof rn_mc.view - sizeof rn_mc.proj);
+    memset(&rn_mc, 0, offsetof(McPed, view));
     rn_mc.on_ground = mc_ground(c, x, y, z + 1.0f, &h);
     rn_mc.pos[0] = x, rn_mc.pos[1] = y, rn_mc.pos[2] = rn_mc.on_ground ? h : z;
     rn_mc.heading = atan2f(fy, fx);

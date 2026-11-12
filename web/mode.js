@@ -38,6 +38,9 @@ const RN_Q = (() => {
   if (!q.has('fps') && matchMedia('(pointer: coarse)').matches) q.set('fps', '30');
   return q;
 })();
+// WORLD asked for in the URL (?pool=1 opens the WORLD row of Free Run, ?world=1 shows it): the only way Original mode gets the UG2 city
+// (web/boot.js turns the WORLD row on, web/ug2/ug2world.js draws it, and only while the game's track id is 1010). Original without it is as shipped.
+const RN_WORLD = RN_Q.get('pool') === '1' || RN_Q.get('world') === '1';
 
 (() => {
   const toast = document.createElement('div');

@@ -15,6 +15,7 @@ typedef struct {
     int32_t walked;      // 1 once the pedestrian moved since leaving the car (log only)
     float view[16];      // scene view of this frame (D3D row vectors: v_cam = v_world * view), copied at the render hook
     float proj[16];      // scene projection of this frame (row vectors, D3D left-handed z 0..1)
+    int32_t track;       // after proj (offsets above stay): the race's track id [0x78a2f0] on race frames, 0 outside a race; 1010 = WORLD (web/ug2/ug2world.js draws the UG2 city only then)
 } McPed;
 
 extern McPed rn_mc;      // wasm address: rn_mc_state() (host/mc.c)
