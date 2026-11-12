@@ -23,6 +23,7 @@ import race_proposals as RP  # noqa: E402
 
 SRC = os.path.join(REPO, 'build', 'openworld', 'TRACKB1010.lzc')
 STEP = 6.0            # node spacing of the road section (NFSU1 sections run 8 m, U.SPACING)
+LANE_MARGIN = 3.0     # m kept between a racing lane and the nearest wall (car half width 1 m + drift)
 RSTEP = 20.0          # progress route node spacing (the shipped paths are 25..45 m)
 HASH = {n: RP.cshash(n) for n in RP.NAMES}
 
@@ -106,7 +107,7 @@ def heading(pts, i, closed=True):
     return hx / l, hy / l
 
 
-def road_chunks(base, pts, closed=True):
+def road_chunks(base, pts, closed=True, room=None):
     """chunks 0x34121 / 0x34122 payloads: one section sid 0 over pts (a closed race: + one type 2 entry last -> first, an open one has no entry)"""
     (b, s), secs0, ent0 = U.parse(base)
     tp = secs0[U.TEMPLATE_SEC]
@@ -118,6 +119,8 @@ def road_chunks(base, pts, closed=True):
     med = [statistics.median(struct.unpack_from('<f', c, o)[0] for c in cand) for o in (0x24, 0x28)]
     tmpl = min(cand, key=lambda c: sum(abs(struct.unpack_from('<f', c, o)[0] - m) for o, m in zip((0x24, 0x28), med)))
     n = len(pts)
+    if room is not None:       # racing lanes 0..9 (template: 2.7..5.5 m left, 3.7..4.7 m right) pulled inside the walls; the smallest room of the 4 nodes behind and 4 ahead, as the aim reads nodes ahead
+        room = [(min(room[j][0] for j in range(max(0, i - 4), min(n, i + 5))), min(room[j][1] for j in range(max(0, i - 4), min(n, i + 5)))) for i in range(n)]
     cum = [0.0]
     for i in range(1, n):
         cum.append(cum[-1] + math.dist(pts[i][:2], pts[i - 1][:2]))
@@ -133,6 +136,11 @@ def road_chunks(base, pts, closed=True):
         prv = math.dist(pts[i][:2], pts[i - 1][:2]) if closed or i else nxt
         struct.pack_into('<2f', nd, 0x1c, nxt, prv)
         struct.pack_into('<f', nd, 0x38, cum[i])
+        if room is not None:
+            for kk in range(10):
+                o = struct.unpack_from('<h', nd, 0x3c + 2 * kk)[0]
+                lim = max(0.0, (room[i][0] if o < 0 else room[i][1]) - LANE_MARGIN)
+                struct.pack_into('<h', nd, 0x3c + 2 * kk, int(math.copysign(min(abs(o), lim * 256), o)))
         for kk in U.UNUSED_LANES:
             struct.pack_into('<h', nd, 0x3c + 2 * kk, -1)
             nd[0x6a + kk] = 6
@@ -204,13 +212,13 @@ def marker_chunk(rows_in):
     return b'\x11' * 8 + b''.join(rows), len(rows)
 
 
-def swap(base, pts, closed, markers):
+def swap(base, pts, closed, markers, room=None):
     ch = w.top_chunks(base)
     ids = [c[0] for c in ch]
     i46, i47 = ids.index(0x34146), ids.index(0x80034147)
     i21 = ids.index(0x34121)
     assert ids[i21:i21 + 3] == [0x34121, 0x34122, 0] and i46 < i47 < i21
-    p21, p22, total = road_chunks(base, pts, closed)
+    p21, p22, total = road_chunks(base, pts, closed, room)
     cont, length, nroute = route_chunks(bytes(base[ch[i47][1] + 8:ch[i47][1] + 8 + ch[i47][2]]), pts, closed)
     p46, nmk = marker_chunk(markers)
 
@@ -238,6 +246,49 @@ def swap(base, pts, closed, markers):
     assert not w.check_alignment(base, bytes(out)), 'misaligned'
     print('%s: %d road nodes (%.0f m), route %d nodes (%.0f m), %d markers' % ('closed' if closed else 'open', len(pts), total, nroute, length, nmk))
     return bytes(out)
+
+
+def side_room(rows, pts, reach=20.0):
+    """metres from each node to the nearest wall edge (collision rows with flag 0x02 / 0x08, z overlapping the node) along the node's left and right normals -> [(left, right)], capped at reach.
+    The racers' lanes sit at node +0x3c + 2 * lane (s16 / 256 m; AIActionGetUnstuck::GetGoalPoint 0x451cb0, census/names_rivals.tsv), copied from a 23 m wide NFSU1 node, so on a narrow
+    UG2 road the outer lanes land on the wall"""
+    cell = collections.defaultdict(list)
+    for r in rows:
+        d = U.ub.unpack(r)
+        if not d['fl'] & 0x0a:
+            continue
+        n = 4 if d['fl'] & 0x10 else 3
+        k4 = 4 if d['fl'] & 4 else 1
+        v = [(d['xs'][k] / 8, d['ys'][k] / 8, U.ub.zof(d, k) * k4) for k in range(n)]
+        for a, b in zip(v, v[1:] + v[:1]):
+            if math.dist(a[:2], b[:2]) < 0.05:
+                continue
+            e = (a[0], a[1], b[0], b[1], min(p[2] for p in v), max(p[2] for p in v))
+            for cx in range(int(min(a[0], b[0]) // 16), int(max(a[0], b[0]) // 16) + 1):
+                for cy in range(int(min(a[1], b[1]) // 16), int(max(a[1], b[1]) // 16) + 1):
+                    cell[(cx, cy)].append(e)
+    out = []
+    for i, (x, y, z) in enumerate(pts):
+        hx, hy = heading(pts, i, False)
+        res = []
+        for nx, ny in ((-hy, hx), (hy, -hx)):
+            best, seen = reach, set()
+            for t in range(0, int(reach) + 1, 8):
+                for e in cell.get((int((x + nx * t) // 16), int((y + ny * t) // 16)), ()):
+                    if id(e) in seen or e[5] < z or e[4] > z + 2.0:
+                        continue
+                    seen.add(id(e))
+                    ex, ey = e[2] - e[0], e[3] - e[1]
+                    den = nx * ey - ny * ex
+                    if abs(den) < 1e-9:
+                        continue
+                    t1 = ((e[0] - x) * ey - (e[1] - y) * ex) / den
+                    u1 = ((e[0] - x) * ny - (e[1] - y) * nx) / den
+                    if 0.05 < t1 < best and -1e-6 <= u1 <= 1 + 1e-6:
+                        best = t1
+            res.append(best)
+        out.append(tuple(res))
+    return out
 
 
 def park_markers(mk, ground):
@@ -350,14 +401,16 @@ def main():
     ground = U.Ground(CF.old_rows(base))
     which = [a for a in sys.argv[1:] if a in ('park', 'bridge')] or ['park', 'bridge']
     for name in which:
+        room = None
         if name == 'park':
             pts, mk = park_loop(ground)
             rows, closed = park_markers(mk, ground), True
         else:
             pts, rows = bridge_race(ground)
             closed = False
+            room = side_room(CF.old_rows(base), pts)
         out = os.path.join(REPO, 'build', 'openworld', 'TRACKB1010_%s.lzc' % name)
-        open(out, 'wb').write(lzc.encode(swap(base, pts, closed, rows)))
+        open(out, 'wb').write(lzc.encode(swap(base, pts, closed, rows, room)))
         print('wrote', out, os.path.getsize(out), 'B')
         if '--png' in sys.argv:
             png(os.path.join(sys.argv[sys.argv.index('--png') + 1], name + '.png'), pts, rows, closed)
