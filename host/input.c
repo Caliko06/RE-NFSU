@@ -298,6 +298,38 @@ void input_jump(Ctx *c) {
     call_guest(c, 0x4b5c00, 0, NULL);
     seen = 0, fired = 1;
 }
+// The main menu's WORLD button (OWNER 2026-11-11, plan row 8). PATCH 0x4b342a replaces the Online accept (0x4b342a..0x4b3435: test [0x7346c4], set
+// [0x777b4c] = 8, MU_Online_NetworkLogin) by: call world_arm (cave 0x7977c0, jmp [SCREEN_ADDR+0xd0]), then jmp 0x4b34e9 = the QuickRace case
+// ([0x777b4c] = 2, FEngSwitchPackages MU_QuickRaceModeSelect). The game builds that screen itself: its ctor 0x4b6880 does the one-time 0xf660
+// block copy (flag [0x748f76], 0x4b6a32..0x4b6a89) the setup 0x4b5090 relies on for the car, and resets [0x777cc8] if it is 2 or 3. Then world_go does
+// what the Quick Race accept does, as RN_JUMP "3:1010" does: mode 3 (Free Run) in [0x777cc8], record 0x7589e0 (0x4ab510(0x748f70, 3)) +8 = 1010,
+// +0xc = 0 (not reversed), QuickRace::StartRaceByMode 0x4b5c00. A few frames of the mode screen show, the price of using the game's own init.
+static int world_pending;
+uint32_t world_arm(Ctx *c) {
+    (void)c;
+    world_pending = 1;
+    rn_log("WORLD: button pressed at frame %u", rn_telem.presents);
+    return 0;
+}
+void world_go(Ctx *c) {
+    static uint32_t seen;
+    if (!world_pending) return;
+    if ((rn_flow >> 8) != 3 || !screen_on("MU_QuickRaceModeSelect")) { seen = 0; return; }
+    if (!seen) seen = rn_telem.presents;
+    if (rn_telem.presents - seen < 6) return;
+    world_pending = 0, seen = 0;
+    uint32_t rows = ld(c, 0x736168, 4), n = ld(c, 0x73616c, 4), k = 0;
+    while (k < n && (uint16_t)ld(c, rows + k * 0xfc + 0x6c, 2) != 1010) k++;
+    if (k == n) { rn_log("WORLD: track 1010 is not in the track table (%u rows; RN_WORLDROW=0?)", n); return; }
+    uint32_t r[8];
+    memcpy(r, c->r, sizeof r);
+    st(c, 0x777cc8, 3, 4);
+    st(c, 0x7589e0 + 8, 1010, 4);
+    st(c, 0x7589e0 + 0xc, 0, 4);
+    rn_log("WORLD: start track 1010 (Free Run) at frame %u", rn_telem.presents);
+    call_guest(c, 0x4b5c00, 0, NULL);
+    memcpy(c->r, r, sizeof r);
+}
 // RN_FINISH=<place>: test-only, finish each race at that place a second after [[0x73619c]] reaches 4, the way
 // the debug race menu's Force Race Finish does (Hopper dbgfin.txt; 0x4c09b0 accept at 0x4c0a52): eax = 0, edx = place,
 // stdcall 0x572a90([0x7345d0], player) -> 0x494b90 message 0 sets [[0x73619c]+0x534] = place, +0x538 = player.

@@ -2,7 +2,7 @@
 // NFSU2 city geometry drawn inside the NFSU1 Free Run scene, textured as UG2 draws its world (no traffic; collision is TRACKB1010).
 // Same path as F-Max (web/maxpayne/boot.js): web/gpu.js calls Ug2.scene() at GPU_FXAA, when the scene colour and depth are bound and
 // the HUD has not started; host/d3d9.c mc_hook has just copied the player's View and Projection into rn_mc.view / rn_mc.proj
-// (host/mc.h, D3D row vectors, clip = v * V * P), which is what is read here. WORLD only: the game's track id 1010 (rn_mc.track), in Remaster, and in Original when the URL asked for WORLD (RN_WORLD, web/mode.js).
+// (host/mc.h, D3D row vectors, clip = v * V * P), which is what is read here. WORLD only: the game's track id 1010 (rn_mc.track), in any mode (Original: the main menu's WORLD button or ?pool=1 reaches it; nothing is fetched before).
 // Files (tools/ug2_world.py, tools/ug2_collfile.py, tools/ug2_tex.py; facts census/ug2/tex.md):
 //   city.bin, bridge.bin 'UG2M': u32 nverts, u32 nidx, u32 0; nverts x (f32 xyz, u8 rgba); nidx x u32 triangle list
 //   city_tex.bin, bridge_tex.bin 'UG2T': u32 nverts, ntri, ntex, nmat; nverts x (f32 u, v); ntri x u16 texture (0xffff none); ntri x u16 material
@@ -54,10 +54,12 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
 }
 @fragment fn fs(i: O) -> @location(0) vec4f { return textureSample(src, samp, i.uv); }`;
 
-  // Remaster, or Original with WORLD asked (Original without it: off, nothing fetched, no depth kept); ?ug2=0 turns it off, ?ug2tex=0 draws vertex colour x 2 only (the untextured baseline).
+  // Remaster, or any mode once the race's track id is 1010 (scene() sees it each frame; before that Original has it off: nothing fetched, no depth kept); ?ug2=0 turns it off, ?ug2tex=0 draws vertex colour x 2 only (the untextured baseline).
   // One line to the page log (web/boot.js line(): the page and build/webcheck.log through tools/serve.py).
   const say = t => line(t);
-  const api = window.Ug2 = { on: (RN_MODE === 'remaster' || RN_WORLD) && RN_Q.get('ug2') !== '0', state: 'idle' };
+  const allowed = RN_Q.get('ug2') !== '0';
+  let world = false;   // the race's track id is 1010 (scene() reads it before anything else)
+  const api = window.Ug2 = { get on() { return allowed && (RN_MODE === 'remaster' || world); }, state: 'idle' };
   const TEXTURED = RN_Q.get('ug2tex') !== '0';
   let device, gpu, loading = false;
 
@@ -212,9 +214,11 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
 
   // Called at GPU_FXAA with the scene targets (web/gpu.js res entries).
   api.scene = (dev, speed, enc, rt, ds, tsw) => {
-    if (!api.on || !rt || !ds || !speed._rn_mc_state) return;
+    if (!allowed || !speed._rn_mc_state) return;
     // WORLD = the race's track id 1010 (host/d3d9.c mc_hook writes it after the matrices, rn_mc.track, 0 outside a race): no load, no draw elsewhere.
-    if (new Int32Array(speed.HEAPU8.buffer, (speed._rn_mc_state() >>> 0) + TRACK_AT, 1)[0] !== WORLD_ID) return;
+    // Read first, so Original turns the pass on by itself (the depth is kept from the next frame) when the menu's WORLD button starts the race.
+    world = new Int32Array(speed.HEAPU8.buffer, (speed._rn_mc_state() >>> 0) + TRACK_AT, 1)[0] === WORLD_ID;
+    if (!world || !rt || !ds) return;
     if (!loading) {
       loading = true; api.state = 'loading'; say(`ug2: WORLD (track ${WORLD_ID}) in ${RN_MODE} mode, loading the city`);
       load(dev).then(m => { if (m) { try { setup(dev, m); api.state = 'ready'; } catch (e) { api.state = 'failed'; say('ug2 upload: ' + e.message); } } else api.state = 'nofile'; },

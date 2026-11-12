@@ -97,7 +97,7 @@ EM_JS(double, world_head, (const char *path), {
 #endif
 
 // ---- the "WORLD" entry of the Free Run list (track id 1010), docs/openworld/world_entry.md -------------------------------------
-// Always on (native and web), RN_WORLDROW=0 = the list as shipped. The game's track-info table (GLOBALB chunk 0x34201, 31 rows
+// Always on (native and web), RN_WORLDROW=0 = the list as shipped, 2 = the row exists but is in no list (worldrow_mode). The game's track-info table (GLOBALB chunk 0x34201, 31 rows
 // x 0xfc, loader 0x442040: [0x736168] = rows, [0x73616c] = count) gets a 32nd row cloned from row 0 (CT1, region L1RA): id 1010,
 // mask 0x90 (0x10 = Free Run only; 0x80 = no reverse entry, PATCH 0x4ba207 skips it in the list's second pass). The chunk handler
 // pointer 0x7007ec points at a cave (PATCH, slot SCREEN_ADDR+0x74) that lands in world_rows, which runs 0x442040 and adds the row.
@@ -111,15 +111,19 @@ EM_JS(double, world_head, (const char *path), {
 #define WORLD_X0   (-3650.f)
 #define WORLD_Y0   4260.f
 #define WORLD_S    6240.f
+#define ONLINE_LABEL_HASH 0x36dbec3eu   // MU_MAIN_PLAY_ONLINE, the label of the main menu's Online button
 #define WORLD_NAME_HASH 0x5461a075u   // "TRACK_NAME_1010" with the game's hash (0x4f42f0: h = -1, h = h * 33 + c)
 
 int rn_tex_overlay;   // 1 once Cars/TEXTURES.BIN was served from the overlay with the DUMMY_SKIN5..12 targets (host/free.c checks it)
 
-static int worldrow_on(void) {
-    static int on = -1;
-    if (on < 0) { const char *e = getenv("RN_WORLDROW"); on = !(e && e[0] == '0'); }
-    return on;
+// RN_WORLDROW: 0 = no row (the table as shipped), 1 (default) = the row listed in Free Run, 2 = the row present but in no list (mask 0x80): Original
+// mode (web/mode.js), where the track still has to exist for the main menu's WORLD button (PATCH 0x4b342a, host/input.c world_arm) to start it.
+static int worldrow_mode(void) {
+    static int m = -1;
+    if (m < 0) { const char *e = getenv("RN_WORLDROW"); m = !e || !e[0] ? 1 : e[0] == '0' ? 0 : e[0] == '2' ? 2 : 1; }
+    return m;
 }
+static int worldrow_on(void) { return worldrow_mode() != 0; }
 
 static uint32_t rows_prev, lang_prev;   // the copies of the last load (the unloaders only zero the pointers): freed at the next one
 
@@ -140,29 +144,36 @@ uint32_t world_rows(Ctx *c) {
     snprintf(G(w + 0xdc), 32, "WORLD");
     snprintf(G(w + 0x20), 32, "Location1\\Track_%d", WORLD_ID);
     st(c, w + 0x6c, WORLD_ID, 2); st(c, w + 0x6e, WORLD_ID, 2);   // s16 id twice
-    st(c, w + 0x74, 0x90, 4);                                     // mask: Free Run (0x10) only, no reverse (0x80)
+    // mask: Free Run (0x10) only, no reverse (0x80); hidden (mode 2): 0x80 alone, no mode bit (0x4ab470) so no list takes the row, but the setup 0x4b5090 finds it by id
+    st(c, w + 0x74, worldrow_mode() == 2 ? 0x80 : 0x90, 4);
     stf(c, w + 0x8c, WORLD_X0); stf(c, w + 0x90, WORLD_Y0); stf(c, w + 0x94, WORLD_S); st(c, w + 0x98, 0, 2);   // minimap bounds, no rotation
     if (rows_prev) guest_free(rows_prev);
     rows_prev = nr;
     st(c, 0x736168, nr, 4); st(c, 0x73616c, n + 1, 4);
-    rn_log("OPENWORLD: track row %u = WORLD (id %d, mask 0x90) at %08x", n, WORLD_ID, w);
+    rn_log("OPENWORLD: track row %u = WORLD (id %d, mask 0x%x) at %08x", n, WORLD_ID, worldrow_mode() == 2 ? 0x80 : 0x90, w);
     return r;
 }
 
-// Handler of chunk 0x39000 (the language table): the original loader, then the name of the WORLD row in sorted place.
+// Handler of chunk 0x39000 (the language table): the original loader, then (a) the label of the main menu's Online button, string hash
+// 0x36dbec3e (MU_MAIN_PLAY_ONLINE, docs/re/frontend_menu.md), now reads "WORLD" because that button starts WORLD (PATCH 0x4b342a), in every mode;
+// (b) with the row listed, the name of the WORLD row in sorted place.
 uint32_t world_lang(Ctx *c) {
     uint32_t chunk = ARG(0), r = call_guest_cdecl(c, 0x59fce0, 1, &chunk);
     if (!r || ld(c, chunk, 4) != 0x39000 || !worldrow_on()) return r;
     uint32_t n = ld(c, 0x73442c, 4), tab = ld(c, 0x734434, 4);
     if (!tab || !n) return r;
-    uint32_t nt = guest_alloc((n + 1) * 8), str = guest_alloc(8), k = 0;
-    if (!nt || !str) return r;
+    uint32_t str = guest_alloc(8), k = 0;
+    if (!str) return r;
     snprintf(G(str), 8, "WORLD");
+    for (uint32_t j = 0; j < n; j++) if (ld(c, tab + 8 * j, 4) == ONLINE_LABEL_HASH) { st(c, tab + 8 * j + 4, str, 4); break; }   // 0x59fce0 made the pointers absolute
+    if (worldrow_mode() != 1) return r;
+    uint32_t nt = guest_alloc((n + 1) * 8);
+    if (!nt) return r;
     while (k < n && ld(c, tab + 8 * k, 4) < WORLD_NAME_HASH) k++;
     // English.bin already has TRACK_NAME_1010 ("Grand Station (DT 6)", a cut track): then that pair is replaced, not duplicated
     int have = k < n && ld(c, tab + 8 * k, 4) == WORLD_NAME_HASH;
     memcpy(G(nt), G(tab), 8 * k);
-    st(c, nt + 8 * k, WORLD_NAME_HASH, 4); st(c, nt + 8 * k + 4, str, 4);   // 0x59fce0 made the string pointers absolute
+    st(c, nt + 8 * k, WORLD_NAME_HASH, 4); st(c, nt + 8 * k + 4, str, 4);
     memcpy(G(nt + 8 * k + 8), G(tab + 8 * (k + have)), 8 * (n - k - have));
     n -= have;
     if (lang_prev) guest_free(lang_prev);
@@ -199,6 +210,7 @@ static void world_install(void) {
     st(g_ctx, SCREEN_ADDR + 0x74, host_addr_of("rn", "world_rows"), 4);
     st(g_ctx, SCREEN_ADDR + 0x78, host_addr_of("rn", "world_lang"), 4);
     st(g_ctx, SCREEN_ADDR + 0xcc, host_addr_of("rn", "world_widx"), 4);
+    st(g_ctx, SCREEN_ADDR + 0xd0, host_addr_of("rn", "world_arm"), 4);   // PATCH 0x4b342a: the main menu's WORLD button (host/input.c)
 }
 // (world_rows and world_lang are in the api table at the end of host/free.c, the last table dispatch.c searches.)
 
@@ -251,7 +263,7 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
             if (world_file("CARS_TEXTURES.BIN", real, n, size)) { rn_tex_overlay = 1; rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size); return 1; }
             return 0;
         }
-        if (worldrow_on() && ci_eq(b, "DYNTEX.BIN", 11) && world_file("DYNTEX.BIN", real, n, size)) {
+        if (worldrow_mode() == 1 && ci_eq(b, "DYNTEX.BIN", 11) && world_file("DYNTEX.BIN", real, n, size)) {
             rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size);
             return 1;
         }

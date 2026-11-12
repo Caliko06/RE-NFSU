@@ -17,7 +17,7 @@ const RN_ORIGINAL = {
   roadrefl: 'game',   // host/sm1.c: the road reflection as worldreflect.efx weights it
 };   // blur: web/tune.js starts the original mode at 'PC original' (shipped blur and flare colour)
 // Native switches of the same mode (host/: traffic pool and pace, rivals, car smoothing, HUD places, night lights, free mode).
-const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43', RN_LIGHTS: '0', RN_CARLOD: '0', RN_FREE: '0', RN_WORLDROW: '0', RN_TRAFPAINT: '0', RN_TRAFLEAN: '0', RN_FEEL: '0', RN_WALLSOFTEN: '0', RN_NPCSMOOTH: '0', RN_MC: '0' };
+const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43', RN_LIGHTS: '0', RN_CARLOD: '0', RN_FREE: '0', RN_WORLDROW: '2', RN_TRAFPAINT: '0', RN_TRAFLEAN: '0', RN_FEEL: '0', RN_WALLSOFTEN: '0', RN_NPCSMOOTH: '0', RN_MC: '0' };
 
 // ?mode=original|remaster: one run in that mode without touching the stored choice (tools/webcheck.mjs).
 const RN_MODE = (() => {
@@ -38,9 +38,6 @@ const RN_Q = (() => {
   if (!q.has('fps') && matchMedia('(pointer: coarse)').matches) q.set('fps', '30');
   return q;
 })();
-// WORLD asked for in the URL (?pool=1 opens the WORLD row of Free Run, ?world=1 shows it): the only way Original mode gets the UG2 city
-// (web/boot.js turns the WORLD row on, web/ug2/ug2world.js draws it, and only while the game's track id is 1010). Original without it is as shipped.
-const RN_WORLD = RN_Q.get('pool') === '1' || RN_Q.get('world') === '1';
 
 (() => {
   const toast = document.createElement('div');

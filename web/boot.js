@@ -96,10 +96,9 @@ async function download(url, what) {
       // web/mode.js: the original mode turns the native bridges off too (?env= still wins)
       if (RN_MODE === 'original') {
         Object.assign(m.ENV, RN_ORIGINAL_ENV);
-        if (RN_WORLD) m.ENV.RN_WORLDROW = '1';   // WORLD in Original: the 1010 row, its merged TRACKB (UG2 collision and roads), its minimap (host/openworld.c worldrow_on)
       } else m.ENV.RN_WALLSOFTEN = '1'; // 0x46bae0: remove the remaster's grazing wall rebound
       line(`mode: ${RN_MODE} (F4 switches)`);
-      line(`ug2: city pass ${window.Ug2?.on ? 'on (drawn while the track id is 1010)' : 'off, not loaded'} (mode ${RN_MODE}, WORLD ${RN_WORLD ? 'asked' : 'not asked'}, WORLD row ${m.ENV.RN_WORLDROW === '0' ? 'off' : 'on'})`);
+      line(`ug2: city pass ${window.Ug2?.on ? 'on (drawn while the track id is 1010)' : 'off until the track id is 1010, nothing fetched'} (mode ${RN_MODE}, WORLD row ${m.ENV.RN_WORLDROW === '0' ? 'off' : m.ENV.RN_WORLDROW === '2' ? 'hidden (menu button only)' : 'listed'})`);
       // ?fps=30: the host frame pacer targets 30 fps (web/mode.js degradation switches; ?fx=0 is read there)
       if (RN_Q.get('fps') === '30') m.ENV.RN_FPS = '30';
       if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);

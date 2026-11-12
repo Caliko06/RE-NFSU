@@ -89,6 +89,7 @@ extern unsigned rn_turbo;       // RN_TURBO: the guest clocks run this many time
 extern const char *rn_fe;       // RN_FLOWLOG: the front end's active packages, "A.fng,B.fng,..."
 extern int rn_screen_w, rn_screen_h;   // the desktop the game sees: RN_SCREEN=WxH (the page passes its window size)
 void rn_log(const char *fmt, ...);
+void world_go(Ctx *c);          // the main menu's WORLD button: starts track 1010 once the Quick Race mode screen is up (host/input.c)
 void input_jump(Ctx *c);        // RN_JUMP (host/input.c), from the RN_FLOWLOG pass at each Present
 void rn_cov_report(void);   // host/cov.c: the coverage bitmap (RN_COV=1 build); empty otherwise
 void input_finish(Ctx *c);      // RN_FINISH (host/input.c), same place
