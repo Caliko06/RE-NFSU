@@ -1,5 +1,6 @@
 /* Pre-game launcher v5 over the WebGL street (#scene, web/launcher_b/scene.js). The look is a 2003 street garage, not neon:
-   black gaffer tape torn by hand, chipped paint lettering, one dull sodium amber, a rust misprint, grain. Nothing sits straight.
+   black gaffer tape torn by hand, chipped paint lettering, one dull sodium amber, a rust misprint. Nothing sits straight.
+   The main menu is four different things stuck on the wall (launcher/v6/*.webp): spray, sticker, cardboard, tape. Each is placed by hand.
    Wear is baked into masks (launcher/v2/ui/tape*.webp, plate.webp, wear.webp), so it costs one mask per element and no filters.
    1rem = 1 unit "u" = 1 % of the smaller of screen height / (9/16 width). Animation uses transform and opacity only.
    OS reduce-motion is ignored on purpose (OWNER): the in-page "Animación" switch is the control. */
@@ -28,7 +29,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 html.static .plate { display: block; }
 #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #050606; }
 html.static #scene { display: none; }
-/* a neutral scrim on the menu flank and the key bar, dirt in the corners, grain over everything */
+/* a neutral scrim on the menu flank and the key bar, dirt in the corners (no moving grain: OWNER) */
 .shade { position: fixed; inset: 0; pointer-events: none; overflow: hidden;
   background:
     linear-gradient(90deg, rgba(4, 5, 5, .88) 0, rgba(5, 6, 6, .6) 26%, rgba(6, 7, 7, .2) 46%, rgba(6, 7, 7, 0) 60%),
@@ -37,10 +38,6 @@ html.static #scene { display: none; }
     radial-gradient(120% 95% at 62% 48%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, .62) 100%); }
 .shade::before { content: ""; position: absolute; inset: 0; background: url(launcher/v2/ui/grime.webp) 0 0 / 90rem; opacity: .5;
   -webkit-mask: radial-gradient(90% 80% at 58% 50%, transparent 40%, #000 100%); mask: radial-gradient(90% 80% at 58% 50%, transparent 40%, #000 100%); }
-.shade::after { content: ""; position: absolute; inset: -12%; background: url(launcher/v2/ui/grain.webp) 0 0 / 256px; mix-blend-mode: overlay; opacity: .17; animation: grain .42s steps(1) infinite; }
-@keyframes grain { 0% { transform: none; } 25% { transform: translate(-5%, 3%); } 50% { transform: translate(4%, -6%); } 75% { transform: translate(-3%, -4%); } }
-html.calm .shade::after { animation: none; }
-
 .ui { position: fixed; inset: 0; pointer-events: none; }
 .ui > *, .stage > .screen > * { pointer-events: auto; }
 .stage { position: absolute; inset: 0; pointer-events: none; }
@@ -93,15 +90,32 @@ body.leaving .ui { transition: opacity .28s ease-in .12s; opacity: 0; }
 /* the marker: a chipped piece of hazard tape stuck on crooked */
 .light .chevs { position: absolute; left: 2.4rem; top: 50%; height: 50%; width: 4.6rem; translate: 0 -50%; rotate: 4deg; background: var(--hazard); opacity: .9;
   -webkit-mask: var(--mw) 12% 40% / 22rem; mask: var(--mw) 12% 40% / 22rem; }
-/* a different tear and tilt on each row, so the strip never looks stamped */
-.list:has(> .item:nth-of-type(2).sel) .light .bg { -webkit-mask-image: var(--m2); mask-image: var(--m2); rotate: .5deg; }
-.list:has(> .item:nth-of-type(3).sel) .light .bg { -webkit-mask-image: var(--m3); mask-image: var(--m3); rotate: -.3deg; scale: -1 1; }
-.list:has(> .item:nth-of-type(4).sel) .light .bg { -webkit-mask-image: var(--m2); mask-image: var(--m2); rotate: .9deg; scale: 1 -1; }
-.list:has(> .item:nth-of-type(2).sel) .light .chevs { rotate: -3deg; }
-.list:has(> .item:nth-of-type(3).sel) .light .chevs { rotate: 7deg; }
-
-.menu-panel { left: -1px; top: 27rem; width: 58rem; padding: 0; }
-.menu-panel::after { display: none; }                 /* the main menu has no plate: lettering on the dark flank */
+.menu-panel { left: -1px; top: 24.6rem; width: 64rem; padding: 0; }
+.menu-panel::after { display: none; }                 /* the main menu has no plate */
+/* ---------- main menu: spray, sticker, cardboard, tape. Sizes, offsets and tilts are set one by one, on purpose uneven ---------- */
+#menu { display: flex; flex-direction: column; align-items: flex-start; --k: 1; }
+#menu .item { display: block; flex: none; height: auto; padding: 0; width: calc(var(--w) * var(--k)); margin: calc(var(--mt, 0rem) * var(--k)) 0 0 calc(var(--ml) * var(--k)); rotate: var(--r); transform-origin: 30% 50%;
+  transition: transform .16s var(--ease), rotate .16s var(--ease); }
+#menu .item.sel { rotate: var(--rs); transform: translateX(1.4rem) scale(1.045); z-index: 5; }
+.art { display: block; width: 100%; height: auto; pointer-events: none; filter: brightness(.5) saturate(.62) drop-shadow(0 .3rem .5rem rgba(0, 0, 0, .7)); transition: filter .16s, transform .12s; }
+.sel > .art { filter: brightness(.95) saturate(.88) drop-shadow(.3rem 1rem 1.2rem rgba(0, 0, 0, .75)); }
+.item:active > .art { transform: scale(.97); }
+body.leaving #menu .item.sel > .art { filter: brightness(1.25) drop-shadow(0 0 2rem rgba(214, 209, 196, .25)); }
+.k-spray { --w: 51rem; --ml: 2.6rem; --r: -2.3deg; --rs: -1.2deg; }
+.k-spray > .art { filter: brightness(.4); } .k-spray.sel > .art { filter: brightness(1); }
+.k-stick { --w: 31rem; --ml: 15rem; --mt: -3.6rem; --r: 2.8deg; --rs: 1.2deg; z-index: 3; }           /* slapped over the drips */
+.k-card { --w: 26.5rem; --ml: 25rem; --mt: -1.5rem; --r: -3.6deg; --rs: -1.8deg; z-index: 2; }        /* half under the sticker */
+.k-tape { --w: 39rem; --ml: -3rem; --mt: -2.4rem; --r: -4deg; --rs: -2.6deg; z-index: 4; }             /* runs off the screen edge */
+/* the cardboard hangs from one scrap of masking tape */
+.k-card::after { content: ""; position: absolute; right: -2.2rem; top: -.5rem; width: 7.4rem; height: 2.5rem; rotate: 37deg; background: #a9a492; opacity: .45; pointer-events: none; transition: opacity .16s;
+  -webkit-mask: var(--m2) 0 0 / 100% 100% no-repeat; mask: var(--m2) 0 0 / 100% 100% no-repeat; }
+.k-card.sel::after { opacity: .9; }
+/* the marker is the only shared piece: a chip of hazard tape, stuck somewhere else next to each one */
+#menu .light .bg, #menu .light .flash { display: none; }
+#menu .light .chevs { left: calc(56rem * var(--k)); top: 34%; height: 4.4rem; rotate: 9deg; transition: left .16s var(--ease), top .16s var(--ease), rotate .16s var(--ease); }
+#menu:has(.k-stick.sel) .light .chevs { left: calc(49rem * var(--k)); top: 70%; rotate: -11deg; }
+#menu:has(.k-card.sel) .light .chevs { left: calc(18.6rem * var(--k)); top: 46%; rotate: 5deg; }
+#menu:has(.k-tape.sel) .light .chevs { left: calc(38.4rem * var(--k)); top: 20%; rotate: -17deg; }
 .item { position: relative; z-index: 1; display: flex; align-items: center; width: 100%; height: 9.6rem; padding: 0 3rem 0 9rem; font-size: 6.4rem; --ink: var(--ink2); outline: none; transition: transform .14s var(--ease); }
 .item.sel { --ink: #d6d1c4; transform: translateX(2rem); }
 .item:nth-of-type(1) { --r: -1.3deg; --wx: 10%; --wy: 30%; }
@@ -236,6 +250,7 @@ body.touch .keys .nb { display: none; }
   .logo { width: 36rem; }
   .tools { right: 1.8rem; top: 1.8rem; }
   .menu-panel { left: 0; right: auto; width: 100%; top: auto; bottom: 10rem; }
+  #menu { --k: .72; }
   .item { height: 8.8rem; font-size: 5.6rem; }
   .desc { padding: 1.2rem 5rem 1.2rem 3rem; min-height: 7rem; font-size: max(14px, 3.1rem); }
   .menu-panel .desc { padding-left: 4rem; }

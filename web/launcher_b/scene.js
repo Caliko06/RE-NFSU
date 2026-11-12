@@ -314,7 +314,7 @@ async function main(canvas, opts, resolveReady) {
         uniform sampler2D reflectionMap;
         uniform float road;
         uniform float glow;
-        uniform vec4 lamps[9]; // 8 street lamps + the far passing car
+        uniform vec4 lamps[9]; // 8 street lamps (slot 8 unused)
         uniform float neon;
         uniform float beamK;
         uniform mat4 worldToCar;
@@ -716,8 +716,8 @@ async function main(canvas, opts, resolveReady) {
     window.RN_B.flares={count:flareCount,source:flareData.source};
     const flareGain=new Float32Array(flareCount).fill(1); // per-lamp breathing / stutter, written by the rig every frame
     const view3={eye:new pc.Vec3(),right:new pc.Vec3(),up:new pc.Vec3(),forward:new pc.Vec3()}; // the camera as placeFlares sees it
-    // Extra billboards made from the same glow: the car's own headlights and tail lights, and the far passing car.
-    const EXTRA=8; // 0,1 headlights, 2,3 tail lights, 4,5 passing car front, 6,7 passing car rear
+    // Extra billboards made from the same glow: the car's own headlights and tail lights.
+    const EXTRA=4; // 0,1 headlights, 2,3 tail lights
     const extraMesh=new pc.Mesh(device);
     const extraIndices=[], extraUvs=[]; for(let i=0;i<EXTRA;i++){ extraIndices.push(4*i,4*i+1,4*i+2,4*i,4*i+2,4*i+3); extraUvs.push(0,0,1,0,1,1,0,1); }
     const extraPositions=new Float32Array(EXTRA*12), extraColors=new Float32Array(EXTRA*16);
@@ -765,7 +765,7 @@ async function main(canvas, opts, resolveReady) {
         flareMesh.setPositions(flarePositions); flareMesh.setColors(flareColors); flareMesh.update(pc.PRIMITIVE_TRIANGLES);
     };
     // ---------------------------------------------------------------------------
-    // Life: rain (pc ParticleSystem), neon / lamp / engine animation, a car passing on the far cross street.
+    // Life: rain (pc ParticleSystem), neon / lamp / engine animation.
     // Everything here is skipped while S.motion is false or in curtain mode.
     // ---------------------------------------------------------------------------
     // Procedural textures, no image files: a soft vertical streak and a thin splash ring.
@@ -800,12 +800,6 @@ async function main(canvas, opts, resolveReady) {
     const rainFar=particles('Rain far',{count:520,life:.8,extents:[34,.1,34],vel:[[-1.4,-12,.4],[-2.2,-15,.8]],size:[.01,.014],stretch:.02,alpha:.28,color:[.65,.75,.9],texture:streakTexture});
     const splashes=particles('Rain splashes',{count:70,life:.45,extents:[16,0,16],vel:[[0,0,0],[0,0,0]],size:[.012,.1],grow:true,world:true,alpha:.16,color:[.6,.7,.85],texture:ringTexture});
     const rainParts=[rainNear,rainFar,splashes];
-
-    // Far cross street (road y about 6 m at z 111, see street.glb): a car crossing every 18-30 s, drawn as flares plus a road glow.
-    const CROSS={z:111,y:6.1,span:50,secs:5.5}; // seen from the hero camera, x -20..15 is the part with a clear line of sight
-    const pass={t:-1,dir:1,next:8};
-    const startPass=()=>{ pass.t=0; pass.dir=Math.random()<.5?1:-1; };
-    window.RN_B.pass=startPass; // test hook: send the car now
 
     // ---------------------------------------------------------------------------
     // The rig. State vector st = pose (see shotPose). Modes: intro, idle, confirm, end.
@@ -940,20 +934,6 @@ async function main(canvas, opts, resolveReady) {
             car.setLocalPosition(carPosition.x+.0005*Math.sin(6.2831853*24*animT+1),
                 carPosition.y+a*Math.sin(6.2831853*25*animT)+.0005*Math.sin(6.2831853*31.7*animT),carPosition.z);
         } else car.setLocalPosition(carPosition);
-        // --- passing car ---
-        lamps[32]=lamps[33]=lamps[34]=lamps[35]=0;
-        if(!live) pass.t=-1;
-        if(live&&pass.t<0&&clock>=pass.next) startPass();
-        if(pass.t>=0){
-            pass.t+=dt;
-            const u=pass.t/CROSS.secs, x=lerp(-pass.dir*CROSS.span,pass.dir*CROSS.span,u), fade=clamp(Math.min(u,1-u)*8,0,1);
-            const c=new pc.Vec3(), far=view3.eye.distance(c.set(x,CROSS.y,CROSS.z)); // like the street lamp flares, the glow grows with distance
-            for(let k=0;k<2;k++){ const z=CROSS.z+(k?.75:-.75);
-                setExtra(4+k,c.set(x,CROSS.y+.7,z),far*.03,.8,.9,1,.8*fade);
-                setExtra(6+k,c.set(x-pass.dir*4.4,CROSS.y+.75,z),far*.018,1,.12,.1,.6*fade); }
-            lamps.set([x+pass.dir*3,CROSS.y+5,CROSS.z,.2*fade],32);
-            if(u>=1){ pass.t=-1; pass.next=clock+18+12*Math.random(); }
-        } else for(let i=4;i<8;i++) setExtra(i,pc.Vec3.ZERO,0,0,0,0,0);
         // --- the car's own lights ---
         for(let k=0;k<2;k++){
             const s=k?-1:1, on=clamp(lamp,0,1.6);

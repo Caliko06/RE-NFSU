@@ -126,6 +126,8 @@
 
   // tube warm-up: a few hard on/off steps, then steady
   function flicker(item) {
+    const art = item.querySelector('.art');             // a thing on the wall does not flicker: it gets a slap
+    if (art) { if (motion) art.animate([{ transform: 'scale(1.06) rotate(-1.4deg)' }, { transform: 'none' }], { duration: 170, easing: 'cubic-bezier(.16,1,.3,1)' }); return; }
     const t = item.querySelector('.t, .lbl') || item;
     if (!motion) { A(t, [{ opacity: .55 }, { opacity: 1 }], { duration: 120 }); return; }
     const s = 'steps(1)';
