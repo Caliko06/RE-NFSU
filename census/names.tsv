@@ -7576,3 +7576,9 @@ addr	name	system	confidence	tool	doc	from	aliases	kind	parent
 0x7971d0	RoadId::CaveSectionByte_7971d0	roadid	V	Capstone exact _ROAD_CODE + caves/road.s	docs/re/roadid.md	roadid		nonhopper	
 0x79720f	RoadId::CaveSectionByte_79720f	roadid	V	Capstone exact _ROAD_CODE + caves/road.s	docs/re/roadid.md	roadid		nonhopper	
 0x79724c	RoadId::CaveSectionByte_79724c	roadid	V	Capstone exact _ROAD_CODE + caves/road.s	docs/re/roadid.md	roadid		nonhopper	
+0x034121	road graph sections (per TRACKB file)	racesetup	V	python+capstone	docs/re/race_setup.md	racesetup		nonhopper	
+0x034146	start/finish marker set (per TRACKB file)	racesetup	V	python	docs/re/race_setup.md	racesetup		nonhopper	
+0x034148	TrackPath progress route (per TRACKB file)	racesetup	V	python+capstone	docs/re/race_setup.md	racesetup		nonhopper	
+0x4b4ac5	QuickRace::SetupCircuit open-flag read	racesetup	V	capstone+objdump	docs/re/race_setup.md	racesetup		nonhopper	
+0x4b4d05	QuickRace::SetupSprint open-flag read	racesetup	V	capstone+objdump	docs/re/race_setup.md	racesetup		nonhopper	
+0x78a318	race open-road flag	racesetup	V	capstone	docs/re/race_setup.md	racesetup		nonhopper	
