@@ -7182,3 +7182,34 @@ addr	name	system	confidence	tool	doc	from	aliases	kind	parent
 0x45d970	DragController::ChangeTrafficLane	racesetup	I	Ghidra+capstone	docs/re/race_setup.md	racesetup		func	
 0x4b55b0	QuickRace::SetupDrag	racesetup	V	Ghidra+capstone	docs/re/race_setup.md	racesetup		func	
 0x7404c0	gViews[1] (player view; [+0] = camera block, view at +0, proj at +0x40)	world	I	read+ghidra+hopper+capstone	docs/re/render_pc.md	world		nonhopper	
+0x013024	WorldUnlockWord (SCREEN_ADDR+0x24; host-owned)	gameflow	V	host+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x4ac220	CustomizationDB::AddExtraCarRows	car.garage	V	ghidra+capstone	docs/re/unlock.md	unlock		func	
+0x4c3240	Screen_MU_UG_TradeCareerCar::FillCarList	ui	V	ghidra+capstone	docs/re/unlock.md	unlock		func	
+0x4c96f0	Profile::Autosave	canon	I	ghidra+capstone	docs/re/garage.md	unlock		func	
+0x4e6f00	MainMenu::KeyChar (feeds the cheat buffer)	ui	I	capstone	docs/re/unlock.md	unlock		func	
+0x59e510	EasterEggs::IsTrackUnlocked	car.parts	V	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		func	
+0x59e5f0	EasterEggs::IsPerfUnlocked	car.parts	V	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		func	
+0x706918	CheatCodeRows[0x21] (0x34 B each)	car.parts	V	capstone(data)+ghidra	docs/re/unlock.md	unlock		nonhopper	
+0x733ff8	CareerEventTable[256] (ptr per event id)	canon	V	ghidra+capstone	census/career_oracle.json	unlock		nonhopper	
+0x7343f8	StyleRewardTable (ptr) / count [0x7343fc]	canon	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x73440c	MoneyCheat (PC byte; GC 0x803c2088)	car.garage	V	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x73494c	VersionHotImportNights (PC dword; GC 0x803c1b88)	canon	I	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x735728	UnlockAllParts (GaragePartsBrowser static; PC byte; GC 0x803c14c8)	car.parts	V	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x735e10	ColorCheat_UnlockLevel2 (PC byte; GC 0x803c1368)	car.parts	I	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x735e11	ColorCheat_UnlockLevel3 (PC byte; GC 0x803c136c)	car.parts	I	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x735e12	CheatToGetAllColors (PC byte; GC 0x803c1370)	car.parts	I	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x735e74	AllTracksUnlocked (PC dword; GC 0x803c12f0)	ui	V	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x735ec0	TweakStylePoints flag (PC byte; GC 0x803c1214) / 0x735ebc DebugStylePoints value	canon	I	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x735ec1	UnlockEverythingThatCanBeLocked (PC byte; GC int 0x803c1218)	canon	V	gc Speed.elf (nm, PPC capstone) + ghidra+capstone PC	docs/re/unlock.md	unlock		nonhopper	
+0x73765c	CheatCodes (object: +4 enabled, +0xc rows ptr, +0x10 count)	car.parts	V	ghidra+capstone	docs/re/tuning.md	unlock		nonhopper	
+0x7588c4	FrontendDB (cFrontendDatabase, the profile in memory)	canon	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x758ad4	FrontendDB.StylePoints (db+0x210)	canon	I	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x758ad8	FrontendDB.StyleRewardUnlocked[0x80] (db+0x214)	canon	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x75ac60	CustomizationDB.CarRecords[20] (db+0x239c, 0x348 B each)	car.garage	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x75ee04	CustomizationDB.ExtraCarRows[15] (key, preset hash, mode flags, style-row idx)	car.garage	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x75eef8	CareerSave (FrontendDB+0x6634, 0x88b4 B)	canon	V	ghidra+capstone	docs/re/unlock.md	unlock	CareerSave+0x00 CareerCarConfig (FECarConfig 0x348 B)@unlock	nonhopper	
+0x75f244	CareerSave.EventStatus[256] (+0x34c)	canon	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x75f344	CareerSave.BoughtParts (+0x44c)	car.parts	V	ghidra+capstone	docs/re/garage.md	unlock		nonhopper	
+0x76026c	CareerSave.Cash (+0x1374)	car.garage	V	ghidra+capstone	docs/re/garage.md	unlock		nonhopper	
+0x760274	CareerSave.Spent (+0x137c)	car.garage	V	ghidra+capstone	docs/re/garage.md	unlock		nonhopper	
+0x7677ac	CareerSave.CareerBeaten (db+0xeee8, saved)	canon	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
