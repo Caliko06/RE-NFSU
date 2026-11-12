@@ -28,3 +28,27 @@ for a, old in [(0x4d7eb9, "8b3d"), (0x4d8077, "a1"), (0x4d8117, "a1"), (0x4d81c7
                (0x512223, "a1"), (0x512dd8, "8b0d")]:
     new = "e8" + _rel(a, _UNLOCK_CAVE[old]) + ("" if old == "a1" else "90")
     PATCHES.append(dict(addr=a, old=old + "ac777600", new=new, when=lambda: True))
+
+# PATCH: unlock gaps (row 9, 2026-11-11). Both tests read only the debug byte [0x735ec1] (the one the 48 retail checks use), so the
+# patches follow it wherever it is set: with 0 every site runs the shipped instruction. Caves in CODE_AREA 0x797700.., one flag test each.
+# Sponsor / preset car rows: 0x4bc34f (Quick Race car list 0x4bc170) and 0x4e0fa0 (multiplayer car select 0x4e0d90) read the style-reward
+# byte [0x758ad8 + row] with no cheat test; the cave ORs the debug byte into cl (the code only tests cl, then jne -> car is listed).
+_FLAG = "803dc15e730000"   # cmp byte [0x735ec1], 0
+_STYLE_ROW = "8a88d88a7500"   # mov cl, [eax+0x758ad8]
+PATCHES.append(dict(addr=0x797700, old="00" * 13, new=_STYLE_ROW + "0a0dc15e7300" + "c3", entry=True, when=lambda: True))
+for a in (0x4bc34f, 0x4e0fa0):
+    PATCHES.append(dict(addr=a, old=_STYLE_ROW, new="e8" + _rel(a, 0x797700) + "90", when=lambda: True))
+# Spending: every purchase does cash -= price, spent += price (0x76026c, 0x760274, saved by Autosave 0x4c96f0). The price register is zeroed
+# when the byte is set, so cash and spent stay as they are and nothing negative reaches the profile.
+# 0x5a2555 (car purchase 0x5a2540): mov eax,[eax+0xc7c] (price in the car row) -> cave 0x797710, then the shipped sub/add see 0.
+PATCHES.append(dict(addr=0x797710, old="00" * 18, new="8b807c0c0000" + _FLAG + "7402" "31c0" "c3", entry=True, when=lambda: True))
+PATCHES.append(dict(addr=0x5a2555, old="8b807c0c0000", new="e8" + _rel(0x5a2555, 0x797710) + "90", when=lambda: True))
+# 0x5a25d6 (performance upgrade 0x5a25a0): sub [edx+0x1374],ecx -> cave 0x797730 zeroes ecx first; the following add edi,ecx adds 0.
+PATCHES.append(dict(addr=0x797730, old="00" * 18, new=_FLAG + "7402" "31c9" "298a74130000" "c3", entry=True, when=lambda: True))
+PATCHES.append(dict(addr=0x5a25d6, old="298a74130000", new="e8" + _rel(0x5a25d6, 0x797730) + "90", when=lambda: True))
+# 0x5a265b (part purchase 0x5a2620): sub [edx+0x1374],eax -> cave 0x797750 zeroes eax first; the following add [edx+0x137c],eax adds 0.
+PATCHES.append(dict(addr=0x797750, old="00" * 18, new=_FLAG + "7402" "31c0" "298274130000" "c3", entry=True, when=lambda: True))
+PATCHES.append(dict(addr=0x5a265b, old="298274130000", new="e8" + _rel(0x5a265b, 0x797750) + "90", when=lambda: True))
+# 0x4c37cd (trade-in 0x4c3730): call _ftol_nocw 0x674898 (price difference in eax) -> cave 0x797770 calls it and zeroes eax; sub/add at 0x4c37de/e0 see 0.
+PATCHES.append(dict(addr=0x797770, old="00" * 17, new="e8" + _rel(0x797770, 0x674898) + _FLAG + "7402" "31c0" "c3", entry=True, when=lambda: True))
+PATCHES.append(dict(addr=0x4c37cd, old="e8c6101b00", new="e8" + _rel(0x4c37cd, 0x797770), when=lambda: True))
