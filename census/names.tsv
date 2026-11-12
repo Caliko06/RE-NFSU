@@ -7220,3 +7220,7 @@ addr	name	system	confidence	tool	doc	from	aliases	kind	parent
 0x797730	UnlockCave.PerfCashSub	unlock	V	patches_unlock.py	docs/re/unlock.md	unlock		nonhopper	
 0x797750	UnlockCave.PartCashSub	unlock	V	patches_unlock.py	docs/re/unlock.md	unlock		nonhopper	
 0x797770	UnlockCave.TradeFtolZero	unlock	V	patches_unlock.py	docs/re/unlock.md	unlock		nonhopper	
+0x4b342a	MU_Main_PC_OnlineAccept_WorldPatch	fe	V	capstone+run	docs/re/frontend_menu.md	frontend		nonhopper	
+0x4b34e9	MU_Main_PC_QuickRaceCase	fe	V	capstone	docs/re/frontend_menu.md	frontend		nonhopper	
+0x7977c0	WorldArm_Cave	fe	V	capstone	docs/re/frontend_menu.md	frontend		nonhopper	
+0x36dbec3e	MU_MAIN_PLAY_ONLINE_LabelHash	fe	V	run	docs/re/frontend_menu.md	frontend		nonhopper	
