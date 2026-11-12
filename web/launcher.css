@@ -101,11 +101,14 @@ body.leaving .ui { transition: opacity .28s ease-in .12s; opacity: 0; }
 .sel > .art { filter: brightness(.95) saturate(.88) drop-shadow(.3rem 1rem 1.2rem rgba(0, 0, 0, .75)); }
 .item:active > .art { transform: scale(.97); }
 body.leaving #menu .item.sel > .art { filter: brightness(1.25) drop-shadow(0 0 2rem rgba(214, 209, 196, .25)); }
+.k-paste { --w: 41rem; --ml: 5rem; --r: 1.6deg; --rs: .6deg; z-index: 1; }                            /* wheatpasted scrap above the spray */
 .k-spray { --w: 51rem; --ml: 2.6rem; --r: -2.3deg; --rs: -1.2deg; }
 .k-spray > .art { filter: brightness(.4); } .k-spray.sel > .art { filter: brightness(1); }
 .k-stick { --w: 31rem; --ml: 15rem; --mt: -3.6rem; --r: 2.8deg; --rs: 1.2deg; z-index: 3; }           /* slapped over the drips */
 .k-card { --w: 26.5rem; --ml: 25rem; --mt: -1.5rem; --r: -3.6deg; --rs: -1.8deg; z-index: 2; }        /* half under the sticker */
 .k-tape { --w: 39rem; --ml: -3rem; --mt: -2.4rem; --r: -4deg; --rs: -2.6deg; z-index: 4; }             /* runs off the screen edge */
+/* WORLD is the first button now: keep the tilts the four others had as nth-of-type 1-4 (.item:nth-of-type wins over the class vars above) */
+#menu .k-spray { --r: -1.3deg; } #menu .k-stick { --r: .8deg; } #menu .k-card { --r: -.5deg; } #menu .k-tape { --r: 1.4deg; } #menu .k-paste { --r: 1.6deg; }
 /* the cardboard hangs from one scrap of masking tape */
 .k-card::after { content: ""; position: absolute; right: -2.2rem; top: -.5rem; width: 7.4rem; height: 2.5rem; rotate: 37deg; background: #a9a492; opacity: .45; pointer-events: none; transition: opacity .16s;
   -webkit-mask: var(--m2) 0 0 / 100% 100% no-repeat; mask: var(--m2) 0 0 / 100% 100% no-repeat; }
@@ -113,6 +116,7 @@ body.leaving #menu .item.sel > .art { filter: brightness(1.25) drop-shadow(0 0 2
 /* the marker is the only shared piece: a chip of hazard tape, stuck somewhere else next to each one */
 #menu .light .bg, #menu .light .flash { display: none; }
 #menu .light .chevs { left: calc(56rem * var(--k)); top: 34%; height: 4.4rem; rotate: 9deg; transition: left .16s var(--ease), top .16s var(--ease), rotate .16s var(--ease); }
+#menu:has(.k-paste.sel) .light .chevs { left: calc(47.5rem * var(--k)); top: 38%; rotate: 7deg; }
 #menu:has(.k-stick.sel) .light .chevs { left: calc(49rem * var(--k)); top: 70%; rotate: -11deg; }
 #menu:has(.k-card.sel) .light .chevs { left: calc(18.6rem * var(--k)); top: 46%; rotate: 5deg; }
 #menu:has(.k-tape.sel) .light .chevs { left: calc(38.4rem * var(--k)); top: 20%; rotate: -17deg; }
