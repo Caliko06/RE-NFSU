@@ -8,7 +8,15 @@ You run the day. You do not write code or do RE yourself. Rules: AGENTS.md (whol
 | What | UG2 traffic | WORLD in menu + launcher | all unlocked | UG2 in Original (WORLD only) | races: rival challenge + fixed NFSU1 races | full Bayview |
 | State | FIXED, needs a play | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED |
 | Known UNKNOWN | - | menu code in Speed.exe | where unlocks live | why Original skips the UG2 pass | how a race start is placed | which parts are missing |
-Row 6 waits on the OWNER's verdict: skip it. plan.json `rejected` is closed: never a task.
+Row 6 waits on the OWNER's verdict: skip it.
+
+## RE first (AGENTS.md "RE leads every row")
+Every lane starts by naming its code path in the census; a patch without a named path is smoke. Named today:
+| Binary | Functions | Named | Census | Gap for this scope |
+|---|---|---|---|---|
+| NFSU1 Speed.exe | 13,761 | 7,082 (4,437 V, 2,621 I) | census/names.tsv + names_<system>.tsv | front end menus (ui 79 names), career/unlock save, race start placement |
+| UG2 SPEED2.EXE | 23,522 | 35 (CRT) | census/ug2/names.tsv (empty, header only) | streaming/sections, world loader, roads, traffic: needed for rows 7 and 12 |
+Prior-art lead, UNKNOWN until read: EA shipped symbols in other NFS builds of the same engine (Most Wanted PS2 Sep 2005 prototype: NFS.ELF + NFS.MAP, hiddenpalace.org); an UG2 PS2 prototype (Sep 26 2004) exists. Matching names from them could name UG2 cheaply. plan.json `rejected` is closed: never a task.
 
 ## Your calls
 - Which rows run in parallel and in what order. A suggestion, not an order: 8+9 together (menu/save RE), 10, 11, 12 each its own lane; 12 starts with a map of full Bayview vs what drives today, shown to the OWNER before filling.

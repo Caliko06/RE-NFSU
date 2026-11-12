@@ -5,6 +5,7 @@ Fable (`nfsu-fable`) sets the rows and what done means. You turn them into real 
 ## You own
 | Area | What |
 |---|---|
+| RE first | each lane opens by reading and naming its code path (AGENTS.md "RE leads every row"); names land in the census before the patch; Codex/Becarios are good at wide naming sweeps, a second tool confirms V |
 | Split | each row Fable gives you into tasks that a worker can finish and show |
 | Workers | pick the pool by strength (AGENTS.md table); brief like a strong engineer: goal, facts and where they live, limits, deliverable; one `slice` per worker that writes code; one-line description so the Agencia shows it |
 | Integration | merge passing slices into main, build, commit; remove merged worktrees (stale ones: `git worktree list`) |
