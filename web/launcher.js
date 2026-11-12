@@ -220,7 +220,7 @@
   scr.main.onSel = n => { const d = n.dataset.desc; setLine(scr.main.root.querySelector('.desc'), d === 'play' ? scr.main.playLine() : d || ''); };
   scr.main.playLine = () => 'Perfil: ' + (scr.main.profile || 'Original 2003') + '.';
   for (const b of $('menu').querySelectorAll('.item')) {
-    b.addEventListener('click', () => { if (b.dataset.go) { snd('accept'); show(b.dataset.go); } else if (b.id === 'play') play(); else if (b.id === 'world') launch('pool=1'); });
+    b.addEventListener('click', () => { if (b.dataset.go) { snd('accept'); show(b.dataset.go); } else if (b.id === 'play') play(); });
   }
 
   // controls
@@ -483,12 +483,11 @@
   }
 
   // ---------- confirm: headlights, push-in (RN_SCENE.confirm), fade, then go ----------
-  async function launch(extra) {
+  async function launch() {
     if (going) return;
     going = true;
     // fast=1 + go=1: the game page boots under a loading curtain (web/index.html) and lifts it by itself at its main menu
     const u = new URLSearchParams(launchHook.query()); u.set('fast', '1'); u.set('go', '1');
-    for (const [k, v] of new URLSearchParams(extra || '')) u.set(k, v);   // WORLD: pool=1, the flag that opens WORLD from the main menu (web/boot.js)
     const q = u.toString();
     const s = scr.main.sel; if (s && scr.main.light) scr.main.light.node.classList.add('go');
     for (const it of scr.main.items()) if (it !== s) it.classList.add('out');
