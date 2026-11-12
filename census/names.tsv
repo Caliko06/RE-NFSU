@@ -7582,3 +7582,4 @@ addr	name	system	confidence	tool	doc	from	aliases	kind	parent
 0x4b4ac5	QuickRace::SetupCircuit open-flag read	racesetup	V	capstone+objdump	docs/re/race_setup.md	racesetup		nonhopper	
 0x4b4d05	QuickRace::SetupSprint open-flag read	racesetup	V	capstone+objdump	docs/re/race_setup.md	racesetup		nonhopper	
 0x78a318	race open-road flag	racesetup	V	capstone	docs/re/race_setup.md	racesetup		nonhopper	
+0x4333c0	RacingCar::RacingCar (init)	racesetup	V	ghidra	docs/re/race_setup.md	racesetup		func	
