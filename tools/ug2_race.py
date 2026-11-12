@@ -88,7 +88,8 @@ def park_loop(ground):
     i0 = min(range(len(pts)), key=lambda i: math.dist(pts[i], sl[1:3]))
     pts = pts[i0:] + pts[:i0]
     a = math.atan2(pts[1][1] - pts[0][1], pts[1][0] - pts[0][0])
-    h = sl[4] * 2 * math.pi / 65536
+    # travel heading = ForwardStartingPosition angle; the StartLine angle is that minus 90 deg in every shipped circuit TRACKB1001-1008 (route tangent at the line == StartingPosition angle)
+    h = min(mk['ForwardStartingPosition'])[4] * 2 * math.pi / 65536
     if math.cos(a - h) < 0:                    # waypoint order runs against the marker heading: drive the other way
         pts = [pts[0]] + pts[:0:-1]
         print('route reversed to match the start marker heading')
