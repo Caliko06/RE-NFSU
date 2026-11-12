@@ -22,7 +22,7 @@ LOD_TRIS = 800_000
 # (build/ug2/coll_rows.bin, tools/ug2_coll.py). FACT 2026-11-10: the full scenery spans x -3967..6750, y -5119..4989 against the
 # collision's -3093..1898, -2079..3149 (backdrop walls up to z 1100); placed at R270+t, 18,745 of its vertices land on NFSU1 ground.
 COLL = os.path.join(REPO, 'build', 'ug2', 'coll_rows.bin')
-REACH, CELL = 160, 16
+REACH, CELL = 600, 16  # was 160: dropped 84 RA instances (7,662 tris: terrain chops, trees, factory/power-plant pieces, 116..368 m from collision, 160 m+ from any NFSU1 ground); 600 m (4-neighbour growth) takes them all, census/ug2/bayview_gaps.md G3
 # Vertex stride and colour offset by the mesh mask (0x134900 +0xc): 24 B (xyz, BGRA @12, uv @16) for masks 0, 0x40, 0x1000;
 # 36 B (xyz, normal @12, BGRA @24, uv @28) for 0x4180. Measured on STREAML4RA.BUN: vertex-buffer bytes / nv = 24.0 and 36.0
 # exactly (census/ug2/tex.md, slice/ug2tex 3e17901); the exe picks the shader object from the mask at 0x5c58cf..0x5c591b.
