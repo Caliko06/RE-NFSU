@@ -144,10 +144,10 @@ void ai_tel(Ctx *c) {
         if (kind == 2) {
             uint32_t rec = ld(c, r + 0x1c, 4);
             if (aids) aids_log(c, f, G(e + 0x73c), r, v, rec, a, sp);
-            rn_log("AIR f%u %s d %+.0f lat %+.0f sp %.1f act %d/%d route %d own %.1f s4b8 %.2f s404 %.2f rec14 %.2f stuck %.1f s unst %d hits wall %d car %d",
+            rn_log("AIR f%u %s d %+.0f lat %+.0f sp %.1f act %d/%d route %d own %.1f s4b8 %.2f s404 %.2f rec14 %.2f stuck %.1f s unst %d hits wall %d car %d at %.0f,%.0f",
                    f, G(e + 0x73c), along >= 0 ? d : -d, lat, sp, at, a ? (int)ld(c, a + 0x1f4, 4) : -1, a ? c->mem[a + 0x1f0] : -1,
                    a ? ldf(c, a + 0x1e4) : 0.0f, v ? ldf(c, v + 0x4b8) : 0.0f, ldf(c, r + 0x404), rec && rec < GUEST_MEM - 0x20 ? ldf(c, rec + 0x14) : 0.0f,
-                   tr[i].stuck / 60.0f, tr[i].unst, tr[i].wall, tr[i].car);
+                   tr[i].stuck / 60.0f, tr[i].unst, tr[i].wall, tr[i].car, x, y);
         } else if (kind == 3 && d < 80) {
             rn_log("AIT f%u car %08x d %+.0f lat %+.1f sp %.1f act %d parked %u hits wall %d car %d draw %u blink %u view %x", f, r, along >= 0 ? d : -d, lat, sp, at,   // probe (exit: delete when "horns with no cars" is decided): the tests of DrawRaceCarList 0x571050
                    v ? c->mem[v + 0x4d1] : 0, tr[i].wall, tr[i].car, c->mem[r + 0x4d0], c->mem[r + 0x8a8], ld(c, r + 0x534, 4));

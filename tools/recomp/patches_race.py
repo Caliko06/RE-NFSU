@@ -216,3 +216,8 @@ PATCHES.append(dict(addr=0x43db2a, old="cc" * 6, new="ff25b4300100", entry=True,
 PATCHES.append(dict(addr=0x63b366, old="6a00ff15ec75", new="ff25a0300100", entry=True, when=lambda: True))
 PATCHES.append(dict(addr=0x583a37, old="e8f5780b00", new="e8" + _rel(0x583a37, 0x63b366), when=lambda: True))
 PATCHES.append(dict(addr=0x583a5b, old="e8d1780b00", new="e8" + _rel(0x583a5b, 0x63b366), when=lambda: True))
+
+# PATCH: 0x4b4d05, OWNER 2026-11-11 (row 11, WORLD races): QuickRace::SetupSprint 0x4b4c30 copies TrackInfo row +0x69 (the open-track byte) to 0x78a318; the WORLD row is a
+# clone of the circuit row CT1 (+0x69 = 0) and serves two races (Circuit = Park Loop, Sprint = the bridge challenge; host/openworld.c rn_world_open picks the file by mode), so
+# the sprint's open flag is now a constant 1: push 1 / pop ecx / nop replaces movsx ecx, [edx + 0x69]. Same value for the 8 shipped sprint rows (GLOBALB 0x34201: 1102..1109 all +0x69 = 1), so nothing changes outside WORLD.
+PATCHES.append(dict(addr=0x4b4d05, old="0fbe4a69", new="6a015990", when=lambda: True))

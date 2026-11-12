@@ -145,12 +145,12 @@ uint32_t world_rows(Ctx *c) {
     snprintf(G(w + 0x20), 32, "Location1\\Track_%d", WORLD_ID);
     st(c, w + 0x6c, WORLD_ID, 2); st(c, w + 0x6e, WORLD_ID, 2);   // s16 id twice
     // mask: Free Run (0x10) only, no reverse (0x80); hidden (mode 2): 0x80 alone, no mode bit (0x4ab470) so no list takes the row, but the setup 0x4b5090 finds it by id
-    st(c, w + 0x74, worldrow_mode() == 2 ? 0x80 : 0x90, 4);
+    st(c, w + 0x74, worldrow_mode() == 2 ? 0x80 : 0x95, 4);   // + 0x01 Circuit list (Park Loop), + 0x04 Sprint list (bridge challenge)
     stf(c, w + 0x8c, WORLD_X0); stf(c, w + 0x90, WORLD_Y0); stf(c, w + 0x94, WORLD_S); st(c, w + 0x98, 0, 2);   // minimap bounds, no rotation
     if (rows_prev) guest_free(rows_prev);
     rows_prev = nr;
     st(c, 0x736168, nr, 4); st(c, 0x73616c, n + 1, 4);
-    rn_log("OPENWORLD: track row %u = WORLD (id %d, mask 0x%x) at %08x", n, WORLD_ID, worldrow_mode() == 2 ? 0x80 : 0x90, w);
+    rn_log("OPENWORLD: track row %u = WORLD (id %d, mask 0x%x) at %08x", n, WORLD_ID, worldrow_mode() == 2 ? 0x80 : 0x95, w);
     return r;
 }
 
@@ -277,6 +277,11 @@ int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) {
     if (id == WORLD_ID && worldrow_on()) {
         // the WORLD row: its own file (tools/openworld/tour.py: the merged city with a closed road tour for the rivals, docs/openworld/tour.md);
         // without it the merged city of the base track
+        // Quick Race Circuit (mode [0x777cc8] == 0) = the Park Loop race (tools/ug2_race.py: this file with its own route, markers and road net, TRACKB1010_park.lzc);
+        // the exe has one route and one marker set per track file (docs/re/race_setup.md), so a second race is a second file
+        // Sprint (mode 1) = the bridge challenge (same tool, an open route from the NFSU1 junction over the connector to the finish of UG2 4121)
+        uint32_t qm = g_ctx ? ld(g_ctx, 0x777cc8, 4) : 3;
+        if ((qm == 0 || qm == 1) && world_file(qm ? "TRACKB1010_bridge.lzc" : "TRACKB1010_park.lzc", real, n, size)) { rn_log("OPENWORLD: %s -> %s (%s, %llu bytes)", gpath, real, qm ? "Sprint: bridge challenge" : "Circuit: Park Loop", (unsigned long long)*size); return 1; }
         if (world_file("TRACKB1010.lzc", real, n, size)) { rn_log("OPENWORLD: %s -> %s (%llu bytes)", gpath, real, (unsigned long long)*size); return 1; }
         id = WORLD_BASE;
     } else if (!enabled()) return 0;
