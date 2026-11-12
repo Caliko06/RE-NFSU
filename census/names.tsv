@@ -7081,3 +7081,101 @@ addr	name	system	confidence	tool	doc	from	aliases	kind	parent
 0x78bcc0	IdentityMatrix	world	I	objdump 0x4467cf..0x4467d9	docs/re/render_pc.md	world		nonhopper	
 0x78d270	gCameraObj	blur	V	C	docs/re/blur.md	blur		nonhopper	
 0x78e980	gParticleSystemA	render	I	hopper	docs/re/render.md	render		nonhopper	
+0x431df0	RaceStatus::Reset	fe	I	capstone+ghidra	docs/re/frontend_menu.md	frontend		func	
+0x4b3240	Screen_MU_Main_PC::NotificationMessage	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		func	
+0x4b6fe0	Screen_MU_QuickRaceModeSelect::AddModeButton	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		func	
+0x4b7a90	Screen_MU_QuickRaceModeSelect::NotificationMessage_thunk	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		func	
+0x4b7a94	Screen_MU_QuickRaceModeSelect::NotificationMessage	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		func	
+0x4b8050	Screen_MU_QuickRaceOptions_PC::NotificationMessage	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		func	
+0x4b9fa0	Screen_MU_QuickRaceTrackSelect::IsNodeBlocked	fe	I	capstone	docs/re/frontend_menu.md	frontend		func	
+0x4bafe0	Screen_MU_QuickRaceTrackSelect::StoreSelectionInSettings	fe	I	capstone	docs/re/frontend_menu.md	frontend		func	
+0x4bb2b0	Screen_MU_QuickRaceTrackSelect::NotificationMessage	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		func	
+0x4bcb40	Screen_MU_QuickRaceCarSelect::NotificationMessage	fe	I	capstone	docs/re/frontend_menu.md	frontend		nonhopper	
+0x4bd710	Screen_MU_QuickRaceLapPopup_PC::NotificationMessage	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		func	
+0x4df790	QuickRace::ResetModeHelpers	fe	U	capstone+hopper	docs/re/frontend_menu.md	frontend		func	
+0x4e2520	GarageVinyl_GetCarBodyVariant	car.garage	I	Ghidra dossier decomp + Speed.exe string read	docs/re/names_w4c.md	w4c		func	
+0x548340	Net_SendRacerRidePacket_Type01	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5484c0	Net_SendStringPacket_Type07	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		nonhopper	
+0x548530	Net_SendStringPacket_Type05	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		nonhopper	
+0x5485a0	Net_SendStringPacket_Type0E	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		nonhopper	
+0x5487c0	Net_SendPacket	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x54ad50	Online::SendReportRequest	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x54af80	Online::RequestNews	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x54b800	Online::IsSystemChatLine	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x54d6b0	Online::SendCreateAccountRequest	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x54f9b0	Screen_MU_Online_Waiting::Screen_MU_Online_Waiting	ui	V	Ghidra dossier decomp + screen factory table (b_screens.tsv)	docs/re/names_w4e.md	w4e		func	
+0x550570	OnlineGameRoom_PlayerList::BindObjects	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5530e0	Screen_MU_OnlineGameRoom::UpdateRoomTitle	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x553a90	Screen_MU_OnlineGameRoom::BeginWhisper	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x555560	OnlineGameOptionsScreen::HandleMouse	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x555a80	OnlineGameOptionsScreen::MoveRowSelection	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x555bf0	OnlineGameOptionsScreen::AdjustLaps	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5563f0	OnlineGameOptionsScreen::OnReplyA	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x556580	OnlineGameOptionsScreen::OnReplyB	online	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x557590	Screen_MU_Online_ISPConnect::Screen_MU_Online_ISPConnect	ui	V	Ghidra dossier decomp + screen factory table (b_screens.tsv)	docs/re/names_w4e.md	w4e		func	
+0x558b80	Screen_MU_Online_CreateAccount_StepOne::~Screen_MU_Online_CreateAccount_StepOne	ui	V	Ghidra live decomp (xref 0x6bcab4)	docs/re/names_w4e.md	w4e		func	
+0x559740	Screen_MU_Online_CreateAccount_StepTwo::Screen_MU_Online_CreateAccount_StepTwo	ui	V	Ghidra live decomp (xref 0x6bca84) + screen factory table	docs/re/names_w4e.md	w4e		func	
+0x55aa80	Screen_MU_Online_AnotherAccount::~Screen_MU_Online_AnotherAccount	ui	V	Ghidra live decomp (xref 0x6bca5c)	docs/re/names_w4e.md	w4e		func	
+0x55b2b0	Screen_MU_Online_AnotherAccount::HandleMouse	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x55bab0	Screen_MU_Online_ParentalEmailRequired_PC::HandleMouse	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x55d160	Screen_MU_Online4PlayerGameDialogueBox::Screen_MU_Online4PlayerGameDialogueBox	ui	V	Ghidra dossier decomp + screen factory table	docs/re/names_w4e.md	w4e		func	
+0x561db0	Screen_MU_Online_BestLapTimes::Screen_MU_Online_BestLapTimes	ui	V	Ghidra dossier decomp + screen factory table	docs/re/names_w4e.md	w4e		func	
+0x5629f0	Screen_MU_OnlinePlayerCar::Screen_MU_OnlinePlayerCar	ui	V	Ghidra dossier decomp + screen factory table	docs/re/names_w4e.md	w4e		func	
+0x5638d0	Screen_MU_OnlinePlayerCar::HandleMouse	ui	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x563a80	Screen_MU_OnlinePlayerDetailsBox::Screen_MU_OnlinePlayerDetailsBox	ui	V	Ghidra dossier decomp + screen factory table	docs/re/names_w4e.md	w4e		func	
+0x571d90	Snapshot::FieldMatrix	physics	V	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x572590	ReplayManager::RunSnapshotChannel	runtime	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x573620	ReplayManager::WriteSnapshotToReplayFile	runtime	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x578060	AnimatedProp::AnimatedProp	props	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x578370	AnimatedProp::~AnimatedProp	props	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		nonhopper	
+0x579310	SpaceNode::SetWorldMatrix	track	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x57a5f0	AI::GetOwnCarSpeed	raceai	V	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x57c3b0	EventLog::Record	runtime	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x57d280	RideInfo::SetDefaultPartForSlot	car	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x582a90	CatmullRomSpline::Evaluate	camera	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5850a0	RigidBody::GetTestImpulseMomentum	physics	I	Ghidra live decomp	docs/re/names_w4e.md	w4e		func	
+0x585810	RigidBody::UpdateDerivedState	physics	I	Ghidra live decomp + xref	docs/re/names_w4e.md	w4e		func	
+0x586640	Countdown::Tick	runtime	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x586bb0	Wheel::UpdateWheelAndGround	car.physics	I	Ghidra live decomp	docs/re/names_w4e.md	w4e		func	
+0x587e90	Wheel::UpdateSkidMarks	car.physics	I	Ghidra live decomp	docs/re/names_w4e.md	w4e		func	
+0x589260	IList::InitEmpty	runtime	V	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x58aba0	AsyncReadQueue::AddRequest	runtime	I	Ghidra live decomp	docs/re/names_w4e.md	w4e		func	
+0x58d010	Player::InitRefs	runtime	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x593170	DynamicCollisionBody::UpdateTrackPolygonWitnesses	physics	I	Ghidra live decomp	docs/re/names_w4e.md	w4e		func	
+0x593620	World::FreeWorldObjectGroups	world	I	Ghidra live decomp	docs/re/names_w4e.md	w4e		func	
+0x593880	FernShaker::InitSlotPool	props	V	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x598260	Collision::EmitContactParticles	physics	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x598f00	PlaceCar_PickNodeOppositeHalf	traffic	V	Ghidra live decomp + Speed.exe disasm (objdump)	docs/re/names_w4e.md	w4e		func	
+0x59e6f0	FEWidget::InitFromDescriptor_59e6f0	ui	I	Ghidra live decomp (xref)	docs/re/names_w4e.md	w4e		func	
+0x59ee90	FEWidget::UpdateSliderThumb	ui	I	Ghidra live decomp (xref)	docs/re/names_w4e.md	w4e		func	
+0x5a74f0	AI::GetOwnLateralOffsetToLane	raceai	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5b1c41	D3DX_HlslLex_ScanIdentifier	render	V	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5b26f6	D3DX_HlslLex_ScanShaderVersionToken	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5b97bb	D3DX_Hlsl_FreeNodeTreeBody_5b97bb	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5bb39e	D3DX_HlslSema_AssembleShaderBlob_5bb39e	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5bcfe4	D3DX_HlslSema_CompareFunctionSignature_5bcfe4	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5c50ee	D3DX_HlslCompiler_Run_5c50ee	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5c5283	D3DX_Preproc_DtorBody_5c5283	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5c5508	D3DX_HlslCompiler_InitContext_5c5508	runtime	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5d031f	D3DX_Hlsl_FreeNodeTreeBody_5d031f	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5d1593	D3DX_Effect_LoadFromBinary_Block_5d1593	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5d5932	D3DX_Effect_LoadFromBinary_5d5932	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5d65b0	D3DX_CreateObject_5d65b0	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		nonhopper	
+0x5d932c	D3DX_Back_AllocPerNodeTable_5d932c	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5dc68d	D3DX_HlslGen_CollectConstantIndices_5dc68d	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5e8c12	D3DX_Asm_BuildConstantFloat4Array_5e8c12	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5f71a2	D3DX_Back_Container_Push	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5f7658	D3DX_Back_PairContainer_DtorBody_5f7658	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		nonhopper	
+0x5f7e20	D3DX_Util_HeapSort	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5f8440	D3DX_Back_RemoveTypeClass0Items_5f8440	render	I	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5f91a4	sub_ps1_backend_pass_5f91a4	render	U	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x5faf93	sub_backend_constnodes_5faf93	render	U	Ghidra dossier decomp	docs/re/names_w4e.md	w4e		func	
+0x6c614c	Screen_MU_Main_PC::vtable	fe	V	capstone	docs/re/frontend_menu.md	frontend		nonhopper	
+0x7346c4	Online_Enabled	online	I	ghidra+capstone	docs/re/frontend_menu.md	frontend		nonhopper	
+0x748f70	FrontendDatabase	canon	V	capstone+hopper	docs/re/frontend_menu.md	frontend		nonhopper	
+0x748f76	FE_QuickRaceBlockCopied	fe	I	capstone	docs/re/frontend_menu.md	frontend		nonhopper	
+0x748f78	FE_Player0_ControllerIndex	fe	I	capstone	docs/re/frontend_menu.md	frontend		nonhopper	
+0x7589e0	QuickRaceSettings_FreeRun	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		nonhopper	
+0x758c28	FrontendDatabase_Player0_CarHandle	fe	I	capstone+ghidra	docs/re/frontend_menu.md	frontend		nonhopper	
+0x777b4c	FE_MainMenuChoice	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		nonhopper	
+0x777cc8	QuickRace_Mode	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		nonhopper	
