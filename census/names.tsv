@@ -7213,3 +7213,10 @@ addr	name	system	confidence	tool	doc	from	aliases	kind	parent
 0x76026c	CareerSave.Cash (+0x1374)	car.garage	V	ghidra+capstone	docs/re/garage.md	unlock		nonhopper	
 0x760274	CareerSave.Spent (+0x137c)	car.garage	V	ghidra+capstone	docs/re/garage.md	unlock		nonhopper	
 0x7677ac	CareerSave.CareerBeaten (db+0xeee8, saved)	canon	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x4bc34f	BuildCarList: style row flag read (cl = [0x758ad8+row])	ui	V	ghidra+capstone	docs/re/unlock.md	unlock		nonhopper	
+0x4c3730	Screen_MU_UG_TradeCareerCar::CommitTrade	ui	I	ghidra+capstone	docs/re/unlock.md	unlock		func	
+0x797700	UnlockCave.StyleRowFlag	unlock	V	patches_unlock.py	docs/re/unlock.md	unlock		nonhopper	
+0x797710	UnlockCave.CarPriceZero	unlock	V	patches_unlock.py	docs/re/unlock.md	unlock		nonhopper	
+0x797730	UnlockCave.PerfCashSub	unlock	V	patches_unlock.py	docs/re/unlock.md	unlock		nonhopper	
+0x797750	UnlockCave.PartCashSub	unlock	V	patches_unlock.py	docs/re/unlock.md	unlock		nonhopper	
+0x797770	UnlockCave.TradeFtolZero	unlock	V	patches_unlock.py	docs/re/unlock.md	unlock		nonhopper	
