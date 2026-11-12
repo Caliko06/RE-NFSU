@@ -7179,3 +7179,5 @@ addr	name	system	confidence	tool	doc	from	aliases	kind	parent
 0x758c28	FrontendDatabase_Player0_CarHandle	fe	I	capstone+ghidra	docs/re/frontend_menu.md	frontend		nonhopper	
 0x777b4c	FE_MainMenuChoice	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		nonhopper	
 0x777cc8	QuickRace_Mode	fe	V	capstone+hopper	docs/re/frontend_menu.md	frontend		nonhopper	
+0x45d970	DragController::ChangeTrafficLane	racesetup	I	Ghidra+capstone	docs/re/race_setup.md	racesetup		func	
+0x4b55b0	QuickRace::SetupDrag	racesetup	V	Ghidra+capstone	docs/re/race_setup.md	racesetup		func	
