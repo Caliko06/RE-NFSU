@@ -283,19 +283,24 @@ def bridge_race(ground):
     assert cands, 'no node north of the junction'
     back = min(cands, key=lambda k: abs(dist[k] - 100))
     fin = world_markers(4121)['ForwardFinishLine'][0]
-    fk = W.snap(fin[1:3])
+    # NFSU1 part on the live net: start -> anchor -> the connector's far end (the bridge landing, WORLD 82.4, 600.6: the connector is section 78 whatever the UG2 net is)
+    land = W.snap((82.4, 600.6))
+    assert math.dist(W.P[land], (82.4, 600.6)) < 1.0, 'connector end not found'
     _, p1 = RP.dijkstra(W.adj, back, anchor)
-    _, p2 = RP.dijkstra(W.adj, anchor, fk)
-    keys = p1 + p2[1:]
-    # run-out: on from the last node along its section, same index direction as the last step
-    (s1, i1), (s2, i2) = keys[-2], keys[-1]
+    _, p2 = RP.dijkstra(W.adj, anchor, land)
+    head = [W.P[k] for k in p1 + p2[1:]]
+    # UG2 part on UG2's own free-roam graph (ids of the WORLD net never enter): landing -> finish, then 80 m on along the same section for the run-out
+    inv = lambda p: (812.25 - p[1], p[0] + 1287.375)
+    P, adj = RP.graph(R.load('A'))
+    snap = lambda p: min(P, key=lambda k: (P[k][0] - p[0]) ** 2 + (P[k][1] - p[1]) ** 2)
+    _, pk = RP.dijkstra(adj, snap(inv(W.P[land])), snap(inv(fin[1:3])))
+    (s1, i1), (s2, i2) = pk[-2], pk[-1]
     step = 1 if s1 != s2 or i2 > i1 else -1
-    nodes = W.S[s2]['nodes']
-    ext, acc, j = [], 0.0, i2
-    while acc < 80 and 0 <= j + step < len(nodes):
-        acc += math.dist(nodes[j], nodes[j + step]); j += step; ext.append((s2, j))
-    keys += ext
-    pts = [W.P[k] for k in keys]
+    sec = {sc['id']: sc for sc in R.load('A')['sections']}[s2]['nodes']
+    acc, j = 0.0, i2
+    while acc < 80 and 0 <= j + step < len(sec):
+        acc += math.dist((sec[j]['x'], sec[j]['y']), (sec[j + step]['x'], sec[j + step]['y'])); j += step; pk.append((s2, j))
+    pts = head + [R.to_nfsu1(P[k][0], P[k][1], 0)[:2] for k in pk]
     pts = [q for i, q in enumerate(pts) if i == 0 or q != pts[i - 1]]
     pts = resample(drop_spurs(resample(pts, 2.0)), STEP)
     out, z = [], 43.0
