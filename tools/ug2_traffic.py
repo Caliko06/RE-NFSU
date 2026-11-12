@@ -1,34 +1,14 @@
 #!/usr/bin/env python3
-"""ug2_traffic.py: NFSU1 traffic on the UG2 city, as far as the road-section id limit allows (census/ug2/roads.md sections 2.1, 5, 8).
+"""NFSU1 WORLD traffic data: deduplicated UG2 trails plus the bridge connector.
 
-Called by ug2_collfile.py (the one writer of build/openworld/TRACKB1010.lzc): apply(base, rows) -> base' with the road chunks 0x34121 / 0x34122
-extended, check(new, old, rows) -> static check numbers (asserts). Nothing else is rewritten; the NFSU1 sections 0..77 keep every byte but the
-link slot bytes, and every NFSU1 node names the same entries as before (the anchor node 28:2 one more, to the connector).
-
-Limit that binds: the section id is a BYTE (node +0x83, entry +9/+0xa, NodeRef +0x5c: 0x44a2ae movsx al -> [0x77af30 + 4*id]); the widen
-patches (tools/recomp/patches_road.py, always on) make it unsigned with a 256-slot table at 0x796000, 255 = none, so <= 254 sections in all
-(citygraph.MAX_SEC). NFSU1 uses 78 + the connector: 175 ids are left for UG2's 855 sections (dedupe + chain merge still leaves ~410,
-citygraph.build on UG2 polylines). Entries (2047, 11 bits) and nodes per section (s16, 0x442bb2) are far from binding.
-  UG2 part : select(): the 600 m seed disc around the bridge mouth (UG2 211, 1405; the near-bridge set, always in), then Dijkstra by road
-             distance over UG2's own entries until the 175 ids are used, skipping a section whose nodes lie >= 80 % within DUP_R (3 m) of road
-             already taken (the same centre line twice). One connected piece of UG2's graph. Nodes moved by the placement
-             R270 (x,y)->(y,-x) + t (tools/ug2_roads.to_nfsu1); node z = s16/8 + tz; tangent (tx,ty)->(ty,-tx), the back heading is its negative;
-             drive flags bit 11/18/25/26/27/28 -> 6/19/25/26/27/28 (0x4424d0, 0x442520 vs 0x5dd550..); intersection bits 20..24 = 31 (as tour.py).
-             Sections renumbered 79.. in UG2 id order, one per UG2 section, nodes 1:1.
-  entries  : > 255 in all, so the wide path: PostLoad hook 0x443123 (cave 0x797000) sets EBASE[s] = first entry whose source is s and skips
-             the sort; a slot byte is the rank inside its source section (readers 0x4564bd, 0x5a53f8, 0x5a56ce, 0x5a6da9 -> caves E1..E4). So
-             all entries, NFSU1 ones included, are written grouped by source section (citygraph.city_chunks does the same).
-  connector: section 78, from the junction node 28:3 (221.6, 401.5, z 43.0) west along the stub road, north over the bridge, left onto the UG2
-             road (ends at the road centre, heading west). Nodes every <= 8 m, z = the collision ground there.
-  links    : the UG2 entries inside the set are twin pairs; a pair is written as citygraph.py writes a link: d=0 entry (source -> target) and its
-             d=1 twin (target side -> source side), both only if the landing is > AHEAD (0.1 m, [0x6cc7b8], citygraph.py:881; the grower at 0x5a58d0
-             faults at 0x462a06 otherwise) ahead of the source along its heading for that direction (d=0 +0xc/+0x10, d=1 +0x14/+0x18). A source
-             that fails is moved back up to 3 nodes (citygraph.py:802-813), hop <= 50 m. Pairs whose ends run against each other
-             (the global walk direction cannot follow them) get no entry that passes the test and are dropped, counted in the report.
-  types    : citygraph.py:742-747: the last way out of a section is type 2 / lane 2 (always taken), the others 0 / 7. The connector's fork entries (28:2 -> connector, 230:24 -> connector) are 0 / 7, its ends 2 / 2.
-  templates: header = live section 0 (the NFSU1 section whose nodes all carry traffic lanes), node = the live section 0 node with default
-             widths nearest to that section's median; see TEMPLATE_* below. Lanes: only traffic lane 11 and 17 (offset 1.8 m right of the driver).
-usage: python3 tools/ug2_traffic.py [--check]   (--check: read build/openworld/TRACKB1010.lzc and run the static check)"""
+UG2 0x34121/0x34122 -> corridor dedupe -> native junction graph -> connected
+edge-disjoint trail partition -> unchanged NFSU1 chunk writer and checker.
+Limits and the complete named consumer path: census/names_roadid.tsv and
+docs/re/roadid.md (0x442bb2 signed node count, 0x4564b0 two slots,
+0x443123 EBASE, 0x458c29/0x458cf0/0x458c95 11-bit entry cache).
+Original NFSU1 nodes retain all bytes except their remapped entry slots.
+Run: python tools/ug2_collfile.py; check: python tools/ug2_traffic.py --check.
+"""
 import collections, heapq, math, os, statistics, struct, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
@@ -42,9 +22,7 @@ import q_owcoll2_write as w  # noqa: E402
 import tour as T  # noqa: E402
 from lib import find  # noqa: E402
 
-MOUTH = (211.0, 1405.0)       # UG2 bridge mouth, raw UG2 units (roads.md section 4)
-RADIUS = 600.0                # seed disc: the near-bridge sections, always in (the connector lands on UG2 230:24)
-DUP_R = 3.0                   # a section this close to taken road (>= 80 % of its nodes) is the same centre line again: skipped
+DUP_R = 3.0                   # citygraph.dedupe corridor radius; also separate stacked roads by height
 MAX_SEC, MAX_ENT, RETAIL_ENT = 254, 2047, 255   # section ids are bytes (255 = none, widened table 0x796000), entries 11 bits (patches_road.py)
 ANCHOR = (28, 3)              # NFSU1 node of the junction in front of the stub road (x 221.6, y 401.5)
 AHEAD = 0.1                   # citygraph.py:881
@@ -112,90 +90,488 @@ class Ground:
         return min(out, key=lambda q: abs(q - near)) if out else None
 
 
-def _seg_d(p, a, b):
-    vx, vy = b[0] - a[0], b[1] - a[1]
-    l2 = vx * vx + vy * vy or 1e-9
-    u = max(0.0, min(1.0, ((p[0] - a[0]) * vx + (p[1] - a[1]) * vy) / l2))
-    return math.hypot(p[0] - a[0] - u * vx, p[1] - a[1] - u * vy)
-
-
 def select(g, budget):
-    """UG2 sections to carry traffic: the 600 m seed disc around the bridge mouth, then Dijkstra by road distance from it over UG2's own
-    entries, one section at a time, until `budget` section ids are used. A section whose nodes lie >= 80 % within DUP_R of the sections
-    already taken (either heading: the same centre line written twice) is skipped, it would spend an id on road that already has traffic.
-    Growing only through taken sections keeps the set one connected piece of UG2's own graph."""
-    S = {s['id']: s for s in g['sections']}
-    P = {k: [(n['x'], n['y']) for n in s['nodes']] for k, s in S.items()}
-    cum = {}
-    for k, p in P.items():
-        c = [0.0]
-        for i in range(1, len(p)):
-            c.append(c[-1] + math.dist(p[i], p[i - 1]))
-        cum[k] = c
-    out = collections.defaultdict(list)
+    """Partition the deduplicated centreline into edge-disjoint trails.
+
+    Corridor dedupe follows citygraph.dedupe (3m, |cos|>.85), retaining
+    elevation to keep stacked roads apart. Native 0x34122 links supply junctions;
+    proximity alone never joins crossing roads. Degree-2 chains are the units
+    of pruning: discard the cheapest odd-to-odd chain which keeps bridge reachability
+    until the trail lower bound (odd vertices / 2) fits the byte section budget.
+    """
+    from citygraph import SegGrid
+    grid, runs, heights = SegGrid(), [], []
+
+    def covered(n):
+        p, h = (n['x'], n['y']), n['t']
+        cx, cy = int(p[0] // 20), int(p[1] // 20)  # citygraph.CELL
+        for k in {k for dx in (-1, 0, 1) for dy in (-1, 0, 1) for k in grid.g.get((cx + dx, cy + dy), ())}:
+            a, b = grid.segs[k]
+            vx, vy = b[0] - a[0], b[1] - a[1]
+            l2 = vx * vx + vy * vy
+            if not l2 or abs(vx * h[0] + vy * h[1]) < .85 * math.sqrt(l2):
+                continue
+            t = max(0., min(1., ((p[0] - a[0]) * vx + (p[1] - a[1]) * vy) / l2))
+            za, zb = heights[k]
+            if math.hypot(p[0] - a[0] - t * vx, p[1] - a[1] - t * vy) < DUP_R and abs(n['z'] - za - t * (zb - za)) < DUP_R:
+                return True
+        return False
+    drive = lambda n: bool(n['fl'] & sum(1 << a for a, _ in MAP_BITS))
+    # Keep the established citygraph longest-first corridor representative.
+    for s in sorted(g['sections'], key=lambda s: (-len(s['nodes']), s['id'])):
+        ns = s['nodes']
+        xy = [(n['x'], n['y']) for n in ns]
+        flags = [drive(n) and not covered(n) for n in ns]
+        for width in (1, 2):  # citygraph.dedupe closes <=2-node holes, only inside drivable road
+            for i in range(1, len(flags) - width):
+                if flags[i - 1] and flags[i + width] and all(drive(n) for n in ns[i:i + width]):
+                    flags[i:i + width] = [True] * width
+        i = 0
+        while i < len(flags):
+            if not flags[i]:
+                i += 1
+                continue
+            j = i
+            while j < len(flags) and flags[j]:
+                j += 1
+            if j - i >= 2:
+                runs.append([(s['id'], k, ns[k]) for k in range(i, j)])
+                for k in range(i, j - 1):
+                    grid.add(xy[k], xy[k + 1])
+                    heights.append((ns[k]['z'], ns[k + 1]['z']))
+            i = j
+    points, parent, refs, segs, owners = [], [], {}, [], []
+    cells, cuts = collections.defaultdict(list), collections.defaultdict(list)
+
+    def new(p, owner):
+        k = len(points)
+        points.append(p)
+        owners.append(owner)
+        parent.append(k)
+        return k
+
+    def root(k):
+        while parent[k] != k:
+            parent[k] = parent[parent[k]]
+            k = parent[k]
+        return k
+
+    def union(a, b):
+        a, b = root(a), root(b)
+        parent[max(a, b)] = min(a, b)
+
+    for ri, run in enumerate(runs):
+        ids = []
+        for sid, i, n in run:
+            ids.append(new(tuple(n[c] for c in ('x', 'y', 'z')), ri))
+            refs[sid, i] = ids[-1]
+        for a, b in zip(ids, ids[1:]):
+            k = len(segs)
+            segs.append((a, b))
+            p, q = points[a], points[b]
+            for cx in range(int(min(p[0], q[0]) // MAX_HOP), int(max(p[0], q[0]) // MAX_HOP) + 1):
+                for cy in range(int(min(p[1], q[1]) // MAX_HOP), int(max(p[1], q[1]) // MAX_HOP) + 1):
+                    cells[cx, cy].append(k)
+
+    def nearest(n):
+        p, h = tuple(n[c] for c in ('x', 'y', 'z')), n['t']
+        cx, cy = int(p[0] // MAX_HOP), int(p[1] // MAX_HOP)
+        best = None
+        for k in sorted({k for dx in (-1, 0, 1) for dy in (-1, 0, 1) for k in cells.get((cx + dx, cy + dy), ())}):
+            a, b = (points[v] for v in segs[k])
+            v = tuple(b[i] - a[i] for i in range(3))
+            l2 = v[0] ** 2 + v[1] ** 2
+            if not l2 or abs(v[0] * h[0] + v[1] * h[1]) < .85 * math.sqrt(l2):
+                continue
+            t = max(0., min(1., sum((p[i] - a[i]) * v[i] for i in range(2)) / l2))
+            q = tuple(a[i] + t * v[i] for i in range(3))
+            d = math.dist(p[:2], q[:2])
+            if d <= MAX_HOP and abs(q[2] - p[2]) < DUP_R and (best is None or (d, k) < best[:2]):
+                best = d, k, t, q
+        if best is None:
+            return None
+        _, k, t, q = best
+        a, b = segs[k]
+        if t == 0:
+            return a
+        if t == 1:
+            return b
+        v = new(q, owners[a])
+        cuts[k].append((t, v))
+        return v
+
+    for s in g['sections']:
+        for i, n in enumerate(s['nodes']):
+            if (s['id'], i) not in refs:
+                v = nearest(n)
+                if v is not None:
+                    refs[s['id'], i] = v
+    joins = []
+    # A flagless margin can still carry a native entry. Keep its source path
+    # to the mapped corridor instead of deleting that junction from the graph.
+    for source in g['sections']:
+        absent = set()
+        for i, n in enumerate(source['nodes']):
+            if (source['id'], i) not in refs:
+                absent.add(i)
+                refs[source['id'], i] = new(tuple(n[c] for c in ('x', 'y', 'z')), ('margin', source['id']))
+        for i in range(len(source['nodes']) - 1):
+            if i in absent or i + 1 in absent:
+                joins.append((refs[source['id'], i], refs[source['id'], i + 1]))
+    for run in runs:
+        for (sid, i, _), step in ((run[0], -1), (run[-1], 1)):
+            a, b = refs[sid, i], refs.get((sid, i + step))
+            if b is not None and owners[a] != owners[b] and math.dist(points[a], points[b]) <= MAX_HOP:
+                if math.dist(points[a], points[b]) < DUP_R:
+                    union(a, b)
+                else:
+                    joins.append((a, b))
+    missing = 0
     for e in g['entries']:
-        out[e['ss']].append((e['sn'], e['ds'], e['dn']))
-    seeds = {k for k, s in S.items() if any(math.hypot(n['x'] - MOUTH[0], n['y'] - MOUTH[1]) <= RADIUS for n in s['nodes'])}
-    grid = collections.defaultdict(list)
-
-    def dup(k):
-        near = 0
-        for p in P[k]:
-            cx, cy = int(p[0] // 20), int(p[1] // 20)
-            near += any(_seg_d(p, a, b) < DUP_R for dx in (-1, 0, 1) for dy in (-1, 0, 1) for a, b in grid.get((cx + dx, cy + dy), ()))
-        return near >= 0.8 * len(P[k])
-    pq = [(0.0, k, 0) for k in sorted(seeds)]
-    heapq.heapify(pq)
-    taken, done, skipped = [], set(), 0
-    while pq and len(taken) < budget:
-        d, k, i = heapq.heappop(pq)
-        if k in done:
+        a, b = refs.get((e['ss'], e['sn'])), refs.get((e['ds'], e['dn']))
+        if a is None or b is None:
+            missing += 1
+        elif owners[a] == owners[b]:
+            continue  # deduplicated overlap already follows the same chain
+        elif math.dist(points[a], points[b]) <= MAX_HOP:
+            union(a, b)
+        else:
+            joins.append((a, b))
+    raw_edges = []
+    for k, (a, b) in enumerate(segs):
+        cc = sorted([(0., a), (1., b)] + cuts[k])
+        for (ta, u), (tb, v) in zip(cc, cc[1:]):
+            # Two float32 ULPs at the WORLD coordinate bound (4096m).
+            # Repeated projections at one cut must be ONE junction node.
+            if (tb - ta) * math.dist(points[a], points[b]) <= 1 / 1024:
+                union(u, v)
+            else:
+                raw_edges.append((u, v, True))
+    raw_edges += [(a, b, False) for a, b in joins]
+    edges, seen = [], set()
+    for a, b, unique in raw_edges:
+        u, v = root(a), root(b)
+        # Keep original geometry: contracting a junction must never move a road.
+        pa, pb = points[a], points[b]
+        key = tuple(sorted((pa, pb)))
+        if key in seen or math.dist(pa[:2], pb[:2]) < 1e-6:
             continue
-        done.add(k)
-        if k not in seeds and dup(k):
-            skipped += 1
+        seen.add(key)
+        edges.append((u, v, pa, pb, math.dist(pa[:2], pb[:2]), unique))
+    # The corridor split can fall between two covered samples. Reconnect those
+    # components through the ORIGINAL consecutive source nodes, not a proximity
+    # guess. Only a spanning set is needed; internal junctions came from entries.
+    connected = list(range(len(points)))
+
+    def comp(k):
+        while connected[k] != k:
+            connected[k] = connected[connected[k]]
+            k = connected[k]
+        return k
+
+    for a, b, *_ in edges:
+        connected[comp(a)] = comp(b)
+    continuity = []
+    for source in g['sections']:
+        for i in range(len(source['nodes']) - 1):
+            a, b = refs[source['id'], i], refs[source['id'], i + 1]
+            u, v = root(a), root(b)
+            if comp(u) != comp(v):
+                continuity.append((math.dist(points[a], points[b]), u, v, a, b))
+    for _, u, v, a, b in sorted(continuity):
+        if comp(u) != comp(v):
+            connected[comp(u)] = comp(v)
+            edges.append((u, v, points[a], points[b], math.dist(points[a][:2], points[b][:2]), False))
+    adj = collections.defaultdict(set)
+    for k, (a, b, *_) in enumerate(edges):
+        adj[a].add(k)
+        adj[b].add(k)
+    bridge = root(refs[230, 24])
+
+    def component(active):
+        seen, todo = {bridge}, [bridge]
+        while todo:
+            u = todo.pop()
+            for k in adj[u] & active:
+                a, b = edges[k][:2]
+                v = b if a == u else a
+                if v not in seen:
+                    seen.add(v)
+                    todo.append(v)
+        return {k for u in seen for k in adj[u] & active}
+
+    active = component({k for k, e in enumerate(edges) if e[0] != e[1]})
+    # A native junction contracts its internal approach segments. Traversing a
+    # contracted self-edge as a road would create a centre->arm->centre U-turn.
+    # These segments stay in the denominator, never claimed as road coverage.
+    total = sum(e[4] for e in edges if e[5])
+    initial = len(active)
+
+    def degrees():
+        d = collections.Counter()
+        for k in active:
+            a, b = edges[k][:2]
+            d[a] += 1
+            d[b] += 1
+        return d
+
+    full_odd = sum(v % 2 for v in degrees().values())
+    # Preserve a connected footprint over the whole city, then trim the shortest
+    # redundant branches. A whole-source-section budget biases toward the bridge disc.
+    while True:
+        deg = degrees()
+        odd = sum(v % 2 for v in deg.values())
+        if odd <= 2 * budget:
+            break
+        candidates = []
+        visited = set()
+        for u in sorted(deg):
+            if deg[u] == 2:
+                continue
+            for start in sorted(adj[u] & active):
+                if start in visited:
+                    continue
+                path, v, k = [], u, start
+                while True:
+                    path.append(k)
+                    visited.add(k)
+                    a, b = edges[k][:2]
+                    v = b if a == v else a
+                    if deg[v] != 2:
+                        break
+                    nxt = (adj[v] & active) - {k}
+                    if not nxt:
+                        break
+                    k = min(nxt)
+                new_odd = odd + (1 if deg[u] % 2 == 0 else -1) + (1 if deg[v] % 2 == 0 else -1)
+                if u != v and new_odd < odd:
+                    candidates.append((sum(edges[k][4] for k in path), tuple(path)))
+        removed = False
+        for _, path in sorted(candidates):
+            trial = active - set(path)
+            reached = component(trial)
+            if reached == trial:
+                active = trial
+                removed = True
+                break
+        if not removed:
+            # General odd-to-odd shortest path, including even-degree junctions.
+            best = None
+            for u in sorted(v for v in deg if deg[v] % 2):
+                pq, dist = [(0., u, ())], {u: 0.}
+                while pq:
+                    d, v, path = heapq.heappop(pq)
+                    if d != dist[v] or (best and d >= best[0]):
+                        continue
+                    if v != u and deg[v] % 2:
+                        trial = active - set(path)
+                        if component(trial) == trial:
+                            best = d, path
+                            break
+                    for k in sorted(adj[v] & active):
+                        a, b = edges[k][:2]
+                        w = b if a == v else a
+                        nd = d + edges[k][4]
+                        if nd < dist.get(w, math.inf):
+                            dist[w] = nd
+                            heapq.heappush(pq, (nd, w, path + (k,)))
+            assert best is not None, 'no connected partition inside section budget'
+            active -= set(best[1])
+    # Euler decomposition with an artificial hub at odd vertices attains odd/2
+    # trails. Artificial edges are removed; they never become road geometry.
+    deg = degrees()
+    ea = {u: list(sorted(adj[u] & active)) for u in deg}
+    hub = -1
+    ee = {k: edges[k][:2] for k in active}
+    for u in sorted(deg):
+        if deg[u] % 2:
+            k = len(edges) + len(ee)
+            ee[k] = u, hub
+            ea[u].append(k)
+            ea.setdefault(hub, []).append(k)
+    start = hub if hub in ea else bridge
+    stack, circuit, used = [(start, None)], [], set()
+    while stack:
+        u, _ = stack[-1]
+        while ea[u] and ea[u][-1] in used:
+            ea[u].pop()
+        if not ea[u]:
+            circuit.append(stack.pop())
             continue
-        taken.append(k)
-        for a, b in zip(P[k], P[k][1:]):
-            for cx in range(int(min(a[0], b[0]) // 20), int(max(a[0], b[0]) // 20) + 1):
-                for cy in range(int(min(a[1], b[1]) // 20), int(max(a[1], b[1]) // 20) + 1):
-                    grid[(cx, cy)].append((a, b))
-        for sn, ds, dn in out[k]:
-            if ds not in done:
-                heapq.heappush(pq, (d + abs(cum[k][sn] - cum[k][i]) + math.dist(P[k][sn], P[ds][dn]), ds, dn))
-    assert seeds <= set(taken), 'the near-bridge sections must all be in'
-    return taken, skipped
+        k = ea[u].pop()
+        used.add(k)
+        a, b = ee[k]
+        stack.append((b if u == a else a, (k, u)))
+    trails, trail = [], []
+    for _, step in reversed(circuit):
+        if step is None:
+            continue
+        k, u = step
+        if k not in active:
+            if trail:
+                trails.append(trail)
+                trail = []
+        else:
+            trail.append((k, u))
+    if trail:
+        trails.append(trail)
+    assert len(trails) <= budget and sum(map(len, trails)) == len(active)
+    # Orient the bridge's trail with the original UG2 230 tangent, preserving
+    # the connector's two-way link without any writer or executable change.
+    source = next(s for s in g['sections'] if s['id'] == 230)['nodes'][24]
+    bp = tuple(source[c] for c in ('x', 'y', 'z'))
+    best = min((min(math.dist(bp, e[2]), math.dist(bp, e[3])), ti, j)
+               for ti, tr in enumerate(trails) for j, (k, _) in enumerate(tr) for e in [edges[k]])
+    _, ti, j = best
+    k, u = trails[ti][j]
+    e = edges[k]
+    pa, pb = (e[2], e[3]) if u == e[0] else (e[3], e[2])
+    if (pb[0] - pa[0]) * source['t'][0] + (pb[1] - pa[1]) * source['t'][1] < 0:
+        trails[ti] = [(k, ee[k][1] if u == ee[k][0] else ee[k][0]) for k, u in reversed(trails[ti])]
+    select.stats = dict(unique_total_km=total / 1000,
+                        unique_covered_km=sum(edges[k][4] for k in active if edges[k][5]) / 1000,
+                        omitted_before_budget_edges=len(edges) - initial,
+                        full_component_min_sections=max(1, full_odd // 2),
+                        sections=len(trails), missing_source_entries=missing, contracted_junction_km=sum(e[4] for e in edges if e[0] == e[1] and e[5]) / 1000,
+                        removed_edges=initial - len(active))
+    return edges, trails, bridge, bp, {u: points[u] for u in deg}
 
 
-def ug2_part(budget):
-    """selected UG2 sections (sorted by UG2 id) with nodes in NFSU1 space, and their entry pairs"""
+def ug2_part(budget, entry_budget):
+    """Long UG2 trails and junction pairs in the unchanged writer's key format."""
     g = R.load('A')
-    keep, skipped = select(g, budget)
-    keep = set(keep)
-    sel = sorted((s for s in g['sections'] if s['id'] in keep), key=lambda s: s['id'])
-    print('UG2 sections: %d of %d taken (budget %d ids), %d skipped as duplicates (%.1f m), %.1f of %.1f km' % (
-        len(sel), len(g['sections']), budget, skipped, DUP_R,
-        sum(math.dist((a['x'], a['y']), (b['x'], b['y'])) for s in sel for a, b in zip(s['nodes'], s['nodes'][1:])) / 1000,
-        sum(math.dist((a['x'], a['y']), (b['x'], b['y'])) for s in g['sections'] for a, b in zip(s['nodes'], s['nodes'][1:])) / 1000))
-    ids = {s['id'] for s in sel}
-    secs = []
-    for s in sel:
+    edges, trails, bridge, bp, centres = select(g, budget)
+    sections, visits = [], collections.defaultdict(lambda: [[], []])
+    implicit = set()
+    # Record inbound and outbound appearances of each physical junction. A
+    # continuation inside a chain consumes no entry; every alternative does.
+    for sid, trail in enumerate(trails):
+        xyz, incoming, outgoing = [], [], []
+
+        def append(p):
+            if not xyz:
+                xyz.append(p)
+                return
+            last = xyz[-1]
+            n = max(1, math.ceil(math.dist(last[:2], p[:2]) / SPACING))
+            if math.dist(last, p) > 1e-6:
+                xyz.extend(tuple(last[c] + (p[c] - last[c]) * j / n for c in range(3)) for j in range(1, n + 1))
+
+        for k, u in trail:
+            a, b, pa, pb, _, _ = edges[k]
+            if u != a:
+                a, b, pa, pb = b, a, pb, pa
+            append(centres[a])
+            if incoming:
+                implicit.add(((sid, incoming[-1][1]), (sid, len(xyz) - 1)))
+            outgoing.append((a, len(xyz) - 1))
+            append(pa)
+            append(pb)
+            append(centres[b])
+            incoming.append((b, len(xyz) - 1))
+        for v, i in incoming:
+            visits[v][0].append((sid, i))
+        for v, i in outgoing:
+            visits[v][1].append((sid, i))
         nodes = []
-        for n in s['nodes']:
-            x, y, z = R.to_nfsu1(n['x'], n['y'], n['z'])
-            hx, hy = n['t'][1], -n['t'][0]
-            l = math.hypot(hx, hy) or 1.0
-            fl = sum(1 << b for a, b in MAP_BITS if n['fl'] >> a & 1)
-            nodes.append(dict(x=x, y=y, z=z, h=(hx / l, hy / l), fl=fl))
-        secs.append(dict(uid=s['id'], cls=s['cls'], nodes=nodes))
+        for i, p in enumerate(xyz):
+            q, r = xyz[max(0, i - 1)], xyz[min(len(xyz) - 1, i + 1)]
+            hx, hy = r[0] - q[0], r[1] - q[1]
+            l = math.hypot(hx, hy) or 1.
+            x, y, z = R.to_nfsu1(*p)
+            nodes.append(dict(x=x, y=y, z=z, h=(hy / l, -hx / l), fl=FWD_BITS | BACK_BITS))
+        assert len(nodes) <= 32767, (sid, len(nodes))  # signed count, 0x442bb2
+        sections.append(dict(uid=sid, nodes=nodes))
     pairs, seen = [], set()
-    for e in g['entries']:
-        if e['ss'] in ids and e['ds'] in ids:
-            a, b = (e['ss'], e['sn']), (e['ds'], e['dn'])
-            if (b, a) not in seen:          # every entry has its reverse twin (roads.md 1.3): one pair
-                seen.add((a, b))
-                pairs.append((a, b))
-    return secs, pairs
+    junctions = 0
+    for v, (ins, outs) in sorted(visits.items()):
+        local = 0
+        for a in ins:
+            for b in outs:
+                if (a, b) in implicit:
+                    continue  # this visit continues along the chain
+                key = tuple(sorted((a, b)))
+                if key not in seen:
+                    seen.add(key)
+                    pairs.append((a, b))
+                    local += 1
+        junctions += bool(local)
+    # Locate the unchanged bridge landing geometrically, not by a removed UG2 id.
+    lx, ly, lz = R.to_nfsu1(*bp)
+    source = next(s for s in g['sections'] if s['id'] == 230)['nodes'][24]
+    h = source['t'][1], -source['t'][0]
+    _, sid, i = min((math.dist((n['x'], n['y'], n['z']), (lx, ly, lz)), s['uid'], i)
+                    for s in sections for i, n in enumerate(s['nodes']) if sum(a * b for a, b in zip(n['h'], h)) > .85)
+    sections[sid]['bridge_node'] = i
+    usage = collections.Counter()
+
+    def candidates(key, step):
+        sid, start = key
+        ns = sections[sid]['nodes']
+        out, distance, previous = [], 0., None
+        for j in range(start, len(ns) if step > 0 else -1, step):
+            n = ns[j]
+            if previous is not None:
+                distance += math.dist((n['x'], n['y']), (previous['x'], previous['y']))
+            if distance > MAX_HOP:
+                break
+            out.append(((sid, j), distance))
+            previous = n
+        return out
+
+    def source(src, dst, direction):
+        target = sections[dst[0]]['nodes'][dst[1]]
+        for shift in range(MAX_SHIFT + 1):
+            c = src[0], src[1] + (shift if direction else -shift)
+            if not 0 <= c[1] < len(sections[c[0]]['nodes']) or c == dst or usage[c] >= 2:
+                continue
+            n = sections[c[0]]['nodes'][c[1]]
+            dx, dy = target['x'] - n['x'], target['y'] - n['y']
+            ahead = (dx * n['h'][0] + dy * n['h'][1]) * (-1 if direction else 1)
+            if ahead > AHEAD and math.hypot(dx, dy) <= MAX_HOP:
+                return c, shift
+        return None
+
+    def paired(a, b):
+        choices = []
+        for u, v in ((a, b), (b, a)):
+            f = source(u, v, 0)
+            if f is None:
+                continue
+            usage[f[0]] += 1
+            r = source(v, u, 1)
+            usage[f[0]] -= 1
+            if r is not None:
+                choices.append(((f[1] + r[1], u), f[0], r[0]))
+        return min(choices) if choices else None
+
+    pinned = []
+    for a, b in pairs:
+        options = []
+        # The writer's exact four-point rule: forward source may move back,
+        # reverse source forward, while BOTH original landings are retained.
+        # Search nearby cut points before serialization, never drop a junction.
+        for origin, destination in ((a, b), (b, a)):
+            for ka, da in candidates(origin, -1):
+                for kb, db in candidates(destination, 1):
+                    choice = paired(ka, kb)
+                    if choice is not None:
+                        options.append((da + db, ka, kb, choice))
+        assert options, ('junction has no two-way ahead landing', a, b)
+        _, ka, kb, choice = min(options)
+        usage[choice[1]] += 1
+        usage[choice[2]] += 1
+        pinned.append((ka, kb))
+    pairs = pinned
+    per_section = collections.Counter()
+    for (sid, _), count in usage.items():
+        per_section[sid] += count
+    assert max(per_section.values(), default=0) < 255
+    assert 2 * len(pairs) <= entry_budget, ('STOP: global entry cap; no executable patch', 2 * len(pairs), entry_budget)
+    select.stats.update(junctions=junctions, junction_pairs=len(pairs),
+                        planned_global_entries=MAX_ENT - entry_budget + 2 * len(pairs))
+    print('UG2 partition:', select.stats, flush=True)
+    return sections, pairs
 
 
 def connector(ground, anchor_xyz):
@@ -259,12 +635,12 @@ def apply(base, rows):
     tmpl = min(cand, key=lambda c: sum(abs(struct.unpack_from('<f', c, o)[0] - m) for o, m in zip((0x24, 0x28), med)))
     tidx = [node(TEMPLATE_SEC, i) for i in range(tn)].index(tmpl)
     # ---- the new geometry
-    ug, pairs = ug2_part(MAX_SEC - n0 - 1)
+    ug, pairs = ug2_part(MAX_SEC - n0 - 1, MAX_ENT - e0 - 4)
     ground = Ground(rows)
     ax, ay, az = struct.unpack_from('<3f', node(*ANCHOR), 0)
     con = connector(ground, (ax, ay, az))
     CID = n0
-    sec_of = {s_['uid']: n0 + 1 + k for k, s_ in enumerate(ug)}          # UG2 section id -> NFSU1 id
+    sec_of = {s_['uid']: n0 + 1 + k for k, s_ in enumerate(ug)}          # partition id -> NFSU1 id
     N = {}                                                                # (sec, i) -> dict(x, y, z, h, fl, off?)
     for i, (x, y, z, hx, hy) in enumerate(con):
         N[(CID, i)] = dict(x=x, y=y, z=z, h=(hx, hy), fl=sum(1 << b_ for _, b_ in MAP_BITS))
@@ -327,8 +703,9 @@ def apply(base, rows):
         if a1:
             free[a1[0]] += 1
         links.append([u, v, 0, 7, a0[0], a1[0] if a1 else None])
-    # the two connector links, first the anchor (NFSU1 28:3 -> connector 0), then the end (connector last -> UG2 230:24)
-    land = (sec_of[230], 24)
+    assert not dropped and all(l[5] is not None for l in links), ('junctions lost', len(dropped), sum(l[5] is None for l in links), dropped[:8])
+    # the two connector links, first the anchor (NFSU1 28:3 -> connector 0), then the geometric bridge landing in the new partition
+    land = next((sec_of[s['uid']], s['bridge_node']) for s in ug if 'bridge_node' in s)
     for u, v in (((ANCHOR[0], ANCHOR[1]), (CID, 0)), ((CID, len(con) - 1), land)):
         p = plan(u, v)
         assert p is not None and p[1] is not None, 'connector link %s -> %s has no entry' % (u, v)
