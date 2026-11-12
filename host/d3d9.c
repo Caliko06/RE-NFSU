@@ -2396,6 +2396,7 @@ static void mc_hook(Ctx *c) {
     if (blk && blk < GUEST_MEM - 0x80) {
         for (int k = 0; k < 16; k++) { rn_mc.view[k] = ldf(c, blk + 4 * k); rn_mc.proj[k] = ldf(c, blk + 64 + 4 * k); }
     }
+    rn_mc.track = (int32_t)ld(c, 0x78a2f0, 4);   // RaceStatus track id (names_world.tsv): 1010 = WORLD, read by web/ug2/ug2world.js
     if (mc_enabled() && rn_mc.on_foot) mc_draw_actor(c, &rn_mc);
 }
 static uint32_t stream0(Ctx *c) {
@@ -2851,7 +2852,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     if (isl) {
         uint32_t lb = ld(c, 0x77a90c, 4);
         if (lb == 0x6c9c3c) racing = 1;
-        else if (lb == 0x6c9cf0 || lb == 0x6c9de8 || lb == 0x6c9e8c || lb == 0x6c9ea0) racing = 0;
+        else if (lb == 0x6c9cf0 || lb == 0x6c9de8 || lb == 0x6c9e8c || lb == 0x6c9ea0) racing = 0, rn_mc.track = 0;
     }
     // BRIDGE: FXAA (web/gpu.js) over the 3D scene, once per race frame, before the first HUD quad (the HUD is drawn last into the same target).
     static uint32_t fxaa_frame = ~0u;
