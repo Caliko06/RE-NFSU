@@ -24,7 +24,7 @@ function telemRing(cap) {
 }
 
 function startTelemetry(M, t0, log, logLines) {
-  if (RN_Q.get('telemetry') === '0') return null;
+  if (RN_Q.get('telemetry') === '0' || window.RN_PUBLIC) return null;   // RN_PUBLIC: tools/build_public.py, no server takes it
   const base = M._rn_telem_addr(), audio = M._rn_audio_ring() >> 2;
   const F = () => M.HEAPF64, U = () => M.HEAPU32;
   // host.h Telem: 7 doubles (gpu_wait, gil_main, gil_other, read, idle_main, hold_main_max, hold_other_max),

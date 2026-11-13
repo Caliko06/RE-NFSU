@@ -6,7 +6,7 @@ let pending = [], allLog = [];       // allLog: the whole session, for the F10 d
 const duelBox = Object.assign(document.createElement('div'), { style: 'position:fixed;left:50%;top:14%;transform:translateX(-50%);padding:6px 16px;background:rgba(0,0,0,.72);color:#ffc24a;font:bold 20px system-ui;border-radius:6px;pointer-events:none;display:none;z-index:9' });
 const duelSay = s => { const m = /DUEL (\S+) (start|won|lost)/.exec(s); if (!m) return; if (!duelBox.isConnected) document.body.appendChild(duelBox); duelBox.textContent = { start: `Duelo con ${m[1]}`, won: `${m[1]} te ganó`, lost: `Le ganaste a ${m[1]}` }[m[2]]; duelBox.style.display = ''; clearTimeout(duelSay.t); duelSay.t = setTimeout(() => duelBox.style.display = 'none', 3500); };
 const keep = s => { pending.push(s); allLog.push(s); if (s.includes('DUEL ')) duelSay(s); };
-let logUp = true;                    // tools/serve.py answers /log; a plain web host does not, and then nothing is sent
+let logUp = !window.RN_PUBLIC;                    // tools/serve.py answers /log; a plain web host does not, and then nothing is sent
 function flush() {
   if (!pending.length) return;
   if (!logUp) { pending = []; return; }
@@ -16,7 +16,7 @@ function flush() {
   // silently (518 pack errors in one second took the race HUD line with them and the run looked hung, build/bench/g_cas).
   fetch('/log', { method: 'POST', body, keepalive: body.length < 60000 }).catch(() => {});
 }
-fetch('/log?new', { method: 'POST', body: `page ${location.href} ${new Date().toISOString()}\n` }).then(r => { logUp = r.ok; }, () => { logUp = false; });
+if (logUp) fetch('/log?new', { method: 'POST', body: `page ${location.href} ${new Date().toISOString()}\n` }).then(r => { logUp = r.ok; }, () => { logUp = false; });
 setInterval(flush, 1000);
 const secs = () => ((performance.now() - t0) / 1000).toFixed(2);
 addEventListener('keydown', e => { if (!e.repeat) keep(`${secs()} key down ${e.code}`); }, true);
