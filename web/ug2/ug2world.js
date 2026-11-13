@@ -202,8 +202,12 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
       vertex: { module: gpu.module, entryPoint: 'vs', buffers: [{ arrayStride: 24, attributes: [
         { shaderLocation: 0, offset: 0, format: 'float32x3' }, { shaderLocation: 1, offset: 12, format: 'unorm8x4' }, { shaderLocation: 2, offset: 16, format: 'float32x2' }] }] },
       fragment: { module: gpu.module, entryPoint: cls === TEST ? 'fs_test' : 'fs', targets: [{ format: 'rgba8unorm', blend }] },
-      // No culling: UG2's cull state per mesh is not read (UNKNOWN); closed shells under the depth test look right either way.
-      primitive: { topology: 'triangle-list', cullMode: 'none' },
+      // UG2 culls: its state setter 0x5bcd15..0x5bcd8c writes D3DRS_CULLMODE (state 0x16) only when [[0x870910]+4] == 5 (NONE for opaque, CW for blended);
+      // in every other pass the D3D default CULLMODE = CCW holds, so one face of each triangle is never drawn. The light cones (SFX_LIGHT_BEAMA/B) carry
+      // both windings in 171 of 244 cones (duplicated faces, only right with culling): without it every cone adds twice. Added to ADD only: a run with
+      // 'cw' culling on every class removed the road (94 % of road triangles have (v1-v0)x(v2-v0).z > 0), so the visible side is 'ccw' in this frame, and
+      // the other classes stay not culled because their winding was not checked (UNKNOWN).
+      primitive: { topology: 'triangle-list', cullMode: cls === ADD ? 'back' : 'none', frontFace: 'ccw' },
       depthStencil: { format: 'depth24plus-stencil8', depthCompare: 'less-equal', depthWriteEnabled: cls <= TEST },
       multisample: { count } });
     gpu.pipes.set(k, p); return p;

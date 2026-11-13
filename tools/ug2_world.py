@@ -33,6 +33,11 @@ STRIDE = {0x4180: (36, 24)}
 # instance at +0x1a. The shipped instances carry 0x10 on 5,999 of them (XO_TRACKBARRIER*, shop beams, door pieces): the state with no
 # group enabled, which is the open city the OWNER drives (no race barriers, no career locks).
 HIDDEN = 0x10
+# Backdrops: an instance whose bbox is wider than this (UG2 units) is a vista, not city. Every PAN_ / SKYDOME / XO_VISTA instance is (751..10000 m); the only other
+# one is OBJECT01 (section 554 of L4RA, 1016 m: the coast's LOD, textures TRN_COASTROADLOD_A_DM / LOD_BLD_A03, 0.34 m over the real road with vertex colour 247, the
+# "ground crossed through" at the bridge mouth, census/ug2/ground_gaps.tsv zone 1). Next widest real piece: 452 m (XB_OBSERVATORYB). The rule UG2 itself uses
+# to hide it (distance LOD, section streaming) was not found in SPEED2.EXE: UNKNOWN; its data (flags 0, section header, def) is byte-identical in shape to PAN_Parkdrive.
+BACKDROP_EXTENT = 600
 
 
 def tree(d):
@@ -170,6 +175,10 @@ def main():
                 continue
             hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
             if hh in sol and sol[hh]['name'].upper().startswith(SKIP):
+                skipped += 1
+                continue
+            bbx = struct.unpack_from('<6f', w, 0)
+            if max(bbx[3] - bbx[0], bbx[4] - bbx[1]) > BACKDROP_EXTENT:
                 skipped += 1
                 continue
             if not near(struct.unpack_from('<6f', w, 0)):

@@ -295,6 +295,9 @@ def walk(data, sol, secs, near, fixed):
             hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
             if hh in sol and sol[hh]['name'].upper().startswith(W.SKIP):
                 continue
+            bbx = struct.unpack_from('<6f', w, 0)
+            if max(bbx[3] - bbx[0], bbx[4] - bbx[1]) > W.BACKDROP_EXTENT:   # backdrops, as ug2_world.main
+                continue
             if not near(struct.unpack_from('<6f', w, 0)):
                 continue
             key = (hh, w[32:62])
