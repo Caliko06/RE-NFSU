@@ -72,8 +72,8 @@
       };
       all().then(async files => {
         const stored = new Set(files.keys());
-        // ?saveseed=1 (dev server only, tools/serve.py): an empty browser store starts from the OWNER's save/ folder
-        if (!files.size && new URLSearchParams(location.search).get('saveseed') === '1') {
+        // Dev server only (tools/serve.py): an empty browser store starts from the OWNER's save/ folder, so :5180 keeps his profiles
+        if (!files.size && !window.RN_PUBLIC) {
           const j = await fetch('/save-backup.json').then(r => r.ok ? r.json() : null).catch(() => null);
           if (j && j.files) for (const k of Object.keys(j.files)) files.set(k, unb64(j.files[k]));
         }

@@ -4,7 +4,7 @@
 / -> web/, /pc/Speed.exe -> pc/Speed.exe, /game/... -> game/ (the OWNER's files, never leave this machine).
 /game-files.json lists game/ (relative paths and sizes); /game/ answers Range requests (host/files.c reads them).
 Saves live in the browser (web/saves.js), not here. /save-backup.json (GET only) hands save/ of this repo (gitignored, the
-native build's folder) out as a backup file: ?saveseed=1 seeds an empty browser store from it, or Restore it in the launcher.
+native build's folder) out as a backup file: an empty browser store on the dev server starts from it (web/saves.js), or Restore it in the launcher.
 Headless Chrome (tests) gets build/save-headless instead, a copy of save/ made when it is missing (webcheck deletes it at start).
 POST /log appends the page's log to build/web.log (POST /log?new starts it again; the last one is kept as
 build/web.prev.log), so a Chrome session can be read after it stops. Headless Chrome (tools/webcheck.mjs) writes
@@ -232,7 +232,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             top = os.path.join(ROOT, "game")
             self.reply(200, "application/json", listing(top) if os.path.isdir(top) else b"[]")
             return
-        if route == "/save-backup.json":      # dev only: the OWNER's save/ as a backup file, for ?saveseed=1 or Restore
+        if route == "/save-backup.json":      # dev only: the OWNER's save/ as a backup file, for web/saves.js seeding or Restore
             top = save_root(self.headers)
             files = {}
             for d, _, names in os.walk(top):

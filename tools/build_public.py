@@ -8,7 +8,7 @@ import json, os, shutil, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W, D = os.path.join(ROOT, "web"), os.path.join(ROOT, "dist")
-LINK_DIRS = ["ug2", "gps", "launcher"]
+LINK_DIRS = ["ug2", "gps", "launcher", "remaster"]
 PAGES = ["index.html", "launcher.html"]
 FLAG = "<script>window.RN_PUBLIC=1</script>\n"
 
@@ -30,6 +30,7 @@ for n in LINK_DIRS:
 for n in ("speed.js", "speed.wasm"):
     os.symlink(os.path.join(W, "out", n), os.path.join(D, "out", n))
 os.symlink(os.path.join(ROOT, "pc", "Speed.exe"), os.path.join(D, "pc", "Speed.exe"))
+os.symlink(os.path.join(ROOT, "build", "openworld"), os.path.join(D, "world"))   # WORLD's merged track files (tools/serve.py /world/)
 game = os.path.join(ROOT, "game")
 os.symlink(game, os.path.join(D, "game"))
 files = sorted([os.path.relpath(os.path.join(d, n), game), os.path.getsize(os.path.join(d, n))]
