@@ -1,0 +1,13 @@
+/* Existing page palette: app.js gate, warm action against deep blue and violet. */
+#gps-map { position:fixed; inset:0; z-index:16; color:#f4f2ff; background:radial-gradient(ellipse at 78% 18%,#35234f 0%,transparent 60%),radial-gradient(ellipse at 12% 88%,#073d4b 0%,#07101e 66%); font-family:"Avenir Next Condensed","Arial Narrow",Arial,sans-serif; }
+#gps-map[hidden] { display:none; }
+#gps-map canvas { position:absolute; inset:0; width:100%; height:100%; cursor:crosshair; }
+#gps-map header { position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:clamp(18px,3vw,40px); pointer-events:none; background:linear-gradient(#08111cc9,transparent); }
+#gps-map small { color:#79f1d9; font-size:12px; letter-spacing:.2em; font-weight:700; }
+#gps-map h1 { font-style:italic; font-size:clamp(18px,2.8vw,32px); margin:7px 0 0; font-weight:700; }
+#gps-map button { pointer-events:auto; color:#fff6ec; background:linear-gradient(135deg,#c65533,#773854); border:1px solid #ffb48a55; border-radius:4px; padding:12px 16px; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 6px 20px #0005; }
+#gps-map button:focus-visible { outline:2px solid #8ffff0; outline-offset:4px; }
+#gps-map kbd { font:12px ui-monospace,monospace; margin-left:12px; color:#ffe0c2; }
+#gps-map footer { position:absolute; bottom:0; left:0; right:0; display:flex; justify-content:space-between; gap:16px; padding:20px clamp(18px,3vw,40px); color:#9eaec3; font:12px system-ui,sans-serif; pointer-events:none; background:linear-gradient(transparent,#06101dea); }
+#gps-map .gps-status { color:#8ff5dc; }
+@media(max-width:600px) { #gps-map footer { flex-direction:column; gap:5px; padding-bottom:12px; } #gps-map h1 { max-width:200px; } #gps-map button { padding:10px; } #gps-map kbd { display:block; margin:4px 0 0; } }
