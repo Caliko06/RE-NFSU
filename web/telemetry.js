@@ -2,8 +2,8 @@
 // tools/serve.py (POST /telemetry -> build/telemetry.ndjson; build/webcheck.telemetry.ndjson for headless Chrome).
 // tools/telemetry.py reads it with build/web.log (same clock: ms since the page started).
 // F8 drops a mark ("this moment"), so a lag or a sound bug can be found in the file. F9 shows the same numbers live over
-// the game (per frame: where its time went). F10 downloads the whole session as one .json (rows, events, the page log),
-// like NFSU1-RE's F9 black box. ?telemetry=0 turns it off.
+// the game (per frame: where its time went). The session report (web/boot.js rnReport: F10, the map, the stop card) takes
+// its rows and events from dump(). ?telemetry=0 turns it off. On a plain host (RN_PUBLIC) nothing is sent.
 'use strict';
 // Row columns. Host totals (host.h Telem) go in as deltas since the previous row.
 const TELEM_COLS = ['t', 'run', 'present', 'draws', 'clears', 'kwords', 'texKb', 'pipes', 'shaders', 'targets', 'hd',
@@ -23,8 +23,9 @@ function telemRing(cap) {
   };
 }
 
-function startTelemetry(M, t0, log, logLines) {
-  if (RN_Q.get('telemetry') === '0' || window.RN_PUBLIC) return null;   // RN_PUBLIC: tools/build_public.py, no server takes it
+function startTelemetry(M, t0, log) {
+  if (RN_Q.get('telemetry') === '0') return null;
+  const SEND = !window.RN_PUBLIC;   // tools/build_public.py: no server takes it, the session stays in the page for the report
   const base = M._rn_telem_addr(), audio = M._rn_audio_ring() >> 2;
   const F = () => M.HEAPF64, U = () => M.HEAPU32;
   // host.h Telem: 7 doubles (gpu_wait, gil_main, gil_other, read, idle_main, hold_main_max, hold_other_max),
@@ -114,11 +115,6 @@ function startTelemetry(M, t0, log, logLines) {
   let noteTimer = 0;
   const show = (text, ms) => { note.textContent = text; note.style.display = 'block'; clearTimeout(noteTimer); noteTimer = setTimeout(() => note.style.display = 'none', ms); };
   let marks = 0;
-  addEventListener('keydown', e => {
-    if (e.code !== 'F8') return;
-    e.preventDefault(); e.stopPropagation();
-    if (!e.repeat) { event('mark', { n: ++marks }); log(`telemetry: mark ${marks}`); show(`marca ${marks} guardada`, 1500); }
-  }, true);
   // F9: the live panel (top right). "juego+espera" = the game's code, its own busy wait for the next frame included. Stacked bars per frame: game code, waiting for the page/GPU, waiting for another
   // guest thread (GIL), file reads. Lines at 16.7 ms (60 fps) and 33 ms (30 fps).
   const panel = document.createElement('div');
@@ -175,13 +171,14 @@ function startTelemetry(M, t0, log, logLines) {
 
   const head = { kind: 'session', url: location.href, date: new Date().toISOString(), ua: navigator.userAgent,
     screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, cols: TELEM_COLS };
-  fetch('/telemetry?new', { method: 'POST', body: JSON.stringify(head) + '\n' }).then(r => {
+  if (SEND) fetch('/telemetry?new', { method: 'POST', body: JSON.stringify(head) + '\n' }).then(r => {
     if (r.ok) return;
     log(`telemetry: the server answered ${r.status}: restart tools/serve.py`);
     show('telemetría sin guardar: reinicia tools/serve.py', 8000);
   }).catch(() => {});
   function flush() {
     if (!rows.length && !events.length) return;
+    if (!SEND) { rows = []; events = []; return; }
     let body = rows.length ? JSON.stringify({ rows }) + '\n' : '';
     for (const e of events) body += JSON.stringify(e) + '\n';
     rows = []; events = [];
@@ -200,21 +197,7 @@ function startTelemetry(M, t0, log, logLines) {
     event('stop', {}); flush();
     setTimeout(() => location.replace('about:blank'), 1500);
   }, stopAfter * 1000);
-  // F10: the session as one file the browser saves (Downloads): head, cols, rows, events, log.
-  addEventListener('keydown', e => {
-    if (e.code !== 'F10') return;
-    e.preventDefault(); e.stopPropagation();
-    if (e.repeat) return;
-    event('download', {});
-    const name = `nfsu-session-${head.date.replace(/[:.]/g, '-')}.json`;
-    const blob = new Blob([JSON.stringify({ format: 'rn-session-1', ...head, saved: ms(), rows: allRows, events: allEvents,
-      log: logLines || [] })], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = name; a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
-    log(`telemetry: session saved as ${name} (${allRows.length} rows)`);
-    show(`sesión descargada: ${name}`, 3000);
-  }, true);
-  log('telemetry: on (build/telemetry.ndjson), F8 = mark, F9 = live panel, F10 = download the session');
-  return { frame, event };
+  log('telemetry: on, B or F8 = mark, F9 = live panel, F10 = download the session');
+  return { frame, event: (kind, data) => { if (kind === 'mark') marks = data.n; event(kind, data); },
+    dump: () => ({ cols: TELEM_COLS, rows: allRows, events: allEvents }) };
 }

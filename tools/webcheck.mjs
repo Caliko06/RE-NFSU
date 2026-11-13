@@ -185,8 +185,15 @@ const shotFe = process.env.RN_SHOT_FE, feSeen = new Set(), feDue = [], feAt = (p
 let feN = 0;
 const shotOn = process.env.RN_SHOT_ON ? new RegExp(process.env.RN_SHOT_ON, 'g') : null, onSeen = new Set(), onDue = [];
 if (shotFe) mkdirSync(shotFe, { recursive: true });
+const evals = (process.env.RN_EVAL || '').split(';;').filter(Boolean).map(x => ({ t: +x.split(':')[0], expr: x.slice(x.indexOf(':') + 1) }));
 while (Date.now() - t0 < secs * 1000) {
   await sleep(1000);
+  // RN_EVAL="64:expr;;70:expr": at that second, run the expression in the page and print its value (a click on a page button).
+  for (const e of evals.filter(e => !e.done && Date.now() - t0 >= e.t * 1000)) {
+    e.done = true;
+    const r = await send('Runtime.evaluate', { expression: e.expr, returnByValue: true });
+    console.log(`eval ${e.t}: ${JSON.stringify(r?.result?.value ?? r?.exceptionDetails?.text)}`);
+  }
   for (const k of keys.filter(k => !k.done && Date.now() - t0 >= k.t * 1000)) {
     k.done = true;
     await send('Runtime.evaluate', { expression: "document.getElementById('screen').focus()" });

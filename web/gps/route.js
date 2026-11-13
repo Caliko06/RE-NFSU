@@ -8,7 +8,10 @@
   const controls = document.createElement('nav');
   controls.setAttribute('aria-label', 'Destino GPS'); controls.className = 'gps-actions';
   controls.innerHTML = `<span class="gps-route-info" role="status">Haz clic en una calle para marcar tu destino</span>
+    <button type="button" class="gps-bayview">Ruta a Bayview</button>
+    <button type="button" class="gps-olympic">Ruta a Olympic</button>
     <button type="button" class="gps-teleport" disabled>Teletransportar</button>
+    <button type="button" class="gps-report">Reporte</button>
     <button type="button" class="gps-clear" disabled>Borrar destino</button>`;
   panel.append(controls);
   const info = controls.querySelector('.gps-route-info');
@@ -105,6 +108,12 @@
     destination = nearest(e.detail.x, e.detail.y); calculate(car);
   });
   clearButton.onclick = () => clear();
+  // The two ends of the bridge road (docs/re/ug2_bridge.md: NFSU1 end y 507.9, UG2 end y 588.8, x 115-135, z 43): one click
+  // routes there from anywhere, then Teletransportar jumps. The join is hard to find by driving (OWNER 2026-11-13).
+  const goTo = (x, y, z) => { const car = gps.pose(); if (car && gps.roads) { destination = nearest(x, y, z); calculate(car); } else info.textContent = 'Cargando calles…'; };
+  controls.querySelector('.gps-bayview').onclick = () => goTo(117, 620, 43);
+  controls.querySelector('.gps-olympic').onclick = () => goTo(121.6, 480, 43);
+  controls.querySelector('.gps-report').onclick = () => window.rnReport?.();
   teleport.onclick = () => {
     const car = gps.pose();
     if (!car || destination === null || teleportPending) return;

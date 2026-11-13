@@ -29,7 +29,7 @@ const RN_APP = (() => {
     [/WebGPU no disponible/, 'Tu navegador no tiene WebGPU. Funciona en Chrome o Edge 113+ (computadora y Android 12+), Safari 26+ (Mac, iPhone, iPad) y Firefox 141+ (Windows) o 145+ (Mac Apple Silicon).'],
     [/sin adaptador/, 'WebGPU está apagado o la tarjeta gráfica de este equipo no es compatible.'],
     [/se perdió la GPU/, 'El navegador soltó la tarjeta gráfica (pasa al dejar la página mucho rato en segundo plano).'],
-    [/memory|Memory|memoria|OOM/, 'Este dispositivo no tiene memoria libre suficiente para el juego. Cierra otras pestañas y apps.'],
+    [/out of memory|Out of memory|memoria|OOM/, 'Este dispositivo no tiene memoria libre suficiente para el juego. Cierra otras pestañas y apps.'],
     [/descarga|Failed to fetch|NetworkError|Load failed/, 'No se pudo descargar el juego. Revisa tu conexión.'],
   ];
 
@@ -69,7 +69,10 @@ const RN_APP = (() => {
     if (view === 'stop') {
       const b = el('button', 'Recargar');
       b.onclick = () => location.reload();
-      gate.append(el('h2', 'El juego se detuvo'), el('p', (WHY.find(([re]) => re.test(why)) || [0, 'Algo falló al correr el juego.'])[1]), b, el('p', why, 'tech'));
+      const r = el('button', 'Descargar reporte');   // web/boot.js rnReport: the session as one file, to send with the bug
+      r.style.cssText = 'background:none;box-shadow:none;border:1px solid #ffffff55;padding:9px 22px;font-size:.8em';
+      r.onclick = () => window.rnReport?.();
+      gate.append(el('h2', 'El juego se detuvo'), el('p', (WHY.find(([re]) => re.test(why)) || [0, 'El juego falló. Recarga para seguir; el reporte dice qué pasó.'])[1]), b, r, el('p', why, 'tech'));
       b.focus();
     } else if (view === 'turn') {
       gate.innerHTML = '<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="20" width="36" height="20" rx="4"/><path d="M14 13a14 14 0 0 1 20 0"/><path d="M34 7v6h-6"/></svg>';

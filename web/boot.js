@@ -4,7 +4,8 @@ const t0 = performance.now();
 // Everything shown here also goes to tools/serve.py (build/web.log), so a session can be read afterwards.
 let pending = [], allLog = [];       // allLog: the whole session, for the F10 download (telemetry.js)
 const duelBox = Object.assign(document.createElement('div'), { style: 'position:fixed;left:50%;top:14%;transform:translateX(-50%);padding:6px 16px;background:rgba(0,0,0,.72);color:#ffc24a;font:bold 20px system-ui;border-radius:6px;pointer-events:none;display:none;z-index:9' });
-const duelSay = s => { const m = /DUEL (\S+) (start|won|lost)/.exec(s); if (!m) return; if (!duelBox.isConnected) document.body.appendChild(duelBox); duelBox.textContent = { start: `Duelo con ${m[1]}`, won: `${m[1]} te ganó`, lost: `Le ganaste a ${m[1]}` }[m[2]]; duelBox.style.display = ''; clearTimeout(duelSay.t); duelSay.t = setTimeout(() => duelBox.style.display = 'none', 3500); };
+const toast = text => { if (!duelBox.isConnected) document.body.appendChild(duelBox); duelBox.textContent = text; duelBox.style.display = ''; clearTimeout(toast.t); toast.t = setTimeout(() => duelBox.style.display = 'none', 3500); };
+const duelSay = s => { const m = /DUEL (\S+) (start|won|lost)/.exec(s); if (m) toast({ start: `Duelo con ${m[1]}`, won: `${m[1]} te ganó`, lost: `Le ganaste a ${m[1]}` }[m[2]]); };
 const keep = s => { pending.push(s); allLog.push(s); if (s.includes('DUEL ')) duelSay(s); };
 let logUp = !window.RN_PUBLIC;                    // tools/serve.py answers /log; a plain web host does not, and then nothing is sent
 function flush() {
@@ -24,6 +25,34 @@ addEventListener('keyup', e => keep(`${secs()} key up ${e.code}`), true);
 addEventListener('error', e => { line('JS error: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'stop'); flush(); });
 addEventListener('unhandledrejection', e => { line('JS rejection: ' + (e.reason && e.reason.stack || e.reason), 'stop'); flush(); });
 addEventListener('pagehide', flush);
+// The session report: one .json the browser saves (Downloads). Nothing is sent, so it also works on a plain host (RN_PUBLIC).
+// B while driving marks the spot (F8 and F10 are media keys on a Mac). The map (M) and the stop card have the download button.
+const trail = [], marks = [];        // [s, x, y, z, yaw16]: the car every 2 s (the last 4 h), and each mark
+const poseRow = () => { const p = window.RN_GPS?.pose(); return p ? [+secs(), +p.x.toFixed(1), +p.y.toFixed(1), +p.z.toFixed(1), p.yaw16] : null; };
+setInterval(() => { const r = poseRow(); if (r) { if (trail.length >= 7200) trail.shift(); trail.push(r); } }, 2000);
+window.rnMark = () => {
+  const r = poseRow();
+  if (!r) return;
+  marks.push(r); telem?.event('mark', { n: marks.length });
+  line(`MARK ${marks.length} at ${r.slice(1).join(':')}`); toast(`Marca ${marks.length} guardada`);
+};
+window.rnReport = () => {
+  const date = new Date().toISOString(), name = `nfsu-session-${date.replace(/[:.]/g, '-')}.json`;
+  const blob = new Blob([JSON.stringify({ format: 'rn-session-2', url: location.href, date, ua: navigator.userAgent,
+    screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, saved: +secs(), state: RN_APP.state, at: poseRow(), marks, trail,
+    ...(telem ? telem.dump() : {}), log: allLog })], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  line(`report: session saved as ${name}`); toast('Reporte descargado');
+};
+let telem = null;
+addEventListener('keydown', e => {
+  const mark = e.code === 'KeyB' && window.RN_GPS?.pose() && !window.RN_GPS.isOpen && !e.ctrlKey && !e.metaKey && !e.altKey;
+  if (!mark && e.code !== 'F8' && e.code !== 'F10') return;
+  e.preventDefault(); e.stopPropagation();
+  if (!e.repeat) (e.code === 'F10' ? window.rnReport : window.rnMark)();
+}, true);
 addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classList.toggle('dbg'); e.preventDefault(); e.stopPropagation(); } }, true);
 function line(s, cls) {
   keep(`${secs()} ${s}`);
@@ -180,7 +209,7 @@ async function download(url, what) {
   // F-Max
   if (maxChar)
     import('./maxpayne/boot.js').then(m => m.start(M, s => line(s))).catch(e => line('[F-Max] STOP ' + e.message, 'stop'));
-  const telem = startTelemetry(M, t0, s => line(s), allLog);
+  telem = startTelemetry(M, t0, s => line(s));
   const onFrame = (s, t, ms) => { if (s.present && !up && !FAST) { up = true; RN_APP.set('run'); } telem?.frame?.(s, t, ms); };
   startGpu(M, document.getElementById('screen'), s => line(s, 'api'), onFrame).catch(e => line('gpu.js: ' + e.message, 'stop'));
   // RN_STEERLOG (host/input.c): also each key at the page and each present's GPU completion, on the page's clock
