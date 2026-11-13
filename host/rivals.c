@@ -1171,7 +1171,7 @@ static uint32_t car_draw(Ctx *c) {
 // length, +0x10 route position, +0x34 body node), own row index (int8) ctx+0x388. Nitro burns while [car+0x3fc] (start tick of the
 // clock [0x73ad34]) is set and younger than [car+0x3f8] ticks (0x465430 on car+0x40). Returns 0x44bd10's eax.
 // ?pool=1 in WORLD, gangs (OWNER 2026-11-03): a rival cruises like tuned traffic (route speed x0.5, action target at most 17 m/s, no nitro) until the player
-// stays within 40 m going its way for 1.5 s, or a duel: full AI for 60 s or until 280 m apart, at most 2 at once; 30 s of cooldown after. DUEL lines reach the page's toast (web/index.html).
+// stays within 15 m for 1.5 s (any heading, any speed), or a duel: full AI for 60 s or until 280 m apart, at most 2 at once; 30 s of cooldown after. DUEL lines reach the page's toast (web/index.html).
 #define CLK_S 4000u
 static int gang_step(Ctx *c, uint32_t v, uint32_t car, uint32_t ent, uint32_t act) {
     static struct { uint32_t v, near, until, cool; } g[16];
@@ -1196,7 +1196,7 @@ static int gang_step(Ctx *c, uint32_t v, uint32_t car, uint32_t ent, uint32_t ac
         rn_log("DUEL %s %s", G(ent + 0x73c), ahead ? "won" : "lost");
         g[k].until = 0, g[k].near = 0, g[k].cool = now + 30 * CLK_S;
         if (duels > 0) duels--;
-    } else if (d < 40 && px * vx + py * vy > 0 && hypotf(px, py) > 12 && now >= g[k].cool && duels < 2) {
+    } else if (d < 15 && now >= g[k].cool && duels < 2) {   // OWNER 2026-11-13: driving up to a rival is the challenge; no hit, no same heading, no speed needed (was 40 m, same way, player over 12 m/s)
         if (!g[k].near) g[k].near = now;
         if (now - g[k].near > 3 * CLK_S / 2) {
             g[k].until = now + 60 * CLK_S; duels++;

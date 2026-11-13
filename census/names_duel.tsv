@@ -1,0 +1,9 @@
+addr	name	conf	proof
+0x44c550	RacerAI::UpdateDesiredSpeed	V	census/names_raceai.tsv:41; calls 0x44bd10 at 0x44c573 (patched to host persona_step)
+0x44bd10	RacerAI::CatchUp	V	called once per racer step from 0x44c573; host persona_step (host/rivals.c) wraps it and calls gang_step
+0xHOST	gang_step (host/rivals.c)	V	WORLD duel = host code, not the game: rival cruises like traffic, "DUEL start" log -> web/boot.js toast; start gate was d<40 same heading player>12 m/s 1.5 s, now d<15 1.5 s; run4 log DUEL JARED start at player 0 m/s with no AIHIT kind 1 before it
+0x44d8b0	RaceGoal::SelectAction	V	census/names_raceai.tsv:RaceGoal cascade: IJustGotHit prio 400
+0x44ed70	IJustGotHit::Finder (GetMostImportantNearbyCollidingAvoidable)	V	census/names_raceai.tsv: walks car contact records [car+0x3c]; the only game reaction to a player hit
+0x4522a0	AIActionIJustGotHit::Update	V	census/names_raceai.tsv: backs off, no revenge code (revenge is host persona_step AGGRESSIVE, only inside a duel)
+0x700680	neighbour reach	V	.data float 50.0 read from pc/Speed.exe (PE section parse), used by 0x57a910; game has no challenge range
+0x6b76a8	IJustGotHit ahead margin	V	.rdata float 2.8 read from pc/Speed.exe
