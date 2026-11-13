@@ -1,4 +1,11 @@
 addr	name	system	confidence	evidence	tool	doc
+0x409cd0	Hud::RenderPass	gps	V	0x409ef0 calls TrackMap::Draw 0x58e810 with render object 0x740460	rea-ghidra+objdump	tableros/gps-hud-evidence.md
+0x58e540	TrackMap::Construct	gps	V	TRACK%d_MAP lookup 0x58e651; stores texture at this+0x78 at 0x58e65b	rea-ghidra+objdump	tableros/gps-hud-evidence.md
+0x58e810	TrackMap::Draw	gps	V	0x58e8b6 calls map quad 0x58f090	rea-ghidra+objdump	tableros/gps-hud-evidence.md
+0x58f090	TrackMap::DrawMapQuad	gps	V	WorldToMap 0x590ad0; transform 0x590dd0; clip 0x58fb10	rea-ghidra+objdump	tableros/gps-hud-evidence.md
+0x58f614	TrackMap::LoadMapTexture	gps	V	mov ecx,[ebx+0x78]; 0x58f631 calls Poly2D::ClipToRect with that texture	rea-ghidra+objdump	tableros/gps-hud-evidence.md
+0x58fb10	Poly2D::ClipToRect	gps	V	Rectangle from this+0x68/+0x6c center and this+0x70/+0x74 extents	rea-ghidra+objdump	tableros/gps-hud-evidence.md
+0x590ad0	TrackMap::WorldToMap	gps	V	Negates y; transforms with matrix this+0x20; row this+0xa4 fields +0x8c/+0x90/+0x94 normalize UV	rea-ghidra+objdump	tableros/gps-hud-evidence.md
 0x427e60	Car::ResetToPoint	gps	V	ecx car, edx &pos, eax yaw16: 0x427c50 then 0x443a10(0x7372b0, car+0x60) then driver vtable +0x2c(1)/+0x30	rea-ghidra+objdump	tableros/gps-recon.md
 0x41f5e0	Car::GetPosition	gps	V	add eax,0x60; ret: position = car+0x60/+0x64/+0x68	objdump+rea	tableros/gps-recon.md
 0x702c98	GameActionTable	gps	V	DIACTION rows 0x28; row 32 semantic 0x81000432 = DIK M, name 0x6cc2d8 Debug Camera Select	python-pe+strings	tableros/gps-recon.md
