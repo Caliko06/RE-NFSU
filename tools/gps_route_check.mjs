@@ -1,12 +1,13 @@
 // One bounded integration check: map click, real cross-city route, driving HUD, clear, teleport and arrival.
-// Serve the slice on 5183; RN_SECS=300 node tools/gps_route_check.mjs
+// Serve the slice on 5183; RN_SECS=300 node tools/gps_route_check.mjs. GPS_PORT=5180 GPS_FINAL=1: main, launcher WORLD path, teleport only by the map button.
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const secs = Math.min(1800, Math.max(60, Number(process.env.RN_SECS || 300)));
-const url = 'http://127.0.0.1:5183/?play=1&pool=1&mode=remaster&mute=1&env=RN_JCLOG=1';
+const FINAL = process.env.GPS_FINAL === '1';
+const url = `http://127.0.0.1:${process.env.GPS_PORT || 5183}/?play=1&pool=1&mode=remaster&mute=1&env=RN_JCLOG=1`;
 const dest = [-1053.7, 993.1]; // map click in Bayview; route.js selects the actual street-node XYZ and yaw.
 const out = 'web/plan/shots', evidence = { url, destination: dest, verified: false };
 mkdirSync(out, { recursive: true });
@@ -105,6 +106,7 @@ try {
   await press('KeyM','m');
   for(let i=0;i<40 && !await evaluate('!!RN_GPS.roads');i++) await sleep(250);
   await sleep(300);
+  await shot('gps_map');
   await clickDestination(); await sleep(400);
   evidence.route=await routeState();
   if(!evidence.route.valid || !evidence.route.sections.includes(78) || !evidence.route.sections.some(id=>id>=79) || evidence.route.count<2) throw new Error('cross-city route/host publication failed');
@@ -139,12 +141,14 @@ try {
       best=Math.min(best,Math.hypot(...d.map((v,j)=>p[j]-a[j]-v*t)));
     } return best;
   })()`);
+  if(!FINAL) {
   if(evidence.offRouteDistance<=40) throw new Error('reroute probe is not off the actual selected route');
   if(!await evaluate(`rnGpsTeleport(${offRoad.join(',')},27453)`)) throw new Error('off-route teleport not queued');
   await until(s=>s.req===0 && s.res!==0,'off-route teleport',30000);
   await sleep(800); evidence.recalculated=await routeState();
   if(!evidence.recalculated.valid || evidence.recalculated.start===oldRoute.start || evidence.recalculated.destination!==oldRoute.destination) throw new Error('off-route reroute failed');
   await shot('gps_route_recalculated');
+  }
   await evaluate("document.querySelector('.gps-teleport').click()");
   after=await until(s=>s.res!==0 && s.req===0,'map teleport result',30000);
   if(after.res!==1) throw new Error('map teleport refused');
@@ -152,9 +156,11 @@ try {
   evidence.arrival=await routeState();
   if(evidence.arrival.route!==null || evidence.arrival.count!==0 || !evidence.arrival.status.includes('Llegaste')) throw new Error('arrival did not clear route');
   await shot('gps_route_arrival');
-  await press('KeyM','m');
+  await press('KeyM','m'); await sleep(500);
+  await shot('gps_teleport');
   await key(true); await sleep(3000); await key(false); await sleep(1500);
   later=await sample();
+  await shot('gps_teleport_later');
   if(!later.car || !after.car || later.car.wheels===0 || Math.hypot(later.car.pos[0]-after.car.pos[0],later.car.pos[1]-after.car.pos[1])<2) throw new Error('did not drive on after map teleport');
   if (errors.length) throw new Error('browser exceptions');
   evidence.verified = true;
