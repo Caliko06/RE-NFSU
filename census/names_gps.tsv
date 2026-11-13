@@ -2,3 +2,5 @@ addr	name	system	confidence	evidence	tool	doc
 0x427e60	Car::ResetToPoint	gps	V	ecx car, edx &pos, eax yaw16: 0x427c50 then 0x443a10(0x7372b0, car+0x60) then driver vtable +0x2c(1)/+0x30	rea-ghidra+objdump	tableros/gps-recon.md
 0x41f5e0	Car::GetPosition	gps	V	add eax,0x60; ret: position = car+0x60/+0x64/+0x68	objdump+rea	tableros/gps-recon.md
 0x702c98	GameActionTable	gps	V	DIACTION rows 0x28; row 32 semantic 0x81000432 = DIK M, name 0x6cc2d8 Debug Camera Select	python-pe+strings	tableros/gps-recon.md
+0x427c50	Car::SetPositionAndHeading	gps	V	stores yaw16 car+0x3b4 and xyz car+0x60/+0x64/+0x68; player entrant kind at +0x14 -> +4	rea-ghidra+objdump	tableros/gps-recon.md
+0x564b10	Angle16::Sin	gps	V	unsigned AX * 9.58738e-05 (2pi/65536); sine polynomial; constant 0x6cc980	rea-ghidra+objdump	tableros/gps-recon.md
