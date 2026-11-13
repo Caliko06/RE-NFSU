@@ -54,7 +54,6 @@ V = read in the binary or data with two tools; I = inferred; U = unknown. Worker
 | Page maps KeyM -> DIK 0x32 and Tab -> 0x0f | web/input.js:11, :6 | V |
 | M is bound in the game: action table 0x702c98 row 32 = {0x33, semantic 0x81000432 (DIK 0x32 = M), name 0x6cc2d8 "Debug Camera Select"}; row 31 0x81000418 = O "Debug Camera Out" | Python PE read of 0x702c98 + strings | V. FACT "KeyM unbound" refuted |
 | Fix: catch M in the capture phase on the page and do not forward it (as F2 boot.js:27, F3 input.js:33-40, F4 mode.js:55, K binds.js:126 already do) | code read | V pattern |
-| Tab is in neither action table (Game 0x702c98, Menu 0x7032d8) | bec PE read | V (one tool) |
 | Mouse: input.js:74-92 scales to canvas, buttons -> 0x80000100|n; pointer lock only when the game holds the mouse exclusive (input.js:67-72,86; host/dinput8.c:181-189) | code read | V |
 | An overlay above the canvas with pointer-events catches clicks before #screen; game keeps running underneath | I (web/gpu.js not read) | I |
 
