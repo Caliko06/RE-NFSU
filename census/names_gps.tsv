@@ -2,3 +2,11 @@ addr	name	system	confidence	evidence	tool	doc
 0x427e60	Car::ResetToPoint	gps	V	ecx car, edx &pos, eax yaw16: 0x427c50 then 0x443a10(0x7372b0, car+0x60) then driver vtable +0x2c(1)/+0x30	rea-ghidra+objdump	tableros/gps-recon.md
 0x41f5e0	Car::GetPosition	gps	V	add eax,0x60; ret: position = car+0x60/+0x64/+0x68	objdump+rea	tableros/gps-recon.md
 0x702c98	GameActionTable	gps	V	DIACTION rows 0x28; row 32 semantic 0x81000432 = DIK M, name 0x6cc2d8 Debug Camera Select	python-pe+strings	tableros/gps-recon.md
+0x427c50	Car::PlaceAndSnap	gps	V	Writes xyz and yaw then clears cache and calls 0x4278d0 at 0x427ccd	rea-ghidra+objdump	tableros/gps-tp-evidence.md
+0x4278d0	Car::PutFlatOnTrack	gps	V	ESI car; 0x4273d0 with car+0x60 and collision cache car+0x540; body origin update	rea-ghidra+objdump	tableros/gps-tp-evidence.md
+0x4273d0	Car::SnapFourWheels	gps	V	Four 0x440a40 calls at 0x42752e; valid floor heights determine body height and orientation	rea-ghidra+objdump	tableros/gps-tp-evidence.md
+0x440a40	GroundQuery::FindSurfaceBelow	gps	V	Five stack args; height on x87; found-byte=0 if no polygon; rebuilds local cache	rea-ghidra+objdump	tableros/gps-tp-evidence.md
+0x444840	Streamer::SeedViewer	gps	V	EAX viewer; EDX streamer; ECX xy; invalidates counter and enables viewer without waiting	rea-ghidra+objdump	tableros/gps-tp-evidence.md
+0x445100	Streamer::IsBusy	gps	V	Called at 0x423011; busy AL from streamer+0x15c or worker queue; does not initiate loads	rea-ghidra+objdump	tableros/gps-tp-evidence.md
+0x441380	CollisionWorld::LoadChunk	gps	V	0x34132 stores chunk+8 and size>>5 as world+0x10/+0x14	rea-ghidra+objdump	tableros/gps-tp-evidence.md
+0x441480	CollisionWorld::UnloadChunk	gps	V	0x34132 clears world+0x10/+0x14	rea-ghidra+objdump	tableros/gps-tp-evidence.md
