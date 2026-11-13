@@ -10,4 +10,8 @@
 #gps-map kbd { font:12px ui-monospace,monospace; margin-left:12px; color:#ffe0c2; }
 #gps-map footer { position:absolute; bottom:0; left:0; right:0; display:flex; justify-content:space-between; gap:16px; padding:20px clamp(18px,3vw,40px); color:#9eaec3; font:12px system-ui,sans-serif; pointer-events:none; background:linear-gradient(transparent,#06101dea); }
 #gps-map .gps-status { color:#8ff5dc; }
+#gps-map .gps-actions { position:absolute; left:clamp(18px,3vw,40px); right:clamp(18px,3vw,40px); bottom:62px; display:flex; align-items:center; justify-content:flex-end; gap:12px; }
+#gps-map .gps-route-info { margin-right:auto; color:#ffc85a; font:14px system-ui,sans-serif; max-width:50%; }
+#gps-map button:disabled { opacity:.45; cursor:default; }
+@media(max-width:600px) { #gps-map .gps-actions { flex-wrap:wrap; bottom:80px; gap:8px; } #gps-map .gps-route-info { flex-basis:100%; max-width:100%; font-size:12px; } }
 @media(max-width:600px) { #gps-map footer { flex-direction:column; gap:5px; padding-bottom:12px; } #gps-map h1 { max-width:200px; } #gps-map button { padding:10px; } #gps-map kbd { display:block; margin:4px 0 0; } }
