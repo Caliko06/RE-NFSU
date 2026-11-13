@@ -201,7 +201,7 @@ def scan_solids(path):
             if 'hash' in sol and sol.get('nv') and sol.get('ntri') and 'v' in sol and 'i' in sol:
                 solids.setdefault(sol['hash'], sol)
         elif i == 0x80034100:
-            end, defs, inst = b + s, [], None
+            end, defs, inst, empty6 = b + s, [], None, False
             k += 1
             while k < n and t[k][1] < end:
                 j, b2, s2, _ = t[k]
@@ -211,8 +211,10 @@ def scan_solids(path):
                 elif j == 0x34103:
                     q, l = W.pay(d, b2, s2)
                     inst = np.frombuffer(d, dtype=np.uint8, count=l // 64 * 64, offset=q).reshape(-1, 64)
+                elif j == 0x34106:   # 128 B rows read by the loader at 0x5dfa51 into section +0x30 (count = size >> 7); all zero in the 23 backdrop sections
+                    empty6 = not any(d[b2:b2 + s2])
                 k += 1
-            if inst is not None:
+            if inst is not None and not empty6:   # SKYDOME, every single-object PAN_ section and OBJECT01 (section 397, the coast LOD): backdrops, not city
                 sections.append((defs, inst))
         else:
             k += 1
@@ -294,9 +296,6 @@ def walk(data, sol, secs, near, fixed):
                 continue
             hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
             if hh in sol and sol[hh]['name'].upper().startswith(W.SKIP):
-                continue
-            bbx = struct.unpack_from('<6f', w, 0)
-            if max(bbx[3] - bbx[0], bbx[4] - bbx[1]) > W.BACKDROP_EXTENT:   # backdrops, as ug2_world.main
                 continue
             if not near(struct.unpack_from('<6f', w, 0)):
                 continue

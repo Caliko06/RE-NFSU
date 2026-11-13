@@ -33,11 +33,9 @@ STRIDE = {0x4180: (36, 24)}
 # instance at +0x1a. The shipped instances carry 0x10 on 5,999 of them (XO_TRACKBARRIER*, shop beams, door pieces): the state with no
 # group enabled, which is the open city the OWNER drives (no race barriers, no career locks).
 HIDDEN = 0x10
-# Backdrops: an instance whose bbox is wider than this (UG2 units) is a vista, not city. Every PAN_ / SKYDOME / XO_VISTA instance is (751..10000 m); the only other
-# one is OBJECT01 (section 554 of L4RA, 1016 m: the coast's LOD, textures TRN_COASTROADLOD_A_DM / LOD_BLD_A03, 0.34 m over the real road with vertex colour 247, the
-# "ground crossed through" at the bridge mouth, census/ug2/ground_gaps.tsv zone 1). Next widest real piece: 452 m (XB_OBSERVATORYB). The rule UG2 itself uses
-# to hide it (distance LOD, section streaming) was not found in SPEED2.EXE: UNKNOWN; its data (flags 0, section header, def) is byte-identical in shape to PAN_Parkdrive.
-BACKDROP_EXTENT = 600
+# Backdrop sections (rule in scan()): a section whose 0x34106 chunk (128 B rows, loader 0x5dfa51..0x5dfa64) is all zero. Exactly 23 of 606 in L4RA: SKYDOME,
+# 21 single-object PAN_ sections and OBJECT01 (section id 397, the coast LOD: TRN_COASTROADLOD_A_DM, LOD_BLD_A03; 0.34 m over the real road, the "ground crossed through"
+# at the bridge mouth). INFERENCE: with no rows a section cannot be picked by position, so it is a global backdrop; its consumer in SPEED2.EXE was not traced.
 
 
 def tree(d):
@@ -95,7 +93,7 @@ def scan(path):
             if 'hash' in sol and sol.get('nv') and sol.get('ntri') and 'v' in sol and 'i' in sol:
                 solids.setdefault(sol['hash'], sol)
         elif i == 0x80034100:
-            end, defs, inst = b + s, [], None
+            end, defs, inst, empty6 = b + s, [], None, False
             k += 1
             while k < n and t[k][1] < end:
                 j, b2, s2, _ = t[k]
@@ -105,8 +103,10 @@ def scan(path):
                 elif j == 0x34103:  # 64-byte instances, aligned
                     q, l = pay(d, b2, s2)
                     inst = np.frombuffer(d, dtype=np.uint8, count=l // 64 * 64, offset=q).reshape(-1, 64)
+                elif j == 0x34106:   # 128 B rows read by the loader at 0x5dfa51 into section +0x30 (count = size >> 7); all zero in the 23 backdrop sections
+                    empty6 = not any(d[b2:b2 + s2])
                 k += 1
-            if inst is not None:
+            if inst is not None and not empty6:   # SKYDOME, every single-object PAN_ section and OBJECT01 (section 397, the coast LOD): backdrops, not city
                 sections.append((defs, inst))
         else:
             k += 1
@@ -175,10 +175,6 @@ def main():
                 continue
             hh = defs[di][0] if defs[di][0] in sol else defs[di][1]
             if hh in sol and sol[hh]['name'].upper().startswith(SKIP):
-                skipped += 1
-                continue
-            bbx = struct.unpack_from('<6f', w, 0)
-            if max(bbx[3] - bbx[0], bbx[4] - bbx[1]) > BACKDROP_EXTENT:
                 skipped += 1
                 continue
             if not near(struct.unpack_from('<6f', w, 0)):
