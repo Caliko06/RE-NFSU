@@ -64,6 +64,7 @@ const bridgeTo = RN_Q.get('bridge');
 if (bridgeTo !== null) window.rnBridge = q => { location.href = (bridgeTo && bridgeTo !== '1' ? bridgeTo : `http://${location.hostname}:5190/`) + '?' + q; return 1; };
 </script>
 <script src="out/speed.js"></script>
+<script src="saves.js"></script>
 <script>
 // ?fast=1&go=1 (the launcher's "Jugar"): the launcher's 3D scene (web/launcher_b/?curtain=1, frozen at the end of its push-in) covers the game while it boots
 // (no intro movies or splash, PATCH 0x4de395; the game's own Accept loads the profile, web/boot.js). It is only a loading curtain: it fades out in 250 ms

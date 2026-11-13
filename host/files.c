@@ -27,9 +27,21 @@ static char root[1024], save_root[1024];
 
 void files_set_root(const char *dir) {
     snprintf(root, sizeof root, "%s", dir);
-    snprintf(save_root, sizeof save_root, "%s/../save", dir);     // tools/serve.py serves the same save/
-#ifndef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
+    (void)dir;
+    snprintf(save_root, sizeof save_root, "/save");               // web/saves.js mounts it in memory and keeps it in the browser (IndexedDB)
+#else
+    snprintf(save_root, sizeof save_root, "%s/../save", dir);
     mkdir(save_root, 0755);
+#endif
+}
+// Native: every path is on disk. Web: only the save folder is (an in-memory FS saved in IndexedDB); game files are read over HTTP.
+static int on_fs(const char *real) {
+#ifdef __EMSCRIPTEN__
+    return !strncmp(real, save_root, strlen(save_root));
+#else
+    (void)real;
+    return 1;
 #endif
 }
 #define SAVE_DIR "C:/Documents and Settings/All Users/Application Data/NFS Underground"
@@ -77,24 +89,8 @@ EM_JS(double, web_lookup, (const char *rel, char *real, int realsz), {
     stringToUTF8(e[0], real, realsz);
     return e[1];
 });
-// A save file: its size, -2 a directory, -1 missing (tools/serve.py /save/; a directory redirects to name/).
-EM_JS(double, web_save_lookup, (const char *rel), {
-    var x = new XMLHttpRequest();
-    x.open('HEAD', '/save/' + UTF8ToString(rel).split('/').map(encodeURIComponent).join('/'), false);
-    x.send();
-    if (x.status !== 200) return -1;
-    return x.responseURL.endsWith('/') ? -2 : Number(x.getResponseHeader('Content-Length'));
-});
-// PUT a whole save file (n bytes at src), or make a directory (src NULL). DELETE with del. 1 = done.
-EM_JS(int, web_save_put, (const char *rel, const uint8_t *src, int n, int del), {
-    var x = new XMLHttpRequest();
-    var url = '/save/' + UTF8ToString(rel).split('/').map(encodeURIComponent).join('/');
-    x.open(del ? 'DELETE' : 'PUT', src || del ? url : url + '/', false);
-    x.send(src ? HEAPU8.slice(src, src + n) : null);
-    return x.status >= 200 && x.status < 300 ? 1 : 0;
-});
 // Names in a directory, "name\tsize\n" (size -1 = a directory), into out; the count, or -1 no directory.
-EM_JS(int, web_list, (const char *rel, int save, char *out, int outsz), {
+EM_JS(int, web_list, (const char *rel, char *out, int outsz), {
     var dir = UTF8ToString(rel).toLowerCase(), seen = new Map();
     var add = (p, n) => {
         var low = p.toLowerCase();
@@ -102,18 +98,13 @@ EM_JS(int, web_list, (const char *rel, int save, char *out, int outsz), {
         var rest = p.slice(dir ? dir.length + 1 : 0), k = rest.indexOf('/');
         if (k < 0) seen.set(rest, n); else if (!seen.has(rest.slice(0, k))) seen.set(rest.slice(0, k), -1);
     };
-    if (save) {
-        var x = new XMLHttpRequest();
-        x.open('GET', '/save-files.json', false);
-        x.send();
-        for (const [p, n] of JSON.parse(x.responseText)) add(p, n);
-    } else for (const [low, e] of Module.rnIndex.files) add(e[0], e[1]);
+    for (const [low, e] of Module.rnIndex.files) add(e[0], e[1]);
     var s = '';
     for (const [name, n] of seen) s += name + '\t' + n + '\n';
     stringToUTF8(s, out, outsz);
     return seen.size;
 });
-// real is "game/<path>" or "save/<path>".
+// real is "game/<path>".
 EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
     var x = new XMLHttpRequest();
     x.open('GET', '/' + UTF8ToString(real).split('/').map(encodeURIComponent).join('/'), false);
@@ -136,14 +127,7 @@ static int lookup(const char *gpath, char *real, size_t n, uint64_t *size) {
     int save = game_rel(gpath, rel, sizeof rel);
     if (save < 0) return -2;
 #ifdef __EMSCRIPTEN__
-    if (save) {
-        double r = !*rel ? -2 : web_save_lookup(rel);
-        if (r == -2) return 1;
-        if (r < 0) return -1;
-        snprintf(real, n, "save/%s", rel);
-        *size = (uint64_t)r;
-        return 0;
-    }
+    if (!save) {
     char g[512];
     double r = web_lookup(rel, g, sizeof g);
     if (r == -2) return 1;
@@ -151,7 +135,9 @@ static int lookup(const char *gpath, char *real, size_t n, uint64_t *size) {
     snprintf(real, n, "game/%s", g);
     *size = (uint64_t)r;
     return 0;
-#else
+    }
+#endif
+    {
     // Each component, matched without case against the directory on disk.
     snprintf(real, n, "%s", save ? save_root : root);
     for (char *c = rel; *c;) {
@@ -178,7 +164,7 @@ static int lookup(const char *gpath, char *real, size_t n, uint64_t *size) {
     if (S_ISDIR(sb.st_mode)) return 1;
     *size = (uint64_t)sb.st_size;
     return 0;
-#endif
+    }
 }
 
 // 0 = a file, 1 = a directory, -1 = missing, -2 = outside the game folder.
@@ -202,10 +188,10 @@ int gf_open(const char *gpath) {
         GFile *g = &files[k];
         if (g->used) continue;
         memset(g, 0, sizeof *g);
-#ifndef __EMSCRIPTEN__
-        g->f = fopen(real, "rb");
-        if (!g->f) return -1;
-#endif
+        if (on_fs(real)) {
+            g->f = fopen(real, "rb");
+            if (!g->f) return -1;
+        }
         g->used = 1;
         g->size = size;
         snprintf(g->real, sizeof g->real, "%s", real);
@@ -249,6 +235,7 @@ int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
     if (n > g->size - off) n = (uint32_t)(g->size - off);
     if (g->save) { memcpy(dst, g->data + off, n); return n; }
 #ifdef __EMSCRIPTEN__
+    if (!g->f) {
     while (g->busy) { gil_release(); sched_yield(); gil_acquire(); }
     uint32_t done = 0;
     while (done < n) {
@@ -281,10 +268,10 @@ int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
         g->next = at + (uint32_t)r;
     }
     return done;
-#else
+    }
+#endif
     if (fseeko(g->f, (off_t)off, SEEK_SET)) return -1;
     return (int64_t)fread(dst, 1, n, g->f);
-#endif
 }
 
 // ---- writes: only inside the save folder; the game folder is read-only ------------------------
@@ -292,16 +279,11 @@ int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
 static int save_rel(const char *gpath, char *rel, size_t n) { return game_rel(gpath, rel, n); }
 
 static int put_whole(const char *rel, const char *real, const uint8_t *p, uint64_t n) {
-#ifdef __EMSCRIPTEN__
-    (void)real;
-    return web_save_put(rel, p, (int)n, 0) ? 0 : -1;
-#else
     (void)rel;
     FILE *f = fopen(real, "wb");
     if (!f) return -1;
     size_t w = n ? fwrite(p, 1, n, f) : 0;
     return fclose(f) || w != n ? -1 : 0;
-#endif
 }
 
 // The real path (native) of a save path that may not exist yet: its parent must be a directory.
@@ -316,11 +298,7 @@ static int save_target(const char *gpath, char *rel, char *real, size_t n) {
     char preal[512];
     uint64_t sz;
     if (lookup(parent, preal, sizeof preal, &sz) != 1) return -3;
-#ifdef __EMSCRIPTEN__
-    snprintf(real, n, "save/%s", rel);
-#else
     snprintf(real, n, "%s/%s", preal, s + 1);
-#endif
     return 0;
 }
 
@@ -347,13 +325,9 @@ int gf_create(const char *gpath, int disp, int *existed) {
     g->cap = size > 4096 ? size : 4096;
     g->data = calloc(1, g->cap);
     if (r == 0 && disp != 2 && disp != 5) {                   // keep the contents
-#ifdef __EMSCRIPTEN__
-        if (size && web_read(real, 0, g->data, (int)size) != (int)size) { gf_close(k); return -1; }
-#else
         FILE *f = fopen(real, "rb");
         if (!f || fread(g->data, 1, size, f) != size) { if (f) fclose(f); free(g->data); g->used = 0; return -1; }
         fclose(f);
-#endif
         g->size = size;
     } else g->dirty = 1;                                      // created or truncated: exists from now on
     if (g->dirty) gf_flush(k);
@@ -391,7 +365,7 @@ int gf_flush(int id) {
     GFile *g = &files[id];
     if (!g->save || !g->dirty) return 0;
     char rel[512];
-    snprintf(rel, sizeof rel, "%s", g->real + (strncmp(g->real, "save/", 5) ? 0 : 5));
+    rel[0] = 0;
     if (put_whole(rel, g->real, g->data, g->size)) return -1;
     g->dirty = 0;
     return 0;
@@ -405,11 +379,7 @@ int gf_mkdir(const char *gpath) {
     if (r == 0) return 1;
     int t = save_target(gpath, rel, real, sizeof real);
     if (t) return t == -3 ? -1 : -2;
-#ifdef __EMSCRIPTEN__
-    return web_save_put(rel, NULL, 0, 0) ? 0 : -1;
-#else
     return mkdir(real, 0755) ? -1 : 0;
-#endif
 }
 
 // 0 deleted, -1 missing, -2 outside the save folder.
@@ -418,11 +388,7 @@ int gf_delete(const char *gpath) {
     uint64_t size;
     if (save_rel(gpath, rel, sizeof rel) != 1) return -2;
     if (lookup(gpath, real, sizeof real, &size) != 0) return -1;
-#ifdef __EMSCRIPTEN__
-    return web_save_put(rel, NULL, 0, 1) ? 0 : -1;
-#else
     return unlink(real) ? -1 : 0;
-#endif
 }
 
 static int wild(const char *p, const char *s) {
@@ -452,8 +418,9 @@ int gf_find(const char *gpath, char *name, size_t n, int *is_dir, uint64_t *size
     if (r == -2) return -2;
     if (r != 1 && !(save && !*rel)) return -1;
 #ifdef __EMSCRIPTEN__
+    if (!save) {
     static char list[65536];
-    if (web_list(rel, save, list, sizeof list) < 0) return -1;
+    if (web_list(rel, list, sizeof list) < 0) return -1;
     for (char *l = list; *l;) {
         char *e = strchr(l, '\n');
         *e = 0;
@@ -464,7 +431,8 @@ int gf_find(const char *gpath, char *name, size_t n, int *is_dir, uint64_t *size
         l = e + 1;
     }
     return -1;
-#else
+    }
+#endif
     DIR *d = opendir(real);
     if (!d) return -1;
     struct dirent *de;
@@ -482,7 +450,6 @@ int gf_find(const char *gpath, char *name, size_t n, int *is_dir, uint64_t *size
         }
     closedir(d);
     return -1;
-#endif
 }
 
 // State the layer keeps for the PC, not the game: save/<name> (DirectInput user maps). The whole file in

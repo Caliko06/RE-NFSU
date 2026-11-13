@@ -547,6 +547,12 @@
     motion = on; root.classList.toggle('calm', !on); btnMot.setAttribute('aria-pressed', String(on)); btnMot.querySelector('.ml').textContent = on ? 'Animación: sí' : 'Animación: no'; store.set('rn_launch_motion', on ? '1' : '0'); scene('motion', on);
   };
   btnMot.addEventListener('click', () => setMotion(!motion));
+  // Saves live in this browser (web/saves.js): download them as one file, or load such a file back.
+  const btnBak = $('btnBak'), btnRes = $('btnRes'), fileRes = $('fileRes');
+  const note = (b, t) => { const l = b.querySelector('.ml'), o = l.dataset.o || l.textContent; l.dataset.o = o; l.textContent = t; setTimeout(() => { l.textContent = o; }, 2200); };
+  btnBak.addEventListener('click', () => RN_SAVES.backup().then(n => note(btnBak, n ? 'Listo' : 'Sin partidas'), () => note(btnBak, 'Error')));
+  btnRes.addEventListener('click', () => fileRes.click());
+  fileRes.addEventListener('change', () => { const f = fileRes.files[0]; fileRes.value = ''; if (f) RN_SAVES.restore(f).then(() => note(btnRes, 'Restaurado'), () => note(btnRes, 'Archivo inválido')); });
   setMotion(motion);
 
   // ---------- input ----------

@@ -1,0 +1,6 @@
+addr	name	system	confidence	evidence	tool	doc
+0x41dc10	Save::BuildPath	save	V	V: SHGetFolderPathA(0x23 = CSIDL_COMMON_APPDATA) + "\NFS Underground\" + CreateDirectoryA, then sprintf "%s%s%d%s" (dir, profile, n, ext) or "%s%s%s%s" (n = -1); hopper decomp.c:48442 and capstone push scan of the format strings agree; host/files.c maps the folder to /save	hopper+capstone	docs/re/garage.md
+0x41d8a0	Ugd::Write	save	V	V: writes <profile><n>.ugd and <profile>_autosave.ugd, 63123 bytes (4+18+25+0xf660+4); on-disk sizes of save/*.ugd = 63123; callers CreateNew 0x41cf40, Profile::Load, Autosave 0x4c96f0	hopper+capstone	docs/re/garage.md
+0x41e200	Opt::Write	save	V	V: ".opt" (0x6cb0f0) pushed at 0x41e262; <profile>.opt is 749 bytes in save/; Opt::Read 0x41e330 pushes it at 0x41e393	capstone+file	docs/re_audio_default.md
+0x41c420	Config::OpenCfgFile	save	V	V: ".cfg" (0x6cb15c) pushed at 0x41e131; <profile>.cfg is 313 bytes in save/	capstone+file	docs/re/canon.md
+0x41d140	ProfileList::Load	save	V	V: ".usr" (0x6cb138) pushed at 0x41d18b; Profiles.usr 68 bytes; rewritten by ProfileList::Touch 0x41d2a0 (.usr push 0x41d547) and Profile::Delete 0x41dd60 (push 0x41dea2); changed after one game boot+route in the browser test 2026-11-13 (hash 457621 -> 810780)	capstone+file	docs/re/canon.md

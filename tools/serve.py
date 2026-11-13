@@ -3,9 +3,9 @@
 
 / -> web/, /pc/Speed.exe -> pc/Speed.exe, /game/... -> game/ (the OWNER's files, never leave this machine).
 /game-files.json lists game/ (relative paths and sizes); /game/ answers Range requests (host/files.c reads them).
-/save/... = save/ of this repo (gitignored): what the game writes. GET reads, PUT writes a whole file, DELETE
-removes one; /save-files.json lists save/. Writes never reach game/. Headless Chrome (tests) gets build/save-headless
-instead, a copy of save/ made when it is missing (webcheck deletes it at start), so a test never changes the OWNER's save.
+Saves live in the browser (web/saves.js), not here. /save-backup.json (GET only) hands save/ of this repo (gitignored, the
+native build's folder) out as a backup file: ?saveseed=1 seeds an empty browser store from it, or Restore it in the launcher.
+Headless Chrome (tests) gets build/save-headless instead, a copy of save/ made when it is missing (webcheck deletes it at start).
 POST /log appends the page's log to build/web.log (POST /log?new starts it again; the last one is kept as
 build/web.prev.log), so a Chrome session can be read after it stops. Headless Chrome (tools/webcheck.mjs) writes
 build/webcheck.log instead, so a test never replaces the OWNER's session.
@@ -24,7 +24,7 @@ profile; iOS: Settings > General > About > Certificate Trust Settings > full tru
 profile (payload com.apple.security.root), made here from build/lan-cert/ca.crt. RN_LAN_PORT / RN_SETUP_PORT change the two ports.
 Usage: .venv/bin/python tools/serve.py [port] [--lan]
 """
-import email.utils, gzip, hashlib, http.server, json, os, plistlib, shutil, socket, ssl, subprocess, sys, threading, time, urllib.parse, uuid
+import base64, email.utils, gzip, hashlib, http.server, json, os, plistlib, shutil, socket, ssl, subprocess, sys, threading, time, urllib.parse, uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARGS = [a for a in sys.argv[1:] if a != "--lan"]
@@ -47,14 +47,6 @@ def save_root(headers):
     if not os.path.isdir(SAVE_HEADLESS):
         shutil.copytree(SAVE, SAVE_HEADLESS) if os.path.isdir(SAVE) else os.makedirs(SAVE_HEADLESS)
     return SAVE_HEADLESS
-
-
-def save_path(url, root):
-    """<root>/<rel> for /save/<rel>, or None when it would leave the save root."""
-    rel = os.path.normpath(urllib.parse.unquote(url.split("?", 1)[0][len("/save/"):]))
-    if rel.startswith("..") or os.path.isabs(rel) or rel == ".":
-        return None
-    return os.path.join(root, rel)
 
 
 def listing(top):
@@ -109,24 +101,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.close_connection = True
         self.send_error(code)
 
-    def do_PUT(self):
-        p = save_path(self.path, save_root(self.headers)) if self.path.startswith("/save/") else None
-        if not p:
-            self.refuse(403)
-            return
-        body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
-        if self.path.endswith("/"):         # PUT /save/dir/ makes a directory (CreateDirectoryA)
-            os.makedirs(p, exist_ok=True)
-            self.send_response(204)
-            self.end_headers()
-            return
-        os.makedirs(os.path.dirname(p), exist_ok=True)
-        with open(p + ".tmp", "wb") as f:
-            f.write(body)
-        os.replace(p + ".tmp", p)
-        self.send_response(204)
-        self.end_headers()
-
     def plan_verdict(self):
         """The OWNER's verdict: details[i].owner in web/plan/plan.json. 204, or 400 for a bad body or unknown detail."""
         n = int(self.headers.get("Content-Length", 0))
@@ -175,15 +149,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             os.replace(log, prev)
         with open(log, "ab") as f:
             f.write(body)
-        self.send_response(204)
-        self.end_headers()
-
-    def do_DELETE(self):
-        p = save_path(self.path, save_root(self.headers)) if self.path.startswith("/save/") else None
-        if not p or not os.path.isfile(p):
-            self.send_error(404)
-            return
-        os.remove(p)
         self.send_response(204)
         self.end_headers()
 
@@ -263,9 +228,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.reply(200, "application/x-apple-aspen-config", body, [("Content-Disposition", 'attachment; filename="nfsu-ca.mobileconfig"')])
             return
-        if route in ("/game-files.json", "/save-files.json"):
-            top = os.path.join(ROOT, "game") if route == "/game-files.json" else save_root(self.headers)
+        if route == "/game-files.json":
+            top = os.path.join(ROOT, "game")
             self.reply(200, "application/json", listing(top) if os.path.isdir(top) else b"[]")
+            return
+        if route == "/save-backup.json":      # dev only: the OWNER's save/ as a backup file, for ?saveseed=1 or Restore
+            top = save_root(self.headers)
+            files = {}
+            for d, _, names in os.walk(top):
+                for n in names:
+                    p = os.path.join(d, n)
+                    files[os.path.relpath(p, top)] = base64.b64encode(open(p, "rb").read()).decode()
+            self.reply(200, "application/json", json.dumps({"rn_saves": 1, "files": files}).encode())
             return
         if route == "/out/speed.wasm" and self.wasm_packed():
             return
@@ -335,9 +309,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return os.path.join(ROOT, "game", os.path.normpath(path[6:]).lstrip("/."))
         if path.startswith("/world/"):    # the open world's merged TRACKB files (tools/openworld/build.py, ?world=1); RN_WORLD_DIR as native
             return os.path.join(WORLD_DIR, os.path.normpath(path[7:]).lstrip("/."))
-        if path.startswith("/save/"):
-            root = save_root(self.headers)
-            return save_path(path, root) or os.path.join(root, "..refused")
         return os.path.join(ROOT, "web", os.path.normpath(path).lstrip("/."))
 
     def end_headers(self):
