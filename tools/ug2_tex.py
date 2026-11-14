@@ -343,9 +343,7 @@ def main():
     root = os.path.dirname(tracks.rstrip('/'))
     for f in sorted(glob.glob(os.path.join(root, 'GLOBAL', '*.[bB][iIuU][nN]')) + glob.glob(os.path.join(root, 'GLOBAL', '*.lzc'))
                     + glob.glob(os.path.join(root, 'FRONTEND', 'FrontB.lzc'))):
-        d = open(f, 'rb').read()
-        if d[:4] not in (b'\x00\x00\x30\xb3', b'\x00\x00\x32\xb3'):
-            continue
+        d = open(f, 'rb').read()   # no first-chunk filter: GLOBALB.BUN starts with chunk 0x00135200 and holds HEADLIGHTGLOW (3394fe62, 12,446 city triangles)
         fi, got = len(data), 0
         data.append(d)
         for pk in packs(d):
