@@ -100,7 +100,13 @@ static void call_host(Ctx *c, uint32_t target) {
     gil_slice();
     if (slot < 0) slot = __atomic_fetch_add(&nbusy, 1, __ATOMIC_RELAXED);
     if (slot < 64) { busy[slot].tid = ld(c, c->fs + 0x24, 4); busy[slot].api = k; busy[slot].ra = ra; busy[slot].in = 1; }
+#ifdef RN_STW
+    c->halt_at = target;   // rt.h RN_STW: a store made by host code reads as this host entry address
+#endif
     uint32_t v = h->fn(c);
+#ifdef RN_STW
+    if (!c->halt) c->halt_at = 0;
+#endif
     if (slot < 64) busy[slot].in = 0;
     if (c->halt) { if (!c->halt_at) c->halt_at = ra; return; }
     c->ret = ra;

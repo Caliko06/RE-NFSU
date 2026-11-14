@@ -28,13 +28,28 @@ typedef struct Ctx {
 // (2026-11-03), but a bad guest pointer then corrupts wasm memory instead of a clean "memory fault" halt.
 #ifdef RN_NOCHK
 #define CHK(a, n, at) do { } while (0)
+#elif defined(RN_STW)
+// RN_STW build (tools/recomp/build.py, off by default): c->halt_at always holds the guest address of the last memory access, so a
+// watched store (host/crashwatch.c) can name the instruction that made it. A host API sets it to its entry address.
+#define CHK(a, n, at) do { c->halt_at = (at); if ((uint32_t)((a) - LOW) > c->memsz - LOW - (n)) { c->why = "memory fault"; goto trap; } } while (0)
 #else
 #define CHK(a, n, at) do { if ((uint32_t)((a) - LOW) > c->memsz - LOW - (n)) { c->halt_at = (at); c->why = "memory fault"; goto trap; } } while (0)
 #endif
 #define TRAP(at, msg) do { c->halt_at = (at); c->why = (msg); goto trap; } while (0)
 
 static inline uint32_t ld(Ctx *c, uint32_t a, int n) { uint32_t v = 0; memcpy(&v, c->mem + a, n); return v; }
+#ifdef RN_STW
+// One bit per 8 bytes of the first 64 MB above the guest heap start (0x800000), armed by host/crashwatch.c each Present.
+extern uint8_t rn_stw_bm[1u << 20];
+void rn_stw_hit(Ctx *c, uint32_t a, uint32_t v, int n);
+static inline void st(Ctx *c, uint32_t a, uint32_t v, int n) {
+    uint32_t o = a - 0x800000u;
+    if (o < (64u << 20) && (rn_stw_bm[o >> 6] >> ((o >> 3) & 7) & 1)) rn_stw_hit(c, a, v, n);
+    memcpy(c->mem + a, &v, n);
+}
+#else
 static inline void st(Ctx *c, uint32_t a, uint32_t v, int n) { memcpy(c->mem + a, &v, n); }
+#endif
 static inline float ldf(Ctx *c, uint32_t a) { float v; memcpy(&v, c->mem + a, 4); return v; }
 static inline double ldd(Ctx *c, uint32_t a) { double v; memcpy(&v, c->mem + a, 8); return v; }
 static inline void stf(Ctx *c, uint32_t a, float v) { memcpy(c->mem + a, &v, 4); }

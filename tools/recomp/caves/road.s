@@ -155,3 +155,9 @@ H:
     ret
 1:  xor ecx, ecx
     ret
+
+# @ F 0x797280
+# FIX 0x458c86 (decider cache 0x458bd0 full, ebp was -1 and the store hit [AIVehicle+8]): count the skipped store at [0x7977f0] (host/crashwatch.c reads
+# it) and leave through the epilogue 0x458cb3 that the type-9 exit uses (same stack: ebx, ebp, esi pushed, bl = the answer).
+    inc dword ptr [0x7977f0]
+    JMPA 0x458cb3

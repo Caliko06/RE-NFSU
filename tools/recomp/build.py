@@ -140,7 +140,7 @@ def stale(o, src, gen=GEN):
 
 
 HOST = ["host/main.c", "host/dispatch.c", "host/win32.c", "host/user32.c", "host/threads.c", "host/net.c", "host/cpu.c",
-        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c", "host/abk.c", "host/bridge.c", "host/carsmooth.c", "host/rivals.c", "host/free.c", "host/aitel.c", "host/lights.c", "host/openworld.c", "host/cov.c", "host/horn.c", "host/feellog.c", "host/phase.c", "host/mc.c", "host/gps.c", "host/gps_tp.c"]
+        "host/d3d9.c", "host/sm1.c", "host/gpu.c", "host/dinput8.c", "host/dsound.c", "host/files.c", "host/input.c", "host/abk.c", "host/bridge.c", "host/carsmooth.c", "host/rivals.c", "host/free.c", "host/aitel.c", "host/lights.c", "host/openworld.c", "host/cov.c", "host/horn.c", "host/feellog.c", "host/phase.c", "host/mc.c", "host/gps.c", "host/gps_tp.c", "host/crashwatch.c"]
 
 
 def compile_native():
@@ -165,9 +165,11 @@ def compile_web():
     srcs = [f"{GEN}/f{k:03d}.c" for k in range(CHUNKS)] + [f"{GEN}/table.c", f"{GEN}/abk.c"]
     # RN_NOCHK=1: guest bounds checks off (host/rt.h), objects in their own folder. Off by default.
     nochk = os.environ.get("RN_NOCHK") == "1"
-    wobj = "build/wobj-nochk/" if nochk else "build/wobj/"
+    # RN_STW=1: the store-watch build (host/rt.h, host/crashwatch.c): last-access address in halt_at, watched stores call rn_stw_hit. Off by default.
+    stw = os.environ.get("RN_STW") == "1"
+    wobj = "build/wobj-nochk/" if nochk else "build/wobj-stw/" if stw else "build/wobj/"
     os.makedirs(wobj, exist_ok=True)
-    flags = ["-O2", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing", "-pthread", *(["-DRN_NOCHK"] if nochk else [])]
+    flags = ["-O2", "-w", "-Ihost", f"-I{GEN}", "-fno-strict-aliasing", "-pthread", *(["-DRN_NOCHK"] if nochk else []), *(["-DRN_STW"] if stw else [])]
     jobs = []
     for s in srcs:
         o = wobj + os.path.basename(s)[:-2] + ".o"
@@ -177,7 +179,7 @@ def compile_web():
     objs = [wobj + os.path.basename(s)[:-2] + ".o" for s in srcs]
     os.makedirs("web/out", exist_ok=True)
     # main() runs in a worker (PROXY_TO_PTHREAD) so guest threads and waits may block.
-    subprocess.run(["emcc", "-O2", "-pthread", "-Ihost", f"-I{GEN}", *HOST, *objs, "-o", "web/out/speed.js",
+    subprocess.run(["emcc", "-O2", "-pthread", "-Ihost", f"-I{GEN}", *(["-DRN_STW"] if stw else []), *HOST, *objs, "-o", "web/out/speed.js",
                     "-sINITIAL_MEMORY=2048MB", "-sSTACK_SIZE=16MB", "-sDEFAULT_PTHREAD_STACK_SIZE=16MB",
                     "-sPROXY_TO_PTHREAD=1", "-sPTHREAD_POOL_SIZE=8", "-sEXIT_RUNTIME=1",
                     "-sMODULARIZE=1", "-sEXPORT_NAME=Speed", "-sEXPORTED_RUNTIME_METHODS=FS,ENV,HEAPU8,HEAP32,HEAPU32,HEAPF64",
