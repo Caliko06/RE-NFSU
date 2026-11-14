@@ -1291,6 +1291,7 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     rng_log(c, dev.frames);
     flow_log(c);
     free_tick(c);
+    crashwatch_present(c);
     world_spawn(c);      // host/openworld.c: RN_SPAWN puts the car at a point after GO
     gps_frame(c);        // host/gps.c: player pose for the GPS map (host/gps.h)
     gps_teleport(c);     // host/gps_tp.c: teleport to the GPS mark

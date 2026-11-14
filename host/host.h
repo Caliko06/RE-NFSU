@@ -43,6 +43,9 @@ void horn_tick(Ctx *c);          // host/horn.c, at each Present next to free_ti
 void rn_player_car(Ctx *c);   // RN_CAR: the player's car in a race (host/rivals.c)
 void free_tick(Ctx *c);          // host/free.c, at each Present
 void world_spawn(Ctx *c);        // host/openworld.c, at each Present: RN_SPAWN
+void crashwatch_present(Ctx *c); // host/crashwatch.c, at each Present (RN_CRASHWATCH, off by default)
+void crashwatch_stop(Ctx *c);
+void crashwatch_free(Ctx *c, uint32_t p);   // from win32.c heap_free (RN_STW build only acts)    // host/crashwatch.c, from rn_stop
 void gps_frame(Ctx *c);        // host/gps.c, at each Present: player pose for the GPS block
 void gps_teleport(Ctx *c);     // host/gps_tp.c, at each Present: teleport the page asked for
 void lights_init(Ctx *c);   // host/lights.c

@@ -256,5 +256,6 @@ void rn_stop(Ctx *c) {
     rn_log("eax=%08x ecx=%08x edx=%08x ebx=%08x esp=%08x ebp=%08x esi=%08x edi=%08x",
            c->r[0], c->r[1], c->r[2], c->r[3], c->r[4], c->r[5], c->r[6], c->r[7]);
     backtrace(c);
+    crashwatch_stop(c);
     exit(0);
 }

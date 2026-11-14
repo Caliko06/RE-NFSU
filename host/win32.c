@@ -120,6 +120,9 @@ static uint32_t heap_alloc(Ctx *c, uint32_t n) {
 }
 static uint32_t heap_size(Ctx *c, uint32_t p) { return (B_SIZE(p - HDR) & ~1u) - HDR; }
 static void heap_free(Ctx *c, uint32_t p) {
+#ifdef RN_STW
+    crashwatch_free(c, p);
+#endif
     uint32_t b = p - HDR, sz = B_SIZE(b) & ~1u;
     uint32_t nx = b + sz;
     if (nx < brk_ptr && !(B_SIZE(nx) & 1)) { unlink_free(c, nx); sz += B_SIZE(nx); }
