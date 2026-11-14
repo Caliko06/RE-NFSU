@@ -1,0 +1,73 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NFSU diag</title>
+<body style="background:#111;color:#ddd;font:14px ui-monospace,Menlo,monospace;padding:16px;white-space:pre-wrap">
+<div id="out">midiendo...</div>
+<script>
+// Read-path diagnosis: the same request the game makes (host/files.c web_read: a synchronous Range XHR from a worker),
+// timed per request with its Resource Timing phases, next to an async fetch of the same ranges and the display cadence.
+// The result is shown and appended to build/web.log (POST /log) as "diag ..." lines.
+const Q = new URLSearchParams(location.search);
+const FILE = location.origin + (Q.get('f') || '/game/Tracks/STREAML1RA.BUN');   // absolute: the worker is a blob
+const MB = +Q.get('mb') || 64;   // file size the ranges stay inside
+const workerSrc = `
+const pct = (a, p) => a.slice().sort((x, y) => x - y)[Math.min(a.length - 1, Math.floor(a.length * p))];
+const line = (name, ts) => name + ': p10 ' + pct(ts, .1).toFixed(1) + ' p50 ' + pct(ts, .5).toFixed(1) + ' p90 ' + pct(ts, .9).toFixed(1) + ' max ' + Math.max(...ts).toFixed(1) + ' ms';
+function syncRun(size, n, base) {
+  const ts = [];
+  for (let i = 0; i < n; i++) {
+    const a = base + i * size, t = performance.now();
+    const x = new XMLHttpRequest();
+    x.open('GET', '${FILE}', false); x.responseType = 'arraybuffer';
+    x.setRequestHeader('Range', 'bytes=' + a + '-' + (a + size - 1));
+    x.send();
+    ts.push(performance.now() - t);
+  }
+  return ts;
+}
+async function asyncRun(size, n, base) {
+  const ts = [];
+  for (let i = 0; i < n; i++) {
+    const a = base + i * size, t = performance.now();
+    const r = await fetch('${FILE}', { headers: { Range: 'bytes=' + a + '-' + (a + size - 1) } });
+    await r.arrayBuffer();
+    ts.push(performance.now() - t);
+  }
+  return ts;
+}
+onmessage = async () => {
+  const out = [];
+  performance.setResourceTimingBufferSize(1000);
+  out.push(line('worker sync XHR 256 KB x60', syncRun(262144, Math.min(60, ${MB} * 4 - 1), 0)));
+  out.push(line('worker sync XHR 4 MB x6', syncRun(4194304, ${MB} >= 44 ? 6 : 1, 0)));
+  // where a sync request's time goes (browser's own phases)
+  const e = performance.getEntriesByType('resource').slice(0, 60);
+  if (e.length) {
+    const ph = (f) => e.map(f);
+    out.push(line('  phase queue (start->requestStart)', ph(x => x.requestStart - x.startTime)));
+    out.push(line('  phase server (requestStart->responseStart)', ph(x => x.responseStart - x.requestStart)));
+    out.push(line('  phase body (responseStart->responseEnd)', ph(x => x.responseEnd - x.responseStart)));
+    out.push('  connections reused: ' + e.filter(x => x.connectStart === x.fetchStart).length + ' of ' + e.length + ', protocol ' + e[0].nextHopProtocol);
+  } else out.push('  no resource timing entries in the worker');
+  out.push(line('worker async fetch 256 KB x60', await asyncRun(262144, Math.min(60, ${MB} * 4 - 1), 0)));
+  postMessage(out);
+};`;
+(async () => {
+  const out = [`diag ${new Date().toISOString()} ${location.origin}`, `ua ${navigator.userAgent}`,
+    `window ${innerWidth}x${innerHeight} dpr ${devicePixelRatio} isolated ${crossOriginIsolated} cores ${navigator.hardwareConcurrency}`];
+  // display cadence for 2 s
+  const fr = []; let last = 0;
+  await new Promise(done => { const f = t => { if (last) fr.push(t - last); last = t; fr.length < 120 ? requestAnimationFrame(f) : done(); }; requestAnimationFrame(f); });
+  fr.sort((a, b) => a - b);
+  out.push(`rAF: p50 ${fr[60].toFixed(1)} p99 ${fr[118].toFixed(1)} max ${fr[119].toFixed(1)} ms`);
+  // ?warm=1: first a whole-file GET (a 200 with Last-Modified, which the browser's HTTP cache may keep)
+  if (Q.get('warm') === '1') { const t = performance.now(); const r = await fetch(FILE); const b = await r.arrayBuffer(); out.push(`whole file GET: ${r.status} ${b.byteLength} bytes ${(performance.now() - t).toFixed(0)} ms`); }
+  const w = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' })));
+  const res = await new Promise(f => { w.onmessage = e => f(e.data); w.postMessage(0); });
+  out.push(...res);
+  const text = out.join('\n');
+  document.getElementById('out').textContent = text;
+  fetch('/log', { method: 'POST', body: out.map(l => 'diag ' + l).join('\n') + '\n' }).catch(() => {});
+})();
+</script>
