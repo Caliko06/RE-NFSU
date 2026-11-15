@@ -141,12 +141,12 @@ function startTelemetry(M, t0, log) {
   const COLORS = { game: '#4c8dff', gpuWait: '#f0a030', gil: '#e5484d', read: '#e8d44d' };
   const STAB_LIMIT = 23, FPS_LIMIT = 16.7;
   // Clock-read call sites seen in spikes (docs/re/hitches.md, census/spikes_history.tsv)
-  const SITE = { 0x474c24: 'física subpasos', 0x585bf7: 'limitador 60 fps', 0x477de0: 'por coche', 0x403a7a: 'reloj del frame' };
+  const SITE = { 0x474c24: 'física subpasos', 0x585bf7: 'limitador 60 fps', 0x477de0: 'por coche', 0x403a7a: 'reloj del frame', 0x540698: 'buscar modelo' };   // 0x540698 inside Solid_FindInAllLists 0x540680 (census/names_assets)
   let stabPtr = 0, raceId = -1, race = null, raceWasOn = false;
   const raceHistory = [], spikeHistory = [];
   const stabRead = () => {
     if (!stabPtr) stabPtr = M._rn_stab_addr();   // host.h RnStab (host/d3d9.c spike_log)
-    const u = U(), f = M.HEAPF32, w = stabPtr >> 2;
+    const u = U(), w = stabPtr >> 2, f = new Float32Array(u.buffer);   // HEAPF32 is not exported (build.py)
     return { racing: u[w], id: u[w + 1], spikes: u[w + 2], lastFrame: u[w + 3], lastMs: f[w + 4],
       sites: [u[w + 5], u[w + 6], u[w + 7]], siteN: [u[w + 8], u[w + 9], u[w + 10]],
       reads: u[w + 11], readKb: u[w + 12], readMs: f[w + 13], holdMs: f[w + 14] };
@@ -213,7 +213,7 @@ function startTelemetry(M, t0, log) {
       `draws ${Math.round(avg('draws'))}   texturas ${(sum('texKb') / 1024 / rspan).toFixed(1)} MB/s   pipes ${sum('pipes')}\n` +
       `disco ${(sum('readKb') / 1024 / rspan).toFixed(1)} MB/s   hilos max ${Math.max(...recent.map(f => f.hold)).toFixed(0)} ms   página ${f1(avg('run'))} ms\n` +
       `audio ${(last[last.length - 1].behind / 44.1).toFixed(0)} ms   silencios ${underruns}   cortes ${starves}   marcas ${marks}\n` +
-      `PICOS: ${spikeHistory.map(s => `${s.t}s ${s.ms.toFixed(1)} ms ${s.cause}${s.site == null ? '' : ` · ${SITE[s.site] || '0x' + s.site.toString(16)} · ${s.readsKb} KB`}`).join('   ') || 'sin picos >23 ms'}`;
+      `PICOS >23 ms:\n${spikeHistory.map(s => `  ${s.t}s ${s.ms.toFixed(1)} ms ${s.cause}${s.site == null ? '' : ` · ${SITE[s.site] || '0x' + s.site.toString(16)} · ${s.readsKb} KB`}`).join('\n') || '  ninguno'}`;
   }
   const setPanel = v => {
     shown = v; panel.style.display = shown ? 'block' : 'none';
