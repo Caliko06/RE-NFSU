@@ -85,7 +85,7 @@ function startInput(M, canvas, steerLog) {
     if (ix) Atomics.add(H(), base + 2, ix);
     if (iy) Atomics.add(H(), base + 3, iy);
   }
-  canvas.addEventListener('mousemove', e => { if (!fromTouch(e)) { cur = null; mouseMove(e.movementX || 0, e.movementY || 0); } });
+  canvas.addEventListener('mousemove', e => { if (!fromTouch(e)) mouseMove(e.movementX || 0, e.movementY || 0); });
   canvas.addEventListener('mousedown', e => {
     canvas.focus();
     if (fromTouch(e)) { e.preventDefault(); return; }
@@ -100,28 +100,6 @@ function startInput(M, canvas, steerLog) {
   // park: the game's own arrow cursor to the bottom-right corner, where it draws off screen. The game adds the mouse
   // delta to its cursor (0x4130d0, DIMOUSESTATE) and clamps it to the client rect (0x4131a0); FEng reads it at 0x4f6080
   // as x-320, y-240 in its 640x480 space, so the corner of the window is past the menu. web/touch.js calls it on phones.
-  let cur = null;   // where a touch last put the game's cursor (640x480 menu units); null = not known (parked, or a real mouse moved it)
-  const park = () => { cur = null; Atomics.add(H(), base + 2, 1 << 20); Atomics.add(H(), base + 3, 1 << 20); };
-  // A touch as the game's mouse (web/touch.js, menus). The cursor only takes motion. From a known place it is one delta. From an
-  // unknown place: a far negative delta clamps it to the top-left corner (0x4131a0), then the point is added; the two must reach
-  // the game in different mouse reads (host/dinput8.c sums what arrives between two reads), so the second waits 100 ms.
-  const wait = ms => new Promise(r => setTimeout(r, ms));
-  const taken = async () => { for (let i = 0; i < 60 && (Atomics.load(H(), base + 2) || Atomics.load(H(), base + 3)); i++) await wait(5); };
-  async function mouseTo(cx, cy) {
-    const r = canvas.getBoundingClientRect();
-    // The cursor is in the menus' own 640x480 units (checked 2026-11-15: a touch on OPTIONS at 844x390 opens it with these, not with
-    // back-buffer pixels). On a screen wider than 4:3 the menus are drawn in the centred 4:3 part.
-    const fe = Math.min(1, r.height * 4 / 3 / r.width), u = Math.min(1, Math.max(0, ((cx - r.left) / r.width - (1 - fe) / 2) / fe));
-    const x = Math.round(u * 640), y = Math.round((cy - r.top) / r.height * 480);
-    if (!cur) {
-      Atomics.add(H(), base + 2, -(1 << 20)); Atomics.add(H(), base + 3, -(1 << 20));
-      await taken(); await wait(100);
-      cur = { x: 0, y: 0 };
-    }
-    Atomics.add(H(), base + 2, x - cur.x); Atomics.add(H(), base + 3, y - cur.y);
-    cur = { x, y };
-    await taken();
-  }
-  const mouseBtn = down => push(0x80000000 | (down ? 0x100 : 0));
-  return { key: setKey, park, mouseTo, mouseBtn };
+  const park = () => { Atomics.add(H(), base + 2, 1 << 20); Atomics.add(H(), base + 3, 1 << 20); };
+  return { key: setKey, park };
 }

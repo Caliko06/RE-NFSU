@@ -9,7 +9,8 @@
 // and back in menu mode on a d-pad press, Start, or 4 s with triggers and buttons released (the post-race screens).
 // Polled in requestAnimationFrame, only while a pad is connected; only changes reach the ring.
 'use strict';
-const PAD_DIK = { esc: 0x01, enter: 0x1c, lshift: 0x2a, space: 0x39, up: 0xc8, left: 0xcb, right: 0xcd, down: 0xd0, camera: 0x2e, respot: 0x13 };
+const PAD_DIK = { esc: 0x01, enter: 0x1c, lshift: 0x2a, space: 0x39, up: 0xc8, left: 0xcb, right: 0xcd, down: 0xd0, camera: 0x2e, respot: 0x13,
+  gup: 0x1e, gdn: 0x2c };   // Shift Up A / Shift Down Z: action table 0x702c98 rows app 7 and 8 (semantic 0x8100041e, 0x8100042c; their other keys are Insert, Delete)
 const PAD_STICK = 0.4, PAD_TRIGGER = 0.3, PAD_IDLE_MS = 4000;
 
 // The menu/drive layout heuristic (web/touch.js reads the game's screens instead). st = { mode, last }; sig = { drive: gas pulled, menu: navigation
