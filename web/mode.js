@@ -41,6 +41,11 @@ const RN_Q = (() => {
   if (q.get('fx') === '0') for (const k of RN_FX_OFF) if (!q.has(k)) q.set(k, RN_ORIGINAL[k]);
   // 30 fps unless ?fps= says otherwise (host RN_FPS, web/boot.js)
   if (RN_PHONE && !q.has('fps')) q.set('fps', '30');
+  // Phones (OWNER 2026-11-15: the blur and the motion looked wrong, the phone ran hot): the game's speed blur off (web/tune.js level 0; the
+  // shipped one lays a half-size zoomed copy of the world over a picture that is already scaled up) and the frame limiter sleeps
+  // instead of spinning (host/win32.c limiter_sleep: in menus the spin held one core at 99 %). ?blur= or ?env=RN_LIMSLEEP=0 say otherwise.
+  if (RN_PHONE && !q.has('blur')) q.set('blur', '0');
+  if (RN_PHONE) q.set('env', ['RN_LIMSLEEP=1', q.get('env')].filter(Boolean).join(','));
   return q;
 })();
 

@@ -23,8 +23,10 @@ const BLUR_DEFAULT = 6;     // PS2 depth (before it: 3 = PS2, OWNER 2026-10-26: 
 // Trail decay k per frame, R G B: shipped BLENDFACTOR 0x008296b4 at 0x409bca (trail 4.4 / 5.6 / 8.6 frames to 5%: the blue tail).
 // Remaster: one k = 0x60 for all three (3.1 frames, white, no blue smear; host/d3d9.c SetRenderState swaps the value), and 'raw'
 // becomes s = 1 (a still lamp = its flare, not 2-3.4x). OWNER 2026-10-31: the trail looked like astigmatism, too aggressive.
-const DECAY = RN_MODE === 'original' ? [0x82, 0x96, 0xb4] : [0x60, 0x60, 0x60];
-const DECAY_RS = RN_MODE === 'original' ? 0 : DECAY.reduce((c, k) => c << 8 | k, 0);
+// Phones keep the short white trail in Original too: at 30 fps the shipped decay lasts twice as long on screen.
+const DECAY_SHIPPED = RN_MODE === 'original' && !RN_PHONE;
+const DECAY = DECAY_SHIPPED ? [0x82, 0x96, 0xb4] : [0x60, 0x60, 0x60];
+const DECAY_RS = DECAY_SHIPPED ? 0 : DECAY.reduce((c, k) => c << 8 | k, 0);
 // D3DCOLOR 0x1fRRGGBB with channel = s (1 - k): the add weight that makes a still light s times its flare.
 const trailColor = s => s === 'raw' && RN_MODE === 'original' ? 0x1fffffff :
   (0x1f000000 | DECAY.reduce((c, k) => c << 8 | Math.min(255, Math.round((s === 'raw' ? 1 : s) * (255 - k))), 0)) >>> 0;

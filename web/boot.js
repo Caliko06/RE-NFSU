@@ -119,7 +119,11 @@ async function download(url, what) {
       // The game draws at the pixels of this window (PATCH 0x408760), at most 2560x1440 to keep the GPU load sane.
       // A phone opened upright still gets a landscape back buffer (the game waits behind the upright gate, web/app.js): the
       // size is fixed here for the whole session.
-      const turned = RN_APP.coarse && innerHeight > innerWidth, vw = turned ? innerHeight : innerWidth, vh = turned ? innerWidth : innerHeight;
+      // Opened from the home screen (no browser bars) the picture is the whole screen: its size comes from screen.*, which does not
+      // depend on how the phone was held at launch (iPhone starts a home-screen app upright; a window size read then left bars).
+      const home = RN_APP.coarse && (navigator.standalone || matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches);
+      const turned = RN_APP.coarse && innerHeight > innerWidth;
+      const vw = home ? Math.max(screen.width, screen.height) : turned ? innerHeight : innerWidth, vh = home ? Math.min(screen.width, screen.height) : turned ? innerWidth : innerHeight;
       const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || (RN_APP.coarse ? 1280 : 2560)), k = Math.min(1, BB / (vw * dpr), BB * 9 / 16 / (vh * dpr));
       // Phones and tablets (coarse pointer): 1280 wide; an iPhone tab at 2560 was killed by iOS after 20-40 s (memory, likely).
       // Even sizes: the layer keeps width and height even (host/win32.c). At k = 1 the canvas gets exactly
@@ -127,7 +131,7 @@ async function download(url, what) {
       const bw = 2 * Math.floor(vw * dpr * k / 2), bh = 2 * Math.floor(vh * dpr * k / 2);
       m.ENV.RN_SCREEN = `${bw}x${bh}`;
       if (k === 1 && !turned) Object.assign(document.getElementById('screen').style, { width: `${bw / dpr}px`, height: `${bh / dpr}px`, margin: 'auto' });
-      line(`screen: window ${innerWidth}x${innerHeight} css, dpr ${dpr}, k ${k.toFixed(3)}, back buffer ${m.ENV.RN_SCREEN}`);
+      line(`screen: window ${innerWidth}x${innerHeight} css${home ? `, home screen ${screen.width}x${screen.height}` : ''}, dpr ${dpr}, k ${k.toFixed(3)}, back buffer ${m.ENV.RN_SCREEN}`);
       // web/mode.js: the original mode turns the native bridges off too (?env= still wins)
       m.ENV.RN_MODE = RN_MODE;
       if (RN_MODE === 'original') {
