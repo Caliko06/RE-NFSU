@@ -72,9 +72,11 @@
       };
       all().then(async files => {
         const stored = new Set(files.keys());
-        // Dev server only (tools/serve.py): an empty browser store starts from the OWNER's save/ folder, so :5180 keeps his profiles
-        if (!files.size && !window.RN_PUBLIC) {
-          const j = await fetch('/save-backup.json').then(r => r.ok ? r.json() : null).catch(() => null);
+        // An empty browser store starts from a save: on the dev server (tools/serve.py) the OWNER's save/ folder, so :5180 keeps
+        // his profiles; on the public build web/seed_save.json, the profile FULL the game made itself (tools/webcheck.mjs typed
+        // the name), so a phone with no keyboard skips the name screen (everything is unlocked for every profile: patches_unlock.py).
+        if (!files.size) {
+          const j = await fetch(window.RN_PUBLIC ? 'seed_save.json' : '/save-backup.json').then(r => r.ok ? r.json() : null).catch(() => null);
           if (j && j.files) for (const k of Object.keys(j.files)) files.set(k, unb64(j.files[k]));
         }
         for (const [k, d] of files) {

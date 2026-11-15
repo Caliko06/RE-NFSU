@@ -111,7 +111,7 @@ function startTouch(input) {
   const say = t => { tip.textContent = t; tip.classList.add('on'); clearTimeout(tipT); tipT = setTimeout(() => tip.classList.remove('on'), 5000); };
   const goFull = () => {
     if (document.documentElement.requestFullscreen) RN_APP.full();
-    else say('En iPhone: toca Compartir y luego "Agregar a inicio". Ábrelo desde ese ícono y el juego llena la pantalla.');
+    else say('iPhone no deja pantalla completa en el navegador. Toca Compartir (Safari: abajo; Chrome: arriba a la derecha) y "Agregar a inicio". Ábrelo desde ese ícono y llena la pantalla.');
   };
 
   // Held keys by DIK, counted over pointers (two thumbs on one key); a release waits out a minimum hold, so a quick tap
