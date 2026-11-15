@@ -16,3 +16,4 @@ Nothing below runs without the OWNER's go for that upload.
 | Cache rule | hostname eq play.<domain> | eligible for cache, edge TTL 1 day | fewer R2 reads (Class B: 10 M/month free, then $0.36/M; a WORLD visit ~2,900 requests, docs/re/public_pack.md) |
 ## Cost (third-party guides, 2026; confirm on Cloudflare's page)
 Storage $0.015/GB-month, 10 GB free; egress free; so ~2 GB fits the free tier. Unknown until live: Range through the cache, Safari/iOS.
+| Redirect rule (live 2026-11-15) | host eq www.nfsu.cc | 301 to concat("https://nfsu.cc", path), query kept | www gave 525 |
