@@ -232,6 +232,7 @@ async function download(url, what) {
   const input = startInput(M, document.getElementById('screen'), /RN_STEERLOG/.test(location.search) ? s => line(s) : null);
   startPad(input);                          // web/pad.js: a gamepad into the same ring
   startTouch(input);                        // web/touch.js: the touch overlay (coarse pointer or ?touch=1) into the same ring
+  startNameKeys(input);                     // web/namekeys.js: on-screen keys for the profile name (touch devices)
   startTune(M);
   startAudio(M, s => line(s)).catch(e => line('audio.js: ' + e.message, 'stop'));
   window.RN_M = M;                          // for checks from the console or tools/webcheck.mjs
