@@ -10,7 +10,7 @@ import hashlib, json, os, re, shutil, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W, D = os.path.join(ROOT, "web"), os.path.join(ROOT, "dist")
-LINK_DIRS = ["gps", "launcher"]
+LINK_DIRS = ["gps", "launcher", "launcher_b"]   # launcher_b = the 3D street behind launcher.html (web/launcher.html:69)
 PAGES = ["index.html", "launcher.html"]
 FLAG = "<script>window.RN_PUBLIC=1;window.RN_V='%s'</script>\n"
 
@@ -37,7 +37,9 @@ for n in sorted(os.listdir(W)):
         if n in PAGES:
             s = open(p, encoding="utf-8").read()
             s = s.replace("<head>", "<head>\n" + FLAG % V, 1)
-            s = re.sub(r'(<script src="[^"?]+)"', r'\1?v=%s"' % V, s)
+            # module scripts and the style sheet too: launcher.css and launcher_b/ sit under the 1-day cache rule (tools/upload_r2.sh)
+            s = re.sub(r'(<script (?:type="module" )?src="[^"?]+)"', r'\1?v=%s"' % V, s)
+            s = re.sub(r'(<link rel="stylesheet" href="[^"?]+)"', r'\1?v=%s"' % V, s)
             open(os.path.join(D, n), "w", encoding="utf-8").write(s)
         else:
             shutil.copy2(p, os.path.join(D, n))
