@@ -97,8 +97,9 @@
   const applies = o => !o.modes || o.modes.includes(mode());
   const save = () => L.save(sel);
   const SHOT = { juego: 'hero', video: 'detail', camara: 'rear', rendimiento: 'low', jugabilidad: 'side', controles: 'hero' };   // the camera goes where the option shows
-  // launcher/ba/<id>_a|_b.webp: real captures of the game at the WORLD start, one run per value (tools/launcher_ba.py)
-  const BA = { bloom: ['Apagado', 'Normal'], remaster: ['Texturas de 2003', 'Texturas remaster'], roadrefl: ['Seco', 'Como el original'], mode: ['Original 2003', 'Remaster'], carlook: ['Con contraste', 'Como 2003'] };
+  // Before/after cards: launcher/ba/<id>_a|_b.webp + two captions per option id (tools/launcher_ba.py crops them). Empty until the captures match:
+  // two runs of WORLD start at different spots with different traffic (2026-11-15, 13 runs), so a pair showed the traffic, not the option.
+  const BA = {};
 
   const helpBox = $('help');
   const setHelp = text => {

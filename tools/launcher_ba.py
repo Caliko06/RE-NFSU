@@ -2,6 +2,8 @@
 Captures: node tools/webcheck.mjs "http://127.0.0.1:5180/?<flag>&traffic=0&play=1&fast=1&go=1&pool=1&mute=1&mode=remaster" 70 <dir>/<name>.png
 with <name>:<flag> = base:x=1 bloom0:bloom=0 rem1:remaster=1 refl:roadrefl=game look:carlook=2003 orig:mode=original (1280x900).
 traffic=0: with traffic every run shows other cars, so the two sides of a card did not match.
+NOT USABLE YET (2026-11-15): the spawn spot and the traffic differ between runs even with traffic=0 (pool=1 refills it), so the
+pairs do not match. Needs a fixed camera and frozen traffic first.
 Usage: .venv/bin/python tools/launcher_ba.py <dir with the captures>"""
 import os, sys
 from PIL import Image
