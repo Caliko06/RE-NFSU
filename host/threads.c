@@ -41,6 +41,8 @@ static unsigned long next_ticket, serving, gen;
 volatile int rn_preempt;
 static uint64_t slice_start, hold_start;
 static uint64_t frame_start, frame_hold_us;   // under the GIL; independent of Telem maxima cleared by the page
+static uint64_t frame_wait_us, frame_other_us;   // per Present interval: main's total wait for the GIL, longest hold by another thread
+static uint32_t frame_other_who;                // start address of that thread (spike lines, host/d3d9.c spike_log)
 static uint64_t free_since;     // the GIL was passed on (under gm) to a thread that waits for it; 0 = it was taken
 static __thread int is_main;
 static __thread uint32_t self_start;    // the guest thread's start address (telemetry hold_other_who)
@@ -93,6 +95,7 @@ void gil_acquire(void) {
     pthread_mutex_unlock(&gm);
     slice_start = hold_start = now_us();
     *(is_main ? &rn_telem.gil_main_ms : &rn_telem.gil_other_ms) += (double)(slice_start - t0) / 1000;
+    if (is_main) frame_wait_us += slice_start - t0;
 }
 // Windows preempts a thread when its quantum (about 20 ms on XP) ends. A guest that polls for work
 // done by another thread relies on it. The GIL holder gives its turn away at the next API call
@@ -151,9 +154,14 @@ static void count_hold(void) {
         rn_telem.hold_main_us += (uint32_t)us;
         if (held > rn_telem.hold_main_max_ms) rn_telem.hold_main_max_ms = held;
     } else {
+        if (us > frame_other_us) frame_other_us = us, frame_other_who = self_start;
         rn_telem.hold_other_us += (uint32_t)us;
         if (held > rn_telem.hold_other_max_ms) { rn_telem.hold_other_max_ms = held; rn_telem.hold_other_who = self_start; }
     }
+}
+void gil_frame_detail(float *wait_ms, float *other_ms, uint32_t *who) {
+    *wait_ms = (float)(frame_wait_us / 1000.0), *other_ms = (float)(frame_other_us / 1000.0), *who = frame_other_who;
+    frame_wait_us = frame_other_us = 0, frame_other_who = 0;
 }
 float gil_frame_hold_ms(void) {
     uint64_t now = now_us(), start = hold_start > frame_start ? hold_start : frame_start;

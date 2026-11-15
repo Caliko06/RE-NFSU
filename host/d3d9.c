@@ -834,7 +834,9 @@ static void spike_log(Ctx *c) {
     static uint32_t clk0, reads0, kb0, race0;
     static double ms0;
     uint64_t t = now_us();
-    float hold_ms = gil_frame_hold_ms();
+    float hold_ms = gil_frame_hold_ms(), wait_ms, other_ms;
+    uint32_t other_who;
+    gil_frame_detail(&wait_ms, &other_ms, &other_who);
     // Counted only while the HUD is up: the grid's load (model lookups, sound banks) and the pause menu stay out
     // (build/stab_route.out: 3 of 4 frames > 23 ms came before "d3d9 race HUD"). A new rn_race starts a new race_id.
     uint32_t racing = rn_racing() && rn_hud_on;
@@ -875,8 +877,8 @@ static void spike_log(Ctx *c) {
                 snprintf(pxy, sizeof pxy, ", pxy %.0f,%.0f", x, y);
             }
         }
-        rn_log("spike: frame %u %.1f ms, clock %u:%s, reads %u (%u KB, %.1f ms)%s", rn_telem.presents, (t - t0) / 1000.0,
-               rn_telem.clock_calls - clk0, top, rn_telem.reads - reads0, rn_telem.read_kb - kb0, rn_telem.read_ms - ms0, pxy);
+        rn_log("spike: frame %u %.1f ms, clock %u:%s, reads %u (%u KB, %.1f ms), main waited %.1f ms, other hold %.1f ms by 0x%x%s", rn_telem.presents, (t - t0) / 1000.0,
+               rn_telem.clock_calls - clk0, top, rn_telem.reads - reads0, rn_telem.read_kb - kb0, rn_telem.read_ms - ms0, wait_ms, other_ms, other_who, pxy);
     }
     memset(rn_clk_n, 0, sizeof rn_clk_n);
     t0 = t, clk0 = rn_telem.clock_calls, reads0 = rn_telem.reads, kb0 = rn_telem.read_kb, ms0 = rn_telem.read_ms;
