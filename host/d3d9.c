@@ -825,6 +825,7 @@ static void pace_sleep(void) {}
 // reads: a long busy wait names its loop, a frame with few clock reads is the game's own work.
 extern uint32_t rn_clk_site[8], rn_clk_n[8];
 static RnStab rn_stab;
+static int rn_hud_on;   // the race HUD is up this frame (set where "d3d9 race HUD" is logged): the window the OWNER drives in
 #ifdef __EMSCRIPTEN__
 EMSCRIPTEN_KEEPALIVE uint32_t rn_stab_addr(void) { return (uint32_t)(uintptr_t)&rn_stab; }
 #endif
@@ -834,13 +835,15 @@ static void spike_log(Ctx *c) {
     static double ms0;
     uint64_t t = now_us();
     float hold_ms = gil_frame_hold_ms();
-    uint32_t racing = rn_racing();
-    if (racing && (!rn_stab.racing || race0 != rn_race)) {
+    // Counted only while the HUD is up: the grid's load (model lookups, sound banks) and the pause menu stay out
+    // (build/stab_route.out: 3 of 4 frames > 23 ms came before "d3d9 race HUD"). A new rn_race starts a new race_id.
+    uint32_t racing = rn_racing() && rn_hud_on;
+    if (racing && (!rn_stab.race_id || race0 != rn_race)) {
         uint32_t id = rn_stab.race_id + 1;
         rn_stab = (RnStab){.race_id = id};
+        race0 = rn_race;
     }
     rn_stab.racing = racing;
-    race0 = rn_race;
     if (t0 && t - t0 > 23000 && racing) {
         rn_stab.spikes++;
         rn_stab.last_frame = rn_telem.presents;
@@ -2959,6 +2962,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     FeNode *fen = NULL;
     if (feo) { fe_tree_frame(c); fen = fe_node_at(feo); fe_log(c); }
     int hud = race && (fen ? fen->hud : !menu), screen = race && fen && !fen->hud;
+    rn_hud_on = hud;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); rn_fixedclock_start(c); }
     if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 8, w1); mc_hook(c); }

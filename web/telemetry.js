@@ -71,7 +71,8 @@ function startTelemetry(M, t0, log) {
         if (live.length > N) live.shift();
         const stab = stabRead();
         sampleRace(acc.dt, t, stab);
-        if (acc.dt > STAB_LIMIT) {
+        if (acc.dt > STAB_LIMIT && !stab.racing) loadSpikes++;   // grid load or pause: shown apart, not in the verdict
+        else if (acc.dt > STAB_LIMIT) {
           const cause = [['juego', acc.game], ['GPU', acc.gpuWait], ['hilos', acc.gil], ['disco', acc.read]].sort((a, b) => b[1] - a[1])[0][0];
           const matched = stab && Math.abs(acc.dt - stab.lastMs) <= 2.5;
           spikeHistory.push({ t: Math.round((t - t0) / 1000), ms: acc.dt, cause,
@@ -142,11 +143,13 @@ function startTelemetry(M, t0, log) {
   const STAB_LIMIT = 23, FPS_LIMIT = 16.7;
   // Clock-read call sites seen in spikes (docs/re/hitches.md, census/spikes_history.tsv)
   const SITE = { 0x474c24: 'física subpasos', 0x585bf7: 'limitador 60 fps', 0x477de0: 'por coche', 0x403a7a: 'reloj del frame', 0x540698: 'buscar modelo' };   // 0x540698 inside Solid_FindInAllLists 0x540680 (census/names_assets)
-  let stabPtr = 0, raceId = -1, race = null, raceWasOn = false;
+  let loadSpikes = 0, f32 = new Float32Array(0), stabPtr = 0, raceId = -1, race = null, raceWasOn = false;
   const raceHistory = [], spikeHistory = [];
   const stabRead = () => {
     if (!stabPtr) stabPtr = M._rn_stab_addr();   // host.h RnStab (host/d3d9.c spike_log)
-    const u = U(), w = stabPtr >> 2, f = new Float32Array(u.buffer);   // HEAPF32 is not exported (build.py)
+    const u = U(), w = stabPtr >> 2;
+    if (f32.buffer !== u.buffer) f32 = new Float32Array(u.buffer);   // HEAPF32 is not exported (build.py); a grown heap is a new buffer
+    const f = f32;
     return { racing: u[w], id: u[w + 1], spikes: u[w + 2], lastFrame: u[w + 3], lastMs: f[w + 4],
       sites: [u[w + 5], u[w + 6], u[w + 7]], siteN: [u[w + 8], u[w + 9], u[w + 10]],
       reads: u[w + 11], readKb: u[w + 12], readMs: f[w + 13], holdMs: f[w + 14] };
@@ -208,7 +211,7 @@ function startTelemetry(M, t0, log) {
     panelBody.textContent =
       `carrera ${h?.id || 0}   ${h?.racing ? 'EN CURSO' : 'ESPERANDO'}   ${raceData.frames || 0} frames   >23 ms ${raceData.over23ms ?? race?.over23 ?? 0}\n` +
       `p99 ${f1(raceData.p99ms || 0)} ms   peor ${f1(raceData.worstMs || 0)} ms   <=16.7 ${(raceData.atOrBelow16_7Pct || 0).toFixed(1)}%   ${(raceData.elapsedSec || 0).toFixed(1)} s\n` +
-      `ahora ${((last.length - 1) / span).toFixed(0)} fps  ${f1(avg('dt'))} ms   >23: ${over23}   lagazos >50: ${lag}\n` +
+      `ahora ${((last.length - 1) / span).toFixed(0)} fps  ${f1(avg('dt'))} ms   >23: ${over23}   lagazos >50: ${lag}   carga >23: ${loadSpikes}\n` +
       `juego ${f1(avg('game'))}   GPU ${f1(avg('gpuWait'))}   hilos ${f1(avg('gil'))}   disco ${f1(avg('read'))} ms\n` +
       `draws ${Math.round(avg('draws'))}   texturas ${(sum('texKb') / 1024 / rspan).toFixed(1)} MB/s   pipes ${sum('pipes')}\n` +
       `disco ${(sum('readKb') / 1024 / rspan).toFixed(1)} MB/s   hilos max ${Math.max(...recent.map(f => f.hold)).toFixed(0)} ms   página ${f1(avg('run'))} ms\n` +
@@ -223,7 +226,8 @@ function startTelemetry(M, t0, log) {
     try { localStorage.setItem('rn-live', shown ? '1' : '0'); } catch {}
   };
   addEventListener('keydown', e => {
-    if (e.code !== 'F9' && e.code !== 'KeyE') return;
+    // E only while driving (HUD up) and not in a text field: the front end takes typed letters (profile name).
+    if (e.code !== 'F9' && !(e.code === 'KeyE' && stabRead().racing && !e.target.closest?.('input,textarea'))) return;
     e.preventDefault(); e.stopImmediatePropagation();
     if (e.repeat) return;
     setPanel(!shown);
