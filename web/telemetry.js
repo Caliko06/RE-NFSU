@@ -69,6 +69,15 @@ function startTelemetry(M, t0, log) {
         acc.game = Math.max(0, acc.dt - acc.gpuWait - acc.gil - acc.read);
         live.push(acc);
         if (live.length > N) live.shift();
+        const stab = stabRead();
+        sampleRace(acc.dt, t, stab);
+        if (acc.dt > STAB_LIMIT) {
+          const cause = [['juego', acc.game], ['GPU', acc.gpuWait], ['hilos', acc.gil], ['disco', acc.read]].sort((a, b) => b[1] - a[1])[0][0];
+          const matched = stab && Math.abs(acc.dt - stab.lastMs) <= 2.5;
+          spikeHistory.push({ t: Math.round((t - t0) / 1000), ms: acc.dt, cause,
+            site: matched ? stab.sites[0] : null, readsKb: matched ? stab.readKb : null });
+          if (spikeHistory.length > 5) spikeHistory.shift();
+        }
       }
       lastPresent = t; acc = null;
     }
@@ -115,19 +124,58 @@ function startTelemetry(M, t0, log) {
   let noteTimer = 0;
   const show = (text, ms) => { note.textContent = text; note.style.display = 'block'; clearTimeout(noteTimer); noteTimer = setTimeout(() => note.style.display = 'none', ms); };
   let marks = 0;
-  // F9: the live panel (top right). "juego+espera" = the game's code, its own busy wait for the next frame included. Stacked bars per frame: game code, waiting for the page/GPU, waiting for another
-  // guest thread (GIL), file reads. Lines at 16.7 ms (60 fps) and 33 ms (30 fps).
+  // F9 or E: live frame and race stability. E is unbound in GameActionTable 0x702c98.
   const panel = document.createElement('div');
-  Object.assign(panel.style, { position: 'fixed', top: '8px', right: '8px', width: '400px', padding: '8px 10px',
-    background: 'rgba(8,10,14,.82)', color: '#d6dde6', font: '12px/1.45 ui-monospace, Menlo, monospace', borderRadius: '6px',
+  Object.assign(panel.style, { position: 'fixed', top: '8px', right: '8px', width: '430px', padding: '12px 14px',
+    background: 'linear-gradient(145deg, rgba(8,15,28,.96), rgba(15,10,27,.94))', color: '#e7f2ff', font: '12px/1.45 ui-monospace, Menlo, monospace',
+    border: '1px solid rgba(89,190,255,.55)', borderTop: '3px solid #48d9ff', borderRadius: '10px',
+    boxShadow: '0 8px 36px rgba(0,0,0,.5), 0 0 22px rgba(20,175,255,.15)',
     pointerEvents: 'none', display: 'none', zIndex: 9, whiteSpace: 'pre' });
   const graph = document.createElement('canvas'), text = document.createElement('div');
-  graph.width = 720; graph.height = 160; graph.style.width = '400px'; graph.style.height = '80px';
-  panel.append(text, graph);
+  graph.width = 860; graph.height = 180; graph.style.width = '430px'; graph.style.height = '90px';
+  panel.append(text);
   document.body.appendChild(panel);
-  let shown = false;
+  let shown = RN_Q.get('live') === '1', panelTimer = 0;
   try { shown = localStorage.getItem('rn-live') === '1'; } catch {}
+  if (RN_Q.get('live') === '1') shown = true;
   const COLORS = { game: '#4c8dff', gpuWait: '#f0a030', gil: '#e5484d', read: '#e8d44d' };
+  const STAB_LIMIT = 23, FPS_LIMIT = 16.7;
+  // Clock-read call sites seen in spikes (docs/re/hitches.md, census/spikes_history.tsv)
+  const SITE = { 0x474c24: 'física subpasos', 0x585bf7: 'limitador 60 fps', 0x477de0: 'por coche', 0x403a7a: 'reloj del frame' };
+  let stabPtr = 0, raceId = -1, race = null, raceWasOn = false;
+  const raceHistory = [], spikeHistory = [];
+  const stabRead = () => {
+    if (!stabPtr) stabPtr = M._rn_stab_addr();   // host.h RnStab (host/d3d9.c spike_log)
+    const u = U(), f = M.HEAPF32, w = stabPtr >> 2;
+    return { racing: u[w], id: u[w + 1], spikes: u[w + 2], lastFrame: u[w + 3], lastMs: f[w + 4],
+      sites: [u[w + 5], u[w + 6], u[w + 7]], siteN: [u[w + 8], u[w + 9], u[w + 10]],
+      reads: u[w + 11], readKb: u[w + 12], readMs: f[w + 13], holdMs: f[w + 14] };
+  };
+  const newRace = (id, t) => ({ id, start: t, end: t, frames: 0, over23: 0, under167: 0, worst: 0, hist: new Map() });
+  const raceSummary = r => {
+    const rank = Math.max(1, Math.ceil(r.frames * .99)); let seen = 0, p99 = 0;
+    for (const [bucket, count] of [...r.hist].sort((a, b) => a[0] - b[0])) { seen += count; if (seen >= rank) { p99 = bucket / 1000; break; } }
+    return { raceId: r.id, frames: r.frames, over23ms: r.over23, p99ms: p99, worstMs: r.worst,
+      atOrBelow16_7Pct: r.frames ? 100 * r.under167 / r.frames : 0, elapsedSec: Math.max(0, (r.end - r.start) / 1000),
+      verdict: r.over23 === 0 ? 'ESTABLE' : 'INESTABLE' };   // OWNER 2026-11-14: no race frame over 23 ms (p99 shown, the 1/60 limiter keeps it near 18)
+  };
+  const finishRace = () => {
+    if (!race || !race.frames) return;
+    raceHistory.push(raceSummary(race)); if (raceHistory.length > 100) raceHistory.shift();
+  };
+  const sampleRace = (dt, t, h) => {
+    if (!h) return;
+    if (h.id !== raceId) { finishRace(); raceId = h.id; race = h.racing ? newRace(h.id, t) : null; raceWasOn = !!h.racing; }
+    if (!h.racing) { if (raceWasOn) finishRace(); race = null; raceWasOn = false; return; }
+    if (!race) race = newRace(h.id, t);
+    raceWasOn = true; race.end = t; race.frames++; race.worst = Math.max(race.worst, dt);
+    if (dt > STAB_LIMIT) race.over23++;
+    if (dt <= FPS_LIMIT) race.under167++;
+    const bin = Math.floor(dt * 1000); race.hist.set(bin, (race.hist.get(bin) || 0) + 1);
+  };
+  const panelTitle = document.createElement('div'), panelBody = document.createElement('div');
+  Object.assign(panelTitle.style, { color: '#58dcff', font: 'bold 14px/1.3 ui-monospace,Menlo,monospace', letterSpacing: '.08em', marginBottom: '5px' });
+  text.append(panelTitle, panelBody); panel.append(graph);
   function draw() {
     if (!shown || !live.length) return;
     const g = graph.getContext('2d'), H = graph.height, sy = H / 50;           // 50 ms tall
@@ -141,36 +189,58 @@ function startTelemetry(M, t0, log) {
       }
       if (f.dt > 50) { g.fillStyle = '#ff3b3b'; g.fillRect(i * bw, 0, Math.max(2, bw), 6); }
     });
-    g.fillStyle = 'rgba(255,255,255,.35)';
-    g.fillRect(0, H - 16.7 * sy, graph.width, 1); g.fillRect(0, H - 33.3 * sy, graph.width, 1);
+    g.fillStyle = 'rgba(255,255,255,.28)'; g.fillRect(0, H - FPS_LIMIT * sy, graph.width, 1);
+    g.fillStyle = '#ff6b59'; g.fillRect(0, H - STAB_LIMIT * sy, graph.width, 2);
+    g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(0, H - 33.3 * sy, graph.width, 1);
     const last = live.slice(-60), recent = live.slice(-300);
     const span = (last[last.length - 1].t - last[0].t) / 1000 || 1;
     const avg = k => last.reduce((a, f) => a + f[k], 0) / last.length;
     const worst = Math.max(...recent.map(f => f.dt));
     const sum = (k, a = recent) => a.reduce((x, f) => x + f[k], 0);
     const rspan = (recent[recent.length - 1].t - recent[0].t) / 1000 || 1;
-    const lag = recent.filter(f => f.dt > 50).length;
+    const lag = recent.filter(f => f.dt > 50).length, over23 = recent.filter(f => f.dt > STAB_LIMIT).length;
     const f1 = x => x.toFixed(1).padStart(5);
-    text.textContent =
-      `${(last.length - 1) / span >= 0 ? ((last.length - 1) / span).toFixed(0) : '-'} fps   frame ${f1(avg('dt'))} ms   peor ${worst.toFixed(0)} ms   lagazos ${lag}\n` +
-      `juego+espera ${f1(avg('game'))}  gpu ${f1(avg('gpuWait'))}  hilos ${f1(avg('gil'))}  disco ${f1(avg('read'))} ms\n` +
-      `draws ${Math.round(avg('draws'))}   texturas ${(sum('texKb') / 1024 / rspan).toFixed(1)} MB/s   pipelines ${sum('pipes')}\n` +
-      `disco ${(sum('readKb') / 1024 / rspan).toFixed(1)} MB/s   GIL max ${Math.max(...recent.map(f => f.hold)).toFixed(0)} ms   página ${f1(avg('run'))} ms\n` +
-      `audio ${(last[last.length - 1].behind / 44.1).toFixed(0)} ms   silencios ${underruns}   cortes stream ${starves}   marcas ${marks}`;
+    const h = stabRead(), rs = race ? raceSummary(race) : raceHistory[raceHistory.length - 1];
+    const badge = rs ? rs.verdict : 'FUERA DE CARRERA';
+    panelTitle.textContent = `ESTABILIDAD / 60 FPS   ${badge}`;
+    panelTitle.style.color = badge === 'ESTABLE' ? '#55eea2' : badge === 'INESTABLE' ? '#ff5575' : '#8fa7bd';
+    const raceData = race ? rs : rs || {};
+    panelBody.textContent =
+      `carrera ${h?.id || 0}   ${h?.racing ? 'EN CURSO' : 'ESPERANDO'}   ${raceData.frames || 0} frames   >23 ms ${raceData.over23ms ?? race?.over23 ?? 0}\n` +
+      `p99 ${f1(raceData.p99ms || 0)} ms   peor ${f1(raceData.worstMs || 0)} ms   <=16.7 ${(raceData.atOrBelow16_7Pct || 0).toFixed(1)}%   ${(raceData.elapsedSec || 0).toFixed(1)} s\n` +
+      `ahora ${((last.length - 1) / span).toFixed(0)} fps  ${f1(avg('dt'))} ms   >23: ${over23}   lagazos >50: ${lag}\n` +
+      `juego ${f1(avg('game'))}   GPU ${f1(avg('gpuWait'))}   hilos ${f1(avg('gil'))}   disco ${f1(avg('read'))} ms\n` +
+      `draws ${Math.round(avg('draws'))}   texturas ${(sum('texKb') / 1024 / rspan).toFixed(1)} MB/s   pipes ${sum('pipes')}\n` +
+      `disco ${(sum('readKb') / 1024 / rspan).toFixed(1)} MB/s   hilos max ${Math.max(...recent.map(f => f.hold)).toFixed(0)} ms   página ${f1(avg('run'))} ms\n` +
+      `audio ${(last[last.length - 1].behind / 44.1).toFixed(0)} ms   silencios ${underruns}   cortes ${starves}   marcas ${marks}\n` +
+      `PICOS: ${spikeHistory.map(s => `${s.t}s ${s.ms.toFixed(1)} ms ${s.cause}${s.site == null ? '' : ` · ${SITE[s.site] || '0x' + s.site.toString(16)} · ${s.readsKb} KB`}`).join('   ') || 'sin picos >23 ms'}`;
   }
-  setInterval(draw, 250);
-  addEventListener('keydown', e => {
-    if (e.code !== 'F9') return;
-    e.preventDefault(); e.stopPropagation();
-    if (e.repeat) return;
-    shown = !shown; panel.style.display = shown ? 'block' : 'none';
+  const setPanel = v => {
+    shown = v; panel.style.display = shown ? 'block' : 'none';
+    if (panelTimer) clearInterval(panelTimer);
+    panelTimer = shown ? setInterval(draw, 250) : 0;
+    if (shown) draw();
     try { localStorage.setItem('rn-live', shown ? '1' : '0'); } catch {}
+  };
+  addEventListener('keydown', e => {
+    if (e.code !== 'F9' && e.code !== 'KeyE') return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if (e.repeat) return;
+    setPanel(!shown);
   }, true);
-  if (shown) panel.style.display = 'block';
+  if (shown) { panel.style.display = 'block'; panelTimer = setInterval(draw, 250); }
   setInterval(() => event('heap', { mb: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : -1 }), 5000);
 
+  let renderer = '';
+  try {
+    const c = document.createElement('canvas'), gl = c.getContext('webgl') || c.getContext('webgl2');
+    renderer = gl?.getExtension('WEBGL_debug_renderer_info')?.UNMASKED_RENDERER_WEBGL &&
+      gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) || gl?.getParameter(gl.RENDERER) || '';
+  } catch {}
+  const machine = { hardwareConcurrency: navigator.hardwareConcurrency || null, deviceMemoryGb: navigator.deviceMemory || null,
+    gpuRenderer: renderer || null, dev: RN_Q.get('dev') || null };
   const head = { kind: 'session', url: location.href, date: new Date().toISOString(), ua: navigator.userAgent,
-    screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, cols: TELEM_COLS };
+    screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, machine, cols: TELEM_COLS };
   if (SEND) fetch('/telemetry?new', { method: 'POST', body: JSON.stringify(head) + '\n' }).then(r => {
     if (r.ok) return;
     log(`telemetry: the server answered ${r.status}: restart tools/serve.py`);
@@ -197,7 +267,8 @@ function startTelemetry(M, t0, log) {
     event('stop', {}); flush();
     setTimeout(() => location.replace('about:blank'), 1500);
   }, stopAfter * 1000);
-  log('telemetry: on, B or F8 = mark, F9 = live panel, F10 = download the session');
+  log('telemetry: on, B/F8 = marca, E/F9 = panel (?live=1), F10 = reporte');
   return { frame, event: (kind, data) => { if (kind === 'mark') marks = data.n; event(kind, data); },
-    dump: () => ({ cols: TELEM_COLS, rows: allRows, events: allEvents }) };
+    dump: () => ({ cols: TELEM_COLS, rows: allRows, events: allEvents, machine,
+      stability: { races: [...raceHistory, ...(race && race.frames ? [raceSummary(race)] : [])], spikes: spikeHistory } }) };
 }
