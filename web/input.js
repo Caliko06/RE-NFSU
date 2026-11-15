@@ -71,7 +71,13 @@ function startInput(M, canvas, steerLog) {
     if (!ex && document.pointerLockElement === canvas) document.exitPointerLock();
   }
   setInterval(mouseMode, 250);
-  canvas.addEventListener('mousemove', e => {   // iOS synthesizes mouse events from taps, without movementX
+  // A tap makes the browser fire mouse events too (iOS without movementX): they would click wherever the game's cursor is.
+  // Touch input goes through web/touch.js only, so mouse events within 1 s of a touch are dropped.
+  let touchAt = -1e9;
+  addEventListener('touchstart', () => { touchAt = performance.now(); }, { capture: true, passive: true });
+  const fromTouch = e => e.sourceCapabilities?.firesTouchEvents || performance.now() - touchAt < 1000;
+  canvas.addEventListener('mousemove', e => {
+    if (fromTouch(e)) return;
     const r = canvas.getBoundingClientRect();
     if (!r.width || !r.height) return;
     remX += (e.movementX || 0) * (canvas.gameW || canvas.width) / r.width;
@@ -83,13 +89,18 @@ function startInput(M, canvas, steerLog) {
   });
   canvas.addEventListener('mousedown', e => {
     canvas.focus();
+    if (fromTouch(e)) { e.preventDefault(); return; }
     if (exclusive() && document.pointerLockElement !== canvas) canvas.requestPointerLock?.()?.catch?.(() => {});   // iOS Safari has no pointer lock
     push(0x80000100 | btn[e.button]);
     e.preventDefault();
   });
-  canvas.addEventListener('mouseup', e => push(0x80000000 | btn[e.button]));
+  canvas.addEventListener('mouseup', e => { if (!fromTouch(e)) push(0x80000000 | btn[e.button]); });
   canvas.addEventListener('wheel', e => { Atomics.add(H(), base + 4, e.deltaY < 0 ? 120 : -120); e.preventDefault(); }, { passive: false });
   canvas.addEventListener('contextmenu', e => e.preventDefault());
   canvas.focus();
-  return { key: setKey };
+  // park: the game's own arrow cursor to the bottom-right corner, where it draws off screen. The game adds the mouse
+  // delta to its cursor (0x4130d0, DIMOUSESTATE) and clamps it to the client rect (0x4131a0); FEng reads it at 0x4f6080
+  // as x-320, y-240 in its 640x480 space, so the corner of the window is past the menu. web/touch.js calls it on phones.
+  const park = () => { Atomics.add(H(), base + 2, 1 << 20); Atomics.add(H(), base + 3, 1 << 20); };
+  return { key: setKey, park };
 }

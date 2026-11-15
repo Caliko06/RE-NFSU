@@ -93,12 +93,14 @@ const RN_APP = (() => {
 
   // Phones and tablets: the first touch asks for the whole screen and a landscape lock (Android Chrome has both; iPhone Safari
   // has neither, so there the upright gate is the answer). A tap on the upright gate asks again.
+  // Every touch asks again while the page is not full screen (a swipe can leave it); web/touch.js has a button for it too.
   const full = () => {
     const d = document.documentElement;
     if (!coarse || document.fullscreenElement || !d.requestFullscreen) return;
     d.requestFullscreen({ navigationUI: 'hide' }).then(() => screen.orientation?.lock?.('landscape')).catch(() => {});
   };
-  addEventListener('touchend', full, { capture: true, once: true });
+  app.full = full;
+  addEventListener('touchend', full, { capture: true });
   gate.addEventListener('click', full);
 
   // Until the game runs it gets no keys or taps (F keys and K, the bindings overlay, stay): a key pressed over the

@@ -123,7 +123,10 @@ async function profile() {
 if (route) await send('Emulation.setDeviceMetricsOverride', { ...ROUTE.view, deviceScaleFactor: 1, mobile: false });
 // RN_VIEW=WxH@dpr: the page at the OWNER's window size and pixel ratio (a stop can depend on the back buffer size).
 const view = process.env.RN_VIEW?.match(/^(\d+)x(\d+)@([\d.]+)$/);
-if (view) await send('Emulation.setDeviceMetricsOverride', { width: +view[1], height: +view[2], deviceScaleFactor: +view[3], mobile: false });
+// RN_MOBILE=1 (with RN_VIEW): a phone, with touch and a coarse pointer, so web/touch.js and the phone paths turn on.
+const mobile = process.env.RN_MOBILE === '1';
+if (view) await send('Emulation.setDeviceMetricsOverride', { width: +view[1], height: +view[2], deviceScaleFactor: +view[3], mobile });
+if (mobile) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 // RN_REC=dir: every frame the compositor makes (CDP screencast, jpeg) -> dir/<page ms>.jpg; tools/recvideo.sh turns them
 // into a video with the real frame times (A/B against the Wine reference recording, tools/wine/rec.sh).
 const rec = process.env.RN_REC;
