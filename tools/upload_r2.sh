@@ -18,9 +18,11 @@ rclone copy dist "r2:$B" --filter "- out/speed.wasm" --filter "- _headers" --fil
 rclone copy dist "r2:$B" --filter "- _headers" --filter "+ /*.{html,js,json,webmanifest}" --filter "- **" --ignore-times --transfers 16 \
   --s3-no-check-bucket --header-upload "Cache-Control: no-cache"
 # speed.wasm 70 MB -> ~16 MB: stored gzipped, sent with Content-Encoding: gzip, the browser unpacks it (fetched whole, no Range).
+# --ignore-times: a same-size re-run otherwise only updates the mod time by a server-side copy, which drops Content-Encoding (2026-11-15:
+# the live page then got raw gzip and stopped: "expected magic word 00 61 73 6d, found 1f 8b").
 T=$(mktemp -d)
 gzip -9c dist/out/speed.wasm > "$T/speed.wasm"
-rclone copyto "$T/speed.wasm" "r2:$B/out/speed.wasm" --s3-no-check-bucket --header-upload "$CACHE" \
+rclone copyto "$T/speed.wasm" "r2:$B/out/speed.wasm" --ignore-times --s3-no-check-bucket --header-upload "Cache-Control: no-cache" \
   --header-upload "Content-Encoding: gzip" --header-upload "Content-Type: application/wasm"
 rm -rf "$T"
 echo "uploaded dist/ to r2:$B ($(python3 -c 'import json;print(round(json.load(open("dist/manifest.json"))["bytes"]/1e9,2))') GB)"
