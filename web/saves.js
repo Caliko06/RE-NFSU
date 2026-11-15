@@ -75,9 +75,10 @@
         // An empty browser store starts from a save: on the dev server (tools/serve.py) the OWNER's save/ folder, so :5180 keeps
         // his profiles; on the public build web/seed_save.json, the profile FULL the game made itself (tools/webcheck.mjs typed
         // the name), so a phone with no keyboard skips the name screen (everything is unlocked for every profile: patches_unlock.py).
-        if (!files.size) {
+        // A visit that stopped at the name screen already stored the game's "DirectInput user maps.txt": no Profiles.usr is the test.
+        if (window.RN_PUBLIC ? !files.has('Profiles.usr') : !files.size) {
           const j = await fetch(window.RN_PUBLIC ? 'seed_save.json' : '/save-backup.json').then(r => r.ok ? r.json() : null).catch(() => null);
-          if (j && j.files) for (const k of Object.keys(j.files)) files.set(k, unb64(j.files[k]));
+          if (j && j.files) for (const k of Object.keys(j.files)) { files.set(k, unb64(j.files[k])); stored.delete(k); }
         }
         for (const [k, d] of files) {
           const parts = k.split('/'); let p = '/save';
