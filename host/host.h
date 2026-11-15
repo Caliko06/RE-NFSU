@@ -146,6 +146,15 @@ typedef struct {
     uint32_t hold_other_who;    // start address of the thread behind hold_other_max_ms (the page clears it with the max)
 } Telem;
 extern Telem rn_telem;
+// RnStab: 60 bytes, little-endian 4-byte u32/f32 fields; racing updates every Present, spike data persists until the next spike or race.
+typedef struct {
+    uint32_t racing, race_id, spikes, last_frame;
+    float last_ms;
+    uint32_t site[3], site_n[3];
+    uint32_t last_reads, last_read_kb;
+    float last_read_ms, last_hold_ms;
+} RnStab;
+float gil_frame_hold_ms(void);   // largest GIL hold within this Present interval; resets its separate frame maximum
 void dispatch_threads_report(void);                             // log what every guest thread is doing now
 void threads_init(Ctx *main_ctx);
 void rn_stop(Ctx *c);                                          // report the halt and end the process

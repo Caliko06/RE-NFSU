@@ -821,21 +821,43 @@ static void pace_sleep(void) {}
 #endif
 
 // Spike probe for the OWNER's F10 (OWNER log 2026-11-01 03:37: 47 race frames > 22 ms, no pipeline or texture work in them).
-// A race frame longer than 25 ms (Present to Present) logs its clock reads by call site (host/win32.c clk_site) and its file
+// A race frame longer than 23 ms (Present to Present) logs its clock reads by call site (host/win32.c clk_site) and its file
 // reads: a long busy wait names its loop, a frame with few clock reads is the game's own work.
 extern uint32_t rn_clk_site[8], rn_clk_n[8];
+static RnStab rn_stab;
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE uint32_t rn_stab_addr(void) { return (uint32_t)(uintptr_t)&rn_stab; }
+#endif
 static void spike_log(Ctx *c) {
     static uint64_t t0;
-    static uint32_t clk0, reads0, kb0;
+    static uint32_t clk0, reads0, kb0, race0;
     static double ms0;
     uint64_t t = now_us();
-    uint32_t rs = ld(c, 0x7361f0, 4);
-    if (t0 && t - t0 > 25000 && rn_racing() && rs && ld(c, rs, 4) != 1) {
+    float hold_ms = gil_frame_hold_ms();
+    uint32_t racing = rn_racing();
+    if (racing && (!rn_stab.racing || race0 != rn_race)) {
+        uint32_t id = rn_stab.race_id + 1;
+        rn_stab = (RnStab){.race_id = id};
+    }
+    rn_stab.racing = racing;
+    race0 = rn_race;
+    if (t0 && t - t0 > 23000 && racing) {
+        rn_stab.spikes++;
+        rn_stab.last_frame = rn_telem.presents;
+        rn_stab.last_ms = (float)((t - t0) / 1000.0);
+        rn_stab.last_reads = rn_telem.reads - reads0;
+        rn_stab.last_read_kb = rn_telem.read_kb - kb0;
+        rn_stab.last_read_ms = (float)(rn_telem.read_ms - ms0);
+        rn_stab.last_hold_ms = hold_ms;
+        memset(rn_stab.site, 0, sizeof rn_stab.site);
+        memset(rn_stab.site_n, 0, sizeof rn_stab.site_n);
         char top[160] = "";
         for (int n = 0, k; n < 3; n++) {
             int b = -1;
             for (k = 0; k < 8; k++) if (rn_clk_n[k] && (b < 0 || rn_clk_n[k] > rn_clk_n[b])) b = k;
             if (b < 0) break;
+            rn_stab.site[n] = rn_clk_site[b];
+            rn_stab.site_n[n] = rn_clk_n[b];
             snprintf(top + strlen(top), sizeof top - strlen(top), " 0x%x x%u", rn_clk_site[b], rn_clk_n[b]);
             rn_clk_n[b] = 0;
         }

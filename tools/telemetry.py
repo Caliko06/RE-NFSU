@@ -9,7 +9,7 @@ the GPU is slow), gilMain = the main thread waiting for another guest thread, re
 idle = the main thread in Sleep or a wait (its own frame pacing), game = the rest (the game's translated code).
 holdMain/holdOther = the longest time one thread kept the GIL: no other guest thread (the music streamer) ran then.
 """
-import bisect, json, os, sys
+import bisect, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 tel = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "build", "telemetry.ndjson")
@@ -75,11 +75,80 @@ for r in rows:
             acc["t"], acc["dt"] = t, t - last_t
             acc["game"] = max(0, acc["dt"] - acc["gpuWait"] - acc["gilMain"] - acc["read"] - acc["idleMain"])
             acc["behind"] = col(r, "audioBehind")
+            if "racing" in C:
+                acc["racing"] = col(r, "racing")
+                for key in ("race_id", "raceId"):
+                    if key in C:
+                        acc["race_id"] = col(r, key)
+                        break
             frames.append(acc)
         last_t, acc = t, None
 
 if not frames:
     sys.exit("no presented frames")
+
+
+def stability():
+    # host/phase.c race_begin/rn_phase_tick and d3d9.c flow_log share the page's log clock.
+    # Prefer per-row race fields when available; older sessions only have these log boundaries.
+    boundaries, serial, pending, active = [], 0, None, None
+    has_flow = any(re.search(r"\bflow state \d+/", s) for _, s in log)
+    flow = None
+    for t, s in log:
+        begin = re.search(r"\bphase race (\d+) begins\b", s)
+        end = re.search(r"\bphase race \d+ ends\b", s)
+        state = re.search(r"\bflow state (\d+)/", s)
+        if begin:
+            pending = int(begin[1])
+            serial = max(serial, pending)
+            active = pending if not has_flow or flow == 6 else None
+        elif end:
+            active = pending = None
+        elif state:
+            flow = int(state[1])
+            if flow == 6 and active is None:
+                if pending is None:
+                    serial += 1
+                    pending = serial
+                active = pending
+            elif flow != 6:
+                if active is not None:
+                    pending = None
+                active = None
+        else:
+            continue
+        boundaries.append((t, active))
+    times = [t for t, _ in boundaries]
+    races, row_serial, previous = {}, 0, None
+    for f in frames:
+        if "racing" in f:
+            race = f.get("race_id") if f["racing"] else None
+            if f["racing"] and "race_id" not in f:
+                if previous is None:
+                    row_serial += 1
+                race = row_serial
+            previous = race
+        else:
+            i = bisect.bisect_right(times, f["t"]) - 1
+            race = boundaries[i][1] if i >= 0 else None
+        if race is not None:
+            races.setdefault(race, []).append(f)
+    print("\nstability per race (observed frames; dominant measured part, not a root-cause proof):")
+    if not races:
+        print("  UNKNOWN: no race frames identified from row fields or flow/race log boundaries")
+    for race, fs in races.items():
+        ds = sorted(f["dt"] for f in fs)
+        percentile = lambda p: ds[min(len(ds) - 1, int(p / 100 * len(ds)))]
+        causes = dict.fromkeys(("game", "gpuWait", "gil", "read"), 0)
+        for f in fs:
+            if f["dt"] > 23:
+                parts = {"game": f["game"], "gpuWait": f["gpuWait"], "gil": f["gilMain"], "read": f["read"]}
+                causes[max(parts, key=parts.get)] += 1
+        print(f"  race {race}: {len(fs)} frames; ms p50 {percentile(50):.2f} p99 {percentile(99):.2f} max {ds[-1]:.2f}; "
+              f">23 ms {sum(causes.values())}; <=16.7 ms {100 * sum(d <= 16.7 for d in ds) / len(ds):.1f}%; "
+              "causes " + " ".join(f"{k}={v}" for k, v in causes.items()))
+
+
 dts = sorted(f["dt"] for f in frames)
 pct = lambda p: dts[min(len(dts) - 1, int(p / 100 * len(dts)))]
 span = (frames[-1]["t"] - frames[0]["t"]) / 1000
@@ -87,6 +156,7 @@ print(f"session {head['date']}  {head['screen']}  {head['url']}")
 print(f"{len(frames)} frames in {span:.0f} s = {len(frames) / span:.1f} fps")
 print(f"frame ms: p50 {pct(50)}  p90 {pct(90)}  p99 {pct(99)}  max {dts[-1]}   "
       f">33 ms: {sum(d > 33 for d in dts)}  >50: {sum(d > 50 for d in dts)}  >100: {sum(d > 100 for d in dts)}  >250: {sum(d > 250 for d in dts)}")
+stability()
 tot = {k: sum(f[k] for f in frames) for k in ("dt", "game", "gpuWait", "gilMain", "read", "idleMain", "run")}
 print("where the time went: " + "  ".join(f"{k} {100 * tot[k] / tot['dt']:.0f}%" for k in ("game", "idleMain", "gpuWait", "gilMain", "read")) +
       f"   (page run {100 * tot['run'] / tot['dt']:.0f}% of the page thread)")

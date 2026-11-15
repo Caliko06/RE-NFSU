@@ -40,6 +40,7 @@ static unsigned long next_ticket, serving, gen;
 #define MAIN_SPIN_US 300
 volatile int rn_preempt;
 static uint64_t slice_start, hold_start;
+static uint64_t frame_start, frame_hold_us;   // under the GIL; independent of Telem maxima cleared by the page
 static uint64_t free_since;     // the GIL was passed on (under gm) to a thread that waits for it; 0 = it was taken
 static __thread int is_main;
 static __thread uint32_t self_start;    // the guest thread's start address (telemetry hold_other_who)
@@ -142,7 +143,9 @@ void gil_preempt(void) {
     gil_acquire();
 }
 static void count_hold(void) {
-    uint64_t us = now_us() - hold_start;
+    uint64_t now = now_us(), us = now - hold_start;
+    uint64_t start = hold_start > frame_start ? hold_start : frame_start;
+    if (now > start && now - start > frame_hold_us) frame_hold_us = now - start;
     double held = (double)us / 1000;
     if (is_main) {
         rn_telem.hold_main_us += (uint32_t)us;
@@ -151,6 +154,14 @@ static void count_hold(void) {
         rn_telem.hold_other_us += (uint32_t)us;
         if (held > rn_telem.hold_other_max_ms) { rn_telem.hold_other_max_ms = held; rn_telem.hold_other_who = self_start; }
     }
+}
+float gil_frame_hold_ms(void) {
+    uint64_t now = now_us(), start = hold_start > frame_start ? hold_start : frame_start;
+    if (now > start && now - start > frame_hold_us) frame_hold_us = now - start;
+    float ms = (float)(frame_hold_us / 1000.0);
+    frame_start = now;
+    frame_hold_us = 0;
+    return ms;
 }
 void gil_release(void) {
     count_hold();

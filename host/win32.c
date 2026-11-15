@@ -575,7 +575,7 @@ static uint64_t game_now_us(void) {
     static uint64_t reads;
     return fixed_base && rn_is_main_thread() ? fixed_base + (uint64_t)(rn_telem.presents - fixed_presents) * 16667 + ++reads : now_us();
 }
-// Spike probe (host/d3d9.c spike_log, race frames > 25 ms -> page log -> F10): the main thread's clock reads by call site
+// Spike probe (host/d3d9.c spike_log, race frames > 23 ms -> page log -> F10): the main thread's clock reads by call site
 // (the return address), to name a busy wait that is not the limiter 0x585b40.
 uint32_t rn_clk_site[8], rn_clk_n[8];
 static void clk_site(Ctx *c) {
