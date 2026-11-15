@@ -25,8 +25,8 @@
       key: 'career', type: 'choice', values: [T('unlock', 'Todo abierto'), T('normal', 'Normal (como salió)')], def: 'unlock',
       modes: BOTH, src: 'web/boot.js' },
 
-    { id: 'remaster', group: 'video', label: 'Texturas del remaster', help: 'Texturas mejoradas de interfaz y coches.',
-      key: 'remaster', type: 'toggle', values: OFF_ON, def: '1', modes: REM, src: 'web/gpu.js' },
+    { id: 'remaster', group: 'video', label: 'Texturas del remaster', help: 'Texturas mejoradas de interfaz, coches y ciudad. Descarga extra grande (1.1 GB), apagadas de inicio.',
+      key: 'remaster', type: 'toggle', values: OFF_ON, def: '0', modes: REM, src: 'web/gpu.js' },
     { id: 'skinhd', group: 'video', label: 'Pinturas de coche en HD', help: 'Calcula las pinturas de los coches a mayor resolución.',
       key: 'skinhd', type: 'toggle', values: OFF_ON, def: '1', modes: REM, src: 'web/gpu.js' },
     { id: 'bloom', group: 'video', label: 'Bloom (brillo de luces)', help: 'Halo de luz en faros y neones. "Luces" lo hace más ancho.',
