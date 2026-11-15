@@ -61,6 +61,10 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
   let world = false;   // the race's track id is 1010 (scene() reads it before anything else)
   const api = window.Ug2 = { get on() { return allowed && (RN_MODE === 'remaster' || world); }, state: 'idle' };
   const TEXTURED = RN_Q.get('ug2tex') !== '0';
+  // Phones and tablets (web/mode.js RN_PHONE; ?ug2half=1|0 forces it): the half-size texture pack (tex_half.pack, tools/pack_loadfast.py: each
+  // texture at half width and height, i.e. today's mip 1, as WebP). A quarter of the GPU memory and of the download; and the pack is fetched after the
+  // mesh is on the GPU, not beside it, so the page never holds both.
+  const HALF = RN_Q.has('ug2half') ? RN_Q.get('ug2half') === '1' : RN_PHONE;
   let device, gpu, loading = false;
 
   // Prepared by tools/pack_loadfast.py. Explicit gzip works on plain static hosts too.
@@ -70,10 +74,10 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
   }
   async function textures() {
-    const b = await packed('tex.pack'), n = new DataView(b).getUint32(0, true);
+    const b = await packed(HALF ? 'tex_half.pack' : 'tex.pack'), n = new DataView(b).getUint32(0, true);
     const index = JSON.parse(new TextDecoder().decode(new Uint8Array(b, 4, n)));
     const blob = new Blob([new Uint8Array(b, 4 + n)]);
-    return file => { const [at, len] = index[file]; return blob.slice(at, at + len, 'image/png'); };
+    return file => { const [at, len] = index[file]; return blob.slice(at, at + len, HALF ? 'image/webp' : 'image/png'); };
   }
   // One UG2M file -> {nv, ni, vb, ib}, or null when it is not a UG2M mesh.
   async function read(name) {
@@ -96,13 +100,18 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
 
   async function load(dev) {
     const t0 = performance.now();
-    const [city, bridge, png] = await Promise.all([read('city.bin'), read('bridge.bin'), TEXTURED ? textures() : null]);
-    if (!city) { say('ug2: no web/ug2/city.bin or city_lod.bin, nothing drawn'); return null; }
-    const [side, bside] = TEXTURED ? await Promise.all([readSide(city), bridge ? readSide(bridge, 'bridge_tex.bin') : null]) : [null, null];
+    const pngSoon = TEXTURED && !HALF ? textures() : null;
+    pngSoon?.catch(() => {});   // awaited below, where a failure is reported
+    let [city, bridge] = await Promise.all([read('city.bin'), read('bridge.bin')]);
+    if (!city) { say('ug2: no web/ug2/city.bin, nothing drawn'); return null; }
+    let [side, bside] = TEXTURED ? await Promise.all([readSide(city), bridge ? readSide(bridge, 'bridge_tex.bin') : null]) : [null, null];
     const info = side ? (await (await fetch('/ug2/tex.json')).json()).textures : [];
+    if (HALF) for (const t of info) { t.w = Math.max(1, t.w >> 1); t.h = Math.max(1, t.h >> 1); }
     const nv = city.nv + (bridge?.nv || 0), ntri = (city.ni + (bridge?.ni || 0)) / 3;
     // Vertices, 24 B: f32 xyz, u8 rgba, f32 uv (untextured: uv 0).
-    const vb = new ArrayBuffer(24 * nv), vf = new Float32Array(vb), vu = new Uint32Array(vb);
+    // Written straight into the GPU buffers (mappedAtCreation): no second copy of the 102 MB of vertices and 35 MB of indices in the page.
+    const vbuf = dev.createBuffer({ size: 24 * nv, usage: GPUBufferUsage.VERTEX, mappedAtCreation: true });
+    const vb = vbuf.getMappedRange(), vf = new Float32Array(vb), vu = new Uint32Array(vb);
     const put = (m, base) => {
       const f = new Float32Array(m.vb.buffer, m.vb.byteOffset, m.nv * 4), w = new Uint32Array(m.vb.buffer, m.vb.byteOffset, m.nv * 4);
       for (let k = 0, o = base * 6; k < m.nv; k++, o += 6) { vf[o] = f[4 * k]; vf[o + 1] = f[4 * k + 1]; vf[o + 2] = f[4 * k + 2]; vu[o + 3] = w[4 * k + 3]; }
@@ -110,6 +119,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     put(city, 0); if (bridge) put(bridge, city.nv);
     if (side) for (let k = 0; k < city.nv; k++) { vf[6 * k + 4] = side.uv[2 * k]; vf[6 * k + 5] = side.uv[2 * k + 1]; }
     if (bside) for (let k = 0, o = 6 * city.nv; k < bridge.nv; k++, o += 6) { vf[o + 4] = bside.uv[2 * k]; vf[o + 5] = bside.uv[2 * k + 1]; }
+    vbuf.unmap();
     // Textures: one 2D array per size (layer = instance index of its draws), plus a 1x1 white layer for "no texture".
     const buckets = new Map(), slot = new Int32Array(info.length + 1).fill(-1);   // texture -> bucket*65536 + layer
     const white = { w: 1, h: 1, list: [-1] }; buckets.set('1x1', white);
@@ -140,7 +150,8 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     const count = new Uint32Array(order.length + 1);
     for (let k = 0; k < ntri; k++) count[triKey[k] + 1]++;
     for (let r = 0; r < order.length; r++) count[r + 1] += count[r];
-    const start = count.slice(), ib = new Uint32Array(3 * ntri), pos = count.slice(0, order.length);
+    const ibuf = dev.createBuffer({ size: 12 * ntri, usage: GPUBufferUsage.INDEX, mappedAtCreation: true });
+    const start = count.slice(), ib = new Uint32Array(ibuf.getMappedRange()), pos = count.slice(0, order.length);
     for (let k = 0; k < ntri; k++) {
       const d = 3 * pos[triKey[k]]++, cityTri = k < city.ni / 3;
       const src = cityTri ? city.ib : bridge.ib, s = cityTri ? 3 * k : 3 * k - city.ni, add = cityTri ? 0 : city.nv;
@@ -148,6 +159,9 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     }
     const draws = [];
     order.forEach((o, r) => { const n = start[r + 1] - start[r]; if (n) draws.push({ cls: o.cls, bucket: o.s >> 16, layer: o.s & 0xffff, first: 3 * start[r], count: 3 * n }); });
+    ibuf.unmap();
+    city = bridge = side = bside = null;   // the files' bytes are not needed past this line
+    const png = TEXTURED ? await (pngSoon || textures()) : null;
     const tMesh = performance.now();
     // Upload the pixels: each PNG into its layer, then the mips on the GPU.
     const texs = blist.map(b => dev.createTexture({ size: [b.w, b.h, b.list.length], format: 'rgba8unorm', dimension: '2d',
@@ -181,13 +195,12 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     });
     dev.queue.submit([enc.finish()]);
     const mb = texs.reduce((a, t) => a + t.width * t.height * t.depthOrArrayLayers * 4 * 4 / 3, 0) / 1e6;
-    say(`ug2: ${side ? 'textured' : 'untextured'}: ${nv} verts ${ntri} tris, ${draws.length} draws, ${info.filter(t => t.file).length} textures in ${blist.length} arrays (${mb.toFixed(0)} MB with mips, ${failed} failed), mesh ${(tMesh - t0).toFixed(0)} ms, total load ${(performance.now() - t0).toFixed(0)} ms`);
-    return { vb: new Uint8Array(vb), ib, draws, texs };
+    say(`ug2: ${info.length ? (HALF ? 'textured, half-size pack' : 'textured') : 'untextured'}: ${nv} verts ${ntri} tris, ${draws.length} draws, ${info.filter(t => t.file).length} textures in ${blist.length} arrays (${mb.toFixed(0)} MB with mips, ${failed} failed), mesh ${(tMesh - t0).toFixed(0)} ms, total load ${(performance.now() - t0).toFixed(0)} ms`);
+    return { vbuf, ibuf, draws, texs };
   }
 
   function setup(dev, m) {
     device = dev;
-    const make = (data, usage) => { const buf = dev.createBuffer({ size: (data.byteLength + 3) & ~3, usage: usage | GPUBufferUsage.COPY_DST }); dev.queue.writeBuffer(buf, 0, data); return buf; };
     const uniform = dev.createBuffer({ size: 64 * 3, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
     const bgl0 = dev.createBindGroupLayout({ entries: [{ binding: 0, visibility: GPUShaderStage.VERTEX, buffer: { type: 'uniform' } }] });
     const bgl1 = dev.createBindGroupLayout({ entries: [
@@ -195,7 +208,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
       { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} }] });
     // D3D's default address mode is WRAP and the terrain uvs are world-planar (census/ug2/tex.md): repeat, trilinear.
     const samp = dev.createSampler({ addressModeU: 'repeat', addressModeV: 'repeat', minFilter: 'linear', magFilter: 'linear', mipmapFilter: 'linear', maxAnisotropy: 8 });
-    gpu = { vbuf: make(m.vb, GPUBufferUsage.VERTEX), ibuf: make(m.ib, GPUBufferUsage.INDEX), draws: m.draws, uniform, pipes: new Map(),
+    gpu = { vbuf: m.vbuf, ibuf: m.ibuf, draws: m.draws, uniform, pipes: new Map(),
       module: dev.createShaderModule({ code: shader }), layout: dev.createPipelineLayout({ bindGroupLayouts: [bgl0, bgl1] }),
       bind0: dev.createBindGroup({ layout: bgl0, entries: [{ binding: 0, resource: { buffer: uniform } }] }),
       bind1: m.texs.map(t => dev.createBindGroup({ layout: bgl1, entries: [{ binding: 0, resource: t.createView({ dimension: '2d-array' }) }, { binding: 1, resource: samp }] })) };

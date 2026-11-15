@@ -181,6 +181,11 @@ function foot() {
   }
   return Object.fromEntries(Object.entries(by).map(([k, v]) => [k, Math.round(v)]));
 }
+// RN_PHONE=1: the page as a phone held sideways (844x390 at dpr 3, touch, coarse pointer): web/mode.js RN_PHONE and everything behind it.
+if (process.env.RN_PHONE) {
+  await send('Emulation.setDeviceMetricsOverride', { width: 844, height: 390, deviceScaleFactor: 3, mobile: true, screenOrientation: { type: 'landscapePrimary', angle: 90 } });
+  await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+}
 await send('Page.navigate', { url });
 const t0 = Date.now();
 let text = '', seen = 0;

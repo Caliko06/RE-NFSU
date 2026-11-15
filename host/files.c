@@ -4,6 +4,7 @@
 // XHR (allowed in its worker), through a read-ahead buffer, so only what the game opens is fetched.
 #include <ctype.h>
 #include <sched.h>
+#include <stdlib.h>
 #include <strings.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -105,7 +106,7 @@ EM_JS(int, web_list, (const char *rel, char *out, int outsz), {
     return seen.size;
 });
 // real is "game/<path>".
-EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
+EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n, int cap_mb), {
     // Handles reopen the same immutable game file (WORLD CARS_TEXTURES especially).
     // Keep recent fetched ranges across handles, rather than discarding them at gf_close.
     var path = UTF8ToString(real), cache = Module.rnRanges ||= new Map();
@@ -116,18 +117,29 @@ EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
             return n;
         }
     }
-    var x = new XMLHttpRequest();
-    x.open('GET', '/' + path.split('/').map(encodeURIComponent).join('/'), false);
-    x.responseType = 'arraybuffer';
-    x.setRequestHeader('Range', 'bytes=' + off + '-' + (off + n - 1));
-    x.send();
-    if (x.status !== 206) return -1;
+    // The game has no answer to a failed disc read (it waits on its loading screen), and a play over the internet makes hundreds
+    // to thousands of these requests: a dropped one (a phone changing cell, a 5xx at the edge) is asked again after 0.3, 1, 2, 4 s.
+    var x, waits = [300, 1000, 2000, 4000];
+    for (var t = 0; ; t++) {
+        try {
+            x = new XMLHttpRequest();
+            x.open('GET', '/' + path.split('/').map(encodeURIComponent).join('/'), false);
+            x.responseType = 'arraybuffer';
+            x.setRequestHeader('Range', 'bytes=' + off + '-' + (off + n - 1));
+            x.send();
+            if (x.status === 206) break;
+            err('files: ' + path + ' at ' + off + ': HTTP ' + x.status + ', try ' + (t + 1));
+        } catch (e) { err('files: ' + path + ' at ' + off + ': ' + e.message + ', try ' + (t + 1)); }
+        if (t === waits.length) return -1;
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waits[t]);
+    }
     var a = new Uint8Array(x.response);
     HEAPU8.set(a, dst);
-    // 64 MiB per reading worker; streams remain ranged, including all music.
-    if (a.length <= 64 * 1048576) {
+    // cap_mb (64, phones 16: RN_RANGEMB) per reading worker; streams remain ranged, including all music.
+    var cap = cap_mb * 1048576;
+    if (a.length <= cap) {
         var used = Module.rnRangeBytes || 0;
-        while (used + a.length > 64 * 1048576 && cache.size) {
+        while (used + a.length > cap && cache.size) {
             var first = cache.keys().next().value;
             used -= cache.get(first).data.length; cache.delete(first);
         }
@@ -234,10 +246,12 @@ void gf_close(int id) {
 // while the file thread 0x63e4d0 waited for the server: 1.1 s of the menu->race load, telemetry 2026-10-24).
 // g->busy keeps a second thread off the same file (its read-ahead buffer) until the request is back (gf_read).
 static int timed_read(GFile *g, uint64_t at, uint8_t *dst, uint32_t n) {
+    static int cap_mb;   // web/boot.js: RN_RANGEMB=16 on phones and tablets
+    if (!cap_mb) { const char *e = getenv("RN_RANGEMB"); cap_mb = e && atoi(e) > 0 ? atoi(e) : 64; }
     g->busy = 1;
     gil_release();
     uint64_t t0 = now_us();
-    int r = web_read(g->real, (double)at, dst, (int)n);
+    int r = web_read(g->real, (double)at, dst, (int)n, cap_mb);
     uint64_t t1 = now_us();
     gil_acquire();
     g->busy = 0;

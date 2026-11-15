@@ -20,9 +20,13 @@ const RN_ORIGINAL = {
 const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HUD: '43', RN_LIGHTS: '0', RN_CARLOD: '0', RN_FREE: '0', RN_WORLDROW: '2', RN_TRAFPAINT: '0', RN_TRAFLEAN: '0', RN_FEEL: '0', RN_WALLSOFTEN: '0', RN_NPCSMOOTH: '0', RN_MC: '0' };
 
 // ?mode=original|remaster: one run in that mode without touching the stored choice (tools/webcheck.mjs).
+// Phones and tablets (coarse pointer) always start light (OWNER 2026-11-15): Original, effects off, 30 fps, whatever this
+// browser stored; only a ?mode= / ?fx= / ?fps= in the address (this visit's overlay or menu switch, a test) says otherwise.
+const RN_PHONE = (() => { try { return matchMedia('(pointer: coarse)').matches; } catch { return false; } })();
 const RN_MODE = (() => {
   const q = new URLSearchParams(location.search).get('mode');
   if (q === 'original' || q === 'remaster') return q;
+  if (RN_PHONE) return 'original';
   // Default remaster (OWNER 2026-11-10: the UG2 city lives in Free Run's WORLD row, which original mode turns off); original only when picked.
   try { return localStorage.getItem('rn_mode') === 'original' ? 'original' : 'remaster'; } catch { return 'remaster'; }
 })();
@@ -33,9 +37,10 @@ const RN_FX_OFF = ['remaster', 'skinhd', 'bloom', 'fxaa', 'sharp', 'aniso', 'car
 const RN_Q = (() => {
   const q = new URLSearchParams(location.search);
   if (RN_MODE === 'original') for (const [k, v] of Object.entries(RN_ORIGINAL)) if (!q.has(k)) q.set(k, v);
+  if (RN_PHONE && !q.has('fx')) q.set('fx', '0');
   if (q.get('fx') === '0') for (const k of RN_FX_OFF) if (!q.has(k)) q.set(k, RN_ORIGINAL[k]);
-  // Coarse pointer (iPad, phone): 30 fps unless ?fps= says otherwise (host RN_FPS, web/boot.js)
-  if (!q.has('fps') && matchMedia('(pointer: coarse)').matches) q.set('fps', '30');
+  // 30 fps unless ?fps= says otherwise (host RN_FPS, web/boot.js)
+  if (RN_PHONE && !q.has('fps')) q.set('fps', '30');
   return q;
 })();
 
@@ -48,7 +53,7 @@ const RN_Q = (() => {
   window.rnToast = show;
   addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(toast);
-    show(RN_MODE === 'original' ? 'Modo ORIGINAL (2003)   ·   F4 = Remaster' : 'Modo Remaster   ·   F4 = Original', 2500);
+    show(RN_PHONE ? (RN_MODE === 'original' ? 'Modo ligero' : 'Modo Remaster') : RN_MODE === 'original' ? 'Modo ORIGINAL (2003)   ·   F4 = Remaster' : 'Modo Remaster   ·   F4 = Original', 2500);
   });
   // The native main-menu button and the second F4 use the same switch.
   window.rnSwitchMode = () => {

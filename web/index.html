@@ -48,7 +48,8 @@
 // ?fast=1 without go=1 (opened by hand, not from the launcher's "Jugar"): the launcher is the entry point.
 { const p = new URLSearchParams(location.search); if (p.get('fast') === '1' && p.get('go') !== '1') location.replace('/launcher'); }
 // Bare / with a saved choice (web/overlay.js, the launcher): play with its keys; web/mode.js reads the mode from storage itself.
-if (!location.search) { const q = RN_LAUNCH.query(RN_LAUNCH.load()).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&'); if (q && localStorage.getItem('rn_launch')) location.replace('/?' + q); }
+// Not on phones and tablets: they always start light (web/mode.js RN_PHONE).
+if (!location.search && !matchMedia('(pointer: coarse)').matches) { const q = RN_LAUNCH.query(RN_LAUNCH.load()).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&'); if (q && localStorage.getItem('rn_launch')) location.replace('/?' + q); }
 </script>
 <script src="mode.js"></script>
 <script src="app.js"></script>
