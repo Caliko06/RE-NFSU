@@ -2975,22 +2975,21 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 8, w1); mc_hook(c); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
-    // RN_HUDINSET=<permille of the window width> (web/boot.js, phones): the side groups stop that far from the window's edge, so
-    // the notch and the rounded corners do not cover them (OWNER 2026-11-15: the game's HUD spread over the wide phone screen).
+    // input_hud_inset (web/touch.js, phones, live): the side groups stop that far from the picture's edge, so the notch and the
+    // rounded corners do not cover them (OWNER 2026-11-15: the game's HUD spread over the wide phone screen).
     static int hud_mode = -1, fe_stretch = -1;
-    static float hud_in;
-    if (hud_mode < 0) {
-        const char *e = getenv("RN_HUD"), *in = getenv("RN_HUDINSET");
-        hud_mode = !e ? 0 : !strcmp(e, "169") ? 1 : !strcmp(e, "43") ? 2 : 0;
-        hud_in = in ? 2.f * (float)atoi(in) / 1000.f : 0;
-    }
+    // RN_FESIDE=0 (web/boot.js, phones): the in-race screens (pause, pre-race, results) stay in the centred 4:3 island like every other
+    // menu, so the touch buttons in the margins never cover them (the pause list went under the up / down buttons, shot 2026-11-15).
+    static int fe_side_on;
+    if (hud_mode < 0) { const char *e = getenv("RN_HUD"), *fs = getenv("RN_FESIDE"); hud_mode = !e ? 0 : !strcmp(e, "169") ? 1 : !strcmp(e, "43") ? 2 : 0; fe_side_on = !(fs && *fs == '0'); }
+    float hud_in = 2.f * (float)input_hud_inset() / 1000.f;
     if (fe_stretch < 0) { const char *e = getenv("RN_FE"); fe_stretch = e && !strcmp(e, "stretch"); }
     if (isl && !race && fe_stretch) {
         float S = 4.f * rn_screen_h / (3.f * rn_screen_w);
         for (int k = 0; k < 4; k++) { uint32_t b = ld(c, ARG(3) + 32 * k, 4); float y; memcpy(&y, &b, 4); y /= S; memcpy(&b, &y, 4); st(c, ARG(3) + 32 * k, b, 4); }
         moved = 1;
     }
-    if ((hud || screen) && hud_mode != 2) {
+    if ((hud || (screen && fe_side_on)) && hud_mode != 2) {
         float S = 4.f * rn_screen_h / (3.f * rn_screen_w), x[4], cx = 0, B = hud_mode == 1 && S * 4 / 3 < 1 ? S * 4 / 3 : 1;
         float u0 = 1e9f, u1 = -1e9f;
         for (int k = 0; k < 4; k++) {

@@ -18,7 +18,7 @@ const DIK = {
   PageDown: 0xd1, Insert: 0xd2, Delete: 0xd3, MetaLeft: 0xdb, MetaRight: 0xdc, ContextMenu: 0xdd,
 };
 
-// Ring (u32 words): [0] head (here), [1] tail (game), [2..4] mouse dx, dy, wheel, [5] exclusive mouse (game), [6] F3 cheat, [8..8+1024) events:
+// Ring (u32 words): [0] head (here), [1] tail (game), [2..4] mouse dx, dy, wheel, [5] exclusive mouse (game), [6] F3 cheat, [7] HUD inset in permille (web/touch.js), [8..8+1024) events:
 // bit 31 = mouse button, bit 8 = down, low byte = DIK or button. The game thread reads it at its input calls.
 function startInput(M, canvas, steerLog) {
   const base = M._rn_input_ring() >> 2, RING = 1024;
@@ -101,5 +101,6 @@ function startInput(M, canvas, steerLog) {
   // delta to its cursor (0x4130d0, DIMOUSESTATE) and clamps it to the client rect (0x4131a0); FEng reads it at 0x4f6080
   // as x-320, y-240 in its 640x480 space, so the corner of the window is past the menu. web/touch.js calls it on phones.
   const park = () => { Atomics.add(H(), base + 2, 1 << 20); Atomics.add(H(), base + 3, 1 << 20); };
-  return { key: setKey, park };
+  const inset = p => Atomics.store(H(), base + 7, p);   // host/d3d9.c: the HUD's side groups stay this far from the picture's edge
+  return { key: setKey, park, inset };
 }

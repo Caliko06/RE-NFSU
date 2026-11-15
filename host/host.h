@@ -190,5 +190,6 @@ void dinput8_key(uint8_t dik, int down);
 int dinput8_key_pending(void);
 void dinput8_button(int b, int down);
 void dinput8_motion(int32_t dx, int32_t dy, int32_t dz);
+int input_hud_inset(void);                                    // web: how far the HUD's side groups stay from the picture's edge (notch), permille of its width
 void input_mouse_exclusive(int on);                            // web: the page hides and locks the pointer
 void user32_key(uint8_t dik, uint8_t vk, int down);

@@ -10,12 +10,12 @@
 //          their middle the thumb is on). Right thumb: GAS and BRAKE above the game's tachometer, NITROUS beside it (it holds the
 //          gas too: one thumb cannot hold both). HANDBRAKE only in a drift race, SHIFT - / + only in a drag race or with the manual
 //          gearbox. Top centre: pause. (OWNER 2026-11-15: no automatic gas; essential buttons; the tachometer stays in its corner.)
-//   menu : any other package (menus, MU_Pause*, post race). Up and down under the left thumb, OK and BACK under the right one; a
+//   menu : any other package (menus, MU_Pause*, post race). Up over down in the left margin, BACK over OK in the right one (the menus keep the centred 4:3 column); a
 //          sideways slide anywhere else is left / right (car and option pickers). With no package up (intro movies) a touch is Enter.
 //   wait : PC_Loading.fng. Nothing but the top bar.
 // One composition with the game's own HUD (OWNER 2026-11-15, plan.json rejected: the two were placed by separate rules): every
-// place and size is in the HUD's own unit, --t-h = 1/480 of the height, from the side the HUD starts at (--t-i, web/boot.js
-// --rn-in = host RN_HUDINSET). Measured on HUD_SingleRace at the edges: lap box y < 110, minimap x 24..149 y 171..306, standings
+// place and size is in the HUD's own unit, --t-h = 1/480 of the picture's height, from the side the HUD starts at (--t-i). fit()
+// lays the overlay on the picture the canvas really draws and measures the notch live; the host gets the same inset (input.inset). Measured on HUD_SingleRace at the edges: lap box y < 110, minimap x 24..149 y 171..306, standings
 // x 437..611 y < 197, tachometer x 413..611 y 330..470 (so 29..227 from the right side).
 // Look: every control is the same thin white circle at --t-o with its word (the game's own action names, in English: OWNER);
 // a pressed one takes the race HUD's blue (144 184 248) with a halo that shows around the thumb. No icons that need learning.
@@ -34,9 +34,8 @@ function startTouch(input) {
   if (+RN_Q.get('to')) S.o = +RN_Q.get('to');
   const css = document.createElement('style');
   css.textContent = `
-    :root { --t-h: calc(100vh / 480); --t-i: var(--rn-in, 0px); --t-t: max(10px, env(safe-area-inset-top)); --t-o: .35; --t-s: 44px; --t-c: 144,184,248; }
-    @supports (height: 100dvh) { :root { --t-h: calc(100dvh / 480); } }
-    #touch { position: fixed; inset: 0; z-index: 8; pointer-events: none; touch-action: none; user-select: none; -webkit-user-select: none;
+    :root { --t-h: 1px; --t-i: 0px; --t-t: max(10px, env(safe-area-inset-top)); --t-o: .35; --t-s: 44px; --t-c: 144,184,248; }
+    #touch { position: fixed; z-index: 8; pointer-events: none; touch-action: none; user-select: none; -webkit-user-select: none;
       -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; color: rgba(255,255,255,calc(var(--t-o) + .3)); cursor: default;
       font: 700 max(10px, calc(var(--t-h) * 14))/1.15 system-ui, sans-serif; letter-spacing: .07em; text-align: center; }
     #touch .g { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .16s ease-out, visibility 0s .16s; }
@@ -60,9 +59,9 @@ function startTouch(input) {
     #touch .gas { --d: 112; --y: 210; --x: 14; } #touch .brake { --d: 96; --y: 224; --x: 136; }
     #touch .nitro { --d: 96; --y: 356; --x: 240; }
     #touch .hand { --d: 96; --y: 236; --x: 242; display: none; } #touch[data-r=drift] .hand { display: flex; }
-    /* menu: up over down under the left thumb; OK under the right thumb, BACK beside it */
+    /* menu: the game's menus sit in the centred 4:3 column, so the buttons keep to the margins: up over down left, BACK over OK right */
     #touch .nav { --d: 92; --x: 14; } #touch .nav.up { --y: 262; } #touch .nav.dn { --y: 364; }
-    #touch .ok { --d: 112; --y: 344; --x: 14; } #touch .back { --d: 92; --y: 364; --x: 138; }
+    #touch .ok { --d: 92; --y: 364; --x: 14; } #touch .back { --d: 92; --y: 262; --x: 14; }
     /* small circles on top. drive: pause, centre. menus: full screen left, options (web/overlay.js) right */
     #touch .top { top: var(--t-t); width: var(--t-s); height: var(--t-s); }
     #touch .pause { left: calc(50% - var(--t-s) / 2); } #touch .fs { left: max(16px, var(--t-i)); }
@@ -89,13 +88,29 @@ function startTouch(input) {
   root.innerHTML = `<div class="g drive">
       <div class="z"></div>
       <div class="b lf mk l">${I.left}</div><div class="b lf mk r">${I.right}</div>
-      ${btn('lf gdn', 'SHIFT<br>−', 'gdn', 'Shift down')}${btn('lf gup', 'SHIFT<br>+', 'gup', 'Shift up')}
-      ${btn('rt gas', 'GAS', 'up', 'Gas')}${btn('rt brake', 'BRAKE', 'down', 'Brake')}${btn('rt nitro', 'NITROUS', 'space,up', 'Nitrous')}${btn('rt hand', 'HAND<br>BRAKE', 'lshift', 'Handbrake')}
+      ${btn('lf gdn', '<span>SHIFT<br>−</span>', 'gdn', 'Shift down')}${btn('lf gup', '<span>SHIFT<br>+</span>', 'gup', 'Shift up')}
+      ${btn('rt gas', 'GAS', 'up', 'Gas')}${btn('rt brake', 'BRAKE', 'down', 'Brake')}${btn('rt nitro', 'NITROUS', 'space,up', 'Nitrous')}${btn('rt hand', '<span>HAND<br>BRAKE</span>', 'lshift', 'Handbrake')}
       ${btn('top pause', I.pause, 'esc', 'Pause')}
     </div><div class="g menu">
       <div class="sw"></div>${btn('lf nav up', I.up, 'up', 'Up')}${btn('lf nav dn', I.down, 'down', 'Down')}${btn('rt ok', 'OK', 'enter', 'OK')}${btn('rt back', 'BACK', 'esc', 'Back')}
     </div><div class="b top fs" data-fs="1" role="button" aria-label="Pantalla completa">${I.fs}</div><div class="tip"></div>`;
   document.body.appendChild(root);
+  // The picture: the canvas keeps the back buffer's aspect inside the window (object-fit: contain, web/index.html), and the game's HUD
+  // is drawn in it. The overlay takes that rect; the inset is what the notch covers of it on either side (?hudin=<px> for a test).
+  const screenEl = document.getElementById('screen'), probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;padding:0 env(safe-area-inset-right) 0 env(safe-area-inset-left)';
+  document.body.appendChild(probe);
+  const fit = () => {
+    const r = screenEl.getBoundingClientRect(), a = (screenEl.gameW || screenEl.width) / (screenEl.gameH || screenEl.height) || r.width / r.height;
+    const w = Math.min(r.width, r.height * a), h = w / a, x = r.left + (r.width - w) / 2, y = r.top + (r.height - h) / 2;
+    if (!(w > 0 && h > 0)) return;
+    const c = getComputedStyle(probe);
+    const px = RN_Q.has('hudin') ? +RN_Q.get('hudin') : Math.max(0, (parseFloat(c.paddingLeft) || 0) - x, (parseFloat(c.paddingRight) || 0) - (innerWidth - x - w));
+    Object.assign(root.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` });
+    const ds = document.documentElement.style; ds.setProperty('--t-h', `${h / 480}px`); ds.setProperty('--t-i', `${px}px`);   // on the document: web/overlay.js' button reads --t-i too
+    input.inset(Math.round(1000 * px / w));
+  };
+  fit(); addEventListener('resize', fit);
   const mkL = root.querySelector('.mk.l'), mkR = root.querySelector('.mk.r');
 
   // Full screen: Android has the API (web/app.js asks on every touch too); an iPhone has none for a page, only a web app
@@ -170,6 +185,7 @@ function startTouch(input) {
       else sw = { id: e.pointerId, x: e.clientX };
       return;
     }
+    if (el.classList.contains('pause')) releaseAll();   // a gas still held would reach the pause list as 'up' and move its choice (seen: Leave Race)
     navigator.vibrate?.(8);   // Android; an iPhone's Safari has no vibration
     el.classList.add('on');
     ptr.set(e.pointerId, { el, keys: swap(new Set(), new Set((el.dataset.k || '').split(',').filter(Boolean).map(n => D[n]))) });
@@ -210,6 +226,6 @@ function startTouch(input) {
   document.addEventListener('visibilitychange', releaseAll);
   for (const t of ['gesturestart', 'gesturechange', 'dblclick', 'contextmenu']) document.addEventListener(t, e => e.preventDefault());   // Safari pinch / double-tap zoom, long-press menu
   // The game's arrow cursor has no use on a phone: keep it parked off screen (web/input.js park).
-  setInterval(() => { if (padUsed()) hide(); if (shown()) input.park(); }, 500);   // a pad takes over
+  setInterval(() => { if (padUsed()) hide(); if (shown()) input.park(); fit(); }, 500);   // a pad takes over
   layout();
 }

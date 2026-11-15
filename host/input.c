@@ -712,12 +712,13 @@ void steer_frame(Ctx *c) {
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 // u32 words: [0] head (page), [1] tail (game), [2..4] mouse dx, dy, wheel (page adds, game takes), [5] exclusive mouse,
-// [6] F3 cheat (page sets, game takes), [8..8+RING) events: bit 31 = mouse button (else key), bit 8 = down, low byte = DIK or button.
+// [6] F3 cheat (page sets, game takes), [7] HUD inset in permille of the picture's width (web/touch.js), [8..8+RING) events: bit 31 = mouse button (else key), bit 8 = down, low byte = DIK or button.
 #define RING 1024
 static uint32_t ring[8 + RING];
 EMSCRIPTEN_KEEPALIVE uint32_t rn_input_ring(void) { return (uint32_t)(uintptr_t)ring; }
 static int cheat_take(void) { return (int)__atomic_exchange_n(&ring[6], 0, __ATOMIC_ACQ_REL); }
 void input_mouse_exclusive(int on) { __atomic_store_n(&ring[5], (uint32_t)on, __ATOMIC_RELEASE); }
+int input_hud_inset(void) { return (int)__atomic_load_n(&ring[7], __ATOMIC_ACQUIRE); }
 void input_poll(void) {
     uint32_t head = __atomic_load_n(&ring[0], __ATOMIC_ACQUIRE), tail = ring[1];
     for (; tail != head; tail++) {
@@ -735,5 +736,6 @@ void input_poll(void) {
 #else
 static int cheat_take(void) { return 0; }
 void input_mouse_exclusive(int on) { (void)on; }
+int input_hud_inset(void) { return 0; }
 void input_poll(void) { script_poll(); }
 #endif
