@@ -1,0 +1,45 @@
+<!doctype html><meta charset="utf-8"><title>Spark lab</title>
+<body style="margin:0;background:#111;color:#eee;font:12px monospace">
+<canvas id="c" width="1024" height="512"></canvas><pre id="o"></pre>
+<script type="module">
+import { Spark } from 'https://cdn.jsdelivr.net/npm/@ludicon/spark.js@0.1.6/dist/spark.esm.js';
+const o = document.getElementById('o'), say = s => { o.textContent += s + '\n'; console.log(s); };
+const rows = (await (await fetch('/lab/sample50.tsv')).text()).trim().split('\n').map(l => l.split('\t'));
+const ad = await navigator.gpu.requestAdapter();
+const dev = await ad.requestDevice({ requiredFeatures: ['texture-compression-bc'].filter(f => ad.features.has(f)) });
+const spark = await Spark.create(dev);
+// blit: draw a texture to an rgba8 target and read it back
+const mod = dev.createShaderModule({ code: `@group(0)@binding(0) var t: texture_2d<f32>; @group(0)@binding(1) var s: sampler;
+struct V{@builtin(position) p:vec4f,@location(0) uv:vec2f};
+@vertex fn vs(@builtin(vertex_index) i:u32)->V{var q=array(vec2f(0,0),vec2f(2,0),vec2f(0,2));let u=q[i];var v:V;v.p=vec4f(u.x*2-1,1-u.y*2,0,1);v.uv=u;return v;}
+@fragment fn fs(v:V)->@location(0) vec4f{return textureSampleLevel(t,s,v.uv,0);}` });
+const pipe = dev.createRenderPipeline({ layout: 'auto', vertex: { module: mod }, fragment: { module: mod, targets: [{ format: 'rgba8unorm' }] } });
+const smp = dev.createSampler({});
+async function readTex(tex, w, h) {
+  const rt = dev.createTexture({ size: [w, h], format: 'rgba8unorm', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC });
+  const bpr = Math.ceil(w * 4 / 256) * 256, buf = dev.createBuffer({ size: bpr * h, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+  const e = dev.createCommandEncoder(), p = e.beginRenderPass({ colorAttachments: [{ view: rt.createView(), loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 0] }] });
+  p.setPipeline(pipe); p.setBindGroup(0, dev.createBindGroup({ layout: pipe.getBindGroupLayout(0), entries: [{ binding: 0, resource: tex.createView({ baseMipLevel: 0, mipLevelCount: 1 }) }, { binding: 1, resource: smp }] }));
+  p.draw(3); p.end(); e.copyTextureToBuffer({ texture: rt }, { buffer: buf, bytesPerRow: bpr }, [w, h]); dev.queue.submit([e.finish()]);
+  await buf.mapAsync(GPUMapMode.READ); const a = new Uint8Array(buf.getMappedRange()), out = new Uint8Array(w * h * 4);
+  for (let y = 0; y < h; y++) out.set(a.subarray(y * bpr, y * bpr + w * 4), y * w * 4); buf.unmap(); rt.destroy(); return out;
+}
+const sets = {}; let first = null;
+say(`adapter bc=${ad.features.has('texture-compression-bc')} astc=${ad.features.has('texture-compression-astc')}`);
+for (const [key, file] of rows) {
+  const blob = await (await fetch('/remaster/' + file)).blob(), bmp = await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
+  const w = bmp.width, h = bmp.height, cv = new OffscreenCanvas(w, h), cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0); const src = cx.getImageData(0, 0, w, h).data;
+  await dev.queue.onSubmittedWorkDone();
+  const t0 = performance.now(); const tex = await spark.encodeTexture(bmp, { format: 'rgba', mips: true }); await dev.queue.onSubmittedWorkDone(); const ms = performance.now() - t0;
+  const got = await readTex(tex, w, h); let se = 0; for (let i = 0; i < src.length; i++) { if ((i & 3) === 3 && src.every === 0) continue; const d = src[i] - got[i]; se += d * d; }
+  const psnr = 10 * Math.log10(255 * 255 / (se / src.length));
+  const set = file.split('/')[0]; (sets[set] ||= { n: 0, ms: 0, psnr: 0, px: 0, max: 0 }); const s = sets[set]; s.n++; s.ms += ms; s.psnr += psnr; s.px += w * h; s.max = Math.max(s.max, ms);
+  say(`${key}\t${set}\t${w}x${h}\t${tex.format}\t${ms.toFixed(2)} ms\tpsnr ${psnr.toFixed(1)}`);
+  if (!first && set === 'cars2') { first = { bmp, got, w, h }; }
+  tex.destroy();
+}
+for (const [k, s] of Object.entries(sets)) say(`SUM ${k} n ${s.n} mean ${(s.ms / s.n).toFixed(2)} ms max ${s.max.toFixed(1)} ms psnr ${(s.psnr / s.n).toFixed(1)} vram_bc7 ${(s.px * 1.333 / 1048576).toFixed(1)} MB rgba8 ${(s.px * 4 * 1.333 / 1048576).toFixed(1)} MB`);
+const c = document.getElementById('c').getContext('2d'); c.drawImage(first.bmp, 0, 0, 512, 512);
+const id = new ImageData(new Uint8ClampedArray(first.got), first.w, first.h), oc = new OffscreenCanvas(first.w, first.h); oc.getContext('2d').putImageData(id, 0, 0); c.drawImage(oc, 512, 0, 512, 512);
+say('DONE');
+</script>
