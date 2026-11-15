@@ -64,6 +64,7 @@ function line(s, cls) {
   if (/^STOP|^JS |abort|Aborted|RuntimeError/.test(s)) setTimeout(flush, 0);
   if (s.includes('WORLD: only on a computer')) window.rnToast?.('WORLD es solo para computadora', 4000);
   // The front-end packages on screen (host/d3d9.c flow_log): web/touch.js picks its layout from them.
+  if (s.includes('flow manual ')) { window.RN_MANUAL = /flow manual 1/.test(s); dispatchEvent(new Event('rn-fe')); }
   if (s.includes('flow fe ')) { const m = /flow fe (\S*) \(frame/.exec(s); if (m) { window.RN_FE = m[1].split(',').filter(Boolean); dispatchEvent(new Event('rn-fe')); } }
   const d = document.createElement('div');
   if (cls) d.className = cls;
@@ -138,6 +139,18 @@ async function download(url, what) {
       m.ENV.RN_MODE = RN_MODE;
       if (RN_MODE === 'original') {
         Object.assign(m.ENV, RN_ORIGINAL_ENV);
+        // Phones (OWNER 2026-11-15: "NO en 4:3"): the game's own HUD at the edges of the wide screen (host/d3d9.c, RN_HUD unset), its
+        // side groups clear of the notch: the largest safe-area inset (upright it is the top one, sideways left / right). ?hudin=<px>.
+        if (RN_PHONE) {
+          delete m.ENV.RN_HUD;
+          const p = document.createElement('div');
+          p.style.cssText = 'position:fixed;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)';
+          document.body.appendChild(p);
+          const c = getComputedStyle(p), px = RN_Q.has('hudin') ? +RN_Q.get('hudin') : Math.max(parseFloat(c.paddingTop) || 0, parseFloat(c.paddingRight) || 0, parseFloat(c.paddingLeft) || 0);
+          p.remove();
+          document.documentElement.style.setProperty('--rn-in', `${px}px`);
+          m.ENV.RN_HUDINSET = String(Math.round(1000 * px / vw));
+        }
       } else m.ENV.RN_WALLSOFTEN = '1'; // 0x46bae0: remove the remaster's grazing wall rebound
       line(`mode: ${RN_MODE} (F4 switches)`);
       line(`ug2: city pass ${window.Ug2?.on ? 'on (drawn while the track id is 1010)' : 'off until the track id is 1010, nothing fetched'} (mode ${RN_MODE}, WORLD row ${m.ENV.RN_WORLDROW === '0' ? 'off' : m.ENV.RN_WORLDROW === '2' ? 'hidden (menu button only)' : 'listed'})`);

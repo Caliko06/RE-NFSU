@@ -53,7 +53,6 @@
       const t = T.get(), next = (list, v) => list[(list.indexOf(v) + 1) % list.length], set = o => { T.set(o); render(); };
       add('h4', 'Táctil');
       add('button', `Botones: ${{ 25: 'tenues', 35: 'medios', 50: 'visibles' }[t.o] || t.o + ' %'}`, '', () => set({ o: next([25, 35, 50], t.o) }));
-      add('button', `Tamaño: ${{ 0.85: 'chico', 1: 'normal', 1.2: 'grande' }[t.k] || t.k}`, '', () => set({ k: next([0.85, 1, 1.2], t.k) }));
     }
     add('small', 'Cambiar perfil o sonido reinicia el juego.');
     add('a', 'Launcher completo', '', null, '/launcher');

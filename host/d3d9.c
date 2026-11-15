@@ -1221,6 +1221,11 @@ static void flow_log(Ctx *c) {
         if (fl < sizeof fe - 40) fl += (size_t)snprintf(fe + fl, sizeof fe - fl, "%s%.32s", fl ? "," : "", G(np[i]));
     if (strcmp(fe, pfe)) { rn_log("flow fe %s (frame %u)", fe, dev.frames); memcpy(pfe, fe, sizeof fe); }
     rn_fe = pfe;
+    // The race's transmission: 0x78a387, copied from the Car Setup option 0x758954 by 0x4b47a0; the mode setup 0x4b55b0 writes 1
+    // itself (I: the drag race, which is always shifted by hand, so 1 = manual). web/touch.js shows the shift buttons on it.
+    static int pman = -1;
+    int man = ld(c, 0x78a387, 1) == 1;
+    if (man != pman) { rn_log("flow manual %d (frame %u)", man, dev.frames); pman = man; }
     // Read only. [0x777cc8] = the Quick Race mode the Accept switch takes (0x4b5c00: 0..6 -> 0x4b49e0..0x4b59b0); the
     // mode list 0x4b70c0 adds Circuit 0, Sprint 1, Drag 5, Drift 6, then 2, 3 (asm: ebx before each call 0x4b6fe0),
     // each only if its flag is set. The setup copies the track to [0x78a2f0] and a race kind to [0x78a31c].
@@ -2970,8 +2975,15 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 8, w1); mc_hook(c); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
+    // RN_HUDINSET=<permille of the window width> (web/boot.js, phones): the side groups stop that far from the window's edge, so
+    // the notch and the rounded corners do not cover them (OWNER 2026-11-15: the game's HUD spread over the wide phone screen).
     static int hud_mode = -1, fe_stretch = -1;
-    if (hud_mode < 0) { const char *e = getenv("RN_HUD"); hud_mode = !e ? 0 : !strcmp(e, "169") ? 1 : !strcmp(e, "43") ? 2 : 0; }
+    static float hud_in;
+    if (hud_mode < 0) {
+        const char *e = getenv("RN_HUD"), *in = getenv("RN_HUDINSET");
+        hud_mode = !e ? 0 : !strcmp(e, "169") ? 1 : !strcmp(e, "43") ? 2 : 0;
+        hud_in = in ? 2.f * (float)atoi(in) / 1000.f : 0;
+    }
     if (fe_stretch < 0) { const char *e = getenv("RN_FE"); fe_stretch = e && !strcmp(e, "stretch"); }
     if (isl && !race && fe_stretch) {
         float S = 4.f * rn_screen_h / (3.f * rn_screen_w);
@@ -2991,10 +3003,11 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
         if (fen && dev.frames == fe_log_at && !fen->hud)
             rn_log("FELOG   quad obj %08x pkg %.24s %.0f..%.0f%s", feo, G(ld(c, fen->pkg + 0xc, 4)), u0, u1, full ? " full" : "");
         float u = (cx + S) / (2 * S) * 640.f, d = 0, m = 1;
-        if (hud) d = u < 0 || u > 640 ? 0 : u < 190 ? -(B - S) : u > 430 ? B - S : 0;
+        float Bi = B - hud_in > S ? B - hud_in : S;   // where the side groups stop; a full layer still covers the window (B)
+        if (hud) d = u < 0 || u > 640 ? 0 : u < 190 ? -(Bi - S) : u > 430 ? Bi - S : 0;
         else if (full) m = B / S;
         else if (u1 <= 0 || u0 >= 640) d = -4;   // parked off the 640 screen: moving the package would bring it into view, so cut it
-        else d = (float)fe_side(fen->pkg) * (B - S);
+        else d = (float)fe_side(fen->pkg) * (Bi - S);
         if (d != 0 || m != 1) {
             for (int k = 0; k < 4; k++) { float y = x[k] * m + d; uint32_t b; memcpy(&b, &y, 4); st(c, ARG(3) + 32 * k, b, 4); }
             moved = 1;

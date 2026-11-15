@@ -2,112 +2,101 @@
 // web/input.js (DIK keys through startInput's setKey, same ring and held set as the keyboard and web/pad.js). It never moves the
 // game's mouse: a phone has no pointer, so the game's arrow cursor stays parked off screen (OWNER 2026-11-15).
 // Keys are the game's default action table (exe 0x702c98, docs/re/hud_input.md): arrows steer / gas / brake, Left Shift handbrake,
-// Space nitrous, A / Z shift up / down, C camera, R respot, Esc pause; menus: arrows, Enter select, Esc back.
+// Space nitrous, A / Z shift up / down, Esc pause; menus: arrows, Enter select, Esc back.
 // It steps aside when a real keyboard key or a gamepad is used, and comes back on the next touch.
 // Layouts, chosen by the game itself: web/boot.js passes each "flow fe" line (host/d3d9.c flow_log: the front-end
-// packages on screen) as window.RN_FE + an 'rn-fe' event.
-//   drive: only HUD_*.fng / Chyron*.fng are up. Left thumb: two arrows (the whole left half steers, by the side of their middle the
-//          thumb is on), shift down / up above them. Right thumb: gas (the whole right half), brake beside it, nitro and handbrake
-//          on its arc. Gas is always a button (OWNER 2026-11-15: no automatic gas).
-//   menu : any other package (menus, MU_Pause*, post race). Up and down under the left thumb, OK and back under the right one; a
+// packages on screen) as window.RN_FE + an 'rn-fe' event, and "flow manual" as window.RN_MANUAL.
+//   drive: only HUD_*.fng / drag_HUD*.fng / Chyron*.fng are up. Left thumb: two arrows (the whole left half steers, by the side of
+//          their middle the thumb is on). Right thumb: GAS and BRAKE above the game's tachometer, NITROUS beside it (it holds the
+//          gas too: one thumb cannot hold both). HANDBRAKE only in a drift race, SHIFT - / + only in a drag race or with the manual
+//          gearbox. Top centre: pause. (OWNER 2026-11-15: no automatic gas; essential buttons; the tachometer stays in its corner.)
+//   menu : any other package (menus, MU_Pause*, post race). Up and down under the left thumb, OK and BACK under the right one; a
 //          sideways slide anywhere else is left / right (car and option pickers). With no package up (intro movies) a touch is Enter.
 //   wait : PC_Loading.fng. Nothing but the top bar.
-// Look (Apple HIG game controls, Xbox touch designer's guide): no fill and no colour at rest, a thin white line at --t-o; a pressed
-// control takes the race HUD's own blue (sampled from the position counter, 144 184 248) with a halo that shows around the thumb.
-// The race HUD owns the top corners (timer left, position and standings right), so in drive the small buttons sit top centre.
+// One composition with the game's own HUD (OWNER 2026-11-15, plan.json rejected: the two were placed by separate rules): every
+// place and size is in the HUD's own unit, --t-h = 1/480 of the height, from the side the HUD starts at (--t-i, web/boot.js
+// --rn-in = host RN_HUDINSET). Measured on HUD_SingleRace at the edges: lap box y < 110, minimap x 24..149 y 171..306, standings
+// x 437..611 y < 197, tachometer x 413..611 y 330..470 (so 29..227 from the right side).
+// Look: every control is the same thin white circle at --t-o with its word (the game's own action names, in English: OWNER);
+// a pressed one takes the race HUD's blue (144 184 248) with a halo that shows around the thumb. No icons that need learning.
 'use strict';
 const TOUCH_MIN_HOLD_MS = 60, TOUCH_STEER_DEAD_PX = 6, TOUCH_SWIPE_PX = 44;
-const touchLayout = fe => fe.some(p => p.startsWith('PC_Loading')) ? 'wait' : fe.length && fe.every(p => /^(HUD_|Chyron)/.test(p)) ? 'drive' : 'menu';
+const touchLayout = fe => fe.some(p => p.startsWith('PC_Loading')) ? 'wait' : fe.length && fe.every(p => /^(HUD_|drag_HUD|Chyron)/.test(p)) ? 'drive' : 'menu';
+const touchRace = fe => fe.some(p => p.startsWith('drag_HUD')) ? 'drag' : fe.some(p => p.startsWith('HUD_Drift')) ? 'drift' : '';
 
 function startTouch(input) {
   const want = RN_Q.get('touch');
   if (!input || want === '0' || !(want === '1' || 'ontouchstart' in window)) return null;
   const D = PAD_DIK;
-  // The player's choices (options panel, web/overlay.js): o = resting opacity in %, k = size. ?to= sets the opacity for one visit.
-  const S = { o: 35, k: 1 };
-  try { const v = JSON.parse(localStorage.getItem('rn-touch') || '{}'); if (v.o) S.o = v.o; if (v.k) S.k = v.k; } catch {}
+  // The player's choice (options panel, web/overlay.js): o = resting opacity in %. ?to= sets it for one visit.
+  const S = { o: 35 };
+  try { const v = JSON.parse(localStorage.getItem('rn-touch') || '{}'); if (v.o) S.o = v.o; } catch {}
   if (+RN_Q.get('to')) S.o = +RN_Q.get('to');
   const css = document.createElement('style');
-  // Sizes follow the phone's height (a landscape phone is 320-430 px tall): --t-u is one thumb unit. Every edge adds the
-  // safe area (notch, rounded corners, home bar): children are absolute, so a padding on #touch would not move them.
   css.textContent = `
-    :root { --t-l: max(16px, env(safe-area-inset-left)); --t-r: max(16px, env(safe-area-inset-right));
-      --t-t: max(10px, env(safe-area-inset-top)); --t-b: max(14px, env(safe-area-inset-bottom));
-      --t-o: .35; --t-k: 1; --t-u: calc(clamp(54px, 19vh, 96px) * var(--t-k)); --t-s: 44px; --t-c: 144,184,248; }
+    :root { --t-h: calc(100vh / 480); --t-i: var(--rn-in, 0px); --t-t: max(10px, env(safe-area-inset-top)); --t-o: .35; --t-s: 44px; --t-c: 144,184,248; }
+    @supports (height: 100dvh) { :root { --t-h: calc(100dvh / 480); } }
     #touch { position: fixed; inset: 0; z-index: 8; pointer-events: none; touch-action: none; user-select: none; -webkit-user-select: none;
-      -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; color: rgba(255,255,255,calc(var(--t-o) + .25)); cursor: default; }
+      -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; color: rgba(255,255,255,calc(var(--t-o) + .3)); cursor: default;
+      font: 700 max(10px, calc(var(--t-h) * 14))/1.15 system-ui, sans-serif; letter-spacing: .07em; text-align: center; }
     #touch .g { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .16s ease-out, visibility 0s .16s; }
     #touch[data-m=drive] .g.drive, #touch[data-m=menu] .g.menu { opacity: 1; visibility: visible; transition: opacity .16s ease-out; }
     #touch .z, #touch .sw { position: absolute; pointer-events: auto; touch-action: none; }
-    #touch .z { top: 22%; bottom: 0; width: 50%; } #touch .zl { left: 0; } #touch .zr { right: 0; } #touch .sw { inset: 0; }
+    #touch .z { top: 22%; bottom: 0; left: 0; width: 50%; } #touch .sw { inset: 0; }
     /* a dark hairline on both sides of the white line keeps it readable over a bright street */
     #touch .b, #ov-btn { position: absolute; box-sizing: border-box; pointer-events: auto; touch-action: none; display: flex; align-items: center; justify-content: center;
+      width: calc(var(--t-h) * var(--d)); height: calc(var(--t-h) * var(--d)); top: calc(var(--t-h) * var(--y)); text-shadow: 0 0 3px rgba(0,0,0,.7);
       border-radius: 50%; border: 1.5px solid rgba(255,255,255,var(--t-o)); background: none; box-shadow: 0 0 0 1px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.16);
       transition: transform .12s cubic-bezier(.22,1,.36,1), border-color .1s ease-out, box-shadow .1s ease-out, color .1s ease-out, background-color .1s ease-out; }
     #touch .b.on { transform: scale(.97); color: rgb(var(--t-c)); border-color: rgb(var(--t-c)); background-color: rgba(var(--t-c),.14);
       box-shadow: 0 0 0 5px rgba(var(--t-c),.16), 0 0 26px 6px rgba(var(--t-c),.55); }
-    #touch .b svg, #ov-btn svg { width: 46%; height: 46%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 1.5px rgba(0,0,0,.6)); pointer-events: none; }
-    #touch .mk { pointer-events: none; bottom: var(--t-b); width: calc(var(--t-u) * 1.25); height: calc(var(--t-u) * 1.25); }
-    /* small circles. menus: full screen top left, options (web/overlay.js) top right. drive: one row top centre: pause, camera, respot, options, full screen */
-    #touch .top { top: var(--t-t); width: var(--t-s); height: var(--t-s); --k: 0; left: calc(50% - var(--t-s) / 2 + var(--k) * (var(--t-s) + 8px)); }
-    #touch .pause { --k: -2; } #touch .cam { --k: -1; } #touch .resp { --k: 0; }
-    #touch .fs { left: var(--t-l); }
-    #touch[data-m=drive] .fs { --k: 2; left: calc(50% - var(--t-s) / 2 + var(--k) * (var(--t-s) + 8px)); }
-    #touch.fsok .fs { display: none; }
-    body[data-touch=drive] #ov-btn { right: auto !important; left: calc(50% + var(--t-s) / 2 + 8px); }
-    #ov-btn { position: fixed !important; top: var(--t-t) !important; right: var(--t-r) !important; width: var(--t-s) !important; height: var(--t-s) !important; opacity: 1 !important;
+    #touch .b svg, #ov-btn svg { width: 42%; height: 42%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 1.5px rgba(0,0,0,.6)); pointer-events: none; }
+    #touch .b::after { content: ''; position: absolute; inset: -7px; border-radius: 50%; }   /* the thumb's margin around the line */
+    #touch .lf { left: calc(var(--t-i) + var(--t-h) * var(--x)); } #touch .rt { right: calc(var(--t-i) + var(--t-h) * var(--x)); }
+    /* drive, left: the arrows under the minimap; shift beside it. right: gas and brake between the standings and the tachometer, nitrous left of it */
+    #touch .mk { pointer-events: none; --d: 116; --y: 340; } #touch .mk.l { --x: 14; } #touch .mk.r { --x: 142; }
+    #touch .gdn, #touch .gup { --d: 92; --y: 236; display: none; } #touch .gdn { --x: 164; } #touch .gup { --x: 266; }
+    #touch[data-g="1"] .gdn, #touch[data-g="1"] .gup { display: flex; }
+    #touch .gas { --d: 112; --y: 210; --x: 14; } #touch .brake { --d: 96; --y: 224; --x: 136; }
+    #touch .nitro { --d: 96; --y: 356; --x: 240; }
+    #touch .hand { --d: 96; --y: 236; --x: 242; display: none; } #touch[data-r=drift] .hand { display: flex; }
+    /* menu: up over down under the left thumb; OK under the right thumb, BACK beside it */
+    #touch .nav { --d: 92; --x: 14; } #touch .nav.up { --y: 262; } #touch .nav.dn { --y: 364; }
+    #touch .ok { --d: 112; --y: 344; --x: 14; } #touch .back { --d: 92; --y: 364; --x: 138; }
+    /* small circles on top. drive: pause, centre. menus: full screen left, options (web/overlay.js) right */
+    #touch .top { top: var(--t-t); width: var(--t-s); height: var(--t-s); }
+    #touch .pause { left: calc(50% - var(--t-s) / 2); } #touch .fs { left: max(16px, var(--t-i)); }
+    #touch[data-m=drive] .fs, #touch.fsok .fs, body[data-touch=drive] #ov-btn { display: none !important; }
+    #ov-btn { position: fixed !important; top: var(--t-t) !important; right: max(16px, var(--t-i)) !important; width: var(--t-s) !important; height: var(--t-s) !important; opacity: 1 !important;
       color: rgba(255,255,255,calc(var(--t-o) + .25)) !important; background: none !important; border: 1.5px solid rgba(255,255,255,var(--t-o)) !important; }
     #ov-btn.on { color: rgb(var(--t-c)) !important; border-color: rgb(var(--t-c)) !important; }
-    #ov { top: calc(var(--t-t) + var(--t-s) + 8px) !important; right: var(--t-r) !important; max-height: calc(100dvh - var(--t-t) - var(--t-s) - 20px); overflow: auto; }
-    /* drive: the two arrows under the left thumb, shift down / up above them; gas under the right thumb, brake beside it, nitro and handbrake on its arc */
-    #touch .mk.l { left: var(--t-l); } #touch .mk.r { left: calc(var(--t-l) + var(--t-u) * 1.4); }
-    #touch .gdn { left: var(--t-l); } #touch .gup { left: calc(var(--t-l) + var(--t-u) * 1); }   /* clear of the minimap */
-    #touch .gdn, #touch .gup { bottom: calc(var(--t-b) + var(--t-u) * 1.55); width: calc(var(--t-u) * .85); height: calc(var(--t-u) * .85); }
-    #touch .mk.gas { right: var(--t-r); width: calc(var(--t-u) * 1.35); height: calc(var(--t-u) * 1.35); }
-    #touch .brake { right: calc(var(--t-r) + var(--t-u) * 1.51); bottom: var(--t-b); width: calc(var(--t-u) * 1.05); height: calc(var(--t-u) * 1.05); }
-    #touch .nitro { right: calc(var(--t-r) + var(--t-u) * 1.14); bottom: calc(var(--t-b) + var(--t-u) * 1.14); width: calc(var(--t-u) * .9); height: calc(var(--t-u) * .9); }
-    #touch .hand { right: calc(var(--t-r) + var(--t-u) * .14); bottom: calc(var(--t-b) + var(--t-u) * 1.51); width: calc(var(--t-u) * .8); height: calc(var(--t-u) * .8); }
-    /* menu: up over down under the left thumb; OK under the right thumb, back beside it */
-    #touch .nav { left: var(--t-l); width: calc(var(--t-u) * .95); height: calc(var(--t-u) * .95); }
-    #touch .nav.up { bottom: calc(var(--t-b) + var(--t-u) * 1.1); } #touch .nav.dn { bottom: var(--t-b); }
-    #touch .ok { right: var(--t-r); bottom: var(--t-b); width: calc(var(--t-u) * 1.15); height: calc(var(--t-u) * 1.15); }
-    #touch .back { right: calc(var(--t-r) + var(--t-u) * 1.3); bottom: var(--t-b); width: calc(var(--t-u) * .85); height: calc(var(--t-u) * .85); }
+    #ov { top: calc(var(--t-t) + var(--t-s) + 8px) !important; right: max(16px, var(--t-i)) !important; max-height: calc(100dvh - var(--t-t) - var(--t-s) - 20px); overflow: auto; }
     #touch .tip { position: absolute; left: 50%; top: calc(var(--t-t) + var(--t-s) + 12px); transform: translateX(-50%); max-width: min(80vw, 420px);
       padding: 10px 16px; border-radius: 14px; background: rgba(8,10,18,.88); border: 1px solid rgba(255,255,255,.2); text-align: center; color: #fff;
-      font: 600 14px/1.4 system-ui, sans-serif; display: none; }
+      font: 600 14px/1.4 system-ui, sans-serif; letter-spacing: 0; display: none; }
     #touch .tip.on { display: block; }
     @media (prefers-reduced-motion: reduce) { #touch .b, #touch .g, #touch[data-m] .g { transition: none; } }`;
   document.head.appendChild(css);
 
   const svg = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
-  const disc = '<circle cx="12" cy="12" r="5.6"/><path d="M4.6 6.2a9.6 9.6 0 0 0 0 11.6M19.4 6.2a9.6 9.6 0 0 1 0 11.6"/>';   // the dashboard's brake lamp
   const I = {
-    left: svg('<path d="M15 5l-7 7 7 7"/>'), right: svg('<path d="M9 5l7 7-7 7"/>'),
-    up: svg('<path d="M5 15l7-7 7 7"/>'), down: svg('<path d="M5 9l7 7 7-7"/>'), ok: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
-    gup: svg('<path d="M7 9l5-5 5 5"/><path d="M12 13v7M8.5 16.5h7"/>'), gdn: svg('<path d="M7 15l5 5 5-5"/><path d="M8.5 7.5h7"/>'),
-    gas: svg('<path d="M5 12.5l7-7 7 7M5 19l7-7 7 7"/>'),
-    brake: svg(disc + '<path d="M12 9.4v3"/><path d="M12 14.7v.1"/>'),
-    hand: svg(disc + '<path d="M10.7 14.8V9.3h1.5a1.7 1.7 0 0 1 0 3.4h-1.5"/>'),
-    nitro: svg('<path d="M12.5 2.5c.6 3.6 5 5.6 5 10.6a5.5 5.5 0 0 1-11 0c0-2.2 1-3.6 2.2-4.8.2 1.8.9 2.7 1.9 3 -.6-3.4.5-6.6 1.9-8.8z"/>'),
-    back: svg('<path d="M8.5 5.5L4 10l4.5 4.5"/><path d="M4 10h10.5a4.5 4.5 0 0 1 0 9H11"/>'),
+    left: svg('<path d="M15 5l-7 7 7 7"/>'), right: svg('<path d="M9 5l7 7-7 7"/>'), up: svg('<path d="M5 15l7-7 7 7"/>'), down: svg('<path d="M5 9l7 7 7-7"/>'),
     pause: svg('<path d="M9 6v12M15 6v12"/>'), fs: svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
-    cam: svg('<path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13" r="3.2"/>'),
-    resp: svg('<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/>'),
   };
   const btn = (cls, label, k, title) => `<div class="b ${cls}" data-k="${k}" role="button" aria-label="${title}">${label}</div>`;
   const root = document.createElement('div');
   root.id = 'touch';
   root.innerHTML = `<div class="g drive">
-      <div class="z zl" data-z="l"></div><div class="z zr" data-z="r"></div>
-      <div class="b mk l">${I.left}</div><div class="b mk r">${I.right}</div><div class="b mk gas">${I.gas}</div>
-      ${btn('gdn', I.gdn, 'gdn', 'Bajar marcha')}${btn('gup', I.gup, 'gup', 'Subir marcha')}
-      ${btn('brake', I.brake, 'down', 'Frenar')}${btn('nitro', I.nitro, 'space', 'Nitro')}${btn('hand', I.hand, 'lshift', 'Freno de mano')}
-      ${btn('top pause', I.pause, 'esc', 'Pausa')}${btn('top cam', I.cam, 'camera', 'Cámara')}${btn('top resp', I.resp, 'respot', 'Reiniciar auto')}
+      <div class="z"></div>
+      <div class="b lf mk l">${I.left}</div><div class="b lf mk r">${I.right}</div>
+      ${btn('lf gdn', 'SHIFT<br>−', 'gdn', 'Shift down')}${btn('lf gup', 'SHIFT<br>+', 'gup', 'Shift up')}
+      ${btn('rt gas', 'GAS', 'up', 'Gas')}${btn('rt brake', 'BRAKE', 'down', 'Brake')}${btn('rt nitro', 'NITROUS', 'space,up', 'Nitrous')}${btn('rt hand', 'HAND<br>BRAKE', 'lshift', 'Handbrake')}
+      ${btn('top pause', I.pause, 'esc', 'Pause')}
     </div><div class="g menu">
-      <div class="sw"></div>${btn('nav up', I.up, 'up', 'Arriba')}${btn('nav dn', I.down, 'down', 'Abajo')}${btn('ok', I.ok, 'enter', 'Aceptar')}${btn('back', I.back, 'esc', 'Atrás')}
+      <div class="sw"></div>${btn('lf nav up', I.up, 'up', 'Up')}${btn('lf nav dn', I.down, 'down', 'Down')}${btn('rt ok', 'OK', 'enter', 'OK')}${btn('rt back', 'BACK', 'esc', 'Back')}
     </div><div class="b top fs" data-fs="1" role="button" aria-label="Pantalla completa">${I.fs}</div><div class="tip"></div>`;
   document.body.appendChild(root);
-  const mkL = root.querySelector('.mk.l'), mkR = root.querySelector('.mk.r'), mkGas = root.querySelector('.mk.gas');
+  const mkL = root.querySelector('.mk.l'), mkR = root.querySelector('.mk.r');
 
   // Full screen: Android has the API (web/app.js asks on every touch too); an iPhone has none for a page, only a web app
   // added to the home screen runs without the browser bars (web/app.webmanifest), so the button says how.
@@ -143,20 +132,17 @@ function startTouch(input) {
   const shown = () => root.style.display !== 'none';
   const driving = () => shown() && !document.hidden && root.dataset.m === 'drive';
 
-  // The two halves of the drive screen. Z.l / Z.r = the thumb on that half ({ id, x }).
-  const Z = { l: null, r: null };
-  let zKeys = new Set();
+  // The left half of the drive screen steers: zl = the thumb on it ({ id, x }), left or right of the middle between the two arrows.
+  let zl = null, zKeys = new Set();
   const zoneSync = () => {
     const k = new Set();
-    let sl = false, sr = false;
-    if (driving()) {
-      if (Z.l) { const x = Z.l.x - (mkL.getBoundingClientRect().right + mkR.getBoundingClientRect().left) / 2; sl = x < -TOUCH_STEER_DEAD_PX; sr = x > TOUCH_STEER_DEAD_PX; }
-      if (Z.r) k.add(D.up);
+    if (driving() && zl) {
+      const x = zl.x - (mkL.getBoundingClientRect().right + mkR.getBoundingClientRect().left) / 2;
+      if (x < -TOUCH_STEER_DEAD_PX) k.add(D.left);
+      if (x > TOUCH_STEER_DEAD_PX) k.add(D.right);
     }
-    if (sl) k.add(D.left);
-    if (sr) k.add(D.right);
     zKeys = swap(zKeys, k);
-    mkL.classList.toggle('on', sl); mkR.classList.toggle('on', sr); mkGas.classList.toggle('on', k.has(D.up));
+    mkL.classList.toggle('on', k.has(D.left)); mkR.classList.toggle('on', k.has(D.right));
   };
 
   // Menus: a sideways slide on the open screen is one left / right step per TOUCH_SWIPE_PX.
@@ -164,7 +150,7 @@ function startTouch(input) {
   const tapKey = d => { press(d); release(d); };
 
   const stop = e => {
-    for (const s of ['l', 'r']) if (Z[s]?.id === e.pointerId) { Z[s] = null; zoneSync(); }
+    if (zl?.id === e.pointerId) { zl = null; zoneSync(); }
     if (sw?.id === e.pointerId) sw = null;
     const p = ptr.get(e.pointerId);
     if (!p) return;
@@ -178,7 +164,7 @@ function startTouch(input) {
     e.preventDefault();
     if (el.dataset.fs) { goFull(); return; }
     try { el.setPointerCapture(e.pointerId); } catch {}   // the pointer can be gone already (a very short tap): the keys still go down and up
-    if (el.dataset.z) { Z[el.dataset.z] = { id: e.pointerId, x: e.clientX }; zoneSync(); return; }
+    if (el.classList.contains('z')) { zl = { id: e.pointerId, x: e.clientX }; zoneSync(); return; }
     if (el.classList.contains('sw')) {
       if (!(window.RN_FE || []).length) tapKey(D.enter);   // intro movies: no package to move in
       else sw = { id: e.pointerId, x: e.clientX };
@@ -189,14 +175,15 @@ function startTouch(input) {
     ptr.set(e.pointerId, { el, keys: swap(new Set(), new Set((el.dataset.k || '').split(',').filter(Boolean).map(n => D[n]))) });
   });
   root.addEventListener('pointermove', e => {
-    if (Z.l?.id === e.pointerId) { Z.l.x = e.clientX; zoneSync(); }
+    if (zl?.id === e.pointerId) { zl.x = e.clientX; zoneSync(); }
     if (sw?.id === e.pointerId && Math.abs(e.clientX - sw.x) >= TOUCH_SWIPE_PX) { tapKey(e.clientX < sw.x ? D.left : D.right); sw.x = e.clientX; }
   });
   for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) root.addEventListener(t, stop);
-  const releaseAll = () => { for (const id of [...ptr.keys(), Z.l?.id, Z.r?.id, sw?.id]) if (id !== undefined) stop({ pointerId: id }); zoneSync(); };
+  const releaseAll = () => { for (const id of [...ptr.keys(), zl?.id, sw?.id]) if (id !== undefined) stop({ pointerId: id }); zoneSync(); };
   // The layout follows the game's screens; what a thumb held on the old layout is released.
   const layout = () => {
-    const m = touchLayout(window.RN_FE || []);
+    const fe = window.RN_FE || [], m = touchLayout(fe), r = touchRace(fe);
+    root.dataset.r = r; root.dataset.g = r === 'drag' || window.RN_MANUAL ? 1 : 0;   // drift: handbrake; drag or manual gearbox: shift
     if (m === root.dataset.m) return;
     releaseAll(); root.dataset.m = document.body.dataset.touch = m; zoneSync();
   };
@@ -204,7 +191,6 @@ function startTouch(input) {
   // The options panel (web/overlay.js) reads and changes the choices; they apply at once.
   const apply = () => {
     document.documentElement.style.setProperty('--t-o', S.o / 100);
-    document.documentElement.style.setProperty('--t-k', S.k);
     releaseAll();
   };
   window.RN_TOUCH = { get: () => ({ ...S }), set: o => { Object.assign(S, o); try { localStorage.setItem('rn-touch', JSON.stringify(S)); } catch {} apply(); } };
