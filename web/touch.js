@@ -2,14 +2,14 @@
 // web/input.js (DIK keys through startInput's setKey, same ring and held set as the keyboard and web/pad.js). It never moves the
 // game's mouse: a phone has no pointer, so the game's arrow cursor stays parked off screen (OWNER 2026-11-15).
 // Keys are the game's default action table (exe 0x702c98, docs/re/hud_input.md): arrows steer / gas / brake, Left Shift handbrake,
-// Space nitrous, A / Z shift up / down, Esc pause; menus: arrows, Enter select, Esc back.
+// Space nitrous, A / Z shift up / down, C camera, R reset car, Esc pause; menus: arrows, Enter select, Esc back.
 // It steps aside when a real keyboard key or a gamepad is used, and comes back on the next touch.
 // Layouts, chosen by the game itself: web/boot.js passes each "flow fe" line (host/d3d9.c flow_log: the front-end
 // packages on screen) as window.RN_FE + an 'rn-fe' event, and "flow manual" as window.RN_MANUAL.
 //   drive: only HUD_*.fng / drag_HUD*.fng / Chyron*.fng are up. Left thumb: two arrows (the whole left half steers, by the side of
 //          their middle the thumb is on). Right thumb: GAS and BRAKE above the game's tachometer, NITROUS beside it (it holds the
 //          gas too: one thumb cannot hold both). HANDBRAKE only in a drift race, SHIFT - / + only in a drag race or with the manual
-//          gearbox. Top centre: pause. (OWNER 2026-11-15: no automatic gas; essential buttons; the tachometer stays in its corner.)
+//          gearbox. Top centre: camera, pause, reset car. (OWNER 2026-11-15: no automatic gas; essential buttons; the tachometer stays in its corner.)
 //   menu : any other package (menus, MU_Pause*, post race). Up over down in the left margin, BACK over OK in the right one (the menus keep the centred 4:3 column); a
 //          sideways slide anywhere else is left / right (car and option pickers). With no package up (intro movies) a touch is Enter.
 //   wait : PC_Loading.fng. Nothing but the top bar.
@@ -64,6 +64,9 @@ function startTouch(input) {
     #touch .ok { --d: 92; --y: 364; --x: 14; } #touch .back { --d: 92; --y: 262; --x: 14; }
     /* small circles on top. drive: pause, centre. menus: full screen left, options (web/overlay.js) right */
     #touch .top { top: var(--t-t); width: var(--t-s); height: var(--t-s); }
+    /* camera and reset car flank the pause (OWNER 2026-11-15: both back, as word buttons) */
+    #touch .cam, #touch .resp { --d: 72; top: var(--t-t); font-size: max(9px, calc(var(--t-h) * 12)); }
+    #touch .cam { left: calc(50% - var(--t-s) / 2 - 14px - var(--t-h) * 72); } #touch .resp { left: calc(50% + var(--t-s) / 2 + 14px); }
     #touch .pause { left: calc(50% - var(--t-s) / 2); } #touch .fs { left: max(16px, var(--t-i)); }
     #touch[data-m=drive] .fs, #touch.fsok .fs, body[data-touch=drive] #ov-btn { display: none !important; }
     #ov-btn { position: fixed !important; top: var(--t-t) !important; right: max(16px, var(--t-i)) !important; width: var(--t-s) !important; height: var(--t-s) !important; opacity: 1 !important;
@@ -90,7 +93,7 @@ function startTouch(input) {
       <div class="b lf mk l">${I.left}</div><div class="b lf mk r">${I.right}</div>
       ${btn('lf gdn', '<span>SHIFT<br>−</span>', 'gdn', 'Shift down')}${btn('lf gup', '<span>SHIFT<br>+</span>', 'gup', 'Shift up')}
       ${btn('rt gas', 'GAS', 'up', 'Gas')}${btn('rt brake', 'BRAKE', 'down', 'Brake')}${btn('rt nitro', 'NITROUS', 'space,up', 'Nitrous')}${btn('rt hand', '<span>HAND<br>BRAKE</span>', 'lshift', 'Handbrake')}
-      ${btn('top pause', I.pause, 'esc', 'Pause')}
+      ${btn('top pause', I.pause, 'esc', 'Pause')}${btn('cam', 'CAMERA', 'camera', 'Camera')}${btn('resp', 'RESET', 'respot', 'Reset car')}
     </div><div class="g menu">
       <div class="sw"></div>${btn('lf nav up', I.up, 'up', 'Up')}${btn('lf nav dn', I.down, 'down', 'Down')}${btn('rt ok', 'OK', 'enter', 'OK')}${btn('rt back', 'BACK', 'esc', 'Back')}
     </div><div class="b top fs" data-fs="1" role="button" aria-label="Pantalla completa">${I.fs}</div><div class="tip"></div>`;
