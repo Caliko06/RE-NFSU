@@ -141,12 +141,12 @@ async function startGpu(M, canvas, report, onFrame) {
 
   // Remaster pack (web/remaster, tools/remaster/index.py): FNV-1a 64 of a DXT level 0 -> an upscaled PNG.
   // A texture keeps its original; while its contents match the index it is drawn with the PNG (own mip chain).
-  // ?remaster=0 turns it off. No index file = off.
+  // The 1.1 GB texture pack is opt-in: ?remaster=1. Mode alone never downloads it.
   const pack = new Map(), hd = new Map();   // key -> png name; png name -> {view} once loaded, null while loading
   let packed = 0, hdMs = 0;   // hdMs: page-thread ms in pack uploads and view swaps since the last frame report
   // ?hdlog=1: each pack hit once (texture id, size, key, png), to find a texture the pack should not take.
   const hdLog = RN_Q.get('hdlog') === '1' ? new Set() : null;
-  if (RN_Q.get('remaster') !== '0') {
+  if (RN_Q.get('remaster') === '1') {
     // The world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh) are on by default in BC7; ?worldhd=0 turns them off.
     // As rgba8 (webp: ?worldhd=1&worldbc=0) gate60 passed 1 run in 4 (scenes > 3300 draws dropped 18-53 frames over 20 ms; base 0-2,
     // build/bench/e_default*); as BC7 4 in 4, max 24-25 ms, 0 > 33 ms like the base (build/bench/f_bc7_q*, 2026-10-26).

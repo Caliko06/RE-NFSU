@@ -106,14 +106,34 @@ EM_JS(int, web_list, (const char *rel, char *out, int outsz), {
 });
 // real is "game/<path>".
 EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
+    // Handles reopen the same immutable game file (WORLD CARS_TEXTURES especially).
+    // Keep recent fetched ranges across handles, rather than discarding them at gf_close.
+    var path = UTF8ToString(real), cache = Module.rnRanges ||= new Map();
+    for (var [key, r] of cache) {
+        if (r.path === path && off >= r.off && off + n <= r.off + r.data.length) {
+            HEAPU8.set(r.data.subarray(off - r.off, off - r.off + n), dst);
+            cache.delete(key); cache.set(key, r);
+            return n;
+        }
+    }
     var x = new XMLHttpRequest();
-    x.open('GET', '/' + UTF8ToString(real).split('/').map(encodeURIComponent).join('/'), false);
+    x.open('GET', '/' + path.split('/').map(encodeURIComponent).join('/'), false);
     x.responseType = 'arraybuffer';
     x.setRequestHeader('Range', 'bytes=' + off + '-' + (off + n - 1));
     x.send();
     if (x.status !== 206) return -1;
     var a = new Uint8Array(x.response);
     HEAPU8.set(a, dst);
+    // 64 MiB per reading worker; streams remain ranged, including all music.
+    if (a.length <= 64 * 1048576) {
+        var used = Module.rnRangeBytes || 0;
+        while (used + a.length > 64 * 1048576 && cache.size) {
+            var first = cache.keys().next().value;
+            used -= cache.get(first).data.length; cache.delete(first);
+        }
+        cache.set(path + ':' + off + ':' + a.length, { path: path, off: off, data: a });
+        Module.rnRangeBytes = used + a.length;
+    }
     return a.length;
 });
 #endif

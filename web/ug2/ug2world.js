@@ -63,11 +63,21 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
   const TEXTURED = RN_Q.get('ug2tex') !== '0';
   let device, gpu, loading = false;
 
-  // One UG2M file -> {nv, ni, vb, ib}, or null when it is missing or not a UG2M mesh.
+  // Prepared by tools/pack_loadfast.py. Explicit gzip works on plain static hosts too.
+  async function packed(name) {
+    const r = await fetch('/ug2/' + name + '.gz');
+    if (!r.ok) throw new Error(`${name}.gz: HTTP ${r.status}; run tools/pack_loadfast.py`);
+    return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+  }
+  async function textures() {
+    const b = await packed('tex.pack'), n = new DataView(b).getUint32(0, true);
+    const index = JSON.parse(new TextDecoder().decode(new Uint8Array(b, 4, n)));
+    const blob = new Blob([new Uint8Array(b, 4 + n)]);
+    return file => { const [at, len] = index[file]; return blob.slice(at, at + len, 'image/png'); };
+  }
+  // One UG2M file -> {nv, ni, vb, ib}, or null when it is not a UG2M mesh.
   async function read(name) {
-    const r = await fetch('/ug2/' + name).catch(() => null);
-    if (!r?.ok) return null;
-    const b = await r.arrayBuffer(), h = new Uint32Array(b, 0, 4);
+    const b = await packed(name), h = new Uint32Array(b, 0, 4);
     if (new TextDecoder().decode(new Uint8Array(b, 0, 4)) !== 'UG2M' || b.byteLength !== 16 + 16 * h[1] + 4 * h[2]) { console.warn('ug2:', name, 'is not a UG2M mesh'); return null; }
     say(`ug2: ${name} ${h[1]} verts ${h[2] / 3} tris`);
     return { nv: h[1], ni: h[2], vb: new Uint8Array(b, 16, 16 * h[1]), ib: new Uint32Array(b, 16 + 16 * h[1], h[2]) };
@@ -75,9 +85,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
 
   // city_tex.bin -> {uv Float32Array (2 per vertex), tri Uint16Array (texture per triangle)}, only when it matches city.bin.
   async function readSide(city, name = 'city_tex.bin') {
-    const r = await fetch('/ug2/' + name).catch(() => null);
-    if (!r?.ok) { say(`ug2: no ${name}, untextured`); return null; }
-    const b = await r.arrayBuffer(), h = new Uint32Array(b, 0, 5);
+    const b = await packed(name), h = new Uint32Array(b, 0, 5);
     if (new TextDecoder().decode(new Uint8Array(b, 0, 4)) !== 'UG2T' || h[1] !== city.nv || h[2] !== city.ni / 3) { say(`ug2: ${name} (${h[1]} verts, ${h[2]} tris) does not match its mesh, untextured`); return null; }
     return { uv: new Float32Array(b, 20, 2 * h[1]), tri: new Uint16Array(b, 20 + 8 * h[1], h[2]) };
   }
@@ -88,9 +96,9 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
 
   async function load(dev) {
     const t0 = performance.now();
-    const city = await read('city.bin') || await read('city_lod.bin'), bridge = await read('bridge.bin');
+    const [city, bridge, png] = await Promise.all([read('city.bin'), read('bridge.bin'), TEXTURED ? textures() : null]);
     if (!city) { say('ug2: no web/ug2/city.bin or city_lod.bin, nothing drawn'); return null; }
-    const side = TEXTURED ? await readSide(city) : null, bside = side && bridge ? await readSide(bridge, 'bridge_tex.bin') : null;
+    const [side, bside] = TEXTURED ? await Promise.all([readSide(city), bridge ? readSide(bridge, 'bridge_tex.bin') : null]) : [null, null];
     const info = side ? (await (await fetch('/ug2/tex.json')).json()).textures : [];
     const nv = city.nv + (bridge?.nv || 0), ntri = (city.ni + (bridge?.ni || 0)) / 3;
     // Vertices, 24 B: f32 xyz, u8 rgba, f32 uv (untextured: uv 0).
@@ -152,7 +160,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
       for (let j; (j = jobs.pop());) {
         const [bi, li, file] = j;
         try {
-          const img = await createImageBitmap(await (await fetch('/ug2/' + file)).blob(), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
+          const img = await createImageBitmap(png(file), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
           dev.queue.copyExternalImageToTexture({ source: img }, { texture: texs[bi], origin: [0, 0, li] }, [img.width, img.height]);
           img.close();
         } catch { failed++; }
