@@ -154,6 +154,7 @@ typedef struct {
     uint32_t last_reads, last_read_kb;
     float last_read_ms, last_hold_ms;
 } RnStab;
+void gil_frame_detail(float *wait_ms, float *other_ms, uint32_t *who);   // this Present interval: main's GIL wait, longest other hold + its thread; resets
 float gil_frame_hold_ms(void);   // largest GIL hold within this Present interval; resets its separate frame maximum
 void dispatch_threads_report(void);                             // log what every guest thread is doing now
 void threads_init(Ctx *main_ctx);

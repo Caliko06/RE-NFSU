@@ -106,10 +106,11 @@ async function startGpu(M, canvas, report, onFrame) {
       usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST }) };
   };
   const recycle = q => { if (`${q.w}x${q.h}` === qSize) freeQ.push(q); else q.tex.destroy(); };
-  // ?pace=vsync (OFF by default; th0mk/nfsu2-web framerate.c): each animation frame writes the refresh time (ms,
+  // Race frames on the display grid (ON by default since 2026-11-14, ?pace=0 off; th0mk/nfsu2-web framerate.c). Headless WORLD race,
+  // same build: off 24-60 frames > 23 ms, worst 30.5-47 ms; on 8, worst 27.9 (build/world_spikes2-3). Each animation frame writes the refresh time (ms,
   // timeOrigin based like the worker's emscripten_get_now) and the measured refresh period into host/d3d9.c pace_box,
   // whose address comes with each Present. In a race the game thread then sleeps after Present to the next display slot.
-  const PACE = RN_Q.get('pace') === 'vsync';
+  const PACE = RN_Q.get('pace') !== '0';
   let paceBox = 0, paceT = 0, paceP = 0;
   function showQueued(ts) {
     requestAnimationFrame(showQueued);
