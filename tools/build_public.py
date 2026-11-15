@@ -12,7 +12,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W, D = os.path.join(ROOT, "web"), os.path.join(ROOT, "dist")
 LINK_DIRS = ["gps", "launcher"]
 PAGES = ["index.html", "launcher.html"]
-FLAG = "<script>window.RN_PUBLIC=1</script>\n"
+FLAG = "<script>window.RN_PUBLIC=1;window.RN_V='%s'</script>\n"
+
+
+def version():
+    """One stamp per build: the page's scripts, speed.wasm and Speed.exe are asked as <name>?v=<stamp>, so a browser or an
+    edge holding an older copy (2026-11-15: a broken speed.wasm went out with a 1-day max-age) asks for the new one."""
+    h = hashlib.sha256()
+    for p in sorted(os.path.join(W, n) for n in os.listdir(W) if n.endswith((".js", ".html"))) + [
+            os.path.join(W, "gps", n) for n in ("map.js", "tp.js", "route.js")] + [
+            os.path.join(W, "ug2", "ug2world.js"), os.path.join(W, "out", "speed.js"), os.path.join(W, "out", "speed.wasm"), os.path.join(ROOT, "pc", "Speed.exe")]:
+        h.update(open(p, "rb").read())
+    return h.hexdigest()[:10]
+
+
+V = version()
 
 shutil.rmtree(D, ignore_errors=True)
 os.makedirs(os.path.join(D, "out"))
@@ -22,7 +36,8 @@ for n in sorted(os.listdir(W)):
     if os.path.isfile(p) and n != "setup.html" and not n.startswith("."):
         if n in PAGES:
             s = open(p, encoding="utf-8").read()
-            s = s.replace("<head>", "<head>\n" + FLAG, 1)
+            s = s.replace("<head>", "<head>\n" + FLAG % V, 1)
+            s = re.sub(r'(<script src="[^"?]+)"', r'\1?v=%s"' % V, s)
             open(os.path.join(D, n), "w", encoding="utf-8").write(s)
         else:
             shutil.copy2(p, os.path.join(D, n))

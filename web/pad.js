@@ -12,7 +12,7 @@
 const PAD_DIK = { esc: 0x01, enter: 0x1c, lshift: 0x2a, space: 0x39, up: 0xc8, left: 0xcb, right: 0xcd, down: 0xd0, camera: 0x2e, respot: 0x13 };
 const PAD_STICK = 0.4, PAD_TRIGGER = 0.3, PAD_IDLE_MS = 4000;
 
-// The menu/drive layout heuristic, shared with web/touch.js. st = { mode, last }; sig = { drive: gas pulled, menu: navigation
+// The menu/drive layout heuristic (web/touch.js reads the game's screens instead). st = { mode, last }; sig = { drive: gas pulled, menu: navigation
 // asked (d-pad, Start), active: any control held }; drive after the gas, menu on navigation or after idleMs without activity.
 function inputNextMode(st, now, sig, idleMs = PAD_IDLE_MS) {
   if (sig.drive) { st.mode = 'drive'; st.last = now; }

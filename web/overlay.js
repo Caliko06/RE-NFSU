@@ -8,12 +8,18 @@
   const stateOf = p => Object.assign({ ...defs }, p.set);
   const active = () => L.presets.find(p => { const s = stateOf(p); return Object.keys(s).every(k => s[k] === sel[k]); });
   // mode is not sent: L.save stores it for web/mode.js, and a ?mode= in the URL would pin it and break F4 (same as web/launcher.js)
-  const go = () => { L.save(sel); const q = L.query(sel).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&'); location.href = '/' + (q ? '?' + q : ''); };
+  // Phones start light on every visit (web/mode.js RN_PHONE): the panel shows what runs, and a choice made here goes in the address (mode and fx), for this visit only.
+  if (RN_PHONE && !new URLSearchParams(location.search).has('mode')) Object.assign(sel, stateOf(L.presets.find(p => p.id === 'modesto')), { mute: sel.mute });
+  const go = () => {
+    L.save(sel);
+    const q = L.query(sel).split('&').filter(x => x !== 'play=1' && (RN_PHONE || !x.startsWith('mode='))).concat(RN_PHONE && sel.fx !== '0' ? ['fx=1'] : []).join('&');
+    location.href = '/' + (q ? '?' + q : '');
+  };
 
   const css = document.createElement('style');
   css.textContent = `
     #ov-btn { position: fixed; top: 10px; right: 10px; z-index: 15; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25);
-      background: linear-gradient(135deg, #ff7a18, #af002d); color: #fff; font: 17px/1 system-ui; cursor: pointer; opacity: .35; padding: 0;
+      background: linear-gradient(135deg, #ff7a18, #af002d); color: #fff; font: 17px/1 system-ui; cursor: pointer; opacity: .35; padding: 0; display: flex; align-items: center; justify-content: center;
       transition: opacity .16s, transform .12s; }
     #ov-btn:hover, #ov-btn.on { opacity: 1; } #ov-btn:active { transform: scale(.97); }
     #ov { position: fixed; top: 52px; right: 10px; z-index: 15; width: 250px; padding: 12px; display: none; flex-direction: column; gap: 8px;
@@ -26,7 +32,8 @@
     @media (prefers-reduced-motion: reduce) { #ov-btn, #ov button { transition: none; } }`;
   document.head.appendChild(css);
 
-  const btn = Object.assign(document.createElement('button'), { id: 'ov-btn', textContent: '⚙', title: 'Opciones' });
+  const btn = Object.assign(document.createElement('button'), { id: 'ov-btn', title: 'Opciones' });   // sliders, drawn: the ⚙ glyph is an emoji on phones
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="55%" height="55%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h9M19 8h1M4 16h1M11 16h9"/><circle cx="16" cy="8" r="2.4"/><circle cx="8" cy="16" r="2.4"/></svg>';
   btn.tabIndex = -1;
   const panel = Object.assign(document.createElement('div'), { id: 'ov' });
   const toggle = on => { panel.classList.toggle('on', on); btn.classList.toggle('on', on); if (on) render(); else document.getElementById('screen')?.focus(); };

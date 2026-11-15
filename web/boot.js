@@ -22,8 +22,12 @@ setInterval(flush, 1000);
 const secs = () => ((performance.now() - t0) / 1000).toFixed(2);
 addEventListener('keydown', e => { if (!e.repeat) keep(`${secs()} key down ${e.code}`); }, true);
 addEventListener('keyup', e => keep(`${secs()} key up ${e.code}`), true);
-addEventListener('error', e => { line('JS error: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'stop'); flush(); });
-addEventListener('unhandledrejection', e => { line('JS rejection: ' + (e.reason && e.reason.stack || e.reason), 'stop'); flush(); });
+// A page error ends the session while the game is still loading (it would never start) or when it is the engine's
+// (out/speed.js and its threads, memory). Once the game runs, an error in the page's own controls is logged and the game goes on
+// (2026-11-15: a setPointerCapture error in web/touch.js put the stop card over a running race).
+const fatal = (msg, file) => RN_APP.state === 'check' || RN_APP.state === 'load' || !file || /speed\.js/.test(file) || /RuntimeError|abort|memory|unreachable|worker/i.test(msg);
+addEventListener('error', e => { line('JS error: ' + e.message + ' at ' + e.filename + ':' + e.lineno, fatal(String(e.message), e.filename) ? 'stop' : 'dim'); flush(); });
+addEventListener('unhandledrejection', e => { const t = String(e.reason && e.reason.stack || e.reason); line('JS rejection: ' + t, fatal(t, /speed\.js/.test(t) ? 'speed.js' : /\.js/.test(t) ? 'page' : '') ? 'stop' : 'dim'); flush(); });
 addEventListener('pagehide', flush);
 // The session report: one .json the browser saves (Downloads). Nothing is sent, so it also works on a plain host (RN_PUBLIC).
 // B while driving marks the spot (F8 and F10 are media keys on a Mac). The map (M) and the stop card have the download button.
@@ -57,6 +61,8 @@ addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classLis
 function line(s, cls) {
   keep(`${secs()} ${s}`);
   if (/^STOP|^JS |abort|Aborted|RuntimeError/.test(s)) setTimeout(flush, 0);
+  // The front-end packages on screen (host/d3d9.c flow_log): web/touch.js picks its layout from them.
+  if (s.includes('flow fe ')) { const m = /flow fe (\S*) \(frame/.exec(s); if (m) { window.RN_FE = m[1].split(',').filter(Boolean); dispatchEvent(new Event('rn-fe')); } }
   const d = document.createElement('div');
   if (cls) d.className = cls;
   else if (/^STOP/.test(s)) d.className = 'stop';
@@ -73,7 +79,7 @@ let up = false;
 RN_APP.on((s, from) => keep(`${secs()} app: ${from} -> ${s}`));
 // A download whose bytes are counted on the gate. Compressed transfers have no usable total, so it shows megabytes.
 async function download(url, what) {
-  const r = await fetch(url);
+  const r = await fetch(url + (window.RN_V ? '?v=' + RN_V : ''));   // RN_V: tools/build_public.py, a new address per build
   if (!r.ok) throw new Error(`descarga de ${url}: HTTP ${r.status}`);
   let n = 0, mb = -1;
   const count = new TransformStream({ transform(c, ctl) {
@@ -131,6 +137,7 @@ async function download(url, what) {
       line(`ug2: city pass ${window.Ug2?.on ? 'on (drawn while the track id is 1010)' : 'off until the track id is 1010, nothing fetched'} (mode ${RN_MODE}, WORLD row ${m.ENV.RN_WORLDROW === '0' ? 'off' : m.ENV.RN_WORLDROW === '2' ? 'hidden (menu button only)' : 'listed'})`);
       // ?fps=30: the host frame pacer targets 30 fps (web/mode.js degradation switches; ?fx=0 is read there)
       if (RN_Q.get('fps') === '30') m.ENV.RN_FPS = '30';
+      if (RN_PHONE) m.ENV.RN_RANGEMB = '16';   // host/files.c: the cache of fetched ranges, per reading thread (64 MB elsewhere)
       if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
       for (const kv of (RN_Q.get('env') || '').split(',').filter(Boolean)) {
