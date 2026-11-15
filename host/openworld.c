@@ -118,7 +118,15 @@ int rn_tex_overlay;   // 1 once Cars/TEXTURES.BIN was served from the overlay wi
 
 // RN_WORLDROW: 0 = no row (the table as shipped), 1 (default) = the row listed in Free Run, 2 = the row present but in no list (mask 0x80): Original
 // mode (web/mode.js), where the track still has to exist for the main menu's WORLD button (PATCH 0x4b342a, host/input.c world_arm) to start it.
+// RN_NOWORLD=1 (phones and tablets, OWNER 2026-11-15: WORLD is for computers; web/boot.js): no row in any mode, nothing of WORLD is ever fetched;
+// the main menu's button reads "WORLD (PC)" and only says so (host/input.c world_arm).
+int world_off(void) {
+    static int m = -1;
+    if (m < 0) { const char *e = getenv("RN_NOWORLD"); m = e && e[0] == '1'; }
+    return m;
+}
 static int worldrow_mode(void) {
+    if (world_off()) return 0;
     static int m = -1;
     if (m < 0) { const char *e = getenv("RN_WORLDROW"); m = !e || !e[0] ? 1 : e[0] == '0' ? 0 : e[0] == '2' ? 2 : 1; }
     return m;
@@ -159,12 +167,12 @@ uint32_t world_rows(Ctx *c) {
 // (b) with the row listed, the name of the WORLD row in sorted place.
 uint32_t world_lang(Ctx *c) {
     uint32_t chunk = ARG(0), r = call_guest_cdecl(c, 0x59fce0, 1, &chunk);
-    if (!r || ld(c, chunk, 4) != 0x39000 || !worldrow_on()) return r;
+    if (!r || ld(c, chunk, 4) != 0x39000 || (!worldrow_on() && !world_off())) return r;
     uint32_t n = ld(c, 0x73442c, 4), tab = ld(c, 0x734434, 4);
     if (!tab || !n) return r;
-    uint32_t str = guest_alloc(8), k = 0;
+    uint32_t str = guest_alloc(16), k = 0;
     if (!str) return r;
-    snprintf(G(str), 8, "WORLD");
+    snprintf(G(str), 16, world_off() ? "WORLD (PC)" : "WORLD");
     for (uint32_t j = 0; j < n; j++) if (ld(c, tab + 8 * j, 4) == ONLINE_LABEL_HASH) { st(c, tab + 8 * j + 4, str, 4); break; }   // 0x59fce0 made the pointers absolute
     if (worldrow_mode() != 1) return r;
     uint32_t nt = guest_alloc((n + 1) * 8);

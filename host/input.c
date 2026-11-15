@@ -307,6 +307,8 @@ void input_jump(Ctx *c) {
 static int world_pending;
 uint32_t world_arm(Ctx *c) {
     (void)c;
+    extern int world_off(void);   // host/openworld.c: phones have no WORLD; the Quick Race screen the patch opens stays
+    if (world_off()) { rn_log("WORLD: only on a computer (RN_NOWORLD)"); return 0; }
     world_pending = 1;
     rn_log("WORLD: button pressed at frame %u", rn_telem.presents);
     return 0;

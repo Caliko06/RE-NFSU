@@ -61,10 +61,6 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
   let world = false;   // the race's track id is 1010 (scene() reads it before anything else)
   const api = window.Ug2 = { get on() { return allowed && (RN_MODE === 'remaster' || world); }, state: 'idle' };
   const TEXTURED = RN_Q.get('ug2tex') !== '0';
-  // Phones and tablets (web/mode.js RN_PHONE; ?ug2half=1|0 forces it): the half-size texture pack (tex_half.pack, tools/pack_loadfast.py: each
-  // texture at half width and height, i.e. today's mip 1, as WebP). A quarter of the GPU memory and of the download; and the pack is fetched after the
-  // mesh is on the GPU, not beside it, so the page never holds both.
-  const HALF = RN_Q.has('ug2half') ? RN_Q.get('ug2half') === '1' : RN_PHONE;
   let device, gpu, loading = false;
 
   // Prepared by tools/pack_loadfast.py. Explicit gzip works on plain static hosts too.
@@ -74,10 +70,10 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
   }
   async function textures() {
-    const b = await packed(HALF ? 'tex_half.pack' : 'tex.pack'), n = new DataView(b).getUint32(0, true);
+    const b = await packed('tex.pack'), n = new DataView(b).getUint32(0, true);
     const index = JSON.parse(new TextDecoder().decode(new Uint8Array(b, 4, n)));
     const blob = new Blob([new Uint8Array(b, 4 + n)]);
-    return file => { const [at, len] = index[file]; return blob.slice(at, at + len, HALF ? 'image/webp' : 'image/png'); };
+    return file => { const [at, len] = index[file]; return blob.slice(at, at + len, 'image/png'); };
   }
   // One UG2M file -> {nv, ni, vb, ib}, or null when it is not a UG2M mesh.
   async function read(name) {
@@ -100,13 +96,12 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
 
   async function load(dev) {
     const t0 = performance.now();
-    const pngSoon = TEXTURED && !HALF ? textures() : null;
+    const pngSoon = TEXTURED ? textures() : null;
     pngSoon?.catch(() => {});   // awaited below, where a failure is reported
     let [city, bridge] = await Promise.all([read('city.bin'), read('bridge.bin')]);
     if (!city) { say('ug2: no web/ug2/city.bin, nothing drawn'); return null; }
     let [side, bside] = TEXTURED ? await Promise.all([readSide(city), bridge ? readSide(bridge, 'bridge_tex.bin') : null]) : [null, null];
     const info = side ? (await (await fetch('/ug2/tex.json')).json()).textures : [];
-    if (HALF) for (const t of info) { t.w = Math.max(1, t.w >> 1); t.h = Math.max(1, t.h >> 1); }
     const nv = city.nv + (bridge?.nv || 0), ntri = (city.ni + (bridge?.ni || 0)) / 3;
     // Vertices, 24 B: f32 xyz, u8 rgba, f32 uv (untextured: uv 0).
     // Written straight into the GPU buffers (mappedAtCreation): no second copy of the 102 MB of vertices and 35 MB of indices in the page.
@@ -161,7 +156,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     order.forEach((o, r) => { const n = start[r + 1] - start[r]; if (n) draws.push({ cls: o.cls, bucket: o.s >> 16, layer: o.s & 0xffff, first: 3 * start[r], count: 3 * n }); });
     ibuf.unmap();
     city = bridge = side = bside = null;   // the files' bytes are not needed past this line
-    const png = TEXTURED ? await (pngSoon || textures()) : null;
+    const png = await pngSoon;
     const tMesh = performance.now();
     // Upload the pixels: each PNG into its layer, then the mips on the GPU.
     const texs = blist.map(b => dev.createTexture({ size: [b.w, b.h, b.list.length], format: 'rgba8unorm', dimension: '2d',
@@ -195,7 +190,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     });
     dev.queue.submit([enc.finish()]);
     const mb = texs.reduce((a, t) => a + t.width * t.height * t.depthOrArrayLayers * 4 * 4 / 3, 0) / 1e6;
-    say(`ug2: ${info.length ? (HALF ? 'textured, half-size pack' : 'textured') : 'untextured'}: ${nv} verts ${ntri} tris, ${draws.length} draws, ${info.filter(t => t.file).length} textures in ${blist.length} arrays (${mb.toFixed(0)} MB with mips, ${failed} failed), mesh ${(tMesh - t0).toFixed(0)} ms, total load ${(performance.now() - t0).toFixed(0)} ms`);
+    say(`ug2: ${info.length ? 'textured' : 'untextured'}: ${nv} verts ${ntri} tris, ${draws.length} draws, ${info.filter(t => t.file).length} textures in ${blist.length} arrays (${mb.toFixed(0)} MB with mips, ${failed} failed), mesh ${(tMesh - t0).toFixed(0)} ms, total load ${(performance.now() - t0).toFixed(0)} ms`);
     return { vbuf, ibuf, draws, texs };
   }
 

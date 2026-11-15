@@ -58,9 +58,11 @@ addEventListener('keydown', e => {
   if (!e.repeat) (e.code === 'F10' ? window.rnReport : window.rnMark)();
 }, true);
 addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classList.toggle('dbg'); e.preventDefault(); e.stopPropagation(); } }, true);
+const NOWORLD = RN_Q.has('noworld') ? RN_Q.get('noworld') === '1' : RN_PHONE;
 function line(s, cls) {
   keep(`${secs()} ${s}`);
   if (/^STOP|^JS |abort|Aborted|RuntimeError/.test(s)) setTimeout(flush, 0);
+  if (s.includes('WORLD: only on a computer')) window.rnToast?.('WORLD es solo para computadora', 4000);
   // The front-end packages on screen (host/d3d9.c flow_log): web/touch.js picks its layout from them.
   if (s.includes('flow fe ')) { const m = /flow fe (\S*) \(frame/.exec(s); if (m) { window.RN_FE = m[1].split(',').filter(Boolean); dispatchEvent(new Event('rn-fe')); } }
   const d = document.createElement('div');
@@ -141,6 +143,8 @@ async function download(url, what) {
       line(`ug2: city pass ${window.Ug2?.on ? 'on (drawn while the track id is 1010)' : 'off until the track id is 1010, nothing fetched'} (mode ${RN_MODE}, WORLD row ${m.ENV.RN_WORLDROW === '0' ? 'off' : m.ENV.RN_WORLDROW === '2' ? 'hidden (menu button only)' : 'listed'})`);
       // ?fps=30: the host frame pacer targets 30 fps (web/mode.js degradation switches; ?fx=0 is read there)
       if (RN_Q.get('fps') === '30') m.ENV.RN_FPS = '30';
+      // Phones and tablets have no WORLD (OWNER 2026-11-15: WORLD is for computers; host/openworld.c world_off). ?noworld=0|1 says otherwise.
+      if (NOWORLD) m.ENV.RN_NOWORLD = '1';
       if (RN_PHONE) m.ENV.RN_RANGEMB = '16';   // host/files.c: the cache of fetched ranges, per reading thread (64 MB elsewhere)
       if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
@@ -192,7 +196,7 @@ async function download(url, what) {
         if (!keys && !RN_Q.get('jump')) m.ENV.RN_KEYS = '1500@=MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN';
       }
       // ?pool=1 opens WORLD directly (the menu path of tools/completion.py jump 3:1010); ?keys= or ?jump= take over
-      if (RN_Q.get('pool') === '1' && !keys && !jump) {
+      if (RN_Q.get('pool') === '1' && !keys && !jump && !NOWORLD) {
         m.ENV.RN_JUMP = '3:1010';
         m.ENV.RN_KEYS = '1500@=MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN,1500@=MU_Main_PC:RETURN';   // no movies to tap through (patches_launcher.py)
         // no RETURN after flow 6: in a race RETURN changes the camera (taps at flow 6/3 and 6/4 cycled POV 1 -> 2 -> 0, FEEL log 2026-11-10)
