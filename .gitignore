@@ -13,6 +13,7 @@ web/remaster/
 /runs
 census/hopper/decomp.c
 web/ug2/*.bin
+web/ug2/*.gz
 web/ug2/tex/
 web/ug2/tex.json
 dist/

@@ -38,3 +38,35 @@ Opener chain (V = literal + xref, I = inferred): bOpenFile 0x594c60 / queue Asyn
 | SpeechStreams, Movies | 0x521e8b SPEECHSTREAMS\ ; MoviePlayer::BuildPath 0x4f57a0 (ref 0x4f57af) | not requested | UNKNOWN |
 | web/ug2 | web/ug2/ug2world.js:68 city.bin, :78 city_tex.bin, :91 bridge, :94 tex.json, :155 tex/*.png | city ready 19.6 s (loads only in WORLD) | whole files |
 Not VERIFIED: the real menu path (title, profile, Quick Race), Original mode tracks, other languages, any non-localhost timing or compression ratio of the data files. REA MCP was not available in this session: second tool = Ghidra decomp + objdump (census/ghidra/, pc/Speed.exe).
+
+## First-play reduction, slice/loadfast, 2026-11-14
+
+FACT: cold browser contexts, headless and muted, same `:5181/?play=1&pool=1&mode=remaster&mute=1` before/after. CDP records page and workers, including in-flight `Network.dataReceived` bytes. Chrome applies 50 Mbit/s at the page context (worker XHRs are also slowed); no added RTT. Three paired runs: calibration, baseline, after. Two earlier CDP setup failures stopped before game startup. Each paired run is bounded to 295 s. `tools/loadfast.mjs` reproduces the capture; `tools/loadfast_report.py` places the milestones using the page log. Menu means the first `flow state 3/255` (front end active, before the automatic WORLD jump), not a manual main-menu route. Byte units below are decimal MB, not MiB; all totals are cumulative from the link.
+
+| Case | Menu MB / requests / seconds | WORLD HUD MB / requests / seconds | HUD + Bayview drawn MB / requests / seconds |
+|---|---:|---:|---:|
+| Before, local | 40.8 / 326 / 1.70 | 441.4 / 2960 / 22.67 | 441.4 / 2960 / 22.67 |
+| After, local | 37.1 / 97 / 3.31 | 286.6 / 590 / 24.33 | 286.6 / 590 / 24.33 |
+| Before, 50 Mbit | 46.0 / 348 / 8.65 | 301.0 / 1599 / 58.19 | 471.7 / 3133 / 85.97 |
+| After, 50 Mbit | 36.6 / 99 / 7.41 | 240.8 / 684 / 53.69 | 302.4 / 706 / 64.57 |
+
+| Case | Menu -> HUD MB / requests / seconds |
+|---|---:|
+| Before, local | 400.6 / 2634 / 20.97 |
+| After, local | 249.5 / 493 / 21.02 |
+| Before, 50 Mbit | 255.0 / 1251 / 49.54 |
+| After, 50 Mbit | 204.2 / 585 / 46.28 |
+
+FACT: at 50 Mbit, the fully drawn WORLD costs 169.2 MB less (35.9%), 2427 fewer requests (77.5%), and arrives 21.4 s sooner (24.9%). The HUD alone does not mean Bayview is ready: the city already loaded asynchronously before this change. The local total time regressed 1.66 s; menu -> HUD stayed about 21 s. INFERENCE: the new build's first local request also regenerated the server's wasm gzip, whereas the baseline server already had it from calibration. This was not isolated in another run. Each case is one sample; the traffic pool and music selection vary.
+
+Changes and exact paths:
+
+- `host/files.c:web_read`: 64 MiB LRU of immutable fetched ranges per reading worker, reused across file handles. A request fully contained in a cached range avoids XHR. At 50 Mbit, CARS_TEXTURES went from 61 requests / 11.96 MB to 55 / 9.34 MB. **Remaining waste:** overlapping ranges are not merged, and workers do not share this cache. This is a partial reduction, not elimination of the repeated-file problem.
+- `tools/pack_loadfast.py` + `web/ug2/ug2world.js:packed/textures/load`: explicit gzip streams and one indexed PNG payload, using browser-native `DecompressionStream`, `Blob.slice`, and `createImageBitmap`. City mesh 103.38 -> 39.40 MB; UV sidecar 45.78 -> 2.89 MB. Texture requests 1482 in these runs -> one 59.26 MB pack; every PNG byte is preserved. Both after logs report 1482 textures, 1483 draws, **0 failed**. This uses the current exports, whose texture count differs from the older 1489-file observation.
+- `web/gpu.js` and `web/launcher_opts.js`: the texture pack requires explicit `?remaster=1`; mode `remaster` alone leaves it off. No Remaster texture asset transfers in either after case (a small off-list TSV remains). All music files and their range reads remain. No guest executable patch or change to Original's gameplay paths.
+
+Prepare assets after every UG2 export, before serving or static packaging: `python3 tools/pack_loadfast.py`. The five generated `web/ug2/*.gz` files are required and ignored by git, like the source city exports. Upload them unchanged; decoding is explicit, so no Content-Encoding configuration is required. Do not configure a static host to automatically decode these `.gz` files. `tools/build_public.py` was not changed. The existing pack links the whole ug2 directory; its new pack-building lane must retain these five files. The host C build used `RN_JOBS=4 .venv/bin/python tools/recomp/build.py web`.
+
+Evidence: `census/loadfast.json` (phase totals, hashes and file counts); raw page/worker CDP captures and timed logs in `build/loadfast/{baseline,after}/`; inspected screenshots `/plan/shots/loadfast_before50.png` and `/plan/shots/loadfast_after50.png`. Code-path census: `census/names_files.tsv`. Prior art consulted: [NFSU2Recomp](https://github.com/TalhaMudo/NFSU2Recomp), [nfsu2-sw performance notes](https://github.com/antoxa2584x/nfsu2-sw/blob/main/PERF_NOTES.md), and [CDP Network](https://chromedevtools.github.io/devtools-protocol/tot/Network/). The chosen implementation uses the browser's gzip decoder and existing game file ranges rather than another runtime library.
+
+UNKNOWN / not verified: real WAN RTT or public hosting, other devices/browsers, manual menu navigation, Original tracks, explicit Remaster opt-in execution after the gate change, audible music (runs must be muted), and long-session memory. Whole-city spatial streaming and a new loading-progress UI were not implemented; row 4 is not fully VERIFIED by this slice.

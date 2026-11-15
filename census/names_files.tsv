@@ -22,3 +22,5 @@ addr	name	system	confidence	evidence	tool	doc
 0x6ee658	LanguageFileTable	files	med	I: pointer to LANGUAGES\ENGLISH.BIN (0x6b87d8) found by scanning Speed.exe; the 9 language .BIN names are 0x6b869c..0x6b87d8	ghidra+objdump+strings+run1 CDP log	docs/re/public_pack.md
 0x411910	Drive_HasRacerBin	files	high	V: existing name; tracks\racer.bin ref 0x41195b, existence check only (web_lookup, no byte read in run)	ghidra+objdump+strings+run1 CDP log	docs/re/public_pack.md
 0x447160	InitZDirArchive	files	high	V: existing name; NFSUNDER\ZDIR.BIN (0x447164/0x44718f), neither it nor ZZDATA ships	ghidra+objdump+strings+run1 CDP log	docs/re/public_pack.md
+host/files.c:web_read	WebFileRangeCache	files	high	V: immutable fetched ranges survive gf_close; containing-range hit copies exact bytes; 64 MiB LRU per reading worker; CDP census/loadfast.json; no guest binary patch	source+CDP	docs/re/public_pack.md
+web/ug2/ug2world.js:packed	WorldCompressedAssets	files	high	V: explicit browser gzip decode of unchanged UG2M/UG2T and PNG payloads; exporter tools/pack_loadfast.py; zero texture failures in after log	source+CDP+render	docs/re/public_pack.md

@@ -1,0 +1,128 @@
+{
+  "date": "2026-11-14",
+  "branch": "slice/loadfast",
+  "base_commit": "21106c0",
+  "url": "/?play=1&pool=1&mode=remaster&mute=1",
+  "method": "Three paired measurement runs; first run calibrated HUD-vs-city and markers, second is baseline, third is after. Separate cold browser contexts per local/50 Mbit scenario. CDP page throttling, workers logged, zero added RTT. Two pre-measurement CDP setup failures did not start the game.",
+  "units": "decimal MB, seconds from navigation; marker boot origin estimated with first /log dispatch",
+  "cases": {
+    "baseline-local": {
+      "phases": {
+        "menu": {
+          "bytes": 40765821,
+          "requests": 326,
+          "seconds": 1.701
+        },
+        "hud": {
+          "bytes": 441394978,
+          "requests": 2960,
+          "seconds": 22.671
+        },
+        "world": {
+          "bytes": 441394978,
+          "requests": 2960,
+          "seconds": 22.671
+        }
+      },
+      "cars_textures": [
+        11533562,
+        63
+      ],
+      "remaster_asset_bytes": 37467640,
+      "png_requests": 1482,
+      "texture_pack": null,
+      "raw_cdp_sha256": "b66d1d5b4fe96c3e826120b1c6fc6b078e2055908b92cc6b1edfbf1c56fe0b5c",
+      "raw_cdp": "build/loadfast/baseline/local.json"
+    },
+    "baseline-50mbit": {
+      "phases": {
+        "menu": {
+          "bytes": 46002105,
+          "requests": 348,
+          "seconds": 8.646
+        },
+        "hud": {
+          "bytes": 300983696,
+          "requests": 1599,
+          "seconds": 58.186
+        },
+        "world": {
+          "bytes": 471683740,
+          "requests": 3133,
+          "seconds": 85.966
+        }
+      },
+      "cars_textures": [
+        11957131,
+        61
+      ],
+      "remaster_asset_bytes": 14771359,
+      "png_requests": 1482,
+      "texture_pack": null,
+      "raw_cdp_sha256": "d4522899e908b29bb76ce4c9ed8b17f793172347a9f3adcf7b7eb23f4669ada3",
+      "raw_cdp": "build/loadfast/baseline/50mbit.json"
+    },
+    "after-local": {
+      "phases": {
+        "menu": {
+          "bytes": 37117910,
+          "requests": 97,
+          "seconds": 3.307
+        },
+        "hud": {
+          "bytes": 286564894,
+          "requests": 590,
+          "seconds": 24.327
+        },
+        "world": {
+          "bytes": 286564894,
+          "requests": 590,
+          "seconds": 24.327
+        }
+      },
+      "cars_textures": [
+        9734551,
+        52
+      ],
+      "remaster_asset_bytes": 755,
+      "png_requests": 0,
+      "texture_pack": [
+        59256422,
+        1
+      ],
+      "raw_cdp_sha256": "5baf778b9597cc89874eba832e819bf22497d080a7cb944ef0699b50b978ec11",
+      "raw_cdp": "build/loadfast/after/local.json"
+    },
+    "after-50mbit": {
+      "phases": {
+        "menu": {
+          "bytes": 36592961,
+          "requests": 99,
+          "seconds": 7.407
+        },
+        "hud": {
+          "bytes": 240773139,
+          "requests": 684,
+          "seconds": 53.687
+        },
+        "world": {
+          "bytes": 302445134,
+          "requests": 706,
+          "seconds": 64.567
+        }
+      },
+      "cars_textures": [
+        9343502,
+        55
+      ],
+      "remaster_asset_bytes": 755,
+      "png_requests": 0,
+      "texture_pack": [
+        59256422,
+        1
+      ],
+      "raw_cdp_sha256": "c0a80962dcb956eb725aa15e1bae1d53546832a26a1b9567b34315cae7018645",
+      "raw_cdp": "build/loadfast/after/50mbit.json"
+    }
+  }
+}
