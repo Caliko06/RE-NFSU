@@ -1,8 +1,7 @@
-// Pre-game launcher v2 (UI). Data comes from window.RN_LAUNCH (web/launcher_opts.js); "Jugar" goes to /?play=1&...
-// The scene behind is window.RN_SCENE (web/launcher_b/scene.js, a module that runs before this one), sound is window.RN_SND (web/launcher_audio.js). Both are optional:
-// every call is guarded, so the UI works over a dark gradient and in silence.
-// Game font: launcher/v2/ui/game_font.png + game_font.json (BMFont-like: glyph rects + advance; see GF below). When present, labels
-// are drawn from it (mask sprites); otherwise the condensed italic system stack in launcher.css is used.
+// Launcher (UI): one JUGAR on the left, the settings board on the right (OWNER 2026-11-15, plan row 10).
+// Sheet A = the few options a newcomer needs; sheet B (Avanzado) = every option of web/launcher_opts.js by group, plus keys and saves.
+// The scene behind is window.RN_SCENE (web/launcher_b/scene.js), sound is window.RN_SND (web/launcher_audio.js); both optional, every call is guarded.
+// Game font: launcher/v2/ui/game_font.png + .json; labels drawn from it are mask sprites (class gf).
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -12,17 +11,16 @@
   const root = document.documentElement, body = document.body;
   // Display copy: noun phrases, neutral Mexican Spanish. The catalog (launcher_opts.js) keeps its own strings; these win when present.
   const COPY = {
-    preset: { original: ['Original 2003', 'El juego tal como salió.'], remaster: ['Remaster', 'Texturas y efectos mejorados.'], modesto: ['Ligero', 'Original a 30 fps, sin efectos.'] },
-    label: { blur: 'Desenfoque de velocidad' },
+    label: { blur: 'Blur de velocidad', fxaa: 'Suavizado FXAA', msaa: 'Suavizado MSAA', chasecam: 'Cámara inclinada', nitrocam: 'Cámara con nitro', speedfov: 'Visión con velocidad', fps: 'Fotogramas', remaster: 'Texturas remaster', skinhd: 'Pinturas en HD', bloom: 'Brillo de luces', roadrefl: 'Reflejo del camino', fx: 'Efectos remaster', trafyield: 'Tráfico se aparta', ai: 'Rivales con carácter', traffic: 'Tráfico', career: 'Progreso', touch: 'Táctil', steer: 'Giro del teclado', carlook: 'Pintura del coche' },
     group: { camara: 'Cámara' },
   };
-  const MODE_NAME = { original: 'Original 2003', remaster: 'Remaster' };
   const L = window.RN_LAUNCH;
-  const ok = !!(L && Array.isArray(L.opts) && Array.isArray(L.presets) && typeof L.query === 'function');
   const scene = (fn, ...a) => { try { const s = window.RN_SCENE; if (s && typeof s[fn] === 'function') return s[fn](...a); } catch (e) { console.warn('RN_SCENE.' + fn, e); } };
   const snd = n => { try { window.RN_SND && window.RN_SND.play(n); } catch {} };
   const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
   const wait = ms => new Promise(r => setTimeout(r, ms));
+  // a material that did not load is dropped: its element falls back to a plain CSS surface (launcher.css :not(:has(.bg)))
+  document.addEventListener('error', e => { const t = e.target; if (t && t.tagName === 'IMG' && t.closest('.board, .arr')) { if (t.parentElement.classList.contains('arr')) t.replaceWith(t.parentElement.classList.contains('l') ? '‹' : '›'); else t.remove(); } }, true);
 
   // ---------- motion switch (default ON, ignores the OS reduce-motion setting) ----------
   let motion = store.get('rn_launch_motion', '1') !== '0';
@@ -90,523 +88,263 @@
   const T = text => { const s = el('span', 't', text); s._text = text; GF.apply(s); return s; };
   const setT = (s, text) => { s._text = text; s.textContent = text; s.classList.remove('gf'); GF.apply(s); };
 
-  // ---------- the one sliding light (spring) ----------
-  function Light(node, box) {
-    node.innerHTML = '<i class="bg"></i><span class="chevs"></span><i class="flash"></i>';
-    let y = 0, h = 0, vy = 0, vh = 0, ty = 0, th = 0, raf = 0, last = 0, first = true, target = null, lastH = -1;
-    const apply = () => {
-      node.style.transform = `translate3d(0,${y.toFixed(2)}px,0) scaleY(${(1 + Math.min(Math.abs(vy) * 0.00004, .05)).toFixed(3)})`;
-      if (Math.abs(h - lastH) > .4) { node.style.height = h.toFixed(1) + 'px'; lastH = h; }
-    };
-    const tick = t => {
-      const K = motion ? 520 : 800, D = motion ? 31 : 56;       // ~160 ms to arrive, about 5 % overshoot (critical in calm mode)
-      const dt = Math.min((t - last) / 1000, .033); last = t;
-      const n = Math.max(1, Math.ceil(dt / (1 / 240))), s = dt / n;
-      for (let i = 0; i < n; i++) {
-        vy += (-K * (y - ty) - D * vy) * s; y += vy * s;
-        vh += (-K * (h - th) - D * vh) * s; h += vh * s;
-      }
-      if (Math.abs(y - ty) < .05 && Math.abs(vy) < .5 && Math.abs(h - th) < .05 && Math.abs(vh) < .5) { y = ty; h = th; vy = vh = 0; raf = 0; apply(); return; }
-      apply(); raf = requestAnimationFrame(tick);
-    };
-    const api = {
-      node,
-      to(t, snap) {
-        target = t; ty = t.offsetTop; th = t.offsetHeight;
-        if (first || snap || !th) { y = ty; h = th; vy = vh = 0; apply(); first = false; node.classList.add('on'); return; }
-        if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
-      },
-      resnap() { if (target && target.offsetParent) { ty = target.offsetTop; th = target.offsetHeight; y = ty; h = th; vy = vh = 0; apply(); } },
-      press(v) { node.classList.toggle('press', v); },
-      hide() { node.classList.remove('on'); first = true; },
-    };
-    if (window.ResizeObserver) new ResizeObserver(() => api.resnap()).observe(box);
-    return api;
-  }
-
-  // tube warm-up: a few hard on/off steps, then steady
-  function flicker(item) {
-    const art = item.querySelector('.art');             // a thing on the wall does not flicker: it gets a slap
-    if (art) { if (motion) art.animate([{ transform: 'scale(1.06) rotate(-1.4deg)' }, { transform: 'none' }], { duration: 170, easing: 'cubic-bezier(.16,1,.3,1)' }); return; }
-    const t = item.querySelector('.t, .lbl') || item;
-    if (!motion) { A(t, [{ opacity: .55 }, { opacity: 1 }], { duration: 120 }); return; }
-    const s = 'steps(1)';
-    t.animate([{ opacity: .12, easing: s }, { opacity: 1, offset: .1, easing: s }, { opacity: .28, offset: .2, easing: s }, { opacity: 1, offset: .33, easing: s },
-      { opacity: .6, offset: .46, easing: s }, { opacity: 1, offset: .6, easing: s }, { opacity: .86, offset: .78, easing: s }, { opacity: 1 }], { duration: 320 });
-  }
-
   // ---------- state ----------
-  let cur = 'main', going = false, revealed = false, kind = (matchMedia('(hover: none)').matches && matchMedia('(pointer: coarse)').matches) ? 'touch' : 'key';
-  const scr = {};                                      // name -> { root, items(), sel, light, onSel(el), onEnter() -> el }
-  const names = { main: 'main', presets: 'presets', opts: 'opts', ctrl: 'ctrl' };
-  const launchHook = { query: () => 'play=1' };       // build() replaces query() once the catalog is read
-  let play = () => launch();
+  const opts = L.opts, byId = Object.fromEntries(opts.map(o => [o.id, o]));
+  const first = store.get('rn_launch', null) === null;      // first visit: nothing saved, the detected level is applied
+  let sel = L.load(), sheet = 'A', tab = null, cur = null, going = false, revealed = false;
+  let kind = (matchMedia('(hover: none)').matches && matchMedia('(pointer: coarse)').matches) ? 'touch' : 'key';
+  const mode = () => sel.mode === 'remaster' ? 'remaster' : 'original';
+  const applies = o => !o.modes || o.modes.includes(mode());
+  const save = () => L.save(sel);
+  const SHOT = { juego: 'hero', video: 'detail', camara: 'rear', rendimiento: 'low', jugabilidad: 'side', controles: 'hero' };   // the camera goes where the option shows
+  // launcher/ba/<id>_a|_b.webp: real captures of the game at the WORLD start, one run per value (tools/launcher_ba.py)
+  const BA = { bloom: ['Apagado', 'Normal'], remaster: ['Texturas de 2003', 'Texturas remaster'], roadrefl: ['Seco', 'Como el original'], mode: ['Original 2003', 'Remaster'], carlook: ['Con contraste', 'Como 2003'] };
 
-  const setLine = (box, text) => {
-    const old = box.querySelector('.dl:last-child');
+  const helpBox = $('help');
+  const setHelp = text => {
+    const old = helpBox.querySelector('.dl:last-child');
     if (old && old._v === text) return;
-    const nw = el('span', 'dl', text); nw._v = text;
-    box.append(nw);
-    if (old) {
-      A(old, [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(-.8rem)' }], { duration: 130, fill: 'forwards' });
-      setTimeout(() => old.remove(), 150);
-      A(nw, [{ opacity: 0, transform: 'translateY(.9rem)' }, { opacity: 1, transform: 'none' }], { duration: 200, delay: 60, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
-    }
+    const nw = el('span', 'dl', text); nw._v = text; helpBox.append(nw);
+    if (old) { A(old, [{ opacity: 1 }, { opacity: 0, transform: 'translateY(-.8rem)' }], { duration: 110, fill: 'forwards' }); setTimeout(() => old.remove(), 130);
+      A(nw, [{ opacity: 0, transform: 'translateY(.9rem)' }, { opacity: 1, transform: 'none' }], { duration: 180, delay: 50, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }); }
+  };
+  const ba = $('ba');
+  const setBA = id => {
+    const t = BA[id];
+    if (!t) { ba.hidden = true; return; }
+    $('baA').src = `launcher/ba/${id}_a.webp`; $('baB').src = `launcher/ba/${id}_b.webp`; $('baAt').textContent = t[0]; $('baBt').textContent = t[1];
+    $('baB').onload = () => { if (ba.hidden) { ba.hidden = false; for (const [i, f] of [...ba.children].entries()) A(f, [{ opacity: 0, transform: `translateY(-3rem) rotate(${i ? 9 : -9}deg)` }, { opacity: 1, transform: 'none' }], { duration: 240, delay: i * 60, easing: 'cubic-bezier(.3,1.4,.5,1)', fill: 'backwards' }); } };
+    $('baB').onerror = () => { ba.hidden = true; };
   };
 
-  // ---------- selection ----------
-  const itemsOf = () => (scr[cur].items ? scr[cur].items() : []);
-  function choose(node, o = {}) {
-    const sc = scr[cur], list = itemsOf(), i = list.indexOf(node);
-    if (i < 0 || sc.sel === node) return;
-    if (sc.sel) sc.sel.classList.remove('sel');
-    sc.sel = node; node.classList.add('sel');
-    if (document.activeElement !== node) node.focus({ preventScroll: true });
-    if (sc.light) sc.light.to(node, o.snap);
-    if (sc.scrolls) {                                  // keep the row in view (only the list scrolls, never the page)
-      const box = node.parentElement, t = node.offsetTop, b = t + node.offsetHeight, beh = motion ? 'smooth' : 'auto';
-      if (t < box.scrollTop + 8) box.scrollTo({ top: Math.max(0, t - 8), behavior: beh });
-      else if (b > box.scrollTop + box.clientHeight - 8) box.scrollTo({ top: b - box.clientHeight + 8, behavior: beh });
-    }
-    if (!o.quiet) { flicker(node); snd('move'); }
-    if (sc.onSel) sc.onSel(node, o);
-    if (!o.noscene) scene('select', i, list.length, cur);
+  // ---------- rows ----------
+  // A row is a strip of masking tape with the name (marker) and the value sprayed next to it. row._adj(±1) changes it, row._ok() activates it.
+  let nrow = 0;
+  function rowBase(box, label, help, group) {
+    const row = el('div', 'row nav'); row.tabIndex = 0; row.style.setProperty('--n', nrow++ % 5);
+    const lt = el('span', 'lt'); lt.append(Object.assign(el('img', 'bg'), { src: `launcher/v7/strip${nrow % 5 + 1}.webp`, alt: '', draggable: false }), el('span', 'mk', label));
+    row.append(lt); row.setAttribute('aria-label', label);
+    row._help = help; row._group = group;
+    box.append(row);
+    return row;
   }
-  function step(d) {
-    const list = itemsOf(); if (!list.length) return;
-    const i = list.indexOf(scr[cur].sel);
-    choose(list[i < 0 ? 0 : (i + d + list.length) % list.length]);
+  const arrow = (row, dir) => {
+    const a = el('button', 'arr ' + (dir < 0 ? 'l' : 'r')); a.type = 'button'; a.tabIndex = -1; a.setAttribute('aria-label', dir < 0 ? 'Anterior' : 'Siguiente');
+    a.append(Object.assign(el('img'), { src: 'launcher/v7/arrow.webp', alt: '', draggable: false }));
+    a.addEventListener('click', e => { e.stopPropagation(); choose(row); row._adj(dir); });
+    return a;
+  };
+  // the value is sprayed on: it wipes in from the side it was pushed from
+  const spray = (vv, label, dir) => {
+    const nw = T(label), old = vv.firstElementChild;
+    vv.append(nw);
+    const fit = () => { nw.style.fontSize = ''; const k = (vv.clientWidth - 4) / (nw.offsetWidth || 1); if (k < 1) nw.style.fontSize = (k * 100).toFixed(1) + '%'; };   // the game font is a picture: it shrinks to its cell
+    vv._fit = fit; requestAnimationFrame(fit); GF.onReady(() => requestAnimationFrame(fit));
+    if (!old) return;
+    if (dir === undefined) { old.remove(); return; }
+    A(old, [{ opacity: 1 }, { opacity: 0 }], { duration: 90, fill: 'forwards' }); setTimeout(() => old.remove(), 100);
+    if (motion) nw.animate([{ clipPath: dir < 0 ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)', filter: 'blur(.5rem)' }, { clipPath: 'inset(0)', filter: 'blur(0)' }], { duration: 190, delay: 50, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
+  };
+  const rows = [];
+  function choiceRow(box, o) {
+    const row = rowBase(box, COPY.label[o.id] || o.label, o.help, o.group);
+    const val = el('span', 'val'), vv = el('span', 'vv');
+    val.append(arrow(row, -1), vv, arrow(row, 1)); row.append(val);
+    row.setAttribute('role', 'spinbutton');
+    row._o = o;
+    row._adj = d => { const i = Math.max(0, o.values.findIndex(x => x.v === sel[o.id])); setOpt(o.id, o.values[(i + d + o.values.length) % o.values.length].v, d); };
+    row._paint = dir => { const x = o.values.find(y => y.v === sel[o.id]), label = x ? x.label : sel[o.id]; if (row._v !== label) { row._v = label; spray(vv, label, dir); row.setAttribute('aria-valuetext', label); } };
+    rows.push(row); return row;
   }
-  const adj = d => { const s = scr[cur].sel; if (s && s._adj) s._adj(d); else if (cur === 'presets') step(d); };
-  const activate = () => { const s = scr[cur].sel; if (!s) { step(0); return; } const lg = scr[cur].light; if (lg) { lg.press(true); setTimeout(() => lg.press(false), 110); } if (s._ok) s._ok(); else if (s._adj) s._adj(1); else s.click(); };
-  const tabStep = d => { if (cur === 'opts' && scr.opts.tabStep) { scr.opts.tabStep(d); snd('tab'); } };
+  function sliderRow(box, o) {      // volume: a lug nut on a strip of gaffer tape; it turns as it slides
+    const row = rowBase(box, o.label, o.help, o.group);
+    const tr = el('span', 'track'), knob = Object.assign(el('img', 'knob'), { src: 'launcher/v7/knob.webp', alt: '', draggable: false }), num = el('span', 'num');
+    tr.append(Object.assign(el('img', 'bg'), { src: 'launcher/v7/track.webp', alt: '', draggable: false }), knob); row.append(tr, num);
+    row.setAttribute('role', 'slider'); row._o = o;
+    const n = o.values.length - 1, idx = () => Math.max(0, o.values.findIndex(x => x.v === sel[o.id]));
+    row._adj = d => { const i = clamp(idx() + d, 0, n); if (i !== idx()) setOpt(o.id, o.values[i].v, d); };
+    row._paint = () => { const i = idx(); tr.style.setProperty('--p', i / n); num.textContent = o.values[i].v; row.setAttribute('aria-valuenow', o.values[i].v); };
+    const drag = e => { const r = tr.getBoundingClientRect(), i = Math.round(clamp((e.clientX - r.left) / r.width, 0, 1) * n); if (i !== idx()) setOpt(o.id, o.values[i].v, 0); };
+    tr.addEventListener('pointerdown', e => { tr.setPointerCapture(e.pointerId); choose(row); drag(e); tr.onpointermove = drag; });
+    tr.addEventListener('pointerup', () => { tr.onpointermove = null; });
+    rows.push(row); return row;
+  }
+  function actionRow(box, label, help, group, fn, value) {
+    const row = rowBase(box, label, help, group);
+    const val = el('span', 'val act'), vv = el('span', 'vv'); vv.append(T(value || 'Abrir')); val.append(vv, arrow(row, 1)); row.append(val);
+    row.setAttribute('role', 'button');
+    row._say = t => { spray(vv, t, 1); setTimeout(() => spray(vv, value || 'Abrir', -1), 2000); };
+    row._ok = () => fn(row); row._adj = d => { if (d > 0) fn(row); };
+    return row;
+  }
 
-  // ---------- screens ----------
-  let swapToken = 0;
-  function enter(sc, base = 0) {
-    // panels/heads first, then the selectable things one after the other (70 ms)
-    const r = sc.root, x = 'translateX(-3rem)', e = 'cubic-bezier(.16,1,.3,1)';
-    let k = 0;
-    for (const n of r.querySelectorAll(':scope > [data-in], :scope > .covers, :scope .tabbar')) { A(n, [{ opacity: 0, transform: x }, { opacity: 1, transform: 'none' }], { duration: 460, delay: base + k * 70, easing: e, fill: 'backwards' }); k++; }
-    const ch = [...r.querySelectorAll('.item, .row:not([hidden]), .cover')].slice(0, 10);
-    ch.forEach((n, i) => {
-      const cover = n.classList.contains('cover');
-      A(n, cover ? [{ opacity: 0, transform: 'translateY(5rem) rotate(-3deg) scale(.9)' }, { opacity: 1, transform: n.classList.contains('sel') ? 'translateY(-2.6rem) scale(1.07)' : 'scale(.93)' }] : [{ opacity: 0, transform: x }, { opacity: 1, transform: n.classList.contains('sel') ? 'translateX(1.4rem)' : 'none' }],
-        { duration: 480, delay: base + 120 + i * 70, easing: e, fill: 'backwards' });
-    });
-    if (sc.light) A(sc.light.node, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: base + 120 + ch.length * 40, fill: 'backwards' });
+  // sheet A: Calidad, Juego, Resolución, Volumen, Controles
+  const simple = $('simple'), adv = $('adv');
+  const qRow = rowBase(simple, 'Calidad', '', 'rendimiento');
+  {
+    const val = el('span', 'val'), vv = el('span', 'vv'); val.append(arrow(qRow, -1), vv, arrow(qRow, 1)); qRow.append(val);
+    qRow._adj = d => { const q = L.qualityOf(sel), i = q ? L.quality.indexOf(q) : (d > 0 ? -1 : 0); const nq = L.quality[(i + d + L.quality.length) % L.quality.length]; Object.assign(sel, nq.set); changed(d); };
+    qRow._paint = dir => { const q = L.qualityOf(sel), label = q ? q.label : 'A mano'; qRow._help = q ? q.desc : 'Ajustes tocados uno por uno en Avanzado.'; if (qRow._v !== label) { qRow._v = label; spray(vv, label, dir); } };
+    rows.push(qRow);
   }
-  function show(name, focusEl, o = {}) {
-    if (!scr[name] || name === cur && !o.force) return;
-    const prev = scr[cur], next = scr[name], tok = ++swapToken;
-    for (const k in scr) if (k !== cur && k !== name) scr[k].root.hidden = true;
-    A(prev.root, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(-2rem)' }], { duration: 130, easing: 'ease-in', fill: 'forwards' });
-    setTimeout(() => { if (tok === swapToken && prev !== scr[cur]) { prev.root.hidden = true; prev.root.getAnimations().forEach(a => a.cancel()); } }, 140);
-    cur = name; body.dataset.screen = name;
-    next.root.hidden = false;
-    next.root.getAnimations().forEach(a => a.cancel());
-    if (next.onShow) next.onShow();
-    next.sel = null;
-    const list = itemsOf();
-    const t = (focusEl && list.includes(focusEl) && focusEl) || (next.onEnter && next.onEnter()) || list[0];
-    if (t) choose(t, { snap: true, quiet: true });
-    if (next.light) next.light.resnap();
-    enter(next, 90);
-    scene('screen', names[name]);
+  for (const o of opts) if (o.simple) (o.slider ? sliderRow : choiceRow)(simple, o);
+  actionRow(simple, 'Controles', 'Teclas, mando y pantalla táctil. Todo se puede reasignar.', 'controles', () => { openAdv('controles'); }, 'Ver');
+
+  // sheet B: every option, by group
+  const groups = L.groups.filter(g => opts.some(o => o.group === g.id)).concat([{ id: 'partidas', title: 'Partidas' }]);
+  for (const o of opts) { const r = (o.slider ? sliderRow : choiceRow)(adv, o); r._adv = true; }
+  const keysRow = actionRow(adv, 'Teclas y mando', 'Clic en una acción y luego la tecla o el botón. También con K dentro del juego.', 'controles', () => { snd('accept'); BINDS.toggle(); }); keysRow._adv = true;
+  const bak = actionRow(adv, 'Guardar copia', 'Descarga tus partidas de este navegador en un archivo.', 'partidas', r => RN_SAVES.backup().then(n => r._say(n ? 'Listo' : 'Sin partidas'), () => r._say('Error')), 'Bajar');
+  const res = actionRow(adv, 'Restaurar copia', 'Carga un archivo de partidas descargado antes.', 'partidas', () => $('fileRes').click(), 'Elegir');
+  const rst = actionRow(adv, 'Ajustes de fábrica', 'Todos los ajustes vuelven a su valor inicial. Las partidas no se tocan.', 'partidas', r => { sel = Object.fromEntries(opts.map(o => [o.id, o.def])); changed(0); r._say('Hecho'); }, 'Borrar');
+  for (const r of [bak, res, rst]) r._adv = true;
+  $('fileRes').addEventListener('change', () => { const f = $('fileRes').files[0]; $('fileRes').value = ''; if (f) RN_SAVES.restore(f).then(() => res._say('Restaurado'), () => res._say('Archivo inválido')); });
+  const tabBtns = groups.map(g => {
+    const b = el('button', 'gtab'); b.type = 'button'; b.tabIndex = -1; b.setAttribute('role', 'tab'); b.append(el('span', '', COPY.group[g.id] || g.title));
+    b.addEventListener('click', () => { if (tab !== g.id) { snd('tab'); setTab(g.id, 1); } });
+    $('tabs').append(b); return { g, b };
+  });
+
+  const WHAT = { '1': ['World', 'una sola ciudad, todo abierto'], '0': ['Carrera', 'el modo Underground de 2003'] };
+  function paint(dir) {
+    for (const r of rows) { r._paint(dir); if (r._adv) r.hidden = r._group !== tab || (r._o && !applies(r._o)); }
+    for (const r of [keysRow, bak, res, rst]) r.hidden = r._group !== tab;
+    for (const { g, b } of tabBtns) { b.setAttribute('aria-selected', String(g.id === tab)); b.hidden = g.id !== 'partidas' && !opts.some(o => o.group === g.id && applies(o)); }
+    const w = WHAT[sel.play] || WHAT['1'];
+    $('what').innerHTML = `<b>${w[0]}</b> ${w[1]}` + (mode() === 'original' ? ', versión original' : '');
+    if (cur && cur._help !== undefined) setHelp(cur._help || '');
+  }
+  function changed(dir) { save(); paint(dir); snd('tab'); scene('pulse'); if (cur && motion) { const lt = cur.querySelector('.lt'); if (lt) lt.animate([{ transform: 'scale(.97)' }, { transform: 'none' }], { duration: 140, easing: 'cubic-bezier(.3,1.6,.5,1)' }); } }
+  function setOpt(id, v, dir) { sel[id] = v; changed(dir); }
+
+  // ---------- navigation: one list per sheet, JUGAR first ----------
+  const items = () => [$('play'), ...(sheet === 'A' ? [...simple.children, $('more')] : [...[...adv.children].filter(r => !r.hidden), $('less')])];
+  function choose(node, o = {}) {
+    if (!node || cur === node) return;
+    if (cur) cur.classList.remove('sel');
+    cur = node; node.classList.add('sel');
+    if (document.activeElement !== node) node.focus({ preventScroll: true });
+    if (node.parentElement === adv) node.scrollIntoView({ block: 'nearest', behavior: motion ? 'smooth' : 'auto' });
+    if (!o.quiet) snd('move');
+    setHelp(node === $('play') ? 'Enter o clic para entrar. Todo lo de la derecha ya viene listo.' : node === $('more') ? 'Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.' : node === $('less') ? 'Vuelve a los ajustes básicos.' : node._help || '');
+    setBA(node._o ? node._o.id : null);
+    scene('shot', node === $('play') ? null : SHOT[node._group] || 'hero');
+  }
+  const step = d => { const l = items(), i = l.indexOf(cur); choose(l[i < 0 ? 0 : (i + d + l.length) % l.length]); };
+  function setTab(id, dir) {
+    tab = id; paint();
+    adv.scrollTop = 0;
+    const vis = [...adv.children].filter(r => !r.hidden);
+    for (const r of vis) { const vv = r.querySelector('.vv'); if (vv && vv._fit) vv._fit(); }
+    // each strip is slapped on, one after the other
+    vis.slice(0, 12).forEach((r, i) => A(r, [{ opacity: 0, transform: `translateX(${dir >= 0 ? 2.4 : -2.4}rem) rotate(${i % 2 ? 2 : -2}deg) scale(1.06)` }, { opacity: 1, transform: 'none' }], { duration: 200, delay: i * 26, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'backwards' }));
+    if (sheet === 'B' && vis[0]) choose(vis[0], { quiet: true });
+  }
+  function flip(to) {      // the other sheet drops onto the board
+    sheet = to; const a = $('sheetA'), b = $('sheetB'), on = to === 'B' ? b : a, off = to === 'B' ? a : b;
+    off.hidden = true; on.hidden = false; $('board').dataset.sheet = to;
+    A(on, [{ opacity: 0, transform: 'translateY(-4rem) rotate(-3deg)' }, { opacity: 1, transform: 'none' }], { duration: to === 'B' ? 250 : 150, easing: 'cubic-bezier(.3,1.35,.5,1)' });   // closing is faster than opening
     hints();
   }
-  const back = () => { if (cur === 'main' || going) return; snd('back'); show('main', document.querySelector(`#s-main [data-go="${cur}"]`)); };
+  function openAdv(id) { snd('accept'); flip('B'); setTab(id || tab || groups[0].id, 1); }
+  function closeAdv() { if (sheet !== 'B') return; snd('back'); flip('A'); cur = null; paint(); choose($('more'), { quiet: true }); }
+  $('more').addEventListener('click', () => openAdv());
+  $('less').addEventListener('click', closeAdv);
+  const tabStep = d => { if (sheet !== 'B') return; const vis = tabBtns.filter(x => !x.b.hidden), i = vis.findIndex(x => x.g.id === tab); snd('tab'); setTab(vis[(i + d + vis.length) % vis.length].g.id, d); };
 
-  // main
-  scr.main = { root: $('s-main'), items: () => [...$('menu').querySelectorAll('.item:not([hidden])')], light: Light($('menu').querySelector('.light'), $('menu')) };
-  scr.main.onSel = n => { const d = n.dataset.desc; setLine(scr.main.root.querySelector('.desc'), d === 'play' ? scr.main.playLine() : d || ''); };
-  scr.main.playLine = () => 'Perfil: ' + (scr.main.profile || 'Original 2003') + '.';
-  for (const b of $('menu').querySelectorAll('.item')) {
-    b.addEventListener('click', () => { if (b.dataset.go) { snd('accept'); show(b.dataset.go); } else if (b.id === 'play') play(); else if (b.id === 'world') launch('pool=1'); });
-  }
-
-  // controls
-  scr.ctrl = { root: $('s-ctrl'), items: () => [...$('ctrlList').querySelectorAll('.item')], light: Light($('ctrlList').querySelector('.light'), $('ctrlList')) };
-  scr.ctrl.onSel = n => setLine(scr.ctrl.root.querySelector('.desc'), n.dataset.desc || '');
-  (() => {
-    const k = (s, c = '') => `<kbd class="${c}">${s}</kbd>`, p = (c, t) => `<p>${c}<span>${t}</span></p>`;
-    const cols = [
-      ['Teclado', [k('Flechas', 'wide'), 'dirección, acelerar y frenar'], [k('Espacio', 'wide'), 'nitro'], [k('Shift', 'wide'), 'freno de mano'], [k('C'), 'cámara'], [k('R'), 'reiniciar el coche'], [k('Esc'), 'pausa y atrás']],
-      ['Mando', [k('LS', 'wide'), 'dirección'], [k('RT', 'wide') + k('LT', 'wide'), 'acelerar / frenar'], [k('A', 'pad a'), 'nitro'], [k('B', 'pad b'), 'freno de mano'], [k('Y', 'pad y'), 'cámara'], [k('RB', 'wide'), 'reiniciar el coche'], [k('Start', 'wide'), 'pausa']],
-      ['En el juego', [k('F4'), 'Original / Remaster'], [k('K') + k('Select', 'wide'), 'reasignar teclas y botones'], [k('F2'), 'registro del juego'], [k('Táctil', 'wide'), 'controles en pantalla']],
-    ];
-    $('ctrlGrid').innerHTML = cols.map(c => `<div><h3>${c[0]}</h3>${c.slice(1).map(r => p(r[0], r[1])).join('')}</div>`).join('');
-  })();
-  $('ctrlList').querySelector('.item').addEventListener('click', back);
-
-  // presets and options (data driven)
-  if (ok) build(); else {
-    for (const b of document.querySelectorAll('[data-go="presets"], [data-go="opts"]')) b.hidden = true;
-    scr.presets = { root: $('s-presets'), items: () => [] }; scr.opts = { root: $('s-opts'), items: () => [] };
-  }
-
-  function build() {
-    const opts = L.opts, presets = L.presets;
-    const modeOpt = opts.find(o => o.id === 'mode' || o.key === 'mode');
-    const modeId = modeOpt ? modeOpt.id : 'mode';
-    const storedMode = () => store.get('rn_mode', 'remaster') === 'original' ? 'original' : 'remaster';
-    const defaults = () => Object.fromEntries(opts.map(o => [o.id, o.def]));
-    const valuesOf = o => (o.values && o.values.length) ? o.values : [{ v: '0', label: 'No' }, { v: '1', label: 'Sí' }];
-    const valid = (o, v) => v !== undefined && v !== null && valuesOf(o).some(x => eq(x.v, v));
-    let sel = (() => {
-      let saved = {};
-      try { const s = L.load && L.load(); if (s && typeof s === 'object') saved = s; } catch {}
-      const s = defaults();
-      for (const o of opts) if (valid(o, saved[o.id])) s[o.id] = saved[o.id];
-      if (!modeOpt) s[modeId] = saved[modeId] === 'remaster' || saved[modeId] === 'original' ? saved[modeId] : storedMode();
-      return s;
-    })();
-    const mode = () => sel[modeId] === 'remaster' ? 'remaster' : 'original';
-    const save = () => { try { L.save && L.save(sel); } catch {} };
-    const applies = o => !o.modes || o.modes.includes(mode());
-    const presetState = p => { const s = defaults(); if (!modeOpt) s[modeId] = mode(); return Object.assign(s, p.set || {}); };
-    const activePreset = () => presets.find(p => { const s = presetState(p); return Object.keys(s).every(k => eq(s[k], sel[k])); });
-    const setOpt = (id, v, dir) => { sel[id] = v; save(); refresh(dir); };
-    function pickPreset(p) {
-      const prev = sel[modeId];
-      sel = defaults();
-      if (!modeOpt) sel[modeId] = prev;
-      Object.assign(sel, p.set || {});
-      save(); refresh(0);
-    }
-    function reset() { sel = defaults(); if (!modeOpt) sel[modeId] = 'original'; save(); refresh(0); }
-
-    // ---- presets: magazine covers ----
-    const MAG = ['mag_01_dub_clocktower', 'mag_03_turbo_neon', 'mag_02_scc_chinatown'], MAGOF = { original: 0, remaster: 1, modesto: 2 }, MAGB = [1.3, 1, 1.5];   // MAGB: per-cover exposure (the SCC cover is very dark)
-    const covBox = $('covers'), track = el('div', 'track'), presetLine = $('presetLine');
-    covBox.append(track);
-    const cards = presets.map((p0, i) => {
-      const cp = COPY.preset[p0.id], p = cp ? { ...p0, label: cp[0], desc: cp[1] } : p0;
-      const c = el('div', 'cover'); c.tabIndex = 0; c.setAttribute('role', 'radio'); c.setAttribute('aria-label', p.label + '. ' + (p.desc || ''));
-      const tilt = el('div', 'tilt'), img = new Image();
-      img.src = `launcher/v2/ui/${MAG[MAGOF[p.id] ?? (i % MAG.length)]}.webp`; img.alt = ''; img.draggable = false; img.width = 340; img.height = 452; img.style.filter = `brightness(${MAGB[MAGOF[p.id] ?? (i % MAG.length)]})`;
-      const clip = el('div', 'clip'); clip.append(el('i', 'shine'));
-      tilt.append(img, clip, el('i', 'dimmer'));
-      const strip = el('div', 'strip'); strip.style.setProperty('--len', p.label.length); strip.append(el('i', 'mk'), T(p.label));
-      const badge = el('span', 'badge', 'Activo'); badge.hidden = true;
-      c.append(tilt, strip, badge);
-      c._ok = () => { pickPreset(p); snd('accept'); show('main', $('play')); };
-      c._adj = d => step(d);
-      c.addEventListener('click', () => { if (scr.presets.sel === c) c._ok(); else choose(c); });
-      c.addEventListener('focus', () => choose(c));
-      track.append(c);
-      return { p: p0, shown: p, c, tilt, badge };
-    });
-    let centers = [];
-    const place = () => {
-      const bw = covBox.clientWidth, tw = track.scrollWidth, s = scr.presets.sel;
-      let sh = bw * .56 - tw / 2;
-      if (bw < 1500) sh = (bw - tw) / 2;
-      if (tw > bw && s) sh = bw / 2 - (s.offsetLeft + s.offsetWidth / 2);
-      track.style.transform = `translate3d(${sh.toFixed(1)}px,0,0)`;
-      centers = cards.map(x => { const r = x.c.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2, r.width, r.height]; });
-    };
-    scr.presets = { root: $('s-presets'), items: () => cards.map(x => x.c) };
-    scr.presets.onSel = n => { const x = cards.find(q => q.c === n); setLine(presetLine, x ? x.shown.desc || '' : ''); place(); setTimeout(place, 520); };
-    scr.presets.onEnter = () => { const a = activePreset(), x = cards.find(q => q.p === a); return x ? x.c : null; };
-    scr.presets.onShow = () => requestAnimationFrame(place);
-    addEventListener('resize', () => { if (cur === 'presets') place(); });
-    // covers tilt toward the cursor (all of them, by their own centre)
-    let px = -1e4, py = -1e4, tiltRaf = 0;
-    const tiltAll = () => {
-      tiltRaf = 0;
-      if (cur !== 'presets' || !motion) return;
-      cards.forEach((x, i) => {
-        const cc = centers[i]; if (!cc) return;
-        const dx = clamp((px - cc[0]) / (cc[2] * 2.2), -1, 1), dy = clamp((py - cc[1]) / (cc[3] * 1.6), -1, 1);
-        x.tilt.style.transform = `rotateY(${(dx * 13).toFixed(2)}deg) rotateX(${(-dy * 10).toFixed(2)}deg)`;
-      });
-    };
-    addEventListener('pointermove', e => { if (e.pointerType === 'touch' || cur !== 'presets') return; px = e.clientX; py = e.clientY; if (!tiltRaf) tiltRaf = requestAnimationFrame(tiltAll); });
-    for (const x of cards) x.tilt.style.transition = 'transform .18s ease-out';
-
-    // ---- options ----
-    const groups = (L.groups || []).slice();
-    for (const o of opts) if (!groups.some(g => g.id === o.group)) groups.push({ id: o.group, title: o.group, desc: '' });
-    const used = groups.filter(g => opts.some(o => o.group === g.id));
-    let tab = used.length ? used[0].id : null;
-    const tabsBox = $('tabs'), listBox = $('optList'), tabline = tabsBox.querySelector('.tabline'), optsRoot = $('s-opts');
-    const tabBtns = used.map(g => {
-      const gt = COPY.group[g.id] || g.title, b = el('button'); b.append(T(gt)); b.setAttribute('aria-label', gt);
-      b.type = 'button'; b.tabIndex = -1; b.setAttribute('role', 'tab');
-      b.addEventListener('click', () => { if (g.id !== tab) { setTab(g.id); snd('tab'); } });
-      tabsBox.append(b);
-      return { g, b };
-    });
-    const setTab = id => {
-      if (id === tab && scr.opts.ready) return;
-      const dir = used.findIndex(g => g.id === id) - used.findIndex(g => g.id === tab);
-      tab = id; scr.opts.ready = true;
-      refresh(0);
-      listBox.scrollTop = 0;
-      const first = itemsFor()[0];
-      scr.opts.sel = null;
-      if (first) choose(first, { snap: true, quiet: true });
-      for (const [i, r] of itemsFor().slice(0, 9).entries()) A(r, [{ opacity: 0, transform: `translateX(${dir >= 0 ? 3 : -3}rem)` }, { opacity: 1, transform: r.classList.contains('sel') ? 'translateX(1rem)' : 'none' }], { duration: 360, delay: i * 35, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
-      placeTab();
-    };
-    const placeTab = () => {
-      const t = tabBtns.find(x => x.g.id === tab); if (!t) return;
-      tabBtns.forEach(x => x.b.setAttribute('aria-selected', String(x === t)));
-      tabline.style.transform = `translate(${t.b.offsetLeft}px, ${t.b.offsetTop + t.b.offsetHeight - tabline.offsetHeight}px) scaleX(${(t.b.offsetWidth / 10).toFixed(3)})`;
-      if (tabsBox.scrollWidth > tabsBox.clientWidth + 2) {      // phone: one scrolling row
-        const want = t.b.offsetLeft + t.b.offsetWidth / 2 - tabsBox.clientWidth / 2;
-        tabsBox.scrollTo({ left: clamp(want, 0, tabsBox.scrollWidth), behavior: motion ? 'smooth' : 'auto' });
-      }
-    };
-    const tabStepFn = d => { const i = Math.max(0, used.findIndex(g => g.id === tab)); setTab(used[(i + d + used.length) % used.length].id); };
-    for (const b of optsRoot.querySelectorAll('.bump')) b.addEventListener('click', () => { tabStepFn(+b.dataset.tab); snd('tab'); });
-
-    const rows = opts.map(o => {
-      const vals = valuesOf(o);
-      const row = el('div', 'row'); row.tabIndex = 0; row.setAttribute('role', 'spinbutton'); row.setAttribute('aria-label', COPY.label[o.id] || o.label);
-      const lname = COPY.label[o.id] || o.label;
-      const lbl = T(lname); lbl.classList.add('lbl');
-      const val = el('span', 'val'), vv = el('span', 'vv');
-      const mkArr = (dir, name) => {
-        const a = el('button', 'arr ' + (dir < 0 ? 'l' : 'r')); a.type = 'button'; a.tabIndex = -1; a.setAttribute('aria-label', name);
-        a.addEventListener('mousedown', e => e.preventDefault());
-        a.addEventListener('click', e => { e.stopPropagation(); choose(row); row._adj(dir); });
-        return a;
-      };
-      const al = mkArr(-1, 'Anterior'), ar = mkArr(1, 'Siguiente');
-      val.append(al, vv, ar);
-      row.append(lbl, val);
-      row._adj = d => {
-        const i = Math.max(0, vals.findIndex(x => eq(x.v, sel[o.id])));
-        const bt = (d < 0 ? al : ar); bt.classList.remove('bump-l', 'bump-r'); void bt.offsetWidth; bt.classList.add(d < 0 ? 'bump-l' : 'bump-r');
-        snd('tab');
-        setOpt(o.id, vals[(i + d + vals.length) % vals.length].v, d);
-      };
-      row.addEventListener('focus', () => choose(row));
-      row.addEventListener('click', e => { if (!e.target.closest('.arr')) { choose(row); row._adj(1); } });
-      listBox.append(row);
-      return { o, row, vv, vals, cur: null };
-    });
-    // In Original mode the Remaster-only options are not drawn as a wall of dead rows: one row per group stands for them.
-    const moreRow = el('div', 'row more'); moreRow.tabIndex = 0; moreRow.setAttribute('role', 'button');
-    const mlbl = T('Mejoras del Remaster'); mlbl.classList.add('lbl');
-    moreRow.append(mlbl, el('span', 'tag', 'Solo Remaster'));
-    moreRow._ok = () => { if (!modeOpt) return; sel[modeId] = 'remaster'; save(); snd('accept'); scr.opts.sel = null; refresh(1); const f = itemsFor()[0]; if (f) choose(f, { snap: true, quiet: true }); };
-    moreRow.addEventListener('click', () => { choose(moreRow); moreRow._ok(); });
-    moreRow.addEventListener('focus', () => choose(moreRow));
-    listBox.append(moreRow);
-    const resetRow = el('div', 'row reset'); resetRow.tabIndex = 0; resetRow.setAttribute('role', 'button');
-    resetRow.append(T('Restablecer valores'));
-    resetRow.firstChild.classList.add('lbl');
-    resetRow._ok = () => { reset(); snd('accept'); resetRow.classList.remove('nope'); };
-    resetRow.addEventListener('click', () => { choose(resetRow); resetRow._ok(); });
-    resetRow.addEventListener('focus', () => choose(resetRow));
-    listBox.append(resetRow);
-    const rowsFor = () => rows.filter(r => r.o.group === tab && applies(r.o));
-    const hasNa = () => rows.some(r => r.o.group === tab && !applies(r.o));
-    const itemsFor = () => [...rowsFor().map(r => r.row), ...(hasNa() ? [moreRow] : []), resetRow];
-    scr.opts = { root: optsRoot, items: itemsFor, light: Light(listBox.querySelector('.light'), listBox), scrolls: true, tabStep: tabStepFn };
-    scr.opts.onEnter = () => itemsFor()[0];
-    scr.opts.onShow = () => requestAnimationFrame(() => { placeTab(); fit(); });
-    scr.opts.onSel = n => {
-      const r = rows.find(x => x.row === n);
-      const txt = n === resetRow ? 'Todo vuelve a su valor de fábrica.' : n === moreRow ? 'Se abren en modo Remaster. Enter lo activa.' : (r.o.help || '');
-      setLine(optsRoot.querySelector('.desc'), txt);
-    };
-    scr.opts.ready = false;
-    addEventListener('resize', () => { if (cur === 'opts') placeTab(); });
-
-    function refresh(dir) {
-      const act = activePreset();
-      for (const { p, c, badge } of cards) { c.setAttribute('aria-checked', String(act === p)); badge.hidden = act !== p; }
-      scr.main.profile = act ? (COPY.preset[act.id] ? COPY.preset[act.id][0] : act.label) : 'tu configuración';
-      const mp = scr.main.sel; if (mp && mp.dataset.desc === 'play') setLine(scr.main.root.querySelector('.desc'), scr.main.playLine());
-      const rowsNow = rowsFor();
-      moreRow.hidden = !hasNa();
-      for (const r of rows) {
-        const on = applies(r.o);
-        r.row.hidden = r.o.group !== tab || !on;
-        const x = r.vals.find(y => eq(y.v, sel[r.o.id])), label = x ? x.label : String(sel[r.o.id]);
-        if (r.cur !== label) {
-          const nw = T(label), old = r.vv.firstElementChild;
-          r.vv.append(nw); r.row.setAttribute('aria-valuetext', label);
-          if (old && !r.row.hidden && dir !== undefined) {
-            const d = dir || 0, dist = d ? 1.6 : 0;
-            A(old, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-d * dist}rem)` }], { duration: 120, easing: 'ease-in', fill: 'forwards' });
-            setTimeout(() => old.remove(), 140);
-            A(nw, [{ opacity: 0, transform: `translateX(${d * dist}rem)` }, { opacity: 1, transform: 'none' }], { duration: 200, delay: 40, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
-          } else if (old) old.remove();
-          r.cur = label;
-        }
-      }
-      requestAnimationFrame(() => { fit(); if (scr.opts.light && rowsNow.length) scr.opts.light.resnap(); });
-    }
-    // long labels and values shrink to their cell (the game font is a picture, it cannot wrap)
-    function fit() {
-      const vis = rows.filter(r => !r.row.hidden && r.row.offsetParent);
-      listBox.style.setProperty('--k', 1);
-      for (const r of vis) for (const t of r.vv.querySelectorAll('.t')) t.style.removeProperty('--kv');
-      let k = 1;                                         // one size for every label of the group
-      const vals = vis.map(r => {
-        const l = r.row.querySelector('.lbl'), val = r.row.querySelector('.val'), t = r.vv.lastElementChild;
-        const lb = l.getBoundingClientRect(), vb = val.getBoundingClientRect();
-        const stop = vb.top >= lb.bottom - 2 ? r.row.getBoundingClientRect().right - 24 : vb.left - 16;   // phone: the value sits under the label
-        k = Math.min(k, (stop - lb.left) / (l.offsetWidth || 1));
-        return [t, Math.min(1, (r.vv.clientWidth - 6) / ((t && t.offsetWidth) || 1))];
-      });
-      if (moreRow.offsetParent) {
-        const l = moreRow.querySelector('.lbl'), tg = moreRow.querySelector('.tag'), lb = l.getBoundingClientRect(), tb = tg.getBoundingClientRect();
-        k = Math.min(k, ((tb.top >= lb.bottom - 2 ? moreRow.getBoundingClientRect().right - 24 : tb.left - 16) - lb.left) / (l.offsetWidth || 1));
-      }
-      listBox.style.setProperty('--k', Math.max(.6, Math.min(1, k)).toFixed(3));
-      for (const [t, b] of vals) if (t && b < 1) t.style.setProperty('--kv', b.toFixed(3));
-    }
-    addEventListener('resize', () => { if (cur === 'opts') requestAnimationFrame(fit); });
-    scr.opts.fit = fit;
-    refresh();
-    placeTab();
-    scr.opts.ready = true;
-    GF.onReady(() => requestAnimationFrame(() => { placeTab(); fit(); for (const k in scr) if (scr[k].light) scr[k].light.resnap(); place(); }));
-
-    launchHook.query = () => {
-      save();
-      store.set('rn_mode', mode());                  // mode.js and F4 read it; a ?mode= in the URL would pin the mode and break F4
-      // Options that do not apply in this mode go out at their default, so they cannot override the mode's own settings.
-      const send = Object.assign({}, sel);
-      for (const o of opts) if (!applies(o)) send[o.id] = o.def;
-      let q = '';
-      try { q = L.query(send) || ''; } catch {}
-      const out = new URLSearchParams();
-      out.set('play', '1');
-      for (const [k, v] of new URLSearchParams(q)) if (k !== 'play' && k !== 'mode') out.append(k, v);
-      return out.toString();
-    };
+  // ---------- detect the machine (first visit: its level is applied) ----------
+  async function detect() {
+    const rig = $('rigName');
+    let gpu = '', ok = !!navigator.gpu;
+    try { const a = ok && await navigator.gpu.requestAdapter(); ok = !!a; const i = a && a.info; if (i) gpu = [i.vendor, i.architecture || i.device].filter(Boolean).join(' '); } catch { ok = false; }
+    if (!ok) { rig.textContent = 'Este navegador no tiene WebGPU. Usa Chrome o Edge.'; $('rig').classList.add('bad'); return; }
+    // how fast this machine draws the street behind (median of 90 frames once the menu is in)
+    const ms = await new Promise(done => { const d = []; let last = 0; const f = t => { if (last) d.push(t - last); last = t; if (d.length < 90) requestAnimationFrame(f); else done(d.sort((a, b) => a - b)[45]); }; requestAnimationFrame(f); setTimeout(() => done(d.length ? d.sort((a, b) => a - b)[d.length >> 1] : 99), 4000); });
+    const tier = ms > 28 ? 'baja' : ms > 20 ? 'media' : 'alta';      // thresholds are ours (60 Hz = 16.7 ms)
+    const q = L.quality.find(x => x.id === tier);
+    $('rig').querySelector('b').textContent = gpu || 'Tu equipo';
+    rig.textContent = 'Va bien en ' + q.label;
+    $('rig').title = `La escena de este menú corre a ${ms.toFixed(1)} ms por cuadro en tu equipo.`;
+    if (first && L.qualityOf(sel) && !detect.touched) { Object.assign(sel, q.set); save(); paint(1); }
+    if (motion) $('rig').animate([{ transform: 'rotate(-9deg) scale(1.12)' }, { transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.3,1.5,.5,1)' });
   }
 
   // ---------- confirm: headlights, push-in (RN_SCENE.confirm), fade, then go ----------
-  async function launch(extra) {
+  async function launch() {
     if (going) return;
-    going = true;
-    // fast=1 + go=1: the game page boots under a loading curtain (web/index.html) and lifts it by itself at its main menu
-    const u = new URLSearchParams(launchHook.query()); u.set('fast', '1'); u.set('go', '1');
-    for (const [k, v] of new URLSearchParams(extra || '')) u.set(k, v);   // WORLD: pool=1, the flag that opens WORLD from the main menu (web/boot.js)
-    const q = u.toString();
-    const s = scr.main.sel; if (s && scr.main.light) scr.main.light.node.classList.add('go');
-    for (const it of scr.main.items()) if (it !== s) it.classList.add('out');
+    going = true; save();
+    const u = new URLSearchParams(L.query(sel)); u.delete('mode'); u.set('play', '1'); u.set('fast', '1'); u.set('go', '1');   // mode: stored (web/mode.js); a ?mode= would pin it and break F4
     snd('accept'); try { window.RN_SND && window.RN_SND.rev(); window.RN_SND && window.RN_SND.fadeOut(900); } catch {}
     body.classList.add('leaving');
-    const done = Promise.resolve(scene('confirm'));
-    await Promise.race([done.catch(() => 0), wait(1800)]);
+    await Promise.race([Promise.resolve(scene('confirm')).catch(() => 0), wait(1800)]);
     $('fade').classList.add('on');
     await wait(motion ? 220 : 120);
-    location.href = '/?' + q;
+    location.href = '/?' + u;
   }
-  addEventListener('pageshow', e => {
-    if (e.persisted) { going = false; body.classList.remove('leaving'); $('fade').classList.remove('on'); for (const it of scr.main.items()) it.classList.remove('out'); scr.main.light.node.classList.remove('go'); }
-  });
-  document.addEventListener('pointerdown', e => { const lg = scr[cur].light; if (lg && e.target.closest && e.target.closest('.item, .row')) lg.press(true); });
-  addEventListener('pointerup', () => { for (const k of ['main', 'ctrl', 'opts']) if (scr[k].light) scr[k].light.press(false); });
+  $('play').addEventListener('click', launch);
+  addEventListener('pageshow', e => { if (e.persisted) { going = false; body.classList.remove('leaving'); $('fade').classList.remove('on'); } });
 
   // ---------- key hints ----------
-  const bar = $('keys');
-  const K = (c, t) => `<kbd class="${c || ''}">${t}</kbd>`;
+  const bar = $('keys'), K = (c, t) => `<kbd class="${c || ''}">${t}</kbd>`;
   function hints() {
-    const sub = cur !== 'main', pad = kind === 'pad', touch = kind === 'touch';
-    const h = (kbds, label, act) => act ? `<button type="button" class="hint" data-act="${act}">${kbds}<span>${label}</span></button>` : `<span class="hint nb">${kbds}<span>${label}</span></span>`;
+    const pad = kind === 'pad', h = (k, label, act) => act ? `<button type="button" class="hint" data-act="${act}">${k}<span>${label}</span></button>` : `<span class="hint nb">${k}<span>${label}</span></span>`;
     const out = [];
-    if (pad) {
-      out.push(h(K('wide', '↕'), 'Elegir'));
-      if (cur === 'opts') out.push(h(K('wide', '↔'), 'Cambiar'), h(K('wide', 'LB') + K('wide', 'RB'), 'Grupo'));
-      if (cur === 'presets') out.push(h(K('wide', '↔'), 'Elegir'));
-      out.push(h(K('pad a', 'A'), 'Aceptar', 'ok'));
-      if (sub) out.push(h(K('pad b', 'B'), 'Atrás', 'back'));
-      out.push(h(K('wide', 'Start'), 'Jugar', 'play'));
-    } else if (!touch) {
-      out.push(h(K('wide', '↑↓'), cur === 'presets' ? 'Elegir' : 'Elegir'));
-      if (cur === 'opts') out.push(h(K('wide', '←→'), 'Cambiar'), h(K('', 'Q') + K('', 'E'), 'Grupo'));
-      if (cur === 'presets') out.push(h(K('wide', '←→'), 'Elegir'));
-      out.push(h(K('wide', '↵'), 'Aceptar', 'ok'));
-      if (sub) out.push(h(K('wide', 'Esc'), 'Atrás', 'back'));
-    } else if (sub) out.push(h(K('wide', '←'), 'Atrás', 'back'));
+    if (kind !== 'touch') {
+      out.push(h(K('wide', pad ? '↕' : '↑↓'), 'Elegir'), h(K('wide', pad ? '↔' : '←→'), 'Cambiar'));
+      if (sheet === 'B') out.push(h(pad ? K('wide', 'LB') + K('wide', 'RB') : K('', 'Q') + K('', 'E'), 'Grupo'), h(pad ? K('pad b', 'B') : K('wide', 'Esc'), 'Básico', 'back'));
+      out.push(h(pad ? K('wide', 'Start') : K('wide', '↵'), 'Jugar', 'play'));
+    } else if (sheet === 'B') out.push(h(K('wide', '←'), 'Básico', 'back'));
     bar.innerHTML = out.join('');
-    for (const b of optsBumps) b.innerHTML = pad ? '<span>' + (b.dataset.tab < 0 ? 'LB' : 'RB') + '</span>' : touch ? '<span>' + (b.dataset.tab < 0 ? '‹' : '›') + '</span>' : '<span>' + (b.dataset.tab < 0 ? 'Q' : 'E') + '</span>';
   }
-  const optsBumps = [...document.querySelectorAll('.bump')];
   bar.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (b) act(b.dataset.act); });
   const setKind = k => { if (k !== kind) { kind = k; body.classList.toggle('touch', k === 'touch'); hints(); } };
 
   // ---------- sound and animation switches ----------
   const btnSnd = $('btnSnd'), btnMot = $('btnMot');
   const sndOn = () => !window.RN_SND || window.RN_SND.isOn();
-  const paintSnd = () => { const on = sndOn(); btnSnd.setAttribute('aria-pressed', String(on)); };
+  const paintSnd = () => btnSnd.setAttribute('aria-pressed', String(sndOn()));
   if (window.RN_SND) window.RN_SND.onChange(paintSnd); else btnSnd.hidden = true;
-  btnSnd.addEventListener('click', () => { window.RN_SND.init(); window.RN_SND.toggle(); if (sndOn()) snd('accept'); });
+  const toggleSnd = () => { window.RN_SND.init(); window.RN_SND.toggle(); if (sndOn()) snd('accept'); };
+  btnSnd.addEventListener('click', toggleSnd);
   paintSnd();
-  const setMotion = on => {
-    motion = on; root.classList.toggle('calm', !on); btnMot.setAttribute('aria-pressed', String(on)); btnMot.querySelector('.ml').textContent = on ? 'Animación: sí' : 'Animación: no'; store.set('rn_launch_motion', on ? '1' : '0'); scene('motion', on);
-  };
+  const setMotion = on => { motion = on; root.classList.toggle('calm', !on); btnMot.setAttribute('aria-pressed', String(on)); btnMot.querySelector('.ml').textContent = on ? 'Animación: sí' : 'Animación: no'; store.set('rn_launch_motion', on ? '1' : '0'); scene('motion', on); };
   btnMot.addEventListener('click', () => setMotion(!motion));
-  // Saves live in this browser (web/saves.js): download them as one file, or load such a file back.
-  const btnBak = $('btnBak'), btnRes = $('btnRes'), fileRes = $('fileRes');
-  const note = (b, t) => { const l = b.querySelector('.ml'), o = l.dataset.o || l.textContent; l.dataset.o = o; l.textContent = t; setTimeout(() => { l.textContent = o; }, 2200); };
-  btnBak.addEventListener('click', () => RN_SAVES.backup().then(n => note(btnBak, n ? 'Listo' : 'Sin partidas'), () => note(btnBak, 'Error')));
-  btnRes.addEventListener('click', () => fileRes.click());
-  fileRes.addEventListener('change', () => { const f = fileRes.files[0]; fileRes.value = ''; if (f) RN_SAVES.restore(f).then(() => note(btnRes, 'Restaurado'), () => note(btnRes, 'Archivo inválido')); });
   setMotion(motion);
 
   // ---------- input ----------
   function act(name) {
-    if (going) return;
+    if (going || BINDS.open) return;
     if (!revealed) { reveal(); return; }
+    detect.touched = true;
     switch (name) {
       case 'up': step(-1); break;
       case 'down': step(1); break;
-      case 'left': adj(-1); break;
-      case 'right': adj(1); break;
-      case 'ok': activate(); break;
-      case 'back': back(); break;
-      case 'play': play(); break;
+      case 'left': if (cur && cur._adj) cur._adj(-1); break;
+      case 'right': if (cur && cur._adj) cur._adj(1); else if (cur === $('play')) step(1); break;
+      case 'ok': if (!cur) step(0); else if (cur._ok) cur._ok(); else if (cur._adj) cur._adj(1); else cur.click(); break;
+      case 'back': closeAdv(); break;
+      case 'play': launch(); break;
       case 'tab-': tabStep(-1); break;
       case 'tab+': tabStep(1); break;
-      case 'home': { const l = itemsOf(); if (l[0]) choose(l[0]); break; }
-      case 'end': { const l = itemsOf(); if (l.length) choose(l[l.length - 1]); break; }
     }
   }
-  // hover moves the selection, like a game menu does
-  document.addEventListener('pointerover', e => {
-    if (e.pointerType === 'touch' || going || !revealed) return;
-    const n = e.target.closest && e.target.closest('.item, .row, .cover');
-    if (n && itemsOf().includes(n)) choose(n);
-  });
-  document.addEventListener('pointerdown', e => {
-    setKind(e.pointerType === 'touch' ? 'touch' : 'key');
-    if (!revealed) { reveal(); return; }
-    const n = e.target.closest && e.target.closest('.item, .row, .cover');
-    if (n && itemsOf().includes(n) && n !== scr[cur].sel) choose(n);
-  });
-  const KEYS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', Escape: 'back', Backspace: 'back', PageUp: 'tab-', PageDown: 'tab+', q: 'tab-', Q: 'tab-', e: 'tab+', E: 'tab+', Home: 'home', End: 'end' };
+  document.addEventListener('pointerover', e => { if (e.pointerType === 'touch' || going || !revealed) return; const n = e.target.closest && e.target.closest('.nav'); if (n && items().includes(n)) choose(n); });
+  document.addEventListener('pointerdown', e => { setKind(e.pointerType === 'touch' ? 'touch' : 'key'); if (!revealed) { reveal(); return; } detect.touched = true; const n = e.target.closest && e.target.closest('.nav'); if (n && items().includes(n)) choose(n); });
+  for (const box of [simple, adv]) box.addEventListener('click', e => { const r = e.target.closest('.row'); if (r && !e.target.closest('.arr, .track')) { if (r._ok) r._ok(); else r._adj(1); } });
+  document.addEventListener('focusin', e => { const n = e.target.closest && e.target.closest('.nav'); if (revealed && n && items().includes(n)) choose(n, { quiet: true }); });   // Tab moves the selection too
+  const KEYS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', Escape: 'back', Backspace: 'back', PageUp: 'tab-', PageDown: 'tab+', q: 'tab-', Q: 'tab-', e: 'tab+', E: 'tab+' };
   addEventListener('keydown', e => {
-    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.altKey || e.ctrlKey || e.metaKey || BINDS.open) return;
     setKind('key');
-    if (e.key === 'm' || e.key === 'M') { e.preventDefault(); if (!e.repeat && window.RN_SND) { window.RN_SND.init(); window.RN_SND.toggle(); if (sndOn()) snd('accept'); } return; }
+    if (e.key === 'm' || e.key === 'M') { e.preventDefault(); if (!e.repeat && window.RN_SND) toggleSnd(); return; }
     const a = KEYS[e.key];
-    if (a) {
-      e.preventDefault();
-      if (e.repeat && (a === 'back' || a === 'tab-' || a === 'tab+')) return;
-      act(a); return;
-    }
-    if (e.key === 'Enter' || e.key === ' ') {
-      const t = e.target;
-      if (t && t.closest && t.closest('.tool, .keys button, .bump, .arr')) return;      // native button behaviour
-      e.preventDefault(); if (!e.repeat) act('ok');
-    }
+    if (a) { e.preventDefault(); if (!(e.repeat && a !== 'up' && a !== 'down' && a !== 'left' && a !== 'right')) act(a); return; }
+    if (e.key === 'Enter' || e.key === ' ') { if (e.target.closest && e.target.closest('.tool, .keys button, .arr, .gtab')) return; e.preventDefault(); if (!e.repeat) act('ok'); }
   });
 
   // pointer -> scene parallax
   let pRaf = 0, pxn = 0, pyn = 0;
-  const sendPointer = () => { pRaf = 0; scene('pointer', pxn, pyn); };
-  const setPointer = (x, y) => { pxn = clamp(x, -1, 1); pyn = clamp(y, -1, 1); if (!pRaf) pRaf = requestAnimationFrame(sendPointer); };
+  const setPointer = (x, y) => { pxn = clamp(x, -1, 1); pyn = clamp(y, -1, 1); if (!pRaf) pRaf = requestAnimationFrame(() => { pRaf = 0; scene('pointer', pxn, pyn); }); };
   addEventListener('pointermove', e => { if (e.pointerType !== 'touch') setPointer(e.clientX / innerWidth * 2 - 1, e.clientY / innerHeight * 2 - 1); });
   root.addEventListener('mouseleave', () => setPointer(0, 0));
 
@@ -622,8 +360,7 @@
   function poll(now) {
     const pads = (navigator.getGamepads ? [...navigator.getGamepads()] : []).filter(Boolean);
     if (!pads.length) { polling = false; return; }
-    const b = i => pads.some(p => p.buttons[i] && p.buttons[i].pressed);
-    const ax = (i, s) => pads.some(p => (p.axes[i] || 0) * s > 0.55);
+    const b = i => pads.some(p => p.buttons[i] && p.buttons[i].pressed), ax = (i, s) => pads.some(p => (p.axes[i] || 0) * s > 0.55);
     let used = false;
     const press = (name, down, repeat, a) => { if (fire(name, down, now, repeat)) { used = true; act(a); } };
     press('l', b(14) || ax(0, -1), true, 'left'); press('r', b(15) || ax(0, 1), true, 'right');
@@ -639,39 +376,28 @@
   addEventListener('gamepadconnected', startPolling);
   if (navigator.getGamepads && [...navigator.getGamepads()].some(Boolean)) startPolling();
 
-  // scene hooks: hover = move the selection, click = accept
-  window.RN_UI = {
-    hover(i) { if (cur === 'main' && !going && revealed) { const n = itemsOf()[i]; if (n) choose(n); } },
-    click(i) { if (going) return; if (!revealed) { reveal(); return; } if (cur !== 'main') return; const n = itemsOf()[i]; if (!n) return; choose(n); n.click(); },
-  };
-
   // ---------- start: scene intro, then the UI comes in ----------
   function reveal() {
     if (revealed) return;
     revealed = true;
     body.classList.remove('boot');
-    for (const n of document.querySelectorAll('.brand, .tools, .keys')) A(n, [{ opacity: 0, transform: n.classList.contains('keys') ? 'translateY(3rem)' : 'translateX(-4rem)' }, { opacity: 1, transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
-    enter(scr.main, 120);
-    // a bad contact: now and then the selected label dips for a moment
-    (function hum() {
-      setTimeout(() => {
-        const s = scr[cur] && scr[cur].sel, t = s && s.querySelector('.t');
-        if (motion && t && !going && !document.hidden) t.animate([{ opacity: 1, easing: 'steps(1)' }, { opacity: .55, offset: .15, easing: 'steps(1)' }, { opacity: 1, offset: .3, easing: 'steps(1)' }, { opacity: .8, offset: .45, easing: 'steps(1)' }, { opacity: 1 }], { duration: 240 });
-        hum();
-      }, 4500 + Math.random() * 6500);
-    })();
+    const e = 'cubic-bezier(.16,1,.3,1)';
+    for (const n of document.querySelectorAll('.brand, .tools, .hero, .help')) A(n, [{ opacity: 0, transform: 'translateX(-4rem)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: e, fill: 'backwards' });
+    A($('keysBar'), [{ opacity: 0, transform: 'translateY(3rem)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: e, fill: 'backwards' });
+    // the board is hung: it swings in from its top corner, then the strips are slapped on
+    A($('board'), [{ opacity: 0, transform: 'translateY(-6rem) rotate(5deg)' }, { opacity: 1, transform: 'none' }], { duration: 280, delay: 120, easing: 'cubic-bezier(.3,1.3,.5,1)', fill: 'backwards' });
+    [...simple.children, $('more'), $('rig')].forEach((r, i) => A(r, [{ opacity: 0, transform: `rotate(${i % 2 ? 3 : -3}deg) scale(1.08)` }, { opacity: 1, transform: 'none' }], { duration: 190, delay: 360 + i * 45, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'backwards' }));
+    setTimeout(detect, 900);
   }
-  const staticMode = () => root.classList.add('static');
   const S = window.RN_SCENE;
   body.classList.toggle('touch', kind === 'touch');
-  hints();
-  // JUGAR selected on load; the first key or click while the intro still runs just brings the menu in
-  choose($('play'), { snap: true, quiet: true, noscene: true });
+  tab = groups[0].id; paint(); hints();
+  choose($('play'), { quiet: true });
   if (S && typeof S.start === 'function') {
     let p;
     try { p = S.start($('scene'), {}); } catch (e) { console.warn('RN_SCENE.start', e); p = Promise.reject(e); }
-    Promise.resolve(p).then(() => { scene('motion', motion); scene('screen', cur); if (typeof S.onIntroDone === 'function') S.onIntroDone(reveal); else setTimeout(reveal, 2500); },
-      () => { staticMode(); setTimeout(reveal, 300); });
+    Promise.resolve(p).then(() => { scene('motion', motion); if (typeof S.onIntroDone === 'function') S.onIntroDone(reveal); else setTimeout(reveal, 2500); },
+      () => { root.classList.add('static'); setTimeout(reveal, 300); });
     setTimeout(reveal, 7000);                        // never leave the menu hidden
-  } else { staticMode(); setTimeout(reveal, 350); }
+  } else { root.classList.add('static'); setTimeout(reveal, 350); }
 })();

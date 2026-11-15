@@ -49,6 +49,8 @@
 { const p = new URLSearchParams(location.search); if (p.get('fast') === '1' && p.get('go') !== '1') location.replace('/launcher'); }
 // Bare / with a saved choice (web/overlay.js, the launcher): play with its keys; web/mode.js reads the mode from storage itself.
 // Not on phones and tablets: they always start light (web/mode.js RN_PHONE).
+// First visit on a computer (nothing saved yet): the launcher is the entry (OWNER 2026-11-15, plan row 10).
+if (!location.search && !matchMedia('(pointer: coarse)').matches && !localStorage.getItem('rn_launch')) location.replace('launcher.html');
 if (!location.search && !matchMedia('(pointer: coarse)').matches) { const q = RN_LAUNCH.query(RN_LAUNCH.load()).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&'); if (q && localStorage.getItem('rn_launch')) location.replace('/?' + q); }
 </script>
 <script src="mode.js"></script>
@@ -58,6 +60,7 @@ if (!location.search && !matchMedia('(pointer: coarse)').matches) { const q = RN
 <script src="gps/map.js"></script>
 <script src="gps/tp.js"></script>
 <script src="gps/route.js"></script>
+<script src="dik.js"></script>
 <script src="input.js"></script>
 <script src="binds.js"></script>
 <script src="pad.js"></script>

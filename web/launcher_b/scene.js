@@ -36,6 +36,8 @@ window.RN_SCENE = {
     onIntroDone(cb) { if (S.introDone) cb(); else S.introCbs.push(cb); },
     select(i,n,screen) { S.item = i|0; S.count = n|0 || S.count; if (screen) S.screen = screen; S.api?.focus(); },
     screen(name) { S.screen = name; S.api?.focus(); },
+    shot(name) { S.shotName = name || null; S.api?.focus(); },   // null: the idle loop picks
+    pulse() { S.pulseAt = performance.now(); },                  // a value changed: the headlights kick once
     confirm() { return S.api ? S.api.confirm() : Promise.resolve(); },
     motion(on) { S.motion = !!on; S.api?.motionChanged(); },
     pointer(x,y) { S.pointer = [clamp(+x||0,-1,1),clamp(+y||0,-1,1)]; },
@@ -75,22 +77,22 @@ const FAILING_LAMP = { loop: 9.7, curve: stepCurve([0,1, 2.9,.15, 3.02,1, 3.14,.
 const HEADLIGHT_ON = stepCurve([0,0, 1,.9, 1.09,.05, 1.27,1]); // intro: snaps on, drops, snaps on again
 const EASE = new pc.Curve([0,0, 1,1]); // CURVE_SMOOTHSTEP between two keys = smoothstep easing
 const INTRO_SECS = 1.6, CONFIRM_SECS = .9, CONFIRM_EMIT = 1.5, IDLE_SECS = 14, BLEND_SMOOTH = .16;
-const MAIN_SHOT = ['hero','side','detail','rear'], SCREEN_SHOT = { presets:'side', opts:'detail', ctrl:'rear' };
+// The UI names the shot (RN_SCENE.shot): the car sits between JUGAR (left) and the settings board (right).
 const SHOT_LOOP = ['hero','low','side','rear'];
 // theta = degrees around the car from its nose towards its +x side (0 front, 90 side, 180 rear), h = camera height
 // in metres, width = share of the screen width the framed box should fill, at = where the box centre lands on
 // screen (x right, y down), range = DOF focus range in metres. drift = az (deg) / radius (fraction) / height (m)
 // keys over one ping-pong pass of `period` seconds.
 const SHOT_SPEC = {
-    hero:   { theta: 40.7, h: 1.0, fov: 43, width: .40, at: [.70,.72], range: 5,   period: 16,
+    hero:   { theta: 40.7, h: 1.0, fov: 43, width: .34, at: [.46,.75], range: 5,   period: 16,
         drift: { az:[-3,-1.2,1.4,3], r:[.03,.01,-.015,-.035], h:[-.04,0,.05,.09] } },
-    low:    { theta: -34, h: .3, fov: 58, width: .55, at: [.66,.62], range: 9,   period: 13,
+    low:    { theta: -34, h: .3, fov: 58, width: .38, at: [.44,.70], range: 9,   period: 13,
         drift: { az:[4,2,-1,-4], r:[0,-.02,-.04,-.05], h:[0,.02,.05,.08] } },
-    side:   { theta: 92, h: .85, fov: 26, width: .56, at: [.66,.62], range: 6,   period: 19,
+    side:   { theta: 92, h: .85, fov: 26, width: .36, at: [.42,.72], range: 6,   period: 19,
         drift: { az:[-5,-2,2,5], r:[.02,.01,-.01,-.03], h:[0,.03,.04,.06] } },
-    rear:   { theta: 148, h: .95, fov: 40, width: .42, at: [.68,.64], range: 6, period: 15,
+    rear:   { theta: 148, h: .95, fov: 40, width: .34, at: [.46,.72], range: 6, period: 15,
         drift: { az:[3,1,-1.5,-4], r:[.04,.02,-.01,-.035], h:[.03,0,-.02,-.05] } },
-    detail: { theta: 62, h: .5, fov: 30, width: .58, at: [.68,.60], range: 2.5, period: 12,
+    detail: { theta: 62, h: .5, fov: 30, width: .36, at: [.40,.70], range: 2.5, period: 12,
         drift: { az:[-4,-1.5,1.5,4], r:[.05,.02,-.02,-.05], h:[-.03,0,.03,.06] } },
 };
 
@@ -808,7 +810,7 @@ async function main(canvas, opts, resolveReady) {
     const ptr=new Float64Array(2), ptrVel=new Float64Array(2), ptrGoal=new Float64Array(2);
     const rig={ mode:'idle', shot:'hero', idleAt:0, introAt:-1, conf:null, confirmPromise:null };
     const pinned=params.get('shot') && shots[params.get('shot')] ? params.get('shot') : null;
-    const mapped=()=> S.screen==='main' ? MAIN_SHOT[S.item]||'hero' : SCREEN_SHOT[S.screen]||'hero';
+    const mapped=()=> shots[S.shotName] ? S.shotName : 'hero';
     let clock=0, animT=0, ready=false, frozen=false, readyFrames=0, lastLamp=-1, rainWas=true;
     const anim=()=>S.motion && !curtain;
     function snapTo(pose){ st.set(pose); vel.fill(0); }
@@ -879,7 +881,7 @@ async function main(canvas, opts, resolveReady) {
         } else if(rig.mode==='end'){
             smoothDamp(st,vel,endPose,BLEND_SMOOTH,dt);
         } else {
-            if(live && !pinned && S.screen==='main' && clock-rig.idleAt>IDLE_SECS){
+            if(live && !pinned && !S.shotName && clock-rig.idleAt>IDLE_SECS){
                 rig.shot=SHOT_LOOP[(SHOT_LOOP.indexOf(rig.shot)+1)%SHOT_LOOP.length]; rig.idleAt=clock;
             }
             shotPose(rig.shot,animT,goal);
@@ -919,6 +921,7 @@ async function main(canvas, opts, resolveReady) {
         else if(rig.mode==='confirm') lamp=lerp(1,CONFIRM_EMIT,Math.min(1,rig.conf.t/CONFIRM_SECS));
         else if(rig.mode==='end') lamp=CONFIRM_EMIT;
         if(live) lamp*=1+.02*Math.sin(6.2831853*7.3*animT)+.015*Math.sin(6.2831853*2.1*animT+1);
+        if(live&&S.pulseAt) lamp*=1+.9*Math.exp(-(performance.now()-S.pulseAt)/160);
         if(lamp!==lastLamp){ lastLamp=lamp; for(const m of lampMaterials) m.setParameter('emit',lamp); for(const m of roadMaterials) m.setParameter('beamK',lamp); }
         // --- neon and lamp flares ---
         for(const sign of neonSigns){

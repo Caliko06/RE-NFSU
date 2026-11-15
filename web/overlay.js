@@ -1,4 +1,4 @@
-// The one small overlay on the running game (proposal A): a corner button opens a panel with the preset, mute and controls.
+// The launcher inside the running game (plan row 10): a corner button opens a panel with quality, game, version, sound and controls (phones: the three profiles).
 // The full pre-game launcher stays at /launcher. A choice is saved like the launcher does (RN_LAUNCH.save) and the game reloads with it.
 (() => {
   const L = window.RN_LAUNCH;
@@ -9,7 +9,7 @@
   const active = () => L.presets.find(p => { const s = stateOf(p); return Object.keys(s).every(k => s[k] === sel[k]); });
   // mode is not sent: L.save stores it for web/mode.js, and a ?mode= in the URL would pin it and break F4 (same as web/launcher.js)
   // Phones start light on every visit (web/mode.js RN_PHONE): the panel shows what runs, and a choice made here goes in the address (mode and fx), for this visit only.
-  if (RN_PHONE && !new URLSearchParams(location.search).has('mode')) Object.assign(sel, stateOf(L.presets.find(p => p.id === 'modesto')), { mute: sel.mute });
+  if (RN_PHONE && !new URLSearchParams(location.search).has('mode')) Object.assign(sel, stateOf(L.presets.find(p => p.id === 'modesto')), { vol: sel.vol, play: sel.play });
   const go = () => {
     L.save(sel);
     const q = L.query(sel).split('&').filter(x => x !== 'play=1' && (RN_PHONE || !x.startsWith('mode='))).concat(RN_PHONE && sel.fx !== '0' ? ['fx=1'] : []).join('&');
@@ -22,9 +22,9 @@
       background: linear-gradient(135deg, #ff7a18, #af002d); color: #fff; font: 17px/1 system-ui; cursor: pointer; opacity: .35; padding: 0; display: flex; align-items: center; justify-content: center;
       transition: opacity .16s, transform .12s; }
     #ov-btn:hover, #ov-btn.on { opacity: 1; } #ov-btn:active { transform: scale(.97); }
-    #ov { position: fixed; top: 52px; right: 10px; z-index: 15; width: 250px; padding: 12px; display: none; flex-direction: column; gap: 8px;
+    #ov { position: fixed; top: 52px; right: 10px; z-index: 15; width: 250px; padding: 12px; display: none; flex-flow: row wrap; gap: 8px;
       background: rgba(12,10,24,.9); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.14); border-radius: 12px; color: #e8e6f2; font: 13px system-ui, sans-serif; }
-    #ov.on { display: flex; } #ov h4 { margin: 0; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #9a93c0; }
+    #ov.on { display: flex; } #ov > * { flex: 1 1 100%; } #ov button.h { flex: 1 1 40%; text-align: center; } #ov h4 { margin: 0; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #9a93c0; }
     #ov button, #ov a { font: inherit; color: inherit; text-align: left; padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06); cursor: pointer; text-decoration: none; transition: transform .12s; }
     #ov button:active { transform: scale(.97); } #ov .sel { background: linear-gradient(135deg, #ff7a18, #af002d); border-color: transparent; }
@@ -39,13 +39,23 @@
   const toggle = on => { panel.classList.toggle('on', on); btn.classList.toggle('on', on); if (on) render(); else document.getElementById('screen')?.focus(); };
   btn.onclick = () => toggle(!panel.classList.contains('on'));
   function render() {
-    const a = active(), muted = sel.mute === '1';
+    const a = active(), muted = sel.vol === '0';
     panel.replaceChildren();
     const add = (tag, text, cls, fn, href) => { const e = Object.assign(document.createElement(tag), { textContent: text }); if (cls) e.className = cls; if (fn) e.onclick = fn; if (href) e.href = href; e.tabIndex = -1; panel.appendChild(e); };
-    add('h4', 'Perfil');
-    for (const p of L.presets) add('button', p.label, a === p ? 'sel' : '', () => { Object.assign(sel, stateOf(p), { mute: sel.mute }); go(); });
+    if (RN_PHONE) {
+      add('h4', 'Perfil');
+      for (const p of L.presets) add('button', p.label, a === p ? 'sel' : '', () => { Object.assign(sel, stateOf(p), { vol: sel.vol, play: sel.play }); go(); });
+    } else {      // computers: the launcher's first board (web/launcher.js), same options, same storage
+      const set = (id, v) => () => { sel[id] = v; go(); }, q = L.qualityOf(sel);
+      add('h4', 'Calidad' + (q ? '' : ' (a mano)'));
+      for (const x of L.quality) add('button', x.label, q === x ? 'sel h' : 'h', () => { Object.assign(sel, x.set); go(); });
+      add('h4', 'Juego');
+      add('button', 'World', sel.play === '1' ? 'sel h' : 'h', set('play', '1')); add('button', 'Carrera', sel.play === '0' ? 'sel h' : 'h', set('play', '0'));
+      add('h4', 'Versión');
+      add('button', 'Remaster', sel.mode === 'remaster' ? 'sel h' : 'h', set('mode', 'remaster')); add('button', 'Original 2003', sel.mode === 'original' ? 'sel h' : 'h', set('mode', 'original'));
+    }
     add('h4', 'Sonido');
-    add('button', muted ? 'Silenciado (clic para activar)' : 'Sonido activo (clic para silenciar)', muted ? 'sel' : '', () => { sel.mute = muted ? '0' : '1'; go(); });
+    add('button', muted ? 'Silenciado (clic para activar)' : 'Sonido activo (clic para silenciar)', muted ? 'sel' : '', () => { sel.vol = muted ? '100' : '0'; go(); });
     add('h4', 'Controles');
     add('button', 'Teclas y mando (K)', '', () => { toggle(false); BINDS.toggle(); });
     const T = window.RN_TOUCH;   // web/touch.js, phones and tablets: these apply at once
@@ -54,8 +64,8 @@
       add('h4', 'Táctil');
       add('button', `Botones: ${{ 25: 'tenues', 35: 'medios', 50: 'visibles' }[t.o] || t.o + ' %'}`, '', () => set({ o: next([25, 35, 50], t.o) }));
     }
-    add('small', 'Cambiar perfil o sonido reinicia el juego.');
-    add('a', 'Launcher completo', '', null, '/launcher');
+    add('small', 'Un cambio aquí reinicia el juego.');
+    add('a', 'Todos los ajustes', '', null, 'launcher.html');
   }
   document.body.append(btn, panel);
   addEventListener('keydown', e => { if (e.code === 'Escape' && panel.classList.contains('on')) { e.stopPropagation(); toggle(false); } }, true);

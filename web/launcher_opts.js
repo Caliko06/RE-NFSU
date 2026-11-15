@@ -1,4 +1,5 @@
-// Option catalog of the pre-game launcher (web/launcher.html). Plain data plus query/load/save; the UI only renders it.
+// Option catalog of the launcher (web/launcher.html) and the in-game panel. Plain data plus query/load/save; the UI only renders it.
+// `simple` options sit on the first board; the rest fold under Avanzado. `quality` = one-click sets of the same options.
 // Every key and value below was checked in the source named in `src`. A URL key wins over the mode (web/mode.js RN_Q).
 // A value equal to `def` is not sent: the game uses it anyway. 'auto' means "send nothing, let the mode/device decide".
 (() => {
@@ -7,21 +8,22 @@
   const BOTH = ['original', 'remaster'], REM = ['remaster'];
 
   const groups = [
-    { id: 'modo', title: 'Modo', desc: 'El juego de 2003 tal cual, o con las mejoras del remaster.' },
-    { id: 'carrera', title: 'Carrera', desc: 'Cómo avanza el modo Underground.' },
+    { id: 'juego', title: 'Juego', desc: 'Qué se juega y con qué versión.' },
     { id: 'video', title: 'Imagen', desc: 'Calidad visual. Casi todo es del remaster.' },
     { id: 'camara', title: 'Cámara y blur', desc: 'Cómo se siente y se ve la velocidad.' },
     { id: 'rendimiento', title: 'Rendimiento', desc: 'Para equipos modestos.' },
-    { id: 'audio', title: 'Audio', desc: 'Sonido del navegador.' },
-    { id: 'controles', title: 'Controles', desc: 'Teclado, mando y pantalla táctil.' },
+    { id: 'jugabilidad', title: 'Jugabilidad', desc: 'Tráfico, rivales y manejo. Lo de 2003 o lo mejorado.' },
+    { id: 'controles', title: 'Sonido y controles', desc: 'Volumen, teclado, mando y pantalla táctil.' },
   ];
 
   const opts = [
-    { id: 'mode', group: 'modo', label: 'Modo', help: 'Original = el juego como salió. Remaster = con texturas y efectos extra.',
+    { id: 'play', group: 'juego', label: 'Juego', simple: true, help: 'World: una sola ciudad abierta con todo desbloqueado. Carrera: el modo Underground de 2003.',
+      key: 'pool', type: 'choice', values: [T('1', 'World'), T('0', 'Carrera')], def: '1', modes: BOTH, src: 'web/boot.js (pool=1 -> RN_JUMP 3:1010)' },
+    { id: 'mode', group: 'juego', label: 'Versión', help: 'Original = el juego como salió. Remaster = con texturas y efectos extra.',
       key: 'mode', type: 'choice', values: [T('original', 'Original 2003'), T('remaster', 'Remaster')], def: 'remaster',
       modes: BOTH, src: 'web/mode.js' },
 
-    { id: 'career', group: 'carrera', label: 'Progreso de carrera', help: 'Normal: eventos se abren uno por uno. Todo abierto: sin candados.',
+    { id: 'career', group: 'juego', label: 'Progreso de carrera', help: 'Normal: eventos se abren uno por uno. Todo abierto: sin candados.',
       key: 'career', type: 'choice', values: [T('unlock', 'Todo abierto'), T('normal', 'Normal (como salió)')], def: 'unlock',
       modes: BOTH, src: 'web/boot.js' },
 
@@ -58,12 +60,23 @@
       key: 'fx', type: 'choice', values: [T('1', 'Activados'), T('0', 'Apagados')], def: '1', modes: REM, src: 'web/mode.js' },
     { id: 'fps', group: 'rendimiento', label: 'Fotogramas por segundo', help: '30 pesa la mitad. En iPad o celular ya es 30 por defecto.',
       key: 'fps', type: 'choice', values: [T('60', '60 fps'), T('30', '30 fps')], def: '60', modes: BOTH, src: 'web/boot.js' },
-    { id: 'bbmax', group: 'rendimiento', label: 'Resolución máxima', help: 'Ancho máximo de dibujo. Menos píxeles, más fluidez.',
+    { id: 'bbmax', group: 'rendimiento', label: 'Resolución', help: 'Ancho máximo de dibujo. Menos píxeles, más fluidez.',
       key: 'bbmax', type: 'choice', values: [T('auto', 'Automática'), T('1280', '1280'), T('1920', '1920'), T('2560', '2560')], def: 'auto',
       modes: BOTH, src: 'web/boot.js' },
 
-    { id: 'mute', group: 'audio', label: 'Silenciar el juego', help: 'El juego corre igual, solo sin sonido.',
-      key: 'mute', type: 'toggle', values: [T('0', 'No'), T('1', 'Sí')], def: '0', modes: BOTH, src: 'web/audio.js' },
+    { id: 'vol', group: 'controles', label: 'Volumen', simple: true, slider: true, help: 'Volumen general del juego. Música y efectos por separado están en el menú del juego.',
+      key: 'vol', type: 'choice', values: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'].map(v => T(v, v + ' %')), def: '100', modes: BOTH, src: 'web/audio.js' },
+
+    { id: 'traffic', group: 'jugabilidad', label: 'Tráfico en la ciudad', help: 'Cuántos coches civiles circulan en World.',
+      key: 'traffic', type: 'choice', values: [T('0', 'Sin tráfico'), T('6', 'Poco'), T('13', 'Normal'), T('15', 'Mucho')], def: '13', modes: REM, src: 'host/free.c:20,166' },
+    { id: 'ai', group: 'jugabilidad', label: 'Rivales con personalidad', help: 'Nerviosos, limpios o agresivos. Apagado: corren como en 2003.',
+      key: 'ai', type: 'toggle', values: OFF_ON, def: '1', modes: REM, src: 'web/boot.js, host/rivals.c' },
+    { id: 'trafyield', group: 'jugabilidad', label: 'El tráfico se hace a un lado', help: 'Los civiles te ven venir por detrás y abren paso.',
+      key: 'trafyield', type: 'toggle', values: OFF_ON, def: '1', modes: REM, src: 'host/rivals.c:789' },
+    { id: 'handling', group: 'jugabilidad', label: 'Agarre trasero', help: 'Original: como salió el juego. Suelto: la cola derrapa más fácil.',
+      key: 'handling', type: 'choice', values: [T('0', 'Original'), T('1', 'Suelto')], def: '0', modes: REM, src: 'web/boot.js, host/rivals.c:673' },
+    { id: 'carlook', group: 'video', label: 'Pintura del coche', help: 'Con contraste (remaster) o tal como la dibuja el juego de 2003.',
+      key: 'carlook', type: 'choice', values: [T('3', 'Con contraste'), T('2003', 'Como 2003')], def: '3', modes: REM, src: 'host/sm1.c:503' },
 
     { id: 'touch', group: 'controles', label: 'Controles táctiles', help: 'Automático los muestra solo en pantallas táctiles.',
       key: 'touch', type: 'choice', values: [T('auto', 'Automático'), T('1', 'Mostrar'), T('0', 'Ocultar')], def: 'auto', modes: BOTH, src: 'web/touch.js' },
@@ -71,6 +84,16 @@
       key: 'steer', type: 'choice', values: [T('key', 'Teclado normal'), T('pad', 'Como mando')], def: 'key', modes: BOTH, src: 'web/boot.js' },
   ];
 
+  // Calidad: each level writes every key below (a level is active when all of them match). Ultra is never picked for the user: 1.1 GB.
+  const Q = (fx, fps, bbmax, skinhd, aniso, msaa, remaster) => ({ fx, fps, bbmax, skinhd, aniso, msaa, remaster });
+  const quality = [
+    { id: 'baja', label: 'Baja', desc: 'Sin efectos, 30 fps, 1280 de ancho. Para equipos modestos.', set: Q('0', '30', '1280', '1', '16', '1', '0') },
+    { id: 'media', label: 'Media', desc: 'Efectos activados, 1920 de ancho, filtros ligeros.', set: Q('1', '60', '1920', '0', '4', '1', '0') },
+    { id: 'alta', label: 'Alta', desc: 'Todo activado a la resolución de tu pantalla.', set: Q('1', '60', 'auto', '1', '16', '1', '0') },
+    { id: 'ultra', label: 'Ultra', desc: 'Alta más texturas del remaster (descarga de 1.1 GB) y MSAA 4x.', set: Q('1', '60', 'auto', '1', '16', '4', '1') },
+  ];
+  const qualityOf = sel => quality.find(q => Object.keys(q.set).every(k => sel[k] === q.set[k]));
+  // The in-game panel (web/overlay.js) still lists three whole profiles.
   const presets = [
     { id: 'original', label: 'Original 2003', desc: 'El juego como salió, sin extras.', set: { mode: 'original' } },
     { id: 'remaster', label: 'Remaster', desc: 'Texturas y efectos mejorados.', set: { mode: 'remaster' } },
@@ -97,9 +120,11 @@
         else if (v === '30') parts.push('fps=30');
         continue;
       }
+      if (o.id === 'play') { if (v === '1' && !coarse()) parts.push('pool=1'); continue; }   // World is the default here, the game's own default is its menu; phones have no WORLD (web/boot.js NOWORLD)
       if (v === o.def) continue;
       if (s.fx === '0' && FX_COVERED.has(o.id)) continue;
       if (o.id === 'steer' && v === 'key') continue;
+      if (o.id === 'vol' && v === '0') { parts.push('mute=1'); continue; }
       parts.push(`${o.key}=${encodeURIComponent(v)}`);
     }
     return parts.join('&');
@@ -122,5 +147,5 @@
     } catch {}
   }
 
-  window.RN_LAUNCH = { groups, opts, presets, query, load, save };
+  window.RN_LAUNCH = { groups, opts, presets, quality, qualityOf, query, load, save };
 })();

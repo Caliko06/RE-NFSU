@@ -64,7 +64,9 @@ async function startAudio(M, log) {
   node.port.onmessage = e => log(e.data.level ? `audio level ${e.data.level} dBFS` : e.data.started ? 'audio started' : `audio resync ${e.data.resync}: ${e.data.behind} frames behind, 64-frame fade`);
   node.port.postMessage({ buffer: M.HEAPU8.buffer, hdr: M._rn_audio_ring(), level: RN_Q.get('audiolog') === '1' });
   let out = ctx.destination;   // ?mute=1: headed test runs stay silent; the ring still drains, so timing is unchanged (GOAL 2026-11-05)
-  if (RN_Q.get('mute') === '1') { const g = ctx.createGain(); g.gain.value = 0; g.connect(out); out = g; }
+  // ?vol=0..100: the launcher's volume, one gain on the whole mix
+  const vol = RN_Q.get('mute') === '1' ? 0 : Math.max(0, Math.min(100, Number(RN_Q.get('vol') ?? 100) || 0)) / 100;
+  if (vol < 1) { const g = ctx.createGain(); g.gain.value = vol * vol; g.connect(out); out = g; }   // squared: an even-sounding slider
   node.connect(out);
   const resume = () => { if (RN_APP.state !== 'paused' && ctx.state !== 'running') ctx.resume(); };
   addEventListener('keydown', resume, true);

@@ -7,14 +7,14 @@
 // Esc and Enter stay fixed on the keyboard (menus need them); sticks, d-pad and triggers stay fixed on the pad.
 'use strict';
 const BIND_KEYS = [   // id, label, DIK the game reads, default KeyboardEvent.code
-  ['left', 'Steer left', 0xcb, 'ArrowLeft'], ['right', 'Steer right', 0xcd, 'ArrowRight'],
-  ['gas', 'Gas', 0xc8, 'ArrowUp'], ['brake', 'Brake / reverse', 0xd0, 'ArrowDown'],
-  ['nitro', 'Nitrous', 0x39, 'Space'], ['handbrake', 'Handbrake', 0x2a, 'ShiftLeft'],
-  ['camera', 'Camera', 0x2e, 'KeyC'], ['respot', 'Reset car', 0x13, 'KeyR'],
+  ['left', 'Girar a la izquierda', 0xcb, 'ArrowLeft'], ['right', 'Girar a la derecha', 0xcd, 'ArrowRight'],
+  ['gas', 'Acelerar', 0xc8, 'ArrowUp'], ['brake', 'Frenar / reversa', 0xd0, 'ArrowDown'],
+  ['nitro', 'Nitro', 0x39, 'Space'], ['handbrake', 'Freno de mano', 0x2a, 'ShiftLeft'],
+  ['camera', 'Cámara', 0x2e, 'KeyC'], ['respot', 'Reiniciar el coche', 0x13, 'KeyR'],
 ];
 const BIND_PAD = [    // id, label, default button (standard mapping: 0 A, 1 B, 2 X, 3 Y, 4 LB, 5 RB, 9 Start)
-  ['nitro', 'Nitrous', 0], ['handbrake', 'Handbrake', 1], ['camera', 'Camera', 3], ['respot', 'Reset car', 5],
-  ['pause', 'Pause (Esc)', 9], ['accept', 'Menu: accept', 0], ['back', 'Menu: back', 1],
+  ['nitro', 'Nitro', 0], ['handbrake', 'Freno de mano', 1], ['camera', 'Cámara', 3], ['respot', 'Reiniciar el coche', 5],
+  ['pause', 'Pausa (Esc)', 9], ['accept', 'Menú: aceptar', 0], ['back', 'Menú: atrás', 1],
 ];
 const PAD_GROUPS = { nitro: 'drive', handbrake: 'drive', camera: 'drive', respot: 'drive', pause: 'drive', accept: 'menu', back: 'menu' };
 const PAD_NAMES = ['A', 'B', 'X', 'Y', 'LB', 'RB', 'LT', 'RT', 'Select', 'Start', 'L3', 'R3', 'Up', 'Down', 'Left', 'Right', 'Home'];
@@ -73,11 +73,11 @@ function dikFor(code) {
 
   function render() {
     const row = (kind, id, label, val) =>
-      `<tr><td>${label}</td><td><button data-k="${kind}" data-id="${id}" class="${cap && cap.kind === kind && cap.id === id ? 'cap' : ''}">${cap && cap.kind === kind && cap.id === id ? 'press…' : val}</button></td></tr>`;
+      `<tr><td>${label}</td><td><button data-k="${kind}" data-id="${id}" class="${cap && cap.kind === kind && cap.id === id ? 'cap' : ''}">${cap && cap.kind === kind && cap.id === id ? 'pulsa…' : val}</button></td></tr>`;
     root.innerHTML = `<div class="box"><div class="cols">
-      <div><h3>Keyboard</h3><table>${BIND_KEYS.map(([id, label]) => row('key', id, label, keyName(BINDS.keys[id]))).join('')}</table></div>
-      <div><h3>Gamepad</h3><table>${BIND_PAD.map(([id, label]) => row('pad', id, label, PAD_NAMES[BINDS.pad[id]] ?? 'B' + BINDS.pad[id])).join('')}</table></div></div>
-      <div class="foot"><button data-reset="1">Defaults</button><span>Click a row, then press the key or button. Stick, d-pad and triggers are fixed. Esc / K / pad Select closes.</span></div></div>`;
+      <div><h3>Teclado</h3><table>${BIND_KEYS.map(([id, label]) => row('key', id, label, keyName(BINDS.keys[id]))).join('')}</table></div>
+      <div><h3>Mando</h3><table>${BIND_PAD.map(([id, label]) => row('pad', id, label, PAD_NAMES[BINDS.pad[id]] ?? 'B' + BINDS.pad[id])).join('')}</table></div></div>
+      <div class="foot"><button data-reset="1">Valores de fábrica</button><span>Clic en una acción y luego la tecla o el botón. Palanca, cruceta y gatillos son fijos. Esc, K o Select cierra.</span></div></div>`;
   }
 
   // Binding one id to a value swaps with whoever had it (same layout group on the pad).
