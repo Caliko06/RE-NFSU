@@ -25,3 +25,7 @@ addr	name	system	confidence	evidence	tool	doc
 0x7977c0	WorldArm_Cave	fe	V	6-byte cave in CODE_AREA: jmp [SCREEN_ADDR+0xd0] = host/input.c world_arm (patches_world.py)	capstone	docs/re/frontend_menu.md
 0x4b34e9	MU_Main_PC_QuickRaceCase	fe	V	QuickRace accept case: [0x777b4c]=2, FEngSwitchPackages(MU_QuickRaceModeSelect.fng, 0x6c2a08); the WORLD button joins it	capstone	docs/re/frontend_menu.md
 0x36dbec3e	MU_MAIN_PLAY_ONLINE_LabelHash	fe	V	string hash of the Online button label; host/openworld.c world_lang points its table pair at "WORLD" (run shot web/plan/shots/world_menu.png)	run	docs/re/frontend_menu.md
+0x5009a0	FEString::Clone	fe	V	ECX source; bool stack arg; allocates 0x74, calls 0x514350; ret 4; false duplicates scripts via 0x502970	objdump+REA/Hopper	docs/re/mode_menu.md
+0x4f65d0	FEng::FindLoadedPackage	fe	V	EAX name; registry 0x746104 via 0x4f3f90; returned node+0x18 is FEPackage, before active-list insertion	objdump+Ghidra	docs/re/mode_menu.md
+0x4fcb20	FEKeyFrame::Copy	fe	V	EAX source frame; cdecl destination; copies inline values and owned key list, preserves shared references unless source resolved	objdump+Ghidra+REA/Hopper	docs/re/mode_menu.md
+0x4f68a0	FEString::SetFormattedText	fe	V	EAX object; cdecl format; calls 0x4f6780; used for new reserved hash 0x5f524e4d RN_MODE_SWITCH	objdump+REA/Hopper	docs/re/mode_menu.md

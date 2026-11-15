@@ -123,6 +123,7 @@ async function download(url, what) {
       if (k === 1 && !turned) Object.assign(document.getElementById('screen').style, { width: `${bw / dpr}px`, height: `${bh / dpr}px`, margin: 'auto' });
       line(`screen: window ${innerWidth}x${innerHeight} css, dpr ${dpr}, k ${k.toFixed(3)}, back buffer ${m.ENV.RN_SCREEN}`);
       // web/mode.js: the original mode turns the native bridges off too (?env= still wins)
+      m.ENV.RN_MODE = RN_MODE;
       if (RN_MODE === 'original') {
         Object.assign(m.ENV, RN_ORIGINAL_ENV);
       } else m.ENV.RN_WALLSOFTEN = '1'; // 0x46bae0: remove the remaster's grazing wall rebound

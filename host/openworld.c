@@ -210,6 +210,8 @@ static void world_install(void) {
     st(g_ctx, SCREEN_ADDR + 0x74, host_addr_of("rn", "world_rows"), 4);
     st(g_ctx, SCREEN_ADDR + 0x78, host_addr_of("rn", "world_lang"), 4);
     st(g_ctx, SCREEN_ADDR + 0xcc, host_addr_of("rn", "world_widx"), 4);
+    st(g_ctx, SCREEN_ADDR + 0xd4, host_addr_of("rn", "mode_menu"), 4);
+    st(g_ctx, SCREEN_ADDR + 0xd8, host_addr_of("rn", "mode_switch"), 4);
     st(g_ctx, SCREEN_ADDR + 0xd0, host_addr_of("rn", "world_arm"), 4);   // PATCH 0x4b342a: the main menu's WORLD button (host/input.c)
 }
 // (world_rows and world_lang are in the api table at the end of host/free.c, the last table dispatch.c searches.)

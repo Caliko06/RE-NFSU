@@ -50,6 +50,15 @@ const RN_Q = (() => {
     document.body.appendChild(toast);
     show(RN_MODE === 'original' ? 'Modo ORIGINAL (2003)   ·   F4 = Remaster' : 'Modo Remaster   ·   F4 = Original', 2500);
   });
+  // The native main-menu button and the second F4 use the same switch.
+  window.rnSwitchMode = () => {
+    const next = RN_MODE === 'original' ? 'remaster' : 'original';
+    try { localStorage.setItem('rn_mode', next); } catch {}
+    show('Reiniciando…', 5000);
+    const url = new URL(location.href);
+    url.searchParams.set('mode', next); // A test/launcher URL must not pin the previous mode.
+    setTimeout(() => location.replace(url.href), 150);
+  };
   let armed = 0;
   // Capture phase on window: the canvas (web/input.js) never sees F4, so the game does not get it.
   addEventListener('keydown', e => {
@@ -62,9 +71,7 @@ const RN_Q = (() => {
       show(`F4 otra vez: cambiar a ${next === 'original' ? 'ORIGINAL (2003)' : 'Remaster'} (el juego reinicia)`, 3000);
       return;
     }
-    try { localStorage.setItem('rn_mode', next); } catch {}
-    show('Reiniciando…', 5000);
-    setTimeout(() => location.reload(), 150);
+    window.rnSwitchMode();
   }, true);
   addEventListener('keyup', e => { if (e.code === 'F4') { e.preventDefault(); e.stopPropagation(); } }, true);
 })();
