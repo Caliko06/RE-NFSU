@@ -36,6 +36,8 @@ const RN_MODE = (() => {
 const RN_FX_OFF = ['remaster', 'skinhd', 'bloom', 'fxaa', 'sharp', 'aniso', 'carlook', 'cardetail', 'roadrefl'];
 const RN_Q = (() => {
   const q = new URLSearchParams(location.search);
+  // Phones draw 1280 wide and scale up: the sharpen-on-upscale pass stays on for them (OWNER 2026-11-15), the other effects off.
+  if (RN_PHONE && !q.has('sharp')) q.set('sharp', '0.5');
   if (RN_MODE === 'original') for (const [k, v] of Object.entries(RN_ORIGINAL)) if (!q.has(k)) q.set(k, v);
   if (RN_PHONE && !q.has('fx')) q.set('fx', '0');
   if (q.get('fx') === '0') for (const k of RN_FX_OFF) if (!q.has(k)) q.set(k, RN_ORIGINAL[k]);
