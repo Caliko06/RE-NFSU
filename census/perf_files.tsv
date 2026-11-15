@@ -1,0 +1,674 @@
+path	size_mb	mtime	lines	spike_lines	kind
+build/bench/ab2_A.log	0.018	2026-10-25 15:46	358	0	run_log
+build/bench/ab2_A.ndjson	0.395	2026-10-25 15:46	227	0	telemetry_ndjson
+build/bench/ab2_A.out	0.015	2026-10-25 15:46	4	0	run_out
+build/bench/ab2_A.png	5.095	2026-10-25 15:46			screenshot
+build/bench/ab2_B.log	0.018	2026-10-25 15:48	358	0	run_log
+build/bench/ab2_B.ndjson	0.373	2026-10-25 15:48	99	0	telemetry_ndjson
+build/bench/ab2_B.out	0.015	2026-10-25 15:48	4	0	run_out
+build/bench/ab2_B.png	5.054	2026-10-25 15:48			screenshot
+build/bench/ab_A.log	0.018	2026-10-25 15:29	360	0	run_log
+build/bench/ab_A.ndjson	0.399	2026-10-25 15:29	63	0	telemetry_ndjson
+build/bench/ab_A.out	0.015	2026-10-25 15:29	4	0	run_out
+build/bench/ab_A.png	5.433	2026-10-25 15:29			screenshot
+build/bench/ab_B.log	0.017	2026-10-25 15:30	358	0	run_log
+build/bench/ab_B.ndjson	0.370	2026-10-25 15:30	65	0	telemetry_ndjson
+build/bench/ab_B.out	0.015	2026-10-25 15:30	4	0	run_out
+build/bench/ab_B.png	5.338	2026-10-25 15:30			screenshot
+build/bench/ahead_c0.log	0.009	2026-10-24 12:57	149	0	run_log
+build/bench/ahead_c0.ndjson	0.782	2026-10-24 12:57	106	0	telemetry_ndjson
+build/bench/ahead_c0.out	0.008	2026-10-24 12:57	4	0	run_out
+build/bench/ahead_c0.png	4.773	2026-10-24 12:57			screenshot
+build/bench/b4_base.log	0.018	2026-10-25 15:01	359	0	run_log
+build/bench/b4_base.ndjson	0.404	2026-10-25 15:01	79	0	telemetry_ndjson
+build/bench/b4_base.out	0.015	2026-10-25 15:01	4	0	run_out
+build/bench/b4_base.png	5.360	2026-10-25 15:01			screenshot
+build/bench/b4_cpu.log	0.012	2026-10-25 15:18	228	0	run_log
+build/bench/b4_cpu.ndjson	0.363	2026-10-25 15:18	59	0	telemetry_ndjson
+build/bench/b4_cpu.out	0.010	2026-10-25 15:18	4	0	run_out
+build/bench/b4_cpu.png	3.120	2026-10-25 15:18			screenshot
+build/bench/b4_enc.log	0.021	2026-10-25 15:08	357	0	run_log
+build/bench/b4_enc.ndjson	0.346	2026-10-25 15:08	71	0	telemetry_ndjson
+build/bench/b4_enc.out	0.018	2026-10-25 15:08	4	0	run_out
+build/bench/b4_enc.png	4.866	2026-10-25 15:08			screenshot
+build/bench/b4_fx2.load	0.000	2026-10-25 21:46	1	0	load_marker
+build/bench/b4_fx2.log	0.018	2026-10-25 21:46	365	0	run_log
+build/bench/b4_fx2.ndjson	0.603	2026-10-25 21:46	76	0	telemetry_ndjson
+build/bench/b4_fx2.out	0.016	2026-10-25 21:46	5	0	run_out
+build/bench/b4_fx2.png	4.602	2026-10-25 21:46			screenshot
+build/bench/b4_fx2.prof.txt	0.011	2026-10-25 21:45	566	0	cpu_profile_txt
+build/bench/b4_gate1.load	0.000	2026-10-25 21:51	1	0	load_marker
+build/bench/b4_gate1.log	0.018	2026-10-25 21:51	364	0	run_log
+build/bench/b4_gate1.ndjson	0.583	2026-10-25 21:51	71	0	telemetry_ndjson
+build/bench/b4_gate1.out	0.016	2026-10-25 21:51	4	0	run_out
+build/bench/b4_gate1.png	4.615	2026-10-25 21:51			screenshot
+build/bench/b4_gil1.load	0.000	2026-10-25 23:04	1	0	load_marker
+build/bench/b4_gil1.log	0.018	2026-10-25 23:04	364	0	run_log
+build/bench/b4_gil1.ndjson	0.692	2026-10-25 23:04	77	0	telemetry_ndjson
+build/bench/b4_gil1.out	0.016	2026-10-25 23:04	4	0	run_out
+build/bench/b4_gil1.png	5.077	2026-10-25 23:04			screenshot
+build/bench/b4_m1.log	0.018	2026-10-25 16:00	358	0	run_log
+build/bench/b4_m1.ndjson	0.399	2026-10-25 16:00	90	0	telemetry_ndjson
+build/bench/b4_m1.out	0.015	2026-10-25 16:00	4	0	run_out
+build/bench/b4_m1.png	4.714	2026-10-25 16:00			screenshot
+build/bench/b4_m2.log	0.018	2026-10-25 16:05	358	0	run_log
+build/bench/b4_m2.ndjson	0.428	2026-10-25 16:05	203	0	telemetry_ndjson
+build/bench/b4_m2.out	0.015	2026-10-25 16:05	4	0	run_out
+build/bench/b4_m2.png	5.439	2026-10-25 16:05			screenshot
+build/bench/b4_prof.log	0.020	2026-10-25 15:04	361	0	run_log
+build/bench/b4_prof.ndjson	0.439	2026-10-25 15:04	81	0	telemetry_ndjson
+build/bench/b4_prof.out	0.017	2026-10-25 15:04	4	0	run_out
+build/bench/b4_prof.png	5.118	2026-10-25 15:04			screenshot
+build/bench/b4_s10.log	0.018	2026-10-25 19:49	362	0	run_log
+build/bench/b4_s10.ndjson	0.508	2026-10-25 19:49	74	0	telemetry_ndjson
+build/bench/b4_s10.out	0.016	2026-10-25 19:49	5	0	run_out
+build/bench/b4_s10.png	4.159	2026-10-25 19:49			screenshot
+build/bench/b4_s10.prof.txt	0.018	2026-10-25 19:49	968	0	cpu_profile_txt
+build/bench/b4_seq.log	0.021	2026-10-25 15:06	357	0	run_log
+build/bench/b4_seq.ndjson	0.357	2026-10-25 15:06	75	0	telemetry_ndjson
+build/bench/b4_seq.out	0.018	2026-10-25 15:06	4	0	run_out
+build/bench/b4_seq.png	5.384	2026-10-25 15:06			screenshot
+build/bench/b4_x87.load	0.000	2026-10-25 20:37	1	0	load_marker
+build/bench/b4_x87.log	0.018	2026-10-25 20:37	366	0	run_log
+build/bench/b4_x87.ndjson	0.571	2026-10-25 20:37	74	0	telemetry_ndjson
+build/bench/b4_x87.out	0.016	2026-10-25 20:37	5	0	run_out
+build/bench/b4_x87.png	4.253	2026-10-25 20:37			screenshot
+build/bench/b4_x87.prof.txt	0.018	2026-10-25 20:37	989	0	cpu_profile_txt
+build/bench/base_ab.log	0.008	2026-10-24 13:02	137	0	run_log
+build/bench/base_ab.ndjson	0.725	2026-10-24 13:02	106	0	telemetry_ndjson
+build/bench/base_ab.out	0.007	2026-10-24 13:02	4	0	run_out
+build/bench/base_ab.png	4.558	2026-10-24 13:02			screenshot
+build/bench/base_c0.log	0.009	2026-10-24 05:41	139	0	run_log
+build/bench/base_c0.ndjson	0.794	2026-10-24 05:41	169	0	telemetry_ndjson
+build/bench/base_c0.out	0.007	2026-10-24 05:41	4	0	run_out
+build/bench/base_c0.png	4.856	2026-10-24 05:41			screenshot
+build/bench/base_drag.log	0.008	2026-10-24 05:37	137	0	run_log
+build/bench/base_drag.ndjson	0.641	2026-10-24 05:37	96	0	telemetry_ndjson
+build/bench/base_drag.out	0.007	2026-10-24 05:37	4	0	run_out
+build/bench/base_drag.png	4.759	2026-10-24 05:37			screenshot
+build/bench/base_now.log	0.009	2026-10-24 06:03	139	0	run_log
+build/bench/base_now.ndjson	0.795	2026-10-24 06:03	118	0	telemetry_ndjson
+build/bench/base_now.out	0.007	2026-10-24 06:03	4	0	run_out
+build/bench/base_now.png	5.248	2026-10-24 06:03			screenshot
+build/bench/bloom_0.log	0.017	2026-10-25 15:37	347	0	run_log
+build/bench/bloom_0.ndjson	0.267	2026-10-25 15:37	45	0	telemetry_ndjson
+build/bench/bloom_0.out	0.014	2026-10-25 15:37	4	0	run_out
+build/bench/bloom_0.png	5.047	2026-10-25 15:37			screenshot
+build/bench/bloom_1.log	0.017	2026-10-25 15:38	349	0	run_log
+build/bench/bloom_1.ndjson	0.272	2026-10-25 15:38	61	0	telemetry_ndjson
+build/bench/bloom_1.out	0.014	2026-10-25 15:38	4	0	run_out
+build/bench/bloom_1.png	6.220	2026-10-25 15:38			screenshot
+build/bench/bloom_split.log	0.017	2026-10-25 15:40	357	0	run_log
+build/bench/bloom_split.ndjson	0.353	2026-10-25 15:40	182	0	telemetry_ndjson
+build/bench/bloom_split.out	0.015	2026-10-25 15:40	4	0	run_out
+build/bench/bloom_split.png	5.264	2026-10-25 15:40			screenshot
+build/bench/blur3.load	0.000	2026-10-30 11:33	1	0	load_marker
+build/bench/blur3.log	0.033	2026-10-30 11:33	650	0	run_log
+build/bench/blur3.ndjson	0.700	2026-10-30 11:33	99	0	telemetry_ndjson
+build/bench/blur3.out	0.029	2026-10-30 11:33	4	0	run_out
+build/bench/blur3.png	4.827	2026-10-30 11:33			screenshot
+build/bench/blur5.load	0.000	2026-10-30 11:31	1	0	load_marker
+build/bench/blur5.log	0.034	2026-10-30 11:31	652	0	run_log
+build/bench/blur5.ndjson	0.719	2026-10-30 11:31	101	0	telemetry_ndjson
+build/bench/blur5.out	0.029	2026-10-30 11:31	4	0	run_out
+build/bench/blur5.png	5.586	2026-10-30 11:31			screenshot
+build/bench/blur6.load	0.000	2026-10-30 11:29	1	0	load_marker
+build/bench/blur6.log	0.037	2026-10-30 11:29	681	0	run_log
+build/bench/blur6.ndjson	0.700	2026-10-30 11:29	101	0	telemetry_ndjson
+build/bench/blur6.out	0.033	2026-10-30 11:29	4	0	run_out
+build/bench/blur6.png	5.157	2026-10-30 11:29			screenshot
+build/bench/blurcyc.png	4.238	2026-10-30 11:36			screenshot
+build/bench/blurrec.png	4.590	2026-10-30 12:16			screenshot
+build/bench/buf_c0.log	0.009	2026-10-24 06:17	139	0	run_log
+build/bench/buf_c0.ndjson	0.796	2026-10-24 06:17	114	0	telemetry_ndjson
+build/bench/buf_c0.out	0.007	2026-10-24 06:17	4	0	run_out
+build/bench/buf_c0.png	4.213	2026-10-24 06:17			screenshot
+build/bench/c_clk1.load	0.000	2026-10-26 00:34	1	0	load_marker
+build/bench/c_clk1.log	0.020	2026-10-26 00:34	419	0	run_log
+build/bench/c_clk1.ndjson	0.717	2026-10-26 00:34	73	0	telemetry_ndjson
+build/bench/c_clk1.out	0.018	2026-10-26 00:34	10	0	run_out
+build/bench/c_clk1.png	4.509	2026-10-26 00:34			screenshot
+build/bench/c_clk2.load	0.000	2026-10-26 00:36	1	0	load_marker
+build/bench/c_clk2.log	0.020	2026-10-26 00:36	419	0	run_log
+build/bench/c_clk2.ndjson	0.702	2026-10-26 00:36	71	0	telemetry_ndjson
+build/bench/c_clk2.out	0.018	2026-10-26 00:36	10	0	run_out
+build/bench/c_clk2.png	4.539	2026-10-26 00:36			screenshot
+build/bench/c_ld0.load	0.000	2026-10-26 00:48	1	0	load_marker
+build/bench/c_ld0.log	0.013	2026-10-26 00:48	257	0	run_log
+build/bench/c_ld0.ndjson	0.457	2026-10-26 00:48	54	0	telemetry_ndjson
+build/bench/c_ld0.out	0.011	2026-10-26 00:48	4	0	run_out
+build/bench/c_ld0.png	1.399	2026-10-26 00:48			screenshot
+build/bench/c_ld1000.load	0.000	2026-10-26 00:47	1	0	load_marker
+build/bench/c_ld1000.log	0.013	2026-10-26 00:47	258	0	run_log
+build/bench/c_ld1000.ndjson	0.489	2026-10-26 00:47	54	0	telemetry_ndjson
+build/bench/c_ld1000.out	0.011	2026-10-26 00:47	4	0	run_out
+build/bench/c_ld1000.png	1.398	2026-10-26 00:47			screenshot
+build/bench/c_prof1.load	0.000	2026-10-26 00:15	1	0	load_marker
+build/bench/c_prof1.log	0.020	2026-10-26 00:15	419	0	run_log
+build/bench/c_prof1.ndjson	0.726	2026-10-26 00:15	76	0	telemetry_ndjson
+build/bench/c_prof1.out	0.018	2026-10-26 00:15	11	0	run_out
+build/bench/c_prof1.png	4.946	2026-10-26 00:15			screenshot
+build/bench/c_prof2.load	0.000	2026-10-26 00:24	1	0	load_marker
+build/bench/c_prof2.log	0.020	2026-10-26 00:24	416	0	run_log
+build/bench/c_prof2.ndjson	0.714	2026-10-26 00:24	71	0	telemetry_ndjson
+build/bench/c_prof2.out	0.018	2026-10-26 00:24	8	0	run_out
+build/bench/c_prof2.png	4.476	2026-10-26 00:24			screenshot
+build/bench/clock_c0.log	0.009	2026-10-24 06:26	139	0	run_log
+build/bench/clock_c0.ndjson	0.779	2026-10-24 06:26	113	0	telemetry_ndjson
+build/bench/clock_c0.out	0.007	2026-10-24 06:26	4	0	run_out
+build/bench/clock_c0.png	4.329	2026-10-24 06:26			screenshot
+build/bench/cp1_race.load	0.000	2026-10-30 05:01	1	0	load_marker
+build/bench/cp1_race.log	0.037	2026-10-30 05:01	681	0	run_log
+build/bench/cp1_race.ndjson	1.362	2026-10-30 05:01	172	0	telemetry_ndjson
+build/bench/cp1_race.out	0.032	2026-10-30 05:01	4	0	run_out
+build/bench/cp1_race.png	4.807	2026-10-30 05:01			screenshot
+build/bench/cv0.load	0.000	2026-10-30 00:02	1	0	load_marker
+build/bench/cv0.log	0.024	2026-10-30 00:02	471	0	run_log
+build/bench/cv0.ndjson	0.742	2026-10-30 00:02	92	0	telemetry_ndjson
+build/bench/cv0.out	0.021	2026-10-30 00:02	4	0	run_out
+build/bench/cv0.png	4.197	2026-10-30 00:02			screenshot
+build/bench/cv1.load	0.000	2026-10-30 00:03	1	0	load_marker
+build/bench/cv1.log	0.024	2026-10-30 00:03	470	0	run_log
+build/bench/cv1.ndjson	0.743	2026-10-30 00:03	92	0	telemetry_ndjson
+build/bench/cv1.out	0.021	2026-10-30 00:03	4	0	run_out
+build/bench/cv1.png	5.407	2026-10-30 00:03			screenshot
+build/bench/e_base.load	0.000	2026-10-26 03:24	1	0	load_marker
+build/bench/e_base.log	0.020	2026-10-26 03:24	415	0	run_log
+build/bench/e_base.ndjson	0.714	2026-10-26 03:24	71	0	telemetry_ndjson
+build/bench/e_base.out	0.018	2026-10-26 03:24	6	0	run_out
+build/bench/e_base.png	4.926	2026-10-26 03:24			screenshot
+build/bench/e_base_g.load	0.000	2026-10-26 06:06	1	0	load_marker
+build/bench/e_base_g.log	0.020	2026-10-26 06:06	411	0	run_log
+build/bench/e_base_g.ndjson	0.740	2026-10-26 06:06	73	0	telemetry_ndjson
+build/bench/e_base_g.out	0.018	2026-10-26 06:06	4	0	run_out
+build/bench/e_base_g.png	4.881	2026-10-26 06:06			screenshot
+build/bench/e_base_q.load	0.000	2026-10-26 05:42	1	0	load_marker
+build/bench/e_base_q.log	0.020	2026-10-26 05:42	417	0	run_log
+build/bench/e_base_q.ndjson	0.725	2026-10-26 05:42	73	0	telemetry_ndjson
+build/bench/e_base_q.out	0.018	2026-10-26 05:42	8	0	run_out
+build/bench/e_base_q.png	4.370	2026-10-26 05:42			screenshot
+build/bench/e_base_q2.load	0.000	2026-10-26 05:54	1	0	load_marker
+build/bench/e_base_q2.log	0.020	2026-10-26 05:54	414	0	run_log
+build/bench/e_base_q2.ndjson	0.722	2026-10-26 05:54	73	0	telemetry_ndjson
+build/bench/e_base_q2.out	0.018	2026-10-26 05:54	6	0	run_out
+build/bench/e_base_q2.png	4.412	2026-10-26 05:54			screenshot
+build/bench/e_default.load	0.000	2026-10-26 05:58	1	0	load_marker
+build/bench/e_default.log	0.020	2026-10-26 05:58	410	0	run_log
+build/bench/e_default.ndjson	0.723	2026-10-26 05:58	73	0	telemetry_ndjson
+build/bench/e_default.out	0.018	2026-10-26 05:58	4	0	run_out
+build/bench/e_default.png	4.258	2026-10-26 05:58			screenshot
+build/bench/e_default_g.load	0.000	2026-10-26 06:03	1	0	load_marker
+build/bench/e_default_g.log	0.020	2026-10-26 06:03	413	0	run_log
+build/bench/e_default_g.ndjson	0.735	2026-10-26 06:03	74	0	telemetry_ndjson
+build/bench/e_default_g.out	0.018	2026-10-26 06:03	6	0	run_out
+build/bench/e_default_g.png	4.533	2026-10-26 06:03			screenshot
+build/bench/e_default_p.load	0.000	2026-10-26 06:01	1	0	load_marker
+build/bench/e_default_p.log	0.020	2026-10-26 06:01	416	0	run_log
+build/bench/e_default_p.ndjson	0.713	2026-10-26 06:01	71	0	telemetry_ndjson
+build/bench/e_default_p.out	0.018	2026-10-26 06:01	7	0	run_out
+build/bench/e_default_p.png	4.725	2026-10-26 06:01			screenshot
+build/bench/e_world1.load	0.000	2026-10-26 03:18	1	0	load_marker
+build/bench/e_world1.log	0.021	2026-10-26 03:18	423	0	run_log
+build/bench/e_world1.ndjson	0.731	2026-10-26 03:18	76	0	telemetry_ndjson
+build/bench/e_world1.out	0.018	2026-10-26 03:18	4	0	run_out
+build/bench/e_world1.png	5.189	2026-10-26 03:18			screenshot
+build/bench/e_world2.load	0.000	2026-10-26 03:22	1	0	load_marker
+build/bench/e_world2.log	0.021	2026-10-26 03:22	422	0	run_log
+build/bench/e_world2.ndjson	0.701	2026-10-26 03:22	75	0	telemetry_ndjson
+build/bench/e_world2.out	0.018	2026-10-26 03:22	6	0	run_out
+build/bench/e_world2.png	4.794	2026-10-26 03:22			screenshot
+build/bench/e_world3.load	0.000	2026-10-26 03:45	1	0	load_marker
+build/bench/e_world3.log	0.020	2026-10-26 03:45	405	0	run_log
+build/bench/e_world3.ndjson	0.560	2026-10-26 03:45	369	0	telemetry_ndjson
+build/bench/e_world3.out	0.017	2026-10-26 03:45	4	0	run_out
+build/bench/e_world3.png	4.851	2026-10-26 03:45			screenshot
+build/bench/e_world_m.load	0.000	2026-10-26 05:51	1	0	load_marker
+build/bench/e_world_m.log	0.020	2026-10-26 05:51	413	0	run_log
+build/bench/e_world_m.ndjson	0.721	2026-10-26 05:51	73	0	telemetry_ndjson
+build/bench/e_world_m.out	0.018	2026-10-26 05:51	6	0	run_out
+build/bench/e_world_m.png	2.988	2026-10-26 05:51			screenshot
+build/bench/e_world_m2.load	0.000	2026-10-26 05:53	1	0	load_marker
+build/bench/e_world_m2.log	0.020	2026-10-26 05:53	413	0	run_log
+build/bench/e_world_m2.ndjson	0.728	2026-10-26 05:53	73	0	telemetry_ndjson
+build/bench/e_world_m2.out	0.018	2026-10-26 05:53	6	0	run_out
+build/bench/e_world_m2.png	4.645	2026-10-26 05:53			screenshot
+build/bench/e_world_p.load	0.000	2026-10-26 05:48	1	0	load_marker
+build/bench/e_world_p.log	0.020	2026-10-26 05:48	413	0	run_log
+build/bench/e_world_p.ndjson	0.725	2026-10-26 05:48	73	0	telemetry_ndjson
+build/bench/e_world_p.out	0.018	2026-10-26 05:48	7	0	run_out
+build/bench/e_world_p.png	4.692	2026-10-26 05:48			screenshot
+build/bench/e_world_q.load	0.000	2026-10-26 05:40	1	0	load_marker
+build/bench/e_world_q.log	0.020	2026-10-26 05:40	410	0	run_log
+build/bench/e_world_q.ndjson	0.705	2026-10-26 05:40	72	0	telemetry_ndjson
+build/bench/e_world_q.out	0.017	2026-10-26 05:40	4	0	run_out
+build/bench/e_world_q.png	5.099	2026-10-26 05:40			screenshot
+build/bench/e_world_t.load	0.000	2026-10-26 05:46	1	0	load_marker
+build/bench/e_world_t.log	0.020	2026-10-26 05:46	410	0	run_log
+build/bench/e_world_t.ndjson	0.701	2026-10-26 05:46	71	0	telemetry_ndjson
+build/bench/e_world_t.out	0.017	2026-10-26 05:46	4	0	run_out
+build/bench/e_world_t.png	4.284	2026-10-26 05:46			screenshot
+build/bench/f_bc7_q.load	0.000	2026-10-26 11:36	1	0	load_marker
+build/bench/f_bc7_q.log	0.020	2026-10-26 11:36	413	0	run_log
+build/bench/f_bc7_q.ndjson	0.711	2026-10-26 11:36	75	0	telemetry_ndjson
+build/bench/f_bc7_q.out	0.018	2026-10-26 11:36	6	0	run_out
+build/bench/f_bc7_q.png	4.487	2026-10-26 11:36			screenshot
+build/bench/f_bc7_q2.load	0.000	2026-10-26 11:38	1	0	load_marker
+build/bench/f_bc7_q2.log	0.020	2026-10-26 11:38	413	0	run_log
+build/bench/f_bc7_q2.ndjson	0.727	2026-10-26 11:38	74	0	telemetry_ndjson
+build/bench/f_bc7_q2.out	0.018	2026-10-26 11:38	6	0	run_out
+build/bench/f_bc7_q2.png	5.024	2026-10-26 11:38			screenshot
+build/bench/f_bc7_q3.load	0.000	2026-10-26 11:40	1	0	load_marker
+build/bench/f_bc7_q3.log	0.020	2026-10-26 11:40	413	0	run_log
+build/bench/f_bc7_q3.ndjson	0.722	2026-10-26 11:40	73	0	telemetry_ndjson
+build/bench/f_bc7_q3.out	0.018	2026-10-26 11:40	6	0	run_out
+build/bench/f_bc7_q3.png	5.177	2026-10-26 11:40			screenshot
+build/bench/f_bc7_q4.load	0.000	2026-10-26 11:41	1	0	load_marker
+build/bench/f_bc7_q4.log	0.021	2026-10-26 11:41	420	0	run_log
+build/bench/f_bc7_q4.ndjson	0.723	2026-10-26 11:41	73	0	telemetry_ndjson
+build/bench/f_bc7_q4.out	0.018	2026-10-26 11:41	10	0	run_out
+build/bench/f_bc7_q4.png	3.843	2026-10-26 11:41			screenshot
+build/bench/f_default_bc7.load	0.000	2026-10-26 11:44	1	0	load_marker
+build/bench/f_default_bc7.log	0.021	2026-10-26 11:44	416	0	run_log
+build/bench/f_default_bc7.ndjson	0.721	2026-10-26 11:44	72	0	telemetry_ndjson
+build/bench/f_default_bc7.out	0.018	2026-10-26 11:44	8	0	run_out
+build/bench/f_default_bc7.png	4.689	2026-10-26 11:44			screenshot
+build/bench/fold2_c0.log	0.009	2026-10-24 06:12	139	0	run_log
+build/bench/fold2_c0.ndjson	0.795	2026-10-24 06:12	113	0	telemetry_ndjson
+build/bench/fold2_c0.out	0.007	2026-10-24 06:12	4	0	run_out
+build/bench/fold2_c0.png	4.288	2026-10-24 06:12			screenshot
+build/bench/fold_c0.log	0.009	2026-10-24 05:57	138	0	run_log
+build/bench/fold_c0.ndjson	0.779	2026-10-24 05:57	120	0	telemetry_ndjson
+build/bench/fold_c0.out	0.008	2026-10-24 05:57	4	0	run_out
+build/bench/fold_c0.png	4.171	2026-10-24 05:57			screenshot
+build/bench/fold_c0p.log	0.012	2026-10-24 06:00	138	0	run_log
+build/bench/fold_c0p.ndjson	0.784	2026-10-24 06:00	246	0	telemetry_ndjson
+build/bench/fold_c0p.out	0.011	2026-10-24 06:00	4	0	run_out
+build/bench/fold_c0p.png	5.475	2026-10-24 06:00			screenshot
+build/bench/fold_discc.log	0.009	2026-10-24 06:09	139	0	run_log
+build/bench/fold_discc.ndjson	0.796	2026-10-24 06:09	114	0	telemetry_ndjson
+build/bench/fold_discc.out	0.007	2026-10-24 06:09	4	0	run_out
+build/bench/fold_discc.png	5.040	2026-10-24 06:09			screenshot
+build/bench/fold_nodisc.log	0.009	2026-10-24 06:06	139	0	run_log
+build/bench/fold_nodisc.ndjson	0.796	2026-10-24 06:06	113	0	telemetry_ndjson
+build/bench/fold_nodisc.out	0.007	2026-10-24 06:06	4	0	run_out
+build/bench/fold_nodisc.png	4.024	2026-10-24 06:06			screenshot
+build/bench/fov0.log	0.035	2026-10-30 12:19	662	0	run_log
+build/bench/fov0.png	4.807	2026-10-30 12:19			screenshot
+build/bench/fov10.log	0.044	2026-10-30 12:22	806	0	run_log
+build/bench/fov10.png	4.882	2026-10-30 12:22			screenshot
+build/bench/fov16.log	0.043	2026-10-30 12:24	798	0	run_log
+build/bench/fov16.png	4.580	2026-10-30 12:24			screenshot
+build/bench/g60_1103.load	0.000	2026-10-29 20:17	1	0	load_marker
+build/bench/g60_1103.log	0.029	2026-10-29 20:17	520	0	run_log
+build/bench/g60_1103.ndjson	1.725	2026-10-29 20:17	217	0	telemetry_ndjson
+build/bench/g60_1103.out	0.026	2026-10-29 20:17	4	0	run_out
+build/bench/g60_1103.png	3.858	2026-10-29 20:17			screenshot
+build/bench/g60_r1.load	0.000	2026-10-29 20:36	1	0	load_marker
+build/bench/g60_r1.log	0.028	2026-10-29 20:36	501	0	run_log
+build/bench/g60_r1.ndjson	1.396	2026-10-29 20:36	177	0	telemetry_ndjson
+build/bench/g60_r1.out	0.024	2026-10-29 20:36	4	0	run_out
+build/bench/g60_r1.png	5.158	2026-10-29 20:36			screenshot
+build/bench/g60_r2.load	0.000	2026-10-29 20:39	1	0	load_marker
+build/bench/g60_r2.log	0.027	2026-10-29 20:39	497	0	run_log
+build/bench/g60_r2.ndjson	1.389	2026-10-29 20:39	174	0	telemetry_ndjson
+build/bench/g60_r2.out	0.024	2026-10-29 20:39	4	0	run_out
+build/bench/g60_r2.png	4.986	2026-10-29 20:39			screenshot
+build/bench/g60_r3.load	0.000	2026-10-29 20:47	1	0	load_marker
+build/bench/g60_r3.log	0.028	2026-10-29 20:47	501	0	run_log
+build/bench/g60_r3.ndjson	1.384	2026-10-29 20:47	173	0	telemetry_ndjson
+build/bench/g60_r3.out	0.024	2026-10-29 20:47	4	0	run_out
+build/bench/g60_r3.png	5.636	2026-10-29 20:47			screenshot
+build/bench/g60_r4.load	0.000	2026-10-29 21:00	1	0	load_marker
+build/bench/g60_r4.log	0.029	2026-10-29 21:00	520	0	run_log
+build/bench/g60_r4.ndjson	1.723	2026-10-29 21:00	216	0	telemetry_ndjson
+build/bench/g60_r4.out	0.026	2026-10-29 21:00	4	0	run_out
+build/bench/g60_r4.png	4.080	2026-10-29 21:00			screenshot
+build/bench/g_b6.load	0.000	2026-10-27 01:56	1	0	load_marker
+build/bench/g_b6.log	0.021	2026-10-27 01:56	412	0	run_log
+build/bench/g_b6.ndjson	0.729	2026-10-27 01:56	71	0	telemetry_ndjson
+build/bench/g_b6.out	0.018	2026-10-27 01:56	4	0	run_out
+build/bench/g_b6.png	4.789	2026-10-27 01:56			screenshot
+build/bench/g_cas.load	0.000	2026-10-26 13:52	1	0	load_marker
+build/bench/g_cas.log	0.068	2026-10-26 13:52	917	0	run_log
+build/bench/g_cas.ndjson	0.740	2026-10-26 13:52	73	0	telemetry_ndjson
+build/bench/g_cas.out	0.150	2026-10-26 13:52	4	0	run_out
+build/bench/g_cas.png	5.515	2026-10-26 13:52			screenshot
+build/bench/g_cas.report	0.004	2026-10-26 13:52	252	0	report
+build/bench/g_cas2.load	0.000	2026-10-26 14:05	1	0	load_marker
+build/bench/g_cas2.log	0.021	2026-10-26 14:05	404	0	run_log
+build/bench/g_cas2.ndjson	0.724	2026-10-26 14:05	69	0	telemetry_ndjson
+build/bench/g_cas2.out	0.018	2026-10-26 14:05	4	0	run_out
+build/bench/g_cas2.png	4.848	2026-10-26 14:05			screenshot
+build/bench/g_cas2.report	0.004	2026-10-26 14:05	259	0	report
+build/bench/g_short.load	0.000	2026-10-26 13:28	1	0	load_marker
+build/bench/g_short.log	4.230	2026-10-26 13:28	79020	0	run_log
+build/bench/g_short.ndjson	0.711	2026-10-26 13:28	73	0	telemetry_ndjson
+build/bench/g_short.out	4.978	2026-10-26 13:28	66794	0	run_out
+build/bench/g_short.png	0.023	2026-10-26 13:28			screenshot
+build/bench/gp_base.log	0.022	2026-10-25 16:48	358	0	run_log
+build/bench/gp_base.ndjson	0.419	2026-10-25 16:48	221	0	telemetry_ndjson
+build/bench/gp_base.out	0.020	2026-10-25 16:48	4	0	run_out
+build/bench/gp_base.png	5.109	2026-10-25 16:48			screenshot
+build/bench/gp_final.log	0.025	2026-10-25 17:11	361	0	run_log
+build/bench/gp_final.ndjson	0.488	2026-10-25 17:11	60	0	telemetry_ndjson
+build/bench/gp_final.out	0.022	2026-10-25 17:11	4	0	run_out
+build/bench/gp_final.png	4.772	2026-10-25 17:11			screenshot
+build/bench/gp_ids.log	0.021	2026-10-25 17:01	355	0	run_log
+build/bench/gp_ids.ndjson	0.351	2026-10-25 17:01	142	0	telemetry_ndjson
+build/bench/gp_ids.out	0.019	2026-10-25 17:01	4	0	run_out
+build/bench/gp_ids.png	5.400	2026-10-25 17:01			screenshot
+build/bench/gp_msaa1.log	0.022	2026-10-25 17:06	358	0	run_log
+build/bench/gp_msaa1.ndjson	0.415	2026-10-25 17:06	54	0	telemetry_ndjson
+build/bench/gp_msaa1.out	0.020	2026-10-25 17:05	4	0	run_out
+build/bench/gp_msaa1.png	5.670	2026-10-25 17:05			screenshot
+build/bench/gp_new.log	0.022	2026-10-25 16:58	358	0	run_log
+build/bench/gp_new.ndjson	0.417	2026-10-25 16:58	173	0	telemetry_ndjson
+build/bench/gp_new.out	0.020	2026-10-25 16:58	4	0	run_out
+build/bench/gp_new.png	5.406	2026-10-25 16:58			screenshot
+build/bench/gp_zen.log	0.022	2026-10-25 16:51	357	0	run_log
+build/bench/gp_zen.ndjson	0.405	2026-10-25 16:51	221	0	telemetry_ndjson
+build/bench/gp_zen.out	0.019	2026-10-25 16:51	4	0	run_out
+build/bench/gp_zen.png	5.870	2026-10-25 16:51			screenshot
+build/bench/gr0.log	0.042	2026-10-30 13:07	786	0	run_log
+build/bench/gr0.png	4.454	2026-10-30 13:07			screenshot
+build/bench/gr1.log	0.043	2026-10-30 13:09	789	0	run_log
+build/bench/gr1.png	4.663	2026-10-30 13:09			screenshot
+build/bench/grid0.png	6.103	2026-10-30 13:10			screenshot
+build/bench/grid1.png	6.104	2026-10-30 13:11			screenshot
+build/bench/loadfree_c0.log	0.009	2026-10-24 12:45	147	0	run_log
+build/bench/loadfree_c0.ndjson	0.732	2026-10-24 12:45	107	0	telemetry_ndjson
+build/bench/loadfree_c0.out	0.007	2026-10-24 12:45	4	0	run_out
+build/bench/loadfree_c0.png	4.954	2026-10-24 12:45			screenshot
+build/bench/new_ab.log	0.009	2026-10-24 13:05	149	0	run_log
+build/bench/new_ab.ndjson	0.778	2026-10-24 13:05	106	0	telemetry_ndjson
+build/bench/new_ab.out	0.008	2026-10-24 13:05	4	0	run_out
+build/bench/new_ab.png	4.887	2026-10-24 13:05			screenshot
+build/bench/nochk1.070F6727.cpuprofile	0.681	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.132059F2.cpuprofile	0.664	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.19831D7C.cpuprofile	0.558	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.7F588FE1.cpuprofile	0.567	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.AD0E06D3.cpuprofile	0.674	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.BC035C53.cpuprofile	2.339	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.DD53EB97.cpuprofile	0.679	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.E942BC30.cpuprofile	0.663	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.E97DE1A3.cpuprofile	0.852	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.F5B32A87.cpuprofile	0.680	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.load	0.000	2026-11-03 01:10	1	0	load_marker
+build/bench/nochk1.log	0.120	2026-11-03 01:10	1426	11	run_log
+build/bench/nochk1.ndjson	0.864	2026-11-03 01:10	102	0	telemetry_ndjson
+build/bench/nochk1.out	0.109	2026-11-03 01:10	5	11	run_out
+build/bench/nochk1.page.cpuprofile	0.690	2026-11-03 01:10			cpuprofile_json
+build/bench/nochk1.png	4.601	2026-11-03 01:10			screenshot
+build/bench/p1103.load	0.000	2026-10-29 20:23	1	0	load_marker
+build/bench/p1103.log	0.029	2026-10-29 20:23	516	0	run_log
+build/bench/p1103.ndjson	1.736	2026-10-29 20:23	219	0	telemetry_ndjson
+build/bench/p1103.out	0.026	2026-10-29 20:23	5	0	run_out
+build/bench/p1103.png	3.844	2026-10-29 20:23			screenshot
+build/bench/p1103.stdout	0.005	2026-10-29 20:23	282	0	run_out
+build/bench/persona.log	0.105	2026-11-01 17:03	4	1	run_log
+build/bench/persona.png	1.553	2026-11-01 17:03			screenshot
+build/bench/port_box_main.load	0.000	2026-10-28 00:37	1	0	load_marker
+build/bench/port_box_main.log	0.022	2026-10-28 00:37	427	0	run_log
+build/bench/port_box_main.ndjson	0.744	2026-10-28 00:37	92	0	telemetry_ndjson
+build/bench/port_box_main.out	0.019	2026-10-28 00:37	4	0	run_out
+build/bench/port_box_main.png	5.684	2026-10-28 00:37			screenshot
+build/bench/port_ftol_main.load	0.000	2026-10-28 00:43	1	0	load_marker
+build/bench/port_ftol_main.log	0.022	2026-10-28 00:43	427	0	run_log
+build/bench/port_ftol_main.ndjson	0.742	2026-10-28 00:43	91	0	telemetry_ndjson
+build/bench/port_ftol_main.out	0.019	2026-10-28 00:43	4	0	run_out
+build/bench/port_ftol_main.png	4.967	2026-10-28 00:43			screenshot
+build/bench/port_inline_main.load	0.000	2026-10-28 00:40	1	0	load_marker
+build/bench/port_inline_main.log	0.022	2026-10-28 00:40	427	0	run_log
+build/bench/port_inline_main.ndjson	0.745	2026-10-28 00:40	90	0	telemetry_ndjson
+build/bench/port_inline_main.out	0.019	2026-10-28 00:40	4	0	run_out
+build/bench/port_inline_main.png	4.973	2026-10-28 00:40			screenshot
+build/bench/port_matrix_main.load	0.000	2026-10-28 00:33	1	0	load_marker
+build/bench/port_matrix_main.log	0.022	2026-10-28 00:33	428	0	run_log
+build/bench/port_matrix_main.ndjson	0.745	2026-10-28 00:33	92	0	telemetry_ndjson
+build/bench/port_matrix_main.out	0.019	2026-10-28 00:33	4	0	run_out
+build/bench/port_matrix_main.png	4.315	2026-10-28 00:33			screenshot
+build/bench/port_pace_main.load	0.000	2026-10-28 00:30	1	0	load_marker
+build/bench/port_pace_main.log	0.022	2026-10-28 00:30	427	0	run_log
+build/bench/port_pace_main.ndjson	0.745	2026-10-28 00:30	90	0	telemetry_ndjson
+build/bench/port_pace_main.out	0.019	2026-10-28 00:30	4	0	run_out
+build/bench/port_pace_main.png	5.289	2026-10-28 00:30			screenshot
+build/bench/prof1.1766C9F9.cpuprofile	1.019	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.313CA269.cpuprofile	0.878	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.4DB05118.cpuprofile	0.721	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.60F1CBEA.cpuprofile	0.792	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.72B4A54A.cpuprofile	0.873	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.7EF21257.cpuprofile	0.856	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.B22D0FFC.cpuprofile	0.733	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.BA48A8BF.cpuprofile	0.791	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.DD22D74C.cpuprofile	2.437	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.E928E616.cpuprofile	0.856	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.load	0.000	2026-11-03 00:30	1	0	load_marker
+build/bench/prof1.log	0.110	2026-11-03 00:30	1335	8	run_log
+build/bench/prof1.ndjson	0.857	2026-11-03 00:30	102	0	telemetry_ndjson
+build/bench/prof1.out	0.100	2026-11-03 00:30	5	8	run_out
+build/bench/prof1.page.cpuprofile	0.886	2026-11-03 00:30			cpuprofile_json
+build/bench/prof1.png	5.310	2026-11-03 00:30			screenshot
+build/bench/prof1.profile.txt	0.010	2026-10-29 21:06	511	0	cpu_profile_txt
+build/bench/prof_c0.log	0.011	2026-10-24 05:44	129	0	run_log
+build/bench/prof_c0.ndjson	0.535	2026-10-24 05:44	79	0	telemetry_ndjson
+build/bench/prof_c0.out	0.010	2026-10-24 05:44	4	0	run_out
+build/bench/prof_c0.png	3.993	2026-10-24 05:44			screenshot
+build/bench/prof_load.log	0.007	2026-10-24 12:47	129	0	run_log
+build/bench/prof_load.ndjson	0.273	2026-10-24 12:47	40	0	telemetry_ndjson
+build/bench/prof_load.out	0.005	2026-10-24 12:47	5	0	run_out
+build/bench/prof_load.png	4.717	2026-10-24 12:47			screenshot
+build/bench/prof_load.txt	0.012	2026-10-24 12:47	593	0	cpu_profile_txt
+build/bench/prof_load2.log	0.006	2026-10-24 12:48	127	0	run_log
+build/bench/prof_load2.ndjson	0.251	2026-10-24 12:48	39	0	telemetry_ndjson
+build/bench/prof_load2.out	0.005	2026-10-24 12:48	5	0	run_out
+build/bench/prof_load2.png	4.038	2026-10-24 12:48			screenshot
+build/bench/prof_load2.txt	0.011	2026-10-24 12:48	538	0	cpu_profile_txt
+build/bench/prof_race.log	0.018	2026-10-25 15:54	358	0	run_log
+build/bench/prof_race.ndjson	0.380	2026-10-25 15:54	132	0	telemetry_ndjson
+build/bench/prof_race.out	0.015	2026-10-25 15:54	5	0	run_out
+build/bench/prof_race.png	4.996	2026-10-25 15:54			screenshot
+build/bench/prof_unload.log	0.006	2026-10-24 06:22	120	0	run_log
+build/bench/prof_unload.ndjson	0.311	2026-10-24 06:22	47	0	telemetry_ndjson
+build/bench/prof_unload.out	0.005	2026-10-24 06:22	5	0	run_out
+build/bench/prof_unload.png	5.219	2026-10-24 06:22			screenshot
+build/bench/prof_unload.txt	0.009	2026-10-24 06:22	482	0	cpu_profile_txt
+build/bench/q_A1.log	0.018	2026-10-25 16:23	359	0	run_log
+build/bench/q_A1.ndjson	0.425	2026-10-25 16:23	164	0	telemetry_ndjson
+build/bench/q_A1.out	0.015	2026-10-25 16:23	4	0	run_out
+build/bench/q_A1.png	5.162	2026-10-25 16:23			screenshot
+build/bench/q_A2.log	0.018	2026-10-25 16:25	358	0	run_log
+build/bench/q_A2.ndjson	0.407	2026-10-25 16:25	152	0	telemetry_ndjson
+build/bench/q_A2.out	0.015	2026-10-25 16:25	4	0	run_out
+build/bench/q_A2.png	5.327	2026-10-25 16:25			screenshot
+build/bench/q_B1.log	0.018	2026-10-25 16:24	359	0	run_log
+build/bench/q_B1.ndjson	0.441	2026-10-25 16:24	240	0	telemetry_ndjson
+build/bench/q_B1.out	0.015	2026-10-25 16:24	4	0	run_out
+build/bench/q_B1.png	5.245	2026-10-25 16:24			screenshot
+build/bench/q_B2.log	0.018	2026-10-25 16:27	359	0	run_log
+build/bench/q_B2.ndjson	0.444	2026-10-25 16:27	200	0	telemetry_ndjson
+build/bench/q_B2.out	0.015	2026-10-25 16:27	4	0	run_out
+build/bench/q_B2.png	5.444	2026-10-25 16:27			screenshot
+build/bench/q_Bs.log	0.018	2026-10-25 16:29	359	0	run_log
+build/bench/q_Bs.ndjson	0.428	2026-10-25 16:29	58	0	telemetry_ndjson
+build/bench/q_Bs.out	0.015	2026-10-25 16:29	4	0	run_out
+build/bench/q_Bs.png	0.238	2026-10-25 16:29			screenshot
+build/bench/readgil_c0.log	0.009	2026-10-24 12:52	149	0	run_log
+build/bench/readgil_c0.ndjson	0.782	2026-10-24 12:52	107	0	telemetry_ndjson
+build/bench/readgil_c0.out	0.008	2026-10-24 12:52	4	0	run_out
+build/bench/readgil_c0.png	4.230	2026-10-24 12:52			screenshot
+build/bench/s0_1003.load	0.000	2026-10-29 21:16	1	0	load_marker
+build/bench/s0_1003.log	0.029	2026-10-29 21:16	518	0	run_log
+build/bench/s0_1003.ndjson	1.714	2026-10-29 21:16	216	0	telemetry_ndjson
+build/bench/s0_1003.out	0.025	2026-10-29 21:16	4	0	run_out
+build/bench/s0_1003.png	4.386	2026-10-29 21:16			screenshot
+build/bench/s1_1003.load	0.000	2026-10-29 21:31	1	0	load_marker
+build/bench/s1_1003.log	0.030	2026-10-29 21:31	523	0	run_log
+build/bench/s1_1003.ndjson	1.713	2026-10-29 21:31	216	0	telemetry_ndjson
+build/bench/s1_1003.out	0.026	2026-10-29 21:31	4	0	run_out
+build/bench/s1_1003.png	4.162	2026-10-29 21:31			screenshot
+build/bench/s1_1103a.load	0.000	2026-10-29 21:23	1	0	load_marker
+build/bench/s1_1103a.log	0.029	2026-10-29 21:23	520	0	run_log
+build/bench/s1_1103a.ndjson	1.721	2026-10-29 21:23	217	0	telemetry_ndjson
+build/bench/s1_1103a.out	0.026	2026-10-29 21:23	4	0	run_out
+build/bench/s1_1103a.png	3.858	2026-10-29 21:23			screenshot
+build/bench/s1_1103b.load	0.000	2026-10-29 21:27	1	0	load_marker
+build/bench/s1_1103b.log	0.029	2026-10-29 21:27	516	0	run_log
+build/bench/s1_1103b.ndjson	1.739	2026-10-29 21:27	216	0	telemetry_ndjson
+build/bench/s1_1103b.out	0.025	2026-10-29 21:27	4	0	run_out
+build/bench/s1_1103b.png	3.847	2026-10-29 21:27			screenshot
+build/bench/s1_1103c.load	0.000	2026-10-29 21:40	1	0	load_marker
+build/bench/s1_1103c.log	0.029	2026-10-29 21:40	514	0	run_log
+build/bench/s1_1103c.ndjson	1.726	2026-10-29 21:40	216	0	telemetry_ndjson
+build/bench/s1_1103c.out	0.025	2026-10-29 21:40	4	0	run_out
+build/bench/s1_1103c.png	4.089	2026-10-29 21:40			screenshot
+build/bench/s2_1003.load	0.000	2026-10-29 21:55	1	0	load_marker
+build/bench/s2_1003.log	0.029	2026-10-29 21:55	520	0	run_log
+build/bench/s2_1003.ndjson	1.725	2026-10-29 21:55	217	0	telemetry_ndjson
+build/bench/s2_1003.out	0.026	2026-10-29 21:55	4	0	run_out
+build/bench/s2_1003.png	4.504	2026-10-29 21:55			screenshot
+build/bench/s2_1103a.load	0.000	2026-10-29 21:47	1	0	load_marker
+build/bench/s2_1103a.log	0.029	2026-10-29 21:47	516	0	run_log
+build/bench/s2_1103a.ndjson	1.726	2026-10-29 21:47	215	0	telemetry_ndjson
+build/bench/s2_1103a.out	0.025	2026-10-29 21:47	4	0	run_out
+build/bench/s2_1103a.png	3.844	2026-10-29 21:47			screenshot
+build/bench/s2_1103b.load	0.000	2026-10-29 21:51	1	0	load_marker
+build/bench/s2_1103b.log	0.029	2026-10-29 21:51	518	0	run_log
+build/bench/s2_1103b.ndjson	1.730	2026-10-29 21:51	216	0	telemetry_ndjson
+build/bench/s2_1103b.out	0.026	2026-10-29 21:51	4	0	run_out
+build/bench/s2_1103b.png	3.844	2026-10-29 21:51			screenshot
+build/bench/spike.06BAB555.cpuprofile	0.805	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.1F2DCF18.cpuprofile	0.687	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.2B6DBB94.cpuprofile	0.739	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.389CD1BC.cpuprofile	0.824	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.46986C35.cpuprofile	0.852	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.537C1DAA.cpuprofile	0.679	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.CB35057F.cpuprofile	0.814	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.DDFFB37A.cpuprofile	0.803	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.EE0F466C.cpuprofile	1.024	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.F5ECC8B2.cpuprofile	0.827	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.log	0.020	2026-11-01 14:05	5	0	run_log
+build/bench/spike.page.cpuprofile	0.708	2026-11-01 14:05			cpuprofile_json
+build/bench/spike.png	0.873	2026-11-01 14:05			screenshot
+build/bench/spk2.0E45513E.cpuprofile	0.969	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.2715D8F0.cpuprofile	2.511	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.7952B53D.cpuprofile	0.741	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.959F2A37.cpuprofile	0.679	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.A9F70557.cpuprofile	0.804	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.B92B5371.cpuprofile	0.689	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.C7068525.cpuprofile	0.811	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.CBC3FD43.cpuprofile	0.828	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.CD02A0EF.cpuprofile	0.812	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.F0F4ED61.cpuprofile	0.831	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.log	0.100	2026-11-01 14:10	5	0	run_log
+build/bench/spk2.page.cpuprofile	0.829	2026-11-01 14:10			cpuprofile_json
+build/bench/spk2.png	1.603	2026-11-01 14:10			screenshot
+build/bench/spk3.048A50B9.cpuprofile	0.707	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.21C38B99.cpuprofile	0.844	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.459025ED.cpuprofile	0.873	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.4E876041.cpuprofile	0.728	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.53FBF901.cpuprofile	2.739	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.932AC8B9.cpuprofile	0.786	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.95F15AF6.cpuprofile	0.863	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.976D3A18.cpuprofile	0.866	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.BB7FE77B.cpuprofile	1.054	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.EF018B86.cpuprofile	0.843	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.load	0.000	2026-11-02 22:36	1	0	load_marker
+build/bench/spk3.log	0.111	2026-11-02 22:36	1347	8	run_log
+build/bench/spk3.ndjson	0.857	2026-11-02 22:36	103	0	telemetry_ndjson
+build/bench/spk3.out	0.101	2026-11-02 22:36	5	8	run_out
+build/bench/spk3.page.cpuprofile	0.890	2026-11-02 22:36			cpuprofile_json
+build/bench/spk3.png	5.424	2026-11-02 22:36			screenshot
+build/bench/spk4.10D0E807.cpuprofile	2.533	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.35C4374D.cpuprofile	0.862	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.39ED89E1.cpuprofile	0.769	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.4D475673.cpuprofile	0.848	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.748A064D.cpuprofile	0.771	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.7C0551A2.cpuprofile	0.714	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.A29BF37D.cpuprofile	0.841	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.DD4F2986.cpuprofile	0.869	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.F24D3B16.cpuprofile	0.724	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.FC2180FB.cpuprofile	1.035	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.load	0.000	2026-11-02 23:59	1	0	load_marker
+build/bench/spk4.log	0.113	2026-11-02 23:59	1365	20	run_log
+build/bench/spk4.ndjson	0.797	2026-11-02 23:59	104	0	telemetry_ndjson
+build/bench/spk4.out	0.103	2026-11-02 23:59	5	20	run_out
+build/bench/spk4.page.cpuprofile	0.875	2026-11-02 23:58			cpuprofile_json
+build/bench/spk4.png	4.711	2026-11-02 23:59			screenshot
+build/bench/spk5.178B8EC9.cpuprofile	0.654	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.1D5100C7.cpuprofile	0.743	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.55477DCE.cpuprofile	2.495	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.691A48C9.cpuprofile	0.656	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.826CBA5C.cpuprofile	0.599	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.840250AA.cpuprofile	0.709	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.B7AAA490.cpuprofile	0.730	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.E8ED3550.cpuprofile	0.918	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.F99AD7B3.cpuprofile	0.715	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.FD44F571.cpuprofile	0.611	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.load	0.000	2026-11-03 00:13	1	0	load_marker
+build/bench/spk5.log	0.120	2026-11-03 00:13	1447	165	run_log
+build/bench/spk5.ndjson	0.788	2026-11-03 00:13	105	0	telemetry_ndjson
+build/bench/spk5.out	0.108	2026-11-03 00:13	5	165	run_out
+build/bench/spk5.page.cpuprofile	0.743	2026-11-03 00:13			cpuprofile_json
+build/bench/spk5.png	5.234	2026-11-03 00:13			screenshot
+build/bench/states2_c0.log	0.006	2026-10-24 12:39	127	0	run_log
+build/bench/states2_c0.ndjson	0.285	2026-10-24 12:39	49	0	telemetry_ndjson
+build/bench/states2_c0.out	0.005	2026-10-24 12:39	4	0	run_out
+build/bench/states2_c0.png	5.221	2026-10-24 12:39			screenshot
+build/bench/states_c0.log	0.006	2026-10-24 12:37	124	0	run_log
+build/bench/states_c0.ndjson	0.277	2026-10-24 12:37	47	0	telemetry_ndjson
+build/bench/states_c0.out	0.005	2026-10-24 12:37	4	0	run_out
+build/bench/states_c0.png	5.222	2026-10-24 12:37			screenshot
+build/bench/triage_main.load	0.000	2026-10-28 00:06	1	0	load_marker
+build/bench/triage_main.log	0.022	2026-10-28 00:06	427	0	run_log
+build/bench/triage_main.ndjson	0.747	2026-10-28 00:06	96	0	telemetry_ndjson
+build/bench/triage_main.out	0.019	2026-10-28 00:06	4	0	run_out
+build/bench/triage_main.png	3.658	2026-10-28 00:06			screenshot
+build/bench/x87_A1.load	0.000	2026-10-25 20:29	1	0	load_marker
+build/bench/x87_A1.log	0.018	2026-10-25 20:29	364	0	run_log
+build/bench/x87_A1.ndjson	0.568	2026-10-25 20:29	76	0	telemetry_ndjson
+build/bench/x87_A1.out	0.016	2026-10-25 20:29	4	0	run_out
+build/bench/x87_A1.png	4.424	2026-10-25 20:29			screenshot
+build/bench/x87_A2.load	0.000	2026-10-25 20:32	1	0	load_marker
+build/bench/x87_A2.log	0.018	2026-10-25 20:32	363	0	run_log
+build/bench/x87_A2.ndjson	0.552	2026-10-25 20:32	74	0	telemetry_ndjson
+build/bench/x87_A2.out	0.016	2026-10-25 20:32	4	0	run_out
+build/bench/x87_A2.png	4.874	2026-10-25 20:32			screenshot
+build/bench/x87_B1.load	0.000	2026-10-25 20:31	1	0	load_marker
+build/bench/x87_B1.log	0.018	2026-10-25 20:31	363	0	run_log
+build/bench/x87_B1.ndjson	0.554	2026-10-25 20:31	74	0	telemetry_ndjson
+build/bench/x87_B1.out	0.016	2026-10-25 20:31	4	0	run_out
+build/bench/x87_B1.png	4.886	2026-10-25 20:31			screenshot
+build/bench/x87_B2.load	0.000	2026-10-25 20:34	1	0	load_marker
+build/bench/x87_B2.log	0.018	2026-10-25 20:34	365	0	run_log
+build/bench/x87_B2.ndjson	0.594	2026-10-25 20:34	74	0	telemetry_ndjson
+build/bench/x87_B2.out	0.016	2026-10-25 20:34	4	0	run_out
+build/bench/x87_B2.png	4.949	2026-10-25 20:34			screenshot
+build/perf_0.log	0.006	2026-10-23 00:20	4	0	run_log
+build/perf_3.log	0.006	2026-10-23 00:21	4	0	run_log
+build/perfx_0.log	0.006	2026-10-23 00:35	4	0	run_log
+build/perfx_1.log	0.006	2026-10-23 00:36	4	0	run_log
+build/rtlog.log	0.191	2026-10-23 00:40	4	0	run_log
+build/tel_0.ndjson	0.000	2026-10-23 00:20	0	0	telemetry_ndjson
+build/tel_3.ndjson	0.000	2026-10-23 00:21	0	0	telemetry_ndjson
+build/tel_base.ndjson	0.405	2026-10-23 17:37	58	0	telemetry_ndjson
+build/tel_def.ndjson	0.416	2026-10-23 19:50	62	0	telemetry_ndjson
+build/tel_msaa.ndjson	0.360	2026-10-23 17:58	167	0	telemetry_ndjson
+build/tel_owner.ndjson	0.371	2026-10-23 17:51	86	0	telemetry_ndjson
+build/tel_owner2.ndjson	0.382	2026-10-23 17:55	56	0	telemetry_ndjson
+build/tel_pump.ndjson	0.451	2026-10-23 17:38	55	0	telemetry_ndjson
+build/tel_res.ndjson	0.382	2026-10-23 17:44	57	0	telemetry_ndjson
+build/tel_whd.ndjson	0.393	2026-10-23 19:04	81	0	telemetry_ndjson
+build/tel_whd2.ndjson	0.391	2026-10-23 19:49	60	0	telemetry_ndjson
+build/telemetry.ndjson	1.607	2026-11-14 20:07	207	0	telemetry_ndjson
+build/telemetry.prev.ndjson	0.052	2026-11-14 20:03	8	0	telemetry_ndjson
+build/web.log	0.989	2026-11-14 20:07	9278	5	run_log
+build/web.prev.log	0.027	2026-11-14 20:03	536	0	run_log
+build/webcheck.log	0.353	2026-11-14 12:19	3702	4	run_log
+build/webcheck.prev.log	0.289	2026-11-13 18:35	3111	9	run_log
+build/webcheck.telemetry.ndjson	0.596	2026-11-14 12:14	72	0	telemetry_ndjson
+build/webcheck.telemetry.prev.ndjson	0.570	2026-11-13 18:35	72	0	telemetry_ndjson
+logs/build_crash.log	0.002	2026-11-13 18:05	20	0	run_log
+logs/build_duel.log	0.001	2026-11-13 17:00	16	0	run_log
+logs/latest.log	0.000	2026-11-10 00:10	1	0	run_log
+logs/serve-lan.log	0.000	2026-11-14 12:01	1	0	run_log
+logs/serve_5180.log	0.000	2026-11-13 13:20	0	0	run_log

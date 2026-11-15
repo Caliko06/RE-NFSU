@@ -1,0 +1,63 @@
+commit	date	cause	fix_location	still_open
+e34839c	2026-11-13	no spike cause named (keyword hit: "query flag")	-	n/a
+4bb6197	2026-11-12	no spike cause named (keyword hit: "open flag")	-	n/a
+53ae965	2026-11-11	no spike cause named (keyword hit: "flag"); runs clean (6 rivals, 19 cars, no LS_ movies)	-	n/a
+ad84c7b	2026-11-10	no spike cause named; ug2 pass GPU-timed 3.3 ms, streaming not needed now	ug2 street pass timing	n/a
+fe14395	2026-11-05	limiter sleeps 0.3 ms before the limiter exit and wakes 1.5-2.5 ms late (p50 17.9-19.0 ms, 53-57 fps)	host limiter sleep margin 3 ms (RN_LIMSLEEP=1)	yes
+f6dcc9d	2026-11-05	traffic substep cave as a spike source near the player	patches_perf.py (gated to WORLD 1010, traffic > 100 m); RN_SPIKEXY	unclear
+9c7b3e9	2026-11-05	no spike cause named; adds frames >20 ms by cause and spike sites	-	n/a
+34c8a27	2026-11-05	no spike cause named (same message as 9c7b3e9)	-	n/a
+4328f03	2026-11-05	extra frame time lives outside the timed indirect-call tree; JSC tier-up ruled out; c1103 p50 17.1 p99 30.6, 16 frames > 33 ms, FAIL	RN_FNTIME=1, tools/bench_headed.py	yes
+304ff00	2026-11-05	no spike cause named (day plan, "no hitches" as goal)	-	n/a
+dce3f20	2026-11-03	no spike cause named; RST/RSTA/RSTW reset events (dz drift over 120 frames)	resetscan tool	n/a
+ba79f2c	2026-11-03	w_L1 hitch: spike:/SMOOTHJOB lines, substep loop, positions	docs/re hitch diagnosis	unclear
+1379988	2026-11-03	spike at (1846,-727) is a speed-field anomaly, not a wall; cause unknown, probe defined	docs/re; AIHIT clusters w_a/w_b/w_d	yes
+f12984f	2026-11-03	no spike cause named; prior art on traffic near the player and shader/streaming hitches	census docs/re (8 sources)	n/a
+d07dc08	2026-11-03	traffic horn on parked/undrawn/recycled cars via StartHorn 0x524f30	host/horn.c horn_tick, horn probe 0x52536a (RN_HORNLOG / RN_HORNFIX), both off	yes
+9269cee	2026-11-03	traffic horn on parked/undrawn/recycled cars via StartHorn 0x524f30 (duplicate of d07dc08)	host/horn.c horn_tick, horn probe 0x52536a (both flags off)	yes
+ba98a03	2026-11-03	WORLD lag: car smoothing parts drawn as authored while smoothing, cache 256 evicting parts in use	car smoothing on its own thread; cache 1024 with probed lookup	no
+0728a13	2026-11-03	no spike cause named; status handoff (limiter sleep off, RN_FPS=30)	-	n/a
+8f7dced	2026-11-03	pace_plan used a fixed 1000/60 instead of the game frame target [0x6f0890] (1/60, 1/30 with RN_FPS=30)	host/d3d9.c pace_plan (W4 stop messages, device loss)	no
+cc5c291	2026-11-03	limiter sleep default made it worse: spk5 p99 33.4, max 149 ms, 35 frames > 33 ms, 55.9 fps vs spk3 59.8; not separated from machine load	RN_LIMSLEEP OFF by default	yes
+b364465	2026-11-03	limiter frame target [0x6f0890] (1/60, read at 0x585b83) had no 30 fps mode; dt split into 1/60 ticks via [0x734570] cap [0x6f0894]	RN_FPS=30 / ?fps=30 (W5, off by default), not yet run at 30 fps	yes
+45e767d	2026-11-03	frame limiter spun on QPC 0x585bf7: game thread 28.4 % in _emscripten_get_now	host/win32.c limiter_sleep, host/threads.c gil_sleep_us; frame regression not separated from run noise	yes
+8d07ff3	2026-11-02	D3DX parameter to shader constants copy 0x5c85c1 was 2.4 % of the race game thread	host/native.h NATIVE body, lift.py; not yet profiled in a race	yes
+40abbee	2026-11-02	D3DX effect state apply 0x5c97cb was 11.4 % of the race game thread	host/native.h, lift.py NATIVE; spk3 clean 59.8 fps	no
+c61b5c8	2026-11-01	D3DXMatrixMultiply 0x5d6f5d was 5.8 % self of the race game thread; frames > 25 ms had unknown clock-read and stream-read sites	host/native.h, lift.py NATIVE; spike: probe in F10	no
+9f91b6d	2026-11-01	race frames not on the display grid (limiter 0x585b40 race wait via mask bit 6)	?pace=vsync and ?warm=1, both off by default	yes
+75b1d86	2026-10-31	catch-up held Free Run rivals at 0.47-0.57x pace for minutes	RN_FREECU (catch-up as shipped, ours off); AIHIT	no
+a9b7559	2026-10-31	no spike cause named (rules: OWNER is the test for lag)	-	n/a
+d449348	2026-10-31	WORLD lag spans not attributed (suspected big uploads)	probe BIGUPLOAD	yes
+1bc1ee3	2026-10-30	no spike cause named (Ghidra on the pod)	-	n/a
+dfe5718	2026-10-30	no spike cause named; AO cost 0.28 ms per frame at 2560x1160	web AO (psblur_vel / GPU_FXAA), host/d3d9.c	n/a
+7c605e4	2026-10-29	no spike cause named (canon corrections)	-	n/a
+e265af5	2026-10-28	stuck rivals and lane flags in the city net; x87 tag bug in 0x59a7c0 giving NaN position -> c0000090	host/free.c free_tmove / free_respawn, citygraph.py, 0x4563d0 / 0x59a2c0 / 0x42adf0	no
+aac8f19	2026-10-28	no spike cause named; probe for traffic cars standing still	RN_CARPOS, list [0x7361f8], city_run.py	n/a
+6fac870	2026-10-28	no spike cause named (city road net)	-	n/a
+45552c0	2026-10-28	no spike cause named; dead end = failed placement (walker 0x4563d0 -> 0x59a2c0), node+0x84 drivable bits	census RE (citygraph step 1)	n/a
+87dcaf4	2026-10-27	ROA block closed: lag, road switch, blur ramp, traffic placement	HANDOFF.md	unclear
+8c99913	2026-10-27	writing the canvas on submit put each Present at the refresh edge, jitter picking the refresh before or after (827 repeats + 850 drops of 5116, 30 fps windows)	D3D-like present queue, one frame per animation frame; ?present=now keeps old path	no
+f95eaf7	2026-10-27	OWNER telemetry: Present steady 95 % 15-18 ms, 1 frame > 33 ms, GPU ~11 ms, so lag is not dropped frames; blur PS_FAR = 200 and W/512 scale are guesses	PLAN Now (blur, traffic, lag, wet road); web/gpu.js psblur	yes
+efac067	2026-10-27	no spike cause named; NIS people smoothing ~6 ms once	in web/gpu.js smooth_draw (worldbone hash 0x95d99bf8)	n/a
+884ada7	2026-10-26	race spikes 31-83 ms were GIL waits: gil_clock handed the GIL at every QPC read, one 83 ms frame waited 49 ms over 247 hand-offs	host/threads.c gil_clock: main passes only after 1 ms held; gate60 PASS x2	no
+b1a4819	2026-10-26	no spike cause named; traffic 12 -> 18 cars, per-car pace x0.85..1.15	0x57d060 block, 0x57cfa0, 0x4b3b01, 0x583910	no
+2dc0f3f	2026-10-25	GIL spikes = main-thread work plus slow GIL wake-ups	HANDOFF.md (diagnosis only)	yes
+833a336	2026-10-25	spikes are main-thread work plus slow GIL wake-ups, not another thread holding the GIL	GIL log per frame (heldMain/heldOther/holdWho), bench SLOW list	yes
+25ce04e	2026-10-25	telemetry whole-ms time made the game limiter 0x585b40 read 16,17,17 -> p50 17, gate60 could not pass; clock_gettime -> wasi -> BigInt ~1.6 % of the game thread	web/telemetry.js at 0.01 ms, host/win32.c now_us()	no
+3e40b06	2026-10-25	OWNER race lag was the GPU: gpuWait 180-400 ms, GPU p50 12 -> 21 ms; MSAA 4x forces every pass's loads/stores on Apple's tiled GPU (?msaa=4 opt-in)	web gpu MSAA switch; Ctx *restrict in lift.py/abk.py, ?gpuprof=1	no
+74054bb	2026-10-25	no spike cause named (docs reconciled)	-	n/a
+5a87f63	2026-10-25	no spike cause named (Quick Race / career rows)	-	n/a
+1548f81	2026-10-25	no spike cause named (roadmap)	-	n/a
+8814efc	2026-10-25	no spike cause named (AGENTS distilled)	-	n/a
+2d236bd	2026-10-24	no spike cause named; acceptance = 0 hitches > 33 ms on localhost	AGENTS acceptance	n/a
+0eba7f7	2026-10-24	frame limiter waited in load states (menu->race 7.57 s)	PATCH 0x585b94; web reads without the GIL, 4 MB read-ahead	no
+5fa1768	2026-10-24	gil_clock handed the GIL on a clock read (limiter 0x585b40 spun on QPC); full clears reloaded stencil/depth, frame buffers and bind groups rebuilt	host/threads.c gil_clock; web/gpu.js loadOp clear, grow-only buffers, bind group cache	unclear
+89f12a4	2026-10-24	no spike cause named; baseline and audit (tools/bench.py, RN_FLOWLOG 0x77a90c, ?gpuprof=1)	-	n/a
+67358ae	2026-10-23	no spike cause named (Wine reference at 60 fps)	-	n/a
+e2b3845	2026-10-23	no spike cause named (handoff)	-	n/a
+ee19398	2026-10-23	the October 22 lag with MSAA was frame pacing plus per-draw copies fixed since; MSAA 4x costs GPU p50 11 / p90 13.5 vs 7.7 / 11.3 ms	MSAA 4x default (?msaa=1 off), gpu ts in the frame log	no
+b27727d	2026-10-23	PN-smoothed car draws resent subdivided vertices every frame (~1.8-2.2 Mwords of ~2.5 M) and hashed ~7 MB of source vertices	GPU_BUFFER/GPU_BUFDATA resident entries, static-source cache key, RN_DRAWSTAT; 55.5 -> 59.8 fps	no
+cdd6f5d	2026-10-23	page ran a frame only at requestAnimationFrame while the game waited in Present (40 % gpu_wait, page 62 % idle)	host/gpu.c seq wake, gpu.js Atomics.waitAsync, static VBs/IBs at Unlock; 30.6 -> 59.8 fps	no
+f7411f3	2026-10-22	2048 px car PNGs doubled GPU waits at 2560x1116	?hdmax= (1024 per side) in the remaster loader; p90 46 -> 24 ms	no
+e1fef04	2026-10-22	4x MSAA bridge tripled GPU waits in the headless race	?msaa=4 opt-in, ?aniso=1 for the 16x sampler; hitches 369 -> 153	no
+17e413b	2026-10-21	no spike cause named; F9 panel with frame time bars by cause	web/telemetry.js	no
