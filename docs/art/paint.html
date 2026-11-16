@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RE-NFSU paintings</title>
+<style>
+  html,body{margin:0;min-height:100%;background:#050508;color:#b9b2a6;font:14px/1.3 -apple-system,"Helvetica Neue",Arial,sans-serif}
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:100vh}
+  canvas{display:block;max-width:calc(100vw - 32px);max-height:calc(100vh - 90px);cursor:pointer;box-shadow:0 30px 80px #000}
+  .bar{display:flex;gap:18px;align-items:center}
+  .hint{opacity:.55}
+  button{font:inherit;color:#efe6d4;background:none;border:0;padding:8px 2px;cursor:pointer;border-bottom:1px solid #6b6258;transition:transform .12s ease-out,border-color .16s}
+  button:hover{border-color:#efe6d4}
+  button:active{transform:scale(.97)}
+  button:focus-visible{outline:2px solid #ffb347;outline-offset:4px}
+  @media (prefers-reduced-motion:reduce){button{transition:none}}
+  body.bare{display:block;min-height:0}
+  body.bare canvas{max-width:none;max-height:none;box-shadow:none}
+  body.bare .bar{display:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="800" aria-label="Painting made by code for the RE-NFSU readme"></canvas>
+<div class="bar">
+  <button id="next">Next painting</button>
+  <button id="save">Save PNG</button>
+  <span class="hint">click or Space: next · S: save</span>
+</div>
+<script>
+'use strict';
+// The pictures of the README, painted by code. No image files go in: each scene draws a hidden
+// reference picture with plain shapes, and the painter repaints it in brush strokes.
+// Painter: Hertzmann 1998 (layers of curved strokes, big to small, repainting only where the
+// picture still differs from the reference) + a paint height map lit from the top left (impasto).
+// Render to PNG: docs/art/README.md.  ?q=<n> picks the scene, ?static=1 paints at once.
+let W=1600,H=800;
+const TAU=Math.PI*2,PI=Math.PI;
+const QS=new URLSearchParams(location.search);
+const STATIC=QS.has('static')||matchMedia('(prefers-reduced-motion:reduce)').matches;
+if(QS.has('bare'))document.body.classList.add('bare');
+
+function R32(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function mkNoise(seed){const r=R32(seed),P=new Float32Array(4096);for(let i=0;i<4096;i++)P[i]=r();
+  const h=(a,b)=>P[((a*73856093)^(b*19349663))&4095];
+  return(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),fx=x-xi,fy=y-yi,sx=fx*fx*(3-2*fx),sy=fy*fy*(3-2*fy);
+    const a=h(xi,yi),b=h(xi+1,yi),c=h(xi,yi+1),d=h(xi+1,yi+1);return a+(b-a)*sx+(c-a)*sy+(a-b-c+d)*sx*sy}}
+const hx3=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const rgba=(h,a)=>{const c=hx3(h);return`rgba(${c[0]},${c[1]},${c[2]},${a})`};
+const mix=(a,b,t)=>{const A=hx3(a),B=hx3(b);return`rgb(${A[0]+(B[0]-A[0])*t|0},${A[1]+(B[1]-A[1])*t|0},${A[2]+(B[2]-A[2])*t|0})`};
+
+// ---------- shape helpers (reference picture) ----------
+function glow(g,x,y,r,hex,a,sy=1){g.save();g.translate(x,y);g.scale(1,sy);const G=g.createRadialGradient(0,0,0,0,0,r);
+  G.addColorStop(0,rgba(hex,a));G.addColorStop(.5,rgba(hex,a*.42));G.addColorStop(1,rgba(hex,0));g.fillStyle=G;g.fillRect(-r,-r,2*r,2*r);g.restore()}
+function fog(g,rnd,n,x0,y0,x1,y1,r0,r1,hex,a){for(let i=0;i<n;i++)glow(g,x0+rnd()*(x1-x0),y0+rnd()*(y1-y0),r0+rnd()*(r1-r0),hex,a)}
+function disc(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,TAU);g.fill()}
+function poly(g,pts,col){g.fillStyle=col;g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);g.closePath();g.fill()}
+function line(g,pts,col,w){g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';g.lineJoin='round';g.beginPath();g.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length-1;i++){const p=pts[i],q=pts[i+1];g.quadraticCurveTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2)}const l=pts[pts.length-1];g.lineTo(l[0],l[1]);g.stroke()}
+function vgrad(g,y0,y1,stops){const G=g.createLinearGradient(0,y0,0,y1);for(const[t,c]of stops)G.addColorStop(t,c);return G}
+function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+// One building: a dark slab, a lit edge, and windows in the city's colour.
+function tower(g,rnd,x,w,top,base,body,win,lit=.45,cw=7,ch=9){
+  g.fillStyle=body;g.fillRect(x,top,w,base-top);
+  g.fillStyle=rgba(win,.28);g.fillRect(x,top,2,base-top);
+  for(let yy=top+8;yy<base-ch;yy+=ch+5)for(let xx=x+5;xx<x+w-cw;xx+=cw+4)if(rnd()<lit){g.fillStyle=rgba(win,.45+rnd()*.55);g.fillRect(xx,yy,cw,ch)}}
+function skyline(g,rnd,x0,x1,base,hMin,hMax,body,win,lit,taller){
+  for(let x=x0;x<x1;){const w=34+rnd()*52,k=taller?taller((x-x0)/(x1-x0)):1,h=(hMin+rnd()*(hMax-hMin))*k;
+    tower(g,rnd,x,w,base-h,base,body,win,lit);if(rnd()<.3){g.fillStyle=body;g.fillRect(x+w*.4,base-h-22,4,22);disc(g,x+w*.4+2,base-h-24,3,'#ff4040')}x+=w+rnd()*10}}
+// Lights that smear down into wet ground or water.
+function streak(g,x,y,len,w,hex,a){const G=g.createLinearGradient(0,y,0,y+len);G.addColorStop(0,rgba(hex,a));G.addColorStop(1,rgba(hex,0));g.fillStyle=G;g.fillRect(x-w/2,y,w,len)}
+
+// ---------- the four paintings ----------
+const DISPLAY='italic 900 SZpx "Arial Black","Helvetica Neue",Impact,sans-serif';
+const LABEL='italic 600 SZpx "Helvetica Neue","Arial Black",Arial,sans-serif';
+const SCENES=[
+// 1. hero: one road, a bridge ahead, a city on each side.
+{name:'hero',W:1600,H:800,bot:'#07070f',
+ texts:[{t:'RE·NFSU',x:800,y:196,sz:176,font:DISPLAY,col:'#f6eedd'},
+        {t:'TWO CITIES · ONE ROAD',x:800,y:262,sz:54,font:LABEL,col:'#ffb347',sp:.16}],
+ flow:N=>(x,y)=>y>452?Math.atan2(y-452,x-800)+(N(x/200,y/200)-.5)*.3:(N(x/320,y/260)-.5)*1.6,
+ draw(g,rnd){
+  const VX=800,HZ=452;
+  g.fillStyle=vgrad(g,0,HZ,[[0,'#05061a'],[.55,'#17103f'],[1,'#4a1c5e']]);g.fillRect(0,0,W,HZ);
+  glow(g,300,HZ,470,'#ff7a2a',.42);glow(g,1300,HZ,470,'#17d9c2',.36);
+  glow(g,VX,HZ,560,'#ff3f9a',.34);glow(g,VX,HZ,230,'#ffc27a',.5);
+  fog(g,rnd,22,0,0,W,300,120,300,'#05061a',.16);
+  // far skylines: warm on the left, cold on the right, lower toward the bridge
+  skyline(g,rnd,-20,650,HZ,70,300,'#160b22','#ffb14a',.5,t=>1.15-.75*t);
+  skyline(g,rnd,950,1620,HZ,70,300,'#08172a','#3ff0dc',.5,t=>.4+.75*t);
+  // ground and water under the cities
+  g.fillStyle=vgrad(g,HZ,H,[[0,'#120a24'],[1,'#04040a']]);g.fillRect(0,HZ,W,H-HZ);
+  for(let i=0;i<46;i++){const x=rnd()*640;streak(g,x,HZ,40+rnd()*150,5+rnd()*9,'#ffa040',.2+rnd()*.3)}
+  for(let i=0;i<46;i++){const x=960+rnd()*640;streak(g,x,HZ,40+rnd()*150,5+rnd()*9,'#30e8d4',.2+rnd()*.3)}
+  // the bridge tower: a gate the road drives through
+  const TT=300;
+  for(const s of[-1,1]){const x=VX+s*74;
+    line(g,[[x,TT],[x+s*150,HZ-60],[x+s*520,HZ+6]],'#2a1838',7);line(g,[[x,TT],[x+s*150,HZ-60],[x+s*520,HZ+6]],'#c98a6a',2);
+    for(let k=1;k<12;k++){const t=k/12,cx=x+s*520*t,cy=TT+(HZ+6-TT)*(1-(1-t)*(1-t));line(g,[[cx,cy],[cx,HZ+4]],'#6a4a6a',1.6)}
+    g.fillStyle='#1c0f2c';g.fillRect(x-11,TT,22,HZ-TT+2);g.fillStyle='#e0946a';g.fillRect(x-11,TT,4,HZ-TT+2);
+    disc(g,x,TT-6,5,'#ff3838');glow(g,x,TT-6,34,'#ff3838',.8)}
+  g.fillStyle='#1c0f2c';g.fillRect(VX-74,TT+18,148,13);g.fillRect(VX-74,TT+84,148,11);
+  g.fillStyle='#e0946a';g.fillRect(VX-74,TT+18,148,3);g.fillRect(VX-74,TT+84,148,3);
+  // the road, wet
+  const RL=[[VX-9,HZ],[-420,H]],RR=[[VX+9,HZ],[2020,H]];
+  g.fillStyle=vgrad(g,HZ,H,[[0,'#3a2048'],[.3,'#1c1830'],[1,'#0d0d18']]);
+  g.beginPath();g.moveTo(RL[0][0],HZ);g.lineTo(RR[0][0],HZ);g.lineTo(RR[1][0],H);g.lineTo(RL[1][0],H);g.closePath();g.fill();
+  g.save();g.beginPath();g.moveTo(RL[0][0],HZ);g.lineTo(RR[0][0],HZ);g.lineTo(RR[1][0],H);g.lineTo(RL[1][0],H);g.closePath();g.clip();
+  glow(g,VX,HZ+10,360,'#ff5fae',.62,1.7);glow(g,VX,HZ,150,'#ffd09a',.55,2.6);
+  for(let i=0;i<16;i++){const t=Math.pow((i+.4)/16,2.2),y=HZ+(H-HZ)*t,hw=9+(RR[1][0]-VX-9)*t;
+    for(const s of[-1,1]){const x=VX+s*hw*.93,hex=s<0?'#ffa040':'#30e8d4';streak(g,x,y,(18+150*t),3+16*t,hex,.5)}}
+  // lane marks running to the vanishing point
+  for(const off of[-.34,.34])for(let i=0;i<9;i++){const t0=Math.pow((i+.15)/9,2.4),t1=Math.pow((i+.6)/9,2.4),y0=HZ+(H-HZ)*t0,y1=HZ+(H-HZ)*t1;
+    const w0=(9+1211*t0)*off,w1=(9+1211*t1)*off,k0=1+9*t0,k1=1+9*t1;poly(g,[[VX+w0-k0,y0],[VX+w0+k0,y0],[VX+w1+k1,y1],[VX+w1-k1,y1]],'rgba(240,230,212,.8)')}
+  g.restore();
+  // rail lamps along both edges, each with its halo
+  for(let i=0;i<13;i++){const t=Math.pow((i+.5)/13,2.3),y=HZ+(H-HZ)*t,hw=9+1211*t,r=2+15*t;
+    for(const s of[-1,1]){const x=VX+s*hw,hex=s<0?'#ffb04a':'#3ff0dc',ph=(10+120*t);
+      g.fillStyle='#0c0812';g.fillRect(x-r*.25,y-ph,r*.5,ph);glow(g,x,y-ph,r*5,hex,.75);disc(g,x,y-ph,r*.8,'#fff4dc')}}
+  // the car, seen from behind
+  const cx=VX,by=716;g.save();g.translate(cx,by+30);g.scale(1.22,1.22);g.translate(-cx,-by);
+  glow(g,cx,by+6,330,'#28f0d0',.75,.16);glow(g,cx,by+2,210,'#b8fff2',.5,.09);
+  for(const s of[-1,1]){streak(g,cx+s*128,by+4,84,70,'#ff2a2a',.5);streak(g,cx+s*128,by+4,60,26,'#ffb09a',.4)}
+  g.fillStyle='#04040a';g.fillRect(cx-176,by-52,56,56);g.fillRect(cx+120,by-52,56,56);
+  // body
+  g.fillStyle=vgrad(g,by-140,by,[[0,'#2b4bd8'],[.45,'#152a8a'],[1,'#0a1244']]);
+  g.beginPath();g.moveTo(cx-186,by-14);g.lineTo(cx-184,by-96);g.quadraticCurveTo(cx-178,by-132,cx-140,by-136);g.lineTo(cx+140,by-136);
+  g.quadraticCurveTo(cx+178,by-132,cx+184,by-96);g.lineTo(cx+186,by-14);g.quadraticCurveTo(cx,by-2,cx-186,by-14);g.closePath();g.fill();
+  // cabin and rear glass
+  poly(g,[[cx-142,by-134],[cx-104,by-208],[cx+104,by-208],[cx+142,by-134]],'#0d1748');
+  g.fillStyle=vgrad(g,by-200,by-140,[[0,'#8a4f9c'],[1,'#141a44']]);
+  g.beginPath();g.moveTo(cx-122,by-140);g.lineTo(cx-92,by-198);g.lineTo(cx+92,by-198);g.lineTo(cx+122,by-140);g.closePath();g.fill();
+  line(g,[[cx-102,by-209],[cx+102,by-209]],'#ff9fd0',4);
+  // wing
+  g.fillStyle='#0a1040';g.fillRect(cx-150,by-166,10,30);g.fillRect(cx+140,by-166,10,30);
+  g.fillStyle='#1b2f9c';g.fillRect(cx-170,by-176,340,14);g.fillStyle='#8fb0ff';g.fillRect(cx-170,by-177,340,4);
+  line(g,[[cx-176,by-134],[cx+176,by-134]],'#7f9cff',3);
+  // tail lights
+  for(const s of[-1,1]){const x=cx+s*128;glow(g,x,by-98,120,'#ff2020',.85);
+    g.fillStyle='#ff2a22';rrect(g,x-46,by-114,92,30,9);g.fill();g.fillStyle='#ffd9b8';rrect(g,x-30,by-106,60,13,6);g.fill()}
+  // bumper, plate, exhaust
+  g.fillStyle='#070b2c';g.beginPath();g.moveTo(cx-186,by-58);g.lineTo(cx+186,by-58);g.lineTo(cx+186,by-14);g.quadraticCurveTo(cx,by-2,cx-186,by-14);g.closePath();g.fill();
+  g.fillStyle='#e9e3cf';g.fillRect(cx-40,by-90,80,24);g.fillStyle='#1a1a2a';g.fillRect(cx-28,by-82,56,8);
+  disc(g,cx+96,by-28,11,'#02020a');disc(g,cx+96,by-28,6,'#ffb347');glow(g,cx+96,by-28,26,'#ffb347',.6);g.restore();
+ }},
+// 2. bridge: the two cities and the road that joins them.
+{name:'bridge',W:1600,H:520,bot:'#05060f',texts:[],
+ flow:N=>(x,y)=>y>338?(N(x/260,y/60)-.5)*.35:(N(x/300,y/240)-.5)*2.2,
+ draw(g,rnd){
+  const WL=338;
+  g.fillStyle=vgrad(g,0,WL,[[0,'#040616'],[.6,'#1a1242'],[1,'#532060']]);g.fillRect(0,0,W,WL);
+  glow(g,260,WL,430,'#ff7a2a',.5);glow(g,1340,WL,430,'#17d9c2',.45);glow(g,800,WL,360,'#ff4fa0',.25);
+  glow(g,1180,92,150,'#f3e6c0',.5);disc(g,1180,92,38,'#f6ecd0');disc(g,1166,84,34,'#fff7e2');
+  fog(g,rnd,18,0,0,W,240,110,260,'#040616',.16);
+  skyline(g,rnd,-20,470,WL,60,250,'#170b22','#ffb14a',.55,t=>1.2-.8*t);
+  skyline(g,rnd,1130,1620,WL,60,250,'#07182a','#3ff0dc',.55,t=>.4+.8*t);
+  // water and what the cities throw on it
+  g.fillStyle=vgrad(g,WL,H,[[0,'#170f30'],[1,'#03040a']]);g.fillRect(0,WL,W,H-WL);
+  for(let i=0;i<60;i++)streak(g,rnd()*500,WL,30+rnd()*150,5+rnd()*12,'#ffa040',.2+rnd()*.35);
+  for(let i=0;i<60;i++)streak(g,1100+rnd()*500,WL,30+rnd()*150,5+rnd()*12,'#30e8d4',.2+rnd()*.35);
+  streak(g,1180,WL,170,60,'#f3e6c0',.3);
+  // the bridge: deck, two towers, cables
+  const DY=292,deck=x=>DY-14*Math.sin((x-380)/(1220-380)*PI),T=[650,950],TT=96;
+  for(const tx of T){g.fillStyle='#1b0f2a';g.fillRect(tx-12,TT,24,WL-TT+34);g.fillStyle='#e8a070';g.fillRect(tx-12,TT,5,WL-TT+34);
+    g.fillStyle='#1b0f2a';g.fillRect(tx-22,TT+34,44,9);g.fillRect(tx-22,TT+120,44,9);disc(g,tx,TT-7,5,'#ff3838');glow(g,tx,TT-7,36,'#ff3838',.85);
+    streak(g,tx,WL+34,90,22,'#e8a070',.22)}
+  const cab=(x0,y0,x1,y1,sag)=>{const P=[];for(let k=0;k<=24;k++){const t=k/24;P.push([x0+(x1-x0)*t,y0+(y1-y0)*t+sag*4*t*(1-t)])}return P};
+  const C=[cab(380,deck(380)-4,650,TT,70),cab(650,TT,950,TT,172),cab(950,TT,1220,deck(1220)-4,70)];
+  for(const P of C){line(g,P,'#2a1838',6);line(g,P,'#d99670',2.2);
+    for(let k=2;k<P.length-1;k+=2)line(g,[P[k],[P[k][0],deck(P[k][0])]],'#8a6080',1.5)}
+  const dk=[];for(let x=380;x<=1220;x+=20)dk.push([x,deck(x)]);
+  line(g,dk,'#0e0818',15);line(g,dk.map(p=>[p[0],p[1]-7]),'#f0b080',2.5);
+  // lamps and the traffic crossing: white coming, red going
+  for(let x=400;x<1220;x+=42){const y=deck(x)-12;glow(g,x,y,26,'#ffd9a0',.75);disc(g,x,y,2.6,'#fff6e0');streak(g,x,WL+2,46,5,'#ffd9a0',.3)}
+  for(let i=0;i<9;i++){const x=440+rnd()*720,y=deck(x)-3,red=i%2;line(g,[[x,y],[x+(red?-34:34),deck(x+(red?-34:34))-3]],red?'#ff3a30':'#fff2d0',3.2);glow(g,x,y,20,red?'#ff3a30':'#fff2d0',.6)}
+  // far shore under the bridge
+  g.fillStyle='rgba(8,5,16,.55)';g.fillRect(380,WL-6,840,8);
+ }},
+// 3. recompile: the old program on the left, the page on the right, and what flows between.
+{name:'recompile',W:1600,H:520,bot:'#06060d',
+ texts:[{t:'Speed.exe',x:260,y:492,sz:46,font:LABEL,col:'#aab7d6'},{t:'13,770 functions',x:800,y:76,sz:46,font:LABEL,col:'#ffb347'},{t:'a browser tab',x:1330,y:492,sz:46,font:LABEL,col:'#7df2e2'}],
+ flow:N=>(x,y)=>(N(x/300,y/200)-.5)*1.1,
+ draw(g,rnd){
+  g.fillStyle='#07070f';g.fillRect(0,0,W,H);
+  glow(g,260,250,420,'#3a4a8a',.4);glow(g,1330,250,440,'#17d9c2',.3);glow(g,800,260,460,'#ff3f9a',.2);
+  // the exe: a steel slab of bytes
+  g.fillStyle='#161c30';rrect(g,70,70,380,370,10);g.fill();g.fillStyle='#8fa2d0';g.fillRect(70,70,380,5);
+  for(let r=0;r<12;r++)for(let c=0;c<12;c++){const v=rnd(),x=92+c*28.5,y=94+r*27.5;
+    g.fillStyle=v<.07?'#ffb347':v<.13?'#ff4f9a':mix('#222b48','#7f90be',rnd()*rnd());g.fillRect(x,y,21,17)}
+  // ribbons: bytes leave grey and arrive in colour
+  const cols=['#7f90be','#9a7fd0','#ff4f9a','#ff7a5a','#ffb347','#ffe08a','#8af0b0','#30e8d4','#5ab8ff'];
+  for(let i=0;i<9;i++){const y0=100+i*39,y1=150+i*26,m=260+(rnd()-.5)*240;
+    const G=g.createLinearGradient(450,0,1150,0);G.addColorStop(0,'#55618a');G.addColorStop(.38,cols[i]);G.addColorStop(1,cols[(i+3)%9]);
+    g.shadowColor=cols[i];g.shadowBlur=26;g.strokeStyle=G;g.lineWidth=13;g.lineCap='round';
+    g.beginPath();g.moveTo(452,y0);g.bezierCurveTo(660,y0,700,m,810,m);g.bezierCurveTo(930,m,960,y1,1150,y1);g.stroke();
+    g.shadowBlur=0;g.strokeStyle='rgba(255,250,235,.5)';g.lineWidth=2.5;
+    g.beginPath();g.moveTo(452,y0-3);g.bezierCurveTo(660,y0-3,700,m-3,810,m-3);g.bezierCurveTo(930,m-3,960,y1-3,1150,y1-3);g.stroke()}
+  // the tab: a window with the night inside
+  g.fillStyle='#10202c';rrect(g,1140,70,380,370,16);g.fill();
+  g.save();rrect(g,1150,110,360,320,8);g.clip();
+  g.fillStyle=vgrad(g,110,300,[[0,'#07081e'],[1,'#5a2068']]);g.fillRect(1150,110,360,190);
+  glow(g,1330,300,170,'#ff4fa0',.6);glow(g,1330,300,80,'#ffd09a',.7);
+  skyline(g,rnd,1150,1300,300,30,130,'#170b22','#ffb14a',.6,t=>1.2-.7*t);skyline(g,rnd,1360,1510,300,30,130,'#07182a','#3ff0dc',.6,t=>.5+.7*t);
+  g.fillStyle=vgrad(g,300,430,[[0,'#1c1230'],[1,'#06060c']]);g.fillRect(1150,300,360,130);
+  poly(g,[[1326,300],[1334,300],[1470,430],[1190,430]],'#0c0c18');glow(g,1330,330,110,'#ff5fae',.4,1.6);
+  g.fillStyle='#1a2f9c';rrect(g,1290,366,80,36,8);g.fill();g.fillStyle='#0d1748';g.fillRect(1302,350,56,18);
+  for(const s of[-1,1]){glow(g,1330+s*26,380,34,'#ff2020',.9);g.fillStyle='#ff3a30';g.fillRect(1330+s*26-11,375,22,8);streak(g,1330+s*26,404,26,18,'#ff2a2a',.5)}
+  g.restore();
+  g.fillStyle='#7df2e2';g.fillRect(1140,104,380,3);
+  disc(g,1166,88,7,'#ff5f57');disc(g,1190,88,7,'#ffbd2e');disc(g,1214,88,7,'#28c840');
+ }},
+// 4. alive: the needle is up.
+{name:'alive',W:800,H:800,bot:'#06060d',
+ texts:[...Array(10)].map((_,i)=>{const a=(135+i*30)*PI/180;return{t:String(i),x:400+Math.cos(a)*232,y:410+Math.sin(a)*232+24,sz:66,font:DISPLAY,col:i>=7?'#ff4a3a':'#f2e9d8'}})
+   .concat([{t:'ALIVE',x:400,y:650,sz:60,font:DISPLAY,col:'#ffb347'}]),
+ flow:N=>(x,y)=>Math.atan2(y-410,x-400)+PI/2+(N(x/200,y/200)-.5)*.5,
+ draw(g,rnd){
+  const cx=400,cy=410,A=i=>(135+i*30)*PI/180;
+  g.fillStyle='#07070f';g.fillRect(0,0,W,H);
+  glow(g,cx,cy,460,'#2a1c5a',.9);glow(g,cx+150,cy-130,300,'#ff3f9a',.28);glow(g,cx-170,cy+90,300,'#17d9c2',.22);
+  g.lineCap='butt';
+  g.strokeStyle='#131326';g.lineWidth=58;g.beginPath();g.arc(cx,cy,318,A(0)-.08,A(9)+.08);g.stroke();
+  g.strokeStyle='#30e8d4';g.lineWidth=12;g.beginPath();g.arc(cx,cy,340,A(0),A(7));g.stroke();
+  g.shadowColor='#ff2a20';g.shadowBlur=30;g.strokeStyle='#ff3a2a';g.lineWidth=16;g.beginPath();g.arc(cx,cy,340,A(7),A(9));g.stroke();g.shadowBlur=0;
+  for(let i=0;i<=18;i++){const a=A(i/2),big=i%2===0,r0=big?284:302,c=Math.cos(a),s=Math.sin(a);
+    line(g,[[cx+c*r0,cy+s*r0],[cx+c*330,cy+s*330]],i>=14?'#ff5a48':'#efe6d4',big?15:8)}
+  // needle at 8, with its heat
+  const a=A(7.5),c=Math.cos(a),s=Math.sin(a);
+  glow(g,cx+c*230,cy+s*230,150,'#ff7a1a',.55);
+  poly(g,[[cx-s*24,cy+c*24],[cx+s*24,cy-c*24],[cx+c*300+s*6,cy+s*300-c*6],[cx+c*300-s*6,cy+s*300+c*6]],'#ff8a1a');
+  poly(g,[[cx-s*9,cy+c*9],[cx+s*9,cy-c*9],[cx+c*292,cy+s*292]],'#ffe6a8');
+  poly(g,[[cx-s*13,cy+c*13],[cx+s*13,cy-c*13],[cx-c*70+s*8,cy-s*70-c*8],[cx-c*70-s*8,cy-s*70+c*8]],'#c2560c');
+  disc(g,cx,cy,46,'#0a0a16');disc(g,cx,cy,36,'#22224a');disc(g,cx-8,cy-10,13,'#8f8fd0');
+ }},
+];
+
+// ---------- canvases ----------
+const D=document.getElementById('c'),dx=D.getContext('2d');
+const mk=(rf)=>{const c=document.createElement('canvas');return[c,c.getContext('2d',{willReadFrequently:!!rf})]};
+const[RFc,rf]=mk(1),[Cc,cx]=mk(1),[Hc,hx]=mk(1),[RLc,rx]=mk(0),[TXc,tx]=mk(1),[BLc,bl]=mk(1);
+let RI;
+const LAY=[{R:46,T:0,mx:7,amp:110,fr:40,jit:.10},{R:22,T:20,mx:8,amp:100,fr:60,jit:.08},{R:10,T:17,mx:9,amp:80,fr:70,jit:.06},{R:5,T:15,mx:9,amp:55,fr:70,jit:.05},{R:2.5,T:24,mx:6,amp:34,fr:50,jit:.03}];
+let qi=Math.max(0,Math.min(SCENES.length-1,(+QS.get('q')||1)-1)),job=0,rnd,flow;
+
+function blurData(s){
+  if(s<=1)return rf.getImageData(0,0,W,H).data;
+  let src=RFc,w=W,h=H;const tw=Math.ceil(W/s);
+  while(w/2>=tw){const c=document.createElement('canvas');w=Math.ceil(w/2);h=Math.ceil(h/2);c.width=w;c.height=h;c.getContext('2d').drawImage(src,0,0,w,h);src=c}
+  bl.imageSmoothingQuality='high';bl.drawImage(src,0,0,W,H);return bl.getImageData(0,0,W,H).data}
+
+function plan(li){
+  const Ly=LAY[li],R=Ly.R,ref=blurData(R*.45),cur=cx.getImageData(0,0,W,H).data,lum=new Float32Array(W*H);
+  for(let i=0,j=0;j<W*H;i+=4,j++)lum[j]=ref[i]*.3+ref[i+1]*.59+ref[i+2]*.11;
+  const step=Math.max(2,Math.round(R)),sub=Math.max(1,step>>3),go=Math.max(1,R>>1),out=[],minL=li===4?1:2;
+  const dist=(i,r,g,b)=>{const a=ref[i]-r,c=ref[i+1]-g,d=ref[i+2]-b;return Math.sqrt(a*a+c*c+d*d)};
+  for(let gy=0;gy<H;gy+=step)for(let gx=0;gx<W;gx+=step){
+    let sum=0,n=0,mx=-1,px=gx,py=gy;
+    for(let y=gy;y<gy+step&&y<H;y+=sub)for(let x=gx;x<gx+step&&x<W;x+=sub){const i=(y*W+x)*4,d=dist(i,cur[i],cur[i+1],cur[i+2]);sum+=d;n++;if(d>mx){mx=d;px=x;py=y}}
+    if(li===0){px=Math.min(W-1,gx+rnd()*step|0);py=Math.min(H-1,gy+rnd()*step|0)}else if(sum/n<=Ly.T)continue;
+    const i0=(py*W+px)*4,r=ref[i0],g=ref[i0+1],b=ref[i0+2],p=[px,py];let x=px,y=py,lx=0,ly=0;
+    for(let k=1;k<=Ly.mx;k++){
+      const xi=x|0,yi=y|0,i=(yi*W+xi)*4;
+      if(k>minL&&dist(i,cur[i],cur[i+1],cur[i+2])<dist(i,r,g,b))break;
+      const x0=Math.max(0,xi-go),x1=Math.min(W-1,xi+go),y0=Math.max(0,yi-go),y1=Math.min(H-1,yi+go);
+      const gX=lum[yi*W+x1]-lum[yi*W+x0],gY=lum[y1*W+xi]-lum[y0*W+xi],m=Math.hypot(gX,gY);let ux,uy;
+      if(m>2.2){ux=-gY/m;uy=gX/m}else{const a=flow(x,y);ux=Math.cos(a);uy=Math.sin(a)}
+      if(k>1){if(ux*lx+uy*ly<0){ux=-ux;uy=-uy}ux=.6*ux+.4*lx;uy=.6*uy+.4*ly;const q=Math.hypot(ux,uy)||1;ux/=q;uy/=q}
+      x+=ux*R;y+=uy*R;if(x<0||y<0||x>=W||y>=H)break;p.push(x,y);lx=ux;ly=uy}
+    if(p.length<4){const a=flow(px,py);p.push(px+Math.cos(a)*R,py+Math.sin(a)*R)}
+    const j=1+(rnd()-.5)*2*Ly.jit;out.push({p,R,amp:Ly.amp,r:r*j,g:g*j,b:b*j})}
+  for(let i=out.length-1;i>0;i--){const k=rnd()*(i+1)|0,t=out[i];out[i]=out[k];out[k]=t}
+  return out}
+
+function drawStroke(s){
+  const p=s.p,n=p.length/2,R=s.R,wd=R*2,nb=Math.max(2,Math.min(9,Math.round(R/3.2)+2)),lw=wd/nb*1.4;
+  cx.lineWidth=lw;hx.lineWidth=lw;
+  for(let b=0;b<nb;b++){
+    const off=((b+.5)/nb-.5)*wd*.92,rg=s.rag||1,e0=rnd()*R*.7*rg,e1=rnd()*R*.9*rg,P=new Path2D();let ox=0,oy=0;
+    for(let i=0;i<n;i++){const a=Math.max(0,i-1),c=Math.min(n-1,i+1);let tx=p[c*2]-p[a*2],ty=p[c*2+1]-p[a*2+1];const m=Math.hypot(tx,ty)||1;tx/=m;ty/=m;
+      let x=p[i*2]-ty*off+(rnd()-.5)*lw*.5,y=p[i*2+1]+tx*off+(rnd()-.5)*lw*.5;
+      if(i===0){x-=tx*e0;y-=ty*e0;P.moveTo(x,y)}else if(i===n-1){x+=tx*e1;y+=ty*e1;P.quadraticCurveTo(ox,oy,x,y)}else P.quadraticCurveTo(ox,oy,(ox+x)/2,(oy+y)/2);
+      ox=x;oy=y}
+    const j=1+(rnd()-.5)*.14,a=(rnd()-.5)*7;
+    cx.strokeStyle=`rgb(${s.r*j+a|0},${s.g*j+a|0},${s.b*j+a|0})`;cx.stroke(P);
+    const h=128+(rnd()-.5)*s.amp|0;hx.strokeStyle=`rgb(${h},${h},${h})`;hx.stroke(P)}}
+
+function relief(){
+  const h=hx.getImageData(0,0,W,H).data,o=RI.data,W4=W*4,wv=[0,1.4,0,-1.4];
+  for(let y=1;y<H-1;y++){let i=(y*W+1)*4;const wy=wv[y&3];
+    for(let x=1;x<W-1;x++,i+=4){const l=h[i-W4-4]-h[i+W4+4]+wy+wv[x&3];
+      if(l>0){o[i]=255;o[i+1]=244;o[i+2]=226;o[i+3]=l*.5>44?44:l*.5}else{o[i]=o[i+1]=o[i+2]=0;o[i+3]=l*-.75>78?78:l*-.75}}}
+  rx.putImageData(RI,0,0)}
+function compose(){dx.globalAlpha=1;dx.drawImage(Cc,0,0);dx.drawImage(RLc,0,0)}
+
+// ---------- text: laid out as a hidden mask, then lettered with the same brush ----------
+function drawText(S,tr){
+  tx.clearRect(0,0,W,H);tx.textBaseline='alphabetic';tx.textAlign='left';tx.fillStyle='#fff';
+  return S.texts.map(b=>{tx.font=b.font.replace('SZ',b.sz);const sp=b.sz*(b.sp||.02);let w=0;for(const ch of b.t)w+=tx.measureText(ch).width+sp;let x=b.x-w/2;
+    for(const ch of b.t){tx.save();tx.translate(x,b.y+(tr()-.5)*b.sz*.04);tx.rotate((tr()-.5)*.025);tx.fillText(ch,0,0);tx.restore();x+=tx.measureText(ch).width+sp}
+    return{...b,x0:b.x-w/2-b.sz*.3,x1:b.x+w/2+b.sz*.3,y0:b.y-b.sz*1.1,y1:b.y+b.sz*.4,c:hx3(b.col)}})}
+
+function textPlan(B,tr){
+  if(!B.length)return[];
+  const d=tx.getImageData(0,0,W,H).data,cov=new Uint8Array(W*H),out=[];
+  const A=(x,y)=>x<1||y<1||x>=W-1||y>=H-1?0:d[((y|0)*W+(x|0))*4+3];
+  const ori=(x,y,wn)=>{x|=0;y|=0;let a=0,b=0,c=0;for(let v=y-wn;v<=y+wn;v+=2)for(let u=x-wn;u<=x+wn;u+=2){const gx=A(u+1,v)-A(u-1,v),gy=A(u,v+1)-A(u,v-1);a+=gx*gx;b+=gy*gy;c+=gx*gy}
+    const t=a+b<1?-1.25:.5*Math.atan2(2*c,a-b)+PI/2;return[Math.cos(t),Math.sin(t)]};
+  B.forEach((T,bi)=>{const wn=Math.max(3,Math.round(T.sz*.065)),mxR=Math.max(1.7,T.sz*.06);
+   for(let y=Math.max(2,T.y0|0);y<Math.min(H-2,T.y1);y+=2)for(let x=Math.max(2,T.x0|0);x<Math.min(W-2,T.x1);x+=2){
+    if(A(x,y)<150||cov[y*W+x])continue;
+    let[ux,uy]=ori(x,y,wn),a=0,b=0;
+    while(a<mxR*2.2&&A(x-uy*(a+1),y+ux*(a+1))>110)a++;while(b<mxR*2.2&&A(x+uy*(b+1),y-ux*(b+1))>110)b++;
+    const sx=x-uy*(a-b)/2,sy=y+ux*(a-b)/2,R=Math.max(.9,Math.min(mxR,(a+b+1)/2*1.05)),st=Math.max(2,R*1.2);
+    const half=s=>{const q=[];let px=sx,py=sy,lx=ux*s,ly=uy*s;for(let k=0;k<6;k++){const nx=px+lx*st,ny=py+ly*st;if(A(nx,ny)<90)break;let[vx,vy]=ori(nx,ny,wn);if(vx*lx+vy*ly<0){vx=-vx;vy=-vy}lx=.6*vx+.4*lx;ly=.6*vy+.4*ly;const m=Math.hypot(lx,ly)||1;lx/=m;ly/=m;px=nx;py=ny;q.push(px,py)}return q};
+    const bk=half(-1),fw=half(1),p=[];for(let i=bk.length-2;i>=0;i-=2)p.push(bk[i],bk[i+1]);p.push(sx,sy,...fw);
+    if(p.length<4)p.push(sx+ux*st*.6,sy+uy*st*.6);
+    const cr=Math.max(1.5,R)|0;cov[y*W+x]=1;
+    for(let i=0;i<p.length;i+=2){const qx=p[i]|0,qy=p[i+1]|0;for(let v=-cr;v<=cr;v++)for(let u=-cr;u<=cr;u++)if(u*u+v*v<=cr*cr+1){const X=qx+u,Y=qy+v;if(X>=0&&Y>=0&&X<W&&Y<H)cov[Y*W+X]=1}}
+    const c=T.c,j=1+(tr()-.5)*.16;
+    out.push({p,R,rag:.45,amp:150,r:c[0]*j,g:c[1]*j,b:c[2]*j,k:bi*1e6+sx+(tr()-.5)*70})}});
+  return out.sort((a,b)=>a.k-b.k)}
+
+// ---------- run ----------
+function start(){
+  const id=++job,S=SCENES[qi],seed=4100+qi*77,tr=R32(seed+5);rnd=R32(seed);flow=S.flow(mkNoise(seed+1));
+  W=S.W;H=S.H;for(const c of[D,RFc,Cc,Hc,RLc,TXc,BLc]){c.width=W;c.height=H}RI=rx.createImageData(W,H);
+  D.style.aspectRatio=W+'/'+H;document.title='RE-NFSU · '+S.name;
+  rf.save();S.draw(rf,R32(seed+2));rf.restore();rf.shadowBlur=0;
+  cx.globalAlpha=1;cx.fillStyle=S.bot;cx.fillRect(0,0,W,H);hx.fillStyle='#808080';hx.fillRect(0,0,W,H);
+  for(const c of[cx,hx]){c.lineCap='round';c.lineJoin='round'}cx.globalAlpha=.94;
+  const B=drawText(S,tr);relief();
+  if(STATIC){for(let li=0;li<LAY.length;li++)for(const s of plan(li))drawStroke(s);for(const s of textPlan(B,tr))drawStroke(s);relief();compose();document.body.dataset.done=S.name;return}
+  let li=0,list=null,pos=0,per=0,fc=0;
+  (function frame(){if(id!==job)return;
+    if(li<=LAY.length){if(!list){list=li<LAY.length?plan(li):textPlan(B,tr);pos=0;per=Math.ceil(list.length/(li<LAY.length?LAY[li].fr:110))||1}
+      for(let n=0;n<per&&pos<list.length;n++,pos++)drawStroke(list[pos]);
+      const end=pos>=list.length;if(end){li++;list=null}if(end||++fc%3===0)relief();compose();requestAnimationFrame(frame)}})()}
+
+function next(){qi=(qi+1)%SCENES.length;start()}
+function save(){D.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=SCENES[qi].name+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)})}
+D.addEventListener('click',next);
+document.getElementById('next').addEventListener('click',next);
+document.getElementById('save').addEventListener('click',save);
+addEventListener('keydown',e=>{if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();next()}else if(e.key==='s'||e.key==='S')save()});
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# GitHub language bar: count the code we wrote, not exports, notes or vendored files.
+census/** linguist-generated
+docs/** linguist-documentation
+web/launcher_b/vendor/** linguist-vendored
+tableros/** linguist-documentation
