@@ -9,8 +9,10 @@
 // and back in menu mode on a d-pad press, Start, or 4 s with triggers and buttons released (the post-race screens).
 // Polled in requestAnimationFrame, only while a pad is connected; only changes reach the ring.
 'use strict';
-const PAD_DIK = { esc: 0x01, enter: 0x1c, lshift: 0x2a, space: 0x39, up: 0xc8, left: 0xcb, right: 0xcd, down: 0xd0, camera: 0x2e, respot: 0x13,
-  gup: 0x1e, gdn: 0x2c };   // Shift Up A / Shift Down Z: action table 0x702c98 rows app 7 and 8 (semantic 0x8100041e, 0x8100042c; their other keys are Insert, Delete)
+const PAD_DIK = { esc: 0x01, back: 0x0e, enter: 0x1c, lshift: 0x2a, space: 0x39, up: 0xc8, left: 0xcb, right: 0xcd, down: 0xd0, camera: 0x2e, respot: 0x13,
+  gup: 0x1e, gdn: 0x2c };
+// back = Backspace: the menus' own Back (menu action table 0x7032d8, row app 0x17, semantic 0x8100040e). Esc is only Pause (game table 0x702c98),
+// so in the front end it does nothing (seen 2026-11-15: Esc on the car picker, no screen change). Menu back sends both: Esc leaves the pause list.   // Shift Up A / Shift Down Z: action table 0x702c98 rows app 7 and 8 (semantic 0x8100041e, 0x8100042c; their other keys are Insert, Delete)
 const PAD_STICK = 0.4, PAD_TRIGGER = 0.3, PAD_IDLE_MS = 4000;
 
 // The menu/drive layout heuristic (web/touch.js reads the game's screens instead). st = { mode, last }; sig = { drive: gas pulled, menu: navigation
@@ -34,7 +36,7 @@ function padKeys(s, now, pb = BINDS.pad) {
   if (s.rt > PAD_TRIGGER) k.add(D.up);
   if (s.lt > PAD_TRIGGER) k.add(D.down);
   if (b[pb.pause]) k.add(D.esc);
-  if (mode === 'menu') { if (b[pb.accept]) k.add(D.enter); if (b[pb.back]) k.add(D.esc); }
+  if (mode === 'menu') { if (b[pb.accept]) k.add(D.enter); if (b[pb.back]) { k.add(D.esc); k.add(D.back); } }
   else {
     if (b[pb.nitro]) k.add(D.space); if (b[pb.handbrake]) k.add(D.lshift);
     if (b[pb.camera]) k.add(D.camera); if (b[pb.respot]) k.add(D.respot);

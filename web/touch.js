@@ -1,6 +1,6 @@
 // Touch overlay (iPad / iPhone: 'ontouchstart' in window; ?touch=1 forces it, ?touch=0 hides it) -> the keyboard path of
-// web/input.js (DIK keys through startInput's setKey, same ring and held set as the keyboard and web/pad.js). It never moves the
-// game's mouse: a phone has no pointer, so the game's arrow cursor stays parked off screen (OWNER 2026-11-15).
+// web/input.js (DIK keys through startInput's setKey, same ring and held set as the keyboard and web/pad.js). The game's arrow
+// cursor stays parked off screen (OWNER 2026-11-15: no PC cursor on a phone); only a tap on a menu option borrows it for that tap.
 // Keys are the game's default action table (exe 0x702c98, docs/re/hud_input.md): arrows steer / gas / brake, Left Shift handbrake,
 // Space nitrous, A / Z shift up / down, C camera, R reset car, Esc pause; menus: arrows, Enter select, Esc back.
 // It steps aside when a real keyboard key or a gamepad is used, and comes back on the next touch.
@@ -10,7 +10,8 @@
 //          their middle the thumb is on). Right thumb: GAS and BRAKE above the game's tachometer, NITROUS beside it (it holds the
 //          gas too: one thumb cannot hold both). HANDBRAKE only in a drift race, SHIFT - / + only in a drag race or with the manual
 //          gearbox. Top centre: camera, pause, reset car. (OWNER 2026-11-15: no automatic gas; essential buttons; the tachometer stays in its corner.)
-//   menu : any other package (menus, MU_Pause*, post race). Up over down in the left margin, BACK over OK in the right one (the menus keep the centred 4:3 column); a
+//   menu : any other package (menus, MU_Pause*, post race). Left, up, down in the left margin; right, BACK, OK in the right one (the menus keep the centred 4:3 column). BACK is Esc + Backspace
+//          (web/pad.js PAD_DIK.back). A tap on the menu itself picks the option under the finger (web/input.js tapAt); a
 //          sideways slide anywhere else is left / right (car and option pickers). With no package up (intro movies) a touch is Enter.
 //   wait : PC_Loading.fng. Nothing but the top bar.
 // One composition with the game's own HUD (OWNER 2026-11-15, plan.json rejected: the two were placed by separate rules): every
@@ -60,7 +61,7 @@ function startTouch(input) {
     #touch .nitro { --d: 96; --y: 356; --x: 240; }
     #touch .hand { --d: 96; --y: 236; --x: 242; display: none; } #touch[data-r=drift] .hand { display: flex; }
     /* menu: the game's menus sit in the centred 4:3 column, so the buttons keep to the margins: up over down left, BACK over OK right */
-    #touch .nav { --d: 92; --x: 14; } #touch .nav.up { --y: 262; } #touch .nav.dn { --y: 364; }
+    #touch .nav { --d: 92; --x: 14; } #touch .nav.up { --y: 262; } #touch .nav.dn { --y: 364; } #touch .nav.lt, #touch .nav.rg { --y: 160; }
     #touch .ok { --d: 92; --y: 364; --x: 14; } #touch .back { --d: 92; --y: 262; --x: 14; }
     /* small circles on top. drive: pause, centre. menus: full screen left, options (web/overlay.js) right */
     #touch .top { top: var(--t-t); width: var(--t-s); height: var(--t-s); }
@@ -95,7 +96,7 @@ function startTouch(input) {
       ${btn('rt gas', 'GAS', 'up', 'Gas')}${btn('rt brake', 'BRAKE', 'down', 'Brake')}${btn('rt nitro', 'NITROUS', 'space,up', 'Nitrous')}${btn('rt hand', '<span>HAND<br>BRAKE</span>', 'lshift', 'Handbrake')}
       ${btn('top pause', I.pause, 'esc', 'Pause')}${btn('cam', 'CAMERA', 'camera', 'Camera')}${btn('resp', 'RESET', 'respot', 'Reset car')}
     </div><div class="g menu">
-      <div class="sw"></div>${btn('lf nav up', I.up, 'up', 'Up')}${btn('lf nav dn', I.down, 'down', 'Down')}${btn('rt ok', 'OK', 'enter', 'OK')}${btn('rt back', 'BACK', 'esc', 'Back')}
+      <div class="sw"></div>${btn('lf nav up', I.up, 'up', 'Up')}${btn('lf nav dn', I.down, 'down', 'Down')}${btn('lf nav lt', I.left, 'left', 'Left')}${btn('rt nav rg', I.right, 'right', 'Right')}${btn('rt ok', 'OK', 'enter', 'OK')}${btn('rt back', 'BACK', 'esc,back', 'Back')}
     </div><div class="b top fs" data-fs="1" role="button" aria-label="Pantalla completa">${I.fs}</div><div class="tip"></div>`;
   document.body.appendChild(root);
   // The picture: the canvas keeps the back buffer's aspect inside the window (object-fit: contain, web/index.html), and the game's HUD
@@ -169,7 +170,7 @@ function startTouch(input) {
 
   const stop = e => {
     if (zl?.id === e.pointerId) { zl = null; zoneSync(); }
-    if (sw?.id === e.pointerId) sw = null;
+    if (sw?.id === e.pointerId) { if (sw.tap && e.type === 'pointerup') input.tapAt(sw.x, sw.y); sw = null; }   // a tap, not a slide: the option under the finger
     const p = ptr.get(e.pointerId);
     if (!p) return;
     p.el.classList.remove('on');
@@ -185,7 +186,7 @@ function startTouch(input) {
     if (el.classList.contains('z')) { zl = { id: e.pointerId, x: e.clientX }; zoneSync(); return; }
     if (el.classList.contains('sw')) {
       if (!(window.RN_FE || []).length) tapKey(D.enter);   // intro movies: no package to move in
-      else sw = { id: e.pointerId, x: e.clientX };
+      else sw = { id: e.pointerId, x: e.clientX, y: e.clientY, tap: true };
       return;
     }
     if (el.classList.contains('pause')) releaseAll();   // a gas still held would reach the pause list as 'up' and move its choice (seen: Leave Race)
@@ -195,7 +196,7 @@ function startTouch(input) {
   });
   root.addEventListener('pointermove', e => {
     if (zl?.id === e.pointerId) { zl.x = e.clientX; zoneSync(); }
-    if (sw?.id === e.pointerId && Math.abs(e.clientX - sw.x) >= TOUCH_SWIPE_PX) { tapKey(e.clientX < sw.x ? D.left : D.right); sw.x = e.clientX; }
+    if (sw?.id === e.pointerId && Math.abs(e.clientX - sw.x) >= TOUCH_SWIPE_PX) { tapKey(e.clientX < sw.x ? D.left : D.right); sw.x = e.clientX; sw.tap = false; }
   });
   for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) root.addEventListener(t, stop);
   const releaseAll = () => { for (const id of [...ptr.keys(), zl?.id, sw?.id]) if (id !== undefined) stop({ pointerId: id }); zoneSync(); };

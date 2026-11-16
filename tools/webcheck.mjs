@@ -194,6 +194,7 @@ let feN = 0;
 const shotOn = process.env.RN_SHOT_ON ? new RegExp(process.env.RN_SHOT_ON, 'g') : null, onSeen = new Set(), onDue = [];
 if (shotFe) mkdirSync(shotFe, { recursive: true });
 const evals = (process.env.RN_EVAL || '').split(';;').filter(Boolean).map(x => ({ t: +x.split(':')[0], expr: x.slice(x.indexOf(':') + 1) }));
+const taps = (process.env.RN_TAP || '').split(';;').filter(Boolean).map(x => ({ t: +x.split(':')[0], at: x.slice(x.indexOf(':') + 1) }));
 while (Date.now() - t0 < secs * 1000) {
   await sleep(1000);
   // RN_EVAL="64:expr;;70:expr": at that second, run the expression in the page and print its value (a click on a page button).
@@ -201,6 +202,20 @@ while (Date.now() - t0 < secs * 1000) {
     e.done = true;
     const r = await send('Runtime.evaluate', { expression: e.expr, returnByValue: true });
     console.log(`eval ${e.t}: ${JSON.stringify(r?.result?.value ?? r?.exceptionDetails?.text)}`);
+  }
+  // RN_TAP="26:#touch .ok;;31:60%,40%": at that second, a real finger tap (CDP touch, so the page's own hit test decides) on the
+  // middle of that selector, or at that point of the window.
+  for (const e of taps.filter(e => !e.done && Date.now() - t0 >= e.t * 1000)) {
+    e.done = true;
+    const pc = /^([\d.]+)%,([\d.]+)%$/.exec(e.at);
+    const r = await send('Runtime.evaluate', { returnByValue: true, expression: pc ? `[innerWidth*${pc[1] / 100},innerHeight*${pc[2] / 100}]`
+      : `(()=>{const b=document.querySelector(${JSON.stringify(e.at)}).getBoundingClientRect();return [b.x+b.width/2,b.y+b.height/2]})()` });
+    const [x, y] = r?.result?.value || [];
+    if (x === undefined) { console.log(`tap ${e.t}: ${e.at} not found`); continue; }
+    await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
+    await sleep(90);
+    await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    console.log(`tap ${e.t}: ${e.at} at ${Math.round(x)},${Math.round(y)}`);
   }
   for (const k of keys.filter(k => !k.done && Date.now() - t0 >= k.t * 1000)) {
     k.done = true;

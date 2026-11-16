@@ -85,7 +85,30 @@ function startInput(M, canvas, steerLog) {
   // park: the game's own arrow cursor to the bottom-right corner, where it draws off screen. The game adds the mouse
   // delta to its cursor (0x4130d0, DIMOUSESTATE) and clamps it to the client rect (0x4131a0); FEng reads it at 0x4f6080
   // as x-320, y-240 in its 640x480 space, so the corner of the window is past the menu. web/touch.js calls it on phones.
-  const park = () => { Atomics.add(H(), base + 2, 1 << 20); Atomics.add(H(), base + 3, 1 << 20); };
+  let busy = false;
+  const park = () => { if (busy) return; Atomics.add(H(), base + 2, 1 << 20); Atomics.add(H(), base + 3, 1 << 20); };
+  // tapAt: a finger tap on a menu option (web/touch.js). The PC menus take the option under the game's cursor at a left click, and the
+  // cursor only takes motion: a far negative delta clamps it to the top-left corner (0x4131a0), then the point is added; the two must
+  // reach the game in different mouse reads (host/dinput8.c sums what arrives between two reads). Then press, release, and the
+  // cursor goes back off screen, so it shows only under the finger for the length of the tap.
+  // The cursor is in the menus' own 640x480 units, drawn in the centred 4:3 part of a wider picture (checked 2026-11-15 at 844x390).
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const taken = async () => { for (let i = 0; i < 60 && (Atomics.load(H(), base + 2) || Atomics.load(H(), base + 3)); i++) await wait(5); };
+  async function tapAt(cx, cy) {
+    if (busy) return;
+    busy = true;
+    try {
+      const r = canvas.getBoundingClientRect();
+      const fe = Math.min(1, r.height * 4 / 3 / r.width), u = Math.min(1, Math.max(0, ((cx - r.left) / r.width - (1 - fe) / 2) / fe));
+      const x = Math.round(u * 640), y = Math.round(Math.min(1, Math.max(0, (cy - r.top) / r.height)) * 480);
+      await taken();
+      Atomics.add(H(), base + 2, -(1 << 20)); Atomics.add(H(), base + 3, -(1 << 20));
+      await taken(); await wait(100);
+      Atomics.add(H(), base + 2, x); Atomics.add(H(), base + 3, y);
+      await taken(); await wait(100);
+      push(0x80000100); await wait(90); push(0x80000000); await wait(120);
+    } finally { busy = false; park(); }
+  }
   const inset = p => Atomics.store(H(), base + 7, p);   // host/d3d9.c: the HUD's side groups stay this far from the picture's edge
-  return { key: setKey, park, inset };
+  return { key: setKey, park, inset, tapAt };
 }
