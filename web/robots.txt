@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /game/
+Disallow: /pc/
+Disallow: /remaster/
+Disallow: /world/
+Disallow: /out/speed.wasm
+Disallow: /diag.html
+
+Sitemap: https://nfsu.cc/sitemap.xml

@@ -14,6 +14,9 @@
     label: { blur: 'Blur de velocidad', fxaa: 'Suavizado FXAA', msaa: 'Suavizado MSAA', chasecam: 'Cámara inclinada', nitrocam: 'Cámara con nitro', speedfov: 'Visión con velocidad', fps: 'Fotogramas', remaster: 'Texturas remaster', skinhd: 'Pinturas en HD', bloom: 'Brillo de luces', roadrefl: 'Reflejo del camino', fx: 'Efectos remaster', trafyield: 'Tráfico se aparta', ai: 'Rivales con carácter', traffic: 'Tráfico', career: 'Progreso', touch: 'Táctil', steer: 'Giro del teclado', carlook: 'Pintura del coche' },
     group: { camara: 'Cámara' },
   };
+  const t = window.RN_TR || (s => s);      // web/i18n.js: Spanish source, English for every non-Spanish browser
+  for (const k in COPY) for (const i in COPY[k]) COPY[k][i] = t(COPY[k][i]);
+  root.lang = window.RN_LANG || 'es';
   const L = window.RN_LAUNCH;
   const scene = (fn, ...a) => { try { const s = window.RN_SCENE; if (s && typeof s[fn] === 'function') return s[fn](...a); } catch (e) { console.warn('RN_SCENE.' + fn, e); } };
   const snd = n => { try { window.RN_SND && window.RN_SND.play(n); } catch {} };
@@ -106,6 +109,7 @@
   // ---------- rows ----------
   // A row is a menu line: the name, then its value between two arrows. row._adj(±1) changes it, row._ok() activates it.
   function rowBase(box, label, help, group) {
+    label = t(label); help = t(help);
     const row = el('div', 'row nav'); row.tabIndex = 0;
     const lt = el('span', 'lt'); lt.append(T(label));
     row.append(lt); row.setAttribute('aria-label', label);
@@ -114,7 +118,7 @@
     return row;
   }
   const arrow = (row, dir) => {
-    const a = el('button', 'arr ' + (dir < 0 ? 'l' : 'r')); a.type = 'button'; a.tabIndex = -1; a.setAttribute('aria-label', dir < 0 ? 'Anterior' : 'Siguiente');
+    const a = el('button', 'arr ' + (dir < 0 ? 'l' : 'r')); a.type = 'button'; a.tabIndex = -1; a.setAttribute('aria-label', t(dir < 0 ? 'Anterior' : 'Siguiente'));
     a.addEventListener('click', e => { e.stopPropagation(); choose(row); row._adj(dir); });
     return a;
   };
@@ -155,28 +159,31 @@
   }
   function actionRow(box, label, help, group, fn, value) {
     const row = rowBase(box, label, help, group);
-    const val = el('span', 'val act'), vv = el('span', 'vv'); vv.append(T(value || 'Abrir')); val.append(vv, arrow(row, 1)); row.append(val);
+    const val = el('span', 'val act'), vv = el('span', 'vv'); value = t(value || 'Abrir'); vv.append(T(value)); val.append(vv, arrow(row, 1)); row.append(val);
     row.setAttribute('role', 'button');
-    row._say = t => { spray(vv, t, 1); setTimeout(() => spray(vv, value || 'Abrir', -1), 2000); };
+    row._say = m => { spray(vv, t(m), 1); setTimeout(() => spray(vv, value, -1), 2000); };
     row._ok = () => fn(row); row._adj = d => { if (d > 0) fn(row); };
     return row;
   }
 
   // screen A: Jugar, Calidad, Juego, Volumen, Controles, Opciones
-  $('titleA').append(T('Menú principal')); $('play').append(T('Jugar')); $('more').append(T('Opciones')); $('less').append(T('Volver'));
+  $('titleA').append(T(t('Menú principal'))); $('play').append(T(t('Jugar'))); $('more').append(T(t('Opciones'))); $('less').append(T(t('Volver')));
+  $('guides').append(T(t('Guías'))); $('guides').href = 'blog/' + (window.RN_LANG === 'es' ? 'es' : 'en') + '/index.html';
+  for (const [id, a, s] of [['board', 'aria-label', 'Menú'], ['play', 'aria-label', 'Jugar'], ['tabPrev', 'aria-label', 'Grupo anterior'], ['tabNext', 'aria-label', 'Grupo siguiente'], ['tabs', 'aria-label', 'Grupos de ajustes'], ['btnSnd', 'title', 'Sonido del menú (M)'], ['btnMot', 'title', 'Animación']]) $(id).setAttribute(a, t(s));
+  $('rig').querySelector('b').textContent = t('Tu equipo'); $('rigName').textContent = t('midiendo');
   const simple = $('simple'), adv = $('adv');
   const qRow = rowBase(simple, 'Calidad', '', 'rendimiento');
   {
     const val = el('span', 'val'), vv = el('span', 'vv'); val.append(arrow(qRow, -1), vv, arrow(qRow, 1)); qRow.append(val);
     qRow._adj = d => { const q = L.qualityOf(sel), i = q ? L.quality.indexOf(q) : (d > 0 ? -1 : 0); const nq = L.quality[(i + d + L.quality.length) % L.quality.length]; Object.assign(sel, nq.set); changed(d); };
-    qRow._paint = dir => { const q = L.qualityOf(sel), label = q ? q.label : 'A mano'; qRow._help = q ? q.desc : 'Ajustes tocados uno por uno en Avanzado.'; if (qRow._v !== label) { qRow._v = label; spray(vv, label, dir); } };
+    qRow._paint = dir => { const q = L.qualityOf(sel), label = q ? q.label : t('A mano'); qRow._help = q ? q.desc : t('Ajustes tocados uno por uno en Avanzado.'); if (qRow._v !== label) { qRow._v = label; spray(vv, label, dir); } };
     rows.push(qRow);
   }
   for (const o of opts) if (o.simple) (o.slider ? sliderRow : choiceRow)(simple, o);
   actionRow(simple, 'Controles', 'Teclas, mando y pantalla táctil. Todo se puede reasignar.', 'controles', () => { openAdv('controles'); }, 'Ver');
 
   // sheet B: every option, by group
-  const groups = L.groups.filter(g => opts.some(o => o.group === g.id)).concat([{ id: 'partidas', title: 'Partidas' }]);
+  const groups = L.groups.filter(g => opts.some(o => o.group === g.id)).concat([{ id: 'partidas', title: t('Partidas') }]);
   for (const o of opts) { const r = (o.slider ? sliderRow : choiceRow)(adv, o); r._adv = true; }
   const keysRow = actionRow(adv, 'Teclas y mando', 'Clic en una acción y luego la tecla o el botón. También con K dentro del juego.', 'controles', () => { snd('accept'); BINDS.toggle(); }); keysRow._adv = true;
   const bak = actionRow(adv, 'Guardar copia', 'Descarga tus partidas de este navegador en un archivo.', 'partidas', r => RN_SAVES.backup().then(n => r._say(n ? 'Listo' : 'Sin partidas'), () => r._say('Error')), 'Bajar');
@@ -189,8 +196,8 @@
     $('tabs').append(b); return { g, b };
   });
 
-  const WHAT = { '1': 'World: una sola ciudad, todo abierto', '0': 'Carrera: el modo Underground de 2003' };
-  const playHelp = () => (WHAT[sel.play] || WHAT['1']) + (mode() === 'original' ? ', versión original' : '') + '. Enter o clic para entrar.';
+  const WHAT = { '1': t('World: una sola ciudad, todo abierto'), '0': t('Carrera: el modo Underground de 2003') };
+  const playHelp = () => (WHAT[sel.play] || WHAT['1']) + (mode() === 'original' ? t(', versión original') : '') + t('. Enter o clic para entrar.');
   function paint(dir) {
     for (const r of rows) { r._paint(dir); if (r._adv) r.hidden = r._group !== tab || (r._o && !applies(r._o)); }
     for (const r of [keysRow, bak, res, rst]) r.hidden = r._group !== tab;
@@ -203,7 +210,7 @@
   function setOpt(id, v, dir) { sel[id] = v; changed(dir); }
 
   // ---------- navigation: one list per screen, JUGAR first ----------
-  const items = () => sheet === 'A' ? [...simple.children, $('more')] : [...[...adv.children].filter(r => !r.hidden), $('less')];
+  const items = () => sheet === 'A' ? [...simple.children, $('more'), $('guides')] : [...[...adv.children].filter(r => !r.hidden), $('less')];
   function choose(node, o = {}) {
     if (!node || cur === node) return;
     if (cur) cur.classList.remove('sel');
@@ -211,7 +218,7 @@
     if (document.activeElement !== node) node.focus({ preventScroll: true });
     if (node.parentElement === adv) node.scrollIntoView({ block: 'nearest', behavior: motion ? 'smooth' : 'auto' });
     if (!o.quiet) snd('move');
-    setHelp(node === $('play') ? playHelp() : node === $('more') ? 'Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.' : node === $('less') ? 'Vuelve al menú principal.' : node._help || '');
+    setHelp(node === $('play') ? playHelp() : node === $('more') ? t('Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.') : node === $('guides') ? t('Cómo jugar, controles, el modo World y cómo se hizo.') : node === $('less') ? t('Vuelve al menú principal.') : node._help || '');
     scene('shot', node === $('play') ? null : SHOT[node._group] || 'hero');
   }
   const step = d => { const l = items(), i = l.indexOf(cur); choose(l[i < 0 ? 0 : (i + d + l.length) % l.length]); };
@@ -243,14 +250,14 @@
     const rig = $('rigName');
     let gpu = '', ok = !!navigator.gpu;
     try { const a = ok && await navigator.gpu.requestAdapter(); ok = !!a; const i = a && a.info; if (i) gpu = [i.vendor, i.architecture || i.device].filter(Boolean).join(' '); } catch { ok = false; }
-    if (!ok) { rig.textContent = 'Este navegador no tiene WebGPU. Usa Chrome o Edge.'; $('rig').classList.add('bad'); return; }
+    if (!ok) { rig.textContent = t('Este navegador no tiene WebGPU. Usa Chrome o Edge.'); $('rig').classList.add('bad'); return; }
     // how fast this machine draws the street behind (median of 90 frames once the menu is in)
     const ms = await new Promise(done => { const d = []; let last = 0; const f = t => { if (last) d.push(t - last); last = t; if (d.length < 90) requestAnimationFrame(f); else done(d.sort((a, b) => a - b)[45]); }; requestAnimationFrame(f); setTimeout(() => done(d.length ? d.sort((a, b) => a - b)[d.length >> 1] : 99), 4000); });
     const tier = ms > 28 ? 'baja' : ms > 20 ? 'media' : 'alta';      // thresholds are ours (60 Hz = 16.7 ms)
     const q = L.quality.find(x => x.id === tier);
-    $('rig').querySelector('b').textContent = gpu || 'Tu equipo';
-    rig.textContent = 'Va bien en ' + q.label;
-    $('rig').title = `La escena de este menú corre a ${ms.toFixed(1)} ms por cuadro en tu equipo.`;
+    $('rig').querySelector('b').textContent = gpu || t('Tu equipo');
+    rig.textContent = t('Va bien en ') + q.label;
+    $('rig').title = t('La escena de este menú corre a {ms} ms por cuadro en tu equipo.').replace('{ms}', ms.toFixed(1));
     if (first && L.qualityOf(sel) && !detect.touched) { Object.assign(sel, q.set); save(); paint(1); }
     A($('rig'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
   }
@@ -277,10 +284,10 @@
     const pad = kind === 'pad', h = (k, label, act) => act ? `<button type="button" class="hint" data-act="${act}">${k}<span>${label}</span></button>` : `<span class="hint nb">${k}<span>${label}</span></span>`;
     const out = [];
     if (kind !== 'touch') {
-      out.push(h(K('wide', pad ? '↕' : '↑↓'), 'Elegir'), h(K('wide', pad ? '↔' : '←→'), 'Cambiar'));
-      if (sheet === 'B') out.push(h(pad ? K('wide', 'LB') + K('wide', 'RB') : K('', 'Q') + K('', 'E'), 'Grupo'), h(pad ? K('pad b', 'B') : K('wide', 'Esc'), 'Volver', 'back'));
-      if (sheet === 'A') out.push(h(pad ? K('wide', 'Start') : K('wide', '↵'), 'Jugar', 'play'));   // in Opciones Enter changes the value, it does not start
-    } else if (sheet === 'B') out.push(h(K('wide', '←'), 'Volver', 'back'));
+      out.push(h(K('wide', pad ? '↕' : '↑↓'), t('Elegir')), h(K('wide', pad ? '↔' : '←→'), t('Cambiar')));
+      if (sheet === 'B') out.push(h(pad ? K('wide', 'LB') + K('wide', 'RB') : K('', 'Q') + K('', 'E'), t('Grupo')), h(pad ? K('pad b', 'B') : K('wide', 'Esc'), t('Volver'), 'back'));
+      if (sheet === 'A') out.push(h(pad ? K('wide', 'Start') : K('wide', '↵'), t('Jugar'), 'play'));   // in Opciones Enter changes the value, it does not start
+    } else if (sheet === 'B') out.push(h(K('wide', '←'), t('Volver'), 'back'));
     bar.innerHTML = out.join('');
   }
   bar.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (b) act(b.dataset.act); });
@@ -289,12 +296,12 @@
   // ---------- sound and animation switches ----------
   const btnSnd = $('btnSnd'), btnMot = $('btnMot');
   const sndOn = () => !window.RN_SND || window.RN_SND.isOn();
-  const paintSnd = () => { btnSnd.setAttribute('aria-pressed', String(sndOn())); btnSnd.querySelector('.sl').textContent = sndOn() ? 'Sonido: sí' : 'Sonido: no'; };
+  const paintSnd = () => { btnSnd.setAttribute('aria-pressed', String(sndOn())); btnSnd.querySelector('.sl').textContent = t(sndOn() ? 'Sonido: sí' : 'Sonido: no'); };
   if (window.RN_SND) window.RN_SND.onChange(paintSnd); else btnSnd.hidden = true;
   const toggleSnd = () => { window.RN_SND.init(); window.RN_SND.toggle(); if (sndOn()) snd('accept'); };
   btnSnd.addEventListener('click', toggleSnd);
   paintSnd();
-  const setMotion = on => { motion = on; root.classList.toggle('calm', !on); btnMot.setAttribute('aria-pressed', String(on)); btnMot.querySelector('.ml').textContent = on ? 'Animación: sí' : 'Animación: no'; store.set('rn_launch_motion', on ? '1' : '0'); scene('motion', on); };
+  const setMotion = on => { motion = on; root.classList.toggle('calm', !on); btnMot.setAttribute('aria-pressed', String(on)); btnMot.querySelector('.ml').textContent = t(on ? 'Animación: sí' : 'Animación: no'); store.set('rn_launch_motion', on ? '1' : '0'); scene('motion', on); };
   btnMot.addEventListener('click', () => setMotion(!motion));
   setMotion(motion);
 
@@ -372,7 +379,7 @@
     A(document.querySelector('.tools'), [{ opacity: 0 }, { opacity: 1 }], { duration: 280, delay: 200, easing: e, fill: 'backwards' });
     // the sheet slides in from its side, then its lines one after the other
     A($('board'), [{ opacity: 0, transform: 'translateX(8rem)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: e, fill: 'backwards' });
-    [$('titleA'), ...simple.children, $('more')].forEach((r, i) => A(r, [{ opacity: 0, transform: 'translateX(4rem)' }, { opacity: 1, transform: 'none' }], { duration: 200, delay: 140 + i * 35, easing: e, fill: 'backwards' }));
+    [$('titleA'), ...simple.children, $('more'), $('guides')].forEach((r, i) => A(r, [{ opacity: 0, transform: 'translateX(4rem)' }, { opacity: 1, transform: 'none' }], { duration: 200, delay: 140 + i * 35, easing: e, fill: 'backwards' }));
     setTimeout(detect, 900);
   }
   const S = window.RN_SCENE;

@@ -1,12 +1,32 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#04121a">
-<title>Need for Speed Underground</title>
-<link rel="icon" href="data:,">
+<title>Need for Speed Underground Online: Play in Your Browser | NFSU.cc</title>
+<meta name="description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game plus a World mode that joins Olympic City with Bayview from Underground 2. Keyboard, gamepad and touch.">
+<link rel="canonical" href="https://nfsu.cc/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NFSU.cc">
+<meta property="og:url" content="https://nfsu.cc/">
+<meta property="og:title" content="Need for Speed Underground in your browser">
+<meta property="og:description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game plus a World mode that joins Olympic City with Bayview from Underground 2. Keyboard, gamepad and touch.">
+<meta property="og:image" content="https://nfsu.cc/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="es_MX">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Need for Speed Underground in your browser">
+<meta name="twitter:description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game plus a World mode that joins Olympic City with Bayview from Underground 2. Keyboard, gamepad and touch.">
+<meta name="twitter:image" content="https://nfsu.cc/og.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Need for Speed Underground (browser version)", "alternateName": ["NFSU", "NFS Underground online", "NFSU.cc"], "url": "https://nfsu.cc/", "image": "https://nfsu.cc/og.jpg", "description": "Play Need for Speed Underground (2003) in your browser, nothing to install. The full game plus a World mode that joins Olympic City with Bayview from Underground 2. Keyboard, gamepad and touch.", "genre": ["Racing", "Arcade racing"], "gamePlatform": ["Web browser", "Chrome", "Edge", "Safari", "Firefox"], "applicationCategory": "Game", "operatingSystem": "Any (WebGPU browser)", "playMode": "SinglePlayer", "inLanguage": ["en", "es"], "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <link rel="stylesheet" href="launcher.css">
 </head>
 <body class="boot">
@@ -18,24 +38,26 @@
 <!-- The launcher is one more screen of the game (OWNER 2026-11-15 night): the menus' own panel, font, selection bar and key hints.
      Screen A = main menu (JUGAR first, the few options); screen B = Opciones (one group at a time, like the game's browsers). -->
 <div class="ui" id="ui">
-  <aside class="panel" id="board" data-in aria-label="Menú">
+  <aside class="panel" id="board" data-in aria-label="Menu">
     <header class="head">
       <h1 class="logo"><img src="launcher/v2/ui/logo.webp" alt="Need for Speed Underground" width="688" height="125"></h1>
-      <p class="rig" id="rig"><b>Tu equipo</b><span id="rigName">midiendo</span></p>
+      <p class="rig" id="rig"><b>Your machine</b><span id="rigName">measuring</span></p>
     </header>
 
     <div class="sheet" id="sheetA">
       <h2 class="title" id="titleA"></h2>
       <div class="rows" id="simple">
-        <button class="item go nav" id="play" type="button" aria-label="Jugar"></button>
+        <button class="item go nav" id="play" type="button" aria-label="Play"></button>
       </div>
       <button class="item nav" id="more" type="button"></button>
+      <!-- a real link, so search engines follow it to the guides (web/blog/, tools/build_blog.py); launcher.js sets its language -->
+      <a class="item nav" id="guides" href="blog/en/index.html" aria-label="Guides"></a>
     </div>
     <div class="sheet adv" id="sheetB" hidden>
       <div class="browse">
-        <button class="arr l" id="tabPrev" type="button" tabindex="-1" aria-label="Grupo anterior"></button>
-        <div class="tabs" id="tabs" role="tablist" aria-label="Grupos de ajustes"></div>
-        <button class="arr r" id="tabNext" type="button" tabindex="-1" aria-label="Grupo siguiente"></button>
+        <button class="arr l" id="tabPrev" type="button" tabindex="-1" aria-label="Previous group"></button>
+        <div class="tabs" id="tabs" role="tablist" aria-label="Setting groups"></div>
+        <button class="arr r" id="tabNext" type="button" tabindex="-1" aria-label="Next group"></button>
       </div>
       <p class="count" id="tabCount"></p>
       <div class="rows" id="adv"></div>
@@ -47,14 +69,15 @@
   </aside>
 
   <div class="tools" data-in>
-    <button class="tool" id="btnSnd" type="button" aria-pressed="true" title="Sonido del menú (M)"><kbd>M</kbd><span class="sl">Sonido: sí</span></button>
-    <button class="tool" id="btnMot" type="button" aria-pressed="true" title="Animación"><i class="dot" aria-hidden="true"></i><span class="ml">Animación: sí</span></button>
+    <button class="tool" id="btnSnd" type="button" aria-pressed="true" title="Menu sound (M)"><kbd>M</kbd><span class="sl">Sound: on</span></button>
+    <button class="tool" id="btnMot" type="button" aria-pressed="true" title="Motion"><i class="dot" aria-hidden="true"></i><span class="ml">Motion: on</span></button>
   </div>
   <input id="fileRes" type="file" accept=".json,application/json" hidden>
 </div>
 
 <div class="fade" id="fade" aria-hidden="true"></div>
 
+<script src="i18n.js"></script>
 <script src="saves.js"></script>
 <script src="launcher_opts.js"></script>
 <script src="launcher_audio.js"></script>

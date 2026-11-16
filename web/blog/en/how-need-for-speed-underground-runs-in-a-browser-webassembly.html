@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#04121a">
+<title>How it works: a 2003 Windows game recompiled to WebAssembly | NFSU.cc</title>
+<meta name="description" content="NFSU.cc is not an emulator or a remake. The original Need for Speed Underground program was translated to WebAssembly and its Windows and DirectX calls were rebuilt on WebGPU.">
+<link rel="canonical" href="https://nfsu.cc/blog/en/how-need-for-speed-underground-runs-in-a-browser-webassembly.html">
+<link rel="alternate" hreflang="en" href="https://nfsu.cc/blog/en/how-need-for-speed-underground-runs-in-a-browser-webassembly.html">
+<link rel="alternate" hreflang="es" href="https://nfsu.cc/blog/es/como-corre-need-for-speed-underground-en-el-navegador-webassembly.html">
+<link rel="alternate" hreflang="x-default" href="https://nfsu.cc/blog/en/how-need-for-speed-underground-runs-in-a-browser-webassembly.html">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="NFSU.cc">
+<meta property="og:url" content="https://nfsu.cc/blog/en/how-need-for-speed-underground-runs-in-a-browser-webassembly.html">
+<meta property="og:title" content="How it works: a 2003 Windows game recompiled to WebAssembly">
+<meta property="og:description" content="NFSU.cc is not an emulator or a remake. The original Need for Speed Underground program was translated to WebAssembly and its Windows and DirectX calls were rebuilt on WebGPU.">
+<meta property="og:image" content="https://nfsu.cc/og.jpg">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="stylesheet" href="../blog.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "How it works: a 2003 Windows game recompiled to WebAssembly", "description": "NFSU.cc is not an emulator or a remake. The original Need for Speed Underground program was translated to WebAssembly and its Windows and DirectX calls were rebuilt on WebGPU.", "inLanguage": "en", "datePublished": "2026-11-16", "dateModified": "2026-11-16", "image": "https://nfsu.cc/blog/img/bayview-race.webp", "mainEntityOfPage": "https://nfsu.cc/blog/en/how-need-for-speed-underground-runs-in-a-browser-webassembly.html", "author": {"@type": "Organization", "name": "NFSU.cc", "url": "https://nfsu.cc/"}, "publisher": {"@type": "Organization", "name": "NFSU.cc", "url": "https://nfsu.cc/"}, "about": {"@type": "VideoGame", "name": "Need for Speed Underground", "url": "https://nfsu.cc/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "NFSU.cc", "item": "https://nfsu.cc/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://nfsu.cc/blog/en/index.html"}, {"@type": "ListItem", "position": 3, "name": "How it works: a 2003 Windows game recompiled to WebAssembly", "item": "https://nfsu.cc/blog/en/how-need-for-speed-underground-runs-in-a-browser-webassembly.html"}]}]}</script>
+</head>
+<body style="--pic: url(/blog/img/olympic-city-drive.webp)">
+<header class="top">
+  <a class="logo" href="/"><img src="/launcher/v2/ui/logo.webp" alt="Need for Speed Underground" width="688" height="125"></a>
+  <nav>
+    <a href="index.html">Guides</a>
+    <a href="../es/como-corre-need-for-speed-underground-en-el-navegador-webassembly.html" hreflang="es" lang="es">Español</a>
+    <a class="play" href="/">Play</a>
+  </nav>
+</header>
+<main>
+<p class="crumbs"><a href="/">NFSU.cc</a> / <a href="index.html">Guides</a></p>
+<article>
+<h1>How it works: a 2003 Windows game recompiled to WebAssembly</h1>
+<p class="lead">What runs in your tab is the game&#x27;s own code from 2003. It was not rewritten and it is not emulated: the program was translated once, ahead of time, into something a browser can run.</p>
+<p class="date"><time datetime="2026-11-16">Updated November 16, 2026</time></p>
+<figure><img src="../img/bayview-race.webp" alt="A race through Bayview in the browser version of Need for Speed Underground, with the position board on screen" width="1000" height="703" fetchpriority="high"><figcaption>The same physics, AI and HUD code as in 2003, now running as WebAssembly.</figcaption></figure>
+<h2>Static recompilation</h2>
+<p>The PC game is one Windows program, Speed.exe, made of machine code for 32-bit Intel processors. A tool reads that program and writes the same logic again as WebAssembly, the portable code format browsers run at close to native speed. This is called static recompilation: the translation happens before you ever open the page, not while you play.</p>
+<p>An emulator would have to imitate a whole PC, instruction by instruction, every frame. Here the handling, the rival drivers, the menus and the career rules are the original ones, already in the browser's own format. The result is a file of about 70 MB that travels compressed in about 16 MB.</p>
+<h2>A new home for an old program</h2>
+<p>The game still believes it is on Windows XP. It asks for windows, files, sound buffers, keyboard state and a DirectX 9 graphics card. A layer written for this project answers each of those calls with what a browser has:</p>
+<ul>
+<li><b>Graphics</b>: the DirectX 9 drawing calls are turned into WebGPU.</li>
+<li><b>Sound</b>: music and effects play through the browser's audio system.</li>
+<li><b>Input</b>: keys, gamepads and touch buttons are handed to the game as the keyboard codes it expects, which is why its own key table still applies.</li>
+<li><b>Files</b>: the game opens its data files as it always did, and the layer fetches only the parts it reads from the server.</li>
+<li><b>Threads</b>: the game runs off the page's main thread on shared memory, which is why the site is served with cross-origin isolation.</li>
+<li><b>Saves</b>: the save folder lives in memory and is copied to your browser's own storage a moment after each change.</li>
+</ul>
+<h2>The remaster layer</h2>
+<p>Because the page owns the drawing step, it can add things the 2003 renderer did not have: bloom on lights, edge smoothing, sharpening, anisotropic filtering, sharper car paint and optional high resolution textures. All of it is a layer on top. Switch the version to Original 2003 and the picture is the one the game always drew.</p>
+<h2>Bringing Bayview over</h2>
+<p><a href="world-mode-olympic-city-bayview-one-map.html">World mode</a> adds the city of Underground 2. Its data was read from that game's files and converted into the formats Underground 1 already uses: the meshes and textures of each district, the vertex colours that give Bayview its baked lighting, the collision surfaces you drive on and the road network the traffic and the GPS follow. The city is cut into sections that load and unload as you move, the same way the original game streams its tracks.</p>
+<p>Nothing else was taken from Underground 2. The sky, the fog and the night look are still the first game's, drawn over both cities.</p>
+<h2>Try it</h2>
+<p>The quickest way to judge the result is to drive it: <a href="play-need-for-speed-underground-online.html">how to start playing</a> takes a minute to read.</p>
+<div class="cta"><a href="/">Play now</a></div>
+</article>
+<h2 class="more">More guides</h2>
+<ul class="list"><li><a href="play-need-for-speed-underground-online.html"><b>How to play Need for Speed Underground online in your browser</b><span>Open nfsu.cc, press Play and drive. What you need, how big the first load is, where your saves live and what to do if the game does not start.</span></a></li><li><a href="need-for-speed-underground-controls-keyboard-gamepad-phone.html"><b>Controls: keyboard, gamepad and phone</b><span>Every key and button of Need for Speed Underground in the browser: default keyboard keys, gamepad layout, touch buttons on phones and how to remap them.</span></a></li><li><a href="world-mode-olympic-city-bayview-one-map.html"><b>World mode: Olympic City and Bayview in one open map</b><span>World mode joins the city of Need for Speed Underground with Bayview from Underground 2 by one road: free roam, traffic, every car unlocked, races anywhere and a GPS map.</span></a></li><li><a href="browsers-phones-performance-settings.html"><b>Browsers, phones and performance settings</b><span>Which browsers and devices run Need for Speed Underground at nfsu.cc, what phones get, and what each quality level and performance option changes.</span></a></li></ul>
+</main>
+<footer><span>NFSU.cc: Need for Speed Underground in the browser.</span><a href="/">Play</a><a href="index.html">Guides</a><a href="../es/como-corre-need-for-speed-underground-en-el-navegador-webassembly.html" hreflang="es" lang="es">Español</a></footer>
+</body>
+</html>

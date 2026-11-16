@@ -73,6 +73,7 @@ html:not(.calm) .row:active > .lt, html:not(.calm) .item:active > .t { transform
 .item.go::after { top: .8rem; bottom: .8rem; background: #e8eef0; }
 body.leaving .item.go::before { background: linear-gradient(90deg, transparent, rgba(196, 225, 229, .6) 30%); }
 #more, #less { margin-top: 1.2rem; }
+a.item { color: inherit; text-decoration: none; }
 
 /* value: ‹ VALUE › in a fixed cell, so names and values keep two clean edges */
 .val { display: grid; grid-template-columns: 3.4rem 21rem 3.4rem; align-items: center; flex: none; }

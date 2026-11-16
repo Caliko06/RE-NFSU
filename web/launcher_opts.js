@@ -147,5 +147,11 @@
     } catch {}
   }
 
+  // English visits (web/i18n.js): the same catalog, its display strings swapped
+  const tr = window.RN_TR || (s => s);
+  for (const g of groups) { g.title = tr(g.title); g.desc = tr(g.desc); }
+  for (const o of opts) { o.label = tr(o.label); o.help = tr(o.help); for (const v of o.values) v.label = tr(v.label); }
+  for (const q of [...quality, ...presets]) { q.label = tr(q.label); q.desc = tr(q.desc); }
+
   window.RN_LAUNCH = { groups, opts, presets, quality, qualityOf, query, load, save };
 })();

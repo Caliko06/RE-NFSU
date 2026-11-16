@@ -33,7 +33,7 @@
     @media (prefers-reduced-motion: reduce) { #ov-btn, #ov button { transition: none; } }`;
   document.head.appendChild(css);
 
-  const btn = Object.assign(document.createElement('button'), { id: 'ov-btn', title: 'Opciones' });   // sliders, drawn: the ⚙ glyph is an emoji on phones
+  const btn = Object.assign(document.createElement('button'), { id: 'ov-btn', title: (window.RN_TR || (s => s))('Opciones') });   // sliders, drawn: the ⚙ glyph is an emoji on phones
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="55%" height="55%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h9M19 8h1M4 16h1M11 16h9"/><circle cx="16" cy="8" r="2.4"/><circle cx="8" cy="16" r="2.4"/></svg>';
   btn.tabIndex = -1;
   const panel = Object.assign(document.createElement('div'), { id: 'ov' });
@@ -42,7 +42,7 @@
   function render() {
     const a = active(), muted = sel.vol === '0';
     panel.replaceChildren();
-    const add = (tag, text, cls, fn, href) => { const e = Object.assign(document.createElement(tag), { textContent: text }); if (cls) e.className = cls; if (fn) e.onclick = fn; if (href) e.href = href; e.tabIndex = -1; panel.appendChild(e); };
+    const add = (tag, text, cls, fn, href) => { const e = Object.assign(document.createElement(tag), { textContent: (window.RN_TR || (s => s))(text) }); if (cls) e.className = cls; if (fn) e.onclick = fn; if (href) e.href = href; e.tabIndex = -1; panel.appendChild(e); };
     if (RN_PHONE) {
       add('h4', 'Perfil');
       for (const p of L.presets) add('button', p.label, a === p ? 'sel' : '', () => { Object.assign(sel, stateOf(p), { vol: sel.vol, play: sel.play }); go(); });
