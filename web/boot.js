@@ -17,7 +17,7 @@ function flush() {
   // silently (518 pack errors in one second took the race HUD line with them and the run looked hung, build/bench/g_cas).
   fetch('/log', { method: 'POST', body, keepalive: body.length < 60000 }).catch(() => {});
 }
-if (logUp) fetch('/log?new', { method: 'POST', body: `page ${location.href} ${new Date().toISOString()}\n` }).then(r => { logUp = r.ok; }, () => { logUp = false; });
+if (logUp) fetch('/log?new', { method: 'POST', body: `page ${location.origin + location.pathname + RN_SEARCH} ${new Date().toISOString()}\n` }).then(r => { logUp = r.ok; }, () => { logUp = false; });
 setInterval(flush, 1000);
 const secs = () => ((performance.now() - t0) / 1000).toFixed(2);
 addEventListener('keydown', e => { if (!e.repeat) keep(`${secs()} key down ${e.code}`); }, true);
@@ -42,7 +42,7 @@ window.rnMark = () => {
 };
 window.rnReport = () => {
   const date = new Date().toISOString(), name = `nfsu-session-${date.replace(/[:.]/g, '-')}.json`;
-  const blob = new Blob([JSON.stringify({ format: 'rn-session-2', url: location.href, date, ua: navigator.userAgent,
+  const blob = new Blob([JSON.stringify({ format: 'rn-session-2', url: location.origin + location.pathname + RN_SEARCH, date, ua: navigator.userAgent,
     screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, saved: +secs(), state: RN_APP.state, at: poseRow(), marks, trail,
     ...(telem ? telem.dump() : {}), log: allLog })], { type: 'application/json' });
   const a = document.createElement('a');

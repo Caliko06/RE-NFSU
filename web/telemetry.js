@@ -243,7 +243,7 @@ function startTelemetry(M, t0, log) {
   } catch {}
   const machine = { hardwareConcurrency: navigator.hardwareConcurrency || null, deviceMemoryGb: navigator.deviceMemory || null,
     gpuRenderer: renderer || null, dev: RN_Q.get('dev') || null };
-  const head = { kind: 'session', url: location.href, date: new Date().toISOString(), ua: navigator.userAgent,
+  const head = { kind: 'session', url: location.origin + location.pathname + RN_SEARCH, date: new Date().toISOString(), ua: navigator.userAgent,
     screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, machine, cols: TELEM_COLS };
   if (SEND) fetch('/telemetry?new', { method: 'POST', body: JSON.stringify(head) + '\n' }).then(r => {
     if (r.ok) return;

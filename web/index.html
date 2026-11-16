@@ -45,13 +45,16 @@
 </div>
 <script src="launcher_opts.js"></script>
 <script>
-// ?fast=1 without go=1 (opened by hand, not from the launcher's "Jugar"): the launcher is the entry point.
-{ const p = new URLSearchParams(location.search); if (p.get('fast') === '1' && p.get('go') !== '1') location.replace('/launcher'); }
-// Bare / with a saved choice (web/overlay.js, the launcher): play with its keys; web/mode.js reads the mode from storage itself.
-// Not on phones and tablets: they always start light (web/mode.js RN_PHONE).
+// ?fast=1 typed by hand without go=1: the launcher is the entry point.
+{ const p = new URLSearchParams(location.search); if (p.get('fast') === '1' && p.get('go') !== '1') location.replace('launcher.html'); }
+// Everything plays at the bare address (OWNER 2026-11-15: no switches in the link; only the launcher has its own page).
+// RN_SEARCH = the switches of this visit: this tab's choice (sessionStorage rn_q, written by the launcher's Jugar, web/overlay.js and the
+// mode switch in web/mode.js), else on a computer the saved launcher choice (the mode itself comes from storage, web/mode.js).
+// Phones and tablets start light with nothing saved (web/mode.js RN_PHONE). A query typed in the address still wins (tests, tools/webcheck.mjs).
 // First visit on a computer (nothing saved yet): the launcher is the entry (OWNER 2026-11-15, plan row 10).
-if (!location.search && !matchMedia('(pointer: coarse)').matches && !localStorage.getItem('rn_launch')) location.replace('launcher.html');
-if (!location.search && !matchMedia('(pointer: coarse)').matches) { const q = RN_LAUNCH.query(RN_LAUNCH.load()).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&'); if (q && localStorage.getItem('rn_launch')) location.replace('/?' + q); }
+const RN_COARSE = matchMedia('(pointer: coarse)').matches;
+if (!location.search && !RN_COARSE && !localStorage.getItem('rn_launch')) location.replace('launcher.html');
+const RN_SEARCH = location.search || '?' + (sessionStorage.getItem('rn_q') ?? (RN_COARSE ? '' : RN_LAUNCH.query(RN_LAUNCH.load()).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&')));
 </script>
 <script src="mode.js"></script>
 <script src="app.js"></script>

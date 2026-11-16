@@ -1,6 +1,6 @@
 // Mode: one address (5180) for everything. 'remaster' (default) = every bridge and effect we added; 'original' = the
 // game as Speed.exe ships it, for A/B. F4 asks, F4 again within 3 s switches and reloads (most switches are read at boot).
-// The choice is kept in this browser. A ?key=value in the URL still wins over the mode (tests, webcheck).
+// The choice is kept in this browser. A key=value of this visit (RN_SEARCH, web/index.html) still wins over the mode.
 // RN_Q replaces new URLSearchParams(location.search) in every page script.
 const RN_ORIGINAL = {
   remaster: '0',      // texture pack (world and cars), web/gpu.js
@@ -24,7 +24,7 @@ const RN_ORIGINAL_ENV = { RN_TRAFFIC: '0', RN_RIVALS: '0', RN_SMOOTH: '0', RN_HU
 // browser stored; only a ?mode= / ?fx= / ?fps= in the address (this visit's overlay or menu switch, a test) says otherwise.
 const RN_PHONE = (() => { try { return matchMedia('(pointer: coarse)').matches; } catch { return false; } })();
 const RN_MODE = (() => {
-  const q = new URLSearchParams(location.search).get('mode');
+  const q = new URLSearchParams(RN_SEARCH).get('mode');
   if (q === 'original' || q === 'remaster') return q;
   if (RN_PHONE) return 'original';
   // Default remaster (OWNER 2026-11-10: the UG2 city lives in Free Run's WORLD row, which original mode turns off); original only when picked.
@@ -35,7 +35,7 @@ const RN_MODE = (() => {
 //        terms back to the shipped ones); the remaster's gameplay and camera keys stay. ?fps=30: host RN_FPS (frame pacer).
 const RN_FX_OFF = ['remaster', 'skinhd', 'bloom', 'fxaa', 'sharp', 'aniso', 'carlook', 'cardetail', 'roadrefl'];
 const RN_Q = (() => {
-  const q = new URLSearchParams(location.search);
+  const q = new URLSearchParams(RN_SEARCH);
   // Phones draw 1280 wide and scale up: the sharpen-on-upscale pass stays on for them (OWNER 2026-11-15), the other effects off.
   if (RN_PHONE && !q.has('sharp')) q.set('sharp', '0.5');
   if (RN_MODE === 'original') for (const [k, v] of Object.entries(RN_ORIGINAL)) if (!q.has(k)) q.set(k, v);
@@ -67,9 +67,10 @@ const RN_Q = (() => {
     const next = RN_MODE === 'original' ? 'remaster' : 'original';
     try { localStorage.setItem('rn_mode', next); } catch {}
     show('Reiniciando…', 5000);
-    const url = new URL(location.href);
-    url.searchParams.set('mode', next); // A test/launcher URL must not pin the previous mode.
-    setTimeout(() => location.replace(url.href), 150);
+    const q = new URLSearchParams(RN_SEARCH);
+    q.set('mode', next); // This visit's switches must not pin the previous mode.
+    try { sessionStorage.setItem('rn_q', q.toString()); } catch {}
+    setTimeout(() => location.replace(location.pathname), 150);
   };
   let armed = 0;
   // Capture phase on window: the canvas (web/input.js) never sees F4, so the game does not get it.

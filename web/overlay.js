@@ -8,12 +8,13 @@
   const stateOf = p => Object.assign({ ...defs }, p.set);
   const active = () => L.presets.find(p => { const s = stateOf(p); return Object.keys(s).every(k => s[k] === sel[k]); });
   // mode is not sent: L.save stores it for web/mode.js, and a ?mode= in the URL would pin it and break F4 (same as web/launcher.js)
-  // Phones start light on every visit (web/mode.js RN_PHONE): the panel shows what runs, and a choice made here goes in the address (mode and fx), for this visit only.
-  if (RN_PHONE && !new URLSearchParams(location.search).has('mode')) Object.assign(sel, stateOf(L.presets.find(p => p.id === 'modesto')), { vol: sel.vol, play: sel.play });
+  // Phones start light on every visit (web/mode.js RN_PHONE): the panel shows what runs, and a choice made here lasts this visit only (mode and fx in sessionStorage rn_q).
+  if (RN_PHONE && !new URLSearchParams(RN_SEARCH).has('mode')) Object.assign(sel, stateOf(L.presets.find(p => p.id === 'modesto')), { vol: sel.vol, play: sel.play });
   const go = () => {
     L.save(sel);
     const q = L.query(sel).split('&').filter(x => x !== 'play=1' && (RN_PHONE || !x.startsWith('mode='))).concat(RN_PHONE && sel.fx !== '0' ? ['fx=1'] : []).join('&');
-    location.href = '/' + (q ? '?' + q : '');
+    try { sessionStorage.setItem('rn_q', q); } catch {}   // this tab's switches (web/index.html RN_SEARCH), never in the address
+    location.href = '/';
   };
 
   const css = document.createElement('style');
