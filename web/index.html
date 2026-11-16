@@ -102,8 +102,8 @@ if (bridgeTo !== null) window.rnBridge = q => { location.href = (bridgeTo && bri
 <script src="saves.js"></script>
 <script>
 // ?fast=1&go=1 (the launcher's "Jugar"): the launcher's 3D scene (web/launcher_b/?curtain=1, frozen at the end of its push-in) covers the game while it boots
-// (no intro movies or splash, PATCH 0x4de395; the game's own Accept loads the profile, web/boot.js). It is only a loading curtain: it fades out in 250 ms
-// when RN_APP leaves 'load' (web/app.js: the main menu is up, or a stop that must show). Opened without go=1 (set at the top of this page) it never gets here.
+// (no intro movies or splash, PATCH 0x4de395). It is only a loading curtain: it fades out in 250 ms
+// when RN_APP leaves 'load' (web/app.js: the game drew its first frame, or a stop that must show). No key is pressed for the player (web/boot.js). Opened without go=1 (set at the top of this page) it never gets here.
 if (RN_Q.get('fast') === '1') {
   const css = document.createElement('style');
   css.textContent = `#ab { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 12; background: #05080d; pointer-events: none; transition: opacity .25s ease; }
