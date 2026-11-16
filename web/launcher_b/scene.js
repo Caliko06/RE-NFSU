@@ -77,22 +77,22 @@ const FAILING_LAMP = { loop: 9.7, curve: stepCurve([0,1, 2.9,.15, 3.02,1, 3.14,.
 const HEADLIGHT_ON = stepCurve([0,0, 1,.9, 1.09,.05, 1.27,1]); // intro: snaps on, drops, snaps on again
 const EASE = new pc.Curve([0,0, 1,1]); // CURVE_SMOOTHSTEP between two keys = smoothstep easing
 const INTRO_SECS = 1.6, CONFIRM_SECS = .9, CONFIRM_EMIT = 1.5, IDLE_SECS = 14, BLEND_SMOOTH = .16;
-// The UI names the shot (RN_SCENE.shot): the car sits between JUGAR (left) and the settings board (right).
+// The UI names the shot (RN_SCENE.shot): the car owns the left of the picture, clear of the menu sheet (web/launcher.css .panel, the right 44 %).
 const SHOT_LOOP = ['hero','low','side','rear'];
 // theta = degrees around the car from its nose towards its +x side (0 front, 90 side, 180 rear), h = camera height
 // in metres, width = share of the screen width the framed box should fill, at = where the box centre lands on
 // screen (x right, y down), range = DOF focus range in metres. drift = az (deg) / radius (fraction) / height (m)
 // keys over one ping-pong pass of `period` seconds.
 const SHOT_SPEC = {
-    hero:   { theta: 40.7, h: 1.0, fov: 43, width: .34, at: [.46,.75], range: 5,   period: 16,
+    hero:   { theta: 40.7, h: 1.0, fov: 43, width: .40, at: [.30,.75], range: 5,   period: 16,
         drift: { az:[-3,-1.2,1.4,3], r:[.03,.01,-.015,-.035], h:[-.04,0,.05,.09] } },
-    low:    { theta: -34, h: .3, fov: 58, width: .38, at: [.44,.70], range: 9,   period: 13,
+    low:    { theta: -34, h: .3, fov: 58, width: .42, at: [.29,.70], range: 9,   period: 13,
         drift: { az:[4,2,-1,-4], r:[0,-.02,-.04,-.05], h:[0,.02,.05,.08] } },
-    side:   { theta: 92, h: .85, fov: 26, width: .36, at: [.42,.72], range: 6,   period: 19,
+    side:   { theta: 92, h: .85, fov: 26, width: .42, at: [.29,.72], range: 6,   period: 19,
         drift: { az:[-5,-2,2,5], r:[.02,.01,-.01,-.03], h:[0,.03,.04,.06] } },
-    rear:   { theta: 148, h: .95, fov: 40, width: .34, at: [.46,.72], range: 6, period: 15,
+    rear:   { theta: 148, h: .95, fov: 40, width: .40, at: [.30,.72], range: 6, period: 15,
         drift: { az:[3,1,-1.5,-4], r:[.04,.02,-.01,-.035], h:[.03,0,-.02,-.05] } },
-    detail: { theta: 62, h: .5, fov: 30, width: .36, at: [.40,.70], range: 2.5, period: 12,
+    detail: { theta: 62, h: .5, fov: 30, width: .40, at: [.28,.70], range: 2.5, period: 12,
         drift: { az:[-4,-1.5,1.5,4], r:[.05,.02,-.02,-.05], h:[-.03,0,.03,.06] } },
 };
 

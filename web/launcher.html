@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#070808">
+<meta name="theme-color" content="#04121a">
 <title>Need for Speed Underground</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="launcher.css">
@@ -15,47 +15,41 @@
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="shade" aria-hidden="true"></div>
 
+<!-- The launcher is one more screen of the game (OWNER 2026-11-15 night): the menus' own panel, font, selection bar and key hints.
+     Screen A = main menu (JUGAR first, the few options); screen B = Opciones (one group at a time, like the game's browsers). -->
 <div class="ui" id="ui">
-  <header class="brand" data-in>
-    <h1 class="logo"><img src="launcher/v2/ui/logo.webp" alt="Need for Speed Underground" width="688" height="125"></h1>
-  </header>
+  <aside class="panel" id="board" data-in aria-label="Menú">
+    <header class="head">
+      <h1 class="logo"><img src="launcher/v2/ui/logo.webp" alt="Need for Speed Underground" width="688" height="125"></h1>
+      <p class="rig" id="rig"><b>Tu equipo</b><span id="rigName">midiendo</span></p>
+    </header>
 
-  <div class="tools" data-in>
-    <button class="tool" id="btnSnd" type="button" aria-pressed="true" aria-label="Sonido del menú (M)" title="Sonido del menú (M)">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path class="spk" d="M4 9.5v5h3.6L13 19V5L7.6 9.5z"/><path class="wv" d="M16 8.6c1.6 1.9 1.6 4.9 0 6.8M18.6 6c3 3.3 3 8.7 0 12"/><path class="xx" d="M16 9l6 6M22 9l-6 6"/></svg>
-    </button>
-    <button class="tool pill" id="btnMot" type="button" aria-pressed="true" title="Animación"><i class="dot" aria-hidden="true"></i><span class="ml">Animación: sí</span></button>
-  </div>
-
-  <!-- left: the one thing a newcomer needs -->
-  <section class="hero" data-in aria-label="Jugar">
-    <button class="go nav" id="play" type="button" aria-label="Jugar"><img class="art" src="launcher/v6/jugar.webp" alt="" width="1300" height="444" draggable="false"></button>
-    <p class="what" id="what" aria-live="polite"></p>
-  </section>
-
-  <!-- right: the settings board. Sheet A = the few options; sheet B (Avanzado) = every option by group. -->
-  <aside class="board" id="board" data-in aria-label="Ajustes">
-    <img class="bg" src="launcher/v7/board.webp" alt="" draggable="false">
     <div class="sheet" id="sheetA">
-      <div class="rig" id="rig"><img class="bg" src="launcher/v7/sticker.webp" alt="" draggable="false"><b>Tu equipo</b><span id="rigName">midiendo</span></div>
-      <div class="rows" id="simple"></div>
-      <button class="tab nav" id="more" type="button"><img class="bg" src="launcher/v7/tab.webp" alt="" draggable="false"><span>Avanzado</span></button>
+      <h2 class="title" id="titleA"></h2>
+      <div class="rows" id="simple">
+        <button class="item go nav" id="play" type="button" aria-label="Jugar"></button>
+      </div>
+      <button class="item nav" id="more" type="button"></button>
     </div>
     <div class="sheet adv" id="sheetB" hidden>
-      <div class="tabs" id="tabs" role="tablist" aria-label="Grupos de ajustes"></div>
+      <div class="browse">
+        <button class="arr l" id="tabPrev" type="button" tabindex="-1" aria-label="Grupo anterior"></button>
+        <div class="tabs" id="tabs" role="tablist" aria-label="Grupos de ajustes"></div>
+        <button class="arr r" id="tabNext" type="button" tabindex="-1" aria-label="Grupo siguiente"></button>
+      </div>
+      <p class="count" id="tabCount"></p>
       <div class="rows" id="adv"></div>
-      <button class="tab nav" id="less" type="button"><img class="bg" src="launcher/v7/tab.webp" alt="" draggable="false"><span>Básico</span></button>
+      <button class="item nav" id="less" type="button"></button>
     </div>
+
+    <p class="help" id="help" aria-live="polite"><span class="dl"></span></p>
+    <footer class="keys" id="keysBar"><div class="keysin" id="keys"></div></footer>
   </aside>
 
-  <!-- what the selected option does: one line, and two real captures when there are any -->
-  <div class="ba" id="ba" hidden aria-hidden="true">
-    <figure><img class="pic" id="baA" alt=""><figcaption id="baAt"></figcaption></figure>
-    <figure><img class="pic" id="baB" alt=""><figcaption id="baBt"></figcaption></figure>
+  <div class="tools" data-in>
+    <button class="tool" id="btnSnd" type="button" aria-pressed="true" title="Sonido del menú (M)"><kbd>M</kbd><span class="sl">Sonido: sí</span></button>
+    <button class="tool" id="btnMot" type="button" aria-pressed="true" title="Animación"><i class="dot" aria-hidden="true"></i><span class="ml">Animación: sí</span></button>
   </div>
-  <p class="help" id="help" data-in aria-live="polite"><span class="dl"></span></p>
-
-  <footer class="keys" id="keysBar" data-in><div class="keysin" id="keys"></div></footer>
   <input id="fileRes" type="file" accept=".json,application/json" hidden>
 </div>
 

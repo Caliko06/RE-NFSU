@@ -1,5 +1,5 @@
-// Launcher (UI): one JUGAR on the left, the settings board on the right (OWNER 2026-11-15, plan row 10).
-// Sheet A = the few options a newcomer needs; sheet B (Avanzado) = every option of web/launcher_opts.js by group, plus keys and saves.
+// Launcher (UI): one more screen of the game (OWNER 2026-11-15 night, plan row 10): the menus' sheet with JUGAR first.
+// Screen A = main menu, the few options a newcomer needs; screen B (Opciones) = every option of web/launcher_opts.js, one group at a time, plus keys and saves.
 // The scene behind is window.RN_SCENE (web/launcher_b/scene.js), sound is window.RN_SND (web/launcher_audio.js); both optional, every call is guarded.
 // Game font: launcher/v2/ui/game_font.png + .json; labels drawn from it are mask sprites (class gf).
 (() => {
@@ -19,8 +19,6 @@
   const snd = n => { try { window.RN_SND && window.RN_SND.play(n); } catch {} };
   const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
   const wait = ms => new Promise(r => setTimeout(r, ms));
-  // a material that did not load is dropped: its element falls back to a plain CSS surface (launcher.css :not(:has(.bg)))
-  document.addEventListener('error', e => { const t = e.target; if (t && t.tagName === 'IMG' && t.closest('.board, .arr')) { if (t.parentElement.classList.contains('arr')) t.replaceWith(t.parentElement.classList.contains('l') ? '‹' : '›'); else t.remove(); } }, true);
 
   // ---------- motion switch (default ON, ignores the OS reduce-motion setting) ----------
   let motion = store.get('rn_launch_motion', '1') !== '0';
@@ -97,10 +95,6 @@
   const applies = o => !o.modes || o.modes.includes(mode());
   const save = () => L.save(sel);
   const SHOT = { juego: 'hero', video: 'detail', camara: 'rear', rendimiento: 'low', jugabilidad: 'side', controles: 'hero' };   // the camera goes where the option shows
-  // Before/after cards: launcher/ba/<id>_a|_b.webp + two captions per option id (tools/launcher_ba.py crops them). Empty until the captures match:
-  // two runs of WORLD start at different spots with different traffic (2026-11-15, 13 runs), so a pair showed the traffic, not the option.
-  const BA = {};
-
   const helpBox = $('help');
   const setHelp = text => {
     const old = helpBox.querySelector('.dl:last-child');
@@ -109,21 +103,11 @@
     if (old) { A(old, [{ opacity: 1 }, { opacity: 0, transform: 'translateY(-.8rem)' }], { duration: 110, fill: 'forwards' }); setTimeout(() => old.remove(), 130);
       A(nw, [{ opacity: 0, transform: 'translateY(.9rem)' }, { opacity: 1, transform: 'none' }], { duration: 180, delay: 50, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }); }
   };
-  const ba = $('ba');
-  const setBA = id => {
-    const t = BA[id];
-    if (!t) { ba.hidden = true; return; }
-    $('baA').src = `launcher/ba/${id}_a.webp`; $('baB').src = `launcher/ba/${id}_b.webp`; $('baAt').textContent = t[0]; $('baBt').textContent = t[1];
-    $('baB').onload = () => { if (ba.hidden) { ba.hidden = false; for (const [i, f] of [...ba.children].entries()) A(f, [{ opacity: 0, transform: `translateY(-3rem) rotate(${i ? 9 : -9}deg)` }, { opacity: 1, transform: 'none' }], { duration: 240, delay: i * 60, easing: 'cubic-bezier(.3,1.4,.5,1)', fill: 'backwards' }); } };
-    $('baB').onerror = () => { ba.hidden = true; };
-  };
-
   // ---------- rows ----------
-  // A row is a strip of masking tape with the name (marker) and the value sprayed next to it. row._adj(±1) changes it, row._ok() activates it.
-  let nrow = 0;
+  // A row is a menu line: the name, then its value between two arrows. row._adj(±1) changes it, row._ok() activates it.
   function rowBase(box, label, help, group) {
-    const row = el('div', 'row nav'); row.tabIndex = 0; row.style.setProperty('--n', nrow++ % 5);
-    const lt = el('span', 'lt'); lt.append(Object.assign(el('img', 'bg'), { src: `launcher/v7/strip${nrow % 5 + 1}.webp`, alt: '', draggable: false }), el('span', 'mk', label));
+    const row = el('div', 'row nav'); row.tabIndex = 0;
+    const lt = el('span', 'lt'); lt.append(T(label));
     row.append(lt); row.setAttribute('aria-label', label);
     row._help = help; row._group = group;
     box.append(row);
@@ -131,11 +115,10 @@
   }
   const arrow = (row, dir) => {
     const a = el('button', 'arr ' + (dir < 0 ? 'l' : 'r')); a.type = 'button'; a.tabIndex = -1; a.setAttribute('aria-label', dir < 0 ? 'Anterior' : 'Siguiente');
-    a.append(Object.assign(el('img'), { src: 'launcher/v7/arrow.webp', alt: '', draggable: false }));
     a.addEventListener('click', e => { e.stopPropagation(); choose(row); row._adj(dir); });
     return a;
   };
-  // the value is sprayed on: it wipes in from the side it was pushed from
+  // a new value wipes in from the side it was pushed from
   const spray = (vv, label, dir) => {
     const nw = T(label), old = vv.firstElementChild;
     vv.append(nw);
@@ -144,7 +127,7 @@
     if (!old) return;
     if (dir === undefined) { old.remove(); return; }
     A(old, [{ opacity: 1 }, { opacity: 0 }], { duration: 90, fill: 'forwards' }); setTimeout(() => old.remove(), 100);
-    if (motion) nw.animate([{ clipPath: dir < 0 ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)', filter: 'blur(.5rem)' }, { clipPath: 'inset(0)', filter: 'blur(0)' }], { duration: 190, delay: 50, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
+    if (motion) nw.animate([{ clipPath: dir < 0 ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)' }, { clipPath: 'inset(0)' }], { duration: 160, delay: 50, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
   };
   const rows = [];
   function choiceRow(box, o) {
@@ -157,10 +140,10 @@
     row._paint = dir => { const x = o.values.find(y => y.v === sel[o.id]), label = x ? x.label : sel[o.id]; if (row._v !== label) { row._v = label; spray(vv, label, dir); row.setAttribute('aria-valuetext', label); } };
     rows.push(row); return row;
   }
-  function sliderRow(box, o) {      // volume: a lug nut on a strip of gaffer tape; it turns as it slides
+  function sliderRow(box, o) {      // volume: the game's segmented bar
     const row = rowBase(box, o.label, o.help, o.group);
-    const tr = el('span', 'track'), knob = Object.assign(el('img', 'knob'), { src: 'launcher/v7/knob.webp', alt: '', draggable: false }), num = el('span', 'num');
-    tr.append(Object.assign(el('img', 'bg'), { src: 'launcher/v7/track.webp', alt: '', draggable: false }), knob); row.append(tr, num);
+    const tr = el('span', 'track'), num = el('span', 'num');
+    row.append(tr, num);
     row.setAttribute('role', 'slider'); row._o = o;
     const n = o.values.length - 1, idx = () => Math.max(0, o.values.findIndex(x => x.v === sel[o.id]));
     row._adj = d => { const i = clamp(idx() + d, 0, n); if (i !== idx()) setOpt(o.id, o.values[i].v, d); };
@@ -179,7 +162,8 @@
     return row;
   }
 
-  // sheet A: Calidad, Juego, Resolución, Volumen, Controles
+  // screen A: Jugar, Calidad, Juego, Volumen, Controles, Opciones
+  $('titleA').append(T('Menú principal')); $('play').append(T('Jugar')); $('more').append(T('Opciones')); $('less').append(T('Volver'));
   const simple = $('simple'), adv = $('adv');
   const qRow = rowBase(simple, 'Calidad', '', 'rendimiento');
   {
@@ -201,25 +185,25 @@
   for (const r of [bak, res, rst]) r._adv = true;
   $('fileRes').addEventListener('change', () => { const f = $('fileRes').files[0]; $('fileRes').value = ''; if (f) RN_SAVES.restore(f).then(() => res._say('Restaurado'), () => res._say('Archivo inválido')); });
   const tabBtns = groups.map(g => {
-    const b = el('button', 'gtab'); b.type = 'button'; b.tabIndex = -1; b.setAttribute('role', 'tab'); b.append(el('span', '', COPY.group[g.id] || g.title));
-    b.addEventListener('click', () => { if (tab !== g.id) { snd('tab'); setTab(g.id, 1); } });
+    const b = el('span', 'gtab'); b.setAttribute('role', 'tab'); b.append(T(COPY.group[g.id] || g.title));
     $('tabs').append(b); return { g, b };
   });
 
-  const WHAT = { '1': ['World', 'una sola ciudad, todo abierto'], '0': ['Carrera', 'el modo Underground de 2003'] };
+  const WHAT = { '1': 'World: una sola ciudad, todo abierto', '0': 'Carrera: el modo Underground de 2003' };
+  const playHelp = () => (WHAT[sel.play] || WHAT['1']) + (mode() === 'original' ? ', versión original' : '') + '. Enter o clic para entrar.';
   function paint(dir) {
     for (const r of rows) { r._paint(dir); if (r._adv) r.hidden = r._group !== tab || (r._o && !applies(r._o)); }
     for (const r of [keysRow, bak, res, rst]) r.hidden = r._group !== tab;
     for (const { g, b } of tabBtns) { b.setAttribute('aria-selected', String(g.id === tab)); b.hidden = g.id !== 'partidas' && !opts.some(o => o.group === g.id && applies(o)); }
-    const w = WHAT[sel.play] || WHAT['1'];
-    $('what').innerHTML = `<b>${w[0]}</b> ${w[1]}` + (mode() === 'original' ? ', versión original' : '');
-    if (cur && cur._help !== undefined) setHelp(cur._help || '');
+    const vis = tabBtns.filter(x => !x.b.hidden), gi = vis.findIndex(x => x.g.id === tab);
+    $('tabCount').textContent = gi < 0 ? '' : `${gi + 1} / ${vis.length}` + (vis[gi].g.desc ? '   ' + vis[gi].g.desc : '');
+    if (cur === $('play')) setHelp(playHelp()); else if (cur && cur._help !== undefined) setHelp(cur._help || '');
   }
-  function changed(dir) { save(); paint(dir); snd('tab'); scene('pulse'); if (cur && motion) { const lt = cur.querySelector('.lt'); if (lt) lt.animate([{ transform: 'scale(.97)' }, { transform: 'none' }], { duration: 140, easing: 'cubic-bezier(.3,1.6,.5,1)' }); } }
+  function changed(dir) { save(); paint(dir); snd('tab'); scene('pulse'); if (cur && motion) { const lt = cur.querySelector('.lt'); if (lt) lt.animate([{ transform: 'scale(.97)' }, { transform: 'none' }], { duration: 140, easing: 'cubic-bezier(.16,1,.3,1)' }); } }
   function setOpt(id, v, dir) { sel[id] = v; changed(dir); }
 
-  // ---------- navigation: one list per sheet, JUGAR first ----------
-  const items = () => [$('play'), ...(sheet === 'A' ? [...simple.children, $('more')] : [...[...adv.children].filter(r => !r.hidden), $('less')])];
+  // ---------- navigation: one list per screen, JUGAR first ----------
+  const items = () => sheet === 'A' ? [...simple.children, $('more')] : [...[...adv.children].filter(r => !r.hidden), $('less')];
   function choose(node, o = {}) {
     if (!node || cur === node) return;
     if (cur) cur.classList.remove('sel');
@@ -227,8 +211,7 @@
     if (document.activeElement !== node) node.focus({ preventScroll: true });
     if (node.parentElement === adv) node.scrollIntoView({ block: 'nearest', behavior: motion ? 'smooth' : 'auto' });
     if (!o.quiet) snd('move');
-    setHelp(node === $('play') ? 'Enter o clic para entrar. Todo lo de la derecha ya viene listo.' : node === $('more') ? 'Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.' : node === $('less') ? 'Vuelve a los ajustes básicos.' : node._help || '');
-    setBA(node._o ? node._o.id : null);
+    setHelp(node === $('play') ? playHelp() : node === $('more') ? 'Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.' : node === $('less') ? 'Vuelve al menú principal.' : node._help || '');
     scene('shot', node === $('play') ? null : SHOT[node._group] || 'hero');
   }
   const step = d => { const l = items(), i = l.indexOf(cur); choose(l[i < 0 ? 0 : (i + d + l.length) % l.length]); };
@@ -237,20 +220,22 @@
     adv.scrollTop = 0;
     const vis = [...adv.children].filter(r => !r.hidden);
     for (const r of vis) { const vv = r.querySelector('.vv'); if (vv && vv._fit) vv._fit(); }
-    // each strip is slapped on, one after the other
-    vis.slice(0, 12).forEach((r, i) => A(r, [{ opacity: 0, transform: `translateX(${dir >= 0 ? 2.4 : -2.4}rem) rotate(${i % 2 ? 2 : -2}deg) scale(1.06)` }, { opacity: 1, transform: 'none' }], { duration: 200, delay: i * 26, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'backwards' }));
+    // the group's lines come in from the side it was browsed from, one after the other
+    vis.slice(0, 12).forEach((r, i) => A(r, [{ opacity: 0, transform: `translateX(${dir >= 0 ? 3 : -3}rem)` }, { opacity: 1, transform: 'none' }], { duration: 170, delay: i * 22, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
+    A($('tabs'), [{ opacity: 0, transform: `translateX(${dir >= 0 ? 2 : -2}rem)` }, { opacity: 1, transform: 'none' }], { duration: 150, easing: 'cubic-bezier(.16,1,.3,1)' });
     if (sheet === 'B' && vis[0]) choose(vis[0], { quiet: true });
   }
-  function flip(to) {      // the other sheet drops onto the board
+  function flip(to) {      // the other screen slides onto the sheet
     sheet = to; const a = $('sheetA'), b = $('sheetB'), on = to === 'B' ? b : a, off = to === 'B' ? a : b;
     off.hidden = true; on.hidden = false; $('board').dataset.sheet = to;
-    A(on, [{ opacity: 0, transform: 'translateY(-4rem) rotate(-3deg)' }, { opacity: 1, transform: 'none' }], { duration: to === 'B' ? 250 : 150, easing: 'cubic-bezier(.3,1.35,.5,1)' });   // closing is faster than opening
+    A(on, [{ opacity: 0, transform: `translateX(${to === 'B' ? 4 : -4}rem)` }, { opacity: 1, transform: 'none' }], { duration: to === 'B' ? 220 : 150, easing: 'cubic-bezier(.16,1,.3,1)' });   // closing is faster than opening
     hints();
   }
   function openAdv(id) { snd('accept'); flip('B'); setTab(id || tab || groups[0].id, 1); }
   function closeAdv() { if (sheet !== 'B') return; snd('back'); flip('A'); cur = null; paint(); choose($('more'), { quiet: true }); }
   $('more').addEventListener('click', () => openAdv());
   $('less').addEventListener('click', closeAdv);
+  $('tabPrev').addEventListener('click', () => tabStep(-1)); $('tabNext').addEventListener('click', () => tabStep(1));
   const tabStep = d => { if (sheet !== 'B') return; const vis = tabBtns.filter(x => !x.b.hidden), i = vis.findIndex(x => x.g.id === tab); snd('tab'); setTab(vis[(i + d + vis.length) % vis.length].g.id, d); };
 
   // ---------- detect the machine (first visit: its level is applied) ----------
@@ -267,7 +252,7 @@
     rig.textContent = 'Va bien en ' + q.label;
     $('rig').title = `La escena de este menú corre a ${ms.toFixed(1)} ms por cuadro en tu equipo.`;
     if (first && L.qualityOf(sel) && !detect.touched) { Object.assign(sel, q.set); save(); paint(1); }
-    if (motion) $('rig').animate([{ transform: 'rotate(-9deg) scale(1.12)' }, { transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+    A($('rig'), [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
   }
 
   // ---------- confirm: headlights, push-in (RN_SCENE.confirm), fade, then go ----------
@@ -280,7 +265,8 @@
     await Promise.race([Promise.resolve(scene('confirm')).catch(() => 0), wait(1800)]);
     $('fade').classList.add('on');
     await wait(motion ? 220 : 120);
-    location.href = '/?' + u;
+    try { sessionStorage.setItem('rn_q', u.toString()); } catch {}   // web/index.html RN_SEARCH: the switches stay out of the address
+    location.href = '/';
   }
   $('play').addEventListener('click', launch);
   addEventListener('pageshow', e => { if (e.persisted) { going = false; body.classList.remove('leaving'); $('fade').classList.remove('on'); } });
@@ -292,9 +278,9 @@
     const out = [];
     if (kind !== 'touch') {
       out.push(h(K('wide', pad ? '↕' : '↑↓'), 'Elegir'), h(K('wide', pad ? '↔' : '←→'), 'Cambiar'));
-      if (sheet === 'B') out.push(h(pad ? K('wide', 'LB') + K('wide', 'RB') : K('', 'Q') + K('', 'E'), 'Grupo'), h(pad ? K('pad b', 'B') : K('wide', 'Esc'), 'Básico', 'back'));
-      out.push(h(pad ? K('wide', 'Start') : K('wide', '↵'), 'Jugar', 'play'));
-    } else if (sheet === 'B') out.push(h(K('wide', '←'), 'Básico', 'back'));
+      if (sheet === 'B') out.push(h(pad ? K('wide', 'LB') + K('wide', 'RB') : K('', 'Q') + K('', 'E'), 'Grupo'), h(pad ? K('pad b', 'B') : K('wide', 'Esc'), 'Volver', 'back'));
+      if (sheet === 'A') out.push(h(pad ? K('wide', 'Start') : K('wide', '↵'), 'Jugar', 'play'));   // in Opciones Enter changes the value, it does not start
+    } else if (sheet === 'B') out.push(h(K('wide', '←'), 'Volver', 'back'));
     bar.innerHTML = out.join('');
   }
   bar.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (b) act(b.dataset.act); });
@@ -303,7 +289,7 @@
   // ---------- sound and animation switches ----------
   const btnSnd = $('btnSnd'), btnMot = $('btnMot');
   const sndOn = () => !window.RN_SND || window.RN_SND.isOn();
-  const paintSnd = () => btnSnd.setAttribute('aria-pressed', String(sndOn()));
+  const paintSnd = () => { btnSnd.setAttribute('aria-pressed', String(sndOn())); btnSnd.querySelector('.sl').textContent = sndOn() ? 'Sonido: sí' : 'Sonido: no'; };
   if (window.RN_SND) window.RN_SND.onChange(paintSnd); else btnSnd.hidden = true;
   const toggleSnd = () => { window.RN_SND.init(); window.RN_SND.toggle(); if (sndOn()) snd('accept'); };
   btnSnd.addEventListener('click', toggleSnd);
@@ -383,11 +369,10 @@
     revealed = true;
     body.classList.remove('boot');
     const e = 'cubic-bezier(.16,1,.3,1)';
-    for (const n of document.querySelectorAll('.brand, .tools, .hero, .help')) A(n, [{ opacity: 0, transform: 'translateX(-4rem)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: e, fill: 'backwards' });
-    A($('keysBar'), [{ opacity: 0, transform: 'translateY(3rem)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: e, fill: 'backwards' });
-    // the board is hung: it swings in from its top corner, then the strips are slapped on
-    A($('board'), [{ opacity: 0, transform: 'translateY(-6rem) rotate(5deg)' }, { opacity: 1, transform: 'none' }], { duration: 280, delay: 120, easing: 'cubic-bezier(.3,1.3,.5,1)', fill: 'backwards' });
-    [...simple.children, $('more'), $('rig')].forEach((r, i) => A(r, [{ opacity: 0, transform: `rotate(${i % 2 ? 3 : -3}deg) scale(1.08)` }, { opacity: 1, transform: 'none' }], { duration: 190, delay: 360 + i * 45, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'backwards' }));
+    A(document.querySelector('.tools'), [{ opacity: 0 }, { opacity: 1 }], { duration: 280, delay: 200, easing: e, fill: 'backwards' });
+    // the sheet slides in from its side, then its lines one after the other
+    A($('board'), [{ opacity: 0, transform: 'translateX(8rem)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: e, fill: 'backwards' });
+    [$('titleA'), ...simple.children, $('more')].forEach((r, i) => A(r, [{ opacity: 0, transform: 'translateX(4rem)' }, { opacity: 1, transform: 'none' }], { duration: 200, delay: 140 + i * 35, easing: e, fill: 'backwards' }));
     setTimeout(detect, 900);
   }
   const S = window.RN_SCENE;
