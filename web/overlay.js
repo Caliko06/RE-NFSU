@@ -12,7 +12,10 @@
   if (RN_PHONE && !new URLSearchParams(RN_SEARCH).has('mode')) Object.assign(sel, stateOf(L.presets.find(p => p.id === 'modesto')), { vol: sel.vol });
   const go = () => {
     L.save(sel);
-    const q = L.query(sel).split('&').filter(x => x !== 'play=1' && (RN_PHONE || !x.startsWith('mode='))).concat(RN_PHONE && sel.fx !== '0' ? ['fx=1'] : []).join('&');
+    // The launcher's entry of this visit (web/launcher.js: fast, go, start) stays, so the reload ends where the player came in: main menu, WORLD or Go Underground.
+    const was = new URLSearchParams(RN_SEARCH), trip = ['fast', 'go', 'start'].filter(k => was.has(k)).map(k => k + '=' + was.get(k));
+    const q = L.query(sel).split('&').filter(x => x !== 'play=1' && (RN_PHONE || !x.startsWith('mode=')) && !(x === 'pool=1' && was.get('start') === 'career'))
+      .concat(RN_PHONE && sel.fx !== '0' ? ['fx=1'] : [], trip).join('&');
     try { sessionStorage.setItem('rn_q', q); } catch {}   // this tab's switches (web/index.html RN_SEARCH), never in the address
     location.href = '/';
   };
