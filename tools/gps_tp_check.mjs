@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const secs = Math.min(1800, Math.max(60, Number(process.env.RN_SECS || 240)));
-const url = 'http://127.0.0.1:5182/?play=1&pool=1&auto=1&mode=remaster&mute=1&env=RN_JCLOG=1';
+const url = 'http://127.0.0.1:5182/?play=1&pool=1&start=world&mode=remaster&mute=1&env=RN_JCLOG=1';
 const dest = [-1053.7, 993.1, -1.5, 9526]; // plan row 12: previously driven UG2 street, NFSU1 frame.
 const out = 'web/plan/shots', evidence = { url, destination: dest, verified: false };
 mkdirSync(out, { recursive: true });

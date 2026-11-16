@@ -7,7 +7,7 @@ import { join } from 'node:path';
 
 const secs = Math.min(1800, Math.max(60, Number(process.env.RN_SECS || 300)));
 const FINAL = process.env.GPS_FINAL === '1';
-const url = `http://127.0.0.1:${process.env.GPS_PORT || 5183}/?play=1&pool=1&auto=1&mode=remaster&mute=1&env=RN_JCLOG=1`;
+const url = `http://127.0.0.1:${process.env.GPS_PORT || 5183}/?play=1&pool=1&start=world&mode=remaster&mute=1&env=RN_JCLOG=1`;
 const dest = [-1053.7, 993.1]; // map click in Bayview; route.js selects the actual street-node XYZ and yaw.
 const out = 'web/plan/shots', evidence = { url, destination: dest, verified: false };
 mkdirSync(out, { recursive: true });

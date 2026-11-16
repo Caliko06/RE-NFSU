@@ -166,12 +166,18 @@
     return row;
   }
 
-  // screen A: Jugar, Calidad, Juego, Volumen, Controles, Opciones
-  $('titleA').append(T(t('Menú principal'))); $('play').append(T(t('Jugar'))); $('more').append(T(t('Opciones'))); $('less').append(T(t('Volver')));
+  // screen A: the three entries (OWNER 2026-11-16) Jugar = the game's main menu, World = straight into the open city, Carrera = Go Underground
+  // (left / right: everything open or the 2003 progress); then Calidad, Volumen, Controles, Opciones
+  $('titleA').append(T(t('Menú principal'))); $('play').append(T(t('Jugar'))); $('world').append(T('World')); $('more').append(T(t('Opciones'))); $('less').append(T(t('Volver')));
   $('guides').append(T(t('Guías'))); $('guides').href = 'blog/' + (window.RN_LANG === 'es' ? 'es' : 'en') + '/index.html';
   for (const [id, a, s] of [['board', 'aria-label', 'Menú'], ['play', 'aria-label', 'Jugar'], ['tabPrev', 'aria-label', 'Grupo anterior'], ['tabNext', 'aria-label', 'Grupo siguiente'], ['tabs', 'aria-label', 'Grupos de ajustes'], ['btnSnd', 'title', 'Sonido del menú (M)'], ['btnMot', 'title', 'Animación']]) $(id).setAttribute(a, t(s));
   $('rig').querySelector('b').textContent = t('Tu equipo'); $('rigName').textContent = t('midiendo');
   const simple = $('simple'), adv = $('adv');
+  const HELP = { play: 'Abre el juego en su menú principal.', world: 'Directo a la ciudad abierta: una sola ciudad, todo desbloqueado.' };
+  const cRow = choiceRow(simple, opts.find(o => o.id === 'career'));
+  cRow.querySelector('.lt').replaceChildren(T(t('Carrera'))); cRow.setAttribute('aria-label', t('Carrera'));
+  cRow._help = t('Directo a Go Underground, la carrera de 2003. Izquierda o derecha: todo abierto o el progreso normal. Enter para entrar.');
+  cRow._ok = () => launch('career');
   const qRow = rowBase(simple, 'Calidad', '', 'rendimiento');
   {
     const val = el('span', 'val'), vv = el('span', 'vv'); val.append(arrow(qRow, -1), vv, arrow(qRow, 1)); qRow.append(val);
@@ -196,15 +202,13 @@
     $('tabs').append(b); return { g, b };
   });
 
-  const WHAT = { '1': t('World: una sola ciudad, todo abierto'), '0': t('Carrera: el modo Underground de 2003') };
-  const playHelp = () => (WHAT[sel.play] || WHAT['1']) + (mode() === 'original' ? t(', versión original') : '') + t('. Enter o clic para entrar.');
   function paint(dir) {
     for (const r of rows) { r._paint(dir); if (r._adv) r.hidden = r._group !== tab || (r._o && !applies(r._o)); }
     for (const r of [keysRow, bak, res, rst]) r.hidden = r._group !== tab;
     for (const { g, b } of tabBtns) { b.setAttribute('aria-selected', String(g.id === tab)); b.hidden = g.id !== 'partidas' && !opts.some(o => o.group === g.id && applies(o)); }
     const vis = tabBtns.filter(x => !x.b.hidden), gi = vis.findIndex(x => x.g.id === tab);
     $('tabCount').textContent = gi < 0 ? '' : `${gi + 1} / ${vis.length}` + (vis[gi].g.desc ? '   ' + vis[gi].g.desc : '');
-    if (cur === $('play')) setHelp(playHelp()); else if (cur && cur._help !== undefined) setHelp(cur._help || '');
+    if (cur && cur._help !== undefined) setHelp(cur._help || '');
   }
   function changed(dir) { save(); paint(dir); snd('tab'); scene('pulse'); if (cur && motion) { const lt = cur.querySelector('.lt'); if (lt) lt.animate([{ transform: 'scale(.97)' }, { transform: 'none' }], { duration: 140, easing: 'cubic-bezier(.16,1,.3,1)' }); } }
   function setOpt(id, v, dir) { sel[id] = v; changed(dir); }
@@ -218,7 +222,7 @@
     if (document.activeElement !== node) node.focus({ preventScroll: true });
     if (node.parentElement === adv) node.scrollIntoView({ block: 'nearest', behavior: motion ? 'smooth' : 'auto' });
     if (!o.quiet) snd('move');
-    setHelp(node === $('play') ? playHelp() : node === $('more') ? t('Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.') : node === $('guides') ? t('Cómo jugar, controles, el modo World y cómo se hizo.') : node === $('less') ? t('Vuelve al menú principal.') : node._help || '');
+    setHelp(HELP[node.id] ? t(HELP[node.id]) : node === $('more') ? t('Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.') : node === $('guides') ? t('Cómo jugar, controles, el modo World y cómo se hizo.') : node === $('less') ? t('Vuelve al menú principal.') : node._help || '');
     scene('shot', node === $('play') ? null : SHOT[node._group] || 'hero');
   }
   const step = d => { const l = items(), i = l.indexOf(cur); choose(l[i < 0 ? 0 : (i + d + l.length) % l.length]); };
@@ -263,10 +267,12 @@
   }
 
   // ---------- confirm: headlights, push-in (RN_SCENE.confirm), fade, then go ----------
-  async function launch() {
+  async function launch(start = 'menu') {
     if (going) return;
     going = true; save();
-    const u = new URLSearchParams(L.query(sel)); u.delete('mode'); u.set('play', '1'); u.set('fast', '1'); u.set('go', '1');   // mode: stored (web/mode.js); a ?mode= would pin it and break F4
+    const u = new URLSearchParams(L.query(sel)); u.delete('mode'); u.set('play', '1'); u.set('fast', '1'); u.set('go', '1'); u.set('start', start);
+    if (start === 'career') u.delete('pool');   // the 2003 career without WORLD's car pool (traffic models, liveries)
+      // mode: stored (web/mode.js); a ?mode= would pin it and break F4
     snd('accept'); try { window.RN_SND && window.RN_SND.rev(); window.RN_SND && window.RN_SND.fadeOut(900); } catch {}
     body.classList.add('leaving');
     await Promise.race([Promise.resolve(scene('confirm')).catch(() => 0), wait(1800)]);
@@ -275,7 +281,7 @@
     try { sessionStorage.setItem('rn_q', u.toString()); } catch {}   // web/index.html RN_SEARCH: the switches stay out of the address
     location.href = '/';
   }
-  $('play').addEventListener('click', launch);
+  $('play').addEventListener('click', () => launch()); $('world').addEventListener('click', () => launch('world'));
   addEventListener('pageshow', e => { if (e.persisted) { going = false; body.classList.remove('leaving'); $('fade').classList.remove('on'); } });
 
   // ---------- key hints ----------

@@ -17,8 +17,6 @@
   ];
 
   const opts = [
-    { id: 'play', group: 'juego', label: 'Juego', simple: true, help: 'World: una sola ciudad abierta con todo desbloqueado. Carrera: el modo Underground de 2003.',
-      key: 'pool', type: 'choice', values: [T('1', 'World'), T('0', 'Carrera')], def: '1', modes: BOTH, src: 'web/boot.js (pool=1 -> RN_JUMP 3:1010)' },
     { id: 'mode', group: 'juego', label: 'Versión', help: 'Original = el juego como salió. Remaster = con texturas y efectos extra.',
       key: 'mode', type: 'choice', values: [T('original', 'Original 2003'), T('remaster', 'Remaster')], def: 'remaster',
       modes: BOTH, src: 'web/mode.js' },
@@ -111,6 +109,7 @@
     const s = { ...defaults(), ...sel };
     const mode = valid(byId.mode, s.mode) ? s.mode : 'original';
     const parts = ['play=1', 'mode=' + mode];
+    if (!coarse()) parts.push('pool=1');   // the car pool look of WORLD (web/boot.js RN_POOL), the default on computers; the launcher's CARRERA drops it (web/launcher.js). Phones have no WORLD
     for (const o of opts) {
       if (o.id === 'mode' || !o.modes.includes(mode)) continue;
       const v = valid(o, s[o.id]) ? s[o.id] : o.def;
@@ -120,7 +119,6 @@
         else if (v === '30') parts.push('fps=30');
         continue;
       }
-      if (o.id === 'play') { if (v === '1' && !coarse()) parts.push('pool=1'); continue; }   // World is the default here, the game's own default is its menu; phones have no WORLD (web/boot.js NOWORLD)
       if (v === o.def) continue;
       if (s.fx === '0' && FX_COVERED.has(o.id)) continue;
       if (o.id === 'steer' && v === 'key') continue;

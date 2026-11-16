@@ -74,8 +74,15 @@ function line(s, cls) {
   log.appendChild(d);
   // A 'stop' line (missing WebGPU, COOP/COEP, a lost GPU) ends the session: the gate says why (web/app.js), F2 opens this log.
   if (cls === 'stop' || /^STOP/.test(s)) { status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; RN_APP.set('stop', s); }
+  // The launcher's curtain (?fast=1 with ?start=, web/index.html) lifts on arrival: the main menu, the race (flow state 6), or the screen after the main menu (career).
+  else if (CURTAIN && !up) {
+    if (/flow fe .*MU_Main_PC\.fng/.test(s)) { if (START === 'menu') arrive(); else main = true; }
+    else if (START === 'world' ? /flow state 6\//.test(s) : START === 'career' && main && /flow fe /.test(s)) arrive();
+  }
 }
-let up = false;
+const START = RN_Q.get('start'), CURTAIN = RN_Q.get('fast') === '1' && !!START;
+let up = false, main = false;
+const arrive = () => { if (!up) { up = true; RN_APP.set('run'); } };
 RN_APP.on((s, from) => keep(`${secs()} app: ${from} -> ${s}`));
 // A download whose bytes are counted on the gate. Compressed transfers have no usable total, so it shows megabytes.
 async function download(url, what) {
@@ -191,13 +198,17 @@ async function download(url, what) {
       // 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift), the next one when a race comes back to the menu
       const jump = RN_Q.get('jump');
       if (jump) m.ENV.RN_JUMP = jump;
-      // No scripted keys in a normal visit (OWNER 2026-11-16: the game must never press its own menus). The intro movies and the splash are gone
-      // (PATCH 0x4de395, tools/recomp/patches_launcher.py); the player accepts the profile and picks WORLD on the main menu (host/input.c world_arm).
-      // ?auto=1&pool=1 (test tools only): the old straight entry into WORLD, the menu path of tools/completion.py jump 3:1010; ?keys= or ?jump= take over.
-      // No RETURN after flow 6: in a race RETURN changes the camera (FEEL log 2026-11-10).
-      if (RN_Q.get('auto') === '1' && RN_Q.get('pool') === '1' && !keys && !jump && !NOWORLD) {
-        m.ENV.RN_JUMP = '3:1010';
-        m.ENV.RN_KEYS = '1500@=MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN,1500@=MU_Main_PC:RETURN';
+      // ?start=menu|world|career (OWNER 2026-11-16): the launcher's three entries (web/launcher.js JUGAR, WORLD, CARRERA). The game's own Accept takes the
+      // player there (RN_KEYS, host/input.c) under the launcher's curtain (web/index.html), so no menu is ever seen moving by itself. Without ?start= no key is scripted.
+      // The intro movies and the splash are gone (PATCH 0x4de395, tools/recomp/patches_launcher.py), so the profile screen is first: Enter 1.5 s after it shows,
+      // then twice more 3 s apart unless the main menu is already up (the game loads the last profile; a tap is dropped once MU_Main_PC shows).
+      // world: one Enter on the main menu, then RN_JUMP 3:1010 (the menu path of tools/completion.py). No RETURN after flow 6: in a race it changes the camera (FEEL log 2026-11-10).
+      // career: one UP on the main menu (the cursor starts on Quick Race, docs/re/frontend_menu.md:29; tools/completion.py:34), then Enter = Go Underground. ?keys= or ?jump= take over.
+      if (START && !keys && !jump) {
+        const menu = '1500@=MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN';
+        if (START === 'world' && !NOWORLD) { m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_KEYS = menu + ',1500@=MU_Main_PC:RETURN'; }
+        else if (START === 'career') m.ENV.RN_KEYS = menu + ',1500@=MU_Main_PC:UP,1500@=MU_Main_PC:RETURN';
+        else m.ENV.RN_KEYS = menu + ',3000@!MU_Main_PC:RETURN';
       }
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
       // 1: the clearcoat (OWNER: flat), 2: the sharp clearcoat candidate, 3 (default): live, the 2003 strength with contrast
@@ -224,7 +235,7 @@ async function download(url, what) {
   if (maxChar)
     import('./maxpayne/boot.js').then(m => m.start(M, s => line(s))).catch(e => line('[F-Max] STOP ' + e.message, 'stop'));
   telem = startTelemetry(M, t0, s => line(s));
-  const onFrame = (s, t, ms) => { if (s.present && !up) { up = true; RN_APP.set('run'); } telem?.frame?.(s, t, ms); };
+  const onFrame = (s, t, ms) => { if (s.present && !up) { if (!CURTAIN) arrive(); else if (!arrive.t) arrive.t = setTimeout(arrive, 45000); /* a trip that stalls must not leave the curtain down */ } telem?.frame?.(s, t, ms); };
   startGpu(M, document.getElementById('screen'), s => line(s, 'api'), onFrame).catch(e => line('gpu.js: ' + e.message, 'stop'));
   // RN_STEERLOG (host/input.c): also each key at the page and each present's GPU completion, on the page's clock
   const input = startInput(M, document.getElementById('screen'), /RN_STEERLOG/.test(location.search) ? s => line(s) : null);

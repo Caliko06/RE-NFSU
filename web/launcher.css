@@ -67,6 +67,7 @@ body.leaving .ui { transition: opacity .28s ease-in .12s; opacity: 0; }
 html:not(.calm) .row:active > .lt, html:not(.calm) .item:active > .t { transform: scale(.97); }
 .lt, .item > .t { transition: transform .12s var(--ease), color .12s; transform-origin: right center; }
 /* JUGAR: the first item and the biggest thing on the sheet */
+#sheetA .row, #sheetA .item:not(.go) { min-height: 6.1rem; }   /* the main menu holds JUGAR + seven lines above the help bar */
 .item.go { min-height: 11rem; font-size: 7.4rem; --ink: rgb(150, 200, 218); margin-bottom: 1rem; }
 .item.go.sel { --ink: #fff; }
 .item.go::before { inset: .8rem 0 .8rem 2rem; background: linear-gradient(90deg, transparent, rgba(92, 150, 184, .4) 30%); }

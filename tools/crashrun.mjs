@@ -9,7 +9,7 @@ import { join } from 'node:path';
 const secs = Math.min(1800, Math.max(60, Number(process.env.RN_SECS || 600)));
 const spawnAt = process.argv[2] || 'RN_SPAWN=-1053.7:993.1:-1.5:9526';
 const port = process.env.RN_PORT || '5183', cdp = process.env.RN_CDP_PORT || '9385';
-const url = `http://127.0.0.1:${port}/?play=1&pool=1&auto=1&mode=remaster&mute=1&env=RN_CRASHWATCH=1,${spawnAt},RN_FREELOG=1${process.env.RN_EXTRA ? ',' + process.env.RN_EXTRA : ''}`;   // RN_EXTRA=RN_CWFILL=1: the full-cache stress test
+const url = `http://127.0.0.1:${port}/?play=1&pool=1&start=world&mode=remaster&mute=1&env=RN_CRASHWATCH=1,${spawnAt},RN_FREELOG=1${process.env.RN_EXTRA ? ',' + process.env.RN_EXTRA : ''}`;   // RN_EXTRA=RN_CWFILL=1: the full-cache stress test
 mkdirSync('build', { recursive: true });
 rmSync('build/save-headless', { recursive: true, force: true });
 const gate = spawnSync('/Users/angeldamian/.claude/hooks/macgate.sh', [], { stdio: 'inherit', timeout: 60000 });

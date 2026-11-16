@@ -7,7 +7,7 @@ import { join } from 'node:path';
 const out = process.argv[2] || 'build/loadfast/before';
 mkdirSync(out, { recursive: true });
 const port = Number(process.env.RN_CDP_PORT || 9382);
-const url = process.env.RN_URL || 'http://127.0.0.1:5181/?play=1&pool=1&auto=1&mode=remaster&mute=1';
+const url = process.env.RN_URL || 'http://127.0.0.1:5181/?play=1&pool=1&start=world&mode=remaster&mute=1';
 const profile = mkdtempSync(join(tmpdir(), 'rn-loadfast-'));
 const chrome = spawn('/Users/angeldamian/.local/bin/chrome-bot', ['--headless=new', '--mute-audio', '--enable-unsafe-webgpu',
   '--no-first-run', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });

@@ -16,7 +16,6 @@
     'Sonido y controles': 'Sound and controls', 'Volumen, teclado, mando y pantalla táctil.': 'Volume, keyboard, gamepad and touch screen.',
     'Partidas': 'Saves',
     // options
-    'World: una sola ciudad abierta con todo desbloqueado. Carrera: el modo Underground de 2003.': 'World: one open city with everything unlocked. Career: the Underground mode of 2003.',
     'Carrera': 'Career', 'Versión': 'Version', 'Original = el juego como salió. Remaster = con texturas y efectos extra.': 'Original = the game as it shipped. Remaster = with extra textures and effects.',
     'Progreso de carrera': 'Career progress', 'Progreso': 'Progress', 'Normal: eventos se abren uno por uno. Todo abierto: sin candados.': 'Normal: events open one by one. All open: no locks.',
     'Todo abierto': 'All open', 'Normal (como salió)': 'Normal (as shipped)',
@@ -62,6 +61,8 @@
     'El juego como salió, sin extras.': 'The game as it shipped, no extras.', 'Texturas y efectos mejorados.': 'Better textures and effects.',
     'Equipo modesto / iPad': 'Modest machine / iPad', 'Original a 30 fps, sin efectos extra.': 'Original at 30 fps, no extra effects.',
     // web/launcher.js
+    'Abre el juego en su menú principal.': 'Opens the game on its main menu.', 'Directo a la ciudad abierta: una sola ciudad, todo desbloqueado.': 'Straight into the open city: one city, everything unlocked.',
+    'Directo a Go Underground, la carrera de 2003. Izquierda o derecha: todo abierto o el progreso normal. Enter para entrar.': 'Straight into Go Underground, the 2003 career. Left or right: everything open or the normal progress. Enter to start.',
     'Menú': 'Menu', 'Menú principal': 'Main menu', 'Jugar': 'Play', 'Opciones': 'Options', 'Volver': 'Back', 'Guías': 'Guides', 'Calidad': 'Quality',
     'A mano': 'Custom', 'Ajustes tocados uno por uno en Avanzado.': 'Settings changed one by one in Options.',
     'Controles': 'Controls', 'Teclas, mando y pantalla táctil. Todo se puede reasignar.': 'Keys, gamepad and touch screen. Everything can be remapped.', 'Ver': 'View', 'Abrir': 'Open',
@@ -69,8 +70,6 @@
     'Guardar copia': 'Save a backup', 'Descarga tus partidas de este navegador en un archivo.': 'Downloads the saves of this browser as one file.', 'Bajar': 'Download', 'Listo': 'Done', 'Sin partidas': 'No saves',
     'Restaurar copia': 'Restore a backup', 'Carga un archivo de partidas descargado antes.': 'Loads a save file you downloaded before.', 'Elegir': 'Choose', 'Restaurado': 'Restored', 'Archivo inválido': 'Invalid file',
     'Ajustes de fábrica': 'Factory settings', 'Todos los ajustes vuelven a su valor inicial. Las partidas no se tocan.': 'Every setting goes back to its first value. Saves are not touched.', 'Borrar': 'Reset', 'Hecho': 'Done',
-    'World: una sola ciudad, todo abierto': 'World: one city, everything open', 'Carrera: el modo Underground de 2003': 'Career: the Underground mode of 2003',
-    ', versión original': ', original version', '. Enter o clic para entrar.': '. Enter or click to start.',
     'Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.': 'Picture, camera, performance, gameplay, keys and saves.', 'Vuelve al menú principal.': 'Back to the main menu.',
     'Cómo jugar, controles, el modo World y cómo se hizo.': 'How to play, controls, World mode and how it was made.',
     'Este navegador no tiene WebGPU. Usa Chrome o Edge.': 'This browser has no WebGPU. Use Chrome or Edge.',

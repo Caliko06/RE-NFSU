@@ -9,7 +9,7 @@
   const active = () => L.presets.find(p => { const s = stateOf(p); return Object.keys(s).every(k => s[k] === sel[k]); });
   // mode is not sent: L.save stores it for web/mode.js, and a ?mode= in the URL would pin it and break F4 (same as web/launcher.js)
   // Phones start light on every visit (web/mode.js RN_PHONE): the panel shows what runs, and a choice made here lasts this visit only (mode and fx in sessionStorage rn_q).
-  if (RN_PHONE && !new URLSearchParams(RN_SEARCH).has('mode')) Object.assign(sel, stateOf(L.presets.find(p => p.id === 'modesto')), { vol: sel.vol, play: sel.play });
+  if (RN_PHONE && !new URLSearchParams(RN_SEARCH).has('mode')) Object.assign(sel, stateOf(L.presets.find(p => p.id === 'modesto')), { vol: sel.vol });
   const go = () => {
     L.save(sel);
     const q = L.query(sel).split('&').filter(x => x !== 'play=1' && (RN_PHONE || !x.startsWith('mode='))).concat(RN_PHONE && sel.fx !== '0' ? ['fx=1'] : []).join('&');
@@ -45,13 +45,11 @@
     const add = (tag, text, cls, fn, href) => { const e = Object.assign(document.createElement(tag), { textContent: (window.RN_TR || (s => s))(text) }); if (cls) e.className = cls; if (fn) e.onclick = fn; if (href) e.href = href; e.tabIndex = -1; panel.appendChild(e); };
     if (RN_PHONE) {
       add('h4', 'Perfil');
-      for (const p of L.presets) add('button', p.label, a === p ? 'sel' : '', () => { Object.assign(sel, stateOf(p), { vol: sel.vol, play: sel.play }); go(); });
+      for (const p of L.presets) add('button', p.label, a === p ? 'sel' : '', () => { Object.assign(sel, stateOf(p), { vol: sel.vol }); go(); });
     } else {      // computers: the launcher's first board (web/launcher.js), same options, same storage
       const set = (id, v) => () => { sel[id] = v; go(); }, q = L.qualityOf(sel);
       add('h4', 'Calidad' + (q ? '' : ' (a mano)'));
       for (const x of L.quality) add('button', x.label, q === x ? 'sel h' : 'h', () => { Object.assign(sel, x.set); go(); });
-      add('h4', 'Juego');
-      add('button', 'World', sel.play === '1' ? 'sel h' : 'h', set('play', '1')); add('button', 'Carrera', sel.play === '0' ? 'sel h' : 'h', set('play', '0'));
       add('h4', 'Versión');
       add('button', 'Remaster', sel.mode === 'remaster' ? 'sel h' : 'h', set('mode', 'remaster')); add('button', 'Original 2003', sel.mode === 'original' ? 'sel h' : 'h', set('mode', 'original'));
     }
