@@ -181,9 +181,9 @@ def compile_web():
     # main() runs in a worker (PROXY_TO_PTHREAD) so guest threads and waits may block.
     subprocess.run(["emcc", "-O2", "-pthread", "-Ihost", f"-I{GEN}", *(["-DRN_STW"] if stw else []), *HOST, *objs, "-o", "web/out/speed.js",
                     "-sINITIAL_MEMORY=2048MB", "-sSTACK_SIZE=16MB", "-sDEFAULT_PTHREAD_STACK_SIZE=16MB",
-                    "-sPROXY_TO_PTHREAD=1", "-sPTHREAD_POOL_SIZE=8", "-sEXIT_RUNTIME=1",
+                    "-sPROXY_TO_PTHREAD=1", "-sPTHREAD_POOL_SIZE=12", "-sEXIT_RUNTIME=1",
                     "-sMODULARIZE=1", "-sEXPORT_NAME=Speed", "-sEXPORTED_RUNTIME_METHODS=FS,ENV,HEAPU8,HEAP32,HEAPU32,HEAPF64",
-                    "-sEXPORTED_FUNCTIONS=_main,_rn_gpu_mailbox,_rn_input_ring,_rn_audio_ring,_rn_telem_addr,_rn_stab_addr,_rn_tune_addr,_rn_mem_mb,_rn_mc_state,_rn_gps_addr",
+                    "-sEXPORTED_FUNCTIONS=_main,_rn_gpu_mailbox,_rn_input_ring,_rn_audio_ring,_rn_telem_addr,_rn_stab_addr,_rn_tune_addr,_rn_mem_mb,_rn_mc_state,_rn_gps_addr,_rn_load_addr",
                     "-sFORCE_FILESYSTEM=1", "-sENVIRONMENT=web,worker",
                     # RN_PROF=1: keep function names for a CPU profile (tools/webcheck.mjs RN_PROFILE); same code.
                     *(["--profiling-funcs"] if os.environ.get("RN_PROF") else [])], check=True)

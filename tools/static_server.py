@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Plain static server for dist/: files, Range, COOP/COEP/CORP headers, nothing else (no /log, /save, /plan). Test stand-in for a real host.
-Usage: python3 tools/static_server.py [port=5181] [dir=dist]"""
-import functools, http.server, os, re, sys
+Usage: python3 tools/static_server.py [port=5181] [dir=dist]
+RN_RTT_MS=80: every answer waits that long first, the round trip of a real visit (live 2026-11-16: 75 ms a request; localhost hides it)."""
+import functools, http.server, os, re, sys, time
+
+RTT = float(os.environ.get("RN_RTT_MS", 0)) / 1000
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5181
 DIR = os.path.abspath(sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dist"))
@@ -19,6 +22,8 @@ class H(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = self.translate_path(self.path)
+        if RTT:
+            time.sleep(RTT)
         m = re.fullmatch(r"bytes=(\d+)-(\d*)", self.headers.get("Range", ""))
         if m and os.path.isfile(path):
             size = os.path.getsize(path)

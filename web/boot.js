@@ -77,12 +77,14 @@ function line(s, cls) {
   // The launcher's curtain (?fast=1 with ?start=, web/index.html) lifts on arrival: the main menu, the race (flow state 6), or the screen after the main menu (career).
   else if (CURTAIN && !up) {
     if (/flow fe .*MU_Main_PC\.fng/.test(s)) { if (START === 'menu') arrive(); else main = true; }
-    else if (START === 'world' ? /flow state 6\//.test(s) : START === 'career' && main && /flow fe /.test(s)) arrive();
+    else if (START === 'world' ? /flow state 6\//.test(s) : START === 'career' && main && /flow fe /.test(s)) cityThen(arrive);
   }
 }
 const START = RN_Q.get('start'), CURTAIN = RN_Q.get('fast') === '1' && !!START;
 let up = false, main = false;
 const arrive = () => { if (!up) { up = true; RN_APP.set('run'); } };
+// WORLD: the curtain stays until the UG2 city is on the GPU (web/ug2/ug2world.js state), so the first seconds of driving do not pay for its upload; 20 s at most.
+const cityThen = f => { const t1 = performance.now(), w = () => START !== 'world' || !window.Ug2 || RN_Q.get('ug2') === '0' || /ready|failed|nofile/.test(Ug2.state) || performance.now() - t1 > 20000 ? f() : setTimeout(w, 100); w(); };
 RN_APP.on((s, from) => keep(`${secs()} app: ${from} -> ${s}`));
 // A download whose bytes are counted on the gate. Compressed transfers have no usable total, so it shows megabytes.
 async function download(url, what) {
@@ -153,7 +155,9 @@ async function download(url, what) {
       if (RN_Q.get('fps') === '30') m.ENV.RN_FPS = '30';
       // Phones and tablets have no WORLD (OWNER 2026-11-15: WORLD is for computers; host/openworld.c world_off). ?noworld=0|1 says otherwise.
       if (NOWORLD) m.ENV.RN_NOWORLD = '1';
-      if (RN_PHONE) m.ENV.RN_RANGEMB = '16';   // host/files.c: the cache of fetched ranges, per reading thread (64 MB elsewhere)
+      if (RN_PHONE) m.ENV.RN_RANGEMB = '16';   // host/files.c: the cache of fetched pieces (256 MB elsewhere)
+      // host/files.c: helper threads bring what this entry always reads (web/entry_hint.tsv) while the engine boots and the menus pass. Not on phones (the 16 MB cache).
+      else m.ENV.RN_PREFETCH = START === 'world' && !NOWORLD ? 'world' : 'boot';
       if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
       for (const kv of (RN_Q.get('env') || '').split(',').filter(Boolean)) {
@@ -205,9 +209,9 @@ async function download(url, what) {
       // world: one Enter on the main menu, then RN_JUMP 3:1010 (the menu path of tools/completion.py). No RETURN after flow 6: in a race it changes the camera (FEEL log 2026-11-10).
       // career: one UP on the main menu (the cursor starts on Quick Race, docs/re/frontend_menu.md:29; tools/completion.py:34), then Enter = Go Underground. ?keys= or ?jump= take over.
       if (START && !keys && !jump) {
-        const menu = '1500@=MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN';
-        if (START === 'world' && !NOWORLD) { m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_KEYS = menu + ',1500@=MU_Main_PC:RETURN'; }
-        else if (START === 'career') m.ENV.RN_KEYS = menu + ',1500@=MU_Main_PC:UP,1500@=MU_Main_PC:RETURN';
+        const menu = '800@=MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN';
+        if (START === 'world' && !NOWORLD) { m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:RETURN'; }
+        else if (START === 'career') m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:UP,800@=MU_Main_PC:RETURN';
         else m.ENV.RN_KEYS = menu + ',3000@!MU_Main_PC:RETURN';
       }
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
@@ -245,6 +249,14 @@ async function download(url, what) {
   startTune(M);
   startAudio(M, s => line(s)).catch(e => line('audio.js: ' + e.message, 'stop'));
   window.RN_M = M;                          // for checks from the console or tools/webcheck.mjs
+  // The loading line: megabytes the prefetch has brought of what it was asked (host/files.c rn_load, KB), while the curtain or the gate is up.
+  const loadTick = setInterval(() => {
+    if (RN_APP.state !== 'load') { if (RN_APP.state !== 'check') clearInterval(loadTick); return; }
+    const a = M._rn_load_addr?.() >>> 0, v = a ? new Uint32Array(M.HEAPU8.buffer, a, 2) : null;
+    if (!v || !v[0]) return;
+    if (v[1] < v[0]) RN_APP.say(`${RN_TR('Cargando')} ${v[1] >> 10} / ${v[0] >> 10} MB`, v[1] / v[0]);
+    else RN_APP.say(RN_TR(START === 'world' ? 'Entrando a la ciudad…' : 'Arrancando…'), 1);
+  }, 200);
   // Memory line when it moves by 16 MB or more (host/win32.c rn_mem_mb): what an iPhone tab (~1.5 GB, then iOS kills it) holds.
   let memLast = '';
   setInterval(() => {

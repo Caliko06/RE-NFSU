@@ -19,8 +19,8 @@ const RN_APP = (() => {
       app.state = s;
       for (const f of subs) f(s, from, detail);
     },
-    // What the gate says while the state is check or load (web/boot.js: the download counter, the boot).
-    say(text) { note = text; render(); },
+    // What the gate says while the state is check or load (web/boot.js: the download counter, the boot); part = 0..1 draws the line of real progress under it.
+    say(text, part = null) { note = text; frac = part; render(); },
   };
 
   // A stop line of the page log -> what a player can do about it.
@@ -40,6 +40,7 @@ const RN_APP = (() => {
       font: italic 700 clamp(14px, 1.5vw, 20px) "Avenir Next Condensed", "DIN Condensed", "Bahnschrift", "Roboto Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif; }
     #gate.load { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 7vh; letter-spacing: .2em; text-transform: uppercase;
       text-shadow: 0 0 .9em rgba(255,47,168,.45), 0 2px 8px #000; font-variant-numeric: tabular-nums; }
+    #gate.load i { position: absolute; left: 30vw; right: 30vw; bottom: calc(7vh - 14px); height: 2px; transform-origin: 0 50%; background: linear-gradient(90deg, #ff2fa8, #b9c3ec); box-shadow: 0 0 10px rgba(255,47,168,.6); }
     #gate.card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; pointer-events: auto;
       background: radial-gradient(120% 90% at 50% 0%, #1a1030 0%, #05080d 70%); }
     #gate h2 { margin: 0; font-size: clamp(20px, 3.2vw, 34px); letter-spacing: .12em; text-transform: uppercase; color: #fff; text-shadow: 0 0 .9em rgba(255,47,168,.45); }
@@ -58,10 +59,10 @@ const RN_APP = (() => {
   document.body.appendChild(gate);
   const el = (tag, text, cls) => { const e = Object.assign(document.createElement(tag), { textContent: text }); if (cls) e.className = cls; return e; };
 
-  let note = 'Cargando…', why = '', shown = '';
+  let note = 'Cargando…', frac = null, why = '', shown = '';
   function render() {
     const s = app.state;
-    const view = s === 'stop' ? 'stop' : upright() ? 'turn' : s === 'check' || s === 'load' ? 'load:' + note : '';
+    const view = s === 'stop' ? 'stop' : upright() ? 'turn' : s === 'check' || s === 'load' ? 'load:' + note + (frac === null ? '' : '|' + Math.round(frac * 200)) : '';
     if (view === shown) return;
     shown = view;
     gate.replaceChildren();
@@ -77,7 +78,10 @@ const RN_APP = (() => {
     } else if (view === 'turn') {
       gate.innerHTML = '<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="20" width="36" height="20" rx="4"/><path d="M14 13a14 14 0 0 1 20 0"/><path d="M34 7v6h-6"/></svg>';
       gate.append(el('h2', 'Gira el teléfono'), el('p', 'El juego es horizontal y espera en pausa.' + (document.documentElement.requestFullscreen ? ' Toca para pantalla completa.' : ' Si no gira, quita el bloqueo de rotación.')));
-    } else if (view) gate.textContent = note;
+    } else if (view) {
+      gate.textContent = note;
+      if (frac !== null) { const b = el('i'); b.style.transform = `scaleX(${Math.max(0, Math.min(1, frac))})`; gate.append(b); }
+    }
   }
 
   // run <-> paused follows the page: hidden, or a phone held upright.

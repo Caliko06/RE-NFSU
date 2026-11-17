@@ -1,7 +1,9 @@
 // Read-only access to the game folder (C:\NFSU = game/) and the save folder (what the game keeps under
 // CSIDL_COMMON_APPDATA\NFS Underground = save/ of this repo). Names match without case, like NTFS.
-// Native: the folder on disk. Web: tools/serve.py; the game thread reads byte ranges with synchronous
-// XHR (allowed in its worker), through a read-ahead buffer, so only what the game opens is fetched.
+// Native: the folder on disk. Web: the reading thread fetches byte ranges with synchronous XHR (allowed in its worker).
+// Over the internet a request costs a round trip (live 2026-11-16: 516 requests in a row at 75 ms = most of the 65 s into
+// WORLD), so a file up to WHOLE_MAX comes whole in one request, the pieces are kept for every thread (blks), and helper
+// threads bring ahead what the entry is known to open (gf_prefetch: web/entry_hint.tsv and the pool's cars).
 #include <ctype.h>
 #include <sched.h>
 #include <stdlib.h>
@@ -15,22 +17,26 @@
 #define AHEAD_MAX (4u << 20)
 // Save files live whole in memory (data): changed there, written back whole by gf_flush and gf_close.
 typedef struct {
-    int used, save, dirty, busy;
+    int used, save, dirty;
     uint64_t size, cap;
     char real[512];
     FILE *f;
-    uint8_t *buf, *data;
-    uint64_t buf_off, next;               // next: where the last request ended
-    uint32_t buf_len, buf_cap, ahead;
+    uint8_t *data;
+    uint64_t next;                        // where the last request ended
+    uint32_t ahead;
 } GFile;
 static GFile files[MAXF];
 static char root[1024], save_root[1024];
 
+#ifdef __EMSCRIPTEN__
+static void files_prefetch_start(void);
+#endif
 void files_set_root(const char *dir) {
     snprintf(root, sizeof root, "%s", dir);
 #ifdef __EMSCRIPTEN__
     (void)dir;
     snprintf(save_root, sizeof save_root, "/save");               // web/saves.js mounts it in memory and keeps it in the browser (IndexedDB)
+    files_prefetch_start();
 #else
     snprintf(save_root, sizeof save_root, "%s/../save", dir);
     mkdir(save_root, 0755);
@@ -106,20 +112,10 @@ EM_JS(int, web_list, (const char *rel, char *out, int outsz), {
     return seen.size;
 });
 // real is "game/<path>".
-EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n, int cap_mb), {
-    // Handles reopen the same immutable game file (WORLD CARS_TEXTURES especially).
-    // Keep recent fetched ranges across handles, rather than discarding them at gf_close.
-    var path = UTF8ToString(real), cache = Module.rnRanges ||= new Map();
-    for (var [key, r] of cache) {
-        if (r.path === path && off >= r.off && off + n <= r.off + r.data.length) {
-            HEAPU8.set(r.data.subarray(off - r.off, off - r.off + n), dst);
-            cache.delete(key); cache.set(key, r);
-            return n;
-        }
-    }
-    // The game has no answer to a failed disc read (it waits on its loading screen), and a play over the internet makes hundreds
-    // to thousands of these requests: a dropped one (a phone changing cell, a 5xx at the edge) is asked again after 0.3, 1, 2, 4 s.
-    var x, waits = [300, 1000, 2000, 4000];
+EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
+    // The game has no answer to a failed disc read (it waits on its loading screen), and a play over the internet makes
+    // hundreds of these requests: a dropped one (a phone changing cell, a 5xx at the edge) is asked again after 0.3, 1, 2, 4 s.
+    var path = UTF8ToString(real), x, waits = [300, 1000, 2000, 4000];
     for (var t = 0; ; t++) {
         try {
             x = new XMLHttpRequest();
@@ -135,18 +131,17 @@ EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n, int cap
     }
     var a = new Uint8Array(x.response);
     HEAPU8.set(a, dst);
-    // cap_mb (64, phones 16: RN_RANGEMB) per reading worker; streams remain ranged, including all music.
-    var cap = cap_mb * 1048576;
-    if (a.length <= cap) {
-        var used = Module.rnRangeBytes || 0;
-        while (used + a.length > cap && cache.size) {
-            var first = cache.keys().next().value;
-            used -= cache.get(first).data.length; cache.delete(first);
-        }
-        cache.set(path + ':' + off + ':' + a.length, { path: path, off: off, data: a });
-        Module.rnRangeBytes = used + a.length;
-    }
     return a.length;
+});
+// A small text file of the site into out; its length, or -1.
+EM_JS(int, web_text, (const char *url, char *out, int cap), {
+    try {
+        var x = new XMLHttpRequest();
+        x.open('GET', UTF8ToString(url), false);
+        x.send();
+        if (x.status !== 200) return -1;
+        return stringToUTF8(x.responseText, out, cap);
+    } catch (e) { return -1; }
 });
 #endif
 
@@ -235,34 +230,139 @@ uint64_t gf_size(int id) { return files[id].size; }
 void gf_close(int id) {
     gf_flush(id);
     if (files[id].f) fclose(files[id].f);
-    free(files[id].buf);
     free(files[id].data);
     files[id].used = 0;
 }
-// Reads up to n bytes at off; returns the count (short at the end of the file), -1 on an I/O error.
 #ifdef __EMSCRIPTEN__
-// One request to the server, counted for the telemetry. The callers hold the GIL; ReadFile blocks only the calling
-// thread on Windows, so the request runs without it and the other guest threads go on (the main loop drew nothing
-// while the file thread 0x63e4d0 waited for the server: 1.1 s of the menu->race load, telemetry 2026-10-24).
-// g->busy keeps a second thread off the same file (its read-ahead buffer) until the request is back (gf_read).
-static int timed_read(GFile *g, uint64_t at, uint8_t *dst, uint32_t n) {
-    static int cap_mb;   // web/boot.js: RN_RANGEMB=16 on phones and tablets
-    if (!cap_mb) { const char *e = getenv("RN_RANGEMB"); cap_mb = e && atoi(e) > 0 ? atoi(e) : 64; }
-    g->busy = 1;
-    gil_release();
-    uint64_t t0 = now_us();
-    int r = web_read(g->real, (double)at, dst, (int)n, cap_mb);
-    uint64_t t1 = now_us();
-    gil_acquire();
-    g->busy = 0;
-    rn_telem.read_ms += (double)(t1 - t0) / 1000;
-    rn_telem.reads++;
-    rn_telem.read_kb += (r > 0 ? (uint32_t)r : 0) >> 10;
-    // A request this slow waited for a connection or the server (a movie or a track stream read as it plays).
-    if (t1 - t0 > 100000) rn_log("files: slow read %s at %llu, %u bytes, %.0f ms", g->real, (unsigned long long)at, n, (t1 - t0) / 1000.0);
-    return r;
+#include <pthread.h>
+// ---- web: the fetched pieces of the game files, shared by every reading thread ------------------
+#define WHOLE_MAX (8u << 20)   // live capture 2026-11-16: 382 of 516 requests were pieces of files this small (car GEOMETRY 5.5 MB in 13 steps)
+#define NBLK 1024
+typedef struct { char real[256]; uint64_t off; uint32_t len, tick; uint8_t *data; int state; } Blk;   // state: 0 free, 1 on its way, 2 ready
+static Blk blks[NBLK];
+static pthread_mutex_t blk_mu = PTHREAD_MUTEX_INITIALIZER;   // blks, the prefetch queue; copies out of a piece run under it, so a piece is never freed mid-copy
+static uint64_t blk_bytes, blk_cap;
+static uint32_t blk_tick;
+static uint32_t rn_load[2];    // KB the prefetch was asked for, KB it has brought: the page's loading bar (web/boot.js)
+uint32_t *rn_load_addr(void) { return rn_load; }
+
+// Under blk_mu: the piece, ready or on its way, that holds byte `at` of the file.
+static Blk *blk_at(const char *real, uint64_t at) {
+    for (Blk *b = blks; b < blks + NBLK; b++)
+        if (b->state && at >= b->off && at - b->off < b->len && !strcmp(b->real, real)) return b;
+    return 0;
+}
+// Under blk_mu: a slot marked "on its way". The least recently used ready pieces go first when the cap or the table is full.
+static Blk *blk_new(const char *real, uint64_t off, uint32_t len) {
+    if (!blk_cap) { const char *e = getenv("RN_RANGEMB"); blk_cap = (uint64_t)(e && atoi(e) > 0 ? atoi(e) : 256) << 20; }   // web/boot.js: 16 on phones and tablets
+    if (strlen(real) >= sizeof blks->real) return 0;
+    for (;;) {
+        Blk *spare = 0, *old = 0;
+        for (Blk *b = blks; b < blks + NBLK; b++) {
+            if (!b->state) spare = b;
+            else if (b->state == 2 && (!old || b->tick < old->tick)) old = b;
+        }
+        if (spare && (blk_bytes + len <= blk_cap || !old)) {
+            snprintf(spare->real, sizeof spare->real, "%s", real);
+            spare->off = off; spare->len = len; spare->data = 0; spare->state = 1;
+            blk_bytes += len;
+            return spare;
+        }
+        if (!old) return 0;
+        free(old->data);
+        blk_bytes -= old->len;
+        old->state = 0;
+    }
+}
+// One request to the server, on the calling thread, outside blk_mu. 0 when the piece is ready.
+static int blk_fetch(Blk *b) {
+    uint8_t *p = malloc(b->len);
+    int r = p ? web_read(b->real, (double)b->off, p, (int)b->len) : -1;
+    pthread_mutex_lock(&blk_mu);
+    if (r == (int)b->len) { b->data = p; b->tick = ++blk_tick; b->state = 2; }
+    else { free(p); blk_bytes -= b->len; b->state = 0; }
+    pthread_mutex_unlock(&blk_mu);
+    return r == (int)b->len ? 0 : -1;
+}
+
+// ---- web: bringing files ahead of the game, NPRE requests at a time ------------------------------
+#define NPRE 4
+#define NQ 1024
+static struct { char real[256]; uint64_t off; uint32_t len; } preq[NQ];
+static unsigned pre_head, pre_tail;   // under blk_mu
+static int pre_run, pre_on;           // threads alive (under blk_mu); set by RN_PREFETCH
+
+static void *pre_main(void *hint);
+static void pre_spawn(void *hint) {     // under blk_mu, or before any thread
+    pthread_t t; pthread_attr_t a;
+    pthread_attr_init(&a); pthread_attr_setdetachstate(&a, PTHREAD_CREATE_DETACHED);
+    if (!pthread_create(&t, &a, pre_main, hint)) pre_run++;
+}
+static void pre_start(void) { for (int k = pre_run; k < NPRE; k++) pre_spawn(0); }
+static void *pre_main(void *hint) {
+    if (hint) {     // "phase \t path \t offset \t length" lines (tools/entry_hint.py): b = up to the main menu, w = on into WORLD
+        static char text[256 << 10];
+        int n = web_text("/entry_hint.tsv", text, sizeof text);
+        int world = !strcmp((const char *)hint, "world");
+        pthread_mutex_lock(&blk_mu);
+        for (char *l = n > 0 ? text : 0; l && *l; ) {
+            char ph, real[256]; double off, len;
+            if (sscanf(l, "%c\t%255[^\t]\t%lf\t%lf", &ph, real, &off, &len) == 4 && (world || ph == 'b') && pre_tail - pre_head < NQ) {
+                snprintf(preq[pre_tail % NQ].real, 256, "%s", real);
+                preq[pre_tail % NQ].off = (uint64_t)off; preq[pre_tail % NQ].len = (uint32_t)len;
+                pre_tail++;
+                rn_load[0] += (uint32_t)len >> 10;
+            }
+            l = strchr(l, '\n'); if (l) l++;
+        }
+        pre_start();
+        pthread_mutex_unlock(&blk_mu);
+    }
+    for (;;) {
+        pthread_mutex_lock(&blk_mu);
+        if (pre_head == pre_tail && !hint) { pre_run--; pthread_mutex_unlock(&blk_mu); return 0; }   // the hint's thread stays for what comes later
+        Blk *b = 0;
+        uint32_t len = 0;
+        if (pre_head != pre_tail) {
+            unsigned k = pre_head++ % NQ;
+            len = preq[k].len;
+            if (blk_at(preq[k].real, preq[k].off)) rn_load[1] += len >> 10;      // the game got there first
+            else b = blk_new(preq[k].real, preq[k].off, len);
+        }
+        pthread_mutex_unlock(&blk_mu);
+        if (b) { blk_fetch(b); __atomic_add_fetch(&rn_load[1], len >> 10, __ATOMIC_RELAXED); }
+        else if (!len) usleep(20000);
+    }
+}
+// RN_PREFETCH=boot|world (web/boot.js, the launcher's entry): the hint's files start coming while the engine boots.
+static void files_prefetch_start(void) {
+    const char *e = getenv("RN_PREFETCH");
+    if (!e || !*e) return;
+    pre_on = 1;
+    pre_spawn((void *)e);
 }
 #endif
+// A game file the host knows the game is about to open (host/rivals.c: the pool's cars): whole when small, else its head.
+void gf_prefetch(const char *gpath) {
+#ifdef __EMSCRIPTEN__
+    char real[512];
+    uint64_t size = 0;
+    if (!pre_on || lookup(gpath, real, sizeof real, &size) || !size || strlen(real) > 255) return;
+    pthread_mutex_lock(&blk_mu);
+    if (!blk_at(real, 0) && pre_tail - pre_head < NQ) {
+        unsigned k = pre_tail++ % NQ;
+        snprintf(preq[k].real, 256, "%s", real);
+        preq[k].off = 0; preq[k].len = size <= WHOLE_MAX ? (uint32_t)size : AHEAD;
+        rn_load[0] += preq[k].len >> 10;
+        pre_start();
+    }
+    pthread_mutex_unlock(&blk_mu);
+#else
+    (void)gpath;
+#endif
+}
+
+// Reads up to n bytes at off; returns the count (short at the end of the file), -1 on an I/O error.
 int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
     GFile *g = &files[id];
     if (off >= g->size) return 0;
@@ -270,36 +370,53 @@ int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
     if (g->save) { memcpy(dst, g->data + off, n); return n; }
 #ifdef __EMSCRIPTEN__
     if (!g->f) {
-    while (g->busy) { gil_release(); sched_yield(); gil_acquire(); }
     uint32_t done = 0;
     while (done < n) {
         uint64_t at = off + done;
-        if (g->buf && at >= g->buf_off && at < g->buf_off + g->buf_len) {
-            uint32_t k = (uint32_t)(g->buf_off + g->buf_len - at);
+        pthread_mutex_lock(&blk_mu);
+        Blk *b = blk_at(g->real, at);
+        if (b && b->state == 2) {
+            uint32_t k = (uint32_t)(b->off + b->len - at);
             if (k > n - done) k = n - done;
-            memcpy(dst + done, g->buf + (at - g->buf_off), k);
+            memcpy(dst + done, b->data + (at - b->off), k);
+            b->tick = ++blk_tick;
+            pthread_mutex_unlock(&blk_mu);
             done += k;
             continue;
         }
-        // A request costs ~2 ms on top of its bytes (telemetry 2026-10-24: 256 KB in 2.2-3.5 ms), and a track loads
-        // in 256 KB steps. While the reads of a file run on in sequence the read-ahead doubles, up to AHEAD_MAX.
-        uint32_t want = n - done;
-        uint32_t ahead = g->ahead && at == g->next ? (g->ahead < AHEAD_MAX ? 2 * g->ahead : AHEAD_MAX) : AHEAD;
-        g->ahead = ahead;
-        if (want >= ahead) {        // large reads go straight to the destination
-            int r = timed_read(g, at, dst + done, want);
-            if (r <= 0) return -1;
-            done += (uint32_t)r;
-            g->next = at + (uint32_t)r;
+        if (b) {        // another thread is bringing it: the callers hold the GIL, the other guest threads go on meanwhile
+            pthread_mutex_unlock(&blk_mu);
+            gil_release(); usleep(1000); gil_acquire();
             continue;
         }
-        if (g->buf_cap < ahead) { free(g->buf); g->buf = malloc(ahead); g->buf_cap = ahead; g->buf_len = 0; }
-        uint32_t len = g->size - at < ahead ? (uint32_t)(g->size - at) : ahead;
-        int r = timed_read(g, at, g->buf, len);
-        if (r <= 0) return -1;
-        g->buf_off = at;
-        g->buf_len = (uint32_t)r;
-        g->next = at + (uint32_t)r;
+        // A small file comes whole. A big one (a track stream, VINYLS, the music) in the steps the game asks for, at least
+        // 256 KB; while its reads run on in sequence the step doubles, up to AHEAD_MAX.
+        uint64_t from = 0;
+        uint32_t len = (uint32_t)g->size;
+        if (g->size > WHOLE_MAX) {
+            uint32_t want = n - done;
+            g->ahead = g->ahead && at == g->next ? (g->ahead < AHEAD_MAX ? 2 * g->ahead : AHEAD_MAX) : AHEAD;
+            from = at;
+            len = want > g->ahead ? want : g->ahead;
+            if (len > g->size - at) len = (uint32_t)(g->size - at);
+            g->next = at + len;
+        }
+        b = blk_new(g->real, from, len);
+        pthread_mutex_unlock(&blk_mu);
+        if (!b) return -1;
+        // ReadFile blocks only the calling thread on Windows, so the request runs without the GIL and the other guest
+        // threads go on (the main loop drew nothing while the file thread 0x63e4d0 waited: telemetry 2026-10-24).
+        gil_release();
+        uint64_t t0 = now_us();
+        int r = blk_fetch(b);
+        uint64_t t1 = now_us();
+        gil_acquire();
+        rn_telem.read_ms += (double)(t1 - t0) / 1000;
+        rn_telem.reads++;
+        rn_telem.read_kb += len >> 10;
+        // A request this slow waited for a connection or the server (a movie or a track stream read as it plays).
+        if (t1 - t0 > 100000) rn_log("files: slow read %s at %llu, %u bytes, %.0f ms", g->real, (unsigned long long)from, len, (t1 - t0) / 1000.0);
+        if (r) return -1;
     }
     return done;
     }

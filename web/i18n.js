@@ -63,7 +63,7 @@
     // web/launcher.js
     'Abre el juego en su menú principal.': 'Opens the game on its main menu.', 'Directo a la ciudad abierta: una sola ciudad, todo desbloqueado.': 'Straight into the open city: one city, everything unlocked.',
     'Directo a Go Underground, la carrera de 2003. Izquierda o derecha: todo abierto o el progreso normal. Enter para entrar.': 'Straight into Go Underground, the 2003 career. Left or right: everything open or the normal progress. Enter to start.',
-    'Menú': 'Menu', 'Menú principal': 'Main menu', 'Jugar': 'Play', 'Opciones': 'Options', 'Volver': 'Back', 'Guías': 'Guides', 'Calidad': 'Quality',
+    'Menú': 'Menu', 'Menú principal': 'Main menu', 'Jugar': 'Play', 'Opciones': 'Options', 'Volver': 'Back', 'Cargando': 'Loading', 'Entrando a la ciudad…': 'Entering the city…', 'Arrancando…': 'Starting…', 'Guías': 'Guides', 'Calidad': 'Quality',
     'A mano': 'Custom', 'Ajustes tocados uno por uno en Avanzado.': 'Settings changed one by one in Options.',
     'Controles': 'Controls', 'Teclas, mando y pantalla táctil. Todo se puede reasignar.': 'Keys, gamepad and touch screen. Everything can be remapped.', 'Ver': 'View', 'Abrir': 'Open',
     'Teclas y mando': 'Keys and gamepad', 'Clic en una acción y luego la tecla o el botón. También con K dentro del juego.': 'Click an action, then the key or the button. Also with K inside the game.',

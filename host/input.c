@@ -197,10 +197,10 @@ static void script_poll(void) {
             if (taps[k].op == '=' && !on) break;
             taps[k].at_us += now, taps[k].op = taps[k].op == '!' ? '?' : 0;
         }
-        if (!(next_tap & 1) && taps[k].op == '?') {   // due: dropped if the screen came up meanwhile
+        if (!(next_tap & 1) && taps[k].op == '?') {   // dropped as soon as the screen is up (waiting for its due time cost 6 s of the launcher's trip, log 2026-11-16)
+            if (screen_on(taps[k].scr)) { taps[k].op = 0; rn_log("RN_KEYS: tap %u dropped on %s", k, rn_screen); next_tap += 2; continue; }
             if (taps[k].at_us > now) break;
             taps[k].op = 0;
-            if (screen_on(taps[k].scr)) { rn_log("RN_KEYS: tap %u dropped on %s", k, rn_screen); next_tap += 2; continue; }
         }
         uint64_t at = taps[k].at_us + (next_tap & 1 ? taps[k].hold_us : 0);
         if (at > now || ((next_tap & 1) && rn_telem.presents - down_at < 2)) break;

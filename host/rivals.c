@@ -36,6 +36,12 @@ int rn_pool_livery(uint32_t skin, int *car, int *n) {
 static uint32_t neon_ride[NSYN];       // skin hash (ride +0x444) of the SHOW and BOSO rivals: neon_pass animates them
 static const char *CARS[20] = {"GOLF", "FOCUS", "MIATA", "NEON", "CIVIC", "PEUGOT", "CELICA", "ECLIPSE", "RX7", "SUPRA",
     "S2000", "RSX", "IMPREZA", "LANCER", "INTEGRA", "TIBURON", "350Z", "SENTRA", "240SX", "SKYLINE"};
+// The pool picks its cars before the game loads them one after another: their files start coming at once (host/files.c, web only).
+static void car_prefetch(const char *car) {
+    static const char *F[] = {"GEOMETRY.BIN", "TEXTURES.BIN", "VINYLS.BIN"};
+    char p[96];
+    for (int k = 0; k < 3; k++) { snprintf(p, sizeof p, "CARS\\%s\\%s", car, F[k]); gf_prefetch(p); }
+}
 
 typedef struct {
     const char *name;
@@ -495,6 +501,7 @@ static uint32_t rival_ride(Ctx *c) {
             uint32_t skin = ld(c, ride + 0x444, 4) ? ld(c, ride + 0x444, 4) : skin0;
             neon_ride[k] = pe.arch == SHOW || pe.arch == BOSO ? skin : 0;
             rn_log("POOLRIDE %s car %s %s tier %d skin %08x", G(e + 0x73c), CARS[pe.car], ARCH[pe.arch].name, lvl >= 7 ? 3 : 2, skin);
+            car_prefetch(CARS[pe.car]);
         }
         return e;
     }
@@ -536,6 +543,7 @@ static uint32_t rival_ride(Ctx *c) {
             uint32_t ls = pick_p->seed ^ 0x51ed270bu;
             livery_set(skin, pick_p->car, roll(&ls, LIVP[pick_p->arch]) ? livery_of(pick_p->arch, &ls) : -1);
         }
+        car_prefetch(CARS[pick_p->car]);
         if (getenv("RN_RIVALLOG")) {
             float r1; memcpy(&r1, G(ride + 0x428), 4);
             rn_log("rival %u: %s %s %s tier %d rating %.1f -> %.1f", a[6], pick_p->name, CARS[pick_p->car], ARCH[pick_p->arch].name,

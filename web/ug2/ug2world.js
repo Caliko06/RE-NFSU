@@ -59,6 +59,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
   const say = t => line(t);
   const allowed = RN_Q.get('ug2') !== '0';
   let world = false;   // the race's track id is 1010 (scene() reads it before anything else)
+  const EARLY = RN_Q.get('start') === 'world';   // the launcher's WORLD entry (web/boot.js): the city loads while the menus pass under the curtain
   const api = window.Ug2 = { get on() { return allowed && (RN_MODE === 'remaster' || world); }, state: 'idle' };
   const TEXTURED = RN_Q.get('ug2tex') !== '0';
   let device, gpu, loading = false;
@@ -238,12 +239,12 @@ struct O { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
     // WORLD = the race's track id 1010 (host/d3d9.c mc_hook writes it after the matrices, rn_mc.track, 0 outside a race): no load, no draw elsewhere.
     // Read first, so Original turns the pass on by itself (the depth is kept from the next frame) when the menu's WORLD button starts the race.
     world = new Int32Array(speed.HEAPU8.buffer, (speed._rn_mc_state() >>> 0) + TRACK_AT, 1)[0] === WORLD_ID;
-    if (!world || !rt || !ds) return;
-    if (!loading) {
+    if (!loading && (world || EARLY)) {
       loading = true; api.state = 'loading'; say(`ug2: WORLD (track ${WORLD_ID}) in ${RN_MODE} mode, loading the city`);
       load(dev).then(m => { if (m) { try { setup(dev, m); api.state = 'ready'; } catch (e) { api.state = 'failed'; say('ug2 upload: ' + e.message); } } else api.state = 'nofile'; },
         e => { api.state = 'failed'; say('ug2 load: ' + e.message); });
     }
+    if (!world || !rt || !ds) return;
     if (api.state !== 'ready') return;
     const c0 = performance.now();
     // Re-take the heap view every frame: wasm memory can grow.

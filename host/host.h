@@ -165,6 +165,7 @@ int gf_open(const char *gpath);                                // id, or -1 miss
 uint64_t gf_size(int id);
 int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n);
 void gf_close(int id);
+void gf_prefetch(const char *gpath);                         // web: bring a file the game is about to open (host/files.c)
 // Save folder only: create/open for writing (disp = CreateFileA dwCreationDisposition). id, or -1 missing,
 // -2 outside, -3 a directory, -4 exists (CREATE_NEW), -5 read-only (game folder), -6 the folder is missing.
 int gf_create(const char *gpath, int disp, int *existed);
