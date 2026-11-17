@@ -272,7 +272,7 @@
     going = true; save();
     const u = new URLSearchParams(L.query(sel)); u.delete('mode'); u.set('play', '1'); u.set('fast', '1'); u.set('go', '1'); u.set('start', start);
       // mode: stored (web/mode.js); a ?mode= would pin it and break F4
-    snd('accept'); try { window.RN_SND && window.RN_SND.rev(); window.RN_SND && window.RN_SND.fadeOut(900); } catch {}
+    snd('accept'); try { window.RN_SND && window.RN_SND.fadeOut(900); } catch {}
     body.classList.add('leaving');
     await Promise.race([Promise.resolve(scene('confirm')).catch(() => 0), wait(1800)]);
     $('fade').classList.add('on');

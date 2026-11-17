@@ -72,9 +72,10 @@
 // RN_SEARCH = the switches of this visit: this tab's choice (sessionStorage rn_q, written by the launcher's Jugar, web/overlay.js and the
 // mode switch in web/mode.js), else on a computer the saved launcher choice (the mode itself comes from storage, web/mode.js).
 // Phones and tablets start light with nothing saved (web/mode.js RN_PHONE). A query typed in the address still wins (tests, tools/webcheck.mjs).
-// First visit on a computer (nothing saved yet): the launcher is the entry (OWNER 2026-11-15, plan row 10).
+// On a computer the launcher is always the entry (OWNER 2026-11-17: nfsu.cc must open the launcher, not the game). Only a tab that
+// already chose (sessionStorage rn_q: the launcher's JUGAR, the in-game panel, web/mode.js) stays in the game on reload.
 const RN_COARSE = matchMedia('(pointer: coarse)').matches;
-if (!location.search && !RN_COARSE && !localStorage.getItem('rn_launch')) location.replace('launcher.html');
+if (!location.search && !RN_COARSE && sessionStorage.getItem('rn_q') === null) location.replace('launcher.html');
 const RN_SEARCH = location.search || '?' + (sessionStorage.getItem('rn_q') ?? (RN_COARSE ? '' : RN_LAUNCH.query(RN_LAUNCH.load()).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&')));
 </script>
 <script src="mode.js"></script>

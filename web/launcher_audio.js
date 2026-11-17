@@ -1,17 +1,17 @@
-// Launcher sound (WebAudio). window.RN_SND = { play(name), rev(), toggle(), set(on), isOn(), fadeOut(ms), onChange(cb) }.
-// Files (same origin): launcher/v2/sfx/{move,accept,back,tab,idle,rain}.ogg. A missing file is never an error: the four UI
-// sounds fall back to a tiny synthesized tick, idle/rain stay silent. Master gain 0.06, never above 0.1.
+// Launcher sound (WebAudio). window.RN_SND = { play(name), toggle(), set(on), isOn(), fadeOut(ms), onChange(cb) }.
+// Files (same origin): launcher/v2/sfx/{move,accept,back,tab}.ogg. A missing file is never an error: the UI sounds fall back to
+// a tiny synthesized tick. No background loop (OWNER 2026-11-17: the rain and idle engine bed is gone). Master gain 0.06, never above 0.1.
 // Browsers start audio only after a user gesture: the context is made on the first pointer/key/touch (or pad button) press.
 // State is remembered in localStorage 'rn_launch_snd' ('0' = off, anything else = on).
 (() => {
   'use strict';
   const KEY = 'rn_launch_snd', MASTER = 0.06, CAP = 0.1, BASE = 'launcher/v2/sfx/';
-  const LEVEL = { move: 1, accept: 1, back: 1, tab: 1, idle: 0.55, rain: 0.4 };
+  const LEVEL = { move: 1, accept: 1, back: 1, tab: 1 };
   const store = {
     get() { try { return localStorage.getItem(KEY) !== '0'; } catch { return true; } },
     set(on) { try { localStorage.setItem(KEY, on ? '1' : '0'); } catch {} },
   };
-  let on = store.get(), ctx = null, master = null, loops = null, started = false;
+  let on = store.get(), ctx = null, master = null, started = false;
   const raw = {}, bufs = {}, subs = [];
   const gainValue = () => Math.min(CAP, on ? MASTER : 0);
 
@@ -26,24 +26,6 @@
       if (!ab || !ctx) continue;
       try { bufs[n] = await ctx.decodeAudioData(ab.slice(0)); } catch { /* bad file: stay on the fallback */ }
     }
-    if (on) startLoops();
-  }
-
-  function startLoops() {
-    if (loops || !ctx || !bufs.idle && !bufs.rain) return;
-    loops = {};
-    const mk = (name, level) => {
-      if (!bufs[name]) return null;
-      const src = ctx.createBufferSource(), g = ctx.createGain();
-      src.buffer = bufs[name]; src.loop = true;
-      g.gain.value = 0;
-      src.connect(g).connect(master);
-      src.start();
-      g.gain.setTargetAtTime(level, ctx.currentTime + 0.05, 0.8);        // fade in over ~2 s
-      return { src, g, level };
-    };
-    loops.idle = mk('idle', LEVEL.idle);
-    loops.rain = mk('rain', LEVEL.rain);
   }
 
   function init() {
@@ -98,37 +80,23 @@
     src.start();
   }
 
-  // Accept revs the idle engine: pitch up fast, settle back slowly.
-  function rev() {
-    if (!on || !ctx || !loops || !loops.idle) return;
-    const { src, g, level } = loops.idle, t = ctx.currentTime;
-    src.playbackRate.cancelScheduledValues(t);
-    src.playbackRate.setValueAtTime(src.playbackRate.value, t);
-    src.playbackRate.linearRampToValueAtTime(1.75, t + 0.16);
-    src.playbackRate.exponentialRampToValueAtTime(1, t + 0.95);
-    g.gain.cancelScheduledValues(t);
-    g.gain.setValueAtTime(g.gain.value, t);
-    g.gain.linearRampToValueAtTime(level * 1.8, t + 0.16);
-    g.gain.linearRampToValueAtTime(level, t + 0.95);
-  }
-
   function set(v) {
     on = !!v;
     store.set(on);
     if (ctx) {
       master.gain.setTargetAtTime(gainValue(), ctx.currentTime, 0.04);
-      if (on) { ctx.resume().catch(() => {}); startLoops(); }
+      if (on) ctx.resume().catch(() => {});
     }
     for (const f of subs) { try { f(on); } catch {} }
   }
 
   window.RN_SND = {
-    play, rev, set,
+    play, set,
     toggle() { set(!on); return on; },
     isOn: () => on,
     onChange: f => { subs.push(f); },
     init,
-    state: () => ({ on, ctx: ctx ? ctx.state : 'none', gain: master ? +master.gain.value.toFixed(3) : 0, files: Object.keys(bufs), loops: loops ? Object.keys(loops).filter(k => loops[k]) : [] }),
+    state: () => ({ on, ctx: ctx ? ctx.state : 'none', gain: master ? +master.gain.value.toFixed(3) : 0, files: Object.keys(bufs) }),
     fadeOut(ms = 500) { if (ctx && master) master.gain.setTargetAtTime(0, ctx.currentTime, ms / 3000); },
   };
 })();
