@@ -65,7 +65,7 @@
     { id: 'vol', group: 'controles', label: 'Volumen', simple: true, slider: true, help: 'Volumen general del juego. Música y efectos por separado están en el menú del juego.',
       key: 'vol', type: 'choice', values: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'].map(v => T(v, v + ' %')), def: '100', modes: BOTH, src: 'web/audio.js' },
 
-    { id: 'traffic', group: 'jugabilidad', label: 'Tráfico en la ciudad', help: 'Cuántos coches civiles circulan en World.',
+    { id: 'traffic', group: 'jugabilidad', label: 'Tráfico', help: 'Cuántos coches civiles circulan en Free Run.',
       key: 'traffic', type: 'choice', values: [T('0', 'Sin tráfico'), T('6', 'Poco'), T('13', 'Normal'), T('15', 'Mucho')], def: '13', modes: REM, src: 'host/free.c:20,166' },
     { id: 'ai', group: 'jugabilidad', label: 'Rivales con personalidad', help: 'Nerviosos, limpios o agresivos. Apagado: corren como en 2003.',
       key: 'ai', type: 'toggle', values: OFF_ON, def: '1', modes: REM, src: 'web/boot.js, host/rivals.c' },
@@ -109,7 +109,6 @@
     const s = { ...defaults(), ...sel };
     const mode = valid(byId.mode, s.mode) ? s.mode : 'original';
     const parts = ['play=1', 'mode=' + mode];
-    if (!coarse()) parts.push('pool=1');   // the car pool look of WORLD (web/boot.js RN_POOL), the default on computers; the launcher's CARRERA drops it (web/launcher.js). Phones have no WORLD
     for (const o of opts) {
       if (o.id === 'mode' || !o.modes.includes(mode)) continue;
       const v = valid(o, s[o.id]) ? s[o.id] : o.def;

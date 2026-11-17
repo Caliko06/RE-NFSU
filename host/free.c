@@ -82,7 +82,7 @@ static uint32_t names;           // NRIV_MAX guest strings of 16 bytes: 0x5809c0
 static uint32_t rnd(uint32_t *s) { uint32_t x = *s; x ^= x << 13; x ^= x >> 17; x ^= x << 5; return *s = x ? x : 0x9e3779b9u; }
 static uint32_t ghash(Ctx *c, uint32_t p) { uint32_t h = 0xffffffffu; for (uint8_t b; (b = c->mem[p]); p++) h = h * 33 + b; return h; }
 static uint32_t nhash(const char *p) { uint32_t h = 0xffffffffu; for (; *p; p++) h = h * 33 + (uint8_t)*p; return h; }
-extern int rn_tex_overlay;      // host/openworld.c: Cars/TEXTURES.BIN came from the overlay
+extern int rn_tex_overlay;      // host/trackfiles.c: Cars/TEXTURES.BIN came from the overlay
 static uint32_t preset_named(Ctx *c, uint32_t h) {   // the game's preset list 0x748844 (0x4b2640 finds them the same way)
     for (uint32_t p = ld(c, 0x748844, 4); p && p != 0x748844; p = ld(c, p, 4))
         if (ghash(c, p + 0x28) == h) return p;
@@ -1242,9 +1242,9 @@ static uint32_t free_jumpcam(Ctx *c) {
 }
 
 uint32_t mode_menu(Ctx *c), mode_switch(Ctx *c);
-uint32_t world_rows(Ctx *c), world_lang(Ctx *c), world_widx(Ctx *c), world_arm(Ctx *c);   // host/openworld.c: the WORLD entry of the Free Run list (PATCH 0x7007ec, 0x700850)
+uint32_t coll_widx(Ctx *c);   // host/trackfiles.c: the collision index loader (PATCH 0x441423)
 const Api free_apis[] = {{"rn", "free_setup", 0, free_setup}, {"rn", "free_traffic", 7, free_traffic},
-                         {"rn", "mode_menu", 0, mode_menu}, {"rn", "mode_switch", 0, mode_switch}, {"rn", "world_rows", -1, world_rows}, {"rn", "world_lang", -1, world_lang}, {"rn", "world_widx", -1, world_widx}, {"rn", "world_arm", 0, world_arm},
+                         {"rn", "mode_menu", 0, mode_menu}, {"rn", "mode_switch", 0, mode_switch}, {"rn", "coll_widx", -1, coll_widx},
                          {"rn", "free_place", 1, free_place}, {"rn", "free_spacing", 1, free_spacing},
                          {"rn", "free_nopath", 0, free_nopath},
                          {"rn", "free_tnode", 0, free_tnode}, {"rn", "free_recycle", 1, free_recycle},

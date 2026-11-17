@@ -145,12 +145,9 @@ EM_JS(int, web_text, (const char *url, char *out, int cap), {
 });
 #endif
 
-int rn_world_alias(const char *gpath, char *out, size_t n) __attribute__((weak));   // host/openworld.c: a WORLD file is a shipped file of its base track
-
 // 0 = found (size set), 1 = a directory, -1 = missing, -2 = outside the game and save folders.
 static int lookup(const char *gpath, char *real, size_t n, uint64_t *size) {
-    char rel[512], alt[512];
-    if (rn_world_alias && rn_world_alias(gpath, alt, sizeof alt)) gpath = alt;
+    char rel[512];
     int save = game_rel(gpath, rel, sizeof rel);
     if (save < 0) return -2;
 #ifdef __EMSCRIPTEN__
@@ -202,14 +199,14 @@ int gf_stat(const char *gpath) {
 }
 
 void rn_race_bridge(const char *gpath);   // host/bridge.c
-int rn_world_open(const char *gpath, char *real, size_t n, uint64_t *size) __attribute__((weak));   // host/openworld.c (RN_WORLD=1, the WORLD entry)
+int rn_overlay_open(const char *gpath, char *real, size_t n, uint64_t *size) __attribute__((weak));   // host/trackfiles.c: the Cars/TEXTURES.BIN overlay
 
 // Opens a game file: id >= 0, or -1 missing, -2 outside the folder, -3 a directory.
 int gf_open(const char *gpath) {
     char real[512];
     uint64_t size = 0;
     rn_race_bridge(gpath);
-    int r = rn_world_open && rn_world_open(gpath, real, sizeof real, &size) ? 0 : lookup(gpath, real, sizeof real, &size);
+    int r = rn_overlay_open && rn_overlay_open(gpath, real, sizeof real, &size) ? 0 : lookup(gpath, real, sizeof real, &size);
     if (r) return r == 1 ? -3 : r;
     for (int k = 0; k < MAXF; k++) {
         GFile *g = &files[k];

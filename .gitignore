@@ -12,8 +12,8 @@ web/remaster/
 /.mvenv
 /runs
 census/hopper/decomp.c
-web/ug2/*.bin
-web/ug2/*.gz
-web/ug2/tex/
-web/ug2/tex.json
+attic/world/web/ug2/*.bin
+attic/world/web/ug2/*.gz
+attic/world/web/ug2/tex/
+attic/world/web/ug2/tex.json
 dist/

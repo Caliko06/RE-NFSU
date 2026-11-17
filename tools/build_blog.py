@@ -14,13 +14,13 @@ LANGS = ("en", "es")
 UI = {
     "en": dict(guides="Guides", play="Play", other="Español", home="NFSU.cc", more="More guides", cta="Play now", updated="Updated November 16, 2026",
                hub_title="Need for Speed Underground in the browser: guides", hub_h1="Guides",
-               hub_desc="How to play Need for Speed Underground online at nfsu.cc: first start, controls, World mode with Bayview, browsers and phones, and how the browser version works.",
-               hub_lead="NFSU.cc is Need for Speed Underground (2003) running in a browser tab, plus a World mode that joins Olympic City with Bayview. These pages explain how to start, how to drive and what is under the hood.",
+               hub_desc="How to play Need for Speed Underground online at nfsu.cc: first start, controls, browsers and phones, and how the browser version works.",
+               hub_lead="NFSU.cc is Need for Speed Underground (2003) running in a browser tab. These pages explain how to start, how to drive and what is under the hood.",
                foot="NFSU.cc: Need for Speed Underground in the browser."),
     "es": dict(guides="Guías", play="Jugar", other="English", home="NFSU.cc", more="Más guías", cta="Jugar ahora", updated="Actualizado el 16 de noviembre de 2026",
                hub_title="Need for Speed Underground en el navegador: guías", hub_h1="Guías",
-               hub_desc="Cómo jugar Need for Speed Underground online en nfsu.cc: primer arranque, controles, el modo World con Bayview, navegadores y celulares, y cómo funciona la versión de navegador.",
-               hub_lead="NFSU.cc es Need for Speed Underground (2003) corriendo en una pestaña del navegador, más un modo World que une Olympic City con Bayview. Estas páginas explican cómo empezar, cómo manejar y qué hay bajo el cofre.",
+               hub_desc="Cómo jugar Need for Speed Underground online en nfsu.cc: primer arranque, controles, navegadores y celulares, y cómo funciona la versión de navegador.",
+               hub_lead="NFSU.cc es Need for Speed Underground (2003) corriendo en una pestaña del navegador. Estas páginas explican cómo empezar, cómo manejar y qué hay bajo el cofre.",
                foot="NFSU.cc: Need for Speed Underground en el navegador."),
 }
 
@@ -38,8 +38,8 @@ ARTICLES = [
          title=dict(en="How to play Need for Speed Underground online in your browser", es="Cómo jugar Need for Speed Underground online en tu navegador"),
          desc=dict(en="Open nfsu.cc, press Play and drive. What you need, how big the first load is, where your saves live and what to do if the game does not start.",
                    es="Abre nfsu.cc, presiona Jugar y maneja. Qué necesitas, cuánto pesa la primera carga, dónde quedan tus partidas y qué hacer si el juego no arranca."),
-         alt=dict(en="Need for Speed Underground running in a browser: a blue Skyline in Olympic City with the route on the minimap", es="Need for Speed Underground corriendo en el navegador: un Skyline azul en Olympic City con la ruta en el minimapa"),
-         cap=dict(en="The 2003 game in a browser tab, here in World mode.", es="El juego de 2003 en una pestaña del navegador, aquí en modo World."),
+         alt=dict(en="Need for Speed Underground running in a browser: a blue Skyline in Olympic City", es="Need for Speed Underground corriendo en el navegador: un Skyline azul en Olympic City"),
+         cap=dict(en="The 2003 game in a browser tab.", es="El juego de 2003 en una pestaña del navegador."),
          lead=dict(en="NFSU.cc runs the original PC game of 2003 inside a browser tab. There is nothing to install and no account to make: you open the page, press Play and you are in the garage.",
                    es="NFSU.cc corre el juego original de PC de 2003 dentro de una pestaña del navegador. No hay nada que instalar ni cuenta que crear: abres la página, presionas Jugar y ya estás en el garaje."),
          body=dict(en="""
@@ -54,15 +54,14 @@ ARTICLES = [
 <h2>Start in three steps</h2>
 <ol>
 <li>Open <a href="/">nfsu.cc</a>. On a computer the first visit shows the launcher: a menu with Play, Quality, Game, Volume and Controls.</li>
-<li>Leave <b>Game</b> on <b>World</b> for the open city with everything unlocked, or switch it to <b>Career</b> for the Underground mode of 2003.</li>
 <li>Press <b>Play</b> (or Enter). The game loads and you land on the profile screen.</li>
 </ol>
 <p>Later visits go straight into the game. A small button in the corner opens a panel with the same options, and its "All settings" link takes you back to the launcher.</p>
 <h2>How big the first load is</h2>
-<p>Reaching the game's menu downloads about 45 MB; the game program itself is about 16 MB compressed. The open city of World arrives while you drive, roughly 380 MB more over a full session. Your browser keeps those files, so the second visit starts faster.</p>
+<p>Reaching the game's menu downloads about 45 MB; the game program itself is about 16 MB compressed. Your browser keeps the files, so the second visit starts faster.</p>
 <p>The optional remaster textures are a separate 1.1 GB download. They are off until you turn them on or pick the Ultra quality level.</p>
-<h2>World or Career, Original or Remaster</h2>
-<p><b>World</b> is one open map with every car and part available from the start. <b>Career</b> is the game as it shipped; its progress can be "All open" or "Normal", where events unlock one by one. More about the open map in <a href="[[world]]">the World mode guide</a>.</p>
+<h2>Play or Career, Original or Remaster</h2>
+<p><b>Play</b> opens the game's main menu. <b>Career</b> goes straight into Go Underground; its progress can be "All open" or "Normal", where events unlock one by one.</p>
 <p><b>Version</b> picks between <b>Original 2003</b>, the game as it looked, and <b>Remaster</b>, which adds effects such as bloom, edge smoothing and sharper car paint. Inside the game, F4 switches between the two.</p>
 <h2>Where your saves live</h2>
 <p>Profiles and progress are stored in your own browser, not on a server. That means they stay on this device and in this browser, and clearing the site's data erases them. In the launcher, Options has a Saves group with <b>Save a backup</b>, which downloads everything as one file, and <b>Restore a backup</b>, which loads it again, also on another computer.</p>
@@ -84,15 +83,14 @@ ARTICLES = [
 <h2>Empieza en tres pasos</h2>
 <ol>
 <li>Abre <a href="/">nfsu.cc</a>. En computadora, la primera visita muestra el launcher: un menú con Jugar, Calidad, Juego, Volumen y Controles.</li>
-<li>Deja <b>Juego</b> en <b>World</b> para la ciudad abierta con todo desbloqueado, o cámbialo a <b>Carrera</b> para el modo Underground de 2003.</li>
 <li>Presiona <b>Jugar</b> (o Enter). El juego carga y llegas a la pantalla de perfil.</li>
 </ol>
 <p>Las siguientes visitas entran directo al juego. Un botón pequeño en la esquina abre un panel con las mismas opciones, y su enlace "Todos los ajustes" te regresa al launcher.</p>
 <h2>Cuánto pesa la primera carga</h2>
-<p>Llegar al menú del juego descarga unos 45 MB; el programa del juego pesa unos 16 MB comprimido. La ciudad abierta de World llega mientras manejas, alrededor de 380 MB más en una sesión completa. Tu navegador guarda esos archivos, así que la segunda visita arranca más rápido.</p>
+<p>Llegar al menú del juego descarga unos 45 MB; el programa del juego pesa unos 16 MB comprimido. Tu navegador guarda los archivos, así que la segunda visita arranca más rápido.</p>
 <p>Las texturas del remaster son una descarga aparte de 1.1 GB. Están apagadas hasta que las prendes o eliges la calidad Ultra.</p>
-<h2>World o Carrera, Original o Remaster</h2>
-<p><b>World</b> es un solo mapa abierto con todos los coches y piezas disponibles desde el inicio. <b>Carrera</b> es el juego como salió; su progreso puede ser "Todo abierto" o "Normal", donde los eventos se abren uno por uno. Hay más sobre el mapa abierto en <a href="[[world]]">la guía del modo World</a>.</p>
+<h2>Jugar o Carrera, Original o Remaster</h2>
+<p><b>Jugar</b> abre el menú principal del juego. <b>Carrera</b> entra directo a Go Underground; su progreso puede ser "Todo abierto" o "Normal", donde los eventos se abren uno por uno.</p>
 <p><b>Versión</b> elige entre <b>Original 2003</b>, el juego como se veía, y <b>Remaster</b>, que agrega efectos como brillo de luces, suavizado de bordes y pintura más nítida. Dentro del juego, F4 cambia entre los dos.</p>
 <h2>Dónde quedan tus partidas</h2>
 <p>Los perfiles y el progreso se guardan en tu propio navegador, no en un servidor. Por eso se quedan en este dispositivo y en este navegador, y borrar los datos del sitio las elimina. En el launcher, Opciones tiene un grupo Partidas con <b>Guardar copia</b>, que descarga todo en un archivo, y <b>Restaurar copia</b>, que lo vuelve a cargar, también en otra computadora.</p>
@@ -122,7 +120,7 @@ ARTICLES = [
 """ + keys([("Steer", K("←", "→")), ("Gas", K("↑")), ("Brake / reverse", K("↓")), ("Nitrous", K("Space")), ("Handbrake", K("Left Shift")), ("Change camera", K("C")), ("Reset car", K("R")),
             ("Pause", K("Esc")), ("Menus: accept", K("Enter")), ("Menus: back", K("Backspace"))]) + """
 <p>Three more keys belong to the page, not to the game:</p>
-""" + keys([("Remap keys and buttons", K("K")), ("Map of World", K("M")), ("Original / Remaster", K("F4"))]) + """
+""" + keys([("Remap keys and buttons", K("K")), ("Original / Remaster", K("F4"))]) + """
 <h2>Gamepad</h2>
 <p>Any pad the browser sees with the standard layout works (Xbox, PlayStation, most USB and Bluetooth pads). Names below are the Xbox ones.</p>
 """ + keys([("Steer", "Left stick"), ("Gas", K("RT")), ("Brake / reverse", K("LT")), ("Nitrous", K("A")), ("Handbrake", K("B")), ("Change camera", K("Y")), ("Reset car", K("RB")),
@@ -139,7 +137,7 @@ ARTICLES = [
 """ + keys([("Girar", K("←", "→")), ("Acelerar", K("↑")), ("Frenar / reversa", K("↓")), ("Nitro", K("Espacio")), ("Freno de mano", K("Shift izq.")), ("Cambiar cámara", K("C")), ("Reiniciar el coche", K("R")),
             ("Pausa", K("Esc")), ("Menús: aceptar", K("Enter")), ("Menús: atrás", K("Retroceso"))]) + """
 <p>Tres teclas más son de la página, no del juego:</p>
-""" + keys([("Reasignar teclas y botones", K("K")), ("Mapa de World", K("M")), ("Original / Remaster", K("F4"))]) + """
+""" + keys([("Reasignar teclas y botones", K("K")), ("Original / Remaster", K("F4"))]) + """
 <h2>Mando</h2>
 <p>Funciona cualquier mando que el navegador reconozca con la distribución estándar (Xbox, PlayStation, casi todos los USB y Bluetooth). Los nombres de abajo son los de Xbox.</p>
 """ + keys([("Girar", "Palanca izquierda"), ("Acelerar", K("RT")), ("Frenar / reversa", K("LT")), ("Nitro", K("A")), ("Freno de mano", K("B")), ("Cambiar cámara", K("Y")), ("Reiniciar el coche", K("RB")),
@@ -153,64 +151,9 @@ ARTICLES = [
 <p>Chrome en Android pasa a pantalla completa al primer toque. Un iPhone no le permite eso a una página web: toca Compartir, elige "Agregar a inicio" y abre el juego desde ese ícono para llenar la pantalla. Qué pueden correr los celulares está en <a href="[[devices]]">la guía de navegadores y celulares</a>.</p>
 """)),
 
-    # Sources: plan.json step 1 rows 2 (bridge road), 6 (NFSU1 sky and atmosphere), 7 (traffic), 9 (everything unlocked, prices 0),
-    # 10 (Original mode in WORLD), 11 (races anywhere: challenge a rival, circuit / sprint / drag / drift with fixed starts), 12 (every UG2
-    # district, highways, airport), 13 (GPS: M, click = destination + route on the HUD minimap); teleport web/gps/tp.js;
-    # launcher 'traffic' option web/launcher_opts.js (host/free.c); phones have no WORLD web/launcher_opts.js query() + web/boot.js NOWORLD.
-    dict(key="world", img="bayview-palms.webp", img2="world-map.webp",
-         slug=dict(en="world-mode-olympic-city-bayview-one-map", es="modo-world-olympic-city-bayview-un-mapa"),
-         title=dict(en="World mode: Olympic City and Bayview in one open map", es="Modo World: Olympic City y Bayview en un solo mapa abierto"),
-         desc=dict(en="World mode joins the city of Need for Speed Underground with Bayview from Underground 2 by one road: free roam, traffic, every car unlocked, races anywhere and a GPS map.",
-                   es="El modo World une la ciudad de Need for Speed Underground con Bayview de Underground 2 por una carretera: manejo libre, tráfico, todos los coches desbloqueados, carreras en cualquier lado y un mapa con GPS."),
-         alt=dict(en="A palm-lined avenue of Bayview, the Underground 2 city, drawn inside Need for Speed Underground", es="Una avenida con palmeras de Bayview, la ciudad de Underground 2, dibujada dentro de Need for Speed Underground"),
-         cap=dict(en="Bayview's streets under Underground 1's night sky.", es="Las calles de Bayview bajo el cielo nocturno de Underground 1."),
-         alt2=dict(en="The World map: the streets of Olympic City on the left, the bridge and Bayview on the right", es="El mapa de World: las calles de Olympic City a la izquierda, el puente y Bayview a la derecha"),
-         cap2=dict(en="The map opens with M and is drawn from the real street network of both cities.", es="El mapa se abre con M y se dibuja con la red de calles real de las dos ciudades."),
-         lead=dict(en="The first Underground never let you leave the race track. World mode does: it turns Olympic City into free roam and connects it by one road to Bayview, the city of Underground 2.",
-                   es="El primer Underground nunca te dejó salir de la pista. El modo World sí: convierte Olympic City en manejo libre y la conecta por una carretera con Bayview, la ciudad de Underground 2."),
-         body=dict(en="""
-<h2>Two cities, one road</h2>
-<p>Olympic City is the setting of Need for Speed Underground (2003). Bayview is the open city of Underground 2 (2004), with its districts, highways and airport. In World mode both sit on the same map, and a bridge road takes you from one to the other without a loading screen.</p>
-<p>Only the city itself comes from Underground 2: streets, buildings, textures, collision and the road network. The sky, the fog, the wet night look, the cars, the physics and the HUD are still Underground 1, so Bayview feels like a new part of the same game.</p>
-<h2>What you can do</h2>
-<ul>
-<li><b>Drive anywhere.</b> There is no timer and no walls: every district of Bayview and every street of Olympic City is open, with traffic on the roads.</li>
-<li><b>Use any car.</b> All cars, parts and visual upgrades are available from the start and cost nothing.</li>
-<li><b>Challenge a rival.</b> Drive up to another racer to start a sprint to a point somewhere in either city.</li>
-<li><b>Run events.</b> Circuit, sprint, drag and drift races have starting points spread over both cities.</li>
-</ul>
-<h2>The map and the GPS</h2>
-<p>Press <b>M</b> to open a full-screen map of both cities while the game keeps running. Click a street to mark a destination: the page traces a route along the real roads and shows it on the HUD minimap until you arrive or clear it. The map can also move your car straight to a point, which helps when the other city is far away.</p>
-[[figure2]]
-<h2>How to enter</h2>
-<p>In the launcher, leave <b>Game</b> on <b>World</b> and press Play. The game's own main menu has a World entry too. World works in both versions, Original 2003 and Remaster; outside World, the Original version stays exactly as the game shipped.</p>
-<p>The amount of traffic is an option of the launcher (Gameplay group): none, a little, normal or a lot.</p>
-<h2>What it needs</h2>
-<p>World is for computers. The two cities together are much heavier than a race track, about 380 MB that arrive as you drive, so phones and tablets start in the regular game without it. See <a href="[[devices]]">browsers, phones and performance</a> for the details, and <a href="[[tech]]">how it works</a> for the way Bayview was brought in.</p>
-""", es="""
-<h2>Dos ciudades, una carretera</h2>
-<p>Olympic City es el escenario de Need for Speed Underground (2003). Bayview es la ciudad abierta de Underground 2 (2004), con sus distritos, autopistas y aeropuerto. En el modo World las dos están en el mismo mapa, y una carretera con puente te lleva de una a otra sin pantalla de carga.</p>
-<p>De Underground 2 solo viene la ciudad: calles, edificios, texturas, colisiones y la red de caminos. El cielo, la niebla, la noche mojada, los coches, la física y el HUD siguen siendo de Underground 1, así que Bayview se siente como una parte nueva del mismo juego.</p>
-<h2>Qué puedes hacer</h2>
-<ul>
-<li><b>Manejar por donde quieras.</b> No hay reloj ni muros: cada distrito de Bayview y cada calle de Olympic City está abierta, con tráfico en los caminos.</li>
-<li><b>Usar cualquier coche.</b> Todos los coches, piezas y mejoras visuales están disponibles desde el inicio y no cuestan nada.</li>
-<li><b>Retar a un rival.</b> Acércate a otro corredor para empezar un sprint hacia un punto de cualquiera de las dos ciudades.</li>
-<li><b>Correr eventos.</b> Las carreras de circuito, sprint, arrancones y drift tienen salidas repartidas por las dos ciudades.</li>
-</ul>
-<h2>El mapa y el GPS</h2>
-<p>Presiona <b>M</b> para abrir un mapa a pantalla completa de las dos ciudades mientras el juego sigue corriendo. Haz clic en una calle para marcar un destino: la página traza una ruta por los caminos reales y la muestra en el minimapa del HUD hasta que llegas o la borras. El mapa también puede mover tu coche directo a un punto, útil cuando la otra ciudad queda lejos.</p>
-[[figure2]]
-<h2>Cómo entrar</h2>
-<p>En el launcher, deja <b>Juego</b> en <b>World</b> y presiona Jugar. El menú principal del propio juego también tiene una entrada World. World funciona en las dos versiones, Original 2003 y Remaster; fuera de World, la versión Original queda exactamente como salió el juego.</p>
-<p>La cantidad de tráfico es una opción del launcher (grupo Jugabilidad): sin tráfico, poco, normal o mucho.</p>
-<h2>Qué necesita</h2>
-<p>World es para computadoras. Las dos ciudades juntas pesan mucho más que una pista de carreras, unos 380 MB que llegan mientras manejas, así que los celulares y tabletas empiezan en el juego normal, sin World. Consulta <a href="[[devices]]">navegadores, celulares y rendimiento</a> para los detalles, y <a href="[[tech]]">cómo funciona</a> para ver cómo se trajo Bayview.</p>
-""")),
-
     # Sources: browsers web/app.js:29; quality levels and every option web/launcher_opts.js (quality, opts); machine detection web/launcher.js detect()
     # (median frame time of the menu scene: > 28 ms low, > 20 ms medium, else high; Ultra never picked); phones start light plan.json step 2 row 5
-    # (Original, effects off, 30 fps, no WORLD) and the presets of web/launcher_opts.js; in-game panel web/overlay.js; iPhone web/touch.js:131.
+    # (Original, effects off, 30 fps) and the presets of web/launcher_opts.js; in-game panel web/overlay.js; iPhone web/touch.js:131.
     dict(key="devices", img="phone-touch.webp",
          slug=dict(en="browsers-phones-performance-settings", es="navegadores-celulares-ajustes-rendimiento"),
          title=dict(en="Browsers, phones and performance settings", es="Navegadores, celulares y ajustes de rendimiento"),
@@ -242,11 +185,11 @@ ARTICLES = [
 <li><b>Frame rate</b>: 30 fps is half the work of 60.</li>
 <li><b>Remaster effects</b>: turns off bloom, smoothing and the other visual extras in one switch, without touching the gameplay improvements.</li>
 <li><b>MSAA 4x</b>: sharper edges, heavy on the graphics card. Leave it off on a laptop.</li>
-<li><b>City traffic</b>: fewer civilian cars in World means less to simulate and draw.</li>
+<li><b>Traffic</b>: fewer civilian cars in Free Run means less to simulate and draw.</li>
 </ul>
 <p>Picking <b>Original 2003</b> as the version is the lightest way to play: it is the game as it shipped, with none of the extra effects.</p>
 <h2>Phones and tablets</h2>
-<p>A phone or tablet starts light on every visit: the Original version, effects off and 30 fps. The corner button in the game offers three profiles (Original 2003, Remaster, and Modest machine / iPad) plus the touch button opacity. World mode is not available on phones; the races, the garage and the career are.</p>
+<p>A phone or tablet starts light on every visit: the Original version, effects off and 30 fps. The corner button in the game offers three profiles (Original 2003, Remaster, and Modest machine / iPad) plus the touch button opacity.</p>
 <p>On an iPhone, add the page to the home screen to play full screen. The touch layout is described in <a href="[[controls]]">the controls guide</a>.</p>
 <h2>Changing settings later</h2>
 <p>After the first visit a computer goes straight into the game. The small button in the top corner opens quality, game, version, sound and keys; a change there restarts the game with the new setting. "All settings" opens the full launcher with every option, grouped as Game, Picture, Camera, Performance, Gameplay, and Sound and controls.</p>
@@ -272,11 +215,11 @@ ARTICLES = [
 <li><b>Fotogramas</b>: 30 fps es la mitad del trabajo de 60.</li>
 <li><b>Efectos remaster</b>: apaga de un golpe el brillo, el suavizado y los demás extras visuales, sin tocar las mejoras de juego.</li>
 <li><b>MSAA 4x</b>: bordes más nítidos, pesado para la tarjeta gráfica. Déjalo apagado en una laptop.</li>
-<li><b>Tráfico</b>: menos coches civiles en World es menos que simular y dibujar.</li>
+<li><b>Tráfico</b>: menos coches civiles en Free Run es menos que simular y dibujar.</li>
 </ul>
 <p>Elegir <b>Original 2003</b> como versión es la forma más ligera de jugar: es el juego como salió, sin ninguno de los efectos extra.</p>
 <h2>Celulares y tabletas</h2>
-<p>Un celular o tableta arranca ligero en cada visita: versión Original, efectos apagados y 30 fps. El botón de la esquina dentro del juego ofrece tres perfiles (Original 2003, Remaster y Equipo modesto / iPad) y la opacidad de los botones táctiles. El modo World no está disponible en celulares; las carreras, el garaje y el modo carrera sí.</p>
+<p>Un celular o tableta arranca ligero en cada visita: versión Original, efectos apagados y 30 fps. El botón de la esquina dentro del juego ofrece tres perfiles (Original 2003, Remaster y Equipo modesto / iPad) y la opacidad de los botones táctiles.</p>
 <p>En un iPhone, agrega la página a la pantalla de inicio para jugar a pantalla completa. Los botones táctiles se explican en <a href="[[controls]]">la guía de controles</a>.</p>
 <h2>Cambiar ajustes después</h2>
 <p>Después de la primera visita, una computadora entra directo al juego. El botón pequeño de la esquina superior abre calidad, juego, versión, sonido y teclas; un cambio ahí reinicia el juego con el ajuste nuevo. "Todos los ajustes" abre el launcher completo con cada opción, en los grupos Juego, Imagen, Cámara, Rendimiento, Jugabilidad, y Sonido y controles.</p>
@@ -285,14 +228,13 @@ ARTICLES = [
     # Sources: AGENTS.md map (Speed.exe statically recompiled x86 -> WebAssembly, tools/recomp; host/ and web/ stand in for Windows/DirectX);
     # speed.wasm 70 MB raw, ~16 MB gzip tools/upload_r2.sh; WebGPU web/gpu.js; threads + cross-origin isolation web/boot.js:97, plan.json step 2 row 2;
     # game files by Range host/files.c (tools/upload_r2.sh comment); keys as DirectInput codes web/binds.js, web/dik.js; saves web/saves.js;
-    # Bayview = meshes, textures, vertex colours, collision, road graph plan.json `rejected` row 1, streaming sections step 1 row 5;
     # remaster effects web/launcher_opts.js (bloom, FXAA, MSAA, sharpness, anisotropic filter).
-    dict(key="tech", img="bayview-race.webp",
+    dict(key="tech", img="olympic-city-drive.webp",
          slug=dict(en="how-need-for-speed-underground-runs-in-a-browser-webassembly", es="como-corre-need-for-speed-underground-en-el-navegador-webassembly"),
          title=dict(en="How it works: a 2003 Windows game recompiled to WebAssembly", es="Cómo funciona: un juego de Windows de 2003 recompilado a WebAssembly"),
          desc=dict(en="NFSU.cc is not an emulator or a remake. The original Need for Speed Underground program was translated to WebAssembly and its Windows and DirectX calls were rebuilt on WebGPU.",
                    es="NFSU.cc no es un emulador ni un remake. El programa original de Need for Speed Underground se tradujo a WebAssembly y sus llamadas a Windows y DirectX se reconstruyeron sobre WebGPU."),
-         alt=dict(en="A race through Bayview in the browser version of Need for Speed Underground, with the position board on screen", es="Una carrera por Bayview en la versión de navegador de Need for Speed Underground, con la tabla de posiciones en pantalla"),
+         alt=dict(en="A car driving through Olympic City in the browser version of Need for Speed Underground", es="Un coche manejando por Olympic City en la versión de navegador de Need for Speed Underground"),
          cap=dict(en="The same physics, AI and HUD code as in 2003, now running as WebAssembly.", es="El mismo código de física, rivales y HUD de 2003, ahora corriendo como WebAssembly."),
          lead=dict(en="What runs in your tab is the game's own code from 2003. It was not rewritten and it is not emulated: the program was translated once, ahead of time, into something a browser can run.",
                    es="Lo que corre en tu pestaña es el código del propio juego de 2003. No se reescribió ni se emula: el programa se tradujo una sola vez, por adelantado, a algo que un navegador puede ejecutar."),
@@ -312,9 +254,6 @@ ARTICLES = [
 </ul>
 <h2>The remaster layer</h2>
 <p>Because the page owns the drawing step, it can add things the 2003 renderer did not have: bloom on lights, edge smoothing, sharpening, anisotropic filtering, sharper car paint and optional high resolution textures. All of it is a layer on top. Switch the version to Original 2003 and the picture is the one the game always drew.</p>
-<h2>Bringing Bayview over</h2>
-<p><a href="[[world]]">World mode</a> adds the city of Underground 2. Its data was read from that game's files and converted into the formats Underground 1 already uses: the meshes and textures of each district, the vertex colours that give Bayview its baked lighting, the collision surfaces you drive on and the road network the traffic and the GPS follow. The city is cut into sections that load and unload as you move, the same way the original game streams its tracks.</p>
-<p>Nothing else was taken from Underground 2. The sky, the fog and the night look are still the first game's, drawn over both cities.</p>
 <h2>Try it</h2>
 <p>The quickest way to judge the result is to drive it: <a href="[[play]]">how to start playing</a> takes a minute to read.</p>
 """, es="""
@@ -333,9 +272,6 @@ ARTICLES = [
 </ul>
 <h2>La capa del remaster</h2>
 <p>Como la página es dueña del paso de dibujo, puede agregar cosas que el motor de 2003 no tenía: brillo en las luces, suavizado de bordes, nitidez, filtro anisotrópico, pintura de coches más nítida y texturas opcionales de alta resolución. Todo es una capa encima. Cambia la versión a Original 2003 y la imagen es la que el juego siempre dibujó.</p>
-<h2>Cómo se trajo Bayview</h2>
-<p><a href="[[world]]">El modo World</a> agrega la ciudad de Underground 2. Sus datos se leyeron de los archivos de ese juego y se convirtieron a los formatos que Underground 1 ya usa: las mallas y texturas de cada distrito, los colores por vértice que le dan a Bayview su iluminación, las superficies de colisión sobre las que manejas y la red de caminos que siguen el tráfico y el GPS. La ciudad está cortada en secciones que cargan y descargan conforme avanzas, igual que el juego original transmite sus pistas.</p>
-<p>Nada más se tomó de Underground 2. El cielo, la niebla y la noche siguen siendo del primer juego, dibujados sobre las dos ciudades.</p>
 <h2>Pruébalo</h2>
 <p>La forma más rápida de juzgar el resultado es manejarlo: <a href="[[play]]">cómo empezar a jugar</a> se lee en un minuto.</p>
 """)),
@@ -408,7 +344,7 @@ def figure(a, lang, n=""):
 
 
 HEIGHT = {"olympic-city-world.webp": 700, "bayview-palms.webp": 703, "bayview-race.webp": 703, "world-map.webp": 850, "phone-touch.webp": 462, "olympic-city-drive.webp": 703}
-BACK = ["olympic-city-drive.webp", "bayview-race.webp", "bayview-palms.webp"]   # behind the sheet: a street picture that is not the one shown in the text
+BACK = ["olympic-city-drive.webp", "olympic-city-world.webp"]   # behind the sheet: a street picture that is not the one shown in the text
 ORG = {"@type": "Organization", "name": "NFSU.cc", "url": SITE + "/"}
 pages = []          # (lang, name, names) for the sitemap
 for lang in LANGS:

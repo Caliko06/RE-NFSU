@@ -12,14 +12,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NFS Underground">
 <title>Need for Speed Underground Online: Play in Your Browser | NFSU.cc</title>
-<meta name="description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game plus a World mode that joins Olympic City with Bayview from Underground 2. Keyboard, gamepad and touch.">
+<meta name="description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game. Keyboard, gamepad and touch.">
 <link rel="canonical" href="https://nfsu.cc/">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NFSU.cc">
 <meta property="og:url" content="https://nfsu.cc/">
 <meta property="og:title" content="Need for Speed Underground in your browser">
-<meta property="og:description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game plus a World mode that joins Olympic City with Bayview from Underground 2. Keyboard, gamepad and touch.">
+<meta property="og:description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game. Keyboard, gamepad and touch.">
 <meta property="og:image" content="https://nfsu.cc/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -27,12 +27,12 @@
 <meta property="og:locale:alternate" content="es_MX">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Need for Speed Underground in your browser">
-<meta name="twitter:description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game plus a World mode that joins Olympic City with Bayview from Underground 2. Keyboard, gamepad and touch.">
+<meta name="twitter:description" content="Play Need for Speed Underground (2003) in your browser, nothing to install. The full game. Keyboard, gamepad and touch.">
 <meta name="twitter:image" content="https://nfsu.cc/og.jpg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Need for Speed Underground (browser version)", "alternateName": ["NFSU", "NFS Underground online", "NFSU.cc"], "url": "https://nfsu.cc/", "image": "https://nfsu.cc/og.jpg", "description": "Play Need for Speed Underground (2003) in your browser, nothing to install. The full game plus a World mode that joins Olympic City with Bayview from Underground 2. Keyboard, gamepad and touch.", "genre": ["Racing", "Arcade racing"], "gamePlatform": ["Web browser", "Chrome", "Edge", "Safari", "Firefox"], "applicationCategory": "Game", "operatingSystem": "Any (WebGPU browser)", "playMode": "SinglePlayer", "inLanguage": ["en", "es"], "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Need for Speed Underground (browser version)", "alternateName": ["NFSU", "NFS Underground online", "NFSU.cc"], "url": "https://nfsu.cc/", "image": "https://nfsu.cc/og.jpg", "description": "Play Need for Speed Underground (2003) in your browser, nothing to install. The full game. Keyboard, gamepad and touch.", "genre": ["Racing", "Arcade racing"], "gamePlatform": ["Web browser", "Chrome", "Edge", "Safari", "Firefox"], "applicationCategory": "Game", "operatingSystem": "Any (WebGPU browser)", "playMode": "SinglePlayer", "inLanguage": ["en", "es"], "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <style>
   :root { --bg: #0b0d10; --fg: #c9d1d9; --dim: #6e7681; --ok: #3fb950; --stop: #f85149; --api: #79c0ff; }
   html, body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.45 ui-monospace, Menlo, monospace; }
@@ -80,10 +80,6 @@ const RN_SEARCH = location.search || '?' + (sessionStorage.getItem('rn_q') ?? (R
 <script src="mode.js"></script>
 <script src="app.js"></script>
 <script src="gpu.js"></script>
-<script src="ug2/ug2world.js"></script>
-<script src="gps/map.js"></script>
-<script src="gps/tp.js"></script>
-<script src="gps/route.js"></script>
 <script src="dik.js"></script>
 <script src="input.js"></script>
 <script src="binds.js"></script>
@@ -103,7 +99,7 @@ if (bridgeTo !== null) window.rnBridge = q => { location.href = (bridgeTo && bri
 <script>
 // ?fast=1&go=1 (the launcher's "Jugar"): the launcher's 3D scene (web/launcher_b/?curtain=1, frozen at the end of its push-in) covers the game while it boots
 // (no intro movies or splash, PATCH 0x4de395). It is only a loading curtain: it fades out in 250 ms
-// when RN_APP leaves 'load' (web/app.js: the player is where the launcher's entry leads: main menu, WORLD or Go Underground, web/boot.js ?start=; or a stop that must show). Opened without go=1 (set at the top of this page) it never gets here.
+// when RN_APP leaves 'load' (web/app.js: the player is where the launcher's entry leads: main menu or Go Underground, web/boot.js ?start=; or a stop that must show). Opened without go=1 (set at the top of this page) it never gets here.
 if (RN_Q.get('fast') === '1') {
   const css = document.createElement('style');
   css.textContent = `#ab { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 12; background: #05080d; pointer-events: none; transition: opacity .25s ease; }

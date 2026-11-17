@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Public package: dist/ = everything a plain static host serves, as real files (APFS clones, no links, no disk cost).
-Engine (out/speed.js, out/speed.wasm, pc/Speed.exe, the web/*.js host), game data (game/ whole, songs included; ug2/, gps/,
-launcher/, remaster/; world/ = only the names host/openworld.c:226-290 asks for), and three manifests:
+Engine (out/speed.js, out/speed.wasm, pc/Speed.exe, the web/*.js host), game data (game/ whole, songs included;
+launcher/, remaster/; world/ = only the Cars/TEXTURES.BIN overlay host/trackfiles.c asks for; WORLD retired 2026-11-17, attic/world/README.md), and three manifests:
 game-files.json (host/files.c reads it), manifest.json (every file: path, bytes, sha256), _headers (COOP/COEP/CORP, the
 Cloudflare Pages / Netlify syntax; SharedArrayBuffer needs them, tools/static_server.py sends the same three).
 No /plan/, no dev tools, no setup page. window.RN_PUBLIC=1 is injected so web/boot.js and web/telemetry.js send nothing.
@@ -10,7 +10,7 @@ import hashlib, json, os, re, shutil, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W, D = os.path.join(ROOT, "web"), os.path.join(ROOT, "dist")
-LINK_DIRS = ["gps", "launcher", "launcher_b", "blog"]   # launcher_b = the 3D street behind launcher.html (web/launcher.html:69); blog = the guides (tools/build_blog.py)
+LINK_DIRS = ["launcher", "launcher_b", "blog"]   # launcher_b = the 3D street behind launcher.html (web/launcher.html:69); blog = the guides (tools/build_blog.py)
 PAGES = ["index.html", "launcher.html"]
 FLAG = "<script>window.RN_PUBLIC=1;window.RN_V='%s'</script>\n"
 
@@ -20,8 +20,7 @@ def version():
     edge holding an older copy (2026-11-15: a broken speed.wasm went out with a 1-day max-age) asks for the new one."""
     h = hashlib.sha256()
     for p in sorted(os.path.join(W, n) for n in os.listdir(W) if n.endswith((".js", ".html"))) + [
-            os.path.join(W, "gps", n) for n in ("map.js", "tp.js", "route.js")] + [
-            os.path.join(W, "ug2", "ug2world.js"), os.path.join(W, "out", "speed.js"), os.path.join(W, "out", "speed.wasm"), os.path.join(ROOT, "pc", "Speed.exe")]:
+            os.path.join(W, "out", "speed.js"), os.path.join(W, "out", "speed.wasm"), os.path.join(ROOT, "pc", "Speed.exe")]:
         h.update(open(p, "rb").read())
     return h.hexdigest()[:10]
 
@@ -50,11 +49,6 @@ def clone(src, dst):
 for n in LINK_DIRS:
     if os.path.isdir(os.path.join(W, n)):
         clone(os.path.join(W, n), os.path.join(D, n))
-# ug2/: only what web/ug2/ug2world.js:68,102 fetches (the .gz packs of tools/pack_loadfast.py, tex.json, the script).
-os.makedirs(os.path.join(D, "ug2"))
-for n in sorted(os.listdir(os.path.join(W, "ug2"))):
-    if n.endswith(".gz") or n in ("tex.json", "ug2world.js"):
-        clone(os.path.join(W, "ug2", n), os.path.join(D, "ug2", n))
 # remaster/ (opt-in): the index lists web/gpu.js:165-168 reads by default and every file they name; the world pack
 # (index_world*.tsv, ?worldhd=1 only, no launcher toggle) stays out: 680 MB.
 R = os.path.join(W, "remaster")
@@ -76,7 +70,7 @@ for n in ("speed.js", "speed.wasm"):
     clone(os.path.join(W, "out", n), os.path.join(D, "out", n))
 clone(os.path.join(ROOT, "pc", "Speed.exe"), os.path.join(D, "pc", "Speed.exe"))
 os.makedirs(os.path.join(D, "world"))
-WORLD = re.compile(r"TRACKB\d+(_park|_bridge)?\.lzc|TEX1010TRACK\.BIN|CARS_TEXTURES\.BIN|DYNTEX\.BIN")   # host/openworld.c rn_world_open
+WORLD = re.compile(r"CARS_TEXTURES\.BIN")   # host/trackfiles.c rn_overlay_open (free mode's traffic racers)
 for n in sorted(os.listdir(os.path.join(ROOT, "build", "openworld"))):
     if WORLD.fullmatch(n):
         clone(os.path.join(ROOT, "build", "openworld", n), os.path.join(D, "world", n))

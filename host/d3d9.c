@@ -9,7 +9,6 @@
 #include "sm1.h"
 #include "carsmooth.h"
 #include "mc.h"
-#include "gps.h"
 #include <pthread.h>
 
 #define D3D_OK 0u
@@ -113,10 +112,6 @@ typedef struct {
 #define MAXOBJ GPU_MAXID
 static Obj objs[MAXOBJ];
 static uint64_t tex_key[MAXOBJ];   // textures: the pack key (FNV-1a 64 of level 0) of the last upload, 0 = none
-// TRACK1010_MAP BGRA bytes: TEX1010TRACK.BIN +0xaad00, 0x40000 bytes (tools/openworld/worldmap.py).
-// A content key restricts GPS painting to WORLD's own map; every shipped map keeps its original texels.
-#define GPS_MAP_KEY UINT64_C(0x59244a5381be2ddb)
-static uint32_t gps_map_id, gps_map_hash;
 static int nobjs;   // slots ever used; objs[top] is the newest object
 static int top;
 // Slots are reused once the table is full: every track load makes thousands of textures and the old ones die
@@ -1255,7 +1250,6 @@ static void flow_log(Ctx *c) {
     if (rating_valid) prating_bits = rating_bits;
     pm = m, pt = t, pe = e, pcar = car;
     input_jump(c);
-    world_go(c);
     input_finish(c);
     input_unstick(c);
     input_open(c);
@@ -1324,9 +1318,6 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     flow_log(c);
     free_tick(c);
     crashwatch_present(c);
-    world_spawn(c);      // host/openworld.c: RN_SPAWN puts the car at a point after GO
-    gps_frame(c);        // host/gps.c: player pose for the GPS map (host/gps.h)
-    gps_teleport(c);     // host/gps_tp.c: teleport to the GPS mark
     traffic_tick(c);
     ai_tel(c);           // host/aitel.c: AI telemetry lines for the F10 (RN_AILOG)
     horn_tick(c);        // host/horn.c: recycle stamps for the horn hook (RN_HORNLOG / RN_HORNFIX)
@@ -1638,7 +1629,6 @@ static void upload_level(Ctx *c, Obj *s) {
         uint32_t k3[3] = {s->container, (uint32_t)h, (uint32_t)(h >> 32)};
         gpu_cmd(GPU_TEXKEY, 3, k3);
         if (s->container) tex_key[s->container - 1] = h;
-        if (h == GPS_MAP_KEY) gps_map_id = 0;   // a newly uploaded/reloaded original must receive the current route
         // RN_TEXDUMP=1: each level-0 content once to save/texdump/<key>.bin (w, h, fmt, pitch, then the locked bytes), for the
         // remaster pack: the exact texels the game uploads, whatever container they came from (tools/remaster/texdump.py).
         static int dump = -1;
@@ -2072,51 +2062,6 @@ static uint32_t IDirect3DDevice9_SetPixelShader(Ctx *c) { DEV(); REC(IDirect3DDe
 static uint32_t IDirect3DDevice9_GetPixelShader(Ctx *c) { DEV(); return get_bound(c, ARG(1), dev.ps); }
 static uint32_t IDirect3DDevice9_SetIndices(Ctx *c) { DEV(); REC(IDirect3DDevice9_SetIndices, 2, -1, 0); return bind(c, &dev.ib, ARG(1), I_IB); }
 static uint32_t IDirect3DDevice9_GetIndices(Ctx *c) { DEV(); return get_bound(c, ARG(1), dev.ib); }
-// Route pixels live in the game's own map texture. TrackMap::Draw (0x58e810) therefore applies
-// its original follow/rotation and Poly2D::ClipToRect (0x58f631 -> 0x58fb10) to streets AND route.
-// WorldToMap 0x590ad0 and WORLD's row (host/openworld.c) give u=(x+3650)/6240, v=(4260-y)/6240.
-// Decode the unchanged guest texture on each route change, so clear/arrival exactly restores it.
-static void gps_map_texture(Ctx *c, Obj *o) {
-    if (!o || !rn_racing() || ld(c, 0x78a2f0, 4) != 1010 || tex_key[idx(o)] != GPS_MAP_KEY) return;
-    int n = __atomic_load_n(&rn_gps.route_n, __ATOMIC_ACQUIRE);
-    if (n < 2 || n > GPS_ROUTE_MAX) n = 0;
-    uint32_t hash = (2166136261u ^ (uint32_t)n) * 16777619u;
-    const unsigned char *bytes = (const unsigned char *)rn_gps.route_xy;
-    for (int k = 0; k < n * 8; k++) hash = (hash ^ bytes[k]) * 16777619u;
-    uint32_t id = idx(o) + 1;
-    if (gps_map_id == id && gps_map_hash == hash) return;
-    Obj *s = obj_k(o->level0 + 1);
-    if (!s) return;
-    uint32_t count = s->w * s->h, *w = malloc((4u + count) * 4u);
-    if (!w) return;
-    w[0] = id; w[1] = 0; w[2] = s->w; w[3] = s->h;
-    if (!decode_texels(s->fmt, (const uint8_t *)G(lock_mem(s)), s->pitch, s->w, s->h, w + 4)) { free(w); return; }
-    for (int k = 1; k < n; k++) {
-        float ax = (rn_gps.route_xy[2*k-2] + 3650.f) / 6240.f * s->w - .5f;
-        float ay = (4260.f - rn_gps.route_xy[2*k-1]) / 6240.f * s->h - .5f;
-        float bx = (rn_gps.route_xy[2*k] + 3650.f) / 6240.f * s->w - .5f;
-        float by = (4260.f - rn_gps.route_xy[2*k+1]) / 6240.f * s->h - .5f;
-        if (!isfinite(ax) || !isfinite(ay) || !isfinite(bx) || !isfinite(by)) continue;
-        int x0 = (int)fmaxf(0, floorf(fminf(ax, bx) - 1.35f));
-        int y0 = (int)fmaxf(0, floorf(fminf(ay, by) - 1.35f));
-        int x1 = (int)fminf(s->w-1, ceilf(fmaxf(ax, bx) + 1.35f));
-        int y1 = (int)fminf(s->h-1, ceilf(fmaxf(ay, by) + 1.35f));
-        float dx = bx-ax, dy = by-ay, length2 = dx*dx + dy*dy;
-        for (int y = y0; y <= y1; y++) for (int x = x0; x <= x1; x++) {
-            float t = length2 > 0 ? fminf(1, fmaxf(0, ((x-ax)*dx + (y-ay)*dy)/length2)) : 0;
-            float coverage = fminf(1, fmaxf(0, 1.35f - hypotf(x-ax-t*dx, y-ay-t*dy)));
-            if (!coverage) continue;
-            uint32_t p = w[4+y*s->w+x];
-            uint32_t r = (uint32_t)((p & 255) * (1-coverage) + 255 * coverage);
-            uint32_t g = (uint32_t)(((p >> 8) & 255) * (1-coverage) + 224 * coverage);
-            uint32_t b = (uint32_t)(((p >> 16) & 255) * (1-coverage) + 66 * coverage);
-            w[4+y*s->w+x] = r | g << 8 | b << 16 | 0xff000000u;
-        }
-    }
-    gpu_cmd(GPU_TEXDATA, (int)(4 + count), w);
-    free(w);
-    gps_map_id = id; gps_map_hash = hash;
-}
 static uint32_t IDirect3DDevice9_SetTexture(Ctx *c) {
     DEV(); REC(IDirect3DDevice9_SetTexture, 3, -1, 0);
     uint32_t s = ARG(1), p = ARG(2);
@@ -2124,7 +2069,6 @@ static uint32_t IDirect3DDevice9_SetTexture(Ctx *c) {
     Obj *o = p ? obj_of(c, p, -1) : NULL;
     if (p && (!o || (o->iface != I_TEXTURE && o->iface != I_CUBE))) return D3DERR_INVALIDCALL;
     dev.tex[s] = o ? idx(o) + 1 : 0;
-    if (s == 0) gps_map_texture(c, o);
     return D3D_OK;
 }
 static uint32_t IDirect3DDevice9_GetTexture(Ctx *c) { DEV(); if (ARG(1) >= 16) return D3DERR_INVALIDCALL; return get_bound(c, ARG(2), dev.tex[ARG(1)]); }

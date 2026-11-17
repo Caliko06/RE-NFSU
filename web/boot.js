@@ -30,20 +30,11 @@ addEventListener('error', e => { line('JS error: ' + e.message + ' at ' + e.file
 addEventListener('unhandledrejection', e => { const t = String(e.reason && e.reason.stack || e.reason); line('JS rejection: ' + t, fatal(t, /speed\.js/.test(t) ? 'speed.js' : /\.js/.test(t) ? 'page' : '') ? 'stop' : 'dim'); flush(); });
 addEventListener('pagehide', flush);
 // The session report: one .json the browser saves (Downloads). Nothing is sent, so it also works on a plain host (RN_PUBLIC).
-// B while driving marks the spot (F8 and F10 are media keys on a Mac). The map (M) and the stop card have the download button.
-const trail = [], marks = [];        // [s, x, y, z, yaw16]: the car every 2 s (the last 4 h), and each mark
-const poseRow = () => { const p = window.RN_GPS?.pose(); return p ? [+secs(), +p.x.toFixed(1), +p.y.toFixed(1), +p.z.toFixed(1), p.yaw16] : null; };
-setInterval(() => { const r = poseRow(); if (r) { if (trail.length >= 7200) trail.shift(); trail.push(r); } }, 2000);
-window.rnMark = () => {
-  const r = poseRow();
-  if (!r) return;
-  marks.push(r); telem?.event('mark', { n: marks.length });
-  line(`MARK ${marks.length} at ${r.slice(1).join(':')}`); toast(`Marca ${marks.length} guardada`);
-};
+// F10 saves it (a media key on a Mac); the stop card has the download button.
 window.rnReport = () => {
   const date = new Date().toISOString(), name = `nfsu-session-${date.replace(/[:.]/g, '-')}.json`;
   const blob = new Blob([JSON.stringify({ format: 'rn-session-2', url: location.origin + location.pathname + RN_SEARCH, date, ua: navigator.userAgent,
-    screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, saved: +secs(), state: RN_APP.state, at: poseRow(), marks, trail,
+    screen: `${innerWidth}x${innerHeight} dpr ${devicePixelRatio}`, saved: +secs(), state: RN_APP.state,
     ...(telem ? telem.dump() : {}), log: allLog })], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = name; a.click();
@@ -52,17 +43,14 @@ window.rnReport = () => {
 };
 let telem = null;
 addEventListener('keydown', e => {
-  const mark = e.code === 'KeyB' && window.RN_GPS?.pose() && !window.RN_GPS.isOpen && !e.ctrlKey && !e.metaKey && !e.altKey;
-  if (!mark && e.code !== 'F8' && e.code !== 'F10') return;
+  if (e.code !== 'F10') return;
   e.preventDefault(); e.stopPropagation();
-  if (!e.repeat) (e.code === 'F10' ? window.rnReport : window.rnMark)();
+  if (!e.repeat) window.rnReport();
 }, true);
 addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classList.toggle('dbg'); e.preventDefault(); e.stopPropagation(); } }, true);
-const NOWORLD = RN_Q.has('noworld') ? RN_Q.get('noworld') === '1' : RN_PHONE;
 function line(s, cls) {
   keep(`${secs()} ${s}`);
   if (/^STOP|^JS |abort|Aborted|RuntimeError/.test(s)) setTimeout(flush, 0);
-  if (s.includes('WORLD: only on a computer')) window.rnToast?.('WORLD es solo para computadora', 4000);
   // The front-end packages on screen (host/d3d9.c flow_log): web/touch.js picks its layout from them.
   if (s.includes('flow manual ')) { window.RN_MANUAL = /flow manual 1/.test(s); dispatchEvent(new Event('rn-fe')); }
   if (s.includes('flow fe ')) { const m = /flow fe (\S*) \(frame/.exec(s); if (m) { window.RN_FE = m[1].split(',').filter(Boolean); dispatchEvent(new Event('rn-fe')); } }
@@ -74,20 +62,18 @@ function line(s, cls) {
   log.appendChild(d);
   // A 'stop' line (missing WebGPU, COOP/COEP, a lost GPU) ends the session: the gate says why (web/app.js), F2 opens this log.
   if (cls === 'stop' || /^STOP/.test(s)) { status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; RN_APP.set('stop', s); }
-  // The launcher's curtain (?fast=1 with ?start=, web/index.html) lifts on arrival: the main menu, the race (flow state 6), or the screen after the main menu (career).
+  // The launcher's curtain (?fast=1 with ?start=, web/index.html) lifts on arrival: the main menu, or the screen after the main menu (career).
   else if (CURTAIN && RN_APP.state === 'load') {
     if (/flow fe .*MU_Main_PC\.fng/.test(s)) { if (DEST === 'menu') arrive(); else main = true; }
-    else if (DEST === 'world' ? /flow state 6\//.test(s) : main && /flow fe /.test(s)) cityThen(arrive);
+    else if (main && /flow fe /.test(s)) arrive();
   }
 }
 const START = RN_Q.get('start'), CURTAIN = RN_Q.get('fast') === '1' && !!START;
-// Where the scripted trip ends, and so what lifts the curtain: WORLD only where WORLD exists (a phone, ?noworld=1), any other ?start= is the main menu
-// (the curtain waited for a race that never came and lifted on its 45 s cap). The curtain is down while RN_APP.state is 'load' (web/app.js): no flag of its own.
-const DEST = START === 'career' ? 'career' : START === 'world' && !NOWORLD ? 'world' : 'menu';
+// Where the scripted trip ends, and so what lifts the curtain: career, any other ?start= is the main menu (WORLD retired 2026-11-17, attic/world/README.md:
+// an old ?start=world link lands on the main menu). The curtain is down while RN_APP.state is 'load' (web/app.js): no flag of its own.
+const DEST = START === 'career' ? 'career' : 'menu';
 let main = false;
 const arrive = () => { if (RN_APP.state === 'load') RN_APP.set('run'); };
-// WORLD: the curtain stays until the UG2 city is on the GPU (web/ug2/ug2world.js state), so the first seconds of driving do not pay for its upload; 20 s at most.
-const cityThen = f => { const t1 = performance.now(), w = () => DEST !== 'world' || !window.Ug2 || RN_Q.get('ug2') === '0' || /ready|failed|nofile/.test(Ug2.state) || performance.now() - t1 > 20000 ? f() : setTimeout(w, 100); w(); };
 RN_APP.on((s, from) => keep(`${secs()} app: ${from} -> ${s}`));
 // A download whose bytes are counted on the gate. Compressed transfers have no usable total, so it shows megabytes.
 async function download(url, what) {
@@ -153,30 +139,25 @@ async function download(url, what) {
         if (RN_PHONE) { delete m.ENV.RN_HUD; m.ENV.RN_FESIDE = '0'; }   // the in-race menus stay centred: the touch buttons own the margins
       } else m.ENV.RN_WALLSOFTEN = '1'; // 0x46bae0: remove the remaster's grazing wall rebound
       line(`mode: ${RN_MODE} (F4 switches)`);
-      line(`ug2: city pass ${window.Ug2?.on ? 'on (drawn while the track id is 1010)' : 'off until the track id is 1010, nothing fetched'} (mode ${RN_MODE}, WORLD row ${m.ENV.RN_WORLDROW === '0' ? 'off' : m.ENV.RN_WORLDROW === '2' ? 'hidden (menu button only)' : 'listed'})`);
       // ?fps=30: the host frame pacer targets 30 fps (web/mode.js degradation switches; ?fx=0 is read there)
       if (RN_Q.get('fps') === '30') m.ENV.RN_FPS = '30';
-      // Phones and tablets have no WORLD (OWNER 2026-11-15: WORLD is for computers; host/openworld.c world_off). ?noworld=0|1 says otherwise.
-      if (NOWORLD) m.ENV.RN_NOWORLD = '1';
       if (RN_PHONE) m.ENV.RN_RANGEMB = '16';   // host/files.c: the cache of fetched pieces (256 MB elsewhere)
       // host/files.c: helper threads bring what this entry always reads (web/entry_hint.tsv) while the engine boots and the menus pass. Not on phones (the 16 MB cache).
-      else m.ENV.RN_PREFETCH = DEST === 'world' ? 'world' : 'boot';
+      else m.ENV.RN_PREFETCH = 'boot';
       if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
       for (const kv of (RN_Q.get('env') || '').split(',').filter(Boolean)) {
         const k = kv.indexOf('=');
         m.ENV[k < 0 ? kv : kv.slice(0, k)] = k < 0 ? '1' : kv.slice(k + 1);
       }
-      // ?world=1: the open world (docs/OPENWORLD.md): the 16 street tracks load one merged collision, no fences (host/openworld.c)
-      if (RN_Q.get('world') === '1') m.ENV.RN_WORLD = '1';
-      // ?ai=0: WORLD rivals drive the shipped skill records, no nervous, clean or aggressive personalities (host/rivals.c), and the WORLD
-      // keeps the plain free mode AI: 6 rivals, 19 traffic cars (host/free.c world_ai). Read at each race.
+      // ?ai=0: rivals drive the shipped skill records, no nervous, clean or aggressive personalities (host/rivals.c). Read at each race.
       if (RN_Q.get('ai') === '0') m.ENV.RN_AI = '0';
       // ?trafyield=0: traffic does not move aside for the player closing from behind (host/rivals.c traffic_tick)
       if (RN_Q.get('trafyield') === '0') m.ENV.RN_TRAFYIELD = '0';
       // ?rivalopen=0: Free Run rivals stay on the start grid until the 10 s respawn rules move them (host/free.c free_respawn)
       if (RN_Q.get('rivalopen') === '0') m.ENV.RN_RIVALOPEN = '0';
-      // ?pool=1 (OWNER 2026-11-03): the car pool: neon puddle, liveries, personas, warm car light (host/rivals.c, web/gpu.js livery). Off until approved.
+      // ?pool=1 (OWNER 2026-11-03): the car pool: neon puddle, liveries, personas, warm car light (host/rivals.c, web/gpu.js livery). Test only:
+      // the launcher stopped sending it with the WORLD retirement (OWNER 2026-11-17).
       if (RN_Q.get('pool') === '1') { m.ENV.RN_POOL = '1'; m.ENV.RN_TRAFMODELS = '1'; m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
       // RN_JCLOG: one log line a second plus one per airborne sample (host/d3d9.c jumpcam_log): why a jump did or did not get the jump camera, in build/web.log
       m.ENV.RN_JCLOG = '1';
@@ -191,7 +172,7 @@ async function download(url, what) {
       if (RN_Q.get('aistuck') === '1') m.ENV.RN_AI_STUCK = '1';
       // Shipped rear grip assist by default (OWNER 2026-10-31: the feel must be the original's); ?handling=1: the 0.18 cap (host/rivals.c)
       if (RN_Q.get('handling') !== '1') m.ENV.RN_HANDLING = '0';
-      // Traffic (host/rivals.c): ?trafmodels=0 no bus, ambulance, fire truck in WORLD (default on), =1 on any track; ?trafrefill=1 traffic_refill in place of free_tmove;
+      // Traffic (host/rivals.c): ?trafmodels=1 bus, ambulance, fire truck on any track; ?trafrefill=1 traffic_refill in place of free_tmove;
       // ?traffic=<n> free mode's traffic count, x1.5 = cars, 23 at most with 6 rivals (0x4322a0)
       if (RN_Q.has('trafmodels')) m.ENV.RN_TRAFMODELS = RN_Q.get('trafmodels');
       if (RN_Q.get('trafrefill') === '1') { m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
@@ -205,17 +186,15 @@ async function download(url, what) {
       // 0 circuit, 1 sprint, 2 lap KO, 3 free run, 5 drag, 6 drift), the next one when a race comes back to the menu
       const jump = RN_Q.get('jump');
       if (jump) m.ENV.RN_JUMP = jump;
-      // ?start=menu|world|career (OWNER 2026-11-16): the launcher's three entries (web/launcher.js JUGAR, WORLD, CARRERA). The game's own Accept takes the
+      // ?start=menu|career (OWNER 2026-11-16, WORLD retired 2026-11-17): the launcher's entries (web/launcher.js JUGAR, CARRERA). The game's own Accept takes the
       // player there (RN_KEYS, host/input.c) under the launcher's curtain (web/index.html), so no menu is ever seen moving by itself. Without ?start= no key is scripted.
       // The intro movies and the splash are gone (PATCH 0x4de395, tools/recomp/patches_launcher.py), so the profile screen is first: Enter 1.5 s after it shows,
       // then twice more 1.2 s apart unless the main menu is already up (the game loads the last profile; a tap is dropped once MU_Main_PC shows).
-      // world: one Enter on the main menu, then RN_JUMP 3:1010 (the menu path of tools/completion.py). No RETURN after flow 6: in a race it changes the camera (FEEL log 2026-11-10).
       // career: one UP on the main menu (the cursor starts on Quick Race, docs/re/frontend_menu.md:29; tools/completion.py:34), then Enter = Go Underground. ?keys= or ?jump= take over.
       if (START && !keys && !jump) {
         // The two retries wait 1.2 s each (3 s each cost 6 s of every entry, log 2026-11-16: the main menu was up 50 ms after the first Enter).
         const menu = '800@=MU_UG_NewOrLoad_PC2:RETURN,1200@!MU_Main_PC:RETURN,1200@!MU_Main_PC:RETURN';
-        if (DEST === 'world') { m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:RETURN'; }
-        else if (DEST === 'career') m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:UP,800@=MU_Main_PC:RETURN';
+        if (DEST === 'career') m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:UP,800@=MU_Main_PC:RETURN';
         else m.ENV.RN_KEYS = menu + ',3000@!MU_Main_PC:RETURN';
       }
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
@@ -259,7 +238,7 @@ async function download(url, what) {
     const a = M._rn_load_addr?.() >>> 0, v = a ? new Uint32Array(M.HEAPU8.buffer, a, 2) : null;
     if (!v || !v[0]) return;
     if (v[1] < v[0]) RN_APP.say(`${RN_TR('Cargando')} ${v[1] >> 10} / ${v[0] >> 10} MB`, v[1] / v[0]);
-    else RN_APP.say(RN_TR(DEST === 'world' ? 'Entrando a la ciudad…' : 'Arrancando…'), 1);
+    else RN_APP.say(RN_TR('Arrancando…'), 1);
   }, 200);
   // Memory line when it moves by 16 MB or more (host/win32.c rn_mem_mb): what an iPhone tab (~1.5 GB, then iOS kills it) holds.
   let memLast = '';

@@ -71,11 +71,21 @@ uint32_t mode_menu(Ctx *c) {
     memcpy(G(buttons), G(old), (idx + 1) * 4);
     st(c, buttons + (idx + 1) * 4, obj, 4);
     memcpy(G(buttons + (idx + 2) * 4), G(old + (idx + 1) * 4), (n - idx - 1) * 4);
-    st(c, pkg + 0x84, buttons, 4); st(c, pkg + 0x88, n + 1, 4); guest_free(old);
+    // Online (0x70fbb1e4, docs/re/frontend_menu.md) leaves the screen (WORLD retired 2026-11-17, attic/world/README.md; the shipped button
+    // needs a network the page does not have): out of the navigable array, moved far below, and every button under it moves up into its place.
+    uint32_t m = n + 1, online = 0;
+    for (uint32_t i = 0; i < m; i++) if (rd(c, rd(c, buttons + 4 * i) + 0x10) == 0x70fbb1e4) { online = rd(c, buttons + 4 * i); memmove(G(buttons + 4 * i), G(buttons + 4 * i + 4), (m - i - 1) * 4); m--; break; }
+    if (online) {
+        float oy, y, gap = 0; memcpy(&oy, G(rd(c, online + 0x2c) + 32), 4);
+        for (uint32_t i = 0; i < m; i++) { memcpy(&y, G(rd(c, rd(c, buttons + 4 * i) + 0x2c) + 32), 4); if (y > oy && (!gap || y - oy < gap)) gap = y - oy; }
+        for (uint32_t i = 0; i < m; i++) { uint32_t b = rd(c, buttons + 4 * i); memcpy(&y, G(rd(c, b + 0x2c) + 32), 4); if (y > oy) shift_y(c, b, -gap); }
+        shift_y(c, online, 2000.0f);
+    }
+    st(c, pkg + 0x84, buttons, 4); st(c, pkg + 0x88, m, 4); guest_free(old);
     const char *mode = getenv("RN_MODE"), *label = mode && !strcmp(mode, "original") ? "MODO REMASTER" : "MODO ORIGINAL";
     uint32_t text = guest_alloc(32); strcpy((char *)G(text), label);
     c->r[EAX] = obj; call_guest_cdecl(c, 0x4f68a0, 1, &text); guest_free(text);
-    rn_log("mode menu: added %s hash=%08x object=%08x buttons=%u", label, MODE_HASH, obj, n + 1);
+    rn_log("mode menu: added %s hash=%08x object=%08x buttons=%u, online %s", label, MODE_HASH, obj, m, online ? "hidden" : "missing");
 out:
     memcpy(c->r, saved, sizeof saved); return saved[EAX];
 }

@@ -1,4 +1,4 @@
-"""Patches: rivals, Free Run, WORLD rows, traffic. Split from patches.py (GOAL 2026-11-05); patches.py imports this file in a fixed order."""
+"""Patches: rivals, Free Run, traffic. Split from patches.py (GOAL 2026-11-05); patches.py imports this file in a fixed order."""
 import struct
 from patches import PATCHES, _rel, _imm, _j32, _jcc32, ROAD_ADDR, EBASE_ADDR, ROAD_RB, CODE_AREA
 
@@ -74,18 +74,6 @@ PATCHES.append(dict(addr=0x439a9a, old="cc" * 6, new="ff258c300100", entry=True,
 PATCHES.append(dict(addr=0x430dbd, old="e85ed8ffff", new="e8" + _rel(0x430dbd, 0x554495), when=lambda: True))
 PATCHES.append(dict(addr=0x554495, old="cc" * 6, new="ff2590300100", entry=True, when=lambda: True))
 
-# PATCH: 0x7007ec, 0x700850 (+ caves 0x6439f2, 0x6439f8: CC padding between two functions, no reference), 0x4ba207; OWNER 2026-10-28
-# (the "WORLD" entry of the Free Run list, docs/openworld/world_entry.md). 0x7007ec / 0x700850 are entries of the chunk handler table
-# (0x442040 track-info table chunk 0x34201, 0x59fce0 language chunk 0x39000; cdecl, one argument = the chunk). They now point at caves,
-# jmp [SCREEN_ADDR+0x74] = host/openworld.c world_rows (original loader, then a 32nd track row: id 1010, mask 0x90, minimap bounds) and
-# jmp [SCREEN_ADDR+0x78] = world_lang (original loader, then the name pair "TRACK_NAME_1010" -> "WORLD" in the sorted language table).
-# The list builder 0x4ba100 adds each row twice (forward, then reverse: pass 2 tests `row[0x74] & 8` at 0x4ba207, test al,8): the test now
-# reads 0x88, so the new row's mask bit 0x80 means "no reverse entry". The shipped rows never have 0x80. RN_WORLDROW=0: no row, no name.
-PATCHES.append(dict(addr=0x6439f2, old="cc" * 6, new="ff2574300100", entry=True, when=lambda: True))
-PATCHES.append(dict(addr=0x6439f8, old="cc" * 6, new="ff2578300100", entry=True, when=lambda: True))
-PATCHES.append(dict(addr=0x7007ec, old="40204400", new=struct.pack("<I", 0x6439f2).hex(), when=lambda: True))
-PATCHES.append(dict(addr=0x700850, old="e0fc5900", new=struct.pack("<I", 0x6439f8).hex(), when=lambda: True))
-PATCHES.append(dict(addr=0x4ba207, old="a808", new="a888", when=lambda: True))
 
 # PATCH: 0x422a78, 0x422a85, 0x422afa, 0x4345a9, OWNER 2026-10-28 (Free Run with 6 rivals, docs/openworld/re_racer_cap_probe.md 4):
 # the game never has more than 4 racers, two places stop more. (a) The race start 0x422a70 asks 0x422580 for 4 start positions
@@ -129,7 +117,7 @@ PATCHES.append(dict(addr=0x57d0c1, old="d984b1600c0000", new="e8bae10b009090", w
 # AddTrafficCars 0x4b3ac0 -> 0x57d160 sets +0x444 = 0. So a GOLF or CIVIC in traffic drew wheels, seat and driver with no
 # body (the OWNER's "invisible cars", PLAN 6.2). Now host/free.c free_traffic gives each racer ride DUMMY_SKIN5..12 / DUMMY_WHEEL5..12,
 # render targets that exist in the overlay build/openworld/CARS_TEXTURES.BIN (tools/remaster/world_overlays.py cars, served by
-# host/openworld.c). Without that file the racer rows stay invisible: build it first.
+# host/trackfiles.c). Without that file the racer rows stay invisible: build it first.
 PATCHES.append(dict(addr=0x57cfc7, old="8b88540c00003bce751c", new="e91ee30b009090909090", when=lambda: True))
 PATCHES.append(dict(addr=0x4b3b01, old="0fbe9479c0000000", new="e80a781800909090", when=lambda: True))
 PATCHES.append(dict(addr=0x583a37, old="e8c4300200", new="e8f5780b00", when=lambda: True))
@@ -217,7 +205,3 @@ PATCHES.append(dict(addr=0x63b366, old="6a00ff15ec75", new="ff25a0300100", entry
 PATCHES.append(dict(addr=0x583a37, old="e8f5780b00", new="e8" + _rel(0x583a37, 0x63b366), when=lambda: True))
 PATCHES.append(dict(addr=0x583a5b, old="e8d1780b00", new="e8" + _rel(0x583a5b, 0x63b366), when=lambda: True))
 
-# PATCH: 0x4b4d05, OWNER 2026-11-11 (row 11, WORLD races): QuickRace::SetupSprint 0x4b4c30 copies TrackInfo row +0x69 (the open-track byte) to 0x78a318; the WORLD row is a
-# clone of the circuit row CT1 (+0x69 = 0) and serves two races (Circuit = Park Loop, Sprint = the bridge challenge; host/openworld.c rn_world_open picks the file by mode), so
-# the sprint's open flag is now a constant 1: push 1 / pop ecx / nop replaces movsx ecx, [edx + 0x69]. Same value for the 8 shipped sprint rows (GLOBALB 0x34201: 1102..1109 all +0x69 = 1), so nothing changes outside WORLD.
-PATCHES.append(dict(addr=0x4b4d05, old="0fbe4a69", new="6a015990", when=lambda: True))
