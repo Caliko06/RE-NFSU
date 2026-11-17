@@ -28,6 +28,8 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Need for Speed Underground (browser version)", "alternateName": ["NFSU", "NFS Underground online", "NFSU.cc"], "url": "https://nfsu.cc/", "image": "https://nfsu.cc/og.jpg", "description": "Play Need for Speed Underground (2003) in your browser, nothing to install. The full game. Keyboard, gamepad and touch.", "genre": ["Racing", "Arcade racing"], "gamePlatform": ["Web browser", "Chrome", "Edge", "Safari", "Firefox"], "applicationCategory": "Game", "operatingSystem": "Any (WebGPU browser)", "playMode": "SinglePlayer", "inLanguage": ["en", "es"], "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <link rel="stylesheet" href="launcher.css">
+<link rel="preload" href="launcher/v2/ui/game_font.png" as="image">
+<link rel="preload" href="launcher/v2/ui/game_font.json" as="fetch" crossorigin>
 </head>
 <body class="boot">
 <!-- Scene: web/launcher_b/scene.js draws the 3D street (PlayCanvas, the game's own assets) into #scene. .plate is a CSS gradient shown if the scene fails. -->
@@ -83,7 +85,8 @@
 <script src="launcher_audio.js"></script>
 <script src="dik.js"></script>
 <script src="binds.js"></script>
-<script type="module" src="launcher_b/scene.js"></script>
+<!-- launcher.js before the scene: modules run in order, and scene.js waits for PlayCanvas (830 KB); the menu must not (2026-11-17) -->
 <script type="module" src="launcher.js"></script>
+<script type="module" src="launcher_b/scene.js"></script>
 </body>
 </html>

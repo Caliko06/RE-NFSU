@@ -981,3 +981,4 @@ async function main(canvas, opts, resolveReady) {
     });
     app.start();
 }
+dispatchEvent(new Event('rn-scene'));   // web/launcher.js runs first and starts the street when this module is ready

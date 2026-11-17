@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+// The launcher entry runs first, before the page asks for any of its scripts (2026-11-17: placed lower, a visit fetched the game's
+// 18 scripts, 1.4 s, before leaving). On a computer the launcher is always the entry (OWNER 2026-11-17); only a tab that already
+// chose (sessionStorage rn_q: the launcher's JUGAR, the in-game panel, web/mode.js) stays in the game. ?fast=1 without go=1 too.
+const RN_COARSE = matchMedia('(pointer: coarse)').matches;
+{ const p = new URLSearchParams(location.search);
+  if (!location.search && !RN_COARSE && sessionStorage.getItem('rn_q') === null || p.get('fast') === '1' && p.get('go') !== '1') location.replace('launcher.html'); }
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#000000">
@@ -66,16 +74,10 @@
 <script src="i18n.js"></script>
 <script src="launcher_opts.js"></script>
 <script>
-// ?fast=1 typed by hand without go=1: the launcher is the entry point.
-{ const p = new URLSearchParams(location.search); if (p.get('fast') === '1' && p.get('go') !== '1') location.replace('launcher.html'); }
 // Everything plays at the bare address (OWNER 2026-11-15: no switches in the link; only the launcher has its own page).
 // RN_SEARCH = the switches of this visit: this tab's choice (sessionStorage rn_q, written by the launcher's Jugar, web/overlay.js and the
 // mode switch in web/mode.js), else on a computer the saved launcher choice (the mode itself comes from storage, web/mode.js).
 // Phones and tablets start light with nothing saved (web/mode.js RN_PHONE). A query typed in the address still wins (tests, tools/webcheck.mjs).
-// On a computer the launcher is always the entry (OWNER 2026-11-17: nfsu.cc must open the launcher, not the game). Only a tab that
-// already chose (sessionStorage rn_q: the launcher's JUGAR, the in-game panel, web/mode.js) stays in the game on reload.
-const RN_COARSE = matchMedia('(pointer: coarse)').matches;
-if (!location.search && !RN_COARSE && sessionStorage.getItem('rn_q') === null) location.replace('launcher.html');
 const RN_SEARCH = location.search || '?' + (sessionStorage.getItem('rn_q') ?? (RN_COARSE ? '' : RN_LAUNCH.query(RN_LAUNCH.load()).split('&').filter(x => x !== 'play=1' && !x.startsWith('mode=')).join('&')));
 </script>
 <script src="mode.js"></script>

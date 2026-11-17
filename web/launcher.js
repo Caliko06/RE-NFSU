@@ -375,7 +375,7 @@
   addEventListener('gamepadconnected', startPolling);
   if (navigator.getGamepads && [...navigator.getGamepads()].some(Boolean)) startPolling();
 
-  // ---------- start: scene intro, then the UI comes in ----------
+  // ---------- start: the UI comes in at once; the scene follows behind ----------
   function reveal() {
     if (revealed) return;
     revealed = true;
@@ -387,15 +387,16 @@
     [$('titleA'), ...simple.children, $('more'), $('guides')].forEach((r, i) => A(r, [{ opacity: 0, transform: 'translateX(4rem)' }, { opacity: 1, transform: 'none' }], { duration: 200, delay: 140 + i * 35, easing: e, fill: 'backwards' }));
     setTimeout(detect, 900);
   }
-  const S = window.RN_SCENE;
   body.classList.toggle('touch', kind === 'touch');
   tab = groups[0].id; paint(); hints();
   choose($('play'), { quiet: true });
-  if (S && typeof S.start === 'function') {
-    let p;
-    try { p = S.start($('scene'), {}); } catch (e) { console.warn('RN_SCENE.start', e); p = Promise.reject(e); }
-    Promise.resolve(p).then(() => { scene('motion', motion); if (typeof S.onIntroDone === 'function') S.onIntroDone(reveal); else setTimeout(reveal, 2500); },
-      () => { root.classList.add('static'); setTimeout(reveal, 300); });
-    setTimeout(reveal, 7000);                        // never leave the menu hidden
-  } else { root.classList.add('static'); setTimeout(reveal, 350); }
+  // The menu comes in at once (OWNER 2026-11-17: "no abre de inmediato"; it used to wait for the 3D street, ~6 s cold).
+  // The street (web/launcher_b/scene.js, PlayCanvas + 16 MB) loads behind it and starts when its module has run ('rn-scene').
+  reveal();
+  const startScene = () => {
+    const S = window.RN_SCENE;
+    if (!S || typeof S.start !== 'function') return;
+    Promise.resolve().then(() => S.start($('scene'), {})).then(() => scene('motion', motion), e => { console.warn('RN_SCENE.start', e); root.classList.add('static'); });
+  };
+  if (window.RN_SCENE) startScene(); else addEventListener('rn-scene', startScene, { once: true });
 })();
