@@ -14,8 +14,8 @@
   --ease: cubic-bezier(.16, 1, .3, 1);
   --pad: 4.4rem;
 }
-html { font-size: max(7px, var(--u)); background: #03090c; }
-@media (pointer: coarse) { html { font-size: max(7.6px, var(--u)); } }
+html { font-size: max(min(7px, 1vh), var(--u)); background: #03090c; }   /* the 7px floor never outgrows the height (520 px tall: rows ran under the help line) */
+@media (pointer: coarse) { html { font-size: max(min(7.6px, 1vh), var(--u)); } }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
 body { color: var(--blue); font-family: var(--f); font-style: italic; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; touch-action: manipulation; background: #03090c; }
@@ -67,7 +67,7 @@ body.leaving .ui { transition: opacity .28s ease-in .12s; opacity: 0; }
 html:not(.calm) .row:active > .lt, html:not(.calm) .item:active > .t { transform: scale(.97); }
 .lt, .item > .t { transition: transform .12s var(--ease), color .12s; transform-origin: right center; }
 /* JUGAR: the first item and the biggest thing on the sheet */
-#sheetA .row, #sheetA .item:not(.go) { min-height: 6.1rem; }   /* the main menu holds JUGAR + seven lines above the help bar */
+#sheetA .row, #sheetA .item:not(.go) { min-height: 5.7rem; }   /* the main menu holds JUGAR + seven lines above the help bar (Idioma added 2026-11-17) */
 .item.go { min-height: 11rem; font-size: 7.4rem; --ink: rgb(150, 200, 218); margin-bottom: 1rem; }
 .item.go.sel { --ink: #fff; }
 .item.go::before { inset: .8rem 0 .8rem 2rem; background: linear-gradient(90deg, transparent, rgba(92, 150, 184, .4) 30%); }
@@ -89,13 +89,13 @@ a.item { color: inherit; text-decoration: none; }
 .arr:active { transform: scale(.86); }
 .arr:focus-visible, .tool:focus-visible, .keys button:focus-visible { outline: 2px solid var(--key); outline-offset: 2px; }
 
-/* volume: the game's segmented bar */
-.track { position: relative; width: 22rem; height: 4.6rem; flex: none; touch-action: none; cursor: ew-resize; }
-.track::before, .track::after { content: ""; position: absolute; left: 0; top: 1.3rem; bottom: 1.3rem; width: 100%;
-  -webkit-mask: repeating-linear-gradient(90deg, #000 0 1.6rem, transparent 1.6rem 2.2rem); mask: repeating-linear-gradient(90deg, #000 0 1.6rem, transparent 1.6rem 2.2rem); }
-.track::before { background: var(--bar); }
-.track::after { background: var(--ink); clip-path: inset(0 calc(100% - var(--p, 1) * 100%) 0 0); transition: clip-path .14s var(--ease), background-color .12s; }
-.num { width: 5.8rem; flex: none; text-align: right; font: italic 600 max(13px, 2.6rem)/1 var(--f); color: var(--ink); transition: color .12s; }
+/* volume: the value reads like every line (70 %), its level is the game's segmented bar under it; click or drag on it sets it */
+.vv.lvl { position: relative; cursor: ew-resize; touch-action: none; }
+.vv.lvl::before, .vv.lvl::after { content: ""; position: absolute; left: 1.6rem; right: 1.6rem; bottom: .2rem; height: .6rem;
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 1.4rem, transparent 1.4rem 1.8rem); mask: repeating-linear-gradient(90deg, #000 0 1.4rem, transparent 1.4rem 1.8rem); }
+.vv.lvl::before { background: var(--bar); }
+.vv.lvl::after { background: var(--ink); clip-path: inset(0 calc(100% - var(--p, 1) * 100%) 0 0); transition: clip-path .14s var(--ease), background-color .12s; }
+.vv.lvl > .t { margin-bottom: .8rem; }
 
 /* ---------- screen B: one group at a time, browsed sideways like the car picker ---------- */
 .browse { display: grid; grid-template-columns: 5rem 1fr 5rem; align-items: center; height: 6.4rem; margin: 0 var(--pad); background: var(--bar); }

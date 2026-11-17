@@ -1,10 +1,11 @@
 // Language of the launcher, the option catalog and the page panels (OWNER 2026-11-16: English and Spanish, by the visitor's region).
-// A browser set to Spanish gets Spanish; every other one gets English. ?lang=es|en forces one (tests).
+// A browser set to Spanish gets Spanish; every other one gets English. ?lang=es|en forces one (tests); the launcher's Idioma line
+// keeps the visitor's own choice in localStorage 'rn_lang' (OWNER 2026-11-17), which wins over the browser.
 // The code keeps its Spanish strings; RN_TR(s) returns the English line when the visit is English, and s itself when there is none.
 // Loaded first by web/launcher.html and web/index.html. The game itself is English only (its own text, not ours).
 (() => {
   let l = 'en';
-  try { l = new URLSearchParams(location.search).get('lang') || navigator.language || 'en'; } catch {}
+  try { l = new URLSearchParams(location.search).get('lang') || localStorage.getItem('rn_lang') || navigator.language || 'en'; } catch {}
   const lang = /^es/i.test(l) ? 'es' : 'en';
   const EN = {
     // web/launcher_opts.js: groups
@@ -41,7 +42,7 @@
     'Efectos del remaster': 'Remaster effects', 'Efectos remaster': 'Remaster effects', 'No apaga las mejoras de juego, solo los efectos visuales.': 'Turns off the visual effects only, not the gameplay improvements.',
     'Fotogramas por segundo': 'Frames per second', 'Fotogramas': 'Frame rate', '30 pesa la mitad. En iPad o celular ya es 30 por defecto.': '30 is half the work. On an iPad or a phone it is already 30.',
     'Resolución': 'Resolution', 'Ancho máximo de dibujo. Menos píxeles, más fluidez.': 'Widest picture drawn. Fewer pixels, smoother play.', 'Automática': 'Automatic',
-    'Volumen': 'Volume', 'Volumen general del juego. Música y efectos por separado están en el menú del juego.': 'Overall game volume. Music and effects have their own sliders in the game menu.',
+    'Volumen': 'Volume', 'Sin sonido': 'Muted', 'Idioma': 'Language', 'Idioma del menú, las guías y el panel del juego. El juego en sí está en inglés, como salió.': 'Language of this menu, the guides and the in-game panel. The game itself is in English, as it shipped.', 'Volumen de todo el juego. Los sonidos de este menú ya suenan a ese nivel. Música y efectos por separado, en el menú del juego.': 'Volume of the whole game. The sounds of this menu already play at that level. Music and effects have their own sliders in the game menu.',
     'Tráfico': 'Traffic', 'Cuántos coches civiles circulan en Free Run.': 'How many civilian cars drive around in Free Run.',
     'Sin tráfico': 'No traffic',
     'Rivales con personalidad': 'Rivals with personality', 'Rivales con carácter': 'Rivals with character', 'Nerviosos, limpios o agresivos. Apagado: corren como en 2003.': 'Nervous, clean or aggressive. Off: they race as in 2003.',

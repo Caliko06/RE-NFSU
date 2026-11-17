@@ -3,6 +3,7 @@
 // a tiny synthesized tick. No background loop (OWNER 2026-11-17: the rain and idle engine bed is gone). Master gain 0.06, never above 0.1.
 // Browsers start audio only after a user gesture: the context is made on the first pointer/key/touch (or pad button) press.
 // State is remembered in localStorage 'rn_launch_snd' ('0' = off, anything else = on).
+// volume(0..1): the launcher's Volumen line; the master is scaled by its square, as the game's gain is (web/audio.js), so a change is heard.
 (() => {
   'use strict';
   const KEY = 'rn_launch_snd', MASTER = 0.06, CAP = 0.1, BASE = 'launcher/v2/sfx/';
@@ -11,9 +12,9 @@
     get() { try { return localStorage.getItem(KEY) !== '0'; } catch { return true; } },
     set(on) { try { localStorage.setItem(KEY, on ? '1' : '0'); } catch {} },
   };
-  let on = store.get(), ctx = null, master = null, started = false;
+  let on = store.get(), ctx = null, master = null, started = false, vol = 1;
   const raw = {}, bufs = {}, subs = [];
-  const gainValue = () => Math.min(CAP, on ? MASTER : 0);
+  const gainValue = () => Math.min(CAP, on ? MASTER * vol * vol : 0);
 
   // Start fetching the files now (plain network reads, no context needed); decode once the context exists.
   for (const n of Object.keys(LEVEL)) {
@@ -92,6 +93,7 @@
 
   window.RN_SND = {
     play, set,
+    volume(v) { vol = Math.max(0, Math.min(1, +v || 0)); if (ctx && master) master.gain.setValueAtTime(gainValue(), ctx.currentTime); },
     toggle() { set(!on); return on; },
     isOn: () => on,
     onChange: f => { subs.push(f); },

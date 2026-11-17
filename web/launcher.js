@@ -144,17 +144,20 @@
     row._paint = dir => { const x = o.values.find(y => y.v === sel[o.id]), label = x ? x.label : sel[o.id]; if (row._v !== label) { row._v = label; spray(vv, label, dir); row.setAttribute('aria-valuetext', label); } };
     rows.push(row); return row;
   }
-  function sliderRow(box, o) {      // volume: the game's segmented bar
+  // volume: ‹ 70 % › like every other line (OWNER 2026-11-17: the bare bar and number did not read), the level as a bar under the value.
+  // It stops at 0 and 100 instead of wrapping; a click or drag on the value sets it too. The menu's own sounds follow it (sndVol).
+  function sliderRow(box, o) {
     const row = rowBase(box, o.label, o.help, o.group);
-    const tr = el('span', 'track'), num = el('span', 'num');
-    row.append(tr, num);
-    row.setAttribute('role', 'slider'); row._o = o;
+    const val = el('span', 'val'), vv = el('span', 'vv lvl');
+    val.append(arrow(row, -1), vv, arrow(row, 1)); row.append(val);
+    row.setAttribute('role', 'slider'); row.setAttribute('aria-valuemin', '0'); row.setAttribute('aria-valuemax', '100'); row._o = o;
     const n = o.values.length - 1, idx = () => Math.max(0, o.values.findIndex(x => x.v === sel[o.id]));
-    row._adj = d => { const i = clamp(idx() + d, 0, n); if (i !== idx()) setOpt(o.id, o.values[i].v, d); };
-    row._paint = () => { const i = idx(); tr.style.setProperty('--p', i / n); num.textContent = o.values[i].v; row.setAttribute('aria-valuenow', o.values[i].v); };
-    const drag = e => { const r = tr.getBoundingClientRect(), i = Math.round(clamp((e.clientX - r.left) / r.width, 0, 1) * n); if (i !== idx()) setOpt(o.id, o.values[i].v, 0); };
-    tr.addEventListener('pointerdown', e => { tr.setPointerCapture(e.pointerId); choose(row); drag(e); tr.onpointermove = drag; });
-    tr.addEventListener('pointerup', () => { tr.onpointermove = null; });
+    row._adj = d => { const i = clamp(idx() + d, 0, n); if (i !== idx()) setOpt(o.id, o.values[i].v, d); else snd('back'); };
+    row._paint = dir => { const i = idx(), label = o.values[i].label; vv.style.setProperty('--p', i / n); row.setAttribute('aria-valuenow', o.values[i].v); row.setAttribute('aria-valuetext', label); if (row._v !== label) { row._v = label; spray(vv, label, dir); } };
+    const drag = e => { const r = vv.getBoundingClientRect(), i = Math.round(clamp((e.clientX - r.left) / r.width, 0, 1) * n); if (i !== idx()) setOpt(o.id, o.values[i].v, i > idx() ? 1 : -1); };
+    vv.addEventListener('pointerdown', e => { e.stopPropagation(); vv.setPointerCapture(e.pointerId); choose(row); drag(e); vv.onpointermove = drag; });
+    vv.addEventListener('pointerup', () => { vv.onpointermove = null; });
+    vv.addEventListener('click', e => e.stopPropagation());
     rows.push(row); return row;
   }
   function actionRow(box, label, help, group, fn, value) {
@@ -187,6 +190,25 @@
   }
   for (const o of opts) if (o.simple) (o.slider ? sliderRow : choiceRow)(simple, o);
   actionRow(simple, 'Controles', 'Teclas, mando y pantalla táctil. Todo se puede reasignar.', 'controles', () => { openAdv('controles'); }, 'Ver');
+  // Idioma (OWNER 2026-11-17): each language named in itself; the choice is kept (web/i18n.js 'rn_lang') and the page reloads in it,
+  // back on this same line. The game's in-page panel (web/index.html) reads the same key.
+  const LANGS = [['es', 'Español'], ['en', 'English']];
+  const langRow = rowBase(simple, 'Idioma', 'Idioma del menú, las guías y el panel del juego. El juego en sí está en inglés, como salió.', 'juego');
+  {
+    const val = el('span', 'val'), vv = el('span', 'vv'); val.append(arrow(langRow, -1), vv, arrow(langRow, 1)); langRow.append(val);
+    langRow.setAttribute('role', 'spinbutton');
+    const now = LANGS.findIndex(x => x[0] === (window.RN_LANG || 'es'));
+    langRow._paint = () => { if (!langRow._v) { langRow._v = LANGS[now][1]; spray(vv, langRow._v); } };
+    langRow._adj = d => {
+      if (going) return;
+      const nx = LANGS[(now + d + LANGS.length) % LANGS.length];
+      going = true; snd('tab'); spray(vv, nx[1], d); store.set('rn_lang', nx[0]);
+      try { sessionStorage.setItem('rn_launch_at', 'lang'); } catch {}
+      setTimeout(() => location.reload(), motion ? 220 : 60);
+    };
+    langRow._ok = () => langRow._adj(1);
+    rows.push(langRow);
+  }
 
   // sheet B: every option, by group
   const groups = L.groups.filter(g => opts.some(o => o.group === g.id)).concat([{ id: 'partidas', title: t('Partidas') }]);
@@ -210,7 +232,10 @@
     $('tabCount').textContent = gi < 0 ? '' : `${gi + 1} / ${vis.length}` + (vis[gi].g.desc ? '   ' + vis[gi].g.desc : '');
     if (cur && cur._help !== undefined) setHelp(cur._help || '');
   }
-  function changed(dir) { save(); paint(dir); snd('tab'); scene('pulse'); if (cur && motion) { const lt = cur.querySelector('.lt'); if (lt) lt.animate([{ transform: 'scale(.97)' }, { transform: 'none' }], { duration: 140, easing: 'cubic-bezier(.16,1,.3,1)' }); } }
+  // the menu's sounds at the chosen volume, squared like the game's own gain (web/audio.js), so a change is heard at its new level
+  const sndVol = () => { try { window.RN_SND && window.RN_SND.volume && window.RN_SND.volume(Number(sel.vol) / 100); } catch {} };
+  sndVol();
+  function changed(dir) { save(); paint(dir); sndVol(); snd('tab'); scene('pulse'); if (cur && motion) { const lt = cur.querySelector('.lt'); if (lt) lt.animate([{ transform: 'scale(.97)' }, { transform: 'none' }], { duration: 140, easing: 'cubic-bezier(.16,1,.3,1)' }); } }
   function setOpt(id, v, dir) { sel[id] = v; changed(dir); }
 
   // ---------- navigation: one list per screen, JUGAR first ----------
@@ -389,7 +414,8 @@
   }
   body.classList.toggle('touch', kind === 'touch');
   tab = groups[0].id; paint(); hints();
-  choose($('play'), { quiet: true });
+  { let at = null; try { at = sessionStorage.getItem('rn_launch_at'); sessionStorage.removeItem('rn_launch_at'); } catch {}
+    choose(at === 'lang' ? langRow : $('play'), { quiet: true }); }
   // The menu comes in at once (OWNER 2026-11-17: "no abre de inmediato"; it used to wait for the 3D street, ~6 s cold).
   // The street (web/launcher_b/scene.js, PlayCanvas + 16 MB) loads behind it and starts when its module has run ('rn-scene').
   reveal();

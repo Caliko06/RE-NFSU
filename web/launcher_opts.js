@@ -62,8 +62,8 @@
       key: 'bbmax', type: 'choice', values: [T('auto', 'Automática'), T('1280', '1280'), T('1920', '1920'), T('2560', '2560')], def: 'auto',
       modes: BOTH, src: 'web/boot.js' },
 
-    { id: 'vol', group: 'controles', label: 'Volumen', simple: true, slider: true, help: 'Volumen general del juego. Música y efectos por separado están en el menú del juego.',
-      key: 'vol', type: 'choice', values: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'].map(v => T(v, v + ' %')), def: '100', modes: BOTH, src: 'web/audio.js' },
+    { id: 'vol', group: 'controles', label: 'Volumen', simple: true, slider: true, help: 'Volumen de todo el juego. Los sonidos de este menú ya suenan a ese nivel. Música y efectos por separado, en el menú del juego.',
+      key: 'vol', type: 'choice', values: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'].map(v => T(v, v === '0' ? 'Sin sonido' : v + ' %')), def: '100', modes: BOTH, src: 'web/audio.js' },
 
     { id: 'traffic', group: 'jugabilidad', label: 'Tráfico', help: 'Cuántos coches civiles circulan en Free Run.',
       key: 'traffic', type: 'choice', values: [T('0', 'Sin tráfico'), T('6', 'Poco'), T('13', 'Normal'), T('15', 'Mucho')], def: '13', modes: REM, src: 'host/free.c:20,166' },
