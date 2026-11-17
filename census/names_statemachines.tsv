@@ -1,0 +1,49 @@
+where	name	system	confidence	kind	states	stored_in	tool
+host/phase.c:17	FlowPhase	statemachine	V	semi	front end, loading, race, finished	rn_flow, open_race, rn_finished	read
+host/phase.c:15	RaceEpoch	statemachine	V	implicit	race N -> N+1 (13 users of rn_new_race)	local copy of rn_race	read
+host/free.c:41	FreeSetupPhase	statemachine	V	implicit	off, building rivals, building traffic, live	on, live, rn_free_now 0/1/2	read
+host/free.c:285	RivalLife	statemachine	V	explicit	GRID, ROAD, COOLDOWN	enum in riv[].st	read
+host/free.c:56	CurveSwap	statemachine	V	implicit	game curves, free curves	cu_was, saved	read
+host/input.c:183	TapScript	statemachine	V	implicit	waiting anchor, down, up, dropped	parity of next_tap, taps[].op = ! ? 0, taps[].cond	read
+host/input.c:232	JumpList	statemachine	V	implicit	no list, waiting screen, fired quick race, fired career, done	cursor s, fired 0/1/2, seen	read
+host/input.c:307	WorldArm	statemachine	V	implicit	idle, armed, settling 6 frames	world_pending, seen	read
+host/input.c:350	FinishCheat	statemachine	V	implicit	idle, armed, waiting race state 4, done	armed, seen, done, forced	read
+host/input.c:504	NextStage	statemachine	V	implicit	not raced, racing, between stages, over	raced, left, want, done, pop[], sent[]	read
+host/input.c:582	CareerWalk	statemachine	V	implicit	resting, event started, raced, stopped	on, last, raced, seen	read
+host/input.c:466	OpenOnce	statemachine	V	implicit	waiting screen, settling, done	seen, done	read
+host/input.c:661	CallOnNth	statemachine	V	implicit	counting showings, settling, done	seen_n, on, seen, done	read
+host/input.c:433	UnstickWatch	statemachine	V	implicit	progressing, no progress 20 s, reset, repeated reset	since, best, same, at	read
+host/rivals.c:1184	GangDuel	statemachine	V	implicit	cruise, near 1.5 s, duel 60 s, cooldown 30 s	g[].near, until, cool; duels	read
+host/rivals.c:700	FrozenCar	statemachine	V	implicit	seen, still, frozen ~10 s	still_r, still_t, still_x, still_y	read
+host/free.c:442	TrafficBlackhole	statemachine	V	implicit	free, marked	bh[64]	read
+host/mc.c:26	OnFoot	statemachine	V	implicit	driving, on foot	rn_mc.on_foot, want_toggle, held[]	read
+host/gps_tp.c:6	GpsTeleport	statemachine	V	implicit	idle, requested, done, refused	rn_gps.tp_req, tp_res	read
+host/openworld.c:39	WorldSpawn	statemachine	V	implicit	waiting, placed, report at 20 s	go, after	read
+host/threads.c:29	GilTurn	statemachine	V	implicit	queued, serving, borrowed, cancelled	next_ticket, serving, borrowed, cancelled[]	read
+host/threads.c:18	ThreadLife	statemachine	V	implicit	created, running, suspended, parked, finished	started, finished, suspended, parked	read
+host/dinput8.c:51	DeviceAcquire	statemachine	V	implicit	no format, ready, acquired	format_set, acquired, actions	read
+host/dsound.c:49	BufferPlay	statemachine	V	implicit	stopped, playing, looping, dead	playing, looping, refs	read
+host/files.c:241	BlockFetch	statemachine	V	implicit	free, on its way, ready	Blk.state 0/1/2	read
+host/gpu.c:35	FrameMailbox	statemachine	V	implicit	writing, in flight, done	box.seq, box.done	read
+host/files.c:20	FileHandle	statemachine	V	implicit	free, open, dirty save	used, save, dirty	read
+host/files.c:299	PrefetchPool	statemachine	V	implicit	off, threads running, drained	pre_run, pre_on, pre_head, pre_tail	read
+host/user32.c:33	QuitLatch	statemachine	V	implicit	running, quit posted	quit_posted, quit_code	read
+host/user32.c:28	FocusOwner	statemachine	V	implicit	no window, active, focused, captured	focus, active, capture	read
+host/d3d9.c:789	FramePace	statemachine	V	implicit	pacing off, slot planned, slot missed	pace_box, pace_next, pace_due	read
+web/app.js:10	AppLife	statemachine	V	explicit	check, load, run, paused, stop	RN_APP.state	read
+web/boot.js:85	Curtain	statemachine	V	implicit	down, main menu seen, waiting city, up	up, main, arrive.t, cityThen poll	read
+web/ug2/ug2world.js:63	CityLoad	statemachine	V	semi	idle, loading, ready, failed, nofile	api.state, loading	read
+web/index.html:69	EntryRoute	statemachine	V	implicit	launcher, in transit, game	sessionStorage rn_q, localStorage rn_launch, ?fast go start	read
+web/mode.js:66	ModeSwitch	statemachine	V	implicit	original, remaster, F4 armed 3 s, restarting	localStorage rn_mode, armed	read
+web/gpu.js:1425	GpuPump	statemachine	V	implicit	running, held, waiting frame	held, letGo	read
+web/audio.js:71	AudioGate	statemachine	V	implicit	suspended, running (follows AppLife)	ctx.state	read
+web/saves.js:91	SaveSync	statemachine	V	implicit	seeding, mounted, scanning	busy, seen map	read
+web/launcher.js:95	LauncherScreen	statemachine	V	implicit	sheet A, sheet B, tab, leaving	sheet, tab, cur, going	read
+web/touch.js:204	TouchLayout	statemachine	V	implicit	menu, drive, drag, drift; shown, hidden	root.dataset.m/r/g, style.display	read
+web/input.js:97	MenuTap	statemachine	V	implicit	idle, corner, move, press, release, park	busy + await sequence	read
+web/pad.js:49	PadMode	statemachine	V	implicit	menu, drive, unplugged	state.mode, running	read
+web/binds.js:70	BindCapture	statemachine	V	implicit	idle, waiting key or button	cap	read
+web/gps/map.js:18	MapPanel	statemachine	V	implicit	closed, open, loading, failed	api.isOpen, loading, failure	read
+host/feellog.c:44	StandingStart	statemachine	V	implicit	moving, still 30 frames, run, 60 mph, 100 mph	ready, run, g60, g100	read
+host/aitel.c:173	ResetWatch	statemachine	V	implicit	idle, armed, watching 120 frames	rq[].armed, after	read
+host/*.c	EnvLatch	statemachine	V	implicit	unread, off, on (pattern, 70 uses)	static int on = -1	read
