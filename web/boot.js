@@ -205,11 +205,12 @@ async function download(url, what) {
       // ?start=menu|world|career (OWNER 2026-11-16): the launcher's three entries (web/launcher.js JUGAR, WORLD, CARRERA). The game's own Accept takes the
       // player there (RN_KEYS, host/input.c) under the launcher's curtain (web/index.html), so no menu is ever seen moving by itself. Without ?start= no key is scripted.
       // The intro movies and the splash are gone (PATCH 0x4de395, tools/recomp/patches_launcher.py), so the profile screen is first: Enter 1.5 s after it shows,
-      // then twice more 3 s apart unless the main menu is already up (the game loads the last profile; a tap is dropped once MU_Main_PC shows).
+      // then twice more 1.2 s apart unless the main menu is already up (the game loads the last profile; a tap is dropped once MU_Main_PC shows).
       // world: one Enter on the main menu, then RN_JUMP 3:1010 (the menu path of tools/completion.py). No RETURN after flow 6: in a race it changes the camera (FEEL log 2026-11-10).
       // career: one UP on the main menu (the cursor starts on Quick Race, docs/re/frontend_menu.md:29; tools/completion.py:34), then Enter = Go Underground. ?keys= or ?jump= take over.
       if (START && !keys && !jump) {
-        const menu = '800@=MU_UG_NewOrLoad_PC2:RETURN,3000@!MU_Main_PC:RETURN,3000@!MU_Main_PC:RETURN';
+        // The two retries wait 1.2 s each (3 s each cost 6 s of every entry, log 2026-11-16: the main menu was up 50 ms after the first Enter).
+        const menu = '800@=MU_UG_NewOrLoad_PC2:RETURN,1200@!MU_Main_PC:RETURN,1200@!MU_Main_PC:RETURN';
         if (START === 'world' && !NOWORLD) { m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:RETURN'; }
         else if (START === 'career') m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:UP,800@=MU_Main_PC:RETURN';
         else m.ENV.RN_KEYS = menu + ',3000@!MU_Main_PC:RETURN';

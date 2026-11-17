@@ -252,9 +252,15 @@ static Blk *blk_at(const char *real, uint64_t at) {
         if (b->state && at >= b->off && at - b->off < b->len && !strcmp(b->real, real)) return b;
     return 0;
 }
+// The cache of pieces: 256 MB (the wasm break stood at 1555 of 2048 MB at the WORLD HUD with it full, log 2026-11-16); RN_RANGEMB=16 on phones and tablets (web/boot.js).
+static uint64_t cap(void) {
+    if (!blk_cap) { const char *e = getenv("RN_RANGEMB"); blk_cap = (uint64_t)(e && atoi(e) > 0 ? atoi(e) : 256) << 20; }
+    return blk_cap;
+}
+// A whole file is at most an eighth of the cache, so a phone's 16 MB keeps the old 256 KB steps for anything over 2 MB.
+static uint64_t whole_max(void) { return cap() / 8 < WHOLE_MAX ? cap() / 8 : WHOLE_MAX; }
 // Under blk_mu: a slot marked "on its way". The least recently used ready pieces go first when the cap or the table is full.
 static Blk *blk_new(const char *real, uint64_t off, uint32_t len) {
-    if (!blk_cap) { const char *e = getenv("RN_RANGEMB"); blk_cap = (uint64_t)(e && atoi(e) > 0 ? atoi(e) : 256) << 20; }   // web/boot.js: 16 on phones and tablets
     if (strlen(real) >= sizeof blks->real) return 0;
     for (;;) {
         Blk *spare = 0, *old = 0;
@@ -262,7 +268,7 @@ static Blk *blk_new(const char *real, uint64_t off, uint32_t len) {
             if (!b->state) spare = b;
             else if (b->state == 2 && (!old || b->tick < old->tick)) old = b;
         }
-        if (spare && (blk_bytes + len <= blk_cap || !old)) {
+        if (spare && (blk_bytes + len <= cap() || !old)) {
             snprintf(spare->real, sizeof spare->real, "%s", real);
             spare->off = off; spare->len = len; spare->data = 0; spare->state = 1;
             blk_bytes += len;
@@ -352,7 +358,7 @@ void gf_prefetch(const char *gpath) {
     if (!blk_at(real, 0) && pre_tail - pre_head < NQ) {
         unsigned k = pre_tail++ % NQ;
         snprintf(preq[k].real, 256, "%s", real);
-        preq[k].off = 0; preq[k].len = size <= WHOLE_MAX ? (uint32_t)size : AHEAD;
+        preq[k].off = 0; preq[k].len = size <= whole_max() ? (uint32_t)size : AHEAD;
         rn_load[0] += preq[k].len >> 10;
         pre_start();
     }
@@ -393,7 +399,7 @@ int64_t gf_read(int id, uint64_t off, uint8_t *dst, uint32_t n) {
         // 256 KB; while its reads run on in sequence the step doubles, up to AHEAD_MAX.
         uint64_t from = 0;
         uint32_t len = (uint32_t)g->size;
-        if (g->size > WHOLE_MAX) {
+        if (g->size > whole_max()) {
             uint32_t want = n - done;
             g->ahead = g->ahead && at == g->next ? (g->ahead < AHEAD_MAX ? 2 * g->ahead : AHEAD_MAX) : AHEAD;
             from = at;
