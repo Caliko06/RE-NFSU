@@ -75,16 +75,19 @@ function line(s, cls) {
   // A 'stop' line (missing WebGPU, COOP/COEP, a lost GPU) ends the session: the gate says why (web/app.js), F2 opens this log.
   if (cls === 'stop' || /^STOP/.test(s)) { status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; RN_APP.set('stop', s); }
   // The launcher's curtain (?fast=1 with ?start=, web/index.html) lifts on arrival: the main menu, the race (flow state 6), or the screen after the main menu (career).
-  else if (CURTAIN && !up) {
-    if (/flow fe .*MU_Main_PC\.fng/.test(s)) { if (START === 'menu') arrive(); else main = true; }
-    else if (START === 'world' ? /flow state 6\//.test(s) : START === 'career' && main && /flow fe /.test(s)) cityThen(arrive);
+  else if (CURTAIN && RN_APP.state === 'load') {
+    if (/flow fe .*MU_Main_PC\.fng/.test(s)) { if (DEST === 'menu') arrive(); else main = true; }
+    else if (DEST === 'world' ? /flow state 6\//.test(s) : main && /flow fe /.test(s)) cityThen(arrive);
   }
 }
 const START = RN_Q.get('start'), CURTAIN = RN_Q.get('fast') === '1' && !!START;
-let up = false, main = false;
-const arrive = () => { if (!up) { up = true; RN_APP.set('run'); } };
+// Where the scripted trip ends, and so what lifts the curtain: WORLD only where WORLD exists (a phone, ?noworld=1), any other ?start= is the main menu
+// (the curtain waited for a race that never came and lifted on its 45 s cap). The curtain is down while RN_APP.state is 'load' (web/app.js): no flag of its own.
+const DEST = START === 'career' ? 'career' : START === 'world' && !NOWORLD ? 'world' : 'menu';
+let main = false;
+const arrive = () => { if (RN_APP.state === 'load') RN_APP.set('run'); };
 // WORLD: the curtain stays until the UG2 city is on the GPU (web/ug2/ug2world.js state), so the first seconds of driving do not pay for its upload; 20 s at most.
-const cityThen = f => { const t1 = performance.now(), w = () => START !== 'world' || !window.Ug2 || RN_Q.get('ug2') === '0' || /ready|failed|nofile/.test(Ug2.state) || performance.now() - t1 > 20000 ? f() : setTimeout(w, 100); w(); };
+const cityThen = f => { const t1 = performance.now(), w = () => DEST !== 'world' || !window.Ug2 || RN_Q.get('ug2') === '0' || /ready|failed|nofile/.test(Ug2.state) || performance.now() - t1 > 20000 ? f() : setTimeout(w, 100); w(); };
 RN_APP.on((s, from) => keep(`${secs()} app: ${from} -> ${s}`));
 // A download whose bytes are counted on the gate. Compressed transfers have no usable total, so it shows megabytes.
 async function download(url, what) {
@@ -157,7 +160,7 @@ async function download(url, what) {
       if (NOWORLD) m.ENV.RN_NOWORLD = '1';
       if (RN_PHONE) m.ENV.RN_RANGEMB = '16';   // host/files.c: the cache of fetched pieces (256 MB elsewhere)
       // host/files.c: helper threads bring what this entry always reads (web/entry_hint.tsv) while the engine boots and the menus pass. Not on phones (the 16 MB cache).
-      else m.ENV.RN_PREFETCH = START === 'world' && !NOWORLD ? 'world' : 'boot';
+      else m.ENV.RN_PREFETCH = DEST === 'world' ? 'world' : 'boot';
       if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
       for (const kv of (RN_Q.get('env') || '').split(',').filter(Boolean)) {
@@ -211,8 +214,8 @@ async function download(url, what) {
       if (START && !keys && !jump) {
         // The two retries wait 1.2 s each (3 s each cost 6 s of every entry, log 2026-11-16: the main menu was up 50 ms after the first Enter).
         const menu = '800@=MU_UG_NewOrLoad_PC2:RETURN,1200@!MU_Main_PC:RETURN,1200@!MU_Main_PC:RETURN';
-        if (START === 'world' && !NOWORLD) { m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:RETURN'; }
-        else if (START === 'career') m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:UP,800@=MU_Main_PC:RETURN';
+        if (DEST === 'world') { m.ENV.RN_JUMP = '3:1010'; m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:RETURN'; }
+        else if (DEST === 'career') m.ENV.RN_KEYS = menu + ',800@=MU_Main_PC:UP,800@=MU_Main_PC:RETURN';
         else m.ENV.RN_KEYS = menu + ',3000@!MU_Main_PC:RETURN';
       }
       // ?carlook=0: the car paint as car.efx draws it (host/sm1.c clearcoat bridge off), 2003: also at the shipped strength,
@@ -240,7 +243,7 @@ async function download(url, what) {
   if (maxChar)
     import('./maxpayne/boot.js').then(m => m.start(M, s => line(s))).catch(e => line('[F-Max] STOP ' + e.message, 'stop'));
   telem = startTelemetry(M, t0, s => line(s));
-  const onFrame = (s, t, ms) => { if (s.present && !up) { if (!CURTAIN) arrive(); else if (!arrive.t) arrive.t = setTimeout(arrive, 45000); /* a trip that stalls must not leave the curtain down */ } telem?.frame?.(s, t, ms); };
+  const onFrame = (s, t, ms) => { if (s.present && RN_APP.state === 'load') { if (!CURTAIN) arrive(); else if (!arrive.t) arrive.t = setTimeout(arrive, 45000); /* a trip that stalls must not leave the curtain down */ } telem?.frame?.(s, t, ms); };
   startGpu(M, document.getElementById('screen'), s => line(s, 'api'), onFrame).catch(e => line('gpu.js: ' + e.message, 'stop'));
   // RN_STEERLOG (host/input.c): also each key at the page and each present's GPU completion, on the page's clock
   const input = startInput(M, document.getElementById('screen'), /RN_STEERLOG/.test(location.search) ? s => line(s) : null);
@@ -256,7 +259,7 @@ async function download(url, what) {
     const a = M._rn_load_addr?.() >>> 0, v = a ? new Uint32Array(M.HEAPU8.buffer, a, 2) : null;
     if (!v || !v[0]) return;
     if (v[1] < v[0]) RN_APP.say(`${RN_TR('Cargando')} ${v[1] >> 10} / ${v[0] >> 10} MB`, v[1] / v[0]);
-    else RN_APP.say(RN_TR(START === 'world' ? 'Entrando a la ciudad…' : 'Arrancando…'), 1);
+    else RN_APP.say(RN_TR(DEST === 'world' ? 'Entrando a la ciudad…' : 'Arrancando…'), 1);
   }, 200);
   // Memory line when it moves by 16 MB or more (host/win32.c rn_mem_mb): what an iPhone tab (~1.5 GB, then iOS kills it) holds.
   let memLast = '';
