@@ -4,7 +4,9 @@ Writes web/blog/<lang>/*.html, web/sitemap.xml and web/robots.txt from the texts
 Every game fact in the texts names its source in the comment above the article; change the text when the source changes.
 URLs end in .html on purpose: the R2 host serves no directory index (docs/re/hosting.md, only "/" is rewritten).
 Usage: python3 tools/build_blog.py   (then tools/build_public.py ships web/blog/ with the rest)"""
-import html, json, os, re
+import html, json, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from blog_dev import DEV, DEV_DATE, REPO
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W = os.path.join(ROOT, "web")
@@ -12,14 +14,14 @@ SITE = "https://nfsu.cc"
 DATE = "2026-11-16"          # first published
 LANGS = ("en", "es")
 UI = {
-    "en": dict(guides="Guides", play="Play", other="Español", home="NFSU.cc", more="More guides", cta="Play now", updated="Updated November 16, 2026",
-               hub_title="Need for Speed Underground in the browser: guides", hub_h1="Guides",
-               hub_desc="How to play Need for Speed Underground online at nfsu.cc: first start, controls, browsers and phones, and how the browser version works.",
+    "en": dict(guides="Guides", play="Play", other="Español", home="NFSU.cc", more="More guides", cta="Play now", updated="Updated %s", dev="How it was made", code="Code on GitHub",
+               hub_title="Need for Speed Underground in the browser: guides and devlog", hub_h1="Guides",
+               hub_desc="How to play Need for Speed Underground online at nfsu.cc: first start, controls, browsers and phones, and how it was built: static recompilation, reverse engineering tools, WebGPU and AI agents.",
                hub_lead="NFSU.cc is Need for Speed Underground (2003) running in a browser tab. These pages explain how to start, how to drive and what is under the hood.",
                foot="NFSU.cc: Need for Speed Underground in the browser."),
-    "es": dict(guides="Guías", play="Jugar", other="English", home="NFSU.cc", more="Más guías", cta="Jugar ahora", updated="Actualizado el 16 de noviembre de 2026",
-               hub_title="Need for Speed Underground en el navegador: guías", hub_h1="Guías",
-               hub_desc="Cómo jugar Need for Speed Underground online en nfsu.cc: primer arranque, controles, navegadores y celulares, y cómo funciona la versión de navegador.",
+    "es": dict(guides="Guías", play="Jugar", other="English", home="NFSU.cc", more="Más guías", cta="Jugar ahora", updated="Actualizado el %s", dev="Cómo se hizo", code="Código en GitHub",
+               hub_title="Need for Speed Underground en el navegador: guías y bitácora", hub_h1="Guías",
+               hub_desc="Cómo jugar Need for Speed Underground online en nfsu.cc: primer arranque, controles, navegadores y celulares, y cómo se hizo: recompilación estática, herramientas de ingeniería inversa, WebGPU y agentes de IA.",
                hub_lead="NFSU.cc es Need for Speed Underground (2003) corriendo en una pestaña del navegador. Estas páginas explican cómo empezar, cómo manejar y qué hay bajo el cofre.",
                foot="NFSU.cc: Need for Speed Underground en el navegador."),
 }
@@ -276,7 +278,10 @@ ARTICLES = [
 <p>La forma más rápida de juzgar el resultado es manejarlo: <a href="[[play]]">cómo empezar a jugar</a> se lee en un minuto.</p>
 """)),
 ]
+GUIDES = list(ARTICLES)
+ARTICLES += DEV
 BY = {a["key"]: a for a in ARTICLES}
+WHEN = {"en": lambda d: "November %d, 2026" % int(d[-2:]), "es": lambda d: "%d de noviembre de 2026" % int(d[-2:])}
 e = html.escape
 
 
@@ -320,22 +325,23 @@ def page(lang, name, names, title, desc, pic, h1, inner, ld):
   <nav>
     <a href="index.html">{u['guides']}</a>
     <a href="../{other}/{names[other]}.html" hreflang="{other}" lang="{other}">{u['other']}</a>
+    <a href="{REPO}" rel="noopener">GitHub</a>
     <a class="play" href="/">{u['play']}</a>
   </nav>
 </header>
 <main>
 {inner}
 </main>
-<footer><span>{u['foot']}</span><a href="/">{u['play']}</a><a href="index.html">{u['guides']}</a><a href="../{other}/{names[other]}.html" hreflang="{other}" lang="{other}">{u['other']}</a></footer>
+<footer><span>{u['foot']}</span><a href="/">{u['play']}</a><a href="index.html">{u['guides']}</a><a href="{REPO}" rel="noopener">{u['code']}</a><a href="../{other}/{names[other]}.html" hreflang="{other}" lang="{other}">{u['other']}</a></footer>
 </body>
 </html>
 """
 
 
-def rows(lang, skip=None):
+def rows(lang, skip=None, only=None):
     return '<ul class="list">' + "".join(
         '<li><a href="%s.html"><b>%s</b><span>%s</span></a></li>' % (a["slug"][lang], e(a["title"][lang]), e(a["desc"][lang]))
-        for a in ARTICLES if a["key"] != skip) + "</ul>"
+        for a in ARTICLES if a["key"] != skip and (only is None or a.get("dev", False) == only)) + "</ul>"
 
 
 def figure(a, lang, n=""):
@@ -354,7 +360,7 @@ for lang in LANGS:
         os.remove(os.path.join(W, "blog", lang, old))
     # hub
     names = {l: "index" for l in LANGS}
-    inner = f'<h1>{u["hub_h1"]}</h1>\n<p class="lead">{e(u["hub_lead"])}</p>\n{rows(lang)}\n<div class="cta"><a href="/">{u["cta"]}</a></div>'
+    inner = f'<h1>{u["hub_h1"]}</h1>\n<p class="lead">{e(u["hub_lead"])}</p>\n{rows(lang, only=False)}\n<h2 class="more">{u["dev"]}</h2>\n{rows(lang, only=True)}\n<p><a href="{REPO}" rel="noopener">{u["code"]}</a></p>\n<div class="cta"><a href="/">{u["cta"]}</a></div>'
     ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": u["hub_title"], "description": u["hub_desc"], "url": url(lang, "index"), "inLanguage": lang,
           "isPartOf": {"@type": "WebSite", "name": "NFSU.cc", "url": SITE + "/"},
           "hasPart": [{"@type": "Article", "headline": a["title"][lang], "url": url(lang, a["slug"][lang])} for a in ARTICLES]}
@@ -362,34 +368,38 @@ for lang in LANGS:
     pages.append((lang, "index", names))
     for a in ARTICLES:
         names = a["slug"]
+        date = DEV_DATE if a.get("dev") else DATE
         body = re.sub(r"\[\[(\w+)\]\]", lambda m: figure(a, lang, "2") if m.group(1) == "figure2" else BY[m.group(1)]["slug"][lang] + ".html", a["body"][lang].strip())
         inner = f"""<p class="crumbs"><a href="/">NFSU.cc</a> / <a href="index.html">{u['guides']}</a></p>
 <article>
 <h1>{e(a['title'][lang])}</h1>
 <p class="lead">{e(a['lead'][lang])}</p>
-<p class="date"><time datetime="{DATE}">{u['updated']}</time></p>
+<p class="date"><time datetime="{date}">{u['updated'] % WHEN[lang](date)}</time></p>
 {figure(a, lang)}
 {body}
 <div class="cta"><a href="/">{u['cta']}</a></div>
 </article>
 <h2 class="more">{u['more']}</h2>
-{rows(lang, a['key'])}"""
+{rows(lang, a['key'], a.get('dev', False))}"""
         ld = {"@context": "https://schema.org", "@graph": [
-            {"@type": "Article", "headline": a["title"][lang], "description": a["desc"][lang], "inLanguage": lang, "datePublished": DATE, "dateModified": DATE,
+            {"@type": "TechArticle" if a.get("dev") else "Article", "headline": a["title"][lang], "description": a["desc"][lang], "inLanguage": lang, "datePublished": date, "dateModified": date,
              "image": "%s/blog/img/%s" % (SITE, a["img"]), "mainEntityOfPage": url(lang, names[lang]), "author": ORG, "publisher": ORG,
              "about": {"@type": "VideoGame", "name": "Need for Speed Underground", "url": SITE + "/"}},
             {"@type": "BreadcrumbList", "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "NFSU.cc", "item": SITE + "/"},
                 {"@type": "ListItem", "position": 2, "name": u["guides"], "item": url(lang, "index")},
-                {"@type": "ListItem", "position": 3, "name": a["title"][lang], "item": url(lang, names[lang])}]}]}
+                {"@type": "ListItem", "position": 3, "name": a["title"][lang], "item": url(lang, names[lang])}]}]
+              + ([{"@type": "SoftwareSourceCode", "name": "RE-NFSU", "codeRepository": REPO, "programmingLanguage": ["C", "Python", "JavaScript"],
+                   "runtimePlatform": "WebAssembly", "description": "Static recompilation of Need for Speed Underground (2003, PC) to WebAssembly."}] if a.get("dev") else [])}
         open(os.path.join(W, "blog", lang, names[lang] + ".html"), "w", encoding="utf-8").write(page(lang, names[lang], names, a["title"][lang], a["desc"][lang], next(b for b in BACK if b not in (a["img"], a.get("img2"))), a["title"][lang], inner, ld))
         pages.append((lang, names[lang], names))
 
+BY_SLUG = {a["slug"][l]: a for a in ARTICLES for l in LANGS}
 # sitemap: the game's address and every guide, each with its language twins
 sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
       "<url><loc>%s/</loc><lastmod>%s</lastmod></url>" % (SITE, DATE)]
 for lang, name, names in pages:
-    sm.append("<url><loc>%s</loc><lastmod>%s</lastmod>%s</url>" % (url(lang, name), DATE, "".join(
+    sm.append("<url><loc>%s</loc><lastmod>%s</lastmod>%s</url>" % (url(lang, name), DEV_DATE if name != "index" and BY_SLUG[name].get("dev") else (DEV_DATE if name == "index" else DATE), "".join(
         '<xhtml:link rel="alternate" hreflang="%s" href="%s"/>' % (l, url(l, names[l])) for l in LANGS)))
 sm.append("</urlset>")
 open(os.path.join(W, "sitemap.xml"), "w", encoding="utf-8").write("\n".join(sm) + "\n")

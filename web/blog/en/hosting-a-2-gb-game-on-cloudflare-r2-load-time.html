@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#04121a">
+<title>From 65.7 to 28.2 seconds: hosting a 2 GB PC game on Cloudflare R2 | NFSU.cc</title>
+<meta name="description" content="Why a game built for a hard drive was slow over the internet, how one measurement found the cause (516 requests in a row), and the setup that serves 1.95 GB with the music included.">
+<link rel="canonical" href="https://nfsu.cc/blog/en/hosting-a-2-gb-game-on-cloudflare-r2-load-time.html">
+<link rel="alternate" hreflang="en" href="https://nfsu.cc/blog/en/hosting-a-2-gb-game-on-cloudflare-r2-load-time.html">
+<link rel="alternate" hreflang="es" href="https://nfsu.cc/blog/es/alojar-un-juego-de-2-gb-en-cloudflare-r2-tiempo-de-carga.html">
+<link rel="alternate" hreflang="x-default" href="https://nfsu.cc/blog/en/hosting-a-2-gb-game-on-cloudflare-r2-load-time.html">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="NFSU.cc">
+<meta property="og:url" content="https://nfsu.cc/blog/en/hosting-a-2-gb-game-on-cloudflare-r2-load-time.html">
+<meta property="og:title" content="From 65.7 to 28.2 seconds: hosting a 2 GB PC game on Cloudflare R2">
+<meta property="og:description" content="Why a game built for a hard drive was slow over the internet, how one measurement found the cause (516 requests in a row), and the setup that serves 1.95 GB with the music included.">
+<meta property="og:image" content="https://nfsu.cc/og.jpg">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="stylesheet" href="../blog.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "From 65.7 to 28.2 seconds: hosting a 2 GB PC game on Cloudflare R2", "description": "Why a game built for a hard drive was slow over the internet, how one measurement found the cause (516 requests in a row), and the setup that serves 1.95 GB with the music included.", "inLanguage": "en", "datePublished": "2026-11-17", "dateModified": "2026-11-17", "image": "https://nfsu.cc/blog/img/olympic-city-drive.webp", "mainEntityOfPage": "https://nfsu.cc/blog/en/hosting-a-2-gb-game-on-cloudflare-r2-load-time.html", "author": {"@type": "Organization", "name": "NFSU.cc", "url": "https://nfsu.cc/"}, "publisher": {"@type": "Organization", "name": "NFSU.cc", "url": "https://nfsu.cc/"}, "about": {"@type": "VideoGame", "name": "Need for Speed Underground", "url": "https://nfsu.cc/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "NFSU.cc", "item": "https://nfsu.cc/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://nfsu.cc/blog/en/index.html"}, {"@type": "ListItem", "position": 3, "name": "From 65.7 to 28.2 seconds: hosting a 2 GB PC game on Cloudflare R2", "item": "https://nfsu.cc/blog/en/hosting-a-2-gb-game-on-cloudflare-r2-load-time.html"}]}, {"@type": "SoftwareSourceCode", "name": "RE-NFSU", "codeRepository": "https://github.com/Caliko06/RE-NFSU", "programmingLanguage": ["C", "Python", "JavaScript"], "runtimePlatform": "WebAssembly", "description": "Static recompilation of Need for Speed Underground (2003, PC) to WebAssembly."}]}</script>
+</head>
+<body style="--pic: url(/blog/img/olympic-city-world.webp)">
+<header class="top">
+  <a class="logo" href="/"><img src="/launcher/v2/ui/logo.webp" alt="Need for Speed Underground" width="688" height="125"></a>
+  <nav>
+    <a href="index.html">Guides</a>
+    <a href="../es/alojar-un-juego-de-2-gb-en-cloudflare-r2-tiempo-de-carga.html" hreflang="es" lang="es">Español</a>
+    <a href="https://github.com/Caliko06/RE-NFSU" rel="noopener">GitHub</a>
+    <a class="play" href="/">Play</a>
+  </nav>
+</header>
+<main>
+<p class="crumbs"><a href="/">NFSU.cc</a> / <a href="index.html">Guides</a></p>
+<article>
+<h1>From 65.7 to 28.2 seconds: hosting a 2 GB PC game on Cloudflare R2</h1>
+<p class="lead">A hard drive in 2003 answered a read in a few milliseconds. A server on the other side of the world answers in tens. The game does not know the difference, and it reads a lot.</p>
+<p class="date"><time datetime="2026-11-17">Updated November 17, 2026</time></p>
+<figure><img src="../img/olympic-city-drive.webp" alt="Driving through Olympic City after the game finished loading" width="1000" height="703" fetchpriority="high"><figcaption>The first visit downloads only what the game reads; the rest waits until you drive there.</figcaption></figure>
+<h2>The whole game, music included</h2>
+<p>The public pack is 1.95 GB: the recompiled program, the game's data, every licensed song and the movies. Nothing is cut. The program itself, speed.wasm, is about 70 MB and travels gzipped in about 16 MB. The first visit fetches about 42.5 MB to reach the main menu; tracks and cars arrive when the game asks for them.</p>
+<h2>Where it is hosted</h2>
+<ul>
+<li><b>Cloudflare R2</b> holds the files. Downloads from R2 cost nothing, which matters for a 2 GB game.</li>
+<li>Three response headers (<code>Cross-Origin-Opener-Policy</code>, <code>Cross-Origin-Embedder-Policy</code>, <code>Cross-Origin-Resource-Policy</code>) turn on cross-origin isolation, which the browser requires before it shares memory between the game's threads.</li>
+<li>Pages and scripts are never cached at the edge; game data is cached for a day. Scripts carry the build number in their address, so a new build is never mixed with an old one.</li>
+</ul>
+<h2>The measurement that found it</h2>
+<p>On our heaviest test route, from the link to driving, the live site took 65.7 seconds. The download size was not the problem. A capture of every request showed 516 byte range requests in a row, each waiting about 75 ms for the previous one: the game reads a file, then the next, exactly as it did on a hard drive, and each read now costs a round trip.</p>
+<h2>The fix</h2>
+<ul>
+<li>A file up to 8 MB is fetched whole on its first read and kept, so its later reads cost nothing.</li>
+<li>A list of what the game always read on that route, recorded from real visits, let four prefetch threads fetch those files before the game asked.</li>
+</ul>
+<p>On a test server with an 80 ms delay added to every request, the same route went from 66.3 to 22.7 seconds. On the live site, a first visit went from 65.7 to 28.2 seconds, and a second visit, with the browser's cache warm, to 21.4.</p>
+<p>The loader is <a href="https://github.com/Caliko06/RE-NFSU/blob/main/host/files.c">host/files.c</a> and the measuring tool is <a href="https://github.com/Caliko06/RE-NFSU/blob/main/tools/loadcap.mjs">tools/loadcap.mjs</a>. To see the result, <a href="/">open the game</a>.</p>
+<div class="cta"><a href="/">Play now</a></div>
+</article>
+<h2 class="more">More guides</h2>
+<ul class="list"><li><a href="static-recompilation-x86-to-webassembly.html"><b>Static recompilation: turning a 2003 x86 .exe into WebAssembly</b><span>How the NFSU.cc lifter reads Speed.exe with Capstone, writes every one of its 13,760 functions as C, compiles them with Emscripten and checks them bit for bit against Unicorn.</span></a></li><li><a href="reverse-engineering-tools-ghidra-hopper-rea.html"><b>The reverse engineering toolbox: Ghidra, Hopper, REA and a census of names</b><span>Which disassemblers and decompilers were used to understand Need for Speed Underground, and the one rule that kept the work honest: no address is trusted until two tools agree.</span></a></li><li><a href="directx-9-and-windows-on-webgpu.html"><b>DirectX 9 and Windows XP rebuilt on WebGPU, Web Audio and workers</b><span>The recompiled game still calls Windows and DirectX. This is the layer that answers: a Radeon 9800 that draws with WebGPU, a sound card made of an AudioWorklet, and a hard drive that lives on a server.</span></a></li><li><a href="reverse-engineering-a-game-with-ai-agents.html"><b>Reverse engineering a game with AI agents: what worked</b><span>NFSU.cc went from the first commit to a public site in four weeks, with Claude, Codex and OpenCode agents doing the reading, patching and testing. The rules that kept them from guessing.</span></a></li></ul>
+</main>
+<footer><span>NFSU.cc: Need for Speed Underground in the browser.</span><a href="/">Play</a><a href="index.html">Guides</a><a href="https://github.com/Caliko06/RE-NFSU" rel="noopener">Code on GitHub</a><a href="../es/alojar-un-juego-de-2-gb-en-cloudflare-r2-tiempo-de-carga.html" hreflang="es" lang="es">Español</a></footer>
+</body>
+</html>
