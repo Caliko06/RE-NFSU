@@ -1,16 +1,17 @@
 // One cold visit, headless and muted: every request of the page and its workers with its times, and a shot at the end.
 // Usage (through macgate.sh): node tools/loadcap.mjs <out prefix> <url>   -> <out>.json (rows: tools/entry_hint.py reads them), <out>.png
 // Ends 12 s after the race HUD line of the page log, or at RN_SECS (150). RN_MOBILE=1: a phone (coarse pointer, 844x390).
+// RN_PROFILE=<dir>: a normal profile kept on disk (run twice for the second visit; the default is a fresh private one).
 // The round trip of a real visit: serve dist with RN_RTT_MS=80 tools/static_server.py (CDP cannot delay worker requests).
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const out = process.argv[2], url = process.argv[3], port = 9391;
-const profile = mkdtempSync(join(tmpdir(), 'rn-livecap-'));
+const KEEP = process.env.RN_PROFILE, profile = KEEP || mkdtempSync(join(tmpdir(), 'rn-livecap-'));
 const chrome = spawn('/Users/angeldamian/.local/bin/chrome-bot', ['--headless=new', '--mute-audio', '--enable-unsafe-webgpu',
   '--no-first-run', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
-process.on('exit', () => { chrome.kill('SIGKILL'); try { rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); } catch { console.log('left behind: ' + profile); } });
+process.on('exit', () => { chrome.kill('SIGKILL'); if (!KEEP) try { rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); } catch { console.log('left behind: ' + profile); } });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let info;
 for (let i = 0; i < 50 && !info; i++) { try { info = await (await fetch(`http://127.0.0.1:${port}/json/version`)).json(); } catch { await sleep(200); } }
@@ -25,7 +26,7 @@ ws.onmessage = e => { const m = JSON.parse(e.data); if (pending.has(m.id)) {
   const p = pending.get(m.id); pending.delete(m.id); m.error ? p.reject(new Error(p.method + ': ' + JSON.stringify(m.error))) : p.resolve(m.result);
 } else event(m); };
 setTimeout(() => { console.error('timeout'); process.exit(1); }, 280000).unref();
-const { browserContextId } = await send('Target.createBrowserContext');
+const { browserContextId } = KEEP ? {} : await send('Target.createBrowserContext');
 const { targetId } = await send('Target.createTarget', { url: 'about:blank', browserContextId });
 const { sessionId: page } = await send('Target.attachToTarget', { targetId, flatten: true });
 const net = new Map(), cons = [];
@@ -64,4 +65,5 @@ const { data } = await send('Page.captureScreenshot', { format: 'png' }, page);
 writeFileSync(out + '.png', Buffer.from(data, 'base64'));
 writeFileSync(out + '.json', JSON.stringify({ url, hud, rows: [...net.values()], lines, cons }));
 console.log('hud', hud, 'requests', net.size, 'lines', lines.length, 'console', cons.length);
+if (KEEP) { await send('Browser.close').catch(() => {}); await sleep(3000); }   // let the disk cache land
 process.exit(0);
