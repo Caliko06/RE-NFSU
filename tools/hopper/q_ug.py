@@ -21,11 +21,13 @@ def where(a):
     p = proc(a); e = p.getEntryPoint() if p else None
     return '0x%x in %s' % (a, ('0x%x %s' % (e, doc.getNameAtAddress(e) or '')) if e is not None else '?')
 def refs(a):
+    err = None
     for get in (lambda: seg(a).getReferencesOfAddress(a), lambda: doc.getReferencesOfAddress(a)):
         try:
             r = get()
             if r is not None: return sorted(set(r))
-        except Exception: pass
+        except Exception as x: err = x
+    if err is not None: f.write('(xrefs of 0x%x failed: %s)\n' % (a, err))   # an empty list must mean no xrefs, never a Hopper error
     return []
 def insn(a):
     try:
@@ -42,7 +44,7 @@ for a in ADDRS:
     except Exception as x: f.write('(decompile failed: %s)\n' % x)
     f.write('callers: %s\n' % '; '.join(where(r) for r in refs(e)))
     try: f.write('callees: %s\n' % ' '.join('0x%x' % c for c in sorted(set(c.toAddress() for c in p.getAllCallees()))))
-    except Exception: pass
+    except Exception as x: f.write('callees failed: %s\n' % x)
     f.flush()
 for a in DATA:
     r = refs(a)

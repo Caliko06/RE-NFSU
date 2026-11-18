@@ -86,6 +86,9 @@
     'Perfil': 'Profile', 'Calidad (a mano)': 'Quality (custom)', 'Sonido': 'Sound', 'Silenciado (clic para activar)': 'Muted (click to turn on)', 'Sonido activo (clic para silenciar)': 'Sound on (click to mute)',
     'Teclas y mando (K)': 'Keys and gamepad (K)', 'Botones: tenues': 'Buttons: faint', 'Botones: medios': 'Buttons: medium', 'Botones: visibles': 'Buttons: visible',
     'Un cambio aquí reinicia el juego.': 'A change here restarts the game.', 'Todos los ajustes': 'All settings',
+    // web/saves.js
+    'No se pudo guardar tu partida en este navegador': 'Your progress could not be saved in this browser',
+    'No se pudieron leer tus partidas en este navegador': 'Your saves could not be read in this browser',
   };
   window.RN_LANG = lang;
   window.RN_TR = s => (lang === 'en' && typeof s === 'string' && EN[s]) || s;

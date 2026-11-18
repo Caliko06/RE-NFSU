@@ -52,6 +52,10 @@
       const FS = m.FS, seen = new Map();            // name -> "size@mtime" last stored
       FS.mkdir('/save');
       m.addRunDependency('rn_saves');
+      // A failed read or write of the browser store reaches the page log (web/boot.js line: build/web.log, the F10 report) and the
+      // player once (boot.js toast): before, it was only console.warn and a career could stop being kept with no sign.
+      const say = s => (cfg.printErr || console.warn)('saves: ' + s);
+      let failing = false;
       const walk = (dir, pre, out) => {
         for (const n of FS.readdir(dir)) {
           if (n === '.' || n === '..') continue;
@@ -77,7 +81,9 @@
         // the name), so a phone with no keyboard skips the name screen (everything is unlocked for every profile: patches_unlock.py).
         // A visit that stopped at the name screen already stored the game's "DirectInput user maps.txt": no Profiles.usr is the test.
         if (window.RN_PUBLIC ? !files.has('Profiles.usr') : !files.size) {
-          const j = await fetch(window.RN_PUBLIC ? 'seed_save.json' : '/save-backup.json').then(r => r.ok ? r.json() : null).catch(() => null);
+          const url = window.RN_PUBLIC ? 'seed_save.json' : '/save-backup.json';
+          // Without the seed a phone lands on the name screen with no keyboard: say why.
+          const j = await fetch(url).then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))).catch(e => { say(`${url}: ${e.message}: no starting profile`); return null; });
           if (j && j.files) for (const k of Object.keys(j.files)) { files.set(k, unb64(j.files[k])); stored.delete(k); }
         }
         for (const [k, d] of files) {
@@ -86,10 +92,22 @@
           FS.writeFile('/save/' + k, d);
         }
         walk('/save', '', new Map()).forEach((f, n) => { if (stored.has(n)) seen.set(n, f.sig); });
-      }).catch(e => console.warn('saves:', e)).finally(() => {
+      }).catch(e => {
+        say('could not read the saves of this browser: ' + (e && e.message || e));
+        toast(RN_TR('No se pudieron leer tus partidas en este navegador'));
+      }).finally(() => {
         m.removeRunDependency('rn_saves');
         let busy = false;
-        const tick = () => { if (busy) return; busy = true; scan().catch(e => console.warn('saves:', e)).finally(() => { busy = false; }); };
+        const tick = () => {
+          if (busy) return;
+          busy = true;
+          scan().then(() => { if (failing) { failing = false; say('saving again'); } }, e => {
+            if (failing) return;       // one line and one notice per failure, not one per second
+            failing = true;
+            say('could not save: ' + (e && e.message || e));
+            toast(RN_TR('No se pudo guardar tu partida en este navegador'));
+          }).finally(() => { busy = false; });
+        };
         setInterval(tick, 1000);
         addEventListener('pagehide', tick);
         document.addEventListener('visibilitychange', () => { if (document.hidden) tick(); });

@@ -12,11 +12,13 @@ f = open(OUT, 'w'); f.write('# %s\nanalysis %.0f s\n' % (Q, time.time() - t0))
 seg = doc.getSegmentAtAddress(0x401000); done = set()
 def refs(a):
     # xrefs live in the segment that holds the address (.data for globals), not in .text
+    err = None
     for get in (lambda: doc.getSegmentAtAddress(a).getReferencesOfAddress(a), lambda: doc.getReferencesOfAddress(a)):
         try:
             r = get()
             if r is not None: return list(r)
-        except Exception: pass
+        except Exception as x: err = x
+    if err is not None: f.write('(xrefs of 0x%x failed: %s)\n' % (a, err))   # an empty list must mean no xrefs, never a Hopper error
     return []
 def callees(p):
     try: return sorted(set(c.toAddress() for c in p.getAllCallees()))

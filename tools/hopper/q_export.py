@@ -31,10 +31,10 @@ for si in range(doc.getSegmentCount()):
             try: f.write((p.decompile() or '(no pseudocode)') + '\n')
             except Exception as x: f.write('(decompile failed: %s)\n' % x)
         try: r = sorted(set(seg.getReferencesOfAddress(e) or []))
-        except Exception: r = []
+        except Exception as x: r = []; f.write('// callers failed: %s\n' % x)   # never an empty callers line for a Hopper error
         f.write('// callers: %s\n' % ' '.join(sorted(set(owner(a) for a in r))))
         try: f.write('// callees: %s\n' % ' '.join('%08x' % c for c in sorted(set(c.toAddress() for c in p.getAllCallees()))))
-        except Exception: pass
+        except Exception as x: f.write('// callees failed: %s\n' % x)
         f.flush()
 f.write('\nDONE %.0f s, %d procedures of %d\n' % (time.time() - t0, n, i)); f.close()
 doc.closeDocument()

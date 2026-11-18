@@ -139,9 +139,9 @@ EM_JS(int, web_text, (const char *url, char *out, int cap), {
         var x = new XMLHttpRequest();
         x.open('GET', UTF8ToString(url), false);
         x.send();
-        if (x.status !== 200) return -1;
+        if (x.status !== 200) { err('files: ' + UTF8ToString(url) + ': HTTP ' + x.status); return -1; }
         return stringToUTF8(x.responseText, out, cap);
-    } catch (e) { return -1; }
+    } catch (e) { err('files: ' + UTF8ToString(url) + ': ' + e.message); return -1; }
 });
 #endif
 
@@ -318,6 +318,9 @@ static void *pre_main(void *hint) {
             }
             l = strchr(l, '\n'); if (l) l++;
         }
+        // One line per visit: with no hint the boot reads every file on demand (65.7 s instead of 22.7 s, HANDOFF 2026-11-16).
+        if (pre_tail) rn_log("files: prefetch %s: %u requests, %u KB", world ? "world" : "boot", pre_tail, rn_load[0]);
+        else rn_log("files: prefetch OFF: /entry_hint.tsv gave no lines (%d bytes)", n);
         pre_start();
         pthread_mutex_unlock(&blk_mu);
     }
