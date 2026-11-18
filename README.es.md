@@ -2,9 +2,9 @@
 
 <a href="https://nfsu.cc"><img src="docs/media/banner.png" alt="Need for Speed Underground corriendo en un navegador: un Skyline azul en Olympic City de noche" width="100%"></a>
 
-# Juega Need for Speed: Underground en tu navegador
+# Juega Need for Speed Underground online, en tu navegador
 
-**El juego de PC de 2003, recompilado de x86 a WebAssembly. Abre un link y corre: nada que instalar, sin emulador.**
+**El juego de PC de 2003, gratis en una pestaña del navegador: sin descargar, sin instalar, sin emulador. Abre [nfsu.cc](https://nfsu.cc) y corre en PC o celular. Por dentro, cada función de `Speed.exe` se recompiló de x86 a WebAssembly.**
 
 <a href="https://nfsu.cc"><img src="https://img.shields.io/badge/%E2%96%B6%20Jugar%20ya-nfsu.cc-3fb950?style=for-the-badge" alt="Jugar ya en nfsu.cc"></a>
 
@@ -24,7 +24,7 @@
 
 ## Jugar
 
-1. Abre **[nfsu.cc](https://nfsu.cc)** en Chrome, Edge o Firefox en una PC, o en el navegador de tu celular.
+1. Abre **[nfsu.cc](https://nfsu.cc)** en Chrome, Edge, Firefox o Safari, en computadora o celular. Sirve cualquier navegador reciente con WebGPU ([detalles](https://nfsu.cc/blog/es/navegadores-celulares-ajustes-rendimiento.html)).
 2. Presiona **Jugar**. La primera visita descarga los datos del juego una vez; las siguientes arrancan desde la caché del navegador.
 3. Maneja con el teclado, un mando o los controles táctiles. Tu perfil y tus partidas se quedan en tu propio navegador.
 

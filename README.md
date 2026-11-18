@@ -2,9 +2,9 @@
 
 <a href="https://nfsu.cc"><img src="docs/media/banner.png" alt="Need for Speed Underground running in a browser: a blue Skyline in Olympic City at night" width="100%"></a>
 
-# Play Need for Speed: Underground in your browser
+# Play Need for Speed Underground online, in your browser
 
-**The 2003 PC game, recompiled from x86 to WebAssembly. Open a link and race: nothing to install, no emulator.**
+**The 2003 PC game, free in a browser tab: no download, no install, no emulator. Open [nfsu.cc](https://nfsu.cc) and race on PC or phone. Under the hood, every function of `Speed.exe` was recompiled from x86 to WebAssembly.**
 
 <a href="https://nfsu.cc"><img src="https://img.shields.io/badge/%E2%96%B6%20Play%20now-nfsu.cc-3fb950?style=for-the-badge" alt="Play now at nfsu.cc"></a>
 
@@ -24,7 +24,7 @@
 
 ## Play
 
-1. Open **[nfsu.cc](https://nfsu.cc)** in Chrome, Edge or Firefox on a PC, or in a phone browser.
+1. Open **[nfsu.cc](https://nfsu.cc)** in Chrome, Edge, Firefox or Safari, on a computer or a phone. Any recent browser with WebGPU works ([details](https://nfsu.cc/blog/en/browsers-phones-performance-settings.html)).
 2. Press **Play**. The first visit downloads the game data once; later visits start from the browser cache.
 3. Drive with the keyboard, a gamepad or the touch controls. Your profile and saves stay in your own browser.
 
