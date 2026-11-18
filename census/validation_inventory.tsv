@@ -1,5 +1,6 @@
 # Inconsistent validation between layers, read-only audit 2026-11-18 (nothing run). path: public = a player on nfsu.cc meets it; dev = :5180 / tests; debug = URL or env switch only.
 # evidence: F = read in source on both sides; I = inference. Extractor tables: logs/validation/{env,urlkeys}.tsv (untracked).
+# FIXED 2026-11-18: L1 L2 L3 L4 L6 L7 S2; L5 by removing the launcher toggle (OWNER). Each row below still shows the defect as found.
 id	path	boundary	producer (file:line, rule)	consumer (file:line, rule)	effect	evidence
 L1	public	launcher->host traffic	web/launcher_opts.js:69 offers traffic=0 "Sin tráfico"	host/free.c:167 applies only base>0; host/rivals.c:434 tests presence	"Sin tráfico" keeps the track's own traffic	F
 L2	public	launcher->mode.js fx	web/launcher_opts.js:121 skips value == def ('1')	web/mode.js:46 phone forces fx=0 when absent	phone picks effects on, gets them off	F

@@ -431,7 +431,9 @@ static void traffic_spacing_back(Ctx *c) { if (ts_row) stf(c, ts_row + 0xd4, ts_
 static void traffic_spacing(Ctx *c) {
     uint32_t esi = c->r[ESI];
     traffic_spacing_back(c);
-    if (!free_race || (!getenv("RN_FREETRAFFIC") && ld(c, 0x78a2f0, 4) != 1010)) return;   // 31 m fits 14 cars on 1010, 20 m fits 26 (docs/traffic_placement.md); refill spreads the rest
+    // By value, not presence: 31 m fits 19..21 cars (the default FREE_TRAFFIC 13 x1.5), more need 20 m; 14 on 1010 (docs/traffic_placement.md)
+    const char *ft = getenv("RN_FREETRAFFIC");
+    if (!free_race || ((ft ? atoi(ft) : FREE_TRAFFIC) <= FREE_TRAFFIC && ld(c, 0x78a2f0, 4) != 1010)) return;
     c->r[ESI] = ld(c, 0x78a2f0, 4);
     uint32_t row = call_guest(c, 0x441fe0, 0, NULL);
     c->r[ESI] = esi, ts_row = row;

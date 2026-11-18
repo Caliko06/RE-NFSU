@@ -17,7 +17,6 @@
 
 #define NRIV_MAX 9          // rivals: the race start's 10 grid slots (PATCH 0x422a78) hold the player and 9; 1 + 9 + 19 traffic <= the entrant table's 30
 static int nriv = 6;        // RN_FREERIV (default 6, 0..NRIV_MAX): 0x4b4040's count; RN_FREERIV=3 is the first free mode
-#define FREE_TRAFFIC 13     // free mode trackinfo traffic count (RN_FREETRAFFIC), x1.5 = 19 cars asked; the placer fits 19 to 21 with FREE_ZONE
 
 // The career's rivals (census/career_oracle.json: every event's opponents, each name with the preset of its last event).
 static const struct { const char *name; uint32_t preset; } CANON[] = {
@@ -164,7 +163,7 @@ static uint32_t free_setup(Ctx *c) {
     uint32_t ti = call_guest(c, 0x441fe0, 0, NULL), cnt = ti + ld(c, 0x78a2fc, 4) + ld(c, 0x78a300, 4) * 2 + 0xc0;
     int8_t keep = (int8_t)c->mem[cnt];
     int base = getenv("RN_FREETRAFFIC") ? atoi(getenv("RN_FREETRAFFIC")) : FREE_TRAFFIC;   // WORLD too: 13 x1.5 = 19 cars (OWNER 2026-11-11; was 27 = 40)
-    if (live && base > 0) c->mem[cnt] = (int8_t)base;
+    if (live && base >= 0) c->mem[cnt] = (int8_t)base;   // 0 = no traffic: 0x4b3b11 skips the add loop on a count <= 0 (launcher 'Sin tráfico')
     if (getenv("RN_FREELOG")) rn_log("FREE traffic asked: trackinfo count %d -> %d (x1.5, at most 55)", keep, (int8_t)c->mem[cnt]);
     uint32_t r = call_guest(c, 0x4b3ac0, 0, NULL);
     c->mem[cnt] = (uint8_t)keep;

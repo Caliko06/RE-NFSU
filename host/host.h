@@ -190,3 +190,5 @@ void dinput8_motion(int32_t dx, int32_t dy, int32_t dz);
 int input_hud_inset(void);                                    // web: how far the HUD's side groups stay from the picture's edge (notch), permille of its width
 void input_mouse_exclusive(int on);                            // web: the page hides and locks the pointer
 void user32_key(uint8_t dik, uint8_t vk, int down);
+
+#define FREE_TRAFFIC 13     // free mode trackinfo traffic count (RN_FREETRAFFIC), x1.5 = 19 cars asked; the placer fits 19 to 21 with FREE_ZONE

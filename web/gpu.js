@@ -147,7 +147,7 @@ async function startGpu(M, canvas, report, onFrame) {
   // ?hdlog=1: each pack hit once (texture id, size, key, png), to find a texture the pack should not take.
   const hdLog = RN_Q.get('hdlog') === '1' ? new Set() : null;
   if (RN_Q.get('remaster') === '1') {
-    // The world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh) are on by default in BC7; ?worldhd=0 turns them off.
+    // The world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh) are off (OWNER 2026-10-31, below); ?worldhd=1 turns them on, in BC7.
     // As rgba8 (webp: ?worldhd=1&worldbc=0) gate60 passed 1 run in 4 (scenes > 3300 draws dropped 18-53 frames over 20 ms; base 0-2,
     // build/bench/e_default*); as BC7 4 in 4, max 24-25 ms, 0 > 33 ms like the base (build/bench/f_bc7_q*, 2026-10-26).
     // Without the BC feature (or with ?pack=1) the webp world pack stays opt-in with ?worldhd=1.

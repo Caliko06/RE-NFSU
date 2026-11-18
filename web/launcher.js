@@ -11,7 +11,7 @@
   const root = document.documentElement, body = document.body;
   // Display copy: noun phrases, neutral Mexican Spanish. The catalog (launcher_opts.js) keeps its own strings; these win when present.
   const COPY = {
-    label: { blur: 'Blur de velocidad', fxaa: 'Suavizado FXAA', msaa: 'Suavizado MSAA', chasecam: 'Cámara inclinada', nitrocam: 'Cámara con nitro', speedfov: 'Visión con velocidad', fps: 'Fotogramas', remaster: 'Texturas remaster', skinhd: 'Pinturas en HD', bloom: 'Brillo de luces', roadrefl: 'Reflejo del camino', fx: 'Efectos remaster', trafyield: 'Tráfico se aparta', ai: 'Rivales con carácter', traffic: 'Tráfico', career: 'Progreso', touch: 'Táctil', steer: 'Giro del teclado', carlook: 'Pintura del coche' },
+    label: { blur: 'Blur de velocidad', fxaa: 'Suavizado FXAA', msaa: 'Suavizado MSAA', chasecam: 'Cámara inclinada', nitrocam: 'Cámara con nitro', speedfov: 'Visión con velocidad', fps: 'Fotogramas', remaster: 'Texturas remaster', skinhd: 'Pinturas en HD', bloom: 'Brillo de luces', roadrefl: 'Reflejo del camino', fx: 'Efectos remaster', trafyield: 'Tráfico se aparta', traffic: 'Tráfico', career: 'Progreso', touch: 'Táctil', steer: 'Giro del teclado', carlook: 'Pintura del coche' },
     group: { camara: 'Cámara' },
   };
   const t = window.RN_TR || (s => s);      // web/i18n.js: Spanish source, English for every non-Spanish browser
@@ -295,8 +295,8 @@
   async function launch(start = 'menu') {
     if (going) return;
     going = true; save();
-    const u = new URLSearchParams(L.query(sel)); u.delete('mode'); u.set('play', '1'); u.set('fast', '1'); u.set('go', '1'); u.set('start', start);
-      // mode: stored (web/mode.js); a ?mode= would pin it and break F4
+    const u = new URLSearchParams(L.query(sel)); if (!matchMedia('(pointer: coarse)').matches) u.delete('mode'); u.set('play', '1'); u.set('fast', '1'); u.set('go', '1'); u.set('start', start);
+      // mode: stored (web/mode.js); a ?mode= would pin it and break F4. Phones keep it: web/mode.js ignores the stored mode there
     snd('accept'); try { window.RN_SND && window.RN_SND.fadeOut(900); } catch {}
     body.classList.add('leaving');
     await Promise.race([Promise.resolve(scene('confirm')).catch(() => 0), wait(1800)]);

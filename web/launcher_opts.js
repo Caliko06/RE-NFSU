@@ -25,7 +25,7 @@
       key: 'career', type: 'choice', values: [T('unlock', 'Todo abierto'), T('normal', 'Normal (como salió)')], def: 'unlock',
       modes: BOTH, src: 'web/boot.js' },
 
-    { id: 'remaster', group: 'video', label: 'Texturas del remaster', help: 'Texturas mejoradas de interfaz, coches y ciudad. Descarga extra grande (1.1 GB), apagadas de inicio.',
+    { id: 'remaster', group: 'video', label: 'Texturas del remaster', help: 'Texturas mejoradas de interfaz y coches. Descarga extra grande (1.1 GB), apagadas de inicio.',
       key: 'remaster', type: 'toggle', values: OFF_ON, def: '0', modes: REM, src: 'web/gpu.js' },
     { id: 'skinhd', group: 'video', label: 'Pinturas de coche en HD', help: 'Calcula las pinturas de los coches a mayor resolución.',
       key: 'skinhd', type: 'toggle', values: OFF_ON, def: '1', modes: REM, src: 'web/gpu.js' },
@@ -67,8 +67,6 @@
 
     { id: 'traffic', group: 'jugabilidad', label: 'Tráfico', help: 'Cuántos coches civiles circulan en Free Run.',
       key: 'traffic', type: 'choice', values: [T('0', 'Sin tráfico'), T('6', 'Poco'), T('13', 'Normal'), T('15', 'Mucho')], def: '13', modes: REM, src: 'host/free.c:20,166' },
-    { id: 'ai', group: 'jugabilidad', label: 'Rivales con personalidad', help: 'Nerviosos, limpios o agresivos. Apagado: corren como en 2003.',
-      key: 'ai', type: 'toggle', values: OFF_ON, def: '1', modes: REM, src: 'web/boot.js, host/rivals.c' },
     { id: 'trafyield', group: 'jugabilidad', label: 'El tráfico se hace a un lado', help: 'Los civiles te ven venir por detrás y abren paso.',
       key: 'trafyield', type: 'toggle', values: OFF_ON, def: '1', modes: REM, src: 'host/rivals.c:789' },
     { id: 'handling', group: 'jugabilidad', label: 'Agarre trasero', help: 'Original: como salió el juego. Suelto: la cola derrapa más fácil.',
@@ -103,7 +101,10 @@
   const valid = (o, v) => o.values.some(x => x.v === v);
   const coarse = () => { try { return matchMedia('(pointer: coarse)').matches; } catch { return false; } };
   // fx=0 already turns these off (web/mode.js RN_FX_OFF), so they are not sent then
-  const FX_COVERED = new Set(['remaster', 'skinhd', 'bloom', 'fxaa', 'sharp', 'aniso', 'roadrefl']);
+  const FX_COVERED = new Set(['remaster', 'skinhd', 'bloom', 'fxaa', 'sharp', 'aniso']);
+  // RN_FX_OFF also fills these when absent, but they are the player's look rows: sent even at def under fx=0, so the row wins
+  // (roadrefl off is also the cheaper one: no mirrored world, PATCH 0x410c1b, host/win32.c)
+  const FX_KEEP = new Set(['roadrefl', 'carlook']);
 
   function query(sel) {
     const s = { ...defaults(), ...sel };
@@ -118,7 +119,9 @@
         else if (v === '30') parts.push('fps=30');
         continue;
       }
-      if (v === o.def) continue;
+      // phones get fx=0 on their own (web/mode.js); an explicit 1 must be sent there
+      if (o.id === 'fx' && v === '1' && coarse()) { parts.push('fx=1'); continue; }
+      if (v === o.def && !(s.fx === '0' && FX_KEEP.has(o.id))) continue;
       if (s.fx === '0' && FX_COVERED.has(o.id)) continue;
       if (o.id === 'steer' && v === 'key') continue;
       if (o.id === 'vol' && v === '0') { parts.push('mute=1'); continue; }

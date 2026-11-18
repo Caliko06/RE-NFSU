@@ -36,10 +36,16 @@
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     return Object.keys(files).length;
   }
+  // A save name the game page can write under /save: a relative path, no empty, '.' or '..' part. restore() and the loader use the same rule.
+  const okName = k => typeof k === 'string' && k.split('/').every(p => p && p !== '.' && p !== '..');
   async function restore(file) {
     const j = JSON.parse(await file.text());
-    if (!j || j.rn_saves !== 1 || typeof j.files !== 'object') throw new Error('No es una copia de partidas');
-    const names = Object.keys(j.files), data = names.map(k => unb64(j.files[k]));
+    if (!j || j.rn_saves !== 1 || !j.files || typeof j.files !== 'object') throw new Error('No es una copia de partidas');
+    const names = Object.keys(j.files);
+    // checked before the store is cleared: a bad copy changes nothing
+    if (!names.every(k => okName(k) && typeof j.files[k] === 'string' && !names.some(o => o.startsWith(k + '/'))))
+      throw new Error('No es una copia de partidas');
+    const data = names.map(k => unb64(j.files[k]));
     await run('readwrite', s => { s.clear(); names.forEach((k, i) => s.put(data[i], k)); });
     return names.length;
   }
@@ -86,10 +92,14 @@
           const j = await fetch(url).then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))).catch(e => { say(`${url}: ${e.message}: no starting profile`); return null; });
           if (j && j.files) for (const k of Object.keys(j.files)) { files.set(k, unb64(j.files[k])); stored.delete(k); }
         }
+        // One bad name (a store filled by an older restore) is skipped and logged, not allowed to stop the others.
         for (const [k, d] of files) {
-          const parts = k.split('/'); let p = '/save';
-          for (const x of parts.slice(0, -1)) { p += '/' + x; try { FS.mkdir(p); } catch {} }
-          FS.writeFile('/save/' + k, d);
+          if (!okName(k)) { say(`skipped bad save name "${k}"`); continue; }
+          try {
+            const parts = k.split('/'); let p = '/save';
+            for (const x of parts.slice(0, -1)) { p += '/' + x; try { FS.mkdir(p); } catch {} }
+            FS.writeFile('/save/' + k, d);
+          } catch (e) { say(`could not load save "${k}": ${e && e.message || e}`); }
         }
         walk('/save', '', new Map()).forEach((f, n) => { if (stored.has(n)) seen.set(n, f.sig); });
       }).catch(e => {
