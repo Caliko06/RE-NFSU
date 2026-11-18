@@ -1,0 +1,53 @@
+# Inconsistent validation between layers, read-only audit 2026-11-18 (nothing run). path: public = a player on nfsu.cc meets it; dev = :5180 / tests; debug = URL or env switch only.
+# evidence: F = read in source on both sides; I = inference. Extractor tables: logs/validation/{env,urlkeys}.tsv (untracked).
+id	path	boundary	producer (file:line, rule)	consumer (file:line, rule)	effect	evidence
+L1	public	launcher->host traffic	web/launcher_opts.js:69 offers traffic=0 "Sin tráfico"	host/free.c:167 applies only base>0; host/rivals.c:434 tests presence	"Sin tráfico" keeps the track's own traffic	F
+L2	public	launcher->mode.js fx	web/launcher_opts.js:121 skips value == def ('1')	web/mode.js:46 phone forces fx=0 when absent	phone picks effects on, gets them off	F
+L3	public	launcher->mode.js mode (phone)	web/launcher.js:298 deletes mode= and trusts stored rn_mode	web/mode.js:29 phone without ?mode= forces original	phone picks Remaster, plays Original; remaster-only keys ignored	F
+L4	public	launcher defaults->fx=0 fills	web/launcher_opts.js:108-110 skips def; FX_COVERED lacks carlook	web/mode.js:36,43 fills RN_ORIGINAL for absent keys	fx off: roadrefl 'Seco' becomes 'game' (wet), carlook 3 becomes 2003; phone sharp off becomes 0.5	F
+L5	public	launcher ai toggle->host	web/launcher_opts.js:70 "Rivales con personalidad"	host/rivals.c:480, host/free.c:48 personas only on track 1010, WORLD free run, pool or RN_AI=2	toggle does nothing on most tracks	F gate, I reach
+L6	public	launcher remaster help->gpu.js	web/launcher_opts.js:28 promises interface, cars and city	web/gpu.js:157 city needs worldhd=1, never sent; gpu.js:150 comment says on by default	city textures not delivered	F
+L7	public	launcher traffic def->rivals.c	web/launcher_opts.js:69 def 13 not sent	host/rivals.c:434 presence test	default traffic always takes the 1010-only path	F
+S1	public	seed vs stored saves	web/saves.js:84 public seeds when Profiles.usr missing (dev: only empty store)	web/saves.js:88 seed overwrites same-name files	visitor stopped at name screen loses DirectInput user maps.txt	F
+S2	public	restore->loader	web/saves.js:44 checks rn_saves and files object only	web/saves.js:92-98 writeFile throws on a bad key	bad backup: partial /save on every load, key stays in IndexedDB	F
+S3	public	restore vs open game tab	web/saves.js:45 clear + put	web/saves.js:63 tab scan deletes only its own seen	second tab writes old saves back over a restore	I
+S4	public	host save write->IndexedDB	host/files.c gf_flush to MEMFS	web/saves.js:106 pagehide runs async IDB	last save before closing may be lost	I
+S6	public	save key case	web/saves.js IndexedDB keys case-sensitive	host/files.c:164-185 strcasecmp	keys differing by case collapse to one file	I
+P1	public	?v= stamp vs stamped files	tools/build_public.py:20-26 hashes web/*.js|html, speed.*, Speed.exe	tools/build_public.py:42 stamps launcher.css, launcher_b/scene.js; tools/upload_r2.sh:14 1-day cache	CSS or scene change can stay stale a day	F
+P2	public	data cache vs engine	tools/upload_r2.sh:14-17 1 day for non-top-level	host/files.c:308 entry_hint.tsv, web/gpu.js:176 remaster_off.tsv, no ?v=	new engine reads an old hint (slower boot)	F
+P3	public	directory URL	web/index.html:111 iframe /launcher_b/?curtain=1	docs/re/hosting.md:15 rewrites only /; R2 no index	dev serves index.html, R2 may 404	F code, I live
+P4	public	URL case	dev APFS case-insensitive	R2 case-sensitive	wrong-case asset URL passes locally, 404s live	I
+U1	public	web->host screen size	web/boot.js:125-131 no floor; bbmax '0'/NaN passes	host/win32.c:1164 640x480..7680x4320 else silent default	canvas and engine size disagree; log shows the asked size	F
+T1	public	web modules: is it a phone	web/mode.js, launcher: pointer:coarse	web/touch.js:30, web/namekeys.js:12: ontouchstart	touch laptop gets touch HUD with PC settings	F
+R1	dev	Range parsers in serve.py	tools/serve.py:184 /mp regex -> 416	tools/serve.py:247-250 split + int	bytes=-500 or multi-range: unhandled error, not 416	F
+R2	dev	Range: static_server	host/files.c:124 sends bytes=a-b only	tools/static_server.py:20 non-match -> 200 full	same family as R1	F
+R3	public	host Range response check	server may return any 206	host/files.c:126 checks status only; copies a.length into dst	206 with other length writes past dst	F
+R4	public	file list fetch	tools/serve.py, build_public.py game-files.json	host/files.c:81-84 no status check (web_text :142 checks)	404 or HTML -> JSON.parse throws in the engine	F
+R5	dev	dev vs public file set	tools/serve.py:52 lists all game/ incl .DS_Store	tools/build_public.py:80-93 drops public_pack.tsv 'no' and .DS_Store	local tests see files the public site lacks	F
+R6	dev	percent-encoding	host/files.c:122 encodeURIComponent	tools/serve.py translate_path no unquote	3 Support/ names 404 on dev only	F
+R7	dev	dev vs public save seed	tools/serve.py /save-backup.json: all of save/ incl .DS_Store	web/seed_save.json 5 files; saves.js:92 no filter	dev and public start from different saves	F
+R8	dev	headers	tools/static_server.py:19-21, _headers: COOP COEP CORP	tools/serve.py: COOP COEP only	CORP problems invisible on dev	I
+R9	dev	manifest vs upload	tools/build_public.py:101-105 raw speed.wasm hash	tools/upload_r2.sh:22-26 uploads gzipped	a future manifest check would flag speed.wasm	I
+R10	dev	overlay size	host/trackfiles.c:20-24 HEAD Content-Length, 200 only	host/files.c:283-288 needs exact len	CDN HEAD without length gives size 0	I
+R11	latent	dir listing buffer	host/files.c:100-112 64 KB	host/files.c gf_find strchr without NULL check	truncated listing crashes (largest today ~3 KB)	F
+E1	debug	env presence vs value	host/win32.c:1174 RN_AUTOPILOT presence; RN_POOL rivals.c:24, RN_HORNFIX horn.c:31, RN_MAXCHAR mc.c:222	other flags use e[0]=='0' (win32.c:1176-1216)	RN_AUTOPILOT=0 / RN_POOL=0 turn the feature ON	F
+E2	debug	env parsers differ	host/host.h:8 rn_env: empty = default, text = 0	host/free.c:690 RN_RIVALOPEN raw atoi: empty = off	same value reads differently across vars	F
+E3	debug	?env= vs named keys	web/mode.js:48 says ?env= wins; web/boot.js:149 applies it first	web/boot.js:161,166-181,174,213 overwrite after	?env=RN_HANDLING=1, RN_ROADREFL=sq have no effect	F
+E4	debug	roadrefl value	web/boot.js:213 unchecked	host/sm1.c:469 unknown -> 0; host/win32.c:1220 exact 'off'	typo or OFF silently becomes game level	F
+E5	debug	RN_CARLOOK two parsers	web/boot.js:218 raw	host/main.c:244 2003|2 -> 0.5; host/sm1.c:503 0 and 2003 = car.efx	carlook=0: car.efx paint with 0.35 reflection	F
+E6	debug	RN_STEER doc	host/win32.c:1200 comment "1"	host/win32.c:1201 strcmp "pad"	RN_STEER=1 ignored	F
+E7	debug	traffic range	web/boot.js:179 raw	host/free.c:166-167 atoi to int8, no cap	>=128 wraps negative	F
+E8	debug	car value	web/boot.js:214 doc <name|index>, ?car=list	host/rivals.c:1068-1071 name[:tier[:n]] only	index or list only logs an error	F
+E9	debug	pool in original	web/boot.js:161 any mode	web/tune.js:49 not original	original + pool: pool on, blur not the pool's	F
+E10	debug	numeric URL keys	web/gpu.js:185 hdnet, :666 aniso, web/audio.js:68 vol	no range check	hdnet=0 never downloads; aniso >16 to WebGPU; vol=abc mutes	F code, I effect
+K1	dev	RN_KEYS key names	producers uppercase	host/input.c:146-150 scan [A-Z0-9_] but strcasecmp	"Return" taps R, then stops	F
+K2	dev	RN_KEYS length	tools/completion.py chains up to 185 taps	host/input.c:139-142 taps[256], silent cut	long chains lose their tail	I
+K3	dev	script errors vs runner	host/input.c:152-153,267-294 log "cannot read"/"no key"	tools/completion.py:291 stop regex misses them	broken script shows empty stop	F
+K4	dev	bad RN_JUMP	host/input.c:267-297 bad entry -> s=""	host/input.c:252-257 "RN_JUMP: done", exit 0; tools/savegate.py:15	failure reads as success	F
+K5	dev	?env= scripts vs ?start=	web/boot.js:148 ?env=RN_KEYS/RN_JUMP	web/boot.js:194 guard reads only ?keys/?jump	both scripts run	I
+K6	dev	mode numbering	tools/completion.py:23-33 menu: 2 drag 3 drift 4 lapko 5 free	completion.py:122-132, host/input.c:226: 2 lapko 3 free 5 drag 6 drift	same names, two numberings	F
+K7	dev	@= needs flow log	any RN_KEYS with @=	host/d3d9.c:1198 updates screen only with RN_FLOWLOG/JUMP/CAREER	script never fires, no log	I
+K8	dev	screen name length	tools/completion.py:98 longest = 32 chars	host/d3d9.c:1213-1217 %.32s, 216 B, np[16]	longer names never match	I
+K9	dev	webcheck key syntax	tools/webcheck.mjs:25 seconds:Code	RN_KEYS ms@cond:NAME	wrong syntax -> NaN, silent	I
+A2	dev	slot 0x88 meaning	tools/recomp/patches_race.py:86-93 free_tnode + "free_walk"	host/free.c:983-987 dispatch by return address, unknown silent	reuse gets a wrong answer	F
+A3	latent	lazy slots	host/trackfiles.c:54-56 writes 0xcc/0xd4/0xd8 at first gf_open	tools/recomp/patches_collision.py:43, patches_mode_menu.py:5,8 jmp [slot]; :40 stale world_widx	cave before first open jumps to 0 (not reachable today)	F/I
