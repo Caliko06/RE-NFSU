@@ -200,12 +200,25 @@ int gf_stat(const char *gpath) {
 
 void rn_race_bridge(const char *gpath);   // host/bridge.c
 int rn_overlay_open(const char *gpath, char *real, size_t n, uint64_t *size) __attribute__((weak));   // host/trackfiles.c: the Cars/TEXTURES.BIN overlay
+extern Ctx *g_ctx;
+
+// Every open asks where the race is going: the mode setup writes the track to [0x78a2f0] when the player confirms (0x4b4a90 and the
+// other modes' setups, 0x43b181, 0x4abc5c), so the first open after it (GLOBAL\INGAMEA.BUN) is ahead of TRACKB. Once per track change.
+static void track_hook(void) {
+#ifdef __EMSCRIPTEN__
+    static int last;
+    if (!g_ctx) return;
+    int id = (int)ld(g_ctx, 0x78a2f0, 4);
+    if (id >= 1000 && id < 2000 && id != last) { last = id; gf_prefetch_track(id); }
+#endif
+}
 
 // Opens a game file: id >= 0, or -1 missing, -2 outside the folder, -3 a directory.
 int gf_open(const char *gpath) {
     char real[512];
     uint64_t size = 0;
     rn_race_bridge(gpath);
+    track_hook();
     int r = rn_overlay_open && rn_overlay_open(gpath, real, sizeof real, &size) ? 0 : lookup(gpath, real, sizeof real, &size);
     if (r) return r == 1 ? -3 : r;
     for (int k = 0; k < MAXF; k++) {
@@ -302,24 +315,30 @@ static void pre_spawn(void *hint) {     // under blk_mu, or before any thread
     if (!pthread_create(&t, &a, pre_main, hint)) pre_run++;
 }
 static void pre_start(void) { for (int k = pre_run; k < NPRE; k++) pre_spawn(0); }
+static char hint_text[256 << 10];     // /entry_hint.tsv (23 KB with 8 tracks, 2026-11-18), kept for gf_prefetch_track
+static int hint_n;                    // its bytes; set under blk_mu once read
+// Under blk_mu: queue a hint line, 1 when it was queued.
+static int pre_push(const char *real, double off, double len) {
+    if (pre_tail - pre_head >= NQ) return 0;
+    snprintf(preq[pre_tail % NQ].real, 256, "%s", real);
+    preq[pre_tail % NQ].off = (uint64_t)off; preq[pre_tail % NQ].len = (uint32_t)len;
+    pre_tail++;
+    rn_load[0] += (uint32_t)len >> 10;
+    return 1;
+}
 static void *pre_main(void *hint) {
-    if (hint) {     // "phase \t path \t offset \t length" lines (tools/entry_hint.py): b = up to the main menu, w = on into WORLD
-        static char text[256 << 10];
-        int n = web_text("/entry_hint.tsv", text, sizeof text);
-        int world = !strcmp((const char *)hint, "world");
+    if (hint) {     // "phase \t path \t offset \t length" lines (tools/entry_hint.py): b = up to the main menu, t<id> = a track's race load
+        int n = web_text("/entry_hint.tsv", hint_text, sizeof hint_text - 1);
         pthread_mutex_lock(&blk_mu);
-        for (char *l = n > 0 ? text : 0; l && *l; ) {
-            char ph, real[256]; double off, len;
-            if (sscanf(l, "%c\t%255[^\t]\t%lf\t%lf", &ph, real, &off, &len) == 4 && (world || ph == 'b') && pre_tail - pre_head < NQ) {
-                snprintf(preq[pre_tail % NQ].real, 256, "%s", real);
-                preq[pre_tail % NQ].off = (uint64_t)off; preq[pre_tail % NQ].len = (uint32_t)len;
-                pre_tail++;
-                rn_load[0] += (uint32_t)len >> 10;
-            }
+        hint_n = n > 0 ? n : 0;
+        hint_text[hint_n] = 0;
+        for (char *l = hint_n ? hint_text : 0; l && *l; ) {
+            char ph[16], real[256]; double off, len;
+            if (sscanf(l, "%15[^\t]\t%255[^\t]\t%lf\t%lf", ph, real, &off, &len) == 4 && !strcmp(ph, "b")) pre_push(real, off, len);
             l = strchr(l, '\n'); if (l) l++;
         }
         // One line per visit: with no hint the boot reads every file on demand (65.7 s instead of 22.7 s, HANDOFF 2026-11-16).
-        if (pre_tail) rn_log("files: prefetch %s: %u requests, %u KB", world ? "world" : "boot", pre_tail, rn_load[0]);
+        if (pre_tail) rn_log("files: prefetch boot: %u requests, %u KB", pre_tail, rn_load[0]);
         else rn_log("files: prefetch OFF: /entry_hint.tsv gave no lines (%d bytes)", n);
         pre_start();
         pthread_mutex_unlock(&blk_mu);
@@ -340,7 +359,7 @@ static void *pre_main(void *hint) {
         else if (!len) usleep(20000);
     }
 }
-// RN_PREFETCH=boot|world (web/boot.js, the launcher's entry): the hint's files start coming while the engine boots.
+// RN_PREFETCH=boot (web/boot.js, the launcher's entry): the hint's files start coming while the engine boots.
 static void files_prefetch_start(void) {
     const char *e = getenv("RN_PREFETCH");
     if (!e || !*e) return;
@@ -365,6 +384,33 @@ void gf_prefetch(const char *gpath) {
     pthread_mutex_unlock(&blk_mu);
 #else
     (void)gpath;
+#endif
+}
+
+// The track the race will load is known ([0x78a2f0], written by the mode setup when the player confirms): its hint lines
+// "t<id> \t path \t offset \t length" come now, once per call, while they fit in the cache.
+void gf_prefetch_track(int id) {
+#ifdef __EMSCRIPTEN__
+    if (!pre_on) return;
+    char tag[16];
+    snprintf(tag, sizeof tag, "t%d", id);
+    unsigned q = 0;
+    uint64_t kb = 0, room = 0;
+    pthread_mutex_lock(&blk_mu);
+    room = cap() > blk_bytes ? cap() - blk_bytes : 0;
+    for (char *l = hint_n ? hint_text : 0; l && *l; ) {
+        char ph[16], real[256]; double off, len;
+        if (sscanf(l, "%15[^\t]\t%255[^\t]\t%lf\t%lf", ph, real, &off, &len) == 4 && !strcmp(ph, tag) && !blk_at(real, (uint64_t)off)) {
+            if ((kb + ((uint64_t)len >> 10)) << 10 > room || !pre_push(real, off, len)) break;
+            kb += (uint64_t)len >> 10; q++;
+        }
+        l = strchr(l, '\n'); if (l) l++;
+    }
+    if (q) pre_start();
+    pthread_mutex_unlock(&blk_mu);
+    rn_log("files: prefetch track %d: %u requests, %u KB", id, q, (unsigned)kb);
+#else
+    (void)id;
 #endif
 }
 
