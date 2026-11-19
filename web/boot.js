@@ -91,7 +91,7 @@ async function download(url, what) {
 }
 (async () => {
   // check: what the game cannot run without, before any download (the wasm is 70 MB).
-  if (!crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
+  if (!crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') { line('sin aislamiento: crossOriginIsolated false (COOP/COEP); WebViews like LineageOS Jelly never isolate', 'stop'); return; }
   // No WebGPU adapter (iOS 18 and older, Firefox on Android/Linux, old Android) or ?gl=1: WebGPU on WebGL 2 (web/webgpu_gl.js). It
   // replaces navigator.gpu and canvas.getContext('webgpu'), so it is loaded only here, never next to a working WebGPU.
   if (RN_Q.get('gl') === '1' || !await navigator.gpu?.requestAdapter().catch(() => null)) {

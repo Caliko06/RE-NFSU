@@ -25,7 +25,7 @@ const RN_APP = (() => {
 
   // A stop line of the page log -> what a player can do about it.
   const WHY = [
-    [/COOP|COEP|SharedArrayBuffer/, 'El servidor no está configurado para el juego (falta el aislamiento COOP/COEP).'],
+    [/sin aislamiento/, 'Este navegador no puede correr el juego: le falta el modo de memoria compartida que usa (pasa en navegadores dentro de apps y en algunos de sistema, como el de LineageOS). Ábrelo en Chrome, Edge, Firefox o Samsung Internet.'],
     [/ni WebGL 2/, 'Tu navegador no puede dibujar el juego (no tiene WebGPU ni WebGL 2). Usa Chrome, Edge, Safari o Firefox recientes.'],
     [/WebGPU no disponible/, 'Tu navegador no tiene WebGPU. Funciona en Chrome o Edge 113+ (computadora y Android 12+), Safari 26+ (Mac, iPhone, iPad) y Firefox 141+ (Windows) o 145+ (Mac Apple Silicon).'],
     [/sin adaptador/, 'WebGPU está apagado o la tarjeta gráfica de este equipo no es compatible.'],
@@ -74,6 +74,13 @@ const RN_APP = (() => {
       const r = el('button', 'Descargar reporte');   // web/boot.js rnReport: the session as one file, to send with the bug
       r.style.cssText = 'background:none;box-shadow:none;border:1px solid #ffffff55;padding:9px 22px;font-size:.8em';
       r.onclick = () => window.rnReport?.();
+      // No isolation (Android WebView browsers such as LineageOS Jelly, in-app browsers): reloading never helps, so hand the link to Chrome.
+      if (/sin aislamiento/.test(why) && /Android/.test(navigator.userAgent)) {
+        b.textContent = 'Abrir en Chrome';
+        b.onclick = () => { location.href = `intent://${location.host}${location.pathname}#Intent;scheme=https;package=com.android.chrome;end`; };
+        r.textContent = 'Copiar enlace';
+        r.onclick = () => navigator.clipboard?.writeText(location.origin + '/').then(() => { r.textContent = 'Enlace copiado'; }, () => {});
+      }
       gate.append(el('h2', 'El juego se detuvo'), el('p', (WHY.find(([re]) => re.test(why)) || [0, 'El juego falló. Recarga para seguir; el reporte dice qué pasó.'])[1]), b, r, el('p', why, 'tech'));
       b.focus();
     } else if (view === 'turn') {
