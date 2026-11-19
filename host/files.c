@@ -206,10 +206,9 @@ extern Ctx *g_ctx;
 // other modes' setups, 0x43b181, 0x4abc5c), so the first open after it (GLOBAL\INGAMEA.BUN) is ahead of TRACKB. Once per track change.
 static void track_hook(void) {
 #ifdef __EMSCRIPTEN__
-    static int last;
     if (!g_ctx) return;
     int id = (int)ld(g_ctx, 0x78a2f0, 4);
-    if (id >= 1000 && id < 2000 && id != last) { last = id; gf_prefetch_track(id); }
+    if (id >= 1000 && id < 2000) { cars_hook(g_ctx); gf_prefetch_track(id); }   // cars first: the load reads them first; the track is a no-op when the highlight poll queued it
 #endif
 }
 
@@ -304,7 +303,8 @@ static int blk_fetch(Blk *b) {
 // ---- web: bringing files ahead of the game, NPRE requests at a time ------------------------------
 #define NPRE 4
 #define NQ 1024
-static struct { char real[256]; uint64_t off; uint32_t len; } preq[NQ];
+static struct { char real[256]; uint64_t off; uint32_t len; int trk; } preq[NQ];   // trk: queued by gf_prefetch_track (droppable)
+static int queued_id;                 // the track whose lines were queued last (under blk_mu)
 static unsigned pre_head, pre_tail;   // under blk_mu
 static int pre_run, pre_on;           // threads alive (under blk_mu); set by RN_PREFETCH
 
@@ -318,10 +318,10 @@ static void pre_start(void) { for (int k = pre_run; k < NPRE; k++) pre_spawn(0);
 static char hint_text[256 << 10];     // /entry_hint.tsv (23 KB with 8 tracks, 2026-11-18), kept for gf_prefetch_track
 static int hint_n;                    // its bytes; set under blk_mu once read
 // Under blk_mu: queue a hint line, 1 when it was queued.
-static int pre_push(const char *real, double off, double len) {
+static int pre_push(const char *real, double off, double len, int trk) {
     if (pre_tail - pre_head >= NQ) return 0;
     snprintf(preq[pre_tail % NQ].real, 256, "%s", real);
-    preq[pre_tail % NQ].off = (uint64_t)off; preq[pre_tail % NQ].len = (uint32_t)len;
+    preq[pre_tail % NQ].off = (uint64_t)off; preq[pre_tail % NQ].len = (uint32_t)len; preq[pre_tail % NQ].trk = trk;
     pre_tail++;
     rn_load[0] += (uint32_t)len >> 10;
     return 1;
@@ -334,7 +334,7 @@ static void *pre_main(void *hint) {
         hint_text[hint_n] = 0;
         for (char *l = hint_n ? hint_text : 0; l && *l; ) {
             char ph[16], real[256]; double off, len;
-            if (sscanf(l, "%15[^\t]\t%255[^\t]\t%lf\t%lf", ph, real, &off, &len) == 4 && !strcmp(ph, "b")) pre_push(real, off, len);
+            if (sscanf(l, "%15[^\t]\t%255[^\t]\t%lf\t%lf", ph, real, &off, &len) == 4 && !strcmp(ph, "b")) pre_push(real, off, len, 0);
             l = strchr(l, '\n'); if (l) l++;
         }
         // One line per visit: with no hint the boot reads every file on demand (65.7 s instead of 22.7 s, HANDOFF 2026-11-16).
@@ -351,7 +351,8 @@ static void *pre_main(void *hint) {
         if (pre_head != pre_tail) {
             unsigned k = pre_head++ % NQ;
             len = preq[k].len;
-            if (blk_at(preq[k].real, preq[k].off)) rn_load[1] += len >> 10;      // the game got there first
+            if (!len) b = 0;
+            else if (blk_at(preq[k].real, preq[k].off)) rn_load[1] += len >> 10;      // the game got there first
             else b = blk_new(preq[k].real, preq[k].off, len);
         }
         pthread_mutex_unlock(&blk_mu);
@@ -377,7 +378,7 @@ void gf_prefetch(const char *gpath) {
     if (!blk_at(real, 0) && pre_tail - pre_head < NQ) {
         unsigned k = pre_tail++ % NQ;
         snprintf(preq[k].real, 256, "%s", real);
-        preq[k].off = 0; preq[k].len = size <= whole_max() ? (uint32_t)size : AHEAD;
+        preq[k].trk = 0; preq[k].off = 0; preq[k].len = size <= whole_max() ? (uint32_t)size : AHEAD;
         rn_load[0] += preq[k].len >> 10;
         pre_start();
     }
@@ -385,6 +386,13 @@ void gf_prefetch(const char *gpath) {
 #else
     (void)gpath;
 #endif
+}
+
+// Under blk_mu: forget the track requests no thread has started yet (the previous highlight's); blocks in flight or cached stay.
+static void track_drop(void) {
+    for (unsigned k = pre_head; k != pre_tail; k++)
+        if (preq[k % NQ].trk && preq[k % NQ].len) { rn_load[0] -= preq[k % NQ].len >> 10; preq[k % NQ].len = 0; }
+    queued_id = 0;
 }
 
 // The track the race will load is known ([0x78a2f0], written by the mode setup when the player confirms): its hint lines
@@ -397,11 +405,14 @@ void gf_prefetch_track(int id) {
     unsigned q = 0;
     uint64_t kb = 0, room = 0;
     pthread_mutex_lock(&blk_mu);
+    if (id == queued_id) { pthread_mutex_unlock(&blk_mu); return; }   // the highlight poll and the Accept hook both land here
+    track_drop();
+    queued_id = id;
     room = cap() > blk_bytes ? cap() - blk_bytes : 0;
     for (char *l = hint_n ? hint_text : 0; l && *l; ) {
         char ph[16], real[256]; double off, len;
         if (sscanf(l, "%15[^\t]\t%255[^\t]\t%lf\t%lf", ph, real, &off, &len) == 4 && !strcmp(ph, tag) && !blk_at(real, (uint64_t)off)) {
-            if ((kb + ((uint64_t)len >> 10)) << 10 > room || !pre_push(real, off, len)) break;
+            if ((kb + ((uint64_t)len >> 10)) << 10 > room || !pre_push(real, off, len, 1)) break;
             kb += (uint64_t)len >> 10; q++;
         }
         l = strchr(l, '\n'); if (l) l++;
@@ -411,6 +422,28 @@ void gf_prefetch_track(int id) {
     rn_log("files: prefetch track %d: %u requests, %u KB", id, q, (unsigned)kb);
 #else
     (void)id;
+#endif
+}
+
+// Every Present: the track highlighted in the Quick Race track menu. The menu stores the highlighted track's id in the mode's staging
+// record, rec+8 (0x4bafe0 at 0x4bb0b3 on each move; the ctor 0x4b9d47 for the first), rec = 0x748f70 + {0xfa10,...}[[0x777cc8]] (0x4ab510).
+// It is prefetched once it has stayed 500 ms; a move drops the previous one's unstarted requests. Only in the front end (flow 3).
+void gf_track_poll(void) {
+#ifdef __EMSCRIPTEN__
+    static const uint16_t rec[7] = {0xfa10, 0xfa30, 0xfa50, 0xfa70, 0xfa94, 0xfb18, 0xfb44};
+    static int cand; static double since;
+    if (!pre_on || !g_ctx || ld(g_ctx, 0x77a920, 4) != 3) return;
+    uint32_t mode = ld(g_ctx, 0x777cc8, 4);
+    if (mode > 6) return;
+    int id = (int)ld(g_ctx, 0x748f70 + rec[mode] + 8, 4);
+    struct timespec ts; clock_gettime(CLOCK_MONOTONIC, &ts);
+    double now = ts.tv_sec * 1e3 + ts.tv_nsec / 1e6;
+    if (id != cand) {
+        cand = id; since = now;
+        pthread_mutex_lock(&blk_mu);
+        if (id != queued_id) track_drop();
+        pthread_mutex_unlock(&blk_mu);
+    } else if (id >= 1000 && id < 2000 && now - since >= 500) gf_prefetch_track(id);
 #endif
 }
 

@@ -1308,6 +1308,7 @@ static void roadrefl_frame(void);
 static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     DEV();
     rn_phase_tick(c);    // host/phase.c: rn_flow and the race edges, before anything reads them
+    gf_track_poll();     // host/files.c: the Quick Race track highlighted in the menu starts its prefetch
     jumpcam_log(c);
     wallcap_log(c);
     tune_apply(c);

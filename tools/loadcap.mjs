@@ -63,7 +63,8 @@ while (now() < Number(process.env.RN_SECS || 150)) {
 }
 const { data } = await send('Page.captureScreenshot', { format: 'png' }, page);
 writeFileSync(out + '.png', Buffer.from(data, 'base64'));
-writeFileSync(out + '.json', JSON.stringify({ url, hud, rows: [...net.values()], lines, cons }));
+const host = (await send('Runtime.evaluate', { expression: "typeof allLog === 'undefined' ? [] : allLog", returnByValue: true }, page)).result.value || [];   // web/boot.js keep(): every host line
+writeFileSync(out + '.json', JSON.stringify({ url, hud, rows: [...net.values()], lines, cons, host }));
 console.log('hud', hud, 'requests', net.size, 'lines', lines.length, 'console', cons.length);
 if (KEEP) { await send('Browser.close').catch(() => {}); await sleep(3000); }   // let the disk cache land
 process.exit(0);

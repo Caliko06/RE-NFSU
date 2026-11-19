@@ -43,6 +43,32 @@ static void car_prefetch(const char *car) {
     for (int k = 0; k < 3; k++) { snprintf(p, sizeof p, "CARS\\%s\\%s", car, F[k]); gf_prefetch(p); }
 }
 
+// The race's whole car list is known before its first car file opens: 0x448f70 walks the entrants [0x78a418] (count [0x78a41c], 0x750
+// each, car type = dword at +0x10) and calls 0x58c3b0 for each; 0x58bb50 prints "CARS\%s\TEXTURES.BIN" with the name at [0x734588] + 0xc90 * type + 0.
+// Called from gf_open (host/files.c): once per change of the list, every folder's files start coming at once (web only).
+void cars_hook(Ctx *c) {
+    static uint32_t last;
+    uint32_t tab = ld(c, 0x78a418, 4), n = ld(c, 0x78a41c, 4), ct = ld(c, 0x734588, 4);
+    if (!tab || !ct || n == 0 || n > 64) return;
+    uint32_t h = n;
+    for (uint32_t i = 0; i < n; i++) h = h * 31 + ld(c, tab + 0x750 * i + 0x10, 4);
+    if (h == last) return;
+    last = h;
+    uint32_t seen = 0; int folders = 0;
+    for (uint32_t i = 0; i < n; i++) {
+        uint32_t t = ld(c, tab + 0x750 * i + 0x10, 4);
+        if (t >= 35 || (seen >> t & 1)) continue;
+        seen |= 1u << t;
+        const char *nm = (const char *)c->mem + ct + 0xc90 * t;
+        int k = 0;
+        while (k < 16 && nm[k] >= 0x21 && nm[k] < 0x7f) k++;
+        if (k == 0 || k >= 16 || nm[k]) continue;
+        car_prefetch(nm);
+        folders++;
+    }
+    rn_log("rivals: prefetch cars: %d folders", folders);
+}
+
 typedef struct {
     const char *name;
     uint8_t kit, wide, hood, scoop, wing, lights, exhaust;   // % at tier 3 (tier t: x t/3)
