@@ -116,14 +116,23 @@ EM_JS(int, web_read, (const char *real, double off, uint8_t *dst, int n), {
     // The game has no answer to a failed disc read (it waits on its loading screen), and a play over the internet makes
     // hundreds of these requests: a dropped one (a phone changing cell, a 5xx at the edge) is asked again after 0.3, 1, 2, 4 s.
     var path = UTF8ToString(real), x, waits = [300, 1000, 2000, 4000];
+    // Exact read pieces, independently HTTP-gzipped by tools/data_chunks.py. Unlisted reads keep Range.
+    // Each worker has its own Module; even prefetch workers load the small index once.
+    if (!Module.rnDataChunks) {
+        var index = new XMLHttpRequest();
+        index.open('GET', '/data-chunks.json', false);
+        index.send();
+        Module.rnDataChunks = index.status === 200 ? JSON.parse(index.responseText) : {};
+    }
+    var chunk = Module.rnDataChunks[path + ':' + off + ':' + n];
     for (var t = 0; ; t++) {
         try {
             x = new XMLHttpRequest();
-            x.open('GET', '/' + path.split('/').map(encodeURIComponent).join('/'), false);
+            x.open('GET', chunk ? '/data-chunks/' + chunk + '.gz' : '/' + path.split('/').map(encodeURIComponent).join('/'), false);
             x.responseType = 'arraybuffer';
-            x.setRequestHeader('Range', 'bytes=' + off + '-' + (off + n - 1));
+            if (!chunk) x.setRequestHeader('Range', 'bytes=' + off + '-' + (off + n - 1));
             x.send();
-            if (x.status === 206) break;
+            if (x.status === (chunk ? 200 : 206) && x.response.byteLength === n) break;
             err('files: ' + path + ' at ' + off + ': HTTP ' + x.status + ', try ' + (t + 1));
         } catch (e) { err('files: ' + path + ' at ' + off + ': ' + e.message + ', try ' + (t + 1)); }
         if (t === waits.length) return -1;

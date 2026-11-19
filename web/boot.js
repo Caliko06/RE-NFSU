@@ -141,9 +141,10 @@ async function download(url, what) {
       line(`mode: ${RN_MODE} (F4 switches)`);
       // ?fps=30: the host frame pacer targets 30 fps (web/mode.js degradation switches; ?fx=0 is read there)
       if (RN_Q.get('fps') === '30') m.ENV.RN_FPS = '30';
-      if (RN_PHONE) m.ENV.RN_RANGEMB = '16';   // host/files.c: the cache of fetched pieces (256 MB elsewhere)
-      // host/files.c: helper threads bring what this entry always reads (web/entry_hint.tsv) while the engine boots and the menus pass. Not on phones (the 16 MB cache).
-      else m.ENV.RN_PREFETCH = 'boot';
+      // host/files.c: the cache of fetched pieces (256 MB elsewhere). Phones: 96 MB, enough for the boot hint, one track and the cars (wasm break 1342 MB with 16 MB, 1523 with 256 on desktop, loadcap 2026-11-18); an iPhone tab dies near 1.5 GB.
+      if (RN_PHONE) m.ENV.RN_RANGEMB = '96';
+      // host/files.c: helper threads bring what this entry always reads (web/entry_hint.tsv) while the engine boots and the menus pass; then each track's race load and the cars.
+      m.ENV.RN_PREFETCH = 'boot';
       if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);
       // ?env=RN_TRACE=1,RN_API=Present: the debug switches of the native build
       for (const kv of (RN_Q.get('env') || '').split(',').filter(Boolean)) {

@@ -9,9 +9,12 @@ B=${1:?usage: tools/upload_r2.sh <bucket>}
 cd "$(dirname "$0")/.."
 test -f dist/manifest.json || { echo "no dist/: run python3 tools/build_public.py"; exit 1; }
 CACHE="Cache-Control: public, max-age=86400"
+# Publish immutable pieces before the index/page can name them. Never remove old pieces here.
+rclone copy dist/data-chunks "r2:$B/data-chunks" --ignore-times --transfers 16 --s3-no-check-bucket \
+  --header-upload "$CACHE" --header-upload "Content-Encoding: gzip" --header-upload "Content-Type: application/octet-stream"
 # Everything but speed.wasm as is. The *.gz packs are NOT Content-Encoding: the page unpacks them itself (web/ug2/ug2world.js:68,
 # web/gpu.js:230). game/ files are read with Range (host/files.c), so they must stay unencoded.
-rclone copy dist "r2:$B" --filter "- out/speed.wasm" --filter "- _headers" --filter "- /*.{html,js,json,webmanifest}" --transfers 16 \
+rclone copy dist "r2:$B" --filter "- /data-chunks/**" --filter "- out/speed.wasm" --filter "- _headers" --filter "- /*.{html,js,json,webmanifest}" --transfers 16 \
   --checksum --s3-no-check-bucket --header-upload "$CACHE" --progress
 # The page and its scripts change with each fix: no-cache, so browsers and Cloudflare's edge ask again (304 when unchanged).
 # Sent every time (--ignore-times, ~50 small files) so the header reaches files whose bytes did not change.

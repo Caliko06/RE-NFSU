@@ -91,8 +91,12 @@ for d, _, ns in os.walk(D):
 files = sorted([os.path.relpath(os.path.join(d, n), game), os.path.getsize(os.path.join(d, n))]
                for d, _, ns in os.walk(game) for n in ns)
 json.dump(files, open(os.path.join(D, "game-files.json"), "w"), separators=(",", ":"))
+from data_chunks import build as build_data_chunks
+build_data_chunks(ROOT, D)
 open(os.path.join(D, "_headers"), "w").write(
     "/*\n  Cross-Origin-Opener-Policy: same-origin\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Resource-Policy: same-origin\n")
+with open(os.path.join(D, "_headers"), "a") as headers:
+    headers.write('/data-chunks/*\n  Content-Encoding: gzip\n  Content-Type: application/octet-stream\n')
 
 
 def sha(p):
