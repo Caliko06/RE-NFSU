@@ -50,7 +50,11 @@ await configure(page);
 if (process.env.RN_INJECT) await send('Page.enable', {}, page), await send('Page.addScriptToEvaluateOnNewDocument', { source: readFileSync(process.env.RN_INJECT, 'utf8') }, page);
 const MOBILE = process.env.RN_MOBILE === '1';
 await send('Emulation.setDeviceMetricsOverride', MOBILE ? { width: 844, height: 390, deviceScaleFactor: 2, mobile: true } : { width: 1280, height: 720, deviceScaleFactor: 1, mobile: false }, page);
+// RN_CPU=<n>: the page's CPU n times slower (an old phone; workers are not throttled by CDP).
+if (process.env.RN_CPU) await send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.RN_CPU) }, page);
 if (MOBILE) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 }, page);
+// RN_HEAPPROF=1: sample the page's JS allocations (garbage included) -> <out>.heap.json, by function.
+if (process.env.RN_HEAPPROF) await send('HeapProfiler.enable', {}, page), await send('HeapProfiler.startSampling', { samplingInterval: 16384, includeObjectsCollectedByMajorGC: true, includeObjectsCollectedByMinorGC: true }, page);
 t0 = Date.now();
 await send('Page.navigate', { url }, page);
 let seen = 0, hud = null; const lines = [];
@@ -59,13 +63,14 @@ while (now() < Number(process.env.RN_SECS || 150)) {
   const log = (await send('Runtime.evaluate', { expression: "document.getElementById('log')?.textContent || ''", returnByValue: true }, page)).result.value || '';
   const all = log.split('\n');
   for (; seen < all.length - 1; seen++) lines.push([now(), all[seen]]);
-  if (!hud && /d3d9 race HUD /.test(log)) hud = now();
+  if (!hud && /d3d9 race HUD /.test(log)) { hud = now(); if (process.env.RN_HEAPPROF === 'race') { await send('HeapProfiler.stopSampling', {}, page); await send('HeapProfiler.startSampling', { samplingInterval: 16384, includeObjectsCollectedByMajorGC: true, includeObjectsCollectedByMinorGC: true }, page); } }   // 'race': only the race
   if (hud && now() > hud + 12) break;
   if (/STOP|JS rejection|JS error/.test(log)) break;
 }
 const { data } = await send('Page.captureScreenshot', { format: 'png' }, page);
 writeFileSync(out + '.png', Buffer.from(data, 'base64'));
 const host = (await send('Runtime.evaluate', { expression: "typeof allLog === 'undefined' ? [] : allLog", returnByValue: true }, page)).result.value || [];   // web/boot.js keep(): every host line
+if (process.env.RN_HEAPPROF) writeFileSync(out + '.heap.json', JSON.stringify((await send('HeapProfiler.stopSampling', {}, page)).profile));
 if (process.env.RN_DUMP) writeFileSync(out + '.dump.json', JSON.stringify((await send('Runtime.evaluate', { expression: process.env.RN_DUMP, returnByValue: true }, page)).result.value ?? null));
 writeFileSync(out + '.json', JSON.stringify({ url, hud, rows: [...net.values()], lines, cons, host }));
 console.log('hud', hud, 'requests', net.size, 'lines', lines.length, 'console', cons.length);

@@ -2447,7 +2447,7 @@
          for (let i = 0; i < nUni; i++) {
             const info = gl.getActiveUniform(this.prog, i);
             if (!info) continue;
-            const loc = gl.getUniformLocation(this.prog, info.name);
+            const loc = uloc(gl, this.prog, info.name);
             const m = info.name.match(/webgpu_g(\d+)_b(\d+)/);
             if (m && loc && SAMPLER_UNIFORM_TYPES[info.type]) {
                const group = parseInt(m[1], 10);
@@ -2503,8 +2503,9 @@
          const t0 = this.targets[0];
          if (t0 && t0.blend) {
             gl.enable(GL.BLEND);
-            const c = Object.assign({ srcFactor: 'one', dstFactor: 'zero', operation: 'add' }, t0.blend.color || {});
-            const a = Object.assign({ srcFactor: 'one', dstFactor: 'zero', operation: 'add' }, t0.blend.alpha || {});
+            // RN: blend states built once per pipeline (two objects per draw were garbage in Safari)
+            const c = this._blendC || (this._blendC = Object.assign({ srcFactor: 'one', dstFactor: 'zero', operation: 'add' }, t0.blend.color || {}));
+            const a = this._blendA || (this._blendA = Object.assign({ srcFactor: 'one', dstFactor: 'zero', operation: 'add' }, t0.blend.alpha || {}));
             gl.blendEquationSeparate(BLEND_EQUATION[c.operation], BLEND_EQUATION[a.operation]);
             gl.blendFuncSeparate(BLEND_FUNC[c.srcFactor], BLEND_FUNC[c.dstFactor], BLEND_FUNC[a.srcFactor], BLEND_FUNC[a.dstFactor]);
          } else {
@@ -2548,15 +2549,16 @@
          if (this.multisample.alphaToCoverageEnabled) gl.enable(GL.SAMPLE_ALPHA_TO_COVERAGE);
          else gl.disable(GL.SAMPLE_ALPHA_TO_COVERAGE);
 
-         if (!this.targets.length) {
-            gl.drawBuffers([GL.NONE]);
-         } else {
-            const drawBufs = [];
-            for (let i = 0; i < this.targets.length; i++) {
-               drawBufs.push(fb ? (GL.COLOR_ATTACHMENT0 + i) : GL.BACK);
-            }
-            gl.drawBuffers(drawBufs);
+         // RN: the draw-buffer list per pipeline and target kind, not a new array per draw
+         const dbk = fb ? '_dbFb' : '_dbBack';
+         let drawBufs = this[dbk];
+         if (!drawBufs) {
+            drawBufs = [];
+            if (!this.targets.length) drawBufs.push(GL.NONE);
+            for (let i = 0; i < this.targets.length; i++) drawBufs.push(fb ? (GL.COLOR_ATTACHMENT0 + i) : GL.BACK);
+            this[dbk] = drawBufs;
          }
+         gl.drawBuffers(drawBufs);
       }
    }
 
@@ -2745,16 +2747,13 @@ void main() {}`;
             for (let x = 0; x < nw; x++) {
                const x0 = Math.min(x * 2, w - 1), x1 = Math.min(x * 2 + 1, w - 1);
                const y0 = Math.min(y * 2, h - 1), y1 = Math.min(y * 2 + 1, h - 1);
-               let r = 0, g = 0, b = 0, a = 0, n = 0;
-               const coords = [[x0, y0], [x1, y0], [x0, y1], [x1, y1]];
-               for (let c = 0; c < 4; c++) {
-                  const i = (coords[c][1] * w + coords[c][0]) * 4;
-                  r += src[i]; g += src[i + 1]; b += src[i + 2];
-                  a += src[i + 3] || 255;
-                  n++;
-               }
+               // RN: same box filter without a coords array per texel (1.3 GB of garbage per load; Safari's GC fell behind)
+               const i0 = (y0 * w + x0) * 4, i1 = (y0 * w + x1) * 4, i2 = (y1 * w + x0) * 4, i3 = (y1 * w + x1) * 4;
                const o = (y * nw + x) * 4;
-               dst[o] = r / n; dst[o + 1] = g / n; dst[o + 2] = b / n; dst[o + 3] = a / n;
+               dst[o] = (src[i0] + src[i1] + src[i2] + src[i3]) / 4;
+               dst[o + 1] = (src[i0 + 1] + src[i1 + 1] + src[i2 + 1] + src[i3 + 1]) / 4;
+               dst[o + 2] = (src[i0 + 2] + src[i1 + 2] + src[i2 + 2] + src[i3 + 2]) / 4;
+               dst[o + 3] = ((src[i0 + 3] || 255) + (src[i1 + 3] || 255) + (src[i2 + 3] || 255) + (src[i3 + 3] || 255)) / 4;
             }
          }
          gl.texSubImage2D(tex._gl.target, lod, 0, 0, nw, nh, info.unpack, info.type, dst);
@@ -2852,12 +2851,13 @@ void main() {}`;
 
       function colorSamplerFor(device, samp, tex) {
       if (!samp) return null;
+      if (samp._rnColor) return samp._rnColor;   // RN: no key string per draw (garbage in Safari)
       // Same as v6: never use LINEAR_MIPMAP_*. App mip uploads leave
       // higher levels black, which desaturates anything not nearby.
       device._colorSamplers = device._colorSamplers || {};
       const key = (samp.desc.minFilter || 'nearest') + ':' + (samp.desc.magFilter || 'nearest') + ':' +
          (samp.desc.addressModeU || 'clamp-to-edge') + ':' + (samp.desc.addressModeV || 'clamp-to-edge');
-      if (device._colorSamplers[key]) return device._colorSamplers[key];
+      if (device._colorSamplers[key]) return samp._rnColor = device._colorSamplers[key];
       const gl = device.gl;
       const s = gl.createSampler();
       gl.samplerParameteri(s, GL.TEXTURE_MIN_FILTER, samp.desc.minFilter === 'linear' ? GL.LINEAR : GL.NEAREST);
@@ -2866,7 +2866,7 @@ void main() {}`;
       gl.samplerParameteri(s, GL.TEXTURE_WRAP_T, WRAP_MODE[samp.desc.addressModeV] || GL.CLAMP_TO_EDGE);
       applyAniso(gl, s, 16);
       device._colorSamplers[key] = s;
-      return s;
+      return samp._rnColor = s;
    }
 
       function depthNearestSampler(device) {
@@ -2904,7 +2904,51 @@ void main() {}`;
 
       // RN: the sampler each texture is read with in the WGSL (textureSample*(tex, smp, ...)), not the group's last sampler:
       // web/gpu.js groups give every D3D stage its own sampler (s0 with x0/y0, s1 with x1/y1, ...).
-      function pairedSampler(pipeline, index, bindGroup, texName) {
+      // RN: uniform locations cached per program. Asking each draw made ~150k WebGLUniformLocation objects a second; Safari keeps
+// them in native memory the GC does not see (8 GB in 30 s, then the tab is killed: iPhone XR froze in the menu).
+function uloc(gl, prog, name) {
+   const m = prog._ul || (prog._ul = new Map());
+   let l = m.get(name);
+   if (l === undefined) { l = gl.getUniformLocation(prog, name); m.set(name, l); }
+   return l;
+}
+// RN: what a texture binding needs at each draw (its uniform names, locations, depth compare), once per pipeline:
+// building names and regexes per draw was most of the WebGL path's garbage.
+// RN: state calls that would not change anything are skipped. The deferred encoder sets the whole pipeline state at each
+// draw (~650k GL calls a second in the menus); in Safari each call crosses to the GPU process. Every caller uses this one
+// context object, so the remembered values stay true; deleting a program or vertex array forgets its entry.
+function skipSameState(gl) {
+   const caps = new Map();
+   const en = gl.enable, dis = gl.disable;
+   gl.enable = c => { if (caps.get(c) !== true) { caps.set(c, true); en.call(gl, c); } };
+   gl.disable = c => { if (caps.get(c) !== false) { caps.set(c, false); dis.call(gl, c); } };
+   const one = (name, forget) => {
+      const f = gl[name]; let last;
+      gl[name] = v => { if (v !== last) { last = v; f.call(gl, v); } };
+      if (forget) { const d = gl[forget]; gl[forget] = o => { if (o === last) last = undefined; d.call(gl, o); }; }
+   };
+   one('useProgram', 'deleteProgram'); one('bindVertexArray', 'deleteVertexArray'); one('activeTexture'); one('frontFace');
+   one('cullFace'); one('depthMask'); one('depthFunc');
+   const four = name => {
+      const f = gl[name]; let a, b, c, d;
+      gl[name] = (w, x, y, z) => { if (w !== a || x !== b || y !== c || z !== d) { a = w; b = x; c = y; d = z; f.call(gl, w, x, y, z); } };
+   };
+   four('colorMask'); four('blendFuncSeparate');
+   const two = name => { const f = gl[name]; let a, b; gl[name] = (x, y) => { if (x !== a || y !== b) { a = x; b = y; f.call(gl, x, y); } }; };
+   two('blendEquationSeparate');
+}
+function texBinding(gl, pipeline, index, binding) {
+   const c = pipeline._texB || (pipeline._texB = new Map()), k = index * 4096 + binding;
+   let t = c.get(k);
+   if (!t) {
+      const texName = findTextureUniformName(pipeline, index, binding);
+      t = { texName, g: uloc(gl, pipeline.prog, 'webgpu_g' + index + '_b' + binding), t: texName ? uloc(gl, pipeline.prog, texName) : null,
+         compareUse: textureIsCompareUse(pipeline, texName) };
+      c.set(k, t);
+   }
+   return t;
+}
+function pairedSampler(pipeline, index, bindGroup, texName) {
       if (!texName) return null;
       if (!pipeline._smpPair) {
          const pair = {}, bind = {};
@@ -2919,13 +2963,13 @@ void main() {}`;
       }
       const gb = pipeline._smpPair[texName];
       if (!gb || gb[0] !== index) return null;
-      const e = bindGroup.desc.entries.find(x => x.binding === gb[1] && x.sampler);
-      return e && !(e.sampler.desc && e.sampler.desc.compare) ? e.sampler : null;
+      for (const e of bindGroup.desc.entries) if (e.binding === gb[1] && e.sampler) return e.sampler.desc && e.sampler.desc.compare ? null : e.sampler;
+      return null;
    }
 
       function applyBindGroup(gl, pipeline, index, bindGroup, dynamicOffsets) {
       if (!bindGroup) return;
-      const dyn = (dynamicOffsets || []).slice();
+      let di = 0;   // RN: next dynamic offset (was a copied array shifted per draw)
       let filterSampler = null;
       let compareSampler = null;
       for (const e of bindGroup.desc.entries) {
@@ -2941,17 +2985,16 @@ void main() {}`;
             gl.activeTexture(GL.TEXTURE0 + loc);
             e.textureView._bindTexture();
             const isDepth = !!(e.textureView._depth || (e._layout && e._layout.texture && e._layout.texture.sampleType === 'depth'));
-            const texName = findTextureUniformName(pipeline, index, e.binding);
+            const tb = texBinding(gl, pipeline, index, e.binding), texName = tb.texName;
             if (isDepth) {
-               const compareUse = textureIsCompareUse(pipeline, texName);
-               gl.bindSampler(loc, compareUse && compareSampler
+               gl.bindSampler(loc, tb.compareUse && compareSampler
                   ? compareSampler._gl
                   : depthNearestSampler(pipeline.device));
             } else {
                gl.bindSampler(loc, colorSamplerFor(pipeline.device, pairedSampler(pipeline, index, bindGroup, texName) || filterSampler, e.textureView.tex));
             }
-            gl.uniform1i(gl.getUniformLocation(pipeline.prog, 'webgpu_g' + index + '_b' + e.binding), loc);
-            if (texName) gl.uniform1i(gl.getUniformLocation(pipeline.prog, texName), loc);
+            if (tb.g) gl.uniform1i(tb.g, loc);
+            if (tb.t) gl.uniform1i(tb.t, loc);
          } else if (e.buffer) {
             const isStorage = e._layout && e._layout.kind === 'buffer' && e._layout.buffer.type !== 'uniform';
             if (isStorage) {
@@ -2972,17 +3015,17 @@ void main() {}`;
                      gl.bindTexture(GL.TEXTURE_2D, tex.id);
                      gl.bindSampler(loc, storageNearestSampler(pipeline.device));
                      const uname = meta.uname || ('webgpu_g' + index + '_b' + e.binding);
-                     const uloc = gl.getUniformLocation(pipeline.prog, uname + '_in');
-                     if (uloc) gl.uniform1i(uloc, loc);
-                     const sl = gl.getUniformLocation(pipeline.prog, uname + '_size');
+                     const il = uloc(gl, pipeline.prog, uname + '_in');
+                     if (il) gl.uniform1i(il, loc);
+                     const sl = uloc(gl, pipeline.prog, uname + '_size');
                      if (sl) gl.uniform2ui(sl, tex.w, tex.h);
                   }
                }
             } else {
                let offset = e.buffer.offset || 0;
                if (e._layout && e._layout.buffer && e._layout.buffer.hasDynamicOffset) {
-                  VALIDATE(dyn.length, 'Missing dynamic offset.');
-                  offset += dyn.shift();
+                  VALIDATE(dynamicOffsets && di < dynamicOffsets.length, 'Missing dynamic offset.');
+                  offset += dynamicOffsets[di++];
                }
                const size = e.buffer.size || (e.buffer.buffer.desc.size - offset);
                e.buffer.buffer._ensureGl();
@@ -3159,7 +3202,7 @@ void main() {}`;
          const ds = this._ds;
          const vbufs = this._vbufs.slice();
          const groups = this._bindGroups.slice();
-         const dyn = this._dyn.map(d => (d || []).slice());
+         const dyn = this._dyn.map(d => d && d.length ? d.slice() : null);   // RN: no copies of empty offset lists
          const stencilRef = this._stencilRef;
          firstInstance = firstInstance || 0;
          baseVertex = baseVertex || 0;
@@ -3168,9 +3211,9 @@ void main() {}`;
             gl.bindFramebuffer(GL.FRAMEBUFFER, fb);
             pipe._setup(gl, fb, colors, ds, this._flipY);
             pipe._setVertexBuffers(gl, vbufs, firstInstance, baseVertex);
-            const fi = gl.getUniformLocation(pipe.prog, 'webgpu_first_instance');
+            const fi = uloc(gl, pipe.prog, 'webgpu_first_instance');
             if (fi) gl.uniform1ui(fi, firstInstance);
-            const fy = gl.getUniformLocation(pipe.prog, 'webgpu_flip_y');
+            const fy = uloc(gl, pipe.prog, 'webgpu_flip_y');
             if (fy) gl.uniform1f(fy, this._flipY ? -1 : 1);
             groups.forEach((bg, i) => applyBindGroup(gl, pipe, i, bg, dyn[i]));
             if (pipe.depthStencil) {
@@ -3256,7 +3299,7 @@ void main() {}`;
          const pipe = this._pipeline;
          VALIDATE(pipe, 'setPipeline required before dispatch.');
          const groups = this._bindGroups.slice();
-         const dyn = this._dyn.map(d => (d || []).slice());
+         const dyn = this._dyn.map(d => d && d.length ? d.slice() : null);   // RN: no copies of empty offset lists
          this.encoder._add(() => dispatchComputeGL(this.device, pipe, groups, dyn, x, y, z));
       }
       dispatchWorkgroupsIndirect(buffer, offset) {
@@ -3342,11 +3385,11 @@ void main() {}`;
       gl.disable(GL.CULL_FACE);
       gl.colorMask(true, true, true, true);
 
-      const locSize = gl.getUniformLocation(pipe.prog, 'webgpu_storage_size');
+      const locSize = uloc(gl, pipe.prog, 'webgpu_storage_size');
       if (locSize) gl.uniform2ui(locSize, texW, texH);
-      const locBase = gl.getUniformLocation(pipe.prog, 'webgpu_global_invocation_base');
-      const locWG = gl.getUniformLocation(pipe.prog, 'webgpu_workgroup_size');
-      const locNW = gl.getUniformLocation(pipe.prog, 'webgpu_num_workgroups');
+      const locBase = uloc(gl, pipe.prog, 'webgpu_global_invocation_base');
+      const locWG = uloc(gl, pipe.prog, 'webgpu_workgroup_size');
+      const locNW = uloc(gl, pipe.prog, 'webgpu_num_workgroups');
       if (locWG) gl.uniform3ui(locWG, sx, sy, sz);
       if (locNW) gl.uniform3ui(locNW, gx, gy, gz);
 
@@ -3357,9 +3400,9 @@ void main() {}`;
          const unit = 8 + si;
          gl.activeTexture(GL.TEXTURE0 + unit);
          gl.bindTexture(GL.TEXTURE_2D, inTex);
-         const loc = gl.getUniformLocation(pipe.prog, sm.uname + '_in');
+         const loc = uloc(gl, pipe.prog, sm.uname + '_in');
          if (loc) gl.uniform1i(loc, unit);
-         const sl = gl.getUniformLocation(pipe.prog, sm.uname + '_size');
+         const sl = uloc(gl, pipe.prog, sm.uname + '_size');
          if (sl) gl.uniform2ui(sl, texW, texH);
       });
 
@@ -3632,6 +3675,7 @@ void main() {}`;
          gl.getExtension('EXT_color_buffer_half_float');
          gl.getExtension('EXT_texture_filter_anisotropic');
          this._gl = gl;
+         skipSameState(gl);
          gl.canvas.addEventListener('webglcontextlost', (e) => {
             e.preventDefault();
             this._lose('unknown', 'WebGL context lost.');
