@@ -159,14 +159,6 @@ PATCHES.append(dict(addr=0x5567e3, old="cc" * 6, new="ff2594300100", entry=True,
 # It was ungated (the Remaster reaction leaked into Original); ecx, edx are dead after the block (docs/re/ai_review2.md (b)).
 PATCHES.append(dict(addr=0x797500, old="00" * 29, new="833d1c30010000740b8b4914837904020f94c0c38b511c85d20f95c0c3", entry=True, when=lambda: True))
 PATCHES.append(dict(addr=0x4539db, old="8b511c85d20f95c0", new="e8" + _rel(0x4539db, 0x797500) + "909090", when=lambda: True))
-# Route speed limit of traffic 0x582f70 = min([ai+0x4dc], 24.58 at 0x6cc988); 0x6cc988 has 4 other readers, so this one reads its own copy at 0x696ea8 (zero padding after .text code): 24.58 as shipped, host/free.c raises it in WORLD for the driver profiles.
-PATCHES.append(dict(addr=0x582f76, old="d81588c96c00", new="d815a86e6900", when=lambda: True))
-PATCHES.append(dict(addr=0x582f85, old="d90588c96c00", new="d905a86e6900", when=lambda: True))
-PATCHES.append(dict(addr=0x696ea8, old="00000000", new="27b1c441", when=lambda: True))
-# Avoid 0x453c60 with a car ahead at 15..30 m and no free lane: target 6 m/s whatever that car does, so queues crawl (ghost f40: traffic mean 4 m/s). call [SCREEN_ADDR+0xbc] = host/free.c avoid_follow: WORLD follows that car's speed, at least 6; elsewhere 6 as shipped.
-PATCHES.append(dict(addr=0x45406c, old="c783e40100000000c040", new="ff15bc30010090909090", when=lambda: True))
-# Same, car ahead within 15 m: target 0, gain 0, a dead stop even if that car is pulling away. call [SCREEN_ADDR+0xc0] = host/free.c avoid_close: WORLD keeps 0.8 x its speed while it moves.
-PATCHES.append(dict(addr=0x4540e9, old="8993e40100008993ec010000", new="ff15c0300100909090909090", when=lambda: True))
 # PATCH: 0x45399f (+ cave 0x44dd21, NOP padding after a ret, no reference: asm.py free), a traffic car sees the player closing from behind. The
 # finder 0x453920 asks 0x44f470 for the nearest car AHEAD in its lane (slots own-1 down to 0 of the neighbour list); nothing reads the slots
 # own+1.. behind it, and the Avoid action cannot take a car behind (its vt[7] 0x453a60 ends it at once, its brake branch 0x45406c would stop the car).
@@ -200,8 +192,4 @@ PATCHES.append(dict(addr=0x43b556, old="cc" * 6, new="ff25b0300100", entry=True,
 # jmp [SCREEN_ADDR+0xb4] = host/rivals.c persona_clear: the original call, then + 1.5 m for a clean rival (WORLD only, ?ai=0 off).
 PATCHES.append(dict(addr=0x45c8c2, old="e8d9050000", new="e8" + _rel(0x45c8c2, 0x43db2a), when=lambda: True))
 PATCHES.append(dict(addr=0x43db2a, old="cc" * 6, new="ff25b4300100", entry=True, when=lambda: True))
-# PATCH: 0x583a37, 0x583a5b (on top of the traffic speed patches above) + cave 0x63b366 (10 free bytes of the dead CRT routine between the traffic caves and 0x63b370): the traffic driver's two lane-speed calls go to jmp [SCREEN_ADDR+0xa0] = host/free.c traffic_speed, which calls the same speed cave 0x63b331 first, then in the WORLD scales by car type (bus/vans slow, taxis fast; elsewhere and with ?ai=0 the result is unchanged).
-PATCHES.append(dict(addr=0x63b366, old="6a00ff15ec75", new="ff25a0300100", entry=True, when=lambda: True))
-PATCHES.append(dict(addr=0x583a37, old="e8f5780b00", new="e8" + _rel(0x583a37, 0x63b366), when=lambda: True))
-PATCHES.append(dict(addr=0x583a5b, old="e8d1780b00", new="e8" + _rel(0x583a5b, 0x63b366), when=lambda: True))
 

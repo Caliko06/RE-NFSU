@@ -40,7 +40,7 @@ ROAD_ADDR, EBASE_ADDR = 0x796000, 0x796410
 ROAD_RB, CODE_AREA = 0x796810, (0x797000, 0x797800)
 
 # The topic files append to PATCHES in this order (an entry that patches on top of another stays after it).
-import patches_render, patches_unlock, patches_test, patches_input, patches_boot, patches_race, patches_road, patches_collision, patches_lights, patches_audio, patches_feel, patches_reset, patches_perf, patches_launcher, patches_mc, patches_mode_menu   # noqa: E402,F401
+import patches_render, patches_unlock, patches_test, patches_input, patches_boot, patches_race, patches_road, patches_collision, patches_lights, patches_audio, patches_feel, patches_reset, patches_launcher, patches_mc, patches_mode_menu   # noqa: E402,F401
 
 def active():
     return [p for p in PATCHES if p["when"]()]

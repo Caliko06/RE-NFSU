@@ -883,7 +883,6 @@ static void ai_tune(Ctx *c) {
 
 // RN_AILOG: per driver profile, cars and mean speed of those moving; lane changes per 600 presents, all and in front of the player within 40 m.
 int traffic_profile(uint32_t ai);   // host/free.c
-extern double rn_lane_sum; extern int rn_lane_n;
 // RN_AILOG probe: every 600 presents, the cars that moved under 3 m since the last one: what holds each (nearest car in a 3 m wide corridor 20 m ahead of its nose), how far it sits from its road's line.
 static void traffic_jam_log(Ctx *c, uint32_t h, uint32_t me) {
     static struct { uint32_t r; float x, y; } was[64];
@@ -962,8 +961,8 @@ static void traffic_prof_log(Ctx *c, uint32_t h, uint32_t me) {
     }
     if ((t += 6) < 600) return;
     t = 0;
-    rn_log("TRAFSPEED <2 %d <6.5 %d <12 %d <20 %d <27 %d more %d avoid %d of %d lane mean %.1f", hist[0], hist[1], hist[2], hist[3], hist[4], hist[5], act3, seen_cars, rn_lane_n ? rn_lane_sum / rn_lane_n : 0.0);
-    memset(hist, 0, sizeof hist), act3 = seen_cars = 0, rn_lane_sum = 0, rn_lane_n = 0;
+    rn_log("TRAFSPEED <2 %d <6.5 %d <12 %d <20 %d <27 %d more %d avoid %d of %d", hist[0], hist[1], hist[2], hist[3], hist[4], hist[5], act3, seen_cars);
+    memset(hist, 0, sizeof hist), act3 = seen_cars = 0;
     traffic_jam_log(c, h, me);
     rn_log("TRAFPROF lc %d cuts %d n %d %d %d %d %d sp %.1f %.1f %.1f %.1f %.1f", lc, cuts, n[0], n[1], n[2], n[3], n[4], n[0] ? sum[0] / n[0] : 0, n[1] ? sum[1] / n[1] : 0, n[2] ? sum[2] / n[2] : 0, n[3] ? sum[3] / n[3] : 0, n[4] ? sum[4] / n[4] : 0);
     lc = cuts = 0;
