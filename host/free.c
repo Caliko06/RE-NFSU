@@ -39,12 +39,12 @@ static const struct { const char *name; uint32_t preset; } CANON[] = {
 
 int rn_free_now;                 // 1 while 0x4b4040 builds free mode's rivals (host/rivals.c rival_ride asks free_rival), 2 in its traffic
 static int on, live, picked[NRIV_MAX], npicked;
-// AI in WORLD (judge order 2026-11-01): the WORLD (track id [0x78a2f0] == 1010, 0x441fe0's key) gets 8 rivals, 21 traffic cars (1 + 8 + 21 = the
-// entrant table's 30, 0x4322a0) and free_tmove keeps 16 of them within 250 m, checked every 15 frames. Other tracks: as before.
-// ?ai=0 (RN_AI=0): off. RN_AI=2 (as host/rivals.c rivalai) or RN_AIFORCE=1, test only: the same on any Free Run track (the WORLD is not reachable headless).
-static int world_ai(Ctx *c) {
+// Extra traffic and rival AI, test only (built for WORLD, judge order 2026-11-01; WORLD retired 2026-11-17, attic/world/README.md):
+// RN_AI=2 (as host/rivals.c rivalai) or RN_AIFORCE=1 on any Free Run track. free_tmove keeps 16 cars within 250 m, checked every 15 frames.
+static int ai_plus(Ctx *c) {
+    (void)c;
     int ai = rn_env("RN_AI", 1);
-    return ai && (ai == 2 || ld(c, 0x78a2f0, 4) == 1010 || getenv("RN_AIFORCE") != NULL);
+    return ai && (ai == 2 || getenv("RN_AIFORCE") != NULL);
 }
 static uint32_t zone_at, zone_was;     // the clear zone free_place changed (free mode, the whole race) and its value
 // The rubber band 0x44bd10 needs a gap from 0x44c010, which is 0 while [0x78a400] (the race options' Catch Up byte +0x1f, set by
@@ -208,11 +208,11 @@ static uint32_t free_traffic(Ctx *c) {
             int k = cand[rnd(&s) % n];
             c->r[EAX] = CANON[k].preset;
             call_guest_cdecl(c, 0x4b26f0, 1, &one);
-            // WORLD (world_ai, judge order 2): a racer that gets an overlay skin below keeps the preset's vinyls, decals and rim paint; they bake into
+            // ai_plus (judge order 2): a racer that gets an overlay skin below keeps the preset's vinyls, decals and rim paint; they bake into
             // its own DUMMY_SKIN13..28 like a rival's. Body kit (slots < 0x13), paint 0x1e, part paint 0x23..0x28, tint 0x73 and neon 0x74 are kept everywhere.
             static int slot;
             if (a[0] == 0x32) slot = 0;
-            int keep_vinyl = rn_tex_overlay && slot < 16 && world_ai(c);
+            int keep_vinyl = rn_tex_overlay && slot < 16 && ai_plus(c);
             for (int sl = 0x13; sl <= 0x72 && !keep_vinyl; sl++)
                 if (sl <= 0x1d || (sl >= 0x1f && sl <= 0x22) || sl == 0x29 || sl >= 0x2a) {
                     st(c, ride + 0x44c + 4 * sl, 0, 4);
@@ -443,10 +443,10 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
     if (rn_new_race(&race)) memset(bh, 0, sizeof bh);   // 64 slots per race (they filled up over races)
     if (off < 0) off = getenv("RN_FREETMOVE") && !atoi(getenv("RN_FREETMOVE"));
     uint32_t tele = ld(c, h + 0x2f0, 4);              // the TrafficTeleporter of this race's car list (ecx at 0x420c77), read live
-    if (off || !tele || !pc || world_ai(c)) return;   // WORLD: traffic_refill (host/rivals.c)
+    if (off || !tele || !pc || ai_plus(c)) return;   // ai_plus: traffic_refill (host/rivals.c)
     double px = ldf(c, pc + 0x50), py = ldf(c, pc + 0x54), sp = hypot(vx, vy);
     uint32_t pick = 0; int prio = 0, near = 0;
-    double far = world_ai(c) ? 300 : 400;   // WORLD: a car past 300 m is free to move (placements land 150..300 m out)
+    double far = ai_plus(c) ? 300 : 400;   // ai_plus: a car past 300 m is free to move (placements land 150..300 m out)
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
         if (!e || ld(c, e + 4, 4) != 3 || !v) continue;
@@ -461,7 +461,7 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
         int p = c->mem[v + 0x4d1] ? 3 : d > far ? 2 : behind && rn_telem.presents >= bh[b].since + 240 ? 1 : 0;
         if (p > prio) prio = p, pick = r;
     }
-    if (near >= (world_ai(c) ? 16 : TMOVE_NEAR) || !pick) return;
+    if (near >= (ai_plus(c) ? 16 : TMOVE_NEAR) || !pick) return;
     if (!respawn_pair) respawn_pair = guest_alloc(8);
     uint32_t zero = 0, ft = c->ftop;
     c->r[EAX] = pc; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
@@ -472,9 +472,9 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
     int along = ldf(c, node + 0xc) * vx + ldf(c, node + 0x10) * vy >= 0, lane = -1;
     uint32_t n2 = 0;
     float m = 0;
-    // WORLD: up to 3 spots per check, each a new random distance (the run with RN_AIFORCE on 1001 failed 6 checks of 7 with one try);
+    // ai_plus: up to 3 spots per check, each a new random distance (the run with RN_AIFORCE on 1001 failed 6 checks of 7 with one try);
     // n_twhy counts the refusals: [3] no player node, walk stalled / within 150 m of the player or 20 m of a car / no free lane.
-    for (int t = 0, tries = world_ai(c) ? 3 : 1; t < tries && lane == -1; t++) {
+    for (int t = 0, tries = ai_plus(c) ? 3 : 1; t < tries && lane == -1; t++) {
         m = TMOVE_AHEAD - 50.0f + (float)(rnd(&seed) % 101) + (float)sp;
         st(c, respawn_pair, sec, 4), st(c, respawn_pair + 4, node, 4);
         uint32_t a[5] = {respawn_pair, 1, 0, (uint32_t)along, 0};
@@ -515,7 +515,7 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
                hypot(ldf(c, pick + 0x50) - px, ldf(c, pick + 0x54) - py), m, lane, v, near, rn_telem.presents);
 }
 
-// Traffic types (judge order 2, WORLD only, ?ai=0 off). PATCH 0x583a37, 0x583a5b (cave 0x63b366: jmp [SCREEN_ADDR+0xa0]) send the traffic driver
+// Traffic types (judge order 2, ai_plus only). PATCH 0x583a37, 0x583a5b (cave 0x63b366: jmp [SCREEN_ADDR+0xa0]) send the traffic driver
 // 0x583910's two lane-speed asks here: first the speed cave 0x63b331 they called before (0x5a6b00, eax/ebx as the caller set them, 1 stack arg,
 // stdcall, the speed on the FPU, x0.85..1.15 per car), then x the factor of the car's type. esi = the traffic AI, [esi+4] = its car (0x58393a reads
 // its speed +0x3d4), car+0x14 = entrant, entrant+0x10 = the ride (0x5809c0 -> 0x4323f0), ride+0 = the CarTypeInfo row (tools/re/carinfo.py cars).
@@ -523,8 +523,8 @@ static void free_tmove(Ctx *c, uint32_t h, uint32_t pc, double vx, double vy) {
 // Avoid lane change (0x453c60). Fast: TAXI 20 / TAXI02 23 x1.2, AMBULANCE 22 x1.25: they close on the car ahead and change lanes to pass it (the
 // same Avoid action), and honk when the player blocks them (0x44c2e0). Other types and other tracks: the cave's speed unchanged.
 double rn_lane_sum; int rn_lane_n;   // RN_AILOG: the lane speed asks of traffic, before the factors
-static int tspeed_on;   // free_tick: free mode live in the WORLD
-#define TRAFFIC_TOP 0x696ea8   // PATCH 0x696ea8: the route speed limit of 0x582f70, 24.58 unless WORLD runs
+static int tspeed_on;   // free_tick: free mode live with ai_plus
+#define TRAFFIC_TOP 0x696ea8   // PATCH 0x696ea8: the route speed limit of 0x582f70, 24.58 unless ai_plus runs
 // 0 slow 20%, 1 normal 45%, 2 fast 25%, 3 very fast 10%; RN_TRAFPROF=0: -1, none.
 int traffic_profile(uint32_t ai) {
     static int off = -1;
@@ -627,7 +627,7 @@ void free_tick(Ctx *c) {
         memset(tw, 0, sizeof tw), memset(was, 0, sizeof was), memset(rp, 0, sizeof rp), memset(tpos, 0, sizeof tpos), memset(ppos, 0, sizeof ppos), memset(last, 0, sizeof last);
     }
     if (!live || !rn_racing()) return;
-    tspeed_on = world_ai(c);
+    tspeed_on = ai_plus(c);
     // The RaceManager's frame 0x435570 calls the record update 0x4338c0 (edi = record: route progress +0x14/+0x1c/+0x20, checkpoint
     // +4/+6/+8) for each record of its own, so the extra records get the same call (RN_FREEXREC=0: not).
     static int xr = -1;
@@ -663,7 +663,7 @@ void free_tick(Ctx *c) {
                                                ldf(c, r + 0x50), ldf(c, r + 0x54), ldf(c, r + 0x58), ld(c, r + 0x1c, 4));
         }
     }
-    int per = world_ai(c) ? 15 : 30;                                       // WORLD: the traffic check twice as often
+    int per = ai_plus(c) ? 15 : 30;                                       // ai_plus: the traffic check twice as often
     if (rn_telem.presents % per == 0 && rn_telem.presents > start + 300) {  // traffic, after the grid
         uint32_t rh = ld(c, 0x7361f8, 4), me = 0;
         for (uint32_t r = rh ? ld(c, rh, 4) : 0, k = 0; r && r != rh && k < 200 && !me; r = ld(c, r, 4), k++) {
@@ -1067,7 +1067,7 @@ static uint32_t grid_fix(Ctx *c) {
 static uint32_t free_recycle(Ctx *c) {
     uint32_t car = ARG(0), r = call_guest(c, 0x5988c0, 1, &car) & 0xff, h = ld(c, 0x7361f8, 4);
     // WORLD: a failed move parks the car (0x598837: not drawn, no collision), even a car driving in sight of the player. Only parked cars go through the teleporter; traffic_refill (host/rivals.c) moves the driving ones, out of sight and never parking them.
-    if (live && world_ai(c)) { uint32_t v = ld(c, car + 0x2c, 4); return v && c->mem[v + 0x4d1] ? r : 0; }
+    if (live && ai_plus(c)) { uint32_t v = ld(c, car + 0x2c, 4); return v && c->mem[v + 0x4d1] ? r : 0; }
     if (!live || r || !h) return r;
     for (uint32_t p = ld(c, h, 4), k = 0; p && p != h && k < 200; p = ld(c, p, 4), k++) {
         uint32_t e = ld(c, p + 0x14, 4);

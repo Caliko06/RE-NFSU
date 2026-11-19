@@ -32,7 +32,7 @@ async function startGpu(M, canvas, report, onFrame) {
   report(`gpu.js: adapter ${adapter.info?.vendor || '?'} ${adapter.info?.architecture || ''} ${adapter.info?.description || ''}`);
   // timestamp-query (when the adapter has it): GPU time of each frame's passes, reported with the frame log (gpu.js ts).
   const TS = adapter.features.has('timestamp-query');
-  // texture-compression-bc (Apple and desktop GPUs have it): the world pack in BC7 (loadDds).
+  // texture-compression-bc (Apple and desktop GPUs have it): the remaster pack in BC7 (loadDds).
   const BC = adapter.features.has('texture-compression-bc');
   const device = await adapter.requestDevice({ requiredFeatures: [...(TS ? ['timestamp-query'] : []), ...(BC ? ['texture-compression-bc'] : [])] });
   device.addEventListener('uncapturederror', e => report('webgpu: ' + e.error.message));
@@ -147,24 +147,15 @@ async function startGpu(M, canvas, report, onFrame) {
   // ?hdlog=1: each pack hit once (texture id, size, key, png), to find a texture the pack should not take.
   const hdLog = RN_Q.get('hdlog') === '1' ? new Set() : null;
   if (RN_Q.get('remaster') === '1') {
-    // The world textures (STREAML1R*.BUN, tools/remaster/world_pod.sh) are off (OWNER 2026-10-31, below); ?worldhd=1 turns them on, in BC7.
-    // As rgba8 (webp: ?worldhd=1&worldbc=0) gate60 passed 1 run in 4 (scenes > 3300 draws dropped 18-53 frames over 20 ms; base 0-2,
-    // build/bench/e_default*); as BC7 4 in 4, max 24-25 ms, 0 > 33 ms like the base (build/bench/f_bc7_q*, 2026-10-26).
-    // Without the BC feature (or with ?pack=1) the webp world pack stays opt-in with ?worldhd=1.
+    // No world textures (STREAML1R*.BUN): OWNER 2026-10-31, the upscaled world pack reads too smooth and badly made; its ?worldhd=1 switch removed 2026-11-19.
     // Pack v2 (tools/remaster/pack_v2.sh: deblock + 4x-UltraSharpV2) overrides the v1 entries it has; ?pack=1 = v1 only.
     // index_fe_v2.tsv (SETS=fe): the front end, HUD and global textures, only in v2.
-    // index_world_bc.tsv (tools/remaster/world_bc7.sh): the same world pack (v2 over v1) in BC7; ?worldbc=0 = the webp.
-    const q = RN_Q, v2 = q.get('pack') !== '1', wq = q.get('worldhd');
-    // OWNER 2026-10-31: the upscaled world pack (deblock + 4x) reads too smooth and badly made: 1:1 with the shipped world textures
-    // by default; ?worldhd=1 brings the pack back.
-    const world = wq === '1';
-    const worldBc = world && v2 && BC && q.get('worldbc') !== '0';
+    const q = RN_Q, v2 = q.get('pack') !== '1';
     // index_bc.tsv (tools/remaster/pack_bc7.py): the same three lists as BC7 .dds, a quarter of the GPU memory of rgba8
     // (title screen: 528 MB -> ~132 MB for its 539 textures); it overrides the keys it has. ?packbc=0 = the webp/png as before.
     const packBc = v2 && BC && q.get('packbc') !== '0';
     const lists = ['remaster/index.tsv', ...(v2 ? ['remaster/index_v2.tsv', 'remaster/index_fe_v2.tsv'] : []),
       ...(packBc ? ['remaster/index_bc.tsv'] : []),
-      ...(worldBc ? ['remaster/index_world_bc.tsv'] : world ? ['remaster/index_world.tsv', ...(v2 ? ['remaster/index_world_v2.tsv'] : [])] : []),
       'remaster/index_glow.tsv'];   // last: tools/remaster/flare_glow.py, the clean round lamp glow wins over any upscale of the flares
     for (const u of lists) try {
       const r = await fetch(u);
@@ -191,7 +182,7 @@ async function startGpu(M, canvas, report, onFrame) {
   }
   async function loadHd(name) {
     if (name.endsWith('.dds')) return loadDds(`remaster/${name}`);
-    // A name with a path is a file under remaster/ (world pack: world/<hash>.webp); a bare key is png/<key>.png.
+    // A name with a path is a file under remaster/ (e.g. cars2/<hash>.webp); a bare key is png/<key>.png.
     const blob = await hdBlob(name.includes('/') ? `remaster/${name}` : `remaster/png/${name}.png`);
     const opt = { premultiplyAlpha: 'none', colorSpaceConversion: 'none' };
     // Level 0 is at most HD_MAX on a side (?hdmax=, default 1024): the 2048 car PNGs cost 22 MB each and, with ~80 in a
@@ -221,7 +212,7 @@ async function startGpu(M, canvas, report, onFrame) {
     hdMs += performance.now() - t;
     return { view: tex.createView() };
   }
-  // A BC7 .dds with its mip chain (tools/remaster/world_bc7.sh, MW's bcdds.cpp), gzipped on disk next to it (<name>.gz):
+  // A BC7 .dds with its mip chain (tools/remaster/pack_bc7.py), gzipped on disk next to it (<name>.gz):
   // no decode on the page thread, a quarter of the VRAM of rgba8.
   async function loadDds(url) {
     if (netN < HD_NET) netN++; else await new Promise(r => netQ.push(r));
@@ -1056,7 +1047,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       uBindBuf = ubuf;
     }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0, ug2Done = false;
+    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
     // What the current draw pass already holds (WebGPU keeps state for the whole pass): a draw sets only what changes,
     // and payload draws keep one binding of the frame's vertex/index buffers, addressed by first vertex/index.
     let stPass = null, stPipe, stBg1, stVp = '', stSc = '', stBf = -1, stVb, stVo = -1, stIb, stIf = '';
@@ -1074,7 +1065,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const a = cl[k] + 1, op = w[a - 1] & 0xff;
         if (op === GPU_TARGET) { if (w[a] === id) return false; }
         else if (op === GPU_DRAW) { if (w[a + (asp ? D_DS : D_RT)] === id) return true; }
-        else if (op === GPU_FXAA) { if (window.MaxChar?.enabled || window.Ug2?.on || (asp && RN_PS.on && res.get(id)?.w >= 1000)) return true; }   // psblur reads the scene depth
+        else if (op === GPU_FXAA) { if (window.MaxChar?.enabled || (asp && RN_PS.on && res.get(id)?.w >= 1000)) return true; }   // psblur reads the scene depth
         else if (op === GPU_CLEAR && w[a + (asp ? 1 : 0)] === id) return !(fullClear(a) & (1 << asp));
       }
       return true;     // the next frame may read it
@@ -1206,10 +1197,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
         const key = `${g(D_RT)}/${g(D_DS)}`;
         if (ds && g(D_ZEN) && (ds.w >= 1000 || window.MaxChar?.enabled) && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
-        // NFSU2 city at the end of the 3D scene: the first draw that leaves the scene target. GPU_FXAA comes at the first HUD quad, which
-        // with the bumper camera (POV 2) is after the game has already copied the scene to the back buffer (636 -> 3), so a pass there
-        // was never shown (the sky-only frames, ?gpuprof=1 pass list 2026-11-10).
-        else if (sceneRt && !ug2Done && g(D_RT) !== sceneRt) { ug2Done = true; endPass(); window.Ug2?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs), tsw); }
         if (key !== passKey) {
           const fold = pend && (!(pend.mask & 1) || pend.rt === g(D_RT)) && (!(pend.mask & 6) || pend.ds === g(D_DS));
           endPass(fold);
@@ -1306,7 +1293,6 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         const rt = res.get(w[a]);
         // F-Max
         window.MaxChar?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs));
-        if (!ug2Done) { ug2Done = true; window.Ug2?.scene(device, M, enc, res.get(sceneRt), res.get(sceneDs), tsw); }   // NFSU2 city (web/ug2/ug2world.js), if the scene was last
         // The scene colour (the target the depth-tested screen-size draws went to), not the FXAA target: that one holds the light trails
         // and the HUD, which the game adds onto the scene afterwards (draws 118 -> 636 with ONE / ONE).
         if (RN_PS.on) { const st = res.get(sceneRt); if (st && !st.depth && !st.msView) psblur(enc, st, res.get(sceneDs), f32.subarray(a + 1, a + 8), w[a + 5]); }

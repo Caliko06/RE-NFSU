@@ -9,7 +9,6 @@
 #include "sm1.h"
 #include "carsmooth.h"
 #include "mc.h"
-#include <pthread.h>
 
 #define D3D_OK 0u
 #define D3DERR_NOTFOUND 0x88760866u
@@ -2429,7 +2428,7 @@ static void mc_hook(Ctx *c) {
     if (blk && blk < GUEST_MEM - 0x80) {
         for (int k = 0; k < 16; k++) { rn_mc.view[k] = ldf(c, blk + 4 * k); rn_mc.proj[k] = ldf(c, blk + 64 + 4 * k); }
     }
-    rn_mc.track = (int32_t)ld(c, 0x78a2f0, 4);   // RaceStatus track id (names_world.tsv): 1010 = WORLD, read by web/ug2/ug2world.js
+    rn_mc.track = (int32_t)ld(c, 0x78a2f0, 4);   // RaceStatus track id (names_world.tsv)
     if (mc_enabled() && rn_mc.on_foot) mc_draw_actor(c, &rn_mc);
 }
 static uint32_t stream0(Ctx *c) {
@@ -2519,64 +2518,6 @@ static void skin_blend(uint8_t *d, const uint8_t *const cv[3], const float *b, c
     if (n) { memcpy(d + sk[1], w3, 12); memcpy(d + sk[2], i3, 12); }
     for (int k = 0; k < 4; k++) d[sk[0] + k] = (uint8_t)lrintf(col[k] < 0 ? 0 : col[k] > 255 ? 255 : col[k]);
 }
-// WORLD: a car part seen for the first time cost the main thread up to 10+ ms (weld sort, patches) in the frame it appeared, so the cars
-// coming into view made the long frames (CPU profile 2026-11-03: 72 frames over 16.6 ms in 50 s, nearly all while new parts appeared). Here
-// cs_smooth runs on its own thread and the part is drawn as authored until it is done, a few frames later. cs_smooth reads only its copies.
-#define SMOOTH_JOBS 64
-typedef struct { uint64_t key; float *v5; uint16_t *ix; CsIn in; CsOut out; int lv, ok; volatile int state; } SmoothJob;   // state: 0 free, 1 queued, 2 done
-static SmoothJob smooth_jobs[SMOOTH_JOBS];
-static pthread_mutex_t smooth_mx = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t smooth_cv = PTHREAD_COND_INITIALIZER;
-static int n_smooth_jobs; static uint64_t us_smooth_jobs;
-static void *smooth_worker(void *arg) {
-    (void)arg;
-    for (;;) {
-        pthread_mutex_lock(&smooth_mx);
-        SmoothJob *j = NULL;
-        while (!j) {
-            for (int k = 0; k < SMOOTH_JOBS && !j; k++) if (smooth_jobs[k].state == 1) j = &smooth_jobs[k];
-            if (!j) pthread_cond_wait(&smooth_cv, &smooth_mx);
-        }
-        pthread_mutex_unlock(&smooth_mx);
-        uint64_t t = now_us();
-        j->ok = cs_smooth(&j->in, &j->out, j->lv);
-        us_smooth_jobs += now_us() - t;
-        __sync_synchronize();
-        j->state = 2;
-    }
-    return NULL;
-}
-// Returns the finished job for this key, or NULL after queueing it (or when the queue is full): the caller draws the part as authored.
-static SmoothJob *smooth_async(uint64_t key, const uint8_t *vsrc, const uint8_t *isrc, uint32_t stride, uint32_t vmin, uint32_t nvert, uint32_t count, int po, int to, int lv) {
-    static int started;
-    SmoothJob *fr = NULL;
-    for (int k = 0; k < SMOOTH_JOBS; k++) {
-        SmoothJob *j = &smooth_jobs[k];
-        if (j->state && j->key == key) { __sync_synchronize(); return j->state == 2 ? j : NULL; }
-        if (!j->state && !fr) fr = j;
-    }
-    if (!fr) return NULL;
-    if (!started) { pthread_t t; started = 1; pthread_create(&t, NULL, smooth_worker, NULL); pthread_detach(t); }
-    fr->v5 = malloc((size_t)nvert * 5 * sizeof *fr->v5);
-    fr->ix = malloc((size_t)count * 6);
-    for (uint32_t k = 0; k < nvert; k++) {
-        const uint8_t *s = vsrc + (size_t)k * stride;
-        memcpy(&fr->v5[5 * k], s + po, 12); memcpy(&fr->v5[5 * k + 3], s + to, 8);
-    }
-    int bad = 0;
-    for (uint32_t k = 0; k < count * 3; k++) {
-        uint32_t v = (uint32_t)(isrc[2 * k] | isrc[2 * k + 1] << 8);
-        if (v < vmin || v - vmin >= nvert) { bad = 1; break; }
-        fr->ix[k] = (uint16_t)(v - vmin);
-    }
-    fr->key = key; fr->lv = lv; fr->in = (CsIn){fr->v5, (int)nvert, fr->ix, bad ? 0 : (int)count * 3, 0, NULL};   // nidx 0: cs_smooth says no
-    pthread_mutex_lock(&smooth_mx);
-    fr->state = 1;
-    pthread_cond_signal(&smooth_cv);
-    pthread_mutex_unlock(&smooth_mx);
-    n_smooth_jobs++;
-    return NULL;
-}
 // Tries to draw the indexed triangle list smoothed; 1 = drawn.
 static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, uint32_t nvert, uint32_t ibp, uint32_t count) {
     static int level = -1;
@@ -2616,17 +2557,14 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
     for (int k = 0; k < SMOOTH_PROBE; k++) { SmoothEnt *e = &smooth_cache[(key + (uint64_t)k) % SMOOTH_N]; if (e->key == key && (e->vb || e->fail)) { ent = e; break; } }
     if (ent && ent->fail) return 0;
     if (!ent) {
-        uint32_t track; memcpy(&track, G(0x78a2f0), 4);
-        SmoothJob *job = NULL;
-        if (!skin && track == 1010 && !(job = smooth_async(key, vsrc, isrc, stride, vmin, nvert, count, po, to, lv))) return 0;
-        float *v5 = job ? job->v5 : malloc((size_t)nvert * 5 * sizeof *v5);
-        uint16_t *ix = job ? job->ix : malloc((size_t)count * 6);
-        for (uint32_t k = 0; !job && k < nvert; k++) {
+        float *v5 = malloc((size_t)nvert * 5 * sizeof *v5);
+        uint16_t *ix = malloc((size_t)count * 6);
+        for (uint32_t k = 0; k < nvert; k++) {
             const uint8_t *s = vsrc + (size_t)k * stride;
             memcpy(&v5[5 * k], s + po, 12); memcpy(&v5[5 * k + 3], s + to, 8);
         }
         int bad = 0;
-        for (uint32_t k = 0; !job && k < count * 3; k++) {
+        for (uint32_t k = 0; k < count * 3; k++) {
             uint32_t v = (uint32_t)(isrc[2 * k] | isrc[2 * k + 1] << 8);
             if (v < vmin || v - vmin >= nvert) { bad = 1; break; }
             ix[k] = (uint16_t)(v - vmin);
@@ -2641,11 +2579,7 @@ static int smooth_draw(Ctx *c, uint32_t base, uint32_t stride, uint32_t vmin, ui
         uint64_t t_us = now_us();
         CsIn in = {v5, (int)nvert, ix, (int)count * 3, skin, nr};
         CsOut out;
-        int ok = job ? job->ok : !bad && cs_smooth(&in, &out, lv);
-        if (job) {
-            out = job->out, job->state = 0;
-            if (getenv("RN_FREELOG")) rn_log("SMOOTHJOB %d tris %u, %.1f ms total on its thread, cache next %u of %d", n_smooth_jobs, count, (double)us_smooth_jobs / 1000, smooth_next, SMOOTH_N);
-        }
+        int ok = !bad && cs_smooth(&in, &out, lv);
         free(v5); free(nr);
         ent = &smooth_cache[(key + (uint64_t)(smooth_next % SMOOTH_PROBE)) % SMOOTH_N];
         for (int k = 0; k < SMOOTH_PROBE; k++) { SmoothEnt *e = &smooth_cache[(key + (uint64_t)k) % SMOOTH_N]; if (!e->vb && !e->fail) { ent = e; break; } }

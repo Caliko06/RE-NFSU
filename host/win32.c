@@ -1187,11 +1187,11 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 0x90, host_addr_of("rn", "free_hud"), 4);     // PATCH 0x430dbd: free mode HUD without WRONG WAY and the gap
     st(c, SCREEN_ADDR + 0x94, host_addr_of("rn", "free_jumpcam"), 4); // PATCH 0x426dd7, 0x4662e0: free mode picks a jump-camera eye with a clear view, or keeps the chase camera
     st(c, SCREEN_ADDR + 0x98, host_addr_of("rn", "traffic_behind"), 4); // PATCH 0x45399f: a traffic car sees the player closing from behind (RN_TRAFYIELD=0 = original)
-    st(c, SCREEN_ADDR + 0xa0, host_addr_of("rn", "traffic_speed"), 4);  // PATCH 0x583a37, 0x583a5b: traffic speed by car type in WORLD (host/free.c, RN_AI=0 = off)
-    st(c, SCREEN_ADDR + 0xbc, host_addr_of("rn", "avoid_follow"), 4);  // PATCH 0x45406c: a traffic queue follows the car ahead in WORLD (host/free.c)
-    st(c, SCREEN_ADDR + 0xc0, host_addr_of("rn", "avoid_close"), 4);   // PATCH 0x4540e9: no dead stop behind a car that moves, WORLD (host/free.c)
-    st(c, SCREEN_ADDR + 0xb0, host_addr_of("rn", "persona_step"), 4);  // PATCH 0x44c573: rival personalities in WORLD (RN_AI=0 = original)
-    st(c, SCREEN_ADDR + 0xb4, host_addr_of("rn", "persona_clear"), 4); // PATCH 0x45c8c2: clean WORLD rivals pass wide
+    st(c, SCREEN_ADDR + 0xa0, host_addr_of("rn", "traffic_speed"), 4);  // PATCH 0x583a37, 0x583a5b: traffic speed by car type with ai_plus (host/free.c, test only)
+    st(c, SCREEN_ADDR + 0xbc, host_addr_of("rn", "avoid_follow"), 4);  // PATCH 0x45406c: a traffic queue follows the car ahead with ai_plus (host/free.c)
+    st(c, SCREEN_ADDR + 0xc0, host_addr_of("rn", "avoid_close"), 4);   // PATCH 0x4540e9: no dead stop behind a car that moves, ai_plus (host/free.c)
+    st(c, SCREEN_ADDR + 0xb0, host_addr_of("rn", "persona_step"), 4);  // PATCH 0x44c573: rival personalities with ?pool=1 or RN_AI=2 (RN_AI=0 = original)
+    st(c, SCREEN_ADDR + 0xb4, host_addr_of("rn", "persona_clear"), 4); // PATCH 0x45c8c2: clean rivals pass wide (personalities on)
     st(c, SCREEN_ADDR + 0xb8, host_addr_of("rn", "neon_pass"), 4);     // PATCH 0x56f21e: neon puddle (?pool=1)
     st(c, SCREEN_ADDR + 0xa4, host_addr_of("rn", "horn_start"), 4);
     st(c, SCREEN_ADDR + 0xc8, host_addr_of("rn", "mc_views"), 4);      // PATCH 0x4479be: camera movers, then the pedestrian's camera (host/mc.c, RN_MC=0 = off)    // PATCH 0x52536a: traffic horn probe/fix (RN_HORNLOG / RN_HORNFIX, off)

@@ -307,7 +307,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return os.path.join(ROOT, "pc", "Speed.exe")
         if path.startswith("/game/"):
             return os.path.join(ROOT, "game", os.path.normpath(path[6:]).lstrip("/."))
-        if path.startswith("/world/"):    # the open world's merged TRACKB files (tools/openworld/build.py, ?world=1); RN_WORLD_DIR as native
+        if path.startswith("/world/"):    # build/openworld: only CARS_TEXTURES.BIN now (host/trackfiles.c overlay); RN_WORLD_DIR as native
             return os.path.join(WORLD_DIR, os.path.normpath(path[7:]).lstrip("/."))
         return os.path.join(ROOT, "web", os.path.normpath(path).lstrip("/."))
 

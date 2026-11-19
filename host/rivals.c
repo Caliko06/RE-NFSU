@@ -413,7 +413,7 @@ static float apply(Ctx *c, uint32_t ride, uint32_t tmp, uint32_t rec, const char
     return r1 > *r0 ? r1 - *r0 : *r0 - r1;
 }
 
-// Personalities, WORLD only (RN_WORLD=1 free mode; ?ai=0 / RN_AI=0 off; RN_AI=2 forces them in any non-career race, for tests).
+// Personalities (built for WORLD, retired 2026-11-17): ?pool=1 in a non-career race; RN_AI=2 forces them, for tests; ?ai=0 / RN_AI=0 off.
 // docs/openworld/re_rival_personality.md, docs/re/race_ai.md. Free mode gives each rival its own skill level (host/free.c RN_FREESKILL
 // 2,5,9,4,7,3,...), so a per-level style is a per-rival style: 2,1 nervous, 5,3 clean, 4,6 blocker, 9,7,8 aggressive; level 0 as shipped.
 // Records 0x779ff8 + 0x54 * level (rival_tables), and per step persona_step below.
@@ -430,20 +430,20 @@ static const uint8_t PERSONA[10] = {NORMAL, NERVOUS, NERVOUS, TIDY, BLOCKER, TID
 static const char *PNAME[5] = {"normal", "nervous", "clean", "aggressive", "blocker"};
 static int free_race;                  // this race is free mode (rival_ride's rn_free_now)
 static int persona_on;                 // this race's rivals have personalities (set at its first opponent)
-static int rivalai(void) {             // 0 off, 1 WORLD only, 2 forced
+static int rivalai(void) {             // 0 off, 1 with ?pool=1, 2 forced
     int ai = rn_env("RN_AI", 1);
     return ai == 0 ? 0 : ai == 2 ? 2 : 1;
 }
 static int rival_style(uint32_t skill, uint32_t style) { return persona_on && skill <= 9 && (PERSONA[skill] == AGGRESSIVE || PERSONA[skill] == BLOCKER) ? 2 : (int)style; }
 
-// Every traffic model, default in WORLD (track 1010, OWNER 2026-11-04; RN_TRAFMODELS=0 off, =1 any track). The cave 0x63b270 weighs a usage 2 row 1.0 if any district weight +0xc60..+0xc70 is set: AMBULANCE, FIRETRUCK and BUS
+// Every traffic model, RN_TRAFMODELS=1 (?trafmodels=1, ?pool=1; built for WORLD, OWNER 2026-11-04). The cave 0x63b270 weighs a usage 2 row 1.0 if any district weight +0xc60..+0xc70 is set: AMBULANCE, FIRETRUCK and BUS
 // have none, so they never come out of 0x57d000. A weight here brings them in, once, before AddTrafficCars 0x4b3ac0 (it runs after 0x4b4040, this hook's caller).
 static const uint8_t TT_ROWS[3] = {22, 26, 30};
 static uint32_t tt_tab, tt_keep[3];    // the weights traffic_types changed (the car table outlives the race), put back by rivals_frontend
 static void traffic_types(Ctx *c) {
     const char *e = getenv("RN_TRAFMODELS");
     uint32_t tab = ld(c, 0x734588, 4);
-    if (!tab || (e ? e[0] != '1' : ld(c, 0x78a2f0, 4) != 1010)) return;
+    if (!tab || !e || e[0] != '1') return;
     if (!tt_tab) for (int k = 0; k < 3; k++) tt_keep[k] = ld(c, tab + 0xc90 * TT_ROWS[k] + 0xc60, 4);
     tt_tab = tab;
     for (int k = 0; k < 3; k++) stf(c, tab + 0xc90 * TT_ROWS[k] + 0xc60, 1.0f);
@@ -457,9 +457,9 @@ static void traffic_spacing_back(Ctx *c) { if (ts_row) stf(c, ts_row + 0xd4, ts_
 static void traffic_spacing(Ctx *c) {
     uint32_t esi = c->r[ESI];
     traffic_spacing_back(c);
-    // By value, not presence: 31 m fits 19..21 cars (the default FREE_TRAFFIC 13 x1.5), more need 20 m; 14 on 1010 (docs/traffic_placement.md)
+    // By value, not presence: 31 m fits 19..21 cars (the default FREE_TRAFFIC 13 x1.5), more need 20 m (docs/traffic_placement.md)
     const char *ft = getenv("RN_FREETRAFFIC");
-    if (!free_race || ((ft ? atoi(ft) : FREE_TRAFFIC) <= FREE_TRAFFIC && ld(c, 0x78a2f0, 4) != 1010)) return;
+    if (!free_race || (ft ? atoi(ft) : FREE_TRAFFIC) <= FREE_TRAFFIC) return;
     c->r[ESI] = ld(c, 0x78a2f0, 4);
     uint32_t row = call_guest(c, 0x441fe0, 0, NULL);
     c->r[ESI] = esi, ts_row = row;
@@ -503,34 +503,14 @@ static uint32_t rival_ride(Ctx *c) {
     uint32_t a[7];
     for (int k = 0; k < 7; k++) a[k] = ARG(k);
     if (a[6] <= 1) {
-        int w = rn_env("RN_WORLD", 0);   // the same test as host/openworld.c world_on
         free_race = rn_free_now != 0;
-        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && ((free_race && w) || rn_pool() || ld(c, 0x78a2f0, 4) == 1010)));
+        persona_on = !c->mem[0x78a33c] && (rivalai() == 2 || (rivalai() && rn_pool()));
         rn_player_car(c), rival_tables(c, persona_on), traffic_types(c), traffic_spacing(c);
     }
     if (rn_free_now) {                                           // host/free.c: free mode's career rivals
         uint32_t e = free_rival(c, a);                           // 0x5809c0 returns the entrant; free_rival picks the level at +0x735
         c->mem[e + 0x736] = (uint8_t)rival_style(c->mem[e + 0x735], c->mem[e + 0x736]);
         if (getenv("RN_FREELOG")) rn_log("rivalai %s level %d style %d", G(e + 0x73c), (int8_t)c->mem[e + 0x735], (int8_t)c->mem[e + 0x736]);
-        if (rn_pool() && ld(c, 0x78a2f0, 4) == 1010 && ld(c, a[2], 4) < 20) {
-            // WORLD: the car of the preset, a pool build that shows how it drives: one game vinyl, kit and rims of an archetype of its style.
-            static const uint8_t BY[5][3] = {[TIDY] = {CLEAN, TRACK, VIP}, [NERVOUS] = {STREET, SHOW, STREET}, [AGGRESSIVE] = {DRIFT, BOSO, DRIFT}, [BLOCKER] = {TRACK, BOSO, VIP}};
-            if (!ready) catalog(c);
-            int lvl = (int8_t)c->mem[e + 0x735], sty = lvl >= 0 && lvl <= 9 ? PERSONA[lvl] : TIDY;
-            uint32_t ride = a[2], k = a[6] % NSYN, tmp = guest_alloc(RIDE_SIZE), skin0 = ld(c, ride + 0x444, 4);
-            memcpy(G(tmp), G(ride), RIDE_SIZE);
-            Persona pe = {.car = (uint8_t)ld(c, ride, 4), .seed = hash(G(e + 0x73c)) * 0x9e3779b1u};
-            pe.arch = BY[sty][pe.seed % 3];
-            char nm[32]; snprintf(nm, sizeof nm, "RN_RIVAL_%u", k);
-            float r0 = 0;
-            apply(c, ride, tmp, syn[k], nm, &pe, lvl >= 7 ? 3 : 2, &r0);
-            guest_free(tmp);
-            personality(c, ride, &pe);
-            uint32_t skin = ld(c, ride + 0x444, 4) ? ld(c, ride + 0x444, 4) : skin0;
-            neon_ride[k] = pe.arch == SHOW || pe.arch == BOSO ? skin : 0;
-            rn_log("POOLRIDE %s car %s %s tier %d skin %08x", G(e + 0x73c), CARS[pe.car], ARCH[pe.arch].name, lvl >= 7 ? 3 : 2, skin);
-            car_prefetch(CARS[pe.car]);
-        }
         return e;
     }
     if (!on) { const char *e = getenv("RN_RIVALS"); on = e && e[0] == '0' ? -1 : 1; }
@@ -718,7 +698,6 @@ static void handling_data(Ctx *c) {
 // behind and past 160 m tries up to 8 nodes 150..650 m + 1 s of speed ahead on the road (0x4563d0), at least 150 m from the player, 18 m from every car that drives; then the
 // Free Run move's own tail, as free_tmove: lane 0x5995e0, speed 0x42adf0, 0x59a7c0 on the teleporter [[0x7361f8]+0x2f0] (ecx at 0x420c77).
 #define REFILL_NEAR 14
-// WORLD: 3/4 of the traffic within 250 m (ghosts, 40 cars: all but 3 near = 50-85% stopped, a jam), 25 m from every car for a refill spot.
 #define REFILL_MIN 150   // m from the player for a refill spot
 // Frozen traffic (w_h, 240 s: 21% of traffic samples did not move, a queue of 10 cars for up to 176 s, 57 cars braking to 6.1 m/s at one spot): the refill below only picks
 // parked, far (>450 m) or behind-the-player cars, and counts a frozen car as "near", so it was never recycled. Speed [car+0x3d4] stays 6.1 on a blocked car (w_i), so it is the
@@ -743,27 +722,24 @@ static void frozen_clear(uint32_t r) { for (int i = 0; i < 64; i++) if (still_r[
 static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
     static int off = -1;
     static uint32_t pair, seed = 0x2f11e0d5;
-    int world = ld(c, 0x78a2f0, 4) == 1010;   // WORLD: always on (OWNER 2026-11-03); RN_TRAFREFILL=0 turns it off
-    if (off < 0) { const char *e = getenv("RN_TRAFREFILL"); off = e ? e[0] != '1' : -2; }
-    if (off == -2 && !world) return;
+    if (off < 0) { const char *e = getenv("RN_TRAFREFILL"); off = !e || e[0] != '1'; }   // RN_TRAFREFILL=1 (?trafrefill=1, ?pool=1); built for WORLD (OWNER 2026-11-03)
     uint32_t tele = ld(c, h + 0x2f0, 4);
     if (off > 0 || !free_race || rn_telem.presents % 12 || !tele) return;
     float px = ldf(c, me + 0x50), py = ldf(c, me + 0x54), vx = ldf(c, me + 0x70), vy = ldf(c, me + 0x74), sp = hypotf(vx, vy);
     uint32_t pick = 0;
-    int prio = 0, near = 0, cars = 0;
+    int prio = 0, near = 0;
     for (uint32_t r = ld(c, h, 4), k = 0; r != h && k < 200; r = ld(c, r, 4), k++) {
         uint32_t e = ld(c, r + 0x14, 4), v = ld(c, r + 0x2c, 4);
         if (!e || ld(c, e + 4, 4) != 3 || !v) continue;
-        cars++;
         float dx = ldf(c, r + 0x50) - px, dy = ldf(c, r + 0x54) - py, d = hypotf(dx, dy);
         int parked = c->mem[v + 0x4d1];
         if (parked) frozen_clear(r);   // parked time is not standing-still time (a car un-parked later would be recycled at once)
-        int frozen = !parked && frozen_car(r, ldf(c, r + 0x50), ldf(c, r + 0x54)) && (d >= 200 || (world && d >= 40 && dx * ldf(c, me + 0x90) + dy * ldf(c, me + 0x94) < 0.34f * d));   // WORLD: also out of the +-70 deg cone (free.c KEEP_M test): a wedged car behind the player leaves
+        int frozen = !parked && frozen_car(r, ldf(c, r + 0x50), ldf(c, r + 0x54)) && d >= 200;
         near += d < 250 && !parked && !frozen;
         int p = parked || frozen ? 3 : d > 450 ? 2 : sp > 2 && dx * vx + dy * vy < 0 && d > 160 ? 1 : 0;
         if (p > prio) prio = p, pick = r;
     }
-    if (!pick || (near >= (world ? cars * 3 / 4 : REFILL_NEAR) && prio < 3)) return;   // a parked car always goes back on the road
+    if (!pick || (near >= REFILL_NEAR && prio < 3)) return;   // a parked car always goes back on the road
     if (!pair) pair = guest_alloc(8);
     uint32_t zero = 0, ft = c->ftop;
     c->r[EAX] = me; uint32_t sec = call_guest(c, 0x428150, 1, &zero);
@@ -784,12 +760,10 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         if (n2 == node || !(call_guest(c, 0x456c90, 0, NULL) & 0xff)) { n_rf[1]++; continue; }
         float nx = ldf(c, n2), ny = ldf(c, n2 + 4);
         int ok = hypotf(nx - px, ny - py) >= REFILL_MIN;
-        float room = 1e9f;   // nearest car to the spot: it arrives at a speed it can stop from (a queue's tail 25 m on took a 20 m/s spawn in the back)
         for (uint32_t o = ld(c, h, 4), j = 0; o != h && j < 200 && ok; o = ld(c, o, 4), j++) {
             uint32_t v = ld(c, o + 0x2c, 4);
             float od = hypotf(ldf(c, o + 0x50) - nx, ldf(c, o + 0x54) - ny);
-            ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || od >= (world ? 25 : 18);
-            if (o != pick && od < room) room = od;
+            ok = o == pick || (v && ld(c, ld(c, o + 0x14, 4) + 4, 4) == 3 && c->mem[v + 0x4d1]) || od >= 18;
         }
         if (!ok) { n_rf[2]++; continue; }
         c->r[ECX] = tele;
@@ -801,7 +775,6 @@ static void traffic_refill(Ctx *c, uint32_t h, uint32_t me) {
         call_guest(c, 0x42adf0, 0, NULL);
         float v = (float)c->st[c->ftop];
         fpop(c);                               // a pop, not ftop = ft: see free_tmove
-        if (world && room > 8 && v * v > 8 * (room - 8)) v = sqrtf(8 * (room - 8));
         uint32_t p[7] = {pick, n2, 0, (uint32_t)lane, 0x41c4b127, 0, 0};
         memcpy(&p[5], &v, 4);
         c->r[ECX] = tele;
@@ -900,20 +873,12 @@ static uint32_t traffic_behind(Ctx *c) {
 
 // Rival stuck test (docs/re/ai_stuck.md, lalo): the finders 0x451b00.. call a rival stuck after [0x6b7680] = 0.4 s under [0x6b7684] = 5.0 m/s and then
 // reverse at prio 500; 27-38 % of the entries happen above 5 m/s. Data floats read only by the stuck finders (3 timer reads, 5 speed reads in the exe).
-// WORLD (track 1010) default since 2026-11-05 (w5): 1.5 s and 3.0 m/s; RN_AI_STUCK=0 turns it off (web: only ?aistuck=1 exists, boot.js is w2's), =1 forces it on any track.
-// Written every present (the page may reload the data); outside WORLD the factory 0.4 s / 5.0 m/s go back, original mode = reference.
+// RN_AI_STUCK=1 (?aistuck=1): 1.5 s and 3.0 m/s (WORLD's default 2026-11-05, retired); else the factory 0.4 s / 5.0 m/s, written every present.
 static void ai_tune(Ctx *c) {
     static int stuck = -1;
-    if (stuck < 0) stuck = getenv("RN_AI_STUCK") ? atoi(getenv("RN_AI_STUCK")) : 2;
-    int on = stuck == 1 || (stuck == 2 && rivalai() && ld(c, 0x78a2f0, 4) == 1010);
+    if (stuck < 0) stuck = getenv("RN_AI_STUCK") ? atoi(getenv("RN_AI_STUCK")) : 0;
+    int on = stuck == 1;
     st(c, 0x6b7680, on ? 0x3fc00000 : 0x3ecccccd, 4), st(c, 0x6b7684, on ? 0x40400000 : 0x40a00000, 4);
-    // The AI look-ahead [0x7006ec] = 2.0 s (REA xrefs: 26 readers, among them the Avoid finder 0x44f8a0 "obstacle on my path within 2.0 s" and the planners
-    // 0x45b050/0x45b150 it calls): a rival at twice a traffic car's speed starts to dodge ~20 m before it. WORLD default 3.0 (the exe's next float 0x7006f0 is 3.0 too; REA read_bytes 0x7006ec = 00000040 0000 4040); RN_AI_HORIZON=<s> sets it, 0 = factory 2.0. NOT A/B tested (OWNER stopped the ghosts 2026-11-05): rival->traffic hits near the player were 10.8/min at 2.0 s.
-    static float hz = -1;
-    if (hz < 0) hz = getenv("RN_AI_HORIZON") ? (float)atof(getenv("RN_AI_HORIZON")) : 3.0f;
-    float h = hz > 0 && rivalai() && ld(c, 0x78a2f0, 4) == 1010 ? hz : 2.0f;
-    uint32_t hb; memcpy(&hb, &h, 4);
-    st(c, 0x7006ec, hb, 4);
 }
 
 // RN_AILOG: per driver profile, cars and mean speed of those moving; lane changes per 600 presents, all and in front of the player within 40 m.
@@ -1029,9 +994,6 @@ void traffic_tick(Ctx *c) {
     handling_data(c);
     ai_tune(c);
     traffic_paint(c);
-    // WORLD: no BeltMover (0x463260, the cheap mover of far rivals; [0x700740] read only at 0x44b9f7). A respawn restarts it on the keys of the old road, hundreds of m away: lateral offset of that size, launched at 3000 m/s.
-    // Every present, before the traffic guards (RN_TRAFYIELD=0, pause or a non-race mode must not turn it back on); outside WORLD it writes the factory value 1.
-    st(c, 0x700740, ld(c, 0x78a2f0, 4) != 1010, 4);
     if (trafyield_off() || rn_telem.presents % 6 || !rn_racing() || c->mem[0x78a33c]) return;
     uint32_t h = ld(c, 0x7361f8, 4), me = 0;
     for (uint32_t r = h ? ld(c, h, 4) : 0, k = 0; r && r != h && k < 200 && !me; r = ld(c, r, 4), k++) {
@@ -1206,48 +1168,6 @@ static uint32_t car_draw(Ctx *c) {
 // [car+0x14] = entrant (+4 kind 2 = rival, +0x735 level), neighbour rows ctx + 8 + i * 0x38 (+4 speed of the other minus own, +0xc half
 // length, +0x10 route position, +0x34 body node), own row index (int8) ctx+0x388. Nitro burns while [car+0x3fc] (start tick of the
 // clock [0x73ad34]) is set and younger than [car+0x3f8] ticks (0x465430 on car+0x40). Returns 0x44bd10's eax.
-// ?pool=1 in WORLD, gangs (OWNER 2026-11-03): a rival cruises like tuned traffic (route speed x0.5, action target at most 17 m/s, no nitro) until the player
-// stays within 15 m for 1.5 s (any heading, any speed), or a duel: full AI for 60 s or until 280 m apart, at most 2 at once; 30 s of cooldown after. DUEL lines reach the page's toast (web/index.html).
-#define CLK_S 4000u
-static int gang_step(Ctx *c, uint32_t v, uint32_t car, uint32_t ent, uint32_t act) {
-    static struct { uint32_t v, near, until, cool; } g[16];
-    static int duels;
-    static uint32_t me, me_at, race;
-    if (ld(c, 0x78a2f0, 4) != 1010) return 1;
-    if (rn_new_race(&race)) memset(g, 0, sizeof g), duels = 0, me = me_at = 0;   // 16 slots, one per vehicle of this race (they filled up over races)
-    int k = 0;
-    while (k < 15 && g[k].v && g[k].v != v) k++;
-    if (g[k].v != v) { if (!k) duels = 0; g[k].v = v, g[k].near = g[k].until = 0, g[k].cool = 0; }
-    uint32_t now = ld(c, 0x73ad34, 4), h = ld(c, 0x7361f8, 4);
-    if (me_at != rn_telem.presents) {
-        me_at = rn_telem.presents, me = 0;
-        for (uint32_t r = h ? ld(c, h, 4) : 0, j = 0; r && r != h && j < 200 && !me; r = ld(c, r, 4), j++) { uint32_t e = ld(c, r + 0x14, 4); if (e && ld(c, e + 4, 4) == 1) me = r; }
-    }
-    if (!me) return 1;
-    float dx = ldf(c, car + 0x50) - ldf(c, me + 0x50), dy = ldf(c, car + 0x54) - ldf(c, me + 0x54), d = hypotf(dx, dy);
-    float vx = ldf(c, car + 0x70), vy = ldf(c, car + 0x74), px = ldf(c, me + 0x70), py = ldf(c, me + 0x74);
-    if (g[k].until) {
-        if (now < g[k].until && d < 280) return 1;
-        int ahead = dx * vx + dy * vy > 0;
-        rn_log("DUEL %s %s", G(ent + 0x73c), ahead ? "won" : "lost");
-        g[k].until = 0, g[k].near = 0, g[k].cool = now + 30 * CLK_S;
-        if (duels > 0) duels--;
-    } else if (d < 15 && now >= g[k].cool && duels < 2) {   // OWNER 2026-11-13: driving up to a rival is the challenge; no hit, no same heading, no speed needed (was 40 m, same way, player over 12 m/s)
-        if (!g[k].near) g[k].near = now;
-        if (now - g[k].near > 3 * CLK_S / 2) {
-            g[k].until = now + 60 * CLK_S; duels++;
-            rn_log("DUEL %s start", G(ent + 0x73c));
-            return 1;
-        }
-    } else g[k].near = 0;
-    uint32_t veh = ld(c, v + 4, 4);
-    stf(c, v + 0x4b8, 0.5f);
-    if (veh) stf(c, veh + 0x404, 1.0f);
-    if (ldf(c, act + 0x1e4) > 17.0f) stf(c, act + 0x1e4, 17.0f);
-    uint32_t t0 = ld(c, car + 0x3fc, 4);
-    if (t0 && t0 != 0x7fffffffu) st(c, car + 0x3fc, 0, 4);
-    return 0;
-}
 
 static uint32_t persona_step(Ctx *c) {
     static struct { uint32_t v, stamp, shot, said; } s[16];
@@ -1271,8 +1191,6 @@ static uint32_t persona_step(Ctx *c) {
     }
     uint32_t ctx = v + 0x2c, car = ld(c, ctx, 4), ent = car ? ld(c, car + 0x14, 4) : 0, act = ld(c, v + 0x3f8, 4);
     if (!ent || ld(c, ent + 4, 4) != 2 || !act) return r;
-    int duel = !rn_pool() || gang_step(c, v, car, ent, act);
-    if (!duel) return r;
     int lv = (int8_t)c->mem[ent + 0x735], p = lv >= 0 && lv <= 9 ? PERSONA[lv] : NORMAL;
     if (p == NORMAL) return r;
     int k = 0;
