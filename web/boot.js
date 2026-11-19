@@ -47,6 +47,8 @@ addEventListener('keydown', e => {
   e.preventDefault(); e.stopPropagation();
   if (!e.repeat) window.rnReport();
 }, true);
+// ?dbg=1: the log panel open from the start (a phone has no F2), to read or screenshot what the page did.
+if (RN_Q.get('dbg') === '1') document.body.classList.add('dbg');
 addEventListener('keydown', e => { if (e.code === 'F2') { document.body.classList.toggle('dbg'); e.preventDefault(); e.stopPropagation(); } }, true);
 function line(s, cls) {
   keep(`${secs()} ${s}`);
