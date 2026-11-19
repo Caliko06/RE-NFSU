@@ -90,8 +90,15 @@ async function download(url, what) {
 (async () => {
   // check: what the game cannot run without, before any download (the wasm is 70 MB).
   if (!crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') { line('Falta COOP/COEP: abre la página desde tools/serve.py', 'stop'); return; }
-  if (!navigator.gpu) { line('gpu.js: WebGPU no disponible en este navegador', 'stop'); return; }
-  if (!await navigator.gpu.requestAdapter().catch(() => null)) { line('gpu.js: WebGPU: sin adaptador', 'stop'); return; }
+  // No WebGPU adapter (iOS 18 and older, Firefox on Android/Linux, old Android) or ?gl=1: WebGPU on WebGL 2 (web/webgpu_gl.js). It
+  // replaces navigator.gpu and canvas.getContext('webgpu'), so it is loaded only here, never next to a working WebGPU.
+  if (RN_Q.get('gl') === '1' || !await navigator.gpu?.requestAdapter().catch(() => null)) {
+    if (!document.createElement('canvas').getContext('webgl2')) { line('gpu.js: este navegador no tiene WebGPU ni WebGL 2', 'stop'); return; }
+    await new Promise((ok, no) => document.head.appendChild(Object.assign(document.createElement('script'), { src: 'webgpu_gl.js', onload: ok, onerror: no })));
+    navigator.gpu.gpu_js.canvas = document.getElementById('screen');
+    if (RN_Q.get('glerr') === '1') navigator.gpu.gpu_js.errs = {};   // GL errors per command kind (web/webgpu_gl.js submit)   // the device's GL context is the page's canvas (no copy per frame)
+    line('gpu.js: WebGL 2 (sin WebGPU)');
+  }
   RN_APP.set('load');
   if (window.RN_HOLD) await window.RN_HOLD;       // ?fast=1: scene B draws first (web/index.html)
   const exe = new Uint8Array(await (await download('pc/Speed.exe', 'Descargando')).arrayBuffer());

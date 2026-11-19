@@ -72,7 +72,7 @@
     'Ajustes de fábrica': 'Factory settings', 'Todos los ajustes vuelven a su valor inicial. Las partidas no se tocan.': 'Every setting goes back to its first value. Saves are not touched.', 'Borrar': 'Reset', 'Hecho': 'Done',
     'Imagen, cámara, rendimiento, jugabilidad, teclas y partidas.': 'Picture, camera, performance, gameplay, keys and saves.', 'Vuelve al menú principal.': 'Back to the main menu.',
     'Cómo jugar, controles y cómo se hizo.': 'How to play, controls and how it was made.',
-    'Este navegador no tiene WebGPU. Usa Chrome o Edge.': 'This browser has no WebGPU. Use Chrome or Edge.',
+    'Este navegador no tiene WebGPU ni WebGL 2. Usa Chrome, Edge, Safari o Firefox recientes.': 'This browser has neither WebGPU nor WebGL 2. Use a recent Chrome, Edge, Safari or Firefox.',
     'Tu equipo': 'Your machine', 'midiendo': 'measuring', 'Va bien en ': 'Runs well on ', 'La escena de este menú corre a {ms} ms por cuadro en tu equipo.': 'The scene of this menu runs at {ms} ms per frame on your machine.',
     'Anterior': 'Previous', 'Siguiente': 'Next', 'Grupo anterior': 'Previous group', 'Grupo siguiente': 'Next group', 'Grupos de ajustes': 'Setting groups',
     'Cambiar': 'Change', 'Grupo': 'Group',

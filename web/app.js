@@ -26,6 +26,7 @@ const RN_APP = (() => {
   // A stop line of the page log -> what a player can do about it.
   const WHY = [
     [/COOP|COEP|SharedArrayBuffer/, 'El servidor no está configurado para el juego (falta el aislamiento COOP/COEP).'],
+    [/ni WebGL 2/, 'Tu navegador no puede dibujar el juego (no tiene WebGPU ni WebGL 2). Usa Chrome, Edge, Safari o Firefox recientes.'],
     [/WebGPU no disponible/, 'Tu navegador no tiene WebGPU. Funciona en Chrome o Edge 113+ (computadora y Android 12+), Safari 26+ (Mac, iPhone, iPad) y Firefox 141+ (Windows) o 145+ (Mac Apple Silicon).'],
     [/sin adaptador/, 'WebGPU está apagado o la tarjeta gráfica de este equipo no es compatible.'],
     [/se perdió la GPU/, 'El navegador soltó la tarjeta gráfica (pasa al dejar la página mucho rato en segundo plano).'],

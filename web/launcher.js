@@ -279,7 +279,9 @@
     const rig = $('rigName');
     let gpu = '', ok = !!navigator.gpu;
     try { const a = ok && await navigator.gpu.requestAdapter(); ok = !!a; const i = a && a.info; if (i) gpu = [i.vendor, i.architecture || i.device].filter(Boolean).join(' '); } catch { ok = false; }
-    if (!ok) { rig.textContent = t('Este navegador no tiene WebGPU. Usa Chrome o Edge.'); $('rig').classList.add('bad'); return; }
+    // No WebGPU: the game draws through WebGL 2 (web/boot.js loads web/webgpu_gl.js); only a browser with neither stops here.
+    if (!ok && !document.createElement('canvas').getContext('webgl2')) { rig.textContent = t('Este navegador no tiene WebGPU ni WebGL 2. Usa Chrome, Edge, Safari o Firefox recientes.'); $('rig').classList.add('bad'); return; }
+    if (!ok) gpu = 'WebGL 2';
     // how fast this machine draws the street behind (median of 90 frames once the menu is in)
     const ms = await new Promise(done => { const d = []; let last = 0; const f = t => { if (last) d.push(t - last); last = t; if (d.length < 90) requestAnimationFrame(f); else done(d.sort((a, b) => a - b)[45]); }; requestAnimationFrame(f); setTimeout(() => done(d.length ? d.sort((a, b) => a - b)[d.length >> 1] : 99), 4000); });
     const tier = ms > 28 ? 'baja' : ms > 20 ? 'media' : 'alta';      // thresholds are ours (60 Hz = 16.7 ms)

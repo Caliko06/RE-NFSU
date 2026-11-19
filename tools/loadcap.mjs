@@ -4,7 +4,7 @@
 // RN_PROFILE=<dir>: a normal profile kept on disk (run twice for the second visit; the default is a fresh private one).
 // The round trip of a real visit: serve dist with RN_RTT_MS=80 tools/static_server.py (CDP cannot delay worker requests).
 import { spawn } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const out = process.argv[2], url = process.argv[3], port = Number(process.env.RN_CDP || 9391);   // RN_CDP: one per slice (9382-9386)
@@ -43,9 +43,11 @@ event = m => {
   if (m.method === 'Network.responseReceived' && net.has(k)) Object.assign(net.get(k), { status: p.response.status, ttfb: now(), cf: p.response.headers['cf-cache-status'], disk: p.response.fromDiskCache });
   if (m.method === 'Network.loadingFinished' && net.has(k)) Object.assign(net.get(k), { bytes: p.encodedDataLength, end: now() });
   if (m.method === 'Network.loadingFailed' && net.has(k)) net.get(k).error = p.errorText;
-  if (m.method === 'Runtime.consoleAPICalled') cons.push([now(), p.args.map(a => a.value ?? a.description ?? '').join(' ').slice(0, 300)]);
+  if (m.method === 'Runtime.consoleAPICalled') cons.push([now(), p.args.map(a => a.value ?? a.description ?? '').join(' ').slice(0, Number(process.env.RN_CONS_MAX || 300))]);
 };
 await configure(page);
+// RN_INJECT=<file>: a script run before the page's own (Page.addScriptToEvaluateOnNewDocument); RN_DUMP=<expr>: its value -> <out>.dump.json.
+if (process.env.RN_INJECT) await send('Page.enable', {}, page), await send('Page.addScriptToEvaluateOnNewDocument', { source: readFileSync(process.env.RN_INJECT, 'utf8') }, page);
 const MOBILE = process.env.RN_MOBILE === '1';
 await send('Emulation.setDeviceMetricsOverride', MOBILE ? { width: 844, height: 390, deviceScaleFactor: 2, mobile: true } : { width: 1280, height: 720, deviceScaleFactor: 1, mobile: false }, page);
 if (MOBILE) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 }, page);
@@ -64,6 +66,7 @@ while (now() < Number(process.env.RN_SECS || 150)) {
 const { data } = await send('Page.captureScreenshot', { format: 'png' }, page);
 writeFileSync(out + '.png', Buffer.from(data, 'base64'));
 const host = (await send('Runtime.evaluate', { expression: "typeof allLog === 'undefined' ? [] : allLog", returnByValue: true }, page)).result.value || [];   // web/boot.js keep(): every host line
+if (process.env.RN_DUMP) writeFileSync(out + '.dump.json', JSON.stringify((await send('Runtime.evaluate', { expression: process.env.RN_DUMP, returnByValue: true }, page)).result.value ?? null));
 writeFileSync(out + '.json', JSON.stringify({ url, hud, rows: [...net.values()], lines, cons, host }));
 console.log('hud', hud, 'requests', net.size, 'lines', lines.length, 'console', cons.length);
 if (KEEP) { await send('Browser.close').catch(() => {}); await sleep(3000); }   // let the disk cache land
