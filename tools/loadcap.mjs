@@ -7,7 +7,7 @@ import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-const out = process.argv[2], url = process.argv[3], port = 9391;
+const out = process.argv[2], url = process.argv[3], port = Number(process.env.RN_CDP || 9391);   // RN_CDP: one per slice (9382-9386)
 const KEEP = process.env.RN_PROFILE, profile = KEEP || mkdtempSync(join(tmpdir(), 'rn-livecap-'));
 const chrome = spawn('/Users/angeldamian/.local/bin/chrome-bot', ['--headless=new', '--mute-audio', '--enable-unsafe-webgpu',
   '--no-first-run', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
