@@ -52,4 +52,4 @@ addr	name	system	confidence	evidence	tool	doc
 0x420b40	World::Step	raceai	V	V: three loops write car+0x47c = 0x426450() for every car then call car vt[3] step	Ghidra	docs/re/race_ai.md
 0x479160	Physics::SetCarScale	raceai	V	V: car+0x404 into physics +0x1e8, [ph+0x50]+8; (1-car+0x47c) into [ph+0x50]+0xc; 0x474d40 does the same on the other path	Ghidra	docs/re/race_ai.md
 0x429b10	Racer::UpdateTwoHumanCatchUp	raceai	V	V: writes car+0x404 for the human behind in a two-human race (0x429b8b)	Ghidra	docs/re/race_ai.md
-0x4338c0	Racer::UpdateStats	raceai	I	I: reads car+0x404 (clamped >=1) to divide the top speed stat of AI racers	Ghidra	docs/re/race_ai.md
+0x4338c0	RacingCar::UpdateLapCounts	raceai	I	I: reads car+0x404 (clamped >=1) to divide the top speed stat of AI racers; 2026-11-19: name aligned with the V rows in names_racesetup.tsv and names_rivals.tsv (lap counter per tick); this row only adds the car+0x404 read	Ghidra	docs/re/race_ai.md

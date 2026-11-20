@@ -36,7 +36,6 @@ def scenarios():
     for name, jmp in [('circuit', 'jump_0_1003'), ('sprint', 'jump_1_1103'), ('drag', 'jump_5_1201'), ('drift', 'jump_6_1304'),
                       ('lapko', 'jump_2_1002'), ('freerun', 'jump_3_1002')]:
         s[name] = jumprun(jmp)
-    s['world'] = jumprun('jump_3_1010')                     # track 1010 (the merged city, RN_WORLD_DIR below)
     # garage/options: RN_OPEN switches the menu to the screen as the menus do (completion.py OPEN), then taps inside it
     s['garage'] = (dict(RN_KEYS=C.ROWS['garage'], RN_OPEN=C.OPEN['garage']), 45)
     s['options'] = (dict(RN_KEYS=C.ROWS['options'], RN_OPEN=C.OPEN['options'], RN_CALL=C.CALL['options']), 45)
@@ -62,7 +61,7 @@ def run_one(name, env_extra, secs):
     out = f'{R}/build/cov/{name}.bin'
     if os.path.exists(out): os.remove(out)
     env = dict(os.environ, RN_TURBO='4', RN_SECS=str(secs), RN_SCREEN='640x480', RN_RASTER='1000000', RN_FLOWLOG='1', RN_SEED='0x1234',
-               RN_AUTOPILOT='1', RN_WORLD_DIR=f'{R}/build/openworld', RN_COV_OUT=out)
+               RN_AUTOPILOT='1', RN_COV_OUT=out)
     env.update(env_extra)
     subprocess.run([GATE], check=True)
     t0 = time.time()
