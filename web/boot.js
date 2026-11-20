@@ -176,7 +176,7 @@ async function download(url, what) {
       if (RN_Q.get('pool') === '1') { m.ENV.RN_POOL = '1'; m.ENV.RN_TRAFMODELS = '1'; m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
       // Verbose C-host diagnostic loggers: off by default in production; enable with ?debuglog=1 or individually via ?env=...
       if (RN_Q.get('debuglog') === '1') {
-        for (const k of ['RN_JCLOG', 'RN_FREELOG', 'RN_AILOG', 'RN_RESETLOG', 'RN_HORNLOG', 'RN_FEELLOG', 'RN_FLOWLOG'])
+        for (const k of ['RN_JCLOG', 'RN_FREELOG', 'RN_AILOG', 'RN_RESETLOG', 'RN_HORNLOG', 'RN_FEELLOG'])
           if (!(k in m.ENV)) m.ENV[k] = '1';
       }
       // ?hornfix=1: no traffic honk from a parked, undrawn or just-recycled car (host/horn.c)
@@ -190,9 +190,9 @@ async function download(url, what) {
       if (RN_Q.has('trafmodels')) m.ENV.RN_TRAFMODELS = RN_Q.get('trafmodels');
       if (RN_Q.get('trafrefill') === '1') { m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
       if (RN_Q.has('traffic')) m.ENV.RN_FREETRAFFIC = RN_Q.get('traffic');
-      // RN_FLOWLOG: off by default in production unless ?debuglog=1 / ?env=RN_FLOWLOG=1, or functionally required by ?start=, curtain, touch layouts, or @-gated ?keys=.
-      const needTouch = RN_Q.get('touch') !== '0' && (RN_APP.coarse || RN_Q.get('touch') === '1');
-      if ((START || CURTAIN || needTouch || /@/.test(RN_Q.get('keys') || '')) && !('RN_FLOWLOG' in m.ENV)) m.ENV.RN_FLOWLOG = '1';
+      // Always on: it fills rn_fe, which the curtain, touch layouts, @-gated ?keys= and F3's briefing check read (host/input.c
+      // cheat_briefing), and an F10 session then shows the menus and files of a normal play (tools/playindex.py). Lines only on a change.
+      if (!('RN_FLOWLOG' in m.ENV)) m.ENV.RN_FLOWLOG = '1';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;

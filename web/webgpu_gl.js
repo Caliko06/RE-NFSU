@@ -2102,8 +2102,15 @@
       _bindTexture() {
          const gl = this.tex.device.gl;
          const obj = this.tex._ensureGl();
-         this.tex._ensureMips();
          gl.bindTexture(obj.target, obj);
+         // RN: a view's mip range as BASE/MAX_LEVEL. Without it a view of level l-1 samples level 0, and drawing level l
+         // while the whole chain is bound is a feedback loop: GL drops the draw and level l stays cleared (web/gpu.js mipPipe).
+         const base = this.desc.baseMipLevel || 0, max = base + Math.max(1, this.desc.mipLevelCount || 1) - 1;
+         if (this.tex._glBase !== base || this.tex._glMax !== max) {
+            gl.texParameteri(obj.target, GL.TEXTURE_BASE_LEVEL, base);
+            gl.texParameteri(obj.target, GL.TEXTURE_MAX_LEVEL, max);
+            this.tex._glBase = base; this.tex._glMax = max;
+         }
       }
 
       _attach(fbTarget, attachment) {
@@ -2189,6 +2196,7 @@
          gl.texParameteri(target, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
          gl.texParameteri(target, GL.TEXTURE_BASE_LEVEL, 0);
          gl.texParameteri(target, GL.TEXTURE_MAX_LEVEL, Math.max(0, (d.mipLevelCount || 1) - 1));
+         this._glBase = 0; this._glMax = Math.max(0, (d.mipLevelCount || 1) - 1);   // the level range a view last set (GPUTextureView._bindTexture)
          if (target === GL.TEXTURE_3D) {
             gl.texStorage3D(target, d.mipLevelCount, info.format, d.size.width, d.size.height, d.size.depthOrArrayLayers);
          } else if (target === GL.TEXTURE_2D_ARRAY) {
@@ -2199,8 +2207,6 @@
          gl.bindTexture(target, null);
          return this._gl;
       }
-
-      _ensureMips() {}
 
       createView(desc) {
          return new GPUTextureView(this, desc);
@@ -2687,6 +2693,12 @@ void main() {}`;
       gl.bindFramebuffer(GL.FRAMEBUFFER, null);
       gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, null);
       gl.bindTexture(tex._gl.target, tex._gl);
+      const top = tex.desc.mipLevelCount - 1;
+      if (tex._glBase !== 0 || tex._glMax !== top) {   // generateMipmap fills BASE+1..MAX: the whole chain
+         gl.texParameteri(tex._gl.target, GL.TEXTURE_BASE_LEVEL, 0);
+         gl.texParameteri(tex._gl.target, GL.TEXTURE_MAX_LEVEL, top);
+         tex._glBase = 0; tex._glMax = top;
+      }
       while (gl.getError()) {}
       gl.generateMipmap(tex._gl.target);
       if (!gl.getError()) {
@@ -2703,7 +2715,7 @@ void main() {}`;
       const viewMips = texView && texView.desc ? texView.desc.mipLevelCount : (tex ? tex.desc.mipLevelCount : 1);
       const useMips = !!(tex && tex.desc.mipLevelCount > 1 && viewMips > 1 && samp.desc.lodMaxClamp !== 0);
       if (useMips) {
-         if (tex._mipsDirty) generateColorMips(tex);
+         if (tex._mipsDirty) { generateColorMips(tex); if (texView._bindTexture) texView._bindTexture(); }
          return samp._gl;
       }
       if (samp._rnColor) return samp._rnColor;   // RN: no key string per draw (garbage in Safari)
