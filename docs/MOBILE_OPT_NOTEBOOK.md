@@ -78,3 +78,15 @@ After `31c1167` (1024 MB WASM, 384 MB guest, 4 MB stacks) + `57c6aee` (`gpu.js` 
 - Rebuilt `speed.wasm` + `dist/` (`5,677` files, `2.10 GB`) and re-ran Safari/WebKit WebGL 2 (`NOGPU=1`, 90 s, 1920×1080):
   - **Before:** 375 fps in `PC_Loading.fng`, `5,538 MB`, 7 `HUNG`, killed at 66 s, never reached HUD.
   - **After:** `PC_Loading.fng` paced cleanly; reached **`d3d9 race HUD` in 29.15 s**; **0 HUNG, 0 STOP, 0 crashes** across 96 s; flat `2,009–2,082 MB` for 25 s of racing (`t=35..60 s`), climbing to `4,032 MB` at `91 s` (remaining late-race climb traced to `web/webgpu_gl.js` per-draw closure allocations in `_preDraw`/`drawIndexed` at ~2,200 draws/frame).
+
+### 6. WebGL 2 Zero-Alloc Pooled Command Tape (`web/webgpu_gl.js`)
+- Replaced per-draw closures (`_preDraw`, `draw`, `drawIndexed`, `setViewport`, `setScissorRect`, `setBlendConstant`), `.slice()`/`.map()` copies, `{ buffer, offset, size }` wrappers, `.forEach()` callbacks in `_setVertexBuffers`, `stencilFront || {}` empty objects in `_setup`, and unnecessary `Uint8Array` wrappers in `writeBuffer()` with a pooled flat opcode/object/number command tape (`allocTape`/`releaseTape`/`replayTape`) and reusable per-device replay state (`device._replay`).
+- Verified:
+  - `node tools/glcheck.mjs logs/pipes.dump.json` → **`13/13 pipelines compile`**.
+  - `node tools/glcheck.mjs logs/pipes_rm.dump.json` → **`17/17 pipelines compile`**.
+  - Safari/WebKit WebGL 2 (`NOGPU=1`, 96 s, `1920×1080`, `footprint -p`, shot `web/plan/shots/wk_gl_tape.png`):
+    - Menus (`5–20 s`): **`656–717 MB`**.
+    - Race HUD (`27.70 s`): **`1,078 MB`** (down from **`2,009 MB`**).
+    - Race `t=60 s`: **`1,303 MB`** (down from **`2,082 MB`**).
+    - Race `t=90 s`: **`1,513 MB`** (down from **`4,032 MB`** — **-2.52 GB / -62.5%**).
+    - Steady **30.0 fps** (`frame 3000 @ 96.50 s`), **0 HUNG / 0 STOP / 0 pageerror**, clean race screenshot.
