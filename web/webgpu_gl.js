@@ -1829,13 +1829,26 @@
          this._mapRange = null;
          this._mapOffset = 0;
          this._mapSize = 0;
-         try {
-            this._cpu = new ArrayBuffer(this.desc.size);
-         } catch (e) {
-            throw new PolyfillOOMError('Failed to allocate GPUBuffer of size ' + this.desc.size);
+         // RN: only mirror in JS RAM when readback/staging or dual VERTEX|INDEX migration needs it
+         // (saves ~20-32 MB of duplicate vbuf/ibuf/ubuf ArrayBuffers on 3 GB phones).
+         const u = this.desc.usage;
+         const needCpu = !!(this.desc.mappedAtCreation ||
+            (u & (GPUBufferUsage.MAP_READ | GPUBufferUsage.MAP_WRITE | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC)) ||
+            ((u & GPUBufferUsage.VERTEX) && (u & GPUBufferUsage.INDEX)));
+         this._keepCpu = !!(u & (GPUBufferUsage.MAP_READ | GPUBufferUsage.MAP_WRITE | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC));
+         if (needCpu) {
+            try {
+               this._cpu = new ArrayBuffer(this.desc.size);
+            } catch (e) {
+               throw new PolyfillOOMError('Failed to allocate GPUBuffer of size ' + this.desc.size);
+            }
+            this._cpuU8 = new Uint8Array(this._cpu);
+         } else {
+            this._cpu = null;
+            this._cpuU8 = null;
          }
-         this._cpuU8 = new Uint8Array(this._cpu);
          this._gl = null;
+         this._glIdx = null;
          this._destroyed = false;
          this._cpuGen = 1;
 
@@ -1857,7 +1870,7 @@
          this._gl = gl.createBuffer();
          if (this.desc.usage & GPUBufferUsage.UNIFORM) this._target = GL.UNIFORM_BUFFER;
          // RN: WebGL ties a buffer to ELEMENT_ARRAY_BUFFER or not for life; a VERTEX|INDEX buffer (web/gpu.js D3D buffers) gets
-         // a second GL buffer for its index use (_ensureIdx), kept in step by _flushToGl.
+         // a second GL buffer for its index use (_ensureIdx), kept in step by _flushToGl / _uploadSlice.
          else if ((this.desc.usage & GPUBufferUsage.INDEX) && !(this.desc.usage & GPUBufferUsage.VERTEX)) this._target = GL.ELEMENT_ARRAY_BUFFER;
          else this._target = GL.ARRAY_BUFFER;
          gl.bindBuffer(this._target, this._gl);
@@ -1868,14 +1881,29 @@
             while (gl.getError()) {}
                throw new PolyfillOOMError('bufferData OUT_OF_MEMORY');
          }
-         if (this._mapState !== 'mapped') {
+         if (this._mapState !== 'mapped' && this._cpuU8) {
             gl.bufferSubData(this._target, 0, this._cpuU8);
          }
          gl.bindBuffer(this._target, null);
          return this._gl;
       }
 
+      _uploadSlice(off, view) {   // RN: direct GL upload without a CPU mirror ArrayBuffer
+         const gl = this.device.gl;
+         this._cpuGen = (this._cpuGen || 0) + 1;
+         this._ensureGl();
+         gl.bindBuffer(this._target, this._gl);
+         gl.bufferSubData(this._target, off, view);
+         gl.bindBuffer(this._target, null);
+         if (this._glIdx) {
+            gl.bindVertexArray(null);
+            gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this._glIdx);
+            gl.bufferSubData(GL.ELEMENT_ARRAY_BUFFER, off, view);
+         }
+      }
+
       _flushToGl(off, len) {   // RN: off/len: only the written range (writeBuffer), not the whole buffer per write
+         if (!this._cpuU8) return;
          const gl = this.device.gl;
          this._cpuGen = (this._cpuGen || 0) + 1;
          this._ensureGl();
@@ -1899,7 +1927,12 @@
             this._glIdx = gl.createBuffer();
             gl.bindVertexArray(null);
             gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this._glIdx);
-            gl.bufferData(GL.ELEMENT_ARRAY_BUFFER, this._cpuU8, GL.DYNAMIC_DRAW);
+            if (this._cpuU8) {
+               gl.bufferData(GL.ELEMENT_ARRAY_BUFFER, this._cpuU8, GL.DYNAMIC_DRAW);
+               if (!this._keepCpu) { this._cpu = null; this._cpuU8 = null; }   // RN: release CPU mirror once mirrored in GL
+            } else {
+               gl.bufferData(GL.ELEMENT_ARRAY_BUFFER, this.desc.size, GL.DYNAMIC_DRAW);
+            }
          }
          return this._glIdx;
       }
@@ -2030,10 +2063,22 @@
 
       destroy() {
          this._destroyed = true;
-         if (this._gl && this.device._gl) {
-            this.device._gl.deleteBuffer(this._gl);
-            this._gl = null;
+         const gl = this.device._gl;
+         if (gl) {
+            if (this._gl) { gl.deleteBuffer(this._gl); this._gl = null; }
+            if (this._glIdx) { gl.deleteBuffer(this._glIdx); this._glIdx = null; }   // RN: do not leak index twin
+            if (this._storageTex) {
+               for (const k in this._storageTex) if (this._storageTex[k]?.id) gl.deleteTexture(this._storageTex[k].id);
+               this._storageTex = null;
+            }
+            if (this._storageUbo) {
+               for (const k in this._storageUbo) if (this._storageUbo[k]?.id) gl.deleteBuffer(this._storageUbo[k].id);
+               this._storageUbo = null;
+            }
          }
+         this._cpu = null;
+         this._cpuU8 = null;
+         this._mapRange = null;
       }
    }
 
@@ -2987,6 +3032,8 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
             pass: null, pipe: null, stencilRef: 0,
             vbufs, bgs, bgMax: 0, dyns, dynLens,
             idxBuf: null, idxFmtId: 0, idxOff: 0,
+            pipeDirty: true, vbDirty: true, bgDirty: 0, stencilDirty: true,
+            lastFI: -1, lastBV: -1, lastIdxBuf: null,
          };
       }
       return r;
@@ -2994,24 +3041,47 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
 
    function _replayPreDraw(gl, r, firstInstance, baseVertex) {
       const pass = r.pass, pipe = r.pipe, fb = pass._fb;
-      gl.bindFramebuffer(GL.FRAMEBUFFER, fb);
-      pipe._setup(gl, fb, pass._colors, pass._ds, pass._flipY);
-      pipe._setVertexBuffers(gl, r.vbufs, firstInstance, baseVertex);
-      const fi = uloc(gl, pipe.prog, 'webgpu_first_instance');
-      if (fi) gl.uniform1ui(fi, firstInstance);
-      const fy = uloc(gl, pipe.prog, 'webgpu_flip_y');
-      if (fy) gl.uniform1f(fy, pass._flipY ? -1 : 1);
-      for (let i = 0; i < r.bgMax; i++) {
-         const bg = r.bgs[i];
-         if (bg) applyBindGroup(gl, pipe, i, bg, r.dyns[i], r.dynLens[i]);
+      const pipeChanged = r.pipeDirty;
+      if (pipeChanged) {
+         pipe._setup(gl, fb, pass._colors, pass._ds, pass._flipY);
+         const fy = uloc(gl, pipe.prog, 'webgpu_flip_y');
+         if (fy) gl.uniform1f(fy, pass._flipY ? -1 : 1);
+         r.pipeDirty = false;
+         r.vbDirty = true;
+         r.bgDirty = (1 << r.bgMax) - 1;
+         r.stencilDirty = true;
+         r.lastFI = -1;
+         r.lastBV = -1;
+         r.lastIdxBuf = null;
       }
-      if (pipe.depthStencil) {
+      if (r.vbDirty || firstInstance !== r.lastFI || baseVertex !== r.lastBV) {
+         pipe._setVertexBuffers(gl, r.vbufs, firstInstance, baseVertex);
+         r.vbDirty = false;
+         r.lastBV = baseVertex;
+      }
+      if (firstInstance !== r.lastFI) {
+         const fi = uloc(gl, pipe.prog, 'webgpu_first_instance');
+         if (fi) gl.uniform1ui(fi, firstInstance);
+         r.lastFI = firstInstance;
+      }
+      let bgd = r.bgDirty;
+      if (bgd) {
+         for (let i = 0; i < r.bgMax; i++) {
+            if (bgd & (1 << i)) {
+               const bg = r.bgs[i];
+               if (bg) applyBindGroup(gl, pipe, i, bg, r.dyns[i], r.dynLens[i]);
+            }
+         }
+         r.bgDirty = 0;
+      }
+      if (r.stencilDirty && pipe.depthStencil) {
          const dsDesc = pipe.depthStencil;
          const front = (dsDesc.stencilFront && dsDesc.stencilFront.compare) || 'always';
          const back = (dsDesc.stencilBack && dsDesc.stencilBack.compare) || 'always';
          const read = dsDesc.stencilReadMask !== undefined ? dsDesc.stencilReadMask : 0xffffffff;
          gl.stencilFuncSeparate(GL.FRONT, COMPARE_FUNC[front], r.stencilRef, read);
          gl.stencilFuncSeparate(GL.BACK, COMPARE_FUNC[back], r.stencilRef, read);
+         r.stencilDirty = false;
       }
    }
 
@@ -3024,9 +3094,17 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          if (op === CMD_DRAW_IDX) {
             const indexCount = nums[ni++], instanceCount = nums[ni++], firstIndex = nums[ni++], baseVertex = nums[ni++], firstInstance = nums[ni++];
             const gl = device.gl;
+            if (!r.idxBuf._glIdx && r.idxBuf._target !== GL.ELEMENT_ARRAY_BUFFER) {
+               r.idxBuf._ensureIdx();
+               r.pipeDirty = true;
+            }
             _replayPreDraw(gl, r, firstInstance, baseVertex);
             const fmt = r.idxFmtId === 1 ? INDEX_FORMAT.uint32 : INDEX_FORMAT.uint16;
-            gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, r.idxBuf._ensureIdx());
+            const ebo = r.idxBuf._ensureIdx();
+            if (ebo !== r.lastIdxBuf) {
+               gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, ebo);
+               r.lastIdxBuf = ebo;
+            }
             gl.drawElementsInstanced(PRIM_TOPO[r.pipe.primitive.topology], indexCount, fmt.type, r.idxOff + firstIndex * fmt.size, instanceCount);
          } else if (op === CMD_BG) {
             const bg = objs[oi++];
@@ -3037,18 +3115,22 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
             if (slot + 1 > r.bgMax) r.bgMax = slot + 1;
             const dst = r.dyns[slot];
             for (let k = 0; k < dlen; k++) dst[k] = nums[ni++];
+            r.bgDirty |= (1 << slot);
          } else if (op === CMD_VB) {
             const buf = objs[oi++];
             const slot = nums[ni++], off = nums[ni++];
             while (slot >= r.vbufs.length) r.vbufs.push({ buffer: null, offset: 0 });
             r.vbufs[slot].buffer = buf || null;
             r.vbufs[slot].offset = off;
+            r.vbDirty = true;
          } else if (op === CMD_IB) {
             r.idxBuf = objs[oi++];
             r.idxFmtId = nums[ni++];
             r.idxOff = nums[ni++];
+            r.lastIdxBuf = null;
          } else if (op === CMD_PIPE) {
-            r.pipe = objs[oi++];
+            const p = objs[oi++];
+            if (p !== r.pipe) { r.pipe = p; r.pipeDirty = true; }
          } else if (op === CMD_DRAW) {
             const vertexCount = nums[ni++], instanceCount = nums[ni++], firstVertex = nums[ni++], firstInstance = nums[ni++];
             const gl = device.gl;
@@ -3065,13 +3147,16 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
             gl.enable(GL.SCISSOR_TEST);
             gl.scissor(x, y, w, h);
          } else if (op === CMD_STENCIL) {
-            r.stencilRef = nums[ni++];
+            const ref = nums[ni++];
+            if (ref !== r.stencilRef) { r.stencilRef = ref; r.stencilDirty = true; }
          } else if (op === CMD_BLEND) {
             const cr = nums[ni++], cg = nums[ni++], cb = nums[ni++], ca = nums[ni++];
             device.gl.blendColor(cr, cg, cb, ca);
          } else if (op === CMD_PASS_BEGIN) {
             const pass = objs[oi++];
             r.pass = pass; r.pipe = null; r.stencilRef = 0; r.idxBuf = null; r.bgMax = 0;
+            r.pipeDirty = true; r.vbDirty = true; r.bgDirty = 0; r.stencilDirty = true;
+            r.lastFI = -1; r.lastBV = -1; r.lastIdxBuf = null;
             for (let i = 0; i < r.bgs.length; i++) { r.bgs[i] = null; r.dynLens[i] = 0; }
             for (let i = 0; i < r.vbufs.length; i++) r.vbufs[i].buffer = null;
             pass._beginGL();
@@ -3079,6 +3164,8 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
             const pass = objs[oi++];
             pass._endGL();
             r.pass = null; r.pipe = null; r.idxBuf = null; r.bgMax = 0;
+            r.pipeDirty = true; r.vbDirty = true; r.bgDirty = 0; r.stencilDirty = true;
+            r.lastFI = -1; r.lastBV = -1; r.lastIdxBuf = null;
             for (let i = 0; i < r.bgs.length; i++) { r.bgs[i] = null; r.dynLens[i] = 0; }
             for (let i = 0; i < r.vbufs.length; i++) r.vbufs[i].buffer = null;
          } else {
@@ -3102,6 +3189,10 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
       }
    }
 
+   // RN: reusable scratch arrays for pass clears/drawBuffers (zero allocations per render pass)
+   const _CLEAR_COL = new Float32Array(4), _CLEAR_DEP = new Float32Array(1), _CLEAR_STEN = new Int32Array(1);
+   const _DB_NONE = [GL.NONE], _DB_C0 = [GL.COLOR_ATTACHMENT0];
+
    class GPURenderPassEncoder {
       constructor(encoder, desc) {
          this.encoder = encoder;
@@ -3109,13 +3200,22 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          this._ended = false;
          this._pipeline = null;
          this._hasIndex = false;
-         const colors = (desc.colorAttachments || []).filter(a => a && (a.view || a.attachment)).map(a => ({
-            view: a.view || a.attachment,
-            resolveTarget: a.resolveTarget || null,
-            loadOp: a.loadOp,
-            storeOp: a.storeOp || 'store',
-            clearValue: asColor(a.clearValue || a.clearColor),
-         }));
+         const rawColors = desc.colorAttachments;
+         const colors = [];
+         if (rawColors) {
+            for (let i = 0; i < rawColors.length; i++) {
+               const a = rawColors[i];
+               if (a && (a.view || a.attachment)) {
+                  colors.push({
+                     view: a.view || a.attachment,
+                     resolveTarget: a.resolveTarget || null,
+                     loadOp: a.loadOp,
+                     storeOp: a.storeOp || 'store',
+                     clearValue: asColor(a.clearValue || a.clearColor),
+                  });
+               }
+            }
+         }
          this._colors = colors;
          this._ds = desc.depthStencilAttachment || null;
          VALIDATE(colors.length || this._ds, 'Render pass needs a color or depth attachment.');
@@ -3128,7 +3228,14 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          this._fb = null;
          const direct = colors.length === 1 && colors[0].view.tex._swapchain && !colors[0].resolveTarget;
          this._direct = !!direct;
-         this._flipY = !direct && !colors.some(c => (c.view && c.view.tex && c.view.tex._swapchain) || (c.resolveTarget && c.resolveTarget.tex && c.resolveTarget.tex._swapchain));
+         let hasSwap = direct;
+         if (!hasSwap) {
+            for (let i = 0; i < colors.length; i++) {
+               const c = colors[i];
+               if ((c.view && c.view.tex && c.view.tex._swapchain) || (c.resolveTarget && c.resolveTarget.tex && c.resolveTarget.tex._swapchain)) { hasSwap = true; break; }
+            }
+         }
+         this._flipY = !hasSwap;
          encoder._opObj(CMD_PASS_BEGIN, this);
          this.setViewport(0, 0, this._size.width, this._size.height, 0, 1);
          this.setScissorRect(0, 0, this._size.width, this._size.height);
@@ -3137,53 +3244,68 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
       _beginGL() {
          const gl = this.device.gl;
          if (!this._direct) {
-            this._fb = gl.createFramebuffer();
-            gl.bindFramebuffer(GL.FRAMEBUFFER, this._fb);
-            this._colors.forEach((c, i) => {
+            // RN: reuse one persistent pass FBO per device (avoids ~300 create/deleteFramebuffer + sync checkFramebufferStatus IPC stalls/s)
+            let fb = this.device._passFb;
+            if (!fb) fb = this.device._passFb = gl.createFramebuffer();
+            this._fb = fb;
+            gl.bindFramebuffer(GL.FRAMEBUFFER, fb);
+            const prevColors = this.device._passFbColors || 0;
+            for (let i = 0; i < this._colors.length; i++) {
+               const c = this._colors[i];
                if (c.view.tex._swapchain) c.view.tex._ensureGl();
                c.view._attach(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0 + i);
-            });
+            }
+            for (let i = this._colors.length; i < prevColors; i++) {
+               gl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0 + i, GL.TEXTURE_2D, null, 0);
+            }
+            this.device._passFbColors = this._colors.length;
+            const prevDs = this.device._passFbDs || 0;
+            let curDs = 0;
             if (this._ds) {
                const v = this._ds.view || this._ds.attachment;
-               if (v._depth && v._stencil) v._attach(GL.FRAMEBUFFER, GL.DEPTH_STENCIL_ATTACHMENT);
-               else if (v._depth) v._attach(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT);
-               else if (v._stencil) v._attach(GL.FRAMEBUFFER, GL.STENCIL_ATTACHMENT);
+               if (v._depth && v._stencil) { v._attach(GL.FRAMEBUFFER, GL.DEPTH_STENCIL_ATTACHMENT); curDs = 3; }
+               else if (v._depth) {
+                  if (prevDs === 3 || prevDs === 2) gl.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.STENCIL_ATTACHMENT, GL.RENDERBUFFER, null);
+                  v._attach(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT); curDs = 1;
+               } else if (v._stencil) {
+                  if (prevDs === 3 || prevDs === 1) gl.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, null);
+                  v._attach(GL.FRAMEBUFFER, GL.STENCIL_ATTACHMENT); curDs = 2;
+               }
+            } else if (prevDs) {
+               if (prevDs === 3) gl.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_STENCIL_ATTACHMENT, GL.RENDERBUFFER, null);
+               else if (prevDs === 1) gl.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, null);
+               else if (prevDs === 2) gl.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.STENCIL_ATTACHMENT, GL.RENDERBUFFER, null);
             }
+            this.device._passFbDs = curDs;
             // Depth-only FBOs are incomplete unless the default COLOR_ATTACHMENT0
             // draw/read buffers are disabled.
             if (!this._colors.length) {
-               gl.drawBuffers([GL.NONE]);
+               gl.drawBuffers(_DB_NONE);
                gl.readBuffer(GL.NONE);
+            } else if (this._colors.length === 1) {
+               gl.drawBuffers(_DB_C0);
             } else {
                const bufs = [];
                for (let i = 0; i < this._colors.length; i++) bufs.push(GL.COLOR_ATTACHMENT0 + i);
                gl.drawBuffers(bufs);
             }
-            const status = gl.checkFramebufferStatus(GL.FRAMEBUFFER);
-            if (status !== GL.FRAMEBUFFER_COMPLETE) {
-               console.warn('webgpu-js: framebuffer incomplete 0x' + status.toString(16) + '; falling back to the default backbuffer.');
-               gl.deleteFramebuffer(this._fb);
-               gl.bindFramebuffer(GL.FRAMEBUFFER, null);
-               this._fb = null;
-               this._direct = true;
-               this._flipY = false;
-            }
          } else {
             gl.bindFramebuffer(GL.FRAMEBUFFER, null);
          }
          gl.disable(GL.SCISSOR_TEST);   // RN: a load 'clear' covers the whole attachment, whatever the last pass left in scissor/masks
-         this._colors.forEach((c, i) => {
+         for (let i = 0; i < this._colors.length; i++) {
+            const c = this._colors[i];
             if (c.loadOp === 'clear') {
-               const col = [c.clearValue.r, c.clearValue.g, c.clearValue.b, c.clearValue.a];
                gl.colorMask(true, true, true, true);
                if (this._direct) {
-                  gl.clearColor(col[0], col[1], col[2], col[3]);
+                  gl.clearColor(c.clearValue.r, c.clearValue.g, c.clearValue.b, c.clearValue.a);
                   gl.clear(GL.COLOR_BUFFER_BIT);
                } else {
-                  gl.clearBufferfv(GL.COLOR, i, col);
+                  _CLEAR_COL[0] = c.clearValue.r; _CLEAR_COL[1] = c.clearValue.g; _CLEAR_COL[2] = c.clearValue.b; _CLEAR_COL[3] = c.clearValue.a;
+                  gl.clearBufferfv(GL.COLOR, i, _CLEAR_COL);
                }
             }
-         });
+         }
          if (this._ds) {
             const ds = this._ds;
             const clearDepth = ds.depthLoadOp === 'clear' || ds.depthLoadOp === undefined;
@@ -3194,12 +3316,14 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
                   gl.clearDepth(depthVal);
                   gl.clear(GL.DEPTH_BUFFER_BIT);
                } else {
-                  gl.clearBufferfv(GL.DEPTH, 0, [depthVal]);
+                  _CLEAR_DEP[0] = depthVal;
+                  gl.clearBufferfv(GL.DEPTH, 0, _CLEAR_DEP);
                }
             }
             if (ds.stencilLoadOp === 'clear') {   // RN: the stencil half of depth24plus-stencil8 was never cleared
                gl.stencilMask(0xff);
-               gl.clearBufferiv(GL.STENCIL, 0, [ds.stencilClearValue || 0]);
+               _CLEAR_STEN[0] = ds.stencilClearValue || 0;
+               gl.clearBufferiv(GL.STENCIL, 0, _CLEAR_STEN);
             }
          }
          gl.viewport(0, 0, this._size.width, this._size.height);
@@ -3316,7 +3440,7 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          });
          gl.bindFramebuffer(GL.READ_FRAMEBUFFER, null);
          gl.bindFramebuffer(GL.DRAW_FRAMEBUFFER, null);
-         if (this._fb) gl.deleteFramebuffer(this._fb);
+         this._fb = null;   // RN: _passFb is reused across passes on the device
       }
 
       end() {
@@ -3574,28 +3698,29 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
             const gl = this.device.gl;
             const ext = asExtent3D(size);
             src.texture._ensureGl();
+            const read = this.device._copyReadFb || (this.device._copyReadFb = gl.createFramebuffer());
             if (dst.texture._swapchain) {   // RN: a copy into the canvas texture goes to the canvas itself (rows top-down -> GL bottom-up)
-               const read = gl.createFramebuffer();
                gl.bindFramebuffer(GL.READ_FRAMEBUFFER, read);
                gl.framebufferTexture2D(GL.READ_FRAMEBUFFER, GL.COLOR_ATTACHMENT0, src.texture._gl.target, src.texture._gl, src.mipLevel || 0);
                gl.bindFramebuffer(GL.DRAW_FRAMEBUFFER, null);
                gl.disable(GL.SCISSOR_TEST);   // RN: a blit obeys the scissor; WebGPU copies do not
                gl.blitFramebuffer(0, 0, ext.width, ext.height, 0, ext.height, ext.width, 0, GL.COLOR_BUFFER_BIT, GL.NEAREST);
+               gl.framebufferTexture2D(GL.READ_FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, null, 0);
                gl.bindFramebuffer(GL.READ_FRAMEBUFFER, null);
-               gl.deleteFramebuffer(read);
                return;
             }
             dst.texture._ensureGl();
-            const read = gl.createFramebuffer();
-            const draw = gl.createFramebuffer();
+            const draw = this.device._copyDrawFb || (this.device._copyDrawFb = gl.createFramebuffer());
             gl.bindFramebuffer(GL.READ_FRAMEBUFFER, read);
             gl.framebufferTexture2D(GL.READ_FRAMEBUFFER, GL.COLOR_ATTACHMENT0, src.texture._gl.target, src.texture._gl, src.mipLevel || 0);
             gl.bindFramebuffer(GL.DRAW_FRAMEBUFFER, draw);
             gl.framebufferTexture2D(GL.DRAW_FRAMEBUFFER, GL.COLOR_ATTACHMENT0, dst.texture._gl.target, dst.texture._gl, dst.mipLevel || 0);
             gl.disable(GL.SCISSOR_TEST);   // RN: a blit obeys the scissor; WebGPU copies do not
             gl.blitFramebuffer(0, 0, ext.width, ext.height, 0, 0, ext.width, ext.height, GL.COLOR_BUFFER_BIT, GL.NEAREST);
-            gl.deleteFramebuffer(read);
-            gl.deleteFramebuffer(draw);
+            gl.framebufferTexture2D(GL.READ_FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, null, 0);
+            gl.framebufferTexture2D(GL.DRAW_FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, null, 0);
+            gl.bindFramebuffer(GL.READ_FRAMEBUFFER, null);
+            gl.bindFramebuffer(GL.DRAW_FRAMEBUFFER, null);
             markMipWritten(dst.texture, dst.mipLevel);
          });
       }
@@ -3631,33 +3756,35 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          } catch (e) { this.device._catch(e); }
       }
       _kick() {
-         const gl = this.device._gl;
-         if (!gl) return;
-         this._pending = this._pending.then(() => new Promise(resolve => {
-            setTimeout(resolve, 0);   // RN: no gl.finish(): it stalled the page on the GPU at every submit (web/gpu.js only logs with it)
-         }));
+         // RN: no per-submit Promise/setTimeout(0) chain (on iOS Safari, 60 submits/s outpaced clamped 4 ms timers and leaked promises).
       }
       onSubmittedWorkDone() {
          const gl = this.device._gl;
          if (gl) {
             try { gl.finish(); } catch (e) {}
          }
-         return this._pending;
+         return Promise.resolve();
       }
       writeBuffer(buffer, bufferOffset, data, dataOffset, size) {
          const bpe = data.BYTES_PER_ELEMENT || 1;
          const off = (dataOffset || 0) * bpe;
          const dstOff = bufferOffset || 0;
-         let count;
+         let src, count;
          if (data instanceof Uint8Array) {
             count = size !== undefined ? size : (data.byteLength - off);
-            buffer._cpuU8.set(off === 0 && count === data.byteLength ? data : data.subarray(off, off + count), dstOff);
+            src = (off === 0 && count === data.byteLength) ? data : data.subarray(off, off + count);
          } else {
-            const src = data.buffer ? new Uint8Array(data.buffer, data.byteOffset, data.byteLength) : new Uint8Array(data);
-            count = size !== undefined ? size * bpe : (src.byteLength - off);
-            buffer._cpuU8.set(off === 0 && count === src.byteLength ? src : src.subarray(off, off + count), dstOff);
+            const u8 = data.buffer ? new Uint8Array(data.buffer, data.byteOffset, data.byteLength) : new Uint8Array(data);
+            count = size !== undefined ? size * bpe : (u8.byteLength - off);
+            src = (off === 0 && count === u8.byteLength) ? u8 : u8.subarray(off, off + count);
          }
-         if (this.device._gl) buffer._flushToGl(dstOff, count);
+         if (buffer._cpuU8) {
+            buffer._cpuU8.set(src, dstOff);
+            if (this.device._gl) buffer._flushToGl(dstOff, count);
+         } else {
+            this.device.gl;
+            buffer._uploadSlice(dstOff, src);
+         }
       }
       writeTexture(dest, data, dataLayout, size) {
          const tex = dest.texture;
@@ -3735,6 +3862,8 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          gl.canvas.addEventListener('webglcontextlost', (e) => {
             e.preventDefault();
             if (gl._resetSameState) gl._resetSameState();
+            this._passFb = this._copyReadFb = this._copyDrawFb = this._resolveFb = null;
+            this._passFbColors = 0; this._passFbDs = 0;
             this._lose('unknown', 'WebGL context lost.');
          });
          gl.canvas.addEventListener('webglcontextrestored', () => {

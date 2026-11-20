@@ -90,3 +90,15 @@ After `31c1167` (1024 MB WASM, 384 MB guest, 4 MB stacks) + `57c6aee` (`gpu.js` 
     - Race `t=60 s`: **`1,303 MB`** (down from **`2,082 MB`**).
     - Race `t=90 s`: **`1,513 MB`** (down from **`4,032 MB`** — **-2.52 GB / -62.5%**).
     - Steady **30.0 fps** (`frame 3000 @ 96.50 s`), **0 HUNG / 0 STOP / 0 pageerror**, clean race screenshot.
+
+### 7. iPhone XR Race Crash Fix (`host/win32.c`, `web/webgpu_gl.js`, `web/boot.js`)
+- **Root cause 1 (`host/win32.c:1164`)**: `win32_init()` rejected any `RN_SCREEN` with `sh < 480`, silently falling back to **`1920×1080`**. On 19.5:9 phones (iPhone XR / 14) with `BB=960`, `bh=442 < 480`, so EVERY iPhone on WebGL2 was rendering **4.9× too many pixels** (`1920×1080` instead of `960×442`) and burning ~75 MB extra VRAM. Lowered minimum height to `320`.
+- **Root cause 2 (`web/webgpu_gl.js`)**:
+  - `GPUQueue._kick()` chained `this._pending = this._pending.then(() => new Promise(r => setTimeout(r, 0)))` on every `submit()` (60/s), outpacing Safari's clamped 4 ms timers. Removed.
+  - `GPUBuffer` allocated a full JS `_cpu` ArrayBuffer mirror for write-only single-usage buffers (`vbuf`/`ibuf`/`ubuf` ~20–32 MB) and `destroy()` leaked `_glIdx` GL buffers. Skipped `_cpu` for single-usage buffers, released `_cpu` once `_glIdx` is created, and deleted `_glIdx` + `_storageTex`/`_storageUbo` on `destroy()`.
+  - `GPURenderPassEncoder._beginGL()` and `copyTextureToTexture()` created/deleted `WebGLFramebuffer`s and called synchronous `gl.checkFramebufferStatus()` on every pass (~300/s). Replaced with persistent pooled FBOs on `device` (`_passFb`, `_copyReadFb`, `_copyDrawFb`).
+  - `_replayPreDraw()` re-bound pipeline, vertex attributes, uniforms, bind groups, and stencil state on every draw call (2,200/frame). Added dirty-state tracking in `replayTape()`.
+- **Root cause 3 (`web/boot.js`)**: lowered phone `RN_RANGEMB` `96 -> 32 MB` (saves 64 MB WASM RAM while keeping 4 MB whole-file reads) and added `?v=RN_V` cache-busting to `webgpu_gl.js`.
+- **Verified (Playwright WebKit `NOGPU=1`, iPhone `844×390` dpr 2, `dist/`, `footprint -p`, shot `web/plan/shots/wk_gl_xr.png`)**:
+  - `present 960x442` confirmed; `d3d9 race HUD` at **`27.56 s`**.
+  - Menus (`5–20 s`): **`638–664 MB`**; Race HUD (`30–35 s`): **`901–902 MB`** (was `1,078 MB`); `t=61 s`: **`996 MB`** (was `1,303 MB`); `t=91 s`: **`1,126 MB`** (was `1,513 MB` in `e79e9d2` / `4,032 MB` live in `d6ef04c`). Steady 30 fps, **0 HUNG / 0 STOP / 0 pageerror**.
