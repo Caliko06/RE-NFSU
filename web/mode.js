@@ -34,10 +34,11 @@ const RN_MODE = (() => {
 // ?fx=0: the remaster's visual effects off (texture pack, HD skins, bloom, FXAA, sharpen, aniso, car and road shader
 //        terms back to the shipped ones); the remaster's gameplay and camera keys stay. ?fps=30: host RN_FPS (frame pacer).
 const RN_FX_OFF = ['remaster', 'skinhd', 'bloom', 'fxaa', 'sharp', 'aniso', 'carlook', 'cardetail', 'roadrefl'];
+const RN_SHARP_EXPLICIT = new URLSearchParams(RN_SEARCH).has('sharp');
 const RN_Q = (() => {
   const q = new URLSearchParams(RN_SEARCH);
-  // Phones draw 1280 wide and scale up: the sharpen-on-upscale pass stays on for them (OWNER 2026-11-15), the other effects off.
-  if (RN_PHONE && !q.has('sharp')) q.set('sharp', '0.5');
+  // WebGPU phones keep sharpen on upscale (OWNER 2026-11-15); boot.js turns this default off for WebGL2 after adapter detection.
+  if (RN_PHONE && !RN_SHARP_EXPLICIT) q.set('sharp', '0.5');
   if (RN_MODE === 'original') for (const [k, v] of Object.entries(RN_ORIGINAL)) if (!q.has(k)) q.set(k, v);
   if (RN_PHONE && !q.has('fx')) q.set('fx', '0');
   if (q.get('fx') === '0') for (const k of RN_FX_OFF) if (!q.has(k)) q.set(k, RN_ORIGINAL[k]);

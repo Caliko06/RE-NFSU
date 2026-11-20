@@ -99,7 +99,10 @@ async function download(url, what) {
   if (!crossOriginIsolated || typeof SharedArrayBuffer === 'undefined') { line('sin aislamiento: crossOriginIsolated false (COOP/COEP); WebViews like LineageOS Jelly never isolate', 'stop'); return; }
   // No WebGPU adapter (iOS 18 and older, Firefox on Android/Linux, old Android) or ?gl=1: WebGPU on WebGL 2 (web/webgpu_gl.js). It
   // replaces navigator.gpu and canvas.getContext('webgpu'), so it is loaded only here, never next to a working WebGPU.
-  if (RN_Q.get('gl') === '1' || !await navigator.gpu?.requestAdapter().catch(() => null)) {
+  const webgl2 = RN_Q.get('gl') === '1' || !await navigator.gpu?.requestAdapter().catch(() => null);
+  if (webgl2) {
+    // Resolve the mobile default before startGpu consumes RN_Q; this visit's ?sharp= still wins.
+    if ((RN_PHONE || RN_APP.coarse) && !RN_SHARP_EXPLICIT) RN_Q.set('sharp', 'off');
     if (!document.createElement('canvas').getContext('webgl2')) { line('gpu.js: este navegador no tiene WebGPU ni WebGL 2', 'stop'); return; }
     await new Promise((ok, no) => document.head.appendChild(Object.assign(document.createElement('script'), { src: 'webgpu_gl.js', onload: ok, onerror: no })));
     navigator.gpu.gpu_js.canvas = document.getElementById('screen');
@@ -139,8 +142,8 @@ async function download(url, what) {
       const home = RN_APP.coarse && (navigator.standalone || matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches);
       const turned = RN_APP.coarse && innerHeight > innerWidth;
       const vw = home ? Math.max(screen.width, screen.height) : turned ? innerHeight : innerWidth, vh = home ? Math.min(screen.width, screen.height) : turned ? innerWidth : innerHeight;
-      const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || (RN_APP.coarse ? 1280 : 2560)), k = Math.min(1, BB / (vw * dpr), BB * 9 / 16 / (vh * dpr));
-      // Phones and tablets (coarse pointer): 1280 wide; an iPhone tab at 2560 was killed by iOS after 20-40 s (memory, likely).
+      const dpr = window.devicePixelRatio || 1, BB = Number(RN_Q.get('bbmax') || ((RN_PHONE || RN_APP.coarse) ? (webgl2 ? 960 : 1280) : 2560)), k = Math.min(1, BB / (vw * dpr), BB * 9 / 16 / (vh * dpr));
+      // Phones and tablets: at most 960x540 on WebGL2, 1280x720 on WebGPU; ?bbmax= overrides either default.
       // Even sizes: the layer keeps width and height even (host/win32.c). At k = 1 the canvas gets exactly
       // back buffer / dpr CSS pixels, centred, so one back-buffer pixel is one device pixel; k < 1: Chrome scales it up.
       const bw = 2 * Math.floor(vw * dpr * k / 2), bh = 2 * Math.floor(vh * dpr * k / 2);

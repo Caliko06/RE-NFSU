@@ -200,11 +200,11 @@ async function startGpu(M, canvas, report, onFrame) {
     const t = performance.now();
     device.queue.copyExternalImageToTexture({ source: base }, { texture: tex, mipLevel: 0 }, [W, H]);
     base.close();
-    const e = device.createCommandEncoder();
+    const e = device.createCommandEncoder(), mp = getMipPipe();
     for (let l = 1; l < levels; l++) {
       const p = e.beginRenderPass({ colorAttachments: [{ view: tex.createView({ baseMipLevel: l, mipLevelCount: 1 }), loadOp: 'clear', storeOp: 'store' }] });
-      p.setPipeline(mipPipe);
-      p.setBindGroup(0, device.createBindGroup({ layout: mipPipe.getBindGroupLayout(0), entries: [
+      p.setPipeline(mp);
+      p.setBindGroup(0, device.createBindGroup({ layout: mp.getBindGroupLayout(0), entries: [
         { binding: 0, resource: tex.createView({ baseMipLevel: l - 1, mipLevelCount: 1 }) }, { binding: 1, resource: skinLin }] }));
       p.draw(3); p.end();
     }
@@ -293,7 +293,8 @@ async function startGpu(M, canvas, report, onFrame) {
   // frame. Pixels whose neighbourhood has little contrast are returned untouched, so textures keep their detail. ?fxaa=0 turns it off.
   const FXAA_MODE = RN_Q.get('fxaa');   // '0' off, '2' debug: edges in red
   const FXAA_ON = FXAA_MODE !== '0';
-  const fxaaMod = device.createShaderModule({ code: `
+  let fxaaMod = null, fxaaPipe = null;
+  const getFxaaMod = () => fxaaMod ??= device.createShaderModule({ code: `
 const DBG = ${FXAA_MODE === '2' ? 1 : 0};
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
@@ -370,8 +371,14 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
   if (!horzSpan) { uv.x = uv.x + pixelOffsetSubpix * lengthSign; } else { uv.y = uv.y + pixelOffsetSubpix * lengthSign; }
   return vec4f(textureSampleLevel(src, smp, uv, 0.0).rgb, m4.a);
 }` });
-  const fxaaPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: fxaaMod, entryPoint: 'vs' },
-    fragment: { module: fxaaMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const getFxaaPipe = () => {
+    if (!fxaaPipe) {
+      const mod = getFxaaMod();
+      fxaaPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: mod, entryPoint: 'vs' },
+        fragment: { module: mod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+    }
+    return fxaaPipe;
+  };
   const fxaaSamp = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   let fxaaTmp = null;
   // BRIDGE: remaster, the last step of a frame. The back buffer is at most 2560 wide (web/index.html), so on the OWNER's
@@ -380,7 +387,8 @@ const Q = array<f32, 12>(1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 4.0, 
   // nearest texels each sharpened by their contrast, then blended), so the 1.5x upscale keeps edges and text crisp.
   // ?sharp=0..1 is CAS's sharpness (default 0.5); ?sharp=off = the old copy at the back buffer size.
   const SHARP_Q = RN_Q.get('sharp'), SHARP = SHARP_Q === 'off' ? -1 : Number(SHARP_Q ?? 0.5);
-  const casMod = device.createShaderModule({ code: `
+  let casMod = null, casPipe = null;
+  const getCasMod = () => casMod ??= device.createShaderModule({ code: `
 struct U { scale: vec2f, peak: f32, pad: f32, inMax: vec2i };
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var<uniform> u: U;
@@ -422,8 +430,14 @@ fn amp(a: vec3f, b: vec3f, c: vec3f, d: vec3f, e: vec3f, mn: ptr<function, f32>,
   let sum = (b + e) * qbe + (c + h) * qch + (i + n) * qir + (l + o) * qlo + f * qf + g * qg + j * qj + k * qk;
   return vec4f(clamp(sum / (2.0 * (qbe + qch + qir + qlo) + qf + qg + qj + qk), vec3f(0.0), vec3f(1.0)), 1.0);
 }` });
-  const casPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: casMod, entryPoint: 'vs' },
-    fragment: { module: casMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const getCasPipe = () => {
+    if (!casPipe) {
+      const mod = getCasMod();
+      casPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: mod, entryPoint: 'vs' },
+        fragment: { module: mod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+    }
+    return casPipe;
+  };
   const casU = device.createBuffer({ size: 32, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
   // The canvas's size in device pixels (what the screen shows), kept by a ResizeObserver.
   let disp = null;
@@ -440,7 +454,8 @@ fn amp(a: vec3f, b: vec3f, c: vec3f, d: vec3f, e: vec3f, mn: ptr<function, f32>,
   // bright pass starts at luma 0.55 and adds back at 0.35 (the default lifts only near-white, 0.72 at 0.2).
   const BLOOM_MODE = RN_Q.get('bloom'), BLOOM_ON = BLOOM_MODE !== '0';
   const [BLOOM_T, BLOOM_W] = BLOOM_MODE?.startsWith('lights') ? ['0.55', '0.35'] : ['0.72', '0.2'];   // lights-split: A/B
-  const bloomMod = device.createShaderModule({ code: `
+  let bloomMod = null, bloomPipes = null;
+  const getBloomMod = () => bloomMod ??= device.createShaderModule({ code: `
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
 struct V { @builtin(position) p: vec4f, @location(0) uv: vec2f };
@@ -469,11 +484,14 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
   let k = select(${BLOOM_W}, ${BLOOM_W} * step(0.5, v.uv.x), ${BLOOM_MODE?.endsWith('split') ? 'true' : 'false'});
   return vec4f(textureSampleLevel(src, smp, v.uv, 0.0).rgb * k, 0.0);
 }` });
-  const bloomPipe = (fs, sc) => device.createRenderPipeline({ layout: 'auto', vertex: { module: bloomMod, entryPoint: 'vs' },
-    fragment: { module: bloomMod, entryPoint: fs, targets: [{ format: 'rgba8unorm', ...(fs === 'add' ? { blend: {
-      color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } } : {}) }] },
-    primitive: { topology: 'triangle-list' }, multisample: { count: sc } });
-  const bloomPipes = BLOOM_ON ? { bright: bloomPipe('bright', 1), blurH: bloomPipe('blurH', 1), blurV: bloomPipe('blurV', 1), add: new Map() } : null;
+  const bloomPipe = (fs, sc) => {
+    const mod = getBloomMod();
+    return device.createRenderPipeline({ layout: 'auto', vertex: { module: mod, entryPoint: 'vs' },
+      fragment: { module: mod, entryPoint: fs, targets: [{ format: 'rgba8unorm', ...(fs === 'add' ? { blend: {
+        color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } } : {}) }] },
+      primitive: { topology: 'triangle-list' }, multisample: { count: sc } });
+  };
+  const getBloomPipes = () => bloomPipes ??= { bright: bloomPipe('bright', 1), blurH: bloomPipe('blurH', 1), blurV: bloomPipe('blurV', 1), add: new Map() };
   // A resource replaced while the frame is being encoded is destroyed after the frame's submit: the game reuses a
   // buffer or texture id mid-frame (GPU_BUFFER on a live id), and destroying it at once made WebGPU reject the whole
   // frame's command buffer ("used in submit while destroyed": 2 frames lost per race, build/bench/f_default_bc7).
@@ -495,12 +513,13 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
       p.end();
     };
     const to = t => ({ view: t.createView(), loadOp: 'clear', clearValue: [0, 0, 0, 1], storeOp: 'store' });
-    step(bloomPipes.bright, rt.tex, to(bloomA), 'bloom bright');
-    step(bloomPipes.blurH, bloomA, to(bloomB), 'bloom blur');
-    step(bloomPipes.blurV, bloomB, to(bloomA), 'bloom blur');
+    const bp = getBloomPipes();
+    step(bp.bright, rt.tex, to(bloomA), 'bloom bright');
+    step(bp.blurH, bloomA, to(bloomB), 'bloom blur');
+    step(bp.blurV, bloomB, to(bloomA), 'bloom blur');
     const sc = rt.msView ? rt.sc : 1;
-    if (!bloomPipes.add.has(sc)) bloomPipes.add.set(sc, bloomPipe('add', sc));
-    step(bloomPipes.add.get(sc), bloomA, colorAtt(rt), 'bloom add');
+    if (!bp.add.has(sc)) bp.add.set(sc, bloomPipe('add', sc));
+    step(bp.add.get(sc), bloomA, colorAtt(rt), 'bloom add');
   }
 
   // BRIDGE: PS2 speed blur with the scene's real depth, not in the PC game. Source: SLUS_208.11 0x113fc8 (read in the corpus C and the
@@ -533,7 +552,8 @@ fn blur(uv: vec2f, d: vec2f) -> vec4f {
   const PS_OFF = [2.3, 6.4, 8.8, 11.4, 22, 40], PS_ALPHA = [50, 35, 28, 17];
   const PS_FAR = Number(RN_Q.get('psfar') || 200);   // metres where the depth byte reaches 255 (not with ?psweight=ps2)
   const PS_W2 = RN_Q.get('psweight') === 'ps2', PS_NEAR = Number(RN_Q.get('psnear') || 0.5);
-  const psMod = device.createShaderModule({ code: `
+  let psMod = null;
+  const getPsMod = () => psMod ??= device.createShaderModule({ code: `
 struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var dep: texture_depth_2d;
@@ -560,13 +580,17 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
   return vec4f(min(col * u.tint.rgb, vec3f(1.0)), a);
 }` });
   const psPipes = new Map();
-  const psPipe = () => {
-    if (!psPipes.has(0)) psPipes.set(0, device.createRenderPipeline({ layout: 'auto', vertex: { module: psMod, entryPoint: 'vs' },
-      fragment: { module: psMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm', blend: {
-        color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha', operation: 'add' },
-        alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } }] }, primitive: { topology: 'triangle-list' } }));
+  const getPsPipe = () => {
+    if (!psPipes.has(0)) {
+      const mod = getPsMod();
+      psPipes.set(0, device.createRenderPipeline({ layout: 'auto', vertex: { module: mod, entryPoint: 'vs' },
+        fragment: { module: mod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm', blend: {
+          color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha', operation: 'add' },
+          alpha: { srcFactor: 'zero', dstFactor: 'one', operation: 'add' } } }] }, primitive: { topology: 'triangle-list' } }));
+    }
     return psPipes.get(0);
   };
+  const psPipe = getPsPipe;
   const psU = Array.from({ length: 6 }, () => device.createBuffer({ size: 64, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST }));
   const PS_LOG = RN_Q.get('pslog') === '1';
   let psN = 0, psTmp = null, psCount = 0;
@@ -866,7 +890,8 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
   // summed; every channel stops at 255. Then the marker texels (the 4 colours of the spec) are written.
   // ?skinhd=0 off; ?skinhd=check runs it at 512 with nearest texels and reports the texels that differ from the game's result.
   const SKIN_MODE = RN_Q.get('skinhd');
-  const skinMod = device.createShaderModule({ code: `
+  let skinMod = null, skinPipe = null, mipMod = null, mipPipe = null;
+  const getSkinMod = () => skinMod ??= device.createShaderModule({ code: `
 struct U { mode: u32, recolour: u32, nmark: u32, exact: u32, src: vec2f, k: f32, pad: f32, cols: array<vec4f, 4>, marks: array<vec4u, 64> };
 @group(0) @binding(0) var prev: texture_2d<f32>;
 @group(0) @binding(1) var layer: texture_2d<f32>;
@@ -915,7 +940,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
   if (r > u.k) { s += floor(d * r); }
   return min(s, vec4f(255.0)) / 255.0;
 }` });
-  const mipMod = device.createShaderModule({ code: `
+  const getMipMod = () => mipMod ??= device.createShaderModule({ code: `
 @group(0) @binding(0) var down: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
 @vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
@@ -925,10 +950,22 @@ fn mulfloor(c: f32, w: f32) -> f32 {
 @fragment fn fs(@builtin(position) p: vec4f) -> @location(0) vec4f {
   return textureSampleLevel(down, smp, 2.0 * p.xy / vec2f(textureDimensions(down)), 0.0);
 }` });
-  const skinPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: skinMod, entryPoint: 'vs' },
-    fragment: { module: skinMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
-  const mipPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: mipMod, entryPoint: 'vs' },
-    fragment: { module: mipMod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+  const getSkinPipe = () => {
+    if (!skinPipe) {
+      const mod = getSkinMod();
+      skinPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: mod, entryPoint: 'vs' },
+        fragment: { module: mod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+    }
+    return skinPipe;
+  };
+  const getMipPipe = () => {
+    if (!mipPipe) {
+      const mod = getMipMod();
+      mipPipe = device.createRenderPipeline({ layout: 'auto', vertex: { module: mod, entryPoint: 'vs' },
+        fragment: { module: mod, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] }, primitive: { topology: 'triangle-list' } });
+    }
+    return mipPipe;
+  };
   const skinLin = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' });
   const skinNear = device.createSampler({ magFilter: 'nearest', minFilter: 'nearest' });
   const skinTmp = new Map();     // size -> [ping, pong]
@@ -939,11 +976,11 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     const check = SKIN_MODE === 'check', S = check ? t.w : Math.min(2048, 4 * t.w);
     if (!skinTmp.has(S)) skinTmp.set(S, [0, 1].map(() => device.createTexture({ size: [S, S], format: 'rgba8unorm',
       usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC })));
-    const [A, B] = skinTmp.get(S), e = device.createCommandEncoder();
+    const [A, B] = skinTmp.get(S), e = device.createCommandEncoder(), sp = getSkinPipe();
     const n = w[a + 2], fill = argb(w[a + 1]);
     const step = (dst, bind) => {
       const p = e.beginRenderPass({ colorAttachments: [{ view: dst.createView(), loadOp: 'load', storeOp: 'store' }] });
-      p.setPipeline(skinPipe); p.setBindGroup(0, bind); p.draw(3); p.end();
+      p.setPipeline(sp); p.setBindGroup(0, bind); p.draw(3); p.end();
     };
     const uni = (mode, recolour, cols, marks) => {
       const b = new ArrayBuffer(96 + 64 * 16), u = new Uint32Array(b), f = new Float32Array(b);
@@ -954,7 +991,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       const g = device.createBuffer({ size: b.byteLength, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
       device.queue.writeBuffer(g, 0, b); return g;
     };
-    const bind = (src, l, m, buf) => device.createBindGroup({ layout: skinPipe.getBindGroupLayout(0), entries: [
+    const bind = (src, l, m, buf) => device.createBindGroup({ layout: sp.getBindGroupLayout(0), entries: [
       { binding: 0, resource: src.createView() }, { binding: 1, resource: l.own }, { binding: 2, resource: m.own },
       { binding: 3, resource: check ? skinNear : skinLin }, { binding: 4, resource: { buffer: buf } }] });
     e.beginRenderPass({ colorAttachments: [{ view: A.createView(), loadOp: 'clear', storeOp: 'store',
@@ -995,10 +1032,11 @@ fn mulfloor(c: f32, w: f32) -> f32 {
     t.view = t.skin.createView();
   }
   function skinMips(e, tex) {
+    const mp = getMipPipe();
     for (let l = 1; l < tex.mipLevelCount; l++) {
       const p = e.beginRenderPass({ colorAttachments: [{ view: tex.createView({ baseMipLevel: l, mipLevelCount: 1 }), loadOp: 'clear', storeOp: 'store' }] });
-      p.setPipeline(mipPipe);
-      p.setBindGroup(0, device.createBindGroup({ layout: mipPipe.getBindGroupLayout(0), entries: [
+      p.setPipeline(mp);
+      p.setBindGroup(0, device.createBindGroup({ layout: mp.getBindGroupLayout(0), entries: [
         { binding: 0, resource: tex.createView({ baseMipLevel: l - 1, mipLevelCount: 1 }) }, { binding: 1, resource: skinLin }] }));
       p.draw(3); p.end();
     }
@@ -1025,7 +1063,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       }));
     livCache.get(url).then(a => {
       if (!a || t.skin !== skinTex) return;
-      livPipe ??= device.createRenderPipeline({ layout: 'auto', vertex: { module: mipMod, entryPoint: 'vs' }, fragment: { module: device.createShaderModule({ code: `
+      livPipe ??= device.createRenderPipeline({ layout: 'auto', vertex: { module: getMipMod(), entryPoint: 'vs' }, fragment: { module: device.createShaderModule({ code: `
 @group(0) @binding(0) var art: texture_2d<f32>;
 @group(0) @binding(1) var smp: sampler;
 @fragment fn fs(@builtin(position) p: vec4f) -> @location(0) vec4f {
@@ -1388,9 +1426,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
             fxaaTmp = device.createTexture({ size: [rt.w, rt.h], format: 'rgba8unorm', usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING });
           }
           enc.copyTextureToTexture({ texture: rt.tex }, { texture: fxaaTmp }, [rt.w, rt.h]);
+          const fp = getFxaaPipe();
           const p = enc.beginRenderPass({ timestampWrites: tsw('fxaa'), colorAttachments: [{ view: rt.view, loadOp: 'load', storeOp: 'store' }] });
-          p.setPipeline(fxaaPipe);
-          p.setBindGroup(0, device.createBindGroup({ layout: fxaaPipe.getBindGroupLayout(0),
+          p.setPipeline(fp);
+          p.setBindGroup(0, device.createBindGroup({ layout: fp.getBindGroupLayout(0),
             entries: [{ binding: 0, resource: fxaaTmp.createView() }, { binding: 1, resource: fxaaSamp }] }));
           p.draw(3);
           p.end();
@@ -1422,9 +1461,10 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         if (q) { shownQ.push(q); while (shownQ.length > QMAX) { recycle(shownQ.shift()); RN_PACE.dropped++; } } else RN_PACE.shown++;
         if (SHARP < 0) enc.copyTextureToTexture({ texture: t.tex }, { texture: dst }, [w[a + 1], w[a + 2]]);
         else {
+          const cp = getCasPipe();
           const p = enc.beginRenderPass({ timestampWrites: tsw('cas'), colorAttachments: [{ view: dst.createView(), loadOp: 'clear', storeOp: 'store' }] });
-          p.setPipeline(casPipe);
-          p.setBindGroup(0, device.createBindGroup({ layout: casPipe.getBindGroupLayout(0),
+          p.setPipeline(cp);
+          p.setBindGroup(0, device.createBindGroup({ layout: cp.getBindGroupLayout(0),
             entries: [{ binding: 0, resource: t.view }, { binding: 1, resource: { buffer: casU } }] }));
           p.draw(3);
           p.end();
