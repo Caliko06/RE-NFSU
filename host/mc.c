@@ -29,15 +29,21 @@ static float mdx, mdy;                    // mouse motion since the last frame
 static uint32_t cache, pt;                // the pedestrian's own ground cache (0x2b4 bytes) and a 3-float point
 static uint64_t last_us;
 
+static int free_run(Ctx *c);
+
 int mc_enabled(void) {
     static int on = -1;
-    if (on < 0) { const char *e = getenv("RN_MC"); on = !(e && e[0] == '0'); }
+    if (on < 0) { const char *e = getenv("RN_MC"); on = e && e[0] == '1'; }
     return on;
 }
 
 int mc_key(uint8_t dik, int down) {
     if (!mc_enabled()) return 0;
-    if (dik == DIK_F) { if (down) want_toggle = 1; return 1; }
+    if (dik == DIK_F) {
+        if (!rn_mc.on_foot && (!g_ctx || !g_ctx->mem || !free_run(g_ctx))) return 0;
+        if (down) want_toggle = 1;
+        return 1;
+    }
     if (!rn_mc.on_foot || dik == DIK_ESC) return 0;
     held[dik] = (uint8_t)down;
     return 1;                             // on foot the car hears nothing

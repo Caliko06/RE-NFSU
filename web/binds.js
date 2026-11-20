@@ -67,18 +67,19 @@ function dikFor(code) {
   root.id = 'binds'; root.tabIndex = -1;
   document.body.appendChild(root);
 
-  let cap = null, padPrev = [], raf = 0;       // cap = { kind: 'key'|'pad', id } while a row waits for its key / button
+  let cap = null, padPrev = [], raf = 0, prevFocus = null;       // cap = { kind: 'key'|'pad', id } while a row waits for its key / button
   const canvas = () => document.getElementById('screen');
   const keyName = c => ({ ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓' })[c] || c.replace(/^Key|^Digit/, '');
 
   function render() {
     const tr = window.RN_TR || (s => s);
+    const closeLabel = (() => { const s = tr('Cerrar'); return s !== 'Cerrar' ? s : window.RN_LANG === 'en' ? 'Close' : 'Cerrar'; })();
     const row = (kind, id, label, val) =>
-      `<tr><td>${label}</td><td><button data-k="${kind}" data-id="${id}" class="${cap && cap.kind === kind && cap.id === id ? 'cap' : ''}">${cap && cap.kind === kind && cap.id === id ? (window.RN_TR || (s => s))('pulsa…') : val}</button></td></tr>`;
+      `<tr><td>${label}</td><td><button type="button" data-k="${kind}" data-id="${id}" class="${cap && cap.kind === kind && cap.id === id ? 'cap' : ''}">${cap && cap.kind === kind && cap.id === id ? tr('pulsa…') : val}</button></td></tr>`;
     root.innerHTML = `<div class="box"><div class="cols">
       <div><h3>${tr('Teclado')}</h3><table>${BIND_KEYS.map(([id, label]) => row('key', id, tr(label), keyName(BINDS.keys[id]))).join('')}</table></div>
       <div><h3>${tr('Mando')}</h3><table>${BIND_PAD.map(([id, label]) => row('pad', id, tr(label), PAD_NAMES[BINDS.pad[id]] ?? 'B' + BINDS.pad[id])).join('')}</table></div></div>
-      <div class="foot"><button data-reset="1">${tr('Valores de fábrica')}</button><span>${tr('Clic en una acción y luego la tecla o el botón. Palanca, cruceta y gatillos son fijos. Esc, K o Select cierra.')}</span></div></div>`;
+      <div class="foot"><button type="button" data-reset="1">${tr('Valores de fábrica')}</button><span style="flex:1">${tr('Clic en una acción y luego la tecla o el botón. Palanca, cruceta y gatillos son fijos. Esc, K o Select cierra.')}</span><button type="button" data-close="1">${closeLabel}</button></div></div>`;
   }
 
   // Binding one id to a value swaps with whoever had it (same layout group on the pad).
@@ -110,15 +111,25 @@ function dikFor(code) {
     if (on === BINDS.open) return;
     BINDS.open = on; cap = null;
     root.classList.toggle('on', on);
-    if (on) { padPrev = []; render(); root.focus(); raf = requestAnimationFrame(padLoop); }   // focusing blurs the canvas, which frees held keys
-    else { cancelAnimationFrame(raf); canvas()?.focus(); }
+    if (on) {
+      prevFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      padPrev = []; render(); root.focus(); raf = requestAnimationFrame(padLoop);
+    }   // focusing blurs the canvas, which frees held keys
+    else {
+      cancelAnimationFrame(raf);
+      const target = prevFocus && prevFocus !== document.body && prevFocus !== document.documentElement && prevFocus.isConnected && typeof prevFocus.focus === 'function' ? prevFocus : canvas();
+      prevFocus = null;
+      target?.focus?.({ preventScroll: true });
+    }
   }
   BINDS.toggle = () => setOpen(!BINDS.open);
 
   root.addEventListener('click', e => {
+    if (e.target === root || !e.target.closest('.box')) { setOpen(false); return; }
     const b = e.target.closest('button');
     if (!b) return;
-    if (b.dataset.reset) { localStorage.removeItem('rn_binds'); BINDS.load(); cap = null; render(); return; }
+    if (b.dataset.close) { setOpen(false); return; }
+    if (b.dataset.reset) { try { localStorage.removeItem('rn_binds'); } catch {} BINDS.load(); cap = null; render(); return; }
     cap = { kind: b.dataset.k, id: b.dataset.id }; render();
   });
 

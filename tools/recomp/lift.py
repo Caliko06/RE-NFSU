@@ -522,7 +522,6 @@ class Lifter:
             b = self.read(ops[1])
             o.append(f"t2={b};")
             o.append(self.write(ops[1], "t1"))
-            self.mem_dst(ops[0])
             o.append(self.write(ops[0], "t2"))
             return
         if m == "xadd":
@@ -621,7 +620,8 @@ class Lifter:
             o.append(step)
         elif kind in ("movs", "stos", "lods"):
             if kind == "movs" and n == 4:   # bulk path for the common forward copy that does not overlap
-                o.append(f"if (!df && ecx && ecx<0x40000000u && (uint32_t)(esi-LOW)<=c->memsz-LOW-ecx*4 && (uint32_t)(edi-LOW)<=c->memsz-LOW-ecx*4 "
+                o.append(f"if (!df && ecx && esi>=LOW && edi>=LOW && esi<=c->memsz && edi<=c->memsz "
+                         f"&& (uint64_t)ecx*4<=c->memsz-esi && (uint64_t)ecx*4<=c->memsz-edi "
                          f"&& (edi+ecx*4<=esi || esi+ecx*4<=edi)) {{ memcpy(c->mem+edi,c->mem+esi,ecx*4); esi+=ecx*4; edi+=ecx*4; ecx=0; }}")
             o.append(f"while (ecx) {{ {step} ecx--; }}")
         else:

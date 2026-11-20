@@ -360,14 +360,37 @@
    };
    const BLEND_FUNC = {
       zero: GL.ZERO, one: GL.ONE,
+      src: GL.SRC_COLOR, 'one-minus-src': GL.ONE_MINUS_SRC_COLOR,
       'src-color': GL.SRC_COLOR, 'one-minus-src-color': GL.ONE_MINUS_SRC_COLOR,
       'src-alpha': GL.SRC_ALPHA, 'one-minus-src-alpha': GL.ONE_MINUS_SRC_ALPHA,
+      dst: GL.DST_COLOR, 'one-minus-dst': GL.ONE_MINUS_DST_COLOR,
       'dst-color': GL.DST_COLOR, 'one-minus-dst-color': GL.ONE_MINUS_DST_COLOR,
       'dst-alpha': GL.DST_ALPHA, 'one-minus-dst-alpha': GL.ONE_MINUS_DST_ALPHA,
       'src-alpha-saturated': GL.SRC_ALPHA_SATURATE,
       constant: GL.CONSTANT_COLOR, 'one-minus-constant': GL.ONE_MINUS_CONSTANT_COLOR,
       'blend-color': GL.CONSTANT_COLOR, 'one-minus-blend-color': GL.ONE_MINUS_CONSTANT_COLOR,
    };
+   const _warnedBlend = new Set();
+   function blendFactorGl(name, fallback) {
+      const v = BLEND_FUNC[name];
+      if (v !== undefined) return v;
+      const key = 'factor:' + String(name);
+      if (!_warnedBlend.has(key)) {
+         _warnedBlend.add(key);
+         console.warn('webgpu-js: unknown blend factor "' + name + '"; falling back to ' + (fallback === GL.ZERO ? 'zero' : 'one') + '.');
+      }
+      return fallback;
+   }
+   function blendEqGl(name) {
+      const v = BLEND_EQUATION[name];
+      if (v !== undefined) return v;
+      const key = 'op:' + String(name);
+      if (!_warnedBlend.has(key)) {
+         _warnedBlend.add(key);
+         console.warn('webgpu-js: unknown blend operation "' + name + '"; falling back to add.');
+      }
+      return GL.FUNC_ADD;
+   }
    const COMPARE_FUNC = {
       never: GL.NEVER, less: GL.LESS, equal: GL.EQUAL, 'less-equal': GL.LEQUAL,
       greater: GL.GREATER, 'not-equal': GL.NOTEQUAL, 'greater-equal': GL.GEQUAL, always: GL.ALWAYS,
@@ -2504,10 +2527,21 @@
          if (t0 && t0.blend) {
             gl.enable(GL.BLEND);
             // RN: blend states built once per pipeline (two objects per draw were garbage in Safari)
-            const c = this._blendC || (this._blendC = Object.assign({ srcFactor: 'one', dstFactor: 'zero', operation: 'add' }, t0.blend.color || {}));
-            const a = this._blendA || (this._blendA = Object.assign({ srcFactor: 'one', dstFactor: 'zero', operation: 'add' }, t0.blend.alpha || {}));
-            gl.blendEquationSeparate(BLEND_EQUATION[c.operation], BLEND_EQUATION[a.operation]);
-            gl.blendFuncSeparate(BLEND_FUNC[c.srcFactor], BLEND_FUNC[c.dstFactor], BLEND_FUNC[a.srcFactor], BLEND_FUNC[a.dstFactor]);
+            let b = this._blendGl;
+            if (!b) {
+               const c = Object.assign({ srcFactor: 'one', dstFactor: 'zero', operation: 'add' }, t0.blend.color || {});
+               const a = Object.assign({ srcFactor: 'one', dstFactor: 'zero', operation: 'add' }, t0.blend.alpha || {});
+               b = this._blendGl = {
+                  cOp: blendEqGl(c.operation),
+                  aOp: blendEqGl(a.operation),
+                  cSrc: blendFactorGl(c.srcFactor, GL.ONE),
+                  cDst: blendFactorGl(c.dstFactor, GL.ZERO),
+                  aSrc: blendFactorGl(a.srcFactor, GL.ONE),
+                  aDst: blendFactorGl(a.dstFactor, GL.ZERO),
+               };
+            }
+            gl.blendEquationSeparate(b.cOp, b.aOp);
+            gl.blendFuncSeparate(b.cSrc, b.cDst, b.aSrc, b.aDst);
          } else {
             gl.disable(GL.BLEND);
          }
@@ -2627,19 +2661,26 @@ void main() {}`;
       if (!tex || tex.desc.mipLevelCount <= 1 || !tex._gl) return false;
       if (tex._gl.target === GL.RENDERBUFFER) return false;
       const info = TEX_FORMAT_INFO[tex.desc.format];
-      if (!info || info.depth || info.stencil || info.integer) return false;
-      return true;
+      if (!info || !info.float || info.depth || info.stencil || info.compressed) return false;
+      return !!DEFAULT_RENDERABLE[info.format];
    }
 
-      function skipGeneratedMipWrite(tex, mipLevel) {
-      if ((mipLevel || 0) <= 0 || !tex) return false;
-      const info = TEX_FORMAT_INFO[tex.desc.format];
-      if (!info || info.depth || info.stencil || info.integer) return false;
-      return tex.desc.mipLevelCount > 1;
+      function markMipWritten(tex, mipLevel) {
+      if (!tex || tex.desc.mipLevelCount <= 1) return;
+      const lvl = mipLevel || 0;
+      const count = tex.desc.mipLevelCount;
+      const allMask = count < 30 ? ((1 << count) - 1) : 0;
+      if (lvl === 0 && (tex._mipsWritten & 1)) {
+         tex._mipsWritten = 1;
+      } else if (lvl < 30) {
+         tex._mipsWritten = (tex._mipsWritten || 0) | (1 << lvl);
+      }
+      tex._mipsDirty = !(allMask && (tex._mipsWritten & allMask) === allMask);
    }
 
       function generateColorMips(tex) {
-      if (!tex || tex._mipsReady || !isAutoMipColor(tex)) return;
+      if (!tex || !tex._mipsDirty || !isAutoMipColor(tex)) return;
+      tex._mipsDirty = false;
       const gl = tex.device.gl;
       const prevFb = gl.getParameter(GL.FRAMEBUFFER_BINDING);
       const prevPbo = gl.getParameter(GL.PIXEL_UNPACK_BUFFER_BINDING);
@@ -2648,215 +2689,29 @@ void main() {}`;
       gl.bindTexture(tex._gl.target, tex._gl);
       while (gl.getError()) {}
       gl.generateMipmap(tex._gl.target);
-      if (!gl.getError()) tex._mipsReady = true;
+      if (!gl.getError()) {
+         const count = tex.desc.mipLevelCount;
+         if (count < 30) tex._mipsWritten = (1 << count) - 1;
+      }
       gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, prevPbo);
       gl.bindFramebuffer(GL.FRAMEBUFFER, prevFb);
    }
 
-      function markTextureLevel0(tex) {
-      tex._level0Written = true;
-      queueMipRebuild(tex);
-   }
-
-      function queueMipRebuild(tex) {
-      if (!tex || tex._mipQueued) return;
-      tex._mipQueued = true;
-      tex._mipsVerified = false;
-      const d = tex.device;
-      d._pendingMips = d._pendingMips || [];
-      d._pendingMips.push(tex);
-   }
-
-      function rebuildPendingMips(device) {
-      const list = device._pendingMips;
-      if (!list || !list.length) return;
-      device._pendingMips = [];
-      for (let i = 0; i < list.length; i++) {
-         const tex = list[i];
-         tex._mipQueued = false;
-         rebuildMipsFromGpu(tex);
-         tex._mipsVerified = true;
-      }
-   }
-
-      function rebuildMipsFromGpu(tex) {
-      if (!isAutoMipColor(tex)) return;
-      const gl = tex.device.gl;
-      const fmt = tex.desc.format;
-      if (fmt !== 'rgba8unorm' && fmt !== 'rgba8unorm-srgb' && fmt !== 'bgra8unorm' && fmt !== 'bgra8unorm-srgb') {
-         generateColorMips(tex);
-         return;
-      }
-      const w = tex.desc.size.width, h = tex.desc.size.height;
-      const prevFb = gl.getParameter(GL.FRAMEBUFFER_BINDING);
-      const prevPack = gl.getParameter(GL.PIXEL_PACK_BUFFER_BINDING);
-      const prevUnpack = gl.getParameter(GL.PIXEL_UNPACK_BUFFER_BINDING);
-      gl.bindBuffer(GL.PIXEL_PACK_BUFFER, null);
-      gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, null);
-      const fb = gl.createFramebuffer();
-      gl.bindFramebuffer(GL.FRAMEBUFFER, fb);
-      gl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, tex._gl, 0);
-      if (gl.checkFramebufferStatus(GL.FRAMEBUFFER) !== GL.FRAMEBUFFER_COMPLETE) {
-         gl.bindFramebuffer(GL.FRAMEBUFFER, prevFb);
-         gl.bindBuffer(GL.PIXEL_PACK_BUFFER, prevPack);
-         gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, prevUnpack);
-         gl.deleteFramebuffer(fb);
-         return;
-      }
-      gl.drawBuffers([GL.COLOR_ATTACHMENT0]);
-      gl.readBuffer(GL.COLOR_ATTACHMENT0);
-      const pix = new Uint8Array(w * h * 4);
-      gl.readPixels(0, 0, w, h, GL.RGBA, GL.UNSIGNED_BYTE, pix);
-      gl.bindFramebuffer(GL.FRAMEBUFFER, prevFb);
-      gl.deleteFramebuffer(fb);
-      let any = false;
-      for (let i = 0; i < pix.length; i += 4) if (pix[i] | pix[i + 1] | pix[i + 2]) { any = true; break; }
-      if (any) cpuUploadMipChain(tex, packedRgba8(pix, w, h, w * 4, 0), w, h);
-      gl.bindBuffer(GL.PIXEL_PACK_BUFFER, prevPack);
-      gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, prevUnpack);
-   }
-
-      function packedRgba8(u8, width, height, bytesPerRow, offset) {
-      offset = offset || 0;
-      const stride = bytesPerRow || (width * 4);
-      const out = new Uint8Array(width * height * 4);
-      for (let y = 0; y < height; y++) {
-         out.set(u8.subarray(offset + y * stride, offset + y * stride + width * 4), y * width * 4);
-      }
-      let anyA = false;
-      for (let i = 3; i < out.length; i += 4) if (out[i]) { anyA = true; break; }
-      if (!anyA) for (let i = 3; i < out.length; i += 4) out[i] = 255;
-      return out;
-   }
-
-      function cpuUploadMipChain(tex, rgba, width, height) {
-      if (!isAutoMipColor(tex) || !rgba) return false;
-      const gl = tex.device.gl;
-      const info = TEX_FORMAT_INFO[tex.desc.format];
-      const prevPbo = gl.getParameter(GL.PIXEL_UNPACK_BUFFER_BINDING);
-      gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, null);
-      gl.bindTexture(tex._gl.target, tex._gl);
-      gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-      gl.pixelStorei(GL.UNPACK_ROW_LENGTH, 0);
-      let src = rgba, w = width, h = height;
-      const maxLod = tex.desc.mipLevelCount;
-      for (let lod = 1; lod < maxLod; lod++) {
-         const nw = Math.max(1, w >> 1), nh = Math.max(1, h >> 1);
-         const dst = new Uint8Array(nw * nh * 4);
-         for (let y = 0; y < nh; y++) {
-            for (let x = 0; x < nw; x++) {
-               const x0 = Math.min(x * 2, w - 1), x1 = Math.min(x * 2 + 1, w - 1);
-               const y0 = Math.min(y * 2, h - 1), y1 = Math.min(y * 2 + 1, h - 1);
-               // RN: same box filter without a coords array per texel (1.3 GB of garbage per load; Safari's GC fell behind)
-               const i0 = (y0 * w + x0) * 4, i1 = (y0 * w + x1) * 4, i2 = (y1 * w + x0) * 4, i3 = (y1 * w + x1) * 4;
-               const o = (y * nw + x) * 4;
-               dst[o] = (src[i0] + src[i1] + src[i2] + src[i3]) / 4;
-               dst[o + 1] = (src[i0 + 1] + src[i1 + 1] + src[i2 + 1] + src[i3 + 1]) / 4;
-               dst[o + 2] = (src[i0 + 2] + src[i1 + 2] + src[i2 + 2] + src[i3 + 2]) / 4;
-               dst[o + 3] = ((src[i0 + 3] || 255) + (src[i1 + 3] || 255) + (src[i2 + 3] || 255) + (src[i3 + 3] || 255)) / 4;
-            }
-         }
-         gl.texSubImage2D(tex._gl.target, lod, 0, 0, nw, nh, info.unpack, info.type, dst);
-         src = dst; w = nw; h = nh;
-      }
-      gl.pixelStorei(GL.UNPACK_ALIGNMENT, 4);
-      gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, prevPbo);
-      tex._level0Written = true;
-      tex._mipsReady = true;
-      tex._alphaMipsOk = true;
-      tex._mipsGood = mipLodHasColor(tex, 1);
-      return tex._mipsGood;
-   }
-
-      function mipLodHasColor(tex, lod) {
-      if (!tex || !tex._gl || lod >= tex.desc.mipLevelCount) return false;
-      const gl = tex.device.gl;
-      const prevFb = gl.getParameter(GL.FRAMEBUFFER_BINDING);
-      const prevPack = gl.getParameter(GL.PIXEL_PACK_BUFFER_BINDING);
-      gl.bindBuffer(GL.PIXEL_PACK_BUFFER, null);
-      const fb = gl.createFramebuffer();
-      gl.bindFramebuffer(GL.FRAMEBUFFER, fb);
-      gl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, tex._gl.target, tex._gl, lod);
-      if (gl.checkFramebufferStatus(GL.FRAMEBUFFER) !== GL.FRAMEBUFFER_COMPLETE) {
-         gl.bindFramebuffer(GL.FRAMEBUFFER, prevFb);
-         gl.bindBuffer(GL.PIXEL_PACK_BUFFER, prevPack);
-         gl.deleteFramebuffer(fb);
-         return false;
-      }
-      const p = new Uint8Array(4);
-      gl.readPixels(0, 0, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, p);
-      gl.bindFramebuffer(GL.FRAMEBUFFER, prevFb);
-      gl.bindBuffer(GL.PIXEL_PACK_BUFFER, prevPack);
-      gl.deleteFramebuffer(fb);
-      return !!(p[0] | p[1] | p[2]);
-   }
-
-      function forceOpaqueAlphaIfEmpty(tex) {
-      if (!tex || !tex._gl) return;
-      const fmt = tex.desc.format;
-      if (fmt !== 'rgba8unorm' && fmt !== 'rgba8unorm-srgb' && fmt !== 'bgra8unorm' && fmt !== 'bgra8unorm-srgb') return;
-      if (tex._gl.target !== GL.TEXTURE_2D) return;
-      const gl = tex.device.gl;
-      const prev = gl.getParameter(GL.FRAMEBUFFER_BINDING);
-      const fb = gl.createFramebuffer();
-      gl.bindFramebuffer(GL.FRAMEBUFFER, fb);
-      gl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, tex._gl, 0);
-      if (gl.checkFramebufferStatus(GL.FRAMEBUFFER) !== GL.FRAMEBUFFER_COMPLETE) {
-         gl.bindFramebuffer(GL.FRAMEBUFFER, prev);
-         gl.deleteFramebuffer(fb);
-         return;
-      }
-      gl.drawBuffers([GL.COLOR_ATTACHMENT0]);
-      gl.readBuffer(GL.COLOR_ATTACHMENT0);
-      const w = tex.desc.size.width, h = tex.desc.size.height;
-      const pix = new Uint8Array(4);
-      const pts = [[0, 0], [Math.max(0, w - 1), 0], [0, Math.max(0, h - 1)], [w >> 1, h >> 1], [w >> 2, h >> 2]];
-      let saw = false;
-      for (let i = 0; i < pts.length; i++) {
-         gl.readPixels(pts[i][0], pts[i][1], 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pix);
-         if (pix[3]) { saw = true; break; }
-      }
-      if (!saw) {
-         const scissor = gl.isEnabled(GL.SCISSOR_TEST);
-         if (scissor) gl.disable(GL.SCISSOR_TEST);
-         gl.colorMask(false, false, false, true);
-         gl.clearBufferfv(GL.COLOR, 0, [0, 0, 0, 1]);
-         gl.colorMask(true, true, true, true);
-         if (scissor) gl.enable(GL.SCISSOR_TEST);
-      }
-      gl.bindFramebuffer(GL.FRAMEBUFFER, prev);
-      gl.deleteFramebuffer(fb);
-   }
-
-      function rgba8AllAlphaZero(u8, offset, byteLength) {
-      const end = Math.min(u8.length, (offset || 0) + byteLength);
-      if (end - (offset || 0) < 4) return false;
-      for (let i = (offset || 0) + 3; i < end; i += 4) if (u8[i]) return false;
-      return true;
-   }
-
-      function fillRgba8Alpha(u8, offset, byteLength, alpha) {
-      const end = Math.min(u8.length, (offset || 0) + byteLength);
-      for (let i = (offset || 0) + 3; i < end; i += 4) u8[i] = alpha;
-   }
-
-      function withOpaqueAlphaIfMissing(src, info) {
-      if (!info || info.bpp !== 4 || info.type !== GL.UNSIGNED_BYTE || !src) return src;
-      const u8 = src instanceof Uint8Array ? src : new Uint8Array(src.buffer || src, src.byteOffset || 0, src.byteLength || src.length);
-      if (!rgba8AllAlphaZero(u8, 0, u8.length)) return src;
-      const out = new Uint8Array(u8);
-      fillRgba8Alpha(out, 0, out.length, 255);
-      return out;
-   }
-
-      function colorSamplerFor(device, samp, tex) {
+      function colorSamplerFor(device, samp, texView) {
       if (!samp) return null;
+      const tex = texView && texView.tex ? texView.tex : texView;
+      const viewMips = texView && texView.desc ? texView.desc.mipLevelCount : (tex ? tex.desc.mipLevelCount : 1);
+      const useMips = !!(tex && tex.desc.mipLevelCount > 1 && viewMips > 1 && samp.desc.lodMaxClamp !== 0);
+      if (useMips) {
+         if (tex._mipsDirty) generateColorMips(tex);
+         return samp._gl;
+      }
       if (samp._rnColor) return samp._rnColor;   // RN: no key string per draw (garbage in Safari)
-      // Same as v6: never use LINEAR_MIPMAP_*. App mip uploads leave
-      // higher levels black, which desaturates anything not nearby.
       device._colorSamplers = device._colorSamplers || {};
+      const aniso = Math.max(1, samp.desc.maxAnisotropy || 1);
       const key = (samp.desc.minFilter || 'nearest') + ':' + (samp.desc.magFilter || 'nearest') + ':' +
-         (samp.desc.addressModeU || 'clamp-to-edge') + ':' + (samp.desc.addressModeV || 'clamp-to-edge');
+         (samp.desc.addressModeU || 'clamp-to-edge') + ':' + (samp.desc.addressModeV || 'clamp-to-edge') + ':' +
+         (samp.desc.addressModeW || 'clamp-to-edge') + ':' + aniso;
       if (device._colorSamplers[key]) return samp._rnColor = device._colorSamplers[key];
       const gl = device.gl;
       const s = gl.createSampler();
@@ -2864,7 +2719,8 @@ void main() {}`;
       gl.samplerParameteri(s, GL.TEXTURE_MAG_FILTER, samp.desc.magFilter === 'linear' ? GL.LINEAR : GL.NEAREST);
       gl.samplerParameteri(s, GL.TEXTURE_WRAP_S, WRAP_MODE[samp.desc.addressModeU] || GL.CLAMP_TO_EDGE);
       gl.samplerParameteri(s, GL.TEXTURE_WRAP_T, WRAP_MODE[samp.desc.addressModeV] || GL.CLAMP_TO_EDGE);
-      applyAniso(gl, s, 16);
+      gl.samplerParameteri(s, GL.TEXTURE_WRAP_R, WRAP_MODE[samp.desc.addressModeW] || GL.CLAMP_TO_EDGE);
+      applyAniso(gl, s, aniso);
       device._colorSamplers[key] = s;
       return samp._rnColor = s;
    }
@@ -2991,7 +2847,7 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
                   ? compareSampler._gl
                   : depthNearestSampler(pipeline.device));
             } else {
-               gl.bindSampler(loc, colorSamplerFor(pipeline.device, pairedSampler(pipeline, index, bindGroup, texName) || filterSampler, e.textureView.tex));
+               gl.bindSampler(loc, colorSamplerFor(pipeline.device, pairedSampler(pipeline, index, bindGroup, texName) || filterSampler, e.textureView));
             }
             if (tb.g) gl.uniform1i(tb.g, loc);
             if (tb.t) gl.uniform1i(tb.t, loc);
@@ -3082,7 +2938,7 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          this._fb = null;
          const direct = colors.length === 1 && colors[0].view.tex._swapchain && !colors[0].resolveTarget;
          this._direct = !!direct;
-         this._flipY = !direct && !colors.some(c => c.view && c.view.tex && c.view.tex._swapchain);
+         this._flipY = !direct && !colors.some(c => (c.view && c.view.tex && c.view.tex._swapchain) || (c.resolveTarget && c.resolveTarget.tex && c.resolveTarget.tex._swapchain));
          encoder._add(() => this._beginGL());
          this.setViewport(0, 0, this._size.width, this._size.height, 0, 1);
          this.setScissorRect(0, 0, this._size.width, this._size.height);
@@ -3262,17 +3118,38 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          this._ended = true;
          this.encoder._add(() => {
             const gl = this.device.gl;
+            const w = this._size.width, h = this._size.height;
+            let scissorDisabled = false;
             this._colors.forEach((c, i) => {
-               if (c.storeOp === 'store' && this._fb && c.view.tex._swapchain) {
-                  gl.disable(GL.SCISSOR_TEST);
+               if (c.resolveTarget && this._fb) {
+                  if (!scissorDisabled) { gl.disable(GL.SCISSOR_TEST); scissorDisabled = true; }
+                  gl.bindFramebuffer(GL.READ_FRAMEBUFFER, this._fb);
+                  gl.readBuffer(GL.COLOR_ATTACHMENT0 + i);
+                  if (c.resolveTarget.tex._swapchain) {
+                     gl.bindFramebuffer(GL.DRAW_FRAMEBUFFER, null);
+                     gl.blitFramebuffer(0, 0, w, h, 0, 0, w, h, GL.COLOR_BUFFER_BIT, GL.NEAREST);
+                  } else {
+                     const rfb = this.device._resolveFb || (this.device._resolveFb = gl.createFramebuffer());
+                     gl.bindFramebuffer(GL.DRAW_FRAMEBUFFER, rfb);
+                     c.resolveTarget._attach(GL.DRAW_FRAMEBUFFER, GL.COLOR_ATTACHMENT0);
+                     gl.drawBuffers([GL.COLOR_ATTACHMENT0]);
+                     gl.blitFramebuffer(0, 0, w, h, 0, 0, w, h, GL.COLOR_BUFFER_BIT, GL.NEAREST);
+                     gl.framebufferTexture2D(GL.DRAW_FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, null, 0);
+                     markMipWritten(c.resolveTarget.tex, c.resolveTarget.desc.baseMipLevel);
+                  }
+               } else if (c.storeOp === 'store' && this._fb && c.view.tex._swapchain) {
+                  if (!scissorDisabled) { gl.disable(GL.SCISSOR_TEST); scissorDisabled = true; }
                   gl.bindFramebuffer(GL.READ_FRAMEBUFFER, this._fb);
                   gl.readBuffer(GL.COLOR_ATTACHMENT0 + i);
                   gl.bindFramebuffer(GL.DRAW_FRAMEBUFFER, null);
-                  const w = this._size.width, h = this._size.height;
-                  gl.disable(GL.SCISSOR_TEST);   // RN: a blit obeys the scissor; WebGPU copies do not
                   gl.blitFramebuffer(0, 0, w, h, 0, 0, w, h, GL.COLOR_BUFFER_BIT, GL.NEAREST);
                }
+               if (c.storeOp === 'store' && c.view && c.view.tex && !c.view.tex._swapchain) {
+                  markMipWritten(c.view.tex, c.view.desc.baseMipLevel);
+               }
             });
+            gl.bindFramebuffer(GL.READ_FRAMEBUFFER, null);
+            gl.bindFramebuffer(GL.DRAW_FRAMEBUFFER, null);
             if (this._fb) gl.deleteFramebuffer(this._fb);
          });
          this.encoder._endPass();
@@ -3467,7 +3344,6 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
       copyBufferToTexture(src, dst, size) {
          this._add(() => {
             const tex = dst.texture;
-            if (skipGeneratedMipWrite(tex, dst.mipLevel)) return;
             const gl = this.device.gl;
             const buf = src.buffer;
             const origin = asOrigin3D(dst.origin);
@@ -3476,14 +3352,6 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
             const offset = src.offset || 0;
             buf._ensureGl();
             tex._ensureGl();
-            if (info.bpp === 4 && info.type === GL.UNSIGNED_BYTE) {
-               const start = offset;
-               const bytes = (src.bytesPerRow || (ext.width * 4)) * ext.height;
-               if (rgba8AllAlphaZero(buf._cpuU8, start, bytes)) {
-                  fillRgba8Alpha(buf._cpuU8, start, bytes, 255);
-                  buf._flushToGl();
-               }
-            }
             gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, buf._gl);
             gl.bindTexture(tex._gl.target, tex._gl);
             if (tex._gl.target === GL.TEXTURE_2D) {
@@ -3493,7 +3361,7 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
                gl.texSubImage3D(tex._gl.target, dst.mipLevel || 0, origin.x, origin.y, origin.z || dst.aspect || 0,
                   ext.width, ext.height, ext.depthOrArrayLayers, info.unpack, info.type, offset);
             }
-            if ((dst.mipLevel || 0) === 0) markTextureLevel0(tex);
+            markMipWritten(tex, dst.mipLevel);
             gl.bindTexture(tex._gl.target, null);
             gl.bindBuffer(GL.PIXEL_UNPACK_BUFFER, null);
          });
@@ -3523,7 +3391,6 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
 
       copyTextureToTexture(src, dst, size) {
          this._add(() => {
-            if (skipGeneratedMipWrite(dst.texture, dst.mipLevel)) return;
             const gl = this.device.gl;
             const ext = asExtent3D(size);
             src.texture._ensureGl();
@@ -3549,7 +3416,7 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
             gl.blitFramebuffer(0, 0, ext.width, ext.height, 0, 0, ext.width, ext.height, GL.COLOR_BUFFER_BIT, GL.NEAREST);
             gl.deleteFramebuffer(read);
             gl.deleteFramebuffer(draw);
-            if ((dst.mipLevel || 0) === 0) markTextureLevel0(dst.texture);
+            markMipWritten(dst.texture, dst.mipLevel);
          });
       }
 
@@ -3574,7 +3441,6 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
             for (const cb of buffers) {
                for (const fn of cb.cmds) { fn(); if (gl) { const e = gl.getError(); if (e) { const k = e + ' ' + fn.toString().slice(0, 160); dbg[k] = (dbg[k] || 0) + 1; } } }
             }
-            rebuildPendingMips(this.device);
             this._kick();
          } catch (e) { this.device._catch(e); }
       }
@@ -3601,14 +3467,13 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
       }
       writeTexture(dest, data, dataLayout, size) {
          const tex = dest.texture;
-         if (skipGeneratedMipWrite(tex, dest.mipLevel)) return;
          const gl = this.device.gl;
          const origin = asOrigin3D(dest.origin);
          const ext = asExtent3D(size);
          const info = TEX_FORMAT_INFO[tex.desc.format];
          tex._ensureGl();
          const layout = dataLayout || {};
-         const src = withOpaqueAlphaIfMissing(typedViewForTexel(info.type, data, layout.offset || 0), info);
+         const src = typedViewForTexel(info.type, data, layout.offset || 0);
          gl.bindTexture(tex._gl.target, tex._gl);
          gl.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
          gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
@@ -3627,13 +3492,11 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          }
          gl.pixelStorei(GL.UNPACK_ROW_LENGTH, 0);
          gl.pixelStorei(GL.UNPACK_ALIGNMENT, 4);
-         if ((dest.mipLevel || 0) === 0) markTextureLevel0(tex);
-         rebuildPendingMips(this.device);
+         markMipWritten(tex, dest.mipLevel);
          gl.bindTexture(tex._gl.target, null);
       }
       copyExternalImageToTexture(src, dest, size) {
          const tex = dest.texture;
-         if (skipGeneratedMipWrite(tex, dest.mipLevel)) return;
          const gl = this.device.gl;
          tex._ensureGl();
          const source = src.source;
@@ -3641,8 +3504,7 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          gl.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, src.flipY ? 1 : 0);
          gl.texSubImage2D(tex._gl.target, dest.mipLevel || 0, 0, 0, GL.RGBA, GL.UNSIGNED_BYTE, source);
          gl.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 0);
-         if ((dest.mipLevel || 0) === 0) markTextureLevel0(tex);
-         rebuildPendingMips(this.device);
+         markMipWritten(tex, dest.mipLevel);
          gl.bindTexture(tex._gl.target, null);
       }
    }

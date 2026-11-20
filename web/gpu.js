@@ -1442,7 +1442,7 @@ fn mulfloor(c: f32, w: f32) -> f32 {
         Atomics.notify(M.HEAP32, box + 1);
       }
     } catch (e) {
-      report(e.message);
+      report('STOP gpu.js: ' + (e && e.message ? e.message : String(e)));
       return false;
     }
     return true;

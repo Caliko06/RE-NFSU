@@ -111,7 +111,7 @@ void input_key_name(uint8_t dik, char *out, int n) {
 }
 
 static void key_event(uint8_t dik, int d) {
-    if (mc_key(dik, d)) return;   // host/mc.c: F and, on foot, the walking keys never reach the game
+    if (mc_key(dik, d)) return;   // host/mc.c: when RN_MC=1, F in Free Run and, on foot, the walking keys never reach the game
     if (down[dik] == d) return;
     const Key *k = key_of(dik);
     down[dik] = (uint8_t)d;

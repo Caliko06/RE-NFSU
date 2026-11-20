@@ -133,7 +133,7 @@ static int find_run(int n) {
     }
     return -1;
 }
-static void reserve(int n) { run_at = find_run(n); run_n = run_at < 0 ? 0 : n; }
+static int reserve(int n) { run_at = find_run(n); run_n = run_at < 0 ? 0 : n; return run_at >= 0; }
 static uint32_t new_obj(Ctx *c, int iface) {
     int k = run_n ? (run_n--, run_at++) : find_run(1);
     if (k < 0) {
@@ -1465,9 +1465,12 @@ static uint32_t IDirect3DDevice9_CreateTexture(Ctx *c) {
     if (!levels) levels = full;
     if (levels > full) return D3DERR_INVALIDCALL;
     if ((!pow2(w) || !pow2(h)) && levels != 1 && pool != POOL_SCRATCH) return D3DERR_INVALIDCALL;   // NONPOW2CONDITIONAL
-    reserve(1 + (int)levels);
+    if (!reserve(1 + (int)levels)) {
+        if (out) st(c, out, 0, 4);
+        return D3DERR_OUTOFVIDEOMEMORY;
+    }
     uint32_t g = new_obj(c, I_TEXTURE);
-    if (!g) return D3DERR_OUTOFVIDEOMEMORY;
+    if (!g) { if (out) st(c, out, 0, 4); return D3DERR_OUTOFVIDEOMEMORY; }
     Obj *t = &objs[top];
     t->w = w; t->h = h; t->fmt = f; t->usage = usage; t->pool = pool; t->type = 3; t->levels = levels;
     uint32_t tk = idx(t) + 1;
@@ -1724,9 +1727,12 @@ static uint32_t IDirect3DDevice9_CreateCubeTexture(Ctx *c) {
         rn_halt(c, "d3d9: cube texture that is not a one-level render target (usage %x, %u levels)", usage, levels);
         return D3DERR_INVALIDCALL;
     }
-    reserve(7);
+    if (!reserve(7)) {
+        if (out) st(c, out, 0, 4);
+        return D3DERR_OUTOFVIDEOMEMORY;
+    }
     uint32_t g = new_obj(c, I_CUBE);
-    if (!g) return D3DERR_OUTOFVIDEOMEMORY;
+    if (!g) { if (out) st(c, out, 0, 4); return D3DERR_OUTOFVIDEOMEMORY; }
     Obj *t = &objs[top];
     t->w = e; t->h = e; t->fmt = f; t->usage = usage; t->pool = pool; t->type = 5; t->levels = 1;
     uint32_t tk = idx(t) + 1;

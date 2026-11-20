@@ -172,8 +172,14 @@ static uint32_t rq_next;            // next presents to fire it
 #define RST_WATCH 120
 static struct { uint32_t car, f0; int idx, armed, after; float x, y, z, sp, lx, ly, lz, lsp; } rq[RST_MAX];
 static int rq_n;
+static uint32_t rq_race;
 static uint32_t gq_pt, gq_flag;
 static uint32_t wx_reset_car, wx_reset_f, wx_resets;   // last reset seen by rst_arm (RN_WALLX)
+
+static void rst_clear(void) {
+    memset(rq, 0, sizeof rq);
+    rq_n = 0;
+}
 
 static int rst_index(Ctx *c, uint32_t car) {
     uint32_t h = ld(c, 0x7361f8, 4);
@@ -206,6 +212,7 @@ static int rst_ground(Ctx *c, uint32_t car, float *h) {
 
 // One watch slot per car; logs the state the reset had when it was called.
 static int rst_arm(Ctx *c, uint32_t car, const char *why, uint32_t target) {
+    if (rn_new_race(&rq_race)) rst_clear();
     uint32_t f = rn_telem.presents;
     int i = 0;
     while (i < RST_MAX && rq[i].car && rq[i].car != car) i++;
@@ -227,7 +234,7 @@ static int rst_arm(Ctx *c, uint32_t car, const char *why, uint32_t target) {
 // target 0x427f70: arg0 = car. target 0x427c50: car = EDI (the entry's this), arg0 = position pointer.
 void reset_call(Ctx *c, uint32_t target) {
     if (rn_resetlog < 0) rn_resetlog = getenv("RN_RESETLOG") != NULL || getenv("RN_WALLX") != NULL;   // RN_WALLX needs the reset frame
-    if (!rn_resetlog) return;
+    if (!rn_resetlog || !rn_racing()) return;
     uint32_t car = target == 0x427c50 ? c->r[EDI] : ld(c, c->r[ESP] + 4, 4);
     if (!car || car >= GUEST_MEM - 0x900) return;
     rst_arm(c, car, "call", target);
@@ -371,6 +378,11 @@ void reset_tel(Ctx *c) {
     reset_every(c);
     wallx_tel(c);
     if (rn_resetlog <= 0) return;
+    if (!rn_racing()) {
+        if (rq_n) rst_clear();
+        return;
+    }
+    if (rn_new_race(&rq_race)) rst_clear();
     uint32_t f = rn_telem.presents;
     for (int i = 0; i < rq_n; i++) {
         if (!rq[i].car || !rq[i].armed) continue;

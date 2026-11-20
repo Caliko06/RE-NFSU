@@ -2,11 +2,12 @@
 const log = document.getElementById('log'), status = document.getElementById('status');
 const t0 = performance.now();
 // Everything shown here also goes to tools/serve.py (build/web.log), so a session can be read afterwards.
-let pending = [], allLog = [];       // allLog: the whole session, for the F10 download (telemetry.js)
+const LOG_MAX = 5000, DOM_LOG_MAX = 500;
+let pending = [], allLog = [], memTick = 0;       // allLog: bounded session log (cap LOG_MAX), for the F10 download (telemetry.js)
 const duelBox = Object.assign(document.createElement('div'), { style: 'position:fixed;left:50%;top:14%;transform:translateX(-50%);padding:6px 16px;background:rgba(0,0,0,.72);color:#ffc24a;font:bold 20px system-ui;border-radius:6px;pointer-events:none;display:none;z-index:9' });
 const toast = text => { if (!duelBox.isConnected) document.body.appendChild(duelBox); duelBox.textContent = text; duelBox.style.display = ''; clearTimeout(toast.t); toast.t = setTimeout(() => duelBox.style.display = 'none', 3500); };
 const duelSay = s => { const m = /DUEL (\S+) (start|won|lost)/.exec(s); if (m) toast({ start: `Duelo con ${m[1]}`, won: `${m[1]} te ganó`, lost: `Le ganaste a ${m[1]}` }[m[2]]); };
-const keep = s => { pending.push(s); allLog.push(s); if (s.includes('DUEL ')) duelSay(s); };
+const keep = s => { pending.push(s); allLog.push(s); if (allLog.length > LOG_MAX) allLog.splice(0, allLog.length - LOG_MAX); if (s.includes('DUEL ')) duelSay(s); };
 let logUp = !window.RN_PUBLIC;                    // tools/serve.py answers /log; a plain web host does not, and then nothing is sent
 function flush() {
   if (!pending.length) return;
@@ -62,8 +63,9 @@ function line(s, cls) {
   else if (/^  \S+!/.test(s)) d.className = 'api';
   d.textContent = s;
   log.appendChild(d);
+  while (log.childElementCount > DOM_LOG_MAX) log.firstElementChild.remove();
   // A 'stop' line (missing WebGPU, COOP/COEP, a lost GPU) ends the session: the gate says why (web/app.js), F2 opens this log.
-  if (cls === 'stop' || /^STOP/.test(s)) { status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; RN_APP.set('stop', s); }
+  if (cls === 'stop' || /^STOP/.test(s)) { if (memTick) { clearInterval(memTick); memTick = 0; } status.textContent = 'detenido a los ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s'; status.className = 'stop'; RN_APP.set('stop', s); }
   // The launcher's curtain (?fast=1 with ?start=, web/index.html) lifts on arrival: the main menu, or the screen after the main menu (career).
   else if (CURTAIN && RN_APP.state === 'load') {
     if (/flow fe .*MU_Main_PC\.fng/.test(s)) { if (DEST === 'menu') arrive(); else main = true; }
@@ -76,7 +78,10 @@ const START = RN_Q.get('start'), CURTAIN = RN_Q.get('fast') === '1' && !!START;
 const DEST = START === 'career' ? 'career' : 'menu';
 let main = false;
 const arrive = () => { if (RN_APP.state === 'load') RN_APP.set('run'); };
-RN_APP.on((s, from) => keep(`${secs()} app: ${from} -> ${s}`));
+RN_APP.on((s, from) => {
+  keep(`${secs()} app: ${from} -> ${s}`);
+  if (s === 'stop' && memTick) { clearInterval(memTick); memTick = 0; }
+});
 // A download whose bytes are counted on the gate. Compressed transfers have no usable total, so it shows megabytes.
 async function download(url, what) {
   const r = await fetch(url + (window.RN_V ? '?v=' + RN_V : ''));   // RN_V: tools/build_public.py, a new address per build
@@ -169,13 +174,11 @@ async function download(url, what) {
       // ?pool=1 (OWNER 2026-11-03): the car pool: neon puddle, liveries, personas, warm car light (host/rivals.c, web/gpu.js livery). Test only:
       // the launcher stopped sending it with the WORLD retirement (OWNER 2026-11-17).
       if (RN_Q.get('pool') === '1') { m.ENV.RN_POOL = '1'; m.ENV.RN_TRAFMODELS = '1'; m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
-      // RN_JCLOG: one log line a second plus one per airborne sample (host/d3d9.c jumpcam_log): why a jump did or did not get the jump camera, in build/web.log
-      m.ENV.RN_JCLOG = '1';
-      // AI evidence in every F10 (OWNER 2026-10-31, "the AI is still bad"): rivals' speed, skill, actions, distance (host/free.c RN_FREELOG),
-      // traffic near the player, reactions, hits (host/rivals.c RN_AILOG). Log lines only, no behaviour change.
-      m.ENV.RN_FREELOG = '1'; m.ENV.RN_AILOG = '1';
-      // Lanes 1-3 evidence in every F10 (OWNER 2026-11-04, docs/archive/SCOPE_2026-11-04.md): log lines only. RST/RSTA/RSTW = each reset 0x427c50 + 120 frames (pos, ground height); HORNL = each traffic honk; FEEL = speed, camera, FOV.
-      m.ENV.RN_RESETLOG = '1'; m.ENV.RN_HORNLOG = '1'; m.ENV.RN_FEELLOG = '1';
+      // Verbose C-host diagnostic loggers: off by default in production; enable with ?debuglog=1 or individually via ?env=...
+      if (RN_Q.get('debuglog') === '1') {
+        for (const k of ['RN_JCLOG', 'RN_FREELOG', 'RN_AILOG', 'RN_RESETLOG', 'RN_HORNLOG', 'RN_FEELLOG', 'RN_FLOWLOG'])
+          if (!(k in m.ENV)) m.ENV[k] = '1';
+      }
       // ?hornfix=1: no traffic honk from a parked, undrawn or just-recycled car (host/horn.c)
       if (RN_Q.get('hornfix') === '1') m.ENV.RN_HORNFIX = '1';
       // ?aistuck=1: rivals count as stuck after 1.5 s under 3 m/s, not 0.4 s under 5 m/s (host/rivals.c ai_tune)
@@ -187,8 +190,9 @@ async function download(url, what) {
       if (RN_Q.has('trafmodels')) m.ENV.RN_TRAFMODELS = RN_Q.get('trafmodels');
       if (RN_Q.get('trafrefill') === '1') { m.ENV.RN_TRAFREFILL = '1'; m.ENV.RN_FREETMOVE = '0'; }
       if (RN_Q.has('traffic')) m.ENV.RN_FREETRAFFIC = RN_Q.get('traffic');
-      // Always on: an F10 session then shows the menus and files of a normal play, so it can answer a gap row without a test (tools/playindex.py)
-      m.ENV.RN_FLOWLOG = '1';
+      // RN_FLOWLOG: off by default in production unless ?debuglog=1 / ?env=RN_FLOWLOG=1, or functionally required by ?start=, curtain, touch layouts, or @-gated ?keys=.
+      const needTouch = RN_Q.get('touch') !== '0' && (RN_APP.coarse || RN_Q.get('touch') === '1');
+      if ((START || CURTAIN || needTouch || /@/.test(RN_Q.get('keys') || '')) && !('RN_FLOWLOG' in m.ENV)) m.ENV.RN_FLOWLOG = '1';
       // ?keys=: an RN_KEYS script (host/input.c; it holds commas, so not in ?env=), e.g. a tools/completion.py row
       const keys = RN_Q.get('keys');
       if (keys) m.ENV.RN_KEYS = keys;
@@ -252,7 +256,8 @@ async function download(url, what) {
   }, 200);
   // Memory line when it moves by 16 MB or more (host/win32.c rn_mem_mb): what an iPhone tab (~1.5 GB, then iOS kills it) holds.
   let memLast = '';
-  setInterval(() => {
+  memTick = setInterval(() => {
+    if (RN_APP.state === 'stop') { clearInterval(memTick); memTick = 0; return; }
     const v = [0, 1, 2].map(k => M._rn_mem_mb(k)), key = v.map(x => x >> 4).join();
     if (key !== memLast) { memLast = key; line(`mem: wasm break ${v[0]} MB (guest 1024 untouched until used), guest heap ${v[1]} MB, guest virtual ${v[2]} MB`); }
   }, 2000);
