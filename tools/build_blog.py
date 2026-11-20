@@ -6,7 +6,7 @@ URLs end in .html on purpose: the R2 host serves no directory index (docs/re/hos
 Usage: python3 tools/build_blog.py   (then tools/build_public.py ships web/blog/ with the rest)"""
 import html, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from blog_dev import DEV, DEV_DATE, REPO
+from blog_dev import CODE, DEV, DEV_DATE, REPO
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W = os.path.join(ROOT, "web")
@@ -14,12 +14,12 @@ SITE = "https://nfsu.cc"
 DATE = "2026-11-16"          # first published
 LANGS = ("en", "es")
 UI = {
-    "en": dict(guides="Guides", play="Play", other="Español", home="NFSU.cc", more="More guides", cta="Play now", updated="Updated %s", dev="How it was made", code="Code on GitHub",
+    "en": dict(guides="Guides", play="Play", other="Español", home="NFSU.cc", more="More guides", cta="Play now", updated="Updated %s", dev="How it was made", code="Code on GitHub", inrepo="In the repo:",
                hub_title="Need for Speed Underground in the browser: guides and devlog", hub_h1="Guides",
                hub_desc="How to play Need for Speed Underground online at nfsu.cc: first start, controls, browsers and phones, and how it was built: static recompilation, reverse engineering tools, WebGPU and AI agents.",
                hub_lead="NFSU.cc is Need for Speed Underground (2003) running in a browser tab. These pages explain how to start, how to drive and what is under the hood.",
                foot="NFSU.cc: Need for Speed Underground in the browser."),
-    "es": dict(guides="Guías", play="Jugar", other="English", home="NFSU.cc", more="Más guías", cta="Jugar ahora", updated="Actualizado el %s", dev="Cómo se hizo", code="Código en GitHub",
+    "es": dict(guides="Guías", play="Jugar", other="English", home="NFSU.cc", more="Más guías", cta="Jugar ahora", updated="Actualizado el %s", dev="Cómo se hizo", code="Código en GitHub", inrepo="En el repo:",
                hub_title="Need for Speed Underground en el navegador: guías y bitácora", hub_h1="Guías",
                hub_desc="Cómo jugar Need for Speed Underground online en nfsu.cc: primer arranque, controles, navegadores y celulares, y cómo se hizo: recompilación estática, herramientas de ingeniería inversa, WebGPU y agentes de IA.",
                hub_lead="NFSU.cc es Need for Speed Underground (2003) corriendo en una pestaña del navegador. Estas páginas explican cómo empezar, cómo manejar y qué hay bajo el cofre.",
@@ -377,6 +377,7 @@ for lang in LANGS:
 <p class="date"><time datetime="{date}">{u['updated'] % WHEN[lang](date)}</time></p>
 {figure(a, lang)}
 {body}
+<p class="repo"><b>{u['inrepo']}</b> {" · ".join('<a href="%s/%s/main/%s" rel="noopener"><code>%s</code></a>' % (REPO, "blob" if "." in c.rsplit("/", 1)[-1] else "tree", c, c) for c in CODE[a['key']])}</p>
 <div class="cta"><a href="/">{u['cta']}</a></div>
 </article>
 <h2 class="more">{u['more']}</h2>
@@ -389,7 +390,7 @@ for lang in LANGS:
                 {"@type": "ListItem", "position": 1, "name": "NFSU.cc", "item": SITE + "/"},
                 {"@type": "ListItem", "position": 2, "name": u["guides"], "item": url(lang, "index")},
                 {"@type": "ListItem", "position": 3, "name": a["title"][lang], "item": url(lang, names[lang])}]}]
-              + ([{"@type": "SoftwareSourceCode", "name": "RE-NFSU", "codeRepository": REPO, "programmingLanguage": ["C", "Python", "JavaScript"],
+              + ([{"@type": "SoftwareSourceCode", "name": "need-for-speed-underground-browser", "codeRepository": REPO, "url": REPO, "programmingLanguage": ["C", "Python", "JavaScript"],
                    "runtimePlatform": "WebAssembly", "description": "Static recompilation of Need for Speed Underground (2003, PC) to WebAssembly."}] if a.get("dev") else [])}
         open(os.path.join(W, "blog", lang, names[lang] + ".html"), "w", encoding="utf-8").write(page(lang, names[lang], names, a["title"][lang], a["desc"][lang], next(b for b in BACK if b not in (a["img"], a.get("img2"))), a["title"][lang], inner, ld))
         pages.append((lang, names[lang], names))

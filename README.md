@@ -69,7 +69,8 @@ flowchart LR
 | Step | Read | Translate | Stand in | Change | Serve |
 |---|---|---|---|---|---|
 | What happens | Every function of the game is found and named | Each function is written again as C, then compiled | The parts of Windows the game calls are rewritten for the browser | Every change to the game is a small patch that names its proof in the binary | Static files only, no server of our own |
-| Where | `census/`, `docs/re/` | `tools/recomp/` | `host/` | `tools/recomp/patches_*.py` | `tools/build_public.py` |
+| Where | [`census/`](census), [`docs/re/`](docs/re) | [`tools/recomp/`](tools/recomp) | [`host/`](host) | [`tools/recomp/patches_*.py`](tools/recomp) | [`tools/build_public.py`](tools/build_public.py) |
+| Read how | [RE tools](https://nfsu.cc/blog/en/reverse-engineering-tools-ghidra-hopper-rea.html) | [Static recompilation](https://nfsu.cc/blog/en/static-recompilation-x86-to-webassembly.html) | [DirectX 9 on WebGPU](https://nfsu.cc/blog/en/directx-9-and-windows-on-webgpu.html) | [The lifter's patches](https://nfsu.cc/blog/en/static-recompilation-x86-to-webassembly.html) | [Hosting 2 GB](https://nfsu.cc/blog/en/hosting-a-2-gb-game-on-cloudflare-r2-load-time.html) |
 
 > [!IMPORTANT]
 > One rule holds the project together: every value, format or patch names what proves it in the binary or the data (an address, a chunk id, a file and line). What is not proven is marked UNKNOWN, and nothing is built on it.
@@ -87,9 +88,10 @@ The game is live at [nfsu.cc](https://nfsu.cc). Step 2 of the plan, public on th
 
 ## Repo map
 
-| Folder | `tools/recomp` | `host` | `web` | `census` | `docs/re` | `tools/hopper` |
+| Folder | [`tools/recomp`](tools/recomp) | [`host`](host) | [`web`](web) | [`census`](census) | [`docs/re`](docs/re) | [`tools/hopper`](tools/hopper) |
 |---|---|---|---|---|---|---|
 | Holds | The translator and the patches | Windows and DirectX, rewritten | The page the player opens | Names and tables read from the binary | Reverse engineering notes | Queries for the disassembler |
+| Guide | [Recompilation](https://nfsu.cc/blog/en/static-recompilation-x86-to-webassembly.html) | [Windows on WebGPU](https://nfsu.cc/blog/en/directx-9-and-windows-on-webgpu.html) | [Play](https://nfsu.cc/blog/en/play-need-for-speed-underground-online.html) | [RE tools](https://nfsu.cc/blog/en/reverse-engineering-tools-ghidra-hopper-rea.html) | [RE tools](https://nfsu.cc/blog/en/reverse-engineering-tools-ghidra-hopper-rea.html) | [RE tools](https://nfsu.cc/blog/en/reverse-engineering-tools-ghidra-hopper-rea.html) |
 
 | Read first | Rules and map | What done means | Hosting |
 |---|---|---|---|

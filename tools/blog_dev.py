@@ -1,7 +1,13 @@
 """Devlog posts for tools/build_blog.py (OWNER 2026-11-17: posts on what was built and the tools, for people who search RE and decomp,
 not only the game; GitHub repo linked; AI agents get their own post). Same rules as the guides: every number names its source above the post."""
 
-REPO = "https://github.com/Caliko06/RE-NFSU"
+REPO = "https://github.com/Caliko06/need-for-speed-underground-browser"
+# Repo folders and files each post explains: shown as "In the repo" links under the post (OWNER 2026-11-19: mix links to the repo with its sections).
+CODE = dict(play=["web", "web/launcher.js", "web/saves.js"], controls=["web/input.js", "web/pad.js", "web/touch.js", "host/dinput8.c"],
+            devices=["web/gpu.js", "web/audio.js", "web/webgpu_gl.js"], tech=["tools/recomp", "host", "web", "census"],
+            recomp=["tools/recomp", "tools/recomp/lift.py", "tools/recomp/difftest.py", "tools/recomp/patches.py", "tools/recomp/abk.py"],
+            retools=["docs/re", "census", "tools/hopper", "census/ghidra"], host=["host", "host/d3d9.c", "host/gpu.c", "web/gpu.js", "host/dsound.c", "host/threads.c"],
+            load=["host/files.c", "tools/build_public.py", "tools/loadcap.mjs", "docs/re/hosting.md"], agents=["AGENTS.md", "web/plan/plan.json", "HANDOFF.md", "docs/re"])
 DEV_DATE = "2026-11-17"
 
 DEV = [

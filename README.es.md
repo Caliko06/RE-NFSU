@@ -69,7 +69,8 @@ flowchart LR
 | Paso | Leer | Traducir | Reemplazar | Cambiar | Servir |
 |---|---|---|---|---|---|
 | Qué pasa | Cada función del juego se encuentra y se nombra | Cada función se escribe de nuevo en C y se compila | Las partes de Windows que llama el juego se reescriben para el navegador | Cada cambio al juego es un parche chico que nombra su prueba en el binario | Solo archivos estáticos, sin servidor propio |
-| Dónde | `census/`, `docs/re/` | `tools/recomp/` | `host/` | `tools/recomp/patches_*.py` | `tools/build_public.py` |
+| Dónde | [`census/`](census), [`docs/re/`](docs/re) | [`tools/recomp/`](tools/recomp) | [`host/`](host) | [`tools/recomp/patches_*.py`](tools/recomp) | [`tools/build_public.py`](tools/build_public.py) |
+| Cómo se hizo | [Herramientas de IE](https://nfsu.cc/blog/es/herramientas-ingenieria-inversa-ghidra-hopper-rea.html) | [Recompilación estática](https://nfsu.cc/blog/es/recompilacion-estatica-x86-a-webassembly.html) | [DirectX 9 sobre WebGPU](https://nfsu.cc/blog/es/directx-9-y-windows-sobre-webgpu.html) | [Los parches](https://nfsu.cc/blog/es/recompilacion-estatica-x86-a-webassembly.html) | [Alojar 2 GB](https://nfsu.cc/blog/es/alojar-un-juego-de-2-gb-en-cloudflare-r2-tiempo-de-carga.html) |
 
 > [!IMPORTANT]
 > Una regla sostiene el proyecto: cada valor, formato o parche nombra lo que lo prueba en el binario o en los datos (una dirección, un id de chunk, un archivo y línea). Lo que no está probado se marca UNKNOWN y nada se construye encima.
@@ -87,9 +88,10 @@ El juego está en línea en [nfsu.cc](https://nfsu.cc). El paso 2 del plan, púb
 
 ## Mapa del repo
 
-| Carpeta | `tools/recomp` | `host` | `web` | `census` | `docs/re` | `tools/hopper` |
+| Carpeta | [`tools/recomp`](tools/recomp) | [`host`](host) | [`web`](web) | [`census`](census) | [`docs/re`](docs/re) | [`tools/hopper`](tools/hopper) |
 |---|---|---|---|---|---|---|
 | Tiene | El traductor y los parches | Windows y DirectX, reescritos | La página que abre el jugador | Nombres y tablas leídos del binario | Notas de ingeniería inversa | Consultas para el desensamblador |
+| Guía | [Recompilación](https://nfsu.cc/blog/es/recompilacion-estatica-x86-a-webassembly.html) | [Windows sobre WebGPU](https://nfsu.cc/blog/es/directx-9-y-windows-sobre-webgpu.html) | [Jugar](https://nfsu.cc/blog/es/jugar-need-for-speed-underground-online.html) | [Herramientas](https://nfsu.cc/blog/es/herramientas-ingenieria-inversa-ghidra-hopper-rea.html) | [Herramientas](https://nfsu.cc/blog/es/herramientas-ingenieria-inversa-ghidra-hopper-rea.html) | [Herramientas](https://nfsu.cc/blog/es/herramientas-ingenieria-inversa-ghidra-hopper-rea.html) |
 
 <details>
 <summary><b>Compilar y correr</b></summary>
