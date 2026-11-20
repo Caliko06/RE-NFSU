@@ -84,7 +84,7 @@ flowchart LR
 
 ## Estado
 
-El juego está en línea en [nfsu.cc](https://nfsu.cc). El paso 2 del plan, público en internet, tiene 11 filas: 1 verificada, 5 construidas que esperan una prueba de juego, 5 abiertas. El estado vivo, fila por fila con su evidencia, está en [`web/plan/plan.json`](web/plan/plan.json). El último cierre está en [`HANDOFF.md`](HANDOFF.md).
+El juego está en línea en [nfsu.cc](https://nfsu.cc).
 
 ## Mapa del repo
 

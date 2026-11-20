@@ -17,3 +17,16 @@ attic/world/web/ug2/*.gz
 attic/world/web/ug2/tex/
 attic/world/web/ug2/tex.json
 dist/
+
+# Internal work notes: kept on this machine, not published
+/AGENTS.md
+/CLAUDE.md
+/HANDOFF.md
+/docs/GOAL.md
+/web/plan/
+/docs/archive/
+/docs/openworld/
+/docs/launch/
+/docs/prior_art/
+/attic/
+/.claude/

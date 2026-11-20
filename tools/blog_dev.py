@@ -2,12 +2,12 @@
 not only the game; GitHub repo linked; AI agents get their own post). Same rules as the guides: every number names its source above the post."""
 
 REPO = "https://github.com/Caliko06/need-for-speed-underground-browser"
-# Repo folders and files each post explains: shown as "In the repo" links under the post (OWNER 2026-11-19: mix links to the repo with its sections).
+# Repo folders and files each post explains: shown as "In the repo" links under the post.
 CODE = dict(play=["web", "web/launcher.js", "web/saves.js"], controls=["web/input.js", "web/pad.js", "web/touch.js", "host/dinput8.c"],
             devices=["web/gpu.js", "web/audio.js", "web/webgpu_gl.js"], tech=["tools/recomp", "host", "web", "census"],
             recomp=["tools/recomp", "tools/recomp/lift.py", "tools/recomp/difftest.py", "tools/recomp/patches.py", "tools/recomp/abk.py"],
             retools=["docs/re", "census", "tools/hopper", "census/ghidra"], host=["host", "host/d3d9.c", "host/gpu.c", "web/gpu.js", "host/dsound.c", "host/threads.c"],
-            load=["host/files.c", "tools/build_public.py", "tools/loadcap.mjs", "docs/re/hosting.md"], agents=["AGENTS.md", "web/plan/plan.json", "HANDOFF.md", "docs/re"])
+            load=["host/files.c", "tools/build_public.py", "tools/loadcap.mjs", "docs/re/hosting.md"], agents=["tools/recomp/difftest.py", "docs/re", "census"])
 DEV_DATE = "2026-11-17"
 
 DEV = [
@@ -242,7 +242,7 @@ DEV = [
 </ul>
 <h2>What did not work</h2>
 <p>Long reports, percent-done scores and big multi-agent ceremonies cost time without making the game better, and were dropped. Heavy testing was cut to one check that matches how the owner plays. What stayed is small: a goal, the evidence rule, a commit after every finished step, and a person who plays the result.</p>
-<p>The whole history, rules included, is public on <a href="REPO">GitHub</a>. The agents' instructions are in <a href="REPO/blob/main/AGENTS.md">AGENTS.md</a>.</p>
+<p>The code and its history are public on <a href="REPO">GitHub</a>.</p>
 """, es="""
 <h2>Quién hizo qué</h2>
 <ul>
@@ -262,7 +262,7 @@ DEV = [
 </ul>
 <h2>Lo que no funcionó</h2>
 <p>Los reportes largos, los porcentajes de avance y las grandes ceremonias de muchos agentes costaron tiempo sin mejorar el juego, y se quitaron. Las pruebas pesadas se redujeron a una revisión que se parece a cómo juega el dueño. Lo que quedó es poco: una meta, la regla de evidencia, un commit después de cada paso terminado y una persona que juega el resultado.</p>
-<p>Toda la historia, reglas incluidas, es pública en <a href="REPO">GitHub</a>. Las instrucciones de los agentes están en <a href="REPO/blob/main/AGENTS.md">AGENTS.md</a>.</p>
+<p>El código y su historia son públicos en <a href="REPO">GitHub</a>.</p>
 """)),
 ]
 

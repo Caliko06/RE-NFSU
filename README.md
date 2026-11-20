@@ -84,7 +84,7 @@ flowchart LR
 
 ## Status
 
-The game is live at [nfsu.cc](https://nfsu.cc). Step 2 of the plan, public on the internet, has 11 rows: 1 verified, 5 built and waiting on a play test, 5 open. The live state, row by row with its evidence, is in [`web/plan/plan.json`](web/plan/plan.json). The last close is in [`HANDOFF.md`](HANDOFF.md).
+The game is live at [nfsu.cc](https://nfsu.cc).
 
 ## Repo map
 
@@ -93,9 +93,9 @@ The game is live at [nfsu.cc](https://nfsu.cc). Step 2 of the plan, public on th
 | Holds | The translator and the patches | Windows and DirectX, rewritten | The page the player opens | Names and tables read from the binary | Reverse engineering notes | Queries for the disassembler |
 | Guide | [Recompilation](https://nfsu.cc/blog/en/static-recompilation-x86-to-webassembly.html) | [Windows on WebGPU](https://nfsu.cc/blog/en/directx-9-and-windows-on-webgpu.html) | [Play](https://nfsu.cc/blog/en/play-need-for-speed-underground-online.html) | [RE tools](https://nfsu.cc/blog/en/reverse-engineering-tools-ghidra-hopper-rea.html) | [RE tools](https://nfsu.cc/blog/en/reverse-engineering-tools-ghidra-hopper-rea.html) | [RE tools](https://nfsu.cc/blog/en/reverse-engineering-tools-ghidra-hopper-rea.html) |
 
-| Read first | Rules and map | What done means | Hosting |
-|---|---|---|---|
-| File | [`AGENTS.md`](AGENTS.md) | [`docs/GOAL.md`](docs/GOAL.md) | [`docs/re/hosting.md`](docs/re/hosting.md) |
+| Read first | Method notes | Hosting |
+|---|---|---|
+| File | [`docs/re/README.md`](docs/re/README.md) | [`docs/re/hosting.md`](docs/re/hosting.md) |
 
 <details>
 <summary><b>Build and run</b></summary>
