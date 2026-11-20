@@ -8,7 +8,6 @@
 #include "gpu.h"
 #include "sm1.h"
 #include "carsmooth.h"
-#include "mc.h"
 
 #define D3D_OK 0u
 #define D3DERR_NOTFOUND 0x88760866u
@@ -1323,7 +1322,6 @@ static uint32_t IDirect3DDevice9_Present(Ctx *c) {
     horn_tick(c);        // host/horn.c: recycle stamps for the horn hook (RN_HORNLOG / RN_HORNFIX)
     reset_tel(c);        // host/aitel.c: the game's reset 0x427c50 + 120 frames after (RN_RESETLOG)
     feel_tel(c);         // host/feellog.c: speed, chase row, FOV and 0-60 / 0-100 (RN_FEELLOG)
-    mc_frame(c);         // host/mc.c: leave the car, walk, get back in (Free Run, RN_MC)
     if (rn_steerlog) steer_frame(c);
     if (ARG(1) || ARG(2) || ARG(3) || ARG(4)) {
         rn_halt(c, "d3d9: Present with rects/window (%08x %08x %08x %08x)", ARG(1), ARG(2), ARG(3), ARG(4));
@@ -2281,7 +2279,6 @@ static void roadrefl_frame(void) {
                (const char *[]){"game", "sq", "cube", "off"}[sm1_roadrefl()], dev.frames, rr.tex, rr.sample, rr.curve, rr.mirror);
     rr.sample = rr.curve = rr.mirror = 0;
 }
-static struct { uint32_t ds, frame; Viewport vp; } scene;   // last scene draw: depth object index + 1, frame + 1 it was drawn in
 static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint32_t stride, uint32_t vmin, uint32_t nvert,
                      uint32_t ib, int i32, int32_t ibias) {
     TR("draw %u x%u vs %u ps %u decl %u tex %u %u %u %u blend %u %u/%u atest %u z %u/%u cull %u fog %u", type, count,
@@ -2311,8 +2308,6 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
     }
     if (!ib && !xdraw.vb && !rdraw.vb) nvert = n;
     Obj *rt = obj_k(dev.rt[0]), *ds = obj_k(dev.ds);
-    // The scene's depth surface and viewport (the same test as web/gpu.js sceneDs): host/mc.c's draws at the first HUD quad reuse them.
-    if (ds && dev.rs[7] && ds->w >= 1000 && rt->w == ds->w) { scene.ds = dev.ds; scene.vp = dev.vp; scene.frame = dev.frames + 1; }
     uint32_t nvc = vs->hl ? 16 + 4 * SM1_HL_N : (uint32_t)(vs->sm->max_const + 1), npc = 8, vbytes = rdraw.vb ? 0 : nvert * stride, ni = rdraw.vb ? 0 : nidx;
     uint32_t total = D_HDR + 4 * nvc + 4 * npc + (vbytes + 3) / 4 + ni;
     uint32_t *w = gpu_put(GPU_DRAW, (int)total);   // straight into the frame list: no calloc, copy and free per draw
@@ -2370,72 +2365,6 @@ static void draw_cmd(Ctx *c, uint32_t type, uint32_t count, uint32_t vbase, uint
         }
     }
     flush_big();
-}
-// Minecraft lane: world-space triangles in one colour (host/mc.h). The shaders are hand-written D3D9 token streams:
-//   vs_1_1: dcl_position v0; m4x4 oPos, v0, c0 (c0..c3 = the columns of world*view*proj, row-vector order); mov oD0, c4 (the colour)
-//   ps_1_1: mov r0, v0
-void d3d9_draw_tris(Ctx *c, const float *xyz, uint32_t ntri, uint32_t argb) {
-    static uint32_t vs_k, ps_k, decl_k;
-    static uint16_t seq[65535];
-    if (!ntri) return;
-    if (!vs_k) {
-        static const uint32_t vs[] = {0xfffe0101,                       // vs_1_1
-            0x0200001f, 0x80000000, 0x900f0000,                         // dcl_position v0
-            0x03000014, 0xc00f0000, 0x90e40000, 0xa0e40000,             // m4x4 oPos, v0, c0
-            0x02000001, 0xd00f0000, 0xa0e40004,                         // mov oD0, c4
-            0x0000ffff};
-        static const uint32_t ps[] = {0xffff0101,                       // ps_1_1
-            0x02000001, 0x800f0000, 0x90e40000,                         // mov r0, v0
-            0x0000ffff};
-        uint32_t g = guest_alloc(256);
-        for (uint32_t k = 0; k < sizeof vs / 4; k++) st(c, g + 4 * k, vs[k], 4);
-        for (uint32_t k = 0; k < sizeof ps / 4; k++) st(c, g + 128 + 4 * k, ps[k], 4);
-        if (new_shader(c, I_VS, g, g + 252) != D3D_OK) { vs_k = ~0u; return; }
-        vs_k = (uint32_t)top + 1;
-        if (new_shader(c, I_PS, g + 128, g + 252) != D3D_OK) { vs_k = ~0u; return; }
-        ps_k = (uint32_t)top + 1;
-        const uint8_t el[16] = {0, 0, 0, 0, 2, 0, 0, 0,                 // stream 0, offset 0, FLOAT3, POSITION 0
-                                0xff, 0, 0, 0, 17, 0, 0, 0};            // D3DDECL_END
-        decl_k = make_decl(c, el, 1);
-        for (uint32_t k = 0; k < 65535; k++) seq[k] = (uint16_t)k;
-    }
-    if (vs_k == ~0u || !decl_k) return;
-    // world * view * proj for row vectors; D3D's m4x4 takes the columns of that matrix in c0..c3.
-    float m[16];
-    for (int r = 0; r < 4; r++) for (int q = 0; q < 4; q++) {
-        m[4 * r + q] = 0;
-        for (int k = 0; k < 4; k++) m[4 * r + q] += rn_mc.view[4 * r + k] * rn_mc.proj[4 * k + q];
-    }
-    static const uint32_t rsi[9] = {7, 14, 23, 22, 27, 15, 28, 168, 174}, rsv[9] = {1, 1, 4, 1, 0, 0, 0, 0xf, 0};
-    uint32_t s_rs[9], s_vs = dev.vs, s_ps = dev.ps, s_decl = dev.decl, s_fvf = dev.fvf, s_ds = dev.ds;
-    float s_vsf[5][4];
-    Viewport s_vp = dev.vp;
-    memcpy(s_vsf, dev.vsf, sizeof s_vsf);
-    for (int k = 0; k < 9; k++) { s_rs[k] = dev.rs[rsi[k]]; dev.rs[rsi[k]] = rsv[k]; }
-    dev.vs = vs_k; dev.ps = ps_k; dev.decl = decl_k; dev.fvf = 0;
-    if (scene.ds && scene.frame == dev.frames + 1) { dev.ds = scene.ds; dev.vp = scene.vp; }   // the scene's depth, even when the HUD draws elsewhere
-    for (int i = 0; i < 4; i++) for (int r = 0; r < 4; r++) dev.vsf[i][r] = m[4 * r + i];
-    dev.vsf[4][0] = (float)(argb >> 16 & 255) / 255; dev.vsf[4][1] = (float)(argb >> 8 & 255) / 255;
-    dev.vsf[4][2] = (float)(argb & 255) / 255; dev.vsf[4][3] = (float)(argb >> 24) / 255;
-    for (uint32_t t = 0; t < ntri;) {                                   // at most 21845 triangles: 16-bit indices
-        uint32_t n = ntri - t < 21845 ? ntri - t : 21845;
-        xdraw.vb = xyz + 9 * t; xdraw.nvert = 3 * n; xdraw.idx = seq; xdraw.nidx = 3 * n;
-        draw_cmd(c, 4, n, 0, 12, 0, 3 * n, 0, 0, 0);
-        xdraw.vb = NULL;
-        t += n;
-    }
-    for (int k = 0; k < 9; k++) dev.rs[rsi[k]] = s_rs[k];
-    dev.vs = s_vs; dev.ps = s_ps; dev.decl = s_decl; dev.fvf = s_fvf; dev.ds = s_ds; dev.vp = s_vp;
-    memcpy(dev.vsf, s_vsf, sizeof s_vsf);
-}
-// The render hook (first HUD quad of a race frame): the player view's matrices for host/mc.c, then the on-foot actor.
-static void mc_hook(Ctx *c) {
-    uint32_t blk = ld(c, 0x7404c0, 4);
-    if (blk && blk < GUEST_MEM - 0x80) {
-        for (int k = 0; k < 16; k++) { rn_mc.view[k] = ldf(c, blk + 4 * k); rn_mc.proj[k] = ldf(c, blk + 64 + 4 * k); }
-    }
-    rn_mc.track = (int32_t)ld(c, 0x78a2f0, 4);   // RaceStatus track id (names_world.tsv)
-    if (mc_enabled() && rn_mc.on_foot) mc_draw_actor(c, &rn_mc);
 }
 static uint32_t stream0(Ctx *c) {
     Obj *vb = obj_k(dev.stream[0].vb);
@@ -2825,7 +2754,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     if (isl) {
         uint32_t lb = ld(c, 0x77a90c, 4);
         if (lb == 0x6c9c3c) racing = 1;
-        else if (lb == 0x6c9cf0 || lb == 0x6c9de8 || lb == 0x6c9e8c || lb == 0x6c9ea0) racing = 0, rn_mc.track = 0;
+        else if (lb == 0x6c9cf0 || lb == 0x6c9de8 || lb == 0x6c9e8c || lb == 0x6c9ea0) racing = 0;
     }
     // BRIDGE: FXAA (web/gpu.js) over the 3D scene, once per race frame, before the first HUD quad (the HUD is drawn last into the same target).
     static uint32_t fxaa_frame = ~0u;
@@ -2857,7 +2786,7 @@ static uint32_t IDirect3DDevice9_DrawPrimitiveUP(Ctx *c) {
     rn_hud_on = hud;
     static int hud_seen;
     if (hud && !hud_seen) { hud_seen = 1; rn_log("d3d9 race HUD %ux%u (track loaded, 0x77a90c = 0x6c9c3c, 3D scene drawn)", rt->w, rt->h); rn_fixedclock_start(c); }
-    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 8, w1); mc_hook(c); }
+    if (race && fxaa_frame != dev.frames) { fxaa_frame = dev.frames; uint32_t w1[8] = {rt->gpu}; psblur_vel(c, w1 + 1); gpu_cmd(GPU_FXAA, 8, w1); }
     // OWNER A/B for the 16:9 decision (build/evidence/1_hud.md): RN_HUD=edges (default) | 169 (the side groups stop at a centred
     // 16:9 box) | 43 (the original 4:3 places); RN_FE=stretch widens the front-end island to the whole window (default: black bars).
     // input_hud_inset (web/touch.js, phones, live): the side groups stop that far from the picture's edge, so the notch and the

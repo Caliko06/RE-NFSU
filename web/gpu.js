@@ -656,26 +656,30 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
   const dummyCubeView = dummyCube.createView({ dimension: 'cube' });
   const ANISO = Number(RN_Q.get('aniso') ?? 16);   // ?aniso=1 turns the bridge off
   const samplers = new Map();
-  function sampler(t) {
-    const key = `${t[T_AU]},${t[T_AV]},${t[T_MAG]},${t[T_MIN]},${t[T_MIP]},${t[T_ANISO]}`;
-    if (samplers.has(key)) return samplers.get(key);
-    const au = ADDRESS[t[T_AU]], av = ADDRESS[t[T_AV]];
-    if (!au || !av) fail(`texture address ${t[T_AU]}/${t[T_AV]}`);
+  function samplerFrom(w, to) {
+    const auv = w[to + T_AU], avv = w[to + T_AV], mag = w[to + T_MAG], min = w[to + T_MIN], mip = w[to + T_MIP], aniso = w[to + T_ANISO];
+    const key = (auv < 16 && avv < 16 && mag < 16 && min < 16 && mip < 16 && aniso < 256)
+      ? (auv | (avv << 4) | (mag << 8) | (min << 12) | (mip << 16) | (aniso << 20))
+      : `${auv},${avv},${mag},${min},${mip},${aniso}`;
+    let s = samplers.get(key);
+    if (s) return s;
+    const au = ADDRESS[auv], av = ADDRESS[avv];
+    if (!au || !av) fail(`texture address ${auv}/${avv}`);
     const filt = f => f >= 2 ? 'linear' : 'nearest';
-    const d = { addressModeU: au, addressModeV: av, magFilter: filt(t[T_MAG]), minFilter: filt(t[T_MIN]),
-      mipmapFilter: t[T_MIP] === 2 ? 'linear' : 'nearest' };
-    if (!t[T_MIP]) d.lodMaxClamp = 0;      // D3DTEXF_NONE: level 0 only
-    if ((t[T_MIN] === 3 || t[T_MAG] === 3) && t[T_MIP] === 2) d.maxAnisotropy = Math.min(16, Math.max(1, t[T_ANISO]));
+    const d = { addressModeU: au, addressModeV: av, magFilter: filt(mag), minFilter: filt(min),
+      mipmapFilter: mip === 2 ? 'linear' : 'nearest' };
+    if (!mip) d.lodMaxClamp = 0;      // D3DTEXF_NONE: level 0 only
+    if ((min === 3 || mag === 3) && mip === 2) d.maxAnisotropy = Math.min(16, Math.max(1, aniso));
     // BRIDGE: remaster, OWNER 2026-10-22: every linear sampler of a mipmapped texture is trilinear with 16x anisotropy
     // (the game asks for point mips or no anisotropy). WebGPU needs all three filters linear for maxAnisotropy > 1.
-    if (ANISO > 1 && t[T_MIP] && filt(t[T_MIN]) === 'linear' && filt(t[T_MAG]) === 'linear') { d.mipmapFilter = 'linear'; d.maxAnisotropy = ANISO; }
-    const s = device.createSampler(d);
+    if (ANISO > 1 && mip && filt(min) === 'linear' && filt(mag) === 'linear') { d.mipmapFilter = 'linear'; d.maxAnisotropy = ANISO; }
+    s = device.createSampler(d);
     samplers.set(key, s);
     return s;
   }
-  const pipes = new Map();
-  function blendState(w) {
-    if (!w[D_BLEND]) return undefined;
+  function sampler(t) { return samplerFrom(t, 0); }
+  function blendState(w, hdr) {
+    if (!w[hdr + D_BLEND]) return undefined;
     const comp = (src, dst, op) => {
       let s = BLEND[src], d = BLEND[dst];
       if (src === 12) { s = 'src-alpha'; d = 'one-minus-src-alpha'; }       // BOTHSRCALPHA
@@ -684,8 +688,8 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       if (op >= 4) { s = 'one'; d = 'one'; }                                 // MIN/MAX ignore the factors
       return { srcFactor: s, dstFactor: d, operation: BLENDOP[op] };
     };
-    const color = comp(w[D_SRCB], w[D_DSTB], w[D_BOP]);
-    return { color, alpha: w[D_SEPA] ? comp(w[D_SRCBA], w[D_DSTBA], w[D_BOPA]) : color };
+    const color = comp(w[hdr + D_SRCB], w[hdr + D_DSTB], w[hdr + D_BOP]);
+    return { color, alpha: w[hdr + D_SEPA] ? comp(w[hdr + D_SRCBA], w[hdr + D_DSTBA], w[hdr + D_BOPA]) : color };
   }
   // Index size of a draw: resident index buffers keep the game's 16 or 32 bits; payload indices are 32 bits.
   const ifmt = (w, hdr) => w[hdr + D_RIB] && w[hdr + D_RIFMT] === 2 ? 'uint16' : 'uint32';
@@ -721,9 +725,8 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       return false;
     });
   }
-  function warmRemember(w, hdr, stride, sc, key) {
-    const vs = shaders.get(w[hdr + D_VS]), ps = shaders.get(w[hdr + D_PS]), dc = decls.get(w[hdr + D_DECL]);
-    const k = hash53(`${vs.h} ${ps.h} ${dc.sig} ${key.slice(key.indexOf(',', key.indexOf(',', key.indexOf(',') + 1) + 1))}`);
+  function warmRemember(vs, ps, dc, stride, sc, w, hdr, tail) {
+    const k = hash53(`${vs.h} ${ps.h} ${dc.sig} ${tail}`);
     if (warmSeen.has(k)) return;
     warmSeen.add(k);
     warmList.push({ k, vs: vs.h, ps: ps.h, decl: dc.sig, stride, sc, st: WARM_F.map(f => w[hdr + f]) });
@@ -732,15 +735,37 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       try { localStorage.setItem(WARM_KEY, JSON.stringify(warmList.slice(-WARM_MAX))); } catch {}
     }, 5000);
   }
+  function findPipe(list, tag, stride, topo, ds, zen, zwrite, zfunc, cull, blend, srcb, dstb, bop, sepa, srcba, dstba, bopa, cwrite, sc, fmt) {
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i];
+      if (e.tag === tag && e.stride === stride && e.topo === topo && e.ds === ds && e.zen === zen &&
+          e.zwrite === zwrite && e.zfunc === zfunc && e.cull === cull && e.blend === blend &&
+          e.srcb === srcb && e.dstb === dstb && e.bop === bop && e.sepa === sepa &&
+          e.srcba === srcba && e.dstba === dstba && e.bopa === bopa && e.cwrite === cwrite &&
+          e.sc === sc && e.fmt === fmt) return e.p;
+    }
+    return null;
+  }
   function pipeline(w, hdr, stride, sc, warm) {
     const vs = shaders.get(w[hdr + D_VS]), ps = shaders.get(w[hdr + D_PS]), decl = decls.get(w[hdr + D_DECL]);
     if (!vs || !ps || !decl) fail('draw with an unknown shader or declaration');
-    const g = i => w[hdr + i];
-    const ds = g(D_DS) !== 0;
-    const key = [g(D_VS), g(D_PS), g(D_DECL), stride, g(D_TOPO), ds, g(D_ZEN), g(D_ZWRITE), g(D_ZFUNC), g(D_CULL), g(D_BLEND),
-      g(D_SRCB), g(D_DSTB), g(D_BOP), g(D_SEPA), g(D_SRCBA), g(D_DSTBA), g(D_BOPA), g(D_CWRITE), sc, ifmt(w, hdr)].join(',');
-    if (pipes.has(key)) return pipes.get(key);
-    if (WARM && !warm) warmRemember(w, hdr, stride, sc, key);
+    const topo = w[hdr + D_TOPO], ds = w[hdr + D_DS] !== 0 ? 1 : 0, zen = w[hdr + D_ZEN], zwrite = w[hdr + D_ZWRITE],
+      zfunc = w[hdr + D_ZFUNC], cull = w[hdr + D_CULL], blend = w[hdr + D_BLEND], srcb = w[hdr + D_SRCB],
+      dstb = w[hdr + D_DSTB], bop = w[hdr + D_BOP], sepa = w[hdr + D_SEPA], srcba = w[hdr + D_SRCBA],
+      dstba = w[hdr + D_DSTBA], bopa = w[hdr + D_BOPA], cwrite = w[hdr + D_CWRITE],
+      fmt = (w[hdr + D_RIB] && w[hdr + D_RIFMT] === 2) ? 1 : 0;
+    const tag = ((stride << 12) ^ (ds << 11) ^ (zen << 10) ^ (zwrite << 9) ^ (blend << 8) ^ (zfunc << 4) ^ (cull << 2) ^ topo ^ (sc << 20) ^ (fmt << 24)) | 0;
+    let m1 = vs._pipes;
+    let m2 = m1 && m1.get(ps);
+    let list = m2 && m2.get(decl);
+    if (list) {
+      const hit = findPipe(list, tag, stride, topo, ds, zen, zwrite, zfunc, cull, blend, srcb, dstb, bop, sepa, srcba, dstba, bopa, cwrite, sc, fmt);
+      if (hit) return hit;
+    }
+    if (WARM && !warm) {
+      const tail = `,${stride},${topo},${ds !== 0},${zen},${zwrite},${zfunc},${cull},${blend},${srcb},${dstb},${bop},${sepa},${srcba},${dstba},${bopa},${cwrite},${sc},${fmt ? 'uint16' : 'uint32'}`;
+      warmRemember(vs, ps, decl, stride, sc, w, hdr, tail);
+    }
     const attributes = [];
     for (let k = 0; k < 16; k++) {
       const inp = vs.inputs[k];
@@ -751,25 +776,35 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
       if (!VFMT[e.type]) fail(`vertex element type ${e.type}`);
       attributes.push({ shaderLocation: k, offset: e.offset, format: VFMT[e.type] });
     }
-    const topo = g(D_TOPO) === 4 ? 'triangle-list' : g(D_TOPO) === 5 ? 'triangle-strip' : fail(`topology ${g(D_TOPO)}`);
-    const cull = g(D_CULL) === 3 ? 'back' : g(D_CULL) === 2 ? 'front' : 'none';
+    const topoStr = topo === 4 ? 'triangle-list' : topo === 5 ? 'triangle-strip' : fail(`topology ${topo}`);
+    const cullStr = cull === 3 ? 'back' : cull === 2 ? 'front' : 'none';
     const st = { compare: 'always' };
     const desc = { layout: drawLayout(ps.texMask),
       vertex: { module: vs.module, entryPoint: 'main', buffers: [{ arrayStride: stride, attributes }] },
       fragment: { module: ps.module, entryPoint: 'main',
-        targets: [{ format: 'rgba8unorm', blend: blendState(w.subarray(hdr)), writeMask: g(D_CWRITE) & 15 }] },
+        targets: [{ format: 'rgba8unorm', blend: blendState(w, hdr), writeMask: cwrite & 15 }] },
       // D3D9 front faces are clockwise on screen; CULL_CCW (the default) culls the back ones.
       multisample: { count: sc },
-      primitive: { topology: topo, frontFace: 'cw', cullMode: cull,
-        stripIndexFormat: topo === 'triangle-strip' && g(D_NIDX) ? ifmt(w, hdr) : undefined },
-      depthStencil: ds ? { format: 'depth24plus-stencil8', depthWriteEnabled: !!(g(D_ZEN) && g(D_ZWRITE)),
-        depthCompare: g(D_ZEN) ? CMP[g(D_ZFUNC)] : 'always', stencilFront: st, stencilBack: st } : undefined };
+      primitive: { topology: topoStr, frontFace: 'cw', cullMode: cullStr,
+        stripIndexFormat: topoStr === 'triangle-strip' && w[hdr + D_NIDX] ? (fmt ? 'uint16' : 'uint32') : undefined },
+      depthStencil: ds ? { format: 'depth24plus-stencil8', depthWriteEnabled: !!(zen && zwrite),
+        depthCompare: zen ? CMP[zfunc] : 'always', stencilFront: st, stencilBack: st } : undefined };
+    if (!m1) vs._pipes = m1 = new Map();
+    if (!m2) m1.set(ps, m2 = new Map());
+    if (!list) m2.set(decl, list = []);
+    const entry = { tag, stride, topo, ds, zen, zwrite, zfunc, cull, blend, srcb, dstb, bop, sepa, srcba, dstba, bopa, cwrite, sc, fmt, p: null };
     if (warm) {
-      device.createRenderPipelineAsync(desc).then(p => { if (!pipes.has(key)) pipes.set(key, p); }, () => {});
+      device.createRenderPipelineAsync(desc).then(p => {
+        if (!findPipe(list, tag, stride, topo, ds, zen, zwrite, zfunc, cull, blend, srcb, dstb, bop, sepa, srcba, dstba, bopa, cwrite, sc, fmt)) {
+          entry.p = p;
+          list.push(entry);
+        }
+      }, () => {});
       return null;
     }
     const p = device.createRenderPipeline(desc);
-    pipes.set(key, p);
+    entry.p = p;
+    list.push(entry);
     newPipes++;
     return p;
   }
@@ -785,12 +820,43 @@ struct U { rect: vec4f, par: vec4f, zz: vec4f, tint: vec4f };
   // Their CPU copies live across frames (a new 8 MB of uniforms per frame made GC pauses). A uniform slot keeps the
   // previous frame's constants above this draw's count, so those are zeroed back (unv/unp: counts last written there).
   const uni = new ArrayBuffer(256 * 1024), uf = new Float32Array(uni);
+  const UOFF_ARR = [0], BF_ARR = [0, 0, 0, 0];
   let vdata = new Uint8Array(0), idata = new Uint32Array(0), udata = new ArrayBuffer(0), udw = null, udf = null,
     unv = new Uint16Array(0), unp = new Uint16Array(0), uBind = null, uBindBuf = null;
   // Texture bind groups by layout and resources (each GPU object gets a number the first time it is seen).
   const objIds = new WeakMap(), texBinds = new Map();
-  let nextObj = 1;
+  let nextObj = 1, texBindCount = 0;
   const oid = o => { let k = objIds.get(o); if (!k) objIds.set(o, k = nextObj++); return k; };
+  function makeTexBindGroup(mask, w, a) {
+    if (texBindCount >= 8192) { texBinds.clear(); texBindCount = 0; }     // keys of destroyed textures are never asked again
+    if (mask === 0) {
+      const bg = device.createBindGroup({ layout: texBgl(0), entries: [] });
+      texBinds.set(0, bg);
+      texBindCount++;
+      return bg;
+    }
+    const entries = [];
+    let node = texBinds.get(mask);
+    if (!node) texBinds.set(mask, node = new Map());
+    let parent = texBinds, lastKey = mask;
+    for (let k = 0; k < 8; k++) if ((mask >>> k) & 1) {
+      const to = a + D_TEX + D_TEXN * k;
+      const tid = w[to + T_ID];
+      const img = tid ? res.get(tid) : null, cube = (w[to + T_TT] & T_CUBE) !== 0;
+      const smp = samplerFrom(w, to), v2 = (!cube && img?.view) || dummyView, vc = (cube && img?.cube) || dummyCubeView;
+      entries.push({ binding: 2 * k, resource: smp }, { binding: 2 * k + 1, resource: v2 }, { binding: 16 + k, resource: vc });
+      const sId = oid(smp), v2Id = oid(v2), vcId = oid(vc);
+      let m1 = node.get(sId); if (!m1) node.set(sId, m1 = new Map());
+      let m2 = m1.get(v2Id); if (!m2) m1.set(v2Id, m2 = new Map());
+      parent = m2; lastKey = vcId;
+      node = m2.get(vcId);
+      if (!node && (mask >>> (k + 1)) !== 0) m2.set(vcId, node = new Map());
+    }
+    const bg = device.createBindGroup({ layout: texBgl(mask), entries });
+    parent.set(lastKey, bg);
+    texBindCount++;
+    return bg;
+  }
 
   // BRIDGE: HD car skins (host/d3d9.c skin_bridge; OWNER 2026-10-23, remaster scope). GPU_SKIN replays the game's CPU composite
   // 0x5a8a50 of DUMMY_SKINn on the GPU at 4x (at most 2048), with the 512 layers and masks sampled bilinear, so mask edges
@@ -1047,15 +1113,16 @@ fn mulfloor(c: f32, w: f32) -> f32 {
       uBindBuf = ubuf;
     }
     let voff = 0, ioff = 0, uoff = 0;
-    let pass = null, passKey = '', pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
+    let pass = null, passRt = -1, passDs = -1, pend = null, ci = 0, sceneDs = 0, sceneRt = 0;
     // What the current draw pass already holds (WebGPU keeps state for the whole pass): a draw sets only what changes,
     // and payload draws keep one binding of the frame's vertex/index buffers, addressed by first vertex/index.
-    let stPass = null, stPipe, stBg1, stVp = '', stSc = '', stBf = -1, stVb, stVo = -1, stIb, stIf = '';
+    let stPass = null, stPipe, stBg1, stVp0 = -1, stVp1 = 0, stVp2 = 0, stVp3 = 0, stVp4 = 0, stVp5 = 0,
+      stSc0 = -1, stSc1 = 0, stSc2 = 0, stSc3 = 0, stBf = -1, stVb, stVo = -1, stIb, stIf = '';
     if (PROF) profSeq = [];
     // A clear that covers whole attachments waits (pend) and becomes the loadOp of the next pass on them;
     // if no such pass comes next, it runs alone as an empty pass with loadOp 'clear' (no timestamps: Metal skips them there).
     const endPass = keepClear => {
-      if (pass) { pass.end(); pass = null; passKey = ''; }
+      if (pass) { pass.end(); pass = null; passRt = -1; passDs = -1; }
       if (pend && !keepClear) { enc.beginRenderPass(passDesc(null, pend.mask & 1 ? pend.rt : 0, pend.mask & 6 ? pend.ds : 0, pend.k, pend)).end(); pend = null; }
     };
     // What a later command does to target id's colour (asp 0, the MSAA twin), depth (1) or stencil (2):
@@ -1193,78 +1260,96 @@ fn mulfloor(c: f32, w: f32) -> f32 {
           { bytesPerRow: 4 * tw }, [tw, th]);
         stats.texKb += tw * th >> 8;
       } else if (op === GPU_DRAW) {
-        const g = k => w[a + k];
-        const rt = res.get(g(D_RT)), ds = g(D_DS) ? res.get(g(D_DS)) : null;
-        const key = `${g(D_RT)}/${g(D_DS)}`;
-        if (ds && g(D_ZEN) && (ds.w >= 1000 || window.MaxChar?.enabled) && rt?.w === ds.w) { sceneDs = g(D_DS); sceneRt = g(D_RT); }
-        if (key !== passKey) {
-          const fold = pend && (!(pend.mask & 1) || pend.rt === g(D_RT)) && (!(pend.mask & 6) || pend.ds === g(D_DS));
+        const rtId = w[a + D_RT], dsId = w[a + D_DS];
+        const rt = res.get(rtId), ds = dsId ? res.get(dsId) : null;
+        if (ds && w[a + D_ZEN] && (ds.w >= 1000 || window.MaxChar?.enabled) && rt?.w === ds.w) { sceneDs = dsId; sceneRt = rtId; }
+        if (rtId !== passRt || dsId !== passDs) {
+          const fold = pend && (!(pend.mask & 1) || pend.rt === rtId) && (!(pend.mask & 6) || pend.ds === dsId);
           endPass(fold);
           let k = ci;      // the pass runs while the draws keep this target pair
-          while (k < cl.length && (w[cl[k]] & 0xff) === GPU_DRAW && w[cl[k] + 1 + D_RT] === g(D_RT) && w[cl[k] + 1 + D_DS] === g(D_DS)) k++;
-          pass = enc.beginRenderPass(passDesc('draw', g(D_RT), g(D_DS), k, fold ? pend : null));
-          if (PROF) profSeq.push(`D${rt ? rt.w : 0}:${g(D_RT)}/${g(D_DS)}${g(D_ZEN) ? 'z' : ''}x${k - ci + 1}`);
+          while (k < cl.length && (w[cl[k]] & 0xff) === GPU_DRAW && w[cl[k] + 1 + D_RT] === rtId && w[cl[k] + 1 + D_DS] === dsId) k++;
+          pass = enc.beginRenderPass(passDesc('draw', rtId, dsId, k, fold ? pend : null));
+          if (PROF) profSeq.push(`D${rt ? rt.w : 0}:${rtId}/${dsId}${w[a + D_ZEN] ? 'z' : ''}x${k - ci + 1}`);
           if (fold) pend = null;
-          passKey = key;
+          passRt = rtId; passDs = dsId;
         }
-        const nv = g(D_NVERT), ni = g(D_NIDX), stride = g(D_STRIDE), nvc = g(D_NVC), npc = g(D_NPC);
-        const ps = shaders.get(g(D_PS));
+        const nv = w[a + D_NVERT], ni = w[a + D_NIDX], stride = w[a + D_STRIDE], nvc = w[a + D_NVC], npc = w[a + D_NPC];
+        const ps = shaders.get(w[a + D_PS]);
         // uniforms (sm1.h SM1_U_*)
         const ub = uoff / 4, src = a + D_HDR, slot = uoff / U_STEP;
-        udf.set(f32.subarray(src, src + 4 * nvc), ub);
-        udf.set(f32.subarray(src + 4 * nvc, src + 4 * nvc + 4 * npc), ub + 1024);
-        if (unv[slot] > nvc) udf.fill(0, ub + 4 * nvc, ub + 4 * unv[slot]);
-        if (unp[slot] > npc) udf.fill(0, ub + 1024 + 4 * npc, ub + 1024 + 4 * unp[slot]);
+        const nv4 = 4 * nvc, np4 = 4 * npc;
+        for (let j = 0; j < nv4; j++) udf[ub + j] = f32[src + j];
+        const psrc = src + nv4, pub = ub + 1024;
+        for (let j = 0; j < np4; j++) udf[pub + j] = f32[psrc + j];
+        if (unv[slot] > nvc) udf.fill(0, ub + nv4, ub + 4 * unv[slot]);
+        if (unp[slot] > npc) udf.fill(0, pub + np4, pub + 4 * unp[slot]);
         unv[slot] = nvc; unp[slot] = npc;
-        udf[ub + 1056] = 1 / g(D_VP + 2); udf[ub + 1057] = 1 / g(D_VP + 3);
-        const fc = g(D_FOGC);
+        udf[ub + 1056] = 1 / w[a + D_VP + 2]; udf[ub + 1057] = 1 / w[a + D_VP + 3];
+        const fc = w[a + D_FOGC];
         udf[ub + 1060] = ((fc >>> 16) & 255) / 255; udf[ub + 1061] = ((fc >>> 8) & 255) / 255; udf[ub + 1062] = (fc & 255) / 255;
-        udw[ub + 1064] = g(D_AFUNC); udw[ub + 1065] = g(D_FOG);
-        udf[ub + 1068] = g(D_AREF) / 255;
-        for (let k = 0; k < 8; k++) udw[ub + 1072 + k] = g(D_TEX + D_TEXN * k + T_TT);
+        udw[ub + 1064] = w[a + D_AFUNC]; udw[ub + 1065] = w[a + D_FOG];
+        udf[ub + 1068] = w[a + D_AREF] / 255;
+        for (let k = 0; k < 8; k++) udw[ub + 1072 + k] = w[a + D_TEX + D_TEXN * k + T_TT];
         // vertices and indices: in the payload, or in resident buffers (GPU_BUFFER)
-        const rvb = g(D_RVB), vsrc = 4 * (src + 4 * nvc + 4 * npc), vbytes = rvb ? 0 : nv * stride;
+        const rvb = w[a + D_RVB], vsrc = 4 * (src + nv4 + np4), vbytes = rvb ? 0 : nv * stride;
         if (!rvb && stride) voff = Math.ceil(voff / stride) * stride;
         if (!rvb) {
           vdata.set(u8.subarray(vsrc, vsrc + vbytes), voff);
-          if (ni) idata.set(w.subarray(src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2), src + 4 * nvc + 4 * npc + ((vbytes + 3) >> 2) + ni), ioff / 4);
+          if (ni) idata.set(w.subarray(src + nv4 + np4 + ((vbytes + 3) >> 2), src + nv4 + np4 + ((vbytes + 3) >> 2) + ni), ioff / 4);
         }
-        const sc = [g(D_SC), g(D_SC + 1), Math.min(g(D_SC + 2), rt.w), Math.min(g(D_SC + 3), rt.h)];
-        if (sc[2] > sc[0] && sc[3] > sc[1]) {
-          if (pass !== stPass) { stPass = pass; stPipe = stBg1 = stVb = stIb = undefined; stVp = stSc = stIf = ''; stBf = stVo = -1; }
+        const sc0 = w[a + D_SC], sc1 = w[a + D_SC + 1], sc2 = Math.min(w[a + D_SC + 2], rt.w), sc3 = Math.min(w[a + D_SC + 3], rt.h);
+        if (sc2 > sc0 && sc3 > sc1) {
+          if (pass !== stPass) {
+            stPass = pass; stPipe = stBg1 = stVb = stIb = undefined;
+            stVp0 = stSc0 = stBf = stVo = -1; stIf = '';
+          }
           const pl = pipeline(w, a, stride, rt.sc || 1);
           if (pl !== stPipe) { pass.setPipeline(pl); stPipe = pl; }
-          pass.setBindGroup(0, uBind, [uoff]);
-          const entries = [];
-          let bkey = ps.texMask;
-          for (let k = 0; k < 8; k++) if (ps.texMask >> k & 1) {
-            const t = w.subarray(a + D_TEX + D_TEXN * k, a + D_TEX + D_TEXN * (k + 1));
-            const img = t[T_ID] ? res.get(t[T_ID]) : null, cube = (t[T_TT] & T_CUBE) !== 0;
-            const smp = sampler(t), v2 = !cube && img?.view || dummyView, vc = cube && img?.cube || dummyCubeView;
-            bkey += `,${oid(smp)},${oid(v2)},${oid(vc)}`;
-            entries.push({ binding: 2 * k, resource: smp }, { binding: 2 * k + 1, resource: v2 }, { binding: 16 + k, resource: vc });
-          }
-          let bg = texBinds.get(bkey);
-          if (!bg) {
-            if (texBinds.size >= 8192) texBinds.clear();     // keys of destroyed textures are never asked again
-            texBinds.set(bkey, bg = device.createBindGroup({ layout: texBgl(ps.texMask), entries }));
-          }
-          if (bg !== stBg1) { pass.setBindGroup(1, bg); stBg1 = bg; }
-          const vp = `${g(D_VP)},${g(D_VP + 1)},${g(D_VP + 2)},${g(D_VP + 3)},${w[a + D_VP + 4]},${w[a + D_VP + 5]}`;
-          if (vp !== stVp) { pass.setViewport(g(D_VP), g(D_VP + 1), g(D_VP + 2), g(D_VP + 3), f32[a + D_VP + 4], f32[a + D_VP + 5]); stVp = vp; }
-          const scs = `${sc[0]},${sc[1]},${sc[2]},${sc[3]}`;
-          if (scs !== stSc) { pass.setScissorRect(sc[0], sc[1], sc[2] - sc[0], sc[3] - sc[1]); stSc = scs; }
-          const bf = g(D_BFACTOR);
-          if (g(D_BLEND) && (bf !== stBf)) { pass.setBlendConstant([((bf >>> 16) & 255) / 255, ((bf >>> 8) & 255) / 255, (bf & 255) / 255, (bf >>> 24) / 255]); stBf = bf; }
-          if (rvb) {
-            const vb = gbufs.get(rvb);
-            if (vb !== stVb || g(D_RVOFF) !== stVo) { pass.setVertexBuffer(0, vb, g(D_RVOFF)); stVb = vb; stVo = g(D_RVOFF); }
-            if (g(D_RIB)) {
-              const ib = gbufs.get(g(D_RIB)), f = ifmt(w, a);
-              if (ib !== stIb || f !== stIf) { pass.setIndexBuffer(ib, f); stIb = ib; stIf = f; }
-              pass.drawIndexed(ni, 1, g(D_RFIRST), w[a + D_RBASEV] | 0);
+          UOFF_ARR[0] = uoff;
+          pass.setBindGroup(0, uBind, UOFF_ARR);
+          const mask = ps.texMask & 0xff;
+          let bg = texBinds.get(mask);
+          if (bg !== undefined && mask !== 0) {
+            for (let k = 0; k < 8; k++) if ((mask >>> k) & 1) {
+              const to = a + D_TEX + D_TEXN * k;
+              const tid = w[to + T_ID];
+              const img = tid ? res.get(tid) : null, cube = (w[to + T_TT] & T_CUBE) !== 0;
+              const smp = samplerFrom(w, to), v2 = (!cube && img?.view) || dummyView, vc = (cube && img?.cube) || dummyCubeView;
+              bg = bg.get(oid(smp));
+              if (bg === undefined) break;
+              bg = bg.get(oid(v2));
+              if (bg === undefined) break;
+              bg = bg.get(oid(vc));
+              if (bg === undefined) break;
             }
-            else pass.draw(nv, 1, g(D_RFIRST));
+          }
+          if (bg === undefined) bg = makeTexBindGroup(mask, w, a);
+          if (bg !== stBg1) { pass.setBindGroup(1, bg); stBg1 = bg; }
+          const vp0 = w[a + D_VP], vp1 = w[a + D_VP + 1], vp2 = w[a + D_VP + 2], vp3 = w[a + D_VP + 3], vp4 = w[a + D_VP + 4], vp5 = w[a + D_VP + 5];
+          if (vp0 !== stVp0 || vp1 !== stVp1 || vp2 !== stVp2 || vp3 !== stVp3 || vp4 !== stVp4 || vp5 !== stVp5) {
+            pass.setViewport(vp0, vp1, vp2, vp3, f32[a + D_VP + 4], f32[a + D_VP + 5]);
+            stVp0 = vp0; stVp1 = vp1; stVp2 = vp2; stVp3 = vp3; stVp4 = vp4; stVp5 = vp5;
+          }
+          if (sc0 !== stSc0 || sc1 !== stSc1 || sc2 !== stSc2 || sc3 !== stSc3) {
+            pass.setScissorRect(sc0, sc1, sc2 - sc0, sc3 - sc1);
+            stSc0 = sc0; stSc1 = sc1; stSc2 = sc2; stSc3 = sc3;
+          }
+          const bf = w[a + D_BFACTOR];
+          if (w[a + D_BLEND] && (bf !== stBf)) {
+            BF_ARR[0] = ((bf >>> 16) & 255) / 255; BF_ARR[1] = ((bf >>> 8) & 255) / 255; BF_ARR[2] = (bf & 255) / 255; BF_ARR[3] = (bf >>> 24) / 255;
+            pass.setBlendConstant(BF_ARR);
+            stBf = bf;
+          }
+          if (rvb) {
+            const vb = gbufs.get(rvb), rvoff = w[a + D_RVOFF];
+            if (vb !== stVb || rvoff !== stVo) { pass.setVertexBuffer(0, vb, rvoff); stVb = vb; stVo = rvoff; }
+            const rib = w[a + D_RIB];
+            if (rib) {
+              const ib = gbufs.get(rib), f = ifmt(w, a);
+              if (ib !== stIb || f !== stIf) { pass.setIndexBuffer(ib, f); stIb = ib; stIf = f; }
+              pass.drawIndexed(ni, 1, w[a + D_RFIRST], w[a + D_RBASEV] | 0);
+            }
+            else pass.draw(nv, 1, w[a + D_RFIRST]);
           } else if (stride) {   // one binding of the frame's vertex/index buffers, addressed per draw
             if (vbuf !== stVb || stVo !== 0) { pass.setVertexBuffer(0, vbuf); stVb = vbuf; stVo = 0; }
             if (ni) {

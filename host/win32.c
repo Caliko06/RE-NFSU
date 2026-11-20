@@ -1190,8 +1190,7 @@ void win32_init(Ctx *c, uint32_t image_size) {
     st(c, SCREEN_ADDR + 0xb0, host_addr_of("rn", "persona_step"), 4);  // PATCH 0x44c573: rival personalities with ?pool=1 or RN_AI=2 (RN_AI=0 = original)
     st(c, SCREEN_ADDR + 0xb4, host_addr_of("rn", "persona_clear"), 4); // PATCH 0x45c8c2: clean rivals pass wide (personalities on)
     st(c, SCREEN_ADDR + 0xb8, host_addr_of("rn", "neon_pass"), 4);     // PATCH 0x56f21e: neon puddle (?pool=1)
-    st(c, SCREEN_ADDR + 0xa4, host_addr_of("rn", "horn_start"), 4);
-    st(c, SCREEN_ADDR + 0xc8, host_addr_of("rn", "mc_views"), 4);      // PATCH 0x4479be: camera movers, then the pedestrian's camera (host/mc.c, RN_MC=0 = off)    // PATCH 0x52536a: traffic horn probe/fix (RN_HORNLOG / RN_HORNFIX, off)
+    st(c, SCREEN_ADDR + 0xa4, host_addr_of("rn", "horn_start"), 4);   // PATCH 0x52536a: traffic horn probe/fix (RN_HORNLOG / RN_HORNFIX, off)
 
     lights_init(c);                            // host/lights.c: live brake lights (RN_LIGHTS=0 = original)
     const char *steer = getenv("RN_STEER");    // PATCH 0x460a80: 1 = the keys steer through the game's gamepad model

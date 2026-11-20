@@ -2718,23 +2718,33 @@ void main() {}`;
          if (tex._mipsDirty) { generateColorMips(tex); if (texView._bindTexture) texView._bindTexture(); }
          return samp._gl;
       }
-      if (samp._rnColor) return samp._rnColor;   // RN: no key string per draw (garbage in Safari)
+      const d = samp.desc || {};
+      const minF = d.minFilter || 'nearest', magF = d.magFilter || 'nearest';
+      const addrU = d.addressModeU || 'clamp-to-edge', addrV = d.addressModeV || 'clamp-to-edge', addrW = d.addressModeW || 'clamp-to-edge';
+      const aniso = Math.max(1, d.maxAnisotropy || 1);
+      let bySamp = device._colorSamplerBySamp;
+      if (!bySamp) bySamp = device._colorSamplerBySamp = new WeakMap();
+      const cached = bySamp.get(samp);
+      if (cached && cached.minF === minF && cached.magF === magF &&
+          cached.addrU === addrU && cached.addrV === addrV && cached.addrW === addrW && cached.aniso === aniso) {
+         return cached.s;
+      }
       device._colorSamplers = device._colorSamplers || {};
-      const aniso = Math.max(1, samp.desc.maxAnisotropy || 1);
-      const key = (samp.desc.minFilter || 'nearest') + ':' + (samp.desc.magFilter || 'nearest') + ':' +
-         (samp.desc.addressModeU || 'clamp-to-edge') + ':' + (samp.desc.addressModeV || 'clamp-to-edge') + ':' +
-         (samp.desc.addressModeW || 'clamp-to-edge') + ':' + aniso;
-      if (device._colorSamplers[key]) return samp._rnColor = device._colorSamplers[key];
-      const gl = device.gl;
-      const s = gl.createSampler();
-      gl.samplerParameteri(s, GL.TEXTURE_MIN_FILTER, samp.desc.minFilter === 'linear' ? GL.LINEAR : GL.NEAREST);
-      gl.samplerParameteri(s, GL.TEXTURE_MAG_FILTER, samp.desc.magFilter === 'linear' ? GL.LINEAR : GL.NEAREST);
-      gl.samplerParameteri(s, GL.TEXTURE_WRAP_S, WRAP_MODE[samp.desc.addressModeU] || GL.CLAMP_TO_EDGE);
-      gl.samplerParameteri(s, GL.TEXTURE_WRAP_T, WRAP_MODE[samp.desc.addressModeV] || GL.CLAMP_TO_EDGE);
-      gl.samplerParameteri(s, GL.TEXTURE_WRAP_R, WRAP_MODE[samp.desc.addressModeW] || GL.CLAMP_TO_EDGE);
-      applyAniso(gl, s, aniso);
-      device._colorSamplers[key] = s;
-      return samp._rnColor = s;
+      const key = minF + ':' + magF + ':' + addrU + ':' + addrV + ':' + addrW + ':' + aniso;
+      let s = device._colorSamplers[key];
+      if (!s) {
+         const gl = device.gl;
+         s = gl.createSampler();
+         gl.samplerParameteri(s, GL.TEXTURE_MIN_FILTER, minF === 'linear' ? GL.LINEAR : GL.NEAREST);
+         gl.samplerParameteri(s, GL.TEXTURE_MAG_FILTER, magF === 'linear' ? GL.LINEAR : GL.NEAREST);
+         gl.samplerParameteri(s, GL.TEXTURE_WRAP_S, WRAP_MODE[addrU] || GL.CLAMP_TO_EDGE);
+         gl.samplerParameteri(s, GL.TEXTURE_WRAP_T, WRAP_MODE[addrV] || GL.CLAMP_TO_EDGE);
+         gl.samplerParameteri(s, GL.TEXTURE_WRAP_R, WRAP_MODE[addrW] || GL.CLAMP_TO_EDGE);
+         applyAniso(gl, s, aniso);
+         device._colorSamplers[key] = s;
+      }
+      bySamp.set(samp, { s, minF, magF, addrU, addrV, addrW, aniso });
+      return s;
    }
 
       function depthNearestSampler(device) {
@@ -2775,9 +2785,10 @@ void main() {}`;
       // RN: uniform locations cached per program. Asking each draw made ~150k WebGLUniformLocation objects a second; Safari keeps
 // them in native memory the GC does not see (8 GB in 30 s, then the tab is killed: iPhone XR froze in the menu).
 function uloc(gl, prog, name) {
-   const m = prog._ul || (prog._ul = new Map());
-   let l = m.get(name);
-   if (l === undefined) { l = gl.getUniformLocation(prog, name); m.set(name, l); }
+   const ver = prog._linkVer || 0;
+   if (!prog._ul || prog._ulVer !== ver) { prog._ul = new Map(); prog._ulVer = ver; }
+   let l = prog._ul.get(name);
+   if (l === undefined) { l = gl.getUniformLocation(prog, name); prog._ul.set(name, l); }
    return l;
 }
 // RN: what a texture binding needs at each draw (its uniform names, locations, depth compare), once per pipeline:
@@ -2786,13 +2797,22 @@ function uloc(gl, prog, name) {
 // draw (~650k GL calls a second in the menus); in Safari each call crosses to the GPU process. Every caller uses this one
 // context object, so the remembered values stay true; deleting a program or vertex array forgets its entry.
 function skipSameState(gl) {
+   if (gl._skipSameState) return;
+   gl._skipSameState = true;
    const caps = new Map();
+   const resets = [];
    const en = gl.enable, dis = gl.disable;
    gl.enable = c => { if (caps.get(c) !== true) { caps.set(c, true); en.call(gl, c); } };
    gl.disable = c => { if (caps.get(c) !== false) { caps.set(c, false); dis.call(gl, c); } };
+   const lp = gl.linkProgram;
+   gl.linkProgram = p => {
+      if (p) { if (p._ul) p._ul.clear(); p._ulVer = p._linkVer = (p._linkVer || 0) + 1; }
+      lp.call(gl, p);
+   };
    const one = (name, forget) => {
       const f = gl[name]; let last;
       gl[name] = v => { if (v !== last) { last = v; f.call(gl, v); } };
+      resets.push(() => { last = undefined; });
       if (forget) { const d = gl[forget]; gl[forget] = o => { if (o === last) last = undefined; d.call(gl, o); }; }
    };
    one('useProgram', 'deleteProgram'); one('bindVertexArray', 'deleteVertexArray'); one('activeTexture'); one('frontFace');
@@ -2800,19 +2820,31 @@ function skipSameState(gl) {
    const four = name => {
       const f = gl[name]; let a, b, c, d;
       gl[name] = (w, x, y, z) => { if (w !== a || x !== b || y !== c || z !== d) { a = w; b = x; c = y; d = z; f.call(gl, w, x, y, z); } };
+      resets.push(() => { a = b = c = d = undefined; });
    };
    four('colorMask'); four('blendFuncSeparate');
-   const two = name => { const f = gl[name]; let a, b; gl[name] = (x, y) => { if (x !== a || y !== b) { a = x; b = y; f.call(gl, x, y); } }; };
+   const two = name => {
+      const f = gl[name]; let a, b;
+      gl[name] = (x, y) => { if (x !== a || y !== b) { a = x; b = y; f.call(gl, x, y); } };
+      resets.push(() => { a = b = undefined; });
+   };
    two('blendEquationSeparate');
+   gl._resetSameState = () => {
+      caps.clear();
+      for (let i = 0; i < resets.length; i++) resets[i]();
+   };
 }
 function texBinding(gl, pipeline, index, binding) {
-   const c = pipeline._texB || (pipeline._texB = new Map()), k = index * 4096 + binding;
-   let t = c.get(k);
-   if (!t) {
+   const groups = pipeline._texB || (pipeline._texB = new Map());
+   let c = groups.get(index);
+   if (!c) groups.set(index, c = new Map());
+   const ver = pipeline.prog._linkVer || 0;
+   let t = c.get(binding);
+   if (!t || t._ver !== ver) {
       const texName = findTextureUniformName(pipeline, index, binding);
-      t = { texName, g: uloc(gl, pipeline.prog, 'webgpu_g' + index + '_b' + binding), t: texName ? uloc(gl, pipeline.prog, texName) : null,
-         compareUse: textureIsCompareUse(pipeline, texName) };
-      c.set(k, t);
+      t = { _ver: ver, texName, g: uloc(gl, pipeline.prog, 'webgpu_g' + index + '_b' + binding),
+         t: texName ? uloc(gl, pipeline.prog, texName) : null, compareUse: textureIsCompareUse(pipeline, texName) };
+      c.set(binding, t);
    }
    return t;
 }
@@ -3552,7 +3584,11 @@ function pairedSampler(pipeline, index, bindGroup, texName) {
          skipSameState(gl);
          gl.canvas.addEventListener('webglcontextlost', (e) => {
             e.preventDefault();
+            if (gl._resetSameState) gl._resetSameState();
             this._lose('unknown', 'WebGL context lost.');
+         });
+         gl.canvas.addEventListener('webglcontextrestored', () => {
+            if (gl._resetSameState) gl._resetSameState();
          });
          return gl;
       }
