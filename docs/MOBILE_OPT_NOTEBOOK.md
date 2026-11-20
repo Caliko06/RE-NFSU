@@ -72,3 +72,9 @@ After `31c1167` (1024 MB WASM, 384 MB guest, 4 MB stacks) + `57c6aee` (`gpu.js` 
 - `host/d3d9.c:1536-1618`: DXT1/3/5 is CPU-decoded to RGBA8 in `decode_texels()` -> `upload_level()` -> `GPU_TEXDATA`.
 - Native BC1/2/3 is **not viable for mobile WebGL2** (`web/webgpu_gl.js` lacks `WEBGL_compressed_texture_s3tc` and mobile GPUs use ASTC/ETC2, not BCn).
 - If a 512×512 mobile texture cap is needed later, the safe hook is `upload_level()` (`host/d3d9.c:1602`) skipping hashes in `web/remaster/index_fe_v2.tsv` (1,135 HUD/FE keys) so UI/HUD stays crisp.
+
+### 5. `PC_Loading.fng` 375 fps Fix (`host/d3d9.c:787-814`) & WebGL 2 Re-Test
+- Added a universal 60 fps (`16.67 ms`) ceiling in `pace_plan()` (`host/d3d9.c:787-814`) whenever `pace_due == 0` (sleeps in `pace_sleep()` without the GIL; zero wait on frames already paced `<= 60 fps`). Needed to cover `PC_Loading.fng` even after `HUD_SingleRace.fng` mounts (`rn_racing()` becomes true before 3D race HUD).
+- Rebuilt `speed.wasm` + `dist/` (`5,677` files, `2.10 GB`) and re-ran Safari/WebKit WebGL 2 (`NOGPU=1`, 90 s, 1920×1080):
+  - **Before:** 375 fps in `PC_Loading.fng`, `5,538 MB`, 7 `HUNG`, killed at 66 s, never reached HUD.
+  - **After:** `PC_Loading.fng` paced cleanly; reached **`d3d9 race HUD` in 29.15 s**; **0 HUNG, 0 STOP, 0 crashes** across 96 s; flat `2,009–2,082 MB` for 25 s of racing (`t=35..60 s`), climbing to `4,032 MB` at `91 s` (remaining late-race climb traced to `web/webgpu_gl.js` per-draw closure allocations in `_preDraw`/`drawIndexed` at ~2,200 draws/frame).

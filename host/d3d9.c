@@ -785,22 +785,33 @@ static double pace_box[2], pace_next, pace_due;
 #include <emscripten.h>
 #include <emscripten/threading.h>
 static void pace_plan(Ctx *c) {
+    static double nr_next;
     pace_due = 0;
     double per = pace_box[1];
-    if (per < 4 || per > 50) return;
-    // The game's frame target [0x6f0890] (1/60 s; 1/30 with RN_FPS=30, host/win32.c): k refreshes per game frame.
-    double tgt = 1000.0 * ldf(c, 0x6f0890);
-    if (tgt < 10 || tgt > 50) tgt = 1000.0 / 60;
-    int k = (int)(tgt / per + 0.5);
-    if (k < 1) k = 1;
-    int on = fabs(k * per - tgt) <= 1.5;                    // else the limiter keeps its race wait
-    uint32_t m = ld(c, 0x707fc8, 4), rs = ld(c, 0x7361f0, 4);
-    if (!!(m & 0x40) != on) st(c, 0x707fc8, on ? m | 0x40 : m & ~0x40u, 4);
-    if (!on || !rn_racing() || !rs || ld(c, rs, 4) == 1) { pace_next = 0; return; }
-    double now = emscripten_get_now(), b = pace_box[0] + per / 2;
-    double next = pace_next ? pace_next + k * per : now;
-    if (next < now) next = now;                             // missed its slot: the next boundary
-    pace_next = pace_due = b + ceil((next - b) / per - 0.25) * per;   // onto the refresh grid
+    if (per >= 4 && per <= 50) {
+        // The game's frame target [0x6f0890] (1/60 s; 1/30 with RN_FPS=30, host/win32.c): k refreshes per game frame.
+        double tgt = 1000.0 * ldf(c, 0x6f0890);
+        if (tgt < 10 || tgt > 50) tgt = 1000.0 / 60;
+        int k = (int)(tgt / per + 0.5);
+        if (k < 1) k = 1;
+        int on = fabs(k * per - tgt) <= 1.5;                    // else the limiter keeps its race wait
+        uint32_t m = ld(c, 0x707fc8, 4), rs = ld(c, 0x7361f0, 4);
+        if (!!(m & 0x40) != on) st(c, 0x707fc8, on ? m | 0x40 : m & ~0x40u, 4);
+        if (on && rn_racing() && rs && ld(c, rs, 4) != 1) {
+            nr_next = 0;
+            double now = emscripten_get_now(), b = pace_box[0] + per / 2;
+            double next = pace_next ? pace_next + k * per : now;
+            if (next < now) next = now;                         // missed its slot: the next boundary
+            pace_next = pace_due = b + ceil((next - b) / per - 0.25) * per;   // onto the refresh grid
+            return;
+        }
+    }
+    pace_next = 0;
+    // Cap any uncapped Present() loop (e.g. PC_Loading.fng, even while HUD_SingleRace.fng is mounted)
+    // to <= 60 fps (16.67 ms) without holding the GIL; frames already paced <= 60 fps pay zero wait.
+    double now = emscripten_get_now();
+    if (nr_next > now) pace_due = nr_next;
+    nr_next = (nr_next > now ? nr_next : now) + (1000.0 / 60.0);
 }
 static void pace_sleep(void) {
     static uint32_t z;
