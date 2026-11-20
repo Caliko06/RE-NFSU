@@ -96,7 +96,11 @@ build_data_chunks(ROOT, D)
 open(os.path.join(D, "_headers"), "w").write(
     "/*\n  Cross-Origin-Opener-Policy: same-origin\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Resource-Policy: same-origin\n")
 with open(os.path.join(D, "_headers"), "a") as headers:
-    headers.write('/data-chunks/*\n  Content-Encoding: gzip\n  Content-Type: application/octet-stream\n')
+    headers.write(
+        "/data-chunks/*\n  Content-Encoding: gzip\n  Content-Type: application/octet-stream\n"
+        "  Cache-Control: public, max-age=31536000, immutable\n"
+        "/game/*\n  Cache-Control: public, max-age=31536000, immutable\n"
+    )
 
 
 def sha(p):

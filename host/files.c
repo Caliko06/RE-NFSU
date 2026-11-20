@@ -310,7 +310,12 @@ static int blk_fetch(Blk *b) {
 }
 
 // ---- web: bringing files ahead of the game, NPRE requests at a time ------------------------------
-#define NPRE 4
+static int npre(void) {     // RN_NPRE (1..4, default 4): prefetch workers; phones ask for 2 (web/boot.js)
+    const char *e = getenv("RN_NPRE");
+    int n = e && *e ? atoi(e) : 4;
+    return n < 1 ? 1 : n > 4 ? 4 : n;
+}
+#define NPRE npre()
 #define NQ 1024
 static struct { char real[256]; uint64_t off; uint32_t len; int trk; } preq[NQ];   // trk: queued by gf_prefetch_track (droppable)
 static int queued_id;                 // the track whose lines were queued last (under blk_mu)

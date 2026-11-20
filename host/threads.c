@@ -282,7 +282,7 @@ static void *run_timer(void *arg) {
 static void start_fn(Thread *t, void *(*fn)(void *)) {
     pthread_attr_t a;
     pthread_attr_init(&a);
-    pthread_attr_setstacksize(&a, 16u << 20);   // lifted guest calls are host calls
+    pthread_attr_setstacksize(&a, 4u << 20);   // lifted guest calls are host calls
     t->started = 1;
     if (pthread_create(&t->pt, &a, fn, t)) { fprintf(stderr, "pthread_create failed\n"); exit(1); }
 }

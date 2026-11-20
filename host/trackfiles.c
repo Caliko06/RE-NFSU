@@ -60,7 +60,10 @@ static void hooks_install(void) {
 static int overlay_file(const char *name, char *real, size_t n, uint64_t *size) {
 #ifdef __EMSCRIPTEN__
     snprintf(real, n, "world/%s", name);
-    double len = file_head(real);
+    static char hname[64]; static double hlen = -2;   // the HEAD answer is kept: every Cars/TEXTURES.BIN open used to repeat it
+    double len;
+    if (hlen != -2 && !strcmp(hname, name)) len = hlen;
+    else { len = file_head(real); snprintf(hname, sizeof hname, "%s", name); hlen = len; }
     if (len < 0) { rn_log("OVERLAY: no file /%s, the original is used", real); return 0; }
     *size = (uint64_t)len;
 #else

@@ -8,7 +8,7 @@
 static inline int rn_env(const char *name, int dflt) { const char *e = getenv(name); return e && *e ? atoi(e) : dflt; }
 
 // Guest memory layout (no relocations in Speed.exe: the image must sit at 0x400000).
-#define GUEST_MEM   0x40000000u     // 1 GB flat guest space
+#define GUEST_MEM   0x18000000u     // 384 MB flat guest space
 #define TEB_ADDR    0x00010000u
 #define PEB_ADDR    0x00011000u
 #define STR_ADDR    0x00012000u     // command line, environment, module name

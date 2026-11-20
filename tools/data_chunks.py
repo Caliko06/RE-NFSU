@@ -15,6 +15,12 @@ def build(root, dist):
         total = (dist / path).stat().st_size
         if total <= 8 << 20:
             pieces.add((path, 0, total))
+    # Every car folder in game/Cars/ can be picked at runtime by host/rivals.c; gf_prefetch/gf_read fetches
+    # files <= 8 MB whole (GEOMETRY.BIN, TEXTURES.BIN, small VINYLS.BIN) and the first 256 KB of larger VINYLS.BIN.
+    for p in (dist / 'game/Cars').rglob('*.BIN'):
+        rel = p.relative_to(dist).as_posix()
+        total = p.stat().st_size
+        pieces.add((rel, 0, total if total <= 8 << 20 else 256 << 10))
     # Actual cold boot -> HUD reads outside the hints (logs/loadzip/before.json).
     # Keep the measured recipe in source so ordinary build_public.py reproduces the pack.
     for line in (root / 'census/data_chunks.tsv').read_text().splitlines()[1:]:

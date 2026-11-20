@@ -721,7 +721,7 @@ void free_tick(Ctx *c) {
     }
     for (int j = 0; j < ncand; j++) {
         uint32_t obj = cand[j], veh = ld(c, obj + 4, 4);
-        if (ld(c, obj, 4) != 0x6c89f0 || veh < 0x10000 || veh > 0x3fff0000) continue;
+        if (ld(c, obj, 4) != 0x6c89f0 || veh < 0x10000 || veh > (GUEST_MEM - 0x10000)) continue;
         uint32_t e = ld(c, veh + 0x14, 4);
         if (!e || ld(c, e + 4, 4) != 2) continue;
         uint32_t ctx = obj + 0x2c, path = ld(c, ctx + 0x3a8, 4), cnt = path ? ld(c, path + 4, 4) : 0;
@@ -767,7 +767,7 @@ void free_tick(Ctx *c) {
         last[k][0] = x, last[k][1] = y;
     }
     for (int j = 0; j < ncand; j++) {
-        uint32_t veh = ld(c, cand[j] + 4, 4), e = veh > 0x10000 && veh < 0x3fff0000 ? ld(c, veh + 0x14, 4) : 0;
+        uint32_t veh = ld(c, cand[j] + 4, 4), e = veh > 0x10000 && veh < (GUEST_MEM - 0x10000) ? ld(c, veh + 0x14, 4) : 0;
         if (!e || ld(c, e + 4, 4) != 2) continue;
         char al[200]; int a = snprintf(al, sizeof al, "FREE actions %s:", G(e + 0x73c));
         for (int ty = 0; ty < 0x16; ty++) if (acts[j][ty]) a += snprintf(al + a, sizeof al - a, " %x:%u", ty, acts[j][ty]);

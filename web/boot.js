@@ -108,7 +108,10 @@ async function download(url, what) {
   }
   RN_APP.set('load');
   if (window.RN_HOLD) await window.RN_HOLD;       // ?fast=1: scene B draws first (web/index.html)
-  const exe = new Uint8Array(await (await download('pc/Speed.exe', 'Descargando')).arrayBuffer());
+  // Speed.exe downloads in parallel with speed.wasm (instantiateWasm below); both resolve before preRun.
+  let exe = null;
+  const exeP = download('pc/Speed.exe', 'Descargando').then(r => r.arrayBuffer()).then(b => new Uint8Array(b));
+  exeP.catch(() => {});
   // Game files are read on demand by the game thread (host/files.c), not loaded here.
   // F-Max (archived lane, off by default since 2026-11-11): ?max=1 in Remaster makes the pedestrian Max Payne when the local Max
   // build answers on /mp/ (tools/serve.py). It boots a second game in the page; with the UG2 city loaded it ended in
@@ -121,8 +124,8 @@ async function download(url, what) {
     onAbort: what => line('STOP wasm abort: ' + what),
     // The 70 MB module compiles while it downloads, as Emscripten's own loader does, with the bytes counted on the gate.
     instantiateWasm: (imports, done) => {
-      download('out/speed.wasm', 'Descargando').then(r => WebAssembly.instantiateStreaming(r, imports))
-        .then(w => { RN_APP.say('Arrancando…'); done(w.instance, w.module); }, e => line('STOP wasm: ' + e.message));
+      Promise.all([exeP, download('out/speed.wasm', 'Descargando').then(r => WebAssembly.instantiateStreaming(r, imports))])
+        .then(([e, w]) => { exe = e; RN_APP.say('Arrancando…'); done(w.instance, w.module); }, e => line('STOP wasm: ' + e.message));
       return {};
     },
     preRun: [m => {
@@ -156,7 +159,7 @@ async function download(url, what) {
       // ?fps=30: the host frame pacer targets 30 fps (web/mode.js degradation switches; ?fx=0 is read there)
       if (RN_Q.get('fps') === '30') m.ENV.RN_FPS = '30';
       // host/files.c: the cache of fetched pieces (256 MB elsewhere). Phones: 96 MB, enough for the boot hint, one track and the cars (wasm break 1342 MB with 16 MB, 1523 with 256 on desktop, loadcap 2026-11-18); an iPhone tab dies near 1.5 GB.
-      if (RN_PHONE) m.ENV.RN_RANGEMB = '96';
+      if (RN_PHONE) { m.ENV.RN_RANGEMB = '96'; m.ENV.RN_NPRE = '2'; }   // ?env= below can override
       // host/files.c: helper threads bring what this entry always reads (web/entry_hint.tsv) while the engine boots and the menus pass; then each track's race load and the cars.
       m.ENV.RN_PREFETCH = 'boot';
       if (RN_Q.get('fx') === '0' || RN_Q.get('fps') === '30') line(`lite: fx ${RN_Q.get('fx') === '0' ? 'off' : 'on'}, fps ${RN_Q.get('fps') === '30' ? 30 : 60}`);
@@ -259,6 +262,6 @@ async function download(url, what) {
   memTick = setInterval(() => {
     if (RN_APP.state === 'stop') { clearInterval(memTick); memTick = 0; return; }
     const v = [0, 1, 2].map(k => M._rn_mem_mb(k)), key = v.map(x => x >> 4).join();
-    if (key !== memLast) { memLast = key; line(`mem: wasm break ${v[0]} MB (guest 1024 untouched until used), guest heap ${v[1]} MB, guest virtual ${v[2]} MB`); }
+    if (key !== memLast) { memLast = key; line(`mem: wasm break ${v[0]} MB (guest 384 untouched until used), guest heap ${v[1]} MB, guest virtual ${v[2]} MB`); }
   }, 2000);
 })();

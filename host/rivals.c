@@ -55,7 +55,9 @@ void cars_hook(Ctx *c) {
     if (h == last) return;
     last = h;
     uint32_t seen = 0; int folders = 0;
-    for (uint32_t i = 0; i < n; i++) {
+    const char *rm = getenv("RN_RANGEMB");
+    int cap = rm && atoi(rm) > 0 && atoi(rm) <= 96 ? 5 : 64;   // phone cache: the first entrant (the player) + 4 unique rivals, the rest load on demand
+    for (uint32_t i = 0; i < n && folders < cap; i++) {
         uint32_t t = ld(c, tab + 0x750 * i + 0x10, 4);
         if (t >= 35 || (seen >> t & 1)) continue;
         seen |= 1u << t;
