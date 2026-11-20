@@ -402,12 +402,14 @@ void gf_prefetch(const char *gpath) {
 #endif
 }
 
+#ifdef __EMSCRIPTEN__
 // Under blk_mu: forget the track requests no thread has started yet (the previous highlight's); blocks in flight or cached stay.
 static void track_drop(void) {
     for (unsigned k = pre_head; k != pre_tail; k++)
         if (preq[k % NQ].trk && preq[k % NQ].len) { rn_load[0] -= preq[k % NQ].len >> 10; preq[k % NQ].len = 0; }
     queued_id = 0;
 }
+#endif
 
 // The track the race will load is known ([0x78a2f0], written by the mode setup when the player confirms): its hint lines
 // "t<id> \t path \t offset \t length" come now, once per call, while they fit in the cache.
